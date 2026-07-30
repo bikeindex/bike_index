@@ -9,8 +9,11 @@ module Org
       # registrations on the show page). Pass render_sortable to enable sort links.
       class Component < ApplicationComponent
         # UI::Table caches each row without digesting the cells rendered into it, so
-        # bump this whenever this component's or UI::Table's markup changes
+        # the digest has to span every component rendered into a row. Bump the version
+        # only to force a flush the digest can't see
         CACHE_VERSION = "bikes_4"
+        CACHED_MARKUP = ["app/components/org/search_results/bikes_table/**/*", "app/components/ui/table/**/*",
+          "app/components/org/origin_display/**/*", "app/components/ui/address_display/**/*"].freeze
 
         delegate :additional_registration_fields, :column_renames, to: :settings_component
 
@@ -20,7 +23,7 @@ module Org
           @bikes = bikes
           @current_user = current_user
           @render_sortable = render_sortable
-          @cache_key = cache_key || "org-#{organization.id}-#{CACHE_VERSION}"
+          @cache_key = cache_key || "org-#{organization.id}-#{CACHE_VERSION}-#{self.class.markup_digest(*CACHED_MARKUP)}"
           @sortable_search_params = sortable_search_params
           @bike_sticker = bike_sticker
           @settings_component = settings_component

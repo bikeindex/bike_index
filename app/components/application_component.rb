@@ -3,6 +3,27 @@
 class ApplicationComponent < ViewComponent::Base
   include ApplicationComponentHelper
 
+  # A digest of the component files rendered inside a fragment cache, for folding into
+  # that cache's key. Fragment caches don't digest their own templates, so without this
+  # editing markup serves stale HTML until someone remembers to bump a version constant.
+  #
+  # Only memoized where the cache is live, so it costs one glob per boot in production
+  # while dev and test pick up edits without a reload.
+  def self.markup_digest(*globs)
+    return compute_markup_digest(globs) unless Rails.application.config.action_controller.perform_caching
+
+    @markup_digest ||= {}
+    @markup_digest[globs] ||= compute_markup_digest(globs)
+  end
+
+  # Previews render outside the cache block, so their markup can't go stale
+  def self.compute_markup_digest(globs)
+    files = globs.flat_map { |glob| Rails.root.glob(glob) }
+      .select(&:file?).reject { |file| file.to_s.match?(%r{/(component_preview\.rb|preview/)}) }.sort
+    Digest::MD5.hexdigest(files.map { |file| "#{file.relative_path_from(Rails.root)}\n#{file.read}" }.join("\n"))[0, 12]
+  end
+  private_class_method :compute_markup_digest
+
   def raise_if_invalid_value!(attribute, value, options = {})
     return if options.include?(value)
 
