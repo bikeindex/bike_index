@@ -1,4 +1,4 @@
-<%# locals: (collection:, render_sortable: false) %>
+<%# locals: (collection:, render_sortable: false, render_size: false) %>
 
 <div class="full-screen-table">
   <table class="table table-striped table-bordered table-sm">
@@ -6,7 +6,10 @@
       <th><%= sortable "created_at", render_sortable: %></th>
       <th class="small"><%= sortable "updated_at", render_sortable: %></th>
       <th>Image</th>
-      <th>Size</th>
+
+      <% if render_size %>
+        <th>Size</th>
+      <% end %>
 
       <th>
         AS
@@ -24,7 +27,7 @@
       data-update-cached-sortable-links-base-url-value="<%= url_for(sortable_search_params) %>"
     >
       <% collection.each do |public_image| %>
-        <% cache(["admin_public_image", public_image, render_sortable]) do %>
+        <% cache(["admin_public_image", public_image, render_sortable, render_size]) do %>
           <tr>
             <td>
               <div class="less-strong-hold">
@@ -53,13 +56,15 @@
               <% end %>
             </td>
 
-            <td>
-              <% image_size = public_image.image_size %>
+            <% if render_size %>
+              <td>
+                <% image_size = public_image.image_size %>
 
-              <small>
-                <%= number_to_human_size(image_size) if image_size %>
-              </small>
-            </td>
+                <small>
+                  <%= number_to_human_size(image_size) if image_size %>
+                </small>
+              </td>
+            <% end %>
 
             <td><%= check_mark if public_image.activestorage? %></td>
 

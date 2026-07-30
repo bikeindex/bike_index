@@ -8,6 +8,8 @@ module Admin
 
     def index
       @per_page = permitted_per_page(default: 25)
+      # Opt-in: fog resolves the size of each carrierwave image with its own request
+      @render_size = Binxtils::InputNormalizer.boolean(params[:search_size])
       @pagy, @collection = pagy(:countish,
         matching_public_images.includes(:imageable, file_attachment: :blob)
           .reorder("public_images.#{sort_column} #{sort_direction}"),

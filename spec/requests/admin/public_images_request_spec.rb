@@ -25,15 +25,21 @@ RSpec.describe Admin::PublicImagesController, type: :request do
       context "with an attached file" do
         let!(:attached_image) { FactoryBot.create(:public_image, :with_attached_file) }
 
-        it "marks it as activestorage, sizes it off the blob, and renders its thumbnail" do
+        it "marks it as activestorage and renders its thumbnail" do
           get base_url
           expect(assigns(:collection).pluck(:id)).to include(attached_image.id)
-          expect(attached_image.reload.image_size).to eq attached_image.file.blob.byte_size
           expect(response.body).to include("ActiveStorage (instead of legacy carrierwave)")
           # image? is carrierwave-only, so the cell has to key off image_url
-          expect(attached_image.image?).to be_falsey
+          expect(attached_image.reload.image?).to be_falsey
           expect(response.body).to include(attached_image.image_url)
           expect(response.body).to include(attached_image.image_url(:small))
+        end
+
+        it "sizes it off the blob when search_size is on" do
+          get base_url, params: {search_size: true}
+          expect(response.status).to eq(200)
+          expect(attached_image.reload.image_size).to eq attached_image.file.blob.byte_size
+          expect(response.body).to include(ActiveSupport::NumberHelper.number_to_human_size(attached_image.image_size))
         end
 
         it "filters to only activestorage" do
@@ -53,6 +59,18 @@ RSpec.describe Admin::PublicImagesController, type: :request do
           expect(response.status).to eq(200)
           expect(assigns(:collection).pluck(:id)).to include(attached_image.id)
         end
+      end
+
+      it "omits the size column unless search_size is on" do
+        sized = FactoryBot.create(:public_image, :with_image_file)
+        expect(sized.image_size).to be > 0
+
+        get base_url
+        expect(response.body).to_not match(/<th>\s*Size\s*<\/th>/)
+
+        get base_url, params: {search_size: true}
+        expect(response.body).to match(/<th>\s*Size\s*<\/th>/)
+        expect(response.body).to include(ActiveSupport::NumberHelper.number_to_human_size(sized.image_size))
       end
 
       it "renders the chart" do
