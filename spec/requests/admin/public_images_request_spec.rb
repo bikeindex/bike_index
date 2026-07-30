@@ -35,6 +35,24 @@ RSpec.describe Admin::PublicImagesController, type: :request do
           expect(response.body).to include(attached_image.image_url)
           expect(response.body).to include(attached_image.image_url(:small))
         end
+
+        it "filters to only activestorage" do
+          get base_url, params: {search_storage: "activestorage"}
+          expect(response.status).to eq(200)
+          expect(assigns(:collection).pluck(:id)).to eq([attached_image.id])
+        end
+
+        it "filters to only carrierwave" do
+          get base_url, params: {search_storage: "carrierwave"}
+          expect(response.status).to eq(200)
+          expect(assigns(:collection).pluck(:id)).to match_array([bike_image.id, blog_image.id, private_image.id])
+        end
+
+        it "ignores an unknown storage and charts the filtered scope" do
+          get base_url, params: {search_storage: "sqlite", render_chart: true}
+          expect(response.status).to eq(200)
+          expect(assigns(:collection).pluck(:id)).to include(attached_image.id)
+        end
       end
 
       it "renders the chart" do
