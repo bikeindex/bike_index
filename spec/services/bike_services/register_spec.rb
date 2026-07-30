@@ -68,37 +68,39 @@ RSpec.describe BikeServices::Register do
       end
     end
 
-    # What a submit without JS posts - the field keeps its name until the uploader takes over
-    it "stores a plain file upload on the b_param" do
-      image = Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/bike.jpg"), "image/jpeg")
-      save.call({"status" => "status_with_owner"}, nil, image)
-
-      expect(b_param.reload.image).to be_present
-      expect(b_param.image_signed_id).to be_blank
-      # It's a file, so it can't ride along in the params json
-      expect(b_param.params.to_json).to_not include "bike.jpg"
-    end
-
-    it "stores absent serials and marks the details completed" do
+    it "stores absent serials, marks the details completed, and keeps saved values over blanks" do
       save.call("serial_number" => "unknown", "status" => "status_with_owner")
       expect(b_param.reload.bike["serial_number"]).to eq "unknown"
       expect(described_class.send(:details_completed?, b_param)).to be_truthy
 
       save.call("serial_number" => "made_without_serial", "status" => "status_with_owner")
       expect(b_param.reload.bike["serial_number"]).to eq "made_without_serial"
-    end
 
-    it "keeps saved values over blanks - except colors, where blank removes" do
       color = FactoryBot.create(:color)
       save.call("frame_size_number" => "56", "frame_size_unit" => "cm",
         "secondary_frame_color_id" => color.id.to_s, "status" => "status_with_owner")
       expect(b_param.reload.bike["frame_size_unit"]).to eq "cm"
       expect(b_param.bike["secondary_frame_color_id"]).to eq color.id.to_s
 
+      # blank removes a color, but leaves everything else as saved
       save.call("frame_size" => "m", "frame_size_unit" => "in", "secondary_frame_color_id" => "")
       expect(b_param.reload.bike["frame_size"]).to eq "m"
       expect(b_param.bike["frame_size_unit"]).to eq "cm" # unit without a number isn't overwritten
       expect(b_param.bike["secondary_frame_color_id"]).to be_blank
+    end
+
+    # What a submit without JS posts - the field keeps its name until the uploader takes over
+    context "with a file rather than a signed id" do
+      let(:image) { Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/bike.jpg"), "image/jpeg") }
+
+      it "stores the upload on the b_param" do
+        save.call({"status" => "status_with_owner"}, nil, image)
+
+        expect(b_param.reload.image).to be_present
+        expect(b_param.image_signed_id).to be_blank
+        # It's a file, so it can't ride along in the params json
+        expect(b_param.params.to_json).to_not include "bike.jpg"
+      end
     end
   end
 

@@ -507,18 +507,14 @@ RSpec.describe RegisterController, type: :request do
             filename: "bike.jpg", content_type: "image/jpeg")
         end
 
-        it "stores the direct upload's signed id on the b_param" do
+        it "stores the direct upload's signed id, and keeps it when a later submit posts none" do
           patch base_url, params: {b_param_token: b_param.id_token,
                                    bike: bike_details.merge(image_signed_id: blob.signed_id)}
           expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
           expect(b_param.reload.image_signed_id).to eq blob.signed_id
           # It isn't a bike attribute, so it stays out of the bike params
           expect(b_param.bike.keys).to_not include "image_signed_id"
-        end
 
-        it "keeps a stored signed id when a later submit posts none" do
-          patch base_url, params: {b_param_token: b_param.id_token,
-                                   bike: bike_details.merge(image_signed_id: blob.signed_id)}
           patch base_url, params: {b_param_token: b_param.id_token,
                                    bike: bike_details.merge(image_signed_id: "")}
           expect(b_param.reload.image_signed_id).to eq blob.signed_id
@@ -526,15 +522,18 @@ RSpec.describe RegisterController, type: :request do
 
         # Without JS nothing strips the field's name, so it posts the bytes and there's no
         # signed id to go with them
-        it "stores the bytes when the field posts them itself" do
-          patch base_url, params: {b_param_token: b_param.id_token,
-                                   bike: bike_details.merge(image_signed_id: "",
-                                     image: Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/bike.jpg"), "image/jpeg"))}
-          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
-          expect(b_param.reload.image).to be_present
-          expect(b_param.image_signed_id).to be_blank
-          # The upload isn't a bike attribute, so it stays out of the params json
-          expect(b_param.params.to_json).to_not include "bike.jpg"
+        context "posting the bytes rather than a signed id" do
+          let(:image) { Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/bike.jpg"), "image/jpeg") }
+
+          it "stores the upload on the b_param" do
+            patch base_url, params: {b_param_token: b_param.id_token,
+                                     bike: bike_details.merge(image_signed_id: "", image:)}
+            expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
+            expect(b_param.reload.image).to be_present
+            expect(b_param.image_signed_id).to be_blank
+            # The upload isn't a bike attribute, so it stays out of the params json
+            expect(b_param.params.to_json).to_not include "bike.jpg"
+          end
         end
       end
 

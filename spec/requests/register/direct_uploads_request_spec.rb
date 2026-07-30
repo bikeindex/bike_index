@@ -9,36 +9,43 @@ RSpec.describe Register::DirectUploadsController, type: :request do
     post base_url, params: {b_param_token: token, blob: blob.merge(overrides)}
   end
 
-  it "issues a presigned upload for a registration's photo" do
+  it "issues a presigned upload for a registration's photo, ignoring the metadata posted with it" do
     post_upload
     expect(response.status).to eq 200
     expect(json_result["signed_id"]).to be_present
     expect(json_result.dig("direct_upload", "url")).to be_present
     # Stamped so only this registration can claim it
     expect(ActiveStorage::Blob.last.binx_data).to eq({"b_param_id" => b_param.id})
-  end
 
-  # ActiveStorage permits the client's metadata; the stamps it might try to forge live in
-  # binx_data, which it has no way to post to
-  it "ignores metadata the client posts" do
-    post base_url, params: {b_param_token: b_param.id_token,
-                            blob: blob.merge(metadata: {processed: true, b_param_id: b_param.id + 1})}
+    # ActiveStorage permits the client's metadata; the stamps it might try to forge live in
+    # binx_data, which it has no way to post to
+    post_upload(metadata: {processed: true, b_param_id: b_param.id + 1})
     expect(response.status).to eq 200
     expect(ActiveStorage::Blob.last).to have_attributes(metadata: {},
       binx_data: {"b_param_id" => b_param.id})
   end
 
-  context "no registration token" do
-    it "is forbidden" do
-      post_upload(token: nil)
-      expect(response.status).to eq 403
-      expect(ActiveStorage::Blob.count).to eq 0
-    end
+  it "is forbidden without a registration to scope the upload to" do
+    post_upload(token: nil)
+    expect(response.status).to eq 403
 
-    it "is forbidden for an unknown token" do
-      post_upload(token: "not-a-token")
-      expect(response.status).to eq 403
-    end
+    post_upload(token: "not-a-token")
+    expect(response.status).to eq 403
+    expect(ActiveStorage::Blob.count).to eq 0
+  end
+
+  # The browser declares both, so this only turns away what doesn't even claim to be
+  # permitted - PublicImage's validation is what checks the bytes, once there are some
+  it "rejects a file the uploader wouldn't have accepted" do
+    post_upload(content_type: "application/pdf", filename: "invoice.pdf")
+    expect(response.status).to eq 422
+
+    post_upload(byte_size: PublicImageUploader::MAX_FILE_SIZE + 1)
+    expect(response.status).to eq 422
+
+    post_upload(byte_size: 0)
+    expect(response.status).to eq 422
+    expect(ActiveStorage::Blob.count).to eq 0
   end
 
   context "signed in" do
@@ -49,27 +56,6 @@ RSpec.describe Register::DirectUploadsController, type: :request do
     it "issues a presigned upload for their own registration" do
       post_upload
       expect(response.status).to eq 200
-    end
-  end
-
-  # The browser declares these and the presigned url is signed against them, so refusing
-  # here is what makes an oversized or non-image upload impossible rather than just unused
-  context "file the uploader wouldn't have accepted" do
-    it "rejects a non-image content type" do
-      post_upload(content_type: "application/pdf", filename: "invoice.pdf")
-      expect(response.status).to eq 422
-      expect(ActiveStorage::Blob.count).to eq 0
-    end
-
-    it "rejects one over the size cap" do
-      post_upload(byte_size: PublicImageUploader::MAX_FILE_SIZE + 1)
-      expect(response.status).to eq 422
-      expect(ActiveStorage::Blob.count).to eq 0
-    end
-
-    it "rejects an empty one" do
-      post_upload(byte_size: 0)
-      expect(response.status).to eq 422
     end
   end
 

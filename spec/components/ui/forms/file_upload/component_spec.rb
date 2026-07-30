@@ -59,9 +59,13 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
       expect(component).to have_css("input[type='hidden'][name='user[avatar_signed_id]'][data-ui--forms--file-upload-target='signedId']", visible: :all)
     end
 
-    it "renders no signed id field without one" do
-      expect(render_inline(described_class.new(form_builder:, attribute:)))
-        .to have_no_css("[data-ui--forms--file-upload-target='signedId']", visible: :all)
+    context "without one" do
+      let(:options) { {} }
+
+      it "renders no signed id field" do
+        expect(component).to have_no_css("[data-ui--forms--file-upload-target='signedId']", visible: :all)
+        expect(component).to have_no_css("[data-ui--forms--file-upload-url-value]:not([data-ui--forms--file-upload-url-value=''])")
+      end
     end
   end
 
