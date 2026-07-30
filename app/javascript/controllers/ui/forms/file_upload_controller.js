@@ -8,7 +8,14 @@ import { collapse } from 'utils/collapse_utils'
 // With a url value, uploads the pick straight to storage and posts its signed blob id.
 export default class extends Controller {
   static targets = ['input', 'filename', 'dropZone', 'preview', 'previewImage', 'signedId']
-  static values = { placeholder: String, url: String, uploading: String, failed: String }
+  // stall: how long without progress before the upload is treated as dead
+  static values = {
+    placeholder: String,
+    url: String,
+    uploading: String,
+    failed: String,
+    stall: { type: Number, default: 30000 }
+  }
 
   connect () {
     this.boundHold = this.hold.bind(this)
@@ -20,6 +27,7 @@ export default class extends Controller {
 
   disconnect () {
     this.form?.removeEventListener('submit', this.boundHold)
+    clearTimeout(this.stallTimer)
     this.releaseObjectUrl()
   }
 
@@ -122,23 +130,55 @@ export default class extends Controller {
     this.objectUrl = null
   }
 
-  // Only reached with a direct_upload_url, where the field is nameless and the form carries
-  // the blob's signed id rather than the bytes.
+  // Only reached with a direct_upload_url, where the form carries the blob's signed id
+  // rather than the bytes.
   upload (file) {
-    this.xhr?.abort() // Picking again shouldn't leave the discarded file uploading
+    this.abortUpload() // Picking again shouldn't leave the discarded file uploading
     this.signedIdTarget.value = ''
+    this.uploadingFile = file
     this.status(file, this.uploadingValue)
 
     const upload = new DirectUpload(file, this.urlValue, this)
     this.currentUpload = upload
-    this.pending = new Promise((resolve) => upload.create((error, blob) => {
-      resolve()
+    this.pending = new Promise((resolve) => { this.settle = resolve })
+    upload.create((error, blob) => {
       if (this.currentUpload !== upload) return // A newer pick owns the field now
 
-      this.pending = null
       if (!error) this.signedIdTarget.value = blob.signed_id
       this.status(file, error && this.failedValue)
-    }))
+      this.finish()
+    })
+    this.watchForStall()
+  }
+
+  // Every ending runs through here, because a submit waiting on `pending` only moves when
+  // it settles - including the endings DirectUpload never reports.
+  finish () {
+    clearTimeout(this.stallTimer)
+    this.currentUpload = null
+    this.pending = null
+    this.settle?.()
+    this.settle = null
+  }
+
+  // DirectUpload listens for load and error, not abort, so an aborted upload never reaches
+  // its callback - without settling it here a held submit would wait on it forever.
+  abortUpload () {
+    if (!this.currentUpload) return
+
+    this.xhr?.abort()
+    this.finish()
+  }
+
+  // A connection that stops moving never errors, so nothing else would end the upload -
+  // the form would sit disabled behind a spinner until the page was reloaded.
+  watchForStall () {
+    clearTimeout(this.stallTimer)
+    this.stallTimer = setTimeout(() => {
+      this.signedIdTarget.value = ''
+      this.status(this.uploadingFile, this.failedValue)
+      this.abortUpload()
+    }, this.stallValue)
   }
 
   status (file, suffix) {
@@ -148,6 +188,16 @@ export default class extends Controller {
   // DirectUpload delegate hook - the handle that makes a discarded upload cancellable
   directUploadWillStoreFileWithXHR (xhr) {
     this.xhr = xhr
+    xhr.upload.addEventListener('progress', (event) => this.showProgress(event))
+  }
+
+  // Bytes moving is also what proves the connection is alive, so this restarts the stall watch
+  showProgress (event) {
+    this.watchForStall()
+    if (!event.lengthComputable) return
+
+    const percent = Math.round((event.loaded / event.total) * 100)
+    this.status(this.uploadingFile, `${this.uploadingValue} ${percent}%`)
   }
 
   // Submitting mid-upload would drop the file, so hold the form until the blob lands.

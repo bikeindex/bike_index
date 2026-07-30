@@ -156,6 +156,70 @@ RSpec.describe "Register flow", :js, type: :system do
       .to eq "bike_photo-landscape.jpeg"
   end
 
+  # The Disk service answers instantly, so what happens between picking a file and the blob
+  # landing is only observable by holding the PUT open at the network layer.
+  describe "an upload still in flight" do
+    let(:image_path) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
+
+    # Nothing in the handler answers the request, so it hangs the way a dead connection does
+    def hang_the_upload
+      page.driver.with_playwright_page do |playwright_page|
+        playwright_page.route("**/rails/active_storage/disk/**", ->(_route, _request) {})
+      end
+    end
+
+    def complete_the_registration
+      type_into("#bike_primary_frame_color_id", "Red")
+      click_combobox_option("Red")
+      fill_in "bike[serial_number]", with: "HELD1234"
+      click_button "Complete Bike Registration"
+    end
+
+    it "holds the submit until the blob lands, then sends it" do
+      start_registration
+      # Held just long enough to submit against it; the upload finishes on its own after
+      page.driver.with_playwright_page do |playwright_page|
+        playwright_page.route("**/rails/active_storage/disk/**", ->(route, _request) {
+          sleep 3
+          route.continue
+        })
+      end
+
+      attach_file("bike_image", image_path, make_visible: true)
+      expect(page).to have_content("uploading")
+
+      complete_the_registration
+
+      # Submitting doesn't navigate - the button spins while the upload finishes
+      expect(page).to have_css("button[type='submit'][disabled]")
+      expect(page).to have_current_path(/step=2/, url: true)
+
+      # ...and once the blob lands the held submit goes through, carrying the photo
+      expect(page).to have_content("Registration saved", wait: 15)
+      expect(BParam.last.image_signed_id).to be_present
+    end
+
+    # Without this the button sits disabled behind a spinner until the page is reloaded
+    it "gives up on an upload that stops responding, and submits without the photo" do
+      start_registration
+      hang_the_upload
+      # Shortens the wait rather than skipping a step - the whole path still runs
+      page.execute_script(<<~JS)
+        document.querySelector("[data-controller~='ui--forms--file-upload']")
+          .setAttribute("data-ui--forms--file-upload-stall-value", "1500")
+      JS
+
+      attach_file("bike_image", image_path, make_visible: true)
+
+      expect(page).to have_content("upload failed", wait: 10)
+
+      complete_the_registration
+
+      expect(page).to have_content("Registration saved", wait: 15)
+      expect(BParam.last.image_signed_id).to be_blank
+    end
+  end
+
   # The example above uploads to the Disk service, same-origin, which never exercises a presigned
   # S3 PUT or a cross-origin request. This one goes to the bikeindex-test R2 bucket for real, so
   # it needs credentials and the network. Kept separate so an R2 blip can't take the whole flow's
