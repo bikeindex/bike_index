@@ -1742,6 +1742,14 @@ RSpec.describe Bike, type: :model do
         image_url = public_image.image_url
         expect(bike.reload.image_url).to eq image_url.gsub("http://test.host", "https://files.bikeindex.org")
       end
+      context "activestorage backed public_image" do
+        let!(:public_image) { FactoryBot.create(:public_image, :with_attached_file, imageable: bike) }
+        it "is the variant url" do
+          expect(bike.reload.thumb_path).to be_present
+          expect(bike.image_url(:large)).to eq public_image.reload.image_url(:large)
+          expect(bike.image_url(:large)).to_not eq public_image.image_url
+        end
+      end
     end
     context "with missing public_image" do
       let(:bike) { FactoryBot.create(:bike) }

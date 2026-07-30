@@ -63,6 +63,21 @@ RSpec.describe ImageServices::StolenProcessor do
       expect(BikeJobs::AfterStolenRecordSaveJob.jobs.count).to eq 0
     end
 
+    context "activestorage backed public_image" do
+      let!(:public_image) { FactoryBot.create(:public_image, :with_attached_file, imageable: bike, listing_order: 5) }
+
+      it "generates the alert images from the attachment" do
+        expect(public_image.reload.file.attached?).to be_truthy
+        expect(public_image.image).to be_blank
+
+        expect do
+          described_class.update_alert_images(stolen_record)
+        end.to change(ActiveStorage::Blob, :count).by 3
+
+        expect(stolen_record.reload.image_four_by_five.blob.binx_data["image_id"]).to eq public_image.id
+      end
+    end
+
     context "public_image deleted" do
       it "removes" do
         expect(stolen_record.reload.image_four_by_five.attached?).to be_falsey

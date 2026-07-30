@@ -204,7 +204,11 @@ module BikeAttributable
       return stock_photo_url.present? ? stock_photo_url : nil
     end
 
-    image_col = public_images.limit(1).first&.image
+    public_image = public_images.limit(1).first
+    # PublicImage owns which backend a row is on
+    return public_image.image_url(size) if public_image&.activestorage?
+
+    image_col = public_image&.image
     # NOTE: avoid image_col.blank? — on Fog storage it issues an S3 HEAD per call (timed out the API search).
     return nil if image_col&.path.blank? && !REMOTE_IMAGE_FALLBACK_URLS
 

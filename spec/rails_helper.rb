@@ -95,10 +95,15 @@ VCR.configure do |config|
   config.ignore_hosts("127.0.0.1", "0.0.0.0", "localhost") # for capybara's app server
 
   %w[CLOUDFLARE_TOKEN EXCHANGE_RATE_API_KEY FACEBOOK_AD_TOKEN GOOGLE_GEOCODER MAILCHIMP_KEY
-    MAXMIND_KEY SENDGRID_EMAIL_VALIDATION_KEY LOGO_API_TOKEN STRAVA_KEY STRAVA_SECRET
-    STRAVA_TEST_ACCESS_TOKEN STRAVA_TEST_REFRESH_TOKEN].each do |key|
+    MAXMIND_KEY R2_TEST_ACCESS_KEY R2_TEST_ACCESS_KEY_SECRET R2_TEST_ENDPOINT SENDGRID_EMAIL_VALIDATION_KEY
+    LOGO_API_TOKEN STRAVA_KEY STRAVA_SECRET STRAVA_TEST_ACCESS_TOKEN
+    STRAVA_TEST_REFRESH_TOKEN].each do |key|
     config.filter_sensitive_data("<#{key}>") { ENV[key] }
   end
+
+  # aws-sdk addresses R2 virtual-host style (bucket.<account>.r2...), so the endpoint never appears
+  # verbatim - filtering the host keeps the account id out, and VCR swaps it back on playback
+  config.filter_sensitive_data("<R2_TEST_HOST>") { URI.parse(ENV["R2_TEST_ENDPOINT"]).host if ENV["R2_TEST_ENDPOINT"].present? }
 
   config.before_record do |i|
     i.response.headers.delete("Set-Cookie")
