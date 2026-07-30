@@ -3,7 +3,8 @@
 require "rails_helper"
 
 RSpec.describe PageBlock::Footer::Component, type: :component do
-  it_behaves_like "cache_version_checkpoint"
+  it_behaves_like "cached_markup_digest", "app/components/page_block/footer/component.html.erb",
+    "app/components/page_block/footer/component_preview.rb"
 
   let(:instance) { described_class.new(current_user: nil, skip_facebook:, page_id: "welcome_index") }
   let(:component) { with_request_url("/") { render_inline(instance) } }
