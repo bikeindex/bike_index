@@ -3,8 +3,9 @@
 module UI
   module Forms
     module FileUpload
-      # direct_upload_url: uploads on pick and posts a signed blob id instead of the bytes,
-      # which means the field submits nothing at all when JS doesn't run.
+      # direct_upload_url: with JS, uploads on pick and posts the blob's signed id instead of
+      # the bytes. The field still renders as an ordinary one, so it posts the file when JS
+      # doesn't run - the controller drops its name only once it's driving the upload.
       class Component < ApplicationComponent
         # mb-0 cancels legacy bootstrap's `label` margin, which items-center would
         # otherwise center along with the button next to it.
@@ -24,16 +25,14 @@ module UI
           @thumbnail_url = thumbnail_version_url || @attachment_url
 
           @direct_upload_url = direct_upload_url
-          # The browser uploads to storage itself and this carries the blob, so the file field
-          # is nameless below - it must not also post the bytes
-          # Scoped to the form builder like every other field here, so two of these on one
-          # page don't collide on the same param
+          # Carries the blob the browser uploaded. Scoped to the form builder like every other
+          # field here, so two of these on one page don't collide on the same param
           @signed_id_field = "#{form_builder.object_name}[#{attribute}_signed_id]" if direct_upload_url.present?
           @html_options = {
             class: "tw:peer tw:sr-only",
             accept: accept_list.join(",").presence,
             data: {"ui--forms--file-upload-target": "input", action: "ui--forms--file-upload#display"}
-          }.merge(@signed_id_field ? {name: nil} : {}).merge(html_options)
+          }.merge(html_options)
 
           # Style the label as a UI::Button; the focus ring is driven by the peer (sr-only) input.
           @label_classes = UI::Button::Component.build_classes(color: :secondary, size: :md, html_class: LABEL_CLASSES)

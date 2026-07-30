@@ -63,9 +63,20 @@ RSpec.describe BikeServices::Register do
   describe "save_step_2" do
     let(:b_param) { BParam.create(origin: "register_flow", params: {bike: bike_params}.as_json) }
     let(:save) do
-      ->(fields, signed_id = nil) do
-        described_class.save_step_2(b_param, user: nil, image_signed_id: signed_id, bike_params: fields)
+      ->(fields, signed_id = nil, image = nil) do
+        described_class.save_step_2(b_param, user: nil, image:, image_signed_id: signed_id, bike_params: fields)
       end
+    end
+
+    # What a submit without JS posts - the field keeps its name until the uploader takes over
+    it "stores a plain file upload on the b_param" do
+      image = Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/bike.jpg"), "image/jpeg")
+      save.call({"status" => "status_with_owner"}, nil, image)
+
+      expect(b_param.reload.image).to be_present
+      expect(b_param.image_signed_id).to be_blank
+      # It's a file, so it can't ride along in the params json
+      expect(b_param.params.to_json).to_not include "bike.jpg"
     end
 
     it "stores absent serials and marks the details completed" do

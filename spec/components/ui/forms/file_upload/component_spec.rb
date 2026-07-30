@@ -48,6 +48,23 @@ RSpec.describe UI::Forms::FileUpload::Component, type: :component do
       .to have_no_css("input[type='file'][accept]")
   end
 
+  describe "direct_upload_url" do
+    let(:options) { {direct_upload_url: "/register/direct_uploads?b_param_token=xyz"} }
+
+    # Rendered as an ordinary file field: without JS it posts the bytes, and the controller
+    # drops the name only once it's uploading them itself
+    it "renders a named field alongside the signed id it will fill" do
+      expect(component).to have_css("input[type='file'][name='user[avatar]']")
+      expect(component).to have_css("[data-ui--forms--file-upload-url-value='/register/direct_uploads?b_param_token=xyz']")
+      expect(component).to have_css("input[type='hidden'][name='user[avatar_signed_id]'][data-ui--forms--file-upload-target='signedId']", visible: :all)
+    end
+
+    it "renders no signed id field without one" do
+      expect(render_inline(described_class.new(form_builder:, attribute:)))
+        .to have_no_css("[data-ui--forms--file-upload-target='signedId']", visible: :all)
+    end
+  end
+
   describe "thumbnail of what's already attached" do
     let(:fixture) { Rails.root.join("spec/fixtures/bike.jpg") }
 

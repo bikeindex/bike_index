@@ -359,10 +359,10 @@ RSpec.describe RegisterController, type: :request do
       b_param.confirm_email!
       get register_path(b_param_token: b_param.id_token, step: 2)
       expect(response.body).to_not include "confirmation link to your email"
-      expect(response.body).to include "bike_image"
-      # the shared upload component, rather than this page's own pair of buttons - posting a
-      # signed blob id, so the file field itself is nameless
+      # the shared upload component, rather than this page's own pair of buttons. The field
+      # posts its own bytes as rendered; JS swaps that for the signed id it uploads to
       expect(response.body).to include "ui--forms--file-upload"
+      expect(response.body).to include "bike[image]"
       expect(response.body).to include "bike[image_signed_id]"
     end
 
@@ -522,6 +522,19 @@ RSpec.describe RegisterController, type: :request do
           patch base_url, params: {b_param_token: b_param.id_token,
                                    bike: bike_details.merge(image_signed_id: "")}
           expect(b_param.reload.image_signed_id).to eq blob.signed_id
+        end
+
+        # Without JS nothing strips the field's name, so it posts the bytes and there's no
+        # signed id to go with them
+        it "stores the bytes when the field posts them itself" do
+          patch base_url, params: {b_param_token: b_param.id_token,
+                                   bike: bike_details.merge(image_signed_id: "",
+                                     image: Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/bike.jpg"), "image/jpeg"))}
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
+          expect(b_param.reload.image).to be_present
+          expect(b_param.image_signed_id).to be_blank
+          # The upload isn't a bike attribute, so it stays out of the params json
+          expect(b_param.params.to_json).to_not include "bike.jpg"
         end
       end
 

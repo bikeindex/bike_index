@@ -64,10 +64,12 @@ module BikeServices
         confirmed_email_creator_id(b_param).present?
     end
 
-    # Step 2 merges over step 1 - creator claimed for signed-in users, the photo's
-    # signed id and the fields into the params json
-    def save_step_2(b_param, user:, image_signed_id:, bike_params:)
+    # Step 2 merges over step 1 - creator claimed for signed-in users, the photo and the
+    # fields into the params json. The photo arrives one of two ways: as bytes from a plain
+    # file field, or as the signed id of a blob the browser already uploaded.
+    def save_step_2(b_param, user:, image:, image_signed_id:, bike_params:)
       b_param.creator_id ||= user&.id
+      b_param.image = image if image.present?
       b_param.clean_params(step_2_params(bike_params.to_h, image_signed_id:).as_json)
       b_param.save
     end

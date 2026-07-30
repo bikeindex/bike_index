@@ -13,6 +13,9 @@ export default class extends Controller {
   connect () {
     this.boundHold = this.hold.bind(this)
     this.form?.addEventListener('submit', this.boundHold)
+    // The field posts its own bytes until this runs, which is what makes the form work
+    // without JS - once we're uploading, the signed id is what the form carries instead.
+    if (this.urlValue) this.inputTarget.removeAttribute('name')
   }
 
   disconnect () {

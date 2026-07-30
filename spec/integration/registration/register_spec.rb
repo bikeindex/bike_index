@@ -178,6 +178,12 @@ RSpec.describe "Register flow", :js, type: :system do
     it "PUTs the photo to the bucket and serves it from the storage domain" do
       start_registration
 
+      # The field ships with its name so a JS-less submit posts the bytes; the controller
+      # drops it on connect, which is what leaves the signed id as the only thing carrying
+      # the photo. Both would otherwise arrive, and the b_param would hold two of them.
+      expect(page).to have_no_css("input[name='bike[image]']", visible: :all)
+      expect(page).to have_css("input#bike_image[type='file']", visible: :all)
+
       attach_file("bike_image", image_path, make_visible: true)
       expect(page).to have_content("bike_photo-landscape.jpeg")
       expect(page).to have_no_content("uploading", wait: 20) # A real cross-origin PUT
