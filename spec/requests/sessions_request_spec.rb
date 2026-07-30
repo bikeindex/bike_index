@@ -71,6 +71,28 @@ RSpec.describe SessionsController, type: :request do
       end
     end
 
+    context "sso organization domain" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
+      end
+
+      it "hands off to the IdP, skipping the credential step" do
+        FactoryBot.create(:organization_saml_configuration, :enabled, organization:)
+        identify("student@sso.edu")
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+      end
+
+      context "SAML config not yet live" do
+        let!(:user) { FactoryBot.create(:user_confirmed, email: "student@sso.edu") }
+        it "falls through to the password step rather than a broken SSO redirect" do
+          identify("student@sso.edu")
+          expect(response).to render_template(:identify)
+          expect(response.body).to include('autocomplete="current-password"')
+        end
+      end
+    end
+
     context "with rack_attack" do
       include_context :rack_attack
 
@@ -147,6 +169,20 @@ RSpec.describe SessionsController, type: :request do
           expect(organization_role.sender_id).to be_blank
           expect(organization_role.role).to eq "member"
         end
+      end
+    end
+
+    context "sso organization email" do
+      let!(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
+      end
+      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+      it "forces SSO instead of sending a link" do
+        ActionMailer::Base.deliveries = []
+        post "/session/create_magic_link", params: {email: "student@sso.edu"}
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+        expect(ActionMailer::Base.deliveries.count).to eq 0
       end
     end
   end
@@ -247,6 +283,21 @@ RSpec.describe SessionsController, type: :request do
         expect(response).to redirect_to new_session_path
         user.reload
         expect(user.last_login_at).to be_blank
+      end
+    end
+
+    context "sso organization email" do
+      let(:user) { FactoryBot.create(:user_confirmed, email: "student@sso.edu", password:, password_confirmation: password) }
+      let!(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
+      end
+      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+      it "forces SSO instead of accepting the password" do
+        post "/session", params: {session: {email: user.email, password:}}
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+        expect(response.cookies["auth"]).to be_blank
+        expect(user.reload.last_login_at).to be_blank
       end
     end
 

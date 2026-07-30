@@ -116,7 +116,10 @@ module Admin
           :slug,
           :spam_registrations,
           :website,
-          [locations_attributes:]
+          [locations_attributes:],
+          organization_saml_configuration_attributes: %i[id enabled idp_entity_id
+            idp_sso_target_url idp_slo_target_url idp_cert idp_cert_fingerprint
+            idp_cert_multi email_attribute_name name_id_format]
         ).merge(kind: approved_kind)
         .merge(registration_field_labels: registration_field_labels_val)
     end
