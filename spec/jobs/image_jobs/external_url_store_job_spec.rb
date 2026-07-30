@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Images::ExternalUrlStoreJob, type: :job do
+RSpec.describe ImageJobs::ExternalUrlStoreJob, type: :job do
   let(:instance) { described_class.new }
 
   context "valid performance" do

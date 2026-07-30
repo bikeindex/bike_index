@@ -1,6 +1,6 @@
 module BikeJobs
   class AfterStolenRecordSaveJob < ApplicationJob
-    # Retries because Images::StolenProcessor fetches remote images and can
+    # Retries because ImageServices::StolenProcessor fetches remote images and can
     # hit transient Net::ReadTimeout. The rest of the job is idempotent.
     sidekiq_options retry: 3
 
@@ -24,7 +24,7 @@ module BikeJobs
       end
       stolen_record.find_or_create_recovery_link_token
 
-      Images::StolenProcessor.update_alert_images(stolen_record,
+      ImageServices::StolenProcessor.update_alert_images(stolen_record,
         force_regenerate: force_regenerate_images,
         public_image_id:)
     end

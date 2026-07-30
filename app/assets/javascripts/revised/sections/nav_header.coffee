@@ -19,6 +19,15 @@ class BikeIndex.NavHeader extends BikeIndex
       # There is also a 16px margin and a bunch of padding on either side on current-organization-submenu, so subtract that as well
       $(".primary-header-nav .current-organization-nav-item a").css("max-width", "#{available_width - 102}px")
 
+  # The menu and its backdrop are fixed to the viewport, but the navbar isn't -
+  # the review-app banner pushes it down, further still when the PR title wraps.
+  # So sit them below wherever the hamburgler actually ends, rather than assuming
+  positionMainMenu: ->
+    $hamburgler = $(".primary-header-nav .hamburgler")
+    return unless $hamburgler.is(":visible")
+    top = $hamburgler[0].getBoundingClientRect().bottom
+    $(".primary-main-menu, #menu-opened-backdrop").css("top", "#{top}px")
+
   initializeHamburgler: ->
     # Add character for displaying the hamburger - doing it here so it isn't rendered for lynx :/
     $("#primary_nav_hamburgler").html("&#9776;")
@@ -29,6 +38,10 @@ class BikeIndex.NavHeader extends BikeIndex
 
     $('#menu-opened-backdrop').click (e) =>
       @toggleMenu(true)
+
+    # Rotating or resizing with the menu open changes how tall the banner is
+    $(window).resize =>
+      @positionMainMenu() if $('nav.primary-header-nav').hasClass('menu-in')
 
     $(document).keyup (e) =>
       return unless e.key == 'Escape' && $('nav.primary-header-nav').hasClass('menu-in')
@@ -49,6 +62,7 @@ class BikeIndex.NavHeader extends BikeIndex
         $('nav.primary-header-nav').removeClass('enabled')
       ), 200
     else
+      @positionMainMenu()
       $('nav.primary-header-nav').addClass('enabled')
       $('#primary_nav_hamburgler').addClass('active')
       setTimeout (->

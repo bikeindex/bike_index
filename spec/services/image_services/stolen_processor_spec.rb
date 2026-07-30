@@ -1,7 +1,7 @@
 require "rails_helper"
 require "chunky_png" # For image comparison
 
-RSpec.describe Images::StolenProcessor do
+RSpec.describe ImageServices::StolenProcessor do
   let(:location_text) { "San Francisco, CA" }
 
   def expect_images_to_match(generated, target, tolerance: 0.1)
@@ -44,7 +44,8 @@ RSpec.describe Images::StolenProcessor do
       expect(stolen_record.image_square.attached?).to be_truthy
       expect(stolen_record.image_opengraph.attached?).to be_truthy
       expect(stolen_record.images_attached_id).to eq public_image.id
-      expect(stolen_record.reload.image_four_by_five.blob.metadata["image_id"]).to eq public_image.id
+      expect(stolen_record.reload.image_four_by_five.blob.binx_data)
+        .to eq({"stolen_record_id" => stolen_record.id, "image_id" => public_image.id})
       expect(stolen_record.bike.updated_at).to be_within(1).of Time.current
       # No new jobs are enqueued
       expect(BikeJobs::AfterStolenRecordSaveJob.jobs.count).to eq 0
@@ -60,6 +61,21 @@ RSpec.describe Images::StolenProcessor do
       expect(stolen_record.reload.bike.updated_at).to be_within(1).of(Time.current - 1.hour)
       # No new jobs are enqueued
       expect(BikeJobs::AfterStolenRecordSaveJob.jobs.count).to eq 0
+    end
+
+    context "activestorage backed public_image" do
+      let!(:public_image) { FactoryBot.create(:public_image, :with_attached_file, imageable: bike, listing_order: 5) }
+
+      it "generates the alert images from the attachment" do
+        expect(public_image.reload.file.attached?).to be_truthy
+        expect(public_image.image).to be_blank
+
+        expect do
+          described_class.update_alert_images(stolen_record)
+        end.to change(ActiveStorage::Blob, :count).by 3
+
+        expect(stolen_record.reload.image_four_by_five.blob.binx_data["image_id"]).to eq public_image.id
+      end
     end
 
     context "public_image deleted" do

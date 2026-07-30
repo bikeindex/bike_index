@@ -5,9 +5,12 @@ module UI
     class Component < ApplicationComponent
       renders_one :body
 
-      def initialize(id:, title: nil)
+      # open: render the dialog already open, for a modal the server decided to show
+      # rather than one waiting on a [data-open-modal] trigger
+      def initialize(id:, title: nil, open: false)
         @id = id
         @title = title
+        @open = open
       end
     end
   end

@@ -112,34 +112,14 @@
     </div>
 
     <% if show_photo? %>
-      <div class="tw:mb-4" data-controller="register--photo">
+      <div class="tw:mb-4">
         <span class="twlabel">
           <%= translation(".attach_photo", cycle_type:) %>
           <%= optional_badge %>
         </span>
 
-        <%= f.file_field :image, accept: ImageUploader.permitted_extensions.join(","),
-            class: "tw:hidden",
-            data: {
-              "register--photo-target": "input",
-              action: "change->register--photo#changed"
-            } %>
-
-        <div class="tw:mt-2 tw:grid tw:grid-cols-2 tw:gap-2">
-          <%= render UI::Button::Component.new(text: translation(".take_photo"), color: :secondary,
-              data: {action: "register--photo#takePhoto"}) %>
-
-          <%= render UI::Button::Component.new(text: translation(".upload"), color: :secondary,
-              data: {action: "register--photo#upload"}) %>
-        </div>
-
-        <p
-          class="
-            tw:mt-1.5 tw:truncate tw:text-xs tw:font-medium tw:text-gray-700
-            tw:dark:text-gray-300
-          "
-          data-register--photo-target="filename"
-        ></p>
+        <%= render UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :image,
+              accept: ImageUploader.permitted_extensions) %>
 
         <p
           class="
