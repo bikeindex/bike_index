@@ -3,8 +3,6 @@
 require "rails_helper"
 
 RSpec.describe "Register flow", :js, type: :system do
-  # Not an RFC 2606 domain: UI::Forms::Email holds the form on one, so "@example.com"
-  # never gets past step 1
   let(:owner_email) { "owner@bikeindex.org" }
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
   let!(:red) { FactoryBot.create(:color, name: "Red") }
