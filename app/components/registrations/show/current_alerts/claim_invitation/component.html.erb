@@ -1,4 +1,4 @@
-<%= render(UI::Modal::Component.new(id: "claim-invitation-modal", title: overlay_translation("your_bike", bike_type: @bike.type), open: true)) do |modal| %>
+<%= render(UI::Modal::Component.new(id: "claim-invitation-modal", title: translation(".your_bike", bike_type: @bike.type), open: true)) do |modal| %>
   <% modal.with_body do %>
     <div class="tw:flex tw:items-start tw:gap-3">
       <% if organization_avatar %>
@@ -8,29 +8,29 @@
       <div class="tw:min-w-0">
         <% if claimable? %>
           <p>
-            <%= overlay_translation("were_honored_to_have_your_bike", bike_type: @bike.type) %>
+            <%= translation(".were_honored_to_have_your_bike", bike_type: @bike.type) %>
           </p>
           <p class="tw:mt-1">
-            <%= overlay_translation("claim_it_so_you_can_update_your_listing") %>
+            <%= translation(".claim_it_so_you_can_update_your_listing") %>
           </p>
         <% else %>
           <p>
             <strong><%= registered_by %></strong>
-            <%= claim_translation("registered_your_bike_on_index", bike_type: @bike.type) %>
+            <%= translation(".registered_your_bike_on_index", bike_type: @bike.type) %>
           </p>
           <p class="tw:mt-2">
-            <%= claim_translation("public_resource_reunited_value_html", value: recoveries_value) %>
+            <%= translation(".public_resource_reunited_value_html", value: recoveries_value) %>
           </p>
           <p class="tw:mt-2">
-            <%= claim_translation("supercharge_if_your_bike_stolen", bike_type: @bike.type) %>
+            <%= translation(".supercharge_if_your_bike_stolen", bike_type: @bike.type) %>
           </p>
           <p class="tw:mt-2">
-            <%= claim_translation("to_see_your_bike_sign_up_html", bike_type: @bike.type, sign_up_link: link_to(claim_translation("sign_up"), claim_path, class: "twlink")) %>
+            <%= translation(".to_see_your_bike_sign_up_html", bike_type: @bike.type, sign_up_link: link_to(translation(".sign_up"), claim_path, class: "twlink")) %>
           </p>
         <% end %>
 
         <div class="tw:mt-4">
-          <%= render(UI::ButtonLink::Component.new(href: claim_path, text: overlay_translation("claim_bike_type", bike_type: @bike.type), color: :purple)) %>
+          <%= render(UI::ButtonLink::Component.new(href: claim_path, text: translation(".claim_bike_type", bike_type: @bike.type), color: :purple)) %>
         </div>
       </div>
     </div>

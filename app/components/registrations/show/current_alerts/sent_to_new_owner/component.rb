@@ -6,8 +6,6 @@ module Registrations
       module SentToNewOwner
         # Shown to the sender while the registration is waiting on the new owner's claim
         class Component < ApplicationComponent
-          include LegacyCopy
-
           def initialize(bike:, owner: false)
             @bike = bike
             @owner = owner

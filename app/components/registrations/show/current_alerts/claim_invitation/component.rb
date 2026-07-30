@@ -8,8 +8,6 @@ module Registrations
         # in as someone it's claimable by, or because they followed the claim link from
         # their registration email (claim_message, so they may still be signed out)
         class Component < ApplicationComponent
-          include LegacyCopy
-
           def initialize(bike:, current_user: nil, claim_message: nil)
             @bike = bike
             @current_user = current_user

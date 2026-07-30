@@ -8,7 +8,7 @@ module Registrations
       class Component < ApplicationComponent
         # Nothing digests the nested components' templates, so bump this whenever
         # their markup changes
-        CACHE_VERSION = "registrations/show-v12"
+        CACHE_VERSION = "registrations/show-v13"
 
         def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, alerts: nil)
           @bike = bike

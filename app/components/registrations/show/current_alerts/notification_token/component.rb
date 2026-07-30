@@ -7,8 +7,6 @@ module Registrations
         # The prompt reached from a parking or graduated notification email's link,
         # offering to mark the notification resolved (or confirming it already is)
         class Component < ApplicationComponent
-          include LegacyCopy
-
           def initialize(bike:, token: nil, token_type: nil, matching_notification: nil)
             @bike = bike
             @token = token
@@ -31,14 +29,14 @@ module Registrations
           end
 
           def resolved_text
-            return overlay_translation("you_have_already_marked_remaining", bike_type: @bike.type) if graduated?
+            return translation(".you_have_already_marked_remaining", bike_type: @bike.type) if graduated?
 
-            overlay_translation("you_have_already_marked_resolved")
+            translation(".you_have_already_marked_resolved")
           end
 
           def resolve_button_text
-            key = graduated? ? "mark_graduated_resolved" : "mark_parking_resolved"
-            overlay_translation(key, bike_type: @bike.type)
+            key = graduated? ? ".mark_graduated_resolved" : ".mark_parking_resolved"
+            translation(key, bike_type: @bike.type)
           end
 
           def organization

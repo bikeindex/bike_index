@@ -12,7 +12,7 @@
       <% if resolved? %>
         <p class="tw:font-bold"><%= resolved_text %></p>
         <p class="tw:mt-1 tw:text-sm tw:opacity-65">
-          <%= overlay_translation("no_futher_action_necessary") %>
+          <%= translation(".no_futher_action_necessary") %>
         </p>
       <% else %>
         <%= form_with(url: resolve_token_bike_path(@bike), method: :put, data: {controller: "csrf-refresh"}) do |form| %>
@@ -26,7 +26,7 @@
 
     <% if organization.present? %>
       <p class="tw:mt-4 tw:text-sm tw:opacity-65">
-        <%= overlay_translation("organization_sent_this_message", org_name: organization.name) %>
+        <%= translation(".organization_sent_this_message", org_name: organization.name) %>
 
         <% if @matching_notification.sent_at.present? %>
           <%= render(UI::Time::Component.new(time: @matching_notification.sent_at)) %>
@@ -34,7 +34,7 @@
       </p>
       <% if organization_email.present? %>
         <p class="tw:mt-1 tw:text-sm tw:opacity-65">
-          <%= overlay_translation("please_email_organization_with_questions_html", email_link: mail_to(organization_email, class: "twlink")) %>
+          <%= translation(".please_email_organization_with_questions_html", email_link: mail_to(organization_email, class: "twlink")) %>
         </p>
       <% end %>
     <% end %>
