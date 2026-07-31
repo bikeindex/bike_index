@@ -5,6 +5,7 @@ RSpec.describe RegisterController, type: :request do
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Trek") }
   let(:color) { FactoryBot.create(:color, name: "Red") }
   let(:owner_email) { "owner@example.com" }
+  let(:user_name) { "Sally Rider" }
   let(:b_param) do
     BParam.create(origin: "register_flow",
       params: {bike: {owner_email:, manufacturer_id: "Trek"}}.as_json)
@@ -41,6 +42,13 @@ RSpec.describe RegisterController, type: :request do
         get "/register/new?status=status_impounded"
         expect(BParam.last.id).to eq stolen_b_param.id
         expect(stolen_b_param.reload.status).to eq "status_stolen"
+      end
+
+      # The organization's link is /register, which has no registration to attach to yet
+      it "keeps the organization through the bare /register" do
+        get "#{base_url}?organization_id=#{organization.slug}"
+        follow_redirect! # into /register/new, which creates the registration
+        expect(BParam.last.creation_organization_id).to eq organization.id
       end
 
       # Only the create branch of b_param_for seeds status, so this is the org path
@@ -130,6 +138,11 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to redirect_to new_register_path
       expect(flash[:info]).to be_nil
 
+      # How they arrived rides along - there's no registration yet to store it on
+      get "#{base_url}?organization_id=brakebills&status=status_stolen&email=someone@example.com"
+      expect(response).to redirect_to new_register_path(organization_id: "brakebills",
+        status: "status_stolen", email: "someone@example.com")
+
       # With a session registration, bare /register resumes it instead
       get "/register/new"
       session_b_param = BParam.last
@@ -157,10 +170,19 @@ RSpec.describe RegisterController, type: :request do
     context "signed in" do
       include_context :request_spec_logged_in_as_user
 
-      it "skips the confirmation email note - they never wait on it" do
+      it "notes the confirmation link - the address is someone else's" do
         get register_path(b_param_token: b_param.id_token, step: 1)
         expect(response.status).to eq 200
-        expect(response.body).to_not include "email a confirmation link"
+        expect(response.body).to include "email a confirmation link"
+      end
+
+      context "registering to their own address" do
+        let(:owner_email) { current_user.email }
+
+        it "skips the note - signing in already proved the address" do
+          get register_path(b_param_token: b_param.id_token, step: 1)
+          expect(response.body).to_not include "email a confirmation link"
+        end
       end
     end
 
@@ -343,6 +365,10 @@ RSpec.describe RegisterController, type: :request do
       JSON.parse(status_field("phone")["data-statuses"])
     end
 
+    def user_name_field
+      Nokogiri::HTML(response.body).at_css("input[name='bike[user_name]']")
+    end
+
     it "renders the details form, showing the email from step 1" do
       get register_path(b_param_token: b_param.id_token, step: 2)
       expect(response.status).to eq 200
@@ -350,6 +376,9 @@ RSpec.describe RegisterController, type: :request do
       expect(response.body).to include owner_email
       # No organization asking for anything, so it's just the registrant's own info
       expect(response.body).to include "Contact info"
+      # Anonymous, so there's no account the name could come from - and the browser
+      # is what asks for it, no js involved
+      expect(user_name_field["required"]).to eq "required"
       # An address nothing has proven yet, so the confirmation is still pending - the photo
       # is offered regardless, uploading against the registration's token
       expect(response.body).to include "confirmation link to your email"
@@ -413,7 +442,7 @@ RSpec.describe RegisterController, type: :request do
         patch base_url, params: {b_param_token: b_param.id_token,
                                  bike: {primary_frame_color_id: color.id, status: "status_with_owner",
                                         extra_registration_number: "XX99", organization_affiliation: "student",
-                                        student_id: "S-1234",
+                                        student_id: "S-1234", user_name:,
                                         address_record_attributes: {street: "1 Main St", city: "Chicago",
                                                                     postal_code: "60608", country_id: Country.united_states_id}}}
         expect(b_param.reload.bike).to include("extra_registration_number" => "XX99",
@@ -443,11 +472,23 @@ RSpec.describe RegisterController, type: :request do
     context "signed in" do
       include_context :request_spec_logged_in_as_user
 
-      it "skips the confirmation alert - they never wait on it" do
+      it "shows the confirmation alert - and asks for the name of whoever it's for" do
         get register_path(b_param_token: b_param.id_token, step: 2)
         expect(response.status).to eq 200
-        expect(response.body).to_not include "confirmation link to your email"
+        expect(response.body).to include "confirmation link to your email"
         expect(response.body).to include "bike_image"
+        # Step 1's address isn't theirs, so their account's name isn't the one to use
+        expect(user_name_field["required"]).to eq "required"
+      end
+
+      context "registering to their own address" do
+        let(:owner_email) { current_user.email }
+
+        it "skips the name and the alert - their account answers both" do
+          get register_path(b_param_token: b_param.id_token, step: 2)
+          expect(user_name_field).to be_nil
+          expect(response.body).to_not include "confirmation link to your email"
+        end
       end
     end
 
@@ -479,7 +520,8 @@ RSpec.describe RegisterController, type: :request do
   describe "update" do
     let(:bike_details) do
       {primary_frame_color_id: color.id, serial_number: "XYZ 123", frame_size: "m",
-       frame_model: "Marlin 7", year: "2023", phone: "(555) 000-0000", status: "status_with_owner"}
+       frame_model: "Marlin 7", year: "2023", phone: "(555) 000-0000", status: "status_with_owner",
+       user_name:}
     end
 
     context "anonymous" do
@@ -572,6 +614,21 @@ RSpec.describe RegisterController, type: :request do
             patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
           }.to change(Bike, :count).by 1
           expect(Bike.last.creator_id).to eq organization.auto_user_id
+          # The name entered is who the registration is for, there being no account to take one from
+          expect(Bike.last.owner_name).to eq user_name
+        end
+      end
+
+      context "blank name" do
+        it "re-renders step 2 with an error, saving nothing" do
+          expect {
+            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.merge(user_name: " ")}
+          }.to_not change { b_param.reload.params }
+          expect(response.status).to eq 422
+          expect(response.body).to include "Owner name is required to register"
+          # Unsaved, so the registration isn't finished - and the form comes back filled in
+          expect(BikeServices::Register.send(:details_completed?, b_param)).to be_falsey
+          expect(response.body).to include "XYZ 123"
         end
       end
 
@@ -605,6 +662,10 @@ RSpec.describe RegisterController, type: :request do
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
         follow_redirect!
         expect(response.body).to include "Registration complete"
+        # Registered for someone else, so it's theirs to claim rather than "your registration"
+        expect(response.body).to include "so they can claim the registration"
+        expect(response.body).to include "View the registration"
+        expect(response.body).to_not include "keep watch"
 
         # Revisiting any step after completion redirects to finished
         get register_path(b_param_token: b_param.id_token, step: 2)
@@ -614,13 +675,27 @@ RSpec.describe RegisterController, type: :request do
       end
 
       context "blank serial" do
-        let(:bike_details) { {primary_frame_color_id: color.id, status: "status_with_owner"} }
+        let(:bike_details) { {primary_frame_color_id: color.id, status: "status_with_owner", user_name:} }
 
         it "registers with an unknown serial" do
           expect {
             patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
           }.to change(Bike, :count).by 1
           expect(Bike.last.serial_number).to eq "unknown"
+        end
+      end
+
+      context "registering to their own address" do
+        let(:owner_email) { current_user.email }
+
+        it "completes without a name - their account is the one it takes" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.except(:user_name)}
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
+          expect(Bike.last.owner_name).to eq current_user.name
+          follow_redirect!
+          # Their own registration, so the completion card is addressed to them
+          expect(response.body).to include "keep watch"
+          expect(response.body).to include "View your registration"
         end
       end
 

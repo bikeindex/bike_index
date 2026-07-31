@@ -1924,6 +1924,8 @@ en:
       find_b_param:
         registration_not_found: We couldn't find that registration — start a new one
           below
+      update:
+        name_required: Owner name is required to register
     search:
       marketplace:
         set_interpreted_params:

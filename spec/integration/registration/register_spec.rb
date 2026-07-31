@@ -4,6 +4,7 @@ require "rails_helper"
 
 RSpec.describe "Register flow", :js, type: :system do
   let(:owner_email) { "owner@bikeindex.org" }
+  let(:user_name) { "Sally Rider" }
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
   let!(:red) { FactoryBot.create(:color, name: "Red") }
   let!(:blue) { FactoryBot.create(:color, name: "Blue") }
@@ -13,6 +14,15 @@ RSpec.describe "Register flow", :js, type: :system do
     # The manufacturer combobox autocompletes against the redis index
     Autocomplete::Loader.clear_redis
     Autocomplete::Loader.load_all(%w[Manufacturer])
+  end
+
+  def sign_in(user)
+    visit new_session_path
+    fill_in "Email", with: user.email
+    click_button "Continue"
+    fill_in "Password", with: "testthisthing7$"
+    click_button "Log in"
+    expect(page).to have_current_path("/my_account", wait: 5)
   end
 
   # Through step 1 and onto step 2, the way a rider gets there
@@ -72,6 +82,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
     # Fill every field: text, chip radio, unit select, comboboxes (including the
     # collapsed additional-color rows) and the missing-serial checkbox
+    fill_in "bike[user_name]", with: user_name
     fill_in "bike[frame_model]", with: "Marlin 7"
     fill_in "bike[year]", with: "2023"
     type_into("#bike_primary_frame_color_id", "Red")
@@ -92,6 +103,7 @@ RSpec.describe "Register flow", :js, type: :system do
     # Nothing submitted yet - the reload restores the whole draft from form-persist
     visit details_url
 
+    expect(page).to have_field("bike[user_name]", with: user_name)
     expect(page).to have_field("bike[frame_model]", with: "Marlin 7")
     expect(page).to have_field("bike[year]", with: "2023")
     expect(page).to have_field("bike_primary_frame_color_id", with: "Red")
@@ -146,7 +158,7 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_content("Registration saved")
     expect(page).to have_content("verify your email")
     b_param = BParam.last
-    expect(b_param.bike).to include("frame_model" => "Marlin 7", "year" => "2023",
+    expect(b_param.bike).to include("user_name" => user_name, "frame_model" => "Marlin 7", "year" => "2023",
       "primary_frame_color_id" => red.id.to_s, "secondary_frame_color_id" => blue.id.to_s,
       "tertiary_frame_color_id" => green.id.to_s, "frame_size" => "m",
       "serial_number" => "made_without_serial", "phone" => "(555) 000-0000",
@@ -154,6 +166,42 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(BikeServices::Register.send(:details_completed?, b_param)).to be_truthy
     expect(ActiveStorage::Blob.find_signed!(b_param.image_signed_id).filename.to_s)
       .to eq "bike_photo-landscape.jpeg"
+  end
+
+  describe "signed in" do
+    let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
+    let(:friend_email) { "friend@bikeindex.org" }
+
+    before { sign_in(current_user) }
+
+    it "asks for a name once the registration is going to someone other than them" do
+      # Step 1 prefills their own address, which their account is already the name for
+      start_registration
+      expect(page).to have_no_field("bike[user_name]")
+
+      # Sending it somewhere else is what asks - step 1 is where that's decided
+      click_link "Back"
+      fill_in "b_param[owner_email]", with: friend_email
+      click_button "Next"
+      expect(page).to have_field("bike[user_name]")
+
+      type_into("#bike_primary_frame_color_id", "Red")
+      click_combobox_option("Red")
+      fill_in "bike[serial_number]", with: "GIFT1234"
+
+      # Required, so the browser holds the submit without any js of ours
+      click_button "Complete Bike Registration"
+      expect(page).to have_current_path(/step=2/, url: true)
+      expect(Bike.count).to eq 0
+
+      fill_in "bike[user_name]", with: user_name
+      click_button "Complete Bike Registration"
+
+      expect(page).to have_content("Registration complete")
+      # Their friend's registration to claim, not theirs
+      expect(page).to have_content("We've emailed #{friend_email} so they can claim")
+      expect(Bike.last).to have_attributes(owner_email: friend_email, owner_name: user_name)
+    end
   end
 
   # The Disk service answers instantly, so what happens between picking a file and the blob
@@ -172,6 +220,7 @@ RSpec.describe "Register flow", :js, type: :system do
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
       fill_in "bike[serial_number]", with: "HELD1234"
+      fill_in "bike[user_name]", with: user_name # anonymous, so it's asked for
       click_button "Complete Bike Registration"
     end
 
@@ -230,14 +279,7 @@ RSpec.describe "Register flow", :js, type: :system do
     let(:image_path) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
     let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
 
-    before do
-      visit new_session_path
-      fill_in "Email", with: current_user.email
-      click_button "Continue"
-      fill_in "Password", with: "testthisthing7$"
-      click_button "Log in"
-      expect(page).to have_current_path("/my_account", wait: 5)
-    end
+    before { sign_in(current_user) }
 
     it "PUTs the photo to the bucket and serves it from the storage domain" do
       start_registration
