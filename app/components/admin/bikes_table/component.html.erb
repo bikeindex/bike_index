@@ -1,31 +1,25 @@
-<%# locals: (bikes: nil, no_show_header: false, show_serial: false, render_sortable: false, skip_user: false, render_multi_check: false) %>
-<% bikes ||= @bikes %>
-<% show_serial = true if params[:show_serial].present? %>
-
 <%# require inline CSS setting because of caching %>
-<% unless display_dev_info? %>
+<% unless helpers.display_dev_info? %>
   <style>.only-dev-visible {display: none !important;} </style>
 <% end %>
 
-<% skip_manufacturer_link = params[:search_manufacturer].present? %>
-
-<% if skip_manufacturer_link %>
+<% if skip_manufacturer_link? %>
   <style>.display-mnfg-link {display: none !important;}</style>
 <% end %>
 
-<% if skip_user %>
+<% if @skip_user %>
   <style>.user-cell {display: none !important;}</style>
 <% end %>
 
-<% unless render_sortable %>
+<% unless @render_sortable %>
   <style>.display-sortable-link {display: none !important;}</style>
 <% end %>
 
-<% unless render_multi_check %>
+<% unless @render_multi_check %>
   <style>.display-multi-check {display: none !important;}</style>
 <% end %>
 
-<% if no_show_header %>
+<% if @no_show_header %>
   <style>.ui-table thead {display: none !important;}</style>
 <% end %>
 
@@ -36,9 +30,9 @@
 
   <div
     data-controller="update-cached-sortable-links"
-    data-update-cached-sortable-links-base-url-value="<%= url_for(sortable_search_params) %>"
+    data-update-cached-sortable-links-base-url-value="<%= url_for(helpers.sortable_search_params) %>"
   >
-    <%= render(UI::Table::Component.new(records: bikes, cache_key: "admin-bikes-v2", render_sortable:, classes: show_serial ? "show-admin-bike-table-serial-cell" : nil)) do |table| %>
+    <%= render(UI::Table::Component.new(records: @bikes, cache_key:, render_sortable: @render_sortable, classes: show_serial? ? "show-admin-bike-table-serial-cell" : nil)) do |table| %>
       <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:bg-transparent tw:border-0 tw:p-0 tw:cursor-pointer", title: "Toggle all checked", aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"}), classes: "display-multi-check tw:w-8", header_classes: "display-multi-check tw:w-8") do |bike| %>
         <%= check_box_tag "bikes_selected[#{bike.id}]", bike.id, false, data: {"table-multi-checkbox-target" => "checkbox"} %>
       <% end %>
