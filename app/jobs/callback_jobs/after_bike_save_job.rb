@@ -13,6 +13,7 @@ module CallbackJobs
 
       bike.update(updated_at: Time.current) && bike.reload if resave_bike
       bike.load_external_images
+      stamp_image_blobs(bike)
       update_matching_partial_registrations(bike)
       BikeJobs::DuplicateBikeFinderJob.perform_async(bike_id)
       if bike.present? && bike.listing_order != bike.calculated_listing_order
@@ -82,6 +83,17 @@ module CallbackJobs
           bike.update(creation_organization_id: matching_b_param.organization_id)
           bike.bike_organizations.where(organization_id: matching_b_param.organization_id).first_or_create
         end
+      end
+    end
+
+    # The register upload stamps each blob with the b_param that minted it, before there's a bike.
+    # Now that the bike owns the image, re-stamp the blob so orphan reaping tracks it by bike.
+    def stamp_image_blobs(bike)
+      bike.public_images.activestorage.each do |public_image|
+        blob = public_image.file.blob
+        next if blob.binx_data.to_h["bike_id"] == bike.id
+
+        blob.update!(binx_data: blob.binx_data.to_h.except("b_param_id").merge("bike_id" => bike.id))
       end
     end
 
