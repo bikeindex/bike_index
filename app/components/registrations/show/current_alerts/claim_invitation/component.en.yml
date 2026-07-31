@@ -12,7 +12,7 @@ en:
             read_more: read more
             registered_your_bike_on_index_html: >-
               registered your %{bike_type} on Bike Index, a free, non-profit, bike
-              registry and stolen bike recovery platform (%{read_more_link})
+              registry and stolen bike recovery platform %{read_more_link}.
             sign_up: sign up
             sign_up_to_claim: Sign up
             to_see_your_bike_sign_up_html: >-

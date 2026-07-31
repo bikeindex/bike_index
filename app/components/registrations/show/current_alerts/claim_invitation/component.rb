@@ -69,8 +69,10 @@ module Registrations
             image_tag(organization.avatar.url(:medium), alt: organization.name, class: "tw:h-10 tw:w-10 tw:rounded-full")
           end
 
+          # Parens included, so they're sized with the link rather than the sentence
           def read_more_link
-            link_to(translation(".read_more"), about_path, target: "_blank", rel: "noopener", class: "twlink")
+            link = link_to(translation(".read_more"), about_path, target: "_blank", rel: "noopener", class: "twlink")
+            tag.span(safe_join(["(", link, ")"]), class: "tw:text-sm")
           end
         end
       end
