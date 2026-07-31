@@ -7,33 +7,30 @@
         <%= form_for [:admin, @superuser_ability] do |f| %>
           <%= render(UI::Alerts::ObjectError::Component.new(object: @superuser_ability)) %>
 
-          <div class="form-group">
-            <%= f.label :user_identifier, "User" %>
-            <%= f.text_field :user_identifier, required: true, autocomplete: "off", class: "form-control" %>
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :user_identifier,
+              label_text: "User", required: true, wrapper_class: "tw:mb-1",
+              html_options: {autocomplete: "off"})) %>
 
-            <small class="below-input-help">email, username or id</small>
-          </div>
+          <p class="tw:mb-4 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
+            email, username or id
+          </p>
 
-          <div class="form-group">
-            <%= f.label :controller_name %>
-            <%= f.text_field :controller_name, autocomplete: "off", class: "form-control" %>
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :controller_name,
+              wrapper_class: "tw:mb-1", html_options: {autocomplete: "off"})) %>
 
-            <small class="below-input-help">
-              <em>leave blank</em> for a universal ability - access to all of
-              admin
-            </small>
-          </div>
+          <p class="tw:mb-4 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
+            <em>leave blank</em> for a universal ability - access to all of
+            admin
+          </p>
 
-          <div class="form-group">
-            <%= f.label :action_name %>
-            <%= f.text_field :action_name, autocomplete: "off", class: "form-control" %>
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :action_name,
+              wrapper_class: "tw:mb-1", html_options: {autocomplete: "off"})) %>
 
-            <small class="below-input-help">
-              only applies with a controller name
-            </small>
-          </div>
+          <p class="tw:mb-4 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
+            only applies with a controller name
+          </p>
 
-          <div class="form-group">
+          <div class="tw:mb-4">
             <% SuperuserAbility::SU_OPTIONS.each do |ability| %>
               <%= render UI::Forms::Checkbox::Component.new(
                 name: ability,
