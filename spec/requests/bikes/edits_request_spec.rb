@@ -371,6 +371,20 @@ RSpec.describe Bikes::EditsController, type: :request do
     end
   end
 
+  context "photos template" do
+    let!(:carrierwave_image) { FactoryBot.create(:public_image, :with_image_file, imageable: bike) }
+    let!(:activestorage_image) { FactoryBot.create(:public_image, :with_attached_file, imageable: bike) }
+
+    it "renders an image for both storage backends" do
+      expect(carrierwave_image.reload.activestorage?).to be_falsey
+      expect(activestorage_image.reload.activestorage?).to be_truthy
+      get "#{base_url}/photos"
+      expect(response.code).to eq("200")
+      expect(response).to render_template(:photos)
+      expect(response.body).to_not include("missing-image")
+    end
+  end
+
   context "strava_gear template" do
     let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, user: current_user) }
     let!(:strava_gear) { FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b12345", name: "My Road Bike") }

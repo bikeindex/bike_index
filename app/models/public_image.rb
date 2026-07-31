@@ -114,6 +114,9 @@ class PublicImage < ApplicationRecord
 
   def carrierwave? = !activestorage?
 
+  # Not carrierwave's `image?`, which answers from that column - blank on an activestorage row
+  def image_present? = image_url.present?
+
   # Both backends name their sizes the same, so callers pass one either way - the
   # activestorage dimensions are just larger
   def image_url(size = nil)
