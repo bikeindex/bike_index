@@ -11,3 +11,4 @@ en:
           postal_code: Postal code
           region: Region
           state: State
+          street_2: Address line 2

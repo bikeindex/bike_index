@@ -8,10 +8,13 @@ module UI
       # address attributes (street, city, region_record_id, region_string,
       # postal_code, country_id)
       class Component < ApplicationComponent
-        def initialize(form_builder:, street_label: nil, default_country_id: Country.united_states_id)
+        def initialize(form_builder:, street_label: nil, default_country_id: Country.united_states_id,
+          required: false, street_2: false)
           @form = form_builder
           @street_label = street_label
           @default_country_id = default_country_id
+          @required = required
+          @street_2 = street_2
         end
 
         private
@@ -21,7 +24,7 @@ module UI
         end
 
         def us_country_id
-          Country.united_states_id
+          @us_country_id ||= Country.united_states_id
         end
 
         # The object's country, falling back to the default, so the dropdown and the
@@ -42,6 +45,12 @@ module UI
         def us_selected?
           selected_country_id == us_country_id
         end
+
+        # Only the visible one of the state/region pair is required — the browser can't
+        # report validity on a hidden field
+        def state_required? = @required && us_selected?
+
+        def region_required? = @required && !us_selected?
       end
     end
   end

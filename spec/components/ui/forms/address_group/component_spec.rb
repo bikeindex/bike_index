@@ -18,6 +18,42 @@ RSpec.describe UI::Forms::AddressGroup::Component, type: :component do
     expect(component).to have_css("input[name='address_record[postal_code]']")
     expect(component).to have_css("select[name='address_record[country_id]']")
     expect(component).to have_css("label", text: "Address")
+    expect(component).to have_no_css("input[name='address_record[street_2]']")
+    expect(component).to have_no_css("[required]")
+  end
+
+  context "with street_2" do
+    let(:options) { {street_2: true} }
+
+    it "renders the street_2 field" do
+      expect(component).to have_css("input[name='address_record[street_2]']")
+      expect(component).to have_css("label", text: "Address line 2")
+    end
+  end
+
+  context "with required" do
+    let(:options) { {required: true, street_2: true} }
+
+    it "requires every field but street_2" do
+      expect(component).to have_css("input[name='address_record[street]'][required]")
+      expect(component).to have_css("input[name='address_record[city]'][required]")
+      expect(component).to have_css("select[name='address_record[region_record_id]'][required]")
+      expect(component).to have_css("input[name='address_record[postal_code]'][required]")
+      expect(component).to have_css("select[name='address_record[country_id]'][required]")
+      expect(component).to have_css("input[name='address_record[street_2]']:not([required])")
+      # The hidden region_string is left optional - the browser can't report validity on it
+      expect(component).to have_css("input[name='address_record[region_string]']:not([required])")
+    end
+
+    context "with a non-US country" do
+      let!(:country) { FactoryBot.create(:country, name: "Testland") }
+      let(:address_record) { AddressRecord.new(country_id: country.id) }
+
+      it "moves required to region_string" do
+        expect(component).to have_css("input[name='address_record[region_string]'][required]")
+        expect(component).to have_css("select[name='address_record[region_record_id]']:not([required])")
+      end
+    end
   end
 
   context "with a street_label" do
