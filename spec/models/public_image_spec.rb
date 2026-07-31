@@ -62,6 +62,32 @@ RSpec.describe PublicImage, type: :model do
     end
   end
 
+  # ApplicationUploader#blank? answers from the retrieved file rather than asking storage,
+  # which with fog is a HEAD request on every render and every validation
+  describe "image?" do
+    it "is false without an image" do
+      expect(PublicImage.new.image?).to be_falsey
+    end
+
+    it "is true for a stored carrierwave image, reloaded" do
+      public_image = FactoryBot.create(:public_image, :with_image_file)
+      expect(public_image.reload.image?).to be_truthy
+    end
+
+    it "is true for a cached image, before storing" do
+      public_image = PublicImage.new(image: File.open(Rails.root.join("spec", "fixtures", "bike.jpg")))
+      expect(public_image.image?).to be_truthy
+    end
+  end
+
+  describe "image_present?" do
+    it "is true for an activestorage row, which image? says no to" do
+      public_image = FactoryBot.create(:public_image, :with_attached_file).reload
+      expect(public_image.image?).to be_falsey
+      expect(public_image.image_present?).to be_truthy
+    end
+  end
+
   describe "process_image_upload" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:image_file) { File.open(Rails.root.join("spec", "fixtures", "bike.jpg")) }
