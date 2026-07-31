@@ -1,4 +1,4 @@
-<%= render(UI::Modal::Component.new(id: "claim-invitation-modal", title: translation(".your_bike", bike_type: @bike.type), open: true)) do |modal| %>
+<%= render(UI::Modal::Component.new(id: MODAL_ID, title: translation(".your_bike", bike_type: @bike.type), open: true)) do |modal| %>
   <% modal.with_body do %>
     <div class="tw:flex tw:items-start tw:gap-3">
       <% if organization_avatar %>

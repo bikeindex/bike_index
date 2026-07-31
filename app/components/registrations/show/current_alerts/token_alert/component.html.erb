@@ -1,0 +1,8 @@
+<%= render(UI::Alert::Component.new(kind: :purple, margin_classes: "")) do %>
+  <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
+    <p><%= prompt.alert_text %></p>
+
+    <%= render(UI::Button::Component.new(text: prompt.alert_button_text, color: :purple,
+      data: {open_modal: modal_id})) %>
+  </div>
+<% end %>

@@ -8,6 +8,8 @@ module Registrations
         # in as someone it's claimable by, or because they followed the claim link from
         # their registration email (claim_message, so they may still be signed out)
         class Component < ApplicationComponent
+          MODAL_ID = "claim-invitation-modal"
+
           def initialize(bike:, current_user: nil, claim_message: nil)
             @bike = bike
             @current_user = current_user
@@ -20,6 +22,11 @@ module Registrations
 
             claimable? || @claim_message.present?
           end
+
+          # Shown by TokenAlert, which links to this dialog rather than repeating it
+          def alert_text = translation(".your_bike", bike_type: @bike.type)
+
+          def alert_button_text = translation(".claim_bike_type", bike_type: @bike.type)
 
           private
 

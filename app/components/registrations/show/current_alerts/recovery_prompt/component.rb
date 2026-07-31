@@ -9,6 +9,8 @@ module Registrations
         # session[:recovery_link_token], deleting the token so this shows once.
         # A similar form lives in edit_report_stolen / edit_report_recovered
         class Component < ApplicationComponent
+          MODAL_ID = "recovery-prompt-modal"
+
           def initialize(bike:, stolen_record: nil)
             @bike = bike
             @stolen_record = stolen_record
@@ -17,6 +19,11 @@ module Registrations
           def render?
             @stolen_record.present?
           end
+
+          # Shown by TokenAlert, which links to this dialog rather than repeating it
+          def alert_text = translation(".mark_your_bike_recovered", bike_type: @bike.type)
+
+          def alert_button_text = translation(".mark_recovered")
 
           private
 

@@ -1,4 +1,4 @@
-<%= render(UI::Modal::Component.new(id: "notification-token-modal", title: @matching_notification.subject, open: true)) do |modal| %>
+<%= render(UI::Modal::Component.new(id: MODAL_ID, title: @matching_notification.subject, open: true)) do |modal| %>
   <% modal.with_body do %>
     <% if @matching_notification.message.present? %>
       <p><%= @matching_notification.message %></p>

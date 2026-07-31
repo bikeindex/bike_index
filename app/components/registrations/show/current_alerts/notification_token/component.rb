@@ -7,6 +7,8 @@ module Registrations
         # The prompt reached from a parking or graduated notification email's link,
         # offering to mark the notification resolved (or confirming it already is)
         class Component < ApplicationComponent
+          MODAL_ID = "notification-token-modal"
+
           def initialize(bike:, token: nil, token_type: nil, matching_notification: nil)
             @bike = bike
             @token = token
@@ -16,6 +18,14 @@ module Registrations
 
           def render?
             @token.present? && @matching_notification.present?
+          end
+
+          # Shown by TokenAlert, which links to this dialog rather than repeating it.
+          # A resolved notification has no form left to submit, so the button just reads it
+          def alert_text = @matching_notification.subject
+
+          def alert_button_text
+            resolved? ? translation(".view_notification") : resolve_button_text
           end
 
           private

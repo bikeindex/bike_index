@@ -12,13 +12,15 @@ module Registrations
 
         # org_role is the role this panel renders as - a superadmin can view any
         # organization as :staff or as :limited (view_as)
-        def initialize(bike:, current_user:, organization:, org_role:, available_views: [], bike_sticker: nil)
+        def initialize(bike:, current_user:, organization:, org_role:, available_views: [], bike_sticker: nil,
+          current_alerts: nil)
           @bike = bike
           @current_user = current_user
           @organization = organization
           @available_views = available_views
           @bike_sticker = bike_sticker
           @org_role = org_role
+          @current_alerts = current_alerts
         end
 
         def render?

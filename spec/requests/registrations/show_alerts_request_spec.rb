@@ -37,10 +37,16 @@ RSpec.describe "RegistrationsController#show alerts", type: :request do
       # Opened without a click, like the legacy overlay
       expect(response.body).to match("data-ui--modal-open-on-connect-value=\"true\"")
 
+      # The dialog opens on its own, but closing it is the end of it — the alert in the
+      # page body is the way back to it
+      expect(response.body).to match("data-open-modal=\"recovery-prompt-modal\"")
+
       # Reading it consumes the token, so a reload doesn't re-prompt
       expect(session[:recovery_link_token]).to be_blank
       get "/registrations/#{bike.id}"
-      expect(whitespace_normalized_body_text).to_not match("Mark your bike recovered!")
+      body = whitespace_normalized_body_text
+      expect(body).to_not match("Mark your bike recovered!")
+      expect(response.body).to_not match("data-open-modal=\"recovery-prompt-modal\"")
     end
 
     context "bike is no longer stolen" do
