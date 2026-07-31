@@ -30,7 +30,7 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
     it "submits a school lead via hero button, persisting entry across a reload" do
       visit "/for_schools"
       expect(page).to have_content("campus bike management")
-      first("button[data-open-modal]").click
+      open_modal(first("button[data-open-modal]"))
 
       expect(page).to have_content("Contact us for a free trial", wait: 5)
       fill_in "Name", with: "Jane Doe"
@@ -78,7 +78,7 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
       log_in_via_browser(user)
       visit "/for_law_enforcement"
       expect(page).to have_content("bike theft recovery")
-      find(".le-cta-section button[data-open-modal]").click
+      open_modal(".le-cta-section button[data-open-modal]")
 
       expect {
         fill_in_and_submit_demo_form(name_label: "City", name_value: "Portland")
