@@ -82,6 +82,12 @@ class RegisterController < ApplicationController
       BikeServices::Register.user_name_required?(@b_param, BikeServices::Register.user_emails(current_user))
   end
 
+  # Everything new seeds a registration from, so arriving on an organization's link
+  # (or a stolen one) without a registration doesn't lose how they got there
+  def start_params
+    params.permit(:organization_id, :status, :email).to_h.compact_blank
+  end
+
   # b_param_token=false abandons the session's registration - the start over link
   def reusable_token
     session[:register_b_param_token] unless params[:b_param_token] == "false"
@@ -98,7 +104,7 @@ class RegisterController < ApplicationController
     @b_param ||= BikeServices::Register.b_param_for(user: current_user) if build
     if @b_param.blank?
       flash[:info] = translation(:registration_not_found) if params[:b_param_token].present?
-      return redirect_to(new_register_path)
+      return redirect_to(new_register_path(start_params))
     end
 
     # The session follows whichever registration the token named, so the next

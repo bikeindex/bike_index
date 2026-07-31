@@ -44,6 +44,13 @@ RSpec.describe RegisterController, type: :request do
         expect(stolen_b_param.reload.status).to eq "status_stolen"
       end
 
+      # The organization's link is /register, which has no registration to attach to yet
+      it "keeps the organization through the bare /register" do
+        get "#{base_url}?organization_id=#{organization.slug}"
+        follow_redirect! # into /register/new, which creates the registration
+        expect(BParam.last.creation_organization_id).to eq organization.id
+      end
+
       # Only the create branch of b_param_for seeds status, so this is the org path
       it "attaches the organization to a blank registration already in the session" do
         get "/register/new" # a blank shell, no organization
@@ -130,6 +137,11 @@ RSpec.describe RegisterController, type: :request do
       get base_url
       expect(response).to redirect_to new_register_path
       expect(flash[:info]).to be_nil
+
+      # How they arrived rides along - there's no registration yet to store it on
+      get "#{base_url}?organization_id=brakebills&status=status_stolen&email=someone@example.com"
+      expect(response).to redirect_to new_register_path(organization_id: "brakebills",
+        status: "status_stolen", email: "someone@example.com")
 
       # With a session registration, bare /register resumes it instead
       get "/register/new"
