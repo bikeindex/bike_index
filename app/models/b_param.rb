@@ -415,7 +415,7 @@ class BParam < ApplicationRecord
     bike["user_name"]
   end
 
-  def self_registration?(user = creator)
+  def self_made?(user = creator)
     return false if user.blank?
 
     ([user.email] + user.confirmed_emails).include?(EmailNormalizer.normalize(owner_email))

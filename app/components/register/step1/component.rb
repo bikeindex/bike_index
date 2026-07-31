@@ -48,7 +48,7 @@ module Register
 
       # Only an address the registrant hasn't proven is theirs has anything to wait on
       def confirmation_email_pending?
-        !@b_param.self_registration?(@current_user)
+        !@b_param.self_made?(@current_user)
       end
 
       # Step 1 is only revisitable once submitted, so this is a return from step 2

@@ -87,7 +87,7 @@ class RegisterController < ApplicationController
 
   # Step 2's own field, so the submitted value is what counts
   def user_name_missing?
-    params.dig(:bike, :user_name).blank? && !@b_param.self_registration?(current_user)
+    params.dig(:bike, :user_name).blank? && !@b_param.self_made?(current_user)
   end
 
   # Everything new seeds a registration from, so arriving on an organization's link

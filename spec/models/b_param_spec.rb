@@ -606,31 +606,31 @@ RSpec.describe BParam, type: :model do
     end
   end
 
-  describe "self_registration?" do
+  describe "self_made?" do
     let(:b_param) { BParam.new(params: {bike: {owner_email: "owner@example.com"}}.as_json) }
     let(:user) { FactoryBot.create(:user_confirmed, email: "owner@example.com") }
 
     it "is only the registrant's own addresses" do
-      expect(b_param.self_registration?(nil)).to be_falsey
-      expect(b_param.self_registration?(user)).to be_truthy
+      expect(b_param.self_made?(nil)).to be_falsey
+      expect(b_param.self_made?(user)).to be_truthy
 
       # An additional address is theirs once it's confirmed, and not before
       user.additional_emails = "second@example.com"
       b_param.owner_email = " SECOND@example.com"
-      expect(b_param.self_registration?(user)).to be_falsey
+      expect(b_param.self_made?(user)).to be_falsey
       user_email = user.user_emails.find_by(email: "second@example.com")
       user_email.confirm(user_email.confirmation_token)
-      expect(b_param.self_registration?(user)).to be_truthy
+      expect(b_param.self_made?(user)).to be_truthy
 
       b_param.owner_email = "someone@example.com"
-      expect(b_param.self_registration?(user)).to be_falsey
+      expect(b_param.self_made?(user)).to be_falsey
     end
 
     context "without a user passed" do
       it "answers for the creator" do
-        expect(b_param.self_registration?).to be_falsey
+        expect(b_param.self_made?).to be_falsey
         b_param.creator = user
-        expect(b_param.self_registration?).to be_truthy
+        expect(b_param.self_made?).to be_truthy
       end
     end
   end

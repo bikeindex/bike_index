@@ -18,8 +18,8 @@ module Register
 
       # Signed in as the owner - to anyone else the registration belongs to the
       # address it was made for, which is where the claim email went
-      def self_registration?
-        @b_param.self_registration?(@current_user)
+      def self_made?
+        @b_param.self_made?(@current_user)
       end
 
       # Without the bike the registration is only held, waiting on the email
@@ -29,7 +29,7 @@ module Register
 
       def subtitle_text
         return translation(".verify_your_email_html", email: owner_email_tag) if @bike.blank?
-        return translation(".we_will_keep_watch", bike_display: @bike.mnfg_name) if self_registration?
+        return translation(".we_will_keep_watch", bike_display: @bike.mnfg_name) if self_made?
 
         translation(".registered_for_owner_html", bike_display: @bike.mnfg_name, email: owner_email_tag)
       end

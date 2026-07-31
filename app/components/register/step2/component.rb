@@ -18,7 +18,7 @@ module Register
       # Registering to the signed-in account's own address proves it, so only an
       # address belonging to someone else is ever waiting on being confirmed
       def awaiting_confirmation?
-        !@b_param.self_registration?(@current_user) && @b_param.email_unconfirmed?
+        !@b_param.self_made?(@current_user) && @b_param.email_unconfirmed?
       end
 
       def organization
@@ -27,13 +27,13 @@ module Register
 
       # Step 1's email settles who this is for, so the name is only asked for here
       def user_name_required?
-        !@b_param.self_registration?(@current_user)
+        !@b_param.self_made?(@current_user)
       end
 
       # What the account already holds only answers the organization's fields when the
       # registration is the registrant's own - registering for someone else asks for theirs
       def reg_field_user
-        @current_user if @b_param.self_registration?(@current_user)
+        @current_user if @b_param.self_made?(@current_user)
       end
 
       # The additional fields the organization asks for, gated exactly as bikes/new
