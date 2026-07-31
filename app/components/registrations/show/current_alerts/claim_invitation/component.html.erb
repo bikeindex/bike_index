@@ -16,13 +16,7 @@
         <% else %>
           <p>
             <strong><%= registered_by %></strong>
-            <%= translation(".registered_your_bike_on_index", bike_type: @bike.type) %>
-          </p>
-          <p class="tw:mt-2">
-            <%= translation(".public_resource_reunited_value_html", value: recoveries_value) %>
-          </p>
-          <p class="tw:mt-2">
-            <%= translation(".supercharge_if_your_bike_stolen", bike_type: @bike.type) %>
+            <%= translation(".registered_your_bike_on_index_html", bike_type: @bike.type, read_more_link: read_more_link) %>
           </p>
           <p class="tw:mt-2">
             <%= translation(".to_see_your_bike_sign_up_html", bike_type: @bike.type, sign_up_link: link_to(translation(".sign_up"), claim_path, class: "twlink")) %>
@@ -30,7 +24,7 @@
         <% end %>
 
         <div class="tw:mt-4">
-          <%= render(UI::ButtonLink::Component.new(href: claim_path, text: translation(".claim_bike_type", bike_type: @bike.type), color: :purple)) %>
+          <%= render(UI::ButtonLink::Component.new(href: claim_path, text: claim_button_text, color: :purple)) %>
         </div>
       </div>
     </div>

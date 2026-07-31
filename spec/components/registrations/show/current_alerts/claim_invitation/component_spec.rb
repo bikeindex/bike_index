@@ -24,9 +24,9 @@ RSpec.describe Registrations::Show::CurrentAlerts::ClaimInvitation::Component, t
     it "pitches the registry and sends them to sign up against the ownership email" do
       render_inline(component)
       expect(page).to have_text("registered your bike on Bike Index")
-      expect(page).to have_text("We're privacy-centric")
+      expect(page).to have_link("read more", href: "/about")
       # Signing up with the ownership's email is what makes the bike claimable
-      claim_link = page.find_link("Claim bike")["href"]
+      claim_link = page.find_link("Sign up")["href"]
       expect(claim_link).to start_with("/users/new")
       expect(CGI.unescape(claim_link)).to include("email=new-owner@example.com")
       expect(CGI.unescape(claim_link)).to include("/registrations/#{bike.id}")

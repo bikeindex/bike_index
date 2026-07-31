@@ -178,7 +178,7 @@ RSpec.describe "RegistrationsController#show alerts", type: :request do
       expect(response.status).to eq(200)
       body = whitespace_normalized_body_text
       expect(body).to match("registered your bike on Bike Index")
-      expect(body).to match("Claim bike")
+      expect(body).to match("Sign up")
       expect(session[:claim_token_email]).to eq "new-owner@example.com"
     end
 

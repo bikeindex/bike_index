@@ -26,9 +26,17 @@ module Registrations
           # Shown by TokenAlert, which links to this dialog rather than repeating it
           def alert_text = translation(".your_bike", bike_type: @bike.type)
 
-          def alert_button_text = translation(".claim_bike_type", bike_type: @bike.type)
+          def alert_button_text = claim_button_text
 
           private
+
+          # Follows claim_path: a signed-in claimant claims outright, anyone else is
+          # being sent to sign up first
+          def claim_button_text
+            return translation(".claim_bike_type", bike_type: @bike.type) if claimable?
+
+            translation(".sign_up_to_claim")
+          end
 
           # Memoized: this hits UserEmail, and render? plus the template and claim_path
           # all ask
@@ -65,8 +73,8 @@ module Registrations
             image_tag(organization.avatar.url(:medium), alt: organization.name, class: "tw:h-10 tw:w-10 tw:rounded-full")
           end
 
-          def recoveries_value
-            helpers.as_currency(Counts.recoveries_value)
+          def read_more_link
+            link_to(translation(".read_more"), about_path, target: "_blank", rel: "noopener", class: "twlink")
           end
         end
       end

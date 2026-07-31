@@ -11,7 +11,7 @@ RSpec.describe Registrations::Show::Wrapper::Component, :js, type: :system do
   # Text that only appears once that alert rendered. Keyed by the component's directory
   # so the keys can be checked against what's actually on disk
   let(:alert_text) do
-    {"claim_invitation" => "Claim bike",
+    {"claim_invitation" => "registered your bike on Bike Index",
      "notification_token" => "Mark bike retrieved",
      "recovery_prompt" => "Mark your bike recovered!",
      "scanned_sticker" => "You scanned",
