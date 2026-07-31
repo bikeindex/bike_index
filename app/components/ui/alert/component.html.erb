@@ -1,5 +1,5 @@
 <div
-  class="tw:flex tw:items-baseline tw:gap-4 tw:rounded-sm tw:border tw:p-4 tw:transition-all tw:duration-300 <%= @margin_classes %> <%= color_classes %>"
+  class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-4 tw:gap-y-2 tw:rounded-sm tw:border tw:p-4 tw:transition-all tw:duration-300 <%= @margin_classes %> <%= color_classes %>"
   role="alert"
   data-controller="ui--alert"
 >
@@ -13,13 +13,13 @@
     <span class="tw:sr-only"><%= @kind.to_s.titleize %></span>
   </div>
 
-  <div class="tw:grow">
-    <% if @header.present? %>
-      <h4 class="uncap tw:mb-0! tw:text-lg! <%= text_color_classes_important %>">
-        <%= @header %>
-      </h4>
-    <% end %>
+  <% if @header.present? %>
+    <h4 class="uncap tw:mb-0! tw:text-lg! <%= text_color_classes_important %>">
+      <%= @header %>
+    </h4>
+  <% end %>
 
+  <div class="<%= body_classes %>">
     <%= @text %>
     <%= content %>
   </div>
