@@ -75,7 +75,7 @@ RSpec.describe RegisterController, type: :request do
       get "/register/new"
       submitted_b_param = BParam.last
       post base_url, params: {b_param_token: submitted_b_param.id_token,
-                              b_param: {manufacturer_id: "Trek", cycle_type: "bike", owner_email:, user_name:}}
+                              b_param: {manufacturer_id: "Trek", cycle_type: "bike", owner_email:}}
       submitted_b_param.update_column(:updated_at, CleanBParamsJob.clean_before - 1.hour)
       expect { CleanBParamsJob.new.perform }.to_not change(BParam, :count)
     end
@@ -152,25 +152,10 @@ RSpec.describe RegisterController, type: :request do
   end
 
   describe "show step: 1" do
-    # The wrapper is what hides, and what's inside it is what's disabled
-    def user_name_field
-      Nokogiri::HTML(response.body).at_css("[data-register--user-name-target='field']")
-    end
-
-    # The addresses js hides the field for
-    def user_name_emails
-      Nokogiri::HTML(response.body).at_css("[data-register--user-name-emails-value]")
-        .attr("data-register--user-name-emails-value")
-    end
-
     it "renders" do
       get register_path(b_param_token: b_param.id_token, step: 1)
       expect(response.status).to eq 200
       expect(response.body).to include "Register your bike!"
-      # Anonymous, so there's no name on file and no address that could produce one
-      expect(user_name_field["class"]).to_not include "tw:hidden"
-      expect(user_name_field.at_css("input")["disabled"]).to be_nil
-      expect(user_name_emails).to eq "[]"
       # Controller-rendered components still wrap in the application layout
       expect(response.body).to include "</html>"
       # Prefilled from the registration, so going back to step 1 keeps the values
@@ -185,25 +170,10 @@ RSpec.describe RegisterController, type: :request do
     context "signed in" do
       include_context :request_spec_logged_in_as_user
 
-      it "skips the confirmation email note - and asks for the name of whoever it's for" do
+      it "skips the confirmation email note - they never wait on it" do
         get register_path(b_param_token: b_param.id_token, step: 1)
         expect(response.status).to eq 200
         expect(response.body).to_not include "email a confirmation link"
-        # The registration is going somewhere other than their own address
-        expect(user_name_field["class"]).to_not include "tw:hidden"
-        expect(user_name_field.at_css("input")["disabled"]).to be_nil
-      end
-
-      context "registering to their own address" do
-        let(:owner_email) { current_user.email }
-
-        it "skips the name - their account is where it comes from" do
-          get register_path(b_param_token: b_param.id_token, step: 1)
-          expect(user_name_field["class"]).to include "tw:hidden"
-          # Hidden isn't enough: a disabled field neither posts nor holds the submit
-          expect(user_name_field.at_css("input")["disabled"]).to eq "disabled"
-          expect(user_name_emails).to eq [current_user.email].to_json
-        end
       end
     end
 
@@ -289,14 +259,14 @@ RSpec.describe RegisterController, type: :request do
 
   describe "create" do
     let!(:empty_b_param) { BParam.create(origin: "register_flow") }
-    let(:step_1_params) { {b_param: {manufacturer_id: "Trek", cycle_type: "cargo", owner_email:, user_name:}} }
+    let(:step_1_params) { {b_param: {manufacturer_id: "Trek", cycle_type: "cargo", owner_email:}} }
     let(:create_params) { step_1_params.merge(b_param_token: empty_b_param.id_token) }
 
     it "saves step 1 and redirects to step 2, without emailing" do
       expect { post base_url, params: create_params }
         .to_not change { [BParam.count, Email::PartialRegistrationJob.jobs.size] }
       empty_b_param.reload
-      expect(empty_b_param).to have_attributes(origin: "register_flow", owner_email:, user_name:,
+      expect(empty_b_param).to have_attributes(origin: "register_flow", owner_email:,
         manufacturer_id: manufacturer.id, creator_id: nil, cycle_type: "cargo")
       expect(empty_b_param.motorized?).to be_falsey
       expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
@@ -304,7 +274,7 @@ RSpec.describe RegisterController, type: :request do
 
     context "motorized, stolen, manufacturer not in the list" do
       let(:step_1_params) do
-        {b_param: {manufacturer_id: "Fancy Cycles", owner_email:, user_name:},
+        {b_param: {manufacturer_id: "Fancy Cycles", owner_email:},
          propulsion_type_motorized: "1", status: "stolen"}
       end
 
@@ -319,7 +289,7 @@ RSpec.describe RegisterController, type: :request do
     end
 
     context "always-motorized cycle type" do
-      let(:step_1_params) { {b_param: {manufacturer_id: "Trek", cycle_type: "e-scooter", owner_email:, user_name:}} }
+      let(:step_1_params) { {b_param: {manufacturer_id: "Trek", cycle_type: "e-scooter", owner_email:}} }
 
       it "is motorized without the checkbox" do
         post base_url, params: create_params
@@ -328,7 +298,7 @@ RSpec.describe RegisterController, type: :request do
     end
 
     context "blank email" do
-      let(:step_1_params) { {b_param: {manufacturer_id: "Trek", owner_email: " ", user_name:}} }
+      let(:step_1_params) { {b_param: {manufacturer_id: "Trek", owner_email: " "}} }
 
       it "renders step 1 with an error, saving nothing" do
         post base_url, params: create_params
@@ -339,37 +309,12 @@ RSpec.describe RegisterController, type: :request do
     end
 
     context "blank manufacturer" do
-      let(:step_1_params) { {b_param: {manufacturer_id: "", owner_email:, user_name:}} }
+      let(:step_1_params) { {b_param: {manufacturer_id: "", owner_email:}} }
 
       it "renders step 1 with an error" do
         post base_url, params: create_params
         expect(response.status).to eq 422
         expect(response.body).to include "Manufacturer is required"
-      end
-    end
-
-    context "blank name" do
-      let(:step_1_params) { {b_param: {manufacturer_id: "Trek", owner_email:, user_name: " "}} }
-
-      it "renders step 1 with an error, saving nothing" do
-        post base_url, params: create_params
-        expect(response.status).to eq 422
-        expect(response.body).to include "Owner name is required to register"
-        expect(empty_b_param.reload.manufacturer_id).to be_nil
-      end
-
-      context "signed in" do
-        include_context :request_spec_logged_in_as_user
-
-        it "registers to the user's own address without one, but not to another" do
-          post base_url, params: create_params.deep_merge(b_param: {owner_email: current_user.email})
-          expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
-          expect(empty_b_param.reload.owner_email).to eq current_user.email
-
-          post base_url, params: create_params
-          expect(response.status).to eq 422
-          expect(response.body).to include "Owner name is required to register"
-        end
       end
     end
 
@@ -411,6 +356,10 @@ RSpec.describe RegisterController, type: :request do
       JSON.parse(status_field("phone")["data-statuses"])
     end
 
+    def user_name_field
+      Nokogiri::HTML(response.body).at_css("input[name='bike[user_name]']")
+    end
+
     it "renders the details form, showing the email from step 1" do
       get register_path(b_param_token: b_param.id_token, step: 2)
       expect(response.status).to eq 200
@@ -418,6 +367,9 @@ RSpec.describe RegisterController, type: :request do
       expect(response.body).to include owner_email
       # No organization asking for anything, so it's just the registrant's own info
       expect(response.body).to include "Contact info"
+      # Anonymous, so there's no account the name could come from - and the browser
+      # is what asks for it, no js involved
+      expect(user_name_field["required"]).to eq "required"
       # An address nothing has proven yet, so the confirmation is still pending - the photo
       # is offered regardless, uploading against the registration's token
       expect(response.body).to include "confirmation link to your email"
@@ -481,7 +433,7 @@ RSpec.describe RegisterController, type: :request do
         patch base_url, params: {b_param_token: b_param.id_token,
                                  bike: {primary_frame_color_id: color.id, status: "status_with_owner",
                                         extra_registration_number: "XX99", organization_affiliation: "student",
-                                        student_id: "S-1234",
+                                        student_id: "S-1234", user_name:,
                                         address_record_attributes: {street: "1 Main St", city: "Chicago",
                                                                     postal_code: "60608", country_id: Country.united_states_id}}}
         expect(b_param.reload.bike).to include("extra_registration_number" => "XX99",
@@ -511,11 +463,22 @@ RSpec.describe RegisterController, type: :request do
     context "signed in" do
       include_context :request_spec_logged_in_as_user
 
-      it "skips the confirmation alert - they never wait on it" do
+      it "skips the confirmation alert - and asks for the name of whoever it's for" do
         get register_path(b_param_token: b_param.id_token, step: 2)
         expect(response.status).to eq 200
         expect(response.body).to_not include "confirmation link to your email"
         expect(response.body).to include "bike_image"
+        # Step 1's address isn't theirs, so their account's name isn't the one to use
+        expect(user_name_field["required"]).to eq "required"
+      end
+
+      context "registering to their own address" do
+        let(:owner_email) { current_user.email }
+
+        it "skips the name - their account is where it comes from" do
+          get register_path(b_param_token: b_param.id_token, step: 2)
+          expect(user_name_field).to be_nil
+        end
       end
     end
 
@@ -547,7 +510,8 @@ RSpec.describe RegisterController, type: :request do
   describe "update" do
     let(:bike_details) do
       {primary_frame_color_id: color.id, serial_number: "XYZ 123", frame_size: "m",
-       frame_model: "Marlin 7", year: "2023", phone: "(555) 000-0000", status: "status_with_owner"}
+       frame_model: "Marlin 7", year: "2023", phone: "(555) 000-0000", status: "status_with_owner",
+       user_name:}
     end
 
     context "anonymous" do
@@ -631,8 +595,8 @@ RSpec.describe RegisterController, type: :request do
       context "organization with an auto user" do
         let(:organization) { FactoryBot.create(:organization, :with_auto_user) }
         let(:b_param) do
-          BParam.create(origin: "register_flow", params: {bike: {owner_email:, user_name:,
-                                                                 manufacturer_id: "Trek", creation_organization_id: organization.id}}.as_json)
+          BParam.create(origin: "register_flow",
+            params: {bike: {owner_email:, manufacturer_id: "Trek", creation_organization_id: organization.id}}.as_json)
         end
 
         it "creates the bike, BikeServices::Builder standing the auto user in as creator" do
@@ -640,8 +604,21 @@ RSpec.describe RegisterController, type: :request do
             patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
           }.to change(Bike, :count).by 1
           expect(Bike.last.creator_id).to eq organization.auto_user_id
-          # Step 1's name is who the registration is for, there being no account to take one from
+          # The name entered is who the registration is for, there being no account to take one from
           expect(Bike.last.owner_name).to eq user_name
+        end
+      end
+
+      context "blank name" do
+        it "re-renders step 2 with an error, saving nothing" do
+          expect {
+            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.merge(user_name: " ")}
+          }.to_not change { b_param.reload.params }
+          expect(response.status).to eq 422
+          expect(response.body).to include "Owner name is required to register"
+          # Unsaved, so the registration isn't finished - and the form comes back filled in
+          expect(BikeServices::Register.send(:details_completed?, b_param)).to be_falsey
+          expect(response.body).to include "XYZ 123"
         end
       end
 
@@ -684,13 +661,23 @@ RSpec.describe RegisterController, type: :request do
       end
 
       context "blank serial" do
-        let(:bike_details) { {primary_frame_color_id: color.id, status: "status_with_owner"} }
+        let(:bike_details) { {primary_frame_color_id: color.id, status: "status_with_owner", user_name:} }
 
         it "registers with an unknown serial" do
           expect {
             patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
           }.to change(Bike, :count).by 1
           expect(Bike.last.serial_number).to eq "unknown"
+        end
+      end
+
+      context "registering to their own address" do
+        let(:owner_email) { current_user.email }
+
+        it "completes without a name - their account is the one it takes" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.except(:user_name)}
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
+          expect(Bike.last.owner_name).to eq current_user.name
         end
       end
 

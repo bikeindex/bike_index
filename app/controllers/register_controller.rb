@@ -46,7 +46,6 @@ class RegisterController < ApplicationController
     @page_title = I18n.t("meta_titles.register_create", cycle_type: @b_param.type)
     @b_param.errors.add(:base, translation(:email_required)) if @b_param.owner_email.blank?
     @b_param.errors.add(:base, translation(:manufacturer_required)) if @b_param.manufacturer_id.blank?
-    @b_param.errors.add(:base, translation(:name_required)) if user_name_missing?
     if @b_param.errors.any?
       render Register::Step1::Component.new(b_param: @b_param, current_user:), status: :unprocessable_entity
     elsif @b_param.save
@@ -58,6 +57,15 @@ class RegisterController < ApplicationController
   end
 
   def update
+    if user_name_missing?
+      # Assigned rather than saved, so the re-render keeps what they entered without
+      # marking the registration completed
+      @b_param.clean_params({bike: update_params}.as_json)
+      @b_param.errors.add(:base, translation(:name_required))
+      return render(Register::Step2::Component.new(b_param: @b_param, current_user:),
+        status: :unprocessable_entity)
+    end
+
     # Both read straight from params - update_params is stored as json, which an upload can't be
     BikeServices::Register.save_step_2(@b_param, user: current_user,
       image: params.dig(:bike, :image), image_signed_id: params.dig(:bike, :image_signed_id),
@@ -77,9 +85,9 @@ class RegisterController < ApplicationController
     register_path(b_param_token: @b_param.id_token, step:)
   end
 
+  # Step 2's own field, so the submitted value is what counts
   def user_name_missing?
-    @b_param.user_name.blank? &&
-      BikeServices::Register.user_name_required?(@b_param, BikeServices::Register.user_emails(current_user))
+    params.dig(:bike, :user_name).blank? && !@b_param.self_registration?(current_user)
   end
 
   # Everything new seeds a registration from, so arriving on an organization's link
@@ -128,7 +136,7 @@ class RegisterController < ApplicationController
   end
 
   def create_params
-    bike_params = params.require(:b_param).permit(:manufacturer_id, :cycle_type, :owner_email, :user_name)
+    bike_params = params.require(:b_param).permit(:manufacturer_id, :cycle_type, :owner_email)
       .to_h.merge(BParam.status_hash_from_params(params))
     {bike: bike_params, propulsion_type_motorized: params[:propulsion_type_motorized]}
   end
@@ -136,7 +144,7 @@ class RegisterController < ApplicationController
   def update_params
     params.fetch(:bike, {}).permit(:primary_frame_color_id, :secondary_frame_color_id,
       :tertiary_frame_color_id, :serial_number, :frame_size, :frame_size_number, :frame_size_unit,
-      :bike_sticker, :phone, :status, :frame_model, :year,
+      :bike_sticker, :phone, :status, :frame_model, :year, :user_name,
       :extra_registration_number, :organization_affiliation, :student_id,
       address_record_attributes: AddressRecord.permitted_params)
   end

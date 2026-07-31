@@ -415,6 +415,14 @@ class BParam < ApplicationRecord
     bike["user_name"]
   end
 
+  # The registrant is the owner (Ownership#self_made?), so their account is the name
+  # it takes - anyone else registering has to say who it's for
+  def self_registration?(user = creator)
+    return false if user.blank?
+
+    ([user.email] + user.confirmed_emails).include?(EmailNormalizer.normalize(owner_email))
+  end
+
   def creation_organization
     Organization.friendly_find(creation_organization_id)
   end

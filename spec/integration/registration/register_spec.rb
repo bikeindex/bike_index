@@ -25,9 +25,8 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_current_path("/my_account", wait: 5)
   end
 
-  # Through step 1 and onto step 2, the way a rider gets there. Signed in as the owner,
-  # the name comes from the account and there's no field asking for it
-  def start_registration(named: true)
+  # Through step 1 and onto step 2, the way a rider gets there
+  def start_registration
     visit "/register/new"
 
     # new creates the registration and lands on its tokenized step 1
@@ -36,7 +35,6 @@ RSpec.describe "Register flow", :js, type: :system do
     type_into("#b_param_manufacturer_id", "Surly")
     click_combobox_option("Surly")
     fill_in "b_param[owner_email]", with: owner_email
-    fill_in "b_param[user_name]", with: user_name if named
     click_button "Next"
 
     expect(page).to have_content("Add your bike")
@@ -51,7 +49,6 @@ RSpec.describe "Register flow", :js, type: :system do
     type_into("#b_param_manufacturer_id", "Surly")
     click_combobox_option("Surly")
     fill_in "b_param[owner_email]", with: owner_email
-    fill_in "b_param[user_name]", with: user_name
     click_button "Next"
 
     expect(page).to have_content("Add your bike")
@@ -62,7 +59,6 @@ RSpec.describe "Register flow", :js, type: :system do
     page.go_back
     expect(page).to have_field("b_param_manufacturer_id", with: "Surly")
     expect(page).to have_field("b_param[owner_email]", with: owner_email)
-    expect(page).to have_field("b_param[user_name]", with: user_name)
 
     # Coming back from step 2 offers starting over - dismissing keeps the registration
     click_button "Start over"
@@ -80,13 +76,13 @@ RSpec.describe "Register flow", :js, type: :system do
     type_into("#b_param_manufacturer_id", "Surly")
     click_combobox_option("Surly")
     fill_in "b_param[owner_email]", with: owner_email
-    fill_in "b_param[user_name]", with: user_name
     click_button "Next"
     expect(page).to have_content("Add your bike")
     details_url = page.current_url
 
     # Fill every field: text, chip radio, unit select, comboboxes (including the
     # collapsed additional-color rows) and the missing-serial checkbox
+    fill_in "bike[user_name]", with: user_name
     fill_in "bike[frame_model]", with: "Marlin 7"
     fill_in "bike[year]", with: "2023"
     type_into("#bike_primary_frame_color_id", "Red")
@@ -107,6 +103,7 @@ RSpec.describe "Register flow", :js, type: :system do
     # Nothing submitted yet - the reload restores the whole draft from form-persist
     visit details_url
 
+    expect(page).to have_field("bike[user_name]", with: user_name)
     expect(page).to have_field("bike[frame_model]", with: "Marlin 7")
     expect(page).to have_field("bike[year]", with: "2023")
     expect(page).to have_field("bike_primary_frame_color_id", with: "Red")
@@ -178,27 +175,30 @@ RSpec.describe "Register flow", :js, type: :system do
     before { sign_in(current_user) }
 
     it "asks for a name once the registration is going to someone other than them" do
-      visit "/register/new"
+      # Step 1 prefills their own address, which their account is already the name for
+      start_registration
+      expect(page).to have_no_field("bike[user_name]")
 
-      # Their own address, which their account is already the name for
-      expect(page).to have_field("b_param[owner_email]", with: owner_email)
-      expect(page).to have_no_field("b_param[user_name]")
-
+      # Sending it somewhere else is what asks - step 1 is where that's decided
+      click_link "Back"
       fill_in "b_param[owner_email]", with: friend_email
-      expect(page).to have_field("b_param[user_name]")
-
-      # The address can change right up until it's submitted, and the name goes with it
-      fill_in "b_param[owner_email]", with: owner_email
-      expect(page).to have_no_field("b_param[user_name]")
-
-      fill_in "b_param[owner_email]", with: friend_email
-      fill_in "b_param[user_name]", with: user_name
-      type_into("#b_param_manufacturer_id", "Surly")
-      click_combobox_option("Surly")
       click_button "Next"
+      expect(page).to have_field("bike[user_name]")
 
-      expect(page).to have_content("Add your bike")
-      expect(BParam.last).to have_attributes(owner_email: friend_email, user_name:)
+      type_into("#bike_primary_frame_color_id", "Red")
+      click_combobox_option("Red")
+      fill_in "bike[serial_number]", with: "GIFT1234"
+
+      # Required, so the browser holds the submit without any js of ours
+      click_button "Complete Bike Registration"
+      expect(page).to have_current_path(/step=2/, url: true)
+      expect(Bike.count).to eq 0
+
+      fill_in "bike[user_name]", with: user_name
+      click_button "Complete Bike Registration"
+
+      expect(page).to have_content("Registration complete")
+      expect(Bike.last).to have_attributes(owner_email: friend_email, owner_name: user_name)
     end
   end
 
@@ -218,6 +218,7 @@ RSpec.describe "Register flow", :js, type: :system do
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
       fill_in "bike[serial_number]", with: "HELD1234"
+      fill_in "bike[user_name]", with: user_name # anonymous, so it's asked for
       click_button "Complete Bike Registration"
     end
 
@@ -279,7 +280,7 @@ RSpec.describe "Register flow", :js, type: :system do
     before { sign_in(current_user) }
 
     it "PUTs the photo to the bucket and serves it from the storage domain" do
-      start_registration(named: false)
+      start_registration
 
       # The field ships with its name so a JS-less submit posts the bytes; the controller
       # drops it on connect, which is what leaves the signed id as the only thing carrying

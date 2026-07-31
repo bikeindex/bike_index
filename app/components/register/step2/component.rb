@@ -25,6 +25,11 @@ module Register
         @organization ||= @b_param.creation_organization
       end
 
+      # Step 1's email settles who this is for, so the name is only asked for here
+      def user_name_required?
+        !@b_param.self_registration?(@current_user)
+      end
+
       # The additional fields the organization asks for, gated exactly as bikes/new
       # gates them. Resolved once - the gates query, and the section heading below
       # re-checks every one of them

@@ -46,15 +46,6 @@ module Register
         CycleType.slug_translation_hash_lowercase_short
       end
 
-      def user_name_required?
-        BikeServices::Register.user_name_required?(@b_param, user_emails)
-      end
-
-      # Typing one of these into the email field takes the name field away again
-      def user_emails
-        @user_emails ||= BikeServices::Register.user_emails(@current_user)
-      end
-
       # Only anonymous registrants have anything to wait on
       def confirmation_email_pending?
         @current_user.blank?

@@ -58,27 +58,11 @@
 
     <%= render Register::SectionLabel::Component.new(text: translation(".your_info"), divider: true) %>
 
-    <div
-      data-controller="register--user-name"
-      data-register--user-name-emails-value="<%= user_emails.to_json %>"
-    >
-      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :owner_email,
-          label_text: translation(".email"), required: true)) do %>
-        <%= render UI::Forms::Email::Component.new(form_builder: f, attribute: :owner_email, required: true,
-            html_options: {value: @b_param.owner_email, placeholder: translation(".email_placeholder"),
-                           data: {action: "input->register--user-name#update"}}) %>
-      <% end %>
-
-      <%# Who the registration is for - only the signed in account's own address arrives with a name %>
-      <div
-        class="<%= "tw:hidden" unless user_name_required? %>"
-        data-register--user-name-target="field"
-      >
-        <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :user_name,
-            label_text: translation(".owner_name"), required: true, wrapper_class: "tw:mb-6",
-            html_options: {disabled: !user_name_required?, autocomplete: "name"}) %>
-      </div>
-    </div>
+    <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :owner_email,
+        label_text: translation(".email"), required: true, wrapper_class: "tw:mb-6")) do %>
+      <%= render UI::Forms::Email::Component.new(form_builder: f, attribute: :owner_email, required: true,
+          html_options: {value: @b_param.owner_email, placeholder: translation(".email_placeholder")}) %>
+    <% end %>
 
     <%= render UI::Button::Component.new(text: translation(".next"), color: :primary, size: :lg,
         kind: :submit, spinner: true, html_class: "tw:w-full") %>

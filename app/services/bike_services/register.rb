@@ -30,19 +30,6 @@ module BikeServices
         .detect { |b| b.creator_id.blank? || b.creator_id == user&.id || b.created_bike_id.present? }
     end
 
-    # The addresses the registrant already has a name on file for
-    def user_emails(user)
-      return [] if user.blank?
-
-      ([user.email] + user.confirmed_emails).uniq
-    end
-
-    # The ownership needs a name, and only a registration to one of the
-    # registrant's own addresses comes with one
-    def user_name_required?(b_param, user_emails)
-      user_emails.exclude?(EmailNormalizer.normalize(b_param.owner_email))
-    end
-
     # An organization can be named in the URL after the registration starts
     # (/register?...&organization_id=slug), right up until the bike is created
     def assign_organization(b_param, organization)
