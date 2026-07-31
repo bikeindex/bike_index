@@ -198,6 +198,8 @@ RSpec.describe "Register flow", :js, type: :system do
       click_button "Complete Bike Registration"
 
       expect(page).to have_content("Registration complete")
+      # Their friend's registration to claim, not theirs
+      expect(page).to have_content("We've emailed #{friend_email} so they can claim")
       expect(Bike.last).to have_attributes(owner_email: friend_email, owner_name: user_name)
     end
   end

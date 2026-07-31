@@ -15,10 +15,10 @@ module Register
         @b_param.type
       end
 
-      # A signed-in registration creates the bike straight from this step, so only
-      # an anonymous one is ever waiting on the address being confirmed
+      # Registering to the signed-in account's own address proves it, so only an
+      # address belonging to someone else is ever waiting on being confirmed
       def awaiting_confirmation?
-        @current_user.blank? && @b_param.email_unconfirmed?
+        !@b_param.self_registration?(@current_user) && @b_param.email_unconfirmed?
       end
 
       def organization

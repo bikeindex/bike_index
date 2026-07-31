@@ -170,10 +170,19 @@ RSpec.describe RegisterController, type: :request do
     context "signed in" do
       include_context :request_spec_logged_in_as_user
 
-      it "skips the confirmation email note - they never wait on it" do
+      it "notes the confirmation link - the address is someone else's" do
         get register_path(b_param_token: b_param.id_token, step: 1)
         expect(response.status).to eq 200
-        expect(response.body).to_not include "email a confirmation link"
+        expect(response.body).to include "email a confirmation link"
+      end
+
+      context "registering to their own address" do
+        let(:owner_email) { current_user.email }
+
+        it "skips the note - signing in already proved the address" do
+          get register_path(b_param_token: b_param.id_token, step: 1)
+          expect(response.body).to_not include "email a confirmation link"
+        end
       end
     end
 
@@ -463,10 +472,10 @@ RSpec.describe RegisterController, type: :request do
     context "signed in" do
       include_context :request_spec_logged_in_as_user
 
-      it "skips the confirmation alert - and asks for the name of whoever it's for" do
+      it "shows the confirmation alert - and asks for the name of whoever it's for" do
         get register_path(b_param_token: b_param.id_token, step: 2)
         expect(response.status).to eq 200
-        expect(response.body).to_not include "confirmation link to your email"
+        expect(response.body).to include "confirmation link to your email"
         expect(response.body).to include "bike_image"
         # Step 1's address isn't theirs, so their account's name isn't the one to use
         expect(user_name_field["required"]).to eq "required"
@@ -475,9 +484,10 @@ RSpec.describe RegisterController, type: :request do
       context "registering to their own address" do
         let(:owner_email) { current_user.email }
 
-        it "skips the name - their account is where it comes from" do
+        it "skips the name and the alert - their account answers both" do
           get register_path(b_param_token: b_param.id_token, step: 2)
           expect(user_name_field).to be_nil
+          expect(response.body).to_not include "confirmation link to your email"
         end
       end
     end
@@ -652,6 +662,10 @@ RSpec.describe RegisterController, type: :request do
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
         follow_redirect!
         expect(response.body).to include "Registration complete"
+        # Registered for someone else, so it's theirs to claim rather than "your registration"
+        expect(response.body).to include "so they can claim the registration"
+        expect(response.body).to include "View the registration"
+        expect(response.body).to_not include "keep watch"
 
         # Revisiting any step after completion redirects to finished
         get register_path(b_param_token: b_param.id_token, step: 2)
@@ -678,6 +692,10 @@ RSpec.describe RegisterController, type: :request do
           patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.except(:user_name)}
           expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
           expect(Bike.last.owner_name).to eq current_user.name
+          follow_redirect!
+          # Their own registration, so the completion card is addressed to them
+          expect(response.body).to include "keep watch"
+          expect(response.body).to include "View your registration"
         end
       end
 

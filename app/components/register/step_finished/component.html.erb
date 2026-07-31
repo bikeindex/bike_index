@@ -21,13 +21,7 @@
       </svg>
     </div>
 
-    <% subtitle = if @bike.present?
-      translation(".we_will_keep_watch", bike_display: @bike.mnfg_name)
-    else
-      translation(".verify_your_email_html", email: content_tag(:strong, @b_param.owner_email))
-    end %>
-
-    <%= render UI::Header::Component.new(text: heading_text, subtitle:) %>
+    <%= render UI::Header::Component.new(text: heading_text, subtitle: subtitle_text) %>
 
     <%# What's still locked behind the confirmation, so the link is worth clicking %>
     <% if @bike.blank? %>
@@ -56,8 +50,9 @@
 
     <div class="tw:flex tw:flex-col tw:gap-2.5">
       <% if @bike.present? %>
-        <%= render UI::ButtonLink::Component.new(text: translation(".view_your_registration"), href: bike_path(@bike),
-            color: :primary, size: :lg, class: "tw:w-full") %>
+        <%= render UI::ButtonLink::Component.new(href: bike_path(@bike), color: :primary, size: :lg,
+            text: translation(self_registration? ? ".view_your_registration" : ".view_the_registration"),
+            class: "tw:w-full") %>
       <% end %>
 
       <%= render UI::ButtonLink::Component.new(text: translation(".register_another", cycle_type:), href: new_register_path,
