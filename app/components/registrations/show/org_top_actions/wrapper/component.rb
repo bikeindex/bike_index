@@ -90,7 +90,13 @@ module Registrations
           end
 
           def show_update_impound?
-            show_impound? && staff? && impounded?
+            show_impound? && staff? && impounded_by_organization?
+          end
+
+          # The update form posts to this org's impound routes, which another
+          # org's record - or an unorganized one, which has no display_id - isn't in
+          def impounded_by_organization?
+            impounded? && @bike.current_impound_record&.organization_id == @organization.id
           end
 
           def show_parking_notifications?

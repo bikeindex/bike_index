@@ -41,6 +41,9 @@ RSpec.describe Registrations::Show::OrgTopActions::Wrapper::Component, type: :co
 
   context "when impounded" do
     let(:status) { :status_impounded }
+    let(:impound_organization_id) { organization.id }
+    let(:impound_record) { ImpoundRecord.new(organization_id: impound_organization_id, display_id: "0001") }
+    let(:bike) { Bike.new(status:, cycle_type: "bike", current_impound_record: impound_record) }
 
     # The owner isn't messageable, and there's no point filing a parking
     # notification against a bike that's already impounded
@@ -51,6 +54,24 @@ RSpec.describe Registrations::Show::OrgTopActions::Wrapper::Component, type: :co
 
     context "and limited" do
       let(:org_role) { :limited }
+
+      it "renders no impound update" do
+        expect(action_panels).to eq(%w[notifications_show])
+      end
+    end
+
+    context "by another organization" do
+      let(:impound_organization_id) { FactoryBot.create(:organization).id }
+
+      it "renders no impound update" do
+        expect(action_panels).to eq(%w[notifications_show])
+      end
+    end
+
+    # An unorganized impound record has a nil display_id, so rendering the form
+    # raised UrlGenerationError rather than just linking to the wrong org
+    context "by no organization" do
+      let(:impound_record) { ImpoundRecord.new }
 
       it "renders no impound update" do
         expect(action_panels).to eq(%w[notifications_show])
