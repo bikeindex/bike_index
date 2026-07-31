@@ -12,7 +12,7 @@
     Recent <%= link_to "Bikes", admin_bikes_url %>
   </h2>
 
-  <%= render partial: "/admin/bikes/table", locals: { bikes: @bikes } %>
+  <%= render Admin::BikesTable::Component.new(bikes: @bikes) %>
 
   <% today = Bike.where("created_at >= ?", Time.current.beginning_of_day).count %>
   <% yesterday = (Bike.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today %>
@@ -36,7 +36,7 @@
       Recent <%= link_to "Users", admin_users_url %>
     </h2>
 
-    <%= render partial: "/admin/users/table" %>
+    <%= render Admin::UsersTable::Component.new(users: @users) %>
 
     <div class="row justify-content-end">
       <div class="col-auto">
