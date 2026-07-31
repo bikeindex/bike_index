@@ -5,7 +5,7 @@
     </p>
 
     <p class="tw:mt-1 tw:font-bold">
-      <%= translation(".its_also_how_we_get_better_at_recovering") %>
+      <%= translation(".its_also_how_we_get_better_at_recovering", bike_type: @bike.type.pluralize) %>
     </p>
 
     <%= form_with(model: @stolen_record, url: bike_recovery_path(bike_id: @bike.id), class: "tw:mt-3", data: {controller: "csrf-refresh"}) do |form| %>
