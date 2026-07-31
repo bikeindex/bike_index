@@ -62,9 +62,11 @@ RSpec.describe BikeServices::Register do
 
   describe "save_step_2" do
     let(:b_param) { BParam.create(origin: "register_flow", params: {bike: bike_params}.as_json) }
+    # user_name unless a test says otherwise - an anonymous registration is for someone else
     let(:save) do
       ->(fields, signed_id = nil, image = nil) do
-        described_class.save_step_2(b_param, user: nil, image:, image_signed_id: signed_id, bike_params: fields)
+        described_class.save_step_2(b_param, user: nil, image:, image_signed_id: signed_id,
+          bike_params: {"user_name" => "Sarah Rider"}.merge(fields))
       end
     end
 
@@ -87,6 +89,28 @@ RSpec.describe BikeServices::Register do
       expect(b_param.reload.bike["frame_size"]).to eq "m"
       expect(b_param.bike["frame_size_unit"]).to eq "cm" # unit without a number isn't overwritten
       expect(b_param.bike["secondary_frame_color_id"]).to be_blank
+    end
+
+    context "without a user_name" do
+      it "saves the details but doesn't complete the step" do
+        expect(described_class.save_step_2(b_param, user: nil, image: nil, image_signed_id: nil,
+          bike_params: {"frame_size" => "m"})).to be_falsey
+        expect(b_param.reload.bike["frame_size"]).to eq "m"
+        expect(described_class.send(:details_completed?, b_param)).to be_falsey
+        # Not finished, so the flow stays on step 2 rather than redirecting past it
+        expect(described_class.finished?(b_param, sequence: nil)).to be_falsey
+        expect(described_class.permitted_step(b_param, "2", sequence: nil)).to eq "2"
+      end
+
+      context "registering their own bike" do
+        let(:user) { FactoryBot.create(:user_confirmed, email: "owner@example.com") }
+
+        it "completes the step" do
+          expect(described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil,
+            bike_params: {"frame_size" => "m"})).to be_truthy
+          expect(described_class.send(:details_completed?, b_param.reload)).to be_truthy
+        end
+      end
     end
 
     # What a submit without JS posts - the field keeps its name until the uploader takes over

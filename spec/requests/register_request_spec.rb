@@ -634,15 +634,15 @@ RSpec.describe RegisterController, type: :request do
       end
 
       context "blank name" do
-        it "re-renders step 2 with an error, saving nothing" do
-          expect {
-            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.merge(user_name: " ")}
-          }.to_not change { b_param.reload.params }
+        it "re-renders step 2 with an error, saving the details but not completing" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.merge(user_name: " ")}
           expect(response.status).to eq 422
           expect(response.body).to include "Owner name is required to register"
-          # Unsaved, so the registration isn't finished - and the form comes back filled in
-          expect(BikeServices::Register.send(:details_completed?, b_param)).to be_falsey
           expect(response.body).to include "XYZ 123"
+          # Everything entered is kept, but incomplete - so the flow stays on step 2
+          expect(b_param.reload.bike["serial_number"]).to eq "XYZ 123"
+          expect(BikeServices::Register.send(:details_completed?, b_param)).to be_falsey
+          expect(BikeServices::Register.permitted_step(b_param, "review", sequence: nil)).to eq "2"
         end
       end
 

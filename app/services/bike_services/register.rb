@@ -142,11 +142,16 @@ module BikeServices
     # Step 2 merges over step 1 - creator claimed for signed-in users, the photo and the
     # fields into the params json. The photo arrives one of two ways: as bytes from a plain
     # file field, or as the signed id of a blob the browser already uploaded.
+    # Returns whether the step passed - a registration for someone else needs their name.
+    # A failed step still saves, it just isn't marked complete, so nothing entered is lost
     def save_step_2(b_param, user:, image:, image_signed_id:, bike_params:)
       b_param.creator_id ||= user&.id
       b_param.image = image if image.present?
-      b_param.clean_params(step_2_params(bike_params.to_h, image_signed_id:).as_json)
+      bike_params = bike_params.to_h
+      completed = b_param.self_made?(user) || bike_params["user_name"].present?
+      b_param.clean_params(step_2_params(bike_params, image_signed_id:, completed:).as_json)
       b_param.save
+      completed
     end
 
     # Ownership requires a creator, and signing in can happen anywhere in the flow -
@@ -221,20 +226,20 @@ module BikeServices
       b_param
     end
 
-    # The marker step_2_params sets, that step 2 has been submitted
+    # The marker step_2_params sets, that step 2 was submitted with everything it needs
     def details_completed?(b_param)
       b_param.params["details_completed"].present?
     end
 
     # Blank values keep what step 1 saved - except the additional colors, where
     # blank is the "remove color" button clearing one
-    def step_2_params(bike_params, image_signed_id:)
+    def step_2_params(bike_params, image_signed_id:, completed:)
       bike_params = bike_params.reject { |key, value| value.blank? && !key.in?(%w[secondary_frame_color_id tertiary_frame_color_id]) }
       # The unit only means something alongside a numeric size
       bike_params = bike_params.except("frame_size_unit") if bike_params["frame_size_number"].blank?
       # The photo went browser -> bucket before submit, so only its signed id rides along.
       # Dropped when blank rather than merged, which would clobber an id already stored.
-      {details_completed: true, bike: bike_params, image_signed_id: image_signed_id.presence}.compact
+      {details_completed: completed, bike: bike_params, image_signed_id: image_signed_id.presence}.compact
     end
 
     conceal :reusable?, :all_steps, :permitted_steps, :confirmed_email_creator_id,

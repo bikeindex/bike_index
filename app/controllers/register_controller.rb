@@ -65,19 +65,17 @@ class RegisterController < ApplicationController
   end
 
   def update
-    if user_name_missing?
-      # Assigned rather than saved, so the re-render keeps what they entered without
-      # marking the registration completed
-      @b_param.clean_params({bike: update_params}.as_json)
+    # Both read straight from params - update_params is stored as json, which an upload can't be
+    saved_step_2 = BikeServices::Register.save_step_2(@b_param, user: current_user,
+      image: params.dig(:bike, :image), image_signed_id: params.dig(:bike, :image_signed_id),
+      bike_params: update_params)
+    # Saved either way, so the re-render has everything they entered
+    unless saved_step_2
       @b_param.errors.add(:base, translation(:name_required))
       return render(Register::Step2::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:),
         status: :unprocessable_entity)
     end
 
-    # Both read straight from params - update_params is stored as json, which an upload can't be
-    BikeServices::Register.save_step_2(@b_param, user: current_user,
-      image: params.dig(:bike, :image), image_signed_id: params.dig(:bike, :image_signed_id),
-      bike_params: update_params)
     # An e-vehicle's safety pages come between the details and the bike
     return redirect_to_current_step unless BikeServices::Register.acknowledged?(@b_param, sequence: @registration_sequence)
 
@@ -129,11 +127,6 @@ class RegisterController < ApplicationController
 
   def step_path(step)
     register_path(b_param_token: @b_param.id_token, step:)
-  end
-
-  # Step 2's own field, so the submitted value is what counts
-  def user_name_missing?
-    params.dig(:bike, :user_name).blank? && !@b_param.self_made?(current_user)
   end
 
   # Everything new seeds a registration from, so arriving on an organization's link
