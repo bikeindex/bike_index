@@ -6,6 +6,4 @@ en:
         continue: Continue
         electric_detected: "⚡️ Electric (motorized) detected"
         have_questions: Have questions about these policies?
-        progress_saved: Progress saved · E-Vehicle Acknowledgment · Step %{number}
-          of %{total}
         read_the_faq: E-Vehicle Acknowledgment FAQ

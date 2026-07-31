@@ -307,7 +307,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
       expect(page).to have_content("Battery & charging")
       expect(page).to have_content("Electric (motorized) detected")
-      expect(page).to have_content("E-Vehicle Acknowledgment · Step 1 of 2")
+      expect(page).to have_content("E-Vehicle Acknowledgment · Step 1 of 3")
       expect(page).to have_button("Continue", disabled: true)
 
       check "Charge with the manufacturer's charger"
@@ -329,6 +329,11 @@ RSpec.describe "Register flow", :js, type: :system do
       click_link "Review", match: :first
       expect(page).to have_content("Battery & charging")
       expect(page).to have_checked_field("Report a swollen battery")
+
+      # Continuing walks forward through the remaining pages rather than jumping
+      # straight back to the review
+      click_button "Continue"
+      expect(page).to have_content("Campus rules")
       click_button "Continue"
 
       expect(page).to have_content("You're almost done")

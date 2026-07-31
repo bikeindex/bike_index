@@ -694,7 +694,7 @@ RSpec.describe RegisterController, type: :request do
       expect(response.body).to include "Battery &amp; charging"
       expect(response.body).to include "Charge with the manufacturer's charger"
       expect(response.body).to include "Electric (motorized) detected"
-      expect(response.body).to include "E-Vehicle Acknowledgment · Step 1 of 2"
+      expect(response.body).to include "E-Vehicle Acknowledgment · Step 1 of 3"
       expect(response.body).to include "https://example.com/faq"
 
       # Ahead of where the registration stands clamps back to it
@@ -720,6 +720,10 @@ RSpec.describe RegisterController, type: :request do
       follow_redirect!
       expect(response.body).to include "You&#39;re almost done"
       expect(response.body).to include "agree to all of it"
+      # The review is the last acknowledgment step, not a completed one - the
+      # attestation below it is still unsigned
+      expect(response.body).to include "E-Vehicle Acknowledgment · Step 3 of 3"
+      expect(response.body).to_not include "Safety check complete"
       expect(response.body).to include current_user.name
 
       # The attestation is what creates the bike
@@ -750,6 +754,21 @@ RSpec.describe RegisterController, type: :request do
         patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", attested: "1"}
       }.to change(Bike, :count).by 1
       expect(Bike.last.creator_id).to eq current_user.id
+    end
+
+    it "advances one page at a time, even once the later ones are acknowledged" do
+      patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
+                                                acknowledged: {"0" => "1", "1" => "1"}}
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "4",
+                                                acknowledged: {"0" => "1"}}
+      expect(response).to redirect_to step_path.call("review")
+
+      # Revisiting the first page from the review and continuing walks forward
+      # through the rest, rather than jumping straight back to the end
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
+                                                acknowledged: {"0" => "1", "1" => "1"}}
+      expect(response).to redirect_to step_path.call("4")
     end
 
     it "refuses a page with a rule left unchecked" do

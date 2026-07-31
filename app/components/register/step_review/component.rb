@@ -21,6 +21,11 @@ module Register
         @total_steps ||= BikeServices::Register.total_steps(@sequence)
       end
 
+      # The review is the last acknowledgment step, so it's both the number and the total
+      def acknowledgment_step_count
+        @acknowledgment_step_count ||= BikeServices::Register.acknowledgment_step_count(@sequence)
+      end
+
       def page_path(index)
         register_path(b_param_token: @b_param.id_token,
           step: BikeServices::Register.step_for_page_index(index))

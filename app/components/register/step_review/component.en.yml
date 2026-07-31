@@ -8,5 +8,4 @@ en:
         complete_registration: Complete %{cycle_type} Registration
         i_name_html: I, %{name},
         review: Review
-        safety_check_complete: Safety check complete
         youre_almost_done: You're almost done.

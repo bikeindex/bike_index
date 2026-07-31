@@ -1,10 +1,9 @@
 <%= render Register::Page::Component.new do %>
   <%= render Register::Progress::Component.new(step: total_steps, total: total_steps) %>
 
-  <div class="tw:mb-3">
-    <%= render UI::Badge::Component.new(text: translation(".safety_check_complete"), color: :success,
-        icon: "icons/check") %>
-  </div>
+  <%# The last acknowledgment step, not a finished one - the attestation is still unsigned %>
+  <%= render Register::AcknowledgmentProgress::Component.new(number: acknowledgment_step_count,
+      total: acknowledgment_step_count) %>
 
   <%= render UI::Header::Component.new(text: translation(".youre_almost_done"),
       subtitle: translation(".a_quick_review")) %>

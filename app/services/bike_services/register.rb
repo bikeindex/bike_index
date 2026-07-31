@@ -69,6 +69,12 @@ module BikeServices
 
     def step_for_page_index(index) = (index + ACKNOWLEDGMENT_OFFSET).to_s
 
+    # The page after this one, or the review the pages end at
+    def step_after(step, sequence:)
+      next_index = page_index_for_step(step) + 1
+      (next_index < sequence_pages(sequence).count) ? step_for_page_index(next_index) : "review"
+    end
+
     # to_a: callers ask for count/any?/[] repeatedly, and a CollectionProxy re-queries
     # for each of them
     def sequence_pages(sequence)
@@ -77,6 +83,9 @@ module BikeServices
 
     # The progress bar's segments - one per step the flow can reach
     def total_steps(sequence) = all_steps(sequence_pages(sequence)).count
+
+    # What the acknowledgment eyebrow counts: the rule pages, plus the review they end at
+    def acknowledgment_step_count(sequence) = sequence_pages(sequence).count + 1
 
     # Nothing to agree to without a sequence, otherwise the attestation record
     def attested?(b_param, sequence:)

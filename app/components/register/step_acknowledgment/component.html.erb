@@ -1,15 +1,8 @@
 <%= render Register::Page::Component.new do %>
   <%= render Register::Progress::Component.new(step: @step.to_i, total: BikeServices::Register.total_steps(@sequence)) %>
 
-  <p
-    class="
-      tw:mb-4 tw:flex tw:items-center tw:gap-1.5 tw:text-xs tw:font-bold
-      tw:text-gray-500 tw:dark:text-gray-400
-    "
-  >
-    <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:h-3.5 tw:w-3.5 tw:shrink-0 tw:text-green-600", aria_hidden: true) %>
-    <%= translation(".progress_saved", number: position + 1, total: pages.count) %>
-  </p>
+  <%= render Register::AcknowledgmentProgress::Component.new(number: position + 1,
+      total: BikeServices::Register.acknowledgment_step_count(@sequence)) %>
 
   <div class="tw:mb-3">
     <% if first? %>

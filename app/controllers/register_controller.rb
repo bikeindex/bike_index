@@ -78,21 +78,29 @@ class RegisterController < ApplicationController
   # Each acknowledgment page posts here, and the review's final attestation
   def acknowledge
     step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence)
-    saved = if step == "review"
-      BikeServices::Register.save_attestation(@b_param, @registration_sequence,
-        attested: params[:attested], user: current_user)
-    else
-      BikeServices::Register.acknowledge_page(@b_param,
-        BikeServices::Register.page_for_step(step, sequence: @registration_sequence),
-        checked: params[:acknowledged]&.to_unsafe_h&.values)
+    unless save_acknowledgment(step)
+      flash[:error] = translation(:acknowledge_everything)
+      return redirect_to step_path(step)
     end
-    flash[:error] = translation(:acknowledge_everything) unless saved
-    return redirect_to_current_step unless saved && step == "review"
+    return complete_registration if step == "review"
 
-    complete_registration
+    # The step after this one, not the furthest reached - revisiting an earlier page
+    # from the review walks forward through the rest rather than jumping back
+    redirect_to step_path(BikeServices::Register.step_after(step, sequence: @registration_sequence))
   end
 
   private
+
+  def save_acknowledgment(step)
+    if step == "review"
+      return BikeServices::Register.save_attestation(@b_param, @registration_sequence,
+        attested: params[:attested], user: current_user)
+    end
+
+    BikeServices::Register.acknowledge_page(@b_param,
+      BikeServices::Register.page_for_step(step, sequence: @registration_sequence),
+      checked: params[:acknowledged]&.to_unsafe_h&.values)
+  end
 
   def complete_registration
     BikeServices::Register.claim_creator(@b_param, current_user)
