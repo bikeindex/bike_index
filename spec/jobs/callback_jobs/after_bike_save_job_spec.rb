@@ -103,7 +103,7 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
       expect(blob.reload.binx_data).to eq({"b_param_id" => b_param.id})
       expect(public_image.reload.imageable).to eq bike
       instance.perform(bike.id)
-      expect(blob.reload.binx_data).to eq({"bike_id" => bike.id})
+      expect(blob.reload.binx_data).to eq({"b_param_id" => b_param.id, "bike_id" => bike.id})
       expect(public_image.reload.imageable).to eq bike
     end
   end

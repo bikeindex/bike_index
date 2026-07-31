@@ -87,13 +87,13 @@ module CallbackJobs
     end
 
     # The register upload stamps each blob with the b_param that minted it, before there's a bike.
-    # Now that the bike owns the image, re-stamp the blob so orphan reaping tracks it by bike.
+    # Now that the bike owns the image, add its id alongside so orphan reaping can track it by bike.
     def stamp_image_blobs(bike)
       bike.public_images.activestorage.each do |public_image|
         blob = public_image.file.blob
         next if blob.binx_data.to_h["bike_id"] == bike.id
 
-        blob.update!(binx_data: blob.binx_data.to_h.except("b_param_id").merge("bike_id" => bike.id))
+        blob.update!(binx_data: blob.binx_data.to_h.merge("bike_id" => bike.id))
       end
     end
 
