@@ -31,7 +31,7 @@ module UI
 
       # order-last keeps the dismiss button, which is last in the DOM, up on the header row
       def body_classes
-        @header.present? ? "tw:order-last tw:w-full" : "tw:grow"
+        @header.present? ? "tw:order-last tw:basis-full" : "tw:grow"
       end
 
       def color_classes
