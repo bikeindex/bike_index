@@ -61,14 +61,14 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_field("b_param[owner_email]", with: owner_email)
 
     # Coming back from step 2 offers starting over - dismissing keeps the registration
-    click_button "Start over"
+    open_modal(find_button("Start over"))
     find("#start-over-modal [aria-label='Close']").click
     click_button "Next"
     expect(page).to have_current_path(details_url, url: true)
 
     # Confirming abandons it for a blank registration, which has nothing to start over from
     click_link "Back"
-    click_button "Start over"
+    open_modal(find_button("Start over"))
     click_link "Yes, start over"
     expect(page).to have_field("b_param[owner_email]", with: "")
     expect(page).to have_no_button("Start over")

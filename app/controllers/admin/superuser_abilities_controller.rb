@@ -2,12 +2,26 @@ module Admin
   class SuperuserAbilitiesController < Admin::BaseController
     include Binxtils::SortableTable
 
-    before_action :find_superuser_ability, except: [:index]
+    before_action :find_superuser_ability, only: %i[edit update]
 
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish, searched_superuser_abilities.reorder("superuser_abilities.#{sort_column} #{sort_direction}")
         .includes(:user), limit: @per_page, page: permitted_page)
+    end
+
+    def new
+      @superuser_ability = SuperuserAbility.new(user_identifier: params[:user_id])
+    end
+
+    def create
+      @superuser_ability = SuperuserAbility.new(permitted_create_parameters)
+      if @superuser_ability.save
+        flash[:success] = "Superuser Ability created!"
+        redirect_to edit_admin_superuser_ability_path(@superuser_ability)
+      else
+        render action: :new
+      end
     end
 
     def edit
@@ -64,6 +78,12 @@ module Admin
       su_options = params.permit(*SuperuserAbility::SU_OPTIONS)
         .select { |so| Binxtils::InputNormalizer.boolean(params[so]) }
       {su_options: su_options.keys}
+    end
+
+    def permitted_create_parameters
+      params.require(:superuser_ability)
+        .permit(:user_identifier, :controller_name, :action_name)
+        .merge(permitted_parameters)
     end
   end
 end
