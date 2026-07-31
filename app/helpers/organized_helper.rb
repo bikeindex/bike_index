@@ -120,4 +120,11 @@ module OrganizedHelper
       bike_url(obj.bike.to_param, graduated_notification_remaining: obj.marked_remaining_link_token)
     end
   end
+
+  def registration_field_label(organization = nil, field_slug = nil, strip_tags: false)
+    txt = organization&.registration_field_labels&.dig(field_slug.to_s)
+    return nil unless txt.present?
+
+    strip_tags ? Binxtils::InputNormalizer.sanitize(txt) : txt.html_safe
+  end
 end

@@ -1,5 +1,5 @@
-# Contains methods used for display, which don't render HTML.
-# Use BikeHelper for methods that do render HTML
+# Contains methods used for display, which don't return HTML.
+# Use BikeHelper for methods that do return HTML
 
 module BikeServices
   module Displayer
@@ -7,15 +7,6 @@ module BikeServices
 
     REG_FIELDS = %w[address bike_sticker extra_registration_number organization_affiliation
       phone student_id].freeze
-
-    # Organizations can rename the fields they ask for - their own text, which is the
-    # one place here that's html (they're allowed tags in it)
-    def registration_field_label(organization = nil, field_slug = nil, strip_tags: false)
-      txt = organization&.registration_field_labels&.dig(field_slug.to_s)
-      return nil unless txt.present?
-
-      strip_tags ? Binxtils::InputNormalizer.sanitize(txt) : txt.html_safe
-    end
 
     # Whether a registration form should ask for one of the organization's additional
     # fields. Pass the user only when the registration is their own - what their account

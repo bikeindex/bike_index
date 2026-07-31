@@ -182,4 +182,45 @@ RSpec.describe OrganizedHelper, type: :helper do
       end
     end
   end
+
+  describe "registration_field_label" do
+    let(:organization) { Organization.new }
+
+    it "is nil with or without an organization" do
+      expect(registration_field_label(organization, "extra_registration_number")).to be_nil
+      expect(registration_field_label(organization, "reg_address")).to be_nil
+      expect(registration_field_label(nil, "reg_phone")).to be_nil
+      expect(registration_field_label(nil, "organization_affiliation")).to be_nil
+      expect(registration_field_label(nil, "reg_student_id")).to be_nil
+      expect(registration_field_label(organization, "reg_bike_sticker")).to be_nil
+      expect(registration_field_label(organization, "owner_email")).to be_nil
+    end
+
+    context "with labels" do
+      let(:labels) { {reg_phone: "You have to put this in, jerk", reg_extra_registration_number: "XXXZZZZ", reg_student_id: "PUT in student ID!"}.as_json }
+      let(:feature_slugs) { %w[reg_extra_registration_number reg_address reg_phone reg_organization_affiliation reg_student_id reg_bike_sticker] }
+      let(:organization) { Organization.new(enabled_feature_slugs: feature_slugs, registration_field_labels: labels) }
+
+      it "is the organization's own wording, for the fields it named" do
+        expect(registration_field_label(organization, "reg_extra_registration_number")).to eq "XXXZZZZ"
+        expect(registration_field_label(organization, "reg_address")).to be_nil
+        expect(registration_field_label(organization, "reg_phone")).to eq labels["reg_phone"]
+        expect(registration_field_label(organization, "reg_organization_affiliation")).to be_nil
+        expect(registration_field_label(organization, "reg_student_id")).to eq "PUT in student ID!"
+        expect(registration_field_label(organization, "reg_bike_sticker")).to be_nil
+        expect(registration_field_label(organization, "owner_email")).to be_nil
+      end
+
+      context "owner_email with tags" do
+        let(:labels) { {reg_address: "ADDY!!", owner_email: "<code>bikeindex.org</code> email"}.as_json }
+
+        it "keeps them, stripping when asked" do
+          expect(registration_field_label(organization, "reg_address")).to eq "ADDY!!"
+          expect(registration_field_label(organization, "reg_phone")).to be_nil
+          expect(registration_field_label(organization, "owner_email")).to eq "<code>bikeindex.org</code> email"
+          expect(registration_field_label(organization, "owner_email", strip_tags: true)).to eq "bikeindex.org email"
+        end
+      end
+    end
+  end
 end

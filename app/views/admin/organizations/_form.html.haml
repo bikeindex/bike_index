@@ -208,7 +208,7 @@
                   %em Owner Email
                   (e.g. "uiowa.edu email")
                   %small.less-strong often desired by universities
-                = text_field_tag "reg_label-#{reg_field}", BikeServices::Displayer.registration_field_label(@organization, reg_field), {class: "form-control"}
+                = text_field_tag "reg_label-#{reg_field}", registration_field_label(@organization, reg_field), {class: "form-control"}
             - elsif @organization.enabled?(reg_field)
               - reg_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
               - reg_attr_title = reg_attr.titleize(keep_id_suffix: true)
@@ -218,7 +218,7 @@
                   %em= reg_attr_title
                   %small.less-strong
                     leave blank unless it's <strong>absolutely</strong> required - default behavior is preferred
-                = text_field_tag "reg_label-#{reg_field}", BikeServices::Displayer.registration_field_label(@organization, reg_field), {class: "form-control"}
+                = text_field_tag "reg_label-#{reg_field}", registration_field_label(@organization, reg_field), {class: "form-control"}
 
           - if @organization.enabled?("organization_stolen_message")
             - organization_stolen_message = OrganizationStolenMessage.for(@organization)
