@@ -73,6 +73,18 @@ module SystemSpecHelpers
     retry_on_detach { find(".hw-combobox__option", text:, match: :first).click }
   end
 
+  # ui--modal wires its trigger in `connect`, and application.js lazy loads controllers -
+  # so a click landing before that module arrives is swallowed, leaving Capybara waiting
+  # on a dialog that will never open. Click again, the way a rider whose click did
+  # nothing would, until the dialog reports itself open.
+  def open_modal(button_text, modal_id, attempts: 5)
+    attempts.times do
+      click_button button_text
+      return if page.has_css?("##{modal_id}[open]", wait: 1)
+    end
+    raise "##{modal_id} never opened after #{attempts} clicks on #{button_text.inspect}"
+  end
+
   private
 
   # Retry a Playwright action when the node detaches mid-action -- the raw
