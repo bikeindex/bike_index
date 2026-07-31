@@ -11,8 +11,7 @@ module Registrations
         # @param view select [consumer, org_admin]
         # @param bike_id text "Bike to render — defaults to one of the org's"
         def no_overlay(view: "consumer", bike_id: nil)
-          # A claimed registration, or SentToNewOwner raises itself off the bike's state
-          page(view:, bike_id: bike_id.presence || claimed_bike&.id)
+          page(view:, bike_id:)
         end
 
         # @param view select [consumer, org_admin]
@@ -42,21 +41,24 @@ module Registrations
         end
 
         # @param view select [consumer, org_admin]
-        # @param bike_id text "Bike to render — defaults to a stolen one"
+        # @param bike_id text "Bike to render — defaults to one of the org's"
         def recovery_prompt(view: "consumer", bike_id: nil)
-          page(view:, bike_id: bike_id.presence || stolen_bike&.id) do |bike|
-            stolen_record = bike.current_stolen_record or next :missing
+          page(view:, bike_id:) do |bike|
+            # The prompt renders whatever record it's handed, so this doesn't have to be
+            # the bike's own — a stolen registration here is an unclaimed one, which
+            # would stack SentToNewOwner's alert on top of the prompt being previewed
+            stolen_record = bike.current_stolen_record || ::StolenRecord.unscoped.last or next :missing
             alerts(recovered_stolen_record: stolen_record)
           end
         end
 
         # @param view select [consumer, org_admin]
-        # @param bike_id text "Bike to render — defaults to one with a sticker"
+        # @param bike_id text "Bike to render — defaults to one of the org's"
         def scanned_sticker(view: "consumer", bike_id: nil)
           sticker = bike_sticker(bike_id)
           return missing_notice("a bike sticker assigned to a bike") if sticker.blank?
 
-          page(view:, bike_id: bike_id.presence || sticker.bike_id, bike_sticker: sticker)
+          page(view:, bike_id:, bike_sticker: sticker)
         end
 
         # @param view select [consumer, org_admin]
@@ -97,8 +99,10 @@ module Registrations
           [resolved_view(view), [:public, nil]].uniq
         end
 
+        # Claimed by default: SentToNewOwner raises itself off an unclaimed registration,
+        # so an unclaimed one would stack that alert onto every other scenario
         def preview_bike(bike_id)
-          ::Bike.unscoped.find_by(id: bike_id) || org_bikes.last
+          ::Bike.unscoped.find_by(id: bike_id) || claimed_bike
         end
 
         def org_bikes
@@ -112,10 +116,6 @@ module Registrations
 
         def graduated_notification_for(bike)
           ::GraduatedNotification.where(bike_id: bike.id).last || ::GraduatedNotification.last
-        end
-
-        def stolen_bike
-          org_bikes.status_stolen.last || ::Bike.unscoped.status_stolen.last
         end
 
         def bike_sticker(bike_id)
