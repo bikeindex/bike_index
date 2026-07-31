@@ -4,28 +4,29 @@
   data-ui--modal-open-on-connect-value="<%= @open %>"
   data-action="click->ui--modal#backdropClick keydown->ui--modal#handleKeydown"
   class="
-    tw:m-auto tw:max-h-dvh tw:w-full tw:max-w-lg tw:bg-transparent tw:px-4
-    tw:pt-4 tw:backdrop:bg-black/50 tw:backdrop:backdrop-blur-sm
-    tw:open:flex tw:open:flex-col tw:open:items-center
-    tw:open:justify-center
+    tw:m-auto tw:max-h-dvh tw:w-full tw:max-w-lg tw:overflow-y-auto
+    tw:overscroll-contain tw:bg-transparent tw:px-4 tw:backdrop:bg-black/50
+    tw:backdrop:backdrop-blur-sm
   "
 >
   <%#
-    overflow-hidden is also what lets this column shrink past its content, so a
-    tall body scrolls instead of pushing the title bar off-screen
+    The dialog is the scroller, so the rounded ends stay off-screen until you
+    reach them. clip rather than hidden: hidden would make this the scrollport
+    and strand the sticky title bar
   %>
 
   <div
     class="
-      tw:flex tw:w-full tw:flex-col tw:overflow-hidden tw:rounded-xl
-      tw:bg-white tw:shadow-xl tw:dark:bg-gray-800
+      tw:my-4 tw:w-full tw:overflow-clip tw:rounded-xl tw:bg-white
+      tw:shadow-xl tw:dark:bg-gray-800
     "
   >
     <% if @title %>
       <div
         class="
-          tw:flex tw:items-center tw:justify-between tw:border-b
-          tw:border-gray-200 tw:px-5 tw:py-4 tw:dark:border-gray-700
+          tw:sticky tw:top-0 tw:flex tw:items-center tw:justify-between
+          tw:border-b tw:border-gray-200 tw:bg-white tw:px-5 tw:py-4
+          tw:dark:border-gray-700 tw:dark:bg-gray-800
         "
       >
         <h3 class="tw:text-lg tw:font-semibold tw:text-gray-900 tw:dark:text-white">
@@ -58,7 +59,7 @@
       </div>
     <% end %>
 
-    <div class="twtext-color tw:overflow-y-auto tw:overscroll-contain tw:px-5 tw:py-4">
+    <div class="twtext-color tw:px-5 tw:py-4">
       <%= body %>
     </div>
   </div>
