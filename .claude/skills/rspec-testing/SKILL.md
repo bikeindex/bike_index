@@ -13,6 +13,12 @@ description: >-
 
 This project uses RSpec. All business logic should be tested.
 
+## Run only the specs your change touches
+
+Pass the files or directories you changed — `bundle exec rspec spec/components/ui/table spec/requests/bikes/show_request_spec.rb`. Never run a bare `bundle exec rspec`, `spec/`, or a whole top-level directory like `spec/components` or `spec/requests`: those take many minutes and sweep in `:flaky`-tagged system specs. CI runs the full suite.
+
+When something fails outside the files you changed, re-run that spec file on its own before treating it as yours. Passing alone means the full run was order-dependent or flaky (check whether its `describe` is tagged `:flaky`); failing alone means it's real, and a real failure gets fixed, never excused as pre-existing.
+
 ## What to test (and what not to)
 
 - Tests should either: help make the code correct now, or prevent bugs in the future. Don't add tests that don't do one of those things.

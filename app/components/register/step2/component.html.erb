@@ -111,46 +111,22 @@
       </div>
     </div>
 
-    <% if show_photo? %>
-      <div class="tw:mb-4" data-controller="register--photo">
-        <span class="twlabel">
-          <%= translation(".attach_photo", cycle_type:) %>
-          <%= optional_badge %>
-        </span>
+    <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :image,
+        label_text: translation(".attach_photo", cycle_type:)) do %>
+      <%# The token rides the query string - DirectUpload posts to this url verbatim %>
+      <%= render UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :image,
+            accept: ImageUploader.permitted_extensions,
+            direct_upload_url: register_direct_uploads_path(b_param_token: @b_param.id_token)) %>
 
-        <%= f.file_field :image, accept: ImageUploader.permitted_extensions.join(","),
-            class: "tw:hidden",
-            data: {
-              "register--photo-target": "input",
-              action: "change->register--photo#changed"
-            } %>
-
-        <div class="tw:mt-2 tw:grid tw:grid-cols-2 tw:gap-2">
-          <%= render UI::Button::Component.new(text: translation(".take_photo"), color: :secondary,
-              data: {action: "register--photo#takePhoto"}) %>
-
-          <%= render UI::Button::Component.new(text: translation(".upload"), color: :secondary,
-              data: {action: "register--photo#upload"}) %>
-        </div>
-
-        <p
-          class="
-            tw:mt-1.5 tw:truncate tw:text-xs tw:font-medium tw:text-gray-700
-            tw:dark:text-gray-300
-          "
-          data-register--photo-target="filename"
-        ></p>
-
-        <p
-          class="
-            tw:mt-1.5 tw:flex tw:items-start tw:gap-1.5 tw:text-xs
-            tw:text-gray-500 tw:dark:text-gray-400
-          "
-        >
-          <%= helpers.inline_svg_tag("icons/info.svg", class: "tw:mt-px tw:h-3.5 tw:w-3.5 tw:shrink-0", aria_hidden: true) %>
-          <%= translation(".database_public_note") %>
-        </p>
-      </div>
+      <p
+        class="
+          tw:mt-1.5 tw:flex tw:items-start tw:gap-1.5 tw:text-xs
+          tw:text-gray-500 tw:dark:text-gray-400
+        "
+      >
+        <%= helpers.inline_svg_tag("icons/info.svg", class: "tw:mt-px tw:h-3.5 tw:w-3.5 tw:shrink-0", aria_hidden: true) %>
+        <%= translation(".database_public_note") %>
+      </p>
     <% end %>
 
     <div class="tw:mb-4" data-controller="ui--collapse register--serial">

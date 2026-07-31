@@ -19,6 +19,21 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
+  describe "images_attached_id" do
+    let(:stolen_record) { FactoryBot.create(:stolen_record, :with_images) }
+    let(:blob) { stolen_record.image_four_by_five.blob }
+
+    it "reads the stamp ImageServices::StolenProcessor sets, not ActiveStorage's metadata" do
+      blob.update!(metadata: blob.metadata.merge("image_id" => 12, "removed" => true))
+      expect(stolen_record.reload.images_attached_id).to be_blank
+      expect(stolen_record.images_attached?).to be_truthy
+
+      blob.update!(binx_data: {"image_id" => 13, "removed" => true})
+      expect(stolen_record.reload.images_attached_id).to eq 13
+      expect(stolen_record.images_attached?).to be_falsey
+    end
+  end
+
   describe "after_save hooks" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }

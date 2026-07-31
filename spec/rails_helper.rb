@@ -14,14 +14,9 @@ if ENV["COVERAGE"] == "true"
   Rails.application.eager_load! if defined?(Rails)
 end
 
-# Adjust REDIS_URL for parallel test workers (each gets its own Redis DB)
-if ENV["TEST_ENV_NUMBER"]
-  redis_database = (ENV.fetch("DEV_PORT", 3042).to_i - 1) % 16 + ENV["TEST_ENV_NUMBER"].to_i
-  ENV["REDIS_URL"] = "redis://localhost:6379/#{redis_database}"
-end
-
 # Assign here because only one .env file
 ENV["BASE_URL"] = "http://test.host"
+# Set before config/boot so bin/env picks the test Redis database
 ENV["RAILS_ENV"] ||= "test"
 ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"] = "true"
 ENV["PARALLEL_TEST_FIRST_IS_1"] = "true" # number parallel databases correctly
@@ -100,10 +95,15 @@ VCR.configure do |config|
   config.ignore_hosts("127.0.0.1", "0.0.0.0", "localhost") # for capybara's app server
 
   %w[CLOUDFLARE_TOKEN EXCHANGE_RATE_API_KEY FACEBOOK_AD_TOKEN GOOGLE_GEOCODER MAILCHIMP_KEY
-    MAXMIND_KEY SENDGRID_EMAIL_VALIDATION_KEY LOGO_API_TOKEN STRAVA_KEY STRAVA_SECRET
-    STRAVA_TEST_ACCESS_TOKEN STRAVA_TEST_REFRESH_TOKEN].each do |key|
+    MAXMIND_KEY R2_TEST_ACCESS_KEY R2_TEST_ACCESS_KEY_SECRET R2_TEST_ENDPOINT SENDGRID_EMAIL_VALIDATION_KEY
+    LOGO_API_TOKEN STRAVA_KEY STRAVA_SECRET STRAVA_TEST_ACCESS_TOKEN
+    STRAVA_TEST_REFRESH_TOKEN].each do |key|
     config.filter_sensitive_data("<#{key}>") { ENV[key] }
   end
+
+  # aws-sdk addresses R2 virtual-host style (bucket.<account>.r2...), so the endpoint never appears
+  # verbatim - filtering the host keeps the account id out, and VCR swaps it back on playback
+  config.filter_sensitive_data("<R2_TEST_HOST>") { URI.parse(ENV["R2_TEST_ENDPOINT"]).host if ENV["R2_TEST_ENDPOINT"].present? }
 
   config.before_record do |i|
     i.response.headers.delete("Set-Cookie")

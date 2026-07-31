@@ -203,13 +203,13 @@ class StolenRecord < ApplicationRecord
     end
   end
 
-  # In Images::StolenProcessor we set metadata["removed"] when we remove an image
+  # ImageServices::StolenProcessor marks the blob removed when the image it rendered from is gone
   def images_attached?
-    image_four_by_five&.attached? && image_four_by_five.blob&.metadata&.dig("removed") != true
+    image_four_by_five&.attached? && alert_blob_data("removed") != true
   end
 
   def images_attached_id
-    image_four_by_five&.blob&.metadata&.dig("image_id")
+    alert_blob_data("image_id")
   end
 
   def should_be_geocoded? = skip_geocoding.blank?
@@ -393,6 +393,8 @@ class StolenRecord < ApplicationRecord
   end
 
   private
+
+  def alert_blob_data(key) = image_four_by_five&.blob&.binx_data&.dig(key)
 
   # The read replica can't make database changes, but can enqueue the worker - which will make the changes
   def enqueue_worker(location_changed = false)

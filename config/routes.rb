@@ -66,6 +66,12 @@ Rails.application.routes.draw do
   end
   get "logout", to: "sessions#destroy"
 
+  # Organization SAML SSO (Service Provider). Metadata is public for IdP onboarding;
+  # init begins SP-initiated login, callback is the Assertion Consumer Service.
+  get "/sso/:org_slug/metadata", to: "saml#metadata", as: :saml_metadata
+  get "/sso/:org_slug/init", to: "saml#init", as: :saml_init
+  post "/sso/:org_slug/callback", to: "saml#callback", as: :saml_callback
+
   resources :payments, only: %i[new create] do
     collection { get :success }
   end
@@ -166,6 +172,14 @@ Rails.application.routes.draw do
   # new makes an empty registration and redirects into show, which renders
   # ?step=1|2|finished (and handles the emailed confirmation link)
   resource :register, only: %i[new create show update], controller: :register
+
+  # Registration photos upload before there's a session, so they get their own endpoint
+  post "/register/direct_uploads" => "register/direct_uploads#create", :as => :register_direct_uploads
+
+  # Shadows ActiveStorage's own route (drawn last, so this wins) so the stock controller, which
+  # checks nothing, isn't reachable. Deliberately unnamed - rails_direct_uploads_path still
+  # resolves here, now to the signed-in-only controller.
+  post "/rails/active_storage/direct_uploads" => "direct_uploads#create"
 
   namespace :search do
     get "/", to: redirect("/search/registrations")
@@ -270,7 +284,8 @@ Rails.application.routes.draw do
     %i[
       bike_sticker_updates email_bans exports graduated_notifications invoices logged_searches
       mailchimp_data model_attestations model_audits
-      notifications organization_statuses paper_trail_versions parking_notifications strava_activities strava_gears strava_requests
+      notifications organization_statuses paper_trail_versions parking_notifications public_images
+      strava_activities strava_gears strava_requests
       stripe_prices stripe_subscriptions user_alerts user_bans user_registration_organizations
     ].each { resources it, only: %i[index] }
 

@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Register flow", :js, type: :system do
-  let(:owner_email) { "owner@example.com" }
+  let(:owner_email) { "owner@bikeindex.org" }
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
   let!(:red) { FactoryBot.create(:color, name: "Red") }
   let!(:blue) { FactoryBot.create(:color, name: "Blue") }
@@ -13,6 +13,21 @@ RSpec.describe "Register flow", :js, type: :system do
     # The manufacturer combobox autocompletes against the redis index
     Autocomplete::Loader.clear_redis
     Autocomplete::Loader.load_all(%w[Manufacturer])
+  end
+
+  # Through step 1 and onto step 2, the way a rider gets there
+  def start_registration
+    visit "/register/new"
+
+    # new creates the registration and lands on its tokenized step 1
+    expect(page).to have_current_path(/register\?b_param_token=.+&step=1/, url: true)
+
+    type_into("#b_param_manufacturer_id", "Surly")
+    click_combobox_option("Surly")
+    fill_in "b_param[owner_email]", with: owner_email
+    click_button "Next"
+
+    expect(page).to have_content("Add your bike")
   end
 
   it "starts a registration, keeps a full details draft across a reload, and completes" do
@@ -120,6 +135,12 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(find("input[name='bike[status]']", visible: :all).value).to eq "status_stolen"
     fill_in "bike[phone]", with: "(555) 000-0000"
 
+    # Anonymous, so this uploads against the registration's token - after the reload above,
+    # which would have dropped a file picked before it
+    attach_file("bike_image", Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg"), make_visible: true)
+    expect(page).to have_content("bike_photo-landscape.jpeg")
+    expect(page).to have_no_content("uploading")
+
     click_button "Complete Bike Registration"
 
     expect(page).to have_content("Registration saved")
@@ -131,5 +152,121 @@ RSpec.describe "Register flow", :js, type: :system do
       "serial_number" => "made_without_serial", "phone" => "(555) 000-0000",
       "status" => "status_stolen")
     expect(BikeServices::Register.send(:details_completed?, b_param)).to be_truthy
+    expect(ActiveStorage::Blob.find_signed!(b_param.image_signed_id).filename.to_s)
+      .to eq "bike_photo-landscape.jpeg"
+  end
+
+  # The Disk service answers instantly, so what happens between picking a file and the blob
+  # landing is only observable by holding the PUT open at the network layer.
+  describe "an upload still in flight" do
+    let(:image_path) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
+
+    # Nothing in the handler answers the request, so it hangs the way a dead connection does
+    def hang_the_upload
+      page.driver.with_playwright_page do |playwright_page|
+        playwright_page.route("**/rails/active_storage/disk/**", ->(_route, _request) {})
+      end
+    end
+
+    def complete_the_registration
+      type_into("#bike_primary_frame_color_id", "Red")
+      click_combobox_option("Red")
+      fill_in "bike[serial_number]", with: "HELD1234"
+      click_button "Complete Bike Registration"
+    end
+
+    it "holds the submit until the blob lands, then sends it" do
+      start_registration
+      # Held just long enough to submit against it; the upload finishes on its own after
+      page.driver.with_playwright_page do |playwright_page|
+        playwright_page.route("**/rails/active_storage/disk/**", ->(route, _request) {
+          sleep 3
+          route.continue
+        })
+      end
+
+      attach_file("bike_image", image_path, make_visible: true)
+      expect(page).to have_content("uploading")
+
+      complete_the_registration
+
+      # Submitting doesn't navigate - the button spins while the upload finishes
+      expect(page).to have_css("button[type='submit'][disabled]")
+      expect(page).to have_current_path(/step=2/, url: true)
+
+      # ...and once the blob lands the held submit goes through, carrying the photo
+      expect(page).to have_content("Registration saved", wait: 15)
+      expect(BParam.last.image_signed_id).to be_present
+    end
+
+    # Without this the button sits disabled behind a spinner until the page is reloaded
+    it "gives up on an upload that stops responding, and submits without the photo" do
+      start_registration
+      hang_the_upload
+      # Shortens the wait rather than skipping a step - the whole path still runs
+      page.execute_script(<<~JS)
+        document.querySelector("[data-controller~='ui--forms--file-upload']")
+          .setAttribute("data-ui--forms--file-upload-stall-value", "1500")
+      JS
+
+      attach_file("bike_image", image_path, make_visible: true)
+
+      expect(page).to have_content("upload failed", wait: 10)
+
+      complete_the_registration
+
+      expect(page).to have_content("Registration saved", wait: 15)
+      expect(BParam.last.image_signed_id).to be_blank
+    end
+  end
+
+  # The example above uploads to the Disk service, same-origin, which never exercises a presigned
+  # S3 PUT or a cross-origin request. This one goes to the bikeindex-test R2 bucket for real, so
+  # it needs credentials and the network. Kept separate so an R2 blip can't take the whole flow's
+  # coverage with it - and signed in, because a bike (and so a PublicImage) is what has a url.
+  describe "uploading to R2" do
+    include_context :cloudflare_test_storage
+
+    let(:image_path) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
+    let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
+
+    before do
+      visit new_session_path
+      fill_in "Email", with: current_user.email
+      click_button "Continue"
+      fill_in "Password", with: "testthisthing7$"
+      click_button "Log in"
+      expect(page).to have_current_path("/my_account", wait: 5)
+    end
+
+    it "PUTs the photo to the bucket and serves it from the storage domain" do
+      start_registration
+
+      # The field ships with its name so a JS-less submit posts the bytes; the controller
+      # drops it on connect, which is what leaves the signed id as the only thing carrying
+      # the photo. Both would otherwise arrive, and the b_param would hold two of them.
+      expect(page).to have_no_css("input[name='bike[image]']", visible: :all)
+      expect(page).to have_css("input#bike_image[type='file']", visible: :all)
+
+      attach_file("bike_image", image_path, make_visible: true)
+      expect(page).to have_content("bike_photo-landscape.jpeg")
+      expect(page).to have_no_content("uploading", wait: 20) # A real cross-origin PUT
+
+      # A color is required for the bike to save, and signed in it saves on submit
+      type_into("#bike_primary_frame_color_id", "Red")
+      click_combobox_option("Red")
+      fill_in "bike[serial_number]", with: "R2UP1234"
+      click_button "Complete Bike Registration"
+      expect(page).to have_content("Registration complete")
+
+      public_image = Bike.last.public_images.first
+      expect(public_image.file.attached?).to be_truthy
+      expect(public_image.image_url).to eq "https://test-uploads.bikeindex.org/#{public_image.file.blob.key}"
+
+      # Fetching it is the actual proof the browser's PUT landed - and that the bucket serves it
+      response = Faraday.get(public_image.image_url)
+      expect(response.status).to eq 200
+      expect(response.body.bytesize).to eq File.size(image_path)
+    end
   end
 end

@@ -48,7 +48,7 @@ module Users
     end
 
     def auto_generate_user_for_organization(organization_role)
-      return false unless organization_role.organization.enabled?("passwordless_users") &&
+      return false unless organization_role.organization.passwordless_user_creation? &&
         organization_role.user.blank?
 
       password = SecurityTokenizer.new_password_token

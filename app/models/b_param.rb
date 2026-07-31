@@ -441,6 +441,21 @@ class BParam < ApplicationRecord
     email_confirmed? || update(params: params.merge("email_confirmed_at" => Time.current))
   end
 
+  # An ActiveStorage blob the browser uploaded straight to the bucket. Held as a signed id
+  # rather than an attachment so the blob's only owner is the PublicImage created from it -
+  # a b_param attachment would purge the blob out from under the bike when it's cleaned up.
+  def image_signed_id
+    params["image_signed_id"]
+  end
+
+  # nil once CleanUnattachedBlobsJob has reaped it, which a late registration has to survive.
+  # Only a blob this registration minted - a signed id is a bearer token, so without the stamp
+  # any registration could claim any other's photo.
+  def image_blob
+    blob = ActiveStorage::Blob.find_signed(image_signed_id)
+    blob if blob&.binx_data&.dig("b_param_id") == id
+  end
+
   def primary_frame_color
     primary_frame_color_id.present? && Color.find_by_id(primary_frame_color_id)&.name
   end
@@ -687,8 +702,8 @@ class BParam < ApplicationRecord
   def process_image_if_required
     return true if image_processed || image.blank?
 
-    Images::AssociatorJob.perform_in(5.seconds)
-    Images::AssociatorJob.perform_in(1.minutes)
+    ImageJobs::AssociatorJob.perform_in(5.seconds)
+    ImageJobs::AssociatorJob.perform_in(1.minutes)
   end
 
   def set_color_key(key = nil)

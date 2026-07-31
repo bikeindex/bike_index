@@ -3,10 +3,13 @@ import { Controller } from '@hotwired/stimulus'
 // Connects to data-controller="ui--modal"
 // The open state persists to the URL query (?modal_<id>=1) so the modal survives a reload.
 export default class extends Controller {
+  static values = { openOnConnect: Boolean }
+
   connect () {
     this.boundOpen = this.openFromTrigger.bind(this)
     this.triggers.forEach(el => el.addEventListener('click', this.boundOpen))
     if (this.paramInUrl) this.open()
+    else if (this.openOnConnectValue) this.showDialog()
   }
 
   disconnect () {
@@ -21,9 +24,15 @@ export default class extends Controller {
   }
 
   open () {
+    this.showDialog()
+    this.persist(true)
+  }
+
+  // A modal the server rendered open (openOnConnect) skips the param: whether it
+  // comes back after a reload is the server's call, not the URL's
+  showDialog () {
     this.element.showModal()
     document.body.classList.add('tw:overflow-hidden')
-    this.persist(true)
   }
 
   close () {

@@ -57,8 +57,10 @@ class RegisterController < ApplicationController
   end
 
   def update
+    # Both read straight from params - update_params is stored as json, which an upload can't be
     BikeServices::Register.save_step_2(@b_param, user: current_user,
-      image: params.dig(:bike, :image), bike_params: update_params)
+      image: params.dig(:bike, :image), image_signed_id: params.dig(:bike, :image_signed_id),
+      bike_params: update_params)
     if BikeServices::Register.creator_available?(@b_param)
       redirect_after_bike_creation(BikeServices::Register.create_bike(@b_param, ip_address: forwarded_ip_address))
     else

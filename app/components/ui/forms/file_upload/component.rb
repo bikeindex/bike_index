@@ -3,12 +3,15 @@
 module UI
   module Forms
     module FileUpload
+      # direct_upload_url: with JS, uploads on pick and posts the blob's signed id instead of
+      # the bytes. The field still renders as an ordinary one, so it posts the file when JS
+      # doesn't run - the controller drops its name only once it's driving the upload.
       class Component < ApplicationComponent
         # mb-0 cancels legacy bootstrap's `label` margin, which items-center would
         # otherwise center along with the button next to it.
         LABEL_CLASSES = "tw:mb-0 tw:whitespace-nowrap tw:peer-focus-visible:ring-3 tw:peer-focus-visible:ring-blue-500/40"
 
-        def initialize(form_builder:, attribute:, accept: nil, camera: nil, html_options: {})
+        def initialize(form_builder:, attribute:, accept: nil, camera: nil, direct_upload_url: nil, html_options: {})
           @form_builder = form_builder
           @attribute = attribute
           @placeholder = translation(".no_file_chosen")
@@ -21,6 +24,10 @@ module UI
           @attachment_url = attached_url
           @thumbnail_url = thumbnail_version_url || @attachment_url
 
+          @direct_upload_url = direct_upload_url
+          # Carries the blob the browser uploaded. Scoped to the form builder like every other
+          # field here, so two of these on one page don't collide on the same param
+          @signed_id_field = "#{form_builder.object_name}[#{attribute}_signed_id]" if direct_upload_url.present?
           @html_options = {
             class: "tw:peer tw:sr-only",
             accept: accept_list.join(",").presence,
@@ -33,12 +40,11 @@ module UI
 
         private
 
-        # Both wordings ship and the pointer media query picks one -- a coarse pointer
-        # can neither click nor drop, so it gets the short one.
+        # The button's gap-1.5 spaces these; the icon is decorative, the text names it.
         def label_content
           safe_join([
-            tag.span(translation(".choose_or_drop_file"), class: "tw:pointer-coarse:hidden"),
-            tag.span(translation(".choose_file"), class: "tw:hidden tw:pointer-coarse:inline")
+            helpers.inline_svg_tag("icons/upload.svg", class: "tw:h-4 tw:w-4", aria_hidden: true),
+            translation(".upload")
           ])
         end
 

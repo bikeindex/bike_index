@@ -18,6 +18,20 @@ RSpec.describe UI::Modal::Component, type: :component do
     expect(component).to have_css("button[aria-label='Close']")
   end
 
+  it "does not flag open-on-connect by default" do
+    component = render_inline(instance) { |modal| modal.with_body { "Body" } }
+    expect(component).to have_css("dialog[data-ui--modal-open-on-connect-value='false']")
+  end
+
+  context "open" do
+    let(:options) { {id: "open-modal", title: "Open Modal", open: true} }
+
+    it "flags the controller to open it on connect" do
+      component = render_inline(instance) { |modal| modal.with_body { "Body" } }
+      expect(component).to have_css("dialog[data-ui--modal-open-on-connect-value='true']")
+    end
+  end
+
   context "without title" do
     let(:options) { {id: "no-title-modal"} }
 

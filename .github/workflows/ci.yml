@@ -221,6 +221,11 @@ jobs:
       TRANSLATION_BRANCH: main
       TRANSLATIONS_SYNC_APP_ID: ${{ secrets.TRANSLATIONS_SYNC_APP_ID }}
       RETRY_FLAKY: true
+      # spec/integration/register_spec.rb uploads to the bikeindex-test bucket for real - the
+      # only way to exercise a presigned cross-origin PUT. Absent, that one example skips.
+      R2_TEST_ACCESS_KEY: ${{ secrets.R2_TEST_ACCESS_KEY }}
+      R2_TEST_ACCESS_KEY_SECRET: ${{ secrets.R2_TEST_ACCESS_KEY_SECRET }}
+      R2_TEST_ENDPOINT: ${{ secrets.R2_TEST_ENDPOINT }}
       KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC: ${{ secrets.KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC }}
       KNAPSACK_PRO_CI_NODE_TOTAL: ${{ matrix.ci_node_total }}
       KNAPSACK_PRO_CI_NODE_INDEX: ${{ matrix.ci_node_index }}
