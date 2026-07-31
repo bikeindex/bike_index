@@ -3,6 +3,8 @@
 module UI
   module Alert
     class ComponentPreview < ApplicationComponentPreview
+      CONFIRMATION_TEXT = "We've sent a confirmation link to your email. No need to wait — you can finish registering right now."
+
       # @!group Kind variants
       def notice
         render(UI::Alert::Component.new(text: "This is a notice alert", kind: :notice))
@@ -21,13 +23,24 @@ module UI
       end
 
       def purple
-        render(UI::Alert::Component.new(text: "We've sent a confirmation link to your email. No need to wait — you can finish registering right now.", kind: :purple))
+        render(UI::Alert::Component.new(text: CONFIRMATION_TEXT, kind: :purple))
       end
 
       def custom_icon
         envelope = ActionController::Base.helpers.inline_svg_tag("icons/envelope.svg",
           class: "tw:-mb-0.5 tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true)
         render(UI::Alert::Component.new(text: "Check your email", kind: :notice, icon: envelope))
+      end
+      # @!endgroup
+
+      # @!group Header variants
+      def with_header
+        render(UI::Alert::Component.new(header: "Registration incomplete", kind: :warning, text: CONFIRMATION_TEXT))
+      end
+
+      def dismissable_with_header
+        render(UI::Alert::Component.new(header: "Registration incomplete", kind: :warning, text: CONFIRMATION_TEXT,
+          dismissable: true))
       end
       # @!endgroup
 

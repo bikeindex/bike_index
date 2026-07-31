@@ -18,8 +18,7 @@ module UI
         private
 
         def header_text
-          translation(".errors_prevented_this_from_being_saved", errors_count: @error_messages.count,
-            object_name: @name)
+          translation(".error_prevented_this_from_being_saved", count: @error_messages.count, object_name: @name)
         end
       end
     end
