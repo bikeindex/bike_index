@@ -1,38 +1,14 @@
 # frozen_string_literal: true
 
-# Fragment caches don't digest the templates inside them, so editing that markup would
-# serve stale HTML. The cached components fold ApplicationComponent.markup_digest over
-# their CACHED_MARKUP globs into the cache key, which invalidates on its own — this just
-# checks that wiring is live, so a mistyped glob can't silently stop covering a directory.
-# Pass sample_preview to also check that previews stay out of the digest.
-RSpec.shared_examples "cached_markup_digest" do |sample_template, sample_preview = nil|
-  let(:cached_markup) { Array(described_class::CACHED_MARKUP) }
-  let(:template) { Rails.root.join(sample_template) }
-
-  # A method, not a let — the point is to recompute it either side of the edit
-  def markup_digest
-    described_class.markup_digest(described_class::CACHED_MARKUP)
-  end
-
-  it "covers the cached markup" do
-    expect(cached_markup).to be_present
-    expect(template).to exist # a moved template shouldn't silently stop being covered
-    expect(markup_digest).to be_present
-
-    original = template.read
-    expect { template.write("#{original}\n<!-- edited -->\n") }.to change { markup_digest }
-  ensure
-    template.write(original) if original
-  end
-
-  if sample_preview
-    it "ignores previews, which render outside the cache block" do
-      preview = Rails.root.join(sample_preview)
-      expect(preview).to exist
-      original = preview.read
-      expect { preview.write("#{original}\n") }.to_not change { markup_digest }
-    ensure
-      preview.write(original) if original
-    end
+# Fragment caches don't digest the templates inside them, so editing that markup serves
+# stale HTML until the cache key changes. Cached components fold in MARKUP_DIGEST, a
+# digest of their own markup plus everything that markup renders transitively. This
+# recomputes it and fails when the markup has moved on, so the digest is committed
+# rather than read from disk on every render.
+RSpec.shared_examples "cached_markup_digest" do
+  it "has the current digest of its cached markup committed" do
+    calculated = described_class.calculated_markup_digest
+    expect(described_class::MARKUP_DIGEST).to eq(calculated),
+      "#{described_class}'s cached markup changed — set its MARKUP_DIGEST to #{calculated.inspect}"
   end
 end

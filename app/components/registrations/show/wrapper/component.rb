@@ -6,11 +6,9 @@ module Registrations
       # Renders the registration show page as the resolved [kind, organization]
       # perspective (e.g. [:public, nil] or [:staff, org]) and fragment-caches it.
       class Component < ApplicationComponent
-        # The cache key digests this markup, so edits invalidate themselves — including
-        # edits to this file, which the glob covers. To force a flush for a change the
-        # digest can't see (a component rendered from outside the glob), touch any file
-        # it does cover.
-        CACHED_MARKUP = "app/components/registrations/show/**/*"
+        # Digest of the markup inside the cache block — the cached_markup_digest spec
+        # keeps it current, following what this tree renders out into UI:: and elsewhere
+        MARKUP_DIGEST = "0b9c0ce42900"
 
         def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: nil)
           @bike = bike
@@ -41,7 +39,7 @@ module Registrations
         # The ownership's timestamp is in here because claiming doesn't touch the bike,
         # and both views show claim state.
         def cache_key
-          [self.class.markup_digest(CACHED_MARKUP), @current_user&.id,
+          [MARKUP_DIGEST, @current_user&.id,
             @current_user&.registration_show_toggleable?, @current_user&.feature_registration_show_legacy?,
             BikeServices::ShowViews.view_param(@view), @bike_sticker&.id,
             @bike.current_ownership&.updated_at,

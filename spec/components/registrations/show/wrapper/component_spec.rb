@@ -4,9 +4,7 @@ require "rails_helper"
 
 RSpec.describe Registrations::Show::Wrapper::Component, type: :component do
   # The whole show tree renders inside this component's cache block
-  it_behaves_like "cached_markup_digest",
-    "app/components/registrations/show/current_alerts/wrapper/component.html.erb",
-    "app/components/registrations/show/org_top_actions/wrapper/component_preview.rb"
+  it_behaves_like "cached_markup_digest"
 
   let(:bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "new-owner@example.com") }
   let(:current_user) { bike.reload.current_ownership.creator }

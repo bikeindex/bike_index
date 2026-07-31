@@ -4,8 +4,8 @@ module PageBlock
   module Footer
     class Component < ApplicationComponent
       FACEBOOK_PIXEL_ID = "199066297131941"
-      # The cache key digests this markup, so edits invalidate themselves
-      CACHED_MARKUP = "app/components/page_block/footer/**/*"
+      # Digest of the cached template — the cached_markup_digest spec keeps it current
+      MARKUP_DIGEST = "ee2436b5a6d7"
 
       def initialize(current_user:, skip_facebook:, page_id:, passive_organization: nil)
         @current_user = current_user
@@ -17,7 +17,7 @@ module PageBlock
       private
 
       def cache_key
-        [self.class.markup_digest(CACHED_MARKUP), @page_id, @current_user, @passive_organization, @skip_facebook]
+        [MARKUP_DIGEST, @page_id, @current_user, @passive_organization, @skip_facebook]
       end
     end
   end
