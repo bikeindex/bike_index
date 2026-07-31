@@ -799,7 +799,10 @@ RSpec.describe RegisterController, type: :request do
       # acknowledgment below it is still unsigned
       expect(response.body).to include "E-Vehicle Acknowledgment · Step 3 of 3"
       expect(response.body).to_not include "Safety check complete"
-      expect(response.body).to include current_user.name
+      # Registered for someone else, so it's their name that's agreeing - not the
+      # signed-in account filling the form in
+      expect(response.body).to include user_name
+      expect(response.body).to_not include current_user.name
 
       # The acknowledgment is what creates the bike
       expect {

@@ -380,7 +380,8 @@ RSpec.describe "Register flow", :js, type: :system do
       click_button "Continue"
 
       expect(page).to have_content("You're almost done")
-      check "I, #{owner_email}, agree to comply with all of the rules above."
+      # Registered for someone else, so it's their name that agrees
+      check "I, #{user_name}, agree to comply with all of the rules above."
       click_button "Complete Bike Registration"
 
       expect(page).to have_content("Registration saved")

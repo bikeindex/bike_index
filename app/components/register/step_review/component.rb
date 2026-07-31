@@ -37,8 +37,10 @@ module Register
 
       # Who's agreeing: their account name, falling back to the address the
       # registration is going to
+      # Whoever the registration is for, not whoever is filling it in - step 2 asks for
+      # a name exactly when the two differ, so it wins over the signed-in account's
       def registrant_name
-        @current_user&.name.presence || @b_param.owner_email
+        @b_param.user_name.presence || @current_user&.name.presence || @b_param.owner_email
       end
     end
   end
