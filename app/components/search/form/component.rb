@@ -77,8 +77,10 @@ module Search
         @interpreted_params[:primary_activity].present?
       end
 
+      # includes, because display_name_search reads through primary_activity_family
       def primary_activity_combobox_options
-        PrimaryActivity.by_priority.map { |pa| {display: pa.display_name_search, value: pa.id} }
+        PrimaryActivity.by_priority.includes(:primary_activity_family)
+          .map { |pa| {display: pa.display_name_search, value: pa.id} }
       end
 
       # Doubles as the visually hidden label, the placeholder and the mobile dialog's label

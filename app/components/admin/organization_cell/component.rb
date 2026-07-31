@@ -17,9 +17,10 @@ module Admin
         @organization_id.present?
       end
 
+      # memoized: the template reads it three times
       def organization_subject
-        return @organization if @organization.present?
-        Organization.unscoped.find_by(id: @organization_id) if @organization_id.present?
+        @organization_subject ||= @organization.presence ||
+          (Organization.unscoped.find_by(id: @organization_id) if @organization_id.present?)
       end
 
       def error_text_class

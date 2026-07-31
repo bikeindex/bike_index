@@ -1,4 +1,4 @@
-= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "bikes-#{@active_tab}", display_recovery: @active_tab == "recoveries" }
+= render(Admin::Bikes::Tabs::Component.new(bike: @bike, active_tab: "bikes-#{@active_tab}", display_recovery: @active_tab == "recoveries"))
 
 %h1.mt-5.mb-4
   = @active_tab.titleize

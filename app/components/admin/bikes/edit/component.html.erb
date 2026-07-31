@@ -1,0 +1,265 @@
+<div class="admin-subnav midpage-subnav">
+  <div class="col-4 col-md-6">
+    <h1>
+      Edit Bike
+      <%= link_to "user edit", edit_bike_path(@bike, return_to: edit_admin_bike_path(@bike)), class: "user-edit-link" %>
+    </h1>
+  </div>
+
+  <div class="col-8 col-md-6 text-right">
+    <%= render partial: "/bikes/credibility_score", locals: {bike: @bike} %>
+  </div>
+</div>
+
+<%= form_for [:admin, @bike], html: {class: "form form-horizontal admin-bike-edit",
+                                     data: {controller: "admin--bike-edit-form",
+                                            "admin--bike-edit-form-original-serial-value": @bike.serial_number}} do |f| %>
+  <%= render(UI::Alerts::ObjectError::Component.new(object: @bike)) %>
+
+  <div class="row">
+    <div class="col-md-4 col-lg-3">
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :cycle_type, required: true)) do %>
+        <%# cycle_type is an integer-backed enum: pass enum *labels* as option values and an explicit value: to override hotwire_combobox's enum branch (which would emit cycle_type_before_type_cast) %>
+        <%= render UI::Forms::Combobox::Component.new(name: :cycle_type, form: f, value: @bike.cycle_type, required: true, options: CycleType.select_options) %>
+      <% end %>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-5">
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :serial_number, required: true,
+            html_options: {class: ("fake-disabled" if @bike.no_serial?),
+                           data: {"admin--bike-edit-form-target": "serial"}})) %>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="ml-2">
+        <%= check_box_tag :has_no_serial, true, @bike.serial_unknown?, class: "form-check-input",
+              data: {"admin--bike-edit-form-target": "noSerial", serial: "unknown",
+                     action: "change->admin--bike-edit-form#serialChanged"} %>
+
+        <%= label_tag :has_no_serial, "Unknown serial" %>
+      </div>
+
+      <div class="ml-2">
+        <%= f.check_box :made_without_serial, class: "form-check-input",
+              data: {"admin--bike-edit-form-target": "noSerial", serial: "made_without_serial",
+                     action: "change->admin--bike-edit-form#serialChanged"} %>
+
+        <%= f.label :made_without_serial %>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-6 col-md-4 col-lg-3">
+      <div
+        data-controller="admin--bike-manufacturer"
+        data-action="hw-combobox:preselection->admin--bike-manufacturer#toggleWarning"
+      >
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :manufacturer_id, label_text: manufacturer_label, required: true)) do %>
+          <%= render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, form: f, required: true) %>
+
+          <%= tag.small("Manufacturer is <em>Other</em>, this isn't a listed manufacturer".html_safe,
+                class: UI::Alert::Component::TEXT_CLASSES[:warning], hidden: !@bike.manufacturer&.other?,
+                data: {"admin--bike-manufacturer-target": "warning"}) %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-3">
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :year)) %>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-3">
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :primary_frame_color_id, label_text: Bike.human_attribute_name(:primary_frame_color_id), required: true)) do %>
+        <%= render UI::Forms::Combobox::Component.new(name: :primary_frame_color_id, form: f, placeholder: "Choose color", required: true, include_blank: true, options: Color.all.pluck(:name, :id)) %>
+      <% end %>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :frame_model)) %>
+    </div>
+
+    <div class="col-md-4 col-lg-6">
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :description, kind: :text_area)) %>
+    </div>
+
+    <div class="col-md-4 col-lg-3">
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :primary_activity_id)) do %>
+        <%= render UI::Forms::Combobox::Component.new(name: :primary_activity_id, form: f, placeholder: "Choose activity", include_blank: true, options: primary_activity_options) %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="row mt-2">
+    <div class="col-md-4 col-lg-6">
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :owner_email, kind: :email_field, required: true)) %>
+
+      <%# its own label rather than part of the group's, so the required * stays with "Owner email" %>
+      <%= f.label :skip_email, class: "twlabel text-info tw:font-normal" do %>
+        <%= f.check_box :skip_email %> Don't Send email
+        <em class="small less-strong">only applies if email changes</em>
+      <% end %>
+    </div>
+
+    <% if organization_options.any? %>
+      <div class="col-md-4 col-lg-3">
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :creation_organization_id, label_text: Bike.human_attribute_name(:creation_organization_id))) do %>
+          <%= render UI::Forms::Combobox::Component.new(name: :creation_organization_id, form: f, placeholder: "Choose organization", include_blank: true, options: organization_options) %>
+        <% end %>
+      </div>
+      <div class="col-md-4 col-lg-3">
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :bike_organization_ids, label_text: "Current orgs")) do %>
+          <%= render UI::Forms::Combobox::Component.new(name: :bike_organization_ids, form: f, placeholder: "Add organization",
+                multiselect_chip_src: admin_combobox_organization_chips_path, options: organization_options) %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-12 text-center">
+      <%= submit_tag "Update the bike", class: "btn btn-success btn-lg" %>
+    </div>
+  </div>
+
+  <% if @bike.current_stolen_record.present? %>
+    <h4 class="mt-4" id="edit-stolen-record">
+      Edit Stolen Record
+    </h4>
+    <%= f.fields_for :stolen_records do |s| %>
+      <% next unless s.object.current %>
+
+      <div class="row mt-4">
+        <div class="col-md-4">
+          <div class="row">
+            <div class="col-6">
+              <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :country_id)) do %>
+                <%= render UI::Forms::Combobox::Component.new(name: :country_id, form: s, placeholder: "Choose country", include_blank: true, options: Country.select_options) %>
+              <% end %>
+            </div>
+
+            <div class="col-6">
+              <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :region_record_id, label_text: "State")) do %>
+                <%= render UI::Forms::Combobox::Component.new(name: :region_record_id, form: s, dialog_label: "State", placeholder: "State", include_blank: true, options: State.united_states.pluck(:name, :id)) %>
+              <% end %>
+            </div>
+          </div>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :street, label_text: "Intersection or address")) %>
+
+          <div class="row">
+            <div class="col-6">
+              <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :city)) %>
+            </div>
+
+            <div class="col-6">
+              <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :postal_code, label_text: "Zipcode")) %>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-8">
+          <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :theft_description, kind: :text_area)) %>
+
+          <div class="row">
+            <div class="col-6">
+              <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :police_report_department)) %>
+            </div>
+
+            <div class="col-6">
+              <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :police_report_number)) %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-6">
+              <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :estimated_value, kind: :number_field)) %>
+            </div>
+
+            <%# Note: this is no longer an attribute on bikes (PR#1875) - but unchecking this expands the recovery fields %>
+            <%# ... and filling in the recovery fields recovers the bike %>
+            <div class="col-6 tw:mb-4">
+              <%= label_tag :stolen do %>
+                <%= check_box_tag :stolen, true, true,
+                      data: {"admin--bike-edit-form-target": "stolen", action: "change->admin--bike-edit-form#stolenChanged"} %>
+                Bike is stolen
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tw:hidden" data-admin--bike-edit-form-target="recoveryFields">
+        <hr>
+
+        <div class="row">
+          <div class="col-md-6">
+            <%# required is toggled by the stimulus controller, but the fields only show when it is %>
+            <%= render(UI::Forms::Group::Component.new(attribute: :mark_recovered_reason, label_text: "How was it recovered", required: true)) do %>
+              <%= text_area_tag :mark_recovered_reason, nil, rows: 3, placeholder: "You HAVE to put something in here",
+                    class: "twinput", data: {"admin--bike-edit-form-target": "recoveryReason"} %>
+            <% end %>
+          </div>
+
+          <div class="col-md-6">
+            <div class="tw:mb-4">
+              <%= label_tag :mark_recovered_we_helped do %>
+                <%= check_box_tag :mark_recovered_we_helped, true %> Did Bike
+                Index help?
+              <% end %>
+            </div>
+
+            <div class="tw:mb-4">
+              <%= label_tag :can_share_recovery do %>
+                <%= check_box_tag :can_share_recovery, true %> Can Share
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
+
+<div class="row mt-4 mb-4">
+  <% unless @bike.deleted? %>
+    <div class="col text-right">
+      <%= link_to "Delete bike", admin_bike_url(@bike), method: :delete, data: {confirm: "Are you sure?"}, class: "btn btn-danger ml-4" %>
+    </div>
+  <% end %>
+</div>
+
+<div class="mt-5">
+  <% if bike_organizations.none? %>
+    <em class="less-strong">No organizations</em>
+  <% else %>
+    <%= render(UI::Table::Component.new(records: bike_organizations)) do |table| %>
+      <% table.column(label: "Organizations") do |bike_organization| %>
+        <%= render(Admin::OrganizationCell::Component.new(organization: bike_organization.organization,
+              organization_id: bike_organization.organization_id)) %>
+      <% end %>
+
+      <% table.column(label: "Created") do |bike_organization| %>
+        <%= render(UI::Time::Component.new(time: bike_organization.created_at)) %>
+
+        <% if helpers.display_dev_info? %>
+          <code class="only-dev-visible small ml-2">
+            ID: <%= bike_organization.id %>
+          </code>
+        <% end %>
+      <% end %>
+
+      <% table.column(label: "Edit claimed?") do |bike_organization| %>
+        <%= check_mark if bike_organization.can_edit_claimed %>
+      <% end %>
+
+      <% table.column(label: "Deleted") do |bike_organization| %>
+        <% if bike_organization.deleted_at.present? %>
+          <span class="<%= UI::Alert::Component::TEXT_CLASSES[:error] %>">
+            <%= render(UI::Time::Component.new(time: bike_organization.deleted_at)) %>
+          </span>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
