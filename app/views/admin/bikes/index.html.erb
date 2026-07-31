@@ -255,7 +255,7 @@
 <% end unless admin_nav_display_view_all %>
 
 <% table_view = capture do %>
-  <%= render partial: "/admin/bikes/table", locals: {render_sortable: true, render_multi_check: @multi_delete} %>
+  <%= render Admin::BikesTable::Component.new(bikes: @bikes, render_sortable: true, render_multi_check: @multi_delete) %>
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
