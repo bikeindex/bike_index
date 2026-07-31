@@ -20,6 +20,13 @@ module Registrations
           page(view:, bike_id:) { alerts(claim_message: "new_registration") }
         end
 
+        # The recipient usually has no account yet, so this is the one most of them see
+        # @param view select [consumer, org_admin]
+        # @param bike_id text "Bike to render — defaults to one of the org's"
+        def claim_invitation_signed_out(view: "consumer", bike_id: nil)
+          page(view:, bike_id:, current_user: nil) { alerts(claim_message: "new_registration") }
+        end
+
         # @param view select [consumer, org_admin]
         # @param bike_id text "Bike to render — defaults to one of the org's"
         def notification_token(view: "consumer", bike_id: nil)
@@ -73,7 +80,7 @@ module Registrations
 
         # Renders the page for the resolved bike. The block builds the alerts from it, or
         # returns :missing when the record that scenario needs doesn't exist here
-        def page(view:, bike_id:, bike_sticker: nil)
+        def page(view:, bike_id:, bike_sticker: nil, current_user: lookbook_user)
           return production_notice if Rails.env.production?
 
           bike = preview_bike(bike_id)
@@ -82,8 +89,8 @@ module Registrations
           current_alerts = block_given? ? yield(bike) : alerts
           return missing_notice("the record this scenario needs") if current_alerts == :missing
 
-          component = Component.new(bike:, current_user: lookbook_user, view: resolved_view(view),
-            available_views: available_views(view), bike_sticker:, current_alerts:)
+          component = Component.new(bike:, current_user:, view: resolved_view(view, current_user),
+            available_views: available_views(view, current_user), bike_sticker:, current_alerts:)
 
           render_with_template(template: "registrations/show/wrapper/preview/scenario",
             locals: {component:, offset_header: consumer?(view)})
@@ -97,12 +104,15 @@ module Registrations
             matching_notification: nil, recovered_stolen_record: nil).with(**overrides)
         end
 
-        def resolved_view(view)
-          (view.to_s == "org_admin") ? [:staff, lookbook_organization] : [:owner, nil]
+        # A signed-out visitor resolves to the public view, the way the controller resolves it
+        def resolved_view(view, current_user)
+          return [:staff, lookbook_organization] if view.to_s == "org_admin"
+
+          current_user.present? ? [:owner, nil] : [:public, nil]
         end
 
-        def available_views(view)
-          [resolved_view(view), [:public, nil]].uniq
+        def available_views(view, current_user)
+          [resolved_view(view, current_user), [:public, nil]].uniq
         end
 
         # Claimed by default: SentToNewOwner raises itself off an unclaimed registration,

@@ -47,6 +47,20 @@ RSpec.describe "ComponentPreviews", type: :request do
       expect(response.body).to match("claim-invitation-modal")
     end
 
+    # The recipient usually has no account yet, so the page behind it is the public one
+    it "renders the signed-out claim invitation over the public view" do
+      get "#{base_url}/claim_invitation_signed_out"
+
+      expect(response.status).to eq 200
+      expect(response.body).to match("claim-invitation-modal")
+
+      component = Registrations::Show::Wrapper::ComponentPreview.new
+        .claim_invitation_signed_out.dig(:locals, :component)
+
+      expect(component.instance_variable_get(:@current_user)).to be_nil
+      expect(component.instance_variable_get(:@view)).to eq [:public, nil]
+    end
+
     it "renders the bike named by bike_id, through the view the select names" do
       other = FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization)
 
