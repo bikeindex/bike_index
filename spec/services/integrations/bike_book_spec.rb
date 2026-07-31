@@ -66,4 +66,14 @@ RSpec.describe Integrations::BikeBook do
       end
     end
   end
+
+  # Registration renders inline, so an unreachable bikebook has to drop rather than block
+  describe "make_request timing out" do
+    after { WebMock.reset! } # this stub is registered outside a VCR cassette
+
+    it "returns nil" do
+      WebMock.stub_request(:get, /bikebook\.io/).to_timeout
+      expect(Integrations::BikeBook.new.get_model_list(manufacturer: "Giant")).to be_nil
+    end
+  end
 end
