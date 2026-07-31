@@ -5,6 +5,28 @@ module BikeServices
   module Displayer
     extend Functionable
 
+    REG_FIELDS = %w[address bike_sticker extra_registration_number organization_affiliation
+      phone student_id].freeze
+
+    # Whether a registration form should ask for one of the organization's additional
+    # fields. Pass the user only when the registration is their own - what their account
+    # already has is what makes asking again unnecessary.
+    def include_reg_field?(field, organization = nil, user = nil, require_user_editable: false)
+      raise ArgumentError, "unknown reg field #{field.inspect}" unless REG_FIELDS.include?(field.to_s)
+      return false unless organization&.additional_registration_fields&.include?("reg_#{field}")
+
+      case field.to_s
+      when "address" then !user&.address_set_manually?
+      when "bike_sticker" then !require_user_editable || organization.enabled?("bike_stickers_user_editable")
+      when "organization_affiliation"
+        user.blank? || user.user_registration_organizations.with_organization_affiliation(organization.id).none?
+      when "phone" then user&.phone.blank?
+      when "student_id"
+        user.blank? || user.user_registration_organizations.with_student_id(organization.id).none?
+      else true # extra_registration_number, which nothing on the account can answer
+      end
+    end
+
     # This is just a quick hack, will improve
     def vehicle_search?(params_and_interpreted_params)
       return true if (%i[propulsion_type cycle_type] & params_and_interpreted_params.keys).any? ||

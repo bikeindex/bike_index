@@ -30,12 +30,18 @@ module Register
         !@b_param.self_registration?(@current_user)
       end
 
+      # What the account already holds only answers the organization's fields when the
+      # registration is the registrant's own - registering for someone else asks for theirs
+      def reg_field_user
+        @current_user if @b_param.self_registration?(@current_user)
+      end
+
       # The additional fields the organization asks for, gated exactly as bikes/new
       # gates them. Resolved once - the gates query, and the section heading below
       # re-checks every one of them
       def reg_fields
         @reg_fields ||= %i[phone extra_registration_number organization_affiliation student_id]
-          .select { |field| helpers.send(:"include_field_reg_#{field}?", organization, @current_user) }
+          .select { BikeServices::Displayer.include_reg_field?(it, organization, reg_field_user) }
       end
 
       def show_extra_registration_number?
@@ -73,7 +79,7 @@ module Register
       # record, so bikes/new only offers these fields for a plain registration
       # (BikeServices::Displayer.display_edit_address_fields?)
       def address_statuses
-        @address_statuses ||= if BikeServices::Builder.include_address_record?(organization, @current_user)
+        @address_statuses ||= if BikeServices::Displayer.include_reg_field?(:address, organization, reg_field_user)
           Bike.statuses - %w[status_stolen status_impounded unregistered_parking_notification]
         else
           []

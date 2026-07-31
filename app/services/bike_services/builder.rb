@@ -4,13 +4,6 @@ module BikeServices
   module Builder
     extend Functionable
 
-    def include_address_record?(organization = nil, user = nil)
-      return false if organization.blank?
-      return false if user&.address_set_manually?
-
-      organization.additional_registration_fields.include?("reg_address")
-    end
-
     def build(b_param, new_attrs = nil)
       new_attrs ||= {}
       # Default attributes
@@ -38,7 +31,7 @@ module BikeServices
       bike = check_example(b_param, bike)
       if b_param.unregistered_parking_notification?
         bike.attributes = default_parking_notification_attrs(b_param, bike)
-      elsif include_address_record?(bike.creation_organization)
+      elsif Displayer.include_reg_field?(:address, bike.creation_organization)
         bike.address_record ||= org_address_record(bike)
       end
       bike.bike_sticker = b_param.bike_sticker_code
