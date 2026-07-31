@@ -1,21 +1,19 @@
 import { Controller } from '@hotwired/stimulus'
 
-const supportsInvokers = () => 'commandForElement' in window.HTMLButtonElement.prototype
+const SUPPORTS_INVOKERS = 'commandForElement' in window.HTMLButtonElement.prototype
 
 // Connects to data-controller="ui--modal"
 // The open state persists to the URL query (?modal_<id>=1) so the modal survives a reload.
-// Triggers carry command/commandfor as well, so a browser with invoker commands opens the
-// dialog itself rather than waiting for this controller to load - which it may not have
-// when the click lands. There the click listener stands down and #invoked keeps the
-// bookkeeping; without invokers the listener opens the dialog as it always did.
+// Triggers carry command/commandfor too, so a browser with invoker commands opens the dialog
+// itself rather than waiting for this lazy loaded controller, which may not have arrived when
+// the click lands. Without them the controller stands in for the browser.
 export default class extends Controller {
   static values = { openOnConnect: Boolean }
 
   connect () {
-    this.boundOpen = this.openFromTrigger.bind(this)
-    this.boundClose = this.close.bind(this)
-    // Without invoker commands this controller stands in for the browser
-    if (!supportsInvokers()) {
+    if (!SUPPORTS_INVOKERS) {
+      this.boundOpen = this.openFromTrigger.bind(this)
+      this.boundClose = this.close.bind(this)
       this.triggers.forEach(el => el.addEventListener('click', this.boundOpen))
       this.closers.forEach(el => el.addEventListener('click', this.boundClose))
     }
@@ -25,6 +23,8 @@ export default class extends Controller {
   }
 
   disconnect () {
+    if (SUPPORTS_INVOKERS) return
+
     this.triggers.forEach(el => el.removeEventListener('click', this.boundOpen))
     this.closers.forEach(el => el.removeEventListener('click', this.boundClose))
   }
@@ -57,7 +57,7 @@ export default class extends Controller {
   }
 
   close () {
-    if (this.element.open) this.element.close()
+    this.element.close()
   }
 
   // Every close ends here - the close command, Escape and #close all fire the dialog's
@@ -80,7 +80,7 @@ export default class extends Controller {
   // data-active, not an `active` class: that's what the is-active variant matches
   markTrigger (trigger) {
     this.trigger = trigger
-    if (trigger) trigger.dataset.active = 'true'
+    trigger.dataset.active = 'true'
   }
 
   lockScroll () {

@@ -23,7 +23,7 @@ RSpec.describe UI::Modal::Component, :js, type: :system do
   it "opens from the trigger with the controller held back, and picks the state up on connect" do
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.route("**/ui/modal_controller*.js", ->(route, _request) {
-        sleep 3
+        sleep 1
         route.continue
       })
     end

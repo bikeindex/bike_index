@@ -73,20 +73,13 @@ module SystemSpecHelpers
     retry_on_detach { find(".hw-combobox__option", text:, match: :first).click }
   end
 
-  # Triggers carry command/commandfor, so the browser opens the dialog on the first click
-  # without waiting for the lazy loaded ui--modal. This covers the fallback path, where the
-  # controller wires the trigger in `connect` and a click landing before it arrives is
-  # swallowed: click again, the way a rider whose click did nothing would, until the dialog
-  # reports itself open. Takes the trigger (a page with two of them opens the same modal
-  # from either), which names the dialog.
-  def open_modal(trigger, attempts: 5)
+  # Takes the trigger (a page with two of them opens the same modal from either), which names
+  # the dialog. The trigger's own command/commandfor is what opens it, so one click is enough
+  # and a page that lost them fails here rather than opening once Stimulus catches up.
+  def open_modal(trigger)
     element = trigger.is_a?(Capybara::Node::Element) ? trigger : find(trigger)
-    modal_id = element["data-open-modal"]
-    attempts.times do
-      retry_on_detach { element.click }
-      return if page.has_css?("##{modal_id}[open]", wait: 1)
-    end
-    raise "##{modal_id} never opened after #{attempts} clicks"
+    retry_on_detach { element.click }
+    expect(page).to have_css("##{element["data-open-modal"]}[open]")
   end
 
   private
