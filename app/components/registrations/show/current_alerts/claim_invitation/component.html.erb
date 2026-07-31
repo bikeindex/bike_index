@@ -1,4 +1,4 @@
-<% body = capture do %>
+<%= render(Registrations::Show::CurrentAlerts::PromptChrome::Component.new(variant: @variant, id: MODAL_ID, title: translation(".claim_your_bike_type", bike_type: @bike.type))) do %>
   <%#
     The avatar sits alongside the opening line only — what follows runs the full width
     rather than staying indented past the image
@@ -31,5 +31,3 @@
     <%= render(UI::ButtonLink::Component.new(href: claim_path, text: claim_button_text, color: :purple)) %>
   </div>
 <% end %>
-
-<%= render(Registrations::Show::CurrentAlerts::PromptChrome::Component.new(variant: @variant, id: MODAL_ID, title: translation(".claim_your_bike_type", bike_type: @bike.type))) { body } %>

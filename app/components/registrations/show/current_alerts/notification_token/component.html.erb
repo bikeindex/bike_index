@@ -1,4 +1,4 @@
-<% body = capture do %>
+<%= render(Registrations::Show::CurrentAlerts::PromptChrome::Component.new(variant: @variant, id: MODAL_ID, title: @matching_notification.subject)) do %>
   <%= render(UI::UserTextBlockDisplay::Component.new(text: @matching_notification.message, max_height_class: "")) %>
 
   <%#
@@ -43,5 +43,3 @@
     <% end %>
   <% end %>
 <% end %>
-
-<%= render(Registrations::Show::CurrentAlerts::PromptChrome::Component.new(variant: @variant, id: MODAL_ID, title: @matching_notification.subject)) { body } %>

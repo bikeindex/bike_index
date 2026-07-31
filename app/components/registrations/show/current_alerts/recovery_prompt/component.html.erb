@@ -1,4 +1,4 @@
-<% body = capture do %>
+<%= render(Registrations::Show::CurrentAlerts::PromptChrome::Component.new(variant: @variant, id: MODAL_ID, title: translation(".mark_your_bike_recovered", bike_type: @bike.type))) do %>
   <p>
     <%= translation(".please_tell_us_how_you_got_your_bike", bike_type: @bike.type) %>
   </p>
@@ -41,5 +41,3 @@
     </div>
   <% end %>
 <% end %>
-
-<%= render(Registrations::Show::CurrentAlerts::PromptChrome::Component.new(variant: @variant, id: MODAL_ID, title: translation(".mark_your_bike_recovered", bike_type: @bike.type))) { body } %>
