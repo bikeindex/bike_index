@@ -8,8 +8,9 @@
     <div class="tw:lg:col-span-2">
       <div
         class="
-          tw:lg:rounded-sm tw:lg:border tw:lg:border-gray-200 tw:lg:bg-white
-          tw:lg:p-4 tw:lg:dark:border-gray-700 tw:lg:dark:bg-gray-800
+          tw:min-[992px]:rounded-t-none tw:lg:rounded-b-sm tw:lg:border
+          tw:lg:border-gray-200 tw:lg:bg-white tw:lg:p-4
+          tw:lg:dark:border-gray-700 tw:lg:dark:bg-gray-800
         "
       >
         <%= render(Registrations::Show::Photos::Component.new(bike: @bike, owner: @owner, title: title, subtitle: render(Registrations::Show::Subtitle::Component.new(bike: @bike)))) %>
