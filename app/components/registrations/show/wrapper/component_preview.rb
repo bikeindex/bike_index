@@ -1,0 +1,151 @@
+# frozen_string_literal: true
+
+module Registrations
+  module Show
+    module Wrapper
+      # The whole registration show page, one scenario per overlay it can raise, plus
+      # the page with none of them. Unlike most previews these render a persisted bike —
+      # the page is far too query-heavy for an in-memory one — so they're gated out of
+      # production, where Lookbook is mounted but the bikes are someone's real ones.
+      class ComponentPreview < ApplicationComponentPreview
+        # @param view select [consumer, org_admin]
+        # @param bike_id text "Bike to render — defaults to one of the org's"
+        def no_overlay(view: "consumer", bike_id: nil)
+          # A claimed registration, or SentToNewOwner raises itself off the bike's state
+          page(view:, bike_id: bike_id.presence || claimed_bike&.id)
+        end
+
+        # @param view select [consumer, org_admin]
+        # @param bike_id text "Bike to render — defaults to one of the org's"
+        def claim_invitation(view: "consumer", bike_id: nil)
+          page(view:, bike_id:) { alerts(claim_message: "new_registration") }
+        end
+
+        # @param view select [consumer, org_admin]
+        # @param bike_id text "Bike to render — defaults to one of the org's"
+        def notification_token(view: "consumer", bike_id: nil)
+          page(view:, bike_id:) do |bike|
+            notification = parking_notification(bike) or next :missing
+            alerts(token: notification.retrieval_link_token, token_type: notification.kind,
+              matching_notification: notification)
+          end
+        end
+
+        # @param view select [consumer, org_admin]
+        # @param bike_id text "Bike to render — defaults to one of the org's"
+        def graduated_notification(view: "consumer", bike_id: nil)
+          page(view:, bike_id:) do |bike|
+            notification = graduated_notification_for(bike) or next :missing
+            alerts(token: notification.marked_remaining_link_token,
+              token_type: "graduated_notification", matching_notification: notification)
+          end
+        end
+
+        # @param view select [consumer, org_admin]
+        # @param bike_id text "Bike to render — defaults to a stolen one"
+        def recovery_prompt(view: "consumer", bike_id: nil)
+          page(view:, bike_id: bike_id.presence || stolen_bike&.id) do |bike|
+            stolen_record = bike.current_stolen_record or next :missing
+            alerts(recovered_stolen_record: stolen_record)
+          end
+        end
+
+        # @param view select [consumer, org_admin]
+        # @param bike_id text "Bike to render — defaults to one with a sticker"
+        def scanned_sticker(view: "consumer", bike_id: nil)
+          sticker = bike_sticker(bike_id)
+          return missing_notice("a bike sticker assigned to a bike") if sticker.blank?
+
+          page(view:, bike_id: bike_id.presence || sticker.bike_id, bike_sticker: sticker)
+        end
+
+        # @param view select [consumer, org_admin]
+        # @param bike_id text "Bike to render — defaults to one awaiting a claim"
+        def sent_to_new_owner(view: "consumer", bike_id: nil)
+          # This one is the registration's own state rather than a token, so it needs an
+          # unclaimed ownership and the owner's view of it
+          page(view:, bike_id: bike_id.presence || unclaimed_bike&.id)
+        end
+
+        private
+
+        # Renders the page for the resolved bike. The block builds the alerts from it, or
+        # returns :missing when the record that scenario needs doesn't exist here
+        def page(view:, bike_id:, bike_sticker: nil)
+          return production_notice if Rails.env.production?
+
+          bike = preview_bike(bike_id)
+          return missing_notice("a bike") if bike.blank?
+
+          current_alerts = block_given? ? yield(bike) : alerts
+          return missing_notice("the record this scenario needs") if current_alerts == :missing
+
+          render(Component.new(bike:, current_user: lookbook_user, view: resolved_view(view),
+            available_views: available_views(view), bike_sticker:, current_alerts:))
+        end
+
+        def alerts(**overrides)
+          BikeServices::ShowCurrentAlerts::Resolved.new(claim_message: nil, token: nil, token_type: nil,
+            matching_notification: nil, recovered_stolen_record: nil).with(**overrides)
+        end
+
+        def resolved_view(view)
+          (view.to_s == "org_admin") ? [:staff, lookbook_organization] : [:owner, nil]
+        end
+
+        def available_views(view)
+          [resolved_view(view), [:public, nil]].uniq
+        end
+
+        def preview_bike(bike_id)
+          ::Bike.unscoped.find_by(id: bike_id) || org_bikes.last
+        end
+
+        def org_bikes
+          lookbook_organization&.bikes || ::Bike.none
+        end
+
+        def parking_notification(bike)
+          sent = ::ParkingNotification.where.not(retrieval_link_token: nil)
+          sent.where(bike_id: bike.id).last || sent.where(organization_id: lookbook_organization&.id).last || sent.last
+        end
+
+        def graduated_notification_for(bike)
+          ::GraduatedNotification.where(bike_id: bike.id).last || ::GraduatedNotification.last
+        end
+
+        def stolen_bike
+          org_bikes.status_stolen.last || ::Bike.unscoped.status_stolen.last
+        end
+
+        def bike_sticker(bike_id)
+          assigned = ::BikeSticker.where.not(bike_id: nil)
+          (bike_id.present? ? assigned.where(bike_id:).last : nil) || assigned.last
+        end
+
+        def unclaimed_bike
+          bike_with_ownership(claimed: false)
+        end
+
+        def claimed_bike
+          bike_with_ownership(claimed: true)
+        end
+
+        def bike_with_ownership(claimed:)
+          owned = ::Ownership.current.where(claimed:).select(:bike_id)
+          org_bikes.where(id: owned).last || ::Bike.unscoped.where(id: owned).last
+        end
+
+        def production_notice
+          render(UI::Alert::Component.new(kind: :error,
+            text: "This preview renders a real registration, so it's disabled in production."))
+        end
+
+        def missing_notice(needed)
+          render(UI::Alert::Component.new(kind: :warning,
+            text: "Nothing to preview — this environment has no #{needed}."))
+        end
+      end
+    end
+  end
+end
