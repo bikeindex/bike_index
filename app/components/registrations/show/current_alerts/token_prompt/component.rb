@@ -15,13 +15,13 @@ module Registrations
           #
           # TokenAlert picks the same way, from the same arguments, so the alert in the
           # page body and the dialog it opens can't disagree about which prompt won.
-          def self.prompt_for(bike:, current_user: nil, current_alerts: nil)
+          def self.prompt_for(bike:, current_user: nil, current_alerts: nil, variant: :modal)
             return if current_alerts.blank?
 
-            [RecoveryPrompt::Component.new(bike:, stolen_record: current_alerts.recovered_stolen_record),
-              NotificationToken::Component.new(bike:, token: current_alerts.token,
+            [RecoveryPrompt::Component.new(bike:, variant:, stolen_record: current_alerts.recovered_stolen_record),
+              NotificationToken::Component.new(bike:, variant:, token: current_alerts.token,
                 token_type: current_alerts.token_type, matching_notification: current_alerts.matching_notification),
-              ClaimInvitation::Component.new(bike:, current_user:,
+              ClaimInvitation::Component.new(bike:, current_user:, variant:,
                 claim_message: current_alerts.claim_message)].find(&:render?)
           end
 

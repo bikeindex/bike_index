@@ -9,26 +9,23 @@ module Registrations
         class Component < ApplicationComponent
           MODAL_ID = "notification-token-modal"
 
-          def initialize(bike:, token: nil, token_type: nil, matching_notification: nil)
+          def initialize(bike:, token: nil, token_type: nil, matching_notification: nil, variant: :modal)
             @bike = bike
             @token = token
             @token_type = token_type
             @matching_notification = matching_notification
+            @variant = variant
           end
 
           def render?
             @token.present? && @matching_notification.present?
           end
 
-          # Shown by TokenAlert, which links to this dialog rather than repeating it.
-          # A resolved notification has no form left to submit, so the button just reads it
-          def alert_text = @matching_notification.subject
-
-          def alert_button_text
-            resolved? ? translation(".view_notification") : resolve_button_text
-          end
-
           private
+
+          # Both variants render at once, so the alert's copy of the form needs its own
+          # field ids rather than a second #token in the document
+          def form_namespace = (@variant == :alert) ? "alert" : nil
 
           def graduated?
             @token_type == "graduated_notification"

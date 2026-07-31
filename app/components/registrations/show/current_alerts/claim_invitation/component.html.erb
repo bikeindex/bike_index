@@ -1,32 +1,32 @@
-<%= render(UI::Modal::Component.new(id: MODAL_ID, title: translation(".your_bike", bike_type: @bike.type), open: true)) do |modal| %>
-  <% modal.with_body do %>
-    <div class="tw:flex tw:items-start tw:gap-3">
-      <% if organization_avatar %>
-        <div class="tw:flex-none"><%= organization_avatar %></div>
+<% body = capture do %>
+  <div class="tw:flex tw:items-start tw:gap-3">
+    <% if organization_avatar %>
+      <div class="tw:flex-none"><%= organization_avatar %></div>
+    <% end %>
+
+    <div class="tw:min-w-0">
+      <% if claimable? %>
+        <p>
+          <%= translation(".were_honored_to_have_your_bike", bike_type: @bike.type) %>
+        </p>
+        <p class="tw:mt-1">
+          <%= translation(".claim_it_so_you_can_update_your_listing") %>
+        </p>
+      <% else %>
+        <p>
+          <strong><%= registered_by %></strong>
+          <%= translation(".registered_your_bike_on_index_html", bike_type: @bike.type, read_more_link: read_more_link) %>
+        </p>
+        <p class="tw:mt-2">
+          <%= translation(".to_see_your_bike_sign_up_html", bike_type: @bike.type, sign_up_link: link_to(translation(".sign_up"), claim_path, class: "twlink")) %>
+        </p>
       <% end %>
 
-      <div class="tw:min-w-0">
-        <% if claimable? %>
-          <p>
-            <%= translation(".were_honored_to_have_your_bike", bike_type: @bike.type) %>
-          </p>
-          <p class="tw:mt-1">
-            <%= translation(".claim_it_so_you_can_update_your_listing") %>
-          </p>
-        <% else %>
-          <p>
-            <strong><%= registered_by %></strong>
-            <%= translation(".registered_your_bike_on_index_html", bike_type: @bike.type, read_more_link: read_more_link) %>
-          </p>
-          <p class="tw:mt-2">
-            <%= translation(".to_see_your_bike_sign_up_html", bike_type: @bike.type, sign_up_link: link_to(translation(".sign_up"), claim_path, class: "twlink")) %>
-          </p>
-        <% end %>
-
-        <div class="tw:mt-4">
-          <%= render(UI::ButtonLink::Component.new(href: claim_path, text: claim_button_text, color: :purple)) %>
-        </div>
+      <div class="tw:mt-4">
+        <%= render(UI::ButtonLink::Component.new(href: claim_path, text: claim_button_text, color: :purple)) %>
       </div>
     </div>
-  <% end %>
+  </div>
 <% end %>
+
+<%= render(Registrations::Show::CurrentAlerts::PromptChrome::Component.new(variant: @variant, id: MODAL_ID, title: translation(".your_bike", bike_type: @bike.type))) { body } %>

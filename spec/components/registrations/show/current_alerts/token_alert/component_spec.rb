@@ -14,13 +14,26 @@ RSpec.describe Registrations::Show::CurrentAlerts::TokenAlert::Component, type: 
   context "a recovery token" do
     let(:current_alerts) { super().with(recovered_stolen_record: bike.current_stolen_record) }
 
-    it "links to the recovery dialog rather than repeating it" do
+    it "renders the whole prompt, without the dialog that took it away" do
       render_inline(component)
+
+      # The dialog's title, and everything its body holds
       expect(page).to have_text("Mark your bike recovered!")
-      # ui--modal opens from any [data-open-modal] in the document, so the dialog itself
-      # stays outside the fragment cache this alert renders inside
-      expect(page).to have_css("button[data-open-modal='recovery-prompt-modal']", text: "Mark recovered")
-      expect(page).to_not have_css("dialog")
+      expect(page).to have_text("Please tell us how you got your bike back")
+      expect(page).to have_css("form[action='/bikes/#{bike.id}/recovery']")
+      expect(page).to have_css("textarea[name='stolen_record[recovered_description]']")
+      expect(page).to have_button("Mark recovered")
+
+      expect(page).to have_no_css("dialog")
+      # Dismissing belongs to the dialog; this is what's left once it's dismissed
+      expect(page).to have_no_button("Nevermind")
+    end
+
+    it "gives its form fields their own ids, so the dialog's copy stays unique" do
+      render_inline(component)
+
+      expect(page).to have_css("#alert_stolen_record_recovered_description")
+      expect(page).to have_no_css("#stolen_record_recovered_description")
     end
   end
 
@@ -38,10 +51,10 @@ RSpec.describe Registrations::Show::CurrentAlerts::TokenAlert::Component, type: 
     end
 
     # TokenPrompt opens only the highest-precedence dialog, so the alert has to agree
-    it "links to the same prompt TokenPrompt would open" do
+    it "renders the same prompt TokenPrompt would open" do
       render_inline(component)
-      expect(page).to have_css("button[data-open-modal='recovery-prompt-modal']")
-      expect(page).to_not have_css("button[data-open-modal='claim-invitation-modal']")
+      expect(page).to have_text("Mark your bike recovered!")
+      expect(page).to have_no_text("registered your bike on Bike Index")
     end
   end
 end

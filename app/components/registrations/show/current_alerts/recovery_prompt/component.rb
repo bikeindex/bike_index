@@ -11,21 +11,23 @@ module Registrations
         class Component < ApplicationComponent
           MODAL_ID = "recovery-prompt-modal"
 
-          def initialize(bike:, stolen_record: nil)
+          def initialize(bike:, stolen_record: nil, variant: :modal)
             @bike = bike
             @stolen_record = stolen_record
+            @variant = variant
           end
 
           def render?
             @stolen_record.present?
           end
 
-          # Shown by TokenAlert, which links to this dialog rather than repeating it
-          def alert_text = translation(".mark_your_bike_recovered", bike_type: @bike.type)
-
-          def alert_button_text = translation(".mark_recovered")
-
           private
+
+          def alert? = @variant == :alert
+
+          # Both variants render at once, so the alert's copy of the form needs its own
+          # field ids rather than a second stolen_record_recovered_at in the document
+          def form_namespace = alert? ? "alert" : nil
 
           def recovered_at
             Binxtils::TimeParser.round(@stolen_record.recovered_at || Time.current)

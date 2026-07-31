@@ -1,0 +1,15 @@
+<% if alert? %>
+  <%= render(UI::Alert::Component.new(kind: :purple, margin_classes: "")) do %>
+    <% if @title.present? %>
+      <p class="tw:font-bold"><%= @title %></p>
+    <% end %>
+
+    <div class="tw:mt-2"><%= content %></div>
+  <% end %>
+<% else %>
+  <%= render(UI::Modal::Component.new(id: @id, title: @title, open: true)) do |modal| %>
+    <% modal.with_body do %>
+      <%= content %>
+    <% end %>
+  <% end %>
+<% end %>

@@ -10,10 +10,11 @@ module Registrations
         class Component < ApplicationComponent
           MODAL_ID = "claim-invitation-modal"
 
-          def initialize(bike:, current_user: nil, claim_message: nil)
+          def initialize(bike:, current_user: nil, claim_message: nil, variant: :modal)
             @bike = bike
             @current_user = current_user
             @claim_message = claim_message
+            @variant = variant
           end
 
           # Parking notification registrations have no owner to invite
@@ -22,11 +23,6 @@ module Registrations
 
             claimable? || @claim_message.present?
           end
-
-          # Shown by TokenAlert, which links to this dialog rather than repeating it
-          def alert_text = translation(".your_bike", bike_type: @bike.type)
-
-          def alert_button_text = claim_button_text
 
           private
 
