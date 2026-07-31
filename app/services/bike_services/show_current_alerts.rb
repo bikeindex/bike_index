@@ -9,7 +9,14 @@ module BikeServices
   module ShowCurrentAlerts
     extend Functionable
 
-    Resolved = Data.define(:claim_message, :token, :token_type, :matching_notification, :recovered_stolen_record)
+    Resolved = Data.define(:claim_message, :token, :token_type, :matching_notification, :recovered_stolen_record) do
+      # What this request's tokens earned, identified rather than typed: two parking
+      # notifications on one bike resolve to the same prompt component, so the component
+      # can't tell one recipient's alert from another's in a fragment key
+      def cache_key
+        [claim_message, token, token_type, matching_notification&.id, recovered_stolen_record&.id].join("/")
+      end
+    end
 
     # recovery_link_token is read from the session by the caller (which deletes it,
     # so the prompt shows once); the token params arrive on the query string and

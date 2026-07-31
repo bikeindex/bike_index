@@ -8,7 +8,7 @@ module Registrations
       class Component < ApplicationComponent
         # Digest of the markup inside the cache block — the cached_markup_digest spec
         # keeps it current, following what this tree renders out into UI:: and elsewhere
-        MARKUP_DIGEST = "b92b49b65d01"
+        MARKUP_DIGEST = "63759b3af823"
 
         def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: nil)
           @bike = bike
@@ -39,14 +39,15 @@ module Registrations
         # The ownership's timestamp is in here because claiming doesn't touch the bike,
         # and both views show claim state.
         #
-        # TokenAlert sits in the cached body, so which prompt a request's tokens earned
-        # is in the key too. That's nil for every request without one, which is nearly
-        # all of them — a token only splits off an entry for the viewer holding it.
+        # TokenAlert sits in the cached body, so the prompt a request's tokens earned is
+        # in the key too — identified, not just typed, or one recipient's alert (and the
+        # token in its form) would be served to the next. Nil for every request without
+        # a prompt, which is nearly all of them.
         def cache_key
           [MARKUP_DIGEST, @current_user&.id,
             @current_user&.registration_show_toggleable?, @current_user&.feature_registration_show_legacy?,
             BikeServices::ShowViews.view_param(@view), @bike_sticker&.id,
-            @bike.current_ownership&.updated_at, token_prompt&.class&.name,
+            @bike.current_ownership&.updated_at, token_prompt && @current_alerts.cache_key,
             @bike.cache_key_with_version, *inner_component.try(:cache_version)]
         end
 
