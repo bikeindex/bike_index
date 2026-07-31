@@ -65,6 +65,15 @@ class RegisterController < ApplicationController
   end
 
   def update
+    if user_name_missing?
+      # Assigned rather than saved, so the re-render keeps what they entered without
+      # marking the registration completed
+      @b_param.clean_params({bike: update_params}.as_json)
+      @b_param.errors.add(:base, translation(:name_required))
+      return render(Register::Step2::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:),
+        status: :unprocessable_entity)
+    end
+
     # Both read straight from params - update_params is stored as json, which an upload can't be
     BikeServices::Register.save_step_2(@b_param, user: current_user,
       image: params.dig(:bike, :image), image_signed_id: params.dig(:bike, :image_signed_id),
@@ -122,6 +131,17 @@ class RegisterController < ApplicationController
     register_path(b_param_token: @b_param.id_token, step:)
   end
 
+  # Step 2's own field, so the submitted value is what counts
+  def user_name_missing?
+    params.dig(:bike, :user_name).blank? && !@b_param.self_made?(current_user)
+  end
+
+  # Everything new seeds a registration from, so arriving on an organization's link
+  # (or a stolen one) without a registration doesn't lose how they got there
+  def start_params
+    params.permit(:organization_id, :status, :email).to_h.compact_blank
+  end
+
   # b_param_token=false abandons the session's registration - the start over link
   def reusable_token
     session[:register_b_param_token] unless params[:b_param_token] == "false"
@@ -143,7 +163,7 @@ class RegisterController < ApplicationController
     @b_param ||= BikeServices::Register.b_param_for(user: current_user) if build
     if @b_param.blank?
       flash[:info] = translation(:registration_not_found) if params[:b_param_token].present?
-      return redirect_to(new_register_path)
+      return redirect_to(new_register_path(start_params))
     end
 
     # The session follows whichever registration the token named, so the next
@@ -175,7 +195,7 @@ class RegisterController < ApplicationController
   def update_params
     params.fetch(:bike, {}).permit(:primary_frame_color_id, :secondary_frame_color_id,
       :tertiary_frame_color_id, :serial_number, :frame_size, :frame_size_number, :frame_size_unit,
-      :bike_sticker, :phone, :status, :frame_model, :year,
+      :bike_sticker, :phone, :status, :frame_model, :year, :user_name,
       :extra_registration_number, :organization_affiliation, :student_id,
       address_record_attributes: AddressRecord.permitted_params)
   end

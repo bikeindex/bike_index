@@ -9,11 +9,11 @@
   <% label_reference = "owner" %>
 
   <%# e.g. NOT checking bike_stickers_user_editable here, since this embed form is for the organization %>
-  <% include_bike_sticker_field = include_field_reg_bike_sticker?(@organization) %>
+  <% include_bike_sticker_field = BikeServices::Displayer.include_reg_field?(:bike_sticker, @organization) %>
   <%= render partial: "/organizations/embed_fields", locals: {f:, include_stolen: false, include_bike_sticker_field:, label_reference:} %>
 
   <%# if the organization doesn't require a phone, show the phone as optional %>
-  <% show_phone_field = !include_field_reg_phone?(@organization) %>
+  <% show_phone_field = !BikeServices::Displayer.include_reg_field?(:phone, @organization) %>
 
   <% if show_phone_field %>
     <div class="input-group border-top">

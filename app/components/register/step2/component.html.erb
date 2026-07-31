@@ -8,6 +8,10 @@
 
   <%= render UI::Header::Component.new(text: translation(".add_your_bikes_details", cycle_type:), subtitle: translation(".more_useful_registration")) %>
 
+  <% if @b_param.errors.any? %>
+    <%= render UI::Alert::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
+  <% end %>
+
   <%= form_with(url: register_path, method: :patch, scope: :bike,
       data: {controller: "autofocus form-persist register--status-fields", form_persist_key_value: "register-details-#{@b_param.id_token}",
         action: "input->form-persist#save hw-combobox:selection->form-persist#save hw-combobox:selection->register--status-fields#update submit->form-persist#clear"}) do |f| %>
@@ -319,6 +323,13 @@
         <%= render UI::Badge::Component.new(text: translation(".from_step_1"), size: :xs) %>
       </p>
     </div>
+
+    <%# Who the registration is for - a signed in registrant's own address arrives with a name %>
+    <% if user_name_required? %>
+      <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :user_name,
+          label_text: translation(".owner_name"), required: true,
+          html_options: {value: bike["user_name"], autocomplete: "name"}) %>
+    <% end %>
 
     <%# The organization's own asks sit under its heading, alongside the contact fields %>
     <% if show_extra_registration_number? %>
