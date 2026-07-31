@@ -46,6 +46,7 @@ class RegisterController < ApplicationController
     @page_title = I18n.t("meta_titles.register_create", cycle_type: @b_param.type)
     @b_param.errors.add(:base, translation(:email_required)) if @b_param.owner_email.blank?
     @b_param.errors.add(:base, translation(:manufacturer_required)) if @b_param.manufacturer_id.blank?
+    @b_param.errors.add(:base, translation(:name_required)) if user_name_missing?
     if @b_param.errors.any?
       render Register::Step1::Component.new(b_param: @b_param, current_user:), status: :unprocessable_entity
     elsif @b_param.save
@@ -74,6 +75,11 @@ class RegisterController < ApplicationController
 
   def step_path(step)
     register_path(b_param_token: @b_param.id_token, step:)
+  end
+
+  def user_name_missing?
+    @b_param.user_name.blank? &&
+      BikeServices::Register.user_name_required?(@b_param, BikeServices::Register.user_emails(current_user))
   end
 
   # b_param_token=false abandons the session's registration - the start over link
@@ -116,7 +122,7 @@ class RegisterController < ApplicationController
   end
 
   def create_params
-    bike_params = params.require(:b_param).permit(:manufacturer_id, :cycle_type, :owner_email)
+    bike_params = params.require(:b_param).permit(:manufacturer_id, :cycle_type, :owner_email, :user_name)
       .to_h.merge(BParam.status_hash_from_params(params))
     {bike: bike_params, propulsion_type_motorized: params[:propulsion_type_motorized]}
   end

@@ -4,6 +4,7 @@ require "rails_helper"
 
 RSpec.describe "Register flow", :js, type: :system do
   let(:owner_email) { "owner@bikeindex.org" }
+  let(:user_name) { "Sally Rider" }
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
   let!(:red) { FactoryBot.create(:color, name: "Red") }
   let!(:blue) { FactoryBot.create(:color, name: "Blue") }
@@ -15,8 +16,18 @@ RSpec.describe "Register flow", :js, type: :system do
     Autocomplete::Loader.load_all(%w[Manufacturer])
   end
 
-  # Through step 1 and onto step 2, the way a rider gets there
-  def start_registration
+  def sign_in(user)
+    visit new_session_path
+    fill_in "Email", with: user.email
+    click_button "Continue"
+    fill_in "Password", with: "testthisthing7$"
+    click_button "Log in"
+    expect(page).to have_current_path("/my_account", wait: 5)
+  end
+
+  # Through step 1 and onto step 2, the way a rider gets there. Signed in as the owner,
+  # the name comes from the account and there's no field asking for it
+  def start_registration(named: true)
     visit "/register/new"
 
     # new creates the registration and lands on its tokenized step 1
@@ -25,6 +36,7 @@ RSpec.describe "Register flow", :js, type: :system do
     type_into("#b_param_manufacturer_id", "Surly")
     click_combobox_option("Surly")
     fill_in "b_param[owner_email]", with: owner_email
+    fill_in "b_param[user_name]", with: user_name if named
     click_button "Next"
 
     expect(page).to have_content("Add your bike")
@@ -39,6 +51,7 @@ RSpec.describe "Register flow", :js, type: :system do
     type_into("#b_param_manufacturer_id", "Surly")
     click_combobox_option("Surly")
     fill_in "b_param[owner_email]", with: owner_email
+    fill_in "b_param[user_name]", with: user_name
     click_button "Next"
 
     expect(page).to have_content("Add your bike")
@@ -49,6 +62,7 @@ RSpec.describe "Register flow", :js, type: :system do
     page.go_back
     expect(page).to have_field("b_param_manufacturer_id", with: "Surly")
     expect(page).to have_field("b_param[owner_email]", with: owner_email)
+    expect(page).to have_field("b_param[user_name]", with: user_name)
 
     # Coming back from step 2 offers starting over - dismissing keeps the registration
     click_button "Start over"
@@ -66,6 +80,7 @@ RSpec.describe "Register flow", :js, type: :system do
     type_into("#b_param_manufacturer_id", "Surly")
     click_combobox_option("Surly")
     fill_in "b_param[owner_email]", with: owner_email
+    fill_in "b_param[user_name]", with: user_name
     click_button "Next"
     expect(page).to have_content("Add your bike")
     details_url = page.current_url
@@ -146,7 +161,7 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_content("Registration saved")
     expect(page).to have_content("verify your email")
     b_param = BParam.last
-    expect(b_param.bike).to include("frame_model" => "Marlin 7", "year" => "2023",
+    expect(b_param.bike).to include("user_name" => user_name, "frame_model" => "Marlin 7", "year" => "2023",
       "primary_frame_color_id" => red.id.to_s, "secondary_frame_color_id" => blue.id.to_s,
       "tertiary_frame_color_id" => green.id.to_s, "frame_size" => "m",
       "serial_number" => "made_without_serial", "phone" => "(555) 000-0000",
@@ -154,6 +169,37 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(BikeServices::Register.send(:details_completed?, b_param)).to be_truthy
     expect(ActiveStorage::Blob.find_signed!(b_param.image_signed_id).filename.to_s)
       .to eq "bike_photo-landscape.jpeg"
+  end
+
+  describe "signed in" do
+    let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
+    let(:friend_email) { "friend@bikeindex.org" }
+
+    before { sign_in(current_user) }
+
+    it "asks for a name once the registration is going to someone other than them" do
+      visit "/register/new"
+
+      # Their own address, which their account is already the name for
+      expect(page).to have_field("b_param[owner_email]", with: owner_email)
+      expect(page).to have_no_field("b_param[user_name]")
+
+      fill_in "b_param[owner_email]", with: friend_email
+      expect(page).to have_field("b_param[user_name]")
+
+      # The address can change right up until it's submitted, and the name goes with it
+      fill_in "b_param[owner_email]", with: owner_email
+      expect(page).to have_no_field("b_param[user_name]")
+
+      fill_in "b_param[owner_email]", with: friend_email
+      fill_in "b_param[user_name]", with: user_name
+      type_into("#b_param_manufacturer_id", "Surly")
+      click_combobox_option("Surly")
+      click_button "Next"
+
+      expect(page).to have_content("Add your bike")
+      expect(BParam.last).to have_attributes(owner_email: friend_email, user_name:)
+    end
   end
 
   # The Disk service answers instantly, so what happens between picking a file and the blob
@@ -230,17 +276,10 @@ RSpec.describe "Register flow", :js, type: :system do
     let(:image_path) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
     let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
 
-    before do
-      visit new_session_path
-      fill_in "Email", with: current_user.email
-      click_button "Continue"
-      fill_in "Password", with: "testthisthing7$"
-      click_button "Log in"
-      expect(page).to have_current_path("/my_account", wait: 5)
-    end
+    before { sign_in(current_user) }
 
     it "PUTs the photo to the bucket and serves it from the storage domain" do
-      start_registration
+      start_registration(named: false)
 
       # The field ships with its name so a JS-less submit posts the bytes; the controller
       # drops it on connect, which is what leaves the signed id as the only thing carrying

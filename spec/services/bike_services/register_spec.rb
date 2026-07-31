@@ -60,6 +60,30 @@ RSpec.describe BikeServices::Register do
     end
   end
 
+  describe "user_name_required?" do
+    let(:user) { FactoryBot.create(:user_confirmed, email: "owner@example.com") }
+
+    def name_required?
+      described_class.user_name_required?(b_param, described_class.user_emails(user))
+    end
+
+    it "asks for a name for every address but the user's own" do
+      expect(described_class.user_name_required?(b_param, described_class.user_emails(nil))).to be_truthy
+      expect(name_required?).to be_falsey
+
+      # An additional address is theirs once it's confirmed, and not before
+      user.additional_emails = "second@example.com"
+      b_param.owner_email = " SECOND@example.com"
+      expect(name_required?).to be_truthy
+      user_email = user.user_emails.find_by(email: "second@example.com")
+      user_email.confirm(user_email.confirmation_token)
+      expect(name_required?).to be_falsey
+
+      b_param.owner_email = "someone@example.com"
+      expect(name_required?).to be_truthy
+    end
+  end
+
   describe "save_step_2" do
     let(:b_param) { BParam.create(origin: "register_flow", params: {bike: bike_params}.as_json) }
     let(:save) do
