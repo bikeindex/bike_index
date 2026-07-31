@@ -82,9 +82,15 @@ module Registrations
           current_alerts = block_given? ? yield(bike) : alerts
           return missing_notice("the record this scenario needs") if current_alerts == :missing
 
-          render(Component.new(bike:, current_user: lookbook_user, view: resolved_view(view),
-            available_views: available_views(view), bike_sticker:, current_alerts:))
+          component = Component.new(bike:, current_user: lookbook_user, view: resolved_view(view),
+            available_views: available_views(view), bike_sticker:, current_alerts:)
+
+          render_with_template(template: "registrations/show/wrapper/preview/scenario",
+            locals: {component:, offset_header: consumer?(view)})
         end
+
+        # Only the consumer page carries the negative top margin
+        def consumer?(view) = view.to_s != "org_admin"
 
         def alerts(**overrides)
           BikeServices::ShowCurrentAlerts::Resolved.new(claim_message: nil, token: nil, token_type: nil,

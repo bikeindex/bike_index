@@ -56,7 +56,7 @@ RSpec.describe "ComponentPreviews", type: :request do
       # Which bike and which perspective aren't reliably greppable out of a whole
       # rendered page, so check the component the preview built
       component = Registrations::Show::Wrapper::ComponentPreview.new
-        .no_overlay(view: "org_admin", bike_id: other.id)[:component]
+        .no_overlay(view: "org_admin", bike_id: other.id).dig(:locals, :component)
 
       expect(component.instance_variable_get(:@bike)).to eq other
       expect(component.instance_variable_get(:@view)).to eq [:staff, organization]
