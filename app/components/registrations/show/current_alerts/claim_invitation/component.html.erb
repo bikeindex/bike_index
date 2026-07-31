@@ -32,4 +32,4 @@
   </div>
 <% end %>
 
-<%= render(Registrations::Show::CurrentAlerts::PromptChrome::Component.new(variant: @variant, id: MODAL_ID, title: translation(".your_bike", bike_type: @bike.type))) { body } %>
+<%= render(Registrations::Show::CurrentAlerts::PromptChrome::Component.new(variant: @variant, id: MODAL_ID, title: translation(".claim_your_bike_type", bike_type: @bike.type))) { body } %>

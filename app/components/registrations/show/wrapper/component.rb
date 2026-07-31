@@ -8,7 +8,7 @@ module Registrations
       class Component < ApplicationComponent
         # Digest of the markup inside the cache block — the cached_markup_digest spec
         # keeps it current, following what this tree renders out into UI:: and elsewhere
-        MARKUP_DIGEST = "9c39b5bb8394"
+        MARKUP_DIGEST = "b0400e36a991"
 
         def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: nil)
           @bike = bike
