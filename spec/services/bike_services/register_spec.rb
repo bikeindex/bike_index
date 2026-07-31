@@ -202,12 +202,12 @@ RSpec.describe BikeServices::Register do
       }.to change(RegistrationSequenceAttestation, :count).by 1
       expect(described_class.attested?(b_param, sequence:)).to be_truthy
 
-      # The agreement is its own record, holding what was agreed to and to which sequence
+      # The agreement is its own record, naming who agreed and to which sequence
       attestation = RegistrationSequenceAttestation.last
       expect(attestation).to have_attributes(registration_sequence_id: sequence.id,
         b_param_id: b_param.id, owner_email: b_param.owner_email, bike_id: nil,
         attestation_text: sequence.attestation)
-      expect(attestation.acknowledged_page_ids).to match_array(pages.map(&:id))
+      expect(attestation.acknowledged_pages.pluck(:id)).to match_array(pages.map(&:id))
       expect(attestation.attested_at).to be_within(5).of(Time.current)
 
       # Without a creator the registration now waits on the confirmation email

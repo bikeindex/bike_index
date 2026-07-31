@@ -113,8 +113,7 @@ module BikeServices
       return false unless Binxtils::InputNormalizer.boolean(attested) && sequence.present?
       return true if attestation(b_param).present?
 
-      RegistrationSequenceAttestation.create_for(b_param, sequence:, user:,
-        page_ids: acknowledged_page_ids(b_param)).persisted?
+      RegistrationSequenceAttestation.create_for(b_param, sequence:, user:).persisted?
     end
 
     # The bike exists, or everything's entered and awaiting the email

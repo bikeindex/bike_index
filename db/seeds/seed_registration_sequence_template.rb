@@ -58,8 +58,13 @@ template.registration_sequence_pages.where("listing_order >= ?", default_pages.c
 # the acknowledgment pages never appear, and the flow can't be seen in development.
 brakebills = Organization.find_by_name("Brakebills")
 if brakebills.present?
-  # Rebuilt rather than left alone, so a re-seed picks up changes to the pages above
-  brakebills.registration_sequences.destroy_all
+  # Rebuilt rather than left alone, so a re-seed picks up changes to the pages above.
+  # really_destroy! (and delete_all, which activation would otherwise refuse) - a soft
+  # delete would pile up rows, and the sequence doesn't take its pages with it
+  brakebills.registration_sequences.with_deleted.each do |sequence|
+    RegistrationSequencePage.where(registration_sequence: sequence).delete_all
+    sequence.really_destroy!
+  end
   sequence = RegistrationSequence.draft_for(brakebills)
   # The school names its own page, the way an organization would in the editor - the
   # template can't, since it's cloned by every organization

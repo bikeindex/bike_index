@@ -19,13 +19,18 @@
 #  index_registration_sequence_pages_on_registration_sequence_id  (registration_sequence_id)
 #
 class RegistrationSequencePage < ApplicationRecord
-  belongs_to :registration_sequence, inverse_of: :registration_sequence_pages
+  # with_deleted: a soft-deleted sequence keeps its pages, so they can still be read
+  # through it - and the guard below needs to see that it was activated
+  belongs_to :registration_sequence, -> { with_deleted }, inverse_of: :registration_sequence_pages
 
   has_one_attached :image
 
   # body is HTML from a Lexxy rich-text editor; sanitize to a safe subset on save
   before_validation :sanitize_body
   before_create :set_listing_order
+  before_create :prevent_activated_change
+  before_update :prevent_activated_change
+  before_destroy :prevent_activated_change
 
   def image_url
     BlobUrl.for(image.blob) if image.attached?
@@ -45,6 +50,19 @@ class RegistrationSequencePage < ApplicationRecord
   end
 
   private
+
+  # An attestation means every page of its sequence, so activation freezes the set as
+  # well as each page - adding one later would rewrite what past registrants agreed to.
+  # The cascade from a destroyed organization still goes through.
+  def prevent_activated_change
+    return unless registration_sequence&.activated?
+    # A sequence saved together with its pages is fine - nothing can have attested to
+    # it yet. What's blocked is changing the pages of one that already existed.
+    return if new_record? && registration_sequence.previously_new_record?
+
+    errors.add(:base, "An activated registration sequence's pages can't be changed")
+    throw :abort
+  end
 
   # Appended to the end; reordering is done by drag-and-drop on the sequence show page
   def set_listing_order

@@ -135,8 +135,9 @@ RSpec.describe "Register flow", :js, type: :system do
 
   context "e-vehicle with an organization's safety rules" do
     let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
-    let!(:sequence) do
-      FactoryBot.create(:registration_sequence_active, organization:,
+    # Built as a draft and activated below, since activation freezes the pages
+    let(:sequence) do
+      FactoryBot.create(:registration_sequence, organization:,
         attestation_text: "agree to comply with all of the rules above.")
     end
     let!(:battery_page) do
@@ -149,6 +150,8 @@ RSpec.describe "Register flow", :js, type: :system do
         title: "Campus rules", body: "<ul><li>Dismount in posted zones</li></ul>",
         organization_specific: true)
     end
+
+    before { sequence.make_active! }
 
     it "gates each page of rules, then the attestation, before completing" do
       visit "/register/new?organization_id=#{organization.slug}"
@@ -200,7 +203,7 @@ RSpec.describe "Register flow", :js, type: :system do
       expect(attestation).to have_attributes(registration_sequence_id: sequence.id,
         b_param_id: BParam.last.id, owner_email:,
         attestation_text: "agree to comply with all of the rules above.")
-      expect(attestation.acknowledged_page_ids).to match_array([battery_page.id, campus_page.id])
+      expect(attestation.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
     end
   end
 end

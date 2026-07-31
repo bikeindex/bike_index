@@ -625,8 +625,9 @@ RSpec.describe RegisterController, type: :request do
 
   describe "acknowledge" do
     let(:organization) { FactoryBot.create(:organization) }
-    let!(:sequence) do
-      FactoryBot.create(:registration_sequence_active, organization:,
+    # Built as a draft and activated below, since activation freezes the pages
+    let(:sequence) do
+      FactoryBot.create(:registration_sequence, organization:,
         faq_url: "https://example.com/faq", attestation_text: "agree to all of it")
     end
     let!(:battery_page) do
@@ -651,6 +652,7 @@ RSpec.describe RegisterController, type: :request do
     let(:step_path) { ->(step) { register_path(b_param_token: b_param.id_token, step:) } }
 
     include_context :request_spec_logged_in_as_user
+    before { sequence.make_active! }
 
     it "walks the safety pages between the details and the bike" do
       # Step 2 hands off to the first safety page rather than creating the bike
@@ -705,7 +707,7 @@ RSpec.describe RegisterController, type: :request do
       expect(attestation).to have_attributes(registration_sequence_id: sequence.id,
         bike_id: Bike.last.id, user_id: current_user.id, owner_email:,
         attestation_text: "agree to all of it")
-      expect(attestation.acknowledged_page_ids).to match_array([battery_page.id, campus_page.id])
+      expect(attestation.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
     end
 
     it "claims a registrant who signed in partway through the safety pages" do

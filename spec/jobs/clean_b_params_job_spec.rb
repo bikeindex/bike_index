@@ -32,7 +32,7 @@ RSpec.describe CleanBParamsJob, type: :job do
       it "sweeps the registration, leaving the attestation record standing" do
         expect { described_class.new.perform }.to change(BParam, :count).by(-2)
         expect(attestation.reload.bike_id).to eq bike.id
-        expect(attestation.attestation_text).to be_present
+        expect(attestation.attestation_text).to be_present # read off the sequence
       end
     end
   end

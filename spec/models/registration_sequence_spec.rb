@@ -87,6 +87,58 @@ RSpec.describe RegistrationSequence, type: :model do
     end
   end
 
+  describe "immutability once activated" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:sequence) { FactoryBot.create(:registration_sequence, :with_pages, organization:) }
+    let(:page) { sequence.registration_sequence_pages.first }
+
+    it "is editable as a draft, frozen once active, and archivable after" do
+      expect(sequence.update(attestation_text: "still a draft")).to be_truthy
+      expect(page.update(title: "still a draft")).to be_truthy
+      expect(sequence.reorder_page!(page, 1)).to_not eq false
+
+      expect(sequence.make_active!).to be_truthy
+
+      # An attestation points at these by id, so they can't move under it
+      expect(sequence.reload.update(attestation_text: "changed")).to be_falsey
+      expect(sequence.errors.full_messages.to_sentence).to match(/can't be edited/)
+      expect(sequence.reload.attestation_text).to eq "still a draft"
+
+      expect(page.reload.update(title: "changed")).to be_falsey
+      expect(page.reload.title).to eq "still a draft"
+      expect(page.destroy).to be_falsey
+      # update_all skips callbacks, so reorder guards itself
+      expect(sequence.reorder_page!(page, 1)).to eq false
+
+      # Adding a page would rewrite what past registrants agreed to
+      expect(RegistrationSequencePage.create(registration_sequence: sequence, title: "Added later"))
+        .to_not be_persisted
+
+      # Archiving is the one change activation still allows
+      expect(sequence.reload.update(end_at: Time.current)).to be_truthy
+      expect(sequence.reload).to be_archived
+    end
+
+    it "allows a sequence created together with its pages - nothing can have attested yet" do
+      born_active = FactoryBot.create(:registration_sequence_active, :with_pages,
+        organization: FactoryBot.create(:organization))
+
+      expect(born_active).to be_active
+      expect(born_active.registration_sequence_pages.count).to eq 2
+    end
+
+    it "is soft-deleted with its organization, keeping its pages readable" do
+      sequence.make_active!
+
+      expect { organization.destroy }.to_not change(RegistrationSequencePage, :count)
+      # Out of the live scope, but still there for the attestations that reference it
+      expect(RegistrationSequence.find_by(id: sequence.id)).to be_nil
+      deleted = RegistrationSequence.with_deleted.find(sequence.id)
+      expect(deleted.deleted_at).to be_present
+      expect(deleted.registration_sequence_pages.count).to eq 2
+    end
+  end
+
   describe "#make_active!" do
     let(:organization) { FactoryBot.create(:organization) }
     let!(:active) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }

@@ -3349,9 +3349,6 @@ CREATE TABLE public.registration_sequence_attestations (
     bike_id bigint,
     user_id bigint,
     owner_email character varying,
-    acknowledged_page_ids bigint[] DEFAULT '{}'::bigint[],
-    attestation_text text,
-    attested_at timestamp(6) without time zone NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -3425,7 +3422,8 @@ CREATE TABLE public.registration_sequences (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     faq_url character varying,
-    attestation_text text
+    attestation_text text,
+    deleted_at timestamp(6) without time zone
 );
 
 
@@ -7324,6 +7322,13 @@ CREATE INDEX index_registration_sequence_pages_on_registration_sequence_id ON pu
 
 
 --
+-- Name: index_registration_sequences_on_deleted_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_registration_sequences_on_deleted_at ON public.registration_sequences USING btree (deleted_at);
+
+
+--
 -- Name: index_registration_sequences_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7334,21 +7339,21 @@ CREATE INDEX index_registration_sequences_on_organization_id ON public.registrat
 -- Name: index_registration_sequences_one_active_per_org; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_registration_sequences_one_active_per_org ON public.registration_sequences USING btree (organization_id) WHERE ((start_at IS NOT NULL) AND (end_at IS NULL));
+CREATE UNIQUE INDEX index_registration_sequences_one_active_per_org ON public.registration_sequences USING btree (organization_id) WHERE ((start_at IS NOT NULL) AND (end_at IS NULL) AND (deleted_at IS NULL));
 
 
 --
 -- Name: index_registration_sequences_one_draft_per_org; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_registration_sequences_one_draft_per_org ON public.registration_sequences USING btree (organization_id) WHERE ((start_at IS NULL) AND (organization_id IS NOT NULL));
+CREATE UNIQUE INDEX index_registration_sequences_one_draft_per_org ON public.registration_sequences USING btree (organization_id) WHERE ((start_at IS NULL) AND (organization_id IS NOT NULL) AND (deleted_at IS NULL));
 
 
 --
 -- Name: index_registration_sequences_single_template; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_registration_sequences_single_template ON public.registration_sequences USING btree (((organization_id IS NULL))) WHERE (organization_id IS NULL);
+CREATE UNIQUE INDEX index_registration_sequences_single_template ON public.registration_sequences USING btree (((organization_id IS NULL))) WHERE ((organization_id IS NULL) AND (deleted_at IS NULL));
 
 
 --
@@ -7704,11 +7709,10 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20260729111713'),
+('20260730145403'),
+('20260730145402'),
 ('20260729085100'),
-('20260729070204'),
 ('20260728220000'),
-('20260728120000'),
 ('20260725192133'),
 ('20260725155657'),
 ('20260725155259'),
