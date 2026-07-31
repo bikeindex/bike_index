@@ -16,6 +16,13 @@ RSpec.describe UI::Modal::Component, :js, type: :system do
     find('button[aria-label="Close"]').click
 
     expect(page).not_to have_css("dialog[open]")
+
+    # Short enough that the body has to scroll rather than grow the dialog
+    resize_window(width: 800, height: 400)
+    click_button "Open Long"
+
+    expect(page).to have_text("Fingerstache koji mumblecore")
+    expect(find('#long-modal button[aria-label="Close"]')).not_to be_obscured
   end
 
   it "opens a server-opened modal on load, without adding the param" do

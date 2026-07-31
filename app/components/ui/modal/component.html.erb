@@ -4,15 +4,20 @@
   data-ui--modal-open-on-connect-value="<%= @open %>"
   data-action="click->ui--modal#backdropClick keydown->ui--modal#handleKeydown"
   class="
-    tw:m-auto tw:w-full tw:max-w-lg tw:bg-transparent tw:p-0
+    tw:m-auto tw:max-h-dvh tw:w-full tw:max-w-lg tw:bg-transparent tw:p-4
     tw:backdrop:bg-black/50 tw:backdrop:backdrop-blur-sm tw:open:flex
-    tw:open:items-center tw:open:justify-center
+    tw:open:flex-col tw:open:items-center tw:open:justify-center
   "
 >
+  <%#
+    overflow-hidden is also what lets this column shrink past its content, so a
+    tall body scrolls instead of pushing the title bar off-screen
+  %>
+
   <div
     class="
-      tw:mx-4 tw:w-full tw:overflow-hidden tw:rounded-xl tw:bg-white
-      tw:shadow-xl tw:dark:bg-gray-800
+      tw:flex tw:w-full tw:flex-col tw:overflow-hidden tw:rounded-xl
+      tw:bg-white tw:shadow-xl tw:dark:bg-gray-800
     "
   >
     <% if @title %>
@@ -52,7 +57,7 @@
       </div>
     <% end %>
 
-    <div class="twtext-color tw:px-5 tw:py-4">
+    <div class="twtext-color tw:overflow-y-auto tw:overscroll-contain tw:px-5 tw:py-4">
       <%= body %>
     </div>
   </div>
