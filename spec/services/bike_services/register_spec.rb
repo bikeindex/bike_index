@@ -197,7 +197,7 @@ RSpec.describe BikeServices::Register do
     it "opens one page at a time, then the review" do
       expect(pages.count).to eq 2
       # The details are in, so the first safety page is where the flow now stands
-      expect(described_class.attested?(b_param, sequence:)).to be_falsey
+      expect(described_class.acknowledged?(b_param, sequence:)).to be_falsey
       expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "3"
       expect(described_class.permitted_step(b_param, "4", sequence:)).to eq "3"
       expect(described_class.page_for_step("3", sequence:)).to eq pages.first
@@ -212,20 +212,20 @@ RSpec.describe BikeServices::Register do
 
       described_class.acknowledge_page(b_param, pages.last, checked: %w[1 1])
       expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "review"
-      expect(described_class.attested?(b_param, sequence:)).to be_falsey
+      expect(described_class.acknowledged?(b_param, sequence:)).to be_falsey
 
       expect {
-        expect(described_class.save_attestation(b_param, sequence, attested: "1")).to be_truthy
-      }.to change(RegistrationSequenceAttestation, :count).by 1
-      expect(described_class.attested?(b_param, sequence:)).to be_truthy
+        expect(described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1")).to be_truthy
+      }.to change(RegistrationSequenceAcknowledgment, :count).by 1
+      expect(described_class.acknowledged?(b_param, sequence:)).to be_truthy
 
       # The agreement is its own record, naming who agreed and to which sequence
-      attestation = RegistrationSequenceAttestation.last
-      expect(attestation).to have_attributes(registration_sequence_id: sequence.id,
+      acknowledgment = RegistrationSequenceAcknowledgment.last
+      expect(acknowledgment).to have_attributes(registration_sequence_id: sequence.id,
         b_param_id: b_param.id, owner_email: b_param.owner_email, bike_id: nil,
-        attestation_text: sequence.attestation)
-      expect(attestation.acknowledged_pages.pluck(:id)).to match_array(pages.map(&:id))
-      expect(attestation.attested_at).to be_within(5).of(Time.current)
+        acknowledgment_text: sequence.acknowledgment)
+      expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array(pages.map(&:id))
+      expect(acknowledgment.acknowledged_at).to be_within(5).of(Time.current)
 
       # Without a creator the registration now waits on the confirmation email
       expect(described_class.finished?(b_param, sequence:)).to be_truthy
@@ -233,11 +233,11 @@ RSpec.describe BikeServices::Register do
 
     it "attests once, even if the review is submitted twice" do
       pages.each { described_class.acknowledge_page(b_param, it, checked: %w[1 1]) }
-      described_class.save_attestation(b_param, sequence, attested: "1")
+      described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1")
 
       expect {
-        expect(described_class.save_attestation(b_param, sequence, attested: "1")).to be_truthy
-      }.to_not change(RegistrationSequenceAttestation, :count)
+        expect(described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1")).to be_truthy
+      }.to_not change(RegistrationSequenceAcknowledgment, :count)
     end
 
     it "refuses a page with any rule unchecked" do
@@ -248,17 +248,17 @@ RSpec.describe BikeServices::Register do
       expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "3"
     end
 
-    it "refuses an unchecked attestation" do
+    it "refuses an unchecked acknowledgment" do
       pages.each { described_class.acknowledge_page(b_param, it, checked: %w[1 1]) }
       expect {
-        expect(described_class.save_attestation(b_param, sequence, attested: "0")).to be_falsey
-      }.to_not change(RegistrationSequenceAttestation, :count)
-      expect(described_class.attested?(b_param, sequence:)).to be_falsey
+        expect(described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "0")).to be_falsey
+      }.to_not change(RegistrationSequenceAcknowledgment, :count)
+      expect(described_class.acknowledged?(b_param, sequence:)).to be_falsey
     end
 
     context "without a sequence" do
       it "has nothing to acknowledge" do
-        expect(described_class.attested?(b_param, sequence: nil)).to be_truthy
+        expect(described_class.acknowledged?(b_param, sequence: nil)).to be_truthy
         expect(described_class.permitted_step(b_param, nil, sequence: nil)).to eq "finished"
       end
     end

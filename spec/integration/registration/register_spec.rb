@@ -275,7 +275,7 @@ RSpec.describe "Register flow", :js, type: :system do
     # Built as a draft and activated below, since activation freezes the pages
     let(:sequence) do
       FactoryBot.create(:registration_sequence, organization:,
-        attestation_text: "agree to comply with all of the rules above.")
+        acknowledgment_text: "agree to comply with all of the rules above.")
     end
     let!(:battery_page) do
       FactoryBot.create(:registration_sequence_page, registration_sequence: sequence, listing_order: 0,
@@ -290,7 +290,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
     before { sequence.make_active! }
 
-    it "gates each page of rules, then the attestation, before completing" do
+    it "gates each page of rules, then the acknowledgment, before completing" do
       visit "/register/new?organization_id=#{organization.slug}"
 
       type_into("#b_param_manufacturer_id", "Surly")
@@ -341,11 +341,11 @@ RSpec.describe "Register flow", :js, type: :system do
       click_button "Complete Bike Registration"
 
       expect(page).to have_content("Registration saved")
-      attestation = RegistrationSequenceAttestation.last
-      expect(attestation).to have_attributes(registration_sequence_id: sequence.id,
+      acknowledgment = RegistrationSequenceAcknowledgment.last
+      expect(acknowledgment).to have_attributes(registration_sequence_id: sequence.id,
         b_param_id: BParam.last.id, owner_email:,
-        attestation_text: "agree to comply with all of the rules above.")
-      expect(attestation.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
+        acknowledgment_text: "agree to comply with all of the rules above.")
+      expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
     end
   end
 end

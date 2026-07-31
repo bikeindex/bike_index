@@ -655,7 +655,7 @@ RSpec.describe RegisterController, type: :request do
     # Built as a draft and activated below, since activation freezes the pages
     let(:sequence) do
       FactoryBot.create(:registration_sequence, organization:,
-        faq_url: "https://example.com/faq", attestation_text: "agree to all of it")
+        faq_url: "https://example.com/faq", acknowledgment_text: "agree to all of it")
     end
     let!(:battery_page) do
       FactoryBot.create(:registration_sequence_page, registration_sequence: sequence, listing_order: 0,
@@ -721,24 +721,24 @@ RSpec.describe RegisterController, type: :request do
       expect(response.body).to include "You&#39;re almost done"
       expect(response.body).to include "agree to all of it"
       # The review is the last acknowledgment step, not a completed one - the
-      # attestation below it is still unsigned
+      # acknowledgment below it is still unsigned
       expect(response.body).to include "E-Vehicle Acknowledgment · Step 3 of 3"
       expect(response.body).to_not include "Safety check complete"
       expect(response.body).to include current_user.name
 
-      # The attestation is what creates the bike
+      # The acknowledgment is what creates the bike
       expect {
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", attested: "1"}
-      }.to change(Bike, :count).by(1).and change(RegistrationSequenceAttestation, :count).by(1)
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
+      }.to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment, :count).by(1)
       expect(response).to redirect_to step_path.call("finished")
       expect(b_param.reload.created_bike_id).to eq Bike.last.id
 
       # The record hangs off the bike, so it survives the b_param being swept
-      attestation = RegistrationSequenceAttestation.last
-      expect(attestation).to have_attributes(registration_sequence_id: sequence.id,
+      acknowledgment = RegistrationSequenceAcknowledgment.last
+      expect(acknowledgment).to have_attributes(registration_sequence_id: sequence.id,
         bike_id: Bike.last.id, user_id: current_user.id, owner_email:,
-        attestation_text: "agree to all of it")
-      expect(attestation.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
+        acknowledgment_text: "agree to all of it")
+      expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
     end
 
     it "claims a registrant who signed in partway through the safety pages" do
@@ -751,7 +751,7 @@ RSpec.describe RegisterController, type: :request do
                                                   acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
       end
       expect {
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", attested: "1"}
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
       }.to change(Bike, :count).by 1
       expect(Bike.last.creator_id).to eq current_user.id
     end
@@ -780,10 +780,10 @@ RSpec.describe RegisterController, type: :request do
       expect(BikeServices::Register.acknowledged_page_ids(b_param.reload)).to eq([])
     end
 
-    it "refuses an attestation that skipped the pages" do
+    it "refuses an acknowledgment that skipped the pages" do
       patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
       expect {
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", attested: "1"}
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
       }.to_not change(Bike, :count)
       # The review isn't reachable yet, so this lands back on the first page
       expect(response).to redirect_to step_path.call("3")
@@ -830,7 +830,7 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to redirect_to step_path.call("review")
 
       expect {
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", attested: "1"}
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
       }.to_not change(Bike, :count)
       expect(response).to redirect_to step_path.call("finished")
       follow_redirect!

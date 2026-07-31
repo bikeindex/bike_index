@@ -51,12 +51,12 @@ class RegistrationSequencePage < ApplicationRecord
 
   private
 
-  # An attestation means every page of its sequence, so activation freezes the set as
+  # An acknowledgment means every page of its sequence, so activation freezes the set as
   # well as each page - adding one later would rewrite what past registrants agreed to.
   # The cascade from a destroyed organization still goes through.
   def prevent_activated_change
     return unless registration_sequence&.activated?
-    # A sequence saved together with its pages is fine - nothing can have attested to
+    # A sequence saved together with its pages is fine - nothing can have acknowledged
     # it yet. What's blocked is changing the pages of one that already existed.
     return if new_record? && registration_sequence.previously_new_record?
 

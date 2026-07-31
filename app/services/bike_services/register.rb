@@ -87,13 +87,13 @@ module BikeServices
     # What the acknowledgment eyebrow counts: the rule pages, plus the review they end at
     def acknowledgment_step_count(sequence) = sequence_pages(sequence).count + 1
 
-    # Nothing to agree to without a sequence, otherwise the attestation record
-    def attested?(b_param, sequence:)
-      sequence_pages(sequence).none? || attestation(b_param).present?
+    # Nothing to agree to without a sequence, otherwise the acknowledgment record
+    def acknowledged?(b_param, sequence:)
+      sequence_pages(sequence).none? || acknowledgment(b_param).present?
     end
 
-    def attestation(b_param)
-      RegistrationSequenceAttestation.find_by(b_param_id: b_param.id)
+    def acknowledgment(b_param)
+      RegistrationSequenceAcknowledgment.find_by(b_param_id: b_param.id)
     end
 
     # Which pages have been acknowledged so far. In-flight progress, so it lives on
@@ -118,18 +118,18 @@ module BikeServices
 
     # The moment the pages become an agreement - promoted off the b_param onto a
     # record of its own, which outlives the registration
-    def save_attestation(b_param, sequence, attested:, user: nil)
-      return false unless Binxtils::InputNormalizer.boolean(attested) && sequence.present?
-      return true if attestation(b_param).present?
+    def save_acknowledgment(b_param, sequence, acknowledged_all:, user: nil)
+      return false unless Binxtils::InputNormalizer.boolean(acknowledged_all) && sequence.present?
+      return true if acknowledgment(b_param).present?
 
-      RegistrationSequenceAttestation.create_for(b_param, sequence:, user:).persisted?
+      RegistrationSequenceAcknowledgment.create_for(b_param, sequence:, user:).persisted?
     end
 
     # The bike exists, or everything's entered and awaiting the email
     def finished?(b_param, sequence:)
       return true if b_param.with_bike?
 
-      details_completed?(b_param) && attested?(b_param, sequence:) && !creator_available?(b_param)
+      details_completed?(b_param) && acknowledged?(b_param, sequence:) && !creator_available?(b_param)
     end
 
     # Whether a bike can be created now - Ownership requires a creator, so
@@ -160,8 +160,8 @@ module BikeServices
     def create_bike(b_param, ip_address:)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
       bike = BikeServices::Creator.new(ip_address:).create_bike(b_param)
-      # The bike is what the attestation hangs off once the b_param is swept
-      attestation(b_param)&.update(bike_id: bike.id, user_id: b_param.creator_id) if bike.id.present?
+      # The bike is what the acknowledgment hangs off once the b_param is swept
+      acknowledgment(b_param)&.update(bike_id: bike.id, user_id: b_param.creator_id) if bike.id.present?
       bike
     end
 

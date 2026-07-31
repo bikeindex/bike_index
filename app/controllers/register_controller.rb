@@ -70,12 +70,12 @@ class RegisterController < ApplicationController
       image: params.dig(:bike, :image), image_signed_id: params.dig(:bike, :image_signed_id),
       bike_params: update_params)
     # An e-vehicle's safety pages come between the details and the bike
-    return redirect_to_current_step unless BikeServices::Register.attested?(@b_param, sequence: @registration_sequence)
+    return redirect_to_current_step unless BikeServices::Register.acknowledged?(@b_param, sequence: @registration_sequence)
 
     complete_registration
   end
 
-  # Each acknowledgment page posts here, and the review's final attestation
+  # Each acknowledgment page posts here, and the review's final acknowledgment
   def acknowledge
     step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence)
     unless save_acknowledgment(step)
@@ -93,8 +93,8 @@ class RegisterController < ApplicationController
 
   def save_acknowledgment(step)
     if step == "review"
-      return BikeServices::Register.save_attestation(@b_param, @registration_sequence,
-        attested: params[:attested], user: current_user)
+      return BikeServices::Register.save_acknowledgment(@b_param, @registration_sequence,
+        acknowledged_all: params[:acknowledged_all], user: current_user)
     end
 
     BikeServices::Register.acknowledge_page(@b_param,

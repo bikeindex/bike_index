@@ -12,7 +12,7 @@ module Organized
       @registration_sequence = find_draft
     end
 
-    # The settings shared by every page: the FAQ link and the final attestation
+    # The settings shared by every page: the FAQ link and the final acknowledgment
     def update
       @registration_sequence = find_draft
       if @registration_sequence.update(permitted_params)
@@ -37,7 +37,7 @@ module Organized
     end
 
     def permitted_params
-      params.require(:registration_sequence).permit(:faq_url, :attestation_text)
+      params.require(:registration_sequence).permit(:faq_url, :acknowledgment_text)
     end
 
     # Superusers can view regardless; org admins/members need the feature flag

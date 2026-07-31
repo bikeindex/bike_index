@@ -3339,10 +3339,10 @@ ALTER SEQUENCE public.recovery_displays_id_seq OWNED BY public.recovery_displays
 
 
 --
--- Name: registration_sequence_attestations; Type: TABLE; Schema: public; Owner: -
+-- Name: registration_sequence_acknowledgments; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.registration_sequence_attestations (
+CREATE TABLE public.registration_sequence_acknowledgments (
     id bigint NOT NULL,
     registration_sequence_id bigint,
     b_param_id bigint,
@@ -3355,10 +3355,10 @@ CREATE TABLE public.registration_sequence_attestations (
 
 
 --
--- Name: registration_sequence_attestations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: registration_sequence_acknowledgments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.registration_sequence_attestations_id_seq
+CREATE SEQUENCE public.registration_sequence_acknowledgments_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3367,10 +3367,10 @@ CREATE SEQUENCE public.registration_sequence_attestations_id_seq
 
 
 --
--- Name: registration_sequence_attestations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: registration_sequence_acknowledgments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.registration_sequence_attestations_id_seq OWNED BY public.registration_sequence_attestations.id;
+ALTER SEQUENCE public.registration_sequence_acknowledgments_id_seq OWNED BY public.registration_sequence_acknowledgments.id;
 
 
 --
@@ -3422,7 +3422,7 @@ CREATE TABLE public.registration_sequences (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     faq_url character varying,
-    attestation_text text,
+    acknowledgment_text text,
     deleted_at timestamp(6) without time zone
 );
 
@@ -5055,10 +5055,10 @@ ALTER TABLE ONLY public.recovery_displays ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
--- Name: registration_sequence_attestations id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: registration_sequence_acknowledgments id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.registration_sequence_attestations ALTER COLUMN id SET DEFAULT nextval('public.registration_sequence_attestations_id_seq'::regclass);
+ALTER TABLE ONLY public.registration_sequence_acknowledgments ALTER COLUMN id SET DEFAULT nextval('public.registration_sequence_acknowledgments_id_seq'::regclass);
 
 
 --
@@ -5916,11 +5916,11 @@ ALTER TABLE ONLY public.recovery_displays
 
 
 --
--- Name: registration_sequence_attestations registration_sequence_attestations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: registration_sequence_acknowledgments registration_sequence_acknowledgments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.registration_sequence_attestations
-    ADD CONSTRAINT registration_sequence_attestations_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.registration_sequence_acknowledgments
+    ADD CONSTRAINT registration_sequence_acknowledgments_pkey PRIMARY KEY (id);
 
 
 --
@@ -6132,10 +6132,10 @@ ALTER TABLE ONLY public.wheel_sizes
 
 
 --
--- Name: idx_on_registration_sequence_id_fa88640992; Type: INDEX; Schema: public; Owner: -
+-- Name: idx_on_registration_sequence_id_78f7372741; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX idx_on_registration_sequence_id_fa88640992 ON public.registration_sequence_attestations USING btree (registration_sequence_id);
+CREATE INDEX idx_on_registration_sequence_id_78f7372741 ON public.registration_sequence_acknowledgments USING btree (registration_sequence_id);
 
 
 --
@@ -7294,31 +7294,31 @@ CREATE INDEX index_recovery_displays_on_stolen_record_id ON public.recovery_disp
 
 
 --
--- Name: index_registration_sequence_attestations_on_b_param_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_registration_sequence_acknowledgments_on_b_param_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_registration_sequence_attestations_on_b_param_id ON public.registration_sequence_attestations USING btree (b_param_id);
-
-
---
--- Name: index_registration_sequence_attestations_on_bike_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_registration_sequence_attestations_on_bike_id ON public.registration_sequence_attestations USING btree (bike_id);
+CREATE INDEX index_registration_sequence_acknowledgments_on_b_param_id ON public.registration_sequence_acknowledgments USING btree (b_param_id);
 
 
 --
--- Name: index_registration_sequence_attestations_on_user_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_registration_sequence_acknowledgments_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_registration_sequence_attestations_on_user_id ON public.registration_sequence_attestations USING btree (user_id);
+CREATE INDEX index_registration_sequence_acknowledgments_on_bike_id ON public.registration_sequence_acknowledgments USING btree (bike_id);
 
 
 --
--- Name: index_registration_sequence_attestations_one_per_b_param; Type: INDEX; Schema: public; Owner: -
+-- Name: index_registration_sequence_acknowledgments_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_registration_sequence_attestations_one_per_b_param ON public.registration_sequence_attestations USING btree (b_param_id) WHERE (b_param_id IS NOT NULL);
+CREATE INDEX index_registration_sequence_acknowledgments_on_user_id ON public.registration_sequence_acknowledgments USING btree (user_id);
+
+
+--
+-- Name: index_registration_sequence_acknowledgments_one_per_b_param; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_registration_sequence_acknowledgments_one_per_b_param ON public.registration_sequence_acknowledgments USING btree (b_param_id) WHERE (b_param_id IS NOT NULL);
 
 
 --
@@ -7716,8 +7716,8 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20260730145403'),
-('20260730145402'),
+('20260731100009'),
+('20260731100008'),
 ('20260729180400'),
 ('20260729085100'),
 ('20260728220000'),

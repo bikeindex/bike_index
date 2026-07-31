@@ -40,7 +40,7 @@ default_pages = [
 ]
 
 template = RegistrationSequence.template
-template.update!(attestation_text: RegistrationSequence::DEFAULT_ATTESTATION_TEXT) if template.attestation_text.blank?
+template.update!(acknowledgment_text: RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT) if template.acknowledgment_text.blank?
 # The ⓘ on every acknowledgment page. An organization can point this at its own policy
 # page; the Bike Index FAQ is the default an org's draft is cloned with
 template.update!(faq_url: "/info/#{Blog.e_vehicle_acknowledgment_faq}") if template.faq_url.blank?

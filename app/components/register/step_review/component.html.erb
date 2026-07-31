@@ -1,7 +1,7 @@
 <%= render Register::Page::Component.new do %>
   <%= render Register::Progress::Component.new(step: total_steps, total: total_steps) %>
 
-  <%# The last acknowledgment step, not a finished one - the attestation is still unsigned %>
+  <%# The last acknowledgment step, not a finished one - the acknowledgment is still unsigned %>
   <%= render Register::AcknowledgmentProgress::Component.new(number: acknowledgment_step_count,
       total: acknowledgment_step_count) %>
 
@@ -48,13 +48,13 @@
         tw:font-normal
       "
     >
-      <%= check_box_tag :attested, "1", false,
+      <%= check_box_tag :acknowledged_all, "1", false,
           class: "tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:cursor-pointer",
           data: {"register--acknowledgment-target": "checkbox", action: "change->register--acknowledgment#update"} %>
 
       <span>
         <%= translation(".i_name_html", name: content_tag(:strong, registrant_name)) %>
-        <%= @sequence.attestation %>
+        <%= @sequence.acknowledgment %>
       </span>
     </label>
 

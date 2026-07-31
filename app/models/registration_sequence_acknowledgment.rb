@@ -3,7 +3,7 @@
 # What was agreed to is read off the sequence, which activation froze.
 # == Schema Information
 #
-# Table name: registration_sequence_attestations
+# Table name: registration_sequence_acknowledgments
 # Database name: primary
 #
 #  id                       :bigint           not null, primary key
@@ -17,13 +17,13 @@
 #
 # Indexes
 #
-#  idx_on_registration_sequence_id_fa88640992                (registration_sequence_id)
-#  index_registration_sequence_attestations_on_b_param_id    (b_param_id)
-#  index_registration_sequence_attestations_on_bike_id       (bike_id)
-#  index_registration_sequence_attestations_on_user_id       (user_id)
-#  index_registration_sequence_attestations_one_per_b_param  (b_param_id) UNIQUE WHERE (b_param_id IS NOT NULL)
+#  idx_on_registration_sequence_id_78f7372741                   (registration_sequence_id)
+#  index_registration_sequence_acknowledgments_on_b_param_id    (b_param_id)
+#  index_registration_sequence_acknowledgments_on_bike_id       (bike_id)
+#  index_registration_sequence_acknowledgments_on_user_id       (user_id)
+#  index_registration_sequence_acknowledgments_one_per_b_param  (b_param_id) UNIQUE WHERE (b_param_id IS NOT NULL)
 #
-class RegistrationSequenceAttestation < ApplicationRecord
+class RegistrationSequenceAcknowledgment < ApplicationRecord
   # with_deleted: the sequence is soft-deleted with its organization, and this record
   # reads what was agreed to straight off it
   belongs_to :registration_sequence, -> { with_deleted }
@@ -43,7 +43,7 @@ class RegistrationSequenceAttestation < ApplicationRecord
     end
   end
 
-  def attested_at = created_at
+  def acknowledged_at = created_at
 
   # The review is only reachable with every page acknowledged, so the whole (frozen)
   # sequence is what was agreed to
@@ -51,7 +51,7 @@ class RegistrationSequenceAttestation < ApplicationRecord
     registration_sequence&.registration_sequence_pages
   end
 
-  def attestation_text
-    registration_sequence&.attestation
+  def acknowledgment_text
+    registration_sequence&.acknowledgment
   end
 end

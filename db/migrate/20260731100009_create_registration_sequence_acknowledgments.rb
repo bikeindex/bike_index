@@ -1,6 +1,6 @@
-class CreateRegistrationSequenceAttestations < ActiveRecord::Migration[8.1]
+class CreateRegistrationSequenceAcknowledgments < ActiveRecord::Migration[8.1]
   def change
-    create_table :registration_sequence_attestations do |t|
+    create_table :registration_sequence_acknowledgments do |t|
       # What was agreed to is read off the sequence, which activation freezes, and which
       # is soft-deleted rather than destroyed
       t.references :registration_sequence, index: true
@@ -13,9 +13,9 @@ class CreateRegistrationSequenceAttestations < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    # A registration attests once
-    add_index :registration_sequence_attestations, :b_param_id, unique: true,
+    # A registration acknowledges once
+    add_index :registration_sequence_acknowledgments, :b_param_id, unique: true,
       where: "b_param_id IS NOT NULL",
-      name: "index_registration_sequence_attestations_one_per_b_param"
+      name: "index_registration_sequence_acknowledgments_one_per_b_param"
   end
 end

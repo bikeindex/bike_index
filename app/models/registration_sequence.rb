@@ -3,15 +3,15 @@
 # Table name: registration_sequences
 # Database name: primary
 #
-#  id               :bigint           not null, primary key
-#  attestation_text :text
-#  deleted_at       :datetime
-#  end_at           :datetime
-#  faq_url          :string
-#  start_at         :datetime
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
-#  organization_id  :bigint
+#  id                  :bigint           not null, primary key
+#  acknowledgment_text :text
+#  deleted_at          :datetime
+#  end_at              :datetime
+#  faq_url             :string
+#  start_at            :datetime
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  organization_id     :bigint
 #
 # Indexes
 #
@@ -27,9 +27,9 @@ class RegistrationSequence < ApplicationRecord
   STATUS_SCOPES = {"draft" => :draft, "active" => :active, "archived" => :archived, "template" => :templates}.freeze
   STATUSES = STATUS_SCOPES.keys.freeze
   COPIED_PAGE_ATTRS = %w[title heading subtitle body listing_order organization_specific].freeze
-  # Follows "I, <registrant's name>," on the flow's final attestation. Seeded onto the
+  # Follows "I, <registrant's name>," on the flow's final acknowledgment. Seeded onto the
   # template, so an organization edits its own copy
-  DEFAULT_ATTESTATION_TEXT = "have read, understood, and agree to comply with all of the " \
+  DEFAULT_ACKNOWLEDGMENT_TEXT = "have read, understood, and agree to comply with all of the " \
     "e-vehicle safety rules above as a condition of registering my vehicle. I understand that " \
     "failure to comply may result in revocation of my registration and/or disciplinary action."
 
@@ -38,8 +38,8 @@ class RegistrationSequence < ApplicationRecord
   # with_attached_image: every reader of the pages renders or copies their images
   has_many :registration_sequence_pages, -> { order(:listing_order).with_attached_image },
     inverse_of: :registration_sequence
-  # an attestation is a record of what someone agreed to, don't remove the record
-  has_many :registration_sequence_attestations
+  # an acknowledgment is a record of what someone agreed to, don't remove the record
+  has_many :registration_sequence_acknowledgments
 
   before_update :prevent_activated_change
 
@@ -77,7 +77,7 @@ class RegistrationSequence < ApplicationRecord
     def build_draft_for(organization)
       transaction do
         source = template
-        draft = create!(organization:, faq_url: source.faq_url, attestation_text: source.attestation_text)
+        draft = create!(organization:, faq_url: source.faq_url, acknowledgment_text: source.acknowledgment_text)
         source.registration_sequence_pages.each do |template_page|
           page = draft.registration_sequence_pages.create!(template_page.slice(*COPIED_PAGE_ATTRS))
           copy_image(template_page.image, page.image) if template_page.image.attached?
@@ -94,7 +94,7 @@ class RegistrationSequence < ApplicationRecord
     end
   end
 
-  def attestation = attestation_text.presence || DEFAULT_ATTESTATION_TEXT
+  def acknowledgment = acknowledgment_text.presence || DEFAULT_ACKNOWLEDGMENT_TEXT
 
   def template? = organization_id.blank?
 
@@ -112,7 +112,7 @@ class RegistrationSequence < ApplicationRecord
     "draft"
   end
 
-  # Activation freezes the sequence and its pages. Attestations reference them by id, so
+  # Activation freezes the sequence and its pages. Acknowledgments reference them by id, so
   # what a registrant agreed to has to keep saying the same thing - a change belongs in a
   # new draft, which activating supersedes this with.
   def activated? = start_at.present?

@@ -68,10 +68,10 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
 
       it "saves the settings shared by every page" do
         patch "#{base_url}/#{draft.id}", params: {registration_sequence: {faq_url: "https://example.com/faq",
-                                                                          attestation_text: "agree to all of it"}}
+                                                                          acknowledgment_text: "agree to all of it"}}
         expect(response).to redirect_to(edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: draft.id))
         expect(draft.reload).to have_attributes(faq_url: "https://example.com/faq",
-          attestation: "agree to all of it")
+          acknowledgment: "agree to all of it")
       end
 
       it "404s for another organization's draft" do

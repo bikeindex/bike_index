@@ -1,9 +1,9 @@
-class AddAttestationToRegistrationSequences < ActiveRecord::Migration[8.1]
+class AddAcknowledgmentToRegistrationSequences < ActiveRecord::Migration[8.1]
   def change
-    # faq_url and attestation_text are the settings shared by every page of a sequence
+    # faq_url and acknowledgment_text are the settings shared by every page of a sequence
     add_column :registration_sequences, :faq_url, :string
-    add_column :registration_sequences, :attestation_text, :text
-    # Soft delete, so an attestation can still read the rules it was given - destroying
+    add_column :registration_sequences, :acknowledgment_text, :text
+    # Soft delete, so an acknowledgment can still read the rules it was given - destroying
     # an organization cascades here, and the record has to outlive that
     add_column :registration_sequences, :deleted_at, :datetime
     add_index :registration_sequences, :deleted_at

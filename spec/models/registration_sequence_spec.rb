@@ -27,9 +27,9 @@ RSpec.describe RegistrationSequence, type: :model do
   describe ".draft_for" do
     let(:organization) { FactoryBot.create(:organization) }
 
-    it "builds a draft cloning the template pages and its attestation settings" do
+    it "builds a draft cloning the template pages and its acknowledgment settings" do
       template = RegistrationSequence.template
-      template.update!(faq_url: "https://example.com/faq", attestation_text: "agree to everything")
+      template.update!(faq_url: "https://example.com/faq", acknowledgment_text: "agree to everything")
       template.registration_sequence_pages.create!(title: "Battery", subtitle: "Charge safely",
         heading: "Looks like you have an e-vehicle!", body: "<p>Hello</p>", listing_order: 0,
         organization_specific: true)
@@ -38,16 +38,16 @@ RSpec.describe RegistrationSequence, type: :model do
 
       expect(draft).to be_draft
       expect(draft).to have_attributes(organization:, faq_url: "https://example.com/faq",
-        attestation: "agree to everything")
+        acknowledgment: "agree to everything")
       page = draft.registration_sequence_pages.first
       expect(page).to have_attributes(title: "Battery", subtitle: "Charge safely",
         heading: "Looks like you have an e-vehicle!", body: "<p>Hello</p>",
         organization_specific: true)
     end
 
-    it "falls back to the default attestation when the template has none" do
-      expect(RegistrationSequence.draft_for(organization).attestation)
-        .to eq RegistrationSequence::DEFAULT_ATTESTATION_TEXT
+    it "falls back to the default acknowledgment when the template has none" do
+      expect(RegistrationSequence.draft_for(organization).acknowledgment)
+        .to eq RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT
     end
 
     it "duplicates template page images into independent blobs" do
@@ -93,16 +93,16 @@ RSpec.describe RegistrationSequence, type: :model do
     let(:page) { sequence.registration_sequence_pages.first }
 
     it "is editable as a draft, frozen once active, and archivable after" do
-      expect(sequence.update(attestation_text: "still a draft")).to be_truthy
+      expect(sequence.update(acknowledgment_text: "still a draft")).to be_truthy
       expect(page.update(title: "still a draft")).to be_truthy
       expect(sequence.reorder_page!(page, 1)).to_not eq false
 
       expect(sequence.make_active!).to be_truthy
 
-      # An attestation points at these by id, so they can't move under it
-      expect(sequence.reload.update(attestation_text: "changed")).to be_falsey
+      # An acknowledgment points at these by id, so they can't move under it
+      expect(sequence.reload.update(acknowledgment_text: "changed")).to be_falsey
       expect(sequence.errors.full_messages.to_sentence).to match(/can't be edited/)
-      expect(sequence.reload.attestation_text).to eq "still a draft"
+      expect(sequence.reload.acknowledgment_text).to eq "still a draft"
 
       expect(page.reload.update(title: "changed")).to be_falsey
       expect(page.reload.title).to eq "still a draft"
@@ -119,7 +119,7 @@ RSpec.describe RegistrationSequence, type: :model do
       expect(sequence.reload).to be_archived
     end
 
-    it "allows a sequence created together with its pages - nothing can have attested yet" do
+    it "allows a sequence created together with its pages - nothing can have acknowledged it yet" do
       born_active = FactoryBot.create(:registration_sequence_active, :with_pages,
         organization: FactoryBot.create(:organization))
 
@@ -131,7 +131,7 @@ RSpec.describe RegistrationSequence, type: :model do
       sequence.make_active!
 
       expect { organization.destroy }.to_not change(RegistrationSequencePage, :count)
-      # Out of the live scope, but still there for the attestations that reference it
+      # Out of the live scope, but still there for the acknowledgments that reference it
       expect(RegistrationSequence.find_by(id: sequence.id)).to be_nil
       deleted = RegistrationSequence.with_deleted.find(sequence.id)
       expect(deleted.deleted_at).to be_present
