@@ -29,7 +29,7 @@ bin/kamal_review accessory reboot db --app 0
 
 ## Sandbox (persistent `main` deploy)
 
-Alongside the per-PR apps, `main` is continuously deployed to **[sandbox.review.bikeindex.org](https://sandbox.review.bikeindex.org)** — think of it as a review app that never gets a PR number and is never destroyed. It shares `config/deploy.review.yml`: with no `REVIEW_APP_PR_NUMBER` set, the ERB resolves the `sandbox` slug and omits the `accessories:` block (so a sandbox deploy can't touch the shared infra the PR apps depend on). It differs only in using Redis logical DB `0` (the one the PR mod-31 allocation never hands out).
+Alongside the per-PR apps, `main` is continuously deployed to **[sandbox.review.bikeindex.org](https://sandbox.review.bikeindex.org)** — think of it as a review app that never gets a PR number and is never destroyed. It shares `config/deploy.review.yml`: with no `REVIEW_APP_PR_NUMBER` set, the ERB resolves the `sandbox` slug and omits the `accessories:` block (so a sandbox deploy can't touch the shared infra the PR apps depend on). It differs only in using Redis logical DB `0` (the one the PR mod-1023 allocation never hands out).
 
 For `bin/kamal_review`, with no `--app` given it defaults to sandbox - but you can also use `--app sandbox` to target it. This works for passthrough commands only, since sandbox is deployed by its own workflow, not the `deploy`/`destroy` lifecycle:
 
@@ -61,7 +61,7 @@ Only CI's on-push dispatch and `closed` are wired up, so toggling the label by h
 
 **Teardown is not gated.** `pull_request: closed` destroys every PR, labeled or not — adding the label is best-effort (`|| true`), so an app can be live with no label on it and would otherwise run forever. Destroy skips the build job and is name-scoped and idempotent, so a PR that never had an app costs one short runner.
 
-The step that isn't idempotent is the redis flush, because mod-31 allocation can point this PR's logical DB at another PR that's still running. So destroy opens by asking the host which apps are up, and skips the flush when one of them shares the DB. That probe also has to succeed: every other step is `|| true`, so an unreachable host would report a clean teardown and let `post` strip the label and GHCR images off an app that's still serving. A failed probe exits non-zero instead, leaving the PR retryable.
+The step that isn't idempotent is the redis flush, because mod-1023 allocation can point this PR's logical DB at another PR that's still running. So destroy opens by asking the host which apps are up, and skips the flush when one of them shares the DB. That probe also has to succeed: every other step is `|| true`, so an unreachable host would report a clean teardown and let `post` strip the label and GHCR images off an app that's still serving. A failed probe exits non-zero instead, leaving the PR retryable.
 
 ## How a deploy works
 
@@ -119,7 +119,8 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 
 ## Known limits
 
-- **Redis DB allocation is mod-31.** PRs congruent mod 31 share a logical DB — caches + Sidekiq queues mix. Mitigation: bump `--databases` in the redis accessory `cmd:` and raise `REDIS_DATABASES` in `bin/kamal_review`.
+- **Redis DB allocation is mod-1023.** PRs congruent mod 1023 still share a logical DB — caches + Sidekiq queues mix — but that now takes two live apps ~5 months of PRs apart, and destroy skips its flush when it finds one. Raising it further means bumping `--databases` in the redis accessory `cmd:` and `REDIS_DATABASES` in `bin/kamal_review` in lockstep; the cost is ~3.5MB of baseline RSS per 1000 databases and slower active expiry of TTL'd keys.
+- **One eviction pool for every app.** `--maxmemory 512mb --maxmemory-policy allkeys-lru` is instance-wide, so it ignores logical DBs entirely: any app's cache growth can evict any other app's keys, including enqueued Sidekiq jobs, with no error. Widening the modulus doesn't help. Watch `evicted_keys` in `INFO stats`.
 - <a id="storage-is-shared"></a>**Storage isn't isolated per app.** CarrierWave (bike photos, most images) writes to the per-PR local `_uploads` volume — isolated, dropped on destroy. ActiveStorage attachments go to the shared R2 dev bucket (`cloudflare_dev` / `bikeindex-dev`), where every app writes to the bucket root with random keys (no prefix). Destroy purges a PR's own blobs — enumerated from its database, deleted by their (globally unique) keys — through the running app before `app remove`, so only that PR's objects go. Best-effort: a PR whose app can't boot at destroy orphans its blobs, and blobs from PRs destroyed before this cleanup existed can only be reclaimed by reconciling live keys against the bucket.
 - **One Sidekiq worker per app at concurrency=2.** Enough for demos, not for stress-testing queues.
 - **Forks aren't auto-deployed.** A maintainer triggers fork PRs manually via `workflow_dispatch` after reviewing the diff.

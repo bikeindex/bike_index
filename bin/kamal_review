@@ -35,7 +35,7 @@
 set -euo pipefail
 
 CONFIG="${KAMAL_CONFIG:-config/deploy.review.yml}"
-REDIS_DATABASES="${REDIS_DATABASES:-31}"  # shared-redis boots with --databases 32; 0 reserved
+REDIS_DATABASES="${REDIS_DATABASES:-1023}"  # shared-redis boots with --databases 1024; 0 reserved
 
 usage() {
   cat <<USAGE
@@ -77,9 +77,10 @@ review_app_pr_number() {
 }
 
 # Export the REVIEW_APP_* vars config/deploy.review.yml's ERB reads. The mod-N
-# Redis logical DB allocation collides PRs congruent mod REDIS_DATABASES (cache +
-# Sidekiq queues mix); mitigation is to bump the shared-redis `--databases` and
-# REDIS_DATABASES together.
+# Redis logical DB allocation still collides PRs congruent mod REDIS_DATABASES
+# (cache + Sidekiq queues mix), but at 1023 that needs two live apps ~5 months of
+# PRs apart; destroy skips its flush when it finds one. Raising it further means
+# bumping the shared-redis `--databases` in lockstep.
 export_review_app_env() {
   export REVIEW_APP_PR_NUMBER="$1"
   export REVIEW_APP_HOST="${REVIEW_APP_HOST:-host.review.bikeindex.org}"
