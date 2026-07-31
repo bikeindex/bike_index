@@ -17,6 +17,7 @@
 #
 # Indexes
 #
+#  index_public_images_on_created_at                       (created_at)
 #  index_public_images_on_imageable_id_and_imageable_type  (imageable_id,imageable_type)
 #
 class PublicImage < ApplicationRecord
@@ -27,6 +28,9 @@ class PublicImage < ApplicationRecord
     photo_of_serial: 5,
     photo_of_receipt: 6
   }.freeze
+
+  # Every model with `has_many :public_images, as: :imageable`
+  IMAGEABLE_TYPES = %w[Bike BikeVersion Blog ImpoundClaim MailSnippet Organization SocialPost].freeze
 
   # Sized for display rather than for the source: `large` covers the show page hero at 2x, `small`
   # the search result cards. `small` stays jpeg because `thumb_path` feeds emails, and Outlook
@@ -76,6 +80,13 @@ class PublicImage < ApplicationRecord
       byte_size.to_i.between?(1, PublicImageUploader::MAX_FILE_SIZE)
   end
 
+  def self.kinds = KIND_ENUM.keys.map(&:to_s)
+
+  # Imageables label themselves differently, and some (ImpoundClaim, MailSnippet, SocialPost) not at all
+  def imageable_name
+    imageable.try(:display_name) || imageable.try(:name) || imageable.try(:title)
+  end
+
   def default_name
     if bike?
       self.name = "#{imageable&.title_string} #{imageable&.frame_colors&.to_sentence}"
@@ -109,6 +120,14 @@ class PublicImage < ApplicationRecord
     return image.url(*size) unless activestorage?
 
     BlobUrl.for_variant(file, size&.to_sym&.presence_in(VARIANTS.keys))
+  end
+
+  # The blob stores it, but fog resolves it with a request per image - so carrierwave
+  # rows are only worth asking from a cached fragment
+  def image_size
+    return file.blob.byte_size if activestorage?
+
+    (image.size if image?)&.nonzero?
   end
 
   # "processed" lands only once the variants exist, so a job that died partway is picked up again
