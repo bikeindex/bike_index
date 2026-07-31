@@ -18,6 +18,29 @@ RSpec.describe UI::Modal::Component, :js, type: :system do
     expect(page).not_to have_css("dialog[open]")
   end
 
+  # The point of the trigger's command/commandfor: opening doesn't wait on Stimulus, which
+  # lazy loads and so may not have arrived when the click lands.
+  it "opens from the trigger with the controller held back, and picks the state up on connect" do
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.route("**/ui/modal_controller*.js", ->(route, _request) {
+        sleep 3
+        route.continue
+      })
+    end
+    visit("/rails/view_components/ui/modal/component/default")
+
+    click_button "Open Settings"
+    expect(page).to have_css("dialog#settings-modal[open]")
+    expect(page).to have_text("Modal body content")
+
+    # Once it does arrive it adopts the open dialog, so a reload still restores it
+    expect(page).to have_current_path(/modal_settings-modal=1/, url: true, wait: 10)
+
+    find('button[aria-label="Close"]').click
+    expect(page).to have_no_css("dialog[open]")
+    expect(page).to have_no_current_path(/modal_settings-modal/, url: true)
+  end
+
   it "opens a server-opened modal on load, without adding the param" do
     visit("/rails/view_components/ui/modal/component/open_on_connect")
 

@@ -152,6 +152,20 @@ RSpec.describe UI::Button::Component, type: :component do
     it "renders data attributes" do
       expect(component).to have_css("button[data-action='click->ui--modal#open']")
     end
+
+    it "doesn't invoke anything" do
+      expect(component).to have_no_css("button[commandfor]")
+    end
+  end
+
+  context "with data-open-modal" do
+    let(:options) { {text: "Open", data: {open_modal: "settings-modal"}} }
+
+    # So a browser with invoker commands opens the dialog without waiting for ui--modal
+    it "says the same thing with the native invoker attributes" do
+      expect(component).to have_css("button[data-open-modal='settings-modal']")
+      expect(component).to have_css("button[commandfor='settings-modal'][command='show-modal']")
+    end
   end
 
   it "always applies the active classes (inert until data-active/pressed)" do

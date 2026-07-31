@@ -69,7 +69,7 @@ module UI
       end
 
       def call
-        content_tag(:button, safe_join([spinner_span, @text || content].compact), class: button_classes, type: (@kind == :submit) ? "submit" : "button", disabled: @disabled, data: button_data, aria: @aria)
+        content_tag(:button, safe_join([spinner_span, @text || content].compact), class: button_classes, type: (@kind == :submit) ? "submit" : "button", disabled: @disabled, data: button_data, aria: @aria, **invoker_attributes)
       end
 
       def button_classes
@@ -77,6 +77,14 @@ module UI
       end
 
       private
+
+      # A [data-open-modal] trigger already names its dialog, so say the same thing in the
+      # platform's own words: a browser with invoker commands opens it without waiting for
+      # ui--modal to load. Everything else still goes through the controller's click listener.
+      def invoker_attributes
+        modal_id = @data[:open_modal] || @data["open_modal"]
+        modal_id.present? ? {commandfor: modal_id, command: "show-modal"} : {}
+      end
 
       def button_data
         data = @data.merge(active: @active || nil)
