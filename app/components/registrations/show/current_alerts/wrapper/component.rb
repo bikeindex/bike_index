@@ -15,6 +15,15 @@ module Registrations
             @owner = owner
             @current_alerts = current_alerts
           end
+
+          # Each renders itself or nothing, so this is only the order they stack in
+          def call
+            safe_join([
+              render(TokenAlert::Component.new(bike: @bike, current_user: @current_user, current_alerts: @current_alerts)),
+              render(ScannedSticker::Component.new(bike: @bike, bike_sticker: @bike_sticker, current_user: @current_user)),
+              render(SentToNewOwner::Component.new(bike: @bike, owner: @owner))
+            ])
+          end
         end
       end
     end
