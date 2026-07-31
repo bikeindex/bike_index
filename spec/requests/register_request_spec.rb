@@ -452,6 +452,10 @@ RSpec.describe RegisterController, type: :request do
       end
 
       context "reg_address" do
+        def address_street_field
+          Nokogiri::HTML(response.body).at_css("[name='bike[address_record_attributes][street]']")
+        end
+
         it "shows the address fields, except for statuses with their own address record" do
           organization.update_column :enabled_feature_slugs, ["reg_address"]
           get register_path(b_param_token: b_param.id_token, step: 2)
@@ -465,6 +469,16 @@ RSpec.describe RegisterController, type: :request do
           b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_stolen"}))
           get register_path(b_param_token: b_param.id_token, step: 2)
           expect(status_field("address_record_attributes")["class"]).to include "tw:hidden"
+        end
+
+        it "only requires the address when the organization requires it" do
+          organization.update_column :enabled_feature_slugs, ["reg_address"]
+          get register_path(b_param_token: b_param.id_token, step: 2)
+          expect(address_street_field["required"]).to be_nil
+
+          organization.update_column :enabled_feature_slugs, %w[reg_address require_reg_address]
+          get register_path(b_param_token: b_param.id_token, step: 2)
+          expect(address_street_field["required"]).to eq "required"
         end
       end
     end

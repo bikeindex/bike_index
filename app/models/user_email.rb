@@ -20,6 +20,7 @@
 class UserEmail < ActiveRecord::Base
   belongs_to :user, touch: true
   belongs_to :old_user, class_name: "User", touch: true
+  has_many :notifications, as: :notifiable
 
   validates_presence_of :user_id, :email
 

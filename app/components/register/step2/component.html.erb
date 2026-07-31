@@ -377,7 +377,8 @@
       >
         <%# _attributes explicitly: form_with has no model to infer nested attributes from %>
         <%= f.fields_for :address_record_attributes, address_record do |address_form| %>
-          <%= render UI::Forms::AddressGroup::Component.new(form_builder: address_form) %>
+          <%= render UI::Forms::AddressGroup::Component.new(form_builder: address_form,
+              required: organization.enabled?("require_reg_address")) %>
         <% end %>
       </div>
     <% end %>

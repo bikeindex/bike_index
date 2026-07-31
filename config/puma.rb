@@ -36,4 +36,5 @@ end
 #
 directory ENV.fetch("STACK_PATH", ".")
 
-# The nginx-facing socket bind lives in the Procfile's custom_web `-b` flag, not here.
+# prune_bundler re-execs Puma, so the bind has to come from this file. Cloud 66's Procfile `-b` still wins.
+port ENV.fetch("PORT", 3000)
