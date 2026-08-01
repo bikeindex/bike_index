@@ -46,9 +46,9 @@ module Register
         CycleType.slug_translation_hash_lowercase_short
       end
 
-      # Only anonymous registrants have anything to wait on
+      # Only an address the registrant hasn't proven is theirs has anything to wait on
       def confirmation_email_pending?
-        @current_user.blank?
+        !@b_param.self_made?(@current_user)
       end
 
       # Step 1 is only revisitable once submitted, so this is a return from step 2

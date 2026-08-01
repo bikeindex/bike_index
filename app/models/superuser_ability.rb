@@ -42,6 +42,12 @@ class SuperuserAbility < ApplicationRecord
 
   belongs_to :user, touch: true
 
+  # user_id rather than user, so an ability outliving its soft-deleted user stays editable
+  validates :user_id, presence: true
+
+  # Admin creation looks the user up by email, username or id
+  attr_accessor :user_identifier
+
   before_validation :set_calculated_attributes
 
   scope :non_universal, -> { where.not(kind: "universal") }
@@ -86,6 +92,9 @@ class SuperuserAbility < ApplicationRecord
   end
 
   def set_calculated_attributes
+    self.controller_name = controller_name.presence
+    self.action_name = action_name.presence
+    self.user ||= User.friendly_find(user_identifier) if user_identifier.present?
     self.kind = calculated_kind
     self.su_options ||= []
     self.su_options = su_options.sort

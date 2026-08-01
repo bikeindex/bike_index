@@ -2,7 +2,7 @@
 
 <% if @mail_snippet.organization_message? %>
   <%= render(UI::Alert::Component.new(kind: :error, header: "This is an Organization Message Snippet!")) do %>
-    <em class="small d-block mt-2">
+    <em class="small d-block">
       This should actually be
       <%= link_to "edited though the organization!", edit_mail_snippet_path_for(@mail_snippet) %>
     </em>
@@ -10,7 +10,7 @@
 <% end %>
 
 <%= render(UI::Alert::Component.new(kind: :info, header: "NOTE: Organization Message snippets are actually the entire email.")) do %>
-  <p class="mb-0 tw:mt-2">
+  <p class="mb-0">
     Organization Messages are editable through the organization's page and
     should probably be edited there (rather than here). Those kinds:
     <small class="d-block mt-2"><%= safe_join(MailSnippet.organization_message_kinds.map { |kind| content_tag(:code, MailSnippet.kind_humanized(kind)) }, ", ") %></small>

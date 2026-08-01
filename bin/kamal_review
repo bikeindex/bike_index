@@ -22,6 +22,7 @@
 #   deploy  — kamal deploy --version <tag> --skip-push (tag via --version or IMAGE_TAG)
 #   destroy — purge the PR's ActiveStorage objects from the shared R2 bucket, kamal
 #             app remove, drop the per-PR databases + role, flush its redis db
+#             (unless a still-running PR shares it), remove its containers + volumes
 # deploy is idempotent — same path on first and subsequent deploys;
 # bin/docker-entrypoint creates the per-PR Postgres role on first boot and
 # db:prepare handles schema/seed-or-migrate.
@@ -34,7 +35,7 @@
 set -euo pipefail
 
 CONFIG="${KAMAL_CONFIG:-config/deploy.review.yml}"
-REDIS_DATABASES="${REDIS_DATABASES:-31}"  # shared-redis boots with --databases 32; 0 reserved
+REDIS_DATABASES="${REDIS_DATABASES:-1023}"  # shared-redis boots with --databases 1024; 0 reserved
 
 usage() {
   cat <<USAGE
@@ -76,9 +77,10 @@ review_app_pr_number() {
 }
 
 # Export the REVIEW_APP_* vars config/deploy.review.yml's ERB reads. The mod-N
-# Redis logical DB allocation collides PRs congruent mod REDIS_DATABASES (cache +
-# Sidekiq queues mix); mitigation is to bump the shared-redis `--databases` and
-# REDIS_DATABASES together.
+# Redis logical DB allocation still collides PRs congruent mod REDIS_DATABASES
+# (cache + Sidekiq queues mix), but at 1023 that needs two live apps ~5 months of
+# PRs apart; destroy skips its flush when it finds one. Raising it further means
+# bumping the shared-redis `--databases` in lockstep.
 export_review_app_env() {
   export REVIEW_APP_PR_NUMBER="$1"
   export REVIEW_APP_HOST="${REVIEW_APP_HOST:-host.review.bikeindex.org}"
@@ -199,6 +201,23 @@ case "$mode" in
     ;;
 
   destroy)
+    # Ask the host what's running before touching anything. Two reasons, both of
+    # which bite now that every closed PR runs destroy: mod-N allocation (see
+    # export_review_app_env) can point our logical redis DB at a PR that's still
+    # up, whose cache and queues a FLUSHDB would drop; and every step below is
+    # `|| true`, so an unreachable host would otherwise report a clean teardown
+    # and let the workflow strip the label and GHCR images off a live app.
+    if ! running="$(kamal server exec --raw "docker ps --format '{{.Label \"service\"}}'" 2>/dev/null)"; then
+      echo "Error: can't reach the review host. $slug may still be running, so nothing was destroyed." >&2
+      exit 1
+    fi
+    redis_shared_with=""
+    for other in $(printf '%s\n' "$running" | sed -n 's/^bike-index-pr-//p'); do
+      if [[ "$other" != "$pr_number" ]] && (( (other % REDIS_DATABASES) + 1 == REVIEW_APP_REDIS_DB )); then
+        redis_shared_with="${redis_shared_with} pr-${other}"
+      fi
+    done
+
     # ActiveStorage attachments land in the shared R2 dev bucket (cloudflare_dev)
     # at the bucket root with random keys — no per-PR prefix to drop — so delete
     # them through the running app, whose database lists exactly this PR's blobs
@@ -222,16 +241,22 @@ case "$mode" in
         -c 'DROP DATABASE IF EXISTS ${analytics_db} WITH (FORCE)' \
         -c 'DROP ROLE IF EXISTS ${role}'" || true
 
-    echo "==> Flushing redis logical DB $REVIEW_APP_REDIS_DB"
-    kamal accessory exec redis --reuse \
-      "redis-cli -n ${REVIEW_APP_REDIS_DB} FLUSHDB" || true
+    if [[ -n "$redis_shared_with" ]]; then
+      echo "==> Skipping the redis flush: logical DB $REVIEW_APP_REDIS_DB is still in use by${redis_shared_with}"
+    else
+      echo "==> Flushing redis logical DB $REVIEW_APP_REDIS_DB"
+      kamal accessory exec redis --reuse \
+        "redis-cli -n ${REVIEW_APP_REDIS_DB} FLUSHDB" || true
+    fi
 
     # Named volumes outlive `kamal app remove`, so drop them or they leak on the
-    # host. The app containers are gone by now, so the volumes are free to remove.
-    # `server exec` runs on the host (as root) rather than inside a container.
-    echo "==> Removing per-PR volumes (${appname}_storage, ${appname}_uploads)"
+    # host. `app remove` prunes its roles in parallel and docker serialises prune
+    # operations, so a role can survive it still holding a volume — remove any
+    # leftovers first. `server exec` runs on the host (as root), not in a container.
+    echo "==> Removing per-PR containers and volumes (${appname}_storage, ${appname}_uploads)"
     kamal server exec \
-      "docker volume rm ${appname}_storage ${appname}_uploads" || true
+      "docker ps -aq --filter label=service=${appname} | xargs -r docker rm -f; \
+       docker volume rm ${appname}_storage ${appname}_uploads" || true
 
     echo "==> Done."
     ;;

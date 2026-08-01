@@ -188,7 +188,7 @@
 
           <%# Show the phone if the bike is stolen, the organization requires phone %>
           <%# only show the phone for impounded records if the current user doesn't have a confirmed phone %>
-          <% if @bike.status_stolen? || include_field_reg_phone?(@organization, current_user) || @bike.status_impounded? && !current_user.phone_confirmed? %>
+          <% if @bike.status_stolen? || BikeServices::Displayer.include_reg_field?(:phone, @organization, current_user) || @bike.status_impounded? && !current_user.phone_confirmed? %>
             <div class="form-group row unnested-field">
               <%= f.label :phone,
                 registration_field_label(@organization, "reg_phone") || t(".phone"),
@@ -214,13 +214,13 @@
                 <%= render(UI::Forms::LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, bike_status: @bike.status)) %>
               <% end %>
             <% end %>
-          <% elsif BikeServices::Builder.include_address_record?(@organization, current_user) && BikeServices::Displayer.display_edit_address_fields?(@bike, current_user) %>
+          <% elsif BikeServices::Displayer.include_reg_field?(:address, @organization, current_user) && BikeServices::Displayer.display_edit_address_fields?(@bike, current_user) %>
             <%= f.fields_for :address_record do |address_form| %>
               <%= render(UI::Forms::LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, organization: @bike.creation_organization, street_2: true)) %>
             <% end %>
           <% end %>
 
-          <% if include_field_reg_extra_registration_number?(@organization, current_user) %>
+          <% if BikeServices::Displayer.include_reg_field?(:extra_registration_number, @organization, current_user) %>
             <div class="form-group row unnested-field no-divider-row">
               <%= f.label :extra_registration_number,
                 registration_field_label(@organization, "reg_extra_registration_number") || t(".additional_serial_sticker_number"),
@@ -236,7 +236,7 @@
             </div>
           <% end %>
 
-          <% if include_field_reg_organization_affiliation?(@organization, current_user) %>
+          <% if BikeServices::Displayer.include_reg_field?(:organization_affiliation, @organization, current_user) %>
             <div
               class="
                 form-group row unnested-field no-divider-row fancy-select
@@ -255,7 +255,7 @@
             </div>
           <% end %>
 
-          <% if include_field_reg_student_id?(@organization, current_user) %>
+          <% if BikeServices::Displayer.include_reg_field?(:student_id, @organization, current_user) %>
             <div class="form-group row unnested-field no-divider-row">
               <%= f.label :student_id,
                 registration_field_label(@organization, "reg_student_id") || t(".student_id"),
@@ -272,7 +272,7 @@
             </div>
           <% end %>
 
-          <% if include_field_reg_bike_sticker?(@organization, current_user, true) %>
+          <% if BikeServices::Displayer.include_reg_field?(:bike_sticker, @organization, current_user, require_user_editable: true) %>
             <div class="form-group row unnested-field no-divider-row">
               <%= f.label :bike_sticker, class: "form-well-label" do %>
                 <%= t(".sticker_id") %>

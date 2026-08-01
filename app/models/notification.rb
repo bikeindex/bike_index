@@ -267,7 +267,7 @@ class Notification < ApplicationRecord
   end
 
   def calculated_email
-    c_email = notifiable&.email if b_param? || notifiable_type == "Payment"
+    c_email = notifiable&.email if b_param? || %w[Payment UserEmail].include?(notifiable_type)
     c_email ||= notifiable&.receiver_email if stolen_notification?
     c_email ||= user&.email if user_id.present?
     c_email ||= notifiable&.user_email if customer_contact?

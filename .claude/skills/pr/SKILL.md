@@ -28,6 +28,8 @@ Invoke the `/simplify` command to review the changed code for reuse, simplificat
 
 Then run `bin/lint` to auto-format the code (it also picks up whatever `/simplify` just changed). Always use `bin/lint`, never another formatter or `standardrb` directly. Scope it to the branch's files rather than walking the whole repo — `bin/lint $(git diff --name-only --diff-filter=d "origin/$BASE"...HEAD)`; `--diff-filter=d` drops deleted paths so they don't show up as "Not found". Files with no linter (`.haml`, `.scss`, `.md`) are skipped, so a branch that touches none of the lintable types exits cleanly rather than looking like a lint failure. It takes directories too, so `bin/lint app/components/foo` works while you're still iterating.
 
+Scope specs the same way — the ones covering what the branch changed, never a bare `bundle exec rspec` or a whole top-level directory (see the `rspec-testing` skill). CI runs the full suite; a green PR isn't your job to prove locally.
+
 Then review the changed files against the repo's `CLAUDE.md` (root and any nested ones in touched directories) and fix anything that doesn't conform — code-style guidelines (functional style, no argument mutation, omitted hash values like `{x:}`, private methods, unabbreviated names, pithy comments), testing conventions, and frontend rules. Only touch lines this branch already changed; don't reformat unrelated code.
 
 Commit these edits before continuing — step 1's `git merge` needs a clean working tree, and committing here is what lets the step 0 edits ride along the merge as ordinary branch commits (which step 3 then pushes).

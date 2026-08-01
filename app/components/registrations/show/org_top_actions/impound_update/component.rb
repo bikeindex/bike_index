@@ -13,7 +13,7 @@ module Registrations
           end
 
           def render?
-            @bike.status_impounded? && impound_record.present?
+            @bike.status_impounded? && impound_record&.organization_id == @organization.id
           end
 
           private
