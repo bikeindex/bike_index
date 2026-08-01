@@ -1,4 +1,4 @@
-<%= render PageBlock::UserAlerts::BottomBar::Component.new(href: "#", data: {open_modal: MODAL_ID},
+<%= render PageBlock::UserAlerts::Banner::Component.new(href: "#", data: {open_modal: MODAL_ID},
       text: translation(".confirm_your_phone_number")) %>
 
 <%= render UI::Modal::Component.new(id: MODAL_ID, title: modal_title) do |modal| %>

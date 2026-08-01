@@ -262,6 +262,15 @@
       </nav>
     <% end %>
 
+    <%# grab (and remove) the donation modal if it's there %>
+    <% donation_request = session.delete(:render_donation_request) %>
+
+    <% if donation_request.present? %>
+      <%= render partial: "/shared/law_enforcement_donation_modal", locals: { kind: donation_request } %>
+    <% elsif show_general_alert %>
+      <%= render PageBlock::UserAlerts::Wrapper::Component.new(current_user:) %>
+    <% end %>
+
     <%= render partial: "/layouts/revised_messages" %>
 
     <%# The strava_search SPA (where @strava_search_config is set) renders its own <main>, so skip this landmark to avoid nesting %>
@@ -275,15 +284,6 @@
           <%= yield %>
         <% end %>
       </main>
-    <% end %>
-
-    <%# grab (and remove) the donation modal if it's there %>
-    <% donation_request = session.delete(:render_donation_request) %>
-
-    <% if donation_request.present? %>
-      <%= render partial: "/shared/law_enforcement_donation_modal", locals: { kind: donation_request } %>
-    <% elsif show_general_alert %>
-      <%= render PageBlock::UserAlerts::Wrapper::Component.new(current_user:) %>
     <% end %>
 
     <%# Skip the Meta pixel on org/oauth pages and when blocked params are present (search_email is PII, and the pixel %>

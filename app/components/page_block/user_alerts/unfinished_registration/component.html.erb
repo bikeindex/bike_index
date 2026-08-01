@@ -1,3 +1,3 @@
-<%= render PageBlock::UserAlerts::BottomBar::Component.new(
+<%= render PageBlock::UserAlerts::Banner::Component.new(
       href: register_path(b_param_token: @b_param.id_token),
       text: translation(".finish_registering", cycle_type: @b_param.type)) %>

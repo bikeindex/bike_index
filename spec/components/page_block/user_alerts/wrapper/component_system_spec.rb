@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe PageBlock::UserAlerts::Wrapper::Component, :js, type: :system do
   # These carry the alerts rather than being one - the wrapper picks between them, and the
   # other two are the chrome the interrupting and non-interrupting alerts share
-  let(:carriers) { %w[bike_list_modal bottom_bar wrapper] }
+  let(:carriers) { %w[banner bike_list_modal wrapper] }
 
   # Text that only appears once that alert rendered, keyed by the component's directory
   # so the keys can be checked against what's on disk
