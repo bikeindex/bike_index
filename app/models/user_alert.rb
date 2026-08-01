@@ -10,6 +10,7 @@
 #  resolved_at     :datetime
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
+#  b_param_id      :bigint
 #  bike_id         :bigint
 #  organization_id :bigint
 #  theft_alert_id  :bigint
@@ -18,6 +19,7 @@
 #
 # Indexes
 #
+#  index_user_alerts_on_b_param_id      (b_param_id)
 #  index_user_alerts_on_bike_id         (bike_id)
 #  index_user_alerts_on_theft_alert_id  (theft_alert_id)
 #  index_user_alerts_on_user_id         (user_id)
@@ -28,12 +30,14 @@ class UserAlert < ApplicationRecord
     phone_waiting_confirmation: 0,
     theft_alert_without_photo: 1,
     stolen_bike_without_location: 2,
-    unassigned_bike_org: 3
+    unassigned_bike_org: 3,
+    unfinished_registration: 4
   }.freeze
 
   enum :kind, KIND_ENUM
 
   belongs_to :user
+  belongs_to :b_param
   belongs_to :bike
   belongs_to :user_phone
   belongs_to :theft_alert
@@ -82,8 +86,15 @@ class UserAlert < ApplicationRecord
     %w[unassigned_bike_org]
   end
 
+  # Highest priority first - only one general alert renders, and this is the order it picks
   def self.general_kinds
-    %w[phone_waiting_confirmation theft_alert_without_photo stolen_bike_without_location]
+    %w[phone_waiting_confirmation stolen_bike_without_location theft_alert_without_photo
+      unfinished_registration]
+  end
+
+  # phone_verification gates the only kind behind a flag
+  def self.disabled_kinds
+    Flipper.enabled?(:phone_verification) ? [] : %w[phone_waiting_confirmation]
   end
 
   def self.account_kinds
@@ -104,6 +115,24 @@ class UserAlert < ApplicationRecord
 
   def self.find_or_build_by(attrs)
     where(attrs).first || new(attrs)
+  end
+
+  # The denormalized copy on the user, which gates whether any alert renders at all
+  def self.refresh_alert_slugs(user)
+    slugs = where(user_id: user.id).active.distinct.pluck(:kind).sort
+    return true if user.alert_slugs == slugs
+
+    user.update(alert_slugs: slugs, skip_update: true)
+  end
+
+  def self.update_unfinished_registration(user:, b_param:)
+    user_alert = find_or_build_by(kind: "unfinished_registration",
+      user_id: user.id, b_param_id: b_param.id)
+    if b_param.unfinished_registration?
+      user_alert.save
+    else # Don't create just to resolve
+      user_alert.id.blank? || user_alert.resolve!
+    end
   end
 
   def self.update_theft_alert_without_photo(user:, theft_alert:)

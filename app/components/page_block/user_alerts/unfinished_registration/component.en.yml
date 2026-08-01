@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    page_block:
+      user_alerts:
+        unfinished_registration:
+          finish_registering: Finish registering your %{cycle_type}

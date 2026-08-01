@@ -160,8 +160,7 @@ module ControllerHelpers
   def show_general_alert
     return @show_general_alert = false if @skip_general_alert || current_user.blank?
 
-    ignored_alerts = Flipper.enabled?(:phone_verification) ? [] : %w[phone_waiting_confirmation]
-    return @show_general_alert = false unless (current_user.alert_slugs - ignored_alerts).any?
+    return @show_general_alert = false unless (current_user.alert_slugs - UserAlert.disabled_kinds).any?
 
     no_alerts = %w[payments theft_alerts].include?(controller_name) || %w[support_bike_index].include?(action_name)
     @show_general_alert = !no_alerts

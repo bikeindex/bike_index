@@ -22,11 +22,12 @@
 #
 # Indexes
 #
-#  index_b_params_on_bike_owner_email_trgm  ((((params -> 'bike'::text) ->> 'owner_email'::text)) gin_trgm_ops) USING gin
-#  index_b_params_on_created_bike_id        (created_bike_id)
-#  index_b_params_on_email_trgm             (email) WHERE (created_bike_id IS NULL) USING gin
-#  index_b_params_on_id_token               (id_token)
-#  index_b_params_on_organization_id        (organization_id)
+#  index_b_params_on_bike_owner_email_trgm    ((((params -> 'bike'::text) ->> 'owner_email'::text)) gin_trgm_ops) USING gin
+#  index_b_params_on_created_bike_id          (created_bike_id)
+#  index_b_params_on_creator_id_without_bike  (creator_id) WHERE (created_bike_id IS NULL)
+#  index_b_params_on_email_trgm               (email) WHERE (created_bike_id IS NULL) USING gin
+#  index_b_params_on_id_token                 (id_token)
+#  index_b_params_on_organization_id          (organization_id)
 #
 
 # b_param stands for Bike param
@@ -72,6 +73,8 @@ class BParam < ApplicationRecord
     stolen
     street
   ].freeze
+  # How long a token resumes a registration for - and so how long it's worth alerting about
+  RESUME_WINDOW = 1.month
   mount_uploader :image, ImageUploaderBackgrounded
   process_in_background :image, CarrierWaveProcessJob # Defer version generation so large uploads don't hit the 30s Rack::Timeout
 
@@ -85,6 +88,9 @@ class BParam < ApplicationRecord
 
   before_create :generate_id_token
   before_save :clean_params
+  # Leaving the flow is exactly when nothing else bumps the user, so the alert can't
+  # wait for their next update job
+  after_commit :update_creator_alert
 
   scope :with_bike, -> { where.not(created_bike_id: nil) }
   scope :without_bike, -> { where(created_bike_id: nil) }
@@ -96,7 +102,12 @@ class BParam < ApplicationRecord
   # at submit) - only seeds and a prefilled email, nothing worth keeping
   scope :without_bike_values, -> { bike_params_empty.or(where(origin: "register_flow").where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
   # Tokenized lookups resume registrations for up to a month
-  scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
+  scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - RESUME_WINDOW) }
+  # The complement of without_bike_values, within the window the token still resumes
+  scope :unfinished_registrations, -> {
+    without_bike.where(origin: "register_flow").where("created_at >= ?", Time.current - RESUME_WINDOW)
+      .where("(params -> 'bike' -> 'manufacturer_id') IS NOT NULL")
+  }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
   scope :cycle_type_bike, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NULL").or(bike_params_empty) }
@@ -281,6 +292,13 @@ class BParam < ApplicationRecord
 
   def with_bike?
     created_bike_id.present?
+  end
+
+  # Step 1 was submitted (manufacturer is required there), so it's more than the shell
+  # new creates, and the token still resumes it
+  def unfinished_registration?
+    origin == "register_flow" && !with_bike? && manufacturer_id.present? &&
+      created_at.present? && created_at > Time.current - RESUME_WINDOW
   end
 
   # Get it unscoped, because unregistered_bike notifications
@@ -686,6 +704,14 @@ class BParam < ApplicationRecord
   end
 
   private
+
+  # origin, so the API and embed forms don't pay for a lookup that can't alert
+  def update_creator_alert
+    return if creator_id.blank? || origin != "register_flow"
+
+    UserAlert.update_unfinished_registration(user: creator, b_param: self)
+    UserAlert.refresh_alert_slugs(creator)
+  end
 
   def ensure_valid_params
     self.params ||= {"bike" => {}}

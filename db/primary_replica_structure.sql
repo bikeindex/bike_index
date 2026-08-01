@@ -4198,7 +4198,8 @@ CREATE TABLE public.user_alerts (
     resolved_at timestamp without time zone,
     dismissed_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    b_param_id bigint
 );
 
 
@@ -6237,6 +6238,13 @@ CREATE INDEX index_b_params_on_created_bike_id ON public.b_params USING btree (c
 
 
 --
+-- Name: index_b_params_on_creator_id_without_bike; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_b_params_on_creator_id_without_bike ON public.b_params USING btree (creator_id) WHERE (created_bike_id IS NULL);
+
+
+--
 -- Name: index_b_params_on_email_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7504,6 +7512,13 @@ CREATE INDEX index_theft_alerts_on_user_id ON public.theft_alerts USING btree (u
 
 
 --
+-- Name: index_user_alerts_on_b_param_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_alerts_on_b_param_id ON public.user_alerts USING btree (b_param_id);
+
+
+--
 -- Name: index_user_alerts_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7716,6 +7731,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260801120000'),
 ('20260731100009'),
 ('20260731100008'),
 ('20260729180400'),

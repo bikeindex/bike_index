@@ -1,0 +1,11 @@
+<%= render UI::Modal::Component.new(id: @id, title: @title, open: true) do |modal| %>
+  <% modal.with_body do %>
+    <p class="tw:mb-3"><%= @intro %></p>
+
+    <%= content %>
+
+    <p class="tw:mb-0">
+      <em class="twless-strong"><%= @footer %></em>
+    </p>
+  <% end %>
+<% end %>

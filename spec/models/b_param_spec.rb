@@ -867,4 +867,69 @@ RSpec.describe BParam, type: :model do
       end
     end
   end
+
+  describe "unfinished_registration?" do
+    let(:b_param) { FactoryBot.create(:b_param, creator:, origin: "register_flow", params: {bike: bike_params}) }
+    let(:creator) { FactoryBot.create(:user_confirmed) }
+    let(:bike_params) { {manufacturer_id: 1} }
+
+    it "is unfinished, and alerts the creator" do
+      expect(b_param.unfinished_registration?).to be_truthy
+      expect(creator.reload.alert_slugs).to eq ["unfinished_registration"]
+      expect(creator.user_alerts.active.unfinished_registration.pluck(:b_param_id)).to eq [b_param.id]
+    end
+
+    context "once the bike is created" do
+      it "resolves the alert" do
+        expect(b_param.unfinished_registration?).to be_truthy
+        expect(creator.reload.alert_slugs).to eq ["unfinished_registration"]
+
+        b_param.update(created_bike_id: FactoryBot.create(:bike).id)
+
+        expect(b_param.unfinished_registration?).to be_falsey
+        expect(creator.reload.alert_slugs).to eq []
+      end
+    end
+
+    context "without a manufacturer" do
+      let(:bike_params) { {owner_email: "stuff@example.com"} }
+
+      it "is not unfinished, and doesn't alert" do
+        expect(b_param.unfinished_registration?).to be_falsey
+        expect(creator.reload.alert_slugs).to eq []
+      end
+    end
+
+    context "with another origin" do
+      let(:b_param) { FactoryBot.create(:b_param, creator:, origin: "api_v2", params: {bike: bike_params}) }
+
+      it "is not unfinished, and doesn't alert" do
+        expect(b_param.unfinished_registration?).to be_falsey
+        expect(creator.reload.alert_slugs).to eq []
+      end
+    end
+
+    context "without a creator" do
+      let(:creator) { nil }
+
+      it "is unfinished, with nobody to alert" do
+        expect(b_param.unfinished_registration?).to be_truthy
+        expect(UserAlert.count).to eq 0
+      end
+    end
+
+    # Past the window the token stops resuming it, so the alert's own link is dead
+    context "older than the resume window" do
+      let(:b_param) do
+        FactoryBot.create(:b_param, creator:, origin: "register_flow", params: {bike: bike_params},
+          created_at: Time.current - BParam::RESUME_WINDOW - 1.day)
+      end
+
+      it "is not unfinished, and isn't in the scope" do
+        expect(b_param.unfinished_registration?).to be_falsey
+        expect(BParam.unfinished_registrations.pluck(:id)).to eq []
+        expect(creator.reload.alert_slugs).to eq []
+      end
+    end
+  end
 end
