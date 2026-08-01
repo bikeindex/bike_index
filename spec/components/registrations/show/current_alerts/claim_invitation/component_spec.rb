@@ -34,6 +34,23 @@ RSpec.describe Registrations::Show::CurrentAlerts::ClaimInvitation::Component, t
     end
   end
 
+  # Someone signed in who isn't the claimant still gets the pitch, but telling them to
+  # sign up would be telling them to make an account they have — ownerships#show says
+  # whose it is instead
+  context "signed in as someone else, arrived via the claim link" do
+    let(:current_user) { FactoryBot.create(:user_confirmed) }
+    let(:claim_message) { "new_registration" }
+
+    it "offers the claim button, without the sign-up instruction" do
+      render_inline(component)
+
+      expect(page).to have_text("registered your bike on Bike Index")
+      expect(page).to have_no_text("with the email address where you received")
+      expect(page).to have_link("Claim bike", href: "/ownerships/#{bike.current_ownership.id}")
+      expect(page).to have_no_link("Sign up")
+    end
+  end
+
   context "no claim message and not claimable" do
     it "does not render" do
       render_inline(component)

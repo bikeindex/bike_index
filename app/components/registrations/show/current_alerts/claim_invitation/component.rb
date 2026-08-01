@@ -26,10 +26,11 @@ module Registrations
 
           private
 
-          # Follows claim_path: a signed-in claimant claims outright, anyone else is
-          # being sent to sign up first
+          def signed_in? = @current_user.present?
+
+          # Follows claim_path — only someone without an account is being asked to make one
           def claim_button_text
-            return translation(".claim_bike_type", bike_type: @bike.type) if claimable?
+            return translation(".claim_bike_type", bike_type: @bike.type) if signed_in?
 
             translation(".sign_up_to_claim")
           end
@@ -46,10 +47,11 @@ module Registrations
             @bike.current_ownership
           end
 
-          # A signed-in claimant claims in one click; anyone else signs up against the
-          # ownership's email and returns to the claim link
+          # A signed-in claimant claims in one click, and one who isn't the claimant is
+          # told so there rather than being sent to sign up for an account they have.
+          # Signed out, they sign up against the ownership's email and come back here
           def claim_path
-            return ownership_path(ownership) if claimable?
+            return ownership_path(ownership) if signed_in?
 
             new_user_path(email: ownership.owner_email,
               return_to: registration_path(@bike, t: ownership.token, email: ownership.owner_email))

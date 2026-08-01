@@ -19,13 +19,20 @@
     </p>
   </div>
 
-  <p class="tw:mt-2">
-    <% if claimable? %>
+  <%#
+    Signed in, the button is the whole instruction — nobody with an account needs
+    telling to make one
+  %>
+
+  <% if claimable? %>
+    <p class="tw:mt-2">
       <%= translation(".claim_it_so_you_can_update_your_listing") %>
-    <% else %>
+    </p>
+  <% elsif !signed_in? %>
+    <p class="tw:mt-2">
       <%= translation(".to_see_your_bike_sign_up_html", bike_type: @bike.type, sign_up_link: link_to(translation(".sign_up"), claim_path, class: "twlink")) %>
-    <% end %>
-  </p>
+    </p>
+  <% end %>
 
   <div class="tw:mt-4">
     <%= render(UI::ButtonLink::Component.new(href: claim_path, text: claim_button_text, color: :purple)) %>
