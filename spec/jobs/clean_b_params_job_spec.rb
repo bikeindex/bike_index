@@ -23,5 +23,17 @@ RSpec.describe CleanBParamsJob, type: :job do
       expect { described_class.new.perform }.to change(BParam, :count).by(-2)
       expect(BParam.pluck(:id)).to match_array([b_param_with_values.id, b_param_with_recent_bike.id, b_param_blank_recent.id])
     end
+
+    context "with an e-vehicle acknowledgment" do
+      let!(:acknowledgment) do
+        FactoryBot.create(:registration_sequence_acknowledgment, b_param: b_param_with_bike, bike:)
+      end
+
+      it "sweeps the registration, leaving the acknowledgment record standing" do
+        expect { described_class.new.perform }.to change(BParam, :count).by(-2)
+        expect(acknowledgment.reload.bike_id).to eq bike.id
+        expect(acknowledgment.acknowledgment_text).to be_present # read off the sequence
+      end
+    end
   end
 end
