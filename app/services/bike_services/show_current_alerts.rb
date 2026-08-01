@@ -6,18 +6,14 @@ module BikeServices
   module ShowCurrentAlerts
     extend Functionable
 
-    Resolved = Data.define(:claim_message, :token, :token_type, :matching_notification, :recovered_stolen_record)
-
-    NONE = Resolved.new(nil, nil, nil, nil, nil)
-
     # The caller reads recovery_link_token from the session, deleting it so the prompt
     # shows once. The rest arrive as query params, and survive the bikes#show redirect
     def find(bike:, params:, recovery_link_token: nil)
-      token, token_type, notification = notification_for(bike:, params:)
+      token, token_type, matching_notification = notification_for(bike:, params:)
 
-      Resolved.new(claim_message: claim_message_for(bike:, claim_token: params[:t]),
-        token:, token_type:, matching_notification: notification,
-        recovered_stolen_record: recovered_stolen_record_for(bike:, recovery_link_token:))
+      {claim_message: claim_message_for(bike:, claim_token: params[:t]),
+       token:, token_type:, matching_notification:,
+       recovered_stolen_record: recovered_stolen_record_for(bike:, recovery_link_token:)}
     end
 
     #

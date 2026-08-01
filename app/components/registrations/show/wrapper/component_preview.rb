@@ -16,14 +16,14 @@ module Registrations
         # @param view select [consumer, org_admin]
         # @param bike_id text "Bike to render — defaults to one of the org's"
         def claim_invitation(view: "consumer", bike_id: nil)
-          page(view:, bike_id:) { alerts(claim_message: "new_registration") }
+          page(view:, bike_id:) { {claim_message: "new_registration"} }
         end
 
         # The recipient usually has no account yet, so this is the one most of them see
         # @param view select [consumer, org_admin]
         # @param bike_id text "Bike to render — defaults to one of the org's"
         def claim_invitation_signed_out(view: "consumer", bike_id: nil)
-          page(view:, bike_id:, current_user: nil) { alerts(claim_message: "new_registration") }
+          page(view:, bike_id:, current_user: nil) { {claim_message: "new_registration"} }
         end
 
         # @param view select [consumer, org_admin]
@@ -31,8 +31,8 @@ module Registrations
         def notification_token(view: "consumer", bike_id: nil)
           page(view:, bike_id:) do |bike|
             notification = parking_notification(bike) or next :missing
-            alerts(token: notification.retrieval_link_token, token_type: notification.kind,
-              matching_notification: notification)
+            {token: notification.retrieval_link_token, token_type: notification.kind,
+             matching_notification: notification}
           end
         end
 
@@ -41,8 +41,8 @@ module Registrations
         def graduated_notification(view: "consumer", bike_id: nil)
           page(view:, bike_id:) do |bike|
             notification = graduated_notification_for(bike) or next :missing
-            alerts(token: notification.marked_remaining_link_token,
-              token_type: "graduated_notification", matching_notification: notification)
+            {token: notification.marked_remaining_link_token,
+             token_type: "graduated_notification", matching_notification: notification}
           end
         end
 
@@ -53,7 +53,7 @@ module Registrations
             # Not the bike's own record: a stolen registration here is an unclaimed one,
             # which would stack SentToNewOwner's alert on top of the prompt being previewed
             stolen_record = bike.current_stolen_record || ::StolenRecord.unscoped.last or next :missing
-            alerts(recovered_stolen_record: stolen_record)
+            {recovered_stolen_record: stolen_record}
           end
         end
 
@@ -82,7 +82,7 @@ module Registrations
           bike = preview_bike(bike_id)
           return missing_notice("a bike") if bike.blank?
 
-          current_alerts = block_given? ? yield(bike) : alerts
+          current_alerts = block_given? ? yield(bike) : {}
           return missing_notice("the record this scenario needs") if current_alerts == :missing
 
           available_views = ::BikeServices::ShowViews.available(bike:, current_user:,
@@ -94,8 +94,6 @@ module Registrations
           render_with_template(template: "registrations/show/wrapper/preview/scenario",
             locals: {component:, offset_header: resolved.last.nil?})
         end
-
-        def alerts(**) = BikeServices::ShowCurrentAlerts::NONE.with(**)
 
         # ShowViews decides what this viewer may see; the param only picks which side of
         # that to show, so a preview can't put up a page the app never serves

@@ -12,7 +12,7 @@ module Registrations
 
         # org_role is what this renders as — a superadmin can view any org either way
         def initialize(bike:, current_user:, organization:, org_role:, available_views: [], bike_sticker: nil,
-          current_alerts: nil)
+          current_alerts: {})
           @bike = bike
           @current_user = current_user
           @organization = organization

@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe BikeServices::ShowCurrentAlerts do
-  let(:resolved) { described_class.find(bike:, params:, recovery_link_token:) }
+  let(:alerts) { described_class.find(bike:, params:, recovery_link_token:) }
   let(:params) { ActionController::Parameters.new }
   let(:recovery_link_token) { nil }
 
@@ -15,8 +15,8 @@ RSpec.describe BikeServices::ShowCurrentAlerts do
       let(:params) { ActionController::Parameters.new(t: ownership.token) }
 
       it "returns the ownership's claim message" do
-        expect(resolved.claim_message).to eq ownership.claim_message
-        expect(resolved.claim_message).to be_present
+        expect(alerts[:claim_message]).to eq ownership.claim_message
+        expect(alerts[:claim_message]).to be_present
       end
     end
 
@@ -24,13 +24,13 @@ RSpec.describe BikeServices::ShowCurrentAlerts do
       let(:params) { ActionController::Parameters.new(t: "#{ownership.token}x") }
 
       it "returns no claim message" do
-        expect(resolved.claim_message).to be_nil
+        expect(alerts[:claim_message]).to be_nil
       end
     end
 
     context "no token" do
       it "returns no claim message" do
-        expect(resolved.claim_message).to be_nil
+        expect(alerts[:claim_message]).to be_nil
       end
     end
 
@@ -39,7 +39,7 @@ RSpec.describe BikeServices::ShowCurrentAlerts do
       let(:params) { ActionController::Parameters.new(t: ownership.token) }
 
       it "returns no claim message" do
-        expect(resolved.claim_message).to be_nil
+        expect(alerts[:claim_message]).to be_nil
       end
     end
   end
@@ -50,17 +50,17 @@ RSpec.describe BikeServices::ShowCurrentAlerts do
     let(:params) { ActionController::Parameters.new(parking_notification_retrieved: notification.retrieval_link_token) }
 
     it "finds the notification and its kind" do
-      expect(resolved.matching_notification).to eq notification
-      expect(resolved.token_type).to eq notification.kind
-      expect(resolved.token).to eq notification.retrieval_link_token
+      expect(alerts[:matching_notification]).to eq notification
+      expect(alerts[:token_type]).to eq notification.kind
+      expect(alerts[:token]).to eq notification.retrieval_link_token
     end
 
     context "token doesn't match" do
       let(:params) { ActionController::Parameters.new(parking_notification_retrieved: "nope") }
 
       it "falls back to the default kind with no notification" do
-        expect(resolved.matching_notification).to be_nil
-        expect(resolved.token_type).to eq "parked_incorrectly_notification"
+        expect(alerts[:matching_notification]).to be_nil
+        expect(alerts[:token_type]).to eq "parked_incorrectly_notification"
       end
     end
 
@@ -69,7 +69,7 @@ RSpec.describe BikeServices::ShowCurrentAlerts do
       let(:params) { ActionController::Parameters.new(parking_notification_retrieved: other_notification.retrieval_link_token) }
 
       it "does not find it" do
-        expect(resolved.matching_notification).to be_nil
+        expect(alerts[:matching_notification]).to be_nil
       end
     end
   end
@@ -84,8 +84,8 @@ RSpec.describe BikeServices::ShowCurrentAlerts do
     let(:params) { ActionController::Parameters.new(graduated_notification_remaining: notification.marked_remaining_link_token) }
 
     it "finds the notification" do
-      expect(resolved.matching_notification).to eq notification
-      expect(resolved.token_type).to eq "graduated_notification"
+      expect(alerts[:matching_notification]).to eq notification
+      expect(alerts[:token_type]).to eq "graduated_notification"
     end
   end
 
@@ -95,14 +95,14 @@ RSpec.describe BikeServices::ShowCurrentAlerts do
     let(:recovery_link_token) { stolen_record.find_or_create_recovery_link_token }
 
     it "finds the stolen record" do
-      expect(resolved.recovered_stolen_record).to eq stolen_record
+      expect(alerts[:recovered_stolen_record]).to eq stolen_record
     end
 
     context "nonmatching token" do
       let(:recovery_link_token) { "nope" }
 
       it "finds nothing" do
-        expect(resolved.recovered_stolen_record).to be_nil
+        expect(alerts[:recovered_stolen_record]).to be_nil
       end
     end
 
@@ -116,7 +116,7 @@ RSpec.describe BikeServices::ShowCurrentAlerts do
 
       it "finds nothing — there's nothing left to recover" do
         expect(bike.reload.status_stolen?).to be_falsey
-        expect(resolved.recovered_stolen_record).to be_nil
+        expect(alerts[:recovered_stolen_record]).to be_nil
       end
     end
   end

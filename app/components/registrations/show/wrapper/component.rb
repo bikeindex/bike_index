@@ -8,9 +8,9 @@ module Registrations
       class Component < ApplicationComponent
         # Digest of the markup inside the cache block — the cached_markup_digest spec
         # keeps it current, following what this tree renders out into UI:: and elsewhere
-        MARKUP_DIGEST = "5233a3abbb57"
+        MARKUP_DIGEST = "97d4fd6c5ee2"
 
-        def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: nil)
+        def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: {})
           @bike = bike
           @current_user = current_user
           @view = view
@@ -38,7 +38,7 @@ module Registrations
           [MARKUP_DIGEST, @current_user&.id,
             @current_user&.registration_show_toggleable?, @current_user&.feature_registration_show_legacy?,
             BikeServices::ShowViews.view_param(@view), @bike_sticker&.id,
-            token_prompt && @current_alerts.to_h.values,
+            token_prompt && @current_alerts.sort,
             @bike.cache_key_with_version, *inner_component.try(:cache_version)]
         end
 

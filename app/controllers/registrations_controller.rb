@@ -71,7 +71,7 @@ class RegistrationsController < ApplicationController
   def current_alerts
     alerts = BikeServices::ShowCurrentAlerts.find(bike: @bike, params:,
       recovery_link_token: session.delete(:recovery_link_token))
-    if alerts.claim_message.present?
+    if alerts[:claim_message].present?
       session[:claim_token_email] = @bike.current_ownership.owner_email
     end
     alerts

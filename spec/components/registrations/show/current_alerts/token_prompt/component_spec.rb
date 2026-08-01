@@ -7,10 +7,10 @@ RSpec.describe Registrations::Show::CurrentAlerts::TokenPrompt::Component, type:
   let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
   let(:current_user) { nil }
   let(:variant) { :modal }
-  let(:current_alerts) { BikeServices::ShowCurrentAlerts::NONE }
+  let(:current_alerts) { {} }
 
   context "a recovery token" do
-    let(:current_alerts) { super().with(recovered_stolen_record: bike.current_stolen_record) }
+    let(:current_alerts) { {recovered_stolen_record: bike.current_stolen_record} }
 
     it "renders the recovery prompt, opened" do
       render_inline(component)
@@ -38,7 +38,7 @@ RSpec.describe Registrations::Show::CurrentAlerts::TokenPrompt::Component, type:
   context "when more than one prompt applies" do
     let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership, owner_email: "new-owner@example.com") }
     let(:current_alerts) do
-      super().with(claim_message: "new_registration", recovered_stolen_record: bike.current_stolen_record)
+      {claim_message: "new_registration", recovered_stolen_record: bike.current_stolen_record}
     end
 
     # Stacked dialogs would bury each other, so only the highest-precedence opens
@@ -53,7 +53,7 @@ RSpec.describe Registrations::Show::CurrentAlerts::TokenPrompt::Component, type:
   # The alert is the same prompt without the dialog, for once the dialog is dismissed
   context "the alert variant" do
     let(:variant) { :alert }
-    let(:current_alerts) { super().with(recovered_stolen_record: bike.current_stolen_record) }
+    let(:current_alerts) { {recovered_stolen_record: bike.current_stolen_record} }
 
     it "renders the prompt whole, with no dialog" do
       render_inline(component)

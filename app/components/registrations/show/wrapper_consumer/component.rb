@@ -8,7 +8,7 @@ module Registrations
 
         # owner: overrides the computed ownership, so the wrapper can force view_as
         def initialize(bike:, current_user:, show_for_sale: false, owner: nil, available_views: [], bike_sticker: nil,
-          current_alerts: nil)
+          current_alerts: {})
           @bike = bike
           @current_user = current_user
           @show_for_sale = show_for_sale

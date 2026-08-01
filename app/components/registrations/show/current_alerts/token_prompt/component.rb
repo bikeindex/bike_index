@@ -9,17 +9,18 @@ module Registrations
         class Component < ApplicationComponent
           # Only one, like the legacy overlays — stacked dialogs would bury each other.
           # Recovery beats a notification, and claiming is the fallback
-          def self.prompt_for(bike:, current_user: nil, current_alerts: nil, variant: :modal)
+          def self.prompt_for(bike:, current_user: nil, current_alerts: {}, variant: :modal)
             return if current_alerts.blank?
 
-            [RecoveryPrompt::Component.new(bike:, variant:, stolen_record: current_alerts.recovered_stolen_record),
-              NotificationToken::Component.new(bike:, variant:, token: current_alerts.token,
-                token_type: current_alerts.token_type, matching_notification: current_alerts.matching_notification),
+            [RecoveryPrompt::Component.new(bike:, variant:, stolen_record: current_alerts[:recovered_stolen_record]),
+              NotificationToken::Component.new(bike:, variant:, token: current_alerts[:token],
+                token_type: current_alerts[:token_type],
+                matching_notification: current_alerts[:matching_notification]),
               ClaimInvitation::Component.new(bike:, current_user:, variant:,
-                claim_message: current_alerts.claim_message)].find(&:render?)
+                claim_message: current_alerts[:claim_message])].find(&:render?)
           end
 
-          def initialize(bike:, current_user: nil, current_alerts: nil, variant: :modal)
+          def initialize(bike:, current_user: nil, current_alerts: {}, variant: :modal)
             @bike = bike
             @current_user = current_user
             @current_alerts = current_alerts
