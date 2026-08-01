@@ -44,3 +44,11 @@
     </div>
   <% end %>
 <% end %>
+
+<h2 class="uncap tw:mt-8 tw:mb-3 tw:text-xl">Preview</h2>
+
+<p class="tw:mb-3 tw:text-sm tw:text-gray-500">
+  What registrants see, in order.
+</p>
+
+<%= render Org::RegistrationSequence::Preview::Component.new(registration_sequence: @registration_sequence) %>

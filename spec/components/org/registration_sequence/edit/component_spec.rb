@@ -46,4 +46,13 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
     expect(page).to have_css("button[data-action~='ui--collapse#toggle'] [data-ui--collapse-target='chevron']", minimum: 1)
     expect(page).to have_css("[data-ui--collapse-target='content'][class*='hidden'] li", minimum: 1)
   end
+
+  it "previews the pages as registrants see them, by heading" do
+    registration_sequence.registration_sequence_pages.first.update!(heading: "Electric vehicle detected")
+    render_inline(described_class.new(registration_sequence:))
+
+    expect(page).to have_content("Preview")
+    # The page list shows the title; only the preview renders heading_text
+    expect(page).to have_css("h3", text: "Electric vehicle detected")
+  end
 end
