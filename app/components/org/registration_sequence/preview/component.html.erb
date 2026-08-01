@@ -11,15 +11,7 @@
       <% end %>
 
       <div class="tw:flex-1">
-        <% if page.heading_text.present? %>
-          <h3 class="uncap tw:text-lg tw:font-semibold">
-            <%= page.heading_text %>
-          </h3>
-        <% end %>
-
-        <% if page.subtitle.present? %>
-          <p class="tw:mb-2 tw:text-gray-600"><%= page.subtitle %></p>
-        <% end %>
+        <%= render UI::Header::Component.new(text: page.heading_text, subtitle: page.subtitle, tag: :h3, html_class: "uncap") %>
 
         <div class="tw:prose tw:max-w-none">
           <%= page.body&.html_safe %>

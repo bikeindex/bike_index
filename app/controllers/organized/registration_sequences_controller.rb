@@ -5,7 +5,7 @@ module Organized
     def index
       @draft = current_organization.registration_sequences.draft.first
       @active = RegistrationSequence.active_for(current_organization)
-      @previous = current_organization.registration_sequences.archived.order(end_at: :desc)
+      @previous = current_organization.registration_sequences.archived.order(end_at: :desc).to_a
     end
 
     # Read-only preview of a sequence (draft or live)

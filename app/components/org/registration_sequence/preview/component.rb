@@ -2,7 +2,7 @@
 
 module Org
   module RegistrationSequence
-    # Read-only renderer for a RegistrationSequence's pages, used by the org show (preview) view.
+    # Read-only renderer for a RegistrationSequence's pages.
     module Preview
       class Component < ApplicationComponent
         def initialize(registration_sequence:)
