@@ -8,7 +8,7 @@ module Registrations
       class Component < ApplicationComponent
         # Digest of the markup inside the cache block — the cached_markup_digest spec
         # keeps it current, following what this tree renders out into UI:: and elsewhere
-        MARKUP_DIGEST = "24cc9ac6d614"
+        MARKUP_DIGEST = "70a85bec4a23"
 
         def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: nil)
           @bike = bike
@@ -19,11 +19,12 @@ module Registrations
           @current_alerts = current_alerts
         end
 
-        # The token prompt renders outside the cache block — it's per-request, so
-        # caching it would serve one token-holder's modal to every later viewer
+        # The dialog renders outside the cache block — it's per-request, so caching it
+        # would serve one token-holder's modal to every later viewer. It's the prompt the
+        # key already resolved, rather than a second selection pass over the same tokens
         def call
           safe_join([
-            render(CurrentAlerts::TokenPrompt::Component.new(bike: @bike, current_user: @current_user, current_alerts: @current_alerts)),
+            token_prompt ? render(token_prompt) : "",
             capture { cache(cache_key) { concat(render(inner_component)) } }
           ])
         end

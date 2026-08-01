@@ -73,7 +73,7 @@ module Registrations
         def sent_to_new_owner(view: "consumer", bike_id: nil)
           # This one is the registration's own state rather than a token, so it needs an
           # unclaimed ownership and the owner's view of it
-          page(view:, bike_id: bike_id.presence || unclaimed_bike&.id)
+          page(view:, bike_id: bike_id.presence || bike_with_ownership(claimed: false)&.id)
         end
 
         private
@@ -113,7 +113,7 @@ module Registrations
         # Claimed by default: SentToNewOwner raises itself off an unclaimed registration,
         # so an unclaimed one would stack that alert onto every other scenario
         def preview_bike(bike_id)
-          ::Bike.unscoped.find_by(id: bike_id) || claimed_bike
+          ::Bike.unscoped.find_by(id: bike_id) || bike_with_ownership(claimed: true)
         end
 
         def org_bikes
@@ -132,14 +132,6 @@ module Registrations
         def bike_sticker(bike_id)
           assigned = ::BikeSticker.where.not(bike_id: nil)
           (bike_id.present? ? assigned.where(bike_id:).last : nil) || assigned.last
-        end
-
-        def unclaimed_bike
-          bike_with_ownership(claimed: false)
-        end
-
-        def claimed_bike
-          bike_with_ownership(claimed: true)
         end
 
         def bike_with_ownership(claimed:)
