@@ -46,8 +46,10 @@ class ApplicationComponent < ViewComponent::Base
     # identifier. Previews render outside the cache block, so their markup can't go stale —
     # and the components only they render aren't cached markup either.
     def component_files(component)
-      Pathname.new(component.identifier).dirname.glob("**/*").select(&:file?)
-        .reject { |file| file.to_s.match?(%r{/(component_)?preview(\.rb|/)}) }
+      directory = Pathname.new(component.identifier).dirname
+      directory.glob("**/*").select(&:file?).reject do |file|
+        file.relative_path_from(directory).each_filename.any? { |part| part.include?("preview") }
+      end
     end
 
     # Component references resolve the way Ruby resolves them — Registrations::Show::Wrapper

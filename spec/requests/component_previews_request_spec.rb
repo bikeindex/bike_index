@@ -25,34 +25,34 @@ RSpec.describe "ComponentPreviews", type: :request do
     expect(response.body).to include("bike.jpg")
   end
 
-  # One scenario per state the claim-impound card reaches, each resolving its own records
-  describe "impound claim scenarios" do
-    let(:base_url) { "/rails/view_components/registrations/show/wrapper/component" }
+  # One preview per state the claim-impound card reaches, each resolving its own records
+  describe "impound claim previews" do
+    let(:base_url) { "/rails/view_components/registrations/show/wrapper/claim_impound" }
     let!(:impound_record) { FactoryBot.create(:impound_record) }
     let!(:stolen_bike) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed) }
 
-    def preview(scenario)
-      get "#{base_url}/#{scenario}"
+    def preview(state)
+      get "#{base_url}/#{state}/default"
       expect(response.status).to eq 200
       expect(response.body).to_not match("Nothing to preview")
       whitespace_normalized_body_text
     end
 
     it "renders the states a viewer without a claim reaches" do
-      expect(preview("claim_impound")).to match("Claim found bike")
-      expect(preview("claim_impound_signed_out")).to match("Claim found bike")
-      expect(preview("claim_impound_no_stolen_bike")).to match("need a stolen bike")
+      expect(preview("with_stolen_registration")).to match("Claim found bike")
+      expect(preview("signed_out")).to match("Claim found bike")
+      expect(preview("without_stolen_registration")).to match("need a stolen bike")
     end
 
     it "renders the claim's own states once the viewer has one" do
       impound_claim = FactoryBot.create(:impound_claim_with_stolen_record, impound_record:)
-      expect(preview("claim_impound_unsubmitted")).to match("Save message")
+      expect(preview("unsubmitted")).to match("Save message")
 
       impound_claim.update(status: "submitting")
-      expect(preview("claim_impound_submitted")).to match("This claim was submitted")
+      expect(preview("submitted")).to match("This claim was submitted")
 
       impound_claim.update(status: "approved")
-      expect(preview("claim_impound_approved")).to match("Your claim was approved")
+      expect(preview("approved")).to match("Your claim was approved")
     end
 
     # The submitting bike is normally the claimant's own, and the card is never shown to
@@ -62,8 +62,7 @@ RSpec.describe "ComponentPreviews", type: :request do
       stolen_record = FactoryBot.create(:stolen_record, bike: submitting)
       FactoryBot.create(:impound_claim, stolen_record:, user: FactoryBot.create(:user_confirmed))
 
-      expect(preview("claim_impound_submitted_with_this_bike"))
-        .to match("You have a pending claim with this bike")
+      expect(preview("submitted_with_this_bike")).to match("You have a pending claim with this bike")
     end
   end
 
