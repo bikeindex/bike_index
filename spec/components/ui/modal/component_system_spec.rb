@@ -41,6 +41,22 @@ RSpec.describe UI::Modal::Component, :js, type: :system do
     expect(page).to have_no_current_path(/modal_settings-modal/, url: true)
   end
 
+  # Nothing else reaches the fallback: the browser these run in takes the native path every
+  # time, so without this the listeners the older half of the world depends on go unexercised.
+  it "opens and closes through the controller's listeners without invoker commands" do
+    emulate_browser_without_invoker_commands
+    visit("/rails/view_components/ui/modal/component/default")
+
+    click_button "Open Settings"
+    expect(page).to have_css("dialog#settings-modal[open]")
+    expect(page).to have_text("Modal body content")
+    expect(page).to have_current_path(/modal_settings-modal=1/, url: true)
+
+    find('button[aria-label="Close"]').click
+    expect(page).to have_no_css("dialog[open]")
+    expect(page).to have_no_current_path(/modal_settings-modal/, url: true)
+  end
+
   it "opens a server-opened modal on load, without adding the param" do
     visit("/rails/view_components/ui/modal/component/open_on_connect")
 

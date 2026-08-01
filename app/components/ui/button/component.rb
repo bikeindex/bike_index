@@ -53,7 +53,7 @@ module UI
         [BASE_CLASSES, html_class, *extras, COLORS[color], ACTIVE_COLORS[color]].compact.join(" ")
       end
 
-      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, disabled: false, spinner: false, data: {}, aria: {})
+      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, disabled: false, spinner: false, data: {}, aria: {}, **html_options)
         @text = text
         @color = COLORS.key?(color) ? color : :secondary
         @kind = KINDS.include?(kind&.to_sym) ? kind.to_sym : KINDS.first
@@ -63,13 +63,15 @@ module UI
         @spinner = spinner
         @data = data
         @aria = aria
+        @html_options = html_options
 
         @size = SIZES.key?(size) ? size : :md
         raise ArgumentError, "size is not supported for link color" if @color == :link && @size != :md
       end
 
+      # html_options first, so the component's own attributes can't be overwritten
       def call
-        content_tag(:button, safe_join([spinner_span, @text || content].compact), class: button_classes, type: (@kind == :submit) ? "submit" : "button", disabled: @disabled, data: button_data, aria: @aria, **invoker_attributes)
+        content_tag(:button, safe_join([spinner_span, @text || content].compact), **@html_options, class: button_classes, type: (@kind == :submit) ? "submit" : "button", disabled: @disabled, data: button_data, aria: @aria)
       end
 
       def button_classes
@@ -77,14 +79,6 @@ module UI
       end
 
       private
-
-      # A [data-open-modal] trigger already names its dialog, so say the same thing in the
-      # platform's own words: a browser with invoker commands opens it without waiting for
-      # ui--modal to load. Everything else still goes through the controller's click listener.
-      def invoker_attributes
-        modal_id = @data[:open_modal] || @data["open_modal"]
-        modal_id.present? ? {commandfor: modal_id, command: "show-modal"} : {}
-      end
 
       def button_data
         data = @data.merge(active: @active || nil)

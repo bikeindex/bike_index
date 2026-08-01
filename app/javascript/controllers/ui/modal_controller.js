@@ -12,10 +12,8 @@ export default class extends Controller {
 
   connect () {
     if (!SUPPORTS_INVOKERS) {
-      this.boundOpen = this.openFromTrigger.bind(this)
-      this.boundClose = this.close.bind(this)
-      this.triggers.forEach(el => el.addEventListener('click', this.boundOpen))
-      this.closers.forEach(el => el.addEventListener('click', this.boundClose))
+      this.boundInvoke = this.invokeFallback.bind(this)
+      this.invokers.forEach(el => el.addEventListener('click', this.boundInvoke))
     }
     // Already open means an invoker got here before this controller loaded
     if (this.element.open || this.paramInUrl) this.open()
@@ -25,8 +23,7 @@ export default class extends Controller {
   disconnect () {
     if (SUPPORTS_INVOKERS) return
 
-    this.triggers.forEach(el => el.removeEventListener('click', this.boundOpen))
-    this.closers.forEach(el => el.removeEventListener('click', this.boundClose))
+    this.invokers.forEach(el => el.removeEventListener('click', this.boundInvoke))
   }
 
   // The browser's own show-modal, which fires before it opens the dialog - so this takes
@@ -39,8 +36,12 @@ export default class extends Controller {
     this.lockScroll()
   }
 
-  openFromTrigger (event) {
-    this.markTrigger(event.currentTarget)
+  // Stands in for the browser, dispatching on the command it would have run
+  invokeFallback (event) {
+    const invoker = event.currentTarget
+    if (invoker.getAttribute('command') === 'close') return this.close()
+
+    this.markTrigger(invoker)
     this.open()
   }
 
@@ -106,11 +107,8 @@ export default class extends Controller {
     window.history.replaceState(window.history.state, '', url)
   }
 
-  get triggers () {
-    return document.querySelectorAll(`[data-open-modal="${this.element.id}"]`)
-  }
-
-  get closers () {
-    return this.element.querySelectorAll('[command="close"]')
+  // Every button aimed at this dialog, open and close alike
+  get invokers () {
+    return document.querySelectorAll(`[commandfor="${this.element.id}"]`)
   }
 }

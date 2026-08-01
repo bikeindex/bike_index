@@ -158,13 +158,19 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
-  context "with data-open-modal" do
-    let(:options) { {text: "Open", data: {open_modal: "settings-modal"}} }
+  context "with invoker attributes" do
+    let(:options) { {text: "Open", commandfor: "settings-modal", command: "show-modal"} }
 
-    # So a browser with invoker commands opens the dialog without waiting for ui--modal
-    it "says the same thing with the native invoker attributes" do
-      expect(component).to have_css("button[data-open-modal='settings-modal']")
+    it "passes them through" do
       expect(component).to have_css("button[commandfor='settings-modal'][command='show-modal']")
+    end
+  end
+
+  context "with an html_option the component sets itself" do
+    let(:options) { {text: "Open", type: "submit"} }
+
+    it "keeps its own" do
+      expect(component).to have_css("button[type='button']")
     end
   end
 

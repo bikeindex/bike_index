@@ -79,7 +79,21 @@ module SystemSpecHelpers
   def open_modal(trigger)
     element = trigger.is_a?(Capybara::Node::Element) ? trigger : find(trigger)
     retry_on_detach { element.click }
-    expect(page).to have_css("##{element["data-open-modal"]}[open]")
+    expect(page).to have_css("##{element["commandfor"]}[open]")
+  end
+
+  # Make the page look like a browser from before invoker commands: the controller's detect
+  # says no, and the browser's own activation behaviour is cancelled, so only the fallback
+  # listeners act. Runs before any script on the page, which is when the detect is read.
+  def emulate_browser_without_invoker_commands
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.add_init_script(script: <<~JS)
+        delete HTMLButtonElement.prototype.commandForElement
+        document.addEventListener("click", (event) => {
+          if (event.target.closest("[commandfor]")) event.preventDefault()
+        }, true)
+      JS
+    end
   end
 
   private
