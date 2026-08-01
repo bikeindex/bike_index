@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Registrations::Show::ClaimImpound::Component, type: :component do
+RSpec.describe Registrations::Show::CurrentAlerts::ClaimImpound::Component, type: :component do
   let(:component) { described_class.new(bike:, current_user:, owner: false) }
   let(:bike) { FactoryBot.create(:impound_record, :with_organization).bike.reload }
 

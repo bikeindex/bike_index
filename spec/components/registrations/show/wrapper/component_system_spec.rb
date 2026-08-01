@@ -10,7 +10,10 @@ RSpec.describe Registrations::Show::Wrapper::Component, :js, type: :system do
   # Text that only appears once that alert rendered, keyed by the component's directory
   # so the keys can be checked against what's on disk
   let(:alert_text) do
-    {"claim_invitation" => "registered your bike on Bike Index",
+    # The card's heading is uppercased in CSS, so this anchors on its body - the lookbook
+    # user has no stolen registration to offer
+    {"claim_impound" => "You need a stolen bike registered",
+     "claim_invitation" => "registered your bike on Bike Index",
      "notification_token" => "Mark bike retrieved",
      "recovery_prompt" => "Mark your bike recovered!",
      "scanned_sticker" => "You scanned",
@@ -31,6 +34,9 @@ RSpec.describe Registrations::Show::Wrapper::Component, :js, type: :system do
       owner_email: "new-owner@example.com")
   end
   let!(:stolen_bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
+  # Its own bike, with no ownership - so the scenarios resolving a claimed registration
+  # don't land on the one carrying the claim card
+  let!(:impound_record) { FactoryBot.create(:impound_record) }
   let!(:parking_notification) { FactoryBot.create(:parking_notification, organization:, bike: claimed_bike) }
   let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: claimed_bike, organization:) }
 

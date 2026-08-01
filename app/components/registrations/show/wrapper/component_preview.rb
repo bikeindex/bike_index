@@ -66,6 +66,16 @@ module Registrations
           page(view:, bike_id:, bike_sticker: sticker)
         end
 
+        # Only ever offered to someone who isn't the owner, so it previews the public
+        # view rather than whatever the lookbook user is entitled to
+        # @param bike_id text "Bike to render — defaults to a claimable found one"
+        def claim_impound(bike_id: nil)
+          bike_id = bike_id.presence || claimable_impound_bike&.id
+          return missing_notice("a found registration to claim") if bike_id.blank?
+
+          page(view: "consumer", bike_id:, as_view: [:public, nil])
+        end
+
         # @param view select [consumer, org_admin]
         # @param bike_id text "Bike to render — defaults to one awaiting a claim"
         def sent_to_new_owner(view: "consumer", bike_id: nil)
@@ -75,8 +85,9 @@ module Registrations
 
         private
 
-        # The block builds the alerts off the resolved bike, or returns :missing
-        def page(view:, bike_id:, bike_sticker: nil, current_user: lookbook_user)
+        # The block builds the alerts off the resolved bike, or returns :missing.
+        # as_view pins the perspective for a scenario that only makes sense in one
+        def page(view:, bike_id:, bike_sticker: nil, current_user: lookbook_user, as_view: nil)
           return production_notice if Rails.env.production?
 
           bike = preview_bike(bike_id)
@@ -87,7 +98,7 @@ module Registrations
 
           available_views = ::BikeServices::ShowViews.available(bike:, current_user:,
             organization: lookbook_organization)
-          resolved = resolved_view(view, available_views, bike:, current_user:)
+          resolved = as_view || resolved_view(view, available_views, bike:, current_user:)
           component = Component.new(bike:, current_user:, view: resolved, available_views:,
             bike_sticker:, current_alerts:)
 
@@ -125,6 +136,12 @@ module Registrations
         def bike_sticker(bike_id)
           assigned = ::BikeSticker.where.not(bike_id: nil)
           (bike_id.present? ? assigned.where(bike_id:).last : nil) || assigned.last
+        end
+
+        # An organization's impound record can't be claimed, so only unorganized ones
+        # raise the card
+        def claimable_impound_bike
+          ::ImpoundRecord.active.unorganized.last&.bike
         end
 
         def bike_with_ownership(claimed:)

@@ -25,6 +25,56 @@ RSpec.describe "ComponentPreviews", type: :request do
     expect(response.body).to include("bike.jpg")
   end
 
+  # One scenario per state the claim-impound card reaches, each resolving its own records
+  describe "impound claim card" do
+    let(:base_url) { "/rails/view_components/registrations/show/current_alerts/claim_impound/component" }
+    let!(:impound_record) { FactoryBot.create(:impound_record) }
+    let!(:stolen_bike) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed) }
+
+    def preview(scenario)
+      get "#{base_url}/#{scenario}"
+      expect(response.status).to eq 200
+      expect(response.body).to_not match("Nothing to preview")
+      whitespace_normalized_body_text
+    end
+
+    it "renders the states a viewer without a claim reaches" do
+      expect(preview("signed_out")).to match("Claim found bike")
+      expect(preview("open_claim")).to match("Claim found bike")
+      expect(preview("no_stolen_bike")).to match("need a stolen bike")
+    end
+
+    it "renders the claim's own states once the viewer has one" do
+      impound_claim = FactoryBot.create(:impound_claim_with_stolen_record, impound_record:)
+      expect(preview("claim_unsubmitted")).to match("Save message")
+
+      impound_claim.update(status: "submitting")
+      expect(preview("claim_submitted")).to match("This claim was submitted")
+
+      impound_claim.update(status: "approved")
+      expect(preview("claim_approved")).to match("Your claim was approved")
+    end
+
+    # The submitting bike is normally the claimant's own, and the card is never shown to
+    # an owner - so reaching this state needs one registered by somebody else
+    it "points the bike a claim was submitted with at the bike it claims" do
+      submitting = FactoryBot.create(:bike, :with_ownership, owner_email: "someone-else@example.com")
+      stolen_record = FactoryBot.create(:stolen_record, bike: submitting)
+      FactoryBot.create(:impound_claim, stolen_record:, user: FactoryBot.create(:user_confirmed))
+
+      expect(preview("submitted_with_this_bike")).to match("You have a pending claim with this bike")
+    end
+
+    it "renders a notice rather than a real claim in production" do
+      allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("production"))
+
+      rendered = Registrations::Show::CurrentAlerts::ClaimImpound::ComponentPreview.new.signed_out
+
+      expect(rendered[:component]).to be_a(UI::Alert::Component)
+      expect(rendered[:component].instance_variable_get(:@text)).to match("disabled in production")
+    end
+  end
+
   # These render a persisted bike rather than an in-memory one, so they're the previews
   # with something to lose if they ever ran against real data
   describe "registration show overlays" do
