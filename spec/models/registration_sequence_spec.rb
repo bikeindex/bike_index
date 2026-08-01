@@ -27,18 +27,27 @@ RSpec.describe RegistrationSequence, type: :model do
   describe ".draft_for" do
     let(:organization) { FactoryBot.create(:organization) }
 
-    it "builds a draft cloning the template pages" do
+    it "builds a draft cloning the template pages and its acknowledgment settings" do
       template = RegistrationSequence.template
-      template.registration_sequence_pages.create!(title: "Battery", subtitle: "Charge safely", body: "<p>Hello</p>", listing_order: 0)
+      template.update!(faq_url: "https://example.com/faq", acknowledgment_text: "agree to everything")
+      template.registration_sequence_pages.create!(title: "Battery", subtitle: "Charge safely",
+        heading: "Looks like you have an e-vehicle!", body: "<p>Hello</p>", listing_order: 0,
+        organization_specific: true)
 
       draft = RegistrationSequence.draft_for(organization)
 
       expect(draft).to be_draft
-      expect(draft.organization).to eq(organization)
+      expect(draft).to have_attributes(organization:, faq_url: "https://example.com/faq",
+        acknowledgment: "agree to everything")
       page = draft.registration_sequence_pages.first
-      expect(page.title).to eq("Battery")
-      expect(page.subtitle).to eq("Charge safely")
-      expect(page.body).to eq("<p>Hello</p>")
+      expect(page).to have_attributes(title: "Battery", subtitle: "Charge safely",
+        heading: "Looks like you have an e-vehicle!", body: "<p>Hello</p>",
+        organization_specific: true)
+    end
+
+    it "falls back to the default acknowledgment when the template has none" do
+      expect(RegistrationSequence.draft_for(organization).acknowledgment)
+        .to eq RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT
     end
 
     it "duplicates template page images into independent blobs" do
@@ -75,6 +84,58 @@ RSpec.describe RegistrationSequence, type: :model do
 
         expect(RegistrationSequence.draft_for(organization)).to eq(existing)
       end
+    end
+  end
+
+  describe "immutability once activated" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:sequence) { FactoryBot.create(:registration_sequence, :with_pages, organization:) }
+    let(:page) { sequence.registration_sequence_pages.first }
+
+    it "is editable as a draft, frozen once active, and archivable after" do
+      expect(sequence.update(acknowledgment_text: "still a draft")).to be_truthy
+      expect(page.update(title: "still a draft")).to be_truthy
+      expect(sequence.reorder_page!(page, 1)).to_not eq false
+
+      expect(sequence.make_active!).to be_truthy
+
+      # An acknowledgment points at these by id, so they can't move under it
+      expect(sequence.reload.update(acknowledgment_text: "changed")).to be_falsey
+      expect(sequence.errors.full_messages.to_sentence).to match(/can't be edited/)
+      expect(sequence.reload.acknowledgment_text).to eq "still a draft"
+
+      expect(page.reload.update(title: "changed")).to be_falsey
+      expect(page.reload.title).to eq "still a draft"
+      expect(page.destroy).to be_falsey
+      # update_all skips callbacks, so reorder guards itself
+      expect(sequence.reorder_page!(page, 1)).to eq false
+
+      # Adding a page would rewrite what past registrants agreed to
+      expect(RegistrationSequencePage.create(registration_sequence: sequence, title: "Added later"))
+        .to_not be_persisted
+
+      # Archiving is the one change activation still allows
+      expect(sequence.reload.update(end_at: Time.current)).to be_truthy
+      expect(sequence.reload).to be_archived
+    end
+
+    it "allows a sequence created together with its pages - nothing can have acknowledged it yet" do
+      born_active = FactoryBot.create(:registration_sequence_active, :with_pages,
+        organization: FactoryBot.create(:organization))
+
+      expect(born_active).to be_active
+      expect(born_active.registration_sequence_pages.count).to eq 2
+    end
+
+    it "is soft-deleted with its organization, keeping its pages readable" do
+      sequence.make_active!
+
+      expect { organization.destroy }.to_not change(RegistrationSequencePage, :count)
+      # Out of the live scope, but still there for the acknowledgments that reference it
+      expect(RegistrationSequence.find_by(id: sequence.id)).to be_nil
+      deleted = RegistrationSequence.with_deleted.find(sequence.id)
+      expect(deleted.deleted_at).to be_present
+      expect(deleted.registration_sequence_pages.count).to eq 2
     end
   end
 

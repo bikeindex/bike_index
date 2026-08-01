@@ -4,8 +4,9 @@ module Register
   module Step1
     # Step 1 of the registration flow: the quick-start form
     class Component < ApplicationComponent
-      def initialize(b_param:, current_user: nil)
+      def initialize(b_param:, sequence: nil, current_user: nil)
         @b_param = b_param
+        @sequence = sequence
         @current_user = current_user
       end
 
@@ -46,9 +47,9 @@ module Register
         CycleType.slug_translation_hash_lowercase_short
       end
 
-      # Only anonymous registrants have anything to wait on
+      # Only an address the registrant hasn't proven is theirs has anything to wait on
       def confirmation_email_pending?
-        @current_user.blank?
+        !@b_param.self_made?(@current_user)
       end
 
       # Step 1 is only revisitable once submitted, so this is a return from step 2

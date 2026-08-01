@@ -9,7 +9,7 @@ name: Review App
 #   - workflow_dispatch   : operator clicks "Run workflow" in Actions UI, OR
 #                           ci.yml dispatches a deploy on push when the PR has
 #                           the 'review-app' label (ci.yml's `dispatch` job)
-#   - pull_request closed : auto-destroy if the 'review-app' label is set
+#   - pull_request closed : auto-destroy, whether or not the label is set
 #
 # There is deliberately NO `pull_request: synchronize` trigger — label-gating it
 # leaves skipped check runs on every push to every unlabeled PR. ci.yml's
@@ -52,10 +52,8 @@ env:
 jobs:
   resolve:
     name: Resolve PR
-    # Skip the runner entirely for unlabeled PR events (`closed` fires for every
-    # PR). The label literal can't reference env.REVIEW_LABEL — the env context
-    # isn't available in job-level `if`.
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'review-app')
+    # Every closed PR runs destroy, label or not — the deploy path's `--add-label`
+    # is best-effort, so an app can be live with no label on it (docs/review-apps.md).
     runs-on: ubuntu-latest
     outputs:
       pr_number: ${{ steps.set.outputs.pr_number }}
@@ -88,7 +86,6 @@ jobs:
             head_sha="$PR_HEAD_SHA_EVENT"
             title=""  # destroy doesn't render the banner, so no title needed
             action="destroy"  # `closed` is the only pull_request trigger
-            # Label presence is enforced by this job's `if:`.
             if [[ "$PR_HEAD_REPO_EVENT" != "$REPO" ]]; then
               echo "PR #$pr is from a fork ($PR_HEAD_REPO_EVENT); skipping auto-trigger."
               proceed=false
@@ -204,8 +201,15 @@ jobs:
       # Each push built a `pr-<N>-<sha>` image; delete every version for this PR so
       # closed PRs don't accumulate images in GHCR. Matches on the trailing dash so
       # `pr-12-` never catches `pr-123-`. Best-effort.
+      # Skipped for an unlabeled close: the listing below paginates every version of
+      # the whole package, and only a PR that deployed — which is what labels it —
+      # has anything to delete. A deploy whose `--add-label` failed leaks its images,
+      # which is what the untagged-version prune in docs/review-apps.md is for.
       - name: Delete PR images from GHCR
-        if: needs.resolve.outputs.action == 'destroy' && needs.op.result == 'success'
+        if: >-
+          needs.resolve.outputs.action == 'destroy' && needs.op.result == 'success' &&
+          (github.event_name == 'workflow_dispatch' ||
+           contains(github.event.pull_request.labels.*.name, 'review-app'))
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ needs.resolve.outputs.pr_number }}

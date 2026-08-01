@@ -4,6 +4,7 @@ require "rails_helper"
 
 RSpec.describe "Register flow", :js, type: :system do
   let(:owner_email) { "owner@bikeindex.org" }
+  let(:user_name) { "Sally Rider" }
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
   let!(:red) { FactoryBot.create(:color, name: "Red") }
   let!(:blue) { FactoryBot.create(:color, name: "Blue") }
@@ -13,6 +14,15 @@ RSpec.describe "Register flow", :js, type: :system do
     # The manufacturer combobox autocompletes against the redis index
     Autocomplete::Loader.clear_redis
     Autocomplete::Loader.load_all(%w[Manufacturer])
+  end
+
+  def sign_in(user)
+    visit new_session_path
+    fill_in "Email", with: user.email
+    click_button "Continue"
+    fill_in "Password", with: "testthisthing7$"
+    click_button "Log in"
+    expect(page).to have_current_path("/my_account", wait: 5)
   end
 
   # Through step 1 and onto step 2, the way a rider gets there
@@ -51,14 +61,14 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_field("b_param[owner_email]", with: owner_email)
 
     # Coming back from step 2 offers starting over - dismissing keeps the registration
-    click_button "Start over"
+    open_modal(find_button("Start over"))
     find("#start-over-modal [aria-label='Close']").click
     click_button "Next"
     expect(page).to have_current_path(details_url, url: true)
 
     # Confirming abandons it for a blank registration, which has nothing to start over from
     click_link "Back"
-    click_button "Start over"
+    open_modal(find_button("Start over"))
     click_link "Yes, start over"
     expect(page).to have_field("b_param[owner_email]", with: "")
     expect(page).to have_no_button("Start over")
@@ -72,6 +82,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
     # Fill every field: text, chip radio, unit select, comboboxes (including the
     # collapsed additional-color rows) and the missing-serial checkbox
+    fill_in "bike[user_name]", with: user_name
     fill_in "bike[frame_model]", with: "Marlin 7"
     fill_in "bike[year]", with: "2023"
     type_into("#bike_primary_frame_color_id", "Red")
@@ -92,6 +103,7 @@ RSpec.describe "Register flow", :js, type: :system do
     # Nothing submitted yet - the reload restores the whole draft from form-persist
     visit details_url
 
+    expect(page).to have_field("bike[user_name]", with: user_name)
     expect(page).to have_field("bike[frame_model]", with: "Marlin 7")
     expect(page).to have_field("bike[year]", with: "2023")
     expect(page).to have_field("bike_primary_frame_color_id", with: "Red")
@@ -146,7 +158,7 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_content("Registration saved")
     expect(page).to have_content("verify your email")
     b_param = BParam.last
-    expect(b_param.bike).to include("frame_model" => "Marlin 7", "year" => "2023",
+    expect(b_param.bike).to include("user_name" => user_name, "frame_model" => "Marlin 7", "year" => "2023",
       "primary_frame_color_id" => red.id.to_s, "secondary_frame_color_id" => blue.id.to_s,
       "tertiary_frame_color_id" => green.id.to_s, "frame_size" => "m",
       "serial_number" => "made_without_serial", "phone" => "(555) 000-0000",
@@ -154,6 +166,42 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(BikeServices::Register.send(:details_completed?, b_param)).to be_truthy
     expect(ActiveStorage::Blob.find_signed!(b_param.image_signed_id).filename.to_s)
       .to eq "bike_photo-landscape.jpeg"
+  end
+
+  describe "signed in" do
+    let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
+    let(:friend_email) { "friend@bikeindex.org" }
+
+    before { sign_in(current_user) }
+
+    it "asks for a name once the registration is going to someone other than them" do
+      # Step 1 prefills their own address, which their account is already the name for
+      start_registration
+      expect(page).to have_no_field("bike[user_name]")
+
+      # Sending it somewhere else is what asks - step 1 is where that's decided
+      click_link "Back"
+      fill_in "b_param[owner_email]", with: friend_email
+      click_button "Next"
+      expect(page).to have_field("bike[user_name]")
+
+      type_into("#bike_primary_frame_color_id", "Red")
+      click_combobox_option("Red")
+      fill_in "bike[serial_number]", with: "GIFT1234"
+
+      # Required, so the browser holds the submit without any js of ours
+      click_button "Complete Bike Registration"
+      expect(page).to have_current_path(/step=2/, url: true)
+      expect(Bike.count).to eq 0
+
+      fill_in "bike[user_name]", with: user_name
+      click_button "Complete Bike Registration"
+
+      expect(page).to have_content("Registration complete")
+      # Their friend's registration to claim, not theirs
+      expect(page).to have_content("We've emailed #{friend_email} so they can claim")
+      expect(Bike.last).to have_attributes(owner_email: friend_email, owner_name: user_name)
+    end
   end
 
   # The Disk service answers instantly, so what happens between picking a file and the blob
@@ -172,6 +220,7 @@ RSpec.describe "Register flow", :js, type: :system do
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
       fill_in "bike[serial_number]", with: "HELD1234"
+      fill_in "bike[user_name]", with: user_name # anonymous, so it's asked for
       click_button "Complete Bike Registration"
     end
 
@@ -230,14 +279,7 @@ RSpec.describe "Register flow", :js, type: :system do
     let(:image_path) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
     let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
 
-    before do
-      visit new_session_path
-      fill_in "Email", with: current_user.email
-      click_button "Continue"
-      fill_in "Password", with: "testthisthing7$"
-      click_button "Log in"
-      expect(page).to have_current_path("/my_account", wait: 5)
-    end
+    before { sign_in(current_user) }
 
     it "PUTs the photo to the bucket and serves it from the storage domain" do
       start_registration
@@ -267,6 +309,87 @@ RSpec.describe "Register flow", :js, type: :system do
       response = Faraday.get(public_image.image_url)
       expect(response.status).to eq 200
       expect(response.body.bytesize).to eq File.size(image_path)
+    end
+  end
+
+  context "e-vehicle with an organization's safety rules" do
+    let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+    # Built as a draft and activated below, since activation freezes the pages
+    let(:sequence) do
+      FactoryBot.create(:registration_sequence, organization:,
+        acknowledgment_text: "agree to comply with all of the rules above.")
+    end
+    let!(:battery_page) do
+      FactoryBot.create(:registration_sequence_page, registration_sequence: sequence, listing_order: 0,
+        title: "Battery & charging", subtitle: "Unsafe charging is the biggest cause of e-bike fires.",
+        body: "<ul><li>Charge with the manufacturer's charger</li><li>Report a swollen battery</li></ul>")
+    end
+    let!(:campus_page) do
+      FactoryBot.create(:registration_sequence_page, registration_sequence: sequence, listing_order: 1,
+        title: "Campus rules", body: "<ul><li>Dismount in posted zones</li></ul>",
+        organization_specific: true)
+    end
+
+    before { sequence.make_active! }
+
+    it "gates each page of rules, then the acknowledgment, before completing" do
+      visit "/register/new?organization_id=#{organization.slug}"
+
+      type_into("#b_param_manufacturer_id", "Surly")
+      click_combobox_option("Surly")
+      check "Electric (motorized)"
+      fill_in "b_param[owner_email]", with: owner_email
+      click_button "Next"
+
+      fill_in "bike[user_name]", with: user_name
+      type_into("#bike_primary_frame_color_id", "Red")
+      click_combobox_option("Red")
+      fill_in "bike[serial_number]", with: "XYZ 123"
+      # The safety pages come next, so step 2 no longer finishes the registration
+      click_button "Next"
+
+      expect(page).to have_content("Battery & charging")
+      expect(page).to have_content("Electric (motorized) detected")
+      expect(page).to have_content("E-Vehicle Acknowledgment · Step 1 of 3")
+      expect(page).to have_button("Continue", disabled: true)
+
+      check "Charge with the manufacturer's charger"
+      expect(page).to have_button("Continue", disabled: true)
+      check "Report a swollen battery"
+      click_button "Continue"
+
+      expect(page).to have_content("Campus rules")
+      # The organization owns this page's rules, so they carry its name
+      expect(page).to have_content("Brakebills")
+      check "Dismount in posted zones"
+      click_button "Continue"
+
+      expect(page).to have_content("You're almost done")
+      expect(page).to have_content("agree to comply with all of the rules above")
+      expect(page).to have_button("Complete Bike Registration", disabled: true)
+
+      # A page stays revisitable from the review, showing what was agreed to
+      click_link "Review", match: :first
+      expect(page).to have_content("Battery & charging")
+      expect(page).to have_checked_field("Report a swollen battery")
+
+      # Continuing walks forward through the remaining pages rather than jumping
+      # straight back to the review
+      click_button "Continue"
+      expect(page).to have_content("Campus rules")
+      click_button "Continue"
+
+      expect(page).to have_content("You're almost done")
+      # Registered for someone else, so it's their name that agrees
+      check "I, #{user_name}, agree to comply with all of the rules above."
+      click_button "Complete Bike Registration"
+
+      expect(page).to have_content("Registration saved")
+      acknowledgment = RegistrationSequenceAcknowledgment.last
+      expect(acknowledgment).to have_attributes(registration_sequence_id: sequence.id,
+        b_param_id: BParam.last.id, owner_email:,
+        acknowledgment_text: "agree to comply with all of the rules above.")
+      expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
     end
   end
 end

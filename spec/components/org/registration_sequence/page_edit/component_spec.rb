@@ -20,5 +20,18 @@ RSpec.describe Org::RegistrationSequence::PageEdit::Component, type: :component 
     expect(component).to have_css("input[type=hidden][name='registration_sequence_page[body]']", visible: :all)
     expect(component).to have_css("lexxy-editor[name='bullet[0][content]']", visible: :all)
     expect(component).to_not have_field("registration_sequence_page_listing_order")
+    # Only an organization's own draft can badge a page with its name
+    expect(component).to_not have_field("registration_sequence_page_organization_specific")
+  end
+
+  context "on an organization's draft" do
+    let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+    let(:registration_sequence) { FactoryBot.create(:registration_sequence, organization:) }
+    let(:page) { FactoryBot.create(:registration_sequence_page, registration_sequence:) }
+
+    it "offers the organization-specific toggle, named after the organization" do
+      expect(component).to have_field("registration_sequence_page_organization_specific")
+      expect(component).to have_content("specific to Brakebills")
+    end
   end
 end

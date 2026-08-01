@@ -29,7 +29,7 @@ bin/kamal_review accessory reboot db --app 0
 
 ## Sandbox (persistent `main` deploy)
 
-Alongside the per-PR apps, `main` is continuously deployed to **[sandbox.review.bikeindex.org](https://sandbox.review.bikeindex.org)** — think of it as a review app that never gets a PR number and is never destroyed. It shares `config/deploy.review.yml`: with no `REVIEW_APP_PR_NUMBER` set, the ERB resolves the `sandbox` slug and omits the `accessories:` block (so a sandbox deploy can't touch the shared infra the PR apps depend on). It differs only in using Redis logical DB `0` (the one the PR mod-31 allocation never hands out).
+Alongside the per-PR apps, `main` is continuously deployed to **[sandbox.review.bikeindex.org](https://sandbox.review.bikeindex.org)** — think of it as a review app that never gets a PR number and is never destroyed. It shares `config/deploy.review.yml`: with no `REVIEW_APP_PR_NUMBER` set, the ERB resolves the `sandbox` slug and omits the `accessories:` block (so a sandbox deploy can't touch the shared infra the PR apps depend on). It differs only in using Redis logical DB `0` (the one the PR mod-1023 allocation never hands out).
 
 For `bin/kamal_review`, with no `--app` given it defaults to sandbox - but you can also use `--app sandbox` to target it. This works for passthrough commands only, since sandbox is deployed by its own workflow, not the `deploy`/`destroy` lifecycle:
 
@@ -48,17 +48,20 @@ Production runs on Cloud66. The differences vs production:
 
 These make information public, but review apps hold no PII - just seeded data + sandbox integrations.
 
-### The `review-app` label is the gate
+### The `review-app` label is the deploy gate
 
 The workflow adds the `review-app` label whenever a deploy is attempted — up front, before the build, regardless of outcome. So the **first** deploy must be a manual `workflow_dispatch` (unlabeled PRs are skipped by CI's dispatch step). That run labels the PR as it starts, arming auto-redeploy for the PR's life — so after a failed first deploy you just push a fix and CI re-dispatches.
 
 Once labeled:
 - **Push → auto-redeploys**: ci.yml's `dispatch` job dispatches this workflow. (No `pull_request: synchronize` trigger — it would leave a skipped review-app check on every push to every unlabeled PR.)
   - A fork's push fires `on: push` in the fork, not here, so this repo's `dispatch` job never sees it — fork PRs only deploy via manual `workflow_dispatch`.
-- **Close PR → auto-destroys** (`pull_request: closed`), removing the label.
 - **Destroy without closing**: re-run with `destroy` (also removes the label).
 
 Only CI's on-push dispatch and `closed` are wired up, so toggling the label by hand does nothing until the next push.
+
+**Teardown is not gated.** `pull_request: closed` destroys every PR, labeled or not — adding the label is best-effort (`|| true`), so an app can be live with no label on it and would otherwise run forever. Destroy skips the build job and is name-scoped and idempotent, so a PR that never had an app costs one short runner.
+
+The step that isn't idempotent is the redis flush, because mod-1023 allocation can point this PR's logical DB at another PR that's still running. So destroy opens by asking the host which apps are up, and skips the flush when one of them shares the DB. That probe also has to succeed: every other step is `|| true`, so an unreachable host would report a clean teardown and let `post` strip the label and GHCR images off an app that's still serving. A failed probe exits non-zero instead, leaving the PR retryable.
 
 ## How a deploy works
 
@@ -68,9 +71,9 @@ Four jobs: `resolve` (PR number + deploy/destroy, and labels on deploy), `op` (c
 |---|---|---|
 | `workflow_dispatch` → deploy (operator, or auto-dispatched by ci.yml on push to a labeled PR) | `deploy` | add `review-app` label, build image, deploy |
 | `workflow_dispatch` → destroy | `destroy` | tear down, remove label, delete PR images from GHCR |
-| `pull_request: closed` (labeled) | `destroy` | tear down, remove label, delete PR images from GHCR |
+| `pull_request: closed` (any PR) | `destroy` | tear down, remove label, delete PR images from GHCR |
 
-Unlabeled PR closes are filtered by `resolve`'s job-level `if:`; fork PRs by the same-repo check (`proceed=false`). On **deploy**:
+Fork PRs are filtered by `resolve`'s same-repo check (`proceed=false`). On **deploy**:
 
 1. The reusable `build` job builds the Docker image (`Dockerfile`) and pushes it to GHCR as `pr-<N>-<sha>`, labeled `service=bike-index-pr-<N>` (kamal requires that label). Warm builds are fast: docker layers cache in GHCR's `:buildcache`, and sprockets' cache persists via a BuildKit cache mount + buildkit-cache-dance.
 2. The `run` job runs `bin/kamal_review deploy --app <pr>` → `kamal deploy --version <tag> --skip-push` (tag from `IMAGE_TAG`). Kamal **pulls** the CI image (no rebuild, which would clone the private `app/services/facebook` submodule) and:
@@ -80,7 +83,7 @@ Unlabeled PR closes are filtered by `resolve`'s job-level `if:`; fork PRs by the
 3. `kamal-proxy` routes `pr-<N>.review.bikeindex.org` to the new container.
 4. The `review-app` environment surfaces the URL ("View deployment").
 
-Destroy reverses it: purge the PR's ActiveStorage objects from the shared R2 bucket (while the app's still up — see [storage](#storage-is-shared)), `kamal app remove`, drop both databases + the role, `FLUSHDB` the assigned Redis logical DB, and delete every `pr-<N>-<sha>` GHCR image version (best-effort, `packages: write`).
+Destroy reverses it: purge the PR's ActiveStorage objects from the shared R2 bucket (while the app's still up — see [storage](#storage-is-shared)), `kamal app remove`, drop both databases + the role, `FLUSHDB` the assigned Redis logical DB (unless a running PR shares it — see [teardown](#the-review-app-label-is-the-deploy-gate)), remove any container `app remove` left behind along with the volumes, and delete every `pr-<N>-<sha>` GHCR image version (best-effort, `packages: write`).
 
 **Failures comment on the PR.** These runs are `workflow_dispatch`-triggered, so their check runs never hit the PR's rollup. The `report` job comments the failure (edited in place on repeats); the next successful deploy deletes it.
 
@@ -116,7 +119,8 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 
 ## Known limits
 
-- **Redis DB allocation is mod-31.** PRs congruent mod 31 share a logical DB — caches + Sidekiq queues mix. Mitigation: bump `--databases` in the redis accessory `cmd:` and raise `REDIS_DATABASES` in `bin/kamal_review`.
+- **Redis DB allocation is mod-1023.** PRs congruent mod 1023 still share a logical DB — caches + Sidekiq queues mix — but that now takes two live apps ~5 months of PRs apart, and destroy skips its flush when it finds one. Raising it further means bumping `--databases` in the redis accessory `cmd:` and `REDIS_DATABASES` in `bin/kamal_review` in lockstep; the cost is ~3.5MB of baseline RSS per 1000 databases and slower active expiry of TTL'd keys.
+- **One eviction pool for every app.** `--maxmemory 512mb --maxmemory-policy allkeys-lru` is instance-wide, so it ignores logical DBs entirely: any app's cache growth can evict any other app's keys, including enqueued Sidekiq jobs, with no error. Widening the modulus doesn't help. Watch `evicted_keys` in `INFO stats`.
 - <a id="storage-is-shared"></a>**Storage isn't isolated per app.** CarrierWave (bike photos, most images) writes to the per-PR local `_uploads` volume — isolated, dropped on destroy. ActiveStorage attachments go to the shared R2 dev bucket (`cloudflare_dev` / `bikeindex-dev`), where every app writes to the bucket root with random keys (no prefix). Destroy purges a PR's own blobs — enumerated from its database, deleted by their (globally unique) keys — through the running app before `app remove`, so only that PR's objects go. Best-effort: a PR whose app can't boot at destroy orphans its blobs, and blobs from PRs destroyed before this cleanup existed can only be reclaimed by reconciling live keys against the bucket.
 - **One Sidekiq worker per app at concurrency=2.** Enough for demos, not for stress-testing queues.
 - **Forks aren't auto-deployed.** A maintainer triggers fork PRs manually via `workflow_dispatch` after reviewing the diff.

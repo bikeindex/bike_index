@@ -543,4 +543,111 @@ RSpec.describe BikeServices::Displayer do
       end
     end
   end
+
+  describe "include_reg_field?" do
+    let(:organization) { Organization.new }
+    let(:user) { User.new }
+
+    it "raises on a field that isn't one" do
+      expect { described_class.include_reg_field?(:reg_phone, organization) }.to raise_error(/unknown reg field/)
+    end
+
+    it "is falsey without the organization asking for it" do
+      expect(described_class.include_reg_field?(:phone, organization)).to be_falsey
+      expect(described_class.include_reg_field?(:phone, organization, user)).to be_falsey
+      expect(described_class.include_reg_field?(:extra_registration_number, organization)).to be_falsey
+      expect(described_class.include_reg_field?(:organization_affiliation, organization, user)).to be_falsey
+      # No organization at all is the same answer, which is what the register flow passes
+      expect(described_class.include_reg_field?(:address)).to be_falsey
+      expect(described_class.include_reg_field?(:address, organization)).to be_falsey
+      expect(described_class.include_reg_field?(:address, organization, user)).to be_falsey
+    end
+
+    context "with enabled features" do
+      let(:feature_slugs) { %w[reg_extra_registration_number reg_address reg_phone reg_organization_affiliation reg_student_id reg_bike_sticker] }
+      let(:organization) { Organization.new(enabled_feature_slugs: feature_slugs) }
+
+      it "includes" do
+        expect(described_class.include_reg_field?(:phone, organization)).to be_truthy
+        expect(described_class.include_reg_field?(:phone, organization, user)).to be_truthy
+        expect(described_class.include_reg_field?(:extra_registration_number, organization)).to be_truthy
+        expect(described_class.include_reg_field?(:organization_affiliation, organization, user)).to be_truthy
+        expect(described_class.include_reg_field?(:address, organization)).to be_truthy
+        expect(described_class.include_reg_field?(:address, organization, user)).to be_truthy
+      end
+
+      context "stickers" do
+        it "only asks for an editable sticker when the caller requires one" do
+          expect(described_class.include_reg_field?(:bike_sticker, organization, user)).to be_truthy
+          expect(described_class.include_reg_field?(:bike_sticker, organization, user, require_user_editable: true)).to be_falsey
+        end
+
+        context "bike_stickers_user_editable" do
+          let(:feature_slugs) { %w[bike_stickers bike_stickers_user_editable reg_bike_sticker] }
+
+          it "includes either way" do
+            expect(described_class.include_reg_field?(:bike_sticker, organization, user)).to be_truthy
+            expect(described_class.include_reg_field?(:bike_sticker, organization, user, require_user_editable: true)).to be_truthy
+          end
+        end
+      end
+
+      context "with a user with a phone" do
+        let(:user) { User.new(phone: "888.888.8888") }
+
+        it "skips the phone, which their account already answers" do
+          expect(organization.additional_registration_fields.include?("reg_phone")).to be_truthy
+          expect(described_class.include_reg_field?(:phone, organization, user)).to be_falsey
+          expect(described_class.include_reg_field?(:student_id, organization, user)).to be_truthy
+        end
+
+        context "with user_registration_organization" do
+          let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: feature_slugs) }
+          let(:registration_info) { {} }
+          let(:user) { FactoryBot.create(:user_confirmed) }
+          let!(:user_registration_organization) { FactoryBot.create(:user_registration_organization, user:, organization:, registration_info:) }
+
+          it "still asks for everything it has no answer for" do
+            expect(described_class.include_reg_field?(:phone, organization)).to be_truthy
+            expect(described_class.include_reg_field?(:phone, organization, user)).to be_truthy # Purely based on whether user has phone
+            expect(described_class.include_reg_field?(:organization_affiliation, organization)).to be_truthy
+            expect(described_class.include_reg_field?(:organization_affiliation, organization, user)).to be_truthy
+            expect(described_class.include_reg_field?(:student_id, organization)).to be_truthy
+            expect(described_class.include_reg_field?(:student_id, organization, user)).to be_truthy
+          end
+
+          context "with registration_info" do
+            let(:user) { FactoryBot.create(:user_confirmed, :with_address_record, address_in: :edmonton, phone: "7773335555", address_set_manually: true) }
+            let(:registration_info) { {student_id: "12", organization_affiliation: "staff"} }
+
+            it "skips what the account already holds" do
+              expect(user.reload.address_record.street).to be_present
+              expect(described_class.include_reg_field?(:phone, organization, user)).to be_falsey # Purely based on whether user has phone
+              expect(described_class.include_reg_field?(:organization_affiliation, organization, user)).to be_falsey
+              expect(described_class.include_reg_field?(:student_id, organization, user)).to be_falsey
+              # A manually set address is only editable from their account page
+              expect(described_class.include_reg_field?(:address, organization, user)).to be_falsey
+              # Each bike needs to have these fields - regardless of user_registration_organization
+              expect(described_class.include_reg_field?(:extra_registration_number, organization, user)).to be_truthy
+              expect(described_class.include_reg_field?(:bike_sticker, organization, user)).to be_truthy
+            end
+          end
+        end
+      end
+
+      context "with users the address is still asked of" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_chicago, enabled_feature_slugs: ["reg_address"]) }
+        let(:user_with_registration_organization) { FactoryBot.create(:user_registration_organization, organization:).user }
+        let(:user_with_address) { FactoryBot.create(:user_confirmed, :with_address_record, address_in: :edmonton, address_set_manually: false) }
+
+        it "includes the address until they've set one themselves" do
+          expect(user_with_registration_organization.reload.address_record?).to be_falsey
+          expect(described_class.include_reg_field?(:address, organization, user_with_registration_organization)).to be_truthy
+
+          expect(user_with_address.reload.address_set_manually).to be_falsey
+          expect(described_class.include_reg_field?(:address, organization, user_with_address)).to be_truthy
+        end
+      end
+    end
+  end
 end

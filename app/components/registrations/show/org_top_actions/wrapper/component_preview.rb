@@ -19,7 +19,7 @@ module Registrations
             {
               "With owner" => component(preview_bike(:status_with_owner)),
               "Stolen" => component(stolen_bike),
-              "Impounded" => component(preview_bike(:status_impounded)),
+              "Impounded" => component(impounded_bike),
               "Unregistered parking notification" => component(preview_bike(:unregistered_parking_notification)),
               "With parking notification" => component(bike_with_parking_notification),
               "Limited (non-staff) member" => component(preview_bike(:status_with_owner), org_role: :limited),
@@ -38,6 +38,13 @@ module Registrations
           # Stolen is the one state carried by an association rather than the status
           def stolen_bike
             preview_bike(:status_stolen).tap { |bike| bike.current_stolen_record = ::StolenRecord.new }
+          end
+
+          # The update action only shows for the previewing org's own record
+          def impounded_bike
+            preview_bike(:status_impounded).tap do |bike|
+              bike.current_impound_record = ::ImpoundRecord.new(organization_id: lookbook_organization.id, display_id: "0001")
+            end
           end
 
           # A live count and the notification panel are DB queries, so this variety

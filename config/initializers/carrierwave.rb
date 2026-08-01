@@ -49,7 +49,10 @@ CarrierWave.configure do |config|
       aws_access_key_id: ENV["S3_ACCESS_KEY"],
       aws_secret_access_key: ENV["S3_SECRET_KEY"],
       region: "us-east-1",
-      path_style: true
+      path_style: true,
+      # Excon defaults to 60s and fog to 5 retries, so an unreachable S3 outlasts rack-timeout's
+      # 30s and the request 500s. Worst case here is 3 connects + 2 intervals = 17s
+      connection_options: {connect_timeout: 5, read_timeout: 10, write_timeout: 10, retry_limit: 2}
     }
     config.fog_directory = ENV["S3_BUCKET"]
     config.fog_attributes = {"Cache-Control" => "max-age=315576000"}
