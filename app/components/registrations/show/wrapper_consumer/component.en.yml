@@ -3,7 +3,7 @@ en:
   components:
     registrations:
       show:
-        consumer:
+        wrapper_consumer:
           about_this_bike: About this %{bike_type}
           audience_owner: Your %{bike_type}
           audience_public: Public view

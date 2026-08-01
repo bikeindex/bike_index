@@ -20,7 +20,7 @@ class RegistrationsController < ApplicationController
       organization_id: params[:organization_id], user: current_user)
 
     render(Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view:,
-      available_views:, bike_sticker:), layout: "application")
+      available_views:, bike_sticker:, current_alerts:), layout: "application")
   end
 
   # The redesign has no edit view of its own; edit still lives on the bike
@@ -65,6 +65,17 @@ class RegistrationsController < ApplicationController
   end
 
   private
+
+  # Both session touches mirror the legacy bikes#show: the recovery token is spent as
+  # it's read, and a matching claim token records the email so signing up can claim
+  def current_alerts
+    alerts = BikeServices::ShowCurrentAlerts.find(bike: @bike, params:,
+      recovery_link_token: session.delete(:recovery_link_token))
+    if alerts[:claim_message].present?
+      session[:claim_token_email] = @bike.current_ownership.owner_email
+    end
+    alerts
+  end
 
   # The resolved [kind, organization] perspective (e.g. [:public, nil] or
   # [:staff, organization]). A ?view_as param overrides the default, but only to a

@@ -13,8 +13,9 @@ class ApplicationComponentPreview < ViewComponent::Preview
     subclass.layout "component_preview"
   end
 
+  # Falls back like lookbook_organization — a fresh database should render, not raise
   def lookbook_user
-    @lookbook_user ||= User.find(ENV.fetch("LOOKBOOK_USER_ID", 1))
+    @lookbook_user ||= User.find_by(id: ENV.fetch("LOOKBOOK_USER_ID", 1)) || User.first
   end
 
   def lookbook_organization

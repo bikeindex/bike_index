@@ -26,14 +26,11 @@
     </div>
   </div>
 
-  <%= render(Registrations::Show::ScannedSticker::Component.new(bike: @bike, bike_sticker: @bike_sticker, current_user: @current_user)) %>
+  <%= render(Registrations::Show::CurrentAlerts::Wrapper::Component.new(bike: @bike, current_user: @current_user, bike_sticker: @bike_sticker, current_alerts: @current_alerts)) %>
 
   <%= render(Registrations::Show::OrgTopActions::Wrapper::Component.new(bike: @bike, organization: @organization, org_role: @org_role)) %>
 
-  <%#
-    On mobile the column wrappers collapse (tw:contents) so every card is a
-    single-column grid item, letting tw:order interleave the two desktop columns
-  %>
+  <%# tw:contents collapses the column wrappers on mobile, so tw:order can interleave them %>
 
   <div class="tw:grid tw:gap-6 tw:lg:grid-cols-3">
     <div class="tw:contents tw:lg:col-span-2 tw:lg:flex tw:lg:flex-col tw:lg:gap-6">

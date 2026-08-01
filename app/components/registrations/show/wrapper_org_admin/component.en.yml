@@ -3,7 +3,7 @@ en:
   components:
     registrations:
       show:
-        org_admin:
+        wrapper_org_admin:
           about_this_bike: About this %{bike_type}
           assign_sticker: Assign sticker
           audit: E-Vehicle Audit
