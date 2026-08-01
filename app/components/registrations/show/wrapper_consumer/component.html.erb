@@ -8,8 +8,9 @@
     <div class="tw:lg:col-span-2">
       <div
         class="
-          tw:lg:rounded-sm tw:lg:border tw:lg:border-gray-200 tw:lg:bg-white
-          tw:lg:p-4 tw:lg:dark:border-gray-700 tw:lg:dark:bg-gray-800
+          tw:min-[992px]:rounded-t-none tw:lg:rounded-b-sm tw:lg:border
+          tw:lg:border-gray-200 tw:lg:bg-white tw:lg:p-4
+          tw:lg:dark:border-gray-700 tw:lg:dark:bg-gray-800
         "
       >
         <%= render(Registrations::Show::Photos::Component.new(bike: @bike, owner: @owner, title: title, subtitle: render(Registrations::Show::Subtitle::Component.new(bike: @bike)))) %>
@@ -41,7 +42,7 @@
         <%= render(Registrations::Show::Status::Component.new(bike: @bike)) %>
       </div>
 
-      <%= render(Registrations::Show::ScannedSticker::Component.new(bike: @bike, bike_sticker: @bike_sticker, current_user: @current_user)) %>
+      <%= render(Registrations::Show::CurrentAlerts::Wrapper::Component.new(bike: @bike, current_user: @current_user, bike_sticker: @bike_sticker, owner: @owner, current_alerts: @current_alerts)) %>
 
       <%= render(Registrations::Show::BikeIndexCard::Component.new(bike: @bike, term: :right_align)) %>
 

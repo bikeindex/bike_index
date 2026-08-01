@@ -2,7 +2,7 @@
 
 module Registrations
   module Show
-    module OrgAdmin
+    module WrapperOrgAdmin
       class Component < ApplicationComponent
         include BikeHelper
 
@@ -10,15 +10,16 @@ module Registrations
         # Registration fields shown with the owner rather than in registration info
         OWNER_ACCESS_REG_FIELDS = %w[reg_address reg_organization_affiliation reg_student_id].freeze
 
-        # org_role is the role this panel renders as - a superadmin can view any
-        # organization as :staff or as :limited (view_as)
-        def initialize(bike:, current_user:, organization:, org_role:, available_views: [], bike_sticker: nil)
+        # org_role is what this renders as — a superadmin can view any org either way
+        def initialize(bike:, current_user:, organization:, org_role:, available_views: [], bike_sticker: nil,
+          current_alerts: {})
           @bike = bike
           @current_user = current_user
           @organization = organization
           @available_views = available_views
           @bike_sticker = bike_sticker
           @org_role = org_role
+          @current_alerts = current_alerts
         end
 
         def render?
@@ -26,8 +27,7 @@ module Registrations
             @current_user.authorized?(@organization) && @bike.visible_by?(@current_user)
         end
 
-        # Org-scoped records shown in this panel that don't touch the bike (so the
-        # bike's own cache version wouldn't expire the fragment when they change)
+        # Records shown here that don't touch the bike, so its cache version misses them
         def cache_version
           [bike_organization_note&.updated_at, organization_model_audit&.updated_at,
             other_registrations.maximum(:updated_at), other_registrations_count]
@@ -35,7 +35,6 @@ module Registrations
 
         private
 
-        # A definition-list row that always renders, showing a muted "-" when blank
         def info_row(label, value = nil, &block)
           render(UI::DefinitionList::Row::Component.new(label:, value:, render_with_no_value: true, no_value_text: "-"), &block)
         end
@@ -54,8 +53,7 @@ module Registrations
           @bike.unregistered_parking_notification?
         end
 
-        # Owner contact + law-enforcement data is only shown to full staff on a bike
-        # registered with their organization
+        # Contact and law-enforcement data: full staff only, on their own org's bike
         def show_contact?
           staff? && organization_registered?
         end
@@ -112,7 +110,6 @@ module Registrations
           @bike_stickers ||= @bike.bike_stickers.reorder(claimed_at: :desc)
         end
 
-        # Org-owned stickers link to their edit page; others show the code as text
         def sticker_link(bike_sticker)
           url = if bike_sticker.organization_id == @organization.id
             edit_organization_sticker_path(id: bike_sticker.code, organization_id: @organization.to_param)
@@ -127,7 +124,6 @@ module Registrations
           @model_audit = @bike.model_audit
         end
 
-        # The org's certification record for this bike's model, if any
         def organization_model_audit
           return @organization_model_audit if defined?(@organization_model_audit)
 
@@ -135,9 +131,8 @@ module Registrations
             OrganizationModelAudit.find_by(organization_id: @organization.id, model_audit_id: @bike.model_audit_id)
         end
 
-        # The organization's additional registration fields (address, etc.) for
-        # this bike, as [label, value] rows — blank values dropped. Sticker, phone,
-        # affiliation and student ID are shown elsewhere
+        # The org's additional registration fields as [label, value], blank ones dropped.
+        # Sticker, phone, affiliation and student ID are shown elsewhere
         def org_registration_field_rows
           (@organization.additional_registration_fields - %w[reg_bike_sticker reg_phone] - OWNER_ACCESS_REG_FIELDS).filter_map do |reg_field|
             bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
@@ -148,8 +143,7 @@ module Registrations
           end
         end
 
-        # Address, affiliation & student ID [label, value] rows for owner & access;
-        # blank values render a muted "-" rather than dropping
+        # The owner & access card's rows — unlike the ones above, blank renders a "-"
         def owner_reg_field_rows
           (OWNER_ACCESS_REG_FIELDS & @organization.additional_registration_fields).map do |reg_field|
             bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field)
@@ -166,7 +160,6 @@ module Registrations
           end
         end
 
-        # The org's custom label for the field, falling back to the humanized attribute
         def org_registration_field_label(reg_field, bike_attr)
           custom = @organization.registration_field_labels&.dig(reg_field)
           return Binxtils::InputNormalizer.sanitize(custom) if custom.present?
@@ -182,8 +175,7 @@ module Registrations
             .compact_blank.join(", ").presence
         end
 
-        # The registration-information card's rows are all feature- or
-        # registration-gated; show a muted note when none apply
+        # Every row in that card is feature- or registration-gated
         def registration_information?
           organization_registered? || @organization.any_enabled?(%w[credibility_badges bike_stickers])
         end
@@ -204,8 +196,7 @@ module Registrations
           edit_bike_path(@bike, edit_template: @bike.default_edit_template)
         end
 
-        # The owner's other registrations are law-enforcement data, feature-gated
-        # like the legacy access panel
+        # Law-enforcement data, feature-gated like the legacy access panel
         def show_other_registrations?
           show_contact? && @organization.enabled?("additional_registrations_information")
         end
@@ -225,7 +216,7 @@ module Registrations
           @other_registrations_count ||= other_registrations.count
         end
 
-        # Most recent registrations only; the rest are reachable via the org search link
+        # The rest are reachable through the org search link below them
         def recent_other_registrations
           @recent_other_registrations ||= other_registrations.reorder(id: :desc).limit(OTHER_REGISTRATIONS_LIMIT)
         end

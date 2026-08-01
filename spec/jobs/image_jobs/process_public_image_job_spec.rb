@@ -12,7 +12,7 @@ RSpec.describe ImageJobs::ProcessPublicImageJob, type: :job do
   let(:identifying) { /gps|make|model|serial|lens|software|datetime|makernote/i }
   let(:dimensions) { [1071, 1173] } # Autorotated; the tag claimed 1173x1071
   # Ours, not blob.metadata - a direct upload posts that, so it can't gate the strip
-  let(:target_binx_data) { {"stripped" => true, "processed" => true} }
+  let(:target_binx_data) { {"stripped" => true, "processed" => true, "bike_id" => bike.id} }
 
   def exif_fields(data)
     Vips::Image.new_from_buffer(data, "").get_fields.grep(/exif|gps/i)
@@ -33,10 +33,11 @@ RSpec.describe ImageJobs::ProcessPublicImageJob, type: :job do
     expect(exif_fields(File.binread(Rails.root.join(image_path)))).to be_present
     expect(public_image.file_needs_processing?).to be_truthy
     original_key, original_checksum = blob.key, blob.checksum
+    blob.update!(binx_data: {"b_param_id" => 42}) # The register direct upload's stamp
 
     instance.perform(public_image.id)
 
-    expect(blob.reload.binx_data).to eq target_binx_data
+    expect(blob.reload.binx_data).to eq target_binx_data.merge("b_param_id" => 42)
     stripped_data = blob.download
     expect(dimensions_of(stripped_data)).to eq dimensions
     expect(exif_fields(stripped_data)).to be_empty
@@ -162,15 +163,40 @@ RSpec.describe ImageJobs::ProcessPublicImageJob, type: :job do
     end
   end
 
-  it "enqueues for an attached file, not for carrierwave" do
-    expect {
-      FactoryBot.create(:public_image, :with_attached_file, imageable: bike)
-    }.to change(described_class.jobs, :size).by(1)
-    # ActiveStorage owns metadata now, so its AnalyzeJob runs as normal
-    expect(Sidekiq::ActiveJob::Wrapper.jobs.map { it["wrapped"] }).to eq ["ActiveStorage::AnalyzeJob"]
+  context "imageable that isn't a bike" do
+    let(:public_image) { FactoryBot.create(:public_image, :with_attached_file, imageable: FactoryBot.create(:organization)) }
 
-    expect {
-      FactoryBot.create(:public_image, :with_image_file, imageable: bike)
-    }.to_not change(described_class.jobs, :size)
+    it "stamps no bike" do
+      instance.perform(public_image.id)
+
+      expect(blob.reload.binx_data).to eq target_binx_data.except("bike_id")
+    end
+  end
+
+  describe "enqueueing" do
+    it "enqueues for an attached file, not for carrierwave" do
+      expect {
+        FactoryBot.create(:public_image, :with_attached_file, imageable: bike)
+      }.to change(described_class.jobs, :size).by(1)
+      # ActiveStorage owns metadata now, so its AnalyzeJob runs as normal
+      expect(Sidekiq::ActiveJob::Wrapper.jobs.map { it["wrapped"] }).to eq ["ActiveStorage::AnalyzeJob"]
+
+      expect {
+        FactoryBot.create(:public_image, :with_image_file, imageable: bike)
+      }.to_not change(described_class.jobs, :size)
+    end
+
+    # A second run would strip the original twice and race the first's writes to the blob
+    it "doesn't enqueue again for a save while the first run is still working" do
+      expect {
+        public_image # The attachment, and the only enqueue it gets
+      }.to change(described_class.jobs, :size).by(1)
+
+      expect {
+        public_image.update(listing_order: 2, kind: "photo_of_serial", is_private: true, name: "Renamed")
+      }.to_not change(described_class.jobs, :size)
+
+      expect(public_image.reload.file_needs_processing?).to be_truthy
+    end
   end
 end
