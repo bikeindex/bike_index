@@ -271,10 +271,13 @@ RSpec.describe RegisterController, type: :request do
     let(:step_1_params) { {b_param: {manufacturer_id: "Trek", cycle_type: "cargo", owner_email:}} }
     let(:create_params) { step_1_params.merge(b_param_token: empty_b_param.id_token) }
 
-    it "saves step 1 and redirects to step 2, without emailing" do
+    it "saves step 1, emails the confirmation link and redirects to step 2" do
       expect { post base_url, params: create_params }
-        .to_not change { [BParam.count, Email::PartialRegistrationJob.jobs.size] }
+        .to change(Email::RegisterConfirmationJob.jobs, :size).by 1
+      expect(BParam.count).to eq 1
+      expect(Email::PartialRegistrationJob.jobs.size).to eq 0
       empty_b_param.reload
+      expect(empty_b_param.email_confirmation_token).to be_present
       expect(empty_b_param).to have_attributes(origin: "register_flow", owner_email:,
         manufacturer_id: manufacturer.id, creator_id: nil, cycle_type: "cargo")
       expect(empty_b_param.motorized?).to be_falsey
@@ -931,6 +934,102 @@ RSpec.describe RegisterController, type: :request do
       # Nothing is browsable behind the completion page any more
       get step_path.call("3")
       expect(response).to redirect_to step_path.call("finished")
+    end
+  end
+
+  describe "confirm" do
+    let!(:token) { b_param.generate_email_confirmation_token! }
+    let(:confirm_params) { {b_param_token: b_param.id_token, confirmation_token: token} }
+    let(:step_path) { ->(step) { register_path(b_param_token: b_param.id_token, step:) } }
+
+    it "renders a self-submitting form, then makes an account and signs them in" do
+      get "#{base_url}/confirm", params: confirm_params
+      expect(response.status).to eq 200
+      expect(response.body).to include token
+      # Rendering confirms nothing - a link scanner following the URL can't spend the token
+      expect(b_param.reload.email_confirmed?).to be_falsey
+
+      expect {
+        post "#{base_url}/confirm_email", params: confirm_params
+      }.to change(User, :count).by 1
+      expect(b_param.reload).to have_attributes(email_confirmed?: true,
+        email_confirmation_token: nil, creator_id: User.last.id)
+      expect(User.last).to have_attributes(email: owner_email, confirmed: true)
+      expect(User.last.last_login_at).to be_within(2.seconds).of Time.current
+      # Dropped on the step the registration is on - and signed in, so nothing's pending
+      expect(response).to redirect_to step_path.call("2")
+      follow_redirect!
+      expect(response.body).to_not include "confirmation link to your email"
+
+      # Single use, so a forwarded link can't sign anyone in again
+      expect {
+        post "#{base_url}/confirm_email", params: confirm_params
+      }.to_not change(User, :count)
+      expect(response).to redirect_to step_path.call("2")
+    end
+
+    context "wrong token" do
+      let(:wrong_params) { confirm_params.merge(confirmation_token: "wrong-token") }
+
+      it "confirms nothing, and emails a new link once the last one is old enough" do
+        # The link went out moments ago, so this doesn't send a second
+        expect { post "#{base_url}/confirm_email", params: wrong_params }
+          .to_not change(Email::RegisterConfirmationJob.jobs, :size)
+        expect(b_param.reload.email_confirmed?).to be_falsey
+        expect(flash[:error]).to be_present
+        expect(response).to redirect_to step_path.call("2")
+
+        sent_at = Time.current - BikeServices::Register::CONFIRMATION_EMAIL_INTERVAL - 1.minute
+        b_param.update(params: b_param.params.merge("email_confirmation_sent_at" => sent_at))
+        expect { post "#{base_url}/confirm_email", params: wrong_params }
+          .to change(Email::RegisterConfirmationJob.jobs, :size).by 1
+      end
+    end
+
+    context "unknown registration" do
+      it "starts a new registration" do
+        post "#{base_url}/confirm_email", params: confirm_params.merge(b_param_token: "unknown-token")
+        expect(response).to redirect_to new_register_path
+      end
+    end
+
+    context "registration waiting on the email" do
+      let(:bike_details) do
+        {primary_frame_color_id: color.id, serial_number: "XYZ 123",
+         status: "status_with_owner", user_name:}
+      end
+      before { patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details} }
+
+      it "creates the bike the registration was holding, and lands on finished" do
+        expect(response).to redirect_to step_path.call("finished")
+
+        expect {
+          post "#{base_url}/confirm_email", params: confirm_params
+        }.to change(Bike, :count).by 1
+        expect(Bike.last).to have_attributes(owner_email:, serial_number: "XYZ 123",
+          creator_id: User.last.id)
+        expect(b_param.reload.created_bike_id).to eq Bike.last.id
+        expect(response).to redirect_to step_path.call("finished")
+        follow_redirect!
+        expect(response.body).to include "Registration complete"
+      end
+
+      context "signed in as someone else" do
+        include_context :request_spec_logged_in_as_user
+
+        it "keeps their session, creating the bike for the confirmed address" do
+          # The registration parked before they signed in, so it's still waiting here
+          expect(b_param.reload.created_bike_id).to be_nil
+          expect {
+            post "#{base_url}/confirm_email", params: confirm_params
+          }.to change(Bike, :count).by 1
+          # No account for the confirmed address - they're still signed in as themselves
+          expect(User.count).to eq 1
+          expect(Bike.last).to have_attributes(owner_email:, creator_id: current_user.id)
+          expect(flash[:info]).to be_present
+          expect(response).to redirect_to step_path.call("finished")
+        end
+      end
     end
   end
 end

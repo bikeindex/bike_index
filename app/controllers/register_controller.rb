@@ -1,10 +1,15 @@
 class RegisterController < ApplicationController
-  before_action :find_b_param, except: %i[new create]
+  include Sessionable
+
+  before_action :find_b_param, except: %i[new create confirm confirm_email]
   # An expired token starts a registration rather than bouncing and losing the
   # submission. assign_organization runs next, so the form's organization_id lands on it
   before_action -> { find_b_param(build: true) }, only: %i[create]
-  before_action :assign_organization, except: %i[new]
-  before_action :find_registration_sequence, except: %i[new]
+  # The emailed link resumes a registration the session knows nothing about
+  before_action :find_b_param_for_confirmation, only: %i[confirm confirm_email]
+  # confirm renders a form and nothing else - neither is read before it posts itself
+  before_action :assign_organization, except: %i[new confirm]
+  before_action :find_registration_sequence, except: %i[new confirm]
   before_action :redirect_finished, only: %i[create update acknowledge]
   # The step shown depends on server state - a cached page could show a step
   # the registration is past (register--revalidate covers Safari's bfcache)
@@ -57,6 +62,9 @@ class RegisterController < ApplicationController
     if @b_param.errors.any?
       render Register::Step1::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:), status: :unprocessable_entity
     elsif @b_param.save
+      # Anonymous registrations need the address proven before there's a bike, and step 2
+      # says the link is on its way - so it goes out here, not at the end
+      BikeServices::Register.send_confirmation_email(@b_param)
       redirect_to step_path(2)
     else
       @b_param.errors.add(:base, translation(:unable_to_save))
@@ -96,6 +104,35 @@ class RegisterController < ApplicationController
     redirect_to step_path(BikeServices::Register.step_after(step, sequence: @registration_sequence))
   end
 
+  def confirm
+    @page_title = I18n.t("meta_titles.register_confirm")
+    render Register::Confirm::Component.new(b_param: @b_param, token: params[:confirmation_token])
+  end
+
+  # The confirmation itself: the address is proven, so the registration has an account
+  # behind it - created here if this is their first registration
+  def confirm_email
+    # Single use, so a second click has nothing left to do - the first one signed them in
+    return redirect_to_current_step if @b_param.email_confirmed?
+
+    unless @b_param.email_confirmation_token_matches?(params[:confirmation_token])
+      BikeServices::Register.send_confirmation_email(@b_param)
+      flash[:error] = translation(:confirmation_link_expired)
+      return redirect_to_current_step
+    end
+
+    # Someone else's session stays theirs - the registration is still finished for the
+    # address that was emailed, it just isn't that account's own
+    if current_user.present?
+      flash[:info] = translation(:signed_in_as_other, email: current_user.email) unless @b_param.self_made?(current_user)
+    elsif sign_in_confirmed_user.blank?
+      return redirect_to_current_step
+    end
+
+    @b_param.confirm_email!(creator_id: current_user.id)
+    complete_registration
+  end
+
   private
 
   def save_acknowledgment(step)
@@ -111,13 +148,26 @@ class RegisterController < ApplicationController
 
   def complete_registration
     BikeServices::Register.claim_creator(@b_param, current_user)
-    if BikeServices::Register.creator_available?(@b_param)
-      redirect_after_bike_creation(BikeServices::Register.create_bike(@b_param, ip_address: forwarded_ip_address))
-    else
-      # Everything is saved on the b_param - the bike is created once the
-      # confirmation link from the partial registration email is clicked
-      redirect_to step_path(:finished)
+    bike = BikeServices::Register.create_bike_if_ready(@b_param,
+      sequence: @registration_sequence, ip_address: forwarded_ip_address)
+    # Everything is saved on the b_param - the bike is created once the
+    # confirmation link from the registration email is clicked
+    return redirect_to_current_step if bike.blank?
+
+    redirect_after_bike_creation(bike)
+  end
+
+  # The account the confirmed address belongs to, created if it doesn't have one yet.
+  # Its password is a token nobody knows - this link is how they get in until they set one
+  def sign_in_confirmed_user
+    user = UserServices::PasswordlessCreator.find_or_create(@b_param.owner_email)
+    if user.blank? || user.banned?
+      flash[:error] = translation(:unable_to_sign_in)
+      return nil
     end
+
+    sign_in_user(user)
+    @current_user = user
   end
 
   # Wherever the registration now stands: the next unacknowledged page, or the review
@@ -147,6 +197,14 @@ class RegisterController < ApplicationController
   # Resolved once - the step math, the progress bar and the pages themselves all read it
   def find_registration_sequence
     @registration_sequence = BikeServices::Register.registration_sequence(@b_param)
+  end
+
+  # The emailed link carries the registration's token, so it resumes from any browser.
+  # Nothing is put in the session here - the token hasn't been checked yet, and dropping
+  # a registration already underway in this browser isn't the link's to do
+  def find_b_param_for_confirmation
+    @b_param = BikeServices::Register.find_for_confirmation(params[:b_param_token])
+    redirect_to(new_register_path) if @b_param.blank?
   end
 
   # build: only step 1's submission, which carries everything a registration needs

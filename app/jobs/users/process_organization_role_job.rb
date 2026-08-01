@@ -51,13 +51,7 @@ module Users
       return false unless organization_role.organization.passwordless_user_creation? &&
         organization_role.user.blank?
 
-      password = SecurityTokenizer.new_password_token
-      user = User.new(skip_update: true,
-        email: organization_role.invited_email,
-        password: password,
-        password_confirmation: password)
-      user.save!
-      user.confirm(user.confirmation_token)
+      user = UserServices::PasswordlessCreator.find_or_create(organization_role.invited_email)
       # We don't want to send users emails in this situation.
       organization_role.update(user_id: user.id, email_invitation_sent_at: Time.current, skip_processing: true)
       organization_role.reload

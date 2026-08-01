@@ -867,4 +867,54 @@ RSpec.describe BParam, type: :model do
       end
     end
   end
+
+  describe "email confirmation token" do
+    let(:b_param) { BParam.create(params: {bike: {owner_email: "owner@example.com"}}) }
+
+    let(:user) { FactoryBot.create(:user_confirmed) }
+
+    it "mints a token, reuses it and spends it on confirmation" do
+      token = b_param.generate_email_confirmation_token!
+      expect(token).to be_present
+      expect(b_param.email_confirmation_sent_at).to be_within(2.seconds).of Time.current
+
+      # Resending reuses the token, so the link already sent keeps working - and
+      # re-stamps, since the stamp is what rate limits the resend
+      b_param.update(params: b_param.params.merge("email_confirmation_sent_at" => Time.current - 1.hour))
+      expect(b_param.generate_email_confirmation_token!).to eq token
+      expect(b_param.email_confirmation_sent_at).to be_within(2.seconds).of Time.current
+
+      expect(b_param.email_confirmation_token_matches?("nonmatching-token")).to be_falsey
+
+      expect(b_param.email_confirmation_token_matches?(token)).to be_truthy
+      expect(b_param.confirm_email!(creator_id: user.id)).to be_truthy
+      expect(b_param.reload).to have_attributes(email_confirmed?: true,
+        email_confirmation_token: nil, creator_id: user.id)
+      # Single use - the same token can't confirm again
+      expect(b_param.email_confirmation_token_matches?(token)).to be_falsey
+    end
+
+    context "with a creator" do
+      let(:creator) { FactoryBot.create(:user_confirmed) }
+      before { b_param.update(creator_id: creator.id) }
+
+      it "keeps the creator it has" do
+        b_param.confirm_email!(creator_id: user.id)
+        expect(b_param.reload.creator_id).to eq creator.id
+      end
+    end
+
+    context "expired token" do
+      let(:expired_token) { SecurityTokenizer.new_token(Time.current - BParam::TOKEN_EXPIRATION - 1.day) }
+      before { b_param.update(params: b_param.params.merge("email_confirmation_token" => expired_token)) }
+
+      it "doesn't match, and mints a new token" do
+        expect(b_param.email_confirmation_token_expired?).to be_truthy
+        expect(b_param.email_confirmation_token_matches?(expired_token)).to be_falsey
+
+        expect(b_param.generate_email_confirmation_token!).to_not eq expired_token
+        expect(b_param.email_confirmation_token_expired?).to be_falsey
+      end
+    end
+  end
 end

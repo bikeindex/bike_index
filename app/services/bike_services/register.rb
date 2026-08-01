@@ -7,6 +7,8 @@ module BikeServices
 
     # Step "3" is the first of the e-vehicle acknowledgment pages
     ACKNOWLEDGMENT_OFFSET = 3
+    # How often a registration will email its confirmation link
+    CONFIRMATION_EMAIL_INTERVAL = 5.minutes
 
     # The token's registration when step 1 was never submitted (redirecting into
     # it can't surprise anyone), otherwise a new one. A signed-in user's email
@@ -29,8 +31,15 @@ module BikeServices
 
       # Once the bike exists the token only ever shows the completion page, so
       # access doesn't require matching the creator assigned at creation
-      BParam.recent_with_token(token)
+      BParam.unexpired_with_token(token)
         .detect { |b| b.creator_id.blank? || b.creator_id == user&.id || b.created_bike_id.present? }
+    end
+
+    # The registration the emailed confirmation link names. No window of its own - the
+    # confirmation token expires on its own clock, and a found registration is what lets
+    # an expired link say so (and send a new one) rather than dead-end
+    def find_for_confirmation(token)
+      BParam.find_by(id_token: token) if token.present?
     end
 
     # An organization can be named in the URL after the registration starts
@@ -129,7 +138,29 @@ module BikeServices
     def finished?(b_param, sequence:)
       return true if b_param.with_bike?
 
-      details_completed?(b_param) && acknowledged?(b_param, sequence:) && !creator_available?(b_param)
+      ready_for_bike?(b_param, sequence:) && !creator_available?(b_param)
+    end
+
+    # A link went to the address and nothing has proven it yet - what the steps tell
+    # the registrant to expect, and what makes their bike once they click it.
+    # user: whoever is looking, since being signed in as the address settles it too
+    def confirmation_email_pending?(b_param, user: nil)
+      return false if b_param.self_made?(user)
+
+      b_param.email_unconfirmed? && !creator_available?(b_param)
+    end
+
+    # Anonymous registrations can't create a bike - Ownership needs a creator - so the
+    # address is emailed a link that proves it, makes an account and signs them in
+    # A resend can be asked for by anyone holding the registration's token, so the address
+    # it was entered for is only emailed this often
+    def send_confirmation_email(b_param)
+      return false unless confirmation_email_pending?(b_param)
+      return false if b_param.email_confirmation_sent_at.to_i > (Time.current - CONFIRMATION_EMAIL_INTERVAL).to_i
+
+      b_param.generate_email_confirmation_token!
+      Email::RegisterConfirmationJob.perform_async(b_param.id)
+      true
     end
 
     # Whether a bike can be created now - Ownership requires a creator, so
@@ -162,6 +193,15 @@ module BikeServices
       b_param.update(creator_id: user.id)
     end
 
+    # The bike everything has been waiting on - nil until the registration is complete
+    # and has a creator, which is what the confirmation link finally supplies
+    def create_bike_if_ready(b_param, sequence:, ip_address:)
+      return nil if b_param.with_bike? || !creator_available?(b_param) ||
+        !ready_for_bike?(b_param, sequence:)
+
+      create_bike(b_param, ip_address:)
+    end
+
     def create_bike(b_param, ip_address:)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
       bike = BikeServices::Creator.new(ip_address:).create_bike(b_param)
@@ -173,6 +213,11 @@ module BikeServices
     #
     # private below here
     #
+
+    # Everything's entered - all that's missing is a creator
+    def ready_for_bike?(b_param, sequence:)
+      details_completed?(b_param) && acknowledged?(b_param, sequence:)
+    end
 
     def reusable?(b_param)
       b_param.present? && !b_param.with_bike? && b_param.manufacturer_id.blank?
@@ -242,7 +287,8 @@ module BikeServices
       {details_completed: completed, bike: bike_params, image_signed_id: image_signed_id.presence}.compact
     end
 
-    conceal :reusable?, :all_steps, :permitted_steps, :confirmed_email_creator_id,
-      :owner_email_for, :assign_owner_email, :details_completed?, :step_2_params
+    conceal :ready_for_bike?, :reusable?, :all_steps, :permitted_steps,
+      :confirmed_email_creator_id, :owner_email_for, :assign_owner_email,
+      :details_completed?, :step_2_params
   end
 end

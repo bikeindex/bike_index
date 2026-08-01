@@ -287,4 +287,39 @@ RSpec.describe BikeServices::Register do
       end
     end
   end
+
+  describe "send_confirmation_email" do
+    let(:b_param) { BParam.create(origin: "register_flow", params: {bike: bike_params}.as_json) }
+
+    it "mints a token and emails it, once per interval" do
+      expect(described_class.send_confirmation_email(b_param)).to be_truthy
+      expect(b_param.reload.email_confirmation_token).to be_present
+      Email::RegisterConfirmationJob.drain
+      expect(Notification.count).to eq 1
+
+      # Anyone holding the registration's token can ask for a resend, so it's rate limited
+      expect(described_class.send_confirmation_email(b_param)).to be_falsey
+
+      sent_at = Time.current - described_class::CONFIRMATION_EMAIL_INTERVAL - 1.minute
+      b_param.update(params: b_param.params.merge("email_confirmation_sent_at" => sent_at))
+      expect(described_class.send_confirmation_email(b_param)).to be_truthy
+    end
+
+    context "confirmed" do
+      before { b_param.confirm_email! }
+
+      it "has nothing to prove" do
+        expect(described_class.send_confirmation_email(b_param)).to be_falsey
+      end
+    end
+
+    context "with a creator" do
+      before { b_param.update(creator_id: FactoryBot.create(:user).id) }
+
+      it "doesn't need the address proven - the bike can be created now" do
+        expect(described_class.confirmation_email_pending?(b_param)).to be_falsey
+        expect(described_class.send_confirmation_email(b_param)).to be_falsey
+      end
+    end
+  end
 end

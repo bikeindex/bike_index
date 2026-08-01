@@ -10,17 +10,12 @@ class OrganizedMailer < ApplicationMailer
   helper :bike
 
   def partial_registration(b_param)
-    @organization = b_param.creation_organization
-    component = Emails::PartialRegistration::Component.new(b_param:)
+    b_param_mail(b_param, Emails::PartialRegistration::Component.new(b_param:), tag: __callee__)
+  end
 
-    I18n.with_locale(@user&.preferred_language) do
-      mail(
-        reply_to: reply_to,
-        to: b_param.owner_email,
-        subject: default_i18n_subject(default_subject_vars),
-        tag: __callee__
-      ) { |format| format.html { render component } }
-    end
+  # The register flow's confirmation link - proves the address, and signs them in
+  def register_confirmation(b_param)
+    b_param_mail(b_param, Emails::RegisterConfirmation::Component.new(b_param:), tag: __callee__)
   end
 
   def finished_registration(ownership)
@@ -122,6 +117,16 @@ class OrganizedMailer < ApplicationMailer
   end
 
   private
+
+  # The emails a registration sends before it has a bike - addressed to whoever
+  # entered it, and subjected by the mailer method's own name
+  def b_param_mail(b_param, component, tag:)
+    @organization = b_param.creation_organization
+    mail(reply_to: reply_to,
+      to: b_param.owner_email,
+      subject: default_i18n_subject(default_subject_vars),
+      tag:) { |format| format.html { render component } }
+  end
 
   def finished_registration_type(bike, ownership)
     return "_stolen" if bike.status_stolen?

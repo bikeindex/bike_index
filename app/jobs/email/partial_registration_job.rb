@@ -2,6 +2,8 @@
 
 module Email
   class PartialRegistrationJob < ApplicationJob
+    include BParamNotification
+
     sidekiq_options queue: "notify", retry: 3
 
     # When we started creating notifications when sending partial registration emails PR#2368
@@ -11,18 +13,7 @@ module Email
       b_param = BParam.find(b_param_id)
       return if b_param.blank?
 
-      if EmailDomain::VERIFICATION_ENABLED
-        email_domain = EmailDomain.find_or_create_for(b_param.owner_email)
-
-        return b_param.destroy if email_domain&.banned?
-        return if email_domain&.provisional_ban?
-      end
-
-      notification = Notification.create(kind: "partial_registration",
-        message_channel: "email",
-        notifiable: b_param)
-
-      notification.track_email_delivery do
+      deliver_b_param_notification(b_param, kind: "partial_registration") do
         OrganizedMailer.partial_registration(b_param).deliver_now
       end
     end

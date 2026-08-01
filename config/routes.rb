@@ -173,6 +173,9 @@ Rails.application.routes.draw do
   # ?step=1|2|3…|review|finished (and handles the emailed confirmation link)
   resource :register, only: %i[new create show update], controller: :register do
     patch :acknowledge
+    # The emailed confirmation link, and the form it posts itself to
+    get :confirm
+    post :confirm_email
   end
 
   # Registration photos upload before there's a session, so they get their own endpoint

@@ -40,7 +40,15 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_content("Add your bike")
   end
 
+  # The emailed link, minus the mailer's host - the app under test is on Capybara's
+  def confirmation_link
+    Email::RegisterConfirmationJob.drain
+    url = ActionMailer::Base.deliveries.last.html_part.decoded[%r{https?://[^"]*/register/confirm[^"]*}]
+    URI.parse(CGI.unescapeHTML(url)).request_uri
+  end
+
   it "starts a registration, keeps a full details draft across a reload, and completes" do
+    ActionMailer::Base.deliveries = []
     visit "/register/new"
 
     # new creates the registration and lands on its tokenized step 1
@@ -155,8 +163,10 @@ RSpec.describe "Register flow", :js, type: :system do
 
     click_button "Complete Bike Registration"
 
+    # Anonymous, so there's nobody to own a bike yet - it's held for the emailed link
     expect(page).to have_content("Registration saved")
     expect(page).to have_content("verify your email")
+    expect(Bike.count).to eq 0
     b_param = BParam.last
     expect(b_param.bike).to include("user_name" => user_name, "frame_model" => "Marlin 7", "year" => "2023",
       "primary_frame_color_id" => red.id.to_s, "secondary_frame_color_id" => blue.id.to_s,
@@ -166,6 +176,27 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(BikeServices::Register.send(:details_completed?, b_param)).to be_truthy
     expect(ActiveStorage::Blob.find_signed!(b_param.image_signed_id).filename.to_s)
       .to eq "bike_photo-landscape.jpeg"
+
+    # Following the link makes the bike the registration was holding
+    visit confirmation_link
+
+    expect(page).to have_content("Registration complete", wait: 10)
+    bike = Bike.last
+    expect(bike).to have_attributes(owner_email:, serial_number: "made_without_serial",
+      status: "status_stolen", frame_model: "Marlin 7")
+    # Signed in as the account the link made - to anyone else this page would say the
+    # registration is the owner's to claim
+    expect(page).to have_content("keep watch")
+
+    # An account nobody signed up for, so the terms are the first thing it's asked
+    visit "/my_account"
+    check "user_terms_of_service"
+    click_button "Submit"
+
+    expect(page).to have_current_path("/my_account", wait: 5)
+    user = User.last
+    expect(user).to have_attributes(email: owner_email, confirmed: true, terms_of_service: true)
+    expect(bike.creator_id).to eq user.id
   end
 
   describe "signed in" do
