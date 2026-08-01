@@ -59,6 +59,7 @@ Rails.application.routes.draw do
   resource :session, only: %i[new create destroy] do
     collection do
       get :magic_link
+      get :magic_link_sent
       post :sign_in_with_magic_link
       post :create_magic_link
       match :identify, via: %i[get post]

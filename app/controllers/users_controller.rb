@@ -10,7 +10,8 @@ class UsersController < ApplicationController
   end
 
   def create
-    @user = User.new(permitted_parameters)
+    # The sign up form doesn't collect a password - they sign in with emailed links
+    @user = User.new(permitted_parameters.merge(passwordless_user: true))
     # Set the user's preferred locale if they have a locale we recognize
     if requested_locale != I18n.default_locale
       @user.preferred_language = requested_locale
@@ -67,7 +68,7 @@ class UsersController < ApplicationController
         render_partner_or_default_signin_layout(redirect_path: new_session_path)
       end
     elsif @user.confirm(params[:code])
-      sign_in_and_redirect(@user)
+      sign_in_and_redirect(@user, signed_up: true)
     else
       render :confirm_error_bad_token
     end
@@ -92,7 +93,7 @@ class UsersController < ApplicationController
   end
 
   def update_password_with_reset_token
-    if @user.present? && @user.update(permitted_password_reset_parameters)
+    if @user.present? && @user.update(permitted_password_reset_parameters.merge(passwordless_user: false))
       flash[:success] = translation(:password_reset_successfully)
       # They got the password reset email, which counts as confirming their email
       @user.confirm(@user.confirmation_token) if @user.unconfirmed?
@@ -194,7 +195,7 @@ class UsersController < ApplicationController
   def permitted_parameters
     params.require(:user)
       .permit(:name, :email, :notification_newsletters, :notification_unstolen, :terms_of_service,
-        :password, :password_confirmation, :preferred_language, :additional)
+        :preferred_language, :additional)
       .merge(sign_in_partner.present? ? {partner_data: {sign_up: sign_in_partner}} : {})
   end
 
@@ -202,8 +203,11 @@ class UsersController < ApplicationController
     params.require(:user).permit(:password, :password_confirmation)
   end
 
+  # Signed in users (e.g. passwordless users setting their first password) don't need the emailed token
   def find_user_from_token_for_password_reset!
-    @token = params[:token]
+    @token = params[:token].presence
+    return @user = current_user if @token.blank? && current_user.present?
+
     @user = User.find_by_token_for_password_reset(@token) if @token.present?
     return true if @user.present? && !@user.auth_token_expired?("token_for_password_reset")
 

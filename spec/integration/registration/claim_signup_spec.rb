@@ -87,7 +87,6 @@ RSpec.describe "Claim registration signup", :js, type: :system do
     # assertion waits for the signup page to finish loading after the click.
     expect(page).to have_field("Email", with: claimer_email)
     fill_in "Name", with: "New Claimer"
-    fill_in "Password", with: "testthisthing7$"
     check "user_terms_of_service"
     click_button "Sign up"
     # The session[:claim_token_email] set when we visited the bike link

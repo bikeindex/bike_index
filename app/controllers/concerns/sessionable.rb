@@ -1,6 +1,8 @@
 module Sessionable
   extend ActiveSupport::Concern
 
+  SIGN_IN_SCOPE = [:controllers, :concerns, :sessionable, :sign_in_and_redirect].freeze
+
   def skip_if_signed_in
     store_return_to
     # Make absolutely sure we don't have an unconfirmed user
@@ -16,9 +18,9 @@ module Sessionable
     end
   end
 
-  def sign_in_and_redirect(user)
+  def sign_in_and_redirect(user, signed_up: false)
     if user.banned? # If user is banned, tell them about it.
-      flash.now[:error] = translation(:user_is_banned, scope: [:controllers, :concerns, :sessionable, __method__])
+      flash.now[:error] = translation(:user_is_banned, scope: SIGN_IN_SCOPE)
       redirect_back(fallback_location: new_session_url) && return
     end
     confirm_user_from_claim_token(user)
@@ -39,7 +41,7 @@ module Sessionable
     elsif user.unconfirmed?
       render_partner_or_default_signin_layout(redirect_path: please_confirm_email_users_path) && return
     elsif !return_to_if_present
-      flash[:success] = translation(:logged_in, scope: [:controllers, :concerns, :sessionable, __method__])
+      set_sign_in_flash(user, signed_up)
       redirect_to(user_root_url) && return
     end
   end
@@ -53,6 +55,20 @@ module Sessionable
   end
 
   private
+
+  # Passwordless users are nudged to set a password, unless their organization is what signs them in
+  def set_sign_in_flash(user, signed_up)
+    if user.organization_passwordless_user?
+      flash[:success] = translation(:organization_signed_in, scope: SIGN_IN_SCOPE)
+    elsif user.passwordless_user?
+      set_password_link = helpers.link_to(translation(:set_password, scope: SIGN_IN_SCOPE),
+        update_password_form_with_reset_token_users_path)
+      flash[:success_html] = translation(signed_up ? :signed_up_html : :signed_in_html,
+        scope: SIGN_IN_SCOPE, set_password_link:)
+    else
+      flash[:success] = translation(:logged_in, scope: SIGN_IN_SCOPE)
+    end
+  end
 
   def cookie_options(user)
     c = {

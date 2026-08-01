@@ -2068,6 +2068,14 @@ nl:
       sessionable:
         sign_in_and_redirect:
           logged_in: Ingelogd!
+          organization_signed_in: Je bent ingelogd
+          set_password: een wachtwoord instellen om in te loggen
+          signed_in_html: >-
+            Je bent ingelogd! Je kunt %{set_password_link} als je dat liever hebt, anders
+            mailen we je gewoon een inloglink.
+          signed_up_html: >-
+            Je hebt je aangemeld bij Bike Index! Je kunt %{set_password_link} als je
+            dat liever hebt, anders mailen we je gewoon een inloglink.
           user_is_banned: Het spijt ons, maar het lijkt erop dat uw account is vergrendeld.
             Neem contact met ons op als u niet zeker weet waarom.
         skip_if_signed_in:
@@ -2243,10 +2251,10 @@ nl:
           Index op %{registration_date}
     confirmation_email:
       html:
-        click_to_verify_html: Klik op de knop <em>E-mail verifiëren</em> om het aanmelden
-          te voltooien!
-        please_confirm_your_email_address: Bevestig je e-mailadres
-        verify_email: Verifieer Email
+        click_to_sign_in_html: Klik op de knop <em>Inloggen</em> om het aanmelden te
+          voltooien!
+        follow_this_link_to_sign_in: Volg deze link om in te loggen
+        sign_in: Inloggen
         youre_almost_there: Je bent er bijna!
       subject: Bevestig uw e-mail met Bike Index!
     invoice_email:
@@ -4202,6 +4210,9 @@ nl:
       if_not_click_button: Zo niet, klik dan op de onderstaande knop
       sign_in: Log in
       you_should_be_signed_in_automatically: Je zou automatisch ingelogd moeten zijn.
+    magic_link_sent:
+      follow_the_link_back: Volg de link in de e-mail om in te loggen!
+      we_sent_a_magic_sign_in_link: We hebben je een magische inloglink gestuurd
     new:
       email: E-mail
       forgot_your_password: Wachtwoord vergeten?

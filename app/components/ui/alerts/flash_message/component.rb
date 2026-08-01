@@ -13,9 +13,9 @@ module UI
         def messages
           @flash.filter_map do |type, message|
             next unless message.is_a?(String)
-            kind = type.to_sym
+            kind, text = helpers.flash_kind_and_body(type, message)
             raise ArgumentError, "Unknown flash type: #{type}" unless UI::Alert::Component::KINDS.include?(kind)
-            {text: message, kind:}
+            {text:, kind:}
           end
         end
       end

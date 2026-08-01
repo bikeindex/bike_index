@@ -3,11 +3,11 @@
 
 
 %h3.center-text{ style: "margin: 2rem 0 3rem;" }
-  = t(".html.please_confirm_your_email_address")
+  = t(".html.follow_this_link_to_sign_in")
 
 - tokenized_url = @email_preview ? @email_preview_tokenized_url : confirm_users_url(id: @user.id, code: @user.confirmation_token, partner: @partner)
-= link_to t(".html.verify_email"), tokenized_url, "data-pm-no-track" => true, class: "binx-button"
+= link_to t(".html.sign_in"), tokenized_url, "data-pm-no-track" => true, class: "binx-button"
 
 - unless @partner
   %p.less-strong.center-text
-    = t(".html.click_to_verify_html")
+    = t(".html.click_to_sign_in_html")

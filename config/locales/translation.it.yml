@@ -2222,6 +2222,14 @@ it:
       sessionable:
         sign_in_and_redirect:
           logged_in: Accesso effettuato!
+          organization_signed_in: Hai effettuato l'accesso
+          set_password: impostare una password per accedere
+          signed_in_html: >-
+            Hai effettuato l'accesso! Se preferisci puoi %{set_password_link}, altrimenti
+            ti invieremo semplicemente un link di accesso via email.
+          signed_up_html: >-
+            Ti sei registrato a Bike Index! Se preferisci puoi %{set_password_link},
+            altrimenti ti invieremo semplicemente un link di accesso via email.
           user_is_banned: Ci dispiace, ma sembra che il tuo account sia stato bloccato.
             Se hai dubbi sui motivi, ti preghiamo di contattarci.
         skip_if_signed_in:
@@ -2549,10 +2557,10 @@ it:
         we_think_your_stolen_bike: Potremmo aver trovato il tuo %{bike_title} rubato!
     confirmation_email:
       html:
-        click_to_verify_html: Fai clic sul pulsante <em>Verifica email</em> per completare
+        click_to_sign_in_html: Fai clic sul pulsante <em>Accedi</em> per completare
           la registrazione!
-        please_confirm_your_email_address: Conferma il tuo indirizzo email
-        verify_email: Verifica l'indirizzo email
+        follow_this_link_to_sign_in: Segui questo link per accedere
+        sign_in: Accedi
         youre_almost_there: Ci sei quasi!
       subject: Conferma il tuo indirizzo email di Bike Index!
     invoice_email:
@@ -5016,6 +5024,9 @@ it:
       unable_to_auth: Impossibile autenticare il token
       you_should_be_signed_in_automatically: Dovresti essere connesso automaticamente.
       your_email_address: Il tuo indirizzo di posta elettronica
+    magic_link_sent:
+      follow_the_link_back: Segui il link nella email per accedere!
+      we_sent_a_magic_sign_in_link: Ti abbiamo inviato un link magico per accedere
     new:
       email: e-mail
       forgot_your_password: Hai dimenticato la password?

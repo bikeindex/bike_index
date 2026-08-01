@@ -90,13 +90,11 @@ RSpec.describe UsersController, type: :controller do
       {
         name: "Test name",
         email: "poo@pile.com",
-        password: "testthisthing7$",
-        password_confirmation: "testthisthing7$",
         terms_of_service: true
       }
     end
     describe "success" do
-      it "creates a non-confirmed record, doesn't block on unknown language" do
+      it "creates a non-confirmed passwordless record, doesn't block on unknown language" do
         expect {
           post :create, params: {locale: "klingon", user: user_attributes}
         }.to change(User, :count).by(1)
@@ -105,9 +103,15 @@ RSpec.describe UsersController, type: :controller do
         user = User.order(:created_at).last
         expect(User.from_auth(cookies.signed[:auth])).to eq user
         expect(user.partner_sign_up).to be_nil
-        expect(user.partner_sign_up).to be_nil
         expect(user.unconfirmed?).to be_truthy
+        expect(user.passwordless_user?).to be_truthy
         expect(user.preferred_language).to be_blank # Because language wasn't passed
+      end
+      it "ignores a submitted password" do
+        post :create, params: {user: user_attributes.merge(password: "testthisthing7$")}
+        user = User.order(:created_at).last
+        expect(user.passwordless_user?).to be_truthy
+        expect(user.authenticate("testthisthing7$")).to be_falsey
       end
       context "with locale passed" do
         it "creates a user with a preferred_language" do
@@ -144,7 +148,7 @@ RSpec.describe UsersController, type: :controller do
         let!(:organization) { organization_role.organization }
         let(:bike) { FactoryBot.create(:bike, example: true, owner_email: email) }
         let!(:ownership) { FactoryBot.create(:ownership, bike: bike, owner_email: email) }
-        let(:user_attributes) { {email: email, name: "SAMPLE", password: "pleaseplease12", terms_of_service: "1", notification_newsletters: "0"} }
+        let(:user_attributes) { {email: email, name: "SAMPLE", terms_of_service: "1", notification_newsletters: "0"} }
 
         it "creates a confirmed user, logs in, and send welcome even with an example bike" do
           expect(session[:passive_organization_id]).to be_blank
@@ -250,11 +254,7 @@ RSpec.describe UsersController, type: :controller do
     end
 
     describe "failure" do
-      let(:user_attributes) do
-        user = FactoryBot.attributes_for(:user)
-        user[:password_confirmation] = "bazoo"
-        user
-      end
+      let(:user_attributes) { {name: "Test name", email: "not-an-email", terms_of_service: true} }
       it "does not create a user or send a welcome email" do
         expect {
           expect {
@@ -291,7 +291,6 @@ RSpec.describe UsersController, type: :controller do
         {
           name: "foo",
           email: "foo1@bar.com",
-          password: "coolpasswprd$$$$$",
           terms_of_service: "0",
           notification_newsletters: "0"
         }
@@ -322,6 +321,32 @@ RSpec.describe UsersController, type: :controller do
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(response).to redirect_to my_account_url
           expect(session[:partner]).to be_nil
+          expect(flash[:success]).to eq "Logged in!"
+          expect(flash[:success_html]).to be_blank
+        end
+
+        context "passwordless user" do
+          let!(:user) { FactoryBot.create(:user, passwordless_user: true) }
+
+          it "offers to set a password" do
+            get :confirm, params: {id: user.id, code: user.confirmation_token}
+            expect(User.from_auth(cookies.signed[:auth])).to eq(user)
+            expect(response).to redirect_to my_account_url
+            expect(flash[:success]).to be_blank
+            expect(flash[:success_html]).to match("You've signed up for Bike Index!")
+            expect(flash[:success_html]).to match(update_password_form_with_reset_token_users_path)
+          end
+
+          context "organization passwordless user" do
+            let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"]) }
+            let!(:organization_role) { FactoryBot.create(:organization_role_claimed, organization:, user:) }
+
+            it "doesn't offer to set a password" do
+              get :confirm, params: {id: user.id, code: user.confirmation_token}
+              expect(flash[:success]).to eq "You're signed in"
+              expect(flash[:success_html]).to be_blank
+            end
+          end
         end
 
         context "with partner" do

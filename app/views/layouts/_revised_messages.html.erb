@@ -7,7 +7,8 @@
 
 <div class="bootstrapstyle primary-alert-block">
   <% flash.each do |name, msg| %>
-    <%= render partial: "/shared/alert", locals: { body: msg, type: name } %>
+    <% type, body = flash_kind_and_body(name, msg) %>
+    <%= render partial: "/shared/alert", locals: { body:, type: } %>
   <% end %>
 
   <% if @page_errors.present? %>

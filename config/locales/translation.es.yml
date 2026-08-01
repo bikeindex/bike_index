@@ -2222,6 +2222,16 @@ es:
       sessionable:
         sign_in_and_redirect:
           logged_in: "¡Sesión iniciada!"
+          organization_signed_in: Has iniciado sesión
+          set_password: establecer una contraseña para iniciar sesión
+          signed_in_html: >-
+            ¡Has iniciado sesión! Puedes %{set_password_link} si lo prefieres, de lo
+            contrario simplemente te enviaremos por correo electrónico un enlace para
+            iniciar sesión.
+          signed_up_html: >-
+            ¡Te has registrado en Bike Index! Puedes %{set_password_link} si lo prefieres,
+            de lo contrario simplemente te enviaremos por correo electrónico un enlace
+            para iniciar sesión.
           user_is_banned: Lo sentimos, pero parece que su cuenta ha sido bloqueada.
             Si desconoce el motivo, póngase en contacto con nosotros.
         skip_if_signed_in:
@@ -2554,11 +2564,10 @@ es:
           robado!"
     confirmation_email:
       html:
-        click_to_verify_html: ¡Haz clic en el botón <em>"Verificar correo electrónico"</em>
-          para finalizar el registro!
-        please_confirm_your_email_address: Por favor, confirme su dirección de correo
-          electrónico.
-        verify_email: Verificar correo electrónico
+        click_to_sign_in_html: ¡Haz clic en el botón <em>Iniciar sesión</em> para finalizar
+          el registro!
+        follow_this_link_to_sign_in: Sigue este enlace para iniciar sesión
+        sign_in: Iniciar sesión
         youre_almost_there: "¡Ya casi llegas!"
       subject: "¡Por favor, confirma tu correo electrónico de Bike Index!"
     invoice_email:
@@ -4996,6 +5005,9 @@ es:
       unable_to_auth: No se pudo autenticar ese token.
       you_should_be_signed_in_automatically: Deberías iniciar sesión automáticamente.
       your_email_address: Su dirección de correo electrónico
+    magic_link_sent:
+      follow_the_link_back: '¡Sigue el enlace del correo electrónico para iniciar sesión!'
+      we_sent_a_magic_sign_in_link: Te hemos enviado un enlace mágico para iniciar sesión
     new:
       email: correo electrónico
       forgot_your_password: "¿Olvidaste tu contraseña?"

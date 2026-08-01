@@ -1715,6 +1715,14 @@ en:
       sessionable:
         sign_in_and_redirect:
           logged_in: Logged in!
+          organization_signed_in: You're signed in
+          set_password: set password to sign in
+          signed_in_html: >-
+            You're signed in! You can %{set_password_link} if you prefer, otherwise
+            we will just email you a sign in link.
+          signed_up_html: >-
+            You've signed up for Bike Index! You can %{set_password_link} if you prefer,
+            otherwise we will just email you a sign in link.
           user_is_banned: >-
             We're sorry, but it appears that your account has been locked. If you
             are unsure as to the reasons for this, please contact us.
@@ -1943,7 +1951,6 @@ en:
       create:
         invalid_email_or_password: Invalid email/password
       create_magic_link:
-        link_sent: Sign in link sent! Just click the link in your email to sign in
         user_not_found: Unable to find that user
     stolen_notifications:
       create:
@@ -2055,10 +2062,10 @@ en:
         we_think_your_stolen_bike: We may have found your stolen %{bike_title}!
     confirmation_email:
       html:
-        click_to_verify_html: Click the <em>Verify email</em> button to finish signing
+        click_to_sign_in_html: Click the <em>Sign in</em> button to finish signing
           up!
-        please_confirm_your_email_address: Please confirm your email address
-        verify_email: Verify email
+        follow_this_link_to_sign_in: Follow this link to sign in
+        sign_in: Sign in
         youre_almost_there: You're almost there!
       subject: Please confirm your Bike Index email!
     invoice_email:
@@ -4775,6 +4782,9 @@ en:
       unable_to_auth: Unable to authenticate that token
       you_should_be_signed_in_automatically: You should be automatically signed in.
       your_email_address: your email address
+    magic_link_sent:
+      follow_the_link_back: Follow the link in the email to sign in!
+      we_sent_a_magic_sign_in_link: We sent you a magic sign in link
     new:
       continue: Continue
       email: email
@@ -5190,12 +5200,9 @@ en:
       agree_bikeindex_toc_html: I agree to Bike Index's %{bikeindex_toc_link}.
       already_have_a_bike_index_account: Already have a Bike Index account?
       already_have_an_account: already have an account?
-      better_password: better
       get_bike_indexs_newsletter: Get Bike Index's Newsletter
       get_on_bike_index: Get on Bike Index
       log_in: log in
-      password_helper_text_html: Password must be at least 12 characters. Longer is
-        %{better_password_link}.
       sign_up: Sign up
       sign_up_using_facebook: Sign up using Facebook
       sign_up_using_globalid: Sign up using globaliD
