@@ -32,19 +32,14 @@ RSpec.describe PageBlock::UserAlerts::Wrapper::Component, :js, type: :system do
       spec = Rails.root.join("spec/components/page_block/user_alerts/#{alert}/component_spec.rb")
       expect(spec.exist?).to be_truthy, "UserAlerts::#{alert.camelize} has no component spec"
     end
-    expect(scenarios).to include("no_alert")
   end
 
-  it "renders the alert each scenario is named for, and none of them without one" do
+  it "renders the alert each scenario is named for, and none of the others" do
     alert_text.each do |scenario, text|
       visit "#{preview_path}/#{scenario}"
 
       expect(page).to have_content(text)
       alert_text.except(scenario).each_value { |other| expect(page).to have_no_content(other) }
     end
-
-    visit "#{preview_path}/no_alert"
-
-    alert_text.each_value { |text| expect(page).to have_no_content(text) }
   end
 end

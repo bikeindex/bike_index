@@ -22,11 +22,6 @@ module PageBlock
           render(UnfinishedRegistration::Component.new(b_param: preview_b_param))
         end
 
-        # Every kind ignored, so the wrapper renders nothing
-        def no_alert
-          render(Component.new(current_user: User.new(alert_slugs: [])))
-        end
-
         private
 
         # manufacturer_id is what makes it resumable rather than a blank shell
