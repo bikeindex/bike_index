@@ -27,6 +27,12 @@ module SystemSpecHelpers
     end
   end
 
+  # Resize for this example only -- the browser context is recreated between
+  # examples, so the configured viewport comes back on its own.
+  def resize_window(width:, height:)
+    page.driver.with_playwright_page { |playwright_page| playwright_page.set_viewport_size(width:, height:) }
+  end
+
   def browser_cookie_value(name)
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.context.cookies.find { |cookie| cookie["name"] == name }&.fetch("value")
