@@ -48,6 +48,74 @@ RSpec.describe Registrations::Show::ClaimImpound::Component, type: :component do
     end
   end
 
+  context "viewer already opened a claim" do
+    let(:impound_record) { FactoryBot.create(:impound_record, :with_organization) }
+    let(:bike) { impound_record.bike.reload }
+    let(:impound_claim) { FactoryBot.create(:impound_claim_with_stolen_record, impound_record:, user: current_user) }
+    let(:current_user) { FactoryBot.create(:user_confirmed) }
+    before { impound_claim }
+
+    it "shows the claim's message form rather than another open-claim form" do
+      render_inline(component)
+      expect(page).to have_text("Your claim")
+      expect(page).to_not have_text("Does this look like your bike?")
+      expect(page).to_not have_button("Open claim")
+      expect(page).to have_css("form[action='/impound_claims/#{impound_claim.id}'] textarea[name='impound_claim[message]']")
+      expect(page).to have_button("Save message")
+      expect(page).to have_button("Submit claim")
+    end
+
+    context "claim submitted" do
+      before { impound_claim.update(status: "submitting") }
+
+      it "shows when it was submitted, without the editing forms" do
+        expect(impound_claim.reload.submitted?).to be_truthy
+        render_inline(component)
+        expect(page).to have_text("This claim was submitted")
+        expect(page).to_not have_button("Save message")
+        expect(page).to_not have_button("Submit claim")
+      end
+
+      context "claim approved" do
+        before { impound_claim.update(status: "approved") }
+
+        it "says the claim was approved" do
+          render_inline(component)
+          expect(page).to have_text("Your claim was approved")
+        end
+      end
+    end
+
+    context "claim denied" do
+      before { impound_claim.update(status: "denied") }
+
+      it "offers the open-claim form again" do
+        expect(impound_claim.reload.rejected?).to be_truthy
+        render_inline(component)
+        expect(page).to have_text("Does this look like your bike?")
+        expect(page).to_not have_text("Your claim")
+      end
+    end
+  end
+
+  # display_impound_claim? matches the bike a claim was submitted *with*, which has
+  # no impound_record of its own
+  context "viewing the stolen bike the claim was submitted with" do
+    let(:stolen_record) { FactoryBot.create(:stolen_record, bike: FactoryBot.create(:bike, :with_ownership)) }
+    let(:bike) { stolen_record.bike.reload }
+    let(:current_user) { FactoryBot.create(:user_confirmed) }
+    let!(:impound_claim) { FactoryBot.create(:impound_claim, stolen_record:, user: current_user) }
+
+    it "points at the claimed bike instead of rendering a claim form" do
+      expect(impound_claim.reload.bike_submitting_id).to eq bike.id
+      expect(bike.owner).to_not eq current_user
+      render_inline(component)
+      expect(page).to have_text("You have a pending claim with this bike")
+      expect(page).to have_link(href: "/registrations/#{impound_claim.bike_claimed_id}")
+      expect(page).to_not have_button("Open claim")
+    end
+  end
+
   context "non-impounded bike" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:current_user) { FactoryBot.create(:user_confirmed) }

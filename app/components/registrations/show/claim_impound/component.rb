@@ -4,7 +4,8 @@ module Registrations
   module Show
     module ClaimImpound
       # "Does this look like your bike?" — lets a non-owner open an impound claim
-      # against one of their stolen bikes. Mirrors the contact-owner card.
+      # against one of their stolen bikes, then shows that claim once it exists.
+      # Mirrors the contact-owner card.
       class Component < ApplicationComponent
         def initialize(bike:, current_user: nil, owner: false)
           @bike = bike
@@ -18,6 +19,10 @@ module Registrations
 
         private
 
+        def heading
+          translation((claim || submitting_claim) ? ".your_claim" : ".does_this_look_like_your_bike")
+        end
+
         def claim_button_text
           translation(@bike.status_found? ? ".claim_found_bike" : ".claim_impounded_bike")
         end
@@ -26,8 +31,30 @@ module Registrations
           @impound_record ||= @bike.current_impound_record
         end
 
-        def impound_claim
-          @impound_claim ||= ImpoundClaim.new(impound_record_id: impound_record&.id)
+        # The viewer's claim against this bike, once they've opened one
+        def claim
+          return @claim if defined?(@claim)
+
+          @claim = viewer_claim(@bike.impound_claims_claimed)
+        end
+
+        # A claim the viewer opened with this bike - they're looking at the stolen bike
+        # they submitted rather than the impounded one being claimed
+        def submitting_claim
+          return if claim.present?
+          return @submitting_claim if defined?(@submitting_claim)
+
+          @submitting_claim = viewer_claim(@bike.impound_claims_submitting)
+        end
+
+        def viewer_claim(claims)
+          return if @current_user.blank?
+
+          claims.where(user_id: @current_user.id).not_rejected.last
+        end
+
+        def new_claim
+          @new_claim ||= ImpoundClaim.new
         end
 
         # The viewer's stolen bikes they could claim this impound with

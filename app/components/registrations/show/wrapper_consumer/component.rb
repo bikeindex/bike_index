@@ -18,6 +18,14 @@ module Registrations
           @owner = owner.nil? ? (@current_user.present? && @bike.owner == @current_user) : owner
         end
 
+        # The claim-impound card renders the viewer's own claim, which nothing else in
+        # the cache key moves when they save or submit it
+        def cache_version
+          return [] if @current_user.blank?
+
+          [ImpoundClaim.involving_bike_id(@bike.id).where(user_id: @current_user.id).maximum(:updated_at)]
+        end
+
         private
 
         def title
