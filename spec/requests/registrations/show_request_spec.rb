@@ -67,8 +67,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
     end
 
     context "current_user sent the bike to a new owner who hasn't claimed it" do
-      # An unclaimed ownership still resolves bike.owner to the creator, so the
-      # sender gets the owner view — with the alert saying it's awaiting the claim
+      # An unclaimed ownership still resolves bike.owner to the creator
       let(:bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "new-owner@example.com") }
       let(:current_user) { bike.reload.current_ownership.creator }
       it "shows the sent-to-new-owner notice" do

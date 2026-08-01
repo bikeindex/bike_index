@@ -69,15 +69,13 @@ module Registrations
         # @param view select [consumer, org_admin]
         # @param bike_id text "Bike to render — defaults to one awaiting a claim"
         def sent_to_new_owner(view: "consumer", bike_id: nil)
-          # This one is the registration's own state rather than a token, so it needs an
-          # unclaimed ownership and the owner's view of it
+          # State rather than a token, so it needs an unclaimed ownership and the owner
           page(view:, bike_id: bike_id.presence || bike_with_ownership(claimed: false)&.id)
         end
 
         private
 
-        # Renders the page for the resolved bike. The block builds the alerts from it, or
-        # returns :missing when the record that scenario needs doesn't exist here
+        # The block builds the alerts off the resolved bike, or returns :missing
         def page(view:, bike_id:, bike_sticker: nil, current_user: lookbook_user)
           return production_notice if Rails.env.production?
 
@@ -100,16 +98,15 @@ module Registrations
         def alerts(**) = BikeServices::ShowCurrentAlerts::NONE.with(**)
 
         # ShowViews decides what this viewer may see; the param only picks which side of
-        # that to show. So a preview can't put up an owner view for someone who doesn't
-        # own the registration, or a staff role they don't hold — pages that don't exist
+        # that to show, so a preview can't put up a page the app never serves
         def resolved_view(view, available_views, bike:, current_user:)
           org_view = view.to_s == "org_admin"
           available_views.find { |_kind, organization| organization.present? == org_view } ||
             ::BikeServices::ShowViews.default_view_for(bike:, current_user:, organization: lookbook_organization)
         end
 
-        # Claimed by default: SentToNewOwner raises itself off an unclaimed registration,
-        # so an unclaimed one would stack that alert onto every other scenario
+        # Claimed by default — SentToNewOwner raises itself off an unclaimed registration,
+        # stacking that alert onto every other scenario
         def preview_bike(bike_id)
           ::Bike.unscoped.find_by(id: bike_id) || bike_with_ownership(claimed: true)
         end

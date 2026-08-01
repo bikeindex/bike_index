@@ -48,7 +48,7 @@ module Registrations
             @matching_notification.organization
           end
 
-          # The org's own copy for this notification kind, shown under the message
+          # The org's own copy for this notification kind
           def organization_snippet
             return @organization_snippet if defined?(@organization_snippet)
 

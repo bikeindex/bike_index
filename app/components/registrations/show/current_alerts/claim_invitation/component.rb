@@ -46,7 +46,7 @@ module Registrations
           end
 
           # ownerships#show claims it, or says whose it is. Signed out, they sign up
-          # against the ownership's email and come back here
+          # against the ownership's email and come back
           def claim_path
             return ownership_path(ownership) if signed_in?
 

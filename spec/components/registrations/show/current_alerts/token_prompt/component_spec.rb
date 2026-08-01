@@ -64,7 +64,6 @@ RSpec.describe Registrations::Show::CurrentAlerts::TokenPrompt::Component, type:
       expect(page).to have_button("Mark recovered")
 
       expect(page).to have_no_css("dialog")
-      # Dismissing belongs to the dialog; this is what's left once it's dismissed
       expect(page).to have_no_button("Nevermind")
     end
 

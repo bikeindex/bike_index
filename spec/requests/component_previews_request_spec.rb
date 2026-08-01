@@ -88,7 +88,7 @@ RSpec.describe "ComponentPreviews", type: :request do
       expect(component.instance_variable_get(:@view)).to eq [:public, nil]
     end
 
-    # Lookbook is mounted in production, where these bikes would be real people's
+    # Lookbook is mounted in production, where the bikes would be real people's
     it "renders a notice rather than the registration in production" do
       allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("production"))
 

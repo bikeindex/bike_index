@@ -107,9 +107,8 @@ RSpec.describe BikeServices::ShowCurrentAlerts do
     end
 
     context "bike is no longer stolen" do
-      # Recover through a freshly loaded record, like the recovery controller does.
-      # Reusing the instance that minted the token carries its skip_update flag over,
-      # which leaves bikes.status stale at status_stolen
+      # Freshly loaded, like the recovery controller does — reusing the instance that
+      # minted the token carries its skip_update flag over, leaving bikes.status stale
       before do
         recovery_link_token
         StolenRecord.unscoped.find(stolen_record.id).add_recovery_information

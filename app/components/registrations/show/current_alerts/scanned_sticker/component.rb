@@ -4,8 +4,8 @@ module Registrations
   module Show
     module CurrentAlerts
       module ScannedSticker
-        # Shown when the viewer arrived by scanning a sticker (?scanned_id), with a
-        # re-link form for viewers who are allowed to reassign the sticker
+        # Shown when the viewer arrived by scanning a sticker (?scanned_id), with a re-link
+        # form for anyone allowed to reassign it
         class Component < ApplicationComponent
           def initialize(bike:, bike_sticker: nil, current_user: nil)
             @bike = bike

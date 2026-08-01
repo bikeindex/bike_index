@@ -4,9 +4,7 @@ module Registrations
   module Show
     module CurrentAlerts
       module RecoveryPrompt
-        # The "mark it recovered" form, reached from the recovery link in a theft
-        # alert email. The controller hands over the stolen record it matched from
-        # session[:recovery_link_token], deleting the token so this shows once.
+        # The "mark it recovered" form, reached from a theft alert email's recovery link.
         # A similar form lives in edit_report_stolen / edit_report_recovered
         class Component < ApplicationComponent
           include PromptVariant

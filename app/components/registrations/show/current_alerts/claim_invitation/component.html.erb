@@ -1,8 +1,5 @@
 <%= render(Registrations::Show::CurrentAlerts::PromptChrome::Component.new(variant: @variant, id: MODAL_ID, title: translation(".claim_your_bike_type", bike_type: @bike.type))) do %>
-  <%#
-    The avatar sits alongside the opening line only — what follows runs the full width
-    rather than staying indented past the image
-  %>
+  <%# The avatar sits alongside the opening line only — the rest runs full width %>
 
   <div class="tw:flex tw:items-start tw:gap-3">
     <% if organization_avatar %>
@@ -19,10 +16,7 @@
     </p>
   </div>
 
-  <%#
-    Signed in, the button is the whole instruction — nobody with an account needs
-    telling to make one
-  %>
+  <%# Signed in, the button is the whole instruction — there's no account to make %>
 
   <% if claimable? %>
     <p class="tw:mt-2">

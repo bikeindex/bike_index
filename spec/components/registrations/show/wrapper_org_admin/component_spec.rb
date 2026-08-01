@@ -7,8 +7,7 @@ RSpec.describe Registrations::Show::WrapperOrgAdmin::Component, type: :component
   let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
   let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
 
-  # The wrapper folds this into its fragment cache key so org-scoped records that
-  # don't touch the bike still expire the cached panel when they change
+  # The wrapper folds this into its cache key, so these still expire the cached panel
   describe "#cache_version" do
     def cache_version
       described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff).cache_version

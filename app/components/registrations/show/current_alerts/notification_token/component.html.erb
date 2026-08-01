@@ -1,10 +1,7 @@
 <%= render(Registrations::Show::CurrentAlerts::PromptChrome::Component.new(variant: @variant, id: MODAL_ID, title: @matching_notification.subject)) do %>
   <%= render(UI::UserTextBlockDisplay::Component.new(text: @matching_notification.message, max_height_class: "")) %>
 
-  <%#
-    The org authors this as HTML in admin, so it renders as HTML — UserTextBlockDisplay
-    escapes, and it strips its text, which drops html_safe anyway
-  %>
+  <%# The org authors this as HTML in admin, and UserTextBlockDisplay would escape it %>
 
   <% if organization_snippet.present? %>
     <div class="tw:mt-2 tw:flex tw:flex-col tw:gap-2">
