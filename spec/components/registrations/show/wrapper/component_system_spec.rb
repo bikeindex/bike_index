@@ -10,9 +10,8 @@ RSpec.describe Registrations::Show::Wrapper::Component, :js, type: :system do
   # Text that only appears once that alert rendered, keyed by the component's directory
   # so the keys can be checked against what's on disk
   let(:alert_text) do
-    # The card's heading is uppercased in CSS, so this anchors on its body - the lookbook
-    # user has no stolen registration to offer
-    {"claim_impound" => "You need a stolen bike registered",
+    # The card's heading is uppercased in CSS, so this anchors on its claim button
+    {"claim_impound" => "Claim found bike",
      "claim_invitation" => "registered your bike on Bike Index",
      "notification_token" => "Mark bike retrieved",
      "recovery_prompt" => "Mark your bike recovered!",
