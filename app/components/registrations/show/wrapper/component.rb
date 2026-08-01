@@ -8,7 +8,7 @@ module Registrations
       class Component < ApplicationComponent
         # Digest of the markup inside the cache block — the cached_markup_digest spec
         # keeps it current, following what this tree renders out into UI:: and elsewhere
-        MARKUP_DIGEST = "97d4fd6c5ee2"
+        MARKUP_DIGEST = "e340959dc45c"
 
         def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: {})
           @bike = bike
@@ -31,14 +31,15 @@ module Registrations
         # Keyed on the viewer for the admin view's per-user content. The bike's cache
         # version misses org-scoped records that don't touch it (notes, model audits, the
         # owner's other registrations), so the inner component folds those in via
-        # #cache_version, and the prompt's fields because its alert is inside the cached
-        # body, token and all. Cached CSRF tokens are session-scoped and can't be keyed
-        # here — the csrf-refresh controller reissues them client-side from the meta tag
+        # #cache_version — as does the prompt, whose alert is inside the cached body,
+        # token and clock-derived form bounds and all. Cached CSRF tokens are
+        # session-scoped and can't be keyed here — the csrf-refresh controller reissues
+        # them client-side from the meta tag
         def cache_key
           [MARKUP_DIGEST, @current_user&.id,
             @current_user&.registration_show_toggleable?, @current_user&.feature_registration_show_legacy?,
             BikeServices::ShowViews.view_param(@view), @bike_sticker&.id,
-            token_prompt && @current_alerts.sort,
+            token_prompt && [@current_alerts.sort, *token_prompt.try(:cache_version)],
             @bike.cache_key_with_version, *inner_component.try(:cache_version)]
         end
 

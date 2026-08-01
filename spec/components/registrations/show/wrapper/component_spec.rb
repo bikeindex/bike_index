@@ -33,5 +33,16 @@ RSpec.describe Registrations::Show::Wrapper::Component, type: :component do
 
       expect(keys.first).to_not eq keys.last
     end
+
+    # The recovery form's default and max are read off the clock into that same cached
+    # alert, so an entry written yesterday must not be served with yesterday's max
+    it "carries the recovery prompt's clock-derived bounds" do
+      stolen_bike = FactoryBot.create(:stolen_bike, :with_ownership_claimed)
+      alerts = {recovered_stolen_record: stolen_bike.current_stolen_record}
+      key = described_class.new(bike: stolen_bike, current_user: nil, view: [:public, nil],
+        available_views: [], current_alerts: alerts).cache_key
+
+      expect(key.flatten).to include(Binxtils::TimeParser.round(Time.current), Time.current.end_of_day)
+    end
   end
 end

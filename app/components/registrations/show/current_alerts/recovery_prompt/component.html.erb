@@ -18,7 +18,7 @@
     <div class="tw:mt-3">
       <%= form.label :recovered_at, translation(".when_did_you_recover_it"), class: "twlabel" %>
       <%= form.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
-      <%= form.datetime_local_field :recovered_at, value: recovered_at, max: Time.current.end_of_day, step: 3600, required: true, class: "twinput tw:w-full" %>
+      <%= form.datetime_local_field :recovered_at, value: recovered_at, max: max_recovered_at, step: 3600, required: true, class: "twinput tw:w-full" %>
     </div>
 
     <label class="tw:mt-3 tw:flex tw:items-center tw:gap-2">

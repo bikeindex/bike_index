@@ -21,11 +21,17 @@ module Registrations
             @stolen_record.present?
           end
 
+          # The form's bounds come off the clock, and the alert is rendered into the
+          # wrapper's fragment cache — so they have to key it
+          def cache_version = [recovered_at, max_recovered_at]
+
           private
 
           def recovered_at
             Binxtils::TimeParser.round(@stolen_record.recovered_at || Time.current)
           end
+
+          def max_recovered_at = Time.current.end_of_day
         end
       end
     end
