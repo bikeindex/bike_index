@@ -634,15 +634,15 @@ RSpec.describe RegisterController, type: :request do
       end
 
       context "blank name" do
-        it "re-renders step 2 with an error, saving nothing" do
-          expect {
-            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.merge(user_name: " ")}
-          }.to_not change { b_param.reload.params }
+        it "re-renders step 2 with an error, saving the details but not completing" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.merge(user_name: " ")}
           expect(response.status).to eq 422
           expect(response.body).to include "Owner name is required to register"
-          # Unsaved, so the registration isn't finished - and the form comes back filled in
-          expect(BikeServices::Register.send(:details_completed?, b_param)).to be_falsey
           expect(response.body).to include "XYZ 123"
+          # Everything entered is kept, but incomplete - so the flow stays on step 2
+          expect(b_param.reload.bike["serial_number"]).to eq "XYZ 123"
+          expect(BikeServices::Register.send(:details_completed?, b_param)).to be_falsey
+          expect(BikeServices::Register.permitted_step(b_param, "review", sequence: nil)).to eq "2"
         end
       end
 
@@ -736,6 +736,201 @@ RSpec.describe RegisterController, type: :request do
         expect(response).to redirect_to new_register_path
         expect(flash[:info]).to be_present
       end
+    end
+  end
+
+  describe "acknowledge" do
+    let(:organization) { FactoryBot.create(:organization) }
+    # Built as a draft and activated below, since activation freezes the pages
+    let(:sequence) do
+      FactoryBot.create(:registration_sequence, organization:,
+        faq_url: "https://example.com/faq", acknowledgment_text: "agree to all of it")
+    end
+    let!(:battery_page) do
+      FactoryBot.create(:registration_sequence_page, registration_sequence: sequence, listing_order: 0,
+        title: "Battery & charging", subtitle: "Charge safely",
+        heading: "Looks like you have an e-vehicle!",
+        body: "<ul><li>Charge with the manufacturer's charger</li><li>Report a swollen battery</li></ul>")
+    end
+    let!(:campus_page) do
+      FactoryBot.create(:registration_sequence_page, registration_sequence: sequence, listing_order: 1,
+        title: "Campus rules", body: "<ul><li>Dismount in posted zones</li></ul>",
+        organization_specific: true)
+    end
+    let(:b_param) do
+      BParam.create(origin: "register_flow",
+        params: {bike: {owner_email:, manufacturer_id: "Trek", cycle_type: "e-scooter",
+                        creation_organization_id: organization.id}}.as_json)
+    end
+    let(:bike_details) do
+      {primary_frame_color_id: color.id, serial_number: "XYZ 123", status: "status_with_owner", user_name:}
+    end
+    let(:step_path) { ->(step) { register_path(b_param_token: b_param.id_token, step:) } }
+
+    include_context :request_spec_logged_in_as_user
+    before { sequence.make_active! }
+
+    it "walks the safety pages between the details and the bike" do
+      # Step 2 hands off to the first safety page rather than creating the bike
+      expect {
+        patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+      }.to_not change(Bike, :count)
+      expect(response).to redirect_to step_path.call("3")
+
+      follow_redirect!
+      # The heading is the page's own; the title labels its rules and names it on the review
+      expect(response.body).to include "Looks like you have an e-vehicle!"
+      expect(response.body).to include "Battery &amp; charging"
+      expect(response.body).to include "Charge with the manufacturer's charger"
+      expect(response.body).to include "Electric (motorized) detected"
+      expect(response.body).to include "E-Vehicle Acknowledgment · Step 1 of 3"
+      expect(response.body).to include "https://example.com/faq"
+
+      # Ahead of where the registration stands clamps back to it
+      get step_path.call("4")
+      expect(response).to redirect_to step_path.call("3")
+
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
+                                                acknowledged: {"0" => "1", "1" => "1"}}
+      expect(response).to redirect_to step_path.call("4")
+      expect(BikeServices::Register.acknowledged_page_ids(b_param.reload)).to eq([battery_page.id])
+
+      follow_redirect!
+      expect(response.body).to include "Campus rules"
+      # The organization owns this page's rules, so its name is on them
+      expect(response.body).to include organization.short_name
+
+      expect {
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "4",
+                                                  acknowledged: {"0" => "1"}}
+      }.to_not change(Bike, :count)
+      expect(response).to redirect_to step_path.call("review")
+
+      follow_redirect!
+      expect(response.body).to include "You&#39;re almost done"
+      expect(response.body).to include "agree to all of it"
+      # The review is the last acknowledgment step, not a completed one - the
+      # acknowledgment below it is still unsigned
+      expect(response.body).to include "E-Vehicle Acknowledgment · Step 3 of 3"
+      expect(response.body).to_not include "Safety check complete"
+      # Registered for someone else, so it's their name that's agreeing - not the
+      # signed-in account filling the form in
+      expect(response.body).to include user_name
+      expect(response.body).to_not include current_user.name
+
+      # The acknowledgment is what creates the bike
+      expect {
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
+      }.to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment, :count).by(1)
+      expect(response).to redirect_to step_path.call("finished")
+      expect(b_param.reload.created_bike_id).to eq Bike.last.id
+
+      # The record hangs off the bike, so it survives the b_param being swept
+      acknowledgment = RegistrationSequenceAcknowledgment.last
+      expect(acknowledgment).to have_attributes(registration_sequence_id: sequence.id,
+        bike_id: Bike.last.id, user_id: current_user.id, owner_email:,
+        acknowledgment_text: "agree to all of it")
+      expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
+    end
+
+    it "claims a registrant who signed in partway through the safety pages" do
+      patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+      # As if the details had gone in before there was an account to attribute them to
+      b_param.reload.update_column(:creator_id, nil)
+
+      sequence.registration_sequence_pages.each_with_index do |page, index|
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: (index + 3).to_s,
+                                                  acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
+      end
+      expect {
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
+      }.to change(Bike, :count).by 1
+      expect(Bike.last.creator_id).to eq current_user.id
+    end
+
+    it "advances one page at a time, even once the later ones are acknowledged" do
+      patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
+                                                acknowledged: {"0" => "1", "1" => "1"}}
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "4",
+                                                acknowledged: {"0" => "1"}}
+      expect(response).to redirect_to step_path.call("review")
+
+      # Revisiting the first page from the review and continuing walks forward
+      # through the rest, rather than jumping straight back to the end
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
+                                                acknowledged: {"0" => "1", "1" => "1"}}
+      expect(response).to redirect_to step_path.call("4")
+    end
+
+    it "refuses a page with a rule left unchecked" do
+      patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
+                                                acknowledged: {"0" => "1"}}
+      expect(flash[:error]).to be_present
+      expect(response).to redirect_to step_path.call("3")
+      expect(BikeServices::Register.acknowledged_page_ids(b_param.reload)).to eq([])
+    end
+
+    it "refuses an acknowledgment that skipped the pages" do
+      patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+      expect {
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
+      }.to_not change(Bike, :count)
+      # The review isn't reachable yet, so this lands back on the first page
+      expect(response).to redirect_to step_path.call("3")
+    end
+
+    context "not an e-vehicle" do
+      let(:b_param) do
+        BParam.create(origin: "register_flow",
+          params: {bike: {owner_email:, manufacturer_id: "Trek", cycle_type: "bike",
+                          creation_organization_id: organization.id}}.as_json)
+      end
+
+      it "completes at step 2, with no safety pages" do
+        expect {
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+        }.to change(Bike, :count).by 1
+        expect(response).to redirect_to step_path.call("finished")
+      end
+    end
+  end
+
+  describe "acknowledge, anonymous" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+    let(:b_param) do
+      BParam.create(origin: "register_flow",
+        params: {bike: {owner_email:, manufacturer_id: "Trek", cycle_type: "e-scooter",
+                        creation_organization_id: organization.id}}.as_json)
+    end
+    let(:step_path) { ->(step) { register_path(b_param_token: b_param.id_token, step:) } }
+
+    it "holds the registration for the confirmation email once everything is acknowledged" do
+      patch base_url, params: {b_param_token: b_param.id_token,
+                               bike: {primary_frame_color_id: color.id, serial_number: "XYZ 123",
+                                      status: "status_with_owner", user_name: "Sally Rider"}}
+      # No creator, but the safety pages still come before the completion page
+      expect(response).to redirect_to step_path.call("3")
+
+      sequence.registration_sequence_pages.each_with_index do |page, index|
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token,
+                                                  step: (index + 3).to_s,
+                                                  acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
+      end
+      expect(response).to redirect_to step_path.call("review")
+
+      expect {
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
+      }.to_not change(Bike, :count)
+      expect(response).to redirect_to step_path.call("finished")
+      follow_redirect!
+      expect(response.body).to include "Registration saved"
+
+      # Nothing is browsable behind the completion page any more
+      get step_path.call("3")
+      expect(response).to redirect_to step_path.call("finished")
     end
   end
 end

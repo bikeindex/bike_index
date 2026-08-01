@@ -66,6 +66,19 @@ RSpec.describe "RegistrationsController#show", type: :request do
       end
     end
 
+    context "current_user sent the bike to a new owner who hasn't claimed it" do
+      # An unclaimed ownership still resolves bike.owner to the creator
+      let(:bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "new-owner@example.com") }
+      let(:current_user) { bike.reload.current_ownership.creator }
+      it "shows the sent-to-new-owner notice" do
+        get "#{base_url}/#{bike.id}"
+        body = whitespace_normalized_body_text
+        expect(body).to match("Your bike")
+        expect(body).to match("You sent this bike to new-owner@example.com")
+        expect(body).to match("been claimed yet")
+      end
+    end
+
     context "with photos" do
       let!(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(Rails.root.join("spec/fixtures/bike.jpg"))) }
       let!(:public_image2) { FactoryBot.create(:public_image, imageable: bike, image: File.open(Rails.root.join("spec/fixtures/bike.jpg"))) }
@@ -341,7 +354,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
       end
 
       context "more than the display limit" do
-        before { stub_const("Registrations::Show::OrgAdmin::Component::OTHER_REGISTRATIONS_LIMIT", 1) }
+        before { stub_const("Registrations::Show::WrapperOrgAdmin::Component::OTHER_REGISTRATIONS_LIMIT", 1) }
         it "caps the table and links to the org search for the full list" do
           get "#{base_url}/#{bike.id}"
           body = whitespace_normalized_body_text

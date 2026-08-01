@@ -7,18 +7,7 @@
         tw:dark:bg-green-950 tw:dark:text-green-400
       "
     >
-      <svg
-        width="30"
-        height="30"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.4"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M20 6 9 17l-5-5"></path>
-      </svg>
+      <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:h-7.5 tw:w-7.5", aria_hidden: true) %>
     </div>
 
     <%= render UI::Header::Component.new(text: heading_text, subtitle: subtitle_text) %>

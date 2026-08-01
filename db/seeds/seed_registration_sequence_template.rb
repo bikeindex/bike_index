@@ -1,91 +1,75 @@
-# Seeds the global RegistrationSequence template (org drafts are cloned from it). The template's
-# pages live in the database; these are the default e-vehicle safety attestation pages a fresh
-# install starts with. The bullets become each page's `body`, a single HTML list authored in the
-# Lexxy rich-text editor on the form.
+# Seeds the global RegistrationSequence template (org drafts are cloned from it). This is the
+# e-vehicle acknowledgment sequence from kelsey_redesign/register-your-bike.html, verbatim —
+# its three screens, their headings and their checkbox rules. The bullets become each page's
+# `body`, a single HTML list authored in the Lexxy rich-text editor on the form.
+#
+# The prototype gates two of these behind its "school" props; Brakebills (the seeded school)
+# has both on, so they're included: the last rule of each of the first two pages is the
+# school's own, and the third page is entirely the school's.
 default_pages = [
   {
-    title: "Battery & charging",
-    subtitle: "The single biggest cause of e-bike fires on campus is unsafe charging. These commitments keep you and your hallmates safe.",
+    title: "Batteries & charging",
+    heading: "Looks like you have an e-vehicle!",
+    subtitle: "We have a few additional campus safety rules to go over before you can complete registration.",
     bullet_points: [
-      "Only charge with the manufacturer's charger or an approved replacement matching my vehicle's voltage and amperage.",
-      "Not leave my e-vehicle charging unattended for extended periods, and never charge it overnight while I'm asleep. <em>Why: most lithium-ion fires happen between 1–5am when no one notices early warning signs.</em>",
-      "Not charge in a hallway, stairwell, exit, or fire-escape route.",
-      "Stop using and immediately report any battery showing damage, swelling, unusual heat, discoloration, or odor.",
-      "Not charge or store my e-vehicle in a residence hall room or campus building unless it's a designated charging location.",
-      "Not charge using an extension cord, multi-outlet adapter, or power strip."
+      "I will charge only with the manufacturer's charger — never unattended, overnight, or in a hallway, stairwell, or exit route.",
+      "I will use only manufacturer-spec batteries certified to UL 2849 / UL 2271 (or equivalent). No aftermarket or uncertified batteries, and no self-modification.",
+      "I will store batteries only in approved locations, keep them in safe operating condition, and stop using &amp; report any damaged, swollen, or overheating battery.",
+      "I will charge at an approved campus charging locker and register my battery serial number with Campus Safety."
     ]
   },
   {
-    title: "Batteries & replacements",
-    subtitle: "Aftermarket and uncertified batteries are the #1 source of catastrophic e-bike fires. Stick to certified.",
+    title: "Riding practices",
+    subtitle: "A few commitments that keep you and everyone on campus safe.",
     bullet_points: [
-      "Only use batteries compatible with my vehicle's manufacturer specifications and, where available, certified to UL 2849, UL 2271, or equivalent UL/CE/EN standards.",
-      "Acknowledge that aftermarket or uncertified batteries are prohibited on university property. <em>Bike Index runs crowd-sourced e-vehicle audits — your battery's certification is on file.</em>",
-      "Not modify, repair, or disassemble my battery or electrical system on my own."
+      "I will wear a CPSC-certified helmet, obey posted limits (max 15 mph, walking pace in crowds), and ride only where the bike's class is allowed.",
+      "I will follow all traffic laws, yield to pedestrians, signal turns, and never ride impaired, distracted, or with earbuds in both ears.",
+      "I will park only in designated areas without blocking paths, lock my bike, and stop to help &amp; report any collision.",
+      "I will complete the campus e-bike orientation module and keep my registration decal visible at all times."
     ]
   },
   {
-    title: "Storage & maintenance",
-    subtitle: "Where you park overnight matters. So does keeping your bike road-ready.",
+    title: "Campus-specific rules",
+    subtitle: "Your school has a couple of additional rules for riding on campus.",
+    organization_specific: true,
     bullet_points: [
-      "Store my e-vehicle only in approved locations — bike rooms, racks, or storage facilities — never in stairwells, hallways, dorm rooms, or lobbies.",
-      "Not leave it where extreme heat, prolonged sunlight, or water could damage the battery.",
-      "Have my battery and electrical system inspected by a qualified technician before charging or riding again after any collision or damage.",
-      "Keep my e-vehicle in safe operating condition — working brakes, lights, and tires.",
-      "Notify the university if I sell, transfer, or permanently remove my e-vehicle from campus."
-    ]
-  },
-  {
-    title: "Helmet, speed & class",
-    subtitle: "The basics that make the biggest difference on campus paths.",
-    bullet_points: [
-      "Wear a properly fitted, CPSC-certified helmet every time I ride on or near campus, no matter how short the trip.",
-      "Acknowledge that helmet use may be required by state law and is required by university policy as a condition of registration.",
-      "Operate my e-bike only in areas and on paths permitted for its class (Class 1, 2, or 3) under university policy and state law.",
-      "Observe posted speed limits, not exceed 15 mph on campus paths, and slow to walking pace (3–5 mph) in crowded pedestrian areas.",
-      "Not modify my e-vehicle to exceed its manufacturer-rated speed or power output."
-    ]
-  },
-  {
-    title: "Rules of the road & campus paths",
-    subtitle: "Pedestrians always come first.",
-    bullet_points: [
-      "Obey all applicable traffic laws, signals, and signage — my e-vehicle is a vehicle under state law.",
-      "Yield to pedestrians at all times on shared paths, crosswalks, and building entrances.",
-      "Ride in designated bike lanes or on the right side of the roadway, and not ride on sidewalks where prohibited.",
-      "Use hand or electronic signals when turning or stopping, and use a bell or verbal alert when passing.",
-      "Not ride side-by-side with another rider in a way that blocks the path."
-    ]
-  },
-  {
-    title: "Impairment & distraction",
-    subtitle: "If you wouldn't drive a car like this, don't ride your e-bike like this either.",
-    bullet_points: [
-      "Not operate my e-vehicle while under the influence of alcohol, cannabis, or any substance that could impair my judgment or reaction time.",
-      "Not use a handheld phone or other device while riding. I'll stop safely before using my phone.",
-      "Not wear headphones or earbuds in both ears while riding — I need to hear traffic, pedestrians, and emergency signals.",
-      "Not carry a passenger unless my vehicle is specifically designed and rated for two riders.",
-      "Not carry loads that obstruct my steering, visibility, or braking."
-    ]
-  },
-  {
-    title: "Parking & incidents",
-    subtitle: "Last set — promise. Parking, lockup, and what to do if something goes wrong.",
-    bullet_points: [
-      "Park only in designated bike parking areas; never block ramps, doorways, pedestrian paths, or accessible routes.",
-      "Secure my e-vehicle with an appropriate lock when parked, and not leave it in unauthorized areas.",
-      "Stop, render assistance or call for help, and report to campus safety if I'm involved in or witness a collision.",
-      "Acknowledge that violating these rules may result in loss of registration, fines, or disciplinary action under the student code of conduct."
+      "I will ride only on designated campus paths and dismount in all posted dismount zones.",
+      "I will park only in campus e-vehicle corrals — never at pedestrian entrances or building exits."
     ]
   }
 ]
 
 template = RegistrationSequence.template
+template.update!(acknowledgment_text: RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT) if template.acknowledgment_text.blank?
+# The ⓘ on every acknowledgment page. An organization can point this at its own policy
+# page; the Bike Index FAQ is the default an org's draft is cloned with
+template.update!(faq_url: "/info/#{Blog.e_vehicle_acknowledgment_faq}") if template.faq_url.blank?
 
 default_pages.each_with_index do |attributes, index|
-  template.registration_sequence_pages.find_or_create_by!(listing_order: index) do |new_page|
-    new_page.title = attributes[:title]
-    new_page.subtitle = attributes[:subtitle]
-    new_page.body = "<ul>#{attributes[:bullet_points].map { |bullet| "<li>#{bullet}</li>" }.join}</ul>"
+  page = template.registration_sequence_pages.find_or_initialize_by(listing_order: index)
+  page.update!(title: attributes[:title], heading: attributes[:heading], subtitle: attributes[:subtitle],
+    organization_specific: attributes[:organization_specific].present?,
+    body: "<ul>#{attributes[:bullet_points].map { |bullet| "<li>#{bullet}</li>" }.join}</ul>")
+end
+# The template is only ever these pages - drop any left from an earlier seeding
+template.registration_sequence_pages.where("listing_order >= ?", default_pages.count).destroy_all
+
+# Brakebills registers e-vehicles, so give it a live sequence — without an active one
+# the acknowledgment pages never appear, and the flow can't be seen in development.
+brakebills = Organization.find_by_name("Brakebills")
+if brakebills.present?
+  # Rebuilt rather than left alone, so a re-seed picks up changes to the pages above.
+  # really_destroy! (and delete_all, which activation would otherwise refuse) - a soft
+  # delete would pile up rows, and the sequence doesn't take its pages with it
+  brakebills.registration_sequences.with_deleted.each do |sequence|
+    RegistrationSequencePage.where(registration_sequence: sequence).delete_all
+    sequence.really_destroy!
   end
+  sequence = RegistrationSequence.draft_for(brakebills)
+  # The school names its own page, the way an organization would in the editor - the
+  # template can't, since it's cloned by every organization
+  sequence.registration_sequence_pages.where(organization_specific: true)
+    .update_all(heading: "#{brakebills.short_name} campus policies")
+  sequence.make_active!
+  puts "Registration sequence activated for Brakebills: #{sequence.registration_sequence_pages.count} pages\n"
 end
