@@ -125,4 +125,18 @@ RSpec.describe Registrations::Show::CurrentAlerts::ClaimImpound::Component, type
       expect(page.native.text).to be_blank
     end
   end
+
+  # The alerts render in the organization's panel too, and its staff aren't being asked
+  # whether the bike is theirs
+  context "viewed through an organization" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:component) { described_class.new(bike:, current_user:, owner: false, organization:) }
+    let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
+
+    it "does not render" do
+      expect(BikeServices::Displayer.display_impound_claim?(bike, current_user)).to be_truthy
+      render_inline(component)
+      expect(page.native.text).to be_blank
+    end
+  end
 end

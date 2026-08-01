@@ -8,14 +8,18 @@ module Registrations
         # against one of their stolen bikes, then shows that claim once it exists.
         # Mirrors the contact-owner card.
         class Component < ApplicationComponent
-          def initialize(bike:, current_user: nil, owner: false)
+          def initialize(bike:, current_user: nil, owner: false, organization: nil)
             @bike = bike
             @current_user = current_user
             @owner = owner
+            @organization = organization
           end
 
+          # An organization's staff panel isn't asking whether the bike is theirs
           def render?
-            !@owner && BikeServices::Displayer.display_impound_claim?(@bike, @current_user)
+            return false if @owner || @organization.present?
+
+            BikeServices::Displayer.display_impound_claim?(@bike, @current_user)
           end
 
           private

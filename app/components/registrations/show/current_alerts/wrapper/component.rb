@@ -7,11 +7,13 @@ module Registrations
         # The alerts about the registration's current state, in both views. The token
         # prompt is the alert here — its dialog renders outside the page's fragment cache
         class Component < ApplicationComponent
-          def initialize(bike:, current_user: nil, bike_sticker: nil, owner: false, current_alerts: {})
+          def initialize(bike:, current_user: nil, bike_sticker: nil, owner: false, organization: nil,
+            current_alerts: {})
             @bike = bike
             @current_user = current_user
             @bike_sticker = bike_sticker
             @owner = owner
+            @organization = organization
             @current_alerts = current_alerts
           end
 
@@ -21,7 +23,9 @@ module Registrations
               render(TokenPrompt::Component.new(bike: @bike, current_user: @current_user,
                 current_alerts: @current_alerts, variant: :alert)),
               render(ScannedSticker::Component.new(bike: @bike, bike_sticker: @bike_sticker, current_user: @current_user)),
-              render(SentToNewOwner::Component.new(bike: @bike, owner: @owner))
+              render(SentToNewOwner::Component.new(bike: @bike, owner: @owner)),
+              render(ClaimImpound::Component.new(bike: @bike, current_user: @current_user, owner: @owner,
+                organization: @organization))
             ])
           end
         end

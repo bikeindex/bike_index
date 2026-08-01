@@ -332,6 +332,20 @@ RSpec.describe "RegistrationsController#show", type: :request do
         end
       end
 
+      # The claim card rides in the alerts, which the staff panel renders too - staff
+      # aren't being asked whether the bike is theirs
+      context "found bike a consumer could claim" do
+        let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization).reload }
+        let!(:impound_record) { FactoryBot.create(:impound_record, bike:) }
+        it "hides the claim card, even though the viewer could claim it" do
+          expect(BikeServices::Displayer.display_impound_claim?(bike.reload, current_user)).to be_truthy
+          get "#{base_url}/#{bike.id}"
+          body = whitespace_normalized_body_text
+          expect(body).to match("Staff")
+          expect(body).to_not match("Does this look like your bike?")
+        end
+      end
+
       context "with parking notifications enabled" do
         let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["parking_notifications"]) }
 
