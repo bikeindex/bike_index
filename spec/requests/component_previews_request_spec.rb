@@ -63,6 +63,8 @@ RSpec.describe "ComponentPreviews", type: :request do
 
     it "renders the bike named by bike_id, through the view the select names" do
       other = FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization)
+      staff = FactoryBot.create(:organization_admin, organization:)
+      stub_const("ENV", ENV.to_hash.merge("LOOKBOOK_USER_ID" => staff.id.to_s))
 
       get "#{base_url}/no_overlay?view=org_admin&bike_id=#{other.id}"
       expect(response.status).to eq 200
@@ -74,6 +76,18 @@ RSpec.describe "ComponentPreviews", type: :request do
 
       expect(component.instance_variable_get(:@bike)).to eq other
       expect(component.instance_variable_get(:@view)).to eq [:staff, organization]
+    end
+
+    # ShowViews decides what the viewer may see, so asking for a view they aren't
+    # entitled to falls back rather than rendering a page the app never serves
+    it "falls back to public when the lookbook user has no claim on the org" do
+      outsider = FactoryBot.create(:user_confirmed)
+      stub_const("ENV", ENV.to_hash.merge("LOOKBOOK_USER_ID" => outsider.id.to_s))
+
+      component = Registrations::Show::Wrapper::ComponentPreview.new
+        .no_overlay(view: "org_admin").dig(:locals, :component)
+
+      expect(component.instance_variable_get(:@view)).to eq [:public, nil]
     end
 
     # Lookbook is mounted in production, where these bikes would be real people's

@@ -89,27 +89,25 @@ module Registrations
           current_alerts = block_given? ? yield(bike) : alerts
           return missing_notice("the record this scenario needs") if current_alerts == :missing
 
-          component = Component.new(bike:, current_user:, view: resolved_view(view, current_user),
-            available_views: available_views(view, current_user), bike_sticker:, current_alerts:)
+          available_views = ::BikeServices::ShowViews.available(bike:, current_user:,
+            organization: lookbook_organization)
+          resolved = resolved_view(view, available_views, bike:, current_user:)
+          component = Component.new(bike:, current_user:, view: resolved, available_views:,
+            bike_sticker:, current_alerts:)
 
           render_with_template(template: "registrations/show/wrapper/preview/scenario",
-            locals: {component:, offset_header: consumer?(view)})
+            locals: {component:, offset_header: resolved.last.nil?})
         end
-
-        # Only the consumer page carries the negative top margin
-        def consumer?(view) = view.to_s != "org_admin"
 
         def alerts(**) = BikeServices::ShowCurrentAlerts::Resolved.new(**)
 
-        # A signed-out visitor resolves to the public view, the way the controller resolves it
-        def resolved_view(view, current_user)
-          return [:staff, lookbook_organization] if view.to_s == "org_admin"
-
-          current_user.present? ? [:owner, nil] : [:public, nil]
-        end
-
-        def available_views(view, current_user)
-          [resolved_view(view, current_user), [:public, nil]].uniq
+        # ShowViews decides what this viewer may see; the param only picks which side of
+        # that to show. So a preview can't put up an owner view for someone who doesn't
+        # own the registration, or a staff role they don't hold — pages that don't exist
+        def resolved_view(view, available_views, bike:, current_user:)
+          org_view = view.to_s == "org_admin"
+          available_views.find { |_kind, organization| organization.present? == org_view } ||
+            ::BikeServices::ShowViews.default_view_for(bike:, current_user:, organization: lookbook_organization)
         end
 
         # Claimed by default: SentToNewOwner raises itself off an unclaimed registration,

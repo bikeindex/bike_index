@@ -20,6 +20,11 @@ RSpec.describe Registrations::Show::Wrapper::Component, :js, type: :system do
 
   let(:preview_path) { "/rails/view_components/registrations/show/wrapper/component" }
   let!(:organization) { FactoryBot.create(:organization_brakebills) }
+  # The seeded lookbook user is a superuser, and ShowViews only offers the owner view to
+  # the owner or a superuser — without one, sent_to_new_owner previews the public page
+  let!(:lookbook_user) { FactoryBot.create(:superuser) }
+
+  before { stub_const("ENV", ENV.to_hash.merge("LOOKBOOK_USER_ID" => lookbook_user.id.to_s)) }
   # One registration per scenario the preview resolves for itself
   let!(:claimed_bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
   let!(:unclaimed_bike) do
