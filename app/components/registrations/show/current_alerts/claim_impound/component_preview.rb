@@ -61,7 +61,7 @@ module Registrations
 
           # A card that won't render says so, rather than previewing as a blank page
           def card(bike:, current_user:)
-            return production_notice if Rails.env.production?
+            return production_notice("impound claim") if Rails.env.production?
             return missing_notice("a claimable impound record") if bike.blank?
 
             component = Component.new(bike: bike.reload, current_user:)
@@ -86,16 +86,6 @@ module Registrations
 
           def stolen_bike_owners
             @stolen_bike_owners ||= ::Bike.status_stolen.reorder(id: :desc).limit(50).filter_map(&:user).uniq
-          end
-
-          def production_notice
-            render(UI::Alert::Component.new(kind: :error,
-              text: "This preview renders a real impound claim, so it's disabled in production."))
-          end
-
-          def missing_notice(needed)
-            render(UI::Alert::Component.new(kind: :warning,
-              text: "Nothing to preview — this environment has no #{needed}."))
           end
         end
       end

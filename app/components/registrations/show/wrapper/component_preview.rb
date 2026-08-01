@@ -88,7 +88,7 @@ module Registrations
         # The block builds the alerts off the resolved bike, or returns :missing.
         # as_view pins the perspective for a scenario that only makes sense in one
         def page(view:, bike_id:, bike_sticker: nil, current_user: lookbook_user, as_view: nil)
-          return production_notice if Rails.env.production?
+          return production_notice("registration") if Rails.env.production?
 
           bike = preview_bike(bike_id)
           return missing_notice("a bike") if bike.blank?
@@ -147,16 +147,6 @@ module Registrations
         def bike_with_ownership(claimed:)
           owned = ::Ownership.current.where(claimed:).select(:bike_id)
           org_bikes.where(id: owned).last || ::Bike.unscoped.where(id: owned).last
-        end
-
-        def production_notice
-          render(UI::Alert::Component.new(kind: :error,
-            text: "This preview renders a real registration, so it's disabled in production."))
-        end
-
-        def missing_notice(needed)
-          render(UI::Alert::Component.new(kind: :warning,
-            text: "Nothing to preview — this environment has no #{needed}."))
         end
       end
     end

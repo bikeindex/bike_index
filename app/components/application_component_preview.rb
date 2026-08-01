@@ -24,6 +24,18 @@ class ApplicationComponentPreview < ViewComponent::Preview
 
   private
 
+  # Lookbook is mounted in production, so a preview built from real records says so
+  # rather than rendering somebody's
+  def production_notice(rendered)
+    render(UI::Alert::Component.new(kind: :error,
+      text: "This preview renders a real #{rendered}, so it's disabled in production."))
+  end
+
+  def missing_notice(needed)
+    render(UI::Alert::Component.new(kind: :warning,
+      text: "Nothing to preview — this environment has no #{needed}."))
+  end
+
   def template
     ActionView::Base.new(
       ActionView::LookupContext.new(ActionController::Base.view_paths),
