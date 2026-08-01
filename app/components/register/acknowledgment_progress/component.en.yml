@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    register:
+      acknowledgment_progress:
+        progress_saved: Progress saved · E-Vehicle Acknowledgment · Step %{number}
+          of %{total}

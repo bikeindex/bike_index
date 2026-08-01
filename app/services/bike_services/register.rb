@@ -5,6 +5,9 @@ module BikeServices
   module Register
     extend Functionable
 
+    # Step "3" is the first of the e-vehicle acknowledgment pages
+    ACKNOWLEDGMENT_OFFSET = 3
+
     # The token's registration when step 1 was never submitted (redirecting into
     # it can't surprise anyone), otherwise a new one. A signed-in user's email
     # prefills owner_email - manufacturer_id is the submitted-step-1 marker.
@@ -40,21 +43,93 @@ module BikeServices
       b_param.save
     end
 
-    # The step to show: finished once the bike exists (or it's awaiting the
-    # email), step 1 until it's submitted - then 1 and 2 both stay browsable
-    def permitted_step(b_param, requested_step)
-      if finished?(b_param)
-        "finished"
-      elsif b_param.manufacturer_id.blank?
-        "1"
-      else
-        (requested_step == "1") ? "1" : "2"
-      end
+    # The safety rules a registration acknowledges before its bike is created - the
+    # organization's active sequence, and only for an e-vehicle
+    def registration_sequence(b_param)
+      organization = b_param.creation_organization
+      RegistrationSequence.active_for(organization) if b_param.motorized? && organization.present?
+    end
+
+    # The step to show: finished once the bike exists (or it's awaiting the email),
+    # otherwise the furthest step reached, since every earlier one stays browsable
+    def permitted_step(b_param, requested_step, sequence:)
+      return "finished" if finished?(b_param, sequence:)
+
+      steps = permitted_steps(b_param, sequence)
+      steps.include?(requested_step) ? requested_step : steps.last
+    end
+
+    # The sequence page a step renders, or nil for any other step
+    def page_for_step(step, sequence:)
+      index = page_index_for_step(step)
+      sequence_pages(sequence)[index] if index >= 0
+    end
+
+    def page_index_for_step(step) = step.to_i - ACKNOWLEDGMENT_OFFSET
+
+    def step_for_page_index(index) = (index + ACKNOWLEDGMENT_OFFSET).to_s
+
+    # The page after this one, or the review the pages end at
+    def step_after(step, sequence:)
+      next_index = page_index_for_step(step) + 1
+      (next_index < sequence_pages(sequence).count) ? step_for_page_index(next_index) : "review"
+    end
+
+    # to_a: callers ask for count/any?/[] repeatedly, and a CollectionProxy re-queries
+    # for each of them
+    def sequence_pages(sequence)
+      sequence&.registration_sequence_pages&.to_a || []
+    end
+
+    # The progress bar's segments - one per step the flow can reach
+    def total_steps(sequence) = all_steps(sequence_pages(sequence)).count
+
+    # What the acknowledgment eyebrow counts: the rule pages, plus the review they end at
+    def acknowledgment_step_count(sequence) = sequence_pages(sequence).count + 1
+
+    # Nothing to agree to without a sequence, otherwise the acknowledgment record
+    def acknowledged?(b_param, sequence:)
+      sequence_pages(sequence).none? || acknowledgment(b_param).present?
+    end
+
+    def acknowledgment(b_param)
+      RegistrationSequenceAcknowledgment.find_by(b_param_id: b_param.id)
+    end
+
+    # Which pages have been acknowledged so far. In-flight progress, so it lives on
+    # the b_param alongside the rest of the wizard's state
+    def acknowledged_page_ids(b_param)
+      b_param.params.dig("registration_sequence", "acknowledged_page_ids") || []
+    end
+
+    # All or nothing: a page is only acknowledged with every one of its rules checked
+    # (an unchecked box submits nothing, so the lengths only match when they all did)
+    def acknowledge_page(b_param, page, checked:)
+      bullets = page&.bullets || []
+      agreed = Array(checked)
+      return false if bullets.none? || agreed.length != bullets.length ||
+        !agreed.all? { Binxtils::InputNormalizer.boolean(it) }
+
+      # id alongside the pages, so the acknowledged ids are unambiguously scoped
+      b_param.clean_params({registration_sequence: {id: page.registration_sequence_id,
+                                                    acknowledged_page_ids: (acknowledged_page_ids(b_param) + [page.id]).uniq}}.as_json)
+      b_param.save
+    end
+
+    # The moment the pages become an agreement - promoted off the b_param onto a
+    # record of its own, which outlives the registration
+    def save_acknowledgment(b_param, sequence, acknowledged_all:, user: nil)
+      return false unless Binxtils::InputNormalizer.boolean(acknowledged_all) && sequence.present?
+      return true if acknowledgment(b_param).present?
+
+      RegistrationSequenceAcknowledgment.create_for(b_param, sequence:, user:).persisted?
     end
 
     # The bike exists, or everything's entered and awaiting the email
-    def finished?(b_param)
-      b_param.with_bike? || (details_completed?(b_param) && !creator_available?(b_param))
+    def finished?(b_param, sequence:)
+      return true if b_param.with_bike?
+
+      details_completed?(b_param) && acknowledged?(b_param, sequence:) && !creator_available?(b_param)
     end
 
     # Whether a bike can be created now - Ownership requires a creator, so
@@ -67,16 +142,32 @@ module BikeServices
     # Step 2 merges over step 1 - creator claimed for signed-in users, the photo and the
     # fields into the params json. The photo arrives one of two ways: as bytes from a plain
     # file field, or as the signed id of a blob the browser already uploaded.
+    # Returns whether the step passed - a registration for someone else needs their name.
+    # A failed step still saves, it just isn't marked complete, so nothing entered is lost
     def save_step_2(b_param, user:, image:, image_signed_id:, bike_params:)
       b_param.creator_id ||= user&.id
       b_param.image = image if image.present?
-      b_param.clean_params(step_2_params(bike_params.to_h, image_signed_id:).as_json)
+      bike_params = bike_params.to_h
+      completed = b_param.self_made?(user) || bike_params["user_name"].present?
+      b_param.clean_params(step_2_params(bike_params, image_signed_id:, completed:).as_json)
       b_param.save
+      completed
+    end
+
+    # Ownership requires a creator, and signing in can happen anywhere in the flow -
+    # e.g. partway through the acknowledgment pages
+    def claim_creator(b_param, user)
+      return if user.blank? || b_param.creator_id.present?
+
+      b_param.update(creator_id: user.id)
     end
 
     def create_bike(b_param, ip_address:)
       b_param.creator_id ||= confirmed_email_creator_id(b_param)
-      BikeServices::Creator.new(ip_address:).create_bike(b_param)
+      bike = BikeServices::Creator.new(ip_address:).create_bike(b_param)
+      # The bike is what the acknowledgment hangs off once the b_param is swept
+      acknowledgment(b_param)&.update(bike_id: bike.id, user_id: b_param.creator_id) if bike.id.present?
+      bike
     end
 
     #
@@ -85,6 +176,26 @@ module BikeServices
 
     def reusable?(b_param)
       b_param.present? && !b_param.with_bike? && b_param.manufacturer_id.blank?
+    end
+
+    # Every step the flow reaches with these pages, in order
+    def all_steps(pages)
+      return %w[1 2] if pages.none?
+
+      %w[1 2] + pages.each_index.map { step_for_page_index(it) } + %w[review]
+    end
+
+    # Every step the registration has reached, in order - the acknowledgment pages
+    # open one at a time, and the review once they're all acknowledged
+    def permitted_steps(b_param, sequence)
+      return %w[1] if b_param.manufacturer_id.blank?
+
+      pages = sequence_pages(sequence)
+      return %w[1 2] unless details_completed?(b_param) && pages.any?
+
+      acknowledged = acknowledged_page_ids(b_param)
+      reached = pages.take_while { acknowledged.include?(it.id) }.count
+      all_steps(pages).first(ACKNOWLEDGMENT_OFFSET + reached)
     end
 
     # The confirmed email's own account, or the AUTO_ORG_MEMBER system user standing in
@@ -115,23 +226,23 @@ module BikeServices
       b_param
     end
 
-    # The marker step_2_params sets, that step 2 has been submitted
+    # The marker step_2_params sets, that step 2 was submitted with everything it needs
     def details_completed?(b_param)
       b_param.params["details_completed"].present?
     end
 
     # Blank values keep what step 1 saved - except the additional colors, where
     # blank is the "remove color" button clearing one
-    def step_2_params(bike_params, image_signed_id:)
+    def step_2_params(bike_params, image_signed_id:, completed:)
       bike_params = bike_params.reject { |key, value| value.blank? && !key.in?(%w[secondary_frame_color_id tertiary_frame_color_id]) }
       # The unit only means something alongside a numeric size
       bike_params = bike_params.except("frame_size_unit") if bike_params["frame_size_number"].blank?
       # The photo went browser -> bucket before submit, so only its signed id rides along.
       # Dropped when blank rather than merged, which would clobber an id already stored.
-      {details_completed: true, bike: bike_params, image_signed_id: image_signed_id.presence}.compact
+      {details_completed: completed, bike: bike_params, image_signed_id: image_signed_id.presence}.compact
     end
 
-    conceal :reusable?, :confirmed_email_creator_id, :owner_email_for,
-      :assign_owner_email, :details_completed?, :step_2_params
+    conceal :reusable?, :all_steps, :permitted_steps, :confirmed_email_creator_id,
+      :owner_email_for, :assign_owner_email, :details_completed?, :step_2_params
   end
 end

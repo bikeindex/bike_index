@@ -10,14 +10,14 @@ module Org
 
         private
 
-        # The page stores its bullets as a single body <ul> of <li>s; split it back into
-        # one editable bullet each, falling back to one empty bullet so a row always shows.
+        # One editable row per bullet, with an empty row so a blank page has somewhere to type
         def bullets
-          html = @form_builder.object.body
-          return [""] if html.blank?
+          @form_builder.object.bullets.presence || [""]
+        end
 
-          items = Nokogiri::HTML.fragment(html).css("li")
-          items.any? ? items.map { it.inner_html.strip } : [html.strip]
+        # Registrants see this page's rules badged with the organization's name
+        def organization_name
+          @form_builder.object.registration_sequence&.organization&.short_name
         end
       end
     end

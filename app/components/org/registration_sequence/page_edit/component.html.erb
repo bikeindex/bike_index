@@ -2,6 +2,19 @@
   <div>
     <%= @form_builder.label :title, "Title", class: "twlabel" %>
     <%= @form_builder.text_field :title, class: "twinput tw:w-full" %>
+
+    <p class="tw:mt-1 tw:mb-0 tw:text-sm tw:text-gray-500">
+      Labels this page's rules, and names it on the final review.
+    </p>
+  </div>
+
+  <div>
+    <%= @form_builder.label :heading, "Heading", class: "twlabel" %>
+    <%= @form_builder.text_field :heading, class: "twinput tw:w-full", placeholder: @form_builder.object.title %>
+
+    <p class="tw:mt-1 tw:mb-0 tw:text-sm tw:text-gray-500">
+      The large text at the top of the page. Defaults to the title.
+    </p>
   </div>
 
   <div>
@@ -14,6 +27,18 @@
 
     <%= render UI::Forms::FileUpload::Component.new(form_builder: @form_builder, attribute: :image, accept: "image/*") %>
   </div>
+
+  <% if organization_name.present? %>
+    <div>
+      <%= render UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :organization_specific,
+          label: "These rules are specific to #{organization_name}") %>
+
+      <p class="tw:mt-1 tw:mb-0 tw:text-sm tw:text-gray-500">
+        Badges the page with your name, so registrants can tell it apart from
+        the standard rules.
+      </p>
+    </div>
+  <% end %>
 
   <div data-controller="bullet-editors">
     <label
