@@ -15,7 +15,11 @@ module ImageJobs
       # Not `preprocessed` - those generate off the un-stripped original, racing the strip
       PublicImage::VARIANTS.each_key { |size| public_image.file.variant(size).processed }
 
-      stamp!(blob, "processed" => true) # Last, so it means every variant exists
+      # The register upload only knew the b_param that minted the blob - reaping wants the bike
+      bike_id = public_image.imageable_id if public_image.bike?
+
+      # Last, so "processed" means every variant exists
+      stamp!(blob, {"processed" => true, "bike_id" => bike_id}.compact)
     end
 
     private
@@ -34,14 +38,18 @@ module ImageJobs
       # Before the upload, which re-identifies content_type using the filename
       blob.filename = "#{blob.filename.base}.webp" if to_webp
       blob.upload(prepared) # Resets checksum/byte_size, which still describe the pre-strip bytes
+      blob.save! # stamp! writes only binx_data, so the new bytes need persisting themselves
       stamp!(blob, "stripped" => true)
     ensure
       prepared&.close!
     end
 
-    # Not metadata - a direct upload posts that, so a client could claim to be processed
+    # Not metadata - a direct upload posts that, so a client could claim to be processed.
+    # Merged by postgres because blob was loaded before a strip that takes seconds, so a
+    # read-modify-write here would drop whatever else stamped it in the meantime
     def stamp!(blob, values)
-      blob.update!(binx_data: blob.binx_data.to_h.merge(values))
+      ActiveStorage::Blob.where(id: blob.id)
+        .update_all(["binx_data = coalesce(binx_data, '{}'::jsonb) || ?::jsonb", values.to_json])
     end
   end
 end

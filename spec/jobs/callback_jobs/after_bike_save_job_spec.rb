@@ -86,28 +86,6 @@ RSpec.describe CallbackJobs::AfterBikeSaveJob, type: :job do
     end
   end
 
-  describe "stamp_image_blobs" do
-    let(:bike) { FactoryBot.create(:bike) }
-    let(:b_param) { FactoryBot.create(:b_param) }
-    let(:blob) do
-      ActiveStorage::Blob.create_and_upload!(io: File.open(Rails.root.join("spec/fixtures/bike.jpg")),
-        filename: "bike.jpg", content_type: "image/jpeg")
-    end
-    # The register direct upload stamps the blob with the b_param that minted it, before there's a bike
-    let!(:public_image) do
-      blob.update!(binx_data: {"b_param_id" => b_param.id})
-      PublicImage.create!(imageable: bike, file: blob)
-    end
-
-    it "re-stamps the blob to the bike and keeps the image on the bike" do
-      expect(blob.reload.binx_data).to eq({"b_param_id" => b_param.id})
-      expect(public_image.reload.imageable).to eq bike
-      instance.perform(bike.id)
-      expect(blob.reload.binx_data).to eq({"b_param_id" => b_param.id, "bike_id" => bike.id})
-      expect(public_image.reload.imageable).to eq bike
-    end
-  end
-
   describe "create_user_registration_organizations" do
     let(:bike) { FactoryBot.create(:bike_organized, :with_ownership) }
     let(:ownership) { bike.current_ownership }
