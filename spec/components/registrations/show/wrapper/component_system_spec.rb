@@ -3,10 +3,10 @@
 require "rails_helper"
 
 RSpec.describe Registrations::Show::Wrapper::Component, :js, type: :system do
-  # Wrapper, TokenPrompt and TokenAlert carry the alerts rather than being alerts, so
+  # Wrapper, TokenPrompt and PromptChrome carry the alerts rather than being alerts, so
   # every scenario exercises them; the rest each need a preview of their own, because
   # reaching one otherwise means minting a token and following an email link
-  let(:carriers) { %w[prompt_chrome token_alert token_prompt wrapper] }
+  let(:carriers) { %w[prompt_chrome token_prompt wrapper] }
 
   # Text that only appears once that alert rendered. Keyed by the component's directory
   # so the keys can be checked against what's actually on disk

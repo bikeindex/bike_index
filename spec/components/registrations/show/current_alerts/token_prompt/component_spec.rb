@@ -3,13 +3,11 @@
 require "rails_helper"
 
 RSpec.describe Registrations::Show::CurrentAlerts::TokenPrompt::Component, type: :component do
-  let(:component) { described_class.new(bike:, current_user:, current_alerts:) }
+  let(:component) { described_class.new(bike:, current_user:, current_alerts:, variant:) }
   let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
   let(:current_user) { nil }
-  let(:current_alerts) do
-    BikeServices::ShowCurrentAlerts::Resolved.new(claim_message: nil, token: nil, token_type: nil,
-      matching_notification: nil, recovered_stolen_record: nil)
-  end
+  let(:variant) { :modal }
+  let(:current_alerts) { BikeServices::ShowCurrentAlerts::Resolved.new }
 
   context "a recovery token" do
     let(:current_alerts) { super().with(recovered_stolen_record: bike.current_stolen_record) }
@@ -49,6 +47,32 @@ RSpec.describe Registrations::Show::CurrentAlerts::TokenPrompt::Component, type:
       expect(page).to have_text("Mark your bike recovered!")
       expect(page).to_not have_text("registered your bike on Bike Index")
       expect(page).to have_css("dialog", count: 1)
+    end
+  end
+
+  # The alert is the same prompt without the dialog, for once the dialog is dismissed
+  context "the alert variant" do
+    let(:variant) { :alert }
+    let(:current_alerts) { super().with(recovered_stolen_record: bike.current_stolen_record) }
+
+    it "renders the prompt whole, with no dialog" do
+      render_inline(component)
+
+      expect(page).to have_text("Mark your bike recovered!")
+      expect(page).to have_text("Please tell us how you got your bike back")
+      expect(page).to have_css("form[action='/bikes/#{bike.id}/recovery']")
+      expect(page).to have_button("Mark recovered")
+
+      expect(page).to have_no_css("dialog")
+      # Dismissing belongs to the dialog; this is what's left once it's dismissed
+      expect(page).to have_no_button("Nevermind")
+    end
+
+    it "gives its form fields their own ids, so the dialog's copy stays unique" do
+      render_inline(component)
+
+      expect(page).to have_css("#alert_stolen_record_recovered_description")
+      expect(page).to have_no_css("#stolen_record_recovered_description")
     end
   end
 end

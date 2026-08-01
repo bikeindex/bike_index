@@ -8,15 +8,13 @@ module Registrations
         # closed, so the same prompt renders again as an alert in the page body —
         # everything the dialog holds, minus the chrome that took it away.
         class Component < ApplicationComponent
+          include PromptVariant
+
           def initialize(variant:, id:, title: nil)
             @variant = variant
             @id = id
             @title = title
           end
-
-          private
-
-          def alert? = @variant == :alert
         end
       end
     end

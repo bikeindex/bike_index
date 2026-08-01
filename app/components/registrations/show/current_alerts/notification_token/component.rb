@@ -7,6 +7,8 @@ module Registrations
         # The prompt reached from a parking or graduated notification email's link,
         # offering to mark the notification resolved (or confirming it already is)
         class Component < ApplicationComponent
+          include PromptVariant
+
           MODAL_ID = "notification-token-modal"
 
           def initialize(bike:, token: nil, token_type: nil, matching_notification: nil, variant: :modal)
@@ -22,10 +24,6 @@ module Registrations
           end
 
           private
-
-          # Both variants render at once, so the alert's copy of the form needs its own
-          # field ids rather than a second #token in the document
-          def form_namespace = (@variant == :alert) ? "alert" : nil
 
           def graduated?
             @token_type == "graduated_notification"

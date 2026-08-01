@@ -9,6 +9,8 @@ module Registrations
         # session[:recovery_link_token], deleting the token so this shows once.
         # A similar form lives in edit_report_stolen / edit_report_recovered
         class Component < ApplicationComponent
+          include PromptVariant
+
           MODAL_ID = "recovery-prompt-modal"
 
           def initialize(bike:, stolen_record: nil, variant: :modal)
@@ -22,12 +24,6 @@ module Registrations
           end
 
           private
-
-          def alert? = @variant == :alert
-
-          # Both variants render at once, so the alert's copy of the form needs its own
-          # field ids rather than a second stolen_record_recovered_at in the document
-          def form_namespace = alert? ? "alert" : nil
 
           def recovered_at
             Binxtils::TimeParser.round(@stolen_record.recovered_at || Time.current)

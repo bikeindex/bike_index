@@ -9,7 +9,12 @@ module BikeServices
   module ShowCurrentAlerts
     extend Functionable
 
+    # Most requests carry one token at most, so the rest default rather than being
+    # spelled out as nil by every caller
     Resolved = Data.define(:claim_message, :token, :token_type, :matching_notification, :recovered_stolen_record) do
+      def initialize(claim_message: nil, token: nil, token_type: nil, matching_notification: nil,
+        recovered_stolen_record: nil) = super
+
       # What this request's tokens earned, identified rather than typed: two parking
       # notifications on one bike resolve to the same prompt component, so the component
       # can't tell one recipient's alert from another's in a fragment key
