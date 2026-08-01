@@ -88,11 +88,11 @@ class PublicImage < ApplicationRecord
   end
 
   def default_name
-    if bike?
-      self.name = "#{imageable&.title_string} #{imageable&.frame_colors&.to_sentence}"
-    elsif image
-      self.name ||= File.basename(image.filename, ".*").titleize
-    end
+    return "#{imageable&.title_string} #{imageable&.frame_colors&.to_sentence}" if bike?
+
+    # The carrierwave uploader is truthy with nothing stored, and its filename is nil then
+    filename = activestorage? ? file.filename : image.filename
+    File.basename(filename.to_s, ".*").titleize
   end
 
   def set_calculated_attributes

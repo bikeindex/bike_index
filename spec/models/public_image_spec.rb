@@ -2,21 +2,28 @@ require "rails_helper"
 
 RSpec.describe PublicImage, type: :model do
   describe "default_name" do
-    it "sets a default name from filename if not bike" do
-      public_image = PublicImage.new
-      allow(public_image).to receive(:imageable_type).and_return("Nope")
-      allow(public_image).to receive(:name).and_return("Boop")
-      public_image.default_name
-      expect(public_image.name).to eq("Boop")
+    let(:organization) { FactoryBot.create(:organization) }
+
+    it "is the bike title and its colors" do
+      bike = FactoryBot.create(:bike, year: 1969, frame_model: "Hobo", cycle_type: "tandem")
+      public_image = FactoryBot.create(:public_image, imageable: bike)
+      expect(public_image.name).to eq("#{bike.title_string} #{bike.frame_colors.to_sentence}")
+      expect(public_image.bike_type).to eq "tandem"
+    end
+
+    it "is the carrierwave filename for an imageable that isn't a bike" do
+      public_image = FactoryBot.create(:public_image, :with_image_file, imageable: organization)
+      expect(public_image.name).to eq "Bike Photo Landscape"
       expect(public_image.bike_type).to be_blank
     end
 
-    it "returns the name of the manufacturer if it isn't other" do
-      bike = FactoryBot.create(:bike, year: 1969, frame_model: "Hobo", cycle_type: "tandem")
-      public_image = PublicImage.new(imageable: bike)
-      public_image.default_name
-      expect(public_image.name).to eq("#{bike.title_string} #{bike.frame_colors.to_sentence}")
-      expect(public_image.bike_type).to eq "tandem"
+    it "is the attached filename for an imageable that isn't a bike" do
+      public_image = FactoryBot.create(:public_image, :with_attached_file, imageable: organization)
+      expect(public_image.name).to eq "Bike Photo Landscape"
+    end
+
+    it "is blank without a file" do
+      expect(PublicImage.new(imageable: organization).default_name).to eq ""
     end
   end
 
