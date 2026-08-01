@@ -7,7 +7,7 @@ RSpec.describe Registrations::Show::CurrentAlerts::TokenPrompt::Component, type:
   let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed) }
   let(:current_user) { nil }
   let(:variant) { :modal }
-  let(:current_alerts) { BikeServices::ShowCurrentAlerts::Resolved.new }
+  let(:current_alerts) { BikeServices::ShowCurrentAlerts::NONE }
 
   context "a recovery token" do
     let(:current_alerts) { super().with(recovered_stolen_record: bike.current_stolen_record) }

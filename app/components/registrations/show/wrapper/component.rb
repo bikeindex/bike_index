@@ -8,7 +8,7 @@ module Registrations
       class Component < ApplicationComponent
         # Digest of the markup inside the cache block — the cached_markup_digest spec
         # keeps it current, following what this tree renders out into UI:: and elsewhere
-        MARKUP_DIGEST = "755822ae02b3"
+        MARKUP_DIGEST = "65600810fb87"
 
         def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: nil)
           @bike = bike
@@ -19,9 +19,8 @@ module Registrations
           @current_alerts = current_alerts
         end
 
-        # The dialog renders outside the cache block — it's per-request, so caching it
-        # would serve one token-holder's modal to every later viewer. It's the prompt the
-        # key already resolved, rather than a second selection pass over the same tokens
+        # The dialog renders outside the cache block: it's per-request, and caching it
+        # would serve one token-holder's modal to everyone after them
         def call
           safe_join([
             token_prompt ? render(token_prompt) : "",
@@ -29,26 +28,18 @@ module Registrations
           ])
         end
 
-        # Keyed on the viewer for the admin view's per-user content. The bike's
-        # cache version misses org-scoped records that don't touch the bike (notes,
-        # model audits, the owner's other registrations), so the inner component
-        # folds their versions in via #cache_version. This key can't keep cached
-        # forms' CSRF tokens valid (they're session-scoped, and a user's session
-        # varies across devices/logins) — the csrf-refresh controller reissues them
-        # client-side from the meta tag.
-        #
-        # The ownership's timestamp is in here because claiming doesn't touch the bike,
-        # and both views show claim state.
-        #
-        # The prompt's alert sits in the cached body, so the prompt a request earned is
-        # in the key too — identified, not just typed, or one recipient's alert (and the
-        # token in its form) would be served to the next. Nil for every request without
-        # a prompt, which is nearly all of them.
+        # Keyed on the viewer for the admin view's per-user content, and on the ownership
+        # because claiming only saves the ownership. The bike's cache version misses
+        # org-scoped records that don't touch it (notes, model audits, the owner's other
+        # registrations), so the inner component folds those in via #cache_version, and
+        # the prompt's fields because its alert is inside the cached body, token and all.
+        # Cached CSRF tokens are session-scoped and can't be keyed here — the csrf-refresh
+        # controller reissues them client-side from the meta tag
         def cache_key
           [MARKUP_DIGEST, @current_user&.id,
             @current_user&.registration_show_toggleable?, @current_user&.feature_registration_show_legacy?,
             BikeServices::ShowViews.view_param(@view), @bike_sticker&.id,
-            @bike.current_ownership&.updated_at, token_prompt && @current_alerts.cache_key,
+            @bike.current_ownership&.updated_at, token_prompt && @current_alerts.to_h.values,
             @bike.cache_key_with_version, *inner_component.try(:cache_version)]
         end
 

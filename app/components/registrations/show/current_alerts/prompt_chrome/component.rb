@@ -4,9 +4,8 @@ module Registrations
   module Show
     module CurrentAlerts
       module PromptChrome
-        # What a token prompt is wrapped in. The dialog opens itself and is gone once
-        # closed, so the same prompt renders again as an alert in the page body —
-        # everything the dialog holds, minus the chrome that took it away.
+        # What a token prompt is wrapped in — the dialog that opens itself, and the alert
+        # holding the same thing once it's dismissed
         class Component < ApplicationComponent
           include PromptVariant
 

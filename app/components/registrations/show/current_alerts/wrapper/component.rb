@@ -4,9 +4,8 @@ module Registrations
   module Show
     module CurrentAlerts
       module Wrapper
-        # The alerts about the registration's current state, rendered above the page body
-        # in both the consumer and org admin views. The token prompt renders here as an
-        # alert; its dialog renders outside this page's fragment cache
+        # The alerts about the registration's current state, in both views. The token
+        # prompt is the alert here — its dialog renders outside the page's fragment cache
         class Component < ApplicationComponent
           def initialize(bike:, current_user: nil, bike_sticker: nil, owner: false, current_alerts: nil)
             @bike = bike

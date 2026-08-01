@@ -3,10 +3,9 @@
 module Registrations
   module Show
     module Wrapper
-      # The whole registration show page, one scenario per overlay it can raise, plus
-      # the page with none of them. Unlike most previews these render a persisted bike —
-      # the page is far too query-heavy for an in-memory one — so they're gated out of
-      # production, where Lookbook is mounted but the bikes are someone's real ones.
+      # The whole registration show page, one scenario per overlay it can raise. These
+      # render a persisted bike — the page is far too query-heavy for an in-memory one — so
+      # they're gated out of production, where the bikes would be someone's real ones
       class ComponentPreview < ApplicationComponentPreview
         # @param view select [consumer, org_admin]
         # @param bike_id text "Bike to render — defaults to one of the org's"
@@ -51,9 +50,8 @@ module Registrations
         # @param bike_id text "Bike to render — defaults to one of the org's"
         def recovery_prompt(view: "consumer", bike_id: nil)
           page(view:, bike_id:) do |bike|
-            # The prompt renders whatever record it's handed, so this doesn't have to be
-            # the bike's own — a stolen registration here is an unclaimed one, which
-            # would stack SentToNewOwner's alert on top of the prompt being previewed
+            # Not the bike's own record: a stolen registration here is an unclaimed one,
+            # which would stack SentToNewOwner's alert on top of the prompt being previewed
             stolen_record = bike.current_stolen_record || ::StolenRecord.unscoped.last or next :missing
             alerts(recovered_stolen_record: stolen_record)
           end
@@ -99,7 +97,7 @@ module Registrations
             locals: {component:, offset_header: resolved.last.nil?})
         end
 
-        def alerts(**) = BikeServices::ShowCurrentAlerts::Resolved.new(**)
+        def alerts(**) = BikeServices::ShowCurrentAlerts::NONE.with(**)
 
         # ShowViews decides what this viewer may see; the param only picks which side of
         # that to show. So a preview can't put up an owner view for someone who doesn't

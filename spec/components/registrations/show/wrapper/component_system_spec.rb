@@ -3,13 +3,12 @@
 require "rails_helper"
 
 RSpec.describe Registrations::Show::Wrapper::Component, :js, type: :system do
-  # Wrapper, TokenPrompt and PromptChrome carry the alerts rather than being alerts, so
-  # every scenario exercises them; the rest each need a preview of their own, because
-  # reaching one otherwise means minting a token and following an email link
+  # These carry the alerts rather than being one, so every scenario exercises them. The
+  # rest each need a preview, since reaching one otherwise means minting a token
   let(:carriers) { %w[prompt_chrome token_prompt wrapper] }
 
-  # Text that only appears once that alert rendered. Keyed by the component's directory
-  # so the keys can be checked against what's actually on disk
+  # Text that only appears once that alert rendered, keyed by the component's directory
+  # so the keys can be checked against what's on disk
   let(:alert_text) do
     {"claim_invitation" => "registered your bike on Bike Index",
      "notification_token" => "Mark bike retrieved",
@@ -20,8 +19,8 @@ RSpec.describe Registrations::Show::Wrapper::Component, :js, type: :system do
 
   let(:preview_path) { "/rails/view_components/registrations/show/wrapper/component" }
   let!(:organization) { FactoryBot.create(:organization_brakebills) }
-  # The seeded lookbook user is a superuser, and ShowViews only offers the owner view to
-  # the owner or a superuser — without one, sent_to_new_owner previews the public page
+  # ShowViews only offers the owner view to the owner or a superuser — without the seeded
+  # superuser, sent_to_new_owner previews the public page
   let!(:lookbook_user) { FactoryBot.create(:superuser) }
 
   before { stub_const("ENV", ENV.to_hash.merge("LOOKBOOK_USER_ID" => lookbook_user.id.to_s)) }

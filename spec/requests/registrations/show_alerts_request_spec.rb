@@ -2,10 +2,9 @@
 
 require "rails_helper"
 
-# The token-carrying links in Bike Index's emails all point at /bikes/:id, which
-# redirects redesign users to /registrations/:id. These walk each link the whole way
-# — email link -> redirect -> rendered prompt — because the prompts are the only
-# reason those tokens exist, and a redirect that drops one fails silently.
+# The token-carrying links in Bike Index's emails point at /bikes/:id, which redirects
+# redesign users to /registrations/:id. These walk each link the whole way — email link
+# -> redirect -> rendered prompt — because a redirect that drops a token fails silently
 RSpec.describe "RegistrationsController#show alerts", type: :request do
   include_context :request_spec_logged_in_as_user_if_present
   before { RearGearType.fixed }
@@ -37,8 +36,7 @@ RSpec.describe "RegistrationsController#show alerts", type: :request do
       # Opened without a click, like the legacy overlay
       expect(response.body).to match("data-ui--modal-open-on-connect-value=\"true\"")
 
-      # The dialog opens on its own, but closing it is the end of it — the same prompt
-      # renders whole in the page body, with its own field ids
+      # Closing the dialog is the end of it, so the body has the prompt whole
       expect(response.body).to match("alert_stolen_record_recovered_description")
 
       # Reading it consumes the token, so a reload doesn't re-prompt
@@ -100,8 +98,8 @@ RSpec.describe "RegistrationsController#show alerts", type: :request do
     context "superseded by a repeat notification" do
       let!(:abandoned) { notification.retrieve_or_repeat_notification!(kind: "appears_abandoned_notification", user: notification.user) }
 
-      # The sent email links to the original, so that's what has to keep resolving —
-      # and its kind is what comes back as token_type for resolve_token to branch on
+      # The email links to the original, so that's what has to keep resolving — and its
+      # kind is what comes back as token_type
       it "still resolves the notification the link was sent for" do
         ProcessParkingNotificationJob.new.perform(abandoned.id)
         expect(notification.reload.status).to eq "replaced"
@@ -116,8 +114,7 @@ RSpec.describe "RegistrationsController#show alerts", type: :request do
     end
   end
 
-  # Graduated rides a different param than parking, and ShowCurrentAlerts branches on
-  # which one is present — so the redirect has to be walked for this one too
+  # Graduated rides a different param than parking, so walk this redirect too
   describe "graduated notification link" do
     let(:organization) do
       FactoryBot.create(:organization_with_organization_features, name: "Brakebills",
@@ -199,8 +196,8 @@ RSpec.describe "RegistrationsController#show alerts", type: :request do
         expect(response.body).to match("/ownerships/#{ownership.id}")
       end
 
-      # The only claim-link case that redirects — a signed-out recipient stays on the
-      # legacy page, since the redesign is gated on the signed-in user's flag
+      # The only claim-link case that redirects — the redesign is gated on the signed-in
+      # user's flag, so a signed-out recipient stays on the legacy page
       it "keeps the token through the redirect" do
         get "/bikes/#{bike.id}?t=#{ownership.token}"
         expect(response).to redirect_to(registration_path(bike, t: ownership.token))
@@ -210,8 +207,8 @@ RSpec.describe "RegistrationsController#show alerts", type: :request do
         expect(whitespace_normalized_body_text).to match("We're honored to have your bike on the Index")
       end
 
-      # Claiming nils the ownership token, so the emailed link goes dead — unlike the
-      # notification links, which keep resolving after they've been acted on
+      # Claiming nils the ownership token, so the link goes dead — unlike the notification
+      # links, which keep resolving after they've been acted on
       it "stops inviting them once they've claimed it" do
         token = ownership.token
         expect(token).to be_present

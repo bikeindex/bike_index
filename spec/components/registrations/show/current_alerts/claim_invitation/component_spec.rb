@@ -34,9 +34,8 @@ RSpec.describe Registrations::Show::CurrentAlerts::ClaimInvitation::Component, t
     end
   end
 
-  # Someone signed in who isn't the claimant still gets the pitch, but telling them to
-  # sign up would be telling them to make an account they have — ownerships#show says
-  # whose it is instead
+  # Someone signed in who isn't the claimant still gets the pitch, but not the sign-up —
+  # they have an account, and ownerships#show is what tells them whose bike it is
   context "signed in as someone else, arrived via the claim link" do
     let(:current_user) { FactoryBot.create(:user_confirmed) }
     let(:claim_message) { "new_registration" }

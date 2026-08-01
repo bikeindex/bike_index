@@ -48,8 +48,8 @@ RSpec.describe Registrations::Show::CurrentAlerts::NotificationToken::Component,
     end
 
     context "already marked remaining" do
-      # Graduated says "remaining", not the parking wording — the other arm of resolved_text.
-      # Reload because mark_remaining! updates a separate instance loaded inside the job
+      # Graduated says "remaining" — the other arm of resolved_text. Reload because
+      # mark_remaining! updates a separate instance loaded inside the job
       before do
         notification.mark_remaining!
         notification.reload

@@ -7,8 +7,7 @@ RSpec.describe "ComponentPreviews", type: :request do
   let(:organization) { FactoryBot.create(:organization_brakebills) }
   let!(:parking_notification) { FactoryBot.create(:parking_notification, organization:) }
 
-  # ParkingNotificationDetails calls display_dev_info?, so it's the canary for
-  # previews rendering through a controller with the helper methods
+  # ParkingNotificationDetails calls display_dev_info? — the canary for helper methods
   it "renders a preview of a component that uses the controller helpers" do
     get "/rails/view_components/registrations/show/org_top_actions/wrapper/component/default"
 
@@ -26,8 +25,8 @@ RSpec.describe "ComponentPreviews", type: :request do
     expect(response.body).to include("bike.jpg")
   end
 
-  # The registration show previews render a persisted bike rather than an in-memory one,
-  # so they're the previews with something to lose if they ever ran against real data
+  # These render a persisted bike rather than an in-memory one, so they're the previews
+  # with something to lose if they ever ran against real data
   describe "registration show overlays" do
     let(:base_url) { "/rails/view_components/registrations/show/wrapper/component" }
     let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
@@ -69,8 +68,7 @@ RSpec.describe "ComponentPreviews", type: :request do
       get "#{base_url}/no_overlay?view=org_admin&bike_id=#{other.id}"
       expect(response.status).to eq 200
 
-      # Which bike and which perspective aren't reliably greppable out of a whole
-      # rendered page, so check the component the preview built
+      # Neither is reliably greppable out of a page, so check the component it built
       component = Registrations::Show::Wrapper::ComponentPreview.new
         .no_overlay(view: "org_admin", bike_id: other.id).dig(:locals, :component)
 
@@ -78,8 +76,8 @@ RSpec.describe "ComponentPreviews", type: :request do
       expect(component.instance_variable_get(:@view)).to eq [:staff, organization]
     end
 
-    # ShowViews decides what the viewer may see, so asking for a view they aren't
-    # entitled to falls back rather than rendering a page the app never serves
+    # ShowViews decides what the viewer may see, so an unentitled view falls back rather
+    # than rendering a page the app never serves
     it "falls back to public when the lookbook user has no claim on the org" do
       outsider = FactoryBot.create(:user_confirmed)
       stub_const("ENV", ENV.to_hash.merge("LOOKBOOK_USER_ID" => outsider.id.to_s))

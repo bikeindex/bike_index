@@ -26,7 +26,7 @@ RSpec.describe Registrations::Show::Wrapper::Component, type: :component do
       first = FactoryBot.create(:parking_notification, bike:)
       second = FactoryBot.create(:parking_notification, bike:, retrieval_link_token: "another-token")
       keys = [first, second].map do |notification|
-        alerts = BikeServices::ShowCurrentAlerts::Resolved.new(token: notification.retrieval_link_token,
+        alerts = BikeServices::ShowCurrentAlerts::NONE.with(token: notification.retrieval_link_token,
           token_type: notification.kind, matching_notification: notification)
         described_class.new(bike: bike.reload, current_user:, view: [:owner, nil],
           available_views: [], current_alerts: alerts).cache_key

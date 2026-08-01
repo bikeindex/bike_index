@@ -2,30 +2,16 @@
 
 module BikeServices
   # The token-scoped prompts shown above a registration: the claim invitation, a
-  # parking/graduated notification's resolve form, and the recovery form. These are
-  # per-request rather than per-bike, so Registrations::Show::Wrapper folds
-  # Resolved#cache_key into its fragment key — otherwise one viewer's prompt would
-  # be cached and served to everyone.
+  # parking/graduated notification's resolve form, and the recovery form
   module ShowCurrentAlerts
     extend Functionable
 
-    # Most requests carry one token at most, so the rest default rather than being
-    # spelled out as nil by every caller
-    Resolved = Data.define(:claim_message, :token, :token_type, :matching_notification, :recovered_stolen_record) do
-      def initialize(claim_message: nil, token: nil, token_type: nil, matching_notification: nil,
-        recovered_stolen_record: nil) = super
+    Resolved = Data.define(:claim_message, :token, :token_type, :matching_notification, :recovered_stolen_record)
 
-      # What this request's tokens earned, identified rather than typed: two parking
-      # notifications on one bike resolve to the same prompt component, so the component
-      # can't tell one recipient's alert from another's in a fragment key
-      def cache_key
-        [claim_message, token, token_type, matching_notification&.id, recovered_stolen_record&.id].join("/")
-      end
-    end
+    NONE = Resolved.new(nil, nil, nil, nil, nil)
 
-    # recovery_link_token is read from the session by the caller (which deletes it,
-    # so the prompt shows once); the token params arrive on the query string and
-    # survive the bikes#show redirect to the redesign.
+    # The caller reads recovery_link_token from the session, deleting it so the prompt
+    # shows once. The rest arrive as query params, and survive the bikes#show redirect
     def find(bike:, params:, recovery_link_token: nil)
       token, token_type, notification = notification_for(bike:, params:)
 
@@ -45,8 +31,7 @@ module BikeServices
       ownership.claim_message
     end
 
-    # [token, token_type, notification] — each branch owns the param it reads, so the
-    # token and the type it implies can't drift apart
+    # [token, token_type, notification] — each branch owns the param it reads
     def notification_for(bike:, params:)
       if (token = params[:parking_notification_retrieved].presence)
         notification = bike.parking_notifications.find_by(retrieval_link_token: token)

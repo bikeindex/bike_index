@@ -4,9 +4,8 @@ module Registrations
   module Show
     module CurrentAlerts
       module ClaimInvitation
-        # Invites the registration's owner to claim it — either because they're signed
-        # in as someone it's claimable by, or because they followed the claim link from
-        # their registration email (claim_message, so they may still be signed out)
+        # Invites the registration's owner to claim it — either signed in as someone it's
+        # claimable by, or arriving from the claim link in their registration email
         class Component < ApplicationComponent
           MODAL_ID = "claim-invitation-modal"
 
@@ -35,8 +34,7 @@ module Registrations
             translation(".sign_up_to_claim")
           end
 
-          # Memoized: this hits UserEmail, and render? plus the template and claim_path
-          # all ask
+          # Memoized — hits UserEmail, and render? and the template both ask
           def claimable?
             return @claimable if defined?(@claimable)
 
@@ -47,9 +45,8 @@ module Registrations
             @bike.current_ownership
           end
 
-          # A signed-in claimant claims in one click, and one who isn't the claimant is
-          # told so there rather than being sent to sign up for an account they have.
-          # Signed out, they sign up against the ownership's email and come back here
+          # ownerships#show claims it, or says whose it is. Signed out, they sign up
+          # against the ownership's email and come back here
           def claim_path
             return ownership_path(ownership) if signed_in?
 

@@ -66,9 +66,8 @@ class RegistrationsController < ApplicationController
 
   private
 
-  # The token-scoped prompts for this request. Both session touches mirror the legacy
-  # bikes#show: the recovery token is deleted as it's read so the form shows once, and
-  # a matching claim token records the email so signing up can claim the bike.
+  # Both session touches mirror the legacy bikes#show: the recovery token is spent as
+  # it's read, and a matching claim token records the email so signing up can claim
   def current_alerts
     alerts = BikeServices::ShowCurrentAlerts.find(bike: @bike, params:,
       recovery_link_token: session.delete(:recovery_link_token))

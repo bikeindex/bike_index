@@ -5,13 +5,10 @@ module Registrations
     module CurrentAlerts
       module TokenPrompt
         # Picks the one prompt a request's tokens have earned, and renders it as the
-        # dialog or as the alert in the page body. Both render, from one selection, so
-        # they can't disagree about which prompt won.
+        # dialog or as the alert in the page body
         class Component < ApplicationComponent
-          # Like the legacy overlays, only one opens — they're modals, and stacked
-          # dialogs would bury each other. Recovery beats a notification (the legacy
-          # partial let it override), and claiming is the fallback. Legacy rendered the
-          # claim pitch inline so it could coexist; here a second token suppresses it.
+          # Only one, like the legacy overlays — stacked dialogs would bury each other.
+          # Recovery beats a notification, and claiming is the fallback
           def self.prompt_for(bike:, current_user: nil, current_alerts: nil, variant: :modal)
             return if current_alerts.blank?
 
