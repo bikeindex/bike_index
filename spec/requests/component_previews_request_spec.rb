@@ -27,12 +27,12 @@ RSpec.describe "ComponentPreviews", type: :request do
 
   # One preview per state the claim-impound card reaches, each resolving its own records
   describe "impound claim previews" do
-    let(:base_url) { "/rails/view_components/registrations/show/wrapper/claim_impound" }
+    let(:base_url) { "/rails/view_components/registrations/show/wrapper/claim_impound/component" }
     let!(:impound_record) { FactoryBot.create(:impound_record) }
     let!(:stolen_bike) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed) }
 
     def preview(state)
-      get "#{base_url}/#{state}/default"
+      get "#{base_url}/#{state}"
       expect(response.status).to eq 200
       expect(response.body).to_not match("Nothing to preview")
       whitespace_normalized_body_text

@@ -13,7 +13,7 @@ RSpec.describe Registrations::Show::Wrapper::Component, :js, type: :system do
   # names the one that raises the card in its resting form
   let(:alert_previews) do
     # The claim card's heading is uppercased in CSS, so it anchors on its claim button
-    {"claim_impound" => ["claim_impound/with_stolen_registration/default", "Claim found bike"],
+    {"claim_impound" => ["claim_impound/component/with_stolen_registration", "Claim found bike"],
      "claim_invitation" => ["component/claim_invitation", "registered your bike on Bike Index"],
      "notification_token" => ["component/notification_token", "Mark bike retrieved"],
      "recovery_prompt" => ["component/recovery_prompt", "Mark your bike recovered!"],
