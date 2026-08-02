@@ -36,6 +36,24 @@ RSpec.describe UI::Alerts::FlashMessage::Component, type: :component do
     end
   end
 
+  context "with a hash flash value" do
+    let(:url) { "/users/update_password_form_with_reset_token" }
+    let(:flash) { {notice: {translation_key: :signed_in, url:}} }
+
+    it "translates the message and links the url" do
+      expect(component).to have_text("You're signed in!")
+      expect(component).to have_link("set password to sign in", href: url)
+    end
+
+    context "round-tripped through the flash cookie" do
+      let(:flash) { {"notice" => {"translation_key" => "signed_in", "url" => url}} }
+
+      it "renders the same, the cookie is JSON so keys come back as strings" do
+        expect(component).to have_link("set password to sign in", href: url)
+      end
+    end
+  end
+
   context "with empty flash" do
     let(:flash) { {} }
 
