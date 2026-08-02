@@ -94,7 +94,7 @@ RSpec.describe "ComponentPreviews", type: :request do
 
       rendered = Registrations::Show::Wrapper::ComponentPreview.new.no_overlay
 
-      expect(rendered[:component]).to be_a(UI::Alert::Component)
+      expect(rendered[:component]).to be_a(UI::Alerts::Base::Component)
       expect(rendered[:component].instance_variable_get(:@text)).to match("disabled in production")
     end
   end

@@ -12,12 +12,12 @@
   </div>
 
   <% if @avery_export_redirect %>
-    <%= render UI::Alert::Component.new(text: t(".shared_alert_body"), kind: :success) %>
+    <%= render UI::Alerts::Base::Component.new(text: t(".shared_alert_body"), kind: :success) %>
   <% end %>
 
   <% if @export.deleted_at.present? %>
     <% deleted_time = content_tag(:span, l(@export.deleted_at, format: :convert_time), class: "localizeTime preciseTime withPreposition") %>
-    <%= render(UI::Alert::Component.new(kind: :error)) do %>
+    <%= render(UI::Alerts::Base::Component.new(kind: :error)) do %>
       This export was deleted <%= deleted_time %>
     <% end %>
   <% end %>

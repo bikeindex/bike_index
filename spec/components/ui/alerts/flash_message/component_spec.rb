@@ -19,6 +19,15 @@ RSpec.describe UI::Alerts::FlashMessage::Component, type: :component do
     end
   end
 
+  context "with info flash" do
+    let(:flash) { {info: "Heads up"} }
+
+    it "renders it as a notice" do
+      expect(component).to have_text("Heads up")
+      expect(component).to have_css(".tw\\:bg-blue-50")
+    end
+  end
+
   context "with multiple flash messages" do
     let(:flash) { {notice: "Done", error: "But watch out"} }
 
@@ -39,8 +48,16 @@ RSpec.describe UI::Alerts::FlashMessage::Component, type: :component do
   context "with empty flash" do
     let(:flash) { {} }
 
-    it "renders no alerts" do
-      expect(component).not_to have_css("[role='alert']")
+    it "renders nothing" do
+      expect(component.to_html).to be_blank
+    end
+  end
+
+  context "with an unknown flash type" do
+    let(:flash) { {bogus: "Who knows"} }
+
+    it "raises" do
+      expect { component }.to raise_error(ArgumentError, /unknown flash type/i)
     end
   end
 end
