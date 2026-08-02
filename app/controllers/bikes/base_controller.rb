@@ -138,7 +138,7 @@ module Bikes
       end
       bike_sticker.claim_if_permitted(user: current_user, bike: @bike)
       if bike_sticker.errors.any?
-        flash[:error] = bike_sticker.errors.full_messages
+        flash[:error] = bike_sticker.errors.full_messages.to_sentence
       else
         flash[:success] = translation(:sticker_assigned, bike_sticker: bike_sticker.pretty_code, bike_type: @bike.type,
           scope: [:controllers, :bikes, :assign_bike_stickers])
