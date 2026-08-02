@@ -322,7 +322,7 @@ RSpec.describe UsersController, type: :controller do
           expect(response).to redirect_to my_account_url
           expect(session[:partner]).to be_nil
           expect(flash[:success]).to eq "Logged in!"
-          expect(flash[:success_html]).to be_blank
+          expect(flash[:notice_html]).to be_blank
         end
 
         context "passwordless user" do
@@ -333,8 +333,8 @@ RSpec.describe UsersController, type: :controller do
             expect(User.from_auth(cookies.signed[:auth])).to eq(user)
             expect(response).to redirect_to my_account_url
             expect(flash[:success]).to be_blank
-            expect(flash[:success_html]).to match("You've signed up for Bike Index!")
-            expect(flash[:success_html]).to match(update_password_form_with_reset_token_users_path)
+            expect(flash[:notice_html]).to match("You've signed up for Bike Index!")
+            expect(flash[:notice_html]).to match(update_password_form_with_reset_token_users_path)
           end
 
           context "organization passwordless user" do
@@ -344,7 +344,7 @@ RSpec.describe UsersController, type: :controller do
             it "doesn't offer to set a password" do
               get :confirm, params: {id: user.id, code: user.confirmation_token}
               expect(flash[:success]).to eq "You're signed in"
-              expect(flash[:success_html]).to be_blank
+              expect(flash[:notice_html]).to be_blank
             end
           end
         end

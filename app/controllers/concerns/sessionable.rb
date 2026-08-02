@@ -56,14 +56,15 @@ module Sessionable
 
   private
 
-  # Passwordless users are nudged to set a password, unless their organization is what signs them in
+  # Passwordless users are nudged to set a password, unless their organization is what signs them in.
+  # notice rather than success - success alerts fade out after 10 seconds, taking the link with them
   def set_sign_in_flash(user, signed_up)
     if user.organization_passwordless_user?
       flash[:success] = translation(:organization_signed_in, scope: SIGN_IN_SCOPE)
     elsif user.passwordless_user?
       set_password_link = helpers.link_to(translation(:set_password, scope: SIGN_IN_SCOPE),
         update_password_form_with_reset_token_users_path)
-      flash[:success_html] = translation(signed_up ? :signed_up_html : :signed_in_html,
+      flash[:notice_html] = translation(signed_up ? :signed_up_html : :signed_in_html,
         scope: SIGN_IN_SCOPE, set_password_link:)
     else
       flash[:success] = translation(:logged_in, scope: SIGN_IN_SCOPE)
