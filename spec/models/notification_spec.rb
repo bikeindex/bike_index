@@ -257,5 +257,17 @@ RSpec.describe Notification, type: :model do
         end
       end
     end
+
+    context "with InvalidEmailRequestError" do
+      let(:invalid_email_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 300}) }
+      it "adds the error to the notification without raising" do
+        expect(notification.reload.delivery_status).to eq "delivery_pending"
+        notification.track_email_delivery { raise invalid_email_error }
+
+        expect(notification.reload.delivery_status).to eq "delivery_failure"
+        expect(notification.delivery_error).to eq "Postmark::InvalidEmailRequestError"
+        expect(notification.delivery_error_invalid?).to be_truthy
+      end
+    end
   end
 end
