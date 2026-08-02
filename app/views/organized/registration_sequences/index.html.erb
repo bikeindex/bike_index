@@ -36,7 +36,13 @@
     <% end %>
   </p>
 
-  <%= button_to "Edit sequence", organization_registration_sequences_path(organization_id: current_organization.to_param), method: :post, class: "twlink", form_class: "tw:mb-6 tw:inline-block" %>
+  <div class="tw:mb-6 tw:flex tw:items-baseline tw:gap-4">
+    <%= button_to "Edit sequence", organization_registration_sequences_path(organization_id: current_organization.to_param), method: :post, class: "twlink", form_class: "tw:inline-block" %>
+
+    <% if @draft.present? %>
+      <%= button_to "Discard draft", organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), method: :delete, class: "twlink tw:text-sm tw:text-gray-500", form_class: "tw:inline-block", data: {turbo_confirm: "Discard this draft and its pages? This can't be undone."} %>
+    <% end %>
+  </div>
 
   <% if @previous.any? %>
     <h2 class="uncap tw:mb-2 tw:text-lg tw:font-semibold">Previous</h2>

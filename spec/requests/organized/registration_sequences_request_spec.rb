@@ -100,6 +100,22 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
         expect(response.status).to eq(404)
       end
     end
+
+    describe "destroy" do
+      let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization: current_organization) }
+
+      it "discards the draft and its pages" do
+        expect { delete "#{base_url}/#{draft.id}" }.to change(RegistrationSequence, :count).by(-1)
+        expect(response).to redirect_to(base_url)
+        expect(RegistrationSequence.with_deleted.find_by(id: draft.id)).to be_nil
+      end
+
+      it "404s for a non-draft sequence" do
+        active = FactoryBot.create(:registration_sequence_active, organization: current_organization)
+        expect { delete "#{base_url}/#{active.id}" }.to_not change(RegistrationSequence, :count)
+        expect(response.status).to eq(404)
+      end
+    end
   end
 
   context "logged_in_as_organization_user" do

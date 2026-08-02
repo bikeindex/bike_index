@@ -30,10 +30,17 @@ module Organized
       end
     end
 
-    # Builds the draft (cloned from the template) the org manages
+    # Opens the draft the org manages, cloning the live sequence (or the template) on first edit
     def create
       draft = RegistrationSequence.draft_for(current_organization)
       redirect_to edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: draft.id)
+    end
+
+    # Throw the draft away to start over; the live sequence is untouched
+    def destroy
+      find_draft.discard_draft!
+      flash[:success] = "Draft discarded"
+      redirect_to organization_registration_sequences_path(organization_id: current_organization.to_param)
     end
 
     private

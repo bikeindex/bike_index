@@ -9,7 +9,7 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
   it "renders the page list with Add page and per-page Edit links" do
     render_inline(described_class.new(registration_sequence:))
 
-    expect(page).to have_css("form[method='post'] button[type='submit']", text: "Add page")
+    expect(page).to have_link("Add page")
     expect(page).to have_css("[data-controller='sortable'] [data-sortable-target='item']", minimum: 1)
     expect(page).to have_link("Edit")
   end
@@ -47,12 +47,15 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
     expect(page).to have_css("[data-ui--collapse-target='content'][class*='hidden'] li", minimum: 1)
   end
 
-  it "previews the pages as registrants see them, by heading" do
+  it "previews the pages as registrants see them" do
     registration_sequence.registration_sequence_pages.first.update!(heading: "Electric vehicle detected")
     render_inline(described_class.new(registration_sequence:))
 
     expect(page).to have_content("Preview")
     # The page list shows the title; only the preview renders heading_text
     expect(page).to have_css("h3", text: "Electric vehicle detected")
+    # Rules render as read-only checkboxes, closing with the final acknowledgment
+    expect(page).to have_css("input[type=checkbox][disabled]", minimum: 3)
+    expect(page).to have_content("I, registrant's name,")
   end
 end

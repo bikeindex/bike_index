@@ -1,22 +1,58 @@
-<div class="tw:flex tw:flex-col tw:gap-6">
-  <% @registration_sequence.registration_sequence_pages.with_attached_image.each do |page| %>
-    <div
-      class="
-        tw:flex tw:flex-col tw:gap-4 tw:rounded tw:border tw:border-gray-200
-        tw:p-4 tw:sm:flex-row
-      "
-    >
-      <% if page.image.attached? %>
-        <%= image_tag page.image_url, class: "tw:w-full tw:rounded tw:object-cover tw:sm:w-64" %>
+<div class="tw:mx-auto tw:flex tw:max-w-md tw:flex-col tw:gap-8">
+  <% @registration_sequence.registration_sequence_pages.each do |page| %>
+    <div class="tw:flex tw:flex-col tw:gap-3">
+      <% if page.organization_specific && organization_name.present? %>
+        <div>
+          <%= render UI::Badge::Component.new(text: organization_name, color: :notice, size: :xs) %>
+        </div>
       <% end %>
 
-      <div class="tw:flex-1">
-        <%= render UI::Header::Component.new(text: page.heading_text, subtitle: page.subtitle, tag: :h3, html_class: "uncap") %>
+      <%= render UI::Header::Component.new(text: page.heading_text, subtitle: page.subtitle, tag: :h3, html_class: "uncap") %>
 
-        <div class="tw:prose tw:max-w-none">
-          <%= page.body&.html_safe %>
-        </div>
+      <% if page.image_url.present? %>
+        <%= image_tag page.image_url, alt: "", class: "tw:w-full tw:rounded-lg tw:object-cover" %>
+      <% end %>
+
+      <%= render Register::SectionLabel::Component.new(text: page.title) do %>
+        <% if @registration_sequence.faq_url.present? %>
+          <%= link_to "FAQ", @registration_sequence.faq_url, target: "_blank", rel: "noopener", class: "twlink tw:text-xs" %>
+        <% end %>
+      <% end %>
+
+      <%# The rules as registrants agree to them - one checkbox each, read-only here %>
+      <div
+        class="
+          tw:divide-y tw:divide-gray-200 tw:rounded-xl tw:border
+          tw:border-gray-200
+        "
+      >
+        <% page.bullets.each do |bullet| %>
+          <div class="tw:flex tw:items-start tw:gap-3 tw:px-4 tw:py-3.5 tw:text-sm">
+            <input
+              type="checkbox"
+              disabled
+              class="tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0"
+            >
+
+            <span><%= sanitize bullet %></span>
+          </div>
+        <% end %>
       </div>
     </div>
   <% end %>
+
+  <%# The final acknowledgment binding the registrant to every page above %>
+  <div
+    class="
+      tw:flex tw:items-start tw:gap-3 tw:rounded-xl tw:border
+      tw:border-gray-200 tw:px-4 tw:py-3.5 tw:text-sm
+    "
+  >
+    <input type="checkbox" disabled class="tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0">
+
+    <span>
+      I, <em>registrant's name</em>,
+      <%= @registration_sequence.acknowledgment %>
+    </span>
+  </div>
 </div>
