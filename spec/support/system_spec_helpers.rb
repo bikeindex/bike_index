@@ -94,6 +94,13 @@ module SystemSpecHelpers
     raise "##{modal_id} never opened after #{attempts} clicks"
   end
 
+  # Flash messages are fixed position, so an undismissed one intercepts clicks on
+  # whatever it overlays. Wait out the dismiss transition before moving on.
+  def dismiss_flash_messages(wait: 10)
+    all("#flash-messages [aria-label='Close']", minimum: 1).each(&:click)
+    expect(page).to have_no_css("#flash-messages [role='alert']", wait:)
+  end
+
   private
 
   # Retry a Playwright action when the node detaches mid-action -- the raw

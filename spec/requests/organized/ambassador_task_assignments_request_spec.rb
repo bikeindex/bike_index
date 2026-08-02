@@ -17,7 +17,7 @@ RSpec.describe Organized::AmbassadorTaskAssignmentsController, type: :request do
 
         expect(response).to redirect_to(organization_ambassador_dashboard_url)
         expect(assignment.reload.completed_at).to be_nil
-        expect(flash[:info]).to match("status updated")
+        expect(flash[:notice]).to match("status updated")
         expect(flash[:error]).to be_blank
       end
     end
@@ -34,7 +34,7 @@ RSpec.describe Organized::AmbassadorTaskAssignmentsController, type: :request do
 
         expect(response).to redirect_to(organization_ambassador_dashboard_url)
         expect(assignment.reload.completed_at).to_not be_nil
-        expect(flash[:info]).to match("status updated")
+        expect(flash[:notice]).to match("status updated")
         expect(flash[:error]).to be_blank
       end
     end
@@ -51,7 +51,7 @@ RSpec.describe Organized::AmbassadorTaskAssignmentsController, type: :request do
 
         expect(response).to redirect_to(organization_ambassador_dashboard_url)
         expect(assignment.reload.completed_at).to_not be_present
-        expect(flash[:info]).to be_blank
+        expect(flash[:notice]).to be_blank
         expect(flash[:error]).to match("Could not update")
       end
     end

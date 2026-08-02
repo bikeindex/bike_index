@@ -54,7 +54,7 @@ module Admin
           @email_domain.reload.process!
           redirect_to admin_email_domain_url(@email_domain) and return
         else
-          flash[:error] = @email_domain.errors.full_messages
+          flash[:error] = @email_domain.errors.full_messages.to_sentence
         end
       end
 

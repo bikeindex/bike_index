@@ -29,9 +29,9 @@ module Admin
 
         def status_class
           case @status
-          when "for_sale" then UI::Alert::Component::TEXT_CLASSES[:notice]
-          when "sold" then UI::Alert::Component::TEXT_CLASSES[:success]
-          when "removed" then UI::Alert::Component::TEXT_CLASSES[:warning]
+          when "for_sale" then UI::Alerts::Base::Component::TEXT_CLASSES[:notice]
+          when "sold" then UI::Alerts::Base::Component::TEXT_CLASSES[:success]
+          when "removed" then UI::Alerts::Base::Component::TEXT_CLASSES[:warning]
           else
             ""
           end

@@ -24,12 +24,12 @@ module Organized
     def destroy
       organization_name = current_organization.name
       if current_organization.paid?
-        flash[:info] = translation(:contact_support_to_delete, org_name: organization_name)
+        flash[:notice] = translation(:contact_support_to_delete, org_name: organization_name)
         redirect_to(current_root_path) && return
       end
       notify_admins("organization_destroyed")
       current_organization.destroy
-      flash[:info] = translation(:deleted_org, org_name: organization_name)
+      flash[:notice] = translation(:deleted_org, org_name: organization_name)
       redirect_to user_root_url
     end
 

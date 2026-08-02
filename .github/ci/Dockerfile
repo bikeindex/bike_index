@@ -18,7 +18,7 @@
 # Rebuilt automatically (ci.yml's build_ci_image job) whenever this file,
 # .tool-versions, or package.json changes.
 
-ARG RUBY_VERSION=4.0.5
+ARG RUBY_VERSION=4.0.6
 FROM docker.io/library/ruby:$RUBY_VERSION-slim
 
 ENV BUNDLE_PATH=/usr/local/bundle

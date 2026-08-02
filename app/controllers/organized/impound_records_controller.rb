@@ -42,7 +42,7 @@ module Organized
         redirect_to organization_impound_record_path(@impound_record.display_id, organization_id: current_organization.to_param)
       else
         flash[:error] = if is_valid_kind
-          @impound_record_update.errors.full_messages
+          @impound_record_update.errors.full_messages.to_sentence
         else
           "Sorry, you can't update this impound record with #{@impound_record_update.kind_humanized}"
         end

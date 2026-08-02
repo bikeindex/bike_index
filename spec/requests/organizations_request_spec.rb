@@ -264,7 +264,7 @@ RSpec.describe OrganizationsController, type: :request do
       include_context :request_spec_logged_in_as_user
       it "redirects to posintegration" do
         get "/lightspeed_interface"
-        expect(flash[:info]).to match(/organization/)
+        expect(flash[:notice]).to match(/organization/)
         expect(response).to redirect_to new_organization_path
       end
     end
@@ -272,7 +272,7 @@ RSpec.describe OrganizationsController, type: :request do
       it "redirects to posintegration" do
         get "/lightspeed_interface"
         expect(response).to redirect_to new_user_path
-        expect(flash[:info]).to match(/sign up/)
+        expect(flash[:notice]).to match(/sign up/)
         expect(session[:return_to]).to eq lightspeed_interface_path
       end
     end
