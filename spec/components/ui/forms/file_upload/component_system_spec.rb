@@ -98,8 +98,7 @@ RSpec.describe UI::Forms::FileUpload::Component, :js, type: :system do
   # This preview renders whatever the seeded org has attached, so it needs one
   context "with an image already attached" do
     let!(:organization) do
-      FactoryBot.create(:organization_brakebills)
-        .tap { it.update(avatar: File.open(Rails.root.join("spec/fixtures/bike.jpg"))) }
+      FactoryBot.create(:organization_brakebills, avatar: File.open(Rails.root.join("spec/fixtures/bike.jpg")))
     end
 
     it "previews what's attached, rather than starting hidden as the empty picker does" do

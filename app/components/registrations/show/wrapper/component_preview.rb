@@ -79,7 +79,7 @@ module Registrations
 
         # The block builds the alerts off the resolved bike, or returns :missing.
         # as_view pins the perspective for a scenario that only makes sense in one
-        def page(view:, bike_id:, bike_sticker: nil, current_user: lookbook_user, as_view: nil)
+        def page(bike_id:, view: nil, bike_sticker: nil, current_user: lookbook_user, as_view: nil)
           return production_notice("registration") if Rails.env.production?
 
           bike = preview_bike(bike_id)

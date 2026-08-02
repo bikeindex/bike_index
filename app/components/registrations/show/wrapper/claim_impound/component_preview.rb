@@ -12,7 +12,8 @@ module Registrations
           # The viewer has a stolen registration to claim the found bike with
           # @param bike_id text "Bike to render — defaults to a claimable found one"
           def with_stolen_registration(bike_id: nil)
-            claim_page(bike_id:, current_user: unclaimed_viewer)
+            viewer = unclaimed_viewer or return missing_notice("viewer who could claim this")
+            claim_page(bike_id:, current_user: viewer)
           end
 
           # Signed out, so the claim button routes through sign-in
@@ -24,7 +25,8 @@ module Registrations
           # Signed in with nothing to claim the found bike with
           # @param bike_id text "Bike to render — defaults to a claimable found one"
           def without_stolen_registration(bike_id: nil)
-            claim_page(bike_id:, current_user: user_without_stolen_bike)
+            viewer = user_without_stolen_bike or return missing_notice("viewer without a stolen registration")
+            claim_page(bike_id:, current_user: viewer)
           end
 
           # Opened but not sent — the message is still editable
@@ -57,12 +59,12 @@ module Registrations
           # are about. A page whose card won't render says so, rather than previewing as
           # one without it
           def claim_page(current_user:, bike_id: nil)
-            bike = ::Bike.unscoped.find_by(id: bike_id.presence || claimable_impound&.bike_id)
+            bike = preview_bike(bike_id.presence || claimable_impound&.bike_id)
             return missing_notice("a found registration to claim") if bike.blank?
             return missing_notice("the records this scenario needs") unless
               ::BikeServices::Displayer.display_impound_claim?(bike, current_user)
 
-            page(view: "consumer", bike_id: bike.id, current_user:, as_view: [:public, nil])
+            page(bike_id: bike.id, current_user:, as_view: [:public, nil])
           end
 
           def claim_page_for(impound_claims)
@@ -95,7 +97,8 @@ module Registrations
           end
 
           def stolen_bike_owners
-            @stolen_bike_owners ||= ::Bike.status_stolen.reorder(id: :desc).limit(50).filter_map(&:user).uniq
+            @stolen_bike_owners ||= ::Bike.status_stolen.includes(current_ownership: :user)
+              .reorder(id: :desc).limit(50).filter_map(&:user).uniq
           end
         end
       end
