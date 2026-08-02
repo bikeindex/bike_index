@@ -18,7 +18,15 @@ module Registrations
           @owner = owner.nil? ? (@current_user.present? && @bike.owner == @current_user) : owner
         end
 
+        def cache_version = current_alerts_component.cache_version
+
         private
+
+        def current_alerts_component
+          @current_alerts_component ||= CurrentAlerts::Wrapper::Component.new(bike: @bike,
+            current_user: @current_user, bike_sticker: @bike_sticker, owner: @owner,
+            current_alerts: @current_alerts)
+        end
 
         def title
           @bike.name.presence || bike_title_html(@bike)
