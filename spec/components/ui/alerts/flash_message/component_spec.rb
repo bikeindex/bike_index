@@ -48,8 +48,9 @@ RSpec.describe UI::Alerts::FlashMessage::Component, type: :component do
   context "with empty flash" do
     let(:flash) { {} }
 
-    it "renders nothing" do
-      expect(component.to_html).to be_blank
+    it "renders the container with no alerts, so turbo_streams can target it" do
+      expect(component).to have_css("#flash-messages")
+      expect(component).not_to have_css("[role='alert']")
     end
   end
 

@@ -1,18 +1,3 @@
-<%#
-  render_flash is passed only by index.turbo_stream.erb: the multi-update
-  form redirects back here and the frame is replaced via turbo_stream, so the
-  flash must live inside the frame to survive. On a full page load the layout
-  renders the flash instead.
-%>
-
-<% if local_assigns[:render_flash] %>
-  <div class="bootstrapstyle primary-alert-block">
-    <% flash.each do |name, msg| %>
-      <%= render partial: "/shared/alert", locals: {body: msg, type: name} %>
-    <% end %>
-  </div>
-<% end %>
-
 <% if @render_chart %>
   <%= render(UI::ChartAsyncFrame::Component.new(
     id: :impound_records_chart_frame,

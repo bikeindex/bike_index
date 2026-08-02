@@ -10,14 +10,12 @@ module UI
           @flash = flash
         end
 
-        def render?
-          messages.any?
-        end
-
         private
 
+        # Renders even when empty: #flash-messages is the turbo_stream target for
+        # frame updates that carry a flash (see organized/impound_records).
         def messages
-          @messages ||= @flash.filter_map do |type, message|
+          @flash.filter_map do |type, message|
             next unless message.is_a?(String)
             {text: message, kind: kind_for(type)}
           end
