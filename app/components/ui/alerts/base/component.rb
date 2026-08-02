@@ -40,6 +40,13 @@ module UI
           KINDS.first
         end
 
+        # A float's box sits at the top of the line it shares, not on that line's
+        # baseline, so nudge it down onto one -- further for a header, whose larger
+        # type puts its baseline lower
+        def icon_classes
+          @header.present? ? "tw:mt-[7px]" : "tw:mt-1"
+        end
+
         def color_classes
           case @kind
           when :notice
