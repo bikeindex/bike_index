@@ -1,4 +1,4 @@
-<%= render(UI::Alert::Component.new(kind: alert_kind, header: heading, margin_classes: "")) do %>
+<%= render(UI::Alerts::Base::Component.new(kind: alert_kind, header: heading, margin_classes: "")) do %>
   <% if impound_claim.present? %>
     <% if impound_claim.unsubmitted? %>
       <%= form_with(model: impound_claim, url: impound_claim_path(impound_claim), builder: BikeIndexFormBuilder, data: {controller: "csrf-refresh"}) do |form| %>
