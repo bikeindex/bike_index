@@ -30,10 +30,17 @@ module Registrations
         # Records shown here that don't touch the bike, so its cache version misses them
         def cache_version
           [bike_organization_note&.updated_at, organization_model_audit&.updated_at,
-            other_registrations.maximum(:updated_at), other_registrations_count]
+            other_registrations.maximum(:updated_at), other_registrations_count,
+            *current_alerts_component.cache_version]
         end
 
         private
+
+        def current_alerts_component
+          @current_alerts_component ||= CurrentAlerts::Wrapper::Component.new(bike: @bike,
+            current_user: @current_user, bike_sticker: @bike_sticker, organization: @organization,
+            current_alerts: @current_alerts)
+        end
 
         def info_row(label, value = nil, &block)
           render(UI::DefinitionList::Row::Component.new(label:, value:, render_with_no_value: true, no_value_text: "-"), &block)
