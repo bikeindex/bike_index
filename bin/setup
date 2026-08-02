@@ -59,7 +59,7 @@ FileUtils.chdir APP_ROOT do
   end
 
   puts "== Checking Ruby version =="
-  required_ruby = File.read(".tool-versions")[/ruby (\S+)/, 1]
+  required_ruby = File.read(".tool-versions")[/^ruby (\S+)/, 1]
   if required_ruby && required_ruby != RUBY_VERSION
     if ENV["SETUP_RUBY_INSTALLED"]
       abort "Failed to activate Ruby #{required_ruby} via mise after installing"
