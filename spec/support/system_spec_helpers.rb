@@ -97,7 +97,7 @@ module SystemSpecHelpers
   # Flash messages are fixed position, so an undismissed one intercepts clicks on
   # whatever it overlays. Wait out the dismiss transition before moving on.
   def dismiss_flash_messages(wait: 10)
-    find("#flash-messages [aria-label='Close']").click
+    all("#flash-messages [aria-label='Close']", minimum: 1).each(&:click)
     expect(page).to have_no_css("#flash-messages [role='alert']", wait:)
   end
 
