@@ -67,7 +67,7 @@ module Messages
 
       def render_sold_alert
         @sold_alert_rendered = true
-        render(UI::Alert::Component.new(kind: :notice, margin_classes: "tw:my-8")) { sold_alert_content }
+        render(UI::Alerts::Base::Component.new(kind: :notice, margin_classes: "tw:my-8")) { sold_alert_content }
       end
 
       def item_type_display

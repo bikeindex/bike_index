@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe UI::Alert::Component, type: :component do
+RSpec.describe UI::Alerts::Base::Component, type: :component do
   let(:options) { {text: "some text"} }
   let(:component) { render_inline(described_class.new(**options)) }
 

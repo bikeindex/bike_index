@@ -154,7 +154,7 @@ class UsersController < ApplicationController
         end
       end
     end
-    flash[:error] = @user.errors.full_messages if @user&.errors&.full_messages.present?
+    flash[:error] = @user.errors.full_messages.to_sentence if @user&.errors&.full_messages.present?
     redirect_back(fallback_location: user_root_url)
   end
 

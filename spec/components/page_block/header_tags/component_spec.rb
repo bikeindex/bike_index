@@ -61,6 +61,15 @@ RSpec.describe PageBlock::HeaderTags::Component, type: :component do
     expect(component.css('[name="twitter:image"]').first["content"]).to eq twitter_image
   end
 
+  # Constant across every layout the component renders in, so it isn't nested under a controller
+  describe "viewport" do
+    let(:controller_name) { "welcome" }
+
+    it "pins the load scale at 1:1" do
+      expect(component.css('meta[name="viewport"]').first["content"]).to eq "width=device-width, initial-scale=1"
+    end
+  end
+
   context "welcome controller" do
     let(:controller_name) { "welcome" }
 

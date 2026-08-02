@@ -24,7 +24,7 @@ class UserAlertsController < ApplicationController
   private
 
   def authenticate_user_for_user_alerts_controller
-    authenticate_user(translation_key: :you_have_to_log_in, flash_type: :info)
+    authenticate_user(translation_key: :you_have_to_log_in, flash_type: :notice)
   end
 
   # Probably only should be called for "unassigned_bike_org"

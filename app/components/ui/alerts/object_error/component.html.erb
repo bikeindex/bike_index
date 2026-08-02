@@ -1,4 +1,4 @@
-<%= render(UI::Alert::Component.new(header: header_text, kind: :error, dismissable: @dismissable)) do %>
+<%= render(UI::Alerts::Base::Component.new(header: header_text, kind: :error, dismissable: @dismissable)) do %>
   <ul class="tw:mb-0! tw:list-inside tw:list-disc">
     <% @error_messages.each do |message| %>
       <li><%= message %></li>

@@ -1,5 +1,5 @@
 <% if alert? %>
-  <%= render(UI::Alert::Component.new(kind: :purple, header: @title, margin_classes: "")) do %>
+  <%= render(UI::Alerts::Base::Component.new(kind: :purple, header: @title, margin_classes: "")) do %>
     <%= content %>
   <% end %>
 <% else %>

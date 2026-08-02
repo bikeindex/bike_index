@@ -17,7 +17,7 @@ module Admin
       @external_registry_credential = ExternalRegistryCredential.new(external_registry_credential_params)
 
       if @external_registry_credential.save
-        flash[:info] = "Saved!"
+        flash[:notice] = "Saved!"
         redirect_to admin_external_registry_credentials_url
       else
         flash[:error] =
@@ -31,7 +31,7 @@ module Admin
 
     def update
       if @external_registry_credential.update(external_registry_credential_params)
-        flash[:info] = "Updated!"
+        flash[:notice] = "Updated!"
         redirect_to admin_external_registry_credentials_url
       else
         flash[:error] = @external_registry_credential.errors.full_messages.to_sentence
@@ -41,7 +41,7 @@ module Admin
 
     def reset
       if @external_registry_credential.set_access_token
-        flash[:info] = "Access token set!"
+        flash[:notice] = "Access token set!"
       else
         flash[:error] = @external_registry_credential.errors.full_messages.to_sentence
       end

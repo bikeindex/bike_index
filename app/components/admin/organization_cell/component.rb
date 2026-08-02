@@ -23,7 +23,7 @@ module Admin
       end
 
       def error_text_class
-        UI::Alert::Component::TEXT_CLASSES[:error]
+        UI::Alerts::Base::Component::TEXT_CLASSES[:error]
       end
     end
   end

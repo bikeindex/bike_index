@@ -118,7 +118,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         expect(response).to render_template(:new)
         get "#{base_url}/new"
         expect(response).to redirect_to admin_theft_alerts_path
-        expect(flash[:info]).to match "bike"
+        expect(flash[:notice]).to match "bike"
       end
     end
 

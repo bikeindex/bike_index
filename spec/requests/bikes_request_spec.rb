@@ -350,7 +350,7 @@ RSpec.describe BikesController, type: :request do
           put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=parked_incorrectly_notification"
           expect(response).to redirect_to(bike_path(bike.id))
           expect(assigns(:bike)).to eq bike
-          expect(flash[:info]).to match(/retrieved/)
+          expect(flash[:notice]).to match(/retrieved/)
           parking_notification.reload
           expect(parking_notification.current?).to be_falsey
           expect(parking_notification.resolved_at).to be_within(1).of retrieval_time
