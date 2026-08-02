@@ -73,7 +73,7 @@
   <% else %>
     <p class="tw:text-sm tw:opacity-65">
       <%# underlined because it sits in a text block, where color alone doesn't distinguish it %>
-      <%= translation(".need_stolen_bike_html", bike_type: @bike.type, add_link: link_to(translation(".add_a_stolen_bike", bike_type: @bike.type), new_bike_path(status: "status_stolen"), class: "twlink tw:underline", target: "_blank", rel: "noopener")) %>
+      <%= translation(".need_stolen_bike_html", bike_type: @bike.type, add_link: link_to(translation(".add_a_stolen_bike", bike_type: @bike.type), new_register_path(status: "status_stolen"), class: "twlink tw:underline", target: "_blank", rel: "noopener")) %>
     </p>
   <% end %>
 <% end %>

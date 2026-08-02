@@ -35,10 +35,10 @@ RSpec.describe Registrations::Show::CurrentAlerts::ClaimImpound::Component, type
   context "impounded e-scooter, viewer has no stolen bike" do
     let(:current_user) { FactoryBot.create(:user_confirmed) }
 
-    it "prompts them to register a stolen bike" do
+    it "prompts them into the registration flow, with the status set" do
       render_inline(component)
       expect(page).to have_text("You need a stolen e-scooter registered")
-      expect(page).to have_link("add a stolen e-scooter")
+      expect(page).to have_link("add a stolen e-scooter", href: "/register/new?status=status_stolen")
     end
   end
 
