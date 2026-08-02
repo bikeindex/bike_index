@@ -10,8 +10,8 @@ en:
             claim_found_bike: Claim found bike
             claim_impounded_bike: Claim impounded bike
             claim_submitted: This claim was submitted
-            claim_was_status: 'Your claim was %{status} — you should have received
-              an email with next steps.'
+            claim_was_status: Your claim was %{status} — you should have received
+              an email with next steps.
             claim_with_this_bike_type: You have a %{status} claim with this %{bike_type}.
             does_this_look_like_your_bike: Does this look like your bike?
             need_stolen_bike_html: You need a stolen bike registered to file a claim
