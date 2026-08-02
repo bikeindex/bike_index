@@ -57,7 +57,11 @@ RSpec.describe Registrations::Show::CurrentAlerts::ClaimImpound::Component, :js,
       # turns an empty claim away
       expect(page).to have_field("Verify your ownership", type: "textarea", valid: false)
       expect(page).to have_button("Save message")
-      expect(page).to have_button("Submit claim")
+
+      # Submitting is the same form, so the required box blocks it too - the page stays put
+      click_button "Submit claim"
+
+      expect(page).to have_current_path("#{preview_path}/unsubmitted")
 
       fill_in "Verify your ownership", with: "it still has my sticker under the seat"
 

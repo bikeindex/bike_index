@@ -19,9 +19,10 @@ module Registrations
         end
 
         # The claim-impound card renders the viewer's own claim, which nothing else in
-        # the cache key moves when they save or submit it
+        # the cache key moves when they save or submit it - and it's never offered to
+        # the owner, so their page doesn't pay for the lookup
         def cache_version
-          return [] if @current_user.blank?
+          return [] if @owner || @current_user.blank?
 
           [ImpoundClaim.involving_bike_id(@bike.id).where(user_id: @current_user.id).maximum(:updated_at)]
         end

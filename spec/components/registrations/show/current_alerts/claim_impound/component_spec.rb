@@ -4,47 +4,51 @@ require "rails_helper"
 
 RSpec.describe Registrations::Show::CurrentAlerts::ClaimImpound::Component, type: :component do
   let(:component) { described_class.new(bike:, current_user:, owner: false) }
-  let(:bike) { FactoryBot.create(:impound_record, :with_organization).bike.reload }
+  # An e-scooter, so every string has to name the registration's cycle type
+  let(:bike) { FactoryBot.create(:impound_record, :with_organization, bike: e_scooter).bike.reload }
+  let(:e_scooter) { FactoryBot.create(:bike, cycle_type: "e-scooter") }
 
-  context "impounded bike, logged out" do
+  context "impounded e-scooter, logged out" do
     let(:current_user) { nil }
 
     it "shows the claim card with a sign-in link" do
       render_inline(component)
-      expect(page).to have_text("Does this look like your bike?")
-      expect(page).to have_css("a[href*='session/new']", text: "Claim impounded bike")
+      expect(page).to have_text("Does this look like your e-scooter?")
+      expect(page).to have_css("a[href*='session/new']", text: "Claim impounded e-scooter")
     end
   end
 
-  context "impounded bike, viewer owns a stolen bike" do
+  context "impounded e-scooter, viewer owns a stolen bike" do
     let(:stolen_bike) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed) }
     let(:current_user) { stolen_bike.reload.user }
 
     it "reveals a form to pick a stolen bike and open the claim" do
       render_inline(component)
-      expect(page).to have_button("Claim impounded bike")
+      expect(page).to have_button("Claim impounded e-scooter")
       expect(page).to have_css("form[action='/impound_claims'] select[name='impound_claim[stolen_record_id]']", visible: :all)
+      expect(page).to have_text("Select the stolen e-scooter you own")
+      expect(page).to have_css("option", text: "Choose stolen e-scooter", visible: :all)
       expect(page).to have_button("Open claim")
     end
   end
 
-  context "impounded bike, viewer has no stolen bike" do
+  context "impounded e-scooter, viewer has no stolen bike" do
     let(:current_user) { FactoryBot.create(:user_confirmed) }
 
     it "prompts them to register a stolen bike" do
       render_inline(component)
-      expect(page).to have_text("need a stolen bike")
-      expect(page).to have_link("add a stolen bike")
+      expect(page).to have_text("You need a stolen e-scooter registered")
+      expect(page).to have_link("add a stolen e-scooter")
     end
   end
 
-  context "found bike" do
-    let(:bike) { FactoryBot.create(:bike, :impounded).reload }
+  context "found e-scooter" do
+    let(:bike) { FactoryBot.create(:bike, :impounded, cycle_type: "e-scooter").reload }
     let(:current_user) { nil }
 
-    it "labels the button for a found bike" do
+    it "labels the button for a found registration" do
       render_inline(component)
-      expect(page).to have_text("Claim found bike")
+      expect(page).to have_text("Claim found e-scooter")
     end
   end
 
@@ -60,9 +64,12 @@ RSpec.describe Registrations::Show::CurrentAlerts::ClaimImpound::Component, type
       expect(page).to have_text("Your claim")
       expect(page).to_not have_text("Does this look like your bike?")
       expect(page).to_not have_button("Open claim")
-      expect(page).to have_css("form[action='/impound_claims/#{impound_claim.id}'] textarea[name='impound_claim[message]']")
+      form = "form[action='/impound_claims/#{impound_claim.id}']"
+      expect(page).to have_css(form, count: 1)
+      expect(page).to have_css("#{form} textarea[name='impound_claim[message]']")
       expect(page).to have_button("Save message")
-      expect(page).to have_button("Submit claim")
+      # Submitting is the same form, so it carries the message rather than dropping it
+      expect(page).to have_css("#{form} button[name='impound_claim[status]'][value='submitting']", text: "Submit claim")
     end
 
     context "claim submitted" do
@@ -137,6 +144,35 @@ RSpec.describe Registrations::Show::CurrentAlerts::ClaimImpound::Component, type
       expect(BikeServices::Displayer.display_impound_claim?(bike, current_user)).to be_truthy
       render_inline(component)
       expect(page.native.text).to be_blank
+    end
+  end
+
+  # Each scenario resolves its own viewer, so one it can't find says so rather than
+  # previewing whichever state the viewer it fell back to lands on
+  describe "Wrapper::ClaimImpound::ComponentPreview" do
+    let(:preview) { Registrations::Show::Wrapper::ClaimImpound::ComponentPreview.new }
+    let(:finder) { FactoryBot.create(:user_confirmed) }
+    let!(:impound_record) { FactoryBot.create(:impound_record, user: finder) }
+
+    def notice_text(rendered) = rendered[:component]&.instance_variable_get(:@text)
+
+    it "says so when nobody holds a stolen registration to claim with" do
+      expect(notice_text(preview.with_stolen_registration)).to match("no viewer")
+    end
+
+    context "the only stolen registration is the finder's" do
+      let!(:stolen_bike) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed, user: finder) }
+
+      def preview_viewer(rendered) = rendered.dig(:locals, :component).instance_variable_get(:@current_user)
+
+      it "previews as the viewer each scenario is about" do
+        expect(preview_viewer(preview.with_stolen_registration)).to eq finder
+
+        without = preview_viewer(preview.without_stolen_registration)
+
+        expect(without).to_not eq finder
+        expect(without.bikes.status_stolen).to be_empty
+      end
     end
   end
 end

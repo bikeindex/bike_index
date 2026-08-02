@@ -25,7 +25,9 @@ module Registrations
           private
 
           def heading
-            translation(shown_impound_claim ? ".your_claim" : ".does_this_look_like_your_bike")
+            return translation(".your_claim") if shown_impound_claim
+
+            translation(".does_this_look_like_your_bike", bike_type: @bike.type)
           end
 
           # An answered claim is good news; everything else is still waiting on somebody
@@ -40,7 +42,8 @@ module Registrations
           end
 
           def claim_button_text
-            translation(@bike.status_found? ? ".claim_found_bike" : ".claim_impounded_bike")
+            translation(@bike.status_found? ? ".claim_found_bike" : ".claim_impounded_bike",
+              bike_type: @bike.type)
           end
 
           def impound_record
@@ -57,7 +60,6 @@ module Registrations
           # A claim the viewer opened with this bike - they're looking at the stolen bike
           # they submitted rather than the impounded one being claimed
           def submitting_impound_claim
-            return if impound_claim.present?
             return @submitting_impound_claim if defined?(@submitting_impound_claim)
 
             @submitting_impound_claim = viewer_impound_claim(@bike.impound_claims_submitting)
@@ -75,7 +77,7 @@ module Registrations
 
           # The viewer's stolen bikes they could claim this impound with
           def stolen_record_options
-            claimable_bikes.map { |bike| [bike.title_string, bike.current_stolen_record&.id] }
+            claimable_bikes.map { |bike| [bike.title_string, bike.current_stolen_record_id] }
           end
 
           def claimable_bikes

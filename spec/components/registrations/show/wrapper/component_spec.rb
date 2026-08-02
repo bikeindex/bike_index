@@ -9,8 +9,8 @@ RSpec.describe Registrations::Show::Wrapper::Component, type: :component do
   let(:bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "new-owner@example.com") }
   let(:current_user) { bike.reload.current_ownership.creator }
 
-  def cache_key
-    described_class.new(bike: bike.reload, current_user:, view: [:owner, nil], available_views: []).cache_key
+  def cache_key(user: current_user, view: [:owner, nil])
+    described_class.new(bike: bike.reload, current_user: user, view:, available_views: []).cache_key
   end
 
   # Claiming writes the ownership, and Ownership touches the bike so this expires
@@ -19,11 +19,15 @@ RSpec.describe Registrations::Show::Wrapper::Component, type: :component do
       expect { bike.current_ownership.mark_claimed }.to change { cache_key }
     end
 
-    # The claim-impound card renders the viewer's own claim inside the cached body
+    # The claim-impound card renders the viewer's own claim inside the cached body, and
+    # it's only ever offered to somebody who isn't the owner
     it "changes when the viewer edits their impound claim" do
+      claimant = FactoryBot.create(:user_confirmed)
       impound_record = FactoryBot.create(:impound_record, bike:)
-      impound_claim = FactoryBot.create(:impound_claim, impound_record:, user: current_user)
-      expect { impound_claim.update(message: "it has my sticker on it") }.to change { cache_key }
+      impound_claim = FactoryBot.create(:impound_claim, impound_record:, user: claimant)
+
+      expect { impound_claim.update(message: "it has my sticker on it") }
+        .to change { cache_key(user: claimant, view: [:public, nil]) }
     end
 
     # The alert renders the prompt inside the cached body, token and all, so two
