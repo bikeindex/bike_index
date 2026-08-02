@@ -70,10 +70,6 @@ module Organized
       edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id)
     end
 
-    def edit_page_path(page)
-      edit_organization_registration_sequence_page_path(organization_id: current_organization.to_param, id: page.id)
-    end
-
     def permitted_parameters
       params.require(:registration_sequence_page).permit(:title, :heading, :subtitle, :image, :body, :organization_specific)
     end

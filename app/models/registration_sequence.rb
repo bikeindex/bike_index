@@ -131,7 +131,8 @@ class RegistrationSequence < ApplicationRecord
   end
 
   def make_active!
-    return false unless draft? && registration_sequence_pages.any? && registration_sequence_pages.all?(&:valid?)
+    pages = registration_sequence_pages.to_a
+    return false unless draft? && pages.any? && pages.all?(&:valid?)
 
     transaction do
       self.class.active_for(organization)&.update!(end_at: Time.current)
