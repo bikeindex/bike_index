@@ -77,7 +77,7 @@ class StravaIntegrationsController < ApplicationController
   private
 
   def authenticate_user_for_strava
-    store_return_and_authenticate_user(translation_key: :create_account, flash_type: :info)
+    store_return_and_authenticate_user(translation_key: :create_account, flash_type: :notice)
   end
 
   def find_strava_integration

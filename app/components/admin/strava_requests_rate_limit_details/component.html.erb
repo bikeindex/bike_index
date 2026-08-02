@@ -40,6 +40,6 @@
   </div>
 
   <% if StravaJobs::RequestRunner.new.skip_job? %>
-    <%= render(UI::Alert::Component.new(text: "StravaJobs::RequestRunner is skipped", kind: :error)) %>
+    <%= render(UI::Alerts::Base::Component.new(text: "StravaJobs::RequestRunner is skipped", kind: :error)) %>
   <% end %>
 </div>

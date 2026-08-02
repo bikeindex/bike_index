@@ -5,7 +5,7 @@
   <%= render UI::Header::Component.new(text: heading_text, subtitle: translation(".just_the_essentials")) %>
 
   <% if @b_param.errors.any? %>
-    <%= render UI::Alert::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
+    <%= render UI::Alerts::Base::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
   <% end %>
 
   <%= form_with(model: @b_param, url: register_path, method: :post, scope: :b_param,

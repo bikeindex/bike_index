@@ -38,6 +38,7 @@
       </div>
     </nav>
 
+    <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
     <%= render 'layouts/revised_messages' %>
 
     <div class="doorkeeper-container">

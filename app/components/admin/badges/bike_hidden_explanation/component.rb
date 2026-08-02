@@ -24,7 +24,7 @@ module Admin
         def user_hidden_content
           return unless @bike.user_hidden?
 
-          content_tag(:small, "user hidden", class: UI::Alert::Component::TEXT_CLASSES[:notice])
+          content_tag(:small, "user hidden", class: UI::Alerts::Base::Component::TEXT_CLASSES[:notice])
         end
 
         # BikeVersion can't be example
@@ -47,11 +47,11 @@ module Admin
           content_tag(:small,
             content_tag(:span, "deleted: ") +
               content_tag(:span, l(@bike.deleted_at, format: :convert_time), class: "localizeTime"),
-            class: UI::Alert::Component::TEXT_CLASSES[:warning])
+            class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning])
         end
 
         def error_class
-          UI::Alert::Component::TEXT_CLASSES[:error]
+          UI::Alerts::Base::Component::TEXT_CLASSES[:error]
         end
       end
     end

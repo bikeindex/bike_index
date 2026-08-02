@@ -35,7 +35,7 @@ module Admin
         flash[:success] = "Success!"
         redirect_to admin_theft_alerts_path
       else
-        flash[:error] = @theft_alert.errors.to_a
+        flash[:error] = @theft_alert.errors.full_messages.to_sentence
         render :edit
       end
     end
@@ -43,7 +43,7 @@ module Admin
     def new
       @bike = Bike.unscoped.find_by_id(params[:bike_id])
       unless @bike.present?
-        flash[:info] = "Unable to find that bike. Select a bike to create a new promoted alert"
+        flash[:notice] = "Unable to find that bike. Select a bike to create a new promoted alert"
         redirect_to admin_theft_alerts_path
         return
       end

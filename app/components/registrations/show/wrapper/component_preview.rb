@@ -133,12 +133,12 @@ module Registrations
         end
 
         def production_notice
-          render(UI::Alert::Component.new(kind: :error,
+          render(UI::Alerts::Base::Component.new(kind: :error,
             text: "This preview renders a real registration, so it's disabled in production."))
         end
 
         def missing_notice(needed)
-          render(UI::Alert::Component.new(kind: :warning,
+          render(UI::Alerts::Base::Component.new(kind: :warning,
             text: "Nothing to preview — this environment has no #{needed}."))
         end
       end

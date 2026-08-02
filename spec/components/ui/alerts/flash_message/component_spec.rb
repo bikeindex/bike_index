@@ -39,8 +39,17 @@ RSpec.describe UI::Alerts::FlashMessage::Component, type: :component do
   context "with empty flash" do
     let(:flash) { {} }
 
-    it "renders no alerts" do
+    it "renders the container with no alerts, so turbo_streams can target it" do
+      expect(component).to have_css("#flash-messages")
       expect(component).not_to have_css("[role='alert']")
+    end
+  end
+
+  context "with an unknown flash type" do
+    let(:flash) { {bogus: "Who knows"} }
+
+    it "raises" do
+      expect { component }.to raise_error(ArgumentError, /unknown flash type/i)
     end
   end
 end

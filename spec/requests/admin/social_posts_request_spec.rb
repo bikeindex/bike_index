@@ -81,7 +81,7 @@ RSpec.describe Admin::SocialPostsController, type: :request do
 
         expect(response).to redirect_to(admin_social_posts_url)
         expect(flash[:error]).to be_blank
-        expect(flash[:info]).to match("deleted")
+        expect(flash[:notice]).to match("deleted")
       end
     end
 
@@ -94,7 +94,7 @@ RSpec.describe Admin::SocialPostsController, type: :request do
         delete "#{base_url}/#{social_post.id}"
 
         expect(response).to redirect_to(edit_admin_social_post_url)
-        expect(flash[:info]).to be_blank
+        expect(flash[:notice]).to be_blank
         expect(flash[:error]).to match("Could not delete")
       end
     end
