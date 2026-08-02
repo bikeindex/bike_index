@@ -12,14 +12,16 @@ module Registrations
 
           private
 
-          # A page whose card won't render says so, rather than previewing as one without it
-          def claim_page(bike_id:, current_user:)
-            bike = ::Bike.unscoped.find_by(id: bike_id)
+          # Defaults to the found registration the states without a claim of their own
+          # are about. A page whose card won't render says so, rather than previewing as
+          # one without it
+          def claim_page(current_user:, bike_id: nil)
+            bike = ::Bike.unscoped.find_by(id: bike_id.presence || claimable_impound&.bike_id)
             return missing_notice("a found registration to claim") if bike.blank?
             return missing_notice("the records this scenario needs") unless
               ::BikeServices::Displayer.display_impound_claim?(bike, current_user)
 
-            page(view: "consumer", bike_id:, current_user:, as_view: [:public, nil])
+            page(view: "consumer", bike_id: bike.id, current_user:, as_view: [:public, nil])
           end
 
           def claim_page_for(claims)
@@ -32,17 +34,23 @@ module Registrations
           # An organization's impound record can't be claimed, so only unorganized ones
           # raise the card
           def claimable_impound
-            ::ImpoundRecord.active.unorganized.last
+            return @claimable_impound if defined?(@claimable_impound)
+
+            @claimable_impound = ::ImpoundRecord.active.unorganized.last
           end
 
           # Claiming needs a stolen registration, and the owner is never offered a claim
-          def unclaimed_viewer(impound)
-            already_claimed = impound&.impound_claims&.pluck(:user_id) || []
-            stolen_bike_owners.find { |user| user != impound&.bike&.owner && already_claimed.exclude?(user.id) }
+          def unclaimed_viewer
+            already_claimed = claimable_impound&.impound_claims&.pluck(:user_id) || []
+            stolen_bike_owners.find { |user| user != impound_owner && already_claimed.exclude?(user.id) }
           end
 
-          def user_without_stolen_bike(impound)
-            ::User.where.not(id: stolen_bike_owners.map(&:id) + [impound&.bike&.owner&.id].compact).first
+          def user_without_stolen_bike
+            ::User.where.not(id: stolen_bike_owners.map(&:id) + [impound_owner&.id].compact).first
+          end
+
+          def impound_owner
+            claimable_impound&.bike&.owner
           end
 
           def stolen_bike_owners

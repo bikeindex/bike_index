@@ -10,9 +10,7 @@ module Registrations
 
           # @param bike_id text "Bike to render — defaults to a claimable found one"
           def default(bike_id: nil)
-            impound = claimable_impound
-            claim_page(bike_id: bike_id.presence || impound&.bike_id,
-              current_user: user_without_stolen_bike(impound))
+            claim_page(bike_id:, current_user: user_without_stolen_bike)
           end
         end
       end
