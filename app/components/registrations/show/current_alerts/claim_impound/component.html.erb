@@ -1,4 +1,4 @@
-<%= render(UI::Alert::Component.new(kind: :purple, header: heading, margin_classes: "")) do %>
+<%= render(UI::Alert::Component.new(kind: alert_kind, header: heading, margin_classes: "")) do %>
   <div
     data-controller="ui--collapse"
     data-ui--collapse-param-value="contact_owner"

@@ -25,7 +25,18 @@ module Registrations
           private
 
           def heading
-            translation((impound_claim || submitting_impound_claim) ? ".your_claim" : ".does_this_look_like_your_bike")
+            translation(shown_impound_claim ? ".your_claim" : ".does_this_look_like_your_bike")
+          end
+
+          # An answered claim is good news; everything else is still waiting on somebody
+          def alert_kind
+            shown_impound_claim&.successful? ? :success : :warning
+          end
+
+          # Whichever side of the claim this bike is - the impound being claimed, or the
+          # stolen registration it was claimed with
+          def shown_impound_claim
+            impound_claim || submitting_impound_claim
           end
 
           def claim_button_text
