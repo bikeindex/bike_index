@@ -35,7 +35,7 @@ module Admin
         flash[:success] = "Success!"
         redirect_to admin_theft_alerts_path
       else
-        flash[:error] = @theft_alert.errors.to_a
+        flash[:error] = @theft_alert.errors.full_messages.to_sentence
         render :edit
       end
     end
