@@ -53,23 +53,21 @@ RSpec.describe Registrations::Show::Wrapper::Component, :js, type: :system do
     end
   end
 
-  it "has a preview for every kind of current alert" do
+  it "previews every kind of current alert, rendering the one each names and none without" do
     expect(alert_names).to eq alert_previews.keys.sort
-    alert_previews.each do |alert, (path, _)|
+
+    alert_previews.each do |alert, (path, text)|
       expect(preview_scenarios).to include("registrations/show/wrapper/#{path}"),
         "CurrentAlerts::#{alert.camelize} has no preview"
-    end
-    expect(preview_scenarios).to include("registrations/show/wrapper/component/no_overlay")
-  end
 
-  it "renders the alert each preview is named for, and none of them without one" do
-    alert_previews.each_value do |(path, text)|
       visit "#{preview_path}/#{path}"
 
       # The preview says so rather than raising when the record it needs is absent
       expect(page).to have_no_content("Nothing to preview")
       expect(page).to have_content(text)
     end
+
+    expect(preview_scenarios).to include("registrations/show/wrapper/component/no_overlay")
 
     visit "#{preview_path}/component/no_overlay"
 
