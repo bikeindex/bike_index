@@ -2175,13 +2175,6 @@ nb:
         sign_in_and_redirect:
           logged_in: Logget inn!
           organization_signed_in: Du er logget inn
-          set_password: angi et passord for å logge på
-          signed_in_html: >-
-            Du er logget inn! Du kan %{set_password_link} hvis du foretrekker det, ellers
-            sender vi deg bare en innloggingslenke på e-post.
-          signed_up_html: >-
-            Du har registrert deg på Bike Index! Du kan %{set_password_link} hvis du
-            foretrekker det, ellers sender vi deg bare en innloggingslenke på e-post.
           user_is_banned: Vi beklager, men det ser ut til at kontoen din har blitt
             låst. Hvis du er usikker på årsakene til dette, vennligst kontakt oss.
         skip_if_signed_in:

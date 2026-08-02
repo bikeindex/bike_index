@@ -18,12 +18,11 @@
   <body id="bi_embed">
     <div id="alert-block">
       <% flash.each do |name, msg| %>
-        <% kind, body = flash_kind_and_body(name, msg) %>
-        <% alert_class = "alert-#{kind}" %>
+        <% alert_class = "alert-#{name}" %>
 
         <div class="alert <%= alert_class %>">
           <a class="close" data-dismiss="alert">×</a>
-          <%= content_tag :div, body, id: "flash_#{kind}" if body.is_a?(String) %>
+          <%= content_tag :div, msg, id: "flash_#{name}" if msg.is_a?(String) %>
         </div>
       <% end %>
 

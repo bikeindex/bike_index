@@ -1716,13 +1716,6 @@ en:
         sign_in_and_redirect:
           logged_in: Logged in!
           organization_signed_in: You're signed in
-          set_password: set password to sign in
-          signed_in_html: >-
-            You're signed in! You can %{set_password_link} if you prefer, otherwise
-            we will just email you a sign in link.
-          signed_up_html: >-
-            You've signed up for Bike Index! You can %{set_password_link} if you prefer,
-            otherwise we will just email you a sign in link.
           user_is_banned: >-
             We're sorry, but it appears that your account has been locked. If you
             are unsure as to the reasons for this, please contact us.

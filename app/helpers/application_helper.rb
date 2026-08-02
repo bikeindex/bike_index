@@ -2,14 +2,6 @@ module ApplicationHelper
   include Binxtils::NavHelper
   include Binxtils::SortableHelper
 
-  # Flash keys suffixed _html hold markup - the flash cookie doesn't preserve html_safe.
-  # Returns the alert kind (the key without the suffix) and the body to render
-  def flash_kind_and_body(key, message)
-    return [key.to_sym, message] unless key.to_s.end_with?("_html")
-
-    [key.to_s.delete_suffix("_html").to_sym, message.to_s.html_safe]
-  end
-
   def notification_delivery_display(status)
     text = if status == "delivery_success"
       check_mark

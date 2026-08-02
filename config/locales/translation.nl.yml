@@ -2069,13 +2069,6 @@ nl:
         sign_in_and_redirect:
           logged_in: Ingelogd!
           organization_signed_in: Je bent ingelogd
-          set_password: een wachtwoord instellen om in te loggen
-          signed_in_html: >-
-            Je bent ingelogd! Je kunt %{set_password_link} als je dat liever hebt, anders
-            mailen we je gewoon een inloglink.
-          signed_up_html: >-
-            Je hebt je aangemeld bij Bike Index! Je kunt %{set_password_link} als je
-            dat liever hebt, anders mailen we je gewoon een inloglink.
           user_is_banned: Het spijt ons, maar het lijkt erop dat uw account is vergrendeld.
             Neem contact met ons op als u niet zeker weet waarom.
         skip_if_signed_in:

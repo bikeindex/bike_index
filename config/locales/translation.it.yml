@@ -2223,13 +2223,6 @@ it:
         sign_in_and_redirect:
           logged_in: Accesso effettuato!
           organization_signed_in: Hai effettuato l'accesso
-          set_password: impostare una password per accedere
-          signed_in_html: >-
-            Hai effettuato l'accesso! Se preferisci puoi %{set_password_link}, altrimenti
-            ti invieremo semplicemente un link di accesso via email.
-          signed_up_html: >-
-            Ti sei registrato a Bike Index! Se preferisci puoi %{set_password_link},
-            altrimenti ti invieremo semplicemente un link di accesso via email.
           user_is_banned: Ci dispiace, ma sembra che il tuo account sia stato bloccato.
             Se hai dubbi sui motivi, ti preghiamo di contattarci.
         skip_if_signed_in:

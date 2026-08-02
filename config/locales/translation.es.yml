@@ -2223,15 +2223,6 @@ es:
         sign_in_and_redirect:
           logged_in: "¡Sesión iniciada!"
           organization_signed_in: Has iniciado sesión
-          set_password: establecer una contraseña para iniciar sesión
-          signed_in_html: >-
-            ¡Has iniciado sesión! Puedes %{set_password_link} si lo prefieres, de lo
-            contrario simplemente te enviaremos por correo electrónico un enlace para
-            iniciar sesión.
-          signed_up_html: >-
-            ¡Te has registrado en Bike Index! Puedes %{set_password_link} si lo prefieres,
-            de lo contrario simplemente te enviaremos por correo electrónico un enlace
-            para iniciar sesión.
           user_is_banned: Lo sentimos, pero parece que su cuenta ha sido bloqueada.
             Si desconoce el motivo, póngase en contacto con nosotros.
         skip_if_signed_in:

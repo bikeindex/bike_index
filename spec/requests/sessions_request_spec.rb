@@ -242,7 +242,7 @@ RSpec.describe SessionsController, type: :request do
       it "offers to set a password" do
         post "/session/sign_in_with_magic_link", params: {token: user.refreshed_magic_link_token}
         expect(response).to redirect_to my_account_url
-        expect(flash[:notice_html]).to match("You're signed in!")
+        expect(flash[:notice]).to eq({translation_key: :signed_in, url: update_password_form_with_reset_token_users_path})
         follow_redirect!
         expect(Capybara.string(response.body))
           .to have_link("set password to sign in", href: update_password_form_with_reset_token_users_path)
@@ -255,7 +255,7 @@ RSpec.describe SessionsController, type: :request do
         it "doesn't offer to set a password" do
           post "/session/sign_in_with_magic_link", params: {token: user.refreshed_magic_link_token}
           expect(flash[:success]).to eq "You're signed in"
-          expect(flash[:notice_html]).to be_blank
+          expect(flash[:notice]).to be_blank
         end
       end
     end
