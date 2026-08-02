@@ -8,7 +8,18 @@ RSpec.describe Registrations::Show::CurrentAlerts::ClaimImpound::Component, :js,
   let!(:impound_record) { FactoryBot.create(:impound_record) }
   let!(:stolen_bike) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed) }
 
-  it "reveals the claim form, holds it open in the URL, and closes it again" do
+  it "offers each viewer without a claim what they can do, and holds the form open in the URL" do
+    visit "#{preview_path}/signed_out"
+
+    expect(page).to have_link("Claim found bike", href: /session\/new/)
+
+    visit "#{preview_path}/without_stolen_registration"
+
+    expect(page).to have_content("You need a stolen bike registered")
+    expect(page).to have_link("add a stolen bike")
+    expect(page).to have_no_button("Claim found bike")
+    expect_axe_clean
+
     visit "#{preview_path}/with_stolen_registration"
 
     expect(page).to have_button("Claim found bike")
@@ -34,19 +45,6 @@ RSpec.describe Registrations::Show::CurrentAlerts::ClaimImpound::Component, :js,
 
     expect(page).to have_no_button("Open claim")
     expect(page).to have_no_current_path(/contact_owner/, url: true)
-  end
-
-  it "sends a signed-out viewer to sign in, and tells one with nothing to claim with" do
-    visit "#{preview_path}/signed_out"
-
-    expect(page).to have_link("Claim found bike", href: /session\/new/)
-
-    visit "#{preview_path}/without_stolen_registration"
-
-    expect(page).to have_content("You need a stolen bike registered")
-    expect(page).to have_link("add a stolen bike")
-    expect(page).to have_no_button("Claim found bike")
-    expect_axe_clean
   end
 
   context "the viewer opened a claim of their own" do
