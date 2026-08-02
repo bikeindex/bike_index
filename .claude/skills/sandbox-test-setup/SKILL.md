@@ -33,21 +33,21 @@ sandbox**; `/home/user/bike_index` uses **Claude Code web sandbox**.
 
 ## Local macOS (Conductor workspace)
 
-Ruby 4.0.5 is installed via [mise](https://mise.jdx.dev/), but Claude
+Ruby 4.0.6 is installed via [mise](https://mise.jdx.dev/), but Claude
 Code's shell sometimes spawns subprocesses without the mise shim on
 PATH — bare `ruby` then resolves to `/usr/bin/ruby` (2.6) and `bundle`
 fails with `Could not find 'bundler' (4.0.0.beta2)`. **The Ruby is
 installed; the PATH just isn't right** — don't reinstall, don't edit
 the Gemfile.
 
-Check first; only prefix PATH if `ruby -v` doesn't already print 4.0.5
+Check first; only prefix PATH if `ruby -v` doesn't already print 4.0.6
 (`mise exec -- ruby`/`bundle` are unreliable in this harness — they
 can still resolve to system 2.6, so use the direct prefix):
 
 ```bash
 ruby -v
-# If it's not 4.0.5:
-export PATH="/Users/seth/.local/share/mise/installs/ruby/4.0.5/bin:$PATH"
+# If it's not 4.0.6:
+export PATH="/Users/seth/.local/share/mise/installs/ruby/4.0.6/bin:$PATH"
 ```
 
 Then run specs the normal way:
@@ -111,7 +111,7 @@ Activate mise so its shims put the pinned Ruby and a matching Bundler on PATH
 ```bash
 export PATH="$HOME/.local/bin:$PATH"
 eval "$(mise activate bash)"
-ruby --version      # => ruby 4.0.5 ... [x86_64-linux]
+ruby --version      # => ruby 4.0.6 ... [x86_64-linux]
 bundle install      # ~8s once shared-mime-info is present; vendor/bundle + .bundle are gitignored
 ```
 
@@ -120,7 +120,7 @@ drops the mise shim (same harness quirk as Local macOS), prefix the install
 dir directly instead of reactivating (match the version in `mise.toml`):
 
 ```bash
-export PATH="$HOME/.local/share/mise/installs/ruby/4.0.5/bin:$PATH"
+export PATH="$HOME/.local/share/mise/installs/ruby/4.0.6/bin:$PATH"
 ```
 
 ### Database-backed specs
@@ -134,7 +134,7 @@ applies to any spec that renders the layout.
 
 ## Claude Code web sandbox
 
-`Gemfile` pins the Ruby version (`ruby "4.0.5"` at time of writing —
+`Gemfile` pins the Ruby version (`ruby "4.0.6"` at time of writing —
 **read the current pin from the `ruby` line in `Gemfile`**, it moves) and
 `Gemfile.lock` pins `BUNDLED WITH 4.0.15`. No prebuilt binary for that
 version is reachable (`cache.ruby-lang.org` is 403'd, `ruby/ruby-builder`'s
@@ -211,8 +211,8 @@ lives only on `/usr/sbin`.
 
 ```bash
 CHROME_DIR=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux | sort -V | tail -1)
-export PATH="/opt/ruby-4.0.5/x64/bin:$CHROME_DIR:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
-export LD_LIBRARY_PATH="/opt/ruby-4.0.5/x64/lib:$LD_LIBRARY_PATH"
+export PATH="/opt/ruby-4.0.6/x64/bin:$CHROME_DIR:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
+export LD_LIBRARY_PATH="/opt/ruby-4.0.6/x64/lib:$LD_LIBRARY_PATH"
 bundle install
 ```
 
@@ -333,13 +333,13 @@ trusts the self-signed cert.
 
 ## End-to-end recap
 
-Assumes the pinned Ruby is already built (paths below use 4.0.5 — swap for
+Assumes the pinned Ruby is already built (paths below use 4.0.6 — swap for
 the current pin). Combines the steps above:
 
 ```bash
 CHROME_DIR=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux | sort -V | tail -1)
-export PATH="/opt/ruby-4.0.5/x64/bin:$CHROME_DIR:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
-export LD_LIBRARY_PATH="/opt/ruby-4.0.5/x64/lib:$LD_LIBRARY_PATH"
+export PATH="/opt/ruby-4.0.6/x64/bin:$CHROME_DIR:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
+export LD_LIBRARY_PATH="/opt/ruby-4.0.6/x64/lib:$LD_LIBRARY_PATH"
 service postgresql start && service redis-server start
 apt-get install -y libvips42   # ruby-vips loads at boot; without it every rails/rspec run dies
 cd /home/user/bike_index
