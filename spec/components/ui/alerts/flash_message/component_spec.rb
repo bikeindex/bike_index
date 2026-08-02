@@ -19,15 +19,6 @@ RSpec.describe UI::Alerts::FlashMessage::Component, type: :component do
     end
   end
 
-  context "with info flash" do
-    let(:flash) { {info: "Heads up"} }
-
-    it "renders it as a notice" do
-      expect(component).to have_text("Heads up")
-      expect(component).to have_css(".tw\\:bg-blue-50")
-    end
-  end
-
   context "with multiple flash messages" do
     let(:flash) { {notice: "Done", error: "But watch out"} }
 

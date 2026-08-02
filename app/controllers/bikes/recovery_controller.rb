@@ -38,7 +38,7 @@ module Bikes
       if @stolen_record.present?
         return true if @bike.status_stolen?
 
-        flash[:info] = translation(:already_recovered)
+        flash[:notice] = translation(:already_recovered)
       else
         flash[:error] = translation(:incorrect_token)
       end

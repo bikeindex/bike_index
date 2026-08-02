@@ -199,7 +199,7 @@ module Organized
       elsif directly_create_export?(bikes_count)
         # There is probably a better way to handle this, via storing in session or building the export but not starting
         # ... but, this works
-        flash[:info] = "Directly creating export - can't configure with over 500 bikes"
+        flash[:notice] = "Directly creating export - can't configure with over 500 bikes"
         export = Export.create(create_export_params)
         OrganizationExportJob.perform_async(export.id)
         redirect_to organization_export_path(export, organization_id: current_organization.id)
@@ -207,7 +207,7 @@ module Organized
         if bikes_count == 0
           flash[:error] = "There are no matching bikes!"
         elsif bikes_count > 200
-          flash[:info] = "Warning: Exporting from search with this many matching bikes may not work correctly"
+          flash[:notice] = "Warning: Exporting from search with this many matching bikes may not work correctly"
         end
         redirect_to new_organization_export_path(new_export_params_custom_bike_ids)
       end

@@ -4,7 +4,6 @@ module UI
   module Alerts
     module Base
       class Component < ApplicationComponent
-        KINDS = %i[notice error warning success purple]
         TEXT_CLASSES = {
           notice: "tw:text-blue-800 tw:dark:text-blue-400",
           error: "tw:text-red-800 tw:dark:text-red-400",
@@ -12,6 +11,7 @@ module UI
           success: "tw:text-green-800 tw:dark:text-green-400",
           purple: "tw:text-purple-800 tw:dark:text-purple-400"
         }.freeze
+        KINDS = TEXT_CLASSES.keys.freeze
 
         # icon: rendered markup, e.g. inline_svg_tag("icons/envelope.svg", class: "tw:h-4 tw:w-4") -
         # replaces the default info icon

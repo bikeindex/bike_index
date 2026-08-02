@@ -93,7 +93,7 @@
               \- or email #{link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org", target: "_blank"}.
       = f.text_area :body, rows: 4, maxlength: @object.max_body_length, placeholder: "Custom text", class: "form-control"
     - if @kind == "other_parking_notification"
-      = render(UI::Alerts::Base::Component.new(kind: :info, margin_classes: 'tw:mt-2 mb-4')) do
+      = render(UI::Alerts::Base::Component.new(kind: :notice, margin_classes: 'tw:mt-2 mb-4')) do
         Parking Notifications of type <strong>Other</strong> (like this one) don't include a "picked up the bike" link
 
     .form-group
@@ -108,7 +108,7 @@
       = submit_tag "Save", class: "btn btn-success btn-md-lg"
 
 - else
-  = render(UI::Alerts::Base::Component.new(header: "Not customizable directly", text: "Ask Bike Index support for help", kind: :info))
+  = render(UI::Alerts::Base::Component.new(header: "Not customizable directly", text: "Ask Bike Index support for help", kind: :notice))
 
 -# We can't preview impound_claims unless there are impound records
 - if @impound_claim_kind && @impound_claim.blank?

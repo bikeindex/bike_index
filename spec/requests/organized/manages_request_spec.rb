@@ -446,7 +446,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             delete base_url
           }.to change(Organization, :count).by(-1)
           expect(response).to redirect_to user_root_url
-          expect(flash[:info]).to be_present
+          expect(flash[:notice]).to be_present
         end
       end
       context "paid organization" do
@@ -456,7 +456,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             delete base_url
           }.to change(Organization, :count).by(0)
           expect(response).to redirect_to organization_manage_path(organization_id: current_organization.to_param)
-          expect(flash[:info]).to be_present
+          expect(flash[:notice]).to be_present
         end
       end
     end

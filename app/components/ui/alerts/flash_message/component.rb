@@ -4,8 +4,6 @@ module UI
   module Alerts
     module FlashMessage
       class Component < ApplicationComponent
-        KIND_ALIASES = {info: :notice}.freeze
-
         def initialize(flash: {})
           @flash = flash
         end
@@ -24,7 +22,7 @@ module UI
         # Rails sweeps the flash after the layout renders, so raising here would raise again
         # on the next request too -- keep it to the environments where that's a useful signal.
         def kind_for(type)
-          kind = KIND_ALIASES.fetch(type.to_sym, type.to_sym)
+          kind = type.to_sym
           return kind if UI::Alerts::Base::Component::KINDS.include?(kind)
           raise ArgumentError, "Unknown flash type: #{type}" if Rails.env.local?
           UI::Alerts::Base::Component::KINDS.first
