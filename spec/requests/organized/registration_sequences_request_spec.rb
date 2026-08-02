@@ -12,6 +12,28 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
         expect { get base_url }.to_not change(RegistrationSequence, :count)
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
+        expect(response.body).to include("There is no active registration sequence")
+      end
+
+      context "with an active sequence" do
+        # Built as a draft and activated, the way an organization gets one
+        let!(:active) do
+          FactoryBot.create(:registration_sequence, organization: current_organization).tap do |sequence|
+            sequence.registration_sequence_pages.create!(title: "Batteries & charging",
+              body: "<ul><li>Charge with the manufacturer's charger</li></ul>")
+            sequence.make_active!
+          end
+        end
+
+        it "lists what registrants are actually agreeing to" do
+          get base_url
+          expect(response.status).to eq(200)
+          expect(response.body).to include("This is the active version your registrants see")
+          expect(response.body).to include("Batteries &amp; charging")
+          expect(response.body).to include("Charge with the manufacturer's charger")
+          # Frozen, so no editing affordances on it
+          expect(response.body).to_not include("data-sortable-target=\"item\"")
+        end
       end
     end
 
@@ -37,6 +59,24 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
       it "404s for a non-draft sequence" do
         active = FactoryBot.create(:registration_sequence_active, organization: current_organization)
         get "#{base_url}/#{active.id}/edit"
+        expect(response.status).to eq(404)
+      end
+    end
+
+    describe "update" do
+      let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization: current_organization) }
+
+      it "saves the settings shared by every page" do
+        patch "#{base_url}/#{draft.id}", params: {registration_sequence: {faq_url: "https://example.com/faq",
+                                                                          acknowledgment_text: "agree to all of it"}}
+        expect(response).to redirect_to(edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: draft.id))
+        expect(draft.reload).to have_attributes(faq_url: "https://example.com/faq",
+          acknowledgment: "agree to all of it")
+      end
+
+      it "404s for another organization's draft" do
+        other = FactoryBot.create(:registration_sequence)
+        patch "#{base_url}/#{other.id}", params: {registration_sequence: {faq_url: "https://example.com"}}
         expect(response.status).to eq(404)
       end
     end

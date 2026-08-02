@@ -3339,6 +3339,41 @@ ALTER SEQUENCE public.recovery_displays_id_seq OWNED BY public.recovery_displays
 
 
 --
+-- Name: registration_sequence_acknowledgments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.registration_sequence_acknowledgments (
+    id bigint NOT NULL,
+    registration_sequence_id bigint,
+    b_param_id bigint,
+    bike_id bigint,
+    user_id bigint,
+    owner_email character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: registration_sequence_acknowledgments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.registration_sequence_acknowledgments_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: registration_sequence_acknowledgments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.registration_sequence_acknowledgments_id_seq OWNED BY public.registration_sequence_acknowledgments.id;
+
+
+--
 -- Name: registration_sequence_pages; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3350,7 +3385,9 @@ CREATE TABLE public.registration_sequence_pages (
     body text,
     listing_order integer,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    organization_specific boolean DEFAULT false NOT NULL,
+    heading character varying
 );
 
 
@@ -3383,7 +3420,10 @@ CREATE TABLE public.registration_sequences (
     start_at timestamp(6) without time zone,
     end_at timestamp(6) without time zone,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    faq_url character varying,
+    acknowledgment_text text,
+    deleted_at timestamp(6) without time zone
 );
 
 
@@ -5015,6 +5055,13 @@ ALTER TABLE ONLY public.recovery_displays ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
+-- Name: registration_sequence_acknowledgments id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.registration_sequence_acknowledgments ALTER COLUMN id SET DEFAULT nextval('public.registration_sequence_acknowledgments_id_seq'::regclass);
+
+
+--
 -- Name: registration_sequence_pages id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5869,6 +5916,14 @@ ALTER TABLE ONLY public.recovery_displays
 
 
 --
+-- Name: registration_sequence_acknowledgments registration_sequence_acknowledgments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.registration_sequence_acknowledgments
+    ADD CONSTRAINT registration_sequence_acknowledgments_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: registration_sequence_pages registration_sequence_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -6074,6 +6129,13 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.wheel_sizes
     ADD CONSTRAINT wheel_sizes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: idx_on_registration_sequence_id_78f7372741; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_on_registration_sequence_id_78f7372741 ON public.registration_sequence_acknowledgments USING btree (registration_sequence_id);
 
 
 --
@@ -7232,10 +7294,45 @@ CREATE INDEX index_recovery_displays_on_stolen_record_id ON public.recovery_disp
 
 
 --
+-- Name: index_registration_sequence_acknowledgments_on_b_param_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_registration_sequence_acknowledgments_on_b_param_id ON public.registration_sequence_acknowledgments USING btree (b_param_id);
+
+
+--
+-- Name: index_registration_sequence_acknowledgments_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_registration_sequence_acknowledgments_on_bike_id ON public.registration_sequence_acknowledgments USING btree (bike_id);
+
+
+--
+-- Name: index_registration_sequence_acknowledgments_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_registration_sequence_acknowledgments_on_user_id ON public.registration_sequence_acknowledgments USING btree (user_id);
+
+
+--
+-- Name: index_registration_sequence_acknowledgments_one_per_b_param; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_registration_sequence_acknowledgments_one_per_b_param ON public.registration_sequence_acknowledgments USING btree (b_param_id) WHERE (b_param_id IS NOT NULL);
+
+
+--
 -- Name: index_registration_sequence_pages_on_registration_sequence_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_registration_sequence_pages_on_registration_sequence_id ON public.registration_sequence_pages USING btree (registration_sequence_id);
+
+
+--
+-- Name: index_registration_sequences_on_deleted_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_registration_sequences_on_deleted_at ON public.registration_sequences USING btree (deleted_at);
 
 
 --
@@ -7249,21 +7346,21 @@ CREATE INDEX index_registration_sequences_on_organization_id ON public.registrat
 -- Name: index_registration_sequences_one_active_per_org; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_registration_sequences_one_active_per_org ON public.registration_sequences USING btree (organization_id) WHERE ((start_at IS NOT NULL) AND (end_at IS NULL));
+CREATE UNIQUE INDEX index_registration_sequences_one_active_per_org ON public.registration_sequences USING btree (organization_id) WHERE ((start_at IS NOT NULL) AND (end_at IS NULL) AND (deleted_at IS NULL));
 
 
 --
 -- Name: index_registration_sequences_one_draft_per_org; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_registration_sequences_one_draft_per_org ON public.registration_sequences USING btree (organization_id) WHERE ((start_at IS NULL) AND (organization_id IS NOT NULL));
+CREATE UNIQUE INDEX index_registration_sequences_one_draft_per_org ON public.registration_sequences USING btree (organization_id) WHERE ((start_at IS NULL) AND (organization_id IS NOT NULL) AND (deleted_at IS NULL));
 
 
 --
 -- Name: index_registration_sequences_single_template; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_registration_sequences_single_template ON public.registration_sequences USING btree (((organization_id IS NULL))) WHERE (organization_id IS NULL);
+CREATE UNIQUE INDEX index_registration_sequences_single_template ON public.registration_sequences USING btree (((organization_id IS NULL))) WHERE ((organization_id IS NULL) AND (deleted_at IS NULL));
 
 
 --
@@ -7619,6 +7716,8 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260731100009'),
+('20260731100008'),
 ('20260729180400'),
 ('20260729085100'),
 ('20260728220000'),
@@ -7629,7 +7728,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20260723120000'),
 ('20260723000000'),
 ('20260722120000'),
-('20260716120000'),
 ('20260713120000'),
 ('20260706180000'),
 ('20260706164500'),

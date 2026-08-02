@@ -170,8 +170,10 @@ Rails.application.routes.draw do
 
   # Redesigned registration flow: quick start, then complete on-site or via email.
   # new makes an empty registration and redirects into show, which renders
-  # ?step=1|2|finished (and handles the emailed confirmation link)
-  resource :register, only: %i[new create show update], controller: :register
+  # ?step=1|2|3…|review|finished (and handles the emailed confirmation link)
+  resource :register, only: %i[new create show update], controller: :register do
+    patch :acknowledge
+  end
 
   # Registration photos upload before there's a session, so they get their own endpoint
   post "/register/direct_uploads" => "register/direct_uploads#create", :as => :register_direct_uploads
@@ -482,7 +484,7 @@ Rails.application.routes.draw do
     end
     resource :manage_impounding
     resources :users, except: %i[show]
-    resources :registration_sequences, only: %i[index create edit] do
+    resources :registration_sequences, only: %i[index create edit update] do
       resources :pages, only: %i[create], controller: "registration_sequence_pages"
     end
     resources :registration_sequence_pages, only: %i[edit update destroy]

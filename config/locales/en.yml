@@ -1917,6 +1917,8 @@ en:
       update:
         image_updated: Image was successfully updated.
     register:
+      acknowledge:
+        acknowledge_everything: Check every box to agree to these rules
       create:
         email_required: Email is required to register
         manufacturer_required: Manufacturer is required to register
@@ -3874,7 +3876,9 @@ en:
     news_index: Bike Index Blog
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
+    register_acknowledgment: "%{cycle_type} safety check"
     register_create: Register your %{cycle_type}!
+    register_review: Review your %{cycle_type} safety check
     register_show: "%{cycle_type} registration"
     register_step_1: Register your %{cycle_type}!
     register_step_2: Add your %{cycle_type}'s details

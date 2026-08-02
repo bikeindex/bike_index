@@ -70,7 +70,7 @@ class Ownership < ApplicationRecord
   enum :pos_kind, Organization::POS_KIND_ENUM
   enum :origin, ORIGIN_ENUM
 
-  belongs_to :bike
+  belongs_to :bike, touch: true
   belongs_to :user
   belongs_to :creator, class_name: "User"
   belongs_to :impound_record
