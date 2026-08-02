@@ -6,7 +6,7 @@ RSpec.describe UI::Alerts::Base::Component, type: :component do
   let(:options) { {text: "some text"} }
   let(:component) { render_inline(described_class.new(**options)) }
 
-  it "renders" do
+  it "renders, defaulting to the notice kind" do
     expect(component).to be_present
     expect(component).to have_css('[role="alert"].tw:text-blue-800')
     expect(component.to_html).to include "M10 9.25v4.5" # the default info icon
@@ -52,6 +52,34 @@ RSpec.describe UI::Alerts::Base::Component, type: :component do
       expect(html).to include('<svg class="custom-icon">')
       # The default info icon is not rendered
       expect(html).to_not include("M10 9.25v4.5")
+    end
+  end
+
+  describe "unknown kind" do
+    let(:options) { {text: "some text", kind: "bogus"} }
+
+    it "raises" do
+      expect { component }.to raise_error(ArgumentError, /unknown kind/i)
+    end
+
+    context "passed nil, rather than omitted" do
+      let(:options) { {text: "some text", kind: nil} }
+
+      it "raises" do
+        expect { component }.to raise_error(ArgumentError, /unknown kind/i)
+      end
+    end
+
+    context "in production" do
+      before { allow(Rails).to receive(:env).and_return("production".inquiry) }
+
+      it "renders a notice and notifies" do
+        stub_const("Honeybadger", spy("Honeybadger"))
+
+        expect(component).to have_css('[role="alert"].tw:text-blue-800')
+        expect(Honeybadger).to have_received(:notify)
+          .with("Unknown alert kind", hash_including(context: {kind: "bogus"}))
+      end
     end
   end
 

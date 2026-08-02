@@ -15,14 +15,10 @@ module UI
 
         # icon: rendered markup, e.g. inline_svg_tag("icons/envelope.svg", class: "tw:h-4 tw:w-4") -
         # replaces the default info icon
-        def initialize(text: nil, header: nil, kind: nil, dismissable: false, margin_classes: "tw:mb-4", icon: nil)
+        def initialize(text: nil, header: nil, kind: :notice, dismissable: false, margin_classes: "tw:mb-4", icon: nil)
           @text = text
           @header = header
-          @kind = if KINDS.include?(kind&.to_sym)
-            kind&.to_sym
-          else
-            KINDS.first
-          end
+          @kind = normalized_kind(kind)
           @dismissable = dismissable
           @margin_classes = margin_classes
           @icon = icon
@@ -30,9 +26,18 @@ module UI
 
         private
 
-        # order-last keeps the dismiss button, which is last in the DOM, up on the header row
-        def body_classes
-          @header.present? ? "tw:order-last tw:basis-full" : "tw:grow"
+        # Anything outside KINDS is a caller bug -- it renders in a color it didn't ask for.
+        # Deployed envs report it rather than raising: sandbox is deployed too, and
+        # Rails.env.production? is false there (see config/environments/sandbox.rb)
+        def normalized_kind(kind)
+          return kind.to_sym if KINDS.include?(kind&.to_sym)
+
+          unless Rails.env.production? || Rails.env.sandbox?
+            raise ArgumentError, "unknown kind #{kind.inspect}, expected one of: #{KINDS.join(", ")}"
+          end
+
+          Honeybadger.notify("Unknown alert kind", {error_class: self.class.to_s, context: {kind:}})
+          KINDS.first
         end
 
         def color_classes
