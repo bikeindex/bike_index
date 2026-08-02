@@ -2054,12 +2054,6 @@ en:
         check_out_match_here: 'Check out the match here:'
         we_think_your_stolen_bike: We may have found your stolen %{bike_title}!
     confirmation_email:
-      html:
-        click_to_sign_in_html: Click the <em>Sign in</em> button to finish signing
-          up!
-        follow_this_link_to_sign_in: Follow this link to sign in
-        sign_in: Sign in
-        youre_almost_there: You're almost there!
       subject: Please confirm your Bike Index email!
     invoice_email:
       html:

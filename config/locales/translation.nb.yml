@@ -2488,11 +2488,6 @@ nb:
         check_out_match_here: 'Sjekk kampen her:'
         we_think_your_stolen_bike: Vi kan ha funnet din stjålne %{bike_title}!
     confirmation_email:
-      html:
-        click_to_sign_in_html: Klikk på <em>Logg på</em>-knappen for å fullføre registreringen!
-        follow_this_link_to_sign_in: Følg denne lenken for å logge på
-        sign_in: Logg på
-        youre_almost_there: Du er nesten der!
       subject: Vennligst bekreft din Bike Index-e-post!
     invoice_email:
       html:
@@ -5407,6 +5402,11 @@ nb:
         legal: Juridisk
         social_media: Sosiale medier
     emails:
+      confirmation_email:
+        click_to_sign_in_html: Klikk på <em>Logg på</em>-knappen for å fullføre registreringen!
+        follow_this_link_to_sign_in: Følg denne lenken for å logge på
+        sign_in: Logg på
+        youre_almost_there: Du er nesten der!
       partials:
         bike_box:
           bike_photo: Sykkelbilde

@@ -2243,12 +2243,6 @@ nl:
         this_email_is_about: Deze e-mail gaat over de %{bike} geregistreerd op Bike
           Index op %{registration_date}
     confirmation_email:
-      html:
-        click_to_sign_in_html: Klik op de knop <em>Inloggen</em> om het aanmelden te
-          voltooien!
-        follow_this_link_to_sign_in: Volg deze link om in te loggen
-        sign_in: Inloggen
-        youre_almost_there: Je bent er bijna!
       subject: Bevestig uw e-mail met Bike Index!
     invoice_email:
       html:
@@ -5558,6 +5552,12 @@ nl:
         legal: Juridisch
         social_media: Sociale media
     emails:
+      confirmation_email:
+        click_to_sign_in_html: Klik op de knop <em>Inloggen</em> om het aanmelden te
+          voltooien!
+        follow_this_link_to_sign_in: Volg deze link om in te loggen
+        sign_in: Inloggen
+        youre_almost_there: Je bent er bijna!
       partials:
         bike_box:
           bike_photo: Fietsfoto

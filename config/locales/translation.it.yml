@@ -2549,12 +2549,6 @@ it:
         check_out_match_here: 'Guarda la partita qui:'
         we_think_your_stolen_bike: Potremmo aver trovato il tuo %{bike_title} rubato!
     confirmation_email:
-      html:
-        click_to_sign_in_html: Fai clic sul pulsante <em>Accedi</em> per completare
-          la registrazione!
-        follow_this_link_to_sign_in: Segui questo link per accedere
-        sign_in: Accedi
-        youre_almost_there: Ci sei quasi!
       subject: Conferma il tuo indirizzo email di Bike Index!
     invoice_email:
       html:
@@ -5671,6 +5665,12 @@ it:
         legal: Legale
         social_media: Social media
     emails:
+      confirmation_email:
+        click_to_sign_in_html: Fai clic sul pulsante <em>Accedi</em> per completare
+          la registrazione!
+        follow_this_link_to_sign_in: Segui questo link per accedere
+        sign_in: Accedi
+        youre_almost_there: Ci sei quasi!
       partials:
         bike_box:
           bike_photo: Foto della bicicletta
