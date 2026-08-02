@@ -2,7 +2,13 @@
   <%= render partial: "results" %>
 <% end %>
 
-<%# The multi-update form redirects back here, so carry its flash along with the frame %>
-<%= turbo_stream.replace "flash-messages" do %>
-  <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
+<%#
+  The multi-update form redirects back here, so carry its flash along with the frame.
+  Only when there is one -- otherwise every filter and sort wipes a live alert.
+%>
+
+<% if flash.any? %>
+  <%= turbo_stream.replace "flash-messages" do %>
+    <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
+  <% end %>
 <% end %>
