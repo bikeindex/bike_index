@@ -47,10 +47,14 @@ RSpec.describe Registrations::Show::CurrentAlerts::ClaimImpound::Component, :js,
     expect(page).to have_no_current_path(/contact_owner/, url: true)
   end
 
-  context "the viewer opened a claim of their own" do
-    let!(:impound_claim) { FactoryBot.create(:impound_claim_with_stolen_record, impound_record:) }
+  # One claim, seen from both sides. The bike it was submitted with is normally the
+  # claimant's own, and the card is never shown to an owner - so reaching that side of it
+  # needs one registered by somebody else
+  context "the viewer opened a claim" do
+    let(:submitting) { FactoryBot.create(:bike, :with_ownership, owner_email: "someone-else@example.com") }
+    let!(:impound_claim) { FactoryBot.create(:impound_claim_with_stolen_record, impound_record:, bike: submitting) }
 
-    it "offers the message form, then carries the outcome once it's answered" do
+    it "offers the message form, points back from the submitting bike, then carries the outcome" do
       visit "#{preview_path}/unsubmitted"
 
       # Required in the browser, so an empty box won't save - though nothing server-side
@@ -70,6 +74,18 @@ RSpec.describe Registrations::Show::CurrentAlerts::ClaimImpound::Component, :js,
       expect(page).to have_no_button("Claim found bike")
       expect_axe_clean
 
+      # The bike the claim was submitted with points at the impound rather than
+      # offering a claim of its own
+      visit "#{preview_path}/submitted_with_this_bike"
+
+      expect(page).to have_content("You have a pending claim with this bike")
+      expect_axe_clean
+
+      # The kind reads off the impound record, so match the part that doesn't vary
+      click_link "view the claimed"
+
+      expect(page).to have_current_path(registration_path(impound_claim.bike_claimed))
+
       impound_claim.update(status: "submitting")
       visit "#{preview_path}/submitted"
 
@@ -81,26 +97,6 @@ RSpec.describe Registrations::Show::CurrentAlerts::ClaimImpound::Component, :js,
       visit "#{preview_path}/approved"
 
       expect(page).to have_content("Your claim was approved")
-    end
-  end
-
-  # The submitting bike is normally the claimant's own, and the card is never shown to an
-  # owner - so reaching this state needs one registered by somebody else
-  context "viewing the stolen bike a claim was submitted with" do
-    let(:submitting) { FactoryBot.create(:bike, :with_ownership, owner_email: "someone-else@example.com") }
-    let(:stolen_record) { FactoryBot.create(:stolen_record, bike: submitting) }
-    let!(:impound_claim) { FactoryBot.create(:impound_claim, stolen_record:, user: FactoryBot.create(:user_confirmed)) }
-
-    it "links through to the bike it claims" do
-      visit "#{preview_path}/submitted_with_this_bike"
-
-      expect(page).to have_content("You have a pending claim with this bike")
-      expect_axe_clean
-
-      # The kind reads off the impound record, so match the part that doesn't vary
-      click_link "view the claimed"
-
-      expect(page).to have_current_path(registration_path(impound_claim.bike_claimed))
     end
   end
 end
