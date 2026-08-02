@@ -24,11 +24,11 @@ module Registrations
             page(view: "consumer", bike_id: bike.id, current_user:, as_view: [:public, nil])
           end
 
-          def claim_page_for(claims)
-            claim = claims.where.not(bike_claimed_id: nil).last
-            return missing_notice("a matching impound claim") if claim.blank?
+          def claim_page_for(impound_claims)
+            impound_claim = impound_claims.where.not(bike_claimed_id: nil).last
+            return missing_notice("a matching impound claim") if impound_claim.blank?
 
-            claim_page(bike_id: claim.bike_claimed_id, current_user: claim.user)
+            claim_page(bike_id: impound_claim.bike_claimed_id, current_user: impound_claim.user)
           end
 
           # An organization's impound record can't be claimed, so only unorganized ones

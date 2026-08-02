@@ -25,7 +25,7 @@ module Registrations
           private
 
           def heading
-            translation((claim || submitting_claim) ? ".your_claim" : ".does_this_look_like_your_bike")
+            translation((impound_claim || submitting_impound_claim) ? ".your_claim" : ".does_this_look_like_your_bike")
           end
 
           def claim_button_text
@@ -37,29 +37,29 @@ module Registrations
           end
 
           # The viewer's claim against this bike, once they've opened one
-          def claim
-            return @claim if defined?(@claim)
+          def impound_claim
+            return @impound_claim if defined?(@impound_claim)
 
-            @claim = viewer_claim(@bike.impound_claims_claimed)
+            @impound_claim = viewer_impound_claim(@bike.impound_claims_claimed)
           end
 
           # A claim the viewer opened with this bike - they're looking at the stolen bike
           # they submitted rather than the impounded one being claimed
-          def submitting_claim
-            return if claim.present?
-            return @submitting_claim if defined?(@submitting_claim)
+          def submitting_impound_claim
+            return if impound_claim.present?
+            return @submitting_impound_claim if defined?(@submitting_impound_claim)
 
-            @submitting_claim = viewer_claim(@bike.impound_claims_submitting)
+            @submitting_impound_claim = viewer_impound_claim(@bike.impound_claims_submitting)
           end
 
-          def viewer_claim(claims)
+          def viewer_impound_claim(impound_claims)
             return if @current_user.blank?
 
-            claims.where(user_id: @current_user.id).not_rejected.last
+            impound_claims.where(user_id: @current_user.id).not_rejected.last
           end
 
-          def new_claim
-            @new_claim ||= ImpoundClaim.new
+          def new_impound_claim
+            @new_impound_claim ||= ImpoundClaim.new
           end
 
           # The viewer's stolen bikes they could claim this impound with

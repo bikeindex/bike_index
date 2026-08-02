@@ -10,10 +10,10 @@ module Registrations
           include PreviewScenarios
 
           def default
-            claim = ::ImpoundClaim.not_rejected.where.not(bike_submitting_id: nil).last
-            return missing_notice("an impound claim") if claim.blank?
+            impound_claim = ::ImpoundClaim.not_rejected.where.not(bike_submitting_id: nil).last
+            return missing_notice("an impound claim") if impound_claim.blank?
 
-            claim_page(bike_id: claim.bike_submitting_id, current_user: claim.user)
+            claim_page(bike_id: impound_claim.bike_submitting_id, current_user: impound_claim.user)
           end
         end
       end
