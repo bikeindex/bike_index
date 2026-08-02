@@ -18,16 +18,15 @@ module Registrations
           @owner = owner.nil? ? (@current_user.present? && @bike.owner == @current_user) : owner
         end
 
-        # The claim-impound card renders the viewer's own claim, which nothing else in
-        # the cache key moves when they save or submit it - and it's never offered to
-        # the owner, so their page doesn't pay for the lookup
-        def cache_version
-          return [] if @owner || @current_user.blank?
-
-          [ImpoundClaim.involving_bike_id(@bike.id).where(user_id: @current_user.id).maximum(:updated_at)]
-        end
+        def cache_version = current_alerts_component.cache_version
 
         private
+
+        def current_alerts_component
+          @current_alerts_component ||= CurrentAlerts::Wrapper::Component.new(bike: @bike,
+            current_user: @current_user, bike_sticker: @bike_sticker, owner: @owner,
+            current_alerts: @current_alerts)
+        end
 
         def title
           @bike.name.presence || bike_title_html(@bike)

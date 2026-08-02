@@ -26,7 +26,7 @@
     </div>
   </div>
 
-  <%= render(Registrations::Show::CurrentAlerts::Wrapper::Component.new(bike: @bike, current_user: @current_user, bike_sticker: @bike_sticker, organization: @organization, current_alerts: @current_alerts)) %>
+  <%= render(current_alerts_component) %>
 
   <%= render(Registrations::Show::OrgTopActions::Wrapper::Component.new(bike: @bike, organization: @organization, org_role: @org_role)) %>
 

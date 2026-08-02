@@ -17,16 +17,28 @@ module Registrations
             @current_alerts = current_alerts
           end
 
-          # Each renders itself or nothing, so this is only the order they stack in
           def call
-            safe_join([
-              render(TokenPrompt::Component.new(bike: @bike, current_user: @current_user,
-                current_alerts: @current_alerts, variant: :alert)),
-              render(ScannedSticker::Component.new(bike: @bike, bike_sticker: @bike_sticker, current_user: @current_user)),
-              render(SentToNewOwner::Component.new(bike: @bike, owner: @owner)),
-              render(ClaimImpound::Component.new(bike: @bike, current_user: @current_user, owner: @owner,
-                organization: @organization))
-            ])
+            safe_join(alerts.map { |alert| render(alert) })
+          end
+
+          # An alert carrying state the bike's own cache version misses declares it, and
+          # the page wrapper folds this into the key of the fragment they render inside
+          def cache_version
+            alerts.flat_map { |alert| alert.try(:cache_version) || [] }
+          end
+
+          private
+
+          # Each renders itself or nothing, so this is only the order they stack in
+          def alerts
+            @alerts ||= [
+              TokenPrompt::Component.new(bike: @bike, current_user: @current_user,
+                current_alerts: @current_alerts, variant: :alert),
+              ScannedSticker::Component.new(bike: @bike, bike_sticker: @bike_sticker, current_user: @current_user),
+              SentToNewOwner::Component.new(bike: @bike, owner: @owner),
+              ClaimImpound::Component.new(bike: @bike, current_user: @current_user, owner: @owner,
+                organization: @organization)
+            ]
           end
         end
       end
