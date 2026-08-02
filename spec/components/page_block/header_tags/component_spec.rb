@@ -70,6 +70,9 @@ RSpec.describe PageBlock::HeaderTags::Component, type: :component do
       expect(component.css('meta[name="description"]').first["content"]).to eq default_description
       expect(component.css('[property="og:image:height"]').first["content"]).to eq "630"
       expect(component.css('[property="og:image:width"]').first["content"]).to eq "1200"
+      # initial-scale pins the load scale at 1:1 -- without it iOS Safari scales to fit the
+      # content, and a page that loads below 1 zooms on field focus without zooming back out
+      expect(component.css('meta[name="viewport"]').first["content"]).to eq "width=device-width, initial-scale=1"
     end
     context "choose registration" do
       let(:action_name) { "choose_registration" }
