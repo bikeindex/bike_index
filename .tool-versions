@@ -1,4 +1,4 @@
+# NOTE: If updating ruby or node version, also update .cloud66/manifest.yml
 ruby 4.0.6
-# NOTE: If updating node version, also update .cloud66/manifest.yml
 nodejs 24.15.0
 
