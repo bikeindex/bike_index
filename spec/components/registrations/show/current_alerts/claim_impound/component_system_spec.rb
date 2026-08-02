@@ -53,9 +53,15 @@ RSpec.describe Registrations::Show::CurrentAlerts::ClaimImpound::Component, :js,
     it "offers the message form, then carries the outcome once it's answered" do
       visit "#{preview_path}/unsubmitted"
 
-      expect(page).to have_field("Verify your ownership")
+      # Required in the browser, so an empty box won't save - though nothing server-side
+      # turns an empty claim away
+      expect(page).to have_field("Verify your ownership", type: "textarea", valid: false)
       expect(page).to have_button("Save message")
       expect(page).to have_button("Submit claim")
+
+      fill_in "Verify your ownership", with: "it still has my sticker under the seat"
+
+      expect(page).to have_field("Verify your ownership", valid: true)
       # The card is the claim now, rather than an invitation to open one
       expect(page).to have_no_button("Claim found bike")
       expect_axe_clean

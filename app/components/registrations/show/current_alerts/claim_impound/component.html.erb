@@ -6,8 +6,14 @@
     <% if impound_claim.present? %>
       <% if impound_claim.unsubmitted? %>
         <%= form_with(model: impound_claim, url: impound_claim_path(impound_claim), builder: BikeIndexFormBuilder, data: {controller: "csrf-refresh"}) do |form| %>
+          <%#
+            Required in the browser only - a claim carries no evidence without it, but nothing
+            server-side turns one away for being empty
+          %>
+
           <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :message, kind: :text_area,
-            label_text: translation(".prove_its_yours", bike_type: impound_claim.bike_type), html_options: {rows: 4})) %>
+            label_text: translation(".prove_its_yours", bike_type: impound_claim.bike_type), required: true,
+            html_options: {rows: 4})) %>
 
           <%= render(UI::Button::Component.new(text: translation(".save_message"), color: :secondary, kind: :submit)) %>
         <% end %>
