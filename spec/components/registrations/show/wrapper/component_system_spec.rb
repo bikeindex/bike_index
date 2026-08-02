@@ -75,5 +75,14 @@ RSpec.describe Registrations::Show::Wrapper::Component, :js, type: :system do
 
     expect(page).to have_no_content("Nothing to preview")
     alert_previews.each_value { |(_, text)| expect(page).to have_no_content(text) }
+    # Only a token prompt opens over the page, and no_overlay hasn't earned one
+    expect(page).to have_no_css("dialog", visible: :all)
+    expect_axe_clean
+
+    # The claim invitation is the one alert that also raises itself as a dialog
+    visit "#{preview_path}/component/claim_invitation"
+
+    expect(page).to have_css("dialog##{Registrations::Show::CurrentAlerts::ClaimInvitation::Component::MODAL_ID}")
+    expect_axe_clean
   end
 end
