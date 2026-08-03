@@ -48,8 +48,8 @@ RSpec.describe UI::Alerts::FlashMessage::Component, type: :component do
   context "with an unknown flash type" do
     let(:flash) { {bogus: "Who knows"} }
 
-    it "raises" do
-      expect { component }.to raise_error(ArgumentError, /unknown flash type/i)
+    it "raises, from the kind it hands the alert" do
+      expect { component }.to raise_error(ArgumentError, /unknown kind/i)
     end
   end
 end
