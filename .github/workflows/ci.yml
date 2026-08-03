@@ -119,7 +119,7 @@ jobs:
           echo "playwright_version=$playwright_version" >> "$GITHUB_OUTPUT"
           echo "image=$REGISTRY/$IMAGE_NAME:$tag" >> "$GITHUB_OUTPUT"
       - name: Log in to GHCR
-        uses: docker/login-action@v4.5.2
+        uses: docker/login-action@v4.6.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
