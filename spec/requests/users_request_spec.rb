@@ -10,6 +10,24 @@ RSpec.describe UsersController, type: :request do
       expect(response).to render_template(:new)
       expect(Capybara.string(response.body)).to have_css("[data-controller='ui--forms--email'] input#user_email")
     end
+
+    context "sso organization domain" do
+      let!(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
+      end
+      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+
+      it "hands the prefilled email off to the IdP rather than the signup form" do
+        get "#{base_url}/new", params: {email: "student@sso.edu"}
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+      end
+
+      it "renders for an email the org doesn't claim" do
+        get "#{base_url}/new", params: {email: "student@example.edu"}
+        expect(response).to render_template(:new)
+      end
+    end
   end
 
   describe "create" do
@@ -47,6 +65,32 @@ RSpec.describe UsersController, type: :request do
 
         post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
         expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
+      end
+    end
+
+    context "sso organization domain" do
+      let(:email) { "student@sso.edu" }
+      let!(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
+      end
+      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+
+      it "forces SSO instead of creating an account the IdP doesn't know about" do
+        expect {
+          post base_url, params: {user: {email:, name: "Test name", terms_of_service: "1"}}
+        }.to_not change(User, :count)
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+      end
+
+      context "SAML config not yet live" do
+        let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, organization:) }
+
+        it "signs up normally rather than redirecting into an unconfigured IdP" do
+          expect {
+            post base_url, params: {user: {email:, name: "Test name", terms_of_service: "1"}}
+          }.to change(User, :count).by(1)
+        end
       end
     end
   end
