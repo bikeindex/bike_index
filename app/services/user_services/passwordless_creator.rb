@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Accounts for people who proved an email address without ever choosing a password -
-# a passwordless organization's members, and registrants following a confirmation link
+# Accounts for people who never chose a password - a passwordless organization's
+# members, and registrants following a confirmation link
 module UserServices
   module PasswordlessCreator
     extend Functionable

@@ -23,10 +23,6 @@ module Register
         translation(".complete_registration", cycle_type: @b_param.type_titleize)
       end
 
-      def confirmation_email_pending?
-        BikeServices::Register.confirmation_email_pending?(@b_param, user: @current_user)
-      end
-
       def organization
         @organization ||= @b_param.creation_organization
       end

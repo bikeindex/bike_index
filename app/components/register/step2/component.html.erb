@@ -1,7 +1,7 @@
 <%= render Register::Page::Component.new do %>
   <%= render Register::Progress::Component.new(step: 2, total: BikeServices::Register.total_steps(@sequence)) %>
 
-  <% if confirmation_email_pending? %>
+  <% if BikeServices::Register.confirmation_email_pending?(@b_param, user: @current_user) %>
     <%= render UI::Alerts::Base::Component.new(kind: :purple, text: translation(".confirmation_link_sent"),
         icon: helpers.inline_svg_tag("icons/envelope.svg", class: "tw:-mb-0.5 tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true)) %>
   <% end %>

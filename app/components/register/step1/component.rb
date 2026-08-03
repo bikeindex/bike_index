@@ -47,10 +47,6 @@ module Register
         CycleType.slug_translation_hash_lowercase_short
       end
 
-      def confirmation_email_pending?
-        BikeServices::Register.confirmation_email_pending?(@b_param, user: @current_user)
-      end
-
       # Step 1 is only revisitable once submitted, so this is a return from step 2
       # - where abandoning the registration is worth offering
       def returned_from_step_2?
