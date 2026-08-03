@@ -20,12 +20,7 @@
       <% end %>
 
       <%# The rules as registrants agree to them - one checkbox each, read-only here %>
-      <div
-        class="
-          tw:divide-y tw:divide-gray-200 tw:rounded-xl tw:border
-          tw:border-gray-200
-        "
-      >
+      <%= render UI::DividedCard::Component.new do %>
         <% page.bullets.each do |bullet| %>
           <div class="tw:flex tw:items-start tw:gap-3 tw:px-4 tw:py-3.5 tw:text-sm">
             <input
@@ -37,22 +32,23 @@
             <span><%= sanitize bullet %></span>
           </div>
         <% end %>
-      </div>
+      <% end %>
     </div>
   <% end %>
 
   <%# The final acknowledgment binding the registrant to every page above %>
-  <div
-    class="
-      tw:flex tw:items-start tw:gap-3 tw:rounded-xl tw:border
-      tw:border-gray-200 tw:px-4 tw:py-3.5 tw:text-sm
-    "
-  >
-    <input type="checkbox" disabled class="tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0">
+  <%= render UI::DividedCard::Component.new do %>
+    <div class="tw:flex tw:items-start tw:gap-3 tw:px-4 tw:py-3.5 tw:text-sm">
+      <input
+        type="checkbox"
+        disabled
+        class="tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0"
+      >
 
-    <span>
-      I, <em>registrant's name</em>,
-      <%= @registration_sequence.acknowledgment %>
-    </span>
-  </div>
+      <span>
+        I, <em>registrant's name</em>,
+        <%= @registration_sequence.acknowledgment %>
+      </span>
+    </div>
+  <% end %>
 </div>

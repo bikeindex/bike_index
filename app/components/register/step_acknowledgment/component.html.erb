@@ -34,13 +34,7 @@
       <% end %>
     <% end %>
 
-    <div
-      class="
-        tw:divide-y tw:divide-gray-200 tw:rounded-xl tw:border
-        tw:border-gray-200 tw:bg-white tw:dark:divide-gray-700
-        tw:dark:border-gray-700 tw:dark:bg-gray-800
-      "
-    >
+    <%= render UI::DividedCard::Component.new do %>
       <% page.bullets.each_with_index do |bullet, index| %>
         <label
           class="
@@ -55,7 +49,7 @@
           <span><%= sanitize bullet %></span>
         </label>
       <% end %>
-    </div>
+    <% end %>
 
     <%= render UI::Button::Component.new(text: translation(".continue"), color: :primary, size: :lg,
         kind: :submit, spinner: true, disabled: true, html_class: "tw:mt-5 tw:w-full",

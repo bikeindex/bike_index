@@ -8,13 +8,7 @@
   <%= render UI::Header::Component.new(text: translation(".youre_almost_done"),
       subtitle: translation(".a_quick_review")) %>
 
-  <div
-    class="
-      tw:divide-y tw:divide-gray-200 tw:rounded-xl tw:border
-      tw:border-gray-200 tw:bg-white tw:dark:divide-gray-700
-      tw:dark:border-gray-700 tw:dark:bg-gray-800
-    "
-  >
+  <%= render UI::DividedCard::Component.new do %>
     <% pages.each_with_index do |page, index| %>
       <div class="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:px-4 tw:py-3">
         <span class="tw:flex tw:items-center tw:gap-2.5">
@@ -35,7 +29,7 @@
             class: "twlink tw:shrink-0 tw:text-xs tw:font-bold tw:tracking-wide tw:uppercase" %>
       </div>
     <% end %>
-  </div>
+  <% end %>
 
   <%= form_with(url: acknowledge_register_path, method: :patch,
       data: {controller: "register--acknowledgment"}) do %>
