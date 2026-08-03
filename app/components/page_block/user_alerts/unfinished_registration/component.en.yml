@@ -4,4 +4,6 @@ en:
     page_block:
       user_alerts:
         unfinished_registration:
-          finish_registering: Finish registering your %{cycle_type}
+          finish_the_required_steps: finish the required steps
+          not_registered_yet_html: Your %{cycle_type} isn't registered yet! Please
+            %{finish_link}

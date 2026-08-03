@@ -197,14 +197,14 @@ RSpec.describe RegisterController, type: :request do
           get register_path(b_param_token: b_param.id_token, step: 1)
 
           expect(assigns(:show_general_alert)).to be_falsey
-          expect(response.body).to_not include "Finish registering your"
+          expect(response.body).to_not include "isn't registered yet!"
         end
 
         it "shows it everywhere else" do
           get "/my_account"
 
           expect(assigns(:show_general_alert)).to be_truthy
-          expect(response.body).to include "Finish registering your bike"
+          expect(response.body).to include "Your bike isn't registered yet!"
           expect(response.body).to include register_path(b_param_token: unfinished.id_token)
         end
       end

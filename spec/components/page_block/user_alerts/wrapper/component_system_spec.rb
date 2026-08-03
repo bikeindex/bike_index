@@ -13,7 +13,7 @@ RSpec.describe PageBlock::UserAlerts::Wrapper::Component, :js, type: :system do
     {"phone_waiting_confirmation" => "Confirm your phone number",
      "stolen_bike_without_location" => "Please add theft location",
      "theft_alert_without_photo" => "Please add a photo",
-     "unfinished_registration" => "Finish registering your"}
+     "unfinished_registration" => "isn't registered yet!"}
   end
 
   let(:preview_path) { "/rails/view_components/page_block/user_alerts/wrapper/component" }

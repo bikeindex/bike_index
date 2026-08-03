@@ -7,8 +7,9 @@ RSpec.describe PageBlock::UserAlerts::UnfinishedRegistration::Component, type: :
   let(:component) { render_inline(described_class.new(b_param:)) }
 
   it "links back into the flow, naming the cycle type" do
+    expect(component.text.squish).to eq "Notice Your cargo bike isn't registered yet! Please finish the required steps"
     link = component.css("a").first
-    expect(link.text.strip).to eq "Finish registering your cargo bike"
+    expect(link.text.strip).to eq "finish the required steps"
     expect(link[:href]).to eq "/register?b_param_token=#{b_param.id_token}"
   end
 

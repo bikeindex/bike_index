@@ -1,5 +1,7 @@
-<%= render PageBlock::UserAlerts::Banner::Component.new(href: "#", data: {open_modal: MODAL_ID},
-      text: translation(".confirm_your_phone_number")) %>
+<%= render PageBlock::UserAlerts::Banner::Component.new do %>
+  <%= link_to translation(".confirm_your_phone_number"), "#",
+        data: {open_modal: MODAL_ID}, class: "twlink" %>
+<% end %>
 
 <%= render UI::Modal::Component.new(id: MODAL_ID, title: modal_title) do |modal| %>
   <% modal.with_body do %>
