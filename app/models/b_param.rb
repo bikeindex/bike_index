@@ -460,11 +460,7 @@ class BParam < ApplicationRecord
   # out - only a secret that lived solely in the email proves the address received it,
   # and only for the address it was mailed to
   def email_confirmation_token
-    params["email_confirmation_token"] if email_confirmation_email == EmailNormalizer.normalize(owner_email)
-  end
-
-  def email_confirmation_email
-    params["email_confirmation_email"]
+    params["email_confirmation_token"] if params["email_confirmation_email"] == EmailNormalizer.normalize(owner_email)
   end
 
   # A blank token reads as expired - token_time floors at EARLIEST_TOKEN_TIME

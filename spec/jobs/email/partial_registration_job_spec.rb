@@ -54,9 +54,10 @@ RSpec.describe Email::PartialRegistrationJob, type: :job do
   end
 
   context "a kind no b_param sends" do
-    it "does nothing" do
+    it "raises" do
       ActionMailer::Base.deliveries = []
-      Email::PartialRegistrationJob.new.perform(b_param.id, "finished_registration")
+      expect { Email::PartialRegistrationJob.new.perform(b_param.id, "finished_registration") }
+        .to raise_error(ArgumentError, /finished_registration/)
       expect(ActionMailer::Base.deliveries.count).to eq 0
       expect(Notification.count).to eq 0
     end

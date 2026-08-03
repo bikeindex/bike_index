@@ -13,8 +13,6 @@ module Emails
         BParam::TOKEN_EXPIRATION.in_days.to_i
       end
 
-      def color_and_brand = @b_param.color_and_brand
-
       def tokenized_url
         confirm_register_url(b_param_token: @b_param.id_token,
           confirmation_token: @b_param.email_confirmation_token)
