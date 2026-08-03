@@ -259,7 +259,7 @@ RSpec.describe SessionsController, type: :request do
         expect(flash[:notice]).to eq({translation_key: :signed_in, url: update_password_form_with_reset_token_users_path})
         follow_redirect!
         expect(Capybara.string(response.body))
-          .to have_link("set password to sign in", href: update_password_form_with_reset_token_users_path)
+          .to have_link("set a password to sign in", href: update_password_form_with_reset_token_users_path)
       end
 
       context "organization passwordless user" do

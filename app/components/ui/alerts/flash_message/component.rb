@@ -28,7 +28,8 @@ module UI
 
           message = message.with_indifferent_access
           key = message[:translation_key]
-          translation(".#{key}_html", link: link_to(translation(".#{key}_link"), message[:url]))
+          link = link_to(translation(".#{key}_link"), message[:url], class: "twlink")
+          translation(".#{key}_html", link:)
         end
 
         # Rails sweeps the flash after the layout renders, so raising here would raise again

@@ -107,8 +107,8 @@
   }
 
   /* Links inherit the alert's own color, so the underline is what marks them as links */
-  .twalert-body a {
-    @apply tw:font-semibold tw:underline;
+  .twalert-body .twlink {
+    @apply tw:underline;
   }
 
   .twless-strong {

@@ -30,8 +30,8 @@ module UI
         def with_link
           text = ActionController::Base.helpers.safe_join([
             "You're signed in! You can ",
-            ActionController::Base.helpers.link_to("set password to sign in", "#"),
-            " if you prefer, otherwise we will just email you a sign in link."
+            ActionController::Base.helpers.link_to("set a password to sign in", "#", class: "twlink"),
+            " if you prefer not to sign in via an emailed link."
           ])
           render(UI::Alerts::Base::Component.new(text:, kind: :notice))
         end

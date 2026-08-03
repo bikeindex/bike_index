@@ -33,7 +33,7 @@ RSpec.describe UsersController, type: :request do
       expect(response).to redirect_to my_account_url
       follow_redirect!
       expect(Capybara.string(response.body))
-        .to have_link("set password to sign in", href: update_password_form_with_reset_token_users_path)
+        .to have_link("set a password to sign in", href: update_password_form_with_reset_token_users_path)
     end
 
     context "with partner" do

@@ -28,7 +28,7 @@ RSpec.describe "Passwordless signup", :js, type: :system do
 
     # The link is a GET, so it lands on the interstitial -- which posts itself
     visit URI(confirm_link).request_uri
-    expect(page).to have_link("set password to sign in", wait: 10)
+    expect(page).to have_link("set a password to sign in", wait: 10)
     expect(user.reload.confirmed?).to be_truthy
   end
 end
