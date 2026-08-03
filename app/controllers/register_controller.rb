@@ -115,7 +115,8 @@ class RegisterController < ApplicationController
     # Single use, so a second click has nothing left to do - the first one signed them in
     return redirect_to_current_step if @b_param.email_confirmed?
 
-    unless @b_param.email_confirmation_token_matches?(params[:confirmation_token])
+    if @b_param.email_confirmation_token_expired? ||
+        !secure_compare?(params[:confirmation_token], @b_param.email_confirmation_token)
       BikeServices::Register.send_confirmation_email(@b_param)
       flash[:error] = translation(:confirmation_link_expired)
       return redirect_to_current_step
@@ -204,9 +205,12 @@ class RegisterController < ApplicationController
 
   # The emailed link carries the registration's token, so it resumes from any browser.
   # Nothing is put in the session here - the token hasn't been checked yet, and dropping
-  # a registration already underway in this browser isn't the link's to do
+  # a registration already underway in this browser isn't the link's to do.
+  # No window like find_token's: the confirmation token expires on its own clock, and
+  # finding the registration is what lets an expired link say so rather than dead-end
   def find_b_param_for_confirmation
-    @b_param = BikeServices::Register.find_for_confirmation(params[:b_param_token])
+    token = params[:b_param_token]
+    @b_param = BParam.find_by(id_token: token) if token.present?
     redirect_to(new_register_path) if @b_param.blank?
   end
 

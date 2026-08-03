@@ -471,12 +471,6 @@ class BParam < ApplicationRecord
     params["email_confirmation_email"]
   end
 
-  def email_confirmation_token_matches?(token)
-    return false if token.blank? || email_confirmation_token.blank? || email_confirmation_token_expired?
-
-    ActiveSupport::SecurityUtils.secure_compare(token, email_confirmation_token)
-  end
-
   # A blank token reads as expired - token_time floors at EARLIEST_TOKEN_TIME
   def email_confirmation_token_expired?
     SecurityTokenizer.token_time(email_confirmation_token) < Time.current - TOKEN_EXPIRATION

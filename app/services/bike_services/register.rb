@@ -35,13 +35,6 @@ module BikeServices
         .detect { |b| b.creator_id.blank? || b.creator_id == user&.id || b.created_bike_id.present? }
     end
 
-    # The registration the emailed confirmation link names. No window of its own - the
-    # confirmation token expires on its own clock, and a found registration is what lets
-    # an expired link say so (and send a new one) rather than dead-end
-    def find_for_confirmation(token)
-      BParam.find_by(id_token: token) if token.present?
-    end
-
     # An organization can be named in the URL after the registration starts
     # (/register?...&organization_id=slug), right up until the bike is created
     def assign_organization(b_param, organization)
@@ -159,7 +152,7 @@ module BikeServices
       return false if b_param.email_confirmation_sent_at.to_i > (Time.current - CONFIRMATION_EMAIL_INTERVAL).to_i
 
       b_param.generate_email_confirmation_token!
-      Email::RegisterConfirmationJob.perform_async(b_param.id)
+      Email::PartialRegistrationJob.perform_async(b_param.id, "partial_register_confirmation")
       true
     end
 

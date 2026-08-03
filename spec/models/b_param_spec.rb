@@ -884,14 +884,10 @@ RSpec.describe BParam, type: :model do
       expect(b_param.generate_email_confirmation_token!).to eq token
       expect(b_param.email_confirmation_sent_at).to be_within(2.seconds).of Time.current
 
-      expect(b_param.email_confirmation_token_matches?("nonmatching-token")).to be_falsey
-
-      expect(b_param.email_confirmation_token_matches?(token)).to be_truthy
       expect(b_param.confirm_email!(creator_id: user.id)).to be_truthy
+      # Single use - confirming spends the token, so there's nothing left to compare against
       expect(b_param.reload).to have_attributes(email_confirmed?: true,
         email_confirmation_token: nil, creator_id: user.id)
-      # Single use - the same token can't confirm again
-      expect(b_param.email_confirmation_token_matches?(token)).to be_falsey
     end
 
     context "with a creator" do
@@ -911,9 +907,8 @@ RSpec.describe BParam, type: :model do
           "email_confirmation_email" => b_param.owner_email))
       end
 
-      it "doesn't match, and mints a new token" do
+      it "reads as expired, and mints a new token" do
         expect(b_param.email_confirmation_token_expired?).to be_truthy
-        expect(b_param.email_confirmation_token_matches?(expired_token)).to be_falsey
 
         expect(b_param.generate_email_confirmation_token!).to_not eq expired_token
         expect(b_param.email_confirmation_token_expired?).to be_falsey
@@ -926,7 +921,7 @@ RSpec.describe BParam, type: :model do
       it "drops the token - it only proves the address it was mailed to" do
         b_param.clean_params({bike: {owner_email: "someone-else@example.com"}}.as_json)
         b_param.save!
-        expect(b_param.reload.email_confirmation_token_matches?(token)).to be_falsey
+        expect(b_param.reload.email_confirmation_token).to be_nil
 
         # A link for the new address is a new token
         expect(b_param.generate_email_confirmation_token!).to_not eq token
@@ -935,7 +930,7 @@ RSpec.describe BParam, type: :model do
       it "keeps the token when only the address's casing changes" do
         b_param.clean_params({bike: {owner_email: "Owner@Example.com"}}.as_json)
         b_param.save!
-        expect(b_param.reload.email_confirmation_token_matches?(token)).to be_truthy
+        expect(b_param.reload.email_confirmation_token).to eq token
       end
     end
   end

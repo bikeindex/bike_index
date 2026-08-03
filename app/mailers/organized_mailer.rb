@@ -14,8 +14,8 @@ class OrganizedMailer < ApplicationMailer
   end
 
   # The register flow's confirmation link - proves the address, and signs them in
-  def register_confirmation(b_param)
-    b_param_mail(b_param, Emails::RegisterConfirmation::Component.new(b_param:), tag: __callee__)
+  def partial_register_confirmation(b_param)
+    b_param_mail(b_param, Emails::PartialRegisterConfirmation::Component.new(b_param:), tag: __callee__)
   end
 
   def finished_registration(ownership)

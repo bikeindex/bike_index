@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Emails
-  module RegisterConfirmation
+  module PartialRegisterConfirmation
     class Component < ApplicationComponent
       def initialize(b_param:)
         @b_param = b_param

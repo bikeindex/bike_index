@@ -42,7 +42,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
   # The emailed link, minus the mailer's host - the app under test is on Capybara's
   def confirmation_link
-    Email::RegisterConfirmationJob.drain
+    Email::PartialRegistrationJob.drain
     url = ActionMailer::Base.deliveries.last.html_part.decoded[%r{https?://[^"]*/register/confirm[^"]*}]
     URI.parse(CGI.unescapeHTML(url)).request_uri
   end

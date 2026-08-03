@@ -2,7 +2,7 @@
 en:
   components:
     emails:
-      register_confirmation:
+      partial_register_confirmation:
         click_below_to_pick_up_where_you_left_off: Click below to confirm this email
           address and pick up where you left off.
         confirm_and_continue: Confirm my email

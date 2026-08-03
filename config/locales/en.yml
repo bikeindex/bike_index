@@ -4666,10 +4666,10 @@ en:
       subject: Confirm your %{organization_name}stolen %{bike_type}on Bike Index
     organization_invitation:
       subject: Join %{organization_name}on Bike Index
+    partial_register_confirmation:
+      subject: Confirm your email to finish your %{organization_name}registration
     partial_registration:
       subject: Finish your %{organization_name}Bike Index registration!
-    register_confirmation:
-      subject: Confirm your email to finish your %{organization_name}registration
   payments:
     form:
       donation_header: Help support our efforts!

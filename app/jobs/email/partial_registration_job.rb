@@ -1,21 +1,31 @@
 # frozen_string_literal: true
 
 module Email
+  # The emails a registration sends before it has a bike, and so before there's an account
+  # to notify - the address itself is all that's been entered, so every one of them runs
+  # the domain check first. kind names both the notification and the mailer method, and
+  # defaults so jobs enqueued before it existed still run
   class PartialRegistrationJob < ApplicationJob
-    include BParamNotification
-
     sidekiq_options queue: "notify", retry: 3
 
     # When we started creating notifications when sending partial registration emails PR#2368
     NOTIFICATION_STARTED = Time.at(1690677345).freeze # 2023-07-29 17:35:45
 
-    def perform(b_param_id)
-      b_param = BParam.find(b_param_id)
-      return if b_param.blank?
+    def perform(b_param_id, kind = "partial_registration")
+      b_param = BParam.find_by(id: b_param_id)
+      return if b_param.blank? || !kind.in?(Notification.b_param_kinds)
+      # confirm_email! spends the token, so a blank one means there's no link left to send
+      return if kind == "partial_register_confirmation" && b_param.email_confirmation_token.blank?
 
-      deliver_b_param_notification(b_param, kind: "partial_registration") do
-        OrganizedMailer.partial_registration(b_param).deliver_now
+      if EmailDomain::VERIFICATION_ENABLED
+        email_domain = EmailDomain.find_or_create_for(b_param.owner_email)
+
+        return b_param.destroy if email_domain&.banned?
+        return if email_domain&.provisional_ban?
       end
+
+      notification = Notification.create(kind:, message_channel: "email", notifiable: b_param)
+      notification.track_email_delivery { OrganizedMailer.public_send(kind, b_param).deliver_now }
     end
   end
 end

@@ -273,9 +273,9 @@ RSpec.describe RegisterController, type: :request do
 
     it "saves step 1, emails the confirmation link and redirects to step 2" do
       expect { post base_url, params: create_params }
-        .to change(Email::RegisterConfirmationJob.jobs, :size).by 1
+        .to change(Email::PartialRegistrationJob.jobs, :size).by 1
       expect(BParam.count).to eq 1
-      expect(Email::PartialRegistrationJob.jobs.size).to eq 0
+      expect(Email::PartialRegistrationJob).to have_enqueued_sidekiq_job(empty_b_param.id, "partial_register_confirmation")
       empty_b_param.reload
       expect(empty_b_param.email_confirmation_token).to be_present
       expect(empty_b_param).to have_attributes(origin: "register_flow", owner_email:,
@@ -976,7 +976,7 @@ RSpec.describe RegisterController, type: :request do
       it "confirms nothing, and emails a new link once the last one is old enough" do
         # The link went out moments ago, so this doesn't send a second
         expect { post "#{base_url}/confirm_email", params: wrong_params }
-          .to_not change(Email::RegisterConfirmationJob.jobs, :size)
+          .to_not change(Email::PartialRegistrationJob.jobs, :size)
         expect(b_param.reload.email_confirmed?).to be_falsey
         expect(flash[:error]).to be_present
         expect(response).to redirect_to step_path.call("2")
@@ -984,7 +984,7 @@ RSpec.describe RegisterController, type: :request do
         sent_at = Time.current - BikeServices::Register::CONFIRMATION_EMAIL_INTERVAL - 1.minute
         b_param.update(params: b_param.params.merge("email_confirmation_sent_at" => sent_at))
         expect { post "#{base_url}/confirm_email", params: wrong_params }
-          .to change(Email::RegisterConfirmationJob.jobs, :size).by 1
+          .to change(Email::PartialRegistrationJob.jobs, :size).by 1
       end
     end
 
