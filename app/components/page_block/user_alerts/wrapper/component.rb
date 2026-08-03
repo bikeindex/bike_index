@@ -40,13 +40,14 @@ module PageBlock
         # TODO: use existing user_alert to select correct phone
         def phone_waiting_confirmation_component
           user_phone = @current_user.user_phones.waiting_confirmation.reorder(:updated_at).last
-          return PhoneWaitingConfirmation::Component.new(user_phone:) if user_phone.present?
-
           # The slug is stale, so enqueue a job to update the user. Enqueuing doesn't write
           # to the DB, so it can be performed by a read replica
-          @current_user.skip_update = false # required for testing
-          @current_user.perform_user_update_jobs
-          nil
+          if user_phone.blank?
+            @current_user.skip_update = false # required for testing
+            @current_user.perform_user_update_jobs
+          end
+
+          PhoneWaitingConfirmation::Component.new(user_phone:)
         end
 
         def unfinished_b_param

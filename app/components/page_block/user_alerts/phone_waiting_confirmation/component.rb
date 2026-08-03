@@ -3,8 +3,8 @@
 module PageBlock
   module UserAlerts
     module PhoneWaitingConfirmation
-      # A bar across the bottom of the page opening the modal that takes the code texted
-      # to a phone the user added but hasn't confirmed
+      # Opens the modal that takes the code texted to a phone the user added but
+      # hasn't confirmed
       class Component < ApplicationComponent
         MODAL_ID = "confirm-phone-number"
 

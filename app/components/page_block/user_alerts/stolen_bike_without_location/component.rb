@@ -3,8 +3,6 @@
 module PageBlock
   module UserAlerts
     module StolenBikeWithoutLocation
-      # Opens on page load, linking each stolen registration missing a street to the
-      # theft details form
       class Component < ApplicationComponent
         MODAL_ID = "stolen-missing-location"
 

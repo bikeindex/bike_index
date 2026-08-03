@@ -102,12 +102,13 @@ class BParam < ApplicationRecord
   # register/new shells whose step 1 was never submitted (manufacturer is required
   # at submit) - only seeds and a prefilled email, nothing worth keeping
   scope :without_bike_values, -> { bike_params_empty.or(where(origin: "register_flow").where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
+  scope :unexpired, -> { where("created_at >= ?", Time.current - TOKEN_EXPIRATION) }
   # Tokenized lookups resume registrations for up to a month
   scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
-  scope :unexpired_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - TOKEN_EXPIRATION) }
+  scope :unexpired_with_token, ->(toke) { unexpired.where(id_token: toke) }
   # The complement of without_bike_values, within the window the token still resumes
   scope :unfinished_registrations, -> {
-    without_bike.where(origin: "register_flow").where("created_at >= ?", Time.current - TOKEN_EXPIRATION)
+    unexpired.without_bike.where(origin: "register_flow")
       .where("(params -> 'bike' -> 'manufacturer_id') IS NOT NULL")
   }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }

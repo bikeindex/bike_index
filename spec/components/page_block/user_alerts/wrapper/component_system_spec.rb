@@ -26,6 +26,8 @@ RSpec.describe PageBlock::UserAlerts::Wrapper::Component, :js, type: :system do
   it "has a preview scenario and a spec for every kind of alert" do
     scenarios = PageBlock::UserAlerts::Wrapper::ComponentPreview.public_instance_methods(false).map(&:to_s)
 
+    # The wrapper switches on general_kinds, so a kind there with no component renders nothing
+    expect(alert_names).to eq UserAlert.general_kinds.sort
     expect(alert_names).to eq alert_text.keys.sort
     alert_names.each do |alert|
       expect(scenarios).to include(alert), "UserAlerts::#{alert.camelize} has no preview scenario"

@@ -122,7 +122,10 @@ class UserAlert < ApplicationRecord
     slugs = where(user_id: user.id).active.distinct.pluck(:kind).sort
     return true if user.alert_slugs == slugs
 
-    user.update(alert_slugs: slugs, skip_update: true)
+    # Straight to the column: this runs in the register flow's request now, and User's
+    # uniqueness validations cost four selects before the update. updated_at explicitly,
+    # since the job bumps it to bust the cache
+    user.update_columns(alert_slugs: slugs, updated_at: Time.current)
   end
 
   def self.update_unfinished_registration(user:, b_param:)
