@@ -17,8 +17,8 @@ module UserServices
     #
 
     def create_confirmed(email)
-      password = SecurityTokenizer.new_password_token
-      user = User.new(skip_update: true, email:, password:, password_confirmation: password)
+      # passwordless_user: set_calculated_attributes is what gives them a digest
+      user = User.new(skip_update: true, passwordless_user: true, email:)
       user.save!
       user.confirm(user.confirmation_token)
       user

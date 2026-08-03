@@ -15,6 +15,14 @@ module UI
         def multiple
           render(UI::Alerts::FlashMessage::Component.new(flash: {notice: "Saved successfully", error: "But there was a warning"}))
         end
+
+        # A hash flash names a translation and the url its link points at, rather than
+        # carrying markup through the cookie
+        def with_link
+          render(UI::Alerts::FlashMessage::Component.new(flash: {
+            notice: {translation_key: :signed_in, url: "/users/update_password_form_with_reset_token"}
+          }))
+        end
       end
     end
   end

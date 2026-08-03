@@ -16,10 +16,11 @@ class CustomerMailer < ApplicationMailer
 
   def confirmation_email(user)
     @user = user
-    @partner = @user.partner_sign_up
+    @partner = @user.partner_sign_up # read by the email layout
+    component = Emails::ConfirmationEmail::Component.new(user:)
 
     I18n.with_locale(@user&.preferred_language) do
-      mail(to: @user.email, tag: __callee__)
+      mail(to: @user.email, tag: __callee__) { |format| format.html { render component } }
     end
   end
 

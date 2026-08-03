@@ -2,8 +2,8 @@
 
 require "rails_helper"
 
-RSpec.describe UI::Alert::Component, :js, type: :system do
-  let(:preview_path) { "/rails/view_components/ui/alert/component/#{kind}" }
+RSpec.describe UI::Alerts::Base::Component, :js, type: :system do
+  let(:preview_path) { "/rails/view_components/ui/alerts/base/component/#{kind}" }
 
   context "dismissable_error" do
     let(:kind) { "dismissable_error" }

@@ -36,7 +36,7 @@
 
   <% table.column(sortable: "activity_type", label: "Type") do |strava_activity| %>
     <% if strava_activity.cycling? %>
-      <span class="<%= UI::Alert::Component::TEXT_CLASSES[:success] %>">
+      <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">
         <%= strava_activity.activity_type %>
       </span>
     <% else %>
@@ -57,7 +57,7 @@
       <small><%= strava_activity.calculated_gear_name %></small>
       <% gear_assoc = strava_activity.strava_integration.strava_gears.find { |ga| ga.strava_id == strava_activity.gear_id } %>
       <% if gear_assoc&.item.present? %>
-        <%= link_to "BI", bike_path(gear_assoc.item), class: "small #{UI::Alert::Component::TEXT_CLASSES[:success]}", title: gear_assoc.item.title_string %>
+        <%= link_to "BI", bike_path(gear_assoc.item), class: "small #{UI::Alerts::Base::Component::TEXT_CLASSES[:success]}", title: gear_assoc.item.title_string %>
       <% end %>
     <% end %>
   <% end %>

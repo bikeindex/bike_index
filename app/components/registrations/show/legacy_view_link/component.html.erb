@@ -1,5 +1,5 @@
 <div class="tw:mt-2 tw:text-center">
-  <%= render(UI::Alert::Component.new(kind: :purple)) do %>
+  <%= render(UI::Alerts::Base::Component.new(kind: :purple)) do %>
     <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3">
       <span class="tw:font-semibold">
         <%= translation(".using_new_view", bike_type: @bike.type) %>
