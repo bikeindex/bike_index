@@ -72,8 +72,8 @@ class BParam < ApplicationRecord
     stolen
     street
   ].freeze
-  # How long a register flow registration resumes by token - and so how long its emailed
-  # confirmation link works, since a link outliving the registration it resumes is a dead end
+  # How long a register flow registration resumes by token, and so how long its
+  # emailed confirmation link works
   TOKEN_EXPIRATION = 90.days
   mount_uploader :image, ImageUploaderBackgrounded
   process_in_background :image, CarrierWaveProcessJob # Defer version generation so large uploads don't hit the 30s Rack::Timeout
@@ -100,7 +100,6 @@ class BParam < ApplicationRecord
   scope :without_bike_values, -> { bike_params_empty.or(where(origin: "register_flow").where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
   # Tokenized lookups resume registrations for up to a month
   scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
-  # The register flow's own (longer) window - see TOKEN_EXPIRATION
   scope :unexpired_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - TOKEN_EXPIRATION) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
@@ -448,8 +447,7 @@ class BParam < ApplicationRecord
     owner_email.present? && !email_confirmed?
   end
 
-  # Spends the confirmation token, so a forwarded email can't sign anyone in later.
-  # creator_id: assigned in the same write, the registration having proven who it's for
+  # Spends the confirmation token, so a forwarded email can't sign anyone in later
   def confirm_email!(creator_id: nil)
     return true if email_confirmed?
 
@@ -458,15 +456,13 @@ class BParam < ApplicationRecord
         .except("email_confirmation_token", "email_confirmation_email"))
   end
 
-  # The emailed link's credential. Distinct from id_token, which is in the registrant's
-  # own URL before any email goes out - only a secret that lived solely in the email
-  # proves the address received it. Nil once owner_email is edited to a different
-  # address, since all the token proves is that the one it was mailed to received it
+  # Distinct from id_token, which is in the registrant's own URL before any email goes
+  # out - only a secret that lived solely in the email proves the address received it,
+  # and only for the address it was mailed to
   def email_confirmation_token
     params["email_confirmation_token"] if email_confirmation_email == EmailNormalizer.normalize(owner_email)
   end
 
-  # The address the token in hand was mailed to
   def email_confirmation_email
     params["email_confirmation_email"]
   end
@@ -476,8 +472,8 @@ class BParam < ApplicationRecord
     SecurityTokenizer.token_time(email_confirmation_token) < Time.current - TOKEN_EXPIRATION
   end
 
-  # Resending reuses an unexpired token, so the link already in their inbox keeps working.
-  # The stamp is what rate limits resends, so it's rewritten either way
+  # Reuses an unexpired token, so the link already in their inbox keeps working - but
+  # re-stamps either way, since the stamp is what rate limits resends
   def generate_email_confirmation_token!
     token = email_confirmation_token_expired? ? SecurityTokenizer.new_token : email_confirmation_token
     update(params: params.merge("email_confirmation_token" => token,
@@ -486,8 +482,8 @@ class BParam < ApplicationRecord
     token
   end
 
-  # When a link last went out - written by whatever asked for the send, rather than by
-  # the job that delivers it, so it rate limits even when delivery drops the email
+  # Written by whatever asked for the send rather than by the job that delivers it,
+  # so it rate limits even when delivery drops the email
   def email_confirmation_sent_at
     Binxtils::TimeParser.parse(params["email_confirmation_sent_at"])
   end
@@ -682,7 +678,6 @@ class BParam < ApplicationRecord
     Manufacturer.calculated_mnfg_name(manufacturer, bike["manufacturer_other"])
   end
 
-  # What the registration's emails call the bike - everything entered that names it
   def color_and_brand
     [primary_frame_color.presence, mnfg_name].compact.join(" ")
   end

@@ -878,8 +878,7 @@ RSpec.describe BParam, type: :model do
       expect(token).to be_present
       expect(b_param.email_confirmation_sent_at).to be_within(2.seconds).of Time.current
 
-      # Resending reuses the token, so the link already sent keeps working - and
-      # re-stamps, since the stamp is what rate limits the resend
+      # Resending reuses the token, but re-stamps - the stamp is what rate limits it
       b_param.update(params: b_param.params.merge("email_confirmation_sent_at" => Time.current - 1.hour))
       expect(b_param.generate_email_confirmation_token!).to eq token
       expect(b_param.email_confirmation_sent_at).to be_within(2.seconds).of Time.current

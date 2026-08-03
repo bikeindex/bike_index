@@ -184,8 +184,7 @@ RSpec.describe "Register flow", :js, type: :system do
     bike = Bike.last
     expect(bike).to have_attributes(owner_email:, serial_number: "made_without_serial",
       status: "status_stolen", frame_model: "Marlin 7")
-    # Signed in as the account the link made - to anyone else this page would say the
-    # registration is the owner's to claim
+    # Signed in as the account the link made - to anyone else it reads as unclaimed
     expect(page).to have_content("keep watch")
 
     # An account nobody signed up for, so the terms are the first thing it's asked

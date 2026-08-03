@@ -7,7 +7,7 @@ class RegisterController < ApplicationController
   before_action -> { find_b_param(build: true) }, only: %i[create]
   # The emailed link resumes a registration the session knows nothing about
   before_action :find_b_param_for_confirmation, only: %i[confirm confirm_email]
-  # confirm renders a form and nothing else - neither is read before it posts itself
+  # confirm renders a self-posting form and nothing else, so it reads neither
   before_action :assign_organization, except: %i[new confirm]
   before_action :find_registration_sequence, except: %i[new confirm]
   before_action :redirect_finished, only: %i[create update acknowledge]
@@ -62,8 +62,7 @@ class RegisterController < ApplicationController
     if @b_param.errors.any?
       render Register::Step1::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:), status: :unprocessable_entity
     elsif @b_param.save
-      # Anonymous registrations need the address proven before there's a bike, and step 2
-      # says the link is on its way - so it goes out here, not at the end
+      # Step 2 says the link is on its way, so it goes out here rather than at the end
       BikeServices::Register.send_confirmation_email(@b_param)
       redirect_to step_path(2)
     else
@@ -109,8 +108,8 @@ class RegisterController < ApplicationController
     render Register::Confirm::Component.new(b_param: @b_param, token: params[:confirmation_token])
   end
 
-  # The confirmation itself: the address is proven, so the registration has an account
-  # behind it - created here if this is their first registration
+  # The confirmation itself - the proven address gets an account, created here if
+  # this is their first registration
   def confirm_email
     # Single use, so a second click has nothing left to do - the first one signed them in
     return redirect_to_current_step if @b_param.email_confirmed?
@@ -151,15 +150,13 @@ class RegisterController < ApplicationController
     BikeServices::Register.claim_creator(@b_param, current_user)
     bike = BikeServices::Register.create_bike_if_ready(@b_param,
       sequence: @registration_sequence, ip_address: forwarded_ip_address)
-    # Everything is saved on the b_param - the bike is created once the
-    # confirmation link from the registration email is clicked
+    # No bike yet - everything stays on the b_param until the emailed link is clicked
     return redirect_to_current_step if bike.blank?
 
     redirect_after_bike_creation(bike)
   end
 
-  # The account the confirmed address belongs to, created if it doesn't have one yet -
-  # passwordless, so it gets the same offer to set one as every other emailed sign in
+  # The account the confirmed address belongs to, created if it doesn't have one yet
   def sign_in_confirmed_user
     user, signed_up = UserServices::PasswordlessCreator.find_or_create(@b_param.owner_email)
     if user.blank? || user.banned?
@@ -203,11 +200,9 @@ class RegisterController < ApplicationController
     @registration_sequence = BikeServices::Register.registration_sequence(@b_param)
   end
 
-  # The emailed link carries the registration's token, so it resumes from any browser.
-  # Nothing is put in the session here - the token hasn't been checked yet, and dropping
-  # a registration already underway in this browser isn't the link's to do.
-  # No window like find_token's: the confirmation token expires on its own clock, and
-  # finding the registration is what lets an expired link say so rather than dead-end
+  # Not find_b_param: the emailed token authorizes this, not the session, and an expired
+  # link has to find its registration to say so rather than dead-end. Nothing is written
+  # to the session - the token hasn't been checked yet
   def find_b_param_for_confirmation
     token = params[:b_param_token]
     @b_param = BParam.find_by(id_token: token) if token.present?

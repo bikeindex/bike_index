@@ -37,9 +37,8 @@ module Sessionable
     end
   end
 
-  # Everything signing in does apart from deciding where to go next - so a flow with
-  # its own destination (the register flow's confirmation link) lands in the same
-  # session state as every other sign in
+  # Everything signing in does apart from deciding where to go next, for flows with
+  # a destination of their own
   def sign_in_user(user)
     confirm_user_from_claim_token(user)
     session[:last_seen] = Time.current

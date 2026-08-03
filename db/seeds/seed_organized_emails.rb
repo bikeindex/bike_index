@@ -235,9 +235,8 @@ unless transferred_bike_exists
   puts "  Created transferred bike ##{bike.id}"
 end
 
-# --- Registrations that never became bikes: the two emails a b_param sends.
-# Both are mid-flow states nothing else seeds, since every other seeded b_param
-# is only an input to BikeServices::Creator and ends up with a created bike. ---
+# --- Registrations that never became bikes: mid-flow states nothing else seeds,
+# since every other seeded b_param ends up with a created bike ---
 if BParam.partial_registrations.none?
   b_param = BParam.create!(origin: "embed_partial", params: {
     bike: {
@@ -251,10 +250,8 @@ if BParam.partial_registrations.none?
   puts "  Created partial registration b_param ##{b_param.id}"
 end
 
-# The register flow parks an anonymous registration here until the emailed link proves
-# the address - generate_email_confirmation_token! is what mints the credential.
-# Brakebills so the preview renders its snippets, though a registration for an
-# organization with an auto_user already has a creator and never sends this
+# Brakebills so the preview renders its snippets, though an organization with an
+# auto_user already has a creator and would never send this
 if BParam.where(origin: "register_flow").where("(params -> 'email_confirmation_token') IS NOT NULL").none?
   b_param = BParam.create!(origin: "register_flow", params: {
     bike: {

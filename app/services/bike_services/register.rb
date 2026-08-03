@@ -7,7 +7,6 @@ module BikeServices
 
     # Step "3" is the first of the e-vehicle acknowledgment pages
     ACKNOWLEDGMENT_OFFSET = 3
-    # How often a registration will email its confirmation link
     CONFIRMATION_EMAIL_INTERVAL = 5.minutes
 
     # The token's registration when step 1 was never submitted (redirecting into
@@ -134,9 +133,7 @@ module BikeServices
       ready_for_bike?(b_param, sequence:) && !creator_available?(b_param)
     end
 
-    # A link went to the address and nothing has proven it yet - what the steps tell
-    # the registrant to expect, and what makes their bike once they click it.
-    # user: whoever is looking, since being signed in as the address settles it too
+    # user: being signed in as the address settles it, without any link being clicked
     def confirmation_email_pending?(b_param, user: nil)
       return false if b_param.self_made?(user)
 
@@ -144,9 +141,8 @@ module BikeServices
     end
 
     # Anonymous registrations can't create a bike - Ownership needs a creator - so the
-    # address is emailed a link that proves it, makes an account and signs them in
-    # A resend can be asked for by anyone holding the registration's token, so the address
-    # it was entered for is only emailed this often
+    # address is emailed a link that proves it. Rate limited: anyone holding the
+    # registration's token can ask for a resend
     def send_confirmation_email(b_param)
       return false unless confirmation_email_pending?(b_param)
       return false if b_param.email_confirmation_sent_at.to_i > (Time.current - CONFIRMATION_EMAIL_INTERVAL).to_i
@@ -186,8 +182,6 @@ module BikeServices
       b_param.update(creator_id: user.id)
     end
 
-    # The bike everything has been waiting on - nil until the registration is complete
-    # and has a creator, which is what the confirmation link finally supplies
     def create_bike_if_ready(b_param, sequence:, ip_address:)
       return nil if b_param.with_bike? || !creator_available?(b_param) ||
         !ready_for_bike?(b_param, sequence:)
@@ -207,7 +201,6 @@ module BikeServices
     # private below here
     #
 
-    # Everything's entered - all that's missing is a creator
     def ready_for_bike?(b_param, sequence:)
       details_completed?(b_param) && acknowledged?(b_param, sequence:)
     end

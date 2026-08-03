@@ -13,7 +13,6 @@ class OrganizedMailer < ApplicationMailer
     b_param_mail(b_param, Emails::PartialRegistration::Component.new(b_param:), tag: __callee__)
   end
 
-  # The register flow's confirmation link - proves the address, and signs them in
   def partial_register_confirmation(b_param)
     b_param_mail(b_param, Emails::PartialRegisterConfirmation::Component.new(b_param:), tag: __callee__)
   end
@@ -118,8 +117,7 @@ class OrganizedMailer < ApplicationMailer
 
   private
 
-  # The emails a registration sends before it has a bike - addressed to whoever
-  # entered it, and subjected by the mailer method's own name
+  # Addressed to whoever entered the registration, and subjected by the caller's own name
   def b_param_mail(b_param, component, tag:)
     @organization = b_param.creation_organization
     mail(reply_to: reply_to,

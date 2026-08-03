@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 module Email
-  # The emails a registration sends before it has a bike, and so before there's an account
-  # to notify - the address itself is all that's been entered, so every one of them runs
-  # the domain check first. kind names both the notification and the mailer method, and
-  # defaults so jobs enqueued before it existed still run
+  # The emails a registration sends before it has a bike - only an address has been
+  # entered, so every one runs the domain check first. kind names both the notification
+  # and the mailer method, and defaults for jobs enqueued before it took one
   class PartialRegistrationJob < ApplicationJob
     sidekiq_options queue: "notify", retry: 3
 
