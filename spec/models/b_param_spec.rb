@@ -906,7 +906,10 @@ RSpec.describe BParam, type: :model do
 
     context "expired token" do
       let(:expired_token) { SecurityTokenizer.new_token(Time.current - BParam::TOKEN_EXPIRATION - 1.day) }
-      before { b_param.update(params: b_param.params.merge("email_confirmation_token" => expired_token)) }
+      before do
+        b_param.update(params: b_param.params.merge("email_confirmation_token" => expired_token,
+          "email_confirmation_email" => b_param.owner_email))
+      end
 
       it "doesn't match, and mints a new token" do
         expect(b_param.email_confirmation_token_expired?).to be_truthy
@@ -914,6 +917,25 @@ RSpec.describe BParam, type: :model do
 
         expect(b_param.generate_email_confirmation_token!).to_not eq expired_token
         expect(b_param.email_confirmation_token_expired?).to be_falsey
+      end
+    end
+
+    context "owner_email edited after the link went out" do
+      let!(:token) { b_param.generate_email_confirmation_token! }
+
+      it "drops the token - it only proves the address it was mailed to" do
+        b_param.clean_params({bike: {owner_email: "someone-else@example.com"}}.as_json)
+        b_param.save!
+        expect(b_param.reload.email_confirmation_token_matches?(token)).to be_falsey
+
+        # A link for the new address is a new token
+        expect(b_param.generate_email_confirmation_token!).to_not eq token
+      end
+
+      it "keeps the token when only the address's casing changes" do
+        b_param.clean_params({bike: {owner_email: "Owner@Example.com"}}.as_json)
+        b_param.save!
+        expect(b_param.reload.email_confirmation_token_matches?(token)).to be_truthy
       end
     end
   end

@@ -455,14 +455,20 @@ class BParam < ApplicationRecord
 
     update(creator_id: self.creator_id || creator_id,
       params: params.merge("email_confirmed_at" => Time.current)
-        .except("email_confirmation_token"))
+        .except("email_confirmation_token", "email_confirmation_email"))
   end
 
   # The emailed link's credential. Distinct from id_token, which is in the registrant's
   # own URL before any email goes out - only a secret that lived solely in the email
-  # proves the address received it
+  # proves the address received it. Nil once owner_email is edited to a different
+  # address, since all the token proves is that the one it was mailed to received it
   def email_confirmation_token
-    params["email_confirmation_token"]
+    params["email_confirmation_token"] if email_confirmation_email == EmailNormalizer.normalize(owner_email)
+  end
+
+  # The address the token in hand was mailed to
+  def email_confirmation_email
+    params["email_confirmation_email"]
   end
 
   def email_confirmation_token_matches?(token)
@@ -481,6 +487,7 @@ class BParam < ApplicationRecord
   def generate_email_confirmation_token!
     token = email_confirmation_token_expired? ? SecurityTokenizer.new_token : email_confirmation_token
     update(params: params.merge("email_confirmation_token" => token,
+      "email_confirmation_email" => EmailNormalizer.normalize(owner_email),
       "email_confirmation_sent_at" => Time.current))
     token
   end

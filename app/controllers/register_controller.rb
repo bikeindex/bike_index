@@ -124,7 +124,7 @@ class RegisterController < ApplicationController
     # Someone else's session stays theirs - the registration is still finished for the
     # address that was emailed, it just isn't that account's own
     if current_user.present?
-      flash[:info] = translation(:signed_in_as_other, email: current_user.email) unless @b_param.self_made?(current_user)
+      flash[:notice] = translation(:signed_in_as_other, email: current_user.email) unless @b_param.self_made?(current_user)
     elsif sign_in_confirmed_user.blank?
       return redirect_to_current_step
     end
@@ -166,6 +166,8 @@ class RegisterController < ApplicationController
       return nil
     end
 
+    # The link proved the address, so an account that had never confirmed it now has
+    user.confirm(user.confirmation_token) unless user.confirmed?
     sign_in_user(user)
     set_sign_in_flash(user, signed_up)
     @current_user = user

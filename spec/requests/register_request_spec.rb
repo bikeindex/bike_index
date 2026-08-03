@@ -1028,9 +1028,43 @@ RSpec.describe RegisterController, type: :request do
           # No account for the confirmed address - they're still signed in as themselves
           expect(User.count).to eq 1
           expect(Bike.last).to have_attributes(owner_email:, creator_id: current_user.id)
-          expect(flash[:info]).to be_present
           expect(response).to redirect_to step_path.call("finished")
+          follow_redirect!
+          expect(response.body).to include "signed in as #{current_user.email}"
         end
+      end
+    end
+
+    context "owner_email edited after the link went out" do
+      let!(:other_user) { FactoryBot.create(:user_confirmed, email: "someone-else@example.com") }
+      let(:step_1_params) { {b_param: {manufacturer_id: "Trek", cycle_type: "cargo", owner_email: other_user.email}} }
+
+      it "doesn't confirm the address the token was never mailed to" do
+        post base_url, params: step_1_params.merge(b_param_token: b_param.id_token)
+        expect(b_param.reload.owner_email).to eq other_user.email
+
+        expect { post "#{base_url}/confirm_email", params: confirm_params }
+          .to_not change(User, :count)
+        expect(b_param.reload.email_confirmed?).to be_falsey
+        expect(flash[:error]).to be_present
+        # Nobody signed in - the link only ever proved the address it was mailed to
+        get "/my_account"
+        expect(response.status).to eq 302
+      end
+    end
+
+    context "unconfirmed account for the address" do
+      let!(:unconfirmed_user) { FactoryBot.create(:user, email: owner_email) }
+
+      it "confirms it, since the link proved the address" do
+        expect { post "#{base_url}/confirm_email", params: confirm_params }
+          .to_not change(User, :count)
+        expect(unconfirmed_user.reload.confirmed).to be_truthy
+        expect(response).to redirect_to step_path.call("2")
+
+        # Actually signed in, rather than bounced to please_confirm_email
+        get "/my_account"
+        expect(response.status).to eq 200
       end
     end
   end
