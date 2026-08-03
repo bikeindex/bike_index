@@ -26,13 +26,10 @@ module UI
 
         private
 
-        # Anything outside KINDS is a caller bug -- it renders in a color it didn't ask for.
-        # Deployed envs report it rather than raising: sandbox is deployed too, and
-        # Rails.env.production? is false there (see config/environments/sandbox.rb)
         def normalized_kind(kind)
           return kind.to_sym if KINDS.include?(kind&.to_sym)
 
-          unless Rails.env.production? || Rails.env.sandbox?
+          unless Rails.env.production?
             raise ArgumentError, "unknown kind #{kind.inspect}, expected one of: #{KINDS.join(", ")}"
           end
 
@@ -41,8 +38,7 @@ module UI
         end
 
         # A float's box sits at the top of the line it shares, not on that line's
-        # baseline, so nudge it down onto one -- further for a header, whose larger
-        # type puts its baseline lower
+        # baseline, so nudge it down onto one -- further for a header
         def icon_classes
           @header.present? ? "tw:mt-[7px]" : "tw:mt-1"
         end
