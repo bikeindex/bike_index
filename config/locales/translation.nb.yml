@@ -2174,6 +2174,7 @@ nb:
       sessionable:
         sign_in_and_redirect:
           logged_in: Logget inn!
+          organization_signed_in: Du er logget inn
           user_is_banned: Vi beklager, men det ser ut til at kontoen din har blitt
             låst. Hvis du er usikker på årsakene til dette, vennligst kontakt oss.
         skip_if_signed_in:
@@ -2487,12 +2488,6 @@ nb:
         check_out_match_here: 'Sjekk kampen her:'
         we_think_your_stolen_bike: Vi kan ha funnet din stjålne %{bike_title}!
     confirmation_email:
-      html:
-        click_to_verify_html: Klikk på <em>Bekreft e-post-</em> knappen for å fullføre
-          registreringen!
-        please_confirm_your_email_address: Vennligst bekreft din epost-addresse
-        verify_email: Verifiser e-post
-        youre_almost_there: Du er nesten der!
       subject: Vennligst bekreft din Bike Index-e-post!
     invoice_email:
       html:
@@ -4772,14 +4767,14 @@ nb:
       enter_email_address: Skriv inn e-postadressen din, vi sender deg en e-post med
         en lenke for å logge inn.
       get_sign_in_link: Få påloggingslenke
-      if_not_click_button: Hvis du ikke er det, vennligst klikk på knappen nedenfor
       reenter_email: Vennligst skriv inn e-postadressen din på nytt for å motta et
         nytt token
-      sign_in: Logg inn
       sign_in_with_magic_link: Logg på uten passord
       unable_to_auth: Kan ikke autentisere det tokenet
-      you_should_be_signed_in_automatically: Du bør logges på automatisk.
       your_email_address: Din epostadresse
+    magic_link_sent:
+      follow_the_link_back: Følg lenken i e-posten for å logge på!
+      we_sent_a_magic_sign_in_link: Vi har sendt deg en magisk innloggingslenke
     new:
       email: e-post
       forgot_your_password: Glemt passordet?
@@ -5261,6 +5256,11 @@ nb:
       index:
         loading_results: Laster inn resultater...
   components:
+    sessions:
+      sign_in_interstitial:
+        if_not_click_button: Hvis du ikke er det, vennligst klikk på knappen nedenfor
+        sign_in: Logg inn
+        you_should_be_signed_in_automatically: Du bør logges på automatisk.
     search:
       everything_combobox:
         query_items_description: Søkebeskrivelser kombinasjonsboksen
@@ -5404,6 +5404,11 @@ nb:
         legal: Juridisk
         social_media: Sosiale medier
     emails:
+      confirmation_email:
+        click_to_sign_in_html: Klikk på <em>Logg på</em>-knappen for å fullføre registreringen!
+        follow_this_link_to_sign_in: Følg denne lenken for å logge på
+        sign_in: Logg på
+        youre_almost_there: Du er nesten der!
       partials:
         bike_box:
           bike_photo: Sykkelbilde

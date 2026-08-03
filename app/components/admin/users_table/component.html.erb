@@ -23,7 +23,7 @@
   <% end %>
 
   <% table.column(sortable: "deleted_at", classes: "deleted-cell tw:text-xs") do |user| %>
-    <span class="<%= UI::Alert::Component::TEXT_CLASSES[:error] %>">
+    <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">
       <%= render UI::Time::Component.new(time: user.deleted_at) %>
     </span>
   <% end %>

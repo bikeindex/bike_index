@@ -2222,6 +2222,7 @@ es:
       sessionable:
         sign_in_and_redirect:
           logged_in: "¡Sesión iniciada!"
+          organization_signed_in: Has iniciado sesión
           user_is_banned: Lo sentimos, pero parece que su cuenta ha sido bloqueada.
             Si desconoce el motivo, póngase en contacto con nosotros.
         skip_if_signed_in:
@@ -2553,13 +2554,6 @@ es:
         we_think_your_stolen_bike: "¡Puede que hayamos encontrado tu %{bike_title}
           robado!"
     confirmation_email:
-      html:
-        click_to_verify_html: ¡Haz clic en el botón <em>"Verificar correo electrónico"</em>
-          para finalizar el registro!
-        please_confirm_your_email_address: Por favor, confirme su dirección de correo
-          electrónico.
-        verify_email: Verificar correo electrónico
-        youre_almost_there: "¡Ya casi llegas!"
       subject: "¡Por favor, confirma tu correo electrónico de Bike Index!"
     invoice_email:
       html:
@@ -4988,14 +4982,14 @@ es:
       enter_email_address: Introduce tu dirección de correo electrónico y te enviaremos
         un correo con un enlace para iniciar sesión.
       get_sign_in_link: Obtener enlace de inicio de sesión
-      if_not_click_button: Si no lo eres, haz clic en el botón de abajo.
       reenter_email: Vuelva a introducir su dirección de correo electrónico para recibir
         un nuevo token.
-      sign_in: Iniciar sesión
       sign_in_with_magic_link: Inicio de sesión sin contraseña
       unable_to_auth: No se pudo autenticar ese token.
-      you_should_be_signed_in_automatically: Deberías iniciar sesión automáticamente.
       your_email_address: Su dirección de correo electrónico
+    magic_link_sent:
+      follow_the_link_back: '¡Sigue el enlace del correo electrónico para iniciar sesión!'
+      we_sent_a_magic_sign_in_link: Te hemos enviado un enlace mágico para iniciar sesión
     new:
       email: correo electrónico
       forgot_your_password: "¿Olvidaste tu contraseña?"
@@ -5510,6 +5504,11 @@ es:
       index:
         loading_results: Cargando resultados...
   components:
+    sessions:
+      sign_in_interstitial:
+        if_not_click_button: Si no lo eres, haz clic en el botón de abajo.
+        sign_in: Iniciar sesión
+        you_should_be_signed_in_automatically: Deberías iniciar sesión automáticamente.
     search:
       everything_combobox:
         query_items_description: Cuadro combinado de descripciones de búsqueda
@@ -5657,6 +5656,12 @@ es:
         legal: Legal
         social_media: Redes sociales
     emails:
+      confirmation_email:
+        click_to_sign_in_html: ¡Haz clic en el botón <em>Iniciar sesión</em> para finalizar
+          el registro!
+        follow_this_link_to_sign_in: Sigue este enlace para iniciar sesión
+        sign_in: Iniciar sesión
+        youre_almost_there: "¡Ya casi llegas!"
       partials:
         bike_box:
           bike_photo: Foto de bicicleta

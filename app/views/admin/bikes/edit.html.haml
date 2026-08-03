@@ -36,7 +36,7 @@
       %div{ data: { controller: "admin--bike-manufacturer", action: "hw-combobox:preselection->admin--bike-manufacturer#toggleWarning" } }
         = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :manufacturer_id, label_text: manufacturer_label, required: true)) do
           = render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, form: f, required: true)
-          %small{class: UI::Alert::Component::TEXT_CLASSES[:warning], hidden: !@bike.manufacturer&.other?, data: { "admin--bike-manufacturer-target": "warning" }}
+          %small{class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning], hidden: !@bike.manufacturer&.other?, data: { "admin--bike-manufacturer-target": "warning" }}
             Manufacturer is <em>Other</em>, this isn't a listed manufacturer
     .col-6.col-md-4.col-lg-3
       .form-group

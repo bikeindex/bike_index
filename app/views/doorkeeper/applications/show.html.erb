@@ -13,7 +13,7 @@
 </div>
 
 <% if @application.is_internal %>
-  <%= render(UI::Alert::Component.new(kind: :notice, text: "This application is internal — users are not prompted to authorize.")) %>
+  <%= render(UI::Alerts::Base::Component.new(kind: :notice, text: "This application is internal — users are not prompted to authorize.")) %>
 <% end %>
 
 <div class="row">

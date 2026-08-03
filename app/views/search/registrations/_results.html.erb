@@ -2,7 +2,7 @@
   <div class="row bikes-searched-default">
     <div class="col-md-12">
       <% if flash[:notice].present? %>
-        <%= render(UI::Alert::Component.new(text: flash[:notice], kind: :warning, dismissable: true)) %>
+        <%= render(UI::Alerts::Base::Component.new(text: flash[:notice], kind: :warning, dismissable: true)) %>
       <% end %>
 
       <% if @bikes.present? %>

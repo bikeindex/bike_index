@@ -136,7 +136,7 @@ RSpec.describe RegisterController, type: :request do
     it "redirects the bare /register" do
       get base_url
       expect(response).to redirect_to new_register_path
-      expect(flash[:info]).to be_nil
+      expect(flash[:notice]).to be_nil
 
       # How they arrived rides along - there's no registration yet to store it on
       get "#{base_url}?organization_id=brakebills&status=status_stolen&email=someone@example.com"
@@ -285,7 +285,7 @@ RSpec.describe RegisterController, type: :request do
       it "redirects to the start" do
         get register_path(b_param_token: "unknown-token", step: 1)
         expect(response).to redirect_to new_register_path
-        expect(flash[:info]).to be_present
+        expect(flash[:notice]).to be_present
       end
     end
   end
@@ -550,7 +550,7 @@ RSpec.describe RegisterController, type: :request do
       it "redirects to the start" do
         get register_path(b_param_token: "unknown-token")
         expect(response).to redirect_to new_register_path
-        expect(flash[:info]).to be_present
+        expect(flash[:notice]).to be_present
       end
     end
   end
@@ -746,7 +746,7 @@ RSpec.describe RegisterController, type: :request do
         it "does not find the registration" do
           patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
           expect(response).to redirect_to new_register_path
-          expect(flash[:info]).to be_present
+          expect(flash[:notice]).to be_present
         end
       end
     end
@@ -758,7 +758,7 @@ RSpec.describe RegisterController, type: :request do
         }.to_not change(BParam, :count)
         expect(Bike.count).to eq 0
         expect(response).to redirect_to new_register_path
-        expect(flash[:info]).to be_present
+        expect(flash[:notice]).to be_present
       end
     end
   end

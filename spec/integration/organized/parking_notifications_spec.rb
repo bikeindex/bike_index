@@ -139,9 +139,7 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     registered = bike.reload.parking_notifications.first
     expect(registered.kind).to eq "parked_incorrectly_notification"
 
-    # Dismiss the flash so it can't intercept the org submenu/nav clicks below.
-    find(".alert-success .close").click
-    expect(page).to have_no_css(".alert-success", wait: 10)
+    dismiss_flash_messages
 
     find("#passive_organization_submenu").click
     within(".current-organization-submenu") { click_link "Parking notifications" }

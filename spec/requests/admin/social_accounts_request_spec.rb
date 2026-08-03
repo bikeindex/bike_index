@@ -64,7 +64,7 @@ RSpec.describe Admin::SocialAccountsController, type: :request, vcr: true do
 
         expect(response).to redirect_to(admin_social_accounts_url)
         expect(flash[:error]).to be_blank
-        expect(flash[:info]).to match("deleted")
+        expect(flash[:notice]).to match("deleted")
       end
     end
 
@@ -78,7 +78,7 @@ RSpec.describe Admin::SocialAccountsController, type: :request, vcr: true do
         delete "#{base_url}/#{social_account.id}"
 
         expect(response).to redirect_to(edit_admin_social_account_url(social_account))
-        expect(flash[:info]).to be_blank
+        expect(flash[:notice]).to be_blank
         expect(flash[:error]).to match("Could not delete")
       end
     end

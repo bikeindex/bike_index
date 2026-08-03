@@ -5,7 +5,9 @@ module Registrations
     module Wrapper
       # The whole registration show page, one scenario per overlay it can raise. These
       # render a persisted bike — the page is far too query-heavy for an in-memory one — so
-      # they're gated out of production, where the bikes would be someone's real ones
+      # they're gated out of production, where the bikes would be someone's real ones.
+      # The claim-impound card's states preview from ClaimImpound::ComponentPreview,
+      # which inherits #page from here
       class ComponentPreview < ApplicationComponentPreview
         # @param view select [consumer, org_admin]
         # @param bike_id text "Bike to render — defaults to one of the org's"
@@ -75,9 +77,10 @@ module Registrations
 
         private
 
-        # The block builds the alerts off the resolved bike, or returns :missing
-        def page(view:, bike_id:, bike_sticker: nil, current_user: lookbook_user)
-          return production_notice if Rails.env.production?
+        # The block builds the alerts off the resolved bike, or returns :missing.
+        # as_view pins the perspective for a scenario that only makes sense in one
+        def page(bike_id:, view: nil, bike_sticker: nil, current_user: lookbook_user, as_view: nil)
+          return production_notice("registration") if Rails.env.production?
 
           bike = preview_bike(bike_id)
           return missing_notice("a bike") if bike.blank?
@@ -87,7 +90,7 @@ module Registrations
 
           available_views = ::BikeServices::ShowViews.available(bike:, current_user:,
             organization: lookbook_organization)
-          resolved = resolved_view(view, available_views, bike:, current_user:)
+          resolved = as_view || resolved_view(view, available_views, bike:, current_user:)
           component = Component.new(bike:, current_user:, view: resolved, available_views:,
             bike_sticker:, current_alerts:)
 
@@ -109,6 +112,11 @@ module Registrations
           ::Bike.unscoped.find_by(id: bike_id) || bike_with_ownership(claimed: true)
         end
 
+        def bike_with_ownership(claimed:)
+          owned = ::Ownership.current.where(claimed:).select(:bike_id)
+          org_bikes.where(id: owned).last || ::Bike.unscoped.where(id: owned).last
+        end
+
         def org_bikes
           lookbook_organization&.bikes || ::Bike.none
         end
@@ -125,21 +133,6 @@ module Registrations
         def bike_sticker(bike_id)
           assigned = ::BikeSticker.where.not(bike_id: nil)
           (bike_id.present? ? assigned.where(bike_id:).last : nil) || assigned.last
-        end
-
-        def bike_with_ownership(claimed:)
-          owned = ::Ownership.current.where(claimed:).select(:bike_id)
-          org_bikes.where(id: owned).last || ::Bike.unscoped.where(id: owned).last
-        end
-
-        def production_notice
-          render(UI::Alert::Component.new(kind: :error,
-            text: "This preview renders a real registration, so it's disabled in production."))
-        end
-
-        def missing_notice(needed)
-          render(UI::Alert::Component.new(kind: :warning,
-            text: "Nothing to preview — this environment has no #{needed}."))
         end
       end
     end

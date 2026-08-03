@@ -32,6 +32,14 @@ Scope specs the same way — the ones covering what the branch changed, never a 
 
 Then review the changed files against the repo's `CLAUDE.md` (root and any nested ones in touched directories) and fix anything that doesn't conform — code-style guidelines (functional style, no argument mutation, omitted hash values like `{x:}`, private methods, unabbreviated names, pithy comments), testing conventions, and frontend rules. Only touch lines this branch already changed; don't reformat unrelated code.
 
+Then check the branch's translations for a hardcoded "bike" where the string means the registration's cycle type — a registration is as often an e-scooter, a stroller or a wheelchair:
+
+```bash
+git diff "origin/$BASE"...HEAD -- '*.en.yml' 'config/locales/en.yml' | grep -in '^+.*bike'
+```
+
+Read each hit. Key names (`about_this_bike:`), the product name ("Bike Index"), and copy that really is bike-only are fine; a value saying "bike" about the registration is not. Fix it by interpolating `%{bike_type}` in the value and passing `bike_type: bike.type` at the call site — `Registrations::Show::CurrentAlerts::ClaimImpound` and `Registrations::Show::WrapperConsumer` are the pattern, and `spec/components/registrations/show/current_alerts/claim_impound/component_spec.rb` shows how to cover it. After hand-editing a `component.en.yml`, run `bundle exec rails prepare_translations` — `bin/lint` doesn't normalize YAML.
+
 Commit these edits before continuing — step 1's `git merge` needs a clean working tree, and committing here is what lets the step 0 edits ride along the merge as ordinary branch commits (which step 3 then pushes).
 
 ### 0.5. Determine the base branch

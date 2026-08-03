@@ -65,7 +65,7 @@ module Admin
 
     def destroy
       if @social_post.present? && @social_post.destroy
-        flash[:info] = "Post deleted."
+        flash[:notice] = "Post deleted."
         redirect_to admin_social_posts_url
       else
         flash[:error] = "Could not delete post."

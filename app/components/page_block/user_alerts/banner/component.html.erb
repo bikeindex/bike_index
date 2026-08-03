@@ -1,7 +1,7 @@
 <%# container, so it lines up with the navbar above it and the page content below %>
 
 <div class="container">
-  <%= render UI::Alert::Component.new(kind: :notice) do %>
+  <%= render UI::Alerts::Base::Component.new do %>
     <%= link_to @text, @href, data: @data, class: "twlink" %>
   <% end %>
 </div>

@@ -271,6 +271,7 @@
       <%= render PageBlock::UserAlerts::Wrapper::Component.new(current_user:) %>
     <% end %>
 
+    <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
     <%= render partial: "/layouts/revised_messages" %>
 
     <%# The strava_search SPA (where @strava_search_config is set) renders its own <main>, so skip this landmark to avoid nesting %>

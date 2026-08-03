@@ -1,0 +1,15 @@
+<h1 class="center-text" style="margin-top: 2rem;">
+  <%= translation("youre_almost_there") %>
+</h1>
+
+<h3 class="center-text" style="margin: 2rem 0 3rem;">
+  <%= translation("follow_this_link_to_sign_in") %>
+</h3>
+
+<%= link_to translation("sign_in"), tokenized_url, "data-pm-no-track" => true, class: "binx-button" %>
+
+<% unless @partner %>
+  <p class="less-strong center-text">
+    <%= translation("click_to_sign_in_html") %>
+  </p>
+<% end %>

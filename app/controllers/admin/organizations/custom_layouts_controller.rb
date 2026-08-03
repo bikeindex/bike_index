@@ -44,7 +44,7 @@ module Admin
       def find_and_authorize_organization
         @organization = Organization.friendly_find(params[:organization_id])
         unless current_user.developer?
-          flash[:info] = "Sorry, you must be a developer to access that page."
+          flash[:notice] = "Sorry, you must be a developer to access that page."
           redirect_to(admin_organization_url(@organization)) && return
         end
         unless @organization

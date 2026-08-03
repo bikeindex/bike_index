@@ -129,7 +129,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
           expect {
             get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true, directly_create_export: 1}
           }.to change(Export, :count).by 1
-          expect(flash[:info]).to be_present
+          expect(flash[:notice]).to be_present
           export = Export.last
           expect(export.organization_id).to eq current_organization.id
           expect(export.kind).to eq "organization"

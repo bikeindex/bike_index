@@ -34,6 +34,7 @@
 #  partner_data                       :jsonb
 #  password                           :text
 #  password_digest                    :string(255)
+#  passwordless_user                  :boolean          default(FALSE), not null
 #  phone                              :string(255)
 #  preferred_language                 :string
 #  show_bikes                         :boolean          default(FALSE), not null
@@ -261,6 +262,11 @@ class User < ApplicationRecord
 
   def unconfirmed?
     !confirmed?
+  end
+
+  # Their organization signs them in (magic link or IdP), so they have no reason to set a password
+  def organization_passwordless_user?
+    passwordless_user? && organizations.any?(&:passwordless_user_creation?)
   end
 
   # Performed inline
@@ -544,6 +550,8 @@ class User < ApplicationRecord
   end
 
   def set_calculated_attributes
+    # Passwordless users sign in by emailed link, but has_secure_password still requires a digest
+    self.password = SecurityTokenizer.new_password_token if passwordless_user? && password_digest.blank?
     self.preferred_language = nil if preferred_language.blank?
     self.phone = Phonifyer.phonify(phone)
     self.alert_slugs = (alert_slugs || [])
