@@ -867,4 +867,70 @@ RSpec.describe BParam, type: :model do
       end
     end
   end
+
+  describe "email confirmation token" do
+    let(:b_param) { BParam.create(params: {bike: {owner_email: "owner@example.com"}}) }
+
+    let(:user) { FactoryBot.create(:user_confirmed) }
+
+    it "mints a token, reuses it and spends it on confirmation" do
+      token = b_param.generate_email_confirmation_token!
+      expect(token).to be_present
+      expect(b_param.email_confirmation_sent_at).to be_within(2.seconds).of Time.current
+
+      # Resending reuses the token, but re-stamps - the stamp is what rate limits it
+      b_param.update(params: b_param.params.merge("email_confirmation_sent_at" => Time.current - 1.hour))
+      expect(b_param.generate_email_confirmation_token!).to eq token
+      expect(b_param.email_confirmation_sent_at).to be_within(2.seconds).of Time.current
+
+      expect(b_param.confirm_email!(creator_id: user.id)).to be_truthy
+      # Single use - confirming spends the token, so there's nothing left to compare against
+      expect(b_param.reload).to have_attributes(email_confirmed?: true,
+        email_confirmation_token: nil, creator_id: user.id)
+    end
+
+    context "with a creator" do
+      let(:creator) { FactoryBot.create(:user_confirmed) }
+      before { b_param.update(creator_id: creator.id) }
+
+      it "keeps the creator it has" do
+        b_param.confirm_email!(creator_id: user.id)
+        expect(b_param.reload.creator_id).to eq creator.id
+      end
+    end
+
+    context "expired token" do
+      let(:expired_token) { SecurityTokenizer.new_token(Time.current - BParam::TOKEN_EXPIRATION - 1.day) }
+      before do
+        b_param.update(params: b_param.params.merge("email_confirmation_token" => expired_token,
+          "email_confirmation_email" => b_param.owner_email))
+      end
+
+      it "reads as expired, and mints a new token" do
+        expect(b_param.email_confirmation_token_expired?).to be_truthy
+
+        expect(b_param.generate_email_confirmation_token!).to_not eq expired_token
+        expect(b_param.email_confirmation_token_expired?).to be_falsey
+      end
+    end
+
+    context "owner_email edited after the link went out" do
+      let!(:token) { b_param.generate_email_confirmation_token! }
+
+      it "drops the token - it only proves the address it was mailed to" do
+        b_param.clean_params({bike: {owner_email: "someone-else@example.com"}}.as_json)
+        b_param.save!
+        expect(b_param.reload.email_confirmation_token).to be_nil
+
+        # A link for the new address is a new token
+        expect(b_param.generate_email_confirmation_token!).to_not eq token
+      end
+
+      it "keeps the token when only the address's casing changes" do
+        b_param.clean_params({bike: {owner_email: "Owner@Example.com"}}.as_json)
+        b_param.save!
+        expect(b_param.reload.email_confirmation_token).to eq token
+      end
+    end
+  end
 end

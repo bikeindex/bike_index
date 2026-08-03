@@ -72,6 +72,9 @@ class BParam < ApplicationRecord
     stolen
     street
   ].freeze
+  # How long a register flow registration resumes by token, and so how long its
+  # emailed confirmation link works
+  TOKEN_EXPIRATION = 90.days
   mount_uploader :image, ImageUploaderBackgrounded
   process_in_background :image, CarrierWaveProcessJob # Defer version generation so large uploads don't hit the 30s Rack::Timeout
 
@@ -97,6 +100,7 @@ class BParam < ApplicationRecord
   scope :without_bike_values, -> { bike_params_empty.or(where(origin: "register_flow").where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
   # Tokenized lookups resume registrations for up to a month
   scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
+  scope :unexpired_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - TOKEN_EXPIRATION) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
   scope :cycle_type_bike, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NULL").or(bike_params_empty) }
@@ -443,8 +447,41 @@ class BParam < ApplicationRecord
     owner_email.present? && !email_confirmed?
   end
 
-  def confirm_email!
-    email_confirmed? || update(params: params.merge("email_confirmed_at" => Time.current))
+  # Spends the confirmation token, so a forwarded email can't sign anyone in later
+  def confirm_email!(creator_id: nil)
+    return true if email_confirmed?
+
+    update(creator_id: self.creator_id || creator_id,
+      params: params.merge("email_confirmed_at" => Time.current)
+        .except("email_confirmation_token", "email_confirmation_email"))
+  end
+
+  # Distinct from id_token, which is in the registrant's own URL before any email goes
+  # out - only a secret that lived solely in the email proves the address received it,
+  # and only for the address it was mailed to
+  def email_confirmation_token
+    params["email_confirmation_token"] if params["email_confirmation_email"] == EmailNormalizer.normalize(owner_email)
+  end
+
+  # A blank token reads as expired - token_time floors at EARLIEST_TOKEN_TIME
+  def email_confirmation_token_expired?
+    SecurityTokenizer.token_time(email_confirmation_token) < Time.current - TOKEN_EXPIRATION
+  end
+
+  # Reuses an unexpired token, so the link already in their inbox keeps working - but
+  # re-stamps either way, since the stamp is what rate limits resends
+  def generate_email_confirmation_token!
+    token = email_confirmation_token_expired? ? SecurityTokenizer.new_token : email_confirmation_token
+    update(params: params.merge("email_confirmation_token" => token,
+      "email_confirmation_email" => EmailNormalizer.normalize(owner_email),
+      "email_confirmation_sent_at" => Time.current))
+    token
+  end
+
+  # Written by whatever asked for the send rather than by the job that delivers it,
+  # so it rate limits even when delivery drops the email
+  def email_confirmation_sent_at
+    Binxtils::TimeParser.parse(params["email_confirmation_sent_at"])
   end
 
   # An ActiveStorage blob the browser uploaded straight to the bucket. Held as a signed id
@@ -635,6 +672,10 @@ class BParam < ApplicationRecord
 
   def mnfg_name
     Manufacturer.calculated_mnfg_name(manufacturer, bike["manufacturer_other"])
+  end
+
+  def color_and_brand
+    [primary_frame_color.presence, mnfg_name].compact.join(" ")
   end
 
   def generate_id_token
