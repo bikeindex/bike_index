@@ -4982,13 +4982,10 @@ es:
       enter_email_address: Introduce tu dirección de correo electrónico y te enviaremos
         un correo con un enlace para iniciar sesión.
       get_sign_in_link: Obtener enlace de inicio de sesión
-      if_not_click_button: Si no lo eres, haz clic en el botón de abajo.
       reenter_email: Vuelva a introducir su dirección de correo electrónico para recibir
         un nuevo token.
-      sign_in: Iniciar sesión
       sign_in_with_magic_link: Inicio de sesión sin contraseña
       unable_to_auth: No se pudo autenticar ese token.
-      you_should_be_signed_in_automatically: Deberías iniciar sesión automáticamente.
       your_email_address: Su dirección de correo electrónico
     magic_link_sent:
       follow_the_link_back: '¡Sigue el enlace del correo electrónico para iniciar sesión!'
@@ -5507,6 +5504,11 @@ es:
       index:
         loading_results: Cargando resultados...
   components:
+    sessions:
+      sign_in_interstitial:
+        if_not_click_button: Si no lo eres, haz clic en el botón de abajo.
+        sign_in: Iniciar sesión
+        you_should_be_signed_in_automatically: Deberías iniciar sesión automáticamente.
     search:
       everything_combobox:
         query_items_description: Cuadro combinado de descripciones de búsqueda

@@ -219,6 +219,20 @@ RSpec.describe SessionsController, type: :request do
     end
   end
 
+  describe "magic_link" do
+    let!(:user) { FactoryBot.create(:user_confirmed) }
+
+    # The emailed link is a GET, so it only renders the form that signs in
+    it "renders the interstitial without spending the token" do
+      token = user.refreshed_magic_link_token
+      get "/session/magic_link", params: {token:}
+      expect(response).to render_template(:magic_link)
+      expect(user.reload.magic_link_token).to be_present
+      expect(Capybara.string(response.body))
+        .to have_css("form[action='/session/sign_in_with_magic_link'] input[name='token'][value='#{token}']", visible: :hidden)
+    end
+  end
+
   describe "sign_in_with_magic_link" do
     let!(:superadmin) { FactoryBot.create(:superuser) }
 

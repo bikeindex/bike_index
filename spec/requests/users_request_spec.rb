@@ -22,11 +22,32 @@ RSpec.describe UsersController, type: :request do
       user = User.order(:created_at).last
       expect(user.passwordless_user?).to be_truthy
 
+      # The emailed link is a GET, so it only renders the form that confirms
       get "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token}
+      expect(response).to render_template(:confirm_interstitial)
+      expect(user.reload.confirmed?).to be_falsey
+      expect(Capybara.string(response.body))
+        .to have_css("form[action='#{base_url}/confirm'] input[name='code'][value='#{user.confirmation_token}']", visible: :hidden)
+
+      post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token}
       expect(response).to redirect_to my_account_url
       follow_redirect!
       expect(Capybara.string(response.body))
         .to have_link("set password to sign in", href: update_password_form_with_reset_token_users_path)
+    end
+
+    context "with partner" do
+      it "carries the partner through the interstitial" do
+        post base_url, params: {user: {email:, name: "Test name", terms_of_service: "1"}, partner: "bikehub"}
+        user = User.order(:created_at).last
+
+        get "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
+        expect(Capybara.string(response.body))
+          .to have_css("input[name='partner'][value='bikehub']", visible: :hidden)
+
+        post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
+        expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
+      end
     end
   end
 

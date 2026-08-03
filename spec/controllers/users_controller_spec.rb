@@ -309,7 +309,7 @@ RSpec.describe UsersController, type: :controller do
   describe "confirm" do
     describe "user exists" do
       it "tells the user to log in when already confirmed" do
-        get :confirm, params: {id: user.id, code: "wtfmate"}
+        post :confirm, params: {id: user.id, code: "wtfmate"}
         expect(response).to redirect_to new_session_url
       end
 
@@ -317,7 +317,7 @@ RSpec.describe UsersController, type: :controller do
         let!(:user) { FactoryBot.create(:user) }
 
         it "logins and redirect when confirmation succeeds" do
-          get :confirm, params: {id: user.id, code: user.confirmation_token}
+          post :confirm, params: {id: user.id, code: user.confirmation_token}
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(response).to redirect_to my_account_url
           expect(session[:partner]).to be_nil
@@ -329,7 +329,7 @@ RSpec.describe UsersController, type: :controller do
           let!(:user) { FactoryBot.create(:user, passwordless_user: true) }
 
           it "offers to set a password" do
-            get :confirm, params: {id: user.id, code: user.confirmation_token}
+            post :confirm, params: {id: user.id, code: user.confirmation_token}
             expect(User.from_auth(cookies.signed[:auth])).to eq(user)
             expect(response).to redirect_to my_account_url
             expect(flash[:success]).to be_blank
@@ -341,7 +341,7 @@ RSpec.describe UsersController, type: :controller do
             let!(:organization_role) { FactoryBot.create(:organization_role_claimed, organization:, user:) }
 
             it "doesn't offer to set a password" do
-              get :confirm, params: {id: user.id, code: user.confirmation_token}
+              post :confirm, params: {id: user.id, code: user.confirmation_token}
               expect(flash[:success]).to eq "You're signed in"
               expect(flash[:notice]).to be_blank
             end
@@ -350,7 +350,7 @@ RSpec.describe UsersController, type: :controller do
 
         context "with partner" do
           it "logins and redirect when confirmation succeeds" do
-            get :confirm, params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
+            post :confirm, params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
             expect(User.from_auth(cookies.signed[:auth])).to eq(user)
             expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
             expect(session[:partner]).to be_nil
@@ -358,7 +358,7 @@ RSpec.describe UsersController, type: :controller do
           context "in session" do
             it "logins and redirect when confirmation succeeds" do
               session[:partner] = "bikehub"
-              get :confirm, params: {id: user.id, code: user.confirmation_token}
+              post :confirm, params: {id: user.id, code: user.confirmation_token}
               expect(User.from_auth(cookies.signed[:auth])).to eq(user)
               expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
               expect(session[:partner]).to be_nil
@@ -368,7 +368,7 @@ RSpec.describe UsersController, type: :controller do
             it "redirects" do
               expect(user.confirmed?).to be_falsey
               set_current_user(user)
-              get :confirm, params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
+              post :confirm, params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
               user.reload
               expect(User.from_auth(cookies.signed[:auth])).to eq(user)
               expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
@@ -379,7 +379,7 @@ RSpec.describe UsersController, type: :controller do
         end
 
         it "shows a view when confirmation fails" do
-          get :confirm, params: {id: user.id, code: "Wtfmate"}
+          post :confirm, params: {id: user.id, code: "Wtfmate"}
           expect(response).to render_template :confirm_error_bad_token
         end
       end
@@ -401,7 +401,7 @@ RSpec.describe UsersController, type: :controller do
           request.env["HTTP_CF_CONNECTING_IP"] = "169.99.69.2"
           user.reload
           expect(user.confirmed?).to be_falsey
-          get :confirm, params: {id: user.id, code: user.confirmation_token}
+          post :confirm, params: {id: user.id, code: user.confirmation_token}
           expect(response).to redirect_to my_account_url
           expect(session[:partner]).to be_nil
           expect_confirmed_and_set_ip(user)
@@ -414,7 +414,7 @@ RSpec.describe UsersController, type: :controller do
             request.env["HTTP_CF_CONNECTING_IP"] = "169.99.69.2"
             expect(user.confirmed?).to be_falsey
             expect(session[:passive_organization_id]).to be_blank
-            get :confirm, params: {id: user.id, code: user.confirmation_token}
+            post :confirm, params: {id: user.id, code: user.confirmation_token}
             expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
             expect(session[:passive_organization_id]).to eq organization.id
             expect_confirmed_and_set_ip(user)
@@ -429,7 +429,7 @@ RSpec.describe UsersController, type: :controller do
       it "redirects" do
         expect(user.confirmed?).to be_truthy
         Sidekiq::Job.clear_all
-        get :confirm, params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
+        post :confirm, params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
         expect(User.from_auth(cookies.signed[:auth])).to eq(user)
         expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
         expect(session[:partner]).to be_nil
@@ -437,7 +437,7 @@ RSpec.describe UsersController, type: :controller do
     end
 
     it "shows an appropriate message when the user is nil" do
-      get :confirm, params: {id: 1234, code: "Wtfmate"}
+      post :confirm, params: {id: 1234, code: "Wtfmate"}
       expect(response).to render_template :confirm_error_404
     end
   end

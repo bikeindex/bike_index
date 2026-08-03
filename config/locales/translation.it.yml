@@ -5003,13 +5003,10 @@ it:
       enter_email_address: Inserisci il tuo indirizzo email, ti invieremo un'email
         con un link per accedere.
       get_sign_in_link: Ottieni il link di accesso
-      if_not_click_button: Se non lo sei, fai clic sul pulsante qui sotto
       reenter_email: Inserisci nuovamente il tuo indirizzo email per ricevere un nuovo
         token.
-      sign_in: Registrazione
       sign_in_with_magic_link: Accesso senza password
       unable_to_auth: Impossibile autenticare il token
-      you_should_be_signed_in_automatically: Dovresti essere connesso automaticamente.
       your_email_address: Il tuo indirizzo di posta elettronica
     magic_link_sent:
       follow_the_link_back: Segui il link nella email per accedere!
@@ -5521,6 +5518,11 @@ it:
       index:
         loading_results: Caricamento dei risultati...
   components:
+    sessions:
+      sign_in_interstitial:
+        if_not_click_button: Se non lo sei, fai clic sul pulsante qui sotto
+        sign_in: Registrazione
+        you_should_be_signed_in_automatically: Dovresti essere connesso automaticamente.
     search:
       everything_combobox:
         query_items_description: Casella combinata delle descrizioni di ricerca

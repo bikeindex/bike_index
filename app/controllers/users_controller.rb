@@ -55,7 +55,11 @@ class UsersController < ApplicationController
     redirect_to please_confirm_email_users_path
   end
 
+  # Confirming signs the user in, so the emailed GET only renders a form that posts here —
+  # a scanner or prefetcher following the link doesn't spend the confirmation token
   def confirm
+    return render_partner_or_default_signin_layout(render_action: :confirm_interstitial) unless request.post?
+
     @user = User.find(params[:id])
     if @user.confirmed?
       flash[:success] = translation(:already_confirmed)

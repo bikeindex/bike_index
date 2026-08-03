@@ -4767,13 +4767,10 @@ nb:
       enter_email_address: Skriv inn e-postadressen din, vi sender deg en e-post med
         en lenke for å logge inn.
       get_sign_in_link: Få påloggingslenke
-      if_not_click_button: Hvis du ikke er det, vennligst klikk på knappen nedenfor
       reenter_email: Vennligst skriv inn e-postadressen din på nytt for å motta et
         nytt token
-      sign_in: Logg inn
       sign_in_with_magic_link: Logg på uten passord
       unable_to_auth: Kan ikke autentisere det tokenet
-      you_should_be_signed_in_automatically: Du bør logges på automatisk.
       your_email_address: Din epostadresse
     magic_link_sent:
       follow_the_link_back: Følg lenken i e-posten for å logge på!
@@ -5259,6 +5256,11 @@ nb:
       index:
         loading_results: Laster inn resultater...
   components:
+    sessions:
+      sign_in_interstitial:
+        if_not_click_button: Hvis du ikke er det, vennligst klikk på knappen nedenfor
+        sign_in: Logg inn
+        you_should_be_signed_in_automatically: Du bør logges på automatisk.
     search:
       everything_combobox:
         query_items_description: Søkebeskrivelser kombinasjonsboksen
