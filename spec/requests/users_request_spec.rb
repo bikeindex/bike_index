@@ -12,6 +12,45 @@ RSpec.describe UsersController, type: :request do
     end
   end
 
+  describe "create" do
+    let(:email) { "ruther99@msu.edu" }
+
+    it "signs up passwordless, links to setting a password once confirmed" do
+      expect {
+        post base_url, params: {user: {email:, name: "Test name", terms_of_service: "1"}}
+      }.to change(User, :count).by(1)
+      user = User.order(:created_at).last
+      expect(user.passwordless_user?).to be_truthy
+
+      # The emailed link is a GET, so it only renders the form that confirms
+      get "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token}
+      expect(response).to render_template(:confirm_interstitial)
+      expect(user.reload.confirmed?).to be_falsey
+      expect(Capybara.string(response.body))
+        .to have_css("form[action='#{base_url}/confirm'] input[name='code'][value='#{user.confirmation_token}']", visible: :hidden)
+
+      post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token}
+      expect(response).to redirect_to my_account_url
+      follow_redirect!
+      expect(Capybara.string(response.body))
+        .to have_link("set a password to sign in", href: update_password_form_with_reset_token_users_path)
+    end
+
+    context "with partner" do
+      it "carries the partner through the interstitial" do
+        post base_url, params: {user: {email:, name: "Test name", terms_of_service: "1"}, partner: "bikehub"}
+        user = User.order(:created_at).last
+
+        get "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
+        expect(Capybara.string(response.body))
+          .to have_css("input[name='partner'][value='bikehub']", visible: :hidden)
+
+        post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
+        expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
+      end
+    end
+  end
+
   describe "create with a null origin" do
     include_context :test_csrf_token
     let(:email) { "ruther99@msu.edu" }
@@ -336,6 +375,17 @@ RSpec.describe UsersController, type: :request do
         expect(response).to redirect_to request_password_reset_form_users_path
         expect(flash[:error]).to be_present
       end
+      context "signed in" do
+        include_context :request_spec_logged_in_as_user
+        let(:current_user) { FactoryBot.create(:user_confirmed, passwordless_user: true) }
+        it "renders without emailing a reset token" do
+          get "#{base_url}/update_password_form_with_reset_token"
+          expect(response.code).to eq("200")
+          expect(response).to render_template(:update_password_form_with_reset_token)
+          expect(flash).to be_blank
+          expect(current_user.reload.token_for_password_reset).to be_blank
+        end
+      end
     end
     context "token not found" do
       it "redirects" do
@@ -447,6 +497,17 @@ RSpec.describe UsersController, type: :request do
         expect(user.token_for_password_reset).to eq og_token
         expect(user.authenticate(valid_params.dig(:user, :password))).to be_falsey
         expect(response.cookies[:auth]).to be_blank
+      end
+    end
+    context "signed in passwordless user" do
+      include_context :request_spec_logged_in_as_user
+      let(:current_user) { FactoryBot.create(:user_confirmed, passwordless_user: true) }
+      it "sets the password without a token" do
+        post "#{base_url}/update_password_with_reset_token", params: valid_params.merge(token: "")
+        expect(response).to redirect_to my_account_url
+        current_user.reload
+        expect(current_user.passwordless_user?).to be_falsey
+        expect(current_user.authenticate(valid_params.dig(:user, :password))).to be_truthy
       end
     end
     context "nil token" do

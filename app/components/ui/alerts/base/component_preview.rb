@@ -28,6 +28,15 @@ module UI
           render(UI::Alerts::Base::Component.new(text: CONFIRMATION_TEXT, kind: :purple))
         end
 
+        def with_link
+          text = ActionController::Base.helpers.safe_join([
+            "You're signed in! You can ",
+            ActionController::Base.helpers.link_to("set a password to sign in", "#", class: "twlink"),
+            " if you prefer not to sign in via an emailed link."
+          ])
+          render(UI::Alerts::Base::Component.new(text:, kind: :notice))
+        end
+
         def custom_icon
           envelope = ActionController::Base.helpers.inline_svg_tag("icons/envelope.svg",
             class: "tw:-mb-0.5 tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true)
