@@ -16,7 +16,7 @@ module UI
           @flash.filter_map do |type, message|
             text = text_for(message)
             next if text.blank?
-            {text:, kind: kind_for(type)}
+            {text:, kind: type}
           end
         end
 
@@ -30,15 +30,6 @@ module UI
           key = message[:translation_key]
           link = link_to(translation(".#{key}_link"), message[:url], class: "twlink")
           translation(".#{key}_html", link:)
-        end
-
-        # Rails sweeps the flash after the layout renders, so raising here would raise again
-        # on the next request too -- keep it to the environments where that's a useful signal.
-        def kind_for(type)
-          kind = type.to_sym
-          return kind if UI::Alerts::Base::Component::KINDS.include?(kind)
-          raise ArgumentError, "Unknown flash type: #{type}" if Rails.env.local?
-          UI::Alerts::Base::Component::KINDS.first
         end
       end
     end

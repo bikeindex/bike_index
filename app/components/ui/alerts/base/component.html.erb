@@ -1,33 +1,22 @@
 <div
-  class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-4 tw:gap-y-2 tw:rounded-sm tw:border tw:p-4 tw:transition-all tw:duration-300 <%= @margin_classes %> <%= color_classes %>"
+  class="tw:flow-root tw:rounded-sm tw:border tw:p-4 tw:transition-all tw:duration-300 <%= @margin_classes %> <%= color_classes %>"
   role="alert"
   data-controller="ui--alert"
 >
-  <div class="tw:w-4">
+  <div class="tw:float-left tw:mr-4 tw:w-4 <%= icon_classes %>">
     <% if @icon.present? %>
       <%= @icon %>
     <% else %>
-      <%= helpers.inline_svg_tag("icons/info.svg", class: "tw:-mb-0.5 tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true) %>
+      <%= helpers.inline_svg_tag("icons/info.svg", class: "tw:-mb-0.5 tw:h-4 tw:w-4", aria_hidden: true) %>
     <% end %>
 
     <span class="tw:sr-only"><%= @kind.to_s.titleize %></span>
   </div>
 
-  <% if @header.present? %>
-    <h4 class="uncap tw:mb-0! tw:flex-1 tw:text-lg! <%= text_color_classes_important %>">
-      <%= @header %>
-    </h4>
-  <% end %>
-
-  <div class="twalert-body <%= body_classes %>">
-    <%= @text %>
-    <%= content %>
-  </div>
-
   <% if @dismissable %>
     <button
       type="button"
-      class="tw:-mx-1.5 tw:-my-1.5 tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-sm tw:p-1.5 tw:focus:ring-2 <%= dismissable_color_classes %>"
+      class="tw:float-right tw:-my-1.5 tw:-mr-1.5 tw:ml-4 tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-sm tw:p-1.5 tw:focus:ring-2 <%= dismissable_color_classes %>"
       aria-label="Close"
       data-action="click->ui--alert#close"
     >
@@ -50,4 +39,15 @@
       </svg>
     </button>
   <% end %>
+
+  <% if @header.present? %>
+    <h4 class="uncap tw:mb-2! tw:text-lg! <%= text_color_classes_important %>">
+      <%= @header %>
+    </h4>
+  <% end %>
+
+  <div class="twalert-body">
+    <%= @text %>
+    <%= content %>
+  </div>
 </div>

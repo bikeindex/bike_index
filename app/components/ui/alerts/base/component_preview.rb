@@ -5,6 +5,7 @@ module UI
     module Base
       class ComponentPreview < ApplicationComponentPreview
         CONFIRMATION_TEXT = "We've sent a confirmation link to your email. No need to wait — you can finish registering right now."
+        LONG_TEXT = "Bauhaus williamsburg seitan rams 8-bit live-edge edison bulb pork belly chia. Black trumpet locavore DSA wabi-sabi fitzcarraldo angela davis. Cassavetes dad shoes japanese breakfast gatekeep truffaut, offal wolf."
 
         # @!group Kind variants
         def notice
@@ -15,8 +16,8 @@ module UI
           render(UI::Alerts::Base::Component.new(text: "This is an error alert", kind: :error))
         end
 
-        def warning
-          render(UI::Alerts::Base::Component.new(text: "This is a warning alert", kind: :warning))
+        def with_header
+          render(UI::Alerts::Base::Component.new(header: "Registration incomplete", kind: :warning, text: CONFIRMATION_TEXT))
         end
 
         def success
@@ -43,17 +44,6 @@ module UI
         end
         # @!endgroup
 
-        # @!group Header variants
-        def with_header
-          render(UI::Alerts::Base::Component.new(header: "Registration incomplete", kind: :warning, text: CONFIRMATION_TEXT))
-        end
-
-        def dismissable_with_header
-          render(UI::Alerts::Base::Component.new(header: "Registration incomplete", kind: :warning, text: CONFIRMATION_TEXT,
-            dismissable: true))
-        end
-        # @!endgroup
-
         # @!group Dismissable variants
         def dismissable_notice
           render(UI::Alerts::Base::Component.new(text: "Dismissable notice", kind: :notice, dismissable: true))
@@ -61,6 +51,15 @@ module UI
 
         def dismissable_error
           render(UI::Alerts::Base::Component.new(text: "Dismissable error", kind: :error, dismissable: true))
+        end
+
+        def dismissable_purple
+          render(UI::Alerts::Base::Component.new(text: LONG_TEXT, kind: :purple, dismissable: true))
+        end
+
+        def dismissable_with_header
+          render(UI::Alerts::Base::Component.new(header: "Registration incomplete", kind: :warning, text: CONFIRMATION_TEXT,
+            dismissable: true))
         end
         # @!endgroup
       end
