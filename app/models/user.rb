@@ -264,7 +264,7 @@ class User < ApplicationRecord
     !confirmed?
   end
 
-  # Their organization signs them in (magic link or IdP), so they have no reason to set a password
+  # Their organization requires passwordless users (magic link or IdP)
   def organization_passwordless_user?
     passwordless_user? && organizations.any?(&:passwordless_user_creation?)
   end
