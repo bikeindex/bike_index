@@ -954,8 +954,10 @@ RSpec.describe RegisterController, type: :request do
       }.to change(User, :count).by 1
       expect(b_param.reload).to have_attributes(email_confirmed?: true,
         email_confirmation_token: nil, creator_id: User.last.id)
-      expect(User.last).to have_attributes(email: owner_email, confirmed: true)
+      expect(User.last).to have_attributes(email: owner_email, confirmed: true, passwordless_user: true)
       expect(User.last.last_login_at).to be_within(2.seconds).of Time.current
+      # An account they never signed up for, so they're offered a password
+      expect(flash[:notice]).to include(translation_key: :signed_up)
       # Dropped on the step the registration is on - and signed in, so nothing's pending
       expect(response).to redirect_to step_path.call("2")
       follow_redirect!

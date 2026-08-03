@@ -157,16 +157,17 @@ class RegisterController < ApplicationController
     redirect_after_bike_creation(bike)
   end
 
-  # The account the confirmed address belongs to, created if it doesn't have one yet.
-  # Its password is a token nobody knows - this link is how they get in until they set one
+  # The account the confirmed address belongs to, created if it doesn't have one yet -
+  # passwordless, so it gets the same offer to set one as every other emailed sign in
   def sign_in_confirmed_user
-    user = UserServices::PasswordlessCreator.find_or_create(@b_param.owner_email)
+    user, signed_up = UserServices::PasswordlessCreator.find_or_create(@b_param.owner_email)
     if user.blank? || user.banned?
       flash[:error] = translation(:unable_to_sign_in)
       return nil
     end
 
     sign_in_user(user)
+    set_sign_in_flash(user, signed_up)
     @current_user = user
   end
 

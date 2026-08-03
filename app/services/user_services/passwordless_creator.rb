@@ -6,10 +6,13 @@ module UserServices
   module PasswordlessCreator
     extend Functionable
 
+    # Returns the user and whether this call is what created them - confirming saves
+    # again, so previously_new_record? can't answer that by the time it returns
     def find_or_create(email)
-      return nil if email.blank?
+      return [nil, false] if email.blank?
 
-      User.fuzzy_confirmed_or_unconfirmed_email_find(email) || create_confirmed(email)
+      existing = User.fuzzy_confirmed_or_unconfirmed_email_find(email)
+      existing.present? ? [existing, false] : [create_confirmed(email), true]
     end
 
     #
