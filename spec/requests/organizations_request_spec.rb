@@ -240,7 +240,7 @@ RSpec.describe OrganizationsController, type: :request do
           get "#{base_url}/#{current_organization.id}/embed_extended?b_param_id_token=#{b_param.id_token}"
           expect(response.code).to eq("200")
           expect(response).to render_template(:embed_extended)
-          expect(assigns(:bike).frame_material).to eq "1"
+          expect(assigns(:bike).frame_material).to be_blank
         end
       end
     end

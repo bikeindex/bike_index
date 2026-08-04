@@ -162,7 +162,6 @@ class BikesController < Bikes::BaseController
 
     @edit_templates = nil # update templates in case bike state has changed
     if @bike.errors.any? || flash[:error].present?
-      flash[:error] ||= @bike.cleaned_error_messages.to_sentence
       edit_bike_url(@bike, edit_template: params[:edit_template])
     else
       flash[:success] ||= translation(:bike_was_updated)

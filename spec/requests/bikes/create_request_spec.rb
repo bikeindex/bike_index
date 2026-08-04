@@ -237,7 +237,7 @@ RSpec.describe "BikesController#create", type: :request do
         post base_url, params: {bike: bike_params}
       }.to change(Bike, :count).by(0)
       b_param = BParam.last
-      expect(b_param.bike_errors).to include("Frame material is not included in the list")
+      expect(b_param.bike_errors).to eq(["Frame material is not valid"])
       expect(response).to redirect_to(new_bike_url(b_param_token: b_param.id_token))
     end
   end

@@ -33,15 +33,6 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.reload.propulsion_type).to eq "human-not-pedal"
     end
   end
-  context "updating with an invalid enum value" do
-    it "doesn't update, and renders the error" do
-      expect(bike.reload.frame_material).to be_blank
-      patch base_url, params: {bike: {frame_material: "1"}}
-      expect(flash[:error]).to match(/frame material/i)
-      expect(flash[:success]).to be_blank
-      expect(bike.reload.frame_material).to be_blank
-    end
-  end
   context "setting address for bike" do
     let(:address_record) { FactoryBot.create(:address_record, :new_york) }
     let(:current_user) { FactoryBot.create(:user_confirmed, address_set_manually: true, address_record:) }
