@@ -21,6 +21,23 @@ RSpec.describe UserAlert, type: :model do
     end
   end
 
+  describe "uniq_kinds" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let(:user_phone) { FactoryBot.create(:user_phone, user:) }
+    let(:theft_alert) { FactoryBot.create(:theft_alert) }
+
+    it "validates uniqueness of alertable only for uniq_kinds" do
+      FactoryBot.create(:user_alert, user:, kind: "phone_waiting_confirmation", alertable: user_phone)
+      duplicate = FactoryBot.build(:user_alert, user:, kind: "phone_waiting_confirmation", alertable: user_phone)
+      expect(duplicate).to_not be_valid
+      expect(duplicate.errors.attribute_names).to eq([:alertable_id])
+
+      # theft_alert_without_photo isn't a uniq_kind - prod has duplicates that must stay saveable
+      FactoryBot.create(:user_alert, user:, kind: "theft_alert_without_photo", alertable: theft_alert)
+      expect(FactoryBot.build(:user_alert, user:, kind: "theft_alert_without_photo", alertable: theft_alert)).to be_valid
+    end
+  end
+
   describe "update_phone_waiting_confirmation" do
     let(:user) { FactoryBot.create(:user) }
     let(:user_phone) { FactoryBot.create(:user_phone, user: user) }
@@ -49,6 +66,39 @@ RSpec.describe UserAlert, type: :model do
       expect(user_alert.active?).to be_falsey
       expect(user_alert.inactive?).to be_truthy
       expect(user_alert.resolved?).to be_falsey
+      expect(user_alert.alertable).to eq user_phone
+      expect(user_alert.alertable_type).to eq "UserPhone"
+    end
+
+    # Until Backfills::UserAlertAlertableJob has run, rows only have the legacy column set
+    context "row written before alertable" do
+      let!(:user_alert) do
+        FactoryBot.create(:user_alert, user:, kind: "phone_waiting_confirmation", user_phone:)
+      end
+
+      it "finds the legacy row rather than creating a duplicate" do
+        expect(user_alert.alertable_id).to be_blank
+        expect(user_alert.alertable).to eq user_phone
+
+        expect {
+          UserAlert.update_phone_waiting_confirmation(user:, user_phone:)
+        }.to_not change(UserAlert, :count)
+      end
+
+      context "another user has the same phone id" do
+        let(:other_alert) do
+          FactoryBot.create(:user_alert, kind: "phone_waiting_confirmation", user_phone:)
+        end
+
+        it "doesn't match across users" do
+          expect(other_alert.user_id).to_not eq user.id
+
+          expect {
+            UserAlert.update_phone_waiting_confirmation(user: other_alert.user, user_phone:)
+          }.to_not change(UserAlert, :count)
+          expect(UserAlert.pluck(:id)).to match_array([user_alert.id, other_alert.id])
+        end
+      end
     end
   end
 
