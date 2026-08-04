@@ -2,17 +2,20 @@ require "rails_helper"
 
 RSpec.describe ForwardCspReportJob, type: :job do
   let(:blocked_uri) { "https://evil.example.com/x.js" }
-  let(:report) { {"csp-report" => {"blocked-uri" => blocked_uri, "document-uri" => "https://bikeindex.org/bikes/1", "effective-directive" => "script-src"}} }
+  let(:effective_directive) { "script-src" }
+  let(:document_uri) { "https://bikeindex.org/bikes/1" }
+  let(:report) { {"csp-report" => {"blocked-uri" => blocked_uri, "document-uri" => document_uri, "effective-directive" => effective_directive}} }
   let(:body) { report.to_json }
   let(:user_agent) { "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/148.0.0.0 Safari/537.36" }
   let(:forwarded) { [] }
+  let(:forwarded_blocked_uri) { forwarded.first&.dig("csp-report", "blocked-uri") }
 
   before { stub_const("ForwardCspReportJob::HONEYBADGER_CSP_API_KEY", "abc123") }
 
   describe "#perform" do
     before do
-      WebMock.stub_request(:post, /api\.honeybadger\.io/).to_return {
-        forwarded << true
+      WebMock.stub_request(:post, /api\.honeybadger\.io/).to_return { |request|
+        forwarded << JSON.parse(request.body)
         {status: 201}
       }
     end
@@ -32,7 +35,16 @@ RSpec.describe ForwardCspReportJob, type: :job do
 
       it "forwards a real violation to Honeybadger" do
         perform
-        expect(forwarded).to contain_exactly(true)
+        expect(forwarded_blocked_uri).to eq blocked_uri
+      end
+
+      context "blocked-uri with a query string" do
+        let(:blocked_uri) { "https://evil.example.com/x.js?label=WADeCPKg7gYQtvfc0wM&guid=ON" }
+
+        it "forwards it without the query, so the fault doesn't fingerprint per-request" do
+          perform
+          expect(forwarded_blocked_uri).to eq "https://evil.example.com/x.js"
+        end
       end
 
       context "without an API key" do
@@ -76,10 +88,44 @@ RSpec.describe ForwardCspReportJob, type: :job do
       end
 
       context "read-aloud data: media" do
-        let(:report) { {"csp-report" => {"blocked-uri" => "data", "effective-directive" => "media-src"}} }
+        let(:blocked_uri) { "data" }
+        let(:effective_directive) { "media-src" }
         it "does not forward" do
           perform
           expect(forwarded).to be_empty
+        end
+      end
+
+      context "blocked by a policy that isn't ours" do
+        # An extension tightening our header still reports to our report-uri
+        let(:blocked_uri) { "https://www.googletagmanager.com/gtm.js?id=GTM-K88RMWC" }
+        let(:effective_directive) { "script-src-elem" }
+
+        it "does not forward" do
+          perform
+          expect(forwarded).to be_empty
+        end
+      end
+
+      context "a host our policy does not allow" do
+        let(:blocked_uri) { "https://images.simplycodes.com/fonts/CircularXXWeb-Medium.woff2" }
+        let(:effective_directive) { "font-src" }
+
+        it "forwards" do
+          perform
+          expect(forwarded_blocked_uri).to eq blocked_uri
+        end
+      end
+
+      context "same-origin blocked-uri our policy would allow" do
+        # 'self' permits it, so this is a redirect to a target the browser won't name
+        let(:blocked_uri) { "https://bikeindex.org/payments" }
+        let(:document_uri) { "https://bikeindex.org/donate" }
+        let(:effective_directive) { "connect-src" }
+
+        it "forwards" do
+          perform
+          expect(forwarded_blocked_uri).to eq blocked_uri
         end
       end
 
