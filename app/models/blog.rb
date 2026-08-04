@@ -31,6 +31,7 @@ class Blog < ApplicationRecord
   include PgSearch::Model
 
   KIND_ENUM = {blog: 0, info: 1, listicle: 2}.freeze
+  YOUTUBE_SHORT_IFRAME = %r{(<iframe[^>]*\bsrc=["'])https?://youtu\.be/}i
 
   enum :kind, KIND_ENUM
 
@@ -196,13 +197,19 @@ class Blog < ApplicationRecord
     body_abbr
   end
 
+  # A youtu.be link 303s to a watch page that refuses to be framed, so an iframe
+  # built from a pasted share link renders nothing
+  def display_body
+    body.to_s.gsub(YOUTUBE_SHORT_IFRAME, '\1https://www.youtube.com/embed/')
+  end
+
   def feed_content
     if is_listicle
       listicles.collect { |l|
         ApplicationController.helpers.listicle_html(l)
       }.join.html_safe
     else
-      Kramdown::Document.new(body).to_html
+      Kramdown::Document.new(display_body).to_html
     end
   end
 
