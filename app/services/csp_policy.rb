@@ -18,8 +18,7 @@ module CspPolicy
   # strava_search sends no header — so a per-controller policy can only make this
   # answer too strict, never too permissive.
   def permits?(directive, uri)
-    # Old browsers send the sources along with the name: "script-src https://x"
-    sources(directive.to_s.split.first).any? { |source| source_permits?(source, uri) }
+    sources(directive).any? { |source| source_permits?(source, uri) }
   end
 
   #

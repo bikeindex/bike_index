@@ -45,12 +45,6 @@ RSpec.describe CspPolicy do
       end
     end
 
-    context "an old browser sending the sources alongside the name" do
-      it "reads the directive name" do
-        expect(permits?("script-src https://www.googletagmanager.com", "https://js.stripe.com/v3")).to be_truthy
-      end
-    end
-
     it "does not match a bare domain against a *. source" do
       expect(permits?("connect-src", "https://google-analytics.com/collect")).to be_falsey
     end

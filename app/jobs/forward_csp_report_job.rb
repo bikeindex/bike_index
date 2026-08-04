@@ -57,7 +57,7 @@ class ForwardCspReportJob < ApplicationJob
     report.present? && !user_agent.to_s.match?(IN_APP_BROWSER) &&
       !extension_noise?(report) && !translate_noise?(report) &&
       !report["blocked-uri"].to_s.match?(BLOCKED_URI_NOISE) &&
-      !foreign_policy_noise?(report)
+      !third_party_font_noise?(report) && !foreign_policy_noise?(report)
   end
 
   def extension_noise?(report)
@@ -76,10 +76,26 @@ class ForwardCspReportJob < ApplicationJob
   # origin is exempt: 'self' always permits it, and what the browser is actually
   # reporting is a redirect to a target it won't name.
   def foreign_policy_noise?(report)
-    uri = parsed_uri(report["blocked-uri"])
-    return false if uri.nil? || uri.host == parsed_uri(report["document-uri"])&.host
+    uri = cross_origin_blocked_uri(report)
+    !uri.nil? && CspPolicy.permits?(directive(report), uri)
+  end
 
-    CspPolicy.permits?(report["effective-directive"].presence || report["violated-directive"], uri)
+  # Every font we load is on our own origin or in font_src, so a font blocked from
+  # a third party was injected into the page — coupon and citation extensions add
+  # page-level <link>s, which carry an https uri EXTENSION_SCHEME can't recognize.
+  # The cost is that a webfont host we forget to allowlist goes unreported.
+  def third_party_font_noise?(report)
+    directive(report) == "font-src" && !cross_origin_blocked_uri(report).nil?
+  end
+
+  # Old browsers send the sources along with the name: "font-src https://x"
+  def directive(report)
+    (report["effective-directive"].presence || report["violated-directive"]).to_s.split.first
+  end
+
+  def cross_origin_blocked_uri(report)
+    uri = parsed_uri(report["blocked-uri"])
+    uri if uri && uri.host != parsed_uri(report["document-uri"])&.host
   end
 
   def parsed_uri(value)

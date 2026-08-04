@@ -107,8 +107,39 @@ RSpec.describe ForwardCspReportJob, type: :job do
         end
       end
 
+      context "an old browser sending the sources alongside the directive name" do
+        let(:report) { {"csp-report" => {"blocked-uri" => "https://www.google-analytics.com/analytics.js", "document-uri" => document_uri, "violated-directive" => "script-src https://www.googletagmanager.com"}} }
+
+        it "does not forward" do
+          perform
+          expect(forwarded).to be_empty
+        end
+      end
+
       context "a host our policy does not allow" do
+        let(:blocked_uri) { "https://images.simplycodes.com/tracker.gif" }
+        let(:effective_directive) { "img-src" }
+
+        it "forwards" do
+          perform
+          expect(forwarded_blocked_uri).to eq blocked_uri
+        end
+      end
+
+      context "a font from a third party" do
+        # Coupon and citation extensions inject page-level <link>s
         let(:blocked_uri) { "https://images.simplycodes.com/fonts/CircularXXWeb-Medium.woff2" }
+        let(:effective_directive) { "font-src" }
+
+        it "does not forward" do
+          perform
+          expect(forwarded).to be_empty
+        end
+      end
+
+      context "a font from our own origin" do
+        let(:blocked_uri) { "https://bikeindex.org/assets/inter.woff2" }
+        let(:document_uri) { "https://bikeindex.org/bikes/1" }
         let(:effective_directive) { "font-src" }
 
         it "forwards" do
