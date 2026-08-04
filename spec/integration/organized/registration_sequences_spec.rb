@@ -22,16 +22,20 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
     visit "/o/#{organization.to_param}/registration_sequences"
 
     # Build the draft (cloned from the seeded template) and open the management view
-    click_button "Edit sequence"
+    click_button "Create a sequence"
     expect(page).to have_content("Draft registration sequence")
     expect(page).to have_content("Batteries & charging") # cloned from the template
 
     # --- Edit the sequence: add a page. Done before the page edit so the success flash from a
-    # save isn't covering the "+ Add page" header button. ---
-    click_button "Add page"
+    # save isn't covering the "+ Add page" header link. ---
+    click_link "Add page"
     expect(page).to have_css("lexxy-editor lexxy-toolbar", wait: 10) # editors upgrade lazily
     fill_in "Title", with: "Winter storage rules"
-    click_button "Save page"
+    # A page needs at least one rule to save
+    new_bullet = first("lexxy-editor [contenteditable='true']")
+    new_bullet.click
+    new_bullet.send_keys("Drain the battery before storing")
+    click_button "Add page"
 
     expect(page).to have_content("Winter storage rules")
 
@@ -73,7 +77,7 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
   # too. That specific regression is guarded by spec/javascript_controller_imports_spec.rb.
   it "adds a bullet to a page that already has bullets" do
     visit "/o/#{organization.to_param}/registration_sequences"
-    click_button "Edit sequence"
+    click_button "Create a sequence"
     click_link "Edit", match: :first
     expect(page).to have_css("lexxy-editor lexxy-toolbar", wait: 10) # editors upgrade lazily
 
