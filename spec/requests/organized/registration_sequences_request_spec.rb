@@ -13,6 +13,19 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
         expect(response.body).to include("There is no active registration sequence")
+        expect(response.body).to include("You don't have a draft sequence")
+        # Nothing to copy yet, so the button starts a fresh one
+        expect(response.body).to include("Create a sequence")
+      end
+
+      context "with a draft" do
+        let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization: current_organization) }
+
+        it "offers to resume editing it" do
+          get base_url
+          expect(response.body).to include("Edit sequence")
+          expect(response.body).to include("Discard draft")
+        end
       end
 
       context "with an active sequence" do
@@ -31,6 +44,8 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
           expect(response.body).to include("This is the active version your registrants see")
           expect(response.body).to include("Batteries &amp; charging")
           expect(response.body).to include("Charge with the manufacturer's charger")
+          # No draft yet, so editing starts from a copy of the live sequence
+          expect(response.body).to include("Copy current sequence and edit")
           # Frozen, so no editing affordances on it
           expect(response.body).to_not include("data-sortable-target=\"item\"")
         end
