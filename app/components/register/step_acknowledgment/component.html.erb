@@ -4,50 +4,33 @@
   <%= render Register::AcknowledgmentProgress::Component.new(number: position + 1,
       total: BikeServices::Register.acknowledgment_step_count(@sequence)) %>
 
-  <div class="tw:mb-3">
-    <% if first? %>
-      <%= render UI::Badge::Component.new(text: translation(".electric_detected"), color: :warning) %>
-    <% elsif page.organization_specific && organization_name.present? %>
-      <%= render UI::Badge::Component.new(text: organization_name, color: :notice) %>
-    <% end %>
-  </div>
-
-  <%= render UI::Header::Component.new(text: page.heading_text, subtitle: page.subtitle) %>
-
-  <% if page.image_url.present? %>
-    <%= image_tag page.image_url, alt: "", class: "tw:mb-5 tw:w-full tw:rounded-lg tw:object-cover" %>
-  <% end %>
-
   <%= form_with(url: acknowledge_register_path, method: :patch,
       data: {controller: "register--acknowledgment"}) do %>
     <%= hidden_field_tag :b_param_token, @b_param.id_token %>
     <%= hidden_field_tag :step, @step %>
 
-    <%= render Register::SectionLabel::Component.new(text: page.title) do %>
-      <% if @sequence.faq_url.present? %>
-        <%= render UI::Tooltip::Component.new(text: translation(".have_questions")) do |tooltip| %>
-          <% tooltip.with_body do %>
-            <%= translation(".have_questions") %>
-            <%= link_to translation(".read_the_faq"), @sequence.faq_url, target: "_blank", rel: "noopener", class: "twlink" %>
-          <% end %>
+    <%= render Register::PageContent::Component.new(page:, control: ->(index) {
+      check_box_tag "acknowledged[#{index}]", "1", acknowledged?,
+        class: "tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:cursor-pointer",
+        data: {"register--acknowledgment-target": "checkbox", action: "change->register--acknowledgment#update"}
+    }) do |content| %>
+      <% content.with_badge do %>
+        <% if first? %>
+          <%= render UI::Badge::Component.new(text: translation(".electric_detected"), color: :warning) %>
+        <% elsif page.organization_specific && organization_name.present? %>
+          <%= render UI::Badge::Component.new(text: organization_name, color: :notice) %>
         <% end %>
       <% end %>
-    <% end %>
 
-    <%= render UI::DividedCard::Component.new do %>
-      <% page.bullets.each_with_index do |bullet, index| %>
-        <label
-          class="
-            tw:mb-0 tw:flex tw:cursor-pointer tw:items-start tw:gap-3
-            tw:px-4 tw:py-3.5 tw:text-sm tw:font-normal
-          "
-        >
-          <%= check_box_tag "acknowledged[#{index}]", "1", acknowledged?,
-              class: "tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:cursor-pointer",
-              data: {"register--acknowledgment-target": "checkbox", action: "change->register--acknowledgment#update"} %>
-
-          <span><%= sanitize bullet %></span>
-        </label>
+      <% content.with_faq do %>
+        <% if @sequence.faq_url.present? %>
+          <%= render UI::Tooltip::Component.new(text: translation(".have_questions")) do |tooltip| %>
+            <% tooltip.with_body do %>
+              <%= translation(".have_questions") %>
+              <%= link_to translation(".read_the_faq"), @sequence.faq_url, target: "_blank", rel: "noopener", class: "twlink" %>
+            <% end %>
+          <% end %>
+        <% end %>
       <% end %>
     <% end %>
 

@@ -1,0 +1,28 @@
+<% if badge? %>
+  <div class="tw:mb-3"><%= badge %></div>
+<% end %>
+
+<%= render UI::Header::Component.new(text: @page.heading_text, subtitle: @page.subtitle) %>
+
+<% if @page.image_url.present? %>
+  <%= image_tag @page.image_url, alt: "", class: "tw:mb-5 tw:w-full tw:rounded-lg tw:object-cover" %>
+<% end %>
+
+<%= render Register::SectionLabel::Component.new(text: @page.title) do %>
+  <%= faq if faq? %>
+<% end %>
+
+<%= render UI::DividedCard::Component.new do %>
+  <% @page.bullets.each_with_index do |bullet, index| %>
+    <label
+      class="
+        tw:mb-0 tw:flex tw:cursor-pointer tw:items-start tw:gap-3 tw:px-4
+        tw:py-3.5 tw:text-sm tw:font-normal
+      "
+    >
+      <%= @control.call(index) %>
+
+      <span><%= sanitize bullet %></span>
+    </label>
+  <% end %>
+<% end %>

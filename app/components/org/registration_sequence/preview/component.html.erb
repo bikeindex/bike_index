@@ -1,54 +1,37 @@
 <div class="tw:mx-auto tw:flex tw:max-w-md tw:flex-col tw:gap-8">
   <% @registration_sequence.registration_sequence_pages.each do |page| %>
-    <div class="tw:flex tw:flex-col tw:gap-3">
-      <% if page.organization_specific && organization_name.present? %>
-        <div>
-          <%= render UI::Badge::Component.new(text: organization_name, color: :notice, size: :xs) %>
-        </div>
+    <%= render Register::PageContent::Component.new(page:, control: ->(_index) {
+      check_box_tag "preview_#{page.id}[]", "1", false, id: nil,
+        class: "tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:cursor-pointer"
+    }) do |content| %>
+      <% content.with_badge do %>
+        <% if page.organization_specific && organization_name.present? %>
+          <%= render UI::Badge::Component.new(text: organization_name, color: :notice) %>
+        <% end %>
       <% end %>
 
-      <%= render UI::Header::Component.new(text: page.heading_text, subtitle: page.subtitle, tag: :h3, html_class: "uncap") %>
-
-      <% if page.image_url.present? %>
-        <%= image_tag page.image_url, alt: "", class: "tw:w-full tw:rounded-lg tw:object-cover" %>
-      <% end %>
-
-      <%= render Register::SectionLabel::Component.new(text: page.title) do %>
+      <% content.with_faq do %>
         <% if @registration_sequence.faq_url.present? %>
           <%= link_to "FAQ", @registration_sequence.faq_url, target: "_blank", rel: "noopener", class: "twlink tw:text-xs" %>
         <% end %>
       <% end %>
-
-      <%# The rules as registrants agree to them - one checkbox each, read-only here %>
-      <%= render UI::DividedCard::Component.new do %>
-        <% page.bullets.each do |bullet| %>
-          <div class="tw:flex tw:items-start tw:gap-3 tw:px-4 tw:py-3.5 tw:text-sm">
-            <input
-              type="checkbox"
-              disabled
-              class="tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0"
-            >
-
-            <span><%= sanitize bullet %></span>
-          </div>
-        <% end %>
-      <% end %>
-    </div>
+    <% end %>
   <% end %>
 
   <%# The final acknowledgment binding the registrant to every page above %>
   <%= render UI::DividedCard::Component.new do %>
-    <div class="tw:flex tw:items-start tw:gap-3 tw:px-4 tw:py-3.5 tw:text-sm">
-      <input
-        type="checkbox"
-        disabled
-        class="tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0"
-      >
+    <label
+      class="
+        tw:mb-0 tw:flex tw:cursor-pointer tw:items-start tw:gap-3 tw:px-4
+        tw:py-3.5 tw:text-sm tw:font-normal
+      "
+    >
+      <%= check_box_tag "preview_acknowledged", "1", false, id: nil, class: "tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:cursor-pointer" %>
 
       <span>
         I, <em>registrant's name</em>,
         <%= @registration_sequence.acknowledgment %>
       </span>
-    </div>
+    </label>
   <% end %>
 </div>
