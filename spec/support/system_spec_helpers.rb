@@ -95,10 +95,16 @@ module SystemSpecHelpers
   end
 
   # Flash messages are fixed position, so an undismissed one intercepts clicks on
-  # whatever it overlays. Wait out the dismiss transition before moving on.
-  def dismiss_flash_messages(wait: 10)
-    all("#flash-messages [aria-label='Close']", minimum: 1).each(&:click)
-    expect(page).to have_no_css("#flash-messages [role='alert']", wait:)
+  # whatever it overlays. Like open_modal, ui--alert wires its close action in
+  # `connect`, so a click landing before that lazy loaded controller arrives does
+  # nothing -- click again until the region clears.
+  def dismiss_flash_messages(attempts: 10)
+    expect(page).to have_css("#flash-messages [role='alert']")
+    attempts.times do
+      retry_on_detach { all("#flash-messages [aria-label='Close']", wait: 0).each(&:click) }
+      return if page.has_no_css?("#flash-messages [role='alert']", wait: 1)
+    end
+    raise "#flash-messages never cleared after #{attempts} dismiss clicks"
   end
 
   private
