@@ -34,6 +34,13 @@ module BikeServices
         .detect { |b| b.creator_id.blank? || b.creator_id == user&.id || b.created_bike_id.present? }
     end
 
+    # Neither filter find_token applies holds here: the emailed token is the authorization,
+    # so there's no creator to match, and an expired one still has to resolve its
+    # registration for confirmation to say the link expired rather than dead-end
+    def find_for_confirmation(token)
+      BParam.find_by(id_token: token) if token.present?
+    end
+
     # An organization can be named in the URL after the registration starts
     # (/register?...&organization_id=slug), right up until the bike is created
     def assign_organization(b_param, organization)
@@ -173,6 +180,16 @@ module BikeServices
     def creator_available?(b_param)
       b_param.creator_id.present? || b_param.creation_organization&.auto_user_id.present? ||
         confirmed_email_creator_id(b_param).present?
+    end
+
+    def permitted_step_1_params = %i[manufacturer_id cycle_type owner_email]
+
+    def permitted_step_2_params
+      [:primary_frame_color_id, :secondary_frame_color_id, :tertiary_frame_color_id,
+        :serial_number, :frame_size, :frame_size_number, :frame_size_unit, :bike_sticker,
+        :phone, :status, :frame_model, :year, :user_name, :extra_registration_number,
+        :organization_affiliation, :student_id,
+        {address_record_attributes: AddressRecord.permitted_params}]
     end
 
     # Step 1 is the least a registration can be: who owns it and what it is. The params are

@@ -183,12 +183,9 @@ class RegisterController < ApplicationController
     @registration_sequence = BikeServices::Register.registration_sequence(@b_param)
   end
 
-  # Not find_b_param: the emailed token authorizes this, not the session, and an expired
-  # link has to find its registration to say so rather than dead-end. Nothing is written
-  # to the session - the token hasn't been checked yet
+  # Nothing is written to the session - the token hasn't been checked yet
   def find_b_param_for_confirmation
-    token = params[:b_param_token]
-    @b_param = BParam.find_by(id_token: token) if token.present?
+    @b_param = BikeServices::Register.find_for_confirmation(params[:b_param_token])
     redirect_to(new_register_path) if @b_param.blank?
   end
 
@@ -223,15 +220,11 @@ class RegisterController < ApplicationController
   end
 
   def create_params
-    params.require(:b_param).permit(:manufacturer_id, :cycle_type, :owner_email)
+    params.require(:b_param).permit(*BikeServices::Register.permitted_step_1_params)
       .to_h.merge(BParam.status_hash_from_params(params))
   end
 
   def update_params
-    params.fetch(:bike, {}).permit(:primary_frame_color_id, :secondary_frame_color_id,
-      :tertiary_frame_color_id, :serial_number, :frame_size, :frame_size_number, :frame_size_unit,
-      :bike_sticker, :phone, :status, :frame_model, :year, :user_name,
-      :extra_registration_number, :organization_affiliation, :student_id,
-      address_record_attributes: AddressRecord.permitted_params)
+    params.fetch(:bike, {}).permit(*BikeServices::Register.permitted_step_2_params)
   end
 end
