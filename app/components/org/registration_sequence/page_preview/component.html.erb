@@ -1,5 +1,11 @@
+<%#
+  Nameless so a walk-through's GET form doesn't serialize them; the shared
+  register--acknowledgment controller (when one wraps this) gates Continue on them.
+%>
+
 <%= render Register::PageContent::Component.new(page: @page, control: ->(_index) {
-  check_box_tag "preview_#{@page.id}[]", "1", false, id: nil, class: "tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:cursor-pointer"
+  tag.input(type: "checkbox", class: "tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:cursor-pointer",
+    data: {"register--acknowledgment-target": "checkbox", action: "change->register--acknowledgment#update"})
 }) do |content| %>
   <% content.with_badge do %>
     <% if @page.organization_specific && organization_name.present? %>

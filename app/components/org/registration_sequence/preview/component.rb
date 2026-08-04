@@ -48,6 +48,12 @@ module Org
             id: @registration_sequence.id, page: index)
         end
 
+        # The show path itself - a GET form appends ?page= from a hidden field, since a
+        # form's own query string is dropped on submit
+        def sequence_path
+          organization_registration_sequence_path(organization_id: organization.to_param, id: @registration_sequence.id)
+        end
+
         # Leaving the preview: back to the draft's editor, or the index for a live one
         def exit_path
           if @registration_sequence.draft?

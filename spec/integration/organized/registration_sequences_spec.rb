@@ -44,6 +44,10 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
     expect(page).to have_css("lexxy-editor lexxy-toolbar", wait: 10)
     expect(page).to have_content("Preview") # the saved page shows below the form
 
+    # Ticking a preview checkbox isn't a form edit, so the preview stays put
+    within("[data-page-preview-target='preview']") { first("input[type=checkbox]").click }
+    expect(page).to have_no_content("Save the page to see the updated preview")
+
     fill_in "Title", with: "Battery safety pledge"
     # Editing hides the now-stale preview and asks for a save
     expect(page).to have_content("Save the page to see the updated preview")
@@ -75,18 +79,23 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
     expect(draft.registration_sequence_pages.pluck(:title)).to include("Campus-specific rules")
   end
 
-  it "walks the full preview through every page to the review, then back to editing" do
+  it "gates each preview page on its rules like the real flow, then finishes to editing" do
     visit "/o/#{organization.to_param}/registration_sequences"
     click_button "Create a sequence"
 
     click_link "Preview"
-    expect(page).to have_link("Continue") # the first rule page, as a registrant sees it
+    # Continue is disabled until every rule is checked - the same register--acknowledgment
+    # controller the real flow uses
+    expect(page).to have_button("Continue", disabled: true)
 
-    # Page through every rule screen to the review
-    click_link "Continue" while page.has_link?("Continue", wait: 2)
+    loop do
+      all("input[type=checkbox]").each { |box| box.click unless box.checked? }
+      break unless page.has_button?("Continue", wait: 2)
+      click_button "Continue"
+    end
 
     expect(page).to have_content("almost done") # the review screen
-    click_link "Finish preview"
+    click_button "Finish preview"
 
     expect(page).to have_content("Draft registration sequence") # back in the editor
   end

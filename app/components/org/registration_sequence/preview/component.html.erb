@@ -25,27 +25,40 @@
         </div>
       <% end %>
     <% end %>
-    <div class="tw:mt-5">
-      <%= render UI::DividedCard::Component.new do %>
-        <label
-          class="
-            tw:mb-0 tw:flex tw:cursor-pointer tw:items-start tw:gap-3
-            tw:px-4 tw:py-3.5 tw:text-sm tw:font-normal
-          "
-        >
-          <%= check_box_tag "preview_acknowledged", "1", false, id: nil, class: "tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:cursor-pointer" %>
+    <%# The acknowledgment gates Finish, via the same register--acknowledgment controller the flow uses %>
+    <%= form_with url: exit_path, method: :get, data: {controller: "register--acknowledgment"} do %>
+      <div class="tw:mt-5">
+        <%= render UI::DividedCard::Component.new do %>
+          <label
+            class="
+              tw:mb-0 tw:flex tw:cursor-pointer tw:items-start tw:gap-3
+              tw:px-4 tw:py-3.5 tw:text-sm tw:font-normal
+            "
+          >
+            <%= tag.input(type: "checkbox", class: "tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:cursor-pointer",
+              data: {"register--acknowledgment-target": "checkbox", action: "change->register--acknowledgment#update"}) %>
 
-          <span>
-            I, <em>registrant's name</em>,
-            <%= @registration_sequence.acknowledgment %>
-          </span>
-        </label>
-      <% end %>
-    </div>
-    <%= render UI::ButtonLink::Component.new(text: "Finish preview", href: exit_path, color: :primary, size: :lg, html_class: "tw:mt-5 tw:w-full") %>
+            <span>
+              I, <em>registrant's name</em>,
+              <%= @registration_sequence.acknowledgment %>
+            </span>
+          </label>
+        <% end %>
+      </div>
+
+      <%= render UI::Button::Component.new(text: "Finish preview", color: :primary, size: :lg, kind: :submit,
+        disabled: true, html_class: "tw:mt-5 tw:w-full", data: {"register--acknowledgment-target": "submit"}) %>
+    <% end %>
   <% else %>
-    <%= render Org::RegistrationSequence::PagePreview::Component.new(page: current_page) %>
-    <%= render UI::ButtonLink::Component.new(text: "Continue", href: continue_path, color: :primary, size: :lg, html_class: "tw:mt-5 tw:w-full") %>
+    <%# Continue is gated on checking every rule, the same as the real flow %>
+    <%= form_with url: sequence_path, method: :get, data: {controller: "register--acknowledgment"} do %>
+      <%= hidden_field_tag :page, @index + 1 %>
+
+      <%= render Org::RegistrationSequence::PagePreview::Component.new(page: current_page) %>
+
+      <%= render UI::Button::Component.new(text: "Continue", color: :primary, size: :lg, kind: :submit,
+        disabled: true, html_class: "tw:mt-5 tw:w-full", data: {"register--acknowledgment-target": "submit"}) %>
+    <% end %>
   <% end %>
 
   <%= render Register::BackLink::Component.new(href: back_path) %>

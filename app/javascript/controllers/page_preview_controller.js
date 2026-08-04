@@ -19,7 +19,10 @@ export default class extends Controller {
     this.element.removeEventListener('change', this.markStale)
   }
 
-  markStale () {
+  markStale (event) {
+    // The preview's own decorative checkboxes aren't form edits, so ignore them
+    if (this.hasPreviewTarget && this.previewTarget.contains(event.target)) return
+
     if (this.hasPreviewTarget) this.previewTarget.hidden = true
     if (this.hasHintTarget) this.hintTarget.hidden = false
   }
