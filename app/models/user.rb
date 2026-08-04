@@ -614,9 +614,9 @@ class User < ApplicationRecord
   protected
 
   def generate_username_confirmation_and_auth
-    usrname = username ? Slugifyer.slugify(username) : self.class.generate_username
+    usrname = username ? Slugifyer.slugify(username) : User.generate_username
     while User.where(username: usrname).where.not(id: id).exists?
-      usrname = self.class.generate_username
+      usrname = User.generate_username
     end
     self.username = usrname
     generate_auth_token("confirmation_token") unless confirmed
