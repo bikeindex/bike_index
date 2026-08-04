@@ -28,7 +28,7 @@ export default class extends Controller {
     // Reveal the results frame's loading placeholder. It ships hidden so a no-JS
     // user never sees a spinner that can't resolve (the eager src needs JS); now
     // that JS is running, the eager fetch will load results, so show it.
-    this.frameElement?.querySelector('[data-search-loading]')?.removeAttribute('hidden')
+    this.showLoading()
 
     // The results frame eager-loads its own contents via its `src` (set
     // server-side once the page shell has rendered), so there's nothing to
@@ -193,12 +193,20 @@ export default class extends Controller {
 
   retryResults = () => {
     this.hideFetchFailed()
-    this.frameElement?.querySelector('[data-search-loading]')?.removeAttribute('hidden')
+    this.showLoading()
     this.frameElement?.reload()
   }
 
+  get loadingElement () {
+    return this.frameElement?.querySelector('[data-search-loading]')
+  }
+
+  showLoading () {
+    this.loadingElement?.removeAttribute('hidden')
+  }
+
   hideLoading () {
-    this.frameElement?.querySelector('[data-search-loading]')?.setAttribute('hidden', '')
+    this.loadingElement?.setAttribute('hidden', '')
   }
 
   hideFetchFailed () {
