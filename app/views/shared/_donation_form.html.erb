@@ -11,7 +11,12 @@
   </p>
 <% end %>
 
-<%# create redirects to Stripe Checkout - a turbo fetch can't follow a cross-origin redirect %>
+<%#
+  A turbo fetch can't follow a cross-origin redirect, and create redirects to
+  Stripe Checkout - so this has to submit as a real navigation. Same for the
+  membership and theft alert checkouts.
+%>
+
 <%= form_for Payment.new, html: {id: "new-payment-form", data: {turbo: false}} do |f| %>
   <%= hidden_field_tag :is_arbitrary, false %>
   <%= f.hidden_field :amount_cents %>

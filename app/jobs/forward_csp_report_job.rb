@@ -24,8 +24,11 @@ class ForwardCspReportJob < ApplicationJob
     report = parsed_report(body)
     return unless forward?(report, user_agent)
 
+    # Honeybadger records this request's user agent, which is Faraday - so the
+    # browser's rides along as context, or a report can't be attributed at all
     query = URI.encode_www_form(api_key: HONEYBADGER_CSP_API_KEY, report_only: false,
-      env: Rails.env, "context[user_id]": user_id.to_s)
+      env: Rails.env, "context[user_id]": user_id.to_s,
+      "context[user_agent]": user_agent.to_s)
     Faraday.post("#{HONEYBADGER_URL}?#{query}", normalized_body(report),
       "Content-Type" => "application/csp-report")
   end

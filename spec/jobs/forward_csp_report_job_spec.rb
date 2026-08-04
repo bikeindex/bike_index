@@ -9,6 +9,8 @@ RSpec.describe ForwardCspReportJob, type: :job do
   let(:user_agent) { "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/148.0.0.0 Safari/537.36" }
   let(:forwarded) { [] }
   let(:forwarded_blocked_uri) { forwarded.first&.dig("csp-report", "blocked-uri") }
+  let(:forwarded_query) { forwarded_uris.first.to_s }
+  let(:forwarded_uris) { [] }
 
   before { stub_const("ForwardCspReportJob::HONEYBADGER_CSP_API_KEY", "abc123") }
 
@@ -16,6 +18,7 @@ RSpec.describe ForwardCspReportJob, type: :job do
     before do
       WebMock.stub_request(:post, /api\.honeybadger\.io/).to_return { |request|
         forwarded << JSON.parse(request.body)
+        forwarded_uris << request.uri
         {status: 201}
       }
     end
@@ -36,6 +39,11 @@ RSpec.describe ForwardCspReportJob, type: :job do
       it "forwards a real violation to Honeybadger" do
         perform
         expect(forwarded_blocked_uri).to eq blocked_uri
+      end
+
+      it "sends the browser's user agent as context, not the forwarder's" do
+        perform
+        expect(CGI.unescape(forwarded_query)).to include("context[user_agent]=#{user_agent}")
       end
 
       context "blocked-uri with a query string" do

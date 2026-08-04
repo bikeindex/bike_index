@@ -1,4 +1,5 @@
-= form_tag bike_theft_alert_path, method: :post, class: "primary-edit-bike-form", id: "alert-form" do |f|
+-# create redirects to Stripe Checkout, which a turbo fetch can't follow
+= form_tag bike_theft_alert_path, method: :post, class: "primary-edit-bike-form", id: "alert-form", data: {turbo: false} do |f|
   = hidden_field_tag :edit_template, :alert_purchase
   = hidden_field_tag :theft_alert_plan_id, @selected_theft_alert_plan&.id
   = hidden_field_tag :bike_id, @bike.id
