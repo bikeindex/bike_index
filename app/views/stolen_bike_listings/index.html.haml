@@ -18,7 +18,7 @@
             = l(@blog.published_at, format: :no_day_with_year)
 
     :markdown
-      #{@blog.display_body}
+      #{@blog.body}
 - else
   .container
     %h1.uncap

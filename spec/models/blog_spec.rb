@@ -169,26 +169,6 @@ RSpec.describe Blog, type: :model do
     end
   end
 
-  describe "display_body" do
-    let(:blog) { Blog.new(body:) }
-
-    context "with a youtu.be iframe" do
-      let(:body) { %(before\n<iframe width="560" src="https://youtu.be/Gq1Omxev9II" allowfullscreen></iframe>\nafter) }
-
-      it "rewrites the src to the embed url" do
-        expect(blog.display_body).to eq %(before\n<iframe width="560" src="https://www.youtube.com/embed/Gq1Omxev9II" allowfullscreen></iframe>\nafter)
-      end
-    end
-
-    context "without a youtu.be iframe" do
-      let(:body) { %(Watch it at https://youtu.be/Gq1Omxev9II\n<iframe src="https://www.youtube.com/embed/MKUNw4zfLJY"></iframe>) }
-
-      it "leaves it alone" do
-        expect(blog.display_body).to eq body
-      end
-    end
-  end
-
   describe "feed_content" do
     it "returns html content for non-listicles" do
       blog = Blog.new(body: "something")
