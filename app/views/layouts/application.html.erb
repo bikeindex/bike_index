@@ -266,7 +266,7 @@
     <% donation_request = session.delete(:render_donation_request) %>
 
     <% if donation_request.present? %>
-      <%= render partial: "/shared/law_enforcement_donation_modal", locals: { kind: donation_request } %>
+      <%= render PageBlock::LawEnforcementDonation::Component.new(current_user:) %>
     <% elsif show_general_alert %>
       <%= render PageBlock::UserAlerts::Wrapper::Component.new(current_user:) %>
     <% end %>

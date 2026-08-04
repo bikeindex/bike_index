@@ -4999,19 +4999,6 @@ en:
       you: You
       your_bikes: Your bikes
       your_preferences: Your preferences
-    law_enforcement_donation_modal:
-      bikeindex_is_a_nonprofit: >-
-        Bike Index is a 501(c)(3) nonprofit. We depend on donations to provide these
-        services. We recommend law enforcement agencies like %{org_name} donate at
-        least $20 a year to help support our efforts.
-      contact_bike_owners: Contact bike owners before their bikes are marked stolen
-      email_for_access_html: Email %{email_link} for access.
-      greeting: Hello %{user_name},
-      law_enforcement_features: 'We have a number of features specifically designed
-        for law enforcement officers:'
-      multiple_serial_search_pane: Multiple serial search pane
-      thank_you: Thank you so much for using Bike Index!
-      thanks_for_using_bike_index: Thanks for using Bike Index!
     organized_menu_items:
       add_a_bike: Add a bike
       ascend_imports: Ascend Imports
