@@ -127,6 +127,16 @@ RSpec.describe BikeServices::Builder do
       end
     end
 
+    context "with an invalid enum value" do
+      let(:b_param_params) { {bike: {frame_material: "1", handlebar_type: "9", frame_model: "Cool model"}} }
+      it "builds, and is invalid rather than raising" do
+        expect(bike.frame_model).to eq "Cool model"
+        expect(bike).to_not be_valid
+        expect(bike.errors.full_messages).to include("Frame material is not included in the list")
+        expect(bike.errors.full_messages).to include("Handlebar type is not included in the list")
+      end
+    end
+
     context "with organization" do
       let(:new_attrs) { {organization:} }
 

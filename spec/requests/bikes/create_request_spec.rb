@@ -229,6 +229,18 @@ RSpec.describe "BikesController#create", type: :request do
       end
     end
   end
+  context "invalid frame_material" do
+    # Form filling bots submit "1" for every field - the enum assignment used to raise
+    let(:bike_params) { basic_bike_params.merge(frame_material: "1") }
+    it "renders the error" do
+      expect {
+        post base_url, params: {bike: bike_params}
+      }.to change(Bike, :count).by(0)
+      b_param = BParam.last
+      expect(b_param.bike_errors).to include("Frame material is not included in the list")
+      expect(response).to redirect_to(new_bike_url(b_param_token: b_param.id_token))
+    end
+  end
   context "no existing b_param, impounded" do
     let(:bike_params) { basic_bike_params }
     context "impound_record" do

@@ -19,10 +19,11 @@ module BikeAttributable
 
     accepts_nested_attributes_for :components, allow_destroy: true
 
-    enum :frame_material, FrameMaterial::SLUGS
-    enum :handlebar_type, HandlebarType::SLUGS
-    enum :cycle_type, CycleType::SLUGS
-    enum :propulsion_type, PropulsionType::SLUGS
+    # validate rather than raise on assignment - these are assigned straight from user params
+    enum :frame_material, FrameMaterial::SLUGS, validate: {allow_blank: true}
+    enum :handlebar_type, HandlebarType::SLUGS, validate: {allow_blank: true}
+    enum :cycle_type, CycleType::SLUGS, validate: {allow_blank: true}
+    enum :propulsion_type, PropulsionType::SLUGS, validate: {allow_blank: true}
 
     scope :with_public_image, -> { joins(:public_images).where.not(public_images: {id: nil}) }
   end

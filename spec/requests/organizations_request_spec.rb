@@ -231,6 +231,18 @@ RSpec.describe OrganizationsController, type: :request do
         expect(bike.status).to eq "status_stolen"
         expect(bike.owner_email).to eq(b_param_attrs[:bike][:owner_email])
       end
+      context "with an invalid enum value" do
+        let(:b_param_attrs) do
+          {bike: {owner_email: "someemail@stuff.com", frame_material: "1",
+                  creation_organization_id: current_organization.id.to_s}}
+        end
+        it "renders" do
+          get "#{base_url}/#{current_organization.id}/embed_extended?b_param_id_token=#{b_param.id_token}"
+          expect(response.code).to eq("200")
+          expect(response).to render_template(:embed_extended)
+          expect(assigns(:bike).frame_material).to eq "1"
+        end
+      end
     end
   end
 
