@@ -30,9 +30,19 @@ module Org
           pages[@index]
         end
 
+        # The registration's step math, so the progress bars match the real flow. The
+        # review is one past the pages, which is exactly the review's step there too.
+        def progress_step
+          BikeServices::Register.step_for_page_index(@index).to_i
+        end
+
+        def progress_total
+          BikeServices::Register.total_steps(@registration_sequence)
+        end
+
         # The rule pages plus the review they end on
-        def total_steps
-          pages.count + 1
+        def acknowledgment_step_count
+          BikeServices::Register.acknowledgment_step_count(@registration_sequence)
         end
 
         def continue_path

@@ -7,9 +7,11 @@ module Org
       # with decorative checkboxes. Used stacked in the full preview and beneath the page
       # editor.
       class Component < ApplicationComponent
-        def initialize(page:)
+        # first: the flow's opening page, where the registrant is told why these appeared
+        def initialize(page:, first: false)
           @page = page
           @sequence = page.registration_sequence
+          @first = first
         end
 
         private
