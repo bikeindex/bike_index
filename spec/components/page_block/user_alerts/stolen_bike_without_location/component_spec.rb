@@ -19,11 +19,19 @@ RSpec.describe PageBlock::UserAlerts::StolenBikeWithoutLocation::Component, type
     expect(link.text).to include "2018 Surly Cross Check"
   end
 
-  # Dismissing the modal would otherwise be the end of it - the banner is how it comes back
-  it "renders a banner outside the modal, linking back to it" do
+  # Dismissing the modal would otherwise be the end of it, so the banner carries the same
+  # thing rather than pointing back at it
+  it "renders a banner outside the modal, saying everything the modal does" do
     banner = component.css("[role='alert']").reject { |el| el.ancestors("dialog").any? }.first
-    expect(banner.text.squish).to eq "Notice Your stolen bike is missing its theft location! Please add the theft location"
-    expect(banner.css("a").first["data-open-modal"]).to eq "stolen-missing-location"
+    modal_body = component.css("dialog#stolen-missing-location [role='alert'], dialog#stolen-missing-location").first
+    expect(banner.text).to include "Please add theft location"
+    expect(banner.text).to include "It is critical for recovery"
+    expect(banner.text).to include "2018 Surly Cross Check"
+    expect(banner.text).to include "Without a location we can't spread the word"
+    expect(banner.css("a").map { |a| a[:href] }).to eq ["/bikes/12/edit/theft_details#where-theft-happened"]
+    # Everything bar the alert's screen-reader-only kind label
+    banner.css("[class~='tw:sr-only']").remove
+    expect(banner.text.squish).to eq modal_body.text.squish
   end
 
   context "with a cargo bike" do
