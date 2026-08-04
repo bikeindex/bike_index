@@ -16,15 +16,18 @@
 <%= render UI::Card::Component.new do %>
   <%= form_with model: @registration_sequence, url: organization_registration_sequence_path(organization_id: @organization.to_param, id: @registration_sequence.id), method: :patch do |f| %>
     <div class="tw:flex tw:flex-col tw:gap-4">
-      <div>
-        <%= f.label :faq_url, "FAQ link", class: "twlabel" %>
-        <%= f.url_field :faq_url, class: "twinput tw:w-full", placeholder: "https://" %>
+      <%# FAQ link — temporarily hidden, re-add later %>
+      <% if false %>
+        <div>
+          <%= f.label :faq_url, "FAQ link", class: "twlabel" %>
+          <%= f.url_field :faq_url, class: "twinput tw:w-full", placeholder: "https://" %>
 
-        <p class="tw:mt-1 tw:mb-0 tw:text-sm tw:text-gray-500">
-          Linked from every page, for registrants with questions about these
-          policies.
-        </p>
-      </div>
+          <p class="tw:mt-1 tw:mb-0 tw:text-sm tw:text-gray-500">
+            Linked from every page, for registrants with questions about these
+            policies.
+          </p>
+        </div>
+      <% end %>
 
       <div>
         <%= f.label :acknowledgment_text, "Final acknowledgment", class: "twlabel" %>
@@ -44,11 +47,3 @@
     </div>
   <% end %>
 <% end %>
-
-<h2 class="uncap tw:mt-8 tw:mb-3 tw:text-xl">Preview</h2>
-
-<p class="tw:mb-3 tw:text-sm tw:text-gray-500">
-  What registrants see, in order.
-</p>
-
-<%= render Org::RegistrationSequence::Preview::Component.new(registration_sequence: @registration_sequence) %>

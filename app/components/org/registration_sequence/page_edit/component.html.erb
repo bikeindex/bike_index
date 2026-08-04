@@ -22,11 +22,14 @@
     <%= @form_builder.text_area :subtitle, rows: 2, class: "twinput tw:w-full" %>
   </div>
 
-  <div>
-    <%= @form_builder.label :image, "Image", class: "twlabel" %>
+  <%# Image upload — temporarily hidden, re-add later %>
+  <% if false %>
+    <div>
+      <%= @form_builder.label :image, "Image", class: "twlabel" %>
 
-    <%= render UI::Forms::FileUpload::Component.new(form_builder: @form_builder, attribute: :image, accept: "image/*") %>
-  </div>
+      <%= render UI::Forms::FileUpload::Component.new(form_builder: @form_builder, attribute: :image, accept: "image/*") %>
+    </div>
+  <% end %>
 
   <% if organization_name.present? %>
     <div>

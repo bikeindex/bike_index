@@ -35,7 +35,7 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
 
     expect(page).to have_content("Winter storage rules")
 
-    # --- Edit a page: title, subtitle, a bullet, and the image ---
+    # --- Edit a page: title, subtitle, a bullet ---
     click_link "Edit", match: :first
     expect(page).to have_css("lexxy-editor lexxy-toolbar", wait: 10)
 
@@ -46,10 +46,11 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
     bullet.click
     bullet.send_keys(" reviewed 2026")
 
-    attach_file "registration_sequence_page[image]",
-      Rails.root.join("spec/fixtures/bike.jpg").to_s, make_visible: true
-    # the UI::Forms::FileUpload Stimulus controller reflects the chosen file
-    expect(page).to have_css("[data-ui--forms--file-upload-target='filename']", text: "bike.jpg")
+    # Image upload temporarily hidden — restore these steps when it returns:
+    # attach_file "registration_sequence_page[image]",
+    #   Rails.root.join("spec/fixtures/bike.jpg").to_s, make_visible: true
+    # # the UI::Forms::FileUpload Stimulus controller reflects the chosen file
+    # expect(page).to have_css("[data-ui--forms--file-upload-target='filename']", text: "bike.jpg")
 
     click_button "Save page"
 
@@ -62,7 +63,7 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
     edited = draft.registration_sequence_pages.find_by(title: "Battery safety pledge")
     expect(edited.subtitle).to eq "Charge safely on campus"
     expect(edited.body).to include("reviewed 2026")
-    expect(edited.image).to be_attached
+    # expect(edited.image).to be_attached # image upload temporarily hidden
     expect(draft.registration_sequence_pages.pluck(:title)).to include("Campus-specific rules")
   end
 

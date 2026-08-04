@@ -4,8 +4,7 @@ module Org
   module RegistrationSequence
     module Edit
       # Draft management UI: the drag-to-reorder page list with per-page Edit
-      # links, the sequence-wide settings form, and a preview of what
-      # registrants see.
+      # links and the sequence-wide settings form.
       class Component < ApplicationComponent
         def initialize(registration_sequence:)
           @registration_sequence = registration_sequence
