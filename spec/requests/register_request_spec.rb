@@ -702,6 +702,24 @@ RSpec.describe RegisterController, type: :request do
         end
       end
 
+      # This flow permits no enum a bot could poison - cycle_type is friendly_found and
+      # status is gated by BParam#status - but it creates the bike from whatever the
+      # registration already holds, so a bad value can still arrive at Builder
+      context "registration holding an invalid enum value" do
+        let(:b_param) do
+          BParam.create(origin: "register_flow",
+            params: {bike: {owner_email:, manufacturer_id: "Trek", frame_material: "1"}}.as_json)
+        end
+
+        it "sends them back to step 2 with the error, rather than raising" do
+          expect {
+            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          }.to_not change(Bike, :count)
+          expect(flash[:error]).to match(/frame material/i)
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: 2)
+        end
+      end
+
       context "registering to their own address" do
         let(:owner_email) { current_user.email }
 
