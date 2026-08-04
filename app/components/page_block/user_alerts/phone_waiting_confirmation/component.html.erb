@@ -1,6 +1,6 @@
 <%= render PageBlock::UserAlerts::Banner::Component.new do %>
-  <%= link_to translation(".confirm_your_phone_number"), "#",
-        data: {open_modal: MODAL_ID}, class: "twlink" %>
+  <%= render UI::Button::Component.new(text: translation(".confirm_your_phone_number"),
+        color: :link, data: {open_modal: MODAL_ID}) %>
 <% end %>
 
 <%= render UI::Modal::Component.new(id: MODAL_ID, title: modal_title) do |modal| %>
