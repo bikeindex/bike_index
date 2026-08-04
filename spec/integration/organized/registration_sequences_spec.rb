@@ -75,6 +75,22 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
     expect(draft.registration_sequence_pages.pluck(:title)).to include("Campus-specific rules")
   end
 
+  it "walks the full preview through every page to the review, then back to editing" do
+    visit "/o/#{organization.to_param}/registration_sequences"
+    click_button "Create a sequence"
+
+    click_link "Preview"
+    expect(page).to have_link("Continue") # the first rule page, as a registrant sees it
+
+    # Page through every rule screen to the review
+    click_link "Continue" while page.has_link?("Continue", wait: 2)
+
+    expect(page).to have_content("almost done") # the review screen
+    click_link "Finish preview"
+
+    expect(page).to have_content("Draft registration sequence") # back in the editor
+  end
+
   # Drives the bullet-editors Stimulus controller end-to-end (add a row, clone the <template>,
   # upgrade a fresh Lexxy editor). This can't catch the importmap relative-import 404 that broke
   # this in production -- dev and test serve undigested assets, so a relative import resolves here

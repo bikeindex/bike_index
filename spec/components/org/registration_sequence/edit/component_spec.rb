@@ -20,6 +20,12 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
     expect(page).to have_css("[data-sortable-target='item'] [data-sortable-target='handle']", minimum: 1)
   end
 
+  it "links to the full preview walk-through" do
+    render_inline(described_class.new(registration_sequence:))
+
+    expect(page).to have_link("Preview")
+  end
+
   it "renders the settings shared by every page" do
     render_inline(described_class.new(registration_sequence:))
 

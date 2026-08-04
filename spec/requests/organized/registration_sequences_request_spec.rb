@@ -71,6 +71,14 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
         expect(response).to render_template(:show)
       end
 
+      it "pages through the rules, then the review" do
+        get "#{base_url}/#{draft.id}?page=0"
+        expect(response.body).to include("Continue")
+
+        get "#{base_url}/#{draft.id}?page=99" # clamped to the review screen
+        expect(response.body).to include("almost done")
+      end
+
       context "with an active (non-draft) sequence" do
         let!(:active) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: current_organization) }
 

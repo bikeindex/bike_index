@@ -8,9 +8,10 @@ module Organized
       @previous = current_organization.registration_sequences.archived.order(end_at: :desc).to_a
     end
 
-    # Read-only preview of a sequence (draft or live)
+    # The faked registrant walk-through, one page (?page=) per screen
     def show
       @registration_sequence = current_organization.registration_sequences.find(params[:id])
+      @preview_index = params[:page].to_i
     end
 
     # Manage the draft's pages (add / reorder / edit) and its sequence-wide settings

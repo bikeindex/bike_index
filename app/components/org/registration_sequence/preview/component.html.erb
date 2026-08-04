@@ -1,22 +1,52 @@
-<div class="tw:mx-auto tw:flex tw:max-w-md tw:flex-col tw:gap-8">
-  <% @registration_sequence.registration_sequence_pages.each do |page| %>
-    <%= render Org::RegistrationSequence::PagePreview::Component.new(page:) %>
+<%= render Register::Page::Component.new do %>
+  <%= render Register::AcknowledgmentProgress::Component.new(number: @index + 1, total: total_steps) %>
+
+  <% if reviewing? %>
+    <%= render UI::Header::Component.new(text: "You're almost done", subtitle: "A quick review before you finish.", html_class: "uncap") %>
+    <%= render UI::DividedCard::Component.new do %>
+      <% pages.each do |page| %>
+        <div
+          class="
+            tw:flex tw:items-center tw:gap-2.5 tw:px-4 tw:py-3 tw:text-sm
+            tw:font-semibold
+          "
+        >
+          <span
+            class="
+              tw:flex tw:h-5.5 tw:w-5.5 tw:shrink-0 tw:items-center
+              tw:justify-center tw:rounded-full tw:bg-green-100
+              tw:text-green-600
+            "
+          >
+            <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:h-3 tw:w-3", aria_hidden: true) %>
+          </span>
+
+          <%= page.title %>
+        </div>
+      <% end %>
+    <% end %>
+    <div class="tw:mt-5">
+      <%= render UI::DividedCard::Component.new do %>
+        <label
+          class="
+            tw:mb-0 tw:flex tw:cursor-pointer tw:items-start tw:gap-3
+            tw:px-4 tw:py-3.5 tw:text-sm tw:font-normal
+          "
+        >
+          <%= check_box_tag "preview_acknowledged", "1", false, id: nil, class: "tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:cursor-pointer" %>
+
+          <span>
+            I, <em>registrant's name</em>,
+            <%= @registration_sequence.acknowledgment %>
+          </span>
+        </label>
+      <% end %>
+    </div>
+    <%= render UI::ButtonLink::Component.new(text: "Finish preview", href: exit_path, color: :primary, size: :lg, html_class: "tw:mt-5 tw:w-full") %>
+  <% else %>
+    <%= render Org::RegistrationSequence::PagePreview::Component.new(page: current_page) %>
+    <%= render UI::ButtonLink::Component.new(text: "Continue", href: continue_path, color: :primary, size: :lg, html_class: "tw:mt-5 tw:w-full") %>
   <% end %>
 
-  <%# The final acknowledgment binding the registrant to every page above %>
-  <%= render UI::DividedCard::Component.new do %>
-    <label
-      class="
-        tw:mb-0 tw:flex tw:cursor-pointer tw:items-start tw:gap-3 tw:px-4
-        tw:py-3.5 tw:text-sm tw:font-normal
-      "
-    >
-      <%= check_box_tag "preview_acknowledged", "1", false, id: nil, class: "tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:cursor-pointer" %>
-
-      <span>
-        I, <em>registrant's name</em>,
-        <%= @registration_sequence.acknowledgment %>
-      </span>
-    </label>
-  <% end %>
-</div>
+  <%= render Register::BackLink::Component.new(href: back_path) %>
+<% end %>
