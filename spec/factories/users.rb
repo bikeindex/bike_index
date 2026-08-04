@@ -1,9 +1,6 @@
 FactoryBot.define do
   factory :user do
     sequence(:name) { |n| "User #{n.to_s.rjust(4, "0")}" }
-    # Without this, User generates a random base64 username, which occasionally
-    # contains a BadWordCleaner word and makes credibility specs flaky
-    sequence(:username) { |n| "user-#{n.to_s.rjust(4, "0")}" }
     email { generate(:unique_email) }
     password { "testthisthing7$" }
     password_confirmation { "testthisthing7$" }
