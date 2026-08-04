@@ -1,3 +1,11 @@
+<%# Outlives the modal being dismissed - its link is how you get the modal back %>
+
+<%= render PageBlock::UserAlerts::Banner::Component.new do %>
+  <%= translation(".missing_photo_html",
+        add_link: link_to(translation(".add_a_photo"), "#",
+          data: {open_modal: MODAL_ID}, class: "twlink")) %>
+<% end %>
+
 <%= render PageBlock::UserAlerts::BikeListModal::Component.new(id: MODAL_ID,
       title: translation(".missing_stolen_photo_title"),
       intro: translation(".photo_critical_html"),

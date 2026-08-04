@@ -4,7 +4,9 @@ en:
     page_block:
       user_alerts:
         theft_alert_without_photo:
+          add_a_photo: add a photo
           add_photo_theft_bike_title_html: Add a photo to your <strong>%{bike_title}</strong>
+          missing_photo_html: Your promoted alert is missing a photo! Please %{add_link}
           missing_stolen_photo_title: Please add a photo
           photo_critical_html: Successful promoted alerts <strong>need to have an
             image</strong>
