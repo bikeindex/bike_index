@@ -175,16 +175,18 @@ module BikeServices
         confirmed_email_creator_id(b_param).present?
     end
 
-    # Step 1 is the least a registration can be: who owns it and what it is. Returns the
-    # translation keys for why it didn't save, empty once it did - the params are merged
-    # in either way, so a re-render still shows everything they entered
+    # Step 1 is the least a registration can be: who owns it and what it is. The params are
+    # merged in whether or not it passes, so a re-render still shows everything they entered
     def save_step_1(b_param, bike_params:, propulsion_type_motorized:)
       b_param.clean_params({bike: bike_params, propulsion_type_motorized:}.as_json)
-      missing = [(:email_required if b_param.owner_email.blank?),
-        (:manufacturer_required if b_param.manufacturer_id.blank?)].compact
-      return missing if missing.any?
+      # Before save, which clears the errors it's about to re-run validations for
+      b_param.errors.add(:base, translation(:email_required)) if b_param.owner_email.blank?
+      b_param.errors.add(:base, translation(:manufacturer_required)) if b_param.manufacturer_id.blank?
+      return false if b_param.errors.any?
+      return true if b_param.save
 
-      b_param.save ? [] : [:unable_to_save]
+      b_param.errors.add(:base, translation(:unable_to_save))
+      false
     end
 
     # Step 2 merges over step 1 - creator claimed for signed-in users, the photo and the
@@ -199,6 +201,7 @@ module BikeServices
       completed = b_param.self_made?(user) || bike_params["user_name"].present?
       b_param.clean_params(step_2_params(bike_params, image_signed_id:, completed:).as_json)
       b_param.save
+      b_param.errors.add(:base, translation(:name_required)) unless completed
       completed
     end
 
@@ -308,8 +311,11 @@ module BikeServices
       {details_completed: completed, bike: bike_params, image_signed_id: image_signed_id.presence}.compact
     end
 
+    def translation(key) = I18n.t(key, scope: "shared.register_flow")
+
     conceal :claim_creator, :create_bike_if_ready, :create_bike, :ready_for_bike?,
       :reusable?, :all_steps, :permitted_steps, :confirmed_email_creator_id,
-      :owner_email_for, :assign_owner_email, :details_completed?, :step_2_params
+      :owner_email_for, :assign_owner_email, :details_completed?, :step_2_params,
+      :translation
   end
 end

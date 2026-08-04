@@ -54,13 +54,11 @@ class RegisterController < ApplicationController
   end
 
   def create
-    errors = BikeServices::Register.save_step_1(@b_param, bike_params: create_params,
+    saved = BikeServices::Register.save_step_1(@b_param, bike_params: create_params,
       propulsion_type_motorized: params[:propulsion_type_motorized])
-    if errors.any?
-      # The 422 renders skip the derived meta title, which now needs the interpolation
+    unless saved
+      # The 422 render skips the derived meta title, which now needs the interpolation
       @page_title = I18n.t("meta_titles.register_create", cycle_type: @b_param.type)
-      # controller_method: the block would otherwise scope the key to itself
-      errors.each { @b_param.errors.add(:base, translation(it, controller_method: __method__)) }
       return render(Register::Step1::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:),
         status: :unprocessable_entity)
     end
@@ -72,12 +70,11 @@ class RegisterController < ApplicationController
 
   def update
     # Both read straight from params - update_params is stored as json, which an upload can't be
-    saved_step_2 = BikeServices::Register.save_step_2(@b_param, user: current_user,
+    saved = BikeServices::Register.save_step_2(@b_param, user: current_user,
       image: params.dig(:bike, :image), image_signed_id: params.dig(:bike, :image_signed_id),
       bike_params: update_params)
     # Saved either way, so the re-render has everything they entered
-    unless saved_step_2
-      @b_param.errors.add(:base, translation(:name_required))
+    unless saved
       return render(Register::Step2::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:),
         status: :unprocessable_entity)
     end
