@@ -1,4 +1,4 @@
-<div class="tw:py-6">
+<div class="tw:py-6" data-controller="page-preview">
   <% editing = @page.persisted? %>
 
   <div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
@@ -27,6 +27,24 @@
       <% if editing %>
         <%= render UI::ButtonLink::Component.new(text: "Delete page", href: organization_registration_sequence_page_path(organization_id: current_organization.to_param, id: @page.id), color: :error, size: :sm, data: {turbo: true, turbo_method: :delete, turbo_confirm: "This action can't be undone, you'll have to re-create the page"}) %>
       <% end %>
+    </div>
+
+    <% if editing %>
+      <p
+        data-page-preview-target="hint"
+        hidden
+        class="tw:mt-2 tw:mb-0 tw:text-sm tw:text-gray-500"
+      >
+        Save the page to see the updated preview.
+      </p>
+    <% end %>
+  <% end %>
+
+  <% if editing %>
+    <div data-page-preview-target="preview" class="tw:mt-8">
+      <h2 class="uncap tw:mb-3 tw:text-xl">Preview</h2>
+
+      <%= render Org::RegistrationSequence::PagePreview::Component.new(page: @page) %>
     </div>
   <% end %>
 </div>

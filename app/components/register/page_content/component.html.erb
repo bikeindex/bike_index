@@ -2,7 +2,8 @@
   <div class="tw:mb-3"><%= badge %></div>
 <% end %>
 
-<%= render UI::Header::Component.new(text: @page.heading_text, subtitle: @page.subtitle) %>
+<%# uncap: the org preview renders in a layout that upper-cases headings; the flow's doesn't %>
+<%= render UI::Header::Component.new(text: @page.heading_text, subtitle: @page.subtitle, html_class: "uncap") %>
 
 <% if @page.image_url.present? %>
   <%= image_tag @page.image_url, alt: "", class: "tw:mb-5 tw:w-full tw:rounded-lg tw:object-cover" %>

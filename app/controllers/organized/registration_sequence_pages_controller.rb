@@ -31,7 +31,8 @@ module Organized
         head :ok
       elsif @page.update(permitted_parameters)
         flash[:success] = "Page updated"
-        redirect_to sequence_path
+        # Back to this page so the refreshed preview is right there
+        redirect_to edit_page_path
       else
         flash[:error] = "Unable to update: #{@page.errors.full_messages.to_sentence}"
         render :edit
@@ -68,6 +69,10 @@ module Organized
 
     def sequence_path
       edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id)
+    end
+
+    def edit_page_path
+      edit_organization_registration_sequence_page_path(organization_id: current_organization.to_param, id: @page.id)
     end
 
     def permitted_parameters

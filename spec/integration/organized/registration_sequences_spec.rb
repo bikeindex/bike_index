@@ -39,11 +39,15 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
 
     expect(page).to have_content("Winter storage rules")
 
-    # --- Edit a page: title, subtitle, a bullet ---
+    # --- Edit a page: it previews as registrants see it, and editing marks it stale ---
     click_link "Edit", match: :first
     expect(page).to have_css("lexxy-editor lexxy-toolbar", wait: 10)
+    expect(page).to have_content("Preview") # the saved page shows below the form
 
     fill_in "Title", with: "Battery safety pledge"
+    # Editing hides the now-stale preview and asks for a save
+    expect(page).to have_content("Save the page to see the updated preview")
+
     fill_in "Subtitle", with: "Charge safely on campus"
 
     bullet = first("lexxy-editor [contenteditable='true']")
@@ -58,9 +62,9 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
 
     click_button "Save page"
 
-    # Back on the management view, the edited title shows and the old one is gone
-    expect(page).to have_content("Battery safety pledge")
-    expect(page).to have_no_content("Battery & charging")
+    # Saving returns to this page with its preview refreshed to the new content
+    expect(page).to have_content("Preview")
+    expect(page).to have_content("Charge safely on campus") # the new subtitle, shown in the preview
 
     # Persistence
     draft = organization.registration_sequences.draft.first

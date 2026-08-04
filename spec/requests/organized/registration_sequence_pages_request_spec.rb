@@ -48,11 +48,11 @@ RSpec.describe Organized::RegistrationSequencePagesController, type: :request do
     describe "update" do
       let(:page) { draft.registration_sequence_pages.first }
 
-      it "updates the page title, subtitle and body, and redirects to the sequence" do
+      it "updates the page title, subtitle and body, and returns to the page's preview" do
         patch "#{member_url}/#{page.id}", params: {
           registration_sequence_page: {title: "Battery & charging", heading: "Looks like you have an e-vehicle!", subtitle: "Charge safely", body: "<ul><li>first</li><li>second</li></ul>", organization_specific: "1"}
         }
-        expect(response).to redirect_to(sequence_path)
+        expect(response).to redirect_to("#{member_url}/#{page.id}/edit")
         expect(page.reload.title).to eq("Battery & charging")
         expect(page.heading).to eq("Looks like you have an e-vehicle!")
         expect(page.subtitle).to eq("Charge safely")

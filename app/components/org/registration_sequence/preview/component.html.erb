@@ -1,21 +1,6 @@
 <div class="tw:mx-auto tw:flex tw:max-w-md tw:flex-col tw:gap-8">
   <% @registration_sequence.registration_sequence_pages.each do |page| %>
-    <%= render Register::PageContent::Component.new(page:, control: ->(_index) {
-      check_box_tag "preview_#{page.id}[]", "1", false, id: nil,
-        class: "tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:cursor-pointer"
-    }) do |content| %>
-      <% content.with_badge do %>
-        <% if page.organization_specific && organization_name.present? %>
-          <%= render UI::Badge::Component.new(text: organization_name, color: :notice) %>
-        <% end %>
-      <% end %>
-
-      <% content.with_faq do %>
-        <% if @registration_sequence.faq_url.present? %>
-          <%= link_to "FAQ", @registration_sequence.faq_url, target: "_blank", rel: "noopener", class: "twlink tw:text-xs" %>
-        <% end %>
-      <% end %>
-    <% end %>
+    <%= render Org::RegistrationSequence::PagePreview::Component.new(page:) %>
   <% end %>
 
   <%# The final acknowledgment binding the registrant to every page above %>

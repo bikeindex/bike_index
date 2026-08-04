@@ -13,12 +13,6 @@ module Org
         def render?
           @registration_sequence.present?
         end
-
-        private
-
-        def organization_name
-          @registration_sequence.organization&.short_name
-        end
       end
     end
   end
