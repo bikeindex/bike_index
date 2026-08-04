@@ -26,6 +26,11 @@ function localizeTime () {
   window.timeLocalizer.localize()
 }
 
+// Navigating away rejects every fetch still in flight, and Turbo rethrows
+// anything that isn't an AbortError - so an abandoned page load reports as an
+// unhandled rejection. Safari words it "Load failed", everyone else these.
+const ABANDONED_FETCH = /Failed to fetch|Load failed|Fetch is aborted|aborted a request/
+
 // Load honeybadger dynamically so ad blockers don't break the entire app
 const honeybadgerApiKey = document.querySelector('meta[name="honeybadger-api-key"]')?.content
 if (honeybadgerApiKey) {
@@ -42,6 +47,9 @@ if (honeybadgerApiKey) {
         }
         // Filter out ResizeObserver loop noise (benign browser warning)
         if (notice.message?.includes('ResizeObserver loop')) {
+          return false
+        }
+        if (ABANDONED_FETCH.test(notice.message)) {
           return false
         }
       })
