@@ -117,6 +117,14 @@ module BikeServices
       b_param.save
     end
 
+    # What a step's submission agrees to: an acknowledgment page's own boxes, or the
+    # single agreement the review ends with
+    def acknowledge_step(b_param, step, sequence:, user:, acknowledged_all:, checked:)
+      return save_acknowledgment(b_param, sequence, acknowledged_all:, user:) if step == "review"
+
+      acknowledge_page(b_param, page_for_step(step, sequence:), checked:)
+    end
+
     # The moment the pages become an agreement - promoted off the b_param onto a
     # record of its own, which outlives the registration
     def save_acknowledgment(b_param, sequence, acknowledged_all:, user: nil)
@@ -152,11 +160,31 @@ module BikeServices
       true
     end
 
+    # Time limited, so an old link proves nothing - the address gets a fresh one.
+    # A blank token reads as expired, so it never reaches the compare
+    def confirmation_token_valid?(b_param, token)
+      return false if b_param.email_confirmation_token_expired?
+
+      ActiveSupport::SecurityUtils.secure_compare(token.to_s, b_param.email_confirmation_token)
+    end
+
     # Whether a bike can be created now - Ownership requires a creator, so
     # anonymous registrations wait for the confirmation email to prove one
     def creator_available?(b_param)
       b_param.creator_id.present? || b_param.creation_organization&.auto_user_id.present? ||
         confirmed_email_creator_id(b_param).present?
+    end
+
+    # Step 1 is the least a registration can be: who owns it and what it is. Returns the
+    # translation keys for why it didn't save, empty once it did - the params are merged
+    # in either way, so a re-render still shows everything they entered
+    def save_step_1(b_param, bike_params:, propulsion_type_motorized:)
+      b_param.clean_params({bike: bike_params, propulsion_type_motorized:}.as_json)
+      missing = [(:email_required if b_param.owner_email.blank?),
+        (:manufacturer_required if b_param.manufacturer_id.blank?)].compact
+      return missing if missing.any?
+
+      b_param.save ? [] : [:unable_to_save]
     end
 
     # Step 2 merges over step 1 - creator claimed for signed-in users, the photo and the
@@ -173,6 +201,17 @@ module BikeServices
       b_param.save
       completed
     end
+
+    # Everything a submission does once its step is saved. Returns the bike, or nil while
+    # the registration is still short of one - more to enter, or the email unconfirmed
+    def complete(b_param, user:, sequence:, ip_address:)
+      claim_creator(b_param, user)
+      create_bike_if_ready(b_param, sequence:, ip_address:)
+    end
+
+    #
+    # private below here
+    #
 
     # Ownership requires a creator, and signing in can happen anywhere in the flow -
     # e.g. partway through the acknowledgment pages
@@ -196,10 +235,6 @@ module BikeServices
       acknowledgment(b_param)&.update(bike_id: bike.id, user_id: b_param.creator_id) if bike.id.present?
       bike
     end
-
-    #
-    # private below here
-    #
 
     def ready_for_bike?(b_param, sequence:)
       details_completed?(b_param) && acknowledged?(b_param, sequence:)
@@ -273,8 +308,8 @@ module BikeServices
       {details_completed: completed, bike: bike_params, image_signed_id: image_signed_id.presence}.compact
     end
 
-    conceal :ready_for_bike?, :reusable?, :all_steps, :permitted_steps,
-      :confirmed_email_creator_id, :owner_email_for, :assign_owner_email,
-      :details_completed?, :step_2_params
+    conceal :claim_creator, :create_bike_if_ready, :create_bike, :ready_for_bike?,
+      :reusable?, :all_steps, :permitted_steps, :confirmed_email_creator_id,
+      :owner_email_for, :assign_owner_email, :details_completed?, :step_2_params
   end
 end
