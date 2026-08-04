@@ -55,7 +55,7 @@ brakebills_feature_ids = []
 official_manufacturer_feature_id = nil
 law_enforcement_feature_id = nil
 
-brakebills_skipped_feature_names = ["Avery Export", "Skip ownership email", "Single Sign On (SSO)"]
+brakebills_skipped_feature_names = ["Avery Export", "Passwordless users", "Single Sign On (SSO)", "Skip ownership email"]
 
 feature_name_and_slugs.each do |attrs|
   org_feature = OrganizationFeature.find_by_name(attrs[:name]) ||
