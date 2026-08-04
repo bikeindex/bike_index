@@ -6,7 +6,7 @@
       <%= editing ? "Edit page" : "Add page" %>
     </h1>
 
-    <%= link_to "Back to pages", edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), class: "twlink" %>
+    <%= link_to "Back to draft overview", edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), class: "twlink" %>
   </div>
 
   <% form_url = editing ?

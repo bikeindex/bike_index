@@ -11,9 +11,7 @@
 
 <%= render Org::RegistrationSequence::PageList::Component.new(registration_sequence: @registration_sequence, editable: true) %>
 
-<h2 class="uncap tw:mt-8 tw:mb-3 tw:text-xl">Settings</h2>
-
-<%= render UI::Card::Component.new do %>
+<%= render UI::Card::Component.new(additional_classes: "tw:mt-8") do %>
   <%= form_with model: @registration_sequence, url: organization_registration_sequence_path(organization_id: @organization.to_param, id: @registration_sequence.id), method: :patch do |f| %>
     <div class="tw:flex tw:flex-col tw:gap-4">
       <%# FAQ link — temporarily hidden, re-add later %>
