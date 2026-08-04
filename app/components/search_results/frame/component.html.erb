@@ -11,6 +11,19 @@
     <%= render UI::Alerts::Base::Component.new(text: translation(".rate_limited"), kind: :warning) %>
   </div>
 
+  <%#
+    Revealed by search--form when the frame's fetch fails outright - offline, or
+    a connection dropped mid-request. Turbo leaves the spinner up for those too.
+  %>
+
+  <div hidden data-search-fetch-failed>
+    <%= render UI::Alerts::Base::Component.new(text: translation(".fetch_failed"),
+      kind: :error, margin_classes: "tw:mb-2") %>
+
+    <%= render UI::Button::Component.new(text: translation(".retry"), size: :sm,
+      data: {search_retry: ""}) %>
+  </div>
+
   <%= helpers.turbo_frame_tag @frame_id, src: @src do %>
     <% if @render_results %>
       <%= content %>

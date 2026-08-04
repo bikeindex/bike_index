@@ -44,8 +44,12 @@ export default class extends Controller {
     // here; the count fetch signals via the search:rate-limited window event.
     document.addEventListener('turbo:before-fetch-response', this.handleFetchResponse)
     document.addEventListener('turbo:before-visit', this.handleBeforeVisit)
+    document.addEventListener('turbo:fetch-request-error', this.handleFetchError)
     window.addEventListener('search:rate-limited', this.showRateLimited)
     window.addEventListener('popstate', this.handlePopstate)
+    // The results frame renders outside this controller's element, so its retry
+    // button is wired here rather than with a data-action
+    this.retryElement?.addEventListener('click', this.retryResults)
   }
 
   disconnect () {
@@ -53,8 +57,10 @@ export default class extends Controller {
     document.removeEventListener('turbo:load', this.handleTurboLoad)
     document.removeEventListener('turbo:before-fetch-response', this.handleFetchResponse)
     document.removeEventListener('turbo:before-visit', this.handleBeforeVisit)
+    document.removeEventListener('turbo:fetch-request-error', this.handleFetchError)
     window.removeEventListener('search:rate-limited', this.showRateLimited)
     window.removeEventListener('popstate', this.handlePopstate)
+    this.retryElement?.removeEventListener('click', this.retryResults)
   }
 
   handleTurboLoad = () => {
@@ -153,8 +159,9 @@ export default class extends Controller {
   handleFrameRender = () => {
     // Content landed, so a pending restore-reload poll is done.
     if (this.frameElement?.childElementCount > 0) clearTimeout(this.emptyReloadTimer)
-    // A frame render means results came back, so clear any rate-limit notice
+    // A frame render means results came back, so clear any failure notice
     this.hideRateLimited()
+    this.hideFetchFailed()
     // Run the time localization command on frame render
     if (window.timeLocalizer && typeof window.timeLocalizer.localize === 'function') {
       window.timeLocalizer.localize()
@@ -171,7 +178,39 @@ export default class extends Controller {
     this.showRateLimited()
 
     // Drop the in-frame loading placeholder so it doesn't spin forever
+    this.hideLoading()
+  }
+
+  // The eager fetch rejects outright when the network drops, rather than coming
+  // back with a status, so handleFetchResponse never sees it and the spinner runs
+  // forever. Ignore other frames' fetches - the combobox raises this too.
+  handleFetchError = (event) => {
+    if (event.target !== this.frameElement) return
+
+    this.hideLoading()
+    this.fetchFailedElement?.removeAttribute('hidden')
+  }
+
+  retryResults = () => {
+    this.hideFetchFailed()
+    this.frameElement?.querySelector('[data-search-loading]')?.removeAttribute('hidden')
+    this.frameElement?.reload()
+  }
+
+  hideLoading () {
     this.frameElement?.querySelector('[data-search-loading]')?.setAttribute('hidden', '')
+  }
+
+  hideFetchFailed () {
+    this.fetchFailedElement?.setAttribute('hidden', '')
+  }
+
+  get fetchFailedElement () {
+    return document.querySelector('[data-search-fetch-failed]')
+  }
+
+  get retryElement () {
+    return document.querySelector('[data-search-retry]')
   }
 
   get rateLimitedElement () {
