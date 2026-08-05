@@ -95,9 +95,15 @@ module SystemSpecHelpers
   end
 
   # Flash messages are fixed position, so an undismissed one intercepts clicks on
-  # whatever it overlays. Wait out the dismiss transition before moving on.
-  def dismiss_flash_messages(wait: 10)
-    all("#flash-messages [aria-label='Close']", minimum: 1).each(&:click)
+  # whatever it overlays. ui--alert wires the close button in `connect` and
+  # application.js lazy loads controllers, so a click landing before that module
+  # arrives is swallowed. Click again, the way a rider whose click did nothing
+  # would, until the alert reports itself gone (the dismiss transition included).
+  def dismiss_flash_messages(wait: 10, attempts: 5)
+    attempts.times do
+      all("#flash-messages [aria-label='Close']", minimum: 1).each { |close| retry_on_detach { close.click } }
+      break if page.has_no_css?("#flash-messages [role='alert']", wait: 1)
+    end
     expect(page).to have_no_css("#flash-messages [role='alert']", wait:)
   end
 

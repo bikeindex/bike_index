@@ -147,7 +147,7 @@ module Bikes
 
     def find_token
       # First, deal with claim_token
-      if params[:t].present? && secure_compare?(params[:t], @bike.current_ownership.token)
+      if params[:t].present? && Binxtils::Secure.compare?(params[:t], @bike.current_ownership.token)
         @claim_message = @bike.current_ownership&.claim_message
         session[:claim_token_email] = @bike.current_ownership.owner_email
       end
