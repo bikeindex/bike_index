@@ -34,6 +34,8 @@ class UserAlert < ApplicationRecord
     unassigned_bike_org: 3
   }.freeze
 
+  UNIQ_KINDS = %w[phone_waiting_confirmation].freeze
+
   # Deprecated columns, still read until Backfills::UserAlertAlertableJob has run
   LEGACY_ALERTABLE_COLUMNS = {"TheftAlert" => :theft_alert_id, "UserPhone" => :user_phone_id}.freeze
 
@@ -118,10 +120,6 @@ class UserAlert < ApplicationRecord
     account_kinds.include?(kind) ? "account" : "general"
   end
 
-  def self.uniq_kinds
-    %w[phone_waiting_confirmation]
-  end
-
   # alertable is matched through for_alertable, so rows still on the legacy columns are found
   def self.find_or_build_by(attrs)
     alertable = attrs[:alertable]
@@ -180,7 +178,7 @@ class UserAlert < ApplicationRecord
   end
 
   def uniq_kind?
-    self.class.uniq_kinds.include?(kind)
+    UNIQ_KINDS.include?(kind)
   end
 
   def kind_humanized

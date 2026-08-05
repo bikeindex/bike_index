@@ -16,10 +16,10 @@ module Backfills
     # Backfilled rows drop out of the relation, but the cursor moves forward by id, so a resumed
     # run doesn't skip anything
     def each_iteration(batch)
-      UserAlert::LEGACY_ALERTABLE_COLUMNS.each do |type, column|
-        batch.where.not(column => nil)
-          .update_all("alertable_type = '#{type}', alertable_id = #{column}")
-      end
+      batch.where.not(theft_alert_id: nil)
+        .update_all("alertable_type = 'TheftAlert', alertable_id = theft_alert_id")
+      batch.where.not(user_phone_id: nil)
+        .update_all("alertable_type = 'UserPhone', alertable_id = user_phone_id")
     end
 
     private
