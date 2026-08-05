@@ -17,6 +17,18 @@ module CspReport
   PRIVATE_IP_FRAME = %r{\Ahttps?://(10\.|127\.|169\.254\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)}
   BLOCKED_URI_NOISE = Regexp.union(GOOGLE_FRAME, PRIVATE_IP_FRAME)
 
+  # The report worth acting on, normalized — nil for noise and malformed bodies.
+  def forwardable(body, user_agent = nil)
+    report = parse(body)
+    return if report.blank? || noise?(report, user_agent)
+
+    normalize(report)
+  end
+
+  #
+  # private below here
+  #
+
   def parse(body)
     parsed = JSON.parse(body)
     parsed["csp-report"] if parsed.is_a?(Hash) && parsed["csp-report"].is_a?(Hash)
@@ -50,10 +62,6 @@ module CspReport
   def permits?(directive, uri)
     sources(directive).any? { |source| source_permits?(source, uri) }
   end
-
-  #
-  # private below here
-  #
 
   # An undeclared directive is enforced by the first one we do declare: an
   # -elem/-attr variant falls back to its base, and anything else to default-src.
@@ -120,7 +128,7 @@ module CspReport
     nil
   end
 
-  conceal :sources, :source_permits?, :extension_noise?, :translate_noise?,
-    :foreign_policy_noise?, :third_party_font_noise?, :directive,
-    :cross_origin_blocked_uri, :parsed_uri
+  conceal :parse, :noise?, :normalize, :permits?, :sources, :source_permits?,
+    :extension_noise?, :translate_noise?, :foreign_policy_noise?,
+    :third_party_font_noise?, :directive, :cross_origin_blocked_uri, :parsed_uri
 end
