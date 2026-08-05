@@ -26,6 +26,15 @@ function localizeTime () {
   window.timeLocalizer.localize()
 }
 
+// A fetch still in flight when the page goes away rejects with a generic network
+// error, not an AbortError, so the message alone can't separate it from real
+// breakage - only treat these phrasings as noise while we're actually leaving.
+const NAVIGATION_FETCH_ERROR = /Failed to fetch|Load failed|Fetch is aborted|aborted a request/
+let navigatingAway = false
+// pagehide rather than beforeunload, which costs the page its bfcache entry
+window.addEventListener('pagehide', () => { navigatingAway = true })
+window.addEventListener('pageshow', () => { navigatingAway = false })
+
 // Load honeybadger dynamically so ad blockers don't break the entire app
 const honeybadgerApiKey = document.querySelector('meta[name="honeybadger-api-key"]')?.content
 if (honeybadgerApiKey) {
@@ -44,8 +53,7 @@ if (honeybadgerApiKey) {
         if (notice.message?.includes('ResizeObserver loop')) {
           return false
         }
-        // A fetch killed by navigating away, in the phrasings browsers give it
-        if (/Failed to fetch|Load failed|Fetch is aborted|aborted a request/.test(notice.message)) {
+        if (navigatingAway && NAVIGATION_FETCH_ERROR.test(notice.message)) {
           return false
         }
       })
