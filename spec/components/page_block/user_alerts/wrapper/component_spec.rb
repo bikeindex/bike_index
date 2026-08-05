@@ -11,6 +11,21 @@ RSpec.describe PageBlock::UserAlerts::Wrapper::Component, type: :component do
     expect(component.render?).to be_falsey
   end
 
+  # The wrapper switches on general_kinds, so a kind there with no component renders nothing
+  it "has a component, a preview scenario and a spec for every kind of alert" do
+    # The rest of the directory is the chrome the alerts share
+    alert_names = Rails.root.glob("app/components/page_block/user_alerts/*").select(&:directory?)
+      .map { |dir| dir.basename.to_s }.sort - %w[banner bike_list_modal wrapper]
+    scenarios = PageBlock::UserAlerts::Wrapper::ComponentPreview.public_instance_methods(false).map(&:to_s)
+
+    expect(alert_names).to eq UserAlert.general_kinds.sort
+    alert_names.each do |alert|
+      expect(scenarios).to include(alert), "UserAlerts::#{alert.camelize} has no preview scenario"
+      spec = Rails.root.join("spec/components/page_block/user_alerts/#{alert}/component_spec.rb")
+      expect(spec.exist?).to be_truthy, "UserAlerts::#{alert.camelize} has no component spec"
+    end
+  end
+
   context "with stolen_bike_without_location" do
     let!(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, user:) }
     let(:alert_slugs) { ["stolen_bike_without_location"] }

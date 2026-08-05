@@ -3,8 +3,8 @@
 module PageBlock
   module UserAlerts
     module Wrapper
-      # The general alert shown at the bottom of every page. Only ever one: the first kind
-      # the user has wins, even when it turns out to have nothing to show
+      # The general alert shown below the navbar on every page. Only ever one: the first
+      # kind the user has wins, even when it turns out to have nothing to show
       class Component < ApplicationComponent
         def initialize(current_user:)
           @current_user = current_user
@@ -57,7 +57,8 @@ module PageBlock
 
         # TODO: use existing user_alert to select correct bikes
         def stolen_bikes(matcher)
-          @current_user.bikes.status_stolen.select { |bike| bike.current_stolen_record&.send(matcher) }
+          @current_user.bikes.status_stolen.includes(:current_stolen_record)
+            .select { |bike| bike.current_stolen_record&.send(matcher) }
         end
       end
     end

@@ -106,7 +106,7 @@ class BParam < ApplicationRecord
   # Tokenized lookups resume registrations for up to a month
   scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
   scope :unexpired_with_token, ->(toke) { unexpired.where(id_token: toke) }
-  # The complement of without_bike_values, within the window the token still resumes
+  # Step 1 submitted, no bike yet, and the token still resumes it
   scope :unfinished_registrations, -> {
     unexpired.without_bike.where(origin: "register_flow")
       .where("(params -> 'bike' -> 'manufacturer_id') IS NOT NULL")
@@ -298,9 +298,10 @@ class BParam < ApplicationRecord
   end
 
   # Step 1 was submitted (manufacturer is required there), so it's more than the shell
-  # new creates, and the token still resumes it
+  # new creates, and the token still resumes it. destroyed? so the after_commit destroy
+  # fires resolves the alert rather than re-saving it onto a row that's gone
   def unfinished_registration?
-    origin == "register_flow" && !with_bike? && manufacturer_id.present? &&
+    !destroyed? && origin == "register_flow" && !with_bike? && manufacturer_id.present? &&
       created_at.present? && created_at > Time.current - TOKEN_EXPIRATION
   end
 

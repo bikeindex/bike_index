@@ -891,6 +891,19 @@ RSpec.describe BParam, type: :model do
       end
     end
 
+    # Email::PartialRegistrationJob destroys them for banned email domains
+    context "destroyed" do
+      it "doesn't alert about a registration that's gone" do
+        expect(b_param.unfinished_registration?).to be_truthy
+        expect(creator.reload.alert_slugs).to eq ["unfinished_registration"]
+
+        b_param.destroy
+
+        expect(creator.reload.user_alerts.active.pluck(:kind)).to eq []
+        expect(creator.reload.alert_slugs).to eq []
+      end
+    end
+
     context "without a manufacturer" do
       let(:bike_params) { {owner_email: "stuff@example.com"} }
 

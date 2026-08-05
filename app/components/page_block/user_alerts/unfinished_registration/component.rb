@@ -3,8 +3,7 @@
 module PageBlock
   module UserAlerts
     module UnfinishedRegistration
-      # Links back into the register flow, which reopens the registration wherever it was
-      # left - including on the e-vehicle rules it never acknowledged
+      # Links back into the register flow, which reopens the registration where it was left
       class Component < ApplicationComponent
         def initialize(b_param:)
           @b_param = b_param

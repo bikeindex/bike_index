@@ -23,7 +23,7 @@ RSpec.describe PageBlock::UserAlerts::StolenBikeWithoutLocation::Component, type
   # thing rather than pointing back at it
   it "renders a banner outside the modal, saying everything the modal does" do
     banner = component.css("[role='alert']").reject { |el| el.ancestors("dialog").any? }.first
-    modal_body = component.css("dialog#stolen-missing-location [role='alert'], dialog#stolen-missing-location").first
+    modal_body = component.css("dialog#stolen-missing-location").first
     expect(banner.text).to include "Please add theft location"
     expect(banner.text).to include "It is critical for recovery"
     expect(banner.text).to include "2018 Surly Cross Check"

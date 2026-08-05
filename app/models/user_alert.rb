@@ -134,7 +134,7 @@ class UserAlert < ApplicationRecord
 
     # A registration that expired (or was deleted) is out of the scope above, and nobody
     # saves an abandoned one again - so this is the only thing that resolves its alert
-    user.user_alerts.active.unfinished_registration
+    user.user_alerts.active.unfinished_registration.includes(:b_param)
       .reject { |user_alert| user_alert.b_param&.unfinished_registration? }
       .each(&:resolve!)
   end

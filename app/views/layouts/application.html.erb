@@ -262,10 +262,8 @@
       </nav>
     <% end %>
 
-    <%# grab (and remove) the donation modal if it's there %>
-    <% donation_request = session.delete(:render_donation_request) %>
-
-    <% if donation_request.present? %>
+    <%# delete, so the donation modal only ever shows once %>
+    <% if session.delete(:render_donation_request).present? %>
       <%= render PageBlock::LawEnforcementDonation::Component.new(current_user:) %>
     <% elsif show_general_alert %>
       <%= render PageBlock::UserAlerts::Wrapper::Component.new(current_user:) %>
