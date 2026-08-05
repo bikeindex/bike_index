@@ -80,7 +80,7 @@ module API
 
       def authenticate_organization
         organization = Organization.friendly_find(params[:organization_slug])
-        if organization.present? && secure_compare?(params[:access_token], organization.access_token)
+        if organization.present? && Binxtils::Secure.compare?(params[:access_token], organization.access_token)
           @organization = organization
         else
           render(json: "Not authorized", status: :unauthorized) && return
