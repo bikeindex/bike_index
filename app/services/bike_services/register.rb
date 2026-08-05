@@ -160,12 +160,11 @@ module BikeServices
       true
     end
 
-    # Time limited, so an old link proves nothing - the address gets a fresh one.
-    # A blank token reads as expired, so it never reaches the compare
+    # Time limited, so an old link proves nothing - the address gets a fresh one
     def confirmation_token_valid?(b_param, token)
       return false if b_param.email_confirmation_token_expired?
 
-      ActiveSupport::SecurityUtils.secure_compare(token.to_s, b_param.email_confirmation_token)
+      Binxtils::Secure.compare?(token, b_param.email_confirmation_token)
     end
 
     # Whether a bike can be created now - Ownership requires a creator, so
