@@ -17,11 +17,12 @@
   %>
 
   <div hidden data-search-fetch-failed>
-    <%= render UI::Alerts::Base::Component.new(text: translation(".fetch_failed"),
-      kind: :error, margin_classes: "tw:mb-2") %>
-
-    <%= render UI::Button::Component.new(text: translation(".retry"), size: :sm,
-      data: {search_retry: ""}) %>
+    <%= render UI::Alerts::Base::Component.new(text: translation(".fetch_failed"), kind: :error) do %>
+      <div class="tw:mt-2">
+        <%= render UI::Button::Component.new(text: translation(".retry"), size: :sm,
+          data: {search_retry: ""}) %>
+      </div>
+    <% end %>
   </div>
 
   <%= helpers.turbo_frame_tag @frame_id, src: @src do %>

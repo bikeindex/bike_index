@@ -160,8 +160,7 @@ export default class extends Controller {
     // Content landed, so a pending restore-reload poll is done.
     if (this.frameElement?.childElementCount > 0) clearTimeout(this.emptyReloadTimer)
     // A frame render means results came back, so clear any failure notice
-    this.hideRateLimited()
-    this.hideFetchFailed()
+    this.hideNotices()
     // Run the time localization command on frame render
     if (window.timeLocalizer && typeof window.timeLocalizer.localize === 'function') {
       window.timeLocalizer.localize()
@@ -181,20 +180,25 @@ export default class extends Controller {
     this.hideLoading()
   }
 
-  // The eager fetch rejects outright when the network drops, rather than coming
-  // back with a status, so handleFetchResponse never sees it and the spinner runs
-  // forever. Ignore other frames' fetches - the combobox raises this too.
+  // A fetch that rejects outright when the network drops never comes back with a
+  // status, so handleFetchResponse never sees it and the spinner runs forever.
+  // Turbo targets the frame for its eager src fetch and the form for a submit;
+  // anything else (the combobox raises this too) isn't ours.
   handleFetchError = (event) => {
-    if (event.target !== this.frameElement) return
+    if (event.target !== this.frameElement && event.target !== this.formTarget) return
 
+    // A failed submit has to be retried by re-submitting: the frame's src still
+    // points at the previous query, so reloading it would show the old results.
+    this.failedSubmit = event.target === this.formTarget
     this.hideLoading()
-    this.fetchFailedElement?.removeAttribute('hidden')
+    this.showNotice('fetch-failed')
   }
 
   retryResults = () => {
-    this.hideFetchFailed()
+    this.hideNotices()
     this.showLoading()
-    this.frameElement?.reload()
+    if (this.failedSubmit) this.formTarget.requestSubmit()
+    else this.frameElement?.reload()
   }
 
   get loadingElement () {
@@ -209,28 +213,20 @@ export default class extends Controller {
     this.loadingElement?.setAttribute('hidden', '')
   }
 
-  hideFetchFailed () {
-    this.fetchFailedElement?.setAttribute('hidden', '')
+  // The notices render beside the results frame, outside this controller's element
+  showNotice (name) {
+    document.querySelector(`[data-search-${name}]`)?.removeAttribute('hidden')
   }
 
-  get fetchFailedElement () {
-    return document.querySelector('[data-search-fetch-failed]')
+  hideNotices () {
+    document.querySelectorAll('[data-search-rate-limited], [data-search-fetch-failed]')
+      .forEach(element => element.setAttribute('hidden', ''))
   }
+
+  showRateLimited = () => this.showNotice('rate-limited')
 
   get retryElement () {
     return document.querySelector('[data-search-retry]')
-  }
-
-  get rateLimitedElement () {
-    return document.querySelector('[data-search-rate-limited]')
-  }
-
-  showRateLimited = () => {
-    this.rateLimitedElement?.removeAttribute('hidden')
-  }
-
-  hideRateLimited () {
-    this.rateLimitedElement?.setAttribute('hidden', '')
   }
 
   // The form sits outside the results frame, so frame-nav period clicks advance

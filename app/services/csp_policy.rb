@@ -4,16 +4,6 @@
 module CspPolicy
   extend Functionable
 
-  # A directive we don't declare is enforced by the first of these we do.
-  # default-src terminates every chain, so it isn't listed.
-  DIRECTIVE_FALLBACKS = {
-    "script-src-elem" => "script-src",
-    "script-src-attr" => "script-src",
-    "style-src-elem" => "style-src",
-    "style-src-attr" => "style-src",
-    "worker-src" => "script-src"
-  }.freeze
-
   # Reads the global policy. No controller narrows it — news widens img_src and
   # strava_search sends no header — so a per-controller policy can only make this
   # answer too strict, never too permissive.
@@ -25,10 +15,12 @@ module CspPolicy
   # private below here
   #
 
+  # An undeclared directive is enforced by the first one we do declare: an
+  # -elem/-attr variant falls back to its base, and anything else to default-src.
   def sources(directive)
     directives = Rails.application.config.content_security_policy&.directives || {}
-    [directive, DIRECTIVE_FALLBACKS[directive], "default-src"]
-      .filter_map { |name| directives[name] }.first || []
+    directives[directive] || directives[directive.to_s.sub(/-(elem|attr)\z/, "")] ||
+      directives["default-src"] || []
   end
 
   def source_permits?(source, uri)

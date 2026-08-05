@@ -61,8 +61,7 @@ class BikeIndex.BikesShow extends BikeIndex
     $(document).keyup (e) =>
       @rotatePhotosOnArrows(e)
     # Load the photos on the first scroll, so there isn't a delay when clicking on
-    # them - and so we don't load them unless there is interaction with the page.
-    # `one` unbinds before running, so a raise can't leave the handler bound.
+    # them - and so we don't load them unless there is interaction with the page
     $(window).one 'scroll', =>
       @loadPhotos()
 

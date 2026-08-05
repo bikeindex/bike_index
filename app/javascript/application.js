@@ -44,7 +44,7 @@ if (honeybadgerApiKey) {
         if (notice.message?.includes('ResizeObserver loop')) {
           return false
         }
-        // A fetch killed by navigating away, in the four phrasings browsers give it
+        // A fetch killed by navigating away, in the phrasings browsers give it
         if (/Failed to fetch|Load failed|Fetch is aborted|aborted a request/.test(notice.message)) {
           return false
         }

@@ -39,14 +39,10 @@ class ForwardCspReportJob < ApplicationJob
   # that varies per request mints a new fault every time — one ad conversion url
   # accounted for hundreds of them.
   def normalized_body(report)
-    {"csp-report" => report.merge("blocked-uri" => normalized_uri(report["blocked-uri"]))}.to_json
-  end
-
-  def normalized_uri(blocked_uri)
+    blocked_uri = report["blocked-uri"]
     uri = parsed_uri(blocked_uri)
-    return blocked_uri if uri.nil?
-
-    "#{uri.scheme}://#{uri.host}#{uri.path}"
+    normalized = uri.nil? ? blocked_uri : "#{uri.scheme}://#{uri.host}#{uri.path}"
+    {"csp-report" => report.merge("blocked-uri" => normalized)}.to_json
   end
 
   def parsed_report(body)
