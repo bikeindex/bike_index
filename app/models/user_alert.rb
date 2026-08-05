@@ -14,17 +14,13 @@
 #  alertable_id    :bigint
 #  bike_id         :bigint
 #  organization_id :bigint
-#  theft_alert_id  :bigint
 #  user_id         :bigint
-#  user_phone_id   :bigint
 #
 # Indexes
 #
-#  index_user_alerts_on_alertable       (alertable_type,alertable_id)
-#  index_user_alerts_on_bike_id         (bike_id)
-#  index_user_alerts_on_theft_alert_id  (theft_alert_id)
-#  index_user_alerts_on_user_id         (user_id)
-#  index_user_alerts_on_user_phone_id   (user_phone_id)
+#  index_user_alerts_on_alertable  (alertable_type,alertable_id)
+#  index_user_alerts_on_bike_id    (bike_id)
+#  index_user_alerts_on_user_id    (user_id)
 #
 class UserAlert < ApplicationRecord
   KIND_ENUM = {
@@ -36,17 +32,12 @@ class UserAlert < ApplicationRecord
 
   UNIQ_KINDS = %w[phone_waiting_confirmation].freeze
 
-  # Deprecated columns, still read until Backfills::UserAlertAlertableJob has run
-  LEGACY_ALERTABLE_COLUMNS = {"TheftAlert" => :theft_alert_id, "UserPhone" => :user_phone_id}.freeze
-
   enum :kind, KIND_ENUM
 
   belongs_to :user
   belongs_to :bike
   belongs_to :organization
   belongs_to :alertable, polymorphic: true
-  belongs_to :user_phone
-  belongs_to :theft_alert
 
   has_one :notification, as: :notifiable
 
@@ -65,16 +56,6 @@ class UserAlert < ApplicationRecord
   scope :account, -> { where(kind: account_kinds) }
   scope :dismissable, -> { where(kind: dismissable_kinds) }
   scope :with_notification, -> { joins(:notification).where.not(notifications: {id: nil}) }
-  # Also matches rows Backfills::UserAlertAlertableJob hasn't reached yet
-  scope :for_alertable, ->(alertable) {
-    next all if alertable.blank?
-
-    type = alertable.class.polymorphic_name
-    matched = where(alertable_type: type, alertable_id: alertable.id)
-    legacy_column = LEGACY_ALERTABLE_COLUMNS[type]
-
-    legacy_column ? matched.or(where(legacy_column => alertable.id)) : matched
-  }
   scope :create_notification, -> {
     where(kind: notification_kinds, updated_at: notify_period)
       .left_joins(:notification).where(notifications: {id: nil})
@@ -123,7 +104,7 @@ class UserAlert < ApplicationRecord
   end
 
   def self.find_or_build_by(attrs)
-    where(attrs.except(:alertable)).for_alertable(attrs[:alertable]).first || new(attrs)
+    where(attrs).first || new(attrs)
   end
 
   def self.update_theft_alert_without_photo(user:, theft_alert:)
@@ -168,11 +149,6 @@ class UserAlert < ApplicationRecord
     else
       user_alert.save unless user_phone.legacy?
     end
-  end
-
-  # Falls back to the legacy columns for rows Backfills::UserAlertAlertableJob hasn't reached
-  def alertable
-    super || theft_alert || user_phone
   end
 
   def kind_humanized
