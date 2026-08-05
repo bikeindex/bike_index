@@ -17,18 +17,6 @@ module CspReport
   PRIVATE_IP_FRAME = %r{\Ahttps?://(10\.|127\.|169\.254\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)}
   BLOCKED_URI_NOISE = Regexp.union(GOOGLE_FRAME, PRIVATE_IP_FRAME)
 
-  # The report worth acting on, normalized — nil for noise and malformed bodies.
-  def forwardable(body, user_agent = nil)
-    report = parse(body)
-    return if report.blank? || noise?(report, user_agent)
-
-    normalize(report)
-  end
-
-  #
-  # private below here
-  #
-
   def parse(body)
     parsed = JSON.parse(body)
     parsed["csp-report"] if parsed.is_a?(Hash) && parsed["csp-report"].is_a?(Hash)
@@ -51,6 +39,10 @@ module CspReport
 
     report.merge("blocked-uri" => "#{uri.scheme}://#{uri.host}#{uri.path}")
   end
+
+  #
+  # private below here
+  #
 
   # Whether our own Content Security Policy would have permitted a request. Only
   # meaningful for a cross-origin uri — quoted sources name no host, so a same
@@ -128,7 +120,7 @@ module CspReport
     nil
   end
 
-  conceal :parse, :noise?, :normalize, :permits?, :sources, :source_permits?,
-    :extension_noise?, :translate_noise?, :foreign_policy_noise?,
-    :third_party_font_noise?, :directive, :cross_origin_blocked_uri, :parsed_uri
+  conceal :permits?, :sources, :source_permits?, :extension_noise?,
+    :translate_noise?, :foreign_policy_noise?, :third_party_font_noise?,
+    :directive, :cross_origin_blocked_uri, :parsed_uri
 end
