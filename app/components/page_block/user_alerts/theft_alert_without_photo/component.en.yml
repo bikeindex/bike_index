@@ -9,5 +9,6 @@ en:
           photo_critical_html: Successful promoted alerts <strong>need to have an
             image</strong>
           without_photo_all_is_lost: >-
-            If you don't have any photos of your bike, find a stock image on the internet
-            and upload it. Without some image, the promoted alert won't be effective.
+            If you don't have any photos of your %{bike_type}, find a stock image
+            on the internet and upload it. Without some image, the promoted alert
+            won't be effective.

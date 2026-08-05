@@ -28,4 +28,12 @@ RSpec.describe PageBlock::UserAlerts::TheftAlertWithoutPhoto::Component, type: :
     expect(banner.text).to include "2018 Surly Cross Check"
     expect(banner.css("a").map { |a| a[:href] }).to eq ["/bikes/12/edit/photos"]
   end
+
+  context "with a cargo bike" do
+    let(:bikes) { [Bike.new(id: 12, cycle_type: :cargo)] }
+
+    it "describes the cycle type" do
+      expect(component.text).to include "any photos of your cargo bike"
+    end
+  end
 end

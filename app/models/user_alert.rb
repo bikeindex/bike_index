@@ -149,8 +149,8 @@ class UserAlert < ApplicationRecord
     user.b_params.unfinished_registrations
       .each { |b_param| update_unfinished_registration(user:, b_param:) }
 
-    # A registration that expired (or was deleted) is out of the scope above, and nobody
-    # saves an abandoned one again - so this is the only thing that resolves its alert
+    # Expiry is silent, and CleanBParamsJob deletes without callbacks, so those alerts
+    # never reach the after_commit that would resolve them
     user.user_alerts.active.unfinished_registration.includes(:alertable)
       .reject { |user_alert| user_alert.alertable&.unfinished_registration? }
       .each(&:resolve!)
@@ -160,7 +160,9 @@ class UserAlert < ApplicationRecord
     user_alert = find_or_build_by(kind: "unfinished_registration",
       user_id: user.id, alertable: b_param)
     if b_param.unfinished_registration?
-      user_alert.save
+      # Nothing is assigned after the lookup, so saving a found one only re-runs the
+      # uniqueness select find_or_build_by just did - in the register flow's request
+      user_alert.save if user_alert.new_record?
     else # Don't create just to resolve
       user_alert.id.blank? || user_alert.resolve!
     end

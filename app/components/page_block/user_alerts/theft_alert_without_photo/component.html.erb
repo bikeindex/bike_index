@@ -1,7 +1,7 @@
 <%= render PageBlock::UserAlerts::BikeListModal::Component.new(id: MODAL_ID,
       title: translation(".missing_stolen_photo_title"),
       intro: translation(".photo_critical_html"),
-      footer: translation(".without_photo_all_is_lost")) do %>
+      footer: translation(".without_photo_all_is_lost", bike_type:)) do %>
   <% @bikes.each do |bike| %>
     <p class="tw:mb-3">
       <%= link_to translation(".add_photo_theft_bike_title_html", bike_title: bike.title_string),

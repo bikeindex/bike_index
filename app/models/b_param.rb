@@ -298,8 +298,8 @@ class BParam < ApplicationRecord
   end
 
   # Step 1 was submitted (manufacturer is required there), so it's more than the shell
-  # new creates, and the token still resumes it. destroyed? so the after_commit destroy
-  # fires resolves the alert rather than re-saving it onto a row that's gone
+  # new creates, and the token still resumes it. A destroyed one is false so that the
+  # after_commit a destroy fires resolves its alert rather than re-saving it
   def unfinished_registration?
     !destroyed? && origin == "register_flow" && !with_bike? && manufacturer_id.present? &&
       created_at.present? && created_at > Time.current - TOKEN_EXPIRATION

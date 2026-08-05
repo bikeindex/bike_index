@@ -13,6 +13,12 @@ module PageBlock
         def render?
           @bikes.present?
         end
+
+        private
+
+        def bike_type
+          @bikes.first.type
+        end
       end
     end
   end
