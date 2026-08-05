@@ -876,7 +876,7 @@ RSpec.describe BParam, type: :model do
     it "is unfinished, and alerts the creator" do
       expect(b_param.unfinished_registration?).to be_truthy
       expect(creator.reload.alert_slugs).to eq ["unfinished_registration"]
-      expect(creator.user_alerts.active.unfinished_registration.pluck(:b_param_id)).to eq [b_param.id]
+      expect(creator.user_alerts.active.unfinished_registration.map(&:alertable)).to eq [b_param]
     end
 
     context "once the bike is created" do

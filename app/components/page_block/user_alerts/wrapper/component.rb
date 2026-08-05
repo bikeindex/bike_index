@@ -52,7 +52,7 @@ module PageBlock
 
         def unfinished_b_param
           @current_user.user_alerts.active.unfinished_registration
-            .reorder(:updated_at).last&.b_param
+            .reorder(:updated_at).last&.alertable
         end
 
         # TODO: use existing user_alert to select correct bikes

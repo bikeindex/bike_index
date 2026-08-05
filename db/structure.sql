@@ -4199,7 +4199,8 @@ CREATE TABLE public.user_alerts (
     dismissed_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    b_param_id bigint
+    alertable_type character varying,
+    alertable_id bigint
 );
 
 
@@ -7513,10 +7514,10 @@ CREATE INDEX index_theft_alerts_on_user_id ON public.theft_alerts USING btree (u
 
 
 --
--- Name: index_user_alerts_on_b_param_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_user_alerts_on_alertable; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_user_alerts_on_b_param_id ON public.user_alerts USING btree (b_param_id);
+CREATE INDEX index_user_alerts_on_alertable ON public.user_alerts USING btree (alertable_type, alertable_id);
 
 
 --
@@ -7733,6 +7734,7 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260804202723'),
+('20260804100000'),
 ('20260801100000'),
 ('20260731100009'),
 ('20260731100008'),
