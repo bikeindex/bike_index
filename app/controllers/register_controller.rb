@@ -118,7 +118,7 @@ class RegisterController < ApplicationController
     return redirect_to_current_step if @b_param.email_confirmed?
 
     if @b_param.email_confirmation_token_expired? ||
-        !secure_compare?(params[:confirmation_token], @b_param.email_confirmation_token)
+        !Binxtils::Secure.compare?(params[:confirmation_token], @b_param.email_confirmation_token)
       BikeServices::Register.send_confirmation_email(@b_param)
       flash[:error] = translation(:confirmation_link_expired)
       return redirect_to_current_step
