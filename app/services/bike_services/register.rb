@@ -34,13 +34,6 @@ module BikeServices
         .detect { |b| b.creator_id.blank? || b.creator_id == user&.id || b.created_bike_id.present? }
     end
 
-    # Neither filter find_token applies holds here: the emailed token is the authorization,
-    # so there's no creator to match, and an expired one still has to resolve its
-    # registration for confirmation to say the link expired rather than dead-end
-    def find_for_confirmation(token)
-      BParam.find_by(id_token: token) if token.present?
-    end
-
     # An organization can be named in the URL after the registration starts
     # (/register?...&organization_id=slug), right up until the bike is created
     def assign_organization(b_param, organization)

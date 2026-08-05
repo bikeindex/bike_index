@@ -183,9 +183,12 @@ class RegisterController < ApplicationController
     @registration_sequence = BikeServices::Register.registration_sequence(@b_param)
   end
 
-  # Nothing is written to the session - the token hasn't been checked yet
+  # Not find_b_param: the emailed token authorizes this, not the session, and an expired
+  # link has to find its registration to say so rather than dead-end. Nothing is written
+  # to the session - the token hasn't been checked yet
   def find_b_param_for_confirmation
-    @b_param = BikeServices::Register.find_for_confirmation(params[:b_param_token])
+    token = params[:b_param_token]
+    @b_param = BParam.find_by(id_token: token) if token.present?
     redirect_to(new_register_path) if @b_param.blank?
   end
 
