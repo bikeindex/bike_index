@@ -285,7 +285,7 @@ RSpec.describe BikesController, type: :controller do
         get :new, params: {stolen: true, b_param_token: "cool-token-thing"}
         expect(response).to redirect_to new_user_url
         # expect(Rack::Utils.parse_query(session[:discourse_redirect])).to eq(discourse_params)
-        expect(flash[:info]).to be_present
+        expect(flash[:notice]).to be_present
         expect(session[:return_to]).to eq new_bike_path(stolen: true, b_param_token: "cool-token-thing")
       end
     end
@@ -354,7 +354,7 @@ RSpec.describe BikesController, type: :controller do
             bike = assigns(:bike)
             expect(bike.is_a?(Bike)).to be_truthy
             expect(assigns(:b_param)).to_not eq b_param
-            expect(flash[:info]).to match(/couldn.t find/i)
+            expect(flash[:notice]).to match(/couldn.t find/i)
           end
         end
       end

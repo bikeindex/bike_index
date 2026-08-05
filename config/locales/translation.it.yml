@@ -2222,6 +2222,7 @@ it:
       sessionable:
         sign_in_and_redirect:
           logged_in: Accesso effettuato!
+          organization_signed_in: Hai effettuato l'accesso
           user_is_banned: Ci dispiace, ma sembra che il tuo account sia stato bloccato.
             Se hai dubbi sui motivi, ti preghiamo di contattarci.
         skip_if_signed_in:
@@ -2548,12 +2549,6 @@ it:
         check_out_match_here: 'Guarda la partita qui:'
         we_think_your_stolen_bike: Potremmo aver trovato il tuo %{bike_title} rubato!
     confirmation_email:
-      html:
-        click_to_verify_html: Fai clic sul pulsante <em>Verifica email</em> per completare
-          la registrazione!
-        please_confirm_your_email_address: Conferma il tuo indirizzo email
-        verify_email: Verifica l'indirizzo email
-        youre_almost_there: Ci sei quasi!
       subject: Conferma il tuo indirizzo email di Bike Index!
     invoice_email:
       html:
@@ -5008,14 +5003,14 @@ it:
       enter_email_address: Inserisci il tuo indirizzo email, ti invieremo un'email
         con un link per accedere.
       get_sign_in_link: Ottieni il link di accesso
-      if_not_click_button: Se non lo sei, fai clic sul pulsante qui sotto
       reenter_email: Inserisci nuovamente il tuo indirizzo email per ricevere un nuovo
         token.
-      sign_in: Registrazione
       sign_in_with_magic_link: Accesso senza password
       unable_to_auth: Impossibile autenticare il token
-      you_should_be_signed_in_automatically: Dovresti essere connesso automaticamente.
       your_email_address: Il tuo indirizzo di posta elettronica
+    magic_link_sent:
+      follow_the_link_back: Segui il link nella email per accedere!
+      we_sent_a_magic_sign_in_link: Ti abbiamo inviato un link magico per accedere
     new:
       email: e-mail
       forgot_your_password: Hai dimenticato la password?
@@ -5523,6 +5518,11 @@ it:
       index:
         loading_results: Caricamento dei risultati...
   components:
+    sessions:
+      sign_in_interstitial:
+        if_not_click_button: Se non lo sei, fai clic sul pulsante qui sotto
+        sign_in: Registrazione
+        you_should_be_signed_in_automatically: Dovresti essere connesso automaticamente.
     search:
       everything_combobox:
         query_items_description: Casella combinata delle descrizioni di ricerca
@@ -5667,6 +5667,12 @@ it:
         legal: Legale
         social_media: Social media
     emails:
+      confirmation_email:
+        click_to_sign_in_html: Fai clic sul pulsante <em>Accedi</em> per completare
+          la registrazione!
+        follow_this_link_to_sign_in: Segui questo link per accedere
+        sign_in: Accedi
+        youre_almost_there: Ci sei quasi!
       partials:
         bike_box:
           bike_photo: Foto della bicicletta

@@ -35,6 +35,20 @@ RSpec.describe SessionsController, type: :request do
       end
     end
 
+    context "passwordless user" do
+      let!(:user) { FactoryBot.create(:user_confirmed, email: "person@example.com", passwordless_user: true) }
+      it "emails a sign in link rather than asking for a password" do
+        ActionMailer::Base.deliveries = []
+        Sidekiq::Testing.inline! do
+          post "/session/identify", params: {session: {email: "person@example.com", remember_me: "1"}}
+        end
+        expect(response).to redirect_to(magic_link_sent_session_path)
+        expect(session[:magic_link_remember_me]).to be_truthy
+        expect(user.reload.magic_link_token).to be_present
+        expect(ActionMailer::Base.deliveries.last.subject).to eq("Sign in to Bike Index")
+      end
+    end
+
     context "no account" do
       it "redirects to sign up with the email pre-filled" do
         identify("newperson@example.com")
@@ -129,6 +143,9 @@ RSpec.describe SessionsController, type: :request do
         expect(mail.to).to eq([current_user.email])
         expect(current_user.reload.magic_link_token).not_to be_nil
       end
+      expect(response).to redirect_to(magic_link_sent_session_path)
+      follow_redirect!
+      expect(response.body).to match("We sent you a magic sign in link")
     end
     context "unknown email" do
       it "redirects to login" do
@@ -202,6 +219,20 @@ RSpec.describe SessionsController, type: :request do
     end
   end
 
+  describe "magic_link" do
+    let!(:user) { FactoryBot.create(:user_confirmed) }
+
+    # The emailed link is a GET, so it only renders the form that signs in
+    it "renders the interstitial without spending the token" do
+      token = user.refreshed_magic_link_token
+      get "/session/magic_link", params: {token:}
+      expect(response).to render_template(:magic_link)
+      expect(user.reload.magic_link_token).to be_present
+      expect(Capybara.string(response.body))
+        .to have_css("form[action='/session/sign_in_with_magic_link'] input[name='token'][value='#{token}']", visible: :hidden)
+    end
+  end
+
   describe "sign_in_with_magic_link" do
     let!(:superadmin) { FactoryBot.create(:superuser) }
 
@@ -217,6 +248,30 @@ RSpec.describe SessionsController, type: :request do
         params: {token: superadmin.refreshed_magic_link_token, return_to: "/bikes/12"}
       expect(response).to redirect_to "/bikes/12"
       expect(superadmin.reload.magic_link_token).to be_nil
+    end
+
+    context "passwordless user" do
+      let(:user) { FactoryBot.create(:user_confirmed, passwordless_user: true) }
+
+      it "offers to set a password" do
+        post "/session/sign_in_with_magic_link", params: {token: user.refreshed_magic_link_token}
+        expect(response).to redirect_to my_account_url
+        expect(flash[:notice]).to eq({translation_key: :signed_in, url: update_password_form_with_reset_token_users_path})
+        follow_redirect!
+        expect(Capybara.string(response.body))
+          .to have_link("set a password to sign in", href: update_password_form_with_reset_token_users_path)
+      end
+
+      context "organization passwordless user" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "party.edu") }
+        let!(:organization_role) { FactoryBot.create(:organization_role_claimed, organization:, user:) }
+
+        it "doesn't offer to set a password" do
+          post "/session/sign_in_with_magic_link", params: {token: user.refreshed_magic_link_token}
+          expect(flash[:success]).to eq "You're signed in"
+          expect(flash[:notice]).to be_blank
+        end
+      end
     end
   end
 

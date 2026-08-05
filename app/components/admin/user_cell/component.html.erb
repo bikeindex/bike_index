@@ -1,7 +1,7 @@
 <span class="tw:inline-flex tw:items-baseline tw:gap-x-2">
   <% if show_missing_user? %>
     <small
-      class="<%= UI::Alert::Component::TEXT_CLASSES[:error] %>"
+      class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>"
       title="<%= @user_id %>"
     >
       Missing user

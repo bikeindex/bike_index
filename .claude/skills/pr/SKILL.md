@@ -26,11 +26,19 @@ The workflow below (steps 0–3) always runs and creates or updates the PR. When
 
 Invoke the `/simplify` command to review the changed code for reuse, simplification, and efficiency cleanups and apply them. Do this first, before writing the PR up, so the body describes the diff's final shape rather than a first draft. It's quality-only — it won't touch correctness — so it's safe to run unattended here; if it reports nothing to clean up, move on.
 
-Then run `bin/lint` to auto-format the code (it also picks up whatever `/simplify` just changed). Always use `bin/lint`, never another formatter or `standardrb` directly. Scope it to the branch's files rather than walking the whole repo — `bin/lint $(git diff --name-only --diff-filter=d "origin/$BASE"...HEAD)`; `--diff-filter=d` drops deleted paths so they don't show up as "Not found". Files with no linter (`.haml`, `.scss`, `.md`) are skipped, so a branch that touches none of the lintable types exits cleanly rather than looking like a lint failure. It takes directories too, so `bin/lint app/components/foo` works while you're still iterating.
+Then run `bin/lint` to auto-format the code (it also picks up whatever `/simplify` just changed). Always use `bin/lint`, never another formatter or `standardrb` directly. Scope it to the branch's files rather than walking the whole repo — `bin/lint $(git diff --name-only --diff-filter=d "origin/$BASE"...HEAD)`; `--diff-filter=d` drops deleted paths so they don't show up as "Not found". Files with no linter (`.haml`, `.scss`, `.md`) are skipped, so a branch that touches none of the lintable types exits cleanly rather than looking like a lint failure. It takes directories too, so `bin/lint app/components/foo` works while you're still iterating. Never revert what the linter wrote — if a too-broad run reformats files outside the branch, those fixes stay in the diff.
 
 Scope specs the same way — the ones covering what the branch changed, never a bare `bundle exec rspec` or a whole top-level directory (see the `rspec-testing` skill). CI runs the full suite; a green PR isn't your job to prove locally.
 
 Then review the changed files against the repo's `CLAUDE.md` (root and any nested ones in touched directories) and fix anything that doesn't conform — code-style guidelines (functional style, no argument mutation, omitted hash values like `{x:}`, private methods, unabbreviated names, pithy comments), testing conventions, and frontend rules. Only touch lines this branch already changed; don't reformat unrelated code.
+
+Then check the branch's translations for a hardcoded "bike" where the string means the registration's cycle type — a registration is as often an e-scooter, a stroller or a wheelchair:
+
+```bash
+git diff "origin/$BASE"...HEAD -- '*.en.yml' 'config/locales/en.yml' | grep -in '^+.*bike'
+```
+
+Read each hit. Key names (`about_this_bike:`), the product name ("Bike Index"), and copy that really is bike-only are fine; a value saying "bike" about the registration is not. Fix it by interpolating `%{bike_type}` in the value and passing `bike_type: bike.type` at the call site — `Registrations::Show::CurrentAlerts::ClaimImpound` and `Registrations::Show::WrapperConsumer` are the pattern, and `spec/components/registrations/show/current_alerts/claim_impound/component_spec.rb` shows how to cover it. After hand-editing a `component.en.yml`, run `bundle exec rails prepare_translations` — `bin/lint` doesn't normalize YAML.
 
 Commit these edits before continuing — step 1's `git merge` needs a clean working tree, and committing here is what lets the step 0 edits ride along the merge as ordinary branch commits (which step 3 then pushes).
 

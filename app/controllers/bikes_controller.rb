@@ -82,14 +82,14 @@ class BikesController < Bikes::BaseController
   def new
     unless current_user.present?
       store_return_to(new_bike_path(b_param_token: params[:b_param_token], stolen: params[:stolen]))
-      flash[:info] = translation(:please_sign_in_to_register)
+      flash[:notice] = translation(:please_sign_in_to_register)
       redirect_to(new_user_path) && return
     end
     find_or_new_b_param
     redirect_to(bike_path(@b_param.created_bike_id)) && return if @b_param.created_bike.present?
 
-    # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
-    flash[:info] = translation(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
+    # Let them know if they sent an invalid b_param token - notice rather than error because we're aggressive about removing b_params
+    flash[:notice] = translation(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
     @bike ||= BikeServices::Builder.build(@b_param, new_bike_attrs)
     @organization = @bike.creation_organization
     @page_errors = @b_param.bike_errors
@@ -197,7 +197,7 @@ class BikesController < Bikes::BaseController
           flash[:error] = translation(:notification_impounded, bike_type: @bike.type, org_name: matching_notification.organization.short_name)
         else
           # It's probably marked retrieved - but it could be something else (status: resolved_otherwise)
-          flash[:info] = translation(:notification_already_retrieved, bike_type: @bike.type)
+          flash[:notice] = translation(:notification_already_retrieved, bike_type: @bike.type)
         end
       else
         flash[:error] = translation(:unable_to_find_parking_notification)

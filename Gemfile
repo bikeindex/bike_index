@@ -5,8 +5,6 @@ source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
-ruby "4.0.5"
-
 # Gems that are no longer in standard library as of Ruby 3.4
 gem "csv"
 gem "observer"

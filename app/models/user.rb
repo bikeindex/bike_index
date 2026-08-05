@@ -34,6 +34,7 @@
 #  partner_data                       :jsonb
 #  password                           :text
 #  password_digest                    :string(255)
+#  passwordless_user                  :boolean          default(FALSE), not null
 #  phone                              :string(255)
 #  preferred_language                 :string
 #  show_bikes                         :boolean          default(FALSE), not null
@@ -194,6 +195,16 @@ class User < ApplicationRecord
       friendly_find(str)&.id
     end
 
+    # BadWordCleaner matches substrings, so roughly 1 in 500 random usernames
+    # contains one -- and CredibilityScorer then scores the user down for a
+    # handle we generated for them. Draw again rather than hand them that.
+    def generate_username
+      loop do
+        username = Slugifyer.slugify(SecureRandom.urlsafe_base64)
+        return username unless CredibilityScorer.suspiscious_handle?(username)
+      end
+    end
+
     def admin_text_search(str)
       q = "%#{str.to_s.strip.downcase}%"
       unscoped.includes(:user_emails)
@@ -260,6 +271,11 @@ class User < ApplicationRecord
 
   def unconfirmed?
     !confirmed?
+  end
+
+  # Their organization requires passwordless users (magic link or IdP)
+  def organization_passwordless_user?
+    passwordless_user? && organizations.any?(&:passwordless_user_creation?)
   end
 
   # Performed inline
@@ -543,6 +559,8 @@ class User < ApplicationRecord
   end
 
   def set_calculated_attributes
+    # Passwordless users sign in by emailed link, but has_secure_password still requires a digest
+    self.password = SecurityTokenizer.new_password_token if passwordless_user? && password_digest.blank?
     self.preferred_language = nil if preferred_language.blank?
     self.phone = Phonifyer.phonify(phone)
     self.alert_slugs = (alert_slugs || [])
@@ -596,9 +614,9 @@ class User < ApplicationRecord
   protected
 
   def generate_username_confirmation_and_auth
-    usrname = Slugifyer.slugify(username || SecureRandom.urlsafe_base64)
+    usrname = username ? Slugifyer.slugify(username) : User.generate_username
     while User.where(username: usrname).where.not(id: id).exists?
-      usrname = SecureRandom.urlsafe_base64
+      usrname = User.generate_username
     end
     self.username = usrname
     generate_auth_token("confirmation_token") unless confirmed

@@ -8,7 +8,7 @@
   %>
 
   <div hidden data-search-rate-limited>
-    <%= render UI::Alert::Component.new(text: translation(".rate_limited"), kind: :warning) %>
+    <%= render UI::Alerts::Base::Component.new(text: translation(".rate_limited"), kind: :warning) %>
   </div>
 
   <%= helpers.turbo_frame_tag @frame_id, src: @src do %>

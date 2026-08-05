@@ -28,7 +28,7 @@ class StravaIntegrationsController < ApplicationController
       return
     end
 
-    unless secure_compare?(params[:state], session.delete(:strava_oauth_state))
+    unless Binxtils::Secure.compare?(params[:state], session.delete(:strava_oauth_state))
       flash[:error] = "Invalid OAuth state. Please try again."
       redirect_to return_to
       return
@@ -77,7 +77,7 @@ class StravaIntegrationsController < ApplicationController
   private
 
   def authenticate_user_for_strava
-    store_return_and_authenticate_user(translation_key: :create_account, flash_type: :info)
+    store_return_and_authenticate_user(translation_key: :create_account, flash_type: :notice)
   end
 
   def find_strava_integration

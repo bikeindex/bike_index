@@ -1,15 +1,15 @@
 <%= render Register::Page::Component.new do %>
   <%= render Register::Progress::Component.new(step: 2, total: BikeServices::Register.total_steps(@sequence)) %>
 
-  <% if awaiting_confirmation? %>
-    <%= render UI::Alert::Component.new(kind: :purple, text: translation(".confirmation_link_sent"),
+  <% if BikeServices::Register.confirmation_email_pending?(@b_param, user: @current_user) %>
+    <%= render UI::Alerts::Base::Component.new(kind: :purple, text: translation(".confirmation_link_sent"),
         icon: helpers.inline_svg_tag("icons/envelope.svg", class: "tw:-mb-0.5 tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true)) %>
   <% end %>
 
   <%= render UI::Header::Component.new(text: translation(".add_your_bikes_details", cycle_type:), subtitle: translation(".more_useful_registration")) %>
 
   <% if @b_param.errors.any? %>
-    <%= render UI::Alert::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
+    <%= render UI::Alerts::Base::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
   <% end %>
 
   <%= form_with(url: register_path, method: :patch, scope: :bike,
