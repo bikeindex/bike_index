@@ -128,6 +128,17 @@ class UserAlert < ApplicationRecord
     user.update_columns(alert_slugs: slugs, updated_at: Time.current)
   end
 
+  def self.update_unfinished_registrations(user)
+    user.b_params.unfinished_registrations
+      .each { |b_param| update_unfinished_registration(user:, b_param:) }
+
+    # A registration that expired (or was deleted) is out of the scope above, and nobody
+    # saves an abandoned one again - so this is the only thing that resolves its alert
+    user.user_alerts.active.unfinished_registration
+      .reject { |user_alert| user_alert.b_param&.unfinished_registration? }
+      .each(&:resolve!)
+  end
+
   def self.update_unfinished_registration(user:, b_param:)
     user_alert = find_or_build_by(kind: "unfinished_registration",
       user_id: user.id, b_param_id: b_param.id)

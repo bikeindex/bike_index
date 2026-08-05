@@ -51,9 +51,7 @@ module CallbackJobs
       end
 
       # Above the returns below - anyone can walk away mid-registration
-      user.b_params.unfinished_registrations.each do |b_param|
-        UserAlert.update_unfinished_registration(user: user, b_param: b_param)
-      end
+      UserAlert.update_unfinished_registrations(user)
 
       # Ignore alerts below for superusers
       if user.superuser?
