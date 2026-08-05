@@ -533,6 +533,19 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "generate_username" do
+    it "returns a username CredibilityScorer doesn't penalize" do
+      expect(CredibilityScorer.suspiscious_handle?(User.generate_username)).to be_falsey
+    end
+    context "random username contains a bad word" do
+      # BadWordCleaner matches substrings, so a random username occasionally does
+      before { allow(SecureRandom).to receive(:urlsafe_base64).and_return("Xcumbersome7", "Zpolitely3") }
+      it "draws again" do
+        expect(User.generate_username).to eq "zpolitely3"
+      end
+    end
+  end
+
   describe "access_tokens_for_application" do
     it "returns [] if no application" do
       user = User.new
