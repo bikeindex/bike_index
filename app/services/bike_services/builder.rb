@@ -10,7 +10,13 @@ module BikeServices
       bike = Bike.new(cycle_type: "bike")
       # passed_organization is assigned unless b_param has an organization
       passed_organization = new_attrs.delete(:organization)
-      bike.attributes = b_param.safe_bike_attrs(new_attrs)
+      # One at a time, so a value the model refuses to take (an out of range enum, say)
+      # becomes an error on the bike rather than a 500, and the rest still land
+      b_param.safe_bike_attrs(new_attrs).each do |key, value|
+        bike.attributes = {key => value}
+      rescue ArgumentError
+        bike.errors.add(key, "is not valid")
+      end
 
       bike.address_record&.bike = bike # Kinda gross, but gotta get it both ways!
 

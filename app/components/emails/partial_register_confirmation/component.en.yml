@@ -1,0 +1,15 @@
+---
+en:
+  components:
+    emails:
+      partial_register_confirmation:
+        click_below_to_pick_up_where_you_left_off: Click below to confirm this email
+          address and pick up where you left off.
+        confirm_and_continue: Confirm my email
+        confirm_your_email: Confirm your email
+        link_signs_you_in: >-
+          This link signs you in to Bike Index, so don't forward it. It works for
+          %{days} days.
+        we_saved_your_registration_html: >-
+          We saved your registration for a <strong>%{color_and_brand}</strong> on
+          the world's most comprehensive bike registry.

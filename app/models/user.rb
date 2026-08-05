@@ -195,6 +195,16 @@ class User < ApplicationRecord
       friendly_find(str)&.id
     end
 
+    # BadWordCleaner matches substrings, so roughly 1 in 500 random usernames
+    # contains one -- and CredibilityScorer then scores the user down for a
+    # handle we generated for them. Draw again rather than hand them that.
+    def generate_username
+      loop do
+        username = Slugifyer.slugify(SecureRandom.urlsafe_base64)
+        return username unless CredibilityScorer.suspiscious_handle?(username)
+      end
+    end
+
     def admin_text_search(str)
       q = "%#{str.to_s.strip.downcase}%"
       unscoped.includes(:user_emails)
@@ -263,7 +273,7 @@ class User < ApplicationRecord
     !confirmed?
   end
 
-  # Their organization signs them in (magic link or IdP), so they have no reason to set a password
+  # Their organization requires passwordless users (magic link or IdP)
   def organization_passwordless_user?
     passwordless_user? && organizations.any?(&:passwordless_user_creation?)
   end
@@ -604,9 +614,9 @@ class User < ApplicationRecord
   protected
 
   def generate_username_confirmation_and_auth
-    usrname = Slugifyer.slugify(username || SecureRandom.urlsafe_base64)
+    usrname = username ? Slugifyer.slugify(username) : User.generate_username
     while User.where(username: usrname).where.not(id: id).exists?
-      usrname = SecureRandom.urlsafe_base64
+      usrname = User.generate_username
     end
     self.username = usrname
     generate_auth_token("confirmation_token") unless confirmed
