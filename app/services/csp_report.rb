@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
-# Parses a browser CSP report and decides whether it describes something we can
-# act on. CspPolicy answers what our own policy permits; this decides what's
-# worth forwarding, and normalizes what is.
+# Parses a browser CSP report, decides whether it describes something we can act
+# on, and normalizes what it does.
 module CspReport
   extend Functionable
 
@@ -41,9 +40,40 @@ module CspReport
     report.merge("blocked-uri" => "#{uri.scheme}://#{uri.host}#{uri.path}")
   end
 
+  # Whether our own Content Security Policy would have permitted a request. Only
+  # meaningful for a cross-origin uri — quoted sources name no host, so a same
+  # origin uri 'self' plainly allows still answers false.
+  #
+  # Reads the global policy. No controller narrows it — news widens img_src and
+  # strava_search sends no header — so a per-controller policy can only make this
+  # answer too strict, never too permissive.
+  def permits?(directive, uri)
+    sources(directive).any? { |source| source_permits?(source, uri) }
+  end
+
   #
   # private below here
   #
+
+  # An undeclared directive is enforced by the first one we do declare: an
+  # -elem/-attr variant falls back to its base, and anything else to default-src.
+  def sources(directive)
+    directives = Rails.application.config.content_security_policy&.directives || {}
+    directives[directive] || directives[directive.to_s.sub(/-(elem|attr)\z/, "")] ||
+      directives["default-src"] || []
+  end
+
+  def source_permits?(source, uri)
+    return false if source.start_with?("'") # 'self' and 'unsafe-*' name no host
+    return uri.scheme == source.chomp(":") if source.end_with?(":") # data:, blob:
+
+    scheme, _, host = source.rpartition("//") # a bare host has no scheme to check
+    return false if scheme.present? && scheme.chomp(":") != uri.scheme
+    # A leading *. matches subdomains only, never the bare domain
+    return uri.host.end_with?(host.delete_prefix("*")) if host.start_with?("*.")
+
+    uri.host == host
+  end
 
   def extension_noise?(report)
     [report["blocked-uri"], report["source-file"]].compact
@@ -62,7 +92,7 @@ module CspReport
   # reporting is a redirect to a target it won't name.
   def foreign_policy_noise?(report)
     uri = cross_origin_blocked_uri(report)
-    uri && CspPolicy.permits?(directive(report), uri)
+    uri && permits?(directive(report), uri)
   end
 
   # Every font we load is on our own origin or in font_src, so a font blocked from
@@ -90,6 +120,7 @@ module CspReport
     nil
   end
 
-  conceal :extension_noise?, :translate_noise?, :foreign_policy_noise?,
-    :third_party_font_noise?, :directive, :cross_origin_blocked_uri, :parsed_uri
+  conceal :sources, :source_permits?, :extension_noise?, :translate_noise?,
+    :foreign_policy_noise?, :third_party_font_noise?, :directive,
+    :cross_origin_blocked_uri, :parsed_uri
 end
