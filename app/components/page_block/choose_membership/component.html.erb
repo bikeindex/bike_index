@@ -12,9 +12,7 @@
       Become a Bike Index member!
     </h1>
 
-    <%# create redirects to Stripe Checkout, which a turbo fetch can't follow %>
-    <%= form_for @membership, builder: BikeIndexFormBuilder, url: membership_path, method: :post,
-      html: {data: {turbo: false}} do |f| %>
+    <%= form_for @membership, builder: BikeIndexFormBuilder, url: membership_path, method: :post do |f| %>
       <%= hidden_field_tag :currency, @currency.slug %>
       <%= hidden_field_tag :referral_source, @referral_source %>
 
