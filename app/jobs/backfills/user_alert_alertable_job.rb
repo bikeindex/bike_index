@@ -25,23 +25,24 @@ module Backfills
     # The duplicates predate the uniqueness validation and are inert while alertable_id is blank.
     # Backfilling arms the validation, which would leave the survivor unable to save
     def on_complete
-      UserAlert.where(id: duplicate_uniq_kind_ids).delete_all
+      uniq_kind_alerts.where.not(id: lowest_of_each_group).delete_all
     end
 
     private
 
-    # find_or_build_by returns the lowest id of a group, so the rest are the ones nothing reads
-    def duplicate_uniq_kind_ids
+    def uniq_kind_alerts
       UserAlert.where(kind: UserAlert::UNIQ_KINDS).where.not(alertable_id: nil)
-        .group(:user_id, :kind, :alertable_type, :alertable_id).having("count(*) > 1")
-        .pluck(Arel.sql("array_agg(id ORDER BY id)")).flat_map { |ids| ids.drop(1) }
+    end
+
+    # find_or_build_by returns the lowest id, so the rest are the rows nothing reads
+    def lowest_of_each_group
+      uniq_kind_alerts.group(:user_id, :kind, :alertable_type, :alertable_id).select("MIN(id)")
     end
 
     def user_alerts
       base = UserAlert.where(alertable_id: nil)
 
-      UserAlert::LEGACY_ALERTABLE_COLUMNS.values
-        .map { |column| base.where.not(column => nil) }.reduce(:or)
+      base.where.not(theft_alert_id: nil).or(base.where.not(user_phone_id: nil))
     end
   end
 end

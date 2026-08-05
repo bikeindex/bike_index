@@ -67,6 +67,8 @@ class UserAlert < ApplicationRecord
   scope :with_notification, -> { joins(:notification).where.not(notifications: {id: nil}) }
   # Also matches rows Backfills::UserAlertAlertableJob hasn't reached yet
   scope :for_alertable, ->(alertable) {
+    next all if alertable.blank?
+
     type = alertable.class.polymorphic_name
     matched = where(alertable_type: type, alertable_id: alertable.id)
     legacy_column = LEGACY_ALERTABLE_COLUMNS[type]
@@ -120,12 +122,8 @@ class UserAlert < ApplicationRecord
     account_kinds.include?(kind) ? "account" : "general"
   end
 
-  # alertable is matched through for_alertable, so rows still on the legacy columns are found
   def self.find_or_build_by(attrs)
-    alertable = attrs[:alertable]
-    scope = alertable.blank? ? where(attrs) : where(attrs.except(:alertable)).for_alertable(alertable)
-
-    scope.first || new(attrs)
+    where(attrs.except(:alertable)).for_alertable(attrs[:alertable]).first || new(attrs)
   end
 
   def self.update_theft_alert_without_photo(user:, theft_alert:)
@@ -175,10 +173,6 @@ class UserAlert < ApplicationRecord
   # Falls back to the legacy columns for rows Backfills::UserAlertAlertableJob hasn't reached
   def alertable
     super || theft_alert || user_phone
-  end
-
-  def uniq_kind?
-    UNIQ_KINDS.include?(kind)
   end
 
   def kind_humanized
@@ -254,6 +248,10 @@ class UserAlert < ApplicationRecord
   end
 
   private
+
+  def uniq_kind?
+    UNIQ_KINDS.include?(kind)
+  end
 
   def set_calculated_attributes
     self.message = nil if message.blank?
