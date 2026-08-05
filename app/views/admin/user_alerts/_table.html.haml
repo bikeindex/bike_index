@@ -47,7 +47,7 @@
                 = link_to "alerts", url_for(sortable_search_params.merge(search_bike_id: user_alert.bike_id)), class: "small gray-link"
             - if (alertable = user_alert.alertable)
               %span.d-block
-                %small #{alertable.class.name.underscore}:
+                %small #{alertable.class.polymorphic_name.underscore}:
                 = link_to alertable.id, admin_path_for_object(alertable)
             - if user_alert.organization.present?
               %span.d-block

@@ -253,6 +253,8 @@ class UserAlert < ApplicationRecord
     end
   end
 
+  private
+
   def set_calculated_attributes
     self.message = nil if message.blank?
   end
