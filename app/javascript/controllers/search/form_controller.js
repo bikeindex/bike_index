@@ -48,10 +48,8 @@ export default class extends Controller {
     window.addEventListener('search:rate-limited', this.showRateLimited)
     window.addEventListener('popstate', this.handlePopstate)
     // The results frame renders outside this controller's element, so its retry
-    // button is wired here rather than with a data-action. Hold the node so
-    // disconnect unbinds the one it bound.
-    this.retryButton = document.querySelector('[data-search-retry]')
-    this.retryButton?.addEventListener('click', this.retryResults)
+    // button can't reach us by data-action
+    document.addEventListener('click', this.handleRetryClick)
   }
 
   disconnect () {
@@ -62,7 +60,7 @@ export default class extends Controller {
     document.removeEventListener('turbo:fetch-request-error', this.handleFetchError)
     window.removeEventListener('search:rate-limited', this.showRateLimited)
     window.removeEventListener('popstate', this.handlePopstate)
-    this.retryButton?.removeEventListener('click', this.retryResults)
+    document.removeEventListener('click', this.handleRetryClick)
   }
 
   handleTurboLoad = () => {
@@ -194,6 +192,10 @@ export default class extends Controller {
     this.failedSubmit = event.target === this.formTarget
     this.hideLoading()
     this.showNotice('fetch-failed')
+  }
+
+  handleRetryClick = (event) => {
+    if (event.target.closest('[data-search-retry]')) this.retryResults()
   }
 
   retryResults = () => {

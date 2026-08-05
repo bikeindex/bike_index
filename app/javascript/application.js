@@ -31,13 +31,13 @@ function localizeTime () {
 // breakage - only treat these phrasings as noise while we're actually leaving.
 const NAVIGATION_FETCH_ERROR = /Failed to fetch|Load failed|Fetch is aborted|aborted a request/
 let navigatingAway = false
-// pagehide rather than beforeunload, which costs the page its bfcache entry
-window.addEventListener('pagehide', () => { navigatingAway = true })
-window.addEventListener('pageshow', () => { navigatingAway = false })
 
 // Load honeybadger dynamically so ad blockers don't break the entire app
 const honeybadgerApiKey = document.querySelector('meta[name="honeybadger-api-key"]')?.content
 if (honeybadgerApiKey) {
+  // pagehide rather than beforeunload, which costs the page its bfcache entry
+  window.addEventListener('pagehide', () => { navigatingAway = true })
+  window.addEventListener('pageshow', () => { navigatingAway = false })
   import('@honeybadger-io/js')
     .then(({ default: Honeybadger }) => {
       Honeybadger.configure({
