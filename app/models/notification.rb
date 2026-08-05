@@ -96,7 +96,7 @@ class Notification < ApplicationRecord
     end
 
     def b_param_kinds
-      %w[partial_registration].freeze
+      %w[partial_registration partial_register_confirmation].freeze
     end
 
     def customer_contact_kinds

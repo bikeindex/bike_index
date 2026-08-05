@@ -4,12 +4,14 @@
 # Database name: primary
 #
 #  id              :bigint           not null, primary key
+#  alertable_type  :string
 #  dismissed_at    :datetime
 #  kind            :integer
 #  message         :text
 #  resolved_at     :datetime
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
+#  alertable_id    :bigint
 #  bike_id         :bigint
 #  organization_id :bigint
 #  theft_alert_id  :bigint
@@ -18,6 +20,7 @@
 #
 # Indexes
 #
+#  index_user_alerts_on_alertable       (alertable_type,alertable_id)
 #  index_user_alerts_on_bike_id         (bike_id)
 #  index_user_alerts_on_theft_alert_id  (theft_alert_id)
 #  index_user_alerts_on_user_id         (user_id)
@@ -31,17 +34,24 @@ class UserAlert < ApplicationRecord
     unassigned_bike_org: 3
   }.freeze
 
+  UNIQ_KINDS = %w[phone_waiting_confirmation].freeze
+
+  # Deprecated columns, still read until Backfills::UserAlertAlertableJob has run
+  LEGACY_ALERTABLE_COLUMNS = {"TheftAlert" => :theft_alert_id, "UserPhone" => :user_phone_id}.freeze
+
   enum :kind, KIND_ENUM
 
   belongs_to :user
   belongs_to :bike
+  belongs_to :organization
+  belongs_to :alertable, polymorphic: true
   belongs_to :user_phone
   belongs_to :theft_alert
-  belongs_to :organization
 
   has_one :notification, as: :notifiable
 
-  validates :user_phone_id, uniqueness: {scope: %i[kind user_id]}, allow_blank: true
+  validates :alertable_id, uniqueness: {scope: %i[alertable_type kind user_id]},
+    allow_blank: true, if: :uniq_kind?
 
   before_validation :set_calculated_attributes
 
@@ -55,6 +65,16 @@ class UserAlert < ApplicationRecord
   scope :account, -> { where(kind: account_kinds) }
   scope :dismissable, -> { where(kind: dismissable_kinds) }
   scope :with_notification, -> { joins(:notification).where.not(notifications: {id: nil}) }
+  # Also matches rows Backfills::UserAlertAlertableJob hasn't reached yet
+  scope :for_alertable, ->(alertable) {
+    next all if alertable.blank?
+
+    type = alertable.class.polymorphic_name
+    matched = where(alertable_type: type, alertable_id: alertable.id)
+    legacy_column = LEGACY_ALERTABLE_COLUMNS[type]
+
+    legacy_column ? matched.or(where(legacy_column => alertable.id)) : matched
+  }
   scope :create_notification, -> {
     where(kind: notification_kinds, updated_at: notify_period)
       .left_joins(:notification).where(notifications: {id: nil})
@@ -103,13 +123,13 @@ class UserAlert < ApplicationRecord
   end
 
   def self.find_or_build_by(attrs)
-    where(attrs).first || new(attrs)
+    where(attrs.except(:alertable)).for_alertable(attrs[:alertable]).first || new(attrs)
   end
 
   def self.update_theft_alert_without_photo(user:, theft_alert:)
     # scope to just active, to alert if the theft alert once again has no image
     user_alert = UserAlert.active.find_or_build_by(kind: "theft_alert_without_photo",
-      user_id: user.id, theft_alert_id: theft_alert.id)
+      user_id: user.id, alertable: theft_alert)
     if theft_alert.missing_photo?
       user_alert.bike_id = theft_alert.bike&.id
       user_alert.save
@@ -141,13 +161,18 @@ class UserAlert < ApplicationRecord
 
   def self.update_phone_waiting_confirmation(user:, user_phone:)
     user_alert = UserAlert.find_or_build_by(kind: "phone_waiting_confirmation",
-      user_id: user.id, user_phone_id: user_phone.id)
+      user_id: user.id, alertable: user_phone)
     if user_phone.confirmed?
       # Don't create if phone is already confirmed
       user_alert.id.blank? || user_alert.resolve!
     else
       user_alert.save unless user_phone.legacy?
     end
+  end
+
+  # Falls back to the legacy columns for rows Backfills::UserAlertAlertableJob hasn't reached
+  def alertable
+    super || theft_alert || user_phone
   end
 
   def kind_humanized
@@ -220,6 +245,12 @@ class UserAlert < ApplicationRecord
     else
       kind_humanized
     end
+  end
+
+  private
+
+  def uniq_kind?
+    UNIQ_KINDS.include?(kind)
   end
 
   def set_calculated_attributes

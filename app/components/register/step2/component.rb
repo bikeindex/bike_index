@@ -23,12 +23,6 @@ module Register
         translation(".complete_registration", cycle_type: @b_param.type_titleize)
       end
 
-      # Registering to the signed-in account's own address proves it, so only an
-      # address belonging to someone else is ever waiting on being confirmed
-      def awaiting_confirmation?
-        !@b_param.self_made?(@current_user) && @b_param.email_unconfirmed?
-      end
-
       def organization
         @organization ||= @b_param.creation_organization
       end

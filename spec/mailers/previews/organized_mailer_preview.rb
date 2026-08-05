@@ -10,8 +10,13 @@ class OrganizedMailerPreview < ActionMailer::Preview
   end
 
   def partial_registration(b_param_id: params[:b_param_id])
-    b_param = b_param_id ? BParam.find(b_param_id) : BParam.order(:created_at).last
+    b_param = b_param_id ? BParam.find(b_param_id) : BParam.partial_registrations.order(:created_at).last
     OrganizedMailer.partial_registration(b_param)
+  end
+
+  def partial_register_confirmation(b_param_id: params[:b_param_id])
+    b_param = b_param_id ? BParam.find(b_param_id) : b_params_awaiting_confirmation.last
+    OrganizedMailer.partial_register_confirmation(b_param)
   end
 
   def finished_registration(bike_id: params[:bike_id])
@@ -60,6 +65,11 @@ class OrganizedMailerPreview < ActionMailer::Preview
   end
 
   private
+
+  # The link is the whole email, so only a registration still holding a token renders one
+  def b_params_awaiting_confirmation
+    BParam.where("(params -> 'email_confirmation_token') IS NOT NULL").order(:created_at)
+  end
 
   def render_finished_registration(bikes, bike_id: nil)
     bike = bike_id ? Bike.unscoped.find(bike_id) : bikes.reorder(:created_at).limit(50).sample
