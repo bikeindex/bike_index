@@ -22,7 +22,7 @@ module BikeServices
 
     def claim_message_for(bike:, claim_token:)
       ownership = bike.current_ownership
-      return if ownership.blank? || !secure_compare?(claim_token, ownership.token)
+      return if ownership.blank? || !Binxtils::Secure.compare?(claim_token, ownership.token)
 
       ownership.claim_message
     end
@@ -47,10 +47,6 @@ module BikeServices
       StolenRecord.find_matching_token(bike_id: bike.id, recovery_link_token:)
     end
 
-    def secure_compare?(value, expected)
-      expected.present? && ActiveSupport::SecurityUtils.secure_compare(value.to_s, expected)
-    end
-
-    conceal :claim_message_for, :notification_for, :recovered_stolen_record_for, :secure_compare?
+    conceal :claim_message_for, :notification_for, :recovered_stolen_record_for
   end
 end
