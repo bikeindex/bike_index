@@ -17,11 +17,11 @@ RSpec.describe SearchResults::Frame::Component, type: :component do
       # overlay spinner is always present
       expect(component).to have_css(".search-loading-overlay")
       # rate-limit notice ships hidden, revealed by search--form on a 429
-      expect(component).to have_css("[hidden][data-search-rate-limited]", visible: :all)
+      expect(component).to have_css("[hidden][data-search-notice=rate-limited]", visible: :all)
       expect(component).to have_text("being rate limited", normalize_ws: true)
       # fetch-failure notice ships hidden too, revealed when the fetch never lands
-      expect(component).to have_css("[hidden][data-search-fetch-failed]", visible: :all)
-      expect(component).to have_css("[data-search-fetch-failed] [data-search-retry]", visible: :all)
+      expect(component).to have_css("[hidden][data-search-notice=fetch-failed]", visible: :all)
+      expect(component).to have_css("[data-search-notice=fetch-failed] [data-search-retry]", visible: :all)
       expect(component).to have_text("check your connection", normalize_ws: true)
     end
   end

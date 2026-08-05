@@ -29,16 +29,11 @@ module CspPolicy
 
     scheme, _, host = source.rpartition("//") # a bare host has no scheme to check
     return false if scheme.present? && scheme.chomp(":") != uri.scheme
+    # A leading *. matches subdomains only, never the bare domain
+    return uri.host.end_with?(host.delete_prefix("*")) if host.start_with?("*.")
 
-    host_permits?(host, uri.host)
+    uri.host == host
   end
 
-  # A leading *. matches subdomains only, never the bare domain
-  def host_permits?(source_host, host)
-    return host == source_host unless source_host.start_with?("*.")
-
-    host.end_with?(source_host.delete_prefix("*"))
-  end
-
-  conceal :sources, :source_permits?, :host_permits?
+  conceal :sources, :source_permits?
 end

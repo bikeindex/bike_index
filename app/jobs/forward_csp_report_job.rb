@@ -39,9 +39,8 @@ class ForwardCspReportJob < ApplicationJob
   # that varies per request mints a new fault every time — one ad conversion url
   # accounted for hundreds of them.
   def normalized_body(report)
-    blocked_uri = report["blocked-uri"]
-    uri = parsed_uri(blocked_uri)
-    normalized = uri.nil? ? blocked_uri : "#{uri.scheme}://#{uri.host}#{uri.path}"
+    uri = parsed_uri(report["blocked-uri"])
+    normalized = uri ? "#{uri.scheme}://#{uri.host}#{uri.path}" : report["blocked-uri"]
     {"csp-report" => report.merge("blocked-uri" => normalized)}.to_json
   end
 
@@ -76,7 +75,7 @@ class ForwardCspReportJob < ApplicationJob
   # reporting is a redirect to a target it won't name.
   def foreign_policy_noise?(report)
     uri = cross_origin_blocked_uri(report)
-    !uri.nil? && CspPolicy.permits?(directive(report), uri)
+    uri && CspPolicy.permits?(directive(report), uri)
   end
 
   # Every font we load is on our own origin or in font_src, so a font blocked from
@@ -84,7 +83,7 @@ class ForwardCspReportJob < ApplicationJob
   # page-level <link>s, which carry an https uri EXTENSION_SCHEME can't recognize.
   # The cost is that a webfont host we forget to allowlist goes unreported.
   def third_party_font_noise?(report)
-    directive(report) == "font-src" && !cross_origin_blocked_uri(report).nil?
+    directive(report) == "font-src" && cross_origin_blocked_uri(report).present?
   end
 
   # Old browsers send the sources along with the name: "font-src https://x"

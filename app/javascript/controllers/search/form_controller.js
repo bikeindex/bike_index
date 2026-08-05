@@ -48,8 +48,10 @@ export default class extends Controller {
     window.addEventListener('search:rate-limited', this.showRateLimited)
     window.addEventListener('popstate', this.handlePopstate)
     // The results frame renders outside this controller's element, so its retry
-    // button is wired here rather than with a data-action
-    this.retryElement?.addEventListener('click', this.retryResults)
+    // button is wired here rather than with a data-action. Hold the node so
+    // disconnect unbinds the one it bound.
+    this.retryButton = document.querySelector('[data-search-retry]')
+    this.retryButton?.addEventListener('click', this.retryResults)
   }
 
   disconnect () {
@@ -60,7 +62,7 @@ export default class extends Controller {
     document.removeEventListener('turbo:fetch-request-error', this.handleFetchError)
     window.removeEventListener('search:rate-limited', this.showRateLimited)
     window.removeEventListener('popstate', this.handlePopstate)
-    this.retryElement?.removeEventListener('click', this.retryResults)
+    this.retryButton?.removeEventListener('click', this.retryResults)
   }
 
   handleTurboLoad = () => {
@@ -215,19 +217,15 @@ export default class extends Controller {
 
   // The notices render beside the results frame, outside this controller's element
   showNotice (name) {
-    document.querySelector(`[data-search-${name}]`)?.removeAttribute('hidden')
+    document.querySelector(`[data-search-notice="${name}"]`)?.removeAttribute('hidden')
   }
 
   hideNotices () {
-    document.querySelectorAll('[data-search-rate-limited], [data-search-fetch-failed]')
+    document.querySelectorAll('[data-search-notice]')
       .forEach(element => element.setAttribute('hidden', ''))
   }
 
   showRateLimited = () => this.showNotice('rate-limited')
-
-  get retryElement () {
-    return document.querySelector('[data-search-retry]')
-  }
 
   // The form sits outside the results frame, so frame-nav period clicks advance
   // the URL but leave its hidden fields stale. Sync from the URL so the next
