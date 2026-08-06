@@ -131,17 +131,23 @@ export default class extends Controller {
   // address bar, not the form, so it's immune to combobox/form restore races.
   reloadFrameIfUrlStale () {
     const frame = this.frameElement
-    const src = frame?.getAttribute('src')
-    if (!src) return
-    const srcUrl = new URL(src, window.location.origin)
-    // Only reconcile within the same search page. A back/forward restoration can
-    // briefly leave one page's frame (eg marketplace_results_frame) in the DOM
-    // while the address bar is another page (/search/registrations); pointing the
-    // frame there fetches a response without that frame, which Turbo discards.
-    if (srcUrl.pathname !== window.location.pathname) return
-    if (srcUrl.search !== window.location.search) {
-      frame.setAttribute('src', window.location.href)
-    }
+    if (!this.differentSearchOnSamePage(frame?.getAttribute('src'), window.location.href)) return
+
+    frame.setAttribute('src', window.location.href)
+  }
+
+  // Two URLs asking the same search page for different results. Pairs on different
+  // pages never reconcile, so they don't count: a back/forward restoration can
+  // briefly leave one page's frame (eg marketplace_results_frame) in the DOM while
+  // the address bar is another page (/search/registrations), and a frame response
+  // that redirected elsewhere is still the one Turbo should render.
+  differentSearchOnSamePage (url, otherUrl) {
+    if (!url || !otherUrl) return false
+
+    const first = new URL(url, window.location.origin)
+    const second = new URL(otherUrl, window.location.origin)
+
+    return first.pathname === second.pathname && first.search !== second.search
   }
 
   // Turbo's [busy]/[aria-busy] loading state is transient, but a back/forward
@@ -171,13 +177,24 @@ export default class extends Controller {
   // The results frame eager-loads via its src; on a 429 Turbo just logs and
   // leaves the spinner spinning. Take over the response so the user sees why.
   handleFetchResponse = (event) => {
-    if (event.detail?.fetchResponse?.response?.status !== 429) return
+    const response = event.detail?.fetchResponse?.response
 
-    event.preventDefault() // stop Turbo's default handling of the throttled response
-    this.showRateLimited()
+    if (response?.status === 429) {
+      event.preventDefault() // stop Turbo's default handling of the throttled response
+      this.showRateLimited()
+      this.hideLoading() // drop the in-frame placeholder so it doesn't spin forever
+    } else if (event.target === this.frameElement && this.frameResponseSuperseded(response?.url)) {
+      event.preventDefault()
+    }
+  }
 
-    // Drop the in-frame loading placeholder so it doesn't spin forever
-    this.hideLoading()
+  // The frame's eager src fetch and a search submitted while it's still in flight
+  // race each other. Turbo renders whichever lands last and rewrites history from
+  // the frame, so the older response would drag the address bar back to the query
+  // the rider searched away from. A submit repoints src before its own response
+  // returns, so src names the search the frame should be showing.
+  frameResponseSuperseded (url) {
+    return this.differentSearchOnSamePage(url, this.frameElement?.getAttribute('src'))
   }
 
   // A fetch that rejects outright when the network drops never comes back with a

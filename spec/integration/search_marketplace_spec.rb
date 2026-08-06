@@ -84,6 +84,20 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     find("#search-button").click
   end
 
+  # Hold back the unfiltered results the frame eager-loads on arrival. Returns the
+  # release, so the example decides when they land rather than racing a timer.
+  def hold_initial_results_load
+    held = Queue.new
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.route("**/search/marketplace*", ->(route, request) {
+        held.pop if request.headers["turbo-frame"] == "marketplace_results_frame" &&
+          !request.url.include?("primary_activity=")
+        route.continue
+      })
+    end
+    -> { held.push(:release) }
+  end
+
   it "loads the kind counts on initial render" do
     visit_marketplace_via_nav
 
@@ -92,6 +106,20 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # longer auto-submits on load, so this guards that initial render still fills them.
     # All 17 listings (15 standard + 2 promoted) are for_sale, so the for_sale count shows (17).
     expect(page).to have_css("[data-count-target='for_sale']", text: "(17)", wait: 10)
+  end
+
+  it "keeps the searched results when the initial load lands after the search" do
+    release_initial_results_load = hold_initial_results_load
+    visit_marketplace_via_nav
+
+    search_primary_activity("Mountain biking")
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
+
+    # The unfiltered results are only now allowed to arrive - they mustn't take over
+    release_initial_results_load.call
+    page.driver.with_playwright_page { |playwright_page| playwright_page.wait_for_load_state(state: "networkidle") }
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", count: 6)
+    expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/)
   end
 
   it "automatically loads the next page when scrolling to bottom" do
