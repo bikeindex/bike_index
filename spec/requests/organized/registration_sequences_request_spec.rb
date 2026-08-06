@@ -70,6 +70,8 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
         expect(response.body).to match(%r{Previewing.{0,40}<strong>Draft</strong>.{0,20}registration sequence}m)
+        # Back link to the index, next to the pagination
+        expect(response.body).to include(">← Registration Sequences</a>")
       end
 
       it "pages through the rules, then the review, with pagination" do
