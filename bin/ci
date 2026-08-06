@@ -2,9 +2,10 @@
 
 # Runs locally what CI runs (.github/workflows/ci.yml), in one command.
 #
-#   bin/ci           lint + scan + the full spec suite
-#   bin/ci --lint    just lint + scan
-#   bin/ci --tests   just the spec suite
+#   bin/ci            lint + scan + the full spec suite
+#   bin/ci --lint     just lint + scan
+#   bin/ci --tests    just the spec suite
+#   bin/ci --github   also report each result on the pushed HEAD commit
 #
 # Nothing stops at the first failure, so one run reports every check.
 
@@ -35,8 +36,19 @@ def run(name, command)
   {name:, succeeded:, elapsed: Process.clock_gettime(Process::CLOCK_MONOTONIC) - started}
 end
 
-unknown = ARGV - ["--lint", "--tests"]
-abort "Unknown option(s): #{unknown.join(" ")}\nUsage: bin/ci [--lint | --tests]" if unknown.any?
+# Commit statuses, not check runs - check runs are only writable by a GitHub App,
+# and `gh` holds a user token. The local-ci/ prefix keeps a laptop's word about a
+# commit distinguishable from the workflow's own checks.
+def post_status(result, sha, note)
+  posted = system("gh", "api", "--silent", "-X", "POST", "repos/{owner}/{repo}/statuses/#{sha}",
+    "-f", "state=#{result[:succeeded] ? "success" : "failure"}",
+    "-f", "context=local-ci/#{result[:name]}",
+    "-f", "description=#{format("%.0fs on this machine", result[:elapsed])}#{note}")
+  warn "  could not post the #{result[:name]} status - is #{sha[0, 7]} pushed?" unless posted
+end
+
+unknown = ARGV - ["--lint", "--tests", "--github"]
+abort "Unknown option(s): #{unknown.join(" ")}\nUsage: bin/ci [--lint | --tests] [--github]" if unknown.any?
 
 checks = if ARGV.include?("--lint")
   LINT_AND_SCAN
@@ -47,7 +59,17 @@ else
 end
 
 Dir.chdir(APP_ROOT) do
-  results = checks.map { |name, command| run(name, command) }
+  github = ARGV.include?("--github")
+  sha = `git rev-parse HEAD`.strip
+  # A run against a dirty tree describes code that isn't at that sha - say so on
+  # the status rather than refusing to post one.
+  note = `git status --porcelain`.empty? ? "" : ", with uncommitted changes"
+
+  results = checks.map do |name, command|
+    result = run(name, command)
+    post_status(result, sha, note) if github
+    result
+  end
 
   puts "\n\e[1m== bin/ci\e[0m"
   results.each do |result|

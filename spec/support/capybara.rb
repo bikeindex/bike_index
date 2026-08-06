@@ -18,11 +18,9 @@ Capybara.configure do |config|
   config.javascript_driver = :playwright
 end
 
-# Pin the app server's port only when something needs to know it up front, via
-# CAPYBARA_PORT - CI's `assets:precompile` step bakes a matching BASE_URL into
-# ERB-templated assets so any asset URL resolves to the host the browser will
-# hit. Otherwise let Capybara pick a free port: bin/turbo_tests runs one process
-# per CPU, and a fixed port leaves every process but the first with EADDRINUSE.
+# Capybara takes a free port unless CAPYBARA_PORT pins one - bin/turbo_tests
+# runs a process per CPU, and a shared port leaves all but the first with
+# EADDRINUSE.
 Capybara.server_host = "localhost"
 if ENV["CAPYBARA_PORT"]
   Capybara.server_port = ENV["CAPYBARA_PORT"].to_i

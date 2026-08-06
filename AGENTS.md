@@ -42,7 +42,7 @@ Worth delegating enumeration at all rather than eyeballing a grep: in that same 
 
 Uses RSpec. All business logic should be tested. The `rspec-testing` skill covers project-specific style (`context`+`let`, request specs over controller specs, avoiding mocks).
 
-`bin/ci` runs everything CI runs (lint, brakeman, the full parallel suite) locally. `bin/ci --lint` is the fast subset. It's on demand only — nothing is enforced by a hook.
+`bin/ci` runs everything CI runs (lint, brakeman, the full parallel suite) locally. `bin/ci --lint` is the fast subset, `bin/ci --github` posts the results to the PR as `local-ci/*` commit statuses. It's on demand only — nothing is enforced by a hook.
 
 ## Frontend Development
 

@@ -89,6 +89,7 @@ We use [`turbo_tests`](https://github.com/serpapi/turbo_tests) to run the test s
 
 - `bin/ci --lint` for just the lint and scan (seconds)
 - `bin/ci --tests` for just the specs
+- `bin/ci --github` additionally reports each result on the pushed HEAD commit, as `local-ci/<check>` commit statuses, so a local run shows up on the PR. They're commit statuses rather than check runs because check runs are only writable by a GitHub App, and `gh` holds a user token.
 
 ## Code Hygiene
 
