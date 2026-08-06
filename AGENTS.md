@@ -42,6 +42,8 @@ Worth delegating enumeration at all rather than eyeballing a grep: in that same 
 
 Uses RSpec. All business logic should be tested. The `rspec-testing` skill covers project-specific style (`context`+`let`, request specs over controller specs, avoiding mocks).
 
+**Never hand-edit a VCR cassette**, and never `git checkout` away one a spec run re-recorded — cassettes only change by being recorded, and a re-recording gets committed on whatever branch you're on. To clear stale contents, `rm` the file and re-run the spec.
+
 `bin/ci` runs everything CI runs (lint, brakeman, the full parallel suite) locally. `bin/ci --lint` is the fast subset, `bin/ci --github` posts the results to the PR as `local-ci/*` commit statuses. It's on demand only — nothing is enforced by a hook.
 
 ## Frontend Development
