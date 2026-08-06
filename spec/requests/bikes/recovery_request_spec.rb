@@ -29,7 +29,7 @@ RSpec.describe Bikes::RecoveryController, type: :request do
         expect(bike.status_stolen?).to be_falsey
         get "#{base_url}/edit?token=#{recovery_link_token}"
         expect(response).to redirect_to bike_url(bike)
-        expect(flash[:info]).to match(/already/)
+        expect(flash[:notice]).to match(/already/)
         expect(session[:recovery_link_token]).to be_blank
       end
     end

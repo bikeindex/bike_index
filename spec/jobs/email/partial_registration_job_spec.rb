@@ -20,6 +20,49 @@ RSpec.describe Email::PartialRegistrationJob, type: :job do
     expect(notification.message_channel_target).to eq b_param.email
   end
 
+  context "partial_register_confirmation" do
+    let!(:b_param) do
+      BParam.create(origin: "register_flow", params: {bike: {owner_email:, manufacturer_id: "Trek"}}.as_json)
+    end
+    before { b_param.generate_email_confirmation_token! }
+
+    it "sends the confirmation email, with the token the flow minted" do
+      ActionMailer::Base.deliveries = []
+      Email::PartialRegistrationJob.new.perform(b_param.id, "partial_register_confirmation")
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+      expect(ActionMailer::Base.deliveries.last.html_part.decoded).to include b_param.email_confirmation_token
+      expect(Notification.count).to eq 1
+      expect(Notification.last).to have_attributes(notifiable: b_param, kind: "partial_register_confirmation",
+        user_id: nil, delivery_status: "delivery_success", message_channel_target: owner_email)
+
+      # The token is spent by the time a stale duplicate runs, so there's no link left to send
+      b_param.confirm_email!
+      expect { Email::PartialRegistrationJob.new.perform(b_param.id, "partial_register_confirmation") }
+        .to_not change(Notification, :count)
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+    end
+
+    it "runs the domain check too" do
+      stub_const("EmailDomain::VERIFICATION_ENABLED", true)
+      FactoryBot.create(:email_domain, domain: "@stuff.org", status: :banned)
+      ActionMailer::Base.deliveries = []
+      Email::PartialRegistrationJob.new.perform(b_param.id, "partial_register_confirmation")
+      expect(ActionMailer::Base.deliveries.count).to eq 0
+      expect(Notification.count).to eq 0
+      expect(BParam.count).to eq 0
+    end
+  end
+
+  context "a kind no b_param sends" do
+    it "raises" do
+      ActionMailer::Base.deliveries = []
+      expect { Email::PartialRegistrationJob.new.perform(b_param.id, "finished_registration") }
+        .to raise_error(ArgumentError, /finished_registration/)
+      expect(ActionMailer::Base.deliveries.count).to eq 0
+      expect(Notification.count).to eq 0
+    end
+  end
+
   context "with EmailDomain verification" do
     before { stub_const("EmailDomain::VERIFICATION_ENABLED", true) }
     let!(:email_domain) { FactoryBot.create(:email_domain, domain: "@stuff.org", status:) }

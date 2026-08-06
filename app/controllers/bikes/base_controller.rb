@@ -138,7 +138,7 @@ module Bikes
       end
       bike_sticker.claim_if_permitted(user: current_user, bike: @bike)
       if bike_sticker.errors.any?
-        flash[:error] = bike_sticker.errors.full_messages
+        flash[:error] = bike_sticker.errors.full_messages.to_sentence
       else
         flash[:success] = translation(:sticker_assigned, bike_sticker: bike_sticker.pretty_code, bike_type: @bike.type,
           scope: [:controllers, :bikes, :assign_bike_stickers])
@@ -147,7 +147,7 @@ module Bikes
 
     def find_token
       # First, deal with claim_token
-      if params[:t].present? && secure_compare?(params[:t], @bike.current_ownership.token)
+      if params[:t].present? && Binxtils::Secure.compare?(params[:t], @bike.current_ownership.token)
         @claim_message = @bike.current_ownership&.claim_message
         session[:claim_token_email] = @bike.current_ownership.owner_email
       end

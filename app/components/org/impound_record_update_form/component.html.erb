@@ -29,7 +29,7 @@
       <div id="impoundRecordUpdateForm" data-controller="org--impound-update">
         <% if @multi %>
           <div class="tw:hidden" data-org--impound-update-multi-target="error">
-            <%= render(UI::Alert::Component.new(text: "Select at least one record to update", kind: :error)) %>
+            <%= render(UI::Alerts::Base::Component.new(text: "Select at least one record to update", kind: :error)) %>
           </div>
         <% end %>
 

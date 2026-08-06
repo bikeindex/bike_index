@@ -304,9 +304,7 @@ class Organization < ApplicationRecord
     !enabled?("passwordless_users") && !user_email_domain.present?
   end
 
-  # Members of these organizations authenticate somewhere other than a Bike Index password
-  # prompt - a magic link, or the organization's IdP - so an invitation mints the account
-  # outright rather than emailing a request to pick a password.
+  # Members of these organizations authenticate via a magic link or the organization's IdP
   def passwordless_user_creation?
     any_enabled?(%w[passwordless_users saml_sso])
   end

@@ -114,6 +114,7 @@
         </header>
       </div>
 
+      <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
       <%= render "layouts/revised_messages" %>
 
       <div class="mt-4"></div>

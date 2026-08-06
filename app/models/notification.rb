@@ -38,7 +38,7 @@ class Notification < ApplicationRecord
   MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
   DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2}.freeze
 
-  UNDELIVERABLE_ERRORS = %w[Postmark::InactiveRecipientError Postmark::InvalidEmailAddressError].freeze
+  UNDELIVERABLE_ERRORS = [Postmark::InactiveRecipientError, Postmark::InvalidEmailRequestError].freeze
 
   enum :kind, KIND_ENUM
   enum :message_channel, MESSAGE_CHANNEL_ENUM
@@ -96,7 +96,7 @@ class Notification < ApplicationRecord
     end
 
     def b_param_kinds
-      %w[partial_registration].freeze
+      %w[partial_registration partial_register_confirmation].freeze
     end
 
     def customer_contact_kinds
@@ -245,7 +245,7 @@ class Notification < ApplicationRecord
     update(delivery_status: "delivery_failure", delivery_error: e.class)
     user_email&.update_last_email_errored!(email_errored: true)
 
-    raise e unless UNDELIVERABLE_ERRORS.include?(delivery_error)
+    raise e unless UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
   end
 
   def delivery_error_spam?
@@ -253,7 +253,7 @@ class Notification < ApplicationRecord
   end
 
   def delivery_error_invalid?
-    delivery_error == "Postmark::InvalidEmailAddressError"
+    delivery_error == "Postmark::InvalidEmailRequestError"
   end
 
   private
