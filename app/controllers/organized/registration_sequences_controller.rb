@@ -8,10 +8,13 @@ module Organized
       @previous = current_organization.registration_sequences.archived.order(end_at: :desc).to_a
     end
 
-    # The faked registrant walk-through, one page (?page=) per screen
+    # The faked registrant walk-through, one page (?page=) per screen. page is 1-indexed
+    # (Pagy); the index is 0-based, and one past the last page is the review.
     def show
       @registration_sequence = current_organization.registration_sequences.find(params[:id])
-      @preview_index = params[:page].to_i
+      page_count = @registration_sequence.registration_sequence_pages.count + 1
+      @preview_index = (params[:page].to_i - 1).clamp(0, page_count - 1)
+      @preview_pagy = Pagy::Offset.new(count: page_count, limit: 1, page: @preview_index + 1)
     end
 
     # Manage the draft's pages (add / reorder / edit) and its sequence-wide settings

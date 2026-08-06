@@ -45,17 +45,14 @@ module Org
           BikeServices::Register.acknowledgment_step_count(@registration_sequence)
         end
 
-        def continue_path
-          preview_path(@index + 1)
-        end
-
         def back_path
           @index.zero? ? exit_path : preview_path(@index - 1)
         end
 
+        # index is 0-based; the page param is 1-indexed
         def preview_path(index)
           organization_registration_sequence_path(organization_id: organization.to_param,
-            id: @registration_sequence.id, page: index)
+            id: @registration_sequence.id, page: index + 1)
         end
 
         # The show path itself - a GET form appends ?page= from a hidden field, since a

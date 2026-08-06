@@ -71,9 +71,10 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
         expect(response).to render_template(:show)
       end
 
-      it "pages through the rules, then the review" do
-        get "#{base_url}/#{draft.id}?page=0"
+      it "pages through the rules, then the review, with pagination" do
+        get "#{base_url}/#{draft.id}?page=1"
         expect(response.body).to include("Continue")
+        expect(response.body).to include("page=2") # pagination links to the next screen
 
         get "#{base_url}/#{draft.id}?page=99" # clamped to the review screen
         expect(response.body).to include("almost done")
