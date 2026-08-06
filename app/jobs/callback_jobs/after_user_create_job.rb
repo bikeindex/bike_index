@@ -38,7 +38,7 @@ module CallbackJobs
 
     def perform_confirmed_jobs(user, email)
       UserEmail.create_confirmed_primary_email(user)
-      create_passwordless_domain_organization_roles(user)
+      create_user_email_domain_organization_role(user)
       CallbackJobs::AfterUserCreateJob.perform_async(user.id, "async")
     end
 
@@ -106,12 +106,12 @@ module CallbackJobs
       Bike.unscoped.where(id: bike_ids)
     end
 
-    def create_passwordless_domain_organization_roles(user)
-      matching_organization = Organization.passwordless_email_matching(user.email)
+    def create_user_email_domain_organization_role(user)
+      matching_organization = Organization.user_role_email_matching(user.email)
       return false unless matching_organization.present?
       return false if user.organization_roles.pluck(:organization_id).include?(matching_organization.id)
 
-      OrganizationRole.create_passwordless(organization_id: matching_organization.id,
+      OrganizationRole.create_for_user_email_domain(organization_id: matching_organization.id,
         invited_email: user.email)
       user.reload
     end

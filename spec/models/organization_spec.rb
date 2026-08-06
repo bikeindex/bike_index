@@ -477,6 +477,24 @@ RSpec.describe Organization, type: :model do
     end
   end
 
+  describe "user_role_email_matching" do
+    let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["user_role_for_user_email_domain"], user_email_domain: "example.gov") }
+
+    it "matches the domain that the feature is granted for" do
+      expect(Organization.user_role_email_matching("seth@EXample.gov ")).to eq organization
+      expect(Organization.user_role_email_matching("seth@other.gov")).to be_blank
+    end
+
+    context "domain claimed for sign in but not for roles" do
+      let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "example.gov") }
+
+      it "is blank - signing in somewhere is not membership there" do
+        expect(Organization.passwordless_email_matching("seth@example.gov")).to eq organization
+        expect(Organization.user_role_email_matching("seth@example.gov")).to be_blank
+      end
+    end
+  end
+
   describe "passwordless_user_creation?" do
     it "is falsey" do
       expect(Organization.new.passwordless_user_creation?).to be_falsey

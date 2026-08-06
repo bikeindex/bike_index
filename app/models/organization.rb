@@ -253,7 +253,17 @@ class Organization < ApplicationRecord
       domain = email_domain(str)
       return nil if domain.blank?
 
-      permitted_domain_signin("passwordless_users").find_by(user_email_domain: domain)
+      permitted_domain_orgs("passwordless_users").find_by(user_email_domain: domain)
+    end
+
+    # The org that grants a role to anyone signing up on its domain, however they authenticate.
+    # Separate from the sign-in features on purpose: claiming a domain for login says nothing
+    # about whether those accounts should also become members.
+    def user_role_email_matching(str)
+      domain = email_domain(str)
+      return nil if domain.blank?
+
+      permitted_domain_orgs("user_role_for_user_email_domain").find_by(user_email_domain: domain)
     end
 
     # The org that forces SSO for an email's domain: feature enabled + a live IdP config.
@@ -263,7 +273,7 @@ class Organization < ApplicationRecord
       domain = email_domain(str)
       return nil if domain.blank?
 
-      permitted_domain_signin("saml_sso").where(user_email_domain: domain)
+      permitted_domain_orgs("saml_sso").where(user_email_domain: domain)
         .includes(:organization_saml_configuration)
         .detect { |org| org.organization_saml_configuration&.configured? }
     end
@@ -276,7 +286,7 @@ class Organization < ApplicationRecord
 
     private
 
-    def permitted_domain_signin(feature_slug)
+    def permitted_domain_orgs(feature_slug)
       where.not(user_email_domain: nil).with_enabled_feature_slugs(feature_slug)
     end
 

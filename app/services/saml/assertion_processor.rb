@@ -61,11 +61,11 @@ module Saml
 
     # Only mint an account when the email's domain is the one this org claims for SSO, so an
     # assertion can never create an account on a domain that routes logins somewhere else.
+    # Provisioning grants no membership - that is user_role_for_user_email_domain's job.
     def provision_user(email, organization)
       return nil unless Organization.saml_email_matching(email)&.id == organization.id
 
-      OrganizationRole.create_passwordless(invited_email: email,
-        organization_id: organization.id, created_by_magic_link: true).user
+      UserServices::PasswordlessCreator.find_or_create(email).first
     end
 
     def failure(message)

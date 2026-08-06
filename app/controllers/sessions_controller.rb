@@ -58,14 +58,11 @@ class SessionsController < ApplicationController
 
   def create_magic_link
     user = User.fuzzy_confirmed_or_unconfirmed_email_find(params[:email])
-    if user.blank?
-      matching_organization = Organization.passwordless_email_matching(params[:email])
-      if matching_organization.present?
-        organization_role = OrganizationRole.create_passwordless(invited_email: params[:email],
-          created_by_magic_link: true,
-          organization_id: matching_organization.id)
-        user = organization_role.user
-      end
+    # Claiming a domain for passwordless sign-in is enough to mint the account, nothing more.
+    # A role only follows if the org also has user_role_for_user_email_domain, which
+    # CallbackJobs::AfterUserCreateJob grants once the new user is confirmed.
+    if user.blank? && Organization.passwordless_email_matching(params[:email]).present?
+      user, _created = UserServices::PasswordlessCreator.find_or_create(params[:email])
     end
     if user.present?
       send_magic_link_and_redirect(user)
