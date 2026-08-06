@@ -1,0 +1,59 @@
+#!/usr/bin/env ruby
+
+# Runs locally what CI runs (.github/workflows/ci.yml), in one command.
+#
+#   bin/ci           lint + scan + the full spec suite
+#   bin/ci --lint    just lint + scan
+#   bin/ci --tests   just the spec suite
+#
+# Nothing stops at the first failure, so one run reports every check.
+
+APP_ROOT = File.expand_path("..", __dir__)
+
+# Each linter is listed out rather than delegated to `bin/lint --no-fix`, which
+# aborts on the first failure and runs the three npm checks as one command.
+LINT_AND_SCAN = {
+  "standardrb" => "bundle exec standardrb --no-fix",
+  "rubocop" => "bundle exec rubocop -c .rubocop_custom.yml",
+  "js lint" => "npm run js:lint_check",
+  "html lint" => "npm run html:lint_check",
+  "html format" => "npm run html:format_check",
+  "brakeman" => "bin/brakeman"
+}.freeze
+
+# parallel:prepare stands in for CI's db:create/db:schema:load - parallel test
+# databases aren't migrated automatically (see README).
+TESTS = {
+  "db prepare" => "bin/rake parallel:prepare",
+  "rspec" => "bin/turbo_tests"
+}.freeze
+
+def run(name, command)
+  puts "\n\e[1;34m== #{name}\e[0m: #{command}"
+  started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  succeeded = system(command)
+  {name:, succeeded:, elapsed: Process.clock_gettime(Process::CLOCK_MONOTONIC) - started}
+end
+
+unknown = ARGV - ["--lint", "--tests"]
+abort "Unknown option(s): #{unknown.join(" ")}\nUsage: bin/ci [--lint | --tests]" if unknown.any?
+
+checks = if ARGV.include?("--lint")
+  LINT_AND_SCAN
+elsif ARGV.include?("--tests")
+  TESTS
+else
+  LINT_AND_SCAN.merge(TESTS)
+end
+
+Dir.chdir(APP_ROOT) do
+  results = checks.map { |name, command| run(name, command) }
+
+  puts "\n\e[1m== bin/ci\e[0m"
+  results.each do |result|
+    status = result[:succeeded] ? "\e[32mpass\e[0m" : "\e[31mFAIL\e[0m"
+    puts format("  %-11s %s %6.1fs", result[:name], status, result[:elapsed])
+  end
+
+  exit results.all? { |result| result[:succeeded] }
+end

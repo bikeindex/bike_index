@@ -83,6 +83,13 @@ We use [`turbo_tests`](https://github.com/serpapi/turbo_tests) to run the test s
 
 - Parallel test databases are **not** migrated by default. After running migrations, sync them with `bin/rake parallel:prepare` (see above), or opt into automatic parallel migrations on `db:migrate` with `PARALLEL_MIGRATIONS=true bin/rake db:migrate`.
 
+### Running CI locally
+
+`bin/ci` runs what CI runs - the lint and security checks, then the full parallel suite - and finishes with a pass/fail summary. Every check runs even after one fails, so a single run reports everything.
+
+- `bin/ci --lint` for just the lint and scan (seconds)
+- `bin/ci --tests` for just the specs
+
 ## Code Hygiene
 
 We use the following tools to automate code formatting and linting:
