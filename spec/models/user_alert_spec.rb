@@ -70,34 +70,21 @@ RSpec.describe UserAlert, type: :model do
       expect(user_alert.alertable_type).to eq "UserPhone"
     end
 
-    # Until Backfills::UserAlertAlertableJob has run, rows only have the legacy column set
-    context "row written before alertable" do
+    context "another user has an alert for the same phone" do
       let!(:user_alert) do
-        FactoryBot.create(:user_alert, user:, kind: "phone_waiting_confirmation", user_phone:)
+        FactoryBot.create(:user_alert, user:, kind: "phone_waiting_confirmation", alertable: user_phone)
+      end
+      let(:other_alert) do
+        FactoryBot.create(:user_alert, kind: "phone_waiting_confirmation", alertable: user_phone)
       end
 
-      it "finds the legacy row rather than creating a duplicate" do
-        expect(user_alert.alertable_id).to be_blank
-        expect(user_alert.alertable).to eq user_phone
+      it "doesn't match across users" do
+        expect(other_alert.user_id).to_not eq user.id
 
         expect {
-          UserAlert.update_phone_waiting_confirmation(user:, user_phone:)
+          UserAlert.update_phone_waiting_confirmation(user: other_alert.user, user_phone:)
         }.to_not change(UserAlert, :count)
-      end
-
-      context "another user has the same phone id" do
-        let(:other_alert) do
-          FactoryBot.create(:user_alert, kind: "phone_waiting_confirmation", user_phone:)
-        end
-
-        it "doesn't match across users" do
-          expect(other_alert.user_id).to_not eq user.id
-
-          expect {
-            UserAlert.update_phone_waiting_confirmation(user: other_alert.user, user_phone:)
-          }.to_not change(UserAlert, :count)
-          expect(UserAlert.pluck(:id)).to match_array([user_alert.id, other_alert.id])
-        end
+        expect(UserAlert.pluck(:id)).to match_array([user_alert.id, other_alert.id])
       end
     end
   end
@@ -121,34 +108,21 @@ RSpec.describe UserAlert, type: :model do
       }.to_not change(UserAlert, :count)
     end
 
-    # Until Backfills::UserAlertAlertableJob has run, rows only have the legacy column set
-    context "row written before alertable" do
+    context "another user has an alert for the same theft_alert" do
       let!(:user_alert) do
-        FactoryBot.create(:user_alert, user:, kind: "theft_alert_without_photo", theft_alert:)
+        FactoryBot.create(:user_alert, user:, kind: "theft_alert_without_photo", alertable: theft_alert)
+      end
+      let(:other_alert) do
+        FactoryBot.create(:user_alert, kind: "theft_alert_without_photo", alertable: theft_alert)
       end
 
-      it "finds the legacy row rather than creating a duplicate" do
-        expect(user_alert.alertable_id).to be_blank
-        expect(user_alert.alertable).to eq theft_alert
+      it "doesn't match across users" do
+        expect(other_alert.user_id).to_not eq user.id
 
         expect {
-          UserAlert.update_theft_alert_without_photo(user:, theft_alert:)
+          UserAlert.update_theft_alert_without_photo(user: other_alert.user, theft_alert:)
         }.to_not change(UserAlert, :count)
-      end
-
-      context "another user has the same theft_alert id" do
-        let(:other_alert) do
-          FactoryBot.create(:user_alert, kind: "theft_alert_without_photo", theft_alert:)
-        end
-
-        it "doesn't match across users" do
-          expect(other_alert.user_id).to_not eq user.id
-
-          expect {
-            UserAlert.update_theft_alert_without_photo(user: other_alert.user, theft_alert:)
-          }.to_not change(UserAlert, :count)
-          expect(UserAlert.pluck(:id)).to match_array([user_alert.id, other_alert.id])
-        end
+        expect(UserAlert.pluck(:id)).to match_array([user_alert.id, other_alert.id])
       end
     end
   end
