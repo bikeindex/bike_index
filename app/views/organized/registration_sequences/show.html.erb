@@ -4,8 +4,12 @@
   Previewing <strong><%= status_word %></strong> registration sequence
 </h1>
 
-<%# Full-bleed on mobile so the flow's gray runs edge to edge, past the org page's padding %>
-<div class="tw:mx-[calc(50%_-_50vw)] tw:sm:mx-0">
+<%#
+  Full-bleed on mobile so the gray runs edge to edge, past the org page's padding. pt
+  cancels the shell's negative top margin (padding doesn't collapse) so the title clears it.
+%>
+
+<div class="tw:mx-[calc(50%_-_50vw)] tw:pt-9 tw:min-[992px]:pt-15 tw:sm:mx-0">
   <%= render Org::RegistrationSequence::Preview::Component.new(registration_sequence: @registration_sequence, index: @preview_index) %>
 </div>
 
