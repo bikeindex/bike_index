@@ -83,10 +83,10 @@ module API
       # returns a Rack::Response, and every 5xx reports.
       def respond_to_error(e)
         message = error_message(e)
-        # Log the scrubbed message, not the exception - Grape's logger has no formatter,
-        # so Logger interpolates e.message and an exception that raises there takes the
-        # whole handler down before it reports.
-        logger.error "#{e.class}: #{message}" unless Rails.env.test? # Breaks tests...
+        # Rails.logger, because Grape's own logger writes to $stdout and never reaches
+        # production.log. The scrubbed message rather than the exception, so a
+        # formatter reading e.message can't take the handler down before it reports.
+        Rails.logger.error "#{e.class}: #{message}" unless Rails.env.test? # Breaks tests...
         status_code = status_code_for(e, message)
         notify_error(e) if status_code > 450 # Only notify for 500s
         message = "OAuth error: #{message}" if /APIAuthorization::Errors/.match?(e.class.to_s)

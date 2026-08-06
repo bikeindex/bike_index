@@ -70,5 +70,21 @@ RSpec.describe API::Base do
         expect(response.status).to eq 404
       end
     end
+
+    # Grape's logger is its own Logger.new($stdout), which never lands in
+    # production.log where every other error is logged
+    context "outside the test env" do
+      let(:error) do
+        raise StandardError, "some api failure"
+      rescue => e
+        e
+      end
+      before { allow(Rails.env).to receive(:test?).and_return(false) }
+
+      it "logs to the Rails logger" do
+        expect(Rails.logger).to receive(:error).with("StandardError: some api failure")
+        expect(response.status).to eq 500
+      end
+    end
   end
 end
