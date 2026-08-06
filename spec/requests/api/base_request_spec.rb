@@ -71,8 +71,6 @@ RSpec.describe API::Base do
       end
     end
 
-    # Grape's logger is its own Logger.new($stdout), which never lands in
-    # production.log where every other error is logged
     context "outside the test env" do
       let(:error) do
         raise StandardError, "some api failure"
