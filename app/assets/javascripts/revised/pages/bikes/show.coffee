@@ -60,11 +60,10 @@ class BikeIndex.BikesShow extends BikeIndex
     # Rotate photos on arrow key presses
     $(document).keyup (e) =>
       @rotatePhotosOnArrows(e)
-    # If the window scrolls, load photos, so there isn't a delay when clicking
-    # on them - and so we don't load them unless there is interaction with the page
-    $(window).scroll =>
+    # Load the photos on the first scroll, so there isn't a delay when clicking on
+    # them - and so we don't load them unless there is interaction with the page
+    $(window).one 'scroll', =>
       @loadPhotos()
-      $(window).unbind('scroll')
 
   showBikeOverlay: ->
     # Affix the edit menu to the page - broken in chrome, so we're using position fixed

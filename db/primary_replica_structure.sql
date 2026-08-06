@@ -4189,16 +4189,16 @@ ALTER SEQUENCE public.theft_alerts_id_seq OWNED BY public.theft_alerts.id;
 CREATE TABLE public.user_alerts (
     id bigint NOT NULL,
     user_id bigint,
-    user_phone_id bigint,
     bike_id bigint,
-    theft_alert_id bigint,
     organization_id bigint,
     message text,
     kind integer,
     resolved_at timestamp without time zone,
     dismissed_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    alertable_type character varying,
+    alertable_id bigint
 );
 
 
@@ -7505,6 +7505,13 @@ CREATE INDEX index_theft_alerts_on_user_id ON public.theft_alerts USING btree (u
 
 
 --
+-- Name: index_user_alerts_on_alertable; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_alerts_on_alertable ON public.user_alerts USING btree (alertable_type, alertable_id);
+
+
+--
 -- Name: index_user_alerts_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7512,24 +7519,10 @@ CREATE INDEX index_user_alerts_on_bike_id ON public.user_alerts USING btree (bik
 
 
 --
--- Name: index_user_alerts_on_theft_alert_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_user_alerts_on_theft_alert_id ON public.user_alerts USING btree (theft_alert_id);
-
-
---
 -- Name: index_user_alerts_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_alerts_on_user_id ON public.user_alerts USING btree (user_id);
-
-
---
--- Name: index_user_alerts_on_user_phone_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_user_alerts_on_user_phone_id ON public.user_alerts USING btree (user_phone_id);
 
 
 --
@@ -7717,6 +7710,8 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260805093756'),
+('20260804100000'),
 ('20260801100000'),
 ('20260731100009'),
 ('20260731100008'),

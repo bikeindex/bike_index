@@ -21,7 +21,7 @@ bin/kamal_review app details  --app pr-3594.review.bikeindex.org
 bin/kamal_review app version  --app https://pr-3594.review.bikeindex.org
 ```
 
-All four resolve to PR `3594`; with no `--app` it defaults to the persistent sandbox app, and `--app sandbox` names it explicitly ([below](#sandbox-persistent-main-deploy)). (It also drives the `deploy`/`destroy` lifecycle — see [Deploying locally](#deploying-locally).) It uses `REVIEW_APP_HOST` + `.kamal/secrets`, so the 1Password setup above is a prerequisite. The `shared-db`/`shared-redis` accessories live only in the per-PR config, so accessory commands need an explicit `--app 0` (or any PR) — e.g. reboot Postgres after changing its `shared_preload_libraries`:
+All four resolve to PR `3594`; with no `--app` it defaults to the persistent sandbox app, and `--app sandbox` names it explicitly ([below](#sandbox-persistent-main-deploy)). (It also drives the `deploy`/`destroy`/`reload_database` lifecycle — see [Deploying locally](#deploying-locally).) It uses `REVIEW_APP_HOST` + `.kamal/secrets`, so the 1Password setup above is a prerequisite. The `shared-db`/`shared-redis` accessories live only in the per-PR config, so accessory commands need an explicit `--app 0` (or any PR) — e.g. reboot Postgres after changing its `shared_preload_libraries`:
 
 ```bash
 bin/kamal_review accessory reboot db --app 0
@@ -31,7 +31,7 @@ bin/kamal_review accessory reboot db --app 0
 
 Alongside the per-PR apps, `main` is continuously deployed to **[sandbox.review.bikeindex.org](https://sandbox.review.bikeindex.org)** — think of it as a review app that never gets a PR number and is never destroyed. It shares `config/deploy.review.yml`: with no `REVIEW_APP_PR_NUMBER` set, the ERB resolves the `sandbox` slug and omits the `accessories:` block (so a sandbox deploy can't touch the shared infra the PR apps depend on). It differs only in using Redis logical DB `0` (the one the PR mod-1023 allocation never hands out).
 
-For `bin/kamal_review`, with no `--app` given it defaults to sandbox - but you can also use `--app sandbox` to target it. This works for passthrough commands only, since sandbox is deployed by its own workflow, not the `deploy`/`destroy` lifecycle:
+For `bin/kamal_review`, with no `--app` given it defaults to sandbox - but you can also use `--app sandbox` to target it. This works for passthrough commands only, since sandbox is deployed by its own workflow, not the `deploy`/`destroy`/`reload_database` lifecycle:
 
 ```bash
 bin/kamal_review shell        --app sandbox   # bash on sandbox
@@ -56,6 +56,7 @@ Once labeled:
 - **Push → auto-redeploys**: ci.yml's `dispatch` job dispatches this workflow. (No `pull_request: synchronize` trigger — it would leave a skipped review-app check on every push to every unlabeled PR.)
   - A fork's push fires `on: push` in the fork, not here, so this repo's `dispatch` job never sees it — fork PRs only deploy via manual `workflow_dispatch`.
 - **Destroy without closing**: re-run with `destroy` (also removes the label).
+- **Reset the data**: re-run with `reload_database` ([below](#reloading-the-database)) — the label is left alone.
 
 Only CI's on-push dispatch and `closed` are wired up, so toggling the label by hand does nothing until the next push.
 
@@ -65,12 +66,13 @@ The step that isn't idempotent is the redis flush, because mod-1023 allocation c
 
 ## How a deploy works
 
-Four jobs: `resolve` (PR number + deploy/destroy, and labels on deploy), `op` (calls the shared `kamal-deploy.yml` reusable workflow to build + run the kamal command), `post` (PR-side follow-ups: deployment link, failure-comment cleanup, label removal + GHCR image cleanup on destroy), `report` (failure-only). The reusable workflow's `build` job cancels superseded builds (`cancel-in-progress`) while its `run` job serializes per PR *without* cancellation, since killing kamal mid-deploy can strand the deploy lock. `kamal-deploy.yml` is shared with `sandbox.yml`.
+Four jobs: `resolve` (PR number + action, and labels on deploy), `op` (calls the shared `kamal-deploy.yml` reusable workflow to build + run the kamal command), `post` (PR-side follow-ups: deployment link, failure-comment cleanup, label removal + GHCR image cleanup on destroy), `report` (failure-only). The reusable workflow's `build` job cancels superseded builds (`cancel-in-progress`) while its `run` job serializes per PR *without* cancellation, since killing kamal mid-deploy can strand the deploy lock. `kamal-deploy.yml` is shared with `sandbox.yml`.
 
 | Trigger | Action | What runs |
 |---|---|---|
 | `workflow_dispatch` → deploy (operator, or auto-dispatched by ci.yml on push to a labeled PR) | `deploy` | add `review-app` label, build image, deploy |
 | `workflow_dispatch` → destroy | `destroy` | tear down, remove label, delete PR images from GHCR |
+| `workflow_dispatch` → reload_database | `reload_database` | drop both databases, then create + seed them again ([below](#reloading-the-database)) |
 | `pull_request: closed` (any PR) | `destroy` | tear down, remove label, delete PR images from GHCR |
 
 Fork PRs are filtered by `resolve`'s same-repo check (`proceed=false`). On **deploy**:
@@ -84,6 +86,10 @@ Fork PRs are filtered by `resolve`'s same-repo check (`proceed=false`). On **dep
 4. The `review-app` environment surfaces the URL ("View deployment").
 
 Destroy reverses it: purge the PR's ActiveStorage objects from the shared R2 bucket (while the app's still up — see [storage](#storage-is-shared)), `kamal app remove`, drop both databases + the role, `FLUSHDB` the assigned Redis logical DB (unless a running PR shares it — see [teardown](#the-review-app-label-is-the-deploy-gate)), remove any container `app remove` left behind along with the volumes, and delete every `pr-<N>-<sha>` GHCR image version (best-effort, `packages: write`).
+
+### Reloading the database
+
+`reload_database` resets a running app's data to a freshly seeded state without redeploying — for when seeds change, or a demo leaves the data in a mess. Containers, image, volumes and the Postgres role are untouched; only the two databases are rebuilt, by `bin/kamal_review reload_database --app <pr>` (which also purges the PR's R2 objects and flushes its redis DB first — see the comments there for why the order matters). It runs the same `db:prepare` the entrypoint runs at boot, so it's as slow as a first deploy, and the app serves partly-seeded data while it runs.
 
 **Failures comment on the PR.** These runs are `workflow_dispatch`-triggered, so their check runs never hit the PR's rollup. The `report` job comments the failure (edited in place on repeats); the next successful deploy deletes it.
 
@@ -104,7 +110,7 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 | `Dockerfile`, `.dockerignore` | Production-style image (Thruster + Puma + Sidekiq). Used only by review apps. |
 | `bin/docker-entrypoint` | Creates the per-PR Postgres **superuser** role + runs `db:prepare` (schema + seed) on first boot |
 | `bin/thrust` | Thruster binstub used by the image's `CMD` |
-| `bin/kamal_review` | Run kamal against one review app — `deploy`/`destroy` lifecycle plus arbitrary passthrough commands (resolves the PR number from any id form, sets `REVIEW_APP_*` + `--config-file`) |
+| `bin/kamal_review` | Run kamal against one review app — `deploy`/`destroy`/`reload_database` lifecycle plus arbitrary passthrough commands (resolves the PR number from any id form, sets `REVIEW_APP_*` + `--config-file`) |
 | `config/deploy.review.yml` | Kamal config for both targets — ERB derives `pr-<N>` (with `REVIEW_APP_PR_NUMBER`) or the `sandbox` slug (without); accessories emitted for PR apps only |
 | `.github/workflows/sandbox.yml` | Thin caller of `kamal-deploy.yml` for the `main`→sandbox deploy, dispatched on every push to `main` — see [Sandbox](#sandbox-persistent-main-deploy) |
 | `.github/workflows/kamal-deploy.yml` | Reusable (`workflow_call`) build + kamal-command workflow shared by review-app and sandbox deploys |
@@ -154,6 +160,7 @@ These are the same values as the `REVIEW_APP_*` GitHub Environment secrets ([Ini
 
 ```bash
 bin/kamal_review deploy --app <pr_number> --version <image_tag>
+bin/kamal_review reload_database --app <pr_number>   # drop + reseed, no redeploy
 ```
 
 `REVIEW_APP_HOST` defaults to `host.review.bikeindex.org`; export it only to target a different host under the `*.review.bikeindex.org` wildcard.
