@@ -43,4 +43,4 @@
   <% end %>
 <% end %>
 
-<%= render UI::ButtonLink::Component.new(text: "Preview", href: organization_registration_sequence_path(organization_id: @organization.to_param, id: @registration_sequence.id), color: :secondary, size: :lg, html_class: "tw:mt-8 tw:w-full") %>
+<%= render UI::ButtonLink::Component.new(text: "Preview", href: organization_registration_sequence_path(organization_id: @organization.to_param, id: @registration_sequence.id), color: :secondary, size: :lg, class: "tw:mt-8 tw:w-full") %>

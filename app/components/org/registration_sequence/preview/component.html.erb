@@ -1,7 +1,7 @@
 <%= render Register::Page::Component.new do %>
   <%= render Register::Progress::Component.new(step: progress_step, total: progress_total) %>
 
-  <%= render Register::AcknowledgmentProgress::Component.new(number: @index + 1, total: acknowledgment_step_count) %>
+  <%= render Register::AcknowledgmentProgress::Component.new(number: index + 1, total: acknowledgment_step_count) %>
 
   <% if reviewing? %>
     <%= render UI::Header::Component.new(text: "You're almost done", subtitle: "A quick review before you finish.", html_class: "uncap") %>
@@ -54,9 +54,9 @@
   <% else %>
     <%# Continue is gated on checking every rule, the same as the real flow %>
     <%= form_with url: sequence_path, method: :get, data: {controller: "register--acknowledgment"} do %>
-      <%= hidden_field_tag :page, page_param(@index + 1) %>
+      <%= hidden_field_tag :page, page_param(index + 1) %>
 
-      <%= render Org::RegistrationSequence::PagePreview::Component.new(page: current_page, first: @index.zero?) %>
+      <%= render Org::RegistrationSequence::PagePreview::Component.new(page: current_page, first: index.zero?) %>
 
       <%= render UI::Button::Component.new(text: "Continue", color: :primary, size: :lg, kind: :submit,
         spinner: true, disabled: true, html_class: "tw:mt-5 tw:w-full", data: {"register--acknowledgment-target": "submit"}) %>

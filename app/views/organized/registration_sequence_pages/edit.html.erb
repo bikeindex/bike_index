@@ -44,7 +44,7 @@
     <div data-page-preview-target="preview" class="tw:mt-8">
       <h2 class="uncap tw:mb-3 tw:text-xl">Preview</h2>
 
-      <%= render Org::RegistrationSequence::PagePreview::Component.new(page: @page) %>
+      <%= render Org::RegistrationSequence::PagePreview::Component.new(page: @page, first: @page.listing_order.to_i.zero?) %>
     </div>
   <% end %>
 </div>

@@ -9,7 +9,7 @@ module Org
       class Component < ApplicationComponent
         def initialize(registration_sequence:, index: 0)
           @registration_sequence = registration_sequence
-          @index = index.to_i.clamp(0, pages.count)
+          @requested_index = index.to_i
         end
 
         def render?
@@ -18,22 +18,27 @@ module Org
 
         private
 
+        # Clamped lazily - it reads the pages, which render? has to gate first
+        def index
+          @index ||= @requested_index.clamp(0, pages.count)
+        end
+
         def pages
           @pages ||= @registration_sequence.registration_sequence_pages.to_a
         end
 
         def reviewing?
-          @index >= pages.count
+          index >= pages.count
         end
 
         def current_page
-          pages[@index]
+          pages[index]
         end
 
         # The registration's step math, so the progress bars match the real flow. The
         # review is one past the pages, which is exactly the review's step there too.
         def progress_step
-          BikeServices::Register.step_for_page_index(@index).to_i
+          BikeServices::Register.step_for_page_index(index).to_i
         end
 
         def progress_total
@@ -46,17 +51,17 @@ module Org
         end
 
         def back_path
-          @index.zero? ? exit_path : preview_path(@index - 1)
+          index.zero? ? exit_path : preview_path(index - 1)
         end
 
-        def preview_path(index)
+        def preview_path(page_index)
           organization_registration_sequence_path(organization_id: organization.to_param,
-            id: @registration_sequence.id, page: page_param(index))
+            id: @registration_sequence.id, page: page_param(page_index))
         end
 
-        # The URL page param is 1-indexed; @index is 0-based
-        def page_param(index)
-          index + 1
+        # The URL page param is 1-indexed; the index is 0-based
+        def page_param(page_index)
+          page_index + 1
         end
 
         # The show path itself - a GET form appends ?page= from a hidden field, since a
