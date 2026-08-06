@@ -173,6 +173,7 @@ ignore_unused:
   - "controllers.*" # our translation helper component blocks detection
   - "components.*" # our translation helper component blocks detection
   - "shared.organized_menu_items.*" # used dynamically by OrganizedServices::UserMenuItems
+  - "shared.register_flow.*" # used dynamically by BikeServices::Register
   - "*_mailer.*"
   - "date.*"
   - "datetime.*"

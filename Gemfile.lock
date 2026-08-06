@@ -853,7 +853,7 @@ GEM
     turbo-rails (2.0.23)
       actionpack (>= 7.1.0)
       railties (>= 7.1.0)
-    turbo_tests (2.2.4)
+    turbo_tests (2.2.5)
       parallel_tests (>= 3.3.0, < 5)
       rspec (>= 3.10)
     twilio-ruby (7.10.5)

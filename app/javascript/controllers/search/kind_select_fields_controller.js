@@ -109,6 +109,12 @@ export default class extends Controller {
       }
       // Then set the location from whatever we got
       this.locationTarget.value = location
+      // Restore the distance saved with it, unless the field holds something
+      // other than the placeholder default - that came from the URL
+      const distance = localStorage.getItem(`${this.storageKeyPrefix}searchDistance`)
+      if (distance && this.distanceTarget.value === this.distanceTarget.placeholder) {
+        this.distanceTarget.value = distance
+      }
     }
   }
 

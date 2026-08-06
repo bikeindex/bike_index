@@ -57,37 +57,30 @@ class RegisterController < ApplicationController
   end
 
   def create
-    @b_param.clean_params(create_params.as_json)
-    # The 422 renders skip the derived meta title, which now needs the interpolation
-    @page_title = I18n.t("meta_titles.register_create", cycle_type: @b_param.type)
-    @b_param.errors.add(:base, translation(:email_required)) if @b_param.owner_email.blank?
-    @b_param.errors.add(:base, translation(:manufacturer_required)) if @b_param.manufacturer_id.blank?
-    if @b_param.errors.any?
-      render Register::Step1::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:), status: :unprocessable_entity
-    elsif @b_param.save
-      # Step 2 says the link is on its way, so it goes out here rather than at the end
-      BikeServices::Register.send_confirmation_email(@b_param)
-      redirect_to step_path(2)
-    else
-      @b_param.errors.add(:base, translation(:unable_to_save))
-      render Register::Step1::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:), status: :unprocessable_entity
+    saved = BikeServices::Register.save_step_1(@b_param, bike_params: create_params,
+      propulsion_type_motorized: params[:propulsion_type_motorized])
+    unless saved
+      # The 422 render skips the derived meta title, which now needs the interpolation
+      @page_title = I18n.t("meta_titles.register_create", cycle_type: @b_param.type)
+      return render(Register::Step1::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:),
+        status: :unprocessable_entity)
     end
+
+    # Step 2 says the link is on its way, so it goes out here rather than at the end
+    BikeServices::Register.send_confirmation_email(@b_param)
+    redirect_to step_path(2)
   end
 
   def update
     # Both read straight from params - update_params is stored as json, which an upload can't be
-    saved_step_2 = BikeServices::Register.save_step_2(@b_param, user: current_user,
+    saved = BikeServices::Register.save_step_2(@b_param, user: current_user,
       image: params.dig(:bike, :image), image_signed_id: params.dig(:bike, :image_signed_id),
       bike_params: update_params)
     # Saved either way, so the re-render has everything they entered
-    unless saved_step_2
-      @b_param.errors.add(:base, translation(:name_required))
+    unless saved
       return render(Register::Step2::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:),
         status: :unprocessable_entity)
     end
-
-    # An e-vehicle's safety pages come between the details and the bike
-    return redirect_to_current_step unless BikeServices::Register.acknowledged?(@b_param, sequence: @registration_sequence)
 
     complete_registration
   end
@@ -95,7 +88,10 @@ class RegisterController < ApplicationController
   # Each acknowledgment page posts here, and the review's final acknowledgment
   def acknowledge
     step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence)
-    unless save_acknowledgment(step)
+    acknowledged = BikeServices::Register.acknowledge_step(@b_param, step,
+      sequence: @registration_sequence, user: current_user,
+      acknowledged_all: params[:acknowledged_all], checked: params[:acknowledged]&.to_unsafe_h&.values)
+    unless acknowledged
       flash[:error] = translation(:acknowledge_everything)
       return redirect_to step_path(step)
     end
@@ -117,8 +113,7 @@ class RegisterController < ApplicationController
     # Single use, so a second click has nothing left to do - the first one signed them in
     return redirect_to_current_step if @b_param.email_confirmed?
 
-    if @b_param.email_confirmation_token_expired? ||
-        !Binxtils::Secure.compare?(params[:confirmation_token], @b_param.email_confirmation_token)
+    unless BikeServices::Register.confirmation_token_valid?(@b_param, params[:confirmation_token])
       BikeServices::Register.send_confirmation_email(@b_param)
       flash[:error] = translation(:confirmation_link_expired)
       return redirect_to_current_step
@@ -138,22 +133,10 @@ class RegisterController < ApplicationController
 
   private
 
-  def save_acknowledgment(step)
-    if step == "review"
-      return BikeServices::Register.save_acknowledgment(@b_param, @registration_sequence,
-        acknowledged_all: params[:acknowledged_all], user: current_user)
-    end
-
-    BikeServices::Register.acknowledge_page(@b_param,
-      BikeServices::Register.page_for_step(step, sequence: @registration_sequence),
-      checked: params[:acknowledged]&.to_unsafe_h&.values)
-  end
-
   def complete_registration
-    BikeServices::Register.claim_creator(@b_param, current_user)
-    bike = BikeServices::Register.create_bike_if_ready(@b_param,
+    bike = BikeServices::Register.complete(@b_param, user: current_user,
       sequence: @registration_sequence, ip_address: forwarded_ip_address)
-    # No bike yet - everything stays on the b_param until the emailed link is clicked
+    # No bike yet - everything stays on the b_param until the flow's remaining steps are done
     return redirect_to_current_step if bike.blank?
 
     redirect_after_bike_creation(bike)
@@ -243,16 +226,11 @@ class RegisterController < ApplicationController
   end
 
   def create_params
-    bike_params = params.require(:b_param).permit(:manufacturer_id, :cycle_type, :owner_email)
+    params.require(:b_param).permit(*BikeServices::Register.permitted_step_1_params)
       .to_h.merge(BParam.status_hash_from_params(params))
-    {bike: bike_params, propulsion_type_motorized: params[:propulsion_type_motorized]}
   end
 
   def update_params
-    params.fetch(:bike, {}).permit(:primary_frame_color_id, :secondary_frame_color_id,
-      :tertiary_frame_color_id, :serial_number, :frame_size, :frame_size_number, :frame_size_unit,
-      :bike_sticker, :phone, :status, :frame_model, :year, :user_name,
-      :extra_registration_number, :organization_affiliation, :student_id,
-      address_record_attributes: AddressRecord.permitted_params)
+    params.fetch(:bike, {}).permit(*BikeServices::Register.permitted_step_2_params)
   end
 end

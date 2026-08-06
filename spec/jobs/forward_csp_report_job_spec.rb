@@ -2,17 +2,21 @@ require "rails_helper"
 
 RSpec.describe ForwardCspReportJob, type: :job do
   let(:blocked_uri) { "https://evil.example.com/x.js" }
-  let(:report) { {"csp-report" => {"blocked-uri" => blocked_uri, "document-uri" => "https://bikeindex.org/bikes/1", "effective-directive" => "script-src"}} }
+  let(:document_uri) { "https://bikeindex.org/bikes/1" }
+  let(:report) { {"csp-report" => {"blocked-uri" => blocked_uri, "document-uri" => document_uri, "effective-directive" => "script-src"}} }
   let(:body) { report.to_json }
   let(:user_agent) { "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/148.0.0.0 Safari/537.36" }
   let(:forwarded) { [] }
+  let(:forwarded_blocked_uri) { forwarded.first&.dig("csp-report", "blocked-uri") }
+  let(:forwarded_uris) { [] }
 
   before { stub_const("ForwardCspReportJob::HONEYBADGER_CSP_API_KEY", "abc123") }
 
   describe "#perform" do
     before do
-      WebMock.stub_request(:post, /api\.honeybadger\.io/).to_return {
-        forwarded << true
+      WebMock.stub_request(:post, /api\.honeybadger\.io/).to_return { |request|
+        forwarded << JSON.parse(request.body)
+        forwarded_uris << request.uri
         {status: 201}
       }
     end
@@ -32,7 +36,21 @@ RSpec.describe ForwardCspReportJob, type: :job do
 
       it "forwards a real violation to Honeybadger" do
         perform
-        expect(forwarded).to contain_exactly(true)
+        expect(forwarded_blocked_uri).to eq blocked_uri
+      end
+
+      it "sends the browser's user agent as context, not the forwarder's" do
+        perform
+        expect(CGI.unescape(forwarded_uris.first.to_s)).to include("context[user_agent]=#{user_agent}")
+      end
+
+      context "blocked-uri with a query string" do
+        let(:blocked_uri) { "https://evil.example.com/x.js?label=WADeCPKg7gYQtvfc0wM" }
+
+        it "forwards it normalized" do
+          perform
+          expect(forwarded_blocked_uri).to eq "https://evil.example.com/x.js"
+        end
       end
 
       context "without an API key" do
@@ -43,7 +61,7 @@ RSpec.describe ForwardCspReportJob, type: :job do
         end
       end
 
-      context "browser-extension noise" do
+      context "a report CspReport treats as noise" do
         let(:blocked_uri) { "chrome-extension://0dca8e62/fonts/Inter-Variable.ttf" }
         it "does not forward" do
           perform
@@ -51,44 +69,10 @@ RSpec.describe ForwardCspReportJob, type: :job do
         end
       end
 
-      context "in-app browser user agent" do
-        let(:user_agent) { "Mozilla/5.0 (Linux; Android 12) Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/488.0.0.78.79;]" }
-        it "does not forward" do
-          perform
-          expect(forwarded).to be_empty
-        end
-      end
-
-      context "google country-domain frame (origin only, no path)" do
-        let(:blocked_uri) { "https://www.google.co.id" }
-        it "does not forward" do
-          perform
-          expect(forwarded).to be_empty
-        end
-      end
-
-      context "private-ip frame injection" do
-        let(:blocked_uri) { "https://10.255.99.112" }
-        it "does not forward" do
-          perform
-          expect(forwarded).to be_empty
-        end
-      end
-
-      context "read-aloud data: media" do
-        let(:report) { {"csp-report" => {"blocked-uri" => "data", "effective-directive" => "media-src"}} }
-        it "does not forward" do
-          perform
-          expect(forwarded).to be_empty
-        end
-      end
-
       context "malformed body" do
-        ["not json", "null", "123", {"csp-report" => 5}.to_json].each do |raw_body|
-          it "does not forward for #{raw_body.inspect}" do
-            perform(raw_body)
-            expect(forwarded).to be_empty
-          end
+        it "does not forward" do
+          perform("not json")
+          expect(forwarded).to be_empty
         end
       end
     end
