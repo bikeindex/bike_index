@@ -77,17 +77,47 @@ module API
     mount API::V3::RootV3
     mount API::V2::RootV2
 
+    # Anything raised in here escapes as a bare 500 with no JSON body and no
+    # Honeybadger notify - the shape that makes API 500s invisible. Every path out
+    # returns a Rack::Response, and every 5xx reports.
     def self.respond_to_error(e)
-      logger.error e unless Rails.env.test? # Breaks tests...
-      # Exception messages can carry invalid UTF-8 (scanner probe URLs, malformed
-      # params). Scrub before matching or serializing — an unscrubbed bad byte
-      # raises here and suppresses the Honeybadger notify below, leaving a bare 500.
-      message = e.message.to_s.dup.force_encoding(Encoding::UTF_8).scrub
+      message = error_message(e)
+      # Log the scrubbed message, not the exception - Grape's logger has no formatter,
+      # so Logger interpolates e.message and an exception that raises there takes the
+      # whole handler down before it reports.
+      logger.error "#{e.class}: #{message}" unless Rails.env.test? # Breaks tests...
       status_code = status_code_for(e, message)
-      Honeybadger.notify(e) if Rails.env.production? && status_code > 450 # Only notify for 500s
+      notify_error(e) if status_code > 450 # Only notify for 500s
       message = "OAuth error: #{message}" if /APIAuthorization::Errors/.match?(e.class.to_s)
       opts = {error: message}
-      opts[:trace] = e.backtrace[0, 10] unless Rails.env.production?
+      opts[:trace] = e.backtrace&.first(10) unless Rails.env.production?
+      error_response(opts, status_code)
+    rescue => handler_error
+      # Nothing fallible on this path - e.backtrace is what raised for some of the
+      # exceptions that land here.
+      notify_error(handler_error, context: {handling: e.class.to_s})
+      error_response({error: "Internal Server Error"}, 500)
+    end
+
+    # Reporting must never cost the response - notify is the last fallible call before
+    # the fallback returns, and it reads e.message to build the notice.
+    def self.notify_error(error, **opts)
+      Honeybadger.notify(error, **opts) if Rails.env.production?
+    rescue
+      nil
+    end
+
+    # Exception messages can carry invalid UTF-8 (scanner probe URLs, malformed
+    # params), and #message can raise outright. Falling back to the class name keeps
+    # status_code_for's mapping intact, so a RecordNotFound stays a 404.
+    def self.error_message(e)
+      e.message.to_s.dup.force_encoding(Encoding::UTF_8).scrub
+    rescue => message_error
+      notify_error(message_error, context: {handling: e.class.to_s})
+      e.class.to_s
+    end
+
+    def self.error_response(opts, status_code)
       Rack::Response.new(opts.to_json, status_code, {
         "Content-Type" => "application/json",
         "Access-Control-Allow-Origin" => "*",
@@ -109,5 +139,7 @@ module API
         (error.respond_to?(:status) && error.status) || 500
       end
     end
+
+    private_class_method :notify_error, :error_message, :error_response, :status_code_for
   end
 end
