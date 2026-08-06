@@ -18,15 +18,14 @@ RSpec.describe Admin::UserAlertsController, type: :request do
       let!(:phone_alert) do
         FactoryBot.create(:user_alert, kind: "phone_waiting_confirmation", alertable: user_phone)
       end
-      # Written before alertable, so it renders off the legacy column
-      let!(:legacy_theft_alert) do
-        FactoryBot.create(:user_alert, kind: "theft_alert_without_photo", theft_alert:)
+      let!(:theft_alert_alert) do
+        FactoryBot.create(:user_alert, kind: "theft_alert_without_photo", alertable: theft_alert)
       end
 
       it "renders the alertable column" do
         get base_url
         expect(response.status).to eq(200)
-        expect(assigns(:collection)).to match_array([phone_alert, legacy_theft_alert])
+        expect(assigns(:collection)).to match_array([phone_alert, theft_alert_alert])
         expect(response.body).to match(admin_theft_alert_path(theft_alert.id))
         # UserPhone has no admin show page, admin_path_for_object links its user
         expect(response.body).to match(admin_user_path(user_phone.user_id))
