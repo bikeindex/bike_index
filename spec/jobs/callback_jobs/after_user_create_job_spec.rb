@@ -250,9 +250,8 @@ RSpec.describe CallbackJobs::AfterUserCreateJob, type: :job do
         expect(organization_role.organization_id).to eq organization.id
         expect(organization_role.role).to eq "member"
 
-        expect(ActionMailer::Base.deliveries.count).to eq 1
-        mail = ActionMailer::Base.deliveries.last
-        expect(mail.subject).to match(/join.*#{organization.name}/i)
+        # An auto-granted role is not an invitation, so it sends no invitation email
+        expect(ActionMailer::Base.deliveries.count).to eq 0
       end
       context "organization_role exists" do
         it "does not create an additional organization_role" do

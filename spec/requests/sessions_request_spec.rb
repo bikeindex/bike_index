@@ -201,10 +201,8 @@ RSpec.describe SessionsController, type: :request do
           expect(organization_role.organization).to eq current_organization
           expect(organization_role.sender_id).to be_blank
           expect(organization_role.role).to eq "member"
-          # Both features means both emails - the invitation is no longer suppressed by
-          # created_by_magic_link, because the role now comes from confirmation, not this request
-          expect(ActionMailer::Base.deliveries.map(&:subject))
-            .to eq(["Join #{current_organization.name} on Bike Index", "Sign in to Bike Index"])
+          # Granting the role must not add a second email on top of the sign in link
+          expect(ActionMailer::Base.deliveries.map(&:subject)).to eq(["Sign in to Bike Index"])
         end
       end
     end

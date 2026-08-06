@@ -55,9 +55,11 @@ class OrganizationRole < ApplicationRecord
     ROLE_TYPES
   end
 
-  # The role an organization grants to anyone on its user_email_domain
+  # The role an organization grants to anyone on its user_email_domain. Nobody invited them, so
+  # stamp email_invitation_sent_at to suppress the invitation - it would otherwise arrive
+  # alongside whatever email the signup itself is already sending them.
   def self.create_for_user_email_domain(**create_attrs)
-    default_attrs = {skip_processing: true, role: "member"}
+    default_attrs = {skip_processing: true, role: "member", email_invitation_sent_at: Time.current}
     if create_attrs[:invited_email].present? # This should always be present...
       # We need to check for existing organization_roles because the CallbackJobs::AfterUserCreateJob calls this.
       # Scoped to the organization - an invite to a different one says nothing about this one.
