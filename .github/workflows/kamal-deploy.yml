@@ -5,23 +5,23 @@ name: Kamal build & deploy
 # image to GHCR, then run a kamal command over SSH. Callers pass the bits that
 # differ (image tag, service label, the kamal command, concurrency, environment).
 #
-# Callers: review-app.yml (per-PR deploy/destroy) and sandbox.yml (main deploy).
-# The `run` job also handles destroy — it just runs whatever `command` it's given
-# and skips the build (there's nothing to build for a teardown).
+# Callers: review-app.yml (per-PR deploy/destroy/reload_database) and sandbox.yml
+# (main deploy). The `run` job just runs whatever `command` it's given; callers
+# with nothing to build (a teardown, a database reload) pass `build: false`.
 
 on:
   workflow_call:
     inputs:
-      action:
-        description: "deploy (build then run) or destroy (run only, no build)"
-        type: string
-        default: deploy
+      build:
+        description: Build and push the image before running the command
+        type: boolean
+        default: true
       ref:
         description: Git ref to check out for the build and the kamal command
         required: true
         type: string
       command:
-        description: The kamal command to run on the host (deploy or destroy)
+        description: The kamal command to run on the host
         required: true
         type: string
       image_tag:
@@ -67,10 +67,10 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # Skipped on destroy (nothing to build). A superseded build is wasted work and
-  # safe to cancel — the kamal run below is the part that must never be killed.
+  # A superseded build is wasted work and safe to cancel — the kamal run below is
+  # the part that must never be killed.
   build:
-    if: inputs.action == 'deploy'
+    if: inputs.build
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ inputs.concurrency_prefix }}-build
@@ -126,12 +126,12 @@ jobs:
 
   run:
     needs: build
-    # Runs after a successful build on deploy, and on its own for destroy (which
-    # skips build, leaving needs.build.result == 'skipped'). A build cancelled by a
-    # newer push leaves 'cancelled', so the stale deploy is skipped here too.
+    # Runs after a successful build, and on its own when there's nothing to build
+    # (leaving needs.build.result == 'skipped'). A build cancelled by a newer push
+    # leaves 'cancelled', so the stale deploy is skipped here too.
     if: >-
       !cancelled() &&
-      (inputs.action != 'deploy' || needs.build.result == 'success')
+      (!inputs.build || needs.build.result == 'success')
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ inputs.concurrency_prefix }}
@@ -140,8 +140,8 @@ jobs:
       name: ${{ inputs.environment_name }}
       url: ${{ inputs.environment_url }}
     # These feed .kamal/secrets-ci via Dotenv variable substitution when kamal runs.
-    # Destroy needs the same bundle even though it uses little of it — avoids silent
-    # empty-string substitutions causing odd failures.
+    # The non-deploy commands need the same bundle even though they use little of
+    # it — avoids silent empty-string substitutions causing odd failures.
     env:
       IMAGE_TAG: ${{ inputs.image_tag }}
       KAMAL_CONFIG: ${{ inputs.kamal_config }}
