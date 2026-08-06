@@ -1,4 +1,4 @@
-<%= render Register::Page::Component.new do %>
+<%= render Register::Page::Component.new(flush_top: false) do %>
   <%= render Register::Progress::Component.new(step: progress_step, total: progress_total) %>
 
   <%= render Register::AcknowledgmentProgress::Component.new(number: @index + 1, total: acknowledgment_step_count) %>
