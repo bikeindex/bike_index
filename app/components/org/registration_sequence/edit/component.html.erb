@@ -14,18 +14,15 @@
 <%= render UI::Card::Component.new(additional_classes: "tw:mt-8") do %>
   <%= form_with model: @registration_sequence, url: organization_registration_sequence_path(organization_id: @organization.to_param, id: @registration_sequence.id), method: :patch do |f| %>
     <div class="tw:flex tw:flex-col tw:gap-4">
-      <%# FAQ link — temporarily hidden, re-add later %>
-      <% if false %>
-        <div>
-          <%= f.label :faq_url, "FAQ link", class: "twlabel" %>
-          <%= f.url_field :faq_url, class: "twinput tw:w-full", placeholder: "https://" %>
+      <div>
+        <%= f.label :faq_url, "FAQ link", class: "twlabel" %>
+        <%= f.url_field :faq_url, class: "twinput tw:w-full", placeholder: "https://" %>
 
-          <p class="tw:mt-1 tw:mb-0 tw:text-sm tw:text-gray-500">
-            Linked from every page, for registrants with questions about these
-            policies.
-          </p>
-        </div>
-      <% end %>
+        <p class="tw:mt-1 tw:mb-0 tw:text-sm tw:text-gray-500">
+          Linked from every page, for registrants with questions about these
+          policies.
+        </p>
+      </div>
 
       <div>
         <%= f.label :acknowledgment_text, "Final acknowledgment", class: "twlabel" %>

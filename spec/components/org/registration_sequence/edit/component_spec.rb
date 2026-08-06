@@ -27,8 +27,10 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
   end
 
   it "renders the settings shared by every page" do
+    registration_sequence.update!(faq_url: "https://example.com/faq")
     render_inline(described_class.new(registration_sequence:))
 
+    expect(page).to have_field("registration_sequence[faq_url]", with: "https://example.com/faq")
     # A blank acknowledgment falls back to the default, which the placeholder shows
     expect(page).to have_field("registration_sequence[acknowledgment_text]", with: "",
       placeholder: RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT)
