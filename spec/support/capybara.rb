@@ -18,16 +18,16 @@ Capybara.configure do |config|
   config.javascript_driver = :playwright
 end
 
-# Pin Capybara's app server to a predictable host:port. Defaults to
-# DEV_PORT + 2000 so it doesn't collide with a developer's running
-# `bin/dev` (which binds DEV_PORT itself); override with CAPYBARA_PORT
-# when the test infrastructure needs to know the port up front (e.g. CI's
-# `assets:precompile` step needs a matching BASE_URL so any ERB-baked
-# asset URL resolves to the same host the browser will hit).
-CAPYBARA_PORT = (ENV["CAPYBARA_PORT"] || ENV.fetch("DEV_PORT", "3042").to_i + 2000).to_i
+# Pin the app server's port only when something needs to know it up front, via
+# CAPYBARA_PORT - CI's `assets:precompile` step bakes a matching BASE_URL into
+# ERB-templated assets so any asset URL resolves to the host the browser will
+# hit. Otherwise let Capybara pick a free port: bin/turbo_tests runs one process
+# per CPU, and a fixed port leaves every process but the first with EADDRINUSE.
 Capybara.server_host = "localhost"
-Capybara.server_port = CAPYBARA_PORT
-Capybara.app_host = "http://#{Capybara.server_host}:#{CAPYBARA_PORT}"
+if ENV["CAPYBARA_PORT"]
+  Capybara.server_port = ENV["CAPYBARA_PORT"].to_i
+  Capybara.app_host = "http://#{Capybara.server_host}:#{Capybara.server_port}"
+end
 Capybara.always_include_port = true
 
 # The application layout pulls Google Fonts and analytics from external hosts

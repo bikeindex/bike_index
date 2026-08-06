@@ -19,7 +19,6 @@ ENV["BASE_URL"] = "http://test.host"
 # Set before config/boot so bin/env picks the test Redis database
 ENV["RAILS_ENV"] ||= "test"
 ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"] = "true"
-ENV["PARALLEL_TEST_FIRST_IS_1"] = "true" # number parallel databases correctly
 ENV["RACK_ATTACK_MAX_LIMIT"] ||= "12"
 ENV["RACK_ATTACK_API_MAX_LIMIT"] ||= "15"
 require "spec_helper"
@@ -31,9 +30,8 @@ require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
 require "paper_trail/frameworks/rspec"
 
-# Capybara setup (driver registration, server host/port, :js BASE_URL hook)
-# lives in spec/support/capybara.rb so it can pin Capybara's port to DEV_PORT
-# before any system spec boots the server.
+# Capybara setup (driver registration, server host, :js BASE_URL hook) lives in
+# spec/support/capybara.rb.
 require "view_component/test_helpers"
 require "view_component/system_test_helpers"
 
