@@ -26,7 +26,6 @@ When something fails outside the files you changed, re-run that spec file on its
 - Avoid testing private methods.
 - Avoid mocking objects.
   - If making external requests, use VCR. Don't manually write VCR cassettes — record them by running the tests.
-  - Cassettes that get modified when you run specs locally are re-recordings, not unrelated churn — they're supposed to update regularly. Commit them with your branch; don't revert them to "keep the PR focused".
 - Don't use `tap` to bundle factory creation with follow-up setup. Create the record in `let`/`let!`, then do the follow-up work on its own line (a separate statement, or a `before` block). One thing per line reads better and keeps the factory call clean.
 
 ### Good
@@ -45,6 +44,12 @@ let!(:bike_transferred) do
   end
 end
 ```
+
+## Commit re-recorded VCR cassettes
+
+A cassette modified by running specs was re-recorded from the real service — cassettes carry a `re_record_interval` and are meant to update. Commit it on the branch you're on, whatever the branch is about. Never `git checkout` it away to keep a diff focused, and never hand-edit one.
+
+`git status` after a spec run is the only signal; a run that re-records prints nothing.
 
 ## Stubbing ENV
 
