@@ -12,7 +12,8 @@ module Organized
     # (Pagy); the index is 0-based, and one past the last page is the review.
     def show
       @registration_sequence = current_organization.registration_sequences.find(params[:id])
-      page_count = @registration_sequence.registration_sequence_pages.count + 1
+      # to_a (not count) so the preview component reuses the loaded association
+      page_count = @registration_sequence.registration_sequence_pages.to_a.size + 1
       @preview_index = (params[:page].to_i - 1).clamp(0, page_count - 1)
       @preview_pagy = Pagy::Offset.new(count: page_count, limit: 1, page: @preview_index + 1)
     end

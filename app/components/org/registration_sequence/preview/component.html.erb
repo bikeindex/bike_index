@@ -54,8 +54,7 @@
   <% else %>
     <%# Continue is gated on checking every rule, the same as the real flow %>
     <%= form_with url: sequence_path, method: :get, data: {controller: "register--acknowledgment"} do %>
-      <%# page is 1-indexed, so the next screen (index @index + 1) is param @index + 2 %>
-      <%= hidden_field_tag :page, @index + 2 %>
+      <%= hidden_field_tag :page, page_param(@index + 1) %>
 
       <%= render Org::RegistrationSequence::PagePreview::Component.new(page: current_page, first: @index.zero?) %>
 

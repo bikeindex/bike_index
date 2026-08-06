@@ -49,10 +49,14 @@ module Org
           @index.zero? ? exit_path : preview_path(@index - 1)
         end
 
-        # index is 0-based; the page param is 1-indexed
         def preview_path(index)
           organization_registration_sequence_path(organization_id: organization.to_param,
-            id: @registration_sequence.id, page: index + 1)
+            id: @registration_sequence.id, page: page_param(index))
+        end
+
+        # The URL page param is 1-indexed; @index is 0-based
+        def page_param(index)
+          index + 1
         end
 
         # The show path itself - a GET form appends ?page= from a hidden field, since a
