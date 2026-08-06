@@ -23,10 +23,11 @@ LINT_AND_SCAN = {
 }.freeze
 
 # parallel:prepare stands in for CI's db:create/db:schema:load - parallel test
-# databases aren't migrated automatically (see README).
+# databases aren't migrated automatically (see README). RETRY_FLAKY is set the
+# way ci.yml sets it, so a `:flaky`-tagged example gets the same two retries here.
 TESTS = {
   "db prepare" => "bin/rake parallel:prepare",
-  "rspec" => "bin/turbo_tests"
+  "rspec" => "RETRY_FLAKY=true bin/turbo_tests"
 }.freeze
 
 def run(name, command)
