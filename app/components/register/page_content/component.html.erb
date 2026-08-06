@@ -32,7 +32,7 @@
         tw:py-3.5 tw:text-sm tw:font-normal
       "
     >
-      <%= @control.call(index) %>
+      <%= render Register::RuleCheckbox::Component.new(name: checkbox_name(index), checked: @checked) %>
 
       <span><%= sanitize bullet %></span>
     </label>

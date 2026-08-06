@@ -13,7 +13,7 @@
     organization_registration_sequence_page_path(organization_id: current_organization.to_param, id: @page.id) :
     organization_registration_sequence_pages_path(organization_id: current_organization.to_param, registration_sequence_id: @draft.id) %>
 
-  <%= form_with model: @page, url: form_url, method: editing ? :patch : :post, html: {multipart: true} do |f| %>
+  <%= form_with model: @page, url: form_url, html: {multipart: true} do |f| %>
     <%= render Org::RegistrationSequence::PageEdit::Component.new(form_builder: f) %>
 
     <div
@@ -28,23 +28,20 @@
         <%= render UI::ButtonLink::Component.new(text: "Delete page", href: organization_registration_sequence_page_path(organization_id: current_organization.to_param, id: @page.id), color: :error, size: :sm, data: {turbo: true, turbo_method: :delete, turbo_confirm: "This action can't be undone, you'll have to re-create the page"}) %>
       <% end %>
     </div>
-
-    <% if editing %>
-      <p
-        data-page-preview-target="hint"
-        hidden
-        class="tw:mt-2 tw:mb-0 tw:text-sm tw:text-gray-500"
-      >
-        Save the page to see the updated preview.
-      </p>
-    <% end %>
   <% end %>
 
   <% if editing %>
+    <p
+      data-page-preview-target="hint"
+      hidden
+      class="tw:mt-2 tw:mb-0 tw:text-sm tw:text-gray-500"
+    >
+      Save the page to see the updated preview.
+    </p>
     <div data-page-preview-target="preview" class="tw:mt-8">
       <h2 class="uncap tw:mb-3 tw:text-xl">Preview</h2>
 
-      <%= render Org::RegistrationSequence::PagePreview::Component.new(page: @page, first: @page.listing_order.to_i.zero?) %>
+      <%= render Register::PageContent::Component.new(page: @page, first: @page.listing_order.to_i.zero?) %>
     </div>
   <% end %>
 </div>

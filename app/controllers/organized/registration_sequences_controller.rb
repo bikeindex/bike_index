@@ -8,14 +8,12 @@ module Organized
       @previous = current_organization.registration_sequences.archived.order(end_at: :desc).to_a
     end
 
-    # The faked registrant walk-through, one page (?page=) per screen. page is 1-indexed
-    # (Pagy); the index is 0-based, and one past the last page is the review.
+    # The faked registrant walk-through, one screen (?page=) per rule page plus the review
+    # they end on. page is 1-indexed (Pagy); the preview component's index is 0-based.
     def show
       @registration_sequence = current_organization.registration_sequences.find(params[:id])
-      # to_a (not count) so the preview component reuses the loaded association
-      page_count = @registration_sequence.registration_sequence_pages.to_a.size + 1
-      @preview_index = (params[:page].to_i - 1).clamp(0, page_count - 1)
-      @preview_pagy = Pagy::Offset.new(count: page_count, limit: 1, page: @preview_index + 1)
+      screen_count = BikeServices::Register.acknowledgment_step_count(@registration_sequence)
+      @preview_pagy = Pagy::Offset.new(count: screen_count, limit: 1, page: permitted_page(max: screen_count))
     end
 
     # Manage the draft's pages (add / reorder / edit) and its sequence-wide settings

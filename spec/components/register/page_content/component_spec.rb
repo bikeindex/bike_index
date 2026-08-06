@@ -10,23 +10,27 @@ RSpec.describe Register::PageContent::Component, type: :component do
       heading: "Charge safely", subtitle: "A few rules",
       body: "<ul><li>Use the right charger</li><li>Store it cool</li></ul>")
   end
-  # In real use the control lambda is defined in a template, where view helpers exist;
-  # here a plain string stands in for whatever checkbox the caller renders.
-  let(:control) { ->(index) { %(<input type="checkbox" data-index="#{index}">).html_safe } }
 
-  it "renders the heading, the title as a section label, and a control per bullet" do
-    render_inline(described_class.new(page: page_record, control:))
+  it "renders the heading, the title as a section label, and a decorative checkbox per rule" do
+    render_inline(described_class.new(page: page_record))
 
     expect(page).to have_css("h1", text: "Charge safely") # heading_text, big like the flow
     expect(page).to have_content("Battery safety") # the title labels the rules
-    expect(page).to have_css("input[type=checkbox][data-index='0']")
-    expect(page).to have_css("input[type=checkbox][data-index='1']")
     expect(page).to have_content("Use the right charger")
     expect(page).to have_link("E-Vehicle Acknowledgment FAQ", href: "https://example.com/faq")
+    # Nameless, so the preview's GET form doesn't serialize them
+    expect(page).to have_css("input[type=checkbox]:not([name])", count: 2)
+  end
+
+  it "names the checkboxes for the flow to submit" do
+    render_inline(described_class.new(page: page_record, checkbox_name: :acknowledged, checked: true))
+
+    expect(page).to have_css("input[type=checkbox][name='acknowledged[0]'][checked]")
+    expect(page).to have_css("input[type=checkbox][name='acknowledged[1]'][checked]")
   end
 
   it "badges the opening page as the electric detection" do
-    render_inline(described_class.new(page: page_record, control:, first: true))
+    render_inline(described_class.new(page: page_record, first: true))
 
     expect(page).to have_content("Electric (motorized) detected")
     expect(page).to have_no_content("Brakebills")
@@ -35,7 +39,7 @@ RSpec.describe Register::PageContent::Component, type: :component do
   context "organization_specific page" do
     it "badges with the organization's name" do
       page_record.organization_specific = true
-      render_inline(described_class.new(page: page_record, control:))
+      render_inline(described_class.new(page: page_record))
 
       expect(page).to have_content("Brakebills")
       expect(page).to have_no_content("Electric (motorized) detected")
@@ -46,7 +50,7 @@ RSpec.describe Register::PageContent::Component, type: :component do
     let(:registration_sequence) { FactoryBot.create(:registration_sequence, organization:) }
 
     it "leaves out the FAQ affordance" do
-      render_inline(described_class.new(page: page_record, control:))
+      render_inline(described_class.new(page: page_record))
 
       expect(page).to have_no_link("E-Vehicle Acknowledgment FAQ")
     end

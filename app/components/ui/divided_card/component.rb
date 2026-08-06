@@ -2,9 +2,7 @@
 
 module UI
   module DividedCard
-    # A bordered, rounded card whose direct children are separated by row dividers.
-    # The shell for the registration flow's rule checklists, its review list, and the
-    # org preview of them - so they stay visually identical.
+    # A bordered, rounded card whose direct children are separated by row dividers
     class Component < ApplicationComponent
       def call
         content_tag(:div, content, class: "tw:divide-y tw:divide-gray-200 tw:rounded-xl " \
