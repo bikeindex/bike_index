@@ -117,6 +117,14 @@ module BikeServices
       b_param.save
     end
 
+    # What a step's submission agrees to: an acknowledgment page's own boxes, or the
+    # single agreement the review ends with
+    def acknowledge_step(b_param, step, sequence:, user:, acknowledged_all:, checked:)
+      return save_acknowledgment(b_param, sequence, acknowledged_all:, user:) if step == "review"
+
+      acknowledge_page(b_param, page_for_step(step, sequence:), checked:)
+    end
+
     # The moment the pages become an agreement - promoted off the b_param onto a
     # record of its own, which outlives the registration
     def save_acknowledgment(b_param, sequence, acknowledged_all:, user: nil)
@@ -152,11 +160,42 @@ module BikeServices
       true
     end
 
+    # Time limited, so an old link proves nothing - the address gets a fresh one
+    def confirmation_token_valid?(b_param, token)
+      return false if b_param.email_confirmation_token_expired?
+
+      Binxtils::Secure.compare?(token, b_param.email_confirmation_token)
+    end
+
     # Whether a bike can be created now - Ownership requires a creator, so
     # anonymous registrations wait for the confirmation email to prove one
     def creator_available?(b_param)
       b_param.creator_id.present? || b_param.creation_organization&.auto_user_id.present? ||
         confirmed_email_creator_id(b_param).present?
+    end
+
+    def permitted_step_1_params = %i[manufacturer_id cycle_type owner_email]
+
+    def permitted_step_2_params
+      [:primary_frame_color_id, :secondary_frame_color_id, :tertiary_frame_color_id,
+        :serial_number, :frame_size, :frame_size_number, :frame_size_unit, :bike_sticker,
+        :phone, :status, :frame_model, :year, :user_name, :extra_registration_number,
+        :organization_affiliation, :student_id,
+        {address_record_attributes: AddressRecord.permitted_params}]
+    end
+
+    # Step 1 is the least a registration can be: who owns it and what it is. The params are
+    # merged in whether or not it passes, so a re-render still shows everything they entered
+    def save_step_1(b_param, bike_params:, propulsion_type_motorized:)
+      b_param.clean_params({bike: bike_params, propulsion_type_motorized:}.as_json)
+      # Before save, which clears the errors it's about to re-run validations for
+      b_param.errors.add(:base, translation(:email_required)) if b_param.owner_email.blank?
+      b_param.errors.add(:base, translation(:manufacturer_required)) if b_param.manufacturer_id.blank?
+      return false if b_param.errors.any?
+      return true if b_param.save
+
+      b_param.errors.add(:base, translation(:unable_to_save))
+      false
     end
 
     # Step 2 merges over step 1 - creator claimed for signed-in users, the photo and the
@@ -171,8 +210,20 @@ module BikeServices
       completed = b_param.self_made?(user) || bike_params["user_name"].present?
       b_param.clean_params(step_2_params(bike_params, image_signed_id:, completed:).as_json)
       b_param.save
+      b_param.errors.add(:base, translation(:name_required)) unless completed
       completed
     end
+
+    # Everything a submission does once its step is saved. Returns the bike, or nil while
+    # the registration is still short of one - more to enter, or the email unconfirmed
+    def complete(b_param, user:, sequence:, ip_address:)
+      claim_creator(b_param, user)
+      create_bike_if_ready(b_param, sequence:, ip_address:)
+    end
+
+    #
+    # private below here
+    #
 
     # Ownership requires a creator, and signing in can happen anywhere in the flow -
     # e.g. partway through the acknowledgment pages
@@ -196,10 +247,6 @@ module BikeServices
       acknowledgment(b_param)&.update(bike_id: bike.id, user_id: b_param.creator_id) if bike.id.present?
       bike
     end
-
-    #
-    # private below here
-    #
 
     def ready_for_bike?(b_param, sequence:)
       details_completed?(b_param) && acknowledged?(b_param, sequence:)
@@ -273,8 +320,11 @@ module BikeServices
       {details_completed: completed, bike: bike_params, image_signed_id: image_signed_id.presence}.compact
     end
 
-    conceal :ready_for_bike?, :reusable?, :all_steps, :permitted_steps,
-      :confirmed_email_creator_id, :owner_email_for, :assign_owner_email,
-      :details_completed?, :step_2_params
+    def translation(key) = I18n.t(key, scope: "shared.register_flow")
+
+    conceal :claim_creator, :create_bike_if_ready, :create_bike, :ready_for_bike?,
+      :reusable?, :all_steps, :permitted_steps, :confirmed_email_creator_id,
+      :owner_email_for, :assign_owner_email, :details_completed?, :step_2_params,
+      :translation
   end
 end

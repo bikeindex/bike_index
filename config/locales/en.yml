@@ -1926,18 +1926,12 @@ en:
         signed_in_as_other: >-
           You're signed in as %{email}, so we kept you in that account. The registration
           is still saved to the address we emailed.
-      create:
-        email_required: Email is required to register
-        manufacturer_required: Manufacturer is required to register
-        unable_to_save: We're unable to save that registration, please try again
       find_b_param:
         registration_not_found: We couldn't find that registration — start a new one
           below
       sign_in_confirmed_user:
         unable_to_sign_in: We confirmed your email, but couldn't sign you in to that
           account
-      update:
-        name_required: Owner name is required to register
     search:
       marketplace:
         set_interpreted_params:
@@ -5071,6 +5065,11 @@ en:
       bike: Bike
       recovered_date: recovered %{date}
       translated_from_english: translated from English
+    register_flow:
+      email_required: Email is required to register
+      manufacturer_required: Manufacturer is required to register
+      name_required: Owner name is required to register
+      unable_to_save: We're unable to save that registration, please try again
     shops_map:
       map_of_partner_locations: Map of partner locations
     user_general_alert:
