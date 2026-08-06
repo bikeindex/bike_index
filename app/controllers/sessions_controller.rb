@@ -62,7 +62,7 @@ class SessionsController < ApplicationController
     # A role only follows if the org also has user_role_for_user_email_domain, which
     # CallbackJobs::AfterUserCreateJob grants once the new user is confirmed.
     if user.blank? && Organization.passwordless_email_matching(params[:email]).present?
-      user, _created = UserServices::PasswordlessCreator.find_or_create(params[:email])
+      user = UserServices::PasswordlessCreator.find_or_create(params[:email]).first
     end
     if user.present?
       send_magic_link_and_redirect(user)

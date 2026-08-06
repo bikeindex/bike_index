@@ -250,20 +250,14 @@ class Organization < ApplicationRecord
     end
 
     def passwordless_email_matching(str)
-      domain = email_domain(str)
-      return nil if domain.blank?
-
-      permitted_domain_orgs("passwordless_users").find_by(user_email_domain: domain)
+      feature_email_matching("passwordless_users", str)
     end
 
     # The org that grants a role to anyone signing up on its domain, however they authenticate.
     # Separate from the sign-in features on purpose: claiming a domain for login says nothing
     # about whether those accounts should also become members.
     def user_role_email_matching(str)
-      domain = email_domain(str)
-      return nil if domain.blank?
-
-      permitted_domain_orgs("user_role_for_user_email_domain").find_by(user_email_domain: domain)
+      feature_email_matching("user_role_for_user_email_domain", str)
     end
 
     # The org that forces SSO for an email's domain: feature enabled + a live IdP config.
@@ -285,6 +279,13 @@ class Organization < ApplicationRecord
     end
 
     private
+
+    def feature_email_matching(feature_slug, str)
+      domain = email_domain(str)
+      return nil if domain.blank?
+
+      permitted_domain_orgs(feature_slug).find_by(user_email_domain: domain)
+    end
 
     def permitted_domain_orgs(feature_slug)
       where.not(user_email_domain: nil).with_enabled_feature_slugs(feature_slug)

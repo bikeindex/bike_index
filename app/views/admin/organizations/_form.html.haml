@@ -180,7 +180,7 @@
                   will search within this radius for other organizations in the same area
 
           - domain_features = {"passwordless_users" => "passwordless sign in", "saml_sso" => "SAML SSO", "user_role_for_user_email_domain" => "automatic user role"}
-          - domain_uses = domain_features.select { |slug, _name| @organization.enabled?(slug) }.values
+          - domain_uses = domain_features.filter_map { |slug, name| name if @organization.enabled?(slug) }
           - if domain_uses.any?
             .form-group
               = f.label :user_email_domain do
