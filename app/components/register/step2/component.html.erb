@@ -1,15 +1,15 @@
 <%= render Register::Page::Component.new do %>
-  <%= render Register::Progress::Component.new(step: 2, total: 2) %>
+  <%= render Register::Progress::Component.new(step: 2, total: BikeServices::Register.total_steps(@sequence)) %>
 
-  <% if awaiting_confirmation? %>
-    <%= render UI::Alert::Component.new(kind: :purple, text: translation(".confirmation_link_sent"),
+  <% if BikeServices::Register.confirmation_email_pending?(@b_param, user: @current_user) %>
+    <%= render UI::Alerts::Base::Component.new(kind: :purple, text: translation(".confirmation_link_sent"),
         icon: helpers.inline_svg_tag("icons/envelope.svg", class: "tw:-mb-0.5 tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true)) %>
   <% end %>
 
   <%= render UI::Header::Component.new(text: translation(".add_your_bikes_details", cycle_type:), subtitle: translation(".more_useful_registration")) %>
 
   <% if @b_param.errors.any? %>
-    <%= render UI::Alert::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
+    <%= render UI::Alerts::Base::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
   <% end %>
 
   <%= form_with(url: register_path, method: :patch, scope: :bike,
@@ -383,12 +383,9 @@
       </div>
     <% end %>
 
-    <%= render UI::Button::Component.new(text: translation(".complete_registration", cycle_type: @b_param.type_titleize),
+    <%= render UI::Button::Component.new(text: submit_text,
         color: :primary, size: :lg, kind: :submit, spinner: true, html_class: "tw:w-full") %>
 
-    <p class="tw:mt-3 tw:mb-0 tw:text-center">
-      <%= link_to "← #{translation(".back")}", register_path(b_param_token: @b_param.id_token, step: 1),
-          class: "tw:text-sm tw:font-medium tw:text-gray-500 tw:no-underline tw:hover:text-gray-700 tw:dark:text-gray-400" %>
-    </p>
+    <%= render Register::BackLink::Component.new(href: register_path(b_param_token: @b_param.id_token, step: 1)) %>
   <% end %>
 <% end %>

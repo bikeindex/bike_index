@@ -59,11 +59,7 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     click_button "Continue"
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
-    find(".alert-success .close").click
-    # Wait for the dismissed flash to finish fading out — otherwise the
-    # fixed-position alert can intercept the org submenu/nav clicks below.
-    # The Bootstrap fade-out can exceed Capybara's default 2s wait on slow CI.
-    expect(page).to have_no_css(".alert-success", wait: 10)
+    dismiss_flash_messages
     find("#passive_organization_submenu").click
     within(".current-organization-submenu") { click_link "Impounded Bikes" }
     expect(page).to have_current_path(/\A#{Regexp.escape(base_url)}(\?|\z)/, wait: 10)
@@ -167,7 +163,8 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     expect(page).to have_no_css("[role=alert]", text: /select at least one record/i)
     within("#impoundRecordUpdateForm") { find("button[type=submit]").click }
 
-    expect(page).to have_content("Updated 1 impound record", wait: 10)
+    # The turbo_stream response replaces the layout's flash region alongside the frame
+    expect(page).to have_css("#flash-messages", text: "Updated 1 impound record", wait: 10)
     expect(registered.impound_record_updates.pluck(:kind)).to eq ["retrieved_by_owner"]
     expect(unregistered.impound_record_updates).to be_empty
 

@@ -4,8 +4,9 @@ module Register
   module Step2
     # Step 2 of the registration flow: the bike details form
     class Component < ApplicationComponent
-      def initialize(b_param:, current_user: nil)
+      def initialize(b_param:, sequence: nil, current_user: nil)
         @b_param = b_param
+        @sequence = sequence
         @current_user = current_user
       end
 
@@ -15,10 +16,11 @@ module Register
         @b_param.type
       end
 
-      # Registering to the signed-in account's own address proves it, so only an
-      # address belonging to someone else is ever waiting on being confirmed
-      def awaiting_confirmation?
-        !@b_param.self_made?(@current_user) && @b_param.email_unconfirmed?
+      # An e-vehicle's safety pages come next, so this form doesn't finish the registration
+      def submit_text
+        return translation(".next") if @sequence&.registration_sequence_pages&.any?
+
+        translation(".complete_registration", cycle_type: @b_param.type_titleize)
       end
 
       def organization

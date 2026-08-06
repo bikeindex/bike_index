@@ -45,6 +45,19 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
+  context "with name and value" do
+    let(:options) { {text:, kind: :submit, name: "impound_claim[status]", value: "submitting"} }
+
+    it "submits the value, so a second submit button can say which was pressed" do
+      expect(component).to have_css("button[type='submit'][name='impound_claim[status]'][value='submitting']")
+    end
+  end
+
+  it "leaves name and value off by default" do
+    expect(component).to have_no_css("button[name]")
+    expect(component).to have_no_css("button[value]")
+  end
+
   context "with link color" do
     let(:color) { :link }
 

@@ -64,7 +64,7 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:registration_sequence_page).permit(:title, :subtitle, :image, :body)
+      params.require(:registration_sequence_page).permit(:title, :heading, :subtitle, :image, :body, :organization_specific)
     end
   end
 end

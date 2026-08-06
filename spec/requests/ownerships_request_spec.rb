@@ -42,6 +42,20 @@ RSpec.describe OwnershipsController, type: :request do
         end
       end
 
+      context "owner_email matches" do
+        before { ownership.update(owner_email: current_user.email) }
+
+        # Claiming writes the ownership rather than the bike, so without the touch nothing
+        # keyed on the bike's cache version notices that the registration is now claimed
+        it "claims it and touches the bike" do
+          expect { get "#{base_url}/#{ownership.id}" }
+            .to change { ownership.bike.reload.updated_at }
+
+          expect(response).to redirect_to edit_bike_url(ownership.bike)
+          expect(ownership.reload.claimed).to be_truthy
+        end
+      end
+
       context "owner_email upcase" do
         before { ownership.update(owner_email: current_user.email.upcase) }
 

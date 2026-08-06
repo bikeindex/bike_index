@@ -52,7 +52,7 @@ RSpec.describe OrganizedHelper, type: :helper do
       end
     end
     context "removed_from_bike_index, trashed or Removed from Bike Index" do
-      let(:error_class) { UI::Alert::Component::TEXT_CLASSES[:error] }
+      let(:error_class) { UI::Alerts::Base::Component::TEXT_CLASSES[:error] }
       it "is red" do
         expect(status_display("removed_from_bike_index")).to eq "<span class=\"#{error_class}\">removed from bike index</span>"
         expect(status_display("Removed from Bike Index")).to eq "<span class=\"#{error_class}\">Removed from Bike Index</span>"
@@ -60,13 +60,13 @@ RSpec.describe OrganizedHelper, type: :helper do
       end
     end
     context "impounded" do
-      let(:error_class) { UI::Alert::Component::TEXT_CLASSES[:error] }
+      let(:error_class) { UI::Alerts::Base::Component::TEXT_CLASSES[:error] }
       it "is orange" do
         expect(status_display("impounded")).to eq "<span class=\"#{error_class}\">impounded</span>"
       end
     end
     context "impound_claim" do
-      let(:error_class) { UI::Alert::Component::TEXT_CLASSES[:error] }
+      let(:error_class) { UI::Alerts::Base::Component::TEXT_CLASSES[:error] }
       it "info for approved, red for denied" do
         expect(status_display("approved")).to eq "<span class=\"text-info\">approved</span>"
         expect(status_display("claim_approved")).to eq "<span class=\"text-info\">claim approved</span>"

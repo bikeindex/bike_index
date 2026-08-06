@@ -1,0 +1,5 @@
+<%= render(UI::Alerts::Base::Component.new(kind: :notice, margin_classes: "")) do %>
+  <p>
+    <%= translation(".you_sent_this_bike_html", bike_type: @bike.type, owner_email: tag.em(@bike.owner_email)) %>
+  </p>
+<% end %>

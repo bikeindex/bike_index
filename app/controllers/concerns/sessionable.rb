@@ -1,6 +1,8 @@
 module Sessionable
   extend ActiveSupport::Concern
 
+  SIGN_IN_SCOPE = [:controllers, :concerns, :sessionable, :sign_in_and_redirect].freeze
+
   def skip_if_signed_in
     store_return_to
     # Make absolutely sure we don't have an unconfirmed user
@@ -16,11 +18,28 @@ module Sessionable
     end
   end
 
-  def sign_in_and_redirect(user)
+  def sign_in_and_redirect(user, signed_up: false)
     if user.banned? # If user is banned, tell them about it.
-      flash.now[:error] = translation(:user_is_banned, scope: [:controllers, :concerns, :sessionable, __method__])
+      flash.now[:error] = translation(:user_is_banned, scope: SIGN_IN_SCOPE)
       redirect_back(fallback_location: new_session_url) && return
     end
+    sign_in_user(user)
+
+    if sign_in_partner.present?
+      session.delete(:partner) # Only removing once signed in, PR#1435
+      session.delete(:company)
+      redirect_to(bikehub_url("account?reauthenticate_bike_index=true"), allow_other_host: true) && return # Only partner rn is bikehub, hardcode it
+    elsif user.unconfirmed?
+      render_partner_or_default_signin_layout(redirect_path: please_confirm_email_users_path) && return
+    elsif !return_to_if_present
+      set_sign_in_flash(user, signed_up)
+      redirect_to(user_root_url) && return
+    end
+  end
+
+  # Everything signing in does apart from deciding where to go next, for flows with
+  # a destination of their own
+  def sign_in_user(user)
     confirm_user_from_claim_token(user)
     session[:last_seen] = Time.current
     session[:render_donation_request] = user.render_donation_request if user&.render_donation_request
@@ -31,17 +50,6 @@ module Sessionable
     else
       default_session_set(user)
     end
-
-    if sign_in_partner.present?
-      session.delete(:partner) # Only removing once signed in, PR#1435
-      session.delete(:company)
-      redirect_to(bikehub_url("account?reauthenticate_bike_index=true"), allow_other_host: true) && return # Only partner rn is bikehub, hardcode it
-    elsif user.unconfirmed?
-      render_partner_or_default_signin_layout(redirect_path: please_confirm_email_users_path) && return
-    elsif !return_to_if_present
-      flash[:success] = translation(:logged_in, scope: [:controllers, :concerns, :sessionable, __method__])
-      redirect_to(user_root_url) && return
-    end
   end
 
   def default_session_set(user)
@@ -49,10 +57,23 @@ module Sessionable
   end
 
   def authenticate_user_for_my_accounts_controller
-    store_return_and_authenticate_user(translation_key: :create_account, flash_type: :info)
+    store_return_and_authenticate_user(translation_key: :create_account, flash_type: :notice)
   end
 
   private
+
+  # Passwordless users are nudged to set a password, unless their organization is what signs them in.
+  # UI::Alerts::FlashMessage renders the hash - it owns the copy and builds the link
+  def set_sign_in_flash(user, signed_up)
+    if user.organization_passwordless_user?
+      flash[:success] = translation(:organization_signed_in, scope: SIGN_IN_SCOPE)
+    elsif user.passwordless_user?
+      flash[:notice] = {translation_key: signed_up ? :signed_up : :signed_in,
+                        url: update_password_form_with_reset_token_users_path}
+    else
+      flash[:success] = translation(:logged_in, scope: SIGN_IN_SCOPE)
+    end
+  end
 
   def cookie_options(user)
     c = {

@@ -40,7 +40,15 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_content("Add your bike")
   end
 
+  # The emailed link, minus the mailer's host - the app under test is on Capybara's
+  def confirmation_link
+    Email::PartialRegistrationJob.drain
+    url = ActionMailer::Base.deliveries.last.html_part.decoded[%r{https?://[^"]*/register/confirm[^"]*}]
+    URI.parse(CGI.unescapeHTML(url)).request_uri
+  end
+
   it "starts a registration, keeps a full details draft across a reload, and completes" do
+    ActionMailer::Base.deliveries = []
     visit "/register/new"
 
     # new creates the registration and lands on its tokenized step 1
@@ -155,8 +163,10 @@ RSpec.describe "Register flow", :js, type: :system do
 
     click_button "Complete Bike Registration"
 
+    # Anonymous, so there's nobody to own a bike yet - it's held for the emailed link
     expect(page).to have_content("Registration saved")
     expect(page).to have_content("verify your email")
+    expect(Bike.count).to eq 0
     b_param = BParam.last
     expect(b_param.bike).to include("user_name" => user_name, "frame_model" => "Marlin 7", "year" => "2023",
       "primary_frame_color_id" => red.id.to_s, "secondary_frame_color_id" => blue.id.to_s,
@@ -166,6 +176,26 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(BikeServices::Register.send(:details_completed?, b_param)).to be_truthy
     expect(ActiveStorage::Blob.find_signed!(b_param.image_signed_id).filename.to_s)
       .to eq "bike_photo-landscape.jpeg"
+
+    # Following the link makes the bike the registration was holding
+    visit confirmation_link
+
+    expect(page).to have_content("Registration complete", wait: 10)
+    bike = Bike.last
+    expect(bike).to have_attributes(owner_email:, serial_number: "made_without_serial",
+      status: "status_stolen", frame_model: "Marlin 7")
+    # Signed in as the account the link made - to anyone else it reads as unclaimed
+    expect(page).to have_content("keep watch")
+
+    # An account nobody signed up for, so the terms are the first thing it's asked
+    visit "/my_account"
+    check "user_terms_of_service"
+    click_button "Submit"
+
+    expect(page).to have_current_path("/my_account", wait: 5)
+    user = User.last
+    expect(user).to have_attributes(email: owner_email, confirmed: true, terms_of_service: true)
+    expect(bike.creator_id).to eq user.id
   end
 
   describe "signed in" do
@@ -309,6 +339,87 @@ RSpec.describe "Register flow", :js, type: :system do
       response = Faraday.get(public_image.image_url)
       expect(response.status).to eq 200
       expect(response.body.bytesize).to eq File.size(image_path)
+    end
+  end
+
+  context "e-vehicle with an organization's safety rules" do
+    let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+    # Built as a draft and activated below, since activation freezes the pages
+    let(:sequence) do
+      FactoryBot.create(:registration_sequence, organization:,
+        acknowledgment_text: "agree to comply with all of the rules above.")
+    end
+    let!(:battery_page) do
+      FactoryBot.create(:registration_sequence_page, registration_sequence: sequence, listing_order: 0,
+        title: "Battery & charging", subtitle: "Unsafe charging is the biggest cause of e-bike fires.",
+        body: "<ul><li>Charge with the manufacturer's charger</li><li>Report a swollen battery</li></ul>")
+    end
+    let!(:campus_page) do
+      FactoryBot.create(:registration_sequence_page, registration_sequence: sequence, listing_order: 1,
+        title: "Campus rules", body: "<ul><li>Dismount in posted zones</li></ul>",
+        organization_specific: true)
+    end
+
+    before { sequence.make_active! }
+
+    it "gates each page of rules, then the acknowledgment, before completing" do
+      visit "/register/new?organization_id=#{organization.slug}"
+
+      type_into("#b_param_manufacturer_id", "Surly")
+      click_combobox_option("Surly")
+      check "Electric (motorized)"
+      fill_in "b_param[owner_email]", with: owner_email
+      click_button "Next"
+
+      fill_in "bike[user_name]", with: user_name
+      type_into("#bike_primary_frame_color_id", "Red")
+      click_combobox_option("Red")
+      fill_in "bike[serial_number]", with: "XYZ 123"
+      # The safety pages come next, so step 2 no longer finishes the registration
+      click_button "Next"
+
+      expect(page).to have_content("Battery & charging")
+      expect(page).to have_content("Electric (motorized) detected")
+      expect(page).to have_content("E-Vehicle Acknowledgment · Step 1 of 3")
+      expect(page).to have_button("Continue", disabled: true)
+
+      check "Charge with the manufacturer's charger"
+      expect(page).to have_button("Continue", disabled: true)
+      check "Report a swollen battery"
+      click_button "Continue"
+
+      expect(page).to have_content("Campus rules")
+      # The organization owns this page's rules, so they carry its name
+      expect(page).to have_content("Brakebills")
+      check "Dismount in posted zones"
+      click_button "Continue"
+
+      expect(page).to have_content("You're almost done")
+      expect(page).to have_content("agree to comply with all of the rules above")
+      expect(page).to have_button("Complete Bike Registration", disabled: true)
+
+      # A page stays revisitable from the review, showing what was agreed to
+      click_link "Review", match: :first
+      expect(page).to have_content("Battery & charging")
+      expect(page).to have_checked_field("Report a swollen battery")
+
+      # Continuing walks forward through the remaining pages rather than jumping
+      # straight back to the review
+      click_button "Continue"
+      expect(page).to have_content("Campus rules")
+      click_button "Continue"
+
+      expect(page).to have_content("You're almost done")
+      # Registered for someone else, so it's their name that agrees
+      check "I, #{user_name}, agree to comply with all of the rules above."
+      click_button "Complete Bike Registration"
+
+      expect(page).to have_content("Registration saved")
+      acknowledgment = RegistrationSequenceAcknowledgment.last
+      expect(acknowledgment).to have_attributes(registration_sequence_id: sequence.id,
+        b_param_id: BParam.last.id, owner_email:,
+        acknowledgment_text: "agree to comply with all of the rules above.")
+      expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
     end
   end
 end

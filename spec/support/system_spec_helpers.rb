@@ -27,6 +27,12 @@ module SystemSpecHelpers
     end
   end
 
+  # Resize for this example only -- the browser context is recreated between
+  # examples, so the configured viewport comes back on its own.
+  def resize_window(width:, height:)
+    page.driver.with_playwright_page { |playwright_page| playwright_page.set_viewport_size(width:, height:) }
+  end
+
   def browser_cookie_value(name)
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.context.cookies.find { |cookie| cookie["name"] == name }&.fetch("value")
@@ -94,6 +100,19 @@ module SystemSpecHelpers
         }, true)
       JS
     end
+  end
+
+  # Flash messages are fixed position, so an undismissed one intercepts clicks on
+  # whatever it overlays. ui--alert wires the close button in `connect` and
+  # application.js lazy loads controllers, so a click landing before that module
+  # arrives is swallowed. Click again, the way a rider whose click did nothing
+  # would, until the alert reports itself gone (the dismiss transition included).
+  def dismiss_flash_messages(wait: 10, attempts: 5)
+    attempts.times do
+      all("#flash-messages [aria-label='Close']", minimum: 1).each { |close| retry_on_detach { close.click } }
+      break if page.has_no_css?("#flash-messages [role='alert']", wait: 1)
+    end
+    expect(page).to have_no_css("#flash-messages [role='alert']", wait:)
   end
 
   private

@@ -2068,6 +2068,7 @@ nl:
       sessionable:
         sign_in_and_redirect:
           logged_in: Ingelogd!
+          organization_signed_in: Je bent ingelogd
           user_is_banned: Het spijt ons, maar het lijkt erop dat uw account is vergrendeld.
             Neem contact met ons op als u niet zeker weet waarom.
         skip_if_signed_in:
@@ -2242,12 +2243,6 @@ nl:
         this_email_is_about: Deze e-mail gaat over de %{bike} geregistreerd op Bike
           Index op %{registration_date}
     confirmation_email:
-      html:
-        click_to_verify_html: Klik op de knop <em>E-mail verifiëren</em> om het aanmelden
-          te voltooien!
-        please_confirm_your_email_address: Bevestig je e-mailadres
-        verify_email: Verifieer Email
-        youre_almost_there: Je bent er bijna!
       subject: Bevestig uw e-mail met Bike Index!
     invoice_email:
       html:
@@ -4199,9 +4194,9 @@ nl:
       sign_in_with_magic_link: Inloggen zonder wachtwoord
       unable_to_auth: Kan dat token niet verifiëren
       your_email_address: Uw e-mailadres
-      if_not_click_button: Zo niet, klik dan op de onderstaande knop
-      sign_in: Log in
-      you_should_be_signed_in_automatically: Je zou automatisch ingelogd moeten zijn.
+    magic_link_sent:
+      follow_the_link_back: Volg de link in de e-mail om in te loggen!
+      we_sent_a_magic_sign_in_link: We hebben je een magische inloglink gestuurd
     new:
       email: E-mail
       forgot_your_password: Wachtwoord vergeten?
@@ -5410,6 +5405,11 @@ nl:
       index:
         loading_results: Resultaten laden...
   components:
+    sessions:
+      sign_in_interstitial:
+        if_not_click_button: Zo niet, klik dan op de onderstaande knop
+        sign_in: Log in
+        you_should_be_signed_in_automatically: Je zou automatisch ingelogd moeten zijn.
     search:
       everything_combobox:
         query_items_description: Zoekbeschrijvingen combobox
@@ -5554,6 +5554,12 @@ nl:
         legal: Juridisch
         social_media: Sociale media
     emails:
+      confirmation_email:
+        click_to_sign_in_html: Klik op de knop <em>Inloggen</em> om het aanmelden te
+          voltooien!
+        follow_this_link_to_sign_in: Volg deze link om in te loggen
+        sign_in: Inloggen
+        youre_almost_there: Je bent er bijna!
       partials:
         bike_box:
           bike_photo: Fietsfoto

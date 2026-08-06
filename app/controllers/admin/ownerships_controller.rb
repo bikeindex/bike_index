@@ -36,7 +36,7 @@ module Admin
         if error_message.present?
           flash[:error] = error_message.join(" ")
         else
-          flash[:info] = "No information updated"
+          flash[:notice] = "No information updated"
         end
         render action: :edit
       end

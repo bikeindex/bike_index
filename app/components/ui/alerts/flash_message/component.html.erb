@@ -1,7 +1,8 @@
 <div
+  id="flash-messages"
   class="
     tw:pointer-events-none tw:fixed tw:right-0 tw:bottom-8 tw:left-0 tw:z-50
-    tw:mx-auto tw:max-w-screen-xl tw:px-4 tw:md:bottom-12
+    tw:mx-auto tw:max-w-screen-xl tw:px-[5px] tw:md:bottom-12 tw:md:px-4
   "
 >
   <div
@@ -11,7 +12,7 @@
     "
   >
     <% messages.each do |msg| %>
-      <%= render UI::Alert::Component.new(text: msg[:text], kind: msg[:kind], dismissable: true, margin_classes: "tw:mb-0") %>
+      <%= render UI::Alerts::Base::Component.new(text: msg[:text], kind: msg[:kind], dismissable: true, margin_classes: "tw:mb-0") %>
     <% end %>
   </div>
 </div>

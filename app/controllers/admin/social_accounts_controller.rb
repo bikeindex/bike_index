@@ -30,7 +30,7 @@ module Admin
 
     def destroy
       if @social_account.present? && @social_account.destroy
-        flash[:info] = "Social account deleted."
+        flash[:notice] = "Social account deleted."
         redirect_to admin_social_accounts_url
       else
         flash[:error] = "Could not delete social account."

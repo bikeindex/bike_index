@@ -18,7 +18,8 @@ HTML
 [
   {title: "Donate to Bike Index", slug: Blog.why_donate_slug, body: why_donate_body,
    secondary_title: "Thank you to everyone who has been part of Bike Index's journey! 10+ years and counting!"},
-  {title: "Bike Index Membership", slug: Blog.membership_slug}
+  {title: "Bike Index Membership", slug: Blog.membership_slug},
+  {title: "E-Vehicle Acknowledgment FAQ", slug: Blog.e_vehicle_acknowledgment_faq}
 ].each do |attrs|
   next if Blog.friendly_find(attrs[:slug]).present?
 

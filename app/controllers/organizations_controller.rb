@@ -15,10 +15,10 @@ class OrganizationsController < ApplicationController
 
     session[:return_to] = lightspeed_interface_path
     if current_user.present?
-      flash[:info] = translation(:must_create_an_organization_first)
+      flash[:notice] = translation(:must_create_an_organization_first)
       redirect_to new_organization_path
     else
-      flash[:info] = translation(:must_create_an_account_first)
+      flash[:notice] = translation(:must_create_an_account_first)
       redirect_to(new_user_path) && return
     end
   end

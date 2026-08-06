@@ -53,8 +53,12 @@ module UI
         [BASE_CLASSES, html_class, *extras, COLORS[color], ACTIVE_COLORS[color]].compact.join(" ")
       end
 
-      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, disabled: false, spinner: false, data: {}, aria: {}, **html_options)
+      # name/value are submitted with the form when this button is the one clicked, which
+      # is how a form with more than one submit says which was pressed
+      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, disabled: false, spinner: false, name: nil, value: nil, data: {}, aria: {}, **html_options)
         @text = text
+        @name = name
+        @value = value
         @color = COLORS.key?(color) ? color : :secondary
         @kind = KINDS.include?(kind&.to_sym) ? kind.to_sym : KINDS.first
         @active = active
@@ -71,7 +75,7 @@ module UI
 
       # html_options first, so the component's own attributes can't be overwritten
       def call
-        content_tag(:button, safe_join([spinner_span, @text || content].compact), **@html_options, class: button_classes, type: (@kind == :submit) ? "submit" : "button", disabled: @disabled, data: button_data, aria: @aria)
+        content_tag(:button, safe_join([spinner_span, @text || content].compact), **@html_options, class: button_classes, type: (@kind == :submit) ? "submit" : "button", disabled: @disabled, name: @name, value: @value, data: button_data, aria: @aria)
       end
 
       def button_classes

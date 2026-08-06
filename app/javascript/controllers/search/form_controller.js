@@ -28,7 +28,7 @@ export default class extends Controller {
     // Reveal the results frame's loading placeholder. It ships hidden so a no-JS
     // user never sees a spinner that can't resolve (the eager src needs JS); now
     // that JS is running, the eager fetch will load results, so show it.
-    this.frameElement?.querySelector('[data-search-loading]')?.removeAttribute('hidden')
+    this.showLoading()
 
     // The results frame eager-loads its own contents via its `src` (set
     // server-side once the page shell has rendered), so there's nothing to
@@ -44,8 +44,12 @@ export default class extends Controller {
     // here; the count fetch signals via the search:rate-limited window event.
     document.addEventListener('turbo:before-fetch-response', this.handleFetchResponse)
     document.addEventListener('turbo:before-visit', this.handleBeforeVisit)
+    document.addEventListener('turbo:fetch-request-error', this.handleFetchError)
     window.addEventListener('search:rate-limited', this.showRateLimited)
     window.addEventListener('popstate', this.handlePopstate)
+    // The results frame renders outside this controller's element, so its retry
+    // button can't reach us by data-action
+    document.addEventListener('click', this.handleRetryClick)
   }
 
   disconnect () {
@@ -53,8 +57,10 @@ export default class extends Controller {
     document.removeEventListener('turbo:load', this.handleTurboLoad)
     document.removeEventListener('turbo:before-fetch-response', this.handleFetchResponse)
     document.removeEventListener('turbo:before-visit', this.handleBeforeVisit)
+    document.removeEventListener('turbo:fetch-request-error', this.handleFetchError)
     window.removeEventListener('search:rate-limited', this.showRateLimited)
     window.removeEventListener('popstate', this.handlePopstate)
+    document.removeEventListener('click', this.handleRetryClick)
   }
 
   handleTurboLoad = () => {
@@ -153,8 +159,8 @@ export default class extends Controller {
   handleFrameRender = () => {
     // Content landed, so a pending restore-reload poll is done.
     if (this.frameElement?.childElementCount > 0) clearTimeout(this.emptyReloadTimer)
-    // A frame render means results came back, so clear any rate-limit notice
-    this.hideRateLimited()
+    // A frame render means results came back, so clear any failure notice
+    this.hideNotices()
     // Run the time localization command on frame render
     if (window.timeLocalizer && typeof window.timeLocalizer.localize === 'function') {
       window.timeLocalizer.localize()
@@ -171,20 +177,57 @@ export default class extends Controller {
     this.showRateLimited()
 
     // Drop the in-frame loading placeholder so it doesn't spin forever
-    this.frameElement?.querySelector('[data-search-loading]')?.setAttribute('hidden', '')
+    this.hideLoading()
   }
 
-  get rateLimitedElement () {
-    return document.querySelector('[data-search-rate-limited]')
+  // A fetch that rejects outright when the network drops never comes back with a
+  // status, so handleFetchResponse never sees it and the spinner runs forever.
+  // Turbo targets the frame for its eager src fetch and the form for a submit;
+  // anything else (the combobox raises this too) isn't ours.
+  handleFetchError = (event) => {
+    if (event.target !== this.frameElement && event.target !== this.formTarget) return
+
+    // A failed submit has to be retried by re-submitting: the frame's src still
+    // points at the previous query, so reloading it would show the old results.
+    this.failedSubmit = event.target === this.formTarget
+    this.hideLoading()
+    this.showNotice('fetch-failed')
   }
 
-  showRateLimited = () => {
-    this.rateLimitedElement?.removeAttribute('hidden')
+  handleRetryClick = (event) => {
+    if (event.target.closest('[data-search-retry]')) this.retryResults()
   }
 
-  hideRateLimited () {
-    this.rateLimitedElement?.setAttribute('hidden', '')
+  retryResults = () => {
+    this.hideNotices()
+    this.showLoading()
+    if (this.failedSubmit) this.formTarget.requestSubmit()
+    else this.frameElement?.reload()
   }
+
+  get loadingElement () {
+    return this.frameElement?.querySelector('[data-search-loading]')
+  }
+
+  showLoading () {
+    this.loadingElement?.removeAttribute('hidden')
+  }
+
+  hideLoading () {
+    this.loadingElement?.setAttribute('hidden', '')
+  }
+
+  // The notices render beside the results frame, outside this controller's element
+  showNotice (name) {
+    document.querySelector(`[data-search-notice="${name}"]`)?.removeAttribute('hidden')
+  }
+
+  hideNotices () {
+    document.querySelectorAll('[data-search-notice]')
+      .forEach(element => element.setAttribute('hidden', ''))
+  }
+
+  showRateLimited = () => this.showNotice('rate-limited')
 
   // The form sits outside the results frame, so frame-nav period clicks advance
   // the URL but leave its hidden fields stale. Sync from the URL so the next

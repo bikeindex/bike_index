@@ -66,6 +66,19 @@ RSpec.describe "RegistrationsController#show", type: :request do
       end
     end
 
+    context "current_user sent the bike to a new owner who hasn't claimed it" do
+      # An unclaimed ownership still resolves bike.owner to the creator
+      let(:bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "new-owner@example.com") }
+      let(:current_user) { bike.reload.current_ownership.creator }
+      it "shows the sent-to-new-owner notice" do
+        get "#{base_url}/#{bike.id}"
+        body = whitespace_normalized_body_text
+        expect(body).to match("Your bike")
+        expect(body).to match("You sent this bike to new-owner@example.com")
+        expect(body).to match("been claimed yet")
+      end
+    end
+
     context "with photos" do
       let!(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(Rails.root.join("spec/fixtures/bike.jpg"))) }
       let!(:public_image2) { FactoryBot.create(:public_image, imageable: bike, image: File.open(Rails.root.join("spec/fixtures/bike.jpg"))) }
@@ -109,6 +122,129 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match(bike_sticker.pretty_code)
         expect(body).to match("Change the bike it links to")
         expect(response.body).to match(bike_sticker_path(id: bike_sticker.code))
+      end
+    end
+  end
+
+  context "short_id" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, id: 35) }
+    let(:current_user) { bike.reload.user }
+
+    it "finds the bike from the decimal id and from the short_id body" do
+      expect(bike.short_id).to eq "r/35"
+      ["#{base_url}/35", "#{base_url}/z", "#{base_url}/Z"].each do |path|
+        get path
+        expect(response.status).to eq(200)
+        expect(whitespace_normalized_body_text).to match("Your bike")
+      end
+    end
+
+    context "with the redesign enabled" do
+      before { Flipper.enable_actor(:bike_show_redesign_toggle, current_user) }
+
+      it "redirects the /r/ short URL here" do
+        get "/r/z"
+        expect(response).to redirect_to(registration_path(bike))
+        get "/r/z"
+        follow_redirect!
+        expect(response.status).to eq(200)
+        expect(whitespace_normalized_body_text).to match("Your bike")
+      end
+    end
+  end
+
+  context "likely_spam bike" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:current_user) { bike.reload.user }
+    # likely_spam is excluded by Bike's default_scope, so show has to find it unscoped
+    before { bike.update(likely_spam: true) }
+
+    it "renders" do
+      get "#{base_url}/#{bike.id}"
+      expect(response.status).to eq(200)
+      expect(whitespace_normalized_body_text).to match("Your bike")
+    end
+  end
+
+  context "user hidden bike" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:owner) { bike.reload.user }
+    let(:current_user) { owner }
+    before { bike.update(marked_user_hidden: "true") }
+
+    it "renders for the owner, without the registered badge" do
+      expect(bike.reload.user_hidden).to be_truthy
+      get "#{base_url}/#{bike.id}"
+      expect(response.status).to eq(200)
+      body = whitespace_normalized_body_text
+      expect(body).to match("Your bike")
+      expect(body).to_not match("Registered & protected")
+    end
+
+    context "superuser viewing" do
+      let(:current_user) { FactoryBot.create(:superuser) }
+      it "renders" do
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq(200)
+        expect(whitespace_normalized_body_text).to match("View Super Admin")
+      end
+    end
+
+    context "non-owner viewing" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      it "404s" do
+        expect(bike.reload.visible_by?(current_user)).to be_falsey
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq 404
+      end
+    end
+
+    context "logged out" do
+      let(:current_user) { nil }
+      it "404s" do
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq 404
+      end
+    end
+  end
+
+  # An organization's impound record can't be claimed, so consumer claims are for
+  # found bikes - impound records without an organization
+  context "found bike, viewed by a non-owner" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let!(:impound_record) { FactoryBot.create(:impound_record, bike:) }
+    let(:stolen_bike) { FactoryBot.create(:bike, :with_stolen_record, :with_ownership_claimed) }
+    let(:current_user) { stolen_bike.reload.user }
+
+    it "offers to open a claim with one of their stolen bikes" do
+      expect(bike.reload.current_impound_record).to be_present
+      expect(bike.owner).to_not eq current_user
+      get "#{base_url}/#{bike.id}"
+      expect(response.status).to eq(200)
+      body = whitespace_normalized_body_text
+      expect(body).to match("Does this look like your bike?")
+      expect(body).to match("Claim found bike")
+      expect(response.body).to include(impound_claims_path)
+    end
+
+    context "current_user has an impound_claim" do
+      let!(:impound_claim) { FactoryBot.create(:impound_claim, user: current_user, impound_record:) }
+
+      it "shows their claim rather than the open-claim prompt" do
+        expect(BikeServices::Displayer.display_impound_claim?(bike.reload, current_user)).to be_truthy
+        get "#{base_url}/#{bike.id}"
+        body = whitespace_normalized_body_text
+        expect(body).to match("Your claim")
+        expect(body).to_not match("Does this look like your bike?")
+        expect(response.body).to include(impound_claim_path(impound_claim))
+      end
+    end
+
+    context "the owner viewing" do
+      let(:current_user) { bike.reload.user }
+      it "doesn't offer a claim" do
+        get "#{base_url}/#{bike.id}"
+        expect(whitespace_normalized_body_text).to_not match("Does this look like your bike?")
       end
     end
   end
@@ -193,6 +329,20 @@ RSpec.describe "RegistrationsController#show", type: :request do
           body = whitespace_normalized_body_text
           expect(body).to match("Impounded")
           expect(body).to_not match("Not stolen")
+        end
+      end
+
+      # The claim card rides in the alerts, which the staff panel renders too - staff
+      # aren't being asked whether the bike is theirs
+      context "found bike a consumer could claim" do
+        let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization).reload }
+        let!(:impound_record) { FactoryBot.create(:impound_record, bike:) }
+        it "hides the claim card, even though the viewer could claim it" do
+          expect(BikeServices::Displayer.display_impound_claim?(bike.reload, current_user)).to be_truthy
+          get "#{base_url}/#{bike.id}"
+          body = whitespace_normalized_body_text
+          expect(body).to match("Staff")
+          expect(body).to_not match("Does this look like your bike?")
         end
       end
 
@@ -341,7 +491,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
       end
 
       context "more than the display limit" do
-        before { stub_const("Registrations::Show::OrgAdmin::Component::OTHER_REGISTRATIONS_LIMIT", 1) }
+        before { stub_const("Registrations::Show::WrapperOrgAdmin::Component::OTHER_REGISTRATIONS_LIMIT", 1) }
         it "caps the table and links to the org search for the full list" do
           get "#{base_url}/#{bike.id}"
           body = whitespace_normalized_body_text
