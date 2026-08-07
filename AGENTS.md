@@ -44,8 +44,6 @@ Uses RSpec. All business logic should be tested. The `rspec-testing` skill cover
 
 **Never hand-edit a VCR cassette**, and never `git checkout` away one a spec run re-recorded — cassettes only change by being recorded, and a re-recording gets committed on whatever branch you're on. To clear stale contents, `rm` the file and re-run the spec.
 
-`bin/ci` runs everything CI runs (lint, brakeman, the full parallel suite) locally. `bin/ci --lint` is the fast subset, `bin/ci --github` posts the results to the PR as `local-ci/*` commit statuses. It's on demand only — nothing is enforced by a hook.
-
 ## Frontend Development
 
 Uses Stimulus.js for JavaScript and Tailwind CSS for styling. SCSS and CoffeeScript files exist but are deprecated. The `bin/dev` command handles Tailwind and JS builds. The `frontend-conventions` skill covers project-specific class prefixes (`tw:`, `twinput`, `twlabel`, `twlink`), the `number_display` helper, and ViewComponent rules.
