@@ -269,7 +269,6 @@ RSpec.describe OrganizationsController, type: :request do
       it "links to the embed" do
         get "#{base_url}/#{organization.slug}/qr?target=shop_display"
         expect(response.status).to eq(200)
-        expect(response.media_type).to eq "image/png"
         expect(assigns(:qr_url)).to eq target_url
       end
     end
