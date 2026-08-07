@@ -21,7 +21,7 @@ RSpec.describe Admin::UserAlertsController, type: :request do
       let!(:theft_alert_alert) do
         FactoryBot.create(:user_alert, kind: "theft_alert_without_photo", alertable: theft_alert)
       end
-      # Creating it is what alerts about it
+      # after_commit creates its unfinished_registration alert
       let!(:b_param) do
         FactoryBot.create(:b_param, origin: "register_flow", params: {bike: {manufacturer_id: 1}})
       end
@@ -29,8 +29,7 @@ RSpec.describe Admin::UserAlertsController, type: :request do
       it "renders the alertable column" do
         get base_url
         expect(response.status).to eq(200)
-        expect(assigns(:collection).pluck(:kind))
-          .to match_array %w[phone_waiting_confirmation theft_alert_without_photo unfinished_registration]
+        expect(assigns(:collection).map(&:alertable)).to match_array([user_phone, theft_alert, b_param])
         expect(response.body).to match(admin_theft_alert_path(theft_alert.id))
         # UserPhone has no admin show page, admin_path_for_object links its user
         expect(response.body).to match(admin_user_path(user_phone.user_id))
