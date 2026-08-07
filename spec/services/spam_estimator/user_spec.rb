@@ -52,6 +52,44 @@ RSpec.describe SpamEstimator::User do
       end
     end
 
+    context "gift-card balance-check profile" do
+      let(:name) { "McGift Giftcardmall" }
+      let(:description) do
+        "This platform offers a secure way to access gift card services. Whether conducting " \
+          "mcgift.giftcardmall balance inquiries or completing mcgiftcard activation, every " \
+          "step is directed through a verified pathway to official encrypted servers."
+      end
+
+      it "is above the spam threshold" do
+        expect(described_class.estimate(user)).to be > SpamEstimator::User::MARK_SPAM_PERCENT
+      end
+    end
+
+    context "gift-card brand run together in a username" do
+      # these profiles smash the brand into usernames and domains, so the gift-card
+      # terms deliberately aren't \b-anchored the way the crypto/gambling ones are
+      let(:user) do
+        User.new(show_bikes: true, username: "vanillaprepaid6",
+          my_bikes_hash: {"link_target" => "https://vanilla-prepaid.cc/"})
+      end
+
+      it "counts references inside the run-together string" do
+        expect(described_class.estimate(user)).to be > SpamEstimator::User::MARK_SPAM_PERCENT
+      end
+    end
+
+    context "legitimate businesses that say prepaid" do
+      # bare "prepaid" matched funeral directors and travel-SIM sellers, so it's qualified
+      it "stays below the threshold" do
+        ["Organize a prepaid funeral in Adelaide. We offer pre-arranged and prepaid funeral options.",
+          "Prepaid travel SIM cards and eSIMs, so you stay connected overseas without roaming fees."]
+          .each do |legitimate_description|
+            expect(described_class.estimate(User.new(show_bikes: true, name:, description: legitimate_description)))
+              .to be < SpamEstimator::User::MARK_SPAM_PERCENT
+          end
+      end
+    end
+
     context "real names that contain spam terms as substrings" do
       # usernames are auto-generated random strings, so substring matching would ban real people
       it "does not count them as references" do
