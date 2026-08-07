@@ -78,19 +78,31 @@ RSpec.describe SpamEstimator::User do
       end
     end
 
-    context "legitimate businesses using gift-card vocabulary" do
-      # bare "prepaid" matched funeral directors and travel-SIM sellers, so it's qualified.
-      # A shop mentioning gift cards once is 30 on top of the link's 50 — it takes a second
-      # reference to reach the threshold, which is what separates a shop from a link farm.
-      it "stays below the threshold, even alongside a promotional link" do
-        ["Organize a prepaid funeral in Adelaide. We offer pre-arranged and prepaid funeral options.",
-          "Prepaid travel SIM cards and eSIMs, so you stay connected overseas without roaming fees.",
-          "Community bike shop. We do tune-ups, wheel builds and fittings. Gift cards available in store."]
-          .each do |legitimate_description|
-            legitimate = User.new(show_bikes: true, name:, description: legitimate_description,
-              my_bikes_hash: {"link_target" => "https://shop.example"})
-            expect(described_class.estimate(legitimate)).to be < SpamEstimator::User::MARK_SPAM_PERCENT
+    context "prepaid outside a gift-card context" do
+      # bare "prepaid" matched prepaid funerals and travel SIMs, so the term is qualified.
+      # Those profiles may well be spam for other reasons — the point is only that the
+      # word on its own isn't a gift-card reference.
+      it "is not counted as a reference" do
+        ["Pre-arranged and prepaid funeral options across Adelaide.",
+          "Prepaid travel SIM cards and eSIMs, so you stay connected overseas."]
+          .each do |unrelated_description|
+            expect(described_class.seo_spam_matches(User.new(show_bikes: true, description: unrelated_description)))
+              .to eq({})
           end
+      end
+    end
+
+    context "a shop that sells gift cards" do
+      # one reference is 30 on top of the link's 50 — it takes a second to reach the
+      # threshold, which is what separates a real shop from a link farm
+      let(:description) { "Community bike shop. We do tune-ups, wheel builds and fittings. Gift cards available in store." }
+      let(:user) do
+        User.new(show_bikes: true, name:, description:, my_bikes_hash: {"link_target" => "https://shop.example"})
+      end
+
+      it "stays below the threshold" do
+        expect(described_class.seo_spam_matches(user).values.sum).to eq 1
+        expect(described_class.estimate(user)).to be < SpamEstimator::User::MARK_SPAM_PERCENT
       end
     end
 
