@@ -250,13 +250,16 @@ RSpec.describe OrganizationsController, type: :request do
     let(:organization) { FactoryBot.create(:organization) }
     let(:target_url) { "http://www.example.com/register/new?organization_id=#{organization.slug}" }
 
-    it "renders, linking to the registration page" do
+    it "renders a png, linking to the registration page" do
       get "#{base_url}/#{organization.slug}/qr"
-      expect(response).to redirect_to("#{base_url}/#{organization.slug}/qr.png")
+      expect(response.status).to eq(200)
+      expect(response.media_type).to eq "image/png"
+      expect(assigns(:organization)).to eq organization
+      expect(assigns(:qr_url)).to eq target_url
 
       get "#{base_url}/#{organization.slug}/qr.png"
       expect(response.status).to eq(200)
-      expect(assigns(:organization)).to eq organization
+      expect(response.media_type).to eq "image/png"
       expect(assigns(:qr_url)).to eq target_url
     end
 
@@ -265,10 +268,8 @@ RSpec.describe OrganizationsController, type: :request do
 
       it "links to the embed" do
         get "#{base_url}/#{organization.slug}/qr?link_to=shop_display"
-        expect(response).to redirect_to("#{base_url}/#{organization.slug}/qr.png?link_to=shop_display")
-
-        get "#{base_url}/#{organization.slug}/qr.png?link_to=shop_display"
         expect(response.status).to eq(200)
+        expect(response.media_type).to eq "image/png"
         expect(assigns(:qr_url)).to eq target_url
       end
     end
@@ -279,7 +280,7 @@ RSpec.describe OrganizationsController, type: :request do
       it "links to the landing page, even without a landing page route" do
         expect(LandingPages::ORGANIZATIONS).to_not include(organization.slug)
 
-        get "#{base_url}/#{organization.slug}/qr.png?link_to=landing"
+        get "#{base_url}/#{organization.slug}/qr?link_to=landing"
         expect(response.status).to eq(200)
         expect(assigns(:qr_url)).to eq target_url
       end
@@ -287,7 +288,7 @@ RSpec.describe OrganizationsController, type: :request do
 
     context "unknown link_to" do
       it "links to the registration page" do
-        get "#{base_url}/#{organization.slug}/qr.png?link_to=xxxxx"
+        get "#{base_url}/#{organization.slug}/qr?link_to=xxxxx"
         expect(response.status).to eq(200)
         expect(assigns(:qr_url)).to eq target_url
       end
