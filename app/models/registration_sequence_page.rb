@@ -25,6 +25,9 @@ class RegistrationSequencePage < ApplicationRecord
 
   has_one_attached :image
 
+  validates :title, presence: true
+  validate :body_has_content
+
   # body is HTML from a Lexxy rich-text editor; sanitize to a safe subset on save
   before_validation :sanitize_body
   before_create :set_listing_order
@@ -71,5 +74,12 @@ class RegistrationSequencePage < ApplicationRecord
 
   def sanitize_body
     self.body = ActionController::Base.helpers.sanitize(body) if body.present?
+  end
+
+  # A page is rules to agree to; one with no bullets has nothing to acknowledge
+  def body_has_content
+    return if Nokogiri::HTML.fragment(body.to_s).text.strip.present?
+
+    errors.add(:body, "needs at least one bullet")
   end
 end

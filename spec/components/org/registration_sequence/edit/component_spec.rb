@@ -9,7 +9,7 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
   it "renders the page list with Add page and per-page Edit links" do
     render_inline(described_class.new(registration_sequence:))
 
-    expect(page).to have_css("form[method='post'] button[type='submit']", text: "Add page")
+    expect(page).to have_link("Add page")
     expect(page).to have_css("[data-controller='sortable'] [data-sortable-target='item']", minimum: 1)
     expect(page).to have_link("Edit")
   end
@@ -18,6 +18,12 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
     render_inline(described_class.new(registration_sequence:))
 
     expect(page).to have_css("[data-sortable-target='item'] [data-sortable-target='handle']", minimum: 1)
+  end
+
+  it "links to the full preview walk-through" do
+    render_inline(described_class.new(registration_sequence:))
+
+    expect(page).to have_link("Preview")
   end
 
   it "renders the settings shared by every page" do
@@ -40,10 +46,11 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
     expect(page).to have_content(organization.short_name)
   end
 
-  it "puts each page's body in a collapsed disclosure toggled by a chevron" do
+  it "puts each page's body in an expanded disclosure toggled by a chevron" do
     render_inline(described_class.new(registration_sequence:))
 
     expect(page).to have_css("button[data-action~='ui--collapse#toggle'] [data-ui--collapse-target='chevron']", minimum: 1)
-    expect(page).to have_css("[data-ui--collapse-target='content'][class*='hidden'] li", minimum: 1)
+    # Starts open - the content is visible, not hidden
+    expect(page).to have_css("[data-ui--collapse-target='content']:not([class*='hidden']) li", minimum: 1)
   end
 end

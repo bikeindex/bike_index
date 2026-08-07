@@ -10,11 +10,28 @@ RSpec.describe Organized::RegistrationSequencePagesController, type: :request do
     before { current_organization.update_columns(enabled_feature_slugs: ["registration_sequences"]) }
     let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization: current_organization) }
 
+    describe "new" do
+      it "renders a blank page form without persisting one" do
+        expect { get "#{base_url}/new" }.to_not change(RegistrationSequencePage, :count)
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:edit)
+      end
+    end
+
     describe "create" do
-      it "adds a blank page and opens it for editing" do
-        expect { post base_url }.to change { draft.registration_sequence_pages.count }.by(1)
-        page = draft.registration_sequence_pages.reorder(:id).last
-        expect(response).to redirect_to("#{member_url}/#{page.id}/edit")
+      it "adds the page and returns to the sequence" do
+        expect {
+          post base_url, params: {registration_sequence_page: {title: "Storage", body: "<ul><li>Store safely</li></ul>"}}
+        }.to change { draft.registration_sequence_pages.count }.by(1)
+        expect(response).to redirect_to(sequence_path)
+        expect(draft.registration_sequence_pages.reorder(:id).last.title).to eq("Storage")
+      end
+
+      it "re-renders without persisting an incomplete page" do
+        expect { post base_url, params: {registration_sequence_page: {title: ""}} }
+          .to_not change(RegistrationSequencePage, :count)
+        expect(response.status).to eq(422)
+        expect(response).to render_template(:edit)
       end
     end
 
@@ -31,11 +48,11 @@ RSpec.describe Organized::RegistrationSequencePagesController, type: :request do
     describe "update" do
       let(:page) { draft.registration_sequence_pages.first }
 
-      it "updates the page title, subtitle and body, and redirects to the sequence" do
+      it "updates the page title, subtitle and body, and returns to the page's preview" do
         patch "#{member_url}/#{page.id}", params: {
           registration_sequence_page: {title: "Battery & charging", heading: "Looks like you have an e-vehicle!", subtitle: "Charge safely", body: "<ul><li>first</li><li>second</li></ul>", organization_specific: "1"}
         }
-        expect(response).to redirect_to(sequence_path)
+        expect(response).to redirect_to("#{member_url}/#{page.id}/edit")
         expect(page.reload.title).to eq("Battery & charging")
         expect(page.heading).to eq("Looks like you have an e-vehicle!")
         expect(page.subtitle).to eq("Charge safely")

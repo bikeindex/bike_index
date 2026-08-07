@@ -74,9 +74,11 @@ class RegistrationSequence < ApplicationRecord
 
     private
 
+    # Start the draft from what's live so an edit tweaks the current sequence rather than
+    # discarding the organization's customizations; the template seeds the first draft.
     def build_draft_for(organization)
       transaction do
-        source = template
+        source = active_for(organization) || template
         draft = create!(organization:, faq_url: source.faq_url, acknowledgment_text: source.acknowledgment_text)
         source.registration_sequence_pages.each do |template_page|
           page = draft.registration_sequence_pages.create!(template_page.slice(*COPIED_PAGE_ATTRS))
@@ -129,11 +131,23 @@ class RegistrationSequence < ApplicationRecord
   end
 
   def make_active!
-    return false unless draft? && registration_sequence_pages.any?
+    pages = registration_sequence_pages.to_a
+    return false unless draft? && pages.any? && pages.all?(&:valid?)
 
     transaction do
       self.class.active_for(organization)&.update!(end_at: Time.current)
       update!(start_at: Time.current)
+    end
+  end
+
+  # Throw an unactivated draft away entirely, pages and all. Unlike an archived sequence,
+  # nothing has acknowledged it, so there's nothing to preserve.
+  def discard_draft!
+    return false if activated?
+
+    transaction do
+      registration_sequence_pages.destroy_all
+      really_destroy!
     end
   end
 

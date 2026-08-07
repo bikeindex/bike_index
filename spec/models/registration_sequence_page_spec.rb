@@ -1,6 +1,24 @@
 require "rails_helper"
 
 RSpec.describe RegistrationSequencePage, type: :model do
+  describe "validations" do
+    it "requires a title and at least one bullet" do
+      page = FactoryBot.build(:registration_sequence_page, title: "", body: "")
+      expect(page).to be_invalid
+      expect(page.errors.attribute_names).to include(:title, :body)
+    end
+
+    it "rejects a body with no visible text" do
+      page = FactoryBot.build(:registration_sequence_page, body: "<ul></ul>")
+      expect(page).to be_invalid
+      expect(page.errors[:body]).to be_present
+    end
+
+    it "accepts a title and a bulleted body" do
+      expect(FactoryBot.build(:registration_sequence_page)).to be_valid
+    end
+  end
+
   describe "#sanitize_body" do
     let(:page) { FactoryBot.create(:registration_sequence_page, body:) }
     let(:body) { "<ul><li>one</li><li><b>two</b><script>alert(1)</script></li></ul>" }
@@ -12,9 +30,9 @@ RSpec.describe RegistrationSequencePage, type: :model do
     end
 
     context "blank body" do
-      let(:body) { nil }
-
-      it "stays nil" do
+      it "leaves nil alone" do
+        page = FactoryBot.build(:registration_sequence_page, body: nil)
+        page.valid?
         expect(page.body).to be_nil
       end
     end
