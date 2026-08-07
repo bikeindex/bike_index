@@ -2,7 +2,7 @@ class BikeIndex.SubmitUserRequest extends BikeIndex
   constructor: (data_hash, response_callback) ->
     $('.modal.in').modal('hide') # They're submitted from modals, which we want to hide
     # url path in rails is send_request_api_v1_users_path
-    url = "<%= ENV['BASE_URL'] %>/api/v1/users/send_request"
+    url = "/api/v1/users/send_request"
     $.ajax
       type: "POST"
       url: url
