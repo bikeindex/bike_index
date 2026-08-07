@@ -127,6 +127,45 @@ RSpec.describe UserAlert, type: :model do
     end
   end
 
+  describe "update_unfinished_registrations" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let!(:b_param) do
+      FactoryBot.create(:b_param, creator: user, origin: "register_flow",
+        params: {bike: {manufacturer_id: 1}})
+    end
+
+    it "leaves the alert the b_param created alone" do
+      expect {
+        UserAlert.update_unfinished_registrations(user)
+      }.to_not change(UserAlert, :count)
+      expect(user.user_alerts.active.pluck(:kind)).to eq ["unfinished_registration"]
+    end
+
+    # Past the token expiration it drops out of BParam.unfinished_registrations, so
+    # nothing would resolve the alert if it were the only thing looked at
+    context "with the b_param expired" do
+      before { b_param.update_column(:created_at, Time.current - BParam::TOKEN_EXPIRATION - 1.day) }
+
+      it "resolves the alert" do
+        UserAlert.update_unfinished_registrations(user)
+
+        expect(user.user_alerts.active.pluck(:kind)).to eq []
+        expect(UserAlert.refresh_alert_slugs(user)).to be_truthy
+        expect(user.reload.alert_slugs).to eq []
+      end
+    end
+
+    context "with the b_param deleted" do
+      before { BParam.where(id: b_param.id).delete_all }
+
+      it "resolves the alert" do
+        UserAlert.update_unfinished_registrations(user)
+
+        expect(user.user_alerts.active.pluck(:kind)).to eq []
+      end
+    end
+  end
+
   describe "create_notification?" do
     it "notification has the kinds" do
       kinds = UserAlert.notification_kinds.map { |k| "user_alert_#{k}" }
