@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://raw.githubusercontent.com/bikeindex/resources/refs/heads/main/data/component_types.csv
+    uri: https://raw.githubusercontent.com/bikeindex/bike_data/refs/heads/main/data/component_types.csv
     body:
       encoding: US-ASCII
       string: ''
@@ -21,7 +21,7 @@ http_interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '1870'
+      - '2265'
       Cache-Control:
       - max-age=300
       Content-Security-Policy:
@@ -29,7 +29,7 @@ http_interactions:
       Content-Type:
       - text/plain; charset=utf-8
       Etag:
-      - W/"2ca0442fe23962c0338bc14cb081dd539364650bf406d449c7eb2362c0c14690"
+      - W/"671157b62e7c8ba55340918aa51d29b039563fd6445b175434b05bc74efe55fb"
       Strict-Transport-Security:
       - max-age=31536000
       X-Content-Type-Options:
@@ -39,21 +39,23 @@ http_interactions:
       X-Xss-Protection:
       - 1; mode=block
       X-Github-Request-Id:
-      - 940E:8B718:2B02F0F:3094116:6A41722D
+      - B624:2254D:13A85:5221D:6A765A85
+      X-Github-Edge-Region:
+      - westus2
       Accept-Ranges:
       - bytes
       Date:
-      - Sun, 28 Jun 2026 19:16:45 GMT
+      - Fri, 07 Aug 2026 22:21:57 GMT
       Via:
       - 1.1 varnish
       X-Served-By:
-      - cache-sjc1000111-SJC
+      - cache-sjc1000086-SJC
       X-Cache:
-      - HIT
+      - MISS
       X-Cache-Hits:
-      - '1'
+      - '0'
       X-Timer:
-      - S1782674205.140266,VS0,VE1
+      - S1786141317.482818,VS0,VE74
       Vary:
       - Authorization,Accept-Encoding
       Access-Control-Allow-Origin:
@@ -61,73 +63,80 @@ http_interactions:
       Cross-Origin-Resource-Policy:
       - cross-origin
       X-Fastly-Request-Id:
-      - 0beb881fbb0e5029334d718f7918dc76f277076e
+      - d61d45f63bef8d97a44d7730aa657485babee104
       Expires:
-      - Sun, 28 Jun 2026 19:21:45 GMT
+      - Fri, 07 Aug 2026 22:26:57 GMT
       Source-Age:
-      - '238'
+      - '0'
     body:
       encoding: ASCII-8BIT
       string: |
         name,secondary_name,has_multiple_locations,group
-        unknown,,false,Additional Parts
-        Water Bottle Cage,,false,Additional Parts
-        Stem,Gooseneck,false,Additional Parts
+        Aero Bars/Extensions/Bar Ends,Aero Bars,false,Additional Parts
+        Axle Nuts,,true,Wheels
         Bashguard/Chain Guide,,false,Drivetrain
-        Fairing,,false,Frame and Fork
-        Lights,,true,Additional Parts
-        Bell/Noisemaker,,false,Additional Parts
         Basket,,true,Cargo
-        Chain Tensioners,Chain Tugs,false,Drivetrain
-        Derailleur,,false,Drivetrain
-        Training Wheels,,false,Wheels
+        Bell/Noisemaker,,false,Additional Parts
         Bottom Bracket,,false,Drivetrain
         Brake,,true,Brakes
-        Hub Guard,,false,Additional Parts
-        Generator/Dynamo,,true,Wheels
-        Handlebar,,false,Additional Parts
-        Wheel,,true,Wheels
-        Saddle,,false,Additional Parts
-        Rim,,true,Wheels
-        Axle Nuts,,true,Wheels
-        Hub,,true,Wheels
-        Spokes,,true,Wheels
-        Tube,,true,Wheels
-        Tire,,true,Wheels
-        Brake Lever,,true,Brakes
-        Shift and Brake Lever,,true,Drivetrain
-        Brake Rotor,,true,Brakes
-        Brake Pad,,true,Brakes
-        Shifter,,true,Drivetrain
-        Fork,,false,Frame and Fork
-        Rear Suspension,,false,Frame and Fork
-        Headset,,false,Frame and Fork
         Brake Cable,,false,Brakes
-        Shift Cable,,false,Drivetrain
-        Chain,,false,Drivetrain
-        Chainrings,,false,Drivetrain
-        Cog/Cassette/Freewheel,,false,Drivetrain
-        Crankset,,false,Drivetrain
-        Pedals,,false,Drivetrain
-        Computer,,false,Additional Parts
-        Pegs,,true,Additional Parts
-        Toe Clips,,false,Additional Parts
-        Grips/Tape,,false,Additional Parts
-        Seatpost Clamp,,false,Additional Parts
-        Detangler,,false,Brakes
-        Kickstand,,false,Additional Parts
-        Rack,,true,Cargo
-        Seatpost,,false,Additional Parts
-        Fender,,true,Additional Parts
-        Aero Bars/Extensions/Bar Ends,Aero Bars,false,Additional Parts
-        Ebike Battery,Electric Bike Battery,false,Drivetrain
-        Ebike Motor,Electric Bike Motor,false,Drivetrain
-        Pannier,Rack Bag,false,Cargo
-        Frame Bag,,false,Cargo
+        Brake Lever,,true,Brakes
+        Brake Pad,,true,Brakes
+        Brake Rotor,,true,Brakes
         Cargo Bike Side Rails,Cargo Bike Monkey Bars,false,Cargo
-        Handlebar Bag,,false,Cargo
-        Seat Bag,Saddle Bag,false,Cargo
-        Top Tube Bag,Bento Box,false,Cargo
+        Chain,,false,Drivetrain
+        Chain Tensioners,Chain Tugs,false,Drivetrain
+        Chainrings,,false,Drivetrain
         Child Seat,,false,Cargo
-  recorded_at: Sun, 28 Jun 2026 19:16:45 GMT
+        Cog/Cassette/Freewheel,,false,Drivetrain
+        Computer,,false,Additional Parts
+        Crankset,,false,Drivetrain
+        Derailleur,,false,Drivetrain
+        Detangler,,false,Brakes
+        Drive Belt,"",false,Drivetrain
+        E-vehicle Battery,Electric Bike Battery,false,Drivetrain
+        E-vehicle Charger,Electric Bike Charger,false,Drivetrain
+        E-vehicle Display/Remote,Electric Bike Computer,false,Drivetrain
+        E-vehicle Motor,Electric Bike Motor,false,Drivetrain
+        E-vehicle Wiring Harness,Electric Bike Wiring Harness,false,Drivetrain
+        Fairing,,false,Frame and Fork
+        Fender,,true,Additional Parts
+        Fork,,false,Frame and Fork
+        Frame Bag,,false,Cargo
+        Generator/Dynamo,,true,Wheels
+        Grips/Tape,,false,Additional Parts
+        Handlebar,,false,Additional Parts
+        Handlebar Bag,,false,Cargo
+        Headset,,false,Frame and Fork
+        Hub,,true,Wheels
+        Hub Guard,,false,Additional Parts
+        Internal Frame Storage,"Downtube Storage (Specialized SWAT, Canyon LoadUp)",false,Frame and Fork
+        Kickstand,,false,Additional Parts
+        Lights,,true,Additional Parts
+        Pannier,Rack Bag,false,Cargo
+        Pedals,,false,Drivetrain
+        Pegs,,true,Additional Parts
+        Rack,,true,Cargo
+        Rear Suspension,,false,Frame and Fork
+        Rim,,true,Wheels
+        Saddle,,false,Additional Parts
+        Seat Bag,Saddle Bag,false,Cargo
+        Seatpost,,false,Additional Parts
+        Seatpost Clamp,,false,Additional Parts
+        Shift and Brake Lever,,true,Drivetrain
+        Shift Cable,,false,Drivetrain
+        Shifter,,true,Drivetrain
+        Spokes,,true,Wheels
+        Stem,Gooseneck,false,Additional Parts
+        Throttle,"",false,Drivetrain
+        Tire,,true,Wheels
+        Toe Clips,,false,Additional Parts
+        Top of Rack Bag,Rack Bag,false,Cargo
+        Top Tube Bag,Bento Box,false,Cargo
+        Training Wheels,,false,Wheels
+        Tube,,true,Wheels
+        unknown,,false,Additional Parts
+        Water Bottle Cage,,false,Additional Parts
+        Wheel,,true,Wheels
+  recorded_at: Fri, 07 Aug 2026 22:21:57 GMT
 recorded_with: VCR 6.4.0
