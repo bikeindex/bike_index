@@ -41,10 +41,8 @@ BLOCKED_EXTERNAL_HOSTS = %w[
   www.google-analytics.com
 ].freeze
 
-# Keep BASE_URL aligned with Capybara's server for `:js` specs so any
-# `*_url` helper rendered during the example -- or ERB-interpolated asset
-# (`<%= ENV['BASE_URL'] %>...`) that gets sprockets-compiled on demand --
-# targets the Capybara server.
+# Keep BASE_URL aligned with Capybara's server for `:js` specs so any `*_url`
+# helper rendered during the example targets the Capybara server.
 RSpec.configure do |config|
   config.around(:each, :js) do |example|
     original_base_url = ENV["BASE_URL"]
