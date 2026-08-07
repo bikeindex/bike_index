@@ -18,12 +18,10 @@ RSpec.describe UsersController, type: :request do
       end
       let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
 
-      it "hands the prefilled email off to the IdP rather than the signup form" do
+      it "hands a claimed email off to the IdP, and renders the form for one it doesn't claim" do
         get "#{base_url}/new", params: {email: "student@sso.edu"}
         expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
-      end
 
-      it "renders for an email the org doesn't claim" do
         get "#{base_url}/new", params: {email: "student@example.edu"}
         expect(response).to render_template(:new)
       end
