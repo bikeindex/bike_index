@@ -13,14 +13,17 @@
                 type="button"
                 data-action="ui--collapse#toggle"
                 data-ui--collapse-target="trigger"
-                aria-expanded="false"
+                aria-expanded="true"
                 class="tw:cursor-pointer tw:text-gray-400 tw:hover:text-gray-600"
               >
                 <span class="tw:sr-only">Toggle page details</span>
 
                 <span
                   data-ui--collapse-target="chevron"
-                  class="tw:inline-block tw:transition-transform tw:duration-200"
+                  class="
+                    tw:inline-block tw:rotate-90 tw:transition-transform
+                    tw:duration-200
+                  "
                 >
                   <span class="tw:flex">
                     <%= render UI::IconChevron::Component.new %>
@@ -40,10 +43,7 @@
             <% if page.subtitle.present? %>
               <p
                 data-ui--collapse-target="content"
-                class="
-                  tw:mt-1 tw:mb-0 tw:hidden tw:pl-5 tw:text-sm
-                  tw:text-gray-600
-                "
+                class="tw:mt-1 tw:mb-0 tw:pl-5 tw:text-sm tw:text-gray-600"
               >
                 <%= page.subtitle %>
               </p>
@@ -58,8 +58,8 @@
         <div
           data-ui--collapse-target="content"
           class="
-            tw:prose tw:mt-1 tw:hidden tw:max-w-none tw:py-2 tw:text-sm
-            tw:[&_ul]:my-0 tw:[&_ul]:list-disc tw:[&_ul]:pl-5
+            tw:prose tw:mt-1 tw:max-w-none tw:py-2 tw:text-sm tw:[&_ul]:my-0
+            tw:[&_ul]:list-disc tw:[&_ul]:pl-5
           "
         >
           <%= page.body&.html_safe %>

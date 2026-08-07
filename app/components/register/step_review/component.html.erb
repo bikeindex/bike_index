@@ -5,58 +5,15 @@
   <%= render Register::AcknowledgmentProgress::Component.new(number: acknowledgment_step_count,
       total: acknowledgment_step_count) %>
 
-  <%= render UI::Header::Component.new(text: translation(".youre_almost_done"),
-      subtitle: translation(".a_quick_review")) %>
-
-  <div
-    class="
-      tw:divide-y tw:divide-gray-200 tw:rounded-xl tw:border
-      tw:border-gray-200 tw:bg-white tw:dark:divide-gray-700
-      tw:dark:border-gray-700 tw:dark:bg-gray-800
-    "
-  >
-    <% pages.each_with_index do |page, index| %>
-      <div class="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:px-4 tw:py-3">
-        <span class="tw:flex tw:items-center tw:gap-2.5">
-          <span
-            class="
-              tw:flex tw:h-5.5 tw:w-5.5 tw:shrink-0 tw:items-center
-              tw:justify-center tw:rounded-full tw:bg-green-100
-              tw:text-green-600 tw:dark:bg-green-950 tw:dark:text-green-400
-            "
-          >
-            <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:h-3 tw:w-3", aria_hidden: true) %>
-          </span>
-
-          <span class="tw:text-sm tw:font-semibold"><%= page.title %></span>
-        </span>
-
-        <%= link_to translation(".review"), page_path(index),
-            class: "twlink tw:shrink-0 tw:text-xs tw:font-bold tw:tracking-wide tw:uppercase" %>
-      </div>
-    <% end %>
-  </div>
+  <%= render Register::ReviewSummary::Component.new(pages:, page_path: method(:page_path)) %>
 
   <%= form_with(url: acknowledge_register_path, method: :patch,
       data: {controller: "register--acknowledgment"}) do %>
     <%= hidden_field_tag :b_param_token, @b_param.id_token %>
     <%= hidden_field_tag :step, "review" %>
 
-    <label
-      class="
-        tw:my-5 tw:flex tw:cursor-pointer tw:items-start tw:gap-3 tw:text-sm
-        tw:font-normal
-      "
-    >
-      <%= check_box_tag :acknowledged_all, "1", false,
-          class: "tw:mt-0.5 tw:h-4 tw:w-4 tw:shrink-0 tw:cursor-pointer",
-          data: {"register--acknowledgment-target": "checkbox", action: "change->register--acknowledgment#update"} %>
-
-      <span>
-        <%= translation(".i_name_html", name: content_tag(:strong, registrant_name)) %>
-        <%= @sequence.acknowledgment %>
-      </span>
-    </label>
+    <%= render Register::AcknowledgmentCheck::Component.new(sequence: @sequence,
+        registrant_name:, checkbox_name: :acknowledged_all) %>
 
     <%= render UI::Button::Component.new(text: translation(".complete_registration", cycle_type: @b_param.type_titleize),
         color: :primary, size: :lg, kind: :submit, spinner: true, disabled: true, html_class: "tw:w-full",

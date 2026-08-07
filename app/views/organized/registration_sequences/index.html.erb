@@ -8,6 +8,7 @@
   <% if @active.present? %>
     <p class="tw:mb-2 tw:text-gray-600">
       This is the active version your registrants see.
+      <%= link_to "Preview", organization_registration_sequence_path(organization_id: current_organization.to_param, id: @active.id), class: "twlink" %>
     </p>
     <div class="tw:mb-6">
       <%= render Org::RegistrationSequence::PageList::Component.new(registration_sequence: @active) %>
@@ -31,9 +32,36 @@
         <%= l @draft.updated_at, format: :convert_time %>
       </span>
     <% else %>
-      You haven't started a draft sequence yet.
+      You don't have a draft sequence
     <% end %>
   </p>
 
-  <%= button_to "Edit sequence", organization_registration_sequences_path(organization_id: current_organization.to_param), method: :post, class: "twlink", form_class: "tw:mb-6 tw:inline-block" %>
+  <% button_label = if @draft.present?
+       "Edit sequence"
+     elsif @active.present?
+       "Copy current sequence and edit"
+     else
+       "Create a sequence"
+     end %>
+
+  <div class="tw:mb-6 tw:flex tw:items-baseline tw:gap-4">
+    <%= button_to button_label, organization_registration_sequences_path(organization_id: current_organization.to_param), method: :post, class: "twlink", form_class: "tw:inline-block" %>
+
+    <% if @draft.present? %>
+      <%= button_to "Discard draft", organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), method: :delete, class: "twlink tw:text-sm tw:text-gray-500", form_class: "tw:inline-block", data: {turbo_confirm: "Discard this draft and its pages? This can't be undone."} %>
+    <% end %>
+  </div>
+
+  <% if @previous.any? %>
+    <h2 class="uncap tw:mb-2 tw:text-lg tw:font-semibold">Previous</h2>
+    <ul class="tw:list-none tw:text-gray-600">
+      <% @previous.each do |registration_sequence| %>
+        <li class="tw:mb-1">
+          <%= link_to "Preview", organization_registration_sequence_path(organization_id: current_organization.to_param, id: registration_sequence.id), class: "twlink" %>
+          ended
+          <%= render UI::Time::Component.new(time: registration_sequence.end_at) %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
 </div>

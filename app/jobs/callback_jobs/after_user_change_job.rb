@@ -22,10 +22,7 @@ module CallbackJobs
       user.update(skip_update: true) if user.changed?
 
       update_user_alerts(user)
-      current_alerts = user_alert_slugs(user)
-      unless user.alert_slugs == current_alerts
-        user.update(alert_slugs: current_alerts, skip_update: true)
-      end
+      UserAlert.refresh_alert_slugs(user)
 
       # Activate activateable theft alerts!
       user.theft_alerts.paid.where(start_at: nil).each do |theft_alert|
@@ -47,16 +44,14 @@ module CallbackJobs
       process_bikes(user) unless skip_bike_update
     end
 
-    def user_alert_slugs(user)
-      # Access via UserAlert query so we don't need to reload user
-      UserAlert.where(user_id: user.id).active.distinct.pluck(:kind).sort
-    end
-
     def update_user_alerts(user)
       # Add user phone alerts
       user.user_phones.each do |user_phone|
         UserAlert.update_phone_waiting_confirmation(user: user, user_phone: user_phone)
       end
+
+      # Above the returns below - anyone can walk away mid-registration
+      UserAlert.update_unfinished_registrations(user)
 
       # Ignore alerts below for superusers
       if user.superuser?

@@ -184,6 +184,30 @@ RSpec.describe RegisterController, type: :request do
           expect(response.body).to_not include "email a confirmation link"
         end
       end
+
+      context "with their own unfinished registration" do
+        let!(:unfinished) do
+          BParam.create(origin: "register_flow", creator: current_user,
+            params: {bike: {owner_email:, manufacturer_id: "Trek"}}.as_json)
+        end
+
+        it "doesn't show the general alert" do
+          expect(current_user.reload.alert_slugs).to eq ["unfinished_registration"]
+
+          get register_path(b_param_token: b_param.id_token, step: 1)
+
+          expect(assigns(:show_general_alert)).to be_falsey
+          expect(response.body).to_not include "isn't registered yet!"
+        end
+
+        it "shows it everywhere else" do
+          get "/my_account"
+
+          expect(assigns(:show_general_alert)).to be_truthy
+          expect(response.body).to include "Your bike isn't registered yet!"
+          expect(response.body).to include register_path(b_param_token: unfinished.id_token)
+        end
+      end
     end
 
     context "with an organization" do

@@ -1,0 +1,103 @@
+#!/usr/bin/env ruby
+
+require "fileutils"
+require "bundler/setup"
+require "active_support"
+require "active_support/number_helper" # number_with_delimiter's backend, without ActionView
+
+# Runs locally what CI runs (.github/workflows/ci.yml), in one command.
+#
+#   bin/ci            lint + scan + the full spec suite
+#   bin/ci --lint     just lint + scan
+#   bin/ci --tests    just the spec suite
+#   bin/ci --github   also report each result on the pushed HEAD commit
+#
+# Nothing stops at the first failure, so one run reports every check.
+
+Dir.chdir(File.expand_path("..", __dir__))
+
+# Listed out rather than `bin/lint --no-fix`, which aborts on the first failure
+# and lumps the three npm checks into one command.
+LINT_AND_SCAN = {
+  "standardrb" => "bundle exec standardrb --no-fix",
+  "rubocop" => "bundle exec rubocop -c .rubocop_custom.yml",
+  "js lint" => "npm run js:lint_check",
+  "html lint" => "npm run html:lint_check",
+  "html format" => "npm run html:format_check",
+  "brakeman" => "bin/brakeman"
+}.freeze
+
+# A second progress formatter writes the summary here, so the counts reach the
+# GitHub status without capturing stdout away from the terminal.
+RSPEC_SUMMARY_PATH = "tmp/ci_rspec_summary.txt"
+
+# parallel:prepare stands in for CI's db:create/db:schema:load - parallel test
+# databases aren't migrated automatically.
+TESTS = {
+  "db prepare" => "bin/rake parallel:prepare",
+  "rspec" => "RETRY_FLAKY=true bin/turbo_tests -f progress -f progress -o #{RSPEC_SUMMARY_PATH}"
+}.freeze
+
+def now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
+def status_label(succeeded) = succeeded ? "\e[32mpass\e[0m" : "\e[31mFAIL\e[0m"
+
+def run(name, command)
+  puts "\n\e[1;34m== #{name}\e[0m: #{command}"
+  started = now
+  succeeded = system(command)
+  {name:, succeeded:, elapsed: now - started}
+end
+
+# Commit statuses, not check runs - check runs are only writable by a GitHub App,
+# and `gh` holds a user token.
+def post_status(result, sha, note)
+  description = [result[:detail], format("%.0fs on this machine", result[:elapsed])].compact.join(", ")
+  posted = system("gh", "api", "--silent", "-X", "POST", "repos/{owner}/{repo}/statuses/#{sha}",
+    "-f", "state=#{result[:succeeded] ? "success" : "failure"}",
+    "-f", "context=local-ci/#{result[:name]}",
+    "-f", "description=#{description}#{note}")
+  warn "  could not post the #{result[:name]} status - is #{sha[0, 7]} pushed?" unless posted
+end
+
+# e.g. "6,846 examples, 0 failures" - nil when a run died before it summarized.
+def rspec_counts
+  return unless File.exist?(RSPEC_SUMMARY_PATH)
+  File.read(RSPEC_SUMMARY_PATH)[/\d+ examples?, \d+ failures?[^\n]*/]
+    &.gsub(/\d+/) { |count| ActiveSupport::NumberHelper.number_to_delimited(count.to_i) }
+end
+
+# A dirty tree describes code that isn't at that sha.
+def dirty_tree_note = `git status --porcelain`.empty? ? "" : ", with uncommitted changes"
+
+unknown = ARGV - ["--lint", "--tests", "--github"]
+abort "Unknown option(s): #{unknown.join(" ")}\nUsage: bin/ci [--lint | --tests] [--github]" if unknown.any?
+
+checks = if ARGV.include?("--lint")
+  LINT_AND_SCAN
+elsif ARGV.include?("--tests")
+  TESTS
+else
+  LINT_AND_SCAN.merge(TESTS)
+end
+
+github = ARGV.include?("--github")
+sha, note = github ? [`git rev-parse HEAD`.strip, dirty_tree_note] : []
+
+# A leftover summary would put the previous run's counts on this run's status.
+FileUtils.rm_f(RSPEC_SUMMARY_PATH)
+
+started = now
+results = checks.map do |name, command|
+  result = run(name, command).merge(detail: (rspec_counts if name == "rspec"))
+  post_status(result, sha, note) if github
+  result
+end
+succeeded = results.all? { |result| result[:succeeded] }
+
+puts "\n\e[1m== bin/ci\e[0m"
+rows = results.map { |result| result.values_at(:name, :succeeded, :elapsed) }
+rows << ["total", succeeded, now - started]
+rows.each { |name, ok, elapsed| puts format("  %-11s %s %6.1fs", name, status_label(ok), elapsed) }
+
+exit succeeded
