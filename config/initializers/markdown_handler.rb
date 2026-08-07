@@ -5,7 +5,8 @@ module MarkdownHandler
 
   def self.call(template, source)
     compiled_source = erb.call(template, source)
-    "begin; output = #{compiled_source}; " \
+    # compiled_source is multiple statements; the parens group them so output binds to the last one
+    "begin; output = (#{compiled_source}\n); " \
     "output = output.to_str if output.respond_to?(:to_str); " \
     "Kramdown::Document.new(output.to_s, auto_ids: false).to_html; end"
   end
