@@ -1,11 +1,14 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Before bin/env: it picks the Redis database off RAILS_ENV, and the REDIS_URL it
-# lands on here is inherited by every worker. Unset, that's a *dev* database - one
-# shared by all of them, and by a running bin/dev.
+# Before bin/env: it picks the Redis database off RAILS_ENV. Unset, that's a *dev*
+# database - one a running bin/dev is also draining.
 ENV["RAILS_ENV"] ||= "test"
+redis_url_set = ENV.key?("REDIS_URL")
 load File.expand_path("env", __dir__)
+# Whatever this process lands on is inherited by every worker, and bin/env only
+# assigns a database per TEST_ENV_NUMBER, which doesn't exist until the workers do.
+ENV.delete("REDIS_URL") unless redis_url_set
 
 require "bundler/setup"
 require "digest"
