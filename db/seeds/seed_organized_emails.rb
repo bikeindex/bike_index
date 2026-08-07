@@ -235,4 +235,35 @@ unless transferred_bike_exists
   puts "  Created transferred bike ##{bike.id}"
 end
 
+# --- Registrations that never became bikes: mid-flow states nothing else seeds,
+# since every other seeded b_param ends up with a created bike ---
+if BParam.partial_registrations.none?
+  b_param = BParam.create!(origin: "embed_partial", params: {
+    bike: {
+      cycle_type: "bike",
+      manufacturer_id: SeedHelpers.weighted_frame_maker_id,
+      primary_frame_color_id: Color.pluck(:id).sample,
+      owner_email: "partial-registrant@bikeindex.org",
+      creation_organization_id: brakebills.id.to_s
+    }
+  })
+  puts "  Created partial registration b_param ##{b_param.id}"
+end
+
+# Brakebills so the preview renders its snippets, though an organization with an
+# auto_user already has a creator and would never send this
+if BParam.where(origin: "register_flow").where("(params -> 'email_confirmation_token') IS NOT NULL").none?
+  b_param = BParam.create!(origin: "register_flow", params: {
+    bike: {
+      cycle_type: "bike",
+      manufacturer_id: SeedHelpers.weighted_frame_maker_id,
+      primary_frame_color_id: Color.pluck(:id).sample,
+      owner_email: "anonymous-registrant@bikeindex.org",
+      creation_organization_id: brakebills.id.to_s
+    }
+  })
+  b_param.generate_email_confirmation_token!
+  puts "  Created anonymous registration b_param ##{b_param.id} awaiting email confirmation"
+end
+
 puts "Organized email seed records seeded successfully!"

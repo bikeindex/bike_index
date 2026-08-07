@@ -107,6 +107,11 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
       expect_localstorage_location(location:, distance:)
 
+      # The re-rendered preview ignores the query string, so the form restores
+      # both saved values rather than rendering them
+      expect(page).to have_field("location", with: location, visible: :all)
+      expect(page).to have_field("distance", with: distance, visible: :all)
+
       target_params = {
         distance: [distance],
         location: [location],

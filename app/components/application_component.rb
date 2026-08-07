@@ -7,8 +7,8 @@ class ApplicationComponent < ViewComponent::Base
   RENDERED_COMPONENT = /\b(?:[A-Z][A-Za-z0-9]*::)+Component\b/
   # A component's digest sits in the markup it covers, so it can't count toward it —
   # committing a new value would otherwise change the value again
-  DIGEST_ASSIGNMENT = /^\s*MARKUP_DIGEST = .*$/
-  private_constant :RENDERED_COMPONENT, :DIGEST_ASSIGNMENT
+  DIGEST_ASSIGNMENT = /^(\s*MARKUP_DIGEST = ).*$/
+  private_constant :RENDERED_COMPONENT
 
   class << self
     # A digest of this component's markup, for folding into the key of a fragment cache

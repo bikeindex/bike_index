@@ -23,16 +23,7 @@ module Sessionable
       flash.now[:error] = translation(:user_is_banned, scope: SIGN_IN_SCOPE)
       redirect_back(fallback_location: new_session_url) && return
     end
-    confirm_user_from_claim_token(user)
-    session[:last_seen] = Time.current
-    session[:render_donation_request] = user.render_donation_request if user&.render_donation_request
-    set_passive_organization(user.default_organization) # Set that organization!
-    user.update_last_login(forwarded_ip_address)
-    if Binxtils::InputNormalizer.boolean(params.dig(:session, :remember_me)) || session.delete(:magic_link_remember_me)
-      cookies.permanent.signed[ControllerHelpers::AUTH_COOKIE_KEY] = cookie_options(user)
-    else
-      default_session_set(user)
-    end
+    sign_in_user(user)
 
     if sign_in_partner.present?
       session.delete(:partner) # Only removing once signed in, PR#1435
@@ -43,6 +34,21 @@ module Sessionable
     elsif !return_to_if_present
       set_sign_in_flash(user, signed_up)
       redirect_to(user_root_url) && return
+    end
+  end
+
+  # Everything signing in does apart from deciding where to go next, for flows with
+  # a destination of their own
+  def sign_in_user(user)
+    confirm_user_from_claim_token(user)
+    session[:last_seen] = Time.current
+    session[:render_donation_request] = user.render_donation_request if user&.render_donation_request
+    set_passive_organization(user.default_organization) # Set that organization!
+    user.update_last_login(forwarded_ip_address)
+    if Binxtils::InputNormalizer.boolean(params.dig(:session, :remember_me)) || session.delete(:magic_link_remember_me)
+      cookies.permanent.signed[ControllerHelpers::AUTH_COOKIE_KEY] = cookie_options(user)
+    else
+      default_session_set(user)
     end
   end
 

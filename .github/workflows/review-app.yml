@@ -1,9 +1,10 @@
 name: Review App
 
-# Deploys / destroys per-PR review apps via the shared kamal-deploy.yml reusable
-# workflow (build + kamal command) to the shared review host. This file owns only
-# the PR lifecycle around it: resolving the trigger, labelling, surfacing the
-# deployment, and PR failure comments. See docs/review-apps.md for host setup.
+# Deploys / destroys / reloads the database of per-PR review apps via the shared
+# kamal-deploy.yml reusable workflow (build + kamal command) to the shared review
+# host. This file owns only the PR lifecycle around it: resolving the trigger,
+# labelling, surfacing the deployment, and PR failure comments. See
+# docs/review-apps.md for host setup.
 #
 # Triggers:
 #   - workflow_dispatch   : operator clicks "Run workflow" in Actions UI, OR
@@ -26,11 +27,11 @@ on:
         required: true
         type: string
       action:
-        description: "deploy or destroy"
+        description: "deploy, destroy, or reload_database (drop + create/migrate/seed)"
         required: true
         type: choice
         default: deploy
-        options: [deploy, destroy]
+        options: [deploy, destroy, reload_database]
   pull_request:
     types: [closed]
 
@@ -45,7 +46,7 @@ env:
   # Marks the `report` job's failure comment so it can be found again. Each comment
   # also carries the failing commit's SHA (`<!-- sha:… -->`), so `report` edits in
   # place only when the SAME commit fails again. The comment is hidden (minimized as
-  # OUTDATED), never deleted, once it's stale — either the deploy succeeds (`post`)
+  # OUTDATED), never deleted, once it's stale — either the op succeeds (`post`)
   # or a newer commit is deployed (`report` hides the prior commit's comment).
   FAILURE_COMMENT_MARKER: "<!-- review-app-failure -->"
 
@@ -117,26 +118,28 @@ jobs:
           gh pr edit "${{ steps.set.outputs.pr_number }}" --repo "$GITHUB_REPOSITORY" --add-label "$REVIEW_LABEL" || true
 
   # Build (deploy only) + run the kamal command, via the shared reusable workflow.
-  # Deploy checks out the PR head; destroy checks out the default branch — it tears
-  # down by PR number and needs none of the PR's code, and a PR predating a
+  # Deploy checks out the PR head; the other actions check out the default branch —
+  # they act on the PR by number and need none of its code, and a PR predating a
   # bin/kamal_review change would otherwise fail on its stale checkout.
   op:
-    name: ${{ needs.resolve.outputs.action == 'destroy' && 'Destroy' || 'Deploy' }} ${{ needs.resolve.outputs.pr_number }}
+    name: ${{ needs.resolve.outputs.action }} ${{ needs.resolve.outputs.pr_number }}
     needs: resolve
     if: needs.resolve.outputs.proceed == 'true'
     uses: ./.github/workflows/kamal-deploy.yml
     secrets: inherit
     with:
-      action: ${{ needs.resolve.outputs.action }}
+      build: ${{ needs.resolve.outputs.action == 'deploy' }}
       ref: ${{ needs.resolve.outputs.action == 'deploy' && needs.resolve.outputs.head_sha || github.event.repository.default_branch }}
-      command: ${{ needs.resolve.outputs.action == 'deploy' && format('bin/kamal_review deploy --app {0}', needs.resolve.outputs.pr_number) || format('bin/kamal_review destroy --app {0}', needs.resolve.outputs.pr_number) }}
+      # Each action is also the bin/kamal_review subcommand of the same name.
+      command: ${{ format('bin/kamal_review {0} --app {1}', needs.resolve.outputs.action, needs.resolve.outputs.pr_number) }}
       image_tag: pr-${{ needs.resolve.outputs.pr_number }}-${{ needs.resolve.outputs.head_sha }}
       service_label: bike-index-pr-${{ needs.resolve.outputs.pr_number }}
       sprockets_cache_prefix: review-app-sprockets
       pr_title: ${{ needs.resolve.outputs.pr_title }}
       concurrency_prefix: review-app-${{ needs.resolve.outputs.pr_number }}
       environment_name: review-app
-      environment_url: ${{ needs.resolve.outputs.action == 'deploy' && format('https://pr-{0}.review.bikeindex.org', needs.resolve.outputs.pr_number) || '' }}
+      # Empty only for destroy — every other action leaves the app serving that URL.
+      environment_url: ${{ needs.resolve.outputs.action != 'destroy' && format('https://pr-{0}.review.bikeindex.org', needs.resolve.outputs.pr_number) || '' }}
 
   # PR-side follow-ups the generic reusable workflow can't own.
   post:
@@ -174,10 +177,10 @@ jobs:
               state: "success",
               environment_url: process.env.DEPLOY_URL,
             })
-      # A successful deploy makes the `report` job's failure comment stale. Hide it
+      # A successful op makes the `report` job's failure comment stale. Hide it
       # (minimize as OUTDATED) rather than delete — the record stays on the PR.
-      - name: Hide stale deploy-failure comment
-        if: needs.resolve.outputs.action == 'deploy' && needs.op.result == 'success'
+      - name: Hide stale failure comment
+        if: needs.resolve.outputs.action != 'destroy' && needs.op.result == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ needs.resolve.outputs.pr_number }}
@@ -255,9 +258,9 @@ jobs:
           set -euo pipefail
           sha_marker="<!-- sha:$HEAD_SHA -->"
           body="$FAILURE_COMMENT_MARKER $sha_marker
-          🚨 **Review app ${ACTION} failed** for \`${HEAD_SHA:0:7}\` — [run logs](${RUN_URL})
+          🚨 **Review app ${ACTION//_/ } failed** for \`${HEAD_SHA:0:7}\` — [run logs](${RUN_URL})
 
-          Push a fix to retry automatically, or re-run the Review App workflow manually."
+          Re-run the Review App workflow to retry (a push re-dispatches a deploy)."
           # Edit in place only when THIS commit failed before; a comment for an older
           # commit is left untouched here and hidden below.
           cid=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \

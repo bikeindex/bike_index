@@ -1920,15 +1920,18 @@ en:
     register:
       acknowledge:
         acknowledge_everything: Check every box to agree to these rules
-      create:
-        email_required: Email is required to register
-        manufacturer_required: Manufacturer is required to register
-        unable_to_save: We're unable to save that registration, please try again
+      confirm_email:
+        confirmation_link_expired: That confirmation link has expired — check your
+          email for a new one
+        signed_in_as_other: >-
+          You're signed in as %{email}, so we kept you in that account. The registration
+          is still saved to the address we emailed.
       find_b_param:
         registration_not_found: We couldn't find that registration — start a new one
           below
-      update:
-        name_required: Owner name is required to register
+      sign_in_confirmed_user:
+        unable_to_sign_in: We confirmed your email, but couldn't sign you in to that
+          account
     search:
       marketplace:
         set_interpreted_params:
@@ -3871,6 +3874,7 @@ en:
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
     register_acknowledgment: "%{cycle_type} safety check"
+    register_confirm: Confirming your email
     register_create: Register your %{cycle_type}!
     register_review: Review your %{cycle_type} safety check
     register_show: "%{cycle_type} registration"
@@ -4656,6 +4660,8 @@ en:
       subject: Confirm your %{organization_name}stolen %{bike_type}on Bike Index
     organization_invitation:
       subject: Join %{organization_name}on Bike Index
+    partial_register_confirmation:
+      subject: Confirm your email to finish your %{organization_name}registration
     partial_registration:
       subject: Finish your %{organization_name}Bike Index registration!
   payments:
@@ -5059,6 +5065,11 @@ en:
       bike: Bike
       recovered_date: recovered %{date}
       translated_from_english: translated from English
+    register_flow:
+      email_required: Email is required to register
+      manufacturer_required: Manufacturer is required to register
+      name_required: Owner name is required to register
+      unable_to_save: We're unable to save that registration, please try again
     shops_map:
       map_of_partner_locations: Map of partner locations
     user_general_alert:
