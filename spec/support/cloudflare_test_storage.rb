@@ -4,6 +4,12 @@
 # rather than to the Disk service - the only way to exercise a presigned, cross-origin PUT.
 # Needs R2_TEST_* (in .env.test locally, repo secrets in CI).
 RSpec.shared_context :cloudflare_test_storage do
+  # example.com is .env's placeholder - it signs well enough to replay a cassette, but there's
+  # no bucket behind it
+  before do
+    skip "no R2_TEST_* credentials" if ENV["R2_TEST_ENDPOINT"].to_s.include?("example.com")
+  end
+
   # service is a class_attribute, so the Capybara server thread picks this up too. VCR blocks
   # un-cassetted http, and a browser's PUT can't be cassetted anyway - it isn't a ruby request.
   around do |example|
@@ -28,6 +34,9 @@ RSpec.shared_context :cloudflare_test_storage do
   def without_http_stubbing
     VCR.turned_off(ignore_cassettes: true) do
       WebMock.disable!
+      # aws-sdk pools its Net::HTTP sessions, and WebMock swaps the class rather than the
+      # instances - a session opened to the bucket under an earlier cassette stays stubbed
+      Seahorse::Client::NetHttp::ConnectionPool.pools.each(&:empty!)
       yield
     ensure
       WebMock.enable!
