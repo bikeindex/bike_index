@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 
 require "fileutils"
+require "bundler/setup"
+require "active_support"
+require "active_support/number_helper" # number_with_delimiter's backend, without ActionView
 
 # Runs locally what CI runs (.github/workflows/ci.yml), in one command.
 #
@@ -57,10 +60,11 @@ def post_status(result, sha, note)
   warn "  could not post the #{result[:name]} status - is #{sha[0, 7]} pushed?" unless posted
 end
 
-# e.g. "6846 examples, 0 failures" - nil when a run died before it summarized.
+# e.g. "6,846 examples, 0 failures" - nil when a run died before it summarized.
 def rspec_counts
   return unless File.exist?(RSPEC_SUMMARY_PATH)
   File.read(RSPEC_SUMMARY_PATH)[/\d+ examples?, \d+ failures?[^\n]*/]
+    &.gsub(/\d+/) { |count| ActiveSupport::NumberHelper.number_to_delimited(count.to_i) }
 end
 
 # A dirty tree describes code that isn't at that sha.
