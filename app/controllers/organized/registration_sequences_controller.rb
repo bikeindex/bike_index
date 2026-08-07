@@ -5,6 +5,15 @@ module Organized
     def index
       @draft = current_organization.registration_sequences.draft.first
       @active = RegistrationSequence.active_for(current_organization)
+      @previous = current_organization.registration_sequences.archived.order(end_at: :desc).to_a
+    end
+
+    # The faked registrant walk-through, one screen (?page=) per rule page plus the review
+    # they end on. page is 1-indexed (Pagy); the preview component's index is 0-based.
+    def show
+      @registration_sequence = current_organization.registration_sequences.find(params[:id])
+      screen_count = BikeServices::Register.acknowledgment_step_count(@registration_sequence)
+      @preview_pagy = Pagy::Offset.new(count: screen_count, limit: 1, page: permitted_page(max: screen_count))
     end
 
     # Manage the draft's pages (add / reorder / edit) and its sequence-wide settings
@@ -24,10 +33,17 @@ module Organized
       end
     end
 
-    # Builds the draft (cloned from the template) the org manages
+    # Opens the draft the org manages, cloning the live sequence (or the template) on first edit
     def create
       draft = RegistrationSequence.draft_for(current_organization)
       redirect_to edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: draft.id)
+    end
+
+    # Throw the draft away to start over; the live sequence is untouched
+    def destroy
+      find_draft.discard_draft!
+      flash[:success] = "Draft discarded"
+      redirect_to organization_registration_sequences_path(organization_id: current_organization.to_param)
     end
 
     private
