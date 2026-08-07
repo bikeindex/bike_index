@@ -2,6 +2,9 @@ class UsersController < ApplicationController
   include Sessionable
 
   before_action :skip_if_signed_in, only: %i[new]
+  # An SSO org owns its domain's accounts, so signing up is the IdP's job too — otherwise
+  # the sign-in guard is bypassed by whatever link or bookmark lands on the signup form.
+  before_action :redirect_forced_saml, only: %i[new create]
   before_action :find_user_from_token_for_password_reset!, only: %i[update_password_form_with_reset_token update_password_with_reset_token]
 
   def new

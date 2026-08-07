@@ -5,6 +5,7 @@
 #   OrganizationFeature.has_feature_slugs.map { |of| of.slice(:name, :feature_slugs) }
 feature_name_and_slugs = [
   {name: "Ad space", feature_slugs: []},
+  {name: "Automatic User Role", description: "Gives every user with a matching email domain this default role", feature_slugs: ["user_role_for_user_email_domain"]},
   {name: "Avery Export", feature_slugs: ["reg_address", "avery_export"]},
   {name: "Bike Stickers", feature_slugs: ["bike_stickers", "bike_stickers_user_editable"]},
   {name: "Bike Stickers: NOT user editable", feature_slugs: ["bike_stickers"]},
@@ -55,7 +56,7 @@ brakebills_feature_ids = []
 official_manufacturer_feature_id = nil
 law_enforcement_feature_id = nil
 
-brakebills_skipped_feature_names = ["Avery Export", "Passwordless users", "Single Sign On (SSO)", "Skip ownership email"]
+brakebills_skipped_feature_names = ["Automatic User Role", "Avery Export", "Passwordless users", "Single Sign On (SSO)", "Skip ownership email"]
 
 feature_name_and_slugs.each do |attrs|
   org_feature = OrganizationFeature.find_by_name(attrs[:name]) ||
