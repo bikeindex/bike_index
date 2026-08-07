@@ -28,7 +28,7 @@ module Bikeindex
     config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL", config.redis_default_url)
     config.redis_rack_attack_url = ENV.fetch("REDIS_RACK_ATTACK_URL", config.redis_cache_url)
 
-    config.load_defaults 8.0
+    config.load_defaults 8.1
 
     # Clear Rails default security headers - secure_headers gem manages these instead
     # (secure_headers has a bug where it tries to delete lowercase keys but Rails uses mixed case)
@@ -37,6 +37,10 @@ module Bikeindex
     # directly using Sidekiq is preferred, but some things (e.g. active_storage) use active job
     config.active_job.queue_adapter = :sidekiq
     config.active_job.default_queue_name = :low_priority
+
+    # Overrides load_defaults. Untracked variant keys are a digest of the blob key, so BlobUrl
+    # builds them without a query - at the cost of only being able to count them from the bucket.
+    config.active_storage.track_variants = false
 
     # Use our custom error pages
     config.exceptions_app = routes
@@ -56,7 +60,9 @@ module Bikeindex
 
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     config.i18n.load_path += Dir[Rails.root.join("config", "locales", "**", "*.{rb,yml}").to_s]
-    config.i18n.load_path += Dir[Rails.root.join("app", "components", "**", "*.{yml}").to_s]
+    # Component sidecar translations. A reloadable path (not a static glob) so dev reloads
+    # re-scan the tree — picking up renamed/added keys and files without a server restart.
+    config.i18n.railties_load_path << config.paths.add("app/components", glob: "**/*.yml")
     config.i18n.enforce_available_locales = false
     config.i18n.default_locale = :en
     config.i18n.available_locales = %i[en es it nl nb]
@@ -79,7 +85,7 @@ module Bikeindex
 
     # Enable instrumentation for ViewComponents (used by rack-mini-profiler)
     config.view_component.instrumentation_enabled = true
-    config.view_component.default_preview_layout = "component_preview"
+    config.view_component.previews.controller = "ComponentPreviewsController"
     # This is ugly but necessary, see github.com/ViewComponent/view_component/issues/1064
     initializer "app_assets", after: "importmap.assets" do
       Rails.application.config.assets.paths << Rails.root.join("app")

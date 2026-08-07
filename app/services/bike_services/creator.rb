@@ -109,12 +109,15 @@ module BikeServices
 
     # Called from ImageAssociatorJob, so can't be private
     def attach_photo(b_param, bike)
-      return true unless b_param.image.present?
+      return if b_param.image_signed_id.blank? && b_param.image.blank?
 
-      public_image = PublicImage.new(image: b_param.image)
-      public_image.imageable = bike
-      public_image.save
-      b_param.update(image_processed: true)
+      if b_param.image_signed_id.present?
+        blob = b_param.image_blob # nil once reaped - drop the photo, not the registration
+        PublicImage.create(imageable: bike, file: blob) if blob
+      else
+        PublicImage.create(imageable: bike, image: b_param.image)
+        b_param.update(image_processed: true)
+      end
       bike.reload
     end
 
@@ -189,10 +192,10 @@ module BikeServices
       return bike unless bike.present? && bike.id.present?
 
       # NOTE: spaminess is recalculated in Email::OwnershipInvitationJob as a failsafe
-      if SpamEstimator.estimate_bike(bike) > SpamEstimator::MARK_SPAM_PERCENT
+      if SpamEstimator::Bike.estimate(bike) > SpamEstimator::Bike::MARK_SPAM_PERCENT
         bike.update(likely_spam: true)
       end
-      CallbackJob::AfterBikeSaveJob.perform_async(bike.id)
+      CallbackJobs::AfterBikeSaveJob.perform_async(bike.id)
       if b_param.bike_sticker_code.present? && bike.creation_organization.present?
         bike_sticker = BikeSticker.lookup_with_fallback(b_param.bike_sticker_code, organization_id: bike.creation_organization.id)
         bike_sticker&.claim_if_permitted(user: bike.creator, bike: bike.id,

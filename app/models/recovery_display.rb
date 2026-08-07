@@ -126,11 +126,11 @@ class RecoveryDisplay < ActiveRecord::Base
 
     stolen_record&.update(updated_at: Time.current)
     if remote_photo_url.present?
-      Images::ProcessRecoveryDisplayPhotoJob.perform_async(id, remote_photo_url)
+      ImageJobs::ProcessRecoveryDisplayPhotoJob.perform_async(id, remote_photo_url)
       self.remote_photo_url = nil # clear to ensure it doesn't get re-enqueued
     elsif photo.attached? && !photo_processed.attached?
       # Otherwise, only enqueue if photo is attached and there isn't a photo_processed attached
-      Images::ProcessRecoveryDisplayPhotoJob.perform_async(id)
+      ImageJobs::ProcessRecoveryDisplayPhotoJob.perform_async(id)
     end
   end
 end

@@ -1,0 +1,47 @@
+<%# focusout rather than blur, which doesn't bubble up to the controller. %>
+<div
+  data-controller="ui--forms--email"
+  data-action="focusout->ui--forms--email#check keydown.enter->ui--forms--email#checkOnEnter input->ui--forms--email#clear"
+  data-ui--forms--email-reserved-value="<%= reserved_pattern %>"
+>
+  <%= render(UI::Forms::Input::Component.new(form_builder: @form_builder, attribute: @attribute,
+    required: @required, html_options: @html_options)) %>
+
+  <%# The region outlives the messages inside it -- one added along with its text has nothing to announce. %>
+  <div aria-live="polite">
+    <%#
+      The paragraph is what hides, so the button inside it needs no tw:hidden of its own.
+      atomic, because only the address inside it changes -- the sentence around it is
+      what's worth announcing.
+    %>
+
+    <p
+      class="tw:mt-1 tw:hidden tw:text-sm"
+      aria-atomic="true"
+      data-ui--forms--email-target="suggestion"
+    >
+      <%= did_you_mean_markup %>
+    </p>
+
+    <%# Text rather than a button, there being no correction to accept. %>
+    <p
+      class="tw:mt-1 tw:hidden tw:text-sm tw:text-red-800 tw:dark:text-red-400"
+      data-ui--forms--email-target="warning"
+    >
+      <%= translation(".not_real") %>
+    </p>
+
+    <%#
+      The way past whichever message is showing, next to what it's asking about.
+      Wrapped, so it takes its own line without a display utility racing tw:inline-flex.
+    %>
+
+    <div>
+      <%# Gray rather than twlink's blue, so it reads as the lesser of the two ways out. %>
+      <%= render(UI::Button::Component.new(text: translation(".submit_anyway"), color: :link,
+        html_class: "tw:mt-1 tw:hidden! tw:text-sm tw:text-gray-500 tw:hover:text-gray-700 " \
+          "tw:dark:text-gray-400 tw:dark:hover:text-gray-200",
+        data: {"ui--forms--email-target": "override", action: "ui--forms--email#submitAnyway"})) %>
+    </div>
+  </div>
+</div>

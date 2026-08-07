@@ -176,13 +176,24 @@ RSpec.describe "BikesController#show", type: :request do
         get "#{base_url}/#{bike.id}"
         expect(assigns(:bike).id).to eq bike.id
         expect(response).to render_template(:show)
-      }.to change(StolenBike::AfterStolenRecordSaveJob.jobs, :count).by 0
+      }.to change(BikeJobs::AfterStolenRecordSaveJob.jobs, :count).by 0
       expect {
-        StolenBike::AfterStolenRecordSaveJob.new.perform(stolen_record.id)
-      }.to change(StolenBike::AfterStolenRecordSaveJob.jobs, :count).by 0
+        BikeJobs::AfterStolenRecordSaveJob.new.perform(stolen_record.id)
+      }.to change(BikeJobs::AfterStolenRecordSaveJob.jobs, :count).by 0
       expect(stolen_record.reload.alert_image).to be_blank
       expect(stolen_record.reload.images_attached?).to be_truthy
       expect(stolen_record.recovery_link_token).to be_present
+    end
+  end
+  context "stolen bike with a location" do
+    let(:ownership) { FactoryBot.create(:ownership, bike: FactoryBot.create(:stolen_bike)) }
+    it "renders the map through the stolen-map controller, without an inline mapboxgl script" do
+      get "#{base_url}/#{bike.id}"
+      expect(response).to render_template(:show)
+      expect(response.body).to include('data-controller="stolen-map"')
+      expect(response.body).to include('data-stolen-map-target="canvas"')
+      # The inline script referencing mapboxgl was the source of the Turbo race - it must be gone
+      expect(response.body).to_not include("mapboxgl")
     end
   end
   context "user hidden bike" do
@@ -678,6 +689,53 @@ RSpec.describe "BikesController#show", type: :request do
         expect(flash).to be_blank
         expect(assigns(:bike)).to eq bike
         expect(assigns(:show_for_sale)).to be_falsey
+      end
+    end
+  end
+  context "bike_show_redesign_toggle flag" do
+    it "renders the legacy page when the flag is disabled" do
+      get "#{base_url}/#{bike.id}"
+      expect(response).to render_template(:show)
+    end
+
+    context "flag enabled for the current user" do
+      before { Flipper.enable_actor(:bike_show_redesign_toggle, current_user) }
+
+      it "redirects the html page but still renders the qr code png" do
+        get "#{base_url}/#{bike.id}"
+        expect(response).to redirect_to(registration_path(bike))
+
+        get "#{base_url}/#{bike.id}.png"
+        expect(response.status).to eq(200)
+      end
+
+      it "redirects with the query params, so scanned stickers aren't lost" do
+        get "#{base_url}/#{bike.id}?scanned_id=XD8888&organization_id=cool-org"
+        expect(response).to redirect_to(registration_path(bike, scanned_id: "XD8888", organization_id: "cool-org"))
+      end
+
+      it "renders the legacy page when no_redesign is passed" do
+        get "#{base_url}/#{bike.id}?no_redesign=true"
+        expect(response).to render_template(:show)
+      end
+
+      context "user opted into the legacy view" do
+        before { current_user.update(feature_registration_show_legacy: true) }
+
+        it "renders the legacy page" do
+          get "#{base_url}/#{bike.id}"
+          expect(response).to render_template(:show)
+        end
+      end
+    end
+
+    context "flag enabled only for another user" do
+      let(:other_user) { FactoryBot.create(:user_confirmed) }
+      before { Flipper.enable_actor(:bike_show_redesign_toggle, other_user) }
+
+      it "renders the legacy page" do
+        get "#{base_url}/#{bike.id}"
+        expect(response).to render_template(:show)
       end
     end
   end

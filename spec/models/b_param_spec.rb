@@ -37,6 +37,27 @@ RSpec.describe BParam, type: :model do
     end
   end
 
+  describe "stolen_attrs" do
+    context "legacy attribute names" do
+      let(:b_param) { BParam.new(params: {stolen_record: {address: "100 Main St", zipcode: "60622", state_id: 12}}) }
+      it "renames to the current attributes" do
+        expect(b_param.stolen_attrs).to eq({"street" => "100 Main St", "postal_code" => "60622", "region_record_id" => 12})
+      end
+      context "nested in stolen_records_attributes" do
+        let(:b_param) { BParam.new(params: {bike: {stolen_records_attributes: {"0" => {zipcode: "60622", street: "100 Main St"}}}}) }
+        it "renames to the current attributes" do
+          expect(b_param.stolen_attrs).to eq({"street" => "100 Main St", "postal_code" => "60622"})
+        end
+      end
+      context "with both legacy and current names" do
+        let(:b_param) { BParam.new(params: {stolen_record: {zipcode: "60622", postal_code: "10007"}}) }
+        it "prefers the current name" do
+          expect(b_param.stolen_attrs).to eq({"postal_code" => "10007"})
+        end
+      end
+    end
+  end
+
   describe "clean_params" do
     context "passed params" do
       it "calls the things we want it to call" do
@@ -585,6 +606,35 @@ RSpec.describe BParam, type: :model do
     end
   end
 
+  describe "self_made?" do
+    let(:b_param) { BParam.new(params: {bike: {owner_email: "owner@example.com"}}.as_json) }
+    let(:user) { FactoryBot.create(:user_confirmed, email: "owner@example.com") }
+
+    it "is only the registrant's own addresses" do
+      expect(b_param.self_made?(nil)).to be_falsey
+      expect(b_param.self_made?(user)).to be_truthy
+
+      # An additional address is theirs once it's confirmed, and not before
+      user.additional_emails = "second@example.com"
+      b_param.owner_email = " SECOND@example.com"
+      expect(b_param.self_made?(user)).to be_falsey
+      user_email = user.user_emails.find_by(email: "second@example.com")
+      user_email.confirm(user_email.confirmation_token)
+      expect(b_param.self_made?(user)).to be_truthy
+
+      b_param.owner_email = "someone@example.com"
+      expect(b_param.self_made?(user)).to be_falsey
+    end
+
+    context "without a user passed" do
+      it "answers for the creator" do
+        expect(b_param.self_made?).to be_falsey
+        b_param.creator = user
+        expect(b_param.self_made?).to be_truthy
+      end
+    end
+  end
+
   describe "status_hash_from_params" do
     let(:params) { ActionController::Parameters.new(params_hash) }
     def acparams(hash)
@@ -814,6 +864,72 @@ RSpec.describe BParam, type: :model do
         result = b_param.safe_bike_attrs({})
         expect(result).to match_hash_indifferently target.merge(cycle_type: "tandem", propulsion_type_slug: "foot-pedal")
         expect(result.keys).to include "propulsion_type_slug"
+      end
+    end
+  end
+
+  describe "email confirmation token" do
+    let(:b_param) { BParam.create(params: {bike: {owner_email: "owner@example.com"}}) }
+
+    let(:user) { FactoryBot.create(:user_confirmed) }
+
+    it "mints a token, reuses it and spends it on confirmation" do
+      token = b_param.generate_email_confirmation_token!
+      expect(token).to be_present
+      expect(b_param.email_confirmation_sent_at).to be_within(2.seconds).of Time.current
+
+      # Resending reuses the token, but re-stamps - the stamp is what rate limits it
+      b_param.update(params: b_param.params.merge("email_confirmation_sent_at" => Time.current - 1.hour))
+      expect(b_param.generate_email_confirmation_token!).to eq token
+      expect(b_param.email_confirmation_sent_at).to be_within(2.seconds).of Time.current
+
+      expect(b_param.confirm_email!(creator_id: user.id)).to be_truthy
+      # Single use - confirming spends the token, so there's nothing left to compare against
+      expect(b_param.reload).to have_attributes(email_confirmed?: true,
+        email_confirmation_token: nil, creator_id: user.id)
+    end
+
+    context "with a creator" do
+      let(:creator) { FactoryBot.create(:user_confirmed) }
+      before { b_param.update(creator_id: creator.id) }
+
+      it "keeps the creator it has" do
+        b_param.confirm_email!(creator_id: user.id)
+        expect(b_param.reload.creator_id).to eq creator.id
+      end
+    end
+
+    context "expired token" do
+      let(:expired_token) { SecurityTokenizer.new_token(Time.current - BParam::TOKEN_EXPIRATION - 1.day) }
+      before do
+        b_param.update(params: b_param.params.merge("email_confirmation_token" => expired_token,
+          "email_confirmation_email" => b_param.owner_email))
+      end
+
+      it "reads as expired, and mints a new token" do
+        expect(b_param.email_confirmation_token_expired?).to be_truthy
+
+        expect(b_param.generate_email_confirmation_token!).to_not eq expired_token
+        expect(b_param.email_confirmation_token_expired?).to be_falsey
+      end
+    end
+
+    context "owner_email edited after the link went out" do
+      let!(:token) { b_param.generate_email_confirmation_token! }
+
+      it "drops the token - it only proves the address it was mailed to" do
+        b_param.clean_params({bike: {owner_email: "someone-else@example.com"}}.as_json)
+        b_param.save!
+        expect(b_param.reload.email_confirmation_token).to be_nil
+
+        # A link for the new address is a new token
+        expect(b_param.generate_email_confirmation_token!).to_not eq token
+      end
+
+      it "keeps the token when only the address's casing changes" do
+        b_param.clean_params({bike: {owner_email: "Owner@Example.com"}}.as_json)
+        b_param.save!
+        expect(b_param.reload.email_confirmation_token).to eq token
       end
     end
   end

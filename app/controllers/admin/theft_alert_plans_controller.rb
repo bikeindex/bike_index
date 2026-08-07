@@ -18,7 +18,6 @@ module Admin
       if @theft_alert_plan.save
         redirect_to(edit_admin_theft_alert_plan_path(@theft_alert_plan))
       else
-        flash[:errors] = @theft_alert_plan.errors.full_messages
         render :new
       end
     end
@@ -33,7 +32,6 @@ module Admin
       if @theft_alert_plan.update(theft_alert_plan_params)
         redirect_to(admin_theft_alert_plans_path)
       else
-        flash[:errors] = @theft_alert_plan.errors.full_messages
         render :edit
       end
     end

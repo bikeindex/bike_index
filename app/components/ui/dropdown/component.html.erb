@@ -1,12 +1,5 @@
 <div class="tw:relative tw:inline-block" data-controller="ui--dropdown">
-  <button
-    type="button"
-    class="<%= button_classes %>"
-    id="<%= button_id %>"
-    aria-expanded="false"
-    data-action="click->ui--dropdown#toggle"
-    data-ui--dropdown-target="button"
-  >
+  <%= tag.button(**button_attributes) do %>
     <span class="tw:sr-only">Open <%= @name %> menu</span>
     <%= button_content %>
 
@@ -16,9 +9,9 @@
         tw:duration-200
       "
     >
-      ▾
+      <%= render UI::IconChevron::Component.new(direction: :down) %>
     </span>
-  </button>
+  <% end %>
 
   <div
     class="

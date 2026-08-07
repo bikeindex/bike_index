@@ -12,12 +12,12 @@
   </div>
 
   <% if @avery_export_redirect %>
-    <%= render UI::Alert::Component.new(text: t(".shared_alert_body"), kind: :success) %>
+    <%= render UI::Alerts::Base::Component.new(text: t(".shared_alert_body"), kind: :success) %>
   <% end %>
 
   <% if @export.deleted_at.present? %>
     <% deleted_time = content_tag(:span, l(@export.deleted_at, format: :convert_time), class: "localizeTime preciseTime withPreposition") %>
-    <%= render(UI::Alert::Component.new(kind: :error)) do %>
+    <%= render(UI::Alerts::Base::Component.new(kind: :error)) do %>
       This export was deleted <%= deleted_time %>
     <% end %>
   <% end %>
@@ -76,29 +76,34 @@
           <% bike_ids = @export.exported_bike_ids %>
 
           <% if bike_ids.present? %>
-            <a
-              class="small less-strong"
-              href="#show_exported_bikes"
-              aria-controls="show_exported_bikes"
-              data-toggle="collapse"
-            >
-              <% unless @export.only_custom_bike_ids %>
-                <% if @export&.rows.to_i > 100 %>
-                  <%= t(".show_first_100_bikes_in_export") %>
-                <% else %>
-                  <%= t(".show_bikes_in_export") %>
+            <details data-controller="ui--details">
+              <summary
+                data-action="click->ui--details#toggle"
+                class="
+                  small less-strong tw:cursor-pointer tw:list-none
+                  tw:[&::-webkit-details-marker]:hidden
+                "
+              >
+                <% unless @export.only_custom_bike_ids %>
+                  <% if @export&.rows.to_i > 100 %>
+                    <%= t(".show_first_100_bikes_in_export") %>
+                  <% else %>
+                    <%= t(".show_bikes_in_export") %>
+                  <% end %>
                 <% end %>
-              <% end %>
-            </a>
-            <div class="collapse" id="show_exported_bikes">
-              <ul class="exported-link-list">
+              </summary>
+
+              <ul
+                data-ui--details-target="content"
+                class="exported-link-list tw:hidden!"
+              >
                 <% bike_ids.each_with_index do |id, i| %>
                   <li>
                     <%= link_to id, bike_path(id, organization_id: current_organization.to_param) %><%= i == (@export.exported_bike_ids.count - 1) ? "" : "," %>
                   </li>
                 <% end %>
               </ul>
-            </div>
+            </details>
           <% end %>
         </td>
       </tr>
@@ -234,14 +239,17 @@
                     </strong>
                   </p>
                 <% end %>
-                <div data-controller="disclosure">
+                <div
+                  data-controller="ui--collapse"
+                  data-ui--collapse-param-value="show_assigned_stickers"
+                >
                   <%= render UI::Button::Component.new(
                     text: t(".show_previously_assigned_stickers"),
                     color: :link,
-                    data: {action: "disclosure#toggle"},
+                    data: {action: "ui--collapse#toggle", "ui--collapse-target": "trigger"},
                     aria: {expanded: false}) %>
 
-                  <div data-disclosure-target="content" class="tw:hidden">
+                  <div data-ui--collapse-target="content" class="tw:hidden">
                     <%= assigned_stickers %>
                   </div>
                 </div>

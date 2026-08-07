@@ -1,0 +1,14 @@
+---
+en:
+  components:
+    ui:
+      forms:
+        address_group:
+          address: Address
+          choose_country: Choose country
+          city: City
+          country: Country
+          postal_code: Postal code
+          region: Region
+          state: State
+          street_2: Address line 2

@@ -83,7 +83,7 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   def stolen_location
-    current_stolen_record&.address
+    StolenRecordV2Serializer.formatted_address_string_with_iso(current_stolen_record)
   end
 
   def stolen_coordinates

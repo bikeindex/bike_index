@@ -173,7 +173,7 @@ RSpec.describe BikeServices::Creator do
             expect(ActionMailer::Base.deliveries.count).to eq 0
 
             bike = Bike.unscoped.last
-            expect(SpamEstimator.estimate_bike(bike)).to eq 100
+            expect(SpamEstimator::Bike.estimate(bike)).to eq 100
             expect(bike.creator&.id).to eq user.id
             expect(bike.current_ownership&.id).to be_present
             expect(bike.likely_spam).to be_truthy
@@ -616,6 +616,45 @@ RSpec.describe BikeServices::Creator do
       b_param.params = {}
       instance.attach_photo(b_param, bike)
       expect(bike.public_images.count).to eq(1)
+    end
+
+    context "direct upload signed id" do
+      let(:bike) { FactoryBot.create(:bike) }
+      let(:blob) do
+        ActiveStorage::Blob.create_and_upload!(io: File.open(Rails.root.join("spec/fixtures/bike.jpg")),
+          filename: "bike.jpg", content_type: "image/jpeg")
+      end
+      let(:b_param) { FactoryBot.create(:b_param, params: {"image_signed_id" => blob.signed_id}) }
+      before { blob.update!(binx_data: {"b_param_id" => b_param.id}) }
+
+      it "creates a public image holding the already-uploaded blob" do
+        instance.attach_photo(b_param, bike)
+        public_image = bike.public_images.first
+        expect(bike.public_images.count).to eq 1
+        expect(public_image.file.attached?).to be_truthy
+        expect(public_image.file.blob).to eq blob
+        expect(public_image.image).to_not be_present
+      end
+
+      # A signed id is a bearer token, so the mint stamps which registration asked for it
+      context "blob minted by a different registration" do
+        before { blob.update!(binx_data: {"b_param_id" => b_param.id + 1}) }
+
+        it "refuses it" do
+          instance.attach_photo(b_param, bike)
+          expect(bike.public_images.count).to eq 0
+        end
+      end
+
+      # CleanUnattachedBlobsJob can beat a long-delayed confirmation to the blob
+      context "blob already reaped" do
+        before { blob.purge }
+
+        it "drops the photo rather than the registration" do
+          instance.attach_photo(b_param, bike)
+          expect(bike.public_images.count).to eq 0
+        end
+      end
     end
   end
 

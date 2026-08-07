@@ -22,7 +22,8 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.to).to eq([user.email])
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.tag).to eq "confirmation_email"
-      expect(mail.deliver_now.text_part.body.to_s).to include("Please confirm your email address").and include("Verify email")
+      expect(mail.body.encoded).to include(CGI.escapeHTML(confirm_users_url(id: user.id, code: user.confirmation_token)))
+      expect(mail.deliver_now.text_part.body.to_s).to include("Follow this link to sign in").and include("Sign in")
     end
     context "partner signup" do
       let(:user) { FactoryBot.create(:user_bikehub_signup) }
@@ -33,7 +34,8 @@ RSpec.describe CustomerMailer, type: :mailer do
         expect(mail.to).to eq([user.email])
         expect(mail.from).to eq(["contact@bikeindex.org"])
         expect(mail.tag).to eq "confirmation_email"
-        expect(mail.deliver_now.text_part.body.to_s).to include("Please confirm your email address").and include("Verify email")
+        expect(mail.body.encoded).to include(CGI.escapeHTML(confirm_users_url(id: user.id, code: user.confirmation_token, partner: "bikehub")))
+        expect(mail.deliver_now.text_part.body.to_s).to include("Follow this link to sign in").and include("Sign in")
       end
     end
   end

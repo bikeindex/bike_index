@@ -5,8 +5,6 @@ source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
-ruby "4.0.5"
-
 # Gems that are no longer in standard library as of Ruby 3.4
 gem "csv"
 gem "observer"
@@ -29,7 +27,7 @@ gem "logstash-event" # Use logstash format for logging data
 gem "rack-utf8_sanitizer" # prevent invalid UTF8 request errors
 gem "responders" # Rails responders modules
 gem "rack-attack" # Rate limiting
-gem "secure_headers", "~> 7.2"
+gem "secure_headers", "~> 7.3"
 
 # Speed, performance, etc
 gem "fast_blank"
@@ -63,7 +61,7 @@ gem "carrierwave", "~> 3.1" # File uploader
 # Using bikeindex fork to support rails 8
 gem "carrierwave_backgrounder", github: "bikeindex/carrierwave_backgrounder" # background processing of images
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
-gem "lexxy", "~> 0.1.26.beta" # Rich text editor (Action Text) for registration sequences
+gem "lexxy", "~> 0.9.27" # Rich text editor (Action Text) for registration sequences
 # gem "wicked_pdf" # TODO: PDFs are broken right now - commented out because they're unused
 # gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused
 gem "rqrcode", "3.2.0" # QR Code image generator
@@ -90,6 +88,7 @@ gem "MailchimpMarketing", github: "mailchimp/mailchimp-marketing-ruby" # Marketi
 gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "main" # For promoted alerts
 gem "down" # used to generate a local tempfile
 gem "faraday_middleware" # Manage faraday request flow
+gem "ruby-saml" # Organization SSO
 
 # OAuth provider, Grape, associated parts of API V2
 gem "api-pagination"
@@ -97,10 +96,6 @@ gem "doorkeeper" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
 gem "grape" # API DSL
 gem "grape_logging" # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
-
-# SAML 2.0 Service Provider (organization SSO). Pin >= 1.18: earlier versions carry
-# critical signature-verification CVEs (CVE-2024-45409, CVE-2025-25291/25292).
-gem "ruby-saml", ">= 1.18", "< 2"
 
 # Frontend
 gem "chartkick" # Display charts
@@ -126,24 +121,24 @@ group :production do
   gem "skylight" # Performance monitoring
 end
 
-group :staging, :production do
+group :sandbox, :production do
   gem "honeybadger" # Error monitoring
 end
 
-group :staging do
+group :sandbox do
   gem "thruster", require: false # HTTP/2, asset caching, X-Sendfile for Puma (used by review-app Dockerfile)
 end
 
-group :staging, :development do
+group :sandbox, :development do
   # Captures ActionMailer deliveries in a web UI mounted at /letter_opener.
-  # Loaded in development (local dev) and staging (review apps — see config/deploy.review.yml).
+  # Loaded in development (local dev) and sandbox (review apps — see config/deploy.review.yml).
   gem "letter_opener_web", "~> 3.0"
 end
 
-# dotenv-rails is also loaded in :staging so review apps pick up the committed
-# .env dev/sandbox values at boot (see config/environments/staging.rb). dotenv
+# dotenv-rails is also loaded in :sandbox so review apps pick up the committed
+# .env dev/sandbox values at boot (see config/environments/sandbox.rb). dotenv
 # never overrides a var kamal already sets, so per-app/managed secrets win.
-group :development, :test, :staging do
+group :development, :test, :sandbox do
   gem "dotenv-rails"
 end
 

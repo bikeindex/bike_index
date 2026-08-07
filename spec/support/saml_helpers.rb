@@ -95,6 +95,23 @@ module SamlHelpers
   end
 end
 
+# Point the SP keypair + BASE_URL at fixtures for any example tagged `:saml_env`,
+# restoring the originals afterward.
+RSpec.shared_context "saml_env" do
+  let(:sp_cert) { File.read(Rails.root.join("spec/fixtures/saml/sp_cert.pem")) }
+  let(:sp_key) { File.read(Rails.root.join("spec/fixtures/saml/sp_key.pem")) }
+
+  around do |example|
+    original = ENV.values_at("SAML_SP_CERTIFICATE", "SAML_SP_PRIVATE_KEY", "BASE_URL")
+    ENV["SAML_SP_CERTIFICATE"] = sp_cert
+    ENV["SAML_SP_PRIVATE_KEY"] = sp_key
+    ENV["BASE_URL"] = "https://bikeindex.org"
+    example.run
+    ENV["SAML_SP_CERTIFICATE"], ENV["SAML_SP_PRIVATE_KEY"], ENV["BASE_URL"] = original
+  end
+end
+
 RSpec.configure do |config|
   config.include SamlHelpers, type: :request
+  config.include_context "saml_env", :saml_env
 end

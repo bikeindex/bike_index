@@ -1,21 +1,10 @@
 require "rails_helper"
 
-RSpec.describe Saml::SettingsBuilder do
-  let(:sp_cert) { File.read(Rails.root.join("spec/fixtures/saml/sp_cert.pem")) }
-  let(:sp_key) { File.read(Rails.root.join("spec/fixtures/saml/sp_key.pem")) }
+RSpec.describe Saml::SettingsBuilder, :saml_env do
   let(:idp_cert) { File.read(Rails.root.join("spec/fixtures/saml/idp_cert.pem")) }
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
   let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
   subject(:settings) { described_class.build(saml_configuration) }
-
-  around do |example|
-    original = ENV.values_at("SAML_SP_CERTIFICATE", "SAML_SP_PRIVATE_KEY", "BASE_URL")
-    ENV["SAML_SP_CERTIFICATE"] = sp_cert
-    ENV["SAML_SP_PRIVATE_KEY"] = sp_key
-    ENV["BASE_URL"] = "https://bikeindex.org"
-    example.run
-    ENV["SAML_SP_CERTIFICATE"], ENV["SAML_SP_PRIVATE_KEY"], ENV["BASE_URL"] = original
-  end
 
   it "sets slug-scoped SP urls" do
     expect(settings.sp_entity_id).to eq "https://bikeindex.org/sso/#{organization.to_param}/metadata"
@@ -39,17 +28,6 @@ RSpec.describe Saml::SettingsBuilder do
     expect(settings.security[:authn_requests_signed]).to be true
     expect(settings.security[:digest_method]).to eq XMLSecurity::Document::SHA256
     expect(settings.security[:signature_method]).to eq XMLSecurity::Document::RSA_SHA256
-  end
-
-  it "does not require encrypted assertions by default" do
-    expect(settings.security[:want_assertions_encrypted]).to be false
-  end
-
-  context "with want_assertions_encrypted" do
-    let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, :encrypted, organization:) }
-    it "requires encrypted assertions" do
-      expect(settings.security[:want_assertions_encrypted]).to be true
-    end
   end
 
   context "with a rotation-overlap cert" do

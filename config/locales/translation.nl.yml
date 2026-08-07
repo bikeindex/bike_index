@@ -1899,10 +1899,6 @@ nl:
         unable_to_find_graduated_notification: Kan die afgestudeerde melding niet
           vinden!
         unable_to_find_parking_notification: Kan die parkeermelding niet vinden!
-    application:
-      handle_unverified_request:
-        csrf_invalid: CSRF ongeldig. Neem contact met ons op als u niet weet waarom
-          u dit bericht ontvangt.
     feedbacks:
       block_the_spam:
         please_sign_in: Meld je aan om dat bericht te verzenden
@@ -2072,6 +2068,7 @@ nl:
       sessionable:
         sign_in_and_redirect:
           logged_in: Ingelogd!
+          organization_signed_in: Je bent ingelogd
           user_is_banned: Het spijt ons, maar het lijkt erop dat uw account is vergrendeld.
             Neem contact met ons op als u niet zeker weet waarom.
         skip_if_signed_in:
@@ -2222,6 +2219,13 @@ nl:
         set_interpreted_params:
           we_dont_know_location: Sorry, we kennen de locatie "%{location}" niet. Probeer
             een andere locatie om te zoeken naar nabijgelegen locaties.
+    application:
+      handle_unverified_request:
+        invalid_authenticity_token: Het verzenden van het formulier is mislukt, probeer
+          het opnieuw. Als dit blijft gebeuren, wordt waarschijnlijk informatie die
+          we nodig hebben geblokkeerd door een VPN of een privacy-extensie. Probeer
+          deze uit te schakelen voor bikeindex.org. Stuur een e-mail naar contact@bikeindex.org
+          als het probleem zich blijft voordoen.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -2239,12 +2243,6 @@ nl:
         this_email_is_about: Deze e-mail gaat over de %{bike} geregistreerd op Bike
           Index op %{registration_date}
     confirmation_email:
-      html:
-        click_to_verify_html: Klik op de knop <em>E-mail verifiëren</em> om het aanmelden
-          te voltooien!
-        please_confirm_your_email_address: Bevestig je e-mailadres
-        verify_email: Verifieer Email
-        youre_almost_there: Je bent er bijna!
       subject: Bevestig uw e-mail met Bike Index!
     invoice_email:
       html:
@@ -4196,24 +4194,24 @@ nl:
       sign_in_with_magic_link: Inloggen zonder wachtwoord
       unable_to_auth: Kan dat token niet verifiëren
       your_email_address: Uw e-mailadres
-      if_not_click_button: Zo niet, klik dan op de onderstaande knop
-      sign_in: Log in
-      you_should_be_signed_in_automatically: Je zou automatisch ingelogd moeten zijn.
+    magic_link_sent:
+      follow_the_link_back: Volg de link in de e-mail om in te loggen!
+      we_sent_a_magic_sign_in_link: We hebben je een magische inloglink gestuurd
     new:
-      dont_have_an_account: Heb je nog geen account?
       email: E-mail
       forgot_your_password: Wachtwoord vergeten?
       get_on_bike_index: Ga op Bike Index
       keep_me_logged_in: Ik wil ingelogd blijven
       log_in: Log in
-      no_bike_index_account: geen Bike Index-account?
-      or: of
       password: Wachtwoord
-      sign_in_using_facebook: Log in met Facebook
-      sign_in_using_magic_link: E-mail aanmelden link
-      sign_in_using_strava: Log in met Strava
-      sign_up: Registreren
-      sign_in_using_globalid: Log in met globaliD
+      continue: Doorgaan
+      email_me_the_link: Stuur me de link via e-mail.
+      log_in_or_sign_up: Log in of registreer je
+      org_uses_passwordless: Uw organisatie meldt zich aan zonder wachtwoord.
+      passwordless_help: We sturen je een beveiligde link per e-mail om in te loggen.
+      sign_in_without_password: Aanmelden zonder wachtwoord
+    identify:
+      different_email: Aanmelden met een ander e-mailadres
   shared:
     email_bike_box:
       color: Kleur
@@ -5407,6 +5405,11 @@ nl:
       index:
         loading_results: Resultaten laden...
   components:
+    sessions:
+      sign_in_interstitial:
+        if_not_click_button: Zo niet, klik dan op de onderstaande knop
+        sign_in: Log in
+        you_should_be_signed_in_automatically: Je zou automatisch ingelogd moeten zijn.
     search:
       everything_combobox:
         query_items_description: Zoekbeschrijvingen combobox
@@ -5441,17 +5444,10 @@ nl:
       result_view_select:
         bike_box_view: Bekijk als lijst
         thumbnail_view: Bekijken als miniaturen
-      form_organized:
-        doesnt_look_like_serial: Dit lijkt geen serienummer. Serienummers bestaan
-          meestal uit 6 of meer letters en cijfers en bevinden zich onder de trapas.
-        search_for_serial_number: Zoek naar framenummer
-        submit: Voorleggen
-        search_notes: Zoeknotities
-        search_owner_email_or_name: Zoek naar het e-mailadres of de naam van de eigenaar.
-      results_frame:
+    search_results:
+      frame:
         rate_limited: Te veel zoekopdrachten te snel achter elkaar — je hebt een limiet
           bereikt. Wacht even en probeer het opnieuw.
-    search_results:
       bike_box:
         location: Plaats
         posted_at: Genoteerd
@@ -5467,8 +5463,6 @@ nl:
         member: Lid van Bike Index
       container:
         no_results: Er zijn geen registraties die exact overeenkomen met uw zoekopdracht
-      multi_result_chip:
-        no_results: geen overeenkomsten
     page_block:
       marketplace_listing_panel:
         condition: Voorwaarde
@@ -5520,7 +5514,7 @@ nl:
         letter_opener_tooltip: Bekijk de e-mail die door deze review-app is verzonden.
         pr_link: 'PR #%{number}'
         commit_tooltip: 'huidige commit:'
-        label_staging: Enscenering
+        label_sandbox: Sandbox
         superadmin_button: Meld u aan als superbeheerder.
         superadmin_signed_in: ingelogd als superbeheerder
       footer:
@@ -5560,6 +5554,12 @@ nl:
         legal: Juridisch
         social_media: Sociale media
     emails:
+      confirmation_email:
+        click_to_sign_in_html: Klik op de knop <em>Inloggen</em> om het aanmelden te
+          voltooien!
+        follow_this_link_to_sign_in: Volg deze link om in te loggen
+        sign_in: Inloggen
+        youre_almost_there: Je bent er bijna!
       partials:
         bike_box:
           bike_photo: Fietsfoto
@@ -5703,7 +5703,110 @@ nl:
         year: jaar
       chart_async_frame:
         loading_chart: Grafiek laden...
+      alerts:
+        object_error:
+          errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen
+            dat dit %{object_name} wordt opgeslagen:"
+      forms:
+        legacy_form_well:
+          address_record:
+            address: Adres
+            address_no_street: Adres
+            address_or_intersection: Adres of kruispunt
+            address_school: Postadres van de campus
+            choose_country: Kies land
+            city: City
+            postal_code: Postcode
+            region: Regio / Provincie
+            state: Staat
+            street_2: Straatadres regel 2 (optioneel)
+            where_was_it_status: Waar was het %{bike_status}?
+            your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
+          address_record_with_default:
+            edit_my_account_path: bewerken op mijn account
+            use_account_address: Gebruik accountadres
     org:
+      search:
+        form:
+          doesnt_look_like_serial: Dit lijkt geen serienummer. Serienummers bestaan
+            meestal uit 6 of meer letters en cijfers en bevinden zich onder de trapas.
+          search_for_serial_number: Zoek naar framenummer
+          submit: Voorleggen
+          search_notes: Zoeknotities
+          search_owner_email_or_name: Zoek naar het e-mailadres of de naam van de eigenaar.
+        wrapper:
+          affiliation: Aansluiting
+          avery_exportable: Avery Exporteerbaar
+          bike: Registratie
+          e_vehicle_propulsion: Elektrisch voertuig (aandrijving)
+          e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
+          link: Link
+          matching_bikes_html: "%{count} %{cycle_type} overeenkomend"
+          mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
+          phone: Telefoon
+          reg_address: Adres
+          registered_bikes_html: "%{count} %{cycle_type} overeenkomend met %{org_name}"
+          student_id: Student-ID
+          vehicle: Registratie
+          view_matching_any_audit: weergave die overeenkomt met elke audit
+        settings:
+          address: 'Adres:'
+          all: Alle
+          avery_cell: Avery Exporteerbaar
+          bike: Registratie
+          color_cell: Kleur
+          create_export_of_vehicles: Export maken van gezochte %{cycle_type}
+          created_at_cell: Geregistreerd
+          creation_description_cell: Bron
+          cycle_type_cell: 'Voertuigtype:'
+          default: standaard
+          filter_impounded_html: alleen <strong>in beslag genomen</strong>
+          filter_no_address_html: alleen <strong>geen</strong> adres
+          filter_no_sticker_html: alleen <strong>geen</strong> sticker
+          filter_not_impounded_html: alleen <strong>niet</strong> in beslag genomen
+          filter_not_stolen_or_impounded_html: niet gestolen of in beslag genomen
+          filter_stolen_html: alleen gestolen
+          filter_with_address_html: alleen <strong>met</strong> adres
+          filter_with_stickers_html: alleen <strong>met</strong> stickers
+          impound_id_cell: Inbeslagname-ID
+          impounded_cell: In beslag genomen bij
+          manufacturer_cell: Fabrikant
+          model_cell: Model
+          none: geen
+          notes_cell: Notes
+          owner_email_cell: Verzonden naar
+          owner_name_cell: Eigenaar naam
+          propulsion_type_cell: Elektrisch voertuig (aandrijving)
+          reg_address_cell: Adres
+          reg_extra_registration_number_cell: Secundair#
+          reg_organization_affiliation_cell: Aansluiting
+          reg_phone_cell: Telefoon
+          reg_student_id_cell: Student-ID
+          serial_number_cell: Serie
+          settings: Instellingen
+          show_notes_search: notities weergeven zoeken
+          status: 'Toestand:'
+          status_cell: Toestand
+          sticker_cell: Sticker
+          stickers: 'stickers:'
+          stolen_cell: Gestolen
+          updated_at_cell: Bijgewerkt
+          url_cell: URL
+          vehicle: Registratie
+          visible_columns: Zichtbare kolommen
+          multi_search: multi serieel zoeken
+      search_results:
+        multi_result_chip:
+          no_results: geen overeenkomsten
+        multi_results:
+          first_n_shown_html: "— eerst %{limit} weergegeven,"
+          no_exact_matches: 'Geen exacte overeenkomsten. Serienummers die er dichtbij
+            liggen:'
+          no_matches_found: Geen overeenkomsten gevonden
+          result_count_html: "— %{count} %{results}"
+          serial_label: 'Serial:'
+          view_all: alles bekijken
+          sticker_label: 'Sticker:'
       location_address_fields:
         address: Adres
         choose_country: Kies land
@@ -5827,119 +5930,3 @@ nl:
         reprocess_instruction: Ga terug naar deze pagina en klik op de knop 'import
           opnieuw verwerken' hieronder.
         unknown_ascend_name: Onbekende Ascend-naam
-      registration_search:
-        affiliation: Aansluiting
-        assign_bike_sticker: Sticker toewijzen
-        avery: Avery?
-        avery_exportable: Avery Exporteerbaar
-        bike: Registratie
-        color: Kleur
-        e_vehicle_propulsion: Elektrisch voertuig (aandrijving)
-        e_vehicles_for_audit: 'Elektrische voertuigen voor audit:'
-        email_hidden: email verborgen
-        impound_id: Inbeslagname-ID
-        impounded: In beslag genomen bij
-        link: Link
-        link_sticker: link sticker
-        manufacturer: Fabrikant
-        matching_bikes_html: "%{count} %{cycle_type} overeenkomend"
-        mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
-        model: Model
-        notes: Notes
-        owner_name: Eigenaar naam
-        phone: Telefoon
-        propulsion_type: Voortstuwing
-        reg_address: Adres
-        registered: Geregistreerd
-        registered_bikes_html: "%{count} %{cycle_type} overeenkomend met %{org_name}"
-        secondary_number: Secundair#
-        sent_to: Verzonden naar
-        serial: Serie
-        source: Bron
-        status_cell: Toestand
-        sticker: Sticker
-        stolen: Gestolen
-        student_id: Student-ID
-        updated: Bijgewerkt
-        url: URL
-        vehicle: Registratie
-        vehicle_type: 'Voertuigtype:'
-        view_matching_any_audit: weergave die overeenkomt met elke audit
-        hidden_not_registered: verborgen, niet geregistreerd bij %{org_name}
-      registration_search_settings:
-        address: 'Adres:'
-        all: Alle
-        avery_cell: Avery Exporteerbaar
-        bike: Registratie
-        color_cell: Kleur
-        create_export_of_vehicles: Export maken van gezochte %{cycle_type}
-        created_at_cell: Geregistreerd
-        creation_description_cell: Bron
-        cycle_type_cell: 'Voertuigtype:'
-        default: standaard
-        filter_impounded_html: alleen <strong>in beslag genomen</strong>
-        filter_no_address_html: alleen <strong>geen</strong> adres
-        filter_no_sticker_html: alleen <strong>geen</strong> sticker
-        filter_not_impounded_html: alleen <strong>niet</strong> in beslag genomen
-        filter_not_stolen_or_impounded_html: niet gestolen of in beslag genomen
-        filter_stolen_html: alleen gestolen
-        filter_with_address_html: alleen <strong>met</strong> adres
-        filter_with_stickers_html: alleen <strong>met</strong> stickers
-        impound_id_cell: Inbeslagname-ID
-        impounded_cell: In beslag genomen bij
-        manufacturer_cell: Fabrikant
-        model_cell: Model
-        none: geen
-        notes_cell: Notes
-        owner_email_cell: Verzonden naar
-        owner_name_cell: Eigenaar naam
-        propulsion_type_cell: Elektrisch voertuig (aandrijving)
-        reg_address_cell: Adres
-        reg_extra_registration_number_cell: Secundair#
-        reg_organization_affiliation_cell: Aansluiting
-        reg_phone_cell: Telefoon
-        reg_student_id_cell: Student-ID
-        serial_number_cell: Serie
-        settings: Instellingen
-        show_notes_search: notities weergeven zoeken
-        status: 'Toestand:'
-        status_cell: Toestand
-        sticker_cell: Sticker
-        stickers: 'stickers:'
-        stolen_cell: Gestolen
-        updated_at_cell: Bijgewerkt
-        url_cell: URL
-        vehicle: Registratie
-        visible_columns: Zichtbare kolommen
-        multi_search: multi serieel zoeken
-      multi_search_results:
-        first_n_shown_html: "— eerst %{limit} weergegeven,"
-        no_exact_matches: 'Geen exacte overeenkomsten. Serienummers die er dichtbij
-          liggen:'
-        no_matches_found: Geen overeenkomsten gevonden
-        result_count_html: "— %{count} %{results}"
-        serial_label: 'Serial:'
-        view_all: alles bekijken
-        sticker_label: 'Sticker:'
-    alerts:
-      object_errors:
-        errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
-          dit %{object_name} wordt opgeslagen:"
-    form:
-      legacy_form_well:
-        address_record:
-          address: Adres
-          address_no_street: Adres
-          address_or_intersection: Adres of kruispunt
-          address_school: Postadres van de campus
-          choose_country: Kies land
-          city: City
-          postal_code: Postcode
-          region: Regio / Provincie
-          state: Staat
-          street_2: Straatadres regel 2 (optioneel)
-          where_was_it_status: Waar was het %{bike_status}?
-          your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
-        address_record_with_default:
-          edit_my_account_path: bewerken op mijn account
-          use_account_address: Gebruik accountadres

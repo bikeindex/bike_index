@@ -1,0 +1,11 @@
+<% if alert? %>
+  <%= render(UI::Alerts::Base::Component.new(kind: :purple, header: @title, margin_classes: "")) do %>
+    <%= content %>
+  <% end %>
+<% else %>
+  <%= render(UI::Modal::Component.new(id: @id, title: @title, open: true)) do |modal| %>
+    <% modal.with_body do %>
+      <%= content %>
+    <% end %>
+  <% end %>
+<% end %>

@@ -2,11 +2,17 @@ module Integrations
   class BikeBook
     require "net/http"
 
+    # Registration blocks on this, so it has to give up well inside rack-timeout's 30s -
+    # Net::HTTP defaults to 60s. Dropping the lookup only costs bike book data
+    TIMEOUT_SECONDS = 5
+
     def make_request(query, method = nil)
       begin
         uri = URI("http://bikebook.io#{method}")
         uri.query = URI.encode_www_form(query)
-        res = Net::HTTP.get_response(uri)
+        res = Net::HTTP.start(uri.hostname, uri.port, open_timeout: TIMEOUT_SECONDS, read_timeout: TIMEOUT_SECONDS) do |http|
+          http.request(Net::HTTP::Get.new(uri))
+        end
       rescue
         return nil
       end

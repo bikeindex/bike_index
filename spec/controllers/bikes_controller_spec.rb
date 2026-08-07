@@ -285,7 +285,7 @@ RSpec.describe BikesController, type: :controller do
         get :new, params: {stolen: true, b_param_token: "cool-token-thing"}
         expect(response).to redirect_to new_user_url
         # expect(Rack::Utils.parse_query(session[:discourse_redirect])).to eq(discourse_params)
-        expect(flash[:info]).to be_present
+        expect(flash[:notice]).to be_present
         expect(session[:return_to]).to eq new_bike_path(stolen: true, b_param_token: "cool-token-thing")
       end
     end
@@ -354,7 +354,7 @@ RSpec.describe BikesController, type: :controller do
             bike = assigns(:bike)
             expect(bike.is_a?(Bike)).to be_truthy
             expect(assigns(:b_param)).to_not eq b_param
-            expect(flash[:info]).to match(/couldn.t find/i)
+            expect(flash[:notice]).to match(/couldn.t find/i)
           end
         end
       end
@@ -464,8 +464,8 @@ RSpec.describe BikesController, type: :controller do
             country_id: country.id,
             street: "2459 W Division St",
             city: "Chicago",
-            zipcode: "60622",
-            state_id: state.id,
+            postal_code: "60622",
+            region_record_id: state.id,
             date_stolen: (Time.current - 1.day).utc,
             timezone: "UTC"
           }
@@ -569,7 +569,7 @@ RSpec.describe BikesController, type: :controller do
             expect(assigns[:persist_email]).to be_falsey
             expect(response).to redirect_to(embed_extended_organization_url(organization))
             # Have to do after, because inline sidekiq ignores delays and created_bike isn't present when it's run
-            Images::AssociatorJob.new.perform
+            ImageJobs::AssociatorJob.new.perform
             bike = Bike.reorder(:id).last
             expect(bike.owner_email).to eq bike_params[:owner_email].downcase
             expect(bike.current_ownership.origin).to eq "embed_extended"
@@ -955,8 +955,8 @@ RSpec.describe BikesController, type: :controller do
               street: "66666666 foo street ,",
               country_id: country.id,
               city: "Chicago ", # seems fairly common that people include a trailing comma, probably a paste error
-              zipcode: "60647 , ", # here too
-              state_id: state.id,
+              postal_code: "60647 , ", # here too
+              region_record_id: state.id,
               locking_description: "Some description",
               lock_defeat_description: "It was cuttttt",
               theft_description: "Someone stole it and stuff",
@@ -976,7 +976,7 @@ RSpec.describe BikesController, type: :controller do
               }
             }
           end
-          let(:skipped_attrs) { %w[street city zipcode proof_of_ownership receive_notifications timezone date_stolen estimated_value].map(&:to_sym) }
+          let(:skipped_attrs) { %w[street city postal_code proof_of_ownership receive_notifications timezone date_stolen estimated_value].map(&:to_sym) }
           include_context :geocoder_real
           it "updates and returns to the right page" do
             # VCR for some reason fails to match this request with standard matching, so specify different
@@ -1008,7 +1008,7 @@ RSpec.describe BikesController, type: :controller do
               expect(current_stolen_record.no_notify?).to be_truthy
               expect(current_stolen_record.estimated_value).to eq 1200
               expect(current_stolen_record.city).to eq "Chicago"
-              expect(current_stolen_record.zipcode).to eq "60647"
+              expect(current_stolen_record.postal_code).to eq "60647"
               expect(current_stolen_record.street).to eq "66666666 foo street"
               stolen_attrs.except(*skipped_attrs).each do |key, value|
                 pp key unless current_stolen_record.send(key) == value
@@ -1026,8 +1026,8 @@ RSpec.describe BikesController, type: :controller do
                 street: "2222 Cambridge St.,",
                 country_id: canada.id,
                 city: "Vancouver\n, ",
-                zipcode: "v5l1E6",
-                state_id: state.id,
+                postal_code: "v5l1E6",
+                region_record_id: state.id,
                 locking_description: "I locked it up!",
                 lock_defeat_description: "",
                 theft_description: "I deeply care about this bike, nefariousness!",
@@ -1060,14 +1060,14 @@ RSpec.describe BikesController, type: :controller do
                 expect(current_stolen_record.proof_of_ownership).to be_truthy
                 expect(current_stolen_record.receive_notifications).to be_falsey
                 expect(current_stolen_record.estimated_value).to eq 5200
-                expect(current_stolen_record.state_id).to be_blank # Ensure we don't do this accidentally, like we were
+                expect(current_stolen_record.region_record_id).to be_blank # Ensure we don't do this accidentally, like we were
                 expect(current_stolen_record.latitude).to be_within(0.001).of(49.1573)
                 expect(current_stolen_record.longitude).to be_within(0.001).of(-123.9664322)
                 expect(current_stolen_record.country_id).to eq Country.canada.id
                 expect(current_stolen_record.city).to eq "Vancouver"
-                expect(current_stolen_record.zipcode).to eq "V5L 1E6"
+                expect(current_stolen_record.postal_code).to eq "V5L 1E6"
                 expect(current_stolen_record.street).to eq "2222 Cambridge St."
-                stolen_attrs.except(:state_id, *skipped_attrs).each do |key, value|
+                stolen_attrs.except(:region_record_id, *skipped_attrs).each do |key, value|
                   pp key unless current_stolen_record.send(key) == value
                   expect(current_stolen_record.send(key)).to eq value
                 end

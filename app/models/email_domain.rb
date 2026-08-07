@@ -25,10 +25,16 @@ class EmailDomain < ApplicationRecord
   include StatusHumanizable
 
   INVALID_REGEX = /[\/\\()\[\]=\s!"']/
+  # RFC 2606 / 6761 reserved domains, which no message ever arrives at. Also checked
+  # client side, so keep it to syntax JS shares -- see UI::Forms::Email::Component.
+  RESERVED_REGEX = /
+    \A(?:.+\.)?example\.(?:com|net|org)\z |
+    (?:\A|\.)(?:test|example|invalid|localhost)\z
+  /xi
   INVALID_DOMAIN = "(invalid).domain"
   EMAIL_MIN_COUNT = ENV.fetch("EMAIL_DOMAIN_BAN_USER_MIN_COUNT", 3).to_i
   STATUS_ENUM = {permitted: 0, provisional_ban: 1, banned: 2, ignored: 3}.freeze
-  TLD_HAS_SUBDOMAIN = %w[.au .hk .il .in .jp .mx .nz .tw .uk .us .za].freeze
+  TLD_HAS_SUBDOMAIN = %w[.au .br .hk .il .in .jp .mx .nz .tw .uk .us .za].freeze
   SPAM_SCORE_AUTO_BAN = 5
   # We don't verify with EmailDomains in most tests because it slows things down.
   # This also includes an env to turn if off in case things block up
@@ -218,7 +224,7 @@ class EmailDomain < ApplicationRecord
   end
 
   def calculated_bikes
-    Bike.matching_domain(domain)
+    Bike.unscoped.matching_domain(domain)
   end
 
   def calculated_b_params

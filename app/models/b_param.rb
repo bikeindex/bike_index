@@ -31,6 +31,8 @@
 
 # b_param stands for Bike param
 class BParam < ApplicationRecord
+  # TODO: #3952 - stolen record legacy attrs, to support accepting the old names
+  LEGACY_STOLEN_ATTRS = {"address" => "street", "zipcode" => "postal_code", "state_id" => "region_record_id"}.freeze
   REGISTRATION_INFO_ATTRS = %w[
     accuracy
     bike_code
@@ -70,6 +72,9 @@ class BParam < ApplicationRecord
     stolen
     street
   ].freeze
+  # How long a register flow registration resumes by token, and so how long its
+  # emailed confirmation link works
+  TOKEN_EXPIRATION = 90.days
   mount_uploader :image, ImageUploaderBackgrounded
   process_in_background :image, CarrierWaveProcessJob # Defer version generation so large uploads don't hit the 30s Rack::Timeout
 
@@ -90,6 +95,12 @@ class BParam < ApplicationRecord
   scope :partial_registrations, -> { where(origin: "embed_partial") }
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
   scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
+  # register/new shells whose step 1 was never submitted (manufacturer is required
+  # at submit) - only seeds and a prefilled email, nothing worth keeping
+  scope :without_bike_values, -> { bike_params_empty.or(where(origin: "register_flow").where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
+  # Tokenized lookups resume registrations for up to a month
+  scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
+  scope :unexpired_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - TOKEN_EXPIRATION) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
   scope :cycle_type_bike, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NULL").or(bike_params_empty) }
@@ -126,9 +137,16 @@ class BParam < ApplicationRecord
       stolen_attrs = h["bike"].delete "stolen_record"
       if stolen_attrs.present? && stolen_attrs.delete_if { |k, v| v.blank? } && stolen_attrs.keys.any?
         h["stolen_record"] = stolen_attrs
-        h["stolen_record"]["street"] = h["stolen_record"].delete("address") if h["stolen_record"]["address"].present?
       end
       h
+    end
+
+    # TODO: #3952 - stolen record legacy attrs
+    def rename_legacy_stolen_attrs(s_attrs)
+      LEGACY_STOLEN_ATTRS.each_with_object(s_attrs) do |(legacy, renamed), attrs|
+        value = attrs.delete(legacy)
+        attrs[renamed] = value if value.present? && attrs[renamed].blank?
+      end
     end
 
     def find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil, bike_sticker: nil)
@@ -159,7 +177,7 @@ class BParam < ApplicationRecord
     def with_organization_or_no_creator(toke)
       return if toke.blank?
 
-      without_bike.where("created_at >= ?", Time.current - 1.month).where(id_token: toke)
+      without_bike.recent_with_token(toke)
         .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params["creation_organization_id"].present? }
     end
 
@@ -287,7 +305,7 @@ class BParam < ApplicationRecord
     # Set the date_stolen if it was passed, if something else didn't already set date_stolen
     date_stolen = params.dig("bike", "date_stolen")
     s_attrs["date_stolen"] ||= date_stolen if date_stolen.present?
-    s_attrs.except("phone_no_show", "show_address")
+    self.class.rename_legacy_stolen_attrs(s_attrs.except("phone_no_show", "show_address"))
   end
 
   def impound_attrs
@@ -350,6 +368,19 @@ class BParam < ApplicationRecord
     bike["manufacturer_id"]
   end
 
+  def manufacturer_other
+    bike["manufacturer_other"]
+  end
+
+  # Mirrors Bike#type - the cycle_type for display
+  def type
+    @type ||= type_titleize&.downcase
+  end
+
+  def type_titleize
+    @type_titleize ||= CycleType.new(cycle_type).short_name_translation
+  end
+
   def is_pos
     bike["is_pos"] || false
   end
@@ -388,6 +419,12 @@ class BParam < ApplicationRecord
     bike["user_name"]
   end
 
+  def self_made?(user = creator)
+    return false if user.blank?
+
+    ([user.email] + user.confirmed_emails).include?(EmailNormalizer.normalize(owner_email))
+  end
+
   def creation_organization
     Organization.friendly_find(creation_organization_id)
   end
@@ -398,6 +435,68 @@ class BParam < ApplicationRecord
 
   def partial_registration?
     origin == "embed_partial"
+  end
+
+  def email_confirmed?
+    params["email_confirmed_at"].present?
+  end
+
+  # Waiting on the confirmation link - there's an address, and nothing has proven
+  # it belongs to whoever is registering
+  def email_unconfirmed?
+    owner_email.present? && !email_confirmed?
+  end
+
+  # Spends the confirmation token, so a forwarded email can't sign anyone in later
+  def confirm_email!(creator_id: nil)
+    return true if email_confirmed?
+
+    update(creator_id: self.creator_id || creator_id,
+      params: params.merge("email_confirmed_at" => Time.current)
+        .except("email_confirmation_token", "email_confirmation_email"))
+  end
+
+  # Distinct from id_token, which is in the registrant's own URL before any email goes
+  # out - only a secret that lived solely in the email proves the address received it,
+  # and only for the address it was mailed to
+  def email_confirmation_token
+    params["email_confirmation_token"] if params["email_confirmation_email"] == EmailNormalizer.normalize(owner_email)
+  end
+
+  # A blank token reads as expired - token_time floors at EARLIEST_TOKEN_TIME
+  def email_confirmation_token_expired?
+    SecurityTokenizer.token_time(email_confirmation_token) < Time.current - TOKEN_EXPIRATION
+  end
+
+  # Reuses an unexpired token, so the link already in their inbox keeps working - but
+  # re-stamps either way, since the stamp is what rate limits resends
+  def generate_email_confirmation_token!
+    token = email_confirmation_token_expired? ? SecurityTokenizer.new_token : email_confirmation_token
+    update(params: params.merge("email_confirmation_token" => token,
+      "email_confirmation_email" => EmailNormalizer.normalize(owner_email),
+      "email_confirmation_sent_at" => Time.current))
+    token
+  end
+
+  # Written by whatever asked for the send rather than by the job that delivers it,
+  # so it rate limits even when delivery drops the email
+  def email_confirmation_sent_at
+    Binxtils::TimeParser.parse(params["email_confirmation_sent_at"])
+  end
+
+  # An ActiveStorage blob the browser uploaded straight to the bucket. Held as a signed id
+  # rather than an attachment so the blob's only owner is the PublicImage created from it -
+  # a b_param attachment would purge the blob out from under the bike when it's cleaned up.
+  def image_signed_id
+    params["image_signed_id"]
+  end
+
+  # nil once CleanUnattachedBlobsJob has reaped it, which a late registration has to survive.
+  # Only a blob this registration minted - a signed id is a bearer token, so without the stamp
+  # any registration could claim any other's photo.
+  def image_blob
+    blob = ActiveStorage::Blob.find_signed(image_signed_id)
+    blob if blob&.binx_data&.dig("b_param_id") == id
   end
 
   def primary_frame_color
@@ -575,6 +674,10 @@ class BParam < ApplicationRecord
     Manufacturer.calculated_mnfg_name(manufacturer, bike["manufacturer_other"])
   end
 
+  def color_and_brand
+    [primary_frame_color.presence, mnfg_name].compact.join(" ")
+  end
+
   def generate_id_token
     self.id_token ||= SecurityTokenizer.new_token
   end
@@ -646,8 +749,8 @@ class BParam < ApplicationRecord
   def process_image_if_required
     return true if image_processed || image.blank?
 
-    Images::AssociatorJob.perform_in(5.seconds)
-    Images::AssociatorJob.perform_in(1.minutes)
+    ImageJobs::AssociatorJob.perform_in(5.seconds)
+    ImageJobs::AssociatorJob.perform_in(1.minutes)
   end
 
   def set_color_key(key = nil)

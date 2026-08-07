@@ -61,6 +61,15 @@ RSpec.describe PageBlock::HeaderTags::Component, type: :component do
     expect(component.css('[name="twitter:image"]').first["content"]).to eq twitter_image
   end
 
+  # Constant across every layout the component renders in, so it isn't nested under a controller
+  describe "viewport" do
+    let(:controller_name) { "welcome" }
+
+    it "pins the load scale at 1:1" do
+      expect(component.css('meta[name="viewport"]').first["content"]).to eq "width=device-width, initial-scale=1"
+    end
+  end
+
   context "welcome controller" do
     let(:controller_name) { "welcome" }
 
@@ -310,10 +319,10 @@ RSpec.describe PageBlock::HeaderTags::Component, type: :component do
         let(:title) { "Stolen #{mnfg_name}" }
         let(:description) do
           "#{bike.primary_frame_color.name} #{mnfg_name}, serial: #{bike.serial_number.upcase}. " \
-          "Stolen: #{Time.current.strftime("%Y-%m-%d")}, from: Chicago, IL 60608, US"
+          "Stolen: #{Time.current.strftime("%Y-%m-%d")}, from: Chicago, IL 60608, United States"
         end
         it "returns expected things" do
-          expect(bike.reload.current_stolen_record.address).to eq "Chicago, IL 60608, US"
+          expect(bike.reload.current_stolen_record.formatted_address_string).to eq "Chicago, IL 60608"
 
           expect_matching_tags(title:, description:, updated_at: bike.updated_at)
         end
@@ -321,7 +330,7 @@ RSpec.describe PageBlock::HeaderTags::Component, type: :component do
           let!(:public_image) { FactoryBot.create(:public_image, imageable: bike, image: File.open(image_path)) }
           let(:stolen_record) { bike.current_stolen_record }
           let(:image_path) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
-          before { Images::StolenProcessor.update_alert_images(stolen_record) }
+          before { ImageServices::StolenProcessor.update_alert_images(stolen_record) }
           let(:target_images) do
             {
               page_image: Rails.application.routes.url_helpers.rails_blob_url(stolen_record.image_opengraph),

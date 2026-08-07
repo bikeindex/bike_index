@@ -14,7 +14,7 @@
             - @bike.public_images.select(&:image_url).each_with_index do |public_image, index|
               - thumb_class = index == 0 ? 'current-thumb' : '' # make the first image current
               %li
-                %a.clickable-image{ class: thumb_class, data: { id: "image#{public_image.id}", img: public_image.image_url(:large), link: public_image.image.url } }
+                %a.clickable-image{ class: thumb_class, data: { id: "image#{public_image.id}", img: public_image.image_url(:large), link: public_image.image_url } }
                   = image_tag public_image.image_url(:small), alt: "#{public_image.name}", id: "i|#{public_image.listing_order}", data: { controller: "image-fallback", action: "error->image-fallback#useOriginal", "image-fallback-url-value": public_image.image_url }
         :plain
           <script id="current-photo-template" type="x-tmpl-mustache">
@@ -94,7 +94,7 @@
           = render partial: "stolen_map", locals: { mapping_record: @stolen_record }
         .col-md-4
           = render(UI::DefinitionList::Container::Component.new) do
-            = render(UI::DefinitionList::Row::Component.new(label: t(".location"), value: @stolen_record.address(country: [:skip_default])))
+            = render(UI::DefinitionList::Row::Component.new(label: t(".location"), value: @stolen_record.formatted_address_string))
             = render(UI::DefinitionList::Row::Component.new(label: t(".locking_description"), value: @stolen_record.locking_description))
             = render(UI::DefinitionList::Row::Component.new(label: t(".locking_circumvented"), value: @stolen_record.lock_defeat_description))
             = render(UI::DefinitionList::Row::Component.new(label: t(".stolen_at"), value: @stolen_record.date_stolen, time_localizer_settings: %i[preciseTime originalTimeZone]))

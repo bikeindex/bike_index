@@ -103,6 +103,11 @@ class Manufacturer < ApplicationRecord
     slug
   end
 
+  # How an async combobox displays an already selected manufacturer
+  def to_combobox_display
+    name
+  end
+
   def official_organization
     @official_organization ||= Organization.find_by_manufacturer_id(id)
   end
@@ -169,7 +174,7 @@ class Manufacturer < ApplicationRecord
   def run_callback_job
     return unless @run_callback_job
 
-    CallbackJob::AfterManufacturerChangeJob.perform_async(id)
+    CallbackJobs::AfterManufacturerChangeJob.perform_async(id)
   end
 
   def b_count

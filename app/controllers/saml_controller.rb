@@ -20,25 +20,29 @@ class SamlController < ApplicationController
       content_type: "application/samlmetadata+xml"
   end
 
-  # SP-initiated login: redirect to the IdP with a signed AuthnRequest, remembering the
-  # request id (replay protection) and org slug (cross-tenant binding) for the callback.
+  # SP-initiated login: redirect to the IdP with a signed AuthnRequest, parking the request id
+  # (replay protection) and org slug (cross-tenant binding) in RelayState for the callback.
   def init
     settings = Saml::SettingsBuilder.build(configured_saml_configuration)
     auth_request = OneLogin::RubySaml::Authrequest.new
-    redirect_url = auth_request.create(settings)
-    session[:saml_request_id] = auth_request.request_id
-    session[:saml_org_slug] = params[:org_slug]
-    redirect_to redirect_url, allow_other_host: true
+    relay_state = Saml::RequestStore.create(request_id: auth_request.request_id,
+      org_slug: params[:org_slug])
+    redirect_to auth_request.create(settings, RelayState: relay_state), allow_other_host: true
   end
 
   # Assertion Consumer Service: validate the IdP's response and sign the user in.
   def callback
     saml_configuration = configured_saml_configuration
-    request_id = session.delete(:saml_request_id)
-    return saml_failure("SAML session mismatch") if session.delete(:saml_org_slug) != params[:org_slug]
+    # RelayState is a bearer token, not bound to the browser that began the login, so an attacker
+    # can hand their own token and assertion to a victim and land them in the attacker's account.
+    # Accepted: binding it needs a cookie that survives the IdP's cross-site POST, and that
+    # fragility is what kept SSO login from working at all. No victim account is taken over.
+    saml_request = Saml::RequestStore.claim(params[:RelayState])
+    return saml_failure("this login has expired, please try again") if saml_request.blank?
+    return saml_failure("SAML session mismatch") if saml_request[:org_slug] != params[:org_slug]
 
     result = Saml::AssertionProcessor.call(saml_configuration:,
-      raw_response: params[:SAMLResponse], request_id:)
+      raw_response: params[:SAMLResponse], request_id: saml_request[:request_id])
     return saml_failure(result.error) unless result.success?
 
     sign_in_and_redirect(result.user)

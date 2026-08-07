@@ -24,18 +24,18 @@ module Admin
       if Binxtils::InputNormalizer.boolean(params[:activate_theft_alert])
         new_data = @theft_alert.facebook_data || {}
         @theft_alert.update(facebook_data: new_data.merge(activating_at: Time.current.to_i))
-        StolenBike::ActivateTheftAlertJob.perform_async(@theft_alert.id, true)
+        BikeJobs::ActivateTheftAlertJob.perform_async(@theft_alert.id, true)
         flash[:success] = "Activating, please wait"
         redirect_to admin_theft_alert_path(@theft_alert)
       elsif Binxtils::InputNormalizer.boolean(params[:update_theft_alert])
-        StolenBike::UpdateTheftAlertFacebookJob.new.perform(@theft_alert.id)
+        BikeJobs::UpdateTheftAlertFacebookJob.new.perform(@theft_alert.id)
         flash[:success] = "Updating Facebook data"
         redirect_to admin_theft_alerts_path
       elsif @theft_alert.update(permitted_update_params)
         flash[:success] = "Success!"
         redirect_to admin_theft_alerts_path
       else
-        flash[:error] = @theft_alert.errors.to_a
+        flash[:error] = @theft_alert.errors.full_messages.to_sentence
         render :edit
       end
     end
@@ -43,7 +43,7 @@ module Admin
     def new
       @bike = Bike.unscoped.find_by_id(params[:bike_id])
       unless @bike.present?
-        flash[:info] = "Unable to find that bike. Select a bike to create a new promoted alert"
+        flash[:notice] = "Unable to find that bike. Select a bike to create a new promoted alert"
         redirect_to admin_theft_alerts_path
         return
       end
@@ -62,7 +62,7 @@ module Admin
     def create
       @theft_alert = TheftAlert.new(permitted_create_params)
       if @theft_alert.save
-        StolenBike::ActivateTheftAlertJob.perform_async(@theft_alert.id) if @theft_alert.activateable?
+        BikeJobs::ActivateTheftAlertJob.perform_async(@theft_alert.id) if @theft_alert.activateable?
         flash[:success] = "Promoted alert created!"
         redirect_to edit_admin_theft_alert_path(@theft_alert)
       else

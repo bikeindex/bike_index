@@ -1,0 +1,19 @@
+<div data-controller="ui--collapse" data-ui--collapse-param-value="details">
+  <button
+    type="button"
+    data-action="ui--collapse#toggle"
+    data-ui--collapse-target="trigger"
+    aria-expanded="false"
+    class="twlink tw:flex tw:items-center tw:gap-2"
+  >
+    <span data-ui--collapse-target="chevron" class="tw:inline-block tw:transition-transform tw:duration-200"><span class="tw:flex"><%= render UI::IconChevron::Component.new %></span></span>
+    Toggle details
+  </button>
+
+  <div data-ui--collapse-target="content" class="tw:mt-2 tw:hidden">
+    <p class="tw:mb-0">
+      Persisted panel body — open state lives in the <code>?details=1</code> URL
+      param.
+    </p>
+  </div>
+</div>

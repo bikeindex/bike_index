@@ -3,8 +3,10 @@ class SessionsController < ApplicationController
 
   before_action :force_html_response
   before_action :skip_if_signed_in, only: [:new, :magic_link]
-  # SSO orgs force SSO: every credential entry point redirects an SSO-managed email to the
-  # IdP before the action runs, so no direct POST can bypass SSO with a password or link.
+  # SSO orgs force SSO: every entry point that submits an email redirects an SSO-managed one
+  # to the IdP before the action runs, so no password or new magic link gets issued for it.
+  # sign_in_with_magic_link is absent because it submits a token rather than an email — a link
+  # issued before the org moved to SSO still signs in until that token expires.
   before_action :redirect_forced_saml, only: %i[identify create create_magic_link]
 
   def new
@@ -20,13 +22,21 @@ class SessionsController < ApplicationController
     @remember_me = params.dig(:session, :remember_me)
     return render_partner_or_default_signin_layout(render_action: :new) if @email.blank?
 
+    user = User.fuzzy_confirmed_or_unconfirmed_email_find(@email)
+    # Passwordless users have no password to enter, so skip the credential step
+    return send_magic_link_and_redirect(user) if user&.passwordless_user?
+
     @login_method = login_method_for(@email)
-    if @login_method == "password" && User.fuzzy_confirmed_or_unconfirmed_email_find(@email).blank?
+    if @login_method == "password" && user.blank?
       # No account — start sign-up with the entered email pre-filled.
       redirect_to new_user_path(email: @email, partner: sign_in_partner)
     else
       render_partner_or_default_signin_layout(render_action: :identify)
     end
+  end
+
+  def magic_link_sent
+    render_partner_or_default_signin_layout
   end
 
   def magic_link
@@ -58,12 +68,7 @@ class SessionsController < ApplicationController
       end
     end
     if user.present?
-      # Stash the remember-me choice so the emailed-link GET (which carries no form
-      # params) can still honor it in sign_in_and_redirect.
-      session[:magic_link_remember_me] = Binxtils::InputNormalizer.boolean(params[:remember_me])
-      user.send_magic_link_email
-      flash[:success] = translation(:link_sent)
-      redirect_to root_path
+      send_magic_link_and_redirect(user)
     else
       flash[:error] = translation(:user_not_found)
       redirect_to new_user_path
@@ -121,10 +126,22 @@ class SessionsController < ApplicationController
     redirect_to saml_init_path(org_slug: organization.to_param) if organization.present?
   end
 
+  def send_magic_link_and_redirect(user)
+    # Stash the remember-me choice so the emailed-link GET (which carries no form
+    # params) can still honor it in sign_in_and_redirect.
+    session[:magic_link_remember_me] = Binxtils::InputNormalizer.boolean(submitted_remember_me)
+    user.send_magic_link_email
+    redirect_to magic_link_sent_session_path(partner: sign_in_partner)
+  end
+
   # The three guarded actions carry the email in different params: identify/create post
   # session[:email]; create_magic_link posts a top-level :email.
   def submitted_email
     params.dig(:session, :email).presence || params[:email]
+  end
+
+  def submitted_remember_me
+    params.dig(:session, :remember_me).presence || params[:remember_me]
   end
 
   def permitted_parameters

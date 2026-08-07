@@ -23,18 +23,17 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
     end
   end
 
-  it "always applies the prefixed active classes (inert until pressed/toggled)" do
+  it "always applies the active classes (inert until data-active/pressed)" do
     tokens = component.css("a").first["class"].split
-    expect(tokens).to include("tw:aria-pressed:ring-2", "tw:active:ring-2")
-    expect(tokens).not_to include("tw:ring-2", "tw:bg-gray-200")
+    expect(tokens).to include("tw:is-active:ring-2", "tw:is-active:bg-gray-200")
+    expect(component).to have_no_css("a[data-active]")
   end
 
   context "active: true" do
-    let(:options) { {text: "Active", href: "/test", active: true} }
+    let(:options) { {text: "Active", href: "/test", active: true, data: {turbo: false}} }
 
-    it "applies the bare active classes statically" do
-      tokens = component.css("a").first["class"].split
-      expect(tokens).to include("tw:ring-2", "tw:bg-gray-200")
+    it "flags the link data-active, keeping the passed data attributes" do
+      expect(component).to have_css("a[data-active='true'][data-turbo='false']")
     end
   end
 

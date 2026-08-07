@@ -15,10 +15,10 @@ class OrganizationsController < ApplicationController
 
     session[:return_to] = lightspeed_interface_path
     if current_user.present?
-      flash[:info] = translation(:must_create_an_organization_first)
+      flash[:notice] = translation(:must_create_an_organization_first)
       redirect_to new_organization_path
     else
-      flash[:info] = translation(:must_create_an_account_first)
+      flash[:notice] = translation(:must_create_an_account_first)
       redirect_to(new_user_path) && return
     end
   end
@@ -67,16 +67,16 @@ class OrganizationsController < ApplicationController
     render layout: "embed_layout"
   end
 
-  def shop_display_qr
-    find_organization
-    redirect_to(format: "png") && return unless request.format == "png"
-
-    respond_to do |format|
-      format.png do
-        qrcode = RQRCode::QRCode.new(embed_organization_url(@organization, non_stolen: true, shop_display: true))
-        render plain: qrcode.as_png(size: 1200, border_modules: 0), template: nil, format: :png
-      end
+  def qr
+    return unless find_organization.present?
+    @qr_url = case params[:target]
+    when "shop_display" then embed_organization_url(@organization, non_stolen: true, shop_display: true)
+    when "landing" then "#{root_url}#{@organization.to_param}" # not routed unless in LandingPages::ORGANIZATIONS
+    else new_register_url(organization_id: @organization.to_param)
     end
+
+    qrcode = RQRCode::QRCode.new(@qr_url)
+    send_data qrcode.as_png(size: 1200, border_modules: 0).to_s, type: "image/png", disposition: "inline"
   end
 
   protected

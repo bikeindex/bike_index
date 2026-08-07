@@ -564,6 +564,7 @@ en:
         phone_for_users: Phone for users
         police_report_department: Police report department
         police_report_number: Police report number
+        postal_code: Postal code
         proof_of_ownership: Proof of ownership
         receive_notifications: Receive notifications
         recovered_at: Date recovered
@@ -575,14 +576,14 @@ en:
         recovery_posted: Recovery posted
         recovery_share: Recovery share
         recovery_tweet: Recovery tweet
+        region_record: :activerecord.models.state
+        region_string: Region
         secondary_phone: Secondary phone
-        state: :activerecord.models.state
         street: Street
         theft_alerts: Theft alerts
         theft_description: Theft description
         time: Time
         tsved_at: Tsved at
-        zipcode: Postal code
       theft_alert:
         creator: :activerecord.models.creator
         end_at: End at
@@ -1296,6 +1297,9 @@ en:
       share_widely_on_your_personal_social: Share widely on your personal social media
       supercharge_sharing_on_facebook: Supercharge sharing on Facebook with Bike Index
       your_police_report: your Police Report Number
+    stolen_map:
+      unavailable: The map couldn't be loaded — your browser or device may not support
+        it.
     theft_alerts:
       new:
         best_value: Best value
@@ -1607,9 +1611,11 @@ en:
   controllers:
     application:
       handle_unverified_request:
-        csrf_invalid: >-
-          CSRF invalid. If you don't know why you're receiving this message, please
-          contact us.
+        invalid_authenticity_token: >-
+          Form submission failed, please try again. If this keeps happening, a VPN
+          or a privacy extension is probably stripping information we need — try turning
+          those off for bikeindex.org. Email contact@bikeindex.org if you're still
+          stuck.
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: You must be signed in to do that.
@@ -1709,6 +1715,7 @@ en:
       sessionable:
         sign_in_and_redirect:
           logged_in: Logged in!
+          organization_signed_in: You're signed in
           user_is_banned: >-
             We're sorry, but it appears that your account has been locked. If you
             are unsure as to the reasons for this, please contact us.
@@ -1910,6 +1917,21 @@ en:
         no_permission_to_edit: Sorry! You don't have permission to edit that image.
       update:
         image_updated: Image was successfully updated.
+    register:
+      acknowledge:
+        acknowledge_everything: Check every box to agree to these rules
+      confirm_email:
+        confirmation_link_expired: That confirmation link has expired — check your
+          email for a new one
+        signed_in_as_other: >-
+          You're signed in as %{email}, so we kept you in that account. The registration
+          is still saved to the address we emailed.
+      find_b_param:
+        registration_not_found: We couldn't find that registration — start a new one
+          below
+      sign_in_confirmed_user:
+        unable_to_sign_in: We confirmed your email, but couldn't sign you in to that
+          account
     search:
       marketplace:
         set_interpreted_params:
@@ -1925,7 +1947,6 @@ en:
       create:
         invalid_email_or_password: Invalid email/password
       create_magic_link:
-        link_sent: Sign in link sent! Just click the link in your email to sign in
         user_not_found: Unable to find that user
     stolen_notifications:
       create:
@@ -2036,12 +2057,6 @@ en:
         check_out_match_here: 'Check out the match here:'
         we_think_your_stolen_bike: We may have found your stolen %{bike_title}!
     confirmation_email:
-      html:
-        click_to_verify_html: Click the <em>Verify email</em> button to finish signing
-          up!
-        please_confirm_your_email_address: Please confirm your email address
-        verify_email: Verify email
-        youre_almost_there: You're almost there!
       subject: Please confirm your Bike Index email!
     invoice_email:
       html:
@@ -3858,6 +3873,13 @@ en:
     news_index: Bike Index Blog
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
+    register_acknowledgment: "%{cycle_type} safety check"
+    register_confirm: Confirming your email
+    register_create: Register your %{cycle_type}!
+    register_review: Review your %{cycle_type} safety check
+    register_show: "%{cycle_type} registration"
+    register_step_1: Register your %{cycle_type}!
+    register_step_2: Add your %{cycle_type}'s details
     registrations_embed: Register a bike with %{organization}
     search_registrations_index: Search results
     sessions_create: Log in
@@ -4491,7 +4513,6 @@ en:
         save: Save
       show:
         abbreviation: Abbreviation
-        choose_file: Choose file...
         contact_to_update_html: Contact %{link} to update abbreviation
         delete_organization: Delete organization
         i_would_like_to_terminate_my_account: I would like to terminate my account
@@ -4523,15 +4544,6 @@ en:
       index:
         matches_visible: visible
         parking_notifications: Parking notifications
-      show_details:
-        address: Address
-        bike: Bike
-        by: Created by
-        created: Created at
-        internal_notes: Internal notes
-        message: Message
-        notification_number: Notification#
-        resolved: Resolved
       table:
         address: Address
         bike: Bike
@@ -4648,6 +4660,8 @@ en:
       subject: Confirm your %{organization_name}stolen %{bike_type}on Bike Index
     organization_invitation:
       subject: Join %{organization_name}on Bike Index
+    partial_register_confirmation:
+      subject: Confirm your email to finish your %{organization_name}registration
     partial_registration:
       subject: Finish your %{organization_name}Bike Index registration!
   payments:
@@ -4754,13 +4768,13 @@ en:
       enter_email_address: Enter your email address, we'll send you an email with
         a link to log in.
       get_sign_in_link: Get sign in link
-      if_not_click_button: If you are not, please click the button below
       reenter_email: Please re-enter your email address to receive a new token
-      sign_in: Sign in
       sign_in_with_magic_link: Passwordless sign in
       unable_to_auth: Unable to authenticate that token
-      you_should_be_signed_in_automatically: You should be automatically signed in.
       your_email_address: your email address
+    magic_link_sent:
+      follow_the_link_back: Follow the link in the email to sign in!
+      we_sent_a_magic_sign_in_link: We sent you a magic sign in link
     new:
       continue: Continue
       email: email
@@ -5051,6 +5065,11 @@ en:
       bike: Bike
       recovered_date: recovered %{date}
       translated_from_english: translated from English
+    register_flow:
+      email_required: Email is required to register
+      manufacturer_required: Manufacturer is required to register
+      name_required: Owner name is required to register
+      unable_to_save: We're unable to save that registration, please try again
     shops_map:
       map_of_partner_locations: Map of partner locations
     user_general_alert:
@@ -5176,12 +5195,9 @@ en:
       agree_bikeindex_toc_html: I agree to Bike Index's %{bikeindex_toc_link}.
       already_have_a_bike_index_account: Already have a Bike Index account?
       already_have_an_account: already have an account?
-      better_password: better
       get_bike_indexs_newsletter: Get Bike Index's Newsletter
       get_on_bike_index: Get on Bike Index
       log_in: log in
-      password_helper_text_html: Password must be at least 12 characters. Longer is
-        %{better_password_link}.
       sign_up: Sign up
       sign_up_using_facebook: Sign up using Facebook
       sign_up_using_globalid: Sign up using globaliD
@@ -5213,7 +5229,13 @@ en:
       weve_sent_an_email: We've sent an email to the address you have on file with
         us.
     show:
+      banned_only_visible_to_superusers: Their profile is only visible because you're
+        a superuser.
+      banned_user: This user is banned
       bikes: Bikes
+      profile_hidden: This profile isn't shared publicly
+      profile_hidden_owner: It's only visible to you because it's your page.
+      profile_hidden_superuser: It's only visible because you're a superuser.
       stolen: Stolen!
       this_user_has_no_bikes_yet: This user has no bikes yet!
       this_users_bikes: This user's bikes

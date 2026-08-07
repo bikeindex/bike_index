@@ -24,8 +24,8 @@ RSpec.describe "BikesController#create", type: :request do
       country_id: country.id,
       street: "2459 West Division Street",
       city: "Chicago",
-      zipcode: "60622",
-      state_id: state.id
+      postal_code: "60622",
+      region_record_id: state.id
     }
   end
 
@@ -172,7 +172,7 @@ RSpec.describe "BikesController#create", type: :request do
           expect(bike.title_string.length).to be < 160 # Because the full frame_model makes things stupid
           expect(bike.current_ownership.status).to eq "status_stolen"
           stolen_record = bike.current_stolen_record
-          chicago_stolen_params.except(:state_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+          chicago_stolen_params.except(:region_record_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
         end
       end
       it "creates a bike and doesn't create a b_param" do
@@ -180,6 +180,15 @@ RSpec.describe "BikesController#create", type: :request do
         expect(OrganizationStolenMessage.for_coordinates([41.9, -87.68])&.id).to eq organization_stolen_message.id
         expect_created_stolen_bike(bike_params: bike_params, stolen_params: chicago_stolen_params.merge(show_address: true))
         expect(organization_stolen_message.reload.stolen_records.count).to eq 1
+      end
+      context "with legacy stolen attribute names" do
+        let(:legacy_chicago_stolen_params) do
+          chicago_stolen_params.except(:postal_code, :region_record_id).merge(zipcode: "60622", state_id: state.id)
+        end
+        it "creates a bike with the renamed attributes" do
+          expect_created_stolen_bike(bike_params: bike_params, stolen_params: legacy_chicago_stolen_params.merge(show_address: true))
+          expect(Bike.last.current_stolen_record.region_record_id).to eq state.id
+        end
       end
       context "outside of area" do
         let!(:organization_default_location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization: organization) }
@@ -218,6 +227,18 @@ RSpec.describe "BikesController#create", type: :request do
         # we retain the stolen record attrs, test that they are assigned correctly too
         expect(bike.stolen_records.first).to match_hash_indifferently chicago_stolen_params
       end
+    end
+  end
+  context "invalid frame_material" do
+    # Form filling bots submit "1" for every field - the enum assignment used to raise
+    let(:bike_params) { basic_bike_params.merge(frame_material: "1") }
+    it "renders the error" do
+      expect {
+        post base_url, params: {bike: bike_params}
+      }.to change(Bike, :count).by(0)
+      b_param = BParam.last
+      expect(b_param.bike_errors).to eq(["Frame material is not valid"])
+      expect(response).to redirect_to(new_bike_url(b_param_token: b_param.id_token))
     end
   end
   context "no existing b_param, impounded" do

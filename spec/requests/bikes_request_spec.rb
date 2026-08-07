@@ -25,7 +25,7 @@ RSpec.describe BikesController, type: :request do
       expect(response).to render_template(:new)
       expect(response.body).to match("<title>Register a bike!</title>")
       expect(response.body).to match('<meta name="description" content="Register a bike on Bike Index quickly')
-      # This still wouldn't show address, because it doesn't have an organization with BikeServices::Builder.include_address_record?
+      # This still wouldn't show address, because it doesn't have an organization with reg_address
       expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_truthy
     end
     context "with bike_sticker" do
@@ -350,7 +350,7 @@ RSpec.describe BikesController, type: :request do
           put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=parked_incorrectly_notification"
           expect(response).to redirect_to(bike_path(bike.id))
           expect(assigns(:bike)).to eq bike
-          expect(flash[:info]).to match(/retrieved/)
+          expect(flash[:notice]).to match(/retrieved/)
           parking_notification.reload
           expect(parking_notification.current?).to be_falsey
           expect(parking_notification.resolved_at).to be_within(1).of retrieval_time

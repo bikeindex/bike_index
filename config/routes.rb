@@ -6,10 +6,10 @@ Rails.application.routes.draw do
   # Liveness endpoint (200 if the app boots). Used by the review-app kamal-proxy health check
   get "up", to: "rails/health#show", as: :rails_health_check
 
-  mount Sidekiq::Web => "/sidekiq", :constraints => DeveloperRestriction
-  mount PgHero::Engine, at: "/pghero", constraints: DeveloperRestriction
-  # letter_opener_web inbox — the gem's Bundler group (:development, :staging)
-  # decides where it's mounted. Unrestricted — staging runs seeded data with no PII.
+  mount Sidekiq::Web => "/sidekiq", :constraints => AuthRestriction::Developer
+  mount PgHero::Engine, at: "/pghero", constraints: AuthRestriction::Developer
+  # letter_opener_web inbox — the gem's Bundler group (:development, :sandbox)
+  # decides where it's mounted. Unrestricted — sandbox runs seeded data with no PII.
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if defined?(LetterOpenerWeb)
 
   use_doorkeeper do
@@ -28,7 +28,7 @@ Rails.application.routes.draw do
       get :embed
       get :embed_extended, as: :embed_extended
       get :embed_create_success
-      get :shop_display_qr
+      get :qr
     end
   end
 
@@ -59,6 +59,7 @@ Rails.application.routes.draw do
   resource :session, only: %i[new create destroy] do
     collection do
       get :magic_link
+      get :magic_link_sent
       post :sign_in_with_magic_link
       post :create_magic_link
       match :identify, via: %i[get post]
@@ -115,7 +116,8 @@ Rails.application.routes.draw do
     collection do
       get "please_confirm_email"
       post "resend_confirmation_email"
-      get "confirm" # Get because needs to be called from a link in an email
+      # The emailed link is a GET, which renders the interstitial that posts here
+      match "confirm", via: %i[get post]
       # Replacing
       get :request_password_reset_form
       post :send_password_reset_email
@@ -128,6 +130,7 @@ Rails.application.routes.draw do
     end
   end
   resource :my_account, only: %i[show update destroy] do
+    post :toggle_show_redesign
     resources :messages, only: %i[index show create], controller: "my_accounts/messages"
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
   end
@@ -163,15 +166,35 @@ Rails.application.routes.draw do
     member { post :is_private }
   end
 
-  resources :registrations, only: %i[new create] do
+  resources :registrations, only: %i[new create show edit] do
     collection { get :embed }
   end
+
+  # Redesigned registration flow: quick start, then complete on-site or via email.
+  # new makes an empty registration and redirects into show, which renders
+  # ?step=1|2|3…|review|finished (and handles the emailed confirmation link)
+  resource :register, only: %i[new create show update], controller: :register do
+    patch :acknowledge
+    # The emailed confirmation link, and the form it posts itself to
+    get :confirm
+    post :confirm_email
+  end
+
+  # Registration photos upload before there's a session, so they get their own endpoint
+  post "/register/direct_uploads" => "register/direct_uploads#create", :as => :register_direct_uploads
+
+  # Shadows ActiveStorage's own route (drawn last, so this wins) so the stock controller, which
+  # checks nothing, isn't reachable. Deliberately unnamed - rails_direct_uploads_path still
+  # resolves here, now to the signed-in-only controller.
+  post "/rails/active_storage/direct_uploads" => "direct_uploads#create"
 
   namespace :search do
     get "/", to: redirect("/search/registrations")
     # Autocomplete + selection chips for the search query items combobox
     get "combobox/options", to: "combobox#options", as: :combobox_options
     post "combobox/chips", to: "combobox#chips", as: :combobox_chips
+    # Autocomplete for the manufacturer combobox (UI::Forms::ComboboxManufacturer)
+    get "combobox/manufacturers", to: "combobox#manufacturers", as: :combobox_manufacturers
     resources :registrations, only: %i[index] do
       collection do
         get :similar_serials
@@ -268,7 +291,8 @@ Rails.application.routes.draw do
     %i[
       bike_sticker_updates email_bans exports graduated_notifications invoices logged_searches
       mailchimp_data model_attestations model_audits
-      notifications organization_statuses paper_trail_versions parking_notifications strava_activities strava_gears strava_requests
+      notifications organization_statuses paper_trail_versions parking_notifications public_images
+      strava_activities strava_gears strava_requests
       stripe_prices stripe_subscriptions user_alerts user_bans user_registration_organizations
     ].each { resources it, only: %i[index] }
 
@@ -328,7 +352,7 @@ Rails.application.routes.draw do
     resources :users, only: %i[index show edit update destroy]
 
     mount Flipper::UI.app(Flipper) => "/feature_flags",
-      :constraints => DeveloperRestriction,
+      :constraints => AuthRestriction::Superuser,
       :as => :feature_flags
   end
 
@@ -408,6 +432,8 @@ Rails.application.routes.draw do
   get "strava_search", to: "strava_search#index"
   post "strava_search/token", to: "strava_search#create_token", as: :strava_search_token
 
+  get "reverse_geocode", to: "reverse_geocode#index", defaults: {format: "json"}
+
   mount Lookbook::Engine, at: "/lookbook"
 
   get "/400", to: "errors#bad_request", via: :all
@@ -463,7 +489,7 @@ Rails.application.routes.draw do
     end
     resource :manage_impounding
     resources :users, except: %i[show]
-    resources :registration_sequences, only: %i[index create edit] do
+    resources :registration_sequences, only: %i[index create edit update] do
       resources :pages, only: %i[create], controller: "registration_sequence_pages"
     end
     resources :registration_sequence_pages, only: %i[edit update destroy]
@@ -486,5 +512,5 @@ Rails.application.routes.draw do
   # Short marketplace_listing URLs: /m/<short_id> (and /M/...)
   get "*id", to: "marketplace_listings#show", constraints: {id: %r{[mM]/.*}}, format: false
 
-  get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.staging? # Handle 404s with lograge
+  get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.sandbox? # Handle 404s with lograge
 end

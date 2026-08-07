@@ -1,0 +1,22 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe UI::Alerts::Base::Component, :js, type: :system do
+  let(:preview_path) { "/rails/view_components/ui/alerts/base/component/#{kind}" }
+
+  context "dismissable_error" do
+    let(:kind) { "dismissable_error" }
+
+    it "is dismissable" do
+      visit(preview_path)
+
+      expect(page).to have_content "Dismissable error"
+      expect_axe_clean
+
+      find('button[aria-label="Close"]').click
+
+      expect(page).to_not have_content "Dismissable error"
+    end
+  end
+end

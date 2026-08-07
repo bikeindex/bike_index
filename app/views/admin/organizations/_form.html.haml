@@ -1,4 +1,4 @@
-= render(Alerts::ObjectErrors::Component.new(object: @organization))
+= render(UI::Alerts::ObjectError::Component.new(object: @organization))
 
 .row
   .form-group.col-md-6
@@ -93,13 +93,13 @@
       = f.label :direct_unclaimed_notifications do
         Send emails directly to unclaimed bike owners
         %small.less-strong don't require org to forward
-    .form-group
-      - parent_org_label = capture do
-        Parent organization
-        %small.less-strong
-          %strong.text-danger (probably) do not add parents!
-          Parents must be part of the same organization
-      = render Form::Combobox::Component.new(name: :parent_organization_id, form: f, label: parent_org_label, placeholder: "Choose organization", include_blank: true, options: Organization.with_enabled_feature_slugs("child_organizations").pluck(:name, :id), data: {"admin--organization-form-target": "ambassadorField"})
+    - parent_org_label = capture do
+      Parent organization
+      %small.less-strong
+        %strong.text-danger (probably) do not add parents!
+        Parents must be part of the same organization
+    = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :parent_organization_id, label_text: parent_org_label, wrapper_class: "form-group")) do
+      = render UI::Forms::Combobox::Component.new(name: :parent_organization_id, form: f, placeholder: "Choose organization", include_blank: true, options: Organization.with_enabled_feature_slugs("child_organizations").pluck(:name, :id), data: {"admin--organization-form-target": "ambassadorField"})
       %small
         %strong Use the "regional" feature instead.
         %em To add regional organizations rather than child/parent relationships, enable it through a paid invoice for the organization. All organizations with a location in the same area will automatically be associated.
@@ -122,11 +122,11 @@
     - if @organization.id.present?
       - emails = @organization.users.pluck(:email)
       - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
-      .form-group
-        - embedable_label = capture do
-          Auto user email
-          %small.less-strong embed registration email
-        = render Form::Combobox::Component.new(name: :embedable_user_email, form: f, label: embedable_label, placeholder: "Select email", value: @embedable_email, include_blank: true, options: emails)
+      - embedable_label = capture do
+        Auto user email
+        %small.less-strong embed registration email
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :embedable_user_email, label_text: embedable_label, wrapper_class: "form-group")) do
+        = render UI::Forms::Combobox::Component.new(name: :embedable_user_email, form: f, placeholder: "Select email", value: @embedable_email, include_blank: true, options: emails)
         %small.less-strong
           - if @organization.organization_roles.count == 0
             You can use #{ENV['AUTO_ORG_MEMBER']} if
@@ -140,8 +140,8 @@
             if checked, we will start email their customers theft surveys
 
     - if @organization.official_manufacturer?
-      .form-group
-        = render Form::ComboboxManufacturer::Component.new(frame_maker: true, form: f, label: Organization.human_attribute_name(:manufacturer), required: true)
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :manufacturer_id, label_text: Organization.human_attribute_name(:manufacturer), required: true, wrapper_class: "form-group")) do
+        = render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, no_manufacturer_other: true, form: f, required: true)
         %small
           %strong This organization has <code>Official manufacturer organization</code> enabled.
           Select a manufacturer to give them manufacturer access.
@@ -179,17 +179,23 @@
                   %code.d-inline nearby_organizations
                   will search within this radius for other organizations in the same area
 
-          - if @organization.enabled?("passwordless_users")
+          - passwordless_enabled = @organization.enabled?("passwordless_users")
+          - saml_sso_enabled = @organization.enabled?("saml_sso")
+          - sign_in_kinds = [("passwordless sign in" if passwordless_enabled), ("SAML SSO" if saml_sso_enabled)].compact
+          - if sign_in_kinds.any?
             .form-group
-              = f.label :passwordless_user_domain do
+              = f.label :user_email_domain do
                 %span
-                permitted domain for passwordless sign in
+                permitted domain for #{sign_in_kinds.to_sentence}
                 %small
-                  <span class="text-success">passwordless user feature</span>
+                  - if passwordless_enabled
+                    <span class="text-success">passwordless user feature</span>
+                  - if saml_sso_enabled
+                    <span class="text-success">SAML SSO feature</span>
               .input-group
                 .input-group-prepend
                   .input-group-text @
-                = f.text_field :passwordless_user_domain, placeholder: "something.gov", class: "form-control", disabled: !current_user.developer?
+                = f.text_field :user_email_domain, placeholder: "something.gov", class: "form-control", disabled: !current_user.developer?
               - unless current_user.developer?
                 %span.small.less-strong Ask Seth for help changing this, it's delicate
 
@@ -245,9 +251,8 @@
                         miles
                   = number_field_tag :organization_stolen_message_search_radius_miles, organization_stolen_message.search_radius_miles, {class: "form-control"}
 
-          - if @organization.enabled?("saml_sso")
+          - if saml_sso_enabled
             - saml_configuration = @organization.organization_saml_configuration || @organization.build_organization_saml_configuration
-            - saml_settings = Saml::SettingsBuilder.new(saml_configuration)
             .form-group.mt-4
               %h4 SAML SSO
               %p.text-success
@@ -258,10 +263,10 @@
                   = link_to saml_metadata_url(org_slug: @organization.to_param), saml_metadata_url(org_slug: @organization.to_param)
                 %li
                   SP entityID:
-                  %code= saml_settings.sp_entity_id
+                  %code= Saml::SettingsBuilder.sp_entity_id(saml_configuration)
                 %li
                   ACS (callback) URL:
-                  %code= saml_settings.assertion_consumer_service_url
+                  %code= Saml::SettingsBuilder.assertion_consumer_service_url(saml_configuration)
               = f.fields_for :organization_saml_configuration, saml_configuration do |saml_f|
                 .form-check.mt-2
                   = saml_f.check_box :enabled, class: "form-check-input"

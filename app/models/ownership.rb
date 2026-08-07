@@ -62,14 +62,15 @@ class Ownership < ApplicationRecord
     impound_import: 9,
     impound_process: 11,
     transferred_ownership: 10,
-    sticker: 13
+    sticker: 13,
+    register_flow: 14
   }.freeze
 
   enum :status, Bike::STATUS_ENUM
   enum :pos_kind, Organization::POS_KIND_ENUM
   enum :origin, ORIGIN_ENUM
 
-  belongs_to :bike
+  belongs_to :bike, touch: true
   belongs_to :user
   belongs_to :creator, class_name: "User"
   belongs_to :impound_record
@@ -189,7 +190,7 @@ class Ownership < ApplicationRecord
     elsif origin.present?
       return "org reg" if %w[embed_extended organization_form].include?(origin)
       return "landing page" if origin == "embed_partial"
-      return "parking notification" if origin == "unregistered_parking_notification"
+      return "parking notification" if origin == "creator_unregistered_parking_notification"
 
       self.class.origin_humanized(origin)
     end
@@ -340,7 +341,7 @@ class Ownership < ApplicationRecord
     # skip cleaning if it's blank
     return {} if r_info.blank?
 
-    # The only place user_name comes from, other than a user setting it themselves, is bulk_import
+    # user_name comes from bulk_import and the register flow, or a user setting it themselves
     r_info["phone"] = Phonifyer.phonify(r_info["phone"])
     # bike_code should be renamed bike_sticker. Legacy ownership issue
     if r_info["bike_code"].present?

@@ -28,11 +28,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     click_button "Continue"
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
-    # Dismiss the post-login flash and wait for it to clear, so the next
-    # navigation isn't racing the redirect. The Bootstrap fade-out can exceed
-    # Capybara's default 2s wait on slow CI runners.
-    find(".alert-success .close").click
-    expect(page).to have_no_css(".alert-success", wait: 10)
+    dismiss_flash_messages
   end
 
   it "searches by email via turbo, then opens the notification" do
@@ -56,7 +52,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).not_to have_content("bob@example.com")
 
     # Back navigation restores the unfiltered listing
-    page.go_back
+    go_back_and_wait
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
     expect(page).to have_css("tbody tr", count: 2, wait: 10)
     expect(page).to have_field("search_email", with: "")
@@ -66,13 +62,13 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_css(".hw-combobox", count: 1, wait: 10)
     type_into(".hw-combobox__input", "Black")
     expect(page).to have_css(".hw-combobox__option", text: "Black", wait: 10)
-    find(".hw-combobox__option", text: "Black", match: :first).click
+    click_combobox_option("Black")
     find("#search-button").click
 
     expect(page).to have_current_path(/query_items/, wait: 10)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame", wait: 10)
 
-    page.go_back
+    go_back_and_wait
     # Back navigation restores the default (unfiltered) search. The eager
     # turbo-frame loads results without rewriting the address bar, so the
     # default search sits at the bare path rather than a serialized query.
@@ -82,11 +78,10 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_css("tbody tr", count: 2, wait: 10)
     expect(page).to have_field("search_email", with: "")
 
-    # Form submit + direct back-nav: regression guard for turbo-cache spinner state.
-    # Let Turbo's restoration preview settle to the real render before typing, then
-    # read the field back so a real "typed value doesn't persist after back-nav"
+    # Form submit + direct back-nav: regression guard for typed-value persistence.
+    # go_back_and_wait guarantees the restoration visit has landed, so this types
+    # into the settled form -- a real "typed value doesn't persist after back-nav"
     # regression still fails here rather than being retried away.
-    wait_for_turbo_restore
     fill_in "search_email", with: "alice@example.com"
     expect(page).to have_field("search_email", with: "alice@example.com", wait: 10)
     find("#search-button").click
@@ -98,18 +93,13 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     # turbo-frame survives the turbo_stream response (catches replace-vs-update regression)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame")
 
-    page.go_back
+    go_back_and_wait
     expect(page).not_to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
     expect(page).to have_css("tbody tr", count: 2, wait: 10)
-    # The typed "alice" value we submitted above leaks into Turbo's restoration
-    # preview snapshot; wait for the real render (empty value attribute) before
-    # asserting the field cleared, or we race the stale preview.
-    wait_for_turbo_restore
     expect(page).to have_field("search_email", with: "", wait: 10)
 
     # Re-apply alice filter for click-row/back-nav steps
-    wait_for_turbo_restore
     fill_in "search_email", with: "alice@example.com"
     find("#search-button").click
 
@@ -124,7 +114,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_content("User Bikes")
 
     # Back from notification show: filtered search restored
-    page.go_back
+    go_back_and_wait
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
     expect(page).to have_css("tbody tr", count: 1, wait: 10)
@@ -139,7 +129,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     expect(page).to have_css(".organized-access-panel")
 
     # Back from bike show: filtered search restored
-    page.go_back
+    go_back_and_wait
     expect(page).to have_current_path(/search_email=alice/, wait: 10)
     expect(page).to have_css("turbo-frame#graduated_notifications_results_frame table.ui-table", wait: 10)
     expect(page).to have_css("tbody tr", count: 1, wait: 10)

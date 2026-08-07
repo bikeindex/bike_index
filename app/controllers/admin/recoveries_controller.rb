@@ -7,7 +7,7 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @recoveries = pagy(:countish, available_recoveries.reorder("stolen_records.#{sort_column} #{sort_direction}")
-        .includes(:bike), limit: @per_page, page: permitted_page)
+        .includes(:bike, :country, :region_record), limit: @per_page, page: permitted_page)
     end
 
     def show
@@ -87,7 +87,10 @@ module Admin
     end
 
     def permitted_parameters
-      params.require(:stolen_record).permit(BikeServices::StolenRecordUpdator.old_attr_accessible)
+      # TODO: #3952 - stolen record legacy attrs
+      BParam.rename_legacy_stolen_attrs(
+        params.require(:stolen_record).permit(BikeServices::StolenRecordUpdator.old_attr_accessible)
+      )
     end
   end
 end

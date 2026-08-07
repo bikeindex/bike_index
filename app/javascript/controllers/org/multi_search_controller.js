@@ -11,7 +11,9 @@ export default class extends Controller {
     if (this.searching) return
     this.onPopState = () => this.syncFromUrl()
     window.addEventListener('popstate', this.onPopState)
-    this.syncFromUrl()
+    // Renders disabled: clicking before connect submits the form and reloads
+    this.buttonTarget.disabled = false
+    this.syncFromUrl({ preserveInput: true })
   }
 
   disconnect () {
@@ -20,7 +22,7 @@ export default class extends Controller {
 
   // Restore the form + results from the URL, on initial load and on back/forward.
   // The URL already reflects this state, so don't push another history entry.
-  syncFromUrl () {
+  syncFromUrl ({ preserveInput = false } = {}) {
     const params = new URL(window.location).searchParams
     const kind = params.get('search_kind') === 'stickers' ? 'stickers' : 'serials'
     if (this.searchKindValue !== kind) this.applyKind(kind)
@@ -29,7 +31,8 @@ export default class extends Controller {
     }
     this.syncSearchAll()
     const serialsParam = params.get('serials') || ''
-    this.textareaTarget.value = serialsParam
+    // On connect, keep anything typed while the controller was still loading
+    if (!preserveInput || serialsParam) this.textareaTarget.value = serialsParam
     const serials = this.parseSerials(serialsParam)
     if (serials.length) {
       this.search(serials, { pushHistory: false })
@@ -129,7 +132,7 @@ export default class extends Controller {
   }
 
   alignTableColumns () {
-    const tables = Array.from(this.resultsTarget.querySelectorAll('.org-registration-search-component table.ui-table'))
+    const tables = Array.from(this.resultsTarget.querySelectorAll('.multi-search-serial-result table.ui-table'))
     if (tables.length < 2) return
 
     tables.forEach(table => {

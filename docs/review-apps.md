@@ -2,7 +2,7 @@
 
 Per-PR review apps deployed with [Kamal](https://kamal-deploy.org/) to a single shared host. Each PR gets its own subdomain (`pr-N.review.bikeindex.org`), Postgres role + databases (primary + analytics), and Sidekiq worker.
 
-Review apps run the **staging Rails environment** `RAILS_ENV=staging`, a near-duplicate of production (`config/environments/staging.rb` imports production.rb)
+Review apps run the **sandbox Rails environment** `RAILS_ENV=sandbox`, a near-duplicate of production (`config/environments/sandbox.rb` imports production.rb)
 
 ## How to trigger one
 
@@ -21,56 +21,61 @@ bin/kamal_review app details  --app pr-3594.review.bikeindex.org
 bin/kamal_review app version  --app https://pr-3594.review.bikeindex.org
 ```
 
-All four resolve to PR `3594`; with no `--app` it defaults to the persistent staging app, and `--app staging` names it explicitly ([below](#staging-persistent-main-deploy)). (It also drives the `deploy`/`destroy` lifecycle — see [Deploying locally](#deploying-locally).) It uses `REVIEW_APP_HOST` + `.kamal/secrets`, so the 1Password setup above is a prerequisite. The `shared-db`/`shared-redis` accessories live only in the per-PR config, so accessory commands need an explicit `--app 0` (or any PR) — e.g. reboot Postgres after changing its `shared_preload_libraries`:
+All four resolve to PR `3594`; with no `--app` it defaults to the persistent sandbox app, and `--app sandbox` names it explicitly ([below](#sandbox-persistent-main-deploy)). (It also drives the `deploy`/`destroy`/`reload_database` lifecycle — see [Deploying locally](#deploying-locally).) It uses `REVIEW_APP_HOST` + `.kamal/secrets`, so the 1Password setup above is a prerequisite. The `shared-db`/`shared-redis` accessories live only in the per-PR config, so accessory commands need an explicit `--app 0` (or any PR) — e.g. reboot Postgres after changing its `shared_preload_libraries`:
 
 ```bash
 bin/kamal_review accessory reboot db --app 0
 ```
 
-## Staging (persistent `main` deploy)
+## Sandbox (persistent `main` deploy)
 
-Alongside the per-PR apps, `main` is continuously deployed to **[staging.review.bikeindex.org](https://staging.review.bikeindex.org)** — think of it as a review app that never gets a PR number and is never destroyed. It shares `config/deploy.review.yml`: with no `REVIEW_APP_PR_NUMBER` set, the ERB resolves the `staging` slug and omits the `accessories:` block (so a staging deploy can't touch the shared infra the PR apps depend on). It differs only in using Redis logical DB `0` (the one the PR mod-31 allocation never hands out).
+Alongside the per-PR apps, `main` is continuously deployed to **[sandbox.review.bikeindex.org](https://sandbox.review.bikeindex.org)** — think of it as a review app that never gets a PR number and is never destroyed. It shares `config/deploy.review.yml`: with no `REVIEW_APP_PR_NUMBER` set, the ERB resolves the `sandbox` slug and omits the `accessories:` block (so a sandbox deploy can't touch the shared infra the PR apps depend on). It differs only in using Redis logical DB `0` (the one the PR mod-1023 allocation never hands out).
 
-For `bin/kamal_review`, with no `--app` given it defaults to staging - but you can also use `--app staging` to target it. This works for passthrough commands only, since staging is deployed by its own workflow, not the `deploy`/`destroy` lifecycle:
+For `bin/kamal_review`, with no `--app` given it defaults to sandbox - but you can also use `--app sandbox` to target it. This works for passthrough commands only, since sandbox is deployed by its own workflow, not the `deploy`/`destroy`/`reload_database` lifecycle:
 
 ```bash
-bin/kamal_review shell        --app staging   # bash on staging
-bin/kamal_review console                      # rails console, also on staging
+bin/kamal_review shell        --app sandbox   # bash on sandbox
+bin/kamal_review console                      # rails console, also on sandbox
 ```
 
 ## What about production?
 
 Production runs on Cloud66. The differences vs production:
 
-- ActionMailer routes through [`letter_opener_web`](https://github.com/fgrehm/letter_opener_web) — the gem is in the `:staging` Bundler group, so production never loads it. Inbox at `pr-N.review.bikeindex.org/letter_opener`, stored in `tmp/letter_opener/`, wiped on every deploy.
+- ActionMailer routes through [`letter_opener_web`](https://github.com/fgrehm/letter_opener_web) — the gem is in the `:sandbox` Bundler group, so production never loads it. Inbox at `pr-N.review.bikeindex.org/letter_opener`, stored in `tmp/letter_opener/`, wiped on every deploy.
 - Mailer **previews** at `/rails/mailers` (off in production), linked from the admin **Mailers** dropdown.
-- The log broadcasts to both stdout (`kamal logs`) and `log/staging.log`, so the `read_logged_searches` cron has a file to read.
+- The log broadcasts to both stdout (`kamal logs`) and `log/sandbox.log`, so the `read_logged_searches` cron has a file to read.
 
 These make information public, but review apps hold no PII - just seeded data + sandbox integrations.
 
-### The `review-app` label is the gate
+### The `review-app` label is the deploy gate
 
 The workflow adds the `review-app` label whenever a deploy is attempted — up front, before the build, regardless of outcome. So the **first** deploy must be a manual `workflow_dispatch` (unlabeled PRs are skipped by CI's dispatch step). That run labels the PR as it starts, arming auto-redeploy for the PR's life — so after a failed first deploy you just push a fix and CI re-dispatches.
 
 Once labeled:
 - **Push → auto-redeploys**: ci.yml's `dispatch` job dispatches this workflow. (No `pull_request: synchronize` trigger — it would leave a skipped review-app check on every push to every unlabeled PR.)
   - A fork's push fires `on: push` in the fork, not here, so this repo's `dispatch` job never sees it — fork PRs only deploy via manual `workflow_dispatch`.
-- **Close PR → auto-destroys** (`pull_request: closed`), removing the label.
 - **Destroy without closing**: re-run with `destroy` (also removes the label).
+- **Reset the data**: re-run with `reload_database` ([below](#reloading-the-database)) — the label is left alone.
 
 Only CI's on-push dispatch and `closed` are wired up, so toggling the label by hand does nothing until the next push.
 
+**Teardown is not gated.** `pull_request: closed` destroys every PR, labeled or not — adding the label is best-effort (`|| true`), so an app can be live with no label on it and would otherwise run forever. Destroy skips the build job and is name-scoped and idempotent, so a PR that never had an app costs one short runner.
+
+The step that isn't idempotent is the redis flush, because mod-1023 allocation can point this PR's logical DB at another PR that's still running. So destroy opens by asking the host which apps are up, and skips the flush when one of them shares the DB. That probe also has to succeed: every other step is `|| true`, so an unreachable host would report a clean teardown and let `post` strip the label and GHCR images off an app that's still serving. A failed probe exits non-zero instead, leaving the PR retryable.
+
 ## How a deploy works
 
-Four jobs: `resolve` (PR number + deploy/destroy, and labels on deploy), `op` (calls the shared `kamal-deploy.yml` reusable workflow to build + run the kamal command), `post` (PR-side follow-ups: deployment link, failure-comment cleanup, label removal + GHCR image cleanup on destroy), `report` (failure-only). The reusable workflow's `build` job cancels superseded builds (`cancel-in-progress`) while its `run` job serializes per PR *without* cancellation, since killing kamal mid-deploy can strand the deploy lock. `kamal-deploy.yml` is shared with `staging.yml`.
+Four jobs: `resolve` (PR number + action, and labels on deploy), `op` (calls the shared `kamal-deploy.yml` reusable workflow to build + run the kamal command), `post` (PR-side follow-ups: deployment link, failure-comment cleanup, label removal + GHCR image cleanup on destroy), `report` (failure-only). The reusable workflow's `build` job cancels superseded builds (`cancel-in-progress`) while its `run` job serializes per PR *without* cancellation, since killing kamal mid-deploy can strand the deploy lock. `kamal-deploy.yml` is shared with `sandbox.yml`.
 
 | Trigger | Action | What runs |
 |---|---|---|
 | `workflow_dispatch` → deploy (operator, or auto-dispatched by ci.yml on push to a labeled PR) | `deploy` | add `review-app` label, build image, deploy |
 | `workflow_dispatch` → destroy | `destroy` | tear down, remove label, delete PR images from GHCR |
-| `pull_request: closed` (labeled) | `destroy` | tear down, remove label, delete PR images from GHCR |
+| `workflow_dispatch` → reload_database | `reload_database` | drop both databases, then create + seed them again ([below](#reloading-the-database)) |
+| `pull_request: closed` (any PR) | `destroy` | tear down, remove label, delete PR images from GHCR |
 
-Unlabeled PR closes are filtered by `resolve`'s job-level `if:`; fork PRs by the same-repo check (`proceed=false`). On **deploy**:
+Fork PRs are filtered by `resolve`'s same-repo check (`proceed=false`). On **deploy**:
 
 1. The reusable `build` job builds the Docker image (`Dockerfile`) and pushes it to GHCR as `pr-<N>-<sha>`, labeled `service=bike-index-pr-<N>` (kamal requires that label). Warm builds are fast: docker layers cache in GHCR's `:buildcache`, and sprockets' cache persists via a BuildKit cache mount + buildkit-cache-dance.
 2. The `run` job runs `bin/kamal_review deploy --app <pr>` → `kamal deploy --version <tag> --skip-push` (tag from `IMAGE_TAG`). Kamal **pulls** the CI image (no rebuild, which would clone the private `app/services/facebook` submodule) and:
@@ -80,7 +85,11 @@ Unlabeled PR closes are filtered by `resolve`'s job-level `if:`; fork PRs by the
 3. `kamal-proxy` routes `pr-<N>.review.bikeindex.org` to the new container.
 4. The `review-app` environment surfaces the URL ("View deployment").
 
-Destroy reverses it: purge the PR's ActiveStorage objects from the shared R2 bucket (while the app's still up — see [storage](#storage-is-shared)), `kamal app remove`, drop both databases + the role, `FLUSHDB` the assigned Redis logical DB, and delete every `pr-<N>-<sha>` GHCR image version (best-effort, `packages: write`).
+Destroy reverses it: purge the PR's ActiveStorage objects from the shared R2 bucket (while the app's still up — see [storage](#storage-is-shared)), `kamal app remove`, drop both databases + the role, `FLUSHDB` the assigned Redis logical DB (unless a running PR shares it — see [teardown](#the-review-app-label-is-the-deploy-gate)), remove any container `app remove` left behind along with the volumes, and delete every `pr-<N>-<sha>` GHCR image version (best-effort, `packages: write`).
+
+### Reloading the database
+
+`reload_database` resets a running app's data to a freshly seeded state without redeploying — for when seeds change, or a demo leaves the data in a mess. Containers, image, volumes and the Postgres role are untouched; only the two databases are rebuilt, by `bin/kamal_review reload_database --app <pr>` (which also purges the PR's R2 objects and flushes its redis DB first — see the comments there for why the order matters). It runs the same `db:prepare` the entrypoint runs at boot, so it's as slow as a first deploy, and the app serves partly-seeded data while it runs.
 
 **Failures comment on the PR.** These runs are `workflow_dispatch`-triggered, so their check runs never hit the PR's rollup. The `report` job comments the failure (edited in place on repeats); the next successful deploy deletes it.
 
@@ -101,14 +110,14 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 | `Dockerfile`, `.dockerignore` | Production-style image (Thruster + Puma + Sidekiq). Used only by review apps. |
 | `bin/docker-entrypoint` | Creates the per-PR Postgres **superuser** role + runs `db:prepare` (schema + seed) on first boot |
 | `bin/thrust` | Thruster binstub used by the image's `CMD` |
-| `bin/kamal_review` | Run kamal against one review app — `deploy`/`destroy` lifecycle plus arbitrary passthrough commands (resolves the PR number from any id form, sets `REVIEW_APP_*` + `--config-file`) |
-| `config/deploy.review.yml` | Kamal config for both targets — ERB derives `pr-<N>` (with `REVIEW_APP_PR_NUMBER`) or the `staging` slug (without); accessories emitted for PR apps only |
-| `.github/workflows/staging.yml` | Thin caller of `kamal-deploy.yml` for the `main`→staging deploy, dispatched on every push to `main` — see [Staging](#staging-persistent-main-deploy) |
-| `.github/workflows/kamal-deploy.yml` | Reusable (`workflow_call`) build + kamal-command workflow shared by review-app and staging deploys |
+| `bin/kamal_review` | Run kamal against one review app — `deploy`/`destroy`/`reload_database` lifecycle plus arbitrary passthrough commands (resolves the PR number from any id form, sets `REVIEW_APP_*` + `--config-file`) |
+| `config/deploy.review.yml` | Kamal config for both targets — ERB derives `pr-<N>` (with `REVIEW_APP_PR_NUMBER`) or the `sandbox` slug (without); accessories emitted for PR apps only |
+| `.github/workflows/sandbox.yml` | Thin caller of `kamal-deploy.yml` for the `main`→sandbox deploy, dispatched on every push to `main` — see [Sandbox](#sandbox-persistent-main-deploy) |
+| `.github/workflows/kamal-deploy.yml` | Reusable (`workflow_call`) build + kamal-command workflow shared by review-app and sandbox deploys |
 | `config/crontab` | Scheduled rake tasks run by the `cron` server role |
 | `.kamal/secrets` | Local secrets — pulls from 1Password and `gh auth token` |
 | `.kamal/secrets-ci` | CI secrets — dotenv passthrough for GitHub Actions env vars; the workflow copies this over `.kamal/secrets` before running kamal |
-| `.kamal/hooks/post-deploy` | Best-effort Honeybadger deploy notification (`staging` env); never fails the deploy — no-ops if `HONEYBADGER_API_KEY` is unset or the gem is absent (e.g. CI) |
+| `.kamal/hooks/post-deploy` | Best-effort Honeybadger deploy notification (`sandbox` env); never fails the deploy — no-ops if `HONEYBADGER_API_KEY` is unset or the gem is absent (e.g. CI) |
 | `.github/workflows/review-app.yml` | `resolve` + `op` (calls `kamal-deploy.yml`) + `post` + `report` jobs handling all triggers (see [How a deploy works](#how-a-deploy-works)) |
 | `.github/workflows/ci.yml` (`dispatch` job) | Auto-dispatches a deploy on every push to a labeled PR — the auto-redeploy half of the label gate |
 | `.kamal/provisioning/` | Ansible playbook for one-time host hardening |
@@ -116,7 +125,8 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 
 ## Known limits
 
-- **Redis DB allocation is mod-31.** PRs congruent mod 31 share a logical DB — caches + Sidekiq queues mix. Mitigation: bump `--databases` in the redis accessory `cmd:` and raise `REDIS_DATABASES` in `bin/kamal_review`.
+- **Redis DB allocation is mod-1023.** PRs congruent mod 1023 still share a logical DB — caches + Sidekiq queues mix — but that now takes two live apps ~5 months of PRs apart, and destroy skips its flush when it finds one. Raising it further means bumping `--databases` in the redis accessory `cmd:` and `REDIS_DATABASES` in `bin/kamal_review` in lockstep; the cost is ~3.5MB of baseline RSS per 1000 databases and slower active expiry of TTL'd keys.
+- **One eviction pool for every app.** `--maxmemory 512mb --maxmemory-policy allkeys-lru` is instance-wide, so it ignores logical DBs entirely: any app's cache growth can evict any other app's keys, including enqueued Sidekiq jobs, with no error. Widening the modulus doesn't help. Watch `evicted_keys` in `INFO stats`.
 - <a id="storage-is-shared"></a>**Storage isn't isolated per app.** CarrierWave (bike photos, most images) writes to the per-PR local `_uploads` volume — isolated, dropped on destroy. ActiveStorage attachments go to the shared R2 dev bucket (`cloudflare_dev` / `bikeindex-dev`), where every app writes to the bucket root with random keys (no prefix). Destroy purges a PR's own blobs — enumerated from its database, deleted by their (globally unique) keys — through the running app before `app remove`, so only that PR's objects go. Best-effort: a PR whose app can't boot at destroy orphans its blobs, and blobs from PRs destroyed before this cleanup existed can only be reclaimed by reconciling live keys against the bucket.
 - **One Sidekiq worker per app at concurrency=2.** Enough for demos, not for stress-testing queues.
 - **Forks aren't auto-deployed.** A maintainer triggers fork PRs manually via `workflow_dispatch` after reviewing the diff.
@@ -150,6 +160,7 @@ These are the same values as the `REVIEW_APP_*` GitHub Environment secrets ([Ini
 
 ```bash
 bin/kamal_review deploy --app <pr_number> --version <image_tag>
+bin/kamal_review reload_database --app <pr_number>   # drop + reseed, no redeploy
 ```
 
 `REVIEW_APP_HOST` defaults to `host.review.bikeindex.org`; export it only to target a different host under the `*.review.bikeindex.org` wildcard.
@@ -219,4 +230,4 @@ Creates the `shared-db` (Postgres 17) and `shared-redis` (Redis 7) containers. E
   - `REVIEW_APP_R2_DEV_ENDPOINT`, `REVIEW_APP_R2_DEV_ACCESS_KEY`, `REVIEW_APP_R2_DEV_ACCESS_KEY_SECRET` — creds for the `bikeindex-dev` R2 bucket (`cloudflare_dev` in `config/storage.yml`), shared by all review apps; do NOT reuse the production R2 token.
   - `REVIEW_APP_HONEYBADGER_API_KEY` — optional; the post-deploy hook no-ops if unset
 
-Review apps also load the committed **`.env`** at boot (`dotenv-rails` is in the `:staging` group). It supplies dev/sandbox creds for third-party integrations — **Stripe (test-mode)**, Twitter, Twilio, Facebook, Strava, Mailchimp, … — so they don't fall through to empty. **kamal's `env:` wins**: dotenv never overrides a var kamal sets, so it only fills gaps. That's why **Stripe is intentionally absent** from the kamal/1Password/GitHub lists — it comes from `.env`. (Google/Mapbox/R2 stay kamal-managed, so their 1Password values must be real, not placeholders.)
+Review apps also load the committed **`.env`** at boot (`dotenv-rails` is in the `:sandbox` group). It supplies dev/sandbox creds for third-party integrations — **Stripe (test-mode)**, Twitter, Twilio, Facebook, Strava, Mailchimp, … — so they don't fall through to empty. **kamal's `env:` wins**: dotenv never overrides a var kamal sets, so it only fills gaps. That's why **Stripe is intentionally absent** from the kamal/1Password/GitHub lists — it comes from `.env`. (Google/Mapbox/R2 stay kamal-managed, so their 1Password values must be real, not placeholders.)

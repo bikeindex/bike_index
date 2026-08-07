@@ -80,7 +80,7 @@ RSpec.describe Bike, type: :model do
           FactoryBot.create(:stolen_bike_in_nyc)
           FactoryBot.create(:stolen_bike_in_los_angeles)
           expect(Bike.currently_stolen_in(country: "New York City")).to be_empty
-          expect(Bike.currently_stolen_in(state: "New York City", country: "Svenborgia")).to be_empty
+          expect(Bike.currently_stolen_in(region: "New York City", country: "Svenborgia")).to be_empty
           expect(Bike.currently_stolen_in(city: "Los Angeles", country: "NL")).to be_empty
         end
       end
@@ -101,10 +101,10 @@ RSpec.describe Bike, type: :model do
           bikes = Bike.currently_stolen_in(city: "Los Angeles")
           expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["Los Angeles"])
 
-          bikes = Bike.currently_stolen_in(state: "NY", country: "US")
+          bikes = Bike.currently_stolen_in(region: "NY", country: "US")
           expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["New York"])
 
-          bikes = Bike.currently_stolen_in(state: "NY", country: "NL")
+          bikes = Bike.currently_stolen_in(region: "NY", country: "NL")
           expect(bikes).to be_empty
         end
       end
@@ -131,7 +131,7 @@ RSpec.describe Bike, type: :model do
       let!(:stolen_record3) { FactoryBot.create(:stolen_record, phone: "2223334444", secondary_phone: "111222333") }
       let(:bike2) { stolen_record3.bike }
       it "finds by stolen_record" do
-        StolenBike::AfterStolenRecordSaveJob.new.perform(stolen_record2.id)
+        BikeJobs::AfterStolenRecordSaveJob.new.perform(stolen_record2.id)
         expect(stolen_record1.reload.current?).to be_falsey
         stolen_record1.update_column :current, true
         bike1.reload
@@ -730,6 +730,17 @@ RSpec.describe Bike, type: :model do
       it "responds with status" do
         expect(bike.status_humanized).to eq "with owner"
         expect(bike.status_humanized_translated).to eq "with owner"
+      end
+    end
+  end
+
+  describe "created_by_notification_or_impounding?" do
+    context "unregistered parking notification" do
+      let(:parking_notification) { FactoryBot.create(:parking_notification_unregistered) }
+      let(:bike) { parking_notification.bike }
+      it "is truthy" do
+        expect(bike.current_ownership.origin).to eq "creator_unregistered_parking_notification"
+        expect(bike.created_by_notification_or_impounding?).to be_truthy
       end
     end
   end
@@ -1730,6 +1741,14 @@ RSpec.describe Bike, type: :model do
         allow_any_instance_of(ImageUploader).to receive(:blank?) { true }
         image_url = public_image.image_url
         expect(bike.reload.image_url).to eq image_url.gsub("http://test.host", "https://files.bikeindex.org")
+      end
+      context "activestorage backed public_image" do
+        let!(:public_image) { FactoryBot.create(:public_image, :with_attached_file, imageable: bike) }
+        it "is the variant url" do
+          expect(bike.reload.thumb_path).to be_present
+          expect(bike.image_url(:large)).to eq public_image.reload.image_url(:large)
+          expect(bike.image_url(:large)).to_not eq public_image.image_url
+        end
       end
     end
     context "with missing public_image" do

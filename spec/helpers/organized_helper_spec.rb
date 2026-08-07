@@ -3,13 +3,12 @@ require "rails_helper"
 RSpec.describe OrganizedHelper, type: :helper do
   describe "organized bike display" do
     let(:bike) { FactoryBot.create(:bike_organized) }
-    let(:target_origin) { "<span title=\"Registered with self registration process\">web</span>" }
-    let(:target_text) do
-      "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong>, <small class=\"less-strong\">#{target_origin}</small></span>"
-    end
+    let(:target_prefix) { "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong>, <small class=\"less-strong\">" }
     it "renders" do
       expect(organized_bike_text).to be_nil
-      expect(organized_bike_text(bike)).to eq target_text
+      result = organized_bike_text(bike)
+      expect(result).to start_with("#{target_prefix}web ") # origin_display label
+      expect(result).to include("Registered with self registration process") # origin_display tooltip
       expect(organized_bike_text(bike, skip_creation: true)).to eq "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong></span>"
     end
     context "unregistered" do
@@ -34,27 +33,6 @@ RSpec.describe OrganizedHelper, type: :helper do
     end
   end
 
-  describe "origin_display" do
-    let(:target) { "<span title=\"Registration began with incomplete registration, via organization landing page\">landing page</span>" }
-    it "renders with title" do
-      expect(origin_display("landing page")).to eq target
-    end
-    context "lightspeed" do
-      let(:target) { "<span title=\"Automatically registered by bike shop point of sale (Lightspeed POS)\">Lightspeed</span>" }
-      it "renders with title" do
-        expect(origin_display("Lightspeed")).to eq target
-      end
-    end
-    context "scanned_sticker" do
-      let(:target) { "<span title=\"Registered via sticker\">sticker</span>" }
-      let(:ownership) { Ownership.new(origin: "sticker") }
-      it "renders with title" do
-        expect(ownership.creation_description).to eq "sticker"
-        expect(origin_display(ownership.creation_description)).to eq target
-      end
-    end
-  end
-
   describe "status_display" do
     it "renders text-success" do
       expect(status_display("current")).to eq "<span class=\"text-success\">current</span>"
@@ -74,7 +52,7 @@ RSpec.describe OrganizedHelper, type: :helper do
       end
     end
     context "removed_from_bike_index, trashed or Removed from Bike Index" do
-      let(:error_class) { UI::Alert::Component::TEXT_CLASSES[:error] }
+      let(:error_class) { UI::Alerts::Base::Component::TEXT_CLASSES[:error] }
       it "is red" do
         expect(status_display("removed_from_bike_index")).to eq "<span class=\"#{error_class}\">removed from bike index</span>"
         expect(status_display("Removed from Bike Index")).to eq "<span class=\"#{error_class}\">Removed from Bike Index</span>"
@@ -82,13 +60,13 @@ RSpec.describe OrganizedHelper, type: :helper do
       end
     end
     context "impounded" do
-      let(:error_class) { UI::Alert::Component::TEXT_CLASSES[:error] }
+      let(:error_class) { UI::Alerts::Base::Component::TEXT_CLASSES[:error] }
       it "is orange" do
         expect(status_display("impounded")).to eq "<span class=\"#{error_class}\">impounded</span>"
       end
     end
     context "impound_claim" do
-      let(:error_class) { UI::Alert::Component::TEXT_CLASSES[:error] }
+      let(:error_class) { UI::Alerts::Base::Component::TEXT_CLASSES[:error] }
       it "info for approved, red for denied" do
         expect(status_display("approved")).to eq "<span class=\"text-info\">approved</span>"
         expect(status_display("claim_approved")).to eq "<span class=\"text-info\">claim approved</span>"
@@ -205,15 +183,10 @@ RSpec.describe OrganizedHelper, type: :helper do
     end
   end
 
-  describe "include_fields" do
+  describe "registration_field_label" do
     let(:organization) { Organization.new }
-    let(:user) { User.new }
-    it "does not include" do
-      expect(include_field_reg_phone?(organization)).to be_falsey
-      expect(include_field_reg_phone?(organization, user)).to be_falsey
-      expect(include_field_reg_extra_registration_number?(organization)).to be_falsey
-      expect(include_field_reg_organization_affiliation?(organization, user)).to be_falsey
-      # the labels work with or without an organization
+
+    it "is nil with or without an organization" do
       expect(registration_field_label(organization, "extra_registration_number")).to be_nil
       expect(registration_field_label(organization, "reg_address")).to be_nil
       expect(registration_field_label(nil, "reg_phone")).to be_nil
@@ -222,16 +195,13 @@ RSpec.describe OrganizedHelper, type: :helper do
       expect(registration_field_label(organization, "reg_bike_sticker")).to be_nil
       expect(registration_field_label(organization, "owner_email")).to be_nil
     end
-    context "with enabled features" do
+
+    context "with labels" do
       let(:labels) { {reg_phone: "You have to put this in, jerk", reg_extra_registration_number: "XXXZZZZ", reg_student_id: "PUT in student ID!"}.as_json }
       let(:feature_slugs) { %w[reg_extra_registration_number reg_address reg_phone reg_organization_affiliation reg_student_id reg_bike_sticker] }
       let(:organization) { Organization.new(enabled_feature_slugs: feature_slugs, registration_field_labels: labels) }
-      it "includes" do
-        expect(include_field_reg_phone?(organization)).to be_truthy
-        expect(include_field_reg_phone?(organization, user)).to be_truthy
-        expect(include_field_reg_extra_registration_number?(organization)).to be_truthy
-        expect(include_field_reg_organization_affiliation?(organization, user)).to be_truthy
-        # And test the labels
+
+      it "is the organization's own wording, for the fields it named" do
         expect(registration_field_label(organization, "reg_extra_registration_number")).to eq "XXXZZZZ"
         expect(registration_field_label(organization, "reg_address")).to be_nil
         expect(registration_field_label(organization, "reg_phone")).to eq labels["reg_phone"]
@@ -240,63 +210,15 @@ RSpec.describe OrganizedHelper, type: :helper do
         expect(registration_field_label(organization, "reg_bike_sticker")).to be_nil
         expect(registration_field_label(organization, "owner_email")).to be_nil
       end
-      context "with user with attributes" do
-        let(:user) { User.new(phone: "888.888.8888") }
-        it "includes" do
-          expect(user.phone).to be_present
-          expect(organization.additional_registration_fields.include?("reg_phone")).to be_truthy
-          expect(include_field_reg_phone?(organization, user)).to be_falsey
-          expect(include_field_reg_student_id?(organization, user)).to be_truthy
-          expect(include_field_reg_student_id?(organization, user)).to be_truthy
-        end
-        context "with user_registration_organization" do
-          let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: feature_slugs) }
-          let(:registration_info) { {} }
-          let(:user) { FactoryBot.create(:user_confirmed) }
-          let!(:user_registration_organization) { FactoryBot.create(:user_registration_organization, user: user, organization: organization, registration_info: registration_info) }
-          it "is falsey with user" do
-            expect(include_field_reg_phone?(organization)).to be_truthy
-            expect(include_field_reg_phone?(organization, user)).to be_truthy # Purely based on whether user has phone
-            expect(include_field_reg_organization_affiliation?(organization)).to be_truthy
-            expect(include_field_reg_organization_affiliation?(organization, user)).to be_truthy
-            expect(include_field_reg_student_id?(organization)).to be_truthy
-            expect(include_field_reg_student_id?(organization, user)).to be_truthy
-          end
-          context "with registration_info" do
-            let(:user) { FactoryBot.create(:user_confirmed, :with_address_record, address_in: :edmonton, phone: "7773335555", address_set_manually: true) }
-            let(:registration_info) { {student_id: "12", organization_affiliation: "staff"} }
-            it "is falsey" do
-              expect(user.reload.address_record.street).to be_present
-              expect(include_field_reg_phone?(organization, user)).to be_falsey # Purely based on whether user has phone
-              expect(include_field_reg_organization_affiliation?(organization, user)).to be_falsey
-              expect(include_field_reg_student_id?(organization, user)).to be_falsey
-              # Each bike needs to have these fields - regardless of user_registration_organization
-              expect(include_field_reg_extra_registration_number?(organization, user)).to be_truthy
-              expect(include_field_reg_bike_sticker?(organization, user)).to be_truthy
-            end
-          end
-        end
-      end
+
       context "owner_email with tags" do
         let(:labels) { {reg_address: "ADDY!!", owner_email: "<code>bikeindex.org</code> email"}.as_json }
-        it "includes the thing" do
+
+        it "keeps them, stripping when asked" do
           expect(registration_field_label(organization, "reg_address")).to eq "ADDY!!"
           expect(registration_field_label(organization, "reg_phone")).to be_nil
           expect(registration_field_label(organization, "owner_email")).to eq "<code>bikeindex.org</code> email"
           expect(registration_field_label(organization, "owner_email", strip_tags: true)).to eq "bikeindex.org email"
-        end
-      end
-      context "stickers" do
-        it "includes" do
-          expect(include_field_reg_bike_sticker?(organization, user)).to be_truthy
-          expect(include_field_reg_bike_sticker?(organization, user, true)).to be_falsey
-        end
-        context "bike_stickers_user_editable" do
-          let(:feature_slugs) { %w[bike_stickers bike_stickers_user_editable reg_bike_sticker] }
-          it "includes" do
-            expect(include_field_reg_bike_sticker?(organization, user)).to be_truthy
-            expect(include_field_reg_bike_sticker?(organization, user, true)).to be_truthy
-          end
         end
       end
     end

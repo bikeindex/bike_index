@@ -13,8 +13,9 @@ class ApplicationComponentPreview < ViewComponent::Preview
     subclass.layout "component_preview"
   end
 
+  # Falls back like lookbook_organization — a fresh database should render, not raise
   def lookbook_user
-    @lookbook_user ||= User.find(ENV.fetch("LOOKBOOK_USER_ID", 1))
+    @lookbook_user ||= User.find_by(id: ENV.fetch("LOOKBOOK_USER_ID", 1)) || User.first
   end
 
   def lookbook_organization
@@ -22,6 +23,16 @@ class ApplicationComponentPreview < ViewComponent::Preview
   end
 
   private
+
+  def production_notice(rendered)
+    render(UI::Alerts::Base::Component.new(kind: :error,
+      text: "This preview renders a real #{rendered}, so it's disabled in production."))
+  end
+
+  def missing_notice(needed)
+    render(UI::Alerts::Base::Component.new(kind: :warning,
+      text: "Nothing to preview — this environment has no #{needed}."))
+  end
 
   def template
     ActionView::Base.new(

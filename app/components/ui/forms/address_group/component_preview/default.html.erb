@@ -1,0 +1,3 @@
+<%= form_with(model: AddressRecord.new, url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(UI::Forms::AddressGroup::Component.new(form_builder: f, required:, street_2:)) %>
+<% end %>

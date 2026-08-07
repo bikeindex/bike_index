@@ -17,12 +17,12 @@ RSpec.describe HotSheet, type: :model do
   end
 
   describe "fetch_stolen_records" do
-    let!(:stolen_record) { FactoryBot.create(:stolen_record, :in_nyc_legacy) }
+    let!(:stolen_record) { FactoryBot.create(:stolen_record, :in_nyc) }
     let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
     let(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization: organization, is_on: true) }
     let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization: organization) }
     context "with two records" do
-      let!(:stolen_record2) { FactoryBot.create(:stolen_record, :in_nyc_legacy, date_stolen: Time.current - 2.days) }
+      let!(:stolen_record2) { FactoryBot.create(:stolen_record, :in_nyc, date_stolen: Time.current - 2.days) }
       before { expect(hot_sheet_configuration).to be_present }
       it "finds the stolen records, assigns" do
         hot_sheet.reload

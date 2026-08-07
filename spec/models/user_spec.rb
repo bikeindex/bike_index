@@ -224,6 +224,33 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "registration_show_redesign?" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+
+    it "is falsey when not in the rollout" do
+      expect(user.registration_show_toggleable?).to be_falsey
+      expect(user.registration_show_redesign?).to be_falsey
+    end
+
+    context "in the rollout" do
+      before { Flipper.enable_actor(:bike_show_redesign_toggle, user) }
+
+      it "is truthy" do
+        expect(user.registration_show_toggleable?).to be_truthy
+        expect(user.registration_show_redesign?).to be_truthy
+      end
+
+      context "switched to the legacy view" do
+        let(:user) { FactoryBot.create(:user_confirmed, feature_registration_show_legacy: true) }
+
+        it "is toggleable, but not the redesign" do
+          expect(user.registration_show_toggleable?).to be_truthy
+          expect(user.registration_show_redesign?).to be_falsey
+        end
+      end
+    end
+  end
+
   describe "superuser?" do
     let(:user) { User.new }
     it "is true for superuser attribute" do
@@ -503,6 +530,19 @@ RSpec.describe User, type: :model do
     end
     it "haves before create callback" do
       expect(User._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:filter).include?(:generate_username_confirmation_and_auth)).to eq(true)
+    end
+  end
+
+  describe "generate_username" do
+    it "returns a username CredibilityScorer doesn't penalize" do
+      expect(CredibilityScorer.suspiscious_handle?(User.generate_username)).to be_falsey
+    end
+    context "random username contains a bad word" do
+      # BadWordCleaner matches substrings, so a random username occasionally does
+      before { allow(SecureRandom).to receive(:urlsafe_base64).and_return("Xcumbersome7", "Zpolitely3") }
+      it "draws again" do
+        expect(User.generate_username).to eq "zpolitely3"
+      end
     end
   end
 

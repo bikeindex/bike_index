@@ -22,7 +22,7 @@ Drive Playwright MCP to capture viewport screenshots of pages served by `bin/dev
 
 ## Output filenames (load-bearing — callers parse these)
 
-`tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`, where `<branch>=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')` and `<timestamp>=$(date +%Y%m%d-%H%M%S)`. Cross-branch shots get an extra `-main-` segment.
+`tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`, where `<branch>=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')` and `<timestamp>=$(date +%Y%m%d-%H%M%S)`. Cross-branch shots get an extra `-base-` segment.
 
 ## Preflight
 
@@ -61,12 +61,13 @@ Two viewports — resize once each, then walk every URL:
 1. `browser_resize` 1440×900 → for each URL: navigate → settle → hide the footer → `browser_take_screenshot` (`fullPage: true`) to `...-desktop.png`.
 2. `browser_resize` 390×844 → same loop → `...-mobile.png`.
 
-**Full page, minus the footer, no `target:` arg.** Capture the whole page (`fullPage: true`) so nothing below the fold is cut off, but hide the site footer first — it's identical on every page and just pads every capture. After each navigation (hiding doesn't persist across page loads), run:
+**Full page, minus the footer and review-app banner, no `target:` arg.** Capture the whole page (`fullPage: true`) so nothing below the fold is cut off, but first hide the site footer (identical on every page, just padding) and the `#review-app-banner` topbar (dev/review-app-only chrome that isn't part of the real page). After each navigation (hiding doesn't persist across page loads), run:
 
 ```js
 browser_evaluate: () => {
   document.querySelector('.primary-footer, footer, [role="contentinfo"]')?.style.setProperty('display', 'none');
-  return document.body.scrollHeight; // content height with the footer gone
+  document.getElementById('review-app-banner')?.style.setProperty('display', 'none');
+  return document.body.scrollHeight; // content height with the footer + banner gone
 }
 ```
 
@@ -90,21 +91,23 @@ $BASE_URL/rails/view_components/<preview_path>/<scenario>
 
 `<preview_path>` is the preview class underscored with the `Preview` suffix dropped, and `<scenario>` is the preview method. `PageBlock::ReviewAppBanner::ComponentPreview#superadmin_signed_in` → `/rails/view_components/page_block/review_app_banner/component/superadmin_signed_in`. If a scenario doesn't exist yet, add a method to the component's `*_preview.rb` first — a preview that renders the exact state (pass the args that trigger it) is often the fastest path to a clean shot.
 
+Use this bare route, not Lookbook's `/lookbook/...`, which wraps the component in its own browser chrome.
+
 The preview page loads Tailwind and renders the component standalone (no site chrome), so capture the viewport as usual (`fullPage: false`); a small ViewComponent render-timing line at the bottom is harmless. Everything else still applies — same PII/seed-data gate, same `(url-path, page-slug)` naming (use a slug like `banner-signed-in`).
 
 Previews that query the dev DB (e.g. `User.admins.first`) render nothing when that data is missing — if the state doesn't appear, seed first with `bundle exec rails db:seed`. This is component-only: a preview can't show layout/stacking against the rest of the page (e.g. a navbar z-index fix), so use a real page for those.
 
 ## Cross-branch comparison (optional)
 
-When the caller wants before/after, repeat the capture loop against `main`.
+When the caller wants before/after, repeat the capture loop against the base ref. The caller passes the base — `origin/main` by default, or the PR's actual base when it isn't `main` (a stacked PR's base often isn't). Set `BASE_REF` to that remote ref (e.g. `origin/main`, `origin/sethherr/feature-x`) and use it throughout; `git fetch origin` first so it's current.
 
 1. `git status` — abort if there are uncommitted changes.
-2. Diff `db/migrate/` between the branch and `main`; abort if it changed — a branch-only migration leaves the DB schema ahead of `main`'s code, so `main` pages can error.
-3. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout origin/main` (detached — `git checkout main` fails if a sibling worktree holds the `main` branch; detached HEAD at `origin/main` is allowed concurrently and is the same code), navigate the browser to force Rails to reload the changed files, repeat capture into `...-main-...` filenames, then `git checkout $BRANCH`.
+2. Diff `db/migrate/` between the branch and `$BASE_REF`; abort if it changed — a branch-only migration leaves the DB schema ahead of the base's code, so base pages can error.
+3. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout --detach $BASE_REF` (detached — checking out a branch name fails if a sibling worktree holds it; detached HEAD at the remote ref is allowed concurrently and is the same code), navigate the browser to force Rails to reload the changed files, repeat capture into `...-base-...` filenames, then `git checkout $BRANCH`.
 
 A `Gemfile.lock` diff is **not** a reason to abort.
 
-The seeded DB persists across checkouts, so the existing session usually still works.
+The seeded DB persists across checkouts, so the existing session usually still works. Preview routes (`/rails/view_components/...`, `/lookbook/...`) reload across the checkout like ordinary pages, so their before/after works against any `$BASE_REF` too.
 
 ## Clean up
 

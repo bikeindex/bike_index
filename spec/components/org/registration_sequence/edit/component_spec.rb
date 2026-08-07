@@ -20,10 +20,30 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
     expect(page).to have_css("[data-sortable-target='item'] [data-sortable-target='handle']", minimum: 1)
   end
 
+  it "renders the settings shared by every page" do
+    registration_sequence.update!(faq_url: "https://example.com/faq")
+    render_inline(described_class.new(registration_sequence:))
+
+    expect(page).to have_field("registration_sequence[faq_url]", with: "https://example.com/faq")
+    # A blank acknowledgment falls back to the default, which the placeholder shows
+    expect(page).to have_field("registration_sequence[acknowledgment_text]", with: "",
+      placeholder: RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT)
+  end
+
+  it "badges an organization-specific page with the organization's name" do
+    render_inline(described_class.new(registration_sequence:))
+    expect(page).to_not have_content(organization.short_name)
+
+    registration_sequence.registration_sequence_pages.first.update!(organization_specific: true)
+    render_inline(described_class.new(registration_sequence:))
+
+    expect(page).to have_content(organization.short_name)
+  end
+
   it "puts each page's body in a collapsed disclosure toggled by a chevron" do
     render_inline(described_class.new(registration_sequence:))
 
-    expect(page).to have_css("button[data-action~='disclosure#toggle'] [data-disclosure-target='chevron']", minimum: 1)
-    expect(page).to have_css("[data-disclosure-target='content'][class*='hidden'] li", minimum: 1)
+    expect(page).to have_css("button[data-action~='ui--collapse#toggle'] [data-ui--collapse-target='chevron']", minimum: 1)
+    expect(page).to have_css("[data-ui--collapse-target='content'][class*='hidden'] li", minimum: 1)
   end
 end

@@ -13,14 +13,19 @@ description: >-
 
 This project uses RSpec. All business logic should be tested.
 
+## Run only the specs your change touches
+
+Pass the files or directories you changed — `bundle exec rspec spec/components/ui/table spec/requests/bikes/show_request_spec.rb`. Never run a bare `bundle exec rspec`, `spec/`, or a whole top-level directory like `spec/components` or `spec/requests`: those take many minutes and sweep in `:flaky`-tagged system specs. CI runs the full suite.
+
+When something fails outside the files you changed, re-run that spec file on its own before treating it as yours. Passing alone means the full run was order-dependent or flaky (check whether its `describe` is tagged `:flaky`); failing alone means it's real, and a real failure gets fixed, never excused as pre-existing.
+
 ## What to test (and what not to)
 
 - Tests should either: help make the code correct now, or prevent bugs in the future. Don't add tests that don't do one of those things.
 - Use **request specs**, not controller specs — request specs go through the full middleware/routing stack, so they catch breakage controller specs can't see. Everything making the same request should be in a single test.
 - Avoid testing private methods.
 - Avoid mocking objects.
-  - If making external requests, use VCR. Don't manually write VCR cassettes — record them by running the tests.
-  - Cassettes that get modified when you run specs locally are re-recordings, not unrelated churn — they're supposed to update regularly. Commit them with your branch; don't revert them to "keep the PR focused".
+  - If making external requests, use VCR. Never write or edit a cassette by hand — record them by running the tests (see [VCR cassettes](#vcr-cassettes-never-hand-edit-always-re-record)).
 - Don't use `tap` to bundle factory creation with follow-up setup. Create the record in `let`/`let!`, then do the follow-up work on its own line (a separate statement, or a `before` block). One thing per line reads better and keeps the factory call clean.
 
 ### Good
@@ -39,6 +44,20 @@ let!(:bike_transferred) do
   end
 end
 ```
+
+## VCR cassettes: never hand-edit, always re-record
+
+**Never open a cassette and change it.** Not a URL, not a token, not a timestamp, not an interaction — no matter how small or how obviously right the edit looks. A cassette is a recording of what a real service actually said; an edited one asserts something no service ever returned, and the spec passes against a fiction. This has no exceptions.
+
+The only way a cassette changes is a spec run that records it:
+
+- **Stale or wrong contents** — `rm` the file and run the spec. VCR writes it from scratch, holding exactly the requests the spec makes now. Re-recording *without* deleting only writes back the requests still being made, so interactions the spec has stopped making survive forever — and because VCR times `re_record_interval` from the cassette's oldest interaction, one stale entry re-triggers re-recording on every run.
+- **Cassette missing for a resource that doesn't exist yet** — leave it absent and the spec red. Don't fabricate one.
+- **Secrets** — `spec/rails_helper.rb`'s `filter_sensitive_data` and `before_record` handle them. Add the key there; don't scrub the file by hand.
+
+**Commit what a run re-records.** A modified cassette is a re-recording, not unrelated churn — cassettes carry a `re_record_interval` and are meant to update. Commit it on the branch you're on, whatever that branch is about. Never `git checkout` it away to keep a diff focused.
+
+`git status` after a spec run is the only signal; a run that re-records prints nothing.
 
 ## Stubbing ENV
 

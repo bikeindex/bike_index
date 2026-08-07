@@ -12,6 +12,19 @@ RSpec.describe UserBan, type: :model do
     end
   end
 
+  describe "update_user_on_create" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: bike) }
+    it "bans the user and marks bikes likely_spam (not deleted), pulling listings" do
+      UserBan.create(user:, reason: :seo_spam)
+      expect(user.reload.banned?).to be_truthy
+      expect(bike.reload.likely_spam).to be_truthy
+      expect(bike.deleted_at).to be_blank
+      expect(marketplace_listing.reload.status).to eq "removed"
+    end
+  end
+
   describe "reason_humanized" do
     it "humanizes by default" do
       expect(UserBan.reason_humanized("known_criminal")).to eq "Known criminal"

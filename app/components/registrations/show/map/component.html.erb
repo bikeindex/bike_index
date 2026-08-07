@@ -1,0 +1,27 @@
+<div
+  data-controller="registrations--show--map"
+  data-registrations--show--map-latitude-value="<%= @latitude %>"
+  data-registrations--show--map-longitude-value="<%= @longitude %>"
+  data-registrations--show--map-radius-meters-value="<%= radius_meters %>"
+  data-registrations--show--map-point-value="<%= @point %>"
+  class="
+    tw:relative tw:mt-3 tw:mb-4 tw:h-80 tw:w-full tw:overflow-hidden
+    tw:rounded-sm tw:bg-gray-100 tw:dark:bg-gray-900
+  "
+>
+  <div
+    data-registrations--show--map-target="canvas"
+    class="tw:h-full tw:w-full"
+  ></div>
+
+  <p
+    hidden
+    data-registrations--show--map-target="unavailable"
+    class="
+      tw:absolute tw:inset-0 tw:flex tw:items-center tw:justify-center
+      tw:p-8 tw:text-center tw:text-sm tw:opacity-65
+    "
+  >
+    <%= translation(".unavailable") %>
+  </p>
+</div>

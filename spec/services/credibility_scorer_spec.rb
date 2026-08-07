@@ -103,7 +103,7 @@ RSpec.describe CredibilityScorer do
       end
       let(:organization) { FactoryBot.create(:organization, approved: true) } # Organizations are verified by default
       let(:ownership) { bike.current_ownership }
-      it "returns created this month", :flaky do
+      it "returns created this month" do
         expect(ownership).to be_present
         expect(subject.creation_badges(ownership)).to eq([:created_this_month])
         expect(bike.creator&.id).to eq auto_user.id
@@ -161,7 +161,7 @@ RSpec.describe CredibilityScorer do
       end
       context "spam_registrations not embed" do
         let(:organization) { FactoryBot.create(:organization, approved: true, spam_registrations: true) }
-        it "returns without spam_registrations", :flaky do
+        it "returns without spam_registrations" do
           expect(subject.organization_trusted?(organization)).to be_falsey
           expect(instance.badges).to eq(%i[created_this_month long_time_user])
         end
@@ -187,7 +187,7 @@ RSpec.describe CredibilityScorer do
     context "registered 2 years ago" do
       let(:created_at) { Time.current - 1.day - 2.years }
       let!(:ownership) { FactoryBot.create(:ownership, created_at: created_at, bike: bike) }
-      it "returns long_time_registration", :flaky do
+      it "returns long_time_registration" do
         bike.reload
         expect(subject.creation_age_badge(ownership)).to eq :long_time_registration
         expect(subject.creation_badges(ownership)).to eq([:long_time_registration])
@@ -208,7 +208,7 @@ RSpec.describe CredibilityScorer do
   describe "ownership_badges" do
     let(:created_at) { Time.current - 400.days }
     let!(:ownership1) { FactoryBot.create(:ownership_claimed, bike: bike, created_at: created_at, creator: bike.creator) }
-    it "returns claimed", :flaky do
+    it "returns claimed" do
       bike.reload
       expect(subject.ownership_badges(bike)).to eq([:current_ownership_claimed])
       # Also, general badges returns long_time_registration
@@ -225,7 +225,7 @@ RSpec.describe CredibilityScorer do
         expect(ownership1.current?).to be_falsey
         expect(subject.ownership_badges(bike)).to eq([:multiple_ownerships])
         # Also, general badges returns long_time_registration
-        expect(instance.badges - %i[user_handle_suspicious]).to match_array(%i[long_time_registration multiple_ownerships])
+        expect(instance.badges).to match_array(%i[long_time_registration multiple_ownerships])
       end
     end
   end
@@ -236,7 +236,7 @@ RSpec.describe CredibilityScorer do
     let(:user) { FactoryBot.create(:user) }
     let(:banned_user) { FactoryBot.create(:user, banned: true) }
     before { bike.reload } # Because current_ownership
-    it "returns []", :flaky do
+    it "returns []" do
       expect(subject.bike_user_badges(bike)).to eq([])
     end
     context "creator banned" do
@@ -265,7 +265,7 @@ RSpec.describe CredibilityScorer do
     end
     describe "long_time_user" do
       let(:user) { FactoryBot.create(:user, created_at: Time.current - 3.years) }
-      it "returns veteran", :flaky do
+      it "returns veteran" do
         expect(subject.bike_user_badges(bike)).to eq([:long_time_user])
         # Also, just test for the full thing, because curiosity
         expect(instance.badges).to eq([:long_time_registration, :current_ownership_claimed, :long_time_user])
@@ -282,7 +282,7 @@ RSpec.describe CredibilityScorer do
       let(:stolen_record) { recovered_bike.current_stolen_record }
       let!(:theft_alert) { FactoryBot.create(:theft_alert, :paid, stolen_record: stolen_record, user: user) }
       let!(:feedback) { FactoryBot.create(:feedback, kind: "tip_stolen_bike", user: user) }
-      it "returns the bike_badges", :flaky do
+      it "returns the bike_badges" do
         stolen_record.add_recovery_information(recovered_description: "I recovered it!")
         stolen_record.reload
         expect(stolen_record.recovered?).to be_truthy
@@ -300,7 +300,7 @@ RSpec.describe CredibilityScorer do
         let(:organization) { FactoryBot.create(:organization_with_organization_features) }
         let!(:organization_user) { FactoryBot.create(:organization_role_claimed, user: user, organization: organization) }
         let!(:payment) { FactoryBot.create(:payment, user: user) }
-        it "returns just user_trusted_organization_role", :flaky do
+        it "returns just user_trusted_organization_role" do
           expect(user.organizations.pluck(:id)).to eq([organization.id])
           expect(subject.bike_user_badges(bike)).to match_array(%i[user_trusted_organization_role user_supporter])
         end

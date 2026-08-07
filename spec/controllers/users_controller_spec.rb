@@ -90,13 +90,11 @@ RSpec.describe UsersController, type: :controller do
       {
         name: "Test name",
         email: "poo@pile.com",
-        password: "testthisthing7$",
-        password_confirmation: "testthisthing7$",
         terms_of_service: true
       }
     end
     describe "success" do
-      it "creates a non-confirmed record, doesn't block on unknown language" do
+      it "creates a non-confirmed passwordless record, doesn't block on unknown language" do
         expect {
           post :create, params: {locale: "klingon", user: user_attributes}
         }.to change(User, :count).by(1)
@@ -105,9 +103,15 @@ RSpec.describe UsersController, type: :controller do
         user = User.order(:created_at).last
         expect(User.from_auth(cookies.signed[:auth])).to eq user
         expect(user.partner_sign_up).to be_nil
-        expect(user.partner_sign_up).to be_nil
         expect(user.unconfirmed?).to be_truthy
+        expect(user.passwordless_user?).to be_truthy
         expect(user.preferred_language).to be_blank # Because language wasn't passed
+      end
+      it "ignores a submitted password" do
+        post :create, params: {user: user_attributes.merge(password: "testthisthing7$")}
+        user = User.order(:created_at).last
+        expect(user.passwordless_user?).to be_truthy
+        expect(user.authenticate("testthisthing7$")).to be_falsey
       end
       context "with locale passed" do
         it "creates a user with a preferred_language" do
@@ -144,7 +148,7 @@ RSpec.describe UsersController, type: :controller do
         let!(:organization) { organization_role.organization }
         let(:bike) { FactoryBot.create(:bike, example: true, owner_email: email) }
         let!(:ownership) { FactoryBot.create(:ownership, bike: bike, owner_email: email) }
-        let(:user_attributes) { {email: email, name: "SAMPLE", password: "pleaseplease12", terms_of_service: "1", notification_newsletters: "0"} }
+        let(:user_attributes) { {email: email, name: "SAMPLE", terms_of_service: "1", notification_newsletters: "0"} }
 
         it "creates a confirmed user, logs in, and send welcome even with an example bike" do
           expect(session[:passive_organization_id]).to be_blank
@@ -168,8 +172,8 @@ RSpec.describe UsersController, type: :controller do
             expect(user.user_emails.first.email).to eq email
             expect(User.fuzzy_email_find(email)).to eq user
             # bike association is processed async, so we have to drain the queue
-            expect(CallbackJob::AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
-            CallbackJob::AfterUserCreateJob.drain
+            expect(CallbackJobs::AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
+            CallbackJobs::AfterUserCreateJob.drain
             bike.reload
             expect(bike.user).to eq user
           }.to change(Email::WelcomeJob.jobs, :count)
@@ -215,7 +219,7 @@ RSpec.describe UsersController, type: :controller do
         end
       end
       context "with auto passwordless users" do
-        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "ladot.online", available_invitation_count: 1) }
+        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "ladot.online", available_invitation_count: 1) }
         let(:email) { "example@ladot.online" }
         it "Does not create a organization_role or automatically confirm the user" do
           expect(session[:passive_organization_id]).to be_blank
@@ -250,11 +254,7 @@ RSpec.describe UsersController, type: :controller do
     end
 
     describe "failure" do
-      let(:user_attributes) do
-        user = FactoryBot.attributes_for(:user)
-        user[:password_confirmation] = "bazoo"
-        user
-      end
+      let(:user_attributes) { {name: "Test name", email: "not-an-email", terms_of_service: true} }
       it "does not create a user or send a welcome email" do
         expect {
           expect {
@@ -291,7 +291,6 @@ RSpec.describe UsersController, type: :controller do
         {
           name: "foo",
           email: "foo1@bar.com",
-          password: "coolpasswprd$$$$$",
           terms_of_service: "0",
           notification_newsletters: "0"
         }
@@ -310,7 +309,7 @@ RSpec.describe UsersController, type: :controller do
   describe "confirm" do
     describe "user exists" do
       it "tells the user to log in when already confirmed" do
-        get :confirm, params: {id: user.id, code: "wtfmate"}
+        post :confirm, params: {id: user.id, code: "wtfmate"}
         expect(response).to redirect_to new_session_url
       end
 
@@ -318,15 +317,40 @@ RSpec.describe UsersController, type: :controller do
         let!(:user) { FactoryBot.create(:user) }
 
         it "logins and redirect when confirmation succeeds" do
-          get :confirm, params: {id: user.id, code: user.confirmation_token}
+          post :confirm, params: {id: user.id, code: user.confirmation_token}
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(response).to redirect_to my_account_url
           expect(session[:partner]).to be_nil
+          expect(flash[:success]).to eq "Logged in!"
+          expect(flash[:notice]).to be_blank
+        end
+
+        context "passwordless user" do
+          let!(:user) { FactoryBot.create(:user, passwordless_user: true) }
+
+          it "offers to set a password" do
+            post :confirm, params: {id: user.id, code: user.confirmation_token}
+            expect(User.from_auth(cookies.signed[:auth])).to eq(user)
+            expect(response).to redirect_to my_account_url
+            expect(flash[:success]).to be_blank
+            expect(flash[:notice]).to eq({translation_key: :signed_up, url: update_password_form_with_reset_token_users_path})
+          end
+
+          context "organization passwordless user" do
+            let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"]) }
+            let!(:organization_role) { FactoryBot.create(:organization_role_claimed, organization:, user:) }
+
+            it "doesn't offer to set a password" do
+              post :confirm, params: {id: user.id, code: user.confirmation_token}
+              expect(flash[:success]).to eq "You're signed in"
+              expect(flash[:notice]).to be_blank
+            end
+          end
         end
 
         context "with partner" do
           it "logins and redirect when confirmation succeeds" do
-            get :confirm, params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
+            post :confirm, params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
             expect(User.from_auth(cookies.signed[:auth])).to eq(user)
             expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
             expect(session[:partner]).to be_nil
@@ -334,7 +358,7 @@ RSpec.describe UsersController, type: :controller do
           context "in session" do
             it "logins and redirect when confirmation succeeds" do
               session[:partner] = "bikehub"
-              get :confirm, params: {id: user.id, code: user.confirmation_token}
+              post :confirm, params: {id: user.id, code: user.confirmation_token}
               expect(User.from_auth(cookies.signed[:auth])).to eq(user)
               expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
               expect(session[:partner]).to be_nil
@@ -344,7 +368,7 @@ RSpec.describe UsersController, type: :controller do
             it "redirects" do
               expect(user.confirmed?).to be_falsey
               set_current_user(user)
-              get :confirm, params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
+              post :confirm, params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
               user.reload
               expect(User.from_auth(cookies.signed[:auth])).to eq(user)
               expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
@@ -355,13 +379,13 @@ RSpec.describe UsersController, type: :controller do
         end
 
         it "shows a view when confirmation fails" do
-          get :confirm, params: {id: user.id, code: "Wtfmate"}
+          post :confirm, params: {id: user.id, code: "Wtfmate"}
           expect(response).to render_template :confirm_error_bad_token
         end
       end
 
       context "with auto_passwordless organization" do
-        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "ladot.online", available_invitation_count: 1) }
+        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "ladot.online", available_invitation_count: 1) }
         let(:user) { FactoryBot.create(:user, email: email) }
         let(:email) { "something@ladot.com" }
 
@@ -377,7 +401,7 @@ RSpec.describe UsersController, type: :controller do
           request.env["HTTP_CF_CONNECTING_IP"] = "169.99.69.2"
           user.reload
           expect(user.confirmed?).to be_falsey
-          get :confirm, params: {id: user.id, code: user.confirmation_token}
+          post :confirm, params: {id: user.id, code: user.confirmation_token}
           expect(response).to redirect_to my_account_url
           expect(session[:partner]).to be_nil
           expect_confirmed_and_set_ip(user)
@@ -390,7 +414,7 @@ RSpec.describe UsersController, type: :controller do
             request.env["HTTP_CF_CONNECTING_IP"] = "169.99.69.2"
             expect(user.confirmed?).to be_falsey
             expect(session[:passive_organization_id]).to be_blank
-            get :confirm, params: {id: user.id, code: user.confirmation_token}
+            post :confirm, params: {id: user.id, code: user.confirmation_token}
             expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
             expect(session[:passive_organization_id]).to eq organization.id
             expect_confirmed_and_set_ip(user)
@@ -405,7 +429,7 @@ RSpec.describe UsersController, type: :controller do
       it "redirects" do
         expect(user.confirmed?).to be_truthy
         Sidekiq::Job.clear_all
-        get :confirm, params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
+        post :confirm, params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
         expect(User.from_auth(cookies.signed[:auth])).to eq(user)
         expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
         expect(session[:partner]).to be_nil
@@ -413,7 +437,7 @@ RSpec.describe UsersController, type: :controller do
     end
 
     it "shows an appropriate message when the user is nil" do
-      get :confirm, params: {id: 1234, code: "Wtfmate"}
+      post :confirm, params: {id: 1234, code: "Wtfmate"}
       expect(response).to render_template :confirm_error_404
     end
   end

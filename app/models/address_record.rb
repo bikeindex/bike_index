@@ -87,7 +87,7 @@ class AddressRecord < ApplicationRecord
     # Bikes & ownerships handle address assignment separately
     return if skip_callback_job || %w[bike ownership].include?(kind)
 
-    CallbackJob::AddressRecordUpdateAssociationsJob.perform_async(id)
+    CallbackJobs::AddressRecordUpdateAssociationsJob.perform_async(id)
   end
 
   def should_be_geocoded?

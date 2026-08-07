@@ -25,7 +25,6 @@
 #  manual_pos_kind                 :integer
 #  name                            :string(255)
 #  opted_into_theft_survey_2023    :boolean          default(FALSE)
-#  passwordless_user_domain        :string
 #  pos_kind                        :integer          default("no_pos")
 #  previous_slug                   :string
 #  regional_ids                    :jsonb
@@ -35,6 +34,7 @@
 #  show_on_map                     :boolean
 #  slug                            :string(255)      not null
 #  spam_registrations              :boolean          default(FALSE)
+#  user_email_domain               :string
 #  website                         :string(255)
 #  created_at                      :datetime         not null
 #  updated_at                      :datetime         not null
@@ -48,6 +48,7 @@
 #  index_organizations_on_manufacturer_id                           (manufacturer_id)
 #  index_organizations_on_parent_organization_id                    (parent_organization_id)
 #  index_organizations_on_slug                                      (slug) UNIQUE
+#  index_organizations_on_user_email_domain                         (user_email_domain)
 #
 class Organization < ApplicationRecord
   include ActionView::Helpers::SanitizeHelper
@@ -137,6 +138,13 @@ class Organization < ApplicationRecord
   validates_with OrganizationNameValidator
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_uniqueness_of :manufacturer_id, allow_blank: true
+  validate :user_email_domain_format
+  # Two SSO orgs on one domain would make saml_email_matching's pick arbitrary (name order),
+  # silently sending logins to the wrong org's IdP. Non-SSO orgs may still share a domain.
+  validates_uniqueness_of :user_email_domain, allow_blank: true,
+    conditions: -> { with_enabled_feature_slugs("saml_sso") },
+    if: -> { enabled?("saml_sso") },
+    message: "is already used for SSO by another organization"
 
   attr_accessor :embedable_user_email, :skip_update
 
@@ -241,30 +249,35 @@ class Organization < ApplicationRecord
       where("enabled_feature_slugs ?| array[:keys]", keys: matching_slugs)
     end
 
-    def permitted_domain_passwordless_signin
-      where.not(passwordless_user_domain: nil).with_enabled_feature_slugs("passwordless_users")
-    end
-
-    def permitted_domain_saml_signin
-      where.not(passwordless_user_domain: nil).with_enabled_feature_slugs("saml_sso")
-    end
-
     def passwordless_email_matching(str)
       domain = email_domain(str)
       return nil if domain.blank?
 
-      permitted_domain_passwordless_signin.detect { |o| o.passwordless_user_domain == domain }
+      permitted_domain_signin("passwordless_users").find_by(user_email_domain: domain)
     end
 
     # The org that forces SSO for an email's domain: feature enabled + a live IdP config.
     # SSO shares the passwordless domain field for routing (no separate saml domain column).
+    # Filter the domain in SQL and eager-load the config so a login never scans every SSO org.
     def saml_email_matching(str)
       domain = email_domain(str)
       return nil if domain.blank?
 
-      permitted_domain_saml_signin.detect do |org|
-        org.passwordless_user_domain == domain && org.organization_saml_configuration&.configured?
-      end
+      permitted_domain_signin("saml_sso").where(user_email_domain: domain)
+        .includes(:organization_saml_configuration)
+        .detect { |org| org.organization_saml_configuration&.configured? }
+    end
+
+    def example
+      # In test, ids climb across examples so a factory org can land on 92 - look up by name instead
+      found = Rails.env.test? ? Organization.find_by(name: "Example Bike Shop") : Organization.find_by_id(92)
+      found || Organization.create(name: "Example Bike Shop")
+    end
+
+    private
+
+    def permitted_domain_signin(feature_slug)
+      where.not(user_email_domain: nil).with_enabled_feature_slugs(feature_slug)
     end
 
     def email_domain(str)
@@ -272,12 +285,6 @@ class Organization < ApplicationRecord
       return nil unless normalized.present? && normalized.count("@") == 1 && normalized.match?(/.@.*\../)
 
       normalized.split("@").last
-    end
-
-    def example
-      # In test, ids climb across examples so a factory org can land on 92 - look up by name instead
-      found = Rails.env.test? ? Organization.find_by(name: "Example Bike Shop") : Organization.find_by_id(92)
-      found || Organization.create(name: "Example Bike Shop")
     end
   end
   # never geocode, use default_location lat/long
@@ -294,7 +301,12 @@ class Organization < ApplicationRecord
   end
 
   def restrict_invitations?
-    !enabled?("passwordless_users") && !passwordless_user_domain.present?
+    !enabled?("passwordless_users") && !user_email_domain.present?
+  end
+
+  # Members of these organizations authenticate via a magic link or the organization's IdP
+  def passwordless_user_creation?
+    any_enabled?(%w[passwordless_users saml_sso])
   end
 
   def sent_invitation_count
@@ -369,10 +381,6 @@ class Organization < ApplicationRecord
 
   def fetch_impound_configuration
     impound_configuration.present? ? impound_configuration : ImpoundConfiguration.create(organization_id: id)
-  end
-
-  def fetch_saml_configuration
-    organization_saml_configuration || OrganizationSamlConfiguration.create(organization_id: id)
   end
 
   def hot_sheet_on?
@@ -556,7 +564,7 @@ class Organization < ApplicationRecord
     self.ascend_name = nil if ascend_name.blank?
     self.is_paid = current_invoices.any? || current_parent_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
-    self.passwordless_user_domain = EmailNormalizer.normalize(passwordless_user_domain)
+    self.user_email_domain = EmailNormalizer.normalize(user_email_domain)
     self.graduated_notification_interval = nil unless graduated_notification_interval.to_i > 0
     # For now, just use them. However - nesting organizations probably need slightly modified organization_feature slugs
     self.enabled_feature_slugs = calculated_enabled_feature_slugs.compact.sort
@@ -624,6 +632,12 @@ class Organization < ApplicationRecord
   end
 
   private
+
+  def user_email_domain_format
+    return if user_email_domain.blank?
+    errors.add(:user_email_domain, "must include a .") unless user_email_domain.include?(".")
+    errors.add(:user_email_domain, "must not include @") if user_email_domain.include?("@")
+  end
 
   def nearby_organizations_including_siblings
     return self.class.none unless regional? && search_coordinates_set?

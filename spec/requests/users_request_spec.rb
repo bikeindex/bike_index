@@ -3,6 +3,71 @@ require "rails_helper"
 RSpec.describe UsersController, type: :request do
   base_url = "/users"
 
+  describe "new" do
+    it "renders an email field that offers a correction for a mistyped domain" do
+      get "#{base_url}/new"
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:new)
+      expect(Capybara.string(response.body)).to have_css("[data-controller='ui--forms--email'] input#user_email")
+    end
+  end
+
+  describe "create" do
+    let(:email) { "ruther99@msu.edu" }
+
+    it "signs up passwordless, links to setting a password once confirmed" do
+      expect {
+        post base_url, params: {user: {email:, name: "Test name", terms_of_service: "1"}}
+      }.to change(User, :count).by(1)
+      user = User.order(:created_at).last
+      expect(user.passwordless_user?).to be_truthy
+
+      # The emailed link is a GET, so it only renders the form that confirms
+      get "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token}
+      expect(response).to render_template(:confirm_interstitial)
+      expect(user.reload.confirmed?).to be_falsey
+      expect(Capybara.string(response.body))
+        .to have_css("form[action='#{base_url}/confirm'] input[name='code'][value='#{user.confirmation_token}']", visible: :hidden)
+
+      post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token}
+      expect(response).to redirect_to my_account_url
+      follow_redirect!
+      expect(Capybara.string(response.body))
+        .to have_link("set a password to sign in", href: update_password_form_with_reset_token_users_path)
+    end
+
+    context "with partner" do
+      it "carries the partner through the interstitial" do
+        post base_url, params: {user: {email:, name: "Test name", terms_of_service: "1"}, partner: "bikehub"}
+        user = User.order(:created_at).last
+
+        get "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
+        expect(Capybara.string(response.body))
+          .to have_css("input[name='partner'][value='bikehub']", visible: :hidden)
+
+        post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
+        expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
+      end
+    end
+  end
+
+  describe "create with a null origin" do
+    include_context :test_csrf_token
+    let(:email) { "ruther99@msu.edu" }
+
+    # Privacy extensions and VPNs strip the Origin header, which Rails rejects outright
+    it "re-renders the signup form with the email and an explanation" do
+      expect {
+        post base_url, params: {user: {email:, password: "somethinggreat", terms_of_service: "1"}},
+          headers: {"HTTP_ORIGIN" => "null"}
+      }.to_not change(User, :count)
+      expect(response).to render_template(:new)
+      expect(response.body).to match(email)
+      expect(flash[:error]).to match(/try again.*a VPN/i)
+      expect(response.body).to match(/try again.*a VPN/i)
+    end
+  end
+
   describe "update" do
     include_context :request_spec_logged_in_as_user
 
@@ -310,6 +375,17 @@ RSpec.describe UsersController, type: :request do
         expect(response).to redirect_to request_password_reset_form_users_path
         expect(flash[:error]).to be_present
       end
+      context "signed in" do
+        include_context :request_spec_logged_in_as_user
+        let(:current_user) { FactoryBot.create(:user_confirmed, passwordless_user: true) }
+        it "renders without emailing a reset token" do
+          get "#{base_url}/update_password_form_with_reset_token"
+          expect(response.code).to eq("200")
+          expect(response).to render_template(:update_password_form_with_reset_token)
+          expect(flash).to be_blank
+          expect(current_user.reload.token_for_password_reset).to be_blank
+        end
+      end
     end
     context "token not found" do
       it "redirects" do
@@ -423,6 +499,17 @@ RSpec.describe UsersController, type: :request do
         expect(response.cookies[:auth]).to be_blank
       end
     end
+    context "signed in passwordless user" do
+      include_context :request_spec_logged_in_as_user
+      let(:current_user) { FactoryBot.create(:user_confirmed, passwordless_user: true) }
+      it "sets the password without a token" do
+        post "#{base_url}/update_password_with_reset_token", params: valid_params.merge(token: "")
+        expect(response).to redirect_to my_account_url
+        current_user.reload
+        expect(current_user.passwordless_user?).to be_falsey
+        expect(current_user.authenticate(valid_params.dig(:user, :password))).to be_truthy
+      end
+    end
     context "nil token" do
       it "redirects" do
         user.reload
@@ -475,6 +562,19 @@ RSpec.describe UsersController, type: :request do
       end
     end
 
+    context "owner viewing their own hidden page" do
+      include_context :request_spec_logged_in_as_user
+      let(:current_user) { FactoryBot.create(:user_confirmed, show_bikes: false) }
+
+      it "renders with a notice that only they can see it" do
+        get "#{base_url}/#{current_user.username}"
+        expect(response.status).to eq 200
+        expect(response).to render_template :show
+        expect(assigns(:profile_hidden_reason)).to eq :owner
+        expect(response.body).to match(/only visible to you/i)
+      end
+    end
+
     context "user shows their page" do
       let(:show_bikes) { true }
 
@@ -501,6 +601,30 @@ RSpec.describe UsersController, type: :request do
           get "#{base_url}/#{user.username}"
           expect(response.status).to eq 404
         end
+      end
+    end
+
+    context "superuser viewing a banned user" do
+      include_context :request_spec_logged_in_as_superuser
+      let(:user) { FactoryBot.create(:user_confirmed, show_bikes:, banned: true) }
+
+      it "renders the profile with a banned alert" do
+        get "#{base_url}/#{user.username}"
+        expect(response.status).to eq 200
+        expect(response).to render_template :show
+        expect(assigns(:user_banned)).to be_truthy
+        expect(response.body).to match(/is banned/)
+      end
+    end
+
+    context "superuser viewing a hidden unbanned user" do
+      include_context :request_spec_logged_in_as_superuser
+
+      it "renders with a notice that only a superuser can see it" do
+        get "#{base_url}/#{user.username}"
+        expect(response.status).to eq 200
+        expect(assigns(:profile_hidden_reason)).to eq :superuser
+        expect(response.body).to match(/only visible because you/i)
       end
     end
   end

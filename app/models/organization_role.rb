@@ -58,8 +58,10 @@ class OrganizationRole < ApplicationRecord
   def self.create_passwordless(**create_attrs)
     new_passwordless_attrs = {skip_processing: true, role: "member"}
     if create_attrs[:invited_email].present? # This should always be present...
-      # We need to check for existing organization_roles because the CallbackJob::AfterUserCreateJob calls this
-      existing_organization_role = OrganizationRole.find_by_invited_email(create_attrs[:invited_email])
+      # We need to check for existing organization_roles because the CallbackJobs::AfterUserCreateJob calls this.
+      # Scoped to the organization - an invite to a different one says nothing about this one.
+      existing_organization_role = find_by(organization_id: create_attrs[:organization_id],
+        invited_email: EmailNormalizer.normalize(create_attrs[:invited_email]))
       return existing_organization_role if existing_organization_role.present?
     end
     organization_role = create!(new_passwordless_attrs.merge(create_attrs))
@@ -105,7 +107,7 @@ class OrganizationRole < ApplicationRecord
 
     # We manually update the user, because Users::ProcessOrganizationRoleJob won't find this organization_role
     if deleted? && user_id.present?
-      CallbackJob::AfterUserChangeJob.perform_async(user_id)
+      CallbackJobs::AfterUserChangeJob.perform_async(user_id)
     else
       Users::ProcessOrganizationRoleJob.perform_async(id)
     end

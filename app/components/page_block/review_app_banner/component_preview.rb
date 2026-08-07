@@ -8,9 +8,14 @@ module PageBlock
           pr_title: "Add Promoted section to marketplace index", commit: "a1b2c3d"))
       end
 
-      # Persistent staging deploy — no PR number, so the label reads "Staging".
-      def staging
+      # Persistent sandbox deploy — no PR number, so the label reads "Sandbox".
+      def sandbox
         render(PageBlock::ReviewAppBanner::Component.new(review_app: "1", commit: "a1b2c3d"))
+      end
+
+      # Local dev server — the label reads "Development".
+      def development
+        render(PageBlock::ReviewAppBanner::Component.new(review_app: "development"))
       end
 
       # No title available — link falls back to "PR #<number>".

@@ -6,7 +6,7 @@ module UI
     # submits a request to a URL (button_to), use UI::ButtonLink instead — it reuses
     # this component's build_classes, so the two stay visually in lockstep.
     class Component < ApplicationComponent
-      BASE_CLASSES = "tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-lg tw:cursor-pointer tw:transition-colors"
+      BASE_CLASSES = "tw:inline-flex tw:items-center tw:justify-center tw:gap-1.5 tw:rounded-lg tw:cursor-pointer tw:transition-colors"
 
       SIZES = {
         sm: "tw:px-2.5 tw:py-1 tw:text-xs",
@@ -15,48 +15,56 @@ module UI
       }.freeze
 
       COLORS = {
-        primary: "tw:text-white tw:bg-blue-600 tw:border tw:border-blue-600 tw:hover:bg-blue-700 tw:active:bg-blue-800 tw:focus:ring-blue-500/40 tw:dark:bg-blue-500 tw:dark:border-blue-500 tw:dark:hover:bg-blue-600 tw:dark:active:bg-blue-700",
-        secondary: "tw:text-gray-800 tw:bg-white tw:border tw:border-gray-300 tw:hover:bg-gray-50 tw:hover:border-gray-400 tw:active:bg-gray-100 tw:focus:ring-blue-500/40 tw:dark:bg-transparent tw:dark:text-gray-100 tw:dark:border-gray-600 tw:dark:hover:bg-gray-800",
-        error: "tw:text-white tw:bg-red-600 tw:border tw:border-red-600 tw:hover:bg-red-700 tw:active:bg-red-800 tw:focus:ring-red-500/40 tw:dark:bg-red-500 tw:dark:border-red-500 tw:dark:hover:bg-red-600 tw:dark:active:bg-red-700",
-        purple: "tw:text-white tw:bg-[#715eb2] tw:border tw:border-[#715eb2] tw:hover:bg-[#5d4b9c] tw:hover:border-[#5d4b9c] tw:active:bg-[#5d4b9c] tw:focus:ring-[#715eb2]/40",
-        danger_outline: "tw:text-[#c0392b] tw:bg-white tw:border tw:border-[#f3c9c9] tw:hover:bg-red-50 tw:active:bg-red-100 tw:focus:ring-red-500/40 tw:dark:bg-transparent tw:dark:text-red-400 tw:dark:border-red-900 tw:dark:hover:bg-red-950",
+        primary: "tw:text-white tw:bg-blue-600 tw:border tw:border-blue-600 tw:hover:bg-blue-700 tw:focus:ring-blue-500/40 tw:dark:bg-blue-500 tw:dark:border-blue-500 tw:dark:hover:bg-blue-600",
+        secondary: "tw:text-gray-800 tw:bg-white tw:border tw:border-gray-300 tw:hover:bg-gray-50 tw:hover:border-gray-400 tw:focus:ring-blue-500/40 tw:dark:bg-transparent tw:dark:text-gray-100 tw:dark:border-gray-600 tw:dark:hover:bg-gray-800",
+        error: "tw:text-white tw:bg-red-600 tw:border tw:border-red-600 tw:hover:bg-red-700 tw:focus:ring-red-500/40 tw:dark:bg-red-500 tw:dark:border-red-500 tw:dark:hover:bg-red-600",
+        purple: "tw:text-white tw:bg-purple-500 tw:border tw:border-purple-500 tw:hover:bg-purple-600 tw:hover:border-purple-600 tw:focus:ring-purple-500/40",
+        danger_outline: "tw:text-[#c0392b] tw:bg-white tw:border tw:border-[#f3c9c9] tw:hover:bg-red-50 tw:focus:ring-red-500/40 tw:dark:bg-transparent tw:dark:text-red-400 tw:dark:border-red-900 tw:dark:hover:bg-red-950",
+        purple_outline: "tw:text-gray-800 tw:bg-white tw:border tw:border-gray-200 tw:hover:border-purple-500 tw:hover:bg-purple-50 tw:focus:ring-purple-500/40 tw:dark:bg-gray-800 tw:dark:text-gray-100 tw:dark:border-gray-700 tw:dark:hover:border-purple-500 tw:dark:hover:bg-purple-950",
         link: "twlink tw:p-0"
       }.freeze
 
+      # The active look, as a delta over COLORS — always emitted alongside it and inert
+      # until the element flags itself active (see the is-active variant in application.css,
+      # which sorts last, so these override the resting colors with no `!` important).
+      # Literal strings so Tailwind's scanner generates them; the spec enforces the prefix.
       ACTIVE_COLORS = {
-        primary: "tw:ring-2 tw:ring-blue-500/40 tw:bg-blue-700 tw:dark:bg-blue-600",
-        secondary: "tw:ring-2 tw:ring-blue-500/40 tw:bg-gray-200 tw:border-gray-400 tw:dark:bg-gray-800 tw:dark:border-gray-600",
-        error: "tw:ring-2 tw:ring-red-500/40 tw:bg-red-700 tw:dark:bg-red-600",
-        link: "tw:text-blue-800 tw:dark:text-blue-300 tw:font-bold tw:underline"
-      }.freeze
-
-      # Literal strings so Tailwind's scanner generates these aria-pressed:/active: variants.
-      ACTIVE_PREFIXED = {
-        primary: "tw:aria-pressed:ring-2 tw:active:ring-2 tw:aria-pressed:ring-blue-500/40 tw:active:ring-blue-500/40 tw:aria-pressed:bg-blue-700 tw:active:bg-blue-700 tw:aria-pressed:dark:bg-blue-600 tw:active:dark:bg-blue-600",
-        secondary: "tw:aria-pressed:ring-2 tw:active:ring-2 tw:aria-pressed:ring-blue-500/40 tw:active:ring-blue-500/40 tw:aria-pressed:bg-gray-200 tw:active:bg-gray-200 tw:aria-pressed:border-gray-400 tw:active:border-gray-400 tw:aria-pressed:dark:bg-gray-800 tw:active:dark:bg-gray-800 tw:aria-pressed:dark:border-gray-600 tw:active:dark:border-gray-600",
-        error: "tw:aria-pressed:ring-2 tw:active:ring-2 tw:aria-pressed:ring-red-500/40 tw:active:ring-red-500/40 tw:aria-pressed:bg-red-700 tw:active:bg-red-700 tw:aria-pressed:dark:bg-red-600 tw:active:dark:bg-red-600",
-        link: "tw:aria-pressed:text-blue-800 tw:active:text-blue-800 tw:aria-pressed:dark:text-blue-300 tw:active:dark:text-blue-300 tw:aria-pressed:font-bold tw:active:font-bold tw:aria-pressed:underline tw:active:underline"
+        primary: "tw:is-active:bg-blue-700 tw:is-active:ring-2 tw:is-active:ring-blue-500/40 tw:is-active:dark:bg-blue-600",
+        secondary: "tw:is-active:bg-gray-200 tw:is-active:border-gray-400 tw:is-active:ring-2 tw:is-active:ring-blue-500/40 tw:is-active:dark:bg-gray-800",
+        error: "tw:is-active:bg-red-700 tw:is-active:ring-2 tw:is-active:ring-red-500/40 tw:is-active:dark:bg-red-600",
+        purple: "tw:is-active:bg-purple-600 tw:is-active:border-purple-600 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
+        danger_outline: "tw:is-active:bg-red-100 tw:is-active:border-[#c0392b] tw:is-active:ring-2 tw:is-active:ring-red-500/40 tw:is-active:dark:bg-red-950 tw:is-active:dark:border-red-700",
+        purple_outline: "tw:is-active:text-white tw:is-active:bg-purple-500 tw:is-active:border-purple-500 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
+        link: "tw:is-active:text-blue-700 tw:is-active:dark:text-blue-300 tw:is-active:font-bold tw:is-active:underline"
       }.freeze
 
       KINDS = %i[button submit]
 
-      def self.build_classes(color:, size:, active: false, html_class: nil)
-        classes = [BASE_CLASSES, COLORS[color], html_class]
+      DISABLED_CLASSES = "tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:disabled:pointer-events-none"
+
+      # is-active sorts after focus, so an active button's ring-2 swallows the focus ring
+      # unless focus is restated under the variant.
+      FOCUS_CLASSES = "tw:focus:outline-none tw:focus:ring-3 tw:is-active:focus:ring-3"
+
+      def self.build_classes(color:, size:, html_class: nil)
         unless color == :link
-          classes << SIZES[size]
-          classes << "tw:focus:outline-none tw:focus:ring-3 tw:font-medium tw:no-underline"
+          extras = [SIZES[size], FOCUS_CLASSES, "tw:font-medium tw:no-underline", DISABLED_CLASSES]
         end
-        classes << ACTIVE_COLORS[color] if active
-        classes << ACTIVE_PREFIXED[color]
-        classes.compact.join(" ")
+        [BASE_CLASSES, html_class, *extras, COLORS[color], ACTIVE_COLORS[color]].compact.join(" ")
       end
 
-      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, data: {}, aria: {})
+      # name/value are submitted with the form when this button is the one clicked, which
+      # is how a form with more than one submit says which was pressed
+      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, disabled: false, spinner: false, name: nil, value: nil, data: {}, aria: {})
         @text = text
+        @name = name
+        @value = value
         @color = COLORS.key?(color) ? color : :secondary
         @kind = KINDS.include?(kind&.to_sym) ? kind.to_sym : KINDS.first
         @active = active
         @html_class = html_class
+        @disabled = disabled
+        @spinner = spinner
         @data = data
         @aria = aria
 
@@ -65,11 +73,29 @@ module UI
       end
 
       def call
-        content_tag(:button, @text || content, class: button_classes, type: (@kind == :submit) ? "submit" : "button", data: @data, aria: @aria)
+        content_tag(:button, safe_join([spinner_span, @text || content].compact), class: button_classes, type: (@kind == :submit) ? "submit" : "button", disabled: @disabled, name: @name, value: @value, data: button_data, aria: @aria)
       end
 
       def button_classes
-        self.class.build_classes(color: @color, size: @size, active: @active, html_class: @html_class)
+        self.class.build_classes(color: @color, size: @size, html_class: @html_class)
+      end
+
+      private
+
+      def button_data
+        data = @data.merge(active: @active || nil)
+        return data unless @spinner
+
+        data.merge(controller: [data[:controller], "ui--button--submit-spinner"].compact.join(" "))
+      end
+
+      # Hidden until the submit-spinner controller reveals it on form submit;
+      # no color_class so the svg spins in the button's own text color.
+      def spinner_span
+        return unless @spinner
+
+        content_tag(:span, render(UI::LoadingSpinner::Component.new(size: :sm, color_class: nil)),
+          class: "tw:hidden", data: {"ui--button--submit-spinner-target": "spinner"})
       end
     end
   end

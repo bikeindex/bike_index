@@ -37,7 +37,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     def combobox_select(query, option_text)
       type_into(".hw-combobox__input", query)
       expect(page).to have_css(".hw-combobox__option", text: option_text, wait: 30)
-      find(".hw-combobox__option", text: option_text, match: :first).click
+      click_combobox_option(option_text)
     end
 
     def expect_count(kind_scope, value = :greater_than_zero)
@@ -56,8 +56,8 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       end
     end
 
-    def expect_localstorage_location(location:, distance:)
-      local_storage = page.evaluate_script(<<~JS)
+    def local_storage
+      page.evaluate_script(<<~JS)
         (() => {
           let storage = {};
           for (let i = 0; i < localStorage.length; i++) {
@@ -67,11 +67,20 @@ RSpec.describe Search::Form::Component, :js, type: :system do
           return storage;
         })()
       JS
+    end
 
-      location_key = local_storage.find { |k, _| k.match?(/location/i) }&.first
-      distance_key = local_storage.find { |k, _| k.match?(/distance/i) }&.first
-      # pp local_storage
-      expect(local_storage).to match_hash_indifferently({location_key => location, distance_key => distance})
+    # kind_select_fields_controller writes these on turbo:submit-end, which fires
+    # after the URL changes; it namespaces the keys inside a component preview.
+    # Raise Capybara's error, not RSpec's: synchronize rescues StandardError, and
+    # an RSpec expectation failure descends from Exception, so it would never retry.
+    def expect_localstorage_location(location:, distance:)
+      expected = {"preview-searchLocation" => location, "preview-searchDistance" => distance}
+      stored = page.document.synchronize(5) do
+        local_storage.tap do |storage|
+          raise Capybara::ExpectationNotMet unless expected.keys.all? { |key| storage[key] }
+        end
+      end
+      expect(stored).to match_hash_indifferently(expected)
     end
 
     it "submits after selecting a color" do
@@ -97,6 +106,11 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       expect(page).to have_current_path(/\?/, wait: 5)
 
       expect_localstorage_location(location:, distance:)
+
+      # The re-rendered preview ignores the query string, so the form restores
+      # both saved values rather than rendering them
+      expect(page).to have_field("location", with: location, visible: :all)
+      expect(page).to have_field("distance", with: distance, visible: :all)
 
       target_params = {
         distance: [distance],

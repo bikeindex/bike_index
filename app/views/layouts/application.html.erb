@@ -60,7 +60,7 @@
       <%= t(".skip_to_main_content") %>
     </a>
 
-    <%= render(PageBlock::ReviewAppBanner::Component.new(review_app: ENV["REVIEW_APP"], pr_number: ENV["REVIEW_APP_PR_NUMBER"], pr_title: ENV["REVIEW_APP_PR_TITLE"], commit: ENV["REVIEW_APP_COMMIT"], current_user:, return_to: request.fullpath)) %>
+    <%= render(PageBlock::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
 
     <%# Cache navbar to speed stuff up, on per-user, per-page %>
     <% cache(["main_navbar5", page_id, current_user_or_unconfirmed_user, passive_organization]) do %>
@@ -84,7 +84,7 @@
                 data-toggle="dropdown"
               >
                 <%= passive_organization.short_name %>
-                <%= inline_svg_tag "icons/chevron-right.svg", class: "tw:rotate-90 tw:inline-block tw:w-3 tw:h-3 tw:ml-1" %>
+                <%= render UI::IconChevron::Component.new(direction: :down, html_class: "tw:ml-1") %>
               </a>
 
               <ul
@@ -262,6 +262,7 @@
       </nav>
     <% end %>
 
+    <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
     <%= render partial: "/layouts/revised_messages" %>
 
     <%# The strava_search SPA (where @strava_search_config is set) renders its own <main>, so skip this landmark to avoid nesting %>

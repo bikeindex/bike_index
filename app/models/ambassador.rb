@@ -18,6 +18,7 @@
 #  description                        :text
 #  developer                          :boolean          default(FALSE), not null
 #  email                              :string(255)
+#  feature_registration_show_legacy   :boolean          default(FALSE), not null
 #  instagram                          :string
 #  last_login_at                      :datetime
 #  last_login_ip                      :string
@@ -33,6 +34,7 @@
 #  partner_data                       :jsonb
 #  password                           :text
 #  password_digest                    :string(255)
+#  passwordless_user                  :boolean          default(FALSE), not null
 #  phone                              :string(255)
 #  preferred_language                 :string
 #  show_bikes                         :boolean          default(FALSE), not null

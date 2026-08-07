@@ -5,10 +5,16 @@ RSpec.describe Admin::RecoveriesController, type: :request do
   include_context :request_spec_logged_in_as_superuser
 
   describe "index" do
+    let!(:stolen_record) do
+      FactoryBot.create(:stolen_record_recovered, city: "Chicago",
+        region_record: FactoryBot.create(:state_illinois))
+    end
     it "renders" do
-      get base_url
+      get "#{base_url}?search_recovery_display_status=all"
       expect(response).to be_ok
       expect(response).to render_template(:index)
+      expect(response.body).to match("Chicago")
+      expect(response.body).to match("IL")
       expect(flash).to_not be_present
       # Added in #2137 because there was an error in the scope
       get "#{base_url}?search_displayed=displayed&search_shareable=true"

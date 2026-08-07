@@ -19,7 +19,7 @@
       <%= f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off' %>
     </div>
 
-    <% if include_field_reg_extra_registration_number?(@organization) %>
+    <% if BikeServices::Displayer.include_reg_field?(:extra_registration_number, @organization) %>
       <% label_secondary_serial = registration_field_label(@organization, "reg_extra_registration_number") || t(".additional_serial") %>
       <%= f.label :extra_registration_number, label_secondary_serial %>
       <div class="controls">
@@ -168,7 +168,7 @@
       <%= fields_for @stolen_record do |builder| %>
         <%= builder.hidden_field :phone_no_show, value: true %>
 
-        <% unless include_field_reg_phone?(@organization) %>
+        <% unless BikeServices::Displayer.include_reg_field?(:phone, @organization) %>
           <div class="input-group">
             <div class="control-group">
               <%= builder.label :phone %>
@@ -211,14 +211,14 @@
             </div>
 
             <div class="controls extra-field">
-              <%= builder.text_field :zipcode, placeholder: t(".zipcode") %>
+              <%= builder.text_field :postal_code, placeholder: t(".zipcode") %>
             </div>
 
             <div
               id="state-select"
               class="controls extra-field special-select-single"
             >
-              <%= builder.collection_select(:state_id, State.united_states, :id, :name, include_blank: true, prompt: t(".state") ) %>
+              <%= builder.collection_select(:region_record_id, State.united_states, :id, :name, include_blank: true, prompt: t(".state") ) %>
             </div>
           </div>
         </div>
@@ -275,13 +275,13 @@
 <% end %>
 
 <%# Note: Don't check display_edit_address_fields? because current_user is probably not owner %>
-<% if BikeServices::Builder.include_address_record?(@organization) %>
+<% if BikeServices::Displayer.include_reg_field?(:address, @organization) %>
   <%= f.fields_for :address_record do |address_form| %>
-    <%= render(Form::LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, embed_layout: true, organization: @bike.creation_organization, street_2: true)) %>
+    <%= render(UI::Forms::LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, embed_layout: true, organization: @bike.creation_organization, street_2: true)) %>
   <% end %>
 <% end %>
 
-<% if include_field_reg_phone?(@organization) %>
+<% if BikeServices::Displayer.include_reg_field?(:phone, @organization) %>
   <% label_phone = registration_field_label(@organization, "reg_phone") || t(".phone_number_#{label_reference}") %>
   <div class="input-group">
     <%= f.label :phone, label_phone %>
@@ -290,7 +290,7 @@
   </div>
 <% end %>
 
-<% if include_field_reg_organization_affiliation?(@organization) %>
+<% if BikeServices::Displayer.include_reg_field?(:organization_affiliation, @organization) %>
   <% label_affiliation = registration_field_label(@organization, "reg_organization_affiliation") || t(".org_affiliation", org_name: @organization.short_name) %>
   <div class="input-group">
     <%= f.label :organization_affiliation, label_affiliation %>
@@ -301,7 +301,7 @@
   </div>
 <% end %>
 
-<% if include_field_reg_student_id?(@organization) %>
+<% if BikeServices::Displayer.include_reg_field?(:student_id, @organization) %>
   <% student_id_required = @organization.enabled?("require_reg_student_id") %>
   <div class="input-group">
     <div class="control-group">

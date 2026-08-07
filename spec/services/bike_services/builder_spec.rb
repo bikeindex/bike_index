@@ -127,6 +127,16 @@ RSpec.describe BikeServices::Builder do
       end
     end
 
+    context "with an invalid enum value" do
+      let(:b_param_params) { {bike: {frame_material: "1", handlebar_type: "9", frame_model: "Cool model"}} }
+      it "adds an error rather than raising" do
+        expect(bike.errors.full_messages).to eq(["Frame material is not valid", "Handlebar type is not valid"])
+        expect(bike.frame_material).to be_blank
+        expect(bike.handlebar_type).to be_blank
+        expect(bike.frame_model).to eq "Cool model"
+      end
+    end
+
     context "with organization" do
       let(:new_attrs) { {organization:} }
 
@@ -190,7 +200,7 @@ RSpec.describe BikeServices::Builder do
           expect(org_address.street).to be_present
           expect(organization.additional_registration_fields.include?("reg_address")).to be_truthy
           expect(BParam.address_record_attributes(b_param.bike)).to be_blank
-          expect(described_class.include_address_record?(bike.creation_organization)).to be_truthy
+          expect(BikeServices::Displayer.include_reg_field?(:address, bike.creation_organization)).to be_truthy
           expect(bike.address_record).to have_attributes target_attributes
         end
         context "with b_param with address_record_attributes" do
@@ -214,7 +224,7 @@ RSpec.describe BikeServices::Builder do
             expect(org_address.street).to be_present
             expect(organization.additional_registration_fields.include?("reg_address")).to be_truthy
             expect(BParam.address_record_attributes(b_param.bike)).to be_present
-            expect(described_class.include_address_record?(bike.creation_organization)).to be_truthy
+            expect(BikeServices::Displayer.include_reg_field?(:address, bike.creation_organization)).to be_truthy
             expect(bike.address_record).to have_attributes b_param_params[:bike][:address_record_attributes]
           end
         end
@@ -224,44 +234,10 @@ RSpec.describe BikeServices::Builder do
           let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["reg_address"]) }
           it "returns an address_record" do
             expect(organization.default_address_record).to be_blank
-            expect(described_class.include_address_record?(bike.creation_organization)).to be_truthy
+            expect(BikeServices::Displayer.include_reg_field?(:address, bike.creation_organization)).to be_truthy
             expect(bike.address_record).to be_blank
           end
         end
-      end
-    end
-  end
-
-  describe "include_fields" do
-    let(:organization) { Organization.new }
-    let(:user_with_phone) { User.new(phone: "888.888.8888") }
-    it "is falsey" do
-      expect(described_class.include_address_record?).to be_falsey
-      expect(described_class.include_address_record?(organization)).to be_falsey
-      expect(described_class.include_address_record?(organization, User.new)).to be_falsey
-      expect(described_class.include_address_record?(organization, user_with_phone)).to be_falsey
-    end
-
-    context "with enabled features" do
-      let(:labels) { {reg_phone: "You have to put this in, jerk"}.as_json }
-      let(:feature_slugs) { %w[reg_address reg_phone] }
-      let!(:organization) { FactoryBot.create(:organization_with_organization_features, :in_chicago, enabled_feature_slugs: ["reg_address"]) }
-      let(:user) { FactoryBot.create(:user_confirmed) }
-      let(:user_with_registration_organization) { FactoryBot.create(:user_registration_organization, organization:).user }
-      let(:user_with_address) { FactoryBot.create(:user_confirmed, :with_address_record, address_in: :edmonton, address_set_manually: false) }
-      let(:user_with_address_manually) { FactoryBot.create(:user_confirmed, :with_address_record, address_in: :edmonton, address_set_manually: true) }
-      it "includes" do
-        expect(described_class.include_address_record?(organization)).to be_truthy
-        expect(described_class.include_address_record?(organization, User.new)).to be_truthy
-        expect(described_class.include_address_record?(organization, user_with_phone)).to be_truthy
-        expect(user_with_registration_organization.reload.address_record?).to be_falsey
-        expect(described_class.include_address_record?(organization, user_with_registration_organization)).to be_truthy
-
-        expect(user_with_address.reload.address_set_manually).to be_falsey
-        expect(described_class.include_address_record?(organization, user_with_address)).to be_truthy
-
-        expect(user_with_address_manually.reload.address_set_manually).to be_truthy
-        expect(described_class.include_address_record?(organization, user_with_address_manually)).to be_falsey
       end
     end
   end

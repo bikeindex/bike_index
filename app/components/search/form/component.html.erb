@@ -37,15 +37,15 @@
           >
             <% if render_primary_activity_field? %>
               <div class="tw:w-full tw:md:max-w-xl">
-                <%= render(::Form::Combobox::Component.new(
+                <%= label_tag :primary_activity, primary_activity_label, class: "twlabel tw:sr-only" %>
+
+                <%= render(::UI::Forms::Combobox::Component.new(
                   name: :primary_activity,
-                  id: "primary_activity",
                   options: primary_activity_combobox_options,
                   value: @interpreted_params[:primary_activity],
                   include_blank: true,
-                  placeholder: translation(".search_for_primary_activity"),
-                  label: translation(".search_for_primary_activity"),
-                  label_class: "tw:sr-only",
+                  placeholder: primary_activity_label,
+                  dialog_label: primary_activity_label,
                 )) %>
               </div>
             <% end %>
@@ -66,7 +66,7 @@
                 <%= number_field_tag :price_min_amount,
                 @price_min_amount,
                 placeholder: translation(".min"),
-                class: "twinput tw:min-w-20 fieldResetsCounts" %>
+                class: "twinput tw:min-w-16 fieldResetsCounts" %>
 
                 <span class="tw:mr-1 tw:ml-2 tw:block tw:min-w-6 tw:py-1.5">
                   &ndash; <%= @currency_sym %>
@@ -79,15 +79,16 @@
                 <%= number_field_tag :price_max_amount,
                 @price_max_amount,
                 placeholder: translation(".max"),
-                class: "twinput tw:min-w-20 fieldResetsCounts" %>
+                class: "twinput tw:min-w-16 fieldResetsCounts" %>
               </span>
             <% end %>
           </div>
         <% end %>
       </div>
 
-      <div class="tw:w-20">
-        <%= render UI::Button::Component.new(color: :primary, kind: :submit, html_class: "tw:w-full tw:h-full tw:justify-center tw:disabled:cursor-wait") do %>
+      <%# shrink-0: the fields column would otherwise squeeze this to a sliver on phones %>
+      <div class="tw:w-20 tw:shrink-0">
+        <%= render UI::Button::Component.new(color: :primary, kind: :submit, html_class: "tw:w-full tw:h-full tw:disabled:cursor-wait") do %>
           <%= helpers.inline_svg_tag "icons/searcher.svg",
             id: "search-button",
             class: "tw:text-white",
@@ -98,7 +99,7 @@
 
     <% if render_serial_field? && serial_looks_like_not_a_serial? %>
       <%= render(
-        UI::Alert::Component.new(
+        UI::Alerts::Base::Component.new(
           text: translation(".doesnt_look_like_serial"),
           kind: :warning,
           margin_classes: "tw:my-2",

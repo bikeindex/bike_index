@@ -3,6 +3,7 @@
 module UI
   module DragHandle
     class ComponentPreview < ApplicationComponentPreview
+      # @!group Drag handle
       # The grip in a sortable list -- one handle per row, registered as the
       # owning controller's "handle" target.
       def default
@@ -18,6 +19,7 @@ module UI
       def with_html_class
         render(UI::DragHandle::Component.new(controller: "sortable", html_class: "tw:pt-2"))
       end
+      # @!endgroup
     end
   end
 end

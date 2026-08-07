@@ -36,17 +36,17 @@ jobs:
             echo "No open PR with the 'review-app' label for branch '$GITHUB_REF_NAME' -> NOT dispatching review-app deploy"
           fi
 
-      # Staging tracks main: redeploy the persistent staging app on every push to
+      # Sandbox tracks main: redeploy the persistent sandbox app on every push to
       # main. Dispatched here (rather than via a workflow_run trigger in
-      # staging.yml) so both deploys fire from CI's single push run.
-      # NOTE: this runs in parallel with the `test` job, so staging does not wait
+      # sandbox.yml) so both deploys fire from CI's single push run.
+      # NOTE: this runs in parallel with the `test` job, so sandbox does not wait
       # for the test suite to pass.
-      - name: Dispatch staging deploy (main only)
+      - name: Dispatch sandbox deploy (main only)
         if: github.ref == 'refs/heads/main'
         run: |
           retry() { local n=1; until "$@"; do [ $n -ge 3 ] && return 1; echo "attempt $n failed; retrying in 15s..." >&2; n=$((n+1)); sleep 15; done; }
-          echo "Push to main -> dispatching staging deploy"
-          retry gh workflow run staging.yml --repo "$GITHUB_REPOSITORY" --ref main
+          echo "Push to main -> dispatching sandbox deploy"
+          retry gh workflow run sandbox.yml --repo "$GITHUB_REPOSITORY" --ref main
 
   lint_and_scan:
     runs-on: ubuntu-latest
@@ -119,7 +119,7 @@ jobs:
           echo "playwright_version=$playwright_version" >> "$GITHUB_OUTPUT"
           echo "image=$REGISTRY/$IMAGE_NAME:$tag" >> "$GITHUB_OUTPUT"
       - name: Log in to GHCR
-        uses: docker/login-action@v4
+        uses: docker/login-action@v4.6.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -221,6 +221,13 @@ jobs:
       TRANSLATION_BRANCH: main
       TRANSLATIONS_SYNC_APP_ID: ${{ secrets.TRANSLATIONS_SYNC_APP_ID }}
       RETRY_FLAKY: true
+      # The runs repo secrets don't reach - named, so a credential missing anywhere else fails
+      CI_WITHOUT_SECRETS: ${{ github.actor == 'dependabot[bot]' || github.event.pull_request.head.repo.fork == true }}
+      # spec/integration/register_spec.rb PUTs to the bikeindex-test bucket for real; absent, it
+      # skips. The placeholders are only so the R2 cassettes still sign.
+      R2_TEST_ACCESS_KEY: ${{ secrets.R2_TEST_ACCESS_KEY || 'test' }}
+      R2_TEST_ACCESS_KEY_SECRET: ${{ secrets.R2_TEST_ACCESS_KEY_SECRET || 'test' }}
+      R2_TEST_ENDPOINT: ${{ secrets.R2_TEST_ENDPOINT || 'https://r2-test.example.com' }}
       KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC: ${{ secrets.KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC }}
       KNAPSACK_PRO_CI_NODE_TOTAL: ${{ matrix.ci_node_total }}
       KNAPSACK_PRO_CI_NODE_INDEX: ${{ matrix.ci_node_index }}
@@ -338,7 +345,21 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: test-results-${{ env.KNAPSACK_PRO_CI_NODE_INDEX }}
-          path: tmp/rspec-${{ env.KNAPSACK_PRO_CI_NODE_INDEX }}.xml
+          # tmp/capybara holds the failure screenshots system specs write, which
+          # are usually the only evidence of what a flaky :js spec actually saw
+          path: |
+            tmp/rspec-${{ env.KNAPSACK_PRO_CI_NODE_INDEX }}.xml
+            tmp/capybara/
+
+  deploy_production:
+    name: "Deploy to production"
+    runs-on: ubuntu-latest
+    needs: [test, lint_and_scan]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to Cloud66 production
+        run: |
+          curl --insecure -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${{ secrets.CLOUD66_REDEPLOYMENT_KEY }}
 
   # Commenting out for now - it doesn't work for forked pull requests,
   # Which means forked PRs always fail

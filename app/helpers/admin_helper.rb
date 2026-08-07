@@ -25,7 +25,8 @@ module AdminHelper
       {title: "Dev: Strava Activities", path: admin_strava_activities_path, match_controller: true},
       {title: "Dev: Strava Gear", path: admin_strava_gears_path, match_controller: true},
       {title: "Dev: Paper Trail Versions", path: admin_paper_trail_versions_path, match_controller: true},
-      {title: "Dev: Registration Sequences", path: admin_registration_sequences_path, match_controller: true}
+      {title: "Dev: Registration Sequences", path: admin_registration_sequences_path, match_controller: true},
+      {title: "Dev: Public Images", path: admin_public_images_path, match_controller: true}
     ]
   end
 
@@ -163,6 +164,8 @@ module AdminHelper
       admin_user_path(obj.user_id)
     elsif obj.instance_of?(UserAlert)
       admin_user_alerts_path(user_id: obj.user_id)
+    elsif obj.instance_of?(Blog)
+      admin_news_path(obj) # blogs are administered as news
     else
       "/admin/#{obj.class.to_s.underscore.pluralize}/#{obj.id}"
     end

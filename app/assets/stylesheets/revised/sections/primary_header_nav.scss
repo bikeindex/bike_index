@@ -4,6 +4,9 @@ $primary-logo-padding-mobile: $vertical-height;
 $mainmenu-transform-speed: 200ms;
 $mainmenu-width: 80%;
 $mainmenu-open-zindex: 10;
+// Approximately where the small screen navbar ends. positionMainMenu
+// (nav_header.coffee) measures the real value when the menu opens
+$mobile-nav-height: 4 * $vertical-height;
 
 // Header nav
 .primary-header-nav {
@@ -237,7 +240,7 @@ $mainmenu-open-zindex: 10;
       background: $primary-nav-background;
       position: fixed;
       right: 0;
-      top: 4 * $vertical-height;
+      top: $mobile-nav-height;
       bottom: 0;
       transform: translate(100%, 0);
       width: $mainmenu-width;
@@ -290,7 +293,7 @@ $mainmenu-open-zindex: 10;
     #menu-opened-backdrop {
       display: none;
       position: fixed;
-      top: 5 * $vertical-height;
+      top: $mobile-nav-height;
       left: 0;
       width: 100%;
       height: 100%;

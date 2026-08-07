@@ -24,6 +24,7 @@ require File.expand_path("db/seeds/seed_organization_bikes_and_associations", Ra
 require File.expand_path("db/seeds/seed_organized_emails", Rails.root)
 require File.expand_path("db/seeds/seed_registration_sequence_template", Rails.root)
 require File.expand_path("db/seeds/seed_counts", Rails.root)
+require File.expand_path("db/seeds/seed_oauth_app", Rails.root)
 
 # Load the search autocomplete (Redis) from the seeded manufacturers/colors/etc.
 # so it matches the database. Without this, a freshly seeded app (e.g. a review

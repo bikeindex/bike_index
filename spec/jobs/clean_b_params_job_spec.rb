@@ -10,18 +10,30 @@ RSpec.describe CleanBParamsJob, type: :job do
   end
 
   describe "perform" do
-    let!(:b_param1) { FactoryBot.create(:b_param) }
-    let(:bike1) { FactoryBot.create(:bike) }
-    let!(:b_param2) { FactoryBot.create(:b_param, created_bike_id: bike1.id) }
-    let(:bike2) { FactoryBot.create(:bike) }
-    let!(:b_param3) { FactoryBot.create(:b_param, created_bike_id: bike2.id) }
-    it "schedules all the workers" do
-      b_param3.update_column :updated_at, Time.current - 1.week
-      Sidekiq::Job.clear_all
-      expect(BParam.count).to eq 3
-      described_class.new.perform
-      expect(BParam.count).to eq 2
-      expect(BParam.pluck(:id)).to match_array([b_param1.id, b_param2.id])
+    let(:stale) { Time.current - 4.days }
+    let!(:b_param_with_values) { FactoryBot.create(:b_param, updated_at: stale) }
+    let(:bike) { FactoryBot.create(:bike) }
+    let!(:b_param_with_bike) { FactoryBot.create(:b_param, created_bike_id: bike.id, updated_at: stale) }
+    let!(:b_param_with_recent_bike) { FactoryBot.create(:b_param, created_bike_id: bike.id, updated_at: Time.current - 2.hours) }
+    let!(:b_param_blank) { BParam.create(origin: "register_flow", params: {bike: {}}.as_json, updated_at: stale) }
+    let!(:b_param_blank_recent) { BParam.create(origin: "register_flow", params: {bike: {}}.as_json) }
+
+    it "deletes stale created-bike and never-submitted registrations" do
+      expect(BParam.without_bike_values.pluck(:id)).to match_array([b_param_blank.id, b_param_blank_recent.id])
+      expect { described_class.new.perform }.to change(BParam, :count).by(-2)
+      expect(BParam.pluck(:id)).to match_array([b_param_with_values.id, b_param_with_recent_bike.id, b_param_blank_recent.id])
+    end
+
+    context "with an e-vehicle acknowledgment" do
+      let!(:acknowledgment) do
+        FactoryBot.create(:registration_sequence_acknowledgment, b_param: b_param_with_bike, bike:)
+      end
+
+      it "sweeps the registration, leaving the acknowledgment record standing" do
+        expect { described_class.new.perform }.to change(BParam, :count).by(-2)
+        expect(acknowledgment.reload.bike_id).to eq bike.id
+        expect(acknowledgment.acknowledgment_text).to be_present # read off the sequence
+      end
     end
   end
 end

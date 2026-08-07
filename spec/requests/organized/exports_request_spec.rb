@@ -121,8 +121,8 @@ RSpec.describe Organized::ExportsController, type: :request do
             expect(response.code).to eq("200")
             expect(response.body).to_not match(/undo_bike_stickers/)
             expect(response.body).to match(/Show previously assigned stickers/)
-            expect(response.body).to match(/data-controller="disclosure"/)
-            expect(response.body).to match(/data-disclosure-target="content"/)
+            expect(response.body).to match(/data-controller="ui--collapse"/)
+            expect(response.body).to match(/data-ui--collapse-target="content"/)
             # Only the second phrase is red
             expect(response.body).to match(%r{Stickers initially assigned, but\s*<span class="text-danger">\s*have now been restored})
             # The restored message comes before the collapsed sticker list
