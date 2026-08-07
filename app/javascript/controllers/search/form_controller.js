@@ -1,14 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import TimeLocalizer from '@bikeindex/time-localizer'
 
-/* global window, Date */
-
-// Record back/forward navigations at module scope: the popstate that re-enters a
-// search page fires before the controller reconnects, so a controller-scoped
-// listener would miss it. reloadRestoredFrame uses this to tell a restoration
-// (popstate, eager frame restored empty) from a link visit (turbo:before-visit,
-// frame fills itself).
-window.addEventListener('popstate', () => { window.searchLastPopAt = Date.now() })
+/* global window */
 
 // Connects to data-controller='search--form'
 export default class extends Controller {
@@ -43,7 +36,6 @@ export default class extends Controller {
     // both come back 429 during active searching. Catch the frame's response
     // here; the count fetch signals via the search:rate-limited window event.
     document.addEventListener('turbo:before-fetch-response', this.handleFetchResponse)
-    document.addEventListener('turbo:before-visit', this.handleBeforeVisit)
     document.addEventListener('turbo:fetch-request-error', this.handleFetchError)
     window.addEventListener('search:rate-limited', this.showRateLimited)
     window.addEventListener('popstate', this.handlePopstate)
@@ -56,7 +48,6 @@ export default class extends Controller {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
     document.removeEventListener('turbo:load', this.handleTurboLoad)
     document.removeEventListener('turbo:before-fetch-response', this.handleFetchResponse)
-    document.removeEventListener('turbo:before-visit', this.handleBeforeVisit)
     document.removeEventListener('turbo:fetch-request-error', this.handleFetchError)
     window.removeEventListener('search:rate-limited', this.showRateLimited)
     window.removeEventListener('popstate', this.handlePopstate)
@@ -67,21 +58,11 @@ export default class extends Controller {
     this.refreshResults()
   }
 
-  // Link/programmatic visits (period & chart links) fire this; history navigation
-  // does not. Stamp it so reloadRestoredFrame can skip a frame the visit is
-  // already filling.
-  handleBeforeVisit = () => {
-    window.searchLastVisitAt = Date.now()
-    clearTimeout(this.emptyReloadTimer)
-  }
-
   // Clear any stale loading state, then bring the results frame in line with the
   // address bar. Runs on initial connect and after every Turbo page load.
   refreshResults () {
-    clearTimeout(this.emptyReloadTimer) // a new page load supersedes any pending poll
     this.clearStaleFrameBusy()
     this.reloadFrameIfUrlStale()
-    this.reloadRestoredFrame()
   }
 
   // The visible text filters live outside the results frame, so a back/forward
@@ -100,48 +81,29 @@ export default class extends Controller {
     })
   }
 
-  // Turbo doesn't cache the eager results frame's contents and won't re-fetch a
-  // [complete] frame, so on a back/forward it comes back empty. Re-fetch its src
-  // so results reappear, like a real browser's BFCache restore.
-  //
-  // Scoped to a recent popstate that no link visit (turbo:before-visit) has
-  // superseded, so it never disturbs a search submit or a period/chart click.
-  // Restoration finalizes a tick or two after the load and can clobber an early
-  // reload, so retry until content sticks; handleFrameRender cancels it once it
-  // lands.
-  reloadRestoredFrame (attempt = 0) {
-    // Suppress only when a link visit is the most recent navigation (it fills the
-    // frame itself); a back/forward popstate, or the initial load, proceeds.
-    if ((window.searchLastPopAt || 0) < (window.searchLastVisitAt || 0)) return
-    const frame = this.frameElement
-    const src = frame?.getAttribute('src')
-    if (!src) return
-    if (frame.childElementCount > 0) return // populated - done
-    if (attempt >= 20) return // give up after ~2s rather than loop on a truly empty result
-    if (frame.hasAttribute('complete')) {
-      frame.removeAttribute('complete') // Turbo skips re-fetching a [complete] frame
-      frame.setAttribute('src', src)
-    }
-    this.emptyReloadTimer = setTimeout(() => this.reloadRestoredFrame(attempt + 1), 100)
-  }
-
   // A back/forward restoration can leave the results frame showing a snapshot for
   // a different query than the address bar (Turbo restores snapshots loosely by
   // path). Reload straight from the URL so results match; this loads from the
   // address bar, not the form, so it's immune to combobox/form restore races.
   reloadFrameIfUrlStale () {
     const frame = this.frameElement
-    const src = frame?.getAttribute('src')
-    if (!src) return
-    const srcUrl = new URL(src, window.location.origin)
-    // Only reconcile within the same search page. A back/forward restoration can
-    // briefly leave one page's frame (eg marketplace_results_frame) in the DOM
-    // while the address bar is another page (/search/registrations); pointing the
-    // frame there fetches a response without that frame, which Turbo discards.
-    if (srcUrl.pathname !== window.location.pathname) return
-    if (srcUrl.search !== window.location.search) {
-      frame.setAttribute('src', window.location.href)
-    }
+    if (!this.differentSearchOnSamePage(frame?.getAttribute('src'), window.location.href)) return
+
+    frame.setAttribute('src', window.location.href)
+  }
+
+  // Two URLs asking the same search page for different results. Pairs on different
+  // pages never reconcile, so they don't count: a back/forward restoration can
+  // briefly leave one page's frame (eg marketplace_results_frame) in the DOM while
+  // the address bar is another page (/search/registrations), and a frame response
+  // that redirected elsewhere is still the one Turbo should render.
+  differentSearchOnSamePage (url, otherUrl) {
+    if (!url || !otherUrl) return false
+
+    const first = new URL(url, window.location.origin)
+    const second = new URL(otherUrl, window.location.origin)
+
+    return first.pathname === second.pathname && first.search !== second.search
   }
 
   // Turbo's [busy]/[aria-busy] loading state is transient, but a back/forward
@@ -157,8 +119,6 @@ export default class extends Controller {
   }
 
   handleFrameRender = () => {
-    // Content landed, so a pending restore-reload poll is done.
-    if (this.frameElement?.childElementCount > 0) clearTimeout(this.emptyReloadTimer)
     // A frame render means results came back, so clear any failure notice
     this.hideNotices()
     // Run the time localization command on frame render
@@ -171,13 +131,24 @@ export default class extends Controller {
   // The results frame eager-loads via its src; on a 429 Turbo just logs and
   // leaves the spinner spinning. Take over the response so the user sees why.
   handleFetchResponse = (event) => {
-    if (event.detail?.fetchResponse?.response?.status !== 429) return
+    const response = event.detail?.fetchResponse?.response
 
-    event.preventDefault() // stop Turbo's default handling of the throttled response
-    this.showRateLimited()
+    if (response?.status === 429) {
+      event.preventDefault() // stop Turbo's default handling of the throttled response
+      this.showRateLimited()
+      this.hideLoading() // drop the in-frame placeholder so it doesn't spin forever
+    } else if (event.target === this.frameElement && this.frameResponseSuperseded(response?.url)) {
+      event.preventDefault()
+    }
+  }
 
-    // Drop the in-frame loading placeholder so it doesn't spin forever
-    this.hideLoading()
+  // The frame's eager src fetch and a search submitted while it's still in flight
+  // race each other. Turbo renders whichever lands last and rewrites history from
+  // the frame, so the older response would drag the address bar back to the query
+  // the rider searched away from. A submit repoints src before its own response
+  // returns, so src names the search the frame should be showing.
+  frameResponseSuperseded (url) {
+    return this.differentSearchOnSamePage(url, this.frameElement?.getAttribute('src'))
   }
 
   // A fetch that rejects outright when the network drops never comes back with a

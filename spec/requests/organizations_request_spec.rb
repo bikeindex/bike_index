@@ -246,15 +246,51 @@ RSpec.describe OrganizationsController, type: :request do
     end
   end
 
-  describe "shop_display_qr" do
+  describe "qr" do
     let(:organization) { FactoryBot.create(:organization) }
+    let(:target_url) { "http://www.example.com/register/new?organization_id=#{organization.slug}" }
 
-    it "renders" do
-      get "#{base_url}/#{organization.slug}/shop_display_qr"
-      expect(response).to redirect_to("#{base_url}/#{organization.slug}/shop_display_qr.png")
-
-      get "#{base_url}/#{organization.slug}/shop_display_qr.png"
+    it "renders a png, linking to the registration page" do
+      get "#{base_url}/#{organization.slug}/qr"
       expect(response.status).to eq(200)
+      expect(response.media_type).to eq "image/png"
+      expect(assigns(:organization)).to eq organization
+      expect(assigns(:qr_url)).to eq target_url
+
+      get "#{base_url}/#{organization.slug}/qr.png"
+      expect(response.status).to eq(200)
+      expect(response.media_type).to eq "image/png"
+      expect(assigns(:qr_url)).to eq target_url
+    end
+
+    context "target=shop_display" do
+      let(:target_url) { "http://www.example.com/organizations/#{organization.slug}/embed?non_stolen=true&shop_display=true" }
+
+      it "links to the embed" do
+        get "#{base_url}/#{organization.slug}/qr?target=shop_display"
+        expect(response.status).to eq(200)
+        expect(assigns(:qr_url)).to eq target_url
+      end
+    end
+
+    context "target=landing" do
+      let(:target_url) { "http://www.example.com/#{organization.slug}" }
+
+      it "links to the landing page, even without a landing page route" do
+        expect(LandingPages::ORGANIZATIONS).to_not include(organization.slug)
+
+        get "#{base_url}/#{organization.slug}/qr?target=landing"
+        expect(response.status).to eq(200)
+        expect(assigns(:qr_url)).to eq target_url
+      end
+    end
+
+    context "unknown target" do
+      it "links to the registration page" do
+        get "#{base_url}/#{organization.slug}/qr?target=xxxxx"
+        expect(response.status).to eq(200)
+        expect(assigns(:qr_url)).to eq target_url
+      end
     end
   end
 
