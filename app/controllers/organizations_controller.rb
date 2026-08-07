@@ -69,7 +69,7 @@ class OrganizationsController < ApplicationController
 
   def qr
     return unless find_organization.present?
-    @qr_url = case params[:link_to]
+    @qr_url = case params[:target]
     when "shop_display" then embed_organization_url(@organization, non_stolen: true, shop_display: true)
     when "landing" then "#{root_url}#{@organization.to_param}" # not routed unless in LandingPages::ORGANIZATIONS
     else new_register_url(organization_id: @organization.to_param)

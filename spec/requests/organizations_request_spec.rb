@@ -263,32 +263,32 @@ RSpec.describe OrganizationsController, type: :request do
       expect(assigns(:qr_url)).to eq target_url
     end
 
-    context "link_to=shop_display" do
+    context "target=shop_display" do
       let(:target_url) { "http://www.example.com/organizations/#{organization.slug}/embed?non_stolen=true&shop_display=true" }
 
       it "links to the embed" do
-        get "#{base_url}/#{organization.slug}/qr?link_to=shop_display"
+        get "#{base_url}/#{organization.slug}/qr?target=shop_display"
         expect(response.status).to eq(200)
         expect(response.media_type).to eq "image/png"
         expect(assigns(:qr_url)).to eq target_url
       end
     end
 
-    context "link_to=landing" do
+    context "target=landing" do
       let(:target_url) { "http://www.example.com/#{organization.slug}" }
 
       it "links to the landing page, even without a landing page route" do
         expect(LandingPages::ORGANIZATIONS).to_not include(organization.slug)
 
-        get "#{base_url}/#{organization.slug}/qr?link_to=landing"
+        get "#{base_url}/#{organization.slug}/qr?target=landing"
         expect(response.status).to eq(200)
         expect(assigns(:qr_url)).to eq target_url
       end
     end
 
-    context "unknown link_to" do
+    context "unknown target" do
       it "links to the registration page" do
-        get "#{base_url}/#{organization.slug}/qr?link_to=xxxxx"
+        get "#{base_url}/#{organization.slug}/qr?target=xxxxx"
         expect(response.status).to eq(200)
         expect(assigns(:qr_url)).to eq target_url
       end
