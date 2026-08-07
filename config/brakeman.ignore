@@ -909,26 +909,6 @@
       "note": "HEAD requests falling through to strava_receive_event is harmless - it will just return 200 OK"
     },
     {
-      "warning_type": "Remote Code Execution",
-      "warning_code": 110,
-      "fingerprint": "9ae68e59cfee3e5256c0540dadfeb74e6b72c91997fdb60411063a6e8518144a",
-      "check_name": "CookieSerialization",
-      "message": "Use of unsafe cookie serialization strategy `:hybrid` might lead to remote code execution",
-      "file": "config/initializers/cookies_serializer.rb",
-      "line": 8,
-      "link": "https://brakemanscanner.org/docs/warning_types/unsafe_deserialization",
-      "code": "Rails.application.config.action_dispatch.cookies_serializer = :hybrid",
-      "render_path": null,
-      "location": null,
-      "user_input": null,
-      "confidence": "Medium",
-      "cwe_id": [
-        565,
-        502
-      ],
-      "note": "Standard Rails migration strategy from Marshal to JSON cookie serialization. :hybrid is the recommended transitional setting"
-    },
-    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "9de2dec925781dd5563bb05130413fef190ee0c95cead55d2442d4dac71c28bc",
