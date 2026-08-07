@@ -161,17 +161,17 @@ RSpec.describe SessionsController, type: :request do
     end
     context "passwordless email" do
       let!(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "party.edu", available_invitation_count: 1) }
-      it "autogenerates" do
+      it "autogenerates the user without granting a role" do
         ActionMailer::Base.deliveries = []
         Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           # Just throw this in here because we don't have anywhere else that tests signup with user_email_domain present...
           expect { post "/session/create_magic_link", params: {email: "somethingcool@ party.edu"} }.to_not change(User, :count)
-          expect(current_organization.organization_roles.count).to eq 0
           expect {
             post "/session/create_magic_link", params: {email: "somethingcool@party.edu"}
           }.to change(User, :count).by 1
-          expect(current_organization.organization_roles.count).to eq 1
+          # Claiming the domain for sign in doesn't grant a role in the organization
+          expect(current_organization.organization_roles.count).to eq 0
           expect(ActionMailer::Base.deliveries.count).to eq 1
           mail = ActionMailer::Base.deliveries.last
           expect(mail.subject).to eq("Sign in to Bike Index")
@@ -180,11 +180,29 @@ RSpec.describe SessionsController, type: :request do
           expect(user.confirmed?).to be_truthy
           expect(user.email).to eq "somethingcool@party.edu"
           expect(user.magic_link_token).to be_present
-          organization_role = user.organization_roles.first
+        end
+      end
+
+      context "also granting a role for the domain" do
+        let!(:current_organization) do
+          FactoryBot.create(:organization_with_organization_features,
+            enabled_feature_slugs: ["passwordless_users", "user_role_for_user_email_domain"],
+            user_email_domain: "party.edu", available_invitation_count: 1)
+        end
+        it "grants the member role" do
+          ActionMailer::Base.deliveries = []
+          Sidekiq::Job.clear_all
+          Sidekiq::Testing.inline! do
+            expect {
+              post "/session/create_magic_link", params: {email: "somethingcool@party.edu"}
+            }.to change(User, :count).by 1
+          end
+          organization_role = User.last.organization_roles.first
           expect(organization_role.organization).to eq current_organization
-          expect(organization_role.created_by_magic_link).to be_truthy
           expect(organization_role.sender_id).to be_blank
           expect(organization_role.role).to eq "member"
+          # Granting the role must not add a second email on top of the sign in link
+          expect(ActionMailer::Base.deliveries.map(&:subject)).to eq(["Sign in to Bike Index"])
         end
       end
     end

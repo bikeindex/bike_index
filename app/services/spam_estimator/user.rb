@@ -4,7 +4,7 @@ module SpamEstimator
 
     MARK_SPAM_PERCENT = 90 # May modify in the future!
 
-    # crypto, gambling and adult terms that SEO-spam profiles exist to promote.
+    # crypto, gambling, adult and gift-card terms that SEO-spam profiles exist to promote.
     # Word boundaries matter: usernames are auto-generated random strings, so
     # unanchored substrings ("Judith", "Hagen", "Sloth", "Donohue") would ban real people.
     SEO_SPAM_REGEX = /(?:
@@ -21,7 +21,16 @@ module SpamEstimator
         nap\s+tien | dang\s+nhap | truc\s+tuyen | khuyen\s+mai | uy\s+tin |
         game\s+bai | co\s+bac | song\s+bac | xo\s+so | lo\s+de |
         link\s+truy\s+cap | clip\s+(?:hot|nong)
-      )\b | 18\+
+      )\b | 18\+ |
+      # Gift-card "check your balance" farms run the brand together in usernames and
+      # domains (mcgiftgiftcardmall3, vanillaprepaid.io), so these can't be \b-anchored.
+      gift\s?(?:cards?|code) | prepaid |
+      (?:mc|my|wm|walmart|five\s?back|vanilla|visa|amex|master(?:card)?)-?\s?e?-?gift |
+      (?:one|my)-?\s?vanilla | vanilla-?\s?balance | secure-?\s?spend |
+      (?:card|gift)\s?balance | balance\s?(?:check|inquiry|inquiries) |
+      check\s?(?:my|your|the)?\s?balance | reward\s?cards? |
+      card\s?activation | activate\s+(?:my\s|your\s|the\s)?(?:gift\s?)?card |
+      redeem\s+(?:code|card)
     )/xi
 
     def estimate(user)
