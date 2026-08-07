@@ -14,6 +14,14 @@ module PageBlock
         def render?
           @b_param&.unfinished_registration?
         end
+
+        def call
+          render(PageBlock::UserAlerts::Banner::Component.new) do
+            translation(".not_registered_yet_html", cycle_type: @b_param.type,
+              finish_link: link_to(translation(".finish_the_required_steps"),
+                register_path(b_param_token: @b_param.id_token), class: "twlink"))
+          end
+        end
       end
     end
   end
