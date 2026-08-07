@@ -78,14 +78,18 @@ RSpec.describe SpamEstimator::User do
       end
     end
 
-    context "legitimate businesses that say prepaid" do
-      # bare "prepaid" matched funeral directors and travel-SIM sellers, so it's qualified
-      it "stays below the threshold" do
+    context "legitimate businesses using gift-card vocabulary" do
+      # bare "prepaid" matched funeral directors and travel-SIM sellers, so it's qualified.
+      # A shop mentioning gift cards once is 30 on top of the link's 50 — it takes a second
+      # reference to reach the threshold, which is what separates a shop from a link farm.
+      it "stays below the threshold, even alongside a promotional link" do
         ["Organize a prepaid funeral in Adelaide. We offer pre-arranged and prepaid funeral options.",
-          "Prepaid travel SIM cards and eSIMs, so you stay connected overseas without roaming fees."]
+          "Prepaid travel SIM cards and eSIMs, so you stay connected overseas without roaming fees.",
+          "Community bike shop. We do tune-ups, wheel builds and fittings. Gift cards available in store."]
           .each do |legitimate_description|
-            expect(described_class.estimate(User.new(show_bikes: true, name:, description: legitimate_description)))
-              .to be < SpamEstimator::User::MARK_SPAM_PERCENT
+            legitimate = User.new(show_bikes: true, name:, description: legitimate_description,
+              my_bikes_hash: {"link_target" => "https://shop.example"})
+            expect(described_class.estimate(legitimate)).to be < SpamEstimator::User::MARK_SPAM_PERCENT
           end
       end
     end
