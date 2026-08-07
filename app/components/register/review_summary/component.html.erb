@@ -1,7 +1,7 @@
 <%# uncap: the org preview renders in a layout that upper-cases headings; the flow's doesn't %>
 <%= render UI::Header::Component.new(text: translation(".youre_almost_done"), subtitle:, html_class: "uncap") %>
 
-<%= render UI::DividedCard::Component.new do %>
+<%= render UI::Card::Component.new(divided: true) do %>
   <% @pages.each_with_index do |page, index| %>
     <div class="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:px-4 tw:py-3">
       <span class="tw:flex tw:items-center tw:gap-2.5">

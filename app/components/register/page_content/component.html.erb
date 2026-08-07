@@ -24,7 +24,7 @@
   <% end %>
 <% end %>
 
-<%= render UI::DividedCard::Component.new do %>
+<%= render UI::Card::Component.new(divided: true) do %>
   <% @page.bullets.each_with_index do |bullet, index| %>
     <label
       class="
