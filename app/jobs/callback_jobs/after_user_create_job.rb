@@ -106,8 +106,14 @@ module CallbackJobs
       Bike.unscoped.where(id: bike_ids)
     end
 
+    # Separate from the sign-in features on purpose: an organization claiming a domain for
+    # login says nothing about whether those accounts should also hold a role there.
     def create_user_email_domain_organization_role(user)
-      matching_organization = Organization.user_role_email_matching(user.email)
+      domain = user.email&.split("@")&.last
+      return false if domain.blank?
+
+      matching_organization = Organization.with_enabled_feature_slugs("user_role_for_user_email_domain")
+        .find_by(user_email_domain: domain)
       return false unless matching_organization.present?
       return false if user.organization_roles.pluck(:organization_id).include?(matching_organization.id)
 

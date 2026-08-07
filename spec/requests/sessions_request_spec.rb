@@ -170,7 +170,7 @@ RSpec.describe SessionsController, type: :request do
           expect {
             post "/session/create_magic_link", params: {email: "somethingcool@party.edu"}
           }.to change(User, :count).by 1
-          # Claiming the domain for sign in doesn't make them a member
+          # Claiming the domain for sign in doesn't grant a role in the organization
           expect(current_organization.organization_roles.count).to eq 0
           expect(ActionMailer::Base.deliveries.count).to eq 1
           mail = ActionMailer::Base.deliveries.last
