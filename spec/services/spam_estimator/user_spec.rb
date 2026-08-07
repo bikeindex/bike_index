@@ -79,15 +79,14 @@ RSpec.describe SpamEstimator::User do
     end
 
     context "prepaid outside a gift-card context" do
-      # bare "prepaid" matched prepaid funerals and travel SIMs, so the term is qualified.
-      # Those profiles may well be spam for other reasons — the point is only that the
-      # word on its own isn't a gift-card reference.
-      it "is not counted as a reference" do
+      # the profiles this caught — prepaid funerals, travel SIMs, mobile recharge — are
+      # link-only profiles with no registrations, so the bare term stays unqualified
+      it "counts as a reference" do
         ["Pre-arranged and prepaid funeral options across Adelaide.",
           "Prepaid travel SIM cards and eSIMs, so you stay connected overseas."]
-          .each do |unrelated_description|
-            expect(described_class.seo_spam_matches(User.new(show_bikes: true, description: unrelated_description)))
-              .to eq({})
+          .each do |description|
+            expect(described_class.seo_spam_matches(User.new(show_bikes: true, description:)))
+              .to eq({"prepaid" => 1})
           end
       end
     end

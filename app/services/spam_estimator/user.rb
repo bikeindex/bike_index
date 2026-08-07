@@ -24,11 +24,9 @@ module SpamEstimator
       )\b | 18\+ |
       # Gift-card "check your balance" farms run the brand together in usernames and
       # domains (mcgiftgiftcardmall3, vanillaprepaid.io), so these can't be \b-anchored.
-      # "prepaid" stays qualified — bare, it matches prepaid funerals and SIM cards.
-      gift\s?(?:cards?|code) |
+      gift\s?(?:cards?|code) | prepaid |
       (?:mc|my|wm|walmart|five\s?back|vanilla|visa|amex|master(?:card)?)-?\s?e?-?gift |
-      prepaid\s?(?:gift|card|visa|master|balance|cent(?:er|re)) |
-      (?:one|my)-?\s?vanilla | vanilla-?\s?(?:balance|prepaid) | secure-?\s?spend |
+      (?:one|my)-?\s?vanilla | vanilla-?\s?balance | secure-?\s?spend |
       (?:card|gift)\s?balance | balance\s?(?:check|inquiry|inquiries) |
       check\s?(?:my|your|the)?\s?balance | reward\s?cards? |
       card\s?activation | activate\s+(?:my\s|your\s|the\s)?(?:gift\s?)?card |
