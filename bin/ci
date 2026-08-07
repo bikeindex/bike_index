@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require "fileutils"
+
 # Runs locally what CI runs (.github/workflows/ci.yml), in one command.
 #
 #   bin/ci            lint + scan + the full spec suite
@@ -9,7 +11,7 @@
 #
 # Nothing stops at the first failure, so one run reports every check.
 
-APP_ROOT = File.expand_path("..", __dir__)
+Dir.chdir(File.expand_path("..", __dir__))
 
 # Each linter is listed out rather than delegated to `bin/lint --no-fix`, which
 # aborts on the first failure and runs the three npm checks as one command.
@@ -27,8 +29,7 @@ LINT_AND_SCAN = {
 RSPEC_SUMMARY_PATH = "tmp/ci_rspec_summary.txt"
 
 # parallel:prepare stands in for CI's db:create/db:schema:load - parallel test
-# databases aren't migrated automatically (see README). RETRY_FLAKY is set the
-# way ci.yml sets it, so a `:flaky`-tagged example gets the same two retries here.
+# databases aren't migrated automatically (see README).
 TESTS = {
   "db prepare" => "bin/rake parallel:prepare",
   "rspec" => "RETRY_FLAKY=true bin/turbo_tests -f progress -f progress -o #{RSPEC_SUMMARY_PATH}"
@@ -46,8 +47,7 @@ def run(name, command)
 end
 
 # Commit statuses, not check runs - check runs are only writable by a GitHub App,
-# and `gh` holds a user token. The local-ci/ prefix keeps a laptop's word about a
-# commit distinguishable from the workflow's own checks.
+# and `gh` holds a user token.
 def post_status(result, sha, note)
   description = [result[:detail], format("%.0fs on this machine", result[:elapsed])].compact.join(", ")
   posted = system("gh", "api", "--silent", "-X", "POST", "repos/{owner}/{repo}/statuses/#{sha}",
@@ -63,6 +63,9 @@ def rspec_counts
   File.read(RSPEC_SUMMARY_PATH)[/\d+ examples?, \d+ failures?[^\n]*/]
 end
 
+# A dirty tree describes code that isn't at that sha.
+def dirty_tree_note = `git status --porcelain`.empty? ? "" : ", with uncommitted changes"
+
 unknown = ARGV - ["--lint", "--tests", "--github"]
 abort "Unknown option(s): #{unknown.join(" ")}\nUsage: bin/ci [--lint | --tests] [--github]" if unknown.any?
 
@@ -74,31 +77,23 @@ else
   LINT_AND_SCAN.merge(TESTS)
 end
 
-Dir.chdir(APP_ROOT) do
-  github = ARGV.include?("--github")
-  sha = `git rev-parse HEAD`.strip
-  # A run against a dirty tree describes code that isn't at that sha - say so on
-  # the status rather than refusing to post one.
-  note = `git status --porcelain`.empty? ? "" : ", with uncommitted changes"
+github = ARGV.include?("--github")
+sha, note = github ? [`git rev-parse HEAD`.strip, dirty_tree_note] : []
 
-  # A leftover summary would put the previous run's counts on this run's status.
-  File.delete(RSPEC_SUMMARY_PATH) if File.exist?(RSPEC_SUMMARY_PATH)
+# A leftover summary would put the previous run's counts on this run's status.
+FileUtils.rm_f(RSPEC_SUMMARY_PATH)
 
-  started = now
-  results = checks.map do |name, command|
-    result = run(name, command)
-    result = result.merge(detail: rspec_counts) if name == "rspec"
-    post_status(result, sha, note) if github
-    result
-  end
-  succeeded = results.all? { |result| result[:succeeded] }
-
-  puts "\n\e[1m== bin/ci\e[0m"
-  results.each do |result|
-    puts format("  %-11s %s %6.1fs", result[:name], status_label(result[:succeeded]), result[:elapsed])
-  end
-  # Wall clock, so it exceeds the sum above by whatever --github spent posting.
-  puts format("  %-11s %s %6.1fs", "total", status_label(succeeded), now - started)
-
-  exit succeeded
+started = now
+results = checks.map do |name, command|
+  result = run(name, command).merge(detail: (rspec_counts if name == "rspec"))
+  post_status(result, sha, note) if github
+  result
 end
+succeeded = results.all? { |result| result[:succeeded] }
+
+puts "\n\e[1m== bin/ci\e[0m"
+rows = results.map { |result| result.values_at(:name, :succeeded, :elapsed) }
+rows << ["total", succeeded, now - started]
+rows.each { |name, ok, elapsed| puts format("  %-11s %s %6.1fs", name, status_label(ok), elapsed) }
+
+exit succeeded

@@ -30,8 +30,6 @@ require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
 require "paper_trail/frameworks/rspec"
 
-# Capybara setup (driver registration, server host, :js BASE_URL hook) lives in
-# spec/support/capybara.rb.
 require "view_component/test_helpers"
 require "view_component/system_test_helpers"
 

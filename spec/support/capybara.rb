@@ -18,14 +18,9 @@ Capybara.configure do |config|
   config.javascript_driver = :playwright
 end
 
-# Capybara takes a free port unless CAPYBARA_PORT pins one - bin/turbo_tests
-# runs a process per CPU, and a shared port leaves all but the first with
-# EADDRINUSE.
+# Each parallel worker needs its own port, so let Capybara pick a free one -
+# pinning left all but the first worker with EADDRINUSE.
 Capybara.server_host = "localhost"
-if ENV["CAPYBARA_PORT"]
-  Capybara.server_port = ENV["CAPYBARA_PORT"].to_i
-  Capybara.app_host = "http://#{Capybara.server_host}:#{Capybara.server_port}"
-end
 Capybara.always_include_port = true
 
 # The application layout pulls Google Fonts and analytics from external hosts

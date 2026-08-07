@@ -11,33 +11,31 @@ load File.expand_path("env", __dir__)
 ENV.delete("REDIS_URL") unless redis_url_set
 
 require "bundler/setup"
-require "digest"
-require "etc"
 
 # For some reason (I believe because of dartsass) assets get recompiled every time tests run
-# So handle asset compilation ourselves
-#
-# JS counts as much as CSS: test serves from the sprockets manifest, so an
-# unrebuilt bundle means the specs drive whatever JavaScript was compiled last -
-# green while testing code that is no longer in the tree.
+# So handle asset compilation ourselves. JS counts as much as CSS: test serves it
+# from the sprockets manifest, so a stale bundle silently tests deleted code.
 CSS_SOURCES = [
   "app/assets/stylesheets/**/*.{scss,css}",
   "app/assets/tailwind/**/*.css",
   "config/initializers/dartsass.rb"
 ].freeze
 
-# Every JS tree app/assets/config/manifest.js links, not just app/assets/javascripts.
+# Every JS tree app/assets/config/manifest.js links, plus Gemfile.lock for the
+# ones a gem ships (lexxy).
 JS_SOURCES = [
   "app/assets/javascripts/**/*",
   "app/javascript/**/*",
   "vendor/javascript/**/*",
-  "app/components/**/*.js"
+  "app/components/**/*.js",
+  "Gemfile.lock"
 ].freeze
 
 # Each output against its own sources - the two are built by different tools, and
 # SKIP_CSS_BUILD leaves builds/tailwind.css behind, so one shared cutoff would
 # read as permanently stale.
-def stale?(sources, outputs)
+def stale?(sources, output_pattern)
+  outputs = app_glob(output_pattern)
   return true if outputs.empty?
 
   oldest_asset_time = outputs.map { |file| File.mtime(file) }.min
@@ -51,8 +49,9 @@ def app_glob(pattern)
 end
 
 def assets_need_compilation?
-  stale?(CSS_SOURCES, app_glob("app/assets/builds/*.css")) ||
-    stale?(JS_SOURCES, app_glob("public/assets/.sprockets-manifest*.json"))
+  stale?(CSS_SOURCES, "app/assets/builds/*.css") ||
+    # Filename pinned by config/initializers/assets.rb
+    stale?(JS_SOURCES, "public/assets/.sprockets-manifest.json")
 end
 
 if assets_need_compilation?
@@ -66,10 +65,4 @@ ENV["RAILS_ASSETS_PRECOMPILE"] = "false"
 # dartsass-rails hooks into test:prepare, skip since assets are already compiled
 ENV["SKIP_CSS_BUILD"] = "true"
 
-# turbo_tests defaults to one process per core, but bin/env only has 8 test Redis
-# databases to hand out (8-15), so a 9th worker shares one - and specs asserting
-# on Sidekiq queue contents then see another worker's jobs. Cap unless asked.
-worker_args = ARGV.grep(/\A-n/).any? ? [] : ["-n", [Etc.nprocessors, 8].min.to_s]
-
-# Pass all arguments to turbo_tests
-exec "bundle", "exec", "turbo_tests", *worker_args, *ARGV
+exec "bundle", "exec", "turbo_tests", *ARGV
