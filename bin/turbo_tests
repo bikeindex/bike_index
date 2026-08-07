@@ -13,26 +13,37 @@ require "etc"
 
 # For some reason (I believe because of dartsass) assets get recompiled every time tests run
 # So handle asset compilation ourselves
-def assets_need_compilation?
-  builds_dir = File.expand_path("../app/assets/builds", __dir__)
+#
+# JS counts as much as CSS: test serves from the sprockets manifest, so an
+# unrebuilt bundle means the specs drive whatever JavaScript was compiled last -
+# green while testing code that is no longer in the tree.
+CSS_SOURCES = [
+  "app/assets/stylesheets/**/*.{scss,css}",
+  "app/assets/tailwind/**/*.css",
+  "config/initializers/dartsass.rb"
+].freeze
 
-  # If builds directory doesn't exist or is empty, we need compilation
-  return true unless Dir.exist?(builds_dir)
-  css_files = Dir.glob(File.join(builds_dir, "*.css"))
-  return true if css_files.empty?
+JS_SOURCES = ["app/assets/javascripts/**/*", "app/javascript/**/*"].freeze
 
-  # Get the oldest compiled asset timestamp
-  oldest_asset_time = css_files.map { |f| File.mtime(f) }.min
+# Each output against its own sources - the two are built by different tools, and
+# SKIP_CSS_BUILD leaves builds/tailwind.css behind, so one shared cutoff would
+# read as permanently stale.
+def stale?(sources, outputs)
+  return true if outputs.empty?
 
-  # Check if any source files are newer than the oldest compiled asset
-  [
-    "app/assets/stylesheets/**/*.scss",
-    "app/assets/stylesheets/**/*.css",
-    "app/assets/tailwind/**/*.css",
-    "config/initializers/dartsass.rb"
-  ].any? do |pattern|
-    Dir.glob(pattern).any? { |f| File.mtime(f) > oldest_asset_time }
+  oldest_asset_time = outputs.map { |file| File.mtime(file) }.min
+  sources.any? do |pattern|
+    app_glob(pattern).any? { |file| File.file?(file) && File.mtime(file) > oldest_asset_time }
   end
+end
+
+def app_glob(pattern)
+  Dir.glob(File.expand_path("../#{pattern}", __dir__))
+end
+
+def assets_need_compilation?
+  stale?(CSS_SOURCES, app_glob("app/assets/builds/*.css")) ||
+    stale?(JS_SOURCES, app_glob("public/assets/.sprockets-manifest*.json"))
 end
 
 if assets_need_compilation?
