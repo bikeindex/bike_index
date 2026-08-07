@@ -5655,6 +5655,9 @@ es:
         who_we_serve: A quién servimos
         legal: Legal
         social_media: Redes sociales
+        status_page: Página de estado
+        marketplace: Mercado
+        search: Buscar
     emails:
       confirmation_email:
         click_to_sign_in_html: ¡Haz clic en el botón <em>Iniciar sesión</em> para finalizar

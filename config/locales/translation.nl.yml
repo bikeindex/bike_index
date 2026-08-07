@@ -5553,6 +5553,9 @@ nl:
         who_we_serve: Wie we dienen
         legal: Juridisch
         social_media: Sociale media
+        status_page: Statuspagina
+        marketplace: Marktplaats
+        search: Zoeken
     emails:
       confirmation_email:
         click_to_sign_in_html: Klik op de knop <em>Inloggen</em> om het aanmelden te

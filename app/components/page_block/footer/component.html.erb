@@ -11,6 +11,14 @@
 
             <ul>
               <li>
+                <%= helpers.active_link translation(".search"), helpers.default_bike_search_path %>
+              </li>
+
+              <li>
+                <%= helpers.active_link translation(".marketplace"), search_marketplace_path %>
+              </li>
+
+              <li>
                 <%= helpers.active_link translation(".faq"), support_path %>
               </li>
 
@@ -86,6 +94,10 @@
 
               <li>
                 <%= helpers.active_link translation(".protect_your_bike"), protect_your_bike_path %>
+              </li>
+
+              <li>
+                <%= link_to translation(".status_page"), "https://status.bikeindex.org" %>
               </li>
 
               <% if Flipper.enabled?(:strava_integration, @current_user) %>
