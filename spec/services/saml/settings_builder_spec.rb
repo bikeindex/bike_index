@@ -23,9 +23,10 @@ RSpec.describe Saml::SettingsBuilder, :saml_env do
     expect(settings.idp_cert).to include("BEGIN CERTIFICATE")
   end
 
-  it "enforces signed assertions + SHA-256" do
+  it "enforces signed assertions + SHA-256, and offers an encryption key" do
     expect(settings.security[:want_assertions_signed]).to be true
     expect(settings.security[:authn_requests_signed]).to be true
+    expect(settings.security[:want_assertions_encrypted]).to be true
     expect(settings.security[:digest_method]).to eq XMLSecurity::Document::SHA256
     expect(settings.security[:signature_method]).to eq XMLSecurity::Document::RSA_SHA256
   end

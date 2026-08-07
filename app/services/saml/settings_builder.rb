@@ -75,6 +75,10 @@ module Saml
       settings.soft = true # collect validation errors instead of raising
       settings.security[:want_assertions_signed] = true
       settings.security[:authn_requests_signed] = true
+      # Metadata-only in ruby-saml: adds the encryption KeyDescriptor so an IdP that encrypts
+      # has a key to encrypt to. It requires nothing — decryption runs off the SP private key
+      # whenever an EncryptedAssertion arrives, set or not.
+      settings.security[:want_assertions_encrypted] = true
       settings.security[:digest_method] = XMLSecurity::Document::SHA256
       settings.security[:signature_method] = XMLSecurity::Document::RSA_SHA256
     end
