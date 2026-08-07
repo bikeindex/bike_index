@@ -4,9 +4,8 @@
 # rather than to the Disk service - the only way to exercise a presigned, cross-origin PUT.
 # Needs R2_TEST_* (in .env.test locally, repo secrets in CI).
 RSpec.shared_context :cloudflare_test_storage do
-  # example.com is .env's placeholder - it signs well enough to replay a cassette, but there's
-  # no bucket behind it. Skipping is only expected on the CI runs repo secrets don't reach;
-  # anywhere else on CI the credentials went missing, which shouldn't cost the coverage silently
+  # example.com is .env's placeholder: it signs, but there's no bucket behind it. Only the runs
+  # without secrets may skip - anywhere else the credentials went missing.
   before do
     next unless ENV["R2_TEST_ENDPOINT"].to_s.include?("example.com")
     raise "R2_TEST_* credentials are missing" if ENV["CI_WITHOUT_SECRETS"] == "false"
@@ -37,8 +36,7 @@ RSpec.shared_context :cloudflare_test_storage do
   def without_http_stubbing
     VCR.turned_off(ignore_cassettes: true) do
       WebMock.disable!
-      # aws-sdk pools its Net::HTTP sessions, and WebMock swaps the class rather than the
-      # instances - a session opened to the bucket under an earlier cassette stays stubbed
+      # aws-sdk pools its Net::HTTP sessions, and WebMock swaps the class, not live instances
       Seahorse::Client::NetHttp::ConnectionPool.pools.each(&:empty!)
       yield
     ensure

@@ -221,12 +221,10 @@ jobs:
       TRANSLATION_BRANCH: main
       TRANSLATIONS_SYNC_APP_ID: ${{ secrets.TRANSLATIONS_SYNC_APP_ID }}
       RETRY_FLAKY: true
-      # The runs repo secrets don't reach. Named rather than inferred from a blank credential, so
-      # a secret that goes missing on a run that should have had one fails instead of skipping.
+      # The runs repo secrets don't reach - named, so a credential missing anywhere else fails
       CI_WITHOUT_SECRETS: ${{ github.actor == 'dependabot[bot]' || github.event.pull_request.head.repo.fork == true }}
-      # spec/integration/register_spec.rb uploads to the bikeindex-test bucket for real - the
-      # only way to exercise a presigned cross-origin PUT. Absent, it skips, and .env's
-      # placeholders stand in so the R2 cassettes still replay.
+      # spec/integration/register_spec.rb PUTs to the bikeindex-test bucket for real; absent, it
+      # skips. The placeholders are only so the R2 cassettes still sign.
       R2_TEST_ACCESS_KEY: ${{ secrets.R2_TEST_ACCESS_KEY || 'test' }}
       R2_TEST_ACCESS_KEY_SECRET: ${{ secrets.R2_TEST_ACCESS_KEY_SECRET || 'test' }}
       R2_TEST_ENDPOINT: ${{ secrets.R2_TEST_ENDPOINT || 'https://r2-test.example.com' }}
