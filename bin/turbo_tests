@@ -6,23 +6,23 @@
 ENV["RAILS_ENV"] ||= "test"
 redis_url_set = ENV.key?("REDIS_URL")
 load File.expand_path("env", __dir__)
-# Whatever this process lands on is inherited by every worker, and bin/env only
-# assigns a database per TEST_ENV_NUMBER, which doesn't exist until the workers do.
+# Every worker inherits whatever this process lands on, and bin/env assigns per
+# TEST_ENV_NUMBER, which doesn't exist until the workers do.
 ENV.delete("REDIS_URL") unless redis_url_set
 
 require "bundler/setup"
 
 # For some reason (I believe because of dartsass) assets get recompiled every time tests run
-# So handle asset compilation ourselves. JS counts as much as CSS: test serves it
-# from the sprockets manifest, so a stale bundle silently tests deleted code.
+# So handle asset compilation ourselves. JS counts too: test serves it from the
+# sprockets manifest, so a stale bundle silently tests deleted code.
 CSS_SOURCES = [
   "app/assets/stylesheets/**/*.{scss,css}",
   "app/assets/tailwind/**/*.css",
   "config/initializers/dartsass.rb"
 ].freeze
 
-# Every JS tree app/assets/config/manifest.js links, plus Gemfile.lock for the
-# ones a gem ships (lexxy).
+# Every JS tree app/assets/config/manifest.js links, plus Gemfile.lock for lexxy,
+# which a gem ships.
 JS_SOURCES = [
   "app/assets/javascripts/**/*",
   "app/javascript/**/*",
@@ -31,9 +31,8 @@ JS_SOURCES = [
   "Gemfile.lock"
 ].freeze
 
-# Each output against its own sources - the two are built by different tools, and
-# SKIP_CSS_BUILD leaves builds/tailwind.css behind, so one shared cutoff would
-# read as permanently stale.
+# Separate cutoffs: different tools build them, and SKIP_CSS_BUILD leaves
+# builds/tailwind.css behind, so one shared cutoff would read as permanently stale.
 def stale?(sources, output_pattern)
   outputs = app_glob(output_pattern)
   return true if outputs.empty?

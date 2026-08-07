@@ -13,8 +13,8 @@ require "fileutils"
 
 Dir.chdir(File.expand_path("..", __dir__))
 
-# Each linter is listed out rather than delegated to `bin/lint --no-fix`, which
-# aborts on the first failure and runs the three npm checks as one command.
+# Listed out rather than `bin/lint --no-fix`, which aborts on the first failure
+# and lumps the three npm checks into one command.
 LINT_AND_SCAN = {
   "standardrb" => "bundle exec standardrb --no-fix",
   "rubocop" => "bundle exec rubocop -c .rubocop_custom.yml",
@@ -24,12 +24,12 @@ LINT_AND_SCAN = {
   "brakeman" => "bin/brakeman"
 }.freeze
 
-# A second progress formatter writes the same summary here, so the example counts
-# can reach the GitHub status without capturing stdout away from the terminal.
+# A second progress formatter writes the summary here, so the counts reach the
+# GitHub status without capturing stdout away from the terminal.
 RSPEC_SUMMARY_PATH = "tmp/ci_rspec_summary.txt"
 
 # parallel:prepare stands in for CI's db:create/db:schema:load - parallel test
-# databases aren't migrated automatically (see README).
+# databases aren't migrated automatically.
 TESTS = {
   "db prepare" => "bin/rake parallel:prepare",
   "rspec" => "RETRY_FLAKY=true bin/turbo_tests -f progress -f progress -o #{RSPEC_SUMMARY_PATH}"

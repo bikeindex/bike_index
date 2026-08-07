@@ -18,8 +18,8 @@ Capybara.configure do |config|
   config.javascript_driver = :playwright
 end
 
-# Each parallel worker needs its own port, so let Capybara pick a free one -
-# pinning left all but the first worker with EADDRINUSE.
+# Each parallel worker needs its own port - a pinned one leaves all but the first
+# with EADDRINUSE.
 Capybara.server_host = "localhost"
 Capybara.always_include_port = true
 
@@ -36,8 +36,8 @@ BLOCKED_EXTERNAL_HOSTS = %w[
   www.google-analytics.com
 ].freeze
 
-# Keep BASE_URL aligned with Capybara's server for `:js` specs so any `*_url`
-# helper rendered during the example targets the Capybara server.
+# Point BASE_URL at Capybara's server for `:js` specs, so `*_url` helpers rendered
+# during the example resolve to it.
 RSpec.configure do |config|
   config.around(:each, :js) do |example|
     original_base_url = ENV["BASE_URL"]
