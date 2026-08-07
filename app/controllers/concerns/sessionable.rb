@@ -62,6 +62,20 @@ module Sessionable
 
   private
 
+  # SSO orgs force SSO: hand an SSO-managed email off to the IdP rather than let it sign in
+  # or sign up any other way. Redirecting halts the filter chain, so the guarded action
+  # never runs for a forced-SSO email.
+  def redirect_forced_saml
+    organization = Organization.saml_email_matching(submitted_email)
+    redirect_to saml_init_path(org_slug: organization.to_param) if organization.present?
+  end
+
+  # The email an unauthenticated request is offering up, wherever its form puts it:
+  # session[:email] signing in, user[:email] signing up, a bare :email elsewhere.
+  def submitted_email
+    params.dig(:session, :email).presence || params.dig(:user, :email).presence || params[:email]
+  end
+
   # Passwordless users are nudged to set a password, unless their organization is what signs them in.
   # UI::Alerts::FlashMessage renders the hash - it owns the copy and builds the link
   def set_sign_in_flash(user, signed_up)
