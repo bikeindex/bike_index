@@ -26,7 +26,13 @@ CSS_SOURCES = [
   "config/initializers/dartsass.rb"
 ].freeze
 
-JS_SOURCES = ["app/assets/javascripts/**/*", "app/javascript/**/*"].freeze
+# Every JS tree app/assets/config/manifest.js links, not just app/assets/javascripts.
+JS_SOURCES = [
+  "app/assets/javascripts/**/*",
+  "app/javascript/**/*",
+  "vendor/javascript/**/*",
+  "app/components/**/*.js"
+].freeze
 
 # Each output against its own sources - the two are built by different tools, and
 # SKIP_CSS_BUILD leaves builds/tailwind.css behind, so one shared cutoff would
