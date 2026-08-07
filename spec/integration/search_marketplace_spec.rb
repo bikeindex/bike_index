@@ -84,14 +84,38 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     find("#search-button").click
   end
 
-  it "loads the kind counts on initial render" do
+  # Hold back the unfiltered results the frame eager-loads on arrival. Returns the
+  # release, so the example decides when they land rather than racing a timer.
+  def hold_initial_results_load
+    held = Queue.new
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.route("**/search/marketplace*", ->(route, request) {
+        held.pop if request.headers["turbo-frame"] == "marketplace_results_frame" &&
+          !request.url.include?("primary_activity=")
+        route.continue
+      })
+    end
+    -> { held.push(:release) }
+  end
+
+  it "fills the kind counts on load, and keeps a search made before the results arrive" do
+    release_initial_results_load = hold_initial_results_load
     visit_marketplace_via_nav
 
     # Counts populate from /search/marketplace/counts once the search--kind-select-fields
-    # controller connects - no form submit required. The eager turbo-frame flow no
-    # longer auto-submits on load, so this guards that initial render still fills them.
-    # All 17 listings (15 standard + 2 promoted) are for_sale, so the for_sale count shows (17).
+    # controller connects - no form submit required, and no results either, since the
+    # frame is held open here. All 17 listings (15 standard + 2 promoted) are for_sale,
+    # so the for_sale count shows (17).
     expect(page).to have_css("[data-count-target='for_sale']", text: "(17)", wait: 10)
+
+    search_primary_activity("Mountain biking")
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
+
+    # The unfiltered results are only now allowed to arrive - they mustn't take over
+    release_initial_results_load.call
+    page.driver.with_playwright_page { |playwright_page| playwright_page.wait_for_load_state(state: "networkidle") }
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", count: 6)
+    expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/)
   end
 
   it "automatically loads the next page when scrolling to bottom" do
