@@ -5,9 +5,12 @@
 # Needs R2_TEST_* (in .env.test locally, repo secrets in CI).
 RSpec.shared_context :cloudflare_test_storage do
   # example.com is .env's placeholder - it signs well enough to replay a cassette, but there's
-  # no bucket behind it
+  # no bucket behind it. Skipping is only expected on the CI runs repo secrets don't reach;
+  # anywhere else on CI the credentials went missing, which shouldn't cost the coverage silently
   before do
-    skip "no R2_TEST_* credentials" if ENV["R2_TEST_ENDPOINT"].to_s.include?("example.com")
+    next unless ENV["R2_TEST_ENDPOINT"].to_s.include?("example.com")
+    raise "R2_TEST_* credentials are missing" if ENV["CI_WITHOUT_SECRETS"] == "false"
+    skip "no R2_TEST_* credentials"
   end
 
   # service is a class_attribute, so the Capybara server thread picks this up too. VCR blocks
