@@ -208,8 +208,8 @@ RSpec.describe CallbackJobs::AfterUserCreateJob, type: :job do
     end
   end
 
-  context "organization with auto passwordless users" do
-    let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "city.gov", available_invitation_count: 1) }
+  context "organization with automatic user role" do
+    let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["user_role_for_user_email_domain"], user_email_domain: "city.gov", available_invitation_count: 1) }
     let(:user) { FactoryBot.create(:user, email: email) }
     let(:email) { "example@somethingcity.gov" }
     it "does not become member for non-matching domain" do
@@ -223,6 +223,15 @@ RSpec.describe CallbackJobs::AfterUserCreateJob, type: :job do
       user.reload
       expect(user.confirmed?).to be_truthy
       expect(user.organization_roles.count).to eq 0
+    end
+    context "passwordless_users without the automatic role feature" do
+      let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "city.gov", available_invitation_count: 1) }
+      let(:email) { "example@city.gov" }
+      it "signs the user in without granting a role" do
+        Sidekiq::Testing.inline! { user.confirm(user.confirmation_token) }
+        expect(user.reload.confirmed?).to be_truthy
+        expect(user.organization_roles.count).to eq 0
+      end
     end
     context "matching domain" do
       let(:email) { "example@city.gov" }
@@ -241,9 +250,8 @@ RSpec.describe CallbackJobs::AfterUserCreateJob, type: :job do
         expect(organization_role.organization_id).to eq organization.id
         expect(organization_role.role).to eq "member"
 
-        expect(ActionMailer::Base.deliveries.count).to eq 1
-        mail = ActionMailer::Base.deliveries.last
-        expect(mail.subject).to match(/join.*#{organization.name}/i)
+        # An auto-granted role is not an invitation, so it sends no invitation email
+        expect(ActionMailer::Base.deliveries.count).to eq 0
       end
       context "organization_role exists" do
         it "does not create an additional organization_role" do

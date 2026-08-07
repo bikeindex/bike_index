@@ -385,7 +385,8 @@ RSpec.describe UsersController, type: :controller do
       end
 
       context "with auto_passwordless organization" do
-        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "ladot.online", available_invitation_count: 1) }
+        let(:enabled_feature_slugs) { ["passwordless_users"] }
+        let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:, user_email_domain: "ladot.online", available_invitation_count: 1) }
         let(:user) { FactoryBot.create(:user, email: email) }
         let(:email) { "something@ladot.com" }
 
@@ -410,15 +411,27 @@ RSpec.describe UsersController, type: :controller do
         end
         context "domain matching" do
           let(:email) { "something@ladot.online" }
-          it "logins and redirects when confirmation succeeds" do
+          it "logins without granting a role" do
             request.env["HTTP_CF_CONNECTING_IP"] = "169.99.69.2"
             expect(user.confirmed?).to be_falsey
             expect(session[:passive_organization_id]).to be_blank
             post :confirm, params: {id: user.id, code: user.confirmation_token}
-            expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
-            expect(session[:passive_organization_id]).to eq organization.id
+            expect(response).to redirect_to my_account_url
             expect_confirmed_and_set_ip(user)
-            expect(user.organization_roles.count).to eq 1
+            expect(user.organization_roles.count).to eq 0
+          end
+          context "with user_role_for_user_email_domain" do
+            let(:enabled_feature_slugs) { ["passwordless_users", "user_role_for_user_email_domain"] }
+            it "logins and redirects to the organization" do
+              request.env["HTTP_CF_CONNECTING_IP"] = "169.99.69.2"
+              expect(user.confirmed?).to be_falsey
+              expect(session[:passive_organization_id]).to be_blank
+              post :confirm, params: {id: user.id, code: user.confirmation_token}
+              expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
+              expect(session[:passive_organization_id]).to eq organization.id
+              expect_confirmed_and_set_ip(user)
+              expect(user.organization_roles.count).to eq 1
+            end
           end
         end
       end
