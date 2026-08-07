@@ -67,13 +67,18 @@ class OrganizationsController < ApplicationController
     render layout: "embed_layout"
   end
 
-  def shop_display_qr
-    find_organization
-    redirect_to(format: "png") && return unless request.format == "png"
+  def qr
+    return unless find_organization.present?
+    redirect_to(format: "png", link_to: params[:link_to].presence) && return unless request.format == "png"
+    @qr_url = case params[:link_to]
+    when "shop_display" then embed_organization_url(@organization, non_stolen: true, shop_display: true)
+    when "landing" then "#{root_url}#{@organization.to_param}" # not routed unless in LandingPages::ORGANIZATIONS
+    else new_register_url(organization_id: @organization.to_param)
+    end
 
     respond_to do |format|
       format.png do
-        qrcode = RQRCode::QRCode.new(embed_organization_url(@organization, non_stolen: true, shop_display: true))
+        qrcode = RQRCode::QRCode.new(@qr_url)
         render plain: qrcode.as_png(size: 1200, border_modules: 0), template: nil, format: :png
       end
     end

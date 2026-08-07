@@ -246,15 +246,51 @@ RSpec.describe OrganizationsController, type: :request do
     end
   end
 
-  describe "shop_display_qr" do
+  describe "qr" do
     let(:organization) { FactoryBot.create(:organization) }
+    let(:target_url) { "http://www.example.com/register/new?organization_id=#{organization.slug}" }
 
-    it "renders" do
-      get "#{base_url}/#{organization.slug}/shop_display_qr"
-      expect(response).to redirect_to("#{base_url}/#{organization.slug}/shop_display_qr.png")
+    it "renders, linking to the registration page" do
+      get "#{base_url}/#{organization.slug}/qr"
+      expect(response).to redirect_to("#{base_url}/#{organization.slug}/qr.png")
 
-      get "#{base_url}/#{organization.slug}/shop_display_qr.png"
+      get "#{base_url}/#{organization.slug}/qr.png"
       expect(response.status).to eq(200)
+      expect(assigns(:organization)).to eq organization
+      expect(assigns(:qr_url)).to eq target_url
+    end
+
+    context "link_to=shop_display" do
+      let(:target_url) { "http://www.example.com/organizations/#{organization.slug}/embed?non_stolen=true&shop_display=true" }
+
+      it "links to the embed" do
+        get "#{base_url}/#{organization.slug}/qr?link_to=shop_display"
+        expect(response).to redirect_to("#{base_url}/#{organization.slug}/qr.png?link_to=shop_display")
+
+        get "#{base_url}/#{organization.slug}/qr.png?link_to=shop_display"
+        expect(response.status).to eq(200)
+        expect(assigns(:qr_url)).to eq target_url
+      end
+    end
+
+    context "link_to=landing" do
+      let(:target_url) { "http://www.example.com/#{organization.slug}" }
+
+      it "links to the landing page, even without a landing page route" do
+        expect(LandingPages::ORGANIZATIONS).to_not include(organization.slug)
+
+        get "#{base_url}/#{organization.slug}/qr.png?link_to=landing"
+        expect(response.status).to eq(200)
+        expect(assigns(:qr_url)).to eq target_url
+      end
+    end
+
+    context "unknown link_to" do
+      it "links to the registration page" do
+        get "#{base_url}/#{organization.slug}/qr.png?link_to=xxxxx"
+        expect(response.status).to eq(200)
+        expect(assigns(:qr_url)).to eq target_url
+      end
     end
   end
 
