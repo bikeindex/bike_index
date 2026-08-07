@@ -98,19 +98,15 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     -> { held.push(:release) }
   end
 
-  it "loads the kind counts on initial render" do
+  it "fills the kind counts on load, and keeps a search made before the results arrive" do
+    release_initial_results_load = hold_initial_results_load
     visit_marketplace_via_nav
 
     # Counts populate from /search/marketplace/counts once the search--kind-select-fields
-    # controller connects - no form submit required. The eager turbo-frame flow no
-    # longer auto-submits on load, so this guards that initial render still fills them.
-    # All 17 listings (15 standard + 2 promoted) are for_sale, so the for_sale count shows (17).
+    # controller connects - no form submit required, and no results either, since the
+    # frame is held open here. All 17 listings (15 standard + 2 promoted) are for_sale,
+    # so the for_sale count shows (17).
     expect(page).to have_css("[data-count-target='for_sale']", text: "(17)", wait: 10)
-  end
-
-  it "keeps the searched results when the initial load lands after the search" do
-    release_initial_results_load = hold_initial_results_load
-    visit_marketplace_via_nav
 
     search_primary_activity("Mountain biking")
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
