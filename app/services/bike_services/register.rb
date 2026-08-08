@@ -8,6 +8,19 @@ module BikeServices
     # Step "3" is the first of the e-vehicle acknowledgment pages
     ACKNOWLEDGMENT_OFFSET = 3
     CONFIRMATION_EMAIL_INTERVAL = 5.minutes
+    # The registrations that report something - a theft, or a vehicle found/abandoned -
+    # and so need the record that goes with it before their bike can be created. Only
+    # these two: BikeServices::Builder builds a record for no other status
+    REPORT_STATUSES = %w[status_stolen status_impounded].freeze
+    # A stolen record carries its own address columns, so the report's location is
+    # flattened onto it - the impound record takes the nested attributes as they are
+    REPORT_ADDRESS_ATTRS = (AddressRecord.permitted_params.map(&:to_s) - %w[street_2]).freeze
+    # The rest of what a theft report asks for. Not the primary phone: a stolen
+    # registration gives one in step 2, and the stolen record is built with it
+    STOLEN_REPORT_ATTRS = %w[theft_description police_report_number police_report_department
+      estimated_value locking_description lock_defeat_description proof_of_ownership
+      receive_notifications secondary_phone phone_for_users phone_for_shops
+      phone_for_police].freeze
 
     # The token's registration when step 1 was never submitted (redirecting into
     # it can't surprise anyone), otherwise a new one. A signed-in user's email
@@ -88,6 +101,13 @@ module BikeServices
       (next_index < sequence_pages(sequence).count) ? step_for_page_index(next_index) : "review"
     end
 
+    # What the back link goes to - nil for the step nothing comes before
+    def step_before(step, sequence:, b_param: nil)
+      steps = all_steps(b_param, sequence_pages(sequence))
+      index = steps.index(step.to_s).to_i
+      steps[index - 1] if index.positive?
+    end
+
     # to_a: callers ask for count/any?/[] repeatedly, and a CollectionProxy re-queries
     # for each of them
     def sequence_pages(sequence)
@@ -95,7 +115,15 @@ module BikeServices
     end
 
     # The progress bar's segments - one per step the flow can reach
-    def total_steps(sequence) = all_steps(sequence_pages(sequence)).count
+    def total_steps(sequence, b_param: nil) = all_steps(b_param, sequence_pages(sequence)).count
+
+    # Which of those segments a step is, 1-based - the report step shifts the ones after it
+    def step_number(step, sequence:, b_param: nil)
+      all_steps(b_param, sequence_pages(sequence)).index(step.to_s).to_i + 1
+    end
+
+    # Whether the flow includes the report step - what was stolen, or what was found
+    def report_step?(b_param) = REPORT_STATUSES.include?(b_param&.status)
 
     # What the acknowledgment eyebrow counts: the rule pages, plus the review they end at
     def acknowledgment_step_count(sequence) = sequence_pages(sequence).count + 1
@@ -146,11 +174,13 @@ module BikeServices
       RegistrationSequenceAcknowledgment.create_for(b_param, sequence:, user:).persisted?
     end
 
-    # The bike exists, or everything's entered and awaiting the email
+    # The bike exists, or everything reachable is entered and awaiting the email - the
+    # report step waits on that same confirmation, so it isn't what's left to enter here
     def finished?(b_param, sequence:)
       return true if b_param.with_bike?
 
-      ready_for_bike?(b_param, sequence:) && !creator_available?(b_param)
+      details_completed?(b_param) && acknowledged?(b_param, sequence:) &&
+        !creator_available?(b_param)
     end
 
     # user: being signed in as the address settles it, without any link being clicked
@@ -226,6 +256,26 @@ module BikeServices
       completed
     end
 
+    def permitted_report_params
+      %i[date timezone impounded_description] + STOLEN_REPORT_ATTRS.map(&:to_sym) +
+        [{address_record_attributes: AddressRecord.permitted_params}]
+    end
+
+    # The theft or the find itself, onto the record the bike is created with - a stolen
+    # record for a theft, an impound record for a vehicle found. A blank date is allowed
+    # through: both records fall back to the current time
+    def save_report(b_param, report_params:)
+      attrs = report_params.to_h.with_indifferent_access
+      date = Binxtils::TimeParser.parse(attrs["date"], attrs["timezone"]) if attrs["date"].present?
+      report = if b_param.status_stolen?
+        {stolen_record: stolen_report_attrs(attrs, date)}
+      else
+        {impound_record: impound_report_attrs(attrs, date)}
+      end
+      b_param.clean_params(report.merge(report_completed: true).as_json)
+      b_param.save
+    end
+
     # Everything a submission does once its step is saved. Returns the bike, or nil while
     # the registration is still short of one - more to enter, or the email unconfirmed
     def complete(b_param, user:, sequence:, ip_address:)
@@ -261,31 +311,60 @@ module BikeServices
     end
 
     def ready_for_bike?(b_param, sequence:)
-      details_completed?(b_param) && acknowledged?(b_param, sequence:)
+      details_completed?(b_param) && acknowledged?(b_param, sequence:) && report_completed?(b_param)
+    end
+
+    # Nothing to report without a status that has a record, otherwise save_report's marker
+    def report_completed?(b_param)
+      !report_step?(b_param) || b_param.params["report_completed"].present?
+    end
+
+    def stolen_report_attrs(attrs, date)
+      address = attrs["address_record_attributes"] || {}
+      attrs.slice(*STOLEN_REPORT_ATTRS)
+        .merge(address.slice(*REPORT_ADDRESS_ATTRS))
+        .merge("date_stolen" => date).compact
+    end
+
+    def impound_report_attrs(attrs, date)
+      {"impounded_at" => date, "impounded_description" => attrs["impounded_description"],
+       "address_record_attributes" => attrs["address_record_attributes"]}.compact
     end
 
     def reusable?(b_param)
       b_param.present? && !b_param.with_bike? && b_param.manufacturer_id.blank?
     end
 
-    # Every step the flow reaches with these pages, in order
-    def all_steps(pages)
-      return %w[1 2] if pages.none?
+    # Every step the flow reaches with these pages, in order. The report comes right after
+    # step 2 - unless the registration is waiting on its confirmation email, since the
+    # emailed link is what proves the address the report belongs to, and it's clicked
+    # after the acknowledgment pages rather than before them
+    def all_steps(b_param, pages)
+      steps = %w[1 2] + pages.each_index.map { step_for_page_index(it) } +
+        (pages.any? ? %w[review] : [])
+      return steps unless report_step?(b_param)
+      return steps + %w[report] unless creator_available?(b_param)
 
-      %w[1 2] + pages.each_index.map { step_for_page_index(it) } + %w[review]
+      steps.first(2) + %w[report] + steps.drop(2)
     end
 
-    # Every step the registration has reached, in order - the acknowledgment pages
-    # open one at a time, and the review once they're all acknowledged
+    # Every step the registration has reached, in order - each one opens the next, so the
+    # flow stops at the first that hasn't been done
     def permitted_steps(b_param, sequence)
-      return %w[1] if b_param.manufacturer_id.blank?
+      steps = all_steps(b_param, sequence_pages(sequence))
+      reached = steps.take_while { step_completed?(b_param, it, sequence:) }.count
+      steps.first(reached + 1)
+    end
 
-      pages = sequence_pages(sequence)
-      return %w[1 2] unless details_completed?(b_param) && pages.any?
-
-      acknowledged = acknowledged_page_ids(b_param)
-      reached = pages.take_while { acknowledged.include?(it.id) }.count
-      all_steps(pages).first(ACKNOWLEDGMENT_OFFSET + reached)
+    # Whether a step has been submitted with everything it asks for
+    def step_completed?(b_param, step, sequence:)
+      case step
+      when "1" then b_param.manufacturer_id.present?
+      when "2" then details_completed?(b_param)
+      when "report" then report_completed?(b_param)
+      when "review" then acknowledgment(b_param).present?
+      else acknowledged_page_ids(b_param).include?(page_for_step(step, sequence:)&.id)
+      end
     end
 
     # The confirmed email's own account, or the AUTO_ORG_MEMBER system user standing in
@@ -335,7 +414,8 @@ module BikeServices
     def translation(key) = I18n.t(key, scope: "shared.register_flow")
 
     conceal :claim_creator, :create_bike_if_ready, :create_bike, :ready_for_bike?,
-      :reusable?, :all_steps, :permitted_steps, :confirmed_email_creator_id,
+      :report_completed?, :stolen_report_attrs, :impound_report_attrs, :reusable?,
+      :all_steps, :permitted_steps, :step_completed?, :confirmed_email_creator_id,
       :owner_email_for, :assign_owner_email, :details_completed?, :step_2_params,
       :translation
   end

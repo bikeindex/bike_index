@@ -841,6 +841,133 @@ RSpec.describe RegisterController, type: :request do
     end
   end
 
+  describe "report" do
+    let(:bike_details) do
+      {primary_frame_color_id: color.id, serial_number: "XYZ 123", status: "status_stolen",
+       phone: "(555) 000-0000", user_name:}
+    end
+    let(:report_details) do
+      {date: "2026-08-05T14:30", timezone: "America/Chicago", theft_description: "Cut lock",
+       police_report_number: "42", locking_description: "U-lock", proof_of_ownership: "1",
+       phone_for_users: "0", phone_for_shops: "1", phone_for_police: "1",
+       address_record_attributes: {street: "1 Main St", city: "Chicago", postal_code: "60608",
+                                   country_id: Country.united_states_id}}
+    end
+    let(:step_path) { ->(step) { register_path(b_param_token: b_param.id_token, step:) } }
+
+    context "signed in" do
+      include_context :request_spec_logged_in_as_user
+
+      it "asks about the theft after step 2, and creates the bike with its stolen record" do
+        expect {
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+        }.to_not change(Bike, :count)
+        expect(response).to redirect_to step_path.call("report")
+        follow_redirect!
+        expect(response.body).to include "Report your stolen bike"
+        expect(response.body).to include "report[police_report_number]"
+        expect(response.body).to include "report[address_record_attributes][street]"
+        # The theft is the last thing asked for, no organization pages to follow it
+        expect(response.body).to include "Complete Bike Registration"
+
+        expect {
+          patch "#{base_url}/report", params: {b_param_token: b_param.id_token, report: report_details}
+        }.to change(Bike, :count).by 1
+        expect(response).to redirect_to step_path.call("finished")
+
+        bike = Bike.last
+        expect(bike).to have_attributes(owner_email:, status: "status_stolen")
+        stolen_record = bike.current_stolen_record
+        expect(stolen_record).to have_attributes(theft_description: "Cut lock",
+          police_report_number: "42", locking_description: "U-lock", proof_of_ownership: true,
+          phone_for_users: false, phone_for_shops: true, street: "1 Main St", city: "Chicago")
+        # Entered in Chicago, rather than wherever the server happens to be
+        expect(stolen_record.date_stolen).to be_within(1).of Time.parse("2026-08-05T19:30:00 UTC")
+        # Step 2's phone is the stolen record's, so the report doesn't ask for it again
+        expect(stolen_record.phone).to eq "5550000000"
+      end
+
+      context "found" do
+        let(:bike_details) { super().merge(status: "status_impounded") }
+
+        it "asks about the find, and creates the bike with its impound record" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          expect(response).to redirect_to step_path.call("report")
+          follow_redirect!
+          expect(response.body).to include "About the bike you found"
+          expect(response.body).to include "report[impounded_description]"
+          expect(response.body).to_not include "report[police_report_number]"
+
+          expect {
+            patch "#{base_url}/report", params: {b_param_token: b_param.id_token,
+                                                 report: report_details.except(:police_report_number)
+                                                   .merge(impounded_description: "Behind the library")}
+          }.to change(Bike, :count).by 1
+          impound_record = Bike.last.current_impound_record
+          expect(impound_record).to have_attributes(impounded_description: "Behind the library",
+            user_id: current_user.id)
+          expect(impound_record.impounded_at).to be_within(1).of Time.parse("2026-08-05T19:30:00 UTC")
+          expect(impound_record.address_record.street).to eq "1 Main St"
+        end
+      end
+
+      context "registered with the owner" do
+        let(:bike_details) { super().merge(status: "status_with_owner") }
+
+        it "has no report to make, so step 2 creates the bike" do
+          expect {
+            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          }.to change(Bike, :count).by 1
+          expect(response).to redirect_to step_path.call("finished")
+
+          patch "#{base_url}/report", params: {b_param_token: b_param.id_token, report: report_details}
+          expect(response).to redirect_to step_path.call("finished")
+          expect(Bike.last.current_stolen_record).to be_blank
+        end
+      end
+    end
+
+    context "anonymous" do
+      let!(:token) { b_param.generate_email_confirmation_token! }
+
+      it "waits for the confirmation email, then asks about the theft" do
+        patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+        # Nothing to report until the address is proven - the flow parks on finished
+        expect(response).to redirect_to step_path.call("finished")
+        get step_path.call("report")
+        expect(response).to redirect_to step_path.call("finished")
+
+        expect {
+          post "#{base_url}/confirm_email", params: {b_param_token: b_param.id_token,
+                                                     confirmation_token: token}
+        }.to_not change(Bike, :count)
+        expect(response).to redirect_to step_path.call("report")
+
+        expect {
+          patch "#{base_url}/report", params: {b_param_token: b_param.id_token, report: report_details}
+        }.to change(Bike, :count).by 1
+        expect(Bike.last).to have_attributes(owner_email:, creator_id: User.last.id)
+        expect(Bike.last.current_stolen_record.theft_description).to eq "Cut lock"
+      end
+    end
+
+    context "details not entered" do
+      it "redirects to the step the registration is on, saving nothing" do
+        expect {
+          patch "#{base_url}/report", params: {b_param_token: b_param.id_token, report: report_details}
+        }.to_not change { b_param.reload.params }
+        expect(response).to redirect_to step_path.call("2")
+      end
+    end
+
+    context "unknown token" do
+      it "redirects to the start" do
+        patch "#{base_url}/report", params: {b_param_token: "unknown-token", report: report_details}
+        expect(response).to redirect_to new_register_path
+      end
+    end
+  end
+
   describe "acknowledge" do
     let(:organization) { FactoryBot.create(:organization) }
     # Built as a draft and activated below, since activation freezes the pages

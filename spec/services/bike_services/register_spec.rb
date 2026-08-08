@@ -178,6 +178,128 @@ RSpec.describe BikeServices::Register do
     end
   end
 
+  describe "report step" do
+    let(:creator) { FactoryBot.create(:user) }
+    let(:bike_params) { {owner_email: "owner@example.com", manufacturer_id: 12, status: "status_stolen"} }
+    let(:b_param) do
+      BParam.create(origin: "register_flow", creator_id: creator.id,
+        params: {details_completed: true, bike: bike_params}.as_json)
+    end
+    let(:report_params) do
+      {date: "2026-08-05T14:30", timezone: "America/Chicago", theft_description: "Cut lock",
+       police_report_number: "42", locking_description: "U-lock", receive_notifications: "0",
+       address_record_attributes: {street: "1 Main St", city: "Chicago", street_2: "Apt 2"}}
+    end
+
+    it "comes after step 2, and saves the stolen record the bike is created with" do
+      expect(described_class.report_step?(b_param)).to be_truthy
+      expect(described_class.total_steps(nil, b_param:)).to eq 3
+      expect(described_class.step_number("report", sequence: nil, b_param:)).to eq 3
+      expect(described_class.step_before("report", sequence: nil, b_param:)).to eq "2"
+      # Not finished: the theft is still to be reported
+      expect(described_class.finished?(b_param, sequence: nil)).to be_falsey
+      expect(described_class.permitted_step(b_param, nil, sequence: nil)).to eq "report"
+
+      expect(described_class.save_report(b_param, report_params:)).to be_truthy
+      stolen_attrs = b_param.reload.stolen_attrs
+      expect(stolen_attrs).to match(hash_including("theft_description" => "Cut lock",
+        "police_report_number" => "42", "locking_description" => "U-lock",
+        "receive_notifications" => "0", "street" => "1 Main St", "city" => "Chicago"))
+      # A stolen record has no second address line to put it on
+      expect(stolen_attrs["street_2"]).to be_blank
+      # Entered in Chicago, so 14:30 there rather than wherever the server is
+      expect(stolen_attrs["date_stolen"].to_time).to be_within(1).of(Time.parse("2026-08-05T19:30:00 UTC"))
+
+      # Everything's in - the submission that saved it creates the bike
+      expect(described_class.send(:report_completed?, b_param)).to be_truthy
+      expect(described_class.send(:ready_for_bike?, b_param, sequence: nil)).to be_truthy
+    end
+
+    context "found" do
+      let(:bike_params) { super().merge(status: "status_impounded") }
+
+      it "saves the impound record instead, keeping the address nested" do
+        expect(described_class.permitted_step(b_param, nil, sequence: nil)).to eq "report"
+        expect(described_class.save_report(b_param, report_params:)).to be_truthy
+
+        impound_attrs = b_param.reload.impound_attrs
+        expect(impound_attrs["impounded_at"].to_time).to be_within(1).of(Time.parse("2026-08-05T19:30:00 UTC"))
+        expect(impound_attrs["address_record_attributes"]).to match(hash_including("street" => "1 Main St",
+          "city" => "Chicago", "street_2" => "Apt 2"))
+        expect(b_param.stolen_attrs).to be_blank
+      end
+    end
+
+    context "registered with the owner" do
+      let(:bike_params) { super().except(:status) }
+
+      it "has no report to make" do
+        expect(described_class.report_step?(b_param)).to be_falsey
+        expect(described_class.total_steps(nil, b_param:)).to eq 2
+        expect(described_class.permitted_step(b_param, "report", sequence: nil)).to eq "2"
+      end
+    end
+
+    context "without a creator" do
+      let(:b_param) do
+        BParam.create(origin: "register_flow",
+          params: {details_completed: true, bike: bike_params}.as_json)
+      end
+
+      it "waits for the confirmation email, and is what's left once it's confirmed" do
+        expect(described_class.creator_available?(b_param)).to be_falsey
+        # The report can't be filled in yet, so the registration is only waiting on the email
+        expect(described_class.finished?(b_param, sequence: nil)).to be_truthy
+        expect(described_class.permitted_step(b_param, "report", sequence: nil)).to eq "finished"
+
+        b_param.update(creator_id: creator.id)
+        expect(described_class.permitted_step(b_param, nil, sequence: nil)).to eq "report"
+      end
+    end
+
+    context "with acknowledgment pages" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+      let(:bike_params) do
+        super().merge(cycle_type: "e-scooter", creation_organization_id: organization.id)
+      end
+
+      it "comes before them" do
+        expect(described_class.registration_sequence(b_param)).to eq sequence
+        # Two detail steps, the report, a page each and the review
+        expect(described_class.total_steps(sequence, b_param:)).to eq 6
+        expect(described_class.permitted_step(b_param, "3", sequence:)).to eq "report"
+        expect(described_class.step_before("3", sequence:, b_param:)).to eq "report"
+
+        described_class.save_report(b_param, report_params:)
+        expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "3"
+        expect(described_class.step_number("3", sequence:, b_param:)).to eq 4
+      end
+
+      context "without a creator" do
+        let(:b_param) do
+          BParam.create(origin: "register_flow",
+            params: {details_completed: true, bike: bike_params}.as_json)
+        end
+
+        it "comes after them - the emailed link is clicked once they're acknowledged" do
+          pages = described_class.sequence_pages(sequence)
+          expect(described_class.step_number("review", sequence:, b_param:)).to eq 5
+          expect(described_class.permitted_step(b_param, "report", sequence:)).to eq "3"
+
+          pages.each { described_class.acknowledge_page(b_param, it, checked: %w[1 1]) }
+          described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1")
+          expect(described_class.finished?(b_param, sequence:)).to be_truthy
+
+          # Confirming the email is what opens the report
+          b_param.update(creator_id: creator.id)
+          expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "report"
+          expect(described_class.step_before("report", sequence:, b_param:)).to eq "2"
+        end
+      end
+    end
+  end
+
   describe "e-vehicle acknowledgment" do
     let(:organization) { FactoryBot.create(:organization) }
     let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }

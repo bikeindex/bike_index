@@ -10,7 +10,7 @@ class RegisterController < ApplicationController
   # confirm renders a self-posting form and nothing else, so it reads neither
   before_action :assign_organization, except: %i[new confirm]
   before_action :find_registration_sequence, except: %i[new confirm]
-  before_action :redirect_finished, only: %i[create update acknowledge]
+  before_action :redirect_finished, only: %i[create update report acknowledge]
   # The step shown depends on server state - a cached page could show a step
   # the registration is past (register--revalidate covers Safari's bfcache)
   before_action { response.set_header("Cache-Control", "no-store") }
@@ -31,9 +31,9 @@ class RegisterController < ApplicationController
     redirect_to step_path(1)
   end
 
-  # The whole flow after the start: ?step=1, ?step=2, the e-vehicle acknowledgment
-  # pages (?step=3 up), ?step=review and ?step=finished. A step the registration
-  # isn't at redirects to one it is.
+  # The whole flow after the start: ?step=1, ?step=2, ?step=report for a theft or a
+  # find, the e-vehicle acknowledgment pages (?step=3 up), ?step=review and
+  # ?step=finished. A step the registration isn't at redirects to one it is.
   def show
     step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence)
     return redirect_to(step_path(step)) if step != params[:step]
@@ -45,6 +45,9 @@ class RegisterController < ApplicationController
     when "review"
       @page_title = I18n.t("meta_titles.register_review", cycle_type: @b_param.type)
       render Register::StepAcknowledgmentReview::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:)
+    when "report"
+      @page_title = I18n.t("meta_titles.register_report")
+      render Register::StepReport::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:)
     when "2"
       @page_title = I18n.t("meta_titles.register_step_2", cycle_type: @b_param.type)
       render Register::Step2::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:)
@@ -83,6 +86,16 @@ class RegisterController < ApplicationController
         status: :unprocessable_entity)
     end
 
+    complete_registration
+  end
+
+  # The theft or the find - everything the stolen or impound record is built from.
+  # Nothing here is required, so it only ever moves the registration forward
+  def report
+    step = BikeServices::Register.permitted_step(@b_param, "report", sequence: @registration_sequence)
+    return redirect_to(step_path(step)) if step != "report"
+
+    BikeServices::Register.save_report(@b_param, report_params:)
     complete_registration
   end
 
@@ -234,5 +247,9 @@ class RegisterController < ApplicationController
 
   def update_params
     params.fetch(:bike, {}).permit(*BikeServices::Register.permitted_step_2_params)
+  end
+
+  def report_params
+    params.fetch(:report, {}).permit(*BikeServices::Register.permitted_report_params)
   end
 end

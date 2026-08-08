@@ -1,5 +1,5 @@
 <%= render Register::Page::Component.new do %>
-  <%= render Register::Progress::Component.new(step: @step.to_i, total: BikeServices::Register.total_steps(@sequence)) %>
+  <%= render Register::Progress::Component.new(step: step_number, total: total_steps) %>
 
   <%= render Register::AcknowledgmentProgress::Component.new(number: position + 1,
       total: BikeServices::Register.acknowledgment_step_count(@sequence)) %>

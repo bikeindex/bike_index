@@ -21,6 +21,14 @@ module Register
         BikeServices::Register.page_index_for_step(@step)
       end
 
+      def step_number
+        BikeServices::Register.step_number(@step, sequence: @sequence, b_param: @b_param)
+      end
+
+      def total_steps
+        BikeServices::Register.total_steps(@sequence, b_param: @b_param)
+      end
+
       def page
         pages[position]
       end
@@ -37,10 +45,8 @@ module Register
       end
 
       def previous_path
-        return register_path(b_param_token: @b_param.id_token, step: 2) if first?
-
         register_path(b_param_token: @b_param.id_token,
-          step: BikeServices::Register.step_for_page_index(position - 1))
+          step: BikeServices::Register.step_before(@step, sequence: @sequence, b_param: @b_param))
       end
     end
   end

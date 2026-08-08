@@ -18,7 +18,12 @@ module Register
       end
 
       def total_steps
-        @total_steps ||= BikeServices::Register.total_steps(@sequence)
+        @total_steps ||= BikeServices::Register.total_steps(@sequence, b_param: @b_param)
+      end
+
+      # Not always the last step: a report waiting on the confirmation email comes after
+      def step_number
+        BikeServices::Register.step_number("review", sequence: @sequence, b_param: @b_param)
       end
 
       # The review is the last acknowledgment step, so it's both the number and the total

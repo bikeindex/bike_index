@@ -3884,6 +3884,7 @@ en:
     register_acknowledgment: "%{cycle_type} safety check"
     register_confirm: Confirming your email
     register_create: Register your %{cycle_type}!
+    register_report: Tell us what happened
     register_review: Review your %{cycle_type} safety check
     register_show: "%{cycle_type} registration"
     register_step_1: Register your %{cycle_type}!
