@@ -88,7 +88,7 @@ module UI
 
         def envelope_icon
           ActionController::Base.helpers.inline_svg_tag("icons/envelope.svg",
-            class: "tw:-mb-0.5 tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true)
+            class: "tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true)
         end
       end
     end

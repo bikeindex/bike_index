@@ -39,10 +39,10 @@ module UI
           KINDS.first
         end
 
-        # A float's box sits at the top of the line it shares, not on that line's
-        # baseline, so nudge it down onto one -- further for a header
+        # Give the float the line-height of the line it shares, so it centers on that
+        # line alone -- taller for a header
         def icon_classes
-          @header.present? ? "tw:mt-[7px]" : "tw:mt-1"
+          @header.present? ? "tw:h-7" : "tw:h-6"
         end
 
         def default_icon
