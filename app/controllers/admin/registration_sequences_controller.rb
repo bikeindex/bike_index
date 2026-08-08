@@ -11,6 +11,38 @@ module Admin
         page: permitted_page)
     end
 
+    # The template every organization's first draft is cloned from. It's created on demand,
+    # so this redirects rather than the index linking to an id that might not exist yet
+    def template
+      redirect_to edit_admin_registration_sequence_path(RegistrationSequence.template)
+    end
+
+    # The faked registrant walk-through, one screen (?page=) per rule page plus the review
+    # they end on. page is 1-indexed (Pagy); the preview component's index is 0-based.
+    def show
+      @registration_sequence = RegistrationSequence.find(params[:id])
+      screen_count = BikeServices::Register.acknowledgment_step_count(@registration_sequence)
+      @preview_pagy = Pagy::Offset.new(count: screen_count, limit: 1, page: permitted_page(max: screen_count))
+    end
+
+    # Manage the sequence's pages and its sequence-wide settings. An activated sequence
+    # renders read-only - acknowledgments reference it, so it can't change
+    def edit
+      @registration_sequence = RegistrationSequence.find(params[:id])
+    end
+
+    # The settings shared by every page: the FAQ link and the final acknowledgment
+    def update
+      @registration_sequence = RegistrationSequence.editable.find(params[:id])
+      if @registration_sequence.update(permitted_params)
+        flash[:success] = "Registration sequence updated"
+        redirect_to edit_admin_registration_sequence_path(@registration_sequence)
+      else
+        flash.now[:error] = @registration_sequence.errors.full_messages.to_sentence
+        render :edit, status: :unprocessable_entity
+      end
+    end
+
     helper_method :matching_registration_sequences, :searchable_statuses
 
     def searchable_statuses
@@ -39,6 +71,10 @@ module Admin
       @time_range_column = sort_column if %w[updated_at].include?(sort_column)
       @time_range_column ||= "created_at"
       registration_sequences.where(@time_range_column => @time_range)
+    end
+
+    def permitted_params
+      params.require(:registration_sequence).permit(:faq_url, :acknowledgment_text)
     end
   end
 end

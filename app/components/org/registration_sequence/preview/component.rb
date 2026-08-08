@@ -7,9 +7,10 @@ module Org
     # exactly what registrants see. index == pages.count is that review screen.
     module Preview
       class Component < ApplicationComponent
-        def initialize(registration_sequence:, index: 0)
+        def initialize(registration_sequence:, index: 0, admin: false)
           @registration_sequence = registration_sequence
           @index = index
+          @paths = RegistrationSequencePaths.new(admin:)
         end
 
         def render?
@@ -54,21 +55,11 @@ module Org
         # A GET form appends ?page= from a hidden field, since a form's own query string
         # is dropped on submit
         def sequence_path(page: nil)
-          organization_registration_sequence_path(organization_id: organization.to_param,
-            id: @registration_sequence.id, page:)
+          @paths.sequence(@registration_sequence, page:)
         end
 
-        # Leaving the preview: back to the draft's editor, or the index for a live one
         def exit_path
-          if @registration_sequence.draft?
-            edit_organization_registration_sequence_path(organization_id: organization.to_param, id: @registration_sequence.id)
-          else
-            organization_registration_sequences_path(organization_id: organization.to_param)
-          end
-        end
-
-        def organization
-          @registration_sequence.organization
+          @paths.preview_exit(@registration_sequence)
         end
       end
     end

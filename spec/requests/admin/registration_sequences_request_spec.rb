@@ -27,6 +27,81 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
         end
       end
     end
+
+    describe "template" do
+      it "creates the template on the way to its editor" do
+        expect { get "#{base_url}/template" }.to change(RegistrationSequence.templates, :count).by(1)
+        expect(response).to redirect_to("#{base_url}/#{RegistrationSequence.template.id}/edit")
+      end
+
+      context "with a template" do
+        let!(:template) { FactoryBot.create(:registration_sequence_template, :with_pages) }
+
+        it "goes to the existing template's editor" do
+          expect { get "#{base_url}/template" }.to_not change(RegistrationSequence.templates, :count)
+          expect(response).to redirect_to("#{base_url}/#{template.id}/edit")
+        end
+      end
+    end
+
+    describe "edit" do
+      it "renders the editor for an organization's draft" do
+        get "#{base_url}/#{draft.id}/edit"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:edit)
+        expect(assigns(:registration_sequence)).to eq draft
+      end
+
+      context "template" do
+        let!(:template) { FactoryBot.create(:registration_sequence_template, :with_pages) }
+
+        it "renders" do
+          get "#{base_url}/#{template.id}/edit"
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:edit)
+        end
+      end
+
+      context "activated sequence" do
+        let!(:active) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+
+        it "renders, read-only" do
+          get "#{base_url}/#{active.id}/edit"
+          expect(response.status).to eq(200)
+          expect(response.body).to match(/can't be edited/)
+        end
+      end
+    end
+
+    describe "show" do
+      it "renders the preview walk-through" do
+        get "#{base_url}/#{draft.id}", params: {page: 2}
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(assigns(:preview_pagy).page).to eq 2
+      end
+    end
+
+    describe "update" do
+      it "updates the settings shared by every page" do
+        patch "#{base_url}/#{draft.id}", params: {
+          registration_sequence: {faq_url: "https://example.com/faq", acknowledgment_text: "agree to the rules"}
+        }
+        expect(response).to redirect_to("#{base_url}/#{draft.id}/edit")
+        expect(draft.reload.faq_url).to eq "https://example.com/faq"
+        expect(draft.acknowledgment_text).to eq "agree to the rules"
+      end
+
+      context "activated sequence" do
+        let!(:active) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+
+        it "404s - activation freezes it" do
+          patch "#{base_url}/#{active.id}", params: {registration_sequence: {faq_url: "https://example.com/faq"}}
+          expect(response.status).to eq(404)
+          expect(active.reload.faq_url).to be_blank
+        end
+      end
+    end
   end
 
   context "logged_in_as_user" do
