@@ -185,7 +185,7 @@ export const ActivityCard = memo(function ActivityCard({
                 title={`Placed on ${topTenRanks.length} all-time segment leaderboard${topTenRanks.length > 1 ? 's' : ''}`}
               >
                 🏅 top 10: {topTenRanks.slice(0, 5).map((rank) => `#${rank}`).join(', ')}
-                {topTenRanks.length > 5 && ` +${topTenRanks.length - 5}`}
+                {topTenRanks.length > 5 && ` +${topTenRanks.length - 5} more`}
               </span>
             )}
 

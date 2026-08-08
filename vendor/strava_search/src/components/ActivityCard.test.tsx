@@ -29,7 +29,7 @@ describe('ActivityCard top 10 badge', () => {
   it('caps the list at five ranks and counts the rest', () => {
     renderCard({ top_10_ranks: [1, 1, 2, 3, 4, 6, 8] });
     expect(screen.getByText(/top 10: #1, #1, #2, #3, #4/)).toBeInTheDocument();
-    expect(screen.getByText(/\+2/)).toBeInTheDocument();
+    expect(screen.getByText(/\+2 more/)).toBeInTheDocument();
   });
 
   it('is absent without ranks', () => {
