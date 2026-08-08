@@ -3844,6 +3844,9 @@ en:
     stolen_merging: >-
       StolenBicycleRegistry.com merged with Bike Index in 2014 to become the largest
       open bike registration service in the world
+    strava_search_index: >-
+      Associate your Strava gear with your Bike Index registrations. Search, filter,
+      and bulk-update your activities to assign gear to rides that are missing it.
     users_new: Sign up for Bike Index
     welcome_index: 'The best bike registry: Simple, secure and free.'
   meta_titles:
@@ -3885,6 +3888,7 @@ en:
     sessions_create: Log in
     sessions_new: Log in
     stolen_index: Bike registry
+    strava_search_index: Bike Index Strava Search
     users_accept_terms: Terms of use - Bike Index
     users_accept_vendor_terms: Organization terms - Bike Index
     users_confirm: Confirm your email - Bike Index

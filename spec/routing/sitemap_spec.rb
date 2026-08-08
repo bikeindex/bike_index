@@ -5,7 +5,7 @@ RSpec.describe "Sitemaps pages" do
     target_info_paths = %w[help donate why-donate]
     expect((SitemapPages::INFORMATION & target_info_paths).count).to eq target_info_paths.count
 
-    target_additional_paths = %w[recovery_stories documentation/api_v3 where]
+    target_additional_paths = %w[recovery_stories documentation/api_v3 where strava_search]
     expect((SitemapPages::ADDITIONAL & target_additional_paths).count).to eq target_additional_paths.count
   end
 
