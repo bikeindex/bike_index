@@ -1,0 +1,5 @@
+Require the client secret when requesting tokens. Turn this on only if the app
+can keep the secret private — mobile apps, single page apps and CLIs can't, and
+should use
+<%= link_to "PKCE", "#{api_v3_documentation_index_url}#ref_pkce", class: "twlink", tabindex: -1 %>
+instead.

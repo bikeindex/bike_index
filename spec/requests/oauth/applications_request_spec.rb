@@ -142,6 +142,28 @@ RSpec.describe Oauth::ApplicationsController, type: :request do
       end
     end
 
+    describe "show" do
+      let(:current_user) { application_owner }
+      let(:body) { Capybara.string(response.body) }
+
+      it "renders confidential false, with the tooltip explaining it" do
+        get "#{base_url}/#{doorkeeper_app.id}"
+        expect(body).to have_css("code", text: "false")
+        expect(body).to have_css("[role=tooltip]", text: /require the client secret/i, visible: :all)
+        expect(body).to_not have_css("[role=alert]")
+      end
+
+      context "confidential app" do
+        before { doorkeeper_app.update(confidential: true) }
+        it "renders confidential true, with the alert instead of the tooltip" do
+          get "#{base_url}/#{doorkeeper_app.id}"
+          expect(body).to have_css("code", text: "true")
+          expect(body).to have_css("[role=alert]", text: /all requests fail/i)
+          expect(body).to_not have_css("[role=tooltip]", visible: :all)
+        end
+      end
+    end
+
     describe "update" do
       context "user's app" do
         let(:current_user) { application_owner }
