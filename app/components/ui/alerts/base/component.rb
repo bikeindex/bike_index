@@ -15,13 +15,15 @@ module UI
 
         # icon: rendered markup, e.g. inline_svg_tag("icons/envelope.svg", class: "tw:h-4 tw:w-4") -
         # replaces the default info icon
-        def initialize(text: nil, header: nil, kind: :notice, dismissable: false, margin_classes: "tw:mb-4", icon: nil)
+        def initialize(text: nil, header: nil, kind: :notice, dismissable: false, margin_classes: "tw:mb-4", icon: nil,
+          default_header_color: false)
           @text = text
           @header = header
           @kind = normalized_kind(kind)
           @dismissable = dismissable
           @margin_classes = margin_classes
           @icon = icon
+          @default_header_color = default_header_color
         end
 
         private
@@ -37,10 +39,14 @@ module UI
           KINDS.first
         end
 
-        # A float's box sits at the top of the line it shares, not on that line's
-        # baseline, so nudge it down onto one -- further for a header
+        # Give the float the line-height of the line it shares, so it centers on that
+        # line alone -- taller for a header
         def icon_classes
-          @header.present? ? "tw:mt-[7px]" : "tw:mt-1"
+          @header.present? ? "tw:h-7" : "tw:h-6"
+        end
+
+        def default_icon
+          (@kind == :error) ? "icons/exclamation-triangle.svg" : "icons/info.svg"
         end
 
         def color_classes
@@ -62,8 +68,10 @@ module UI
           TEXT_CLASSES[@kind]
         end
 
-        # Required because bootstrap alert color overrides
-        def text_color_classes_important
+        # The ! overrides bootstrap's alert colors
+        def header_color_classes
+          return "twtext-color!" if @default_header_color
+
           text_color_classes.gsub("00", "00!")
         end
 
