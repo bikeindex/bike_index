@@ -28,7 +28,7 @@ module Bikeindex
     config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL", config.redis_default_url)
     config.redis_rack_attack_url = ENV.fetch("REDIS_RACK_ATTACK_URL", config.redis_cache_url)
 
-    config.load_defaults 8.0
+    config.load_defaults 8.1
 
     # Clear Rails default security headers - secure_headers gem manages these instead
     # (secure_headers has a bug where it tries to delete lowercase keys but Rails uses mixed case)

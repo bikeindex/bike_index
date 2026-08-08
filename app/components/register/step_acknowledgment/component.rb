@@ -42,10 +42,6 @@ module Register
         register_path(b_param_token: @b_param.id_token,
           step: BikeServices::Register.step_for_page_index(position - 1))
       end
-
-      def organization_name
-        @sequence.organization&.short_name
-      end
     end
   end
 end

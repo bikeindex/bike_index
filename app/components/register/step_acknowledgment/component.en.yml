@@ -4,6 +4,3 @@ en:
     register:
       step_acknowledgment:
         continue: Continue
-        electric_detected: "⚡️ Electric (motorized) detected"
-        have_questions: Have questions about these policies?
-        read_the_faq: E-Vehicle Acknowledgment FAQ

@@ -106,13 +106,16 @@ module SystemSpecHelpers
   # whatever it overlays. ui--alert wires the close button in `connect` and
   # application.js lazy loads controllers, so a click landing before that module
   # arrives is swallowed. Click again, the way a rider whose click did nothing
-  # would, until the alert reports itself gone (the dismiss transition included).
-  def dismiss_flash_messages(wait: 10, attempts: 5)
-    attempts.times do
+  # would, for the whole of `wait` - a click is the only thing that dismisses an
+  # alert, so time spent waiting without clicking can never resolve one.
+  def dismiss_flash_messages(wait: 10)
+    deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + wait
+    loop do
       all("#flash-messages [aria-label='Close']", minimum: 1).each { |close| retry_on_detach { close.click } }
       break if page.has_no_css?("#flash-messages [role='alert']", wait: 1)
+      break if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
     end
-    expect(page).to have_no_css("#flash-messages [role='alert']", wait:)
+    expect(page).to have_no_css("#flash-messages [role='alert']", wait: 1)
   end
 
   private

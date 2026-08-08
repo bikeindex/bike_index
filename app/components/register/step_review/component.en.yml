@@ -3,9 +3,4 @@ en:
   components:
     register:
       step_review:
-        a_quick_review: A quick review of everything you acknowledged. Tap Review
-          to revisit a protocol.
         complete_registration: Complete %{cycle_type} Registration
-        i_name_html: I, %{name},
-        review: Review
-        youre_almost_done: You're almost done.

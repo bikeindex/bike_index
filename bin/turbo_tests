@@ -1,33 +1,56 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+# Before bin/env: it picks the Redis database off RAILS_ENV. Unset, that's a *dev*
+# database - one a running bin/dev is also draining.
+ENV["RAILS_ENV"] ||= "test"
+redis_url_set = ENV.key?("REDIS_URL")
 load File.expand_path("env", __dir__)
+# Every worker inherits whatever this process lands on, and bin/env assigns per
+# TEST_ENV_NUMBER, which doesn't exist until the workers do.
+ENV.delete("REDIS_URL") unless redis_url_set
 
 require "bundler/setup"
-require "digest"
 
 # For some reason (I believe because of dartsass) assets get recompiled every time tests run
-# So handle asset compilation ourselves
-def assets_need_compilation?
-  builds_dir = File.expand_path("../app/assets/builds", __dir__)
+# So handle asset compilation ourselves. JS counts too: test serves it from the
+# sprockets manifest, so a stale bundle silently tests deleted code.
+CSS_SOURCES = [
+  "app/assets/stylesheets/**/*.{scss,css}",
+  "app/assets/tailwind/**/*.css",
+  "config/initializers/dartsass.rb"
+].freeze
 
-  # If builds directory doesn't exist or is empty, we need compilation
-  return true unless Dir.exist?(builds_dir)
-  css_files = Dir.glob(File.join(builds_dir, "*.css"))
-  return true if css_files.empty?
+# Every JS tree app/assets/config/manifest.js links, plus Gemfile.lock for lexxy,
+# which a gem ships.
+JS_SOURCES = [
+  "app/assets/javascripts/**/*",
+  "app/javascript/**/*",
+  "vendor/javascript/**/*",
+  "app/components/**/*.js",
+  "Gemfile.lock"
+].freeze
 
-  # Get the oldest compiled asset timestamp
-  oldest_asset_time = css_files.map { |f| File.mtime(f) }.min
+# Separate cutoffs: different tools build them, and SKIP_CSS_BUILD leaves
+# builds/tailwind.css behind, so one shared cutoff would read as permanently stale.
+def stale?(sources, output_pattern)
+  outputs = app_glob(output_pattern)
+  return true if outputs.empty?
 
-  # Check if any source files are newer than the oldest compiled asset
-  [
-    "app/assets/stylesheets/**/*.scss",
-    "app/assets/stylesheets/**/*.css",
-    "app/assets/tailwind/**/*.css",
-    "config/initializers/dartsass.rb"
-  ].any? do |pattern|
-    Dir.glob(pattern).any? { |f| File.mtime(f) > oldest_asset_time }
+  oldest_asset_time = outputs.map { |file| File.mtime(file) }.min
+  sources.any? do |pattern|
+    app_glob(pattern).any? { |file| File.file?(file) && File.mtime(file) > oldest_asset_time }
   end
+end
+
+def app_glob(pattern)
+  Dir.glob(File.expand_path("../#{pattern}", __dir__))
+end
+
+def assets_need_compilation?
+  stale?(CSS_SOURCES, "app/assets/builds/*.css") ||
+    # Filename pinned by config/initializers/assets.rb
+    stale?(JS_SOURCES, "public/assets/.sprockets-manifest.json")
 end
 
 if assets_need_compilation?
@@ -41,5 +64,4 @@ ENV["RAILS_ASSETS_PRECOMPILE"] = "false"
 # dartsass-rails hooks into test:prepare, skip since assets are already compiled
 ENV["SKIP_CSS_BUILD"] = "true"
 
-# Pass all arguments to turbo_tests
 exec "bundle", "exec", "turbo_tests", *ARGV

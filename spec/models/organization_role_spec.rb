@@ -44,23 +44,22 @@ RSpec.describe OrganizationRole, type: :model do
     end
   end
 
-  describe ".create_passwordless" do
+  describe ".create_for_user_email_domain" do
     let(:invited_email) { "student@sso.edu" }
-    let(:organization) do
-      FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "passwordless_users")
-    end
-    let(:create_passwordless) { OrganizationRole.create_passwordless(organization_id: organization.id, invited_email:) }
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:user) { FactoryBot.create(:user_confirmed, email: invited_email) }
+    let(:create_for_user_email_domain) { OrganizationRole.create_for_user_email_domain(organization_id: organization.id, invited_email:) }
 
-    it "creates the role and its passwordless user" do
-      expect(create_passwordless.organization_id).to eq organization.id
-      expect(create_passwordless.user.email).to eq invited_email
-      expect(create_passwordless.user.passwordless_user?).to be_truthy
+    it "grants the existing user the default member role" do
+      expect(create_for_user_email_domain.organization_id).to eq organization.id
+      expect(create_for_user_email_domain.role).to eq "member"
+      expect(create_for_user_email_domain.user).to eq user
     end
 
     it "returns the existing role rather than a second one" do
-      existing = create_passwordless
+      existing = create_for_user_email_domain
       expect {
-        expect(OrganizationRole.create_passwordless(organization_id: organization.id, invited_email: "Student@SSO.edu "))
+        expect(OrganizationRole.create_for_user_email_domain(organization_id: organization.id, invited_email: "Student@SSO.edu "))
           .to eq existing
       }.to_not change(OrganizationRole, :count)
     end
@@ -72,8 +71,8 @@ RSpec.describe OrganizationRole, type: :model do
       end
 
       it "creates the role for this organization anyway" do
-        expect(create_passwordless.organization_id).to eq organization.id
-        expect(create_passwordless.id).to_not eq other_organization_role.id
+        expect(create_for_user_email_domain.organization_id).to eq organization.id
+        expect(create_for_user_email_domain.id).to_not eq other_organization_role.id
       end
     end
   end

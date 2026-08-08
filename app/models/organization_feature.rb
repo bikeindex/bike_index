@@ -75,6 +75,7 @@ class OrganizationFeature < ApplicationRecord
     show_partial_registrations
     show_recoveries
     skip_ownership_email
+    user_role_for_user_email_domain
   ] + BIKE_ACTIONS + REG_FIELDS).freeze
 
   enum :kind, KIND_ENUM

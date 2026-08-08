@@ -1,5 +1,5 @@
-- cache(['manufacturers_index', @manufacturers.maximum(:updated_at)]) do
-  - github_url = "https://github.com/bikeindex/resources/blob/main/manufacturers.csv"
+- cache(['manufacturers_index2', @manufacturers.maximum(:updated_at)]) do
+  - github_url = "https://github.com/bikeindex/bike_data/blob/main/data/manufacturers.csv"
   - csv_on_github = link_to t('.csv_on_github'), github_url
   %h1
     = t(".manufacturers_we_know_about")
