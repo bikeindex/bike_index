@@ -95,11 +95,11 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
-  context "with invalid color" do
+  context "with an unknown color" do
     let(:color) { :invalid }
 
-    it "falls back to secondary" do
-      expect(component.to_html).to include("tw:bg-white")
+    it "raises, naming the colors it takes" do
+      expect { instance }.to raise_error(ArgumentError, /unknown color :invalid, expected one of: primary, secondary/)
     end
   end
 

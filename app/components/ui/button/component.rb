@@ -53,6 +53,7 @@ module UI
 
       # ButtonLink calls this too, so the pair answers a caller the same way
       def self.validate_options!(color:, size:, html_options:)
+        raise ArgumentError, "unknown color #{color.inspect}, expected one of: #{COLORS.keys.join(", ")}" unless COLORS.key?(color)
         raise ArgumentError, "size is not supported for link color" if color == :link && size != :md
         # The component builds its own class, so a passed one is dropped rather than merged
         raise ArgumentError, "class is not supported, you must use the keyword arg html_class" if html_options.key?(:class)
@@ -64,7 +65,7 @@ module UI
         @text = text
         @name = name
         @value = value
-        @color = COLORS.key?(color) ? color : :secondary
+        @color = color
         @active = active
         @html_class = html_class
         @spinner = spinner

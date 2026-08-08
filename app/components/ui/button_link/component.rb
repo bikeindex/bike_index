@@ -6,7 +6,7 @@ module UI
       def initialize(href:, text: nil, color: :secondary, size: :md, active: false, method: nil, html_class: nil, **html_options)
         @text = text
         @href = href
-        @color = UI::Button::Component::COLORS.key?(color) ? color : :secondary
+        @color = color
         @size = UI::Button::Component::SIZES.key?(size) ? size : :md
         @active = active
         @method = method

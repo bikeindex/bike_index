@@ -69,6 +69,14 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
     end
   end
 
+  context "with an unknown color" do
+    let(:options) { {text: "Link", href: "/test", color: :invalid} }
+
+    it "raises, naming the colors it takes" do
+      expect { instance }.to raise_error(ArgumentError, /unknown color :invalid, expected one of: primary, secondary/)
+    end
+  end
+
   context "with a size for link color" do
     let(:options) { {text: "Link", href: "/test", color: :link, size: :lg} }
 
