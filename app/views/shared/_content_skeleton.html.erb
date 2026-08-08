@@ -74,7 +74,7 @@
         <nav class="content-nav-group">
           <h3><%= t(".related") %></h3>
 
-          <ul>
+          <ul class="tw:m-0 tw:mb-4 tw:list-none">
             <% if content_page_type == "news" %>
               <li>
                 <% all_active = action_name == "index" && !sortable_search_params? %>
@@ -104,7 +104,7 @@
         <nav class="content-nav-group">
           <h3><%= t(".other_pages") %></h3>
 
-          <ul>
+          <ul class="tw:m-0 tw:mb-4 tw:list-none">
             <li>
               <%= active_link t(".how_to_get_your_stolen_bike_back"), get_your_stolen_bike_back_path %>
             </li>

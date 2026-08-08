@@ -9,7 +9,19 @@
           >
             <h4><%= translation(".bike_index") %></h4>
 
-            <ul>
+            <ul class="tw:m-0 tw:list-none">
+              <li>
+                <%= helpers.active_link translation(".search"), helpers.default_bike_search_path %>
+              </li>
+
+              <li>
+                <%= helpers.active_link translation(".marketplace"), search_marketplace_path %>
+              </li>
+
+              <li>
+                <%= helpers.active_link translation(".register_a_bike"), new_register_path %>
+              </li>
+
               <li>
                 <%= helpers.active_link translation(".faq"), support_path %>
               </li>
@@ -46,7 +58,7 @@
           >
             <h4><%= translation(".support_us") %></h4>
 
-            <ul>
+            <ul class="tw:m-0 tw:list-none">
               <li>
                 <%= helpers.active_link translation(".donate"), why_donate_path %>
               </li>
@@ -67,7 +79,7 @@
           >
             <h4><%= translation(".resources") %></h4>
 
-            <ul>
+            <ul class="tw:m-0 tw:list-none">
               <li>
                 <%= helpers.active_link translation(".api_documentation"), documentation_index_path %>
               </li>
@@ -88,6 +100,10 @@
                 <%= helpers.active_link translation(".protect_your_bike"), protect_your_bike_path %>
               </li>
 
+              <li>
+                <%= link_to translation(".status_page"), "https://status.bikeindex.org" %>
+              </li>
+
               <% if Flipper.enabled?(:strava_integration, @current_user) %>
                 <li>
                   <%= helpers.active_link translation(".strava_search"), strava_search_path %>
@@ -102,7 +118,7 @@
           >
             <h4><%= translation(".who_we_serve") %></h4>
 
-            <ul>
+            <ul class="tw:m-0 tw:list-none">
               <li>
                 <%= helpers.active_link translation(".bike_shops"), for_bike_shops_path %>
               </li>
@@ -135,7 +151,7 @@
             class="col-md-2 social-nav"
             aria-label="<%= translation(".social_media") %>"
           >
-            <ul>
+            <ul class="tw:m-0 tw:list-none">
               <li>
                 <%# = link_to "https://twitter.com/BikeIndex" do %>
                 <%# %span.sr-only Bike Index Twitter %>

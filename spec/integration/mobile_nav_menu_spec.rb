@@ -10,7 +10,7 @@ RSpec.describe "Mobile nav menu", :js, type: :system do
   def open_menu_and_search
     find("#primary_nav_hamburgler").click
     expect(page).to have_css("nav.primary-header-nav.menu-in", wait: 5)
-    click_link "Search"
+    within("nav.primary-header-nav") { click_link "Search" }
     expect(page).to have_current_path(search_registrations_path, ignore_query: true)
   end
 
