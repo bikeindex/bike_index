@@ -18,6 +18,15 @@ RSpec.describe UI::Modal::Component, type: :component do
     expect(component).to have_css("button[aria-label='Close']")
   end
 
+  it "closes through the native command, and hears the browser's own open and close" do
+    component = render_inline(instance) { |modal| modal.with_body { "Body" } }
+
+    expect(component).to have_css("button[aria-label='Close'][commandfor='test-modal'][command='close']")
+    action = component.css("dialog").attr("data-action").value
+    expect(action).to include("close->ui--modal#closed")
+    expect(action).to include("command->ui--modal#invoked")
+  end
+
   it "does not flag open-on-connect by default" do
     component = render_inline(instance) { |modal| modal.with_body { "Body" } }
     expect(component).to have_css("dialog[data-ui--modal-open-on-connect-value='false']")

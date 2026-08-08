@@ -12,7 +12,7 @@ RSpec.describe PageBlock::UserAlerts::PhoneWaitingConfirmation::Component, type:
 
   it "opens the modal with the code form for the phone" do
     # A button, not an anchor - there's no target to link to, it opens the dialog
-    expect(component.css("button[data-open-modal='confirm-phone-number']").text.strip)
+    expect(component.css("button[commandfor='confirm-phone-number']").text.strip)
       .to eq "Confirm your phone number"
     modal = component.css("dialog#confirm-phone-number")
     expect(modal.text).to include "Verify 201-888-4111"
