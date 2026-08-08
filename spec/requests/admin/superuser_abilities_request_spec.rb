@@ -16,10 +16,14 @@ RSpec.describe Admin::SuperuserAbilitiesController, type: :request do
   end
 
   describe "new" do
-    it "renders" do
+    it "renders, with each field's helper text describing it" do
       get "#{base_url}/new"
       expect(response.status).to eq(200)
       expect(response).to render_template(:new)
+      body = Nokogiri::HTML(response.body)
+      expect(body.at_css("p#superuser_ability_controller_name_helper").to_html).to include("<em>leave blank</em>")
+      expect(body.at_css("#superuser_ability_controller_name")["aria-describedby"])
+        .to eq "superuser_ability_controller_name_helper"
     end
   end
 
