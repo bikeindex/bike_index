@@ -1,7 +1,7 @@
 <div class="tw:mb-3 tw:flex tw:items-baseline tw:justify-between tw:gap-4">
   <h1 class="uncap">
     <%= @registration_sequence.status_display %> registration sequence
-    <span class="tw:text-xl tw:font-normal tw:text-gray-500">· <%= helpers.number_display(pages.size) %> <%= "page".pluralize(pages.size) %></span>
+    <span class="tw:text-xl tw:font-normal tw:whitespace-nowrap tw:text-gray-500">· <%= helpers.number_display(pages.size) %> <%= "page".pluralize(pages.size) %></span>
   </h1>
 
   <% if @registration_sequence.editable? %>
