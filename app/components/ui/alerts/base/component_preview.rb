@@ -9,59 +9,87 @@ module UI
 
         # @!group Kind variants
         def notice
-          render(UI::Alerts::Base::Component.new(text: "This is a notice alert", kind: :notice))
+          alert(kind: :notice, text: "This is a notice alert")
+        end
+
+        def notice_with_header
+          alert(kind: :notice, header: "Profile hidden", text: "Only you and superusers can see this profile.")
         end
 
         def error
-          render(UI::Alerts::Base::Component.new(text: "This is an error alert", kind: :error))
+          alert(kind: :error, text: "This is an error alert")
         end
 
-        def with_header
-          render(UI::Alerts::Base::Component.new(header: "Registration incomplete", kind: :warning, text: CONFIRMATION_TEXT))
+        def error_with_header
+          alert(kind: :error, header: "Banned user", text: "This profile is only visible to superusers.")
+        end
+
+        def warning
+          alert(kind: :warning, text: "This is a warning alert")
+        end
+
+        def warning_with_header
+          alert(kind: :warning, header: "Registration incomplete", text: CONFIRMATION_TEXT)
         end
 
         def success
-          render(UI::Alerts::Base::Component.new(text: "This is a success alert", kind: :success))
+          alert(kind: :success, text: "This is a success alert")
         end
 
-        def purple
-          render(UI::Alerts::Base::Component.new(text: CONFIRMATION_TEXT, kind: :purple))
-        end
-
-        def with_link
+        def success_with_header
           text = ActionController::Base.helpers.safe_join([
-            "You're signed in! You can ",
+            "You can ",
             ActionController::Base.helpers.link_to("set a password to sign in", "#", class: "twlink"),
             " if you prefer not to sign in via an emailed link."
           ])
-          render(UI::Alerts::Base::Component.new(text:, kind: :notice))
+          alert(kind: :success, header: "You're signed in", text:)
         end
 
-        def custom_icon
-          envelope = ActionController::Base.helpers.inline_svg_tag("icons/envelope.svg",
-            class: "tw:-mb-0.5 tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true)
-          render(UI::Alerts::Base::Component.new(text: "Check your email", kind: :notice, icon: envelope))
+        def purple
+          alert(kind: :purple, text: CONFIRMATION_TEXT, icon: envelope_icon)
+        end
+
+        def purple_with_header
+          alert(kind: :purple, header: "Check your email", text: CONFIRMATION_TEXT, icon: envelope_icon)
         end
         # @!endgroup
 
         # @!group Dismissable variants
         def dismissable_notice
-          render(UI::Alerts::Base::Component.new(text: "Dismissable notice", kind: :notice, dismissable: true))
+          alert(kind: :notice, text: "Dismissable notice", dismissable: true)
         end
 
         def dismissable_error
-          render(UI::Alerts::Base::Component.new(text: "Dismissable error", kind: :error, dismissable: true))
+          alert(kind: :error, text: "Dismissable error", dismissable: true)
+        end
+
+        def dismissable_warning
+          alert(kind: :warning, text: "Dismissable warning", dismissable: true)
+        end
+
+        def dismissable_success
+          alert(kind: :success, text: "Dismissable success", dismissable: true)
         end
 
         def dismissable_purple
-          render(UI::Alerts::Base::Component.new(text: LONG_TEXT, kind: :purple, dismissable: true))
+          alert(kind: :purple, text: LONG_TEXT, dismissable: true)
         end
 
         def dismissable_with_header
-          render(UI::Alerts::Base::Component.new(header: "Registration incomplete", kind: :warning, text: CONFIRMATION_TEXT,
-            dismissable: true))
+          alert(kind: :warning, header: "Registration incomplete", text: CONFIRMATION_TEXT, dismissable: true)
         end
         # @!endgroup
+
+        private
+
+        def alert(**)
+          render(UI::Alerts::Base::Component.new(**))
+        end
+
+        def envelope_icon
+          ActionController::Base.helpers.inline_svg_tag("icons/envelope.svg",
+            class: "tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true)
+        end
       end
     end
   end
