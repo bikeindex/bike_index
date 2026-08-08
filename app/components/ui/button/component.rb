@@ -38,8 +38,6 @@ module UI
         link: "tw:is-active:text-blue-700 tw:is-active:dark:text-blue-300 tw:is-active:font-bold tw:is-active:underline"
       }.freeze
 
-      KINDS = %i[button submit]
-
       DISABLED_CLASSES = "tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:disabled:pointer-events-none"
 
       # is-active sorts after focus, so an active button's ring-2 swallows the focus ring
@@ -53,27 +51,35 @@ module UI
         [BASE_CLASSES, html_class, *extras, COLORS[color], ACTIVE_COLORS[color]].compact.join(" ")
       end
 
+      # ButtonLink calls this too, so the pair answers a caller the same way
+      def self.validate_options!(color:, size:, html_options:)
+        raise ArgumentError, "unknown color #{color.inspect}, expected one of: #{COLORS.keys.join(", ")}" unless COLORS.key?(color)
+        raise ArgumentError, "size is not supported for link color" if color == :link && size != :md
+        # The component builds its own class, so a passed one is dropped rather than merged
+        raise ArgumentError, "class is not supported, you must use the keyword arg html_class" if html_options.key?(:class)
+      end
+
       # name/value are submitted with the form when this button is the one clicked, which
       # is how a form with more than one submit says which was pressed
-      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, disabled: false, spinner: false, name: nil, value: nil, data: {}, aria: {})
+      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, spinner: false, name: nil, value: nil, **html_options)
         @text = text
         @name = name
         @value = value
-        @color = COLORS.key?(color) ? color : :secondary
-        @kind = KINDS.include?(kind&.to_sym) ? kind.to_sym : KINDS.first
+        @color = color
         @active = active
         @html_class = html_class
-        @disabled = disabled
         @spinner = spinner
-        @data = data
-        @aria = aria
+        @type = html_options.delete(:type) || "button"
+        @data = html_options.delete(:data) || {}
+        @html_options = html_options
 
         @size = SIZES.key?(size) ? size : :md
-        raise ArgumentError, "size is not supported for link color" if @color == :link && @size != :md
+        self.class.validate_options!(color: @color, size: @size, html_options:)
       end
 
+      # html_options lead, so the component's own attributes can't be overwritten
       def call
-        content_tag(:button, safe_join([spinner_span, @text || content].compact), class: button_classes, type: (@kind == :submit) ? "submit" : "button", disabled: @disabled, name: @name, value: @value, data: button_data, aria: @aria)
+        content_tag(:button, safe_join([spinner_span, @text || content].compact), **@html_options, type: @type, class: button_classes, name: @name, value: @value, data: button_data)
       end
 
       def button_classes

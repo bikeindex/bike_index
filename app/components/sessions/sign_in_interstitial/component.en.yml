@@ -3,7 +3,7 @@ en:
   components:
     sessions:
       sign_in_interstitial:
-        if_not_click_button: If you are not, please click the button below
+        if_not_click_button: If not, please click the button below
         sign_in: Sign in
         you_should_be_signed_in_automatically: You should be automatically signed
           in.

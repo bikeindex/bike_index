@@ -4,6 +4,10 @@ module UI
   module Forms
     module Group
       class Component < ApplicationComponent
+        # Text under the field. The input points at it with aria-describedby -- a
+        # content block renders its own field, so it passes helper_text_id itself.
+        renders_one :helper_text
+
         # Pass a block (a UI::Forms::Combobox, Select, TextEditor...) and it renders in
         # place of the input -- `kind` is then unused. Without a form_builder that block
         # is the only valid shape: the label falls back to label_tag, so it points at
@@ -20,10 +24,27 @@ module UI
         end
 
         def before_render
-          raise ArgumentError, "pass form_builder, or a content block" if @form_builder.nil? && !content?
+          raise ArgumentError, "pass form_builder, or a content block" if @form_builder.nil? && !content_field?
+        end
+
+        # aria-describedby for a field a content block renders, which Group can't reach
+        def helper_text_id
+          @helper_text_id ||= "#{@form_builder&.field_id(@attribute) || @attribute}_helper"
         end
 
         private
+
+        # content? is true for a block that only sets the helper_text slot, so the
+        # field it renders is what decides whether to fall back to UI::Forms::Input
+        def content_field?
+          content.present?
+        end
+
+        def input_html_options
+          return @html_options unless helper_text?
+
+          @html_options.merge("aria-describedby" => helper_text_id)
+        end
 
         def label_markup
           if @form_builder

@@ -13,7 +13,7 @@
 </div>
 
 <% if @application.is_internal %>
-  <%= render(UI::Alerts::Base::Component.new(kind: :notice, text: "This application is internal — users are not prompted to authorize.")) %>
+  <%= render(UI::Alerts::Base::Component.new(kind: :notice, margin_classes: "tw:mb-8", text: "This application is internal — users are not prompted to authorize.")) %>
 <% end %>
 
 <div class="row">
@@ -33,6 +33,36 @@
     <p class="tw:overflow-x-auto tw:whitespace-nowrap">
       <code id="secret"><%= @application.secret %></code>
     </p>
+
+    <h4 class="mb-1 uncap" style="font-size: 18px;">
+      Confidential:
+    </h4>
+
+    <% if @application.confidential? %>
+      <p class="tw:mb-2"><code>true</code></p>
+      <div class="tw:text-base">
+        <%= render(UI::Alerts::Base::Component.new(kind: :warning, margin_classes: "tw:mb-6")) do %>
+          All requests fail that don't include a
+          <code class="
+            tw:inline-block tw:max-w-full tw:overflow-x-auto tw:align-bottom
+            tw:leading-none tw:whitespace-nowrap
+          ">client_secret</code>
+          parameter
+        <% end %>
+      </div>
+    <% else %>
+      <p class="tw:flex tw:items-center tw:gap-2">
+        <code>false</code>
+
+        <%= render(UI::Tooltip::Component.new) do |tooltip| %>
+          <% tooltip.with_body do %>
+            <span class="tw:block tw:w-64 tw:whitespace-normal">
+              <%= render "confidential_help" %>
+            </span>
+          <% end %>
+        <% end %>
+      </p>
+    <% end %>
 
     <h4 class="mb-1 uncap" style="font-size: 18px;">
       Bikes registered

@@ -13513,21 +13513,6 @@ table .photo-cell img {
   height: 35px
 }
 
-.admin-navbar .dropdown-toggle {
-  cursor: pointer
-}
-
-.admin-navbar .fancy-select {
-  min-width: 300px;
-  margin-top: 4px
-}
-
-@media(max-width:575.98px) {
-  .admin-navbar .fancy-select {
-    min-width: 240px
-  }
-}
-
 .admin-graphs-list a.active {
   font-weight: 700
 }

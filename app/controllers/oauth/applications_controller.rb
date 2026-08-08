@@ -5,6 +5,10 @@ module Oauth
     include Binxtils::SortableTable
     include Pagy::Method
 
+    # Managing your own applications is an ordinary signed-in page - the minimal doorkeeper
+    # layout is for the authorization prompt, which deliberately has no site chrome
+    layout "application"
+
     before_action :store_return_and_authenticate_user
     before_action :ensure_app_owner!, except: %i[index new create]
     before_action :set_period, only: %i[index]

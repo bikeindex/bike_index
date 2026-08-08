@@ -22,6 +22,18 @@ RSpec.describe Admin::DashboardController, type: :request do
   context "logged in as admin" do
     include_context :request_spec_logged_in_as_superuser
 
+    describe "review app banner" do
+      it "renders the banner, and suppresses it with NO_REVIEW_TOPBAR" do
+        stub_const("ENV", ENV.to_hash.merge("REVIEW_APP" => "1"))
+        get "/admin/maintenance"
+        expect(response.body).to include("review-app-banner")
+
+        stub_const("ENV", ENV.to_hash.merge("REVIEW_APP" => "1", "NO_REVIEW_TOPBAR" => "true"))
+        get "/admin/maintenance"
+        expect(response.body).not_to include("review-app-banner")
+      end
+    end
+
     describe "index (also timezone setting tests)" do
       let!(:bike) { FactoryBot.create(:bike, :with_ownership) }
       before do
