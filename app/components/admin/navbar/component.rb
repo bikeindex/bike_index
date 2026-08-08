@@ -1,16 +1,38 @@
 # frozen_string_literal: true
 
 module Admin
-  module Combobox
-    # The admin navbar's page picker: a combobox of every admin page, preceded by an
-    # "All" link back to the active page's index when this isn't it. Selecting an
-    # option navigates -- see admin/combobox_controller.js.
+  module Navbar
+    # The admin navbar: a few shortcut links beside a combobox of every admin page,
+    # preceded by an "All" link back to the active page's index when this isn't it.
+    # Picking an option navigates -- see admin/navbar_controller.js.
     class Component < ApplicationComponent
-      def initialize(developer: false)
-        @developer = developer
+      def initialize(current_user:)
+        @current_user = current_user
       end
 
       private
+
+      # Shorter labels and a deliberate order, so these don't derive from
+      # nav_select_links -- only the paths are shared, and only by hand
+      def shortcut_links
+        [{title: "Users", path: admin_users_path},
+          {title: "Bikes", path: admin_bikes_path},
+          {title: "Organizations", path: admin_organizations_path},
+          {title: "News", path: admin_news_index_path},
+          {title: "Stolen", path: admin_stolen_bikes_path}]
+      end
+
+      def mailer_links
+        [["Organized", "/rails/mailers/organized_mailer"],
+          ["Admin", "/rails/mailers/admin_mailer"],
+          ["Donation", "/rails/mailers/donation_mailer"],
+          ["Customer", "/rails/mailers/customer_mailer"],
+          ["Letter opener (view sent mail)", letter_opener_web_path]]
+      end
+
+      def render_mailer_links?
+        Rails.env.development? || Rails.env.sandbox?
+      end
 
       # Without an id the gem gives each option a uuid, which is most of the rendered
       # payload and barely compresses
@@ -110,7 +132,7 @@ module Admin
       end
 
       def dev_nav_select_links
-        return [] unless @developer
+        return [] unless @current_user.developer?
 
         [
           # Impound claims index is currently busted, so ignoring for now

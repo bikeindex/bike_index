@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller='admin--combobox'
+// Connects to data-controller='admin--navbar'
 //
 // The admin navbar's page picker has no form to submit - picking a page navigates to
 // its path. The combobox also reports a selection when it closes untouched, which
