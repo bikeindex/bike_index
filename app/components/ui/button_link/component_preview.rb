@@ -15,6 +15,25 @@ module UI
       def error
         render(UI::ButtonLink::Component.new(text: "Error Link", href: "#", color: :error))
       end
+
+      # White link with a soft danger outline
+      def danger_outline
+        render(UI::ButtonLink::Component.new(text: "Mark stolen", href: "#", color: :danger_outline))
+      end
+
+      # Filled purple primary
+      def purple
+        render(UI::ButtonLink::Component.new(text: "Purple Link", href: "#", color: :purple))
+      end
+
+      # White link with a purple outline (toggles to a purple tint when active)
+      def purple_outline
+        render(UI::ButtonLink::Component.new(text: "Purple outline", href: "#", color: :purple_outline))
+      end
+
+      def link
+        render(UI::ButtonLink::Component.new(text: "Link style", href: "#", color: :link))
+      end
       # @!endgroup
 
       # @!group States
