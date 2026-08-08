@@ -111,6 +111,13 @@ RSpec.describe UI::Button::Component, type: :component do
       tokens = component.css("button").first["class"].split
       expect(tokens).to include(*described_class::DISABLED_CLASSES.split)
     end
+
+    # With pointer events off the browser takes the cursor from underneath the button,
+    # so not-allowed never renders
+    it "styles the cursor rather than dropping pointer events" do
+      expect(component.css("button").first["class"].split).to include("tw:disabled:cursor-not-allowed")
+      expect(component.to_html).to_not include("pointer-events-none")
+    end
   end
 
   it "is not disabled by default" do

@@ -11,11 +11,6 @@ module UI
         UI::Button::Component::COLORS[:purple_outline]
       ].join(" ").freeze
 
-      # Not UI::Button's DISABLED_CLASSES: its pointer-events-none stops the browser
-      # applying a cursor at all, so the chip would keep the plain arrow. A disabled
-      # <button> takes no clicks anyway.
-      DISABLED_CHIP_CLASSES = "tw:disabled:opacity-50 tw:disabled:cursor-not-allowed"
-
       # The active half is inert until a chip flags itself data-active, the same way
       # UI::Button's is — the radio group restates it off its checked input instead.
       CHIP_CLASSES = [
@@ -23,7 +18,7 @@ module UI
         "tw:no-underline",
         UI::Button::Component::ACTIVE_COLORS[:purple_outline],
         UI::Button::Component::FOCUS_CLASSES,
-        DISABLED_CHIP_CLASSES
+        UI::Button::Component::DISABLED_CLASSES
       ].join(" ").freeze
 
       # full_width lays the chips out as equal columns that wrap, staying the same width

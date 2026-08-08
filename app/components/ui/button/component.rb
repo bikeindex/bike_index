@@ -38,7 +38,9 @@ module UI
         link: "tw:is-active:text-blue-700 tw:is-active:dark:text-blue-300 tw:is-active:font-bold tw:is-active:underline"
       }.freeze
 
-      DISABLED_CLASSES = "tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:disabled:pointer-events-none"
+      # No pointer-events-none — with pointer events off the browser applies the cursor
+      # from underneath, so not-allowed never shows. A disabled button takes no clicks anyway.
+      DISABLED_CLASSES = "tw:disabled:opacity-50 tw:disabled:cursor-not-allowed"
 
       # is-active sorts after focus, so an active button's ring-2 swallows the focus ring
       # unless focus is restated under the variant.
