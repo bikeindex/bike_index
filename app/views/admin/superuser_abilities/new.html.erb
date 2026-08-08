@@ -8,27 +8,22 @@
           <%= render(UI::Alerts::ObjectError::Component.new(object: @superuser_ability)) %>
 
           <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :user_identifier,
-              label_text: "User", required: true, wrapper_class: "tw:mb-1",
-              html_options: {autocomplete: "off"})) %>
-
-          <p class="tw:mb-4 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
-            email, username or id
-          </p>
+              label_text: "User", required: true, html_options: {autocomplete: "off"})) do |group| %>
+            <% group.with_helper_text { "email, username or id" } %>
+          <% end %>
 
           <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :controller_name,
-              wrapper_class: "tw:mb-1", html_options: {autocomplete: "off"})) %>
-
-          <p class="tw:mb-4 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
-            <em>leave blank</em> for a universal ability - access to all of
-            admin
-          </p>
+              html_options: {autocomplete: "off"})) do |group| %>
+            <% group.with_helper_text do %>
+              <em>leave blank</em> for a universal ability - access to all of
+              admin
+            <% end %>
+          <% end %>
 
           <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :action_name,
-              wrapper_class: "tw:mb-1", html_options: {autocomplete: "off"})) %>
-
-          <p class="tw:mb-4 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
-            only applies with a controller name
-          </p>
+              html_options: {autocomplete: "off"})) do |group| %>
+            <% group.with_helper_text { "only applies with a controller name" } %>
+          <% end %>
 
           <div class="tw:mb-4">
             <% SuperuserAbility::SU_OPTIONS.each do |ability| %>
