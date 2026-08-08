@@ -57,6 +57,7 @@
     <%# onsubmit, not turbo_confirm: Turbo Drive is off app-wide, so it never fires %>
     <% if @draft.present? %>
       <%= render UI::ButtonLink::Component.new(text: "Discard draft", href: organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), method: :delete, color: :error, size: :sm,
+        form_class: "button_to tw:ml-auto",
         form: {onsubmit: "return confirm('#{j "Discard this draft and its pages? This can't be undone."}')"}) %>
     <% end %>
   </div>
