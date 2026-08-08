@@ -1,7 +1,6 @@
-<% status_word = @registration_sequence.active? ? "Current" : @registration_sequence.status.capitalize %>
-
 <h1 class="uncap tw:mb-6 tw:text-2xl tw:font-semibold">
-  Previewing <strong><%= status_word %></strong> registration sequence
+  Previewing <strong><%= @registration_sequence.status_display %></strong>
+  registration sequence
 </h1>
 
 <%#

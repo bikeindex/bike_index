@@ -1,0 +1,15 @@
+<div class="tw:mx-auto tw:max-w-3xl tw:py-4">
+  <h1 class="uncap tw:mb-6 tw:text-2xl tw:font-semibold">
+    Previewing <strong><%= @registration_sequence.status_display %></strong>
+    registration sequence
+  </h1>
+
+  <%= render Org::RegistrationSequence::Preview::Component.new(registration_sequence: @registration_sequence, index: @preview_pagy.page - 1, admin: true) %>
+
+  <%# Below the gray. mt-24 clears the flow shell's -mb-18 pull-up. %>
+  <div class="tw:mt-24 tw:flex tw:items-baseline tw:gap-4">
+    <%= link_to "← All registration sequences", admin_registration_sequences_path, class: "twlink tw:shrink-0 tw:text-sm" %>
+
+    <%= render UI::Pagination::Component.new(pagy: @preview_pagy, page_params: {id: @registration_sequence.id}) %>
+  </div>
+</div>

@@ -36,7 +36,7 @@
               </h3>
 
               <% if page.organization_specific %>
-                <%= render UI::Badge::Component.new(text: @organization.short_name, color: :notice, size: :xs) %>
+                <%= render UI::Badge::Component.new(text: @registration_sequence.badge_name, color: :notice, size: :xs) %>
               <% end %>
             </div>
 
@@ -51,7 +51,7 @@
           </div>
 
           <% if @editable %>
-            <%= link_to "Edit", edit_page_path(page), class: "twlink" %>
+            <%= link_to "Edit", @paths.edit_page(page), class: "twlink" %>
           <% end %>
         </div>
 

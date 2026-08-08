@@ -46,6 +46,34 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
     expect(page).to have_content(organization.short_name)
   end
 
+  context "admin" do
+    let(:registration_sequence) { FactoryBot.create(:registration_sequence_template, :with_pages) }
+
+    it "titles the template and links Add page through the admin routes" do
+      render_inline(described_class.new(registration_sequence:, admin: true))
+
+      expect(page).to have_content("Template registration sequence")
+      expect(page).to have_link("Add page", href: "/admin/registration_sequences/#{registration_sequence.id}/pages/new")
+      expect(page).to have_css("form[action='/admin/registration_sequences/#{registration_sequence.id}']")
+      expect(page).to have_link("Preview", href: "/admin/registration_sequences/#{registration_sequence.id}")
+    end
+
+    context "activated sequence" do
+      let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+
+      it "renders read-only - acknowledgments reference what it says" do
+        render_inline(described_class.new(registration_sequence:, admin: true))
+
+        expect(page).to have_content("Current registration sequence")
+        expect(page).to have_content("can't be edited")
+        expect(page).to_not have_link("Add page")
+        expect(page).to_not have_field("registration_sequence[faq_url]")
+        expect(page).to_not have_css("[data-controller='sortable']")
+        expect(page).to_not have_link("Edit")
+      end
+    end
+  end
+
   it "puts each page's body in an expanded disclosure toggled by a chevron" do
     render_inline(described_class.new(registration_sequence:))
 
