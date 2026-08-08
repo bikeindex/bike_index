@@ -26,9 +26,7 @@
         <tr>
           <td>
             <div class="less-strong-hold">
-              <span class="localizeTime">
-                <%= l registration_sequence.created_at, format: :convert_time %>
-              </span>
+              <%= link_to l(registration_sequence.created_at, format: :convert_time), admin_registration_sequence_path(registration_sequence), class: "localizeTime" %>
 
               <span class="less-strong-right d-none d-md-block">
                 <%= registration_sequence.id %>
