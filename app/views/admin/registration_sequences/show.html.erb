@@ -1,17 +1,5 @@
 <div class="tw:mx-auto tw:max-w-3xl tw:py-4">
-  <%= render Admin::RegistrationSequence::Header::Component.new(registration_sequence: @registration_sequence, previewing: true) %>
+  <%= render Admin::RegistrationSequence::Header::Component.new(registration_sequence: @registration_sequence, mode: :view) %>
 
-  <%#
-    pt cancels the flow shell's negative top margin (padding doesn't collapse), so the
-    header sits above the gray rather than inside it
-  %>
-
-  <div class="tw:pt-9 tw:min-[992px]:pt-15">
-    <%= render Org::RegistrationSequence::Preview::Component.new(registration_sequence: @registration_sequence, index: @preview_pagy.page - 1, admin: true) %>
-  </div>
-
-  <%# Below the gray. mt-24 clears the flow shell's -mb-18 pull-up. %>
-  <div class="tw:mt-24">
-    <%= render UI::Pagination::Component.new(pagy: @preview_pagy, page_params: {id: @registration_sequence.id}) %>
-  </div>
+  <%= render Org::RegistrationSequence::Edit::Component.new(registration_sequence: @registration_sequence, admin: true, editable: false) %>
 </div>

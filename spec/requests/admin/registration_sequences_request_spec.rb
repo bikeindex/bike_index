@@ -58,10 +58,19 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
     end
 
     describe "show" do
-      it "renders the preview walk-through" do
-        get "#{base_url}/#{draft.id}", params: {page: 2}
+      it "renders the sequence read-only" do
+        get "#{base_url}/#{draft.id}"
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
+        expect(response.body).to_not include("registration_sequence[faq_url]")
+      end
+    end
+
+    describe "preview" do
+      it "renders the preview walk-through" do
+        get "#{base_url}/#{draft.id}/preview", params: {page: 2}
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:preview)
         expect(assigns(:preview_pagy).page).to eq 2
       end
     end

@@ -12,12 +12,20 @@ module RegistrationSequencePaths
     routes.organization_registration_sequences_path(organization_id: organization_param(registration_sequence))
   end
 
-  # The preview - and, as a PATCH, where the sequence-wide settings are saved
+  # Admin's read-only screen - and, as a PATCH, where the sequence-wide settings are
+  # saved. The organization has no read-only screen; its member path is the preview
   def sequence(registration_sequence, page: nil, admin: false)
     return routes.admin_registration_sequence_path(registration_sequence, page:) if admin
 
     routes.organization_registration_sequence_path(organization_id: organization_param(registration_sequence),
       id: registration_sequence.id, page:)
+  end
+
+  # The registrant walk-through
+  def preview(registration_sequence, page: nil, admin: false)
+    return routes.preview_admin_registration_sequence_path(registration_sequence, page:) if admin
+
+    sequence(registration_sequence, page:)
   end
 
   def edit(registration_sequence, admin: false)
@@ -61,13 +69,12 @@ module RegistrationSequencePaths
     )
   end
 
-  # Leaving the preview: back to the editor, or to the list for a frozen sequence
+  # Leaving the preview. Admin lands on its read-only screen, which every sequence has;
+  # an organization has only the editor, and a frozen sequence hasn't got one
   def preview_exit(registration_sequence, admin: false)
-    if registration_sequence.activated?
-      index(registration_sequence, admin:)
-    else
-      edit(registration_sequence, admin:)
-    end
+    return sequence(registration_sequence, admin: true) if admin
+
+    registration_sequence.activated? ? index(registration_sequence) : edit(registration_sequence)
   end
 
   #

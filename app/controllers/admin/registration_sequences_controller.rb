@@ -11,9 +11,14 @@ module Admin
         page: permitted_page)
     end
 
+    # The sequence's pages and settings, read-only - editing it is #edit
+    def show
+      @registration_sequence = ::RegistrationSequence.find(params[:id])
+    end
+
     # The faked registrant walk-through, one screen (?page=) per rule page plus the review
     # they end on. page is 1-indexed (Pagy); the preview component's index is 0-based.
-    def show
+    def preview
       @registration_sequence = ::RegistrationSequence.find(params[:id])
       screen_count = BikeServices::Register.acknowledgment_step_count(@registration_sequence)
       @preview_pagy = Pagy::Offset.new(count: screen_count, limit: 1, page: permitted_page(max: screen_count))

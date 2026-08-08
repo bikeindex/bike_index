@@ -4,36 +4,30 @@ module Admin
   module RegistrationSequence
     module Header
       # The header every admin registration-sequence screen shares: which sequence
-      # is open and what's being done to it, with links to the other view of it and
-      # to the organization's own.
+      # is open and what's being done to it, the switch between its three screens,
+      # and a link to the organization's own.
       class Component < ApplicationComponent
-        # previewing: the registrant walk-through, rather than the editor
-        def initialize(registration_sequence:, previewing: false)
+        MODES = %i[view preview edit].freeze
+        ACTION_WORDS = {view: "Viewing", preview: "Previewing", edit: "Editing"}.freeze
+
+        def initialize(registration_sequence:, mode: :view)
+          raise ArgumentError, "mode must be one of #{MODES.inspect}, got #{mode.inspect}" unless MODES.include?(mode)
+
           @registration_sequence = registration_sequence
-          @previewing = previewing
+          @mode = mode
         end
 
         private
 
-        # Activation freezes a sequence, so its editor only ever shows it
-        def action_word
-          return "Previewing" if @previewing
+        def action_word = ACTION_WORDS[@mode]
 
-          @registration_sequence.editable? ? "Editing" : "Viewing"
-        end
-
-        def switch_text
-          return "Preview" unless @previewing
-
-          @registration_sequence.editable? ? "Edit" : "View"
-        end
-
-        def switch_path
-          if @previewing
-            RegistrationSequencePaths.edit(@registration_sequence, admin: true)
-          else
-            RegistrationSequencePaths.sequence(@registration_sequence, admin: true)
-          end
+        # Activation freezes a sequence, so editing a live one is offered but inert
+        def entries
+          [{label: "View", href: RegistrationSequencePaths.sequence(@registration_sequence, admin: true), active: @mode == :view},
+            {label: "Preview", href: RegistrationSequencePaths.preview(@registration_sequence, admin: true), active: @mode == :preview},
+            {label: "Edit", href: RegistrationSequencePaths.edit(@registration_sequence, admin: true),
+             active: @mode == :edit, disabled: !@registration_sequence.editable?,
+             title: ("An activated sequence can't be edited" unless @registration_sequence.editable?)}]
         end
 
         # The organization's own copy of this screen; the template has no organization

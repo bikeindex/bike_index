@@ -7,9 +7,11 @@ module Org
       # links and the sequence-wide settings form. Admin opens this on any sequence,
       # so an activated one - which acknowledgments freeze - renders read-only.
       class Component < ApplicationComponent
-        def initialize(registration_sequence:, admin: false)
+        # editable: admin's read-only screen renders a draft without its forms
+        def initialize(registration_sequence:, admin: false, editable: registration_sequence.editable?)
           @registration_sequence = registration_sequence
           @admin = admin
+          @editable = editable
         end
 
         private

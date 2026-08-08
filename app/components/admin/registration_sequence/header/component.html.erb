@@ -12,7 +12,7 @@
       tw:gap-y-1
     "
   >
-    <%= render UI::ButtonLink::Component.new(text: switch_text, href: switch_path, color: :secondary, size: :sm, html_class: "tw:whitespace-nowrap") %>
+    <%= render UI::ButtonGroup::Component.new(entries:) %>
 
     <% if organization_path.present? %>
       <%= link_to "View in organization", organization_path, class: "twlink tw:ml-auto tw:text-sm" %>

@@ -57,7 +57,8 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
       expect(page).to_not have_content("registration sequence")
       expect(page).to have_link("Add page", href: "/admin/registration_sequences/#{registration_sequence.id}/pages/new")
       expect(page).to have_css("form[action='/admin/registration_sequences/#{registration_sequence.id}']")
-      expect(page).to have_link("Preview", href: "/admin/registration_sequences/#{registration_sequence.id}")
+      # Admin's header switches between the screens, so there's no big Preview button
+      expect(page).to_not have_link("Preview")
     end
 
     context "activated sequence" do

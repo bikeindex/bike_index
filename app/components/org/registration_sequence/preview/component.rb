@@ -55,7 +55,7 @@ module Org
         # A GET form appends ?page= from a hidden field, since a form's own query string
         # is dropped on submit
         def sequence_path(page: nil)
-          RegistrationSequencePaths.sequence(@registration_sequence, page:, admin: @admin)
+          RegistrationSequencePaths.preview(@registration_sequence, page:, admin: @admin)
         end
 
         def exit_path

@@ -11,17 +11,17 @@
     </h1>
   <% end %>
 
-  <% if @registration_sequence.editable? %>
+  <% if @editable %>
     <%= render UI::ButtonLink::Component.new(href: new_page_path, color: :secondary, html_class: "tw:whitespace-nowrap") do %>
       <span aria-hidden="true">+</span> Add page
     <% end %>
   <% end %>
 </div>
 
-<%= render Org::RegistrationSequence::PageList::Component.new(registration_sequence: @registration_sequence, admin: @admin) %>
+<%= render Org::RegistrationSequence::PageList::Component.new(registration_sequence: @registration_sequence, admin: @admin, editable: @editable) %>
 
 <%= render UI::Card::Component.new(additional_classes: "tw:mt-8") do %>
-  <% if @registration_sequence.editable? %>
+  <% if @editable %>
     <%= form_with model: @registration_sequence, url: sequence_path, method: :patch do |f| %>
       <div class="tw:flex tw:flex-col tw:gap-4">
         <div>
@@ -52,10 +52,12 @@
       </div>
     <% end %>
   <% else %>
-    <p class="tw:mb-4 tw:text-gray-600">
-      Registrants have acknowledged this sequence, so it can't be edited —
-      changes belong in a new draft.
-    </p>
+    <% if @registration_sequence.activated? %>
+      <p class="tw:mb-4 tw:text-gray-600">
+        Registrants have acknowledged this sequence, so it can't be edited —
+        changes belong in a new draft.
+      </p>
+    <% end %>
     <%= render UI::DefinitionList::Container::Component.new(term: :below) do %>
       <%= render UI::DefinitionList::Row::Component.new(label: "FAQ link", value: @registration_sequence.faq_url) %>
 
@@ -64,4 +66,7 @@
   <% end %>
 <% end %>
 
-<%= render UI::ButtonLink::Component.new(text: "Preview", href: sequence_path, color: :secondary, size: :lg, html_class: "tw:mt-8 tw:w-full") %>
+<%# Admin's header switches between the screens, so the big button is the organization's %>
+<% unless @admin %>
+  <%= render UI::ButtonLink::Component.new(text: "Preview", href: sequence_path, color: :secondary, size: :lg, html_class: "tw:mt-8 tw:w-full") %>
+<% end %>
