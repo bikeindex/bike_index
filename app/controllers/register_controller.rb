@@ -21,8 +21,9 @@ class RegisterController < ApplicationController
   # Redirects into step 1 with a token (reusing the session's registration when
   # it's still blank), so going back from step 2 lands on the same registration
   def new
-    @b_param = BikeServices::Register.b_param_for(user: current_user, token_id: reusable_token,
-      status: params[:status], email: params[:email])
+    discard_session_registration if params[:b_param_token] == "false"
+    @b_param = BikeServices::Register.b_param_for(user: current_user,
+      token_id: session[:register_b_param_token], status: params[:status], email: params[:email])
     # The same filter every other action runs, so reusing the session's
     # registration can't quietly drop the organization the URL named
     assign_organization
@@ -172,9 +173,10 @@ class RegisterController < ApplicationController
     params.permit(:organization_id, :status, :email).to_h.compact_blank
   end
 
-  # b_param_token=false abandons the session's registration - the start over link
-  def reusable_token
-    session[:register_b_param_token] unless params[:b_param_token] == "false"
+  # b_param_token=false is the start over link
+  def discard_session_registration
+    BikeServices::Register.discard(session_token: session.delete(:register_b_param_token),
+      user: current_user)
   end
 
   def assign_organization
