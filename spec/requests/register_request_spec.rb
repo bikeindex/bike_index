@@ -11,6 +11,12 @@ RSpec.describe RegisterController, type: :request do
       params: {bike: {owner_email:, manufacturer_id: "Trek"}}.as_json)
   end
 
+  # Where Register::Step1::Component's start over link goes - it names the registration
+  # it was rendered on, rather than leaving it to the session
+  def start_over_path(b_param)
+    new_register_path(discard_token: b_param.id_token)
+  end
+
   describe "new" do
     it "creates an empty registration and redirects to its step 1" do
       expect { get "/register/new" }.to change(BParam, :count).by 1
@@ -99,9 +105,31 @@ RSpec.describe RegisterController, type: :request do
         expect(current_user.user_alerts.active.unfinished_registration.count).to eq 1
 
         # One destroyed, one created
-        expect { get "/register/new?b_param_token=false" }.to_not change(BParam, :count)
+        expect { get start_over_path(discarded) }.to_not change(BParam, :count)
         expect(BParam.where(id: discarded.id)).to be_empty
         expect(current_user.user_alerts.active.unfinished_registration.count).to eq 0
+      end
+
+      # The link names the registration it was rendered on, which a second registration
+      # started in another tab has taken the session off of
+      it "discards the registration start over was rendered on, not the session's" do
+        get "/register/new"
+        first_tab = BParam.last
+        post base_url, params: {b_param_token: first_tab.id_token,
+                                b_param: {manufacturer_id: "Trek", cycle_type: "bike", owner_email:}}
+
+        # The submitted first_tab isn't reusable, so the second tab starts its own
+        expect { get "/register/new" }.to change(BParam, :count).by 1
+        second_tab = BParam.last
+        expect(session[:register_b_param_token]).to eq second_tab.id_token
+
+        # Start over from the first tab's step 1, with the session on the second tab's
+        # - one destroyed, one created
+        expect { get start_over_path(first_tab) }.to_not change(BParam, :count)
+        expect(BParam.where(id: first_tab.id)).to be_empty
+        expect(BParam.where(id: second_tab.id)).to be_present
+        # A blank step 1 either way, rather than dropping them onto the second tab's
+        expect(BParam.last.id).to_not eq second_tab.id
       end
     end
 
@@ -130,22 +158,36 @@ RSpec.describe RegisterController, type: :request do
           get "/register/new?email=someone@example.com"
           expect(BParam.last.owner_email).to eq "someone@example.com"
 
-          get "/register/new?b_param_token=false"
+          get start_over_path(BParam.last)
           expect(BParam.last.owner_email).to eq current_user.email
         end
       end
     end
 
-    it "starts a fresh registration with b_param_token=false, destroying the session's" do
+    it "starts a fresh registration with the start over link, destroying the session's" do
       get "/register/new"
       session_b_param = BParam.last
       # One destroyed, one created
-      expect { get "/register/new?b_param_token=false" }.to_not change(BParam, :count)
+      expect { get start_over_path(session_b_param) }.to_not change(BParam, :count)
       expect(BParam.where(id: session_b_param.id)).to be_empty
       expect(response).to redirect_to register_path(b_param_token: BParam.last.id_token, step: 1)
 
       # The new registration is now the session's, so /register/new reuses it again
       expect { get "/register/new" }.to_not change(BParam, :count)
+    end
+
+    # The emailed link is the only way an anonymous registration finishes, so start
+    # over leaves the registration that link resumes
+    it "keeps the registration once its confirmation email is out" do
+      get "/register/new"
+      emailed = BParam.last
+      post base_url, params: {b_param_token: emailed.id_token,
+                              b_param: {manufacturer_id: "Trek", cycle_type: "bike", owner_email:}}
+      expect(emailed.reload.email_confirmation_sent_at).to be_present
+
+      expect { get start_over_path(emailed) }.to change(BParam, :count).by 1
+      expect(BParam.where(id: emailed.id)).to be_present
+      expect(response).to redirect_to register_path(b_param_token: BParam.last.id_token, step: 1)
     end
 
     it "redirects the bare /register" do
@@ -249,7 +291,7 @@ RSpec.describe RegisterController, type: :request do
         it "carries the organization and status onto the start over link" do
           get register_path(b_param_token: b_param.id_token, step: 1)
           start_over = Nokogiri::HTML(response.body).at_css("#start-over-modal a")["href"]
-          expect(start_over).to eq new_register_path(b_param_token: false,
+          expect(start_over).to eq new_register_path(discard_token: b_param.id_token,
             organization_id: organization.slug, status: "status_stolen")
         end
       end
