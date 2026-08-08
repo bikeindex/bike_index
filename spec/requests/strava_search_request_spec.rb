@@ -13,6 +13,8 @@ RSpec.describe StravaSearchController, type: :request do
       expect(response.status).to eq 200
       expect(response.body).to include("Connect with Strava")
       expect(response.body).to include("btn_strava_connect")
+      expect(response.body).to match("<title>Bike Index Strava Search</title>")
+      expect(response.body).to match(/<meta name="description" content="Associate your Strava gear/)
     end
 
     context "signed in" do
