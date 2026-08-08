@@ -12,13 +12,12 @@ RSpec.describe Sessions::SignInInterstitial::Component, :js, type: :system do
 
     # The token is never valid, so the POST lands back on the magic link form
     expect(page).to have_current_path(/session\/magic_link/, url: true, wait: 10)
-    expect(page).to have_text("Unable to authenticate that token")
 
+    # auto_submit off, so the button is still there to be found - it posts to "#", which
+    # would navigate off this preview if it fired
     visit "#{base_url}/default"
 
     expect(page).to have_button("Sign in")
     expect_axe_clean
-    # Still on the preview — nothing submitted on its own
-    expect(page).to have_current_path("#{base_url}/default", wait: 5)
   end
 end

@@ -681,6 +681,9 @@ RSpec.describe UsersController, type: :request do
       expect(assigns(:user)&.id).to eq user.id
       expect(response.code).to eq("200")
       expect(response).to render_template("users/unsubscribe")
+      # The rendered interstitial posts to unsubscribe_update, it doesn't unsubscribe here
+      expect(Capybara.string(response.body))
+        .to have_css("form[action^='#{base_url}/'][action$='/unsubscribe_update']")
       expect(flash).to be_blank
       expect(user.reload.notification_newsletters).to be_truthy
     end

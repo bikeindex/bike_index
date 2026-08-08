@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 # Emailed links have to be GETs, so each one lands on an interstitial that posts the token
@@ -30,10 +32,12 @@ RSpec.describe "emailed token routes", type: :request do
     "not routable"
   end
 
-  # Every template that auto submits, minus the shared component's own markup
+  # Everything that auto submits, minus the shared component's own files. Includes .rb, so a
+  # component that renders from `call` or a controller counts; the quotes around auto-submit
+  # keep prose about auto-submitting out of it
   def auto_submitting_templates
-    Dir.glob(Rails.root.join("app/{views,components}/**/*.{haml,erb}"))
-      .select { |file| File.read(file).match?(/SignInInterstitial|auto-submit/) }
+    Dir.glob(Rails.root.join("app/**/*.{rb,haml,erb}"))
+      .select { |file| File.read(file).match?(/Sessions::SignInInterstitial::Component|"auto-submit"/) }
       .map { |file| Pathname.new(file).relative_path_from(Rails.root).to_s }
       .reject { |path| path.start_with?("app/components/sessions/sign_in_interstitial/") }
   end
@@ -46,8 +50,10 @@ RSpec.describe "emailed token routes", type: :request do
       [flow[:interstitial], {get: flow[:get_endpoint], post: flow[:post_endpoint]}]
     end
     expect(recognized).to eq target
+  end
 
-    # A new auto submitting template means a new emailed token flow, which belongs above
+  # Separate, so a routing regression doesn't mask this
+  it "knows every auto submitting template" do
     expect(auto_submitting_templates).to match_array flows.map { |flow| flow[:interstitial] }
   end
 end

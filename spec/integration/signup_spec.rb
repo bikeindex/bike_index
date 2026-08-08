@@ -24,7 +24,8 @@ RSpec.describe "Signup", :js, type: :system do
     expect(user.confirmed?).to be_falsey
 
     Email::ConfirmationJob.drain
-    # The link is a GET, so it lands on the interstitial -- which posts itself
+    # Lands on the interstitial, which posts itself. That the GET alone doesn't confirm is
+    # users_request_spec's job - here the point is that the POST happens without a click
     visit emailed_path("/users/confirm")
     expect(page).to have_link("set a password to sign in", wait: 10)
     expect(user.reload.confirmed?).to be_truthy
@@ -53,16 +54,17 @@ RSpec.describe "Signup", :js, type: :system do
     fill_in "Password confirmation", with: password
     click_button "Update password"
 
-    # Signing in overwrites the password_reset_successfully flash it sets first
-    expect(page).to have_content("Logged in!", wait: 10)
+    # The nudge is gone once they have a password - it's what sign_in_flash renders instead
+    expect(page).to have_no_link("set a password to sign in", wait: 10)
     expect(user.reload.passwordless_user?).to be_falsey
 
     visit "/logout"
     visit new_session_path
     fill_in "Email", with: email
-    click_button "Continue"
 
     # No longer passwordless, so identify asks for the password rather than emailing a link
+    expect { click_button "Continue" }.to_not change(Email::MagicLoginLinkJob.jobs, :count)
+
     fill_in "Password", with: password
     click_button "Log in"
 

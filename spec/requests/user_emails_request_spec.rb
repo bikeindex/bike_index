@@ -64,6 +64,9 @@ RSpec.describe UserEmailsController, type: :request do
           }.to change(Users::MergeAdditionalEmailJob.jobs, :size).by 0
           expect(response.code).to eq("200")
           expect(response).to render_template("user_emails/confirm")
+          expect(Capybara.string(response.body))
+            .to have_css("form[action='#{base_url}/#{user_email.id}/confirm'] " \
+              "input[name='confirmation_token'][value='#{user_email.confirmation_token}']", visible: :hidden)
           expect(user_email.reload.confirmed?).to be_falsey
           expect(flash).to be_blank
         end
