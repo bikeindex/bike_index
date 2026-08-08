@@ -89,6 +89,20 @@ RSpec.describe RegisterController, type: :request do
         expect(new_b_param.owner_email).to eq current_user.email
         expect(response).to redirect_to register_path(b_param_token: new_b_param.id_token, step: 1)
       end
+
+      it "destroys the submitted registration start over leaves, resolving its alert" do
+        get "/register/new"
+        discarded = BParam.last
+        post base_url, params: {b_param_token: discarded.id_token,
+                                b_param: {manufacturer_id: "Trek", cycle_type: "bike", owner_email:}}
+        expect(discarded.reload.unfinished_registration?).to be_truthy
+        expect(current_user.user_alerts.active.unfinished_registration.count).to eq 1
+
+        # One destroyed, one created
+        expect { get "/register/new?b_param_token=false" }.to_not change(BParam, :count)
+        expect(BParam.where(id: discarded.id)).to be_empty
+        expect(current_user.user_alerts.active.unfinished_registration.count).to eq 0
+      end
     end
 
     context "email param" do
@@ -122,11 +136,12 @@ RSpec.describe RegisterController, type: :request do
       end
     end
 
-    it "starts a fresh registration with b_param_token=false, ignoring the session's" do
+    it "starts a fresh registration with b_param_token=false, destroying the session's" do
       get "/register/new"
       session_b_param = BParam.last
-      expect { get "/register/new?b_param_token=false" }.to change(BParam, :count).by 1
-      expect(BParam.last.id).to_not eq session_b_param.id
+      # One destroyed, one created
+      expect { get "/register/new?b_param_token=false" }.to_not change(BParam, :count)
+      expect(BParam.where(id: session_b_param.id)).to be_empty
       expect(response).to redirect_to register_path(b_param_token: BParam.last.id_token, step: 1)
 
       # The new registration is now the session's, so /register/new reuses it again

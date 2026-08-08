@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Register::StepReview::Component, type: :component do
+RSpec.describe Register::StepAcknowledgmentReview::Component, type: :component do
   let(:organization) { FactoryBot.create(:organization) }
   let(:sequence) do
     FactoryBot.create(:registration_sequence_active, :with_pages, organization:,
