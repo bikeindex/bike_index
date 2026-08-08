@@ -40,6 +40,7 @@ const defaultFilters: SearchFilters = {
   sufferScoreTo: null,
   kudosFrom: null,
   kudosTo: null,
+  hasTop10: false,
   country: null,
   region: null,
   city: null,

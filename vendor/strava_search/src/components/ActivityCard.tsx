@@ -178,6 +178,15 @@ export const ActivityCard = memo(function ActivityCard({
               </span>
             )}
 
+            {!!activity.top_10_count && (
+              <span
+                className="text-[#fc4c02] font-medium"
+                title={`${activity.top_10_count} segment${activity.top_10_count > 1 ? 's' : ''} in the all-time top 10`}
+              >
+                🏅 {activity.top_10_count} top 10
+              </span>
+            )}
+
             {activity.commute && (
               <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded-full" title="Commute">Commute</span>
             )}

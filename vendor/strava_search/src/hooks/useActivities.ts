@@ -294,6 +294,11 @@ export function useActivities(): UseActivitiesResult {
         }
       }
 
+      // Top 10 filter
+      if (filters.hasTop10 && !activity.top_10_count) {
+        return false;
+      }
+
       return true;
     });
   }, [activities, filters, units]);
