@@ -778,9 +778,9 @@ describe('useActivities', () => {
     describe('top 10 filter', () => {
       it('filters to activities with a top 10 segment', async () => {
         mockActivities.push(
-          createActivity({ id: 1, top_10_count: 0 }),
-          createActivity({ id: 2, top_10_count: 3 }),
-          createActivity({ id: 3, top_10_count: null }),
+          createActivity({ id: 1, top_10_ranks: [] }),
+          createActivity({ id: 2, top_10_ranks: [1, 4] }),
+          createActivity({ id: 3, top_10_ranks: null }),
           createActivity({ id: 4 })
         );
 

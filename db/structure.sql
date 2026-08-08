@@ -3849,7 +3849,7 @@ CREATE TABLE public.strava_activities (
     suffer_score double precision,
     strava_data jsonb,
     enriched_at timestamp(6) without time zone,
-    top_10_count integer
+    top_10_ranks integer[]
 );
 
 

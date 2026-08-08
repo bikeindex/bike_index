@@ -22,7 +22,7 @@
 #  suffer_score                :float
 #  timezone                    :string
 #  title                       :string
-#  top_10_count                :integer
+#  top_10_ranks                :integer          is an Array
 #  total_elevation_gain_meters :float
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
@@ -61,7 +61,7 @@ class StravaActivity < ApplicationRecord
     suffer_score
     timezone
     title
-    top_10_count
+    top_10_ranks
     total_elevation_gain_meters
     gear_id
     strava_id
@@ -118,7 +118,7 @@ class StravaActivity < ApplicationRecord
         suffer_score: detail["suffer_score"],
         photos:,
         segment_locations: Integrations::Strava::SegmentLocations.locations_for(detail["segment_efforts"]),
-        top_10_count: top_10_count_from(detail["segment_efforts"]),
+        top_10_ranks: top_10_ranks_from(detail["segment_efforts"]),
         kudos_count: detail["kudos_count"],
         enriched_at: Time.current,
         strava_data: strava_data_from(detail)
@@ -126,8 +126,8 @@ class StravaActivity < ApplicationRecord
     end
 
     # kom_rank is 1-10 for efforts that placed on the segment's all-time leaderboard
-    def top_10_count_from(segment_efforts)
-      segment_efforts.to_a.count { |effort| effort["kom_rank"].present? }
+    def top_10_ranks_from(segment_efforts)
+      segment_efforts.to_a.filter_map { |effort| effort["kom_rank"] }.sort
     end
 
     def strava_data_from(data)
