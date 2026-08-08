@@ -2574,7 +2574,9 @@ CREATE TABLE public.oauth_access_grants (
     redirect_uri text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     revoked_at timestamp without time zone,
-    scopes character varying(255)
+    scopes character varying(255),
+    code_challenge character varying,
+    code_challenge_method character varying
 );
 
 
@@ -7719,6 +7721,7 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260808100000'),
+('20260807153129'),
 ('20260807132506'),
 ('20260805093756'),
 ('20260804100000'),
