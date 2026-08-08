@@ -7,7 +7,11 @@ class UserEmailsController < ApplicationController
     redirect_to edit_my_account_path
   end
 
+  # Confirming merges the email into the account, so the emailed GET only renders a form that
+  # posts here — a prefetch in the owner's signed in browser doesn't spend the token
   def confirm
+    return unless request.post?
+
     if @user_email.confirm(params[:confirmation_token])
       flash[:success] = translation(:email_confirmed, user_email: @user_email.email)
     elsif @user_email.confirmed?
