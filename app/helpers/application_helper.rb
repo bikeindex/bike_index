@@ -35,6 +35,7 @@ module ApplicationHelper
   #  - nil - which just calls yield directly
   def current_page_skeleton
     return "organized_skeleton" if controller_namespace == "organized" && action_name != "landing"
+    return "oauth_applications_skeleton" if controller_namespace == "oauth" && controller_name == "applications"
     return nil if controller_namespace == "search"
     return nil if @force_landing_page_render
 

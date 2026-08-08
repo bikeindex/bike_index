@@ -56,4 +56,33 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
       expect(page).to have_css('[aria-expanded="false"]')
     end
   end
+
+  context "when the widest entry is wider than the button" do
+    it "widens the menu to fit it on one line, without exceeding the viewport" do
+      visit "/rails/view_components/ui/dropdown/component/long_entry"
+      click_button("Mail")
+
+      expect(page).to have_css('[aria-expanded="true"]')
+
+      metrics = page.evaluate_script(<<~JS)
+        (() => {
+          const menu = document.querySelector('[data-ui--dropdown-target="menu"]');
+          const entry = [...menu.querySelectorAll('li[role="menuitem"] a')]
+            .find(a => a.textContent.includes('Letter opener'));
+          const style = getComputedStyle(entry);
+          const padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+          return {
+            lines: Math.round((entry.getBoundingClientRect().height - padding) / parseFloat(style.lineHeight)),
+            menuWidth: menu.getBoundingClientRect().width,
+            buttonWidth: document.querySelector('[data-ui--dropdown-target="button"]').getBoundingClientRect().width,
+            maxWidth: window.innerWidth * 0.75
+          };
+        })()
+      JS
+
+      expect(metrics["lines"]).to eq 1
+      expect(metrics["menuWidth"]).to be > metrics["buttonWidth"]
+      expect(metrics["menuWidth"]).to be <= metrics["maxWidth"]
+    end
+  end
 end

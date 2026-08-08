@@ -1,0 +1,63 @@
+<%# a long URI scrolls inside its own box rather than wrapping the sentence around it %>
+<% scrolling_code_class = "tw:inline-block tw:max-w-full tw:overflow-x-auto tw:align-bottom tw:whitespace-nowrap" %>
+
+<%# twlabel sets its own tw:text-sm, so base has to reach it by descendant selector to win %>
+<%= form_for @application, url: doorkeeper_submit_path(@application), html: {class: "tw:text-base tw:[&_.twlabel]:text-base", role: "form"} do |f| %>
+  <%= render(UI::Alerts::ObjectError::Component.new(object: application, name: "Application")) %>
+
+  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name, required: true)) %>
+
+  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :redirect_uri,
+    kind: :text_area, label_text: "Redirect URI", required: true,
+    wrapper_class: "tw:mb-8", html_options: {rows: 4})) do |group| %>
+    <% group.with_helper_text do %>
+      <span class="tw:block">
+        <span class="tw:block">Use one line per URI</span>
+
+        <% if Doorkeeper.configuration.native_redirect_uri %>
+          <span class="tw:block">
+            Include
+            <code class="<%= scrolling_code_class %>"><%= Doorkeeper.configuration.native_redirect_uri %></code>
+            for local tests.
+          </span>
+        <% end %>
+
+        <span class="tw:block">
+          Include <code class="<%= scrolling_code_class %>">bikeindex://</code>
+          for
+          <%= link_to "iOS app deeplinks", "https://github.com/bikeindex/bike_index_ios?tab=readme-ov-file#quick-start", class: "twlink", tabindex: -1 %>.
+        </span>
+
+        <span class="tw:block">
+          Include
+          <code class="<%= scrolling_code_class %>"><%= authorize_documentation_index_url %></code>
+          to be able to add new tokens
+          <%= link_to "from the documentation", api_v3_documentation_index_url, class: "twlink", tabindex: -1 %>.
+        </span>
+      </span>
+    <% end %>
+  <% end %>
+
+  <%# same for the button/link sizes UI::Button owns %>
+  <div
+    class="
+      tw:mb-8 tw:flex tw:items-center tw:gap-2 tw:[&_a]:text-base
+      tw:[&_button]:text-base
+    "
+  >
+    <%= render(UI::Button::Component.new(text: "Submit", color: :primary, type: "submit")) %>
+    <%= render(UI::ButtonLink::Component.new(text: "Cancel", color: :secondary, href: oauth_applications_path)) %>
+  </div>
+
+  <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :confidential, label: "Confidential")) %>
+
+  <p class="tw:mb-2 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
+    <%= render "confidential_help" %>
+  </p>
+
+  <%= render(UI::Alerts::Base::Component.new(kind: :warning)) do %>
+    Turning this on will make any request FAIL that doesn't include a
+    <code class="tw:leading-none <%= scrolling_code_class %>">client_secret</code>
+    parameter
+  <% end %>
+<% end %>
