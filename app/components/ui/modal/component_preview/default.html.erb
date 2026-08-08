@@ -1,9 +1,9 @@
 <div class="tw:space-y-8">
-  <%= render(UI::Button::Component.new(text: "Open Settings", data: { open_modal: "settings-modal" })) %>
+  <%= render(UI::Button::Component.new(text: "Open Settings", commandfor: "settings-modal", command: "show-modal")) %>
 
-  <%= render(UI::Button::Component.new(text: "Open Confirmation", data: { open_modal: "confirm-modal" })) %>
+  <%= render(UI::Button::Component.new(text: "Open Confirmation", commandfor: "confirm-modal", command: "show-modal")) %>
 
-  <%= render(UI::Button::Component.new(text: "Open Long", data: { open_modal: "long-modal" })) %>
+  <%= render(UI::Button::Component.new(text: "Open Long", commandfor: "long-modal", command: "show-modal")) %>
 </div>
 
 <%= render(UI::Modal::Component.new(title: "Settings", id: "settings-modal")) do |modal| %>

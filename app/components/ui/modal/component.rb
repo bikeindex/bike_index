@@ -6,7 +6,7 @@ module UI
       renders_one :body
 
       # open: render the dialog already open, for a modal the server decided to show
-      # rather than one waiting on a [data-open-modal] trigger
+      # rather than one waiting on a [commandfor] trigger
       def initialize(id:, title: nil, open: false)
         @id = id
         @title = title
