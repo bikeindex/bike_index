@@ -1,9 +1,9 @@
 .user-page
   .container
     - if @user_banned
-      = render(UI::Alerts::Base::Component.new(kind: :error, header: t(".banned_user"), text: t(".banned_only_visible_to_superusers")))
+      = render(UI::Alerts::Base::Component.new(kind: :error, header: t(".banned_user"), text: t(".banned_only_visible_to_superusers"), margin_classes: "tw:mb-8", default_header_color: true))
     - elsif @profile_hidden_reason
-      = render(UI::Alerts::Base::Component.new(kind: :notice, header: t(".profile_hidden"), text: t(".profile_hidden_#{@profile_hidden_reason}")))
+      = render(UI::Alerts::Base::Component.new(kind: :notice, header: t(".profile_hidden"), text: t(".profile_hidden_#{@profile_hidden_reason}"), margin_classes: "tw:mb-8"))
     .row
       .col-md-6
         .row
