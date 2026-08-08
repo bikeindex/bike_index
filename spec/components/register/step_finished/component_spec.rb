@@ -8,7 +8,7 @@ RSpec.describe Register::StepFinished::Component, type: :component do
   let(:bike_params) { {owner_email: "someone@bikeindex.org", cycle_type: "e-scooter"} }
 
   it "registers another without an organization" do
-    expect(component).to have_link("Register another e-scooter", href: "/register/new")
+    expect(component).to have_link("Register another vehicle", href: "/register/new")
   end
 
   context "registered with an organization" do
@@ -16,7 +16,7 @@ RSpec.describe Register::StepFinished::Component, type: :component do
     let(:bike_params) { super().merge(creation_organization_id: organization.id) }
 
     it "carries the organization onto the next registration" do
-      expect(component).to have_link("Register another e-scooter",
+      expect(component).to have_link("Register another vehicle",
         href: "/register/new?organization_id=#{organization.slug}")
     end
   end
