@@ -26,11 +26,28 @@ RSpec.describe UI::Alerts::Base::Component, type: :component do
 
   describe "error" do
     let(:options) { {text: "some text", kind: "error"} }
-    it "renders" do
+    it "renders, with the exclamation triangle icon" do
       expect(component).to have_content "some text"
       expect(component).to have_css('[role="alert"].tw:text-red-800')
+      expect(component.to_html).to include "M10 2.5 18.5 17.25H1.5z" # the triangle path
+      expect(component.to_html).to_not include "M10 9.25v4.5" # the default info path
       # It doesn't have dismissable button
       expect(component).to_not have_selector("button")
+    end
+  end
+
+  describe "header" do
+    let(:options) { {text: "some text", header: "Banned user", kind: "error"} }
+    it "colors the header for the kind" do
+      expect(component).to have_css('h4.tw\:text-red-800\!', text: "Banned user")
+    end
+
+    context "default_header_color" do
+      let(:options) { {text: "some text", header: "Banned user", kind: "error", default_header_color: true} }
+      it "renders the header in the default text color" do
+        expect(component).to have_css('h4.twtext-color\!', text: "Banned user")
+        expect(component).to_not have_css('h4.tw\:text-red-800\!')
+      end
     end
   end
 
