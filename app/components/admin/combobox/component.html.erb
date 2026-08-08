@@ -1,0 +1,16 @@
+<% if display_view_all? %>
+  <%= link_to active_link[:path], class: "nav-link text-muted em" do %>
+    All
+    <div class="d-none d-sm-inline-block d-lg-none d-xl-inline-block">
+      <%= view_all_title %>
+    </div>
+  <% end %>
+<% end %>
+
+<div
+  class="tw:mt-1 tw:min-w-75 tw:max-sm:min-w-60"
+  data-controller="admin--combobox"
+  data-action="hw-combobox:selection->admin--combobox#navigate"
+>
+  <%= render(::UI::Forms::Combobox::Component.new(name: :admin_navigation, options: combobox_options, placeholder:)) %>
+</div>
