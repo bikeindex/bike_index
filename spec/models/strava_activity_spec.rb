@@ -173,6 +173,34 @@ RSpec.describe StravaActivity, type: :model do
       end
     end
 
+    context "with segment_efforts" do
+      let(:segment_efforts) do
+        [{"kom_rank" => 10}, {"kom_rank" => 1}, {"kom_rank" => nil}, {"pr_rank" => 1}, {"kom_rank" => 2}]
+      end
+      let(:detail) { summary.merge("segment_efforts" => segment_efforts) }
+
+      it "collects the all-time leaderboard ranks, best first" do
+        strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration, detail)
+        expect(strava_activity.top_10_ranks).to eq [1, 2, 10]
+      end
+
+      context "without any ranked efforts" do
+        let(:segment_efforts) { [{"kom_rank" => nil}] }
+
+        it "is empty" do
+          strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration, detail)
+          expect(strava_activity.top_10_ranks).to eq([])
+        end
+      end
+
+      # Summaries carry no segment_efforts, so a re-list must leave the enriched ranks alone
+      it "survives a later summary response" do
+        StravaActivity.create_or_update_from_strava_response(strava_integration, detail)
+        strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration, summary)
+        expect(strava_activity.top_10_ranks).to eq [1, 2, 10]
+      end
+    end
+
     context "with explicit nil in response" do
       let(:existing) do
         FactoryBot.create(:strava_activity, strava_integration:, strava_id: "9876543",
@@ -206,6 +234,7 @@ RSpec.describe StravaActivity, type: :model do
         suffer_score: 42.0,
         timezone: "America/Denver",
         title: "Morning Ride",
+        top_10_ranks: [1, 2, 5, 9],
         total_elevation_gain_meters: 200.0,
         gear_id: "b1234",
         strava_id: "123",
@@ -232,6 +261,7 @@ RSpec.describe StravaActivity, type: :model do
         average_speed: 6.944,
         suffer_score: 42.0,
         kudos_count: 10,
+        top_10_ranks: [1, 2, 5, 9],
         gear_id: "b1234",
         private: false,
         timezone: "America/Denver",
@@ -301,6 +331,7 @@ RSpec.describe StravaActivity, type: :model do
           average_speed: 6.154,
           suffer_score: 113.0,
           kudos_count: 4,
+          top_10_ranks: [],
           gear_id: nil,
           private: false,
           description: "",

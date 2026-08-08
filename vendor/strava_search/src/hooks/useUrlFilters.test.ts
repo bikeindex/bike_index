@@ -41,6 +41,7 @@ describe('useUrlFilters', () => {
         sufferScoreTo: null,
         kudosFrom: null,
         kudosTo: null,
+        hasTop10: false,
         country: null,
         region: null,
         city: null,
@@ -122,6 +123,7 @@ describe('useUrlFilters', () => {
         sufferScoreTo: null,
         kudosFrom: null,
         kudosTo: null,
+        hasTop10: false,
         country: null,
         region: null,
         city: null,
@@ -225,6 +227,15 @@ describe('useUrlFilters', () => {
       expect(result.current[0].filtersExpanded).toBe(true);
     });
 
+    it('parses top10 from URL and auto-expands properties panel', () => {
+      window.history.replaceState({}, '', '/?top10=1');
+
+      const { result } = renderHook(() => useUrlFilters());
+
+      expect(result.current[0].hasTop10).toBe(true);
+      expect(result.current[0].filtersExpanded).toBe(true);
+    });
+
     it('parses country from URL and auto-expands properties panel', () => {
       window.history.replaceState({}, '', '/?country=United+States');
 
@@ -275,6 +286,7 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          hasTop10: false,
           country: null,
           region: null,
           city: null,
@@ -313,6 +325,7 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          hasTop10: false,
           country: null,
           region: null,
           city: null,
@@ -351,6 +364,7 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          hasTop10: false,
           country: null,
           region: null,
           city: null,
@@ -390,6 +404,7 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          hasTop10: false,
           country: null,
           region: null,
           city: null,
@@ -428,6 +443,7 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          hasTop10: false,
           country: null,
           region: null,
           city: null,
@@ -466,6 +482,7 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          hasTop10: false,
           country: null,
           region: null,
           city: null,
@@ -505,6 +522,7 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          hasTop10: false,
           country: null,
           region: null,
           city: null,
@@ -543,6 +561,7 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          hasTop10: false,
           country: null,
           region: null,
           city: null,
@@ -583,6 +602,7 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          hasTop10: false,
           country: null,
           region: null,
           city: null,
@@ -665,6 +685,7 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          hasTop10: false,
           country: null,
           region: null,
           city: null,
@@ -705,6 +726,7 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          hasTop10: false,
           country: null,
           region: null,
           city: null,
@@ -799,6 +821,7 @@ describe('useUrlFilters', () => {
           sufferScoreTo: 100,
           kudosFrom: null,
           kudosTo: null,
+          hasTop10: false,
           country: null,
           region: null,
           city: null,
@@ -838,12 +861,23 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: 5,
           kudosTo: 50,
+          hasTop10: false,
           page: 1,
         });
       });
 
       expect(window.location.search).toContain('kudosFrom=5');
       expect(window.location.search).toContain('kudosTo=50');
+    });
+
+    it('updates URL with top 10 filter', () => {
+      const { result } = renderHook(() => useUrlFilters());
+
+      act(() => {
+        result.current[1]({ ...result.current[0], hasTop10: true });
+      });
+
+      expect(window.location.search).toContain('top10=1');
     });
 
     it('clears URL when filters are reset to defaults', () => {
@@ -875,6 +909,7 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          hasTop10: false,
           country: null,
           region: null,
           city: null,
@@ -949,6 +984,7 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          hasTop10: false,
           country: null,
           region: null,
           city: null,
@@ -997,6 +1033,7 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          hasTop10: false,
           country: null,
           region: null,
           city: null,
@@ -1029,6 +1066,7 @@ describe('useUrlFilters', () => {
           sufferScoreTo: null,
           kudosFrom: null,
           kudosTo: null,
+          hasTop10: false,
           country: null,
           region: null,
           city: null,
@@ -1065,6 +1103,7 @@ describe('useUrlFilters', () => {
               sufferScoreTo: null,
               kudosFrom: null,
               kudosTo: null,
+              hasTop10: false,
             },
           },
         }));

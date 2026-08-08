@@ -44,7 +44,7 @@ vi.mock('./hooks/useActivities', () => ({
     isLoading: false,
     error: null,
     clearError: vi.fn(),
-    filters: { query: '', activityTypes: [], gearIds: [], noEquipment: false, dateFrom: null, dateTo: null, distanceFrom: null, distanceTo: null, elevationFrom: null, elevationTo: null, filtersExpanded: false, activityTypesExpanded: false, equipmentExpanded: false, updatePanelExpanded: false, mutedFilter: 'all', photoFilter: 'all', privateFilter: 'all', commuteFilter: 'all', trainerFilter: 'all', sufferScoreFrom: null, sufferScoreTo: null, kudosFrom: null, kudosTo: null, country: null, region: null, city: null, page: 1 },
+    filters: { query: '', activityTypes: [], gearIds: [], noEquipment: false, dateFrom: null, dateTo: null, distanceFrom: null, distanceTo: null, elevationFrom: null, elevationTo: null, filtersExpanded: false, activityTypesExpanded: false, equipmentExpanded: false, updatePanelExpanded: false, mutedFilter: 'all', photoFilter: 'all', privateFilter: 'all', commuteFilter: 'all', trainerFilter: 'all', sufferScoreFrom: null, sufferScoreTo: null, kudosFrom: null, kudosTo: null, hasTop10: false, country: null, region: null, city: null, page: 1 },
     setFilters: vi.fn(),
     selectedIds: new Set(),
     setSelectedIds: vi.fn(),

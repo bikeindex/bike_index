@@ -32,6 +32,7 @@ export const ActivityCard = memo(function ActivityCard({
   const activityGear = gear.find((g) => g.id === activity.gear_id);
   const photoUrl = activity.photos?.photo_url;
   const photoCount = activity.photos?.photo_count || 0;
+  const topTenRanks = activity.top_10_ranks ?? [];
   const firstLocation = activity.segment_locations?.locations?.[0];
   const firstCity = firstLocation?.city;
   const firstRegion = firstLocation?.region;
@@ -175,6 +176,16 @@ export const ActivityCard = memo(function ActivityCard({
             {activity.pr_count > 0 && (
               <span className="text-[#fc4c02] font-medium">
                 🏆 {activity.pr_count} PR{activity.pr_count > 1 ? 's' : ''}
+              </span>
+            )}
+
+            {topTenRanks.length > 0 && (
+              <span
+                className="font-medium"
+                title={`Placed on ${topTenRanks.length} all-time segment leaderboard${topTenRanks.length > 1 ? 's' : ''}`}
+              >
+                🏅 top 10: {topTenRanks.slice(0, 5).map((rank) => `#${rank}`).join(', ')}
+                {topTenRanks.length > 5 && ` +${topTenRanks.length - 5} more`}
               </span>
             )}
 

@@ -80,6 +80,9 @@ function filtersToParams(filters: SearchFilters): URLSearchParams {
   if (filters.kudosTo !== null && filters.kudosTo !== undefined) {
     params.set('kudosTo', filters.kudosTo.toString());
   }
+  if (filters.hasTop10) {
+    params.set('top10', '1');
+  }
   if (filters.country) {
     params.set('country', filters.country);
   }
@@ -106,6 +109,7 @@ function hasPropertyFilters(filters: SearchFilters): boolean {
     (filters.trainerFilter !== 'all') ||
     filters.sufferScoreFrom !== null || filters.sufferScoreTo !== null ||
     filters.kudosFrom !== null || filters.kudosTo !== null ||
+    filters.hasTop10 ||
     filters.country || filters.region || filters.city
   );
 }
@@ -129,6 +133,7 @@ function paramsToFilters(params: URLSearchParams): SearchFilters {
     params.get('muted') || params.get('photo') || params.get('private') ||
     params.get('commute') || params.get('trainer') ||
     sufferFromStr || sufferToStr || kudosFromStr || kudosToStr ||
+    params.get('top10') ||
     params.get('country') || params.get('region') || params.get('city')
   );
 
@@ -156,6 +161,7 @@ function paramsToFilters(params: URLSearchParams): SearchFilters {
     sufferScoreTo: sufferToStr ? parseFloat(sufferToStr) : null,
     kudosFrom: kudosFromStr ? parseFloat(kudosFromStr) : null,
     kudosTo: kudosToStr ? parseFloat(kudosToStr) : null,
+    hasTop10: params.get('top10') === '1',
     country: params.get('country') || null,
     region: params.get('region') || null,
     city: params.get('city') || null,
@@ -194,6 +200,7 @@ export function useUrlFilters(): [SearchFilters, React.Dispatch<React.SetStateAc
         prev.trainerFilter === resolved.trainerFilter &&
         prev.sufferScoreFrom === resolved.sufferScoreFrom && prev.sufferScoreTo === resolved.sufferScoreTo &&
         prev.kudosFrom === resolved.kudosFrom && prev.kudosTo === resolved.kudosTo &&
+        prev.hasTop10 === resolved.hasTop10 &&
         prev.country === resolved.country && prev.region === resolved.region && prev.city === resolved.city &&
         prev.page === resolved.page;
 

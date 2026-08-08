@@ -131,6 +131,7 @@ export function SearchFilters({
     filters.sufferScoreTo !== null ||
     filters.kudosFrom !== null ||
     filters.kudosTo !== null ||
+    filters.hasTop10 ||
     filters.country !== null ||
     filters.region !== null ||
     filters.city !== null;
@@ -157,6 +158,7 @@ export function SearchFilters({
       sufferScoreTo: null,
       kudosFrom: null,
       kudosTo: null,
+      hasTop10: false,
       country: null,
       region: null,
       city: null,
@@ -247,6 +249,7 @@ export function SearchFilters({
                   filters.trainerFilter !== 'all',
                   filters.sufferScoreFrom !== null, filters.sufferScoreTo !== null,
                   filters.kudosFrom !== null, filters.kudosTo !== null,
+                  filters.hasTop10,
                   !!filters.country, !!filters.region, !!filters.city,
                 ].filter(Boolean).length;
                 return count > 0 ? (
@@ -458,7 +461,7 @@ export function SearchFilters({
           </div>
         </div>
 
-        {/* Relative effort and kudos range */}
+        {/* Relative effort, kudos range and top 10 */}
         <div className="flex flex-wrap gap-y-2 gap-x-6 items-center mb-4">
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <span>Relative effort:</span>
@@ -511,6 +514,15 @@ export function SearchFilters({
                 placeholder="max"
                 className={`w-16 ${inputClasses}`}
               />
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <input
+                type="checkbox"
+                checked={filters.hasTop10}
+                onChange={(e) => onFiltersChange({ ...filters, hasTop10: e.target.checked })}
+                className="w-4 h-4 text-[#fc4c02] border-gray-300 dark:border-gray-600 rounded focus:ring-[#fc4c02]"
+              />
+              <span>Top 10</span>
             </label>
         </div>
 
