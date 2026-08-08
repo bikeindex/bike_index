@@ -36,6 +36,13 @@
     <% end %>
   </p>
 
+  <%# Read-only here, the same as the active version above - the draft is edited on its own screen %>
+  <% if @draft.present? %>
+    <div class="tw:mb-6">
+      <%= render Org::RegistrationSequence::PageList::Component.new(registration_sequence: @draft, editable: false) %>
+    </div>
+  <% end %>
+
   <% button_label = if @draft.present?
        "Edit"
      elsif @active.present?
