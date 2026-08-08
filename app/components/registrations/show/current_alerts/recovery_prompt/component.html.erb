@@ -32,7 +32,7 @@
     </label>
 
     <div class="tw:mt-4 tw:flex tw:items-center tw:gap-2">
-      <%= render(UI::Button::Component.new(text: translation(".mark_recovered"), color: :purple, kind: :submit)) %>
+      <%= render(UI::Button::Component.new(text: translation(".mark_recovered"), color: :purple, type: "submit")) %>
 
       <%# Dismissing only makes sense for the dialog — the alert is what's left after it %>
       <% unless alert? %>
