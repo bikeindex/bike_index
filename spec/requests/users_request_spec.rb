@@ -463,6 +463,8 @@ RSpec.describe UsersController, type: :request do
       og_token = user.token_for_password_reset
       post "#{base_url}/update_password_with_reset_token", params: valid_params
       expect(response).to redirect_to my_account_url
+      # Signing in doesn't replace it with the generic "Logged in!"
+      expect(flash[:success]).to match(/password reset successfully/i)
       user.reload
       expect(user.token_for_password_reset).to_not eq og_token
       expect(user.auth_token).to_not eq og_auth

@@ -54,8 +54,9 @@ RSpec.describe "Signup", :js, type: :system do
     fill_in "Password confirmation", with: password
     click_button "Update password"
 
+    expect(page).to have_content("Password reset successfully", wait: 10)
     # The nudge is gone once they have a password - it's what sign_in_flash renders instead
-    expect(page).to have_no_link("set a password to sign in", wait: 10)
+    expect(page).to have_no_link("set a password to sign in")
     expect(user.reload.passwordless_user?).to be_falsey
 
     visit "/logout"
