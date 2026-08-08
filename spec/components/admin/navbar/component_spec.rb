@@ -12,7 +12,7 @@ RSpec.describe Admin::Navbar::Component, type: :component do
   let(:view_all_link) { "a.nav-link.text-muted" }
 
   it "renders the shortcut links and an option per admin page, minus the dev pages" do
-    expect(component).to have_css("a.nav-link", text: "Stolen")
+    expect(component.css("ul.navbar-nav a").map(&:text)).to eq(%w[Users Bikes Organizations News Stolen])
     expect(component).to have_css("[data-controller='admin--navbar'][data-action='hw-combobox:selection->admin--navbar#navigate']")
     expect(component).to have_css("[role='option'][data-value='#{admin_bikes}']", text: "Bikes", visible: :all)
     expect(component).to have_css("[role='option'][data-value='/admin/organizations']", text: "Organizations", visible: :all)

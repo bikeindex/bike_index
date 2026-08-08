@@ -12,26 +12,25 @@ module Admin
 
       private
 
-      # Shorter labels and a deliberate order, so these don't derive from
-      # nav_select_links -- only the paths are shared, and only by hand
+      # Shorter labels and a deliberate order, so these don't derive from nav_select_links
       def shortcut_links
-        [{title: "Users", path: admin_users_path},
-          {title: "Bikes", path: admin_bikes_path},
-          {title: "Organizations", path: admin_organizations_path},
-          {title: "News", path: admin_news_index_path},
-          {title: "Stolen", path: admin_stolen_bikes_path}]
+        [["Users", admin_users_path],
+          ["Bikes", admin_bikes_path],
+          ["Organizations", admin_organizations_path],
+          ["News", admin_news_index_path],
+          ["Stolen", admin_stolen_bikes_path]]
       end
 
+      # letter_opener_web_path only exists where the engine is mounted, so the guard
+      # has to come first
       def mailer_links
+        return [] unless Rails.env.development? || Rails.env.sandbox?
+
         [["Organized", "/rails/mailers/organized_mailer"],
           ["Admin", "/rails/mailers/admin_mailer"],
           ["Donation", "/rails/mailers/donation_mailer"],
           ["Customer", "/rails/mailers/customer_mailer"],
           ["Letter opener (view sent mail)", letter_opener_web_path]]
-      end
-
-      def render_mailer_links?
-        Rails.env.development? || Rails.env.sandbox?
       end
 
       # Without an id the gem gives each option a uuid, which is most of the rendered
@@ -66,7 +65,7 @@ module Admin
 
       # Because organization invoices edit doesn't match controller
       def invoices_edit_link
-        return unless helpers.controller_name == "invoices" && helpers.action_name == "edit"
+        return unless controller_name == "invoices" && action_name == "edit"
 
         nav_select_links.detect { |link| link[:title].match(/invoices/i) }
       end

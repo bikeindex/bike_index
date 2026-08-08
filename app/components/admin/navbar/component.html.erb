@@ -1,19 +1,19 @@
-<nav class="navbar navbar-expand-md navbar-light bg-light admin-navbar more">
+<nav class="navbar navbar-expand-md navbar-light bg-light admin-navbar">
   <span class="navbar-brand">
-    <%= link_to (image_tag("logo.svg")), helpers.user_root_url %>
+    <%= link_to image_tag("logo.svg"), helpers.user_root_url %>
   </span>
 
   <% if @current_user.superuser? %>
     <ul class="navbar-nav d-none d-lg-flex">
-      <% shortcut_links.each do |link| %>
+      <% shortcut_links.each do |title, path| %>
         <li class="nav-item">
-          <%= helpers.active_link link[:title], link[:path], role: "button", class: "nav-link", match_controller: true %>
+          <%= helpers.active_link title, path, class: "nav-link", match_controller: true %>
         </li>
       <% end %>
 
-      <% if render_mailer_links? %>
+      <% if mailer_links.any? %>
         <li class="nav-item">
-          <%= render(UI::Dropdown::Component.new(name: "Mailers", button_class: "nav-link")) do |dropdown| %>
+          <%= render(UI::Dropdown::Component.new(name: "Mailers", button_class: "nav-link tw:cursor-pointer")) do |dropdown| %>
             <% mailer_links.each do |title, path| %>
               <% dropdown.with_entry_item { link_to title, path } %>
             <% end %>
@@ -34,7 +34,7 @@
       data-controller="admin--navbar"
       data-action="hw-combobox:selection->admin--navbar#navigate"
     >
-      <%= render(::UI::Forms::Combobox::Component.new(name: :admin_navigation, options: combobox_options, placeholder:)) %>
+      <%= render(UI::Forms::Combobox::Component.new(name: :admin_navigation, options: combobox_options, placeholder:)) %>
     </div>
   <% end %>
 
