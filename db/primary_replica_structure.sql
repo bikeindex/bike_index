@@ -3848,7 +3848,8 @@ CREATE TABLE public.strava_activities (
     average_speed double precision,
     suffer_score double precision,
     strava_data jsonb,
-    enriched_at timestamp(6) without time zone
+    enriched_at timestamp(6) without time zone,
+    top_10_ranks integer[]
 );
 
 
@@ -7717,6 +7718,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260808100000'),
 ('20260807132506'),
 ('20260805093756'),
 ('20260804100000'),

@@ -49,6 +49,7 @@ const defaultFilters: SearchFilters = {
   sufferScoreTo: null,
   kudosFrom: null,
   kudosTo: null,
+  hasTop10: false,
   country: null,
   region: null,
   city: null,
@@ -771,6 +772,26 @@ describe('useActivities', () => {
 
         expect(result.current.filteredActivities).toHaveLength(2);
         expect(result.current.filteredActivities.map((a) => a.id)).toEqual([2, 3]);
+      });
+    });
+
+    describe('top 10 filter', () => {
+      it('filters to activities with a top 10 segment', async () => {
+        mockActivities.push(
+          createActivity({ id: 1, top_10_ranks: [] }),
+          createActivity({ id: 2, top_10_ranks: [1, 4] }),
+          createActivity({ id: 3, top_10_ranks: null }),
+          createActivity({ id: 4 })
+        );
+
+        const { result } = renderHook(() => useActivities());
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        act(() => {
+          result.current.setFilters((prev) => ({ ...prev, hasTop10: true }));
+        });
+
+        expect(result.current.filteredActivities.map((a) => a.id)).toEqual([2]);
       });
     });
 

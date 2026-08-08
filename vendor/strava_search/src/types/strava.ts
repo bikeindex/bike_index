@@ -46,6 +46,7 @@ export interface StravaActivity {
   muted: boolean;
   enriched_at?: string | null;
   pr_count: number;
+  top_10_ranks?: number[] | null;
   device_name?: string;
   device_watts?: boolean;
   average_watts?: number;
@@ -178,6 +179,7 @@ export interface SearchFilters {
   sufferScoreTo: number | null;
   kudosFrom: number | null;
   kudosTo: number | null;
+  hasTop10: boolean;
   country: string | null;
   region: string | null;
   city: string | null;
