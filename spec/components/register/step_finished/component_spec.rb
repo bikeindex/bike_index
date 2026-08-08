@@ -7,8 +7,19 @@ RSpec.describe Register::StepFinished::Component, type: :component do
   let(:b_param) { FactoryBot.create(:b_param, params: {bike: bike_params}) }
   let(:bike_params) { {owner_email: "someone@bikeindex.org", cycle_type: "e-scooter"} }
 
-  it "registers another without an organization" do
+  it "registers another without an organization, and doesn't offer impound details" do
     expect(component).to have_link("Register another vehicle", href: "/register/new")
+    expect(component).to have_no_text("Add details about where you found")
+  end
+
+  %w[status_impounded status_abandoned unregistered_parking_notification].each do |status|
+    context status do
+      let(:bike_params) { super().merge(status:) }
+
+      it "offers to add where it was found" do
+        expect(component).to have_text("Add details about where you found the e-scooter")
+      end
+    end
   end
 
   context "registered with an organization" do

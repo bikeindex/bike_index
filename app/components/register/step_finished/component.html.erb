@@ -31,7 +31,11 @@
           "
         >
           <li><%= translation(".report_it_stolen", cycle_type:) %></li>
-          <li><%= translation(".add_impound_details") %></li>
+
+          <% if found? %>
+            <li><%= translation(".add_impound_details", cycle_type:) %></li>
+          <% end %>
+
           <li><%= translation(".add_photos", cycle_type:) %></li>
         </ul>
       </div>
