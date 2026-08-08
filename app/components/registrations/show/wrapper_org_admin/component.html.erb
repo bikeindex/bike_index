@@ -386,7 +386,7 @@
             <%= form.text_field :code, required: true, class: "twinput" %>
           </div>
 
-          <%= render(UI::Button::Component.new(text: translation(".assign_sticker"), color: :purple, kind: :submit)) %>
+          <%= render(UI::Button::Component.new(text: translation(".assign_sticker"), color: :purple, type: "submit")) %>
         <% end %>
       <% end %>
     <% end %>

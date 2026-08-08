@@ -38,8 +38,6 @@ module UI
         link: "tw:is-active:text-blue-700 tw:is-active:dark:text-blue-300 tw:is-active:font-bold tw:is-active:underline"
       }.freeze
 
-      KINDS = %i[button submit]
-
       DISABLED_CLASSES = "tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:disabled:pointer-events-none"
 
       # is-active sorts after focus, so an active button's ring-2 swallows the focus ring
@@ -55,12 +53,11 @@ module UI
 
       # name/value are submitted with the form when this button is the one clicked, which
       # is how a form with more than one submit says which was pressed
-      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, spinner: false, name: nil, value: nil, **html_options)
+      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, spinner: false, name: nil, value: nil, **html_options)
         @text = text
         @name = name
         @value = value
         @color = COLORS.key?(color) ? color : :secondary
-        @kind = KINDS.include?(kind&.to_sym) ? kind.to_sym : KINDS.first
         @active = active
         @html_class = html_class
         @spinner = spinner
@@ -72,9 +69,10 @@ module UI
         raise ArgumentError, "class is not supported, you must use the keyword arg html_class" if html_options.key?(:class)
       end
 
-      # html_options first, so the component's own attributes can't be overwritten
+      # type leads, as the default a caller can replace; the rest follow html_options,
+      # so the component's own attributes can't be overwritten
       def call
-        content_tag(:button, safe_join([spinner_span, @text || content].compact), **@html_options, class: button_classes, type: (@kind == :submit) ? "submit" : "button", name: @name, value: @value, data: button_data)
+        content_tag(:button, safe_join([spinner_span, @text || content].compact), type: "button", **@html_options, class: button_classes, name: @name, value: @value, data: button_data)
       end
 
       def button_classes

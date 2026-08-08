@@ -35,7 +35,7 @@ RSpec.describe UI::Button::Component, type: :component do
   end
 
   context "with spinner" do
-    let(:options) { {text:, kind: :submit, spinner: true} }
+    let(:options) { {text:, type: "submit", spinner: true} }
 
     it "renders a self-wired hidden spinner that inherits the button's text color" do
       expect(component).to have_css("button[data-controller='ui--button--submit-spinner']")
@@ -46,7 +46,7 @@ RSpec.describe UI::Button::Component, type: :component do
   end
 
   context "with name and value" do
-    let(:options) { {text:, kind: :submit, name: "impound_claim[status]", value: "submitting"} }
+    let(:options) { {text:, type: "submit", name: "impound_claim[status]", value: "submitting"} }
 
     it "submits the value, so a second submit button can say which was pressed" do
       expect(component).to have_css("button[type='submit'][name='impound_claim[status]'][value='submitting']")
@@ -144,9 +144,10 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
-  context "with submit kind" do
-    let(:options) { {text: "Submit", kind: :submit} }
+  context "with type submit" do
+    let(:options) { {text: "Submit", type: "submit"} }
 
+    # type is the one attribute html_options replaces rather than adds to
     it "renders submit button" do
       expect(component).to have_css("button[type='submit']")
     end
@@ -176,14 +177,6 @@ RSpec.describe UI::Button::Component, type: :component do
 
     it "passes them through" do
       expect(component).to have_css("button[commandfor='settings-modal'][command='show-modal']")
-    end
-  end
-
-  context "with an html_option the component sets itself" do
-    let(:options) { {text: "Open", type: "submit"} }
-
-    it "keeps its own" do
-      expect(component).to have_css("button[type='button']")
     end
   end
 
