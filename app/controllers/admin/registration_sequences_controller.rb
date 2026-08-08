@@ -11,12 +11,6 @@ module Admin
         page: permitted_page)
     end
 
-    # The template every organization's first draft is cloned from. It's created on demand,
-    # so this redirects rather than the index linking to an id that might not exist yet
-    def template
-      redirect_to edit_admin_registration_sequence_path(RegistrationSequence.template)
-    end
-
     # The faked registrant walk-through, one screen (?page=) per rule page plus the review
     # they end on. page is 1-indexed (Pagy); the preview component's index is 0-based.
     def show

@@ -28,22 +28,6 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
       end
     end
 
-    describe "template" do
-      it "creates the template on the way to its editor" do
-        expect { get "#{base_url}/template" }.to change(RegistrationSequence.templates, :count).by(1)
-        expect(response).to redirect_to("#{base_url}/#{RegistrationSequence.template.id}/edit")
-      end
-
-      context "with a template" do
-        let!(:template) { FactoryBot.create(:registration_sequence_template, :with_pages) }
-
-        it "goes to the existing template's editor" do
-          expect { get "#{base_url}/template" }.to_not change(RegistrationSequence.templates, :count)
-          expect(response).to redirect_to("#{base_url}/#{template.id}/edit")
-        end
-      end
-    end
-
     describe "edit" do
       it "renders the editor for an organization's draft" do
         get "#{base_url}/#{draft.id}/edit"

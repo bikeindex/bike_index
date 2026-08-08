@@ -1,9 +1,5 @@
 <% nav_header_list_items = capture do %>
   <li class="nav-item tw:text-sm">
-    <%= link_to "Edit template", template_admin_registration_sequences_path, class: "twlink" %>
-  </li>
-
-  <li class="nav-item tw:text-sm">
     <%= render(UI::Dropdown::Component.new(
       name: @status.present? ? "#{@status.titleize} only" : "All statuses",
       button_size: :sm,
