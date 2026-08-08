@@ -42,11 +42,6 @@
     <%= render 'layouts/revised_messages' %>
 
     <div class="doorkeeper-container">
-      <% if @current_user && @current_user.superuser? && @application.present? && @application.owner.present? %>
-        Application by
-        <strong><%= @application.owner.display_name %></strong>
-      <% end %>
-
       <% if controller_name.match('application') && action_name != 'index' %>
         <%= link_to 'Your applications', oauth_applications_url, class: 'pull-right' %>
       <% end %>

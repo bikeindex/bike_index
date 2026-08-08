@@ -30,6 +30,22 @@ The Client-side flow is good for client-side javascript apps. Here's an article 
 
 *There will be rate limiting on the future for non-authenticated requests - so if you have an access token, consider using it for everything.*
 
+<a class="ref" id="ref_pkce">
+
+###PKCE
+
+Use [PKCE](https://datatracker.ietf.org/doc/html/rfc7636) with the Authorization flow so an intercepted authorization code can't be redeemed by anyone else. It matters most for apps that can't keep a `client_secret` private - mobile apps, single page apps, CLIs - but we recommend it for every client.
+
+Generate a random `code_verifier`, then send the base64url encoding (without padding) of its SHA256 digest as the `code_challenge`:
+
+    GET <%= ENV['BASE_URL'] %>/oauth/authorize?response_type=code&client_id={app_id}&redirect_uri={redirect_uri}&scope={scopes}&code_challenge={code_challenge}&code_challenge_method=S256
+
+`S256` is the only accepted `code_challenge_method`. Send the original `code_verifier` when exchanging the code:
+
+    POST <%= ENV['BASE_URL'] %>/oauth/token?grant_type=authorization_code&client_id={app_id}&redirect_uri={redirect_uri}&code={code}&code_verifier={code_verifier}
+
+PKCE is optional, but once you've sent a `code_challenge` the matching `code_verifier` is required to get a token.
+
 <a class="ref" id="ref_applications_authorized">
 
 ###Applications you've authorized

@@ -14,7 +14,9 @@
 
   <% if @pr_number %>
     <span class="tw:hidden tw:sm:inline">&middot;</span>
-    <a class="tw:underline" href="<%= pr_url %>"><%= pr_link_text %></a>
+    <a class="tw:text-inherit tw:underline" href="<%= pr_url %>">
+      <%= pr_link_text %>
+    </a>
   <% end %>
 
   <% if @commit.present? %>
@@ -36,7 +38,8 @@
 
   <span>&middot;</span>
 
-  <%= link_to translation(".letter_opener_link"), "/letter_opener", class: "tw:font-normal tw:underline" %>
+  <%= link_to translation(".letter_opener_link"), "/letter_opener",
+    class: "tw:font-normal tw:text-inherit tw:underline" %>
 
   <%= render(UI::Tooltip::Component.new(text: translation(".letter_opener_tooltip"))) do |tooltip| %>
     <% tooltip.with_tooltip_button(class: pill_button_class) { "?" } %>

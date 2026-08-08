@@ -13,11 +13,17 @@
     </span>
   <% end %>
 
+  <%#
+    The menu is absolute inside a wrapper only as wide as the button, so without
+    w-max it shrink-to-fits to that and long entries wrap. 75vw so a long one
+    can't run off the screen instead.
+  %>
+
   <div
     class="
-      tw:absolute tw:top-0 tw:left-0 tw:hidden tw:min-w-44 tw:rounded-lg
-      tw:border tw:border-gray-200 tw:bg-white tw:shadow-lg
-      tw:dark:border-gray-700 tw:dark:bg-gray-800
+      tw:absolute tw:top-0 tw:left-0 tw:hidden tw:w-max tw:max-w-[75vw]
+      tw:min-w-44 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white
+      tw:shadow-lg tw:dark:border-gray-700 tw:dark:bg-gray-800
     "
     data-ui--dropdown-target="menu"
   >

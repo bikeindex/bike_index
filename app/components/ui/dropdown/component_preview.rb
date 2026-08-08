@@ -27,6 +27,14 @@ module UI
         end
       end
 
+      # An entry wider than the button, which the menu sizes to rather than wrapping
+      def long_entry
+        render(UI::Dropdown::Component.new(name: "Mail")) do |dropdown|
+          dropdown.with_entry_item { content_tag(:a, "Inbox", href: "#") }
+          dropdown.with_entry_item { content_tag(:a, "Letter opener (view sent mail)", href: "#") }
+        end
+      end
+
       # @!endgroup
 
       private
