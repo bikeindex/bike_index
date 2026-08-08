@@ -8,36 +8,34 @@
 
   <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :redirect_uri,
     kind: :text_area, label_text: "Redirect URI", required: true,
-    wrapper_class: "tw:mb-1", html_options: {rows: 4})) %>
+    wrapper_class: "tw:mb-8", html_options: {rows: 4})) do |group| %>
+    <% group.with_helper_text do %>
+      <span class="tw:block tw:leading-normal">
+        <span class="tw:block">Use one line per URI</span>
 
-  <div
-    class="
-      tw:mb-8 tw:text-xs tw:leading-normal tw:text-gray-500
-      tw:dark:text-gray-400
-    "
-  >
-    <p class="tw:mb-1">Use one line per URI</p>
+        <% if Doorkeeper.configuration.native_redirect_uri %>
+          <span class="tw:block">
+            Include
+            <code class="<%= scrolling_code_class %>"><%= Doorkeeper.configuration.native_redirect_uri %></code>
+            for local tests.
+          </span>
+        <% end %>
 
-    <% if Doorkeeper.configuration.native_redirect_uri %>
-      <p class="tw:mb-1">
-        Include
-        <code class="<%= scrolling_code_class %>"><%= Doorkeeper.configuration.native_redirect_uri %></code>
-        for local tests.
-      </p>
+        <span class="tw:block">
+          Include <code class="<%= scrolling_code_class %>">bikeindex://</code>
+          for
+          <%= link_to "iOS app deeplinks", "https://github.com/bikeindex/bike_index_ios?tab=readme-ov-file#quick-start", class: "twlink", tabindex: -1 %>.
+        </span>
+
+        <span class="tw:block">
+          Include
+          <code class="<%= scrolling_code_class %>"><%= authorize_documentation_index_url %></code>
+          to be able to add new tokens
+          <%= link_to "from the documentation", api_v3_documentation_index_url, class: "twlink", tabindex: -1 %>.
+        </span>
+      </span>
     <% end %>
-
-    <p class="tw:mb-1">
-      Include <code class="<%= scrolling_code_class %>">bikeindex://</code> for
-      <%= link_to "iOS app deeplinks", "https://github.com/bikeindex/bike_index_ios?tab=readme-ov-file#quick-start", class: "twlink", tabindex: -1 %>.
-    </p>
-
-    <p class="tw:mb-0">
-      Include
-      <code class="<%= scrolling_code_class %>"><%= authorize_documentation_index_url %></code>
-      to be able to add new tokens
-      <%= link_to "from the documentation", api_v3_documentation_index_url, class: "twlink", tabindex: -1 %>.
-    </p>
-  </div>
+  <% end %>
 
   <div class="tw:mb-8 tw:flex tw:items-center tw:gap-2">
     <%= render(UI::Button::Component.new(text: "Submit", color: :primary, type: "submit")) %>
