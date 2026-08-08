@@ -16,9 +16,7 @@
   </div>
 
   <%# Below the gray. mt-24 clears the flow shell's -mb-18 pull-up. %>
-  <div class="tw:mt-24 tw:flex tw:items-baseline tw:gap-4">
-    <%= link_to "← All registration sequences", admin_registration_sequences_path, class: "twlink tw:shrink-0 tw:text-sm" %>
-
+  <div class="tw:mt-24">
     <%= render UI::Pagination::Component.new(pagy: @preview_pagy, page_params: {id: @registration_sequence.id}) %>
   </div>
 </div>
