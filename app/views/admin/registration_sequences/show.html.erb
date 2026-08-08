@@ -1,10 +1,19 @@
 <div class="tw:mx-auto tw:max-w-3xl tw:py-4">
+  <%# The template has no organization to name %>
+  <% previewing = [@registration_sequence.status_display, @registration_sequence.organization&.short_name].compact.join(" ") %>
+
   <h1 class="uncap tw:mb-6 tw:text-2xl tw:font-semibold">
-    Previewing <strong><%= @registration_sequence.status_display %></strong>
-    registration sequence
+    Previewing <strong><%= previewing %></strong> registration sequence
   </h1>
 
-  <%= render Org::RegistrationSequence::Preview::Component.new(registration_sequence: @registration_sequence, index: @preview_pagy.page - 1, admin: true) %>
+  <%#
+    pt cancels the flow shell's negative top margin (padding doesn't collapse), so the
+    title sits above the gray rather than inside it
+  %>
+
+  <div class="tw:pt-9 tw:min-[992px]:pt-15">
+    <%= render Org::RegistrationSequence::Preview::Component.new(registration_sequence: @registration_sequence, index: @preview_pagy.page - 1, admin: true) %>
+  </div>
 
   <%# Below the gray. mt-24 clears the flow shell's -mb-18 pull-up. %>
   <div class="tw:mt-24 tw:flex tw:items-baseline tw:gap-4">
