@@ -55,7 +55,7 @@ module UI
 
       # name/value are submitted with the form when this button is the one clicked, which
       # is how a form with more than one submit says which was pressed
-      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, disabled: false, spinner: false, name: nil, value: nil, data: {}, aria: {}, **html_options)
+      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, spinner: false, name: nil, value: nil, **html_options)
         @text = text
         @name = name
         @value = value
@@ -63,10 +63,7 @@ module UI
         @kind = KINDS.include?(kind&.to_sym) ? kind.to_sym : KINDS.first
         @active = active
         @html_class = html_class
-        @disabled = disabled
         @spinner = spinner
-        @data = data
-        @aria = aria
         @html_options = html_options
 
         @size = SIZES.key?(size) ? size : :md
@@ -77,7 +74,7 @@ module UI
 
       # html_options first, so the component's own attributes can't be overwritten
       def call
-        content_tag(:button, safe_join([spinner_span, @text || content].compact), **@html_options, class: button_classes, type: (@kind == :submit) ? "submit" : "button", disabled: @disabled, name: @name, value: @value, data: button_data, aria: @aria)
+        content_tag(:button, safe_join([spinner_span, @text || content].compact), **@html_options, class: button_classes, type: (@kind == :submit) ? "submit" : "button", name: @name, value: @value, data: button_data)
       end
 
       def button_classes
@@ -86,8 +83,9 @@ module UI
 
       private
 
+      # The only html_option the component adds to rather than passes through
       def button_data
-        data = @data.merge(active: @active || nil)
+        data = (@html_options[:data] || {}).merge(active: @active || nil)
         return data unless @spinner
 
         data.merge(controller: [data[:controller], "ui--button--submit-spinner"].compact.join(" "))
