@@ -10,7 +10,7 @@
     kind: :text_area, label_text: "Redirect URI", required: true,
     wrapper_class: "tw:mb-8", html_options: {rows: 4})) do |group| %>
     <% group.with_helper_text do %>
-      <span class="tw:block tw:leading-normal">
+      <span class="tw:block tw:text-base">
         <span class="tw:block">Use one line per URI</span>
 
         <% if Doorkeeper.configuration.native_redirect_uri %>
@@ -44,17 +44,13 @@
 
   <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :confidential, label: "Confidential")) %>
 
-  <p
-    class="
-      tw:mb-2 tw:text-xs tw:leading-normal tw:text-gray-500
-      tw:dark:text-gray-400
-    "
-  >
+  <p class="tw:mb-2 tw:text-base tw:text-gray-500 tw:dark:text-gray-400">
     <%= render "confidential_help" %>
   </p>
 
   <%= render(UI::Alerts::Base::Component.new(kind: :warning)) do %>
     Turning this on will make any request FAIL that doesn't include a
-    <code class="<%= scrolling_code_class %>">client_secret</code> parameter
+    <code class="tw:leading-none <%= scrolling_code_class %>">client_secret</code>
+    parameter
   <% end %>
 <% end %>
