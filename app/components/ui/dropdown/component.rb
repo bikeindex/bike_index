@@ -18,15 +18,27 @@ module UI
         }
       }
 
-      def initialize(name:, button_class: nil, button_color: :secondary, button_size: :md, active: false)
+      # The menu shrink-to-fits against the wrapper, which is only as wide as the
+      # button, so long entries wrap -- menu_class: "tw:w-max" sizes it to them instead
+      MENU_CLASSES = "tw:absolute tw:top-0 tw:left-0 tw:hidden tw:min-w-44 tw:rounded-lg " \
+        "tw:border tw:border-gray-200 tw:bg-white tw:shadow-lg " \
+        "tw:dark:border-gray-700 tw:dark:bg-gray-800"
+
+      def initialize(name:, button_class: nil, button_color: :secondary, button_size: :md, active: false,
+        menu_class: nil)
         @name = name
         @button_class = button_class
         @button_color = button_color
         @button_size = button_size
         @active = active
+        @menu_class = menu_class
       end
 
       private
+
+      def menu_classes
+        [MENU_CLASSES, @menu_class].compact.join(" ")
+      end
 
       def button_attributes
         {

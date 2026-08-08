@@ -13,14 +13,7 @@
     </span>
   <% end %>
 
-  <div
-    class="
-      tw:absolute tw:top-0 tw:left-0 tw:hidden tw:min-w-44 tw:rounded-lg
-      tw:border tw:border-gray-200 tw:bg-white tw:shadow-lg
-      tw:dark:border-gray-700 tw:dark:bg-gray-800
-    "
-    data-ui--dropdown-target="menu"
-  >
+  <div class="<%= menu_classes %>" data-ui--dropdown-target="menu">
     <ul role="menu" class="twdropdown" aria-labelledby="<%= button_id %>">
       <% entries.each do |entry| %>
         <%= entry %>
