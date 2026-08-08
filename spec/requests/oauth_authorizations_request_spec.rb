@@ -158,8 +158,7 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
       let(:code_verifier) { "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk" }
       let(:code_challenge) { Base64.urlsafe_encode64(Digest::SHA256.digest(code_verifier), padding: false) }
       let(:code_challenge_method) { "S256" }
-      let(:sent_code_challenge) { code_challenge }
-      let(:authorize_params) { "response_type=code&redirect_uri=#{doorkeeper_app.redirect_uri}&client_id=#{doorkeeper_app.uid}&scope=read_bikes&code_challenge=#{sent_code_challenge}&code_challenge_method=#{code_challenge_method}" }
+      let(:authorize_params) { "response_type=code&redirect_uri=#{doorkeeper_app.redirect_uri}&client_id=#{doorkeeper_app.uid}&scope=read_bikes&code_challenge=#{code_challenge}&code_challenge_method=#{code_challenge_method}" }
       # No client_secret - the point of PKCE is securing public clients, which can't keep one
       let(:token_params) { "grant_type=authorization_code&redirect_uri=#{doorkeeper_app.redirect_uri}&client_id=#{doorkeeper_app.uid}" }
       let(:auth_code) do
@@ -194,7 +193,7 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
 
       context "code_challenge_method=plain" do
         let(:code_challenge_method) { "plain" }
-        let(:sent_code_challenge) { code_verifier }
+        let(:code_challenge) { code_verifier }
         it "refuses to authorize" do
           get "/oauth/authorize?#{authorize_params}"
           expect(response.code).to eq("400")

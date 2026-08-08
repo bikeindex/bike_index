@@ -3,12 +3,13 @@ module MarkdownHandler
     @erb ||= ActionView::Template.registered_template_handler(:erb)
   end
 
+  # ERB compiles to several statements; begin/end groups them so to_html receives the last one
   def self.call(template, source)
-    compiled_source = erb.call(template, source)
-    # compiled_source is multiple statements; the parens group them so output binds to the last one
-    "begin; output = (#{compiled_source}\n); " \
-    "output = output.to_str if output.respond_to?(:to_str); " \
-    "Kramdown::Document.new(output.to_s, auto_ids: false).to_html; end"
+    "MarkdownHandler.to_html(begin;#{erb.call(template, source)}\nend)"
+  end
+
+  def self.to_html(output)
+    Kramdown::Document.new(output.to_s, auto_ids: false).to_html
   end
 end
 
