@@ -21,6 +21,7 @@ class RegisterController < ApplicationController
   # Redirects into step 1 with a token (reusing the session's registration when
   # it's still blank), so going back from step 2 lands on the same registration
   def new
+    BikeServices::Register.discard(token: params[:discard_token], user: current_user)
     @b_param = BikeServices::Register.b_param_for(user: current_user, token_id: reusable_token,
       status: params[:status], email: params[:email])
     # The same filter every other action runs, so reusing the session's
@@ -43,7 +44,7 @@ class RegisterController < ApplicationController
       render Register::StepFinished::Component.new(b_param: @b_param, current_user:)
     when "review"
       @page_title = I18n.t("meta_titles.register_review", cycle_type: @b_param.type)
-      render Register::StepReview::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:)
+      render Register::StepAcknowledgmentReview::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:)
     when "2"
       @page_title = I18n.t("meta_titles.register_step_2", cycle_type: @b_param.type)
       render Register::Step2::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:)
@@ -104,7 +105,7 @@ class RegisterController < ApplicationController
 
   def confirm
     @page_title = I18n.t("meta_titles.register_confirm")
-    render Register::Confirm::Component.new(b_param: @b_param, token: params[:confirmation_token])
+    render Register::StepConfirm::Component.new(b_param: @b_param, token: params[:confirmation_token])
   end
 
   # The confirmation itself - the proven address gets an account, created here if
@@ -172,9 +173,10 @@ class RegisterController < ApplicationController
     params.permit(:organization_id, :status, :email).to_h.compact_blank
   end
 
-  # b_param_token=false abandons the session's registration - the start over link
+  # Starting over lands on a blank registration, not whatever the session was left on -
+  # which would drop the organization and status the link carries
   def reusable_token
-    session[:register_b_param_token] unless params[:b_param_token] == "false"
+    session[:register_b_param_token] if params[:discard_token].blank?
   end
 
   def assign_organization
