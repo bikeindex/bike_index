@@ -14,12 +14,15 @@ module UI
         lg: "tw:px-4 tw:py-2 tw:text-base"
       }.freeze
 
+      # Hover is guarded by not-disabled: nothing else stops it applying to a disabled
+      # button, now that DISABLED_CLASSES no longer drops pointer events. A link is never
+      # :disabled, so the guard is inert on UI::ButtonLink.
       COLORS = {
-        primary: "tw:text-white tw:bg-blue-600 tw:border tw:border-blue-600 tw:hover:bg-blue-700 tw:focus:ring-blue-500/40 tw:dark:bg-blue-500 tw:dark:border-blue-500 tw:dark:hover:bg-blue-600",
-        secondary: "tw:text-gray-800 tw:bg-white tw:border tw:border-gray-200 tw:hover:border-purple-500 tw:hover:bg-purple-50 tw:focus:ring-purple-500/40 tw:dark:bg-gray-800 tw:dark:text-gray-100 tw:dark:border-gray-700 tw:dark:hover:border-purple-500 tw:dark:hover:bg-purple-950",
-        error: "tw:text-white tw:bg-red-600 tw:border tw:border-red-600 tw:hover:bg-red-700 tw:focus:ring-red-500/40 tw:dark:bg-red-500 tw:dark:border-red-500 tw:dark:hover:bg-red-600",
-        purple: "tw:text-white tw:bg-purple-500 tw:border tw:border-purple-500 tw:hover:bg-purple-600 tw:hover:border-purple-600 tw:focus:ring-purple-500/40",
-        danger_outline: "tw:text-[#c0392b] tw:bg-white tw:border tw:border-[#f3c9c9] tw:hover:bg-red-50 tw:focus:ring-red-500/40 tw:dark:bg-transparent tw:dark:text-red-400 tw:dark:border-red-900 tw:dark:hover:bg-red-950",
+        primary: "tw:text-white tw:bg-blue-600 tw:border tw:border-blue-600 tw:not-disabled:hover:bg-blue-700 tw:focus:ring-blue-500/40 tw:dark:bg-blue-500 tw:dark:border-blue-500 tw:dark:not-disabled:hover:bg-blue-600",
+        secondary: "tw:text-gray-800 tw:bg-white tw:border tw:border-gray-200 tw:not-disabled:hover:border-purple-500 tw:not-disabled:hover:bg-purple-50 tw:focus:ring-purple-500/40 tw:dark:bg-gray-800 tw:dark:text-gray-100 tw:dark:border-gray-700 tw:dark:not-disabled:hover:border-purple-500 tw:dark:not-disabled:hover:bg-purple-950",
+        error: "tw:text-white tw:bg-red-600 tw:border tw:border-red-600 tw:not-disabled:hover:bg-red-700 tw:focus:ring-red-500/40 tw:dark:bg-red-500 tw:dark:border-red-500 tw:dark:not-disabled:hover:bg-red-600",
+        purple: "tw:text-white tw:bg-purple-500 tw:border tw:border-purple-500 tw:not-disabled:hover:bg-purple-600 tw:not-disabled:hover:border-purple-600 tw:focus:ring-purple-500/40",
+        danger_outline: "tw:text-[#c0392b] tw:bg-white tw:border tw:border-[#f3c9c9] tw:not-disabled:hover:bg-red-50 tw:focus:ring-red-500/40 tw:dark:bg-transparent tw:dark:text-red-400 tw:dark:border-red-900 tw:dark:not-disabled:hover:bg-red-950",
         link: "twlink tw:p-0"
       }.freeze
 

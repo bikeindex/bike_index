@@ -63,11 +63,9 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
       expect(component).to have_css("input[value='m'][checked]", visible: :all)
     end
 
-    # Equal columns rather than a flex row, so a wrapped line's chips stay the
-    # same width as the first line's
-    it "lays the chips out as evenly sized columns that wrap" do
+    # The grid itself is UI::ButtonGroup.layout_classes, covered in its spec
+    it "passes full_width through to the layout" do
       expect(component).to have_css("div.tw\\:grid")
-      expect(component.css("div").first["class"]).to include("repeat(auto-fit,minmax(4rem,1fr))")
     end
   end
 end

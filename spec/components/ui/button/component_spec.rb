@@ -91,7 +91,7 @@ RSpec.describe UI::Button::Component, type: :component do
     let(:color) { :secondary }
 
     it "renders the purple outline styles" do
-      expect(component.to_html).to include("tw:hover:border-purple-500")
+      expect(component.to_html).to include("tw:not-disabled:hover:border-purple-500")
     end
   end
 
@@ -110,14 +110,17 @@ RSpec.describe UI::Button::Component, type: :component do
       expect(component).to have_css("button[disabled]")
       tokens = component.css("button").first["class"].split
       expect(tokens).to include(*described_class::DISABLED_CLASSES.split)
-    end
-
-    # With pointer events off the browser takes the cursor from underneath the button,
-    # so not-allowed never renders
-    it "styles the cursor rather than dropping pointer events" do
-      expect(component.css("button").first["class"].split).to include("tw:disabled:cursor-not-allowed")
+      # With pointer events off the browser takes the cursor from underneath the button,
+      # so not-allowed never renders
       expect(component.to_html).to_not include("pointer-events-none")
     end
+  end
+
+  # Which is what keeps hover off a disabled button, now that nothing drops its pointer events
+  it "guards every hover utility with not-disabled" do
+    hovers = described_class::COLORS.values.flat_map(&:split).grep(/hover:/)
+    expect(hovers).to be_present
+    expect(hovers.grep_v(/\Atw:(?:dark:)?not-disabled:hover:/)).to eq([])
   end
 
   it "is not disabled by default" do

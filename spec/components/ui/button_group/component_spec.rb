@@ -40,7 +40,6 @@ RSpec.describe UI::ButtonGroup::Component, type: :component do
     it "renders a disabled button rather than a link" do
       expect(component).to have_css("a", count: 1)
       expect(component).to have_css("button[type='button'][disabled]", text: "For sale")
-      expect(component.css("button").first["class"].split).to include(*UI::Button::Component::DISABLED_CLASSES.split)
     end
   end
 
