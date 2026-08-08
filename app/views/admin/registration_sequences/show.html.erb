@@ -1,14 +1,9 @@
 <div class="tw:mx-auto tw:max-w-3xl tw:py-4">
-  <%# The template has no organization to name %>
-  <% previewing = [@registration_sequence.organization&.short_name, @registration_sequence.status_display].compact.join(" ") %>
-
-  <h1 class="uncap tw:mb-6 tw:text-2xl tw:font-semibold">
-    Previewing <strong><%= previewing %></strong> registration sequence
-  </h1>
+  <%= render Admin::RegistrationSequence::Header::Component.new(registration_sequence: @registration_sequence, previewing: true) %>
 
   <%#
     pt cancels the flow shell's negative top margin (padding doesn't collapse), so the
-    title sits above the gray rather than inside it
+    header sits above the gray rather than inside it
   %>
 
   <div class="tw:pt-9 tw:min-[992px]:pt-15">

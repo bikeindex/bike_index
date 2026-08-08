@@ -1,8 +1,15 @@
 <div class="tw:mb-3 tw:flex tw:items-baseline tw:justify-between tw:gap-4">
-  <h1 class="uncap">
-    <%= @registration_sequence.status_display %> registration sequence
-    <span class="tw:text-xl tw:font-normal tw:whitespace-nowrap tw:text-gray-500">· <%= helpers.number_display(pages.size) %> <%= "page".pluralize(pages.size) %></span>
-  </h1>
+  <%# Admin's own header already names the sequence, so only the page count is left to say %>
+  <% if @admin %>
+    <h2 class="uncap tw:mb-0 tw:text-xl tw:font-normal tw:text-gray-500">
+      <%= helpers.number_display(pages.size) %> <%= "page".pluralize(pages.size) %>
+    </h2>
+  <% else %>
+    <h1 class="uncap">
+      <%= @registration_sequence.status_display %> registration sequence
+      <span class="tw:text-xl tw:font-normal tw:whitespace-nowrap tw:text-gray-500">· <%= helpers.number_display(pages.size) %> <%= "page".pluralize(pages.size) %></span>
+    </h1>
+  <% end %>
 
   <% if @registration_sequence.editable? %>
     <%= render UI::ButtonLink::Component.new(href: new_page_path, color: :secondary, class: "tw:whitespace-nowrap") do %>

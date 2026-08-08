@@ -1,0 +1,20 @@
+<div
+  class="
+    tw:mb-6 tw:flex tw:flex-wrap tw:items-baseline tw:justify-between
+    tw:gap-x-4 tw:gap-y-1
+  "
+>
+  <h1 class="uncap tw:mb-0 tw:text-2xl tw:font-semibold">
+    <%= action_word %>
+    <strong><%= @registration_sequence.display_name %></strong> registration
+    sequence
+  </h1>
+
+  <div class="tw:flex tw:items-baseline tw:gap-4 tw:text-sm">
+    <%= link_to switch_text, switch_path, class: "twlink" %>
+
+    <% if organization_path.present? %>
+      <%= link_to "View in organization", organization_path, class: "twlink" %>
+    <% end %>
+  </div>
+</div>

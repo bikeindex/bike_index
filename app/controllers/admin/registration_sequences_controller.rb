@@ -14,7 +14,7 @@ module Admin
     # The faked registrant walk-through, one screen (?page=) per rule page plus the review
     # they end on. page is 1-indexed (Pagy); the preview component's index is 0-based.
     def show
-      @registration_sequence = RegistrationSequence.find(params[:id])
+      @registration_sequence = ::RegistrationSequence.find(params[:id])
       screen_count = BikeServices::Register.acknowledgment_step_count(@registration_sequence)
       @preview_pagy = Pagy::Offset.new(count: screen_count, limit: 1, page: permitted_page(max: screen_count))
     end
@@ -22,12 +22,12 @@ module Admin
     # Manage the sequence's pages and its sequence-wide settings. An activated sequence
     # renders read-only - acknowledgments reference it, so it can't change
     def edit
-      @registration_sequence = RegistrationSequence.find(params[:id])
+      @registration_sequence = ::RegistrationSequence.find(params[:id])
     end
 
     # The settings shared by every page: the FAQ link and the final acknowledgment
     def update
-      @registration_sequence = RegistrationSequence.editable.find(params[:id])
+      @registration_sequence = ::RegistrationSequence.editable.find(params[:id])
       if @registration_sequence.update(permitted_params)
         flash[:success] = "Registration sequence updated"
         redirect_to edit_admin_registration_sequence_path(@registration_sequence)
@@ -40,7 +40,7 @@ module Admin
     helper_method :matching_registration_sequences, :searchable_statuses
 
     def searchable_statuses
-      RegistrationSequence::STATUSES
+      ::RegistrationSequence::STATUSES
     end
 
     protected
@@ -54,7 +54,7 @@ module Admin
     end
 
     def matching_registration_sequences
-      registration_sequences = RegistrationSequence.all
+      registration_sequences = ::RegistrationSequence.all
       @status = searchable_statuses.include?(params[:search_status]) ? params[:search_status] : nil
       registration_sequences = registration_sequences.for_status(@status) if @status.present?
 
