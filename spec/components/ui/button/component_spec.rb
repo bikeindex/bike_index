@@ -176,15 +176,6 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
-  # TEMPORARY, alongside the retired-kind raise
-  context "with kind in html_options" do
-    let(:options) { {text: "Save", kind: :submit} }
-
-    it "raises, naming type" do
-      expect { instance }.to raise_error(ArgumentError, /kind is retired/)
-    end
-  end
-
   context "with class in html_options" do
     let(:options) { {text: "Open", class: "tw:text-xs"} }
 
