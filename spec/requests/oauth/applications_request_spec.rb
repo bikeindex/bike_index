@@ -102,6 +102,16 @@ RSpec.describe Oauth::ApplicationsController, type: :request do
         end
       end
 
+      context "confidential app" do
+        let(:current_user) { application_owner }
+        before { doorkeeper_app.update(confidential: true) }
+        it "renders the toggle checked" do
+          get "#{base_url}/#{doorkeeper_app.id}/edit"
+          expect(Capybara.string(response.body))
+            .to have_css("input#doorkeeper_application_confidential[checked]")
+        end
+      end
+
       context "no current user" do
         let(:current_user) { false }
         it "redirects if no user present" do
@@ -141,6 +151,15 @@ RSpec.describe Oauth::ApplicationsController, type: :request do
           put "#{base_url}/#{doorkeeper_app.id}", params: {doorkeeper_application: {name: "new thing"}}
           doorkeeper_app.reload
           expect(doorkeeper_app.name).to eq("new thing")
+        end
+
+        it "toggles confidential" do
+          expect(doorkeeper_app.confidential).to be_falsey
+          put "#{base_url}/#{doorkeeper_app.id}", params: {doorkeeper_application: {confidential: "1"}}
+          expect(doorkeeper_app.reload.confidential).to be_truthy
+          # The checkbox submits "0" when unchecked, so it can be turned back off
+          put "#{base_url}/#{doorkeeper_app.id}", params: {doorkeeper_application: {confidential: "0"}}
+          expect(doorkeeper_app.reload.confidential).to be_falsey
         end
       end
 

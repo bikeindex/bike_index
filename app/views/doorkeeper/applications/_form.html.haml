@@ -27,5 +27,10 @@
         Include <code>#{authorize_documentation_index_url}</code> to be able to add new tokens #{link_to "from the documentation", api_v3_documentation_index_url, tabindex: -1}.
   .form-group
     .offset-sm-2.col-sm-10
+      = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :confidential, label: "Confidential"))
+      %span.help-block
+        Require the client secret when exchanging authorization codes. Turn this on only if the app can keep the secret private — mobile apps, single page apps and CLIs can't, and should use #{link_to "PKCE", "#{api_v3_documentation_index_url}#ref_pkce", tabindex: -1} instead.
+  .form-group
+    .offset-sm-2.col-sm-10
       = f.submit 'Submit', class: "btn btn-primary"
       = link_to "Cancel", oauth_applications_path, class: "btn btn-secondary"
