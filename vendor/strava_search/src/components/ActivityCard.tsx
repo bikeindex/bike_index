@@ -181,7 +181,7 @@ export const ActivityCard = memo(function ActivityCard({
 
             {topTenRanks.length > 0 && (
               <span
-                className="text-[#fc4c02] font-medium"
+                className="font-medium"
                 title={`Placed on ${topTenRanks.length} all-time segment leaderboard${topTenRanks.length > 1 ? 's' : ''}`}
               >
                 🏅 top 10: {topTenRanks.slice(0, 5).map((rank) => `#${rank}`).join(', ')}
