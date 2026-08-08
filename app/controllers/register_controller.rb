@@ -44,7 +44,7 @@ class RegisterController < ApplicationController
       render Register::StepFinished::Component.new(b_param: @b_param, current_user:)
     when "review"
       @page_title = I18n.t("meta_titles.register_review", cycle_type: @b_param.type)
-      render Register::StepReview::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:)
+      render Register::StepAcknowledgmentReview::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:)
     when "2"
       @page_title = I18n.t("meta_titles.register_step_2", cycle_type: @b_param.type)
       render Register::Step2::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Register
-  module StepReview
+  module StepAcknowledgmentReview
     # The last of the e-vehicle pages: what was acknowledged, and the acknowledgment
     # binding the registrant to it
     class Component < ApplicationComponent

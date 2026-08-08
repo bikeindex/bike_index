@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Register
-  module StepReview
+  module StepAcknowledgmentReview
     # The acknowledgment the rule pages end at, rendered from an organization's live sequence
     class ComponentPreview < ApplicationComponentPreview
       # Signing for themselves, so the account's name is what's bound
@@ -23,7 +23,7 @@ module Register
         pages = ::BikeServices::Register.sequence_pages(sequence)
         return missing_notice("a registration sequence with pages") if pages.none?
 
-        render(Register::StepReview::Component.new(sequence:, current_user: lookbook_user,
+        render(Register::StepAcknowledgmentReview::Component.new(sequence:, current_user: lookbook_user,
           b_param: preview_b_param(sequence, pages.map(&:id), bike)))
       end
 
