@@ -4,6 +4,9 @@
 module SamlHelpers
   SAML_NS = "urn:oasis:names:tc:SAML:2.0:assertion"
   SAMLP_NS = "urn:oasis:names:tc:SAML:2.0:protocol"
+  MD_NS = "urn:oasis:names:tc:SAML:2.0:metadata"
+  XMLENC_NS = "http://www.w3.org/2001/04/xmlenc#"
+  XMLDSIG_NS = "http://www.w3.org/2000/09/xmldsig#"
   EMAIL_OID = OrganizationSamlConfiguration::DEFAULT_EMAIL_ATTRIBUTE
 
   def saml_idp_key
@@ -12,6 +15,10 @@ module SamlHelpers
 
   def saml_idp_cert
     @saml_idp_cert ||= OpenSSL::X509::Certificate.new(File.read(Rails.root.join("spec/fixtures/saml/idp_cert.pem")))
+  end
+
+  def saml_sp_cert
+    @saml_sp_cert ||= OpenSSL::X509::Certificate.new(File.read(Rails.root.join("spec/fixtures/saml/sp_cert.pem")))
   end
 
   # The AuthnRequest ID from an init redirect (HTTP-Redirect binding = deflated + base64)
@@ -23,7 +30,7 @@ module SamlHelpers
 
   def signed_saml_response(audience:, recipient:, in_response_to:, email:,
     name_id: nil, issuer: "https://idp.example.edu/", not_on_or_after: nil,
-    sign: true, tamper: false, email_attribute: EMAIL_OID)
+    sign: true, tamper: false, encrypt: false, email_attribute: EMAIL_OID)
     name_id ||= email
     not_on_or_after ||= (Time.current + 5.minutes).utc.iso8601
     assertion_id = "_#{SecureRandom.uuid}"
@@ -34,6 +41,7 @@ module SamlHelpers
     if tamper
       assertion = assertion.sub(%r{(<ds:SignatureValue[^>]*>)[^<]+}, '\1TAMPEREDSIGNATUREVALUE==')
     end
+    assertion = encrypted_assertion_xml(assertion) if encrypt
 
     # Collapse only the wrapper, then inject the signed assertion so its signed bytes stay intact
     wrapper = collapse(saml_response_xml(issuer:, destination: recipient, in_response_to:, assertion: "SIGNED_ASSERTION"))
@@ -45,6 +53,31 @@ module SamlHelpers
   # Strip whitespace between tags (the signed assertion has none, so this leaves it byte-intact)
   def collapse(xml)
     xml.gsub(/>\s+</, "><").strip
+  end
+
+  # What an IdP that encrypts does: a one-off AES key encrypts the assertion, and the SP's
+  # public key — the one our metadata publishes — encrypts that AES key.
+  def encrypted_assertion_xml(assertion_xml)
+    cipher = OpenSSL::Cipher.new("AES-256-CBC").encrypt
+    session_key = cipher.random_key
+    ciphertext = cipher.random_iv + cipher.update(assertion_xml) + cipher.final
+    encrypted_key = saml_sp_cert.public_key
+      .public_encrypt(session_key, OpenSSL::PKey::RSA::PKCS1_OAEP_PADDING)
+
+    collapse(<<~XML)
+      <saml:EncryptedAssertion xmlns:saml="#{SAML_NS}">
+        <xenc:EncryptedData xmlns:xenc="#{XMLENC_NS}" Type="#{XMLENC_NS}Element">
+          <xenc:EncryptionMethod Algorithm="#{XMLENC_NS}aes256-cbc"/>
+          <ds:KeyInfo xmlns:ds="#{XMLDSIG_NS}">
+            <xenc:EncryptedKey>
+              <xenc:EncryptionMethod Algorithm="#{XMLENC_NS}rsa-oaep-mgf1p"/>
+              <xenc:CipherData><xenc:CipherValue>#{Base64.strict_encode64(encrypted_key)}</xenc:CipherValue></xenc:CipherData>
+            </xenc:EncryptedKey>
+          </ds:KeyInfo>
+          <xenc:CipherData><xenc:CipherValue>#{Base64.strict_encode64(ciphertext)}</xenc:CipherValue></xenc:CipherData>
+        </xenc:EncryptedData>
+      </saml:EncryptedAssertion>
+    XML
   end
 
   def sign_saml_assertion(assertion_xml, assertion_id)
