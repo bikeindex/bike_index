@@ -2,7 +2,7 @@
   id="<%= @id %>"
   data-controller="ui--modal"
   data-ui--modal-open-on-connect-value="<%= @open %>"
-  data-action="click->ui--modal#backdropClick keydown->ui--modal#handleKeydown"
+  data-action="click->ui--modal#backdropClick close->ui--modal#closed command->ui--modal#invoked"
   class="
     tw:m-auto tw:max-h-dvh tw:w-full tw:max-w-lg tw:overflow-y-auto
     tw:overscroll-contain tw:bg-transparent tw:px-4 tw:backdrop:bg-black/50
@@ -35,7 +35,8 @@
 
         <button
           type="button"
-          data-action="click->ui--modal#close"
+          commandfor="<%= @id %>"
+          command="close"
           aria-label="Close"
           class="
             tw:text-gray-400 tw:hover:text-gray-600
