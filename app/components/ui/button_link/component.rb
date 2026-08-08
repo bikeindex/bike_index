@@ -3,14 +3,18 @@
 module UI
   module ButtonLink
     class Component < ApplicationComponent
-      def initialize(href:, text: nil, color: :secondary, size: :md, active: false, method: nil, **html_options)
+      def initialize(href:, text: nil, color: :secondary, size: :md, active: false, method: nil, html_class: nil, **html_options)
         @text = text
         @href = href
-        @color = UI::Button::Component::COLORS.key?(color) ? color : :secondary
+        @color = color
         @size = UI::Button::Component::SIZES.key?(size) ? size : :md
         @active = active
         @method = method
+        @html_class = html_class
+        @data = html_options.delete(:data) || {}
         @html_options = html_options
+
+        UI::Button::Component.validate_options!(color: @color, size: @size, html_options:)
       end
 
       # Passing method: renders a button_to form (a styled button that submits a
@@ -31,11 +35,11 @@ module UI
       end
 
       def html_attributes
-        @html_options.merge(class: link_classes, data: (@html_options[:data] || {}).merge(active: @active || nil))
+        @html_options.merge(class: link_classes, data: @data.merge(active: @active || nil))
       end
 
       def link_classes
-        UI::Button::Component.build_classes(color: @color, size: @size, html_class: @html_options[:class])
+        UI::Button::Component.build_classes(color: @color, size: @size, html_class: @html_class)
       end
     end
   end

@@ -95,11 +95,11 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
-  context "with invalid color" do
+  context "with an unknown color" do
     let(:color) { :invalid }
 
-    it "falls back to secondary" do
-      expect(component.to_html).to include("tw:bg-white")
+    it "raises, naming the colors it takes" do
+      expect { instance }.to raise_error(ArgumentError, /unknown color :invalid, expected one of: primary, secondary/)
     end
   end
 
@@ -186,6 +186,14 @@ RSpec.describe UI::Button::Component, type: :component do
     # It would be dropped for the built classes, so say so rather than ignoring it
     it "raises, naming html_class" do
       expect { instance }.to raise_error(ArgumentError, /you must use the keyword arg html_class/)
+    end
+  end
+
+  context "with an html_option the component doesn't know" do
+    let(:options) { {text: "Search", form: "search-form"} }
+
+    it "passes it through" do
+      expect(component).to have_css("button[form='search-form']")
     end
   end
 
