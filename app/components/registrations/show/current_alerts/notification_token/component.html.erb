@@ -20,7 +20,7 @@
         <%= form.hidden_field :token, value: @token %>
         <%= form.hidden_field :token_type, value: @token_type %>
 
-        <%= render(UI::Button::Component.new(text: resolve_button_text, color: :purple, kind: :submit)) %>
+        <%= render(UI::Button::Component.new(text: resolve_button_text, color: :purple, type: "submit")) %>
       <% end %>
     <% end %>
   </div>

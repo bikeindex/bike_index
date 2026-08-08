@@ -35,7 +35,7 @@ RSpec.describe UI::Button::Component, type: :component do
   end
 
   context "with spinner" do
-    let(:options) { {text:, kind: :submit, spinner: true} }
+    let(:options) { {text:, type: "submit", spinner: true} }
 
     it "renders a self-wired hidden spinner that inherits the button's text color" do
       expect(component).to have_css("button[data-controller='ui--button--submit-spinner']")
@@ -46,7 +46,7 @@ RSpec.describe UI::Button::Component, type: :component do
   end
 
   context "with name and value" do
-    let(:options) { {text:, kind: :submit, name: "impound_claim[status]", value: "submitting"} }
+    let(:options) { {text:, type: "submit", name: "impound_claim[status]", value: "submitting"} }
 
     it "submits the value, so a second submit button can say which was pressed" do
       expect(component).to have_css("button[type='submit'][name='impound_claim[status]'][value='submitting']")
@@ -144,9 +144,10 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
-  context "with submit kind" do
-    let(:options) { {text: "Submit", kind: :submit} }
+  context "with type submit" do
+    let(:options) { {text: "Submit", type: "submit"} }
 
+    # type is the one attribute html_options replaces rather than adds to
     it "renders submit button" do
       expect(component).to have_css("button[type='submit']")
     end
@@ -164,6 +165,23 @@ RSpec.describe UI::Button::Component, type: :component do
 
     it "renders data attributes" do
       expect(component).to have_css("button[data-action='click->ui--modal#open']")
+    end
+  end
+
+  context "with an html_option the component doesn't know" do
+    let(:options) { {text: "Search", form: "search-form"} }
+
+    it "passes it through" do
+      expect(component).to have_css("button[form='search-form']")
+    end
+  end
+
+  context "with class in html_options" do
+    let(:options) { {text: "Open", class: "tw:text-xs"} }
+
+    # It would be dropped for the built classes, so say so rather than ignoring it
+    it "raises, naming html_class" do
+      expect { instance }.to raise_error(ArgumentError, /you must use the keyword arg html_class/)
     end
   end
 

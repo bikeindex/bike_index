@@ -38,8 +38,6 @@ module UI
         link: "tw:is-active:text-blue-700 tw:is-active:dark:text-blue-300 tw:is-active:font-bold tw:is-active:underline"
       }.freeze
 
-      KINDS = %i[button submit]
-
       DISABLED_CLASSES = "tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:disabled:pointer-events-none"
 
       # is-active sorts after focus, so an active button's ring-2 swallows the focus ring
@@ -55,25 +53,26 @@ module UI
 
       # name/value are submitted with the form when this button is the one clicked, which
       # is how a form with more than one submit says which was pressed
-      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, kind: nil, disabled: false, spinner: false, name: nil, value: nil, data: {}, aria: {})
+      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, spinner: false, name: nil, value: nil, **html_options)
         @text = text
         @name = name
         @value = value
         @color = COLORS.key?(color) ? color : :secondary
-        @kind = KINDS.include?(kind&.to_sym) ? kind.to_sym : KINDS.first
         @active = active
         @html_class = html_class
-        @disabled = disabled
         @spinner = spinner
-        @data = data
-        @aria = aria
+        @html_options = html_options
 
         @size = SIZES.key?(size) ? size : :md
         raise ArgumentError, "size is not supported for link color" if @color == :link && @size != :md
+        # The component builds its own class, so a passed one is dropped rather than merged
+        raise ArgumentError, "class is not supported, you must use the keyword arg html_class" if html_options.key?(:class)
       end
 
+      # type leads, as the default a caller can replace; the rest follow html_options,
+      # so the component's own attributes can't be overwritten
       def call
-        content_tag(:button, safe_join([spinner_span, @text || content].compact), class: button_classes, type: (@kind == :submit) ? "submit" : "button", disabled: @disabled, name: @name, value: @value, data: button_data, aria: @aria)
+        content_tag(:button, safe_join([spinner_span, @text || content].compact), type: "button", **@html_options, class: button_classes, name: @name, value: @value, data: button_data)
       end
 
       def button_classes
@@ -82,8 +81,9 @@ module UI
 
       private
 
+      # The only html_option the component adds to rather than passes through
       def button_data
-        data = @data.merge(active: @active || nil)
+        data = (@html_options[:data] || {}).merge(active: @active || nil)
         return data unless @spinner
 
         data.merge(controller: [data[:controller], "ui--button--submit-spinner"].compact.join(" "))
