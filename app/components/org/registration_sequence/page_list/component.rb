@@ -10,7 +10,7 @@ module Org
         def initialize(registration_sequence:, admin: false)
           @registration_sequence = registration_sequence
           @editable = registration_sequence.editable?
-          @paths = RegistrationSequencePaths.new(admin:)
+          @admin = admin
         end
 
         private
@@ -28,8 +28,10 @@ module Org
           collapse = {controller: "ui--collapse"}
           return collapse unless @editable
 
-          collapse.merge(sortable_target: "item", url: @paths.page(page))
+          collapse.merge(sortable_target: "item", url: RegistrationSequencePaths.page(page, admin: @admin))
         end
+
+        def edit_page_path(page) = RegistrationSequencePaths.edit_page(page, admin: @admin)
       end
     end
   end

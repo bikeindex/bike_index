@@ -10,7 +10,7 @@ module Org
         def initialize(registration_sequence:, index: 0, admin: false)
           @registration_sequence = registration_sequence
           @index = index
-          @paths = RegistrationSequencePaths.new(admin:)
+          @admin = admin
         end
 
         def render?
@@ -55,11 +55,11 @@ module Org
         # A GET form appends ?page= from a hidden field, since a form's own query string
         # is dropped on submit
         def sequence_path(page: nil)
-          @paths.sequence(@registration_sequence, page:)
+          RegistrationSequencePaths.sequence(@registration_sequence, page:, admin: @admin)
         end
 
         def exit_path
-          @paths.preview_exit(@registration_sequence)
+          RegistrationSequencePaths.preview_exit(@registration_sequence, admin: @admin)
         end
       end
     end

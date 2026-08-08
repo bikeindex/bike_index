@@ -10,7 +10,6 @@ module Org
         def initialize(registration_sequence:, admin: false)
           @registration_sequence = registration_sequence
           @admin = admin
-          @paths = RegistrationSequencePaths.new(admin:)
         end
 
         private
@@ -18,6 +17,10 @@ module Org
         def pages
           @pages ||= @registration_sequence.registration_sequence_pages.to_a
         end
+
+        def new_page_path = RegistrationSequencePaths.new_page(@registration_sequence, admin: @admin)
+
+        def sequence_path = RegistrationSequencePaths.sequence(@registration_sequence, admin: @admin)
       end
     end
   end

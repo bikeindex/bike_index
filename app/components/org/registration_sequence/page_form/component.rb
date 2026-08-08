@@ -8,7 +8,7 @@ module Org
         def initialize(page:, admin: false)
           @page = page
           @registration_sequence = page.registration_sequence
-          @paths = RegistrationSequencePaths.new(admin:)
+          @admin = admin
         end
 
         private
@@ -17,8 +17,12 @@ module Org
         def editing? = @page.persisted?
 
         def form_url
-          editing? ? @paths.page(@page) : @paths.pages(@registration_sequence)
+          editing? ? page_path : RegistrationSequencePaths.pages(@registration_sequence, admin: @admin)
         end
+
+        def page_path = RegistrationSequencePaths.page(@page, admin: @admin)
+
+        def sequence_path = RegistrationSequencePaths.edit(@registration_sequence, admin: @admin)
       end
     end
   end

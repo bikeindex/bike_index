@@ -5,7 +5,7 @@
   </h1>
 
   <% if @registration_sequence.editable? %>
-    <%= render UI::ButtonLink::Component.new(href: @paths.new_page(@registration_sequence), color: :secondary, class: "tw:whitespace-nowrap") do %>
+    <%= render UI::ButtonLink::Component.new(href: new_page_path, color: :secondary, class: "tw:whitespace-nowrap") do %>
       <span aria-hidden="true">+</span> Add page
     <% end %>
   <% end %>
@@ -15,7 +15,7 @@
 
 <%= render UI::Card::Component.new(additional_classes: "tw:mt-8") do %>
   <% if @registration_sequence.editable? %>
-    <%= form_with model: @registration_sequence, url: @paths.sequence(@registration_sequence), method: :patch do |f| %>
+    <%= form_with model: @registration_sequence, url: sequence_path, method: :patch do |f| %>
       <div class="tw:flex tw:flex-col tw:gap-4">
         <div>
           <%= f.label :faq_url, "FAQ link", class: "twlabel" %>
@@ -57,4 +57,4 @@
   <% end %>
 <% end %>
 
-<%= render UI::ButtonLink::Component.new(text: "Preview", href: @paths.sequence(@registration_sequence), color: :secondary, size: :lg, class: "tw:mt-8 tw:w-full") %>
+<%= render UI::ButtonLink::Component.new(text: "Preview", href: sequence_path, color: :secondary, size: :lg, class: "tw:mt-8 tw:w-full") %>
