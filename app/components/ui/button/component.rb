@@ -71,6 +71,8 @@ module UI
 
         @size = SIZES.key?(size) ? size : :md
         raise ArgumentError, "size is not supported for link color" if @color == :link && @size != :md
+        # The component builds its own class, so a passed one is dropped rather than merged
+        raise ArgumentError, "class is not supported, you must use the keyword arg html_class" if html_options.key?(:class)
       end
 
       # html_options first, so the component's own attributes can't be overwritten

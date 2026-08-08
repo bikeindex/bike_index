@@ -187,6 +187,15 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
+  context "with class in html_options" do
+    let(:options) { {text: "Open", class: "tw:text-xs"} }
+
+    # It would be dropped for the built classes, so say so rather than ignoring it
+    it "raises, naming html_class" do
+      expect { instance }.to raise_error(ArgumentError, /you must use the keyword arg html_class/)
+    end
+  end
+
   it "always applies the active classes (inert until data-active/pressed)" do
     tokens = component.css("button").first["class"].split
     expect(tokens).to include("tw:is-active:ring-2", "tw:is-active:bg-gray-200")
