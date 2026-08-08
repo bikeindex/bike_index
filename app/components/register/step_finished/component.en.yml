@@ -3,10 +3,10 @@ en:
   components:
     register:
       step_finished:
-        add_impound_details: Add impound details if you've found it
+        add_impound_details: Add details about where you found the %{cycle_type}
         add_photos: Add photos of your %{cycle_type}
         confirming_lets_you: 'Confirming your email lets you:'
-        register_another: Register another %{cycle_type}
+        register_another: Register another vehicle
         registered_for_owner_html: >-
           The %{bike_display} is registered with Bike Index. We've emailed %{email}
           so they can claim the registration.

@@ -74,7 +74,7 @@ RSpec.describe "Register flow", :js, type: :system do
     click_button "Next"
     expect(page).to have_current_path(details_url, url: true)
 
-    # Confirming abandons it for a blank registration, which has nothing to start over from
+    # Confirming swaps it for a blank registration, which has nothing to start over from
     click_link "Back"
     open_modal(find_button("Start over"))
     click_link "Yes, start over"

@@ -3838,12 +3838,20 @@ en:
     registrations_embed: >-
       Embedable %{organization} Bike Index registration form. Register your bike for
       free, right now
+    search_marketplace_index: >-
+      Bikes for sale on Bike Index. Search the marketplace by manufacturer, price
+      and location.
+    search_registrations_index: Search for bikes that have been registered on Bike
+      Index
     sessions_create: Log in to Bike Index
     sessions_new: Log in to Bike Index
     stolen_index: Bike Index helps recover your stolen bike
     stolen_merging: >-
       StolenBicycleRegistry.com merged with Bike Index in 2014 to become the largest
       open bike registration service in the world
+    strava_search_index: >-
+      Associate your Strava gear with your Bike Index registrations. Search, filter,
+      and bulk-update your activities to assign gear to rides that are missing it.
     users_new: Sign up for Bike Index
     welcome_index: 'The best bike registry: Simple, secure and free.'
   meta_titles:
@@ -3881,10 +3889,12 @@ en:
     register_step_1: Register your %{cycle_type}!
     register_step_2: Add your %{cycle_type}'s details
     registrations_embed: Register a bike with %{organization}
+    search_marketplace_index: Bike Index Marketplace
     search_registrations_index: Search results
     sessions_create: Log in
     sessions_new: Log in
     stolen_index: Bike registry
+    strava_search_index: Bike Index Strava Search
     users_accept_terms: Terms of use - Bike Index
     users_accept_vendor_terms: Organization terms - Bike Index
     users_confirm: Confirm your email - Bike Index

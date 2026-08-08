@@ -33,11 +33,12 @@ module Register
           org_name: ERB::Util.html_escape(organization.short_name))
       end
 
-      # Discarding the registration shouldn't discard how they arrived - the
-      # organization it's attributed to, or the status they came to report. The
-      # raw status, since BParam#status answers status_with_owner for an unset one
+      # Names this registration rather than leaving it to the session, which another tab
+      # may have moved on. Discarding it shouldn't discard how they arrived - the
+      # organization it's attributed to, or the status they came to report. The raw
+      # status, since BParam#status answers status_with_owner for an unset one
       def start_over_path
-        new_register_path({b_param_token: false, organization_id: organization&.slug,
+        new_register_path({discard_token: @b_param.id_token, organization_id: organization&.slug,
                            status: @b_param.bike["status"]}.compact)
       end
 
