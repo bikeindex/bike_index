@@ -19,7 +19,7 @@ RSpec.describe "emailed token routes", type: :request do
       {interstitial: "app/views/users/unsubscribe.html.haml",
        get_path: "/users/1/unsubscribe", get_endpoint: "users#unsubscribe",
        post_path: "/users/1/unsubscribe_update", post_endpoint: "users#unsubscribe_update"},
-      {interstitial: "app/components/register/confirm/component.html.erb",
+      {interstitial: "app/components/register/step_confirm/component.html.erb",
        get_path: "/register/confirm", get_endpoint: "register#confirm",
        post_path: "/register/confirm_email", post_endpoint: "register#confirm_email"}
     ]

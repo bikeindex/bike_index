@@ -34,6 +34,18 @@ module BikeServices
         .detect { |b| b.creator_id.blank? || b.creator_id == user&.id || b.created_bike_id.present? }
     end
 
+    # The start over link. Destroyed rather than left behind: its token would still resume
+    # it, and it would go on alerting its creator to come back to what they discarded.
+    # Kept once a confirmation link is out - that email promises the address it can still
+    # finish this registration
+    def discard(token:, user:)
+      b_param = find_token(params_token: token, user:)
+      return unless b_param&.origin == "register_flow" && !b_param.with_bike? &&
+        b_param.email_confirmation_sent_at.blank?
+
+      b_param.destroy
+    end
+
     # An organization can be named in the URL after the registration starts
     # (/register?...&organization_id=slug), right up until the bike is created
     def assign_organization(b_param, organization)

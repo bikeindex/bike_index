@@ -37,6 +37,17 @@ module Register
       def owner_email_tag
         content_tag(:strong, @b_param.owner_email)
       end
+
+      # Only a found registration has an impound record to fill in
+      def found?
+        %w[status_abandoned status_impounded unregistered_parking_notification].include?(@b_param.status)
+      end
+
+      # Registering again stays with the organization they arrived through, rather
+      # than dropping them onto an unattributed registration
+      def register_another_path
+        new_register_path({organization_id: @b_param.creation_organization&.slug}.compact)
+      end
     end
   end
 end
