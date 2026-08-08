@@ -39,6 +39,8 @@
   <% admin_body_class = "news-page" if controller_name == "news" %>
 
   <body id="<%= page_id %>" class="<%= admin_body_class || body_class %>">
+    <%= render(PageBlock::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
+
     <nav class="navbar navbar-expand-md navbar-light bg-light admin-navbar more">
       <span class="navbar-brand">
         <%= link_to (image_tag("logo.svg")), user_root_url %>
