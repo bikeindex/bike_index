@@ -40,7 +40,9 @@ RSpec.describe UI::ButtonGroup::Component, type: :component do
     it "renders a disabled button rather than a link" do
       expect(component).to have_css("a", count: 1)
       expect(component).to have_css("button[type='button'][disabled]", text: "For sale")
-      expect(component.css("button").first["class"].split).to include("tw:disabled:pointer-events-none")
+      expect(component.css("button").first["class"].split).to include("tw:disabled:cursor-not-allowed")
+      # pointer-events-none would stop the browser applying that cursor
+      expect(component.css("button").first["class"]).to_not include("pointer-events-none")
     end
   end
 
