@@ -6,5 +6,5 @@ class SitemapPages
     privacy terms vendor_terms security how_not_to_buy_stolen lightspeed
     ascend why-donate membership].freeze
 
-  ADDITIONAL = ["where", "organizations/new", "documentation/api_v3", "recovery_stories"].freeze
+  ADDITIONAL = ["where", "organizations/new", "documentation/api_v3", "recovery_stories", "strava_search"].freeze
 end
