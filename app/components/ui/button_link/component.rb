@@ -11,6 +11,7 @@ module UI
         @active = active
         @method = method
         @html_class = html_class
+        @data = html_options.delete(:data) || {}
         @html_options = html_options
 
         UI::Button::Component.validate_options!(color: @color, size: @size, html_options:)
@@ -34,7 +35,7 @@ module UI
       end
 
       def html_attributes
-        @html_options.merge(class: link_classes, data: (@html_options[:data] || {}).merge(active: @active || nil))
+        @html_options.merge(class: link_classes, data: @data.merge(active: @active || nil))
       end
 
       def link_classes

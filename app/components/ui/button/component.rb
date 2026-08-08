@@ -69,16 +69,17 @@ module UI
         @active = active
         @html_class = html_class
         @spinner = spinner
+        @type = html_options.delete(:type) || "button"
+        @data = html_options.delete(:data) || {}
         @html_options = html_options
 
         @size = SIZES.key?(size) ? size : :md
         self.class.validate_options!(color: @color, size: @size, html_options:)
       end
 
-      # type leads, as the default a caller can replace; the rest follow html_options,
-      # so the component's own attributes can't be overwritten
+      # html_options lead, so the component's own attributes can't be overwritten
       def call
-        content_tag(:button, safe_join([spinner_span, @text || content].compact), type: "button", **@html_options, class: button_classes, name: @name, value: @value, data: button_data)
+        content_tag(:button, safe_join([spinner_span, @text || content].compact), **@html_options, type: @type, class: button_classes, name: @name, value: @value, data: button_data)
       end
 
       def button_classes
@@ -87,9 +88,8 @@ module UI
 
       private
 
-      # The only html_option the component adds to rather than passes through
       def button_data
-        data = (@html_options[:data] || {}).merge(active: @active || nil)
+        data = @data.merge(active: @active || nil)
         return data unless @spinner
 
         data.merge(controller: [data[:controller], "ui--button--submit-spinner"].compact.join(" "))
