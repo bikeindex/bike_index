@@ -1,9 +1,5 @@
 .container
-  .text-center
-    %h3
-      = t(".you_should_be_unsubscribed_automatically")
-    %p= t(".if_not_click_button")
-    = form_tag unsubscribe_update_user_path(@user.signed_id(purpose: :unsubscribe, expires_in: 365.days)), id: "unsubscribe_update", method: "post" do
-      %input{ type: "submit", value: t(".unsubscribe"), class: 'btn btn-success btn-lg' }
-    :javascript
-      document.forms["unsubscribe_update"].submit()
+  - unsubscribe_url = unsubscribe_update_user_path(@user.signed_id(purpose: :unsubscribe, expires_in: 365.days))
+  = render Sessions::SignInInterstitial::Component.new(url: unsubscribe_url,
+    heading: t(".you_should_be_unsubscribed_automatically"),
+    submit_text: t(".unsubscribe"))
