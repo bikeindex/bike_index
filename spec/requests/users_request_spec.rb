@@ -463,6 +463,8 @@ RSpec.describe UsersController, type: :request do
       og_token = user.token_for_password_reset
       post "#{base_url}/update_password_with_reset_token", params: valid_params
       expect(response).to redirect_to my_account_url
+      # Signing in doesn't replace it with the generic "Logged in!"
+      expect(flash[:success]).to match(/password reset successfully/i)
       user.reload
       expect(user.token_for_password_reset).to_not eq og_token
       expect(user.auth_token).to_not eq og_auth
@@ -681,6 +683,9 @@ RSpec.describe UsersController, type: :request do
       expect(assigns(:user)&.id).to eq user.id
       expect(response.code).to eq("200")
       expect(response).to render_template("users/unsubscribe")
+      # The rendered interstitial posts to unsubscribe_update, it doesn't unsubscribe here
+      expect(Capybara.string(response.body))
+        .to have_css("form[action^='#{base_url}/'][action$='/unsubscribe_update']")
       expect(flash).to be_blank
       expect(user.reload.notification_newsletters).to be_truthy
     end

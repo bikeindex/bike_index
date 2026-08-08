@@ -85,7 +85,9 @@ module Sessionable
       flash[:notice] = {translation_key: signed_up ? :signed_up : :signed_in,
                         url: update_password_form_with_reset_token_users_path}
     else
-      flash[:success] = translation(:logged_in, scope: SIGN_IN_SCOPE)
+      # Generic, so it doesn't replace what the caller already said - resetting a password
+      # signs in too, and "Logged in!" isn't the news there
+      flash[:success] ||= translation(:logged_in, scope: SIGN_IN_SCOPE)
     end
   end
 
