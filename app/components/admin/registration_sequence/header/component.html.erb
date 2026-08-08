@@ -4,17 +4,18 @@
     tw:gap-x-4 tw:gap-y-1
   "
 >
-  <h1 class="uncap tw:mb-0 tw:text-2xl tw:font-semibold">
-    <%= action_word %>
-    <strong><%= @registration_sequence.display_name %></strong> registration
-    sequence
-  </h1>
+  <div class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-4 tw:gap-y-1">
+    <h1 class="uncap tw:mb-0 tw:text-2xl tw:font-semibold">
+      <%= action_word %>
+      <strong><%= @registration_sequence.display_name %></strong> registration
+      sequence
+    </h1>
 
-  <div class="tw:flex tw:items-baseline tw:gap-4 tw:text-sm">
-    <%= link_to switch_text, switch_path, class: "twlink" %>
-
-    <% if organization_path.present? %>
-      <%= link_to "View in organization", organization_path, class: "twlink" %>
-    <% end %>
+    <%= render UI::ButtonLink::Component.new(text: switch_text, href: switch_path, color: :secondary, size: :sm, html_class: "tw:whitespace-nowrap") %>
   </div>
+
+  <%# ml-auto keeps it against the right edge on its own line, once the title wraps it there %>
+  <% if organization_path.present? %>
+    <%= link_to "View in organization", organization_path, class: "twlink tw:ml-auto tw:text-sm" %>
+  <% end %>
 </div>
