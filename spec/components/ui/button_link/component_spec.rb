@@ -25,7 +25,7 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
 
   it "always applies the active classes (inert until data-active/pressed)" do
     tokens = component.css("a").first["class"].split
-    expect(tokens).to include("tw:is-active:ring-2", "tw:is-active:bg-gray-200")
+    expect(tokens).to include("tw:is-active:ring-2", "tw:is-active:bg-purple-500")
     expect(component).to have_no_css("a[data-active]")
   end
 

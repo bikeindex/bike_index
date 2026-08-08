@@ -4,8 +4,8 @@ require "rails_helper"
 
 RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
   let(:entries) { [{value: "", label: "All"}, {value: "active", label: "Active"}] }
-  let(:button) { UI::Button::Component.build_classes(color: :purple_outline, size: :md) }
-  let(:button_active) { UI::Button::Component::ACTIVE_COLORS[:purple_outline] }
+  let(:button) { UI::Button::Component.build_classes(color: :secondary, size: :md) }
+  let(:button_active) { UI::Button::Component::ACTIVE_COLORS[:secondary] }
 
   # Every purple-* color utility a class string uses, ignoring variant prefixes
   # (hover:, dark:, has-[:checked]:, is-active:, …) so the group's
@@ -30,7 +30,7 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
     expect(component).to have_css("label span", text: "Active")
   end
 
-  it "uses the same purple palette as UI::Button's purple_outline" do
+  it "uses the same purple palette as UI::Button's secondary" do
     expect(purple_tokens(label)).not_to be_empty
     expect(purple_tokens(label)).to eq(purple_tokens(button))
   end

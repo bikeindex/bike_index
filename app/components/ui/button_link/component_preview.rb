@@ -8,6 +8,7 @@ module UI
         render(UI::ButtonLink::Component.new(text: "Primary Link", href: "#", color: :primary))
       end
 
+      # White link with a purple outline (fills purple when active)
       def secondary
         render(UI::ButtonLink::Component.new(text: "Secondary Link", href: "#", color: :secondary))
       end
@@ -24,11 +25,6 @@ module UI
       # Filled purple primary
       def purple
         render(UI::ButtonLink::Component.new(text: "Purple Link", href: "#", color: :purple))
-      end
-
-      # White link with a purple outline (toggles to a purple tint when active)
-      def purple_outline
-        render(UI::ButtonLink::Component.new(text: "Purple outline", href: "#", color: :purple_outline))
       end
 
       def link

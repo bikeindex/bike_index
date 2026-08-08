@@ -26,6 +26,7 @@ module UI
         render(UI::Button::Component.new(text: "Primary Active", color: :primary, active: true))
       end
 
+      # White button with a purple outline (fills purple when active)
       # @label secondary (with data)
       def secondary
         render(UI::Button::Component.new(text: "Secondary", color: :secondary, data: {action: "click->ui--modal#open"}))
@@ -72,15 +73,6 @@ module UI
 
       def purple_active
         render(UI::Button::Component.new(text: "Purple Active", color: :purple, active: true))
-      end
-
-      # White button with a purple outline (toggles to a purple tint when active)
-      def purple_outline
-        render(UI::Button::Component.new(text: "Purple outline", color: :purple_outline))
-      end
-
-      def purple_outline_active
-        render(UI::Button::Component.new(text: "Purple Outline Active", color: :purple_outline, active: true))
       end
 
       # @!endgroup

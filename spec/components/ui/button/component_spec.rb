@@ -15,7 +15,7 @@ RSpec.describe UI::Button::Component, type: :component do
     expect(component).to have_text("Click me")
     html = component.to_html
     expect(html).to include("tw:bg-white")
-    expect(html).to include("tw:border-gray-300")
+    expect(html).to include("tw:border-gray-200")
   end
 
   context "with primary color" do
@@ -87,10 +87,10 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
-  context "with purple_outline color" do
-    let(:color) { :purple_outline }
+  context "with secondary color" do
+    let(:color) { :secondary }
 
-    it "renders purple_outline styles" do
+    it "renders the purple outline styles" do
       expect(component.to_html).to include("tw:hover:border-purple-500")
     end
   end
@@ -206,7 +206,7 @@ RSpec.describe UI::Button::Component, type: :component do
 
   it "always applies the active classes (inert until data-active/pressed)" do
     tokens = component.css("button").first["class"].split
-    expect(tokens).to include("tw:is-active:ring-2", "tw:is-active:bg-gray-200")
+    expect(tokens).to include("tw:is-active:ring-2", "tw:is-active:bg-purple-500")
     expect(component).to have_no_css("button[data-active]")
   end
 
