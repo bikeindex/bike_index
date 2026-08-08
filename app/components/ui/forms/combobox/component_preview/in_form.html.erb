@@ -3,5 +3,5 @@
     <%= render(UI::Forms::Combobox::Component.new(name: :cycle_type, options: CycleType.select_options.map(&:first))) %>
   <% end %>
 
-  <%= render(UI::Button::Component.new(text: "Search", kind: :submit, color: :primary)) %>
+  <%= render(UI::Button::Component.new(text: "Search", type: "submit", color: :primary)) %>
 <% end %>

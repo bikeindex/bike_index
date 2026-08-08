@@ -53,6 +53,38 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
     end
   end
 
+  context "with html_class" do
+    let(:options) { {text: "Wide", href: "/test", html_class: "tw:w-full"} }
+
+    it "builds it into the link's classes" do
+      expect(component.css("a").first["class"].split).to include("tw:w-full", "tw:inline-flex")
+    end
+  end
+
+  context "with class in html_options" do
+    let(:options) { {text: "Wide", href: "/test", class: "tw:w-full"} }
+
+    it "raises, naming html_class" do
+      expect { instance }.to raise_error(ArgumentError, /you must use the keyword arg html_class/)
+    end
+  end
+
+  context "with an unknown color" do
+    let(:options) { {text: "Link", href: "/test", color: :invalid} }
+
+    it "raises, naming the colors it takes" do
+      expect { instance }.to raise_error(ArgumentError, /unknown color :invalid, expected one of: primary, secondary/)
+    end
+  end
+
+  context "with a size for link color" do
+    let(:options) { {text: "Link", href: "/test", color: :link, size: :lg} }
+
+    it "raises" do
+      expect { instance }.to raise_error(ArgumentError, /size is not supported/)
+    end
+  end
+
   context "with method" do
     let(:options) { {text: "Follow", href: "/follow", color: :primary, method: :post} }
 

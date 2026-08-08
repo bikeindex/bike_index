@@ -43,7 +43,7 @@
     <div class="tw:mt-15" id="markSoldSection">
       <%= helpers.turbo_frame_tag "mark_sold_section" do %>
         <div class="tw:text-center">
-          <%= render UI::ButtonLink::Component.new(href: new_sale_path(marketplace_message_id: @initial_message.id), color: :primary, class: "tw:px-8", data: {turbo_stream: true}) do %>
+          <%= render UI::ButtonLink::Component.new(href: new_sale_path(marketplace_message_id: @initial_message.id), color: :primary, html_class: "tw:px-8", data: {turbo_stream: true}) do %>
             <%= translation(".sold_to", item_type: item_type_display) %>
             <em><%= @other_user_name %></em>
           <% end %>

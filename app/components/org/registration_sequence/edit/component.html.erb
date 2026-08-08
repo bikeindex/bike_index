@@ -4,7 +4,7 @@
     <span class="tw:text-xl tw:font-normal tw:text-gray-500">· <%= helpers.number_display(pages.size) %> <%= "page".pluralize(pages.size) %></span>
   </h1>
 
-  <%= render UI::ButtonLink::Component.new(href: new_organization_registration_sequence_page_path(organization_id: @organization.to_param, registration_sequence_id: @registration_sequence.id), color: :secondary, class: "tw:whitespace-nowrap") do %>
+  <%= render UI::ButtonLink::Component.new(href: new_organization_registration_sequence_page_path(organization_id: @organization.to_param, registration_sequence_id: @registration_sequence.id), color: :secondary, html_class: "tw:whitespace-nowrap") do %>
     <span aria-hidden="true">+</span> Add page
   <% end %>
 </div>
@@ -37,10 +37,10 @@
       </div>
 
       <div>
-        <%= render UI::Button::Component.new(text: "Save settings", color: :primary, kind: :submit) %>
+        <%= render UI::Button::Component.new(text: "Save settings", color: :primary, type: "submit") %>
       </div>
     </div>
   <% end %>
 <% end %>
 
-<%= render UI::ButtonLink::Component.new(text: "Preview", href: organization_registration_sequence_path(organization_id: @organization.to_param, id: @registration_sequence.id), color: :secondary, size: :lg, class: "tw:mt-8 tw:w-full") %>
+<%= render UI::ButtonLink::Component.new(text: "Preview", href: organization_registration_sequence_path(organization_id: @organization.to_param, id: @registration_sequence.id), color: :secondary, size: :lg, html_class: "tw:mt-8 tw:w-full") %>

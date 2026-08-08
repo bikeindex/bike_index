@@ -151,7 +151,8 @@ Rails.application.routes.draw do
   resources :user_emails, only: [:destroy] do
     member do
       post "resend_confirmation"
-      get "confirm"
+      # The emailed link is a GET, which renders the interstitial that posts here
+      match "confirm", via: %i[get post]
       post "make_primary"
     end
   end

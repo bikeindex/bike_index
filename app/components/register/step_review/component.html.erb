@@ -16,7 +16,7 @@
         registrant_name:, checkbox_name: :acknowledged_all) %>
 
     <%= render UI::Button::Component.new(text: translation(".complete_registration", cycle_type: @b_param.type_titleize),
-        color: :primary, size: :lg, kind: :submit, spinner: true, disabled: true, html_class: "tw:w-full",
+        color: :primary, size: :lg, type: "submit", spinner: true, disabled: true, html_class: "tw:w-full",
         data: {"register--acknowledgment-target": "submit"}) %>
 
     <%= render Register::BackLink::Component.new(href: previous_path) %>
