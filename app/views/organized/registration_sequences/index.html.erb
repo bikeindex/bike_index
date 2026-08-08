@@ -37,7 +37,7 @@
   </p>
 
   <% button_label = if @draft.present?
-       "Edit sequence"
+       "Edit"
      elsif @active.present?
        "Copy current sequence and edit"
      else
@@ -45,10 +45,12 @@
      end %>
 
   <div class="tw:mb-6 tw:flex tw:items-baseline tw:gap-4">
-    <%= button_to button_label, organization_registration_sequences_path(organization_id: current_organization.to_param), method: :post, class: "twlink", form_class: "tw:inline-block" %>
+    <%= render UI::ButtonLink::Component.new(text: button_label, href: organization_registration_sequences_path(organization_id: current_organization.to_param), method: :post, color: :primary) %>
 
+    <%# onsubmit, not turbo_confirm: Turbo Drive is off app-wide, so it never fires %>
     <% if @draft.present? %>
-      <%= button_to "Discard draft", organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), method: :delete, class: "twlink tw:text-sm tw:text-gray-500", form_class: "tw:inline-block", data: {turbo_confirm: "Discard this draft and its pages? This can't be undone."} %>
+      <%= render UI::ButtonLink::Component.new(text: "Discard draft", href: organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), method: :delete, color: :error, size: :sm,
+        form: {onsubmit: "return confirm('#{j "Discard this draft and its pages? This can't be undone."}')"}) %>
     <% end %>
   </div>
 
