@@ -36,6 +36,10 @@ module UI
         def custom_label
           {template: "ui/forms/group/component_preview/custom_label"}
         end
+
+        def helper_text
+          {template: "ui/forms/group/component_preview/helper_text"}
+        end
         # @!endgroup
       end
     end
