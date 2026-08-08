@@ -51,6 +51,13 @@ module UI
         [BASE_CLASSES, html_class, *extras, COLORS[color], ACTIVE_COLORS[color]].compact.join(" ")
       end
 
+      # ButtonLink calls this too, so the pair answers a caller the same way
+      def self.validate_options!(color:, size:, html_options:)
+        raise ArgumentError, "size is not supported for link color" if color == :link && size != :md
+        # The component builds its own class, so a passed one is dropped rather than merged
+        raise ArgumentError, "class is not supported, you must use the keyword arg html_class" if html_options.key?(:class)
+      end
+
       # name/value are submitted with the form when this button is the one clicked, which
       # is how a form with more than one submit says which was pressed
       def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, spinner: false, name: nil, value: nil, **html_options)
@@ -64,9 +71,7 @@ module UI
         @html_options = html_options
 
         @size = SIZES.key?(size) ? size : :md
-        raise ArgumentError, "size is not supported for link color" if @color == :link && @size != :md
-        # The component builds its own class, so a passed one is dropped rather than merged
-        raise ArgumentError, "class is not supported, you must use the keyword arg html_class" if html_options.key?(:class)
+        self.class.validate_options!(color: @color, size: @size, html_options:)
       end
 
       # type leads, as the default a caller can replace; the rest follow html_options,

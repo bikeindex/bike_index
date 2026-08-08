@@ -41,11 +41,11 @@
       <% if @bike.present? %>
         <%= render UI::ButtonLink::Component.new(href: bike_path(@bike), color: :primary, size: :lg,
             text: translation(self_made? ? ".view_your_registration" : ".view_the_registration"),
-            class: "tw:w-full") %>
+            html_class: "tw:w-full") %>
       <% end %>
 
       <%= render UI::ButtonLink::Component.new(text: translation(".register_another", cycle_type:), href: new_register_path,
-          color: :secondary, size: :lg, class: "tw:w-full tw:font-bold tw:text-blue-600!") %>
+          color: :secondary, size: :lg, html_class: "tw:w-full tw:font-bold tw:text-blue-600!") %>
     </div>
   </div>
 <% end %>

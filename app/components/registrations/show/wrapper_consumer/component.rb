@@ -60,7 +60,7 @@ module Registrations
 
         def edit_bike_button
           render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: @bike.default_edit_template),
-            text: translation(".edit_this_bike", bike_type: @bike.type), color: :purple, size: :lg, class: "tw:text-center tw:py-2.5!"))
+            text: translation(".edit_this_bike", bike_type: @bike.type), color: :purple, size: :lg, html_class: "tw:text-center tw:py-2.5!"))
         end
       end
     end
