@@ -12,16 +12,12 @@
       <% end %>
 
       <% if render_mailer_links? %>
-        <li class="dropdown nav-item">
-          <a class="dropdown-toggle nav-link" data-toggle="dropdown">
-            Mailers
-          </a>
-
-          <div class="dropdown-menu admin-nav-dropdown">
+        <li class="nav-item">
+          <%= render(UI::Dropdown::Component.new(name: "Mailers", button_class: "nav-link")) do |dropdown| %>
             <% mailer_links.each do |title, path| %>
-              <%= link_to title, path, role: "button", class: "btn btn-light dropdown-item" %>
+              <% dropdown.with_entry_item { link_to title, path } %>
             <% end %>
-          </div>
+          <% end %>
         </li>
       <% end %>
     </ul>
