@@ -38,7 +38,8 @@ RSpec.describe Admin::MailSnippetsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:new)
 
-      expect(parsed_body).to have_css("fieldset.hw-combobox[data-controller='hw-combobox']", count: 2)
+      # scoped to the form, so the admin nav's own combobox doesn't count
+      expect(parsed_body).to have_css("form fieldset.hw-combobox[data-controller='hw-combobox']", count: 2)
       expect(parsed_body).to have_css("input[type=hidden][name='mail_snippet[organization_id]']", visible: :all)
       # kind options carry enum labels, not the integer values kind= rejects
       expect(parsed_body).to have_css("[role='option'][data-value='custom']", visible: :all)
