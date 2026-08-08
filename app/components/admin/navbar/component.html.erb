@@ -13,8 +13,7 @@
 
       <% if mailer_links.any? %>
         <li class="nav-item">
-          <%= render(UI::Dropdown::Component.new(name: "Mailers", button_class: "nav-link tw:mr-1 tw:cursor-pointer",
-            menu_class: "tw:w-max")) do |dropdown| %>
+          <%= render(UI::Dropdown::Component.new(name: "Mailers", button_class: "nav-link tw:mr-1 tw:cursor-pointer")) do |dropdown| %>
             <% mailer_links.each do |title, path| %>
               <% dropdown.with_entry_item { link_to title, path } %>
             <% end %>
