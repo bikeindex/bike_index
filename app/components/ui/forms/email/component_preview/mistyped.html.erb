@@ -3,11 +3,11 @@
     <%= render(UI::Forms::Email::Component.new(form_builder: f, html_options: {value: "you@gmial.con"})) %>
   <% end %>
 
-  <%= render(UI::Button::Component.new(text: "Register", color: :primary, kind: :submit)) %>
+  <%= render(UI::Button::Component.new(text: "Register", color: :primary, type: "submit")) %>
 
   <%#
     Stands in for a submit something else is holding -- ui--button--submit-spinner
     disables the same bit to see off a second submit.
   %>
-  <%= render(UI::Button::Component.new(text: "Held elsewhere", kind: :submit, disabled: true)) %>
+  <%= render(UI::Button::Component.new(text: "Held elsewhere", type: "submit", disabled: true)) %>
 <% end %>

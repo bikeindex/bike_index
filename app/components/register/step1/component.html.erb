@@ -65,7 +65,7 @@
     <% end %>
 
     <%= render UI::Button::Component.new(text: translation(".next"), color: :primary, size: :lg,
-        kind: :submit, spinner: true, html_class: "tw:w-full") %>
+        type: "submit", spinner: true, html_class: "tw:w-full") %>
 
     <% if BikeServices::Register.confirmation_email_pending?(@b_param, user: @current_user) %>
       <p

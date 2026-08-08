@@ -197,7 +197,7 @@
               </p>
             </div>
 
-            <%= render(UI::ButtonLink::Component.new(href: edit_access_path, text: translation(".edit"), color: :secondary, size: :sm, class: "tw:flex-none")) %>
+            <%= render(UI::ButtonLink::Component.new(href: edit_access_path, text: translation(".edit"), color: :secondary, size: :sm, html_class: "tw:flex-none")) %>
           </div>
         <% elsif !show_contact? && !unregistered? %>
           <div
@@ -386,7 +386,7 @@
             <%= form.text_field :code, required: true, class: "twinput" %>
           </div>
 
-          <%= render(UI::Button::Component.new(text: translation(".assign_sticker"), color: :purple, kind: :submit)) %>
+          <%= render(UI::Button::Component.new(text: translation(".assign_sticker"), color: :purple, type: "submit")) %>
         <% end %>
       <% end %>
     <% end %>

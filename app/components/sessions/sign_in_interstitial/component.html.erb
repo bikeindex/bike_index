@@ -8,6 +8,6 @@
       <%= hidden_field_tag name, value %>
     <% end %>
 
-    <%= render UI::Button::Component.new(text: @submit_text, kind: :submit, color: :primary, size: :lg) %>
+    <%= render UI::Button::Component.new(text: @submit_text, type: "submit", color: :primary, size: :lg) %>
   <% end %>
 </div>

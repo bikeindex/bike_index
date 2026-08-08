@@ -13,7 +13,7 @@
         checkbox_name: :acknowledged, checked: acknowledged?) %>
 
     <%= render UI::Button::Component.new(text: translation(".continue"), color: :primary, size: :lg,
-        kind: :submit, spinner: true, disabled: true, html_class: "tw:mt-5 tw:w-full",
+        type: "submit", spinner: true, disabled: true, html_class: "tw:mt-5 tw:w-full",
         data: {"register--acknowledgment-target": "submit"}) %>
 
     <%= render Register::BackLink::Component.new(href: previous_path) %>
