@@ -5,12 +5,15 @@ module Register
     # One page of an organization's e-vehicle rules, rendered from its live sequence
     class ComponentPreview < ApplicationComponentPreview
       # Where the flow explains why these pages appeared at all
-      def first_page
+      # @label Step 1 of 4
+      def step_1_of_4
         acknowledgment_page(0)
       end
 
-      def later_page
-        acknowledgment_page(1)
+      # The last of the rule pages, with only the review left after it
+      # @label Step 3 of 4
+      def step_3_of_4
+        acknowledgment_page(2)
       end
 
       # Revisited from the review, showing what was agreed to rather than asking again
