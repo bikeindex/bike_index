@@ -105,7 +105,7 @@ class RegisterController < ApplicationController
 
   def confirm
     @page_title = I18n.t("meta_titles.register_confirm")
-    render Register::Confirm::Component.new(b_param: @b_param, token: params[:confirmation_token])
+    render Register::StepConfirm::Component.new(b_param: @b_param, token: params[:confirmation_token])
   end
 
   # The confirmation itself - the proven address gets an account, created here if

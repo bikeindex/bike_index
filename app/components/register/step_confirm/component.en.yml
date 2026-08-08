@@ -2,7 +2,7 @@
 en:
   components:
     register:
-      confirm:
+      step_confirm:
         confirming_your_email: Confirming your email
         continue: Continue
         this_only_takes_a_moment: Hang on, we're picking up where you left off.
