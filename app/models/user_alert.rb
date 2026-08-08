@@ -27,10 +27,11 @@ class UserAlert < ApplicationRecord
     phone_waiting_confirmation: 0,
     theft_alert_without_photo: 1,
     stolen_bike_without_location: 2,
-    unassigned_bike_org: 3
+    unassigned_bike_org: 3,
+    unfinished_registration: 4
   }.freeze
 
-  UNIQ_KINDS = %w[phone_waiting_confirmation].freeze
+  UNIQ_KINDS = %w[phone_waiting_confirmation unfinished_registration].freeze
 
   enum :kind, KIND_ENUM
 
@@ -83,8 +84,15 @@ class UserAlert < ApplicationRecord
     %w[unassigned_bike_org]
   end
 
+  # Highest priority first - only one general alert renders, and this is the order it picks
   def self.general_kinds
-    %w[phone_waiting_confirmation theft_alert_without_photo stolen_bike_without_location]
+    %w[phone_waiting_confirmation stolen_bike_without_location theft_alert_without_photo
+      unfinished_registration]
+  end
+
+  # phone_verification gates the only kind behind a flag
+  def self.disabled_kinds
+    Flipper.enabled?(:phone_verification) ? [] : %w[phone_waiting_confirmation]
   end
 
   def self.account_kinds
@@ -105,6 +113,40 @@ class UserAlert < ApplicationRecord
 
   def self.find_or_build_by(attrs)
     where(attrs).first || new(attrs)
+  end
+
+  # The denormalized copy on the user, which gates whether any alert renders at all
+  def self.refresh_alert_slugs(user)
+    slugs = where(user_id: user.id).active.distinct.pluck(:kind).sort
+    return true if user.alert_slugs == slugs
+
+    # Straight to the column: this runs in the register flow's request now, and User's
+    # uniqueness validations cost four selects before the update. updated_at explicitly,
+    # since the job bumps it to bust the cache
+    user.update_columns(alert_slugs: slugs, updated_at: Time.current)
+  end
+
+  def self.update_unfinished_registrations(user)
+    user.b_params.unfinished_registrations
+      .each { |b_param| update_unfinished_registration(user:, b_param:) }
+
+    # Expiry is silent, and CleanBParamsJob deletes without callbacks, so those alerts
+    # never reach the after_commit that would resolve them
+    user.user_alerts.active.unfinished_registration.includes(:alertable)
+      .reject { |user_alert| user_alert.alertable&.unfinished_registration? }
+      .each(&:resolve!)
+  end
+
+  def self.update_unfinished_registration(user:, b_param:)
+    user_alert = find_or_build_by(kind: "unfinished_registration",
+      user_id: user.id, alertable: b_param)
+    if b_param.unfinished_registration?
+      # Nothing is assigned after the lookup, so saving a found one only re-runs the
+      # uniqueness select find_or_build_by just did - in the register flow's request
+      user_alert.save if user_alert.new_record?
+    else # Don't create just to resolve
+      user_alert.id.blank? || user_alert.resolve!
+    end
   end
 
   def self.update_theft_alert_without_photo(user:, theft_alert:)

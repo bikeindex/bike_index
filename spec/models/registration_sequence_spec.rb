@@ -52,7 +52,8 @@ RSpec.describe RegistrationSequence, type: :model do
 
     it "duplicates template page images into independent blobs" do
       template = RegistrationSequence.template
-      template_page = template.registration_sequence_pages.create!(title: "Battery", listing_order: 0)
+      template_page = template.registration_sequence_pages.create!(title: "Battery", listing_order: 0,
+        body: "<ul><li>Charge safely</li></ul>")
       template_page.image.attach(io: StringIO.new("fake image"), filename: "battery.jpg", content_type: "image/jpeg")
 
       page = RegistrationSequence.draft_for(organization).registration_sequence_pages.first
@@ -62,6 +63,24 @@ RSpec.describe RegistrationSequence, type: :model do
       expect(page.image.blob.id).to_not eq(template_page.image.blob.id)
       expect(page.image.download).to eq("fake image")
       expect(page.image.filename.to_s).to eq("battery.jpg")
+    end
+
+    context "with an active sequence" do
+      let!(:active) do
+        FactoryBot.create(:registration_sequence_active, :with_pages, organization:, faq_url: "https://example.com/live")
+      end
+
+      it "clones the live sequence, not the template" do
+        RegistrationSequence.template.registration_sequence_pages.create!(title: "Template only",
+          body: "<ul><li>from template</li></ul>", listing_order: 0)
+
+        draft = RegistrationSequence.draft_for(organization)
+
+        expect(draft.faq_url).to eq "https://example.com/live"
+        expect(draft.registration_sequence_pages.pluck(:title))
+          .to eq(active.registration_sequence_pages.pluck(:title))
+        expect(draft.registration_sequence_pages.pluck(:title)).to_not include("Template only")
+      end
     end
 
     context "with an existing draft" do
@@ -162,6 +181,34 @@ RSpec.describe RegistrationSequence, type: :model do
         expect(draft.reload).to be_draft
         expect(active.reload).to be_active
       end
+    end
+
+    context "draft with an incomplete page" do
+      it "does not become active" do
+        # update_column bypasses validation, the way legacy data could
+        draft.registration_sequence_pages.first.update_column(:body, "")
+        expect(draft.make_active!).to be_falsey
+        expect(draft.reload).to be_draft
+      end
+    end
+  end
+
+  describe "#discard_draft!" do
+    let(:organization) { FactoryBot.create(:organization) }
+
+    it "removes the draft and its pages" do
+      draft = FactoryBot.create(:registration_sequence, :with_pages, organization:)
+
+      expect { expect(draft.discard_draft!).to be_truthy }
+        .to change(RegistrationSequence, :count).by(-1)
+        .and change(RegistrationSequencePage, :count).by(-2)
+      expect(RegistrationSequence.with_deleted.find_by(id: draft.id)).to be_nil
+    end
+
+    it "refuses to discard an activated sequence" do
+      active = FactoryBot.create(:registration_sequence_active, :with_pages, organization:)
+      expect(active.discard_draft!).to eq false
+      expect(active.reload).to be_active
     end
   end
 

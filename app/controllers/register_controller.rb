@@ -14,6 +14,9 @@ class RegisterController < ApplicationController
   # The step shown depends on server state - a cached page could show a step
   # the registration is past (register--revalidate covers Safari's bfcache)
   before_action { response.set_header("Cache-Control", "no-store") }
+  # The unfinished_registration alert links back to here, so it would sit on top of the
+  # very flow that resolves it
+  before_action { @skip_general_alert = true }
 
   # Redirects into step 1 with a token (reusing the session's registration when
   # it's still blank), so going back from step 2 lands on the same registration

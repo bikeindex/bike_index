@@ -11,7 +11,7 @@ module UI
 
       # The same state without the submit, for reviewing it alongside the colors
       def submitting
-        render(UI::Button::Component.new(text: "Next", color: :primary, kind: :submit,
+        render(UI::Button::Component.new(text: "Next", color: :primary, type: "submit",
           spinner: true, disabled: true, html_class: "tw:[&_span]:inline-flex!"))
       end
 

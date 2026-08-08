@@ -179,19 +179,16 @@
                   %code.d-inline nearby_organizations
                   will search within this radius for other organizations in the same area
 
-          - passwordless_enabled = @organization.enabled?("passwordless_users")
-          - saml_sso_enabled = @organization.enabled?("saml_sso")
-          - sign_in_kinds = [("passwordless sign in" if passwordless_enabled), ("SAML SSO" if saml_sso_enabled)].compact
-          - if sign_in_kinds.any?
+          - domain_features = {"passwordless_users" => "passwordless sign in", "saml_sso" => "SAML SSO", "user_role_for_user_email_domain" => "automatic user role"}
+          - domain_uses = domain_features.filter_map { |slug, name| name if @organization.enabled?(slug) }
+          - if domain_uses.any?
             .form-group
               = f.label :user_email_domain do
                 %span
-                permitted domain for #{sign_in_kinds.to_sentence}
+                permitted domain for #{domain_uses.to_sentence}
                 %small
-                  - if passwordless_enabled
-                    <span class="text-success">passwordless user feature</span>
-                  - if saml_sso_enabled
-                    <span class="text-success">SAML SSO feature</span>
+                  - domain_uses.each do |domain_use|
+                    %span.text-success #{domain_use} feature
               .input-group
                 .input-group-prepend
                   .input-group-text @
@@ -251,7 +248,7 @@
                         miles
                   = number_field_tag :organization_stolen_message_search_radius_miles, organization_stolen_message.search_radius_miles, {class: "form-control"}
 
-          - if saml_sso_enabled
+          - if @organization.enabled?("saml_sso")
             - saml_configuration = @organization.organization_saml_configuration || @organization.build_organization_saml_configuration
             .form-group.mt-4
               %h4 SAML SSO

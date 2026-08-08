@@ -1,13 +1,24 @@
 module Organized
   class RegistrationSequencePagesController < Organized::AdminController
     before_action :ensure_access_to_registration_sequences!
-    before_action :find_draft, only: %i[create]
+    before_action :find_draft, only: %i[new create]
     before_action :find_page, only: %i[edit update destroy]
 
-    # Adds a blank page to the draft, then opens it for editing
+    # A blank page to fill in; it's only persisted once it has a title and rules
+    def new
+      @page = @draft.registration_sequence_pages.new
+      render :edit
+    end
+
     def create
-      page = @draft.registration_sequence_pages.create!
-      redirect_to edit_page_path(page)
+      @page = @draft.registration_sequence_pages.new(permitted_parameters)
+      if @page.save
+        flash[:success] = "Page added"
+        redirect_to sequence_path
+      else
+        flash.now[:error] = "Unable to add: #{@page.errors.full_messages.to_sentence}"
+        render :edit, status: :unprocessable_entity
+      end
     end
 
     def edit
@@ -20,7 +31,8 @@ module Organized
         head :ok
       elsif @page.update(permitted_parameters)
         flash[:success] = "Page updated"
-        redirect_to sequence_path
+        # Back to this page so the refreshed preview is right there
+        redirect_to edit_page_path
       else
         flash[:error] = "Unable to update: #{@page.errors.full_messages.to_sentence}"
         render :edit
@@ -59,8 +71,8 @@ module Organized
       edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id)
     end
 
-    def edit_page_path(page)
-      edit_organization_registration_sequence_page_path(organization_id: current_organization.to_param, id: page.id)
+    def edit_page_path
+      edit_organization_registration_sequence_page_path(organization_id: current_organization.to_param, id: @page.id)
     end
 
     def permitted_parameters

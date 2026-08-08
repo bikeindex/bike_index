@@ -28,7 +28,7 @@ Rails.application.routes.draw do
       get :embed
       get :embed_extended, as: :embed_extended
       get :embed_create_success
-      get :shop_display_qr
+      get :qr
     end
   end
 
@@ -151,7 +151,8 @@ Rails.application.routes.draw do
   resources :user_emails, only: [:destroy] do
     member do
       post "resend_confirmation"
-      get "confirm"
+      # The emailed link is a GET, which renders the interstitial that posts here
+      match "confirm", via: %i[get post]
       post "make_primary"
     end
   end
@@ -489,8 +490,8 @@ Rails.application.routes.draw do
     end
     resource :manage_impounding
     resources :users, except: %i[show]
-    resources :registration_sequences, only: %i[index create edit update] do
-      resources :pages, only: %i[create], controller: "registration_sequence_pages"
+    resources :registration_sequences, only: %i[index create show edit update destroy] do
+      resources :pages, only: %i[new create], controller: "registration_sequence_pages"
     end
     resources :registration_sequence_pages, only: %i[edit update destroy]
   end

@@ -5666,6 +5666,10 @@ it:
         who_we_serve: A chi ci rivolgiamo
         legal: Legale
         social_media: Social media
+        status_page: Pagina di stato
+        register_a_bike: Registra una bici
+        marketplace: Mercato
+        search: Cerca
     emails:
       confirmation_email:
         click_to_sign_in_html: Fai clic sul pulsante <em>Accedi</em> per completare

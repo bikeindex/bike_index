@@ -10,6 +10,22 @@ RSpec.describe UsersController, type: :request do
       expect(response).to render_template(:new)
       expect(Capybara.string(response.body)).to have_css("[data-controller='ui--forms--email'] input#user_email")
     end
+
+    context "sso organization domain" do
+      let!(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
+      end
+      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+
+      it "hands a claimed email off to the IdP, and renders the form for one it doesn't claim" do
+        get "#{base_url}/new", params: {email: "student@sso.edu"}
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+
+        get "#{base_url}/new", params: {email: "student@example.edu"}
+        expect(response).to render_template(:new)
+      end
+    end
   end
 
   describe "create" do
@@ -47,6 +63,32 @@ RSpec.describe UsersController, type: :request do
 
         post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
         expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
+      end
+    end
+
+    context "sso organization domain" do
+      let(:email) { "student@sso.edu" }
+      let!(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
+      end
+      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+
+      it "forces SSO instead of creating an account the IdP doesn't know about" do
+        expect {
+          post base_url, params: {user: {email:, name: "Test name", terms_of_service: "1"}}
+        }.to_not change(User, :count)
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+      end
+
+      context "SAML config not yet live" do
+        let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, organization:) }
+
+        it "signs up normally rather than redirecting into an unconfigured IdP" do
+          expect {
+            post base_url, params: {user: {email:, name: "Test name", terms_of_service: "1"}}
+          }.to change(User, :count).by(1)
+        end
       end
     end
   end
@@ -421,6 +463,8 @@ RSpec.describe UsersController, type: :request do
       og_token = user.token_for_password_reset
       post "#{base_url}/update_password_with_reset_token", params: valid_params
       expect(response).to redirect_to my_account_url
+      # Signing in doesn't replace it with the generic "Logged in!"
+      expect(flash[:success]).to match(/password reset successfully/i)
       user.reload
       expect(user.token_for_password_reset).to_not eq og_token
       expect(user.auth_token).to_not eq og_auth
@@ -639,6 +683,9 @@ RSpec.describe UsersController, type: :request do
       expect(assigns(:user)&.id).to eq user.id
       expect(response.code).to eq("200")
       expect(response).to render_template("users/unsubscribe")
+      # The rendered interstitial posts to unsubscribe_update, it doesn't unsubscribe here
+      expect(Capybara.string(response.body))
+        .to have_css("form[action^='#{base_url}/'][action$='/unsubscribe_update']")
       expect(flash).to be_blank
       expect(user.reload.notification_newsletters).to be_truthy
     end

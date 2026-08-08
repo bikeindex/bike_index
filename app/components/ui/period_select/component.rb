@@ -33,7 +33,7 @@ module UI
           href: period_url(period_key),
           size: :sm,
           active: @period == period_key,
-          class: period_button_class,
+          html_class: period_button_class,
           data: {period: period_key, turbo_action: "advance"}
         )
       end

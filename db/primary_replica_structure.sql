@@ -6240,6 +6240,13 @@ CREATE INDEX index_b_params_on_created_bike_id ON public.b_params USING btree (c
 
 
 --
+-- Name: index_b_params_on_creator_id_without_bike; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_b_params_on_creator_id_without_bike ON public.b_params USING btree (creator_id) WHERE (created_bike_id IS NULL);
+
+
+--
 -- Name: index_b_params_on_email_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7713,6 +7720,7 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260807153129'),
+('20260807132506'),
 ('20260805093756'),
 ('20260804100000'),
 ('20260801100000'),

@@ -36,12 +36,12 @@ class @ManufacturersSelect
           callback res.matches.slice(0, @per_page)
 
   makeFrameManufacturer: ($target, initial_opts) ->
-    url = "<%= ENV['BASE_URL'] %>/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg&q="
+    url = "/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg&q="
     $target.selectize(@selectizeSettings(url, initial_opts))
     $target.removeClass('unfancy') # So we don't instantiate multiple times
 
   makeComponentManufacturer: ($target, initial_opts) ->
-    url = "<%= ENV['BASE_URL'] %>/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg,cmp_mnfg&q="
+    url = "/api/autocomplete?per_page=#{per_page}&categories=frame_mnfg,cmp_mnfg&q="
     component_selectize_opts = 
       valueField: 'id' # for convenience instantiating, overrides frameManufacturer
     opts = _.merge(@selectizeSettings(url, initial_opts), component_selectize_opts)

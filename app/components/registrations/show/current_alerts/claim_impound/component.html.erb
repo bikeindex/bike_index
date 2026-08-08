@@ -7,11 +7,11 @@
           label_text: translation(".prove_its_yours", bike_type: impound_claim.bike_type), required: true,
           html_options: {rows: 4})) %>
 
-        <%= render(UI::Button::Component.new(text: translation(".save_message"), color: :secondary, kind: :submit)) %>
+        <%= render(UI::Button::Component.new(text: translation(".save_message"), color: :secondary, type: "submit")) %>
 
         <%# The same form, so submitting sends the message rather than dropping an unsaved one %>
         <div class="tw:mt-4">
-          <%= render(UI::Button::Component.new(text: translation(".submit_claim"), color: :purple, kind: :submit,
+          <%= render(UI::Button::Component.new(text: translation(".submit_claim"), color: :purple, type: "submit",
             name: form.field_name(:status), value: "submitting")) %>
         </div>
 
@@ -66,7 +66,7 @@
               required: true)) %>
           <% end %>
 
-          <%= render(UI::Button::Component.new(text: translation(".open_claim"), color: :purple, kind: :submit)) %>
+          <%= render(UI::Button::Component.new(text: translation(".open_claim"), color: :purple, type: "submit")) %>
         <% end %>
       </div>
     </div>

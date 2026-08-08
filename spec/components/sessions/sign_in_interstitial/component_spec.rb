@@ -15,6 +15,16 @@ RSpec.describe Sessions::SignInInterstitial::Component, type: :component do
     expect(component).to have_button("Sign in")
   end
 
+  context "copy passed in" do
+    let(:options) { {heading: "Unsubscribing", submit_text: "Unsubscribe"} }
+
+    it "renders it instead of the sign in copy" do
+      expect(component).to have_css("h3", text: "Unsubscribing")
+      expect(component).to have_button("Unsubscribe")
+      expect(component).to have_no_button("Sign in")
+    end
+  end
+
   context "auto_submit false" do
     let(:options) { {auto_submit: false} }
 
