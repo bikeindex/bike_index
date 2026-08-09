@@ -422,5 +422,84 @@ RSpec.describe "Register flow", :js, type: :system do
         acknowledgment_text: "agree to comply with all of the rules above.")
       expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
     end
+
+    # Every step submits through Turbo, which makes a throttle or a bad gateway a response
+    # the page can retry - rather than an error page with the step's answers behind it.
+    # This flow has one of every step, so each of them gets its turn at failing.
+    context "when the server fails each step once" do
+      let(:failed_steps) { [] }
+
+      def step_param(url) = Rack::Utils.parse_query(URI.parse(url.to_s).query)["step"]
+
+      # The first submission of each step is answered in the browser, the way an edge that
+      # never reaches the app would; the retry that follows it is let through. The statuses
+      # alternate so the throttle and the outright failure each get their turn.
+      before do
+        page.driver.with_playwright_page do |playwright_page|
+          playwright_page.route(%r{/register}, ->(route, request) {
+            # Every submission is a POST to one of three paths (Rails' method override), so
+            # what tells the steps apart is the page each was submitted from
+            step = [URI.parse(request.url).path, step_param(request.headers["referer"])]
+            next route.continue if request.method == "GET" || failed_steps.include?(step)
+
+            failed_steps << step
+            route.fulfill(status: failed_steps.length.odd? ? 429 : 500,
+              contentType: "text/plain", body: "Try again")
+          })
+        end
+      end
+
+      it "retries each of them, and the registration still finishes" do
+        ActionMailer::Base.deliveries = []
+        visit "/register/new?organization_id=#{organization.slug}"
+
+        type_into("#b_param_manufacturer_id", "Surly")
+        click_combobox_option("Surly")
+        check "Electric (motorized)"
+        fill_in "b_param[owner_email]", with: owner_email
+        click_button "Next"
+
+        # The failure is never something the rider sees - the retry is what lands
+        expect(page).to have_content("Add your bike")
+
+        fill_in "bike[user_name]", with: user_name
+        type_into("#bike_primary_frame_color_id", "Red")
+        click_combobox_option("Red")
+        fill_in "bike[serial_number]", with: "XYZ 123"
+        click_button "Next"
+
+        expect(page).to have_content("Battery & charging")
+        check "Charge with the manufacturer's charger"
+        check "Report a swollen battery"
+        click_button "Continue"
+
+        expect(page).to have_content("Campus rules")
+        check "Dismount in posted zones"
+        click_button "Continue"
+
+        expect(page).to have_content("You're almost done")
+        check "I, #{user_name}, agree to comply with all of the rules above."
+        click_button "Complete Bike Registration"
+
+        expect(page).to have_content("Registration saved")
+
+        # The emailed link finishes a step like any other, and fails like one
+        visit confirmation_link
+        click_button "Continue"
+
+        expect(page).to have_content("Registration complete", wait: 10)
+        expect(Bike.last).to have_attributes(owner_email:, serial_number: "XYZ 123",
+          propulsion_type: "pedal-assist")
+        # A retry that landed twice would show up as a second registration, or a second
+        # signature on the rules
+        expect(Bike.count).to eq 1
+        expect(RegistrationSequenceAcknowledgment.count).to eq 1
+
+        # Every step of the flow failed, and none of them more than once
+        expect(failed_steps).to eq([["/register", "1"], ["/register", "2"],
+          ["/register/acknowledge", "3"], ["/register/acknowledge", "4"],
+          ["/register/acknowledge", "review"], ["/register/confirm_email", nil]])
+      end
+    end
   end
 end
