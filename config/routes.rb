@@ -310,7 +310,11 @@ Rails.application.routes.draw do
     resources :registration_sequences, only: %i[index]
 
     resources :bug_reports, only: %i[index show update] do
-      collection { post :assign_tags }
+      collection do
+        post :assign_tags
+        # Selection chips for the tags combobox on the show page
+        post :tag_chips
+      end
     end
 
     resources :organizations do

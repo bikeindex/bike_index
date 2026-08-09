@@ -140,6 +140,15 @@ RSpec.describe Admin::BugReportsController, type: :request do
     end
   end
 
+  describe "tag_chips" do
+    it "renders a normalized chip for each combobox value" do
+      post "#{base_url}/tag_chips", params: {combobox_values: "Search, broken", for_id: "bug_report_tags"},
+        as: :turbo_stream
+      expect(response.status).to eq(200)
+      expect(response.body.scan(/<span>([^<]+)<\/span>/).flatten).to eq(%w[broken search])
+    end
+  end
+
   describe "assign_tags" do
     let!(:bug_report_unselected) { FactoryBot.create(:bug_report) }
 

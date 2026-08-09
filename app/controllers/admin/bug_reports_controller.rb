@@ -60,6 +60,15 @@ module Admin
       redirect_back(fallback_location: admin_bug_reports_path)
     end
 
+    # The multiselect combobox renders its selections through this - a tag is its own display
+    def tag_chips
+      chips = BugReport.normalized_tags(params[:combobox_values]).map do
+        helpers.hw_combobox_selection_chip(display: it, value: it, for_id: params[:for_id])
+      end
+
+      render turbo_stream: helpers.safe_join(chips)
+    end
+
     helper_method :matching_bug_reports, :searchable_tags, :searchable_receivers,
       :membership_filters, :status_filters, :status_only_filters
 
