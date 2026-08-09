@@ -20,8 +20,8 @@
 
 <%= render Org::RegistrationSequence::PageList::Component.new(registration_sequence: @registration_sequence, admin: @admin, editable: @editable) %>
 
-<%= render UI::Card::Component.new(additional_classes: "tw:mt-8") do %>
-  <% if @editable %>
+<% if @editable %>
+  <%= render UI::Card::Component.new(additional_classes: "tw:mt-8") do %>
     <%= form_with model: @registration_sequence, url: sequence_path, method: :patch do |f| %>
       <div class="tw:flex tw:flex-col tw:gap-4">
         <div>
@@ -51,19 +51,13 @@
         </div>
       </div>
     <% end %>
-  <% else %>
-    <% if @registration_sequence.activated? %>
-      <p class="tw:mb-4 tw:text-gray-600">
-        Registrants have acknowledged this sequence, so it can't be edited —
-        changes belong in a new draft.
-      </p>
-    <% end %>
-    <%= render UI::DefinitionList::Container::Component.new(term: :below) do %>
-      <%= render UI::DefinitionList::Row::Component.new(label: "FAQ link", value: @registration_sequence.faq_url) %>
-
-      <%= render UI::DefinitionList::Row::Component.new(label: "Final acknowledgment", value: @registration_sequence.acknowledgment) %>
-    <% end %>
   <% end %>
+  <%# The page list carries the FAQ link and the acknowledgment when it's read-only %>
+<% elsif @registration_sequence.activated? %>
+  <p class="tw:mt-8 tw:mb-0 tw:text-gray-600">
+    Registrants have acknowledged this sequence, so it can't be edited — changes
+    belong in a new draft.
+  </p>
 <% end %>
 
 <%# Admin's header switches between the screens, so the big button is the organization's %>

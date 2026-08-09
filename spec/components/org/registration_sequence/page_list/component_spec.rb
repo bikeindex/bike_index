@@ -23,7 +23,10 @@ RSpec.describe Org::RegistrationSequence::PageList::Component, type: :component 
   end
 
   context "activated sequence" do
-    let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+    let(:registration_sequence) do
+      FactoryBot.create(:registration_sequence_active, :with_pages, organization:,
+        faq_url: "https://example.com/faq", acknowledgment_text: "agree to the rules above")
+    end
 
     it "is read-only - activation froze it" do
       render_inline(described_class.new(registration_sequence:))
@@ -32,6 +35,32 @@ RSpec.describe Org::RegistrationSequence::PageList::Component, type: :component 
       expect(page).to_not have_css("[data-controller='sortable']")
       expect(page).to_not have_css("[data-sortable-target='item']")
     end
+
+    it "ends on the acknowledgment registrants agree to, linking the FAQ" do
+      render_inline(described_class.new(registration_sequence:))
+
+      expect(page).to have_css("h3", text: "Final acknowledgment")
+      expect(page).to have_link("FAQ link", href: "https://example.com/faq")
+      expect(page).to have_content("agree to the rules above")
+    end
+
+    context "without a faq_url" do
+      let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+
+      it "falls back to the default acknowledgment, with no link to show" do
+        render_inline(described_class.new(registration_sequence:))
+
+        expect(page).to have_css("h3", text: "Final acknowledgment")
+        expect(page).to have_content(RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT)
+        expect(page).to_not have_link("FAQ link")
+      end
+    end
+  end
+
+  it "leaves the acknowledgment to the editor's own field when editable" do
+    render_inline(described_class.new(registration_sequence:))
+
+    expect(page).to_not have_css("h3", text: "Final acknowledgment")
   end
 
   context "organization-specific page" do

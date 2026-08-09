@@ -66,5 +66,24 @@
         </div>
       <% end %>
     <% end %>
+
+    <%# What registrants agree to after the pages. The editor has its own field for it %>
+    <% unless @editable %>
+      <div class="tw:py-1.5 tw:pl-5">
+        <h3 class="uncap tw:mb-0 tw:text-base tw:font-semibold">
+          Final acknowledgment
+        </h3>
+
+        <% if @registration_sequence.faq_url.present? %>
+          <p class="tw:mt-1 tw:mb-0 tw:text-sm tw:text-gray-600">
+            <%= link_to "FAQ link", @registration_sequence.faq_url, class: "twlink" %>
+          </p>
+        <% end %>
+
+        <p class="tw:mt-1 tw:mb-0 tw:py-2 tw:text-sm">
+          <%= @registration_sequence.acknowledgment %>
+        </p>
+      </div>
+    <% end %>
   <% end %>
 <% end %>
