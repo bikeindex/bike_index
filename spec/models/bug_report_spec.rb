@@ -94,6 +94,24 @@ RSpec.describe BugReport, type: :model do
     end
   end
 
+  describe "all_receivers" do
+    let!(:bug_report) { FactoryBot.create(:bug_report, receiver: "support@bikeindex.org") }
+    let!(:bug_report_other) { FactoryBot.create(:bug_report, receiver: "contact@bikeindex.org") }
+    let!(:bug_report_without_receiver) { FactoryBot.create(:bug_report, receiver: nil) }
+
+    it "returns the distinct receivers" do
+      expect(BugReport.all_receivers).to eq(%w[contact@bikeindex.org support@bikeindex.org])
+    end
+  end
+
+  describe "display_receiver" do
+    it "drops our domain" do
+      expect(BugReport.display_receiver("contact@bikeindex.org")).to eq "contact"
+      expect(BugReport.display_receiver("someone@example.com")).to eq "someone@example.com"
+      expect(BugReport.display_receiver(nil)).to eq ""
+    end
+  end
+
   describe "github_pull_request_url" do
     let(:bug_report) { FactoryBot.build(:bug_report, github_pull_request: 3805) }
 

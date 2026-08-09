@@ -76,6 +76,23 @@ RSpec.describe Admin::BugReportsController, type: :request do
       end
     end
 
+    context "with search_receiver" do
+      let!(:bug_report_support) { FactoryBot.create(:bug_report, receiver: "support@bikeindex.org") }
+
+      it "filters by the receiver" do
+        expect(bug_report.receiver).to eq "contact@bikeindex.org"
+        get "#{base_url}.json", params: {search_receiver: "support@bikeindex.org", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_support.id])
+      end
+
+      it "ignores a receiver no bug report has" do
+        expect(bug_report).to be_present
+        get "#{base_url}.json", params: {search_receiver: "nonsense@bikeindex.org", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] })
+          .to match_array([bug_report.id, bug_report_support.id])
+      end
+    end
+
     context "with search_membership" do
       let!(:bug_report_paid) { FactoryBot.create(:bug_report, is_paid_organization: true) }
 

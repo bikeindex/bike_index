@@ -72,6 +72,15 @@ class BugReport < ApplicationRecord
     distinct.pluck(Arel.sql("unnest(tags)")).sort
   end
 
+  def self.all_receivers
+    distinct.pluck(:receiver).compact.sort
+  end
+
+  # Our domain is noise in the admin table - and only ours can be dropped unambiguously
+  def self.display_receiver(value)
+    value.to_s.delete_suffix("@#{EmailReceiver::OUR_EMAIL_DOMAIN}")
+  end
+
   def self.normalized_tags(value)
     value = value.to_s.split(/,|\n/) unless value.is_a?(Array)
     value.map { it.to_s.strip.downcase }.reject(&:blank?).uniq.sort

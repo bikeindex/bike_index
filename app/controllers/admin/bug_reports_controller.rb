@@ -60,11 +60,15 @@ module Admin
       redirect_back(fallback_location: admin_bug_reports_path)
     end
 
-    helper_method :matching_bug_reports, :searchable_tags, :membership_filters,
-      :status_filters, :status_only_filters
+    helper_method :matching_bug_reports, :searchable_tags, :searchable_receivers,
+      :membership_filters, :status_filters, :status_only_filters
 
     def searchable_tags
       @searchable_tags ||= BugReport.all_tags
+    end
+
+    def searchable_receivers
+      @searchable_receivers ||= BugReport.all_receivers
     end
 
     def membership_filters
@@ -95,6 +99,8 @@ module Admin
       bug_reports = BugReport.all
       @searched_tag = params[:search_tag] if searchable_tags.include?(params[:search_tag])
       bug_reports = bug_reports.with_tag(@searched_tag) if @searched_tag.present?
+      @searched_receiver = params[:search_receiver] if searchable_receivers.include?(params[:search_receiver])
+      bug_reports = bug_reports.where(receiver: @searched_receiver) if @searched_receiver.present?
       bug_reports = bug_reports.where(user_id: params[:user_id]) if params[:user_id].present?
       @searched_membership = params[:search_membership] if MEMBERSHIP_FILTERS.key?(params[:search_membership])
       bug_reports = filter_by_membership(bug_reports)
