@@ -1,7 +1,7 @@
 <%= render Register::Page::Component.new(data: {controller: "register--heading",
     "register--heading-names-value": cycle_type_names.to_json,
     action: "hw-combobox:selection->register--heading#update"}) do %>
-  <%= render Register::Progress::Component.new(step: 1, total: BikeServices::Register.total_steps(@sequence, b_param: @b_param)) %>
+  <%= render Register::Progress::Component.new(steps: @steps, step: 1) %>
   <%= render UI::Header::Component.new(text: heading_text, subtitle: translation(".just_the_essentials")) %>
 
   <% if @b_param.errors.any? %>

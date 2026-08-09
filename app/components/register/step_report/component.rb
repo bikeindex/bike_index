@@ -5,10 +5,9 @@ module Register
     # What the registration is reporting - the theft, or the vehicle that was found.
     # The fields become the created bike's stolen record or its impound record
     class Component < ApplicationComponent
-      def initialize(b_param:, sequence: nil, current_user: nil)
+      def initialize(b_param:, steps:)
         @b_param = b_param
-        @sequence = sequence
-        @current_user = current_user
+        @steps = steps
       end
 
       private
@@ -21,19 +20,25 @@ module Register
         @b_param.status_stolen?
       end
 
-      # Memoized: the step list is what places the report, and it asks whether the
-      # registration has a creator yet, which is a query
-      def step_number
-        @step_number ||= BikeServices::Register.step_number("report", sequence: @sequence, b_param: @b_param)
+      def heading
+        stolen? ? translation(".report_your_stolen", cycle_type:) : translation(".about_the_one_you_found", cycle_type:)
       end
 
-      def total_steps
-        @total_steps ||= BikeServices::Register.total_steps(@sequence, b_param: @b_param)
+      def subtitle
+        stolen? ? translation(".the_more_we_know") : translation(".help_us_reunite")
+      end
+
+      def date_label
+        stolen? ? translation(".when_was_it_stolen", cycle_type:) : translation(".when_did_you_find_it")
+      end
+
+      def street_label
+        stolen? ? translation(".where_was_it_stolen") : translation(".where_did_you_find_it")
       end
 
       # The safety pages can come after the report, so this doesn't always finish the flow
       def submit_text
-        return translation(".next") if step_number < total_steps
+        return translation(".next") unless @steps.last == "report"
 
         translation(".complete_registration", cycle_type: @b_param.type_titleize)
       end
@@ -44,29 +49,30 @@ module Register
           .with_indifferent_access
       end
 
-      # The two records name their date differently, and a datetime_local field wants
-      # wall-clock time. Blank when nothing's saved - register--report-date fills in the
-      # browser's now, which the server falls back to anyway
-      def date_value
-        date = report_attrs[stolen? ? :date_stolen : :impounded_at]
-        Binxtils::TimeParser.parse(date)&.in_time_zone&.strftime("%Y-%m-%dT%H:%M") if date.present?
+      # The two records name their date differently. Nothing saved falls back to now,
+      # which is what both records do with a blank date anyway
+      def report_date
+        @report_date ||= Binxtils::TimeParser
+          .parse(report_attrs[stolen? ? :date_stolen : :impounded_at], parse_error: :nil) || Time.current
       end
+
+      # A datetime_local field holds wall-clock time, and this is the app's zone - the zone
+      # a submission that arrives without one is read back in. dateInputUpdateZone rewrites
+      # it into the browser's from data-initialtime, and posts that zone alongside
+      def date_value = report_date.in_time_zone.strftime("%Y-%m-%dT%H:%M")
 
       # form_with has no model here, so fields_for renders from this - the stolen record
       # keeps the address on its own columns, the impound record on an AddressRecord
       def address_record
-        @address_record ||= AddressRecord.new(saved_address.slice(*AddressRecord.permitted_params.map(&:to_s)))
-      end
-
-      def saved_address
-        (stolen? ? report_attrs : report_attrs[:address_record_attributes] || {}).to_h
+        @address_record ||= AddressRecord.new((stolen? ? report_attrs : report_attrs[:address_record_attributes] || {})
+          .slice(*AddressRecord.permitted_params))
       end
 
       # Back goes to whatever came before the report - step 2, or the review the
       # acknowledgment pages end at when the report waited on the emailed link
       def previous_path
         register_path(b_param_token: @b_param.id_token,
-          step: BikeServices::Register.step_before("report", sequence: @sequence, b_param: @b_param))
+          step: BikeServices::Register.step_before("report", steps: @steps))
       end
 
       def phone_visibility_entries

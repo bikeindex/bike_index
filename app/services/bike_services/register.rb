@@ -9,15 +9,16 @@ module BikeServices
     ACKNOWLEDGMENT_OFFSET = 3
     CONFIRMATION_EMAIL_INTERVAL = 5.minutes
     # The registrations that report something - a theft, or a vehicle found/abandoned -
-    # and so need the record that goes with it before their bike can be created. Only
+    # and the record the report is saved onto, which their bike is created with. Only
     # these two: BikeServices::Builder builds a record for no other status
-    REPORT_STATUSES = %w[status_stolen status_impounded].freeze
+    REPORT_RECORDS = {"status_stolen" => "stolen_record",
+                      "status_impounded" => "impound_record"}.freeze
     # A stolen record carries its own address columns, so the report's location is
     # flattened onto it - the impound record takes the nested attributes as they are
-    REPORT_ADDRESS_ATTRS = (AddressRecord.permitted_params.map(&:to_s) - %w[street_2]).freeze
+    REPORT_ADDRESS_ATTRS = (AddressRecord.permitted_params - %i[street_2]).freeze
     # The rest of what a theft report asks for. No phone number: a stolen registration
     # gives one in step 2, and the stolen record is built with it
-    STOLEN_REPORT_ATTRS = %w[theft_description police_report_number police_report_department
+    STOLEN_REPORT_ATTRS = %i[theft_description police_report_number police_report_department
       estimated_value locking_description lock_defeat_description proof_of_ownership
       receive_notifications phone_for_users phone_for_shops phone_for_police].freeze
 
@@ -101,8 +102,7 @@ module BikeServices
     end
 
     # What the back link goes to - nil for the step nothing comes before
-    def step_before(step, sequence:, b_param: nil)
-      steps = all_steps(b_param, sequence_pages(sequence))
+    def step_before(step, steps:)
       index = steps.index(step.to_s).to_i
       steps[index - 1] if index.positive?
     end
@@ -113,16 +113,13 @@ module BikeServices
       sequence&.registration_sequence_pages&.to_a || []
     end
 
-    # The progress bar's segments - one per step the flow can reach
-    def total_steps(sequence, b_param: nil) = all_steps(b_param, sequence_pages(sequence)).count
-
-    # Which of those segments a step is, 1-based - the report step shifts the ones after it
-    def step_number(step, sequence:, b_param: nil)
-      all_steps(b_param, sequence_pages(sequence)).index(step.to_s).to_i + 1
-    end
+    # Every step the flow reaches, in order - what the progress bar counts off and the
+    # back links walk. Placing the report asks whether the registration has a creator,
+    # which is a query, so it's built once a render and passed down
+    def steps(b_param, sequence:) = all_steps(b_param, sequence_pages(sequence))
 
     # Whether the flow includes the report step - what was stolen, or what was found
-    def report_step?(b_param) = REPORT_STATUSES.include?(b_param&.status)
+    def report_step?(b_param) = REPORT_RECORDS.key?(b_param&.status)
 
     # What the acknowledgment eyebrow counts: the rule pages, plus the review they end at
     def acknowledgment_step_count(sequence) = sequence_pages(sequence).count + 1
@@ -176,10 +173,8 @@ module BikeServices
     # The bike exists, or everything reachable is entered and awaiting the email - the
     # report step waits on that same confirmation, so it isn't what's left to enter here
     def finished?(b_param, sequence:)
-      return true if b_param.with_bike?
-
-      details_completed?(b_param) && acknowledged?(b_param, sequence:) &&
-        !creator_available?(b_param)
+      b_param.with_bike? ||
+        details_and_acknowledged?(b_param, sequence:) && !creator_available?(b_param)
     end
 
     # user: being signed in as the address settles it, without any link being clicked
@@ -249,6 +244,7 @@ module BikeServices
       b_param.image = image if image.present?
       bike_params = bike_params.to_h
       completed = b_param.self_made?(user) || bike_params["user_name"].present?
+      clear_stale_report(b_param, bike_params["status"])
       b_param.clean_params(step_2_params(bike_params, image_signed_id:, completed:).as_json)
       b_param.save
       b_param.errors.add(:base, translation(:name_required)) unless completed
@@ -256,22 +252,18 @@ module BikeServices
     end
 
     def permitted_report_params
-      %i[date timezone impounded_description] + STOLEN_REPORT_ATTRS.map(&:to_sym) +
+      %i[date timezone impounded_description] + STOLEN_REPORT_ATTRS +
         [{address_record_attributes: AddressRecord.permitted_params}]
     end
 
     # The theft or the find itself, onto the record the bike is created with - a stolen
-    # record for a theft, an impound record for a vehicle found. A blank date is allowed
-    # through: both records fall back to the current time
+    # record for a theft, an impound record for a vehicle found. A date that's blank or
+    # unparseable is allowed through: both records fall back to the current time
     def save_report(b_param, report_params:)
       attrs = report_params.to_h.with_indifferent_access
-      date = Binxtils::TimeParser.parse(attrs["date"], attrs["timezone"]) if attrs["date"].present?
-      report = if b_param.status_stolen?
-        {stolen_record: stolen_report_attrs(attrs, date)}
-      else
-        {impound_record: impound_report_attrs(attrs, date)}
-      end
-      b_param.clean_params(report.merge(report_completed: true).as_json)
+      date = Binxtils::TimeParser.parse(attrs["date"], attrs["timezone"], parse_error: :nil)
+      report = b_param.status_stolen? ? stolen_report_attrs(attrs, date) : impound_report_attrs(attrs, date)
+      b_param.clean_params({REPORT_RECORDS[b_param.status] => report, :report_completed => true}.as_json)
       b_param.save
     end
 
@@ -310,12 +302,26 @@ module BikeServices
     end
 
     def ready_for_bike?(b_param, sequence:)
-      details_completed?(b_param) && acknowledged?(b_param, sequence:) && report_completed?(b_param)
+      details_and_acknowledged?(b_param, sequence:) && report_completed?(b_param)
+    end
+
+    def details_and_acknowledged?(b_param, sequence:)
+      details_completed?(b_param) && acknowledged?(b_param, sequence:)
     end
 
     # Nothing to report without a status that has a record, otherwise save_report's marker
     def report_completed?(b_param)
       !report_step?(b_param) || b_param.params["report_completed"].present?
+    end
+
+    # Step 2 can change the status after the report was filled in, and BParam reads the
+    # status back off the record that saved it - so a record the new status has no use for
+    # would pin the registration to the old one. Dropped, along with save_report's marker
+    def clear_stale_report(b_param, status)
+      stale = REPORT_RECORDS.except(status).values & b_param.params.keys
+      return if status.blank? || stale.none?
+
+      b_param.params = b_param.params.except(*stale, "report_completed")
     end
 
     def stolen_report_attrs(attrs, date)
@@ -339,12 +345,10 @@ module BikeServices
     # emailed link is what proves the address the report belongs to, and it's clicked
     # after the acknowledgment pages rather than before them
     def all_steps(b_param, pages)
-      steps = %w[1 2] + pages.each_index.map { step_for_page_index(it) } +
-        (pages.any? ? %w[review] : [])
-      return steps unless report_step?(b_param)
-      return steps + %w[report] unless creator_available?(b_param)
+      rest = pages.each_index.map { step_for_page_index(it) } + (pages.any? ? %w[review] : [])
+      return %w[1 2] + rest unless report_step?(b_param)
 
-      steps.first(2) + %w[report] + steps.drop(2)
+      creator_available?(b_param) ? %w[1 2 report] + rest : %w[1 2] + rest + %w[report]
     end
 
     # Every step the registration has reached, in order - each one opens the next, so the
@@ -413,9 +417,9 @@ module BikeServices
     def translation(key) = I18n.t(key, scope: "shared.register_flow")
 
     conceal :claim_creator, :create_bike_if_ready, :create_bike, :ready_for_bike?,
-      :report_completed?, :stolen_report_attrs, :impound_report_attrs, :reusable?,
-      :all_steps, :permitted_steps, :step_completed?, :confirmed_email_creator_id,
-      :owner_email_for, :assign_owner_email, :details_completed?, :step_2_params,
-      :translation
+      :details_and_acknowledged?, :report_completed?, :clear_stale_report, :stolen_report_attrs,
+      :impound_report_attrs, :reusable?, :all_steps, :permitted_steps, :step_completed?,
+      :confirmed_email_creator_id, :owner_email_for, :assign_owner_email, :details_completed?,
+      :step_2_params, :translation
   end
 end

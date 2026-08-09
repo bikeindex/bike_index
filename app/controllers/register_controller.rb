@@ -44,19 +44,19 @@ class RegisterController < ApplicationController
       render Register::StepFinished::Component.new(b_param: @b_param, current_user:)
     when "review"
       @page_title = I18n.t("meta_titles.register_review", cycle_type: @b_param.type)
-      render Register::StepAcknowledgmentReview::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:)
+      render Register::StepAcknowledgmentReview::Component.new(b_param: @b_param, sequence: @registration_sequence, steps: flow_steps, current_user:)
     when "report"
       @page_title = I18n.t("meta_titles.register_report")
-      render Register::StepReport::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:)
+      render Register::StepReport::Component.new(b_param: @b_param, steps: flow_steps)
     when "2"
       @page_title = I18n.t("meta_titles.register_step_2", cycle_type: @b_param.type)
-      render Register::Step2::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:)
+      render Register::Step2::Component.new(b_param: @b_param, sequence: @registration_sequence, steps: flow_steps, current_user:)
     when "1"
       @page_title = I18n.t("meta_titles.register_step_1", cycle_type: @b_param.type)
-      render Register::Step1::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:)
+      render Register::Step1::Component.new(b_param: @b_param, sequence: @registration_sequence, steps: flow_steps, current_user:)
     else
       @page_title = I18n.t("meta_titles.register_acknowledgment", cycle_type: @b_param.type)
-      render Register::StepAcknowledgment::Component.new(b_param: @b_param, sequence: @registration_sequence, step:)
+      render Register::StepAcknowledgment::Component.new(b_param: @b_param, sequence: @registration_sequence, step:, steps: flow_steps)
     end
   end
 
@@ -66,7 +66,7 @@ class RegisterController < ApplicationController
     unless saved
       # The 422 render skips the derived meta title, which now needs the interpolation
       @page_title = I18n.t("meta_titles.register_create", cycle_type: @b_param.type)
-      return render(Register::Step1::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:),
+      return render(Register::Step1::Component.new(b_param: @b_param, sequence: @registration_sequence, steps: flow_steps, current_user:),
         status: :unprocessable_entity)
     end
 
@@ -82,7 +82,7 @@ class RegisterController < ApplicationController
       bike_params: update_params)
     # Saved either way, so the re-render has everything they entered
     unless saved
-      return render(Register::Step2::Component.new(b_param: @b_param, sequence: @registration_sequence, current_user:),
+      return render(Register::Step2::Component.new(b_param: @b_param, sequence: @registration_sequence, steps: flow_steps, current_user:),
         status: :unprocessable_entity)
     end
 
@@ -199,6 +199,12 @@ class RegisterController < ApplicationController
   # Resolved once - the step math, the progress bar and the pages themselves all read it
   def find_registration_sequence
     @registration_sequence = BikeServices::Register.registration_sequence(@b_param)
+  end
+
+  # Read at render time rather than in a filter: the submissions save first, and where
+  # the report sits depends on what they saved
+  def flow_steps
+    BikeServices::Register.steps(@b_param, sequence: @registration_sequence)
   end
 
   # Not find_b_param: the emailed token authorizes this, not the session, and an expired

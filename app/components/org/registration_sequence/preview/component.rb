@@ -30,14 +30,14 @@ module Org
           pages[@index]
         end
 
-        # The registration's step math, so the progress bars match the real flow. The
-        # review is one past the pages, which is exactly the review's step there too.
-        def progress_step
-          BikeServices::Register.step_for_page_index(@index).to_i
+        # The registration's own steps, so the progress bar matches the real flow. No
+        # b_param, so it's the flow without a report - which is what a preview walks
+        def progress_steps
+          @progress_steps ||= BikeServices::Register.steps(nil, sequence: @registration_sequence)
         end
 
-        def progress_total
-          BikeServices::Register.total_steps(@registration_sequence)
+        def progress_step
+          reviewing? ? "review" : BikeServices::Register.step_for_page_index(@index)
         end
 
         def acknowledgment_step_count

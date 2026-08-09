@@ -1,5 +1,6 @@
 <%= render Register::Page::Component.new do %>
-  <%= render Register::Progress::Component.new(step: step_number, total: total_steps) %>
+  <%# Not always the last step: a report waiting on the confirmation email comes after %>
+  <%= render Register::Progress::Component.new(steps: @steps, step: "review") %>
 
   <%# The last acknowledgment step, not a finished one - the acknowledgment is still unsigned %>
   <%= render Register::AcknowledgmentProgress::Component.new(number: acknowledgment_step_count,

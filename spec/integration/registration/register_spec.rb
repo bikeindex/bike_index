@@ -177,13 +177,27 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(ActiveStorage::Blob.find_signed!(b_param.image_signed_id).filename.to_s)
       .to eq "bike_photo-landscape.jpeg"
 
-    # Following the link makes the bike the registration was holding
+    # The link proves the address, which leaves the theft it's reporting to tell us about
     visit confirmation_link
+
+    expect(page).to have_content("Report your stolen bike", wait: 10)
+    expect(Bike.count).to eq 0
+    # Nothing was saved to fill it in from, so the browser answered when in its own zone
+    expect(page).to have_field("report[date]", with: /\d{4}-\d\d-\d\dT\d\d:\d\d/)
+    fill_in "report[address_record_attributes][street]", with: "278 Broadway"
+    fill_in "report[theft_description]", with: "Locked to a rack outside the coffee shop"
+    fill_in "report[police_report_number]", with: "8675309"
+
+    click_button "Complete Bike Registration"
 
     expect(page).to have_content("Registration complete", wait: 10)
     bike = Bike.last
     expect(bike).to have_attributes(owner_email:, serial_number: "made_without_serial",
       status: "status_stolen", frame_model: "Marlin 7")
+    expect(bike.current_stolen_record).to have_attributes(street: "278 Broadway",
+      theft_description: "Locked to a rack outside the coffee shop", police_report_number: "8675309",
+      phone: "5550000000")
+    expect(bike.current_stolen_record.date_stolen).to be_within(5.minutes).of(Time.current)
     # Signed in as the account the link made - to anyone else it reads as unclaimed
     expect(page).to have_content("keep watch")
 

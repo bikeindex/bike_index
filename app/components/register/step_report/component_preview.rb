@@ -31,8 +31,9 @@ module Register
           bike: {owner_email: lookbook_user&.email, status:,
                  manufacturer_id: ::Manufacturer.frame_makers.first&.id}
         }.merge(params).as_json)
-        render(Register::StepReport::Component.new(b_param:, current_user: lookbook_user,
-          sequence: ::BikeServices::Register.registration_sequence(b_param)))
+        sequence = ::BikeServices::Register.registration_sequence(b_param)
+        render(Register::StepReport::Component.new(b_param:,
+          steps: ::BikeServices::Register.steps(b_param, sequence:)))
       end
     end
   end

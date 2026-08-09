@@ -5,19 +5,22 @@ require "rails_helper"
 RSpec.describe Register::StepReport::Component, type: :component do
   let(:current_user) { FactoryBot.create(:user_confirmed) }
   let(:status) { "status_stolen" }
+  let(:sequence) { nil }
   let(:params) { {bike: {owner_email: current_user.email, manufacturer_id: 12, status:}} }
   let(:b_param) { BParam.create(origin: "register_flow", creator_id: current_user.id, params: params.as_json) }
+  let(:steps) { BikeServices::Register.steps(b_param, sequence:) }
 
   it "asks about the theft, and is the last step" do
-    render_inline(described_class.new(b_param:, current_user:))
+    render_inline(described_class.new(b_param:, steps:))
 
-    expect(page).to have_field("report[date]")
     expect(page).to have_field("report[address_record_attributes][street]")
     expect(page).to have_field("report[police_report_number]")
     expect(page).to have_button("Complete Bike Registration")
-    # The date is filled in by the browser, in the zone it's entered in
-    expect(page.find("input[name='report[date]']")[:value]).to be_blank
-    expect(page).to have_css("[data-controller~='register--report-date']")
+    # Nothing saved, so the field opens on now - dateInputUpdateZone rewrites it into
+    # the browser's zone, which the hiddenFieldTimezone posts alongside
+    expect(page.find("input[name='report[date]'].dateInputUpdateZone")[:value])
+      .to eq Time.current.in_time_zone.strftime("%Y-%m-%dT%H:%M")
+    expect(page).to have_css("input[name='report[timezone]'].hiddenFieldTimezone", visible: :all)
     # Nothing to report about a vehicle nobody found
     expect(page).to_not have_field("report[impounded_description]")
   end
@@ -29,10 +32,13 @@ RSpec.describe Register::StepReport::Component, type: :component do
     end
 
     it "shows the report as it was entered" do
-      render_inline(described_class.new(b_param:, current_user:))
+      render_inline(described_class.new(b_param:, steps:))
 
-      expect(page.find("input[name='report[date]']")[:value])
-        .to eq Time.parse("2026-08-05T19:30:00 UTC").in_time_zone.strftime("%Y-%m-%dT%H:%M")
+      date = page.find("input[name='report[date]']")
+      # The app's zone, which is what a submission without one is read back in
+      expect(date[:value]).to eq Time.parse("2026-08-05T19:30:00 UTC").in_time_zone.strftime("%Y-%m-%dT%H:%M")
+      # The instant itself, for the localizer to render in the browser's zone
+      expect(Time.parse(date["data-initialtime"])).to be_within(1).of Time.parse("2026-08-05T19:30:00 UTC")
       expect(page).to have_field("report[address_record_attributes][street]", with: "1 Main St")
       expect(page).to have_field("report[theft_description]", with: "Cut lock")
       expect(page.find("input[name='report[phone_for_users]'][type='checkbox']")).to_not be_checked
@@ -45,7 +51,7 @@ RSpec.describe Register::StepReport::Component, type: :component do
     let(:status) { "status_impounded" }
 
     it "asks about the find instead" do
-      render_inline(described_class.new(b_param:, current_user:))
+      render_inline(described_class.new(b_param:, steps:))
 
       expect(page).to have_field("report[impounded_description]")
       expect(page).to have_field("report[address_record_attributes][street]")
@@ -63,8 +69,7 @@ RSpec.describe Register::StepReport::Component, type: :component do
     end
 
     it "doesn't claim to finish the registration" do
-      render_inline(described_class.new(b_param:, current_user:,
-        sequence: BikeServices::Register.registration_sequence(b_param)))
+      render_inline(described_class.new(b_param:, steps:))
 
       expect(page).to have_button("Next")
       expect(page).to_not have_button("Complete Bike Registration")

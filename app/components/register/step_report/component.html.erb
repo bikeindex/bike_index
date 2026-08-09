@@ -1,27 +1,25 @@
 <%= render Register::Page::Component.new do %>
-  <%= render Register::Progress::Component.new(step: step_number, total: total_steps) %>
+  <%= render Register::Progress::Component.new(steps: @steps, step: "report") %>
 
-  <%= render UI::Header::Component.new(text: stolen? ? translation(".report_your_stolen", cycle_type:) : translation(".about_the_one_you_found", cycle_type:),
-      subtitle: stolen? ? translation(".the_more_we_know") : translation(".help_us_reunite")) %>
+  <%= render UI::Header::Component.new(text: heading, subtitle:) %>
 
   <%= form_with(url: report_register_path, method: :patch, scope: :report,
-      data: {controller: "autofocus register--report-date"}) do |f| %>
+      data: {controller: "autofocus"}) do |f| %>
     <%= hidden_field_tag :b_param_token, @b_param.id_token %>
 
     <%# A wall-clock time only means something alongside the zone it was entered in %>
-    <%= f.hidden_field :timezone, data: {"register--report-date-target": "timezone"} %>
+    <%= f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
 
     <%= render Register::SectionLabel::Component.new(text: translation(".when_and_where")) %>
 
     <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :date, kind: :datetime_local_field,
-        label_text: stolen? ? translation(".when_was_it_stolen", cycle_type:) : translation(".when_did_you_find_it"),
+        label_text: date_label,
         html_options: {value: date_value, max: Binxtils::TimeParser.round(Time.current + 1.day),
-          data: {"register--report-date-target": "date"}}) %>
+          class: "dateInputUpdateZone", "data-initialtime": report_date.iso8601}) %>
 
     <%# _attributes explicitly: form_with has no model to infer nested attributes from %>
     <%= f.fields_for :address_record_attributes, address_record do |address_form| %>
-      <%= render UI::Forms::AddressGroup::Component.new(form_builder: address_form,
-          street_label: stolen? ? translation(".where_was_it_stolen") : translation(".where_did_you_find_it")) %>
+      <%= render UI::Forms::AddressGroup::Component.new(form_builder: address_form, street_label:) %>
     <% end %>
 
     <% if stolen? %>

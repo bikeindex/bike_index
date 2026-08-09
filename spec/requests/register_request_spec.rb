@@ -925,6 +925,28 @@ RSpec.describe RegisterController, type: :request do
           expect(Bike.last.current_stolen_record).to be_blank
         end
       end
+
+      # The safety pages sit between the report and the bike, which is the window to go back in
+      context "the status changes after the report" do
+        let(:organization) { FactoryBot.create(:organization) }
+        let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+        let(:b_param) do
+          BParam.create(origin: "register_flow", params: {bike: {owner_email:, manufacturer_id: "Trek",
+                                                                 cycle_type: "e-scooter", creation_organization_id: organization.id}}.as_json)
+        end
+
+        it "carries on to the safety pages, with no theft to report on the way" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          expect(response).to redirect_to step_path.call("report")
+          patch "#{base_url}/report", params: {b_param_token: b_param.id_token, report: report_details}
+          expect(response).to redirect_to step_path.call("3")
+
+          patch base_url, params: {b_param_token: b_param.id_token,
+                                   bike: bike_details.merge(status: "status_with_owner")}
+          expect(response).to redirect_to step_path.call("3")
+          expect(b_param.reload.status).to eq "status_with_owner"
+        end
+      end
     end
 
     context "anonymous" do

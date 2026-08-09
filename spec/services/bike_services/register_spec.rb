@@ -193,9 +193,9 @@ RSpec.describe BikeServices::Register do
 
     it "comes after step 2, and saves the stolen record the bike is created with" do
       expect(described_class.report_step?(b_param)).to be_truthy
-      expect(described_class.total_steps(nil, b_param:)).to eq 3
-      expect(described_class.step_number("report", sequence: nil, b_param:)).to eq 3
-      expect(described_class.step_before("report", sequence: nil, b_param:)).to eq "2"
+      expect(described_class.steps(b_param, sequence: nil).count).to eq 3
+      expect(described_class.steps(b_param, sequence: nil)).to eq %w[1 2 report]
+      expect(described_class.step_before("report", steps: described_class.steps(b_param, sequence: nil))).to eq "2"
       # Not finished: the theft is still to be reported
       expect(described_class.finished?(b_param, sequence: nil)).to be_falsey
       expect(described_class.permitted_step(b_param, nil, sequence: nil)).to eq "report"
@@ -213,6 +213,51 @@ RSpec.describe BikeServices::Register do
       # Everything's in - the submission that saved it creates the bike
       expect(described_class.send(:report_completed?, b_param)).to be_truthy
       expect(described_class.send(:ready_for_bike?, b_param, sequence: nil)).to be_truthy
+    end
+
+    it "takes an unparseable date as no date at all" do
+      expect(described_class.save_report(b_param, report_params: report_params.merge(date: "2026-13-45T99:99")))
+        .to be_truthy
+      expect(b_param.reload.stolen_attrs["date_stolen"]).to be_blank
+      # Which the record it's created with fills in
+      expect(Bike.new.build_new_stolen_record(b_param.stolen_attrs).date_stolen).to be_within(5).of(Time.current)
+    end
+
+    context "the status changes after the report" do
+      # Going back to step 2 and picking a different one. user_name: the registration is
+      # for an address that isn't the creator's, so step 2 doesn't pass without a name
+      def resubmit_step_2(status, **bike_attrs)
+        described_class.save_step_2(b_param, user: creator, image: nil, image_signed_id: nil,
+          bike_params: {"status" => status, "user_name" => "Sally Rider"}.merge(bike_attrs))
+      end
+
+      before { described_class.save_report(b_param, report_params:) }
+
+      it "drops the report the new status has no use for" do
+        expect(resubmit_step_2("status_with_owner")).to be_truthy
+
+        # Not just the bike's status: BParam reads it back off the record the report saved
+        expect(b_param.reload.status).to eq "status_with_owner"
+        expect(b_param.stolen_attrs).to be_blank
+        expect(described_class.report_step?(b_param)).to be_falsey
+        expect(described_class.send(:ready_for_bike?, b_param, sequence: nil)).to be_truthy
+      end
+
+      it "asks the other report's questions when it's still a status that reports" do
+        resubmit_step_2("status_impounded")
+
+        expect(b_param.reload.status).to eq "status_impounded"
+        expect(b_param.stolen_attrs).to be_blank
+        # The theft report doesn't stand in for the find, so the step opens again
+        expect(described_class.permitted_step(b_param, nil, sequence: nil)).to eq "report"
+      end
+
+      it "keeps the report when the status it was made for doesn't change" do
+        resubmit_step_2("status_stolen", "frame_model" => "Marlin 7")
+
+        expect(b_param.reload.stolen_attrs["theft_description"]).to eq "Cut lock"
+        expect(described_class.send(:report_completed?, b_param)).to be_truthy
+      end
     end
 
     context "found" do
@@ -235,7 +280,7 @@ RSpec.describe BikeServices::Register do
 
       it "has no report to make" do
         expect(described_class.report_step?(b_param)).to be_falsey
-        expect(described_class.total_steps(nil, b_param:)).to eq 2
+        expect(described_class.steps(b_param, sequence: nil)).to eq %w[1 2]
         expect(described_class.permitted_step(b_param, "report", sequence: nil)).to eq "2"
       end
     end
@@ -267,13 +312,13 @@ RSpec.describe BikeServices::Register do
       it "comes before them" do
         expect(described_class.registration_sequence(b_param)).to eq sequence
         # Two detail steps, the report, a page each and the review
-        expect(described_class.total_steps(sequence, b_param:)).to eq 6
+        expect(described_class.steps(b_param, sequence:)).to eq %w[1 2 report 3 4 review]
         expect(described_class.permitted_step(b_param, "3", sequence:)).to eq "report"
-        expect(described_class.step_before("3", sequence:, b_param:)).to eq "report"
+        expect(described_class.step_before("3", steps: described_class.steps(b_param, sequence:))).to eq "report"
 
         described_class.save_report(b_param, report_params:)
         expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "3"
-        expect(described_class.step_number("3", sequence:, b_param:)).to eq 4
+        expect(described_class.steps(b_param, sequence:).index("3")).to eq 3
       end
 
       context "without a creator" do
@@ -284,7 +329,7 @@ RSpec.describe BikeServices::Register do
 
         it "comes after them - the emailed link is clicked once they're acknowledged" do
           pages = described_class.sequence_pages(sequence)
-          expect(described_class.step_number("review", sequence:, b_param:)).to eq 5
+          expect(described_class.steps(b_param, sequence:)).to eq %w[1 2 3 4 review report]
           expect(described_class.permitted_step(b_param, "report", sequence:)).to eq "3"
 
           pages.each { described_class.acknowledge_page(b_param, it, checked: %w[1 1]) }
@@ -294,7 +339,7 @@ RSpec.describe BikeServices::Register do
           # Confirming the email is what opens the report
           b_param.update(creator_id: creator.id)
           expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "report"
-          expect(described_class.step_before("report", sequence:, b_param:)).to eq "2"
+          expect(described_class.step_before("report", steps: described_class.steps(b_param, sequence:))).to eq "2"
         end
       end
     end
@@ -317,7 +362,7 @@ RSpec.describe BikeServices::Register do
       it "is the organization's active sequence" do
         expect(described_class.registration_sequence(b_param)).to eq sequence
         # Two detail steps, a page each and the review
-        expect(described_class.total_steps(sequence)).to eq 5
+        expect(described_class.steps(b_param, sequence:).count).to eq 5
       end
 
       context "not an e-vehicle" do
@@ -326,7 +371,7 @@ RSpec.describe BikeServices::Register do
         it "is nil - only e-vehicles acknowledge safety rules" do
           expect(b_param.motorized?).to be_falsey
           expect(described_class.registration_sequence(b_param)).to be_nil
-          expect(described_class.total_steps(nil)).to eq 2
+          expect(described_class.steps(b_param, sequence: nil).count).to eq 2
         end
       end
 
