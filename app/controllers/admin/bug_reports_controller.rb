@@ -1,6 +1,7 @@
 module Admin
   class BugReportsController < Admin::BaseController
     include Binxtils::SortableTable
+    include API::TokenAuthenticatable
 
     # Keyed by the BugReport scope each filter applies
     MEMBERSHIP_FILTERS = {"member" => "Only members", "paid_organization" => "Only paid org",
@@ -8,6 +9,8 @@ module Admin
     STATUS_FILTER_ALL = "all"
     STATUS_FILTER_INVESTIGATE = "investigate"
 
+    # Token requests carry no CSRF token, they authenticate with the token alone
+    skip_before_action :verify_authenticity_token, if: -> { doorkeeper_token.present? }
     before_action :find_bug_report, only: %i[show update]
 
     def index
@@ -123,6 +126,11 @@ module Admin
     end
 
     private
+
+    # Token requests get the API's JSON errors rather than a flash + redirect
+    def require_index_admin!
+      doorkeeper_token.present? ? require_token_superuser! : super
+    end
 
     def find_bug_report
       @bug_report = BugReport.find(params[:id])

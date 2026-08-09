@@ -1,14 +1,19 @@
 # frozen_string_literal: true
 
 module API
-  # OAuth bearer-token lookup and user authorization for plain Rails controllers
-  # under the API namespace.
+  # OAuth bearer-token lookup and user authorization for plain Rails controllers,
+  # both the API endpoints and the admin pages local agents/tooling reach.
   module TokenAuthenticatable
     extend ActiveSupport::Concern
 
+    ADMIN_DOORKEEPER_APP_ID = ENV.fetch("ADMIN_DOORKEEPER_APP_ID", 54).to_i
+
     private
 
+    # A token identifies the user when one is passed, otherwise the signed in user
     def current_user
+      return super if doorkeeper_token.blank?
+
       authorize_user(doorkeeper_token)[:user]
     end
 
@@ -27,13 +32,25 @@ module API
       end
     end
 
-    # Overridden by controllers that restrict access to a specific OAuth application
-    def authorized_app?(_access_token)
-      true
+    # Renders the JSON error unless the token belongs to a superuser for this controller
+    def require_token_superuser!
+      auth = authorize_user(doorkeeper_token)
+      return render(json: {error: auth[:error]}, status: auth[:status]) if auth[:error]
+      return if auth[:user].superuser?(controller_name:, action_name:)
+
+      render json: {error: "Not permitted"}, status: 403
     end
 
+    # The admin app, unless overridden by a controller serving a different OAuth application
+    def authorized_app?(access_token)
+      access_token.application_id == ADMIN_DOORKEEPER_APP_ID
+    end
+
+    # Memoizes the miss too - every admin page view asks, and most have no token
     def doorkeeper_token
-      @doorkeeper_token ||= Doorkeeper::OAuth::Token.authenticate(
+      return @doorkeeper_token if defined?(@doorkeeper_token)
+
+      @doorkeeper_token = Doorkeeper::OAuth::Token.authenticate(
         request, *Doorkeeper.configuration.access_token_methods
       )
     end

@@ -111,6 +111,18 @@ RSpec.describe Admin::BugReportsController, type: :request do
       expect(bug_report.reload).to have_attributes(tags: %w[parking search], github_pull_request: 3805)
     end
 
+    context "session without a CSRF token" do
+      include_context :test_csrf_token
+      it "does not update" do
+        patch "#{base_url}/#{bug_report.to_param}", params: {
+          bug_report: {github_pull_request: "3805"}
+        }
+        expect(response.status).to eq 302
+        expect(flash[:error]).to be_present
+        expect(bug_report.reload.github_pull_request).to be_blank
+      end
+    end
+
     context "json" do
       it "updates" do
         patch "#{base_url}/#{bug_report.to_param}", params: {
@@ -154,6 +166,73 @@ RSpec.describe Admin::BugReportsController, type: :request do
         expect(response).to redirect_to(admin_bug_reports_path)
         expect(flash[:error]).to be_present
         expect(bug_report.reload.tags).to eq(["parking"])
+      end
+    end
+  end
+
+  describe "authenticated with an API token" do
+    let(:current_user) { false } # No session - the token is the authentication
+    include_context :admin_doorkeeper_token
+    include_context :test_csrf_token
+
+    context "without a token or a session" do
+      it "redirects" do
+        get "#{base_url}.json"
+        expect(response.status).to eq 302
+        expect(flash[:error]).to be_present
+      end
+    end
+
+    context "token from the wrong app" do
+      before { stub_const("API::TokenAuthenticatable::ADMIN_DOORKEEPER_APP_ID", doorkeeper_app.id + 1) }
+      it "returns 403" do
+        get "#{base_url}.json", params: token_param
+        expect(response.status).to eq 403
+        expect(json_result[:error]).to eq "Unauthorized application"
+      end
+    end
+
+    context "token for a user without the bug_reports ability" do
+      before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "bikes") }
+      it "returns 403" do
+        get "#{base_url}.json", params: token_param
+        expect(response.status).to eq 403
+        expect(json_result[:error]).to eq "Not permitted"
+      end
+    end
+
+    context "token for a bug_reports superuser" do
+      before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "bug_reports") }
+
+      it "renders the index" do
+        expect(bug_report).to be_present
+        get "#{base_url}.json", params: token_param.merge(search_status: "all")
+        expect(response.status).to eq 200
+        expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report.id])
+      end
+
+      it "updates" do
+        patch "#{base_url}/#{bug_report.to_param}", params: token_param.merge(
+          bug_report: {tags: %w[search], github_pull_request: 3805}
+        ), as: :json
+        expect(response.status).to eq 200
+        expect(bug_report.reload).to have_attributes(tags: %w[search], github_pull_request: 3805)
+      end
+
+      it "assigns tags" do
+        post "#{base_url}/assign_tags", params: token_param.merge(
+          tags: "search", bug_reports_selected: {bug_report.id.to_s => bug_report.id}
+        )
+        expect(response).to redirect_to(admin_bug_reports_path)
+        expect(bug_report.reload.tags).to eq(%w[parking search])
+      end
+    end
+
+    context "universal superuser token" do
+      let(:token_user) { FactoryBot.create(:superuser) }
+      it "renders the index" do
+        get "#{base_url}.json", params: token_param
+        expect(response.status).to eq 200
       end
     end
   end
