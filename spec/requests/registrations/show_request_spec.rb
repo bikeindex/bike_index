@@ -3,8 +3,12 @@ require "rails_helper"
 RSpec.describe "RegistrationsController#show", type: :request do
   include_context :request_spec_logged_in_as_user_if_present
   let(:base_url) { "/registrations" }
-  # Required when rendering bike details, otherwise it raises ReadOnlyError
-  before { RearGearType.fixed }
+  # show reads from the replica, and the render reaches both of these first_or_create
+  # singletons — outside of test they're already-existing rows, so they only select
+  before do
+    RearGearType.fixed
+    Country.united_states
+  end
 
   context "consumer view" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity) }
