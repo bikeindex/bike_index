@@ -106,6 +106,12 @@
     @apply tw:text-blue-700 tw:dark:text-blue-300 tw:font-bold tw:underline;
   }
 
+  /* Bootstrap's `.container p, ul, ol, dl` margins are in the legacy layer, which
+   * beats Tailwind's preflight -- restore the base spacing inside an alert */
+  .twalert :is(p, ul, ol, dl) {
+    @apply tw:m-0;
+  }
+
   /* Links inherit the alert's own color, so the underline is what marks them as links */
   .twalert-body .twlink {
     @apply tw:underline tw:hover:text-blue-800;

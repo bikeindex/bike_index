@@ -68,11 +68,8 @@ module UI
           TEXT_CLASSES[@kind]
         end
 
-        # The ! overrides bootstrap's alert colors
         def header_color_classes
-          return "twtext-color!" if @default_header_color
-
-          text_color_classes.gsub("00", "00!")
+          @default_header_color ? "twtext-color" : text_color_classes
         end
 
         def dismissable_color_classes
