@@ -10,6 +10,7 @@ class SessionsController < ApplicationController
   before_action :redirect_forced_saml, only: %i[identify create create_magic_link]
 
   def new
+    @email = params[:email]
     render_partner_or_default_signin_layout
   end
 
@@ -90,6 +91,22 @@ class SessionsController < ApplicationController
       # Email address is not in the DB — back to the email step
       flash.now[:error] = translation(:invalid_email_or_password)
       render_partner_or_default_signin_layout(render_action: :new)
+    end
+  end
+
+  # Rather than dumping a would-be sign in at user_root_url, hand back the form they
+  # submitted - losing the session that failed the check is exactly when they need it
+  def handle_unverified_request
+    flash.now[:error] = invalid_authenticity_token_message
+    case action_name
+    when "sign_in_with_magic_link"
+      @token = params[:token]
+      render_partner_or_default_signin_layout(render_action: :magic_link)
+    when "identify", "create", "create_magic_link"
+      @email = submitted_email
+      render_partner_or_default_signin_layout(render_action: :new)
+    else
+      super
     end
   end
 
