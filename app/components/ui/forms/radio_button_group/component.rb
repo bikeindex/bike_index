@@ -11,7 +11,10 @@ module UI
           UI::ButtonGroup::Component::RESTING_CHIP_CLASSES,
           "tw:mb-0!", # the chip is a <label>, which legacy CSS gives a bottom margin
           "tw:has-[:checked]:bg-purple-500 tw:has-[:checked]:text-white tw:has-[:checked]:border-purple-500",
-          "tw:has-[:checked]:hover:bg-purple-500 tw:has-[:checked]:hover:border-purple-500",
+          # Hovering a checked chip has to keep its fill, and the hover it overrides is
+          # guarded not-disabled:not-aria-disabled: — neither of which a <label> can be,
+          # so they're here to carry the specificity that beats it.
+          "tw:has-[:checked]:not-disabled:not-aria-disabled:hover:bg-purple-500 tw:has-[:checked]:not-disabled:not-aria-disabled:hover:border-purple-500",
           "tw:has-[:checked]:ring-2 tw:has-[:checked]:ring-purple-500/40",
           "tw:has-[:focus-visible]:outline-none tw:has-[:focus-visible]:ring-3 tw:has-[:focus-visible]:ring-purple-500/40"
         ].join(" ").freeze
