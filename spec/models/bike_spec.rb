@@ -225,8 +225,9 @@ RSpec.describe Bike, type: :model do
           bike.update(created_at: Time.current - 2.days)
           allow(bike).to receive(:phone) { "1112223333" }
           # Accepts properties
-          stolen_record = bike.build_new_stolen_record(country_id: country.id)
+          stolen_record = bike.build_new_stolen_record(country_id: country.id, region_string: "Vlaanderen")
           expect(stolen_record.country_id).to eq country.id
+          expect(stolen_record.region_string).to eq "Vlaanderen"
           expect(stolen_record.phone).to eq "1112223333"
           expect(stolen_record.date_stolen).to be > Time.current - 1.second
           expect(stolen_record.creation_organization_id).to be_blank
