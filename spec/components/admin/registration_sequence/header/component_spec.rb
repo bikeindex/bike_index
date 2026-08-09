@@ -40,7 +40,7 @@ RSpec.describe Admin::RegistrationSequence::Header::Component, type: :component 
       expect(page).to have_content("Editing Brakebills Current", normalize_ws: true)
       expect(page).to_not have_link("Edit")
       expect(page).to have_css("button[disabled]", text: "Edit")
-      # The tooltip carries the reason: a disabled button can't be hovered, so its title never shows
+      # A disabled button can't be hovered, so the tooltip carries the reason
       expect(page).to have_css("[role='tooltip']", text: "Can't edit current registration sequence - create a draft", visible: :all)
       # The other two stay reachable
       expect(page).to have_link("View", href: admin_url)

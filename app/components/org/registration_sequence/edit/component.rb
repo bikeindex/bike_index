@@ -3,11 +3,9 @@
 module Org
   module RegistrationSequence
     module Edit
-      # Sequence management UI: the drag-to-reorder page list with per-page Edit
-      # links and the sequence-wide settings form. Admin opens this on any sequence,
-      # so an activated one - which acknowledgments freeze - renders read-only.
+      # The drag-to-reorder page list and the sequence-wide settings form.
       class Component < ApplicationComponent
-        # editable: admin's read-only screen renders a draft without its forms
+        # editable: admin's read-only screen shows a draft without its forms
         def initialize(registration_sequence:, admin: false, editable: registration_sequence.editable?)
           @registration_sequence = registration_sequence
           @admin = admin

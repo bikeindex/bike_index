@@ -20,8 +20,7 @@ module Register
         @page.registration_sequence
       end
 
-      # Whatever the editor promised the badge would say. Registrants only ever reach an
-      # organization's own sequence; the template's name shows when admin previews it
+      # What the editor promised the badge would say - "Template" when admin previews it
       def organization_name
         sequence&.badge_name
       end

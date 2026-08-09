@@ -24,8 +24,7 @@ module Admin
       @preview_pagy = Pagy::Offset.new(count: screen_count, limit: 1, page: permitted_page(max: screen_count))
     end
 
-    # Manage the sequence's pages and its sequence-wide settings. An activated sequence
-    # renders read-only - acknowledgments reference it, so it can't change
+    # An activated sequence renders read-only - acknowledgments reference what it says
     def edit
       @registration_sequence = ::RegistrationSequence.find(params[:id])
     end

@@ -1,5 +1,5 @@
 <div class="tw:mb-3 tw:flex tw:items-baseline tw:justify-between tw:gap-4">
-  <%# Admin's own header already names the sequence, so only the page count is left to say %>
+  <%# Admin's header names the sequence %>
   <% if @admin %>
     <h2 class="uncap tw:mb-0 tw:text-xl tw:font-normal tw:text-gray-500">
       <%= helpers.number_display(pages.size) %> <%= "page".pluralize(pages.size) %>
@@ -54,7 +54,7 @@
   <% end %>
 <% end %>
 
-<%# Admin's header switches between the screens, so the big button is the organization's %>
+<%# Admin's header carries the switch %>
 <% unless @admin %>
   <%= render UI::ButtonLink::Component.new(text: "Preview", href: sequence_path, color: :secondary, size: :lg, html_class: "tw:mt-8 tw:w-full") %>
 <% end %>

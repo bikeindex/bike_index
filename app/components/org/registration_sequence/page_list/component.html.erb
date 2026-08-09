@@ -1,4 +1,4 @@
-<%# One disclosure trigger, shared by the pages and the acknowledgment that follows them %>
+<%# Shared by the pages and the acknowledgment below them %>
 <% collapse_toggle = capture do %>
   <button
     type="button"
@@ -67,7 +67,7 @@
       <% end %>
     <% end %>
 
-    <%# What registrants agree to after the pages. The editor has its own field for it %>
+    <%# The editor has its own field for this %>
     <% unless @editable %>
       <%= tag.div(class: "tw:py-1.5", data: {controller: "ui--collapse"}) do %>
         <div class="tw:flex tw:items-baseline">

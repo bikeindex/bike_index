@@ -3,9 +3,8 @@
 module Admin
   module RegistrationSequence
     module Header
-      # The header every admin registration-sequence screen shares: which sequence
-      # is open and what's being done to it, the switch between its three screens,
-      # and a link to the organization's own.
+      # Shared by every admin registration-sequence screen: which sequence is open,
+      # what's being done to it, and the switch between its three screens.
       class Component < ApplicationComponent
         MODES = %i[view preview edit].freeze
         ACTION_WORDS = {view: "Viewing", preview: "Previewing", edit: "Editing"}.freeze
@@ -21,7 +20,7 @@ module Admin
 
         def action_word = ACTION_WORDS[@mode]
 
-        # Activation freezes a sequence, so editing a live one is offered but inert
+        # Activation freezes a sequence, so its Edit is offered but inert
         def entries
           [{label: "View", href: RegistrationSequencePaths.sequence(@registration_sequence, admin: true), active: @mode == :view},
             {label: "Preview", href: RegistrationSequencePaths.preview(@registration_sequence, admin: true), active: @mode == :preview},
@@ -29,14 +28,14 @@ module Admin
              active: @mode == :edit, disabled: !@registration_sequence.editable?}]
         end
 
-        # Archived sequences are frozen too, so the status says which one this is
+        # Archived sequences are frozen too, so name which one this is
         def uneditable_title
           return if @registration_sequence.editable?
 
           "Can't edit #{@registration_sequence.status_display.downcase} registration sequence - create a draft"
         end
 
-        # This sequence on the organization's own screens; the template has no organization
+        # The template has no organization to view it in
         def organization_sequence_path
           return if @registration_sequence.template?
 

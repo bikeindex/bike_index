@@ -20,7 +20,6 @@ RSpec.describe Org::RegistrationSequence::PageEdit::Component, type: :component 
     expect(component).to have_css("input[type=hidden][name='registration_sequence_page[body]']", visible: :all)
     expect(component).to have_css("lexxy-editor[name='bullet[0][content]']", visible: :all)
     expect(component).to_not have_field("registration_sequence_page_listing_order")
-    # There's no badge to name until the page belongs to a sequence
     expect(component).to_not have_field("registration_sequence_page_organization_specific")
   end
 

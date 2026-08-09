@@ -14,8 +14,7 @@ RSpec.describe Org::RegistrationSequence::PageForm::Component, :js, type: :syste
       body: "<ul><li>Charge safely</li><li>Store safely</li></ul>")
   end
 
-  # The saved page renders below the form, so every trigger below starts from a preview
-  # that hasn't gone stale - and only a fresh load has one
+  # Every trigger starts from a preview that hasn't gone stale, and only a load has one
   def visit_form
     visit preview_path
 
@@ -62,8 +61,7 @@ RSpec.describe Org::RegistrationSequence::PageForm::Component, :js, type: :syste
     expect_stale_after { click_button "+ Add bullet" }
     expect_stale_after { click_button "Remove", match: :first }
 
-    # Dragged upward: dropping a bullet on the top half of the row below it lands where
-    # it already is, so that direction is a no-op by design
+    # Upward: dropping on the top half of the row below lands where it already is
     expect_stale_after do
       all("[data-bullet-editors-target='handle']").last
         .drag_to(all("[data-bullet-editors-target='item']").first)
@@ -71,7 +69,7 @@ RSpec.describe Org::RegistrationSequence::PageForm::Component, :js, type: :syste
       expect(first_bullet).to have_text("Store safely")
     end
 
-    # The stale form is still the form - a new bullet row is new markup to audit
+    # A new bullet row is new markup to audit
     click_button "+ Add bullet"
     expect(page).to have_css("lexxy-editor", count: 3, wait: 10)
     expect_axe_clean

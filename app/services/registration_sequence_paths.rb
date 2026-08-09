@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
-# The sequence editor renders in two places - an organization managing its own sequence,
-# and admin, which edits any of them (including the template org drafts are cloned from).
-# Only the routes differ, so the components ask here rather than building paths.
+# The sequence editor renders for an organization and for admin, which edits any
+# sequence. Only the routes differ, so the components ask here.
 module RegistrationSequencePaths
   extend Functionable
 
@@ -12,8 +11,8 @@ module RegistrationSequencePaths
     routes.organization_registration_sequences_path(organization_id: organization_param(registration_sequence))
   end
 
-  # Admin's read-only screen - and, as a PATCH, where the sequence-wide settings are
-  # saved. The organization has no read-only screen; its member path is the preview
+  # Admin's read-only screen, and the PATCH target for both. An organization has no
+  # read-only screen - its member path is the preview
   def sequence(registration_sequence, page: nil, admin: false)
     return routes.admin_registration_sequence_path(registration_sequence, page:) if admin
 
@@ -69,8 +68,8 @@ module RegistrationSequencePaths
     )
   end
 
-  # Leaving the preview. Admin lands on its read-only screen, which every sequence has;
-  # an organization has only the editor, and a frozen sequence hasn't got one
+  # Leaving the preview. An organization has only the editor, and a frozen sequence
+  # hasn't got one
   def preview_exit(registration_sequence, admin: false)
     return sequence(registration_sequence, admin: true) if admin
 

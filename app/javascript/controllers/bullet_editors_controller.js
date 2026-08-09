@@ -74,8 +74,7 @@ export default class extends Sortable {
       .filter((content) => this.#hasText(content))
       .map((content) => `<li>${content}</li>`)
     const body = items.length ? `<ul>${items.join('')}</ul>` : ''
-    // Only when it actually moved: composing on upgrade recomposes what the server sent,
-    // and that isn't an edit
+    // Composing on upgrade recomposes what the server sent, which isn't an edit
     if (body === this.fieldTarget.value) return
 
     this.fieldTarget.value = body
@@ -86,8 +85,8 @@ export default class extends Sortable {
     return this.element.closest('form')
   }
 
-  // Lexxy doesn't bubble an input event, and the body field is set in code, so nothing
-  // else would tell the form - or the preview watching it - that a bullet changed
+  // Lexxy doesn't bubble an input event and the body field is set in code, so nothing
+  // else tells the form its bullets changed
   #markEdited () {
     this.fieldTarget.dispatchEvent(new Event('input', { bubbles: true }))
   }
