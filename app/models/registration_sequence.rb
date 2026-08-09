@@ -33,6 +33,10 @@ class RegistrationSequence < ApplicationRecord
     "e-vehicle safety rules above as a condition of registering my vehicle. I understand that " \
     "failure to comply may result in revocation of my registration and/or disciplinary action."
 
+  # What each status is called on screen
+  STATUS_DISPLAY = {"template" => "Template", "draft" => "Draft",
+                    "active" => "Current", "archived" => "Previous"}.freeze
+
   belongs_to :organization
 
   # with_attached_image: every reader of the pages renders or copies their images
@@ -44,7 +48,9 @@ class RegistrationSequence < ApplicationRecord
   before_update :prevent_activated_change
 
   scope :templates, -> { where(organization_id: nil) }
-  scope :draft, -> { where(start_at: nil).where.not(organization_id: nil) }
+  # Everything activation hasn't frozen: the template, and organizations' drafts
+  scope :editable, -> { where(start_at: nil) }
+  scope :draft, -> { editable.where.not(organization_id: nil) }
   scope :active, -> { where.not(start_at: nil).where(end_at: nil) }
   scope :archived, -> { where.not(start_at: nil).where.not(end_at: nil) }
 
@@ -114,10 +120,20 @@ class RegistrationSequence < ApplicationRecord
     "draft"
   end
 
+  def status_display = STATUS_DISPLAY[status]
+
+  # Which sequence this is, e.g. "Brakebills Current" - the template has no organization
+  def display_name = [organization&.short_name, status_display].compact.join(" ")
+
+  # An organization-specific page is badged with this
+  def badge_name = organization&.short_name || "Template"
+
   # Activation freezes the sequence and its pages. Acknowledgments reference them by id, so
   # what a registrant agreed to has to keep saying the same thing - a change belongs in a
   # new draft, which activating supersedes this with.
   def activated? = start_at.present?
+
+  def editable? = !activated?
 
   # Moves page to position and re-sequences listing_order (drag-and-drop on the show page).
   # update_all skips the pages' own callbacks, so the guard is here too

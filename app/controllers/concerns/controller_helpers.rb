@@ -235,9 +235,9 @@ module ControllerHelpers
   #
   # For example, in `ApplicationController#handle_unverified_request` we have
   #
-  #   flash[:error] = translation(:csrf_invalid, scope: [:controllers, :application, __method__])
+  #   flash[:error] = translation(:invalid_authenticity_token, scope: [:controllers, :application, __method__])
   #
-  # which maps to controllers.application.handle_unverified_request.csrf_invalid.
+  # which maps to controllers.application.handle_unverified_request.invalid_authenticity_token.
   #
   # In `LocksController#find_lock`, by contrast, the full scope can be inferred
   # from the method invocation:

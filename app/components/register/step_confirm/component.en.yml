@@ -5,4 +5,4 @@ en:
       step_confirm:
         confirming_your_email: Confirming your email
         continue: Continue
-        this_only_takes_a_moment: Hang on, we're picking up where you left off.
+        continue_where_you_left_off: Continue, and we'll pick up where you left off.
