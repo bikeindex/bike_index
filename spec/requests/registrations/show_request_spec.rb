@@ -3,8 +3,8 @@ require "rails_helper"
 RSpec.describe "RegistrationsController#show", type: :request do
   include_context :request_spec_logged_in_as_user_if_present
   let(:base_url) { "/registrations" }
-  # Required when rendering bike details, otherwise it raises ReadOnlyError
-  before { RearGearType.fixed }
+  # show reads from the replica, so anything it first_or_creates has to exist already
+  before { RearGearType.fixed && Country.united_states }
 
   context "consumer view" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity) }
@@ -130,23 +130,21 @@ RSpec.describe "RegistrationsController#show", type: :request do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, id: 35) }
     let(:current_user) { bike.reload.user }
 
-    it "finds the bike from the decimal id and from the short_id body" do
+    it "finds the bike from any short_id form and the /r/ short URL" do
       expect(bike.short_id).to eq "r/35"
-      ["#{base_url}/35", "#{base_url}/z", "#{base_url}/Z"].each do |path|
+      ["#{base_url}/35", "#{base_url}/z", "#{base_url}/r/z", "#{base_url}/R.Z-", "/r/z", "/R/Z"].each do |path|
         get path
         expect(response.status).to eq(200)
         expect(whitespace_normalized_body_text).to match("Your bike")
       end
     end
 
-    context "with the redesign enabled" do
-      before { Flipper.enable_actor(:bike_show_redesign_toggle, current_user) }
+    context "short_id body starting with the prefix letter" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, id: 34992) }
 
-      it "redirects the /r/ short URL here" do
-        get "/r/z"
-        expect(response).to redirect_to(registration_path(bike))
-        get "/r/z"
-        follow_redirect!
+      it "does not double-strip the prefix" do
+        expect(bike.short_id).to eq "r/R00"
+        get "/#{bike.short_id}"
         expect(response.status).to eq(200)
         expect(whitespace_normalized_body_text).to match("Your bike")
       end
