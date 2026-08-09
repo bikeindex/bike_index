@@ -7,12 +7,9 @@ module Sessions
         render(Sessions::SignInInterstitial::Component.new(url: "#", fields: {token: "example-token"}))
       end
 
-      # Posts itself, at a token that's never valid — so it redirects back to the magic link
-      # form rather than signing anyone in. That path is rack_attack throttled, so reloading
-      # this preview repeatedly will 429 the auth endpoints for a minute
-      def auto_submitting
-        render(Sessions::SignInInterstitial::Component.new(url: sign_in_with_magic_link_session_path,
-          fields: {token: "not-a-real-token"}, auto_submit: true))
+      def unsubscribing
+        render(Sessions::SignInInterstitial::Component.new(url: "#",
+          heading: "Confirm you want to unsubscribe", submit_text: "Unsubscribe"))
       end
     end
   end

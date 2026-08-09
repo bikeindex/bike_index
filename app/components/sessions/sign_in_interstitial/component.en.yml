@@ -5,5 +5,4 @@ en:
       sign_in_interstitial:
         click_button_to_continue: Click the button below to continue
         finish_signing_in: Finish signing in
-        if_not_click_button: If not, please click the button below
         sign_in: Sign in
