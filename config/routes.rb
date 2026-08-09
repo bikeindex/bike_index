@@ -126,6 +126,8 @@ Rails.application.routes.draw do
     end
     member do
       get "unsubscribe"
+      # A client without one-click opens the POST target in a browser; that GET gets the interstitial
+      get "unsubscribe_update", to: "users#unsubscribe", as: nil
       post "unsubscribe_update"
     end
   end

@@ -442,6 +442,11 @@ class User < ApplicationRecord
     magic_link_token
   end
 
+  # Newsletters are infrequent, so this outlives any reasonable "unsubscribe me" click
+  def unsubscribe_signed_id
+    signed_id(purpose: :unsubscribe, expires_in: 365.days)
+  end
+
   def update_last_login(ip_address)
     save! unless id.present? # throw an error that shows why the user isn't created
     update_columns(last_login_at: Time.current, last_login_ip: ip_address)
