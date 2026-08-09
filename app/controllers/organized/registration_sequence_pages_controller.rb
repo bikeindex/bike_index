@@ -14,7 +14,7 @@ module Organized
       @page = @draft.registration_sequence_pages.new(permitted_parameters)
       if @page.save
         flash[:success] = "Page added"
-        redirect_to sequence_path
+        redirect_to RegistrationSequencePaths.edit(@draft)
       else
         flash.now[:error] = "Unable to add: #{@page.errors.full_messages.to_sentence}"
         render :edit, status: :unprocessable_entity
@@ -32,7 +32,7 @@ module Organized
       elsif @page.update(permitted_parameters)
         flash[:success] = "Page updated"
         # Back to this page so the refreshed preview is right there
-        redirect_to edit_page_path
+        redirect_to RegistrationSequencePaths.edit_page(@page)
       else
         flash[:error] = "Unable to update: #{@page.errors.full_messages.to_sentence}"
         render :edit
@@ -42,7 +42,7 @@ module Organized
     def destroy
       @page.destroy
       flash[:success] = "Page removed"
-      redirect_to sequence_path
+      redirect_to RegistrationSequencePaths.edit(@draft)
     end
 
     private
@@ -65,14 +65,6 @@ module Organized
         .where(registration_sequence: current_organization.registration_sequences.draft)
         .find(params[:id])
       @draft = @page.registration_sequence
-    end
-
-    def sequence_path
-      edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id)
-    end
-
-    def edit_page_path
-      edit_organization_registration_sequence_page_path(organization_id: current_organization.to_param, id: @page.id)
     end
 
     def permitted_parameters
