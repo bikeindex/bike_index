@@ -21,8 +21,15 @@
     <div class="tw:flex tw:items-center tw:gap-2">
       <%= render UI::ButtonGroup::Component.new(entries:) %>
 
+      <%#
+        Overlapping the chip it explains. The chip is pointer-events-none while
+        disabled, so it can't swallow the hover
+      %>
+
       <% if uneditable_title.present? %>
-        <%= render UI::Tooltip::Component.new(text: uneditable_title) %>
+        <span class="tw:relative tw:z-10 tw:-mt-4 tw:-ml-4">
+          <%= render UI::Tooltip::Component.new(text: uneditable_title) %>
+        </span>
       <% end %>
     </div>
 
