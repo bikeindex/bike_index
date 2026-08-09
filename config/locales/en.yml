@@ -4673,6 +4673,12 @@ en:
       subject: Join %{organization_name}on Bike Index
     partial_register_confirmation:
       subject: Confirm your email to finish your %{organization_name}registration
+    partial_register_confirmation_abandoned:
+      subject: Finish reporting your abandoned %{bike_type}
+    partial_register_confirmation_found:
+      subject: Finish reporting your found %{bike_type}
+    partial_register_confirmation_stolen:
+      subject: Finish reporting your stolen %{bike_type}
     partial_registration:
       subject: Finish your %{organization_name}Bike Index registration!
   payments:
