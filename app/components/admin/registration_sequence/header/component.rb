@@ -37,11 +37,7 @@ module Admin
 
         def activate_path = RegistrationSequencePaths.activate(@registration_sequence)
 
-        def discard_path = RegistrationSequencePaths.sequence(@registration_sequence, admin: true)
-
         def create_draft_path = RegistrationSequencePaths.create_draft(@registration_sequence.organization_id)
-
-        def discard_confirm = "Discard this draft and its pages? This can't be undone."
 
         # What the frozen sequence offers in place of its inert Edit chip. The draft belongs
         # to the owner rather than to this sequence, so a second archived one points at it too

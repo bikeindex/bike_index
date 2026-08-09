@@ -2,4 +2,6 @@
   <%= render Admin::RegistrationSequence::Header::Component.new(registration_sequence: @registration_sequence, mode: :edit) %>
 
   <%= render Org::RegistrationSequence::Edit::Component.new(registration_sequence: @registration_sequence, admin: true) %>
+
+  <%= render Admin::RegistrationSequence::DiscardDraft::Component.new(registration_sequence: @registration_sequence) %>
 </div>

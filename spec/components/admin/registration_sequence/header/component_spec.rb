@@ -17,10 +17,10 @@ RSpec.describe Admin::RegistrationSequence::Header::Component, type: :component 
     expect(page).to have_link("View in organization", href: "/o/#{organization.to_param}/registration_sequences/#{registration_sequence.id}")
     # Nothing to explain while it's editable
     expect(page).to_not have_css("[role='tooltip']", visible: :all)
-    # A draft is what gets made live or thrown away
+    # Making the draft live is the header's action; discarding it lives at the foot of the page
     expect(page).to have_css("form[action='#{admin_url}/activate'] button", text: "Activate")
-    expect(page).to have_css("form[action='#{admin_url}'] button", text: "Discard draft")
     expect(page).to_not have_button("Create draft")
+    expect(page).to_not have_button("Discard draft")
   end
 
   it "marks the screen it's on" do

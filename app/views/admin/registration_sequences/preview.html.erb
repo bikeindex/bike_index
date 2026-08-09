@@ -10,4 +10,6 @@
   <div class="tw:mt-24">
     <%= render UI::Pagination::Component.new(pagy: @preview_pagy, page_params: {id: @registration_sequence.id}) %>
   </div>
+
+  <%= render Admin::RegistrationSequence::DiscardDraft::Component.new(registration_sequence: @registration_sequence) %>
 </div>

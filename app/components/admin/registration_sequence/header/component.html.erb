@@ -26,21 +26,23 @@
       <% end %>
     </div>
 
-    <% if organization_sequence_path.present? %>
-      <%= link_to "View in organization", organization_sequence_path, class: "twlink tw:ml-auto tw:text-sm" %>
-    <% end %>
-  </div>
+    <%# onsubmit, not turbo_confirm: Turbo Drive is off app-wide, so it never fires %>
+    <div
+      class="
+        tw:ml-auto tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-4
+        tw:gap-y-1
+      "
+    >
+      <% if organization_sequence_path.present? %>
+        <%= link_to "View in organization", organization_sequence_path, class: "twlink tw:text-sm" %>
+      <% end %>
 
-  <%# onsubmit, not turbo_confirm: Turbo Drive is off app-wide, so it never fires %>
-  <div class="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-    <% if @registration_sequence.draft? %>
-      <%= render UI::ButtonLink::Component.new(text: "Activate", href: activate_path, method: :patch, color: :primary, size: :sm,
-        form: {onsubmit: "return confirm('#{j activate_confirm}')"}) %>
-      <%= render UI::ButtonLink::Component.new(text: "Discard draft", href: discard_path, method: :delete, color: :error, size: :sm,
-        form_class: "button_to tw:ml-auto",
-        form: {onsubmit: "return confirm('#{j discard_confirm}')"}) %>
-    <% else %>
-      <%= render UI::ButtonLink::Component.new(text: create_draft_text, href: create_draft_path, method: :post, color: :primary, size: :sm) %>
-    <% end %>
+      <% if @registration_sequence.draft? %>
+        <%= render UI::ButtonLink::Component.new(text: "Activate", href: activate_path, method: :patch, color: :primary, size: :sm,
+          form: {onsubmit: "return confirm('#{j activate_confirm}')"}) %>
+      <% else %>
+        <%= render UI::ButtonLink::Component.new(text: create_draft_text, href: create_draft_path, method: :post, color: :primary, size: :sm) %>
+      <% end %>
+    </div>
   </div>
 </div>
