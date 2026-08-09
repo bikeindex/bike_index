@@ -12,6 +12,11 @@ module UI
         render(UI::ButtonLink::Component.new(text: "Primary Active", href: "#", color: :primary, active: true))
       end
 
+      # Disabled drops the href, so the chip renders as a link that can't be followed
+      def primary_disabled
+        render(UI::ButtonLink::Component.new(text: "Primary Disabled", href: "#", color: :primary, disabled: true))
+      end
+
       # White link with a purple outline (fills purple when active)
       def secondary
         render(UI::ButtonLink::Component.new(text: "Secondary Link", href: "#", color: :secondary))
@@ -21,12 +26,20 @@ module UI
         render(UI::ButtonLink::Component.new(text: "Secondary Active", href: "#", color: :secondary, active: true))
       end
 
+      def secondary_disabled
+        render(UI::ButtonLink::Component.new(text: "Secondary Disabled", href: "#", color: :secondary, disabled: true))
+      end
+
       def error
         render(UI::ButtonLink::Component.new(text: "Error Link", href: "#", color: :error))
       end
 
       def error_active
         render(UI::ButtonLink::Component.new(text: "Error Active", href: "#", color: :error, active: true))
+      end
+
+      def error_disabled
+        render(UI::ButtonLink::Component.new(text: "Error Disabled", href: "#", color: :error, disabled: true))
       end
 
       # White link with a soft danger outline
@@ -38,12 +51,22 @@ module UI
         render(UI::ButtonLink::Component.new(text: "Danger Outline Active", href: "#", color: :danger_outline, active: true))
       end
 
+      def danger_outline_disabled
+        render(UI::ButtonLink::Component.new(text: "Danger Outline Disabled", href: "#", color: :danger_outline, disabled: true))
+      end
+
       def link
         render(UI::ButtonLink::Component.new(text: "Link style", href: "#", color: :link))
       end
 
       def link_active
         render(UI::ButtonLink::Component.new(text: "Link Active", href: "#", color: :link, active: true))
+      end
+
+      # build_classes skips the disabled styling for link color, so this dims by nothing —
+      # it's here because the link still can't be followed
+      def link_disabled
+        render(UI::ButtonLink::Component.new(text: "Link Disabled", href: "#", color: :link, disabled: true))
       end
 
       # Filled purple primary
@@ -53,6 +76,10 @@ module UI
 
       def purple_active
         render(UI::ButtonLink::Component.new(text: "Purple Active", href: "#", color: :purple, active: true))
+      end
+
+      def purple_disabled
+        render(UI::ButtonLink::Component.new(text: "Purple Disabled", href: "#", color: :purple, disabled: true))
       end
       # @!endgroup
 
@@ -69,6 +96,11 @@ module UI
       # @label button_to DELETE
       def button_to_delete
         render(UI::ButtonLink::Component.new(text: "Delete", href: "#", color: :error, method: :delete))
+      end
+
+      # @label button_to disabled
+      def button_to_disabled
+        render(UI::ButtonLink::Component.new(text: "Follow", href: "#", color: :primary, method: :post, disabled: true))
       end
       # @!endgroup
     end

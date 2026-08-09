@@ -91,7 +91,7 @@ RSpec.describe UI::Button::Component, type: :component do
     let(:color) { :secondary }
 
     it "renders the purple outline styles" do
-      expect(component.to_html).to include("tw:not-disabled:hover:border-purple-500")
+      expect(component.to_html).to include("tw:not-disabled:not-aria-disabled:hover:border-purple-500")
     end
   end
 
@@ -116,11 +116,12 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
-  # Which is what keeps hover off a disabled button, now that nothing drops its pointer events
-  it "guards every hover utility with not-disabled" do
+  # Which is what keeps hover off a disabled button (:disabled) and off UI::ButtonLink's
+  # disabled anchor (aria-disabled), now that nothing drops their pointer events
+  it "guards every hover utility against both disabled flags" do
     hovers = described_class::COLORS.values.flat_map(&:split).grep(/hover:/)
     expect(hovers).to be_present
-    expect(hovers.grep_v(/\Atw:(?:dark:)?not-disabled:hover:/)).to eq([])
+    expect(hovers.grep_v(/\Atw:(?:dark:)?not-disabled:not-aria-disabled:hover:/)).to eq([])
   end
 
   it "is not disabled by default" do
