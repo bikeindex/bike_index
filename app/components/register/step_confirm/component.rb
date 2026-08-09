@@ -3,13 +3,12 @@
 module Register
   module StepConfirm
     # Where the emailed confirmation link lands. Nothing is confirmed by rendering it -
-    # the form posts itself, so a link scanner's GET can't spend the token
+    # confirming is single use, and a link scanner runs this page's JS, so the form waits
+    # for a click rather than posting itself
     class Component < ApplicationComponent
-      # auto_submit off leaves the form for the preview, which has nothing to confirm
-      def initialize(b_param:, token:, auto_submit: true)
+      def initialize(b_param:, token:)
         @b_param = b_param
         @token = token
-        @auto_submit = auto_submit
       end
     end
   end

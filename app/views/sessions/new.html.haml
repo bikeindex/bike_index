@@ -26,7 +26,7 @@
             .form-group
               = f.label :email, class: 'sr-only'
               = render(UI::Forms::Email::Component.new(form_builder: f, required: true,
-              html_options: {value: params[:email], placeholder: t(".email"), autocomplete: "username", autofocus: true}))
+              html_options: {value: @email, placeholder: t(".email"), autocomplete: "username", autofocus: true}))
 
             .checkbox{ class: "tw:mt-4!" }
               %label
