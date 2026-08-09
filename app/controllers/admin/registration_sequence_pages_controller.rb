@@ -13,7 +13,7 @@ module Admin
       @page = @registration_sequence.registration_sequence_pages.new(permitted_parameters)
       if @page.save
         flash[:success] = "Page added"
-        redirect_to edit_admin_registration_sequence_path(@registration_sequence)
+        redirect_to RegistrationSequencePaths.edit(@registration_sequence, admin: true)
       else
         flash.now[:error] = "Unable to add: #{@page.errors.full_messages.to_sentence}"
         render :edit, status: :unprocessable_entity
@@ -31,7 +31,7 @@ module Admin
       elsif @page.update(permitted_parameters)
         flash[:success] = "Page updated"
         # Back to this page so the refreshed preview is right there
-        redirect_to edit_admin_registration_sequence_page_path(@page)
+        redirect_to RegistrationSequencePaths.edit_page(@page, admin: true)
       else
         flash[:error] = "Unable to update: #{@page.errors.full_messages.to_sentence}"
         render :edit
@@ -41,7 +41,7 @@ module Admin
     def destroy
       @page.destroy
       flash[:success] = "Page removed"
-      redirect_to edit_admin_registration_sequence_path(@registration_sequence)
+      redirect_to RegistrationSequencePaths.edit(@registration_sequence, admin: true)
     end
 
     private

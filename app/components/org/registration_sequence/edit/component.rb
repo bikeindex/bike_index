@@ -5,11 +5,10 @@ module Org
     module Edit
       # The drag-to-reorder page list and the sequence-wide settings form.
       class Component < ApplicationComponent
-        # editable: admin's read-only screen shows a draft without its forms
-        def initialize(registration_sequence:, admin: false, editable: registration_sequence.editable?)
+        def initialize(registration_sequence:, admin: false)
           @registration_sequence = registration_sequence
           @admin = admin
-          @editable = editable
+          @editable = registration_sequence.editable?
         end
 
         private

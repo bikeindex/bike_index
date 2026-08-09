@@ -2,6 +2,8 @@ module Admin
   class RegistrationSequencesController < Admin::BaseController
     include Binxtils::SortableTable
 
+    before_action :find_registration_sequence, only: %i[show preview edit]
+
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
@@ -13,20 +15,17 @@ module Admin
 
     # The sequence's pages and settings, read-only - editing it is #edit
     def show
-      @registration_sequence = ::RegistrationSequence.find(params[:id])
     end
 
     # The faked registrant walk-through, one screen (?page=) per rule page plus the review
     # they end on. page is 1-indexed (Pagy); the preview component's index is 0-based.
     def preview
-      @registration_sequence = ::RegistrationSequence.find(params[:id])
       screen_count = BikeServices::Register.acknowledgment_step_count(@registration_sequence)
       @preview_pagy = Pagy::Offset.new(count: screen_count, limit: 1, page: permitted_page(max: screen_count))
     end
 
     # An activated sequence renders read-only - acknowledgments reference what it says
     def edit
-      @registration_sequence = ::RegistrationSequence.find(params[:id])
     end
 
     # The settings shared by every page: the FAQ link and the final acknowledgment
@@ -34,7 +33,7 @@ module Admin
       @registration_sequence = ::RegistrationSequence.editable.find(params[:id])
       if @registration_sequence.update(permitted_params)
         flash[:success] = "Registration sequence updated"
-        redirect_to edit_admin_registration_sequence_path(@registration_sequence)
+        redirect_to RegistrationSequencePaths.edit(@registration_sequence, admin: true)
       else
         flash.now[:error] = @registration_sequence.errors.full_messages.to_sentence
         render :edit, status: :unprocessable_entity
@@ -69,6 +68,11 @@ module Admin
       @time_range_column = sort_column if %w[updated_at].include?(sort_column)
       @time_range_column ||= "created_at"
       registration_sequences.where(@time_range_column => @time_range)
+    end
+
+    def find_registration_sequence
+      @registration_sequence = ::RegistrationSequence.includes(:organization, :registration_sequence_pages)
+        .find(params[:id])
     end
 
     def permitted_params

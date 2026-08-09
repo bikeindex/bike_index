@@ -20,8 +20,8 @@ module Register
         @page.registration_sequence
       end
 
-      # What the editor promised the badge would say - "Template" when admin previews it
-      def organization_name
+      # What the editor promised - "Template" when admin previews the template
+      def badge_name
         sequence&.badge_name
       end
 

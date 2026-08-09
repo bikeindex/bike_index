@@ -6,8 +6,8 @@ module Admin
       # Shared by every admin registration-sequence screen: which sequence is open,
       # what's being done to it, and the switch between its three screens.
       class Component < ApplicationComponent
-        MODES = %i[view preview edit].freeze
         ACTION_WORDS = {view: "Viewing", preview: "Previewing", edit: "Editing"}.freeze
+        MODES = ACTION_WORDS.keys.freeze
 
         def initialize(registration_sequence:, mode: :view)
           raise ArgumentError, "mode must be one of #{MODES.inspect}, got #{mode.inspect}" unless MODES.include?(mode)
