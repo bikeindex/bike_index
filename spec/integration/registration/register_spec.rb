@@ -188,7 +188,18 @@ RSpec.describe "Register flow", :js, type: :system do
     fill_in "report[theft_description]", with: "Locked to a rack outside the coffee shop"
     fill_in "report[police_report_number]", with: "8675309"
 
-    # The browser holds the submit until they're answered, so nothing reaches the server
+    # Going back to fix a detail doesn't cost the report - the longest form in the flow,
+    # and the one nothing has been saved from yet
+    click_link "Back"
+    expect(page).to have_content("Add your bike's details")
+    click_button "Complete Bike Registration"
+
+    expect(page).to have_field("report[theft_description]",
+      with: "Locked to a rack outside the coffee shop", wait: 10)
+    expect(page).to have_field("report[police_report_number]", with: "8675309")
+
+    # The browser holds the submit until when and where are answered, so nothing reaches
+    # the server
     click_button "Complete Bike Registration"
     expect(page).to have_current_path(/step=report/, url: true)
     expect(Bike.count).to eq 0

@@ -44,8 +44,12 @@ export default class extends Controller {
     if (this.timer) this.write()
   }
 
+  // timer is nulled as well as cancelled: a pending write left behind would have
+  // pagehide's flush put the draft straight back, and submitting mid-keystroke is
+  // exactly when there's one pending
   clear () {
     clearTimeout(this.timer)
+    this.timer = null
     localStorage.removeItem(this.storageKey)
   }
 
