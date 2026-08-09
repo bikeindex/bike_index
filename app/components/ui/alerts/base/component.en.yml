@@ -1,0 +1,9 @@
+en:
+  components:
+    ui:
+      alerts:
+        base:
+          error: Error
+          notice: Notice
+          success: Success
+          warning: Warning

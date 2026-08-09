@@ -14,6 +14,24 @@ RSpec.describe UI::Alerts::Base::Component, type: :component do
     expect(component).to_not have_selector("button")
   end
 
+  describe "screen reader announcement" do
+    it "announces each kind's meaning, translated" do
+      %w[notice error warning success].each do |kind|
+        alert = render_inline(described_class.new(text: "some text", kind:))
+        expect(alert.css(".tw\\:sr-only").text).to eq I18n.t("components.ui.alerts.base.#{kind}")
+      end
+    end
+
+    context "purple" do
+      let(:options) { {text: "some text", kind: "purple"} }
+
+      it "announces the meaning rather than the color" do
+        expect(component.css(".tw\\:sr-only").text).to eq I18n.t("components.ui.alerts.base.notice")
+        expect(component.to_html).to_not include "Purple"
+      end
+    end
+  end
+
   describe "icon" do
     let(:icon) { ActionController::Base.helpers.inline_svg_tag("icons/envelope.svg", class: "tw:h-4 tw:w-4") }
     let(:options) { {text: "some text", icon:} }

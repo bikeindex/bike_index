@@ -12,6 +12,8 @@ module UI
           purple: "tw:text-purple-800 tw:dark:text-purple-400"
         }.freeze
         KINDS = TEXT_CLASSES.keys.freeze
+        # :purple names a color rather than a meaning - announce it as what it is, a notice
+        ANNOUNCED_AS = {purple: :notice}.freeze
 
         # icon: rendered markup, e.g. inline_svg_tag("icons/envelope.svg", class: "tw:h-4 tw:w-4") -
         # replaces the default info icon
@@ -27,6 +29,11 @@ module UI
         end
 
         private
+
+        # What a screen reader reads in place of the icon
+        def announcement
+          translation(".#{ANNOUNCED_AS.fetch(@kind, @kind)}")
+        end
 
         def normalized_kind(kind)
           return kind.to_sym if KINDS.include?(kind&.to_sym)
