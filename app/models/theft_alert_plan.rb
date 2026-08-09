@@ -22,8 +22,8 @@ class TheftAlertPlan < ApplicationRecord
   include Amountable
   include Translatable
 
-  has_many :theft_alerts, dependent: :destroy
-  has_many :stolen_records, through: :theft_alerts
+  has_many :promoted_alerts, dependent: :destroy
+  has_many :stolen_records, through: :promoted_alerts
 
   validates :name,
     :amount_cents,
