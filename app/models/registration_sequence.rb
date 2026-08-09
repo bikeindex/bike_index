@@ -56,13 +56,16 @@ class RegistrationSequence < ApplicationRecord
   scope :archived, -> { where.not(start_at: nil).where.not(end_at: nil) }
 
   class << self
-    # What an organization's first draft is cloned from. The template belongs to no
-    # organization, so nil is its owner in every lookup here
+    # The template belongs to no organization, so nil is its owner in every lookup here
     def active_template = active_for(nil)
 
     def active_for(organization)
       active.find_by(organization:)
     end
+
+    # What a draft is cloned from, and what the registration flow shows: the owner's live
+    # sequence, falling back to the template every organization starts from
+    def active_or_template_for(organization) = active_for(organization) || active_template
 
     # The draft as it stands - draft_for opens one when there isn't one
     def existing_draft_for(organization) = draft.find_by(organization:)
@@ -83,10 +86,10 @@ class RegistrationSequence < ApplicationRecord
     private
 
     # Start the draft from what's live so an edit tweaks the current sequence rather than
-    # discarding the organization's customizations; the live template seeds an organization's
-    # first draft. Nothing sits above the template, so the very first draft starts empty.
+    # discarding the organization's customizations. Nothing sits above the template, so its
+    # very first draft starts empty.
     def build_draft_for(organization)
-      source = active_for(organization) || active_template
+      source = active_or_template_for(organization)
       transaction do
         draft = create!(organization:, faq_url: source&.faq_url, acknowledgment_text: source&.acknowledgment_text)
         source&.registration_sequence_pages&.each do |source_page|
@@ -127,7 +130,8 @@ class RegistrationSequence < ApplicationRecord
   # Which sequence this is, e.g. "Brakebills Current" or "Template Draft"
   def display_name = "#{badge_name} #{status_display}"
 
-  # An organization-specific page is badged with this
+  # Who this sequence belongs to - badges an organization-specific page, and names the
+  # sequence in display_name
   def badge_name = organization&.short_name || "Template"
 
   # Activation freezes the sequence and its pages. Acknowledgments reference them by id, so

@@ -50,10 +50,10 @@ end
 
 discard_sequences.call(RegistrationSequence.templates.with_deleted)
 
-template = RegistrationSequence.draft_for(nil)
-# faq_url is the ⓘ on every acknowledgment page. An organization can point this at its own
-# policy page; the Bike Index FAQ is the default an org's draft is cloned with
-template.update!(acknowledgment_text: RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT,
+# Created rather than draft_for(nil) - every template was just discarded, so there's
+# nothing above this one to clone. faq_url is the ⓘ on every acknowledgment page; an
+# organization can point it at its own policy page, the Bike Index FAQ is the default
+template = RegistrationSequence.create!(acknowledgment_text: RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT,
   faq_url: "/info/#{Blog.e_vehicle_acknowledgment_faq}")
 
 default_pages.each_with_index do |attributes, index|

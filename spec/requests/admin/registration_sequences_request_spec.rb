@@ -136,9 +136,17 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
         it "opens the template's draft, cloning the live template" do
           expect { post base_url }.to change(RegistrationSequence, :count).by(1)
 
-          template_draft = RegistrationSequence.templates.draft.first
+          template_draft = RegistrationSequence.existing_draft_for(nil)
           expect(response).to redirect_to("#{base_url}/#{template_draft.id}/edit")
           expect(template_draft.registration_sequence_pages.count).to eq 2
+        end
+      end
+
+      context "organization that doesn't resolve" do
+        it "404s rather than opening the template every organization clones" do
+          expect { post base_url, params: {organization_id: "#{organization.to_param}-typo"} }
+            .to_not change(RegistrationSequence, :count)
+          expect(response.status).to eq(404)
         end
       end
     end

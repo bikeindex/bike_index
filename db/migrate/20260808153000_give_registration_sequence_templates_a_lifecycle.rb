@@ -20,6 +20,8 @@ class GiveRegistrationSequenceTemplatesALifecycle < ActiveRecord::Migration[8.1]
       name: "index_registration_sequences_one_active_template"
   end
 
+  # Fails while a template draft and a live template both exist - the single-template index
+  # is the schema that can't hold them, so discard the draft before rolling back
   def down
     remove_index :registration_sequences, name: "index_registration_sequences_one_draft_template"
     remove_index :registration_sequences, name: "index_registration_sequences_one_active_template"

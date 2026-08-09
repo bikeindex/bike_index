@@ -36,9 +36,9 @@
     <% if @registration_sequence.draft? %>
       <%= render UI::ButtonLink::Component.new(text: "Activate", href: activate_path, method: :patch, color: :primary, size: :sm,
         form: {onsubmit: "return confirm('#{j activate_confirm}')"}) %>
-      <%= render UI::ButtonLink::Component.new(text: "Discard draft", href: RegistrationSequencePaths.sequence(@registration_sequence, admin: true), method: :delete, color: :error, size: :sm,
+      <%= render UI::ButtonLink::Component.new(text: "Discard draft", href: discard_path, method: :delete, color: :error, size: :sm,
         form_class: "button_to tw:ml-auto",
-        form: {onsubmit: "return confirm('#{j "Discard this draft and its pages? This can't be undone."}')"}) %>
+        form: {onsubmit: "return confirm('#{j discard_confirm}')"}) %>
     <% else %>
       <%= render UI::ButtonLink::Component.new(text: create_draft_text, href: create_draft_path, method: :post, color: :primary, size: :sm) %>
     <% end %>
