@@ -29,8 +29,8 @@ RSpec.describe UI::Button::Component, type: :component do
   context "with error color" do
     let(:color) { :error }
 
-    it "renders error styles" do
-      expect(component.to_html).to include("tw:bg-red-600")
+    it "renders the danger outline styles" do
+      expect(component.to_html).to include("tw:border-[#f3c9c9]", "tw:not-disabled:not-aria-disabled:hover:bg-red-50")
     end
   end
 

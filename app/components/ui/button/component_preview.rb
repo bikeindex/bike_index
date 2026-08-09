@@ -45,6 +45,7 @@ module UI
         render(UI::Button::Component.new(text: "Secondary Disabled", color: :secondary, disabled: true))
       end
 
+      # White button with a soft danger outline
       def error
         render(UI::Button::Component.new(text: "Delete", color: :error))
       end
@@ -55,19 +56,6 @@ module UI
 
       def error_disabled
         render(UI::Button::Component.new(text: "Error Disabled", color: :error, disabled: true))
-      end
-
-      # White button with a soft danger outline
-      def danger_outline
-        render(UI::Button::Component.new(text: "Mark stolen", color: :danger_outline))
-      end
-
-      def danger_outline_active
-        render(UI::Button::Component.new(text: "Danger Outline Active", color: :danger_outline, active: true))
-      end
-
-      def danger_outline_disabled
-        render(UI::Button::Component.new(text: "Danger Outline Disabled", color: :danger_outline, disabled: true))
       end
 
       def link

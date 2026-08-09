@@ -30,6 +30,7 @@ module UI
         render(UI::ButtonLink::Component.new(text: "Secondary Disabled", href: "#", color: :secondary, disabled: true))
       end
 
+      # White link with a soft danger outline
       def error
         render(UI::ButtonLink::Component.new(text: "Error Link", href: "#", color: :error))
       end
@@ -40,19 +41,6 @@ module UI
 
       def error_disabled
         render(UI::ButtonLink::Component.new(text: "Error Disabled", href: "#", color: :error, disabled: true))
-      end
-
-      # White link with a soft danger outline
-      def danger_outline
-        render(UI::ButtonLink::Component.new(text: "Mark stolen", href: "#", color: :danger_outline))
-      end
-
-      def danger_outline_active
-        render(UI::ButtonLink::Component.new(text: "Danger Outline Active", href: "#", color: :danger_outline, active: true))
-      end
-
-      def danger_outline_disabled
-        render(UI::ButtonLink::Component.new(text: "Danger Outline Disabled", href: "#", color: :danger_outline, disabled: true))
       end
 
       def link
