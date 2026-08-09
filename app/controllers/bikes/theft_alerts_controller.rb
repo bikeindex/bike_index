@@ -2,7 +2,7 @@ module Bikes
   class TheftAlertsController < Bikes::BaseController
     include BikeEditable
 
-    before_action :get_existing_theft_alerts, except: [:create]
+    before_action :get_existing_promoted_alerts, except: [:create]
 
     def new
       return unless setup_edit_template("alert")
@@ -22,22 +22,22 @@ module Bikes
       return unless setup_edit_template("alert_purchase_confirmation")
 
       @payment&.update_from_stripe!
-      if @payment.theft_alert&.activateable?
-        BikeJobs::ActivateTheftAlertJob.perform_async(@payment.theft_alert.id)
+      if @payment.promoted_alert&.activateable?
+        BikeJobs::ActivateTheftAlertJob.perform_async(@payment.promoted_alert.id)
       end
     end
 
     def create
       theft_alert_plan = TheftAlertPlan.find(params[:theft_alert_plan_id])
-      theft_alert = TheftAlert.create!(
+      promoted_alert = PromotedAlert.create!(
         stolen_record: @bike.current_stolen_record,
         theft_alert_plan: theft_alert_plan,
         user: current_user
       )
-      @payment = Payment.new(create_parameters(theft_alert))
-      @payment.stripe_checkout_session(item_name: product_description(theft_alert))
+      @payment = Payment.new(create_parameters(promoted_alert))
+      @payment.stripe_checkout_session(item_name: product_description(promoted_alert))
 
-      theft_alert.update(payment: @payment)
+      promoted_alert.update(payment: @payment)
 
       # Enqueue creation of the image with the specified image
       BikeJobs::AfterStolenRecordSaveJob.perform_async(@bike.current_stolen_record_id, false,
@@ -48,12 +48,12 @@ module Bikes
 
     private
 
-    def create_parameters(theft_alert)
+    def create_parameters(promoted_alert)
       {
         kind: "theft_alert",
         payment_method: "stripe",
-        theft_alert: theft_alert,
-        amount_cents: theft_alert.amount_cents,
+        promoted_alert:,
+        amount_cents: promoted_alert.amount_cents,
         user_id: current_user.id,
         email: current_user.email,
         currency: params[:currency] || Currency.default.name # TODO: handle this better
@@ -66,24 +66,24 @@ module Bikes
       {customer: current_user.stripe_id}
     end
 
-    def product_description(theft_alert)
+    def product_description(promoted_alert)
       return params[:description] if params[:description].present?
 
-      theft_alert.theft_alert_plan&.name
+      promoted_alert.theft_alert_plan&.name
     end
 
-    def get_existing_theft_alerts
+    def get_existing_promoted_alerts
       return unless @bike&.current_stolen_record.present?
 
-      @theft_alerts = @bike.current_stolen_record
-        .theft_alerts
+      @promoted_alerts = @bike.current_stolen_record
+        .promoted_alerts
         .includes(:theft_alert_plan)
         .creation_ordered_desc
         .references(:theft_alert_plan)
-      # Only show non-user theft_alerts to superuser
-      return @theft_alerts if current_user.superuser?
+      # Only show non-user promoted_alerts to superuser
+      return @promoted_alerts if current_user.superuser?
 
-      @theft_alerts = @theft_alerts.where(user: current_user)
+      @promoted_alerts = @promoted_alerts.where(user: current_user)
     end
   end
 end

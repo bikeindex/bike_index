@@ -57,7 +57,7 @@ RSpec.describe PageBlock::UserAlerts::Wrapper::Component, type: :component do
 
   context "with theft_alert_without_photo" do
     let!(:bike) { FactoryBot.create(:stolen_bike, :with_ownership_claimed, user:) }
-    let!(:theft_alert) { FactoryBot.create(:theft_alert, stolen_record: bike.current_stolen_record, user:) }
+    let!(:promoted_alert) { FactoryBot.create(:promoted_alert, stolen_record: bike.current_stolen_record, user:) }
 
     before { user.update(alert_slugs: ["theft_alert_without_photo"]) }
 

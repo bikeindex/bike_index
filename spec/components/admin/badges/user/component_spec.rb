@@ -34,11 +34,11 @@ RSpec.describe Admin::Badges::User::Component, type: :component do
     end
 
     context "with theft alert" do
-      let!(:theft_alert) { FactoryBot.create(:theft_alert_paid, user:) }
+      let!(:promoted_alert) { FactoryBot.create(:promoted_alert_paid, user:) }
 
       it "renders both donor and theft alert icons" do
         expect(user.donor?).to be_truthy
-        expect(user.theft_alert_purchaser?).to be_truthy
+        expect(user.promoted_alert_purchaser?).to be_truthy
         result = render_component(user:)
         expect(result).to have_css("[role='tooltip']", text: "Donor", visible: :all)
         expect(result).to have_css("[role='tooltip']", text: "Promoted alert purchaser", visible: :all)

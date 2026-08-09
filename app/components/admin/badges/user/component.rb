@@ -56,7 +56,7 @@ module Admin
           result << :donor if @user.donor?
           result << :member if @user.membership_active.present?
           result << :recovery if @user.recovered_records.limit(1).any?
-          result << :theft_alert if @user.theft_alert_purchaser?
+          result << :promoted_alert if @user.promoted_alert_purchaser?
           result << :organization_role if organization.present?
           result
         end
@@ -92,7 +92,7 @@ module Admin
             organization_role: :notice,
             superuser: :purple,
             recovery: :warning,
-            theft_alert: :cyan,
+            promoted_alert: :cyan,
             banned: :error,
             email_banned: :error
           }[variant]

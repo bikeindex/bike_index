@@ -106,6 +106,7 @@ class User < ApplicationRecord
   has_many :strava_activities, through: :strava_integration
   has_many :stripe_subscriptions
   has_many :superuser_abilities
+  has_many :promoted_alerts
   has_many :theft_alerts
   has_many :user_alerts
   has_many :user_emails, dependent: :destroy
@@ -359,8 +360,8 @@ class User < ApplicationRecord
     donations > 900
   end
 
-  def theft_alert_purchaser?
-    theft_alerts.paid.limit(1).any?
+  def promoted_alert_purchaser?
+    promoted_alerts.paid.limit(1).any?
   end
 
   def organization_prioritized

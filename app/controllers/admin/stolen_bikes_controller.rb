@@ -118,7 +118,7 @@ module Admin
 
       @with_promoted_alert = Binxtils::InputNormalizer.boolean(params[:search_with_promoted_alert])
       if @with_promoted_alert
-        available_stolen_records = available_stolen_records.with_theft_alerts_paid_or_admin
+        available_stolen_records = available_stolen_records.with_promoted_alerts_paid_or_admin
       end
 
       # We always render distance

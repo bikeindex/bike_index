@@ -310,7 +310,7 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
       user.reload
       expect(user.alert_slugs).to eq(["stolen_bike_without_location"])
 
-      FactoryBot.create(:theft_alert, stolen_record: stolen_record, user: user)
+      FactoryBot.create(:promoted_alert, stolen_record: stolen_record, user: user)
       instance.perform(user.id)
       user.reload
       expect(user.alert_slugs).to eq(%w[stolen_bike_without_location theft_alert_without_photo])

@@ -116,8 +116,8 @@ class CustomerMailer < ApplicationMailer
     end
   end
 
-  def theft_alert_email(theft_alert, notification)
-    @theft_alert = theft_alert
+  def theft_alert_email(promoted_alert, notification)
+    @promoted_alert = promoted_alert
     @notification = notification
     title = if @notification.kind == "theft_alert_posted"
       "Your promoted alert advertisement is live!"

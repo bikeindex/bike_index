@@ -63,7 +63,7 @@ RSpec.describe AdminHelper, type: :helper do
     end
     context "theft_alert" do
       it "returns" do
-        expect(admin_path_for_object(TheftAlert.new(id: 69))).to eq admin_theft_alert_path(69)
+        expect(admin_path_for_object(PromotedAlert.new(id: 69))).to eq admin_theft_alert_path(69)
       end
     end
     context "user_phone" do

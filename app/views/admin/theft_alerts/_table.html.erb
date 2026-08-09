@@ -35,39 +35,39 @@
     </thead>
 
     <tbody>
-      <% theft_alerts.each do |theft_alert| %>
+      <% promoted_alerts.each do |promoted_alert| %>
         <tr>
           <td>
-            <%= link_to l(theft_alert.created_at, format: :convert_time), edit_admin_theft_alert_path(theft_alert), class: "localizeTime" %>
-            <small class="less-strong"><%= theft_alert.id %></small>
+            <%= link_to l(promoted_alert.created_at, format: :convert_time), edit_admin_theft_alert_path(promoted_alert), class: "localizeTime" %>
+            <small class="less-strong"><%= promoted_alert.id %></small>
           </td>
 
           <td>
-            <% if theft_alert.recovered? %>
-              <%= link_to "recovered!", admin_recovery_path(theft_alert.stolen_record), class: "text-success" %>
+            <% if promoted_alert.recovered? %>
+              <%= link_to "recovered!", admin_recovery_path(promoted_alert.stolen_record), class: "text-success" %>
             <% end %>
 
-            <% if theft_alert.failed_to_activate? %>
+            <% if promoted_alert.failed_to_activate? %>
               <span class="text-danger">Failed activation!</span>
-            <% elsif theft_alert.activating? %>
+            <% elsif promoted_alert.activating? %>
               <span class="text-success">activating!</span>
             <% else %>
-              <% unless theft_alert.recovered? && theft_alert.inactive? %>
-                <span class="<%= theft_alert_status_class(theft_alert) %>">
-                  <%= theft_alert.status %>
+              <% unless promoted_alert.recovered? && promoted_alert.inactive? %>
+                <span class="<%= promoted_alert_status_class(promoted_alert) %>">
+                  <%= promoted_alert.status %>
                 </span>
               <% end %>
-              <% if theft_alert.pending? %>
-                <% if theft_alert.activateable? %>
+              <% if promoted_alert.pending? %>
+                <% if promoted_alert.activateable? %>
                   <em class="small text-success">activateable</em>
                 <% else %>
                   <em class="small d-block">
                     <span class="text-danger">missing:</span>
                     <% missing = [] %>
-                    <% missing << "photo" if theft_alert.missing_photo? %>
-                    <% missing << "location" if theft_alert.missing_location? %>
-                    <% missing << "payment" unless theft_alert.paid? %>
-                    <% missing << "approval" unless theft_alert.stolen_record_approved? %>
+                    <% missing << "photo" if promoted_alert.missing_photo? %>
+                    <% missing << "location" if promoted_alert.missing_location? %>
+                    <% missing << "payment" unless promoted_alert.paid? %>
+                    <% missing << "approval" unless promoted_alert.stolen_record_approved? %>
 
                     <%= missing.join(", ") %>
                   </em>
@@ -78,91 +78,93 @@
 
           <% unless skip_bike %>
             <td>
-              <%= render Admin::BikeCell::Component.new(bike: theft_alert.bike, bike_id: theft_alert.bike_id) %>
+              <%= render Admin::BikeCell::Component.new(bike: promoted_alert.bike, bike_id: promoted_alert.bike_id) %>
             </td>
           <% end %>
 
           <td>
-            <%= cache(theft_alert.user) do %>
-              <%= render Admin::UserCell::Component.new(user: theft_alert.user, render_search: true, user_id: theft_alert.user_id) %>
+            <%= cache(promoted_alert.user) do %>
+              <%= render Admin::UserCell::Component.new(user: promoted_alert.user, render_search: true, user_id: promoted_alert.user_id) %>
             <% end %>
           </td>
 
           <td>
-            <% theft_alert_plan = theft_alert.theft_alert_plan %>
+            <% theft_alert_plan = promoted_alert.theft_alert_plan %>
 
             <small>
-              <%= theft_alert.amount_facebook %>
+              <%= promoted_alert.amount_facebook %>
               <span class="less-strong"><%= theft_alert_plan.name %></span>
             </small>
           </td>
 
           <td>
-            <% if theft_alert.amount_cents_facebook_spent.to_i > 0 %>
-              <%= theft_alert.amount_facebook_spent %>
+            <% if promoted_alert.amount_cents_facebook_spent.to_i > 0 %>
+              <%= promoted_alert.amount_facebook_spent %>
             <% end %>
           </td>
 
           <td>
-            <% if theft_alert.start_at.present? %>
+            <% if promoted_alert.start_at.present? %>
               <small class="localizeTime">
-                <%= l(theft_alert.start_at, format: :convert_time) %>
+                <%= l(promoted_alert.start_at, format: :convert_time) %>
               </small>
             <% end %>
           </td>
 
           <td>
-            <% if theft_alert.end_at.present? %>
+            <% if promoted_alert.end_at.present? %>
               <small class="localizeTime">
-                <%= l(theft_alert.end_at, format: :convert_time) %>
+                <%= l(promoted_alert.end_at, format: :convert_time) %>
               </small>
             <% end %>
           </td>
 
           <% if display_dev_info? %>
             <td>
-              <% if theft_alert.facebook_updated_at.present? %>
+              <% if promoted_alert.facebook_updated_at.present? %>
                 <small class="localizeTime">
-                  <%= l theft_alert.facebook_updated_at, format: :convert_time %>
+                  <%= l promoted_alert.facebook_updated_at, format: :convert_time %>
                 </small>
               <% end %>
             </td>
             <td>
-              <% if theft_alert.objective_adset.present? %>
+              <% if promoted_alert.objective_adset.present? %>
                 <small
-                  title="Campaign: <%= theft_alert.objective_campaign %>&#10;Adset: <%= theft_alert.objective_adset %>&#10;"
+                  title="Campaign: <%= promoted_alert.objective_campaign %>&#10;Adset: <%= promoted_alert.objective_adset %>&#10;"
                 >
-                  <%= theft_alert.objective_campaign.humanize.downcase.gsub("outcome", "").strip %>
+                  <%= promoted_alert.objective_campaign.humanize.downcase.gsub("outcome", "").strip %>
                 </small>
               <% end %>
             </td>
           <% end %>
 
-          <td><%= number_display(theft_alert.reach) %></td>
+          <td><%= number_display(promoted_alert.reach) %></td>
 
           <td>
             <small>
-              <%= number_display(theft_alert.engagement&.dig("unique_clicks")) %>
+              <%= number_display(promoted_alert.engagement&.dig("unique_clicks")) %>
             </small>
           </td>
 
           <td>
-            <%= theft_alert.city %>
+            <%= promoted_alert.city %>
 
-            <% if theft_alert.region.present? %>
-              <small class="less-strong"><%= theft_alert.region %></small>
-            <% elsif theft_alert.country.present? && theft_alert.country != Country.united_states %>
-              <small class="less-strong"><%= theft_alert.country.name %></small>
+            <% if promoted_alert.region.present? %>
+              <small class="less-strong"><%= promoted_alert.region %></small>
+            <% elsif promoted_alert.country.present? && promoted_alert.country != Country.united_states %>
+              <small class="less-strong">
+                <%= promoted_alert.country.name %>
+              </small>
             <% end %>
           </td>
 
           <td>
             <small>
-              <%= theft_alert.notes %>
+              <%= promoted_alert.notes %>
 
-              <% if theft_alert.facebook_post_url.present? %>
+              <% if promoted_alert.facebook_post_url.present? %>
                 <small class="d-block">
-                  <%= link_to "facebook", theft_alert.facebook_post_url %>
+                  <%= link_to "facebook", promoted_alert.facebook_post_url %>
                 </small>
               <% end %>
             </small>

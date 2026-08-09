@@ -149,12 +149,12 @@ class UserAlert < ApplicationRecord
     end
   end
 
-  def self.update_theft_alert_without_photo(user:, theft_alert:)
-    # scope to just active, to alert if the theft alert once again has no image
+  def self.update_theft_alert_without_photo(user:, promoted_alert:)
+    # scope to just active, to alert if the promoted alert once again has no image
     user_alert = UserAlert.active.find_or_build_by(kind: "theft_alert_without_photo",
-      user_id: user.id, alertable: theft_alert)
-    if theft_alert.missing_photo?
-      user_alert.bike_id = theft_alert.bike&.id
+      user_id: user.id, alertable: promoted_alert)
+    if promoted_alert.missing_photo?
+      user_alert.bike_id = promoted_alert.bike&.id
       user_alert.save
     else # Don't create just to resolve
       user_alert.id.blank? || user_alert.resolve!

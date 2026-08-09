@@ -192,7 +192,7 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(assigns(:edit_templates)).to eq theft_edit_templates.as_json
       expect(bike.user_id).to eq current_user.id
       expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_falsey
-      # It redirects "alert" to new_bike_theft_alert, for backward compatibility
+      # It redirects "alert" to new_bike_promoted_alert, for backward compatibility
       # Maybe sometime after merging #2041, stop redirecting?
       get "#{base_url}?edit_template=alert"
       expect(response).to redirect_to(new_bike_theft_alert_path(bike_id: bike.id))
@@ -264,7 +264,7 @@ RSpec.describe Bikes::EditsController, type: :request do
           expect(response).to render_template(template)
           expect(assigns(:edit_template)).to eq(template)
           expect(assigns(:private_images)).to eq([]) if template == "photos"
-          expect(assigns(:theft_alerts)).to eq([]) if template == "alert"
+          expect(assigns(:promoted_alerts)).to eq([]) if template == "alert"
 
           should_show_general_alert = no_global_alert_templates.exclude?(template)
           pp template unless assigns(:show_general_alert) == should_show_general_alert

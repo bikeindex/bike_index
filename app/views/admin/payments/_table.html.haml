@@ -51,7 +51,7 @@
           - unless skip_kind
             %td
               - if payment.theft_alert?
-                = link_to "Promoted alert", edit_admin_theft_alert_path(payment.theft_alert)
+                = link_to "Promoted alert", edit_admin_theft_alert_path(payment.promoted_alert)
               - else
                 = payment.kind_humanized
               - if render_sortable

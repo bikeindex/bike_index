@@ -24,7 +24,7 @@ RSpec.describe UserAlert, type: :model do
   describe "uniq_kinds" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let(:user_phone) { FactoryBot.create(:user_phone, user:) }
-    let(:theft_alert) { FactoryBot.create(:theft_alert) }
+    let(:promoted_alert) { FactoryBot.create(:promoted_alert) }
 
     it "validates uniqueness of alertable only for uniq_kinds" do
       FactoryBot.create(:user_alert, user:, kind: "phone_waiting_confirmation", alertable: user_phone)
@@ -33,8 +33,8 @@ RSpec.describe UserAlert, type: :model do
       expect(duplicate.errors.attribute_names).to eq([:alertable_id])
 
       # theft_alert_without_photo isn't a uniq_kind - prod has duplicates that must stay saveable
-      FactoryBot.create(:user_alert, user:, kind: "theft_alert_without_photo", alertable: theft_alert)
-      expect(FactoryBot.build(:user_alert, user:, kind: "theft_alert_without_photo", alertable: theft_alert)).to be_valid
+      FactoryBot.create(:user_alert, user:, kind: "theft_alert_without_photo", alertable: promoted_alert)
+      expect(FactoryBot.build(:user_alert, user:, kind: "theft_alert_without_photo", alertable: promoted_alert)).to be_valid
     end
   end
 
@@ -90,37 +90,37 @@ RSpec.describe UserAlert, type: :model do
   end
 
   describe "update_theft_alert_without_photo" do
-    let(:theft_alert) { FactoryBot.create(:theft_alert) }
-    let(:user) { theft_alert.user }
+    let(:promoted_alert) { FactoryBot.create(:promoted_alert) }
+    let(:user) { promoted_alert.user }
 
     it "creates only once" do
-      expect(theft_alert.missing_photo?).to be_truthy
+      expect(promoted_alert.missing_photo?).to be_truthy
       expect {
-        UserAlert.update_theft_alert_without_photo(user:, theft_alert:)
+        UserAlert.update_theft_alert_without_photo(user:, promoted_alert:)
       }.to change(UserAlert, :count).by 1
       user_alert = UserAlert.last
       expect(user_alert.kind).to eq "theft_alert_without_photo"
-      expect(user_alert.alertable).to eq theft_alert
-      expect(user_alert.alertable_type).to eq "TheftAlert"
+      expect(user_alert.alertable).to eq promoted_alert
+      expect(user_alert.alertable_type).to eq "PromotedAlert"
       # It doesn't create a second time
       expect {
-        UserAlert.update_theft_alert_without_photo(user:, theft_alert:)
+        UserAlert.update_theft_alert_without_photo(user:, promoted_alert:)
       }.to_not change(UserAlert, :count)
     end
 
-    context "another user has an alert for the same theft_alert" do
+    context "another user has an alert for the same promoted_alert" do
       let!(:user_alert) do
-        FactoryBot.create(:user_alert, user:, kind: "theft_alert_without_photo", alertable: theft_alert)
+        FactoryBot.create(:user_alert, user:, kind: "theft_alert_without_photo", alertable: promoted_alert)
       end
       let(:other_alert) do
-        FactoryBot.create(:user_alert, kind: "theft_alert_without_photo", alertable: theft_alert)
+        FactoryBot.create(:user_alert, kind: "theft_alert_without_photo", alertable: promoted_alert)
       end
 
       it "doesn't match across users" do
         expect(other_alert.user_id).to_not eq user.id
 
         expect {
-          UserAlert.update_theft_alert_without_photo(user: other_alert.user, theft_alert:)
+          UserAlert.update_theft_alert_without_photo(user: other_alert.user, promoted_alert:)
         }.to_not change(UserAlert, :count)
         expect(UserAlert.pluck(:id)).to match_array([user_alert.id, other_alert.id])
       end

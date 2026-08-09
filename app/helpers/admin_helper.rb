@@ -49,6 +49,8 @@ module AdminHelper
       admin_stolen_bike_path(obj.id, stolen_record_id: obj.id)
     elsif obj.instance_of?(ImpoundRecord)
       admin_impound_record_path("pkey-#{obj.id}")
+    elsif obj.instance_of?(PromotedAlert)
+      admin_theft_alert_path(obj.id) # promoted alerts are still administered at /admin/theft_alerts
     elsif obj.instance_of?(UserPhone)
       admin_user_path(obj.user_id)
     elsif obj.instance_of?(UserAlert)
@@ -60,15 +62,15 @@ module AdminHelper
     end
   end
 
-  def theft_alert_status_class(theft_alert)
-    text_class = if theft_alert.active?
+  def promoted_alert_status_class(promoted_alert)
+    text_class = if promoted_alert.active?
       "text-info"
-    elsif theft_alert.pending?
+    elsif promoted_alert.pending?
       "text-warning"
-    elsif theft_alert.inactive?
+    elsif promoted_alert.inactive?
       "less-strong small"
     end
-    theft_alert.recovered? ? text_class + " small" : text_class
+    promoted_alert.recovered? ? text_class + " small" : text_class
   end
 
   def render_admin_pagination_with_count(collection:, count: nil, skip_total: false, skip_today: false, skip_pagination: false, humanized_time_range_column_override: nil, viewing: nil)

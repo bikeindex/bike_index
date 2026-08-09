@@ -44,6 +44,7 @@ class Payment < ApplicationRecord
   belongs_to :membership
 
   has_one :theft_alert
+  has_one :promoted_alert
 
   has_many :notifications, as: :notifiable
 
@@ -92,6 +93,11 @@ class Payment < ApplicationRecord
 
       where("referral_source ilike ?", "%#{normalize_referral_source(str)}%")
     end
+  end
+
+  # Backfills::PromotedAlertJob may not have copied this payment's alert over yet
+  def promoted_alert
+    super || theft_alert
   end
 
   def paid?
@@ -146,7 +152,7 @@ class Payment < ApplicationRecord
       self.email = EmailNormalizer.normalize(email)
       self.user ||= User.fuzzy_confirmed_or_unconfirmed_email_find(email) if email.present?
     end
-    self.amount_cents ||= theft_alert&.amount_cents if theft_alert?
+    self.amount_cents ||= promoted_alert&.amount_cents if theft_alert?
     self.organization_id ||= invoice&.organization_id
     self.membership_id ||= stripe_subscription&.membership_id
     self.referral_source = self.class.normalize_referral_source(referral_source)
@@ -261,7 +267,7 @@ class Payment < ApplicationRecord
   def calculated_kind
     if invoice_id.present?
       "invoice_payment"
-    elsif theft_alert.present?
+    elsif promoted_alert.present?
       "theft_alert"
     elsif kind.present?
       kind
@@ -274,7 +280,7 @@ class Payment < ApplicationRecord
 
   def success_url
     if theft_alert?
-      "#{ENV["BASE_URL"]}/bikes/#{theft_alert&.bike_id}/theft_alert?session_id={CHECKOUT_SESSION_ID}"
+      "#{ENV["BASE_URL"]}/bikes/#{promoted_alert&.bike_id}/theft_alert?session_id={CHECKOUT_SESSION_ID}"
     elsif stripe_subscription?
       "#{ENV["BASE_URL"]}/membership/success?session_id={CHECKOUT_SESSION_ID}"
     else
@@ -284,7 +290,7 @@ class Payment < ApplicationRecord
 
   def cancel_url
     if theft_alert?
-      "#{ENV["BASE_URL"]}/bikes/#{theft_alert&.bike_id}/theft_alert/new"
+      "#{ENV["BASE_URL"]}/bikes/#{promoted_alert&.bike_id}/theft_alert/new"
     elsif stripe_subscription?
       "#{ENV["BASE_URL"]}/membership/new"
     else

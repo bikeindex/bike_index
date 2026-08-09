@@ -4,7 +4,7 @@
     Promoted Alerts
     <%= link_to "New Promoted alert", new_admin_theft_alert_path(bike_id: @bike.id), class: "small btn btn-outline-success btn-sm ml-2" %>
   </h1>
-  <%= render partial: "table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: true} %>
+  <%= render partial: "table", locals: {render_sortable: true, promoted_alerts: @promoted_alerts, skip_bike: true} %>
 <% else %>
   <% nav_header_list_items = capture do %>
     <li class="nav-item dropdown dropleft">
@@ -65,21 +65,21 @@
       <%= link_to "location counts", admin_theft_alerts_path(sortable_search_params.merge(search_location_counts: !@location_counts)), class: "nav-link #{@location_counts ? 'active' : ''}" %>
     </li>
   <% end %>
-  <% theft_alert_plans = TheftAlertPlan.price_ordered_desc.select { |plan| searched_theft_alerts.where(theft_alert_plan: plan).any? } %>
-  <% stolen_records = StolenRecord.recovered.with_theft_alerts.where(theft_alerts: {id: searched_theft_alerts.pluck(:id)}) %>
+  <% theft_alert_plans = TheftAlertPlan.price_ordered_desc.select { |plan| searched_promoted_alerts.where(theft_alert_plan: plan).any? } %>
+  <% stolen_records = StolenRecord.recovered.with_promoted_alerts.where(promoted_alerts: {id: searched_promoted_alerts.pluck(:id)}) %>
   <% rendered_chart = nil %>
   <% if @render_chart %>
     <% rendered_chart = capture do %>
-      <% theft_alerts_graph = theft_alert_plans.map do |theft_alert_plan|
+      <% promoted_alerts_graph = theft_alert_plans.map do |theft_alert_plan|
           {
             name: theft_alert_plan.name,
-            data: time_range_counts(collection: searched_theft_alerts.where(theft_alert_plan_id: theft_alert_plan.id))
+            data: time_range_counts(collection: searched_promoted_alerts.where(theft_alert_plan_id: theft_alert_plan.id))
           }
         end
         alerts_recoveries_graph = theft_alert_plans.map do |theft_alert_plan|
           {
             name: "#{theft_alert_plan.name} recoveries",
-            data: time_range_counts(collection: stolen_records.where(theft_alerts: {theft_alert_plan_id: theft_alert_plan.id}), column: "theft_alerts.created_at")
+            data: time_range_counts(collection: stolen_records.where(promoted_alerts: {theft_alert_plan_id: theft_alert_plan.id}), column: "promoted_alerts.created_at")
           }
         end
 
@@ -87,13 +87,13 @@
           facebook_reach_graph = theft_alert_plans.map do |theft_alert_plan|
             {
               name: theft_alert_plan.name,
-              data: time_range_amounts(collection: searched_theft_alerts.where(theft_alert_plan_id: theft_alert_plan.id), amount_column: "reach")
+              data: time_range_amounts(collection: searched_promoted_alerts.where(theft_alert_plan_id: theft_alert_plan.id), amount_column: "reach")
             }
           end
         end %>
 
       <div class="col-12 mt-2">
-        <%= column_chart theft_alerts_graph, stacked: true, thousands: "," %>
+        <%= column_chart promoted_alerts_graph, stacked: true, thousands: "," %>
       </div>
 
       <% if @search_facebook_data %>
@@ -171,31 +171,31 @@
                     </td>
 
                     <td>
-                      <% alert_count = searched_theft_alerts.where(theft_alert_plan: theft_alert_plan).count %>
+                      <% alert_count = searched_promoted_alerts.where(theft_alert_plan: theft_alert_plan).count %>
                       <% alert_count_total += alert_count %>
                       <%= number_display(alert_count) %>
                     </td>
 
                     <td>
-                      <% fbook_reach = searched_theft_alerts.where(theft_alert_plan: theft_alert_plan).sum(:reach) %>
+                      <% fbook_reach = searched_promoted_alerts.where(theft_alert_plan: theft_alert_plan).sum(:reach) %>
                       <% fbook_reach_total += fbook_reach %>
                       <%= number_display(fbook_reach) %>
                     </td>
 
                     <td>
-                      <% fbook_cents = searched_theft_alerts.where(theft_alert_plan: theft_alert_plan).sum(:amount_cents_facebook_spent) %>
+                      <% fbook_cents = searched_promoted_alerts.where(theft_alert_plan: theft_alert_plan).sum(:amount_cents_facebook_spent) %>
                       <% fbook_cents_total += fbook_cents %>
                       <%= MoneyFormatter.money_format(fbook_cents) %>
                     </td>
 
                     <td class="small">
-                      <% revenue_cents = searched_theft_alerts.where(theft_alert_plan: theft_alert_plan).paid_cents %>
+                      <% revenue_cents = searched_promoted_alerts.where(theft_alert_plan: theft_alert_plan).paid_cents %>
                       <% revenue_cents_total += revenue_cents %>
                       <%= MoneyFormatter.money_format(revenue_cents) %>
                     </td>
 
                     <td class="small">
-                      <% recovered_count = stolen_records.where(theft_alerts: {theft_alert_plan_id: theft_alert_plan.id}).count %>
+                      <% recovered_count = stolen_records.where(promoted_alerts: {theft_alert_plan_id: theft_alert_plan.id}).count %>
                       <% recovered_count_total += recovered_count %>
                       <%= number_display(recovered_count) %>
                     </td>
@@ -241,7 +241,7 @@
             </thead>
 
             <tbody>
-              <% searched_theft_alerts.cities_count.each do |count| %>
+              <% searched_promoted_alerts.cities_count.each do |count| %>
                 <tr>
                   <td class="small"><%= count[0] %></td>
 
@@ -260,10 +260,10 @@
       </div>
     <% end %>
 
-    <%= render partial: "table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: false} %>
+    <%= render partial: "table", locals: {render_sortable: true, promoted_alerts: @promoted_alerts, skip_bike: false} %>
   <% end %>
   <%= render(Admin::IndexSkeleton::Component.new(
-    collection: @theft_alerts,
+    collection: @promoted_alerts,
     viewing: "Promoted Alerts",
     nav_header_list_items:,
     rendered_chart:,

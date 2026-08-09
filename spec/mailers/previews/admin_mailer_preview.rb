@@ -31,12 +31,12 @@ class AdminMailerPreview < ActionMailer::Preview
   end
 
   def theft_alert_notification
-    theft_alert = TheftAlert.last
-    AdminMailer.theft_alert_notification(theft_alert)
+    promoted_alert = PromotedAlert.last
+    AdminMailer.theft_alert_notification(promoted_alert)
   end
 
-  def theft_alert_recovery
-    theft_alert = TheftAlert.last
-    AdminMailer.theft_alert_notification(theft_alert, notification_type: :recovered)
+  def promoted_alert_recovery
+    promoted_alert = PromotedAlert.last
+    AdminMailer.theft_alert_notification(promoted_alert, notification_type: :recovered)
   end
 end

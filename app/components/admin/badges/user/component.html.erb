@@ -49,9 +49,9 @@
     </span>
   <% end %>
 
-  <% if @tags.include?(:theft_alert) %>
+  <% if @tags.include?(:promoted_alert) %>
     <span>
-      <%= render ::UI::Badge::Component.new(text: "P", title: (@full_text ? nil : "Promoted alert purchaser"), color: badge_color(:theft_alert)) %>
+      <%= render ::UI::Badge::Component.new(text: "P", title: (@full_text ? nil : "Promoted alert purchaser"), color: badge_color(:promoted_alert)) %>
 
       <% if @full_text %>
         <span class="less-strong">Promoted alert</span>

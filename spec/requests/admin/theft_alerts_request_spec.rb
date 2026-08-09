@@ -9,7 +9,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
     let(:bike) { stolen_record.bike }
 
     describe "GET /admin/theft_alerts" do
-      let!(:theft_alert) { FactoryBot.create(:theft_alert) }
+      let!(:promoted_alert) { FactoryBot.create(:promoted_alert) }
       it "responds with 200 OK and renders the index template" do
         get base_url
         expect(response).to be_ok
@@ -58,9 +58,9 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
 
     describe "GET /admin/theft_alerts/:id/edit" do
       it "responds with 200 and the edit template" do
-        theft_alert = FactoryBot.create(:theft_alert)
+        promoted_alert = FactoryBot.create(:promoted_alert)
 
-        get "/admin/theft_alerts/#{theft_alert.id}/edit"
+        get "/admin/theft_alerts/#{promoted_alert.id}/edit"
 
         expect(response.status).to eq(200)
         expect(response).to render_template(:edit)
@@ -69,41 +69,41 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
 
     describe "PATCH /admin/theft_alerts/:id" do
       it "redirects to the index route on update success" do
-        theft_alert = FactoryBot.create(:theft_alert)
-        expect(theft_alert.status).to eq("pending")
+        promoted_alert = FactoryBot.create(:promoted_alert)
+        expect(promoted_alert.status).to eq("pending")
 
-        patch "/admin/theft_alerts/#{theft_alert.id}",
+        patch "/admin/theft_alerts/#{promoted_alert.id}",
           params: {
-            theft_alert: {update_theft_alert: true, notes: "Some notes"}
+            promoted_alert: {update_theft_alert: true, notes: "Some notes"}
           }
 
         expect(response).to redirect_to(admin_theft_alerts_path)
         expect(flash[:success]).to match(/success/i)
         expect(flash[:errors]).to be_blank
-        expect(theft_alert.reload.notes).to eq("Some notes")
+        expect(promoted_alert.reload.notes).to eq("Some notes")
       end
     end
 
     describe "enqueing jobs" do
-      let(:theft_alert) { FactoryBot.create(:theft_alert, status: "pending") }
-      context "activate_theft_alert" do
-        it "enqueues the activate_theft_alert job" do
-          expect(theft_alert.reload.activating_at).to be_blank
-          expect(theft_alert.activating?).to be_falsey
+      let(:promoted_alert) { FactoryBot.create(:promoted_alert, status: "pending") }
+      context "activate_promoted_alert" do
+        it "enqueues the activate_promoted_alert job" do
+          expect(promoted_alert.reload.activating_at).to be_blank
+          expect(promoted_alert.activating?).to be_falsey
           Sidekiq::Job.clear_all
-          patch "/admin/theft_alerts/#{theft_alert.id}", params: {activate_theft_alert: 1}
+          patch "/admin/theft_alerts/#{promoted_alert.id}", params: {activate_theft_alert: 1}
           expect(BikeJobs::ActivateTheftAlertJob.jobs.count).to eq 1
-          expect(theft_alert.reload.activating_at).to be_present
-          expect(theft_alert.activating?).to be_truthy
+          expect(promoted_alert.reload.activating_at).to be_present
+          expect(promoted_alert.activating?).to be_truthy
         end
       end
-      context "update_theft_alert" do
+      context "update_promoted_alert" do
         it "enqueues the job" do
-          expect(theft_alert.reload.activating_at).to be_blank
+          expect(promoted_alert.reload.activating_at).to be_blank
           Sidekiq::Job.clear_all
-          patch "/admin/theft_alerts/#{theft_alert.id}", params: {update_theft_alert: true}
+          patch "/admin/theft_alerts/#{promoted_alert.id}", params: {update_theft_alert: true}
           # expect(BikeJobs::UpdateTheftAlertFacebookJob.jobs.count).to eq 1
-          expect(theft_alert.reload.activating_at).to be_blank
+          expect(promoted_alert.reload.activating_at).to be_blank
         end
       end
     end
@@ -131,25 +131,25 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         expect do
           post "/admin/theft_alerts",
             params: {
-              theft_alert: {
+              promoted_alert: {
                 stolen_record_id: stolen_record.id,
                 theft_alert_plan_id: theft_alert_plan.id,
                 notes: "Some notes",
                 ad_radius_miles: 33
               }
             }
-        end.to change(TheftAlert, :count).by 1
+        end.to change(PromotedAlert, :count).by 1
 
         expect(flash[:success]).to be_present
-        theft_alert = TheftAlert.last
-        expect(theft_alert.admin).to be_truthy
-        expect(theft_alert.user_id).to eq current_user.id
-        expect(theft_alert.stolen_record_id).to eq stolen_record.id
-        expect(theft_alert.bike_id).to eq bike.id
-        expect(theft_alert.ad_radius_miles).to eq 33
-        expect(theft_alert.notes).to eq "Some notes"
-        expect(theft_alert.status).to eq "pending"
-        expect(theft_alert.activateable?).to be_truthy
+        promoted_alert = PromotedAlert.last
+        expect(promoted_alert.admin).to be_truthy
+        expect(promoted_alert.user_id).to eq current_user.id
+        expect(promoted_alert.stolen_record_id).to eq stolen_record.id
+        expect(promoted_alert.bike_id).to eq bike.id
+        expect(promoted_alert.ad_radius_miles).to eq 33
+        expect(promoted_alert.notes).to eq "Some notes"
+        expect(promoted_alert.status).to eq "pending"
+        expect(promoted_alert.activateable?).to be_truthy
         expect(BikeJobs::ActivateTheftAlertJob.jobs.count).to eq 1
       end
       context "not activateable" do
@@ -160,26 +160,26 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
           expect do
             post "/admin/theft_alerts",
               params: {
-                theft_alert: {
+                promoted_alert: {
                   stolen_record_id: stolen_record.id,
                   theft_alert_plan_id: theft_alert_plan.id,
                   notes: "Some notes",
                   ad_radius_miles: 33
                 }
               }
-          end.to change(TheftAlert, :count).by 1
+          end.to change(PromotedAlert, :count).by 1
 
           expect(flash[:success]).to be_present
-          theft_alert = TheftAlert.last
-          expect(theft_alert.admin).to be_truthy
-          expect(theft_alert.user_id).to eq current_user.id
-          expect(theft_alert.stolen_record_id).to eq stolen_record.id
-          expect(theft_alert.bike_id).to eq bike.id
-          expect(theft_alert.ad_radius_miles).to eq 33
-          expect(theft_alert.notes).to eq "Some notes"
-          expect(theft_alert.status).to eq "pending"
-          expect(theft_alert.activateable?).to be_falsey
-          expect(theft_alert.activating?).to be_falsey
+          promoted_alert = PromotedAlert.last
+          expect(promoted_alert.admin).to be_truthy
+          expect(promoted_alert.user_id).to eq current_user.id
+          expect(promoted_alert.stolen_record_id).to eq stolen_record.id
+          expect(promoted_alert.bike_id).to eq bike.id
+          expect(promoted_alert.ad_radius_miles).to eq 33
+          expect(promoted_alert.notes).to eq "Some notes"
+          expect(promoted_alert.status).to eq "pending"
+          expect(promoted_alert.activateable?).to be_falsey
+          expect(promoted_alert.activating?).to be_falsey
           expect(BikeJobs::ActivateTheftAlertJob.jobs.count).to eq 0
         end
       end

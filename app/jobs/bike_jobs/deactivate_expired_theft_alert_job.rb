@@ -7,9 +7,9 @@ module BikeJobs
     end
 
     def perform
-      TheftAlert
-        .should_expire
-        .update_all(status: "inactive")
+      PromotedAlert.should_expire.update_all(status: "inactive")
+      # Alerts Backfills::PromotedAlertJob hasn't copied over yet
+      TheftAlert.should_expire.update_all(status: "inactive")
     end
   end
 end

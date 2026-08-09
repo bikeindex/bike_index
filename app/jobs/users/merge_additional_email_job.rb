@@ -26,6 +26,7 @@ module Users
       old_user.memberships.update_all(user_id:)
       old_user.sent_stolen_notifications.update_all(sender_id: user_id)
       old_user.received_stolen_notifications.update_all(receiver_id: user_id)
+      old_user.promoted_alerts.update_all(user_id:)
       old_user.theft_alerts.update_all(user_id:)
       old_user.bike_sticker_updates.update_all(user_id:)
       old_user.email_bans.each { |eb| eb.update(user_id:) }

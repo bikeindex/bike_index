@@ -24,11 +24,11 @@ module CallbackJobs
       update_user_alerts(user)
       UserAlert.refresh_alert_slugs(user)
 
-      # Activate activateable theft alerts!
-      user.theft_alerts.paid.where(start_at: nil).each do |theft_alert|
-        next unless theft_alert.activateable?
+      # Activate activateable promoted alerts!
+      user.promoted_alerts.paid.where(start_at: nil).each do |promoted_alert|
+        next unless promoted_alert.activateable?
 
-        BikeJobs::ActivateTheftAlertJob.perform_async(theft_alert.id)
+        BikeJobs::ActivateTheftAlertJob.perform_async(promoted_alert.id)
       end
 
       process_user_registration_organizations(user)
@@ -59,8 +59,8 @@ module CallbackJobs
         return
       end
 
-      user.theft_alerts.each do |theft_alert|
-        UserAlert.update_theft_alert_without_photo(user: user, theft_alert: theft_alert)
+      user.promoted_alerts.each do |promoted_alert|
+        UserAlert.update_theft_alert_without_photo(user:, promoted_alert:)
       end
 
       # Ignore alerts below for org members, otherwise they might get a lot of useless ones
