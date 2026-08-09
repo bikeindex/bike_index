@@ -261,7 +261,8 @@ RSpec.describe SessionsController, type: :request do
       end
 
       it "names the timeout for a token older than the window" do
-        expect(failure_for(SecurityTokenizer.new_token(3.hours.ago))).to match(/link has expired/i)
+        stale = SecurityTokenizer.new_token((User::AUTH_TOKEN_EXPIRY + 1.minute).ago)
+        expect(failure_for(stale)).to match(/link has expired/i)
       end
 
       it "says it was already used for a token inside the window" do
@@ -284,6 +285,17 @@ RSpec.describe SessionsController, type: :request do
       expect(response).to redirect_to admin_root_url
       expect(superadmin.reload.magic_link_token).to be_nil
       expect(superadmin.last_login_at).to be_within(1.second).of Time.current
+    end
+
+    # find_by with a blank token matches IS NULL - the first user without an outstanding
+    # link, which is nearly everyone. Nothing but the expiry check kept that from signing
+    # someone in, so a blank token must never reach the lookup
+    it "signs nobody in for a blank or missing token" do
+      [{token: ""}, {}].each do |params|
+        post "/session/sign_in_with_magic_link", params: params
+        expect(response).to redirect_to magic_link_session_path(incorrect_token: params[:token])
+        expect(response.cookies["auth"]).to be_blank
+      end
     end
 
     # The biggest bucket of real failures: the link worked, and then got clicked again
