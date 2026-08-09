@@ -70,9 +70,7 @@ class User < ApplicationRecord
   include AddressRecordedWithinBoundingBox
 
   EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/
-  # How long an emailed token stays good for - magic link sign in and password reset alike.
-  # 99% of magic links are clicked inside 5 minutes, so a long window is exposure without
-  # much use. SessionsController also reads it to tell an expired link from a spent one
+  # How long an emailed token stays good for - magic link sign in and password reset alike
   AUTH_TOKEN_EXPIRY = 10.minutes
 
   cattr_accessor :current_user
@@ -169,9 +167,7 @@ class User < ApplicationRecord
   scope :member, -> { includes(:memberships).merge(Membership.active) }
 
   class << self
-    # Emailed tokens are looked up through here, never find_by_<column>: a blank token there
-    # matches IS NULL, which is nearly every row, leaving only auth_token_expired? between a
-    # tokenless request and someone else's account
+    # Never find_by_<column> for these - a blank token matches IS NULL, which is nearly every row
     def find_for_auth_token(auth_token_type, token)
       where(auth_token_type => token).first if token.present?
     end

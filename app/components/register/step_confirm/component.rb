@@ -2,9 +2,8 @@
 
 module Register
   module StepConfirm
-    # Where the emailed confirmation link lands. Nothing is confirmed by rendering it -
-    # confirming is single use, and a link scanner runs this page's JS, so the form waits
-    # for a click rather than posting itself
+    # Where the emailed confirmation link lands. Confirming is single use and scanners run the
+    # page's JS, so the form waits for a click rather than submitting on render
     class Component < ApplicationComponent
       def initialize(b_param:, token:)
         @b_param = b_param

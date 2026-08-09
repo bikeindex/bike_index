@@ -250,9 +250,7 @@ RSpec.describe SessionsController, type: :request do
         .to have_css("form[action='/session/sign_in_with_magic_link'] input[name='token'][value='#{token}']", visible: :hidden)
     end
 
-    # A dead token is dead the same way whatever killed it, so the reason comes from the
-    # timestamp inside it. Getting this wrong reads as "the site is broken" rather than
-    # "you already did this"
+    # A dead token matches no user whatever killed it, so the reason comes from its timestamp
     context "incorrect_token" do
       def failure_for(token)
         get "/session/magic_link", params: {incorrect_token: token}
@@ -287,9 +285,7 @@ RSpec.describe SessionsController, type: :request do
       expect(superadmin.last_login_at).to be_within(1.second).of Time.current
     end
 
-    # find_by with a blank token matches IS NULL - the first user without an outstanding
-    # link, which is nearly everyone. Nothing but the expiry check kept that from signing
-    # someone in, so a blank token must never reach the lookup
+    # find_by with a blank token matches IS NULL - nearly every user
     it "signs nobody in for a blank or missing token" do
       [{token: ""}, {}].each do |params|
         post "/session/sign_in_with_magic_link", params: params
