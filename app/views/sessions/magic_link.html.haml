@@ -4,15 +4,17 @@
   - else
     %h3= t(".sign_in_with_magic_link")
     - if @failure
-      .alert.alert-warning.mt-2.mb-4
-        - if @failure == :expired
-          %h3.header-font-alt.mb-2= t(".link_expired")
-          %p= t(".links_work_for", hours: User::AUTH_TOKEN_EXPIRY.in_hours.to_i)
-        - elsif @failure == :already_used
-          %h3.header-font-alt.mb-2= t(".link_already_used")
-          %p= t(".only_the_newest_link_works")
-        - else
-          %h3.header-font-alt.mb-2= t(".unable_to_auth")
+      - header = t(".unable_to_auth")
+      - detail = nil
+      - if @failure == :expired
+        - header = t(".link_expired")
+        - detail = t(".links_work_for", hours: User::AUTH_TOKEN_EXPIRY.in_hours.to_i)
+      - elsif @failure == :already_used
+        - header = t(".link_already_used")
+        - detail = t(".only_the_newest_link_works")
+      = render UI::Alerts::Base::Component.new(kind: :warning, header:, margin_classes: "tw:mt-2 tw:mb-4") do
+        - if detail
+          %p= detail
         %p= t(".reenter_email")
 
     %p= t(".enter_email_address")
