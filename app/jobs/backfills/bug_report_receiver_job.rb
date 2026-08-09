@@ -7,7 +7,8 @@ module Backfills
     sidekiq_options queue: "low_priority", retry: false
 
     def perform
-      bug_reports.find_each do |bug_report|
+      # Small batches - reading a report's mail holds its whole raw email, attachments and all
+      bug_reports.find_each(batch_size: 100) do |bug_report|
         receiver = receiver_for(bug_report.inbound_email)
         next if receiver.blank?
 
@@ -19,12 +20,13 @@ module Backfills
     private
 
     def bug_reports
-      BugReport.where(receiver: nil).where.not(inbound_email_id: nil).includes(:inbound_email)
+      BugReport.where(receiver: nil).where.not(inbound_email_id: nil)
+        .includes(inbound_email: {raw_email_attachment: :blob})
     end
 
     # A blob can go missing without its inbound email row - skip rather than stall the backfill
     def receiver_for(inbound_email)
-      EmailReceiver.for_mail(inbound_email.mail)
+      BugReport.receiver_from_mail(inbound_email.mail)
     rescue ActiveStorage::FileNotFoundError
       nil
     end

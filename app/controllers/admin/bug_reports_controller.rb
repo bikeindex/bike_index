@@ -60,9 +60,9 @@ module Admin
       redirect_back(fallback_location: admin_bug_reports_path)
     end
 
-    # The multiselect combobox renders its selections through this - a tag is its own display
+    # Chips carry the value verbatim - the combobox removes a selection by the text as typed
     def tag_chips
-      chips = BugReport.normalized_tags(params[:combobox_values]).map do
+      chips = params[:combobox_values].to_s.split(",").map do
         helpers.hw_combobox_selection_chip(display: it, value: it, for_id: params[:for_id])
       end
 

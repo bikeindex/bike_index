@@ -6557,6 +6557,13 @@ CREATE INDEX index_bug_reports_on_inbound_email_id ON public.bug_reports USING b
 
 
 --
+-- Name: index_bug_reports_on_receiver; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bug_reports_on_receiver ON public.bug_reports USING btree (receiver);
+
+
+--
 -- Name: index_bug_reports_on_status; Type: INDEX; Schema: public; Owner: -
 --
 

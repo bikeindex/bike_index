@@ -51,11 +51,10 @@
           </td>
 
           <td>
-            <small>
-              <%= BugReport.display_receiver(bug_report.receiver) %>
-            </small>
-
             <% if bug_report.receiver.present? %>
+              <small>
+                <%= BugReport.display_receiver(bug_report.receiver) %>
+              </small>
               <%= link_to search_emoji, url_for(sortable_search_params.merge(search_receiver: bug_report.receiver)), class: "display-sortable-link small" %>
             <% end %>
           </td>

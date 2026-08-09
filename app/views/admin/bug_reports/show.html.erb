@@ -85,13 +85,11 @@
 
   <div class="col-md-6">
     <%= form_with(model: [:admin, @bug_report]) do |f| %>
-      <div class="mb-3">
-        <%= f.label :tags, class: "twlabel" %>
-
+      <%= render(UI::Forms::Group::Component.new(attribute: :tags, form_builder: f)) do %>
         <%= render UI::Forms::Combobox::Component.new(name: :tags, form: f, free_text: true,
-          options: BugReport.all_tags, multiselect_chip_src: tag_chips_admin_bug_reports_path,
+          options: searchable_tags, multiselect_chip_src: tag_chips_admin_bug_reports_path,
           placeholder: "Select or create tags") %>
-      </div>
+      <% end %>
 
       <div class="mb-3">
         <%= f.label :github_pull_request, class: "twlabel" %>

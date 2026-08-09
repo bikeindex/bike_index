@@ -141,11 +141,12 @@ RSpec.describe Admin::BugReportsController, type: :request do
   end
 
   describe "tag_chips" do
-    it "renders a normalized chip for each combobox value" do
-      post "#{base_url}/tag_chips", params: {combobox_values: "Search, broken", for_id: "bug_report_tags"},
+    it "renders a chip for each combobox value, verbatim so the combobox can remove it" do
+      post "#{base_url}/tag_chips", params: {combobox_values: "search,Not Yet Normalized", for_id: "bug_report_tags"},
         as: :turbo_stream
       expect(response.status).to eq(200)
-      expect(response.body.scan(/<span>([^<]+)<\/span>/).flatten).to eq(%w[broken search])
+      expect(response.body.scan(/<span>([^<]+)<\/span>/).flatten).to eq(["search", "Not Yet Normalized"])
+      expect(response.body).to include('data-hw-combobox-value-param="Not Yet Normalized"')
     end
   end
 

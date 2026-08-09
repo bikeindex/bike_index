@@ -4,7 +4,7 @@ class BugReportsMailbox < ApplicationMailbox
       inbound_email:,
       email: mail.from&.first,
       from_name: mail[:from]&.display_names&.first,
-      receiver: EmailReceiver.for_mail(mail),
+      receiver: BugReport.receiver_from_mail(mail),
       subject: mail.subject,
       body: body_text,
       received_at: mail.date || Time.current
