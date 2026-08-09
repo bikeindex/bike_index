@@ -53,11 +53,11 @@ module SystemSpecHelpers
   def hover_then_press(element, settle: 400)
     box = element.native.bounding_box
     x, y = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
-    with_mouse { |mouse| mouse.move(x, y) }
+    with_mouse(settle:) { |mouse| mouse.move(x, y) }
     yield :hover
-    with_mouse(&:down)
+    with_mouse(settle:, &:down)
     yield :press
-    with_mouse { |mouse| mouse.up.tap { mouse.move(0, 0) } }
+    with_mouse(settle:) { |mouse| mouse.up.tap { mouse.move(0, 0) } }
   end
 
   def browser_cookie_value(name)
