@@ -83,13 +83,26 @@ class BugReport < ApplicationRecord
     value.to_s.delete_suffix("@#{OUR_EMAIL_DOMAIN}")
   end
 
+  # Who wrote in, as [email, name]. Mail our app sends itself - the contact form, admin
+  # notifications - is From: contact@bikeindex.org with the person who wrote in as the Reply-To,
+  # so attribute those to them rather than to us
+  def self.sender_from_mail(mail)
+    field = (our_address?(mail.from&.first) && mail[:reply_to].presence) || mail[:from]
+
+    [EmailNormalizer.normalize(field&.addresses&.first), field&.display_names&.first]
+  end
+
+  def self.our_address?(value)
+    value.to_s.downcase.end_with?("@#{OUR_EMAIL_DOMAIN}")
+  end
+  private_class_method :our_address?
+
   # Which of our addresses the email was sent to (contact@, support@, bugs@, ...). Prefer an
   # address of ours, since a message can be addressed to a mix of recipients. X-Original-To is
   # the envelope recipient Postmark's ingress prepends, the only source when we're bcc'd
   def self.receiver_from_mail(mail)
     recipients = Array(mail.to) + Array(mail.cc)
-    address = ([mail["X-Original-To"]&.to_s] + recipients)
-      .find { it.to_s.downcase.end_with?("@#{OUR_EMAIL_DOMAIN}") } || recipients.first
+    address = ([mail["X-Original-To"]&.to_s] + recipients).find { our_address?(it) } || recipients.first
 
     EmailNormalizer.normalize(address)
   end
@@ -123,8 +136,9 @@ class BugReport < ApplicationRecord
     self.email = EmailNormalizer.normalize(email)
     self.receiver = EmailNormalizer.normalize(receiver)
     self.user_id ||= User.fuzzy_email_find(email)&.id
-    # booleans snapshot the sender's status at report time - don't re-derive on update
-    return unless new_record? && user.present?
+    # booleans snapshot the sender's status - re-taken only when the sender changes, so an
+    # ordinary update keeps the snapshot from when the report came in
+    return unless user_id_changed? && user.present?
 
     self.is_member = user.member?
     self.is_paid_organization = user.paid_org?
