@@ -12,7 +12,19 @@
       tw:gap-y-1
     "
   >
-    <%= render UI::ButtonGroup::Component.new(entries:) %>
+    <%#
+      The tooltip sits beside the group, not in the Edit chip: a disabled button is
+      pointer-events-none, so nothing inside it can be hovered - which is why its
+      title never showed - and the trigger is a button, which can't nest in one
+    %>
+
+    <div class="tw:flex tw:items-center tw:gap-2">
+      <%= render UI::ButtonGroup::Component.new(entries:) %>
+
+      <% if uneditable_title.present? %>
+        <%= render UI::Tooltip::Component.new(text: uneditable_title) %>
+      <% end %>
+    </div>
 
     <% if organization_path.present? %>
       <%= link_to "View in organization", organization_path, class: "twlink tw:ml-auto tw:text-sm" %>

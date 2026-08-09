@@ -15,6 +15,8 @@ RSpec.describe Admin::RegistrationSequence::Header::Component, type: :component 
     expect(page).to have_link("Preview", href: "#{admin_url}/preview")
     expect(page).to have_link("Edit", href: "#{admin_url}/edit")
     expect(page).to have_link("View in organization", href: "/o/#{organization.to_param}/registration_sequences/#{registration_sequence.id}")
+    # Nothing to explain while it's editable
+    expect(page).to_not have_css("[role='tooltip']", visible: :all)
   end
 
   it "marks the screen it's on" do
@@ -38,7 +40,8 @@ RSpec.describe Admin::RegistrationSequence::Header::Component, type: :component 
       expect(page).to have_content("Editing Brakebills Current", normalize_ws: true)
       expect(page).to_not have_link("Edit")
       expect(page).to have_css("button[disabled]", text: "Edit")
-      expect(page.find("button[disabled]")[:title]).to eq "Can't edit current registration sequence - create a draft"
+      # The tooltip carries the reason: a disabled button can't be hovered, so its title never shows
+      expect(page).to have_css("[role='tooltip']", text: "Can't edit current registration sequence - create a draft", visible: :all)
       # The other two stay reachable
       expect(page).to have_link("View", href: admin_url)
       expect(page).to have_link("Preview", href: "#{admin_url}/preview")
@@ -50,7 +53,7 @@ RSpec.describe Admin::RegistrationSequence::Header::Component, type: :component 
       it "names the status it can't edit" do
         render_inline(described_class.new(registration_sequence:))
 
-        expect(page.find("button[disabled]")[:title]).to eq "Can't edit previous registration sequence - create a draft"
+        expect(page).to have_css("[role='tooltip']", text: "Can't edit previous registration sequence - create a draft", visible: :all)
       end
     end
   end
