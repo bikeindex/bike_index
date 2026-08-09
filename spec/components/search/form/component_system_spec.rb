@@ -21,6 +21,9 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     let!(:burgundy) { FactoryBot.create(:color, name: "Burgundy", display: "#900") }
 
     before do
+      # Redis outlives the transaction the colors roll back with, so an earlier
+      # example's Burgundy would still be indexed - and matched ahead of this one's
+      Autocomplete::Loader.clear_redis
       Autocomplete::Loader.load_all(%w[Color])
       visit(preview_path)
       # Clear localStorage
@@ -31,6 +34,13 @@ RSpec.describe Search::Form::Component, :js, type: :system do
     # what actually get submitted with the form
     def combobox_values
       all("input[name='query_items[]']", visible: :all).map(&:value)
+    end
+
+    # The hidden query_items[] fields are written after the selection, so wait for
+    # them rather than reading whatever is in the DOM at that instant
+    def expect_combobox_values(values)
+      expect(page).to have_css("input[name='query_items[]']", count: values.count, visible: :all)
+      expect(combobox_values).to match_array(values)
     end
 
     # Type a query into the combobox, then click the matching autocomplete option
@@ -91,7 +101,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       find("label", text: "Stolen in search area").click
 
       combobox_select("Burg", "Burgundy")
-      expect(combobox_values).to eq([burgundy.search_id])
+      expect_combobox_values([burgundy.search_id])
 
       distance = "251"
       location = "Portland, OR"
@@ -133,7 +143,7 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
       # Enter with a matching option selects it rather than adding free text
       find(".hw-combobox__input").send_keys(:return)
-      expect(combobox_values).to eq([burgundy.search_id])
+      expect_combobox_values([burgundy.search_id])
     end
 
     it "escapes HTML in autocomplete results" do
@@ -161,12 +171,10 @@ RSpec.describe Search::Form::Component, :js, type: :system do
 
         combobox_select("Black", "Black")
 
-        expect(combobox_values).to match_array(["v_9", black.search_id])
-
-        proximity_text = find("[data-test-id=\"Search::KindOption-proximity\"]").text
+        expect_combobox_values(["v_9", black.search_id])
 
         # Counts should have been hidden because a new item was added
-        expect(proximity_text.strip).to eq("Stolen in search area")
+        expect(find("label", text: "Stolen in search area").text.strip).to eq("Stolen in search area")
       end
     end
 
@@ -186,9 +194,8 @@ RSpec.describe Search::Form::Component, :js, type: :system do
         find("#location").set("Edmonton, AB")
         expect(page_text(page.text)).to match("miles of")
 
-        proximity_text = find("[data-test-id=\"Search::KindOption-for_sale_proximity\"]").text
         # Counts should have been hidden because a new item was added
-        expect(proximity_text.strip).to eq("For sale in search area")
+        expect(find("label", text: "For sale in search area").text.strip).to eq("For sale in search area")
       end
 
       context "for_sale_san_francisco_atb" do

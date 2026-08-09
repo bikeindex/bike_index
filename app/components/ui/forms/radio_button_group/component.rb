@@ -16,6 +16,8 @@ module UI
           "tw:has-[:focus-visible]:outline-none tw:has-[:focus-visible]:ring-3 tw:has-[:focus-visible]:ring-purple-500/40"
         ].join(" ").freeze
 
+        # entries: [{value:, label:}, …] — anything else in an entry becomes an attribute
+        # on its chip, while data: applies to every radio.
         # full_width: chips share the row evenly (the frame-size XS-XL selector),
         # rather than each taking only the width of its label.
         def initialize(name:, entries:, selected: nil, form: nil, full_width: false, data: {})
@@ -37,8 +39,11 @@ module UI
 
         def chip(option)
           value = option[:value].to_s
+          # The entry's attributes go on the label rather than the sr-only input, since
+          # the label is what a user sees and hovers
+          attributes = option.except(:value, :label).merge(class: CHIP_CLASSES)
 
-          tag.label(class: CHIP_CLASSES) do
+          tag.label(**attributes) do
             radio_button_tag(@name, value, value == @selected, class: "tw:sr-only", form: @form, data: @data) +
               tag.span(option[:label].html_safe)
           end
