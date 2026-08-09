@@ -15,7 +15,7 @@ RSpec.describe Admin::BugReportsController, type: :request do
 
     context "json" do
       let(:target_json) do
-        bug_report.as_json(only: %w[id user_id email from_name subject body tags github_pull_request
+        bug_report.as_json(only: %w[id user_id email from_name receiver subject body tags github_pull_request
           is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
       end
 
@@ -76,6 +76,23 @@ RSpec.describe Admin::BugReportsController, type: :request do
       end
     end
 
+    context "with search_receiver" do
+      let!(:bug_report_support) { FactoryBot.create(:bug_report, receiver: "support@bikeindex.org") }
+
+      it "filters by the receiver" do
+        expect(bug_report.receiver).to eq "contact@bikeindex.org"
+        get "#{base_url}.json", params: {search_receiver: "support@bikeindex.org", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_support.id])
+      end
+
+      it "ignores a receiver no bug report has" do
+        expect(bug_report).to be_present
+        get "#{base_url}.json", params: {search_receiver: "nonsense@bikeindex.org", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] })
+          .to match_array([bug_report.id, bug_report_support.id])
+      end
+    end
+
     context "with search_membership" do
       let!(:bug_report_paid) { FactoryBot.create(:bug_report, is_paid_organization: true) }
 
@@ -120,6 +137,16 @@ RSpec.describe Admin::BugReportsController, type: :request do
         expect(bug_report.reload).to have_attributes(tags: %w[broken search], github_pull_request: 3805)
         expect(json_result.dig("bug_report", "tags")).to eq(%w[broken search])
       end
+    end
+  end
+
+  describe "tag_chips" do
+    it "renders a chip for each combobox value, verbatim so the combobox can remove it" do
+      post "#{base_url}/tag_chips", params: {combobox_values: "search,Not Yet Normalized", for_id: "bug_report_tags"},
+        as: :turbo_stream
+      expect(response.status).to eq(200)
+      expect(response.body.scan(/<span>([^<]+)<\/span>/).flatten).to eq(["search", "Not Yet Normalized"])
+      expect(response.body).to include('data-hw-combobox-value-param="Not Yet Normalized"')
     end
   end
 
