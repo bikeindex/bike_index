@@ -6,6 +6,8 @@ class UsersController < ApplicationController
   # the sign-in guard is bypassed by whatever link or bookmark lands on the signup form.
   before_action :redirect_forced_saml, only: %i[new create]
   before_action :find_user_from_token_for_password_reset!, only: %i[update_password_form_with_reset_token update_password_with_reset_token]
+  # RFC 8058 one-click POSTs arrive from the mail provider's servers, with no session or token
+  skip_before_action :verify_authenticity_token, only: %i[unsubscribe_update]
 
   def new
     @user ||= User.new(email: params[:email])
@@ -190,9 +192,13 @@ class UsersController < ApplicationController
     end
   end
 
+  # Forgery protection is skipped here, so the signed id is the only credential - trusting the
+  # session would let any page unsubscribe whoever visits it, without a click behind it
   def unsubscribe_update
-    user = current_user || User.find_signed(params[:id], purpose: :unsubscribe)
-    user.update_attribute :notification_newsletters, false if user.present?
+    User.find_signed(params[:id], purpose: :unsubscribe)&.update_attribute(:notification_newsletters, false)
+    # One-click clients read the status and nothing else
+    return head(:ok) if params["List-Unsubscribe"] == "One-Click"
+
     flash[:success] = translation(:successfully_unsubscribed)
     redirect_to(user_root_url) && return
   end

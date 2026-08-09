@@ -60,11 +60,24 @@ module Admin
       redirect_back(fallback_location: admin_bug_reports_path)
     end
 
-    helper_method :matching_bug_reports, :searchable_tags, :membership_filters,
-      :status_filters, :status_only_filters
+    # Chips carry the value verbatim - the combobox removes a selection by the text as typed
+    def tag_chips
+      chips = params[:combobox_values].to_s.split(",").map do
+        helpers.hw_combobox_selection_chip(display: it, value: it, for_id: params[:for_id])
+      end
+
+      render turbo_stream: helpers.safe_join(chips)
+    end
+
+    helper_method :matching_bug_reports, :searchable_tags, :searchable_receivers,
+      :membership_filters, :status_filters, :status_only_filters
 
     def searchable_tags
       @searchable_tags ||= BugReport.all_tags
+    end
+
+    def searchable_receivers
+      @searchable_receivers ||= BugReport.all_receivers
     end
 
     def membership_filters
@@ -84,7 +97,7 @@ module Admin
     protected
 
     def sortable_columns
-      %w[created_at received_at updated_at email user_id github_pull_request status].freeze
+      %w[created_at received_at updated_at email receiver user_id github_pull_request status].freeze
     end
 
     def earliest_period_date
@@ -95,6 +108,8 @@ module Admin
       bug_reports = BugReport.all
       @searched_tag = params[:search_tag] if searchable_tags.include?(params[:search_tag])
       bug_reports = bug_reports.with_tag(@searched_tag) if @searched_tag.present?
+      @searched_receiver = params[:search_receiver] if searchable_receivers.include?(params[:search_receiver])
+      bug_reports = bug_reports.where(receiver: @searched_receiver) if @searched_receiver.present?
       bug_reports = bug_reports.where(user_id: params[:user_id]) if params[:user_id].present?
       @searched_membership = params[:search_membership] if MEMBERSHIP_FILTERS.key?(params[:search_membership])
       bug_reports = filter_by_membership(bug_reports)
@@ -133,7 +148,7 @@ module Admin
     end
 
     def bug_report_json(bug_report)
-      bug_report.as_json(only: %w[id user_id email from_name subject body tags github_pull_request
+      bug_report.as_json(only: %w[id user_id email from_name receiver subject body tags github_pull_request
         is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
     end
   end

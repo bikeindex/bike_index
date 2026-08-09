@@ -256,16 +256,21 @@ RSpec.describe CustomerMailer, type: :mailer do
   describe "newsletter" do
     let(:mail_snippet) { FactoryBot.build(:mail_snippet, kind: :newsletter) }
     let(:user) { FactoryBot.create(:user) }
+    let(:mail) { CustomerMailer.newsletter(user:, mail_snippet:) }
 
     it "renders, includes unsubscribe" do
-      mail = CustomerMailer.newsletter(user:, mail_snippet:)
-
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.to).to eq([user.email])
       expect(mail.tag).to eq "newsletter"
       expect(mail.body.encoded).to match "unsubscribe"
       expect(mail.body.encoded).to match "binx-header-banner" # shared blue banner header, not the old logo
       expect(mail.body.encoded).to_not match "email_assets/logo.png"
+    end
+
+    it "includes one-click unsubscribe headers, pointing at the POST endpoint" do
+      expect(mail["List-Unsubscribe-Post"].value).to eq "List-Unsubscribe=One-Click"
+      signed_id = mail["List-Unsubscribe"].value[%r{/users/(.+)/unsubscribe_update>\z}, 1]
+      expect(User.find_signed(signed_id, purpose: :unsubscribe)).to eq user
     end
   end
 
