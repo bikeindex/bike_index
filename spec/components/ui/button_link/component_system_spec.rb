@@ -23,6 +23,23 @@ RSpec.describe UI::ButtonLink::Component, :js, type: :system do
     expect_axe_clean
   end
 
+  # The same contract the button holds: an active link is already showing its active
+  # colors, so only focus and press change anything, and they change the same thing
+  it "leaves an active color alone on hover, and rings the same for focus and press" do
+    UI::Button::Component::COLORS.each_key do |color|
+      visit "/rails/view_components/ui/button_link/component/#{color}_active"
+      link = find("a[data-active='true']")
+      looks = {resting: [computed_colors(link), computed_ring(link)]}
+      hover_then_press(link) { |state| looks[state] = [computed_colors(link), computed_ring(link)] }
+      looks[:focus] = [computed_colors(link), computed_ring(link)]
+
+      expect(looks[:hover]).to eq(looks[:resting]), "#{color} changed on hover"
+      expect(looks[:focus]).to_not eq(looks[:resting]), "#{color} shows nothing on focus"
+      expect(looks[:press]).to eq(looks[:focus]), "#{color} presses differently than it focuses"
+      expect(looks.values.map(&:first).uniq.count).to eq(1), "#{color} changed color, not just its ring"
+    end
+  end
+
   # The same three answers a button gives, from an element that only styles like one
   it "answers hover and press differently, in every color" do
     UI::Button::Component::COLORS.each_key do |color|

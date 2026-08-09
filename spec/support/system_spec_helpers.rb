@@ -43,6 +43,11 @@ module SystemSpecHelpers
     element.evaluate_script("[getComputedStyle(this).backgroundColor, getComputedStyle(this).color, getComputedStyle(this).borderTopColor, getComputedStyle(this).textDecorationLine, getComputedStyle(this).fontWeight]")
   end
 
+  # The ring an element wears right now — box-shadow is how Tailwind draws one.
+  def computed_ring(element)
+    element.evaluate_script("getComputedStyle(this).boxShadow")
+  end
+
   # Point at an element and hold the mouse down, yielding at each state so the caller
   # can measure. Capybara can hover but has no press-and-hold, and :active is only
   # reachable by actually holding the button down, the way a rider does.

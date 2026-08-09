@@ -66,8 +66,6 @@ module UI
         render(UI::Button::Component.new(text: "Link Active", color: :link, active: true))
       end
 
-      # build_classes skips the disabled styling for link color, so this dims by
-      # nothing — it's here because the button is still unclickable
       def link_disabled
         render(UI::Button::Component.new(text: "Link Disabled", color: :link, disabled: true))
       end
