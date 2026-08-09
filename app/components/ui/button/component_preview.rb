@@ -26,6 +26,10 @@ module UI
         render(UI::Button::Component.new(text: "Primary Active", color: :primary, active: true))
       end
 
+      def primary_disabled
+        render(UI::Button::Component.new(text: "Primary Disabled", color: :primary, disabled: true))
+      end
+
       # White button with a purple outline (fills purple when active)
       # @label secondary (with data)
       def secondary
@@ -37,12 +41,20 @@ module UI
         render(UI::Button::Component.new(text: "Secondary Active", color: :secondary, active: true, data: {action: "click->ui--modal#open"}))
       end
 
+      def secondary_disabled
+        render(UI::Button::Component.new(text: "Secondary Disabled", color: :secondary, disabled: true))
+      end
+
       def error
         render(UI::Button::Component.new(text: "Delete", color: :error))
       end
 
       def error_active
         render(UI::Button::Component.new(text: "Error Active", color: :error, active: true))
+      end
+
+      def error_disabled
+        render(UI::Button::Component.new(text: "Error Disabled", color: :error, disabled: true))
       end
 
       # White button with a soft danger outline
@@ -54,12 +66,22 @@ module UI
         render(UI::Button::Component.new(text: "Danger Outline Active", color: :danger_outline, active: true))
       end
 
+      def danger_outline_disabled
+        render(UI::Button::Component.new(text: "Danger Outline Disabled", color: :danger_outline, disabled: true))
+      end
+
       def link
         render(UI::Button::Component.new(text: "Link style", color: :link))
       end
 
       def link_active
         render(UI::Button::Component.new(text: "Link Active", color: :link, active: true))
+      end
+
+      # build_classes skips the disabled styling for link color, so this dims by
+      # nothing — it's here because the button is still unclickable
+      def link_disabled
+        render(UI::Button::Component.new(text: "Link Disabled", color: :link, disabled: true))
       end
 
       # Filled purple primary
@@ -69,6 +91,10 @@ module UI
 
       def purple_active
         render(UI::Button::Component.new(text: "Purple Active", color: :purple, active: true))
+      end
+
+      def purple_disabled
+        render(UI::Button::Component.new(text: "Purple Disabled", color: :purple, disabled: true))
       end
 
       # @!endgroup

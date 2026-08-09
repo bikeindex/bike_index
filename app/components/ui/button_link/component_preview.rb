@@ -56,13 +56,11 @@ module UI
       end
       # @!endgroup
 
-      # @!group States
+      # @!group Extra types
       def with_data_attribute
         render(UI::ButtonLink::Component.new(text: "Turbo Link", href: "#", data: {turbo: false}))
       end
-      # @!endgroup
 
-      # @!group button_to (form submit)
       # @label button_to POST
       def button_to_post
         render(UI::ButtonLink::Component.new(text: "Follow", href: "#", color: :primary, method: :post))
