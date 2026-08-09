@@ -15,7 +15,7 @@ RSpec.describe Admin::BugReportsController, type: :request do
 
     context "json" do
       let(:target_json) do
-        bug_report.as_json(only: %w[id user_id email from_name subject body tags github_pull_request
+        bug_report.as_json(only: %w[id user_id email from_name receiver subject body tags github_pull_request
           is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
       end
 

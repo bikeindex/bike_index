@@ -17,6 +17,7 @@
 
       <th><%= sortable "received_at", "Received", render_sortable: %></th>
       <th><%= sortable "email", "Sender", render_sortable: %></th>
+      <th><%= sortable "receiver", "Receiver", render_sortable: %></th>
       <th>Subject</th>
       <th><%= sortable "status", "Status", render_sortable: %></th>
       <th>Tags</th>
@@ -48,6 +49,8 @@
               <small><%= bug_report.email %></small>
             <% end %>
           </td>
+
+          <td><small><%= bug_report.receiver %></small></td>
 
           <td>
             <%= link_to bug_report.display_subject, admin_bug_report_path(bug_report) %>

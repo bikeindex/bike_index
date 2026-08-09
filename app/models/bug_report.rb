@@ -12,6 +12,7 @@
 #  is_paid_organization       :boolean          default(FALSE), not null
 #  is_paid_organization_staff :boolean          default(FALSE), not null
 #  received_at                :datetime
+#  receiver                   :text
 #  status                     :integer          default("unprioritized"), not null
 #  subject                    :text
 #  tags                       :text             default([]), not null, is an Array
@@ -98,6 +99,7 @@ class BugReport < ApplicationRecord
 
   def set_calculated_attributes
     self.email = EmailNormalizer.normalize(email)
+    self.receiver = EmailNormalizer.normalize(receiver)
     self.user_id ||= User.fuzzy_email_find(email)&.id
     # booleans snapshot the sender's status at report time - don't re-derive on update
     return unless new_record? && user.present?

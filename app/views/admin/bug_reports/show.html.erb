@@ -36,6 +36,14 @@
         </tr>
 
         <tr>
+          <td>Receiver</td>
+
+          <td>
+            <%= mail_to @bug_report.receiver, nil, class: "twlink" if @bug_report.receiver.present? %>
+          </td>
+        </tr>
+
+        <tr>
           <td>Received</td>
 
           <td>

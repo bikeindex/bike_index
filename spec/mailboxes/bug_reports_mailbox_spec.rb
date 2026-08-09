@@ -16,7 +16,8 @@ RSpec.describe BugReportsMailbox do
     end.to change(BugReport, :count).by 1
 
     expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id,
-      subject: "Search is broken", body: "I searched and nothing happened",
+      receiver: "bugs@bikeindex.org", subject: "Search is broken",
+      body: "I searched and nothing happened",
       inbound_email_id: ActionMailbox::InboundEmail.last.id)
     expect(BugReport.last.received_at).to be_present
     expect(BugReportAutoPrioritizeJob.jobs.map { it["args"] }).to eq([[BugReport.last.id]])
@@ -32,7 +33,8 @@ RSpec.describe BugReportsMailbox do
       )
     end.to change(BugReport, :count).by 1
 
-    expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id, subject: "Question")
+    expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id,
+      receiver: "contact@bikeindex.org", subject: "Question")
   end
 
   context "with attachments" do
@@ -67,7 +69,32 @@ RSpec.describe BugReportsMailbox do
         )
       end.to change(BugReport, :count).by 1
 
-      expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id, subject: "Hi")
+      expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id,
+        receiver: "support@bikeindex.org", subject: "Hi")
+    end
+  end
+
+  context "addressed to someone else" do
+    it "receives the envelope recipient" do
+      mail = Mail.new(:from => user.email, :to => "friend@example.com", :subject => "Hi", :body => "Hello",
+        "X-Original-To" => "Support@bikeindex.org")
+      receive_inbound_email_from_source(mail.to_s)
+
+      expect(BugReport.last.receiver).to eq "support@bikeindex.org"
+    end
+
+    it "receives our cc'd address" do
+      receive_inbound_email_from_mail(from: user.email, to: "friend@example.com",
+        cc: "Contact@bikeindex.org", subject: "Hi", body: "Hello")
+
+      expect(BugReport.last.receiver).to eq "contact@bikeindex.org"
+    end
+
+    it "falls back to the first recipient without an address of ours" do
+      receive_inbound_email_from_mail(from: user.email, to: "friend@example.com",
+        subject: "Hi", body: "Hello")
+
+      expect(BugReport.last.receiver).to eq "friend@example.com"
     end
   end
 end
