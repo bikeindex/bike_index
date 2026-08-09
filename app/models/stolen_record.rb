@@ -98,6 +98,7 @@ class StolenRecord < ApplicationRecord
   has_many :impound_claims
   has_many :social_posts
   has_many :theft_alerts
+  has_many :promoted_alerts
   has_many :notifications, as: :notifiable
   has_many :theft_surveys, -> { theft_survey }, as: :notifiable, class_name: "Notification"
   has_one :alert_image
@@ -130,6 +131,8 @@ class StolenRecord < ApplicationRecord
   scope :recovered_ordered, -> { recovered.order("recovered_at desc") }
   scope :with_theft_alerts, -> { includes(:theft_alerts).where.not(theft_alerts: {id: nil}).distinct(true) }
   scope :with_theft_alerts_paid_or_admin, -> { joins(:theft_alerts).merge(TheftAlert.paid_or_admin).distinct(true) }
+  scope :with_promoted_alerts, -> { includes(:promoted_alerts).where.not(promoted_alerts: {id: nil}).distinct(true) }
+  scope :with_promoted_alerts_paid_or_admin, -> { joins(:promoted_alerts).merge(PromotedAlert.paid_or_admin).distinct(true) }
   scope :can_share_recovery, -> { recovered_ordered.where(can_share_recovery: true) }
   scope :with_recovery_display, -> { joins(:recovery_display).where.not(recovery_displays: {id: nil}) }
   scope :without_recovery_display, -> { left_joins(:recovery_display).where(recovery_displays: {id: nil}) }
@@ -365,7 +368,7 @@ class StolenRecord < ApplicationRecord
 
   # If there isn't any image and there is a theft alert, we want to tell the user to upload an image
   def theft_alert_missing_photo?
-    missing_photo? && theft_alerts.any?
+    missing_photo? && (theft_alerts.any? || promoted_alerts.any?)
   end
 
   # The associated bike's first public image, if available. Else nil.
