@@ -47,7 +47,7 @@ module Admin
     # the template, which organizations' first drafts are cloned from
     def create
       draft = ::RegistrationSequence.draft_for(::Organization.friendly_find(params[:organization_id]))
-      redirect_to edit_admin_registration_sequence_path(draft)
+      redirect_to RegistrationSequencePaths.edit(draft, admin: true)
     end
 
     # Make the draft live, archiving the sequence it supersedes. Organizations ask us to do
@@ -56,10 +56,10 @@ module Admin
       @registration_sequence = ::RegistrationSequence.draft.find(params[:id])
       if @registration_sequence.make_active!
         flash[:success] = "#{@registration_sequence.display_name} registration sequence is live"
-        redirect_to admin_registration_sequence_path(@registration_sequence)
+        redirect_to RegistrationSequencePaths.sequence(@registration_sequence, admin: true)
       else
         flash[:error] = "Unable to activate - every page needs a title and rules"
-        redirect_to edit_admin_registration_sequence_path(@registration_sequence)
+        redirect_to RegistrationSequencePaths.edit(@registration_sequence, admin: true)
       end
     end
 
@@ -68,7 +68,7 @@ module Admin
       registration_sequence = ::RegistrationSequence.draft.find(params[:id])
       registration_sequence.discard_draft!
       flash[:success] = "Draft discarded"
-      redirect_to admin_registration_sequences_path
+      redirect_to RegistrationSequencePaths.index(registration_sequence, admin: true)
     end
 
     helper_method :matching_registration_sequences, :searchable_statuses
