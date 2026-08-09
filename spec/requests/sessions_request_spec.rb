@@ -249,6 +249,31 @@ RSpec.describe SessionsController, type: :request do
       expect(Capybara.string(response.body))
         .to have_css("form[action='/session/sign_in_with_magic_link'] input[name='token'][value='#{token}']", visible: :hidden)
     end
+
+    # A dead token is dead the same way whatever killed it, so the reason comes from the
+    # timestamp inside it. Getting this wrong reads as "the site is broken" rather than
+    # "you already did this"
+    context "incorrect_token" do
+      def failure_for(token)
+        get "/session/magic_link", params: {incorrect_token: token}
+        expect(response).to render_template(:magic_link)
+        response.body
+      end
+
+      it "names the timeout for a token older than the window" do
+        expect(failure_for(SecurityTokenizer.new_token(3.hours.ago))).to match(/link has expired/i)
+      end
+
+      it "says it was already used for a token inside the window" do
+        expect(failure_for(SecurityTokenizer.new_token)).to match(/already been used/i)
+      end
+
+      it "stays generic for a token it can't read" do
+        body = failure_for("mangled-by-some-email-client")
+        expect(body).to match(/unable to authenticate/i)
+        expect(body).to_not match(/already been used|link has expired/i)
+      end
+    end
   end
 
   describe "sign_in_with_magic_link" do
@@ -259,6 +284,20 @@ RSpec.describe SessionsController, type: :request do
       expect(response).to redirect_to admin_root_url
       expect(superadmin.reload.magic_link_token).to be_nil
       expect(superadmin.last_login_at).to be_within(1.second).of Time.current
+    end
+
+    # The biggest bucket of real failures: the link worked, and then got clicked again
+    it "tells a spent token it was already used, not that something went wrong" do
+      user = FactoryBot.create(:user_confirmed)
+      token = user.refreshed_magic_link_token
+      post "/session/sign_in_with_magic_link", params: {token:}
+      expect(user.reload.magic_link_token).to be_nil
+      delete "/session"
+
+      post "/session/sign_in_with_magic_link", params: {token:}
+      expect(response).to redirect_to magic_link_session_path(incorrect_token: token)
+      follow_redirect!
+      expect(response.body).to match(/already been used/i)
     end
 
     it "redirects back to return_to when passed (review-app banner)" do

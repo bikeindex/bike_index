@@ -3,10 +3,17 @@
     = render Sessions::SignInInterstitial::Component.new(url: sign_in_with_magic_link_session_path, fields: { token: @token })
   - else
     %h3= t(".sign_in_with_magic_link")
-    - if @incorrect_token
+    - if @failure
       .alert.alert-warning.mt-2.mb-4
-        %h3.header-font-alt.mb-2=t(".unable_to_auth")
-        %p=t(".reenter_email")
+        - if @failure == :expired
+          %h3.header-font-alt.mb-2= t(".link_expired")
+          %p= t(".links_work_for", hours: User::AUTH_TOKEN_EXPIRY.in_hours.to_i)
+        - elsif @failure == :already_used
+          %h3.header-font-alt.mb-2= t(".link_already_used")
+          %p= t(".only_the_newest_link_works")
+        - else
+          %h3.header-font-alt.mb-2= t(".unable_to_auth")
+        %p= t(".reenter_email")
 
     %p= t(".enter_email_address")
 

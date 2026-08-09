@@ -69,6 +69,9 @@ class User < ApplicationRecord
   include AddressRecordedWithinBoundingBox
 
   EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/
+  # How long an emailed token stays good for. SessionsController reads it to tell an expired
+  # magic link apart from one that was already spent
+  AUTH_TOKEN_EXPIRY = 2.hours
 
   cattr_accessor :current_user
 
@@ -398,7 +401,7 @@ class User < ApplicationRecord
   end
 
   def auth_token_expired?(auth_token_type)
-    auth_token_time(auth_token_type) < (Time.current - 2.hours)
+    auth_token_time(auth_token_type) < (Time.current - AUTH_TOKEN_EXPIRY)
   end
 
   def accepted_vendor_terms_of_service?
