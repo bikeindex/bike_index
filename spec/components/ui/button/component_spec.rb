@@ -258,5 +258,15 @@ RSpec.describe UI::Button::Component, type: :component do
     it "is declared last, so it outranks the colors it overrides" do
       expect(stylesheet.scan(/^@custom-variant (\S+)/).flatten.last).to eq("is-active")
     end
+
+    # Declaration order only breaks ties between rules of equal specificity. The hovers
+    # carry two :not()s, so without the same two here a pressed button renders its hover
+    # color rather than its active one — and a disabled one renders the active look.
+    it "carries the guards the hovers do, so it ties them on specificity" do
+      selectors = stylesheet[/^@custom-variant is-active \((.*)\);/, 1]
+      guards = described_class::COLORS[:secondary][/tw:((?:not-[a-z-]+:)+)hover:/, 1].split(":")
+      expect(guards).to eq(%w[not-disabled not-aria-disabled])
+      expect(selectors).to include(":not(:disabled)", ':not([aria-disabled="true"])')
+    end
   end
 end

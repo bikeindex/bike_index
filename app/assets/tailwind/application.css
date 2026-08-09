@@ -20,8 +20,14 @@
 /* The selected/pressed state of a button, link or menu item, however it's flagged.
  * Keep it the last @custom-variant: tailwind sorts custom variants in declaration
  * order, and sorting after `dark` is what lets tw:is-active:* beat the resting,
- * hover and dark colors it overrides without `!important`. */
-@custom-variant is-active (&:is([data-active="true"], [aria-pressed="true"], [aria-current], :active));
+ * hover and dark colors it overrides without `!important`.
+ *
+ * The :not()s carry their weight twice over. They keep a disabled element from
+ * showing the active look, and they match the specificity of the hover they have to
+ * beat (UI::Button's hovers are guarded not-disabled:not-aria-disabled:) — sorting
+ * last only decides between rules of equal specificity, so without them a pressed
+ * button renders its hover color instead of its active one. */
+@custom-variant is-active (&:is([data-active="true"], [aria-pressed="true"], [aria-current], :active):not(:disabled):not([aria-disabled="true"]));
 
 @theme {
   --font-sans: "Open Sans", sans-serif;
