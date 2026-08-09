@@ -25,7 +25,9 @@
         <tr>
           <td>
             <div class="less-strong-hold">
-              <%= link_to l(registration_sequence.created_at, format: :convert_time), admin_registration_sequence_path(registration_sequence), class: "localizeTime" %>
+              <%= link_to admin_registration_sequence_path(registration_sequence) do %>
+                <%= render UI::Time::Component.new(time: registration_sequence.created_at) %>
+              <% end %>
 
               <span class="less-strong-right d-none d-md-block">
                 <%= registration_sequence.id %>
