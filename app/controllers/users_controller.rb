@@ -144,7 +144,7 @@ class UsersController < ApplicationController
           flash[:success] = translation(:you_can_use_bike_index)
           redirect_to(my_account_url) && return
         else
-          flash[:notice] = translation(:accept_tos)
+          flash[:error] = translation(:accept_tos)
           redirect_to(accept_terms_url) && return
         end
       elsif params.dig(:user, :vendor_terms_of_service).present?
