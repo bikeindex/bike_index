@@ -48,7 +48,7 @@ class RegisterController < ApplicationController
 
     case step
     when "finished"
-      @page_title = I18n.t("meta_titles.register_show", cycle_type: @b_param.type_titleize)
+      @page_title = I18n.t("meta_titles.register_show", cycle_type: @b_param.type)
       render Register::StepFinished::Component.new(b_param: @b_param, current_user:)
     when "review"
       @page_title = I18n.t("meta_titles.register_review", cycle_type: @b_param.type)
