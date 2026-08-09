@@ -46,13 +46,13 @@ module Admin
 
     private
 
-    # Activation freezes a sequence and its pages, so only the template and drafts are edited
+    # Activation freezes a sequence and its pages, so only drafts are edited
     def find_registration_sequence
-      @registration_sequence = ::RegistrationSequence.editable.find(params[:registration_sequence_id])
+      @registration_sequence = ::RegistrationSequence.draft.find(params[:registration_sequence_id])
     end
 
     def find_page
-      @page = ::RegistrationSequencePage.where(registration_sequence: ::RegistrationSequence.editable)
+      @page = ::RegistrationSequencePage.where(registration_sequence: ::RegistrationSequence.draft)
         .find(params[:id])
       @registration_sequence = @page.registration_sequence
     end

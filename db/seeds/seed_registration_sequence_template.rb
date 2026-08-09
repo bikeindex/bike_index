@@ -39,32 +39,37 @@ default_pages = [
   }
 ]
 
-template = RegistrationSequence.template
-template.update!(acknowledgment_text: RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT) if template.acknowledgment_text.blank?
-# The ⓘ on every acknowledgment page. An organization can point this at its own policy
-# page; the Bike Index FAQ is the default an org's draft is cloned with
-template.update!(faq_url: "/info/#{Blog.e_vehicle_acknowledgment_faq}") if template.faq_url.blank?
+# Sequences are rebuilt rather than edited in place, so a re-seed picks up changes to the
+# pages above - activation freezes a sequence, and it can't be edited afterward.
+# really_destroy! (and delete_all, which activation would otherwise refuse) - a soft delete
+# would pile up rows, and the sequence doesn't take its pages with it
+discard_sequences = lambda do |sequences|
+  RegistrationSequencePage.where(registration_sequence_id: sequences.select(:id)).delete_all
+  sequences.each(&:really_destroy!)
+end
+
+discard_sequences.call(RegistrationSequence.templates.with_deleted)
+
+template = RegistrationSequence.draft_for(nil)
+# faq_url is the ⓘ on every acknowledgment page. An organization can point this at its own
+# policy page; the Bike Index FAQ is the default an org's draft is cloned with
+template.update!(acknowledgment_text: RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT,
+  faq_url: "/info/#{Blog.e_vehicle_acknowledgment_faq}")
 
 default_pages.each_with_index do |attributes, index|
-  page = template.registration_sequence_pages.find_or_initialize_by(listing_order: index)
-  page.update!(title: attributes[:title], heading: attributes[:heading], subtitle: attributes[:subtitle],
+  template.registration_sequence_pages.create!(listing_order: index, title: attributes[:title],
+    heading: attributes[:heading], subtitle: attributes[:subtitle],
     organization_specific: attributes[:organization_specific].present?,
     body: "<ul>#{attributes[:bullet_points].map { |bullet| "<li>#{bullet}</li>" }.join}</ul>")
 end
-# The template is only ever these pages - drop any left from an earlier seeding
-template.registration_sequence_pages.where("listing_order >= ?", default_pages.count).destroy_all
+# Organizations clone the live template, so the seeded one has to be activated
+template.make_active!
 
 # Brakebills registers e-vehicles, so give it a live sequence — without an active one
 # the acknowledgment pages never appear, and the flow can't be seen in development.
 brakebills = Organization.find_by_name("Brakebills")
 if brakebills.present?
-  # Rebuilt rather than left alone, so a re-seed picks up changes to the pages above.
-  # really_destroy! (and delete_all, which activation would otherwise refuse) - a soft
-  # delete would pile up rows, and the sequence doesn't take its pages with it
-  brakebills.registration_sequences.with_deleted.each do |sequence|
-    RegistrationSequencePage.where(registration_sequence: sequence).delete_all
-    sequence.really_destroy!
-  end
+  discard_sequences.call(brakebills.registration_sequences.with_deleted)
   sequence = RegistrationSequence.draft_for(brakebills)
   # The school names its own page, the way an organization would in the editor - the
   # template can't, since it's cloned by every organization

@@ -8,7 +8,7 @@ module Org
       # so an activated one - which acknowledgments freeze - renders read-only.
       class Component < ApplicationComponent
         # editable: admin's read-only screen renders a draft without its forms
-        def initialize(registration_sequence:, admin: false, editable: registration_sequence.editable?)
+        def initialize(registration_sequence:, admin: false, editable: registration_sequence.draft?)
           @registration_sequence = registration_sequence
           @admin = admin
           @editable = editable

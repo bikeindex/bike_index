@@ -28,6 +28,13 @@ module RegistrationSequencePaths
     sequence(registration_sequence, page:)
   end
 
+  # Making a draft live is admin's alone - an organization asks us to do it
+  def activate(registration_sequence) = routes.activate_admin_registration_sequence_path(registration_sequence)
+
+  # POSTs open the owner's draft, cloning one if there isn't one. A blank organization
+  # is the template
+  def create_draft(organization_id) = routes.admin_registration_sequences_path(organization_id:)
+
   def edit(registration_sequence, admin: false)
     return routes.edit_admin_registration_sequence_path(registration_sequence) if admin
 
