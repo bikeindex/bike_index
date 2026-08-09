@@ -35,7 +35,16 @@
     <div data-page-preview-target="preview" class="tw:mt-8">
       <h2 class="uncap tw:mb-3 tw:text-xl">Preview</h2>
 
-      <%= render Register::PageContent::Component.new(page: @page, first: @page.listing_order.to_i.zero?) %>
+      <%#
+        pt and mb cancel the flow shell's negative margins, which are there to run the
+        gray full-bleed past a layout's chrome - padding doesn't collapse
+      %>
+
+      <div class="tw:mb-24 tw:pt-9 tw:min-[992px]:pt-15">
+        <%= render Register::Page::Component.new do %>
+          <%= render Register::PageContent::Component.new(page: @page, first: @page.listing_order.to_i.zero?) %>
+        <% end %>
+      </div>
     </div>
   <% end %>
 </div>
