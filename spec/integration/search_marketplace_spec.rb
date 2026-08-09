@@ -85,17 +85,30 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   end
 
   # Hold back the unfiltered results the frame eager-loads on arrival. Returns the
-  # release, so the example decides when they land rather than racing a timer.
+  # release, so the example decides when they land rather than racing a timer. The
+  # release returns once that response is back - waiting on the one request it let
+  # through, rather than on the whole page going idle, which also waits out whatever
+  # else the listings are fetching and timed out at 30s on CI.
   def hold_initial_results_load
     held = Queue.new
+    held_urls = Queue.new
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.route("**/search/marketplace*", ->(route, request) {
-        held.pop if request.headers["turbo-frame"] == "marketplace_results_frame" &&
-          !request.url.include?("primary_activity=")
+        if request.headers["turbo-frame"] == "marketplace_results_frame" &&
+            !request.url.include?("primary_activity=")
+          held_urls.push(request.url)
+          held.pop
+        end
         route.continue
       })
     end
-    -> { held.push(:release) }
+
+    lambda do
+      url = held_urls.pop(timeout: 10) or raise "the results frame never requested its eager src"
+      page.driver.with_playwright_page do |playwright_page|
+        playwright_page.expect_response(url) { held.push(:release) }.body
+      end
+    end
   end
 
   it "fills the kind counts on load, and keeps a search made before the results arrive" do
@@ -113,7 +126,6 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
 
     # The unfiltered results are only now allowed to arrive - they mustn't take over
     release_initial_results_load.call
-    page.driver.with_playwright_page { |playwright_page| playwright_page.wait_for_load_state(state: "networkidle") }
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", count: 6)
     expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/)
   end
