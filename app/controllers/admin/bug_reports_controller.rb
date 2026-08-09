@@ -10,7 +10,7 @@ module Admin
     STATUS_FILTER_INVESTIGATE = "investigate"
 
     # Token requests carry no CSRF token, they authenticate with the token alone
-    skip_before_action :verify_authenticity_token, if: -> { doorkeeper_token.present? }
+    skip_before_action :verify_authenticity_token, if: -> { token_request? }
     before_action :find_bug_report, only: %i[show update]
 
     def index
@@ -133,7 +133,7 @@ module Admin
 
     # Token requests get the API's JSON errors rather than a flash + redirect
     def require_index_admin!
-      doorkeeper_token.present? ? require_token_superuser! : super
+      token_request? ? require_token_superuser! : super
     end
 
     def find_bug_report

@@ -12,9 +12,20 @@ module API
 
     # A token identifies the user when one is passed, otherwise the signed in user
     def current_user
-      return super if doorkeeper_token.blank?
+      return super unless token_request?
 
       authorize_user(doorkeeper_token)[:user]
+    end
+
+    # Branches on the token string rather than doorkeeper_token, which is nil for a token
+    # that matches no record - a caller passing a revoked token gets the API's 401, not
+    # a redirect to sign in
+    def token_request?
+      return @token_request if defined?(@token_request)
+
+      @token_request = Doorkeeper::OAuth::Token.from_request(
+        request, *Doorkeeper.configuration.access_token_methods
+      ).present?
     end
 
     # Returns {user:} when the token authorizes a user, otherwise {error:, status:}

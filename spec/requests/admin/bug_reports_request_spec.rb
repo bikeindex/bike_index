@@ -193,6 +193,14 @@ RSpec.describe Admin::BugReportsController, type: :request do
       end
     end
 
+    context "a token matching no record" do
+      it "returns 401" do
+        get "#{base_url}.json", params: {access_token: "not-a-real-token"}
+        expect(response.status).to eq 401
+        expect(json_result[:error]).to eq "OAuth token required"
+      end
+    end
+
     context "token from the wrong app" do
       before { stub_const("API::TokenAuthenticatable::ADMIN_DOORKEEPER_APP_ID", doorkeeper_app.id + 1) }
       it "returns 403" do
