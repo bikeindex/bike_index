@@ -25,19 +25,6 @@ RSpec.describe PromotedAlert, type: :model do
     end
   end
 
-  describe "find_alert" do
-    let(:theft_alert) { FactoryBot.create(:theft_alert) }
-    # CreatePromotedAlerts parks the sequence past the theft_alerts, so the ids never overlap
-    let(:promoted_alert) { FactoryBot.create(:promoted_alert, id: theft_alert.id + 10_000) }
-
-    it "takes the promoted alert, or the theft alert the backfill hasn't copied over yet" do
-      expect(PromotedAlert.find_alert(promoted_alert.id)).to eq promoted_alert
-      expect(PromotedAlert.find_alert(theft_alert.id)).to eq theft_alert
-      expect { PromotedAlert.find_alert(promoted_alert.id + 1) }
-        .to raise_error(ActiveRecord::RecordNotFound)
-    end
-  end
-
   describe "recovered bike" do
     let(:stolen_record) { FactoryBot.create(:stolen_record_recovered) }
     let!(:stolen_record2) { FactoryBot.create(:stolen_record_recovered) }

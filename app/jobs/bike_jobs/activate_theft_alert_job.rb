@@ -3,7 +3,7 @@ module BikeJobs
     sidekiq_options retry: 4 # It will retry because of BikeJobs::UpdateTheftAlertFacebookJob
 
     def perform(promoted_alert_id, force_activate = false)
-      promoted_alert = PromotedAlert.find_alert(promoted_alert_id)
+      promoted_alert = PromotedAlert.find(promoted_alert_id)
       return false unless promoted_alert.pending?
       return false unless promoted_alert.activateable? || force_activate
 

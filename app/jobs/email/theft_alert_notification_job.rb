@@ -5,7 +5,7 @@ module Email
     sidekiq_options queue: "notify", retry: 3
 
     def perform(promoted_alert_id, kind, promoted_alert = nil)
-      promoted_alert ||= PromotedAlert.find_alert(promoted_alert_id)
+      promoted_alert ||= PromotedAlert.find(promoted_alert_id)
 
       notification = promoted_alert.notifications.where(kind: kind).first
       notification ||= Notification.create(user: promoted_alert.user,

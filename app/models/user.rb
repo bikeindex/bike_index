@@ -107,7 +107,6 @@ class User < ApplicationRecord
   has_many :stripe_subscriptions
   has_many :superuser_abilities
   has_many :promoted_alerts
-  has_many :theft_alerts
   has_many :user_alerts
   has_many :user_emails, dependent: :destroy
   has_many :user_phones

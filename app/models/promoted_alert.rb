@@ -118,12 +118,6 @@ class PromotedAlert < ApplicationRecord
       where("(facebook_data ->> 'objective_adset') = ?", objective)
         .or(where("(facebook_data ->> 'objective_campaign') = ?", objective))
     end
-
-    # Until Backfills::PromotedAlertJob has run, an alert may only exist as a TheftAlert.
-    # The ids are shared, so take whichever is present
-    def find_alert(id)
-      find_by(id:) || TheftAlert.find(id)
-    end
   end
 
   # Override because of recovered bikes not being in default scope

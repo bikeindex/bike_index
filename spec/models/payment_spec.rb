@@ -125,20 +125,11 @@ RSpec.describe Payment, type: :model do
       expect(payment.reload.promoted_alert).to eq promoted_alert
     end
 
-    context "only a theft alert, not yet copied over by Backfills::PromotedAlertJob" do
-      let!(:promoted_alert) { nil }
-      let!(:theft_alert) { FactoryBot.create(:theft_alert, payment:) }
-
-      it "is the theft alert" do
-        expect(payment.reload.promoted_alert).to eq theft_alert
-      end
-    end
-
     context "a payment without an alert" do
       let(:payment) { FactoryBot.create(:payment) }
       let!(:promoted_alert) { nil }
 
-      it "is nil, without looking for a theft alert" do
+      it "is nil" do
         expect(payment.reload.theft_alert?).to be_falsey
         expect(payment.promoted_alert).to be_nil
       end

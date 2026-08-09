@@ -43,7 +43,6 @@ class Payment < ApplicationRecord
   belongs_to :stripe_subscription
   belongs_to :membership
 
-  has_one :theft_alert
   has_one :promoted_alert
 
   has_many :notifications, as: :notifiable
@@ -93,12 +92,6 @@ class Payment < ApplicationRecord
 
       where("referral_source ilike ?", "%#{normalize_referral_source(str)}%")
     end
-  end
-
-  # Payments whose alert Backfills::PromotedAlertJob hasn't copied over yet. Gated on the
-  # kind so every other payment resolves without touching theft_alerts
-  def promoted_alert
-    super || (theft_alert if theft_alert?)
   end
 
   def paid?

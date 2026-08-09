@@ -75,7 +75,7 @@ module Admin
     private
 
     def find_promoted_alert
-      @promoted_alert ||= PromotedAlert.find_alert(params[:id])
+      @promoted_alert ||= PromotedAlert.find(params[:id])
       @stolen_record ||= @promoted_alert.stolen_record
       @bike ||= Bike.unscoped.find_id(@stolen_record.bike_id)
     end

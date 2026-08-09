@@ -11,7 +11,7 @@ module BikeJobs
     def perform(promoted_alert_id = nil)
       return enqueue_workers if promoted_alert_id.blank?
 
-      promoted_alert = PromotedAlert.find_alert(promoted_alert_id)
+      promoted_alert = PromotedAlert.find(promoted_alert_id)
       return if promoted_alert.manual_override_inactive?
 
       # If the ad_id is blank, we need to activate the ad
