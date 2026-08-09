@@ -7607,6 +7607,13 @@ CREATE INDEX index_users_on_email_trgm ON public.users USING gin (email public.g
 
 
 --
+-- Name: index_users_on_magic_link_token_outstanding; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_magic_link_token_outstanding ON public.users USING btree (magic_link_token) WHERE (magic_link_token IS NOT NULL);
+
+
+--
 -- Name: index_users_on_token_for_password_reset; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7728,6 +7735,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260808224655'),
 ('20260808120000'),
 ('20260808100000'),
 ('20260807153129'),

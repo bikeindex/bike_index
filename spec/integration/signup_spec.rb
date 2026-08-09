@@ -24,8 +24,8 @@ RSpec.describe "Signup", :js, type: :system do
     expect(user.confirmed?).to be_falsey
 
     Email::ConfirmationJob.drain
-    # Lands on the interstitial, which waits for the click rather than spending the token on
-    # a scanner's visit. That the GET alone doesn't confirm is users_request_spec's job
+    # The interstitial waits for a click; that the GET alone doesn't confirm is
+    # users_request_spec's job
     visit emailed_path("/users/confirm")
     expect(user.reload.confirmed?).to be_falsey
     click_button "Sign in"

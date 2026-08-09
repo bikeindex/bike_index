@@ -39,8 +39,8 @@ RSpec.describe "emailed token routes", type: :request do
     flows.select { |flow| flow[key] }.map { |flow| flow[:interstitial] }
   end
 
-  # Includes .rb, so a component that renders from `call` or a controller counts. The shared
-  # component's own files name it without being a flow, so they're not callers
+  # Includes .rb, so a component rendering from `call` counts. The shared component's own
+  # files name it without being callers
   let(:app_sources) do
     Dir.glob(Rails.root.join("app/**/*.{rb,haml,erb}"))
       .to_h { |file| [Pathname.new(file).relative_path_from(Rails.root).to_s, File.read(file)] }
@@ -52,8 +52,8 @@ RSpec.describe "emailed token routes", type: :request do
   end
 
   # What actually renders an emailed link's form: each flow's own template, plus the shared
-  # component it delegates to. Other forms submit themselves for good reasons - a search box
-  # reacting to a filter - so only these are held to waiting for a click.
+  # component it delegates to. Other forms submit themselves for good reasons, so only these
+  # are held to waiting for a click
   def emailed_form_sources
     paths = flows.map { |flow| flow[:interstitial] } +
       Dir.glob(Rails.root.join("app/components/sessions/sign_in_interstitial/*.{rb,erb}"))
@@ -77,8 +77,7 @@ RSpec.describe "emailed token routes", type: :request do
       .to match_array interstitials_where(:shared_component)
   end
 
-  # A scanner following an emailed link runs the page's JS too, so submitting on render hands
-  # it the action: spending the token, or unsubscribing someone who never asked to be
+  # Scanners run the page's JS, so submitting on render hands them the action
   it "leaves every emailed-link form for the reader to submit" do
     submitting = emailed_form_sources.select do |path|
       File.read(Rails.root.join(path)).match?(/auto.submit|requestSubmit|data-controller/)
