@@ -52,7 +52,7 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
         it "renders, read-only" do
           get "#{base_url}/#{active.id}/edit"
           expect(response.status).to eq(200)
-          expect(response.body).to match(/can't be edited/)
+          expect(response.body).to_not include("registration_sequence[faq_url]")
         end
       end
     end

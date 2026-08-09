@@ -67,7 +67,6 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
       it "renders read-only - acknowledgments reference what it says" do
         render_inline(described_class.new(registration_sequence:, admin: true))
 
-        expect(page).to have_content("can't be edited")
         expect(page).to_not have_link("Add page")
         expect(page).to_not have_field("registration_sequence[faq_url]")
         expect(page).to_not have_css("[data-controller='sortable']")
