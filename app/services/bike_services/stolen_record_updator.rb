@@ -3,7 +3,7 @@ module BikeServices
     # Used to be in StolenRecord - but now it's here. Eventually, I'd like to actually do permitted params handling in here
     # recovery_tweet, recovery_share # We edit this in the admin panel
     OLD_ATTR_ACCESSIBLE = (%i[police_report_number police_report_department locking_description lock_defeat_description
-      timezone date_stolen bike creation_organization_id country_id region_record_id street postal_code city latitude
+      timezone date_stolen bike creation_organization_id country_id region_record_id region_string street postal_code city latitude
       longitude theft_description current phone secondary_phone phone_for_everyone
       phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
       approved recovered_at recovered_description index_helped_recovery can_share_recovery
@@ -61,7 +61,7 @@ module BikeServices
 
     def permitted_attributes(params)
       ActionController::Parameters.new(params).permit(:phone, :secondary_phone, :street, :city, :postal_code,
-        :country_id, :region_record_id, :police_report_number, :police_report_department, :estimated_value,
+        :country_id, :region_record_id, :region_string, :police_report_number, :police_report_department, :estimated_value,
         :theft_description, :locking_description, :lock_defeat_description, :proof_of_ownership,
         :receive_notifications, :phone_for_everyone, :phone_for_users,
         :phone_for_shops, :phone_for_police, :skip_geocoding)
