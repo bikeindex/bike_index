@@ -25,4 +25,20 @@ RSpec.describe UI::Button::Component, :js, type: :system do
     expect(page).to have_button("Next", disabled: true)
     expect_axe_clean
   end
+
+  # Every color at once: the hovers are guarded not-disabled:, the is-active variant
+  # (what :active triggers) excludes disabled, and link color's hover/pressed come from
+  # .twlink instead — three mechanisms that each have to hold for a disabled button to
+  # look disabled.
+  it "holds every disabled color through hover and press" do
+    UI::Button::Component::COLORS.each_key do |color|
+      visit "/rails/view_components/ui/button/component/#{color}_disabled"
+      button = find("button[disabled]")
+      resting = computed_colors(button)
+
+      hover_then_press(button) do |state|
+        expect(computed_colors(button)).to eq(resting), "#{color} changed on #{state}"
+      end
+    end
+  end
 end

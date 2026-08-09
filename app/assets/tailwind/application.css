@@ -104,11 +104,18 @@
 
 @layer components {
   .twlink {
-    @apply tw:text-blue-600 tw:hover:text-blue-700 tw:hover:underline tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:transition-colors;
+    @apply tw:text-blue-600 tw:dark:text-blue-400 tw:transition-colors;
+  }
+
+  /* Hover and pressed are guarded, so a disabled UI::Button/UI::ButtonLink in link
+   * color holds its color the way the other colors do -- theirs is guarded in the
+   * utilities that build them, but link color's comes from here. */
+  .twlink:not(:disabled, [aria-disabled="true"]):hover {
+    @apply tw:text-blue-700 tw:underline tw:dark:text-blue-300;
   }
 
   .twlink.active,
-  .twlink:active {
+  .twlink:not(:disabled, [aria-disabled="true"]):active {
     @apply tw:text-blue-700 tw:dark:text-blue-300 tw:font-bold tw:underline;
   }
 
