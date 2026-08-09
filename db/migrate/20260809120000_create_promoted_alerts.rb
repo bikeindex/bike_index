@@ -1,5 +1,11 @@
 class CreatePromotedAlerts < ActiveRecord::Migration[8.1]
-  def change
+  # Backfills::PromotedAlertJob copies theft_alerts across keeping their ids. Park the
+  # sequence well past those so an alert created before the copy runs can't take an id
+  # the copy still needs - it would be skipped, and its notifications would end up on
+  # whichever alert did take the id.
+  ID_HEADROOM = 10_000
+
+  def up
     create_table :promoted_alerts do |t|
       t.integer :stolen_record_id
       t.integer :theft_alert_plan_id
@@ -31,5 +37,12 @@ class CreatePromotedAlerts < ActiveRecord::Migration[8.1]
     add_foreign_key :promoted_alerts, :stolen_records, on_delete: :cascade
     add_foreign_key :promoted_alerts, :theft_alert_plans, on_delete: :cascade
     add_foreign_key :promoted_alerts, :users
+
+    execute("SELECT setval('promoted_alerts_id_seq', " \
+      "(SELECT COALESCE(MAX(id), 0) FROM theft_alerts) + #{ID_HEADROOM}, false)")
+  end
+
+  def down
+    drop_table :promoted_alerts
   end
 end
