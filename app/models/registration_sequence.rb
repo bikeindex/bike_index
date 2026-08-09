@@ -127,8 +127,7 @@ class RegistrationSequence < ApplicationRecord
   # Which sequence this is, e.g. "Brakebills Current" or "Template Draft"
   def display_name = "#{badge_name} #{status_display}"
 
-  # Registrants see an organization-specific page badged with the organization's name;
-  # the template has none until an organization clones it
+  # An organization-specific page is badged with this
   def badge_name = organization&.short_name || "Template"
 
   # Activation freezes the sequence and its pages. Acknowledgments reference them by id, so

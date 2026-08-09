@@ -1,6 +1,6 @@
 <div class="tw:py-6" data-controller="page-preview">
   <div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
-    <%# Admin's own header is the h1 naming the sequence, so this is a step below it %>
+    <%# A step below admin's own h1 %>
     <% if @admin %>
       <h2 class="uncap tw:mb-0 tw:text-xl tw:font-normal tw:text-gray-500">
         <%= editing? ? "Edit page" : "Add page" %>
@@ -42,11 +42,7 @@
     <div data-page-preview-target="preview" class="tw:mt-8">
       <h2 class="uncap tw:mb-3 tw:text-xl">Preview</h2>
 
-      <%#
-        pt and mb cancel the flow shell's negative margins, which are there to run the
-        gray full-bleed past a layout's chrome - padding doesn't collapse
-      %>
-
+      <%# pt and mb cancel the flow shell's negative margins; padding doesn't collapse %>
       <div class="tw:mb-24 tw:pt-9 tw:min-[992px]:pt-15">
         <%= render Register::Page::Component.new do %>
           <%= render Register::PageContent::Component.new(page: @page, first: @page.listing_order.to_i.zero?) %>

@@ -5,7 +5,6 @@
     sequence
   </h1>
 
-  <%# ml-auto holds the organization link against the right edge, wrapped or not %>
   <div
     class="
       tw:flex tw:flex-wrap tw:items-baseline tw:justify-between tw:gap-x-4
@@ -13,18 +12,12 @@
     "
   >
     <%#
-      The tooltip sits beside the group, not in the Edit chip: a disabled button is
-      pointer-events-none, so nothing inside it can be hovered - which is why its
-      title never showed - and the trigger is a button, which can't nest in one
+      Beside the chip, not in it: a disabled button is pointer-events-none, so
+      nothing inside it can be hovered
     %>
 
     <div class="tw:flex tw:items-center tw:gap-2">
       <%= render UI::ButtonGroup::Component.new(entries:) %>
-
-      <%#
-        Overlapping the chip it explains. The chip is pointer-events-none while
-        disabled, so it can't swallow the hover
-      %>
 
       <% if uneditable_title.present? %>
         <span class="tw:relative tw:z-10 tw:-mt-4 tw:-ml-4">

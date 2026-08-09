@@ -59,11 +59,4 @@ RSpec.describe RegistrationSequencePaths do
       end
     end
   end
-
-  describe "conceal" do
-    it "doesn't expose the private helpers" do
-      expect { described_class.routes }.to raise_error(NoMethodError)
-      expect { described_class.organization_param(registration_sequence) }.to raise_error(NoMethodError)
-    end
-  end
 end

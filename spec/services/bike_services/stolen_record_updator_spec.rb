@@ -19,6 +19,30 @@ RSpec.describe BikeServices::StolenRecordUpdator do
         expect { stolen_record_updator.update_records }.to change(StolenRecord, :count).by(1)
         expect(bike.reload.status).to eq "status_stolen"
       end
+      context "region_string passed" do
+        let(:stolen_params) do
+          {date_stolen: Time.current.to_s, street: "Sarphatistraat 32", city: "Amsterdam",
+           postal_code: "1018 GL", country_id: Country.netherlands.id,
+           region_string: "North Holland", skip_geocoding: true}
+        end
+        let(:updator) { BikeServices::StolenRecordUpdator.new(bike:, b_param: BParam.new(params: {stolen_record: stolen_params}.as_json)) }
+        it "assigns the region_string" do
+          stolen_record = updator.update_records
+          expect(stolen_record.reload).to have_attributes(city: "Amsterdam",
+            region_string: "North Holland", region_record_id: nil)
+        end
+        context "region_string matching a state" do
+          let(:state) { FactoryBot.create(:state_new_york) }
+          let(:stolen_params) do
+            {date_stolen: Time.current.to_s, city: "New York", postal_code: "10007",
+             country_id: state.country_id, region_string: "New York", skip_geocoding: true}
+          end
+          it "assigns the region_record" do
+            stolen_record = updator.update_records
+            expect(stolen_record.reload).to have_attributes(region_record_id: state.id, region_string: nil)
+          end
+        end
+      end
       context "existing stolen_record" do
         let(:stolen_record) { FactoryBot.create(:stolen_record) }
         let(:bike) { stolen_record.bike }
