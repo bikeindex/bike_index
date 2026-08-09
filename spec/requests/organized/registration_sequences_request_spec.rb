@@ -21,10 +21,15 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
       context "with a draft" do
         let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization: current_organization) }
 
-        it "offers to resume editing it" do
+        it "lists its pages, and offers to resume editing or discard it" do
           get base_url
-          expect(response.body).to include("Edit sequence")
+          expect(response.body).to include(draft.registration_sequence_pages.first.title)
+          # Read-only, the same as the active version - it's edited on its own screen
+          expect(response.body).to_not include("data-controller=\"sortable\"")
+          expect(response.body).to include(">Edit<")
           expect(response.body).to include("Discard draft")
+          # Turbo Drive is off app-wide, so the confirm has to be the form's own
+          expect(response.body).to include("onsubmit=\"return confirm(")
         end
       end
 
