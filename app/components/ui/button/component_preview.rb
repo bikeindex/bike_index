@@ -3,17 +3,19 @@
 module UI
   module Button
     class ComponentPreview < ApplicationComponentPreview
+      # @!group In form
       # Submit reveals the spinner and disables the button -- but only once native
       # validation has passed, so an empty email leaves the button alone
       def in_form
         {template: "ui/button/component_preview/in_form"}
       end
 
-      # The same state without the submit, for reviewing it alongside the colors
+      # The same state without the submit
       def submitting
         render(UI::Button::Component.new(text: "Next", color: :primary, type: "submit",
           spinner: true, disabled: true, html_class: "tw:[&_span]:inline-flex!"))
       end
+      # @!endgroup
 
       # @!group Colors
       def primary
@@ -24,6 +26,11 @@ module UI
         render(UI::Button::Component.new(text: "Primary Active", color: :primary, active: true))
       end
 
+      def primary_disabled
+        render(UI::Button::Component.new(text: "Primary Disabled", color: :primary, disabled: true))
+      end
+
+      # White button with a purple outline (fills purple when active)
       # @label secondary (with data)
       def secondary
         render(UI::Button::Component.new(text: "Secondary", color: :secondary, data: {action: "click->ui--modal#open"}))
@@ -34,6 +41,11 @@ module UI
         render(UI::Button::Component.new(text: "Secondary Active", color: :secondary, active: true, data: {action: "click->ui--modal#open"}))
       end
 
+      def secondary_disabled
+        render(UI::Button::Component.new(text: "Secondary Disabled", color: :secondary, disabled: true))
+      end
+
+      # White button with a soft danger outline
       def error
         render(UI::Button::Component.new(text: "Delete", color: :error))
       end
@@ -42,13 +54,8 @@ module UI
         render(UI::Button::Component.new(text: "Error Active", color: :error, active: true))
       end
 
-      # White button with a soft danger outline
-      def danger_outline
-        render(UI::Button::Component.new(text: "Mark stolen", color: :danger_outline))
-      end
-
-      def danger_outline_active
-        render(UI::Button::Component.new(text: "Danger Outline Active", color: :danger_outline, active: true))
+      def error_disabled
+        render(UI::Button::Component.new(text: "Error Disabled", color: :error, disabled: true))
       end
 
       def link
@@ -59,8 +66,8 @@ module UI
         render(UI::Button::Component.new(text: "Link Active", color: :link, active: true))
       end
 
-      def link_bold
-        render(UI::Button::Component.new(text: "Where's my serial number?", color: :link, html_class: "tw:text-xs tw:font-bold"))
+      def link_disabled
+        render(UI::Button::Component.new(text: "Link Disabled", color: :link, disabled: true))
       end
 
       # Filled purple primary
@@ -72,13 +79,8 @@ module UI
         render(UI::Button::Component.new(text: "Purple Active", color: :purple, active: true))
       end
 
-      # White button with a purple outline (toggles to a purple tint when active)
-      def purple_outline
-        render(UI::Button::Component.new(text: "Purple outline", color: :purple_outline))
-      end
-
-      def purple_outline_active
-        render(UI::Button::Component.new(text: "Purple Outline Active", color: :purple_outline, active: true))
+      def purple_disabled
+        render(UI::Button::Component.new(text: "Purple Disabled", color: :purple, disabled: true))
       end
 
       # @!endgroup

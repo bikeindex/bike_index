@@ -74,7 +74,7 @@ RSpec.describe SessionsController, type: :controller do
   describe "magic_link" do
     it "renders" do
       get :magic_link
-      expect(assigns(:incorrect_token)).to be_falsey
+      expect(assigns(:failure)).to be_falsey
       expect(cookies.signed[:auth]).to be_nil
       expect(response.code).to eq "200"
       expect(response).to render_template("magic_link")
@@ -83,7 +83,7 @@ RSpec.describe SessionsController, type: :controller do
     context "incorrect_token" do
       it "renders" do
         get :magic_link, params: {incorrect_token: SecurityTokenizer.new_token}
-        expect(assigns(:incorrect_token)).to be_truthy
+        expect(assigns(:failure)).to be_truthy
         expect(cookies.signed[:auth]).to be_nil
         expect(response.code).to eq "200"
         expect(response).to render_template("magic_link")
