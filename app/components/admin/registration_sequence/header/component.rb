@@ -27,7 +27,7 @@ module Admin
             {label: "Preview", href: RegistrationSequencePaths.preview(@registration_sequence, admin: true), active: @mode == :preview},
             {label: "Edit", href: RegistrationSequencePaths.edit(@registration_sequence, admin: true),
              active: @mode == :edit, disabled: !@registration_sequence.editable?,
-             title: ("An activated sequence can't be edited" unless @registration_sequence.editable?)}]
+             title: ("Can't edit current registration sequence - create a draft" unless @registration_sequence.editable?)}]
         end
 
         # The organization's own copy of this screen; the template has no organization

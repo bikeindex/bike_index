@@ -38,6 +38,7 @@ RSpec.describe Admin::RegistrationSequence::Header::Component, type: :component 
       expect(page).to have_content("Editing Brakebills Current", normalize_ws: true)
       expect(page).to_not have_link("Edit")
       expect(page).to have_css("button[disabled]", text: "Edit")
+      expect(page.find("button[disabled]")[:title]).to eq "Can't edit current registration sequence - create a draft"
       # The other two stay reachable
       expect(page).to have_link("View", href: admin_url)
       expect(page).to have_link("Preview", href: "#{admin_url}/preview")
