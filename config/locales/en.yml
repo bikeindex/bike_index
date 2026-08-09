@@ -4780,7 +4780,7 @@ en:
       get_sign_in_link: Get sign in link
       link_already_used: That sign in link has already been used
       link_expired: That sign in link has expired
-      links_work_for: Sign in links work for %{hours} hours after they're sent.
+      links_work_for: Sign in links work for %{duration} after they're sent.
       only_the_newest_link_works: >-
         You may already be signed in somewhere else. If you asked for more than one
         email, only the link in the newest one works.
