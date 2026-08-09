@@ -14,9 +14,8 @@ module UI
         lg: "tw:px-4 tw:py-2 tw:text-base"
       }.freeze
 
-      # Hover is guarded against both ways an element says it's disabled: :disabled for a
-      # button, aria-disabled for UI::ButtonLink's anchor, which takes no :disabled.
-      # Nothing else stops it, now that DISABLED_CLASSES no longer drops pointer events.
+      # Hover is guarded against both ways an element says it's disabled — :disabled for a
+      # button, aria-disabled for UI::ButtonLink's anchor. Nothing else stops it now.
       COLORS = {
         primary: "tw:text-white tw:bg-blue-600 tw:border tw:border-blue-600 tw:not-disabled:not-aria-disabled:hover:bg-blue-700 tw:focus:ring-blue-500/40 tw:dark:bg-blue-500 tw:dark:border-blue-500 tw:dark:not-disabled:not-aria-disabled:hover:bg-blue-600",
         secondary: "tw:text-gray-800 tw:bg-white tw:border tw:border-gray-200 tw:not-disabled:not-aria-disabled:hover:border-purple-500 tw:not-disabled:not-aria-disabled:hover:bg-purple-50 tw:focus:ring-purple-500/40 tw:dark:bg-gray-800 tw:dark:text-gray-100 tw:dark:border-gray-700 tw:dark:not-disabled:not-aria-disabled:hover:border-purple-500 tw:dark:not-disabled:not-aria-disabled:hover:bg-purple-950",
@@ -37,18 +36,17 @@ module UI
         link: "tw:is-active:text-blue-700 tw:is-active:dark:text-blue-300 tw:is-active:font-bold tw:is-active:underline"
       }.freeze
 
-      # No pointer-events-none — with pointer events off the browser applies the cursor
-      # from underneath, so not-allowed never shows. A disabled button takes no clicks anyway.
-      # The aria-disabled half is what dims UI::ButtonLink's disabled anchor; each half is
-      # inert on the element the other one covers.
+      # No pointer-events-none: with pointer events off the browser takes the cursor from
+      # underneath, so not-allowed never shows. The aria-disabled half dims ButtonLink's
+      # anchor; each half is inert on the element the other covers.
       DISABLED_CLASSES = "tw:disabled:opacity-50 tw:disabled:cursor-not-allowed tw:aria-disabled:opacity-50 tw:aria-disabled:cursor-not-allowed"
 
       # is-active sorts after focus, so an active button's ring-2 swallows the focus ring
       # unless focus is restated under the variant.
       FOCUS_CLASSES = "tw:focus:outline-none tw:focus:ring-3 tw:is-active:focus:ring-3"
 
-      # Focus and disabled reach link color too — one so a keyboard can see where it is,
-      # the other so a disabled one dims. Only the sizing and weight are button-shaped.
+      # Focus and disabled reach link color too — only the sizing and weight are
+      # button-shaped
       def self.build_classes(color:, size:, html_class: nil)
         extras = [FOCUS_CLASSES, DISABLED_CLASSES]
         extras += [SIZES[size], "tw:font-medium tw:no-underline"] unless color == :link

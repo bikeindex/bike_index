@@ -48,6 +48,11 @@ module SystemSpecHelpers
     element.evaluate_script("getComputedStyle(this).boxShadow")
   end
 
+  # Everything a state can change about how an element looks, for telling states apart
+  def state_of(element)
+    [computed_colors(element), computed_ring(element)]
+  end
+
   # Point at an element and hold the mouse down, yielding at each state so the caller
   # can measure. Capybara can hover but has no press-and-hold, and :active is only
   # reachable by actually holding the button down, the way a rider does.

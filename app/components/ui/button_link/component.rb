@@ -30,9 +30,8 @@ module UI
 
       private
 
-      # An <a> takes no disabled attribute, so a disabled one drops its href — that's what
-      # makes it unclickable — and says so through aria. tabindex -1 takes it out of the
-      # tab order the missing href would otherwise still leave it in for a screen reader.
+      # An <a> takes no disabled attribute, so dropping the href is what makes it
+      # unfollowable; aria says so, and tabindex -1 takes it out of the tab order.
       def disabled_link
         content_tag(:a, @text || content, **html_attributes, role: "link", tabindex: -1,
           aria: (@html_options[:aria] || {}).merge(disabled: true))

@@ -9,7 +9,7 @@ module Org
       # registrations on the show page). Pass render_sortable to enable sort links.
       class Component < ApplicationComponent
         # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "d47290d1e361"
+        MARKUP_DIGEST = "bf9a23181a9a"
 
         delegate :additional_registration_fields, :column_renames, to: :settings_component
 

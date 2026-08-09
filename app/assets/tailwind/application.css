@@ -22,11 +22,9 @@
  * order, and sorting after `dark` is what lets tw:is-active:* beat the resting,
  * hover and dark colors it overrides without `!important`.
  *
- * The :not()s carry their weight twice over. They keep a disabled element from
- * showing the active look, and they match the specificity of the hover they have to
- * beat (UI::Button's hovers are guarded not-disabled:not-aria-disabled:) — sorting
- * last only decides between rules of equal specificity, so without them a pressed
- * button renders its hover color instead of its active one. */
+ * The :not()s keep a disabled element from looking active, and tie the specificity of
+ * the hovers they beat (guarded not-disabled:not-aria-disabled:) — sorting last only
+ * settles ties, so without them a pressed button renders its hover color. */
 @custom-variant is-active (&:is([data-active="true"], [aria-pressed="true"], [aria-current], :active):not(:disabled):not([aria-disabled="true"]));
 
 @theme {
@@ -107,9 +105,8 @@
     @apply tw:text-blue-600 tw:dark:text-blue-400 tw:transition-colors;
   }
 
-  /* Hover and pressed are guarded, so a disabled UI::Button/UI::ButtonLink in link
-   * color holds its color the way the other colors do -- theirs is guarded in the
-   * utilities that build them, but link color's comes from here. */
+  /* Guarded so a disabled UI::Button/UI::ButtonLink in link color holds its color.
+   * Every other color guards its hover in the utilities; link color's lives here. */
   .twlink:not(:disabled, [aria-disabled="true"]):hover {
     @apply tw:text-blue-700 tw:underline tw:dark:text-blue-300;
   }

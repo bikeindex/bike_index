@@ -3,9 +3,7 @@
 require "rails_helper"
 
 RSpec.describe UI::ButtonLink::Component, :js, type: :system do
-  # An <a> takes no :disabled, so the guards it holds are the aria-disabled half of
-  # each pair — and link color's hover/pressed come from .twlink instead. The link
-  # also has no href, so this asserts what "disabled" means for a link either way.
+  # An <a> takes no :disabled, so what holds here is the aria-disabled half of each guard
   it "holds every disabled color through hover and press, and can't be followed" do
     UI::Button::Component::COLORS.each_key do |color|
       visit "/rails/view_components/ui/button_link/component/#{color}_disabled"
@@ -29,9 +27,9 @@ RSpec.describe UI::ButtonLink::Component, :js, type: :system do
     UI::Button::Component::COLORS.each_key do |color|
       visit "/rails/view_components/ui/button_link/component/#{color}_active"
       link = find("a[data-active='true']")
-      looks = {resting: [computed_colors(link), computed_ring(link)]}
-      hover_then_press(link) { |state| looks[state] = [computed_colors(link), computed_ring(link)] }
-      looks[:focus] = [computed_colors(link), computed_ring(link)]
+      looks = {resting: state_of(link)}
+      hover_then_press(link) { |state| looks[state] = state_of(link) }
+      looks[:focus] = state_of(link)
 
       expect(looks[:hover]).to eq(looks[:resting]), "#{color} changed on hover"
       expect(looks[:focus]).to_not eq(looks[:resting]), "#{color} shows nothing on focus"
@@ -40,15 +38,16 @@ RSpec.describe UI::ButtonLink::Component, :js, type: :system do
     end
   end
 
-  # The same three answers a button gives, from an element that only styles like one
-  it "answers hover and press differently, in every color" do
+  # The same four answers a button gives, from an element that only styles like one
+  it "looks different resting, hovered, focused and pressed, in every color" do
     UI::Button::Component::COLORS.each_key do |color|
       visit "/rails/view_components/ui/button_link/component/#{color}"
       link = find("a[href='#']")
-      looks = {resting: computed_colors(link)}
-      hover_then_press(link) { |state| looks[state] = computed_colors(link) }
+      looks = {resting: state_of(link)}
+      hover_then_press(link) { |state| looks[state] = state_of(link) }
+      looks[:focus] = state_of(link)
 
-      expect(looks.values.uniq.count).to eq(3), "#{color} repeats a look: #{looks.inspect}"
+      expect(looks.values.uniq.count).to eq(4), "#{color} repeats a look: #{looks.inspect}"
     end
   end
 end
