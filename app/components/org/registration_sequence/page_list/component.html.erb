@@ -1,3 +1,23 @@
+<%# One disclosure trigger, shared by the pages and the acknowledgment that follows them %>
+<% collapse_toggle = capture do %>
+  <button
+    type="button"
+    data-action="ui--collapse#toggle"
+    data-ui--collapse-target="trigger"
+    aria-expanded="true"
+    class="tw:cursor-pointer tw:text-gray-400 tw:hover:text-gray-600"
+  >
+    <span class="tw:sr-only">Toggle details</span>
+
+    <span
+      data-ui--collapse-target="chevron"
+      class="tw:inline-block tw:rotate-90 tw:transition-transform tw:duration-200"
+    >
+      <span class="tw:flex"><%= render UI::IconChevron::Component.new %></span>
+    </span>
+  </button>
+<% end %>
+
 <%= render UI::Card::Component.new do %>
   <%= tag.div(class: "tw:-my-1.5 tw:divide-y tw:divide-gray-200", data: list_data) do %>
     <% pages.each do |page| %>
@@ -9,27 +29,7 @@
 
           <div class="tw:min-w-0 tw:flex-1">
             <div class="tw:flex tw:items-center tw:gap-2">
-              <button
-                type="button"
-                data-action="ui--collapse#toggle"
-                data-ui--collapse-target="trigger"
-                aria-expanded="true"
-                class="tw:cursor-pointer tw:text-gray-400 tw:hover:text-gray-600"
-              >
-                <span class="tw:sr-only">Toggle page details</span>
-
-                <span
-                  data-ui--collapse-target="chevron"
-                  class="
-                    tw:inline-block tw:rotate-90 tw:transition-transform
-                    tw:duration-200
-                  "
-                >
-                  <span class="tw:flex">
-                    <%= render UI::IconChevron::Component.new %>
-                  </span>
-                </span>
-              </button>
+              <%= collapse_toggle %>
 
               <h3 class="uncap tw:mb-0 tw:text-base tw:font-semibold">
                 <%= page.title %>
@@ -69,21 +69,35 @@
 
     <%# What registrants agree to after the pages. The editor has its own field for it %>
     <% unless @editable %>
-      <div class="tw:py-1.5 tw:pl-5">
-        <h3 class="uncap tw:mb-0 tw:text-base tw:font-semibold">
-          Final acknowledgment
-        </h3>
+      <%= tag.div(class: "tw:py-1.5", data: {controller: "ui--collapse"}) do %>
+        <div class="tw:flex tw:items-baseline">
+          <div class="tw:min-w-0 tw:flex-1">
+            <div class="tw:flex tw:items-center tw:gap-2">
+              <%= collapse_toggle %>
 
-        <% if @registration_sequence.faq_url.present? %>
-          <p class="tw:mt-1 tw:mb-0 tw:text-sm tw:text-gray-600">
-            <%= link_to "FAQ link", @registration_sequence.faq_url, class: "twlink" %>
-          </p>
-        <% end %>
+              <h3 class="uncap tw:mb-0 tw:text-base tw:font-semibold">
+                Final acknowledgment
+              </h3>
+            </div>
 
-        <p class="tw:mt-1 tw:mb-0 tw:py-2 tw:text-sm">
+            <% if @registration_sequence.faq_url.present? %>
+              <p
+                data-ui--collapse-target="content"
+                class="tw:mt-1 tw:mb-0 tw:pl-5 tw:text-sm tw:text-gray-600"
+              >
+                <%= link_to "FAQ link", @registration_sequence.faq_url, class: "twlink" %>
+              </p>
+            <% end %>
+          </div>
+        </div>
+
+        <div
+          data-ui--collapse-target="content"
+          class="tw:mt-1 tw:py-2 tw:text-sm"
+        >
           <%= @registration_sequence.acknowledgment %>
-        </p>
-      </div>
+        </div>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>
