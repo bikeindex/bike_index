@@ -1,10 +1,9 @@
 <%= render Register::Page::Component.new do %>
   <div class="tw:px-1 tw:py-6 tw:text-center">
     <%= render UI::Header::Component.new(text: translation(".confirming_your_email"),
-        subtitle: translation(".this_only_takes_a_moment")) %>
+        subtitle: translation(".continue_where_you_left_off")) %>
 
-    <%= form_with(url: confirm_email_register_path, method: :post,
-        data: {controller: @auto_submit ? "auto-submit" : nil}) do %>
+    <%= form_with(url: confirm_email_register_path, method: :post) do %>
       <%= hidden_field_tag :b_param_token, @b_param.id_token %>
       <%= hidden_field_tag :confirmation_token, @token %>
 

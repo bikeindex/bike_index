@@ -1,5 +1,7 @@
 .container
   - unsubscribe_url = unsubscribe_update_user_path(@user.signed_id(purpose: :unsubscribe, expires_in: 365.days))
+  -# Unsubscribing is idempotent and its signed id lasts a year, so a scanner posting it
+  -# early costs nothing - keep the click-free path the unsubscribe link promises
   = render Sessions::SignInInterstitial::Component.new(url: unsubscribe_url,
     heading: t(".you_should_be_unsubscribed_automatically"),
-    submit_text: t(".unsubscribe"))
+    submit_text: t(".unsubscribe"), auto_submit: true)

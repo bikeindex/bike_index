@@ -2,12 +2,12 @@
 
 require "rails_helper"
 
-# The whole point of the interstitial is the POST it makes without being clicked — request
-# specs post directly, so this is the only place the Stimulus controller actually runs
+# Request specs post directly, so this is the only place the auto-submit Stimulus controller
+# actually runs — and the only place that proves the default really doesn't submit itself
 RSpec.describe Sessions::SignInInterstitial::Component, :js, type: :system do
   let(:base_url) { "/rails/view_components/sessions/sign_in_interstitial/component" }
 
-  it "posts itself on load, and waits for the reader when auto_submit is off" do
+  it "posts itself when auto_submit is on, and waits for the reader by default" do
     visit "#{base_url}/auto_submitting"
 
     # The token is never valid, so the POST lands back on the magic link form

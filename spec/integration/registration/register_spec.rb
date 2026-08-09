@@ -177,8 +177,10 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(ActiveStorage::Blob.find_signed!(b_param.image_signed_id).filename.to_s)
       .to eq "bike_photo-landscape.jpeg"
 
-    # Following the link makes the bike the registration was holding
+    # Following the link lands on the interstitial; confirming is single use, so it waits
+    # for the click rather than spending the token on a scanner's visit
     visit confirmation_link
+    click_button "Continue"
 
     expect(page).to have_content("Registration complete", wait: 10)
     bike = Bike.last

@@ -8,8 +8,9 @@ RSpec.describe Sessions::SignInInterstitial::Component, type: :component do
   let(:fields) { {token: "sometoken", partner: nil} }
   let(:options) { {} }
 
-  it "posts the fields it was given, dropping the blank ones" do
-    expect(component).to have_css("form[action='#{url}'][method='post'][data-controller='auto-submit']")
+  it "posts the fields it was given, dropping the blank ones, and waits for a click" do
+    expect(component).to have_css("form[action='#{url}'][method='post']")
+    expect(component).to have_no_css("[data-controller='auto-submit']")
     expect(component).to have_css("input[name='token'][value='sometoken']", visible: :hidden)
     expect(component).to have_no_css("input[name='partner']", visible: :hidden)
     expect(component).to have_button("Sign in")
@@ -25,12 +26,11 @@ RSpec.describe Sessions::SignInInterstitial::Component, type: :component do
     end
   end
 
-  context "auto_submit false" do
-    let(:options) { {auto_submit: false} }
+  context "auto_submit true" do
+    let(:options) { {auto_submit: true} }
 
-    it "leaves the submitting to the reader" do
-      expect(component).to have_css("form[action='#{url}']")
-      expect(component).to have_no_css("[data-controller='auto-submit']")
+    it "posts itself on render" do
+      expect(component).to have_css("form[action='#{url}'][data-controller='auto-submit']")
     end
   end
 end
