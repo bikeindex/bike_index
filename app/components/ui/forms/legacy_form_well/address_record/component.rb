@@ -56,12 +56,6 @@ module UI
             (@static_fields == :shown) ? "tw:hidden!" : ""
           end
 
-          def static_field_class
-            return "" unless @static_fields
-
-            (@static_fields == :hidden) ? "tw:hidden!" : ""
-          end
-
           def initial_state_class
             (@initial_country_id == Country.united_states_id) ? "" : "tw:hidden!" # Should check if address_object.country_id == Country.united_states_id
           end
