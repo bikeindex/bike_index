@@ -26,6 +26,30 @@ RSpec.describe BikeServices::Register do
         }.to_not change(BParam, :count)
       end
 
+      it "takes the status onto it, and keeps it when the next link names none" do
+        described_class.b_param_for(user:, token_id: blank_b_param.id_token, status: "status_stolen")
+        expect(blank_b_param.reload.status).to eq "status_stolen"
+
+        described_class.b_param_for(user:, token_id: blank_b_param.id_token)
+        expect(blank_b_param.reload.status).to eq "status_stolen"
+      end
+
+      # "false" blanks the address even for a signed-in user, status or no status
+      context "signed in, asking for no address" do
+        let(:user) { FactoryBot.create(:user_confirmed) }
+        let!(:blank_b_param) do
+          BParam.create(origin: "register_flow", params: {bike: {owner_email: user.email}}.as_json)
+        end
+
+        it "clears it alongside the status it takes" do
+          described_class.b_param_for(user:, token_id: blank_b_param.id_token,
+            status: "status_stolen", email: "false")
+
+          expect(blank_b_param.reload.owner_email).to be_blank
+          expect(blank_b_param.status).to eq "status_stolen"
+        end
+      end
+
       context "once step 1 is submitted" do
         let!(:blank_b_param) do
           BParam.create(origin: "register_flow", params: {bike: {manufacturer_id: 12}}.as_json)

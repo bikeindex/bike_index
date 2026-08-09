@@ -38,16 +38,33 @@ RSpec.describe RegisterController, type: :request do
     context "status and organization params" do
       let(:organization) { FactoryBot.create(:organization) }
 
-      it "stores them on the registration it creates, keeping them on revisit" do
+      it "stores them on the registration it creates, and takes what a later link names" do
         # The slug resolves to the organization, rather than being stored as-is
-        get "/register/new?status=status_stolen&organization_id=#{organization.slug}"
+        get "/register/new?status=stolen&organization_id=#{organization.slug}"
         stolen_b_param = BParam.last
         expect(stolen_b_param).to have_attributes(status: "status_stolen",
           creation_organization_id: organization.id, organization_id: organization.id)
 
-        get "/register/new?status=status_impounded"
+        # The same registration, so nothing entered is lost - but a link that says what
+        # this is says it again, the way the organization's does
+        get "/register/new?status=found"
         expect(BParam.last.id).to eq stolen_b_param.id
-        expect(stolen_b_param.reload.status).to eq "status_stolen"
+        expect(stolen_b_param.reload.status).to eq "status_impounded"
+
+        # A link that names no status leaves the one it has
+        get "/register/new"
+        expect(BParam.last.id).to eq stolen_b_param.id
+        expect(stolen_b_param.reload.status).to eq "status_impounded"
+      end
+
+      # ?status=stolen, ?status=found and ?stolen=true, not just the full enum value
+      it "takes the shorthand every other entry point takes" do
+        {"status=stolen" => "status_stolen", "status=found" => "status_impounded",
+         "stolen=true" => "status_stolen", "status=status_impounded" => "status_impounded",
+         "status=nonsense" => "status_with_owner"}.each do |query, expected|
+          get "/register/new?discard_token=#{BParam.last&.id_token}&#{query}"
+          expect(BParam.last.status).to eq(expected), "#{query} gave #{BParam.last.status}"
+        end
       end
 
       # The organization's link is /register, which has no registration to attach to yet

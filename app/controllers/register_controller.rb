@@ -23,7 +23,7 @@ class RegisterController < ApplicationController
   def new
     BikeServices::Register.discard(token: params[:discard_token], user: current_user)
     @b_param = BikeServices::Register.b_param_for(user: current_user, token_id: reusable_token,
-      status: params[:status], email: params[:email])
+      status: start_status, email: params[:email])
     # The same filter every other action runs, so reusing the session's
     # registration can't quietly drop the organization the URL named
     assign_organization
@@ -191,6 +191,10 @@ class RegisterController < ApplicationController
   def start_params
     params.permit(:organization_id, :status, :email).to_h.compact_blank
   end
+
+  # ?status=stolen and ?stolen=true as well as the full status_stolen - a link to report
+  # a theft takes the same shorthand everywhere else in the app does
+  def start_status = BParam.status_hash_from_params(params)[:status]
 
   # Starting over lands on a blank registration, not whatever the session was left on -
   # which would drop the organization and status the link carries

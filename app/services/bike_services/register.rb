@@ -26,13 +26,11 @@ module BikeServices
     # it can't surprise anyone), otherwise a new one. A signed-in user's email
     # prefills owner_email - manufacturer_id is the submitted-step-1 marker.
     def b_param_for(user:, token_id: nil, status: nil, email: nil)
+      status = nil unless Bike.statuses.include?(status)
       existing = find_token(session_token: token_id, user:)
-      return assign_owner_email(existing, user, email) if reusable?(existing)
+      return assign_start_params(existing, user, email:, status:) if reusable?(existing)
 
-      bike_params = {
-        owner_email: owner_email_for(user, email),
-        status: (status if Bike.statuses.include?(status))
-      }.compact
+      bike_params = {owner_email: owner_email_for(user, email), status:}.compact
       BParam.create(origin: "register_flow", creator_id: user&.id, params: {bike: bike_params}.as_json)
     end
 
@@ -398,17 +396,26 @@ module BikeServices
       email.presence || user&.email
     end
 
-    # A reused registration keeps the address it has unless email asked otherwise -
-    # through clean_params, since owner_email= ignores a blank value
-    def assign_owner_email(b_param, user, email)
-      return b_param if email.blank? && b_param.owner_email.present?
+    # A reused registration takes what the link named - the status whenever one is named,
+    # the same way assign_organization takes the organization, since the link is how a
+    # theft says it's a theft. A link that names neither leaves both alone
+    def assign_start_params(b_param, user, email:, status:)
+      bike_params = reused_owner_email(b_param, user, email)
+      bike_params[:status] = status if status.present? && status != b_param.bike["status"]
+      return b_param if bike_params.none?
 
-      owner_email = owner_email_for(user, email)
-      return b_param if owner_email == b_param.owner_email
-
-      b_param.clean_params({bike: {owner_email:}}.as_json)
+      b_param.clean_params({bike: bike_params}.as_json)
       b_param.save
       b_param
+    end
+
+    # The address it has unless email asked otherwise - through clean_params, since
+    # owner_email= ignores a blank value
+    def reused_owner_email(b_param, user, email)
+      return {} if email.blank? && b_param.owner_email.present?
+
+      owner_email = owner_email_for(user, email)
+      (owner_email == b_param.owner_email) ? {} : {owner_email:}
     end
 
     # The marker step_2_params sets, that step 2 was submitted with everything it needs
@@ -432,7 +439,7 @@ module BikeServices
     conceal :claim_creator, :create_bike_if_ready, :create_bike, :ready_for_bike?,
       :details_and_acknowledged?, :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
       :impound_report_attrs, :reusable?, :all_steps, :permitted_steps, :step_completed?,
-      :confirmed_email_creator_id, :owner_email_for, :assign_owner_email, :details_completed?,
+      :confirmed_email_creator_id, :owner_email_for, :assign_start_params, :reused_owner_email, :details_completed?,
       :step_2_params, :translation
   end
 end
