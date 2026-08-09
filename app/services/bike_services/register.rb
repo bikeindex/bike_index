@@ -15,12 +15,11 @@ module BikeServices
     # A stolen record carries its own address columns, so the report's location is
     # flattened onto it - the impound record takes the nested attributes as they are
     REPORT_ADDRESS_ATTRS = (AddressRecord.permitted_params.map(&:to_s) - %w[street_2]).freeze
-    # The rest of what a theft report asks for. Not the primary phone: a stolen
-    # registration gives one in step 2, and the stolen record is built with it
+    # The rest of what a theft report asks for. No phone number: a stolen registration
+    # gives one in step 2, and the stolen record is built with it
     STOLEN_REPORT_ATTRS = %w[theft_description police_report_number police_report_department
       estimated_value locking_description lock_defeat_description proof_of_ownership
-      receive_notifications secondary_phone phone_for_users phone_for_shops
-      phone_for_police].freeze
+      receive_notifications phone_for_users phone_for_shops phone_for_police].freeze
 
     # The token's registration when step 1 was never submitted (redirecting into
     # it can't surprise anyone), otherwise a new one. A signed-in user's email

@@ -59,10 +59,7 @@
           label_text: translation(".department_city"),
           html_options: {value: report_attrs[:police_report_department]}) %>
       <%= render Register::SectionLabel::Component.new(text: translation(".contact_and_sharing"), divider: true) %>
-      <%# The primary phone is step 2's - stolen registrations ask for one there %>
-      <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :secondary_phone, kind: :telephone_field,
-          label_text: translation(".secondary_phone"),
-          html_options: {value: report_attrs[:secondary_phone]}) %>
+      <%# The number itself is step 2's - stolen registrations ask for one there %>
       <div class="tw:mb-4 tw:flex tw:flex-col tw:gap-2">
         <span class="twlabel">
           <%= translation(".who_can_see_your_phone") %>

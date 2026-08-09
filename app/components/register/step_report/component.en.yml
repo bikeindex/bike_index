@@ -22,7 +22,6 @@ en:
           a possible match
         report_number: Report number
         report_your_stolen: Report your stolen %{cycle_type}
-        secondary_phone: Secondary phone
         show_phone_police: Police
         show_phone_shops: Bike shops
         show_phone_users: Signed in Bike Index users
