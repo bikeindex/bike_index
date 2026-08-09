@@ -12,4 +12,11 @@ RSpec.describe UI::Dropdown::Component, type: :component do
   it "sizes the menu to its entries, capped against the viewport" do
     expect(component).to have_css("[data-ui--dropdown-target='menu'].tw\\:w-max.tw\\:max-w-\\[75vw\\]", visible: :all)
   end
+
+  # The current entry fills like an active UI::Button, whose trigger sits right above it
+  it "fills the current entry with the button's active color" do
+    fill = UI::Button::Component::ACTIVE_COLORS[:secondary][/bg-purple-\d+/]
+    expect(fill).to be_present
+    expect(described_class::ACTIVE_COLORS).to include(fill)
+  end
 end

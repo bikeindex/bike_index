@@ -54,7 +54,7 @@
           <% end %>
           <%= render(Registrations::Show::Share::Component.new(text: translation(".share_my_page"), url: bike_url(@bike))) %>
           <% if @bike.status_with_owner? %>
-            <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "report_stolen"), text: translation(".mark_stolen"), color: :danger_outline, html_class: "tw:text-center tw:py-2.5!")) %>
+            <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "report_stolen"), text: translation(".mark_stolen"), color: :error, html_class: "tw:text-center tw:py-2.5!")) %>
           <% end %>
         <% else %>
           <%= render(Registrations::Show::Share::Component.new(text: translation(".share"), url: bike_url(@bike))) %>

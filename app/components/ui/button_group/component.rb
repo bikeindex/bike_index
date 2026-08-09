@@ -5,18 +5,17 @@ module UI
     # A row of chips that navigate or act — the link/button counterpart of
     # UI::Forms::RadioButtonGroup, which chips off RESTING_CHIP_CLASSES too.
     class Component < ApplicationComponent
-      # Mirrors UI::Button color: :purple_outline, so retuning its grays reaches the chips
+      # Mirrors UI::Button color: :secondary, so retuning it reaches the chips
       RESTING_CHIP_CLASSES = [
         "tw:cursor-pointer tw:select-none tw:inline-flex tw:items-center tw:justify-center tw:rounded tw:px-3 tw:py-1 tw:text-sm tw:leading-snug tw:transition-colors",
-        UI::Button::Component::COLORS[:purple_outline]
+        UI::Button::Component::COLORS[:secondary]
       ].join(" ").freeze
 
-      # The active half is inert until a chip flags itself data-active, the same way
-      # UI::Button's is — the radio group restates it off its checked input instead.
+      # The radio group stops at the resting half, restating the rest off its checked input
       CHIP_CLASSES = [
         RESTING_CHIP_CLASSES,
         "tw:no-underline",
-        UI::Button::Component::ACTIVE_COLORS[:purple_outline],
+        UI::Button::Component::ACTIVE_COLORS[:secondary],
         UI::Button::Component::FOCUS_CLASSES,
         UI::Button::Component::DISABLED_CLASSES
       ].join(" ").freeze
@@ -45,7 +44,7 @@ module UI
       private
 
       def chip(entry)
-        active = entry[:active] || nil
+        active = entry[:active].presence # false would render data-active="false", nil renders nothing
         # A disabled entry is a <button disabled> even when it has an href — an <a>
         # takes no disabled attribute, so a link would stay live
         href = entry[:disabled] ? nil : entry[:href].presence

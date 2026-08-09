@@ -15,7 +15,7 @@ RSpec.describe UI::Button::Component, type: :component do
     expect(component).to have_text("Click me")
     html = component.to_html
     expect(html).to include("tw:bg-white")
-    expect(html).to include("tw:border-gray-300")
+    expect(html).to include("tw:border-gray-200")
   end
 
   context "with primary color" do
@@ -29,8 +29,8 @@ RSpec.describe UI::Button::Component, type: :component do
   context "with error color" do
     let(:color) { :error }
 
-    it "renders error styles" do
-      expect(component.to_html).to include("tw:bg-red-600")
+    it "renders the danger outline styles" do
+      expect(component.to_html).to include("tw:border-[#f3c9c9]", "tw:not-disabled:not-aria-disabled:hover:bg-red-50")
     end
   end
 
@@ -87,11 +87,11 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
-  context "with purple_outline color" do
-    let(:color) { :purple_outline }
+  context "with secondary color" do
+    let(:color) { :secondary }
 
-    it "renders purple_outline styles" do
-      expect(component.to_html).to include("tw:hover:border-purple-500")
+    it "renders the purple outline styles" do
+      expect(component.to_html).to include("tw:not-disabled:not-aria-disabled:hover:border-purple-500")
     end
   end
 
@@ -110,7 +110,18 @@ RSpec.describe UI::Button::Component, type: :component do
       expect(component).to have_css("button[disabled]")
       tokens = component.css("button").first["class"].split
       expect(tokens).to include(*described_class::DISABLED_CLASSES.split)
+      # With pointer events off the browser takes the cursor from underneath the button,
+      # so not-allowed never renders
+      expect(component.to_html).to_not include("pointer-events-none")
     end
+  end
+
+  # Which is what keeps hover off a disabled button (:disabled) and off UI::ButtonLink's
+  # disabled anchor (aria-disabled), now that nothing drops their pointer events
+  it "guards every hover utility against both disabled flags" do
+    hovers = described_class::COLORS.values.flat_map(&:split).grep(/hover:/)
+    expect(hovers).to be_present
+    expect(hovers.grep_v(/\Atw:(?:dark:)?not-disabled:not-aria-disabled:hover:/)).to eq([])
   end
 
   it "is not disabled by default" do
@@ -199,7 +210,7 @@ RSpec.describe UI::Button::Component, type: :component do
 
   it "always applies the active classes (inert until data-active/pressed)" do
     tokens = component.css("button").first["class"].split
-    expect(tokens).to include("tw:is-active:ring-2", "tw:is-active:bg-gray-200")
+    expect(tokens).to include("tw:is-active:ring-2", "tw:is-active:bg-purple-500")
     expect(component).to have_no_css("button[data-active]")
   end
 
@@ -246,6 +257,16 @@ RSpec.describe UI::Button::Component, type: :component do
 
     it "is declared last, so it outranks the colors it overrides" do
       expect(stylesheet.scan(/^@custom-variant (\S+)/).flatten.last).to eq("is-active")
+    end
+
+    # Declaration order only breaks ties between rules of equal specificity. The hovers
+    # carry two :not()s, so without the same two here a pressed button renders its hover
+    # color rather than its active one — and a disabled one renders the active look.
+    it "carries the guards the hovers do, so it ties them on specificity" do
+      selectors = stylesheet[/^@custom-variant is-active \((.*)\);/, 1]
+      guards = described_class::COLORS[:secondary][/tw:((?:not-[a-z-]+:)+)hover:/, 1].split(":")
+      expect(guards).to eq(%w[not-disabled not-aria-disabled])
+      expect(selectors).to include(":not(:disabled)", ':not([aria-disabled="true"])')
     end
   end
 end
