@@ -470,6 +470,25 @@ RSpec.describe RegisterController, type: :request do
       Nokogiri::HTML(response.body).at_css("input[name='bike[user_name]']")
     end
 
+    # The button says what it does: a theft is reported after this form, so it doesn't
+    # finish the registration the way an ordinary one does
+    def submit_label
+      Nokogiri::HTML(response.body).at_css("[data-register--status-fields-target='submitLabel']")
+    end
+
+    # The button says what it does: a theft is reported after this form, so it doesn't
+    # finish the registration the way an ordinary one does
+    it "submits to the report rather than completing, for a registration that reports" do
+      get register_path(b_param_token: b_param.id_token, step: 2)
+      expect(submit_label.text.strip).to eq "Complete Bike Registration"
+      # Picked in this form, so register--status-fields rechecks it against these
+      expect(JSON.parse(submit_label["data-statuses"])).to eq %w[status_stolen status_impounded]
+
+      b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_stolen"}))
+      get register_path(b_param_token: b_param.id_token, step: 2)
+      expect(submit_label.text.strip).to eq "Next"
+    end
+
     it "renders the details form, showing the email from step 1" do
       get register_path(b_param_token: b_param.id_token, step: 2)
       expect(response.status).to eq 200

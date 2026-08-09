@@ -22,16 +22,22 @@ module Register
         @b_param.self_made?(@current_user)
       end
 
+      # The bike's own status, once there's a bike to have one
+      def stolen? = @bike&.status_stolen?
+
       # Without the bike the registration is only held, waiting on the email
       def heading_text
-        translation(@bike.present? ? ".registration_complete" : ".registration_saved")
+        return translation(".registration_saved") if @bike.blank?
+
+        translation(stolen? ? ".reported_stolen" : ".registration_complete")
       end
 
+      # A theft isn't a bike being watched over, it's one already being looked for
       def subtitle_text
         return translation(".verify_your_email_html", email: owner_email_tag) if @bike.blank?
-        return translation(".we_will_keep_watch", bike_display: @bike.mnfg_name) if self_made?
+        return translation(".registered_for_owner_html", bike_display: @bike.mnfg_name, email: owner_email_tag) unless self_made?
 
-        translation(".registered_for_owner_html", bike_display: @bike.mnfg_name, email: owner_email_tag)
+        translation(stolen? ? ".listed_as_stolen" : ".we_will_keep_watch", bike_display: @bike.mnfg_name)
       end
 
       def owner_email_tag

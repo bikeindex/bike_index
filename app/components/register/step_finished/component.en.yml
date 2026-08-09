@@ -6,6 +6,9 @@ en:
         add_impound_details: Add details about where you found the %{cycle_type}
         add_photos: Add photos of your %{cycle_type}
         confirming_lets_you: 'Confirming your email lets you:'
+        listed_as_stolen: >-
+          Your %{bike_display} is listed as stolen on Bike Index. We'll spread the
+          word, and the community keeps an eye out on resale sites.
         register_another: Register another vehicle
         registered_for_owner_html: >-
           The %{bike_display} is registered with Bike Index. We've emailed %{email}
@@ -15,6 +18,7 @@ en:
         report_it_stolen: >-
           Finish reporting your stolen %{cycle_type} and take advantage of our community
           network
+        reported_stolen: Reported stolen
         verify_your_email_html: >-
           One more step — verify your email. We sent a confirmation link to %{email};
           click it to finish your registration. Everything you've entered is saved.

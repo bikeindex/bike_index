@@ -17,11 +17,19 @@ module Register
         @b_param.type
       end
 
-      # An e-vehicle's safety pages come next, so this form doesn't finish the registration
+      # A theft report and an e-vehicle's safety pages both come after this form, so it
+      # doesn't always finish the registration
       def submit_text
-        return translation(".next") if @sequence&.registration_sequence_pages&.any?
+        return translation(".next") unless @steps.last == "2"
 
         translation(".complete_registration", cycle_type: @b_param.type_titleize)
+      end
+
+      # Which statuses have a step after this form - the report, or the safety pages,
+      # which follow whatever the status. Rechecked client-side, since the status is
+      # picked in this form rather than known when it renders
+      def continuing_statuses
+        @steps.include?("review") ? Bike.statuses : BikeServices::Register::REPORT_RECORDS.keys
       end
 
       def organization

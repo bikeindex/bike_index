@@ -381,8 +381,22 @@
       </div>
     <% end %>
 
-    <%= render UI::Button::Component.new(text: submit_text,
-        color: :primary, size: :lg, type: "submit", spinner: true, html_class: "tw:w-full") %>
+    <%#
+      The label is a block so register--status-fields has a span to rewrite: which
+      statuses have a step after this form is decided by the combobox above
+    %>
+
+    <%= render(UI::Button::Component.new(color: :primary, size: :lg, type: "submit",
+        spinner: true, html_class: "tw:w-full")) do %>
+      <span
+        data-register--status-fields-target="submitLabel"
+        data-statuses="<%= continuing_statuses.to_json %>"
+        data-next-text="<%= translation(".next") %>"
+        data-complete-text="<%= translation(".complete_registration", cycle_type: @b_param.type_titleize) %>"
+      >
+        <%= submit_text %>
+      </span>
+    <% end %>
 
     <%= render Register::BackLink::Component.new(href: register_path(b_param_token: @b_param.id_token, step: 1)) %>
   <% end %>

@@ -10,7 +10,7 @@ import { collapse } from 'utils/collapse_utils'
 // it's picked in this form, so each field carries its own statuses and gets
 // rechecked whenever the combobox changes.
 export default class extends Controller {
-  static targets = ['field']
+  static targets = ['field', 'submitLabel']
 
   connect () {
     // form-persist restores a drafted status by assignment, firing no event
@@ -37,5 +37,17 @@ export default class extends Controller {
       // status no longer asks for
       field.querySelectorAll('input, select, textarea').forEach((el) => { el.disabled = !shown })
     })
+    this.applySubmitLabel(status)
+  }
+
+  // A theft is reported after this form, so the button can't claim to finish the
+  // registration - and which statuses do that is picked in this form too
+  applySubmitLabel (status) {
+    if (!this.hasSubmitLabelTarget) return
+
+    const label = this.submitLabelTarget
+    label.textContent = JSON.parse(label.dataset.statuses).includes(status)
+      ? label.dataset.nextText
+      : label.dataset.completeText
   }
 }

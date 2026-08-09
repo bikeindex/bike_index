@@ -22,6 +22,36 @@ RSpec.describe Register::StepFinished::Component, type: :component do
     end
   end
 
+  # Once there's a bike, the card says what happened to it - a theft isn't a bike being
+  # watched over, it's one already being looked for
+  context "the bike exists" do
+    let(:current_user) { FactoryBot.create(:user_confirmed, email: "someone@bikeindex.org") }
+    let(:component) { render_inline(described_class.new(b_param:, current_user:)) }
+    let(:b_param) do
+      FactoryBot.create(:b_param, created_bike_id: bike.id, params: {bike: bike_params})
+    end
+
+    context "status_with_owner" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "someone@bikeindex.org") }
+
+      it "says it's being watched over" do
+        expect(component).to have_text("Registration complete!")
+        expect(component).to have_text("We'll keep watch")
+      end
+    end
+
+    context "status_stolen" do
+      let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership, owner_email: "someone@bikeindex.org") }
+
+      it "says it's listed as stolen, not that it's being watched for a theft" do
+        expect(component).to have_text("Reported stolen")
+        expect(component).to have_text("is listed as stolen on Bike Index")
+        expect(component).to have_no_text("Registration complete!")
+        expect(component).to have_no_text("if it's ever reported stolen")
+      end
+    end
+  end
+
   context "registered with an organization" do
     let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
     let(:bike_params) { super().merge(creation_organization_id: organization.id) }

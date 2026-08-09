@@ -162,7 +162,9 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_content("bike_photo-landscape.jpeg")
     expect(page).to have_no_content("uploading")
 
-    click_button "Complete Bike Registration"
+    # The theft is reported after this form, so the button doesn't claim to finish
+    expect(page).to have_no_button("Complete Bike Registration")
+    click_button "Next"
 
     # Anonymous, so there's nobody to own a bike yet - it's held for the emailed link
     expect(page).to have_content("Registration saved")
@@ -192,7 +194,7 @@ RSpec.describe "Register flow", :js, type: :system do
     # and the one nothing has been saved from yet
     click_link "Back"
     expect(page).to have_content("Add your bike's details")
-    click_button "Complete Bike Registration"
+    click_button "Next"
 
     expect(page).to have_field("report[theft_description]",
       with: "Locked to a rack outside the coffee shop", wait: 10)
@@ -213,7 +215,9 @@ RSpec.describe "Register flow", :js, type: :system do
 
     click_button "Complete Bike Registration"
 
-    expect(page).to have_content("Registration complete", wait: 10)
+    # The theft was the point of the flow, so the card says that rather than congratulating
+    # them on a registration that's being watched over
+    expect(page).to have_content("Reported stolen", wait: 10)
     bike = Bike.last
     expect(bike).to have_attributes(owner_email:, serial_number: "made_without_serial",
       status: "status_stolen", frame_model: "Marlin 7")
@@ -225,8 +229,8 @@ RSpec.describe "Register flow", :js, type: :system do
     browser_zone = page.evaluate_script("Intl.DateTimeFormat().resolvedOptions().timeZone")
     expect(bike.current_stolen_record.date_stolen.in_time_zone(browser_zone).strftime("%Y-%m-%dT%H:%M"))
       .to eq "2026-08-05T14:30"
-    # Signed in as the account the link made - to anyone else it reads as unclaimed
-    expect(page).to have_content("keep watch")
+    # Signed in as the account the link made, so it's their own theft being described
+    expect(page).to have_content("is listed as stolen on Bike Index")
 
     # An account nobody signed up for, so the terms are the first thing it's asked
     visit "/my_account"
