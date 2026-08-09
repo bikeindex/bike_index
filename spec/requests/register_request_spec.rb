@@ -911,6 +911,27 @@ RSpec.describe RegisterController, type: :request do
         end
       end
 
+      context "without when and where" do
+        it "re-renders the step with what was entered, and creates no bike" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          expect(response).to redirect_to step_path.call("report")
+
+          expect {
+            patch "#{base_url}/report", params: {b_param_token: b_param.id_token,
+                                                 report: report_details.except(:date, :address_record_attributes)}
+          }.to_not change(Bike, :count)
+          expect(response).to have_http_status :unprocessable_entity
+          expect(response.body).to include "Please tell us when it was stolen"
+          expect(response.body).to include "Please tell us where it was stolen"
+          # Saved anyway, so the re-render has the rest of the report
+          expect(response.body).to include "Cut lock"
+
+          expect {
+            patch "#{base_url}/report", params: {b_param_token: b_param.id_token, report: report_details}
+          }.to change(Bike, :count).by 1
+        end
+      end
+
       context "registered with the owner" do
         let(:bike_details) { super().merge(status: "status_with_owner") }
 

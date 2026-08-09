@@ -13,13 +13,16 @@ RSpec.describe Register::StepReport::Component, type: :component do
   it "asks about the theft, and is the last step" do
     render_inline(described_class.new(b_param:, steps:))
 
-    expect(page).to have_field("report[address_record_attributes][street]")
     expect(page).to have_field("report[police_report_number]")
     expect(page).to have_button("Complete Bike Registration")
-    # Nothing saved, so the field opens on now - dateInputUpdateZone rewrites it into
-    # the browser's zone, which the hiddenFieldTimezone posts alongside
-    expect(page.find("input[name='report[date]'].dateInputUpdateZone")[:value])
-      .to eq Time.current.in_time_zone.strftime("%Y-%m-%dT%H:%M")
+    # When and where are what a theft has to answer, so they open blank and required
+    date = page.find("input[name='report[date]'].dateInputUpdateZone")
+    expect(date[:value]).to be_blank
+    expect(date[:required]).to be_present
+    expect(page.find("input[name='report[address_record_attributes][street]']")[:required]).to be_present
+    expect(page.find("input[name='report[address_record_attributes][city]']")[:required]).to be_present
+    # The rest of it isn't
+    expect(page.find("input[name='report[police_report_number]']")[:required]).to be_blank
     expect(page).to have_css("input[name='report[timezone]'].hiddenFieldTimezone", visible: :all)
     # Nothing to report about a vehicle nobody found
     expect(page).to_not have_field("report[impounded_description]")
@@ -50,13 +53,15 @@ RSpec.describe Register::StepReport::Component, type: :component do
   context "found" do
     let(:status) { "status_impounded" }
 
-    it "asks about the find instead" do
+    it "asks about the find instead, and requires none of it" do
       render_inline(described_class.new(b_param:, steps:))
 
       expect(page).to have_field("report[impounded_description]")
       expect(page).to have_field("report[address_record_attributes][street]")
       expect(page).to_not have_field("report[theft_description]")
       expect(page).to_not have_field("report[police_report_number]")
+      expect(page.find("input[name='report[date]']")[:required]).to be_blank
+      expect(page.find("input[name='report[address_record_attributes][street]']")[:required]).to be_blank
     end
   end
 

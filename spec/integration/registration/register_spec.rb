@@ -9,6 +9,7 @@ RSpec.describe "Register flow", :js, type: :system do
   let!(:red) { FactoryBot.create(:color, name: "Red") }
   let!(:blue) { FactoryBot.create(:color, name: "Blue") }
   let!(:green) { FactoryBot.create(:color, name: "Green") }
+  let!(:state) { FactoryBot.create(:state_new_york) }
 
   before do
     # The manufacturer combobox autocompletes against the redis index
@@ -182,11 +183,22 @@ RSpec.describe "Register flow", :js, type: :system do
 
     expect(page).to have_content("Report your stolen bike", wait: 10)
     expect(Bike.count).to eq 0
-    # Nothing was saved to fill it in from, so the browser answered when in its own zone
-    expect(page).to have_field("report[date]", with: /\d{4}-\d\d-\d\dT\d\d:\d\d/)
-    fill_in "report[address_record_attributes][street]", with: "278 Broadway"
+    # When and where are required, and nothing was saved to fill them in from
+    expect(page).to have_field("report[date]", with: "")
     fill_in "report[theft_description]", with: "Locked to a rack outside the coffee shop"
     fill_in "report[police_report_number]", with: "8675309"
+
+    # The browser holds the submit until they're answered, so nothing reaches the server
+    click_button "Complete Bike Registration"
+    expect(page).to have_current_path(/step=report/, url: true)
+    expect(Bike.count).to eq 0
+
+    fill_in "report[date]", with: "2026-08-05T14:30"
+    fill_in "report[address_record_attributes][street]", with: "278 Broadway"
+    fill_in "report[address_record_attributes][city]", with: "New York"
+    # The whole address is required alongside the street and city the server checks
+    select state.name, from: "report[address_record_attributes][region_record_id]"
+    fill_in "report[address_record_attributes][postal_code]", with: "10007"
 
     click_button "Complete Bike Registration"
 
@@ -194,10 +206,14 @@ RSpec.describe "Register flow", :js, type: :system do
     bike = Bike.last
     expect(bike).to have_attributes(owner_email:, serial_number: "made_without_serial",
       status: "status_stolen", frame_model: "Marlin 7")
-    expect(bike.current_stolen_record).to have_attributes(street: "278 Broadway",
+    expect(bike.current_stolen_record).to have_attributes(street: "278 Broadway", city: "New York",
       theft_description: "Locked to a rack outside the coffee shop", police_report_number: "8675309",
       phone: "5550000000")
-    expect(bike.current_stolen_record.date_stolen).to be_within(5.minutes).of(Time.current)
+    # Entered in the browser's zone, which posts alongside it rather than the server's -
+    # so it reads back as the time that was typed, wherever the server happens to be
+    browser_zone = page.evaluate_script("Intl.DateTimeFormat().resolvedOptions().timeZone")
+    expect(bike.current_stolen_record.date_stolen.in_time_zone(browser_zone).strftime("%Y-%m-%dT%H:%M"))
+      .to eq "2026-08-05T14:30"
     # Signed in as the account the link made - to anyone else it reads as unclaimed
     expect(page).to have_content("keep watch")
 

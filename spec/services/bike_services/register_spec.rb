@@ -215,12 +215,39 @@ RSpec.describe BikeServices::Register do
       expect(described_class.send(:ready_for_bike?, b_param, sequence: nil)).to be_truthy
     end
 
-    it "takes an unparseable date as no date at all" do
-      expect(described_class.save_report(b_param, report_params: report_params.merge(date: "2026-13-45T99:99")))
-        .to be_truthy
-      expect(b_param.reload.stolen_attrs["date_stolen"]).to be_blank
-      # Which the record it's created with fills in
-      expect(Bike.new.build_new_stolen_record(b_param.stolen_attrs).date_stolen).to be_within(5).of(Time.current)
+    describe "when and where a theft has to answer" do
+      # A failed step saves anyway, so the re-render still has everything they entered
+      def expect_incomplete(params, error)
+        expect(described_class.save_report(b_param, report_params: params)).to be_falsey
+        expect(b_param.errors.full_messages.to_sentence).to match error
+        expect(b_param.reload.stolen_attrs["theft_description"]).to eq "Cut lock"
+        expect(described_class.send(:report_completed?, b_param)).to be_falsey
+        expect(described_class.permitted_step(b_param, nil, sequence: nil)).to eq "report"
+      end
+
+      it "rejects a blank date" do
+        expect_incomplete(report_params.except(:date), /when it was stolen/)
+      end
+
+      # Rather than 500ing on it, or quietly recording the moment they submitted
+      it "rejects an unparseable date" do
+        expect_incomplete(report_params.merge(date: "2026-13-45T99:99"), /when it was stolen/)
+      end
+
+      it "rejects a location with no street" do
+        expect_incomplete(report_params.merge(address_record_attributes: {city: "Chicago"}),
+          /where it was stolen/)
+      end
+
+      it "rejects a location with no city" do
+        expect_incomplete(report_params.merge(address_record_attributes: {street: "1 Main St"}),
+          /where it was stolen/)
+      end
+
+      it "names both when neither is answered" do
+        expect_incomplete(report_params.except(:date, :address_record_attributes),
+          /when it was stolen.*where it was stolen/m)
+      end
     end
 
     context "the status changes after the report" do
@@ -272,6 +299,13 @@ RSpec.describe BikeServices::Register do
         expect(impound_attrs["address_record_attributes"]).to match(hash_including("street" => "1 Main St",
           "city" => "Chicago", "street_2" => "Apt 2"))
         expect(b_param.stolen_attrs).to be_blank
+      end
+
+      it "asks nothing of a find - a blank report still passes" do
+        expect(described_class.save_report(b_param, report_params: {})).to be_truthy
+        expect(described_class.send(:report_completed?, b_param.reload)).to be_truthy
+        # Which the record it's created with fills in
+        expect(b_param.impound_attrs["impounded_at"]).to be_blank
       end
     end
 

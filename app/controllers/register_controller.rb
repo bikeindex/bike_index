@@ -90,12 +90,18 @@ class RegisterController < ApplicationController
   end
 
   # The theft or the find - everything the stolen or impound record is built from.
-  # Nothing here is required, so it only ever moves the registration forward
+  # A theft has to say when and where; the rest of the step is optional
   def report
     step = BikeServices::Register.permitted_step(@b_param, "report", sequence: @registration_sequence)
     return redirect_to(step_path(step)) if step != "report"
 
-    BikeServices::Register.save_report(@b_param, report_params:)
+    # Saved either way, so the re-render has everything they entered
+    unless BikeServices::Register.save_report(@b_param, report_params:)
+      @page_title = I18n.t("meta_titles.register_report")
+      return render(Register::StepReport::Component.new(b_param: @b_param, steps: flow_steps),
+        status: :unprocessable_entity)
+    end
+
     complete_registration
   end
 

@@ -49,17 +49,18 @@ module Register
           .with_indifferent_access
       end
 
-      # The two records name their date differently. Nothing saved falls back to now,
-      # which is what both records do with a blank date anyway
+      # The two records name their date differently. Blank until it's answered - a field
+      # that opens on the current time is one nobody corrects, and the theft time is the
+      # answer least likely to be now
       def report_date
         @report_date ||= Binxtils::TimeParser
-          .parse(report_attrs[stolen? ? :date_stolen : :impounded_at], parse_error: :nil) || Time.current
+          .parse(report_attrs[stolen? ? :date_stolen : :impounded_at], parse_error: :nil)
       end
 
       # A datetime_local field holds wall-clock time, and this is the app's zone - the zone
       # a submission that arrives without one is read back in. dateInputUpdateZone rewrites
       # it into the browser's from data-initialtime, and posts that zone alongside
-      def date_value = report_date.in_time_zone.strftime("%Y-%m-%dT%H:%M")
+      def date_value = report_date&.in_time_zone&.strftime("%Y-%m-%dT%H:%M")
 
       # form_with has no model here, so fields_for renders from this - the stolen record
       # keeps the address on its own columns, the impound record on an AddressRecord

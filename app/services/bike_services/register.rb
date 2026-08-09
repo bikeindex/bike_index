@@ -257,14 +257,17 @@ module BikeServices
     end
 
     # The theft or the find itself, onto the record the bike is created with - a stolen
-    # record for a theft, an impound record for a vehicle found. A date that's blank or
-    # unparseable is allowed through: both records fall back to the current time
+    # record for a theft, an impound record for a vehicle found. Returns whether the step
+    # passed; a failed one still saves, so nothing entered is lost on the re-render
     def save_report(b_param, report_params:)
       attrs = report_params.to_h.with_indifferent_access
       date = Binxtils::TimeParser.parse(attrs["date"], attrs["timezone"], parse_error: :nil)
+      errors = report_errors(b_param, attrs, date)
       report = b_param.status_stolen? ? stolen_report_attrs(attrs, date) : impound_report_attrs(attrs, date)
-      b_param.clean_params({REPORT_RECORDS[b_param.status] => report, :report_completed => true}.as_json)
+      b_param.clean_params({REPORT_RECORDS[b_param.status] => report, :report_completed => errors.none?}.as_json)
       b_param.save
+      errors.each { b_param.errors.add(:base, it) }
+      errors.none?
     end
 
     # Everything a submission does once its step is saved. Returns the bike, or nil while
@@ -322,6 +325,16 @@ module BikeServices
       return if status.blank? || stale.none?
 
       b_param.params = b_param.params.except(*stale, "report_completed")
+    end
+
+    # A theft has to say when and where it happened - everything else on the step, and
+    # the whole of a find's report, is optional
+    def report_errors(b_param, attrs, date)
+      return [] unless b_param.status_stolen?
+
+      address = attrs["address_record_attributes"] || {}
+      [(translation(:date_stolen_required) if date.blank?),
+        (translation(:location_required) if address["street"].blank? || address["city"].blank?)].compact
     end
 
     def stolen_report_attrs(attrs, date)
@@ -417,7 +430,7 @@ module BikeServices
     def translation(key) = I18n.t(key, scope: "shared.register_flow")
 
     conceal :claim_creator, :create_bike_if_ready, :create_bike, :ready_for_bike?,
-      :details_and_acknowledged?, :report_completed?, :clear_stale_report, :stolen_report_attrs,
+      :details_and_acknowledged?, :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
       :impound_report_attrs, :reusable?, :all_steps, :permitted_steps, :step_completed?,
       :confirmed_email_creator_id, :owner_email_for, :assign_owner_email, :details_completed?,
       :step_2_params, :translation

@@ -3,6 +3,10 @@
 
   <%= render UI::Header::Component.new(text: heading, subtitle:) %>
 
+  <% if @b_param.errors.any? %>
+    <%= render UI::Alerts::Base::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
+  <% end %>
+
   <%= form_with(url: report_register_path, method: :patch, scope: :report,
       data: {controller: "autofocus"}) do |f| %>
     <%= hidden_field_tag :b_param_token, @b_param.id_token %>
@@ -13,13 +17,14 @@
     <%= render Register::SectionLabel::Component.new(text: translation(".when_and_where")) %>
 
     <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :date, kind: :datetime_local_field,
-        label_text: date_label,
+        label_text: date_label, required: stolen?,
         html_options: {value: date_value, max: Binxtils::TimeParser.round(Time.current + 1.day),
-          class: "dateInputUpdateZone", "data-initialtime": report_date.iso8601}) %>
+          class: "dateInputUpdateZone", "data-initialtime": report_date&.iso8601}) %>
 
     <%# _attributes explicitly: form_with has no model to infer nested attributes from %>
     <%= f.fields_for :address_record_attributes, address_record do |address_form| %>
-      <%= render UI::Forms::AddressGroup::Component.new(form_builder: address_form, street_label:) %>
+      <%= render UI::Forms::AddressGroup::Component.new(form_builder: address_form, street_label:,
+          required: stolen?) %>
     <% end %>
 
     <% if stolen? %>
