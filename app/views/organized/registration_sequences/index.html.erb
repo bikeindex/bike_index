@@ -25,42 +25,39 @@
 
   <h2 class="uncap tw:mb-2 tw:text-lg tw:font-semibold">Draft</h2>
 
-  <p class="tw:mb-2 tw:text-gray-600">
-    <% if @draft.present? %>
-      Your draft sequence, last edited
-      <span class="localizeTime preciseTime">
-        <%= l @draft.updated_at, format: :convert_time %>
-      </span>
-    <% else %>
-      You don't have a draft sequence
-    <% end %>
-  </p>
+  <%# Both buttons POST here; the controller opens the draft, cloning one if there isn't one %>
+  <% draft_path = organization_registration_sequences_path(organization_id: current_organization.to_param) %>
 
-  <%# Read-only here, the same as the active version above - the draft is edited on its own screen %>
   <% if @draft.present? %>
+    <div
+      class="
+        tw:mb-2 tw:flex tw:flex-wrap tw:items-baseline tw:justify-between
+        tw:gap-x-4 tw:gap-y-1
+      "
+    >
+      <p class="tw:mb-0 tw:text-gray-600">
+        Your draft sequence, last edited
+        <span class="localizeTime preciseTime"><%= l @draft.updated_at, format: :convert_time %></span>
+      </p>
+
+      <%= render UI::ButtonLink::Component.new(text: "Edit", href: draft_path, method: :post, color: :primary, form_class: "button_to tw:ml-auto") %>
+    </div>
+    <%# Read-only here, the same as the active version above - the draft is edited on its own screen %>
     <div class="tw:mb-6">
       <%= render Org::RegistrationSequence::PageList::Component.new(registration_sequence: @draft, editable: false) %>
     </div>
-  <% end %>
-
-  <% button_label = if @draft.present?
-       "Edit"
-     elsif @active.present?
-       "Copy current sequence and edit"
-     else
-       "Create a sequence"
-     end %>
-
-  <div class="tw:mb-6 tw:flex tw:items-baseline tw:gap-4">
-    <%= render UI::ButtonLink::Component.new(text: button_label, href: organization_registration_sequences_path(organization_id: current_organization.to_param), method: :post, color: :primary) %>
-
     <%# onsubmit, not turbo_confirm: Turbo Drive is off app-wide, so it never fires %>
-    <% if @draft.present? %>
+    <div class="tw:mb-6 tw:flex">
       <%= render UI::ButtonLink::Component.new(text: "Discard draft", href: organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), method: :delete, color: :error, size: :sm,
         form_class: "button_to tw:ml-auto",
         form: {onsubmit: "return confirm('#{j "Discard this draft and its pages? This can't be undone."}')"}) %>
-    <% end %>
-  </div>
+    </div>
+  <% else %>
+    <p class="tw:mb-2 tw:text-gray-600">You don't have a draft sequence</p>
+    <div class="tw:mb-6">
+      <%= render UI::ButtonLink::Component.new(text: @active.present? ? "Copy current sequence and edit" : "Create a sequence", href: draft_path, method: :post, color: :primary) %>
+    </div>
+  <% end %>
 
   <% if @previous.any? %>
     <h2 class="uncap tw:mb-2 tw:text-lg tw:font-semibold">Previous</h2>
