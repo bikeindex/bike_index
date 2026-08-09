@@ -41,4 +41,17 @@ RSpec.describe UI::Button::Component, :js, type: :system do
       end
     end
   end
+
+  # Pointing at a button and pressing it are different answers to give, so a color whose
+  # :active look repeats its hover leaves a press looking like nothing happened.
+  it "answers hover and press differently, in every color" do
+    UI::Button::Component::COLORS.each_key do |color|
+      visit "/rails/view_components/ui/button/component/#{color}"
+      button = find("button")
+      looks = {resting: computed_colors(button)}
+      hover_then_press(button) { |state| looks[state] = computed_colors(button) }
+
+      expect(looks.values.uniq.count).to eq(3), "#{color} repeats a look: #{looks.inspect}"
+    end
+  end
 end

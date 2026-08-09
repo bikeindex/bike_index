@@ -33,11 +33,14 @@ module SystemSpecHelpers
     page.driver.with_playwright_page { |playwright_page| playwright_page.set_viewport_size(width:, height:) }
   end
 
-  # The colors an element paints right now, for asserting that a state leaves them alone.
+  # The colors an element paints right now, for comparing one state against another.
   # A node script binds the element to `this` on this driver -- an (el) => arrow returns
   # nil, which would compare equal to itself and assert nothing.
+  #
+  # No box-shadow: pressing an element focuses it, so its focus ring would tell every
+  # pressed state apart from its hover no matter what the colors do.
   def computed_colors(element)
-    element.evaluate_script("[getComputedStyle(this).backgroundColor, getComputedStyle(this).color, getComputedStyle(this).borderTopColor, getComputedStyle(this).textDecorationLine]")
+    element.evaluate_script("[getComputedStyle(this).backgroundColor, getComputedStyle(this).color, getComputedStyle(this).borderTopColor, getComputedStyle(this).textDecorationLine, getComputedStyle(this).fontWeight]")
   end
 
   # Point at an element and hold the mouse down, yielding at each state so the caller

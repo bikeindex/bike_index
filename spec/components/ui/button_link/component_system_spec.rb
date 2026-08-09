@@ -22,4 +22,16 @@ RSpec.describe UI::ButtonLink::Component, :js, type: :system do
 
     expect_axe_clean
   end
+
+  # The same three answers a button gives, from an element that only styles like one
+  it "answers hover and press differently, in every color" do
+    UI::Button::Component::COLORS.each_key do |color|
+      visit "/rails/view_components/ui/button_link/component/#{color}"
+      link = find("a[href='#']")
+      looks = {resting: computed_colors(link)}
+      hover_then_press(link) { |state| looks[state] = computed_colors(link) }
+
+      expect(looks.values.uniq.count).to eq(3), "#{color} repeats a look: #{looks.inspect}"
+    end
+  end
 end
