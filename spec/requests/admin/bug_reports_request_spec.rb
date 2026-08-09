@@ -99,6 +99,16 @@ RSpec.describe Admin::BugReportsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
     end
+
+    context "json" do
+      it "renders the bug report" do
+        get "#{base_url}/#{bug_report.to_param}.json"
+        expect(response.status).to eq(200)
+        expect(json_result["bug_report"]).to eq(bug_report.as_json(only: %w[id user_id email from_name
+          subject body tags github_pull_request is_member is_paid_organization is_paid_organization_staff
+          received_at created_at updated_at]))
+      end
+    end
   end
 
   describe "update" do
@@ -209,6 +219,12 @@ RSpec.describe Admin::BugReportsController, type: :request do
         get "#{base_url}.json", params: token_param.merge(search_status: "all")
         expect(response.status).to eq 200
         expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report.id])
+      end
+
+      it "renders a single report" do
+        get "#{base_url}/#{bug_report.to_param}.json", params: token_param
+        expect(response.status).to eq 200
+        expect(json_result.dig("bug_report", "id")).to eq bug_report.id
       end
 
       it "updates" do

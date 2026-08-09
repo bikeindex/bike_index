@@ -31,6 +31,10 @@ module Admin
     end
 
     def show
+      respond_to do |format|
+        format.html
+        format.json { render json: {bug_report: bug_report_json(@bug_report)} }
+      end
     end
 
     def update

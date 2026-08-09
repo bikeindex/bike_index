@@ -62,12 +62,13 @@ It fetches sidekiq then pghero and prints a `summary:` line and an `OK`/`ABNORMA
 
 ```
 .claude/skills/admin-data-api/scripts/admin_data.rb get bug_reports search_status=all per_page=10
+.claude/skills/admin-data-api/scripts/admin_data.rb show-bug-report 42
 .claude/skills/admin-data-api/scripts/admin_data.rb update-bug-report 42 tags=search,broken github_pull_request=4064
 ```
 
 `get bug_reports` takes any index filter as `key=value`: `search_status` (defaults to the investigate statuses — pass `all`, or one of `BugReport.statuses`), `query` (full text over subject/body/email), `search_tag`, `search_membership` (`member`, `paid_organization`, `paid_organization_staff`), `user_id`, `sort`/`direction`, `per_page`/`page`, `period`/`start_time`/`end_time`. It returns `bug_reports`, `page`, `per_page`, `total_count`.
 
-`update-bug-report` sets `tags` (comma separated — it replaces the report's tags rather than appending) and `github_pull_request`. Only `index` and `update` render JSON; `show` is HTML only, so read a single report with `get bug_reports query=…`.
+`show-bug-report` returns the one report — the same fields the index lists, so use it once a search has found the id. `update-bug-report` sets `tags` (comma separated — it replaces the report's tags rather than appending) and `github_pull_request`.
 
 ## Refreshing the token
 

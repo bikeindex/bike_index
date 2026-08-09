@@ -199,6 +199,11 @@ when "get" # get <endpoint> [param=value …] — auto-refreshes and retries onc
   body = get_endpoint(endpoint, parse_params(ARGV.drop(2))) or exit(22)
   puts body
 
+when "show-bug-report" # show-bug-report <id>
+  id = ARGV[1] or abort("usage: show-bug-report <id>")
+  body = with_token(:get, "#{BUG_REPORTS}/#{id}.json") or exit(22)
+  puts body
+
 when "update-bug-report" # update-bug-report <id> tags=a,b github_pull_request=4064
   id = ARGV[1] or abort("usage: update-bug-report <id> [tags=a,b] [github_pull_request=N]")
   attributes = parse_params(ARGV.drop(2))
@@ -227,6 +232,7 @@ when "refresh" # refresh the token pair now (needs ADMIN_DOORKEEPER_APP_CLIENT_S
 
 else
   warn "usage: admin_data.rb {check | get <#{PATHS.keys.join("|")}> [param=value …] | " \
-    "update-bug-report <id> [param=value …] | authorize-url | set-tokens <access> <refresh> | refresh}"
+    "show-bug-report <id> | update-bug-report <id> [param=value …] | " \
+    "authorize-url | set-tokens <access> <refresh> | refresh}"
   exit 64
 end
