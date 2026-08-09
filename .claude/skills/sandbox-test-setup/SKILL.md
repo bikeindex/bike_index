@@ -16,7 +16,10 @@ description: >-
   Ruby must be built from GitHub source (~8–10 min, `cache.ruby-lang.org`
   firewalled); also postgres/redis, tailwind build, Chrome-matching
   ChromeDriver, and a local jsdelivr proxy for `:js, type: :system`
-  specs. Trigger whenever a session runs RSpec/bundle/`bin/lint`, or
+  specs. It's also the one environment where Claude starts `bin/dev`
+  itself rather than asking — nobody else owns that container.
+  Trigger whenever a session runs RSpec/bundle/`bin/lint`, needs a
+  running dev server, or
   the user reports `env: 'ruby': No such file or directory` /
   `Bundler::RubyVersionMismatch` /
   `Could not find 'bundler' (4.0.0.beta2)` /
@@ -252,6 +255,43 @@ bundle exec rails tailwindcss:build
 
 (See the `integration-testing` skill — same rule applies to
 layout-rendering request specs, not just system specs.)
+
+## Starting the dev server — web sandbox (C) only
+
+`CLAUDE.md` says to stop and ask the user to start `bin/dev`. That rule is about
+*their* machine, where the server is a process they own and may already have
+running. **In the web sandbox there is nobody to ask** — the container is yours,
+it's ephemeral, and nothing else is on the port — so start it yourself when a
+task needs a running app (screenshots, checking a page actually renders). In
+**A (local macOS Conductor workspace)** and **B (Conductor cloud sandbox)** the
+rule stands: a human owns that machine, so ask.
+
+Two things beyond Toolchain + Services above. Development databases, which the
+test setup doesn't create — and which don't take `database.yml`'s `CI=1` branch,
+so the credentials have to be passed as `PG*`. And a UTF-8 locale: foreman reads
+`.env` in the process's external encoding, and an unset locale makes that
+US-ASCII, which dies on the file's non-ASCII bytes with `invalid byte sequence
+in US-ASCII`.
+
+```bash
+export PGHOST=127.0.0.1 PGUSER=rails PGPASSWORD=password
+export LANG=C.UTF-8 LC_ALL=C.UTF-8
+eval "$(ruby bin/env --export)"
+bundle exec rails db:create db:migrate   # bikeindex_development + its analytics database
+bin/dev                                  # run it in the background - it doesn't return
+```
+
+Then wait for it rather than assuming — the first boot compiles assets:
+
+```bash
+until curl -fs -o /dev/null "$BASE_URL/"; do sleep 5; done
+```
+
+`bin/dev` runs foreman, so the tailwind and dartsass watchers come with it and a
+page you screenshot is styled. It starts its own redis, which exits harmlessly
+when one is already listening. Postgres and redis don't survive a container idle
+period: a server answering `PG::ConnectionBad` wants `service postgresql start`
+and a restart, not debugging.
 
 ## Running plain specs
 
