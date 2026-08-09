@@ -21,12 +21,14 @@ module Register
         @b_param.status_stolen?
       end
 
+      # Memoized: the step list is what places the report, and it asks whether the
+      # registration has a creator yet, which is a query
       def step_number
-        BikeServices::Register.step_number("report", sequence: @sequence, b_param: @b_param)
+        @step_number ||= BikeServices::Register.step_number("report", sequence: @sequence, b_param: @b_param)
       end
 
       def total_steps
-        BikeServices::Register.total_steps(@sequence, b_param: @b_param)
+        @total_steps ||= BikeServices::Register.total_steps(@sequence, b_param: @b_param)
       end
 
       # The safety pages can come after the report, so this doesn't always finish the flow
