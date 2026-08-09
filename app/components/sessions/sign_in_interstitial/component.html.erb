@@ -1,9 +1,9 @@
 <div class="tw:text-center">
   <h3><%= @heading %></h3>
 
-  <p class="tw:mt-2 tw:mb-6"><%= translation("if_not_click_button") %></p>
+  <p class="tw:mt-2 tw:mb-6"><%= translation("click_button_to_continue") %></p>
 
-  <%= form_tag @url, method: "post", data: {controller: @auto_submit ? "auto-submit" : nil} do %>
+  <%= form_tag @url, method: "post" do %>
     <% @fields.each do |name, value| %>
       <%= hidden_field_tag name, value %>
     <% end %>
