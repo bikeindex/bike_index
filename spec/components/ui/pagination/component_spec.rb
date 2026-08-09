@@ -22,6 +22,16 @@ RSpec.describe UI::Pagination::Component, type: :component do
       end
     end
 
+    # The current page fills like an active UI::Button, which a filter row above the
+    # paginator often has one of
+    it "fills the current page with the button's active color" do
+      with_request_url "/search/registrations" do
+        fill = UI::Button::Component::ACTIVE_COLORS[:secondary][/bg-purple-\d+/]
+        expect(fill).to be_present
+        expect(component.css("a[aria-disabled='true']").map { it["class"] }.join(" ")).to include(fill)
+      end
+    end
+
     context "midrange" do
       let(:page) { 3 }
       it "renders with previous and next" do

@@ -6,7 +6,8 @@ module UI
       # Applied to the <li>; the `[&>a]` variant colors the item's link (the surface).
       # The item flags itself aria-current rather than aria-pressed, which is invalid on
       # role="menuitem" — the is-active variant (application.css) covers both.
-      ACTIVE_COLORS = "tw:is-active:[&>a]:bg-gray-200 tw:is-active:[&>a]:text-gray-900 tw:is-active:dark:[&>a]:bg-gray-600 tw:is-active:dark:[&>a]:text-gray-100"
+      # The fill is UI::Button's secondary active, minus the border and ring a menu item has no room for.
+      ACTIVE_COLORS = "tw:is-active:[&>a]:bg-purple-500 tw:is-active:[&>a]:text-white"
 
       renders_one :button
       renders_many :entries, types: {
