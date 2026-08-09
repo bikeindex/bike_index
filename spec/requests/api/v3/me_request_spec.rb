@@ -20,7 +20,8 @@ RSpec.describe "Me API V3", type: :request do
     context "fully scoped token" do
       let(:scopes) { all_scopes }
       let!(:secondary_email) { FactoryBot.create(:user_email, user: user, email: "d@f.co") }
-      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: user) }
+      let(:role) { "member" }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user:, role:) }
       let(:organization) { organization_role.organization }
       let(:target_menu) do
         [
@@ -41,7 +42,7 @@ RSpec.describe "Me API V3", type: :request do
           organization_short_name: organization.short_name,
           organization_slug: organization.slug,
           organization_id: organization.id,
-          organization_access_token: organization.access_token,
+          organization_access_token: nil,
           organization_logo_url: nil,
           user_is_organization_admin: false,
           menu: target_menu
@@ -61,6 +62,17 @@ RSpec.describe "Me API V3", type: :request do
         expect(json_result["memberships"].is_a?(Array)).to be_truthy
         expect(json_result["memberships"]).to eq([target_membership.as_json])
         expect(response.response_code).to eq(200)
+      end
+
+      context "organization admin" do
+        let(:role) { "admin" }
+        it "includes the organization access_token" do
+          get "/api/v3/me", params: {access_token: token.token}, headers: {format: :json}
+          expect(response.response_code).to eq(200)
+          membership = json_result["memberships"].first
+          expect(membership["user_is_organization_admin"]).to be_truthy
+          expect(membership["organization_access_token"]).to eq(organization.access_token)
+        end
       end
 
       context "organization with uploaded avatar" do

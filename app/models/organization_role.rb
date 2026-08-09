@@ -100,6 +100,11 @@ class OrganizationRole < ApplicationRecord
     organization.ambassador?
   end
 
+  # The organization's permanent API token creates bikes and runs bulk imports - admins only
+  def organization_access_token
+    organization.access_token if admin?
+  end
+
   def organization_creator?
     organization.organization_roles.minimum(:id) == id
   end
