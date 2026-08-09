@@ -20,8 +20,10 @@ module Register
         @page.registration_sequence
       end
 
+      # Whatever the editor promised the badge would say. Registrants only ever reach an
+      # organization's own sequence; the template's name shows when admin previews it
       def organization_name
-        sequence.organization&.short_name
+        sequence&.badge_name
       end
 
       def checkbox_name(index)

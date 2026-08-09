@@ -1,8 +1,15 @@
 <div class="tw:py-6" data-controller="page-preview">
   <div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
-    <h1 class="uncap tw:text-2xl tw:font-semibold">
-      <%= editing? ? "Edit page" : "Add page" %>
-    </h1>
+    <%# Admin's own header is the h1 naming the sequence, so this is a step below it %>
+    <% if @admin %>
+      <h2 class="uncap tw:mb-0 tw:text-xl tw:font-normal tw:text-gray-500">
+        <%= editing? ? "Edit page" : "Add page" %>
+      </h2>
+    <% else %>
+      <h1 class="uncap tw:text-2xl tw:font-semibold">
+        <%= editing? ? "Edit page" : "Add page" %>
+      </h1>
+    <% end %>
 
     <%= link_to "Back to sequence overview", sequence_path, class: "twlink" %>
   </div>

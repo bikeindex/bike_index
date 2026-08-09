@@ -11,7 +11,7 @@ RSpec.describe Org::RegistrationSequence::PageForm::Component, type: :component 
     it "posts a new page to the sequence, without a preview or a delete" do
       render_inline(described_class.new(page: registration_sequence.registration_sequence_pages.new))
 
-      expect(page).to have_content("Add page")
+      expect(page).to have_css("h1", text: "Add page")
       expect(page).to have_css("form[action='/o/#{organization_id}/registration_sequences/#{registration_sequence.id}/pages']")
       expect(page).to_not have_content("Preview")
       expect(page).to_not have_link("Delete page")
@@ -36,6 +36,9 @@ RSpec.describe Org::RegistrationSequence::PageForm::Component, type: :component 
 
       expect(page).to have_css("form[action='/admin/registration_sequences/#{registration_sequence.id}/pages']")
       expect(page).to have_link("Back to sequence overview", href: "/admin/registration_sequences/#{registration_sequence.id}/edit")
+      # Admin's header is the h1 naming the sequence, so this heading sits below it
+      expect(page).to have_css("h2", text: "Add page")
+      expect(page).to_not have_css("h1")
     end
   end
 end

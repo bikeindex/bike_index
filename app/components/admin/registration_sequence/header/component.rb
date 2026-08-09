@@ -26,7 +26,7 @@ module Admin
           [{label: "View", href: RegistrationSequencePaths.sequence(@registration_sequence, admin: true), active: @mode == :view},
             {label: "Preview", href: RegistrationSequencePaths.preview(@registration_sequence, admin: true), active: @mode == :preview},
             {label: "Edit", href: RegistrationSequencePaths.edit(@registration_sequence, admin: true),
-             active: @mode == :edit, disabled: !@registration_sequence.editable?, title: uneditable_title}]
+             active: @mode == :edit, disabled: !@registration_sequence.editable?}]
         end
 
         # Archived sequences are frozen too, so the status says which one this is
@@ -36,8 +36,8 @@ module Admin
           "Can't edit #{@registration_sequence.status_display.downcase} registration sequence - create a draft"
         end
 
-        # The organization's own copy of this screen; the template has no organization
-        def organization_path
+        # This sequence on the organization's own screens; the template has no organization
+        def organization_sequence_path
           return if @registration_sequence.template?
 
           RegistrationSequencePaths.sequence(@registration_sequence)
