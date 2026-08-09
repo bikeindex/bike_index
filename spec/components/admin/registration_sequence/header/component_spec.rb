@@ -43,6 +43,16 @@ RSpec.describe Admin::RegistrationSequence::Header::Component, type: :component 
       expect(page).to have_link("View", href: admin_url)
       expect(page).to have_link("Preview", href: "#{admin_url}/preview")
     end
+
+    context "archived" do
+      let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, organization:, end_at: Time.current) }
+
+      it "names the status it can't edit" do
+        render_inline(described_class.new(registration_sequence:))
+
+        expect(page.find("button[disabled]")[:title]).to eq "Can't edit previous registration sequence - create a draft"
+      end
+    end
   end
 
   context "template" do
