@@ -117,6 +117,34 @@ RSpec.describe Payment, type: :model do
     end
   end
 
+  describe "promoted_alert" do
+    let(:payment) { FactoryBot.create(:payment, kind: "theft_alert") }
+    let!(:promoted_alert) { FactoryBot.create(:promoted_alert, payment:) }
+
+    it "is the promoted alert" do
+      expect(payment.reload.promoted_alert).to eq promoted_alert
+    end
+
+    context "only a theft alert, not yet copied over by Backfills::PromotedAlertJob" do
+      let!(:promoted_alert) { nil }
+      let!(:theft_alert) { FactoryBot.create(:theft_alert, payment:) }
+
+      it "is the theft alert" do
+        expect(payment.reload.promoted_alert).to eq theft_alert
+      end
+    end
+
+    context "a payment without an alert" do
+      let(:payment) { FactoryBot.create(:payment) }
+      let!(:promoted_alert) { nil }
+
+      it "is nil, without looking for a theft alert" do
+        expect(payment.reload.theft_alert?).to be_falsey
+        expect(payment.promoted_alert).to be_nil
+      end
+    end
+  end
+
   describe "success_url, cancel_url" do
     let(:target_success) { "http://test.host/payments/success?session_id={CHECKOUT_SESSION_ID}" }
     let(:target_cancel) { "http://test.host/payments/new" }

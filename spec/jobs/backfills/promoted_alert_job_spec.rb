@@ -8,6 +8,11 @@ RSpec.describe Backfills::PromotedAlertJob, type: :job do
       facebook_data: {campaign_id: "xxx"}, reach: 42, created_at: Time.current - 2.years)
   end
 
+  def new_promoted_alert
+    PromotedAlert.create!(stolen_record:, theft_alert_plan: theft_alert.theft_alert_plan,
+      user: theft_alert.user)
+  end
+
   it "copies every column, ids and timestamps included" do
     expect { instance.perform }.to change(PromotedAlert, :count).by(1)
 
@@ -24,9 +29,19 @@ RSpec.describe Backfills::PromotedAlertJob, type: :job do
   it "leaves room in the sequence for the copied ids" do
     instance.perform
 
-    expect(PromotedAlert.create!(stolen_record:,
-      theft_alert_plan: theft_alert.theft_alert_plan, user: theft_alert.user).id)
-      .to be > theft_alert.id
+    expect(new_promoted_alert.id).to be > theft_alert.id
+  end
+
+  context "with the sequence parked past the theft alerts, as CreatePromotedAlerts leaves it" do
+    let(:parked_at) { theft_alert.id + 10_000 }
+    before { PromotedAlert.connection.execute("SELECT setval('promoted_alerts_id_seq', #{parked_at}, false)") }
+
+    it "copies without colliding, and doesn't wind the sequence back" do
+      instance.perform
+
+      expect(PromotedAlert.find(theft_alert.id)).to be_present
+      expect(new_promoted_alert.id).to eq parked_at
+    end
   end
 
   it "doesn't duplicate on a second run" do

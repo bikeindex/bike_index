@@ -368,7 +368,7 @@ class StolenRecord < ApplicationRecord
 
   # If there isn't any image and there is a theft alert, we want to tell the user to upload an image
   def theft_alert_missing_photo?
-    missing_photo? && (theft_alerts.any? || promoted_alerts.any?)
+    missing_photo? && promoted_alerts.any?
   end
 
   # The associated bike's first public image, if available. Else nil.
@@ -405,11 +405,10 @@ class StolenRecord < ApplicationRecord
   end
 
   def notify_of_promoted_alert_recovery
-    promoted_alert = promoted_alerts.last || theft_alerts.last
-    return unless recovered? && promoted_alert.present?
+    return unless recovered? && promoted_alerts.any?
 
     Email::TheftAlertNotificationJob
-      .perform_async(promoted_alert.id, "theft_alert_recovered")
+      .perform_async(promoted_alerts.last.id, "theft_alert_recovered")
   end
 
   def all_location_attributes_present?

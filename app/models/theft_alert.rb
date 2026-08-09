@@ -225,8 +225,10 @@ class TheftAlert < ApplicationRecord
     stolen_record&.approved? || false
   end
 
+  # StolenRecord#theft_alert_missing_photo? counts promoted_alerts now. Its other half - that
+  # the record has an alert at all - is a given from here
   def missing_photo?
-    stolen_record.present? && stolen_record.theft_alert_missing_photo?
+    stolen_record&.missing_photo? || false
   end
 
   def facebook_name(kind = "campaign")

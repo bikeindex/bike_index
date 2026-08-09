@@ -95,9 +95,10 @@ class Payment < ApplicationRecord
     end
   end
 
-  # Backfills::PromotedAlertJob may not have copied this payment's alert over yet
+  # Payments whose alert Backfills::PromotedAlertJob hasn't copied over yet. Gated on the
+  # kind so every other payment resolves without touching theft_alerts
   def promoted_alert
-    super || theft_alert
+    super || (theft_alert if theft_alert?)
   end
 
   def paid?
