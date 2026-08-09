@@ -74,7 +74,7 @@
 
             <td>
               <%= link_to @bug_report.github_pull_request_url, class: "twlink" do %>
-                #<%= number_display(@bug_report.github_pull_request) %>
+                #<%= @bug_report.github_pull_request %>
               <% end %>
             </td>
           </tr>

@@ -85,7 +85,7 @@
           <td>
             <% if bug_report.github_pull_request.present? %>
               <%= link_to bug_report.github_pull_request_url do %>
-                #<%= number_display(bug_report.github_pull_request) %>
+                #<%= bug_report.github_pull_request %>
               <% end %>
             <% end %>
           </td>
