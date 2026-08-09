@@ -36,6 +36,14 @@
         </tr>
 
         <tr>
+          <td>Receiver</td>
+
+          <td>
+            <%= mail_to @bug_report.receiver, nil, class: "twlink" if @bug_report.receiver.present? %>
+          </td>
+        </tr>
+
+        <tr>
           <td>Received</td>
 
           <td>
@@ -66,7 +74,7 @@
 
             <td>
               <%= link_to @bug_report.github_pull_request_url, class: "twlink" do %>
-                #<%= number_display(@bug_report.github_pull_request) %>
+                #<%= @bug_report.github_pull_request %>
               <% end %>
             </td>
           </tr>
@@ -77,10 +85,11 @@
 
   <div class="col-md-6">
     <%= form_with(model: [:admin, @bug_report]) do |f| %>
-      <div class="mb-3">
-        <%= f.label :tags, "Tags (comma separated)", class: "twlabel" %>
-        <%= f.text_field :tags, value: @bug_report.tags.join(", "), class: "twinput" %>
-      </div>
+      <%= render(UI::Forms::Group::Component.new(attribute: :tags, form_builder: f)) do %>
+        <%= render UI::Forms::Combobox::Component.new(name: :tags, form: f, free_text: true,
+          options: searchable_tags, multiselect_chip_src: tag_chips_admin_bug_reports_path,
+          placeholder: "Select or create tags") %>
+      <% end %>
 
       <div class="mb-3">
         <%= f.label :github_pull_request, class: "twlabel" %>

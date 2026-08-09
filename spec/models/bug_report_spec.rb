@@ -2,11 +2,15 @@ require "rails_helper"
 
 RSpec.describe BugReport, type: :model do
   describe "set_calculated_attributes" do
-    let(:bug_report) { FactoryBot.create(:bug_report, email: "SomeOne@example.com ", tags: "Broken , search,broken,") }
+    let(:bug_report) do
+      FactoryBot.create(:bug_report, email: "SomeOne@example.com ",
+        receiver: " Contact@bikeindex.org", tags: "Broken , search,broken,")
+    end
 
-    it "normalizes email and tags" do
+    it "normalizes email, receiver and tags" do
       expect(bug_report).to have_attributes(email: "someone@example.com",
-        tags: %w[broken search], user_id: nil, is_member: false,
+        receiver: "contact@bikeindex.org", tags: %w[broken search],
+        user_id: nil, is_member: false,
         is_paid_organization: false, is_paid_organization_staff: false)
     end
 
@@ -87,6 +91,75 @@ RSpec.describe BugReport, type: :model do
       expect(BugReport.with_tag("broken").pluck(:id)).to eq([bug_report.id])
       expect(BugReport.with_tag("search").pluck(:id)).to match_array([bug_report.id, bug_report_other.id])
       expect(BugReport.all_tags).to eq(%w[broken search])
+    end
+  end
+
+  describe "all_receivers" do
+    let!(:bug_report) { FactoryBot.create(:bug_report, receiver: "support@bikeindex.org") }
+    let!(:bug_report_other) { FactoryBot.create(:bug_report, receiver: "contact@bikeindex.org") }
+    let!(:bug_report_without_receiver) { FactoryBot.create(:bug_report, receiver: nil) }
+
+    it "returns the distinct receivers" do
+      expect(BugReport.all_receivers).to eq(%w[contact@bikeindex.org support@bikeindex.org])
+    end
+  end
+
+  describe "display_receiver" do
+    it "drops our domain" do
+      expect(BugReport.display_receiver("contact@bikeindex.org")).to eq "contact"
+      expect(BugReport.display_receiver("someone@example.com")).to eq "someone@example.com"
+      expect(BugReport.display_receiver(nil)).to eq ""
+    end
+  end
+
+  describe "receiver_from_mail" do
+    let(:mail) { Mail.new(from: "someone@example.com", to: "Bugs@bikeindex.org", subject: "Hi", body: "Hello") }
+
+    it "normalizes the address it was sent to" do
+      expect(BugReport.receiver_from_mail(mail)).to eq "bugs@bikeindex.org"
+    end
+
+    context "addressed to someone else too" do
+      let(:mail) { Mail.new(from: "someone@example.com", to: ["friend@example.com", "contact@bikeindex.org"]) }
+
+      it "prefers our address" do
+        expect(BugReport.receiver_from_mail(mail)).to eq "contact@bikeindex.org"
+      end
+    end
+
+    context "with our address cc'd" do
+      let(:mail) { Mail.new(from: "someone@example.com", to: "friend@example.com", cc: "Support@bikeindex.org") }
+
+      it "receives the cc" do
+        expect(BugReport.receiver_from_mail(mail)).to eq "support@bikeindex.org"
+      end
+    end
+
+    context "with an X-Original-To header" do
+      let(:mail) do
+        Mail.new(:from => "someone@example.com", :to => "friend@example.com",
+          "X-Original-To" => "contact@bikeindex.org")
+      end
+
+      it "receives the envelope recipient" do
+        expect(BugReport.receiver_from_mail(mail)).to eq "contact@bikeindex.org"
+      end
+    end
+
+    context "without an address of ours" do
+      let(:mail) { Mail.new(from: "someone@example.com", to: "Friend@example.com") }
+
+      it "falls back to the first recipient" do
+        expect(BugReport.receiver_from_mail(mail)).to eq "friend@example.com"
+      end
+
+      context "without any recipient" do
+        let(:mail) { Mail.new(from: "someone@example.com") }
+
+        it "is nil" do
+          expect(BugReport.receiver_from_mail(mail)).to be_nil
+        end
+      end
     end
   end
 

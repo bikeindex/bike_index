@@ -16,7 +16,8 @@ RSpec.describe BugReportsMailbox do
     end.to change(BugReport, :count).by 1
 
     expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id,
-      subject: "Search is broken", body: "I searched and nothing happened",
+      receiver: "bugs@bikeindex.org", subject: "Search is broken",
+      body: "I searched and nothing happened",
       inbound_email_id: ActionMailbox::InboundEmail.last.id)
     expect(BugReport.last.received_at).to be_present
     expect(BugReportAutoPrioritizeJob.jobs.map { it["args"] }).to eq([[BugReport.last.id]])
@@ -32,7 +33,8 @@ RSpec.describe BugReportsMailbox do
       )
     end.to change(BugReport, :count).by 1
 
-    expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id, subject: "Question")
+    expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id,
+      receiver: "contact@bikeindex.org", subject: "Question")
   end
 
   context "with attachments" do
@@ -67,7 +69,8 @@ RSpec.describe BugReportsMailbox do
         )
       end.to change(BugReport, :count).by 1
 
-      expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id, subject: "Hi")
+      expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id,
+        receiver: "support@bikeindex.org", subject: "Hi")
     end
   end
 end

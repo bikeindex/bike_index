@@ -65,6 +65,11 @@ class CustomerMailer < ApplicationMailer
     @_action_has_layout = false # layout is manually included here
     @mail_snippet_body = mail_snippet.body
     @title = mail_snippet.subject
+    @unsubscribe_signed_id = @user.unsubscribe_signed_id
+
+    # RFC 8058 one-click, required by Gmail and Yahoo for bulk senders
+    headers["List-Unsubscribe"] = "<#{unsubscribe_update_user_url(@unsubscribe_signed_id)}>"
+    headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
 
     mail(to: @user.email, subject: @title, tag: __callee__)
   end
