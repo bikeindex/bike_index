@@ -42,7 +42,7 @@ class SessionsController < ApplicationController
 
   def magic_link
     @token = params[:token]
-    @incorrect_token = params[:incorrect_token].presence
+    @failure = magic_link_failure(params[:incorrect_token]) if params[:incorrect_token].present?
   end
 
   def sign_in_with_magic_link
@@ -131,6 +131,16 @@ class SessionsController < ApplicationController
   # redirect_forced_saml before_action; here only magic-link vs password remains.
   def login_method_for(email)
     Organization.passwordless_email_matching(email).present? ? "magic_link" : "password"
+  end
+
+  # Whatever killed a magic link token, it matches no user afterward - so the timestamp baked
+  # into the token is the only thing left to read. Old enough and it timed out; recent and it
+  # was spent signing in, or replaced by the link in a newer email.
+  def magic_link_failure(token)
+    return :unrecognized unless SecurityTokenizer.recognized_token?(token)
+
+    expired = SecurityTokenizer.token_time(token) < Time.current - User::AUTH_TOKEN_EXPIRY
+    expired ? :expired : :already_used
   end
 
   def send_magic_link_and_redirect(user)
