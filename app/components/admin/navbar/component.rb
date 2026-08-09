@@ -90,6 +90,7 @@ module Admin
           {title: "Memberships", path: admin_memberships_path, match_controller: true},
           {title: "Payments", path: admin_payments_path, match_controller: true},
           {title: "Organization Features", path: admin_organization_features_path, match_controller: true},
+          {title: "Registration Sequences", path: admin_registration_sequences_path, match_controller: true},
           {title: "Invoices", path: admin_invoices_path(query: "active", direction: "asc", sort: "subscription_end_at"), match_controller: true},
           {title: "Impound Records", path: admin_impound_records_path, match_controller: true},
           {title: "Parking Notifications", path: admin_parking_notifications_path, match_controller: true},
@@ -156,7 +157,6 @@ module Admin
           {title: "Dev: Strava Activities", path: admin_strava_activities_path, match_controller: true},
           {title: "Dev: Strava Gear", path: admin_strava_gears_path, match_controller: true},
           {title: "Dev: Paper Trail Versions", path: admin_paper_trail_versions_path, match_controller: true},
-          {title: "Dev: Registration Sequences", path: admin_registration_sequences_path, match_controller: true},
           {title: "Dev: Public Images", path: admin_public_images_path, match_controller: true}
         ]
       end

@@ -5151,7 +5151,7 @@ en:
   user_emails:
     confirm:
       confirm_email: Confirm email
-      you_should_be_confirmed_automatically: "%{user_email} should be confirmed automatically."
+      confirm_this_email: Confirm %{user_email}
   user_embeds:
     show:
       bike: Bike
@@ -5223,8 +5223,8 @@ en:
       this_user_has_no_bikes_yet: This user has no bikes yet!
       this_users_bikes: This user's bikes
     unsubscribe:
+      confirm_unsubscribe: Confirm you want to unsubscribe
       unsubscribe: Unsubscribe
-      you_should_be_unsubscribed_automatically: You should be unsubscribed automatically
     update_password_form_with_reset_token:
       and_try_not_to_forget_it: and try not to forget it...
       better_password: better

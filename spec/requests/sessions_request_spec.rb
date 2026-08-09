@@ -293,6 +293,29 @@ RSpec.describe SessionsController, type: :request do
     end
   end
 
+  describe "posting with a null origin" do
+    include_context :test_csrf_token
+    let!(:user) { FactoryBot.create(:user_confirmed) }
+
+    # Privacy extensions and VPNs strip the Origin header, which Rails rejects outright.
+    # Losing the session that failed the check is exactly when the form is worth keeping
+    it "hands identify back the email it was given" do
+      post "/session/identify", params: {session: {email: user.email}}, headers: {"HTTP_ORIGIN" => "null"}
+      expect(response).to render_template(:new)
+      expect(response.body).to match(user.email)
+      expect(flash[:error]).to match(/try again.*a VPN/i)
+    end
+
+    it "hands the magic link back its token, unspent" do
+      token = user.refreshed_magic_link_token
+      post "/session/sign_in_with_magic_link", params: {token:}, headers: {"HTTP_ORIGIN" => "null"}
+      expect(response).to render_template(:magic_link)
+      expect(user.reload.magic_link_token).to eq token
+      expect(Capybara.string(response.body))
+        .to have_css("form[action='/session/sign_in_with_magic_link'] input[name='token'][value='#{token}']", visible: :hidden)
+    end
+  end
+
   describe "remember_me across the magic-link round-trip" do
     let!(:user) { FactoryBot.create(:user_confirmed) }
     it "sets a permanent auth cookie when remember_me was chosen at request time" do
