@@ -61,7 +61,7 @@ module BikeServices
 
     def permitted_attributes(params)
       ActionController::Parameters.new(params).permit(:phone, :secondary_phone, :street, :city, :postal_code,
-        :country_id, :region_record_id, :police_report_number, :police_report_department, :estimated_value,
+        :country_id, :region_record_id, :region_string, :police_report_number, :police_report_department, :estimated_value,
         :theft_description, :locking_description, :lock_defeat_description, :proof_of_ownership,
         :receive_notifications, :phone_for_everyone, :phone_for_users,
         :phone_for_shops, :phone_for_police, :skip_geocoding)
