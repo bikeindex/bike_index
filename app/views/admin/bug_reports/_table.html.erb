@@ -17,6 +17,7 @@
 
       <th><%= sortable "received_at", "Received", render_sortable: %></th>
       <th><%= sortable "email", "Sender", render_sortable: %></th>
+      <th><%= sortable "receiver", "Receiver", render_sortable: %></th>
       <th>Subject</th>
       <th><%= sortable "status", "Status", render_sortable: %></th>
       <th>Tags</th>
@@ -50,6 +51,15 @@
           </td>
 
           <td>
+            <% if bug_report.receiver.present? %>
+              <small>
+                <%= BugReport.display_receiver(bug_report.receiver) %>
+              </small>
+              <%= link_to search_emoji, url_for(sortable_search_params.merge(search_receiver: bug_report.receiver)), class: "display-sortable-link small" %>
+            <% end %>
+          </td>
+
+          <td>
             <%= link_to bug_report.display_subject, admin_bug_report_path(bug_report) %>
           </td>
 
@@ -74,7 +84,7 @@
           <td>
             <% if bug_report.github_pull_request.present? %>
               <%= link_to bug_report.github_pull_request_url do %>
-                #<%= number_display(bug_report.github_pull_request) %>
+                #<%= bug_report.github_pull_request %>
               <% end %>
             <% end %>
           </td>
