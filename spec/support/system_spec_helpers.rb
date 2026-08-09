@@ -128,6 +128,16 @@ module SystemSpecHelpers
     expect(page).to have_css("##{element["commandfor"]}[open]")
   end
 
+  # Block until something the browser reaches on its own is true - a route handler's
+  # record of a request it answered, say, which no Capybara matcher can wait on.
+  def wait_for(timeout: 5)
+    deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + timeout
+    until yield
+      raise "waited #{timeout}s for the block to be true" if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
+      sleep 0.05
+    end
+  end
+
   # Flash messages are fixed position, so an undismissed one intercepts clicks on
   # whatever it overlays. ui--alert wires the close button in `connect` and
   # application.js lazy loads controllers, so a click landing before that module

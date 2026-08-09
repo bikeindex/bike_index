@@ -457,10 +457,24 @@ RSpec.describe "Register flow", :js, type: :system do
         click_combobox_option("Surly")
         check "Electric (motorized)"
         fill_in "b_param[owner_email]", with: owner_email
+
+        # Lengthens the wait rather than skipping it - the retry still runs, there's just
+        # time to look at the button while it's pending
+        page.execute_script(<<~JS)
+          document.querySelector("[data-controller~='register--retry']")
+            .setAttribute("data-register--retry-delay-value", "3000")
+        JS
         click_button "Next"
 
-        # The failure is never something the rider sees - the retry is what lands
-        expect(page).to have_content("Add your bike")
+        # Turbo re-enables the button it submitted from as soon as the failed submission
+        # finishes, so without the hold a rider could click through the wait and submit
+        # the step a second time
+        wait_for { failed_steps.any? }
+        expect(page).to have_button("Next", disabled: true)
+
+        # The failure is never something the rider sees - the retry is what lands.
+        # Waits out the lengthened retry, which is longer than Capybara's default
+        expect(page).to have_content("Add your bike", wait: 10)
 
         fill_in "bike[user_name]", with: user_name
         type_into("#bike_primary_frame_color_id", "Red")
