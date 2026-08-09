@@ -675,7 +675,7 @@ RSpec.describe UsersController, type: :request do
 
   describe "unsubscribe" do
     let!(:user) { FactoryBot.create(:user_confirmed, notification_newsletters: true) }
-    let(:signed_id) { user.signed_id(purpose: :unsubscribe, expires_in: 365.days) }
+    let(:signed_id) { user.unsubscribe_signed_id }
 
     it "renders" do
       expect(user.notification_newsletters).to be_truthy
@@ -737,7 +737,7 @@ RSpec.describe UsersController, type: :request do
 
   describe "unsubscribe_update" do
     let!(:user) { FactoryBot.create(:user_confirmed, notification_newsletters: true) }
-    let(:signed_id) { user.signed_id(purpose: :unsubscribe, expires_in: 365.days) }
+    let(:signed_id) { user.unsubscribe_signed_id }
 
     it "unsubscribes" do
       expect(user.notification_newsletters).to be_truthy
@@ -750,14 +750,33 @@ RSpec.describe UsersController, type: :request do
     context "current_user" do
       include_context :request_spec_logged_in_as_user
       let(:current_user) { FactoryBot.create(:user_confirmed, notification_newsletters: true) }
-      it "unsubscribes current user instead" do
+      it "unsubscribes the signed id's user, not the session's" do
         expect(current_user.notification_newsletters).to be_truthy
         post "#{base_url}/#{signed_id}/unsubscribe_update"
         expect(response.code).to eq("302")
         expect(flash[:success]).to be_present
-        expect(user.reload.notification_newsletters).to be_truthy
-        expect(current_user.reload.notification_newsletters).to be_falsey
+        expect(user.reload.notification_newsletters).to be_falsey
+        expect(current_user.reload.notification_newsletters).to be_truthy
       end
+    end
+
+    # RFC 8058 - the mail client's own unsubscribe button
+    context "one-click" do
+      include_context :test_csrf_token
+      it "unsubscribes without a session or a CSRF token" do
+        post "#{base_url}/#{signed_id}/unsubscribe_update", params: {"List-Unsubscribe" => "One-Click"}
+        expect(response.code).to eq("200")
+        expect(response.body).to be_blank
+        expect(user.reload.notification_newsletters).to be_falsey
+      end
+    end
+
+    # A mail client that doesn't do one-click opens the POST target in a browser
+    it "GET renders the interstitial rather than unsubscribing" do
+      get "#{base_url}/#{signed_id}/unsubscribe_update"
+      expect(response.code).to eq("200")
+      expect(response).to render_template("users/unsubscribe")
+      expect(user.reload.notification_newsletters).to be_truthy
     end
 
     context "with plain username" do
