@@ -118,6 +118,10 @@ in, neither of which shows up as an error — the page just behaves oddly:
   up on screen at once. Fix it at the controller with `before_action { request.format = :html }`
   for actions that only ever render pages. (An `.html.erb` view doesn't have this problem: the
   template's own format sets the content type.)
+- **`data-turbo="true"` on a form opts in every link inside it too** — navigability is
+  resolved with `closest("[data-turbo]")`, so it isn't scoped to the submission. A link that
+  leaves for a legacy jQuery page needs `data: {turbo: false}`, or it gets Turbo-rendered into
+  a body whose `loadPageScript` never runs. Links to pages the Stimulus redesign owns are fine.
 - **Turbo restores its own snapshot on back/forward**, which `Cache-Control: no-store` can't
   reach. If what a page renders depends on server state, opt out with
   `<meta name="turbo-cache-control" content="no-cache">` — the layout renders it when the

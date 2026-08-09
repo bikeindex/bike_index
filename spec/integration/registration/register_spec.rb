@@ -343,6 +343,38 @@ RSpec.describe "Register flow", :js, type: :system do
     end
   end
 
+  # A throttle answers text/plain, which Turbo renders as nothing at all, and asks to be
+  # waited for in tens of seconds - so retrying is neither possible to do silently nor
+  # worth doing behind a spinner
+  describe "a step the server throttles" do
+    it "stops retrying, says so, and gives the step back" do
+      attempts = []
+      visit "/register/new"
+      page.driver.with_playwright_page do |playwright_page|
+        playwright_page.route(%r{/register}, ->(route, request) {
+          next route.continue if request.method == "GET"
+
+          attempts << request.url
+          route.fulfill(status: 429, headers: {"retry-after" => "20"},
+            contentType: "text/plain", body: "Too Many Requests")
+        })
+      end
+
+      type_into("#b_param_manufacturer_id", "Surly")
+      click_combobox_option("Surly")
+      fill_in "b_param[owner_email]", with: owner_email
+      click_button "Next"
+
+      expect(page).to have_content("try again in a moment")
+      # It was told how long the wait is, so it didn't spend its retries finding out
+      expect(attempts.length).to eq 1
+      # The step is theirs to submit again, rather than a spinner that never resolves
+      expect(page).to have_button("Next", disabled: false)
+      expect(page).to have_field("b_param[owner_email]", with: owner_email)
+      expect(BParam.last.owner_email).to be_blank
+    end
+  end
+
   context "e-vehicle with an organization's safety rules" do
     let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
     # Built as a draft and activated below, since activation freezes the pages
@@ -459,17 +491,18 @@ RSpec.describe "Register flow", :js, type: :system do
         fill_in "b_param[owner_email]", with: owner_email
 
         # Lengthens the wait rather than skipping it - the retry still runs, there's just
-        # time to look at the button while it's pending
+        # time to look at the button while it's pending. The flag is what makes that time
+        # findable: Turbo re-enables the button as the failed submission ends, so a poll
+        # that lands before then would read the button the submit itself disabled
         page.execute_script(<<~JS)
-          document.querySelector("[data-controller~='register--retry']")
-            .setAttribute("data-register--retry-delay-value", "3000")
+          const form = document.querySelector("[data-controller~='register--retry']")
+          form.setAttribute("data-register--retry-delay-value", "3000")
+          form.addEventListener("turbo:submit-end", () => { window.submitEnded = true })
         JS
         click_button "Next"
 
-        # Turbo re-enables the button it submitted from as soon as the failed submission
-        # finishes, so without the hold a rider could click through the wait and submit
-        # the step a second time
-        wait_for { failed_steps.any? }
+        # Without the hold a rider could click through the wait, submitting the step twice
+        wait_for { page.evaluate_script("window.submitEnded") }
         expect(page).to have_button("Next", disabled: true)
 
         # The failure is never something the rider sees - the retry is what lands.

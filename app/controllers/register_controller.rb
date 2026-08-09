@@ -21,7 +21,7 @@ class RegisterController < ApplicationController
   # Every step is a page. A component takes its content type from the request, and a Turbo
   # submission asks for a turbo_stream first - which would hand the next step back as a
   # stream message, to be grafted onto the step it replaces rather than replacing it
-  before_action { request.format = :html }
+  before_action :force_html_response
   # The unfinished_registration alert links back to here, so it would sit on top of the
   # very flow that resolves it
   before_action { @skip_general_alert = true }
