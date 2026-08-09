@@ -3,8 +3,9 @@ name: admin-data-api
 description: >-
   Read live production data from Bike Index through the admin OAuth token —
   Sidekiq and PgHero status (`GET /api/admin_data/sidekiq`,
-  `GET /api/admin_data/pghero`) and the user-submitted bug reports
-  (`GET /admin/bug_reports.json`, `PATCH /admin/bug_reports/:id`) — the same
+  `GET /api/admin_data/pghero`) and the user-submitted bug reports (`GET
+  /admin/bug_reports.json`, `GET /admin/bug_reports/:id.json`, `PATCH
+  /admin/bug_reports/:id`) — the same
   data as the cookie-gated dashboards, but agent-friendly JSON. Trigger when
   the user asks about production queue depth, job backlog, retries/dead jobs,
   running Sidekiq processes, or Postgres health (slow/blocked queries, index
@@ -24,7 +25,7 @@ Production JSON reachable with the admin OAuth token:
 
 - `GET https://bikeindex.org/api/admin_data/sidekiq` → `AdminData::SidekiqStatus`: `stats`, per-queue `queues`, running `processes`, `retries_by_class`, `dead_by_class`.
 - `GET https://bikeindex.org/api/admin_data/pghero` → `AdminData::PgheroStatus`: `query_stats`, `database_size`, connection/query health, index usage, unused/invalid/duplicate indexes, sequence/txid/autovacuum danger, `settings`, etc. Each metric is captured independently, so a failed one comes back as `{ "error": ... }` in its slot instead of blanking the payload.
-- `GET /admin/bug_reports.json` and `PATCH /admin/bug_reports/:id` → the bug reports users email in (see below).
+- `GET /admin/bug_reports.json`, `GET /admin/bug_reports/:id.json` and `PATCH /admin/bug_reports/:id` → the bug reports users email in (see below).
 
 Auth is a Bearer token gated on the admin Doorkeeper app **and** a superuser ability for the controller — `admin_data` for the two status endpoints, `bug_reports` for the bug reports (a universal ability covers both). Controllers: `app/controllers/api/admin_data_controller.rb`, `app/controllers/admin/bug_reports_controller.rb`; auth concern: `app/controllers/concerns/api/token_authenticatable.rb`.
 

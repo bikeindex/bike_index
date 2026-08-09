@@ -3,6 +3,10 @@ require "rails_helper"
 base_url = "/admin/bug_reports"
 RSpec.describe Admin::BugReportsController, type: :request do
   let(:bug_report) { FactoryBot.create(:bug_report, tags: ["parking"]) }
+  let(:target_json) do
+    bug_report.as_json(only: %w[id user_id email from_name subject body tags github_pull_request
+      is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
+  end
   include_context :request_spec_logged_in_as_superuser
 
   describe "index" do
@@ -14,11 +18,6 @@ RSpec.describe Admin::BugReportsController, type: :request do
     end
 
     context "json" do
-      let(:target_json) do
-        bug_report.as_json(only: %w[id user_id email from_name subject body tags github_pull_request
-          is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
-      end
-
       it "renders a paginated list" do
         expect(bug_report).to be_present
         get "#{base_url}.json", params: {per_page: 1, search_status: "all"}
@@ -104,9 +103,7 @@ RSpec.describe Admin::BugReportsController, type: :request do
       it "renders the bug report" do
         get "#{base_url}/#{bug_report.to_param}.json"
         expect(response.status).to eq(200)
-        expect(json_result["bug_report"]).to eq(bug_report.as_json(only: %w[id user_id email from_name
-          subject body tags github_pull_request is_member is_paid_organization is_paid_organization_staff
-          received_at created_at updated_at]))
+        expect(json_result["bug_report"]).to eq(target_json)
       end
     end
   end

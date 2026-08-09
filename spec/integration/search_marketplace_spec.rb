@@ -87,8 +87,8 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   # Hold back the unfiltered results the frame eager-loads on arrival. Returns the
   # release, so the example decides when they land rather than racing a timer. The
   # release returns once that response is back - waiting on the one request it let
-  # through, rather than on the whole page going idle, which also waits out whatever
-  # else the listings are fetching and timed out at 30s on CI.
+  # through, not on the page going idle, which is hostage to every other fetch the
+  # listings it renders kick off.
   def hold_initial_results_load
     held = Queue.new
     held_urls = Queue.new
