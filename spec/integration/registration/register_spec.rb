@@ -59,6 +59,24 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_content("Add your bike")
   end
 
+  # An async combobox carries no options to map a saved id back to a name, so the server
+  # has to render the display itself - and a step 1 the back button returns to is where
+  # a raw id would show up instead
+  it "shows the manufacturer by name, not by id, when back returns to step 1" do
+    start_registration
+    page.go_back
+
+    expect(page).to have_field("b_param_manufacturer_id", with: "Surly")
+    # The id is what submits, and only ever from the hidden field
+    expect(find("input[name='b_param[manufacturer_id]']", visible: :all).value).to eq manufacturer.id.to_s
+    expect(page).to have_no_field("b_param_manufacturer_id", with: manufacturer.id.to_s)
+
+    # The registration kept the manufacturer itself, rather than falling back to
+    # Manufacturer.other with the id stored as free text
+    expect(BParam.last.manufacturer_id).to eq manufacturer.id
+    expect(BParam.last.manufacturer_other).to be_blank
+  end
+
   it "starts a registration, keeps a full details draft across a reload, and completes" do
     ActionMailer::Base.deliveries = []
     visit "/register/new"
