@@ -32,8 +32,7 @@
       aria-expanded="false"
     >
       <% if params[:search_displayed].present? %>
-        Only
-        <%= params[:search_displayed].titleize %>
+        Only <%= params[:search_displayed].titleize %>
       <% else %>
         Displayed and not
       <% end %>
