@@ -16,10 +16,24 @@
   <% end %>
 </div>
 
-<% if @pagy.next %>
-  <%= turbo_frame_tag "page_#{@pagy.next}", src: search_marketplace_path(page: @pagy.next, **params.except(:page, :controller, :action).permit!), loading: :lazy do %>
-    <div class="tw:py-4 tw:text-center">
-      <%= render UI::LoadingSpinner::Component.new(text: "Loading more...") %>
+<% if @pagy.pages > 1 %>
+  <div data-controller="search--pagination-fallback">
+    <%# The links are the non-JS path - with JS the next page lazy-loads on scroll instead %>
+    <div data-search--pagination-fallback-target="links">
+      <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: params)) %>
     </div>
-  <% end %>
+
+    <% if @pagy.next %>
+      <%= turbo_frame_tag "page_#{@pagy.next}", src: search_marketplace_path(page: @pagy.next, **params.except(:page, :controller, :action).permit!), loading: :lazy do %>
+        <%# Ships hidden so a non-JS user isn't left watching a fetch that never happens %>
+        <div
+          hidden
+          data-search--pagination-fallback-target="spinner"
+          class="tw:py-4 tw:text-center"
+        >
+          <%= render UI::LoadingSpinner::Component.new(text: "Loading more...") %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
 <% end %>

@@ -73,15 +73,18 @@ RSpec.describe "Search without JavaScript", type: :system do
   end
 
   describe "marketplace" do
-    # The :for_sale trait builds the listing's address_record, and the listing
-    # copies its coordinates onto the bike - which is what proximity filters on.
-    let!(:cheap_listing_nyc) { FactoryBot.create(:marketplace_listing, :for_sale, amount_cents: 200_00) }
-    let!(:pricey_listing_nyc) { FactoryBot.create(:marketplace_listing, :for_sale, amount_cents: 900_00) }
+    # 14 for-sale listings - two more than the 12 that fit on a page, so the
+    # unfiltered search spans two. The :for_sale trait builds each listing's
+    # address_record and copies its coordinates onto the bike, which is what
+    # proximity filters on.
+    let!(:cheap_listings_nyc) { FactoryBot.create_list(:marketplace_listing, 11, :for_sale, amount_cents: 200_00) }
     let!(:cheap_listing_la) { FactoryBot.create(:marketplace_listing, :for_sale, address_in: :los_angeles, amount_cents: 300_00) }
+    let!(:pricey_listings_nyc) { FactoryBot.create_list(:marketplace_listing, 2, :for_sale, amount_cents: 900_00) }
 
     let(:thumbnail) { "[data-test-id^='vehicle-thumbnail-linkspan-']" }
+    let(:pagination) { "[data-search--pagination-fallback-target='links']" }
 
-    it "renders listings server-side and filters via standard form submission" do
+    it "renders listings server-side, paginates and filters via standard form submission" do
       visit "/"
       click_link "Marketplace", exact: true, match: :first
 
@@ -91,23 +94,30 @@ RSpec.describe "Search without JavaScript", type: :system do
       expect(page).to have_css("[data-search-loading]", visible: :hidden)
       expect(page).to have_no_css(thumbnail)
 
-      # Submitting renders all three for-sale listings synchronously
+      # Submitting renders the first page of the 14 for-sale listings synchronously
       submit_search
-      expect(page).to have_css(thumbnail, count: 3)
+      expect(page).to have_css(thumbnail, count: 12)
 
-      # A max price drops the $900 listing
-      fill_in "price_max_amount", with: "500"
-      submit_search
+      # The lazy-loading frame that appends page 2 on scroll can't fetch itself
+      # without JS, so its spinner stays hidden and the links carry the user instead
+      expect(page).to have_css("turbo-frame#page_2 [data-search--pagination-fallback-target='spinner']", visible: :hidden)
+      within(pagination) { click_link "2" }
       expect(page).to have_css(thumbnail, count: 2)
 
+      # A max price drops both $900 listings, leaving a single page - so the
+      # pagination links go away
+      fill_in "price_max_amount", with: "500"
+      submit_search
+      expect(page).to have_css(thumbnail, count: 12)
+      expect(page).to have_no_css(pagination)
+
       # Proximity around NYC drops the LA listing. The price filter is re-rendered
-      # into the form, so it still applies - only the cheap NYC listing survives.
+      # into the form, so it still applies.
       choose "marketplace_scope_for_sale_proximity", visible: :all
       fill_in "distance", with: "200"
       fill_in "location", with: "New York, NY"
       submit_search
-      expect(page).to have_css("[data-test-id='vehicle-thumbnail-linkspan-#{cheap_listing_nyc.item_id}']", count: 1)
-      expect(page).to have_css(thumbnail, count: 1)
+      expect(page).to have_css(thumbnail, count: 11)
       expect(page).to have_current_path(/search_no_js/)
     end
   end
