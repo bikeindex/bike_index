@@ -103,7 +103,7 @@
 
   <a
     id="add-secondary"
-    class="optional-form-block"
+    class="optional-form-block tw:underline"
     data-target="#secondary-color"
     data-toggle="#rm-secondary"
     href="#"
@@ -113,7 +113,7 @@
 
   <a
     id="rm-secondary"
-    class="optional-form-block rm-block currently-hidden"
+    class="optional-form-block rm-block currently-hidden tw:underline"
     data-target="#secondary-color"
     data-toggle="#add-secondary"
     href="#"
@@ -132,7 +132,7 @@
 
     <a
       id="add-tertiary"
-      class="optional-form-block"
+      class="optional-form-block tw:underline"
       data-target="#tertiary-color"
       data-toggle="#rm-tertiary"
       href="#"
@@ -142,7 +142,7 @@
 
     <a
       id="rm-tertiary"
-      class="optional-form-block rm-block currently-hidden"
+      class="optional-form-block rm-block currently-hidden tw:underline"
       data-target="#tertiary-color"
       data-toggle="#add-tertiary"
       href="#"
@@ -369,7 +369,10 @@
     <strong><%= t(".image_has_been_uploaded") %></strong>
   <% else %>
     <div class="filefield-button">
-      <%= f.file_field :image, accept: ImageUploader.permitted_extensions.join(",") %>
+      <%# preflight strips the picker's native chrome; these approximate it back %>
+      <%= f.file_field :image, accept: ImageUploader.permitted_extensions.join(","),
+            class: "tw:file:mr-2 tw:file:rounded tw:file:border tw:file:border-gray-400 " \
+              "tw:file:bg-gray-100 tw:file:px-2 tw:file:py-0.5" %>
     </div>
     <div id="filepath"></div>
     <span style="margin-top: 0.25em">
