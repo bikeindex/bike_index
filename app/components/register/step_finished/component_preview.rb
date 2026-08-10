@@ -15,8 +15,7 @@ module Register
       end
 
       def bike_created
-        finished(current_user: lookbook_user, with_bike: true, owner_email: lookbook_user&.email,
-          bike_scope: ::Bike.unscoped.where.not(status: :status_stolen))
+        finished(current_user: lookbook_user, with_bike: true, owner_email: lookbook_user&.email)
       end
 
       # A theft was the point of the flow, so the card reports it rather than promising
@@ -46,7 +45,10 @@ module Register
 
       private
 
-      def finished(current_user:, with_bike: false, bike_scope: ::Bike.unscoped, **bike)
+      # An ordinary bike unless a preview asks otherwise: a stolen one renders the theft
+      # card, which is reported_stolen's to show
+      def finished(current_user:, with_bike: false,
+        bike_scope: ::Bike.unscoped.where.not(status: :status_stolen), **bike)
         return production_notice("registration") if Rails.env.production?
 
         created_bike_id = bike_scope.last&.id if with_bike
