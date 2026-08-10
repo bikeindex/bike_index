@@ -1,3 +1,9 @@
+// Layered so tailwind utilities override these without !important. The order must be
+// declared identically everywhere it appears -- see revised.scss for why.
+@layer theme, base, legacy, components, utilities;
+
+@layer legacy {
+
 /*
 
 Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
@@ -10011,3 +10017,5 @@ input.submit {
     font-size: 0.9em;
   }
 }
+
+} // end @layer legacy

@@ -1,3 +1,9 @@
+// Layered so tailwind utilities override these without !important. The order must be
+// declared identically everywhere it appears -- see revised.scss for why.
+@layer theme, base, legacy, components, utilities;
+
+@layer legacy {
+
 @import "legacy_includes/selectize_bootstrap3.scss";
 @import "legacy_includes/_colors.scss";
 @import "legacy_includes/_variables.scss";
@@ -688,3 +694,5 @@ a {
 .cursor-not-allowed {
   cursor: not-allowed;
 }
+
+} // end @layer legacy

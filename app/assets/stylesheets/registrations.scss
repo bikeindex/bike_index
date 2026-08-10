@@ -1,3 +1,9 @@
+// Layered so tailwind utilities override these without !important. The order must be
+// declared identically everywhere it appears -- see revised.scss for why.
+@layer theme, base, legacy, components, utilities;
+
+@layer legacy {
+
 @import "legacy_includes/selectize.bootstrap3";
 
 // TODO: import a manifest for assets here.
@@ -388,3 +394,5 @@ img {
   // NOT assigned in here. see PR#2866
   //
 }
+
+} // end @layer legacy

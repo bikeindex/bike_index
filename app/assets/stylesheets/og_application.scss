@@ -1,3 +1,9 @@
+// Layered so tailwind utilities override these without !important. The order must be
+// declared identically everywhere it appears -- see revised.scss for why.
+@layer theme, base, legacy, components, utilities;
+
+@layer legacy {
+
 /**** app/assets/stylesheets/og_application.ass ***/
 .red-text {
     color: #c0392b
@@ -16314,3 +16320,5 @@ body.welcome-page .content:before {
 .text-success {
     color: #27ae60;
 }
+
+} // end @layer legacy
