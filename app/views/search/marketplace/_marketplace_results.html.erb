@@ -16,10 +16,28 @@
   <% end %>
 </div>
 
-<% if @pagy.next %>
-  <%= turbo_frame_tag "page_#{@pagy.next}", src: search_marketplace_path(page: @pagy.next, **params.except(:page, :controller, :action).permit!), loading: :lazy do %>
-    <div class="tw:py-4 tw:text-center">
-      <%= render UI::LoadingSpinner::Component.new(text: "Loading more...") %>
+<% if @pagy.pages > 1 %>
+  <div data-controller="search--pagination-fallback">
+    <%#
+      Only one of these two survives search--pagination-fallback: the links are the
+      non-JS path, the lazy frame below appends the next page on scroll instead
+    %>
+
+    <div data-search--pagination-fallback-target="links">
+      <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: params,
+        size: :lg, data: {turbo_action: "advance"})) %>
     </div>
-  <% end %>
+
+    <% if @pagy.next %>
+      <%= turbo_frame_tag "page_#{@pagy.next}", src: search_marketplace_path(page: @pagy.next, **params.except(:page, :controller, :action).permit!), loading: :lazy do %>
+        <div
+          hidden
+          data-search--pagination-fallback-target="spinner"
+          class="tw:py-4 tw:text-center"
+        >
+          <%= render UI::LoadingSpinner::Component.new(text: "Loading more...") %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
 <% end %>

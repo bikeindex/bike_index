@@ -11,7 +11,7 @@ RSpec.describe Search::EverythingComboboxOptions::Component, type: :component do
     it "renders an option with the color swatch and 'that are' prefix" do
       expect(rendered.css(".hw-combobox__option").size).to eq 1
       expect(rendered.css(".hw-combobox__option .sch_").text).to include("Registrations that are")
-      expect(rendered.css(".hw-combobox__option span[title='Blue']").attr("style").value).to include("background: #00f")
+      expect(rendered.css(".hw-combobox__option span[aria-hidden]").attr("style").value).to include("background: #00f")
       expect(rendered.css(".hw-combobox__option .label").text).to eq "Blue"
     end
   end
@@ -20,7 +20,7 @@ RSpec.describe Search::EverythingComboboxOptions::Component, type: :component do
     let(:matches) { [{"search_id" => "c_9", "text" => Color::COVER_UP_NAME, "category" => "colors", "display" => nil}] }
 
     it "renders the multicolor swatch instead of a display fill" do
-      swatch = rendered.css(".hw-combobox__option span[title='#{Color::COVER_UP_NAME}']")
+      swatch = rendered.css(".hw-combobox__option span[aria-hidden]")
       expect(swatch.attr("style").value).to eq "background: #{Color::COVER_UP_SWATCH}"
     end
   end

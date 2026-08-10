@@ -147,6 +147,10 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     expect_axe_clean
     # Verify the lazy-loading frame for page 2 exists (5 listings remain)
     expect(page).to have_css("turbo-frame#page_2[loading='lazy']", visible: :all)
+    # Pagination is the fallback for users without JS - here the links are gone,
+    # and the spinner they ship hidden alongside is showing instead
+    expect(page).to have_no_link(exact_text: "2")
+    expect(page).to have_text("Loading more...")
     scroll_to_lazy_load
     # All 17 listings now visible (2 promoted + 15 standard); promoted bikes are not duplicated
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 17)
