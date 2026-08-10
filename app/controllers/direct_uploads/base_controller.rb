@@ -34,19 +34,8 @@ module DirectUploads
       super.merge(metadata: {})
     end
 
-    # The registration an upload is scoped to. Only the subclasses a token authorizes have one.
-    def b_param
-    end
-
-    # Prepended by those subclasses - a token that names no registration authorizes nothing
-    def require_registration
-      head :forbidden if b_param.blank?
-    end
-
-    # A signed id is a bearer token, so without this any registration could claim any blob.
-    # BParam#image_blob only hands back one stamped with its own id.
     def binx_data
-      b_param.present? ? {"b_param_id" => b_param.id} : {}
+      {}
     end
 
     def current_user

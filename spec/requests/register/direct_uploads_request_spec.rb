@@ -59,6 +59,35 @@ RSpec.describe Register::DirectUploadsController, type: :request do
     end
   end
 
+  # Only an organization hands its registrations' tokens to somebody else
+  context "somebody else's registration" do
+    let(:b_param) { BParam.create(origin: "registration_flow", creator_id: FactoryBot.create(:user_confirmed).id) }
+
+    it "is forbidden" do
+      post_upload
+      expect(response.status).to eq 403
+      expect(ActiveStorage::Blob.count).to eq 0
+    end
+  end
+
+  # The embed forms post here too. Their b_param is created by the organization's auto user,
+  # so the person filling the form in holds nothing but the token - which is all the form
+  # itself is scoped by either
+  context "an organization's embed registration" do
+    let(:organization) { FactoryBot.create(:organization_with_auto_user) }
+    # Created the same way the organizations controller creates one for the embed forms
+    let(:b_param) do
+      BParam.create(creator_id: organization.auto_user.id,
+        params: {creation_organization_id: organization.id, embeded: true, bike: {}})
+    end
+
+    it "issues a presigned upload to whoever holds the token" do
+      post_upload
+      expect(response.status).to eq 200
+      expect(ActiveStorage::Blob.last.binx_data).to eq({"b_param_id" => b_param.id})
+    end
+  end
+
   # Stays under the global requests/ip throttle (12 in test, see rails_helper) so it's this
   # throttle being measured and not that one
   describe "throttling" do
