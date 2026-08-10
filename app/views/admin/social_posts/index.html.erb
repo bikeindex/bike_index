@@ -19,8 +19,7 @@
       <% if @search_kind == "all" %>
         All kinds
       <% else %>
-        <%= @search_kind.gsub(/_?post/, "").humanize %>
-        posts
+        <%= @search_kind.gsub(/_?post/, "").humanize %> posts
       <% end %>
     </a>
 

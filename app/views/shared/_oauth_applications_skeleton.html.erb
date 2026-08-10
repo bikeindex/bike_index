@@ -1,7 +1,6 @@
 <div class="doorkeeper-container">
   <% if current_user&.superuser? && @application&.owner.present? %>
-    Application by
-    <strong><%= @application.owner.display_name %></strong>
+    Application by <strong><%= @application.owner.display_name %></strong>
   <% end %>
 
   <% if action_name != "index" %>
