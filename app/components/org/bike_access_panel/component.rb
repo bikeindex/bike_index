@@ -19,6 +19,10 @@ module Org
 
       private
 
+      def parking_notification
+        @parking_notification ||= ::ParkingNotification.build_for(bike: @bike, organization: @organization)
+      end
+
       def organization_registered?
         return @organization_registered if defined?(@organization_registered)
 

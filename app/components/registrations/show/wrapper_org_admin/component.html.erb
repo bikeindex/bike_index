@@ -60,7 +60,7 @@
                     tw:hover:border-[#715eb2] tw:dark:border-gray-700
                   "
                 >
-                  <%= image_tag(public_image.image_url(:small), alt: public_image.name.to_s, class: "tw:size-full tw:object-cover") %>
+                  <%= image_tag(public_image.image_url(:small), alt: public_image.image_alt, class: "tw:size-full tw:object-cover") %>
                 </a>
               </li>
             <% end %>

@@ -287,12 +287,13 @@ a {
   padding-top: 1em;
   border-top: 1px solid $grayLightish;
 
+  // organized/bikes/new_iframe still hand-rolls its photo field
   .filefield-button {
     float: left;
   }
 
-  span {
-    float: left;
+  // Direct children only - the upload component brings a span of its own
+  > span {
     color: $grayMed;
   }
 }

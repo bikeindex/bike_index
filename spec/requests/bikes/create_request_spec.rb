@@ -512,6 +512,28 @@ RSpec.describe "BikesController#create", type: :request do
         expect(new_bike.current_ownership.origin).to eq "embed"
       end
     end
+    context "with a photo" do
+      let(:blob) do
+        ActiveStorage::Blob.create_and_upload!(io: File.open(Rails.root.join("spec/fixtures/bike.jpg")),
+          filename: "bike.jpg", content_type: "image/jpeg")
+      end
+
+      it "stores the direct upload's signed id, and keeps it when a resubmission posts none" do
+        expect {
+          post base_url, params: {bike: bike_params.merge(image_signed_id: blob.signed_id, primary_frame_color_id: "")}
+        }.to_not change(Bike, :count)
+        expect(flash[:error]).to be_present
+        expect(b_param.reload.image_signed_id).to eq blob.signed_id
+        # It isn't a bike attribute, so it stays out of the bike params
+        expect(b_param.bike.keys).to_not include "image_signed_id"
+
+        # Blank is what the field posts when the browser hasn't uploaded anything this time
+        expect {
+          post base_url, params: {bike: bike_params.merge(image_signed_id: "")}
+        }.to change(Bike, :count).by(1)
+        expect(b_param.reload.image_signed_id).to eq blob.signed_id
+      end
+    end
     context "no organization" do
       it "registers" do
         b_param.reload

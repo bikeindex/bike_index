@@ -183,9 +183,9 @@
         <div id="stolenDisplay" class="input-group">
           <div class="control-group" style="width: 300px; max-width: 100%;">
             <%= builder.label :date_stolen, t(".when_was_it_stolen") %>
-            <% builder.object.date_stolen = Binxtils::TimeParser.round(builder.object.date_stolen || Time.current) %>
+            <% date_stolen = Binxtils::TimeParser.round(builder.object.date_stolen || Time.current) %>
             <%= builder.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
-            <%= builder.datetime_local_field :date_stolen, max: Binxtils::TimeParser.round(Time.current + 1.day), required: true, class: 'form-control', style: "font-size: 90%; width: 100%;" %>
+            <%= builder.datetime_local_field :date_stolen, value: date_stolen, max: Binxtils::TimeParser.round(Time.current + 1.day), required: true, class: 'form-control', style: "font-size: 90%; width: 100%;" %>
           </div>
         </div>
 
@@ -365,22 +365,22 @@
 </div>
 
 <div class="input-group form-photo-group">
-  <% if @b_param.image.present? or @b_param.image_tmp.present? %>
+  <% if @b_param.image.present? || @b_param.image_tmp.present? || @b_param.image_signed_id.present? %>
     <strong><%= t(".image_has_been_uploaded") %></strong>
   <% else %>
-    <div class="filefield-button">
-      <%# preflight strips the picker's native chrome; these approximate it back %>
-      <%= f.file_field :image, accept: ImageUploader.permitted_extensions.join(","),
-            class: "tw:file:mr-2 tw:file:rounded tw:file:border tw:file:border-gray-400 " \
-              "tw:file:bg-gray-100 tw:file:px-2 tw:file:py-0.5" %>
-    </div>
-    <div id="filepath"></div>
-    <span style="margin-top: 0.25em">
+    <span>
       <%= t(".optional_upload_a_photo") %>
 
       <small class="less-strong">
         (<%= ImageUploader.permitted_extensions_display.join(", ") %>)
       </small>
     </span>
+    <%#
+      A stale token leaves an unsaved registration with no token to upload against,
+      so the field posts its own bytes instead
+    %>
+    <%= render UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :image,
+          accept: ImageUploader.permitted_extensions,
+          direct_upload_url: (register_direct_uploads_path(b_param_token: @b_param.id_token) if @b_param.id_token.present?)) %>
   <% end %>
 </div>

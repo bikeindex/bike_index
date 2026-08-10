@@ -136,6 +136,9 @@ RSpec.describe OrganizationsController, type: :request do
         expect(response.headers["X-Frame-Options"]).to be_blank
         expect(response.body).to match("<title>Register a bike with #{current_organization.short_name}</title>")
         expect(response.body).to match("Click here to register a STOLEN")
+        # The photo uploads straight to storage, scoped by the registration's own token
+        expect(response.body).to include "bike[image_signed_id]"
+        expect(response.body).to include "/register/direct_uploads?b_param_token=#{assigns(:b_param).id_token}"
         expect(assigns(:current_user)&.id).to be_blank
         expect(assigns(:stolen)).to be_falsey
         expect(assigns(:bike).status).to eq "status_with_owner"

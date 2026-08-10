@@ -15,7 +15,7 @@
               - thumb_class = index == 0 ? 'current-thumb' : '' # make the first image current
               %li
                 %a.clickable-image{ class: thumb_class, data: { id: "image#{public_image.id}", img: public_image.image_url(:large), link: public_image.image_url } }
-                  = image_tag public_image.image_url(:small), alt: "#{public_image.name}", id: "i|#{public_image.listing_order}", data: { controller: "image-fallback", action: "error->image-fallback#useOriginal", "image-fallback-url-value": public_image.image_url }
+                  = image_tag public_image.image_url(:small), alt: public_image.image_alt, id: "i|#{public_image.listing_order}", data: { controller: "image-fallback", action: "error->image-fallback#useOriginal", "image-fallback-url-value": public_image.image_url }
         :plain
           <script id="current-photo-template" type="x-tmpl-mustache">
             <div id="{{id}}" style="display: none;">
