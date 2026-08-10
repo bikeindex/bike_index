@@ -119,6 +119,27 @@ RSpec.describe ParkingNotification, type: :model do
     end
   end
 
+  describe ".build_for" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications], approved: true) }
+
+    it "defaults the kind and the location, without a repeat to point at" do
+      built = ParkingNotification.build_for(bike:, organization:)
+      expect(built).to be_new_record
+      expect(built.bike_id).to eq bike.id
+      expect(built.organization_id).to eq organization.id
+      expect(built.is_repeat).to be_falsey
+      expect(built.kind).to eq ParkingNotification.kinds.first
+    end
+
+    it "takes the kind of the notification it would repeat" do
+      FactoryBot.create(:parking_notification, bike:, organization:, kind: "appears_abandoned_notification")
+      built = ParkingNotification.build_for(bike:, organization:)
+      expect(built.is_repeat).to be_truthy
+      expect(built.kind).to eq "appears_abandoned_notification"
+    end
+  end
+
   describe "initial/repeat_record" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }

@@ -88,6 +88,10 @@ class PublicImage < ApplicationRecord
     imageable.try(:display_name) || imageable.try(:name) || imageable.try(:title)
   end
 
+  # A bike's name is its title_string, which stands alone - everything else names itself
+  # after the source file, which doesn't
+  def image_alt = (bike? ? [name] : [name, imageable_name]).filter_map(&:presence).join(" - ")
+
   def default_name
     return "#{imageable&.title_string} #{imageable&.frame_colors&.to_sentence}" if bike?
 

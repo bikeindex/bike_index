@@ -25,7 +25,7 @@ The general `context`/`let` style and "what to test" rules are in the [`rspec-te
 
 If a user does it in the UI, the spec does it in the UI — every step, including setup. `FactoryBot.create(:bike, …)` to skip a complicated form turns the spec back into a model test and passes silently when the form is broken.
 
-If the UI path is hard or flaky, that's a real signal — usually a production bug (stale asset cache, missing seed data, wrong API URL). Fix the root cause; don't `execute_script` or factory around it.
+If the UI path is hard, that's a real signal — usually a production bug (stale asset cache, missing seed data, wrong API URL). Fix the root cause; don't `execute_script` or factory around it. When it's *intermittent* rather than hard, the same principle applies with sharper teeth — see [`fixing-flaky-failures`](../fixing-flaky-failures/SKILL.md), which owns flake diagnosis and the rule that coverage is never what gives way.
 
 Legitimate exceptions: reference data that exists in production via migrations, admin accounts outside the user flow, and stubs for genuinely external services (third-party APIs, Stripe, geocoders).
 

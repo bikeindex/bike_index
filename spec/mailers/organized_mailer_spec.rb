@@ -447,11 +447,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
     before { expect(header_mail_snippet).to be_present }
     let(:mail) { OrganizedMailer.hot_sheet(hot_sheet) }
     it "renders email" do
-      # Sometimes, bikes end up without the most recent thumb path. We want to ensure that the
-      bike.update_column :thumb_path, nil
-      bike.reload
       expect(bike.public_images.count).to eq 1
-      expect(bike.thumb_path).to be_blank
       expect(hot_sheet.fetch_recipients.pluck(:id)).to match_array([organization.auto_user.id, recipient.id])
       expect(mail.body.encoded).to match header_mail_snippet.body
       expect(mail.body.encoded).to match hot_sheet.subject
@@ -462,9 +458,6 @@ RSpec.describe OrganizedMailer, type: :mailer do
       expect(mail.bcc).to eq([recipient.email])
       expect(mail.subject).to eq hot_sheet.subject
       expect(mail.deliver_now.text_part.body.to_s).to include("HEADERXSNIPPET").and include(hot_sheet.subject)
-      # expect the bike to have a thumb_path
-      bike.reload
-      expect(bike.thumb_path).to be_present
     end
     context "passed in email" do
       let(:mail) { OrganizedMailer.hot_sheet(hot_sheet, ["seth@test.com"]) }

@@ -101,6 +101,10 @@ class MailSnippet < ApplicationRecord
       organization_snippets.dig(kind, :emails)
     end
 
+    def kind_display(kind)
+      "#{kind_humanized(kind)} - in #{organization_email_for(kind)} emails"
+    end
+
     def organization_emails_with_snippets
       # Worth noting: no snippet is named "finished_registration"
       ParkingNotification.kinds + %w[finished_registration finished_registration_stolen partial_registration
