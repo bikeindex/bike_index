@@ -9,7 +9,8 @@ module Bikes
       # The email loads email.css rather than tailwind, so the legacy class names stay on
       # as its styling hooks (revised/emails/email_stolen_checklist) - on the web they're
       # inert, and the tw: classes beside them are what render it
-      ITEM_CLASSES = "tw:relative tw:mt-2 tw:block tw:pl-8 tw:leading-normal"
+      # pl-9 rather than pl-8: the circle ends at 28px, so this leaves a gap beside it
+      ITEM_CLASSES = "tw:relative tw:mt-2 tw:block tw:pl-9 tw:leading-normal"
       # size-6 over a 2px border leaves a 20px line box; nudged down so the tick sits on
       # the same baseline as the item's first line rather than 2px above it
       BOX_CLASSES = "tw:absolute tw:top-0.5 tw:left-1 tw:block tw:min-h-6 tw:min-w-6 " \
