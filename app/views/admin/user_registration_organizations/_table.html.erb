@@ -40,9 +40,7 @@
             <% if user_registration_organization.user_id.present? %>
               <%= link_to user_registration_organization.user&.display_name, admin_user_path(user_registration_organization.user_id) %>
             <% else %>
-              Missing ID: "
-              <%= user_registration_organization.user_id %>
-              "
+              Missing ID: " <%= user_registration_organization.user_id %> "
             <% end %>
           </td>
 
