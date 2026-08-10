@@ -7,16 +7,9 @@ require "rails_helper"
 # its plain `query`/`serial` text fields, and the `search_no_js` hidden field is
 # never stripped, so submitting renders results synchronously instead of into the
 # eager turbo frame (whose `src` is never fetched without JS).
-RSpec.describe "Registration search without JavaScript", type: :system do
+RSpec.describe "Search without JavaScript", type: :system do
   include_context :geocoder_stubbed_bounding_box
   include_context :geocoder_default_location
-
-  let(:blue) { FactoryBot.create(:color, name: "Blue") }
-
-  let!(:blue_stolen_bike_nyc) { FactoryBot.create(:stolen_bike_in_nyc, primary_frame_color: blue) }
-  let!(:red_stolen_bike_nyc) { FactoryBot.create(:stolen_bike_in_nyc) }
-  let!(:blue_stolen_bike_la) { FactoryBot.create(:stolen_bike_in_los_angeles, primary_frame_color: blue) }
-  let!(:non_stolen_bike) { FactoryBot.create(:bike) }
 
   # type: :system defaults to the selenium driver; force rack_test so no
   # JavaScript runs at all
@@ -28,45 +21,94 @@ RSpec.describe "Registration search without JavaScript", type: :system do
     within("#Search_Form") { find("button[type='submit']").click }
   end
 
-  it "renders results server-side and filters via standard form submission" do
-    # Reach the search page the way a user does - from the homepage nav. The
-    # "Search" link carries stolenness=all (default_bike_search_path), so all
-    # registrations start in scope.
-    visit "/"
-    click_link "Search", exact: true, match: :first
+  describe "registrations" do
+    let(:blue) { FactoryBot.create(:color, name: "Blue") }
 
-    # Without JS the eager frame's src is never fetched, so the page initially
-    # shows the form with the results frame still empty (no results rendered).
-    expect(page).to have_css("turbo-frame#search_registrations_results_frame[src]", visible: :all)
-    expect(page).to have_no_css(".bike-box-item")
+    let!(:blue_stolen_bike_nyc) { FactoryBot.create(:stolen_bike_in_nyc, primary_frame_color: blue) }
+    let!(:red_stolen_bike_nyc) { FactoryBot.create(:stolen_bike_in_nyc) }
+    let!(:blue_stolen_bike_la) { FactoryBot.create(:stolen_bike_in_los_angeles, primary_frame_color: blue) }
+    let!(:non_stolen_bike) { FactoryBot.create(:bike) }
 
-    # The loading spinner ships hidden and is only revealed by JS - so a no-JS
-    # user is never stuck staring at a spinner the eager src can never resolve.
-    expect(page).to have_css("[data-search-loading]", visible: :hidden)
-    expect(page).to have_no_css("[data-search-loading]", visible: true)
+    it "renders results server-side and filters via standard form submission" do
+      # Reach the search page the way a user does - from the homepage nav. The
+      # "Search" link carries stolenness=all (default_bike_search_path), so all
+      # registrations start in scope.
+      visit "/"
+      click_link "Search", exact: true, match: :first
 
-    # Submitting renders results synchronously. The nav link pre-selected "all"
-    # registrations, so all four bikes match
-    submit_search
-    expect(page).to have_css(".bike-box-item", count: 4)
+      # Without JS the eager frame's src is never fetched, so the page initially
+      # shows the form with the results frame still empty (no results rendered).
+      expect(page).to have_css("turbo-frame#search_registrations_results_frame[src]", visible: :all)
+      expect(page).to have_no_css(".bike-box-item")
 
-    # Narrow to stolen only - the non-stolen bike drops out
-    choose "stolenness_stolen", visible: :all
-    submit_search
-    expect(page).to have_css(".bike-box-item", count: 3)
+      # The loading spinner ships hidden and is only revealed by JS - so a no-JS
+      # user is never stuck staring at a spinner the eager src can never resolve.
+      expect(page).to have_css("[data-search-loading]", visible: :hidden)
+      expect(page).to have_no_css("[data-search-loading]", visible: true)
 
-    # Proximity search around NYC drops the LA bike (outside the stubbed bounding box)
-    choose "stolenness_proximity", visible: :all
-    fill_in "distance", with: "200"
-    fill_in "location", with: "New York, NY"
-    submit_search
-    expect(page).to have_css(".bike-box-item", count: 2)
+      # Submitting renders results synchronously. The nav link pre-selected "all"
+      # registrations, so all four bikes match
+      submit_search
+      expect(page).to have_css(".bike-box-item", count: 4)
 
-    # A serial search across all registrations narrows to the single matching bike
-    choose "stolenness_all", visible: :all
-    fill_in "serial", with: blue_stolen_bike_nyc.serial_number
-    submit_search
-    expect(page).to have_css(".bike-box-item", count: 1)
-    expect(page).to have_current_path(/search_no_js/)
+      # Narrow to stolen only - the non-stolen bike drops out
+      choose "stolenness_stolen", visible: :all
+      submit_search
+      expect(page).to have_css(".bike-box-item", count: 3)
+
+      # Proximity search around NYC drops the LA bike (outside the stubbed bounding box)
+      choose "stolenness_proximity", visible: :all
+      fill_in "distance", with: "200"
+      fill_in "location", with: "New York, NY"
+      submit_search
+      expect(page).to have_css(".bike-box-item", count: 2)
+
+      # A serial search across all registrations narrows to the single matching bike
+      choose "stolenness_all", visible: :all
+      fill_in "serial", with: blue_stolen_bike_nyc.serial_number
+      submit_search
+      expect(page).to have_css(".bike-box-item", count: 1)
+      expect(page).to have_current_path(/search_no_js/)
+    end
+  end
+
+  describe "marketplace" do
+    # The :for_sale trait builds the listing's address_record, and the listing
+    # copies its coordinates onto the bike - which is what proximity filters on.
+    let!(:cheap_listing_nyc) { FactoryBot.create(:marketplace_listing, :for_sale, amount_cents: 200_00) }
+    let!(:pricey_listing_nyc) { FactoryBot.create(:marketplace_listing, :for_sale, amount_cents: 900_00) }
+    let!(:cheap_listing_la) { FactoryBot.create(:marketplace_listing, :for_sale, address_in: :los_angeles, amount_cents: 300_00) }
+
+    let(:thumbnail) { "[data-test-id^='vehicle-thumbnail-linkspan-']" }
+
+    it "renders listings server-side and filters via standard form submission" do
+      visit "/"
+      click_link "Marketplace", exact: true, match: :first
+
+      # Same eager-frame fallback as registrations: no src fetch, so nothing is
+      # rendered until the form is submitted, and the spinner stays hidden.
+      expect(page).to have_css("turbo-frame#marketplace_results_frame[src]", visible: :all)
+      expect(page).to have_css("[data-search-loading]", visible: :hidden)
+      expect(page).to have_no_css(thumbnail)
+
+      # Submitting renders all three for-sale listings synchronously
+      submit_search
+      expect(page).to have_css(thumbnail, count: 3)
+
+      # A max price drops the $900 listing
+      fill_in "price_max_amount", with: "500"
+      submit_search
+      expect(page).to have_css(thumbnail, count: 2)
+
+      # Proximity around NYC drops the LA listing. The price filter is re-rendered
+      # into the form, so it still applies - only the cheap NYC listing survives.
+      choose "marketplace_scope_for_sale_proximity", visible: :all
+      fill_in "distance", with: "200"
+      fill_in "location", with: "New York, NY"
+      submit_search
+      expect(page).to have_css("[data-test-id='vehicle-thumbnail-linkspan-#{cheap_listing_nyc.item_id}']", count: 1)
+      expect(page).to have_css(thumbnail, count: 1)
+      expect(page).to have_current_path(/search_no_js/)
+    end
   end
 end
