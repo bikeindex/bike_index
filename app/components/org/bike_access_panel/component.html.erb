@@ -552,8 +552,7 @@
 
             <% if @bike.status == "with_owner" %>
               but was sent to a new owner, so is now a standard
-              <%= @bike.type %>
-              on Bike Index.
+              <%= @bike.type %> on Bike Index.
             <% end %>
           </em>
         </div>
@@ -610,8 +609,7 @@
             impounded!
           <% else %>
             impounded by
-            <%= @bike.current_impound_record&.organized? ? @bike.current_impound_record.organization.name : "an individual" %>
-            !
+            <%= @bike.current_impound_record&.organized? ? @bike.current_impound_record.organization.name : "an individual" %> !
           <% end %>
         </span>
 
@@ -640,14 +638,7 @@
       <%= pluralize(number_with_delimiter(current_count), "current notification") %>,
       <% if resolved_notifications.count > 0 %>
         -
-        <a
-          href="#resolvedParkingNotificationTable"
-          aria-controls="resolvedParkingNotificationTable"
-          data-toggle="collapse"
-        >
-          show
-          <%= pluralize(number_with_delimiter(resolved_notifications.count), "resolved notification") %>
-        </a>
+        <a href="#resolvedParkingNotificationTable" aria-controls="resolvedParkingNotificationTable" data-toggle="collapse">show <%= pluralize(number_with_delimiter(resolved_notifications.count), "resolved notification") %></a>
       <% else %>
         <span class="less-strong">0 resolved notifications</span>
       <% end %>
@@ -709,7 +700,12 @@
                   <%= f.radio_button :is_repeat, false %> First notice
                 </label>
 
-                <label class="btn btn-secondary <%= "active" if @parking_notification.is_repeat %>" <%= "disabled" unless @parking_notification.can_be_repeat? %>> <%# herb:disable erb-no-output-in-attribute-position %>
+                <label
+                  class="btn btn-secondary <%= "active" if @parking_notification.is_repeat %>"
+                  <% unless @parking_notification.can_be_repeat? %>
+                    disabled
+                  <% end %>
+                >
                   <%= f.radio_button :is_repeat, true %>
                   <%# We have to add 1 on the repeat because this hasn't been created yet %>
                   Repeat

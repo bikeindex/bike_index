@@ -11,7 +11,7 @@
 # GitHub Repo: https://github.com/marcoroth/herb
 #
 
-version: 0.9.2
+version: 0.10.3
 
 files:
 #   # Additional patterns beyond the defaults (**.html, **.rhtml, **.html.erb, etc.)
@@ -53,6 +53,9 @@ linter:
     # .html_safe and .raw are always hacks and I know they're hacks and are avoided
     erb-no-unsafe-raw:
       enabled: false
+    # Commented-out output tags are kept on purpose - a TODO, or what a thing replaced
+    erb-no-commented-out-output-tags:
+      enabled: false
 
     #
     # Rules I'd like to enable but we have legacy things that make it hard
@@ -70,6 +73,29 @@ linter:
       enabled: false
     # Disabled: UI::Table column blocks run via instance_exec, so helpers need helpers. prefix
     actionview-no-silent-helper:
+      enabled: false
+
+    #
+    # Introduced in 0.9.3-0.10.3, disabled by `herb-lint --upgrade` because we have offenses.
+    # Each is worth fixing and re-enabling.
+    #
+    # Templates assign to the form/combobox builder before rendering it (9 offenses)
+    erb-no-unused-expressions:
+      enabled: false
+    # A template defines a helper method inline, whose body herb reads as a stray literal (1)
+    erb-no-unused-literals:
+      enabled: false
+    # Interpolated strings in <%= %> that want splitting into literal + separate tags (5, autocorrectable)
+    erb-prefer-direct-output:
+      enabled: false
+    # Bare & and > in copy that wants &amp;/&gt; (10)
+    html-no-unescaped-entities:
+      enabled: false
+    # False positive: a `tag` local shadows ActionView's tag builder, so `tag.id` reads as <id> (2)
+    html-no-unknown-tag:
+      enabled: false
+    # Our CSP allows inline <script> via unsafe_inline rather than nonces (40)
+    html-require-script-nonce:
       enabled: false
   #
   #   # Rules can have 'include', 'only', and 'exclude' patterns

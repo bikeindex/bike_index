@@ -35,9 +35,7 @@
                 <% if user_ban&.creator.present? %>
                   <%= user_ban.creator.display_name %>
                 <% elsif user_ban&.creator_id.present? %>
-                  User #
-                  <%= user_ban.creator_id %>
-                  (unknown user)
+                  User # <%= user_ban.creator_id %> (unknown user)
                 <% end %>
               </td>
             </tr>
@@ -190,8 +188,7 @@
                     <% else %>
                       Can access
                       <% if superuser_ability.action_name.present? %>
-                        <em><%= superuser_ability.action_name %></em>
-                        in
+                        <em><%= superuser_ability.action_name %></em> in
                       <% end %>
                       <%= superuser_ability.controller_name %>
                     <% end %>
@@ -476,7 +473,7 @@
 <h4 class="mt-4">
   OrganizationRoles
   <small class="less-strong mr-3"><%= number_display(@user.organization_roles.count) %></small>
-  
+
   <small class="d-inline-block less-strong"><% reg_orgs_count = @user.user_registration_organizations.count %> <%= link_to admin_user_registration_organizations_path(user_id: @user.id) do %><%= number_display(reg_orgs_count) %><% end %> <%= "registration org".pluralize(reg_orgs_count) %></small>
 </h4>
 
