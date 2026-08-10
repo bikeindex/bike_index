@@ -21,6 +21,13 @@ module Register
           bike_scope: ::Bike.unscoped.status_stolen)
       end
 
+      # A find ends on the ordinary card - the checklist and the heading are a theft's,
+      # since a found vehicle is waiting to be claimed rather than looked for
+      def reported_found
+        finished(current_user: lookbook_user, with_bike: true, owner_email: lookbook_user&.email,
+          status: "status_impounded", bike_scope: ::Bike.unscoped.status_impounded)
+      end
+
       # Registered for someone else, so the claim email is what went out
       def registered_for_owner
         finished(current_user: lookbook_user, with_bike: true, owner_email: "someone-else@bikeindex.org")
