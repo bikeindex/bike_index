@@ -1,6 +1,4 @@
-// Layered so tailwind utilities override these without !important. The order must be
-// declared identically everywhere it appears -- see revised.scss for why.
-@layer theme, base, legacy, components, utilities;
+@import "legacy_includes/css_layers";
 
 @layer legacy {
 
