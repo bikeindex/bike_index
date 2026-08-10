@@ -11,9 +11,6 @@ en:
         have_proof_of_ownership: I have proof I own this %{cycle_type}
         help_us_reunite: Help us get it back to its owner.
         how_did_you_find_it: How did you find the %{cycle_type}?
-        how_did_you_find_it_placeholder: >-
-          e.g. locked to a rack behind the library, looked like it had been there
-          for weeks
         how_was_it_locked: How was the %{cycle_type} locked?
         how_was_the_lock_defeated: How was the lock defeated?
         next: Next

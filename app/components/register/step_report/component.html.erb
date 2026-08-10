@@ -88,8 +88,7 @@
     <% else %>
       <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :impounded_description, kind: :text_area,
           label_text: translation(".how_did_you_find_it", cycle_type:), wrapper_class: "tw:mb-6",
-          html_options: {value: report_attrs[:impounded_description], rows: 3,
-            placeholder: translation(".how_did_you_find_it_placeholder")}) %>
+          html_options: {value: report_attrs[:impounded_description], rows: 3}) %>
     <% end %>
 
     <%= render UI::Button::Component.new(text: submit_text,
