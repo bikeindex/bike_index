@@ -1,4 +1,5 @@
-<%= render Register::Page::Component.new do %>
+<%# The checklist wants room, so a finished theft report is the one wide page here %>
+<%= render Register::Page::Component.new(wide: stolen_checklist?) do %>
   <div class="tw:px-1 tw:py-6 tw:text-center">
     <div
       class="
@@ -18,7 +19,12 @@
     %>
 
     <% if stolen_checklist? %>
-      <div class="tw:mb-6 tw:text-left">
+      <div
+        class="
+          tw:mb-6 tw:rounded-lg tw:bg-white tw:px-4 tw:py-3 tw:text-left
+          tw:dark:bg-gray-800
+        "
+      >
         <p class="tw:mb-2 tw:text-sm tw:font-semibold">
           <%= translation(".do_these_things") %>
         </p>
@@ -58,7 +64,7 @@
       </div>
     <% end %>
 
-    <div class="tw:flex tw:flex-col tw:gap-2.5">
+    <div class="tw:mx-auto tw:flex tw:max-w-md tw:flex-col tw:gap-2.5">
       <% if @bike.present? %>
         <%= render UI::ButtonLink::Component.new(href: bike_path(@bike), color: :primary, size: :lg,
             text: translation(self_made? ? ".view_your_registration" : ".view_the_registration"),

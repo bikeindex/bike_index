@@ -10,9 +10,11 @@ module Bikes
       # as its styling hooks (revised/emails/email_stolen_checklist) - on the web they're
       # inert, and the tw: classes beside them are what render it
       ITEM_CLASSES = "tw:relative tw:mt-2 tw:block tw:pl-8 tw:leading-normal"
-      BOX_CLASSES = "tw:absolute tw:top-1 tw:left-1 tw:block tw:min-h-6 tw:min-w-6 " \
-        "tw:rounded-full tw:border-2 tw:border-[#919197] tw:bg-white tw:p-px tw:text-center " \
-        "tw:leading-none tw:text-[#919197]"
+      # size-6 over a 2px border leaves a 20px line box; nudged down so the tick sits on
+      # the same baseline as the item's first line rather than 2px above it
+      BOX_CLASSES = "tw:absolute tw:top-0.5 tw:left-1 tw:block tw:min-h-6 tw:min-w-6 " \
+        "tw:rounded-full tw:border-2 tw:border-[#919197] tw:bg-white tw:text-center " \
+        "tw:leading-5 tw:text-[#919197]"
       # The sub-list's marker is a dash rather than a circle
       DASH_CLASSES = "tw:absolute tw:top-3 tw:left-1 tw:block tw:min-h-[0.2em] tw:min-w-6 " \
         "tw:border-2 tw:border-[#919197] tw:bg-[#919197]"
