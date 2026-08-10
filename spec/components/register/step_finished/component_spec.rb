@@ -60,14 +60,16 @@ RSpec.describe Register::StepFinished::Component, type: :component do
       end
     end
 
-    # A find is waiting to be claimed rather than looked for, so it ends on the ordinary
-    # card - the heading and the checklist are a theft's
+    # A find is waiting to be claimed rather than looked for, so the checklist a theft
+    # ends on isn't its
     context "status_impounded" do
       let(:bike) { FactoryBot.create(:impounded_bike, :with_ownership, owner_email: "someone@bikeindex.org") }
 
-      it "says it's being watched over, like any other registration" do
-        expect(component).to have_text("Registration complete!")
-        expect(component).to have_text("We'll keep watch")
+      it "says it's listed as found, and who it's waiting for" do
+        expect(component).to have_css("h1", text: "is listed as found on Bike Index")
+        expect(component).to have_text("Its owner can find it here and claim it")
+        # Not the registrant's to be watched over, and no checklist - it isn't lost
+        expect(component).to have_no_text("We'll keep watch")
         expect(component).to have_no_css("ul.stolen-checklist")
       end
     end

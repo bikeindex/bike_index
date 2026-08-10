@@ -25,8 +25,8 @@ module Register
           bike_scope: ::Bike.unscoped.status_stolen)
       end
 
-      # A find ends on the ordinary card - the checklist and the heading are a theft's,
-      # since a found vehicle is waiting to be claimed rather than looked for
+      # A find is waiting to be claimed rather than looked for, so it says that instead
+      # of the checklist a theft ends on
       def reported_found
         finished(current_user: lookbook_user, with_bike: true, owner_email: lookbook_user&.email,
           status: "status_impounded", bike_scope: ::Bike.unscoped.status_impounded)
