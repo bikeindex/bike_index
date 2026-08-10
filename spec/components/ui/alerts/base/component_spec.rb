@@ -26,7 +26,7 @@ RSpec.describe UI::Alerts::Base::Component, type: :component do
       let(:options) { {text: "some text", kind: "purple"} }
 
       it "announces the meaning rather than the color" do
-        expect(component.css(".tw\\:sr-only").text).to eq I18n.t("components.ui.alerts.base.notice")
+        expect(component.css(".tw\\:sr-only").text).to eq I18n.t("components.ui.alerts.base.info")
         expect(component.to_html).to_not include "Purple"
       end
     end
