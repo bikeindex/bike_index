@@ -3265,9 +3265,9 @@ CREATE TABLE public.promoted_alerts (
 --
 
 CREATE SEQUENCE public.promoted_alerts_id_seq
-    START WITH 1
+    START WITH 10000
     INCREMENT BY 1
-    NO MINVALUE
+    MINVALUE 10000
     NO MAXVALUE
     CACHE 1;
 

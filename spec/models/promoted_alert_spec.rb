@@ -1,6 +1,25 @@
 require "rails_helper"
 
 RSpec.describe PromotedAlert, type: :model do
+  describe "duplicate of TheftAlert" do
+    it "has everything TheftAlert has" do
+      expect(TheftAlert.column_names - PromotedAlert.column_names).to eq([])
+      expect(TheftAlert.constants(false) - PromotedAlert.constants(false)).to eq([])
+      expect(TheftAlert.instance_methods(false) - PromotedAlert.instance_methods(false)).to eq([])
+      expect(TheftAlert.singleton_methods(false) - PromotedAlert.singleton_methods(false)).to eq([])
+    end
+  end
+
+  describe "id sequence" do
+    # Backfills::PromotedAlertJob copies theft_alerts across keeping their ids - CreatePromotedAlerts
+    # reserves that range, and MINVALUE is what carries the reservation into db/structure.sql
+    let(:min_value) { PromotedAlert.connection.select_value("SELECT min_value FROM pg_sequences WHERE sequencename = 'promoted_alerts_id_seq'") }
+    it "starts above the reserved ids" do
+      expect(min_value).to be > 1
+      expect(FactoryBot.create(:promoted_alert).id).to be >= min_value
+    end
+  end
+
   describe "factory" do
     let(:promoted_alert) { FactoryBot.build(:promoted_alert) }
     it "is valid" do
