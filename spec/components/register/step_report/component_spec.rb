@@ -28,7 +28,8 @@ RSpec.describe Register::StepReport::Component, type: :component do
     expect(page).to_not have_field("report[impounded_description]")
   end
 
-  context "already reported" do
+  # Saved report data, which is what a re-render reads back - not a finished report
+  context "with report data" do
     let(:params) do
       super().merge(stolen_record: {date_stolen: "2026-08-05T14:30:00-05:00", street: "1 Main St",
                                     theft_description: "Cut lock", phone_for_users: "0"})

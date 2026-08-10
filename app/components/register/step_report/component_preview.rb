@@ -13,8 +13,9 @@ module Register
         step_report(status: "status_impounded")
       end
 
-      # Coming back to a report that's already been filled in
-      def already_reported
+      # The step re-rendered over what was entered before - coming back to it, or a
+      # submission that didn't say when and where. Saved report data, not a finished report
+      def with_report_data
         step_report(status: "status_stolen", stolen_record: {
           date_stolen: Time.current - 3.days, street: "1 Main St", city: "Chicago",
           theft_description: "Locked to a rack outside the coffee shop",
