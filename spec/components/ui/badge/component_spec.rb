@@ -77,6 +77,25 @@ RSpec.describe UI::Badge::Component, type: :component do
     end
   end
 
+  describe "decorative leading elements" do
+    context "with an icon" do
+      let(:options) { {text:, icon: "link"} }
+
+      it "hides the icon from screen readers" do
+        expect(component.css("svg[aria-hidden='true']")).to be_present
+        expect(component).to have_text("Test Badge")
+      end
+    end
+
+    context "with an indicator" do
+      let(:options) { {text:, indicator: true} }
+
+      it "hides the dot from screen readers" do
+        expect(component.css("span[aria-hidden='true']")).to be_present
+      end
+    end
+  end
+
   context "with content block" do
     let(:component) { render_inline(described_class.new(text: "Fallback")) { "Block content" } }
 
