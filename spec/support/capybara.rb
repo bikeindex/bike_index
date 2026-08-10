@@ -13,6 +13,18 @@ Capybara.register_driver :playwright do |app|
     viewport: {width: 1920, height: 1080})
 end
 
+# The same browser with scripting turned off, for specs about what a rider without
+# JavaScript gets. rack_test can't answer that on its own: it applies no stylesheets and
+# runs no HTML5 constraint validation, so a form a real browser refuses to submit (a
+# required control hidden by CSS) passes there.
+Capybara.register_driver :playwright_no_js do |app|
+  Capybara::Playwright::Driver.new(app,
+    browser_type: :chromium,
+    headless: true,
+    javaScriptEnabled: false,
+    viewport: {width: 1920, height: 1080})
+end
+
 Capybara.configure do |config|
   config.default_driver = :playwright
   config.javascript_driver = :playwright
@@ -47,8 +59,13 @@ RSpec.configure do |config|
     ENV["BASE_URL"] = original_base_url
   end
 
-  config.before(:each, :js) do
-    Capybara.current_session.driver.with_playwright_page do |playwright_page|
+  # Any playwright-driven example, scripting or not - rack_test fetches no external
+  # host, so it has nothing to block and no page to reach through
+  config.before(:each, type: :system) do
+    driver = Capybara.current_session.driver
+    next unless driver.respond_to?(:with_playwright_page)
+
+    driver.with_playwright_page do |playwright_page|
       BLOCKED_EXTERNAL_HOSTS.each do |host|
         playwright_page.route("https://#{host}/**", ->(route, _request) { route.abort })
       end

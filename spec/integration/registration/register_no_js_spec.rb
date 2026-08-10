@@ -2,12 +2,14 @@
 
 require "rails_helper"
 
-# Without the :js tag these run on the rack_test driver, which never executes
-# JavaScript - so the steps post as plain forms (the `data-turbo` they carry is
-# inert), and register--retry, the submit spinners and the comboboxes never wire
-# up. A combobox submits through a hidden field only its Stimulus controller
-# writes, so each one the flow needs is backed by a UI::Forms::NoJsField control
-# that only exists when scripting is off - a select, or a textbox where a list
+# A real browser with scripting turned off, which is the only thing that answers what a
+# rider without JavaScript actually gets: the steps post as plain forms (the `data-turbo`
+# they carry is inert), register--retry and the submit spinners never wire up, `<noscript>`
+# becomes real DOM, and - the part no other driver reaches - the browser runs HTML5
+# constraint validation and applies the stylesheet that hides each combobox.
+#
+# A combobox submits through a hidden field only its Stimulus controller writes, so each
+# one is backed by a UI::Forms::NoJsField control: a select, or a textbox where a list
 # can't serve.
 RSpec.describe "Register flow without JavaScript", type: :system do
   let(:owner_email) { "owner@bikeindex.org" }
@@ -15,9 +17,7 @@ RSpec.describe "Register flow without JavaScript", type: :system do
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
   let!(:red) { FactoryBot.create(:color, name: "Red") }
 
-  # type: :system defaults to the selenium driver; force rack_test so no
-  # JavaScript runs at all
-  before { driven_by(:rack_test) }
+  before { driven_by(:playwright_no_js) }
 
   it "registers a bike through the plain controls the comboboxes fall back to" do
     visit "/register/new"
@@ -27,20 +27,14 @@ RSpec.describe "Register flow without JavaScript", type: :system do
     expect(page).to have_current_path(/register\?b_param_token=.+&step=1/, url: true)
     expect(page).to have_content("Register your bike!")
 
-    # The combobox is inside the wrapper the fallback's stylesheet hides, and the field
-    # carrying its name is the control standing in for it - a textbox here, since
-    # manufacturers are autocompleted from an endpoint and take free text
-    expect(page).to have_css("[data-js-required] input#b_param_manufacturer_id")
-    expect(page).to have_css("noscript input[name='b_param[manufacturer_id]']", visible: :all)
+    # The combobox really is hidden here - the stylesheet ships inside the noscript, so
+    # this is a rendering only a browser with scripting off produces
+    expect(page).to have_no_css("[data-js-required] input#b_param_manufacturer_id")
+    # ...and the control standing in for it is the one a rider can see and use. A textbox,
+    # since manufacturers are autocompleted from an endpoint and take free text
+    expect(page).to have_css("input[name='b_param[manufacturer_id]']")
     # The cycle types are a list worth showing, so that one falls back to a select
-    expect(page).to have_css("noscript select[name='b_param[cycle_type]']", visible: :all)
-
-    # The hidden combobox must not be `required` - a browser won't submit a form holding a
-    # required control it can't focus, so a rider would fill the fallback in and go nowhere.
-    # ui--forms--js-required puts it back. rack_test runs no constraint validation, so this
-    # is the only part of that a spec can see
-    expect(page).to have_css("[data-js-required] input#b_param_manufacturer_id:not([required])")
-    expect(page).to have_css("noscript input[name='b_param[manufacturer_id]'][required]", visible: :all)
+    expect(page).to have_select("b_param[cycle_type]")
 
     fill_in "b_param[manufacturer_id]", with: "Surly"
     fill_in "b_param[owner_email]", with: owner_email
@@ -138,15 +132,24 @@ RSpec.describe "Register flow without JavaScript", type: :system do
     end
   end
 
-  it "says what's missing when a required textbox is left empty" do
+  # The browser's own validation, which is what makes the fallback a control rather than
+  # decoration - and what a required combobox hidden behind it would break, since a form
+  # holding a required control it can't focus is one the browser refuses to submit at all
+  it "holds the step until the fallback is filled, then lets it through" do
     visit "/register/new"
+    step_1_url = page.current_url
+
     fill_in "b_param[owner_email]", with: owner_email
     click_button "Next"
 
-    # Nothing silently swallowed - the step re-renders with what was entered
-    expect(page).to have_content("Manufacturer is required to register")
-    expect(page).to have_field("b_param[owner_email]", with: owner_email)
-    expect(page.status_code).to eq 422
+    # Nothing entered for the manufacturer, so the browser never posts it
+    expect(page).to have_current_path(step_1_url, url: true)
     expect(BParam.last.manufacturer_id).to be_blank
+
+    fill_in "b_param[manufacturer_id]", with: "Surly"
+    click_button "Next"
+
+    expect(page).to have_content("Add your bike")
+    expect(BParam.last.manufacturer_id).to eq manufacturer.id
   end
 end
