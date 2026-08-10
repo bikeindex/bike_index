@@ -18,13 +18,12 @@
     %>
 
     <% if stolen_checklist? %>
-      <%# stolen-checklist-wrap is what the checklist's own styles hang off %>
-      <div class="stolen-checklist-wrap tw:mb-6 tw:text-left">
+      <div class="tw:mb-6 tw:text-left">
         <p class="tw:mb-2 tw:text-sm tw:font-semibold">
           <%= translation(".do_these_things") %>
         </p>
 
-        <%= render partial: "bikes/stolen_checklist", locals: {bike: @bike, stolen_record: @bike.current_stolen_record} %>
+        <%= render Bikes::StolenChecklist::Component.new(bike: @bike, stolen_record: @bike.current_stolen_record) %>
       </div>
     <% end %>
 
