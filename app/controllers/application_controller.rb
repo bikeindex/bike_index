@@ -25,8 +25,7 @@ class ApplicationController < ActionController::Base
     redirect_to user_root_url
   end
 
-  # Overrides hand back the form they were given rather than redirecting, so they share the
-  # copy from here - one scope literal instead of one per controller
+  # Shared with the controllers that override handle_unverified_request to re-render
   def invalid_authenticity_token_message
     translation(:invalid_authenticity_token, scope: [:controllers, :application, :handle_unverified_request])
   end

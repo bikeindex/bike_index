@@ -2,8 +2,7 @@
 
 require "rails_helper"
 
-# Request specs post directly, so a real browser is the only place that can prove the form
-# doesn't submit itself — which is the whole point of the interstitial
+# Request specs post directly, so only a real browser can prove the form doesn't submit itself
 RSpec.describe Sessions::SignInInterstitial::Component, :js, type: :system do
   let(:base_url) { "/rails/view_components/sessions/sign_in_interstitial/component" }
 

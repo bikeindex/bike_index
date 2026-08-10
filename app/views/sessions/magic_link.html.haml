@@ -8,7 +8,7 @@
       - detail = nil
       - if @failure == :expired
         - header = t(".link_expired")
-        - detail = t(".links_work_for", hours: User::AUTH_TOKEN_EXPIRY.in_hours.to_i)
+        - detail = t(".links_work_for", duration: distance_of_time_in_words(User::AUTH_TOKEN_EXPIRY))
       - elsif @failure == :already_used
         - header = t(".link_already_used")
         - detail = t(".only_the_newest_link_works")
