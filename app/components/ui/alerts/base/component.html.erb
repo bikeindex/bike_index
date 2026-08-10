@@ -10,7 +10,7 @@
       <%= helpers.inline_svg_tag(default_icon, class: "tw:h-4 tw:w-4", aria_hidden: true) %>
     <% end %>
 
-    <span class="tw:sr-only"><%= @kind.to_s.titleize %></span>
+    <span class="tw:sr-only"><%= announcement %></span>
   </div>
 
   <% if @dismissable %>
