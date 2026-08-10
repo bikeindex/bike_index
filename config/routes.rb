@@ -187,7 +187,8 @@ Rails.application.routes.draw do
     post :confirm_email
   end
 
-  # Registration photos upload before there's a session, so they get their own endpoint
+  # Registration photos - the /register flow's and the embed forms' - upload before
+  # there's a session, so they get their own endpoint
   post "/register/direct_uploads" => "register/direct_uploads#create", :as => :register_direct_uploads
 
   # Shadows ActiveStorage's own route (drawn last, so this wins) so the stock controller, which

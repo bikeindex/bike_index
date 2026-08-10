@@ -17,7 +17,7 @@ This project uses RSpec. All business logic should be tested.
 
 Pass the files or directories you changed — `bundle exec rspec spec/components/ui/table spec/requests/bikes/show_request_spec.rb`. Never run a bare `bundle exec rspec`, `spec/`, or a whole top-level directory like `spec/components` or `spec/requests`: those take many minutes and sweep in `:flaky`-tagged system specs. CI runs the full suite.
 
-When something fails outside the files you changed, re-run that spec file on its own before treating it as yours. Passing alone means the full run was order-dependent or flaky (check whether its `describe` is tagged `:flaky`); failing alone means it's real, and a real failure gets fixed, never excused as pre-existing.
+When something fails outside the files you changed, re-run that spec file on its own before treating it as yours. Failing alone means it's real, and a real failure gets fixed, never excused as pre-existing. Passing alone means the full run was order-dependent or flaky — that's the [`fixing-flaky-failures`](../fixing-flaky-failures/SKILL.md) skill, and its first rule is that you can't reach for a retry, a looser matcher, or a deleted assertion to make it green.
 
 ## What to test (and what not to)
 

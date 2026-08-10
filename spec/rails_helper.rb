@@ -21,6 +21,8 @@ ENV["RAILS_ENV"] ||= "test"
 ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"] = "true"
 ENV["RACK_ATTACK_MAX_LIMIT"] ||= "12"
 ENV["RACK_ATTACK_API_MAX_LIMIT"] ||= "15"
+# Production's hourly budget can't be driven to 429 under RACK_ATTACK_MAX_LIMIT above
+ENV["RACK_ATTACK_REGISTER_DIRECT_UPLOAD_LIMIT"] ||= "5"
 require "spec_helper"
 # Load functionable patch before Rails boot so all Functionable modules get permissive test hooks
 require File.expand_path("../../config/boot", __FILE__)

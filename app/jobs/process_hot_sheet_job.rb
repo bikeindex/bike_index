@@ -14,7 +14,9 @@ class ProcessHotSheetJob < ScheduledJob
     return hot_sheet if hot_sheet&.email_success?
 
     hot_sheet ||= HotSheet.create!(organization_id: org_id, sheet_date: Time.current.to_date)
-    hot_sheet.fetch_stolen_records
+    # Bump bike cached attributes, to be sure the email has all the info. Once per sheet -
+    # deliver_email sends a separate email per 48 recipients, all rendering the same bikes
+    hot_sheet.fetch_stolen_records.each { it.bike.update(updated_at: Time.current) }
     hot_sheet.fetch_recipients
     hot_sheet.deliver_email
   end

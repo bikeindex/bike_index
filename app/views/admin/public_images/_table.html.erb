@@ -50,7 +50,7 @@
 
               <% if image_url.present? %>
                 <%= link_to image_url do %>
-                  <%= image_tag(public_image.image_url(:small), class: "tw:max-h-12", loading: "lazy",
+                  <%= image_tag(public_image.image_url(:small), class: "tw:max-h-12", loading: "lazy", alt: public_image.image_alt,
                     data: {controller: "image-fallback", action: "error->image-fallback#useOriginal", "image-fallback-url-value": image_url}) %>
                 <% end %>
               <% end %>
