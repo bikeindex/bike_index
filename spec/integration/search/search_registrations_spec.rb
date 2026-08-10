@@ -29,12 +29,16 @@ RSpec.describe "Bike search", :js, type: :system do
   end
 
   def click_first_bike_and_go_back
-    first(".bike-box-item .title-link a").click
+    # Click what a user would: results that have finished loading. A restoration
+    # fires turbo:load, which is where reloadFrameIfUrlStale can put the frame back
+    # in flight, and a click landing while that swap runs navigates nowhere.
+    expect(page).to have_css("turbo-frame#search_registrations_results_frame[complete]:not([busy])", wait: 10)
+    retry_on_detach { first(".bike-box-item .title-link a").click }
     # Assert the navigation separately from the render: this flakes on CI, and the
     # two failures have different causes. A nil current_path is the browser sitting
-    # on about:blank - Capybara returns nil for an `about:` scheme - so the page
-    # itself went away rather than the click missing; current_path without the h1
-    # means the bike page was slow to render under load.
+    # on about:blank - Capybara returns nil for an `about:` scheme - so the click
+    # went somewhere rather than being lost; current_path without the h1 means the
+    # bike page itself was slow to render under load.
     expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
     expect(page).to have_css("h1.bike-title", wait: 15)
     page.go_back
@@ -185,10 +189,9 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
     expect(page).to have_css("[data-count-target='stolen']", text: "(2)", wait: 10)
 
-    # Viewing a result and returning (the "everything fails after going back from a
-    # search" bug) is deliberately not exercised here: clicking a link straight out
-    # of a go_forward-restored snapshot is the one step whose failure is the
-    # WebDriver artifact above rather than the app, and "filters by color and
-    # location" already runs click_first_bike_and_go_back after a search three times.
+    # Viewing a result and returning must reload the frame, not restore a Turbo
+    # snapshot stuck in the [busy] loading state (results hidden under the spinner
+    # overlay) - the "everything fails after going back from a search" bug.
+    click_first_bike_and_go_back
   end
 end
