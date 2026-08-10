@@ -45,7 +45,9 @@
             tw:text-gray-600 tw:dark:text-gray-300
           "
         >
-          <li><%= translation(".report_it_stolen", cycle_type:) %></li>
+          <li>
+            <%= stolen? ? translation(".report_it_stolen", cycle_type:) : translation(".finish_adding", cycle_type:) %>
+          </li>
 
           <% if found? %>
             <li><%= translation(".add_impound_details", cycle_type:) %></li>

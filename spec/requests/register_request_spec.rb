@@ -694,11 +694,13 @@ RSpec.describe RegisterController, type: :request do
         expect(b_param.bike).to match_hash_indifferently(bike_details.merge(owner_email:,
           manufacturer_id: manufacturer.id, primary_frame_color_id: color.id.to_s))
         follow_redirect!
-        expect(response.body).to include "Registration saved"
+        expect(response.body).to include "Progress saved"
         expect(response.body).to include "verify your email"
-        # Why the confirmation link is worth clicking
+        # Why the confirmation link is worth clicking - this one isn't a theft, so it's
+        # the registration it finishes rather than a report
         expect(response.body).to include "Confirming your email lets you"
-        expect(response.body).to include "Finish reporting your stolen bike"
+        expect(response.body).to include "Finish adding your bike to Bike Index"
+        expect(response.body).to_not include "Finish reporting your stolen"
       end
 
       context "with a photo" do
@@ -1258,7 +1260,7 @@ RSpec.describe RegisterController, type: :request do
       }.to_not change(Bike, :count)
       expect(response).to redirect_to step_path("finished")
       follow_redirect!
-      expect(response.body).to include "Registration saved"
+      expect(response.body).to include "Progress saved"
 
       # Nothing is browsable behind the completion page any more
       get step_path("3")

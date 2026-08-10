@@ -7,6 +7,26 @@ RSpec.describe Register::StepFinished::Component, type: :component do
   let(:b_param) { FactoryBot.create(:b_param, params: {bike: bike_params}) }
   let(:bike_params) { {owner_email: "someone@bikeindex.org", cycle_type: "e-scooter"} }
 
+  # What confirming is for depends on what the registration is - a theft's link opens
+  # the report, an ordinary one's just finishes adding the bike
+  describe "awaiting the confirmation email" do
+    it "heads with the progress saved, and offers to finish adding it" do
+      expect(component).to have_css("h1", text: "Progress saved")
+      expect(component).to have_text("Finish adding your e-scooter to Bike Index")
+      expect(component).to have_no_text("Finish reporting your stolen")
+    end
+
+    context "status_stolen" do
+      let(:bike_params) { super().merge(status: "status_stolen") }
+
+      it "offers to finish the report instead" do
+        expect(component).to have_css("h1", text: "Progress saved")
+        expect(component).to have_text("Finish reporting your stolen e-scooter")
+        expect(component).to have_no_text("Finish adding your")
+      end
+    end
+  end
+
   it "registers another without an organization, and doesn't offer impound details" do
     expect(component).to have_link("Register another vehicle", href: "/register/new")
     expect(component).to have_no_text("Add details about where you found")

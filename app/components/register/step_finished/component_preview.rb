@@ -9,6 +9,11 @@ module Register
         finished(current_user: nil, owner_email: "someone-else@bikeindex.org")
       end
 
+      # The link is what opens the theft report, so it's what confirming is for here
+      def awaiting_email_confirmation_stolen
+        finished(current_user: nil, owner_email: "someone-else@bikeindex.org", status: "status_stolen")
+      end
+
       def bike_created
         finished(current_user: lookbook_user, with_bike: true, owner_email: lookbook_user&.email,
           bike_scope: ::Bike.unscoped.where.not(status: :status_stolen))

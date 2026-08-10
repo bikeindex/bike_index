@@ -22,8 +22,9 @@ module Register
         @b_param.self_made?(@current_user)
       end
 
-      # The bike's own status - only asked once there's a bike to have one
-      def stolen? = @bike.status_stolen?
+      # The bike's own status once it exists, otherwise what the registration is for -
+      # the confirmation page asks before there's a bike
+      def stolen? = @bike.present? ? @bike.status_stolen? : @b_param.status_stolen?
 
       # display_checklist? is address_present? - a theft reported through this flow always
       # has one, but a bike created some other way and shown here might not
@@ -36,7 +37,7 @@ module Register
 
       # Without the bike the registration is only held, waiting on the email
       def heading_text
-        return translation(".registration_saved") if @bike.blank?
+        return translation(".progress_saved") if @bike.blank?
         return translation(".listed_as_stolen", bike_display: @bike.mnfg_name) if own_theft?
         return translation(".reported_stolen") if stolen?
 
