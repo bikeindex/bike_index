@@ -131,13 +131,11 @@
     </ul>
   </li>
 
-  <li class="<%= item_classes(approved?) %>">
-    <%= box(approved?) %>
-
-    <span class="<%= text_classes(approved?) %>">
-      <%= translation(:share_on_twitter) %>
-    </span>
-  </li>
+  <%#
+    Share on Twitter is commented out for now. Left as a note rather than commented in
+    place, since an ERB comment ends at the first closing delimiter inside it - restore
+    it as an item reading translation(:share_on_twitter), ticked by approved?
+  %>
 
   <li class="<%= item_classes(false) %>">
     <%= box(false) %>
