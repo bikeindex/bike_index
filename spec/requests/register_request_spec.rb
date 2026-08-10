@@ -454,7 +454,8 @@ RSpec.describe RegisterController, type: :request do
   describe "show step: 2" do
     # Methods rather than let, since the examples re-request and re-check
     def status_field(field_name)
-      Nokogiri::HTML(response.body).css("[data-register--status-fields-target='field']")
+      # ~=, since a field can be more than one target - phone is a requiredField too
+      Nokogiri::HTML(response.body).css("[data-register--status-fields-target~='field']")
         .find { |el| el.at_css("[name^='bike[#{field_name}']") }
     end
 
@@ -524,6 +525,30 @@ RSpec.describe RegisterController, type: :request do
       b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_stolen"}))
       get register_path(b_param_token: b_param.id_token, step: 2)
       expect(phone_field_classes).to_not include "tw:hidden"
+    end
+
+    # A theft or a find is contacted on it, so those two ask for a phone rather than
+    # offering one - and the status that decides which is picked in this form
+    it "requires the phone for a theft or a find, saying which" do
+      get register_path(b_param_token: b_param.id_token, step: 2)
+      phone_field = status_field("phone")
+      expect(phone_field.at_css("input[name='bike[phone]']")["required"]).to be_blank
+      expect(phone_field.at_css("[data-optional-marker]")["hidden"]).to be_blank
+      expect(phone_field.at_css("[data-required-marker]")["hidden"]).to be_present
+      expect(phone_field.at_css("[data-required-helper]")["hidden"]).to be_present
+      expect(JSON.parse(phone_field["data-required-texts"]))
+        .to eq("status_stolen" => "Phone is required for stolen bike",
+          "status_impounded" => "Phone is required for found bike")
+
+      b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_stolen"}))
+      get register_path(b_param_token: b_param.id_token, step: 2)
+      phone_field = status_field("phone")
+      expect(phone_field.at_css("input[name='bike[phone]']")["required"]).to be_present
+      expect(phone_field.at_css("[data-optional-marker]")["hidden"]).to be_present
+      expect(phone_field.at_css("[data-required-marker]")["hidden"]).to be_blank
+      helper = phone_field.at_css("[data-required-helper]")
+      expect(helper["hidden"]).to be_blank
+      expect(helper.text.strip).to eq "Phone is required for stolen bike"
     end
 
     context "with an organization" do

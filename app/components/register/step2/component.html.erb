@@ -354,12 +354,19 @@
 
     <div
       class="<%= "tw:hidden" unless show_phone? %>"
-      data-register--status-fields-target="field"
+      data-register--status-fields-target="field requiredField"
       data-statuses="<%= phone_statuses.to_json %>"
+      data-required-texts="<%= phone_required_texts.to_json %>"
     >
-      <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :phone, kind: :telephone_field,
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone, kind: :telephone_field,
           label_text: translation(".phone"), wrapper_class: "tw:mb-6",
-          html_options: {value: bike["phone"], placeholder: translation(".phone_placeholder")}) %>
+          required: phone_required?, required_toggleable: true,
+          html_options: {value: bike["phone"], placeholder: translation(".phone_placeholder")})) do |group| %>
+        <% group.with_helper_text do %>
+          <%= tag.span(phone_required_texts[@b_param.status], data: {required_helper: true},
+              hidden: !phone_required?) %>
+        <% end %>
+      <% end %>
     </div>
 
     <%#

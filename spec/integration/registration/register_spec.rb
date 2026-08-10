@@ -145,8 +145,13 @@ RSpec.describe "Register flow", :js, type: :system do
 
     # Like bikes/new, phone is only asked for once the status calls for it
     expect(page).to have_no_field("bike[phone]")
+    expect(page).to have_no_content("Phone is required")
     type_into("#bike_status", "Stolen")
     click_combobox_option("Stolen")
+
+    # A theft is contacted on it, so the field it reveals asks rather than offers
+    expect(page).to have_content("Phone is required for stolen bike")
+    expect(find("input[name='bike[phone]']")[:required]).to be_present
 
     # The status the server renders is only a default, so the draft outlives a
     # reload - and the fields it gates reopen with it

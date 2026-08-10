@@ -119,6 +119,16 @@ module Register
       def show_phone?
         phone_statuses.include?(@b_param.status)
       end
+
+      # A phone number is how a theft or a find gets contacted, so those two ask for one
+      # rather than offering it. Which of them applies is picked in this form, so the copy
+      # for each renders and register--status-fields shows whichever the status names
+      def phone_required_texts
+        {"status_stolen" => translation(".phone_required_stolen", cycle_type:),
+         "status_impounded" => translation(".phone_required_found", cycle_type:)}
+      end
+
+      def phone_required? = phone_required_texts.key?(@b_param.status)
     end
   end
 end

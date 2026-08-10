@@ -10,7 +10,7 @@ import { collapse } from 'utils/collapse_utils'
 // it's picked in this form, so each field carries its own statuses and gets
 // rechecked whenever the combobox changes.
 export default class extends Controller {
-  static targets = ['field', 'submitLabel']
+  static targets = ['field', 'requiredField', 'submitLabel']
 
   connect () {
     // form-persist restores a drafted status by assignment, firing no event
@@ -37,7 +37,23 @@ export default class extends Controller {
       // status no longer asks for
       field.querySelectorAll('input, select, textarea').forEach((el) => { el.disabled = !shown })
     })
+    this.requiredFieldTargets.forEach((field) => this.applyRequired(field, status))
     this.applySubmitLabel(status)
+  }
+
+  // Fields some statuses ask for rather than offer - the phone a theft or a find gets
+  // contacted on. The copy for each status renders with the field, so which one applies
+  // is a lookup rather than a rebuilt label
+  applyRequired (field, status) {
+    const text = JSON.parse(field.dataset.requiredTexts)[status]
+    field.querySelectorAll('input, select, textarea').forEach((el) => { el.required = Boolean(text) })
+    field.querySelectorAll('[data-required-marker]').forEach((el) => { el.hidden = !text })
+    field.querySelectorAll('[data-optional-marker]').forEach((el) => { el.hidden = Boolean(text) })
+    const helper = field.querySelector('[data-required-helper]')
+    if (helper) {
+      helper.textContent = text || ''
+      helper.hidden = !text
+    }
   }
 
   // A theft is reported after this form, so the button can't claim to finish the
