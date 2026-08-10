@@ -82,7 +82,6 @@ RSpec.describe "Search without JavaScript", type: :system do
     let!(:pricey_listings_nyc) { FactoryBot.create_list(:marketplace_listing, 2, :for_sale, amount_cents: 900_00) }
 
     let(:thumbnail) { "[data-test-id^='vehicle-thumbnail-linkspan-']" }
-    let(:pagination) { "[data-search--pagination-fallback-target='links']" }
 
     it "renders listings server-side, paginates and filters via standard form submission" do
       visit "/"
@@ -100,8 +99,9 @@ RSpec.describe "Search without JavaScript", type: :system do
 
       # The lazy-loading frame that appends page 2 on scroll can't fetch itself
       # without JS, so its spinner stays hidden and the links carry the user instead
-      expect(page).to have_css("turbo-frame#page_2 [data-search--pagination-fallback-target='spinner']", visible: :hidden)
-      within(pagination) { click_link "2" }
+      expect(page).to have_css("turbo-frame#page_2", visible: :all)
+      expect(page).to have_no_text("Loading more...")
+      click_link(exact_text: "2")
       expect(page).to have_css(thumbnail, count: 2)
 
       # A max price drops both $900 listings, leaving a single page - so the
@@ -109,7 +109,7 @@ RSpec.describe "Search without JavaScript", type: :system do
       fill_in "price_max_amount", with: "500"
       submit_search
       expect(page).to have_css(thumbnail, count: 12)
-      expect(page).to have_no_css(pagination)
+      expect(page).to have_no_link(exact_text: "2")
 
       # Proximity around NYC drops the LA listing. The price filter is re-rendered
       # into the form, so it still applies.
