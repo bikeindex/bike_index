@@ -18,7 +18,7 @@ RSpec.describe OauthRedirectUri do
     end
 
     it "is false for loopback, which never leaves the device" do
-      ["http://localhost:3000/oauth", "http://127.0.0.1:3000/oauth", "http://[::1]:3000/oauth"].each do |redirect_uri|
+      ["http://localhost:3000/oauth", "http://LOCALHOST:3000/oauth", "http://127.0.0.1:3000/oauth", "http://[::1]:3000/oauth"].each do |redirect_uri|
         expect(OauthRedirectUri.cleartext?(redirect_uri)).to be_falsey
       end
     end
