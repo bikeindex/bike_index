@@ -31,19 +31,26 @@ module Register
         @bike.present? && stolen? && @bike.current_stolen_record&.display_checklist?
       end
 
+      # Their own theft, rather than one reported for whoever the registration is for
+      def own_theft? = stolen? && self_made?
+
       # Without the bike the registration is only held, waiting on the email
       def heading_text
         return translation(".registration_saved") if @bike.blank?
+        return translation(".listed_as_stolen", bike_display: @bike.mnfg_name) if own_theft?
+        return translation(".reported_stolen") if stolen?
 
-        translation(stolen? ? ".reported_stolen" : ".registration_complete")
+        translation(".registration_complete")
       end
 
-      # A theft isn't a bike being watched over, it's one already being looked for
+      # Nothing under their own theft's heading - it already says what happened, and the
+      # checklist below is what there is to read next
       def subtitle_text
         return translation(".verify_your_email_html", email: owner_email_tag) if @bike.blank?
+        return if own_theft?
         return translation(".registered_for_owner_html", bike_display: @bike.mnfg_name, email: owner_email_tag) unless self_made?
 
-        translation(stolen? ? ".listed_as_stolen" : ".we_will_keep_watch", bike_display: @bike.mnfg_name)
+        translation(".we_will_keep_watch", bike_display: @bike.mnfg_name)
       end
 
       def owner_email_tag

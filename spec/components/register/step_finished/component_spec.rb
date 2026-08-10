@@ -43,11 +43,12 @@ RSpec.describe Register::StepFinished::Component, type: :component do
     context "status_stolen" do
       let(:bike) { FactoryBot.create(:stolen_bike, :with_ownership, owner_email: "someone@bikeindex.org") }
 
-      it "says it's listed as stolen, not that it's being watched for a theft" do
-        expect(component).to have_text("Reported stolen")
-        expect(component).to have_text("is listed as stolen on Bike Index")
+      it "heads with the theft, and leaves the watching-over copy to a bike that isn't stolen" do
+        expect(component).to have_css("h1", text: "is listed as stolen on Bike Index")
         expect(component).to have_no_text("Registration complete!")
         expect(component).to have_no_text("if it's ever reported stolen")
+        # The heading says what happened, so nothing is repeated under it
+        expect(component).to have_no_css("h1 + p")
         # No address on this stolen record, so there's no checklist to show yet
         expect(component).to have_no_css("ul.stolen-checklist")
       end

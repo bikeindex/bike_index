@@ -222,9 +222,9 @@ RSpec.describe "Register flow", :js, type: :system do
 
     click_button "Complete Bike Registration"
 
-    # The theft was the point of the flow, so the card says that rather than congratulating
-    # them on a registration that's being watched over
-    expect(page).to have_content("Reported stolen", wait: 10)
+    # The theft was the point of the flow, so the card heads with it rather than
+    # congratulating them on a registration that's being watched over
+    expect(page).to have_css("h1", text: "is listed as stolen on Bike Index", wait: 10)
     bike = Bike.last
     expect(bike).to have_attributes(owner_email:, serial_number: "made_without_serial",
       status: "status_stolen", frame_model: "Marlin 7")
@@ -236,8 +236,9 @@ RSpec.describe "Register flow", :js, type: :system do
     browser_zone = page.evaluate_script("Intl.DateTimeFormat().resolvedOptions().timeZone")
     expect(bike.current_stolen_record.date_stolen.in_time_zone(browser_zone).strftime("%Y-%m-%dT%H:%M"))
       .to eq "2026-08-05T14:30"
-    # Signed in as the account the link made, so it's their own theft being described
-    expect(page).to have_content("is listed as stolen on Bike Index")
+    # Signed in as the account the link made, so the checklist knows what's already done
+    expect(page).to have_css("li.completed-item", text: "Report theft on Bike Index")
+    expect(page).to have_link("your Police Report Number")
 
     # An account nobody signed up for, so the terms are the first thing it's asked
     visit "/my_account"
