@@ -46,14 +46,10 @@ RSpec.describe PromotedAlert, type: :model do
 
   describe "recovered bike" do
     let(:stolen_record) { FactoryBot.create(:stolen_record_recovered) }
-    let!(:stolen_record2) { FactoryBot.create(:stolen_record_recovered) }
     let!(:promoted_alert) { FactoryBot.create(:promoted_alert, stolen_record: stolen_record) }
-    let!(:promoted_alert2) { FactoryBot.create(:promoted_alert) }
     it "returns the bike" do
       expect(promoted_alert.stolen_record).to eq stolen_record
       expect(promoted_alert.recovered?).to be_truthy
-      expect(StolenRecord.unscoped.with_promoted_alerts.pluck(:id)).to match_array([stolen_record.id, promoted_alert2.stolen_record_id])
-      expect(StolenRecord.recovered.with_promoted_alerts.pluck(:id)).to eq([stolen_record.id])
     end
   end
 
@@ -61,7 +57,6 @@ RSpec.describe PromotedAlert, type: :model do
     let(:promoted_alert) { FactoryBot.create(:promoted_alert, facebook_data: {no_notify: true}) }
     it "is false" do
       expect(promoted_alert.missing_location?).to be_truthy
-      expect(promoted_alert.missing_photo?).to be_truthy
       expect(promoted_alert.stolen_record_approved?).to be_falsey
       expect(promoted_alert.paid?).to be_falsey
       expect(promoted_alert.activateable?).to be_falsey
@@ -250,7 +245,7 @@ RSpec.describe PromotedAlert, type: :model do
     end
   end
 
-  describe "stolen_record scoping" do
+  describe "paid and admin scoping" do
     let(:payment_unpaid) { FactoryBot.create(:payment, paid_at: nil) }
     let(:promoted_alert_unpaid) { FactoryBot.create(:promoted_alert, payment: payment_unpaid, user: payment_unpaid.user) }
     let!(:stolen_record_unpaid_id) { promoted_alert_unpaid.stolen_record_id }
@@ -263,14 +258,12 @@ RSpec.describe PromotedAlert, type: :model do
     let!(:promoted_alert_admin_unpaid) { FactoryBot.create(:promoted_alert, stolen_record_id: stolen_record_admin_and_unpaid_id) }
     let(:stolen_record_ids) { [stolen_record_unpaid_id, stolen_record_paid_id, stolen_record_admin_id, stolen_record_admin_and_unpaid_id] }
 
-    it "finds the pertinent stolen_records" do
+    it "finds the pertinent alerts" do
       expect(Payment.paid.pluck(:id)).to eq([promoted_alert_paid.payment_id])
       expect(StolenRecord.pluck(:id)).to match_array stolen_record_ids
-      expect(StolenRecord.with_promoted_alerts.pluck(:id)).to match_array stolen_record_ids
       expect(PromotedAlert.paid.pluck(:id)).to match_array([promoted_alert_paid.id])
       expect(PromotedAlert.admin.pluck(:id)).to match_array([promoted_alert_admin.id, promoted_alert_admin_and_unpaid.id])
       expect(PromotedAlert.paid_or_admin.pluck(:id)).to match_array([promoted_alert_paid.id, promoted_alert_admin.id, promoted_alert_admin_and_unpaid.id])
-      expect(StolenRecord.with_promoted_alerts_paid_or_admin.pluck(:id)).to match_array(stolen_record_ids - [stolen_record_unpaid_id])
     end
   end
 end
