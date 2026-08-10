@@ -23,14 +23,13 @@
     <%= render Register::SectionLabel::Component.new(text: translation(".when_and_where")) %>
 
     <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :date, kind: :datetime_local_field,
-        label_text: date_label, required: stolen?,
+        label_text: date_label, required: true,
         html_options: {value: date_value, max: Binxtils::TimeParser.round(Time.current + 1.day),
           class: "dateInputUpdateZone", "data-initialtime": report_date&.iso8601}) %>
 
     <%# _attributes explicitly: form_with has no model to infer nested attributes from %>
     <%= f.fields_for :address_record_attributes, address_record do |address_form| %>
-      <%= render UI::Forms::AddressGroup::Component.new(form_builder: address_form, street_label:,
-          required: stolen?) %>
+      <%= render UI::Forms::AddressGroup::Component.new(form_builder: address_form, street_label:, required: true) %>
     <% end %>
 
     <% if stolen? %>

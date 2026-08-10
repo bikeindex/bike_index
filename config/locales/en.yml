@@ -5075,9 +5075,11 @@ en:
       recovered_date: recovered %{date}
       translated_from_english: translated from English
     register_flow:
+      date_found_required: Please tell us when you found it
       date_stolen_required: Please tell us when it was stolen
       email_required: Email is required to register
-      location_required: Please tell us where it was stolen
+      location_found_required: Please tell us where you found it
+      location_stolen_required: Please tell us where it was stolen
       manufacturer_required: Manufacturer is required to register
       name_required: Owner name is required to register
       unable_to_save: We're unable to save that registration, please try again

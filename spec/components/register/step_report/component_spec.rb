@@ -54,15 +54,16 @@ RSpec.describe Register::StepReport::Component, type: :component do
   context "found" do
     let(:status) { "status_impounded" }
 
-    it "asks about the find instead, and requires none of it" do
+    it "asks about the find instead, in its own words" do
       render_inline(described_class.new(b_param:, steps:))
 
       expect(page).to have_field("report[impounded_description]")
-      expect(page).to have_field("report[address_record_attributes][street]")
       expect(page).to_not have_field("report[theft_description]")
       expect(page).to_not have_field("report[police_report_number]")
-      expect(page.find("input[name='report[date]']")[:required]).to be_blank
-      expect(page.find("input[name='report[address_record_attributes][street]']")[:required]).to be_blank
+      expect(page).to have_css("label", text: "Address where you found it")
+      # When and where are asked of a find as well as a theft
+      expect(page.find("input[name='report[date]']")[:required]).to be_present
+      expect(page.find("input[name='report[address_record_attributes][street]']")[:required]).to be_present
     end
   end
 

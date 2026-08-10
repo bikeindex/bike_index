@@ -36,7 +36,7 @@ module Register
       end
 
       def street_label
-        stolen? ? translation(".where_was_it_stolen") : translation(".where_did_you_find_it")
+        stolen? ? translation(".where_was_it_stolen") : translation(".address_where_you_found_it")
       end
 
       # The safety pages can come after the report, so this doesn't always finish the flow

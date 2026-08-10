@@ -4,6 +4,7 @@ en:
     register:
       step_report:
         about_the_one_you_found: About the %{cycle_type} you found
+        address_where_you_found_it: Address where you found it
         complete_registration: Complete %{cycle_type} Registration
         contact_and_sharing: Contact and sharing
         department_city: Department/city
@@ -30,7 +31,6 @@ en:
         when_and_where: When and where
         when_did_you_find_it: When did you find it?
         when_was_it_stolen: When was the %{cycle_type} stolen?
-        where_did_you_find_it: Where did you find it?
         where_was_it_stolen: Where was it stolen?
         who_can_see_your_phone: Who can see your phone number?
         without_a_report: >-

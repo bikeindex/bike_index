@@ -330,14 +330,15 @@ module BikeServices
       b_param.params = b_param.params.except(*stale, "report_completed") if stale.any?
     end
 
-    # A theft has to say when and where it happened - everything else on the step, and
-    # the whole of a find's report, is optional
+    # Both reports have to say when and where, each in its own words - everything else
+    # on the step is optional
     def report_errors(b_param, attrs, date)
-      return [] unless b_param.status_stolen?
+      return [] unless report_step?(b_param.status)
 
+      report = b_param.status_stolen? ? "stolen" : "found"
       address = attrs["address_record_attributes"] || {}
-      [(translation(:date_stolen_required) if date.blank?),
-        (translation(:location_required) if address["street"].blank? || address["city"].blank?)].compact
+      [(translation(:"date_#{report}_required") if date.blank?),
+        (translation(:"location_#{report}_required") if address["street"].blank? || address["city"].blank?)].compact
     end
 
     def stolen_report_attrs(attrs, date)

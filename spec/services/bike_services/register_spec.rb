@@ -325,11 +325,12 @@ RSpec.describe BikeServices::Register do
         expect(b_param.stolen_attrs).to be_blank
       end
 
-      it "asks nothing of a find - a blank report still passes" do
-        expect(described_class.save_report(b_param, report_params: {})).to be_truthy
-        expect(described_class.send(:report_completed?, b_param.reload)).to be_truthy
-        # Which the record it's created with fills in
-        expect(b_param.impound_attrs["impounded_at"]).to be_blank
+      # Asked in its own words, since it isn't a theft being described
+      it "asks a find when and where too" do
+        expect(described_class.save_report(b_param, report_params: {})).to be_falsey
+        expect(b_param.errors.full_messages.to_sentence)
+          .to match(/when you found it.*where you found it/m)
+        expect(described_class.send(:report_completed?, b_param.reload)).to be_falsey
       end
     end
 
