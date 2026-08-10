@@ -125,10 +125,13 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     search_primary_activity("Mountain biking")
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
 
-    # The unfiltered results are only now allowed to arrive - they mustn't take over
+    # The unfiltered results are only now allowed to arrive - they mustn't take over.
+    # The wait covers a round trip that hasn't started yet: releasing the route only
+    # then sends the request, and rendering all 17 unfiltered listings is the slowest
+    # response in this file. 10s was enough locally and not on a loaded CI shard.
     watch_for_superseded_results
     release_initial_results_load.call
-    expect(page).to have_css("body[data-test-superseded-results-rejected]", wait: 10)
+    expect(page).to have_css("body[data-test-superseded-results-rejected]", wait: 30)
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", count: 6)
     expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/)
   end
