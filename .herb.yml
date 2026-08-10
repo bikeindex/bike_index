@@ -74,27 +74,8 @@ linter:
     # Disabled: UI::Table column blocks run via instance_exec, so helpers need helpers. prefix
     actionview-no-silent-helper:
       enabled: false
-
-    #
-    # Introduced in 0.9.3-0.10.3, disabled by `herb-lint --upgrade` because we have offenses.
-    # Each is worth fixing and re-enabling.
-    #
-    # Templates assign to the form/combobox builder before rendering it (9 offenses)
-    erb-no-unused-expressions:
-      enabled: false
-    # A template defines a helper method inline, whose body herb reads as a stray literal (1)
-    erb-no-unused-literals:
-      enabled: false
-    # Interpolated strings in <%= %> that want splitting into literal + separate tags (5, autocorrectable)
-    erb-prefer-direct-output:
-      enabled: false
-    # Bare & and > in copy that wants &amp;/&gt; (10)
-    html-no-unescaped-entities:
-      enabled: false
-    # False positive: a `tag` local shadows ActionView's tag builder, so `tag.id` reads as <id> (2)
-    html-no-unknown-tag:
-      enabled: false
-    # Our CSP allows inline <script> via unsafe_inline rather than nonces (40)
+    # Every inline <script> would need a nonce, and CSP ignores unsafe_inline once one is
+    # present - so turning this on means moving the whole policy to nonces at the same time
     html-require-script-nonce:
       enabled: false
   #
