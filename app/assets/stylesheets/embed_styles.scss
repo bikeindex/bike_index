@@ -694,3 +694,12 @@ a {
 }
 
 } // end @layer legacy
+
+// Deliberately outside @layer legacy: tailwind's own `body { @apply tw:base-font }` is
+// unlayered, so only another unlayered rule can outrank it -- and this id beats its type
+// selector. Inside the layer it would lose, and the embed would take tailwind's font.
+// $sansFontFamily is inlined because the layer block scopes it.
+#bi_embed {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  line-height: normal;
+}
