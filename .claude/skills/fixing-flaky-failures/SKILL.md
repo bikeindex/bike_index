@@ -72,7 +72,32 @@ Capybara returns a nil `current_path` **only** for an `about:` scheme
 was on `about:blank` and the page had gone away. Different cause, different fix.
 Check the matcher's source when a message is surprising.
 
-### 3. Try to reproduce, and treat failure-to-reproduce as information
+### 3. Instrument rather than theorise
+
+When you can't reproduce, you can still make the browser tell you what happened.
+Copy the spec to a scratch file, record the events the app actually emits, and
+run it — a log beats an argument, and this routinely overturns the theory you
+were about to ship:
+
+```ruby
+page.execute_script(<<~JS)
+  window.__events = []
+  const stamp = (name, extra) => window.__events.push(Object.assign({name, t: Math.round(performance.now())}, extra))
+  document.addEventListener("turbo:before-fetch-response", (e) => {
+    stamp("response", {target: e.target?.id, url: e.detail?.fetchResponse?.response?.url, prevented: e.defaultPrevented})
+  })
+JS
+# ...drive the spec...
+page.evaluate_script("window.__events").each { |e| puts e }
+```
+
+Parameterise the scratch spec over the variable you suspect (`[0, 8].each do |delay|`
+around an injected `sleep`) so one run compares the fast and slow paths. Delete the
+scratch file when you're done. Two things this buys that reasoning doesn't: it
+distinguishes "the event never arrived" from "the event arrived and the assertion
+misread it", and it tells you *when* things happened, which is usually the answer.
+
+### 4. Try to reproduce, and treat failure-to-reproduce as information
 
 ```bash
 for i in 1 2 3; do bundle exec rspec <the spec file> 2>&1 | grep -E "examples, " | tail -1; done
@@ -121,6 +146,32 @@ retry_on_detach { first(".bike-box-item .title-link a").click }
 `Playwright::Error` for a detached node, which Capybara's own retry does not.
 This is *not* a coverage reduction: the assertions are untouched, the click just
 happens on a DOM that has stopped moving.
+
+**A probe that measures itself instead of the app.** When a spec observes
+behaviour by listening for an event, check whether what it reads is a property of
+the app or of the listener's position. `event.defaultPrevented` read *inside* a
+`document` listener only reflects `preventDefault` calls from listeners that
+already ran, so it reports registration order as much as the app's verdict.
+Measured in this repo, same event, same run: read in the listener `false`, read on
+the next tick `true`. Defer the read so every listener has had its turn:
+
+```js
+document.addEventListener("turbo:before-fetch-response", (event) => {
+  if (event.target?.id !== "results_frame") return
+  // Next tick: the verdict no longer depends on where this sits in the order
+  setTimeout(() => { document.body.dataset.testRejected = event.defaultPrevented ? "true" : "false" })
+})
+```
+
+Order is easy to invert without noticing, because the two sides have different
+lifetimes: `document` listeners survive a Turbo Drive body swap, while Stimulus
+controllers disconnect and re-add theirs at the *end* of the list on reconnect. So
+a probe registered before a Turbo visit ends up ahead of the controller it's
+watching. Two habits that keep this class of bug visible: record the verdict for
+both outcomes (`"true"`/`"false"`) rather than only writing the marker on success,
+so a wrong verdict fails loudly instead of timing out as if the event never
+arrived; and prefer asserting the user-visible consequence alongside the internal
+verdict.
 
 **Programmatic back/forward.** Playwright drives these specs and there is no
 BFCache, so `go_back`/`go_forward` onto a `turbo-action: advance` entry is

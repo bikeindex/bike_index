@@ -100,14 +100,21 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     -> { held.push(:release) }
   end
 
-  # Registers after search--form's own turbo:before-fetch-response listener, so
-  # defaultPrevented already carries its verdict on the superseded response.
+  # Records whether search--form rejected the superseded response. defaultPrevented
+  # read *inside* the listener would only report preventDefault calls from listeners
+  # that already ran, so the verdict would depend on where this registration lands
+  # relative to search--form's own - invisible, and inverted by anything that makes
+  # the controller reconnect (document listeners survive a Turbo Drive body swap;
+  # Stimulus controllers disconnect and re-add theirs at the end of the list).
+  # Reading on the next tick waits for every listener, whatever the order.
   def watch_for_superseded_results
     page.execute_script(<<~JS)
       document.addEventListener("turbo:before-fetch-response", (event) => {
-        if (event.target?.id === "marketplace_results_frame" && event.defaultPrevented) {
-          document.body.dataset.testSupersededResultsRejected = "true"
-        }
+        if (event.target?.id !== "marketplace_results_frame") return
+
+        setTimeout(() => {
+          document.body.dataset.testSupersededResultsRejected = event.defaultPrevented ? "true" : "false"
+        })
       })
     JS
   end
@@ -131,7 +138,9 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # response in this file. 10s was enough locally and not on a loaded CI shard.
     watch_for_superseded_results
     release_initial_results_load.call
-    expect(page).to have_css("body[data-test-superseded-results-rejected]", wait: 30)
+    # ='true': the marker records the verdict either way, so a response Turbo was
+    # allowed to render fails here rather than timing out as if it never arrived
+    expect(page).to have_css("body[data-test-superseded-results-rejected='true']", wait: 30)
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", count: 6)
     expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/)
   end
