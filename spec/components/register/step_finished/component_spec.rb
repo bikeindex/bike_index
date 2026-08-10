@@ -48,6 +48,28 @@ RSpec.describe Register::StepFinished::Component, type: :component do
         expect(component).to have_text("is listed as stolen on Bike Index")
         expect(component).to have_no_text("Registration complete!")
         expect(component).to have_no_text("if it's ever reported stolen")
+        # No address on this stolen record, so there's no checklist to show yet
+        expect(component).to have_no_css("ul.stolen-checklist")
+      end
+
+      # What getting it back takes - the same list the theft details page ends on. The
+      # report step asks for a location, so a theft registered through this flow has one
+      context "with the location the report asks for" do
+        let(:bike) do
+          FactoryBot.create(:stolen_bike_in_chicago, :with_ownership, owner_email: "someone@bikeindex.org")
+        end
+
+        it "renders the checklist, ticking off what the registration already did" do
+          expect(component).to have_css("ul.stolen-checklist")
+          expect(component).to have_text("Do these things for the best chance of getting it back")
+          # Listing it and reporting the theft are what the flow just did
+          done = component.css("li.completed-item").map { |li| li.text.squish }
+          expect(done.first).to eq "✓ List bike on Bike Index"
+          expect(done.any? { |text| text.include?("Report theft on Bike Index") }).to be_truthy
+          # Still to do, so it links to where they're added
+          expect(component).to have_link("a photo of your bike")
+          expect(component).to have_link("your Police Report Number")
+        end
       end
     end
   end

@@ -12,6 +12,22 @@
 
     <%= render UI::Header::Component.new(text: heading_text, subtitle: subtitle_text) %>
 
+    <%#
+      What getting it back takes, the same list the theft details page ends on - the
+      report asks for a location, so a theft registered here always has one to show
+    %>
+
+    <% if stolen_checklist? %>
+      <%# stolen-checklist-wrap is what the checklist's own styles hang off %>
+      <div class="stolen-checklist-wrap tw:mb-6 tw:text-left">
+        <p class="tw:mb-2 tw:text-sm tw:font-semibold">
+          <%= translation(".do_these_things") %>
+        </p>
+
+        <%= render partial: "bikes/stolen_checklist", locals: {bike: @bike, stolen_record: @bike.current_stolen_record} %>
+      </div>
+    <% end %>
+
     <%# What's still locked behind the confirmation, so the link is worth clicking %>
     <% if @bike.blank? %>
       <div

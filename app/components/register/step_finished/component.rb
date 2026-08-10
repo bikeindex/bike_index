@@ -25,6 +25,12 @@ module Register
       # The bike's own status - only asked once there's a bike to have one
       def stolen? = @bike.status_stolen?
 
+      # display_checklist? is address_present? - a theft reported through this flow always
+      # has one, but a bike created some other way and shown here might not
+      def stolen_checklist?
+        @bike.present? && stolen? && @bike.current_stolen_record&.display_checklist?
+      end
+
       # Without the bike the registration is only held, waiting on the email
       def heading_text
         return translation(".registration_saved") if @bike.blank?

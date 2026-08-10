@@ -6,6 +6,7 @@ en:
         add_impound_details: Add details about where you found the %{cycle_type}
         add_photos: Add photos of your %{cycle_type}
         confirming_lets_you: 'Confirming your email lets you:'
+        do_these_things: Do these things for the best chance of getting it back
         listed_as_stolen: >-
           Your %{bike_display} is listed as stolen on Bike Index. We'll spread the
           word, and the community keeps an eye out on resale sites.
