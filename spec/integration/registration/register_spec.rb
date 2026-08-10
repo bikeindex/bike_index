@@ -25,6 +25,28 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_current_path("/my_account", wait: 5)
   end
 
+  def submit_step_1
+    type_into("#b_param_manufacturer_id", "Surly")
+    click_combobox_option("Surly")
+    fill_in "b_param[owner_email]", with: owner_email
+    click_button "Next"
+  end
+
+  # Answers every submission in the browser, the way an edge that never reaches the app
+  # would, and collects what it turned away
+  def fail_submissions(status:, headers: {})
+    [].tap do |attempts|
+      page.driver.with_playwright_page do |playwright_page|
+        playwright_page.route(%r{/register}, ->(route, request) {
+          next route.continue if request.method == "GET"
+
+          attempts << request.url
+          route.fulfill(status:, headers:, contentType: "text/plain", body: "Nope")
+        })
+      end
+    end
+  end
+
   # Through step 1 and onto step 2, the way a rider gets there
   def start_registration
     visit "/register/new"
@@ -32,19 +54,9 @@ RSpec.describe "Register flow", :js, type: :system do
     # new creates the registration and lands on its tokenized step 1
     expect(page).to have_current_path(/register\?b_param_token=.+&step=1/, url: true)
 
-    type_into("#b_param_manufacturer_id", "Surly")
-    click_combobox_option("Surly")
-    fill_in "b_param[owner_email]", with: owner_email
-    click_button "Next"
+    submit_step_1
 
     expect(page).to have_content("Add your bike")
-  end
-
-  # The emailed link, minus the mailer's host - the app under test is on Capybara's
-  def confirmation_link
-    Email::PartialRegistrationJob.drain
-    url = ActionMailer::Base.deliveries.last.html_part.decoded[%r{https?://[^"]*/register/confirm[^"]*}]
-    URI.parse(CGI.unescapeHTML(url)).request_uri
   end
 
   it "starts a registration, keeps a full details draft across a reload, and completes" do
@@ -348,27 +360,35 @@ RSpec.describe "Register flow", :js, type: :system do
   # worth doing behind a spinner
   describe "a step the server throttles" do
     it "stops retrying, says so, and gives the step back" do
-      attempts = []
       visit "/register/new"
-      page.driver.with_playwright_page do |playwright_page|
-        playwright_page.route(%r{/register}, ->(route, request) {
-          next route.continue if request.method == "GET"
-
-          attempts << request.url
-          route.fulfill(status: 429, headers: {"retry-after" => "20"},
-            contentType: "text/plain", body: "Too Many Requests")
-        })
-      end
-
-      type_into("#b_param_manufacturer_id", "Surly")
-      click_combobox_option("Surly")
-      fill_in "b_param[owner_email]", with: owner_email
-      click_button "Next"
+      attempts = fail_submissions(status: 429, headers: {"retry-after" => "20"})
+      submit_step_1
 
       expect(page).to have_content("try again in a moment")
       # It was told how long the wait is, so it didn't spend its retries finding out
       expect(attempts.length).to eq 1
       # The step is theirs to submit again, rather than a spinner that never resolves
+      expect(page).to have_button("Next", disabled: false)
+      expect(page).to have_field("b_param[owner_email]", with: owner_email)
+      expect(BParam.last.owner_email).to be_blank
+    end
+  end
+
+  # A 500 carries no retry-after, so it's what the retries actually get spent on
+  describe "a step the server keeps failing" do
+    it "spends its retries, and spends them again when the rider tries once more" do
+      visit "/register/new"
+      attempts = fail_submissions(status: 500)
+      submit_step_1
+
+      # The submission and the two retries behind it, which back off past Capybara's default wait
+      expect(page).to have_content("try again in a moment", wait: 5)
+      expect(attempts.length).to eq 3
+
+      # The notice asks for another try, so that try is worth as much as the first was
+      click_button "Next"
+      wait_for { attempts.length == 6 }
+
       expect(page).to have_button("Next", disabled: false)
       expect(page).to have_field("b_param[owner_email]", with: owner_email)
       expect(BParam.last.owner_email).to be_blank

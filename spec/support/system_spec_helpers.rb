@@ -128,6 +128,14 @@ module SystemSpecHelpers
     expect(page).to have_css("##{element["commandfor"]}[open]")
   end
 
+  # The registration's emailed link, minus the mailer's host - the app under test
+  # is on Capybara's
+  def confirmation_link
+    Email::PartialRegistrationJob.drain
+    url = ActionMailer::Base.deliveries.last.html_part.decoded[%r{https?://[^"]*/register/confirm[^"]*}]
+    URI.parse(CGI.unescapeHTML(url)).request_uri
+  end
+
   # Block until something the browser reaches on its own is true - a route handler's
   # record of a request it answered, say, which no Capybara matcher can wait on.
   def wait_for(timeout: 5)

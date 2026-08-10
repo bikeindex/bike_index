@@ -31,17 +31,16 @@ module UI
         STACKED_OVERLAY_CLASSES = "tw:flex tw:flex-col tw:justify-center tw:overflow-hidden"
         STACKED_INPUT_CLASSES = "tw:min-h-13"
 
-        def initialize(name:, options: [], src: nil, rich_display: nil, **combobox_options)
+        def initialize(name:, options: [], src: nil, rich_display: nil, no_js: nil, **combobox_options)
           @name = name
           @options_or_src = src || options
           @rich_display = RICH_DISPLAYS.detect { |display| display.to_s == rich_display.to_s }
+          @no_js = no_js
           @combobox_options = combobox_options
         end
 
         def call
-          tag.div(**wrapper_attrs) do
-            safe_join([combobox, overlay].compact)
-          end
+          safe_join([tag.div(**wrapper_attrs) { safe_join([combobox, overlay].compact) }, no_js_field].compact)
         end
 
         private
@@ -53,12 +52,33 @@ module UI
           end
         end
 
-        # Only a rich display needs the controller, or the positioning context
-        # the overlay is placed against
-        def wrapper_attrs
-          return {} unless @rich_display
+        # The textbox this falls back to without JavaScript. What it posts is the caller's
+        # to say - the server resolves a color by name but a cycle type by slug, neither of
+        # which is reliably the display this lists. The rest is the combobox's own: which
+        # field, whether it's required, and what it's called
+        def no_js_field
+          return if @no_js.blank?
 
-          {class: "tw:relative", data: {controller: "ui--forms--combobox-display"}}
+          render UI::Forms::NoJsText::Component.new(name: no_js_name,
+            label: @combobox_options.fetch(:dialog_label) { defaults[:dialog_label] },
+            value: @no_js[:value], options: @no_js[:options] || [],
+            required: @combobox_options[:required])
+        end
+
+        # The combobox's own field unless the fallback posts a different one
+        def no_js_name
+          attribute = @no_js[:name] || @name
+          form = @combobox_options[:form]
+          form ? form.field_name(attribute) : attribute
+        end
+
+        # Only a rich display needs the controller, or the positioning context
+        # the overlay is placed against. js_required: the fallback's stylesheet hides
+        # this, so the textbox is the only control when there's no JavaScript
+        def wrapper_attrs
+          data = {controller: ("ui--forms--combobox-display" if @rich_display),
+                  js_required: (true if @no_js.present?)}.compact
+          {class: ("tw:relative" if @rich_display), data:}.compact
         end
 
         def overlay

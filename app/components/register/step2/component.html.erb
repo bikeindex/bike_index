@@ -46,9 +46,18 @@
         <%= render UI::Badge::Component.new(text: translation(".up_to_3"), size: :xs) %>
       <% end %>
 
+      <%#
+        no_js posts primary_frame_color, not _id - a name is what set_color_key resolves,
+        and an id param present at all is what makes it skip the name. presence, since
+        BParam#primary_frame_color answers false for a blank one
+      %>
+
       <%= render UI::Forms::Combobox::Component.new(name: :primary_frame_color_id, form: f,
           value: @b_param.primary_frame_color_id, options: color_combobox_options,
-          placeholder: translation(".primary_color_blank"), required: true, rich_display: :inline) %>
+          placeholder: translation(".primary_color_blank"), required: true, rich_display: :inline,
+          dialog_label: translation(".color"),
+          no_js: {name: :primary_frame_color, value: @b_param.primary_frame_color.presence,
+                  options: color_combobox_options.map { it[:display] }}) %>
 
       <% {secondary_frame_color_id: translation(".second_color_blank"), tertiary_frame_color_id: translation(".third_color_blank")}.each do |field, blank_label| %>
         <% value = bike[field.to_s] %>

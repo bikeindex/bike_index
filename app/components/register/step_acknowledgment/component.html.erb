@@ -12,8 +12,14 @@
     <%= render Register::PageContent::Component.new(page:, first: first?,
         checkbox_name: :acknowledged, checked: acknowledged?) %>
 
+    <%#
+      Enabled as rendered, and disabled by register--acknowledgment on connect - a button
+      that ships disabled is one nobody without JavaScript can ever press. The server
+      turns away a submission that didn't agree to everything either way
+    %>
+
     <%= render UI::Button::Component.new(text: translation(".continue"), color: :primary, size: :lg,
-        type: "submit", spinner: true, disabled: true, html_class: "tw:mt-5 tw:w-full",
+        type: "submit", spinner: true, html_class: "tw:mt-5 tw:w-full",
         data: {"register--acknowledgment-target": "submit"}) %>
 
     <%= render Register::BackLink::Component.new(href: previous_path) %>

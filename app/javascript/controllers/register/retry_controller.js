@@ -62,8 +62,15 @@ export default class extends Controller {
 
   giveUp () {
     this.retrying = false
-    // The notice is on the page shell, which wraps this form rather than sitting inside it
-    document.querySelector('[data-register-retry-notice]')?.removeAttribute('hidden')
+    // The notice asks them to try again, so that try gets the attempts this one spent -
+    // otherwise the second submission gives up the moment it fails, having retried nothing
+    this.retried = 0
+    // The notice is on the page shell, which wraps this form rather than sitting inside it -
+    // so it's above a step whose submit button can be a screen or more below it. Scroll it to
+    // them, or all the failure looks like is a spinner that stopped
+    const notice = document.querySelector('[data-register-retry-notice]')
+    notice?.removeAttribute('hidden')
+    notice?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     this.submitButtons.forEach((button) => button.dispatchEvent(new Event('spinner:reset')))
   }
 
