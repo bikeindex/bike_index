@@ -2,8 +2,7 @@
   <% if show_user? %>
     <p>
       <% if @user_subject.present? %>
-        <%= viewing.pluralize %>
-        for
+        <%= viewing.pluralize %> for
         <%= link_to @user_subject.display_name, admin_user_path(@user_subject), class: "twlink" %>
       <% else %>
         <span class="<%= error_text_class %>">
@@ -18,8 +17,7 @@
   <% if show_bike? %>
     <p>
       <% if bike_subject.present? %>
-        <%= viewing.pluralize %>
-        for
+        <%= viewing.pluralize %> for
         <%= link_to bike_subject.title_string, admin_bike_path(bike_subject), class: "twlink" %>
       <% else %>
         <span class="<%= error_text_class %>">
@@ -38,13 +36,10 @@
   <% if show_marketplace_listing? %>
     <p>
       <% if marketplace_listing_subject.present? %>
-        <%= viewing.pluralize %>
-        for
-        <em>
-          Marketplace Listing
-          <%= render(Admin::Badges::MarketplaceListing::Component.new(status: marketplace_listing_subject.status, status_humanized: marketplace_listing_subject.status_humanized, kind: :marketplace_listing)) %>
-          <%= "##{marketplace_listing_subject.id}," %>
-        </em>
+        <%= viewing.pluralize %> for
+        <em>Marketplace Listing <%= render(Admin::Badges::MarketplaceListing::Component.new(status: marketplace_listing_subject.status, status_humanized: marketplace_listing_subject.status_humanized, kind: :marketplace_listing)) %> <%= "##{marketplace_listing_subject.id}," %></em>
+
+
         <%= render Admin::BikeCell::Component.new(bike: marketplace_listing_subject.item, bike_id: marketplace_listing_subject.item_id) %>
       <% else %>
         <span class="<%= error_text_class %>">
@@ -83,7 +78,7 @@
     <p>
       <%= viewing.pluralize %> for
       <%= link_to "Membership #{membership_id}", admin_membership_path(membership_id), class: "twlink" %>
-      
+
       <%= link_to "view for all memberships", url_for(sortable_search_params.merge(search_membership_id: nil)), class: "gray-link tw:text-sm" %>
     </p>
   <% end %>
