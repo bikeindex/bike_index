@@ -9,20 +9,10 @@ module Register
 
     private
 
-    def require_registration
-      head :forbidden if b_param.blank?
-    end
-
     def b_param
       return @b_param if defined?(@b_param)
 
       @b_param = BikeServices::Register.find_token(user: current_user, params_token: params[:b_param_token])
-    end
-
-    # A signed id is a bearer token, so without this any registration could claim any blob.
-    # BParam#image_blob only hands back one stamped with its own id.
-    def binx_data
-      {"b_param_id" => b_param.id}
     end
   end
 end

@@ -102,10 +102,13 @@ class BikesController < Bikes::BaseController
       if @b_param.created_bike.present?
         redirect_to edit_bike_url(@b_param.created_bike)
       end
-      if params[:bike][:image].present? # Have to do in the controller, before assigning
-        @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
-      end
-      @b_param.update(params: permitted_bparams,
+      # Have to do in the controller, before assigning
+      @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
+      # With JS the photo goes straight to storage and the form posts the blob's signed id.
+      # These params replace the b_param's rather than merging, so a resubmission after an
+      # error has to carry the id already stored.
+      signed_id = params[:bike].delete(:image_signed_id).presence || @b_param.image_signed_id
+      @b_param.update(params: permitted_bparams.merge({"image_signed_id" => signed_id}.compact),
         origin: (params[:bike][:embeded_extended] ? "embed_extended" : "embed"))
       @bike = BikeServices::Creator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
       if @bike.errors.any?

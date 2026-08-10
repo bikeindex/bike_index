@@ -32,6 +32,10 @@ export default class extends Controller {
   }
 
   submit (event) {
+    // The embed forms submit from the valid event below, so a submit something else has
+    // already cancelled (an upload still in flight) would go through here regardless
+    if (event.defaultPrevented) return
+
     this.stripAllInputs()
 
     // Find first invalid field after stripping

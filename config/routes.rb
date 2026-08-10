@@ -189,6 +189,10 @@ Rails.application.routes.draw do
   # Registration photos upload before there's a session, so they get their own endpoint
   post "/register/direct_uploads" => "register/direct_uploads#create", :as => :register_direct_uploads
 
+  # The embed forms upload before there's a session too, against a token that resolves
+  # differently - see the controller
+  post "/embed/direct_uploads" => "organizations/direct_uploads#create", :as => :embed_direct_uploads
+
   # Shadows ActiveStorage's own route (drawn last, so this wins) so the stock controller, which
   # checks nothing, isn't reachable. Deliberately unnamed - rails_direct_uploads_path still
   # resolves here, now to the signed-in-only controller.
