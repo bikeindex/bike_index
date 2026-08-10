@@ -50,21 +50,30 @@ module UI
 
         def combobox
           # customize_ (rather than the input: kwarg) appends to the gem's own classes
-          helpers.hw_combobox_tag(@name, @options_or_src, **defaults, **@combobox_options) do |component|
+          helpers.hw_combobox_tag(@name, @options_or_src, **defaults, **combobox_attrs) do |component|
             component.customize_input(class: STACKED_INPUT_CLASSES) if stacked?
           end
         end
 
+        # ui--forms--js-required marks it required on connect instead. Rendered required,
+        # it's a control the no-JS stylesheet has hidden and no browser will submit past -
+        # which would be every submission a rider without JavaScript makes
+        def combobox_attrs
+          js_required? ? @combobox_options.except(:required) : @combobox_options
+        end
+
+        def js_required? = @no_js.present? && @combobox_options[:required].present?
+
         # What this falls back to without JavaScript. A select of the same options posts
-        # their own values, so it needs nothing the combobox doesn't already hold - only
-        # a textbox needs the caller to say what it posts (`no_js: {name:, value:}`)
+        # their own values, so it needs nothing the combobox doesn't already hold - only a
+        # textbox needs the caller to say what to show, since the options aren't ours
+        # (`no_js: {value:}`)
         def no_js_field
           return if @no_js.blank?
 
-          overrides = @no_js.is_a?(Hash) ? @no_js : {}
-          render UI::Forms::NoJsField::Component.new(name: no_js_name(overrides[:name]),
+          render UI::Forms::NoJsField::Component.new(name: no_js_name,
             label: @combobox_options.fetch(:dialog_label) { defaults[:dialog_label] },
-            value: overrides.fetch(:value) { @combobox_options[:value] },
+            value: @no_js.is_a?(Hash) ? @no_js[:value] : @combobox_options[:value],
             options: no_js_options, required: @combobox_options[:required], text: no_js_text?)
         end
 
@@ -84,17 +93,17 @@ module UI
           end
         end
 
-        # The combobox's own field unless the fallback posts a different one
-        def no_js_name(attribute)
+        def no_js_name
           form = @combobox_options[:form]
-          form ? form.field_name(attribute || @name) : (attribute || @name)
+          form ? form.field_name(@name) : @name
         end
 
-        # Only a rich display needs the controller, or the positioning context
-        # the overlay is placed against. js_required: the fallback's stylesheet hides
-        # this, so the textbox is the only control when there's no JavaScript
+        # Only a rich display needs the controller, or the positioning context the overlay
+        # is placed against. data-js-required is what the fallback's stylesheet hides
         def wrapper_attrs
-          data = {controller: ("ui--forms--combobox-display" if @rich_display),
+          controllers = [("ui--forms--combobox-display" if @rich_display),
+            ("ui--forms--js-required" if js_required?)].compact
+          data = {controller: controllers.presence&.join(" "),
                   js_required: (true if @no_js.present?)}.compact
           {class: ("tw:relative" if @rich_display), data:}.compact
         end

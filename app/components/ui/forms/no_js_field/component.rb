@@ -56,7 +56,7 @@ module UI
         end
 
         def datalist
-          return unless @text && @options.any?
+          return if list_id.blank?
 
           tag.datalist(id: list_id) do
             safe_join(@options.map { |display, _value| tag.option(value: display) })

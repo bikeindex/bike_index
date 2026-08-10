@@ -931,6 +931,8 @@ RSpec.describe RegisterController, type: :request do
 
       follow_redirect!
       expect(response.body).to include "<title>Your e-scooter registration</title>"
+      # Which step a page shows is server state, so Turbo mustn't restore it from a snapshot
+      expect(response.body).to include "<meta name=\"turbo-cache-control\" content=\"no-cache\">"
 
       # The record hangs off the bike, so it survives the b_param being swept
       acknowledgment = RegistrationSequenceAcknowledgment.last

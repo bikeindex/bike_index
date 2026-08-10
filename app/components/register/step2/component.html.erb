@@ -61,7 +61,7 @@
           <div class="tw:flex-1">
             <%= render UI::Forms::Combobox::Component.new(name: field, form: f,
                 value:, options: color_combobox_options, placeholder: blank_label,
-                rich_display: :inline) %>
+                rich_display: :inline, dialog_label: blank_label, no_js: true) %>
           </div>
 
           <%= render UI::Button::Component.new(text: "×", color: :link,
@@ -307,7 +307,8 @@
     <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :status,
         label_text: translation(".registration_type"), required: true)) do %>
       <%= render UI::Forms::Combobox::Component.new(name: :status, form: f, required: true,
-          value: @b_param.status, options: status_options, rich_display: :stacked) %>
+          value: @b_param.status, options: status_options, rich_display: :stacked,
+          dialog_label: translation(".registration_type"), no_js: true) %>
     <% end %>
 
     <%= render Register::SectionLabel::Component.new(text: contact_section_text, divider: true) %>

@@ -13,6 +13,10 @@ module Register
       end
 
       def call
+        # Which step a page shows depends on server state, and Turbo restores its own
+        # snapshot on back/forward - the cache Cache-Control: no-store can't reach
+        helpers.content_for(:header) { tag.meta(name: "turbo-cache-control", content: "no-cache") }
+
         content_tag(:div,
           content_tag(:div, safe_join([retry_notice, content]), class: "tw:mx-auto tw:max-w-md"),
           class: "tw:-mt-9 tw:-mb-18 tw:bg-gray-100 tw:px-4 tw:py-10 tw:min-[992px]:-mt-15 tw:dark:bg-gray-900",

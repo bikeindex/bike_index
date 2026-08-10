@@ -13,11 +13,8 @@ class RegisterController < ApplicationController
   before_action :redirect_finished, only: %i[create update acknowledge]
   # The step shown depends on server state - a cached page could show a step the
   # registration is past (register--revalidate covers Safari's bfcache, and
-  # @turbo_no_cache the snapshots Turbo restores from on back/forward)
-  before_action do
-    response.set_header("Cache-Control", "no-store")
-    @turbo_no_cache = true
-  end
+  # Register::Page the snapshots Turbo restores from on back/forward)
+  before_action { response.set_header("Cache-Control", "no-store") }
   # Every step is a page. A component takes its content type from the request, and a Turbo
   # submission asks for a turbo_stream first - which would hand the next step back as a
   # stream message, to be grafted onto the step it replaces rather than replacing it

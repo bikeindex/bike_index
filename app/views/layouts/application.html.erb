@@ -8,11 +8,6 @@
     <%# TODO: Cache this ^ %>
     <%= csrf_meta_tags %>
 
-    <%#
-      Set alongside Cache-Control: no-store, for the cache the header can't reach:
-      Turbo restores its own snapshot on back/forward unless the page opts out
-    %>
-    <%= tag.meta name: "turbo-cache-control", content: "no-cache" if @turbo_no_cache %>
     <%= tag.meta name: "honeybadger-api-key", content: ENV["HONEYBADGER_FRONTEND_API_KEY"] %>
     <%= tag.meta name: "honeybadger-environment", content: Rails.env %>
     <%= stylesheet_link_tag 'tailwind', 'revised', "data-turbo-track": "reload" %>

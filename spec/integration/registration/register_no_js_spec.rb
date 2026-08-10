@@ -35,6 +35,13 @@ RSpec.describe "Register flow without JavaScript", type: :system do
     # The cycle types are a list worth showing, so that one falls back to a select
     expect(page).to have_css("noscript select[name='b_param[cycle_type]']", visible: :all)
 
+    # The hidden combobox must not be `required` - a browser won't submit a form holding a
+    # required control it can't focus, so a rider would fill the fallback in and go nowhere.
+    # ui--forms--js-required puts it back. rack_test runs no constraint validation, so this
+    # is the only part of that a spec can see
+    expect(page).to have_css("[data-js-required] input#b_param_manufacturer_id:not([required])")
+    expect(page).to have_css("noscript input[name='b_param[manufacturer_id]'][required]", visible: :all)
+
     fill_in "b_param[manufacturer_id]", with: "Surly"
     fill_in "b_param[owner_email]", with: owner_email
     click_button "Next"
