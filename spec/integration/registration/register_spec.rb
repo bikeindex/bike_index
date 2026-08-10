@@ -150,7 +150,7 @@ RSpec.describe "Register flow", :js, type: :system do
     click_combobox_option("Stolen")
 
     # A theft is contacted on it, so the field it reveals asks rather than offers
-    expect(page).to have_content("Phone is required for stolen bike")
+    expect(page).to have_content("Phone is required to register a stolen bike")
     expect(find("input[name='bike[phone]']")[:required]).to be_present
 
     # The status the server renders is only a default, so the draft outlives a

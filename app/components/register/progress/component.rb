@@ -12,7 +12,7 @@ module Register
 
       private
 
-      def number = @steps.index(@step).to_i + 1
+      def number = @number ||= @steps.index(@step).to_i + 1
 
       def total = @steps.count
     end

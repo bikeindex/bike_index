@@ -4,10 +4,9 @@ module Register
   module Step2
     # Step 2 of the registration flow: the bike details form
     class Component < ApplicationComponent
-      def initialize(b_param:, steps:, sequence: nil, current_user: nil)
+      def initialize(b_param:, steps:, current_user: nil)
         @b_param = b_param
         @steps = steps
-        @sequence = sequence
         @current_user = current_user
       end
 
@@ -18,19 +17,18 @@ module Register
       end
 
       # A theft report and an e-vehicle's safety pages both come after this form, so it
-      # doesn't always finish the registration
-      def submit_text
-        return translation(".next") unless @steps.last == "2"
+      # doesn't always finish the registration. Which statuses have one is rechecked
+      # client-side, since the status is picked in this form rather than known when it
+      # renders - so the label reads off the same answer both times
+      def submit_texts
+        @submit_texts ||= Bike.statuses.index_with do |status|
+          next translation(".next") if @steps.include?("review") || BikeServices::Register.report_step?(status)
 
-        translation(".complete_registration", cycle_type: @b_param.type_titleize)
+          translation(".complete_registration", cycle_type: @b_param.type_titleize)
+        end
       end
 
-      # Which statuses have a step after this form - the report, or the safety pages,
-      # which follow whatever the status. Rechecked client-side, since the status is
-      # picked in this form rather than known when it renders
-      def continuing_statuses
-        @steps.include?("review") ? Bike.statuses : BikeServices::Register::REPORT_RECORDS.keys
-      end
+      def submit_text = submit_texts[@b_param.status]
 
       def organization
         @organization ||= @b_param.creation_organization
@@ -124,8 +122,9 @@ module Register
       # rather than offering it. Which of them applies is picked in this form, so the copy
       # for each renders and register--status-fields shows whichever the status names
       def phone_required_texts
-        {"status_stolen" => translation(".phone_required_stolen", cycle_type:),
-         "status_impounded" => translation(".phone_required_found", cycle_type:)}
+        @phone_required_texts ||= BikeServices::Register::REPORT_RECORDS.keys.index_with do |status|
+          translation((status == "status_stolen") ? ".phone_required_stolen" : ".phone_required_found", cycle_type:)
+        end
       end
 
       def phone_required? = phone_required_texts.key?(@b_param.status)

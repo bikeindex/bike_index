@@ -16,8 +16,11 @@ module Register
         @b_param.type
       end
 
+      # Memoized: every branch on this page asks, and BParam#status re-dups the params
       def stolen?
-        @b_param.status_stolen?
+        return @stolen unless @stolen.nil?
+
+        @stolen = @b_param.status_stolen?
       end
 
       def heading

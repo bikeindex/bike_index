@@ -22,8 +22,8 @@ module Register
         @b_param.self_made?(@current_user)
       end
 
-      # The bike's own status, once there's a bike to have one
-      def stolen? = @bike&.status_stolen?
+      # The bike's own status - only asked once there's a bike to have one
+      def stolen? = @bike.status_stolen?
 
       # Without the bike the registration is only held, waiting on the email
       def heading_text

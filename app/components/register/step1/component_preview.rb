@@ -27,9 +27,8 @@ module Register
 
         b_param = ::BParam.new(origin: "register_flow",
           params: {bike: {owner_email: lookbook_user&.email}.merge(bike).compact}.as_json)
-        sequence = ::BikeServices::Register.registration_sequence(b_param)
-        render(Register::Step1::Component.new(b_param:, sequence:, current_user: lookbook_user,
-          steps: ::BikeServices::Register.steps(b_param, sequence:)))
+        render(Register::Step1::Component.new(b_param:, current_user: lookbook_user,
+          steps: ::BikeServices::Register.steps(b_param, sequence: ::BikeServices::Register.registration_sequence(b_param))))
       end
     end
   end

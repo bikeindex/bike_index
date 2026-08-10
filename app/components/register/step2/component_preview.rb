@@ -33,9 +33,8 @@ module Register
                          manufacturer_id: ::Manufacturer.frame_makers.first&.id}
         b_param = ::BParam.new(origin: "register_flow",
           params: {bike: step_1_values.merge(bike).compact}.as_json)
-        sequence = ::BikeServices::Register.registration_sequence(b_param)
-        render(Register::Step2::Component.new(b_param:, sequence:, current_user: lookbook_user,
-          steps: ::BikeServices::Register.steps(b_param, sequence:)))
+        render(Register::Step2::Component.new(b_param:, current_user: lookbook_user,
+          steps: ::BikeServices::Register.steps(b_param, sequence: ::BikeServices::Register.registration_sequence(b_param))))
       end
     end
   end

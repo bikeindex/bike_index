@@ -5,12 +5,13 @@ import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='register--status-fields'
 //
-// Fields only some registration statuses ask for - phone, address - gated the
-// way bikes/new gates them. bikes/new knows the status before it renders; here
-// it's picked in this form, so each field carries its own statuses and gets
-// rechecked whenever the combobox changes.
+// What a registration status asks for, rechecked whenever the combobox changes.
+// bikes/new knows the status before it renders; here it's picked in this form, so each
+// piece carries its own answer: a field its data-statuses, and anything whose copy varies
+// a data-texts map of status -> what to say. For a field, having copy is what makes it
+// asked for rather than offered.
 export default class extends Controller {
-  static targets = ['field', 'requiredField', 'submitLabel']
+  static targets = ['field', 'submitLabel']
 
   connect () {
     // form-persist restores a drafted status by assignment, firing no event
@@ -36,16 +37,20 @@ export default class extends Controller {
       // the address (its country select always has a value) and a phone the
       // status no longer asks for
       field.querySelectorAll('input, select, textarea').forEach((el) => { el.disabled = !shown })
+      if (field.dataset.texts) this.applyRequired(field, this.textFor(field, status))
     })
-    this.requiredFieldTargets.forEach((field) => this.applyRequired(field, status))
-    this.applySubmitLabel(status)
+    if (this.hasSubmitLabelTarget) {
+      this.submitLabelTarget.textContent = this.textFor(this.submitLabelTarget, status)
+    }
   }
 
-  // Fields some statuses ask for rather than offer - the phone a theft or a find gets
-  // contacted on. The copy for each status renders with the field, so which one applies
-  // is a lookup rather than a rebuilt label
-  applyRequired (field, status) {
-    const text = JSON.parse(field.dataset.requiredTexts)[status]
+  textFor (element, status) {
+    return JSON.parse(element.dataset.texts)[status]
+  }
+
+  // The phone a theft or a find gets contacted on: required, starred rather than badged
+  // optional, and captioned with which of them is asking
+  applyRequired (field, text) {
     field.querySelectorAll('input, select, textarea').forEach((el) => { el.required = Boolean(text) })
     field.querySelectorAll('[data-required-marker]').forEach((el) => { el.hidden = !text })
     field.querySelectorAll('[data-optional-marker]').forEach((el) => { el.hidden = Boolean(text) })
@@ -54,16 +59,5 @@ export default class extends Controller {
       helper.textContent = text || ''
       helper.hidden = !text
     }
-  }
-
-  // A theft is reported after this form, so the button can't claim to finish the
-  // registration - and which statuses do that is picked in this form too
-  applySubmitLabel (status) {
-    if (!this.hasSubmitLabelTarget) return
-
-    const label = this.submitLabelTarget
-    label.textContent = JSON.parse(label.dataset.statuses).includes(status)
-      ? label.dataset.nextText
-      : label.dataset.completeText
   }
 }

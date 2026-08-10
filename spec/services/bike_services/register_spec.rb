@@ -216,7 +216,7 @@ RSpec.describe BikeServices::Register do
     end
 
     it "comes after step 2, and saves the stolen record the bike is created with" do
-      expect(described_class.report_step?(b_param)).to be_truthy
+      expect(described_class.report_step?(b_param.status)).to be_truthy
       expect(described_class.steps(b_param, sequence: nil).count).to eq 3
       expect(described_class.steps(b_param, sequence: nil)).to eq %w[1 2 report]
       expect(described_class.step_before("report", steps: described_class.steps(b_param, sequence: nil))).to eq "2"
@@ -290,7 +290,7 @@ RSpec.describe BikeServices::Register do
         # Not just the bike's status: BParam reads it back off the record the report saved
         expect(b_param.reload.status).to eq "status_with_owner"
         expect(b_param.stolen_attrs).to be_blank
-        expect(described_class.report_step?(b_param)).to be_falsey
+        expect(described_class.report_step?(b_param.status)).to be_falsey
         expect(described_class.send(:ready_for_bike?, b_param, sequence: nil)).to be_truthy
       end
 
@@ -337,7 +337,7 @@ RSpec.describe BikeServices::Register do
       let(:bike_params) { super().except(:status) }
 
       it "has no report to make" do
-        expect(described_class.report_step?(b_param)).to be_falsey
+        expect(described_class.report_step?(b_param.status)).to be_falsey
         expect(described_class.steps(b_param, sequence: nil)).to eq %w[1 2]
         expect(described_class.permitted_step(b_param, "report", sequence: nil)).to eq "2"
       end

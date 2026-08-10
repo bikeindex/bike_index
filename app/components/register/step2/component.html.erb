@@ -354,9 +354,9 @@
 
     <div
       class="<%= "tw:hidden" unless show_phone? %>"
-      data-register--status-fields-target="field requiredField"
+      data-register--status-fields-target="field"
       data-statuses="<%= phone_statuses.to_json %>"
-      data-required-texts="<%= phone_required_texts.to_json %>"
+      data-texts="<%= phone_required_texts.to_json %>"
     >
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone, kind: :telephone_field,
           label_text: translation(".phone"), wrapper_class: "tw:mb-6",
@@ -397,9 +397,7 @@
         spinner: true, html_class: "tw:w-full")) do %>
       <span
         data-register--status-fields-target="submitLabel"
-        data-statuses="<%= continuing_statuses.to_json %>"
-        data-next-text="<%= translation(".next") %>"
-        data-complete-text="<%= translation(".complete_registration", cycle_type: @b_param.type_titleize) %>"
+        data-texts="<%= submit_texts.to_json %>"
       >
         <%= submit_text %>
       </span>

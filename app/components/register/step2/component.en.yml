@@ -51,8 +51,8 @@ en:
         owner_registration_description: Registering for myself or on behalf of owner
         phone: Phone
         phone_placeholder: "(555) 000-0000"
-        phone_required_found: Phone is required for found %{cycle_type}
-        phone_required_stolen: Phone is required for stolen %{cycle_type}
+        phone_required_found: Phone is required to register a found %{cycle_type}
+        phone_required_stolen: Phone is required to register a stolen %{cycle_type}
         primary_color_blank: Primary color — e.g. Black
         read_how_to_find_html: Read about %{how_to_find_link} <small>(opens in a separate
           window)</small>

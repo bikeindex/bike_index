@@ -129,7 +129,7 @@ class OrganizedMailer < ApplicationMailer
     mail(reply_to: reply_to,
       to: b_param.owner_email,
       subject: I18n.t("organized_mailer.#{subject_key}.subject",
-        **default_subject_vars.merge(bike_type: b_param.type)),
+        **default_subject_vars, cycle_type: b_param.type),
       tag:) { |format| format.html { render component } }
   end
 

@@ -35,7 +35,8 @@ class RegisterController < ApplicationController
   # find, the e-vehicle acknowledgment pages (?step=3 up), ?step=review and
   # ?step=finished. A step the registration isn't at redirects to one it is.
   def show
-    step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence)
+    steps = flow_steps
+    step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence, steps:)
     return redirect_to(step_path(step)) if step != params[:step]
 
     case step
@@ -44,19 +45,19 @@ class RegisterController < ApplicationController
       render Register::StepFinished::Component.new(b_param: @b_param, current_user:)
     when "review"
       @page_title = I18n.t("meta_titles.register_review", cycle_type: @b_param.type)
-      render Register::StepAcknowledgmentReview::Component.new(b_param: @b_param, sequence: @registration_sequence, steps: flow_steps, current_user:)
+      render Register::StepAcknowledgmentReview::Component.new(b_param: @b_param, sequence: @registration_sequence, steps:, current_user:)
     when "report"
       @page_title = I18n.t("meta_titles.register_report")
-      render Register::StepReport::Component.new(b_param: @b_param, steps: flow_steps)
+      render Register::StepReport::Component.new(b_param: @b_param, steps:)
     when "2"
       @page_title = I18n.t("meta_titles.register_step_2", cycle_type: @b_param.type)
-      render Register::Step2::Component.new(b_param: @b_param, sequence: @registration_sequence, steps: flow_steps, current_user:)
+      render Register::Step2::Component.new(b_param: @b_param, steps:, current_user:)
     when "1"
       @page_title = I18n.t("meta_titles.register_step_1", cycle_type: @b_param.type)
-      render Register::Step1::Component.new(b_param: @b_param, sequence: @registration_sequence, steps: flow_steps, current_user:)
+      render Register::Step1::Component.new(b_param: @b_param, steps:, current_user:)
     else
       @page_title = I18n.t("meta_titles.register_acknowledgment", cycle_type: @b_param.type)
-      render Register::StepAcknowledgment::Component.new(b_param: @b_param, sequence: @registration_sequence, step:, steps: flow_steps)
+      render Register::StepAcknowledgment::Component.new(b_param: @b_param, sequence: @registration_sequence, step:, steps:)
     end
   end
 
@@ -66,7 +67,7 @@ class RegisterController < ApplicationController
     unless saved
       # The 422 render skips the derived meta title, which now needs the interpolation
       @page_title = I18n.t("meta_titles.register_create", cycle_type: @b_param.type)
-      return render(Register::Step1::Component.new(b_param: @b_param, sequence: @registration_sequence, steps: flow_steps, current_user:),
+      return render(Register::Step1::Component.new(b_param: @b_param, steps: flow_steps, current_user:),
         status: :unprocessable_entity)
     end
 
@@ -82,7 +83,7 @@ class RegisterController < ApplicationController
       bike_params: update_params)
     # Saved either way, so the re-render has everything they entered
     unless saved
-      return render(Register::Step2::Component.new(b_param: @b_param, sequence: @registration_sequence, steps: flow_steps, current_user:),
+      return render(Register::Step2::Component.new(b_param: @b_param, steps: flow_steps, current_user:),
         status: :unprocessable_entity)
     end
 
@@ -92,13 +93,15 @@ class RegisterController < ApplicationController
   # The theft or the find - everything the stolen or impound record is built from.
   # A theft has to say when and where; the rest of the step is optional
   def report
-    step = BikeServices::Register.permitted_step(@b_param, "report", sequence: @registration_sequence)
+    # The report doesn't move the status or the creator, so the list survives the save
+    steps = flow_steps
+    step = BikeServices::Register.permitted_step(@b_param, "report", sequence: @registration_sequence, steps:)
     return redirect_to(step_path(step)) if step != "report"
 
     # Saved either way, so the re-render has everything they entered
     unless BikeServices::Register.save_report(@b_param, report_params:)
       @page_title = I18n.t("meta_titles.register_report")
-      return render(Register::StepReport::Component.new(b_param: @b_param, steps: flow_steps),
+      return render(Register::StepReport::Component.new(b_param: @b_param, steps:),
         status: :unprocessable_entity)
     end
 
@@ -107,7 +110,8 @@ class RegisterController < ApplicationController
 
   # Each acknowledgment page posts here, and the review's final acknowledgment
   def acknowledge
-    step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence)
+    steps = flow_steps
+    step = BikeServices::Register.permitted_step(@b_param, params[:step], sequence: @registration_sequence, steps:)
     acknowledged = BikeServices::Register.acknowledge_step(@b_param, step,
       sequence: @registration_sequence, user: current_user,
       acknowledged_all: params[:acknowledged_all], checked: params[:acknowledged]&.to_unsafe_h&.values)
@@ -119,7 +123,7 @@ class RegisterController < ApplicationController
 
     # The step after this one, not the furthest reached - revisiting an earlier page
     # from the review walks forward through the rest rather than jumping back
-    redirect_to step_path(BikeServices::Register.step_after(step, sequence: @registration_sequence))
+    redirect_to step_path(BikeServices::Register.step_after(step, steps:))
   end
 
   def confirm
