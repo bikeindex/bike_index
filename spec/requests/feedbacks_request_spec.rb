@@ -26,6 +26,20 @@ RSpec.describe FeedbacksController, type: :request do
     end
     let!(:user) { FactoryBot.create(:user_confirmed) }
 
+    # Nothing else covers ApplicationController's own handler - the controllers that
+    # override it never reach this branch
+    context "with a null origin" do
+      include_context :test_csrf_token
+
+      it "redirects with the CSRF explanation rather than a missing translation" do
+        expect {
+          post base_url, params: {feedback: feedback_attrs}, headers: {"HTTP_ORIGIN" => "null"}
+        }.to_not change(Feedback, :count)
+        expect(response).to redirect_to root_url
+        expect(flash[:error]).to match(/try again.*a VPN/i)
+      end
+    end
+
     context "valid feedback" do
       it "creates a feedback message" do
         expect(user.name).to be_present

@@ -28,6 +28,8 @@ export default class extends Sortable {
     event.preventDefault()
     const markup = this.templateTarget.innerHTML.replaceAll('__INDEX__', `new_${this.#counter++}`)
     this.listTarget.insertAdjacentHTML('beforeend', markup)
+    // An empty bullet composes to the same body, so say so ourselves
+    this.#markEdited()
   }
 
   remove (event) {
@@ -71,11 +73,22 @@ export default class extends Sortable {
       .map((editor) => this.#inline(editor.value))
       .filter((content) => this.#hasText(content))
       .map((content) => `<li>${content}</li>`)
-    this.fieldTarget.value = items.length ? `<ul>${items.join('')}</ul>` : ''
+    const body = items.length ? `<ul>${items.join('')}</ul>` : ''
+    // Composing on upgrade recomposes what the server sent, which isn't an edit
+    if (body === this.fieldTarget.value) return
+
+    this.fieldTarget.value = body
+    this.#markEdited()
   }
 
   get form () {
     return this.element.closest('form')
+  }
+
+  // Lexxy doesn't bubble an input event and the body field is set in code, so nothing
+  // else tells the form its bullets changed
+  #markEdited () {
+    this.fieldTarget.dispatchEvent(new Event('input', { bubbles: true }))
   }
 
   // Flatten the editor's block markup into inline content for one <li>. Lexxy wraps each

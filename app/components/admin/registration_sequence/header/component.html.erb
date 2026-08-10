@@ -1,0 +1,33 @@
+<div class="tw:mb-6">
+  <h1 class="uncap tw:mb-2 tw:text-2xl tw:font-semibold">
+    <%= action_word %>
+    <strong><%= @registration_sequence.display_name %></strong> registration
+    sequence
+  </h1>
+
+  <div
+    class="
+      tw:flex tw:flex-wrap tw:items-baseline tw:justify-between tw:gap-x-4
+      tw:gap-y-1
+    "
+  >
+    <%#
+      Beside the chip, not in it: a disabled button is pointer-events-none, so
+      nothing inside it can be hovered
+    %>
+
+    <div class="tw:flex tw:items-center tw:gap-2">
+      <%= render UI::ButtonGroup::Component.new(entries:) %>
+
+      <% if uneditable_title.present? %>
+        <span class="tw:relative tw:z-10 tw:-mt-4 tw:-ml-4">
+          <%= render UI::Tooltip::Component.new(text: uneditable_title) %>
+        </span>
+      <% end %>
+    </div>
+
+    <% if organization_sequence_path.present? %>
+      <%= link_to "View in organization", organization_sequence_path, class: "twlink tw:ml-auto tw:text-sm" %>
+    <% end %>
+  </div>
+</div>

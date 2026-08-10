@@ -44,6 +44,17 @@ RSpec.describe Register::PageContent::Component, type: :component do
       expect(page).to have_content("Brakebills")
       expect(page).to have_no_content("Electric (motorized) detected")
     end
+
+    context "on the template" do
+      let(:registration_sequence) { FactoryBot.create(:registration_sequence_template) }
+
+      it "badges the template, matching what the editor promised" do
+        page_record.organization_specific = true
+        render_inline(described_class.new(page: page_record))
+
+        expect(page).to have_content("Template")
+      end
+    end
   end
 
   context "without an faq_url" do

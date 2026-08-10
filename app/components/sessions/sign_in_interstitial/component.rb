@@ -2,15 +2,14 @@
 
 module Sessions
   module SignInInterstitial
-    # Emailed links have to be GETs, so they land on a page that renders this and it posts
-    # the token — a scanner or prefetcher following the link doesn't spend it.
+    # Emailed links have to be GETs, so they land here and post what the link carried. Scanners
+    # run the page's JS too, so the form waits for a click rather than submitting on render
     class Component < ApplicationComponent
-      def initialize(url:, fields: {}, heading: nil, submit_text: nil, auto_submit: true)
+      def initialize(url:, fields: {}, heading: nil, submit_text: nil)
         @url = url
         @fields = fields.compact_blank
-        @heading = heading || translation("you_should_be_signed_in_automatically")
+        @heading = heading || translation("finish_signing_in")
         @submit_text = submit_text || translation("sign_in")
-        @auto_submit = auto_submit
       end
     end
   end

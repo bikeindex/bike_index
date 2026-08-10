@@ -15,10 +15,8 @@ module Org
           @form_builder.object.bullets.presence || [""]
         end
 
-        # Registrants see this page's rules badged with the organization's name
-        def organization_name
-          @form_builder.object.registration_sequence&.organization&.short_name
-        end
+        # There's no badge to name until the page belongs to a sequence
+        def badge_name = @form_builder.object.registration_sequence&.badge_name
       end
     end
   end

@@ -126,6 +126,8 @@ Rails.application.routes.draw do
     end
     member do
       get "unsubscribe"
+      # A client without one-click opens the POST target in a browser; that GET gets the interstitial
+      get "unsubscribe_update", to: "users#unsubscribe", as: nil
       post "unsubscribe_update"
     end
   end
@@ -167,6 +169,9 @@ Rails.application.routes.draw do
     member { post :is_private }
   end
 
+  # Short_id forms the resources :id segment can't match (prefix + slash, dots).
+  # Before resources so it wins for "r/..." paths; its constraint leaves plain ids alone.
+  get "registrations/*id", to: "registrations#show", constraints: {id: /r\W.*/i}, format: false
   resources :registrations, only: %i[new create show edit] do
     collection { get :embed }
   end
@@ -209,8 +214,7 @@ Rails.application.routes.draw do
     end
   end
 
-  # Short_id forms the resources :id segment can't match (prefix + slash, dots).
-  # Before resources so it wins for "r/..." paths; its constraint leaves plain ids alone.
+  # Short_id forms the resources :id segment can't match; before resources, as with registrations above
   get "bikes/*id", to: "bikes#show", constraints: {id: /r\W.*/i}, format: false
   resources :bikes, except: %i[index edit] do
     collection { get :scanned }
@@ -308,10 +312,18 @@ Rails.application.routes.draw do
 
     resources :theft_alert_plans, only: %i[index edit update new create]
 
-    resources :registration_sequences, only: %i[index]
+    resources :registration_sequences, only: %i[index show edit update] do
+      member { get :preview }
+      resources :pages, only: %i[new create], controller: "registration_sequence_pages"
+    end
+    resources :registration_sequence_pages, only: %i[edit update destroy]
 
     resources :bug_reports, only: %i[index show update] do
-      collection { post :assign_tags }
+      collection do
+        post :assign_tags
+        # Selection chips for the tags combobox on the show page
+        post :tag_chips
+      end
     end
 
     resources :organizations do
@@ -508,7 +520,7 @@ Rails.application.routes.draw do
 
   # Short bike URLs: /r/<short_id> (and /R/...). The whole path is passed through
   # so ShortId#decode strips the "r/" prefix itself, even when the body starts with "r".
-  get "*id", to: "bikes#show", constraints: {id: %r{[rR]/.*}}, format: false
+  get "*id", to: "registrations#show", constraints: {id: %r{[rR]/.*}}, format: false
   # Short bike_version URLs: /v/<short_id> (and /V/...)
   get "*id", to: "bike_versions#show", constraints: {id: %r{[vV]/.*}}, format: false
   # Short marketplace_listing URLs: /m/<short_id> (and /M/...)

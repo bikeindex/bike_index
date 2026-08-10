@@ -249,6 +249,30 @@ RSpec.describe SessionsController, type: :request do
       expect(Capybara.string(response.body))
         .to have_css("form[action='/session/sign_in_with_magic_link'] input[name='token'][value='#{token}']", visible: :hidden)
     end
+
+    # A dead token matches no user whatever killed it, so the reason comes from its timestamp
+    context "incorrect_token" do
+      def failure_for(token)
+        get "/session/magic_link", params: {incorrect_token: token}
+        expect(response).to render_template(:magic_link)
+        response.body
+      end
+
+      it "names the timeout for a token older than the window" do
+        stale = SecurityTokenizer.new_token((User::AUTH_TOKEN_EXPIRY + 1.minute).ago)
+        expect(failure_for(stale)).to match(/link has expired/i)
+      end
+
+      it "says it was already used for a token inside the window" do
+        expect(failure_for(SecurityTokenizer.new_token)).to match(/already been used/i)
+      end
+
+      it "stays generic for a token it can't read" do
+        body = failure_for("mangled-by-some-email-client")
+        expect(body).to match(/unable to authenticate/i)
+        expect(body).to_not match(/already been used|link has expired/i)
+      end
+    end
   end
 
   describe "sign_in_with_magic_link" do
@@ -259,6 +283,29 @@ RSpec.describe SessionsController, type: :request do
       expect(response).to redirect_to admin_root_url
       expect(superadmin.reload.magic_link_token).to be_nil
       expect(superadmin.last_login_at).to be_within(1.second).of Time.current
+    end
+
+    # find_by with a blank token matches IS NULL - nearly every user
+    it "signs nobody in for a blank or missing token" do
+      [{token: ""}, {}].each do |params|
+        post "/session/sign_in_with_magic_link", params: params
+        expect(response).to redirect_to magic_link_session_path(incorrect_token: params[:token])
+        expect(response.cookies["auth"]).to be_blank
+      end
+    end
+
+    # The biggest bucket of real failures: the link worked, and then got clicked again
+    it "tells a spent token it was already used, not that something went wrong" do
+      user = FactoryBot.create(:user_confirmed)
+      token = user.refreshed_magic_link_token
+      post "/session/sign_in_with_magic_link", params: {token:}
+      expect(user.reload.magic_link_token).to be_nil
+      delete "/session"
+
+      post "/session/sign_in_with_magic_link", params: {token:}
+      expect(response).to redirect_to magic_link_session_path(incorrect_token: token)
+      follow_redirect!
+      expect(response.body).to match(/already been used/i)
     end
 
     it "redirects back to return_to when passed (review-app banner)" do
@@ -290,6 +337,29 @@ RSpec.describe SessionsController, type: :request do
           expect(flash[:notice]).to be_blank
         end
       end
+    end
+  end
+
+  describe "posting with a null origin" do
+    include_context :test_csrf_token
+    let!(:user) { FactoryBot.create(:user_confirmed) }
+
+    # Privacy extensions and VPNs strip the Origin header, which Rails rejects outright.
+    # Losing the session that failed the check is exactly when the form is worth keeping
+    it "hands identify back the email it was given" do
+      post "/session/identify", params: {session: {email: user.email}}, headers: {"HTTP_ORIGIN" => "null"}
+      expect(response).to render_template(:new)
+      expect(response.body).to match(user.email)
+      expect(flash[:error]).to match(/try again.*a VPN/i)
+    end
+
+    it "hands the magic link back its token, unspent" do
+      token = user.refreshed_magic_link_token
+      post "/session/sign_in_with_magic_link", params: {token:}, headers: {"HTTP_ORIGIN" => "null"}
+      expect(response).to render_template(:magic_link)
+      expect(user.reload.magic_link_token).to eq token
+      expect(Capybara.string(response.body))
+        .to have_css("form[action='/session/sign_in_with_magic_link'] input[name='token'][value='#{token}']", visible: :hidden)
     end
   end
 

@@ -10,6 +10,7 @@ class SessionsController < ApplicationController
   before_action :redirect_forced_saml, only: %i[identify create create_magic_link]
 
   def new
+    @email = params[:email]
     render_partner_or_default_signin_layout
   end
 
@@ -41,11 +42,11 @@ class SessionsController < ApplicationController
 
   def magic_link
     @token = params[:token]
-    @incorrect_token = params[:incorrect_token].presence
+    @failure = magic_link_failure(params[:incorrect_token]) if params[:incorrect_token].present?
   end
 
   def sign_in_with_magic_link
-    user = User.find_by_magic_link_token(params[:token])
+    user = User.find_for_auth_token("magic_link_token", params[:token])
     if user.present? && !user.auth_token_expired?("magic_link_token")
       user.confirm(user.confirmation_token) unless user.confirmed?
       @user = user
@@ -93,6 +94,21 @@ class SessionsController < ApplicationController
     end
   end
 
+  # Hand back the form they submitted rather than dumping them at user_root_url
+  def handle_unverified_request
+    flash.now[:error] = invalid_authenticity_token_message
+    case action_name
+    when "sign_in_with_magic_link"
+      @token = params[:token]
+      render_partner_or_default_signin_layout(render_action: :magic_link)
+    when "identify", "create", "create_magic_link"
+      @email = submitted_email
+      render_partner_or_default_signin_layout(render_action: :new)
+    else
+      super
+    end
+  end
+
   def destroy
     remove_session
     if params[:partner] == "bikehub"
@@ -114,6 +130,14 @@ class SessionsController < ApplicationController
   # redirect_forced_saml before_action; here only magic-link vs password remains.
   def login_method_for(email)
     Organization.passwordless_email_matching(email).present? ? "magic_link" : "password"
+  end
+
+  # A dead token matches no user whatever killed it, so its timestamp is all that's left to read
+  def magic_link_failure(token)
+    return :unrecognized unless SecurityTokenizer.recognized_token?(token)
+
+    expired = SecurityTokenizer.token_time(token) < Time.current - User::AUTH_TOKEN_EXPIRY
+    expired ? :expired : :already_used
   end
 
   def send_magic_link_and_redirect(user)

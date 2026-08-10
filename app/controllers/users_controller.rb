@@ -6,6 +6,8 @@ class UsersController < ApplicationController
   # the sign-in guard is bypassed by whatever link or bookmark lands on the signup form.
   before_action :redirect_forced_saml, only: %i[new create]
   before_action :find_user_from_token_for_password_reset!, only: %i[update_password_form_with_reset_token update_password_with_reset_token]
+  # RFC 8058 one-click POSTs arrive from the mail provider's servers, with no session or token
+  skip_before_action :verify_authenticity_token, only: %i[unsubscribe_update]
 
   def new
     @user ||= User.new(email: params[:email])
@@ -32,7 +34,7 @@ class UsersController < ApplicationController
     return super unless action_name == "create"
 
     @user = User.new(email: params.dig(:user, :email))
-    flash.now[:error] = translation(:invalid_authenticity_token, scope: [:controllers, :application, :handle_unverified_request])
+    flash.now[:error] = invalid_authenticity_token_message
     render_partner_or_default_signin_layout(render_action: :new)
   end
 
@@ -190,9 +192,13 @@ class UsersController < ApplicationController
     end
   end
 
+  # Forgery protection is skipped here, so the signed id is the only credential - trusting the
+  # session would let any page unsubscribe whoever visits it, without a click behind it
   def unsubscribe_update
-    user = current_user || User.find_signed(params[:id], purpose: :unsubscribe)
-    user.update_attribute :notification_newsletters, false if user.present?
+    User.find_signed(params[:id], purpose: :unsubscribe)&.update_attribute(:notification_newsletters, false)
+    # One-click clients read the status and nothing else
+    return head(:ok) if params["List-Unsubscribe"] == "One-Click"
+
     flash[:success] = translation(:successfully_unsubscribed)
     redirect_to(user_root_url) && return
   end
@@ -215,7 +221,7 @@ class UsersController < ApplicationController
     @token = params[:token].presence
     return @user = current_user if @token.blank? && current_user.present?
 
-    @user = User.find_by_token_for_password_reset(@token) if @token.present?
+    @user = User.find_for_auth_token("token_for_password_reset", @token)
     return true if @user.present? && !@user.auth_token_expired?("token_for_password_reset")
 
     remove_session

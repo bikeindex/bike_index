@@ -180,8 +180,10 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(ActiveStorage::Blob.find_signed!(b_param.image_signed_id).filename.to_s)
       .to eq "bike_photo-landscape.jpeg"
 
-    # The link proves the address, which leaves the theft it's reporting to tell us about
+    # The emailed link lands on the interstitial, which waits for a click - confirming
+    # proves the address, which leaves the theft it's reporting to tell us about
     visit confirmation_link
+    click_button "Continue"
 
     expect(page).to have_content("Report your stolen bike", wait: 10)
     expect(Bike.count).to eq 0

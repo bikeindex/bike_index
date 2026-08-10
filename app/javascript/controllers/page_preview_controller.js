@@ -8,8 +8,8 @@ export default class extends Controller {
 
   connect () {
     this.markStale = this.markStale.bind(this)
-    // input bubbles from the text fields and the contenteditable bullets; change covers
-    // the checkbox and file inputs. Both are user-driven, so neither fires as Lexxy upgrades.
+    // input covers the text fields and the bullet editors, which dispatch their own;
+    // change covers the checkbox and file inputs
     this.element.addEventListener('input', this.markStale)
     this.element.addEventListener('change', this.markStale)
   }

@@ -57,11 +57,12 @@
 #
 # Indexes
 #
-#  index_users_on_address_record_id         (address_record_id)
-#  index_users_on_email                     (email) WHERE (deleted_at IS NULL)
-#  index_users_on_email_trgm                (email) WHERE (deleted_at IS NULL) USING gin
-#  index_users_on_token_for_password_reset  (token_for_password_reset)
-#  index_users_on_username                  (username) WHERE (deleted_at IS NULL)
+#  index_users_on_address_record_id             (address_record_id)
+#  index_users_on_email                         (email) WHERE (deleted_at IS NULL)
+#  index_users_on_email_trgm                    (email) WHERE (deleted_at IS NULL) USING gin
+#  index_users_on_magic_link_token_outstanding  (magic_link_token) WHERE (magic_link_token IS NOT NULL)
+#  index_users_on_token_for_password_reset      (token_for_password_reset)
+#  index_users_on_username                      (username) WHERE (deleted_at IS NULL)
 #
 class User < ApplicationRecord
   include FeatureFlaggable
@@ -69,6 +70,8 @@ class User < ApplicationRecord
   include AddressRecordedWithinBoundingBox
 
   EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/
+  # How long an emailed token stays good for - magic link sign in and password reset alike
+  AUTH_TOKEN_EXPIRY = 10.minutes
 
   cattr_accessor :current_user
 
@@ -164,6 +167,11 @@ class User < ApplicationRecord
   scope :member, -> { includes(:memberships).merge(Membership.active) }
 
   class << self
+    # Never find_by_<column> for these - a blank token matches IS NULL, which is nearly every row
+    def find_for_auth_token(auth_token_type, token)
+      where(auth_token_type => token).first if token.present?
+    end
+
     def fuzzy_email_find(email)
       UserEmail.confirmed.fuzzy_user_find(email)
     end
@@ -398,7 +406,7 @@ class User < ApplicationRecord
   end
 
   def auth_token_expired?(auth_token_type)
-    auth_token_time(auth_token_type) < (Time.current - 2.hours)
+    auth_token_time(auth_token_type) < (Time.current - AUTH_TOKEN_EXPIRY)
   end
 
   def accepted_vendor_terms_of_service?
@@ -437,6 +445,11 @@ class User < ApplicationRecord
       update_auth_token("magic_link_token")
     end
     magic_link_token
+  end
+
+  # Newsletters are infrequent, so this outlives any reasonable "unsubscribe me" click
+  def unsubscribe_signed_id
+    signed_id(purpose: :unsubscribe, expires_in: 365.days)
   end
 
   def update_last_login(ip_address)

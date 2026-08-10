@@ -24,9 +24,11 @@ RSpec.describe "Signup", :js, type: :system do
     expect(user.confirmed?).to be_falsey
 
     Email::ConfirmationJob.drain
-    # Lands on the interstitial, which posts itself. That the GET alone doesn't confirm is
-    # users_request_spec's job - here the point is that the POST happens without a click
+    # The interstitial waits for a click; that the GET alone doesn't confirm is
+    # users_request_spec's job
     visit emailed_path("/users/confirm")
+    expect(user.reload.confirmed?).to be_falsey
+    click_button "Sign in"
     expect(page).to have_link("set a password to sign in", wait: 10)
     expect(user.reload.confirmed?).to be_truthy
 
@@ -86,6 +88,7 @@ RSpec.describe "Signup", :js, type: :system do
 
     Email::MagicLoginLinkJob.drain
     visit emailed_path("/session/magic_link")
+    click_button "Sign in"
     expect(page).to have_link("set a password to sign in", wait: 10)
 
     click_link "Update your profile"
@@ -100,6 +103,7 @@ RSpec.describe "Signup", :js, type: :system do
 
     Email::AdditionalEmailConfirmationJob.drain
     visit emailed_path("/user_emails/#{user_email.id}/confirm")
+    click_button "Confirm email"
 
     expect(page).to have_content("has been confirmed and added to your account", wait: 10)
     expect(user_email.reload.confirmed?).to be_truthy
