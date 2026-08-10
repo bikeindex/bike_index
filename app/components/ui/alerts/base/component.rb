@@ -28,6 +28,12 @@ module UI
 
         private
 
+        # What a screen reader reads in place of the icon. :purple names a color rather
+        # than a meaning, so it announces the meaning it actually carries
+        def announcement
+          translation((@kind == :purple) ? ".info" : ".#{@kind}")
+        end
+
         def normalized_kind(kind)
           return kind.to_sym if KINDS.include?(kind&.to_sym)
 
