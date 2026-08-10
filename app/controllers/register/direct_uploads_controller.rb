@@ -15,13 +15,14 @@ module Register
     end
 
     # An embed registration belongs to the organization handing out the form, not to whoever
-    # fills it in, so find_token - which resumes a registration - won't hand it over
+    # fills it in, so find_token - which resumes a registration - won't hand it over. The
+    # fallback is the lookup the embed page itself built the form from.
     def b_param
       return @b_param if defined?(@b_param)
 
       token = params[:b_param_token]
       @b_param = BikeServices::Register.find_token(user: current_user, params_token: token) ||
-        BParam.with_organization_or_no_creator(token)
+        BParam.find_from_token(token)
     end
 
     # A signed id is a bearer token, so without this any registration could claim any blob.

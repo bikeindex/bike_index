@@ -18,12 +18,6 @@ export default class extends Controller {
     this.element.removeEventListener('focusout', this.stripAllInputs.bind(this))
   }
 
-  handleFocusout (event) {
-    if (event.target.matches(this.constructor.inputSelector)) {
-      this.stripAllInputs()
-    }
-  }
-
   stripAllInputs () {
     const textInputs = this.element.querySelectorAll(this.constructor.inputSelector)
     textInputs.forEach(input => {
