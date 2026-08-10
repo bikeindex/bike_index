@@ -28,9 +28,6 @@ All of these are reducing coverage, and none of them is a fix:
 - Deleting an assertion, a step, a helper call, or a whole example.
 - Loosening a matcher so it can't fail (`have_css(count: 2)` → `have_css`,
   an exact string → a regex, `have_no_content` → nothing).
-- Adding `:flaky`, or raising an existing `flaky: N` to a bigger N.
-- Bumping `wait:` when you don't have a specific reason to believe the thing
-  being waited on legitimately takes that long.
 - `skip`/`pending`/`xit`, or excluding the spec from a CI shard.
 
 A flaky test is a *reporting* problem — the suite is telling you something real
@@ -38,15 +35,42 @@ and telling you unreliably. Every item above changes the reporting and leaves
 the underlying behaviour untested, which is strictly worse than the flake: a
 flake wastes your time, silently-missing coverage wastes an incident.
 
-The two legitimate outcomes are: **fix the cause**, or **leave it failing and
-say so**. If the only fix you can see requires giving up coverage, that is a
-decision for the user — describe what you'd have to give up and ask. Do not
-make that trade yourself and mention it in the summary afterwards; announcing a
-scope reduction is not the same as getting agreement for it.
+If the only fix you can see requires giving up coverage, that is a decision for
+the user — describe what you'd have to give up and ask. Do not make that trade
+yourself and mention it in the summary afterwards; announcing a scope reduction
+is not the same as getting agreement for it.
 
 The one exception that isn't an exception: if the assertion is *wrong* — it
 asserts behaviour the app never promised — then fixing it is correcting a bad
 test, not reducing coverage. Say explicitly why it was wrong.
+
+## Retries and longer waits: allowed, but earn them first
+
+`:flaky` (and raising an existing `flaky: N`) and a bigger `wait:` are a
+different category from the list above, because they keep every assertion and
+still require it to pass. Nothing goes untested. They're a legitimate last
+resort — reach for them when the diagnosis below has genuinely run out, not as
+the first thing you try.
+
+What "earn them" means in practice:
+
+- Diagnose first. Instrument, read the failure literally, check the known causes
+  below. Most flakes here have a mechanism you can find in one focused pass, and
+  a retry over a findable cause just makes it intermittent for longer.
+- Leave a comment saying what you found and why the retry stands in for a fix —
+  the harness artifact, the contention, the thing you ruled out. The existing
+  `flaky: 4` on `search_registrations_spec` is the pattern: it names WebDriver's
+  unreliable `go_forward` onto a `turbo-action: advance` entry and explains why
+  more retries than the default. A bare `flaky: true` with no comment tells the
+  next person nothing and will outlive the problem.
+- Say plainly in your summary that you papered over it rather than fixed it, so
+  the user can decide whether that's good enough.
+
+Two signals that a retry is the *wrong* answer even as a last resort: an example
+that fails through all its retries (the cause is structural, and a bigger N won't
+help), and a wait you can't say what it's waiting for. A bump is honest when the
+assertion starts before the work does — a held route released, a job enqueued,
+an expensive response — and the comment names that.
 
 ## Diagnose before you touch anything
 
@@ -192,6 +216,9 @@ papering over a race.
   the link"), not a symptom ("this is flaky on CI").
 - You can explain why the fix addresses that mechanism, even though you probably
   can't reproduce the original failure locally.
+- Or — where you fell back to a retry or a longer wait — you say so as the
+  headline rather than the footnote, and the comment in the spec records what you
+  ruled out, so the next person starts where you stopped.
 - Comments describing the flake are corrected if your diagnosis contradicts
   them — a wrong comment sends the next person down the same wrong path.
 - You say plainly that CI is the only real verification, rather than implying
@@ -200,13 +227,10 @@ papering over a race.
 ## Working on an already-tagged spec
 
 `flaky:` retries only run on CI (`RETRY_FLAKY`, see `spec/rails_helper.rb`).
-`flaky: true` retries twice; `flaky: <n>` overrides the count. Two things follow:
-
-- An example that fails through all its retries is telling you the cause is
-  structural, not random. More retries will not help — that's the signal to go
-  find the mechanism.
-- Local runs don't retry, so a `flaky:`-tagged spec failing once locally is not
-  automatically "the known flake".
+`flaky: true` retries twice; `flaky: <n>` overrides the count. So local runs
+don't retry, and a `flaky:`-tagged spec failing once locally is not
+automatically "the known flake" — it may be a plain reproducible failure that
+the tag has been hiding on CI.
 
 Removing a now-unnecessary `flaky:` tag after you've fixed the cause is good
 housekeeping — that direction adds signal rather than removing it.
