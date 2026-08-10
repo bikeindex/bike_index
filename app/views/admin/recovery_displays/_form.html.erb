@@ -144,7 +144,7 @@
         <div class="tw:flex tw:flex-row tw:gap-2">
           <div>
             <% if @recovery_display.photo_processed.attached? %>
-              <%= image_tag(@recovery_display.photo_url, class: "tw:mb-1 tw:w-24") %>
+              <%= image_tag(@recovery_display.photo_url, class: "tw:mb-1 tw:w-24", alt: @recovery_display.image_alt) %>
             <% elsif @recovery_display.id.present? %>
               <p class="text-danger">No picture!</p>
             <% end %>
@@ -211,7 +211,7 @@
               </a>
 
               <% if (@bike.public_images.present? || @bike.stock_photo_url.present?) && @recovery_display.id.blank? %>
-                <%= image_tag(@bike.image_url, class: "tw:mt-1 tw:w-24", data: { admin__recovery_display_form_target: "usingBikeImage" }) %>
+                <%= image_tag(@bike.image_url, class: "tw:mt-1 tw:w-24", alt: "Photo of the #{@bike.type}", data: { admin__recovery_display_form_target: "usingBikeImage" }) %>
               <% end %>
             </p>
           <% else %>
