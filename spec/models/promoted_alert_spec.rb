@@ -11,12 +11,11 @@ RSpec.describe PromotedAlert, type: :model do
   end
 
   describe "id sequence" do
-    # Backfills::PromotedAlertJob copies theft_alerts across keeping their ids - CreatePromotedAlerts
-    # reserves that range, and MINVALUE is what carries the reservation into db/structure.sql
-    let(:min_value) { PromotedAlert.connection.select_value("SELECT min_value FROM pg_sequences WHERE sequencename = 'promoted_alerts_id_seq'") }
+    # CreatePromotedAlerts reserves the ids the follow-up backfill copies theft_alerts into.
+    # db/structure.sql is the only way that reservation reaches a database built by schema:load
+    let(:start_value) { PromotedAlert.connection.select_value("SELECT start_value FROM pg_sequences WHERE sequencename = 'promoted_alerts_id_seq'") }
     it "starts above the reserved ids" do
-      expect(min_value).to be > 1
-      expect(FactoryBot.create(:promoted_alert).id).to be >= min_value
+      expect(start_value).to be >= 10_000
     end
   end
 

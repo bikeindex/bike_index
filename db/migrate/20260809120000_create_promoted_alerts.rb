@@ -1,21 +1,19 @@
 class CreatePromotedAlerts < ActiveRecord::Migration[8.1]
-  # Backfills::PromotedAlertJob copies theft_alerts across keeping their ids. Start this
-  # sequence above those, so an alert created before the copy runs can't take an id the copy
-  # still needs - it would be skipped, and its notifications would end up on whichever alert
-  # did take the id. MINVALUE, not setval: pg_dump writes MINVALUE into db/structure.sql, so
-  # databases built by db:schema:load get the reservation too, and nothing can wind back under it
-  ID_HEADROOM = 10_000
-
   def up
     # The foreign keys below lock out writes to the tables they reference. Fail rather than
     # queue behind a long transaction and take those writes down with us
     execute("SET LOCAL lock_timeout = '5s'")
 
+    # The follow-up backfill copies theft_alerts across keeping their ids. Reserve room above
+    # them, so an alert created before it runs can't take an id the copy still needs - it would
+    # be skipped, and its notifications would end up on whichever alert did take the id
+    first_id = select_value("SELECT COALESCE(MAX(id), 0) FROM theft_alerts") + 10_000
+
     create_table :promoted_alerts do |t|
-      t.integer :stolen_record_id
-      t.integer :theft_alert_plan_id
-      t.integer :payment_id
-      t.integer :user_id
+      t.references :stolen_record, type: :integer, foreign_key: {on_delete: :cascade}
+      t.references :theft_alert_plan, type: :integer, foreign_key: {on_delete: :cascade}
+      t.references :payment, type: :integer, foreign_key: true
+      t.references :user, type: :integer, foreign_key: true
       t.integer :status, default: 0, null: false
       t.datetime :start_at
       t.datetime :end_at
@@ -25,26 +23,16 @@ class CreatePromotedAlerts < ActiveRecord::Migration[8.1]
       t.float :latitude
       t.float :longitude
       t.integer :reach
-      t.bigint :bike_id
+      t.bigint :bike_id, index: true
       t.datetime :facebook_updated_at
       t.integer :amount_cents_facebook_spent
       t.boolean :admin, default: false
       t.integer :ad_radius_miles
     end
 
-    add_index :promoted_alerts, :bike_id
-    add_index :promoted_alerts, :payment_id
-    add_index :promoted_alerts, :stolen_record_id
-    add_index :promoted_alerts, :theft_alert_plan_id
-    add_index :promoted_alerts, :user_id
-
-    add_foreign_key :promoted_alerts, :payments
-    add_foreign_key :promoted_alerts, :stolen_records, on_delete: :cascade
-    add_foreign_key :promoted_alerts, :theft_alert_plans, on_delete: :cascade
-    add_foreign_key :promoted_alerts, :users
-
-    first_id = select_value("SELECT COALESCE(MAX(id), 0) FROM theft_alerts") + ID_HEADROOM
-    execute("ALTER SEQUENCE promoted_alerts_id_seq MINVALUE #{first_id} START #{first_id} RESTART")
+    # pg_dump writes START into db/structure.sql, so databases built by db:schema:load get the
+    # reservation too - a setval wouldn't reach them
+    execute("ALTER SEQUENCE promoted_alerts_id_seq START #{first_id} RESTART")
   end
 
   def down
