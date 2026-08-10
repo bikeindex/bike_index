@@ -24,12 +24,13 @@
         <div class="alert alert-error">
           <a class="close" data-dismiss="alert">×</a>
 
-          <h4>
+          <%# preflight drops heading sizing and list markers; embed_styles never restated them %>
+          <h4 class="tw:font-bold">
             <%= t(".please_fix_the_following") %>
             <%= pluralize(@b_param.bike_errors.count, t(".error")) %>
           </h4>
 
-          <ul>
+          <ul class="tw:list-disc tw:pl-10">
             <% @b_param.bike_errors.each do |msg| %>
               <li><%= msg %></li>
             <% end %>

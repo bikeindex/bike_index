@@ -5,4 +5,7 @@
 // can load has to declare the same order — otherwise whichever the browser parses
 // first decides it. Import this at the top of each Sass entry point;
 // app/assets/tailwind/application.css isn't Sass and keeps its own copy of the line.
+//
+// Still unlayered, so they outrank every tailwind layer on the pages that load both:
+// email.scss (premailer inlines it, and css_parser can't read @layer) and kelsey_styles.css.
 @layer theme, base, legacy, components, utilities;

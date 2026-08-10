@@ -11,8 +11,7 @@
       <% if @search_kind == "all" %>
         All kinds
       <% else %>
-        <%= @search_kind.humanize %>
-        only
+        <%= @search_kind.humanize %> only
       <% end %>
     </a>
 
@@ -34,8 +33,7 @@
 
 <% count_detail = capture do %>
   <% if @tags.present? %>
-    &mdash; with tags:
-    <%= @tags.pluck(:name).join(", ") %>
+    &mdash; with tags: <%= @tags.pluck(:name).join(", ") %>
   <% end %>
 <% end %>
 

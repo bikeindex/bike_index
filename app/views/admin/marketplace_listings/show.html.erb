@@ -107,10 +107,9 @@
             <% elsif @marketplace_listing.item.is_a?(BikeVersion) %>
               BikeVersion
               <%= link_to @marketplace_listing.item_id, bike_version_path(@marketplace_listing.item_id) %>
-              <small>
-                (bike:
-                <%= link_to @marketplace_listing.item.bike_id, admin_bike_path(@marketplace_listing.item.bike_id) %>)
-              </small>
+
+
+              <small>(bike: <%= link_to @marketplace_listing.item.bike_id, admin_bike_path(@marketplace_listing.item.bike_id) %>)</small>
             <% end %>
           </td>
         </tr>

@@ -29,8 +29,7 @@
       <% if @kind.blank? %>
         All kinds
       <% else %>
-        <%= @kind.titleize %>
-        only
+        <%= @kind.titleize %> only
       <% end %>
     </a>
 
@@ -58,8 +57,7 @@
       <% if @incompleteness == "all" %>
         Paid and Incomplete
       <% else %>
-        <%= @incompleteness.titleize %>
-        only
+        <%= @incompleteness.titleize %> only
       <% end %>
     </a>
 
@@ -86,8 +84,7 @@
       <% elsif @payment_method == "show" %>
         All methods, shown
       <% else %>
-        <%= @payment_method.titleize %>
-        only
+        <%= @payment_method.titleize %> only
       <% end %>
     </a>
 
