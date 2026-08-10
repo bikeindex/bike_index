@@ -19,14 +19,8 @@ module Org
 
       private
 
-      # The panel only ever offers a new notification, so is_repeat and the location are
-      # always defaulted - there's no existing record whose values they'd overwrite
       def parking_notification
-        @parking_notification ||= ::ParkingNotification.new(bike_id: @bike.id, organization: @organization, use_entered_address: false).tap do |notification|
-          notification.is_repeat = notification.likely_repeat?
-          notification.set_location_from_organization
-          notification.kind ||= notification.potential_initial_record&.kind || ::ParkingNotification.kinds.first
-        end
+        @parking_notification ||= ::ParkingNotification.build_for(bike: @bike, organization: @organization)
       end
 
       def organization_registered?

@@ -79,6 +79,8 @@ class OrganizedMailer < ApplicationMailer
   def hot_sheet(hot_sheet, override_emails = nil)
     @organization = hot_sheet.organization
     stolen_records = hot_sheet.fetch_stolen_records
+    # Bump bike cached attributes, to be sure we have all the info
+    stolen_records.each { it.bike.update(updated_at: Time.current) }
     # Enable passing in email to make testing easier, ensure the emails are an array
     recipient_emails = Array(override_emails || hot_sheet.recipient_emails)
     # Ensure we only email people once

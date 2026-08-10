@@ -14,7 +14,7 @@ module UI
             user.address_record = ::AddressRecord.new(country: organization&.country || Country.united_states, user:)
 
             {template: "ui/forms/legacy_form_well/address_record/component_preview/default",
-             locals: {organization:, user:, bike: nil}}
+             locals: {organization:, user:}}
           end
 
           def impounded_bike
@@ -22,7 +22,7 @@ module UI
             bike.impound_records.build(address_record: ::AddressRecord.new(country: Country.united_states))
 
             {template: "ui/forms/legacy_form_well/address_record/component_preview/default",
-             locals: {bike:, user: nil, organization: nil}}
+             locals: {bike:}}
           end
 
           # TODO: WTF, why isn't the @param working :/

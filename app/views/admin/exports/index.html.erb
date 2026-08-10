@@ -67,6 +67,8 @@
 
       <%= link_to "Registered", url_for(sortable_search_params.merge(search_registrations: "registered")), class: "dropdown-item #{params[:search_registrations] == 'registered' ? 'active' : ''}" %>
       <%= link_to "Incomplete", url_for(sortable_search_params.merge(search_registrations: "incomplete")), class: "dropdown-item #{params[:search_registrations] == 'incomplete' ? 'active' : ''}" %>
+
+      <%# link_to escapes the label, so writing &amp; here would double-escape %>
       <%= link_to "Incompletes & registrations", url_for(sortable_search_params.merge(search_registrations: "incompletes_and_registrations")), class: "dropdown-item #{params[:search_registrations] == 'incompletes_and_registrations' ? 'active' : ''}" %> <%# herb:disable html-no-unescaped-entities %>
       <%= link_to "Specific", url_for(sortable_search_params.merge(search_registrations: "specific")), class: "dropdown-item #{params[:search_registrations] == 'specific' ? 'active' : ''}" %>
       <%= link_to "Impounded", url_for(sortable_search_params.merge(search_registrations: "impounded")), class: "dropdown-item #{params[:search_registrations] == 'impounded' ? 'active' : ''}" %>

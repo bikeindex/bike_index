@@ -1,3 +1,7 @@
+<% bike ||= nil %>
+<% user ||= nil %>
+<% organization ||= nil %>
+
 <% if bike.present? %>
   <%= form_for bike, url: bikes_path, method: :post, multipart: true do |f| %>
     <%= fields_for(bike.impound_records.last) do |irecord| %>

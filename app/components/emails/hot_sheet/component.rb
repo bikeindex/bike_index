@@ -8,11 +8,6 @@ module Emails
         @stolen_records = stolen_records
       end
 
-      # Bump bike cached attributes, to be sure we have all the info
-      def before_render
-        @stolen_records.each { it.bike.update(updated_at: Time.current) }
-      end
-
       private
 
       def organization
