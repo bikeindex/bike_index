@@ -90,12 +90,26 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     held = Queue.new
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.route("**/search/marketplace*", ->(route, request) {
-        held.pop if request.headers["turbo-frame"] == "marketplace_results_frame" &&
+        # Pushing the token back leaves the gate open, so a later unfiltered
+        # request doesn't hang on the drained queue.
+        held.push(held.pop) if request.headers["turbo-frame"] == "marketplace_results_frame" &&
           !request.url.include?("primary_activity=")
         route.continue
       })
     end
     -> { held.push(:release) }
+  end
+
+  # Registers after search--form's own turbo:before-fetch-response listener, so
+  # defaultPrevented already carries its verdict on the superseded response.
+  def watch_for_superseded_results
+    page.execute_script(<<~JS)
+      document.addEventListener("turbo:before-fetch-response", (event) => {
+        if (event.target?.id === "marketplace_results_frame" && event.defaultPrevented) {
+          document.body.dataset.testSupersededResultsRejected = "true"
+        }
+      })
+    JS
   end
 
   it "fills the kind counts on load, and keeps a search made before the results arrive" do
@@ -112,8 +126,9 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
 
     # The unfiltered results are only now allowed to arrive - they mustn't take over
+    watch_for_superseded_results
     release_initial_results_load.call
-    page.driver.with_playwright_page { |playwright_page| playwright_page.wait_for_load_state(state: "networkidle") }
+    expect(page).to have_css("body[data-test-superseded-results-rejected]", wait: 10)
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", count: 6)
     expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/)
   end
