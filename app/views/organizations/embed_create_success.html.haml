@@ -1,7 +1,7 @@
 .embed-success-block
   = image_tag "resources/logo_striped.svg"
   -# preflight drops heading font-size and paragraph margins; embed_styles sets neither
-  %h1{class: "tw:text-[2rem]"}
+  %h1{class: "tw:my-[0.67em] tw:text-[2rem]"}
     = t(".your_bike_has_been_added_to_bike_index", bike_type: @bike.type)
   %p{class: "tw:my-4"}
     - bike_link = link_to bike_title_html(@bike), bike_url(@bike), target: "_blank", class: "tw:underline"

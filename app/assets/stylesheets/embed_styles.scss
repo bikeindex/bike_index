@@ -702,4 +702,7 @@ a {
 #bi_embed {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   line-height: normal;
+  // base-font sets these two as well, and neither was ever styled here
+  color: #000;
+  -webkit-font-smoothing: auto;
 }
