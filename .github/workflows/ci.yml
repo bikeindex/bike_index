@@ -8,10 +8,8 @@ permissions:
   contents: write
   pull-requests: write
 
-# A push that supersedes an earlier one makes its run wasted work, so cancel it.
-# Never on main, where deploy_production runs — kamal-deploy.yml refuses to cancel
-# a deploy for the same reason, and cancelling the run that dispatched it would
-# leave the deploy going with no CI behind it.
+# Not on main: cancelling would kill deploy_production, or leave a deploy this run
+# dispatched still going with no CI behind it
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}

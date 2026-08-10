@@ -104,9 +104,8 @@ class BikesController < Bikes::BaseController
       end
       # Have to do in the controller, before assigning
       @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
-      # With JS the photo goes straight to storage and the form posts the blob's signed id.
-      # These params replace the b_param's rather than merging, so a resubmission after an
-      # error has to carry the id already stored.
+      # These params replace the b_param's rather than merging into them, so a resubmission
+      # after an error has to carry the signed id already stored
       signed_id = params[:bike].delete(:image_signed_id).presence || @b_param.image_signed_id
       @b_param.update(params: permitted_bparams.merge({"image_signed_id" => signed_id}.compact),
         origin: (params[:bike][:embeded_extended] ? "embed_extended" : "embed"))

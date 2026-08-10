@@ -100,13 +100,9 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     -> { held.push(:release) }
   end
 
-  # Records whether search--form rejected the superseded response. defaultPrevented
-  # read *inside* the listener would only report preventDefault calls from listeners
-  # that already ran, so the verdict would depend on where this registration lands
-  # relative to search--form's own - invisible, and inverted by anything that makes
-  # the controller reconnect (document listeners survive a Turbo Drive body swap;
-  # Stimulus controllers disconnect and re-add theirs at the end of the list).
-  # Reading on the next tick waits for every listener, whatever the order.
+  # defaultPrevented read inside the listener only reports preventDefault from listeners
+  # that already ran, so the verdict would turn on registration order - which a Stimulus
+  # reconnect silently inverts. The next tick has heard from everyone.
   def watch_for_superseded_results
     page.execute_script(<<~JS)
       document.addEventListener("turbo:before-fetch-response", (event) => {
@@ -132,14 +128,12 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     search_primary_activity("Mountain biking")
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
 
-    # The unfiltered results are only now allowed to arrive - they mustn't take over.
-    # The wait covers a round trip that hasn't started yet: releasing the route only
-    # then sends the request, and rendering all 17 unfiltered listings is the slowest
-    # response in this file. 10s was enough locally and not on a loaded CI shard.
+    # The unfiltered results are only now allowed to arrive - they mustn't take over. The
+    # wait covers a round trip the release only now starts, for this file's slowest response.
     watch_for_superseded_results
     release_initial_results_load.call
-    # ='true': the marker records the verdict either way, so a response Turbo was
-    # allowed to render fails here rather than timing out as if it never arrived
+    # ='true' rather than presence: a response Turbo was allowed to render fails here,
+    # instead of timing out as if it never arrived
     expect(page).to have_css("body[data-test-superseded-results-rejected='true']", wait: 30)
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", count: 6)
     expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/)

@@ -71,8 +71,7 @@ RSpec.describe Register::DirectUploadsController, type: :request do
   end
 
   # The embed forms post here too. Their b_param is created by the organization's auto user,
-  # so the person filling the form in holds nothing but the token - which is all the form
-  # itself is scoped by either
+  # so the person filling the form in holds nothing but the token - as with the form itself
   context "an organization's embed registration" do
     let(:organization) { FactoryBot.create(:organization_with_auto_user) }
     # Created the same way the organizations controller creates one for the embed forms

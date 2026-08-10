@@ -376,8 +376,8 @@
       </small>
     </span>
     <%#
-      A stale token leaves a registration that was never saved, with no token to upload
-      against - the field posts its own bytes then, and the submit makes the registration
+      A stale token leaves an unsaved registration with no token to upload against,
+      so the field posts its own bytes instead
     %>
     <%= render UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :image,
           accept: ImageUploader.permitted_extensions,

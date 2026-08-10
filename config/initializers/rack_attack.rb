@@ -84,9 +84,8 @@ class Rack::Attack
 
   # Each direct upload hands out a presigned URL to write into our bucket. Both endpoints
   # verify who's asking in the app - signed in for one, a registration token for the other -
-  # so these only cap how fast one address can ask. One registration needs a single upload, but
-  # a shop's embed form registers bike after bike from the one address, hence the hourly rather
-  # than per-minute budget on the anonymous one.
+  # so these only cap how fast one address can ask. The anonymous one is hourly rather than
+  # per-minute because a shop's embed form registers bike after bike from the one address.
   throttle("direct_uploads/ip", limit: DIRECT_UPLOAD_MAX, period: 1.minute) do |request|
     request.ip if request.post? && request.path == DIRECT_UPLOADS_PATH
   end

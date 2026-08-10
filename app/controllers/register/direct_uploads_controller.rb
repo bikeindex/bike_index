@@ -14,9 +14,8 @@ module Register
       head :forbidden if b_param.blank?
     end
 
-    # An embed registration belongs to the organization handing out the form rather than to
-    # whoever fills it in, so find_token - which resumes a registration - won't hand it over.
-    # The organization's own rule, that holding the token is enough, is the fallback.
+    # An embed registration belongs to the organization handing out the form, not to whoever
+    # fills it in, so find_token - which resumes a registration - won't hand it over
     def b_param
       return @b_param if defined?(@b_param)
 

@@ -31,8 +31,8 @@ RSpec.describe "Organization embed registration", :js, type: :system do
     fill_in "bike[owner_email]", with: owner_email
   end
 
-  # This form submits itself, from its own handler rather than from the click - so an upload
-  # still in flight is what proves the photo and the legacy submit path work together
+  # This form submits itself from its own handler rather than from the click, so an upload
+  # still in flight is what proves the two work together
   it "uploads the photo straight to storage, holding the submit until the blob lands" do
     visit "/organizations/#{organization.slug}/embed"
 

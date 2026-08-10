@@ -19,8 +19,8 @@ export default class extends Controller {
 
   connect () {
     this.boundHold = this.hold.bind(this)
-    // Captured on the document so this runs ahead of the form's own submit handlers - one of
-    // them (strip-inputs) resubmits the form itself, and only bows out to a prevented submit.
+    // Captured on the document so it runs ahead of the form's own submit handlers -
+    // strip-inputs resubmits the form itself, and only bows out to a prevented submit
     document.addEventListener('submit', this.boundHold, true)
     // The field posts its own bytes until this runs, which is what makes the form work
     // without JS - once we're uploading, the signed id is what the form carries instead.
