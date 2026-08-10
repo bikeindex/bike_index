@@ -6,8 +6,9 @@ require "rails_helper"
 # JavaScript - so the steps post as plain forms (the `data-turbo` they carry is
 # inert), and register--retry, the submit spinners and the comboboxes never wire
 # up. A combobox submits through a hidden field only its Stimulus controller
-# writes, so each one the flow needs is backed by a UI::Forms::NoJsText textbox
-# that only exists when scripting is off.
+# writes, so each one the flow needs is backed by a UI::Forms::NoJsField control
+# that only exists when scripting is off - a select, or a textbox where a list
+# can't serve.
 RSpec.describe "Register flow without JavaScript", type: :system do
   let(:owner_email) { "owner@bikeindex.org" }
   let(:user_name) { "Sally Rider" }
@@ -18,7 +19,7 @@ RSpec.describe "Register flow without JavaScript", type: :system do
   # JavaScript runs at all
   before { driven_by(:rack_test) }
 
-  it "registers a bike through the textboxes the comboboxes fall back to" do
+  it "registers a bike through the plain controls the comboboxes fall back to" do
     visit "/register/new"
 
     # Starting the registration and landing on its tokenized step 1 is all redirects,
@@ -26,10 +27,13 @@ RSpec.describe "Register flow without JavaScript", type: :system do
     expect(page).to have_current_path(/register\?b_param_token=.+&step=1/, url: true)
     expect(page).to have_content("Register your bike!")
 
-    # The combobox is inside the wrapper the layout's noscript stylesheet hides, and
-    # the field carrying its name is the textbox standing in for it
+    # The combobox is inside the wrapper the fallback's stylesheet hides, and the field
+    # carrying its name is the control standing in for it - a textbox here, since
+    # manufacturers are autocompleted from an endpoint and take free text
     expect(page).to have_css("[data-js-required] input#b_param_manufacturer_id")
     expect(page).to have_css("noscript input[name='b_param[manufacturer_id]']", visible: :all)
+    # The cycle types are a list worth showing, so that one falls back to a select
+    expect(page).to have_css("noscript select[name='b_param[cycle_type]']", visible: :all)
 
     fill_in "b_param[manufacturer_id]", with: "Surly"
     fill_in "b_param[owner_email]", with: owner_email
@@ -40,7 +44,8 @@ RSpec.describe "Register flow without JavaScript", type: :system do
     expect(BParam.last.manufacturer_id).to eq manufacturer.id
 
     fill_in "bike[user_name]", with: user_name
-    fill_in "bike[primary_frame_color]", with: "Red"
+    # The select posts the color's own id, so nothing has to resolve a typed name
+    select "Red", from: "bike[primary_frame_color_id]"
     fill_in "bike[serial_number]", with: "XYZ 123"
     click_button "Complete Bike Registration"
 
@@ -55,19 +60,19 @@ RSpec.describe "Register flow without JavaScript", type: :system do
     click_button "Continue"
 
     expect(page).to have_content("Registration complete")
-    # Every one of these came from a textbox that only exists without JavaScript
+    # Every one of these came from a control that only exists without JavaScript
     expect(Bike.last).to have_attributes(owner_email:, serial_number: "XYZ 123",
       manufacturer_id: manufacturer.id, primary_frame_color_id: red.id)
   end
 
-  it "keeps a manufacturer it doesn't know as free text, and takes a typed cycle type" do
+  it "keeps a manufacturer it doesn't know as free text, and takes a chosen cycle type" do
     visit "/register/new"
 
-    # The datalist suggests what the combobox would have listed, without needing it open
-    expect(page).to have_css("noscript datalist option[value='e-scooter']", visible: :all)
+    # Blank first, so a required select can't submit whichever option sorts first
+    expect(page).to have_css("noscript select[name='b_param[cycle_type]'] option[value='']", visible: :all)
 
     fill_in "b_param[manufacturer_id]", with: "Fabriquer Cycles"
-    fill_in "b_param[cycle_type]", with: "e-scooter"
+    select "e-Scooter", from: "b_param[cycle_type]"
     fill_in "b_param[owner_email]", with: owner_email
     click_button "Next"
 
@@ -100,12 +105,12 @@ RSpec.describe "Register flow without JavaScript", type: :system do
       visit "/register/new?organization_id=#{organization.slug}"
 
       fill_in "b_param[manufacturer_id]", with: "Surly"
-      fill_in "b_param[cycle_type]", with: "e-scooter"
+      select "e-Scooter", from: "b_param[cycle_type]"
       fill_in "b_param[owner_email]", with: owner_email
       click_button "Next"
 
       fill_in "bike[user_name]", with: user_name
-      fill_in "bike[primary_frame_color]", with: "Red"
+      select "Red", from: "bike[primary_frame_color_id]"
       fill_in "bike[serial_number]", with: "XYZ 123"
       click_button "Next"
 

@@ -26,6 +26,9 @@ module UI
       class Component < ApplicationComponent
         RICH_DISPLAYS = %i[inline stacked].freeze
 
+        # Past this many options a no-JS select is worse to pick from than a textbox is to type in
+        NO_JS_SELECT_MAX = 99
+
         OVERLAY_CLASSES = "tw:pointer-events-none tw:absolute tw:hidden tw:text-gray-900 tw:dark:text-gray-200"
         # Centered as a block, so blurring lines up with the input's own centered text
         STACKED_OVERLAY_CLASSES = "tw:flex tw:flex-col tw:justify-center tw:overflow-hidden"
@@ -52,24 +55,39 @@ module UI
           end
         end
 
-        # The textbox this falls back to without JavaScript. What it posts is the caller's
-        # to say - the server resolves a color by name but a cycle type by slug, neither of
-        # which is reliably the display this lists. The rest is the combobox's own: which
-        # field, whether it's required, and what it's called
+        # What this falls back to without JavaScript. A select of the same options posts
+        # their own values, so it needs nothing the combobox doesn't already hold - only
+        # a textbox needs the caller to say what it posts (`no_js: {name:, value:}`)
         def no_js_field
           return if @no_js.blank?
 
-          render UI::Forms::NoJsText::Component.new(name: no_js_name,
+          overrides = @no_js.is_a?(Hash) ? @no_js : {}
+          render UI::Forms::NoJsField::Component.new(name: no_js_name(overrides[:name]),
             label: @combobox_options.fetch(:dialog_label) { defaults[:dialog_label] },
-            value: @no_js[:value], options: @no_js[:options] || [],
-            required: @combobox_options[:required])
+            value: overrides.fetch(:value) { @combobox_options[:value] },
+            options: no_js_options, required: @combobox_options[:required], text: no_js_text?)
+        end
+
+        # A list can't serve a combobox that takes free text, that fetches its options from
+        # an endpoint, or that has more of them than anyone wants to scroll
+        def no_js_text?
+          @combobox_options[:free_text].present? || !@options_or_src.is_a?(Array) ||
+            @options_or_src.length > NO_JS_SELECT_MAX
+        end
+
+        # [display, value] pairs. Nothing to offer when the options aren't ours to list
+        def no_js_options
+          return [] unless @options_or_src.is_a?(Array)
+
+          @options_or_src.map do |option|
+            option.is_a?(Hash) ? [option[:display], option[:value]] : [option, option]
+          end
         end
 
         # The combobox's own field unless the fallback posts a different one
-        def no_js_name
-          attribute = @no_js[:name] || @name
+        def no_js_name(attribute)
           form = @combobox_options[:form]
-          form ? form.field_name(attribute) : attribute
+          form ? form.field_name(attribute || @name) : (attribute || @name)
         end
 
         # Only a rich display needs the controller, or the positioning context

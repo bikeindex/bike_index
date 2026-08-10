@@ -189,8 +189,7 @@ module BikeServices
     def permitted_step_1_params = %i[manufacturer_id cycle_type owner_email]
 
     def permitted_step_2_params
-      # primary_frame_color is the name the no-JS textbox posts, resolved by set_color_key
-      [:primary_frame_color, :primary_frame_color_id, :secondary_frame_color_id, :tertiary_frame_color_id,
+      [:primary_frame_color_id, :secondary_frame_color_id, :tertiary_frame_color_id,
         :serial_number, :frame_size, :frame_size_number, :frame_size_unit, :bike_sticker,
         :phone, :status, :frame_model, :year, :user_name, :extra_registration_number,
         :organization_affiliation, :student_id,
