@@ -880,7 +880,7 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to redirect_to step_path.call("3")
 
       follow_redirect!
-      # The cycle type reads as it's stored, so no title can lead with it and stay sentence case
+      # The cycle type reads as it's stored, so no title leads with it and stays sentence case
       expect(response.body).to include "<title>Safety check for your e-scooter</title>"
       # The heading is the page's own; the title labels its rules and names it on the review
       expect(response.body).to include "Looks like you have an e-vehicle!"

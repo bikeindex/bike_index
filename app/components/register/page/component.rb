@@ -13,8 +13,8 @@ module Register
       end
 
       def call
-        # Which step a page shows depends on server state, and Turbo restores its own
-        # snapshot on back/forward - the cache Cache-Control: no-store can't reach
+        # Which step a page shows is server state, and Turbo restores its own snapshot on
+        # back/forward - the cache Cache-Control: no-store can't reach
         helpers.content_for(:header) { tag.meta(name: "turbo-cache-control", content: "no-cache") }
 
         content_tag(:div,
@@ -25,9 +25,8 @@ module Register
 
       private
 
-      # Revealed by register--retry when a step's submission can't be retried into working.
-      # Ships with the page rather than being built in JS, so it's translated and styled
-      # like every other alert - and so a step that fails says something either way
+      # Revealed by register--retry when a submission can't be retried into working. Ships
+      # with the page rather than built in JS, so it's translated and styled like any alert
       def retry_notice
         content_tag(:div, render(UI::Alerts::Base::Component.new(kind: :error, text: translation(".retry_failed"))),
           hidden: true, data: {register_retry_notice: true})

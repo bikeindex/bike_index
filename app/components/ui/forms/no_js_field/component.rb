@@ -3,18 +3,16 @@
 module UI
   module Forms
     module NoJsField
-      # The plain control a combobox falls back to without JavaScript. A combobox submits
-      # through a hidden field only its Stimulus controller writes, so nothing a rider
-      # picks otherwise reaches the server.
+      # The plain control a combobox falls back to without JavaScript, since a combobox
+      # submits through a hidden field only its Stimulus controller writes.
       #
-      # noscript's contents are DOM only when scripting is off - so with JavaScript this
-      # renders nothing at all, and without it this is the last field of its name and
-      # therefore the one Rack keeps. Pair it with a `data-js-required` wrapper around the
-      # combobox, which the stylesheet below hides.
+      # noscript's contents are DOM only when scripting is off, where this is the last
+      # field of its name and so the one Rack keeps. Pair it with a `data-js-required`
+      # wrapper around the combobox, which the stylesheet below hides.
       #
-      # A select by default, since it posts the option's own value and can't be mistyped.
-      # text: for the comboboxes a list can't serve - see UI::Forms::Combobox::Component -
-      # where the options become a datalist of suggestions instead.
+      # A select by default - it posts the option's own value and can't be mistyped. text:
+      # for the comboboxes a list can't serve (see UI::Forms::Combobox::Component), where
+      # the options become a datalist of suggestions instead.
       class Component < ApplicationComponent
         # [display, value] pairs, the shape options_for_select takes
         def initialize(name:, label:, value: nil, options: [], required: false, text: false)
@@ -32,9 +30,8 @@ module UI
 
         private
 
-        # Ships with the field rather than the layout's head, where a noscript element
-        # coincided with the legacy pages' remote selectize failing to open (unexplained,
-        # so keep it out of there until someone gets to the bottom of it)
+        # Not the layout's head, where a noscript element coincided with the legacy pages'
+        # remote selectize failing to open - unexplained, so keep it out until it isn't
         def stylesheet
           tag.style("[data-js-required]{display:none}".html_safe)
         end
@@ -48,8 +45,7 @@ module UI
             required: @required, class: "twinput tw:w-full", aria: {label: @label})
         end
 
-        # A blank first option, so a required select can't quietly submit whichever
-        # option happens to sort first
+        # A blank first option, so a required select can't quietly submit whichever sorts first
         def select
           helpers.select_tag(@name, helpers.options_for_select(@options, @value.to_s),
             include_blank: true, required: @required, class: "twinput tw:w-full", aria: {label: @label})

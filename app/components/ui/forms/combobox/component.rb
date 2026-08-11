@@ -26,7 +26,7 @@ module UI
       class Component < ApplicationComponent
         RICH_DISPLAYS = %i[inline stacked].freeze
 
-        # Past this many options a no-JS select is worse to pick from than a textbox is to type in
+        # Past this many, a no-JS select is worse to pick from than a textbox is to type in
         NO_JS_SELECT_MAX = 99
 
         OVERLAY_CLASSES = "tw:pointer-events-none tw:absolute tw:hidden tw:text-gray-900 tw:dark:text-gray-200"
@@ -55,19 +55,17 @@ module UI
           end
         end
 
-        # ui--forms--js-required marks it required on connect instead. Rendered required,
-        # it's a control the no-JS stylesheet has hidden and no browser will submit past -
-        # which would be every submission a rider without JavaScript makes
+        # ui--forms--js-required marks it required on connect instead - rendered required,
+        # it's a hidden control no browser will submit past, which without JavaScript is
+        # every submission
         def combobox_attrs
           js_required? ? @combobox_options.except(:required) : @combobox_options
         end
 
         def js_required? = @no_js.present? && @combobox_options[:required].present?
 
-        # What this falls back to without JavaScript. A select of the same options posts
-        # their own values, so it needs nothing the combobox doesn't already hold - only a
-        # textbox needs the caller to say what to show, since the options aren't ours
-        # (`no_js: {value:}`)
+        # What this falls back to without JavaScript. A select posts the options' own
+        # values, so only a textbox needs the caller to say what to show (`no_js: {value:}`)
         def no_js_field
           return if @no_js.blank?
 
@@ -77,8 +75,8 @@ module UI
             options: no_js_options, required: @combobox_options[:required], text: no_js_text?)
         end
 
-        # A list can't serve a combobox that takes free text, that fetches its options from
-        # an endpoint, or that has more of them than anyone wants to scroll
+        # A list can't serve free text, options fetched from an endpoint, or more of them
+        # than anyone wants to scroll
         def no_js_text?
           @combobox_options[:free_text].present? || !@options_or_src.is_a?(Array) ||
             @options_or_src.length > NO_JS_SELECT_MAX
@@ -98,7 +96,7 @@ module UI
           form ? form.field_name(@name) : @name
         end
 
-        # Only a rich display needs the controller, or the positioning context the overlay
+        # Only a rich display needs the controller, or the positioning context its overlay
         # is placed against. data-js-required is what the fallback's stylesheet hides
         def wrapper_attrs
           controllers = [("ui--forms--combobox-display" if @rich_display),

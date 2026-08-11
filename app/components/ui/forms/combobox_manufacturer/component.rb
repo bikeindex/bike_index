@@ -50,8 +50,7 @@ module UI
         end
 
         # Autocompleted against an index no textbox can reach, so the fallback offers no
-        # options - a name it doesn't know becomes manufacturer_other, the same as the
-        # combobox's own free text
+        # options - an unknown name becomes manufacturer_other, like the combobox's free text
         def no_js_options
           return {} unless @no_js
 
@@ -64,8 +63,8 @@ module UI
           manufacturer.other? ? @combobox_options[:form].object.manufacturer_other : manufacturer.name
         end
 
-        # BParam#manufacturer is a friendly_find, so it's a query every time it's asked -
-        # and both the fallback's value and the free-text swap below want it
+        # BParam#manufacturer is a friendly_find, so a query every time - and both the
+        # fallback's value and the free-text swap below want it
         def manufacturer
           return @manufacturer if defined?(@manufacturer)
 
