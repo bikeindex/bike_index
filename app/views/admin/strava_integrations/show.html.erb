@@ -112,9 +112,7 @@
 
             <% if @strava_integration.athlete_activity_count %>
               /
-              <small title="Strava Athlete Activity count">
-                <%= number_display(@strava_integration.athlete_activity_count) %>
-              </small>
+              <small title="Strava Athlete Activity count"><%= number_display(@strava_integration.athlete_activity_count) %></small>
             <% end %>
           </td>
         </tr>

@@ -9,9 +9,11 @@ module UI
         # off the radio rather than the chip's own :active/:focus.
         CHIP_CLASSES = [
           UI::ButtonGroup::Component::RESTING_CHIP_CLASSES,
-          "tw:mb-0!", # the chip is a <label>, which legacy CSS gives a bottom margin
+          "tw:mb-0", # the chip is a <label>, which legacy CSS gives a bottom margin
           "tw:has-[:checked]:bg-purple-500 tw:has-[:checked]:text-white tw:has-[:checked]:border-purple-500",
-          "tw:has-[:checked]:hover:bg-purple-500 tw:has-[:checked]:hover:border-purple-500",
+          # A <label> is never :disabled — these carry the specificity to beat the hover
+          # they override, which is guarded not-disabled:not-aria-disabled:
+          "tw:has-[:checked]:not-disabled:not-aria-disabled:hover:bg-purple-500 tw:has-[:checked]:not-disabled:not-aria-disabled:hover:border-purple-500",
           "tw:has-[:checked]:ring-2 tw:has-[:checked]:ring-purple-500/40",
           "tw:has-[:focus-visible]:outline-none tw:has-[:focus-visible]:ring-3 tw:has-[:focus-visible]:ring-purple-500/40"
         ].join(" ").freeze

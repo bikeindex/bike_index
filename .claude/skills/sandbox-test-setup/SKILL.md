@@ -16,7 +16,10 @@ description: >-
   Ruby must be built from GitHub source (~8–10 min, `cache.ruby-lang.org`
   firewalled); also postgres/redis, tailwind build, Chrome-matching
   ChromeDriver, and a local jsdelivr proxy for `:js, type: :system`
-  specs. Trigger whenever a session runs RSpec/bundle/`bin/lint`, or
+  specs. It's also the one environment where Claude starts `bin/dev`
+  itself rather than asking — nobody else owns that container.
+  Trigger whenever a session runs RSpec/bundle/`bin/lint`, needs a
+  running dev server, or
   the user reports `env: 'ruby': No such file or directory` /
   `Bundler::RubyVersionMismatch` /
   `Could not find 'bundler' (4.0.0.beta2)` /
@@ -252,6 +255,97 @@ bundle exec rails tailwindcss:build
 
 (See the `integration-testing` skill — same rule applies to
 layout-rendering request specs, not just system specs.)
+
+## Starting the dev server — web sandbox (C) only
+
+`CLAUDE.md` says to stop and ask the user to start `bin/dev`. That rule is about
+*their* machine, where the server is a process they own and may already have
+running. **In the web sandbox there is nobody to ask** — the container is yours,
+it's ephemeral, and nothing else is on the port — so start it yourself when a
+task needs a running app (screenshots, checking a page actually renders). In
+**A (local macOS Conductor workspace)** and **B (Conductor cloud sandbox)** the
+rule stands: a human owns that machine, so ask.
+
+Two things beyond Toolchain + Services above. Development databases, which the
+test setup doesn't create — and which don't take `database.yml`'s `CI=1` branch,
+so the credentials have to be passed as `PG*`. And a UTF-8 locale: foreman reads
+`.env` in the process's external encoding, and an unset locale makes that
+US-ASCII, which dies on the file's non-ASCII bytes with `invalid byte sequence
+in US-ASCII`.
+
+```bash
+export PGHOST=127.0.0.1 PGUSER=rails PGPASSWORD=password
+export LANG=C.UTF-8 LC_ALL=C.UTF-8
+eval "$(ruby bin/env --export)"
+bundle exec rails db:create db:migrate   # bikeindex_development + its analytics database
+bin/dev                                  # run it in the background - it doesn't return
+```
+
+Then wait for it rather than assuming — the first boot compiles assets:
+
+```bash
+until curl -fs -o /dev/null "$BASE_URL/"; do sleep 5; done
+```
+
+`bin/dev` runs foreman, so the tailwind and dartsass watchers come with it and a
+page you screenshot is styled. It starts its own redis, which exits harmlessly
+when one is already listening. Postgres and redis don't survive a container idle
+period: a server answering `PG::ConnectionBad` wants `service postgresql start`
+and a restart, not debugging.
+
+A fresh development database is **empty**, and the app doesn't say so — it renders
+a combobox with no matches rather than an error. `bundle exec rails db:seed` needs
+`setup:import_spreadsheets` (network), so for a single flow seed only what it asks
+for, via `rails runner`: the reference data from the relevant `db/seeds/seed_*.rb`
+(`seed_bike_associations` covers colors), a `Manufacturer` or two — and then
+`Autocomplete::Loader.load_all(%w[Manufacturer])`, without which the manufacturer
+combobox stays empty however many rows exist, because it reads Redis rather than
+the database.
+
+## Driving the app with Playwright MCP (web sandbox)
+
+The MCP server is a different browser from the one `spec/support/local_chrome.rb`
+configures, and it comes up unconfigured. Three one-time fixes, each of which fails
+with a message that names the missing path:
+
+```bash
+# 1. It looks for the `chrome` channel at a fixed path
+mkdir -p /opt/google/chrome
+ln -sfn "$(ls -d /opt/pw-browsers/chromium-*/chrome-linux | sort -V | tail -1)/chrome" /opt/google/chrome/chrome
+
+# 2. The npm playwright pin wants a newer browser build than the image ships. Point the
+#    expected build number at the one that's there (NNNN from the error, MMMM from `ls`)
+ln -sfn /opt/pw-browsers/chromium-MMMM /opt/pw-browsers/chromium-NNNN
+mkdir -p /opt/pw-browsers/chromium_headless_shell-NNNN
+ln -sfn /opt/pw-browsers/chromium_headless_shell-MMMM/chrome-linux \
+        /opt/pw-browsers/chromium_headless_shell-NNNN/chrome-headless-shell-linux64
+ln -sfn headless_shell /opt/pw-browsers/chromium_headless_shell-MMMM/chrome-linux/chrome-headless-shell
+
+# 3. It reads a storage-state file that doesn't exist yet
+mkdir -p /root/.cache/ms-playwright
+printf '{"cookies":[],"origins":[]}' > /root/.cache/ms-playwright/mcp-auth.json
+```
+
+This browser gets no `--host-resolver-rules`, so the jsdelivr pins (jquery, select2,
+honeybadger) fail to load and every page logs `ERR_TUNNEL_CONNECTION_FAILED` for them,
+plus Google Fonts / GTM / Facebook. **Those console errors are the sandbox, not the
+app** — read past them and treat an app-origin error as the signal.
+
+Two selector notes for driving pages here: a local `UI::Forms::Combobox` keeps all its
+options in the DOM and hides the non-matching ones, so `.hw-combobox__option` `.first()`
+resolves to a hidden option and the click times out — use
+`.hw-combobox__option:not([hidden])` or match by text. And `mcp__playwright__browser_click`
+waits for the page to settle before returning, so it can't measure a state that resolves
+in under a second or two; sample from inside one `browser_evaluate` instead.
+
+## No `gh` in the web sandbox
+
+The GitHub CLI isn't installed. Anything the `pr` skill (or any other) expresses as
+`gh pr …` goes through the GitHub MCP tools instead — `mcp__github__list_pull_requests`
+(filter with `head: "<owner>:<branch>"`), `create_pull_request`, `update_pull_request`,
+`pull_request_read`. Check for an existing PR before creating one: a push to a branch can
+open a PR by itself, so the branch may already have one whose body wants updating rather
+than a second PR.
 
 ## Running plain specs
 

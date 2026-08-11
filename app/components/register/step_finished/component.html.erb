@@ -1,4 +1,5 @@
-<%= render Register::Page::Component.new do %>
+<%# The checklist wants room, so a finished theft report is the one wide page here %>
+<%= render Register::Page::Component.new(wide: stolen_checklist?) do %>
   <div class="tw:px-1 tw:py-6 tw:text-center">
     <div
       class="
@@ -11,6 +12,26 @@
     </div>
 
     <%= render UI::Header::Component.new(text: heading_text, subtitle: subtitle_text) %>
+
+    <%#
+      What getting it back takes, the same list the theft details page ends on - the
+      report asks for a location, so a theft registered here always has one to show
+    %>
+
+    <% if stolen_checklist? %>
+      <div
+        class="
+          tw:mb-6 tw:rounded-lg tw:bg-white tw:px-4 tw:py-3 tw:text-left
+          tw:dark:bg-gray-800
+        "
+      >
+        <p class="tw:mb-2 tw:text-sm tw:font-semibold">
+          <%= translation(".do_these_things") %>
+        </p>
+
+        <%= render Bikes::StolenChecklist::Component.new(bike: @bike, stolen_record: @bike.current_stolen_record) %>
+      </div>
+    <% end %>
 
     <%# What's still locked behind the confirmation, so the link is worth clicking %>
     <% if @bike.blank? %>
@@ -30,7 +51,9 @@
             tw:text-gray-600 tw:dark:text-gray-300
           "
         >
-          <li><%= translation(".report_it_stolen", cycle_type:) %></li>
+          <li>
+            <%= stolen? ? translation(".report_it_stolen", cycle_type:) : translation(".finish_adding", cycle_type:) %>
+          </li>
 
           <% if found? %>
             <li><%= translation(".add_impound_details", cycle_type:) %></li>
@@ -41,7 +64,7 @@
       </div>
     <% end %>
 
-    <div class="tw:flex tw:flex-col tw:gap-2.5">
+    <div class="tw:mx-auto tw:flex tw:max-w-md tw:flex-col tw:gap-2.5">
       <% if @bike.present? %>
         <%= render UI::ButtonLink::Component.new(href: bike_path(@bike), color: :primary, size: :lg,
             text: translation(self_made? ? ".view_your_registration" : ".view_the_registration"),

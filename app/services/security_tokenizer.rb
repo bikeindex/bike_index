@@ -19,8 +19,12 @@ module SecurityTokenizer
   end
 
   def token_time(str)
-    t, toke = str.to_s.split("-")
-    t = (t.present? && toke.present? && t.to_i > EARLIEST_TOKEN_TIME) ? t.to_i : EARLIEST_TOKEN_TIME
-    Time.at(t)
+    recognized_token?(str) ? Time.at(str.to_s.split("-").first.to_i) : Time.at(EARLIEST_TOKEN_TIME)
+  end
+
+  # token_time floors what it can't read at EARLIEST_TOKEN_TIME, which reads as long expired
+  def recognized_token?(str)
+    time, hex = str.to_s.split("-")
+    time.present? && hex.present? && time.to_i > EARLIEST_TOKEN_TIME
   end
 end

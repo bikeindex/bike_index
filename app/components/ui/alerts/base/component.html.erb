@@ -10,7 +10,7 @@
       <%= helpers.inline_svg_tag(default_icon, class: "tw:h-4 tw:w-4", aria_hidden: true) %>
     <% end %>
 
-    <span class="tw:sr-only"><%= @kind.to_s.titleize %></span>
+    <span class="tw:sr-only"><%= announcement %></span>
   </div>
 
   <% if @dismissable %>
@@ -41,7 +41,7 @@
   <% end %>
 
   <% if @header.present? %>
-    <h4 class="uncap tw:mb-2! tw:text-lg! <%= header_color_classes %>">
+    <h4 class="tw:mb-2 tw:font-sans tw:text-lg tw:normal-case <%= header_color_classes %>">
       <%= @header %>
     </h4>
   <% end %>

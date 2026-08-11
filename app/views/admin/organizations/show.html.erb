@@ -231,8 +231,7 @@
   <div class="col-md-6">
     <p>
       <% if @organization.invoices.count > 0 %>
-        <strong><%= @organization.invoices.active.count %> active</strong>
-        and
+        <strong><%= @organization.invoices.active.count %> active</strong> and
       <% end %>
 
       <em class="less-strong">
@@ -370,9 +369,7 @@
               <td>
                 <% if @organization.hot_sheet_on? %>
                   Enabled
-                  <em class="less-strong">
-                    <%= "recipient".pluralize(@organization.hot_sheet_configuration.current_recipients.count) %>
-                  </em>
+                  <em class="less-strong"><%= "recipient".pluralize(@organization.hot_sheet_configuration.current_recipients.count) %></em>
                 <% else %>
                   <small class="less-strong">not enabled</small>
                 <% end %>
@@ -424,10 +421,7 @@
               <td>
                 <% if @organization.deliver_graduated_notifications? %>
                   Delivering notifications
-                  <small>
-                    <%= @organization.graduated_notification_interval_days %>
-                    day interval
-                  </small>
+                  <small><%= @organization.graduated_notification_interval_days %> day interval</small>
                 <% else %>
                   <em class="text-warning">Not delivering</em>
                   <small>notification interval is not set</small>
@@ -595,28 +589,15 @@
           </small>
           <% unless @organization.deleted? %>
             -
-            <small class="less-strong">
-              <%= link_to admin_organization_path(@organization, deleted_organization_roles: false), class: "gray-link" do %>
-                <%= number_with_delimiter(@organization.organization_roles.count) %>
-                <strong>NOT</strong> deleted organization role
-              <% end %>
-            </small>
+            <small class="less-strong"><%= link_to admin_organization_path(@organization, deleted_organization_roles: false), class: "gray-link" do %>              <%= number_with_delimiter(@organization.organization_roles.count) %>              <strong>NOT</strong> deleted organization role<% end %></small>
           <% end %>
         <% else %>
-          <small>
-            <%= number_with_delimiter(@organization.organization_roles.claimed.count) %>
-            claimed
-          </small>
+          <small><%= number_with_delimiter(@organization.organization_roles.claimed.count) %> claimed</small>
           -
-          <small class="less-strong">
-            <%= link_to admin_organization_path(@organization, deleted_organization_roles: true), class: "gray-link" do %>
-              <%= number_with_delimiter(@organization.organization_roles.deleted.count) %>
-              deleted
-            <% end %>
-          </small>
-          <small>
-            <%= link_to "new organization role", new_admin_organization_role_url(organization_id: @organization.to_param), class: "btn btn-outline-secondary btn-sm ml-3" %>
-          </small>
+          <small class="less-strong"><%= link_to admin_organization_path(@organization, deleted_organization_roles: true), class: "gray-link" do %>            <%= number_with_delimiter(@organization.organization_roles.deleted.count) %>            deleted<% end %></small>
+
+
+          <small><%= link_to "new organization role", new_admin_organization_role_url(organization_id: @organization.to_param), class: "btn btn-outline-secondary btn-sm ml-3" %></small>
         <% end %>
       </small>
     </h4>

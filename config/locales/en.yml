@@ -2015,8 +2015,7 @@ en:
       unsubscribe_update:
         successfully_unsubscribed: You have been unsubscribed from Bike Index updates.
       update:
-        accept_tos: You have to accept the Terms of Service if you would like to use
-          Bike Index.
+        accept_tos: You must agree to the terms to use Bike Index
         accept_tos_to_use_as_org: >-
           You have to accept the Terms of Service if you would like to use Bike Index
           through an organization
@@ -3881,11 +3880,12 @@ en:
     news_index: Bike Index Blog
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
-    register_acknowledgment: "%{cycle_type} safety check"
+    register_acknowledgment: Safety check for your %{cycle_type}
     register_confirm: Confirming your email
     register_create: Register your %{cycle_type}!
+    register_report: Tell us what happened
     register_review: Review your %{cycle_type} safety check
-    register_show: "%{cycle_type} registration"
+    register_show: Your %{cycle_type} registration
     register_step_1: Register your %{cycle_type}!
     register_step_2: Add your %{cycle_type}'s details
     registrations_embed: Register a bike with %{organization}
@@ -4672,6 +4672,12 @@ en:
       subject: Join %{organization_name}on Bike Index
     partial_register_confirmation:
       subject: Confirm your email to finish your %{organization_name}registration
+    partial_register_confirmation_abandoned:
+      subject: Finish reporting your abandoned %{cycle_type}
+    partial_register_confirmation_found:
+      subject: Finish reporting your found %{cycle_type}
+    partial_register_confirmation_stolen:
+      subject: Finish reporting your stolen %{cycle_type}
     partial_registration:
       subject: Finish your %{organization_name}Bike Index registration!
   payments:
@@ -4778,6 +4784,12 @@ en:
       enter_email_address: Enter your email address, we'll send you an email with
         a link to log in.
       get_sign_in_link: Get sign in link
+      link_already_used: That sign in link has already been used
+      link_expired: That sign in link has expired
+      links_work_for: Sign in links work for %{duration} after they're sent.
+      only_the_newest_link_works: >-
+        You may already be signed in somewhere else. If you asked for more than one
+        email, only the link in the newest one works.
       reenter_email: Please re-enter your email address to receive a new token
       sign_in_with_magic_link: Passwordless sign in
       unable_to_auth: Unable to authenticate that token
@@ -5063,7 +5075,11 @@ en:
       recovered_date: recovered %{date}
       translated_from_english: translated from English
     register_flow:
+      date_found_required: Please tell us when you found it
+      date_stolen_required: Please tell us when it was stolen
       email_required: Email is required to register
+      location_found_required: Please tell us where you found it
+      location_stolen_required: Please tell us where it was stolen
       manufacturer_required: Manufacturer is required to register
       name_required: Owner name is required to register
       unable_to_save: We're unable to save that registration, please try again

@@ -22,24 +22,51 @@ module Register
         @b_param.self_made?(@current_user)
       end
 
-      # Without the bike the registration is only held, waiting on the email
-      def heading_text
-        translation(@bike.present? ? ".registration_complete" : ".registration_saved")
+      # The bike's own status once it exists, otherwise what the registration is for -
+      # the confirmation page asks before there's a bike
+      def stolen? = @bike.present? ? @bike.status_stolen? : @b_param.status_stolen?
+
+      # display_checklist? is address_present? - a theft reported through this flow always
+      # has one, but a bike created some other way and shown here might not
+      def stolen_checklist?
+        @bike.present? && stolen? && @bike.current_stolen_record&.display_checklist?
       end
 
+      # Their own theft, rather than one reported for whoever the registration is for
+      def own_theft? = stolen? && self_made?
+
+      # Without the bike the registration is only held, waiting on the email
+      def heading_text
+        return translation(".progress_saved") if @bike.blank?
+        return translation(".listed_as_stolen", bike_display: @bike.mnfg_name) if own_theft?
+        return translation(".reported_stolen") if stolen?
+        return translation(".listed_as_found", bike_display: @bike.mnfg_name) if found?
+
+        translation(".registration_complete")
+      end
+
+      # Nothing under their own theft's heading - it already says what happened, and the
+      # checklist below is what there is to read next
       def subtitle_text
         return translation(".verify_your_email_html", email: owner_email_tag) if @bike.blank?
-        return translation(".we_will_keep_watch", bike_display: @bike.mnfg_name) if self_made?
+        return if own_theft?
+        # A find isn't theirs to be watched over, and isn't claimed by the address it was
+        # registered for - it's claimed by whoever lost it
+        return translation(".owner_can_claim") if found?
+        return translation(".registered_for_owner_html", bike_display: @bike.mnfg_name, email: owner_email_tag) unless self_made?
 
-        translation(".registered_for_owner_html", bike_display: @bike.mnfg_name, email: owner_email_tag)
+        translation(".we_will_keep_watch", bike_display: @bike.mnfg_name)
       end
 
       def owner_email_tag
         content_tag(:strong, @b_param.owner_email)
       end
 
-      # Only a found registration has an impound record to fill in
+      # The bike's own status once it exists, otherwise what the registration is for -
+      # only a find has an impound record to fill in
       def found?
+        return @bike.status_impounded? if @bike.present?
+
         %w[status_abandoned status_impounded unregistered_parking_notification].include?(@b_param.status)
       end
 

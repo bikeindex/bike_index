@@ -7,7 +7,7 @@ module UI
         class Component < ApplicationComponent
           STATIC_FIELDS_OPTIONS = %i[shown hidden]
 
-          # NOTE: Keep in mind this renders for the embed and embed_extended views (which don't have tailwind styles)
+          # NOTE: Keep in mind this renders for the embed and embed_extended views
           def initialize(form_builder:,
             organization: nil,
             not_related_fields: false,
@@ -54,12 +54,6 @@ module UI
             return "" unless @static_fields
 
             (@static_fields == :shown) ? "tw:hidden!" : ""
-          end
-
-          def static_field_class
-            return "" unless @static_fields
-
-            (@static_fields == :hidden) ? "tw:hidden!" : ""
           end
 
           def initial_state_class

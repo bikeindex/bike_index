@@ -159,9 +159,15 @@ class BParam < ApplicationRecord
       end
     end
 
-    def find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil, bike_sticker: nil)
+    # The lookup half of find_or_new_from_token - what the embed forms resolve their token
+    # to, so anything acting on one of those forms can reach the same record
+    def find_from_token(toke = nil, user_id: nil)
       b = where(creator_id: user_id, id_token: toke).first if toke.present? && user_id.present?
-      b ||= with_organization_or_no_creator(toke)
+      b || with_organization_or_no_creator(toke)
+    end
+
+    def find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil, bike_sticker: nil)
+      b = find_from_token(toke, user_id:)
       b ||= BParam.new(creator_id: user_id, params: {revised_new: true}.as_json)
       b.creator_id ||= user_id
       if bike_sticker.present?

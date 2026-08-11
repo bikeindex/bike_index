@@ -12,6 +12,7 @@
 #  is_paid_organization       :boolean          default(FALSE), not null
 #  is_paid_organization_staff :boolean          default(FALSE), not null
 #  received_at                :datetime
+#  receiver                   :text
 #  status                     :integer          default("unprioritized"), not null
 #  subject                    :text
 #  tags                       :text             default([]), not null, is an Array
@@ -23,6 +24,7 @@
 # Indexes
 #
 #  index_bug_reports_on_inbound_email_id  (inbound_email_id)
+#  index_bug_reports_on_receiver          (receiver)
 #  index_bug_reports_on_status            (status)
 #  index_bug_reports_on_tags              (tags) USING gin
 #  index_bug_reports_on_user_id           (user_id)
@@ -35,6 +37,7 @@ class BugReport < ApplicationRecord
   include PgSearch::Model
 
   GITHUB_REPO_URL = "https://github.com/bikeindex/bike_index"
+  OUR_EMAIL_DOMAIN = "bikeindex.org"
   STATUS_ENUM = {unprioritized: 0, investigate_priority_high: 1, investigate_priority_low: 2,
                  resolved: 19, ignored: 20}.freeze
   INTERNAL_NOTIFICATION_TAG = "bike_index_notification"
@@ -71,6 +74,39 @@ class BugReport < ApplicationRecord
     distinct.pluck(Arel.sql("unnest(tags)")).sort
   end
 
+  def self.all_receivers
+    where.not(receiver: nil).distinct.order(:receiver).pluck(:receiver)
+  end
+
+  # Our domain is noise in the admin table - and only ours can be dropped unambiguously
+  def self.display_receiver(value)
+    value.to_s.delete_suffix("@#{OUR_EMAIL_DOMAIN}")
+  end
+
+  # Who wrote in, as [email, name]. Mail our app sends itself - the contact form, admin
+  # notifications - is From: contact@bikeindex.org with the person who wrote in as the Reply-To,
+  # so attribute those to them rather than to us
+  def self.sender_from_mail(mail)
+    field = (our_address?(mail.from&.first) && mail[:reply_to].presence) || mail[:from]
+
+    [EmailNormalizer.normalize(field&.addresses&.first), field&.display_names&.first]
+  end
+
+  def self.our_address?(value)
+    value.to_s.downcase.end_with?("@#{OUR_EMAIL_DOMAIN}")
+  end
+  private_class_method :our_address?
+
+  # Which of our addresses the email was sent to (contact@, support@, bugs@, ...). Prefer an
+  # address of ours, since a message can be addressed to a mix of recipients. X-Original-To is
+  # the envelope recipient Postmark's ingress prepends, the only source when we're bcc'd
+  def self.receiver_from_mail(mail)
+    recipients = Array(mail.to) + Array(mail.cc)
+    address = ([mail["X-Original-To"]&.to_s] + recipients).find { our_address?(it) } || recipients.first
+
+    EmailNormalizer.normalize(address)
+  end
+
   def self.normalized_tags(value)
     value = value.to_s.split(/,|\n/) unless value.is_a?(Array)
     value.map { it.to_s.strip.downcase }.reject(&:blank?).uniq.sort
@@ -98,9 +134,11 @@ class BugReport < ApplicationRecord
 
   def set_calculated_attributes
     self.email = EmailNormalizer.normalize(email)
+    self.receiver = EmailNormalizer.normalize(receiver)
     self.user_id ||= User.fuzzy_email_find(email)&.id
-    # booleans snapshot the sender's status at report time - don't re-derive on update
-    return unless new_record? && user.present?
+    # booleans snapshot the sender's status - re-taken only when the sender changes, so an
+    # ordinary update keeps the snapshot from when the report came in
+    return unless user_id_changed? && user.present?
 
     self.is_member = user.member?
     self.is_paid_organization = user.paid_org?

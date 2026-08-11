@@ -74,7 +74,7 @@ RSpec.describe SessionsController, type: :controller do
   describe "magic_link" do
     it "renders" do
       get :magic_link
-      expect(assigns(:incorrect_token)).to be_falsey
+      expect(assigns(:failure)).to be_falsey
       expect(cookies.signed[:auth]).to be_nil
       expect(response.code).to eq "200"
       expect(response).to render_template("magic_link")
@@ -83,7 +83,7 @@ RSpec.describe SessionsController, type: :controller do
     context "incorrect_token" do
       it "renders" do
         get :magic_link, params: {incorrect_token: SecurityTokenizer.new_token}
-        expect(assigns(:incorrect_token)).to be_truthy
+        expect(assigns(:failure)).to be_truthy
         expect(cookies.signed[:auth]).to be_nil
         expect(response.code).to eq "200"
         expect(response).to render_template("magic_link")
@@ -140,7 +140,7 @@ RSpec.describe SessionsController, type: :controller do
       end
       context "magic_link expired" do
         it "renders" do
-          user.update_auth_token("magic_link_token", Time.current - 121.minutes)
+          user.update_auth_token("magic_link_token", (User::AUTH_TOKEN_EXPIRY + 1.minute).ago)
           og_token = user.magic_link_token
           request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
           post :sign_in_with_magic_link, params: {token: og_token}

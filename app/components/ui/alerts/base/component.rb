@@ -28,6 +28,12 @@ module UI
 
         private
 
+        # What a screen reader reads in place of the icon. :purple names a color rather
+        # than a meaning, so it announces the meaning it actually carries
+        def announcement
+          translation((@kind == :purple) ? ".info" : ".#{@kind}")
+        end
+
         def normalized_kind(kind)
           return kind.to_sym if KINDS.include?(kind&.to_sym)
 
@@ -68,11 +74,8 @@ module UI
           TEXT_CLASSES[@kind]
         end
 
-        # The ! overrides bootstrap's alert colors
         def header_color_classes
-          return "twtext-color!" if @default_header_color
-
-          text_color_classes.gsub("00", "00!")
+          @default_header_color ? "twtext-color" : text_color_classes
         end
 
         def dismissable_color_classes

@@ -922,7 +922,8 @@ CREATE TABLE public.bug_reports (
     received_at timestamp(6) without time zone,
     from_name text,
     inbound_email_id bigint,
-    status integer DEFAULT 0 NOT NULL
+    status integer DEFAULT 0 NOT NULL,
+    receiver text
 );
 
 
@@ -6556,6 +6557,13 @@ CREATE INDEX index_bug_reports_on_inbound_email_id ON public.bug_reports USING b
 
 
 --
+-- Name: index_bug_reports_on_receiver; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bug_reports_on_receiver ON public.bug_reports USING btree (receiver);
+
+
+--
 -- Name: index_bug_reports_on_status; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7599,6 +7607,13 @@ CREATE INDEX index_users_on_email_trgm ON public.users USING gin (email public.g
 
 
 --
+-- Name: index_users_on_magic_link_token_outstanding; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_magic_link_token_outstanding ON public.users USING btree (magic_link_token) WHERE (magic_link_token IS NOT NULL);
+
+
+--
 -- Name: index_users_on_token_for_password_reset; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7720,6 +7735,8 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260808224655'),
+('20260808120000'),
 ('20260808100000'),
 ('20260807153129'),
 ('20260807132506'),

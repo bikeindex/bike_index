@@ -19,6 +19,11 @@ on:
       # bump changes the build environment, so it must trigger a run too.
       - '.tool-versions'
 
+# github.ref is refs/pull/N/merge here, so each PR cancels only its own run
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 defaults:
   run:
     working-directory: vendor/strava_search

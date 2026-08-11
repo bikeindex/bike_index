@@ -16,7 +16,8 @@ RSpec.describe BugReportsMailbox do
     end.to change(BugReport, :count).by 1
 
     expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id,
-      subject: "Search is broken", body: "I searched and nothing happened",
+      receiver: "bugs@bikeindex.org", subject: "Search is broken",
+      body: "I searched and nothing happened",
       inbound_email_id: ActionMailbox::InboundEmail.last.id)
     expect(BugReport.last.received_at).to be_present
     expect(BugReportAutoPrioritizeJob.jobs.map { it["args"] }).to eq([[BugReport.last.id]])
@@ -32,7 +33,8 @@ RSpec.describe BugReportsMailbox do
       )
     end.to change(BugReport, :count).by 1
 
-    expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id, subject: "Question")
+    expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id,
+      receiver: "contact@bikeindex.org", subject: "Question")
   end
 
   context "with attachments" do
@@ -59,6 +61,62 @@ RSpec.describe BugReportsMailbox do
     end
   end
 
+  context "sent by us, with the sender in Reply-To" do
+    let(:mail) do
+      Mail.new do
+        from '"Bike Index" <contact@bikeindex.org>'
+        reply_to "Sender Person <sender@example.com>"
+        to "contact@bikeindex.org"
+        subject "Bike Recovery"
+        body "I got it back"
+      end
+    end
+
+    it "attributes the report to the Reply-To" do
+      expect { receive_inbound_email_from_source(mail.to_s) }.to change(BugReport, :count).by 1
+
+      expect(BugReport.last).to have_attributes(email: "sender@example.com",
+        from_name: "Sender Person", receiver: "contact@bikeindex.org", subject: "Bike Recovery")
+    end
+  end
+
+  context "sent by us, without a Reply-To" do
+    let(:mail) do
+      Mail.new do
+        from '"Bike Index" <contact@bikeindex.org>'
+        to "contact@bikeindex.org"
+        subject "Stolen notification blocked!"
+        body "It was blocked"
+      end
+    end
+
+    it "attributes the report to us" do
+      expect { receive_inbound_email_from_source(mail.to_s) }.to change(BugReport, :count).by 1
+
+      expect(BugReport.last).to have_attributes(email: "contact@bikeindex.org",
+        from_name: "Bike Index", subject: "Stolen notification blocked!")
+    end
+  end
+
+  context "with a Reply-To from someone outside our domain" do
+    let(:mail) do
+      Mail.new do
+        from "Someone Reporting <someone@example.com>"
+        reply_to "someone-else@example.com"
+        to "bugs@bikeindex.org"
+        subject "Hi"
+        body "Hello"
+      end
+    end
+
+    it "attributes the report to the From" do
+      expect { receive_inbound_email_from_source(mail.to_s) }.to change(BugReport, :count).by 1
+
+      expect(BugReport.last).to have_attributes(email: "someone@example.com",
+        from_name: "Someone Reporting")
+    end
+  end
+
   context "addressed to another address" do
     it "still routes to a bug report" do
       expect do
@@ -67,7 +125,8 @@ RSpec.describe BugReportsMailbox do
         )
       end.to change(BugReport, :count).by 1
 
-      expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id, subject: "Hi")
+      expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id,
+        receiver: "support@bikeindex.org", subject: "Hi")
     end
   end
 end

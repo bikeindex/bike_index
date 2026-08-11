@@ -70,15 +70,16 @@ module UI
       private
 
       # An inline icon (@icon is a path under app/assets/images, sans .svg) takes
-      # precedence over the status dot
+      # precedence over the status dot. Both are decorative - the badge's text is
+      # its accessible name - so they stay out of the accessibility tree.
       def leading_element
-        return helpers.inline_svg_tag("#{@icon}.svg", class: "tw:mr-1 tw:size-3.5") if @icon.present?
+        return helpers.inline_svg_tag("#{@icon}.svg", class: "tw:mr-1 tw:size-3.5", aria_hidden: true) if @icon.present?
         indicator_dot if @indicator
       end
 
       # A small status dot inheriting the badge's text color
       def indicator_dot
-        content_tag(:span, "", class: "tw:mr-1.5 tw:inline-block tw:size-1.5 tw:rounded-full tw:bg-current")
+        content_tag(:span, "", class: "tw:mr-1.5 tw:inline-block tw:size-1.5 tw:rounded-full tw:bg-current", aria: {hidden: true})
       end
 
       def custom_title?

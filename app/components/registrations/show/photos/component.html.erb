@@ -33,13 +33,13 @@
                 data-action="click->registrations--show--photos#select"
                 data-large-url="<%= public_image.image_url(:large) %>"
                 data-original-url="<%= public_image.image_url %>"
-                data-photo-alt="<%= public_image.name %>"
+                data-photo-alt="<%= public_image.image_alt %>"
                 class="
                   tw:cursor-pointer tw:overflow-hidden tw:rounded-sm tw:border-2
                   <%= (index == 0) ? "tw:border-blue-500" : "tw:border-transparent" %>
                 "
               >
-                <%= image_tag public_image.image_url(:small), alt: public_image.name.to_s, class: "tw:h-16 tw:w-16 tw:object-cover" %>
+                <%= image_tag public_image.image_url(:small), alt: public_image.image_alt, class: "tw:h-16 tw:w-16 tw:object-cover" %>
               </button>
             </li>
           <% end %>
