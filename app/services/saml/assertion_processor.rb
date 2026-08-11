@@ -25,10 +25,16 @@ module Saml
       return failure("assertion is missing an email") if email.blank?
 
       organization = saml_configuration.organization
+      # An org's IdP may only ever authenticate emails on the domain that org claims for SSO.
+      # Guarding the whole resolution rather than provisioning alone is what keeps an assertion
+      # for someone else's address - another org's admin, a superadmin - from signing them in.
+      return failure("#{email} is not on this organization's SSO domain") unless
+        Organization.saml_email_matching(email)&.id == organization.id
+
       # One lookup drives both the returning-user short-circuit and the post-login update.
       identity = SsoIdentity.for(organization:, provider:, uid: name_id) ||
         SsoIdentity.new(organization:, provider:, uid: name_id)
-      user = identity.user || User.fuzzy_confirmed_or_unconfirmed_email_find(email) || provision_user(email, organization)
+      user = identity.user || User.fuzzy_confirmed_or_unconfirmed_email_find(email) || provision_user(email)
       return failure("no Bike Index account for #{email}") if user.blank?
 
       # The IdP vouched for this email, so confirm the account (as the magic-link path
@@ -59,12 +65,8 @@ module Saml
       EmailNormalizer.normalize(raw)
     end
 
-    # Only mint an account when the email's domain is the one this org claims for SSO, so an
-    # assertion can never create an account on a domain that routes logins somewhere else.
     # Provisioning grants no organization role - that is user_role_for_user_email_domain's job.
-    def provision_user(email, organization)
-      return nil unless Organization.saml_email_matching(email)&.id == organization.id
-
+    def provision_user(email)
       UserServices::PasswordlessCreator.find_or_create(email).first
     end
 
