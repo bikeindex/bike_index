@@ -357,7 +357,6 @@ module BikeServices
       b_param.present? && !b_param.with_bike? && b_param.manufacturer_id.blank?
     end
 
-    # Every step the flow reaches with these pages, in order. The report comes right after
     # Every step the registration has reached, in order - each one opens the next, so the
     # flow stops at the first that hasn't been done
     def permitted_steps(b_param, sequence, steps)

@@ -454,7 +454,6 @@ RSpec.describe RegisterController, type: :request do
   describe "show step: 2" do
     # Methods rather than let, since the examples re-request and re-check
     def status_field(field_name)
-      # ~=, since a field can be more than one target - phone is a requiredField too
       Nokogiri::HTML(response.body).css("[data-register--status-fields-target~='field']")
         .find { |el| el.at_css("[name^='bike[#{field_name}']") }
     end

@@ -72,8 +72,7 @@ module Register
           .slice(*AddressRecord.permitted_params))
       end
 
-      # Back goes to whatever came before the report - step 2, or the review the
-      # acknowledgment pages end at when the report waited on the emailed link
+      # Read off the list rather than hardcoded - where the report sits is the flow's to say
       def previous_path
         register_path(b_param_token: @b_param.id_token,
           step: BikeServices::Register.step_before("report", steps: @steps))

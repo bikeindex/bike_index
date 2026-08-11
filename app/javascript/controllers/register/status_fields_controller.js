@@ -39,9 +39,10 @@ export default class extends Controller {
       field.querySelectorAll('input, select, textarea').forEach((el) => { el.disabled = !shown })
       if (field.dataset.texts) this.applyRequired(field, this.textFor(field, status))
     })
-    if (this.hasSubmitLabelTarget) {
-      this.submitLabelTarget.textContent = this.textFor(this.submitLabelTarget, status)
-    }
+    // Backspacing the combobox empty deselects it, so keep the label it had rather
+    // than writing an undefined status's missing text into the button
+    const submitText = this.hasSubmitLabelTarget && this.textFor(this.submitLabelTarget, status)
+    if (submitText) this.submitLabelTarget.textContent = submitText
   }
 
   textFor (element, status) {
