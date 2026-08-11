@@ -291,7 +291,7 @@
 
         <td>
           <% if @user.avatar? %>
-            <%= image_tag @user.avatar_url(:medium), class: "tw:w-24" %>
+            <%= image_tag @user.avatar_url(:medium), class: "tw:w-24", alt: "#{@user.display_name} avatar" %>
           <% end %>
         </td>
       </tr>
@@ -392,7 +392,7 @@
 <% if @user.ambassador? %>
   <h4 class="mt-4">Ambassador Tasks</h4>
   <% ambassador = Ambassador.find(@user.id) %>
-  <p><strong><%= "#{ambassador.progress_count} complete" %></strong></p>
+  <p><strong><%= ambassador.progress_count %> complete</strong></p>
   <table class="table table-striped table-bordered ambassador-tasks-table">
     <thead class="small-header thead-light">
       <tr>

@@ -17,13 +17,7 @@ module Registrations
           private
 
           def new_parking_notification
-            return @new_parking_notification if defined?(@new_parking_notification)
-
-            notification = ::ParkingNotification.new(bike_id: @bike.id, organization: @organization, use_entered_address: false)
-            notification.is_repeat = notification.likely_repeat?
-            notification.set_location_from_organization
-            notification.kind ||= notification.potential_initial_record&.kind || ::ParkingNotification.kinds.first
-            @new_parking_notification = notification
+            @new_parking_notification ||= ::ParkingNotification.build_for(bike: @bike, organization: @organization)
           end
 
           def create_parking_notifications_path

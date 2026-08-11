@@ -57,7 +57,7 @@
         <% if @bike_sticker_batch.non_sequential_integers.any? %>
           <ul>
             <% @bike_sticker_batch.non_sequential_integers.each do |arr| %>
-              <li class="small"><%= arr[0] %> > <%= arr[1] %></li>
+              <li class="small"><%= arr[0] %> &gt; <%= arr[1] %></li>
             <% end %>
           </ul>
         <% else %>
