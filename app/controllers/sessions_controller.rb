@@ -46,7 +46,7 @@ class SessionsController < ApplicationController
   end
 
   def sign_in_with_magic_link
-    user = User.find_by_magic_link_token(params[:token])
+    user = User.find_for_auth_token("magic_link_token", params[:token])
     if user.present? && !user.auth_token_expired?("magic_link_token")
       user.confirm(user.confirmation_token) unless user.confirmed?
       @user = user
@@ -94,8 +94,7 @@ class SessionsController < ApplicationController
     end
   end
 
-  # Rather than dumping a would-be sign in at user_root_url, hand back the form they
-  # submitted - losing the session that failed the check is exactly when they need it
+  # Hand back the form they submitted rather than dumping them at user_root_url
   def handle_unverified_request
     flash.now[:error] = invalid_authenticity_token_message
     case action_name
@@ -133,9 +132,7 @@ class SessionsController < ApplicationController
     Organization.passwordless_email_matching(email).present? ? "magic_link" : "password"
   end
 
-  # Whatever killed a magic link token, it matches no user afterward - so the timestamp baked
-  # into the token is the only thing left to read. Old enough and it timed out; recent and it
-  # was spent signing in, or replaced by the link in a newer email.
+  # A dead token matches no user whatever killed it, so its timestamp is all that's left to read
   def magic_link_failure(token)
     return :unrecognized unless SecurityTokenizer.recognized_token?(token)
 

@@ -90,7 +90,9 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     held = Queue.new
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.route("**/search/marketplace*", ->(route, request) {
-        held.pop if request.headers["turbo-frame"] == "marketplace_results_frame" &&
+        # Pushing the token back leaves the gate open, so a later unfiltered
+        # request doesn't hang on the drained queue.
+        held.push(held.pop) if request.headers["turbo-frame"] == "marketplace_results_frame" &&
           !request.url.include?("primary_activity=")
         route.continue
       })
@@ -98,7 +100,28 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     -> { held.push(:release) }
   end
 
-  it "fills the kind counts on load, and keeps a search made before the results arrive" do
+  # defaultPrevented read inside the listener only reports preventDefault from listeners
+  # that already ran, so the verdict would turn on registration order - which a Stimulus
+  # reconnect silently inverts. The next tick has heard from everyone.
+  def watch_for_superseded_results
+    page.execute_script(<<~JS)
+      document.addEventListener("turbo:before-fetch-response", (event) => {
+        if (event.target?.id !== "marketplace_results_frame") return
+
+        setTimeout(() => {
+          document.body.dataset.testSupersededResultsRejected = event.defaultPrevented ? "true" : "false"
+        })
+      })
+    JS
+  end
+
+  # flaky: 2 — papering over, not a diagnosis. Two causes are already ruled out: the verdict
+  # is no longer read inside the listener (where it reported registration order instead of
+  # search--form's answer), and the wait is no longer too short for a round trip the release
+  # only then starts. What's left is a CI-only failure of the released response to reach the
+  # page at all, which nothing reproduces locally. The split assertion below is what will say
+  # which half is at fault next time it goes red; drop this tag once it has.
+  it "fills the kind counts on load, and keeps a search made before the results arrive", flaky: 2 do
     release_initial_results_load = hold_initial_results_load
     visit_marketplace_via_nav
 
@@ -111,9 +134,15 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     search_primary_activity("Mountain biking")
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
 
-    # The unfiltered results are only now allowed to arrive - they mustn't take over
+    # The unfiltered results are only now allowed to arrive - they mustn't take over. The
+    # wait covers a round trip the release only now starts, for this file's slowest response.
+    watch_for_superseded_results
     release_initial_results_load.call
-    page.driver.with_playwright_page { |playwright_page| playwright_page.wait_for_load_state(state: "networkidle") }
+    # Arrival and verdict assert separately so a failure says which happened: no marker at
+    # all means the released response never reached the page, ='false' means it did and
+    # Turbo was allowed to render it
+    expect(page).to have_css("body[data-test-superseded-results-rejected]", wait: 30)
+    expect(page).to have_css("body[data-test-superseded-results-rejected='true']")
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", count: 6)
     expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/)
   end
@@ -132,6 +161,10 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     expect_axe_clean
     # Verify the lazy-loading frame for page 2 exists (5 listings remain)
     expect(page).to have_css("turbo-frame#page_2[loading='lazy']", visible: :all)
+    # Frame-rendered results are proof of JS, so the no-JS pagination links never
+    # render - only the frame's spinner
+    expect(page).to have_no_link(exact_text: "2")
+    expect(page).to have_text("Loading more...")
     scroll_to_lazy_load
     # All 17 listings now visible (2 promoted + 15 standard); promoted bikes are not duplicated
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 17)
@@ -182,6 +215,35 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # the visible input shows the display name
     expect(find("#primary_activity-hw-hidden-field", visible: false).value).to eq primary_activity.id.to_s
     expect(find("#primary_activity").value).to eq "Mountain biking"
+  end
+
+  # search_no_js reaches riders who do have JS: Search::RegistrationsController
+  # forwards it on the marketplace redirect, and it survives in any URL shared
+  # before search--form strips the hidden field. Those renders can't tell, so they
+  # ship both paginations and search--pagination-fallback picks.
+  it "hands a search_no_js render back to infinite scroll, except on the last page" do
+    page.current_window.resize_to(1280, 900)
+    visit "/search/marketplace?search_no_js=true"
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
+
+    # The links a rider without JS would have used are gone, the frame's spinner shows
+    expect(page).to have_no_link(exact_text: "2")
+    expect(page).to have_text("Loading more...")
+    scroll_to_lazy_load
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 17)
+
+    # The last page has no frame to scroll into, so its links stay - they're the only
+    # way out for a rider who deep-linked here
+    visit "/search/marketplace?search_no_js=true&page=2"
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 5)
+    expect(page).to have_no_text("Loading more...")
+    # Following one navigates the results frame, like registrations search - so page 1
+    # comes back in infinite-scroll mode, with no links of its own. Don't count
+    # thumbnails here: the click leaves the page scrolled down, so page 2 may already
+    # be lazy-loading.
+    click_link(exact_text: "1")
+    expect(page).to have_css("turbo-frame#page_2[loading='lazy']", visible: :all, wait: 10)
+    expect(page).to have_no_link(exact_text: "2")
   end
 
   # :flaky retry: a programmatic go_forward to a form-submitted (turbo advance)

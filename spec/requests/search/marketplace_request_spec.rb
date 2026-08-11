@@ -72,6 +72,31 @@ RSpec.describe Search::MarketplaceController, type: :request do
         end
       end
 
+      context "with more listings than fit on a page" do
+        let!(:extra_listings) { FactoryBot.create_list(:marketplace_listing, 13, :for_sale, seller:) }
+
+        it "renders pagination links only when it can't tell whether JS is running" do
+          # A turbo request proves JS, so infinite scroll is the whole story - rendering
+          # the links too would be markup thrown away on every lazily appended page
+          get base_url, as: :turbo_stream
+          expect(response.body).to include("id=\"page_2\"")
+          expect(response.body).to_not include("search--pagination-fallback")
+
+          get base_url, headers: {"Turbo-Frame" => "marketplace_results_frame"}
+          expect(response.body).to include("id=\"page_2\"")
+          expect(response.body).to_not include("search--pagination-fallback")
+
+          get "#{base_url}?search_no_js=true"
+          expect(response.body).to include("id=\"page_2\"")
+          expect(response.body).to include("search--pagination-fallback")
+
+          # The last page has no lazy frame, so its links are all a rider has
+          get "#{base_url}?search_no_js=true&page=2"
+          expect(response.body).to_not include("Loading more...")
+          expect(response.body).to include("search--pagination-fallback")
+        end
+      end
+
       context "promoted listings" do
         let(:paid_seller) { FactoryBot.create(:user, :with_address_record, address_in: :davis) }
         let!(:membership) { FactoryBot.create(:membership, user: paid_seller) }

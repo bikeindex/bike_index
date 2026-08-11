@@ -1,7 +1,7 @@
 <%= render Register::Page::Component.new(data: {controller: "register--heading",
     "register--heading-names-value": cycle_type_names.to_json,
     action: "hw-combobox:selection->register--heading#update"}) do %>
-  <%= render Register::Progress::Component.new(step: 1, total: BikeServices::Register.total_steps(@sequence)) %>
+  <%= render Register::Progress::Component.new(steps: @steps, step: 1) %>
   <%= render UI::Header::Component.new(text: heading_text, subtitle: translation(".just_the_essentials")) %>
 
   <% if @b_param.errors.any? %>
@@ -9,7 +9,7 @@
   <% end %>
 
   <%= form_with(model: @b_param, url: register_path, method: :post, scope: :b_param,
-      data: {controller: "autofocus"}) do |f| %>
+      data: {turbo: true, controller: "autofocus register--retry"}) do |f| %>
     <%= hidden_field_tag :b_param_token, @b_param.id_token %>
 
     <%# So the organization survives a submission that has to build a registration %>
@@ -21,7 +21,7 @@
         label_text: Manufacturer.model_name.human, required: true)) do %>
       <%# The async combobox reads f.object.manufacturer to display the saved value %>
       <%= render UI::Forms::ComboboxManufacturer::Component.new(form: f,
-          frame_maker: true, required: true) %>
+          frame_maker: true, required: true, no_js: true) %>
     <% end %>
 
     <div
@@ -43,7 +43,8 @@
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :cycle_type,
           label_text: translation(".vehicle_type"), required: true, wrapper_class: "tw:mb-0")) do %>
         <%= render UI::Forms::Combobox::Component.new(name: :cycle_type, form: f, required: true,
-            value: @b_param.cycle_type, options: cycle_type_options, rich_display: :inline) %>
+            value: @b_param.cycle_type, options: cycle_type_options, rich_display: :inline,
+            dialog_label: translation(".vehicle_type"), no_js: true) %>
       <% end %>
 
       <%= render UI::Forms::Checkbox::Component.new(name: :propulsion_type_motorized, value: true,

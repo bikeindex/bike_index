@@ -16,9 +16,14 @@ RSpec.describe UI::ColorSwatch::Component, type: :component do
     it "renders a solid swatch using the display color" do
       swatch = component.css("span").first
       expect(swatch["style"]).to eq "background: #386ed2"
-      expect(swatch["title"]).to eq "Blue"
       expect(component.to_html).to include("tw:inline-block")
       expect(component.to_html).to include("tw:rounded-xs")
+    end
+
+    it "is hidden from screen readers, which read the name beside it" do
+      swatch = component.css("span").first
+      expect(swatch["aria-hidden"]).to eq "true"
+      expect(swatch["title"]).to be_nil
     end
 
     it "defaults to the md size, middle alignment" do
@@ -62,7 +67,6 @@ RSpec.describe UI::ColorSwatch::Component, type: :component do
     it "renders the multicolor blend instead of a solid fill" do
       swatch = component.css("span").first
       expect(swatch["style"]).to eq "background: #{Color::COVER_UP_SWATCH}"
-      expect(swatch["title"]).to eq Color::COVER_UP_NAME
     end
   end
 end

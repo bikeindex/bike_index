@@ -22,6 +22,37 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     expect(component).to_not have_css("input[aria-describedby]")
   end
 
+  # A field whose required-ness is decided in the browser carries both markers, since a
+  # controller can flip their hidden state but can't rebuild the label
+  context "required_toggleable" do
+    let(:component) do
+      render_inline(described_class.new(form_builder:, attribute:, required:, required_toggleable: true))
+    end
+
+    it "renders both markers, hiding the required one" do
+      expect(component).to have_css("[data-required-marker][hidden]", text: "*", visible: :all)
+      expect(component).to have_css("[data-optional-marker]", text: "optional")
+      expect(component).to_not have_css("[data-optional-marker][hidden]", visible: :all)
+      expect(component).to_not have_css("input[required]")
+    end
+
+    context "required" do
+      let(:required) { true }
+
+      it "hides the optional one instead" do
+        expect(component).to have_css("[data-required-marker]", text: "*")
+        expect(component).to_not have_css("[data-required-marker][hidden]", visible: :all)
+        expect(component).to have_css("[data-optional-marker][hidden]", text: "optional", visible: :all)
+        expect(component).to have_css("input[required]")
+      end
+    end
+  end
+
+  it "renders one unmarked suffix without it" do
+    expect(component).to_not have_css("[data-required-marker], [data-optional-marker]", visible: :all)
+    expect(component).to have_css("label", text: "optional")
+  end
+
   context "with custom label" do
     let(:label_text) { "Display Name" }
 

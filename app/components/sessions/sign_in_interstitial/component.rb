@@ -2,9 +2,8 @@
 
 module Sessions
   module SignInInterstitial
-    # Emailed links have to be GETs, so they land on a page that renders this and it posts
-    # what the link carried. Scanners follow the link and run its JS, so the form waits for a
-    # click — submitting on render would let them spend the token, or unsubscribe the reader.
+    # Emailed links have to be GETs, so they land here and post what the link carried. Scanners
+    # run the page's JS too, so the form waits for a click rather than submitting on render
     class Component < ApplicationComponent
       def initialize(url:, fields: {}, heading: nil, submit_text: nil)
         @url = url

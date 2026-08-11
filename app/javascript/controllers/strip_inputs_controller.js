@@ -18,12 +18,6 @@ export default class extends Controller {
     this.element.removeEventListener('focusout', this.stripAllInputs.bind(this))
   }
 
-  handleFocusout (event) {
-    if (event.target.matches(this.constructor.inputSelector)) {
-      this.stripAllInputs()
-    }
-  }
-
   stripAllInputs () {
     const textInputs = this.element.querySelectorAll(this.constructor.inputSelector)
     textInputs.forEach(input => {
@@ -32,6 +26,10 @@ export default class extends Controller {
   }
 
   submit (event) {
+    // The embed forms submit from the valid event below, so without this a submit
+    // something else already cancelled would go through anyway
+    if (event.defaultPrevented) return
+
     this.stripAllInputs()
 
     // Find first invalid field after stripping

@@ -55,6 +55,30 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
         expect(response.body).to match(/form action=.\/oauth\/authorize/)
         expect(response.body).to_not include("fbevents.js")
       end
+      context "non-https redirect_uri" do
+        before { doorkeeper_app.update(redirect_uri:) }
+
+        context "custom scheme, like a native app" do
+          let(:redirect_uri) { "bikeindex://oauth-callback" }
+          it "renders without the insecure authorization modal" do
+            get authorization_url
+            expect(response.code).to eq("200")
+            expect(response.body).to_not match("insecure-authorization-modal")
+          end
+        end
+
+        context "cleartext http" do
+          let(:redirect_uri) { "http://app.com" }
+          it "renders the insecure authorization modal, its cancel button denying" do
+            get authorization_url
+            expect(response.code).to eq("200")
+            expect(response.body).to match("insecure-authorization-modal")
+            # Cancelling has to deny - closing the modal is the documented way to continue anyway
+            expect(response.body).to match(/<form[^>]*id="deny-authorization"/)
+            expect(response.body).to match(/<button[^>]*form="deny-authorization"/)
+          end
+        end
+      end
       context "no scope" do
         let(:scope_param) { "" }
         it "errors" do

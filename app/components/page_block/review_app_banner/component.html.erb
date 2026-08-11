@@ -47,9 +47,7 @@
 
   <% if signed_in_as_superadmin? %>
     &middot;
-    <span class="tw:font-normal tw:text-black/60 tw:italic">
-      <%= translation(".superadmin_signed_in") %>
-    </span>
+    <span class="tw:font-normal tw:text-black/60 tw:italic"><%= translation(".superadmin_signed_in") %></span>
   <% elsif superadmin %>
     &middot;
     <%= form_with url: sign_in_with_magic_link_session_path, class: "tw:inline-block tw:align-middle" do %>
@@ -59,8 +57,6 @@
     <% end %>
   <% else %>
     &middot;
-    <span class="tw:font-normal tw:text-black/60 tw:italic">
-      <%= translation(".no_superadmin") %>
-    </span>
+    <span class="tw:font-normal tw:text-black/60 tw:italic"><%= translation(".no_superadmin") %></span>
   <% end %>
 </div>

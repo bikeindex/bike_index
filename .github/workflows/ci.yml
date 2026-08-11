@@ -8,6 +8,12 @@ permissions:
   contents: write
   pull-requests: write
 
+# Not on main: cancelling would kill deploy_production, or leave a deploy this run
+# dispatched still going with no CI behind it
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   # Dispatches review-app deploys from CI's single `on: push` run — a
   # `pull_request: synchronize` trigger + label gate in review-app.yml would

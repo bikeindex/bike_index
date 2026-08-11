@@ -7,8 +7,9 @@
   </small>
 <% elsif @bike.present? %>
   <% unless @bike.status_with_owner? %>
+    <% status_color_class = "#{@bike.status_humanized.tr(" ", "-")}-color" %>
     <strong
-      class="<%= "#{@bike.status_humanized.tr(" ", "-")}-color uppercase" %>"
+      class="uppercase <%= status_color_class %>"
       title="<%= Bike.status_humanized_translated(@bike.status_humanized) %>"
     >
       <%= Bike.status_humanized_translated(@bike.status_humanized).first %>

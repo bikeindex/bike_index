@@ -59,7 +59,7 @@
               <span class="extended-col-info small">
                 - <em><%= parking_notification.kind_humanized %></em> - by
                 <strong><%= parking_notification.organization.short_name %></strong>
-                
+
                 <small class="less-strong">(<%= parking_notification.user&.display_name %>)</small>
               </span>
 
@@ -108,9 +108,7 @@
           <% if @bike.unregistered_parking_notification? %>
             Was this bike retrieved?
           <% else %>
-            Have you retrieved this
-            <%= @bike.type %>
-            ?
+            Have you retrieved this <%= @bike.type %> ?
           <% end %>
         </strong>
       </h3>
