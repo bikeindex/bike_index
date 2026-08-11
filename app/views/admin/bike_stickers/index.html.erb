@@ -17,20 +17,13 @@
         <%= number_display(@bike_sticker_batches.count) %>
 
         <% if @matching_batches %>
-          matching
-          <%= "batch".pluralize(@bike_sticker_batches.count) %>
+          matching <%= "batch".pluralize(@bike_sticker_batches.count) %>
         <% elsif @all_batches %>
           batches
-          <small class="less-strong">
-            - show
-            <%= link_to "only most recent", url_for(sortable_search_params.merge(search_all_batches: false)) %>
-          </small>
+          <small class="less-strong">- show <%= link_to "only most recent", url_for(sortable_search_params.merge(search_all_batches: false)) %></small>
         <% else %>
           most recent batches
-          <small class="less-strong">
-            - <%= number_display(BikeStickerBatch.count) %>
-            <%= link_to "total batches", url_for(sortable_search_params.merge(search_all_batches: true)), class: "less-strong" %>
-          </small>
+          <small class="less-strong">- <%= number_display(BikeStickerBatch.count) %> <%= link_to "total batches", url_for(sortable_search_params.merge(search_all_batches: true)), class: "less-strong" %></small>
         <% end %>
       </h5>
     <% end %>
@@ -64,7 +57,7 @@
         <% if @bike_sticker_batch.non_sequential_integers.any? %>
           <ul>
             <% @bike_sticker_batch.non_sequential_integers.each do |arr| %>
-              <li class="small"><%= arr[0] %> > <%= arr[1] %></li>
+              <li class="small"><%= arr[0] %> &gt; <%= arr[1] %></li>
             <% end %>
           </ul>
         <% else %>
@@ -100,8 +93,7 @@
           <%= humanized_time_range(@time_range) %>
         </em>
         <% if sortable_search_params? %>
-          -
-          <em><%= link_to "view all stickers", url_for %></em>
+          - <em><%= link_to "view all stickers", url_for %></em>
         <% end %>
       </p>
 

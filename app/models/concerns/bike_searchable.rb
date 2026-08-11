@@ -1,6 +1,12 @@
 module BikeSearchable
   extend ActiveSupport::Concern
 
+  # pg_trgm's 0.3 default drops ~5% of the LEVENSHTEIN < 3 matches, and 47% of the two-edit
+  # ones on serials of 8 characters or fewer
+  CLOSE_SERIAL_SIMILARITY = 0.2
+  # Deeper than any caller paginates
+  CLOSE_SERIAL_LIMIT = 1000
+
   class << self
     # searchable_interpreted_params returns the args for by all other public methods in this class
     # query_params:
@@ -231,10 +237,7 @@ module BikeSearchable
     def search_close_serials(interpreted_params)
       return none if interpreted_params[:serial].blank? # normalized_serial blank
 
-      # serials_not_containing excludes exact matches too
-      serials_not_containing(interpreted_params[:serial], interpreted_params[:serial_no_space])
-        .non_serial_matches(interpreted_params)
-        .where("LEVENSHTEIN(serial_normalized_no_space, ?) < 3", interpreted_params[:serial_no_space])
+      where(id: close_serial_ids(interpreted_params))
     end
 
     def search_serials_containing(interpreted_params)
@@ -262,6 +265,22 @@ module BikeSearchable
 
     # TODO: actually make private?
     # Private (internal only) methods below here, as defined at the start
+
+    # LEVENSHTEIN can't use an index; `%` narrows the candidates through the trigram one, and
+    # takes its threshold from a session setting - hence the eager select inside a transaction
+    def close_serial_ids(interpreted_params)
+      serial, serial_no_space = interpreted_params.values_at(:serial, :serial_no_space)
+      transaction do
+        connection.execute("SET LOCAL pg_trgm.similarity_threshold = #{CLOSE_SERIAL_SIMILARITY}")
+        serials_not_containing(serial, serial_no_space) # also excludes exact matches
+          .non_serial_matches(interpreted_params)
+          .where("serial_normalized_no_space % ?", serial_no_space)
+          .where("LEVENSHTEIN(serial_normalized_no_space, ?) < 3", serial_no_space)
+          .unscope(:includes).reorder(nil) # default_scope's eager loads and sort triple an id select
+          .limit(CLOSE_SERIAL_LIMIT)
+          .pluck(:id)
+      end
+    end
 
     def non_serial_matches(interpreted_params)
       # For each of the of the colors, call searching_matching_color_ids with the color_id on the previous ;)

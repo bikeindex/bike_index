@@ -29,11 +29,14 @@ RSpec.describe "Bike search", :js, type: :system do
   end
 
   def click_first_bike_and_go_back
-    first(".bike-box-item .title-link a").click
-    # Assert the navigation separately from the render: this flakes on CI, and the
-    # two failures have different causes. No current_path means the click was lost
-    # (the frame re-rendered and detached the link); current_path without the h1
-    # means the bike page itself was slow to render under load.
+    # Click what a user would: results that have finished loading. A restoration fires
+    # turbo:load, where reloadFrameIfUrlStale can put the frame back in flight, and a
+    # click landing mid-swap navigates nowhere.
+    expect(page).to have_css("turbo-frame#search_registrations_results_frame[complete]:not([busy])", wait: 10)
+    retry_on_detach { first(".bike-box-item .title-link a").click }
+    # Navigation and render assert separately because they fail differently: a nil
+    # current_path is about:blank (Capybara returns nil for an `about:` scheme), not a
+    # lost click; current_path without the h1 is just a slow bike page.
     expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
     expect(page).to have_css("h1.bike-title", wait: 15)
     page.go_back

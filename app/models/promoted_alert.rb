@@ -40,6 +40,8 @@
 #  fk_rails_...  (user_id => users.id)
 #
 class PromotedAlert < ApplicationRecord
+  # Duplicate of TheftAlert until that model is removed - anything added to one belongs on both
+
   FAILED_DELAY = 5.minutes.to_i.freeze
   STATUS_ENUM = {pending: 0, active: 1, inactive: 2}.freeze
   # Timestamp 1s before first alert was automated
@@ -233,6 +235,7 @@ class PromotedAlert < ApplicationRecord
     stolen_record.present? && stolen_record.theft_alert_missing_photo?
   end
 
+  # Names campaigns that already exist on Facebook - "Theft Alert" survives the rename
   def facebook_name(kind = "campaign")
     n = "Theft Alert #{id} - #{amount_facebook}"
     return n if kind == "campaign"

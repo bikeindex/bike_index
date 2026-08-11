@@ -4,6 +4,9 @@ module UI
   module ColorSwatch
     # A small square showing a bike color. The display-less "cover-up" color
     # renders Color::COVER_UP_SWATCH's multicolor blend instead of a solid fill.
+    #
+    # Decorative: every caller prints the color name beside the swatch, so giving the
+    # swatch an accessible name of its own would announce "Red Red".
     class Component < ApplicationComponent
       # leading-[0] collapses the empty box's line-height strut so align-baseline
       # sits its bottom on the text baseline instead of floating above it
@@ -21,7 +24,7 @@ module UI
       end
 
       def call
-        content_tag(:span, "", class: "#{BASE_CLASSES} #{SIZES[@size]} #{ALIGNS[@align]}", style: swatch_style, title: @name)
+        content_tag(:span, "", class: "#{BASE_CLASSES} #{SIZES[@size]} #{ALIGNS[@align]}", style: swatch_style, aria: {hidden: true})
       end
 
       private

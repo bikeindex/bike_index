@@ -13,10 +13,23 @@ module Register
       end
 
       def call
+        # Which step a page shows is server state, and Turbo restores its own snapshot on
+        # back/forward - the cache Cache-Control: no-store can't reach
+        helpers.content_for(:header) { tag.meta(name: "turbo-cache-control", content: "no-cache") }
+
         content_tag(:div,
-          content_tag(:div, content, class: "tw:mx-auto tw:max-w-md"),
+          content_tag(:div, safe_join([retry_notice, content]), class: "tw:mx-auto tw:max-w-md"),
           class: "tw:-mt-9 tw:-mb-18 tw:bg-gray-100 tw:px-4 tw:py-10 tw:min-[992px]:-mt-15 tw:dark:bg-gray-900",
           data: @data.merge(controller: ["register--revalidate", @data[:controller]].compact.join(" ")))
+      end
+
+      private
+
+      # Revealed by register--retry when a submission can't be retried into working. Ships
+      # with the page rather than built in JS, so it's translated and styled like any alert
+      def retry_notice
+        content_tag(:div, render(UI::Alerts::Base::Component.new(kind: :error, text: translation(".retry_failed"))),
+          hidden: true, data: {register_retry_notice: true})
       end
     end
   end

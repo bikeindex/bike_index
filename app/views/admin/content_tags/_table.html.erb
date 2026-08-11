@@ -17,34 +17,34 @@
     </thead>
 
     <tbody>
-      <% collection.each do |tag| %>
+      <% collection.each do |content_tag| %>
         <tr>
           <td>
             <span class="localizeTime">
-              <%= l tag.created_at, format: :convert_time %>
+              <%= l content_tag.created_at, format: :convert_time %>
             </span>
 
             <% if display_dev_info? %>
-              <code class="only-dev-visible"><%= tag.id %></code>
+              <code class="only-dev-visible"><%= content_tag.id %></code>
             <% end %>
           </td>
 
           <td>
             <small class="localizeTime">
-              <%= l tag.updated_at, format: :convert_time %>
+              <%= l content_tag.updated_at, format: :convert_time %>
             </small>
           </td>
 
           <td>
-            <%= link_to tag.name, edit_admin_content_tag_url(tag) %>
+            <%= link_to content_tag.name, edit_admin_content_tag_url(content_tag) %>
           </td>
 
           <td>
-            <small><%= tag.priority %></small>
+            <small><%= content_tag.priority %></small>
           </td>
 
           <td>
-            <%= number_display(tag.blogs.count) %>
+            <%= number_display(content_tag.blogs.count) %>
           </td>
         </tr>
       <% end %>
