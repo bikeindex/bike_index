@@ -30,11 +30,11 @@
       label: translation(".query_items_description"),
       placeholder: translation(".search_descriptions"),
     ) do |combobox| %>
-      <% combobox.customize_label class: "tw:sr-only" %>
+      <% combobox.customize_label class: "tw:sr-only" %> <%# herb:disable erb-no-unused-expressions %>
 
       <%# The combobox keeps its own comma-joined value here; the stimulus %>
       <%# controller mirrors it into query_items[] fields, so disable submission %>
-      <% combobox.customize_hidden_field disabled: true %>
+      <% combobox.customize_hidden_field disabled: true %> <%# herb:disable erb-no-unused-expressions %>
     <% end %>
   </div>
 

@@ -10,7 +10,7 @@
 
 <h1><%= link_to name, polymorphic_path(@public_image.imageable) %></h1>
 
-<%= image_tag @public_image.image_url(:large) %>
+<%= image_tag @public_image.image_url(:large), alt: @public_image.image_alt %>
 
 <% if @owner_viewing %>
   <div class="padded">

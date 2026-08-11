@@ -25,6 +25,28 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_current_path("/my_account", wait: 5)
   end
 
+  def submit_step_1
+    type_into("#b_param_manufacturer_id", "Surly")
+    click_combobox_option("Surly")
+    fill_in "b_param[owner_email]", with: owner_email
+    click_button "Next"
+  end
+
+  # Answers every submission in the browser, the way an edge that never reaches the app
+  # would, and collects what it turned away
+  def fail_submissions(status:, headers: {})
+    [].tap do |attempts|
+      page.driver.with_playwright_page do |playwright_page|
+        playwright_page.route(%r{/register}, ->(route, request) {
+          next route.continue if request.method == "GET"
+
+          attempts << request.url
+          route.fulfill(status:, headers:, contentType: "text/plain", body: "Nope")
+        })
+      end
+    end
+  end
+
   # Through step 1 and onto step 2, the way a rider gets there
   def start_registration
     visit "/register/new"
@@ -32,19 +54,25 @@ RSpec.describe "Register flow", :js, type: :system do
     # new creates the registration and lands on its tokenized step 1
     expect(page).to have_current_path(/register\?b_param_token=.+&step=1/, url: true)
 
-    type_into("#b_param_manufacturer_id", "Surly")
-    click_combobox_option("Surly")
-    fill_in "b_param[owner_email]", with: owner_email
-    click_button "Next"
+    submit_step_1
 
     expect(page).to have_content("Add your bike")
   end
 
-  # The emailed link, minus the mailer's host - the app under test is on Capybara's
-  def confirmation_link
-    Email::PartialRegistrationJob.drain
-    url = ActionMailer::Base.deliveries.last.html_part.decoded[%r{https?://[^"]*/register/confirm[^"]*}]
-    URI.parse(CGI.unescapeHTML(url)).request_uri
+  # An async combobox carries no options to map a saved id back to a name, so the server
+  # renders the display itself - and back to step 1 is where a raw id would show up instead
+  it "shows the manufacturer by name, not by id, when back returns to step 1" do
+    start_registration
+    page.go_back
+
+    expect(page).to have_field("b_param_manufacturer_id", with: "Surly")
+    # The id is what submits, and only ever from the hidden field
+    expect(find("input[name='b_param[manufacturer_id]']", visible: :all).value).to eq manufacturer.id.to_s
+    expect(page).to have_no_field("b_param_manufacturer_id", with: manufacturer.id.to_s)
+
+    # The manufacturer itself, rather than Manufacturer.other with the id as free text
+    expect(BParam.last.manufacturer_id).to eq manufacturer.id
+    expect(BParam.last.manufacturer_other).to be_blank
   end
 
   it "starts a registration, keeps a full details draft across a reload, and completes" do
@@ -343,6 +371,92 @@ RSpec.describe "Register flow", :js, type: :system do
     end
   end
 
+  # A throttle answers text/plain, which Turbo renders as nothing, and asks to be waited
+  # for in tens of seconds - so it can be neither retried silently nor waited out
+  describe "a step the server throttles" do
+    it "stops retrying, says so, and gives the step back" do
+      visit "/register/new"
+      attempts = fail_submissions(status: 429, headers: {"retry-after" => "20"})
+      submit_step_1
+
+      expect(page).to have_content("try again in a moment")
+      # It was told how long the wait is, so it didn't spend its retries finding out
+      expect(attempts.length).to eq 1
+      # The step is theirs to submit again, rather than a spinner that never resolves
+      expect(page).to have_button("Next", disabled: false)
+      expect(page).to have_field("b_param[owner_email]", with: owner_email)
+      expect(BParam.last.owner_email).to be_blank
+    end
+  end
+
+  # A 500 carries no retry-after, so it's what the retries actually get spent on
+  describe "a step the server keeps failing" do
+    it "spends its retries, and spends them again when the rider tries once more" do
+      visit "/register/new"
+      attempts = fail_submissions(status: 500)
+      submit_step_1
+
+      # The submission and its two retries, which back off past Capybara's default wait
+      expect(page).to have_content("try again in a moment", wait: 5)
+      expect(attempts.length).to eq 3
+
+      # The notice asks for another try, so that try is worth as much as the first
+      click_button "Next"
+      wait_for { attempts.length == 6 }
+
+      expect(page).to have_button("Next", disabled: false)
+      expect(page).to have_field("b_param[owner_email]", with: owner_email)
+      expect(BParam.last.owner_email).to be_blank
+    end
+  end
+
+  # The combobox pages its options into a turbo-frame inside the step's own form, so
+  # their responses pass register--retry on the way out - and a failed list isn't a
+  # failed submission
+  describe "the manufacturer options failing partway down the list" do
+    # More than the endpoint's page size, so there's a second page to reach for
+    let!(:manufacturers) { 16.times.map { |i| FactoryBot.create(:manufacturer, name: "Surly Bikes #{i}") } }
+
+    # These are built after the outer index load, so the index doesn't know them yet
+    before { Autocomplete::Loader.load_all(%w[Manufacturer]) }
+
+    it "leaves the step for the rider to submit" do
+      visit "/register/new"
+      submissions = []
+      failed_options = []
+
+      page.driver.with_playwright_page do |playwright_page|
+        playwright_page.route(%r{/register}, ->(route, request) {
+          submissions << request.url unless request.method == "GET"
+          route.continue
+        })
+        playwright_page.route(%r{/search/combobox/manufacturers}, ->(route, request) {
+          next route.continue unless request.url.include?("page=2")
+
+          failed_options << request.url
+          route.fulfill(status: 500, contentType: "text/plain", body: "Nope")
+        })
+      end
+
+      fill_in "b_param[owner_email]", with: owner_email
+      type_into("#b_param_manufacturer_id", "Surly")
+      # The list resets its scroll as it re-renders, so scrolling before the whole first
+      # page is there goes nowhere
+      expect(page).to have_css(".hw-combobox__option", text: "Surly Bikes 7")
+      find(".hw-combobox__listbox").scroll_to(:bottom)
+      wait_for { failed_options.any? }
+      # A non-event is only provable by waiting: a scheduled retry is 500ms behind
+      sleep 1
+
+      # Still theirs to submit - and their own click is the only thing that does
+      click_combobox_option("Surly Bikes 0")
+      click_button "Next"
+
+      expect(page).to have_content("Add your bike")
+      expect(submissions.length).to eq 1
+    end
+  end
+
   context "e-vehicle with an organization's safety rules" do
     let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
     # Built as a draft and activated below, since activation freezes the pages
@@ -421,6 +535,95 @@ RSpec.describe "Register flow", :js, type: :system do
         b_param_id: BParam.last.id, owner_email:,
         acknowledgment_text: "agree to comply with all of the rules above.")
       expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
+    end
+
+    # Every step submits through Turbo, so a throttle or a bad gateway is a response the
+    # page can retry. This flow has one of every step, so each gets its turn at failing.
+    context "when the server fails each step once" do
+      let(:failed_steps) { [] }
+
+      def step_param(url) = Rack::Utils.parse_query(URI.parse(url.to_s).query)["step"]
+
+      # Each step's first submission is answered in the browser and the retry behind it is
+      # let through. The statuses alternate, so both kinds of failure get their turn.
+      before do
+        page.driver.with_playwright_page do |playwright_page|
+          playwright_page.route(%r{/register}, ->(route, request) {
+            # Every submission is a POST to one of three paths (Rails' method override),
+            # so what tells the steps apart is the page each came from
+            step = [URI.parse(request.url).path, step_param(request.headers["referer"])]
+            next route.continue if request.method == "GET" || failed_steps.include?(step)
+
+            failed_steps << step
+            route.fulfill(status: failed_steps.length.odd? ? 429 : 500,
+              contentType: "text/plain", body: "Try again")
+          })
+        end
+      end
+
+      it "retries each of them, and the registration still finishes" do
+        ActionMailer::Base.deliveries = []
+        visit "/register/new?organization_id=#{organization.slug}"
+
+        type_into("#b_param_manufacturer_id", "Surly")
+        click_combobox_option("Surly")
+        check "Electric (motorized)"
+        fill_in "b_param[owner_email]", with: owner_email
+
+        # Lengthens the wait rather than skipping it, leaving time to look at the button
+        # while it's pending. The flag is what finds that window: Turbo re-enables the
+        # button as the failed submission ends, so an earlier poll reads the wrong state
+        page.execute_script(<<~JS)
+          const form = document.querySelector("[data-controller~='register--retry']")
+          form.setAttribute("data-register--retry-delay-value", "3000")
+          form.addEventListener("turbo:submit-end", () => { window.submitEnded = true })
+        JS
+        click_button "Next"
+
+        # Without the hold a rider could click through the wait, submitting the step twice
+        wait_for { page.evaluate_script("window.submitEnded") }
+        expect(page).to have_button("Next", disabled: true)
+
+        # The rider never sees the failure, only the retry - waited out past Capybara's default
+        expect(page).to have_content("Add your bike", wait: 10)
+
+        fill_in "bike[user_name]", with: user_name
+        type_into("#bike_primary_frame_color_id", "Red")
+        click_combobox_option("Red")
+        fill_in "bike[serial_number]", with: "XYZ 123"
+        click_button "Next"
+
+        expect(page).to have_content("Battery & charging")
+        check "Charge with the manufacturer's charger"
+        check "Report a swollen battery"
+        click_button "Continue"
+
+        expect(page).to have_content("Campus rules")
+        check "Dismount in posted zones"
+        click_button "Continue"
+
+        expect(page).to have_content("You're almost done")
+        check "I, #{user_name}, agree to comply with all of the rules above."
+        click_button "Complete Bike Registration"
+
+        expect(page).to have_content("Registration saved")
+
+        # The emailed link finishes a step like any other, and fails like one
+        visit confirmation_link
+        click_button "Continue"
+
+        expect(page).to have_content("Registration complete", wait: 10)
+        expect(Bike.last).to have_attributes(owner_email:, serial_number: "XYZ 123",
+          propulsion_type: "pedal-assist")
+        # A retry that landed twice would be a second registration, or a second signature
+        expect(Bike.count).to eq 1
+        expect(RegistrationSequenceAcknowledgment.count).to eq 1
+
+        # Every step of the flow failed, and none of them more than once
+        expect(failed_steps).to eq([["/register", "1"], ["/register", "2"],
+          ["/register/acknowledge", "3"], ["/register/acknowledge", "4"],
+          ["/register/acknowledge", "review"], ["/register/confirm_email", nil]])
+      end
     end
   end
 end

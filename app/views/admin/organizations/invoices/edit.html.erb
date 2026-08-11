@@ -68,15 +68,13 @@
           </ul>
 
           <% if @invoice.law_enforcement_functionality_invoice? %>
-            <strong class="less-strong">
-              Verified Law Enforcement functionality
-            </strong>
+            <strong class="less-strong"> Verified Law Enforcement functionality </strong>
             invoice
           <% end %>
 
           <% if @invoice.paid_money_but_no_cost? %>
-            <strong class="less-strong">Amount due is $0</strong>
-            this invoice doesn't make the organization "Paid"
+            <strong class="less-strong">Amount due is $0</strong> this invoice
+            doesn't make the organization "Paid"
             <% if @invoice.payments.any? %>
               <span class="d-block mt-1">
                 <strong class="text-danger">This invoice has a payment,</strong>
@@ -121,8 +119,7 @@
 
         <td>
           <% if @invoice.endless? %>
-            <span class="text-warning">Endless</span>
-            (invoice never ends)
+            <span class="text-warning">Endless</span> (invoice never ends)
           <% elsif @invoice.subscription_end_at.present? %>
             <span class="localizeTime preciseTimeSeconds">
               <%= l @invoice.subscription_end_at, format: :convert_time %>

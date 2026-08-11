@@ -19,14 +19,16 @@ export default class extends Controller {
 
   connect () {
     this.boundHold = this.hold.bind(this)
-    this.form?.addEventListener('submit', this.boundHold)
+    // Captured on the document so it runs ahead of the form's own submit handlers -
+    // strip-inputs resubmits the form itself, and only bows out to a prevented submit
+    document.addEventListener('submit', this.boundHold, true)
     // The field posts its own bytes until this runs, which is what makes the form work
     // without JS - once we're uploading, the signed id is what the form carries instead.
     if (this.urlValue) this.inputTarget.removeAttribute('name')
   }
 
   disconnect () {
-    this.form?.removeEventListener('submit', this.boundHold)
+    document.removeEventListener('submit', this.boundHold, true)
     clearTimeout(this.stallTimer)
     this.releaseObjectUrl()
   }
@@ -203,7 +205,7 @@ export default class extends Controller {
   // Submitting mid-upload would drop the file, so hold the form until the blob lands.
   // A failed upload submits anyway - the rest of the form matters more.
   async hold (event) {
-    if (!this.pending) return
+    if (!this.pending || event.target !== this.form) return
 
     event.preventDefault()
     await this.pending

@@ -120,9 +120,7 @@
   <% show_unconfirmed_count = params[:search_domain].present? && !@search_unconfirmed && !@search_confirmed %>
 
   <% if show_unconfirmed_count %>
-    <strong>
-      <%= number_with_delimiter(matching_users.unconfirmed.size) %>
-    </strong>
+    <strong><%= number_with_delimiter(matching_users.unconfirmed.size) %></strong>
     unconfirmed users
   <% end %>
 

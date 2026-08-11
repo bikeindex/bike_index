@@ -11,7 +11,7 @@ module Admin
     end
 
     def show
-      @bike_version = BikeVersion.unscoped.find(params[:id])
+      @bike_version = BikeVersion.unscoped.includes(public_images: :imageable).find(params[:id])
       @bike = @bike_version.bike
     end
 

@@ -105,6 +105,31 @@ This project uses the ViewComponent gem to render components.
 - **Never nest a component inside a folder that already holds a `component.rb`.** Each component lives in `app/components/<path>/component.rb` (and `spec/components/<path>/component_spec.rb`); siblings go in sibling folders, not subfolders. If you have `search/everything_combobox/component.rb` and need a related component, place it at `search/everything_combobox_options/component.rb` (module `Search::EverythingComboboxOptions`), not `search/everything_combobox/options/component.rb`.
 - **Converting a partial to a component is a faithful move, not a cleanup.** Carry the markup over verbatim — including comments and commented-out code. Those lines are often a deliberate stash (a link that's temporarily disabled, a snippet someone expects to restore), so dropping them silently loses intent and surprises the reviewer, who expects the diff to read as "same content, new home." The only changes a conversion should introduce are the mechanical ones the move *requires*: `t(".x")` → `translation(".x")`, adding `helpers.` where a helper now needs it, and the like. If you spot something that genuinely looks like dead code worth removing, that's a separate judgment call — raise it with the user or do it in its own commit, don't fold it into the move.
 
+## Turbo is opt-in, and opting a form in has two consequences
+
+`application.js` sets `Turbo.session.drive = false`, so links and forms submit natively
+until something carries `data-turbo="true"`. Two things bite the first time a form opts
+in, neither of which shows up as an error — the page just behaves oddly:
+
+- **A controller-rendered component takes its content type from the request.** A Turbo
+  submission sends `Accept: text/vnd.turbo-stream.html` first, and `render Foo::Component.new(...)`
+  has no template format to override it, so the response comes back as a *stream message* —
+  which Turbo appends to the current page instead of replacing it. Two steps of a wizard end
+  up on screen at once. Fix it at the controller with `before_action { request.format = :html }`
+  for actions that only ever render pages. (An `.html.erb` view doesn't have this problem: the
+  template's own format sets the content type.)
+- **`data-turbo="true"` on a form opts in every link inside it too** — navigability is
+  resolved with `closest("[data-turbo]")`, so it isn't scoped to the submission. A link that
+  leaves for a legacy jQuery page needs `data: {turbo: false}`, or it gets Turbo-rendered into
+  a body whose `loadPageScript` never runs. Links to pages the Stimulus redesign owns are fine.
+- **Turbo restores its own snapshot on back/forward**, which `Cache-Control: no-store` can't
+  reach. If what a page renders depends on server state, opt out with
+  `<meta name="turbo-cache-control" content="no-cache">` — the layout renders it when the
+  controller sets `@turbo_no_cache` — and a restoration re-fetches instead of showing a page
+  the user has moved past.
+
+`RegisterController` and the `Register::` components are the worked example of both.
+
 ## Playwright screenshot filenames
 
 **Every `mcp__playwright__browser_take_screenshot` call must pass a `filename:` that starts with `tmp/`** (e.g. `tmp/tooltip-hover.png`). The MCP tool's default root is the project root — a bare filename like `tooltip.png` lands in the working tree, shows up in `git status`, and has to be cleaned up by hand. `tmp/` is gitignored, so screenshots there stay out of commits and don't pollute the diff. This rule applies to ad-hoc visual verification, not just PR-screenshot capture.

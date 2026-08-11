@@ -1,3 +1,7 @@
+@import "legacy_includes/css_layers";
+
+@layer legacy {
+
 /*
 
 Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
@@ -10011,3 +10015,5 @@ input.submit {
     font-size: 0.9em;
   }
 }
+
+} // end @layer legacy
