@@ -2,36 +2,28 @@
 
 require "rails_helper"
 
-# A real browser with scripting turned off, which is the only thing that answers what a
-# rider without JavaScript actually gets: the steps post as plain forms (the `data-turbo`
-# they carry is inert), register--retry and the submit spinners never wire up, `<noscript>`
-# becomes real DOM, and - the part no other driver reaches - the browser runs HTML5
-# constraint validation and applies the stylesheet that hides each combobox.
-#
-# A combobox submits through a hidden field only its Stimulus controller writes, so each
-# one is backed by a UI::Forms::NoJsField control: a select, or a textbox where a list
-# can't serve.
-RSpec.describe "Register flow without JavaScript", type: :system do
+# A real browser with scripting off is the only thing that answers what a rider without
+# JavaScript gets: the steps post as plain forms, `<noscript>` becomes real DOM, and - the
+# part no other driver reaches - HTML5 constraint validation runs against the stylesheet
+# that hides each combobox. Each one falls back to a UI::Forms::NoJsField control.
+RSpec.describe "Register flow without JavaScript", type: :system, driver: :playwright_no_js do
   let(:owner_email) { "owner@bikeindex.org" }
   let(:user_name) { "Sally Rider" }
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
   let!(:red) { FactoryBot.create(:color, name: "Red") }
 
-  before { driven_by(:playwright_no_js) }
-
   it "registers a bike through the plain controls the comboboxes fall back to" do
     visit "/register/new"
 
-    # Starting the registration and landing on its tokenized step 1 is all redirects,
-    # so it works the same either way
+    # All redirects up to here, so it works the same either way
     expect(page).to have_current_path(/register\?b_param_token=.+&step=1/, url: true)
     expect(page).to have_content("Register your bike!")
 
-    # The combobox really is hidden here - the stylesheet ships inside the noscript, so
-    # this is a rendering only a browser with scripting off produces
+    # Really hidden: the stylesheet ships inside the noscript, so only a browser with
+    # scripting off renders it this way
     expect(page).to have_no_css("[data-js-required] input#b_param_manufacturer_id")
-    # ...and the control standing in for it is the one a rider can see and use. A textbox,
-    # since manufacturers are autocompleted from an endpoint and take free text
+    # ...and what stands in for it is usable. A textbox, since manufacturers come from an
+    # endpoint and take free text
     expect(page).to have_css("input[name='b_param[manufacturer_id]']")
     # The cycle types are a list worth showing, so that one falls back to a select
     expect(page).to have_select("b_param[cycle_type]")
@@ -85,8 +77,8 @@ RSpec.describe "Register flow without JavaScript", type: :system do
     expect(b_param.cycle_type).to eq "e-scooter"
   end
 
-  # The safety pages gate their submit behind every box being checked, which without
-  # JavaScript can only be the server's job - so the button ships enabled
+  # Every box has to be checked, which without JavaScript is the server's job alone -
+  # so the button ships enabled
   context "an organization's e-vehicle safety rules" do
     let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
     # Built as a draft and activated below, since activation freezes the pages
@@ -132,9 +124,8 @@ RSpec.describe "Register flow without JavaScript", type: :system do
     end
   end
 
-  # The browser's own validation, which is what makes the fallback a control rather than
-  # decoration - and what a required combobox hidden behind it would break, since a form
-  # holding a required control it can't focus is one the browser refuses to submit at all
+  # The browser's own validation is what makes the fallback a control rather than
+  # decoration - and what a required combobox hidden behind it would break outright
   it "holds the step until the fallback is filled, then lets it through" do
     visit "/register/new"
     step_1_url = page.current_url

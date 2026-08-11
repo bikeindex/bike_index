@@ -14,9 +14,8 @@ Capybara.register_driver :playwright do |app|
 end
 
 # The same browser with scripting turned off, for specs about what a rider without
-# JavaScript gets. rack_test can't answer that on its own: it applies no stylesheets and
-# runs no HTML5 constraint validation, so a form a real browser refuses to submit (a
-# required control hidden by CSS) passes there.
+# JavaScript gets. rack_test applies no stylesheets and runs no HTML5 constraint
+# validation, so a form a real browser refuses to submit passes there.
 Capybara.register_driver :playwright_no_js do |app|
   Capybara::Playwright::Driver.new(app,
     browser_type: :chromium,
@@ -59,8 +58,9 @@ RSpec.configure do |config|
     ENV["BASE_URL"] = original_base_url
   end
 
-  # Any playwright-driven example, scripting or not - rack_test fetches no external
-  # host, so it has nothing to block and no page to reach through
+  # Any playwright-driven example, scripting or not - rack_test has nothing to block.
+  # An example picks its driver with `driver:` metadata rather than `driven_by`, which
+  # runs too late for this to reach the session it chose
   config.before(:each, type: :system) do
     driver = Capybara.current_session.driver
     next unless driver.respond_to?(:with_playwright_page)
