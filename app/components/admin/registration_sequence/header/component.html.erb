@@ -5,12 +5,8 @@
     sequence
   </h1>
 
-  <div
-    class="
-      tw:flex tw:flex-wrap tw:items-baseline tw:justify-between tw:gap-x-4
-      tw:gap-y-1
-    "
-  >
+  <%# ml-auto on the group below, not justify-between: it holds it right when the row wraps %>
+  <div class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-4 tw:gap-y-1">
     <%#
       Beside the chip, not in it: a disabled button is pointer-events-none, so
       nothing inside it can be hovered

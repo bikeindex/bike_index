@@ -16,7 +16,7 @@ module Admin
 
         def discard_path = RegistrationSequencePaths.sequence(@registration_sequence, admin: true)
 
-        def confirm_text = "Discard this draft and its pages? This can't be undone."
+        def confirm_text = ::RegistrationSequence::DISCARD_DRAFT_CONFIRM
       end
     end
   end

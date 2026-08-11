@@ -38,6 +38,8 @@ class RegistrationSequence < ApplicationRecord
 
   # What each status is called on screen
   STATUS_DISPLAY = {"draft" => "Draft", "active" => "Current", "archived" => "Previous"}.freeze
+  # Both the admin and the organization screens warn with this before discarding
+  DISCARD_DRAFT_CONFIRM = "Discard this draft and its pages? This can't be undone."
 
   belongs_to :organization
 

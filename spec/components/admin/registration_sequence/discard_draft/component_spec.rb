@@ -3,8 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Admin::RegistrationSequence::DiscardDraft::Component, type: :component do
-  let(:organization) { FactoryBot.create(:organization) }
-  let(:registration_sequence) { FactoryBot.create(:registration_sequence, organization:) }
+  let(:registration_sequence) { FactoryBot.create(:registration_sequence) }
 
   it "deletes the draft, behind a confirm" do
     rendered = render_inline(described_class.new(registration_sequence:))
@@ -22,13 +21,12 @@ RSpec.describe Admin::RegistrationSequence::DiscardDraft::Component, type: :comp
   end
 
   context "activated sequence" do
-    let(:registration_sequence) { FactoryBot.create(:registration_sequence_active, organization:) }
+    let(:registration_sequence) { FactoryBot.create(:registration_sequence_active) }
 
     it "renders nothing - there's no draft to throw away" do
       rendered = render_inline(described_class.new(registration_sequence:))
 
       expect(rendered.to_html).to be_blank
-      expect(page).to_not have_button("Discard draft")
     end
   end
 end
