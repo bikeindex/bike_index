@@ -2,6 +2,9 @@ import { Controller } from '@hotwired/stimulus'
 
 /* global Turbo, requestAnimationFrame */
 
+// Each serial is a separate search, so a long paste otherwise opens a request per serial at once
+const MAX_CONCURRENT_SEARCHES = 4
+
 // Connects to data-controller='org--multi-search'
 export default class extends Controller {
   static targets = ['textarea', 'button', 'serialChips', 'results', 'searchAll', 'searchAllHint']
@@ -118,7 +121,7 @@ export default class extends Controller {
     this.renderPlaceholderChips(serials)
     this.buttonTarget.disabled = true
 
-    await Promise.all(serials.map((serial, index) => this.searchItem(serial, index)))
+    await this.searchAllItems(serials)
 
     // Wait a frame for Turbo stream DOM updates to complete
     await new Promise(resolve => requestAnimationFrame(resolve))
@@ -129,6 +132,19 @@ export default class extends Controller {
     window.timeLocalizer?.localize()
     this.buttonTarget.disabled = false
     this.searching = false
+  }
+
+  // Runs every search, MAX_CONCURRENT_SEARCHES of them in flight at a time
+  async searchAllItems (serials) {
+    const pending = serials.map((serial, index) => ({ serial, index }))
+    const runNext = async () => {
+      while (pending.length) {
+        const { serial, index } = pending.shift()
+        await this.searchItem(serial, index)
+      }
+    }
+    const workers = Math.min(MAX_CONCURRENT_SEARCHES, pending.length)
+    await Promise.all(Array.from({ length: workers }, runNext))
   }
 
   alignTableColumns () {

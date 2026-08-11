@@ -1,6 +1,12 @@
 module BikeSearchable
   extend ActiveSupport::Concern
 
+  # index_bikes_on_serial_normalized_no_space_trgm answers `%`, whose threshold comes from a
+  # session setting. 0.2 keeps ~98% of the LEVENSHTEIN < 3 matches that 0.3 (the default) drops
+  CLOSE_SERIAL_SIMILARITY = 0.2
+  # More close matches than any caller paginates through
+  CLOSE_SERIAL_LIMIT = 1000
+
   class << self
     # searchable_interpreted_params returns the args for by all other public methods in this class
     # query_params:
@@ -231,10 +237,7 @@ module BikeSearchable
     def search_close_serials(interpreted_params)
       return none if interpreted_params[:serial].blank? # normalized_serial blank
 
-      # serials_not_containing excludes exact matches too
-      serials_not_containing(interpreted_params[:serial], interpreted_params[:serial_no_space])
-        .non_serial_matches(interpreted_params)
-        .where("LEVENSHTEIN(serial_normalized_no_space, ?) < 3", interpreted_params[:serial_no_space])
+      where(id: close_serial_ids(interpreted_params))
     end
 
     def search_serials_containing(interpreted_params)
@@ -262,6 +265,23 @@ module BikeSearchable
 
     # TODO: actually make private?
     # Private (internal only) methods below here, as defined at the start
+
+    # LEVENSHTEIN is unindexable, so on its own it scans every bike. `%` narrows the candidates
+    # via the trigram index first - but it reads its threshold from a session setting, so the
+    # ids have to be selected eagerly, inside the transaction that SET LOCAL applies to.
+    def close_serial_ids(interpreted_params)
+      serial_no_space = interpreted_params[:serial_no_space]
+      transaction do
+        connection.execute("SET LOCAL pg_trgm.similarity_threshold = #{BikeSearchable::CLOSE_SERIAL_SIMILARITY}")
+        # serials_not_containing excludes exact matches too
+        serials_not_containing(interpreted_params[:serial], serial_no_space)
+          .non_serial_matches(interpreted_params)
+          .where("serial_normalized_no_space % ?", serial_no_space)
+          .where("LEVENSHTEIN(serial_normalized_no_space, ?) < 3", serial_no_space)
+          .limit(BikeSearchable::CLOSE_SERIAL_LIMIT)
+          .pluck(:id)
+      end
+    end
 
     def non_serial_matches(interpreted_params)
       # For each of the of the colors, call searching_matching_color_ids with the color_id on the previous ;)
