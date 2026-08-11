@@ -1,5 +1,5 @@
 <%= render Register::Page::Component.new do %>
-  <%= render Register::Progress::Component.new(step: 2, total: BikeServices::Register.total_steps(@sequence)) %>
+  <%= render Register::Progress::Component.new(steps: @steps, step: 2) %>
 
   <% if BikeServices::Register.confirmation_email_pending?(@b_param, user: @current_user) %>
     <%= render UI::Alerts::Base::Component.new(kind: :purple, text: translation(".confirmation_link_sent"),
@@ -365,10 +365,17 @@
       class="<%= "tw:hidden" unless show_phone? %>"
       data-register--status-fields-target="field"
       data-statuses="<%= phone_statuses.to_json %>"
+      data-texts="<%= phone_required_texts.to_json %>"
     >
-      <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :phone, kind: :telephone_field,
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone, kind: :telephone_field,
           label_text: translation(".phone"), wrapper_class: "tw:mb-6",
-          html_options: {value: bike["phone"], placeholder: translation(".phone_placeholder")}) %>
+          required: phone_required?, required_toggleable: true,
+          html_options: {value: bike["phone"], placeholder: translation(".phone_placeholder")})) do |group| %>
+        <% group.with_helper_text do %>
+          <%= tag.span(phone_required_texts[@b_param.status], data: {required_helper: true},
+              hidden: !phone_required?) %>
+        <% end %>
+      <% end %>
     </div>
 
     <%#
@@ -390,8 +397,20 @@
       </div>
     <% end %>
 
-    <%= render UI::Button::Component.new(text: submit_text,
-        color: :primary, size: :lg, type: "submit", spinner: true, html_class: "tw:w-full") %>
+    <%#
+      The label is a block so register--status-fields has a span to rewrite: which
+      statuses have a step after this form is decided by the combobox above
+    %>
+
+    <%= render(UI::Button::Component.new(color: :primary, size: :lg, type: "submit",
+        spinner: true, html_class: "tw:w-full")) do %>
+      <span
+        data-register--status-fields-target="submitLabel"
+        data-texts="<%= submit_texts.to_json %>"
+      >
+        <%= submit_text %>
+      </span>
+    <% end %>
 
     <%= render Register::BackLink::Component.new(href: register_path(b_param_token: @b_param.id_token, step: 1)) %>
   <% end %>

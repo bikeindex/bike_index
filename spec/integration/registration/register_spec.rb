@@ -9,6 +9,7 @@ RSpec.describe "Register flow", :js, type: :system do
   let!(:red) { FactoryBot.create(:color, name: "Red") }
   let!(:blue) { FactoryBot.create(:color, name: "Blue") }
   let!(:green) { FactoryBot.create(:color, name: "Green") }
+  let!(:state) { FactoryBot.create(:state_new_york) }
 
   before do
     # The manufacturer combobox autocompletes against the redis index
@@ -172,8 +173,13 @@ RSpec.describe "Register flow", :js, type: :system do
 
     # Like bikes/new, phone is only asked for once the status calls for it
     expect(page).to have_no_field("bike[phone]")
+    expect(page).to have_no_content("Phone is required")
     type_into("#bike_status", "Stolen")
     click_combobox_option("Stolen")
+
+    # A theft is contacted on it, so the field it reveals asks rather than offers
+    expect(page).to have_content("Phone is required to register a stolen bike")
+    expect(find("input[name='bike[phone]']")[:required]).to be_present
 
     # The status the server renders is only a default, so the draft outlives a
     # reload - and the fields it gates reopen with it
@@ -189,10 +195,12 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_content("bike_photo-landscape.jpeg")
     expect(page).to have_no_content("uploading")
 
-    click_button "Complete Bike Registration"
+    # The theft is reported after this form, so the button doesn't claim to finish
+    expect(page).to have_no_button("Complete Bike Registration")
+    click_button "Next"
 
     # Anonymous, so there's nobody to own a bike yet - it's held for the emailed link
-    expect(page).to have_content("Registration saved")
+    expect(page).to have_css("h1", text: "Progress saved")
     expect(page).to have_content("verify your email")
     expect(Bike.count).to eq 0
     b_param = BParam.last
@@ -205,16 +213,60 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(ActiveStorage::Blob.find_signed!(b_param.image_signed_id).filename.to_s)
       .to eq "bike_photo-landscape.jpeg"
 
-    # The emailed link lands on the interstitial, which waits for a click
+    # The emailed link lands on the interstitial, which waits for a click - confirming
+    # proves the address, which leaves the theft it's reporting to tell us about
     visit confirmation_link
     click_button "Continue"
 
-    expect(page).to have_content("Registration complete", wait: 10)
+    expect(page).to have_content("Report your stolen bike", wait: 10)
+    expect(Bike.count).to eq 0
+    # When and where are required, and nothing was saved to fill them in from
+    expect(page).to have_field("report[date]", with: "")
+    fill_in "report[theft_description]", with: "Locked to a rack outside the coffee shop"
+    fill_in "report[police_report_number]", with: "8675309"
+
+    # Going back to fix a detail doesn't cost the report - the longest form in the flow,
+    # and the one nothing has been saved from yet
+    click_link "Back"
+    expect(page).to have_content("Add your bike's details")
+    click_button "Next"
+
+    expect(page).to have_field("report[theft_description]",
+      with: "Locked to a rack outside the coffee shop", wait: 10)
+    expect(page).to have_field("report[police_report_number]", with: "8675309")
+
+    # The browser holds the submit until when and where are answered, so nothing reaches
+    # the server
+    click_button "Complete Bike Registration"
+    expect(page).to have_current_path(/step=report/, url: true)
+    expect(Bike.count).to eq 0
+
+    fill_in "report[date]", with: "2026-08-05T14:30"
+    fill_in "report[address_record_attributes][street]", with: "278 Broadway"
+    fill_in "report[address_record_attributes][city]", with: "New York"
+    # The whole address is required alongside the street and city the server checks
+    select state.name, from: "report[address_record_attributes][region_record_id]"
+    fill_in "report[address_record_attributes][postal_code]", with: "10007"
+
+    click_button "Complete Bike Registration"
+
+    # The theft was the point of the flow, so the card heads with it rather than
+    # congratulating them on a registration that's being watched over
+    expect(page).to have_css("h1", text: "is listed as stolen on Bike Index", wait: 10)
     bike = Bike.last
     expect(bike).to have_attributes(owner_email:, serial_number: "made_without_serial",
       status: "status_stolen", frame_model: "Marlin 7")
-    # Signed in as the account the link made - to anyone else it reads as unclaimed
-    expect(page).to have_content("keep watch")
+    expect(bike.current_stolen_record).to have_attributes(street: "278 Broadway", city: "New York",
+      theft_description: "Locked to a rack outside the coffee shop", police_report_number: "8675309",
+      phone: "5550000000")
+    # Entered in the browser's zone, which posts alongside it rather than the server's -
+    # so it reads back as the time that was typed, wherever the server happens to be
+    browser_zone = page.evaluate_script("Intl.DateTimeFormat().resolvedOptions().timeZone")
+    expect(bike.current_stolen_record.date_stolen.in_time_zone(browser_zone).strftime("%Y-%m-%dT%H:%M"))
+      .to eq "2026-08-05T14:30"
+    # Signed in as the account the link made, so the checklist knows what's already done
+    expect(page).to have_css("li.completed-item", text: "Report theft on Bike Index")
+    expect(page).to have_link("your Police Report Number")
 
     # An account nobody signed up for, so the terms are the first thing it's asked
     visit "/my_account"
@@ -303,7 +355,7 @@ RSpec.describe "Register flow", :js, type: :system do
       expect(page).to have_current_path(/step=2/, url: true)
 
       # ...and once the blob lands the held submit goes through, carrying the photo
-      expect(page).to have_content("Registration saved", wait: 15)
+      expect(page).to have_css("h1", text: "Progress saved", wait: 15)
       expect(BParam.last.image_signed_id).to be_present
     end
 
@@ -323,7 +375,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
       complete_the_registration
 
-      expect(page).to have_content("Registration saved", wait: 15)
+      expect(page).to have_css("h1", text: "Progress saved", wait: 15)
       expect(BParam.last.image_signed_id).to be_blank
     end
   end
@@ -529,7 +581,7 @@ RSpec.describe "Register flow", :js, type: :system do
       check "I, #{user_name}, agree to comply with all of the rules above."
       click_button "Complete Bike Registration"
 
-      expect(page).to have_content("Registration saved")
+      expect(page).to have_css("h1", text: "Progress saved")
       acknowledgment = RegistrationSequenceAcknowledgment.last
       expect(acknowledgment).to have_attributes(registration_sequence_id: sequence.id,
         b_param_id: BParam.last.id, owner_email:,
@@ -591,6 +643,11 @@ RSpec.describe "Register flow", :js, type: :system do
         type_into("#bike_primary_frame_color_id", "Red")
         click_combobox_option("Red")
         fill_in "bike[serial_number]", with: "XYZ 123"
+        # A theft, so the report is in the flow too - it waits on the emailed link, which
+        # puts it last rather than after this form
+        type_into("#bike_status", "Stolen")
+        click_combobox_option("Stolen")
+        fill_in "bike[phone]", with: "555 000 0000"
         click_button "Next"
 
         expect(page).to have_content("Battery & charging")
@@ -606,15 +663,25 @@ RSpec.describe "Register flow", :js, type: :system do
         check "I, #{user_name}, agree to comply with all of the rules above."
         click_button "Complete Bike Registration"
 
-        expect(page).to have_content("Registration saved")
+        expect(page).to have_css("h1", text: "Progress saved")
 
         # The emailed link finishes a step like any other, and fails like one
         visit confirmation_link
         click_button "Continue"
 
-        expect(page).to have_content("Registration complete", wait: 10)
+        # Confirming proves the address, which leaves the theft it's reporting
+        expect(page).to have_content("Report your stolen bike", wait: 10)
+        fill_in "report[date]", with: "2026-08-05T14:30"
+        fill_in "report[address_record_attributes][street]", with: "278 Broadway"
+        fill_in "report[address_record_attributes][city]", with: "New York"
+        select state.name, from: "report[address_record_attributes][region_record_id]"
+        fill_in "report[address_record_attributes][postal_code]", with: "10007"
+        click_button "Complete Bike Registration"
+
+        expect(page).to have_css("h1", text: "is listed as stolen on Bike Index", wait: 10)
         expect(Bike.last).to have_attributes(owner_email:, serial_number: "XYZ 123",
-          propulsion_type: "pedal-assist")
+          propulsion_type: "pedal-assist", status: "status_stolen")
+        expect(Bike.last.current_stolen_record.street).to eq "278 Broadway"
         # A retry that landed twice would be a second registration, or a second signature
         expect(Bike.count).to eq 1
         expect(RegistrationSequenceAcknowledgment.count).to eq 1
@@ -622,7 +689,8 @@ RSpec.describe "Register flow", :js, type: :system do
         # Every step of the flow failed, and none of them more than once
         expect(failed_steps).to eq([["/register", "1"], ["/register", "2"],
           ["/register/acknowledge", "3"], ["/register/acknowledge", "4"],
-          ["/register/acknowledge", "review"], ["/register/confirm_email", nil]])
+          ["/register/acknowledge", "review"], ["/register/confirm_email", nil],
+          ["/register/report", "report"]])
       end
     end
   end

@@ -38,16 +38,33 @@ RSpec.describe RegisterController, type: :request do
     context "status and organization params" do
       let(:organization) { FactoryBot.create(:organization) }
 
-      it "stores them on the registration it creates, keeping them on revisit" do
+      it "stores them on the registration it creates, and takes what a later link names" do
         # The slug resolves to the organization, rather than being stored as-is
-        get "/register/new?status=status_stolen&organization_id=#{organization.slug}"
+        get "/register/new?status=stolen&organization_id=#{organization.slug}"
         stolen_b_param = BParam.last
         expect(stolen_b_param).to have_attributes(status: "status_stolen",
           creation_organization_id: organization.id, organization_id: organization.id)
 
-        get "/register/new?status=status_impounded"
+        # The same registration, so nothing entered is lost - but a link that says what
+        # this is says it again, the way the organization's does
+        get "/register/new?status=found"
         expect(BParam.last.id).to eq stolen_b_param.id
-        expect(stolen_b_param.reload.status).to eq "status_stolen"
+        expect(stolen_b_param.reload.status).to eq "status_impounded"
+
+        # A link that names no status leaves the one it has
+        get "/register/new"
+        expect(BParam.last.id).to eq stolen_b_param.id
+        expect(stolen_b_param.reload.status).to eq "status_impounded"
+      end
+
+      # ?status=stolen, ?status=found and ?stolen=true, not just the full enum value
+      it "takes the shorthand every other entry point takes" do
+        {"status=stolen" => "status_stolen", "status=found" => "status_impounded",
+         "stolen=true" => "status_stolen", "status=status_impounded" => "status_impounded",
+         "status=nonsense" => "status_with_owner"}.each do |query, expected|
+          get "/register/new?discard_token=#{BParam.last&.id_token}&#{query}"
+          expect(BParam.last.status).to eq(expected), "#{query} gave #{BParam.last.status}"
+        end
       end
 
       # The organization's link is /register, which has no registration to attach to yet
@@ -437,7 +454,7 @@ RSpec.describe RegisterController, type: :request do
   describe "show step: 2" do
     # Methods rather than let, since the examples re-request and re-check
     def status_field(field_name)
-      Nokogiri::HTML(response.body).css("[data-register--status-fields-target='field']")
+      Nokogiri::HTML(response.body).css("[data-register--status-fields-target~='field']")
         .find { |el| el.at_css("[name^='bike[#{field_name}']") }
     end
 
@@ -451,6 +468,24 @@ RSpec.describe RegisterController, type: :request do
 
     def user_name_field
       Nokogiri::HTML(response.body).at_css("input[name='bike[user_name]']")
+    end
+
+    # The button says what it does: a theft is reported after this form, so it doesn't
+    # finish the registration the way an ordinary one does
+    def submit_label
+      Nokogiri::HTML(response.body).at_css("[data-register--status-fields-target='submitLabel']")
+    end
+
+    it "submits to the report rather than completing, for a registration that reports" do
+      get register_path(b_param_token: b_param.id_token, step: 2)
+      expect(submit_label.text.strip).to eq "Complete Bike Registration"
+      # Picked in this form, so register--status-fields rechecks it against these
+      expect(JSON.parse(submit_label["data-texts"]).select { |_status, text| text == "Next" }.keys)
+        .to eq %w[status_stolen status_impounded]
+
+      b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_stolen"}))
+      get register_path(b_param_token: b_param.id_token, step: 2)
+      expect(submit_label.text.strip).to eq "Next"
     end
 
     it "renders the details form, showing the email from step 1" do
@@ -488,6 +523,30 @@ RSpec.describe RegisterController, type: :request do
       b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_stolen"}))
       get register_path(b_param_token: b_param.id_token, step: 2)
       expect(phone_field_classes).to_not include "tw:hidden"
+    end
+
+    # A theft or a find is contacted on it, so those two ask for a phone rather than
+    # offering one - and the status that decides which is picked in this form
+    it "requires the phone for a theft or a find, saying which" do
+      get register_path(b_param_token: b_param.id_token, step: 2)
+      phone_field = status_field("phone")
+      expect(phone_field.at_css("input[name='bike[phone]']")["required"]).to be_blank
+      expect(phone_field.at_css("[data-optional-marker]")["hidden"]).to be_blank
+      expect(phone_field.at_css("[data-required-marker]")["hidden"]).to be_present
+      expect(phone_field.at_css("[data-required-helper]")["hidden"]).to be_present
+      expect(JSON.parse(phone_field["data-texts"]))
+        .to eq("status_stolen" => "Phone is required to register a stolen bike",
+          "status_impounded" => "Phone is required to register a found bike")
+
+      b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_stolen"}))
+      get register_path(b_param_token: b_param.id_token, step: 2)
+      phone_field = status_field("phone")
+      expect(phone_field.at_css("input[name='bike[phone]']")["required"]).to be_present
+      expect(phone_field.at_css("[data-optional-marker]")["hidden"]).to be_present
+      expect(phone_field.at_css("[data-required-marker]")["hidden"]).to be_blank
+      helper = phone_field.at_css("[data-required-helper]")
+      expect(helper["hidden"]).to be_blank
+      expect(helper.text.strip).to eq "Phone is required to register a stolen bike"
     end
 
     context "with an organization" do
@@ -634,11 +693,13 @@ RSpec.describe RegisterController, type: :request do
         expect(b_param.bike).to match_hash_indifferently(bike_details.merge(owner_email:,
           manufacturer_id: manufacturer.id, primary_frame_color_id: color.id.to_s))
         follow_redirect!
-        expect(response.body).to include "Registration saved"
+        expect(response.body).to include "Progress saved"
         expect(response.body).to include "verify your email"
-        # Why the confirmation link is worth clicking
+        # Why the confirmation link is worth clicking - this one isn't a theft, so it's
+        # the registration it finishes rather than a report
         expect(response.body).to include "Confirming your email lets you"
-        expect(response.body).to include "Finish reporting your stolen bike"
+        expect(response.body).to include "Finish adding your bike to Bike Index"
+        expect(response.body).to_not include "Finish reporting your stolen"
       end
 
       context "with a photo" do
@@ -841,6 +902,176 @@ RSpec.describe RegisterController, type: :request do
     end
   end
 
+  describe "report" do
+    let(:bike_details) do
+      {primary_frame_color_id: color.id, serial_number: "XYZ 123", status: "status_stolen",
+       phone: "(555) 000-0000", user_name:}
+    end
+    let(:report_details) do
+      {date: "2026-08-05T14:30", timezone: "America/Chicago", theft_description: "Cut lock",
+       police_report_number: "42", locking_description: "U-lock", proof_of_ownership: "1",
+       phone_for_users: "0", phone_for_shops: "1", phone_for_police: "1",
+       address_record_attributes: {street: "1 Main St", city: "Chicago", postal_code: "60608",
+                                   country_id: Country.united_states_id}}
+    end
+    def step_path(step) = register_path(b_param_token: b_param.id_token, step:)
+
+    context "signed in" do
+      include_context :request_spec_logged_in_as_user
+
+      it "asks about the theft after step 2, and creates the bike with its stolen record" do
+        expect {
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+        }.to_not change(Bike, :count)
+        expect(response).to redirect_to step_path("report")
+        follow_redirect!
+        expect(response.body).to include "Report your stolen bike"
+        expect(response.body).to include "report[police_report_number]"
+        expect(response.body).to include "report[address_record_attributes][street]"
+        # The theft is the last thing asked for, no organization pages to follow it
+        expect(response.body).to include "Complete Bike Registration"
+
+        expect {
+          patch "#{base_url}/report", params: {b_param_token: b_param.id_token, report: report_details}
+        }.to change(Bike, :count).by 1
+        expect(response).to redirect_to step_path("finished")
+
+        bike = Bike.last
+        expect(bike).to have_attributes(owner_email:, status: "status_stolen")
+        stolen_record = bike.current_stolen_record
+        expect(stolen_record).to have_attributes(theft_description: "Cut lock",
+          police_report_number: "42", locking_description: "U-lock", proof_of_ownership: true,
+          phone_for_users: false, phone_for_shops: true, street: "1 Main St", city: "Chicago")
+        # Entered in Chicago, rather than wherever the server happens to be
+        expect(stolen_record.date_stolen).to be_within(1).of Time.parse("2026-08-05T19:30:00 UTC")
+        # Step 2's phone is the stolen record's, so the report doesn't ask for it again
+        expect(stolen_record.phone).to eq "5550000000"
+      end
+
+      context "found" do
+        let(:bike_details) { super().merge(status: "status_impounded") }
+
+        it "asks about the find, and creates the bike with its impound record" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          expect(response).to redirect_to step_path("report")
+          follow_redirect!
+          expect(response.body).to include "About the bike you found"
+          expect(response.body).to include "report[impounded_description]"
+          expect(response.body).to_not include "report[police_report_number]"
+
+          expect {
+            patch "#{base_url}/report", params: {b_param_token: b_param.id_token,
+                                                 report: report_details.except(:police_report_number)
+                                                   .merge(impounded_description: "Behind the library")}
+          }.to change(Bike, :count).by 1
+          impound_record = Bike.last.current_impound_record
+          expect(impound_record).to have_attributes(impounded_description: "Behind the library",
+            user_id: current_user.id)
+          expect(impound_record.impounded_at).to be_within(1).of Time.parse("2026-08-05T19:30:00 UTC")
+          expect(impound_record.address_record.street).to eq "1 Main St"
+        end
+      end
+
+      context "without when and where" do
+        it "re-renders the step with what was entered, and creates no bike" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          expect(response).to redirect_to step_path("report")
+
+          expect {
+            patch "#{base_url}/report", params: {b_param_token: b_param.id_token,
+                                                 report: report_details.except(:date, :address_record_attributes)}
+          }.to_not change(Bike, :count)
+          expect(response).to have_http_status :unprocessable_entity
+          expect(response.body).to include "Please tell us when it was stolen"
+          expect(response.body).to include "Please tell us where it was stolen"
+          # Saved anyway, so the re-render has the rest of the report
+          expect(response.body).to include "Cut lock"
+
+          expect {
+            patch "#{base_url}/report", params: {b_param_token: b_param.id_token, report: report_details}
+          }.to change(Bike, :count).by 1
+        end
+      end
+
+      context "registered with the owner" do
+        let(:bike_details) { super().merge(status: "status_with_owner") }
+
+        it "has no report to make, so step 2 creates the bike" do
+          expect {
+            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          }.to change(Bike, :count).by 1
+          expect(response).to redirect_to step_path("finished")
+
+          patch "#{base_url}/report", params: {b_param_token: b_param.id_token, report: report_details}
+          expect(response).to redirect_to step_path("finished")
+          expect(Bike.last.current_stolen_record).to be_blank
+        end
+      end
+
+      # The safety pages sit between the report and the bike, which is the window to go back in
+      context "the status changes after the report" do
+        let(:organization) { FactoryBot.create(:organization) }
+        let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+        let(:b_param) do
+          BParam.create(origin: "register_flow", params: {bike: {owner_email:, manufacturer_id: "Trek",
+                                                                 cycle_type: "e-scooter", creation_organization_id: organization.id}}.as_json)
+        end
+
+        it "carries on to the safety pages, with no theft to report on the way" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          expect(response).to redirect_to step_path("report")
+          patch "#{base_url}/report", params: {b_param_token: b_param.id_token, report: report_details}
+          expect(response).to redirect_to step_path("3")
+
+          patch base_url, params: {b_param_token: b_param.id_token,
+                                   bike: bike_details.merge(status: "status_with_owner")}
+          expect(response).to redirect_to step_path("3")
+          expect(b_param.reload.status).to eq "status_with_owner"
+        end
+      end
+    end
+
+    context "anonymous" do
+      let!(:token) { b_param.generate_email_confirmation_token! }
+
+      it "waits for the confirmation email, then asks about the theft" do
+        patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+        # Nothing to report until the address is proven - the flow parks on finished
+        expect(response).to redirect_to step_path("finished")
+        get step_path("report")
+        expect(response).to redirect_to step_path("finished")
+
+        expect {
+          post "#{base_url}/confirm_email", params: {b_param_token: b_param.id_token,
+                                                     confirmation_token: token}
+        }.to_not change(Bike, :count)
+        expect(response).to redirect_to step_path("report")
+
+        expect {
+          patch "#{base_url}/report", params: {b_param_token: b_param.id_token, report: report_details}
+        }.to change(Bike, :count).by 1
+        expect(Bike.last).to have_attributes(owner_email:, creator_id: User.last.id)
+        expect(Bike.last.current_stolen_record.theft_description).to eq "Cut lock"
+      end
+    end
+
+    context "details not entered" do
+      it "redirects to the step the registration is on, saving nothing" do
+        expect {
+          patch "#{base_url}/report", params: {b_param_token: b_param.id_token, report: report_details}
+        }.to_not change { b_param.reload.params }
+        expect(response).to redirect_to step_path("2")
+      end
+    end
+
+    context "unknown token" do
+      it "redirects to the start" do
+        patch "#{base_url}/report", params: {b_param_token: "unknown-token", report: report_details}
+        expect(response).to redirect_to new_register_path
+      end
+    end
+  end
+
   describe "acknowledge" do
     let(:organization) { FactoryBot.create(:organization) }
     # Built as a draft and activated below, since activation freezes the pages
@@ -867,7 +1098,7 @@ RSpec.describe RegisterController, type: :request do
     let(:bike_details) do
       {primary_frame_color_id: color.id, serial_number: "XYZ 123", status: "status_with_owner", user_name:}
     end
-    let(:step_path) { ->(step) { register_path(b_param_token: b_param.id_token, step:) } }
+    def step_path(step) = register_path(b_param_token: b_param.id_token, step:)
 
     include_context :request_spec_logged_in_as_user
     before { sequence.make_active! }
@@ -877,7 +1108,7 @@ RSpec.describe RegisterController, type: :request do
       expect {
         patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
       }.to_not change(Bike, :count)
-      expect(response).to redirect_to step_path.call("3")
+      expect(response).to redirect_to step_path("3")
 
       follow_redirect!
       # The cycle type reads as it's stored, so no title leads with it and stays sentence case
@@ -891,12 +1122,12 @@ RSpec.describe RegisterController, type: :request do
       expect(response.body).to include "https://example.com/faq"
 
       # Ahead of where the registration stands clamps back to it
-      get step_path.call("4")
-      expect(response).to redirect_to step_path.call("3")
+      get step_path("4")
+      expect(response).to redirect_to step_path("3")
 
       patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
                                                 acknowledged: {"0" => "1", "1" => "1"}}
-      expect(response).to redirect_to step_path.call("4")
+      expect(response).to redirect_to step_path("4")
       expect(BikeServices::Register.acknowledged_page_ids(b_param.reload)).to eq([battery_page.id])
 
       follow_redirect!
@@ -908,7 +1139,7 @@ RSpec.describe RegisterController, type: :request do
         patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "4",
                                                   acknowledged: {"0" => "1"}}
       }.to_not change(Bike, :count)
-      expect(response).to redirect_to step_path.call("review")
+      expect(response).to redirect_to step_path("review")
 
       follow_redirect!
       expect(response.body).to include "You&#39;re almost done"
@@ -926,7 +1157,7 @@ RSpec.describe RegisterController, type: :request do
       expect {
         patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
       }.to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment, :count).by(1)
-      expect(response).to redirect_to step_path.call("finished")
+      expect(response).to redirect_to step_path("finished")
       expect(b_param.reload.created_bike_id).to eq Bike.last.id
 
       follow_redirect!
@@ -963,13 +1194,13 @@ RSpec.describe RegisterController, type: :request do
                                                 acknowledged: {"0" => "1", "1" => "1"}}
       patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "4",
                                                 acknowledged: {"0" => "1"}}
-      expect(response).to redirect_to step_path.call("review")
+      expect(response).to redirect_to step_path("review")
 
       # Revisiting the first page from the review and continuing walks forward
       # through the rest, rather than jumping straight back to the end
       patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
                                                 acknowledged: {"0" => "1", "1" => "1"}}
-      expect(response).to redirect_to step_path.call("4")
+      expect(response).to redirect_to step_path("4")
     end
 
     it "refuses a page with a rule left unchecked" do
@@ -977,7 +1208,7 @@ RSpec.describe RegisterController, type: :request do
       patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
                                                 acknowledged: {"0" => "1"}}
       expect(flash[:error]).to be_present
-      expect(response).to redirect_to step_path.call("3")
+      expect(response).to redirect_to step_path("3")
       expect(BikeServices::Register.acknowledged_page_ids(b_param.reload)).to eq([])
     end
 
@@ -987,7 +1218,7 @@ RSpec.describe RegisterController, type: :request do
         patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
       }.to_not change(Bike, :count)
       # The review isn't reachable yet, so this lands back on the first page
-      expect(response).to redirect_to step_path.call("3")
+      expect(response).to redirect_to step_path("3")
     end
 
     context "not an e-vehicle" do
@@ -1001,7 +1232,7 @@ RSpec.describe RegisterController, type: :request do
         expect {
           patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
         }.to change(Bike, :count).by 1
-        expect(response).to redirect_to step_path.call("finished")
+        expect(response).to redirect_to step_path("finished")
       end
     end
   end
@@ -1014,39 +1245,39 @@ RSpec.describe RegisterController, type: :request do
         params: {bike: {owner_email:, manufacturer_id: "Trek", cycle_type: "e-scooter",
                         creation_organization_id: organization.id}}.as_json)
     end
-    let(:step_path) { ->(step) { register_path(b_param_token: b_param.id_token, step:) } }
+    def step_path(step) = register_path(b_param_token: b_param.id_token, step:)
 
     it "holds the registration for the confirmation email once everything is acknowledged" do
       patch base_url, params: {b_param_token: b_param.id_token,
                                bike: {primary_frame_color_id: color.id, serial_number: "XYZ 123",
                                       status: "status_with_owner", user_name: "Sally Rider"}}
       # No creator, but the safety pages still come before the completion page
-      expect(response).to redirect_to step_path.call("3")
+      expect(response).to redirect_to step_path("3")
 
       sequence.registration_sequence_pages.each_with_index do |page, index|
         patch acknowledge_register_path, params: {b_param_token: b_param.id_token,
                                                   step: (index + 3).to_s,
                                                   acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
       end
-      expect(response).to redirect_to step_path.call("review")
+      expect(response).to redirect_to step_path("review")
 
       expect {
         patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
       }.to_not change(Bike, :count)
-      expect(response).to redirect_to step_path.call("finished")
+      expect(response).to redirect_to step_path("finished")
       follow_redirect!
-      expect(response.body).to include "Registration saved"
+      expect(response.body).to include "Progress saved"
 
       # Nothing is browsable behind the completion page any more
-      get step_path.call("3")
-      expect(response).to redirect_to step_path.call("finished")
+      get step_path("3")
+      expect(response).to redirect_to step_path("finished")
     end
   end
 
   describe "confirm" do
     let!(:token) { b_param.generate_email_confirmation_token! }
     let(:confirm_params) { {b_param_token: b_param.id_token, confirmation_token: token} }
-    let(:step_path) { ->(step) { register_path(b_param_token: b_param.id_token, step:) } }
+    def step_path(step) = register_path(b_param_token: b_param.id_token, step:)
 
     it "renders a self-submitting form, then makes an account and signs them in" do
       get "#{base_url}/confirm", params: confirm_params
@@ -1065,7 +1296,7 @@ RSpec.describe RegisterController, type: :request do
       # An account they never signed up for, so they're offered a password
       expect(flash[:notice]).to include(translation_key: :signed_up)
       # Dropped on the step the registration is on - and signed in, so nothing's pending
-      expect(response).to redirect_to step_path.call("2")
+      expect(response).to redirect_to step_path("2")
       follow_redirect!
       expect(response.body).to_not include "confirmation link to your email"
 
@@ -1073,7 +1304,7 @@ RSpec.describe RegisterController, type: :request do
       expect {
         post "#{base_url}/confirm_email", params: confirm_params
       }.to_not change(User, :count)
-      expect(response).to redirect_to step_path.call("2")
+      expect(response).to redirect_to step_path("2")
     end
 
     context "wrong token" do
@@ -1085,7 +1316,7 @@ RSpec.describe RegisterController, type: :request do
           .to_not change(Email::PartialRegistrationJob.jobs, :size)
         expect(b_param.reload.email_confirmed?).to be_falsey
         expect(flash[:error]).to be_present
-        expect(response).to redirect_to step_path.call("2")
+        expect(response).to redirect_to step_path("2")
 
         sent_at = Time.current - BikeServices::Register::CONFIRMATION_EMAIL_INTERVAL - 1.minute
         b_param.update(params: b_param.params.merge("email_confirmation_sent_at" => sent_at))
@@ -1109,7 +1340,7 @@ RSpec.describe RegisterController, type: :request do
       before { patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details} }
 
       it "creates the bike the registration was holding, and lands on finished" do
-        expect(response).to redirect_to step_path.call("finished")
+        expect(response).to redirect_to step_path("finished")
 
         expect {
           post "#{base_url}/confirm_email", params: confirm_params
@@ -1117,7 +1348,7 @@ RSpec.describe RegisterController, type: :request do
         expect(Bike.last).to have_attributes(owner_email:, serial_number: "XYZ 123",
           creator_id: User.last.id)
         expect(b_param.reload.created_bike_id).to eq Bike.last.id
-        expect(response).to redirect_to step_path.call("finished")
+        expect(response).to redirect_to step_path("finished")
         follow_redirect!
         expect(response.body).to include "Registration complete"
       end
@@ -1134,7 +1365,7 @@ RSpec.describe RegisterController, type: :request do
           # No account for the confirmed address - they're still signed in as themselves
           expect(User.count).to eq 1
           expect(Bike.last).to have_attributes(owner_email:, creator_id: current_user.id)
-          expect(response).to redirect_to step_path.call("finished")
+          expect(response).to redirect_to step_path("finished")
           follow_redirect!
           expect(response.body).to include "signed in as #{current_user.email}"
         end
@@ -1166,7 +1397,7 @@ RSpec.describe RegisterController, type: :request do
         expect { post "#{base_url}/confirm_email", params: confirm_params }
           .to_not change(User, :count)
         expect(unconfirmed_user.reload.confirmed).to be_truthy
-        expect(response).to redirect_to step_path.call("2")
+        expect(response).to redirect_to step_path("2")
 
         # Actually signed in, rather than bounced to please_confirm_email
         get "/my_account"

@@ -178,8 +178,9 @@ Rails.application.routes.draw do
 
   # Redesigned registration flow: quick start, then complete on-site or via email.
   # new makes an empty registration and redirects into show, which renders
-  # ?step=1|2|3…|review|finished (and handles the emailed confirmation link)
+  # ?step=1|2|report|3…|review|finished (and handles the emailed confirmation link)
   resource :register, only: %i[new create show update], controller: :register do
+    patch :report
     patch :acknowledge
     # The emailed confirmation link, and the form it posts itself to
     get :confirm
