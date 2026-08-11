@@ -111,6 +111,7 @@ module Admin
       @searched_receiver = params[:search_receiver] if searchable_receivers.include?(params[:search_receiver])
       bug_reports = bug_reports.where(receiver: @searched_receiver) if @searched_receiver.present?
       bug_reports = bug_reports.where(user_id: params[:user_id]) if params[:user_id].present?
+      bug_reports = bug_reports.where("email ILIKE ?", "%#{EmailNormalizer.normalize(params[:search_email])}%") if params[:search_email].present?
       @searched_membership = params[:search_membership] if MEMBERSHIP_FILTERS.key?(params[:search_membership])
       bug_reports = filter_by_membership(bug_reports)
       bug_reports = filter_by_status(bug_reports)

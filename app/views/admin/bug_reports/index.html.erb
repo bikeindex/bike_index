@@ -61,6 +61,7 @@
   <%= form_tag admin_bug_reports_path, method: :get, class: "form-inline mt-4 mb-4 justify-content-md-end" do %>
     <%= hidden_field_tag :search_tag, params[:search_tag] %>
     <%= hidden_field_tag :search_receiver, params[:search_receiver] %>
+    <%= hidden_field_tag :search_email, params[:search_email] %>
     <%= hidden_field_tag :search_membership, params[:search_membership] %>
     <%= hidden_field_tag :search_status, params[:search_status] %>
 

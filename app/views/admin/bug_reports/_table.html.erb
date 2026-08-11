@@ -39,6 +39,10 @@
                 <%= l bug_report.received_at || bug_report.created_at, format: :convert_time %>
               </span>
             <% end %>
+
+            <% if display_dev_info? %>
+              <code class="only-dev-visible small"><%= bug_report.id %></code>
+            <% end %>
           </td>
 
           <td>

@@ -93,6 +93,16 @@ RSpec.describe Admin::BugReportsController, type: :request do
       end
     end
 
+    context "with search_email" do
+      let!(:bug_report_other) { FactoryBot.create(:bug_report, email: "someone@example.com") }
+
+      it "filters by a partial, case insensitive match" do
+        expect(bug_report.email).to_not eq bug_report_other.email
+        get "#{base_url}.json", params: {search_email: "SOMEONE@example", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_other.id])
+      end
+    end
+
     context "with search_membership" do
       let!(:bug_report_paid) { FactoryBot.create(:bug_report, is_paid_organization: true) }
 
@@ -115,6 +125,17 @@ RSpec.describe Admin::BugReportsController, type: :request do
       get "#{base_url}/#{bug_report.to_param}"
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
+    end
+
+    context "with a user" do
+      let(:bug_report) { FactoryBot.create(:bug_report, user: FactoryBot.create(:user)) }
+
+      it "renders, linking to the user" do
+        get "#{base_url}/#{bug_report.to_param}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(response.body).to include(admin_user_path(bug_report.user_id))
+      end
     end
   end
 

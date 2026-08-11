@@ -23,33 +23,22 @@
           <td>Sender</td>
 
           <td>
-            <% if @bug_report.user_id.present? %>
-              <%= render Admin::UserCell::Component.new(user: @bug_report.user, user_id: @bug_report.user_id) %>
-            <% end %>
-
             <%= @bug_report.from_name %>
 
-            <small>
-              <%= mail_to @bug_report.email, nil, class: "twlink" %>
-            </small>
-          </td>
-        </tr>
+            <%= content_tag(:code, @bug_report.email) %>
 
-        <tr>
-          <td>Receiver</td>
+            <%= mail_to @bug_report.email, inline_svg_tag("icons/envelope.svg", class: "tw:inline-block tw:h-4 tw:w-4"), class: "twlink tw:ml-1", title: "Email #{@bug_report.email}" %>
 
-          <td>
-            <%= mail_to @bug_report.receiver, nil, class: "twlink" if @bug_report.receiver.present? %>
-          </td>
-        </tr>
+            <%= bug_report_search_link(@bug_report.user_id.present? ? {user_id: @bug_report.user_id} : {search_email: @bug_report.email}) %>
 
-        <tr>
-          <td>Received</td>
-
-          <td>
-            <span class="localizeTime preciseTime">
-              <%= l @bug_report.received_at || @bug_report.created_at, format: :convert_time %>
-            </span>
+            <div class="small">
+              user:
+              <% if @bug_report.user_id.present? %>
+                <%= render Admin::UserCell::Component.new(user: @bug_report.user, user_id: @bug_report.user_id) %>
+              <% else %>
+                not a user
+              <% end %>
+            </div>
           </td>
         </tr>
 
@@ -66,6 +55,27 @@
         <tr>
           <td>Paid organization staff</td>
           <td><%= check_mark if @bug_report.is_paid_organization_staff %></td>
+        </tr>
+
+        <tr>
+          <td>Receiver</td>
+
+          <td>
+            <% if @bug_report.receiver.present? %>
+              <%= content_tag(:code, BugReport.display_receiver(@bug_report.receiver)) %>
+              <%= bug_report_search_link(search_receiver: @bug_report.receiver) %>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Received</td>
+
+          <td>
+            <span class="localizeTime preciseTime">
+              <%= l @bug_report.received_at || @bug_report.created_at, format: :convert_time %>
+            </span>
+          </td>
         </tr>
 
         <% if @bug_report.github_pull_request.present? %>
