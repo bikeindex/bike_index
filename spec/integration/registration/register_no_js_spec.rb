@@ -43,7 +43,7 @@ RSpec.describe "Register flow without JavaScript", type: :system, driver: :playw
     click_button "Complete Bike Registration"
 
     # Anonymous, so there's nobody to own a bike yet - it's held for the emailed link
-    expect(page).to have_content("Registration saved")
+    expect(page).to have_css("h1", text: "Progress saved")
     expect(page).to have_content("verify your email")
     expect(Bike.count).to eq 0
 
@@ -119,7 +119,7 @@ RSpec.describe "Register flow without JavaScript", type: :system, driver: :playw
       check "I, #{user_name}, agree to comply with all of the rules above."
       click_button "Complete e-Scooter Registration"
 
-      expect(page).to have_content("Registration saved")
+      expect(page).to have_css("h1", text: "Progress saved")
       expect(RegistrationSequenceAcknowledgment.count).to eq 1
     end
   end

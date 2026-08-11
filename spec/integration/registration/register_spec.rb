@@ -200,7 +200,7 @@ RSpec.describe "Register flow", :js, type: :system do
     click_button "Next"
 
     # Anonymous, so there's nobody to own a bike yet - it's held for the emailed link
-    expect(page).to have_content("Progress saved")
+    expect(page).to have_css("h1", text: "Progress saved")
     expect(page).to have_content("verify your email")
     expect(Bike.count).to eq 0
     b_param = BParam.last
@@ -355,7 +355,7 @@ RSpec.describe "Register flow", :js, type: :system do
       expect(page).to have_current_path(/step=2/, url: true)
 
       # ...and once the blob lands the held submit goes through, carrying the photo
-      expect(page).to have_content("Progress saved", wait: 15)
+      expect(page).to have_css("h1", text: "Progress saved", wait: 15)
       expect(BParam.last.image_signed_id).to be_present
     end
 
@@ -375,7 +375,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
       complete_the_registration
 
-      expect(page).to have_content("Progress saved", wait: 15)
+      expect(page).to have_css("h1", text: "Progress saved", wait: 15)
       expect(BParam.last.image_signed_id).to be_blank
     end
   end
@@ -581,7 +581,7 @@ RSpec.describe "Register flow", :js, type: :system do
       check "I, #{user_name}, agree to comply with all of the rules above."
       click_button "Complete Bike Registration"
 
-      expect(page).to have_content("Progress saved")
+      expect(page).to have_css("h1", text: "Progress saved")
       acknowledgment = RegistrationSequenceAcknowledgment.last
       expect(acknowledgment).to have_attributes(registration_sequence_id: sequence.id,
         b_param_id: BParam.last.id, owner_email:,
@@ -658,7 +658,7 @@ RSpec.describe "Register flow", :js, type: :system do
         check "I, #{user_name}, agree to comply with all of the rules above."
         click_button "Complete Bike Registration"
 
-        expect(page).to have_content("Registration saved")
+        expect(page).to have_css("h1", text: "Progress saved")
 
         # The emailed link finishes a step like any other, and fails like one
         visit confirmation_link
