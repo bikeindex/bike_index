@@ -11,7 +11,7 @@ RSpec.describe Register::StepReport::Component, type: :component do
   let(:steps) { BikeServices::Register.steps(b_param, sequence:) }
 
   it "asks about the theft, and is the last step" do
-    render_inline(described_class.new(b_param:, steps:))
+    render_inline(described_class.new(b_param:, sequence:, steps:))
 
     expect(page).to have_field("report[police_report_number]")
     expect(page).to have_button("Complete Bike Registration")
@@ -36,7 +36,7 @@ RSpec.describe Register::StepReport::Component, type: :component do
     end
 
     it "shows the report as it was entered" do
-      render_inline(described_class.new(b_param:, steps:))
+      render_inline(described_class.new(b_param:, sequence:, steps:))
 
       date = page.find("input[name='report[date]']")
       # The app's zone, which is what a submission without one is read back in
@@ -55,7 +55,7 @@ RSpec.describe Register::StepReport::Component, type: :component do
     let(:status) { "status_impounded" }
 
     it "asks about the find instead, in its own words" do
-      render_inline(described_class.new(b_param:, steps:))
+      render_inline(described_class.new(b_param:, sequence:, steps:))
 
       expect(page).to have_field("report[impounded_description]")
       expect(page).to_not have_field("report[theft_description]")
@@ -76,10 +76,23 @@ RSpec.describe Register::StepReport::Component, type: :component do
     end
 
     it "doesn't claim to finish the registration" do
-      render_inline(described_class.new(b_param:, steps:))
+      render_inline(described_class.new(b_param:, sequence:, steps:))
 
       expect(page).to have_button("Next")
-      expect(page).to_not have_button("Complete Bike Registration")
+      expect(page).to_not have_button("Complete e-Scooter Registration")
+    end
+
+    # The emailed link is clicked after the pages, so the report is what's left - the same
+    # step list as above, which is why the button reads off what's been agreed to instead
+    context "already acknowledged" do
+      before { FactoryBot.create(:registration_sequence_acknowledgment, b_param:, registration_sequence: sequence) }
+
+      it "finishes the registration" do
+        render_inline(described_class.new(b_param:, sequence:, steps:))
+
+        expect(page).to have_button("Complete e-Scooter Registration")
+        expect(page).to_not have_button("Next")
+      end
     end
   end
 end

@@ -5,9 +5,10 @@ module Register
     # What the registration is reporting - the theft, or the vehicle that was found.
     # The fields become the created bike's stolen record or its impound record
     class Component < ApplicationComponent
-      def initialize(b_param:, steps:)
+      def initialize(b_param:, steps:, sequence: nil)
         @b_param = b_param
         @steps = steps
+        @sequence = sequence
       end
 
       private
@@ -39,9 +40,11 @@ module Register
         stolen? ? translation(".where_was_it_stolen") : translation(".address_where_you_found_it")
       end
 
-      # The safety pages can come after the report, so this doesn't always finish the flow
+      # The safety pages can come after the report, or already be signed when the emailed
+      # link is what opened it - the step list is the same either way, so what says whether
+      # this finishes the registration is whether anything is left to agree to
       def submit_text
-        return translation(".next") unless @steps.last == "report"
+        return translation(".next") unless BikeServices::Register.acknowledged?(@b_param, sequence: @sequence)
 
         translation(".complete_registration", cycle_type: @b_param.type_titleize)
       end

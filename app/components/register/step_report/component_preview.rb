@@ -33,7 +33,7 @@ module Register
                  manufacturer_id: ::Manufacturer.frame_makers.first&.id}
         }.merge(params).as_json)
         sequence = ::BikeServices::Register.registration_sequence(b_param)
-        render(Register::StepReport::Component.new(b_param:,
+        render(Register::StepReport::Component.new(b_param:, sequence:,
           steps: ::BikeServices::Register.steps(b_param, sequence:)))
       end
     end

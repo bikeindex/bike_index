@@ -51,7 +51,7 @@ class RegisterController < ApplicationController
       render Register::StepAcknowledgmentReview::Component.new(b_param: @b_param, sequence: @registration_sequence, steps:, current_user:)
     when "report"
       @page_title = I18n.t("meta_titles.register_report")
-      render Register::StepReport::Component.new(b_param: @b_param, steps:)
+      render Register::StepReport::Component.new(b_param: @b_param, sequence: @registration_sequence, steps:)
     when "2"
       @page_title = I18n.t("meta_titles.register_step_2", cycle_type: @b_param.type)
       render Register::Step2::Component.new(b_param: @b_param, steps:, current_user:)
@@ -104,7 +104,7 @@ class RegisterController < ApplicationController
     # Saved either way, so the re-render has everything they entered
     unless BikeServices::Register.save_report(@b_param, report_params:)
       @page_title = I18n.t("meta_titles.register_report")
-      return render(Register::StepReport::Component.new(b_param: @b_param, steps:),
+      return render(Register::StepReport::Component.new(b_param: @b_param, sequence: @registration_sequence, steps:),
         status: :unprocessable_entity)
     end
 
