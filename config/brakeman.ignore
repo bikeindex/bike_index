@@ -230,20 +230,20 @@
     {
       "warning_type": "Redirect",
       "warning_code": 18,
-      "fingerprint": "d1de06806c36414ad7d4dd99a60fd5145753bc0292b61683f7160182186c3d2c",
+      "fingerprint": "0ff0699af68a1bcf202cc1a2958e990fd678bed2092f9a0b4d2a4cb41de3a057",
       "check_name": "Redirect",
       "message": "Possible unprotected redirect",
       "file": "app/controllers/bikes/theft_alerts_controller.rb",
       "line": 46,
       "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
-      "code": "redirect_to(Payment.new(create_parameters(TheftAlert.create!(:stolen_record => Bike.unscoped.find_id((params[:bike_id] or params[:id])).current_stolen_record, :theft_alert_plan => TheftAlertPlan.find(params[:theft_alert_plan_id]), :user => current_user))).stripe_checkout_session.url, :allow_other_host => true)",
+      "code": "redirect_to(Payment.new(create_parameters(PromotedAlert.create!(:stolen_record => Bike.unscoped.find_id((params[:bike_id] or params[:id])).current_stolen_record, :theft_alert_plan => TheftAlertPlan.find(params[:theft_alert_plan_id]), :user => current_user))).stripe_checkout_session.url, :allow_other_host => true)",
       "render_path": null,
       "location": {
         "type": "method",
         "class": "Bikes::TheftAlertsController",
         "method": "create"
       },
-      "user_input": "Payment.new(create_parameters(TheftAlert.create!(:stolen_record => Bike.unscoped.find_id((params[:bike_id] or params[:id])).current_stolen_record, :theft_alert_plan => TheftAlertPlan.find(params[:theft_alert_plan_id]), :user => current_user))).stripe_checkout_session.url",
+      "user_input": "Payment.new(create_parameters(PromotedAlert.create!(:stolen_record => Bike.unscoped.find_id((params[:bike_id] or params[:id])).current_stolen_record, :theft_alert_plan => TheftAlertPlan.find(params[:theft_alert_plan_id]), :user => current_user))).stripe_checkout_session.url",
       "confidence": "Weak",
       "cwe_id": [
         601
@@ -763,18 +763,18 @@
     {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
-      "fingerprint": "7b6d99d6be4a97595ba18b0d5c46df34fcfb294aa35f183cbd716fca76f99cce",
+      "fingerprint": "5162a263528da65e2e9fa7c4e3cdc84c596a250723225c2b3615d0110abe8da1",
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/theft_alerts_controller.rb",
-      "line": 149,
+      "line": 150,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
-      "code": "(if Binxtils::InputNormalizer.boolean(params[:search_recovered]) then\n  stolen_record_ids = StolenRecord.recovered.with_theft_alerts.where(:theft_alerts => ({ :created_at => (@time_range) })).pluck(:id)\n  TheftAlert.where(:stolen_record_id => StolenRecord.recovered.with_theft_alerts.where(:theft_alerts => ({ :created_at => (@time_range) })).pluck(:id))\nelse\n  TheftAlert\nend).where(:user_id => ((user_subject.id or params[:user_id]))).where(:bike_id => Bike.unscoped.friendly_find(params[:search_bike_id]).id).public_send((params[:search_paid_admin] or if (user_subject.present? or Bike.unscoped.friendly_find(params[:search_bike_id]).present?) then\n  \"paid_and_unpaid\"\nelse\n  available_paid_admin.first\nend)).facebook_updateable.send(params[:search_status])",
+      "code": "(if Binxtils::InputNormalizer.boolean(params[:search_recovered]) then\n  stolen_record_ids = StolenRecord.recovered.with_promoted_alerts.where(:promoted_alerts => ({ :created_at => (@time_range) })).pluck(:id)\n  PromotedAlert.where(:stolen_record_id => StolenRecord.recovered.with_promoted_alerts.where(:promoted_alerts => ({ :created_at => (@time_range) })).pluck(:id))\nelse\n  PromotedAlert\nend).where(:user_id => ((user_subject.id or params[:user_id]))).where(:bike_id => Bike.unscoped.friendly_find(params[:search_bike_id]).id).public_send((params[:search_paid_admin] or if (user_subject.present? or Bike.unscoped.friendly_find(params[:search_bike_id]).present?) then\n  \"paid_and_unpaid\"\nelse\n  available_paid_admin.first\nend)).facebook_updateable.send(params[:search_status])",
       "render_path": null,
       "location": {
         "type": "method",
         "class": "Admin::TheftAlertsController",
-        "method": "searched_theft_alerts"
+        "method": "searched_promoted_alerts"
       },
       "user_input": "params[:search_status]",
       "confidence": "High",
@@ -1124,40 +1124,6 @@
       "note": "Admin-only view. file_url is a stored upload path, not user input"
     },
     {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 4,
-      "fingerprint": "be2ce00918c2c3877cf571e2ab007fca6ad86fc744198b859c0c646bdcffb2c7",
-      "check_name": "LinkToHref",
-      "message": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/admin/theft_alerts/edit.html.haml",
-      "line": 88,
-      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(\"Facebook post\", TheftAlert.find(params[:id]).facebook_post_url, :target => \"_blank\")",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Admin::TheftAlertsController",
-          "method": "edit",
-          "line": 20,
-          "file": "app/controllers/admin/theft_alerts_controller.rb",
-          "rendered": {
-            "name": "admin/theft_alerts/edit",
-            "file": "app/views/admin/theft_alerts/edit.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "admin/theft_alerts/edit"
-      },
-      "user_input": "TheftAlert.find(params[:id]).facebook_post_url",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "Admin-only view. facebook_post_url is stored model data, not user input"
-    },
-    {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
       "fingerprint": "bfa5fc184049bb5b09acc8702c591595cfdb8d9d04b843c51a6db4f4194e35ed",
@@ -1475,19 +1441,19 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
-      "fingerprint": "d7aae98890d9207d0f5ce2bd318ed2b6194bb3ab89f9678ae74c60a6503117b2",
+      "fingerprint": "ee76c8a489e6be7a70d14529c816434eabb1cd8fbcb574840b1502b907895642",
       "check_name": "CrossSiteScripting",
       "message": "Unescaped model attribute",
       "file": "app/views/admin/theft_alerts/edit.html.haml",
       "line": 7,
       "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_class(true, theft_alert_status_class(TheftAlert.find(params[:id])))",
+      "code": "::Haml::AttributeBuilder.build_class(true, promoted_alert_status_class(PromotedAlert.find_alert(params[:id])))",
       "render_path": [
         {
           "type": "controller",
           "class": "Admin::TheftAlertsController",
           "method": "edit",
-          "line": 20,
+          "line": 21,
           "file": "app/controllers/admin/theft_alerts_controller.rb",
           "rendered": {
             "name": "admin/theft_alerts/edit",
@@ -1499,12 +1465,12 @@
         "type": "template",
         "template": "admin/theft_alerts/edit"
       },
-      "user_input": "TheftAlert.find(params[:id])",
+      "user_input": "PromotedAlert.find_alert(params[:id])",
       "confidence": "Weak",
       "cwe_id": [
         79
       ],
-      "note": "Admin-only view. theft_alert_status_class() returns hardcoded CSS class names"
+      "note": "Admin-only view. promoted_alert_status_class() returns hardcoded CSS class names"
     },
     {
       "warning_type": "Command Injection",
@@ -1692,18 +1658,18 @@
     {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
-      "fingerprint": "f264e5a6cc8f62dc9ffb2cf65c00f441582a2f6e6831463554b1d5633b2d3345",
+      "fingerprint": "a72fdf7a8372064d925c2af46ef8875512179f56d061b571e7fd64ff96d7453e",
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/admin/theft_alerts_controller.rb",
-      "line": 139,
+      "line": 140,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
-      "code": "(if Binxtils::InputNormalizer.boolean(params[:search_recovered]) then\n  stolen_record_ids = StolenRecord.recovered.with_theft_alerts.where(:theft_alerts => ({ :created_at => (@time_range) })).pluck(:id)\n  TheftAlert.where(:stolen_record_id => StolenRecord.recovered.with_theft_alerts.where(:theft_alerts => ({ :created_at => (@time_range) })).pluck(:id))\nelse\n  TheftAlert\nend).where(:user_id => ((user_subject.id or params[:user_id]))).where(:bike_id => Bike.unscoped.friendly_find(params[:search_bike_id]).id).public_send((params[:search_paid_admin] or if (user_subject.present? or Bike.unscoped.friendly_find(params[:search_bike_id]).present?) then\n  \"paid_and_unpaid\"\nelse\n  available_paid_admin.first\nend))",
+      "code": "(if Binxtils::InputNormalizer.boolean(params[:search_recovered]) then\n  stolen_record_ids = StolenRecord.recovered.with_promoted_alerts.where(:promoted_alerts => ({ :created_at => (@time_range) })).pluck(:id)\n  PromotedAlert.where(:stolen_record_id => StolenRecord.recovered.with_promoted_alerts.where(:promoted_alerts => ({ :created_at => (@time_range) })).pluck(:id))\nelse\n  PromotedAlert\nend).where(:user_id => ((user_subject.id or params[:user_id]))).where(:bike_id => Bike.unscoped.friendly_find(params[:search_bike_id]).id).public_send((params[:search_paid_admin] or if (user_subject.present? or Bike.unscoped.friendly_find(params[:search_bike_id]).present?) then\n  \"paid_and_unpaid\"\nelse\n  available_paid_admin.first\nend))",
       "render_path": null,
       "location": {
         "type": "method",
         "class": "Admin::TheftAlertsController",
-        "method": "searched_theft_alerts"
+        "method": "searched_promoted_alerts"
       },
       "user_input": "params[:search_paid_admin]",
       "confidence": "High",
@@ -1926,6 +1892,29 @@
         79
       ],
       "note": "github_pull_request is an integer column interpolated into a constant GitHub URL"
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "1f927410ff26325485eff36ed726508782af190f7867b7ea1d06aa0f58ef4d8e",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/jobs/backfills/promoted_alert_job.rb",
+      "line": 29,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.execute(\"INSERT INTO promoted_alerts (#{TheftAlert.column_names.map do\n connection.quote_column_name(it)\n end.join(\", \")}) SELECT #{TheftAlert.column_names.map do\n connection.quote_column_name(it)\n end.join(\", \")} FROM theft_alerts ON CONFLICT (id) DO NOTHING\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Backfills::PromotedAlertJob",
+        "method": "copy_alerts"
+      },
+      "user_input": "TheftAlert.column_names.map",
+      "confidence": "High",
+      "cwe_id": [
+        89
+      ],
+      "note": "Column list is TheftAlert.column_names run through quote_column_name - schema, not user input"
     }
   ],
   "brakeman_version": "8.0.4"
