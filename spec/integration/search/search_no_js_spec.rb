@@ -2,18 +2,14 @@
 
 require "rails_helper"
 
-# Without the :js tag these run on the rack_test driver, which never executes
-# JavaScript - exercising the non-JS fallback: the combobox stays hidden behind
+# The rack_test driver never executes JavaScript, which is what exercises the
+# non-JS fallback here: the combobox stays hidden behind
 # its plain `query`/`serial` text fields, and the `search_no_js` hidden field is
 # never stripped, so submitting renders results synchronously instead of into the
 # eager turbo frame (whose `src` is never fetched without JS).
-RSpec.describe "Search without JavaScript", type: :system do
+RSpec.describe "Search without JavaScript", type: :system, driver: :rack_test do
   include_context :geocoder_stubbed_bounding_box
   include_context :geocoder_default_location
-
-  # type: :system defaults to the selenium driver; force rack_test so no
-  # JavaScript runs at all
-  before { driven_by(:rack_test) }
 
   def submit_search
     # The submit button is icon-only (an inline SVG), so it has no accessible name

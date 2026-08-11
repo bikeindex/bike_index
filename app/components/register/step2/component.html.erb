@@ -13,7 +13,8 @@
   <% end %>
 
   <%= form_with(url: register_path, method: :patch, scope: :bike,
-      data: {controller: "autofocus form-persist register--status-fields", form_persist_key_value: "register-details-#{@b_param.id_token}",
+      data: {turbo: true, controller: "autofocus form-persist register--status-fields register--retry",
+        form_persist_key_value: "register-details-#{@b_param.id_token}",
         action: "input->form-persist#save hw-combobox:selection->form-persist#save hw-combobox:selection->register--status-fields#update submit->form-persist#clear"}) do |f| %>
     <%= hidden_field_tag :b_param_token, @b_param.id_token %>
 
@@ -47,7 +48,8 @@
 
       <%= render UI::Forms::Combobox::Component.new(name: :primary_frame_color_id, form: f,
           value: @b_param.primary_frame_color_id, options: color_combobox_options,
-          placeholder: translation(".primary_color_blank"), required: true, rich_display: :inline) %>
+          placeholder: translation(".primary_color_blank"), required: true, rich_display: :inline,
+          dialog_label: translation(".color"), no_js: true) %>
 
       <% {secondary_frame_color_id: translation(".second_color_blank"), tertiary_frame_color_id: translation(".third_color_blank")}.each do |field, blank_label| %>
         <% value = bike[field.to_s] %>
@@ -59,7 +61,7 @@
           <div class="tw:flex-1">
             <%= render UI::Forms::Combobox::Component.new(name: field, form: f,
                 value:, options: color_combobox_options, placeholder: blank_label,
-                rich_display: :inline) %>
+                rich_display: :inline, dialog_label: blank_label, no_js: true) %>
           </div>
 
           <%= render UI::Button::Component.new(text: "×", color: :link,
@@ -278,7 +280,13 @@
           <% end %>
         </div>
 
-        <%= link_to translation(".view_serial_guide"), serials_path, class: "twlink tw:text-xs tw:font-semibold" %>
+        <%#
+          turbo: false - the form's data-turbo opts in every link inside it, and this
+          one leaves for a legacy page whose jQuery doesn't re-run on a Turbo render
+        %>
+
+        <%= link_to translation(".view_serial_guide"), serials_path, class: "twlink tw:text-xs tw:font-semibold",
+            data: {turbo: false} %>
       </div>
     </div>
 
@@ -299,7 +307,8 @@
     <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :status,
         label_text: translation(".registration_type"), required: true)) do %>
       <%= render UI::Forms::Combobox::Component.new(name: :status, form: f, required: true,
-          value: @b_param.status, options: status_options, rich_display: :stacked) %>
+          value: @b_param.status, options: status_options, rich_display: :stacked,
+          dialog_label: translation(".registration_type"), no_js: true) %>
     <% end %>
 
     <%= render Register::SectionLabel::Component.new(text: contact_section_text, divider: true) %>

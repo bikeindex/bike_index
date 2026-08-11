@@ -3881,11 +3881,11 @@ en:
     news_index: Bike Index Blog
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
-    register_acknowledgment: "%{cycle_type} safety check"
+    register_acknowledgment: Safety check for your %{cycle_type}
     register_confirm: Confirming your email
     register_create: Register your %{cycle_type}!
     register_review: Review your %{cycle_type} safety check
-    register_show: "%{cycle_type} registration"
+    register_show: Your %{cycle_type} registration
     register_step_1: Register your %{cycle_type}!
     register_step_2: Add your %{cycle_type}'s details
     registrations_embed: Register a bike with %{organization}

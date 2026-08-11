@@ -169,6 +169,37 @@ The test cable adapter is `:async`, so broadcasts in the test process do round-t
 
 The pattern is: prepare the data the broadcast will render → call the real broadcaster → assert on an unambiguous post-morph element with a `wait:` (e.g. `expect(page).to have_css(some_new_selector, wait: 5)`). The trailing wait is the synchronization barrier — the test proceeds only once the morph has actually rendered.
 
+## Failing a request on purpose: Playwright routes
+
+`page.driver.with_playwright_page { |pw| pw.route(pattern, handler) }` is how a spec makes the
+server 429, 500 or hang for one request — the app never sees it, so nothing half-saves. Four
+things that cost real time when they go wrong:
+
+- **The handler runs on a Playwright thread, and a raising handler hangs the request.** Nothing
+  fulfills or continues it, so the page just sits there and the failure surfaces a step later as
+  a confusing "expected to find …". Keep handlers boring: no `Enumerator#next` (`[429, 500].cycle`
+  raises `fiber called across threads`), nothing that assumes the RSpec thread. Derive what varies
+  from state you can read, e.g. `failures.length.odd? ? 429 : 500`.
+- **Every Rails form submission is a POST over the wire**, so the HTTP method can't tell `create`
+  from `update` — Rails' `_method` override lives in the body, and a multipart body (any form with
+  a file input) turns `Rack::Utils.parse_query(request.post_data)` into garbage. Key on the page the
+  request came from instead: `request.headers["referer"]` carries the step in its query string.
+- **Collect what you intercepted and assert on it at the end.** A list of the requests you failed,
+  compared against the exact list you expected, is what proves each one was hit — and hit once.
+  Without it a key collision quietly means half your interceptions never happened.
+- **A client-side timer you lengthen outruns Capybara's default wait.** `default_max_wait_time` is
+  2 seconds here, so a retry/debounce stretched to 3s needs an explicit `wait:` on the next
+  assertion. Use `wait_for { ... }` (in `SystemSpecHelpers`) to block on something only the browser
+  knows — a route handler's record of a request it answered — that no Capybara matcher can see.
+
+## Drive it the way a user does, when checking what a click leaves behind
+
+This is the "real user path" rule again, and it bites hardest when *verifying* rather than setting
+up. `form.requestSubmit()` and clicking the submit button are not the same event: Turbo re-enables
+the **submitter** when a submission finishes, so a form submitted programmatically has no button to
+re-enable and looks correctly disabled — while the same code under a real click leaves the button
+live. A probe that drives the page programmatically can pass on a page that's broken for a rider.
+
 ## Build Tailwind before running system specs
 
 CI builds `app/assets/builds/tailwind.css` automatically; your local sandbox does not. Without it, Tailwind utility classes (most importantly `tw:hidden` → `display: none`) silently don't apply, and assertions like `expect(tooltip).not_to be_visible` fail in confusing ways that look like flakes but aren't.
