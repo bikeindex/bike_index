@@ -13,7 +13,7 @@ module ControllerHelpers
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
       :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
       :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert,
-      :display_dev_info?, :current_country_id, :current_currency
+      :display_dev_info?, :current_country_id, :current_currency, :turbo_request?
     before_action :enable_rack_profiler
 
     before_action do
