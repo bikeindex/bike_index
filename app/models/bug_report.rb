@@ -97,14 +97,13 @@ class BugReport < ApplicationRecord
   end
   private_class_method :our_address?
 
-  # Which of our addresses the email was sent to (contact@, support@, bugs@, ...). Prefer an
-  # address of ours, since a message can be addressed to a mix of recipients. X-Original-To is
-  # the envelope recipient Postmark's ingress prepends, the only source when we're bcc'd
+  # Which of our addresses the email was sent to (contact@, support@, bugs@, ...) - nil when none of
+  # the recipients is ours, e.g. a blast we're bcc'd on. X-Original-To is the envelope recipient
+  # Postmark's ingress prepends, the only source when we're bcc'd
   def self.receiver_from_mail(mail)
-    recipients = Array(mail.to) + Array(mail.cc)
-    address = ([mail["X-Original-To"]&.to_s] + recipients).find { our_address?(it) } || recipients.first
+    recipients = [mail["X-Original-To"]&.to_s] + Array(mail.to) + Array(mail.cc)
 
-    EmailNormalizer.normalize(address)
+    EmailNormalizer.normalize(recipients.find { our_address?(it) })
   end
 
   def self.normalized_tags(value)

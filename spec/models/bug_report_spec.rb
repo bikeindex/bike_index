@@ -149,8 +149,8 @@ RSpec.describe BugReport, type: :model do
     context "without an address of ours" do
       let(:mail) { Mail.new(from: "someone@example.com", to: "Friend@example.com") }
 
-      it "falls back to the first recipient" do
-        expect(BugReport.receiver_from_mail(mail)).to eq "friend@example.com"
+      it "is nil, rather than recording someone else's address" do
+        expect(BugReport.receiver_from_mail(mail)).to be_nil
       end
 
       context "without any recipient" do
