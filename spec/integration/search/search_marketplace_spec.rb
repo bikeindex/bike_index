@@ -161,8 +161,8 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     expect_axe_clean
     # Verify the lazy-loading frame for page 2 exists (5 listings remain)
     expect(page).to have_css("turbo-frame#page_2[loading='lazy']", visible: :all)
-    # Pagination is the fallback for users without JS - here the links are gone,
-    # and the spinner they ship hidden alongside is showing instead
+    # Frame-rendered results are proof of JS, so the no-JS pagination links never
+    # render - only the frame's spinner
     expect(page).to have_no_link(exact_text: "2")
     expect(page).to have_text("Loading more...")
     scroll_to_lazy_load
@@ -215,6 +215,35 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # the visible input shows the display name
     expect(find("#primary_activity-hw-hidden-field", visible: false).value).to eq primary_activity.id.to_s
     expect(find("#primary_activity").value).to eq "Mountain biking"
+  end
+
+  # search_no_js reaches riders who do have JS: Search::RegistrationsController
+  # forwards it on the marketplace redirect, and it survives in any URL shared
+  # before search--form strips the hidden field. Those renders can't tell, so they
+  # ship both paginations and search--pagination-fallback picks.
+  it "hands a search_no_js render back to infinite scroll, except on the last page" do
+    page.current_window.resize_to(1280, 900)
+    visit "/search/marketplace?search_no_js=true"
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
+
+    # The links a rider without JS would have used are gone, the frame's spinner shows
+    expect(page).to have_no_link(exact_text: "2")
+    expect(page).to have_text("Loading more...")
+    scroll_to_lazy_load
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 17)
+
+    # The last page has no frame to scroll into, so its links stay - they're the only
+    # way out for a rider who deep-linked here
+    visit "/search/marketplace?search_no_js=true&page=2"
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 5)
+    expect(page).to have_no_text("Loading more...")
+    # Following one navigates the results frame, like registrations search - so page 1
+    # comes back in infinite-scroll mode, with no links of its own. Don't count
+    # thumbnails here: the click leaves the page scrolled down, so page 2 may already
+    # be lazy-loading.
+    click_link(exact_text: "1")
+    expect(page).to have_css("turbo-frame#page_2[loading='lazy']", visible: :all, wait: 10)
+    expect(page).to have_no_link(exact_text: "2")
   end
 
   # :flaky retry: a programmatic go_forward to a form-submitted (turbo advance)

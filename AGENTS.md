@@ -24,9 +24,35 @@ Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't us
 - Prefer less code, by character count (excluding whitespace and comments). Use `bin/char_count {FILE OR FOLDER}` to get the non-whitespace character count
 - prefer un-abbreviated variable names
 - Use full class/module names everywhere — `UI::Forms::Combobox::Component`, not the `Combobox::Component` that lexical scope also resolves from inside `UI::Forms`
-- Keep comments pithy — often they aren't necessary. Explain *why* only where a reader would otherwise get it wrong; don't narrate the change that introduced the code, and don't defend a choice against an edit nobody would make — a failing test already defends it
+- Default to no comment — see **Comments** below for when one earns its place
 - **Prefer composition over inheritance and `include`.** Share behavior by calling an object that owns it, not by mixing a module into several classes or adding a base class. A `module` extracted only to be `include`d in two classes is usually one of those classes with a parameter — pass the difference in as an argument instead. Rails' own extension points (`ApplicationRecord`, `ApplicationJob`, `ActiveSupport::Concern` for controller filters) are fine; new mixins of our own are what to avoid.
 - **Service objects** (`app/services/`): a stateless service is a `module` with `extend Functionable` (see the `functionable` gem) — inputs passed as args, no instance state, private methods via `conceal` + a `# private below here` block. Don't write a stateless service as a `class` with `def self.` methods.
+
+### Comments
+
+- **Default to no comment.** Code shows *how*; a comment earns its place only by carrying *why* — a non-obvious constraint, a deliberate deviation, a gotcha, a workaround.
+- **Never narrate the code.** "Loop over users", "parse the body" — the line below already says it.
+- **Never narrate the change.** "Fixed X", "updated to Y", "as requested". The diff and the commit hold that history; a comment repeating it outlives the change and goes stale.
+- **Don't defend a choice against an edit nobody would make.** A failing test already defends it.
+- **Warranted ≠ warranted as written — razor the wording too.** Keep the one non-obvious fact a reader needs *at that line*, and cut the rest: mechanism the code already shows, where the value gets used downstream, second-order consequences, and the justification's justification. Multi-line blocks rarely survive intact:
+
+  ```ruby
+  # Levenshtein can't use an index, so Postgres would scan every bike. The `%`
+  # operator hits index_bikes_on_serial_normalized_no_space_trgm instead, and
+  # takes its threshold from a session setting, which we set to 0.2 rather than
+  # the 0.3 default because 0.3 dropped too many real matches when we measured it.
+  ```
+
+  becomes
+
+  ```ruby
+  # `%` reads its threshold from a session setting; 0.2 rather than the 0.3
+  # default keeps ~98% of the LEVENSHTEIN < 3 matches
+  ```
+
+- **Re-earn the comment when you edit the code under it.** Rewrite it to fit the new shape rather than appending a clause per change.
+
+None of this governs magic comments, `# rubocop:disable` (keep its justification), or `TODO:`/`HACK:`/`NOTE:` markers.
 
 ## Subagents
 

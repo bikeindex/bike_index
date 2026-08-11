@@ -11,9 +11,12 @@ class RegisterController < ApplicationController
   before_action :assign_organization, except: %i[new confirm]
   before_action :find_registration_sequence, except: %i[new confirm]
   before_action :redirect_finished, only: %i[create update report acknowledge]
-  # The step shown depends on server state - a cached page could show a step
-  # the registration is past (register--revalidate covers Safari's bfcache)
+  # The step shown is server state - a cached page could show one the registration is past
+  # (register--revalidate covers Safari's bfcache, Register::Page Turbo's own snapshots)
   before_action { response.set_header("Cache-Control", "no-store") }
+  # Every step is a page, but a component takes its content type from the request - and a
+  # Turbo submission asks for a turbo_stream, which grafts the next step onto this one
+  before_action :force_html_response
   # The unfinished_registration alert links back to here, so it would sit on top of the
   # very flow that resolves it
   before_action { @skip_general_alert = true }
@@ -41,7 +44,7 @@ class RegisterController < ApplicationController
 
     case step
     when "finished"
-      @page_title = I18n.t("meta_titles.register_show", cycle_type: @b_param.type_titleize)
+      @page_title = I18n.t("meta_titles.register_show", cycle_type: @b_param.type)
       render Register::StepFinished::Component.new(b_param: @b_param, current_user:)
     when "review"
       @page_title = I18n.t("meta_titles.register_review", cycle_type: @b_param.type)

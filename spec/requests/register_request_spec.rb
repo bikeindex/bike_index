@@ -1111,6 +1111,8 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to redirect_to step_path("3")
 
       follow_redirect!
+      # The cycle type reads as it's stored, so no title leads with it and stays sentence case
+      expect(response.body).to include "<title>Safety check for your e-scooter</title>"
       # The heading is the page's own; the title labels its rules and names it on the review
       expect(response.body).to include "Looks like you have an e-vehicle!"
       expect(response.body).to include "Battery &amp; charging"
@@ -1157,6 +1159,11 @@ RSpec.describe RegisterController, type: :request do
       }.to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment, :count).by(1)
       expect(response).to redirect_to step_path("finished")
       expect(b_param.reload.created_bike_id).to eq Bike.last.id
+
+      follow_redirect!
+      expect(response.body).to include "<title>Your e-scooter registration</title>"
+      # Which step a page shows is server state, so Turbo mustn't restore it from a snapshot
+      expect(response.body).to include "<meta name=\"turbo-cache-control\" content=\"no-cache\">"
 
       # The record hangs off the bike, so it survives the b_param being swept
       acknowledgment = RegistrationSequenceAcknowledgment.last
