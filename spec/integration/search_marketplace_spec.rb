@@ -86,13 +86,25 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
 
   # Hold back the unfiltered results the frame eager-loads on arrival. Returns the
   # release, so the example decides when they land rather than racing a timer. The
-  # release returns once that response is back - waiting on the one request it let
-  # through, not on the page going idle, which is hostage to every other fetch the
-  # listings it renders kick off.
+  # release waits on the one request it let through - not on the page going idle,
+  # which is hostage to every other fetch the listings it renders kick off, and not
+  # on the response merely reaching the browser, which happens before the frame has
+  # had its chance to swap.
   def hold_initial_results_load
     held = Queue.new
     held_urls = Queue.new
     page.driver.with_playwright_page do |playwright_page|
+      # The frame discards the stale response, so its arrival leaves no mark in the
+      # DOM to wait on. Record the delivery instead, a paint after Turbo hands the
+      # response to the frame - by then a frame that was going to swap has.
+      playwright_page.add_init_script(script: <<~JS)
+        document.addEventListener("turbo:before-fetch-response", (event) => {
+          const url = event.detail?.fetchResponse?.response?.url || ""
+          if (event.target.id !== "marketplace_results_frame" || url.includes("primary_activity=")) return
+          requestAnimationFrame(() => { document.documentElement.dataset.heldResultsDelivered = "true" })
+        })
+      JS
+
       playwright_page.route("**/search/marketplace*", ->(route, request) {
         if request.headers["turbo-frame"] == "marketplace_results_frame" &&
             !request.url.include?("primary_activity=")
@@ -104,10 +116,9 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     end
 
     lambda do
-      url = held_urls.pop(timeout: 10) or raise "the results frame never requested its eager src"
-      page.driver.with_playwright_page do |playwright_page|
-        playwright_page.expect_response(url) { held.push(:release) }.body
-      end
+      held_urls.pop(timeout: 10) or raise "the results frame never requested its eager src"
+      held.push(:release)
+      expect(page).to have_css("html[data-held-results-delivered]", visible: :all, wait: 10)
     end
   end
 
