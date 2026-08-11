@@ -2,8 +2,8 @@ import { Controller } from '@hotwired/stimulus'
 
 /* global Turbo, requestAnimationFrame */
 
-// Each serial is a separate search, so a long paste otherwise opens a request per serial at once
-const MAX_CONCURRENT_SEARCHES = 4
+// A long paste would otherwise open one request per serial at once
+const MAX_CONCURRENT_SEARCHES = 6
 
 // Connects to data-controller='org--multi-search'
 export default class extends Controller {
@@ -134,17 +134,11 @@ export default class extends Controller {
     this.searching = false
   }
 
-  // Runs every search, MAX_CONCURRENT_SEARCHES of them in flight at a time
   async searchAllItems (serials) {
-    const pending = serials.map((serial, index) => ({ serial, index }))
-    const runNext = async () => {
-      while (pending.length) {
-        const { serial, index } = pending.shift()
-        await this.searchItem(serial, index)
-      }
+    for (let start = 0; start < serials.length; start += MAX_CONCURRENT_SEARCHES) {
+      await Promise.all(serials.slice(start, start + MAX_CONCURRENT_SEARCHES)
+        .map((serial, offset) => this.searchItem(serial, start + offset)))
     }
-    const workers = Math.min(MAX_CONCURRENT_SEARCHES, pending.length)
-    await Promise.all(Array.from({ length: workers }, runNext))
   }
 
   alignTableColumns () {

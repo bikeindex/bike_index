@@ -1,10 +1,10 @@
 module BikeSearchable
   extend ActiveSupport::Concern
 
-  # index_bikes_on_serial_normalized_no_space_trgm answers `%`, whose threshold comes from a
-  # session setting. 0.2 keeps ~98% of the LEVENSHTEIN < 3 matches that 0.3 (the default) drops
+  # pg_trgm's 0.3 default drops ~5% of the LEVENSHTEIN < 3 matches, and 47% of the two-edit
+  # ones on serials of 8 characters or fewer
   CLOSE_SERIAL_SIMILARITY = 0.2
-  # More close matches than any caller paginates through
+  # Deeper than any caller paginates
   CLOSE_SERIAL_LIMIT = 1000
 
   class << self
@@ -266,19 +266,18 @@ module BikeSearchable
     # TODO: actually make private?
     # Private (internal only) methods below here, as defined at the start
 
-    # LEVENSHTEIN is unindexable, so on its own it scans every bike. `%` narrows the candidates
-    # via the trigram index first - but it reads its threshold from a session setting, so the
-    # ids have to be selected eagerly, inside the transaction that SET LOCAL applies to.
+    # LEVENSHTEIN can't use an index; `%` narrows the candidates through the trigram one, and
+    # takes its threshold from a session setting - hence the eager select inside a transaction
     def close_serial_ids(interpreted_params)
-      serial_no_space = interpreted_params[:serial_no_space]
+      serial, serial_no_space = interpreted_params.values_at(:serial, :serial_no_space)
       transaction do
-        connection.execute("SET LOCAL pg_trgm.similarity_threshold = #{BikeSearchable::CLOSE_SERIAL_SIMILARITY}")
-        # serials_not_containing excludes exact matches too
-        serials_not_containing(interpreted_params[:serial], serial_no_space)
+        connection.execute("SET LOCAL pg_trgm.similarity_threshold = #{CLOSE_SERIAL_SIMILARITY}")
+        serials_not_containing(serial, serial_no_space) # also excludes exact matches
           .non_serial_matches(interpreted_params)
           .where("serial_normalized_no_space % ?", serial_no_space)
           .where("LEVENSHTEIN(serial_normalized_no_space, ?) < 3", serial_no_space)
-          .limit(BikeSearchable::CLOSE_SERIAL_LIMIT)
+          .unscope(:includes).reorder(nil) # default_scope's eager loads and sort triple an id select
+          .limit(CLOSE_SERIAL_LIMIT)
           .pluck(:id)
       end
     end
