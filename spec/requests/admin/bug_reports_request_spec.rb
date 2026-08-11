@@ -284,9 +284,8 @@ RSpec.describe Admin::BugReportsController, type: :request do
       end
     end
 
-    # Presenting a token skips CSRF, so a forged cross-site write can reach the
-    # action by passing any token at all - the signed in superuser below is the one
-    # such a request rides in on. The token, not the session, has to authorize it
+    # Presenting a token skips CSRF, so a forged write reaches the action with any
+    # token at all - what stops it is that the token, not the session, authorizes
     context "a junk token forged onto a superuser's session" do
       let(:current_user) { FactoryBot.create(:superuser) }
       let(:forged_param) { {access_token: "not-a-real-token"} }

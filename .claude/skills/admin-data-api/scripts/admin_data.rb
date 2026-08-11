@@ -22,7 +22,6 @@ REPO_ROOT = File.expand_path("../../../..", __dir__)
 ENV_FILE = File.join(REPO_ROOT, ".env.development")
 
 BUG_REPORTS = "/admin/bug_reports" # Admin pages rather than API routes, same admin token
-# Readable endpoint => path
 PATHS = {
   "sidekiq" => "/api/admin_data/sidekiq",
   "pghero" => "/api/admin_data/pghero",
@@ -58,7 +57,6 @@ def request(method, url, headers: {}, form: nil)
   http.request(req)
 end
 
-# "key=value" arguments => {"key" => "value"}
 def parse_params(args)
   args.to_h do |arg|
     abort("params are key=value, got: #{arg}") unless arg.include?("=")
@@ -100,7 +98,7 @@ def warn_false(message)
   false
 end
 
-# Request the path with the current token. Returns [status(Integer or nil), body].
+# Returns [status(Integer or nil), body] - a nil status is having no token to send
 def token_request(method, path, form: nil)
   token = env_get("ADMIN_DATA_TOKEN")
   if token.to_s.empty?
@@ -122,7 +120,7 @@ def with_token(method, path, form: nil)
     return nil
   end
 
-  warn "Token rejected — refreshing and retrying…" if status
+  warn "Token rejected — refreshing and retrying…" if status == 401
   return nil unless refresh_token!
 
   status, body = token_request(method, path, form:)

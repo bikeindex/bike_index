@@ -10,7 +10,6 @@ module API
 
     private
 
-    # A token identifies the user when one is passed, otherwise the signed in user
     def current_user
       return super unless token_request?
 
@@ -18,9 +17,13 @@ module API
     end
 
     # doorkeeper_token is nil for a revoked token, so branch on the string as presented -
-    # that caller gets the API's 401 rather than a redirect to sign in
+    # that caller gets the API's 401 rather than a redirect to sign in. Every current_user
+    # call asks, which an admin page render does ~10 times
     def token_request?
-      Doorkeeper::OAuth::Token.from_request(request, *Doorkeeper.configuration.access_token_methods).present?
+      return @token_request if defined?(@token_request)
+
+      @token_request = Doorkeeper::OAuth::Token
+        .from_request(request, *Doorkeeper.configuration.access_token_methods).present?
     end
 
     # Returns {user:} when the token authorizes a user, otherwise {error:, status:}
@@ -38,7 +41,6 @@ module API
       end
     end
 
-    # Renders the JSON error unless the token belongs to a superuser for this controller
     def require_token_superuser!
       auth = authorize_user(doorkeeper_token)
       return render(json: {error: auth[:error]}, status: auth[:status]) if auth[:error]
@@ -50,15 +52,6 @@ module API
     # The admin app, unless overridden by a controller serving a different OAuth application
     def authorized_app?(access_token)
       access_token.application_id == ADMIN_DOORKEEPER_APP_ID
-    end
-
-    # Memoizes the miss too - every admin page view asks, and most have no token
-    def doorkeeper_token
-      return @doorkeeper_token if defined?(@doorkeeper_token)
-
-      @doorkeeper_token = Doorkeeper::OAuth::Token.authenticate(
-        request, *Doorkeeper.configuration.access_token_methods
-      )
     end
   end
 end
