@@ -145,8 +145,8 @@ export default class extends Controller {
   // The frame's eager src fetch and a search submitted while it's still in flight
   // race each other. Turbo renders whichever lands last and rewrites history from
   // the frame, so the older response would drag the address bar back to the query
-  // the rider searched away from. A submit repoints src before its own response
-  // returns, so src names the search the frame should be showing.
+  // the rider searched away from. A src fetch assigns src before it is sent, so a
+  // response that no longer matches it is one the frame has moved on from.
   frameResponseSuperseded (url) {
     return this.differentSearchOnSamePage(url, this.frameElement?.getAttribute('src'))
   }
