@@ -100,9 +100,9 @@ class OrganizationRole < ApplicationRecord
     organization.ambassador?
   end
 
-  # The organization's permanent API token creates bikes and runs bulk imports - admins only
+  # The organization's permanent API token creates bikes, so it goes to the roles that can
   def organization_access_token
-    organization.access_token if admin?
+    organization.access_token unless member_no_bike_edit?
   end
 
   def organization_creator?

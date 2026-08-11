@@ -48,19 +48,19 @@ RSpec.describe "Me API V2", type: :request do
       let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user:, role:) }
       before { token.update_attribute :scopes, all_scopes }
 
-      it "doesn't include the organization access_token" do
+      it "includes the organization access_token" do
         get "#{base_url}/me", params: {access_token: token.token, format: :json}
         expect(response.response_code).to eq(200)
-        expect(json_result["memberships"].first["organization_access_token"]).to be_nil
+        expect(json_result["memberships"].first["organization_access_token"])
+          .to eq(organization_role.organization.access_token)
       end
 
-      context "organization admin" do
-        let(:role) { "admin" }
-        it "includes the organization access_token" do
+      context "member_no_bike_edit" do
+        let(:role) { "member_no_bike_edit" }
+        it "doesn't include the organization access_token" do
           get "#{base_url}/me", params: {access_token: token.token, format: :json}
           expect(response.response_code).to eq(200)
-          expect(json_result["memberships"].first["organization_access_token"])
-            .to eq(organization_role.organization.access_token)
+          expect(json_result["memberships"].first["organization_access_token"]).to be_nil
         end
       end
     end

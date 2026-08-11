@@ -42,7 +42,7 @@ RSpec.describe "Me API V3", type: :request do
           organization_short_name: organization.short_name,
           organization_slug: organization.slug,
           organization_id: organization.id,
-          organization_access_token: nil,
+          organization_access_token: organization.access_token,
           organization_logo_url: nil,
           user_is_organization_admin: false,
           menu: target_menu
@@ -64,14 +64,14 @@ RSpec.describe "Me API V3", type: :request do
         expect(response.response_code).to eq(200)
       end
 
-      context "organization admin" do
-        let(:role) { "admin" }
-        it "includes the organization access_token" do
+      context "member_no_bike_edit" do
+        let(:role) { "member_no_bike_edit" }
+        it "doesn't include the organization access_token" do
           get "/api/v3/me", params: {access_token: token.token}, headers: {format: :json}
           expect(response.response_code).to eq(200)
           membership = json_result["memberships"].first
-          expect(membership["user_is_organization_admin"]).to be_truthy
-          expect(membership["organization_access_token"]).to eq(organization.access_token)
+          expect(membership["user_is_organization_admin"]).to be_falsey
+          expect(membership["organization_access_token"]).to be_nil
         end
       end
 

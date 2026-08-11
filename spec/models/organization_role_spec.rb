@@ -105,6 +105,13 @@ RSpec.describe OrganizationRole, type: :model do
 
     context "member" do
       let(:role) { "member" }
+      it "returns the organization's token" do
+        expect(organization_role.organization_access_token).to eq organization.access_token
+      end
+    end
+
+    context "member_no_bike_edit" do
+      let(:role) { "member_no_bike_edit" }
       it "returns nil" do
         expect(organization.access_token).to be_present
         expect(organization_role.organization_access_token).to be_nil
