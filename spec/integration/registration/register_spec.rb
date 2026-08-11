@@ -643,6 +643,11 @@ RSpec.describe "Register flow", :js, type: :system do
         type_into("#bike_primary_frame_color_id", "Red")
         click_combobox_option("Red")
         fill_in "bike[serial_number]", with: "XYZ 123"
+        # A theft, so the report is in the flow too - it waits on the emailed link, which
+        # puts it last rather than after this form
+        type_into("#bike_status", "Stolen")
+        click_combobox_option("Stolen")
+        fill_in "bike[phone]", with: "555 000 0000"
         click_button "Next"
 
         expect(page).to have_content("Battery & charging")
@@ -664,9 +669,19 @@ RSpec.describe "Register flow", :js, type: :system do
         visit confirmation_link
         click_button "Continue"
 
-        expect(page).to have_content("Registration complete", wait: 10)
+        # Confirming proves the address, which leaves the theft it's reporting
+        expect(page).to have_content("Report your stolen bike", wait: 10)
+        fill_in "report[date]", with: "2026-08-05T14:30"
+        fill_in "report[address_record_attributes][street]", with: "278 Broadway"
+        fill_in "report[address_record_attributes][city]", with: "New York"
+        select state.name, from: "report[address_record_attributes][region_record_id]"
+        fill_in "report[address_record_attributes][postal_code]", with: "10007"
+        click_button "Complete Bike Registration"
+
+        expect(page).to have_css("h1", text: "is listed as stolen on Bike Index", wait: 10)
         expect(Bike.last).to have_attributes(owner_email:, serial_number: "XYZ 123",
-          propulsion_type: "pedal-assist")
+          propulsion_type: "pedal-assist", status: "status_stolen")
+        expect(Bike.last.current_stolen_record.street).to eq "278 Broadway"
         # A retry that landed twice would be a second registration, or a second signature
         expect(Bike.count).to eq 1
         expect(RegistrationSequenceAcknowledgment.count).to eq 1
@@ -674,7 +689,8 @@ RSpec.describe "Register flow", :js, type: :system do
         # Every step of the flow failed, and none of them more than once
         expect(failed_steps).to eq([["/register", "1"], ["/register", "2"],
           ["/register/acknowledge", "3"], ["/register/acknowledge", "4"],
-          ["/register/acknowledge", "review"], ["/register/confirm_email", nil]])
+          ["/register/acknowledge", "review"], ["/register/confirm_email", nil],
+          ["/register/report", "report"]])
       end
     end
   end

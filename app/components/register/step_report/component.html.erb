@@ -13,11 +13,15 @@
   %>
 
   <%= form_with(url: report_register_path, method: :patch, scope: :report,
-      data: {controller: "autofocus form-persist", form_persist_key_value: "register-report-#{@b_param.id_token}",
+      data: {turbo: true, controller: "autofocus form-persist register--retry",
+             form_persist_key_value: "register-report-#{@b_param.id_token}",
              action: "input->form-persist#save change->form-persist#save submit->form-persist#clear"}) do |f| %>
     <%= hidden_field_tag :b_param_token, @b_param.id_token %>
 
-    <%# A wall-clock time only means something alongside the zone it was entered in %>
+    <%#
+      A wall-clock time only means something alongside the zone it was entered in.
+      Blank without JavaScript, which reads it back in the zone the field rendered in
+    %>
     <%= f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
 
     <%= render Register::SectionLabel::Component.new(text: translation(".when_and_where")) %>

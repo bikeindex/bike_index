@@ -28,8 +28,11 @@ export default class extends Controller {
     window.addEventListener('pagehide', this.boundFlush)
   }
 
+  // Flushed rather than dropped: a Turbo visit swaps the body without a pagehide, so
+  // leaving mid-keystroke through a step's Back link would lose the last of what was
+  // typed. clear() nulls the timer, so a submit still leaves nothing to write back
   disconnect () {
-    clearTimeout(this.timer)
+    this.flush()
     clearTimeout(this.restoreTimer)
     window.removeEventListener('pagehide', this.boundFlush)
   }

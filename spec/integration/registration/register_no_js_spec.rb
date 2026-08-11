@@ -58,6 +58,54 @@ RSpec.describe "Register flow without JavaScript", type: :system, driver: :playw
       manufacturer_id: manufacturer.id, primary_frame_color_id: red.id)
   end
 
+  # The report is the one step whose fields are all plain controls already - what it needs
+  # from JavaScript is the timezone the wall-clock time was entered in, which it does
+  # without by reading the time back in the zone the field rendered in
+  it "reports a theft picked from the status fallback" do
+    state = FactoryBot.create(:state_new_york)
+    visit "/register/new"
+
+    fill_in "b_param[manufacturer_id]", with: "Surly"
+    fill_in "b_param[owner_email]", with: owner_email
+    click_button "Next"
+
+    fill_in "bike[user_name]", with: user_name
+    select "Red", from: "bike[primary_frame_color_id]"
+    fill_in "bike[serial_number]", with: "XYZ 123"
+    # The status is a combobox too, so which registration this is gets picked here
+    select "Stolen", from: "bike[status]"
+    click_button "Complete Bike Registration"
+
+    # Anonymous, so the theft waits on the link that proves the address
+    expect(page).to have_css("h1", text: "Progress saved")
+    expect(page).to have_content("Finish reporting your stolen bike")
+    expect(BParam.last.status).to eq "status_stolen"
+
+    visit confirmation_link
+    click_button "Continue"
+
+    expect(page).to have_content("Report your stolen bike")
+    # Nothing entered for when and where, so the browser holds the step here
+    click_button "Complete Bike Registration"
+    expect(page).to have_content("Report your stolen bike")
+    expect(Bike.count).to eq 0
+
+    fill_in "report[date]", with: "2026-08-05T14:30"
+    fill_in "report[address_record_attributes][street]", with: "278 Broadway"
+    fill_in "report[address_record_attributes][city]", with: "New York"
+    select state.name, from: "report[address_record_attributes][region_record_id]"
+    fill_in "report[address_record_attributes][postal_code]", with: "10007"
+    fill_in "report[theft_description]", with: "Cut lock"
+    click_button "Complete Bike Registration"
+
+    expect(page).to have_css("h1", text: "is listed as stolen on Bike Index")
+    stolen_record = Bike.last.current_stolen_record
+    expect(stolen_record).to have_attributes(street: "278 Broadway", city: "New York",
+      theft_description: "Cut lock")
+    # No timezone field to fill it in, so the time reads back in the zone it rendered in
+    expect(stolen_record.date_stolen.in_time_zone.strftime("%Y-%m-%dT%H:%M")).to eq "2026-08-05T14:30"
+  end
+
   it "keeps a manufacturer it doesn't know as free text, and takes a chosen cycle type" do
     visit "/register/new"
 
