@@ -4,17 +4,16 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='register--retry'
 //
-// Every step submits through Turbo, so a throttled or restarting server comes back as
-// a response we can take over rather than an error page the rider lands on with the
-// step they just filled out behind them. Re-submit from behind the submit button's
-// spinner - and when a retry won't help, say so and give the button back. Turbo can't
-// do that part for us: rack_attack answers text/plain, which it renders as nothing.
+// Every step submits through Turbo, so a throttled or restarting server is a response to
+// take over rather than an error page the rider lands on with their filled-out step
+// behind them. Retry behind the submit spinner; when a retry won't help, say so and give
+// the button back - Turbo can't, since rack_attack answers text/plain, which it renders
+// as nothing.
 export default class extends Controller {
   static values = {
     retries: { type: Number, default: 2 },
     delay: { type: Number, default: 500 },
-    // Past this, waiting it out behind a spinner is worse than saying so - a throttle
-    // asking to be waited for counts in tens of seconds
+    // Past this a spinner is worse than saying so - throttles ask for tens of seconds
     maxDelay: { type: Number, default: 3000 }
   }
 
@@ -30,9 +29,13 @@ export default class extends Controller {
     clearTimeout(this.timer)
   }
 
-  // Only what a second try could answer differently: a throttle and the 5xxs.
-  // The steps re-render themselves 422 when what was entered is the problem.
+  // Only what a second try could answer differently: a throttle and the 5xxs - a step
+  // re-renders itself 422 when what was entered is the problem
   retryTransient = (event) => {
+    // It bubbles, so it carries what Turbo fetches for elements inside the form too -
+    // the combobox's paginated options frame is nobody's submission
+    if (event.target !== this.element) return
+
     const response = event.detail.fetchResponse?.response
     const status = response?.status
     if (!(status === 429 || (status >= 500 && status < 600))) return
@@ -49,8 +52,8 @@ export default class extends Controller {
     }, delay)
   }
 
-  // null when another try is pointless: the attempts are spent, or the response asks to
-  // be waited for longer than we're willing to keep them waiting
+  // null when another try is pointless: the attempts are spent, or the wait asked for is
+  // longer than we'll hold them for
   delayFor (response) {
     if (this.retried >= this.retriesValue) return null
 
@@ -62,21 +65,18 @@ export default class extends Controller {
 
   giveUp () {
     this.retrying = false
-    // The notice asks them to try again, so that try gets the attempts this one spent -
-    // otherwise the second submission gives up the moment it fails, having retried nothing
+    // The notice asks for another try, so that try gets a full budget of its own
     this.retried = 0
-    // The notice is on the page shell, which wraps this form rather than sitting inside it -
-    // so it's above a step whose submit button can be a screen or more below it. Scroll it to
-    // them, or all the failure looks like is a spinner that stopped
+    // The notice lives on the page shell, which can be a screen above the button they
+    // pressed - unscrolled, the failure looks like a spinner that stopped
     const notice = document.querySelector('[data-register-retry-notice]')
     notice?.removeAttribute('hidden')
     notice?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     this.submitButtons.forEach((button) => button.dispatchEvent(new Event('spinner:reset')))
   }
 
-  // Turbo re-enables the button it submitted from once the submission finishes, which this
-  // one has - but the submit hasn't, so leave it disabled under the spinner it's still
-  // showing. A second click during the wait would submit the step twice.
+  // Turbo re-enables the submitter once the submission finishes - but the submit hasn't,
+  // and a second click during the wait would submit the step twice
   holdSubmit = () => {
     if (!this.retrying) return
 
