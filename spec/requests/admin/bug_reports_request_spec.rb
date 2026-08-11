@@ -256,5 +256,31 @@ RSpec.describe Admin::BugReportsController, type: :request do
         expect(response.status).to eq 200
       end
     end
+
+    # Presenting a token skips CSRF, so a forged cross-site write can reach the
+    # action by passing any token at all - the signed in superuser below is the one
+    # such a request rides in on. The token, not the session, has to authorize it
+    context "a junk token forged onto a superuser's session" do
+      let(:current_user) { FactoryBot.create(:superuser) }
+      let(:forged_param) { {access_token: "not-a-real-token"} }
+
+      it "does not update" do
+        patch "#{base_url}/#{bug_report.to_param}", params: forged_param.merge(
+          bug_report: {github_pull_request: "3805"}
+        )
+        expect(response.status).to eq 401
+        expect(json_result[:error]).to eq "OAuth token required"
+        expect(bug_report.reload.github_pull_request).to be_blank
+      end
+
+      it "does not assign tags" do
+        post "#{base_url}/assign_tags", params: forged_param.merge(
+          tags: "forged", bug_reports_selected: {bug_report.id.to_s => bug_report.id}
+        )
+        expect(response.status).to eq 401
+        expect(json_result[:error]).to eq "OAuth token required"
+        expect(bug_report.reload.tags).to eq(%w[parking])
+      end
+    end
   end
 end
