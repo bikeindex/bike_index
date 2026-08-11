@@ -102,8 +102,7 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
         end
       end
 
-      # An IdP may only vouch for its own domain, so no resolution path may reach a user here -
-      # not provisioning, not linking an existing account, not a previously linked identity.
+      # No resolution path may reach a user: not provisioning, not linking, not a returning identity
       context "asserted email domain not in the org" do
         let(:email) { "outsider@gmail.com" }
         it "does not provision or sign in" do

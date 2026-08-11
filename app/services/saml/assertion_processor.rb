@@ -25,11 +25,10 @@ module Saml
       return failure("assertion is missing an email") if email.blank?
 
       organization = saml_configuration.organization
-      # An org's IdP may only ever authenticate emails on the domain that org claims for SSO.
-      # Guarding the whole resolution rather than provisioning alone is what keeps an assertion
-      # for someone else's address - another org's admin, a superadmin - from signing them in.
+      # Guards the whole resolution, not just provisioning: otherwise an assertion for any address -
+      # another org's admin, a superadmin - links or returns an existing account and signs it in.
       return failure("#{email} is not on this organization's SSO domain") unless
-        Organization.saml_email_matching(email)&.id == organization.id
+        organization == Organization.saml_email_matching(email)
 
       # One lookup drives both the returning-user short-circuit and the post-login update.
       identity = SsoIdentity.for(organization:, provider:, uid: name_id) ||
