@@ -39,20 +39,8 @@ default_pages = [
   }
 ]
 
-# Sequences are rebuilt rather than edited in place, so a re-seed picks up changes to the
-# pages above - activation freezes a sequence, and it can't be edited afterward.
-# really_destroy! (and delete_all, which activation would otherwise refuse) - a soft delete
-# would pile up rows, and the sequence doesn't take its pages with it
-discard_sequences = lambda do |sequences|
-  RegistrationSequencePage.where(registration_sequence_id: sequences.select(:id)).delete_all
-  sequences.each(&:really_destroy!)
-end
-
-discard_sequences.call(RegistrationSequence.templates.with_deleted)
-
-# Created rather than draft_for(nil) - every template was just discarded, so there's
-# nothing above this one to clone. faq_url is the ⓘ on every acknowledgment page; an
-# organization can point it at its own policy page, the Bike Index FAQ is the default
+# faq_url is the ⓘ on every acknowledgment page; an organization can point it at its own
+# policy page, the Bike Index FAQ is the default
 template = RegistrationSequence.create!(acknowledgment_text: RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT,
   faq_url: "/info/#{Blog.e_vehicle_acknowledgment_faq}")
 
@@ -69,7 +57,6 @@ template.make_active!
 # the acknowledgment pages never appear, and the flow can't be seen in development.
 brakebills = Organization.find_by_name("Brakebills")
 if brakebills.present?
-  discard_sequences.call(brakebills.registration_sequences.with_deleted)
   sequence = RegistrationSequence.draft_for(brakebills)
   # The school names its own page, the way an organization would in the editor - the
   # template can't, since it's cloned by every organization
