@@ -74,6 +74,13 @@ RSpec.describe "Register flow", :js, type: :system do
     # The manufacturer itself, rather than Manufacturer.other with the id as free text
     expect(BParam.last.manufacturer_id).to eq manufacturer.id
     expect(BParam.last.manufacturer_other).to be_blank
+
+    # This field is autofocused, so the click into it brings no focus event of its own -
+    # typing still replaces the restored name rather than mashing into the middle of it
+    find_field("b_param_manufacturer_id").click
+    send_keys("Kona")
+
+    expect(page).to have_field("b_param_manufacturer_id", with: "Kona")
   end
 
   it "starts a registration, keeps a full details draft across a reload, and completes" do
