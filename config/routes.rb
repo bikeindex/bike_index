@@ -313,7 +313,7 @@ Rails.application.routes.draw do
 
     resources :theft_alert_plans, only: %i[index edit update new create]
 
-    resources :registration_sequences, only: %i[index show edit update] do
+    resources :registration_sequences, only: %i[index create show edit update destroy] do
       member { get :preview }
       resources :pages, only: %i[new create], controller: "registration_sequence_pages"
     end

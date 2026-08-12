@@ -14,12 +14,17 @@ FactoryBot.define do
       end
     end
 
-    factory :registration_sequence_active do
+    trait :activated do
       start_at { Time.current }
     end
 
+    factory :registration_sequence_active, traits: [:activated]
+
+    # The template drafts, activates and archives like an organization's sequence
     factory :registration_sequence_template do
       organization { nil }
+
+      factory :registration_sequence_template_active, traits: [:activated]
     end
   end
 end

@@ -1,6 +1,10 @@
 FactoryBot.define do
   factory :organization_saml_configuration do
-    organization { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
+    # Sequenced because two saml_sso organizations may not claim the same domain
+    sequence(:organization) do |n|
+      FactoryBot.create(:organization_with_organization_features,
+        enabled_feature_slugs: "saml_sso", user_email_domain: "sso-#{n}.example.com")
+    end
 
     trait :enabled do
       enabled { true }

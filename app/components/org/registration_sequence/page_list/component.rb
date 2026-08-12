@@ -7,7 +7,7 @@ module Org
       # drags to reorder and links into each page.
       class Component < ApplicationComponent
         # editable: admin's read-only screen lists a draft without its controls
-        def initialize(registration_sequence:, admin: false, editable: registration_sequence.editable?)
+        def initialize(registration_sequence:, admin: false, editable: registration_sequence.draft?)
           @registration_sequence = registration_sequence
           @editable = editable
           @admin = admin

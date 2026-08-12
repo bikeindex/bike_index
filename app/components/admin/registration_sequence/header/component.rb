@@ -25,14 +25,31 @@ module Admin
           [{label: "View", href: RegistrationSequencePaths.sequence(@registration_sequence, admin: true), active: @mode == :view},
             {label: "Preview", href: RegistrationSequencePaths.preview(@registration_sequence, admin: true), active: @mode == :preview},
             {label: "Edit", href: RegistrationSequencePaths.edit(@registration_sequence, admin: true),
-             active: @mode == :edit, disabled: !@registration_sequence.editable?}]
+             active: @mode == :edit, disabled: !@registration_sequence.draft?}]
         end
 
         # Archived sequences are frozen too, so name which one this is
         def uneditable_title
-          return if @registration_sequence.editable?
+          return if @registration_sequence.draft?
 
           "Can't edit #{@registration_sequence.status_display.downcase} registration sequence - create a draft"
+        end
+
+        def activate_path = RegistrationSequencePaths.activate(@registration_sequence)
+
+        def create_draft_path = RegistrationSequencePaths.create_draft(@registration_sequence.organization_id)
+
+        # What the frozen sequence offers in place of its inert Edit chip. The draft belongs
+        # to the owner rather than to this sequence, so a second archived one points at it too
+        def create_draft_text
+          return "Edit draft" if ::RegistrationSequence.existing_draft_for(@registration_sequence.organization).present?
+
+          "Create draft"
+        end
+
+        def activate_confirm
+          "Make this the live #{@registration_sequence.badge_name} registration sequence? " \
+            "It can't be edited afterward."
         end
 
         # The template has no organization to view it in

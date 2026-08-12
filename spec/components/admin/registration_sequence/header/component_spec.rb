@@ -17,6 +17,10 @@ RSpec.describe Admin::RegistrationSequence::Header::Component, type: :component 
     expect(page).to have_link("View in organization", href: "/o/#{organization.to_param}/registration_sequences/#{registration_sequence.id}")
     # Nothing to explain while it's editable
     expect(page).to_not have_css("[role='tooltip']", visible: :all)
+    # Making the draft live is the header's action; discarding it lives at the foot of the page
+    expect(page).to have_css("form[action='#{admin_url}?activate=true'] button", text: "Activate")
+    expect(page).to_not have_button("Create draft")
+    expect(page).to_not have_button("Discard draft")
   end
 
   it "marks the screen it's on" do
@@ -45,6 +49,21 @@ RSpec.describe Admin::RegistrationSequence::Header::Component, type: :component 
       # The other two stay reachable
       expect(page).to have_link("View", href: admin_url)
       expect(page).to have_link("Preview", href: "#{admin_url}/preview")
+      # What the inert Edit chip points at instead
+      expect(page).to have_css("form[action='/admin/registration_sequences?organization_id=#{organization.id}'] button",
+        text: "Create draft")
+      expect(page).to_not have_button("Activate")
+    end
+
+    context "with a draft already open" do
+      let!(:draft) { FactoryBot.create(:registration_sequence, organization:) }
+
+      it "points at the draft that exists rather than offering a new one" do
+        render_inline(described_class.new(registration_sequence:))
+
+        expect(page).to have_button("Edit draft")
+        expect(page).to_not have_button("Create draft")
+      end
     end
 
     context "archived" do
@@ -61,12 +80,25 @@ RSpec.describe Admin::RegistrationSequence::Header::Component, type: :component 
   context "template" do
     let(:registration_sequence) { FactoryBot.create(:registration_sequence_template) }
 
-    it "names the template once, with no organization to view it in" do
+    it "names the template's status, with no organization to view it in" do
       render_inline(described_class.new(registration_sequence:))
 
-      expect(page).to have_content("Viewing Template registration sequence", normalize_ws: true)
+      expect(page).to have_content("Viewing Template Draft registration sequence", normalize_ws: true)
       expect(page).to have_link("Edit", href: "#{admin_url}/edit")
       expect(page).to_not have_link("View in organization")
+      expect(page).to have_button("Activate")
+    end
+
+    context "live" do
+      let(:registration_sequence) { FactoryBot.create(:registration_sequence_template_active) }
+
+      it "is frozen like any live sequence, and drafts without an organization" do
+        render_inline(described_class.new(registration_sequence:, mode: :edit))
+
+        expect(page).to have_content("Editing Template Current registration sequence", normalize_ws: true)
+        expect(page).to have_css("button[disabled]", text: "Edit")
+        expect(page).to have_css("form[action='/admin/registration_sequences'] button", text: "Create draft")
+      end
     end
   end
 end
