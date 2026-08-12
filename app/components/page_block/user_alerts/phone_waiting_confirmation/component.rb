@@ -19,7 +19,7 @@ module PageBlock
         private
 
         def modal_title
-          translation(".verify_number", phone_number: phone_display(@user_phone.phone))
+          translation(".verify_number", phone_number: Phonifyer.display(@user_phone.phone))
         end
       end
     end
