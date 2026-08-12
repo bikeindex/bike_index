@@ -9,7 +9,11 @@ description: >-
   intermittent, "green locally", "passes on retry", "fix CI", or a pasted
   `gh run`/Actions URL whose failure isn't reproducible; also whenever you catch
   yourself about to delete, skip, loosen, or retry an assertion to make a red
-  build go green. Covers diagnosing the real mechanism, this repo's `flaky:`
+  build go green. **Equally: any spec that fails intermittently while you verify
+  your own work** — deciding whether your change caused a flake, or whether to
+  ship past one, is this skill's problem too, and it arrives with no CI run, no
+  `:flaky` tag, and nobody but you calling it flaky. Covers diagnosing the real
+  mechanism, attributing a flake to a change, this repo's `flaky:`
   retry harness, and the known false-flake causes (missing Tailwind build, shared
   Redis autocomplete cache, Turbo frame timing, probe-run interference).
 ---
