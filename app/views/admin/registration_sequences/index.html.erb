@@ -12,6 +12,15 @@
       end
     end %>
   </li>
+
+  <li class="nav-item tw:text-sm">
+    <% if @template.present? %>
+      <%= link_to "#{@template.display_name} sequence", RegistrationSequencePaths.sequence(@template, admin: true), class: "nav-link" %>
+    <% else %>
+      <%# Nothing for organizations to clone yet - the first template is drafted here %>
+      <%= render UI::ButtonLink::Component.new(text: "Create template", href: RegistrationSequencePaths.create_draft(nil), method: :post, color: :primary, size: :sm) %>
+    <% end %>
+  </li>
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, chart_collection: @render_chart && matching_registration_sequences)) %>

@@ -8,7 +8,7 @@ module Org
         def initialize(registration_sequence:, admin: false)
           @registration_sequence = registration_sequence
           @admin = admin
-          @editable = registration_sequence.editable?
+          @editable = registration_sequence.draft?
         end
 
         private

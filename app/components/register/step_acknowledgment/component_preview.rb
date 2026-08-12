@@ -45,10 +45,8 @@ module Register
         }.as_json)
       end
 
-      # The template stands in where no organization has activated a sequence
-      def preview_sequence
-        ::RegistrationSequence.active_for(lookbook_organization) || ::RegistrationSequence.templates.first
-      end
+      # The live template stands in where no organization has activated a sequence
+      def preview_sequence = ::RegistrationSequence.active_or_template_for(lookbook_organization)
     end
   end
 end
