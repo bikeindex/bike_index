@@ -323,9 +323,13 @@ RSpec.describe "Register flow", :js, type: :system do
 
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
-      fill_in "bike[serial_number]", with: "GIFT1234"
 
-      # Required, so the browser holds the submit without any js of ours
+      # Marking it missing hides the input, which still has to submit the "unknown" it holds
+      check "Missing serial"
+      expect(page).to have_no_field("bike[serial_number]")
+
+      # user_name is required, so the browser holds the submit without any js of ours -
+      # and holds it on that alone, not on the serial it can no longer see
       click_button "Complete Bike Registration"
       expect(page).to have_current_path(/step=2/, url: true)
       expect(Bike.count).to eq 0
@@ -336,7 +340,12 @@ RSpec.describe "Register flow", :js, type: :system do
       expect(page).to have_content("Registration complete")
       # Their friend's registration to claim, not theirs
       expect(page).to have_content("We've emailed #{friend_email} so they can claim")
-      expect(Bike.last).to have_attributes(owner_email: friend_email, owner_name: user_name)
+      expect(Bike.last).to have_attributes(owner_email: friend_email, owner_name: user_name,
+        serial_number: "unknown")
+      # What the browser actually posted: a bike built without any serial at all is
+      # given "unknown" too (BikeServices::Builder), so the bike alone can't tell a
+      # hidden field that submitted from one that didn't
+      expect(BParam.last.bike["serial_number"]).to eq "unknown"
     end
   end
 
