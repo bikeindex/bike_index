@@ -2,7 +2,10 @@ require "rails_helper"
 
 RSpec.describe Saml::SettingsBuilder, :saml_env do
   let(:idp_cert) { File.read(Rails.root.join("spec/fixtures/saml/idp_cert.pem")) }
-  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
+  let(:organization) do
+    FactoryBot.create(:organization_with_organization_features,
+      enabled_feature_slugs: "saml_sso", user_email_domain: "example.edu")
+  end
   let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
   subject(:settings) { described_class.build(saml_configuration) }
 

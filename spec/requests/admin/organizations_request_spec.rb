@@ -245,7 +245,10 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       end
     end
     context "update organization_saml_configuration" do
-      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: "saml_sso", user_email_domain: "example.edu")
+      end
       let(:saml_attributes) do
         {enabled: "1", idp_entity_id: "https://idp.example.edu/",
          idp_sso_target_url: "https://idp.example.edu/idp/profile/SAML2/POST/SSO",
