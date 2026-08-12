@@ -10,7 +10,7 @@ module UI
       end
 
       def with_country_code_and_extension
-        render(UI::PhoneDisplay::Component.new(phone: "+91 8041505583 x2929", class: "twlink tw:font-mono"))
+        render(UI::PhoneDisplay::Component.new(phone: "+91 8041505583 x2929"))
       end
 
       def skip_link
