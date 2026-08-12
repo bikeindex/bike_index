@@ -136,6 +136,25 @@ Caveat when measuring locally: after a heavy record-creating run (seeding,
 probe scripts, a big suite), `:js` specs fail spuriously for a while. Re-measure
 in a quiet environment before concluding a spec is flaky.
 
+### 5. Blaming your own change needs both arms measured together
+
+"Is this spec flaky?" and "did my change make it flaky?" are different questions.
+The second one is where sequential sampling lies to you: local load drifts — a
+browser left open, another suite, the machine waking up — so a sample taken now
+and one taken an hour ago aren't comparable, and whichever arm ran while things
+were busy looks guilty.
+
+Revert *only* the suspect change and run both arms the same number of times, back
+to back, then compare. Measured that way here, a patch blamed for `:js` failures
+on sequential samples (0 failures in 9 clean runs against 5 in 13 patched ones)
+came out at 2/6 versus the baseline's 1/6 — indistinguishable, and the spec was
+flaky on its own. Sample sizes this small can't separate a 17% failure rate from
+a 7% one, so treat a handful of green runs as weak evidence in either direction.
+
+Ruling ordering out is cheap and worth doing first: RSpec prints `Randomized with
+seed N`, and `--seed N` replays that order. A failing seed that passes on replay
+leaves timing, not ordering or leaked state.
+
 ## Known causes in this repo
 
 Work through these before inventing a new theory — most flakes here are one of
