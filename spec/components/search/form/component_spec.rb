@@ -22,6 +22,17 @@ RSpec.describe Search::Form::Component, type: :component do
     expect(component).to_not have_css("#primary_activity")
   end
 
+  # The button is the icon and nothing else, and an SVG with only a viewBox is
+  # sized at each browser's discretion -- one that resolves it to zero renders a
+  # blank blue button
+  it "renders the search icon at a size it does not leave to the browser" do
+    icon = component.at_css("#search-button")
+
+    expect(icon["width"]).to eq "29"
+    expect(icon["height"]).to eq "29"
+    expect(icon["class"]).to match(/tw:w-full/)
+  end
+
   context "with primary_activity" do
     let!(:primary_activity) { FactoryBot.create(:primary_activity) }
     let(:interpreted_params) { BikeSearchable.searchable_interpreted_params({primary_activity: primary_activity.id}) }

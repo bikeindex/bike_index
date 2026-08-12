@@ -3,6 +3,12 @@
 require "rails_helper"
 
 RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
+  # The dialog locks the page behind it by pinning the body -- with overflow
+  # everywhere except iOS, where only position sticks
+  def scroll_locked_body
+    "body[style*='overflow: hidden'], body[style*='position: fixed']"
+  end
+
   it "opens, filters, selects, and closes" do
     visit "/rails/view_components/ui/forms/combobox/component/default"
 
@@ -135,7 +141,7 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
 
     # The gem swaps to a full screen dialog below its mobile breakpoint, and
     # selecting there fills the input after the selection event, never focusing it
-    it "mirrors a selection made in the small viewport dialog" do
+    it "mirrors a selection made in the small viewport dialog, and always unlocks the page" do
       page.current_window.resize_to(390, 844)
       visit "/rails/view_components/ui/forms/combobox/component/stacked"
 
@@ -144,10 +150,24 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
       find_field("Registration type").click
 
       expect(page).to have_css("dialog[open]")
+      expect(page).to have_css(scroll_locked_body)
+
+      # Android's back gesture closes the dialog with a close request rather than a
+      # keypress, which nothing on the page can synthesize. The controller used to
+      # unlock only along its own collapse path, stranding the page unscrollable.
+      page.execute_script("document.querySelector('dialog[open]').close()")
+
+      expect(page).to have_no_css("dialog[open]")
+      expect(page).to have_no_css(scroll_locked_body)
+
+      find_field("Registration type").click
+
+      expect(page).to have_css("dialog[open]")
 
       find('[role="option"]', text: "It was stolen").click
 
       expect(page).to have_no_css("dialog[open]")
+      expect(page).to have_no_css(scroll_locked_body)
       expect(page).to have_css("#{overlay} span", text: "It was stolen")
     end
   end
