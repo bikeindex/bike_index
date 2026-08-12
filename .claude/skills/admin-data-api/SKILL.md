@@ -67,7 +67,7 @@ It fetches sidekiq then pghero and prints a `summary:` line and an `OK`/`ABNORMA
 .claude/skills/admin-data-api/scripts/admin_data.rb update-bug-report 42 tags=search,broken github_pull_request=4064 status=resolved
 ```
 
-`get bug_reports` takes any index filter as `key=value`: `search_status` (defaults to the investigate statuses — pass `all`, or one of `BugReport.statuses`), `query` (full text over subject and body), `search_email` (partial, case insensitive, matches the sender), `search_receiver` (exact, which of our addresses it arrived at), `search_tag`, `search_membership` (`member`, `paid_organization`, `paid_organization_staff`), `user_id`, `sort`/`direction`, `per_page`/`page`, `period`/`start_time`/`end_time`. A `search_tag` or `search_receiver` nothing has matches nothing, rather than being ignored. It returns `bug_reports`, `page`, `per_page`, `total_count`.
+`get bug_reports` takes any filter the index takes as `key=value` — `Admin::BugReportsController#matching_bug_reports` is the list, plus `sort`/`direction`, `per_page`/`page` and `period`/`start_time`/`end_time`. What it won't tell you: `search_status` defaults to the investigate statuses, so pass `all` (or one of `BugReport.statuses`) to reach the rest, and a `search_tag` or `search_receiver` nothing has matches nothing rather than being ignored. It returns `bug_reports`, `page`, `per_page`, `total_count`.
 
 `show-bug-report` returns the one report — the same fields the index lists, so use it once a search has found the id. `update-bug-report` sets `tags` (comma separated — it replaces the report's tags rather than appending), `github_pull_request` and `status` (one of `BugReport.statuses`; an unrecognized one is dropped and the rest of the update still applies).
 

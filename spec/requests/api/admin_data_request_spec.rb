@@ -6,36 +6,13 @@ RSpec.describe "Admin Data API", type: :request do
   include_context :admin_doorkeeper_token
 
   shared_examples "requires admin_data superuser" do
+    include_examples "rejects_unauthorized_token"
+
     context "no token" do
       it "returns 401" do
         get url
         expect(response.status).to eq 401
         expect(json_result[:error]).to eq "OAuth token required"
-      end
-    end
-
-    context "token from the wrong app" do
-      before { stub_const("API::TokenAuthenticatable::ADMIN_DOORKEEPER_APP_ID", doorkeeper_app.id + 1) }
-      it "returns 403" do
-        get url, params: token_param
-        expect(response.status).to eq 403
-        expect(json_result[:error]).to eq "Unauthorized application"
-      end
-    end
-
-    context "token for a non-superuser" do
-      it "returns 403" do
-        get url, params: token_param
-        expect(response.status).to eq 403
-        expect(json_result[:error]).to eq "Not permitted"
-      end
-    end
-
-    context "token for a user with an unrelated superuser ability" do
-      before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "bikes") }
-      it "returns 403" do
-        get url, params: token_param
-        expect(response.status).to eq 403
       end
     end
   end

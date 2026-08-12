@@ -245,37 +245,14 @@ RSpec.describe Admin::BugReportsController, type: :request do
     include_context :admin_doorkeeper_token
     include_context :test_csrf_token
 
+    let(:url) { "#{base_url}.json" }
+    include_examples "rejects_unauthorized_token"
+
     context "without a token or a session" do
       it "redirects" do
-        get "#{base_url}.json"
+        get url
         expect(response.status).to eq 302
         expect(flash[:error]).to be_present
-      end
-    end
-
-    context "a token matching no record" do
-      it "returns 401" do
-        get "#{base_url}.json", params: {access_token: "not-a-real-token"}
-        expect(response.status).to eq 401
-        expect(json_result[:error]).to eq "OAuth token required"
-      end
-    end
-
-    context "token from the wrong app" do
-      before { stub_const("API::TokenAuthenticatable::ADMIN_DOORKEEPER_APP_ID", doorkeeper_app.id + 1) }
-      it "returns 403" do
-        get "#{base_url}.json", params: token_param
-        expect(response.status).to eq 403
-        expect(json_result[:error]).to eq "Unauthorized application"
-      end
-    end
-
-    context "token for a user without the bug_reports ability" do
-      before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "bikes") }
-      it "returns 403" do
-        get "#{base_url}.json", params: token_param
-        expect(response.status).to eq 403
-        expect(json_result[:error]).to eq "Not permitted"
       end
     end
 

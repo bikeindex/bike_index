@@ -13,12 +13,11 @@ module API
     def current_user
       return super unless token_request?
 
-      authorize_user(doorkeeper_token)[:user]
+      authorize_user[:user]
     end
 
     # doorkeeper_token is nil for a revoked token, so branch on the string as presented -
-    # that caller gets the API's 401 rather than a redirect to sign in. Every current_user
-    # call asks, which an admin page render does ~10 times
+    # that caller gets the API's 401 rather than a redirect to sign in
     def token_request?
       return @token_request if defined?(@token_request)
 
@@ -27,14 +26,14 @@ module API
     end
 
     # Returns {user:} when the token authorizes a user, otherwise {error:, status:}
-    def authorize_user(access_token)
+    def authorize_user
       return @authorize_user if defined?(@authorize_user)
 
-      @authorize_user = if !access_token&.accessible?
+      @authorize_user = if !doorkeeper_token&.accessible?
         {status: 401, error: "OAuth token required"}
-      elsif !authorized_app?(access_token)
+      elsif !authorized_app?(doorkeeper_token)
         {status: 403, error: "Unauthorized application"}
-      elsif (user = User.find_by(id: access_token.resource_owner_id))
+      elsif (user = User.find_by(id: doorkeeper_token.resource_owner_id))
         {user:}
       else
         {status: 401, error: "User not found"}
@@ -42,7 +41,7 @@ module API
     end
 
     def require_token_superuser!
-      auth = authorize_user(doorkeeper_token)
+      auth = authorize_user
       return render(json: {error: auth[:error]}, status: auth[:status]) if auth[:error]
       return if auth[:user].superuser?(controller_name:, action_name:)
 
