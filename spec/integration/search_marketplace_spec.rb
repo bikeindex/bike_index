@@ -84,18 +84,35 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     find("#search-button").click
   end
 
-  # Hold back the unfiltered results the frame eager-loads on arrival. Returns the
-  # release, so the example decides when they land rather than racing a timer.
+  # The results frame's own eager load - the unfiltered one a search submitted while
+  # it's still in flight has to supersede.
+  def initial_results_request?(request)
+    request.headers["turbo-frame"] == "marketplace_results_frame" &&
+      !request.url.include?("primary_activity=")
+  end
+
+  # Hold back the unfiltered results the frame eager-loads on arrival. The release
+  # returns once the page has the whole response and the moment Turbo needs to render
+  # it, so the example asserts against a response that was dropped rather than one
+  # that hasn't arrived. It waits on that response rather than on the page going
+  # network-idle, which any unrelated slow request holds open for its whole timeout.
   def hold_initial_results_load
     held = Queue.new
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.route("**/search/marketplace*", ->(route, request) {
-        held.pop if request.headers["turbo-frame"] == "marketplace_results_frame" &&
-          !request.url.include?("primary_activity=")
+        held.pop if initial_results_request?(request)
         route.continue
       })
     end
-    -> { held.push(:release) }
+
+    lambda do
+      page.driver.with_playwright_page do |playwright_page|
+        response = playwright_page
+          .expect_response(->(candidate) { initial_results_request?(candidate.request) }) { held.push(:release) }
+        response.finished
+        playwright_page.wait_for_timeout(500)
+      end
+    end
   end
 
   it "fills the kind counts on load, and keeps a search made before the results arrive" do
@@ -113,7 +130,6 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
 
     # The unfiltered results are only now allowed to arrive - they mustn't take over
     release_initial_results_load.call
-    page.driver.with_playwright_page { |playwright_page| playwright_page.wait_for_load_state(state: "networkidle") }
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", count: 6)
     expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/)
   end
