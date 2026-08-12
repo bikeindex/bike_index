@@ -33,11 +33,15 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       all("input[name='query_items[]']", visible: :all).map(&:value)
     end
 
-    # Type a query into the combobox, then click the matching autocomplete option
+    # Type a query into the combobox, then click the matching autocomplete option.
+    # Selecting refocuses the combobox asynchronously, and anything typed into another
+    # field before that lands goes to the combobox instead - so wait for it to close,
+    # the same as a user who types on once the dropdown has gone.
     def combobox_select(query, option_text)
       type_into(".hw-combobox__input", query)
       expect(page).to have_css(".hw-combobox__option", text: option_text, wait: 30)
       click_combobox_option(option_text)
+      expect(page).to have_css('.hw-combobox__input[aria-expanded="false"]', wait: 10)
     end
 
     def expect_count(kind_scope, value = :greater_than_zero)
@@ -99,6 +103,10 @@ RSpec.describe Search::Form::Component, :js, type: :system do
       find("#distance").set(distance)
       find("#location").set(location)
       expect(page_text(page.text)).to match("miles of")
+      # setSearchProximity saves whatever the fields hold at submit-end, so pin them here:
+      # a failure on these says the set was lost, rather than the storage write being wrong
+      expect(page).to have_field("distance", with: distance, visible: :all)
+      expect(page).to have_field("location", with: location, visible: :all)
 
       # Submit via the button — Enter on the combobox is flaky under Playwright
       # (refocusing it reopens the dropdown, which swallows the keypress).

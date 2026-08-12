@@ -321,6 +321,14 @@ RSpec.shared_examples "bike_searchable" do
         expect(organization.bikes.search_close_serials(interpreted_params).pluck(:id)).to eq([stolen_bike.id])
       end
     end
+    context "close serial under the default trigram similarity threshold" do
+      let!(:similar_bike) { FactoryBot.create(:bike, serial_number: "G8FA08255") }
+      let(:query_params) { {serial: "G8FY082T5", stolenness: "all"} }
+      # Two edits apart but only 0.25 similar, so CLOSE_SERIAL_SIMILARITY has to be below pg_trgm's 0.3 default
+      it "returns the match" do
+        expect(Bike.search_close_serials(interpreted_params).pluck(:id)).to eq([similar_bike.id])
+      end
+    end
   end
 
   describe "search_serials_containing" do

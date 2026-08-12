@@ -15,6 +15,13 @@ module UI
           "Man braid sustainable solarpunk vexillologist grailed marxism schlitz big mood shabby chic cornhole yuccie PBR&B vegan."
         end
       end
+
+      def divided
+        render(UI::Card::Component.new(divided: true)) do
+          safe_join(["Man braid sustainable solarpunk", "Vexillologist grailed marxism schlitz", "Big mood shabby chic cornhole"]
+            .map { |row| tag.div(row, class: "tw:px-4 tw:py-3.5 tw:text-sm") })
+        end
+      end
     end
   end
 end

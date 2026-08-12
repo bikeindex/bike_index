@@ -13,7 +13,7 @@ module ControllerHelpers
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
       :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
       :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert,
-      :display_dev_info?, :current_country_id, :current_currency
+      :display_dev_info?, :current_country_id, :current_currency, :turbo_request?
     before_action :enable_rack_profiler
 
     before_action do
@@ -154,8 +154,7 @@ module ControllerHelpers
   def show_general_alert
     return @show_general_alert = false if @skip_general_alert || current_user.blank?
 
-    ignored_alerts = Flipper.enabled?(:phone_verification) ? [] : %w[phone_waiting_confirmation]
-    return @show_general_alert = false unless (current_user.alert_slugs - ignored_alerts).any?
+    return @show_general_alert = false unless (current_user.alert_slugs - UserAlert.disabled_kinds).any?
 
     no_alerts = %w[payments theft_alerts].include?(controller_name) || %w[support_bike_index].include?(action_name)
     @show_general_alert = !no_alerts
@@ -236,9 +235,9 @@ module ControllerHelpers
   #
   # For example, in `ApplicationController#handle_unverified_request` we have
   #
-  #   flash[:error] = translation(:csrf_invalid, scope: [:controllers, :application, __method__])
+  #   flash[:error] = translation(:invalid_authenticity_token, scope: [:controllers, :application, __method__])
   #
-  # which maps to controllers.application.handle_unverified_request.csrf_invalid.
+  # which maps to controllers.application.handle_unverified_request.invalid_authenticity_token.
   #
   # In `LocksController#find_lock`, by contrast, the full scope can be inferred
   # from the method invocation:

@@ -55,6 +55,30 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
         expect(response.body).to match(/form action=.\/oauth\/authorize/)
         expect(response.body).to_not include("fbevents.js")
       end
+      context "non-https redirect_uri" do
+        before { doorkeeper_app.update(redirect_uri:) }
+
+        context "custom scheme, like a native app" do
+          let(:redirect_uri) { "bikeindex://oauth-callback" }
+          it "renders without the insecure authorization modal" do
+            get authorization_url
+            expect(response.code).to eq("200")
+            expect(response.body).to_not match("insecure-authorization-modal")
+          end
+        end
+
+        context "cleartext http" do
+          let(:redirect_uri) { "http://app.com" }
+          it "renders the insecure authorization modal, its cancel button denying" do
+            get authorization_url
+            expect(response.code).to eq("200")
+            expect(response.body).to match("insecure-authorization-modal")
+            # Cancelling has to deny - closing the modal is the documented way to continue anyway
+            expect(response.body).to match(/<form[^>]*id="deny-authorization"/)
+            expect(response.body).to match(/<button[^>]*form="deny-authorization"/)
+          end
+        end
+      end
       context "no scope" do
         let(:scope_param) { "" }
         it "errors" do
@@ -151,6 +175,65 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
           expect(access_token.resource_owner_id).to eq current_user.id
           expect(access_token.scopes).to match_array(%w[write_bikes read_bikes])
         end
+      end
+    end
+
+    describe "authorization_code flow with PKCE" do
+      let(:code_verifier) { "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk" }
+      let(:code_challenge) { Base64.urlsafe_encode64(Digest::SHA256.digest(code_verifier), padding: false) }
+      let(:code_challenge_method) { "S256" }
+      let(:authorize_params) { "response_type=code&redirect_uri=#{doorkeeper_app.redirect_uri}&client_id=#{doorkeeper_app.uid}&scope=read_bikes&code_challenge=#{code_challenge}&code_challenge_method=#{code_challenge_method}" }
+      # No client_secret - the point of PKCE is securing public clients, which can't keep one
+      let(:token_params) { "grant_type=authorization_code&redirect_uri=#{doorkeeper_app.redirect_uri}&client_id=#{doorkeeper_app.uid}" }
+      let(:auth_code) do
+        post "/oauth/authorize?#{authorize_params}"
+        response.redirect_url[/code=[^&]*/i].gsub(/code=/i, "")
+      end
+
+      it "stores the challenge and exchanges the code for a token" do
+        expect(Doorkeeper::AccessGrant.find_by(token: auth_code).code_challenge).to eq code_challenge
+        post "/oauth/token?#{token_params}&code=#{auth_code}&code_verifier=#{code_verifier}"
+        expect(Doorkeeper::AccessToken.count).to eq 1
+        expect(json_result["access_token"]).to eq Doorkeeper::AccessToken.last.token
+      end
+
+      context "mismatched code_verifier" do
+        it "refuses the token" do
+          post "/oauth/token?#{token_params}&code=#{auth_code}&code_verifier=#{code_verifier.reverse}"
+          expect(response.code).to eq("400")
+          expect(json_result["error"]).to eq "invalid_grant"
+          expect(Doorkeeper::AccessToken.count).to eq 0
+        end
+      end
+
+      context "missing code_verifier" do
+        it "refuses the token" do
+          post "/oauth/token?#{token_params}&code=#{auth_code}"
+          expect(response.code).to eq("400")
+          expect(json_result["error"]).to eq "invalid_request"
+          expect(Doorkeeper::AccessToken.count).to eq 0
+        end
+      end
+
+      context "code_challenge_method=plain" do
+        let(:code_challenge_method) { "plain" }
+        let(:code_challenge) { code_verifier }
+        it "refuses to authorize" do
+          get "/oauth/authorize?#{authorize_params}"
+          expect(response.code).to eq("400")
+          expect(response).to render_template(:error)
+          expect(response.body).to match("code_challenge_method must be S256")
+          expect(Doorkeeper::AccessGrant.count).to eq 0
+        end
+      end
+    end
+
+    describe "password flow" do
+      it "isn't supported, even with valid credentials" do
+        post "/oauth/token?grant_type=password&client_id=#{doorkeeper_app.uid}&client_secret=#{doorkeeper_app.secret}&username=#{CGI.escape(current_user.email)}&password=testthisthing7$&scope=read_bikes"
+        expect(response.code).to eq("400")
+        expect(json_result["error"]).to eq "unsupported_grant_type"
+        expect(Doorkeeper::AccessToken.count).to eq 0
       end
     end
 

@@ -15,7 +15,7 @@ RSpec.describe Admin::BugReportsController, type: :request do
 
     context "json" do
       let(:target_json) do
-        bug_report.as_json(only: %w[id user_id email from_name subject body tags github_pull_request
+        bug_report.as_json(only: %w[id user_id email from_name receiver subject body tags github_pull_request
           is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
       end
 
@@ -76,6 +76,38 @@ RSpec.describe Admin::BugReportsController, type: :request do
       end
     end
 
+    context "with search_receiver" do
+      let!(:bug_report_support) { FactoryBot.create(:bug_report, receiver: "support@bikeindex.org") }
+
+      it "filters by the receiver" do
+        expect(bug_report.receiver).to eq "contact@bikeindex.org"
+        get "#{base_url}.json", params: {search_receiver: "support@bikeindex.org", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_support.id])
+      end
+
+      it "matches nothing for a receiver no bug report has" do
+        expect(bug_report).to be_present
+        get "#{base_url}.json", params: {search_receiver: "nonsense@bikeindex.org", search_status: "all"}
+        expect(json_result["bug_reports"]).to eq([])
+      end
+
+      it "names the search in the count detail" do
+        get base_url, params: {search_receiver: "support@bikeindex.org", search_status: "all"}
+        expect(response.body).to match(/1<\/strong>\s*Matching/)
+        expect(response.body).to include("receiver: <code>support@bikeindex.org</code>")
+      end
+    end
+
+    context "with search_email" do
+      let!(:bug_report_other) { FactoryBot.create(:bug_report, email: "someone@example.com") }
+
+      it "filters by a partial, case insensitive match" do
+        expect(bug_report.email).to_not eq bug_report_other.email
+        get "#{base_url}.json", params: {search_email: "SOMEONE@example", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_other.id])
+      end
+    end
+
     context "with search_membership" do
       let!(:bug_report_paid) { FactoryBot.create(:bug_report, is_paid_organization: true) }
 
@@ -99,16 +131,37 @@ RSpec.describe Admin::BugReportsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
     end
+
+    context "with a user" do
+      let(:bug_report) { FactoryBot.create(:bug_report, user: FactoryBot.create(:user)) }
+
+      it "renders, linking to the user" do
+        get "#{base_url}/#{bug_report.to_param}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(response.body).to include(admin_user_path(bug_report.user_id))
+      end
+    end
   end
 
   describe "update" do
     it "updates from the form, splitting tags" do
       patch "#{base_url}/#{bug_report.to_param}", params: {
-        bug_report: {tags: "parking, Search", github_pull_request: "3805"}
+        bug_report: {tags: "parking, Search", github_pull_request: "3805", status: "investigate_priority_high"}
       }
       expect(response).to redirect_to(admin_bug_report_path(bug_report))
       expect(flash[:success]).to be_present
-      expect(bug_report.reload).to have_attributes(tags: %w[parking search], github_pull_request: 3805)
+      expect(bug_report.reload).to have_attributes(tags: %w[parking search], github_pull_request: 3805,
+        status: "investigate_priority_high")
+    end
+
+    context "with an unknown status" do
+      it "ignores it" do
+        expect(bug_report.status).to eq "unprioritized"
+        patch "#{base_url}/#{bug_report.to_param}", params: {bug_report: {status: "nonsense", tags: "parking"}}
+        expect(response).to redirect_to(admin_bug_report_path(bug_report))
+        expect(bug_report.reload).to have_attributes(status: "unprioritized", tags: ["parking"])
+      end
     end
 
     context "json" do
@@ -120,6 +173,16 @@ RSpec.describe Admin::BugReportsController, type: :request do
         expect(bug_report.reload).to have_attributes(tags: %w[broken search], github_pull_request: 3805)
         expect(json_result.dig("bug_report", "tags")).to eq(%w[broken search])
       end
+    end
+  end
+
+  describe "tag_chips" do
+    it "renders a chip for each combobox value, verbatim so the combobox can remove it" do
+      post "#{base_url}/tag_chips", params: {combobox_values: "search,Not Yet Normalized", for_id: "bug_report_tags"},
+        as: :turbo_stream
+      expect(response.status).to eq(200)
+      expect(response.body.scan(/<span>([^<]+)<\/span>/).flatten).to eq(["search", "Not Yet Normalized"])
+      expect(response.body).to include('data-hw-combobox-value-param="Not Yet Normalized"')
     end
   end
 

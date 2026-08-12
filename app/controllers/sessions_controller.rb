@@ -10,6 +10,7 @@ class SessionsController < ApplicationController
   before_action :redirect_forced_saml, only: %i[identify create create_magic_link]
 
   def new
+    @email = params[:email]
     render_partner_or_default_signin_layout
   end
 
@@ -41,11 +42,11 @@ class SessionsController < ApplicationController
 
   def magic_link
     @token = params[:token]
-    @incorrect_token = params[:incorrect_token].presence
+    @failure = magic_link_failure(params[:incorrect_token]) if params[:incorrect_token].present?
   end
 
   def sign_in_with_magic_link
-    user = User.find_by_magic_link_token(params[:token])
+    user = User.find_for_auth_token("magic_link_token", params[:token])
     if user.present? && !user.auth_token_expired?("magic_link_token")
       user.confirm(user.confirmation_token) unless user.confirmed?
       @user = user
@@ -58,14 +59,11 @@ class SessionsController < ApplicationController
 
   def create_magic_link
     user = User.fuzzy_confirmed_or_unconfirmed_email_find(params[:email])
-    if user.blank?
-      matching_organization = Organization.passwordless_email_matching(params[:email])
-      if matching_organization.present?
-        organization_role = OrganizationRole.create_passwordless(invited_email: params[:email],
-          created_by_magic_link: true,
-          organization_id: matching_organization.id)
-        user = organization_role.user
-      end
+    # Claiming a domain for passwordless sign-in is enough to mint the account, nothing more.
+    # A role only follows if the org also has user_role_for_user_email_domain, which
+    # CallbackJobs::AfterUserCreateJob grants once the new user is confirmed.
+    if user.blank? && Organization.passwordless_email_matching(params[:email]).present?
+      user = UserServices::PasswordlessCreator.find_or_create(params[:email]).first
     end
     if user.present?
       send_magic_link_and_redirect(user)
@@ -96,6 +94,21 @@ class SessionsController < ApplicationController
     end
   end
 
+  # Hand back the form they submitted rather than dumping them at user_root_url
+  def handle_unverified_request
+    flash.now[:error] = invalid_authenticity_token_message
+    case action_name
+    when "sign_in_with_magic_link"
+      @token = params[:token]
+      render_partner_or_default_signin_layout(render_action: :magic_link)
+    when "identify", "create", "create_magic_link"
+      @email = submitted_email
+      render_partner_or_default_signin_layout(render_action: :new)
+    else
+      super
+    end
+  end
+
   def destroy
     remove_session
     if params[:partner] == "bikehub"
@@ -119,11 +132,12 @@ class SessionsController < ApplicationController
     Organization.passwordless_email_matching(email).present? ? "magic_link" : "password"
   end
 
-  # See the before_action: hand an SSO-managed email off to the IdP. Redirecting here
-  # halts the filter chain, so the action never runs for a forced-SSO email.
-  def redirect_forced_saml
-    organization = Organization.saml_email_matching(submitted_email)
-    redirect_to saml_init_path(org_slug: organization.to_param) if organization.present?
+  # A dead token matches no user whatever killed it, so its timestamp is all that's left to read
+  def magic_link_failure(token)
+    return :unrecognized unless SecurityTokenizer.recognized_token?(token)
+
+    expired = SecurityTokenizer.token_time(token) < Time.current - User::AUTH_TOKEN_EXPIRY
+    expired ? :expired : :already_used
   end
 
   def send_magic_link_and_redirect(user)
@@ -132,12 +146,6 @@ class SessionsController < ApplicationController
     session[:magic_link_remember_me] = Binxtils::InputNormalizer.boolean(submitted_remember_me)
     user.send_magic_link_email
     redirect_to magic_link_sent_session_path(partner: sign_in_partner)
-  end
-
-  # The three guarded actions carry the email in different params: identify/create post
-  # session[:email]; create_magic_link posts a top-level :email.
-  def submitted_email
-    params.dig(:session, :email).presence || params[:email]
   end
 
   def submitted_remember_me

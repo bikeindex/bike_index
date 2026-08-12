@@ -30,6 +30,7 @@ data:
     - ['components.admin.badges.{:}.*', 'app/components/admin/badges/\1/component.%{locale}.yml']
     - ['components.emails.partials.{:}.*', 'app/components/emails/partials/\1/component.%{locale}.yml']
     - ['components.org.registration_sequence.{:}.*', 'app/components/org/registration_sequence/\1/component.%{locale}.yml']
+    - ['components.page_block.user_alerts.{:}.*', 'app/components/page_block/user_alerts/\1/component.%{locale}.yml']
     - ['components.registrations.show.current_alerts.{:}.*', 'app/components/registrations/show/current_alerts/\1/component.%{locale}.yml']
     - ['components.registrations.show.org_top_actions.{:}.*', 'app/components/registrations/show/org_top_actions/\1/component.%{locale}.yml']
     - ['components.registrations.show.{:}.*', 'app/components/registrations/show/\1/component.%{locale}.yml']
@@ -173,6 +174,8 @@ ignore_unused:
   - "components.*" # our translation helper component blocks detection
   - "shared.organized_menu_items.*" # used dynamically by OrganizedServices::UserMenuItems
   - "shared.register_flow.*" # used dynamically by BikeServices::Register
+  - "bikes.stolen_checklist.*" # Bikes::StolenChecklist reads these with an explicit scope,
+    # so they stay here rather than moving to the component and orphaning their translations
   - "*_mailer.*"
   - "date.*"
   - "datetime.*"

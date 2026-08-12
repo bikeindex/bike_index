@@ -2015,8 +2015,7 @@ en:
       unsubscribe_update:
         successfully_unsubscribed: You have been unsubscribed from Bike Index updates.
       update:
-        accept_tos: You have to accept the Terms of Service if you would like to use
-          Bike Index.
+        accept_tos: You must agree to the terms to use Bike Index
         accept_tos_to_use_as_org: >-
           You have to accept the Terms of Service if you would like to use Bike Index
           through an organization
@@ -3838,12 +3837,20 @@ en:
     registrations_embed: >-
       Embedable %{organization} Bike Index registration form. Register your bike for
       free, right now
+    search_marketplace_index: >-
+      Bikes for sale on Bike Index. Search the marketplace by manufacturer, price
+      and location.
+    search_registrations_index: Search for bikes that have been registered on Bike
+      Index
     sessions_create: Log in to Bike Index
     sessions_new: Log in to Bike Index
     stolen_index: Bike Index helps recover your stolen bike
     stolen_merging: >-
       StolenBicycleRegistry.com merged with Bike Index in 2014 to become the largest
       open bike registration service in the world
+    strava_search_index: >-
+      Associate your Strava gear with your Bike Index registrations. Search, filter,
+      and bulk-update your activities to assign gear to rides that are missing it.
     users_new: Sign up for Bike Index
     welcome_index: 'The best bike registry: Simple, secure and free.'
   meta_titles:
@@ -3873,18 +3880,21 @@ en:
     news_index: Bike Index Blog
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
-    register_acknowledgment: "%{cycle_type} safety check"
+    register_acknowledgment: Safety check for your %{cycle_type}
     register_confirm: Confirming your email
     register_create: Register your %{cycle_type}!
+    register_report: Tell us what happened
     register_review: Review your %{cycle_type} safety check
-    register_show: "%{cycle_type} registration"
+    register_show: Your %{cycle_type} registration
     register_step_1: Register your %{cycle_type}!
     register_step_2: Add your %{cycle_type}'s details
     registrations_embed: Register a bike with %{organization}
+    search_marketplace_index: Bike Index Marketplace
     search_registrations_index: Search results
     sessions_create: Log in
     sessions_new: Log in
     stolen_index: Bike registry
+    strava_search_index: Bike Index Strava Search
     users_accept_terms: Terms of use - Bike Index
     users_accept_vendor_terms: Organization terms - Bike Index
     users_confirm: Confirm your email - Bike Index
@@ -4662,6 +4672,12 @@ en:
       subject: Join %{organization_name}on Bike Index
     partial_register_confirmation:
       subject: Confirm your email to finish your %{organization_name}registration
+    partial_register_confirmation_abandoned:
+      subject: Finish reporting your abandoned %{cycle_type}
+    partial_register_confirmation_found:
+      subject: Finish reporting your found %{cycle_type}
+    partial_register_confirmation_stolen:
+      subject: Finish reporting your stolen %{cycle_type}
     partial_registration:
       subject: Finish your %{organization_name}Bike Index registration!
   payments:
@@ -4768,6 +4784,12 @@ en:
       enter_email_address: Enter your email address, we'll send you an email with
         a link to log in.
       get_sign_in_link: Get sign in link
+      link_already_used: That sign in link has already been used
+      link_expired: That sign in link has expired
+      links_work_for: Sign in links work for %{duration} after they're sent.
+      only_the_newest_link_works: >-
+        You may already be signed in somewhere else. If you asked for more than one
+        email, only the link in the newest one works.
       reenter_email: Please re-enter your email address to receive a new token
       sign_in_with_magic_link: Passwordless sign in
       unable_to_auth: Unable to authenticate that token
@@ -4993,19 +5015,6 @@ en:
       you: You
       your_bikes: Your bikes
       your_preferences: Your preferences
-    law_enforcement_donation_modal:
-      bikeindex_is_a_nonprofit: >-
-        Bike Index is a 501(c)(3) nonprofit. We depend on donations to provide these
-        services. We recommend law enforcement agencies like %{org_name} donate at
-        least $20 a year to help support our efforts.
-      contact_bike_owners: Contact bike owners before their bikes are marked stolen
-      email_for_access_html: Email %{email_link} for access.
-      greeting: Hello %{user_name},
-      law_enforcement_features: 'We have a number of features specifically designed
-        for law enforcement officers:'
-      multiple_serial_search_pane: Multiple serial search pane
-      thank_you: Thank you so much for using Bike Index!
-      thanks_for_using_bike_index: Thanks for using Bike Index!
     organized_menu_items:
       add_a_bike: Add a bike
       ascend_imports: Ascend Imports
@@ -5066,30 +5075,16 @@ en:
       recovered_date: recovered %{date}
       translated_from_english: translated from English
     register_flow:
+      date_found_required: Please tell us when you found it
+      date_stolen_required: Please tell us when it was stolen
       email_required: Email is required to register
+      location_found_required: Please tell us where you found it
+      location_stolen_required: Please tell us where it was stolen
       manufacturer_required: Manufacturer is required to register
       name_required: Owner name is required to register
       unable_to_save: We're unable to save that registration, please try again
     shops_map:
       map_of_partner_locations: Map of partner locations
-    user_general_alert:
-      add_location_theft_bike_title_html: Add the location of the theft of your <strong>%{bike_title}</strong>
-      add_photo_theft_bike_title_html: Add a photo to your <strong>%{bike_title}</strong>
-      confirm_your_phone_number: Confirm your phone number
-      location_critical_html: >-
-        <strong>It is critical for recovery</strong> that you include the address
-        or cross-street where your %{bike_type} was stolen.
-      missing_stolen_photo_title: Please add a photo
-      photo_critical_html: Successful promoted alerts <strong>need to have an image</strong>
-      stolen_missing_location_title: Please add theft location
-      verification_code: Verification code
-      verify_number: Verify %{phone_number}
-      without_location_all_is_lost: >-
-        Without a location we can't spread the word about the theft and people won't
-        know where to look for your %{bike_type}.
-      without_photo_all_is_lost: >-
-        If you don't have any photos of your bike, find a stock image on the internet
-        and upload it. Without some image, the promoted alert won't be effective.
   stolen:
     index:
       ambassador: ambassador
@@ -5169,6 +5164,10 @@ en:
       short_with_hour: "%l%P - %m.%d.%y"
       short_with_year: "%a, %B %d %Y"
       standard_display: "%a, %B %d"
+  user_emails:
+    confirm:
+      confirm_email: Confirm email
+      confirm_this_email: Confirm %{user_email}
   user_embeds:
     show:
       bike: Bike
@@ -5240,9 +5239,8 @@ en:
       this_user_has_no_bikes_yet: This user has no bikes yet!
       this_users_bikes: This user's bikes
     unsubscribe:
-      if_not_click_button: If you are not, please click the button below
+      confirm_unsubscribe: Confirm you want to unsubscribe
       unsubscribe: Unsubscribe
-      you_should_be_unsubscribed_automatically: You should be unsubscribed automatically
     update_password_form_with_reset_token:
       and_try_not_to_forget_it: and try not to forget it...
       better_password: better

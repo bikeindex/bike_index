@@ -13,6 +13,24 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
         expect(response.body).to include("There is no active registration sequence")
+        expect(response.body).to include("You don't have a draft sequence")
+        # Nothing to copy yet, so the button starts a fresh one
+        expect(response.body).to include("Create a sequence")
+      end
+
+      context "with a draft" do
+        let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization: current_organization) }
+
+        it "lists its pages, and offers to resume editing or discard it" do
+          get base_url
+          expect(response.body).to include(draft.registration_sequence_pages.first.title)
+          # Read-only, the same as the active version - it's edited on its own screen
+          expect(response.body).to_not include("data-controller=\"sortable\"")
+          expect(response.body).to include(">Edit<")
+          expect(response.body).to include("Discard draft")
+          # Turbo Drive is off app-wide, so the confirm has to be the form's own
+          expect(response.body).to include("onsubmit=\"return confirm(")
+        end
       end
 
       context "with an active sequence" do
@@ -31,6 +49,8 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
           expect(response.body).to include("This is the active version your registrants see")
           expect(response.body).to include("Batteries &amp; charging")
           expect(response.body).to include("Charge with the manufacturer's charger")
+          # No draft yet, so editing starts from a copy of the live sequence
+          expect(response.body).to include("Copy current sequence and edit")
           # Frozen, so no editing affordances on it
           expect(response.body).to_not include("data-sortable-target=\"item\"")
         end
@@ -44,6 +64,39 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
         }.to change { current_organization.registration_sequences.draft.count }.by(1)
         draft = current_organization.registration_sequences.draft.first
         expect(response).to redirect_to(edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: draft.id))
+      end
+    end
+
+    describe "show" do
+      let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization: current_organization) }
+
+      it "renders, titled for a draft" do
+        get "#{base_url}/#{draft.id}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(response.body).to match(%r{Previewing.{0,40}<strong>Draft</strong>.{0,20}registration sequence}m)
+        # Back link to the index, next to the pagination
+        expect(response.body).to include(">← Registration Sequences</a>")
+      end
+
+      it "pages through the rules, then the review, with pagination" do
+        get "#{base_url}/#{draft.id}?page=1"
+        expect(response.body).to include("Continue")
+        expect(response.body).to include("page=2") # pagination links to the next screen
+
+        get "#{base_url}/#{draft.id}?page=99" # clamped to the review screen
+        expect(response.body).to include("almost done")
+      end
+
+      context "with an active (non-draft) sequence" do
+        let!(:active) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: current_organization) }
+
+        it "renders the preview, titled live" do
+          get "#{base_url}/#{active.id}"
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:show)
+          expect(response.body).to match(%r{Previewing.{0,40}<strong>Current</strong>.{0,20}registration sequence}m)
+        end
       end
     end
 
@@ -77,6 +130,22 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
       it "404s for another organization's draft" do
         other = FactoryBot.create(:registration_sequence)
         patch "#{base_url}/#{other.id}", params: {registration_sequence: {faq_url: "https://example.com"}}
+        expect(response.status).to eq(404)
+      end
+    end
+
+    describe "destroy" do
+      let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization: current_organization) }
+
+      it "discards the draft and its pages" do
+        expect { delete "#{base_url}/#{draft.id}" }.to change(RegistrationSequence, :count).by(-1)
+        expect(response).to redirect_to(base_url)
+        expect(RegistrationSequence.with_deleted.find_by(id: draft.id)).to be_nil
+      end
+
+      it "404s for a non-draft sequence" do
+        active = FactoryBot.create(:registration_sequence_active, organization: current_organization)
+        expect { delete "#{base_url}/#{active.id}" }.to_not change(RegistrationSequence, :count)
         expect(response.status).to eq(404)
       end
     end

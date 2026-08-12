@@ -32,6 +32,7 @@ const defaultFilters: SearchFiltersType = {
   sufferScoreTo: null,
   kudosFrom: null,
   kudosTo: null,
+  hasTop10: false,
   country: null,
   region: null,
   city: null,
@@ -279,6 +280,26 @@ describe('SearchFilters', () => {
       expect(onFiltersChange).toHaveBeenCalledWith(
         expect.objectContaining({ country: null, region: null, city: 'Berlin' }),
       );
+    });
+  });
+
+  describe('top 10 filter', () => {
+    it('calls onFiltersChange when checked', () => {
+      render(<SearchFilters {...defaultProps} onFiltersChange={onFiltersChange} />);
+      fireEvent.click(screen.getByLabelText('Top 10'));
+      expect(onFiltersChange).toHaveBeenCalledWith(expect.objectContaining({ hasTop10: true }));
+    });
+
+    it('counts toward the active filter badge', () => {
+      render(
+        <SearchFilters
+          {...defaultProps}
+          filters={{ ...defaultFilters, hasTop10: true }}
+          onFiltersChange={onFiltersChange}
+        />,
+      );
+      expect(screen.getByLabelText('Top 10')).toBeChecked();
+      expect(screen.getByText('Search Activity Properties').nextElementSibling).toHaveTextContent('1');
     });
   });
 });

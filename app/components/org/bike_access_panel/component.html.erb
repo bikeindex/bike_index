@@ -552,8 +552,7 @@
 
             <% if @bike.status == "with_owner" %>
               but was sent to a new owner, so is now a standard
-              <%= @bike.type %>
-              on Bike Index.
+              <%= @bike.type %> on Bike Index.
             <% end %>
           </em>
         </div>
@@ -610,8 +609,7 @@
             impounded!
           <% else %>
             impounded by
-            <%= @bike.current_impound_record&.organized? ? @bike.current_impound_record.organization.name : "an individual" %>
-            !
+            <%= @bike.current_impound_record&.organized? ? @bike.current_impound_record.organization.name : "an individual" %> !
           <% end %>
         </span>
 
@@ -640,14 +638,7 @@
       <%= pluralize(number_with_delimiter(current_count), "current notification") %>,
       <% if resolved_notifications.count > 0 %>
         -
-        <a
-          href="#resolvedParkingNotificationTable"
-          aria-controls="resolvedParkingNotificationTable"
-          data-toggle="collapse"
-        >
-          show
-          <%= pluralize(number_with_delimiter(resolved_notifications.count), "resolved notification") %>
-        </a>
+        <a href="#resolvedParkingNotificationTable" aria-controls="resolvedParkingNotificationTable" data-toggle="collapse">show <%= pluralize(number_with_delimiter(resolved_notifications.count), "resolved notification") %></a>
       <% else %>
         <span class="less-strong">0 resolved notifications</span>
       <% end %>
@@ -680,40 +671,35 @@
         class="collapse <%= "in" if parking_notification_open %>"
       >
         <hr>
-        <% parking_notification_present = @parking_notification.present? %>
-        <% @parking_notification ||= ParkingNotification.new(bike_id: @bike.id, organization: @organization, use_entered_address: false) %>
 
-        <% unless parking_notification_present %>
-          <%# We only want to assign is_repeat if creating a new parking notification %>
-          <% @parking_notification.is_repeat = @parking_notification.likely_repeat? %>
-          <% @parking_notification.set_location_from_organization %>
-        <% end %>
-
-        <% @parking_notification.kind ||= @parking_notification.potential_initial_record&.kind || ParkingNotification.kinds.first %>
-
-        <%= form_for @parking_notification, url: organization_parking_notifications_path(organization_id: @organization) do |f| %>
+        <%= form_for parking_notification, url: organization_parking_notifications_path(organization_id: @organization) do |f| %>
           <%= f.hidden_field :bike_id %>
           <%= f.hidden_field :latitude, class: "parkingLocation-latitude" %>
           <%= f.hidden_field :longitude, class: "parkingLocation-longitude" %>
           <%= f.hidden_field :accuracy, class: "parkingLocation-accuracy" %>
 
           <div class="mt-4 text-center">
-            <% if @parking_notification.can_be_repeat? %>
+            <% if parking_notification.can_be_repeat? %>
               <div
                 class="btn-group"
                 role="group"
                 aria-label="Repeat notice"
                 data-toggle="buttons"
               >
-                <label class="btn btn-secondary <%= "active" unless @parking_notification.is_repeat %>">
+                <label class="btn btn-secondary <%= "active" unless parking_notification.is_repeat %>">
                   <%= f.radio_button :is_repeat, false %> First notice
                 </label>
 
-                <label class="btn btn-secondary <%= "active" if @parking_notification.is_repeat %>" <%= "disabled" unless @parking_notification.can_be_repeat? %>> <%# herb:disable erb-no-output-in-attribute-position %>
+                <label
+                  class="btn btn-secondary <%= "active" if parking_notification.is_repeat %>"
+                  <% unless parking_notification.can_be_repeat? %>
+                    disabled
+                  <% end %>
+                >
                   <%= f.radio_button :is_repeat, true %>
                   <%# We have to add 1 on the repeat because this hasn't been created yet %>
                   Repeat
-                  #<%= @parking_notification.earlier_bike_notifications.count %>
+                  #<%= parking_notification.earlier_bike_notifications.count %>
                   of earlier notification
                 </label>
               </div>
@@ -799,11 +785,11 @@
                 </div>
 
                 <div class="row countrystatezip">
-                  <div class="col-sm-4 fancy-select unfancy no-restore-on-backspace hidden-other <%= "unhidden" if @parking_notification.country_id == Country.united_states_id %>">
+                  <div class="col-sm-4 fancy-select unfancy no-restore-on-backspace hidden-other <%= "unhidden" if parking_notification.country_id == Country.united_states_id %>">
                     <%= f.collection_select(:region_record_id, State.united_states, :id, :name, {include_blank: true, prompt: translation(".state")}, {class: "form-control"}) %>
                   </div>
 
-                  <div class="col-sm-4 shown-other <%= "unhidden" unless @parking_notification.country_id == Country.united_states_id %>">
+                  <div class="col-sm-4 shown-other <%= "unhidden" unless parking_notification.country_id == Country.united_states_id %>">
                     <%= f.text_field :region_string, placeholder: translation(".region"), class: "form-control" %>
                   </div>
 

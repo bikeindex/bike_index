@@ -21,8 +21,13 @@ class ApplicationController < ActionController::Base
   end
 
   def handle_unverified_request
-    flash[:error] = translation(:csrf_invalid, scope: [:controllers, :application, __method__])
+    flash[:error] = invalid_authenticity_token_message
     redirect_to user_root_url
+  end
+
+  # Shared with the controllers that override handle_unverified_request to re-render
+  def invalid_authenticity_token_message
+    translation(:invalid_authenticity_token, scope: [:controllers, :application, :handle_unverified_request])
   end
 
   def cors_set_access_control_headers

@@ -19,9 +19,10 @@ ENV["BASE_URL"] = "http://test.host"
 # Set before config/boot so bin/env picks the test Redis database
 ENV["RAILS_ENV"] ||= "test"
 ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"] = "true"
-ENV["PARALLEL_TEST_FIRST_IS_1"] = "true" # number parallel databases correctly
 ENV["RACK_ATTACK_MAX_LIMIT"] ||= "12"
 ENV["RACK_ATTACK_API_MAX_LIMIT"] ||= "15"
+# Production's hourly budget can't be driven to 429 under RACK_ATTACK_MAX_LIMIT above
+ENV["RACK_ATTACK_REGISTER_DIRECT_UPLOAD_LIMIT"] ||= "5"
 require "spec_helper"
 # Load functionable patch before Rails boot so all Functionable modules get permissive test hooks
 require File.expand_path("../../config/boot", __FILE__)
@@ -31,9 +32,6 @@ require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
 require "paper_trail/frameworks/rspec"
 
-# Capybara setup (driver registration, server host/port, :js BASE_URL hook)
-# lives in spec/support/capybara.rb so it can pin Capybara's port to DEV_PORT
-# before any system spec boots the server.
 require "view_component/test_helpers"
 require "view_component/system_test_helpers"
 
@@ -75,10 +73,10 @@ RSpec.configure do |config|
   config.include ViewComponent::SystemTestHelpers, type: :component
   config.include Capybara::RSpecMatchers, type: :component
   config.include HtmlContentHelpers, type: :component
-  # Every system spec drives Playwright (overridable per-example, e.g. rack_test).
-  # Without this, untagged `type: :system` specs fall back to Rails' default
-  # :selenium driver, which no longer loads.
-  config.before(:each, type: :system) { driven_by(:playwright) }
+  # Whatever Capybara has settled on: the default :playwright, or the `driver:`
+  # metadata an example overrides it with. Without this, untagged `type: :system`
+  # specs fall back to Rails' default :selenium driver, which no longer loads.
+  config.before(:each, type: :system) { driven_by(Capybara.current_driver) }
 end
 
 require "vcr"

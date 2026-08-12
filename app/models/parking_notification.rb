@@ -109,6 +109,16 @@ class ParkingNotification < ActiveRecord::Base
     }
   end
 
+  # The org form panels only ever offer a new notification, so the repeat flag, location
+  # and kind are defaulted here rather than read off an existing record
+  def self.build_for(bike:, organization:)
+    new(bike_id: bike.id, organization:, use_entered_address: false).tap do |notification|
+      notification.is_repeat = notification.likely_repeat?
+      notification.set_location_from_organization
+      notification.kind ||= notification.potential_initial_record&.kind || kinds.first
+    end
+  end
+
   def self.associated_notifications_including_self(id, initial_record_id)
     potential_id_matches = [id, initial_record_id].compact
     where(initial_record_id: potential_id_matches).or(where(id: potential_id_matches))

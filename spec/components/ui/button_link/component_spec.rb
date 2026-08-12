@@ -25,7 +25,7 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
 
   it "always applies the active classes (inert until data-active/pressed)" do
     tokens = component.css("a").first["class"].split
-    expect(tokens).to include("tw:is-active:ring-2", "tw:is-active:bg-gray-200")
+    expect(tokens).to include("tw:is-active:ring-2", "tw:is-active:bg-purple-500")
     expect(component).to have_no_css("a[data-active]")
   end
 
@@ -34,6 +34,33 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
 
     it "flags the link data-active, keeping the passed data attributes" do
       expect(component).to have_css("a[data-active='true'][data-turbo='false']")
+    end
+  end
+
+  context "disabled: true" do
+    let(:options) { {text: "Disabled", href: "/test", disabled: true, aria: {controls: "panel"}} }
+
+    # An <a> takes no disabled attribute, so dropping the href is what makes it
+    # unfollowable — aria-disabled is what says so, and what the styling hangs off
+    it "renders a link that can't be followed, keeping the passed aria" do
+      expect(component).to have_css("a[aria-disabled='true'][role='link'][tabindex='-1']", text: "Disabled")
+      expect(component).to have_no_css("a[href]")
+      expect(component).to have_css("a[aria-controls='panel']")
+      expect(component.css("a").first["class"].split).to include("tw:aria-disabled:opacity-50", "tw:aria-disabled:cursor-not-allowed")
+    end
+
+    it "keeps hover off it" do
+      hovers = component.css("a").first["class"].split.grep(/hover:/)
+      expect(hovers).to be_present
+      expect(hovers.grep_v(/not-aria-disabled:/)).to eq([])
+    end
+
+    context "with method" do
+      let(:options) { {text: "Follow", href: "/follow", method: :post, disabled: true} }
+
+      it "disables the button the form submits with" do
+        expect(component).to have_css("form button[type='submit'][disabled]", text: "Follow")
+      end
     end
   end
 
@@ -50,6 +77,38 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
 
     it "passes through html options" do
       expect(component).to have_css("a[data-turbo='false']")
+    end
+  end
+
+  context "with html_class" do
+    let(:options) { {text: "Wide", href: "/test", html_class: "tw:w-full"} }
+
+    it "builds it into the link's classes" do
+      expect(component.css("a").first["class"].split).to include("tw:w-full", "tw:inline-flex")
+    end
+  end
+
+  context "with class in html_options" do
+    let(:options) { {text: "Wide", href: "/test", class: "tw:w-full"} }
+
+    it "raises, naming html_class" do
+      expect { instance }.to raise_error(ArgumentError, /you must use the keyword arg html_class/)
+    end
+  end
+
+  context "with an unknown color" do
+    let(:options) { {text: "Link", href: "/test", color: :invalid} }
+
+    it "raises, naming the colors it takes" do
+      expect { instance }.to raise_error(ArgumentError, /unknown color :invalid, expected one of: primary, secondary/)
+    end
+  end
+
+  context "with a size for link color" do
+    let(:options) { {text: "Link", href: "/test", color: :link, size: :lg} }
+
+    it "raises" do
+      expect { instance }.to raise_error(ArgumentError, /size is not supported/)
     end
   end
 

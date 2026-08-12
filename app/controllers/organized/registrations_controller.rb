@@ -158,9 +158,6 @@ module Organized
       return if chart_only?
 
       @pagy, @bikes = pagy(:countish, @available_bikes.reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
-      if @interpreted_params[:serial]
-        @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
-      end
     end
 
     # Set filter params for settings component on initial (non-turbo) page load

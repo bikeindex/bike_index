@@ -5403,6 +5403,10 @@ nb:
         who_we_serve: Hvem vi tjener
         legal: Juridisk
         social_media: Sosiale medier
+        status_page: Statusside
+        register_a_bike: Registrer en sykkel
+        marketplace: Markedsplass
+        search: Søk
     emails:
       confirmation_email:
         click_to_sign_in_html: Klikk på <em>Logg på</em>-knappen for å fullføre registreringen!

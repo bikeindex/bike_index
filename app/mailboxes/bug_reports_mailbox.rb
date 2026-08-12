@@ -1,9 +1,11 @@
 class BugReportsMailbox < ApplicationMailbox
   def process
+    email, from_name = BugReport.sender_from_mail(mail)
     bug_report = BugReport.create!(
       inbound_email:,
-      email: mail.from&.first,
-      from_name: mail[:from]&.display_names&.first,
+      email:,
+      from_name:,
+      receiver: BugReport.receiver_from_mail(mail),
       subject: mail.subject,
       body: body_text,
       received_at: mail.date || Time.current

@@ -19,11 +19,10 @@
     <div class="col-12 mt-2 mb-4">
       <h4>
         <% if sort_column == "created_at" %>
-          <% time_range_column = "stolen_records.created_at" %>
-          Stolen records created
+          <% time_range_column = "stolen_records.created_at" %> Stolen records
+          created
         <% else %>
-          <% time_range_column = "stolen_records.date_stolen" %>
-          Date stolen
+          <% time_range_column = "stolen_records.date_stolen" %> Date stolen
         <% end %>
       </h4>
 

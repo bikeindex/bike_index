@@ -13,21 +13,25 @@ Capybara.register_driver :playwright do |app|
     viewport: {width: 1920, height: 1080})
 end
 
+# The same browser with scripting turned off, for specs about what a rider without
+# JavaScript gets. rack_test applies no stylesheets and runs no HTML5 constraint
+# validation, so a form a real browser refuses to submit passes there.
+Capybara.register_driver :playwright_no_js do |app|
+  Capybara::Playwright::Driver.new(app,
+    browser_type: :chromium,
+    headless: true,
+    javaScriptEnabled: false,
+    viewport: {width: 1920, height: 1080})
+end
+
 Capybara.configure do |config|
   config.default_driver = :playwright
   config.javascript_driver = :playwright
 end
 
-# Pin Capybara's app server to a predictable host:port. Defaults to
-# DEV_PORT + 2000 so it doesn't collide with a developer's running
-# `bin/dev` (which binds DEV_PORT itself); override with CAPYBARA_PORT
-# when the test infrastructure needs to know the port up front (e.g. CI's
-# `assets:precompile` step needs a matching BASE_URL so any ERB-baked
-# asset URL resolves to the same host the browser will hit).
-CAPYBARA_PORT = (ENV["CAPYBARA_PORT"] || ENV.fetch("DEV_PORT", "3042").to_i + 2000).to_i
+# Each parallel worker needs its own port - a pinned one leaves all but the first
+# with EADDRINUSE.
 Capybara.server_host = "localhost"
-Capybara.server_port = CAPYBARA_PORT
-Capybara.app_host = "http://#{Capybara.server_host}:#{CAPYBARA_PORT}"
 Capybara.always_include_port = true
 
 # The application layout pulls Google Fonts and analytics from external hosts
@@ -43,10 +47,8 @@ BLOCKED_EXTERNAL_HOSTS = %w[
   www.google-analytics.com
 ].freeze
 
-# Keep BASE_URL aligned with Capybara's server for `:js` specs so any
-# `*_url` helper rendered during the example -- or ERB-interpolated asset
-# (`<%= ENV['BASE_URL'] %>...`) that gets sprockets-compiled on demand --
-# targets the Capybara server.
+# Point BASE_URL at Capybara's server for `:js` specs, so `*_url` helpers rendered
+# during the example resolve to it.
 RSpec.configure do |config|
   config.around(:each, :js) do |example|
     original_base_url = ENV["BASE_URL"]
@@ -56,8 +58,14 @@ RSpec.configure do |config|
     ENV["BASE_URL"] = original_base_url
   end
 
-  config.before(:each, :js) do
-    Capybara.current_session.driver.with_playwright_page do |playwright_page|
+  # Any playwright-driven example, scripting or not - rack_test has nothing to block.
+  # An example picks its driver with `driver:` metadata rather than `driven_by`, which
+  # runs too late for this to reach the session it chose
+  config.before(:each, type: :system) do
+    driver = Capybara.current_session.driver
+    next unless driver.respond_to?(:with_playwright_page)
+
+    driver.with_playwright_page do |playwright_page|
       BLOCKED_EXTERNAL_HOSTS.each do |host|
         playwright_page.route("https://#{host}/**", ->(route, _request) { route.abort })
       end

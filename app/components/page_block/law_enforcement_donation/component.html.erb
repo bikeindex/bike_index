@@ -1,0 +1,31 @@
+<%= render UI::Modal::Component.new(id: MODAL_ID, title: translation(".thanks_for_using_bike_index"), open: true) do |modal| %>
+  <% modal.with_body do %>
+    <p class="tw:mb-2!">
+      <%= translation(".greeting", user_name: @current_user&.display_name) %>
+    </p>
+
+    <p class="tw:mb-2!"><%= translation(".thank_you") %></p>
+    <p class="tw:mb-2!"><%= translation(".law_enforcement_features") %></p>
+
+    <ul class="tw:mb-2 tw:ml-4 tw:list-disc">
+      <li>
+        <%= link_to translation(".contact_bike_owners"),
+              "https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen",
+              target: "_blank", class: "twlink" %>
+      </li>
+
+      <li><%= translation(".multiple_serial_search_pane") %></li>
+    </ul>
+
+    <p class="tw:mb-3">
+      <%= translation(".email_for_access_html",
+            email_link: link_to("support@bikeindex.org", "mailto:support@bikeindex.org", class: "twlink")) %>
+    </p>
+
+    <p class="tw:mb-0 tw:text-center">
+      <em class="twless-strong">
+        <%= translation(".bikeindex_is_a_nonprofit", org_name:) %>
+      </em>
+    </p>
+  <% end %>
+<% end %>

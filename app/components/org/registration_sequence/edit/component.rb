@@ -3,12 +3,12 @@
 module Org
   module RegistrationSequence
     module Edit
-      # Draft management UI: page-count header with Add page, and the
-      # drag-to-reorder list of pages with per-page Edit links.
+      # The drag-to-reorder page list and the sequence-wide settings form.
       class Component < ApplicationComponent
-        def initialize(registration_sequence:)
+        def initialize(registration_sequence:, admin: false)
           @registration_sequence = registration_sequence
-          @organization = registration_sequence.organization
+          @admin = admin
+          @editable = registration_sequence.draft?
         end
 
         private
@@ -16,6 +16,10 @@ module Org
         def pages
           @pages ||= @registration_sequence.registration_sequence_pages.to_a
         end
+
+        def new_page_path = RegistrationSequencePaths.new_page(@registration_sequence, admin: @admin)
+
+        def sequence_path = RegistrationSequencePaths.sequence(@registration_sequence, admin: @admin)
       end
     end
   end

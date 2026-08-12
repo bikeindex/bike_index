@@ -88,7 +88,7 @@
 
       <%# shrink-0: the fields column would otherwise squeeze this to a sliver on phones %>
       <div class="tw:w-20 tw:shrink-0">
-        <%= render UI::Button::Component.new(color: :primary, kind: :submit, html_class: "tw:w-full tw:h-full tw:disabled:cursor-wait") do %>
+        <%= render UI::Button::Component.new(color: :primary, type: "submit", html_class: "tw:w-full tw:h-full tw:disabled:cursor-wait") do %>
           <%= helpers.inline_svg_tag "icons/searcher.svg",
             id: "search-button",
             class: "tw:text-white",

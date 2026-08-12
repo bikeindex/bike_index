@@ -7,6 +7,7 @@
 
     <%# TODO: Cache this ^ %>
     <%= csrf_meta_tags %>
+
     <%= tag.meta name: "honeybadger-api-key", content: ENV["HONEYBADGER_FRONTEND_API_KEY"] %>
     <%= tag.meta name: "honeybadger-environment", content: Rails.env %>
     <%= stylesheet_link_tag 'tailwind', 'revised', "data-turbo-track": "reload" %>
@@ -115,7 +116,10 @@
             ></button>
           </div>
 
-          <ul id="primary-main-menu" class="primary-main-menu">
+          <ul
+            id="primary-main-menu"
+            class="primary-main-menu tw:m-0 tw:list-none"
+          >
             <li class="primary-nav-item d-lg-none">
               <%= link_to t(".search"), default_bike_search_path, class: "nav-link #{bike_search_active ? 'active' : ''}" %>
             </li>
@@ -262,6 +266,13 @@
       </nav>
     <% end %>
 
+    <%# delete, so the donation modal only ever shows once %>
+    <% if session.delete(:render_donation_request).present? %>
+      <%= render PageBlock::LawEnforcementDonation::Component.new(current_user:) %>
+    <% elsif show_general_alert %>
+      <%= render PageBlock::UserAlerts::Wrapper::Component.new(current_user:) %>
+    <% end %>
+
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
     <%= render partial: "/layouts/revised_messages" %>
 
@@ -276,15 +287,6 @@
           <%= yield %>
         <% end %>
       </main>
-    <% end %>
-
-    <%# grab (and remove) the donation modal if it's there %>
-    <% donation_request = session.delete(:render_donation_request) %>
-
-    <% if donation_request.present? %>
-      <%= render partial: "/shared/law_enforcement_donation_modal", locals: { kind: donation_request } %>
-    <% elsif show_general_alert %>
-      <%= render partial: "/shared/user_general_alert" %>
     <% end %>
 
     <%# Skip the Meta pixel on org/oauth pages and when blocked params are present (search_email is PII, and the pixel %>

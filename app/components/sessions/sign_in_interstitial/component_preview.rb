@@ -3,10 +3,13 @@
 module Sessions
   module SignInInterstitial
     class ComponentPreview < ApplicationComponentPreview
-      # auto_submit off, otherwise the preview posts itself away as soon as it renders
       def default
-        render(Sessions::SignInInterstitial::Component.new(url: "#", fields: {token: "example-token"},
-          auto_submit: false))
+        render(Sessions::SignInInterstitial::Component.new(url: "#", fields: {token: "example-token"}))
+      end
+
+      def unsubscribing
+        render(Sessions::SignInInterstitial::Component.new(url: "#",
+          heading: "Confirm you want to unsubscribe", submit_text: "Unsubscribe"))
       end
     end
   end

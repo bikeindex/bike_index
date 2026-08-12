@@ -39,10 +39,9 @@
                 <% impound_notification = @parking_notification.associated_notifications.impound_notification.last %>
                 View the
                 <%= link_to "Impound notification", organization_parking_notification_path(impound_notification, organization_id: @organization.to_param) %>
-                <small>
-                  <em>created <%= render(UI::Time::Component.new(time: impound_notification.created_at, format: :localize_time_precise)) %></em>
-                  by <%= impound_notification.user.display_name %>
-                </small>
+
+
+                <small><em>created <%= render(UI::Time::Component.new(time: impound_notification.created_at, format: :localize_time_precise)) %></em> by <%= impound_notification.user.display_name %></small>
               <% end %>
 
               <% if @parking_notification.impound_record_id.present? %>
@@ -67,10 +66,8 @@
             <%= render(UI::Time::Component.new(time: retrieved_notification.created_at, format: :localize_time_precise)) %>
             by
             <% if retrieved_notification.organization_recovery? %>
-              <%= @organization.short_name %>
-              (
-              <em><%= retrieved_notification.retrieved_by.display_name %></em>
-              )
+              <%= @organization.short_name %> (
+              <em><%= retrieved_notification.retrieved_by.display_name %></em> )
             <% else %>
               the user
             <% end %>

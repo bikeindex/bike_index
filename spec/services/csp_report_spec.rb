@@ -157,14 +157,16 @@ RSpec.describe CspReport do
 
     # blocked-uri / effective-directive pairs taken from the top CSP faults
     context "hosts our policy allowlists" do
-      {
-        "script-src-elem" => "https://www.googletagmanager.com/gtm.js?id=GTM-K88RMWC",
-        "script-src" => "https://connect.facebook.net/en_US/all.js",
-        "img-src" => "https://www.googleadservices.com/pagead/conversion/980892598/",
-        "font-src" => "https://fonts.gstatic.com/s/inter/v13/x.woff2",
-        "connect-src" => "https://region1.google-analytics.com/g/collect", # a *. source
-        "frame-src" => "https://js.stripe.com"
-      }.each do |directive, uri|
+      [["script-src-elem", "https://www.googletagmanager.com/gtm.js?id=GTM-K88RMWC"],
+        ["script-src", "https://connect.facebook.net/en_US/all.js"],
+        ["img-src", "https://www.googleadservices.com/pagead/conversion/980892598/"],
+        ["img-src", "https://stats.g.doubleclick.net/g/collect"],
+        ["img-src", "https://region1.google-analytics.com/g/collect"],
+        ["font-src", "https://fonts.gstatic.com/s/inter/v13/x.woff2"],
+        ["connect-src", "https://region1.google-analytics.com/g/collect"], # a *. source
+        ["connect-src", "https://analytics.google.com/g/collect"],
+        ["connect-src", "https://region1.analytics.google.com/g/collect"],
+        ["frame-src", "https://js.stripe.com"]].each do |directive, uri|
         it "permits #{directive} #{uri}" do
           expect(permits?(directive, uri)).to be_truthy
         end
@@ -172,12 +174,11 @@ RSpec.describe CspReport do
     end
 
     context "hosts our policy does not allowlist" do
-      {
-        "font-src" => "https://images.simplycodes.com/fonts/CircularXXWeb-Medium.woff2",
-        "connect-src" => "https://region1.analytics.google.com", # analytics.google.com is exact-match only
-        "frame-src" => "https://youtu.be",
-        "img-src" => "https://evil.example.com/tracker.gif"
-      }.each do |directive, uri|
+      [["font-src", "https://images.simplycodes.com/fonts/CircularXXWeb-Medium.woff2"],
+        ["frame-src", "https://youtu.be"],
+        # a *. source matches on the label boundary, not a bare suffix
+        ["connect-src", "https://analytics.google.com.evil.com/g/collect"],
+        ["img-src", "https://evil.example.com/tracker.gif"]].each do |directive, uri|
         it "does not permit #{directive} #{uri}" do
           expect(permits?(directive, uri)).to be_falsey
         end

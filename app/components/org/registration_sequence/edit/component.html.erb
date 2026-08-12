@@ -1,46 +1,60 @@
 <div class="tw:mb-3 tw:flex tw:items-baseline tw:justify-between tw:gap-4">
-  <h1 class="uncap">
-    Draft registration sequence
-    <span class="tw:text-xl tw:font-normal tw:text-gray-500">· <%= helpers.number_display(pages.size) %> <%= "page".pluralize(pages.size) %></span>
-  </h1>
+  <%# Admin's header names the sequence %>
+  <% if @admin %>
+    <h2 class="uncap tw:mb-0 tw:text-xl tw:font-normal tw:text-gray-500">
+      <%= helpers.number_display(pages.size) %> <%= "page".pluralize(pages.size) %>
+    </h2>
+  <% else %>
+    <h1 class="uncap">
+      <%= @registration_sequence.status_display %> registration sequence
+      <span class="tw:text-xl tw:font-normal tw:whitespace-nowrap tw:text-gray-500">· <%= helpers.number_display(pages.size) %> <%= "page".pluralize(pages.size) %></span>
+    </h1>
+  <% end %>
 
-  <%= render UI::ButtonLink::Component.new(href: organization_registration_sequence_pages_path(organization_id: @organization.to_param, registration_sequence_id: @registration_sequence.id), method: :post, color: :secondary, class: "tw:whitespace-nowrap") do %>
-    <span aria-hidden="true">+</span> Add page
+  <% if @editable %>
+    <%= render UI::ButtonLink::Component.new(href: new_page_path, color: :secondary, html_class: "tw:whitespace-nowrap") do %>
+      <span aria-hidden="true">+</span> Add page
+    <% end %>
   <% end %>
 </div>
 
-<%= render Org::RegistrationSequence::PageList::Component.new(registration_sequence: @registration_sequence, editable: true) %>
+<%= render Org::RegistrationSequence::PageList::Component.new(registration_sequence: @registration_sequence, admin: @admin) %>
 
-<h2 class="uncap tw:mt-8 tw:mb-3 tw:text-xl">Settings</h2>
+<% if @editable %>
+  <%= render UI::Card::Component.new(additional_classes: "tw:mt-8") do %>
+    <%= form_with model: @registration_sequence, url: sequence_path, method: :patch do |f| %>
+      <div class="tw:flex tw:flex-col tw:gap-4">
+        <div>
+          <%= f.label :faq_url, "FAQ link", class: "twlabel" %>
+          <%= f.url_field :faq_url, class: "twinput tw:w-full", placeholder: "https://" %>
 
-<%= render UI::Card::Component.new do %>
-  <%= form_with model: @registration_sequence, url: organization_registration_sequence_path(organization_id: @organization.to_param, id: @registration_sequence.id), method: :patch do |f| %>
-    <div class="tw:flex tw:flex-col tw:gap-4">
-      <div>
-        <%= f.label :faq_url, "FAQ link", class: "twlabel" %>
-        <%= f.url_field :faq_url, class: "twinput tw:w-full", placeholder: "https://" %>
+          <p class="tw:mt-1 tw:mb-0 tw:text-sm tw:text-gray-500">
+            Linked from every page, for registrants with questions about these
+            policies.
+          </p>
+        </div>
 
-        <p class="tw:mt-1 tw:mb-0 tw:text-sm tw:text-gray-500">
-          Linked from every page, for registrants with questions about these
-          policies.
-        </p>
+        <div>
+          <%= f.label :acknowledgment_text, "Final acknowledgment", class: "twlabel" %>
+
+          <%= f.text_area :acknowledgment_text, rows: 3, class: "twinput tw:w-full",
+              placeholder: RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT %>
+
+          <p class="tw:mt-1 tw:mb-0 tw:text-sm tw:text-gray-500">
+            Follows "I, <em>registrant's name</em>," on the last page, where the
+            registrant agrees to everything they've acknowledged.
+          </p>
+        </div>
+
+        <div>
+          <%= render UI::Button::Component.new(text: "Save settings", color: :primary, type: "submit") %>
+        </div>
       </div>
-
-      <div>
-        <%= f.label :acknowledgment_text, "Final acknowledgment", class: "twlabel" %>
-
-        <%= f.text_area :acknowledgment_text, rows: 3, class: "twinput tw:w-full",
-            placeholder: RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT %>
-
-        <p class="tw:mt-1 tw:mb-0 tw:text-sm tw:text-gray-500">
-          Follows "I, <em>registrant's name</em>," on the last page, where the
-          registrant agrees to everything they've acknowledged.
-        </p>
-      </div>
-
-      <div>
-        <%= render UI::Button::Component.new(text: "Save settings", color: :primary, kind: :submit) %>
-      </div>
-    </div>
+    <% end %>
   <% end %>
+<% end %>
+
+<%# Admin's header carries the switch %>
+<% unless @admin %>
+  <%= render UI::ButtonLink::Component.new(text: "Preview", href: sequence_path, color: :secondary, size: :lg, html_class: "tw:mt-8 tw:w-full") %>
 <% end %>

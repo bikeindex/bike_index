@@ -118,8 +118,7 @@
             <em><%= current_organization.name %></em>
             <%= link_to "view all associated bikes", url_for(sortable_search_params.merge(search_only_creation_organization: nil)) %>
           <% else %>
-            Viewing all associated
-            <em><%= current_organization.name %></em>
+            Viewing all associated <em><%= current_organization.name %></em>
             bikes -
             <%= link_to "view only bikes created by", url_for(sortable_search_params.merge(search_only_creation_organization: true)) %>
           <% end %>
@@ -252,7 +251,7 @@
   <%= number_display(Ownership.where(current: true, claimed: true).count) %>
   claimed, <%= number_display(PublicImage.count) %> bike images
   <em>(<%= number_display(PublicImage.where("created_at >= ?", Time.current.beginning_of_day).count) %> today)</em>
-<% end unless admin_nav_display_view_all %>
+<% end unless admin_search_filtered? %>
 
 <% table_view = capture do %>
   <%= render Admin::BikesTable::Component.new(bikes: @bikes, render_sortable: true, render_multi_check: @multi_delete) %>

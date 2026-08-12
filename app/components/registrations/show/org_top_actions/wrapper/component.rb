@@ -35,7 +35,7 @@ module Registrations
           # stretches to the button's width
           def action_button(panel_name, icon:, title:, tile: :purple, subtitle: nil)
             classes = "tw:min-h-15 tw:flex-wrap tw:content-center tw:gap-x-3 tw:gap-y-2 tw:rounded-xl tw:p-4! tw:text-center tw:sm:grid! tw:sm:grid-cols-[auto_1fr] tw:sm:gap-y-0.5 tw:sm:text-left tw:lg:flex-1"
-            render(UI::Button::Component.new(color: :purple_outline, size: :lg, html_class: classes, aria: {expanded: false},
+            render(UI::Button::Component.new(color: :secondary, size: :lg, html_class: classes, aria: {expanded: false},
               data: {"registrations--show--action-panels-target": "trigger", "panel-name": panel_name,
                      action: "registrations--show--action-panels#toggle"})) do
               safe_join([

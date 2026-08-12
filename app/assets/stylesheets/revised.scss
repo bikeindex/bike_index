@@ -1,12 +1,4 @@
-// Wrap all Bootstrap / legacy styles in @layer legacy so Tailwind's @layer
-// components / utilities (declared in app/assets/tailwind/application.css)
-// can override them by simple cascade order, without needing !important.
-//
-// The layer order must be declared identically here and in
-// app/assets/tailwind/application.css — CSS fixes a layer's position the
-// first time it is named, so whichever stylesheet the browser parses first
-// would otherwise decide the order.
-@layer theme, base, legacy, components, utilities;
+@import "legacy_includes/css_layers";
 
 @layer legacy {
 
@@ -182,7 +174,6 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 @import 'revised/sections/side_boxes';
 @import 'revised/new_table_extensions'; // Import from new scss files!
 @import 'revised/sections/embeded_tweet';
-@import 'revised/sections/general_alerts';
 
 // Shared organized styles
 @import 'revised/pages/organized/forms';

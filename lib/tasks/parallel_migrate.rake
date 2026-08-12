@@ -4,9 +4,6 @@
 # Opt-in only: set PARALLEL_MIGRATIONS to enable (e.g. PARALLEL_MIGRATIONS=true bin/rake db:migrate).
 # Off by default, since parallel test databases aren't always needed and CI doesn't use them.
 if Rails.env.development? && ENV["PARALLEL_MIGRATIONS"].present?
-  # number parallel databases correctly
-  ENV["PARALLEL_TEST_FIRST_IS_1"] = "true"
-
   Rake::Task["db:migrate"].enhance do
     puts "Running parallel:migrate for test databases..."
     system("rake parallel:migrate")

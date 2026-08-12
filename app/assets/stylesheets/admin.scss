@@ -1,5 +1,4 @@
-/* Declare CSS layers so that legacy is overridden by tailwind utility classes */
-@layer theme, base, legacy, components, utilities;
+@import "legacy_includes/css_layers";
 
 // If this whole stylesheet is put into layer legacy, it breaks
 // ... so just pull in specific things to override

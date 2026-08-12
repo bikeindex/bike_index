@@ -5,10 +5,11 @@ module Register
     # One page of the organization's e-vehicle safety rules. Every rule has to be
     # checked before the flow moves on, so the page is agreed to as a whole.
     class Component < ApplicationComponent
-      def initialize(b_param:, sequence:, step:)
+      def initialize(b_param:, sequence:, step:, steps:)
         @b_param = b_param
         @sequence = sequence
         @step = step
+        @steps = steps
       end
 
       private
@@ -37,14 +38,8 @@ module Register
       end
 
       def previous_path
-        return register_path(b_param_token: @b_param.id_token, step: 2) if first?
-
         register_path(b_param_token: @b_param.id_token,
-          step: BikeServices::Register.step_for_page_index(position - 1))
-      end
-
-      def organization_name
-        @sequence.organization&.short_name
+          step: BikeServices::Register.step_before(@step, steps: @steps))
       end
     end
   end

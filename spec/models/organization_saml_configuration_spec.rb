@@ -42,6 +42,19 @@ RSpec.describe OrganizationSamlConfiguration, type: :model do
       end
     end
 
+    context "organization without a permitted domain" do
+      let(:saml_configuration) { FactoryBot.build(:organization_saml_configuration, :enabled, organization:) }
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
+      it "can't be enabled" do
+        expect(saml_configuration).to_not be_valid
+        expect(saml_configuration.errors.full_messages)
+          .to include("Organization must have a permitted domain to enable SAML SSO")
+
+        saml_configuration.enabled = false
+        expect(saml_configuration).to be_valid
+      end
+    end
+
     context "invalid certificate" do
       it "adds an error" do
         saml_configuration.assign_attributes(idp_entity_id: "https://idp.example.edu/",

@@ -3,7 +3,6 @@ en:
   components:
     sessions:
       sign_in_interstitial:
-        if_not_click_button: If you are not, please click the button below
+        click_button_to_continue: Click the button below to continue
+        finish_signing_in: Finish signing in
         sign_in: Sign in
-        you_should_be_signed_in_automatically: You should be automatically signed
-          in.

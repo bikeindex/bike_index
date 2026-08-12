@@ -81,10 +81,7 @@
             <% elsif @sale.item.is_a?(BikeVersion) %>
               BikeVersion
               <%= link_to @sale.item_id, bike_version_path(@sale.item_id) %>
-              <small>
-                (bike:
-                <%= link_to @sale.item.bike_id, admin_bike_path(@sale.item.bike_id) %>)
-              </small>
+              <small>(bike: <%= link_to @sale.item.bike_id, admin_bike_path(@sale.item.bike_id) %>)</small>
             <% end %>
           </td>
         </tr>

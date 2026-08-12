@@ -14,7 +14,9 @@
 
   <% if @pr_number %>
     <span class="tw:hidden tw:sm:inline">&middot;</span>
-    <a class="tw:underline" href="<%= pr_url %>"><%= pr_link_text %></a>
+    <a class="tw:text-inherit tw:underline" href="<%= pr_url %>">
+      <%= pr_link_text %>
+    </a>
   <% end %>
 
   <% if @commit.present? %>
@@ -36,7 +38,8 @@
 
   <span>&middot;</span>
 
-  <%= link_to translation(".letter_opener_link"), "/letter_opener", class: "tw:font-normal tw:underline" %>
+  <%= link_to translation(".letter_opener_link"), "/letter_opener",
+    class: "tw:font-normal tw:text-inherit tw:underline" %>
 
   <%= render(UI::Tooltip::Component.new(text: translation(".letter_opener_tooltip"))) do |tooltip| %>
     <% tooltip.with_tooltip_button(class: pill_button_class) { "?" } %>
@@ -44,20 +47,16 @@
 
   <% if signed_in_as_superadmin? %>
     &middot;
-    <span class="tw:font-normal tw:text-black/60 tw:italic">
-      <%= translation(".superadmin_signed_in") %>
-    </span>
+    <span class="tw:font-normal tw:text-black/60 tw:italic"><%= translation(".superadmin_signed_in") %></span>
   <% elsif superadmin %>
     &middot;
     <%= form_with url: sign_in_with_magic_link_session_path, class: "tw:inline-block tw:align-middle" do %>
       <%= hidden_field_tag :token, superadmin_magic_link_token %>
       <%= hidden_field_tag :return_to, @return_to if @return_to.present? %>
-      <%= render UI::Button::Component.new(text: translation(".superadmin_button"), kind: :submit, size: :sm) %>
+      <%= render UI::Button::Component.new(text: translation(".superadmin_button"), type: "submit", size: :sm) %>
     <% end %>
   <% else %>
     &middot;
-    <span class="tw:font-normal tw:text-black/60 tw:italic">
-      <%= translation(".no_superadmin") %>
-    </span>
+    <span class="tw:font-normal tw:text-black/60 tw:italic"><%= translation(".no_superadmin") %></span>
   <% end %>
 </div>

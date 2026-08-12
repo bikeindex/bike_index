@@ -41,11 +41,11 @@ module UI
 
       # Multiline classes strings here were confusing tailwind somehow :(
       def disabled_classes
-        "tw:disabled:cursor-default tw:px-3 tw:py-1 tw:leading-tight tw:border tw:border-gray-300 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:text-gray-500 tw:dark:text-gray-400 "
+        "tw:disabled:cursor-default tw:px-3 tw:py-1 tw:leading-tight tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:text-gray-500 tw:dark:text-gray-400 "
       end
 
       def active_classes(current = false)
-        disabled_classes + "tw:dark:hover:bg-gray-700 tw:hover:bg-gray-100 tw:hover:text-gray-700 tw:dark:hover:text-white "
+        disabled_classes + "tw:hover:border-purple-500 tw:hover:bg-purple-50 tw:hover:text-gray-800 tw:dark:hover:border-purple-500 tw:dark:hover:bg-purple-950 tw:dark:hover:text-white "
       end
 
       def current_link_class
@@ -57,8 +57,9 @@ module UI
         else
           ""
         end
+        # The current page fills like an active UI::Button secondary
         extra_classes +
-          "tw:disabled:cursor-default tw:px-3 tw:py-1 tw:leading-tight tw:border tw:border-gray-300 tw:dark:border-gray-700 tw:bg-gray-200 tw:dark:bg-gray-600 tw:text-gray-800 tw:dark:text-gray-200 "
+          "tw:disabled:cursor-default tw:px-3 tw:py-1 tw:leading-tight tw:border tw:border-purple-500 tw:bg-purple-500 tw:text-white "
       end
 
       def pagy_series

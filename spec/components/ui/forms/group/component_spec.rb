@@ -19,6 +19,38 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     # .twlabel carries the gap to the field, so neither side spaces itself
     expect(component).to have_css("label.twlabel")
     expect(component).to_not have_css("[class*='tw:mt-1'], [class*='tw:mb-1']")
+    expect(component).to_not have_css("input[aria-describedby]")
+  end
+
+  # A field whose required-ness is decided in the browser carries both markers, since a
+  # controller can flip their hidden state but can't rebuild the label
+  context "required_toggleable" do
+    let(:component) do
+      render_inline(described_class.new(form_builder:, attribute:, required:, required_toggleable: true))
+    end
+
+    it "renders both markers, hiding the required one" do
+      expect(component).to have_css("[data-required-marker][hidden]", text: "*", visible: :all)
+      expect(component).to have_css("[data-optional-marker]", text: "optional")
+      expect(component).to_not have_css("[data-optional-marker][hidden]", visible: :all)
+      expect(component).to_not have_css("input[required]")
+    end
+
+    context "required" do
+      let(:required) { true }
+
+      it "hides the optional one instead" do
+        expect(component).to have_css("[data-required-marker]", text: "*")
+        expect(component).to_not have_css("[data-required-marker][hidden]", visible: :all)
+        expect(component).to have_css("[data-optional-marker][hidden]", text: "optional", visible: :all)
+        expect(component).to have_css("input[required]")
+      end
+    end
+  end
+
+  it "renders one unmarked suffix without it" do
+    expect(component).to_not have_css("[data-required-marker], [data-optional-marker]", visible: :all)
+    expect(component).to have_css("label", text: "optional")
   end
 
   context "with custom label" do
@@ -130,6 +162,38 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
       expect(component).to have_css("my-field")
       expect(component).to_not have_css("input")
       expect(component).to_not have_css("textarea")
+    end
+  end
+
+  describe "helper_text" do
+    let(:component) do
+      render_inline(described_class.new(form_builder:, attribute:)) do |group|
+        group.with_helper_text { "email, username or id" }
+      end
+    end
+
+    # The block sets a slot and renders no field, so UI::Forms::Input still has to run
+    it "renders under the input, which describes itself with it" do
+      expect(component).to have_css("input.twinput[aria-describedby='user_name_helper']")
+      expect(component).to have_css("p#user_name_helper", text: "email, username or id")
+    end
+
+    # Group can't reach the field a block renders, so the block describes it instead
+    context "with a content block" do
+      let(:component) do
+        render_in_view_context do
+          render(UI::Forms::Group::Component.new(attribute: :cycle_type)) do |group|
+            group.with_helper_text { "pick the closest match" }
+            render(UI::Forms::Combobox::Component.new(name: :cycle_type, options: %w[Bike Tandem],
+              "aria-describedby": group.helper_text_id))
+          end
+        end
+      end
+
+      it "renders the helper text with the id the block described its field by" do
+        expect(component).to have_css("p#cycle_type_helper", text: "pick the closest match")
+        expect(component).to have_css("input[role='combobox'][aria-describedby='cycle_type_helper']")
+      end
     end
   end
 

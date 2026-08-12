@@ -9,6 +9,7 @@ RSpec.describe "Register flow", :js, type: :system do
   let!(:red) { FactoryBot.create(:color, name: "Red") }
   let!(:blue) { FactoryBot.create(:color, name: "Blue") }
   let!(:green) { FactoryBot.create(:color, name: "Green") }
+  let!(:state) { FactoryBot.create(:state_new_york) }
 
   before do
     # The manufacturer combobox autocompletes against the redis index
@@ -25,6 +26,28 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_current_path("/my_account", wait: 5)
   end
 
+  def submit_step_1
+    type_into("#b_param_manufacturer_id", "Surly")
+    click_combobox_option("Surly")
+    fill_in "b_param[owner_email]", with: owner_email
+    click_button "Next"
+  end
+
+  # Answers every submission in the browser, the way an edge that never reaches the app
+  # would, and collects what it turned away
+  def fail_submissions(status:, headers: {})
+    [].tap do |attempts|
+      page.driver.with_playwright_page do |playwright_page|
+        playwright_page.route(%r{/register}, ->(route, request) {
+          next route.continue if request.method == "GET"
+
+          attempts << request.url
+          route.fulfill(status:, headers:, contentType: "text/plain", body: "Nope")
+        })
+      end
+    end
+  end
+
   # Through step 1 and onto step 2, the way a rider gets there
   def start_registration
     visit "/register/new"
@@ -32,19 +55,25 @@ RSpec.describe "Register flow", :js, type: :system do
     # new creates the registration and lands on its tokenized step 1
     expect(page).to have_current_path(/register\?b_param_token=.+&step=1/, url: true)
 
-    type_into("#b_param_manufacturer_id", "Surly")
-    click_combobox_option("Surly")
-    fill_in "b_param[owner_email]", with: owner_email
-    click_button "Next"
+    submit_step_1
 
     expect(page).to have_content("Add your bike")
   end
 
-  # The emailed link, minus the mailer's host - the app under test is on Capybara's
-  def confirmation_link
-    Email::PartialRegistrationJob.drain
-    url = ActionMailer::Base.deliveries.last.html_part.decoded[%r{https?://[^"]*/register/confirm[^"]*}]
-    URI.parse(CGI.unescapeHTML(url)).request_uri
+  # An async combobox carries no options to map a saved id back to a name, so the server
+  # renders the display itself - and back to step 1 is where a raw id would show up instead
+  it "shows the manufacturer by name, not by id, when back returns to step 1" do
+    start_registration
+    page.go_back
+
+    expect(page).to have_field("b_param_manufacturer_id", with: "Surly")
+    # The id is what submits, and only ever from the hidden field
+    expect(find("input[name='b_param[manufacturer_id]']", visible: :all).value).to eq manufacturer.id.to_s
+    expect(page).to have_no_field("b_param_manufacturer_id", with: manufacturer.id.to_s)
+
+    # The manufacturer itself, rather than Manufacturer.other with the id as free text
+    expect(BParam.last.manufacturer_id).to eq manufacturer.id
+    expect(BParam.last.manufacturer_other).to be_blank
   end
 
   it "starts a registration, keeps a full details draft across a reload, and completes" do
@@ -74,7 +103,7 @@ RSpec.describe "Register flow", :js, type: :system do
     click_button "Next"
     expect(page).to have_current_path(details_url, url: true)
 
-    # Confirming abandons it for a blank registration, which has nothing to start over from
+    # Confirming swaps it for a blank registration, which has nothing to start over from
     click_link "Back"
     open_modal(find_button("Start over"))
     click_link "Yes, start over"
@@ -144,8 +173,13 @@ RSpec.describe "Register flow", :js, type: :system do
 
     # Like bikes/new, phone is only asked for once the status calls for it
     expect(page).to have_no_field("bike[phone]")
+    expect(page).to have_no_content("Phone is required")
     type_into("#bike_status", "Stolen")
     click_combobox_option("Stolen")
+
+    # A theft is contacted on it, so the field it reveals asks rather than offers
+    expect(page).to have_content("Phone is required to register a stolen bike")
+    expect(find("input[name='bike[phone]']")[:required]).to be_present
 
     # The status the server renders is only a default, so the draft outlives a
     # reload - and the fields it gates reopen with it
@@ -161,10 +195,12 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_content("bike_photo-landscape.jpeg")
     expect(page).to have_no_content("uploading")
 
-    click_button "Complete Bike Registration"
+    # The theft is reported after this form, so the button doesn't claim to finish
+    expect(page).to have_no_button("Complete Bike Registration")
+    click_button "Next"
 
     # Anonymous, so there's nobody to own a bike yet - it's held for the emailed link
-    expect(page).to have_content("Registration saved")
+    expect(page).to have_css("h1", text: "Progress saved")
     expect(page).to have_content("verify your email")
     expect(Bike.count).to eq 0
     b_param = BParam.last
@@ -177,15 +213,60 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(ActiveStorage::Blob.find_signed!(b_param.image_signed_id).filename.to_s)
       .to eq "bike_photo-landscape.jpeg"
 
-    # Following the link makes the bike the registration was holding
+    # The emailed link lands on the interstitial, which waits for a click - confirming
+    # proves the address, which leaves the theft it's reporting to tell us about
     visit confirmation_link
+    click_button "Continue"
 
-    expect(page).to have_content("Registration complete", wait: 10)
+    expect(page).to have_content("Report your stolen bike", wait: 10)
+    expect(Bike.count).to eq 0
+    # When and where are required, and nothing was saved to fill them in from
+    expect(page).to have_field("report[date]", with: "")
+    fill_in "report[theft_description]", with: "Locked to a rack outside the coffee shop"
+    fill_in "report[police_report_number]", with: "8675309"
+
+    # Going back to fix a detail doesn't cost the report - the longest form in the flow,
+    # and the one nothing has been saved from yet
+    click_link "Back"
+    expect(page).to have_content("Add your bike's details")
+    click_button "Next"
+
+    expect(page).to have_field("report[theft_description]",
+      with: "Locked to a rack outside the coffee shop", wait: 10)
+    expect(page).to have_field("report[police_report_number]", with: "8675309")
+
+    # The browser holds the submit until when and where are answered, so nothing reaches
+    # the server
+    click_button "Complete Bike Registration"
+    expect(page).to have_current_path(/step=report/, url: true)
+    expect(Bike.count).to eq 0
+
+    fill_in "report[date]", with: "2026-08-05T14:30"
+    fill_in "report[address_record_attributes][street]", with: "278 Broadway"
+    fill_in "report[address_record_attributes][city]", with: "New York"
+    # The whole address is required alongside the street and city the server checks
+    select state.name, from: "report[address_record_attributes][region_record_id]"
+    fill_in "report[address_record_attributes][postal_code]", with: "10007"
+
+    click_button "Complete Bike Registration"
+
+    # The theft was the point of the flow, so the card heads with it rather than
+    # congratulating them on a registration that's being watched over
+    expect(page).to have_css("h1", text: "is listed as stolen on Bike Index", wait: 10)
     bike = Bike.last
     expect(bike).to have_attributes(owner_email:, serial_number: "made_without_serial",
       status: "status_stolen", frame_model: "Marlin 7")
-    # Signed in as the account the link made - to anyone else it reads as unclaimed
-    expect(page).to have_content("keep watch")
+    expect(bike.current_stolen_record).to have_attributes(street: "278 Broadway", city: "New York",
+      theft_description: "Locked to a rack outside the coffee shop", police_report_number: "8675309",
+      phone: "5550000000")
+    # Entered in the browser's zone, which posts alongside it rather than the server's -
+    # so it reads back as the time that was typed, wherever the server happens to be
+    browser_zone = page.evaluate_script("Intl.DateTimeFormat().resolvedOptions().timeZone")
+    expect(bike.current_stolen_record.date_stolen.in_time_zone(browser_zone).strftime("%Y-%m-%dT%H:%M"))
+      .to eq "2026-08-05T14:30"
+    # Signed in as the account the link made, so the checklist knows what's already done
+    expect(page).to have_css("li.completed-item", text: "Report theft on Bike Index")
+    expect(page).to have_link("your Police Report Number")
 
     # An account nobody signed up for, so the terms are the first thing it's asked
     visit "/my_account"
@@ -274,7 +355,7 @@ RSpec.describe "Register flow", :js, type: :system do
       expect(page).to have_current_path(/step=2/, url: true)
 
       # ...and once the blob lands the held submit goes through, carrying the photo
-      expect(page).to have_content("Registration saved", wait: 15)
+      expect(page).to have_css("h1", text: "Progress saved", wait: 15)
       expect(BParam.last.image_signed_id).to be_present
     end
 
@@ -294,7 +375,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
       complete_the_registration
 
-      expect(page).to have_content("Registration saved", wait: 15)
+      expect(page).to have_css("h1", text: "Progress saved", wait: 15)
       expect(BParam.last.image_signed_id).to be_blank
     end
   end
@@ -339,6 +420,92 @@ RSpec.describe "Register flow", :js, type: :system do
       response = Faraday.get(public_image.image_url)
       expect(response.status).to eq 200
       expect(response.body.bytesize).to eq File.size(image_path)
+    end
+  end
+
+  # A throttle answers text/plain, which Turbo renders as nothing, and asks to be waited
+  # for in tens of seconds - so it can be neither retried silently nor waited out
+  describe "a step the server throttles" do
+    it "stops retrying, says so, and gives the step back" do
+      visit "/register/new"
+      attempts = fail_submissions(status: 429, headers: {"retry-after" => "20"})
+      submit_step_1
+
+      expect(page).to have_content("try again in a moment")
+      # It was told how long the wait is, so it didn't spend its retries finding out
+      expect(attempts.length).to eq 1
+      # The step is theirs to submit again, rather than a spinner that never resolves
+      expect(page).to have_button("Next", disabled: false)
+      expect(page).to have_field("b_param[owner_email]", with: owner_email)
+      expect(BParam.last.owner_email).to be_blank
+    end
+  end
+
+  # A 500 carries no retry-after, so it's what the retries actually get spent on
+  describe "a step the server keeps failing" do
+    it "spends its retries, and spends them again when the rider tries once more" do
+      visit "/register/new"
+      attempts = fail_submissions(status: 500)
+      submit_step_1
+
+      # The submission and its two retries, which back off past Capybara's default wait
+      expect(page).to have_content("try again in a moment", wait: 5)
+      expect(attempts.length).to eq 3
+
+      # The notice asks for another try, so that try is worth as much as the first
+      click_button "Next"
+      wait_for { attempts.length == 6 }
+
+      expect(page).to have_button("Next", disabled: false)
+      expect(page).to have_field("b_param[owner_email]", with: owner_email)
+      expect(BParam.last.owner_email).to be_blank
+    end
+  end
+
+  # The combobox pages its options into a turbo-frame inside the step's own form, so
+  # their responses pass register--retry on the way out - and a failed list isn't a
+  # failed submission
+  describe "the manufacturer options failing partway down the list" do
+    # More than the endpoint's page size, so there's a second page to reach for
+    let!(:manufacturers) { 16.times.map { |i| FactoryBot.create(:manufacturer, name: "Surly Bikes #{i}") } }
+
+    # These are built after the outer index load, so the index doesn't know them yet
+    before { Autocomplete::Loader.load_all(%w[Manufacturer]) }
+
+    it "leaves the step for the rider to submit" do
+      visit "/register/new"
+      submissions = []
+      failed_options = []
+
+      page.driver.with_playwright_page do |playwright_page|
+        playwright_page.route(%r{/register}, ->(route, request) {
+          submissions << request.url unless request.method == "GET"
+          route.continue
+        })
+        playwright_page.route(%r{/search/combobox/manufacturers}, ->(route, request) {
+          next route.continue unless request.url.include?("page=2")
+
+          failed_options << request.url
+          route.fulfill(status: 500, contentType: "text/plain", body: "Nope")
+        })
+      end
+
+      fill_in "b_param[owner_email]", with: owner_email
+      type_into("#b_param_manufacturer_id", "Surly")
+      # The list resets its scroll as it re-renders, so scrolling before the whole first
+      # page is there goes nowhere
+      expect(page).to have_css(".hw-combobox__option", text: "Surly Bikes 7")
+      find(".hw-combobox__listbox").scroll_to(:bottom)
+      wait_for { failed_options.any? }
+      # A non-event is only provable by waiting: a scheduled retry is 500ms behind
+      sleep 1
+
+      # Still theirs to submit - and their own click is the only thing that does
+      click_combobox_option("Surly Bikes 0")
+      click_button "Next"
+
+      expect(page).to have_content("Add your bike")
+      expect(submissions.length).to eq 1
     end
   end
 
@@ -414,12 +581,117 @@ RSpec.describe "Register flow", :js, type: :system do
       check "I, #{user_name}, agree to comply with all of the rules above."
       click_button "Complete Bike Registration"
 
-      expect(page).to have_content("Registration saved")
+      expect(page).to have_css("h1", text: "Progress saved")
       acknowledgment = RegistrationSequenceAcknowledgment.last
       expect(acknowledgment).to have_attributes(registration_sequence_id: sequence.id,
         b_param_id: BParam.last.id, owner_email:,
         acknowledgment_text: "agree to comply with all of the rules above.")
       expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
+    end
+
+    # Every step submits through Turbo, so a throttle or a bad gateway is a response the
+    # page can retry. This flow has one of every step, so each gets its turn at failing.
+    context "when the server fails each step once" do
+      let(:failed_steps) { [] }
+
+      def step_param(url) = Rack::Utils.parse_query(URI.parse(url.to_s).query)["step"]
+
+      # Each step's first submission is answered in the browser and the retry behind it is
+      # let through. The statuses alternate, so both kinds of failure get their turn.
+      before do
+        page.driver.with_playwright_page do |playwright_page|
+          playwright_page.route(%r{/register}, ->(route, request) {
+            # Every submission is a POST to one of three paths (Rails' method override),
+            # so what tells the steps apart is the page each came from
+            step = [URI.parse(request.url).path, step_param(request.headers["referer"])]
+            next route.continue if request.method == "GET" || failed_steps.include?(step)
+
+            failed_steps << step
+            route.fulfill(status: failed_steps.length.odd? ? 429 : 500,
+              contentType: "text/plain", body: "Try again")
+          })
+        end
+      end
+
+      it "retries each of them, and the registration still finishes" do
+        ActionMailer::Base.deliveries = []
+        visit "/register/new?organization_id=#{organization.slug}"
+
+        type_into("#b_param_manufacturer_id", "Surly")
+        click_combobox_option("Surly")
+        check "Electric (motorized)"
+        fill_in "b_param[owner_email]", with: owner_email
+
+        # Lengthens the wait rather than skipping it, leaving time to look at the button
+        # while it's pending. The flag is what finds that window: Turbo re-enables the
+        # button as the failed submission ends, so an earlier poll reads the wrong state
+        page.execute_script(<<~JS)
+          const form = document.querySelector("[data-controller~='register--retry']")
+          form.setAttribute("data-register--retry-delay-value", "3000")
+          form.addEventListener("turbo:submit-end", () => { window.submitEnded = true })
+        JS
+        click_button "Next"
+
+        # Without the hold a rider could click through the wait, submitting the step twice
+        wait_for { page.evaluate_script("window.submitEnded") }
+        expect(page).to have_button("Next", disabled: true)
+
+        # The rider never sees the failure, only the retry - waited out past Capybara's default
+        expect(page).to have_content("Add your bike", wait: 10)
+
+        fill_in "bike[user_name]", with: user_name
+        type_into("#bike_primary_frame_color_id", "Red")
+        click_combobox_option("Red")
+        fill_in "bike[serial_number]", with: "XYZ 123"
+        # A theft, so the report is in the flow too - it waits on the emailed link, which
+        # puts it last rather than after this form
+        type_into("#bike_status", "Stolen")
+        click_combobox_option("Stolen")
+        fill_in "bike[phone]", with: "555 000 0000"
+        click_button "Next"
+
+        expect(page).to have_content("Battery & charging")
+        check "Charge with the manufacturer's charger"
+        check "Report a swollen battery"
+        click_button "Continue"
+
+        expect(page).to have_content("Campus rules")
+        check "Dismount in posted zones"
+        click_button "Continue"
+
+        expect(page).to have_content("You're almost done")
+        check "I, #{user_name}, agree to comply with all of the rules above."
+        click_button "Complete Bike Registration"
+
+        expect(page).to have_css("h1", text: "Progress saved")
+
+        # The emailed link finishes a step like any other, and fails like one
+        visit confirmation_link
+        click_button "Continue"
+
+        # Confirming proves the address, which leaves the theft it's reporting
+        expect(page).to have_content("Report your stolen bike", wait: 10)
+        fill_in "report[date]", with: "2026-08-05T14:30"
+        fill_in "report[address_record_attributes][street]", with: "278 Broadway"
+        fill_in "report[address_record_attributes][city]", with: "New York"
+        select state.name, from: "report[address_record_attributes][region_record_id]"
+        fill_in "report[address_record_attributes][postal_code]", with: "10007"
+        click_button "Complete Bike Registration"
+
+        expect(page).to have_css("h1", text: "is listed as stolen on Bike Index", wait: 10)
+        expect(Bike.last).to have_attributes(owner_email:, serial_number: "XYZ 123",
+          propulsion_type: "pedal-assist", status: "status_stolen")
+        expect(Bike.last.current_stolen_record.street).to eq "278 Broadway"
+        # A retry that landed twice would be a second registration, or a second signature
+        expect(Bike.count).to eq 1
+        expect(RegistrationSequenceAcknowledgment.count).to eq 1
+
+        # Every step of the flow failed, and none of them more than once
+        expect(failed_steps).to eq([["/register", "1"], ["/register", "2"],
+          ["/register/acknowledge", "3"], ["/register/acknowledge", "4"],
+          ["/register/acknowledge", "review"], ["/register/confirm_email", nil],
+          ["/register/report", "report"]])
+      end
     end
   end
 end

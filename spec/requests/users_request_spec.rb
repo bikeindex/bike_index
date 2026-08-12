@@ -10,6 +10,22 @@ RSpec.describe UsersController, type: :request do
       expect(response).to render_template(:new)
       expect(Capybara.string(response.body)).to have_css("[data-controller='ui--forms--email'] input#user_email")
     end
+
+    context "sso organization domain" do
+      let!(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
+      end
+      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+
+      it "hands a claimed email off to the IdP, and renders the form for one it doesn't claim" do
+        get "#{base_url}/new", params: {email: "student@sso.edu"}
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+
+        get "#{base_url}/new", params: {email: "student@example.edu"}
+        expect(response).to render_template(:new)
+      end
+    end
   end
 
   describe "create" do
@@ -47,6 +63,32 @@ RSpec.describe UsersController, type: :request do
 
         post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
         expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
+      end
+    end
+
+    context "sso organization domain" do
+      let(:email) { "student@sso.edu" }
+      let!(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
+      end
+      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+
+      it "forces SSO instead of creating an account the IdP doesn't know about" do
+        expect {
+          post base_url, params: {user: {email:, name: "Test name", terms_of_service: "1"}}
+        }.to_not change(User, :count)
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+      end
+
+      context "SAML config not yet live" do
+        let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, organization:) }
+
+        it "signs up normally rather than redirecting into an unconfigured IdP" do
+          expect {
+            post base_url, params: {user: {email:, name: "Test name", terms_of_service: "1"}}
+          }.to change(User, :count).by(1)
+        end
       end
     end
   end
@@ -123,6 +165,25 @@ RSpec.describe UsersController, type: :request do
       expect(current_user.vendor_terms_of_service).to be_falsey
       get "/accept_terms"
       expect(response).to render_template(:accept_terms)
+    end
+
+    # Submitting with the box unchecked lands back on the same form, which reads as
+    # nothing having happened unless it says what's missing
+    it "errors when the terms aren't agreed to" do
+      patch "/users/#{current_user.to_param}", params: {user: {terms_of_service: "0"}}
+
+      expect(response).to redirect_to accept_terms_url
+      expect(flash[:error]).to eq "You must agree to the terms to use Bike Index"
+      expect(flash[:notice]).to be_blank
+      expect(current_user.reload.terms_of_service).to be_falsey
+    end
+
+    it "accepts them when it is" do
+      patch "/users/#{current_user.to_param}", params: {user: {terms_of_service: "1"}}
+
+      expect(response).to redirect_to my_account_url
+      expect(flash[:error]).to be_blank
+      expect(current_user.reload.terms_of_service).to be_truthy
     end
   end
 
@@ -396,7 +457,7 @@ RSpec.describe UsersController, type: :request do
     end
     context "auth token expired" do
       it "redirects" do
-        user.update_auth_token("token_for_password_reset", Time.current - 121.minutes)
+        user.update_auth_token("token_for_password_reset", (User::AUTH_TOKEN_EXPIRY + 1.minute).ago)
         og_token = user.token_for_password_reset
         get "#{base_url}/update_password_form_with_reset_token", params: {token: user.token_for_password_reset}
         expect(response).to redirect_to request_password_reset_form_users_path
@@ -421,6 +482,8 @@ RSpec.describe UsersController, type: :request do
       og_token = user.token_for_password_reset
       post "#{base_url}/update_password_with_reset_token", params: valid_params
       expect(response).to redirect_to my_account_url
+      # Signing in doesn't replace it with the generic "Logged in!"
+      expect(flash[:success]).to match(/password reset successfully/i)
       user.reload
       expect(user.token_for_password_reset).to_not eq og_token
       expect(user.auth_token).to_not eq og_auth
@@ -532,7 +595,7 @@ RSpec.describe UsersController, type: :request do
     end
     context "auth token expired" do
       it "redirects" do
-        user.update_auth_token("token_for_password_reset", Time.current - 3.hours)
+        user.update_auth_token("token_for_password_reset", (User::AUTH_TOKEN_EXPIRY + 1.minute).ago)
         user.reload
         og_token = user.token_for_password_reset
         post "#{base_url}/update_password_with_reset_token", params: valid_params
@@ -631,7 +694,7 @@ RSpec.describe UsersController, type: :request do
 
   describe "unsubscribe" do
     let!(:user) { FactoryBot.create(:user_confirmed, notification_newsletters: true) }
-    let(:signed_id) { user.signed_id(purpose: :unsubscribe, expires_in: 365.days) }
+    let(:signed_id) { user.unsubscribe_signed_id }
 
     it "renders" do
       expect(user.notification_newsletters).to be_truthy
@@ -639,6 +702,9 @@ RSpec.describe UsersController, type: :request do
       expect(assigns(:user)&.id).to eq user.id
       expect(response.code).to eq("200")
       expect(response).to render_template("users/unsubscribe")
+      # The rendered interstitial posts to unsubscribe_update, it doesn't unsubscribe here
+      expect(Capybara.string(response.body))
+        .to have_css("form[action^='#{base_url}/'][action$='/unsubscribe_update']")
       expect(flash).to be_blank
       expect(user.reload.notification_newsletters).to be_truthy
     end
@@ -690,7 +756,7 @@ RSpec.describe UsersController, type: :request do
 
   describe "unsubscribe_update" do
     let!(:user) { FactoryBot.create(:user_confirmed, notification_newsletters: true) }
-    let(:signed_id) { user.signed_id(purpose: :unsubscribe, expires_in: 365.days) }
+    let(:signed_id) { user.unsubscribe_signed_id }
 
     it "unsubscribes" do
       expect(user.notification_newsletters).to be_truthy
@@ -703,14 +769,33 @@ RSpec.describe UsersController, type: :request do
     context "current_user" do
       include_context :request_spec_logged_in_as_user
       let(:current_user) { FactoryBot.create(:user_confirmed, notification_newsletters: true) }
-      it "unsubscribes current user instead" do
+      it "unsubscribes the signed id's user, not the session's" do
         expect(current_user.notification_newsletters).to be_truthy
         post "#{base_url}/#{signed_id}/unsubscribe_update"
         expect(response.code).to eq("302")
         expect(flash[:success]).to be_present
-        expect(user.reload.notification_newsletters).to be_truthy
-        expect(current_user.reload.notification_newsletters).to be_falsey
+        expect(user.reload.notification_newsletters).to be_falsey
+        expect(current_user.reload.notification_newsletters).to be_truthy
       end
+    end
+
+    # RFC 8058 - the mail client's own unsubscribe button
+    context "one-click" do
+      include_context :test_csrf_token
+      it "unsubscribes without a session or a CSRF token" do
+        post "#{base_url}/#{signed_id}/unsubscribe_update", params: {"List-Unsubscribe" => "One-Click"}
+        expect(response.code).to eq("200")
+        expect(response.body).to be_blank
+        expect(user.reload.notification_newsletters).to be_falsey
+      end
+    end
+
+    # A mail client that doesn't do one-click opens the POST target in a browser
+    it "GET renders the interstitial rather than unsubscribing" do
+      get "#{base_url}/#{signed_id}/unsubscribe_update"
+      expect(response.code).to eq("200")
+      expect(response).to render_template("users/unsubscribe")
+      expect(user.reload.notification_newsletters).to be_truthy
     end
 
     context "with plain username" do

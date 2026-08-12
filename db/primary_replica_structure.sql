@@ -922,7 +922,8 @@ CREATE TABLE public.bug_reports (
     received_at timestamp(6) without time zone,
     from_name text,
     inbound_email_id bigint,
-    status integer DEFAULT 0 NOT NULL
+    status integer DEFAULT 0 NOT NULL,
+    receiver text
 );
 
 
@@ -2574,7 +2575,9 @@ CREATE TABLE public.oauth_access_grants (
     redirect_uri text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     revoked_at timestamp without time zone,
-    scopes character varying(255)
+    scopes character varying(255),
+    code_challenge character varying,
+    code_challenge_method character varying
 );
 
 
@@ -3848,7 +3851,8 @@ CREATE TABLE public.strava_activities (
     average_speed double precision,
     suffer_score double precision,
     strava_data jsonb,
-    enriched_at timestamp(6) without time zone
+    enriched_at timestamp(6) without time zone,
+    top_10_ranks integer[]
 );
 
 
@@ -6238,6 +6242,13 @@ CREATE INDEX index_b_params_on_created_bike_id ON public.b_params USING btree (c
 
 
 --
+-- Name: index_b_params_on_creator_id_without_bike; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_b_params_on_creator_id_without_bike ON public.b_params USING btree (creator_id) WHERE (created_bike_id IS NULL);
+
+
+--
 -- Name: index_b_params_on_email_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6543,6 +6554,13 @@ CREATE INDEX index_blog_content_tags_on_content_tag_id ON public.blog_content_ta
 --
 
 CREATE INDEX index_bug_reports_on_inbound_email_id ON public.bug_reports USING btree (inbound_email_id);
+
+
+--
+-- Name: index_bug_reports_on_receiver; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bug_reports_on_receiver ON public.bug_reports USING btree (receiver);
 
 
 --
@@ -7351,6 +7369,13 @@ CREATE UNIQUE INDEX index_registration_sequences_one_active_per_org ON public.re
 
 
 --
+-- Name: index_registration_sequences_one_active_template; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_registration_sequences_one_active_template ON public.registration_sequences USING btree (((organization_id IS NULL))) WHERE ((organization_id IS NULL) AND (start_at IS NOT NULL) AND (end_at IS NULL) AND (deleted_at IS NULL));
+
+
+--
 -- Name: index_registration_sequences_one_draft_per_org; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7358,10 +7383,10 @@ CREATE UNIQUE INDEX index_registration_sequences_one_draft_per_org ON public.reg
 
 
 --
--- Name: index_registration_sequences_single_template; Type: INDEX; Schema: public; Owner: -
+-- Name: index_registration_sequences_one_draft_template; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_registration_sequences_single_template ON public.registration_sequences USING btree (((organization_id IS NULL))) WHERE ((organization_id IS NULL) AND (deleted_at IS NULL));
+CREATE UNIQUE INDEX index_registration_sequences_one_draft_template ON public.registration_sequences USING btree (((organization_id IS NULL))) WHERE ((organization_id IS NULL) AND (start_at IS NULL) AND (deleted_at IS NULL));
 
 
 --
@@ -7589,6 +7614,13 @@ CREATE INDEX index_users_on_email_trgm ON public.users USING gin (email public.g
 
 
 --
+-- Name: index_users_on_magic_link_token_outstanding; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_magic_link_token_outstanding ON public.users USING btree (magic_link_token) WHERE (magic_link_token IS NOT NULL);
+
+
+--
 -- Name: index_users_on_token_for_password_reset; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7710,6 +7742,12 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260811085030'),
+('20260808224655'),
+('20260808120000'),
+('20260808100000'),
+('20260807153129'),
+('20260807132506'),
 ('20260805093756'),
 ('20260804100000'),
 ('20260801100000'),
