@@ -290,11 +290,12 @@
       </div>
     </div>
 
-    <%# Unlike bikes/new this isn't org-gated - anyone can buy a Bike Index sticker %>
-    <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :bike_sticker,
-        label_text: reg_label("reg_bike_sticker", translation(".sticker_number")),
-        html_options: {value: @b_param.bike_sticker_code, placeholder: translation(".sticker_placeholder"),
-          autocomplete: "off", class: "tw:font-mono"}) %>
+    <% if show_bike_sticker? %>
+      <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :bike_sticker,
+          label_text: reg_label("reg_bike_sticker", translation(".sticker_number")),
+          html_options: {value: @b_param.bike_sticker_code, placeholder: translation(".sticker_placeholder"),
+            autocomplete: "off", class: "tw:font-mono"}) %>
+    <% end %>
 
     <% status_options = {"status_with_owner" => [translation(".owner_registration"), translation(".owner_registration_description")],
         "status_stolen" => [translation(".stolen"), translation(".stolen_description", cycle_type:)],

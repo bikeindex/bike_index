@@ -562,8 +562,7 @@ RSpec.describe RegisterController, type: :request do
         reg_fields.each { |field| expect(response.body).to_not include field }
         # Not rendered at all - no status could reveal it, and it's ~300 option tags
         expect(status_field("address_record_attributes")).to be_nil
-        # The Bike Index sticker isn't org-gated here, unlike bikes/new
-        expect(response.body).to include "bike[bike_sticker]"
+        expect(response.body).to_not include "bike[bike_sticker]"
         # Nothing extra was asked for, so the section is just the registrant's own info
         expect(response.body).to include "Contact info"
         expect(response.body).to_not include "Information for"
@@ -578,6 +577,27 @@ RSpec.describe RegisterController, type: :request do
         expect(phone_field_classes).to_not include "tw:hidden"
         expect(phone_statuses_watched).to eq Bike.statuses
         expect(response.body).to include "#{organization.short_name} affiliation"
+      end
+
+      # update_column skips the derivation that rides reg_bike_sticker along with
+      # bike_stickers, so both are set here the way it would leave them
+      it "asks for the sticker only for an organization with user editable stickers" do
+        organization.update_column :enabled_feature_slugs, %w[bike_stickers reg_bike_sticker]
+        get register_path(b_param_token: b_param.id_token, step: 2)
+        expect(response.body).to_not include "bike[bike_sticker]"
+
+        organization.update_column :enabled_feature_slugs,
+          %w[bike_stickers reg_bike_sticker bike_stickers_user_editable]
+        get register_path(b_param_token: b_param.id_token, step: 2)
+        expect(response.body).to include "bike[bike_sticker]"
+      end
+
+      it "asks for the sticker a scanned registration already carries" do
+        b_param.update(params: b_param.params.deep_merge("bike" => {"bike_sticker" => "A 471 829"}))
+        get register_path(b_param_token: b_param.id_token, step: 2)
+        expect(organization.additional_registration_fields).to_not include "reg_bike_sticker"
+        expect(Nokogiri::HTML(response.body).at_css("input[name='bike[bike_sticker]']")["value"])
+          .to eq "A 471 829"
       end
 
       it "saves the additional registration fields" do

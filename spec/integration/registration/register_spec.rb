@@ -135,7 +135,8 @@ RSpec.describe "Register flow", :js, type: :system do
     check "Missing serial"
     # readonly rather than disabled, so "unknown" still submits
     expect(page).to have_field("bike[serial_number]", with: "unknown", readonly: true)
-    fill_in "bike[bike_sticker]", with: "A 471 829"
+    # No organization with stickers, and nothing scanned, so there is no sticker to give
+    expect(page).to have_no_field("bike[bike_sticker]")
 
     # Nothing submitted yet - the reload restores the whole draft from form-persist
     visit details_url
@@ -158,7 +159,6 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_field("bike[serial_number]", with: "unknown", readonly: true)
     expect(page).to have_checked_field("Missing serial")
     expect(page).to have_button("This bike was made without a serial number")
-    expect(page).to have_field("bike[bike_sticker]", with: "A 471 829")
 
     # The modal's made-without confirm mutates fields programmatically - that
     # state survives a reload too
