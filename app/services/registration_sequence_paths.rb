@@ -27,8 +27,11 @@ module RegistrationSequencePaths
     sequence(registration_sequence, page:)
   end
 
-  # Making a draft live is admin's alone - an organization asks us to do it
-  def activate(registration_sequence) = routes.activate_admin_registration_sequence_path(registration_sequence)
+  # Making a draft live is admin's alone - an organization asks us to do it. It PATCHes the
+  # sequence like any other edit, with the param saying which edit
+  def activate(registration_sequence)
+    routes.admin_registration_sequence_path(registration_sequence, activate: true)
+  end
 
   # POSTs open the owner's draft, cloning one if there isn't one. A blank organization
   # is the template

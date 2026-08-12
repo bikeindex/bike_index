@@ -121,6 +121,49 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
           expect(active.reload.faq_url).to be_blank
         end
       end
+
+      context "activate" do
+        it "makes the draft live" do
+          patch "#{base_url}/#{draft.id}", params: {activate: true}
+
+          expect(response).to redirect_to("#{base_url}/#{draft.id}")
+          expect(draft.reload).to be_active
+        end
+
+        context "template draft" do
+          let!(:template) { FactoryBot.create(:registration_sequence_template, :with_pages) }
+          let!(:previous_template) { FactoryBot.create(:registration_sequence_template_active, :with_pages) }
+
+          it "makes it the live template, archiving the one it supersedes" do
+            patch "#{base_url}/#{template.id}", params: {activate: true}
+
+            expect(response).to redirect_to("#{base_url}/#{template.id}")
+            expect(RegistrationSequence.active_template).to eq template
+            expect(previous_template.reload).to be_archived
+          end
+        end
+
+        context "draft without pages" do
+          let!(:draft) { FactoryBot.create(:registration_sequence, organization:) }
+
+          it "says why it can't go live" do
+            patch "#{base_url}/#{draft.id}", params: {activate: true}
+
+            expect(response).to redirect_to("#{base_url}/#{draft.id}/edit")
+            expect(flash[:error]).to match(/every page needs/)
+            expect(draft.reload).to be_draft
+          end
+        end
+
+        context "activated sequence" do
+          let!(:active) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+
+          it "404s" do
+            patch "#{base_url}/#{active.id}", params: {activate: true}
+            expect(response.status).to eq(404)
+          end
+        end
+      end
     end
 
     describe "create" do
@@ -146,49 +189,6 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
         it "404s rather than opening the template every organization clones" do
           expect { post base_url, params: {organization_id: "#{organization.to_param}-typo"} }
             .to_not change(RegistrationSequence, :count)
-          expect(response.status).to eq(404)
-        end
-      end
-    end
-
-    describe "activate" do
-      it "makes the draft live" do
-        patch "#{base_url}/#{draft.id}/activate"
-
-        expect(response).to redirect_to("#{base_url}/#{draft.id}")
-        expect(draft.reload).to be_active
-      end
-
-      context "template draft" do
-        let!(:template) { FactoryBot.create(:registration_sequence_template, :with_pages) }
-        let!(:previous_template) { FactoryBot.create(:registration_sequence_template_active, :with_pages) }
-
-        it "makes it the live template, archiving the one it supersedes" do
-          patch "#{base_url}/#{template.id}/activate"
-
-          expect(response).to redirect_to("#{base_url}/#{template.id}")
-          expect(RegistrationSequence.active_template).to eq template
-          expect(previous_template.reload).to be_archived
-        end
-      end
-
-      context "draft without pages" do
-        let!(:draft) { FactoryBot.create(:registration_sequence, organization:) }
-
-        it "says why it can't go live" do
-          patch "#{base_url}/#{draft.id}/activate"
-
-          expect(response).to redirect_to("#{base_url}/#{draft.id}/edit")
-          expect(flash[:error]).to match(/every page needs/)
-          expect(draft.reload).to be_draft
-        end
-      end
-
-      context "activated sequence" do
-        let!(:active) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
-
-        it "404s" do
-          patch "#{base_url}/#{active.id}/activate"
           expect(response.status).to eq(404)
         end
       end

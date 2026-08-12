@@ -18,7 +18,7 @@ RSpec.describe Admin::RegistrationSequence::Header::Component, type: :component 
     # Nothing to explain while it's editable
     expect(page).to_not have_css("[role='tooltip']", visible: :all)
     # Making the draft live is the header's action; discarding it lives at the foot of the page
-    expect(page).to have_css("form[action='#{admin_url}/activate'] button", text: "Activate")
+    expect(page).to have_css("form[action='#{admin_url}?activate=true'] button", text: "Activate")
     expect(page).to_not have_button("Create draft")
     expect(page).to_not have_button("Discard draft")
   end
