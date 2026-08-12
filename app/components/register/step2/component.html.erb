@@ -162,11 +162,16 @@
         class="<%= "tw:hidden" if made_without_serial %>"
         data-register--serial-target="serialSection"
       >
-        <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :serial_number, kind: :text_field, required: true,
-            html_options: {value: bike["serial_number"], placeholder: translation(".serial_placeholder"),
-              autocomplete: "off", readonly: bike["serial_number"] == "unknown",
-              data: {"register--serial-target": "input"},
-              class: ["tw:mt-1 tw:font-mono", ("tw:text-gray-400 tw:cursor-not-allowed" if bike["serial_number"] == "unknown")].compact.join(" ")}) %>
+        <%# Hidden rather than removed, so the serial it holds still submits %>
+        <div
+          class="<%= "tw:hidden" if bike["serial_number"] == "unknown" %>"
+          data-register--serial-target="inputRow"
+        >
+          <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :serial_number, kind: :text_field, required: true,
+              html_options: {value: bike["serial_number"], placeholder: translation(".serial_placeholder"),
+                autocomplete: "off", data: {"register--serial-target": "input"},
+                class: "tw:mt-1 tw:font-mono"}) %>
+        </div>
 
         <%= render UI::Forms::Checkbox::Component.new(name: :serial_missing, value: true,
             checked: bike["serial_number"] == "unknown", label: translation(".missing_serial"), class_name: "tw:mt-2",

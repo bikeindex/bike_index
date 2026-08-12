@@ -140,8 +140,9 @@ RSpec.describe "Register flow", :js, type: :system do
     find("label", text: "M", exact_text: true).click
     select "cm", from: "bike[frame_size_unit]"
     check "Missing serial"
-    # readonly rather than disabled, so "unknown" still submits
-    expect(page).to have_field("bike[serial_number]", with: "unknown", readonly: true)
+    # Hidden rather than removed, so "unknown" still submits
+    expect(page).to have_no_field("bike[serial_number]")
+    expect(page).to have_field("bike[serial_number]", with: "unknown", visible: :all)
     # No organization with stickers, and nothing scanned, so there is no sticker to give
     expect(page).to have_no_field("bike[bike_sticker]")
 
@@ -162,8 +163,9 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(find("input[name='bike[frame_size]'][value='m']", visible: :all)).to be_checked
     # A select always has a value, so it restores from the draft rather than the server default
     expect(page).to have_select("bike[frame_size_unit]", selected: "cm")
-    # The restored missing serial re-reveals the made-without link
-    expect(page).to have_field("bike[serial_number]", with: "unknown", readonly: true)
+    # The restored missing serial hides the input again and re-reveals the made-without link
+    expect(page).to have_no_field("bike[serial_number]")
+    expect(page).to have_field("bike[serial_number]", with: "unknown", visible: :all)
     expect(page).to have_checked_field("Missing serial")
     expect(page).to have_button("This bike was made without a serial number")
 
@@ -177,6 +179,22 @@ RSpec.describe "Register flow", :js, type: :system do
 
     expect(page).to have_checked_field("This bike was made without a serial")
     expect(page).to have_no_field("bike[serial_number]") # the serial section stays swapped out
+
+    # The input was hidden twice getting here - by the missing checkbox, then by the
+    # made-without swap - so unchecking has to bring it back from both
+    uncheck "This bike was made without a serial"
+
+    expect(page).to have_field("bike[serial_number]", with: "")
+    expect(page).to have_unchecked_field("Missing serial")
+
+    check "Missing serial"
+
+    expect(page).to have_no_field("bike[serial_number]")
+
+    click_button "This bike was made without a serial number"
+    click_button "I'm 100% sure"
+
+    expect(page).to have_checked_field("This bike was made without a serial")
 
     # Like bikes/new, phone is only asked for once the status calls for it
     expect(page).to have_no_field("bike[phone]")
