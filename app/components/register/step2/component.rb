@@ -70,8 +70,8 @@ module Register
       end
 
       # Not one of reg_fields, which head the contact section - this renders with the bike
-      # details. user_editable, as bikes/new gates it: a code the organization won't let a
-      # registrant claim is dropped on save. A code already set arrived with a scanned sticker
+      # details. user_editable, as bikes/new gates it: only an organization that lets ordinary
+      # users assign its stickers. A code already set arrived with a scanned sticker
       def show_bike_sticker?
         @b_param.bike_sticker_code.present? ||
           BikeServices::Displayer.include_reg_field?(:bike_sticker, organization, require_user_editable: true)
