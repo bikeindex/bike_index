@@ -100,9 +100,17 @@ cannondale_user.save
 OrganizationRole.create(organization_id: cannondale.id, user_id: cannondale_user.id, role: "admin")
 
 # --- Bike Recovery Team: Law Enforcement functionality ---
+# law_enforcement is the kind, not just the features: phone_for_police and the rest of
+# Bike#phoneable_by? key off Organization.law_enforcement rather than the feature slugs
 recovery_team = Organization.find_by_name("Bike Recovery Team") || Organization.create!(name: "Bike Recovery Team")
+recovery_team.update(kind: :law_enforcement)
 recovery_team_invoice = Invoice.create(organization: recovery_team, amount_due: 0, start_at: Time.current - 1.hour, subscription_end_at: 1.year.from_now)
 recovery_team_invoice.update(organization_feature_ids: [law_enforcement_feature_id].compact)
+
+recovery_team_user = User.find_by_email("recovery@bikeindex.org") ||
+  User.create(name: "Recovery Team Member", email: "recovery@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true)
+recovery_team_user.confirm(recovery_team_user.confirmation_token) unless recovery_team_user.confirmed?
+OrganizationRole.create(organization_id: recovery_team.id, user_id: recovery_team_user.id, role: "member")
 
 # Make sure example organization exists
 Organization.example

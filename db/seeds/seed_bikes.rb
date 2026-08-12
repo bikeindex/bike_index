@@ -79,7 +79,16 @@ stolen_locations.each_with_index do |loc, i|
     }
   )
   unless bike.errors.any?
-    bike.current_stolen_record&.update_columns(latitude: loc[:latitude], longitude: loc[:longitude])
+    # The first is police-only and the second public, so both ends of Bike#phoneable_by?
+    # are visible in dev — the rest keep the signed-in-user default. phone is set here
+    # already normalized, since update_columns skips the phonify callback
+    phone_visibility = case i
+    when 0 then {phone_for_users: false, phone_for_shops: false}
+    when 1 then {phone_for_everyone: true}
+    else {}
+    end
+    bike.current_stolen_record&.update_columns(latitude: loc[:latitude], longitude: loc[:longitude],
+      phone: "1112223333", **phone_visibility)
     puts "  Created stolen bike ##{i + 1} at #{loc[:street]}, #{loc[:city]}"
   end
 end
