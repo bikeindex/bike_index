@@ -11,7 +11,7 @@
 # GitHub Repo: https://github.com/marcoroth/herb
 #
 
-version: 0.9.2
+version: 0.10.3
 
 files:
 #   # Additional patterns beyond the defaults (**.html, **.rhtml, **.html.erb, etc.)
@@ -53,6 +53,9 @@ linter:
     # .html_safe and .raw are always hacks and I know they're hacks and are avoided
     erb-no-unsafe-raw:
       enabled: false
+    # Commented-out output tags are kept on purpose - a TODO, or what a thing replaced
+    erb-no-commented-out-output-tags:
+      enabled: false
 
     #
     # Rules I'd like to enable but we have legacy things that make it hard
@@ -70,6 +73,10 @@ linter:
       enabled: false
     # Disabled: UI::Table column blocks run via instance_exec, so helpers need helpers. prefix
     actionview-no-silent-helper:
+      enabled: false
+    # Every inline <script> would need a nonce, and CSP ignores unsafe_inline once one is
+    # present - so turning this on means moving the whole policy to nonces at the same time
+    html-require-script-nonce:
       enabled: false
   #
   #   # Rules can have 'include', 'only', and 'exclude' patterns

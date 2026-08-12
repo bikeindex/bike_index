@@ -30,9 +30,10 @@ module Register
         page = ::BikeServices::Register.sequence_pages(sequence)[index]
         return missing_notice("a registration sequence with #{index + 1} pages") if page.blank?
 
-        render(Register::StepAcknowledgment::Component.new(sequence:,
-          b_param: preview_b_param(sequence, acknowledged ? [page.id] : []),
-          step: ::BikeServices::Register.step_for_page_index(index)))
+        b_param = preview_b_param(sequence, acknowledged ? [page.id] : [])
+        render(Register::StepAcknowledgment::Component.new(sequence:, b_param:,
+          step: ::BikeServices::Register.step_for_page_index(index),
+          steps: ::BikeServices::Register.steps(b_param, sequence:)))
       end
 
       # The pages only appear for an e-vehicle registered with the organization
@@ -44,10 +45,8 @@ module Register
         }.as_json)
       end
 
-      # The template stands in where no organization has activated a sequence
-      def preview_sequence
-        ::RegistrationSequence.active_for(lookbook_organization) || ::RegistrationSequence.templates.first
-      end
+      # The live template stands in where no organization has activated a sequence
+      def preview_sequence = ::RegistrationSequence.active_or_template_for(lookbook_organization)
     end
   end
 end

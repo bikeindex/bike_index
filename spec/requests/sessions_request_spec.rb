@@ -250,9 +250,7 @@ RSpec.describe SessionsController, type: :request do
         .to have_css("form[action='/session/sign_in_with_magic_link'] input[name='token'][value='#{token}']", visible: :hidden)
     end
 
-    # A dead token is dead the same way whatever killed it, so the reason comes from the
-    # timestamp inside it. Getting this wrong reads as "the site is broken" rather than
-    # "you already did this"
+    # A dead token matches no user whatever killed it, so the reason comes from its timestamp
     context "incorrect_token" do
       def failure_for(token)
         get "/session/magic_link", params: {incorrect_token: token}
@@ -261,7 +259,8 @@ RSpec.describe SessionsController, type: :request do
       end
 
       it "names the timeout for a token older than the window" do
-        expect(failure_for(SecurityTokenizer.new_token(3.hours.ago))).to match(/link has expired/i)
+        stale = SecurityTokenizer.new_token((User::AUTH_TOKEN_EXPIRY + 1.minute).ago)
+        expect(failure_for(stale)).to match(/link has expired/i)
       end
 
       it "says it was already used for a token inside the window" do
@@ -284,6 +283,15 @@ RSpec.describe SessionsController, type: :request do
       expect(response).to redirect_to admin_root_url
       expect(superadmin.reload.magic_link_token).to be_nil
       expect(superadmin.last_login_at).to be_within(1.second).of Time.current
+    end
+
+    # find_by with a blank token matches IS NULL - nearly every user
+    it "signs nobody in for a blank or missing token" do
+      [{token: ""}, {}].each do |params|
+        post "/session/sign_in_with_magic_link", params: params
+        expect(response).to redirect_to magic_link_session_path(incorrect_token: params[:token])
+        expect(response.cookies["auth"]).to be_blank
+      end
     end
 
     # The biggest bucket of real failures: the link worked, and then got clicked again

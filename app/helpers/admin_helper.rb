@@ -8,6 +8,12 @@ module AdminHelper
     (sortable_search_params.reject { |_k, v| v.blank? }.keys - UNFILTERING_SEARCH_KEYS).any?
   end
 
+  # search_status: "all" because the index otherwise only shows the investigate statuses
+  def bug_report_search_link(search_params)
+    link_to search_emoji, admin_bug_reports_path(search_params.merge(search_status: "all")),
+      class: "display-sortable-link small tw:ml-1"
+  end
+
   def edit_mail_snippet_path_for(mail_snippet)
     if mail_snippet.organization_message?
       edit_organization_email_path(mail_snippet.kind, organization_id: mail_snippet.organization_id)

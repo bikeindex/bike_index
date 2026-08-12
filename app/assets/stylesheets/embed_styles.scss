@@ -1,3 +1,7 @@
+@import "legacy_includes/css_layers";
+
+@layer legacy {
+
 @import "legacy_includes/selectize_bootstrap3.scss";
 @import "legacy_includes/_colors.scss";
 @import "legacy_includes/_variables.scss";
@@ -283,12 +287,13 @@ a {
   padding-top: 1em;
   border-top: 1px solid $grayLightish;
 
+  // organized/bikes/new_iframe still hand-rolls its photo field
   .filefield-button {
     float: left;
   }
 
-  span {
-    float: left;
+  // Direct children only - the upload component brings a span of its own
+  > span {
     color: $grayMed;
   }
 }
@@ -687,4 +692,18 @@ a {
 }
 .cursor-not-allowed {
   cursor: not-allowed;
+}
+
+} // end @layer legacy
+
+// Deliberately outside @layer legacy: tailwind's own `body { @apply tw:base-font }` is
+// unlayered, so only another unlayered rule can outrank it -- and this id beats its type
+// selector. Inside the layer it would lose, and the embed would take tailwind's font.
+// $sansFontFamily is inlined because the layer block scopes it.
+#bi_embed {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  line-height: normal;
+  // base-font sets these two as well, and neither was ever styled here
+  color: #000;
+  -webkit-font-smoothing: auto;
 }

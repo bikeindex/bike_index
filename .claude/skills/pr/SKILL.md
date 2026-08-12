@@ -30,7 +30,17 @@ Then run `bin/lint` to auto-format the code (it also picks up whatever `/simplif
 
 Scope specs the same way — the ones covering what the branch changed, never a bare `bundle exec rspec` or a whole top-level directory (see the `rspec-testing` skill). CI runs the full suite; a green PR isn't your job to prove locally.
 
-Then review the changed files against the repo's `CLAUDE.md` (root and any nested ones in touched directories) and fix anything that doesn't conform — code-style guidelines (functional style, no argument mutation, omitted hash values like `{x:}`, private methods, unabbreviated names, pithy comments), testing conventions, and frontend rules. Only touch lines this branch already changed; don't reformat unrelated code.
+Then review the changed files against the repo's `CLAUDE.md` (root and any nested ones in touched directories) and fix anything that doesn't conform — code-style guidelines (functional style, no argument mutation, omitted hash values like `{x:}`, private methods, unabbreviated names), testing conventions, and frontend rules. Only touch lines this branch already changed; don't reformat unrelated code.
+
+Class methods go in a `class << self` block when the class has more than 5 of them, or when any of them should be private — `BugReport` is the pattern.
+
+**Then review every comment the branch adds or edits — this step is required, not conditional on the diff looking clean.** List them:
+
+```bash
+git diff "origin/$BASE"...HEAD -U0 | grep -E '^\+\s*(#|//|/\*|\*)'
+```
+
+Judge each one against the **Comments** section of `CLAUDE.md`, and reach a verdict of keep / razor / delete on every line — a comment survives only by carrying a *why* the code can't. Deleting is the common outcome and razoring is the next most common; leaving a block untouched should be the exception you can justify. Watch hardest for the ones you wrote to explain your own reasoning as you worked: narration of the change, mechanism the code already shows, and a second sentence justifying the first.
 
 Then check the branch's translations for a hardcoded "bike" where the string means the registration's cycle type — a registration is as often an e-scooter, a stroller or a wheelchair:
 

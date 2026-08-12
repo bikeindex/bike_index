@@ -26,8 +26,8 @@ RSpec.describe FeedbacksController, type: :request do
     end
     let!(:user) { FactoryBot.create(:user_confirmed) }
 
-    # Nothing else covers ApplicationController's own handler - the controllers that override
-    # it never reach this branch, and it shipped a missing translation key for years
+    # Nothing else covers ApplicationController's own handler - the controllers that
+    # override it never reach this branch
     context "with a null origin" do
       include_context :test_csrf_token
 

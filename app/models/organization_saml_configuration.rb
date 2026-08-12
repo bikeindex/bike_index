@@ -31,6 +31,7 @@ class OrganizationSamlConfiguration < ApplicationRecord
   validates :organization_id, presence: true, uniqueness: true
   validates :idp_entity_id, :idp_sso_target_url, :idp_cert, presence: true, if: :enabled?
   validate :idp_certificates_parseable
+  validate :organization_claims_a_domain, if: :enabled?
 
   before_validation :set_calculated_attributes
   after_commit :update_organization
@@ -70,6 +71,13 @@ class OrganizationSamlConfiguration < ApplicationRecord
     rescue OpenSSL::X509::CertificateError
       errors.add(attribute, "is not a valid X.509 certificate")
     end
+  end
+
+  # Every assertion is authorized against the domain, so without one this config can't sign anyone in
+  def organization_claims_a_domain
+    return if organization&.user_email_domain.present?
+
+    errors.add(:base, "Organization must have a permitted domain to enable SAML SSO")
   end
 
   def update_organization

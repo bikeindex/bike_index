@@ -7,4 +7,6 @@
   </h2>
 
   <%= render Org::RegistrationSequence::PageList::Component.new(registration_sequence: @registration_sequence, admin: true, editable: false) %>
+
+  <%= render Admin::RegistrationSequence::DiscardDraft::Component.new(registration_sequence: @registration_sequence) %>
 </div>

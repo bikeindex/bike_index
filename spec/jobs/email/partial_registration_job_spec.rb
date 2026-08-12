@@ -30,6 +30,7 @@ RSpec.describe Email::PartialRegistrationJob, type: :job do
       ActionMailer::Base.deliveries = []
       Email::PartialRegistrationJob.new.perform(b_param.id, "partial_register_confirmation")
       expect(ActionMailer::Base.deliveries.count).to eq 1
+      expect(ActionMailer::Base.deliveries.last.subject).to eq "Confirm your email to finish your registration"
       expect(ActionMailer::Base.deliveries.last.html_part.decoded).to include b_param.email_confirmation_token
       expect(Notification.count).to eq 1
       expect(Notification.last).to have_attributes(notifiable: b_param, kind: "partial_register_confirmation",
@@ -40,6 +41,28 @@ RSpec.describe Email::PartialRegistrationJob, type: :job do
       expect { Email::PartialRegistrationJob.new.perform(b_param.id, "partial_register_confirmation") }
         .to_not change(Notification, :count)
       expect(ActionMailer::Base.deliveries.count).to eq 1
+    end
+
+    # The link is what finishes a report, so the subject says what's being reported
+    context "a registration that reports something" do
+      let!(:b_param) do
+        BParam.create(origin: "register_flow", params: {bike: {owner_email:, manufacturer_id: "Trek",
+                                                               cycle_type: "e-scooter", status:}}.as_json)
+      end
+
+      {"status_stolen" => "Finish reporting your stolen e-scooter",
+       "status_impounded" => "Finish reporting your found e-scooter",
+       "status_abandoned" => "Finish reporting your abandoned e-scooter"}.each do |status, subject|
+        context status do
+          let(:status) { status }
+
+          it "subjects it #{subject.inspect}" do
+            ActionMailer::Base.deliveries = []
+            Email::PartialRegistrationJob.new.perform(b_param.id, "partial_register_confirmation")
+            expect(ActionMailer::Base.deliveries.last.subject).to eq subject
+          end
+        end
+      end
     end
 
     it "runs the domain check too" do

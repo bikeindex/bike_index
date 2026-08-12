@@ -116,6 +116,17 @@
     @apply tw:text-blue-700 tw:dark:text-blue-300 tw:font-bold tw:underline;
   }
 
+  /* Legacy's `.container` reaches into an alert two ways tailwind can't answer on
+   * its own: `font-size: 15px; line-height: 2em` by inheritance, and `p, ul, ol,
+   * dl` margins from a layer that beats preflight. Own both here. */
+  .twalert-body {
+    @apply tw:text-base;
+  }
+
+  .twalert-body :is(p, ul, ol, dl) {
+    @apply tw:m-0;
+  }
+
   /* Links inherit the alert's own color, so the underline is what marks them as links */
   .twalert-body .twlink {
     @apply tw:underline tw:hover:text-blue-800;
@@ -128,7 +139,7 @@
   .twinput {
     @apply tw:bg-white tw:border tw:border-gray-200 tw:dark:bg-gray-700 tw:dark:border-gray-700 tw:rounded-sm
       tw:placeholder-gray-500 tw:text-gray-900 tw:text-base tw:dark:placeholder-gray-400 tw:dark:text-gray-200
-      tw:focus-visible:outline-0 tw:focus-visible:ring tw:focus-visible:ring-purple-500/40 tw:focus-visible:border-purple-500 tw:dark:focus-visible:ring-purple-500/40 tw:dark:focus:border-purple-500
+      tw:focus-visible:outline-0 tw:focus-visible:ring tw:focus-visible:ring-blue-400 tw:focus-visible:border-blue-400 tw:dark:focus-visible:ring-blue-500 tw:dark:focus-visible:border-blue-500
       tw:w-full tw:py-1.5 tw:px-2.5 tw:block;
   }
   /* block + the gap to its field, so a label spaces the same whatever renders

@@ -146,7 +146,7 @@ class UsersController < ApplicationController
           flash[:success] = translation(:you_can_use_bike_index)
           redirect_to(my_account_url) && return
         else
-          flash[:notice] = translation(:accept_tos)
+          flash[:error] = translation(:accept_tos)
           redirect_to(accept_terms_url) && return
         end
       elsif params.dig(:user, :vendor_terms_of_service).present?
@@ -221,7 +221,7 @@ class UsersController < ApplicationController
     @token = params[:token].presence
     return @user = current_user if @token.blank? && current_user.present?
 
-    @user = User.find_by_token_for_password_reset(@token) if @token.present?
+    @user = User.find_for_auth_token("token_for_password_reset", @token)
     return true if @user.present? && !@user.auth_token_expired?("token_for_password_reset")
 
     remove_session

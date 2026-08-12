@@ -6,8 +6,7 @@ RSpec.describe Register::StepConfirm::Component, type: :component do
   let(:component) { render_inline(described_class.new(b_param:, token: "sometoken")) }
   let(:b_param) { FactoryBot.create(:b_param, params: {bike: {owner_email: "someone@bikeindex.org"}}) }
 
-  # Confirming is single use, and a link scanner runs the page's JS - so the token only
-  # goes anywhere on a click
+  # Confirming is single use, and scanners run the page's JS
   it "posts the token, and waits for a click to do it" do
     expect(component).to have_css("form[action='/register/confirm_email'][method='post']")
     expect(component).to have_no_css("[data-controller='auto-submit']")

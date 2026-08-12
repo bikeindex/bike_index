@@ -120,7 +120,7 @@
     <div class="row">
       <% @bike_version.public_images.each do |image| %>
         <div class="col-md-3">
-          <%= image_tag image.image_url(:medium), class: "img-fluid" %>
+          <%= image_tag image.image_url(:medium), class: "img-fluid", alt: image.image_alt %>
         </div>
       <% end %>
     </div>

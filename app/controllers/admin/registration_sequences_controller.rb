@@ -3,8 +3,13 @@ module Admin
     include Binxtils::SortableTable
 
     before_action :find_registration_sequence, only: %i[show preview edit]
+    # Activation freezes a sequence, so the actions that change one only ever find a draft
+    before_action :find_draft, only: %i[update destroy]
 
     def index
+      # The sequence organizations' drafts are cloned from, reachable without hunting the
+      # table for it. Its draft when there is one - that's what there is to do to it
+      @template = ::RegistrationSequence.existing_draft_for(nil) || ::RegistrationSequence.active_template
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
         matching_registration_sequences.includes(:organization, :registration_sequence_pages)
@@ -28,16 +33,32 @@ module Admin
     def edit
     end
 
-    # The settings shared by every page: the FAQ link and the final acknowledgment
+    # An activate param makes the draft live; otherwise it's the settings shared by every
+    # page, the FAQ link and the final acknowledgment
     def update
-      @registration_sequence = ::RegistrationSequence.editable.find(params[:id])
-      if @registration_sequence.update(permitted_params)
+      if params[:activate].present?
+        make_active
+      elsif @registration_sequence.update(permitted_params)
         flash[:success] = "Registration sequence updated"
         redirect_to RegistrationSequencePaths.edit(@registration_sequence, admin: true)
       else
         flash.now[:error] = @registration_sequence.errors.full_messages.to_sentence
         render :edit, status: :unprocessable_entity
       end
+    end
+
+    # Opens the draft, cloning the live sequence on first edit. No organization_id is the
+    # template - friendly_find! so a typo 404s rather than opening the template's draft
+    def create
+      organization = ::Organization.friendly_find!(params[:organization_id]) if params[:organization_id].present?
+      redirect_to RegistrationSequencePaths.edit(::RegistrationSequence.draft_for(organization), admin: true)
+    end
+
+    # Throw the draft away to start over; the live sequence is untouched
+    def destroy
+      @registration_sequence.discard_draft!
+      flash[:success] = "Draft discarded"
+      redirect_to RegistrationSequencePaths.index(@registration_sequence, admin: true)
     end
 
     helper_method :matching_registration_sequences, :searchable_statuses
@@ -73,6 +94,22 @@ module Admin
     def find_registration_sequence
       @registration_sequence = ::RegistrationSequence.includes(:organization, :registration_sequence_pages)
         .find(params[:id])
+    end
+
+    def find_draft
+      @registration_sequence = ::RegistrationSequence.draft.find(params[:id])
+    end
+
+    # Archives the sequence it supersedes. Organizations ask us to do this for them -
+    # their own screens only get them as far as a finished draft
+    def make_active
+      if @registration_sequence.make_active!
+        flash[:success] = "#{@registration_sequence.display_name} registration sequence is live"
+        redirect_to RegistrationSequencePaths.sequence(@registration_sequence, admin: true)
+      else
+        flash[:error] = "Unable to activate - every page needs a title and rules"
+        redirect_to RegistrationSequencePaths.edit(@registration_sequence, admin: true)
+      end
     end
 
     def permitted_params

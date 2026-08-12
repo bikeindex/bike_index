@@ -58,38 +58,31 @@
 <% end %>
 
 <% admin_search_form = capture do %>
-  <%= form_tag admin_bug_reports_path, method: :get, class: "form-inline mt-4 mb-4 justify-content-md-end" do %>
+  <%= form_with(url: admin_bug_reports_path, method: :get,
+    html: {class: "tw:my-4 tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-3"}) do |f| %>
     <%= hidden_field_tag :search_tag, params[:search_tag] %>
     <%= hidden_field_tag :search_receiver, params[:search_receiver] %>
     <%= hidden_field_tag :search_membership, params[:search_membership] %>
     <%= hidden_field_tag :search_status, params[:search_status] %>
 
-    <div class="form-group mr-2 mb-2">
-      <%= text_field_tag :query, params[:query], placeholder: "Search subject, body and sender", class: "form-control tw:w-96" %>
-    </div>
+    <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :search_email,
+      html_options: {value: params[:search_email], placeholder: "Sender email", class: "tw:w-full tw:sm:w-72"}) %>
 
-    <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
+    <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :query,
+      html_options: {value: params[:query], placeholder: "Search subject and body", class: "tw:w-full tw:sm:w-[32rem]"}) %>
+
+    <%= render UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search") %>
   <% end %>
 <% end %>
 
-<% table_view = capture do %>
-  <%= form_tag assign_tags_admin_bug_reports_path, method: :post, data: {controller: "table-multi-checkbox"} do %>
-    <div class="row align-items-end">
-      <div class="col-md-4">
-        <%= render(UI::Forms::Group::Component.new(attribute: :tags, label_text: "Tag to assign", wrapper_class: "tw:mb-0")) do %>
-          <%= render UI::Forms::Combobox::Component.new(name: :tags, free_text: true, options: searchable_tags, placeholder: "Select or create a tag") %>
-        <% end %>
-      </div>
+<% searched_terms = {"receiver" => @searched_receiver, "tag" => @searched_tag, "sender email" => params[:search_email],
+  "user" => params[:user_id], "text" => params[:query]}
+  .filter_map { |label, value| safe_join(["#{label}: ", content_tag(:code, value)]) if value.present? } %>
 
-      <div class="col-md-2">
-        <%= submit_tag "Add tag to selected", class: "btn btn-primary" %>
-      </div>
-    </div>
+<% count_detail = capture do %>
+  &mdash; with <%= safe_join(searched_terms, ", ") %>
+<% end if searched_terms.any? %>
 
-    <div class="mt-4">
-      <%= render partial: "table", locals: {collection: @collection, render_sortable: true} %>
-    </div>
-  <% end %>
-<% end %>
-
-<%= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, admin_search_form:, table_view:, chart_collection: @render_chart && matching_bug_reports)) %>
+<%= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, admin_search_form:, count_detail:,
+  table_view: render(Admin::BugReportsTable::Component.new(collection: @collection, render_sortable: true)),
+  chart_collection: @render_chart && matching_bug_reports)) %>

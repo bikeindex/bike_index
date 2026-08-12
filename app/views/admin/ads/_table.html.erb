@@ -34,7 +34,7 @@
 
           <td class="w-25">
             <% if ad.image.present? %>
-              <%= image_tag ad.image_url(:small) %>
+              <%= image_tag ad.image_url(:small), alt: "#{ad.title} ad" %>
             <% end %>
           </td>
         </tr>

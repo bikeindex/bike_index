@@ -178,15 +178,17 @@ Rails.application.routes.draw do
 
   # Redesigned registration flow: quick start, then complete on-site or via email.
   # new makes an empty registration and redirects into show, which renders
-  # ?step=1|2|3…|review|finished (and handles the emailed confirmation link)
+  # ?step=1|2|report|3…|review|finished (and handles the emailed confirmation link)
   resource :register, only: %i[new create show update], controller: :register do
+    patch :report
     patch :acknowledge
     # The emailed confirmation link, and the form it posts itself to
     get :confirm
     post :confirm_email
   end
 
-  # Registration photos upload before there's a session, so they get their own endpoint
+  # Registration photos - the /register flow's and the embed forms' - upload before
+  # there's a session, so they get their own endpoint
   post "/register/direct_uploads" => "register/direct_uploads#create", :as => :register_direct_uploads
 
   # Shadows ActiveStorage's own route (drawn last, so this wins) so the stock controller, which
@@ -311,7 +313,7 @@ Rails.application.routes.draw do
 
     resources :theft_alert_plans, only: %i[index edit update new create]
 
-    resources :registration_sequences, only: %i[index show edit update] do
+    resources :registration_sequences, only: %i[index create show edit update destroy] do
       member { get :preview }
       resources :pages, only: %i[new create], controller: "registration_sequence_pages"
     end

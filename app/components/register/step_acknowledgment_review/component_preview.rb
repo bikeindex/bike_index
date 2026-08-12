@@ -11,8 +11,9 @@ module Register
         pages = ::BikeServices::Register.sequence_pages(sequence)
         return missing_notice("a registration sequence with pages") if pages.none?
 
-        render(Register::StepAcknowledgmentReview::Component.new(sequence:, current_user: lookbook_user,
-          b_param: preview_b_param(sequence, pages.map(&:id))))
+        b_param = preview_b_param(sequence, pages.map(&:id))
+        render(Register::StepAcknowledgmentReview::Component.new(sequence:, b_param:, current_user: lookbook_user,
+          steps: ::BikeServices::Register.steps(b_param, sequence:)))
       end
 
       private
@@ -26,10 +27,8 @@ module Register
         }.as_json)
       end
 
-      # The template stands in where no organization has activated a sequence
-      def preview_sequence
-        ::RegistrationSequence.active_for(lookbook_organization) || ::RegistrationSequence.templates.first
-      end
+      # The live template stands in where no organization has activated a sequence
+      def preview_sequence = ::RegistrationSequence.active_or_template_for(lookbook_organization)
     end
   end
 end

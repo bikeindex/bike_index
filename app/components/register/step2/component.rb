@@ -4,9 +4,9 @@ module Register
   module Step2
     # Step 2 of the registration flow: the bike details form
     class Component < ApplicationComponent
-      def initialize(b_param:, sequence: nil, current_user: nil)
+      def initialize(b_param:, steps:, current_user: nil)
         @b_param = b_param
-        @sequence = sequence
+        @steps = steps
         @current_user = current_user
       end
 
@@ -16,12 +16,19 @@ module Register
         @b_param.type
       end
 
-      # An e-vehicle's safety pages come next, so this form doesn't finish the registration
-      def submit_text
-        return translation(".next") if @sequence&.registration_sequence_pages&.any?
+      # A theft report and an e-vehicle's safety pages both come after this form, so it
+      # doesn't always finish the registration. Which statuses have one is rechecked
+      # client-side, since the status is picked in this form rather than known when it
+      # renders - so the label reads off the same answer both times
+      def submit_texts
+        @submit_texts ||= Bike.statuses.index_with do |status|
+          next translation(".next") if @steps.include?("review") || BikeServices::Register.report_step?(status)
 
-        translation(".complete_registration", cycle_type: @b_param.type_titleize)
+          translation(".complete_registration", cycle_type: @b_param.type_titleize)
+        end
       end
+
+      def submit_text = submit_texts[@b_param.status]
 
       def organization
         @organization ||= @b_param.creation_organization
@@ -110,6 +117,17 @@ module Register
       def show_phone?
         phone_statuses.include?(@b_param.status)
       end
+
+      # A phone number is how a theft or a find gets contacted, so those two ask for one
+      # rather than offering it. Which of them applies is picked in this form, so the copy
+      # for each renders and register--status-fields shows whichever the status names
+      def phone_required_texts
+        @phone_required_texts ||= BikeServices::Register::REPORT_RECORDS.keys.index_with do |status|
+          translation((status == "status_stolen") ? ".phone_required_stolen" : ".phone_required_found", cycle_type:)
+        end
+      end
+
+      def phone_required? = phone_required_texts.key?(@b_param.status)
     end
   end
 end

@@ -51,7 +51,7 @@ module UI
         end
 
         def dd_classes
-          @full_width ? "tw:mb-0!" : "tw:mb-0! tw:text-right"
+          @full_width ? "tw:mb-0" : "tw:mb-0 tw:text-right"
         end
 
         def time_localizer_classes(time_localizer_settings)
