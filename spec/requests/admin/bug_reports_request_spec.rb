@@ -4,7 +4,7 @@ base_url = "/admin/bug_reports"
 RSpec.describe Admin::BugReportsController, type: :request do
   let(:bug_report) { FactoryBot.create(:bug_report, tags: ["parking"]) }
   let(:target_json) do
-    bug_report.as_json(only: %w[id user_id email from_name receiver subject body tags github_pull_request
+    bug_report.as_json(only: %w[id user_id email from_name receiver subject body tags status github_pull_request
       is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
   end
   include_context :request_spec_logged_in_as_superuser
