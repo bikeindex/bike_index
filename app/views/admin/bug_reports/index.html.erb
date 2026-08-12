@@ -83,25 +83,7 @@
   &mdash; with <%= safe_join(searched_terms, ", ") %>
 <% end if searched_terms.any? %>
 
-<% table_view = capture do %>
-  <%= form_tag assign_tags_admin_bug_reports_path, method: :post, data: {controller: "table-multi-checkbox"} do %>
-    <div class="row align-items-end">
-      <div class="col-md-4">
-        <%= render(UI::Forms::Group::Component.new(attribute: :tags, label_text: "Tag to assign", wrapper_class: "tw:mb-0")) do %>
-          <%= render UI::Forms::Combobox::Component.new(name: :tags, free_text: true, options: searchable_tags, placeholder: "Select or create a tag") %>
-        <% end %>
-      </div>
-
-      <div class="col-md-2">
-        <%= submit_tag "Add tag to selected", class: "btn btn-primary" %>
-      </div>
-    </div>
-
-    <div class="mt-4">
-      <%= render Admin::BugReportsTable::Component.new(collection: @collection, render_sortable: true) %>
-    </div>
-  <% end %>
-<% end %>
+<% table_view = render(Admin::BugReportsTable::Component.new(collection: @collection, render_sortable: true)) %>
 
 <%= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, admin_search_form:, table_view:, count_detail:,
   chart_collection: @render_chart && matching_bug_reports)) %>
