@@ -19,3 +19,42 @@ HwComboboxController.prototype.navigate = function (event) {
 
   navigate.call(this, event)
 }
+
+// A combobox holding a selection shows its display text, and the caret lands wherever
+// the click did -- so typing inserts into the middle, matches no option, and the gem
+// clears the hidden field along with the selection the user had
+
+// A gesture at a time, so the click being followed is only ever one element
+let clickFocusing = null
+
+const noteClickIntoFocus = ({ currentTarget }) => {
+  if (document.activeElement !== currentTarget) clickFocusing = currentTarget
+}
+
+// Only the focus a click into the field brings. The gem refocuses the input itself while
+// filtering, and selecting on that would make the next keystroke replace the query
+const selectDisplay = ({ currentTarget }) => {
+  if (clickFocusing === currentTarget && currentTarget.value) currentTarget.select()
+}
+
+// The mouseup ending that same click would collapse the selection back to a caret.
+// Only that one: a drag leaves a selection of its own, and a later click still places
+// the caret, so the display stays editable
+const keepSelectionThroughClick = (event) => {
+  const input = event.currentTarget
+  if (clickFocusing !== input) return
+
+  clickFocusing = null
+  if (input.selectionStart === 0 && input.selectionEnd === input.value.length) event.preventDefault()
+}
+
+// Stimulus calls these per element, for targets the gem declares but leaves without a
+// callback -- the seam that also reaches the small-viewport dialog's own combobox
+const listenForClickIntoFocus = function (input) {
+  input.addEventListener('mousedown', noteClickIntoFocus)
+  input.addEventListener('focus', selectDisplay)
+  input.addEventListener('mouseup', keepSelectionThroughClick)
+}
+
+HwComboboxController.prototype.comboboxTargetConnected = listenForClickIntoFocus
+HwComboboxController.prototype.dialogComboboxTargetConnected = listenForClickIntoFocus
