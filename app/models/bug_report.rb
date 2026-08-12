@@ -40,6 +40,8 @@ class BugReport < ApplicationRecord
   OUR_EMAIL_DOMAIN = "bikeindex.org"
   STATUS_ENUM = {unprioritized: 0, investigate_priority_high: 1, investigate_priority_low: 2,
                  resolved: 19, ignored: 20}.freeze
+  # Below this share of the body, stripped markup is an autolink or two rather than an HTML email
+  SIGNIFICANT_TAG_SHARE = 0.1
   INTERNAL_NOTIFICATION_TAG = "bike_index_notification"
   AUTO_REPLY_TAG = "auto_replies"
   ORGANIZATION_AUTO_REPLY_TAG = "auto_replies_organization"
@@ -56,7 +58,7 @@ class BugReport < ApplicationRecord
 
   has_paper_trail only: %i[tags github_pull_request is_member is_paid_organization is_paid_organization_staff]
 
-  pg_search_scope :text_search, against: {subject: "A", email: "A", body: "B"}
+  pg_search_scope :text_search, against: {subject: "A", body: "B"}
 
   validates :email, presence: true
 
@@ -70,45 +72,74 @@ class BugReport < ApplicationRecord
   # Includes unprioritized so reports the auto-prioritize job hasn't reached yet stay visible
   scope :investigate, -> { where(status: %i[unprioritized investigate_priority_high investigate_priority_low]) }
 
-  def self.all_tags
-    distinct.pluck(Arel.sql("unnest(tags)")).sort
-  end
+  class << self
+    def all_tags
+      distinct.pluck(Arel.sql("unnest(tags)")).sort
+    end
 
-  def self.all_receivers
-    where.not(receiver: nil).distinct.order(:receiver).pluck(:receiver)
-  end
+    def all_receivers
+      where.not(receiver: nil).distinct.order(:receiver).pluck(:receiver)
+    end
 
-  # Our domain is noise in the admin table - and only ours can be dropped unambiguously
-  def self.display_receiver(value)
-    value.to_s.delete_suffix("@#{OUR_EMAIL_DOMAIN}")
-  end
+    def status_display(str)
+      return if str.blank?
+      return str.humanize.downcase unless str.match?("investigate")
 
-  # Who wrote in, as [email, name]. Mail our app sends itself - the contact form, admin
-  # notifications - is From: contact@bikeindex.org with the person who wrote in as the Reply-To,
-  # so attribute those to them rather than to us
-  def self.sender_from_mail(mail)
-    field = (our_address?(mail.from&.first) && mail[:reply_to].presence) || mail[:from]
+      (str.to_sym == :investigate_priority_high) ? "investigate p high" : "investigate p low"
+    end
 
-    [EmailNormalizer.normalize(field&.addresses&.first), field&.display_names&.first]
-  end
+    # Binxtils::InputNormalizer.sanitize collapses the whitespace, which an email body's paragraphs need.
+    # unescapeHTML because the sanitizer encodes what it keeps, and this renders as text
+    def sanitize_with_whitespace(value)
+      normalize_whitespace(CGI.unescapeHTML(Rails::Html::Sanitizer.full_sanitizer.new.sanitize(value.to_s)))
+    end
 
-  def self.our_address?(value)
-    value.to_s.downcase.end_with?("@#{OUR_EMAIL_DOMAIN}")
-  end
-  private_class_method :our_address?
+    # The markup an HTML email lays out with leaves ragged indentation and runs of blank lines - and
+    # those "blank" lines are often a &nbsp;, which String#strip doesn't count as whitespace
+    def normalize_whitespace(value)
+      value.to_s.tr(" ", " ").lines.map(&:strip).join("\n").gsub(/\n{3,}/, "\n\n").strip
+    end
 
-  # Which of our addresses the email was sent to (contact@, support@, bugs@, ...) - nil when none of
-  # the recipients is ours, e.g. a blast we're bcc'd on. X-Original-To is the envelope recipient
-  # Postmark's ingress prepends, the only source when we're bcc'd
-  def self.receiver_from_mail(mail)
-    recipients = [mail["X-Original-To"]&.to_s] + Array(mail.to) + Array(mail.cc)
+    # Our domain is noise in the admin table - and only ours can be dropped unambiguously
+    def display_receiver(value)
+      value.to_s.delete_suffix("@#{OUR_EMAIL_DOMAIN}")
+    end
 
-    EmailNormalizer.normalize(recipients.find { our_address?(it) })
-  end
+    # Who wrote in, as [email, name]. Mail our app sends itself - the contact form, admin
+    # notifications - is From: contact@bikeindex.org with the person who wrote in as the Reply-To,
+    # so attribute those to them rather than to us
+    def sender_from_mail(mail)
+      field = (our_address?(mail.from&.first) && mail[:reply_to].presence) || mail[:from]
 
-  def self.normalized_tags(value)
-    value = value.to_s.split(/,|\n/) unless value.is_a?(Array)
-    value.map { it.to_s.strip.downcase }.reject(&:blank?).uniq.sort
+      [EmailNormalizer.normalize(field&.addresses&.first), field&.display_names&.first]
+    end
+
+    # Which of our addresses the email was sent to (contact@, support@, bugs@, ...) - nil when none of
+    # the recipients is ours. X-Original-To is the envelope recipient Postmark's ingress prepends,
+    # which for anything forwarded is Postmark's own inbound address rather than one of ours
+    def receiver_from_mail(mail)
+      recipients = [mail["X-Original-To"]&.to_s] + Array(mail.to) + Array(mail.cc) + received_for_addresses(mail)
+
+      EmailNormalizer.normalize(recipients.find { our_address?(it) })
+    end
+
+    def normalized_tags(value)
+      value = value.to_s.split(/,|\n/) unless value.is_a?(Array)
+      value.map { it.to_s.strip.downcase }.reject(&:blank?).uniq.sort
+    end
+
+    private
+
+    def our_address?(value)
+      value.to_s.downcase.end_with?("@#{OUR_EMAIL_DOMAIN}")
+    end
+
+    # The forward to Postmark rewrites the envelope recipient, but the hop that accepted the message
+    # for us still names it - the only place our address survives on a bcc'd or forwarded email
+    def received_for_addresses(mail)
+      mail.header.fields.select { it.name.casecmp?("Received") }
+        .filter_map { it.value.to_s[/for <([^>]+)>/, 1] }
+    end
   end
 
   def tags=(value)
@@ -123,6 +154,17 @@ class BugReport < ApplicationRecord
 
   def display_subject
     subject.presence || "(no subject)"
+  end
+
+  def body_stripped
+    @body_stripped ||= self.class.sanitize_with_whitespace(body)
+  end
+
+  # Measured after the same whitespace normalization, so an email's indentation doesn't read as tags
+  def body_significant_tags?
+    body_length = self.class.normalize_whitespace(body).length
+
+    body_length - body_stripped.length > body_length * SIGNIFICANT_TAG_SHARE
   end
 
   def ignored_tag?

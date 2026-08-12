@@ -91,7 +91,7 @@ module Admin
     end
 
     def status_only_filters
-      BugReport.statuses.keys.index_with { |status| "Only #{status.humanize.downcase}" }
+      BugReport.statuses.keys.index_with { |status| "Only #{BugReport.status_display(status)}" }
     end
 
     protected
@@ -106,9 +106,9 @@ module Admin
 
     def matching_bug_reports
       bug_reports = BugReport.all
-      @searched_tag = params[:search_tag] if searchable_tags.include?(params[:search_tag])
+      @searched_tag = params[:search_tag]
       bug_reports = bug_reports.with_tag(@searched_tag) if @searched_tag.present?
-      @searched_receiver = params[:search_receiver] if searchable_receivers.include?(params[:search_receiver])
+      @searched_receiver = params[:search_receiver]
       bug_reports = bug_reports.where(receiver: @searched_receiver) if @searched_receiver.present?
       bug_reports = bug_reports.where(user_id: params[:user_id]) if params[:user_id].present?
       bug_reports = bug_reports.where("email ILIKE ?", "%#{EmailNormalizer.normalize(params[:search_email])}%") if params[:search_email].present?
@@ -144,8 +144,11 @@ module Admin
       @bug_report = BugReport.find(params[:id])
     end
 
+    # Dropping an unknown status rather than letting the enum raise on assignment
     def permitted_params
-      params.require(:bug_report).permit(:github_pull_request, :tags, tags: [])
+      permitted = params.require(:bug_report).permit(:github_pull_request, :status, :tags, tags: [])
+
+      BugReport.statuses.key?(permitted[:status]) ? permitted : permitted.except(:status)
     end
 
     def bug_report_json(bug_report)

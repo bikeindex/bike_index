@@ -32,6 +32,8 @@ Scope specs the same way — the ones covering what the branch changed, never a 
 
 Then review the changed files against the repo's `CLAUDE.md` (root and any nested ones in touched directories) and fix anything that doesn't conform — code-style guidelines (functional style, no argument mutation, omitted hash values like `{x:}`, private methods, unabbreviated names), testing conventions, and frontend rules. Only touch lines this branch already changed; don't reformat unrelated code.
 
+Class methods go in a `class << self` block when the class has more than 5 of them, or when any of them should be private — `BugReport` is the pattern.
+
 **Then review every comment the branch adds or edits — this step is required, not conditional on the diff looking clean.** List them:
 
 ```bash

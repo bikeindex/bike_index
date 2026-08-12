@@ -35,9 +35,7 @@
 
           <td>
             <%= link_to admin_bug_report_path(bug_report) do %>
-              <span class="localizeTime">
-                <%= l bug_report.received_at || bug_report.created_at, format: :convert_time %>
-              </span>
+              <%= render UI::Time::Component.new(time: bug_report.received_at || bug_report.created_at) %>
             <% end %>
 
             <% if display_dev_info? %>
@@ -49,9 +47,11 @@
             <% if bug_report.user_id.present? %>
               <%= render Admin::UserCell::Component.new(user: bug_report.user, user_id: bug_report.user_id) %>
             <% else %>
-              <%= bug_report.from_name %>
-              <small><%= bug_report.email %></small>
+              <span class="tw:block tw:xl:inline"><%= bug_report.from_name %></span>
+              <%= content_tag(:code, bug_report.email, class: "small") %>
             <% end %>
+
+            <%= link_to search_emoji, url_for(sortable_search_params.merge(search_email: bug_report.email)), class: "display-sortable-link small" %>
           </td>
 
           <td>
@@ -64,10 +64,21 @@
           </td>
 
           <td>
-            <%= link_to bug_report.display_subject, admin_bug_report_path(bug_report) %>
+            <%= bug_report.display_subject %>
+
+            <%= render(UI::Tooltip::Component.new) do |tooltip| %>
+              <% tooltip.with_body do %>
+                <div class="tw:w-96 tw:text-left">
+                  <%= content_tag(:strong, bug_report.display_subject) %>
+
+                  <%# truncated because the tooltip can't be scrolled - it has no pointer events %>
+                  <%= content_tag(:div, bug_report.body_stripped.truncate(1000), class: "tw:mt-1 tw:whitespace-pre-wrap") %>
+                </div>
+              <% end %>
+            <% end %>
           </td>
 
-          <td><%= bug_report.status.humanize %></td>
+          <td><%= BugReport.status_display(bug_report.status) %></td>
 
           <td>
             <% bug_report.tags.each do |tag| %>

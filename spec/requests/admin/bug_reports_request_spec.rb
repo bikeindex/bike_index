@@ -85,11 +85,16 @@ RSpec.describe Admin::BugReportsController, type: :request do
         expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_support.id])
       end
 
-      it "ignores a receiver no bug report has" do
+      it "matches nothing for a receiver no bug report has" do
         expect(bug_report).to be_present
         get "#{base_url}.json", params: {search_receiver: "nonsense@bikeindex.org", search_status: "all"}
-        expect(json_result["bug_reports"].map { it["id"] })
-          .to match_array([bug_report.id, bug_report_support.id])
+        expect(json_result["bug_reports"]).to eq([])
+      end
+
+      it "names the search in the count detail" do
+        get base_url, params: {search_receiver: "support@bikeindex.org", search_status: "all"}
+        expect(response.body).to match(/1<\/strong>\s*Matching/)
+        expect(response.body).to include("receiver: <code>support@bikeindex.org</code>")
       end
     end
 
@@ -142,11 +147,21 @@ RSpec.describe Admin::BugReportsController, type: :request do
   describe "update" do
     it "updates from the form, splitting tags" do
       patch "#{base_url}/#{bug_report.to_param}", params: {
-        bug_report: {tags: "parking, Search", github_pull_request: "3805"}
+        bug_report: {tags: "parking, Search", github_pull_request: "3805", status: "investigate_priority_high"}
       }
       expect(response).to redirect_to(admin_bug_report_path(bug_report))
       expect(flash[:success]).to be_present
-      expect(bug_report.reload).to have_attributes(tags: %w[parking search], github_pull_request: 3805)
+      expect(bug_report.reload).to have_attributes(tags: %w[parking search], github_pull_request: 3805,
+        status: "investigate_priority_high")
+    end
+
+    context "with an unknown status" do
+      it "ignores it" do
+        expect(bug_report.status).to eq "unprioritized"
+        patch "#{base_url}/#{bug_report.to_param}", params: {bug_report: {status: "nonsense", tags: "parking"}}
+        expect(response).to redirect_to(admin_bug_report_path(bug_report))
+        expect(bug_report.reload).to have_attributes(status: "unprioritized", tags: ["parking"])
+      end
     end
 
     context "json" do
