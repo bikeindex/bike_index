@@ -4,7 +4,7 @@ module Admin
   module BugReportsTable
     class Component < ApplicationComponent
       # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-      MARKUP_DIGEST = "2634672a3dc2"
+      MARKUP_DIGEST = "a7c808d3eaf5"
 
       def initialize(collection:, render_sortable: false)
         @collection = collection
@@ -13,9 +13,8 @@ module Admin
 
       private
 
-      # The user is in the key because the sender cell renders their badges
-      def row_cache_key(bug_report)
-        ["admin_bug_report", MARKUP_DIGEST, bug_report, bug_report.user]
+      def cache_key
+        "admin-bug-reports-#{MARKUP_DIGEST}"
       end
     end
   end
