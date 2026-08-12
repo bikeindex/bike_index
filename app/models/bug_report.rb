@@ -94,8 +94,7 @@ class BugReport < ApplicationRecord
       normalize_whitespace(CGI.unescapeHTML(Rails::Html::Sanitizer.full_sanitizer.new.sanitize(value.to_s)))
     end
 
-    # The markup an HTML email lays out with leaves ragged indentation and runs of blank lines - and
-    # those "blank" lines are often a &nbsp;, which String#strip doesn't count as whitespace
+    # An HTML email's "blank" lines are often a &nbsp;, which String#strip doesn't count as whitespace
     def normalize_whitespace(value)
       value.to_s.tr(" ", " ").lines.map(&:strip).join("\n").gsub(/\n{3,}/, "\n\n").strip
     end
@@ -134,8 +133,8 @@ class BugReport < ApplicationRecord
       value.to_s.downcase.end_with?("@#{OUR_EMAIL_DOMAIN}")
     end
 
-    # The forward to Postmark rewrites the envelope recipient, but the hop that accepted the message
-    # for us still names it - the only place our address survives on a bcc'd or forwarded email
+    # The forward to Postmark rewrites the envelope recipient, but the hop that accepted the
+    # message for us still names it
     def received_for_addresses(mail)
       mail.header.fields.select { it.name.casecmp?("Received") }
         .filter_map { it.value.to_s[/for <([^>]+)>/, 1] }

@@ -98,7 +98,7 @@
     </div>
 
     <div class="mt-4">
-      <%= render partial: "table", locals: {collection: @collection, render_sortable: true} %>
+      <%= render Admin::BugReportsTable::Component.new(collection: @collection, render_sortable: true) %>
     </div>
   <% end %>
 <% end %>
