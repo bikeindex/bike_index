@@ -115,13 +115,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     JS
   end
 
-  # flaky: 2 — papering over, not a diagnosis. Two causes are already ruled out: the verdict
-  # is no longer read inside the listener (where it reported registration order instead of
-  # search--form's answer), and the wait is no longer too short for a round trip the release
-  # only then starts. What's left is a CI-only failure of the released response to reach the
-  # page at all, which nothing reproduces locally. The split assertion below is what will say
-  # which half is at fault next time it goes red; drop this tag once it has.
-  it "fills the kind counts on load, and keeps a search made before the results arrive", flaky: 2 do
+  it "fills the kind counts on load, and keeps a search made before the results arrive" do
     release_initial_results_load = hold_initial_results_load
     visit_marketplace_via_nav
 
@@ -130,6 +124,11 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # frame is held open here. All 17 listings (15 standard + 2 promoted) are for_sale,
     # so the for_sale count shows (17).
     expect(page).to have_css("[data-count-target='for_sale']", text: "(17)", wait: 10)
+
+    # The counts come from a different controller, so they don't mean search--form -
+    # which rejects the superseded response below - is listening yet. Dropping
+    # search_no_js is the first thing its connect does.
+    expect(page).to have_no_css("#search_no_js", visible: :all, wait: 10)
 
     search_primary_activity("Mountain biking")
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
