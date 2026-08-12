@@ -1,5 +1,8 @@
 # Local SAML SSO testing
 
+For provisioning the SP keypair and onboarding an organization, see
+[sso-operations.md](sso-operations.md).
+
 To exercise the SP-initiated SSO login flow end-to-end against a real Identity
 Provider on your machine, use the throwaway Keycloak IdP in
 [bikeindex/saml-idp-test](https://github.com/bikeindex/saml-idp-test). Its README
