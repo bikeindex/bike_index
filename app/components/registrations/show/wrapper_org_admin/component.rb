@@ -203,9 +203,10 @@ module Registrations
           edit_bike_path(@bike, edit_template: @bike.default_edit_template)
         end
 
-        # Law-enforcement data, feature-gated like the legacy access panel
+        # Feature-gated like the legacy access panel and no further: looking up the owner's
+        # registrations on a bike that isn't the org's own is what the feature is for
         def show_other_registrations?
-          show_contact? && @organization.enabled?("additional_registrations_information")
+          @organization.enabled?("additional_registrations_information")
         end
 
         def other_registrations
