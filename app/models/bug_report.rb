@@ -88,17 +88,6 @@ class BugReport < ApplicationRecord
       (str.to_sym == :investigate_priority_high) ? "investigate p high" : "investigate p low"
     end
 
-    # Binxtils::InputNormalizer.sanitize collapses the whitespace, which an email body's paragraphs need.
-    # unescapeHTML because the sanitizer encodes what it keeps, and this renders as text
-    def sanitize_with_whitespace(value)
-      normalize_whitespace(CGI.unescapeHTML(Rails::Html::Sanitizer.full_sanitizer.new.sanitize(value.to_s)))
-    end
-
-    # An HTML email's "blank" lines are often a &nbsp;, which String#strip doesn't count as whitespace
-    def normalize_whitespace(value)
-      value.to_s.tr(" ", " ").lines.map(&:strip).join("\n").gsub(/\n{3,}/, "\n\n").strip
-    end
-
     # Our domain is noise in the admin table - and only ours can be dropped unambiguously
     def display_receiver(value)
       value.to_s.delete_suffix("@#{OUR_EMAIL_DOMAIN}")
@@ -156,12 +145,12 @@ class BugReport < ApplicationRecord
   end
 
   def body_stripped
-    @body_stripped ||= self.class.sanitize_with_whitespace(body)
+    @body_stripped ||= Binxtils::InputNormalizer.plain_text(body)
   end
 
   # Measured after the same whitespace normalization, so an email's indentation doesn't read as tags
   def body_significant_tags?
-    body_length = self.class.normalize_whitespace(body).length
+    body_length = Binxtils::InputNormalizer.normalize_whitespace(body).length
 
     body_length - body_stripped.length > body_length * SIGNIFICANT_TAG_SHARE
   end
