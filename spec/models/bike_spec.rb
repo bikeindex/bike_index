@@ -156,7 +156,7 @@ RSpec.describe Bike, type: :model do
     describe "admin_email_search" do
       let(:creator) { FactoryBot.create(:user_confirmed, email: "shop@bikeindex.org") }
       let!(:bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "Robin.Jay.Parker@example.com", creator:) }
-      let!(:transferred_bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "someone@example.com") }
+      let!(:transferred_bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "previous@example.com") }
       it "matches any part of the email, ignoring case and surrounding whitespace" do
         expect(Bike.unscoped.admin_email_search("robin.jay.parker@example.com").pluck(:id)).to eq([bike.id])
         expect(Bike.unscoped.admin_email_search(" Robin.Jay.Parker@EXAMPLE.com ").pluck(:id)).to eq([bike.id])
@@ -164,9 +164,11 @@ RSpec.describe Bike, type: :model do
         expect(Bike.unscoped.admin_email_search("parker").pluck(:id)).to eq([bike.id])
         expect(Bike.unscoped.admin_email_search("").pluck(:id)).to match_array(Bike.unscoped.pluck(:id))
       end
-      context "with a prior ownership" do
-        let!(:prior_ownership) { FactoryBot.create(:ownership, bike: transferred_bike, owner_email: "previous@example.com") }
+      context "with a transferred ownership" do
+        let(:updator) { FactoryBot.create(:user_confirmed) }
+        before { BikeServices::OwnershipTransferer.find_or_create(transferred_bike, updator:, new_owner_email: "someone@example.com") }
         it "matches the prior owner and the registration creator" do
+          expect(transferred_bike.reload.owner_email).to eq "someone@example.com"
           expect(Bike.unscoped.admin_email_search("previous@example.com").pluck(:id)).to eq([transferred_bike.id])
           expect(Bike.unscoped.admin_email_search("shop@bikeindex.org").pluck(:id)).to eq([bike.id])
         end
