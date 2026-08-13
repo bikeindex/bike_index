@@ -235,6 +235,24 @@ RSpec.describe RegisterController, type: :request do
     end
   end
 
+  describe "embed" do
+    let(:organization) { FactoryBot.create(:organization) }
+
+    it "renders step 1 for the frame, on a registration the submission carries out of it" do
+      expect { get "/register/embed?organization_id=#{organization.slug}" }.to change(BParam, :count).by 1
+      expect(response.status).to eq 200
+      expect(BParam.last.creation_organization_id).to eq organization.id
+
+      expect(response).to render_template(layout: "layouts/register_embed")
+      expect(response.body).to match(/<form[^>]*target="_top"/)
+      expect(response.body).to match(/<form[^>]*data-turbo="false"/)
+      expect(response.body).to include('name="robots" content="noindex"')
+
+      # The session's still-blank registration, rather than one per view
+      expect { get "/register/embed?organization_id=#{organization.slug}" }.to_not change(BParam, :count)
+    end
+  end
+
   describe "show step: 1" do
     it "renders" do
       get register_path(b_param_token: b_param.id_token, step: 1)

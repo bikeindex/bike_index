@@ -7,10 +7,11 @@ class RegisterController < ApplicationController
     policy.frame_ancestors :self
   end
 
-  before_action :find_b_param, except: %i[new create confirm confirm_email]
+  before_action :find_b_param, except: %i[new embed create confirm confirm_email]
   # An expired token starts a registration rather than bouncing and losing the
   # submission. assign_organization runs next, so the form's organization_id lands on it
   before_action -> { find_b_param(build: true) }, only: %i[create]
+  before_action :start_registration, only: %i[embed]
   # The emailed link resumes a registration the session knows nothing about
   before_action :find_b_param_for_confirmation, only: %i[confirm confirm_email]
   # confirm renders a self-posting form and nothing else, so it reads neither
@@ -31,13 +32,19 @@ class RegisterController < ApplicationController
   # it's still blank), so going back from step 2 lands on the same registration
   def new
     BikeServices::Register.discard(token: params[:discard_token], user: current_user)
-    @b_param = BikeServices::Register.b_param_for(user: current_user, token_id: reusable_token,
-      status: start_status, email: params[:email])
+    start_registration
     # The same filter every other action runs, so reusing the session's
     # registration can't quietly drop the organization the URL named
     assign_organization
-    session[:register_b_param_token] = @b_param.id_token
     redirect_to step_path(1)
+  end
+
+  # Step 1 framed on an organization's landing page. It renders rather than redirecting into
+  # a tokenized step, so the frame is one request and nothing past step 1 is embeddable
+  def embed
+    @page_title = I18n.t("meta_titles.register_step_1", cycle_type: @b_param.type)
+    render Register::Step1::Component.new(b_param: @b_param, steps: flow_steps, current_user:, embed: true),
+      layout: "register_embed"
   end
 
   # The whole flow after the start: ?step=1, ?step=2, ?step=report for a theft or a
@@ -197,6 +204,14 @@ class RegisterController < ApplicationController
 
   def step_path(step)
     register_path(b_param_token: @b_param.id_token, step:)
+  end
+
+  # The registration new and embed start from - the session's still-blank one when it has
+  # one, so going back from step 2 (or reloading the frame) lands on the same registration
+  def start_registration
+    @b_param = BikeServices::Register.b_param_for(user: current_user, token_id: reusable_token,
+      status: start_status, email: params[:email])
+    session[:register_b_param_token] = @b_param.id_token
   end
 
   # Everything new seeds a registration from, so arriving on an organization's link

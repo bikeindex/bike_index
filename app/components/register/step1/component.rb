@@ -4,13 +4,30 @@ module Register
   module Step1
     # Step 1 of the registration flow: the quick-start form
     class Component < ApplicationComponent
-      def initialize(b_param:, steps:, current_user: nil)
+      # embed: framed on an organization's landing page (RegisterController#embed)
+      def initialize(b_param:, steps:, current_user: nil, embed: false)
         @b_param = b_param
         @steps = steps
         @current_user = current_user
+        @embed = embed
       end
 
       private
+
+      # Turbo ignores a form's target unless it names an iframe, so a Turbo submission would
+      # render step 2 back inside the frame. Nor does autofocus belong in one - it scrolls
+      # the embedding page down to the frame on load
+      def form_options
+        return {data: {turbo: false}, html: {target: "_top"}} if @embed
+
+        {data: {turbo: true, controller: "autofocus register--retry"}}
+      end
+
+      # The frame is narrower than the combobox's mobile breakpoint, and its dialog can't
+      # escape the frame to be the full-screen picker it's meant to be
+      def combobox_options
+        @embed ? {mobile_at: "0px"} : {}
+      end
 
       def cycle_type
         @b_param.type
