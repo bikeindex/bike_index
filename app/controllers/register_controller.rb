@@ -31,6 +31,7 @@ class RegisterController < ApplicationController
     # registration can't quietly drop the organization the URL named
     assign_organization
     session[:register_b_param_token] = @b_param.id_token
+    session[:register_button_color] = HexColor.normalize(params[:button])
     redirect_to step_path(1)
   end
 
@@ -57,7 +58,7 @@ class RegisterController < ApplicationController
       render Register::Step2::Component.new(b_param: @b_param, steps:, current_user:)
     when "1"
       @page_title = I18n.t("meta_titles.register_step_1", cycle_type: @b_param.type)
-      render Register::Step1::Component.new(b_param: @b_param, steps:, current_user:)
+      render Register::Step1::Component.new(b_param: @b_param, steps:, current_user:, button_color:)
     else
       @page_title = I18n.t("meta_titles.register_acknowledgment", cycle_type: @b_param.type)
       render Register::StepAcknowledgment::Component.new(b_param: @b_param, sequence: @registration_sequence, step:, steps:)
@@ -70,7 +71,7 @@ class RegisterController < ApplicationController
     unless saved
       # The 422 render skips the derived meta title, which now needs the interpolation
       @page_title = I18n.t("meta_titles.register_create", cycle_type: @b_param.type)
-      return render(Register::Step1::Component.new(b_param: @b_param, steps: flow_steps, current_user:),
+      return render(Register::Step1::Component.new(b_param: @b_param, steps: flow_steps, current_user:, button_color:),
         status: :unprocessable_entity)
     end
 
@@ -196,8 +197,12 @@ class RegisterController < ApplicationController
   # Everything new seeds a registration from, so arriving on an organization's link
   # (or a stolen one) without a registration doesn't lose how they got there
   def start_params
-    params.permit(:organization_id, :status, :email).to_h.compact_blank
+    params.permit(:organization_id, :status, :email, :button).to_h.compact_blank
   end
+
+  # In the session rather than on the registration the way the other start params are:
+  # it's how this browser arrived, not something the registration becomes a bike with
+  def button_color = session[:register_button_color]
 
   # ?status=stolen and ?stolen=true as well as the full status_stolen - a link to report
   # a theft takes the same shorthand everywhere else in the app does

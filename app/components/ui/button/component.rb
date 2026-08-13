@@ -45,6 +45,8 @@ module UI
       # unless focus is restated under the variant.
       FOCUS_CLASSES = "tw:focus:outline-none tw:focus:ring-3 tw:is-active:focus:ring-3"
 
+      HEX_COLOR = /\A#(\h{3}|\h{6})\z/
+
       # Focus and disabled reach link color too — only the sizing and weight are
       # button-shaped
       def self.build_classes(color:, size:, html_class: nil)
@@ -54,20 +56,22 @@ module UI
       end
 
       # ButtonLink calls this too, so the pair answers a caller the same way
-      def self.validate_options!(color:, size:, html_options:)
+      def self.validate_options!(color:, size:, html_options:, background_color: nil)
         raise ArgumentError, "unknown color #{color.inspect}, expected one of: #{COLORS.keys.join(", ")}" unless COLORS.key?(color)
         raise ArgumentError, "size is not supported for link color" if color == :link && size != :md
+        raise ArgumentError, "background_color must be a hex color, got #{background_color.inspect}" unless background_color.nil? || background_color.match?(HEX_COLOR)
         # The component builds its own class, so a passed one is dropped rather than merged
         raise ArgumentError, "class is not supported, you must use the keyword arg html_class" if html_options.key?(:class)
       end
 
       # name/value are submitted with the form when this button is the one clicked, which
       # is how a form with more than one submit says which was pressed
-      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, spinner: false, name: nil, value: nil, **html_options)
+      def initialize(text: nil, color: :secondary, size: :md, active: false, html_class: nil, spinner: false, name: nil, value: nil, background_color: nil, **html_options)
         @text = text
         @name = name
         @value = value
         @color = color
+        @background_color = background_color
         @active = active
         @html_class = html_class
         @spinner = spinner
@@ -76,12 +80,12 @@ module UI
         @html_options = html_options
 
         @size = SIZES.key?(size) ? size : :md
-        self.class.validate_options!(color: @color, size: @size, html_options:)
+        self.class.validate_options!(color: @color, size: @size, html_options:, background_color:)
       end
 
       # html_options lead, so the component's own attributes can't be overwritten
       def call
-        content_tag(:button, safe_join([spinner_span, @text || content].compact), **@html_options, type: @type, class: button_classes, name: @name, value: @value, data: button_data)
+        content_tag(:button, safe_join([spinner_span, @text || content].compact), **@html_options, type: @type, class: button_classes, style: background_style, name: @name, value: @value, data: button_data)
       end
 
       def button_classes
@@ -89,6 +93,11 @@ module UI
       end
 
       private
+
+      # Inline, so it beats COLORS - including the hover a one-off color has no palette for
+      def background_style
+        "background-color: #{@background_color}; border-color: #{@background_color}" if @background_color.present?
+      end
 
       def button_data
         data = @data.merge(active: @active || nil)

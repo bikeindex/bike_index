@@ -13,8 +13,8 @@ RSpec.describe RegisterController, type: :request do
 
   # Where Register::Step1::Component's start over link goes - it names the registration
   # it was rendered on, rather than leaving it to the session
-  def start_over_path(b_param)
-    new_register_path(discard_token: b_param.id_token)
+  def start_over_path(b_param, **params)
+    new_register_path(discard_token: b_param.id_token, **params)
   end
 
   describe "new" do
@@ -361,6 +361,33 @@ RSpec.describe RegisterController, type: :request do
         expect(response).to redirect_to new_register_path
         expect(flash[:notice]).to be_present
       end
+    end
+  end
+
+  # The same ?button= the embed form takes, for a link that wants its own color
+  describe "button color" do
+    let(:orange_style) { "background-color: #ee7e2c; border-color: #ee7e2c" }
+
+    def submit_button_style
+      response.parsed_body.at_css("form button[type=submit]")["style"]
+    end
+
+    it "colors step 1's button until a link that names no color" do
+      get "#{base_url}?button=ee7e2c"
+      follow_redirect! # into /register/new, which creates the registration
+      follow_redirect!
+      expect(submit_button_style).to eq orange_style
+
+      # Held in the session, so a registration reached without the param has it too -
+      # and start over carries it into the registration it begins
+      get register_path(b_param_token: b_param.id_token, step: 1)
+      expect(submit_button_style).to eq orange_style
+      expect(response.parsed_body.at_css("#start-over-modal a")["href"])
+        .to eq start_over_path(b_param, button: "#ee7e2c")
+
+      get "/register/new"
+      follow_redirect!
+      expect(submit_button_style).to be_nil
     end
   end
 

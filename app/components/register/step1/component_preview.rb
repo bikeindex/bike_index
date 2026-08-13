@@ -20,14 +20,19 @@ module Register
         step_1(manufacturer_id: ::Manufacturer.frame_makers.first&.id, cycle_type: "e-scooter")
       end
 
+      # Arrived on a link that names its own button color, like the embed form's ?button=
+      def with_button_color
+        step_1(button_color: "#ee7e2c")
+      end
+
       private
 
-      def step_1(**bike)
+      def step_1(button_color: nil, **bike)
         return production_notice("registration") if Rails.env.production?
 
         b_param = ::BParam.new(origin: "register_flow",
           params: {bike: {owner_email: lookbook_user&.email}.merge(bike).compact}.as_json)
-        render(Register::Step1::Component.new(b_param:, current_user: lookbook_user,
+        render(Register::Step1::Component.new(b_param:, current_user: lookbook_user, button_color:,
           steps: ::BikeServices::Register.steps(b_param, sequence: ::BikeServices::Register.registration_sequence(b_param))))
       end
     end
