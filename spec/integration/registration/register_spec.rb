@@ -579,6 +579,9 @@ RSpec.describe "Register flow", :js, type: :system do
       fill_in "b_param[owner_email]", with: owner_email
       click_button "Next"
 
+      # Step 2's combobox is typed into below, so it has to be the new page's - typing
+      # into the one Turbo is still replacing filters nothing and finds no option
+      expect(page).to have_content("Add your bike")
       fill_in "bike[user_name]", with: user_name
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")

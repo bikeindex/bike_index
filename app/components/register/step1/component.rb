@@ -4,15 +4,25 @@ module Register
   module Step1
     # Step 1 of the registration flow: the quick-start form
     class Component < ApplicationComponent
-      def initialize(b_param:, steps:, current_user: nil, button_color: nil)
+      def initialize(b_param:, steps:, current_user: nil, embed: false, button_color: nil)
         @b_param = b_param
         @steps = steps
         @current_user = current_user
+        @embed = embed
         # Sanitized here as well as in the controller - this is where it reaches a style attribute
         @button_color = HexColor.normalize(button_color)
       end
 
       private
+
+      # Turbo ignores a form's target unless it names an iframe, so a Turbo submission would
+      # render step 2 back inside the frame. Nor does autofocus belong in one - it scrolls
+      # the embedding page down to the frame on load
+      def form_options
+        return {data: {turbo: false}, html: {target: "_top"}} if @embed
+
+        {data: {turbo: true, controller: "autofocus register--retry"}}
+      end
 
       # The hover shade rides a variable because Tailwind only generates classes it can
       # read literally, and is !important because the inline color outranks a class
@@ -37,17 +47,17 @@ module Register
         @organization ||= @b_param.creation_organization
       end
 
-      # Every rendering of the cycle type is its own span, so register--heading
-      # can swap them all when the combobox changes
+      # Its own span, so register--heading can swap the word when the combobox changes
       def cycle_type_tag
         tag.span(cycle_type, data: {"register--heading-target": "cycleType"})
       end
 
+      # The step is still asking what's being registered, so the heading can't name the
+      # type. Framed, the page around it already says whose registration this is
       def heading_text
-        return translation(".register_your_bike_html", cycle_type: cycle_type_tag) if organization.blank?
+        return translation(".register_your_vehicle") if @embed || organization.blank?
 
-        translation(".register_your_bike_with_org_html", cycle_type: cycle_type_tag,
-          org_name: ERB::Util.html_escape(organization.short_name))
+        translation(".register_your_vehicle_with_org", org_name: organization.short_name)
       end
 
       # Names this registration rather than leaving it to the session, which another tab
@@ -59,7 +69,7 @@ module Register
                            status: @b_param.bike["status"], button: @button_color}.compact)
       end
 
-      # slug => the word the heading uses, for register--heading to swap in
+      # slug => the word the section label uses, for register--heading to swap in
       # (the same map bikes/new hands its JS as window.cycleTypeTranslations)
       def cycle_type_names
         CycleType.slug_translation_hash_lowercase_short

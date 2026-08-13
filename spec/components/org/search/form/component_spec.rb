@@ -19,6 +19,8 @@ RSpec.describe Org::Search::Form::Component, type: :component do
     expect(component).to have_css("input[name='search_model_audit_id']", visible: :hidden)
     expect(component).not_to have_css("input[name='search_location']")
     expect(component).not_to have_css("input[name='search_proximity']")
+    # The icon is the button's only content, so an unsized one leaves a blank blue box
+    expect(component).to have_css("#search-button[width='29'].tw\\:w-full.tw\\:h-auto")
   end
 
   context "with interpreted_params values" do

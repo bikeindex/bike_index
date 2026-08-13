@@ -22,9 +22,7 @@ RSpec.describe Admin::UserAlertsController, type: :request do
         FactoryBot.create(:user_alert, kind: "theft_alert_without_photo", alertable: theft_alert)
       end
       # after_commit creates its unfinished_registration alert
-      let!(:b_param) do
-        FactoryBot.create(:b_param, origin: "register_flow", params: {bike: {manufacturer_id: 1}})
-      end
+      let!(:b_param) { FactoryBot.create(:b_param_unfinished_registration) }
 
       it "renders the alertable column" do
         get base_url

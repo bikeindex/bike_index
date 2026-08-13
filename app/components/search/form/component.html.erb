@@ -91,7 +91,7 @@
         <%= render UI::Button::Component.new(color: :primary, type: "submit", html_class: "tw:w-full tw:h-full tw:disabled:cursor-wait") do %>
           <%= helpers.inline_svg_tag "icons/searcher.svg",
             id: "search-button",
-            class: "tw:text-white",
+            class: "tw:text-white tw:w-full tw:h-auto",
             title: "searcher" %>
         <% end %>
       </div>
