@@ -1,0 +1,5 @@
+<%# onsubmit, not turbo_confirm: Turbo Drive is off app-wide, so it never fires %>
+<div class="tw:mt-10 tw:flex tw:justify-end">
+  <%= render UI::ButtonLink::Component.new(text: "Discard draft", href: discard_path, method: :delete, color: :error, size: :sm,
+    form: {onsubmit: "return confirm('#{j confirm_text}')"}) %>
+</div>
