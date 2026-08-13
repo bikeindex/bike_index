@@ -23,6 +23,18 @@ RSpec.describe OrganizationLandingPage, type: :model do
     end
   end
 
+  describe "touching the organization" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:organization_landing_page) { FactoryBot.create(:organization_landing_page, organization:) }
+
+    it "touches on save, so the fragment keyed on the organization busts" do
+      organization.update_column(:updated_at, Time.current - 1.hour)
+
+      expect { organization_landing_page.update!(body: "<p>Edited</p>") }
+        .to change { organization.reload.updated_at }
+    end
+  end
+
   describe "enabled_mismatch_error" do
     let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
     let(:organization_landing_page) { FactoryBot.create(:organization_landing_page, organization:) }

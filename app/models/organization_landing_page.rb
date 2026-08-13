@@ -17,7 +17,8 @@
 class OrganizationLandingPage < ApplicationRecord
   has_paper_trail only: %i[body enabled organization_id]
 
-  belongs_to :organization
+  # touch so the landing page fragment, which is keyed on the organization, busts on save
+  belongs_to :organization, touch: true
 
   validates :organization_id, presence: true, uniqueness: true
 

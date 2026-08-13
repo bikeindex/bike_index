@@ -29,7 +29,7 @@ module Admin
 
       protected
 
-      # Built, not created - opening the editor shouldn't leave a blank page behind
+      # Built, not created - only a save should create the page
       def edited_record
         return @organization unless landing_page?
 

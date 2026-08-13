@@ -1,4 +1,3 @@
 .organization-landing-page-wrap
-  - landing_page = current_organization.organization_landing_page
-  - cache(["org_landing", landing_page]) do
-    = landing_page&.body&.html_safe
+  - cache(["org_landing", current_organization]) do
+    = current_organization.organization_landing_page&.body&.html_safe
