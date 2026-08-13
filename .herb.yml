@@ -78,6 +78,14 @@ linter:
     # present - so turning this on means moving the whole policy to nonces at the same time
     html-require-script-nonce:
       enabled: false
+
+    #
+    # Rules that don't apply everywhere
+    #
+    # db/seeds templates render through ERB.new, which has no view helpers
+    erb-prefer-image-tag-helper:
+      exclude:
+        - 'db/seeds/**/*'
   #
   #   # Rules can have 'include', 'only', and 'exclude' patterns
   #   some-rule:
