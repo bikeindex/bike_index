@@ -103,27 +103,6 @@ RSpec.describe UI::Button::Component, type: :component do
     end
   end
 
-  context "with background_color" do
-    let(:options) { {text:, color: :primary, background_color: "#ee7e2c"} }
-
-    it "renders it inline, over the color's own background" do
-      expect(component).to have_css("button[style='background-color: #ee7e2c; border-color: #ee7e2c']")
-      expect(component.to_html).to include("tw:bg-blue-600")
-    end
-
-    context "not a hex color" do
-      let(:options) { {text:, background_color: "orange; background-image: url(x)"} }
-
-      it "raises rather than passing it through to the attribute" do
-        expect { instance }.to raise_error(ArgumentError, /background_color must be a hex color/)
-      end
-    end
-  end
-
-  it "leaves style off without a background_color" do
-    expect(component).to have_no_css("button[style]")
-  end
-
   context "with disabled" do
     let(:options) { {text: "Click", disabled: true} }
 

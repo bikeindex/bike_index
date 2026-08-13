@@ -8,10 +8,15 @@ module Register
         @b_param = b_param
         @steps = steps
         @current_user = current_user
-        @button_color = button_color
+        @button_color = HexColor.normalize(button_color)
       end
 
       private
+
+      # Inline, so it beats COLORS - including the hover a one-off color has no palette for
+      def button_style
+        "background-color: #{@button_color}; border-color: #{@button_color}" if @button_color.present?
+      end
 
       def cycle_type
         @b_param.type
