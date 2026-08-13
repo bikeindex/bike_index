@@ -48,3 +48,24 @@ const listenForClickIntoFocus = function (input) {
 
 HwComboboxController.prototype.comboboxTargetConnected = listenForClickIntoFocus
 HwComboboxController.prototype.dialogComboboxTargetConnected = listenForClickIntoFocus
+
+// On small viewports it opens in a modal dialog and locks body scroll, but only
+// unlocks along its own collapse path, which a keypress or a click has to start.
+// Android's back gesture closes the dialog without either, stranding the page
+// unscrollable until reload.
+const openInDialog = HwComboboxController.prototype._openInDialog
+HwComboboxController.prototype._openInDialog = function () {
+  openInDialog.call(this)
+
+  this.dialogTarget.addEventListener('close', () => {
+    if (!this.expandedValue) return // its own collapse path already ran
+
+    // The browser sends this same close request for Escape, so close the way escape
+    // does -- tearing the dialog down by hand instead leaves a typed query sitting in
+    // the field with nothing selected behind it
+    this.close('hw:keyHandler:escape')
+    // `close` collapsed inline, the dialog already being shut, so its half is still owed
+    this._moveArtifactsInline()
+    this._restoreBodyScroll()
+  }, { once: true })
+}
