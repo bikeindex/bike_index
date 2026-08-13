@@ -17,8 +17,6 @@ class UpdateOrganizationAssociationsJob < ApplicationJob
       organization.update(skip_update: true, updated_at: Time.current)
       add_organization_manufacturers(organization)
       update_organization_stolen_message(organization)
-      # Re-derives organization_slug, which the landing page is looked up by
-      organization.organization_landing_page&.save
 
       if organization.enabled?("impound_bikes_locations")
         # If there is isn't a default impound bikes location and there should be, set one

@@ -20,35 +20,6 @@ RSpec.describe OrganizationLandingPage, type: :model do
     end
   end
 
-  describe "organization_slug" do
-    let(:organization) { FactoryBot.create(:organization, short_name: "Cool Bikes") }
-    let(:organization_landing_page) { FactoryBot.create(:organization_landing_page, organization:) }
-
-    it "matches the organization" do
-      expect(organization.slug).to eq "cool-bikes"
-      expect(organization_landing_page.organization_slug).to eq "cool-bikes"
-    end
-
-    context "when the organization is renamed" do
-      it "re-derives on save" do
-        organization.update!(short_name: "Rad Bikes")
-        expect(organization.reload.slug).to eq "rad-bikes"
-
-        organization_landing_page.save!
-        expect(organization_landing_page.organization_slug).to eq "rad-bikes"
-      end
-    end
-
-    context "when the organization is deleted" do
-      it "clears, so the slug is free for the next organization" do
-        organization.destroy
-        # Loaded fresh, the way the backfill does
-        described_class.find(organization_landing_page.id).save!
-        expect(organization_landing_page.reload.organization_slug).to be_nil
-      end
-    end
-  end
-
   describe "uniqueness" do
     let(:organization_landing_page) { FactoryBot.create(:organization_landing_page) }
 
@@ -87,14 +58,6 @@ RSpec.describe OrganizationLandingPage, type: :model do
           organization_landing_page.update!(enabled: true)
           expect(organization_landing_page.versions.count).to eq 2
           expect(organization_landing_page.versions.last.object_changes).to eq({enabled: [false, true]}.as_json)
-        end
-      end
-
-      context "renaming the organization" do
-        it "doesn't create a version, since organization_slug is derived" do
-          organization_landing_page.organization.update!(short_name: "Renamed Bikes")
-          expect { organization_landing_page.save! }
-            .to_not change { organization_landing_page.reload.versions.count }
         end
       end
     end

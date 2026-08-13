@@ -2721,7 +2721,6 @@ ALTER SEQUENCE public.organization_features_id_seq OWNED BY public.organization_
 CREATE TABLE public.organization_landing_pages (
     id bigint NOT NULL,
     organization_id bigint NOT NULL,
-    organization_slug character varying,
     body text,
     enabled boolean DEFAULT false NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
@@ -7128,13 +7127,6 @@ CREATE UNIQUE INDEX index_oauth_applications_on_uid ON public.oauth_applications
 --
 
 CREATE UNIQUE INDEX index_organization_landing_pages_on_organization_id ON public.organization_landing_pages USING btree (organization_id);
-
-
---
--- Name: index_organization_landing_pages_on_organization_slug; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_organization_landing_pages_on_organization_slug ON public.organization_landing_pages USING btree (organization_slug);
 
 
 --

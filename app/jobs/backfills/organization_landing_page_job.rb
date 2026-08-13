@@ -5,7 +5,7 @@ module Backfills
     sidekiq_options queue: "low_priority", retry: false
 
     def perform
-      # unscoped: a deleted organization can be restored
+      # unscoped: a deleted organization can be restored, and landing_html is going away
       Organization.unscoped.where.not(landing_html: [nil, ""])
         .where.missing(:organization_landing_page).find_each do |organization|
         # enabled matches today's routing gate, so nothing new goes live

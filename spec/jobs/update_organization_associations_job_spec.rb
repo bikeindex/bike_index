@@ -162,17 +162,4 @@ RSpec.describe UpdateOrganizationAssociationsJob, type: :job do
       expect(organization_stolen_message.reload.is_enabled).to be_falsey
     end
   end
-
-  describe "organization_landing_page" do
-    let(:organization) { FactoryBot.create(:organization, short_name: "Cool Bikes") }
-    let!(:organization_landing_page) { FactoryBot.create(:organization_landing_page, organization:) }
-
-    it "re-derives organization_slug when the organization is renamed" do
-      expect(organization_landing_page.organization_slug).to eq "cool-bikes"
-      organization.update_columns(short_name: "Rad Bikes", slug: "rad-bikes")
-
-      instance.perform(organization.id)
-      expect(organization_landing_page.reload.organization_slug).to eq "rad-bikes"
-    end
-  end
 end
