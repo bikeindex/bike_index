@@ -63,7 +63,7 @@ RSpec.describe LandingPagesController, type: :request do
 
     it "renders" do
       expect(LandingPages::ORGANIZATIONS).to include(organization.slug)
-      get "/brakebills"
+      get "/#{organization.slug}"
       expect(response.status).to eq(200)
       expect(response).to render_template("show")
       expect(title).to eq "Brakebills Bike Registration"
