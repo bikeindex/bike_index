@@ -17,46 +17,50 @@
     <p class="tw:mb-2 tw:text-gray-600">
       There is no active registration sequence.
     </p>
-    <p class="tw:mb-2 tw:text-gray-600">
-      Edit your draft sequence and contact Bike Index when you're ready to make
-      it live.
-    </p>
+    <% if can_edit_registration_sequences? %>
+      <p class="tw:mb-2 tw:text-gray-600">
+        Edit your draft sequence and contact Bike Index when you're ready to
+        make it live.
+      </p>
+    <% end %>
   <% end %>
 
-  <h2 class="uncap tw:mb-2 tw:text-lg tw:font-semibold">Draft</h2>
+  <% if can_edit_registration_sequences? %>
+    <h2 class="uncap tw:mb-2 tw:text-lg tw:font-semibold">Draft</h2>
 
-  <%# POSTing opens the draft, cloning one if there isn't one %>
-  <% draft_path = organization_registration_sequences_path(organization_id: current_organization.to_param) %>
+    <%# POSTing opens the draft, cloning one if there isn't one %>
+    <% draft_path = organization_registration_sequences_path(organization_id: current_organization.to_param) %>
 
-  <% if @draft.present? %>
-    <div
-      class="
-        tw:mb-2 tw:flex tw:flex-wrap tw:items-baseline tw:justify-between
-        tw:gap-x-4 tw:gap-y-1
-      "
-    >
-      <p class="tw:mb-0 tw:text-gray-600">
-        Your draft sequence, last edited
-        <%= render UI::Time::Component.new(time: @draft.updated_at, format: :localize_time_precise) %>
-      </p>
+    <% if @draft.present? %>
+      <div
+        class="
+          tw:mb-2 tw:flex tw:flex-wrap tw:items-baseline tw:justify-between
+          tw:gap-x-4 tw:gap-y-1
+        "
+      >
+        <p class="tw:mb-0 tw:text-gray-600">
+          Your draft sequence, last edited
+          <%= render UI::Time::Component.new(time: @draft.updated_at, format: :localize_time_precise) %>
+        </p>
 
-      <%= render UI::ButtonLink::Component.new(text: "Edit", href: draft_path, method: :post, color: :primary, form_class: "button_to tw:ml-auto") %>
-    </div>
-    <%# Read-only, like the active version above - the draft has its own screen %>
-    <div class="tw:mb-6">
-      <%= render Org::RegistrationSequence::PageList::Component.new(registration_sequence: @draft, editable: false) %>
-    </div>
-    <%# onsubmit, not turbo_confirm: Turbo Drive is off app-wide %>
-    <div class="tw:mb-6 tw:flex">
-      <%= render UI::ButtonLink::Component.new(text: "Discard draft", href: organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), method: :delete, color: :error, size: :sm,
-        form_class: "button_to tw:ml-auto",
-        form: {onsubmit: "return confirm('#{j RegistrationSequence::DISCARD_DRAFT_CONFIRM}')"}) %>
-    </div>
-  <% else %>
-    <p class="tw:mb-2 tw:text-gray-600">You don't have a draft sequence</p>
-    <div class="tw:mb-6">
-      <%= render UI::ButtonLink::Component.new(text: @active.present? ? "Copy current sequence and edit" : "Create a sequence", href: draft_path, method: :post, color: :primary) %>
-    </div>
+        <%= render UI::ButtonLink::Component.new(text: "Edit", href: draft_path, method: :post, color: :primary, form_class: "button_to tw:ml-auto") %>
+      </div>
+      <%# Read-only, like the active version above - the draft has its own screen %>
+      <div class="tw:mb-6">
+        <%= render Org::RegistrationSequence::PageList::Component.new(registration_sequence: @draft, editable: false) %>
+      </div>
+      <%# onsubmit, not turbo_confirm: Turbo Drive is off app-wide %>
+      <div class="tw:mb-6 tw:flex">
+        <%= render UI::ButtonLink::Component.new(text: "Discard draft", href: organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), method: :delete, color: :error, size: :sm,
+          form_class: "button_to tw:ml-auto",
+          form: {onsubmit: "return confirm('#{j RegistrationSequence::DISCARD_DRAFT_CONFIRM}')"}) %>
+      </div>
+    <% else %>
+      <p class="tw:mb-2 tw:text-gray-600">You don't have a draft sequence</p>
+      <div class="tw:mb-6">
+        <%= render UI::ButtonLink::Component.new(text: @active.present? ? "Copy current sequence and edit" : "Create a sequence", href: draft_path, method: :post, color: :primary) %>
+      </div>
+    <% end %>
   <% end %>
 
   <% if @previous.any? %>

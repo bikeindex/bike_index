@@ -89,13 +89,14 @@ export class CollapseUtils {
     if (this.isVisible(element) && !element.classList.contains(scale)) return
     // Remove the hidden
     element.classList.remove('tw:hidden!', 'tw:hidden')
+    // An animated hide leaves the size/scale pinned to 0, so reset before the
+    // duration-0 return too - display alone doesn't uncollapse it
+    element.classList.remove(scale)
+    this.setSize(element, styles, '')
 
     // Skip animation if duration is 0
     if (!duration) return
 
-    // A prior hide leaves the size/scale pinned to 0; reset before measuring.
-    element.classList.remove(scale)
-    this.setSize(element, styles, '')
     // Measure the natural size while visible, before collapsing to 0.
     const target = this.naturalSize(element, dimension)
     // Collapse to 0 as the transition's starting point

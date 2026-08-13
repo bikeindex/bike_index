@@ -26,5 +26,7 @@
         </div>
       <% end %>
     </div>
+
+    <%= render(Registrations::Show::OwnerPhone::Component.new(phone: owner_phone)) %>
   <% end %>
 </div>

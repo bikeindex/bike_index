@@ -17,7 +17,7 @@
   </div>
 
   <% if contactable? %>
-    <%= render(Registrations::Show::OrgTopActions::MessageOwner::Component.new(bike: @bike)) %>
+    <%= render(Registrations::Show::OrgTopActions::MessageOwner::Component.new(bike: @bike, current_user: @current_user)) %>
   <% end %>
 
   <% if show_create_parking_notification? || show_create_impound? %>

@@ -74,6 +74,13 @@ RSpec.describe "Register flow", :js, type: :system do
     # The manufacturer itself, rather than Manufacturer.other with the id as free text
     expect(BParam.last.manufacturer_id).to eq manufacturer.id
     expect(BParam.last.manufacturer_other).to be_blank
+
+    # This field is autofocused, so the click into it brings no focus event of its own -
+    # typing still replaces the restored name rather than mashing into the middle of it
+    find_field("b_param_manufacturer_id").click
+    send_keys("Kona")
+
+    expect(page).to have_field("b_param_manufacturer_id", with: "Kona")
   end
 
   it "starts a registration, keeps a full details draft across a reload, and completes" do
@@ -133,9 +140,18 @@ RSpec.describe "Register flow", :js, type: :system do
     find("label", text: "M", exact_text: true).click
     select "cm", from: "bike[frame_size_unit]"
     check "Missing serial"
-    # readonly rather than disabled, so "unknown" still submits
-    expect(page).to have_field("bike[serial_number]", with: "unknown", readonly: true)
-    fill_in "bike[bike_sticker]", with: "A 471 829"
+    # Hidden rather than removed, so "unknown" still submits
+    expect(page).to have_no_field("bike[serial_number]")
+    expect(page).to have_field("bike[serial_number]", with: "unknown", visible: :all)
+    # No organization with stickers, and nothing scanned, so there is no sticker to give
+    expect(page).to have_no_field("bike[bike_sticker]")
+
+    # Unchecking has to undo the animated hide, not just its display:none
+    uncheck "Missing serial"
+    fill_in "bike[serial_number]", with: "SERIAL9"
+
+    check "Missing serial"
+    expect(page).to have_no_field("bike[serial_number]")
 
     # Nothing submitted yet - the reload restores the whole draft from form-persist
     visit details_url
@@ -154,11 +170,11 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(find("input[name='bike[frame_size]'][value='m']", visible: :all)).to be_checked
     # A select always has a value, so it restores from the draft rather than the server default
     expect(page).to have_select("bike[frame_size_unit]", selected: "cm")
-    # The restored missing serial re-reveals the made-without link
-    expect(page).to have_field("bike[serial_number]", with: "unknown", readonly: true)
+    # The restored missing serial hides the input again and re-reveals the made-without link
+    expect(page).to have_no_field("bike[serial_number]")
+    expect(page).to have_field("bike[serial_number]", with: "unknown", visible: :all)
     expect(page).to have_checked_field("Missing serial")
     expect(page).to have_button("This bike was made without a serial number")
-    expect(page).to have_field("bike[bike_sticker]", with: "A 471 829")
 
     # The modal's made-without confirm mutates fields programmatically - that
     # state survives a reload too
@@ -170,6 +186,22 @@ RSpec.describe "Register flow", :js, type: :system do
 
     expect(page).to have_checked_field("This bike was made without a serial")
     expect(page).to have_no_field("bike[serial_number]") # the serial section stays swapped out
+
+    # The input was hidden twice getting here - by the missing checkbox, then by the
+    # made-without swap - so unchecking has to bring it back from both
+    uncheck "This bike was made without a serial"
+
+    expect(page).to have_field("bike[serial_number]", with: "")
+    expect(page).to have_unchecked_field("Missing serial")
+
+    check "Missing serial"
+
+    expect(page).to have_no_field("bike[serial_number]")
+
+    click_button "This bike was made without a serial number"
+    click_button "I'm 100% sure"
+
+    expect(page).to have_checked_field("This bike was made without a serial")
 
     # Like bikes/new, phone is only asked for once the status calls for it
     expect(page).to have_no_field("bike[phone]")
@@ -298,9 +330,13 @@ RSpec.describe "Register flow", :js, type: :system do
 
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
-      fill_in "bike[serial_number]", with: "GIFT1234"
 
-      # Required, so the browser holds the submit without any js of ours
+      # Marking it missing hides the input, which still has to submit the "unknown" it holds
+      check "Missing serial"
+      expect(page).to have_no_field("bike[serial_number]")
+
+      # user_name is required, so the browser holds the submit without any js of ours -
+      # and holds it on that alone, not on the serial it can no longer see
       click_button "Complete Bike Registration"
       expect(page).to have_current_path(/step=2/, url: true)
       expect(Bike.count).to eq 0
@@ -311,7 +347,12 @@ RSpec.describe "Register flow", :js, type: :system do
       expect(page).to have_content("Registration complete")
       # Their friend's registration to claim, not theirs
       expect(page).to have_content("We've emailed #{friend_email} so they can claim")
-      expect(Bike.last).to have_attributes(owner_email: friend_email, owner_name: user_name)
+      expect(Bike.last).to have_attributes(owner_email: friend_email, owner_name: user_name,
+        serial_number: "unknown")
+      # What the browser actually posted: a bike built without any serial at all is
+      # given "unknown" too (BikeServices::Builder), so the bike alone can't tell a
+      # hidden field that submitted from one that didn't
+      expect(BParam.last.bike["serial_number"]).to eq "unknown"
     end
   end
 
