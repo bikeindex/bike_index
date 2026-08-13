@@ -133,14 +133,14 @@ class UserAlert < ApplicationRecord
     # Expiry is silent, and CleanBParamsJob deletes without callbacks, so those alerts
     # never reach the after_commit that would resolve them
     user.user_alerts.active.unfinished_registration.includes(:alertable)
-      .reject { |user_alert| user_alert.alertable&.unfinished_registration? }
+      .reject { |user_alert| user_alert.alertable&.unfinished_registration?(user) }
       .each(&:resolve!)
   end
 
   def self.update_unfinished_registration(user:, b_param:)
     user_alert = find_or_build_by(kind: "unfinished_registration",
       user_id: user.id, alertable: b_param)
-    if b_param.unfinished_registration?
+    if b_param.unfinished_registration?(user)
       # Nothing is assigned after the lookup, so saving a found one only re-runs the
       # uniqueness select find_or_build_by just did - in the register flow's request
       user_alert.save if user_alert.new_record?

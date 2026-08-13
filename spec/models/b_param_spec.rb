@@ -871,7 +871,7 @@ RSpec.describe BParam, type: :model do
   describe "unfinished_registration?" do
     let(:b_param) { FactoryBot.create(:b_param, creator:, origin: "register_flow", params: {bike: bike_params}) }
     let(:creator) { FactoryBot.create(:user_confirmed) }
-    let(:bike_params) { {manufacturer_id: 1} }
+    let(:bike_params) { {manufacturer_id: 1, owner_email: creator&.email} }
 
     it "is unfinished, and alerts the creator" do
       expect(b_param.unfinished_registration?).to be_truthy
@@ -905,11 +905,32 @@ RSpec.describe BParam, type: :model do
     end
 
     context "without a manufacturer" do
-      let(:bike_params) { {owner_email: "stuff@example.com"} }
+      let(:bike_params) { {owner_email: creator.email} }
 
       it "is not unfinished, and doesn't alert" do
         expect(b_param.unfinished_registration?).to be_falsey
         expect(creator.reload.alert_slugs).to eq []
+      end
+    end
+
+    # An organization user registering a customer's bike, or anyone registering a friend's
+    context "owned by someone else" do
+      let(:bike_params) { {manufacturer_id: 1, owner_email: "someone-else@example.com"} }
+
+      it "is unfinished, but isn't the creator's to be alerted about" do
+        expect(b_param.unfinished_registration?).to be_falsey
+        expect(creator.reload.alert_slugs).to eq []
+      end
+    end
+
+    context "owned by a confirmed secondary email of the creator's" do
+      let!(:user_email) { FactoryBot.create(:user_email, user: creator) }
+      let(:bike_params) { {manufacturer_id: 1, owner_email: user_email.email} }
+
+      it "is the creator's own, and alerts" do
+        expect(creator.reload.confirmed_emails).to include user_email.email
+        expect(b_param.unfinished_registration?).to be_truthy
+        expect(creator.reload.alert_slugs).to eq ["unfinished_registration"]
       end
     end
 
@@ -925,8 +946,8 @@ RSpec.describe BParam, type: :model do
     context "without a creator" do
       let(:creator) { nil }
 
-      it "is unfinished, with nobody to alert" do
-        expect(b_param.unfinished_registration?).to be_truthy
+      it "can't be self made, and has nobody to alert" do
+        expect(b_param.unfinished_registration?).to be_falsey
         expect(UserAlert.count).to eq 0
       end
     end

@@ -26,6 +26,9 @@
 
 <div class="organized-wrap">
   <div class="<%= organized_container %>">
+    <%# the layout skips its own spot for this - the menu is positioned over it %>
+    <%= content_for(:general_alert) %>
+
     <% if OrganizationDisplayer.law_enforcement_missing_verified_features?(current_organization) %>
       <div class="organization-wide-alert alert alert-info in">
         <button

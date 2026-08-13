@@ -22,7 +22,7 @@ module Register
         content_tag(:div,
           content_tag(:div, safe_join([retry_notice, content]),
             class: "tw:mx-auto #{@wide ? "tw:max-w-3xl" : "tw:max-w-md"}"),
-          class: "tw:-mt-9 tw:-mb-18 tw:bg-gray-100 tw:px-4 tw:py-10 tw:min-[992px]:-mt-15 tw:dark:bg-gray-900",
+          class: "tw:-mt-(--nav-gap) tw:-mb-18 tw:bg-gray-100 tw:px-4 tw:py-10 tw:dark:bg-gray-900",
           data: @data.merge(controller: ["register--revalidate", @data[:controller]].compact.join(" ")))
       end
 

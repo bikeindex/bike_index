@@ -305,10 +305,12 @@ class BParam < ApplicationRecord
 
   # Step 1 was submitted (manufacturer is required there), so it's more than the shell
   # new creates, and the token still resumes it. A destroyed one is false so that the
-  # after_commit a destroy fires resolves its alert rather than re-saving it
-  def unfinished_registration?
+  # after_commit a destroy fires resolves its alert rather than re-saving it.
+  # self_made? last, and taking the user callers already hold, since it's the only clause
+  # that queries: one made for someone else isn't the creator's bike to alert about
+  def unfinished_registration?(user = creator)
     !destroyed? && origin == "register_flow" && !with_bike? && manufacturer_id.present? &&
-      created_at.present? && created_at > Time.current - TOKEN_EXPIRATION
+      created_at.present? && created_at > Time.current - TOKEN_EXPIRATION && self_made?(user)
   end
 
   # Get it unscoped, because unregistered_bike notifications
