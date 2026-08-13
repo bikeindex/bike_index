@@ -17,7 +17,12 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  clip-path: inset(-100px 0 0 0);
+  /* The tiles bleed 100px up; the rest of the inset is headroom for the box-shadow to
+     fill, which is what keeps a general alert standing between the navbar and the hero
+     from reading as a white band. Beyond the tiles it's flat blue, and the navbar covers
+     the whole thing when there's no alert and the hero sits flush */
+  clip-path: inset(-400px 0 0 0);
+  box-shadow: 0 -400px 0 var(--redesign-blue-800);
   padding: 3rem 0;
 }
 
