@@ -51,18 +51,23 @@ HwComboboxController.prototype.dialogComboboxTargetConnected = listenForClickInt
 
 // The dialog is the small-screen picker, but the gem measures the window the combobox is
 // in - so an iframe narrower than the breakpoint got it on a desktop, where it can't
-// escape the frame to be full-screen anyway. Measure the top window, which is the screen.
-const viewportWindow = () => {
+// escape the frame to be full-screen anyway.
+const isSmallViewport = (query) => {
+  // Lookbook frames its previews, and dragging its viewport handle is how they're reviewed
+  if (window.inComponentPreview) return window.matchMedia(query).matches
+
   try {
-    return window.top.matchMedia ? window.top : window
+    return window.top.matchMedia(query).matches
   } catch {
-    return window // a cross-origin top isn't readable, so the frame is all we can measure
+    return window.matchMedia(query).matches // a cross-origin top isn't readable to measure
   }
 }
 
+// Shadows an inherited accessor, so it can't be a plain assignment like the patches above
 Object.defineProperty(HwComboboxController.prototype, '_isSmallViewport', {
+  configurable: true,
   get () {
-    return viewportWindow().matchMedia(`(max-width: ${this.smallViewportMaxWidthValue})`).matches
+    return isSmallViewport(`(max-width: ${this.smallViewportMaxWidthValue})`)
   }
 })
 

@@ -335,7 +335,7 @@ RSpec.describe RegisterController, type: :request do
       it "names the organization in the heading, and the cycle type only where js can swap it" do
         get register_path(b_param_token: b_param.id_token, step: 1)
         expect(response.body).to include "Register your vehicle with Brakebills!"
-        expect(response.body).to include "<span data-register--heading-target=\"cycleType\">cargo bike</span> info"
+        expect(response.body).to include '<span data-register--heading-target="cycleType">cargo bike</span> info'
         # Posted back, so a submission that has to build a registration keeps the org
         expect(Nokogiri::HTML(response.body).at_css("input[name='organization_id']")["value"])
           .to eq organization.id.to_s

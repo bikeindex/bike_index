@@ -30,18 +30,17 @@ module Register
         @organization ||= @b_param.creation_organization
       end
 
-      # Every rendering of the cycle type is its own span, so register--heading
-      # can swap them all when the combobox changes
+      # Its own span, so register--heading can swap the word when the combobox changes
       def cycle_type_tag
         tag.span(cycle_type, data: {"register--heading-target": "cycleType"})
       end
 
-      # Not the cycle type the section label swaps - the step is still asking what's
-      # being registered, so the heading can't name it
+      # The step is still asking what's being registered, so the heading can't name the
+      # type. Framed, the page around it already says whose registration this is
       def heading_text
-        return translation(".register_your_vehicle_html") if organization.blank?
+        return translation(".register_your_vehicle") if @embed || organization.blank?
 
-        translation(".register_your_vehicle_with_org_html", org_name: ERB::Util.html_escape(organization.short_name))
+        translation(".register_your_vehicle_with_org", org_name: organization.short_name)
       end
 
       # Names this registration rather than leaving it to the session, which another tab
@@ -53,7 +52,7 @@ module Register
                            status: @b_param.bike["status"]}.compact)
       end
 
-      # slug => the word the heading uses, for register--heading to swap in
+      # slug => the word the section label uses, for register--heading to swap in
       # (the same map bikes/new hands its JS as window.cycleTypeTranslations)
       def cycle_type_names
         CycleType.slug_translation_hash_lowercase_short

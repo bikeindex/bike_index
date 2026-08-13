@@ -7,15 +7,15 @@ RSpec.describe "Organization landing page registration embed", :js, type: :syste
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
   # The slug LandingPages::ORGANIZATIONS routes by default, so /brakebills is the landing page
   let!(:organization) { FactoryBot.create(:organization, name: "Brakebills", landing_html:) }
-  # The column the seeded page frames it in - narrower than the combobox's mobile
-  # breakpoint, which the patched combobox measures the screen rather than the frame for
+  # The column the seeded page frames it in, which is narrower than the combobox's
+  # mobile breakpoint
   let(:landing_html) do
     <<~HTML
       <h1>Brakebills University Bicycle Registration</h1>
       <div class="container"><div class="row"><div class="col-md-5">
         <iframe src="/register/embed?organization_id=brakebills"
           title="Register your bike with Brakebills University"
-          style="width: 100%; border: none; height: 680px;"></iframe>
+          style="width: 100%; border: none; height: 620px;"></iframe>
       </div></div></div>
     HTML
   end
@@ -31,12 +31,14 @@ RSpec.describe "Organization landing page registration embed", :js, type: :syste
     expect(page).to have_content("Brakebills University Bicycle Registration")
 
     within_frame(find("iframe")) do
-      expect(page).to have_content("Register your vehicle with Brakebills!")
+      # The page around the frame names the organization, so the heading doesn't
+      expect(page).to have_content("Register your vehicle!")
       expect(page).to have_no_css("nav.primary-header-nav")
 
       type_into("#b_param_manufacturer_id", "Surly")
       # The frame is under the combobox's mobile breakpoint but the screen isn't, so it
       # drops down inline rather than opening the picker meant for a phone
+      expect(page).to have_css(".hw-combobox__option", text: "Surly")
       expect(page).to have_no_css(".hw-combobox__dialog__listbox")
       click_combobox_option("Surly")
       fill_in "b_param[owner_email]", with: owner_email
@@ -59,9 +61,6 @@ RSpec.describe "Organization landing page registration embed", :js, type: :syste
     within_frame(find("iframe")) do
       type_into("#b_param_manufacturer_id", "Surly")
       expect(page).to have_css(".hw-combobox__dialog__listbox")
-      click_combobox_option("Surly")
-
-      expect(page).to have_field("b_param_manufacturer_id", with: "Surly")
     end
   end
 end

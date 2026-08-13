@@ -42,7 +42,7 @@ class RegisterController < ApplicationController
   # Step 1 framed on an organization's landing page. It renders rather than redirecting into
   # a tokenized step, so the frame is one request and nothing past step 1 is embeddable
   def embed
-    @page_title = I18n.t("meta_titles.register_step_1", cycle_type: @b_param.type)
+    @page_title = I18n.t("meta_titles.register_step_1")
     render Register::Embed::Component.new(b_param: @b_param, steps: flow_steps, current_user:), layout: false
   end
 
@@ -68,7 +68,7 @@ class RegisterController < ApplicationController
       @page_title = I18n.t("meta_titles.register_step_2", cycle_type: @b_param.type)
       render Register::Step2::Component.new(b_param: @b_param, steps:, current_user:)
     when "1"
-      @page_title = I18n.t("meta_titles.register_step_1", cycle_type: @b_param.type)
+      @page_title = I18n.t("meta_titles.register_step_1")
       render Register::Step1::Component.new(b_param: @b_param, steps:, current_user:)
     else
       @page_title = I18n.t("meta_titles.register_acknowledgment", cycle_type: @b_param.type)
@@ -80,8 +80,6 @@ class RegisterController < ApplicationController
     saved = BikeServices::Register.save_step_1(@b_param, bike_params: create_params,
       propulsion_type_motorized: params[:propulsion_type_motorized])
     unless saved
-      # The 422 render skips the derived meta title, which now needs the interpolation
-      @page_title = I18n.t("meta_titles.register_create", cycle_type: @b_param.type)
       return render(Register::Step1::Component.new(b_param: @b_param, steps: flow_steps, current_user:),
         status: :unprocessable_entity)
     end
