@@ -18,6 +18,7 @@ module Admin
       def update
         if edited_record.update(permitted_parameters)
           flash[:success] = "Layout Saved!"
+          flash[:error] = enabled_mismatch_error
           redirect_to edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id])
         else
           render action: :edit, id: params[:id]
@@ -33,6 +34,16 @@ module Admin
         return @organization unless layout_kind == "landing_page"
 
         @landing_page ||= @organization.organization_landing_page || @organization.build_organization_landing_page
+      end
+
+      # enabled only moves when Backfills::OrganizationLandingPageJob runs, so a save is the
+      # moment to surface that it disagrees with the variable that routes the page
+      def enabled_mismatch_error
+        return if layout_kind != "landing_page" || edited_record.enabled_matches_env?
+
+        "This landing page's enabled is #{edited_record.enabled?}, but ORGANIZATIONS_WITH_LANDING_PAGES " \
+          "#{edited_record.env_enabled? ? "includes" : "does not include"} \"#{@organization.slug}\". " \
+          "Run Backfills::OrganizationLandingPageJob to sync them."
       end
 
       def permitted_parameters

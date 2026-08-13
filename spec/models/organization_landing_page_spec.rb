@@ -23,6 +23,31 @@ RSpec.describe OrganizationLandingPage, type: :model do
     end
   end
 
+  describe "enabled_matches_env?" do
+    let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+    let(:organization_landing_page) { FactoryBot.create(:organization_landing_page, organization:) }
+
+    it "compares enabled against ORGANIZATIONS_WITH_LANDING_PAGES" do
+      expect(LandingPages::ORGANIZATIONS).to include(organization.slug)
+      expect(organization_landing_page.env_enabled?).to be_truthy
+      # The factory default, so a routed organization starts out disagreeing
+      expect(organization_landing_page.enabled).to be_falsey
+      expect(organization_landing_page.enabled_matches_env?).to be_falsey
+
+      organization_landing_page.update!(enabled: true)
+      expect(organization_landing_page.enabled_matches_env?).to be_truthy
+    end
+
+    context "with an organization that isn't routed" do
+      let(:organization) { FactoryBot.create(:organization) }
+
+      it "matches when disabled" do
+        expect(organization_landing_page.env_enabled?).to be_falsey
+        expect(organization_landing_page.enabled_matches_env?).to be_truthy
+      end
+    end
+  end
+
   describe "versioning" do
     include_context :with_paper_trail
 

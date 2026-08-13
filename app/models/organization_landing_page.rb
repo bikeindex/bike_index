@@ -27,6 +27,16 @@ class OrganizationLandingPage < ApplicationRecord
     where(organization_id: organization.id).first_or_create
   end
 
+  # ORGANIZATIONS_WITH_LANDING_PAGES is what actually routes the page; enabled is a copy of it
+  # that only Backfills::OrganizationLandingPageJob reconciles, so the two can drift
+  def env_enabled?
+    LandingPages::ORGANIZATIONS.include?(organization&.slug)
+  end
+
+  def enabled_matches_env?
+    enabled? == env_enabled?
+  end
+
   private
 
   def set_calculated_attributes

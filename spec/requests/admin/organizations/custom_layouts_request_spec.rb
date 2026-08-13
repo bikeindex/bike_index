@@ -68,6 +68,32 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           expect(organization.reload.organization_landing_page.body).to eq update[:body]
           # dropping landing_html is a follow-up
           expect(organization.landing_html).to be_nil
+          # enabled false and the organization isn't routed, so the two agree
+          expect(flash[:error]).to be_blank
+        end
+
+        context "when enabled disagrees with ORGANIZATIONS_WITH_LANDING_PAGES" do
+          let!(:landing_page) { FactoryBot.create(:organization_landing_page, organization:, enabled: true) }
+
+          it "saves and flashes an error" do
+            expect(LandingPages::ORGANIZATIONS).to_not include(organization.slug)
+            put "#{base_url}/landing_page", params: {organization_landing_page: update}
+            expect(landing_page.reload.body).to eq update[:body]
+            expect(flash[:success]).to be_present
+            expect(flash[:error]).to match(/enabled is true.*does not include.*#{organization.slug}/)
+          end
+
+          context "enabled false for a routed organization" do
+            let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+            let!(:landing_page) { FactoryBot.create(:organization_landing_page, organization:, enabled: false) }
+
+            it "saves and flashes an error" do
+              expect(LandingPages::ORGANIZATIONS).to include(organization.slug)
+              put "#{base_url}/landing_page", params: {organization_landing_page: update}
+              expect(landing_page.reload.body).to eq update[:body]
+              expect(flash[:error]).to match(/enabled is false.*includes.*#{organization.slug}/)
+            end
+          end
         end
       end
       context "mail_snippet" do
