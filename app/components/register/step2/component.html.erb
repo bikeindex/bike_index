@@ -157,6 +157,7 @@
       </div>
 
       <% made_without_serial = bike["serial_number"] == "made_without_serial" %>
+      <% serial_missing = bike["serial_number"] == "unknown" %>
 
       <div
         class="<%= "tw:hidden" if made_without_serial %>"
@@ -164,7 +165,7 @@
       >
         <%# Hidden rather than removed, so the serial it holds still submits %>
         <div
-          class="<%= "tw:hidden" if bike["serial_number"] == "unknown" %>"
+          class="<%= "tw:hidden" if serial_missing %>"
           data-register--serial-target="inputRow"
         >
           <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :serial_number, kind: :text_field, required: true,
@@ -174,11 +175,11 @@
         </div>
 
         <%= render UI::Forms::Checkbox::Component.new(name: :serial_missing, value: true,
-            checked: bike["serial_number"] == "unknown", label: translation(".missing_serial"), class_name: "tw:mt-2",
+            checked: serial_missing, label: translation(".missing_serial"), class_name: "tw:mt-2",
             input_data: {"register--serial-target": "missing", action: "change->register--serial#toggleMissing"}) %>
 
         <div
-          class="tw:mt-1.5 <%= "tw:hidden" unless bike["serial_number"] == "unknown" %>"
+          class="tw:mt-1.5 <%= "tw:hidden" unless serial_missing %>"
           data-register--serial-target="madeWithoutLink"
         >
           <%= render UI::Button::Component.new(text: translation(".without_serial_number", cycle_type:),
