@@ -13,8 +13,12 @@ RSpec.describe RegisterController, type: :request do
 
   # Where Register::Step1::Component's start over link goes - it names the registration
   # it was rendered on, rather than leaving it to the session
-  def start_over_path(b_param)
-    new_register_path(discard_token: b_param.id_token)
+  def start_over_path(b_param, **params)
+    new_register_path(discard_token: b_param.id_token, **params)
+  end
+
+  def submit_button_style
+    Nokogiri::HTML(response.body).at_css("form button[type=submit]")["style"]
   end
 
   describe "new" do
@@ -254,6 +258,18 @@ RSpec.describe RegisterController, type: :request do
       # The session's still-blank registration, rather than one per view
       expect { get "/register/embed?organization_id=#{organization.slug}" }.to_not change(BParam, :count)
     end
+
+    it "colors the button with the frame's ?button=, which the flow's own pages ignore" do
+      get "/register/embed?organization_id=#{organization.slug}&button=c9a227"
+      expect(submit_button_style).to include("background-color: #c9a227", "--button-hover-color: #a78620")
+
+      # The derived shade, unless the frame names the one it wants
+      get "/register/embed?organization_id=#{organization.slug}&button=c9a227&button_hover=123456"
+      expect(submit_button_style).to include("--button-hover-color: #123456")
+
+      get register_path(b_param_token: BParam.last.id_token, step: 1, button: "c9a227")
+      expect(submit_button_style).to be_nil
+    end
   end
 
   describe "show step: 1" do
@@ -340,7 +356,7 @@ RSpec.describe RegisterController, type: :request do
         it "carries the organization and status onto the start over link" do
           get register_path(b_param_token: b_param.id_token, step: 1)
           start_over = Nokogiri::HTML(response.body).at_css("#start-over-modal a")["href"]
-          expect(start_over).to eq new_register_path(discard_token: b_param.id_token,
+          expect(start_over).to eq start_over_path(b_param,
             organization_id: organization.slug, status: "status_stolen")
         end
       end

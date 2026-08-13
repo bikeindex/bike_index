@@ -9,9 +9,9 @@ RSpec.describe Register::Step1::Component, type: :component do
 
   # Reloaded, so an organization updated mid-example isn't answered from the copy
   # the previous render left on the registration
-  def render_step_1
+  def render_step_1(**options)
     reloaded = b_param.reload
-    render_inline(described_class.new(b_param: reloaded,
+    render_inline(described_class.new(b_param: reloaded, **options,
       steps: BikeServices::Register.steps(reloaded, sequence: nil)))
   end
 
@@ -55,6 +55,42 @@ RSpec.describe Register::Step1::Component, type: :component do
 
       expect(email_label).to eq "Email"
       expect(email_placeholder).to eq "you@example.com"
+    end
+  end
+
+  describe "button_color" do
+    def submit_button
+      page.find("form button[type=submit]")
+    end
+
+    it "colors the button, hovering a shade darker" do
+      render_step_1(button_color: "#c9a227")
+
+      expect(submit_button["style"])
+        .to eq "background-color: #c9a227; border-color: #c9a227; --button-hover-color: #a78620"
+    end
+
+    # UI::Button guards every hover against both disabled flags, and an !important
+    # would outrank that guard rather than inherit it
+    it "guards the hover the way UI::Button's own colors are guarded" do
+      render_step_1(button_color: "#c9a227")
+      hovers = submit_button["class"].split.grep(/hover:.+--button-hover-color/)
+
+      expect(hovers.count).to eq 2
+      expect(hovers.grep_v(/\Atw:not-disabled:not-aria-disabled:hover:/)).to eq([])
+    end
+
+    it "takes a hover color rather than deriving one" do
+      render_step_1(button_color: "#c9a227", button_hover_color: "#123456")
+
+      expect(submit_button["style"]).to include "--button-hover-color: #123456"
+    end
+
+    it "leaves the style off without one" do
+      render_step_1
+
+      expect(submit_button["style"]).to be_nil
+      expect(submit_button["class"]).to_not include "--button-hover-color"
     end
   end
 end

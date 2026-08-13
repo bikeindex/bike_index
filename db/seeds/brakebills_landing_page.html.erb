@@ -1,3 +1,5 @@
+<% brand_color = "c9a227" %>
+
 <style>
   #organized_manage_landing,
   #landing_pages_show {
@@ -15,7 +17,7 @@
     fill: #000000;
   }
   div.org-landing-tips-list img {
-    border-color: #c9a227;
+    border-color: #<%= brand_color %>;
   }
   .org-landing-header-logo {
     max-width: 300px;
@@ -36,7 +38,7 @@
   <div class="row">
     <div class="col-md-5 org-landing-embed-col">
       <iframe
-        src="/register/embed?organization_id=brakebills"
+        src="/register/embed?organization_id=brakebills&button=<%= brand_color %>"
         title="Register your bike with Brakebills University"
         style="width: 100%; border: none; height: 620px;"
       ></iframe>

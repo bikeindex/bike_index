@@ -4,11 +4,14 @@ module Register
   module Step1
     # Step 1 of the registration flow: the quick-start form
     class Component < ApplicationComponent
-      def initialize(b_param:, steps:, current_user: nil, embed: false)
+      def initialize(b_param:, steps:, current_user: nil, embed: false, button_color: nil,
+        button_hover_color: nil)
         @b_param = b_param
         @steps = steps
         @current_user = current_user
         @embed = embed
+        @button_color = button_color
+        @button_hover_color = button_hover_color
       end
 
       private
@@ -20,6 +23,22 @@ module Register
         return {data: {turbo: false}, html: {target: "_top"}} if @embed
 
         {data: {turbo: true, controller: "autofocus register--retry"}}
+      end
+
+      # Derived when the frame's src doesn't name one
+      def button_hover_color
+        @button_hover_color.presence || HexColor.darken_hex(@button_color)
+      end
+
+      # The shade rides a variable because Tailwind only generates classes it can read
+      # literally, and is !important because the inline color outranks a class
+      def button_options
+        return {html_class: "tw:w-full"} unless @button_color
+
+        {html_class: "tw:w-full tw:not-disabled:not-aria-disabled:hover:bg-[var(--button-hover-color)]! " \
+          "tw:not-disabled:not-aria-disabled:hover:border-[var(--button-hover-color)]!",
+         style: "background-color: #{@button_color}; border-color: #{@button_color}; " \
+           "--button-hover-color: #{button_hover_color}"}
       end
 
       def cycle_type
