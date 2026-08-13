@@ -1,0 +1,157 @@
+<div class="card">
+  <div class="card-body">
+    <h4 class="mb-4">Settings for organization features</h4>
+
+    <% if @organization.enabled?("graduated_notifications") %>
+      <% graduated_label = capture do %>
+        Interval for send graduated notifications, in days
+        <small><span class="text-success">graduated_notifications setting</span></small>
+      <% end %>
+
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :graduated_notification_interval_days, kind: :number_field, label_text: graduated_label)) do |group| %>
+        <% group.with_helper_text do %>
+          <span class="text-warning">
+            Unless this is set, the organization will not send graduated
+            notifications - even if they have the feature enabled
+          </span>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% if @organization.enabled?("regional_bike_counts") %>
+      <% radius_label = capture do %>
+        Search radius
+        (<%= @organization.search_radius_metric_units? ? "km" : "mi" %>)
+        <small><span class="text-success">regional bike counts setting</span>, controls how large the region is to associate regional sub-organizations</small>
+      <% end %>
+
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: search_radius_attribute, kind: :number_field, label_text: radius_label)) do |group| %>
+        <% group.with_helper_text do %>
+          <span class="text-warning">
+            <code class="d-inline">nearby_organizations</code> will search
+            within this radius for other organizations in the same area
+          </span>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% if domain_uses.any? %>
+      <% domain_label = capture do %>
+        permitted domain for <%= domain_uses.to_sentence %>
+        <small><% domain_uses.each do |domain_use| %><span class="text-success"><%= domain_use %> feature</span><% end %></small>
+      <% end %>
+
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :user_email_domain, label_text: domain_label)) do |group| %>
+        <% unless @current_user.developer? %>
+          <% group.with_helper_text { "Ask Seth for help changing this, it's delicate" } %>
+        <% end %>
+
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text">@</div>
+          </div>
+
+          <%= render(UI::Forms::Input::Component.new(form_builder: @form_builder, attribute: :user_email_domain, html_options: {placeholder: "something.gov", disabled: !@current_user.developer?, "aria-describedby" => group.helper_text_id})) %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <% OrganizationFeature.reg_fields_with_customizable_labels.each do |reg_field| %>
+      <% owner_email = reg_field == "owner_email" %>
+      <% next unless owner_email ? @organization.paid? : @organization.enabled?(reg_field) %>
+
+      <% reg_label = capture do %>
+        <% if owner_email %>
+          Custom Label for <em>Owner Email</em> (e.g. "uiowa.edu email")
+          <small class="less-strong">often desired by universities</small>
+        <% else %>
+          Custom Label for
+          <em><%= OrganizationFeature.reg_field_to_bike_attrs(reg_field).titleize(keep_id_suffix: true) %></em>
+
+
+          <small class="less-strong">leave blank unless it's <strong>absolutely</strong> required - default behavior is preferred</small>
+        <% end %>
+      <% end %>
+
+      <%= render(UI::Forms::Group::Component.new(attribute: "reg_label-#{reg_field}", label_text: reg_label)) do %>
+        <%= text_field_tag "reg_label-#{reg_field}", helpers.registration_field_label(@organization, reg_field), class: "twinput" %>
+      <% end %>
+    <% end %>
+
+    <% if @organization.enabled?("organization_stolen_message") %>
+      <% stolen_message_label = capture do %>
+        Stolen Message type
+        <small><span class="text-success">Organization Stolen Message setting</span>, edit message in the <%= link_to "orgs own edit page", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param) %></small>
+      <% end %>
+
+      <div class="mt-4">
+        <%= render(UI::Forms::Group::Component.new(attribute: :organization_stolen_message_kind, label_text: stolen_message_label)) do %>
+          <%= select_tag :organization_stolen_message_kind, options_for_select(stolen_message_kind_options, selected: organization_stolen_message.kind), class: "twinput", data: {"admin--organization-form-target": "stolenMessageKind", action: "change->admin--organization-form#toggleStolenMessageArea"} %>
+        <% end %>
+
+        <div
+          class="<%= "tw:hidden!" if organization_stolen_message.kind != "area" %>"
+          data-admin--organization-form-target="stolenMessageArea"
+        >
+          <% radius_label = capture do %>
+            <% if organization_stolen_message.search_radius_metric_units? %>
+              Stolen Message radius (km)
+              <small><span class="text-success">Organization Stolen Message setting</span> - only available for area type <span class="less-strong">max <%= OrganizationStolenMessage.max_search_radius_kilometers %> km</span></small>
+            <% else %>
+              Stolen Message radius (mi)
+              <small><span class="text-success">Organization Stolen Message setting</span> - only available for area type <span class="less-strong">max <%= OrganizationStolenMessage::MAX_SEARCH_RADIUS %> miles</span></small>
+            <% end %>
+          <% end %>
+
+          <%= render(UI::Forms::Group::Component.new(attribute: stolen_message_radius_attribute, label_text: radius_label)) do %>
+            <%= number_field_tag stolen_message_radius_attribute, stolen_message_radius_value, class: "twinput" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @organization.enabled?("saml_sso") %>
+      <div class="mt-4">
+        <h4>SAML SSO</h4>
+
+        <p class="text-success">
+          Service Provider details for the organization's IdP admin — or just
+          share the metadata URL, which contains all of them.
+        </p>
+
+        <ul>
+          <li>
+            Metadata URL:
+            <%= link_to saml_metadata_url(org_slug: @organization.to_param), saml_metadata_url(org_slug: @organization.to_param) %>
+          </li>
+
+          <li>
+            SP entityID:
+            <code><%= Saml::SettingsBuilder.sp_entity_id(saml_configuration) %></code>
+          </li>
+
+          <li>
+            ACS (callback) URL:
+            <code><%= Saml::SettingsBuilder.assertion_consumer_service_url(saml_configuration) %></code>
+          </li>
+        </ul>
+
+        <%= @form_builder.fields_for :organization_saml_configuration, saml_configuration do |saml_f| %>
+          <%= render(UI::Forms::Checkbox::Component.new(form_builder: saml_f, attribute: :enabled, label: "Enable live SAML login for this organization", class_name: "tw:mb-4")) %>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_entity_id, label_text: "IdP entityID")) %>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_sso_target_url, label_text: "IdP SSO target URL")) %>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_slo_target_url, label_text: "IdP SLO target URL")) %>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_cert, kind: :text_area, label_text: "IdP certificate (PEM or base64)", html_options: {rows: 4})) %>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_cert_fingerprint, label_text: "IdP certificate fingerprint")) %>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :email_attribute_name, label_text: "Email attribute name", html_options: {placeholder: OrganizationSamlConfiguration::DEFAULT_EMAIL_ATTRIBUTE})) %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
