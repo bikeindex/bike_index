@@ -7263,6 +7263,13 @@ CREATE INDEX index_ownerships_on_organization_id ON public.ownerships USING btre
 
 
 --
+-- Name: index_ownerships_on_owner_email_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ownerships_on_owner_email_trgm ON public.ownerships USING gin (owner_email public.gin_trgm_ops);
+
+
+--
 -- Name: index_ownerships_on_sale_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7798,6 +7805,7 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260813100000'),
+('20260812200000'),
 ('20260811085030'),
 ('20260808224655'),
 ('20260808120000'),
