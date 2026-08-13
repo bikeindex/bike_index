@@ -31,7 +31,7 @@ module OrganizedServices
     def for(organization:, current_user:)
       return [] if organization.nil? || current_user.nil?
 
-      Rails.cache.fetch(["organized_menu_items_v1", organization.id, current_user.cache_key_with_version]) do
+      Rails.cache.fetch(["organized_menu_items_v2", organization.id, current_user.cache_key_with_version]) do
         build_items(organization, current_user)
       end
     end
@@ -136,6 +136,8 @@ module OrganizedServices
       items
     end
 
+    # :on_bikes_new outlives the path it was named for - api/v3/me serializes the marker,
+    # so renaming it would change a response third parties read
     def add_bike_items(organization)
       items = [link(translation(:add_a_bike),
         routes.new_organization_registration_path(organization.to_param), active: :on_bikes_new)]

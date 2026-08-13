@@ -132,7 +132,8 @@ module Org
         when :on_registrations_index
           routed_controller == "organized/registrations" && routed_action == "index"
         when :on_bikes_new
-          (on_registrations_new? || on_bikes_new?) && !on_bikes_new_with_parking_notification?
+          # Add-a-bike goes to the register flow now; the old form is still linked from it
+          on_registrations_new? || (on_bikes_new? && !on_bikes_new_with_parking_notification?)
         when :on_bikes_new_with_parking_notification
           on_bikes_new_with_parking_notification?
         when :on_registration_sequences
@@ -142,7 +143,6 @@ module Org
         end
       end
 
-      # Where add-a-bike goes now. The old form is still linked from it, so both light it up
       def on_registrations_new?
         routed_controller == "organized/registrations" && routed_action == "new"
       end
