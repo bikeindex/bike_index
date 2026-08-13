@@ -168,12 +168,19 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
       expect(page).to have_css("dialog[open]")
       expect(page).to have_css(scroll_locked_body)
 
+      # Type a query that matches nothing, so dismissing has something to clean up
+      type_into(".hw-combobox__dialog__input", "zzz")
+
       # Android's back gesture closes the dialog with a close request rather than a
       # keypress, which nothing on the page can synthesize
       page.execute_script("document.querySelector('dialog[open]').close()")
 
       expect(page).to have_no_css("dialog[open]")
       expect(page).to have_no_css(scroll_locked_body)
+      # Where escape lands, the browser having sent the same close request: the query
+      # is gone rather than stranded in the field with an empty value behind it
+      expect(find_field("Registration type").value).to eq ""
+      expect(find("input[name='status']", visible: :hidden).value).to eq ""
 
       find_field("Registration type").click
 

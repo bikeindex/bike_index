@@ -60,8 +60,12 @@ HwComboboxController.prototype._openInDialog = function () {
   this.dialogTarget.addEventListener('close', () => {
     if (!this.expandedValue) return // its own collapse path already ran
 
+    // The browser sends this same close request for Escape, so close the way escape
+    // does -- tearing the dialog down by hand instead leaves a typed query sitting in
+    // the field with nothing selected behind it
+    this.close('hw:keyHandler:escape')
+    // `close` collapsed inline, the dialog already being shut, so its half is still owed
     this._moveArtifactsInline()
     this._restoreBodyScroll()
-    this.expandedValue = false
   }, { once: true })
 }

@@ -43,6 +43,11 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", wait: 10)
   end
 
+  # The whole param value, so a search for c_9 isn't satisfied by a URL holding c_90
+  def searched_for(color)
+    /=#{Regexp.escape(color.search_id)}(&|$)/
+  end
+
   def search_color_and_submit(color)
     type_into(".hw-combobox__input", color)
     expect(page).to have_css(".hw-combobox__option", text: "that are", wait: 5)
@@ -173,7 +178,7 @@ RSpec.describe "Bike search", :js, type: :system do
     # snapshot must show this query's counts, not a stale or blank carry-over.
     page.execute_script("window.__submitStarts = 0; document.addEventListener('turbo:submit-start', () => { window.__submitStarts += 1 })")
     page.go_back
-    expect(page).to have_current_path(/query_items/, wait: 10)
+    expect(page).to have_current_path(searched_for(red), wait: 10)
     expect_results_frame_color("Red", "Blue")
     expect(page).to have_css(".hw-combobox__chip", text: "Red")
     expect(page).to have_no_css(".hw-combobox__chip", text: "Blue")
@@ -186,7 +191,7 @@ RSpec.describe "Bike search", :js, type: :system do
     # frame, chips and counts all restore from the page snapshot, so they settle
     # while the traversal itself may not have, and the click at the end of this
     # example is where the about:blank failures land.
-    expect(page).to have_current_path(/#{Regexp.escape(blue.search_id)}/, wait: 10)
+    expect(page).to have_current_path(searched_for(blue), wait: 10)
     expect_results_frame_color("Blue", "Red")
     expect(page).to have_css(".hw-combobox__chip", text: "Blue")
     expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
