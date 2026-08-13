@@ -2,6 +2,16 @@
 # depend on this reference data and would otherwise raise a misleading error.
 abort "Seeding failed: bin/rake setup:import_spreadsheets" unless system("bin/rake setup:import_spreadsheets")
 
+# Seeds that send mail render layouts/email, which links a dartsass-built stylesheet -
+# Sprockets raises on a missing one rather than skipping the tag. app/assets/builds is
+# gitignored, so a workspace that hasn't run bin/dev yet has none of them.
+missing_stylesheets = Rails.application.config.dartsass.builds.values
+  .reject { Rails.root.join("app/assets/builds", it).exist? }
+if missing_stylesheets.any?
+  puts "Building stylesheets, #{missing_stylesheets.count} missing from app/assets/builds"
+  Rake::Task["dartsass:build"].invoke
+end
+
 # Set Cgroup display order; the import assigns priority by CSV row order, which isn't what we want
 cgroup_priorities = [["Frame and Fork", 1], ["Wheels", 2], ["Drivetrain", 3], ["Brakes", 4], ["Cargo", 5], ["Additional Parts", 6]]
 cgroup_priorities.each do |name, priority|
