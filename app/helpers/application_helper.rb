@@ -76,7 +76,10 @@ module ApplicationHelper
     elsif controller_name == "info" && action_name == "resources"
       "kelsey_landing-page-body"
     elsif current_page_skeleton == "organized_skeleton"
-      "organized-body"
+      # Register::Page's gray only covers the form, and the organized container insets it -
+      # so the page paints it instead, behind the whole content column
+      register_flow = controller_name == "registrations" && action_name == "new"
+      "organized-body#{" tw:bg-gray-100 tw:dark:bg-gray-900" if register_flow}"
     elsif controller_name == "registrations" && action_name == "show"
       "tw:bg-[#f7f6fb]"
     end

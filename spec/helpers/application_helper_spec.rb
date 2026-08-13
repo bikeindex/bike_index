@@ -335,6 +335,14 @@ RSpec.describe ApplicationHelper, type: :helper do
         expect(helper).to receive(:current_page_skeleton) { "organized_skeleton" }
         expect(helper.body_class).to eq "organized-body"
       end
+      context "the register flow" do
+        it "adds the gray the flow's page renders on" do
+          expect(helper).to receive(:current_page_skeleton) { "organized_skeleton" }
+          allow(view).to receive(:controller_name) { "registrations" }
+          allow(view).to receive(:action_name) { "new" }
+          expect(helper.body_class).to eq "organized-body tw:bg-gray-100 tw:dark:bg-gray-900"
+        end
+      end
     end
     context "landing_page controller" do
       before { allow(view).to receive(:controller_name) { "landing_pages" } }
