@@ -37,6 +37,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           expect(response).to render_template(:edit)
           expect(response).to render_template("_landing_page")
           expect(response.body).to_not match("search_item_type=OrganizationLandingPage")
+          expect(response.body).to_not include "button_hover"
         end
 
         context "with a landing page" do
@@ -53,6 +54,27 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
             get history_path
             expect(response.status).to eq(200)
             expect(assigns(:collection).map(&:item_id)).to eq([landing_page.id])
+          end
+
+          context "framing a register embed with a button color" do
+            let(:landing_page) do
+              FactoryBot.create(:organization_landing_page, organization:, body: iframe)
+            end
+            let(:iframe) { "<iframe src='/register/embed?organization_id=x&button=c9a227'></iframe>" }
+
+            it "recommends the shade step 1 would derive" do
+              get "#{base_url}/landing_page/edit"
+              expect(response.body).to include "Add &amp;button_hover=a78620"
+            end
+
+            context "one that names its hover too" do
+              let(:iframe) { "<iframe src='/register/embed?button=c9a227&button_hover=a78620'></iframe>" }
+
+              it "says nothing" do
+                get "#{base_url}/landing_page/edit"
+                expect(response.body).to_not include "Add &amp;button_hover"
+              end
+            end
           end
         end
       end

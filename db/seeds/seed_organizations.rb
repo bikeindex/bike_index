@@ -85,6 +85,8 @@ if brakebills.avatar.blank?
   brakebills.save!
 end
 
+brakebills.update!(registration_field_labels: {owner_email: "Brakebills email"})
+
 landing_page_template = File.read(Rails.root.join("db/seeds/organization_landing_page.html.erb"))
 OrganizationLandingPage.find_or_initialize_by(organization_id: brakebills.id).tap do |landing_page|
   landing_page.update!(body: ERB.new(landing_page_template).result_with_hash(organization: brakebills),
