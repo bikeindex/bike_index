@@ -33,6 +33,17 @@ RSpec.describe "Register flow", :js, type: :system do
     click_button "Next"
   end
 
+  # The step's content renders before its Stimulus controllers connect, and autofocus
+  # is the first of the form's four - so the focus it puts on the first field is the
+  # signal that they're all connected. Filling before it lands loses the text: Playwright
+  # focuses the field in the page, then sends the characters to whatever holds focus a
+  # round trip later, so autofocus arriving in between puts them in the field filled
+  # just before (a step 2 that failed on CI had user_name = "Sally RiderMarlin 7").
+  def wait_for_details_step(wait: Capybara.default_max_wait_time)
+    expect(page).to have_content("Add your bike", wait:)
+    expect(page).to have_css("input[name='bike[frame_model]']:focus", wait:)
+  end
+
   # Answers every submission in the browser, the way an edge that never reaches the app
   # would, and collects what it turned away
   def fail_submissions(status:, headers: {})
@@ -57,7 +68,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
     submit_step_1
 
-    expect(page).to have_content("Add your bike")
+    wait_for_details_step
   end
 
   # An async combobox carries no options to map a saved id back to a name, so the server
@@ -95,7 +106,7 @@ RSpec.describe "Register flow", :js, type: :system do
     fill_in "b_param[owner_email]", with: owner_email
     click_button "Next"
 
-    expect(page).to have_content("Add your bike")
+    wait_for_details_step
     details_url = page.current_url
     expect(details_url).to match(/register\?b_param_token=.+&step=2/)
 
@@ -121,7 +132,7 @@ RSpec.describe "Register flow", :js, type: :system do
     click_combobox_option("Surly")
     fill_in "b_param[owner_email]", with: owner_email
     click_button "Next"
-    expect(page).to have_content("Add your bike")
+    wait_for_details_step
     details_url = page.current_url
 
     # Fill every field: text, chip radio, unit select, comboboxes (including the
@@ -545,7 +556,7 @@ RSpec.describe "Register flow", :js, type: :system do
       click_combobox_option("Surly Bikes 0")
       click_button "Next"
 
-      expect(page).to have_content("Add your bike")
+      wait_for_details_step
       expect(submissions.length).to eq 1
     end
   end
@@ -571,8 +582,9 @@ RSpec.describe "Register flow", :js, type: :system do
     before { sequence.make_active! }
 
     # flaky: the color combobox below is typed into right after step 1's Turbo navigation,
-    # and filters nothing when its controller hasn't connected yet - the wait for step 2's
-    # content took this from ~2 failures in 3 to ~1 in 3, but can't prove hydration
+    # and filters nothing when its controller hasn't connected yet. wait_for_details_step
+    # now proves hydration rather than guessing at it, so the retries are here pending a
+    # few green CI runs rather than because the cause is still unknown
     it "gates each page of rules, then the acknowledgment, before completing", flaky: 4 do
       visit "/register/new?organization_id=#{organization.slug}"
 
@@ -582,7 +594,7 @@ RSpec.describe "Register flow", :js, type: :system do
       fill_in "b_param[owner_email]", with: owner_email
       click_button "Next"
 
-      expect(page).to have_content("Add your bike")
+      wait_for_details_step
       fill_in "bike[user_name]", with: user_name
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
@@ -682,7 +694,7 @@ RSpec.describe "Register flow", :js, type: :system do
         expect(page).to have_button("Next", disabled: true)
 
         # The rider never sees the failure, only the retry - waited out past Capybara's default
-        expect(page).to have_content("Add your bike", wait: 10)
+        wait_for_details_step(wait: 10)
 
         fill_in "bike[user_name]", with: user_name
         type_into("#bike_primary_frame_color_id", "Red")
