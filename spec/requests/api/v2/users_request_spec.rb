@@ -15,6 +15,8 @@ RSpec.describe "Users API V2", type: :request do
 
     context "all scopes" do
       let(:scopes) { all_scopes }
+      let(:role) { "member" }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user:, role:) }
       it "responds with all available attributes with full scoped token" do
         get "/api/v2/users/current", params: {access_token: token.token, format: :json}
         expect(response.response_code).to eq(200)
@@ -23,7 +25,17 @@ RSpec.describe "Users API V2", type: :request do
         expect(result["user"].is_a?(Hash)).to be_truthy
         expect(result["bike_ids"].is_a?(Array)).to be_truthy
         expect(result["memberships"].is_a?(Array)).to be_truthy
+        expect(result["memberships"].first["organization_access_token"]).to eq(organization_role.organization.access_token)
         expect(result["user"].key?("secondary_emails")).to be_falsey
+      end
+
+      context "member_no_bike_edit" do
+        let(:role) { "member_no_bike_edit" }
+        it "doesn't include the organization access_token" do
+          get "/api/v2/users/current", params: {access_token: token.token, format: :json}
+          expect(response.response_code).to eq(200)
+          expect(json_result["memberships"].first["organization_access_token"]).to be_nil
+        end
       end
     end
 
