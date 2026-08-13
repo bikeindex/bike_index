@@ -78,8 +78,11 @@ module ApplicationHelper
     elsif current_page_skeleton == "organized_skeleton"
       # Register::Page's gray only covers the form, and the organized container insets it -
       # so the page paints it instead, behind the whole content column
-      register_flow = controller_name == "registrations" && action_name == "new"
-      "organized-body#{" tw:bg-gray-100 tw:dark:bg-gray-900" if register_flow}"
+      if controller_name == "registrations" && action_name == "new"
+        "organized-body tw:bg-gray-100 tw:dark:bg-gray-900"
+      else
+        "organized-body"
+      end
     elsif controller_name == "registrations" && action_name == "show"
       "tw:bg-[#f7f6fb]"
     end

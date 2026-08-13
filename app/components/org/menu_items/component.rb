@@ -132,7 +132,7 @@ module Org
         when :on_registrations_index
           routed_controller == "organized/registrations" && routed_action == "index"
         when :on_bikes_new
-          # Add-a-bike goes to the register flow now; the old form is still linked from it
+          # The register flow links back to the old form, so its row highlights on both
           on_registrations_new? || (on_bikes_new? && !on_bikes_new_with_parking_notification?)
         when :on_bikes_new_with_parking_notification
           on_bikes_new_with_parking_notification?

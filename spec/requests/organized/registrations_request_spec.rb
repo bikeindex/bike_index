@@ -277,7 +277,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(response.body).to include(b_param.id_token)
       expect(response.body).to include(new_organization_bike_path(organization_id: current_organization.to_param))
 
-      # Revisiting reuses the still-blank registration the session is on
       expect { get "#{base_url}/new" }.to_not change(BParam, :count)
 
       # ... but a shell started on /register isn't taken over, so it stays attributed there
