@@ -227,11 +227,6 @@ class Bike < ApplicationRecord
     against: {serial_number: "A", cached_data: "B", all_description: "C"},
     using: {tsearch: {tsvector_column: "search_vector"}}
 
-  pg_search_scope :admin_search,
-    against: {owner_email: "A"},
-    associated_against: {ownerships: :owner_email, creator: :email},
-    using: {tsearch: {dictionary: "english", prefix: true}}
-
   class << self
     def statuses
       STATUS_ENUM.keys.map(&:to_s)
@@ -252,8 +247,19 @@ class Bike < ApplicationRecord
       query.present? ? pg_search(query) : all
     end
 
-    def admin_text_search(query)
-      query.present? ? admin_search(query) : all
+    # Unioned rather than OR'd because an OR keeps every branch off its index
+    def admin_email_search(query)
+      return all if query.blank?
+
+      matching = "%#{EmailNormalizer.normalize(query)}%"
+      bike_ids = [
+        Ownership.where("ownerships.owner_email ILIKE ?", matching).select(:bike_id),
+        Ownership.joins(:creator).where("users.email ILIKE ?", matching).select(:bike_id),
+        unscoped.where("bikes.owner_email ILIKE ?", matching).select(:id)
+      ].map { |relation| relation.reorder(nil).arel.ast }
+        .reduce { |left, right| Arel::Nodes::UnionAll.new(left, right) }
+
+      where(arel_table[:id].in(bike_ids))
     end
 
     def search_phone(str)
