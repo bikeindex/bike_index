@@ -163,6 +163,23 @@ expect(page).to have_css("lexxy-editor lexxy-toolbar", count: 3)
 expect_axe_clean # re-audit: the cloned row is new markup
 ```
 
+## A preview is not the page
+
+A preview renders the component alone, so everything the surrounding page
+contributes is absent: `autofocus` on the form, sibling Stimulus controllers,
+Turbo, the rest of the layout. Behaviour that depends on any of those can pass
+against the preview while the real page stays broken — the preview spec isn't
+wrong, it just can't see the condition.
+
+A combobox fix keyed off the `focus` event passed
+`spec/components/ui/forms/combobox/component_system_spec.rb` while step 1 of the
+register flow was still mangling its manufacturer field: that form is
+`autofocus`, so the input already held focus and the rider's entering click
+brought no focus event to hang the selection on. Keep the preview spec for what
+the component does on its own, and cover page-level behaviour in the flow's own
+spec under `spec/integration/` — where the autofocus, the Turbo frame and the
+other controllers are all present.
+
 ## ActionCable broadcasts: do the real thing
 
 The test cable adapter is `:async`, so broadcasts in the test process do round-trip to the browser. **Don't synthesize `turbo:morph-element` events with `execute_script` to fake an ActionCable refresh** — call the real broadcaster (`Component.broadcast_replace_to`, `broadcast_refresh_later_to`, etc.) and let Capybara's wait do the synchronization.

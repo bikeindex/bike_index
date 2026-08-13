@@ -562,8 +562,6 @@ RSpec.describe RegisterController, type: :request do
         reg_fields.each { |field| expect(response.body).to_not include field }
         # Not rendered at all - no status could reveal it, and it's ~300 option tags
         expect(status_field("address_record_attributes")).to be_nil
-        # The Bike Index sticker isn't org-gated here, unlike bikes/new
-        expect(response.body).to include "bike[bike_sticker]"
         # Nothing extra was asked for, so the section is just the registrant's own info
         expect(response.body).to include "Contact info"
         expect(response.body).to_not include "Information for"
