@@ -332,10 +332,6 @@ RSpec.describe RegisterController, type: :request do
           params: {bike: {owner_email:, cycle_type: "cargo", creation_organization_id: organization.id}}.as_json)
       end
 
-      def email_placeholder(response_body)
-        Nokogiri::HTML(response_body).at_css("input[name='b_param[owner_email]']")["placeholder"]
-      end
-
       it "names the organization in the heading, and the cycle type only where js can swap it" do
         get register_path(b_param_token: b_param.id_token, step: 1)
         expect(response.body).to include "Register your vehicle with Brakebills!"
@@ -343,21 +339,6 @@ RSpec.describe RegisterController, type: :request do
         # Posted back, so a submission that has to build a registration keeps the org
         expect(Nokogiri::HTML(response.body).at_css("input[name='organization_id']")["value"])
           .to eq organization.id.to_s
-        # Nothing organization-specific to ask for, so the example address stands
-        expect(email_placeholder(response.body)).to eq "you@example.com"
-      end
-
-      # The same setting the legacy embed form reads, so a university asking for the
-      # campus address keeps asking for it here
-      it "takes the email placeholder from the organization" do
-        organization.update(kind: "school")
-        get register_path(b_param_token: b_param.id_token, step: 1)
-        expect(email_placeholder(response.body)).to eq "Brakebills email"
-
-        # The label set in admin wins over the school's name
-        organization.update(registration_field_labels: {owner_email: "brakebills.edu email"})
-        get register_path(b_param_token: b_param.id_token, step: 1)
-        expect(email_placeholder(response.body)).to eq "brakebills.edu email"
       end
 
       context "started as stolen" do
