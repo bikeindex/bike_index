@@ -17,8 +17,8 @@ class RegisterController < ApplicationController
   # Every step is a page, but a component takes its content type from the request - and a
   # Turbo submission asks for a turbo_stream, which grafts the next step onto this one
   before_action :force_html_response
-  # The unfinished_registration alert links back to here, so it would sit on top of the
-  # very flow that resolves it
+  # Every kind, not just the unfinished_registration one whose link lands back in this
+  # flow: the two stolen bike alerts open their modal on load, over a registration in progress
   before_action { @skip_general_alert = true }
 
   # Redirects into step 1 with a token (reusing the session's registration when
