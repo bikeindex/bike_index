@@ -7,8 +7,8 @@ RSpec.describe "Organization landing page registration embed", :js, type: :syste
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
   # The slug LandingPages::ORGANIZATIONS routes by default, so /brakebills is the landing page
   let!(:organization) { FactoryBot.create(:organization, name: "Brakebills", landing_html:) }
-  # The column the seeded page frames it in, which is what puts the frame under the
-  # combobox's mobile breakpoint - full width, it would drop down inline instead
+  # The column the seeded page frames it in - narrower than the combobox's mobile
+  # breakpoint, which the patched combobox measures the screen rather than the frame for
   let(:landing_html) do
     <<~HTML
       <h1>Brakebills University Bicycle Registration</h1>
@@ -35,8 +35,9 @@ RSpec.describe "Organization landing page registration embed", :js, type: :syste
       expect(page).to have_no_css("nav.primary-header-nav")
 
       type_into("#b_param_manufacturer_id", "Surly")
-      # Narrow enough that the combobox picks in its dialog, which opens within the frame
-      expect(page).to have_css(".hw-combobox__dialog__listbox")
+      # The frame is under the combobox's mobile breakpoint but the screen isn't, so it
+      # drops down inline rather than opening the picker meant for a phone
+      expect(page).to have_no_css(".hw-combobox__dialog__listbox")
       click_combobox_option("Surly")
       fill_in "b_param[owner_email]", with: owner_email
       click_button "Next"
@@ -49,5 +50,18 @@ RSpec.describe "Organization landing page registration embed", :js, type: :syste
 
     expect(BParam.last).to have_attributes(owner_email:, manufacturer_id: manufacturer.id,
       creation_organization_id: organization.id)
+  end
+
+  it "opens the combobox picker in the frame on a phone, where the screen is small" do
+    resize_window(width: 390, height: 844)
+    visit "/brakebills"
+
+    within_frame(find("iframe")) do
+      type_into("#b_param_manufacturer_id", "Surly")
+      expect(page).to have_css(".hw-combobox__dialog__listbox")
+      click_combobox_option("Surly")
+
+      expect(page).to have_field("b_param_manufacturer_id", with: "Surly")
+    end
   end
 end
