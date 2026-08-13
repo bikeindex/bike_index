@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe "Organized registration sequences", :js, type: :system do
   let(:organization) do
-    FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["registration_sequences"])
+    FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[registration_sequences registration_sequences_edit])
   end
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
 
