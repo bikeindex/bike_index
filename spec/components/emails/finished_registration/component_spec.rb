@@ -28,7 +28,6 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
       expect(component).to have_content("Use a U-Lock")
       expect(component).to_not have_content("thieves are jerks")
       expect(component).to have_content("tempo-snippet")
-      # The only button, and it's in the bike details card
       expect(component.css("a.binx-button").map { |a| a.text.strip }).to eq(["View your bike"])
       expect(component.css(".finished-registration-bike-box a.binx-button").count).to eq 1
     end
@@ -87,6 +86,8 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
       expect(component).to have_content("Claim your bike")
       expect(component).to have_link("Confirm this #{bike.type}")
       expect(component).to_not have_link("View your bike")
+      # Above the bike details
+      expect(component.css(".finished-registration-intro a.binx-button").count).to eq 1
       expect(component).to_not have_content("What's next?")
     end
   end

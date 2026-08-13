@@ -45,6 +45,16 @@
       </p>
     <% end %>
   <% end %>
+
+  <% unless claimed? %>
+    <div class="finished-registration-cta">
+      <%= link_to claim_cta_text, bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
+
+      <p>
+        <%= translation("sign_up_on_bikeindexorg_to_claim_your_bik", bike_type: bike.type) %>
+      </p>
+    </div>
+  <% end %>
 </div>
 
 <% if show_after_welcome_snippet? %>
@@ -90,14 +100,6 @@
   <% if show_view_bike_cta? %>
     <div class="finished-registration-cta">
       <%= link_to translation("view_your_bike"), bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
-    </div>
-  <% elsif !claimed? %>
-    <div class="finished-registration-cta">
-      <%= link_to claim_cta_text, bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
-
-      <p>
-        <%= translation("sign_up_on_bikeindexorg_to_claim_your_bik", bike_type: bike.type) %>
-      </p>
     </div>
   <% end %>
 </div>
