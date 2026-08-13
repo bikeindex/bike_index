@@ -55,7 +55,7 @@ module Organized
         origin: "register_flow_organized")
       BikeServices::Register.assign_organization(@b_param, current_organization)
       session[:register_b_param_token] = @b_param.id_token
-      @page_title = I18n.t("meta_titles.register_step_1", cycle_type: @b_param.type)
+      @page_title = I18n.t("meta_titles.register_step_1")
       # The unfinished_registration alert links into this flow, so it would sit on top of it
       @skip_general_alert = true
       # The form carries this registration's token, and a cached page would carry a stale one
