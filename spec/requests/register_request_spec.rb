@@ -263,6 +263,10 @@ RSpec.describe RegisterController, type: :request do
       get "/register/embed?organization_id=#{organization.slug}&button=c9a227"
       expect(submit_button_style).to include("background-color: #c9a227", "--button-hover-color: hsla(")
 
+      # The derived shade, unless the frame names the one it wants
+      get "/register/embed?organization_id=#{organization.slug}&button=c9a227&button_hover=123456"
+      expect(submit_button_style).to include("--button-hover-color: #123456")
+
       get register_path(b_param_token: BParam.last.id_token, step: 1, button: "c9a227")
       expect(submit_button_style).to be_nil
     end

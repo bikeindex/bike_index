@@ -34,6 +34,26 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           expect(response.status).to eq(200)
           expect(response).to render_template(:edit)
           expect(response).to render_template("_landing_page")
+          expect(response.body).to_not include "button_hover"
+        end
+
+        context "a register frame with a button color" do
+          let(:iframe) { "<iframe src='/register/embed?organization_id=x&button=c9a227'></iframe>" }
+          before { organization.update(landing_html: iframe) }
+
+          it "recommends the shade step 1 would derive" do
+            get "#{base_url}/landing_page/edit"
+            expect(response.body).to include "Add &amp;button_hover=a78820"
+          end
+
+          context "one that names its hover too" do
+            let(:iframe) { "<iframe src='/register/embed?button=c9a227&button_hover=a78820'></iframe>" }
+
+            it "says nothing" do
+              get "#{base_url}/landing_page/edit"
+              expect(response.body).to_not include "Add &amp;button_hover"
+            end
+          end
         end
       end
       describe "mail_snippets" do

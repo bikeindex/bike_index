@@ -67,6 +67,12 @@ RSpec.describe Register::Step1::Component, type: :component do
       expect(hovers.grep_v(/\Atw:not-disabled:not-aria-disabled:hover:/)).to eq([])
     end
 
+    it "takes a hover color rather than deriving one" do
+      render_step_1(button_color: "#c9a227", button_hover_color: "#123456")
+
+      expect(submit_button["style"]).to include "--button-hover-color: #123456"
+    end
+
     it "leaves the style off without one" do
       render_step_1
 

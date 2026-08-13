@@ -37,4 +37,18 @@ RSpec.describe HexColor do
       expect(HexColor.darken(nil)).to be_nil
     end
   end
+
+  describe "darken_hex" do
+    # The same color the hsla names, for the places that take a hex - the admin
+    # recommendation, and the ?button_hover= it recommends writing
+    it "is the hex a browser renders the hsla as" do
+      expect(HexColor.darken_hex("c9a227")).to eq "#a78820"
+      expect(HexColor.darken_hex("#fff")).to eq "#ebebeb"
+      expect(HexColor.darken_hex("#000")).to eq "#000000"
+    end
+
+    it "is nil for anything that isn't a hex color" do
+      expect(HexColor.darken_hex("@user + 1233")).to be_nil
+    end
+  end
 end

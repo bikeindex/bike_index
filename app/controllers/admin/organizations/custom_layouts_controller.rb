@@ -3,6 +3,9 @@ module Admin
     class CustomLayoutsController < Admin::BaseController
       before_action :find_and_authorize_organization
 
+      BUTTON_COLOR_MATCHER = /button=#?(\h{3}|\h{6})\b/
+      BUTTON_HOVER_MATCHER = /button_hover=/
+
       def index
       end
 
@@ -22,9 +25,18 @@ module Admin
         end
       end
 
-      helper_method :layout_kind
+      helper_method :layout_kind, :suggested_button_hover
 
       protected
+
+      # Step 1 derives a hover shade from the button color, but a page that names its own
+      # keeps the pair somewhere the person editing the markup can see them
+      def suggested_button_hover
+        landing_html = @organization.landing_html
+        return if landing_html.blank? || landing_html.match?(BUTTON_HOVER_MATCHER)
+
+        HexColor.darken_hex(landing_html[BUTTON_COLOR_MATCHER, 1])
+      end
 
       def permitted_parameters
         params.require(:organization)
