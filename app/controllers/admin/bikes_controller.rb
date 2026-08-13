@@ -199,7 +199,7 @@ module Admin
       # Get a query error if both are passed
       if params[:search_email].present? && user_subject.blank?
         @search_email = params[:search_email]
-        bikes = bikes.admin_text_search(@search_email)
+        bikes = bikes.admin_email_search(@search_email)
       elsif params[:search_domain].present?
         @search_domain = params[:search_domain]
         bikes = bikes.matching_domain(@search_domain)
