@@ -59,7 +59,7 @@
     <%= render Register::SectionLabel::Component.new(text: translation(".your_info"), divider: true) %>
 
     <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :owner_email,
-        label_text: translation(".email"), required: true, wrapper_class: "tw:mb-6")) do %>
+        label_text: email_label, required: true, wrapper_class: "tw:mb-6")) do %>
       <%= render UI::Forms::Email::Component.new(form_builder: f, attribute: :owner_email, required: true,
           html_options: {value: @b_param.owner_email, placeholder: email_placeholder}) %>
     <% end %>
