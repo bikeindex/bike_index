@@ -19,6 +19,7 @@ en:
           is_true: 'true'
           link_sticker: Link sticker
           no_duplicate_serials: no dup. serials
+          no_other_registrations: None found
           no_registration_information: No registration information visible to %{org_name}
           not_audited: Not audited
           not_registered_message: >-

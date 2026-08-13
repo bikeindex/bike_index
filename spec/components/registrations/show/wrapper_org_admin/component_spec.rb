@@ -26,14 +26,35 @@ RSpec.describe Registrations::Show::WrapperOrgAdmin::Component, type: :component
 
   describe "other registrations" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[additional_registrations_information]) }
-    let!(:other_bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: bike.user) }
 
-    it "renders the column-toggle settings inside the card" do
+    context "with another registration" do
+      let!(:other_bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: bike.user) }
+
+      it "renders the column-toggle settings inside the card" do
+        render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+        expect(page).to have_css("[data-controller~='org--search-column-toggle']")
+        expect(page).to have_text("Visible columns")
+        expect(page).to have_button("settings", visible: :all)
+      end
+
+      context "on a bike registered elsewhere, viewed by a limited member" do
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+
+        it "renders the card" do
+          render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :limited))
+
+          expect(page).to have_text("Other registrations by this user")
+          expect(page).to have_text("1 other registrations")
+        end
+      end
+    end
+
+    it "renders the card when the owner has no other registrations" do
       render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
 
-      expect(page).to have_css("[data-controller~='org--search-column-toggle']")
-      expect(page).to have_text("Visible columns")
-      expect(page).to have_button("settings", visible: :all)
+      expect(page).to have_text("Other registrations by this user")
+      expect(page).to have_text("None found")
     end
   end
 end

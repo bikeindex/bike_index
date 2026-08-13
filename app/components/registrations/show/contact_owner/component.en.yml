@@ -7,7 +7,6 @@ en:
           contact_the_owner: Contact the owner
           know_something_about_this_bike_type: Know something about this %{bike_type}?
           link_url: Link url
-          or_call: Or call
           send_message: Send message
           where_did_you_see_this_bike: >-
             Where did you see this %{bike_type}? If you're contacting about an ad
