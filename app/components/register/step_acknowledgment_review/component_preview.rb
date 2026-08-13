@@ -28,7 +28,7 @@ module Register
       end
 
       # The live template stands in where no organization has activated a sequence
-      def preview_sequence = ::RegistrationSequence.active_or_template_for(lookbook_organization)
+      def preview_sequence = ::RegistrationSequence.active_or_template_for(lookbook_organization, kind: "e_vehicle")
     end
   end
 end

@@ -1,4 +1,4 @@
-# The record that a registrant agreed to an organization's e-vehicle safety rules.
+# The record that a registrant agreed to an organization's safety rules.
 # Outlives the registration it came from - the b_param is swept once its bike exists.
 # What was agreed to is read off the sequence, which activation froze.
 # == Schema Information

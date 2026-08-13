@@ -5,7 +5,7 @@ module BikeServices
   module Register
     extend Functionable
 
-    # Step "3" is the first of the e-vehicle acknowledgment pages
+    # Step "3" is the first of the acknowledgment pages
     ACKNOWLEDGMENT_OFFSET = 3
     CONFIRMATION_EMAIL_INTERVAL = 5.minutes
     # The registrations that report something - a theft, or a vehicle found/abandoned -
@@ -68,10 +68,13 @@ module BikeServices
     end
 
     # The safety rules a registration acknowledges before its bike is created - the
-    # organization's active sequence, and only for an e-vehicle
+    # organization's active sequence for what's being registered, e-vehicle or not
     def registration_sequence(b_param)
       organization = b_param.creation_organization
-      RegistrationSequence.active_for(organization) if b_param.motorized? && organization.present?
+      return if organization.blank?
+
+      kind = b_param.motorized? ? "e_vehicle" : "non_e_vehicle"
+      RegistrationSequence.active_for(organization, kind:)
     end
 
     # The step to show: finished once the bike exists (or it's awaiting the email),

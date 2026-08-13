@@ -20,6 +20,10 @@ module Register
         @page.registration_sequence
       end
 
+      # Only the e-vehicle sequence is chosen by what's being registered, so it's the
+      # only one that opens by announcing it
+      def electric_detected? = @first && sequence&.e_vehicle?
+
       # What the editor promised - "Template" when admin previews the template
       def badge_name
         sequence&.badge_name

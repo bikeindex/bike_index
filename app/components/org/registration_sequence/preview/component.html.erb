@@ -1,7 +1,7 @@
 <%= render Register::Page::Component.new do %>
   <%= render Register::Progress::Component.new(steps: progress_steps, step: progress_step) %>
 
-  <%= render Register::AcknowledgmentProgress::Component.new(number: @index + 1, total: acknowledgment_step_count) %>
+  <%= render Register::AcknowledgmentProgress::Component.new(sequence: @registration_sequence, number: @index + 1, total: acknowledgment_step_count) %>
 
   <% if reviewing? %>
     <%= render Register::ReviewSummary::Component.new(pages:) %>

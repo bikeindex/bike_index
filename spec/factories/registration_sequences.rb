@@ -18,6 +18,10 @@ FactoryBot.define do
       start_at { Time.current }
     end
 
+    trait :non_e_vehicle do
+      kind { :non_e_vehicle }
+    end
+
     factory :registration_sequence_active, traits: [:activated]
 
     # The template drafts, activates and archives like an organization's sequence

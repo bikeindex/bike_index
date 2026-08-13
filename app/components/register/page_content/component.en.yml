@@ -5,4 +5,6 @@ en:
       page_content:
         electric_detected: "⚡️ Electric (motorized) detected"
         have_questions: Have questions about these policies?
-        read_the_faq: E-Vehicle Acknowledgment FAQ
+        read_the_faq:
+          e_vehicle: E-Vehicle Acknowledgment FAQ
+          non_e_vehicle: Registration Acknowledgment FAQ

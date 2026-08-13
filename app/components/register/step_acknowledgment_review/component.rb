@@ -2,7 +2,7 @@
 
 module Register
   module StepAcknowledgmentReview
-    # The last of the e-vehicle pages: what was acknowledged, and the acknowledgment
+    # The last of the acknowledgment pages: what was acknowledged, and the acknowledgment
     # binding the registrant to it
     class Component < ApplicationComponent
       def initialize(b_param:, sequence:, steps:, current_user: nil)

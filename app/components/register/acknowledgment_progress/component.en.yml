@@ -3,5 +3,8 @@ en:
   components:
     register:
       acknowledgment_progress:
-        progress_saved: Progress saved · E-Vehicle Acknowledgment · Step %{number}
-          of %{total}
+        progress_saved:
+          e_vehicle: Progress saved · E-Vehicle Acknowledgment · Step %{number} of
+            %{total}
+          non_e_vehicle: Progress saved · Registration Acknowledgment · Step %{number}
+            of %{total}

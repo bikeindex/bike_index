@@ -37,18 +37,22 @@ module Admin
 
         def activate_path = RegistrationSequencePaths.activate(@registration_sequence)
 
-        def create_draft_path = RegistrationSequencePaths.create_draft(@registration_sequence.organization_id)
+        def create_draft_path
+          RegistrationSequencePaths.create_draft(@registration_sequence.organization,
+            kind: @registration_sequence.kind, admin: true)
+        end
 
         # What the frozen sequence offers in place of its inert Edit chip. The draft belongs
         # to the owner rather than to this sequence, so a second archived one points at it too
         def create_draft_text
-          return "Edit draft" if ::RegistrationSequence.existing_draft_for(@registration_sequence.organization).present?
-
-          "Create draft"
+          existing = ::RegistrationSequence.existing_draft_for(@registration_sequence.organization,
+            kind: @registration_sequence.kind)
+          existing.present? ? "Edit draft" : "Create draft"
         end
 
         def activate_confirm
-          "Make this the live #{@registration_sequence.badge_name} registration sequence? " \
+          "Make this the live #{@registration_sequence.badge_name} " \
+            "#{@registration_sequence.kind_display.downcase} registration sequence? " \
             "It can't be edited afterward."
         end
 
