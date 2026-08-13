@@ -7,8 +7,7 @@ class CreateOrganizationLandingPages < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    # Imported with SQL rather than through the model, so backfilled pages have no
-    # paper_trail create version - their history starts at the first edit after this
+    # Backfilled pages have no paper_trail create version - history starts at the first edit
     execute <<~SQL
       INSERT INTO organization_landing_pages (organization_id, body, created_at, updated_at)
       SELECT id, landing_html, NOW(), NOW() FROM organizations
@@ -16,8 +15,7 @@ class CreateOrganizationLandingPages < ActiveRecord::Migration[8.1]
     SQL
   end
 
-  # organizations.landing_html is left in place, so rolling back loses only the edits
-  # made after this migration ran
+  # landing_html is left in place, so rolling back loses only edits made after this migration
   def down
     drop_table :organization_landing_pages
   end
