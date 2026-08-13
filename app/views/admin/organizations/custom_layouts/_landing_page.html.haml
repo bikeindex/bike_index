@@ -4,7 +4,7 @@
   = hidden_field_tag :kind, "landing_page"
   - if @landing_page.persisted?
     .mb-2
-      = link_to "Version history", admin_paper_trail_versions_path(search_item_type: "OrganizationLandingPage", search_item_id: @landing_page.id, period: "all"), class: "gray-link"
+      = link_to "Version history", admin_paper_trail_versions_path(search_item_type: "OrganizationLandingPage", search_item_id: @landing_page.id, period: "all"), class: "twlink"
   .form-group
     = f.text_area :body, placeholder: 'Landing page (html)', rows: 20, class: "form-control"
   .row.justify-content-end

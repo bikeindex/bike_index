@@ -85,9 +85,9 @@ if brakebills.avatar.blank?
   brakebills.save!
 end
 
-brakebills_landing_template = File.read(Rails.root.join("db/seeds/brakebills_landing_page.html.erb"))
-OrganizationLandingPage.for(brakebills).tap do |landing_page|
-  landing_page.update!(body: ERB.new(brakebills_landing_template).result(binding),
+landing_page_template = File.read(Rails.root.join("db/seeds/organization_landing_page.html.erb"))
+OrganizationLandingPage.find_or_initialize_by(organization_id: brakebills.id).tap do |landing_page|
+  landing_page.update!(body: ERB.new(landing_page_template).result_with_hash(organization: brakebills),
     enabled: landing_page.env_enabled?)
 end
 

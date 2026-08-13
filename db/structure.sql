@@ -2958,7 +2958,6 @@ CREATE TABLE public.organizations (
     avatar character varying(255),
     is_paid boolean DEFAULT false NOT NULL,
     lock_show_on_map boolean DEFAULT false NOT NULL,
-    landing_html text,
     enabled_feature_slugs jsonb,
     parent_organization_id integer,
     kind integer,
@@ -7804,6 +7803,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260813150000'),
 ('20260813100000'),
 ('20260812200000'),
 ('20260811085030'),

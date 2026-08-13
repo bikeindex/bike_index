@@ -26,7 +26,7 @@
 
 <div class="container org-landing-wrapper">
   <img
-    src="<%= brakebills.avatar.url %>"
+    src="<%= organization.avatar.url %>"
     class="org-landing-header-logo"
     alt="Brakebills University"
   >
@@ -36,7 +36,7 @@
   <div class="row">
     <div class="col-md-5 org-landing-embed-col">
       <iframe
-        src="/register/embed?organization_id=brakebills"
+        src="/register/embed?organization_id=<%= organization.to_param %>"
         title="Register your bike with Brakebills University"
         style="width: 100%; border: none; height: 620px;"
       ></iframe>

@@ -84,8 +84,6 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           target = edit_admin_organization_custom_layout_path(organization_id: organization.to_param, id: "landing_page")
           expect(response).to redirect_to target
           expect(organization.reload.organization_landing_page.body).to eq update[:body]
-          # dropping landing_html is a follow-up
-          expect(organization.landing_html).to be_nil
           # the two agree, so no error
           expect(flash[:error]).to be_blank
         end

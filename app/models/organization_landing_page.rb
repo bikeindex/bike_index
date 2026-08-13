@@ -24,10 +24,6 @@ class OrganizationLandingPage < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  def self.for(organization)
-    where(organization_id: organization.id).first_or_create
-  end
-
   # ORGANIZATIONS_WITH_LANDING_PAGES routes the page - enabled is only a copy of it
   def env_enabled?
     LandingPages::ORGANIZATIONS.include?(organization&.slug)
