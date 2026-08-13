@@ -11,14 +11,17 @@ module Admin
 
       def edit
         @edit_template = edit_layout_pages.include?(params[:id]) ? params[:id] : edit_layout_pages.first
-        if @edit_template != "landing_page" # we're rendering a snippet
+        if landing_page?
+          @landing_page = edited_record
+        else
           @mail_snippet = @organization.mail_snippets.where(kind: @edit_template).first_or_create
         end
       end
 
       def update
-        if @organization.update(permitted_parameters)
+        if edited_record.update(permitted_parameters)
           flash[:success] = "Layout Saved!"
+          flash[:error] = edited_record.enabled_mismatch_error if landing_page?
           redirect_to edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id])
         else
           render action: :edit, id: params[:id]
@@ -29,28 +32,38 @@ module Admin
 
       protected
 
+      # Built, not created - only a save should create the page
+      def edited_record
+        return @organization unless landing_page?
+
+        @landing_page ||= @organization.organization_landing_page || @organization.build_organization_landing_page
+      end
+
       # Step 1 derives a hover shade from the button color, but a page that names its own
       # keeps the pair somewhere the person editing the markup can see them
       def suggested_button_hover
-        landing_html = @organization.landing_html
-        return if landing_html.blank? || landing_html.match?(BUTTON_HOVER_MATCHER)
+        body = @landing_page&.body
+        return if body.blank? || body.match?(BUTTON_HOVER_MATCHER)
 
-        HexColor.darken_hex(landing_html[BUTTON_COLOR_MATCHER, 1])
+        HexColor.darken_hex(body[BUTTON_COLOR_MATCHER, 1])
       end
 
       def permitted_parameters
-        params.require(:organization)
-          .permit(:landing_html, mail_snippets_attributes: [:body, :is_enabled, :id])
+        return params.require(:organization_landing_page).permit(:body) if landing_page?
+
+        params.require(:organization).permit(mail_snippets_attributes: [:body, :is_enabled, :id])
       end
 
       def edit_layout_pages
         @edit_layout_pages ||= MailSnippet.organization_snippet_kinds + %w[landing_page]
       end
 
-      def layout_kind
-        return "landing_page" if params[:id] == "landing_page"
+      def landing_page?
+        params[:id] == "landing_page"
+      end
 
-        "mail_snippet"
+      def layout_kind
+        landing_page? ? "landing_page" : "mail_snippet"
       end
 
       def find_and_authorize_organization

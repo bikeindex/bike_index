@@ -23,6 +23,48 @@ RSpec.describe OrganizationLandingPage, type: :model do
     end
   end
 
+  describe "touching the organization" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:organization_landing_page) { FactoryBot.create(:organization_landing_page, organization:) }
+
+    it "touches on save, so the fragment keyed on the organization busts" do
+      organization.update_column(:updated_at, Time.current - 1.hour)
+
+      expect { organization_landing_page.update!(body: "<p>Edited</p>") }
+        .to change { organization.reload.updated_at }
+    end
+  end
+
+  describe "enabled_mismatch_error" do
+    let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+    let(:organization_landing_page) { FactoryBot.create(:organization_landing_page, organization:) }
+
+    it "reports a routed organization whose page is disabled" do
+      expect(LandingPages::ORGANIZATIONS).to include(organization.slug)
+      expect(organization_landing_page.env_enabled?).to be_truthy
+      # The factory default, so a routed organization starts out disagreeing
+      expect(organization_landing_page.enabled).to be_falsey
+      expect(organization_landing_page.enabled_mismatch_error)
+        .to match(/enabled is false.*includes "brakebills"/)
+
+      organization_landing_page.update!(enabled: true)
+      expect(organization_landing_page.enabled_mismatch_error).to be_nil
+    end
+
+    context "with an organization that isn't routed" do
+      let(:organization) { FactoryBot.create(:organization) }
+
+      it "reports only when the page is enabled" do
+        expect(organization_landing_page.env_enabled?).to be_falsey
+        expect(organization_landing_page.enabled_mismatch_error).to be_nil
+
+        organization_landing_page.update!(enabled: true)
+        expect(organization_landing_page.enabled_mismatch_error)
+          .to match(/enabled is true.*does not include "#{organization.slug}"/)
+      end
+    end
+  end
+
   describe "versioning" do
     include_context :with_paper_trail
 

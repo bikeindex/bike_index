@@ -29,29 +29,51 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
 
     describe "edit" do
       context "landing_page" do
-        it "renders" do
-          get "#{base_url}/landing_page/edit"
+        it "renders without creating a landing page, and without a version history link" do
+          expect {
+            get "#{base_url}/landing_page/edit"
+          }.to_not change(OrganizationLandingPage, :count)
           expect(response.status).to eq(200)
           expect(response).to render_template(:edit)
           expect(response).to render_template("_landing_page")
+          expect(response.body).to_not match("search_item_type=OrganizationLandingPage")
           expect(response.body).to_not include "button_hover"
         end
 
-        context "a register frame with a button color" do
-          let(:iframe) { "<iframe src='/register/embed?organization_id=x&button=c9a227'></iframe>" }
-          before { organization.update(landing_html: iframe) }
+        context "with a landing page" do
+          include_context :with_paper_trail
+          let!(:landing_page) { FactoryBot.create(:organization_landing_page, organization:) }
 
-          it "recommends the shade step 1 would derive" do
+          it "links to the version history" do
             get "#{base_url}/landing_page/edit"
-            expect(response.body).to include "Add &amp;button_hover=a78620"
+            expect(response.status).to eq(200)
+            history_path = admin_paper_trail_versions_path(search_item_type: "OrganizationLandingPage",
+              search_item_id: landing_page.id, period: "all")
+            expect(response.body).to include CGI.escapeHTML(history_path)
+
+            get history_path
+            expect(response.status).to eq(200)
+            expect(assigns(:collection).map(&:item_id)).to eq([landing_page.id])
           end
 
-          context "one that names its hover too" do
-            let(:iframe) { "<iframe src='/register/embed?button=c9a227&button_hover=a78620'></iframe>" }
+          context "framing a register embed with a button color" do
+            let(:landing_page) do
+              FactoryBot.create(:organization_landing_page, organization:, body: iframe)
+            end
+            let(:iframe) { "<iframe src='/register/embed?organization_id=x&button=c9a227'></iframe>" }
 
-            it "says nothing" do
+            it "recommends the shade step 1 would derive" do
               get "#{base_url}/landing_page/edit"
-              expect(response.body).to_not include "Add &amp;button_hover"
+              expect(response.body).to include "Add &amp;button_hover=a78620"
+            end
+
+            context "one that names its hover too" do
+              let(:iframe) { "<iframe src='/register/embed?button=c9a227&button_hover=a78620'></iframe>" }
+
+              it "says nothing" do
+                get "#{base_url}/landing_page/edit"
+                expect(response.body).to_not include "Add &amp;button_hover"
+              end
             end
           end
         end
@@ -76,13 +98,29 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
 
     describe "organization update" do
       context "landing_page" do
-        let(:update) { {landing_html: "<p>html for the landing page</p>"} }
+        let(:update) { {body: "<p>html for the landing page</p>"} }
         it "updates and redirects to the landing_page edit" do
-          put "#{base_url}/landing_page", params: {organization: update}
+          expect {
+            put "#{base_url}/landing_page", params: {organization_landing_page: update}
+          }.to change(OrganizationLandingPage, :count).by 1
           target = edit_admin_organization_custom_layout_path(organization_id: organization.to_param, id: "landing_page")
           expect(response).to redirect_to target
-          organization.reload
-          expect(organization.landing_html).to eq update[:landing_html]
+          expect(organization.reload.organization_landing_page.body).to eq update[:body]
+          # dropping landing_html is a follow-up
+          expect(organization.landing_html).to be_nil
+          # the two agree, so no error
+          expect(flash[:error]).to be_blank
+        end
+
+        context "when enabled disagrees with ORGANIZATIONS_WITH_LANDING_PAGES" do
+          let!(:landing_page) { FactoryBot.create(:organization_landing_page, organization:, enabled: true) }
+
+          it "saves and flashes the mismatch" do
+            put "#{base_url}/landing_page", params: {organization_landing_page: update}
+            expect(landing_page.reload.body).to eq update[:body]
+            expect(flash[:success]).to be_present
+            expect(flash[:error]).to eq landing_page.enabled_mismatch_error
+          end
         end
       end
       context "mail_snippet" do
