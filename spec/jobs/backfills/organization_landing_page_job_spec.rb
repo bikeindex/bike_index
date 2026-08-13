@@ -23,14 +23,43 @@ RSpec.describe Backfills::OrganizationLandingPageJob, type: :job do
         instance.perform
         expect(organization.reload.organization_landing_page.enabled).to be_truthy
       end
+
+      it "syncs enabled on a re-run, in both directions" do
+        instance.perform
+        landing_page = organization.reload.organization_landing_page
+        expect(landing_page.enabled).to be_truthy
+
+        stub_const("LandingPages::ORGANIZATIONS", [])
+        instance.perform
+        expect(landing_page.reload.enabled).to be_falsey
+
+        stub_const("LandingPages::ORGANIZATIONS", [organization.slug])
+        instance.perform
+        expect(landing_page.reload.enabled).to be_truthy
+      end
+
+      context "when the organization is deleted" do
+        it "disables its page" do
+          instance.perform
+          landing_page = organization.reload.organization_landing_page
+          expect(landing_page.enabled).to be_truthy
+
+          organization.destroy
+          instance.perform
+          expect(landing_page.reload.enabled).to be_falsey
+        end
+      end
     end
 
     it "is idempotent" do
       instance.perform
-      organization.organization_landing_page.update!(body: "<p>Edited since the backfill</p>")
+      landing_page = organization.reload.organization_landing_page
+      landing_page.update!(body: "<p>Edited since the backfill</p>")
 
       expect { instance.perform }.to change(OrganizationLandingPage, :count).by 0
-      expect(organization.reload.organization_landing_page.body).to eq "<p>Edited since the backfill</p>"
+      expect(landing_page.reload.body).to eq "<p>Edited since the backfill</p>"
+      # The enabled sync re-saves every page, so verify an unchanged one doesn't churn
+      expect { instance.perform }.to_not change { landing_page.reload.updated_at }
     end
 
     context "with a blank landing_html" do
