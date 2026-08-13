@@ -419,6 +419,14 @@ Rails.application.routes.draw do
     end
   end
 
+  # stolen#index's vendored multi_serial_search bundle still asks for its icon at
+  # webpacker's publicPath, which has served nothing since packs went away, so the
+  # search button renders a broken image. The bundle can't be rebuilt.
+  # 302 because the target carries the asset digest, which a 301 would pin in caches
+  # past the next edit of the icon
+  get "/packs/media/stolen/search-583a6c1f.svg",
+    to: redirect(status: 302) { ActionController::Base.helpers.image_path("stolen/search.svg") }
+
   resources :manufacturers, only: %i[index] do
     collection { get "tsv" } # TODO: can we delete this?
   end
