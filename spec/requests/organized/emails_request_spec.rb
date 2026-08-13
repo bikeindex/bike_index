@@ -237,8 +237,17 @@ RSpec.describe Organized::EmailsController, type: :request do
             end
           end
 
-          it "renders snippets as they were at ownership.created_at" do
+          it "renders the current snippets, and the snippets at ownership.created_at when versioned" do
             get "#{base_url}/finished_registration"
+            expect(response.status).to eq(200)
+            expect(response.body).to include("welcome now")
+            expect(response.body).to include("after_welcome now")
+            expect(response.body).to include("security now")
+            expect(response.body).to_not include("welcome when sent")
+            expect(response.body).to_not include("after_welcome when sent")
+            expect(response.body).to_not include("security when sent")
+
+            get "#{base_url}/finished_registration", params: {versioned: true}
             expect(response.status).to eq(200)
             expect(response.body).to include("welcome when sent")
             expect(response.body).to include("after_welcome when sent")
