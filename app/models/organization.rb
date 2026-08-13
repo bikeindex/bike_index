@@ -124,6 +124,7 @@ class Organization < ApplicationRecord
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other organization features
   has_one :hot_sheet_configuration
   has_one :organization_stolen_message
+  has_one :organization_landing_page
   has_one :impound_configuration
   has_one :organization_saml_configuration
   has_many :hot_sheets
