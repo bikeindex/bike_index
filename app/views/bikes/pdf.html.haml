@@ -62,7 +62,7 @@
                 %td.td-title
                   = t(".owner_phone")
                 %td
-                  = phone_link(@stolen_record.phone, class: "phone-number-link")
+                  = render UI::PhoneDisplay::Component.new(phone: @stolen_record.phone)
             - if @stolen_record.police_report_number.present?
               %tr
                 %td.td-title

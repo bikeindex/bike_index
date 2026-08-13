@@ -131,7 +131,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
         # Theft details always show a location row, even with no location on file
         expect(body).to match("No location given")
         # Owner phone shows when phone visibility permits
-        expect(body).to match("3025551234")
+        expect(body).to match("302-555-1234")
       end
     end
 

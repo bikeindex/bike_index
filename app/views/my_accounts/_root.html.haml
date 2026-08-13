@@ -46,7 +46,7 @@
     .form-well-input
       -# if the user was just updated, they might not have the user_phone assigned
       -# in which case, show the phone number to reduce confusion
-      - phone_value = @user.user_phones.where(phone: @user.phone).any? ? "" : phone_display(@user.phone)
+      - phone_value = @user.user_phones.where(phone: @user.phone).any? ? "" : Phonifyer.display(@user.phone)
       = f.text_field :phone, value: phone_value, placeholder: t(".add_new_phone_number"), class: "form-control"
     - if @user.user_phones.any?
       .form-well-input-static-full-width.ml-auto
@@ -54,7 +54,7 @@
           - @user.user_phones.each do |user_phone|
             %li.row
               .col-sm-8
-                = phone_display(user_phone.phone)
+                = render UI::PhoneDisplay::Component.new(phone: user_phone.phone, skip_link: true)
                 - if Flipper.enabled?(:phone_verification)
                   - if user_phone.confirmed?
                     %small.less-strong= t(".verified")
