@@ -1,11 +1,11 @@
-<%# The padding absorbs the negative top margin Register::Page pulls itself up by (-mt-9, -mt-15 at 992px) %>
-<h2
+<%= render Register::Step1::Component.new(b_param: @b_param, steps: @steps, current_user:) %>
+
+<%# The padding clears the negative bottom margin Register::Page pulls the next element up by (-mb-18) %>
+<p
   class="
-    uncap tw:-mt-4 tw:mb-8 tw:pb-9 tw:pl-4 tw:text-lg tw:font-semibold
-    tw:text-gray-900 tw:italic tw:min-[992px]:pb-15 tw:dark:text-gray-100
+    uncap tw:mt-8 tw:mb-8 tw:pt-18 tw:pl-4 tw:text-lg tw:font-semibold
+    tw:text-gray-900 tw:italic tw:dark:text-gray-100
   "
 >
   <%= link_to "Go back to the old view", new_organization_bike_path(organization_id: current_organization.to_param), class: "twlink" %>
-</h2>
-
-<%= render Register::Step1::Component.new(b_param: @b_param, steps: @steps, current_user:) %>
+</p>
