@@ -43,16 +43,6 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to_not redirect_to register_path(b_param_token: new_b_param.id_token, step: 1)
     end
 
-    it "permits iframing on our own domain only, through to the step it redirects to" do
-      get "/register/new"
-      expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
-      expect(response.headers["Content-Security-Policy"]).to include("frame-ancestors 'self'")
-      follow_redirect!
-      expect(response.status).to eq 200
-      expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
-      expect(response.headers["Content-Security-Policy"]).to include("frame-ancestors 'self'")
-    end
-
     context "status and organization params" do
       let(:organization) { FactoryBot.create(:organization) }
 

@@ -1,12 +1,6 @@
 class RegisterController < ApplicationController
   include Sessionable
 
-  # The flow is meant to be iframed, so it deliberately restates the app-wide X-Frame-Options
-  # SAMEORIGIN - frame-ancestors is what browsers enforce when both headers are present
-  content_security_policy do |policy|
-    policy.frame_ancestors :self
-  end
-
   before_action :find_b_param, except: %i[new embed create confirm confirm_email]
   # An expired token starts a registration rather than bouncing and losing the
   # submission. assign_organization runs next, so the form's organization_id lands on it
