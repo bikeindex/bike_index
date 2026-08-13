@@ -266,12 +266,17 @@
       </nav>
     <% end %>
 
-    <%# delete, so the donation modal only ever shows once %>
-    <% if session.delete(:render_donation_request).present? %>
+    <% if render_donation_request? %>
       <%= render PageBlock::LawEnforcementDonation::Component.new(current_user:) %>
-    <% elsif show_general_alert %>
-      <%= render PageBlock::UserAlerts::Wrapper::Component.new(current_user:) %>
     <% end %>
+
+    <%# organized_skeleton renders its own, inside the content column the menu doesn't cover %>
+    <% general_alert = PageBlock::UserAlerts::Wrapper::Component.new(current_user:) if
+      show_general_alert && current_page_skeleton != "organized_skeleton" %>
+
+    <% show_general_alert_here = general_alert&.render? %>
+
+    <%= render general_alert if show_general_alert_here %>
 
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
     <%= render partial: "/layouts/revised_messages" %>
@@ -280,7 +285,15 @@
     <% if @strava_search_config %>
       <%= yield %>
     <% else %>
-      <main id="main-content">
+      <%#
+        the alert sits in the navbar's gap, so the full-bleed pages that pull up
+        by --nav-gap would slide under it
+      %>
+
+      <main
+        id="main-content"
+        class="<%= "tw:[--nav-gap:0px]" if show_general_alert_here %>"
+      >
         <% if current_page_skeleton.present? %>
           <%= render partial: "/shared/#{current_page_skeleton}" %>
         <% else %>

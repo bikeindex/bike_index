@@ -26,6 +26,11 @@
 
 <div class="organized-wrap">
   <div class="<%= organized_container %>">
+    <%# the layout skips its own spot for this - the menu is positioned over it %>
+    <% if show_general_alert %>
+      <%= render PageBlock::UserAlerts::Wrapper::Component.new(current_user:, wrapper_class: nil) %>
+    <% end %>
+
     <% if OrganizationDisplayer.law_enforcement_missing_verified_features?(current_organization) %>
       <div class="organization-wide-alert alert alert-info in">
         <button

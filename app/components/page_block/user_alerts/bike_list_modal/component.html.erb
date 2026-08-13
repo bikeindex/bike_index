@@ -10,7 +10,7 @@
   </p>
 <% end %>
 
-<%= render PageBlock::UserAlerts::Banner::Component.new(header: @title) do %>
+<%= render UI::Alerts::Base::Component.new(header: @title) do %>
   <%= body %>
 <% end %>
 

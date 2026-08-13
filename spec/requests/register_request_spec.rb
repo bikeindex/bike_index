@@ -123,18 +123,27 @@ RSpec.describe RegisterController, type: :request do
         expect(response).to redirect_to register_path(b_param_token: new_b_param.id_token, step: 1)
       end
 
+      # Registering for themselves, which is what raises the alert start over resolves
       it "destroys the submitted registration start over leaves, resolving its alert" do
         get "/register/new"
         discarded = BParam.last
         post base_url, params: {b_param_token: discarded.id_token,
-                                b_param: {manufacturer_id: "Trek", cycle_type: "bike", owner_email:}}
+                                b_param: {manufacturer_id: "Trek", cycle_type: "bike",
+                                          owner_email: current_user.email}}
         expect(discarded.reload.unfinished_registration?).to be_truthy
         expect(current_user.user_alerts.active.unfinished_registration.count).to eq 1
+        expect(current_user.reload.alert_slugs).to eq ["unfinished_registration"]
 
         # One destroyed, one created
         expect { get start_over_path(discarded) }.to_not change(BParam, :count)
         expect(BParam.where(id: discarded.id)).to be_empty
         expect(current_user.user_alerts.active.unfinished_registration.count).to eq 0
+
+        # show_general_alert reads the slugs, so resolving the alert isn't enough on its own
+        expect(current_user.reload.alert_slugs).to eq []
+        get "/my_account"
+        expect(assigns(:show_general_alert)).to be_falsey
+        expect(response.body).to_not include "isn't registered yet!"
       end
 
       # The link names the registration it was rendered on, which a second registration
@@ -290,7 +299,7 @@ RSpec.describe RegisterController, type: :request do
       context "with their own unfinished registration" do
         let!(:unfinished) do
           BParam.create(origin: "register_flow", creator: current_user,
-            params: {bike: {owner_email:, manufacturer_id: "Trek"}}.as_json)
+            params: {bike: {owner_email: current_user.email, manufacturer_id: "Trek"}}.as_json)
         end
 
         it "doesn't show the general alert" do

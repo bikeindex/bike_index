@@ -35,7 +35,7 @@ module Register
       def shell_class
         return "tw:p-1" if @embed
 
-        "tw:-mt-9 tw:-mb-18 tw:bg-gray-100 tw:px-4 tw:py-10 tw:min-[992px]:-mt-15 tw:dark:bg-gray-900"
+        "tw:-mt-(--nav-gap) tw:-mb-18 tw:bg-gray-100 tw:px-4 tw:py-10 tw:dark:bg-gray-900"
       end
 
       # Revealed by register--retry when a submission can't be retried into working. Ships
