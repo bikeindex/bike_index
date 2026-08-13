@@ -570,7 +570,10 @@ RSpec.describe "Register flow", :js, type: :system do
 
     before { sequence.make_active! }
 
-    it "gates each page of rules, then the acknowledgment, before completing" do
+    # flaky: the color combobox below is typed into right after step 1's Turbo navigation,
+    # and filters nothing when its controller hasn't connected yet - the wait for step 2's
+    # content took this from ~2 failures in 3 to ~1 in 3, but can't prove hydration
+    it "gates each page of rules, then the acknowledgment, before completing", flaky: 4 do
       visit "/register/new?organization_id=#{organization.slug}"
 
       type_into("#b_param_manufacturer_id", "Surly")
@@ -579,6 +582,7 @@ RSpec.describe "Register flow", :js, type: :system do
       fill_in "b_param[owner_email]", with: owner_email
       click_button "Next"
 
+      expect(page).to have_content("Add your bike")
       fill_in "bike[user_name]", with: user_name
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
