@@ -252,14 +252,14 @@ class Bike < ApplicationRecord
       return all if query.blank?
 
       matching = "%#{EmailNormalizer.normalize(query)}%"
-      matching_ids = [
+      bike_ids = [
         Ownership.where("ownerships.owner_email ILIKE ?", matching).select(:bike_id),
-        Ownership.where(creator_id: User.where("users.email ILIKE ?", matching).select(:id)).select(:bike_id),
+        Ownership.joins(:creator).where("users.email ILIKE ?", matching).select(:bike_id),
         unscoped.where("bikes.owner_email ILIKE ?", matching).select(:id)
       ].map { |relation| relation.reorder(nil).arel.ast }
         .reduce { |left, right| Arel::Nodes::UnionAll.new(left, right) }
 
-      where(Arel::Nodes::In.new(arel_table[:id], matching_ids))
+      where(arel_table[:id].in(bike_ids))
     end
 
     def search_phone(str)
