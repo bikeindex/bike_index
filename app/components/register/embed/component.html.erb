@@ -1,8 +1,3 @@
-<%#
-  Rendered before the document, so Register::Page's content_for(:header) is in the buffer
-  by the time <head> reads it - a layout would have run after the view either way
-%>
-<% body = step_1 %>
 <!DOCTYPE html>
 
 <html lang="<%= I18n.locale %>">
@@ -26,5 +21,5 @@
   </head>
 
   <%# The embedding page supplies the background %>
-  <body class="tw:bg-transparent"><%= body %></body>
+  <body class="tw:bg-transparent"><%= @body %></body>
 </html>

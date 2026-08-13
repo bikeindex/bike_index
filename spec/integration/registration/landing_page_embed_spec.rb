@@ -7,12 +7,16 @@ RSpec.describe "Organization landing page registration embed", :js, type: :syste
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
   # The slug LandingPages::ORGANIZATIONS routes by default, so /brakebills is the landing page
   let!(:organization) { FactoryBot.create(:organization, name: "Brakebills", landing_html:) }
+  # The column the seeded page frames it in, which is what puts the frame under the
+  # combobox's mobile breakpoint - full width, it would drop down inline instead
   let(:landing_html) do
     <<~HTML
       <h1>Brakebills University Bicycle Registration</h1>
-      <iframe src="/register/embed?organization_id=brakebills"
-        title="Register your bike with Brakebills University"
-        style="width: 100%; border: none; height: 620px;"></iframe>
+      <div class="container"><div class="row"><div class="col-md-5">
+        <iframe src="/register/embed?organization_id=brakebills"
+          title="Register your bike with Brakebills University"
+          style="width: 100%; border: none; height: 620px;"></iframe>
+      </div></div></div>
     HTML
   end
 
@@ -31,6 +35,8 @@ RSpec.describe "Organization landing page registration embed", :js, type: :syste
       expect(page).to have_no_css("nav.primary-header-nav")
 
       type_into("#b_param_manufacturer_id", "Surly")
+      # Narrow enough that the combobox picks in its dialog, which opens within the frame
+      expect(page).to have_css(".hw-combobox__dialog__listbox")
       click_combobox_option("Surly")
       fill_in "b_param[owner_email]", with: owner_email
       click_button "Next"

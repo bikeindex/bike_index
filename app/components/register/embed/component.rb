@@ -2,9 +2,8 @@
 
 module Register
   module Embed
-    # The whole document for step 1 framed on an organization's landing page - rendered
-    # with layout: false, since the embedding page is the chrome. It carries only what the
-    # form itself needs: no nav, no footer, and no analytics, which the page around it counts.
+    # The whole document for step 1 framed on an organization's landing page - no analytics
+    # among them, which the page around the frame counts.
     class Component < ApplicationComponent
       def initialize(b_param:, steps:, current_user: nil)
         @b_param = b_param
@@ -12,10 +11,10 @@ module Register
         @current_user = current_user
       end
 
-      private
-
-      def step_1
-        render Register::Step1::Component.new(b_param: @b_param, steps: @steps,
+      # Rendered before the document, so Register::Page's content_for(:header) is in the
+      # buffer by the time <head> reads it
+      def before_render
+        @body = render Register::Step1::Component.new(b_param: @b_param, steps: @steps,
           current_user: @current_user, embed: true)
       end
     end

@@ -252,9 +252,11 @@ RSpec.describe RegisterController, type: :request do
       expect(response.status).to eq 200
       expect(BParam.last.creation_organization_id).to eq organization.id
 
-      # Its own document, with none of the application layout's chrome around it
       expect(response.body).to start_with("<!DOCTYPE html>")
       expect(response.body).to_not include("primary-header-nav")
+      # The form's own styling, which nothing renders around it
+      expect(response.body).to match(/<link[^>]*stylesheet[^>]*tailwind/)
+      expect(response.body).to match(/<link[^>]*stylesheet[^>]*hotwire_combobox/)
       expect(response.body).to match(/<form[^>]*target="_top"/)
       expect(response.body).to match(/<form[^>]*data-turbo="false"/)
       expect(response.body).to include('name="robots" content="noindex"')

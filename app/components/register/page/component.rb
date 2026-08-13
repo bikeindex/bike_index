@@ -30,8 +30,7 @@ module Register
 
       private
 
-      # Embedded, the frame is the shell - the padding is only so a focus ring at the
-      # form's edge isn't clipped by it
+      # p-1 so a focus ring at the form's edge isn't clipped by the frame
       def shell_class
         return "tw:p-1" if @embed
 
