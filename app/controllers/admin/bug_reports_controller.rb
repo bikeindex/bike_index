@@ -16,7 +16,7 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
-        matching_bug_reports.includes(:user)
+        matching_bug_reports.includes(:user).with_attached_images
           .reorder("bug_reports.#{sort_column} #{sort_direction}"),
         limit: @per_page,
         page: permitted_page)
@@ -166,6 +166,13 @@ module Admin
     def bug_report_json(bug_report)
       bug_report.as_json(only: %w[id user_id email from_name receiver subject body tags status github_pull_request
         is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
+        .merge("images" => bug_report.images.map { image_json(it) })
+    end
+
+    # BlobUrl serves the CDN rather than a signed redirect, so the url doesn't expire
+    def image_json(image)
+      {filename: image.filename.to_s, byte_size: image.byte_size,
+       content_type: image.content_type, url: BlobUrl.for(image.blob)}
     end
   end
 end

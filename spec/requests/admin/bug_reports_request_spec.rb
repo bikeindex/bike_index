@@ -6,6 +6,7 @@ RSpec.describe Admin::BugReportsController, type: :request do
   let(:target_json) do
     bug_report.as_json(only: %w[id user_id email from_name receiver subject body tags status github_pull_request
       is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
+      .merge("images" => [])
   end
   include_context :request_spec_logged_in_as_superuser
 
@@ -136,6 +137,22 @@ RSpec.describe Admin::BugReportsController, type: :request do
         get "#{base_url}/#{bug_report.to_param}.json"
         expect(response.status).to eq(200)
         expect(json_result["bug_report"]).to eq(target_json)
+      end
+
+      context "with an attached image" do
+        before do
+          bug_report.images.attach(io: StringIO.new("fake image"), filename: "broken.png",
+            content_type: "image/png")
+        end
+
+        it "renders each image with a url that doesn't expire" do
+          get "#{base_url}/#{bug_report.to_param}.json"
+          expect(json_result.dig("bug_report", "images").count).to eq 1
+          expect(json_result.dig("bug_report", "images", 0)).to eq({
+            "filename" => "broken.png", "byte_size" => 10, "content_type" => "image/png",
+            "url" => BlobUrl.for(bug_report.reload.images.first.blob)
+          })
+        end
       end
     end
 

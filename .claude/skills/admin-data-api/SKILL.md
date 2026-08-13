@@ -71,6 +71,8 @@ It fetches sidekiq then pghero and prints a `summary:` line and an `OK`/`ABNORMA
 
 `show-bug-report` returns the one report — the same fields the index lists, so use it once a search has found the id. `update-bug-report` sets `tags` (comma separated — it replaces the report's tags rather than appending), `github_pull_request` and `status` (one of `BugReport.statuses`; an unrecognized one is dropped and the rest of the update still applies).
 
+Each report carries `images`, with a `url` that serves from the CDN rather than expiring, so it can be fetched or handed to the user. Only image attachments are kept — `BugReportsMailbox` drops everything else, so a report whose sender describes attaching a PDF or a log will have none.
+
 ## Refreshing the token
 
 `.env.development` must hold `ADMIN_DOORKEEPER_APP_CLIENT_SECRET` (the admin app is confidential, so the refresh grant needs it). With it, `get` refreshes automatically on a 401 — you rarely call this directly. To force a refresh:
@@ -100,5 +102,5 @@ The authorization code expires 10 minutes after the page loads — if it shows a
 ## Notes
 
 - These hit **production** with a superuser token. `update-bug-report` is the only write — confirm the tags and PR number with the user before running it. Never a substitute for the log or Honeybadger workflows for their jobs.
-- Bug report bodies are user-submitted email: they carry names, addresses and bike details. Summarize them; don't paste raw bodies into anything that leaves the session.
+- Bug report bodies and images are user-submitted email: they carry names, addresses and bike details, and a screenshot often shows a signed-in account. Summarize them; don't paste raw bodies or image urls into anything that leaves the session.
 - `.env.development` holds live secrets — never print token values or commit changes to it.
