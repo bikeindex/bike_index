@@ -23,12 +23,6 @@ module Register
         {data: {turbo: true, controller: "autofocus register--retry"}}
       end
 
-      # The frame is narrower than the combobox's mobile breakpoint, and its dialog can't
-      # escape the frame to be the full-screen picker it's meant to be
-      def combobox_options
-        @embed ? {mobile_at: "0px"} : {}
-      end
-
       def cycle_type
         @b_param.type
       end

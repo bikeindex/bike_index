@@ -20,7 +20,7 @@
         label_text: Manufacturer.model_name.human, required: true)) do %>
       <%# The async combobox reads f.object.manufacturer to display the saved value %>
       <%= render UI::Forms::ComboboxManufacturer::Component.new(form: f,
-          frame_maker: true, required: true, no_js: true, **combobox_options) %>
+          frame_maker: true, required: true, no_js: true) %>
     <% end %>
 
     <div
@@ -43,7 +43,7 @@
           label_text: translation(".vehicle_type"), required: true, wrapper_class: "tw:mb-0")) do %>
         <%= render UI::Forms::Combobox::Component.new(name: :cycle_type, form: f, required: true,
             value: @b_param.cycle_type, options: cycle_type_options, rich_display: :inline,
-            dialog_label: translation(".vehicle_type"), no_js: true, **combobox_options) %>
+            dialog_label: translation(".vehicle_type"), no_js: true) %>
       <% end %>
 
       <%= render UI::Forms::Checkbox::Component.new(name: :propulsion_type_motorized, value: true,
