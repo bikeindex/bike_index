@@ -270,7 +270,7 @@ RSpec.describe RegisterController, type: :request do
     it "renders" do
       get register_path(b_param_token: b_param.id_token, step: 1)
       expect(response.status).to eq 200
-      expect(response.body).to include "Register your bike!"
+      expect(response.body).to include "Register your vehicle!"
       # Controller-rendered components still wrap in the application layout
       expect(response.body).to include "</html>"
       # Prefilled from the registration, so going back to step 1 keeps the values
@@ -332,9 +332,10 @@ RSpec.describe RegisterController, type: :request do
           params: {bike: {owner_email:, cycle_type: "cargo", creation_organization_id: organization.id}}.as_json)
       end
 
-      it "names the organization in the heading, with the cycle type js can swap" do
+      it "names the organization in the heading, and the cycle type only where js can swap it" do
         get register_path(b_param_token: b_param.id_token, step: 1)
-        expect(response.body).to include "Register your <span data-register--heading-target=\"cycleType\">cargo bike</span> with Brakebills!"
+        expect(response.body).to include "Register your vehicle with Brakebills!"
+        expect(response.body).to include "<span data-register--heading-target=\"cycleType\">cargo bike</span> info"
         # Posted back, so a submission that has to build a registration keeps the org
         expect(Nokogiri::HTML(response.body).at_css("input[name='organization_id']")["value"])
           .to eq organization.id.to_s

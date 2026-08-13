@@ -4,7 +4,6 @@ module Register
   module Step1
     # Step 1 of the registration flow: the quick-start form
     class Component < ApplicationComponent
-      # embed: framed on an organization's landing page (RegisterController#embed)
       def initialize(b_param:, steps:, current_user: nil, embed: false)
         @b_param = b_param
         @steps = steps
@@ -37,11 +36,12 @@ module Register
         tag.span(cycle_type, data: {"register--heading-target": "cycleType"})
       end
 
+      # Not the cycle type the section label swaps - the step is still asking what's
+      # being registered, so the heading can't name it
       def heading_text
-        return translation(".register_your_bike_html", cycle_type: cycle_type_tag) if organization.blank?
+        return translation(".register_your_vehicle_html") if organization.blank?
 
-        translation(".register_your_bike_with_org_html", cycle_type: cycle_type_tag,
-          org_name: ERB::Util.html_escape(organization.short_name))
+        translation(".register_your_vehicle_with_org_html", org_name: ERB::Util.html_escape(organization.short_name))
       end
 
       # Names this registration rather than leaving it to the session, which another tab
