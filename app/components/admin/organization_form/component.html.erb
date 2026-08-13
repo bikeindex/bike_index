@@ -1,21 +1,20 @@
 <%= render(UI::Alerts::ObjectError::Component.new(object: @organization)) %>
 
 <div class="row">
-  <div class="form-group col-md-6">
-    <%= @form_builder.label :name %>
-    <%= @form_builder.text_field :name, required: true, class: "form-control" %>
+  <div class="col-md-6">
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :name, required: true)) %>
   </div>
 
-  <div class="form-group col-md-6">
+  <div class="col-md-6">
     <% if @organization.restrict_invitations? %>
-      <%= @form_builder.label :available_invitation_count, "Available invitations" %>
-      <%= @form_builder.number_field :available_invitation_count, class: "form-control" %>
-      <p class="text-success">
-        Invitations sent: <%= @organization.sent_invitation_count %>
-      </p>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :available_invitation_count, kind: :number_field, label_text: "Available invitations")) do |group| %>
+        <% group.with_helper_text do %>
+          Invitations sent: <%= @organization.sent_invitation_count %>
+        <% end %>
+      <% end %>
     <% else %>
       <div class="d-md-block d-none">
-        <label>&nbsp;</label>
+        <label class="twlabel">&nbsp;</label>
 
         <div class="text-form-control">
           permitted domain with passwordless sign in, no invite restrictions
@@ -27,166 +26,128 @@
 
 <div class="row">
   <div class="col-md-6">
-    <div class="form-group">
-      <%= @form_builder.label :short_name do %>
-        Short name (30 letters or less)
-        <% if @organization.block_short_name_edit? %>
-          <small class="em text-danger">warning - will change org URLs (landing pages, embeds)</small>
-        <% end %>
+    <% short_name_label = capture do %>
+      Short name (30 letters or less)
+      <% if @organization.block_short_name_edit? %>
+        <small class="em text-danger">warning - will change org URLs (landing pages, embeds)</small>
       <% end %>
+    <% end %>
 
-      <%= @form_builder.text_field :short_name, class: "form-control" %>
-    </div>
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :short_name, label_text: short_name_label)) %>
   </div>
 
-  <div class="col-md-6">
-    <div class="form-group">
-      <%= @form_builder.label :ascend_name, data: {"admin--organization-form-target": "ambassadorLabel"} %>
-      <%= @form_builder.text_field :ascend_name, class: "form-control", data: {"admin--organization-form-target": "ambassadorField"} %>
-    </div>
+  <div class="col-md-6" data-admin--organization-form-target="ambassadorLabel">
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :ascend_name, html_options: {data: {"admin--organization-form-target": "ambassadorField"}})) %>
   </div>
 </div>
 
 <div class="row">
-  <div class="col-md-6">
-    <div class="form-group">
-      <%= @form_builder.label :website, data: {"admin--organization-form-target": "ambassadorLabel"} %>
-      <%= @form_builder.text_field :website, class: "form-control", data: {"admin--organization-form-target": "ambassadorField"} %>
+  <div class="col-md-6" data-admin--organization-form-target="ambassadorLabel">
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :website, html_options: {data: {"admin--organization-form-target": "ambassadorField"}})) %>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <div class="tw:mb-4">
+      <label class="twlabel">Slug:</label>
+
+      <p class="less-strong">
+        <%= @organization.slug %>
+      </p>
     </div>
   </div>
 
   <div class="col-6 col-lg-3">
-    <fieldset disabled>
-      <div class="form-group">
-        <%= @form_builder.label :slug, "Slug:" %>
+    <% previous_slug_label = capture do %>
+      Previous Slug <em class="small text-warning">Rarely unnecessary</em>
+    <% end %>
 
-        <p class="less-strong">
-          <%= @organization.slug %>
-        </p>
-      </div>
-    </fieldset>
-  </div>
+    <% if helpers.display_dev_info? %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :previous_slug, label_text: previous_slug_label, html_options: {class: "only-dev-visible"})) %>
+    <% else %>
+      <div class="tw:mb-4">
+        <label class="twlabel"><%= previous_slug_label %></label>
 
-  <div class="col-6 col-lg-3">
-    <%= tag.div(class: "form-group", disabled: !helpers.display_dev_info?) do %>
-      <%= @form_builder.label :previous_slug do %>
-        Previous Slug <em class="small text-warning">Rarely unnecessary</em>
-      <% end %>
-
-      <% if helpers.display_dev_info? %>
-        <%= @form_builder.text_field :previous_slug, class: "form-control only-dev-visible" %>
-      <% else %>
         <p class="less-strong">
           <%= @organization.previous_slug %>
         </p>
-      <% end %>
+      </div>
     <% end %>
   </div>
 </div>
 
 <div class="row">
   <div class="col-md-6">
-    <div class="form-group">
-      <%= @form_builder.label :kind, "Organization Type" %>
-      <%= @form_builder.select :kind, options_for_select(kind_options, selected: @organization.kind), {}, class: "form-control", data: {"admin--organization-form-target": "kind", action: "change->admin--organization-form#toggleAmbassadorFields"} %>
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :kind, label_text: "Organization Type")) do %>
+      <%= render(UI::Forms::Select::Component.new(form_builder: @form_builder, attribute: :kind, option_tags: options_for_select(kind_options, selected: @organization.kind), html_options: {data: {"admin--organization-form-target": "kind", action: "change->admin--organization-form#toggleAmbassadorFields"}})) %>
+    <% end %>
 
-      <% if @organization.bike_shop? %>
-        <div class="form-group mt-2">
-          <%= @form_builder.check_box :lightspeed_register_with_phone %>
-
-          <%= @form_builder.label :lightspeed_register_with_phone do %>
-            Lightspeed POS registrations include phone
-            <small class="less-strong">originally for Edmonton</small>
-          <% end %>
-        </div>
+    <% if @organization.bike_shop? %>
+      <% lightspeed_label = capture do %>
+        Lightspeed POS registrations include phone
+        <small class="less-strong">originally for Edmonton</small>
       <% end %>
-    </div>
 
-    <div class="form-group mt-4">
-      <%= @form_builder.check_box :show_on_map, data: {"admin--organization-form-target": "ambassadorField"} %>
-      <%= @form_builder.label :show_on_map, data: {"admin--organization-form-target": "ambassadorLabel"} %>
-    </div>
+      <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :lightspeed_register_with_phone, label: lightspeed_label, class_name: "tw:mb-4")) %>
+    <% end %>
 
-    <div class="form-group">
-      <%= @form_builder.check_box :lock_show_on_map, data: {"admin--organization-form-target": "ambassadorField"} %>
+    <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :show_on_map, label: Organization.human_attribute_name(:show_on_map), class_name: "tw:mb-4", data: {"admin--organization-form-target": "ambassadorLabel"}, input_data: {"admin--organization-form-target": "ambassadorField"})) %>
 
-      <%= @form_builder.label :lock_show_on_map, data: {"admin--organization-form-target": "ambassadorLabel"} do %>
-        Lock shown on map
-        <small class="less-strong"> restrict org from updating show on map above (e.g. they're known bad actors) </small>
-      <% end %>
-    </div>
+    <% lock_show_on_map_label = capture do %>
+      Lock shown on map
+      <small class="less-strong">restrict org from updating show on map above (e.g. they're known bad actors)</small>
+    <% end %>
 
-    <div class="form-group">
-      <%= @form_builder.check_box :spam_registrations %>
+    <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :lock_show_on_map, label: lock_show_on_map_label, class_name: "tw:mb-4", data: {"admin--organization-form-target": "ambassadorLabel"}, input_data: {"admin--organization-form-target": "ambassadorField"})) %>
 
-      <%= @form_builder.label :spam_registrations do %>
-        High spam registrations
-        <small class="less-strong">don't email suspicious registrations</small>
-      <% end %>
-    </div>
+    <% spam_registrations_label = capture do %>
+      High spam registrations
+      <small class="less-strong">don't email suspicious registrations</small>
+    <% end %>
 
-    <div class="form-group">
-      <%= @form_builder.check_box :api_access_approved, data: {"admin--organization-form-target": "ambassadorField"} %>
+    <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :spam_registrations, label: spam_registrations_label, class_name: "tw:mb-4")) %>
 
-      <%= @form_builder.label :api_access_approved, data: {"admin--organization-form-target": "ambassadorLabel"} do %>
-        API V1 access approved
-        <small class="less-strong"> to be able to post updates via legacy API (rarely necessary) </small>
-      <% end %>
-    </div>
+    <% api_access_label = capture do %>
+      API V1 access approved
+      <small class="less-strong">to be able to post updates via legacy API (rarely necessary)</small>
+    <% end %>
 
-    <div class="form-group">
-      <%= @form_builder.check_box :approved, data: {"admin--organization-form-target": "ambassadorField"} %>
-      <%= @form_builder.label :approved, "Validated & approved", data: {"admin--organization-form-target": "ambassadorLabel"} %>
-    </div>
+    <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :api_access_approved, label: api_access_label, class_name: "tw:mb-4", data: {"admin--organization-form-target": "ambassadorLabel"}, input_data: {"admin--organization-form-target": "ambassadorField"})) %>
 
-    <div class="form-group">
-      <%= @form_builder.check_box :direct_unclaimed_notifications %>
+    <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :approved, label: "Validated & approved", class_name: "tw:mb-4", data: {"admin--organization-form-target": "ambassadorLabel"}, input_data: {"admin--organization-form-target": "ambassadorField"})) %>
 
-      <%= @form_builder.label :direct_unclaimed_notifications do %>
-        Send emails directly to unclaimed bike owners
-        <small class="less-strong">don't require org to forward</small>
-      <% end %>
-    </div>
+    <% direct_unclaimed_label = capture do %>
+      Send emails directly to unclaimed bike owners
+      <small class="less-strong">don't require org to forward</small>
+    <% end %>
+
+    <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :direct_unclaimed_notifications, label: direct_unclaimed_label, class_name: "tw:mb-4")) %>
 
     <% parent_org_label = capture do %>
       Parent organization
       <small class="less-strong"><strong class="text-danger">(probably) do not add parents!</strong> Parents must be part of the same organization</small>
     <% end %>
 
-    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :parent_organization_id, label_text: parent_org_label, wrapper_class: "form-group")) do %>
-      <%= render UI::Forms::Combobox::Component.new(name: :parent_organization_id, form: @form_builder, placeholder: "Choose organization", include_blank: true, options: parent_organization_options, data: {"admin--organization-form-target": "ambassadorField"}) %>
-
-      <small>
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :parent_organization_id, label_text: parent_org_label)) do |group| %>
+      <% group.with_helper_text do %>
         <strong>Use the "regional" feature instead.</strong>
         <em>To add regional organizations rather than child/parent relationships, enable it through a paid invoice for the organization. All organizations with a location in the same area will automatically be associated.</em>
-      </small>
+      <% end %>
+
+      <%= render UI::Forms::Combobox::Component.new(name: :parent_organization_id, form: @form_builder, placeholder: "Choose organization", include_blank: true, options: parent_organization_options, data: {"admin--organization-form-target": "ambassadorField"}) %>
     <% end %>
   </div>
 
   <div class="col-md-6">
     <% if helpers.display_dev_info? %>
-      <div class="mt-4 only-dev-visible mb-4">
-        <label class="less-strong d-block">
-          Manually set POS kind
-          <span class="text-danger">Warning - you can break things here!</span>
-        </label>
+      <% manual_pos_kind_label = capture do %>
+        Manually set POS kind
+        <span class="text-danger">Warning - you can break things here!</span>
+      <% end %>
 
-        <div class="form-check form-check-inline">
-          <%= @form_builder.radio_button "manual_pos_kind", "not_set", class: "form-check-input" %>
-
-          <strong>
-            <%= @form_builder.label "manual_pos_kind_not_set", "not set", class: "form-check-label" %>
-          </strong>
-        </div>
-
-        <% Organization.pos_kinds.each do |pos_kind| %>
-          <div class="form-check form-check-inline small">
-            <%= @form_builder.radio_button "manual_pos_kind", pos_kind, class: "form-check-input" %>
-            <%= @form_builder.label "manual_pos_kind_#{pos_kind}", pos_kind.humanize.gsub("pos", "").strip, class: "form-check-label" %>
-          </div>
+      <div class="only-dev-visible mt-4">
+        <%= render(UI::Forms::Group::Component.new(attribute: :manual_pos_kind, label_text: manual_pos_kind_label)) do %>
+          <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "organization[manual_pos_kind]", entries: manual_pos_kind_entries, selected: selected_manual_pos_kind)) %>
         <% end %>
-
-        <div class="mb-4"></div>
       </div>
     <% end %>
 
@@ -195,37 +156,36 @@
         Auto user email
         <small class="less-strong">embed registration email</small>
       <% end %>
-      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :embedable_user_email, label_text: embedable_label, wrapper_class: "form-group")) do %>
-        <%= render UI::Forms::Combobox::Component.new(name: :embedable_user_email, form: @form_builder, placeholder: "Select email", value: @embedable_email, include_blank: true, options: auto_user_emails) %>
 
-        <small class="less-strong">
-          <% if @organization.organization_roles.count == 0 %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :embedable_user_email, label_text: embedable_label)) do |group| %>
+        <% if @organization.organization_roles.count == 0 %>
+          <% group.with_helper_text do %>
             You can use <%= ENV["AUTO_ORG_MEMBER"] %> if there are no members of
             the organization
           <% end %>
-        </small>
+        <% end %>
+
+        <%= render UI::Forms::Combobox::Component.new(name: :embedable_user_email, form: @form_builder, placeholder: "Select email", value: @embedable_email, include_blank: true, options: auto_user_emails) %>
       <% end %>
     <% end %>
 
     <% if @organization.bike_shop? %>
-      <div class="form-group">
-        <%= @form_builder.check_box :opted_into_theft_survey_2023 %>
+      <% theft_survey_label = capture do %>
+        Opted into theft survey 2023
+        <small class="less-strong">if checked, we will start email their customers theft surveys</small>
+      <% end %>
 
-        <%= @form_builder.label :opted_into_theft_survey_2023 do %>
-          Opted into theft survey 2023
-          <small class="less-strong"> if checked, we will start email their customers theft surveys </small>
-        <% end %>
-      </div>
+      <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :opted_into_theft_survey_2023, label: theft_survey_label, class_name: "tw:mb-4")) %>
     <% end %>
 
     <% if @organization.official_manufacturer? %>
-      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :manufacturer_id, label_text: Organization.human_attribute_name(:manufacturer), required: true, wrapper_class: "form-group")) do %>
-        <%= render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, no_manufacturer_other: true, form: @form_builder, required: true) %>
-
-        <small>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :manufacturer_id, label_text: Organization.human_attribute_name(:manufacturer), required: true)) do |group| %>
+        <% group.with_helper_text do %>
           <strong>This organization has <code>Official manufacturer organization</code> enabled.</strong>
           Select a manufacturer to give them manufacturer access.
-        </small>
+        <% end %>
+
+        <%= render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, no_manufacturer_other: true, form: @form_builder, required: true) %>
       <% end %>
     <% end %>
 
@@ -235,54 +195,48 @@
           <h4 class="mb-4">Settings for organization features</h4>
 
           <% if @organization.enabled?("graduated_notifications") %>
-            <div class="form-group">
-              <%= @form_builder.label :graduated_notification_interval_days do %>
-                Interval for send graduated notifications, in days
-                <small><span class="text-success">graduated_notifications setting</span></small>
-              <% end %>
+            <% graduated_label = capture do %>
+              Interval for send graduated notifications, in days
+              <small><span class="text-success">graduated_notifications setting</span></small>
+            <% end %>
 
-              <%= @form_builder.number_field :graduated_notification_interval_days, {class: "form-control"} %>
-
-              <div class="text-warning p-1">
-                <em class="small">
+            <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :graduated_notification_interval_days, kind: :number_field, label_text: graduated_label)) do |group| %>
+              <% group.with_helper_text do %>
+                <span class="text-warning">
                   Unless this is set, the organization will not send graduated
                   notifications - even if they have the feature enabled
-                </em>
-              </div>
-            </div>
+                </span>
+              <% end %>
+            <% end %>
           <% end %>
 
           <% if @organization.enabled?("regional_bike_counts") %>
-            <div class="form-group">
-              <% if @organization.search_radius_metric_units? %>
-                <%= @form_builder.label :search_radius_kilometers do %>
-                  Search radius (km)
-                  <small><span class="text-success">regional bike counts setting</span>, controls how large the region is to associate regional sub-organizations</small>
-                <% end %>
-                <%= @form_builder.number_field :search_radius_kilometers, {class: "form-control"} %>
-              <% else %>
-                <%= @form_builder.label :search_radius_miles do %>
-                  Search radius (mi)
-                  <small><span class="text-success">regional bike counts setting</span>, controls how large the region is to associate regional sub-organizations</small>
-                <% end %>
-                <%= @form_builder.number_field :search_radius_miles, {class: "form-control"} %>
-              <% end %>
+            <% radius_attribute = @organization.search_radius_metric_units? ? :search_radius_kilometers : :search_radius_miles %>
+            <% radius_label = capture do %>
+              Search radius
+              (<%= @organization.search_radius_metric_units? ? "km" : "mi" %>)
+              <small><span class="text-success">regional bike counts setting</span>, controls how large the region is to associate regional sub-organizations</small>
+            <% end %>
 
-              <div class="text-warning p-1">
-                <em class="small">
+            <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: radius_attribute, kind: :number_field, label_text: radius_label)) do |group| %>
+              <% group.with_helper_text do %>
+                <span class="text-warning">
                   <code class="d-inline">nearby_organizations</code> will search
                   within this radius for other organizations in the same area
-                </em>
-              </div>
-            </div>
+                </span>
+              <% end %>
+            <% end %>
           <% end %>
 
           <% if domain_uses.any? %>
-            <div class="form-group">
-              <%= @form_builder.label :user_email_domain do %>
-                <span></span>
-                permitted domain for <%= domain_uses.to_sentence %>
-                <small><% domain_uses.each do |domain_use| %><span class="text-success"><%= domain_use %> feature</span><% end %></small>
+            <% domain_label = capture do %>
+              permitted domain for <%= domain_uses.to_sentence %>
+              <small><% domain_uses.each do |domain_use| %><span class="text-success"><%= domain_use %> feature</span><% end %></small>
+            <% end %>
+
+            <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :user_email_domain, label_text: domain_label)) do |group| %>
+              <% unless @current_user.developer? %>
+                <% group.with_helper_text { "Ask Seth for help changing this, it's delicate" } %>
               <% end %>
 
               <div class="input-group">
@@ -290,73 +244,70 @@
                   <div class="input-group-text">@</div>
                 </div>
 
-                <%= @form_builder.text_field :user_email_domain, placeholder: "something.gov", class: "form-control", disabled: !@current_user.developer? %>
+                <%= render(UI::Forms::Input::Component.new(form_builder: @form_builder, attribute: :user_email_domain, html_options: {placeholder: "something.gov", disabled: !@current_user.developer?, "aria-describedby" => group.helper_text_id})) %>
               </div>
-
-              <% unless @current_user.developer? %>
-                <span class="small less-strong">Ask Seth for help changing this, it's delicate</span>
-              <% end %>
-            </div>
+            <% end %>
           <% end %>
 
           <% OrganizationFeature.reg_fields_with_customizable_labels.each do |reg_field| %>
             <%# Separate handling for owner_email %>
             <% if reg_field == "owner_email" && @organization.paid? %>
-              <div class="form-group small">
-                <%= label_tag "reg_label-#{reg_field}" do %>
-                  Custom Label for <em>Owner Email</em> (e.g. "uiowa.edu
-                  email")
-                  <small class="less-strong">often desired by universities</small>
-                <% end %>
-
-                <%= text_field_tag "reg_label-#{reg_field}", helpers.registration_field_label(@organization, reg_field), {class: "form-control"} %>
-              </div>
+              <% reg_label = capture do %>
+                Custom Label for <em>Owner Email</em> (e.g. "uiowa.edu email")
+                <small class="less-strong">often desired by universities</small>
+              <% end %>
             <% elsif @organization.enabled?(reg_field) %>
-              <% reg_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field) %>
-              <div class="form-group small">
-                <%= label_tag "reg_label-#{reg_field}" do %>
-                  Custom Label for
-                  <em><%= reg_attr.titleize(keep_id_suffix: true) %></em>
-                  <small class="less-strong">leave blank unless it's <strong>absolutely</strong> required - default behavior is preferred</small>
-                <% end %>
+              <% reg_label = capture do %>
+                Custom Label for
+                <em><%= OrganizationFeature.reg_field_to_bike_attrs(reg_field).titleize(keep_id_suffix: true) %></em>
 
-                <%= text_field_tag "reg_label-#{reg_field}", helpers.registration_field_label(@organization, reg_field), {class: "form-control"} %>
-              </div>
+                <small class="less-strong">leave blank unless it's <strong>absolutely</strong> required - default behavior is preferred</small>
+              <% end %>
+            <% else %>
+              <% reg_label = nil %>
+            <% end %>
+
+            <% if reg_label.present? %>
+              <%= render(UI::Forms::Group::Component.new(attribute: "reg_label-#{reg_field}", label_text: reg_label)) do %>
+                <%= text_field_tag "reg_label-#{reg_field}", helpers.registration_field_label(@organization, reg_field), {class: "twinput"} %>
+              <% end %>
             <% end %>
           <% end %>
 
           <% if @organization.enabled?("organization_stolen_message") %>
-            <div class="form-group mt-4">
-              <%= label_tag :organization_stolen_message_kind do %>
-                Stolen Message type
-                <small><span class="text-success">Organization Stolen Message setting</span>, edit message in the <%= link_to "orgs own edit page", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param) %></small>
+            <% stolen_message_label = capture do %>
+              Stolen Message type
+              <small><span class="text-success">Organization Stolen Message setting</span>, edit message in the <%= link_to "orgs own edit page", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param) %></small>
+            <% end %>
+
+            <div class="mt-4">
+              <%= render(UI::Forms::Group::Component.new(attribute: :organization_stolen_message_kind, label_text: stolen_message_label)) do %>
+                <%= select_tag :organization_stolen_message_kind, options_for_select(stolen_message_kind_options, selected: organization_stolen_message.kind), {class: "twinput", data: {"admin--organization-form-target": "stolenMessageKind", action: "change->admin--organization-form#toggleStolenMessageArea"}} %>
               <% end %>
 
-              <%= select_tag :organization_stolen_message_kind, options_for_select(stolen_message_kind_options, selected: organization_stolen_message.kind), {class: "form-control", data: {"admin--organization-form-target": "stolenMessageKind", action: "change->admin--organization-form#toggleStolenMessageArea"}} %>
-
               <div
-                class="form-group mt-2 <%= "tw:hidden!" if organization_stolen_message.kind != "area" %>"
+                class="<%= "tw:hidden!" if organization_stolen_message.kind != "area" %>"
                 data-admin--organization-form-target="stolenMessageArea"
               >
-                <% if organization_stolen_message.search_radius_metric_units? %>
-                  <%= @form_builder.label :organization_stolen_message_search_radius_kilometers do %>
+                <% radius_label = capture do %>
+                  <% if organization_stolen_message.search_radius_metric_units? %>
                     Stolen Message radius (km)
                     <small><span class="text-success">Organization Stolen Message setting</span> - only available for area type <span class="less-strong">max <%= OrganizationStolenMessage.max_search_radius_kilometers %> km</span></small>
-                  <% end %>
-                  <%= number_field_tag :organization_stolen_message_search_radius_kilometers, organization_stolen_message.search_radius_kilometers, {class: "form-control"} %>
-                <% else %>
-                  <%= label_tag :organization_stolen_message_search_radius_miles do %>
+                  <% else %>
                     Stolen Message radius (mi)
                     <small><span class="text-success">Organization Stolen Message setting</span> - only available for area type <span class="less-strong">max <%= OrganizationStolenMessage::MAX_SEARCH_RADIUS %> miles</span></small>
                   <% end %>
-                  <%= number_field_tag :organization_stolen_message_search_radius_miles, organization_stolen_message.search_radius_miles, {class: "form-control"} %>
+                <% end %>
+
+                <%= render(UI::Forms::Group::Component.new(attribute: stolen_message_radius_attribute, label_text: radius_label)) do %>
+                  <%= number_field_tag stolen_message_radius_attribute, stolen_message_radius_value, {class: "twinput"} %>
                 <% end %>
               </div>
             </div>
           <% end %>
 
           <% if @organization.enabled?("saml_sso") %>
-            <div class="form-group mt-4">
+            <div class="mt-4">
               <h4>SAML SSO</h4>
 
               <p class="text-success">
@@ -382,40 +333,19 @@
               </ul>
 
               <%= @form_builder.fields_for :organization_saml_configuration, saml_configuration do |saml_f| %>
-                <div class="form-check mt-2">
-                  <%= saml_f.check_box :enabled, class: "form-check-input" %>
-                  <%= saml_f.label :enabled, "Enable live SAML login for this organization", class: "form-check-label" %>
-                </div>
+                <%= render(UI::Forms::Checkbox::Component.new(form_builder: saml_f, attribute: :enabled, label: "Enable live SAML login for this organization", class_name: "tw:mb-4")) %>
 
-                <div class="form-group mt-2">
-                  <%= saml_f.label :idp_entity_id, "IdP entityID" %>
-                  <%= saml_f.text_field :idp_entity_id, class: "form-control" %>
-                </div>
+                <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_entity_id, label_text: "IdP entityID")) %>
 
-                <div class="form-group mt-2">
-                  <%= saml_f.label :idp_sso_target_url, "IdP SSO target URL" %>
-                  <%= saml_f.text_field :idp_sso_target_url, class: "form-control" %>
-                </div>
+                <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_sso_target_url, label_text: "IdP SSO target URL")) %>
 
-                <div class="form-group mt-2">
-                  <%= saml_f.label :idp_slo_target_url, "IdP SLO target URL (optional)" %>
-                  <%= saml_f.text_field :idp_slo_target_url, class: "form-control" %>
-                </div>
+                <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_slo_target_url, label_text: "IdP SLO target URL")) %>
 
-                <div class="form-group mt-2">
-                  <%= saml_f.label :idp_cert, "IdP certificate (PEM or base64)" %>
-                  <%= saml_f.text_area :idp_cert, class: "form-control", rows: 4 %>
-                </div>
+                <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_cert, kind: :text_area, label_text: "IdP certificate (PEM or base64)", html_options: {rows: 4})) %>
 
-                <div class="form-group mt-2">
-                  <%= saml_f.label :idp_cert_fingerprint, "IdP certificate fingerprint (optional)" %>
-                  <%= saml_f.text_field :idp_cert_fingerprint, class: "form-control" %>
-                </div>
+                <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_cert_fingerprint, label_text: "IdP certificate fingerprint")) %>
 
-                <div class="form-group mt-2">
-                  <%= saml_f.label :email_attribute_name, "Email attribute name (optional)" %>
-                  <%= saml_f.text_field :email_attribute_name, class: "form-control", placeholder: OrganizationSamlConfiguration::DEFAULT_EMAIL_ATTRIBUTE %>
-                </div>
+                <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :email_attribute_name, label_text: "Email attribute name", html_options: {placeholder: OrganizationSamlConfiguration::DEFAULT_EMAIL_ATTRIBUTE})) %>
               <% end %>
             </div>
           <% end %>

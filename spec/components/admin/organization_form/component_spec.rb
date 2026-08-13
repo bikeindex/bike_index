@@ -27,6 +27,15 @@ RSpec.describe Admin::OrganizationForm::Component, type: :component do
     expect(component).not_to have_field("organization_previous_slug")
   end
 
+  it "renders every field through the UI::Forms components" do
+    expect(component).to have_css("#organization_name.twinput")
+    expect(component).to have_css("#organization_kind.twinput")
+    expect(component).to have_css("label.twlabel[for='organization_name']")
+    # UI::Forms::Checkbox wraps its input in the label, rather than a sibling label + for
+    expect(component).to have_css("label.twlabel #organization_approved")
+    expect(component).not_to have_css(".form-control")
+  end
+
   context "with passwordless_users enabled" do
     let(:organization) do
       FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "passwordless_users")
@@ -82,6 +91,9 @@ RSpec.describe Admin::OrganizationForm::Component, type: :component do
       expect(component).to have_select("organization_stolen_message_kind")
       expect(component).to have_css("[data-admin--organization-form-target='stolenMessageArea'].tw\\:hidden\\!")
       expect(component).to have_field("organization_stolen_message_search_radius_miles")
+      # A top-level param, so the label points at the bare name - not the
+      # organization-scoped id the form builder gave it before
+      expect(component).to have_css("label[for='organization_stolen_message_search_radius_miles']")
     end
 
     context "with an area message" do

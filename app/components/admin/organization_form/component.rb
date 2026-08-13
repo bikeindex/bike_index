@@ -40,6 +40,32 @@ module Admin
           ["Area: seen by bikes stolen in radius. Default for law enforcement, advocacy", "area"]]
       end
 
+      # A top-level param rather than an organization attribute
+      def stolen_message_radius_attribute
+        if organization_stolen_message.search_radius_metric_units?
+          :organization_stolen_message_search_radius_kilometers
+        else
+          :organization_stolen_message_search_radius_miles
+        end
+      end
+
+      def stolen_message_radius_value
+        if organization_stolen_message.search_radius_metric_units?
+          organization_stolen_message.search_radius_kilometers
+        else
+          organization_stolen_message.search_radius_miles
+        end
+      end
+
+      def manual_pos_kind_entries
+        [{value: "not_set", label: "not set"}] +
+          Organization.pos_kinds.map { |pos_kind| {value: pos_kind, label: pos_kind.humanize.gsub("pos", "").strip} }
+      end
+
+      def selected_manual_pos_kind
+        @organization.manual_pos_kind.presence || "not_set"
+      end
+
       def organization_stolen_message
         @organization_stolen_message ||= OrganizationStolenMessage.for(@organization)
       end
