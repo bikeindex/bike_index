@@ -36,15 +36,16 @@ class RegisterController < ApplicationController
     # The same filter every other action runs, so reusing the session's
     # registration can't quietly drop the organization the URL named
     assign_organization
-    session[:register_button_color] = HexColor.normalize(params[:button])
     redirect_to step_path(1)
   end
 
   # Step 1 framed on an organization's landing page. It renders rather than redirecting into
-  # a tokenized step, so the frame is one request and nothing past step 1 is embeddable
+  # a tokenized step, so the frame is one request and nothing past step 1 is embeddable -
+  # which is also what lets ?button= ride the frame's src rather than being held anywhere
   def embed
     @page_title = I18n.t("meta_titles.register_step_1")
-    render Register::Embed::Component.new(b_param: @b_param, steps: flow_steps, current_user:), layout: false
+    render Register::Embed::Component.new(b_param: @b_param, steps: flow_steps, current_user:,
+      button_color: params[:button]), layout: false
   end
 
   # The whole flow after the start: ?step=1, ?step=2, ?step=report for a theft or a
@@ -70,7 +71,7 @@ class RegisterController < ApplicationController
       render Register::Step2::Component.new(b_param: @b_param, steps:, current_user:)
     when "1"
       @page_title = I18n.t("meta_titles.register_step_1")
-      render Register::Step1::Component.new(b_param: @b_param, steps:, current_user:, button_color:)
+      render Register::Step1::Component.new(b_param: @b_param, steps:, current_user:)
     else
       @page_title = I18n.t("meta_titles.register_acknowledgment", cycle_type: @b_param.type)
       render Register::StepAcknowledgment::Component.new(b_param: @b_param, sequence: @registration_sequence, step:, steps:)
@@ -81,7 +82,7 @@ class RegisterController < ApplicationController
     saved = BikeServices::Register.save_step_1(@b_param, bike_params: create_params,
       propulsion_type_motorized: params[:propulsion_type_motorized])
     unless saved
-      return render(Register::Step1::Component.new(b_param: @b_param, steps: flow_steps, current_user:, button_color:),
+      return render(Register::Step1::Component.new(b_param: @b_param, steps: flow_steps, current_user:),
         status: :unprocessable_entity)
     end
 
@@ -212,15 +213,11 @@ class RegisterController < ApplicationController
     session[:register_b_param_token] = @b_param.id_token
   end
 
-  # Everything the start URL carries, so arriving on an organization's link
+  # Everything new seeds a registration from, so arriving on an organization's link
   # (or a stolen one) without a registration doesn't lose how they got there
   def start_params
-    params.permit(:organization_id, :status, :email, :button).to_h.compact_blank
+    params.permit(:organization_id, :status, :email).to_h.compact_blank
   end
-
-  # In the session, not on the registration - it's how this browser arrived,
-  # not what the bike gets made from
-  def button_color = session[:register_button_color]
 
   # ?status=stolen and ?stolen=true as well as the full status_stolen - a link to report
   # a theft takes the same shorthand everywhere else in the app does

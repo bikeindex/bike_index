@@ -21,6 +21,10 @@ RSpec.describe RegisterController, type: :request do
     response.parsed_body.at_css("#start-over-modal a")["href"]
   end
 
+  def submit_button_style
+    response.parsed_body.at_css("form button[type=submit]")["style"]
+  end
+
   describe "new" do
     it "creates an empty registration and redirects to its step 1" do
       expect { get "/register/new" }.to change(BParam, :count).by 1
@@ -268,6 +272,16 @@ RSpec.describe RegisterController, type: :request do
       # The session's still-blank registration, rather than one per view
       expect { get "/register/embed?organization_id=#{organization.slug}" }.to_not change(BParam, :count)
     end
+
+    # The landing page around the frame is the only thing with a color to match
+    it "colors the button with the frame's ?button=, which the flow's own pages ignore" do
+      get "/register/embed?organization_id=#{organization.slug}&button=c9a227"
+      expect(submit_button_style)
+        .to eq "background-color: #c9a227; border-color: #c9a227; --button-hover-color: hsla(46, 68%, 39%, 1)"
+
+      get register_path(b_param_token: BParam.last.id_token, step: 1, button: "c9a227")
+      expect(submit_button_style).to be_nil
+    end
   end
 
   describe "show step: 1" do
@@ -410,30 +424,6 @@ RSpec.describe RegisterController, type: :request do
   end
 
   # The same ?button= the embed form takes
-  describe "button color" do
-    let(:orange_style) do
-      "background-color: #ee7e2c; border-color: #ee7e2c; --button-hover-color: hsla(25, 85%, 47%, 1)"
-    end
-
-    def submit_button_style
-      response.parsed_body.at_css("form button[type=submit]")["style"]
-    end
-
-    it "colors step 1's button until a link that names no color" do
-      get "#{base_url}?button=ee7e2c"
-      follow_redirect! # into /register/new, which stores the color and creates the registration
-
-      # Held in the session, so a registration reached without the param has it too
-      get register_path(b_param_token: b_param.id_token, step: 1)
-      expect(submit_button_style).to eq orange_style
-      expect(start_over_href).to eq start_over_path(b_param, button: "#ee7e2c")
-
-      get "/register/new"
-      follow_redirect!
-      expect(submit_button_style).to be_nil
-    end
-  end
-
   describe "create" do
     let!(:empty_b_param) { BParam.create(origin: "register_flow") }
     let(:step_1_params) { {b_param: {manufacturer_id: "Trek", cycle_type: "cargo", owner_email:}} }

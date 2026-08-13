@@ -9,7 +9,7 @@ module Register
         @steps = steps
         @current_user = current_user
         @embed = embed
-        # Sanitized here as well as in the controller - this is where it reaches a style attribute
+        # Sanitized here, since this is where it reaches a style attribute
         @button_color = HexColor.normalize(button_color)
       end
 
@@ -61,12 +61,12 @@ module Register
       end
 
       # Names this registration rather than leaving it to the session, which another tab
-      # may have moved on. Discarding it shouldn't discard everything the link they
-      # arrived on carried. The raw status, since BParam#status answers
-      # status_with_owner for an unset one
+      # may have moved on. Discarding it shouldn't discard how they arrived - the
+      # organization it's attributed to, or the status they came to report. The raw
+      # status, since BParam#status answers status_with_owner for an unset one
       def start_over_path
         new_register_path({discard_token: @b_param.id_token, organization_id: organization&.slug,
-                           status: @b_param.bike["status"], button: @button_color}.compact)
+                           status: @b_param.bike["status"]}.compact)
       end
 
       # slug => the word the section label uses, for register--heading to swap in

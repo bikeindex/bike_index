@@ -20,14 +20,14 @@ module Register
         step_1(manufacturer_id: ::Manufacturer.frame_makers.first&.id, cycle_type: "e-scooter")
       end
 
-      # Arrived on a link that names its own button color, like the embed form's ?button=
-      def with_button_color
-        step_1(button_color: "#ee7e2c")
-      end
-
       # Framed on an organization's landing page
       def embedded
         step_1(embed: true, creation_organization_id: lookbook_organization&.id)
+      end
+
+      # The framed step 1 on a landing page whose ?button= names its own color
+      def embedded_with_button_color
+        step_1(embed: true, button_color: "#c9a227", creation_organization_id: lookbook_organization&.id)
       end
 
       private
