@@ -29,13 +29,32 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
 
     describe "edit" do
       context "landing_page" do
-        it "renders without creating a landing page" do
+        it "renders without creating a landing page, and without a version history link" do
           expect {
             get "#{base_url}/landing_page/edit"
           }.to_not change(OrganizationLandingPage, :count)
           expect(response.status).to eq(200)
           expect(response).to render_template(:edit)
           expect(response).to render_template("_landing_page")
+          expect(response.body).to_not match("search_item_type=OrganizationLandingPage")
+        end
+
+        context "with a landing page" do
+          include_context :with_paper_trail
+          let!(:landing_page) { FactoryBot.create(:organization_landing_page, organization:) }
+
+          it "links to the version history" do
+            get "#{base_url}/landing_page/edit"
+            expect(response.status).to eq(200)
+            history_path = admin_paper_trail_versions_path(search_item_type: "OrganizationLandingPage",
+              search_item_id: landing_page.id, period: "all")
+            expect(response.body).to include CGI.escapeHTML(history_path)
+
+            # The link lands on this landing page's versions, not an empty page
+            get history_path
+            expect(response.status).to eq(200)
+            expect(assigns(:collection).map(&:item_id)).to eq([landing_page.id])
+          end
         end
       end
       describe "mail_snippets" do
