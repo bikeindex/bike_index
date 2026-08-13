@@ -35,6 +35,16 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to_not redirect_to register_path(b_param_token: new_b_param.id_token, step: 1)
     end
 
+    it "permits iframing on our own domain only, through to the step it redirects to" do
+      get "/register/new"
+      expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
+      expect(response.headers["Content-Security-Policy"]).to include("frame-ancestors 'self'")
+      follow_redirect!
+      expect(response.status).to eq 200
+      expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
+      expect(response.headers["Content-Security-Policy"]).to include("frame-ancestors 'self'")
+    end
+
     context "status and organization params" do
       let(:organization) { FactoryBot.create(:organization) }
 
@@ -234,11 +244,33 @@ RSpec.describe RegisterController, type: :request do
     end
   end
 
+  describe "embed" do
+    let(:organization) { FactoryBot.create(:organization) }
+
+    it "renders step 1 for the frame, on a registration the submission carries out of it" do
+      expect { get "/register/embed?organization_id=#{organization.slug}" }.to change(BParam, :count).by 1
+      expect(response.status).to eq 200
+      expect(BParam.last.creation_organization_id).to eq organization.id
+
+      expect(response.body).to start_with("<!DOCTYPE html>")
+      expect(response.body).to_not include("primary-header-nav")
+      # The form's own styling, which nothing renders around it
+      expect(response.body).to match(/<link[^>]*stylesheet[^>]*tailwind/)
+      expect(response.body).to match(/<link[^>]*stylesheet[^>]*hotwire_combobox/)
+      expect(response.body).to match(/<form[^>]*target="_top"/)
+      expect(response.body).to match(/<form[^>]*data-turbo="false"/)
+      expect(response.body).to include('name="robots" content="noindex"')
+
+      # The session's still-blank registration, rather than one per view
+      expect { get "/register/embed?organization_id=#{organization.slug}" }.to_not change(BParam, :count)
+    end
+  end
+
   describe "show step: 1" do
     it "renders" do
       get register_path(b_param_token: b_param.id_token, step: 1)
       expect(response.status).to eq 200
-      expect(response.body).to include "Register your bike!"
+      expect(response.body).to include "Register your vehicle!"
       # Controller-rendered components still wrap in the application layout
       expect(response.body).to include "</html>"
       # Prefilled from the registration, so going back to step 1 keeps the values
@@ -300,9 +332,10 @@ RSpec.describe RegisterController, type: :request do
           params: {bike: {owner_email:, cycle_type: "cargo", creation_organization_id: organization.id}}.as_json)
       end
 
-      it "names the organization in the heading, with the cycle type js can swap" do
+      it "names the organization in the heading, and the cycle type only where js can swap it" do
         get register_path(b_param_token: b_param.id_token, step: 1)
-        expect(response.body).to include "Register your <span data-register--heading-target=\"cycleType\">cargo bike</span> with Brakebills!"
+        expect(response.body).to include "Register your vehicle with Brakebills!"
+        expect(response.body).to include '<span data-register--heading-target="cycleType">cargo bike</span> info'
         # Posted back, so a submission that has to build a registration keeps the org
         expect(Nokogiri::HTML(response.body).at_css("input[name='organization_id']")["value"])
           .to eq organization.id.to_s

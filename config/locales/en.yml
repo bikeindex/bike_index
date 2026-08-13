@@ -3882,11 +3882,11 @@ en:
     payments_new: Support Bike Index!
     register_acknowledgment: Safety check for your %{cycle_type}
     register_confirm: Confirming your email
-    register_create: Register your %{cycle_type}!
+    register_create: Register your vehicle!
     register_report: Tell us what happened
     register_review: Review your %{cycle_type} safety check
     register_show: Your %{cycle_type} registration
-    register_step_1: Register your %{cycle_type}!
+    register_step_1: Register your vehicle!
     register_step_2: Add your %{cycle_type}'s details
     registrations_embed: Register a bike with %{organization}
     search_marketplace_index: Bike Index Marketplace
