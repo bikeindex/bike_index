@@ -8,13 +8,15 @@ module Admin
 
       def edit
         @edit_template = edit_layout_pages.include?(params[:id]) ? params[:id] : edit_layout_pages.first
-        if @edit_template != "landing_page" # we're rendering a snippet
+        if @edit_template == "landing_page"
+          @landing_page = edited_record
+        else
           @mail_snippet = @organization.mail_snippets.where(kind: @edit_template).first_or_create
         end
       end
 
       def update
-        if @organization.update(permitted_parameters)
+        if edited_record.update(permitted_parameters)
           flash[:success] = "Layout Saved!"
           redirect_to edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id])
         else
@@ -26,9 +28,17 @@ module Admin
 
       protected
 
+      # Built rather than created, so opening the editor doesn't leave a blank page behind
+      def edited_record
+        return @organization unless layout_kind == "landing_page"
+
+        @landing_page ||= @organization.organization_landing_page || @organization.build_organization_landing_page
+      end
+
       def permitted_parameters
-        params.require(:organization)
-          .permit(:landing_html, mail_snippets_attributes: [:body, :is_enabled, :id])
+        return params.require(:organization_landing_page).permit(:body) if layout_kind == "landing_page"
+
+        params.require(:organization).permit(mail_snippets_attributes: [:body, :is_enabled, :id])
       end
 
       def edit_layout_pages

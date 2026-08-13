@@ -6,10 +6,11 @@ RSpec.describe "Organization landing page registration embed", :js, type: :syste
   let(:owner_email) { "owner@bikeindex.org" }
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
   # The slug LandingPages::ORGANIZATIONS routes by default, so /brakebills is the landing page
-  let!(:organization) { FactoryBot.create(:organization, name: "Brakebills", landing_html:) }
+  let!(:organization) { FactoryBot.create(:organization, name: "Brakebills") }
+  let!(:organization_landing_page) { FactoryBot.create(:organization_landing_page, organization:, body:) }
   # The column the seeded page frames it in, which is narrower than the combobox's
   # mobile breakpoint
-  let(:landing_html) do
+  let(:body) do
     <<~HTML
       <h1>Brakebills University Bicycle Registration</h1>
       <div class="container"><div class="row"><div class="col-md-5">

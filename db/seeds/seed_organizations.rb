@@ -86,7 +86,8 @@ if brakebills.avatar.blank?
 end
 
 brakebills_landing_template = File.read(Rails.root.join("db/seeds/brakebills_landing_page.html.erb"))
-brakebills.update!(landing_html: ERB.new(brakebills_landing_template).result(binding))
+OrganizationLandingPage.for(brakebills)
+  .update!(body: ERB.new(brakebills_landing_template).result(binding), enabled: true)
 
 # --- Ike's Bikes ---
 ikes = Organization.find_by_name("Ikes Bike's") || Organization.create(name: "Ikes Bike's", website: "", short_name: "Ikes", show_on_map: true)

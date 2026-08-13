@@ -23,6 +23,10 @@ class OrganizationLandingPage < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
+  def self.for(organization)
+    where(organization_id: organization.id).first_or_create
+  end
+
   private
 
   def set_calculated_attributes

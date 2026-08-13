@@ -29,8 +29,10 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
 
     describe "edit" do
       context "landing_page" do
-        it "renders" do
-          get "#{base_url}/landing_page/edit"
+        it "renders without creating a landing page" do
+          expect {
+            get "#{base_url}/landing_page/edit"
+          }.to_not change(OrganizationLandingPage, :count)
           expect(response.status).to eq(200)
           expect(response).to render_template(:edit)
           expect(response).to render_template("_landing_page")
@@ -56,13 +58,16 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
 
     describe "organization update" do
       context "landing_page" do
-        let(:update) { {landing_html: "<p>html for the landing page</p>"} }
+        let(:update) { {body: "<p>html for the landing page</p>"} }
         it "updates and redirects to the landing_page edit" do
-          put "#{base_url}/landing_page", params: {organization: update}
+          expect {
+            put "#{base_url}/landing_page", params: {organization_landing_page: update}
+          }.to change(OrganizationLandingPage, :count).by 1
           target = edit_admin_organization_custom_layout_path(organization_id: organization.to_param, id: "landing_page")
           expect(response).to redirect_to target
-          organization.reload
-          expect(organization.landing_html).to eq update[:landing_html]
+          expect(organization.reload.organization_landing_page.body).to eq update[:body]
+          # dropping landing_html is a follow-up
+          expect(organization.landing_html).to be_nil
         end
       end
       context "mail_snippet" do

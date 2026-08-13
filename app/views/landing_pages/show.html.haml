@@ -1,3 +1,4 @@
 .organization-landing-page-wrap
-  - cache(["org_landing_#{current_organization.to_param}", current_organization.updated_at]) do
-    = current_organization.landing_html && current_organization.landing_html.html_safe
+  - landing_page = current_organization.organization_landing_page
+  - cache(["org_landing", landing_page]) do
+    = landing_page&.body&.html_safe
