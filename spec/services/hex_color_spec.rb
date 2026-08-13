@@ -11,14 +11,12 @@ RSpec.describe HexColor do
       expect(HexColor.normalize("#ee7e2c")).to eq "#ee7e2c"
     end
 
-    context "not a hex color" do
-      it "is nil, so nothing else reaches the style attribute" do
-        expect(HexColor.normalize("@user + 1233")).to be_nil
-        expect(HexColor.normalize("red; background-image: url(x)")).to be_nil
-        expect(HexColor.normalize("ee7e2cff")).to be_nil
-        expect(HexColor.normalize(nil)).to be_nil
-        expect(HexColor.normalize(" ")).to be_nil
-      end
+    it "is nil for anything that isn't a hex color, so nothing else reaches the style attribute" do
+      expect(HexColor.normalize("@user + 1233")).to be_nil
+      expect(HexColor.normalize("red; background-image: url(x)")).to be_nil
+      expect(HexColor.normalize("ee7e2cff")).to be_nil
+      expect(HexColor.normalize(nil)).to be_nil
+      expect(HexColor.normalize(" ")).to be_nil
     end
   end
 end

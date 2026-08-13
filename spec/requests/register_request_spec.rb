@@ -17,6 +17,10 @@ RSpec.describe RegisterController, type: :request do
     new_register_path(discard_token: b_param.id_token, **params)
   end
 
+  def start_over_href
+    response.parsed_body.at_css("#start-over-modal a")["href"]
+  end
+
   describe "new" do
     it "creates an empty registration and redirects to its step 1" do
       expect { get "/register/new" }.to change(BParam, :count).by 1
@@ -307,8 +311,7 @@ RSpec.describe RegisterController, type: :request do
 
         it "carries the organization and status onto the start over link" do
           get register_path(b_param_token: b_param.id_token, step: 1)
-          start_over = Nokogiri::HTML(response.body).at_css("#start-over-modal a")["href"]
-          expect(start_over).to eq new_register_path(discard_token: b_param.id_token,
+          expect(start_over_href).to eq start_over_path(b_param,
             organization_id: organization.slug, status: "status_stolen")
         end
       end
@@ -364,7 +367,7 @@ RSpec.describe RegisterController, type: :request do
     end
   end
 
-  # The same ?button= the embed form takes, for a link that wants its own color
+  # The same ?button= the embed form takes
   describe "button color" do
     let(:orange_style) { "background-color: #ee7e2c; border-color: #ee7e2c" }
 
@@ -374,16 +377,12 @@ RSpec.describe RegisterController, type: :request do
 
     it "colors step 1's button until a link that names no color" do
       get "#{base_url}?button=ee7e2c"
-      follow_redirect! # into /register/new, which creates the registration
-      follow_redirect!
-      expect(submit_button_style).to eq orange_style
+      follow_redirect! # into /register/new, which stores the color and creates the registration
 
-      # Held in the session, so a registration reached without the param has it too -
-      # and start over carries it into the registration it begins
+      # Held in the session, so a registration reached without the param has it too
       get register_path(b_param_token: b_param.id_token, step: 1)
       expect(submit_button_style).to eq orange_style
-      expect(response.parsed_body.at_css("#start-over-modal a")["href"])
-        .to eq start_over_path(b_param, button: "#ee7e2c")
+      expect(start_over_href).to eq start_over_path(b_param, button: "#ee7e2c")
 
       get "/register/new"
       follow_redirect!

@@ -194,14 +194,14 @@ class RegisterController < ApplicationController
     register_path(b_param_token: @b_param.id_token, step:)
   end
 
-  # Everything new seeds a registration from, so arriving on an organization's link
+  # Everything the start URL carries, so arriving on an organization's link
   # (or a stolen one) without a registration doesn't lose how they got there
   def start_params
     params.permit(:organization_id, :status, :email, :button).to_h.compact_blank
   end
 
-  # In the session rather than on the registration the way the other start params are:
-  # it's how this browser arrived, not something the registration becomes a bike with
+  # In the session, not on the registration - it's how this browser arrived,
+  # not what the bike gets made from
   def button_color = session[:register_button_color]
 
   # ?status=stolen and ?stolen=true as well as the full status_stolen - a link to report
