@@ -1,0 +1,426 @@
+<%= render(UI::Alerts::ObjectError::Component.new(object: @organization)) %>
+
+<div class="row">
+  <div class="form-group col-md-6">
+    <%= @form_builder.label :name %>
+    <%= @form_builder.text_field :name, required: true, class: "form-control" %>
+  </div>
+
+  <div class="form-group col-md-6">
+    <% if @organization.restrict_invitations? %>
+      <%= @form_builder.label :available_invitation_count, "Available invitations" %>
+      <%= @form_builder.number_field :available_invitation_count, class: "form-control" %>
+      <p class="text-success">
+        Invitations sent: <%= @organization.sent_invitation_count %>
+      </p>
+    <% else %>
+      <div class="d-md-block d-none">
+        <label>&nbsp;</label>
+
+        <div class="text-form-control">
+          permitted domain with passwordless sign in, no invite restrictions
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="form-group">
+      <%= @form_builder.label :short_name do %>
+        Short name (30 letters or less)
+        <% if @organization.block_short_name_edit? %>
+          <small class="em text-danger">warning - will change org URLs (landing pages, embeds)</small>
+        <% end %>
+      <% end %>
+
+      <%= @form_builder.text_field :short_name, class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="form-group">
+      <%= @form_builder.label :ascend_name, data: {"admin--organization-form-target": "ambassadorLabel"} %>
+      <%= @form_builder.text_field :ascend_name, class: "form-control", data: {"admin--organization-form-target": "ambassadorField"} %>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="form-group">
+      <%= @form_builder.label :website, data: {"admin--organization-form-target": "ambassadorLabel"} %>
+      <%= @form_builder.text_field :website, class: "form-control", data: {"admin--organization-form-target": "ambassadorField"} %>
+    </div>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <fieldset disabled>
+      <div class="form-group">
+        <%= @form_builder.label :slug, "Slug:" %>
+
+        <p class="less-strong">
+          <%= @organization.slug %>
+        </p>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <%= tag.div(class: "form-group", disabled: !helpers.display_dev_info?) do %>
+      <%= @form_builder.label :previous_slug do %>
+        Previous Slug <em class="small text-warning">Rarely unnecessary</em>
+      <% end %>
+
+      <% if helpers.display_dev_info? %>
+        <%= @form_builder.text_field :previous_slug, class: "form-control only-dev-visible" %>
+      <% else %>
+        <p class="less-strong">
+          <%= @organization.previous_slug %>
+        </p>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="form-group">
+      <%= @form_builder.label :kind, "Organization Type" %>
+      <%= @form_builder.select :kind, options_for_select(kind_options, selected: @organization.kind), {}, class: "form-control", data: {"admin--organization-form-target": "kind", action: "change->admin--organization-form#toggleAmbassadorFields"} %>
+
+      <% if @organization.bike_shop? %>
+        <div class="form-group mt-2">
+          <%= @form_builder.check_box :lightspeed_register_with_phone %>
+
+          <%= @form_builder.label :lightspeed_register_with_phone do %>
+            Lightspeed POS registrations include phone
+            <small class="less-strong">originally for Edmonton</small>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="form-group mt-4">
+      <%= @form_builder.check_box :show_on_map, data: {"admin--organization-form-target": "ambassadorField"} %>
+      <%= @form_builder.label :show_on_map, data: {"admin--organization-form-target": "ambassadorLabel"} %>
+    </div>
+
+    <div class="form-group">
+      <%= @form_builder.check_box :lock_show_on_map, data: {"admin--organization-form-target": "ambassadorField"} %>
+
+      <%= @form_builder.label :lock_show_on_map, data: {"admin--organization-form-target": "ambassadorLabel"} do %>
+        Lock shown on map
+        <small class="less-strong"> restrict org from updating show on map above (e.g. they're known bad actors) </small>
+      <% end %>
+    </div>
+
+    <div class="form-group">
+      <%= @form_builder.check_box :spam_registrations %>
+
+      <%= @form_builder.label :spam_registrations do %>
+        High spam registrations
+        <small class="less-strong">don't email suspicious registrations</small>
+      <% end %>
+    </div>
+
+    <div class="form-group">
+      <%= @form_builder.check_box :api_access_approved, data: {"admin--organization-form-target": "ambassadorField"} %>
+
+      <%= @form_builder.label :api_access_approved, data: {"admin--organization-form-target": "ambassadorLabel"} do %>
+        API V1 access approved
+        <small class="less-strong"> to be able to post updates via legacy API (rarely necessary) </small>
+      <% end %>
+    </div>
+
+    <div class="form-group">
+      <%= @form_builder.check_box :approved, data: {"admin--organization-form-target": "ambassadorField"} %>
+      <%= @form_builder.label :approved, "Validated & approved", data: {"admin--organization-form-target": "ambassadorLabel"} %>
+    </div>
+
+    <div class="form-group">
+      <%= @form_builder.check_box :direct_unclaimed_notifications %>
+
+      <%= @form_builder.label :direct_unclaimed_notifications do %>
+        Send emails directly to unclaimed bike owners
+        <small class="less-strong">don't require org to forward</small>
+      <% end %>
+    </div>
+
+    <% parent_org_label = capture do %>
+      Parent organization
+      <small class="less-strong"><strong class="text-danger">(probably) do not add parents!</strong> Parents must be part of the same organization</small>
+    <% end %>
+
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :parent_organization_id, label_text: parent_org_label, wrapper_class: "form-group")) do %>
+      <%= render UI::Forms::Combobox::Component.new(name: :parent_organization_id, form: @form_builder, placeholder: "Choose organization", include_blank: true, options: parent_organization_options, data: {"admin--organization-form-target": "ambassadorField"}) %>
+
+      <small>
+        <strong>Use the "regional" feature instead.</strong>
+        <em>To add regional organizations rather than child/parent relationships, enable it through a paid invoice for the organization. All organizations with a location in the same area will automatically be associated.</em>
+      </small>
+    <% end %>
+  </div>
+
+  <div class="col-md-6">
+    <% if helpers.display_dev_info? %>
+      <div class="mt-4 only-dev-visible mb-4">
+        <label class="less-strong d-block">
+          Manually set POS kind
+          <span class="text-danger">Warning - you can break things here!</span>
+        </label>
+
+        <div class="form-check form-check-inline">
+          <%= @form_builder.radio_button "manual_pos_kind", "not_set", class: "form-check-input" %>
+
+          <strong>
+            <%= @form_builder.label "manual_pos_kind_not_set", "not set", class: "form-check-label" %>
+          </strong>
+        </div>
+
+        <% Organization.pos_kinds.each do |pos_kind| %>
+          <div class="form-check form-check-inline small">
+            <%= @form_builder.radio_button "manual_pos_kind", pos_kind, class: "form-check-input" %>
+            <%= @form_builder.label "manual_pos_kind_#{pos_kind}", pos_kind.humanize.gsub("pos", "").strip, class: "form-check-label" %>
+          </div>
+        <% end %>
+
+        <div class="mb-4"></div>
+      </div>
+    <% end %>
+
+    <% if @organization.id.present? %>
+      <% embedable_label = capture do %>
+        Auto user email
+        <small class="less-strong">embed registration email</small>
+      <% end %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :embedable_user_email, label_text: embedable_label, wrapper_class: "form-group")) do %>
+        <%= render UI::Forms::Combobox::Component.new(name: :embedable_user_email, form: @form_builder, placeholder: "Select email", value: @embedable_email, include_blank: true, options: auto_user_emails) %>
+
+        <small class="less-strong">
+          <% if @organization.organization_roles.count == 0 %>
+            You can use <%= ENV["AUTO_ORG_MEMBER"] %> if there are no members of
+            the organization
+          <% end %>
+        </small>
+      <% end %>
+    <% end %>
+
+    <% if @organization.bike_shop? %>
+      <div class="form-group">
+        <%= @form_builder.check_box :opted_into_theft_survey_2023 %>
+
+        <%= @form_builder.label :opted_into_theft_survey_2023 do %>
+          Opted into theft survey 2023
+          <small class="less-strong"> if checked, we will start email their customers theft surveys </small>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if @organization.official_manufacturer? %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :manufacturer_id, label_text: Organization.human_attribute_name(:manufacturer), required: true, wrapper_class: "form-group")) do %>
+        <%= render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, no_manufacturer_other: true, form: @form_builder, required: true) %>
+
+        <small>
+          <strong>This organization has <code>Official manufacturer organization</code> enabled.</strong>
+          Select a manufacturer to give them manufacturer access.
+        </small>
+      <% end %>
+    <% end %>
+
+    <% if @organization.any_enabled?(OrganizationFeature.with_admin_organization_attributes) %>
+      <div class="card">
+        <div class="card-body">
+          <h4 class="mb-4">Settings for organization features</h4>
+
+          <% if @organization.enabled?("graduated_notifications") %>
+            <div class="form-group">
+              <%= @form_builder.label :graduated_notification_interval_days do %>
+                Interval for send graduated notifications, in days
+                <small><span class="text-success">graduated_notifications setting</span></small>
+              <% end %>
+
+              <%= @form_builder.number_field :graduated_notification_interval_days, {class: "form-control"} %>
+
+              <div class="text-warning p-1">
+                <em class="small">
+                  Unless this is set, the organization will not send graduated
+                  notifications - even if they have the feature enabled
+                </em>
+              </div>
+            </div>
+          <% end %>
+
+          <% if @organization.enabled?("regional_bike_counts") %>
+            <div class="form-group">
+              <% if @organization.search_radius_metric_units? %>
+                <%= @form_builder.label :search_radius_kilometers do %>
+                  Search radius (km)
+                  <small><span class="text-success">regional bike counts setting</span>, controls how large the region is to associate regional sub-organizations</small>
+                <% end %>
+                <%= @form_builder.number_field :search_radius_kilometers, {class: "form-control"} %>
+              <% else %>
+                <%= @form_builder.label :search_radius_miles do %>
+                  Search radius (mi)
+                  <small><span class="text-success">regional bike counts setting</span>, controls how large the region is to associate regional sub-organizations</small>
+                <% end %>
+                <%= @form_builder.number_field :search_radius_miles, {class: "form-control"} %>
+              <% end %>
+
+              <div class="text-warning p-1">
+                <em class="small">
+                  <code class="d-inline">nearby_organizations</code> will search
+                  within this radius for other organizations in the same area
+                </em>
+              </div>
+            </div>
+          <% end %>
+
+          <% if domain_uses.any? %>
+            <div class="form-group">
+              <%= @form_builder.label :user_email_domain do %>
+                <span></span>
+                permitted domain for <%= domain_uses.to_sentence %>
+                <small><% domain_uses.each do |domain_use| %><span class="text-success"><%= domain_use %> feature</span><% end %></small>
+              <% end %>
+
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">@</div>
+                </div>
+
+                <%= @form_builder.text_field :user_email_domain, placeholder: "something.gov", class: "form-control", disabled: !@current_user.developer? %>
+              </div>
+
+              <% unless @current_user.developer? %>
+                <span class="small less-strong">Ask Seth for help changing this, it's delicate</span>
+              <% end %>
+            </div>
+          <% end %>
+
+          <% OrganizationFeature.reg_fields_with_customizable_labels.each do |reg_field| %>
+            <%# Separate handling for owner_email %>
+            <% if reg_field == "owner_email" && @organization.paid? %>
+              <div class="form-group small">
+                <%= label_tag "reg_label-#{reg_field}" do %>
+                  Custom Label for <em>Owner Email</em> (e.g. "uiowa.edu
+                  email")
+                  <small class="less-strong">often desired by universities</small>
+                <% end %>
+
+                <%= text_field_tag "reg_label-#{reg_field}", helpers.registration_field_label(@organization, reg_field), {class: "form-control"} %>
+              </div>
+            <% elsif @organization.enabled?(reg_field) %>
+              <% reg_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field) %>
+              <div class="form-group small">
+                <%= label_tag "reg_label-#{reg_field}" do %>
+                  Custom Label for
+                  <em><%= reg_attr.titleize(keep_id_suffix: true) %></em>
+                  <small class="less-strong">leave blank unless it's <strong>absolutely</strong> required - default behavior is preferred</small>
+                <% end %>
+
+                <%= text_field_tag "reg_label-#{reg_field}", helpers.registration_field_label(@organization, reg_field), {class: "form-control"} %>
+              </div>
+            <% end %>
+          <% end %>
+
+          <% if @organization.enabled?("organization_stolen_message") %>
+            <div class="form-group mt-4">
+              <%= label_tag :organization_stolen_message_kind do %>
+                Stolen Message type
+                <small><span class="text-success">Organization Stolen Message setting</span>, edit message in the <%= link_to "orgs own edit page", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param) %></small>
+              <% end %>
+
+              <%= select_tag :organization_stolen_message_kind, options_for_select(stolen_message_kind_options, selected: organization_stolen_message.kind), {class: "form-control", data: {"admin--organization-form-target": "stolenMessageKind", action: "change->admin--organization-form#toggleStolenMessageArea"}} %>
+
+              <div
+                class="form-group mt-2 <%= "tw:hidden!" if organization_stolen_message.kind != "area" %>"
+                data-admin--organization-form-target="stolenMessageArea"
+              >
+                <% if organization_stolen_message.search_radius_metric_units? %>
+                  <%= @form_builder.label :organization_stolen_message_search_radius_kilometers do %>
+                    Stolen Message radius (km)
+                    <small><span class="text-success">Organization Stolen Message setting</span> - only available for area type <span class="less-strong">max <%= OrganizationStolenMessage.max_search_radius_kilometers %> km</span></small>
+                  <% end %>
+                  <%= number_field_tag :organization_stolen_message_search_radius_kilometers, organization_stolen_message.search_radius_kilometers, {class: "form-control"} %>
+                <% else %>
+                  <%= label_tag :organization_stolen_message_search_radius_miles do %>
+                    Stolen Message radius (mi)
+                    <small><span class="text-success">Organization Stolen Message setting</span> - only available for area type <span class="less-strong">max <%= OrganizationStolenMessage::MAX_SEARCH_RADIUS %> miles</span></small>
+                  <% end %>
+                  <%= number_field_tag :organization_stolen_message_search_radius_miles, organization_stolen_message.search_radius_miles, {class: "form-control"} %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
+          <% if @organization.enabled?("saml_sso") %>
+            <div class="form-group mt-4">
+              <h4>SAML SSO</h4>
+
+              <p class="text-success">
+                Service Provider details for the organization's IdP admin — or
+                just share the metadata URL, which contains all of them.
+              </p>
+
+              <ul>
+                <li>
+                  Metadata URL:
+                  <%= link_to saml_metadata_url(org_slug: @organization.to_param), saml_metadata_url(org_slug: @organization.to_param) %>
+                </li>
+
+                <li>
+                  SP entityID:
+                  <code><%= Saml::SettingsBuilder.sp_entity_id(saml_configuration) %></code>
+                </li>
+
+                <li>
+                  ACS (callback) URL:
+                  <code><%= Saml::SettingsBuilder.assertion_consumer_service_url(saml_configuration) %></code>
+                </li>
+              </ul>
+
+              <%= @form_builder.fields_for :organization_saml_configuration, saml_configuration do |saml_f| %>
+                <div class="form-check mt-2">
+                  <%= saml_f.check_box :enabled, class: "form-check-input" %>
+                  <%= saml_f.label :enabled, "Enable live SAML login for this organization", class: "form-check-label" %>
+                </div>
+
+                <div class="form-group mt-2">
+                  <%= saml_f.label :idp_entity_id, "IdP entityID" %>
+                  <%= saml_f.text_field :idp_entity_id, class: "form-control" %>
+                </div>
+
+                <div class="form-group mt-2">
+                  <%= saml_f.label :idp_sso_target_url, "IdP SSO target URL" %>
+                  <%= saml_f.text_field :idp_sso_target_url, class: "form-control" %>
+                </div>
+
+                <div class="form-group mt-2">
+                  <%= saml_f.label :idp_slo_target_url, "IdP SLO target URL (optional)" %>
+                  <%= saml_f.text_field :idp_slo_target_url, class: "form-control" %>
+                </div>
+
+                <div class="form-group mt-2">
+                  <%= saml_f.label :idp_cert, "IdP certificate (PEM or base64)" %>
+                  <%= saml_f.text_area :idp_cert, class: "form-control", rows: 4 %>
+                </div>
+
+                <div class="form-group mt-2">
+                  <%= saml_f.label :idp_cert_fingerprint, "IdP certificate fingerprint (optional)" %>
+                  <%= saml_f.text_field :idp_cert_fingerprint, class: "form-control" %>
+                </div>
+
+                <div class="form-group mt-2">
+                  <%= saml_f.label :email_attribute_name, "Email attribute name (optional)" %>
+                  <%= saml_f.text_field :email_attribute_name, class: "form-control", placeholder: OrganizationSamlConfiguration::DEFAULT_EMAIL_ATTRIBUTE %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
