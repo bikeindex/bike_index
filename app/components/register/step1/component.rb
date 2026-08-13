@@ -9,7 +9,7 @@ module Register
         @steps = steps
         @current_user = current_user
         @embed = embed
-        # Sanitized here, since this is where it reaches a style attribute
+        # The boundary: what the controller passes through is still a raw param
         @button_color = HexColor.normalize(button_color)
       end
 
@@ -24,19 +24,16 @@ module Register
         {data: {turbo: true, controller: "autofocus register--retry"}}
       end
 
-      # The hover shade rides a variable because Tailwind only generates classes it can
-      # read literally, and is !important because the inline color outranks a class
-      def button_style
-        return unless @button_color
+      # The shade rides a variable because Tailwind only generates classes it can read
+      # literally, and is !important because the inline color outranks a class. Guarded
+      # like every UI::Button hover, which an !important would otherwise outrank too
+      def button_options
+        return {html_class: "tw:w-full"} unless @button_color
 
-        "background-color: #{@button_color}; border-color: #{@button_color}; " \
-          "--button-hover-color: #{HexColor.darken(@button_color)}"
-      end
-
-      def button_class
-        return "tw:w-full" if @button_color.blank?
-
-        "tw:w-full tw:hover:bg-[var(--button-hover-color)]! tw:hover:border-[var(--button-hover-color)]!"
+        {html_class: "tw:w-full tw:not-disabled:not-aria-disabled:hover:bg-[var(--button-hover-color)]! " \
+          "tw:not-disabled:not-aria-disabled:hover:border-[var(--button-hover-color)]!",
+         style: "background-color: #{@button_color}; border-color: #{@button_color}; " \
+           "--button-hover-color: #{HexColor.darken(@button_color)}"}
       end
 
       def cycle_type

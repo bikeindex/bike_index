@@ -34,7 +34,7 @@ RSpec.describe "Organization landing page registration embed", :js, type: :syste
       # The page around the frame names the organization, so the heading doesn't
       expect(page).to have_content("Register your vehicle!")
       expect(page).to have_no_css("nav.primary-header-nav")
-      # The color the frame's src names, matching the page it's framed on
+      # Matches the page it's framed on
       expect(page).to have_css("button[type=submit][style*='#c9a227']")
 
       type_into("#b_param_manufacturer_id", "Surly")

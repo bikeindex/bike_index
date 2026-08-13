@@ -34,8 +34,7 @@ class RegisterController < ApplicationController
   end
 
   # Step 1 framed on an organization's landing page. It renders rather than redirecting into
-  # a tokenized step, so the frame is one request and nothing past step 1 is embeddable -
-  # which is also what lets ?button= ride the frame's src rather than being held anywhere
+  # a tokenized step, so the frame is one request and nothing past step 1 is embeddable
   def embed
     @page_title = I18n.t("meta_titles.register_step_1")
     render Register::Embed::Component.new(b_param: @b_param, steps: flow_steps, current_user:,

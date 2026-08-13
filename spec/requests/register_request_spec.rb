@@ -17,12 +17,8 @@ RSpec.describe RegisterController, type: :request do
     new_register_path(discard_token: b_param.id_token, **params)
   end
 
-  def start_over_href
-    response.parsed_body.at_css("#start-over-modal a")["href"]
-  end
-
   def submit_button_style
-    response.parsed_body.at_css("form button[type=submit]")["style"]
+    Nokogiri::HTML(response.body).at_css("form button[type=submit]")["style"]
   end
 
   describe "new" do
@@ -357,7 +353,8 @@ RSpec.describe RegisterController, type: :request do
 
         it "carries the organization and status onto the start over link" do
           get register_path(b_param_token: b_param.id_token, step: 1)
-          expect(start_over_href).to eq start_over_path(b_param,
+          start_over = Nokogiri::HTML(response.body).at_css("#start-over-modal a")["href"]
+          expect(start_over).to eq start_over_path(b_param,
             organization_id: organization.slug, status: "status_stolen")
         end
       end
@@ -413,7 +410,6 @@ RSpec.describe RegisterController, type: :request do
     end
   end
 
-  # The same ?button= the embed form takes
   describe "create" do
     let!(:empty_b_param) { BParam.create(origin: "register_flow") }
     let(:step_1_params) { {b_param: {manufacturer_id: "Trek", cycle_type: "cargo", owner_email:}} }
