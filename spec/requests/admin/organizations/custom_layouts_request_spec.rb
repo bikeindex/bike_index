@@ -30,12 +30,10 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
     describe "edit" do
       context "landing_page" do
         it "renders" do
-          expect(organization.organization_landing_page).to be_blank
           get "#{base_url}/landing_page/edit"
           expect(response.status).to eq(200)
           expect(response).to render_template(:edit)
           expect(response).to render_template("_landing_page")
-          expect(organization.reload.organization_landing_page).to be_present
         end
       end
       describe "mail_snippets" do
@@ -58,18 +56,13 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
 
     describe "organization update" do
       context "landing_page" do
-        let!(:landing_page) { OrganizationLandingPage.for(organization) }
-        let(:update) do
-          {organization_landing_page_attributes: {id: landing_page.id, body: "<p>html for the landing page</p>"}}
-        end
+        let(:update) { {landing_html: "<p>html for the landing page</p>"} }
         it "updates and redirects to the landing_page edit" do
-          expect {
-            put "#{base_url}/landing_page", params: {organization: update}
-          }.to change(OrganizationLandingPage, :count).by 0
+          put "#{base_url}/landing_page", params: {organization: update}
           target = edit_admin_organization_custom_layout_path(organization_id: organization.to_param, id: "landing_page")
           expect(response).to redirect_to target
-          expect(landing_page.reload.body).to eq "<p>html for the landing page</p>"
-          expect(organization.reload.landing_page_body).to eq "<p>html for the landing page</p>"
+          organization.reload
+          expect(organization.landing_html).to eq update[:landing_html]
         end
       end
       context "mail_snippet" do

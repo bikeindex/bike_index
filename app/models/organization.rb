@@ -131,7 +131,6 @@ class Organization < ApplicationRecord
   has_many :organization_model_audits
   accepts_nested_attributes_for :mail_snippets
   accepts_nested_attributes_for :organization_stolen_message
-  accepts_nested_attributes_for :organization_landing_page
   accepts_nested_attributes_for :organization_saml_configuration
   accepts_nested_attributes_for :locations, allow_destroy: true
 
@@ -298,12 +297,8 @@ class Organization < ApplicationRecord
     slug
   end
 
-  def landing_page_body
-    organization_landing_page&.body
-  end
-
-  def landing_page_body?
-    landing_page_body.present?
+  def landing_html?
+    landing_html.present?
   end
 
   def restrict_invitations?
