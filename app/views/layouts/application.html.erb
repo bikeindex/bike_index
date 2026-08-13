@@ -266,15 +266,17 @@
       </nav>
     <% end %>
 
-    <%# organized_skeleton renders its own, inside the content column the menu doesn't cover %>
-    <% general_alert = PageBlock::UserAlerts::Wrapper::Component.new(current_user:) if
-      show_general_alert && !render_donation_request? && current_page_skeleton != "organized_skeleton" %>
-
     <% if render_donation_request? %>
       <%= render PageBlock::LawEnforcementDonation::Component.new(current_user:) %>
     <% end %>
 
-    <%= render general_alert if general_alert %>
+    <%# organized_skeleton renders its own, inside the content column the menu doesn't cover %>
+    <% general_alert = PageBlock::UserAlerts::Wrapper::Component.new(current_user:) %>
+
+    <% show_general_alert_here = show_general_alert && general_alert.render? &&
+      current_page_skeleton != "organized_skeleton" %>
+
+    <%= render general_alert if show_general_alert_here %>
 
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
     <%= render partial: "/layouts/revised_messages" %>
@@ -290,7 +292,7 @@
 
       <main
         id="main-content"
-        class="<%= "tw:[--nav-gap:0px]" if general_alert&.render? %>"
+        class="<%= "tw:[--nav-gap:0px]" if show_general_alert_here %>"
       >
         <% if current_page_skeleton.present? %>
           <%= render partial: "/shared/#{current_page_skeleton}" %>

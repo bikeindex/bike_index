@@ -13,10 +13,9 @@ FactoryBot.define do
     # What BParam#unfinished_registration? requires: step 1 submitted (manufacturer_id),
     # registered to an address of the creator's rather than for someone else
     factory :b_param_unfinished_registration do
-      transient { cycle_type { "cargo" } }
       origin { "register_flow" }
       owner_email { creator.email }
-      params { {bike: {manufacturer_id: 1, cycle_type: cycle_type, owner_email: owner_email}} }
+      params { {bike: {manufacturer_id: 1, cycle_type: "cargo", owner_email: owner_email}} }
     end
 
     factory :organized do

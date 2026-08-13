@@ -152,16 +152,18 @@ module ControllerHelpers
     end
   end
 
-  # Deletes, so the donation modal only ever shows once. Memoized because the layout and
-  # organized_skeleton both ask - it's what the general alert gives way to
+  # Deletes, so the donation modal only ever shows once - memoized because
+  # show_general_alert asks too, being what it gives way to
   def render_donation_request?
-    return @render_donation_request unless defined?(@render_donation_request)
+    return @render_donation_request if defined?(@render_donation_request)
 
     @render_donation_request = session.delete(:render_donation_request).present?
   end
 
   def show_general_alert
     return @show_general_alert = false if @skip_general_alert || current_user.blank?
+
+    return @show_general_alert = false if render_donation_request?
 
     return @show_general_alert = false unless (current_user.alert_slugs - UserAlert.disabled_kinds).any?
 

@@ -271,13 +271,11 @@
 
 body {
   @apply tw:base-font;
-}
 
-/* .primary-header-nav's margin-bottom, which the full-bleed pages pull up by to sit
-   flush under the navbar. Defined here rather than beside the nav in revised.scss, which
-   the admin and component-preview layouts don't load; the layout zeroes it on <main>
-   when the general alert stands in the gap instead */
-body {
+  /* .primary-header-nav's margin-bottom, which the full-bleed pages pull up by to sit
+     flush under the navbar. Defined here rather than beside the nav in revised.scss,
+     which the admin and component-preview layouts don't load; the layout zeroes it on
+     <main> when the general alert stands in the gap instead */
   --nav-gap: 36px;
 }
 @media (min-width: 992px) {

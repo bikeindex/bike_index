@@ -6,25 +6,27 @@ module PageBlock
       # The general alert shown below the navbar on every page. Only ever one: the first
       # kind the user has wins, even when it turns out to have nothing to show
       class Component < ApplicationComponent
-        # container: false where the page already provides one - organized_skeleton
-        # renders this inside its content column, since the menu covers the usual spot
-        def initialize(current_user:, container: true)
+        # container lines it up with the navbar above; z-20 because the homepage and
+        # landing page bike tile grids are positioned, so they'd otherwise paint over
+        # this in-flow banner. Blank where the page already places it - organized_skeleton
+        # renders this inside its content column, which the menu doesn't cover
+        def initialize(current_user:, wrapper_class: "container tw:relative tw:z-20")
           @current_user = current_user
-          @container = container
+          @wrapper_class = wrapper_class
         end
 
-        # The kind's own component has the final say, so the layout can ask whether an
-        # alert is really going to show before it makes room for one
+        # Memoized, and deferring to the kind's own component, so the layout can ask
+        # whether an alert is really going to show before it makes room for one
         def render?
-          @current_user.present? && alert_component&.render?
+          return @render if defined?(@render)
+
+          @render = @current_user.present? && alert_component&.render?
         end
 
-        # z-20 because the homepage and landing page bike tile grids are positioned,
-        # so they'd otherwise paint over this in-flow banner
         def call
-          return render(alert_component) unless @container
+          return render(alert_component) if @wrapper_class.blank?
 
-          tag.div(render(alert_component), class: "container tw:relative tw:z-20")
+          tag.div(render(alert_component), class: @wrapper_class)
         end
 
         private
