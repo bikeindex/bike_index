@@ -256,9 +256,10 @@ class Bike < ApplicationRecord
         Ownership.where("ownerships.owner_email ILIKE ?", matching).select(:bike_id),
         Ownership.where(creator_id: User.where("users.email ILIKE ?", matching).select(:id)).select(:bike_id),
         unscoped.where("bikes.owner_email ILIKE ?", matching).select(:id)
-      ].map { |relation| relation.reorder(nil).to_sql }
+      ].map { |relation| relation.reorder(nil).arel.ast }
+        .reduce { |left, right| Arel::Nodes::UnionAll.new(left, right) }
 
-      where("bikes.id IN (#{matching_ids.join(" UNION ALL ")})")
+      where(Arel::Nodes::In.new(arel_table[:id], matching_ids))
     end
 
     def search_phone(str)
