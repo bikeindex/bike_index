@@ -35,12 +35,15 @@ module Register
         tag.span(cycle_type, data: {"register--heading-target": "cycleType"})
       end
 
-      # A university wants the campus address, not any address the rider has. The label a
-      # paid organization sets in admin wins; failing that a school's name stands in for
-      # the example, which is what the legacy embed form does with the same setting
-      def email_placeholder
+      # owner_email is the setting bikes/new labels its email field with
+      def email_label
         helpers.registration_field_label(organization, "owner_email", strip_tags: true) ||
-          (translation(".email_placeholder_school", org_name: organization.short_name) if organization&.school?) ||
+          (translation(".email_school", org_name: organization.short_name) if organization&.school?) ||
+          translation(".email")
+      end
+
+      def email_placeholder
+        helpers.registration_field_label(organization, "email_placeholder", strip_tags: true) ||
           translation(".email_placeholder")
       end
 
