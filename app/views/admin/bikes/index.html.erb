@@ -234,7 +234,7 @@
             <% if @search_domain.present? %>
               <%= text_field_tag :search_domain, @search_domain, placeholder: "Search bikes by domain", class: "form-control" %>
             <% else %>
-              <%= text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by full email", class: "form-control" %>
+              <%= text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by email", class: "form-control" %>
             <% end %>
           </div>
 

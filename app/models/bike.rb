@@ -251,11 +251,11 @@ class Bike < ApplicationRecord
     def matching_email(query)
       return all if query.blank?
 
-      email = EmailNormalizer.normalize(query)
+      matching = "%#{EmailNormalizer.normalize(query)}%"
       matching_ids = [
-        Ownership.where(owner_email: email).select(:bike_id),
-        Ownership.where(creator_id: User.where(email:).select(:id)).select(:bike_id),
-        unscoped.where(owner_email: email).select(:id)
+        Ownership.where("ownerships.owner_email ILIKE ?", matching).select(:bike_id),
+        Ownership.where(creator_id: User.where("users.email ILIKE ?", matching).select(:id)).select(:bike_id),
+        unscoped.where("bikes.owner_email ILIKE ?", matching).select(:id)
       ].map { |relation| relation.reorder(nil).to_sql }
 
       where("bikes.id IN (#{matching_ids.join(" UNION ALL ")})")

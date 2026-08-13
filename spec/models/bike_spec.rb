@@ -157,10 +157,11 @@ RSpec.describe Bike, type: :model do
       let(:creator) { FactoryBot.create(:user_confirmed, email: "shop@bikeindex.org") }
       let!(:bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "Robin.Jay.Parker@example.com", creator:) }
       let!(:transferred_bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "someone@example.com") }
-      it "matches the whole email, ignoring case and surrounding whitespace" do
+      it "matches any part of the email, ignoring case and surrounding whitespace" do
         expect(Bike.unscoped.matching_email("robin.jay.parker@example.com").pluck(:id)).to eq([bike.id])
         expect(Bike.unscoped.matching_email(" Robin.Jay.Parker@EXAMPLE.com ").pluck(:id)).to eq([bike.id])
-        expect(Bike.unscoped.matching_email("robin.jay.parker").pluck(:id)).to eq([])
+        expect(Bike.unscoped.matching_email("robin.jay").pluck(:id)).to eq([bike.id])
+        expect(Bike.unscoped.matching_email("parker").pluck(:id)).to eq([bike.id])
         expect(Bike.unscoped.matching_email("").pluck(:id)).to match_array(Bike.unscoped.pluck(:id))
       end
       context "with a prior ownership" do

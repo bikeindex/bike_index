@@ -7208,10 +7208,10 @@ CREATE INDEX index_ownerships_on_organization_id ON public.ownerships USING btre
 
 
 --
--- Name: index_ownerships_on_owner_email; Type: INDEX; Schema: public; Owner: -
+-- Name: index_ownerships_on_owner_email_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_ownerships_on_owner_email ON public.ownerships USING btree (owner_email);
+CREATE INDEX index_ownerships_on_owner_email_trgm ON public.ownerships USING gin (owner_email public.gin_trgm_ops);
 
 
 --
