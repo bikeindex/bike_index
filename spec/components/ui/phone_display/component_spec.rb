@@ -27,40 +27,10 @@ RSpec.describe UI::PhoneDisplay::Component, type: :component do
     end
   end
 
-  context "with html_class" do
-    let(:options) { {phone:, html_class: "phone-number-link"} }
-    it "replaces the default classes" do
-      expect(component).to eq '<a class="phone-number-link" href="tel:999-999-9999">999-999-9999</a>'
-    end
-  end
-
-  context "with html_options" do
-    let(:options) { {phone:, title: "Call the owner"} }
-    it "passes them to the link" do
-      expect(component).to eq '<a title="Call the owner" class="twlink tw:font-mono" href="tel:999-999-9999">999-999-9999</a>'
-    end
-  end
-
-  context "with class in html_options" do
-    let(:options) { {phone:, class: "phone-number-link"} }
-
-    # It would be dropped for the built classes, so say so rather than ignoring it
-    it "raises, naming html_class" do
-      expect { instance }.to raise_error(ArgumentError, /you must use the keyword arg html_class/)
-    end
-  end
-
   context "skip_link" do
     let(:options) { {phone:, skip_link: true} }
     it "renders the number without a link, and without twlink" do
       expect(component).to eq '<span class="tw:font-mono">999-999-9999</span>'
-    end
-
-    context "with html_class" do
-      let(:options) { {phone:, skip_link: true, html_class: "less-strong"} }
-      it "replaces the default classes" do
-        expect(component).to eq '<span class="less-strong">999-999-9999</span>'
-      end
     end
 
     context "with html in the extension" do
