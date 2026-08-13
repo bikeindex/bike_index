@@ -27,14 +27,18 @@ class OrganizationLandingPage < ApplicationRecord
     where(organization_id: organization.id).first_or_create
   end
 
-  # ORGANIZATIONS_WITH_LANDING_PAGES is what actually routes the page; enabled is a copy of it
-  # that only Backfills::OrganizationLandingPageJob reconciles, so the two can drift
+  # ORGANIZATIONS_WITH_LANDING_PAGES is what actually routes the page - enabled is a copy of it
   def env_enabled?
     LandingPages::ORGANIZATIONS.include?(organization&.slug)
   end
 
-  def enabled_matches_env?
-    enabled? == env_enabled?
+  # Only Backfills::OrganizationLandingPageJob reconciles the two, so nothing else reports the drift
+  def enabled_mismatch_error
+    return if enabled? == env_enabled?
+
+    "This landing page's enabled is #{enabled?}, but ORGANIZATIONS_WITH_LANDING_PAGES " \
+      "#{enabled? ? "does not include" : "includes"} \"#{organization&.slug}\". " \
+      "Run Backfills::OrganizationLandingPageJob to sync them."
   end
 
   private

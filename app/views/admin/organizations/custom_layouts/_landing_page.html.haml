@@ -2,7 +2,6 @@
 
 = form_for @landing_page, {url: admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id]), html: {method: :patch}} do |f|
   = hidden_field_tag :kind, "landing_page"
-  -# Unsaved until the first save, and paper_trail has nothing to show until then
   - if @landing_page.persisted?
     .mb-2
       = link_to "Version history", admin_paper_trail_versions_path(search_item_type: "OrganizationLandingPage", search_item_id: @landing_page.id, period: "all"), class: "gray-link"

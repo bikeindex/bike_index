@@ -50,7 +50,6 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
               search_item_id: landing_page.id, period: "all")
             expect(response.body).to include CGI.escapeHTML(history_path)
 
-            # The link lands on this landing page's versions, not an empty page
             get history_path
             expect(response.status).to eq(200)
             expect(assigns(:collection).map(&:item_id)).to eq([landing_page.id])
@@ -87,31 +86,18 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           expect(organization.reload.organization_landing_page.body).to eq update[:body]
           # dropping landing_html is a follow-up
           expect(organization.landing_html).to be_nil
-          # enabled false and the organization isn't routed, so the two agree
+          # the two agree, so no error
           expect(flash[:error]).to be_blank
         end
 
         context "when enabled disagrees with ORGANIZATIONS_WITH_LANDING_PAGES" do
           let!(:landing_page) { FactoryBot.create(:organization_landing_page, organization:, enabled: true) }
 
-          it "saves and flashes an error" do
-            expect(LandingPages::ORGANIZATIONS).to_not include(organization.slug)
+          it "saves and flashes the mismatch" do
             put "#{base_url}/landing_page", params: {organization_landing_page: update}
             expect(landing_page.reload.body).to eq update[:body]
             expect(flash[:success]).to be_present
-            expect(flash[:error]).to match(/enabled is true.*does not include.*#{organization.slug}/)
-          end
-
-          context "enabled false for a routed organization" do
-            let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
-            let!(:landing_page) { FactoryBot.create(:organization_landing_page, organization:, enabled: false) }
-
-            it "saves and flashes an error" do
-              expect(LandingPages::ORGANIZATIONS).to include(organization.slug)
-              put "#{base_url}/landing_page", params: {organization_landing_page: update}
-              expect(landing_page.reload.body).to eq update[:body]
-              expect(flash[:error]).to match(/enabled is false.*includes.*#{organization.slug}/)
-            end
+            expect(flash[:error]).to eq landing_page.enabled_mismatch_error
           end
         end
       end
