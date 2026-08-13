@@ -1,5 +1,7 @@
 import HwComboboxController from 'controllers/hw_combobox_controller'
 
+/* global AbortController, requestAnimationFrame */
+
 // hotwire_combobox 0.4.1 finds an option by interpolating the raw value into
 // `[data-value='<value>']`; a value containing a quote (e.g. a search term like
 // `2011'`) builds an invalid selector and throws a SyntaxError, which aborts the
@@ -96,6 +98,10 @@ HwComboboxController.prototype._openInDialog = function () {
     // `close` collapsed inline, the dialog already being shut, so its half is still owed
     this._moveArtifactsInline()
     this._restoreBodyScroll()
+    // iOS pins the body from inside a requestAnimationFrame, and this restore doesn't
+    // wait for it -- a lock taken and released within one frame lands after its own
+    // release and stays. Ours is queued second, so it runs once the pin is on.
+    requestAnimationFrame(() => this._restoreBodyScroll())
   }
 
   this.dialogTarget.addEventListener('close', dismiss, { signal: listeners.signal })

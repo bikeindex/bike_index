@@ -205,6 +205,26 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
       expect(page).to have_no_css("dialog[open]")
       expect(page).to have_no_css(scroll_locked_body)
       expect(page).to have_css("#{overlay} span", text: "It was stolen")
+
+      # Leaving in the same frame the dialog opened in, which is a rider swiping back the
+      # instant the picker appears. iOS pins the body from inside its own animation frame,
+      # so a release that doesn't wait for it leaves the pin on with nothing left to lift it
+      page.execute_script(<<~JS)
+        const dialog = document.querySelector(".hw-combobox dialog")
+        new MutationObserver((_records, observer) => {
+          if (!dialog.open) return
+          observer.disconnect()
+          document.dispatchEvent(new CustomEvent("turbo:before-render"))
+          // The frame the pin lands in, so the assertions below can't run ahead of it
+          requestAnimationFrame(() => requestAnimationFrame(() => { window.tornDownMidFrame = true }))
+        }).observe(dialog, {attributes: true, attributeFilter: ["open"]})
+        document.querySelector(".hw-combobox__input").click()
+      JS
+      wait_for { page.evaluate_script("window.tornDownMidFrame") }
+
+      expect(page).to have_no_css("dialog[open]")
+      expect(page).to have_no_css(scroll_locked_body)
+      expect(touch_scroll_blocked?).to be false
     end
   end
 end
