@@ -180,6 +180,7 @@ Rails.application.routes.draw do
   # new makes an empty registration and redirects into show, which renders
   # ?step=1|2|report|3…|review|finished (and handles the emailed confirmation link)
   resource :register, only: %i[new create show update], controller: :register do
+    get :embed
     patch :report
     patch :acknowledge
     # The emailed confirmation link, and the form it posts itself to
