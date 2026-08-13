@@ -34,6 +34,11 @@ module Register
         @organization ||= @b_param.creation_organization
       end
 
+      # Still offered once unchecked, unchecking being what takes `organization` away
+      def auto_organization
+        @auto_organization ||= @b_param.auto_organization
+      end
+
       # Step 1's email settles who this is for, so the name is only asked for here
       def user_name_required?
         !@b_param.self_made?(@current_user)
@@ -114,8 +119,10 @@ module Register
       end
 
       # An organization asking for more than a standard registration owns the section
+      def organization_section? = reg_fields.any? || address_statuses.any?
+
       def contact_section_text
-        return translation(".contact_info") if reg_fields.none? && address_statuses.none?
+        return translation(".contact_info") unless organization_section?
 
         translation(".information_for_org", org_name: organization.short_name)
       end

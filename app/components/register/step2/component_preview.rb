@@ -13,6 +13,13 @@ module Register
         step_2(creation_organization_id: lookbook_organization&.id)
       end
 
+      # No link named the organization - the registrant's own was assigned for them, so
+      # the checkbox that drops it heads the form
+      def with_auto_organization
+        step_2(auto_organization_id: lookbook_organization&.id,
+          creation_organization_id: lookbook_organization&.id)
+      end
+
       # Someone else's registration: it asks for their name, and the confirmation
       # link is still out
       def for_someone_else
@@ -26,13 +33,13 @@ module Register
 
       private
 
-      def step_2(**bike)
+      def step_2(auto_organization_id: nil, **bike)
         return production_notice("registration") if Rails.env.production?
 
         step_1_values = {owner_email: lookbook_user&.email,
                          manufacturer_id: ::Manufacturer.frame_makers.first&.id}
         b_param = ::BParam.new(origin: "register_flow",
-          params: {bike: step_1_values.merge(bike).compact}.as_json)
+          params: {bike: step_1_values.merge(bike).compact, auto_organization_id:}.compact.as_json)
         render(Register::Step2::Component.new(b_param:, current_user: lookbook_user,
           steps: ::BikeServices::Register.steps(b_param, sequence: ::BikeServices::Register.registration_sequence(b_param))))
       end

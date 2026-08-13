@@ -186,3 +186,16 @@ export class CollapseUtils {
 export function collapse (action, element, duration = 200, direction = 'vertical') {
   return CollapseUtils.collapse(action, element, duration, direction)
 }
+
+/**
+ * Collapse a form field, disabling what it holds. Collapsing only hides, so a field the
+ * form no longer asks for would still post its values - and a required one it can't
+ * reach would block the submission outright.
+ * @param {HTMLElement} field - The wrapper to collapse
+ * @param {boolean} shown - Whether the form is asking for it
+ * @param {number} duration - Animation duration in milliseconds
+ */
+export function collapseField (field, shown, duration) {
+  collapse(shown ? 'show' : 'hide', field, duration)
+  field.querySelectorAll('input, select, textarea').forEach((el) => { el.disabled = !shown })
+}

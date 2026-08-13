@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { collapse } from 'utils/collapse_utils'
+import { collapseField } from 'utils/collapse_utils'
 
 /* global window */
 
@@ -31,12 +31,9 @@ export default class extends Controller {
   applyStatuses (duration) {
     const status = this.element.querySelector('input[name$="[status]"]')?.value
     this.fieldTargets.forEach((field) => {
-      const shown = JSON.parse(field.dataset.statuses).includes(status)
-      collapse(shown ? 'show' : 'hide', field, duration)
-      // Collapsing only hides - disable too, or a stolen registration still posts
-      // the address (its country select always has a value) and a phone the
-      // status no longer asks for
-      field.querySelectorAll('input, select, textarea').forEach((el) => { el.disabled = !shown })
+      // register--organization sets the flag on a field only its organization asks for
+      const shown = JSON.parse(field.dataset.statuses).includes(status) && !field.dataset.organizationOff
+      collapseField(field, shown, duration)
       if (field.dataset.texts) this.applyRequired(field, this.textFor(field, status))
     })
     // Backspacing the combobox empty deselects it, so keep the label it had rather

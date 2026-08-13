@@ -18,6 +18,31 @@ RSpec.describe Register::Step2::Component, type: :component do
       steps: BikeServices::Register.steps(reloaded, sequence: nil)))
   end
 
+  describe "the organization checkbox" do
+    it "isn't offered for an organization a link named" do
+      render_step_2
+      expect(page).to_not have_field("register_with_organization")
+    end
+
+    context "assigned automatically" do
+      let(:params) { super().merge(auto_organization_id: organization.id) }
+
+      it "offers it checked" do
+        render_step_2
+        expect(page).to have_checked_field("register_with_organization")
+      end
+
+      context "dropped" do
+        let(:params) { {bike: {owner_email: "owner@bikeindex.org", manufacturer_id: 12}, auto_organization_id: organization.id} }
+
+        it "offers it unchecked" do
+          render_step_2
+          expect(page).to have_unchecked_field("register_with_organization")
+        end
+      end
+    end
+  end
+
   describe "the bike sticker field" do
     # reg_bike_sticker rides along with bike_stickers (Organization#enabled_feature_slugs),
     # which update_column skips - so both are set here the way it would leave them
