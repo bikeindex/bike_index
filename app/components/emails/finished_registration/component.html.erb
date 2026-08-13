@@ -87,7 +87,11 @@
     </div>
   <% end %>
 
-  <% unless claimed? %>
+  <% if show_view_bike_cta? %>
+    <div class="finished-registration-cta">
+      <%= link_to translation("view_your_bike"), bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
+    </div>
+  <% elsif !claimed? %>
     <div class="finished-registration-cta">
       <%= link_to claim_cta_text, bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
 
@@ -116,7 +120,7 @@
       <tbody>
         <tr>
           <td class="locking-copy">
-            <h3>
+            <h3 class="uncap" style="font-weight: 400">
               <%= translation("use_a_ulock") %> <%= translation("cable_locks_should_never_be_used") %>
             </h3>
           </td>
@@ -220,10 +224,6 @@
         </tr>
       </tbody>
     </table>
-
-    <div class="finished-registration-cta subtle">
-      <%= link_to translation("view_your_bike"), bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
-    </div>
   </div>
 <% end %>
 
@@ -234,10 +234,6 @@
         <strong><%= translation("spread_the_word_title") %></strong>
         <%= translation("spread_the_word_body") %>
       </p>
-
-      <% if claimed? %>
-        <%= link_to translation("view_your_bike"), bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
-      <% end %>
     </div>
 
     <table
