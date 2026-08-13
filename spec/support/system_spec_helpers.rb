@@ -128,6 +128,13 @@ module SystemSpecHelpers
     expect(page).to have_css("##{element["commandfor"]}[open]")
   end
 
+  # A dialog holding the page behind it pins the body - with overflow everywhere
+  # except iOS, where only position sticks. Pass to have_css/have_no_css, so the
+  # unlock gets Capybara's wait: closing a dialog fires `close` a task later.
+  def scroll_locked_body
+    "body[style*='overflow: hidden'], body[style*='position: fixed']"
+  end
+
   # The registration's emailed link, minus the mailer's host - the app is on Capybara's
   def confirmation_link
     Email::PartialRegistrationJob.drain

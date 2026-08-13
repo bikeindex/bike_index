@@ -161,6 +161,7 @@ RSpec.describe API::V1::OrganizationsController, type: :request do
           put "#{base_url}/#{organization.to_param}", params: update_params.merge(access_token: "vvvvvvvvv").to_json, headers: json_headers
         }.to_not change(UpdateOrganizationPosKindJob.jobs, :count)
         expect(response.code).to eq("401")
+        expect(json_result).to eq({"401" => "Not permitted"})
         organization.reload
         expect(organization.manual_pos_kind).to be_blank
       end
