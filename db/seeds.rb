@@ -3,12 +3,9 @@
 abort "Seeding failed: bin/rake setup:import_spreadsheets" unless system("bin/rake setup:import_spreadsheets")
 
 # Seeds that send mail render layouts/email, which links a dartsass-built stylesheet -
-# Sprockets raises on a missing one rather than skipping the tag. app/assets/builds is
-# gitignored, so a workspace that hasn't run bin/dev yet has none of them.
-missing_stylesheets = Rails.application.config.dartsass.builds.values
-  .reject { Rails.root.join("app/assets/builds", it).exist? }
-if missing_stylesheets.any?
-  puts "Building stylesheets, #{missing_stylesheets.count} missing from app/assets/builds"
+# Sprockets raises on a missing one rather than skipping the tag
+unless Rails.application.config.dartsass.builds.values.all? { Rails.root.join("app/assets/builds", it).exist? }
+  puts "\n== Building stylesheets =="
   Rake::Task["dartsass:build"].invoke
 end
 
