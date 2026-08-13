@@ -17,11 +17,30 @@
 class OrganizationLandingPage < ApplicationRecord
   has_paper_trail only: %i[body enabled organization_id]
 
-  belongs_to :organization
+  # touch: the landing page fragment is keyed on the organization
+  belongs_to :organization, touch: true
 
   validates :organization_id, presence: true, uniqueness: true
 
   before_validation :set_calculated_attributes
+
+  def self.for(organization)
+    where(organization_id: organization.id).first_or_create
+  end
+
+  # ORGANIZATIONS_WITH_LANDING_PAGES routes the page - enabled is only a copy of it
+  def env_enabled?
+    LandingPages::ORGANIZATIONS.include?(organization&.slug)
+  end
+
+  # Only Backfills::OrganizationLandingPageJob reconciles the two
+  def enabled_mismatch_error
+    return if enabled? == env_enabled?
+
+    "This landing page's enabled is #{enabled?}, but ORGANIZATIONS_WITH_LANDING_PAGES " \
+      "#{enabled? ? "does not include" : "includes"} \"#{organization&.slug}\". " \
+      "Run Backfills::OrganizationLandingPageJob to sync them."
+  end
 
   private
 
