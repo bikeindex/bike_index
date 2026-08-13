@@ -146,6 +146,13 @@ RSpec.describe "Register flow", :js, type: :system do
     # No organization with stickers, and nothing scanned, so there is no sticker to give
     expect(page).to have_no_field("bike[bike_sticker]")
 
+    # Unchecking has to undo the animated hide, not just its display:none
+    uncheck "Missing serial"
+    fill_in "bike[serial_number]", with: "SERIAL9"
+
+    check "Missing serial"
+    expect(page).to have_no_field("bike[serial_number]")
+
     # Nothing submitted yet - the reload restores the whole draft from form-persist
     visit details_url
 
