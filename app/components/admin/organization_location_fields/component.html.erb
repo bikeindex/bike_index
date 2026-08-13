@@ -1,0 +1,47 @@
+<div class="col-md-6 mt-4">
+  <fieldset class="mr-2 ml-2">
+    <div class="card bg-light">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-lg-6">
+            <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :name)) %>
+          </div>
+
+          <div class="col-lg-6">
+            <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :phone, kind: :telephone_field)) %>
+          </div>
+
+          <div class="col-12">
+            <%= @form_builder.fields_for :address_record do |address_form| %>
+              <%= render(Org::LocationAddressFields::Component.new(form_builder: address_form)) %>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-6">
+            <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :publicly_visible, label: publicly_visible_label, class_name: "tw:mb-2")) %>
+
+            <% if @organization.enabled?("impound_bikes") %>
+              <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :impound_location, label: Location.human_attribute_name(:impound_location), class_name: "tw:mb-2")) %>
+
+              <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :default_impound_location, label: Location.human_attribute_name(:default_impound_location), class_name: "tw:mb-2")) %>
+            <% end %>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="form-group text-center">
+              <% if @location.destroy_forbidden? %>
+                <small class="less-strong">can't remove, has impounded bikes</small>
+              <% else %>
+                <%# A checkbox styled as a button - the legacy remove_fields handler slides the card up %>
+                <%= @form_builder.check_box :_destroy, class: "d-none" %>
+                <%= @form_builder.label :_destroy, "Remove", class: "remove_fields btn btn-danger" %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+</div>

@@ -101,12 +101,13 @@ module ApplicationHelper
     (link_to link_text, link_path, class: class_name).html_safe
   end
 
-  def link_to_add_fields(name, f, association, class_name: nil, obj_attrs: {}, filename: nil)
+  # Pass a block to render the fields yourself - for fields that are a component, not a partial
+  def link_to_add_fields(name, f, association, class_name: nil, obj_attrs: {}, filename: nil, &block)
     new_object = f.object.send(association).klass.new(obj_attrs)
     id = new_object.object_id
     filename ||= association.to_s.singularize + "_fields"
     fields = f.fields_for(association, new_object, child_index: id) { |builder|
-      render(filename, f: builder)
+      block ? capture(builder, &block) : render(filename, f: builder)
     }
     link_to name, "#", class: "add_fields #{class_name}",
       data: {id: id, fields: fields.delete("\n")}
