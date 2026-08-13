@@ -678,6 +678,8 @@ class Organization < ApplicationRecord
     end
     # If it has stickers, add reg_bike_sticker field
     fslugs += ["reg_bike_sticker"] if fslugs.include?("bike_stickers")
+    # Alone, the edit feature would lock the organization out - viewing is gated separately
+    fslugs += ["registration_sequences"] if fslugs.include?("registration_sequences_edit")
 
     if fslugs.include?("impound_bikes")
       # If impound_bikes enabled and there is a default location for impounding bikes, add impound_bikes_locations

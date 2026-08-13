@@ -42,9 +42,12 @@ end
 end
 
 # --- 10 stolen bikes in San Francisco and Oakland ---
+# phone_visibility puts both ends of Bike#phoneable_by? in dev — police-only and public
 stolen_locations = [
-  {latitude: 37.7749, longitude: -122.4194, street: "50 Fremont St", city: "San Francisco", zipcode: "94105"},
-  {latitude: 37.7833, longitude: -122.4167, street: "200 Kearny St", city: "San Francisco", zipcode: "94108"},
+  {latitude: 37.7749, longitude: -122.4194, street: "50 Fremont St", city: "San Francisco", zipcode: "94105",
+   phone_visibility: {phone_for_users: false, phone_for_shops: false}},
+  {latitude: 37.7833, longitude: -122.4167, street: "200 Kearny St", city: "San Francisco", zipcode: "94108",
+   phone_visibility: {phone_for_everyone: true}},
   {latitude: 37.7599, longitude: -122.4148, street: "2800 Mission St", city: "San Francisco", zipcode: "94110"},
   {latitude: 37.7694, longitude: -122.4862, street: "800 Great Hwy", city: "San Francisco", zipcode: "94121"},
   {latitude: 37.7956, longitude: -122.3933, street: "55 The Embarcadero", city: "San Francisco", zipcode: "94105"},
@@ -72,10 +75,11 @@ stolen_locations.each_with_index do |loc, i|
         state_id: ca_state&.id.to_s,
         country_id: us&.id.to_s,
         skip_geocoding: true,
+        phone: "111 222 3333",
         theft_description: "Bike was locked on #{loc[:street]} and stolen overnight",
         locking_description: StolenRecord::LOCKING_DESCRIPTIONS.sample,
         lock_defeat_description: StolenRecord::LOCKING_DEFEAT_DESCRIPTIONS.sample
-      }
+      }.merge(loc[:phone_visibility].to_h)
     }
   )
   unless bike.errors.any?

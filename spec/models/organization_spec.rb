@@ -397,6 +397,13 @@ RSpec.describe Organization, type: :model do
       expect(organization.child_ids).to eq([organization_child.id])
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
     end
+    context "registration_sequences_edit" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["registration_sequences_edit"]) }
+
+      it "adds registration_sequences, since editing without viewing locks the organization out" do
+        expect(organization.reload.enabled_feature_slugs).to match_array(%w[registration_sequences registration_sequences_edit])
+      end
+    end
     context "regional bike_stickers" do
       let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }
       let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: %w[regional_bike_counts bike_stickers]) }

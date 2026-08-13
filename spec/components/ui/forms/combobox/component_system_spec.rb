@@ -43,6 +43,28 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
     expect(page).to have_css('[aria-expanded="false"]')
   end
 
+  context "with a selection already made" do
+    # Typing used to insert wherever the click left the caret, mangling the display into a
+    # query matching no option -- which cleared the hidden field, and the selection with it
+    it "replaces the display rather than typing into the middle of it" do
+      visit "/rails/view_components/ui/forms/combobox/component/default"
+
+      expect(page).to have_css('[aria-expanded="false"]', wait: 10)
+
+      find_field("Cycle type").click
+      find('[role="option"]', text: "Unicycle", exact_text: true).click
+
+      expect(find_field("Cycle type").value).to eq "Unicycle"
+
+      # Clicking in selects the display, so the first keystroke replaces it
+      find_field("Cycle type").click
+      send_keys("tand")
+
+      expect(find_field("Cycle type").value).to eq "Tandem"
+      expect(find("input[name='cycle_type']", visible: :hidden).value).to eq "Tandem"
+    end
+  end
+
   context "inside a form" do
     it "submits on enter once the listbox is closed" do
       visit "/rails/view_components/ui/forms/combobox/component/in_form"
