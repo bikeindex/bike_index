@@ -102,12 +102,23 @@ Previews that query the dev DB (e.g. `User.admins.first`) render nothing when th
 When the caller wants before/after, repeat the capture loop against the base ref. The caller passes the base — `origin/main` by default, or the PR's actual base when it isn't `main` (a stacked PR's base often isn't). Set `BASE_REF` to that remote ref (e.g. `origin/main`, `origin/sethherr/feature-x`) and use it throughout; `git fetch origin` first so it's current.
 
 1. `git status` — abort if there are uncommitted changes.
-2. Diff `db/migrate/` between the branch and `$BASE_REF`; abort if it changed — a branch-only migration leaves the DB schema ahead of the base's code, so base pages can error.
+2. Check the branch's migrations. An **additive** one is fine: the base's code ignores a column it doesn't select, so its pages render normally against the ahead-of-it schema. Abort only on one that takes away something the base's code still reads. Scan the `up` path alone — nearly every additive migration undoes itself with a `remove_column` in `down`, so diffing the whole file reports a false abort:
+
+   ```bash
+   for f in $(git diff "$BASE_REF"...HEAD --name-only --diff-filter=AM -- db/migrate db/analytics_migrate); do
+     git show "HEAD:$f" | sed '/def down/,$d' |
+       grep -E 'remove_column|rename_column|drop_table|rename_table|change_column' | sed "s|^|$f: |"
+   done
+   ```
+
+   Hits abort; no output means capture. Never roll a migration back to capture the base — that churns the dev DB for a screenshot.
 3. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout --detach $BASE_REF` (detached — checking out a branch name fails if a sibling worktree holds it; detached HEAD at the remote ref is allowed concurrently and is the same code), navigate the browser to force Rails to reload the changed files, repeat capture into `...-base-...` filenames, then `git checkout $BRANCH`.
 
 A `Gemfile.lock` diff is **not** a reason to abort.
 
 The seeded DB persists across checkouts, so the existing session usually still works. Preview routes (`/rails/view_components/...`, `/lookbook/...`) reload across the checkout like ordinary pages, so their before/after works against any `$BASE_REF` too.
+
+That shared DB means the base renders rows the branch created, so a base shot is "the old code showing today's data", not "what production looks like now" — which is what makes it a fair comparison, and is worth a line in the PR comment when the base labels a branch-created record as something it isn't.
 
 ## Clean up
 
