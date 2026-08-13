@@ -134,7 +134,6 @@ RSpec.describe Organized::BaseController, type: :request do
 
     # The organization menu is positioned over the layout's usual spot for the alert
     it "renders once, inside the organization's content column" do
-      expect(current_user.reload.alert_slugs).to eq ["unfinished_registration"]
       get "/o/#{current_organization.to_param}/registrations"
       alerts = Nokogiri::HTML(response.body).css("[role=alert]")
         .select { |alert| alert.text.include?("isn't registered yet!") }

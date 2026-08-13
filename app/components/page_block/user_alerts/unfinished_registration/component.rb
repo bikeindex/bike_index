@@ -5,14 +5,16 @@ module PageBlock
     module UnfinishedRegistration
       # Links back into the register flow, which reopens the registration where it was left
       class Component < ApplicationComponent
-        def initialize(b_param:)
+        def initialize(b_param:, current_user: nil)
           @b_param = b_param
+          @current_user = current_user
         end
 
         # The alert outlives the registration finishing elsewhere (another tab, the
-        # confirmation email), so the b_param has the final say
+        # confirmation email), so the b_param has the final say - passed the user it
+        # would otherwise load, since this runs on every page render
         def render?
-          @b_param&.unfinished_registration?
+          @b_param&.unfinished_registration?(@current_user || @b_param.creator)
         end
 
         def call

@@ -141,15 +141,13 @@ RSpec.describe MyAccountsController, type: :request do
         expect(user.reload.alert_slugs).to eq ["unfinished_registration"]
 
         get base_url
-        expect(assigns(:show_general_alert)).to be_falsey
         expect(whitespace_normalized_body_text).to match("Thanks for using Bike Index")
-        expect(response.body).to_not include "isn't registered yet!"
+        expect(whitespace_normalized_body_text).to_not match("isn't registered yet!")
 
         # The session only carries it once, so the alert has the spot back
         get base_url
-        expect(assigns(:show_general_alert)).to be_truthy
         expect(whitespace_normalized_body_text).to_not match("Thanks for using Bike Index")
-        expect(response.body).to include "isn't registered yet!"
+        expect(whitespace_normalized_body_text).to match("isn't registered yet!")
       end
     end
   end

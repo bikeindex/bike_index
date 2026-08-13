@@ -271,10 +271,10 @@
     <% end %>
 
     <%# organized_skeleton renders its own, inside the content column the menu doesn't cover %>
-    <% general_alert = PageBlock::UserAlerts::Wrapper::Component.new(current_user:) %>
+    <% general_alert = PageBlock::UserAlerts::Wrapper::Component.new(current_user:) if
+      show_general_alert && current_page_skeleton != "organized_skeleton" %>
 
-    <% show_general_alert_here = show_general_alert && general_alert.render? &&
-      current_page_skeleton != "organized_skeleton" %>
+    <% show_general_alert_here = general_alert&.render? %>
 
     <%= render general_alert if show_general_alert_here %>
 

@@ -39,7 +39,7 @@ module PageBlock
           when "theft_alert_without_photo"
             TheftAlertWithoutPhoto::Component.new(bikes: stolen_bikes(:theft_alert_missing_photo?))
           when "unfinished_registration"
-            UnfinishedRegistration::Component.new(b_param: unfinished_b_param)
+            UnfinishedRegistration::Component.new(b_param: unfinished_b_param, current_user: @current_user)
           end
         end
 

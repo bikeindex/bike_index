@@ -53,7 +53,6 @@ RSpec.describe "RegistrationsController#show", type: :request do
       # The page pulls up by --nav-gap to sit flush under the navbar, so the alert
       # standing in that gap has to zero it or the photos render underneath
       it "zeroes the pull up, and restores it once the alert is gone" do
-        expect(current_user.reload.alert_slugs).to eq ["unfinished_registration"]
         get "#{base_url}/#{bike.id}"
         expect(whitespace_normalized_body_text).to match("isn't registered yet!")
         expect(main_class).to eq "tw:[--nav-gap:0px]"

@@ -161,9 +161,8 @@ module ControllerHelpers
   end
 
   def show_general_alert
-    return @show_general_alert = false if @skip_general_alert || current_user.blank?
-
-    return @show_general_alert = false if render_donation_request?
+    return @show_general_alert = false if @skip_general_alert || current_user.blank? ||
+      render_donation_request?
 
     return @show_general_alert = false unless (current_user.alert_slugs - UserAlert.disabled_kinds).any?
 
