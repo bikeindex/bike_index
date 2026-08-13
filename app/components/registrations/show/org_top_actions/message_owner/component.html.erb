@@ -33,7 +33,7 @@
           <%= translation(".or_call") %>
         </span>
 
-        <%= phone_link(owner_phone, class: "twlink tw:font-mono") %>
+        <%= render UI::PhoneDisplay::Component.new(phone: owner_phone) %>
       </p>
     <% end %>
   <% end %>
