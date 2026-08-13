@@ -7,7 +7,7 @@ RSpec.describe Organized::RegistrationSequencePagesController, type: :request do
 
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
-    before { current_organization.update_columns(enabled_feature_slugs: ["registration_sequences"]) }
+    before { current_organization.update_columns(enabled_feature_slugs: %w[registration_sequences registration_sequences_edit]) }
     let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization: current_organization) }
 
     describe "new" do
@@ -112,6 +112,16 @@ RSpec.describe Organized::RegistrationSequencePagesController, type: :request do
       post base_url
       expect(response).to redirect_to(organization_root_path)
       expect(flash[:error]).to be_present
+    end
+
+    context "with registration_sequences but not registration_sequences_edit" do
+      before { current_organization.update_columns(enabled_feature_slugs: ["registration_sequences"]) }
+
+      it "blocks the org admin" do
+        post base_url
+        expect(response).to redirect_to(organization_root_path)
+        expect(flash[:error]).to be_present
+      end
     end
   end
 end

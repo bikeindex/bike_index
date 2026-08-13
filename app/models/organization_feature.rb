@@ -66,6 +66,7 @@ class OrganizationFeature < ApplicationRecord
     regional_bike_counts
     registration_notes
     registration_sequences
+    registration_sequences_edit
     require_reg_address
     require_reg_student_id
     saml_sso
