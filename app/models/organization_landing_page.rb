@@ -17,7 +17,7 @@
 class OrganizationLandingPage < ApplicationRecord
   has_paper_trail only: %i[body enabled organization_id]
 
-  # touch so the landing page fragment, which is keyed on the organization, busts on save
+  # touch: the landing page fragment is keyed on the organization
   belongs_to :organization, touch: true
 
   validates :organization_id, presence: true, uniqueness: true
@@ -28,12 +28,12 @@ class OrganizationLandingPage < ApplicationRecord
     where(organization_id: organization.id).first_or_create
   end
 
-  # ORGANIZATIONS_WITH_LANDING_PAGES is what actually routes the page - enabled is a copy of it
+  # ORGANIZATIONS_WITH_LANDING_PAGES routes the page - enabled is only a copy of it
   def env_enabled?
     LandingPages::ORGANIZATIONS.include?(organization&.slug)
   end
 
-  # Only Backfills::OrganizationLandingPageJob reconciles the two, so nothing else reports the drift
+  # Only Backfills::OrganizationLandingPageJob reconciles the two
   def enabled_mismatch_error
     return if enabled? == env_enabled?
 

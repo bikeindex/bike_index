@@ -33,12 +33,9 @@ RSpec.describe "Register flow", :js, type: :system do
     click_button "Next"
   end
 
-  # The step's content renders before its Stimulus controllers connect, and autofocus
-  # is the first of the form's four - so the focus it puts on the first field is the
-  # signal that they're all connected. Filling before it lands loses the text: Playwright
-  # focuses the field in the page, then sends the characters to whatever holds focus a
-  # round trip later, so autofocus arriving in between puts them in the field filled
-  # just before (a step 2 that failed on CI had user_name = "Sally RiderMarlin 7").
+  # fill_in focuses the field, then sends its text a round trip later - so autofocus
+  # connecting in between lands the text in the field filled just before. Its focus is
+  # also the signal that the form's controllers have connected.
   def wait_for_details_step(wait: Capybara.default_max_wait_time)
     expect(page).to have_content("Add your bike", wait:)
     expect(page).to have_css("input[name='bike[frame_model]']:focus", wait:)
@@ -583,8 +580,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
     # flaky: the color combobox below is typed into right after step 1's Turbo navigation,
     # and filters nothing when its controller hasn't connected yet. wait_for_details_step
-    # now proves hydration rather than guessing at it, so the retries are here pending a
-    # few green CI runs rather than because the cause is still unknown
+    # proves hydration now - the retries stay until CI has run green a few times
     it "gates each page of rules, then the acknowledgment, before completing", flaky: 4 do
       visit "/register/new?organization_id=#{organization.slug}"
 
