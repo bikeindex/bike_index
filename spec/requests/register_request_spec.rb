@@ -252,7 +252,9 @@ RSpec.describe RegisterController, type: :request do
       expect(response.status).to eq 200
       expect(BParam.last.creation_organization_id).to eq organization.id
 
-      expect(response).to render_template(layout: "layouts/register_embed")
+      # Its own document, with none of the application layout's chrome around it
+      expect(response.body).to start_with("<!DOCTYPE html>")
+      expect(response.body).to_not include("primary-header-nav")
       expect(response.body).to match(/<form[^>]*target="_top"/)
       expect(response.body).to match(/<form[^>]*data-turbo="false"/)
       expect(response.body).to include('name="robots" content="noindex"')

@@ -43,8 +43,7 @@ class RegisterController < ApplicationController
   # a tokenized step, so the frame is one request and nothing past step 1 is embeddable
   def embed
     @page_title = I18n.t("meta_titles.register_step_1", cycle_type: @b_param.type)
-    render Register::Step1::Component.new(b_param: @b_param, steps: flow_steps, current_user:, embed: true),
-      layout: "register_embed"
+    render Register::Embed::Component.new(b_param: @b_param, steps: flow_steps, current_user:), layout: false
   end
 
   # The whole flow after the start: ?step=1, ?step=2, ?step=report for a theft or a
