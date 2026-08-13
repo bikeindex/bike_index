@@ -10,7 +10,7 @@ module Admin
     STATUS_FILTER_INVESTIGATE = "investigate"
 
     # Token requests carry no CSRF token, they authenticate with the token alone
-    skip_before_action :verify_authenticity_token, if: -> { token_request? }
+    skip_before_action :verify_authenticity_token, if: :token_request?
     before_action :find_bug_report, only: %i[show update]
 
     def index

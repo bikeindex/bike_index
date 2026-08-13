@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
-# API::TokenAuthenticatable's rejection contract, which every controller it gates
-# answers identically. Needs the :admin_doorkeeper_token context and a `url`.
-# How a controller answers *no* token is its own business - the API endpoints 401,
-# the admin pages redirect to sign in - so that case stays with the controller.
+# API::TokenAuthenticatable's rejection contract. Needs the :admin_doorkeeper_token
+# context and a `url`. Answering *no* token stays with the controller - the API
+# endpoints 401, the admin pages redirect to sign in.
 RSpec.shared_examples "rejects_unauthorized_token" do
   context "a token matching no record" do
     it "returns 401" do

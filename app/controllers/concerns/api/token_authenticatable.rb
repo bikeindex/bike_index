@@ -19,10 +19,7 @@ module API
     # doorkeeper_token is nil for a revoked token, so branch on the string as presented -
     # that caller gets the API's 401 rather than a redirect to sign in
     def token_request?
-      return @token_request if defined?(@token_request)
-
-      @token_request = Doorkeeper::OAuth::Token
-        .from_request(request, *Doorkeeper.configuration.access_token_methods).present?
+      Doorkeeper::OAuth::Token.from_request(request, *Doorkeeper.configuration.access_token_methods).present?
     end
 
     # Returns {user:} when the token authorizes a user, otherwise {error:, status:}

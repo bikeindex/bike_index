@@ -147,11 +147,10 @@ RSpec.describe Admin::BugReportsController, type: :request do
 
         it "renders each image with a url that doesn't expire" do
           get "#{base_url}/#{bug_report.to_param}.json"
-          expect(json_result.dig("bug_report", "images").count).to eq 1
-          expect(json_result.dig("bug_report", "images", 0)).to eq({
+          expect(json_result.dig("bug_report", "images")).to eq([{
             "filename" => "broken.png", "byte_size" => 10, "content_type" => "image/png",
             "url" => BlobUrl.for(bug_report.reload.images.first.blob)
-          })
+          }])
         end
       end
     end
@@ -278,7 +277,7 @@ RSpec.describe Admin::BugReportsController, type: :request do
 
       it "renders the index" do
         expect(bug_report).to be_present
-        get "#{base_url}.json", params: token_param.merge(search_status: "all")
+        get url, params: token_param.merge(search_status: "all")
         expect(response.status).to eq 200
         expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report.id])
       end
@@ -309,7 +308,7 @@ RSpec.describe Admin::BugReportsController, type: :request do
     context "universal superuser token" do
       let(:token_user) { FactoryBot.create(:superuser) }
       it "renders the index" do
-        get "#{base_url}.json", params: token_param
+        get url, params: token_param
         expect(response.status).to eq 200
       end
     end
