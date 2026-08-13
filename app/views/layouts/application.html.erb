@@ -266,23 +266,15 @@
       </nav>
     <% end %>
 
-    <%# delete, so the donation modal only ever shows once %>
-    <% if session.delete(:render_donation_request).present? %>
+    <%# organized_skeleton renders its own, inside the content column the menu doesn't cover %>
+    <% general_alert = PageBlock::UserAlerts::Wrapper::Component.new(current_user:) if
+      show_general_alert && !render_donation_request? && current_page_skeleton != "organized_skeleton" %>
+
+    <% if render_donation_request? %>
       <%= render PageBlock::LawEnforcementDonation::Component.new(current_user:) %>
-    <% elsif show_general_alert %>
-      <% content_for :general_alert, render(PageBlock::UserAlerts::Wrapper::Component.new(current_user:)) %>
     <% end %>
 
-    <% if content_for?(:general_alert) && current_page_skeleton != "organized_skeleton" %>
-      <%#
-        z-20 because the homepage and landing page bike tile grids are positioned,
-        so they'd otherwise paint over this in-flow banner
-      %>
-
-      <div class="container tw:relative tw:z-20">
-        <%= content_for(:general_alert) %>
-      </div>
-    <% end %>
+    <%= render general_alert if general_alert %>
 
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
     <%= render partial: "/layouts/revised_messages" %>
@@ -298,7 +290,7 @@
 
       <main
         id="main-content"
-        class="<%= "tw:[--nav-gap:0px]" if content_for?(:general_alert) %>"
+        class="<%= "tw:[--nav-gap:0px]" if general_alert&.render? %>"
       >
         <% if current_page_skeleton.present? %>
           <%= render partial: "/shared/#{current_page_skeleton}" %>

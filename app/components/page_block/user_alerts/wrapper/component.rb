@@ -6,16 +6,25 @@ module PageBlock
       # The general alert shown below the navbar on every page. Only ever one: the first
       # kind the user has wins, even when it turns out to have nothing to show
       class Component < ApplicationComponent
-        def initialize(current_user:)
+        # container: false where the page already provides one - organized_skeleton
+        # renders this inside its content column, since the menu covers the usual spot
+        def initialize(current_user:, container: true)
           @current_user = current_user
+          @container = container
         end
 
+        # The kind's own component has the final say, so the layout can ask whether an
+        # alert is really going to show before it makes room for one
         def render?
-          @current_user.present? && alert_component.present?
+          @current_user.present? && alert_component&.render?
         end
 
+        # z-20 because the homepage and landing page bike tile grids are positioned,
+        # so they'd otherwise paint over this in-flow banner
         def call
-          render(alert_component)
+          return render(alert_component) unless @container
+
+          tag.div(render(alert_component), class: "container tw:relative tw:z-20")
         end
 
         private

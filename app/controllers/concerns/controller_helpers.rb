@@ -13,7 +13,8 @@ module ControllerHelpers
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
       :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
       :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert,
-      :display_dev_info?, :current_country_id, :current_currency, :turbo_request?
+      :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
+      :render_donation_request?
     before_action :enable_rack_profiler
 
     before_action do
@@ -149,6 +150,14 @@ module ControllerHelpers
     else
       organization_root_url(organization_id: current_user.default_organization.to_param)
     end
+  end
+
+  # Deletes, so the donation modal only ever shows once. Memoized because the layout and
+  # organized_skeleton both ask - it's what the general alert gives way to
+  def render_donation_request?
+    return @render_donation_request unless defined?(@render_donation_request)
+
+    @render_donation_request = session.delete(:render_donation_request).present?
   end
 
   def show_general_alert
