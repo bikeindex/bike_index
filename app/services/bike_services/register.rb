@@ -25,13 +25,13 @@ module BikeServices
     # The token's registration when step 1 was never submitted (redirecting into
     # it can't surprise anyone), otherwise a new one. A signed-in user's email
     # prefills owner_email - manufacturer_id is the submitted-step-1 marker.
-    def b_param_for(user:, token_id: nil, status: nil, email: nil)
+    def b_param_for(user:, token_id: nil, status: nil, email: nil, origin: "register_flow")
       status = nil unless Bike.statuses.include?(status)
       existing = find_token(session_token: token_id, user:)
-      return assign_start_params(existing, user, email:, status:) if reusable?(existing)
+      return assign_start_params(existing, user, email:, status:) if reusable?(existing, origin)
 
       bike_params = {owner_email: owner_email_for(user, email), status:}.compact
-      BParam.create(origin: "register_flow", creator_id: user&.id, params: {bike: bike_params}.as_json)
+      BParam.create(origin:, creator_id: user&.id, params: {bike: bike_params}.as_json)
     end
 
     # Resume a registration by token: anonymous or created by the passed user
@@ -51,7 +51,7 @@ module BikeServices
     # finish this registration
     def discard(token:, user:)
       b_param = find_token(params_token: token, user:)
-      return unless b_param&.origin == "register_flow" && !b_param.with_bike? &&
+      return unless b_param&.register_flow? && !b_param.with_bike? &&
         b_param.email_confirmation_sent_at.blank?
 
       b_param.destroy
@@ -69,9 +69,12 @@ module BikeServices
 
     # The safety rules a registration acknowledges before its bike is created - the
     # organization's active sequence, and only for an e-vehicle
+    # motorized? first - it's in memory, and creation_organization is a query
     def registration_sequence(b_param)
+      return nil unless b_param.motorized?
+
       organization = b_param.creation_organization
-      RegistrationSequence.active_for(organization) if b_param.motorized? && organization.present?
+      RegistrationSequence.active_for(organization) if organization.present?
     end
 
     # The step to show: finished once the bike exists (or it's awaiting the email),
@@ -353,8 +356,11 @@ module BikeServices
        "address_record_attributes" => attrs["address_record_attributes"]}.compact
     end
 
-    def reusable?(b_param)
-      b_param.present? && !b_param.with_bike? && b_param.manufacturer_id.blank?
+    # Matching origin, so arriving from an organization's page doesn't take over a shell
+    # started on /register and register the bike as though it came in there
+    def reusable?(b_param, origin)
+      b_param.present? && !b_param.with_bike? && b_param.manufacturer_id.blank? &&
+        b_param.origin == origin
     end
 
     # Every step the registration has reached, in order - each one opens the next, so the

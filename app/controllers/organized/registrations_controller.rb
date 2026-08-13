@@ -47,6 +47,24 @@ module Organized
       end
     end
 
+    # The /register flow's opening step, rendered here so the organized menu stays
+    # alongside it. Its submission, and every step after, continue on /register
+    def new
+      @b_param = BikeServices::Register.b_param_for(user: current_user, token_id: session[:register_b_param_token],
+        status: BParam.status_hash_from_params(params)[:status], email: params[:email],
+        origin: "register_flow_organized")
+      BikeServices::Register.assign_organization(@b_param, current_organization)
+      session[:register_b_param_token] = @b_param.id_token
+      @page_title = I18n.t("meta_titles.register_step_1", cycle_type: @b_param.type)
+      # The unfinished_registration alert links into this flow, so it would sit on top of it
+      @skip_general_alert = true
+      # The form carries this registration's token, and a cached page would carry a stale one
+      response.set_header("Cache-Control", "no-store")
+      sequence = BikeServices::Register.registration_sequence(@b_param)
+      render Register::Step1::Component.new(b_param: @b_param, current_user:,
+        steps: BikeServices::Register.steps(@b_param, sequence:))
+    end
+
     def multi_search
       @search_kind = normalized_search_kind
     end

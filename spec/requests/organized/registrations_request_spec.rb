@@ -265,6 +265,45 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
   end
 
+  describe "new" do
+    it "renders the register flow's step 1, attributed to the organization, inside the organized menu" do
+      expect { get "#{base_url}/new" }.to change(BParam, :count).by 1
+      expect(response.status).to eq(200)
+      b_param = BParam.last
+      expect(b_param).to have_attributes(origin: "register_flow_organized",
+        creation_organization_id: current_organization.id)
+      expect(assigns(:b_param)&.id).to eq b_param.id
+      expect(response.body).to include("organized-left-menu")
+      expect(response.body).to include(b_param.id_token)
+
+      # Revisiting reuses the still-blank registration the session is on
+      expect { get "#{base_url}/new" }.to_not change(BParam, :count)
+
+      # ... but a shell started on /register isn't taken over, so it stays attributed there
+      expect { get "/register/new?discard_token=#{b_param.id_token}" }.to change(BParam, :count).by 0
+      expect(BParam.last.origin).to eq "register_flow"
+      expect { get "#{base_url}/new" }.to change(BParam, :count).by 1
+      expect(BParam.last.origin).to eq "register_flow_organized"
+    end
+
+    context "status param" do
+      it "starts a theft report" do
+        get "#{base_url}/new", params: {status: "stolen"}
+        expect(response.status).to eq(200)
+        expect(BParam.last.status).to eq "status_stolen"
+      end
+    end
+
+    context "not an organization member" do
+      include_context :request_spec_logged_in_as_user
+
+      it "redirects" do
+        expect { get "#{base_url}/new" }.to_not change(BParam, :count)
+        expect(response).to redirect_to user_root_url
+      end
+    end
+  end
+
   describe "multi_search" do
     it "renders" do
       get "#{base_url}/multi_search"
