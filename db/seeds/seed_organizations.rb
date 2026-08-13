@@ -85,9 +85,13 @@ if brakebills.avatar.blank?
   brakebills.save!
 end
 
+brakebills.update!(registration_field_labels: {owner_email: "Brakebills email"})
+
 brakebills_landing_template = File.read(Rails.root.join("db/seeds/brakebills_landing_page.html.erb"))
-brakebills.update!(landing_html: ERB.new(brakebills_landing_template).result(binding),
-  registration_field_labels: {owner_email: "Brakebills email"})
+OrganizationLandingPage.for(brakebills).tap do |landing_page|
+  landing_page.update!(body: ERB.new(brakebills_landing_template).result(binding),
+    enabled: landing_page.env_enabled?)
+end
 
 # --- Ike's Bikes ---
 ikes = Organization.find_by_name("Ikes Bike's") || Organization.create(name: "Ikes Bike's", website: "", short_name: "Ikes", show_on_map: true)
