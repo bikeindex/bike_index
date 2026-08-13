@@ -19,7 +19,7 @@ RSpec.describe "Sitemaps pages" do
     let(:landing_pages_routes) { all_app_routes.select { |r| r.controller == "landing_pages" }.map { |r| to_formatted_path(r) } }
     let(:excluded_routes) do
       ["support_bike_index", "support_the_index", "support_the_bike_index", "info/:id", "primary_activities",
-        "info/how-to-get-your-stolen-bike-back", "ikes", "university"]
+        "info/how-to-get-your-stolen-bike-back", *LandingPages::ORGANIZATIONS]
     end
 
     def to_formatted_path(route)
