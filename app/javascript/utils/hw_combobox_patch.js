@@ -23,7 +23,7 @@ HwComboboxController.prototype.navigate = function (event) {
 // On small viewports it opens in a modal dialog and locks body scroll, but only
 // unlocks along its own collapse path, which a keypress or a click has to start.
 // Android's back gesture closes the dialog without either, stranding the page
-// unscrollable until reload -- so unlock on the close itself.
+// unscrollable until reload.
 const openInDialog = HwComboboxController.prototype._openInDialog
 HwComboboxController.prototype._openInDialog = function () {
   openInDialog.call(this)

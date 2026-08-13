@@ -420,9 +420,8 @@ Rails.application.routes.draw do
   end
 
   # stolen#index's vendored multi_serial_search bundle still asks for its icon at
-  # webpacker's publicPath, which has served nothing since packs went away -- so the
-  # search button renders a broken image. The bundle can't be rebuilt; point the one
-  # URL it emits at the asset we still have.
+  # webpacker's publicPath, which has served nothing since packs went away, so the
+  # search button renders a broken image. The bundle can't be rebuilt.
   get "/packs/media/stolen/search-583a6c1f.svg",
     to: redirect { ActionController::Base.helpers.image_path("stolen/search.svg") }
 

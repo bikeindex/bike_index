@@ -3,12 +3,6 @@
 require "rails_helper"
 
 RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
-  # The dialog locks the page behind it by pinning the body -- with overflow
-  # everywhere except iOS, where only position sticks
-  def scroll_locked_body
-    "body[style*='overflow: hidden'], body[style*='position: fixed']"
-  end
-
   it "opens, filters, selects, and closes" do
     visit "/rails/view_components/ui/forms/combobox/component/default"
 
@@ -153,8 +147,7 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
       expect(page).to have_css(scroll_locked_body)
 
       # Android's back gesture closes the dialog with a close request rather than a
-      # keypress, which nothing on the page can synthesize. The controller used to
-      # unlock only along its own collapse path, stranding the page unscrollable.
+      # keypress, which nothing on the page can synthesize
       page.execute_script("document.querySelector('dialog[open]').close()")
 
       expect(page).to have_no_css("dialog[open]")
