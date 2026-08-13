@@ -28,7 +28,8 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
       expect(component).to have_content("Use a U-Lock")
       expect(component).to_not have_content("thieves are jerks")
       expect(component).to have_content("tempo-snippet")
-      expect(component.css("a.binx-button").map { |a| a.text.strip }).to eq(["View your bike"])
+      # Below the bike details, and again in the promo callout
+      expect(component.css("a.binx-button").map { |a| a.text.strip }).to eq(["View your bike", "View your bike"])
       expect(component.css(".finished-registration-bike-box a.binx-button").count).to eq 1
     end
     context "tempo_snippet not is_enabled" do
@@ -84,9 +85,10 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
       expect(component).to_not have_content("Registration complete")
       expect(component).to_not have_content("Confirm your registration")
       expect(component).to have_content("Claim your bike")
-      expect(component).to have_link("Confirm this #{bike.type}")
       expect(component).to_not have_link("View your bike")
-      # Above the bike details
+      # Above the bike details, and again in the promo callout
+      expect(component.css("a.binx-button").map { |a| a.text.strip })
+        .to eq(["Confirm this #{bike.type}", "Confirm this #{bike.type}"])
       expect(component.css(".finished-registration-intro a.binx-button").count).to eq 1
       expect(component).to_not have_content("What's next?")
     end

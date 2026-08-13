@@ -48,7 +48,7 @@
 
   <% unless claimed? %>
     <div class="finished-registration-cta">
-      <%= link_to claim_cta_text, bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
+      <%= link_to cta_text, bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
 
       <p>
         <%= translation("sign_up_on_bikeindexorg_to_claim_your_bik", bike_type: bike.type) %>
@@ -99,7 +99,7 @@
 
   <% if show_view_bike_cta? %>
     <div class="finished-registration-cta">
-      <%= link_to translation("view_your_bike"), bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
+      <%= link_to cta_text, bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
     </div>
   <% end %>
 </div>
@@ -236,6 +236,8 @@
         <strong><%= translation("spread_the_word_title") %></strong>
         <%= translation("spread_the_word_body") %>
       </p>
+
+      <%= link_to cta_text, bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
     </div>
 
     <table

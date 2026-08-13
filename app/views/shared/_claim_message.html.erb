@@ -2,7 +2,7 @@
 <% ownership = bike.current_ownership %>
 <% skip_to_see ||= false %>
 
-<p>
+<p style="font-style: italic">
   <% if OrganizationDisplayer.avatar?(ownership.organization) %>
     <%= image_tag ownership.organization.avatar.url(:medium), alt: ownership.organization.name, class: "claim-message-org-avatar" %>
   <% end %>

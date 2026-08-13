@@ -90,7 +90,8 @@ module Emails
         end
       end
 
-      def claim_cta_text
+      def cta_text
+        return translation("view_your_bike") if claimed?
         return translation("claim_the_bike_type", bike_type: bike.type) if registered_by_owner?
 
         translation("confirm_this_bike_type", bike_type: bike.type)
