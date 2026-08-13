@@ -49,6 +49,28 @@ const listenForClickIntoFocus = function (input) {
 HwComboboxController.prototype.comboboxTargetConnected = listenForClickIntoFocus
 HwComboboxController.prototype.dialogComboboxTargetConnected = listenForClickIntoFocus
 
+// The dialog is the small-screen picker, but the gem measures the window the combobox is
+// in - so an iframe narrower than the breakpoint got it on a desktop, where it can't
+// escape the frame to be full-screen anyway.
+const isSmallViewport = (query) => {
+  // Lookbook frames its previews, and dragging its viewport handle is how they're reviewed
+  if (window.inComponentPreview) return window.matchMedia(query).matches
+
+  try {
+    return window.top.matchMedia(query).matches
+  } catch {
+    return window.matchMedia(query).matches // a cross-origin top isn't readable to measure
+  }
+}
+
+// Shadows an inherited accessor, so it can't be a plain assignment like the patches above
+Object.defineProperty(HwComboboxController.prototype, '_isSmallViewport', {
+  configurable: true,
+  get () {
+    return isSmallViewport(`(max-width: ${this.smallViewportMaxWidthValue})`)
+  }
+})
+
 // On small viewports it opens in a modal dialog and locks body scroll, but only
 // unlocks along its own collapse path, which a keypress or a click has to start.
 // Android's back gesture closes the dialog without either, stranding the page

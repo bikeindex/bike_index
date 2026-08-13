@@ -8,7 +8,7 @@
   cancels the shell's negative top margin (padding doesn't collapse) so the title clears it.
 %>
 
-<div class="tw:mx-[calc(50%_-_50vw)] tw:pt-9 tw:min-[992px]:pt-15 tw:sm:mx-0">
+<div class="tw:mx-[calc(50%_-_50vw)] tw:pt-(--nav-gap) tw:sm:mx-0">
   <%= render Org::RegistrationSequence::Preview::Component.new(registration_sequence: @registration_sequence, index: @preview_pagy.page - 1) %>
 </div>
 

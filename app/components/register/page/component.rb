@@ -9,9 +9,11 @@ module Register
       # data: for a step-wide controller, since this wraps everything on the page
       # (register--heading needs both the heading and the form in scope).
       # wide: for a page that isn't a form - the finished theft report's checklist
-      def initialize(data: {}, wide: false)
+      # embed: framed on someone else's page, which supplies the shell instead
+      def initialize(data: {}, wide: false, embed: false)
         @data = data
         @wide = wide
+        @embed = embed
       end
 
       def call
@@ -22,11 +24,18 @@ module Register
         content_tag(:div,
           content_tag(:div, safe_join([retry_notice, content]),
             class: "tw:mx-auto #{@wide ? "tw:max-w-3xl" : "tw:max-w-md"}"),
-          class: "tw:-mt-9 tw:-mb-18 tw:bg-gray-100 tw:px-4 tw:py-10 tw:min-[992px]:-mt-15 tw:dark:bg-gray-900",
+          class: shell_class,
           data: @data.merge(controller: ["register--revalidate", @data[:controller]].compact.join(" ")))
       end
 
       private
+
+      # p-1 so a focus ring at the form's edge isn't clipped by the frame
+      def shell_class
+        return "tw:p-1" if @embed
+
+        "tw:-mt-(--nav-gap) tw:-mb-18 tw:bg-gray-100 tw:px-4 tw:py-10 tw:dark:bg-gray-900"
+      end
 
       # Revealed by register--retry when a submission can't be retried into working. Ships
       # with the page rather than built in JS, so it's translated and styled like any alert
