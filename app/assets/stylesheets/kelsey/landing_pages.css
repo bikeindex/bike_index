@@ -1,6 +1,18 @@
 .kelsey_landing-page-body .primary-header-nav {
   margin-bottom: 0;
 }
+
+/* The hero sits flush under the navbar, so this only shows where something stands
+   between them - a general alert - which would otherwise be a white band above the hero */
+.kelsey_landing-page-body {
+  background-color: var(--redesign-blue-800);
+}
+
+/* The navbar's gap is zeroed above, so an alert standing in it takes that spacing
+   itself rather than butting against the navbar the way no other page does */
+.kelsey_landing-page-body .general-alert {
+  margin-top: var(--nav-gap);
+}
 .kelsey_landing-page-body .primary-footer {
   margin-top: 0;
 }
