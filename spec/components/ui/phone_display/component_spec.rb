@@ -37,7 +37,16 @@ RSpec.describe UI::PhoneDisplay::Component, type: :component do
   context "with html_options" do
     let(:options) { {phone:, title: "Call the owner"} }
     it "passes them to the link" do
-      expect(component).to eq '<a class="twlink tw:font-mono" title="Call the owner" href="tel:999-999-9999">999-999-9999</a>'
+      expect(component).to eq '<a title="Call the owner" class="twlink tw:font-mono" href="tel:999-999-9999">999-999-9999</a>'
+    end
+  end
+
+  context "with class in html_options" do
+    let(:options) { {phone:, class: "phone-number-link"} }
+
+    # It would be dropped for the built classes, so say so rather than ignoring it
+    it "raises, naming html_class" do
+      expect { instance }.to raise_error(ArgumentError, /you must use the keyword arg html_class/)
     end
   end
 
