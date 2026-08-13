@@ -369,7 +369,9 @@ RSpec.describe RegisterController, type: :request do
 
   # The same ?button= the embed form takes
   describe "button color" do
-    let(:orange_style) { "background-color: #ee7e2c; border-color: #ee7e2c" }
+    let(:orange_style) do
+      "background-color: #ee7e2c; border-color: #ee7e2c; --button-hover-color: hsla(25, 85%, 47%, 1)"
+    end
 
     def submit_button_style
       response.parsed_body.at_css("form button[type=submit]")["style"]

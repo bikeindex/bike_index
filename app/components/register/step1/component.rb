@@ -14,9 +14,19 @@ module Register
 
       private
 
-      # Inline beats COLORS, hover included - a one-off color has no hover shade
+      # The hover shade rides a variable because Tailwind only generates classes it can
+      # read literally, and is !important because the inline color outranks a class
       def button_style
-        "background-color: #{@button_color}; border-color: #{@button_color}" if @button_color
+        return unless @button_color
+
+        "background-color: #{@button_color}; border-color: #{@button_color}; " \
+          "--button-hover-color: #{HexColor.darken(@button_color)}"
+      end
+
+      def button_class
+        return "tw:w-full" if @button_color.blank?
+
+        "tw:w-full tw:hover:bg-[var(--button-hover-color)]! tw:hover:border-[var(--button-hover-color)]!"
       end
 
       def cycle_type
