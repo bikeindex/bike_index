@@ -7,6 +7,12 @@
 .kelsey_landing-page-body {
   background-color: var(--redesign-blue-800);
 }
+
+/* The navbar's gap is zeroed above, so an alert standing in it takes that spacing
+   itself rather than butting against the navbar the way no other page does */
+.kelsey_landing-page-body .general-alert {
+  margin-top: var(--nav-gap);
+}
 .kelsey_landing-page-body .primary-footer {
   margin-top: 0;
 }

@@ -8,9 +8,10 @@ module PageBlock
       class Component < ApplicationComponent
         # container lines it up with the navbar above; z-20 because the homepage and
         # landing page bike tile grids are positioned, so they'd otherwise paint over
-        # this in-flow banner. Blank where the page already places it - organized_skeleton
+        # this in-flow banner; general-alert is what the landing pages hang their own
+        # spacing on. Blank where the page already places it - organized_skeleton
         # renders this inside its content column, which the menu doesn't cover
-        def initialize(current_user:, wrapper_class: "container tw:relative tw:z-20")
+        def initialize(current_user:, wrapper_class: "general-alert container tw:relative tw:z-20")
           @current_user = current_user
           @wrapper_class = wrapper_class
         end
