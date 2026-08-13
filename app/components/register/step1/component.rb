@@ -27,7 +27,7 @@ module Register
 
       # Derived when the frame's src doesn't name one
       def button_hover_color
-        @button_hover_color.presence || HexColor.darken(@button_color)
+        @button_hover_color.presence || HexColor.darken_hex(@button_color)
       end
 
       # The shade rides a variable because Tailwind only generates classes it can read

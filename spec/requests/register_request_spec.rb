@@ -261,7 +261,7 @@ RSpec.describe RegisterController, type: :request do
 
     it "colors the button with the frame's ?button=, which the flow's own pages ignore" do
       get "/register/embed?organization_id=#{organization.slug}&button=c9a227"
-      expect(submit_button_style).to include("background-color: #c9a227", "--button-hover-color: hsla(")
+      expect(submit_button_style).to include("background-color: #c9a227", "--button-hover-color: #a78620")
 
       # The derived shade, unless the frame names the one it wants
       get "/register/embed?organization_id=#{organization.slug}&button=c9a227&button_hover=123456"

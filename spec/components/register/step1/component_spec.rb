@@ -54,7 +54,7 @@ RSpec.describe Register::Step1::Component, type: :component do
       render_step_1(button_color: "#c9a227")
 
       expect(submit_button["style"])
-        .to eq "background-color: #c9a227; border-color: #c9a227; --button-hover-color: hsla(46, 68%, 39%, 1)"
+        .to eq "background-color: #c9a227; border-color: #c9a227; --button-hover-color: #a78620"
     end
 
     # UI::Button guards every hover against both disabled flags, and an !important

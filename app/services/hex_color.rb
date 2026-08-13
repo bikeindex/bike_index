@@ -7,15 +7,7 @@ module HexColor
     "##{hex}" if hex
   end
 
-  # hsla, so taking a shade off a color of any hue is one number rather than three
-  def darken(string, amount: 0.08)
-    hue, saturation, lightness = darkened_hsl(string, amount:)
-    return if hue.nil?
-
-    "hsla(#{hue}, #{percent(saturation)}, #{percent(lightness)}, 1)"
-  end
-
-  # The same shade for the places that take a hex rather than a color - a URL parameter
+  # Through hsl, so taking a shade off a color of any hue is one number rather than three
   def darken_hex(string, amount: 0.08)
     hsl = darkened_hsl(string, amount:)
     return if hsl.nil?
@@ -36,8 +28,7 @@ module HexColor
     lightness = (max + min) / 2
     delta = max - min
     saturation = delta.zero? ? 0 : delta / (1 - ((2 * lightness) - 1).abs)
-    # Rounded to what the hsla string can say, so the hex is the color a browser renders from it
-    [hue(*rgb, delta, max), whole_percent(saturation), whole_percent([lightness - amount, 0].max)]
+    [hue(*rgb, delta, max), saturation, [lightness - amount, 0].max]
   end
 
   def digits(string)
@@ -60,7 +51,7 @@ module HexColor
     when green then ((blue - red) / delta) + 2
     else ((red - green) / delta) + 4
     end
-    (sector * 60).round
+    sector * 60
   end
 
   def rgb_from(hue, saturation, lightness)
@@ -77,9 +68,5 @@ module HexColor
     unshifted.map { it + lightness - (chroma / 2) }
   end
 
-  def whole_percent(fraction) = (fraction * 100).round / 100.0
-
-  def percent(fraction) = "#{(fraction * 100).round}%"
-
-  conceal :darkened_hsl, :digits, :channels, :hue, :rgb_from, :whole_percent, :percent
+  conceal :darkened_hsl, :digits, :channels, :hue, :rgb_from
 end

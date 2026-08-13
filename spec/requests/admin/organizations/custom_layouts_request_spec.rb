@@ -43,11 +43,11 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
 
           it "recommends the shade step 1 would derive" do
             get "#{base_url}/landing_page/edit"
-            expect(response.body).to include "Add &amp;button_hover=a78820"
+            expect(response.body).to include "Add &amp;button_hover=a78620"
           end
 
           context "one that names its hover too" do
-            let(:iframe) { "<iframe src='/register/embed?button=c9a227&button_hover=a78820'></iframe>" }
+            let(:iframe) { "<iframe src='/register/embed?button=c9a227&button_hover=a78620'></iframe>" }
 
             it "says nothing" do
               get "#{base_url}/landing_page/edit"
