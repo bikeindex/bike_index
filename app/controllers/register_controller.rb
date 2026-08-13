@@ -38,7 +38,7 @@ class RegisterController < ApplicationController
   def embed
     @page_title = I18n.t("meta_titles.register_step_1")
     render Register::Embed::Component.new(b_param: @b_param, steps: flow_steps, current_user:,
-      button_color: params[:button]), layout: false
+      button_color: HexColor.normalize(params[:button])), layout: false
   end
 
   # The whole flow after the start: ?step=1, ?step=2, ?step=report for a theft or a

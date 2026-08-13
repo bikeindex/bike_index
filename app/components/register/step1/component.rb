@@ -9,8 +9,7 @@ module Register
         @steps = steps
         @current_user = current_user
         @embed = embed
-        # The boundary: what the controller passes through is still a raw param
-        @button_color = HexColor.normalize(button_color)
+        @button_color = button_color
       end
 
       private
@@ -25,8 +24,7 @@ module Register
       end
 
       # The shade rides a variable because Tailwind only generates classes it can read
-      # literally, and is !important because the inline color outranks a class. Guarded
-      # like every UI::Button hover, which an !important would otherwise outrank too
+      # literally, and is !important because the inline color outranks a class
       def button_options
         return {html_class: "tw:w-full"} unless @button_color
 

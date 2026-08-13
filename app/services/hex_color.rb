@@ -1,7 +1,7 @@
 module HexColor
   extend Functionable
 
-  # nil for anything else - this lands in a style attribute
+  # Lands in a style attribute, so nil unless it really is a hex
   def normalize(string)
     hex = digits(string)
     "##{hex}" if hex
@@ -12,12 +12,12 @@ module HexColor
     hex = digits(string)
     return if hex.blank?
 
-    red, green, blue = channels(hex)
-    min, max = [red, green, blue].minmax
+    rgb = channels(hex)
+    min, max = rgb.minmax
     lightness = (max + min) / 2
     delta = max - min
     saturation = delta.zero? ? 0 : delta / (1 - ((2 * lightness) - 1).abs)
-    "hsla(#{hue(red, green, blue, delta, max)}, #{percent(saturation)}, #{percent([lightness - amount, 0].max)}, 1)"
+    "hsla(#{hue(*rgb, delta, max)}, #{percent(saturation)}, #{percent([lightness - amount, 0].max)}, 1)"
   end
 
   #
@@ -32,8 +32,8 @@ module HexColor
   end
 
   def channels(hex)
-    expanded = (hex.length == 3) ? hex.chars.flat_map { [it, it] }.join : hex
-    expanded.scan(/../).map { it.to_i(16) / 255.0 }
+    chunks = (hex.length == 3) ? hex.chars.map { it * 2 } : hex.scan(/../)
+    chunks.map { it.to_i(16) / 255.0 }
   end
 
   def hue(red, green, blue, delta, max)
