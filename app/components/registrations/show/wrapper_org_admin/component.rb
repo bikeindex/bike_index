@@ -203,8 +203,7 @@ module Registrations
           edit_bike_path(@bike, edit_template: @bike.default_edit_template)
         end
 
-        # Feature-gated like the legacy access panel and no further: looking up the owner's
-        # registrations on a bike that isn't the org's own is what the feature is for
+        # Not gated on show_contact? — looking up registrations on another org's bike is the point
         def show_other_registrations?
           @organization.enabled?("additional_registrations_information")
         end

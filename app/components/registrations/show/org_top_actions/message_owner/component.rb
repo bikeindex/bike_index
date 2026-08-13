@@ -19,7 +19,6 @@ module Registrations
             @message_notification ||= StolenNotification.new(bike: @bike)
           end
 
-          # Shown only when the owner's phone-visibility settings permit this viewer
           def owner_phone
             @bike.phone if @bike.phoneable_by?(@current_user)
           end

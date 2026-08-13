@@ -27,14 +27,6 @@
       <% end %>
     </div>
 
-    <% if owner_phone.present? %>
-      <p class="tw:mt-3 tw:text-sm">
-        <span class="tw:italic tw:opacity-65">
-          <%= translation(".or_call") %>
-        </span>
-
-        <%= render UI::PhoneDisplay::Component.new(phone: owner_phone) %>
-      </p>
-    <% end %>
+    <%= render(Registrations::Show::OwnerPhone::Component.new(phone: owner_phone)) %>
   <% end %>
 </div>

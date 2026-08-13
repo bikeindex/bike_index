@@ -369,14 +369,14 @@
             <%= render(Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, current_user: @current_user, settings_component: other_registrations_settings)) %>
           </div>
         <% end %>
+      <% end %>
 
-        <% if more_other_registrations? %>
-          <p class="tw:mt-3 tw:text-xs tw:opacity-65">
-            <%= translation(".showing_recent", count: recent_other_registrations.size) %>
-            ·
-            <%= link_to translation(".view_all_registrations"), other_registrations_search_path, class: "twlink", data: {turbo_frame: "_top"} %>
-          </p>
-        <% end %>
+      <% if more_other_registrations? %>
+        <p class="tw:mt-3 tw:text-xs tw:opacity-65">
+          <%= translation(".showing_recent", count: recent_other_registrations.size) %>
+          ·
+          <%= link_to translation(".view_all_registrations"), other_registrations_search_path, class: "twlink", data: {turbo_frame: "_top"} %>
+        </p>
       <% end %>
     <% end %>
   <% end %>

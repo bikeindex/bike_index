@@ -100,8 +100,7 @@ cannondale_user.save
 OrganizationRole.create(organization_id: cannondale.id, user_id: cannondale_user.id, role: "admin")
 
 # --- Bike Recovery Team: Law Enforcement functionality ---
-# law_enforcement is the kind, not just the features: phone_for_police and the rest of
-# Bike#phoneable_by? key off Organization.law_enforcement rather than the feature slugs
+# phoneable_by?'s police check reads Organization.law_enforcement — the kind, not the feature slugs
 recovery_team = Organization.find_by_name("Bike Recovery Team") || Organization.create!(name: "Bike Recovery Team")
 recovery_team.update(kind: :law_enforcement)
 recovery_team_invoice = Invoice.create(organization: recovery_team, amount_due: 0, start_at: Time.current - 1.hour, subscription_end_at: 1.year.from_now)

@@ -38,7 +38,6 @@ RSpec.describe Registrations::Show::WrapperOrgAdmin::Component, type: :component
         expect(page).to have_button("settings", visible: :all)
       end
 
-      # Looking up the owner's registrations on someone else's bike is the feature
       context "on a bike registered elsewhere, viewed by a limited member" do
         let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
 
