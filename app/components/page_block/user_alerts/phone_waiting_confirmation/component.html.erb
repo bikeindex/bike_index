@@ -1,4 +1,4 @@
-<%= render PageBlock::UserAlerts::Banner::Component.new do %>
+<%= render UI::Alerts::Base::Component.new do %>
   <%= render UI::Button::Component.new(text: translation(".confirm_your_phone_number"),
         color: :link, commandfor: MODAL_ID, command: "show-modal") %>
 <% end %>

@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe PageBlock::UserAlerts::UnfinishedRegistration::Component, type: :component do
-  let(:b_param) { FactoryBot.create(:b_param, origin: "register_flow", params: {bike: {manufacturer_id: 1, cycle_type: "cargo"}}) }
+  let(:b_param) { FactoryBot.create(:b_param_unfinished_registration) }
   let(:component) { render_inline(described_class.new(b_param:)) }
 
   it "links back into the flow, naming the cycle type" do

@@ -3,6 +3,6 @@
   it alone — without this the top of the page is dragged off the frame
 %>
 
-<div class="<%= "tw:min-[992px]:pt-[44px]" if offset_header %>">
+<div class="<%= "tw:pt-(--nav-gap)" if offset_header %>">
   <%= render(component) %>
 </div>

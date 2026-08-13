@@ -13,7 +13,7 @@ $mobile-nav-height: 4 * $vertical-height;
   background: $primary-nav-background;
   position: relative;
   z-index: $zindex-navbar-fixed;
-  margin-bottom: 3 * $vertical-height;
+  margin-bottom: var(--nav-gap);
   &::after {
     content: "";
     display: table;
@@ -356,7 +356,6 @@ $mobile-nav-height: 4 * $vertical-height;
 // Large screen styles
 @media (min-width: $grid-breakpoint-lg) {
   .primary-header-nav {
-    margin-bottom: 5 * $vertical-height;
     .hamburgler {
       display: none;
     }
