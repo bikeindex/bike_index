@@ -71,38 +71,33 @@ Object.defineProperty(HwComboboxController.prototype, '_isSmallViewport', {
   }
 })
 
-// Turbo discards the page around an open dialog without closing it, so neither the
-// gem's collapse path nor the `close` below ever runs
+// Neither covers the other: only `before-cache` runs early enough to keep an open dialog
+// out of a cached snapshot, and it's skipped on the no-cache pages the comboboxes are on
 const RENDER_EVENTS = ['turbo:before-cache', 'turbo:before-render']
 
 // On small viewports it opens in a modal dialog and locks body scroll, but only
 // unlocks along its own collapse path, which a keypress or a click has to start.
-// Neither of the two ways a phone leaves the dialog is one of those: Android's back
-// gesture closes it, and iOS's back swipe navigates. Both strand the page
-// unscrollable until reload -- iOS everywhere it goes next, its lock being a
-// preventDefault on document's touchmove, and document outliving any render.
+// Neither way a phone leaves the dialog starts one -- Android's back gesture closes it,
+// iOS's back swipe navigates away -- and iOS takes its lock out on document, so the
+// page it lands on is stranded unscrollable too.
 const openInDialog = HwComboboxController.prototype._openInDialog
 HwComboboxController.prototype._openInDialog = function () {
   openInDialog.call(this)
 
-  const stopListening = () => {
-    this.dialogTarget.removeEventListener('close', dismiss)
-    RENDER_EVENTS.forEach(name => document.removeEventListener(name, dismiss))
-  }
-
+  const listeners = new AbortController()
   const dismiss = () => {
-    stopListening() // the close below re-enters here otherwise
+    listeners.abort() // the close below re-enters here otherwise
     if (!this.expandedValue) return // its own collapse path already ran
 
-    // The browser sends the close request Escape does, so close the way escape does --
-    // tearing the dialog down by hand instead leaves a typed query sitting in the
-    // field with nothing selected behind it
+    // The browser sends this same close request for Escape, so close the way escape
+    // does -- tearing the dialog down by hand instead leaves a typed query sitting in
+    // the field with nothing selected behind it
     this.close('hw:keyHandler:escape')
-    // Owed whenever `close` collapsed inline, the dialog already being shut
+    // `close` collapsed inline, the dialog already being shut, so its half is still owed
     this._moveArtifactsInline()
     this._restoreBodyScroll()
   }
 
-  this.dialogTarget.addEventListener('close', dismiss)
-  RENDER_EVENTS.forEach(name => document.addEventListener(name, dismiss))
+  this.dialogTarget.addEventListener('close', dismiss, { signal: listeners.signal })
+  RENDER_EVENTS.forEach(name => document.addEventListener(name, dismiss, { signal: listeners.signal }))
 }
