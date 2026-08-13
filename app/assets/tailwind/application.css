@@ -271,6 +271,17 @@
 
 body {
   @apply tw:base-font;
+
+  /* .primary-header-nav's margin-bottom, which the full-bleed pages pull up by to sit
+     flush under the navbar. Defined here rather than beside the nav in revised.scss,
+     which the admin and component-preview layouts don't load; the layout zeroes it on
+     <main> when the general alert stands in the gap instead */
+  --nav-gap: 36px;
+}
+@media (min-width: 992px) {
+  body {
+    --nav-gap: 60px;
+  }
 }
 /*
   'dark:' syntax isn't working for the body element, unclear why - hacking with this for now
