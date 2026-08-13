@@ -71,23 +71,38 @@ Object.defineProperty(HwComboboxController.prototype, '_isSmallViewport', {
   }
 })
 
+// Turbo discards the page around an open dialog without closing it, so neither the
+// gem's collapse path nor the `close` below ever runs
+const RENDER_EVENTS = ['turbo:before-cache', 'turbo:before-render']
+
 // On small viewports it opens in a modal dialog and locks body scroll, but only
 // unlocks along its own collapse path, which a keypress or a click has to start.
-// Android's back gesture closes the dialog without either, stranding the page
-// unscrollable until reload.
+// Neither of the two ways a phone leaves the dialog is one of those: Android's back
+// gesture closes it, and iOS's back swipe navigates. Both strand the page
+// unscrollable until reload -- iOS everywhere it goes next, its lock being a
+// preventDefault on document's touchmove, and document outliving any render.
 const openInDialog = HwComboboxController.prototype._openInDialog
 HwComboboxController.prototype._openInDialog = function () {
   openInDialog.call(this)
 
-  this.dialogTarget.addEventListener('close', () => {
+  const stopListening = () => {
+    this.dialogTarget.removeEventListener('close', dismiss)
+    RENDER_EVENTS.forEach(name => document.removeEventListener(name, dismiss))
+  }
+
+  const dismiss = () => {
+    stopListening() // the close below re-enters here otherwise
     if (!this.expandedValue) return // its own collapse path already ran
 
-    // The browser sends this same close request for Escape, so close the way escape
-    // does -- tearing the dialog down by hand instead leaves a typed query sitting in
-    // the field with nothing selected behind it
+    // The browser sends the close request Escape does, so close the way escape does --
+    // tearing the dialog down by hand instead leaves a typed query sitting in the
+    // field with nothing selected behind it
     this.close('hw:keyHandler:escape')
-    // `close` collapsed inline, the dialog already being shut, so its half is still owed
+    // Owed whenever `close` collapsed inline, the dialog already being shut
     this._moveArtifactsInline()
     this._restoreBodyScroll()
-  }, { once: true })
+  }
+
+  this.dialogTarget.addEventListener('close', dismiss)
+  RENDER_EVENTS.forEach(name => document.addEventListener(name, dismiss))
 }

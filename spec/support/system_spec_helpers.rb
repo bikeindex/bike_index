@@ -135,6 +135,26 @@ module SystemSpecHelpers
     "body[style*='overflow: hidden'], body[style*='position: fixed']"
   end
 
+  # hotwire_combobox's scroll lock picks its mechanism at import from
+  # navigator.platform, and only its iOS branch reaches document. Call before `visit`.
+  def emulate_ios_platform
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.add_init_script(script: "Object.defineProperty(navigator, 'platform', {get: () => 'iPhone'})")
+    end
+  end
+
+  # iOS locks the page by preventing document's touchmove, which leaves no mark on
+  # the body for scroll_locked_body to catch - and outlives the body it was taken for
+  def touch_scroll_blocked?
+    page.evaluate_script(<<~JS)
+      (() => {
+        const event = new TouchEvent('touchmove', {bubbles: true, cancelable: true, touches: [], targetTouches: [], changedTouches: []})
+        document.body.dispatchEvent(event)
+        return event.defaultPrevented
+      })()
+    JS
+  end
+
   # The registration's emailed link, minus the mailer's host - the app is on Capybara's
   def confirmation_link
     Email::PartialRegistrationJob.drain

@@ -192,5 +192,29 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
       expect(page).to have_no_css(scroll_locked_body)
       expect(page).to have_css("#{overlay} span", text: "It was stolen")
     end
+
+    it "unlocks the page when a render replaces the open dialog" do
+      emulate_ios_platform
+      page.current_window.resize_to(390, 844)
+      visit "/rails/view_components/ui/forms/combobox/component/stacked"
+
+      expect(page).to have_css('[aria-expanded="false"]', wait: 10)
+
+      find_field("Registration type").click
+
+      expect(page).to have_css("dialog[open]")
+      expect(page).to have_css(scroll_locked_body)
+      expect(touch_scroll_blocked?).to be true
+
+      # iOS's back swipe navigates rather than dismissing, so Turbo discards the dialog
+      # without ever closing it - a gesture no keypress or click on the page stands in for
+      page.execute_script("document.dispatchEvent(new CustomEvent('turbo:before-render'))")
+
+      expect(page).to have_no_css("dialog[open]")
+      expect(page).to have_no_css(scroll_locked_body)
+      # The lock document holds survives the render that takes the body, so this is the
+      # half the reporter feels: a page that looks untouched and scrolls nowhere
+      expect(touch_scroll_blocked?).to be false
+    end
   end
 end
