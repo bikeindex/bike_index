@@ -124,12 +124,14 @@ class Organization < ApplicationRecord
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other organization features
   has_one :hot_sheet_configuration
   has_one :organization_stolen_message
+  has_one :organization_landing_page
   has_one :impound_configuration
   has_one :organization_saml_configuration
   has_many :hot_sheets
   has_many :organization_model_audits
   accepts_nested_attributes_for :mail_snippets
   accepts_nested_attributes_for :organization_stolen_message
+  accepts_nested_attributes_for :organization_landing_page
   accepts_nested_attributes_for :organization_saml_configuration
   accepts_nested_attributes_for :locations, allow_destroy: true
 
@@ -296,8 +298,12 @@ class Organization < ApplicationRecord
     slug
   end
 
-  def landing_html?
-    landing_html.present?
+  def landing_page_body
+    organization_landing_page&.body
+  end
+
+  def landing_page_body?
+    landing_page_body.present?
   end
 
   def restrict_invitations?

@@ -8,7 +8,9 @@ module Admin
 
       def edit
         @edit_template = edit_layout_pages.include?(params[:id]) ? params[:id] : edit_layout_pages.first
-        if @edit_template != "landing_page" # we're rendering a snippet
+        if @edit_template == "landing_page"
+          @landing_page = OrganizationLandingPage.for(@organization)
+        else # we're rendering a snippet
           @mail_snippet = @organization.mail_snippets.where(kind: @edit_template).first_or_create
         end
       end
@@ -28,7 +30,8 @@ module Admin
 
       def permitted_parameters
         params.require(:organization)
-          .permit(:landing_html, mail_snippets_attributes: [:body, :is_enabled, :id])
+          .permit(organization_landing_page_attributes: [:body, :id],
+            mail_snippets_attributes: [:body, :is_enabled, :id])
       end
 
       def edit_layout_pages
