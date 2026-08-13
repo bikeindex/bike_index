@@ -1,0 +1,13 @@
+<%# Register::Page pulls itself up over the layout's spacing (-mt-9, -mt-15 at 992px), so the padding cancels that before the heading's own margin %>
+<div class="tw:pb-9 tw:min-[992px]:pb-15">
+  <h2
+    class="
+      uncap tw:-mt-4 tw:mb-8 tw:pl-4 tw:text-lg tw:font-semibold
+      tw:text-gray-900 tw:italic tw:dark:text-gray-100
+    "
+  >
+    <%= link_to "Go back to the old view", new_organization_bike_path(organization_id: current_organization.to_param), class: "twlink" %>
+  </h2>
+</div>
+
+<%= render Register::Step1::Component.new(b_param: @b_param, steps: @steps, current_user:) %>

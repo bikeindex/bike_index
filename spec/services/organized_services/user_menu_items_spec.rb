@@ -16,7 +16,7 @@ RSpec.describe OrganizedServices::UserMenuItems do
         [
           link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", active: :on_registrations_index),
           {type: :disabled, label: "Incomplete registrations", secondary: true},
-          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
+          link_item("Add a bike", "/o/#{organization.to_param}/registrations/new", active: :on_bikes_new),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false}
         ]
@@ -50,7 +50,7 @@ RSpec.describe OrganizedServices::UserMenuItems do
           link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", active: :on_registrations_index),
           link_item("Impounded Bikes", "/o/#{organization.to_param}/impound_records", secondary: true, active: :match_controller),
           {type: :disabled, label: "Incomplete registrations", secondary: true},
-          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
+          link_item("Add a bike", "/o/#{organization.to_param}/registrations/new", active: :on_bikes_new),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false}
         ]
@@ -66,7 +66,7 @@ RSpec.describe OrganizedServices::UserMenuItems do
         [
           link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", active: :on_registrations_index),
           {type: :disabled, label: "Incomplete registrations", secondary: true},
-          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
+          link_item("Add a bike", "/o/#{organization.to_param}/registrations/new", active: :on_bikes_new),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false},
           link_item("Manage users", "/o/#{organization.to_param}/users", active: :match_controller),
@@ -85,7 +85,7 @@ RSpec.describe OrganizedServices::UserMenuItems do
         [
           link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", active: :on_registrations_index),
           {type: :disabled, label: "Incomplete registrations", secondary: true},
-          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
+          link_item("Add a bike", "/o/#{organization.to_param}/registrations/new", active: :on_bikes_new),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false},
           link_item("Manage users", "/o/#{organization.to_param}/users", active: :match_controller),
@@ -107,7 +107,7 @@ RSpec.describe OrganizedServices::UserMenuItems do
         [
           link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", active: :on_registrations_index),
           {type: :disabled, label: "Incomplete registrations", secondary: true},
-          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
+          link_item("Add a bike", "/o/#{organization.to_param}/registrations/new", active: :on_bikes_new),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false},
           link_item("Manage users", "/o/#{organization.to_param}/users", active: :match_controller),

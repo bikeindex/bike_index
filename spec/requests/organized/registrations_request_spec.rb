@@ -275,6 +275,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(assigns(:b_param)&.id).to eq b_param.id
       expect(response.body).to include("organized-left-menu")
       expect(response.body).to include(b_param.id_token)
+      expect(response.body).to include(new_organization_bike_path(organization_id: current_organization.to_param))
 
       # Revisiting reuses the still-blank registration the session is on
       expect { get "#{base_url}/new" }.to_not change(BParam, :count)

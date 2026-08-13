@@ -30,7 +30,7 @@ RSpec.describe "Me API V3", type: :request do
            secondary: false, active: "on_registrations_index"},
           {type: "disabled", label: "Incomplete registrations", secondary: true},
           {type: "link", label: "Add a bike",
-           path: "/o/#{organization.slug}/bikes/new",
+           path: "/o/#{organization.slug}/registrations/new",
            secondary: false, active: "on_bikes_new"},
           {type: "divider"},
           {type: "disabled", label: "Registration stickers", secondary: false}

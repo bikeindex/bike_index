@@ -138,7 +138,7 @@ module OrganizedServices
 
     def add_bike_items(organization)
       items = [link(translation(:add_a_bike),
-        routes.new_organization_bike_path(organization.to_param), active: :on_bikes_new)]
+        routes.new_organization_registration_path(organization.to_param), active: :on_bikes_new)]
 
       divider_below = organization.show_bulk_import? || organization.lightspeed_or_broken_lightspeed? ||
         organization.enabled?("parking_notifications")
