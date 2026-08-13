@@ -182,6 +182,11 @@ RSpec.describe "Bike search", :js, type: :system do
 
     # Forward to the Blue search - frame, form, and counts reconcile back to Blue.
     page.go_forward
+    # Pin the address bar before anything below starts a navigation of its own. The
+    # frame, chips and counts all restore from the page snapshot, so they settle
+    # while the traversal itself may not have, and the click at the end of this
+    # example is where the about:blank failures land.
+    expect(page).to have_current_path(/#{Regexp.escape(blue.search_id)}/, wait: 10)
     expect_results_frame_color("Blue", "Red")
     expect(page).to have_css(".hw-combobox__chip", text: "Blue")
     expect(page).to have_no_css(".hw-combobox__chip", text: "Red")
