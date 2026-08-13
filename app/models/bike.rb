@@ -248,7 +248,7 @@ class Bike < ApplicationRecord
     end
 
     # Unioned rather than OR'd because an OR keeps every branch off its index
-    def matching_email(query)
+    def admin_email_search(query)
       return all if query.blank?
 
       matching = "%#{EmailNormalizer.normalize(query)}%"

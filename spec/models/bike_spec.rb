@@ -153,22 +153,22 @@ RSpec.describe Bike, type: :model do
       end
     end
 
-    describe "matching_email" do
+    describe "admin_email_search" do
       let(:creator) { FactoryBot.create(:user_confirmed, email: "shop@bikeindex.org") }
       let!(:bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "Robin.Jay.Parker@example.com", creator:) }
       let!(:transferred_bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "someone@example.com") }
       it "matches any part of the email, ignoring case and surrounding whitespace" do
-        expect(Bike.unscoped.matching_email("robin.jay.parker@example.com").pluck(:id)).to eq([bike.id])
-        expect(Bike.unscoped.matching_email(" Robin.Jay.Parker@EXAMPLE.com ").pluck(:id)).to eq([bike.id])
-        expect(Bike.unscoped.matching_email("robin.jay").pluck(:id)).to eq([bike.id])
-        expect(Bike.unscoped.matching_email("parker").pluck(:id)).to eq([bike.id])
-        expect(Bike.unscoped.matching_email("").pluck(:id)).to match_array(Bike.unscoped.pluck(:id))
+        expect(Bike.unscoped.admin_email_search("robin.jay.parker@example.com").pluck(:id)).to eq([bike.id])
+        expect(Bike.unscoped.admin_email_search(" Robin.Jay.Parker@EXAMPLE.com ").pluck(:id)).to eq([bike.id])
+        expect(Bike.unscoped.admin_email_search("robin.jay").pluck(:id)).to eq([bike.id])
+        expect(Bike.unscoped.admin_email_search("parker").pluck(:id)).to eq([bike.id])
+        expect(Bike.unscoped.admin_email_search("").pluck(:id)).to match_array(Bike.unscoped.pluck(:id))
       end
       context "with a prior ownership" do
         let!(:prior_ownership) { FactoryBot.create(:ownership, bike: transferred_bike, owner_email: "previous@example.com") }
         it "matches the prior owner and the registration creator" do
-          expect(Bike.unscoped.matching_email("previous@example.com").pluck(:id)).to eq([transferred_bike.id])
-          expect(Bike.unscoped.matching_email("shop@bikeindex.org").pluck(:id)).to eq([bike.id])
+          expect(Bike.unscoped.admin_email_search("previous@example.com").pluck(:id)).to eq([transferred_bike.id])
+          expect(Bike.unscoped.admin_email_search("shop@bikeindex.org").pluck(:id)).to eq([bike.id])
         end
       end
     end
