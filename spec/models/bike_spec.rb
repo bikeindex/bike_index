@@ -153,6 +153,25 @@ RSpec.describe Bike, type: :model do
       end
     end
 
+    describe "matching_email" do
+      let(:creator) { FactoryBot.create(:user_confirmed, email: "shop@bikeindex.org") }
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "Robin.Jay.Parker@example.com", creator:) }
+      let!(:transferred_bike) { FactoryBot.create(:bike, :with_ownership, owner_email: "someone@example.com") }
+      it "matches the whole email, ignoring case and surrounding whitespace" do
+        expect(Bike.unscoped.matching_email("robin.jay.parker@example.com").pluck(:id)).to eq([bike.id])
+        expect(Bike.unscoped.matching_email(" Robin.Jay.Parker@EXAMPLE.com ").pluck(:id)).to eq([bike.id])
+        expect(Bike.unscoped.matching_email("robin.jay.parker").pluck(:id)).to eq([])
+        expect(Bike.unscoped.matching_email("").pluck(:id)).to match_array(Bike.unscoped.pluck(:id))
+      end
+      context "with a prior ownership" do
+        let!(:prior_ownership) { FactoryBot.create(:ownership, bike: transferred_bike, owner_email: "previous@example.com") }
+        it "matches the prior owner and the registration creator" do
+          expect(Bike.unscoped.matching_email("previous@example.com").pluck(:id)).to eq([transferred_bike.id])
+          expect(Bike.unscoped.matching_email("shop@bikeindex.org").pluck(:id)).to eq([bike.id])
+        end
+      end
+    end
+
     describe ".possibly_found_with_match" do
       let(:bike1) { FactoryBot.create(:impounded_bike, serial_number: "He10o") }
       let(:bike1b) { FactoryBot.create(:impounded_bike, serial_number: "He10o") }

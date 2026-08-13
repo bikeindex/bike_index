@@ -6466,6 +6466,13 @@ CREATE INDEX index_bikes_on_model_audit_id ON public.bikes USING btree (model_au
 
 
 --
+-- Name: index_bikes_on_owner_email; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_owner_email ON public.bikes USING btree (owner_email);
+
+
+--
 -- Name: index_bikes_on_owner_email_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7208,6 +7215,13 @@ CREATE INDEX index_ownerships_on_organization_id ON public.ownerships USING btre
 
 
 --
+-- Name: index_ownerships_on_owner_email; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ownerships_on_owner_email ON public.ownerships USING btree (owner_email);
+
+
+--
 -- Name: index_ownerships_on_sale_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7742,6 +7756,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260812200000'),
 ('20260811085030'),
 ('20260808224655'),
 ('20260808120000'),

@@ -85,6 +85,7 @@
 #  index_bikes_on_lower_mnfg_name                  (lower((mnfg_name)::text))
 #  index_bikes_on_manufacturer_id                  (manufacturer_id)
 #  index_bikes_on_model_audit_id                   (model_audit_id) WHERE (model_audit_id IS NOT NULL)
+#  index_bikes_on_owner_email                      (owner_email)
 #  index_bikes_on_owner_email_trgm                 (owner_email) USING gin
 #  index_bikes_on_primary_activity_id              (primary_activity_id) WHERE (primary_activity_id IS NOT NULL)
 #  index_bikes_on_primary_frame_color_id           (primary_frame_color_id)
@@ -227,11 +228,6 @@ class Bike < ApplicationRecord
     against: {serial_number: "A", cached_data: "B", all_description: "C"},
     using: {tsearch: {tsvector_column: "search_vector"}}
 
-  pg_search_scope :admin_search,
-    against: {owner_email: "A"},
-    associated_against: {ownerships: :owner_email, creator: :email},
-    using: {tsearch: {dictionary: "english", prefix: true}}
-
   class << self
     def statuses
       STATUS_ENUM.keys.map(&:to_s)
@@ -252,8 +248,18 @@ class Bike < ApplicationRecord
       query.present? ? pg_search(query) : all
     end
 
-    def admin_text_search(query)
-      query.present? ? admin_search(query) : all
+    # Unioned rather than OR'd because an OR keeps every branch off its index
+    def matching_email(query)
+      return all if query.blank?
+
+      email = EmailNormalizer.normalize(query)
+      matching_ids = [
+        Ownership.where(owner_email: email).select(:bike_id),
+        Ownership.where(creator_id: User.where(email:).select(:id)).select(:bike_id),
+        unscoped.where(owner_email: email).select(:id)
+      ].map { |relation| relation.reorder(nil).to_sql }
+
+      where("bikes.id IN (#{matching_ids.join(" UNION ALL ")})")
     end
 
     def search_phone(str)
