@@ -2,7 +2,8 @@
 # Note: you have to seed the users first, or else the bikes don't have anywhere to go.
 
 user_attrs = {
-  admin: {name: "Admin User", email: "admin@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current},
+  # developer too, so one sign-in reaches the admin pages that require both
+  admin: {name: "Admin User", email: "admin@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current, developer: true},
   dev: {name: "Dev User", email: "dev@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current, developer: true},
   member: {name: "Member User", email: "member@brakebills.edu", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current},
   user: {name: "Test User", email: "user@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true},
