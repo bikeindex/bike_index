@@ -11,7 +11,7 @@ import { collapseField } from 'utils/collapse_utils'
 // to read. The checkbox is only rendered for an automatic assignment, so without one
 // there is nothing here to toggle.
 export default class extends Controller {
-  static targets = ['checkbox', 'field', 'statusField']
+  static targets = ['checkbox', 'field', 'label', 'statusField']
 
   connect () {
     // form-persist restores a drafted checkbox by assignment, firing no event
@@ -33,6 +33,9 @@ export default class extends Controller {
 
     const registering = this.checkboxTarget.checked
     this.fieldTargets.forEach((field) => collapseField(field, registering, duration))
+    this.labelTargets.forEach((label) => {
+      label.textContent = JSON.parse(label.dataset.texts)[registering ? 'on' : 'off']
+    })
     this.statusFieldTargets.forEach((field) => {
       if (registering) delete field.dataset.organizationOff
       else field.dataset.organizationOff = 'true'

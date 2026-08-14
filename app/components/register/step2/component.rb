@@ -127,6 +127,15 @@ module Register
         translation(".information_for_org", org_name: organization.short_name)
       end
 
+      # The checkbox heads this section, so the heading can't go with the organization the
+      # way its fields do - both texts ride along for register--organization to swap between
+      def contact_section_label
+        return contact_section_text unless auto_organization.present? && organization_section?
+
+        tag.span(contact_section_text, data: {"register--organization-target": "label",
+                                              texts: {on: contact_section_text, off: translation(".contact_info")}.to_json})
+      end
+
       # bikes/new knows the status before rendering - here it's picked in this
       # form, so register--status-fields rechecks the list whenever it changes
       def show_phone?

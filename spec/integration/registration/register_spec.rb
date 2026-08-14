@@ -370,6 +370,9 @@ RSpec.describe "Register flow", :js, type: :system do
         expect(page).to have_checked_field("register_with_organization")
         expect(page).to have_content(/information for brakebills/i)
         expect(page).to have_field("bike[student_id]")
+        # It heads the section whose contents it decides
+        expect(page.text.index(/information for brakebills/i))
+          .to be < page.text.index("Register with Brakebills")
 
         type_into("#bike_primary_frame_color_id", "Red")
         click_combobox_option("Red")
@@ -380,9 +383,12 @@ RSpec.describe "Register flow", :js, type: :system do
         expect(page).to have_current_path(/step=2/, url: true)
         expect(Bike.count).to eq 0
 
-        # Dropping the organization drops what it asks for, required and all
+        # Dropping the organization drops what it asks for, required and all - and the
+        # heading, which can't go with them, the checkbox being under it
         uncheck "Register with Brakebills"
         expect(page).to have_no_field("bike[student_id]")
+        expect(page).to have_content(/contact info/i)
+        expect(page).to have_no_content(/information for brakebills/i)
 
         click_button "Complete Bike Registration"
         expect(page).to have_content("Registration complete")
