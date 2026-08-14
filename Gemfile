@@ -95,7 +95,8 @@ gem "api-pagination"
 gem "doorkeeper" # OAuth providing
 gem "doorkeeper-i18n" # Translations for doorkeeper
 gem "grape" # API DSL
-gem "grape_logging" # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
+# master until 3.0.1 ships - 3.0.0 reads the thrown error as a Hash, which grape 3.3 replaced with Grape::Exceptions::ErrorResponse
+gem "grape_logging", github: "aserafin/grape_logging" # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
 
 # Frontend
 gem "chartkick" # Display charts

@@ -1,4 +1,13 @@
 GIT
+  remote: https://github.com/aserafin/grape_logging.git
+  revision: 54827825e234a34a256fa23f744d463b68d689e5
+  specs:
+    grape_logging (3.0.1)
+      grape (>= 2.4.0)
+      rack
+      zeitwerk
+
+GIT
   remote: https://github.com/bikeindex/carrierwave_backgrounder.git
   revision: 7b2b0e9bc43f2ec20f09db3fea7bbc5f167f52c7
   specs:
@@ -342,9 +351,6 @@ GEM
       mustermann (>= 4.0)
       rack (>= 2.2.4)
       zeitwerk (>= 2.6)
-    grape_logging (3.0.0)
-      grape (>= 2.4.0)
-      rack
     groupdate (6.8.0)
       activesupport (>= 7.2)
     guard (2.20.2)
@@ -942,7 +948,7 @@ DEPENDENCIES
   functionable
   geocoder
   grape
-  grape_logging
+  grape_logging!
   groupdate
   guard
   guard-rspec
