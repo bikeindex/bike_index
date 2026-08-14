@@ -33,12 +33,12 @@ RSpec.describe "Register flow", :js, type: :system do
     click_button "Next"
   end
 
-  # fill_in focuses the field, then sends its text a round trip later - so autofocus
-  # connecting in between lands the text in the field filled just before. Its focus is
-  # also the signal that the form's controllers have connected.
+  # fill_in focuses the field, then sends its text a round trip later - so a controller
+  # connecting in between lands the text in the field filled just before
   def wait_for_details_step(wait: Capybara.default_max_wait_time)
     expect(page).to have_content("Add your bike", wait:)
     expect(page).to have_css("input[name='bike[frame_model]']:focus", wait:)
+    wait_for_stimulus(timeout: wait)
   end
 
   # Answers every submission in the browser, the way an edge that never reaches the app

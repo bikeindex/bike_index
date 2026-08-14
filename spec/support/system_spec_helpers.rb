@@ -89,6 +89,18 @@ module SystemSpecHelpers
     field
   end
 
+  # Stimulus lazy loads controller modules, so a rendered page can have none of them
+  # connected yet -- a combobox filters no options, a restored draft reaches no listener
+  def wait_for_stimulus(timeout: Capybara.default_max_wait_time)
+    wait_for(timeout:) do
+      page.evaluate_script(<<~JS)
+        [...document.querySelectorAll('[data-controller]')].every((element) =>
+          element.dataset.controller.split(' ').filter(Boolean).every((identifier) =>
+            window.Stimulus?.getControllerForElementAndIdentifier(element, identifier)))
+      JS
+    end
+  end
+
   # search--form#handlePopstate reconciles these to the address bar on a
   # back/forward; the results frame reloads separately and faster.
   RESTORED_FILTER_FIELDS = %w[search_email serial search_notes].freeze
