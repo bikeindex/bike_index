@@ -29,7 +29,8 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
 
     describe "edit" do
       context "landing_page" do
-        it "renders without creating a landing page, and without a version history link" do
+        it "renders without creating a landing page, and links to the preview" do
+          expect(LandingPages::ORGANIZATIONS).to_not include(organization.slug)
           expect {
             get "#{base_url}/landing_page/edit"
           }.to_not change(OrganizationLandingPage, :count)
@@ -38,6 +39,34 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           expect(response).to render_template("_landing_page")
           expect(response.body).to_not match("search_item_type=OrganizationLandingPage")
           expect(response.body).to_not include "button_hover"
+          expect(response.body).to include organization_landing_path(organization_id: organization.to_param)
+        end
+
+        context "with a routed organization" do
+          let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+          let!(:landing_page) { FactoryBot.create(:organization_landing_page, organization:, enabled: true) }
+
+          it "links to the landing page, and alerts that it's enabled" do
+            expect(LandingPages::ORGANIZATIONS).to include(organization.slug)
+            expect(landing_page.enabled_mismatch_error).to be_blank
+            get "#{base_url}/landing_page/edit"
+            expect(response.status).to eq(200)
+            expect(response.body).to include "href=\"#{root_url}#{organization.to_param}\""
+            expect(response.body).to_not include organization_landing_path(organization_id: organization.to_param)
+            expect(response.body).to include "This landing page is enabled"
+          end
+
+          context "with the landing page disabled" do
+            let!(:landing_page) { FactoryBot.create(:organization_landing_page, organization:) }
+
+            it "alerts the mismatch instead, and still links to the routed page" do
+              get "#{base_url}/landing_page/edit"
+              expect(response.status).to eq(200)
+              expect(response.body).to include CGI.escapeHTML(landing_page.enabled_mismatch_error)
+              expect(response.body).to_not include "This landing page is enabled"
+              expect(response.body).to include "href=\"#{root_url}#{organization.to_param}\""
+            end
+          end
         end
 
         context "with a landing page" do
@@ -113,11 +142,14 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
         context "when enabled disagrees with ORGANIZATIONS_WITH_LANDING_PAGES" do
           let!(:landing_page) { FactoryBot.create(:organization_landing_page, organization:, enabled: true) }
 
-          it "saves and flashes the mismatch" do
+          it "saves, and the edit page alerts the mismatch" do
             put "#{base_url}/landing_page", params: {organization_landing_page: update}
             expect(landing_page.reload.body).to eq update[:body]
             expect(flash[:success]).to be_present
-            expect(flash[:error]).to eq landing_page.enabled_mismatch_error
+            expect(flash[:error]).to be_blank
+
+            follow_redirect!
+            expect(response.body).to include CGI.escapeHTML(landing_page.enabled_mismatch_error)
           end
         end
       end

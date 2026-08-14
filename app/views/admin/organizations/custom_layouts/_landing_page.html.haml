@@ -6,6 +6,11 @@
     .mb-2
       = link_to "Version history", admin_paper_trail_versions_path(search_item_type: "OrganizationLandingPage", search_item_id: @landing_page.id, period: "all"), class: "twlink"
   .form-group
+    - enabled_mismatch_error = @landing_page.enabled_mismatch_error
+    - if enabled_mismatch_error.present?
+      = render(UI::Alerts::Base::Component.new(kind: :error, margin_classes: "tw:mb-2", text: enabled_mismatch_error))
+    - elsif @landing_page.enabled?
+      = render(UI::Alerts::Base::Component.new(kind: :purple, margin_classes: "tw:mb-2", text: "This landing page is enabled"))
     = f.text_area :body, placeholder: 'Landing page (html)', rows: 20, class: "form-control"
     - if suggested_button_hover.present?
       = render(UI::Alerts::Base::Component.new(kind: :notice, margin_classes: "tw:mt-2", text: "The register frame names a button color but no hover color. Add &button_hover=#{suggested_button_hover.delete_prefix("#")} to its src to set the shade it currently derives."))
