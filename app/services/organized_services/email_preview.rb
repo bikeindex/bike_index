@@ -5,26 +5,26 @@ module OrganizedServices
     # Placeholder for tokenized URLs in email previews — to make sure preview token links don't work
     TOKEN_PATH = "/404"
 
-    def view_component(kind:, organization:, user:, params:)
+    def view_component(kind:, organization:, user:, params:, versioned:)
       if ParkingNotification.kinds.include?(kind)
         parking_notification = find_or_build_parking_notification(kind:, organization:, user:, params:)
         bike = parking_notification.bike || default_bike(organization:, user:)
-        Emails::ParkingNotification::Component.new(parking_notification:, bike:, email_preview: true)
+        Emails::ParkingNotification::Component.new(parking_notification:, bike:, email_preview: true, versioned:)
       elsif kind == "graduated_notification"
         graduated_notification = find_or_build_graduated_notification(organization:, user:, params:)
         bike = graduated_notification.bike || default_bike(organization:, user:)
-        Emails::GraduatedNotification::Component.new(graduated_notification:, bike:, email_preview: true)
+        Emails::GraduatedNotification::Component.new(graduated_notification:, bike:, email_preview: true, versioned:)
       elsif %w[impound_claim_approved impound_claim_denied].include?(kind)
         Emails::ImpoundClaimApprovedOrDenied::Component.new(
-          impound_claim: find_or_build_impound_claim(kind:, organization:, params:)
+          impound_claim: find_or_build_impound_claim(kind:, organization:, params:), versioned:
         )
       elsif kind == "partial_registration"
         b_param = organization.b_params.order(:created_at).last ||
           BParam.new(organization_id: organization.id)
-        Emails::PartialRegistration::Component.new(b_param:, email_preview: true)
+        Emails::PartialRegistration::Component.new(b_param:, email_preview: true, versioned:)
       else
         bike = (kind == "organization_stolen_message") ? default_stolen_bike(organization:, user:) : default_bike(organization:, user:)
-        Emails::FinishedRegistration::Component.new(ownership: bike.current_ownership, bike:, email_preview: true)
+        Emails::FinishedRegistration::Component.new(ownership: bike.current_ownership, bike:, email_preview: true, versioned:)
       end
     end
 

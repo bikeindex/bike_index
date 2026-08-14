@@ -10,7 +10,7 @@ user = User.find_by_email("user@bikeindex.org")
 raise "missing Brakebills org or test users" if brakebills.blank? || member.blank? || user.blank?
 
 # --- Mail snippets ---
-# Bodies for the "structural" snippets (header/welcome/footer/security/partial_registration)
+# Bodies for the "structural" snippets (header/welcome/after_welcome/footer/security/partial_registration)
 # are copied verbatim from the dev database's Brakebills records. The notification-kind
 # snippets exercise the `organization_message_snippet` paths in OrganizedMailer previews.
 snippets = {
@@ -30,6 +30,14 @@ snippets = {
     body: <<~HTML
       <p style="color: purple; margin: 20px 0; text-align: center;">
         <strong>We can add text here!</strong> - this is the <em>welcome</em>  snippet
+      </p>
+    HTML
+  },
+  "after_welcome" => {
+    is_enabled: true,
+    body: <<~HTML
+      <p style="color: purple; margin: 20px 0; text-align: center;">
+        <strong>We can add text here!</strong> - this is the <em>After Welcome</em>  snippet
       </p>
     HTML
   },

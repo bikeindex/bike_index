@@ -4,9 +4,10 @@ RSpec.describe OrganizedServices::EmailPreview do
   let(:organization) { FactoryBot.create(:organization) }
   let(:user) { FactoryBot.create(:user) }
   let(:params) { ActionController::Parameters.new }
+  let(:versioned) { false }
 
   describe "view_component" do
-    subject(:component) { described_class.view_component(kind:, organization:, user:, params:) }
+    subject(:component) { described_class.view_component(kind:, organization:, user:, params:, versioned:) }
 
     context "with a parking_notification kind" do
       let(:kind) { "appears_abandoned_notification" }
