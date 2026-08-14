@@ -93,7 +93,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
 
             it "recommends the shade step 1 would derive" do
               get "#{base_url}/landing_page/edit"
-              expect(response.body).to include "Add &amp;button_hover=a78620"
+              expect(response.body).to include "<code>&amp;button_hover=a78620</code>"
             end
 
             context "one that names its hover too" do
@@ -101,7 +101,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
 
               it "says nothing" do
                 get "#{base_url}/landing_page/edit"
-                expect(response.body).to_not include "Add &amp;button_hover"
+                expect(response.body).to_not include "<code>&amp;button_hover"
               end
             end
           end
