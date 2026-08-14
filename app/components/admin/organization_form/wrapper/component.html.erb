@@ -189,8 +189,8 @@
       <% end %>
     <% end %>
 
-    <% if Admin::OrganizationFeatureSettings::Component.any_for?(@organization) %>
-      <%= render(Admin::OrganizationFeatureSettings::Component.new(form_builder: @form_builder, organization: @organization, current_user: @current_user)) %>
+    <% if Admin::OrganizationForm::FeatureSettings::Component.any_for?(@organization) %>
+      <%= render(Admin::OrganizationForm::FeatureSettings::Component.new(form_builder: @form_builder, organization: @organization, current_user: @current_user)) %>
     <% end %>
   </div>
 </div>
@@ -198,11 +198,11 @@
 <% if @organization.persisted? %>
   <div class="row mt-4" id="admin-locations-fields">
     <%= @form_builder.fields_for :locations do |location_form| %>
-      <%= render(Admin::OrganizationLocationFields::Component.new(form_builder: location_form, organization: @organization)) %>
+      <%= render(Admin::OrganizationForm::LocationFields::Component.new(form_builder: location_form, organization: @organization)) %>
     <% end %>
 
     <%= helpers.link_to_add_fields("Add a location", @form_builder, :locations, class_name: "mx-auto mt-4") do |location_form| %>
-      <%= render(Admin::OrganizationLocationFields::Component.new(form_builder: location_form, organization: @organization)) %>
+      <%= render(Admin::OrganizationForm::LocationFields::Component.new(form_builder: location_form, organization: @organization)) %>
     <% end %>
   </div>
 <% end %>
