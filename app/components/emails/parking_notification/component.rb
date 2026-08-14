@@ -3,14 +3,19 @@
 module Emails
   module ParkingNotification
     class Component < ApplicationComponent
-      def initialize(parking_notification:, bike: nil, email_preview: false)
+      def initialize(parking_notification:, bike: nil, email_preview: false, versioned: true)
         @parking_notification = parking_notification
         @bike = bike
         @email_preview = email_preview
+        @versioned = versioned
       end
 
       def email_sent_at
         @parking_notification.sent_at
+      end
+
+      def snippet_time
+        email_sent_at if @versioned
       end
 
       private
@@ -24,7 +29,7 @@ module Emails
       end
 
       def organization_snippet_body
-        MailSnippet.for_organization(organization_id: organization.id, kind: @parking_notification.kind, time: email_sent_at)&.body
+        MailSnippet.for_organization(organization_id: organization.id, kind: @parking_notification.kind, time: snippet_time)&.body
       end
 
       def impound_record

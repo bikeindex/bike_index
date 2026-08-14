@@ -40,11 +40,8 @@ class RegistrationsController < ApplicationController
     @owner_email = current_user&.email
     @selectable_child_organizations = find_selectable_child_organizations
     creation_organization_id = @selectable_child_organizations.any? ? nil : @organization&.id
-    if params[:button_and_header].present?
-      @button_and_header = valid_hex(params[:button_and_header])
-    elsif params[:button].present?
-      @button = valid_hex(params[:button])
-    end
+    @button_and_header = HexColor.normalize(params[:button_and_header])
+    @button = HexColor.normalize(params[:button])
     if @b_param.blank?
       bike_params = {creation_organization_id: creation_organization_id, owner_email: @owner_email}
         .merge(BParam.status_hash_from_params(params))
@@ -114,11 +111,6 @@ class RegistrationsController < ApplicationController
     return [] unless @organization.present? && Binxtils::InputNormalizer.boolean(params[:select_child_organization])
 
     @organization.child_organizations
-  end
-
-  # returns up to 6 letters/numbers, for safety
-  def valid_hex(str)
-    "##{str.strip.gsub(/\W/, "")[0..5]}"
   end
 
   def permitted_params

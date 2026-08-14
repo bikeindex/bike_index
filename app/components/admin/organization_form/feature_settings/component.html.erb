@@ -57,13 +57,17 @@
     <% end %>
 
     <% OrganizationFeature.reg_fields_with_customizable_labels.each do |reg_field| %>
-      <% owner_email = reg_field == "owner_email" %>
-      <% next unless owner_email ? @organization.paid? : @organization.enabled?(reg_field) %>
+      <%# The email fields aren't features, so paid? is what gates them %>
+      <% email_field = OrganizationFeature.email_customizable_labels.include?(reg_field) %>
+      <% next unless email_field ? @organization.paid? : @organization.enabled?(reg_field) %>
 
       <% reg_label = capture do %>
-        <% if owner_email %>
+        <% if reg_field == "owner_email" %>
           Custom Label for <em>Owner Email</em> (e.g. "uiowa.edu email")
           <small class="less-strong">often desired by universities</small>
+        <% elsif reg_field == "email_placeholder" %>
+          Custom Placeholder for <em>Owner Email</em> (e.g. "you@uiowa.edu")
+          <small class="less-strong">the greyed out example inside the empty field</small>
         <% else %>
           Custom Label for
           <em><%= OrganizationFeature.reg_field_to_bike_attrs(reg_field).titleize(keep_id_suffix: true) %></em>
