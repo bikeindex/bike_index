@@ -29,13 +29,12 @@ class OrganizationLandingPage < ApplicationRecord
     LandingPages::ORGANIZATIONS.include?(organization&.slug)
   end
 
-  # Only Backfills::OrganizationLandingPageJob reconciles the two
   def enabled_mismatch_error
     return if enabled? == env_enabled?
 
     "This landing page's enabled is #{enabled?}, but ORGANIZATIONS_WITH_LANDING_PAGES " \
-      "#{enabled? ? "does not include" : "includes"} \"#{organization&.slug}\". " \
-      "Run Backfills::OrganizationLandingPageJob to sync them."
+      "#{enabled? ? "does not include" : "includes"} \"#{organization&.slug}\" - " \
+      "and that's what routes the page."
   end
 
   private
