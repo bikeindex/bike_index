@@ -335,13 +335,13 @@ GEM
     google-protobuf (4.34.0-x86_64-linux-gnu)
       bigdecimal
       rake (~> 13.3)
-    grape (3.2.1)
+    grape (3.3.5)
       activesupport (>= 7.2)
-      dry-configurable
+      dry-configurable (>= 1.0)
       dry-types (>= 1.1)
-      mustermann-grape (~> 1.1.0)
-      rack (>= 2)
-      zeitwerk
+      mustermann (>= 4.0)
+      rack (>= 2.2.4)
+      zeitwerk (>= 2.6)
     grape_logging (3.0.0)
       grape (>= 2.4.0)
       rack
@@ -525,8 +525,6 @@ GEM
     multi_json (1.21.1)
     multipart-post (2.4.1)
     mustermann (4.0.0)
-    mustermann-grape (1.1.0)
-      mustermann (>= 1.0.0)
     naught (1.1.0)
     nenv (0.3.0)
     net-imap (0.6.6)
@@ -613,7 +611,7 @@ GEM
     puma (8.0.2)
       nio4r (~> 2.0)
     racc (1.8.1)
-    rack (3.2.6)
+    rack (3.2.7)
     rack-attack (6.8.0)
       rack (>= 1.0, < 4)
     rack-mini-profiler (4.0.1)
