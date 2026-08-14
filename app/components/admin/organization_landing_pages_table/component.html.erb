@@ -1,6 +1,7 @@
-<%# locals: (collection:, render_sortable: false) %>
+<%# a local, because the cell blocks below are instance_exec'd and can't see the component's ivars %>
+<% render_search = @render_search %>
 
-<%= render(UI::Table::Component.new(records: collection, render_sortable:)) do |table| %>
+<%= render(UI::Table::Component.new(records: @collection, render_sortable: @render_sortable)) do |table| %>
   <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |landing_page| %>
     <%= link_to edit_admin_organization_custom_layout_path(organization_id: landing_page.organization_id, id: "landing_page") do %>
       <%= render UI::Time::Component.new(time: landing_page.created_at) %>
@@ -14,7 +15,7 @@
   <% end %>
 
   <% table.column(sortable: "organization_id", label: "Organization") do |landing_page| %>
-    <%= render Admin::OrganizationCell::Component.new(organization: landing_page.organization, organization_id: landing_page.organization_id, render_search: params[:organization_id].blank?) %>
+    <%= render Admin::OrganizationCell::Component.new(organization: landing_page.organization, organization_id: landing_page.organization_id, render_search:) %>
   <% end %>
 
   <% table.column(sortable: "enabled", label: "Enabled") do |landing_page| %>
@@ -27,7 +28,7 @@
 
   <%# A body is a whole landing page, so its length says more than an excerpt would %>
   <% table.column(label: "Body (characters)", header_classes: "tw:font-normal") do |landing_page| %>
-    <%= number_display(landing_page.body.to_s.size) %>
+    <%= helpers.number_display(landing_page.body.to_s.size) %>
   <% end %>
 
   <% table.column(label: "History", header_classes: "tw:font-normal") do |landing_page| %>
