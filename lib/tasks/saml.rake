@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 namespace :saml do
-  desc "Generate a self-signed SP keypair for SAML_SP_CERTIFICATE / SAML_SP_PRIVATE_KEY (YEARS=10)"
+  desc "Generate a self-signed SP keypair for SAML_SP_CERTIFICATE / SAML_SP_PRIVATE_KEY (YEARS=50)"
   task generate_sp_keypair: :environment do
-    years = (ENV["YEARS"].presence || 10).to_i
+    # Long-lived on purpose: an IdP trusts this cert because it is in our registered metadata,
+    # not via PKI, so expiry buys no security - it only risks an outage nothing warns us about.
+    years = (ENV["YEARS"].presence || 50).to_i
     common_name = URI.parse(ENV["BASE_URL"].to_s).host.presence || "bikeindex.org"
     key = OpenSSL::PKey::RSA.new(2048)
 

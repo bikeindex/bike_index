@@ -30,7 +30,7 @@ One keypair serves every organization. Generate it anywhere — a laptop is fine
 is ordinary `openssl` output with no host binding:
 
 ```bash
-bundle exec rake saml:generate_sp_keypair        # YEARS=10 unless overridden
+bundle exec rake saml:generate_sp_keypair        # YEARS=50 unless overridden
 ```
 
 It prints both PEMs already labelled with the environment variable names they belong
@@ -38,7 +38,9 @@ in, plus the expiry date. Nothing is written to disk and nothing touches the dat
 
 The CN is cosmetic; IdPs trust the key through our metadata, not a hostname check.
 
-Long expiry is deliberate — see rotation below.
+Long expiry is deliberate — see rotation below. Past 2049 X.509 switches the validity
+dates from UTCTime to GeneralizedTime; the default 50 years crosses that line, which our
+stack handles but an unusual IdP might not. `YEARS=20` stays on UTCTime if one ever balks.
 
 Never write the private key to a file you don't delete. It belongs only in the
 environment's secret store.
