@@ -97,17 +97,13 @@
           class="<%= "tw:hidden!" if organization_stolen_message.kind != "area" %>"
           data-admin--organization-form-target="stolenMessageArea"
         >
-          <% radius_label = capture do %>
-            <% if organization_stolen_message.search_radius_metric_units? %>
-              Stolen Message radius (km)
-              <small><span class="text-success">Organization Stolen Message setting</span> - only available for area type <span class="less-strong">max <%= OrganizationStolenMessage.max_search_radius_kilometers %> km</span></small>
-            <% else %>
-              Stolen Message radius (mi)
-              <small><span class="text-success">Organization Stolen Message setting</span> - only available for area type <span class="less-strong">max <%= OrganizationStolenMessage::MAX_SEARCH_RADIUS %> miles</span></small>
-            <% end %>
+          <% stolen_radius_label = capture do %>
+            Stolen Message radius
+            (<%= organization_stolen_message.search_radius_metric_units? ? "km" : "mi" %>)
+            <small><span class="text-success">Organization Stolen Message setting</span> - only available for area type <span class="less-strong">max <%= stolen_message_radius_max %></span></small>
           <% end %>
 
-          <%= render(UI::Forms::Group::Component.new(attribute: stolen_message_radius_attribute, label_text: radius_label)) do %>
+          <%= render(UI::Forms::Group::Component.new(attribute: stolen_message_radius_attribute, label_text: stolen_radius_label)) do %>
             <%= number_field_tag stolen_message_radius_attribute, stolen_message_radius_value, class: "twinput" %>
           <% end %>
         </div>

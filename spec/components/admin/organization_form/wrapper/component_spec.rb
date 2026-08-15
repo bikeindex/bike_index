@@ -106,8 +106,7 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
       expect(component).to have_select("organization_stolen_message_kind")
       expect(component).to have_css("[data-admin--organization-form-target='stolenMessageArea'].tw\\:hidden\\!")
       expect(component).to have_field("organization_stolen_message_search_radius_miles")
-      # A top-level param, so the label points at the bare name - not the
-      # organization-scoped id the form builder gave it before
+      # A top-level param, so the label points at the bare name, not an organization-scoped id
       expect(component).to have_css("label[for='organization_stolen_message_search_radius_miles']")
     end
 

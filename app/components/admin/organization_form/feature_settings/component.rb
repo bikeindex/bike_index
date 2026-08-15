@@ -3,7 +3,6 @@
 module Admin
   module OrganizationForm
     module FeatureSettings
-      # The settings an organization's enabled features add to the admin organization form
       class Component < ApplicationComponent
         DOMAIN_FEATURES = {
           "passwordless_users" => "passwordless sign in",
@@ -11,15 +10,13 @@ module Admin
           "user_role_for_user_email_domain" => "automatic user role"
         }.freeze
 
-        def self.any_for?(organization)
-          organization.any_enabled?(OrganizationFeature.with_admin_organization_attributes)
-        end
-
         def initialize(form_builder:, organization:, current_user:)
           @form_builder = form_builder
           @organization = organization
           @current_user = current_user
         end
+
+        def render? = @organization.any_enabled?(OrganizationFeature.with_admin_organization_attributes)
 
         private
 
@@ -42,20 +39,20 @@ module Admin
           @organization_stolen_message ||= OrganizationStolenMessage.for(@organization)
         end
 
-        # A top-level param rather than an organization attribute
-        def stolen_message_radius_attribute
-          if organization_stolen_message.search_radius_metric_units?
-            :organization_stolen_message_search_radius_kilometers
-          else
-            :organization_stolen_message_search_radius_miles
-          end
+        def stolen_message_radius_units
+          organization_stolen_message.search_radius_metric_units? ? "kilometers" : "miles"
         end
 
-        def stolen_message_radius_value
+        # A top-level param rather than an organization attribute
+        def stolen_message_radius_attribute = :"organization_stolen_message_search_radius_#{stolen_message_radius_units}"
+
+        def stolen_message_radius_value = organization_stolen_message.send(:"search_radius_#{stolen_message_radius_units}")
+
+        def stolen_message_radius_max
           if organization_stolen_message.search_radius_metric_units?
-            organization_stolen_message.search_radius_kilometers
+            "#{OrganizationStolenMessage.max_search_radius_kilometers} km"
           else
-            organization_stolen_message.search_radius_miles
+            "#{OrganizationStolenMessage::MAX_SEARCH_RADIUS} miles"
           end
         end
 

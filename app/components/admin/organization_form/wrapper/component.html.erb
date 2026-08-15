@@ -14,11 +14,7 @@
       <% end %>
     <% else %>
       <div class="d-md-block d-none">
-        <label class="twlabel">&nbsp;</label>
-
-        <div>
-          permitted domain with passwordless sign in, no invite restrictions
-        </div>
+        <%= read_only_field("&nbsp;".html_safe, "permitted domain with passwordless sign in, no invite restrictions") %>
       </div>
     <% end %>
   </div>
@@ -47,13 +43,7 @@
   </div>
 
   <div class="col-6 col-lg-3">
-    <div class="tw:mb-4">
-      <label class="twlabel">Slug:</label>
-
-      <p class="less-strong">
-        <%= @organization.slug %>
-      </p>
-    </div>
+    <%= read_only_field("Slug:", @organization.slug) %>
   </div>
 
   <div class="col-6 col-lg-3">
@@ -64,13 +54,7 @@
     <% if helpers.display_dev_info? %>
       <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :previous_slug, label_text: previous_slug_label, html_options: {class: "only-dev-visible"})) %>
     <% else %>
-      <div class="tw:mb-4">
-        <label class="twlabel"><%= previous_slug_label %></label>
-
-        <p class="less-strong">
-          <%= @organization.previous_slug %>
-        </p>
-      </div>
+      <%= read_only_field(previous_slug_label, @organization.previous_slug) %>
     <% end %>
   </div>
 </div>
@@ -78,49 +62,24 @@
 <div class="row">
   <div class="col-md-6">
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :kind, label_text: "Organization Type")) do %>
-      <%= render(UI::Forms::Select::Component.new(form_builder: @form_builder, attribute: :kind, option_tags: options_for_select(kind_options, selected: @organization.kind), html_options: {data: {"admin--organization-form-target": "kind", action: "change->admin--organization-form#toggleAmbassadorFields"}})) %>
+      <%= render(UI::Forms::Select::Component.new(form_builder: @form_builder, attribute: :kind, option_tags: kind_option_tags, html_options: {data: {"admin--organization-form-target": "kind", action: "change->admin--organization-form#toggleAmbassadorFields"}})) %>
     <% end %>
 
     <% if @organization.bike_shop? %>
-      <% lightspeed_label = capture do %>
-        Lightspeed POS registrations include phone
-        <small class="less-strong">originally for Edmonton</small>
-      <% end %>
-
-      <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :lightspeed_register_with_phone, label: lightspeed_label, class_name: "tw:mb-4")) %>
+      <%= checkbox_field(:lightspeed_register_with_phone, "Lightspeed POS registrations include phone", note: "originally for Edmonton") %>
     <% end %>
 
-    <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :show_on_map, label: Organization.human_attribute_name(:show_on_map), class_name: "tw:mb-4", data: {"admin--organization-form-target": "ambassadorLabel"}, input_data: {"admin--organization-form-target": "ambassadorField"})) %>
+    <%= checkbox_field(:show_on_map, Organization.human_attribute_name(:show_on_map), ambassador: true) %>
 
-    <% lock_show_on_map_label = capture do %>
-      Lock shown on map
-      <small class="less-strong">restrict org from updating show on map above (e.g. they're known bad actors)</small>
-    <% end %>
+    <%= checkbox_field(:lock_show_on_map, "Lock shown on map", note: "restrict org from updating show on map above (e.g. they're known bad actors)", ambassador: true) %>
 
-    <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :lock_show_on_map, label: lock_show_on_map_label, class_name: "tw:mb-4", data: {"admin--organization-form-target": "ambassadorLabel"}, input_data: {"admin--organization-form-target": "ambassadorField"})) %>
+    <%= checkbox_field(:spam_registrations, "High spam registrations", note: "don't email suspicious registrations") %>
 
-    <% spam_registrations_label = capture do %>
-      High spam registrations
-      <small class="less-strong">don't email suspicious registrations</small>
-    <% end %>
+    <%= checkbox_field(:api_access_approved, "API V1 access approved", note: "to be able to post updates via legacy API (rarely necessary)", ambassador: true) %>
 
-    <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :spam_registrations, label: spam_registrations_label, class_name: "tw:mb-4")) %>
+    <%= checkbox_field(:approved, "Validated & approved", ambassador: true) %>
 
-    <% api_access_label = capture do %>
-      API V1 access approved
-      <small class="less-strong">to be able to post updates via legacy API (rarely necessary)</small>
-    <% end %>
-
-    <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :api_access_approved, label: api_access_label, class_name: "tw:mb-4", data: {"admin--organization-form-target": "ambassadorLabel"}, input_data: {"admin--organization-form-target": "ambassadorField"})) %>
-
-    <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :approved, label: "Validated & approved", class_name: "tw:mb-4", data: {"admin--organization-form-target": "ambassadorLabel"}, input_data: {"admin--organization-form-target": "ambassadorField"})) %>
-
-    <% direct_unclaimed_label = capture do %>
-      Send emails directly to unclaimed bike owners
-      <small class="less-strong">don't require org to forward</small>
-    <% end %>
-
-    <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :direct_unclaimed_notifications, label: direct_unclaimed_label, class_name: "tw:mb-4")) %>
+    <%= checkbox_field(:direct_unclaimed_notifications, "Send emails directly to unclaimed bike owners", note: "don't require org to forward") %>
 
     <% parent_org_label = capture do %>
       Parent organization
@@ -151,13 +110,8 @@
       </div>
     <% end %>
 
-    <% if @organization.id.present? %>
-      <% embedable_label = capture do %>
-        Auto user email
-        <small class="less-strong">embed registration email</small>
-      <% end %>
-
-      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :embedable_user_email, label_text: embedable_label)) do |group| %>
+    <% if @organization.persisted? %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :embedable_user_email, label_text: label_with_note("Auto user email", "embed registration email"))) do |group| %>
         <% if @organization.organization_roles.count == 0 %>
           <% group.with_helper_text do %>
             You can use <%= ENV["AUTO_ORG_MEMBER"] %> if there are no members of
@@ -165,17 +119,12 @@
           <% end %>
         <% end %>
 
-        <%= render UI::Forms::Combobox::Component.new(name: :embedable_user_email, form: @form_builder, placeholder: "Select email", value: @embedable_email, include_blank: true, options: auto_user_emails) %>
+        <%= render UI::Forms::Combobox::Component.new(name: :embedable_user_email, form: @form_builder, placeholder: "Select email", value: embedable_email, include_blank: true, options: auto_user_emails) %>
       <% end %>
     <% end %>
 
     <% if @organization.bike_shop? %>
-      <% theft_survey_label = capture do %>
-        Opted into theft survey 2023
-        <small class="less-strong">if checked, we will start email their customers theft surveys</small>
-      <% end %>
-
-      <%= render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute: :opted_into_theft_survey_2023, label: theft_survey_label, class_name: "tw:mb-4")) %>
+      <%= checkbox_field(:opted_into_theft_survey_2023, "Opted into theft survey 2023", note: "if checked, we will start email their customers theft surveys") %>
     <% end %>
 
     <% if @organization.official_manufacturer? %>
@@ -189,9 +138,7 @@
       <% end %>
     <% end %>
 
-    <% if Admin::OrganizationForm::FeatureSettings::Component.any_for?(@organization) %>
-      <%= render(Admin::OrganizationForm::FeatureSettings::Component.new(form_builder: @form_builder, organization: @organization, current_user: @current_user)) %>
-    <% end %>
+    <%= render(Admin::OrganizationForm::FeatureSettings::Component.new(form_builder: @form_builder, organization: @organization, current_user: @current_user)) %>
   </div>
 </div>
 

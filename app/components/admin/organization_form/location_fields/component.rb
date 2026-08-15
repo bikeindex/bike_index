@@ -3,6 +3,7 @@
 module Admin
   module OrganizationForm
     module LocationFields
+      # TODO: use organized/manages/location_fields instead of this
       class Component < ApplicationComponent
         def initialize(form_builder:, organization:)
           @form_builder = form_builder
