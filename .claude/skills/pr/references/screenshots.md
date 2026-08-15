@@ -4,9 +4,13 @@ This is SKILL.md's **Screenshots** section — read it once the PR exists and **
 
 The flow: decide what to capture → capture the branch → upload → capture the same URLs on the base branch → post one `## Screenshots` PR comment. Screenshots go in a **comment**, never the PR body, so the human-written summary stays first and recaptures don't churn the description.
 
-**Preflight — the Claude Code web sandbox can't finish this phase.** Capture (steps 1, 2 and 4) works there, but the upload can't: the MCP browser rejects the egress proxy's CA, so github.com fails to load with `ERR_CERT_AUTHORITY_INVALID`, and even past that, uploading needs a logged-in GitHub session that can't be established headlessly. Don't start the capture there — tell the user this phase needs a machine with a browser signed in to GitHub, and hand back the PR URL.
+## Preflight: no `gh`, no screenshots
 
-Substituting other evidence is fine when it's genuinely stronger — a rendered-HTML diff against the base says more about a pure move than a screenshot pair does. It goes in the one `## Screenshots` comment under that heading, per step 5, not in a comment of its own.
+**This phase needs `gh` *and* a browser signed in to GitHub. Missing either, skip the whole thing** — don't capture, don't upload, don't post anything in its place. Say in your summary that screenshots need a machine with both, and hand back the PR URL.
+
+The Claude Code web sandbox is the case that has neither: no GitHub CLI, and an MCP browser that rejects the egress proxy's CA, so github.com won't even load (`ERR_CERT_AUTHORITY_INVALID`) and a logged-in session can't be established headlessly. Capture alone would work there, which is the trap — PNGs nothing can host, and no way to post them.
+
+**Skipping means posting nothing at all**, not posting something else. Substitute evidence — a rendered-HTML diff, a note about what couldn't be captured — reads as a fine idea in the moment and leaves a comment the next run can't find or replace, because it isn't the `## Screenshots` comment. That's how #4126 ended up with three comments telling one story. If the evidence is worth having, put it in your summary to the user and let them decide where it goes.
 
 ## 1. Decide whether screenshots are needed and which URLs to capture
 

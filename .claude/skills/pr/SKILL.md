@@ -128,7 +128,12 @@ Always pass the body via `--body-file`, not inline `--body`, to preserve formatt
 
 ## Screenshots
 
-Frontend diffs only — if the classifier said not frontend, skip this section. Otherwise read `references/screenshots.md` and follow it to capture before/after screenshots and post them as a PR comment. Screenshot tooling never blocks the PR — if it fails, report the failure and carry on to **What this run taught you**.
+Two gates, either of which skips the section outright:
+
+- **Not a frontend diff** — per the classifier above.
+- **No `gh`, or no browser signed in to GitHub.** Then there is nowhere to host or post the images, so don't capture them and don't post anything in their place. Say so in your summary. The `gh`-less sandbox in the appendix is this case.
+
+Otherwise read `references/screenshots.md` and follow it to capture before/after screenshots and post them as a PR comment. Screenshot tooling never blocks the PR — if it fails, report the failure and carry on to **What this run taught you**.
 
 ## What this run taught you
 
@@ -153,11 +158,7 @@ Only the Claude Code web sandbox (`/home/user/bike_index`) lacks the GitHub CLI;
 | Publish | `gh pr list --state merged` | `list_pull_requests`, `state: "closed"` |
 | Publish | `gh pr create --draft` | `create_pull_request`, `draft: true`, `head: "<branch>"` |
 | Publish | `gh pr edit <n> --body-file` | `update_pull_request` |
-| Screenshots | `gh pr comment` | `add_issue_comment`, `issue_number: <pr>` |
-| Screenshots | `gh api -X PATCH …/issues/comments/<id>` | check the registered tools before assuming there's none — see below |
 
 Three traps in that column: `head` takes `owner:branch` when listing but a bare branch name when creating; the body is a string parameter, so `--body-file` has no equivalent; and `list_pull_requests` reports `merged: false` even for merged PRs (verified against #4122, which `pull_request_read` reports correctly) — which is why the branch-state query asks for open PRs rather than filtering `all` on that field.
 
-**Editing an existing comment: search the registered tools for one before concluding you can't.** An earlier version of this table asserted there was no equivalent and said to post a second comment instead; that is how PR #4126 ended up with three comments telling one story. If a search really turns up nothing, the fallback is to hand the updated text back for a run that has `gh` — not to post a comment beside the one that needed updating.
-
-**Screenshots** doesn't run here at all — see the preflight in `references/screenshots.md`.
+**There is no Screenshots row because the section doesn't run here.** No `gh` means no browser session either, so nothing can be hosted or posted; skip it and say so, rather than reaching for `add_issue_comment` to post something in its place. PR #4126 is what that looks like when you don't: three comments telling one story, none of them replaceable by the next run.

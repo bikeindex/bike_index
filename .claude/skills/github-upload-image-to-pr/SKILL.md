@@ -21,6 +21,12 @@ Browser-driven workflow for embedding local images in a GitHub PR — the GitHub
 
 Since the GitHub API does not support direct image uploads, this skill uses the **PR comment textarea as a staging area for GitHub's image hosting** — uploading files there to obtain persistent `user-attachments/assets/` URLs, then updating the PR description or posting a comment via the `gh` CLI.
 
+## Preflight: this needs `gh` and a signed-in browser
+
+Both, or nothing works — the upload is a real browser session against github.com, and the posting is `gh`. **Stop before uploading anything if either is missing**, say which one, and return without posting. Don't half-run it: images hosted with nowhere to go are wasted, and a comment posted through some other route is one the next run can't find.
+
+The Claude Code web sandbox has neither: no GitHub CLI, and a browser that rejects the egress proxy's CA, so github.com fails to load with `ERR_CERT_AUTHORITY_INVALID`. Callers should have skipped before reaching you — the `pr` skill's screenshot phase gates on exactly this — but check anyway, since a direct request won't have.
+
 ## Step 1: Resolve PR context
 
 If the user didn't specify a PR number or URL, auto-detect it:
