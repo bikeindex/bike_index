@@ -86,17 +86,6 @@ module Org
         {type: :divider}
       end
 
-      # Use request.path_parameters rather than controller.controller_name so the
-      # routed controller is reflected in component specs (which dispatch through
-      # a generic vc_test_controller).
-      def routed_controller
-        controller.request.path_parameters[:controller]
-      end
-
-      def routed_action
-        controller.request.path_parameters[:action]
-      end
-
       def on_dashboard?
         routed_controller == "organized/dashboard" && routed_action == "index"
       end

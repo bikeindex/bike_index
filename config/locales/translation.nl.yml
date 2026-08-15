@@ -3614,23 +3614,6 @@ nl:
       error: Fout
       please_fix_the_following: Corrigeer het volgende %{errors}
     application:
-      blog: Blog
-      donate: Schenken
-      help: Helpen
-      log_in: Log in
-      logout: Afmelden
-      register_a_new_bike: Registreer een nieuwe fiets
-      sign_up: Registreren
-      the_nonprofit_bike_registry: het fietsregister zonder winstoogmerk
-      user_settings: "%{user_email} instellingen"
-      view_org: Bekijk %{org_name}
-      stolen_bike: Fiets gestolen?
-      search: Zoeken
-      marketplace_messages: Marktplaatsberichten
-      your_registrations: Uw registraties
-      marketplace: Marktplaats
-      menu: Menu
-      settings_menu: Instellingen
       skip_to_main_content: Ga direct naar de hoofdinhoud
     application_bikehub:
       contact: contact
@@ -5557,6 +5540,24 @@ nl:
         register_a_bike: Registreer een fiets
         marketplace: Marktplaats
         search: Zoeken
+      navbar:
+        blog: Blog
+        donate: Schenken
+        help: Helpen
+        log_in: Log in
+        logout: Afmelden
+        register_a_new_bike: Registreer een nieuwe fiets
+        sign_up: Registreren
+        the_nonprofit_bike_registry: het fietsregister zonder winstoogmerk
+        user_settings: "%{user_email} instellingen"
+        view_org: Bekijk %{org_name}
+        stolen_bike: Fiets gestolen?
+        search: Zoeken
+        marketplace_messages: Marktplaatsberichten
+        your_registrations: Uw registraties
+        marketplace: Marktplaats
+        menu: Menu
+        settings_menu: Instellingen
     emails:
       confirmation_email:
         click_to_sign_in_html: Klik op de knop <em>Inloggen</em> om het aanmelden te

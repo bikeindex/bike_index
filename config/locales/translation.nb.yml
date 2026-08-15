@@ -3802,23 +3802,6 @@ nb:
       year: år
   layouts:
     application:
-      blog: Blogg
-      donate: Donere
-      help: Hjelp
-      log_in: Logg Inn
-      logout: Logg ut
-      register_a_new_bike: Registrer en ny sykkel
-      sign_up: Registrer deg
-      stolen_bike: Stjålet sykkel?
-      the_nonprofit_bike_registry: det ideelle sykkelregisteret
-      user_settings: "%{user_email}-innstillinger"
-      view_org: Se %{org_name}
-      search: Søk
-      marketplace_messages: Markedsplassmeldinger
-      your_registrations: Dine registreringer
-      marketplace: Markedsplass
-      menu: Meny
-      settings_menu: Innstillinger
       skip_to_main_content: Hopp til hovedinnhold
     application_bikehub:
       accounts_powered_by_bike_index: BikeHub-kontoer er drevet av Bike Index – det
@@ -5407,6 +5390,24 @@ nb:
         register_a_bike: Registrer en sykkel
         marketplace: Markedsplass
         search: Søk
+      navbar:
+        blog: Blogg
+        donate: Donere
+        help: Hjelp
+        log_in: Logg Inn
+        logout: Logg ut
+        register_a_new_bike: Registrer en ny sykkel
+        sign_up: Registrer deg
+        stolen_bike: Stjålet sykkel?
+        the_nonprofit_bike_registry: det ideelle sykkelregisteret
+        user_settings: "%{user_email}-innstillinger"
+        view_org: Se %{org_name}
+        search: Søk
+        marketplace_messages: Markedsplassmeldinger
+        your_registrations: Dine registreringer
+        marketplace: Markedsplass
+        menu: Meny
+        settings_menu: Innstillinger
     emails:
       confirmation_email:
         click_to_sign_in_html: Klikk på <em>Logg på</em>-knappen for å fullføre registreringen!

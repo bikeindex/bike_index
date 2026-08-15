@@ -30,13 +30,7 @@
     id="<%= page_id %>"
     class="<%= 'organized-body' if current_page_skeleton == 'organized_skeleton' %>"
   >
-    <nav class="primary-header-nav">
-      <div class="container">
-        <a href="<%= user_root_url %>" class="primary-logo">
-          <%= image_tag 'revised/logo.svg', class: 'primary-nav', alt: 'Bike Index home' %>
-        </a>
-      </div>
-    </nav>
+    <%= render PageBlock::Navbar::Component.new(logo_only: true) %>
 
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
     <%= render 'layouts/revised_messages' %>

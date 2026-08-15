@@ -79,6 +79,17 @@ class ApplicationComponent < ViewComponent::Base
 
   private
 
+  # Use request.path_parameters rather than controller.controller_name so the routed
+  # controller is reflected in component specs (which dispatch through a generic
+  # vc_test_controller).
+  def routed_controller
+    controller.request.path_parameters[:controller]
+  end
+
+  def routed_action
+    controller.request.path_parameters[:action]
+  end
+
   # Wrap `I18n.translate` for use in components, abstracting away
   # scope-setting.
   #
