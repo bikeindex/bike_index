@@ -63,6 +63,8 @@ Run in parallel:
 
 Diff against `origin/main`, not the local base branch — in a Conductor worktree the local base often lags the remote, which would inflate or stale the diff. In body-only mode (step 1), `git fetch origin` first, since step 3 didn't run. If the branch has no commits ahead of `origin/main`, stop and tell the user.
 
+`gh pr view` exits non-zero with "no pull requests found" when the branch has none — that's the answer to step 9's question, not a broken command, and it's the normal case on a first run.
+
 `gh pr view` returns MERGED and CLOSED PRs too. **Only a PR whose `state` is `OPEN` counts as existing** — for a merged or closed one, create a new PR in step 9 rather than editing it. Note the number for steps 9 and 10.
 
 No `bin/env` eval is needed here — it's only relevant to the screenshot phase, and `frontend-screenshots` runs its own in preflight. Backend-only PRs never touch it.
@@ -94,7 +96,7 @@ Rules:
 - **Reference branches by PR number.** A stacked base or a branch this builds on is `#3918`, not a branch name: `gh pr list --head <branch> --state all --json number --jq '.[0].number'`. Name the branch only when it has no PR.
 - **No "Test plan" section unless the user asks.** Never list what CI already covers. Only reviewer-facing manual verification ("click X, confirm Y appears") qualifies, and only on request.
 - **No generic "covered by tests" bullet.** That a change is tested is assumed, and naming test mechanics (a fixture, a cassette) goes stale. Mention tests only when *what* is verified is the reviewer-facing point ("adds a regression test for the UTF-8 download crash").
-- **No Claude Code attribution footer.** The body should read like the human author wrote it.
+- **No Claude Code attribution footer**, here or in any comment this workflow posts. It should read like the human author wrote it.
 - **Link the issue when there is one.** If the branch name, a commit message, or the user's request names an issue, close it from the body — `Closes #4103` on its own line. Don't invent a number.
 
 If a bullet is turning into an essay, compress it to one sentence naming the *kind* of change.
@@ -142,8 +144,10 @@ Only the Claude Code web sandbox (`/home/user/bike_index`) lacks the GitHub CLI;
 | 9 | `gh pr create --draft` | `create_pull_request`, `draft: true`, `head: "<branch>"` |
 | 9 | `gh pr edit <n> --body-file` | `update_pull_request` |
 | 10 | `gh pr comment` | `add_issue_comment`, `issue_number: <pr>` |
-| 10 | `gh api -X PATCH …/issues/comments/<id>` | **no equivalent** — post a new comment and say the old one is stale |
+| 10 | `gh api -X PATCH …/issues/comments/<id>` | check the registered tools before assuming there's none — see below |
 
 Three traps in that column: `head` takes `owner:branch` when listing but a bare branch name when creating; the body is a string parameter, so `--body-file` has no equivalent; and `list_pull_requests` reports `merged: false` even for merged PRs (verified against #4122, which `pull_request_read` reports correctly) — which is why step 6's query asks for open PRs rather than filtering `all` on that field.
+
+**Editing an existing comment: search the registered tools for one before concluding you can't.** An earlier version of this table asserted there was no equivalent and said to post a second comment instead; that is how PR #4126 ended up with three comments telling one story. If a search really turns up nothing, the fallback is to hand the updated text back for a run that has `gh` — not to post a comment beside the one that needed updating.
 
 Step 10 doesn't run here at all — see the preflight in `references/screenshots.md`.

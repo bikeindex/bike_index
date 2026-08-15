@@ -6,6 +6,8 @@ The flow: decide what to capture → capture the branch → upload → capture t
 
 **Preflight — the Claude Code web sandbox can't finish this phase.** Capture (steps 1, 2 and 4) works there, but the upload can't: the MCP browser rejects the egress proxy's CA, so github.com fails to load with `ERR_CERT_AUTHORITY_INVALID`, and even past that, uploading needs a logged-in GitHub session that can't be established headlessly. Don't start the capture there — tell the user step 10 needs a machine with a browser signed in to GitHub, and hand back the PR URL.
 
+Substituting other evidence is fine when it's genuinely stronger — a rendered-HTML diff against the base says more about a pure move than a screenshot pair does. It goes in the one `## Screenshots` comment under that heading, per step 5, not in a comment of its own.
+
 ## 1. Decide whether screenshots are needed and which URLs to capture
 
 You're only here because the diff is frontend (SKILL.md step 7 gates on that). Decide scope by PR state:
@@ -42,6 +44,8 @@ Skip per-page only when the URL didn't exist on the base (a brand-new route or p
 Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs, passing the base as its `BASE_REF` (`origin/main` unless step 2 chose otherwise) — its "Cross-branch comparison" section does the rest, whether or not the base is `main`. Then re-invoke `github-upload-image-to-pr` for those PNGs (upload-only, exactly as in step 3 — collect URLs, do not post).
 
 ## 5. Post the Screenshots section as a PR comment
+
+**One comment per PR, and its first line is always `## Screenshots`.** That heading is the handle every later run finds it by — the lookup below matches on it — so it stays even when what's underneath isn't screenshots: a rendered-markup parity table, a note that this environment couldn't capture. Retitling the comment to describe the substitute (`## Rendered-markup parity instead of screenshots`) orphans it, and the next run posts a second one beside it rather than replacing it. PR #4126 collected three that way.
 
 On a fresh PR, this comment is naturally the first one. On an update, find your existing screenshots comment and edit it in place rather than posting a new one (substitute the PR number for `<number>`):
 

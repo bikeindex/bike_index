@@ -139,11 +139,14 @@ Substitute whichever form (markdown `![](...)` or HTML `<img ...>`) GitHub retur
 
 **Post as a comment** (the default). A comment keeps the description tight and skimmable, and avoids re-editing the body (and its notification noise) on every recapture.
 
-If a screenshots comment already exists (one authored by you whose body starts with `## Screenshots`), edit it in place instead of posting a new one:
+If a screenshots comment already exists (one authored by you whose body starts with `## Screenshots`), edit it in place instead of posting a new one. Keep the heading as the handle: one such comment per PR, always starting `## Screenshots`, even when what's under it isn't screenshots — retitle it and the next run can't find it.
 ```bash
-SCREENSHOT_COMMENT_ID=$(gh api "repos/{owner}/{repo}/issues/$PR_NUMBER/comments" \
-  --jq '.[] | select(.body | startswith("## Screenshots")) | .id' | head -1)
+ME=$(gh api user --jq .login)
+SCREENSHOT_COMMENT_ID=$(gh api --paginate "repos/{owner}/{repo}/issues/$PR_NUMBER/comments" \
+  --jq ".[] | select(.user.login == \"$ME\") | select(.body | startswith(\"## Screenshots\")) | .id" | head -1)
 ```
+
+`--paginate` matters — comments come 30 to a page, and on a busy PR the screenshots comment often isn't on the first. The author filter keeps someone else's `## Screenshots` comment from being overwritten.
 
 Write the comment body to a temp file:
 ```
