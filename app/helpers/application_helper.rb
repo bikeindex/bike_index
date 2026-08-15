@@ -29,7 +29,6 @@ module ApplicationHelper
     link_to(raw(link_text), link_path, html_options).html_safe
   end
 
-  # Memoized because the layout asks this about the page before it renders it
   def main_content_component
     @main_content_component ||= PageBlock::MainContent::Wrapper::Component.new(
       controller_namespace:, controller_name:, action_name:,

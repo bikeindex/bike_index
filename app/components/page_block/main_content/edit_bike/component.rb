@@ -15,6 +15,13 @@ module PageBlock
           @current_user = current_user
           @passive_organization = passive_organization
         end
+
+        private
+
+        # bikes/edits leaves the submitted, unsaved value on @bike.owner_email
+        def owner_email
+          @og_email || @bike.owner_email
+        end
       end
     end
   end
