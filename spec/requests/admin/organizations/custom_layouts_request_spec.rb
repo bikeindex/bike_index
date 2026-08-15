@@ -46,24 +46,23 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
           let!(:landing_page) { FactoryBot.create(:organization_landing_page, organization:, enabled: true) }
 
-          it "links to the landing page, and alerts that it's enabled" do
+          it "links to the landing page, and says nothing about enabled" do
             expect(LandingPages::ORGANIZATIONS).to include(organization.slug)
             expect(landing_page.enabled_mismatch_error).to be_blank
             get "#{base_url}/landing_page/edit"
             expect(response.status).to eq(200)
             expect(response.body).to include "href=\"#{root_url}#{organization.to_param}\""
             expect(response.body).to_not include organization_landing_path(organization_id: organization.to_param)
-            expect(response.body).to include "This landing page is enabled"
+            expect(response.body).to_not include "ORGANIZATIONS_WITH_LANDING_PAGES"
           end
 
           context "with the landing page disabled" do
             let!(:landing_page) { FactoryBot.create(:organization_landing_page, organization:) }
 
-            it "alerts the mismatch instead, and still links to the routed page" do
+            it "alerts the mismatch, and still links to the routed page" do
               get "#{base_url}/landing_page/edit"
               expect(response.status).to eq(200)
               expect(response.body).to include CGI.escapeHTML(landing_page.enabled_mismatch_error)
-              expect(response.body).to_not include "This landing page is enabled"
               expect(response.body).to include "href=\"#{root_url}#{organization.to_param}\""
               expect(response.body).to include 'name="organization_landing_page[enabled]"'
             end
@@ -90,7 +89,6 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
             let(:landing_page) do
               FactoryBot.create(:organization_landing_page, organization:, body: iframe)
             end
-            # not the seeded body's color, so the suggestion can only come from this iframe
             let(:iframe) { "<iframe src='/register/embed?organization_id=x&button=336699'></iframe>" }
 
             it "recommends the shade step 1 would derive" do
