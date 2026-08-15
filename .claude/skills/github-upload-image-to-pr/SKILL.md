@@ -6,7 +6,10 @@ description: >-
   with an existing PR (by #number, URL, branch name, or "the open PR"), regardless of verb —
   attach, embed, add, put, post, drop, show, document. Also covers visually documenting test runs,
   bug repros, UI states, or CI failures on an existing PR. The `gh` CLI cannot upload images;
-  this skill drives a real browser to GitHub's user-attachments uploader.
+  this skill drives a real browser to GitHub's user-attachments uploader. It also owns the PR's
+  one `## Screenshots` comment — finding, creating, editing and verifying it — so other workflows
+  (the `pr` skill's screenshot phase) call it to host images and get URLs back, then hand it a
+  composed body to post.
 allowed-tools: Bash(gh:*), Bash(cp:*), ToolSearch, Read, mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, mcp__playwright__browser_click, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_take_screenshot
 ---
 
@@ -118,7 +121,7 @@ Both render the image in the PR — preserve whichever form GitHub used. If you 
 
 ## Step 7: Clear the textarea (do not submit the comment)
 
-Submitting via the UI's "Comment" button would post a public comment as a side effect of the upload. The only thing that should determine where the image lands (PR body vs. a new comment) is step 8 — so the textarea here is purely an upload-staging surface, never a submission surface. Clear it, then let `gh pr edit` / `gh pr comment` decide the destination.
+Submitting via the UI's "Comment" button would post a public comment as a side effect of the upload. The only thing that should determine where the image lands — a comment, the PR body, or nowhere yet — is step 8, so the textarea here is purely an upload-staging surface, never a submission surface. Clear it, then let `gh` decide the destination.
 
 Use the **standard textarea selector** from step 6, then assign `ta.value = ""`:
 
@@ -131,11 +134,16 @@ Use the **standard textarea selector** from step 6, then assign `ta.value = ""`:
 }
 ```
 
-## Step 8: Embed images in the PR
+## Step 8: Put them on the PR
 
-> **Upload-only callers:** if another workflow invoked this skill just to host images — e.g. the `pr` skill's screenshot phase, which gathers branch + base URLs and composes its own combined `## Screenshots` before/after comment — **stop after step 7**: hand the collected URLs back and do **not** post here. Otherwise the caller ends up with a premature, partial comment. Only run this step when you own the posting.
+**Two ways this skill gets called, decided by whether you were handed a body:**
 
-Substitute whichever form (markdown `![](...)` or HTML `<img ...>`) GitHub returned in step 6 — preserve it verbatim instead of rewrapping.
+- **Host only** — no body. Stop here: return the URLs from step 6, keyed however the caller asked. The `pr` skill's screenshot phase calls this twice (branch, then base) before it has anything worth posting. Posting here would land a partial comment.
+- **Host and post** — the caller handed you a composed body, or the request was a direct "put this image on the PR" with no other workflow involved. Post it as below.
+
+This skill owns the `## Screenshots` comment: finding it, creating it, editing it, checking it rendered. Callers compose bodies; they don't post them.
+
+Substitute whichever form (markdown `![](...)` or HTML `<img ...>`) GitHub returned in step 6 — preserve it verbatim instead of rewrapping. A body handed to you by a caller is posted verbatim too; don't recompose it.
 
 **Post as a comment** (the default). A comment keeps the description tight and skimmable, and avoids re-editing the body (and its notification noise) on every recapture.
 
@@ -148,7 +156,9 @@ SCREENSHOT_COMMENT_ID=$(gh api --paginate "repos/{owner}/{repo}/issues/$PR_NUMBE
 
 `--paginate` matters — comments come 30 to a page, and on a busy PR the screenshots comment often isn't on the first. The author filter keeps someone else's `## Screenshots` comment from being overwritten.
 
-Write the comment body to a temp file:
+A caller updating one page of a multi-page comment needs the current body to edit — hand it back on request: `gh api repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID --jq .body`.
+
+Write the comment body to a temp file — the caller's, or, when you're composing it yourself:
 ```
 ## Screenshots
 

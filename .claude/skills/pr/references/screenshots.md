@@ -29,9 +29,9 @@ Invoke the `frontend-screenshots` skill with the `(url-path, page-slug)` pairs f
 
 If it returns failures it couldn't diagnose, report them and leave the PR without screenshots — don't post partial results.
 
-## 3. Upload branch screenshots and get inline URLs
+## 3. Host the branch screenshots and get inline URLs
 
-Invoke the `github-upload-image-to-pr` skill **for uploading only**: run it through its step 7 (upload each PNG from step 2, read back the `user-attachments/assets/` URLs, clear the textarea) and **stop there — do not run its step 8 posting.** This phase composes and posts one combined before/after comment itself in step 5, so the upload skill must not post its own. GitHub mints persistent URLs that render inline in the browser (release assets would force a download on click).
+Invoke `github-upload-image-to-pr` with the PNGs from step 2 and **no body** — that's its host-only call, and it returns the `user-attachments/assets/` URLs without posting anything. The comment gets composed here in step 5 and posted by that same skill in one go at the end, so nothing lands on the PR until the before/after is complete. GitHub mints persistent URLs that render inline in the browser (release assets would force a download on click).
 
 Collect the returned URLs, keyed by `(page-slug, viewport)`.
 
@@ -41,24 +41,13 @@ Capture the **base-branch** version (the base from SKILL.md's **Orient**) of eve
 
 Skip per-page only when the URL didn't exist on the base (a brand-new route or page added in this PR) — there's nothing to compare to.
 
-Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs, passing the base as its `BASE_REF` (`origin/main` unless **Orient** chose otherwise) — its "Cross-branch comparison" section does the rest, whether or not the base is `main`. Then re-invoke `github-upload-image-to-pr` for those PNGs (upload-only, exactly as in step 3 — collect URLs, do not post).
+Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs, passing the base as its `BASE_REF` (`origin/main` unless **Orient** chose otherwise) — its "Cross-branch comparison" section does the rest, whether or not the base is `main`. Then re-invoke `github-upload-image-to-pr` for those PNGs, host-only exactly as in step 3.
 
-## 5. Post the Screenshots section as a PR comment
+## 5. Compose the Screenshots comment and hand it back
 
-**One comment per PR, and its first line is always `## Screenshots`.** That heading is the handle every later run finds it by — the lookup below matches on it — so it stays even when what's underneath isn't screenshots: a rendered-markup parity table, a note that this environment couldn't capture. Retitling the comment to describe the substitute (`## Rendered-markup parity instead of screenshots`) orphans it, and the next run posts a second one beside it rather than replacing it. PR #4126 collected three that way.
+Write the body to a temp file and invoke `github-upload-image-to-pr` with it. That skill owns the comment — finding the existing one, creating or editing it, verifying it rendered — and it posts what you hand it verbatim. Everything below is what goes *in* the body.
 
-On a fresh PR, this comment is naturally the first one. On an update, find your existing screenshots comment and edit it in place rather than posting a new one (substitute the PR number for `<number>`):
-
-```bash
-ME=$(gh api user --jq .login)
-gh api --paginate "repos/{owner}/{repo}/issues/<number>/comments" \
-  --jq ".[] | select(.user.login == \"$ME\") | select(.body | startswith(\"## Screenshots\")) | .id" | head -1
-```
-
-`{owner}` and `{repo}` are expanded by `gh api`; the PR number is not, so write it in. `--paginate` matters — comments come 30 to a page, and a busy PR's screenshots comment is often not on the first.
-
-- No id found: `gh pr comment <number> --body-file <tmp-comment-file>`.
-- Otherwise: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/<comment-id> -F body=@<tmp-comment-file> --jq .html_url`. Use `-F` (which reads a file when the value starts with `@`), not `-f` — `-f` stores the literal string `@<file>` and clobbers the comment with the filename. Re-verify after editing: `gh api repos/{owner}/{repo}/issues/comments/<comment-id> --jq .body | head`.
+Its first line is always `## Screenshots`, because that heading is the handle it's found by next time.
 
 The base-branch shots and branch shots stack as rows in one table, with a small indicator row between them when both are present. The indicator labels the base by its PR when it has one — `#3918 👆` for a stacked base, plain `main 👆` otherwise:
 
@@ -96,6 +85,6 @@ Rules:
 - **Headers are always `| Desktop | Mobile |`** — never `| main | this branch |` or any per-PR variation. Reviewers should see the same column meaning across every PR.
 - Use `<img src=... width=...>` rather than `![]()` so the widths render predictably in GitHub's table cells. ~500 for desktop, ~250 for mobile fits a side-by-side cell layout cleanly.
 
-When updating an existing screenshots comment, replace the existing `### <url-path>` block for any page you recaptured; leave other pages' blocks alone.
+When updating an existing screenshots comment, ask `github-upload-image-to-pr` for its current body first, replace the `### <url-path>` block for any page you recaptured, and leave every other page's block alone — you're handing back a whole body, so anything you drop is dropped.
 
 Return the PR URL.
