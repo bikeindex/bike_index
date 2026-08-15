@@ -29,41 +29,13 @@ module ApplicationHelper
     link_to(raw(link_text), link_path, html_options).html_safe
   end
 
-  # Used to render the page wrapper
-  # MUST be either:
-  #  - a valid partial file in views/shared
-  #  - nil - which just calls yield directly
-  def current_page_skeleton
-    return "organized_skeleton" if controller_namespace == "organized" && action_name != "landing"
-    return "oauth_applications_skeleton" if controller_namespace == "oauth" && controller_name == "applications"
-    return nil if controller_namespace == "search"
-    return nil if @force_landing_page_render
-
-    case controller_name
-    when "bikes"
-      "edit_bike_skeleton" if %w[update].include?(action_name)
-    when "edits", "theft_alerts", "recovery"
-      "edit_bike_skeleton"
-    when "info"
-      "content_skeleton" unless %w[terms security vendor_terms privacy support_the_index resources].include?(action_name)
-    when "welcome"
-      "content_skeleton" if %w[goodbye].include?(action_name)
-    when "organizations"
-      "content_skeleton" if %w[lightspeed_integration].include?(action_name)
-    when "news", "feedbacks", "manufacturers", "errors"
-      "content_skeleton"
-    when "registrations"
-      "content_skeleton" unless action_name == "show"
-    end
-  end
-
-  # For determining menu items to display on content skeleton
-  def content_page_type
-    if controller_name == "info"
-      action_name
-    elsif controller_name == "news"
-      "news"
-    end
+  # Wraps the page in whichever skeleton its route calls for. Memoized because the
+  # layout asks it about the page before it renders it
+  def page_skeleton_component
+    @page_skeleton_component ||= PageBlock::Skeletons::Wrapper::Component.new(
+      controller_namespace:, controller_name:, action_name:,
+      force_landing_page_render: @force_landing_page_render
+    )
   end
 
   def body_class
@@ -75,7 +47,7 @@ module ApplicationHelper
       end
     elsif controller_name == "info" && action_name == "resources"
       "kelsey_landing-page-body"
-    elsif current_page_skeleton == "organized_skeleton"
+    elsif page_skeleton_component.organized?
       "organized-body"
     elsif controller_name == "registrations" && action_name == "show"
       "tw:bg-[#f7f6fb]"

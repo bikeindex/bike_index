@@ -270,9 +270,9 @@
       <%= render PageBlock::LawEnforcementDonation::Component.new(current_user:) %>
     <% end %>
 
-    <%# organized_skeleton renders its own, inside the content column the menu doesn't cover %>
+    <%# the organized skeleton renders its own, inside the content column the menu doesn't cover %>
     <% general_alert = PageBlock::UserAlerts::Wrapper::Component.new(current_user:) if
-      show_general_alert && current_page_skeleton != "organized_skeleton" %>
+      show_general_alert && !page_skeleton_component.organized? %>
 
     <% show_general_alert_here = general_alert&.render? %>
 
@@ -294,9 +294,7 @@
         id="main-content"
         class="<%= "tw:[--nav-gap:0px]" if show_general_alert_here %>"
       >
-        <% if current_page_skeleton.present? %>
-          <%= render partial: "/shared/#{current_page_skeleton}" %>
-        <% else %>
+        <%= render(page_skeleton_component) do %>
           <%= yield %>
         <% end %>
       </main>
