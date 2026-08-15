@@ -79,7 +79,7 @@ RSpec.describe PageBlock::Navbar::Component, type: :component do
   end
 
   context "with logo_only" do
-    let(:instance) { described_class.new(logo_only: true) }
+    let(:instance) { described_class.logo_only }
 
     it "renders the logo without the menu" do
       expect(component).to have_css "nav.primary-header-nav a.primary-logo"

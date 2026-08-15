@@ -5,27 +5,31 @@ module PageBlock
     class ComponentPreview < ApplicationComponentPreview
       # @!group Navbar
 
+      # page_id keys the fragment cache — a real page's id would serve this preview's
+      # render to that page when dev caching is on
+      PAGE_ID = "lookbook_preview"
+
       # @display legacy_stylesheet true
       def default
-        render(PageBlock::Navbar::Component.new(current_user: nil, current_user_or_unconfirmed_user: nil,
-          passive_organization: nil, page_id: "welcome_index"))
+        render(PageBlock::Navbar::Component.new(page_id: PAGE_ID, current_user: nil,
+          current_user_or_unconfirmed_user: nil))
       end
 
       # @display legacy_stylesheet true
       def signed_in
-        render(PageBlock::Navbar::Component.new(current_user: lookbook_user, current_user_or_unconfirmed_user: lookbook_user,
-          passive_organization: nil, page_id: "welcome_index"))
+        render(PageBlock::Navbar::Component.new(page_id: PAGE_ID, current_user: lookbook_user,
+          current_user_or_unconfirmed_user: lookbook_user))
       end
 
       # @display legacy_stylesheet true
       def with_organization
-        render(PageBlock::Navbar::Component.new(current_user: lookbook_user, current_user_or_unconfirmed_user: lookbook_user,
-          passive_organization: lookbook_organization, page_id: "welcome_index"))
+        render(PageBlock::Navbar::Component.new(page_id: PAGE_ID, current_user: lookbook_user,
+          current_user_or_unconfirmed_user: lookbook_user, passive_organization: lookbook_organization))
       end
 
       # @display legacy_stylesheet true
       def logo_only
-        render(PageBlock::Navbar::Component.new(logo_only: true))
+        render(PageBlock::Navbar::Component.logo_only)
       end
       # @endgroup
     end

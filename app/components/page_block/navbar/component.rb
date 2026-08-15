@@ -2,13 +2,18 @@
 
 module PageBlock
   module Navbar
-    # The site-wide header nav. logo_only drops everything but the logo, for the OAuth
-    # authorization prompt -- which is why nothing else is passed there.
+    # The site-wide header nav. `.logo_only` drops everything but the logo, for the OAuth
+    # authorization prompt.
     class Component < ApplicationComponent
       # Digest of the cached template — the cached_markup_digest spec keeps it current
-      MARKUP_DIGEST = "8b072264ae14"
+      MARKUP_DIGEST = "8b1312f36f4e"
 
-      def initialize(page_id: nil, current_user: nil, current_user_or_unconfirmed_user: nil,
+      # Renders nothing that varies, so it skips the cache and needs none of its key
+      def self.logo_only
+        new(page_id: nil, current_user: nil, current_user_or_unconfirmed_user: nil, logo_only: true)
+      end
+
+      def initialize(page_id:, current_user:, current_user_or_unconfirmed_user:,
         passive_organization: nil, logo_only: false, unregistered_parking_notification: nil)
         @page_id = page_id
         @current_user = current_user
@@ -31,7 +36,7 @@ module PageBlock
           {type: :divider, item_class: "d-lg-none"},
           *account_items,
           {label: translation(".help"), path: help_path},
-          # Because of caching, this needs to be set to be active with JS (index.coffee)
+          # Because of caching, this needs to be set to be active with JS (welcome/index.coffee)
           {label: translation(".stolen_bike"), path: get_your_stolen_bike_back_path, active: false,
            html_options: {id: "getStolenBackLink"}},
           {label: translation(".donate"), path: why_donate_path},
@@ -64,7 +69,7 @@ module PageBlock
           {label: translation(".register_a_new_bike"), path: choose_registration_path},
           {label: translation(".user_settings", user_email: @current_user_or_unconfirmed_user.email),
            path: edit_my_account_path,
-           html_options: {:id => "navUserSettingLink", "data-email" => @current_user_or_unconfirmed_user.email}},
+           html_options: {id: "navUserSettingLink", data: {email: @current_user_or_unconfirmed_user.email}}},
           {type: :divider},
           {label: translation(".logout"), path: goodbye_path, active: false}].compact
       end
@@ -87,6 +92,8 @@ module PageBlock
         {label: translation(".marketplace_messages"), path: my_account_messages_path}
       end
 
+      # nil computes active from the path, :match_controller from the controller alone, false
+      # pins it inactive -- swapping nil for false fails silently
       def menu_link(item)
         options = {class: link_class(item), **item.fetch(:html_options, {})}
         case item[:active]

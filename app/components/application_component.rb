@@ -79,8 +79,8 @@ class ApplicationComponent < ViewComponent::Base
 
   private
 
-  # Use request.path_parameters rather than controller.controller_name so the routed
-  # controller is reflected in component specs (which dispatch through a generic
+  # Prefer these to controller_name/action_name: they read request.path_parameters, so the
+  # routed controller is reflected in component specs (which dispatch through a generic
   # vc_test_controller).
   def routed_controller
     controller.request.path_parameters[:controller]
