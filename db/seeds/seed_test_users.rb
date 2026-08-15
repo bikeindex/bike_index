@@ -2,8 +2,7 @@
 # Note: you have to seed the users first, or else the bikes don't have anywhere to go.
 
 user_attrs = {
-  # developer too, so one sign-in reaches the admin pages that require both
-  admin: {name: "Admin User", email: "admin@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current, developer: true},
+  admin: {name: "Admin User", email: "admin@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current},
   dev: {name: "Dev User", email: "dev@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current, developer: true},
   member: {name: "Member User", email: "member@brakebills.edu", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true, vendor_terms_of_service: true, when_vendor_terms_of_service: Time.current},
   user: {name: "Test User", email: "user@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true},
@@ -17,9 +16,10 @@ user_attrs.values.each do |attributes|
   new_user.save
 end
 
-# Create superuser ability for admin user
-admin = User.find_by(email: "admin@bikeindex.org")
-SuperuserAbility.create!(user: admin)
+# dev is a superuser too, so one sign-in reaches the admin pages that also require developer
+%w[admin@bikeindex.org dev@bikeindex.org].each do |email|
+  SuperuserAbility.create!(user: User.find_by(email:))
+end
 
 # Group gate rather than per-actor — opting out writes users.feature_registration_show_legacy
 Flipper.enable_group(:bike_show_redesign_toggle, :superusers)
