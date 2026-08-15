@@ -65,8 +65,11 @@ Class methods go in a `class << self` block when the class has more than 5 of th
 **Then review every comment the branch adds or edits — this is required, not conditional on the diff looking clean.** List them with their files:
 
 ```bash
-git diff origin/main...HEAD -U0 | grep -E '^(\+\+\+ |\+.*(#|//|<%#|/\*))'
+git diff origin/main...HEAD -U0 -- '*.rb' '*.erb' '*.js' '*.ts' '*.coffee' '*.scss' '*.css' '*.rake' |
+  grep -E '^(\+\+\+ |\+.*(#|//|<%#|/\*))'
 ```
+
+The `+++ b/…` lines keep each hit attached to its file; the code-path filter keeps markdown headings out. It catches trailing comments too, and over-matches on `#{}` interpolation — that's fine, the list is candidates to judge, not verdicts.
 
 Judge each against the **Comments** section of `CLAUDE.md` and reach a verdict of keep / razor / delete on every line — a comment survives only by carrying a *why* the code can't. Deleting is the common outcome, razoring the next most common; leaving a block untouched should be the exception you can justify. Watch hardest for the ones you wrote to explain your own reasoning as you worked: narration of the change, mechanism the code already shows, and a second sentence justifying the first.
 

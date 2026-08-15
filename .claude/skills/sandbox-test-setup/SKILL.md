@@ -137,8 +137,9 @@ applies to any spec that renders the layout.
 
 ## Claude Code web sandbox
 
-`Gemfile` pins the Ruby version (`ruby "4.0.6"` at time of writing —
-**read the current pin from the `ruby` line in `Gemfile`**, it moves) and
+`.tool-versions` pins the Ruby version (`ruby 4.0.6` at time of writing —
+**read the current pin from its `ruby` line**, it moves; the `Gemfile` has
+no `ruby` directive) and
 `Gemfile.lock` pins `BUNDLED WITH 4.0.15`. No prebuilt binary for that
 version is reachable (`cache.ruby-lang.org` is 403'd, `ruby/ruby-builder`'s
 toolcache tops out at `3.5.0-preview1`), so build from the GitHub source
@@ -155,7 +156,7 @@ dep, so install it separately: `apt-get install -y libvips42` (run
 
 ## One-shot Ruby build
 
-Set `RUBYVER` to the pin from `Gemfile`. Skip if
+Set `RUBYVER` to the pin from `.tool-versions`. Skip if
 `/opt/ruby-$RUBYVER/x64/bin/ruby --version` already prints it. Three
 quirks the bash block handles: (1) GitHub's archive-tarball endpoint
 (`/archive/refs/tags/*.tar.gz`) **403s through the sandbox proxy** even
@@ -168,7 +169,7 @@ with `curl` (which honours `/etc/ssl/certs/ca-certificates.crt`) before
 `make install`.
 
 ```bash
-RUBYVER=$(grep -oE '^ruby "([0-9.]+)"' /home/user/bike_index/Gemfile | grep -oE '[0-9.]+')
+RUBYVER=$(awk '$1=="ruby"{print $2}' /home/user/bike_index/.tool-versions)
 
 # 1. Source — shallow git clone of the tag. The archive tarball URL 403s here;
 #    codeload does too. `git clone` over https is what works.
