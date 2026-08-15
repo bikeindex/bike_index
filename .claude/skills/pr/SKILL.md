@@ -29,7 +29,7 @@ Run the `gh` commands as written. The appendix at the bottom covers the one envi
 
 Then pick the mode:
 
-- **Body-only** — the user asked to edit/rewrite/fix the description, body, summary or title of an existing PR and nothing else. Skip steps 3, 4 and 5 (no merge, no code edits, no migration re-dating) and go 1 → 2 → 6 → 7 → 8 → 9. A request to reword the description shouldn't rewrite code.
+- **Body-only** — the user asked to edit/rewrite/fix the description, body, summary or title of an existing PR and nothing else. Skip steps 3, 4 and 5 (no merge, no code edits, no migration re-dating) and go 1 → 2 → 6 → 8 → 9 → 11. A request to reword the description shouldn't rewrite code, and it shouldn't recapture screenshots either — so step 7, which exists only to gate step 10, is skipped too.
 - **Full** — everything else (creating a PR, "get this ready", or an update after new commits). Run every step.
 
 ### 2. Determine the base branch
