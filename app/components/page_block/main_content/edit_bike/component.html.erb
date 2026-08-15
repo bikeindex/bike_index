@@ -10,7 +10,7 @@
         <% if @bike.status_with_owner? %>
           <%= translation(".edit") %>
         <% else %>
-          <%= helpers.bike_status_span(@bike) %>
+          <%= bike_status_span(@bike) %>
         <% end %>
 
         <% if @bike.version? %>
@@ -19,7 +19,7 @@
             of <em><%= @bike_og.title_string %></em>
           </small>
         <% else %>
-          <%= helpers.bike_title_html(@bike) %>
+          <%= bike_title_html(@bike) %>
         <% end %>
 
         <% if @bike.deleted? %>

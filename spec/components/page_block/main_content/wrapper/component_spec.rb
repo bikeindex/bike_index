@@ -237,6 +237,16 @@ RSpec.describe PageBlock::MainContent::Wrapper::Component, type: :component do
       it "renders the edit header and menu around the page" do
         expect(result.css("#edit-bike-skeleton").to_html).to match "<p>the page</p>"
         expect(result.text).to match "Details"
+        expect(result.css(".bike-status-html").count).to eq 0
+        expect(result.text).to match bike.mnfg_name
+      end
+
+      context "not with its owner" do
+        let(:bike) { FactoryBot.create(:bike, :with_ownership, :with_stolen_record) }
+
+        it "renders the status in place of the edit heading" do
+          expect(result.css(".bike-status-html").text).to match(/stolen/i)
+        end
       end
     end
 

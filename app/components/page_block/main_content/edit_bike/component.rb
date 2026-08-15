@@ -5,6 +5,8 @@ module PageBlock
     module EditBike
       # The header and edit-page menu wrapped around every bike edit template
       class Component < ApplicationComponent
+        include BikeHelper
+
         def initialize(bike:, bike_og:, og_email:, edit_template:, edit_templates:,
           current_user:, passive_organization:)
           @bike = bike
