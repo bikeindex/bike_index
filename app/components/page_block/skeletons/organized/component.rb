@@ -3,8 +3,8 @@
 module PageBlock
   module Skeletons
     module Organized
-      # The organization admin shell - the left menu, the org-wide alerts, and the
-      # content column the menu is positioned over
+      # The organization admin shell - the left menu, and the content column it's
+      # positioned over
       class Component < ApplicationComponent
         def initialize(current_organization:, current_user:, passive_organization:,
           unregistered_parking_notification:, show_general_alert:, controller_name:, action_name:)
@@ -19,7 +19,7 @@ module PageBlock
 
         private
 
-        # If viewing the dashboard, show the link
+        # The dashboard itself shows the link, even for an organization without the feature
         def show_overview_dashboard?
           @current_organization.overview_dashboard? ||
             (@controller_name == "dashboard" && @action_name == "index")

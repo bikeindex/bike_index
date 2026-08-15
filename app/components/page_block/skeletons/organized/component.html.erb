@@ -126,6 +126,6 @@
   <script>
     window.passiveOrganizationId = <%== @passive_organization&.slug.to_json %>;
   </script>
-  <%# Important that this is below yield, sometimes important page data is added to the dom in there %>
+  <%# Important that this is below the content, sometimes important page data is added to the dom in there %>
   <script src="/vendored_assets/application.js"></script>
 <% end %>

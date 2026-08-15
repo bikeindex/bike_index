@@ -3,8 +3,8 @@
 module PageBlock
   module Skeletons
     module Content
-      # The two column shell for the informational pages - the page in the wide column,
-      # a menu of related pages (or a donation ask) in the narrow one
+      # The two column shell for the informational pages, with a menu of related pages -
+      # or a donation ask - beside them
       class Component < ApplicationComponent
         def initialize(blog:, related_blogs:, current_user:, controller_name:, action_name:)
           @blog = blog
@@ -26,11 +26,11 @@ module PageBlock
         end
 
         def render_why_donate?
-          @blog.present? && @blog.title_slug == Blog.why_donate_slug
+          @blog&.title_slug == Blog.why_donate_slug
         end
 
         def render_get_your_stolen_bike_back?
-          @blog.present? && @blog.title_slug == Blog.get_your_stolen_bike_back_slug
+          @blog&.title_slug == Blog.get_your_stolen_bike_back_slug
         end
 
         def referral_source
