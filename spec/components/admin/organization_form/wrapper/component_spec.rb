@@ -131,15 +131,12 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
       expect(add_link.text).to eq "Add a location"
 
       # ui--forms--add-fields inserts this payload into the page, so it has to be exactly one
-      # blank location, carrying the child index the controller swaps for a unique one
+      # blank location
       add_fields = Nokogiri::HTML.fragment(add_link["data-ui--forms--add-fields-fields-value"])
       expect(add_fields.css(".card").length).to eq 1
       expect(add_fields.css("input.twinput[name*='locations_attributes']").length).to be > 1
       expect(add_fields.css("[name='organization[name]']")).to be_empty
       expect(add_fields.text).not_to match "Main Office"
-
-      child_index = add_link["data-ui--forms--add-fields-child-index-value"]
-      expect(add_fields.css("[name*='locations_attributes'][name*=\"[#{child_index}]\"]")).to be_present
     end
   end
 

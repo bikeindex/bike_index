@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe UI::Forms::AddFields::Component, type: :component do
   let(:organization) { FactoryBot.create(:organization) }
   let(:fields) { ->(builder) { builder.text_field(:name) } }
-  let(:options) { {} }
+  let(:options) { {class_name: "twlink"} }
 
   def rendered_link(organization, fields, options)
     rendered = render_in_view_context do
@@ -20,18 +20,13 @@ RSpec.describe UI::Forms::AddFields::Component, type: :component do
   let(:link) { rendered_link(organization, fields, options) }
   let(:added) { Nokogiri::HTML.fragment(link["data-ui--forms--add-fields-fields-value"]) }
 
-  context "with a class_name" do
-    let(:options) { {class_name: "twlink"} }
-
-    it "renders the link with the blank fields the controller inserts" do
-      expect(link.text).to eq "Add a location"
-      expect(link["class"]).to eq "twlink"
-      expect(link["data-action"]).to eq "click->ui--forms--add-fields#add"
-
-      child_index = link["data-ui--forms--add-fields-child-index-value"]
-      expect(added.css("input").map { |input| input["name"] })
-        .to eq ["organization[locations_attributes][#{child_index}][name]"]
-    end
+  it "renders the link with the blank fields the controller inserts" do
+    expect(link.text).to eq "Add a location"
+    expect(link["class"]).to eq "twlink"
+    expect(link["data-action"]).to eq "click->ui--forms--add-fields#add"
+    # The controller swaps the placeholder for a unique index, so it has to survive to the browser
+    expect(added.css("input").map { |input| input["name"] })
+      .to eq ["organization[locations_attributes][__INDEX__][name]"]
   end
 
   it "builds the new record blank, rather than reusing a saved one" do

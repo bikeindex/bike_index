@@ -1,4 +1,8 @@
-<div class="col-md-6 mt-4" data-controller="ui--forms--remove-fields">
+<div
+  class="col-md-6 mt-4"
+  data-controller="ui--collapse"
+  data-ui--collapse-target="content"
+>
   <fieldset class="mr-2 ml-2">
     <div class="card bg-light">
       <div class="card-body">
@@ -34,9 +38,9 @@
               <% if @location.destroy_forbidden? %>
                 <small class="less-strong">can't remove, has impounded bikes</small>
               <% else %>
-                <%# The label checks the hidden _destroy box; ui--forms--remove-fields collapses the card %>
+                <%# The label checks the hidden _destroy box, so collapsing the card is all that's left to do %>
                 <%= @form_builder.check_box :_destroy, class: "d-none" %>
-                <%= @form_builder.label :_destroy, "Remove", class: "btn btn-danger", data: {action: "click->ui--forms--remove-fields#remove"} %>
+                <%= @form_builder.label :_destroy, "Remove", class: "btn btn-danger", data: {action: "click->ui--collapse#hide"} %>
               <% end %>
             </div>
           </div>
