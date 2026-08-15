@@ -16,9 +16,9 @@ user_attrs.values.each do |attributes|
   new_user.save
 end
 
-# dev is a superuser too, so one sign-in reaches the admin pages that also require developer
-%w[admin@bikeindex.org dev@bikeindex.org].each do |email|
-  SuperuserAbility.create!(user: User.find_by(email:))
+# dev is a superuser too - some admin pages require both
+user_attrs.values_at(:admin, :dev).each do |attributes|
+  SuperuserAbility.create!(user: User.find_by(email: attributes[:email]))
 end
 
 # Group gate rather than per-actor — opting out writes users.feature_registration_show_legacy

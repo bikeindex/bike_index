@@ -53,7 +53,8 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
             expect(response.status).to eq(200)
             expect(response.body).to include "href=\"#{root_url}#{organization.to_param}\""
             expect(response.body).to_not include organization_landing_path(organization_id: organization.to_param)
-            expect(response.body).to_not include "ORGANIZATIONS_WITH_LANDING_PAGES"
+            # the agreeing state is the checkbox's job - no alert of any kind
+            expect(response.body).to_not include "role=\"alert\""
           end
 
           context "with the landing page disabled" do
