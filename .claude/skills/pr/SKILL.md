@@ -123,4 +123,13 @@ Push the branch: `git push -u origin HEAD`. Don't report the local branch name d
 
 Always pass the body via `--body-file` (not inline `--body`) to preserve formatting.
 
-**If `FRONTEND=false`, stop here and return the PR URL.** If `FRONTEND=true`, read `references/screenshots.md` and follow it to capture before/after screenshots and post them as a PR comment (it uses `$EXISTING_PR`/`$PR_NUMBER` from the steps above). Screenshot tooling never blocks the PR — if it fails, return the PR URL and report the failure.
+### Comments: at most one, and only the screenshots one
+
+This workflow posts **exactly one kind of PR comment — the `## Screenshots` one in `references/screenshots.md`** — and posts it at most once per PR, editing that same comment on later runs. Nothing else you produce goes in a comment. Findings, caveats, verification you ran, evidence you gathered, things you decided not to fix: those go in the PR body if a reviewer needs them, and in your reply to the user otherwise. Don't invent a new comment type because you have something to say.
+
+Two failure modes to name, because both feel responsible in the moment:
+
+- **The "nothing changed" update.** After a later push, you notice an existing comment might be stale. Re-run whatever produced it and edit that comment in place. If re-running gives the same answer, *say nothing* — a comment reporting that the previous comment still holds is pure noise, and reasoning your way to "it still holds" without re-running is worse than either. Whether a claim went stale is something the user can be told in chat.
+- **Letting the tool surface pick the action.** If there's no edit-comment tool available (`gh` missing, MCP server without one), that means *don't post* — not "post a new one instead." Report the limitation to the user and let them do the one-click edit or delete.
+
+If `FRONTEND=true`, read `references/screenshots.md` and follow it to capture before/after screenshots and post them as a PR comment (it uses `$EXISTING_PR`/`$PR_NUMBER` from the steps above). Screenshot tooling never blocks the PR — if it fails, return the PR URL and report the failure.
