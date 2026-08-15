@@ -3,22 +3,22 @@
 module Admin
   module UserCell
     class Component < ApplicationComponent
-      include Binxtils::SortableHelper
-
       def initialize(
         user: nil,
         user_id: nil,
         email: nil,
         user_link_path: nil,
         search_url: nil,
-        render_search: nil
+        sortable_search_params: nil,
+        render_search: true
       )
         @user = user
         @user_id = user_id || user&.id
         @email = email || user&.email
         @search_url = search_url
+        @sortable_search_params = sortable_search_params
         @user_link_path_arg = user_link_path
-        @render_search = render_search.nil? ? @search_url.present? : render_search
+        @render_search = render_search
       end
 
       def render?
@@ -26,6 +26,23 @@ module Admin
       end
 
       private
+
+      def computed_search_url
+        return @computed_search_url if defined?(@computed_search_url)
+
+        @computed_search_url = search_url_from_params
+      end
+
+      def search_url_from_params
+        return @search_url if @search_url.present?
+        return nil if @sortable_search_params.blank?
+
+        if @user_id.present?
+          url_for(@sortable_search_params.merge(user_id: @user_id))
+        elsif @email.present?
+          url_for(@sortable_search_params.merge(search_email: @email))
+        end
+      end
 
       def user_link_path
         # bike_link_path can be false to not link
@@ -57,17 +74,7 @@ module Admin
       end
 
       def show_search?
-        @render_search && (@email.present? || @user_id.present?)
-      end
-
-      def computed_search_url
-        return @search_url if @search_url.present?
-
-        if @user_id.present?
-          url_for(sortable_search_params.merge(user_id: @user_id))
-        elsif @email.present?
-          url_for(sortable_search_params.merge(search_email: @email))
-        end
+        @render_search && computed_search_url.present?
       end
     end
   end

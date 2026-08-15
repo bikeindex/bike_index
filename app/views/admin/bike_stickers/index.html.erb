@@ -132,12 +132,11 @@
   <%= render partial: "table", locals: {bike_stickers: @bike_stickers, render_sortable: true} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @bike_stickers,
   viewing: "Stickers",
   chart_collection: @render_chart && matching_bike_stickers,
-  time_range_column: @time_range_column,
   nav_header_list_items:,
   admin_search_form:,
   table_view:
-)) %>
+) %>

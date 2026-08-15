@@ -3,8 +3,10 @@
 module Org
   module MenuItems
     class Component < ApplicationComponent
-      def initialize(organization:, current_user:, is_dropdown: false, unregistered_parking_notification: nil)
+      def initialize(organization:, current_user:, routed_controller: nil, routed_action: nil, is_dropdown: false, unregistered_parking_notification: nil)
         @organization = organization
+        @routed_controller = routed_controller
+        @routed_action = routed_action
         @current_user = current_user
         @is_dropdown = is_dropdown
         @unregistered_parking_notification = unregistered_parking_notification
@@ -86,27 +88,16 @@ module Org
         {type: :divider}
       end
 
-      # Use request.path_parameters rather than controller.controller_name so the
-      # routed controller is reflected in component specs (which dispatch through
-      # a generic vc_test_controller).
-      def routed_controller
-        controller.request.path_parameters[:controller]
-      end
-
-      def routed_action
-        controller.request.path_parameters[:action]
-      end
-
       def on_dashboard?
-        routed_controller == "organized/dashboard" && routed_action == "index"
+        @routed_controller == "organized/dashboard" && @routed_action == "index"
       end
 
       def on_bulk_imports?
-        routed_controller == "organized/bulk_imports"
+        @routed_controller == "organized/bulk_imports"
       end
 
       def on_registration_sequences?
-        %w[organized/registration_sequences organized/registration_sequence_pages].include?(routed_controller)
+        %w[organized/registration_sequences organized/registration_sequence_pages].include?(@routed_controller)
       end
 
       def skip?(item)
@@ -130,7 +121,7 @@ module Org
         case item[:active]
         when :auto, :match_controller then nil
         when :on_registrations_index
-          routed_controller == "organized/registrations" && routed_action == "index"
+          @routed_controller == "organized/registrations" && @routed_action == "index"
         when :on_bikes_new
           on_bikes_new? && !on_bikes_new_with_parking_notification?
         when :on_bikes_new_with_parking_notification
@@ -143,7 +134,7 @@ module Org
       end
 
       def on_bikes_new?
-        routed_controller == "organized/bikes" && routed_action == "new"
+        @routed_controller == "organized/bikes" && @routed_action == "new"
       end
 
       def on_bikes_new_with_parking_notification?

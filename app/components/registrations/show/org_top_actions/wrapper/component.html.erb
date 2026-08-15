@@ -29,6 +29,6 @@
   <% end %>
 
   <% if show_parking_notifications? %>
-    <%= render(Registrations::Show::OrgTopActions::ParkingNotificationShow::Component.new(bike: @bike, organization: @organization)) %>
+    <%= render(Registrations::Show::OrgTopActions::ParkingNotificationShow::Component.new(bike: @bike, organization: @organization, display_dev_info: @display_dev_info)) %>
   <% end %>
 </div>

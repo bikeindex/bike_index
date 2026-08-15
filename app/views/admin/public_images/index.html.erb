@@ -62,4 +62,4 @@
   <%= render partial: "table", locals: {collection: @collection, render_sortable: true, render_size: @render_size} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, rendered_chart:, table_view:)) %>
+<%= render_admin_index_skeleton(nav_header_list_items:, rendered_chart:, table_view:) %>

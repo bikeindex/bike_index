@@ -14,7 +14,7 @@
   <% end %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   chart_collection: @render_chart && matching_versions,
   admin_search_form:
-)) %>
+) %>

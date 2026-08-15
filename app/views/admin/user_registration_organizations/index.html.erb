@@ -44,11 +44,10 @@
   <%= render partial: "table", locals: {collection: @user_registration_organizations, render_sortable: true} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @user_registration_organizations,
   viewing: "User Registration Organizations",
   chart_collection: @render_chart && matching_user_registration_organizations,
-  time_range_column: @time_range_column,
   nav_header_list_items:,
   table_view:
-)) %>
+) %>

@@ -1,5 +1,5 @@
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @stolen_notifications,
   index_title: "Stolen Notifications",
   chart_collection: @render_chart && searched_stolen_notifications
-)) %>
+) %>

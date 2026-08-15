@@ -7,8 +7,9 @@ module Search
     # select2. Sibling to Search::EverythingCombobox::Component (the form
     # control); this is the async response that backs its autocomplete.
     class Component < ApplicationComponent
-      def initialize(matches:, search_obj_name:, next_page:, q: nil)
+      def initialize(matches:, search_obj_name:, next_page:, first_page:, q: nil)
         @matches = matches
+        @first_page = first_page
         @search_obj_name = search_obj_name
         @next_page = next_page
         @q = q.presence
@@ -32,7 +33,7 @@ module Search
         # Synthetic "Search for X" option (matches the prior select2 tags:true
         # affordance). End of the first page so it doesn't outrank real
         # matches under `match: :first` or the controller's enter handler.
-        data << search_for_option if @q && helpers.hw_first_page?
+        data << search_for_option if @q && @first_page
         data
       end
 

@@ -27,4 +27,4 @@
 
 - table_view = render partial: "/admin/ownerships/table", locals: {ownerships: @ownerships, render_sortable: true}
 
-= render(Admin::IndexSkeleton::Component.new(collection: @ownerships, nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_ownerships))
+= render_admin_index_skeleton(collection: @ownerships, nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_ownerships)

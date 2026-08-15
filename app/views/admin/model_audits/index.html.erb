@@ -25,11 +25,10 @@
   <% end %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @model_audits,
   viewing: "Model Audits",
   chart_collection: @render_chart && matching_model_audits,
-  time_range_column: @time_range_column,
   nav_header_list_items:,
   admin_search_form:
-)) %>
+) %>

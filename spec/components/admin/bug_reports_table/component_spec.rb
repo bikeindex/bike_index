@@ -8,7 +8,7 @@ RSpec.describe Admin::BugReportsTable::Component, type: :component do
   let(:bug_report) { FactoryBot.create(:bug_report, subject: "Broken search", body: "<p>It &amp; everything</p>") }
   let(:component) do
     with_controller_class(Admin::BugReportsController) do
-      with_request_url("/admin/bug_reports") { render_inline(described_class.new(collection: [bug_report])) }
+      with_request_url("/admin/bug_reports") { render_inline(described_class.new(collection: [bug_report], searchable_tags: [])) }
     end
   end
 

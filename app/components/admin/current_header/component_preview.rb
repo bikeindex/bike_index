@@ -6,7 +6,7 @@ module Admin
       # @!group Header Variants
 
       def default
-        render(Admin::CurrentHeader::Component.new(params: passed_params))
+        render(Admin::CurrentHeader::Component.new(params: passed_params, viewing: "Notifications"))
       end
 
       def with_current_organization

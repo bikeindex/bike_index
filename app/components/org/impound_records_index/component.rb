@@ -3,16 +3,19 @@
 module Org
   module ImpoundRecordsIndex
     class Component < ApplicationComponent
-      include Binxtils::SortableHelper
-
-      def initialize(pagy:, impound_records:, search_status:, search_unregisteredness:, time_range:, available_statuses:, current_organization:, multi_update_open: false)
+      def initialize(pagy:, impound_records:, search_status:, search_unregisteredness:, humanized_time_range:, available_statuses:, current_organization:, current_user: nil, params: {}, sortable_search_params: {}, sort: nil, sort_direction: nil, multi_update_open: false)
         @pagy = pagy
         @impound_records = impound_records
         @search_status = search_status
         @search_unregisteredness = search_unregisteredness
-        @time_range = time_range
+        @humanized_time_range = humanized_time_range
         @available_statuses = available_statuses
         @current_organization = current_organization
+        @current_user = current_user
+        @params = params
+        @sortable_search_params = sortable_search_params
+        @sort = sort
+        @sort_direction = sort_direction
         @multi_update_open = multi_update_open
       end
 

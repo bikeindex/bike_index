@@ -73,7 +73,7 @@
         <%= helpers.pretty_print_json(other_errors) %>
       <% end %>
 
-      <% if helpers.display_dev_info? %>
+      <% if @display_dev_info %>
         <code class="small d-block only-dev-visible p-1">
           <%= @bulk_import.import_errors %>
         </code>

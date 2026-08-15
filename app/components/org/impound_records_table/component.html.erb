@@ -1,6 +1,6 @@
 <% current_organization = @current_organization %>
 
-<%= render(UI::Table::Component.new(records: @impound_records, render_sortable: @render_sortable)) do |table| %>
+<%= render(UI::Table::Component.new(records: @impound_records, render_sortable: @render_sortable, sort: @sort, sort_direction: @sort_direction, sortable_search_params: @sortable_search_params)) do |table| %>
   <% table.column(sortable: "display_id_integer", label: "ID") do |impound_record| %>
     <%= impound_record.display_id %>
   <% end %>
@@ -29,7 +29,7 @@
         <%= link_to helpers.organized_bike_text(impound_record.bike), bike_path(impound_record.bike, organization_id: current_organization.id), data: {turbo_frame: "_top"} %>
         <% unless impound_record.bike.no_serial? %>
           <small>
-            <%= helpers.render_serial_display(impound_record.bike, helpers.current_user) %>
+            <%= helpers.render_serial_display(impound_record.bike, @current_user) %>
           </small>
         <% end %>
       <% end %>

@@ -193,11 +193,11 @@
   <%= render partial: "/admin/organizations/invoices/table", locals: {invoices: @invoices, render_sortable: true, display_organization: true} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @invoices,
   index_title:,
   nav_header_list_items:,
   rendered_chart:,
   table_view:,
   time_range_column: @time_range_column
-)) %>
+) %>

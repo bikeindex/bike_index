@@ -121,7 +121,7 @@
   <%= render partial: "table", locals: {recoveries: @recoveries, render_sortable: true} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @recoveries,
   viewing: "Recoveries",
   rendered_chart:,
@@ -129,4 +129,4 @@
   admin_search_form:,
   table_view:,
   time_range_column: @time_range_column
-)) %>
+) %>

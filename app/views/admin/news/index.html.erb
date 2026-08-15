@@ -41,11 +41,11 @@
   <%= render partial: "/admin/news/table", locals: {blogs: @blogs, skip_kind: @search_kind != "all"} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @blogs,
   viewing: "News/Blogs/Info",
   nav_header_list_items:,
   table_view:,
   count_detail:,
   chart_collection: @render_chart && available_blogs
-)) %>
+) %>

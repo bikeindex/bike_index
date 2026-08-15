@@ -32,7 +32,7 @@ RSpec.describe Org::Search::Wrapper::Component, type: :component do
       search_status:,
       skip_search_and_filters:,
       stolenness: "all",
-      time_range: 1.year.ago..Time.current
+      humanized_time_range: "in the past year"
     }
   end
 

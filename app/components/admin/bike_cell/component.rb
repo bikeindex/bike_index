@@ -3,14 +3,13 @@
 module Admin
   module BikeCell
     class Component < ApplicationComponent
-      include Binxtils::SortableHelper
-
       def initialize(
         bike: nil,
         bike_id: nil,
         bike_link_path: nil,
         search_url: nil,
-        render_search: nil,
+        sortable_search_params: nil,
+        render_search: true,
         skip_status: false
       )
         @bike = bike
@@ -19,8 +18,9 @@ module Admin
 
         # Store the raw bike_link_path value (can be false, nil, or a path)
         @bike_link_path_arg = bike_link_path
-        @passed_search_url = search_url
-        @render_search = (bike_id.present? && render_search.nil?) ? @search_url.present? : render_search
+        @search_url = search_url
+        @sortable_search_params = sortable_search_params
+        @render_search = render_search
         @skip_status = skip_status
       end
 
@@ -41,8 +41,13 @@ module Admin
         nil
       end
 
-      def search_url
-        @passed_search_url || url_for(sortable_search_params.merge(search_bike_id: @bike_id))
+      def computed_search_url
+        return @computed_search_url if defined?(@computed_search_url)
+        return @computed_search_url = @search_url if @search_url.present?
+
+        @computed_search_url = if @sortable_search_params.present?
+          url_for(@sortable_search_params.merge(search_bike_id: @bike_id))
+        end
       end
 
       def bike_content

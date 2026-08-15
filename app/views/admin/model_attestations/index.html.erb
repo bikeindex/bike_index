@@ -11,9 +11,9 @@
   <%= render partial: "/admin/model_attestations/table", locals: {collection: @model_attestations, render_sortable: true} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @model_attestations,
   viewing: "Model Attestations",
   table_view:,
   chart_collection: @render_chart && matching_model_attestations
-)) %>
+) %>

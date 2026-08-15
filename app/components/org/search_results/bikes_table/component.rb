@@ -9,13 +9,15 @@ module Org
       # registrations on the show page). Pass render_sortable to enable sort links.
       class Component < ApplicationComponent
         # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "a385d2deb01a"
+        MARKUP_DIGEST = "ff5eab665127"
 
         delegate :additional_registration_fields, :column_renames, to: :settings_component
 
         def initialize(organization:, bikes:, current_user: nil, render_sortable: false,
-          cache_key: nil, sortable_search_params: {}, bike_sticker: nil, settings_component: nil)
+          cache_key: nil, sortable_search_params: {}, sort: nil, sort_direction: nil, bike_sticker: nil, settings_component: nil)
           @organization = organization
+          @sort = sort
+          @sort_direction = sort_direction
           @bikes = bikes
           @current_user = current_user
           @render_sortable = render_sortable

@@ -3,8 +3,6 @@
 module Admin
   module CurrentHeader
     class Component < ApplicationComponent
-      include Binxtils::SortableHelper
-
       HEADER_KEYS = %i[
         organization_id
         primary_activity
@@ -16,8 +14,9 @@ module Admin
         search_strava_integration_id
       ].freeze
 
-      def initialize(params:, viewing: nil, kind_humanized: nil, user_subject: nil, bike: nil, marketplace_listing: nil, primary_activity: nil, current_organization: nil)
+      def initialize(params:, viewing:, sortable_search_params: {}, kind_humanized: nil, user_subject: nil, bike: nil, marketplace_listing: nil, primary_activity: nil, current_organization: nil)
         @params = params
+        @sortable_search_params = sortable_search_params
         @viewing = viewing
         @kind_humanized = kind_humanized
         @user_subject = user_subject
@@ -33,10 +32,6 @@ module Admin
       end
 
       private
-
-      def viewing
-        @viewing || controller_name.humanize
-      end
 
       def show_user?
         @user_subject.present? || @params[:user_id].present?

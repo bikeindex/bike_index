@@ -93,10 +93,10 @@
   <% end %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @mailchimp_data,
   viewing: "Mailchimp Data",
   nav_header_list_items:,
   admin_search_form:,
   chart_collection: @render_chart && matching_mailchimp_data
-)) %>
+) %>

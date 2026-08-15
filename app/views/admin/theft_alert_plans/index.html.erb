@@ -4,9 +4,9 @@
   </li>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @theft_alert_plans,
   index_title: "Promoted Alert Plans",
   nav_header_list_items:,
   skip_charting: true
-)) %>
+) %>

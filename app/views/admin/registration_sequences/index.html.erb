@@ -23,4 +23,4 @@
   </li>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, chart_collection: @render_chart && matching_registration_sequences)) %>
+<%= render_admin_index_skeleton(nav_header_list_items:, chart_collection: @render_chart && matching_registration_sequences) %>

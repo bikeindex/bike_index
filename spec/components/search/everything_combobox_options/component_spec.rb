@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Search::EverythingComboboxOptions::Component, type: :component do
-  let(:rendered) { render_inline(described_class.new(matches:, search_obj_name: "Registrations", next_page: nil)) }
+  let(:rendered) { render_inline(described_class.new(matches:, search_obj_name: "Registrations", next_page: nil, first_page: true)) }
 
   context "with a color match" do
     let(:matches) { [{"search_id" => "c_1", "text" => "Blue", "category" => "colors", "display" => "#00f"}] }
@@ -45,7 +45,7 @@ RSpec.describe Search::EverythingComboboxOptions::Component, type: :component do
 
   context "with a query" do
     let(:matches) { [{"search_id" => "c_1", "text" => "Blue", "category" => "colors", "display" => "#00f"}] }
-    let(:rendered) { render_inline(described_class.new(matches:, search_obj_name: "Registrations", next_page: nil, q: "blu")) }
+    let(:rendered) { render_inline(described_class.new(matches:, search_obj_name: "Registrations", next_page: nil, q: "blu", first_page: true)) }
 
     it "appends a 'Search for' synthetic option after the real matches" do
       options = rendered.css(".hw-combobox__option")
@@ -57,9 +57,7 @@ RSpec.describe Search::EverythingComboboxOptions::Component, type: :component do
 
     context "on a non-first page" do
       it "omits the synthetic option" do
-        rendered = with_request_url("/search/combobox/options?page=2") do
-          render_inline(described_class.new(matches:, search_obj_name: "Registrations", next_page: nil, q: "blu"))
-        end
+        rendered = render_inline(described_class.new(matches:, search_obj_name: "Registrations", next_page: nil, q: "blu", first_page: false))
         expect(rendered.css("#hw_search_for_option")).to be_empty
       end
     end
@@ -69,7 +67,7 @@ RSpec.describe Search::EverythingComboboxOptions::Component, type: :component do
     payload = '<img src=x onerror="document.body.dataset.xss=1">'
     rendered = render_inline(described_class.new(
       matches: [{"search_id" => "c_9", "text" => payload, "category" => "colors", "display" => nil}],
-      search_obj_name: "Registrations", next_page: nil
+      search_obj_name: "Registrations", next_page: nil, first_page: true
     ))
 
     # No <img> element should be parsed out of the payload - it should land

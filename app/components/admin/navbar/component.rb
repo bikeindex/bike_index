@@ -6,8 +6,12 @@ module Admin
     # preceded by an "All" link back to the active page's index when this isn't it.
     # Picking an option navigates -- see admin/navbar_controller.js.
     class Component < ApplicationComponent
-      def initialize(current_user:)
+      def initialize(current_user:, user_root_url:, controller_name:, action_name:, search_filtered: false)
         @current_user = current_user
+        @user_root_url = user_root_url
+        @controller_name = controller_name
+        @action_name = action_name
+        @search_filtered = search_filtered
       end
 
       private
@@ -53,7 +57,7 @@ module Admin
       def display_view_all?
         return false unless active_link&.dig(:match_controller)
 
-        !helpers.current_page_active?(active_link[:path]) || helpers.admin_search_filtered?
+        !helpers.current_page_active?(active_link[:path]) || @search_filtered
       end
 
       def active_link
@@ -65,7 +69,7 @@ module Admin
 
       # Because organization invoices edit doesn't match controller
       def invoices_edit_link
-        return unless controller_name == "invoices" && action_name == "edit"
+        return unless @controller_name == "invoices" && @action_name == "edit"
 
         nav_select_links.detect { |link| link[:title].match(/invoices/i) }
       end

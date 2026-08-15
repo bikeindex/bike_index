@@ -40,9 +40,9 @@
   <% end %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @graduated_notifications,
   index_title: "Graduated notifications",
   nav_header_list_items:,
   rendered_chart:
-)) %>
+) %>

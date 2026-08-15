@@ -71,7 +71,7 @@
             <% else %>
               the user
             <% end %>
-            <% if helpers.display_dev_info? %>
+            <% if @display_dev_info %>
               <br>
               <small class="only-dev-visible">
                 <span class="less-strong">developer info:</span>
@@ -118,7 +118,7 @@
           From GPS
         <% end %>
 
-        <% if helpers.display_dev_info? %>
+        <% if @display_dev_info %>
           <small class="only-dev-visible ml-2">
             <span class="less-strong">developer info:</span>
             <%= @parking_notification.to_coordinates %>

@@ -2,6 +2,11 @@ module ApplicationHelper
   include Binxtils::NavHelper
   include Binxtils::SortableHelper
 
+  def render_period_select(**options)
+    render(UI::PeriodSelect::Component.new(period: @period, start_time: @start_time,
+      end_time: @end_time, sortable_search_params:, **options))
+  end
+
   def notification_delivery_display(status)
     text = if status == "delivery_success"
       check_mark

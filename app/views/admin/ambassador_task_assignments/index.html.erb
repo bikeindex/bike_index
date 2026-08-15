@@ -32,9 +32,9 @@
   </li>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @ambassador_task_assignments,
   index_title: "Completed Ambassador Activities",
   nav_header_list_items:,
   skip_charting: true
-)) %>
+) %>

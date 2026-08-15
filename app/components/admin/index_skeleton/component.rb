@@ -3,11 +3,10 @@
 module Admin
   module IndexSkeleton
     class Component < ApplicationComponent
-      include Binxtils::SortableHelper
-
       def initialize(
+        viewing:,
         collection: nil,
-        viewing: nil,
+        sortable_search_params: {},
         index_title: nil,
         nav_header_list_items: nil,
         skip_charting: false,
@@ -18,47 +17,45 @@ module Admin
         table_view: nil,
         chart_collection: nil,
         header_content: nil,
-        count_detail: nil
+        count_detail: nil,
+        render_chart: false,
+        render_deleted: nil,
+        pagy: nil,
+        per_page: nil,
+        time_range: nil,
+        period: nil,
+        start_time: nil,
+        end_time: nil,
+        current_header: nil,
+        params: {}
       )
         @collection = collection
         @viewing = viewing
+        @sortable_search_params = sortable_search_params
         @index_title = index_title
         @nav_header_list_items = nav_header_list_items
         @skip_charting = skip_charting
         @rendered_chart = rendered_chart
         @render_sortable = render_sortable
-        @time_range_column_override = time_range_column
+        @time_range_column = time_range_column || "created_at"
         @admin_search_form = admin_search_form
         @table_view = table_view
         @chart_collection = chart_collection
         @header_content = header_content
         @count_detail = count_detail
-      end
-
-      def before_render
-        @collection ||= controller.instance_variable_get(:@collection)
-        @render_chart = controller.instance_variable_get(:@render_chart)
-        @pagy = controller.instance_variable_get(:@pagy)
-        @per_page = controller.instance_variable_get(:@per_page)
-        @render_deleted = controller.instance_variable_get(:@render_deleted)
-        @time_range = controller.instance_variable_get(:@time_range)
-        @period = controller.instance_variable_get(:@period)
-        @start_time = controller.instance_variable_get(:@start_time)
-        @end_time = controller.instance_variable_get(:@end_time)
-        @time_range_column = @time_range_column_override || controller.instance_variable_get(:@time_range_column) || "created_at"
-        @user_subject = controller.instance_variable_get(:@user_subject)
-        @bike = controller.instance_variable_get(:@bike)
-        @marketplace_listing = controller.instance_variable_get(:@marketplace_listing)
-        @primary_activity = controller.instance_variable_get(:@primary_activity)
-        @current_organization = helpers.respond_to?(:current_organization) ? helpers.current_organization : nil
-        @params = helpers.params
+        @render_chart = render_chart
+        @render_deleted = render_deleted
+        @pagy = pagy
+        @per_page = per_page
+        @time_range = time_range
+        @period = period
+        @start_time = start_time
+        @end_time = end_time
+        @current_header = current_header
+        @params = params
       end
 
       private
-
-      def viewing
-        @viewing || helpers.controller_name.humanize
-      end
 
       def show_chart?
         !@skip_charting && @render_chart
@@ -66,22 +63,12 @@ module Admin
 
       def default_chart
         data = UI::Chart::Component.time_range_counts(collection: @chart_collection, time_range: @time_range, column: @time_range_column)
-        render(UI::Chart::Component.new(series: [{name: viewing, data:}], time_range: @time_range))
-      end
-
-      def current_header_component
-        Admin::CurrentHeader::Component.new(
-          params: @params, viewing: @viewing,
-          user_subject: @user_subject, bike: @bike,
-          marketplace_listing: @marketplace_listing,
-          primary_activity: @primary_activity,
-          current_organization: @current_organization
-        )
+        render(UI::Chart::Component.new(series: [{name: @viewing, data:}], time_range: @time_range))
       end
 
       def pagination_component(skip_total: false)
         Admin::PaginationWithCount::Component.new(
-          collection: @collection, viewing:, skip_total:,
+          collection: @collection, viewing: @viewing, skip_total:,
           count_detail: skip_total ? nil : @count_detail,
           pagy: @pagy, per_page: @per_page, time_range: @time_range,
           period: @period, time_range_column: @time_range_column, params: @params

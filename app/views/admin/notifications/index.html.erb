@@ -133,11 +133,11 @@
   <%= render partial: "/admin/notifications/table", locals: {notifications: @notifications, render_sortable: true, skip_error: !show_error_column} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @notifications,
   viewing: "Notifications",
   nav_header_list_items:,
   rendered_chart:,
   admin_search_form:,
   table_view:
-)) %>
+) %>

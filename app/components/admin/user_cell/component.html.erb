@@ -20,6 +20,6 @@
   <%= render(Admin::Badges::User::Component.new(user: @user)) %>
 
   <% if show_search? %>
-    <%= link_to helpers.search_emoji, computed_search_url, class: "display-sortable-link small" %>
+    <%= link_to search_emoji, computed_search_url, class: "display-sortable-link small" %>
   <% end %>
 </span>

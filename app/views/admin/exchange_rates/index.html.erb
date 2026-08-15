@@ -32,10 +32,10 @@
   </div>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @exchange_rates,
   viewing: "Exchange Rates",
   skip_charting: true,
   nav_header_list_items:,
   admin_search_form:
-)) %>
+) %>

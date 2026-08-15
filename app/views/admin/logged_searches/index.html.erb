@@ -85,10 +85,10 @@
   <%= render partial: "table", locals: {logged_searches: @logged_searches} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @logged_searches,
   viewing: "Logged Searches",
   rendered_chart:,
   nav_header_list_items:,
   table_view:
-)) %>
+) %>

@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe Admin::CurrentHeader::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { with_request_url("/admin") { render_inline(instance) } }
-  let(:options) { {params:} }
+  let(:options) { {params:, viewing: "Notifications", sortable_search_params: params} }
   let(:params) { {} }
 
   describe "rendering" do

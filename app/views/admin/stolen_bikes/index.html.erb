@@ -78,11 +78,11 @@
   <% end %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @stolen_records,
   viewing: "Stolen Bikes",
   nav_header_list_items:,
   rendered_chart:,
   admin_search_form:,
   table_view:
-)) %>
+) %>

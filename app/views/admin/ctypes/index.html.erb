@@ -12,11 +12,11 @@
   <%= render partial: "table", locals: {collection: @ctypes, render_sortable: true} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @ctypes,
   viewing: "Component Types",
   skip_charting: true,
   nav_header_list_items:,
   header_content:,
   table_view:
-)) %>
+) %>

@@ -206,11 +206,11 @@
   <%= render partial: "table", locals: {collection: @bike_sticker_updates, render_sortable: true} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @bike_sticker_updates,
   viewing: "Sticker updates",
   rendered_chart:,
   nav_header_list_items:,
   admin_search_form:,
   table_view:
-)) %>
+) %>

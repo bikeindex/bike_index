@@ -4,9 +4,9 @@
   </li>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @external_registry_credentials,
   index_title: "External Registry Credentials",
   nav_header_list_items:,
   skip_charting: true
-)) %>
+) %>

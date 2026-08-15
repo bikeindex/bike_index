@@ -10,8 +10,13 @@
   impound_records: @impound_records,
   search_status: @search_status,
   search_unregisteredness: @search_unregisteredness,
-  time_range: @time_range,
+  humanized_time_range: humanized_time_range(@time_range),
   available_statuses: available_statuses,
   current_organization: current_organization,
+  current_user:,
+  params:,
+  sortable_search_params:,
+  sort: sort_column,
+  sort_direction:,
   multi_update_open: @multi_update_open
 )) %>

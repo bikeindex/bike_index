@@ -5,8 +5,9 @@ module Register
     # The whole document for step 1 framed on an organization's landing page - no analytics
     # among them, which the page around the frame counts.
     class Component < ApplicationComponent
-      def initialize(b_param:, steps:, current_user: nil, button_color: nil, button_hover_color: nil)
+      def initialize(b_param:, steps:, header_tags_options:, current_user: nil, button_color: nil, button_hover_color: nil)
         @b_param = b_param
+        @header_tags_options = header_tags_options
         @steps = steps
         @current_user = current_user
         @button_color = button_color

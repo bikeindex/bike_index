@@ -83,10 +83,10 @@
   <%= render partial: "table", locals: {impound_records: @impound_records, render_sortable: true, skip_organization: current_organization.present?} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @impound_records,
   viewing: "Impound Records",
   nav_header_list_items:,
   rendered_chart:,
   table_view:
-)) %>
+) %>

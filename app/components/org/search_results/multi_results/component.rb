@@ -4,11 +4,12 @@ module Org
   module SearchResults
     module MultiResults
       class Component < ApplicationComponent
-        include Binxtils::SortableHelper
-
         def initialize(organization:, query:, chip_id:, pagy:, search_kind: "serials",
-          bikes: nil, close_serials: nil)
+          bikes: nil, close_serials: nil, sortable_search_params: {}, sort: nil, sort_direction: nil)
           @organization = organization
+          @sortable_search_params = sortable_search_params
+          @sort = sort
+          @sort_direction = sort_direction
           @query = query
           @chip_id = chip_id
           @pagy = pagy

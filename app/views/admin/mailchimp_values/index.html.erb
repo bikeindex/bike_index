@@ -34,9 +34,9 @@
   </li>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @mailchimp_values,
   viewing: "Mailchimp Values",
   skip_charting: true,
   nav_header_list_items:
-)) %>
+) %>

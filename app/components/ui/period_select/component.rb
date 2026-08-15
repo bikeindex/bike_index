@@ -14,12 +14,13 @@ module UI
         {key: "all", prefix: nil, label: "all"}
       ].freeze
 
-      def initialize(period:, start_time:, end_time:, include_future: false, prepend_text: nil)
+      def initialize(period:, start_time:, end_time:, sortable_search_params: {}, include_future: false, prepend_text: nil)
         @include_future = include_future
         @prepend_text = prepend_text
         @period = period
         @start_time = start_time
         @end_time = end_time
+        @sortable_search_params = sortable_search_params
       end
 
       private
@@ -44,7 +45,7 @@ module UI
       end
 
       def period_url(period)
-        helpers.url_for(helpers.sortable_search_params.merge(period:))
+        helpers.url_for(@sortable_search_params.merge(period:))
       end
 
       def custom_form_classes

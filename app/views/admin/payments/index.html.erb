@@ -194,11 +194,11 @@
   <%= render partial: "table", locals: {payments: @payments, render_sortable: true, skip_paid_at: @incompleteness == "paid", render_method: @render_method} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @payments,
   viewing: "Payments",
   rendered_chart:,
   nav_header_list_items:,
   admin_search_form:,
   table_view:
-)) %>
+) %>

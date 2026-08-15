@@ -24,11 +24,11 @@
   <% end %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @manufacturers,
   viewing: "Manufacturers",
   nav_header_list_items:,
   table_view:,
   count_detail:,
   skip_charting: true
-)) %>
+) %>

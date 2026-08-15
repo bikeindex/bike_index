@@ -55,11 +55,11 @@
   <% end %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @b_params,
   viewing: "Partial bikes",
   rendered_chart:,
   nav_header_list_items:,
   admin_search_form:,
   count_detail:
-)) %>
+) %>

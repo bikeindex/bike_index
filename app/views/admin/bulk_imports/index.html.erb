@@ -112,10 +112,10 @@
   <%= render partial: "/admin/bulk_imports/table", locals: {collection: @bulk_imports, render_sortable: true} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @bulk_imports,
   viewing: "Bulk imports",
   rendered_chart:,
   nav_header_list_items:,
   table_view:
-)) %>
+) %>

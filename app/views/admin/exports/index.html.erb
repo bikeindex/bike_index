@@ -85,7 +85,7 @@
 <% end %>
 
 <% table_view = capture do %>
-  <%= render(UI::Table::Component.new(records: @collection, render_sortable: true)) do |table| %>
+  <%= render(UI::Table::Component.new(records: @collection, render_sortable: true, sort: sort_column, sort_direction:, sortable_search_params:)) do |table| %>
     <% table.column(sortable: "created_at", label: "Date") do |export| %>
       <%= link_to organization_export_path(export, organization_id: export.organization.to_param) do %>
         <%= render UI::Time::Component.new(time: export.created_at) %>
@@ -117,7 +117,7 @@
     <% end %>
 
     <% table.column(label: "Organization", header_classes: "tw:font-normal") do |export| %>
-      <%= render Admin::OrganizationCell::Component.new(organization: export.organization, render_search: true) %>
+      <%= render Admin::OrganizationCell::Component.new(sortable_search_params:, organization: export.organization, render_search: true) %>
     <% end %>
 
     <% table.column(label: "File", header_classes: "tw:font-normal") do |export| %>
@@ -161,9 +161,9 @@
   <% end %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   viewing: "Exports",
   nav_header_list_items:,
   table_view:,
   chart_collection: @render_chart && matching_exports
-)) %>
+) %>

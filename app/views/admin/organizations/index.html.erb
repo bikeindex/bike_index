@@ -91,10 +91,10 @@
 
 <% table_view = render(partial: "/admin/organizations/table", locals: {render_sortable: true}) %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render_admin_index_skeleton(
   collection: @organizations,
   nav_header_list_items:,
   chart_collection: @render_chart && matching_organizations,
   admin_search_form:,
   table_view:
-)) %>
+) %>

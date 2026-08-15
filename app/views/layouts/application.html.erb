@@ -92,7 +92,7 @@
                 class="current-organization-submenu"
                 aria-labelledby="passive_organization_submenu"
               >
-                <%= render Org::MenuItems::Component.new(organization: passive_organization, current_user: current_user, is_dropdown: true, unregistered_parking_notification: @unregistered_parking_notification) %>
+                <%= render Org::MenuItems::Component.new(organization: passive_organization, current_user: current_user, routed_controller: request.path_parameters[:controller], routed_action: request.path_parameters[:action], is_dropdown: true, unregistered_parking_notification: @unregistered_parking_notification) %>
               </ul>
             </span>
           <% elsif current_user.blank? %>
