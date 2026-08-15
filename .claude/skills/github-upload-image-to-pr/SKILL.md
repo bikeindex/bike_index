@@ -193,6 +193,8 @@ Reload the page in the Playwright browser and confirm the images render. **Do no
 
 A non-zero `naturalWidth` on every image is the pass.
 
+Then `browser_close` — same rule `frontend-screenshots` follows, and the reason it hands you an open browser rather than paying the startup twice: whoever is last out closes it, or the profile lock stays held and the next `browser_navigate` anywhere fails with "Browser is already in use". On a host-only call in the middle of a sequence (the `pr` phase hosts branch shots, captures the base, then hosts again), leave it open and close on the last one.
+
 ## Tips
 
 - **Image sizing**: Control display size via HTML `<img>` tags: `<img width="800" alt="description" src="..." />`
