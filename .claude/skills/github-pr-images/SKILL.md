@@ -1,5 +1,5 @@
 ---
-name: github-upload-image-to-pr
+name: github-pr-images
 description: >-
   Embed a local image file into an existing GitHub PR — either in the PR body or as a comment.
   Trigger when a request pairs a local image (screenshot, .png/.jpg, CleanShot capture, before/after)

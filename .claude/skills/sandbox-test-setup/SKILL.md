@@ -334,7 +334,7 @@ app** — read past them and treat an app-origin error as the signal.
 It also can't reach anything outside localhost: it doesn't trust the egress proxy's CA,
 so github.com fails with `ERR_CERT_AUTHORITY_INVALID` (`curl` is fine — it reads
 `/etc/ssl/certs`, Chromium reads its own NSS db, and `certutil` isn't installed). Local
-pages screenshot fine; `github-upload-image-to-pr` and anything else driving a remote
+pages screenshot fine; `github-pr-images` and anything else driving a remote
 site does not work here, and a logged-in GitHub session can't be established headlessly
 either.
 
@@ -379,25 +379,31 @@ drives the `playwright` npm package pinned in `package.json` — so
 anything that reaches for a CfT chromedriver download is solving a problem
 this repo doesn't have.
 
-- The browser is whichever Chromium that npm package finds. The image ships
-  builds under `/opt/pw-browsers/chromium-*`, so point Playwright there
-  rather than letting it look in `~/.cache/ms-playwright`:
+- **Ask it where it's looking rather than guessing.** This downloads nothing
+  and works in any environment:
+  ```bash
+  npx playwright install --dry-run     # per browser: install location + build number
+  ```
+  It prints the directory the pinned Playwright expects (`…/ms-playwright/chromium-<build>`)
+  and the build number that pin wants. Every question below is answered by
+  re-running it.
+- The image ships builds under `/opt/pw-browsers`, so redirect it there
+  instead of the default `~/.cache/ms-playwright`, and re-run the dry-run to
+  confirm the location it now reports:
   ```bash
   export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
   ```
-- The pinned Playwright wants a specific build number and the image may
-  ship a different one. That mismatch, and the symlink that resolves it,
-  are the same ones the MCP section above documents — reuse those, the
-  error names the path it wanted.
+- If the build number it wants isn't the one the image ships, symlink — the
+  same mismatch the MCP section above resolves that way. Don't reach for
+  `npx playwright install chromium` instead: Chromium's only download URL is
+  `cdn.playwright.dev` (no fallbacks, unlike firefox/webkit), which is the
+  class of CDN this sandbox blocks.
 - `spec/support/local_chrome.rb` re-registers the `:playwright` driver with
   the flags Chromium needs as root in a container (`--no-sandbox`,
   `--disable-dev-shm-usage`) plus the jsdelivr host-resolver rule below,
   gated on `LOCAL_CHROME_OVERRIDE=1`. Set that env var when running system
   specs; the default registration in `spec/support/capybara.rb` passes none
   of them.
-
-The two browser-location bullets are reasoned from the driver setup rather
-than run in the web sandbox — expect to iterate on the build number.
 
 ### 2. `cdn.jsdelivr.net` is firewalled
 
