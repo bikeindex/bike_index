@@ -19,7 +19,7 @@ module PageBlock
 
         def component(controller_name:, action_name:)
           PageBlock::MainContent::Content::Component.new(blog: nil, related_blogs: nil,
-            current_user: nil, controller_name:, action_name:)
+            source: nil, current_user: nil, controller_name:, action_name:)
         end
 
         def placeholder

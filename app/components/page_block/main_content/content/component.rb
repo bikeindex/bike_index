@@ -6,9 +6,10 @@ module PageBlock
       # The two column shell for the informational pages, with a menu of related pages -
       # or a donation ask - beside them
       class Component < ApplicationComponent
-        def initialize(blog:, related_blogs:, current_user:, controller_name:, action_name:)
+        def initialize(blog:, related_blogs:, source:, current_user:, controller_name:, action_name:)
           @blog = blog
           @related_blogs = related_blogs
+          @source = source
           @current_user = current_user
           @controller_name = controller_name
           @action_name = action_name
@@ -36,7 +37,7 @@ module PageBlock
         # Only reached from the why-donate post, which the donation funnel counts under
         # "why-donate" rather than under its own long slug
         def referral_source
-          helpers.params[:source].presence || "why-donate"
+          @source.presence || "why-donate"
         end
       end
     end

@@ -32,7 +32,13 @@ module ApplicationHelper
   def main_content_component
     @main_content_component ||= PageBlock::MainContent::Wrapper::Component.new(
       controller_namespace:, controller_name:, action_name:,
-      force_landing_page_render: @force_landing_page_render
+      force_landing_page_render: @force_landing_page_render,
+      current_user:, current_organization:, passive_organization:, show_general_alert:,
+      blog: @blog, related_blogs: @related_blogs, source: params[:source],
+      bike: @bike, bike_og: @bike_og, og_email: @og_email,
+      edit_template: @edit_template, edit_templates: @edit_templates,
+      oauth_application: @application,
+      unregistered_parking_notification: @unregistered_parking_notification
     )
   end
 

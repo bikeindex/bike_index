@@ -30,10 +30,29 @@ module PageBlock
           end
         end
 
+        # Every wrapper's subject, since the layout renders this before knowing which
+        # wrapper it gets - only the matched one's are read
         def initialize(controller_namespace:, controller_name:, action_name:,
-          force_landing_page_render: false)
+          force_landing_page_render: false, current_user: nil, current_organization: nil,
+          passive_organization: nil, show_general_alert: false, blog: nil, related_blogs: nil,
+          bike: nil, bike_og: nil, og_email: nil, edit_template: nil, edit_templates: nil,
+          oauth_application: nil, unregistered_parking_notification: nil, source: nil)
           @controller_name = controller_name
           @action_name = action_name
+          @current_user = current_user
+          @current_organization = current_organization
+          @passive_organization = passive_organization
+          @show_general_alert = show_general_alert
+          @blog = blog
+          @related_blogs = related_blogs
+          @bike = bike
+          @bike_og = bike_og
+          @og_email = og_email
+          @edit_template = edit_template
+          @edit_templates = edit_templates
+          @oauth_application = oauth_application
+          @unregistered_parking_notification = unregistered_parking_notification
+          @source = source
           @kind = self.class.kind(controller_namespace:, controller_name:, action_name:,
             force_landing_page_render:)
         end
@@ -64,9 +83,10 @@ module PageBlock
 
         def content_component
           PageBlock::MainContent::Content::Component.new(
-            blog: controller_ivar(:@blog),
-            related_blogs: controller_ivar(:@related_blogs),
-            current_user: helpers.current_user,
+            blog: @blog,
+            related_blogs: @related_blogs,
+            source: @source,
+            current_user: @current_user,
             controller_name: @controller_name,
             action_name: @action_name
           )
@@ -74,40 +94,34 @@ module PageBlock
 
         def edit_bike_component
           PageBlock::MainContent::EditBike::Component.new(
-            bike: controller_ivar(:@bike),
-            bike_og: controller_ivar(:@bike_og),
-            og_email: controller_ivar(:@og_email),
-            edit_template: controller_ivar(:@edit_template),
-            edit_templates: controller_ivar(:@edit_templates),
-            current_user: helpers.current_user,
-            passive_organization: helpers.passive_organization
+            bike: @bike,
+            bike_og: @bike_og,
+            og_email: @og_email,
+            edit_template: @edit_template,
+            edit_templates: @edit_templates,
+            current_user: @current_user,
+            passive_organization: @passive_organization
           )
         end
 
         def oauth_applications_component
           PageBlock::MainContent::OauthApplications::Component.new(
-            oauth_application: controller_ivar(:@application),
-            current_user: helpers.current_user,
+            oauth_application: @oauth_application,
+            current_user: @current_user,
             action_name: @action_name
           )
         end
 
         def organized_component
           PageBlock::MainContent::Organized::Component.new(
-            current_organization: helpers.current_organization,
-            current_user: helpers.current_user,
-            passive_organization: helpers.passive_organization,
-            unregistered_parking_notification: controller_ivar(:@unregistered_parking_notification),
-            show_general_alert: helpers.show_general_alert,
+            current_organization: @current_organization,
+            current_user: @current_user,
+            passive_organization: @passive_organization,
+            unregistered_parking_notification: @unregistered_parking_notification,
+            show_general_alert: @show_general_alert,
             controller_name: @controller_name,
             action_name: @action_name
           )
-        end
-
-        # Nine subjects across four wrappers, one route's worth of them set per request -
-        # threading all nine through the layout costs more than reaching for the one that's set
-        def controller_ivar(name)
-          controller.instance_variable_get(name)
         end
       end
     end

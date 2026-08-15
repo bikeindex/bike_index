@@ -266,7 +266,7 @@ module ControllerHelpers
     end
 
     scope ||= [:controllers, controller_namespace, controller_name, controller_method.to_sym]
-    I18n.t(key, **kwargs, scope: scope.compact)
+    HtmlSafeTranslation.translate(key, scope:, **kwargs)
   end
 
   # This is overridden in FeedbacksController and InfoController

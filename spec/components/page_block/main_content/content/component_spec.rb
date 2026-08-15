@@ -6,7 +6,7 @@ RSpec.describe PageBlock::MainContent::Content::Component, type: :component do
   include Rails.application.routes.url_helpers
 
   let(:options) do
-    {blog: nil, related_blogs: nil, current_user: nil, controller_name:, action_name:}
+    {blog: nil, related_blogs: nil, source: nil, current_user: nil, controller_name:, action_name:}
   end
   let(:controller_name) { "info" }
   let(:action_name) { "about" }
@@ -66,6 +66,15 @@ RSpec.describe PageBlock::MainContent::Content::Component, type: :component do
         expect(component.text).to match "Make a difference in bike theft"
         expect(component.text).to_not match "Other pages"
         expect(component.css("a[href='#{donate_path(source: "why-donate")}']").count).to eq 1
+      end
+
+      context "with an incoming source" do
+        let(:options) { super().merge(source: "newsletter") }
+
+        it "carries it through to the donate links" do
+          expect(component.css("a[href='#{donate_path(source: "newsletter")}']").count).to eq 1
+          expect(component.css("a[href='#{donate_path(initial_amount: 50, source: "newsletter")}']").count).to eq 1
+        end
       end
     end
   end

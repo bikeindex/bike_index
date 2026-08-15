@@ -194,13 +194,74 @@ RSpec.describe PageBlock::MainContent::Wrapper::Component, type: :component do
   end
 
   describe "render" do
-    let(:instance) do
-      described_class.new(controller_namespace: nil, controller_name: "welcome", action_name: "index")
+    let(:page) { "<p>the page</p>".html_safe }
+    let(:result) { render_inline(described_class.new(**options)) { page } }
+
+    context "no wrapper" do
+      let(:options) { {controller_namespace: nil, controller_name: "welcome", action_name: "index"} }
+
+      it "renders the content, unwrapped" do
+        expect(result.to_html.strip).to eq "<p>the page</p>"
+      end
     end
 
-    it "renders the content, unwrapped" do
-      result = render_inline(instance) { "<p>the page</p>".html_safe }
-      expect(result.to_html.strip).to eq "<p>the page</p>"
+    context "content" do
+      let(:options) { {controller_namespace: nil, controller_name: "info", action_name: "about"} }
+
+      it "renders the content wrapper around the page" do
+        expect(result.css(".primary-content-block").to_html).to match "<p>the page</p>"
+        expect(result.text).to match "Other pages"
+      end
+    end
+
+    context "edit_bike" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership) }
+      let(:options) do
+        {controller_namespace: nil, controller_name: "edits", action_name: "show", bike:,
+         edit_template: "bike_details", edit_templates: {"bike_details" => "Details"}}
+      end
+
+      # bikes/_owner_bike_status_alerts is a view, and reads the bike off the controller;
+      # edit_bike_template_path_for comes from BikeEditable, which only the edit
+      # controllers include. Must be on the class, not the singleton, to avoid leaking
+      before do
+        vc_test_controller.instance_variable_set(:@bike, bike)
+        unless vc_test_controller.class.method_defined?(:edit_bike_template_path_for)
+          vc_test_controller.class.define_method(:edit_bike_template_path_for) do |bike, template = nil|
+            "/bikes/#{bike.id}/edit/#{template}"
+          end
+          vc_test_controller.class.helper_method :edit_bike_template_path_for
+        end
+      end
+
+      it "renders the edit header and menu around the page" do
+        expect(result.css("#edit-bike-skeleton").to_html).to match "<p>the page</p>"
+        expect(result.text).to match "Details"
+      end
+    end
+
+    context "oauth_applications" do
+      let(:options) do
+        {controller_namespace: "oauth", controller_name: "applications", action_name: "index"}
+      end
+
+      it "renders the doorkeeper container around the page" do
+        expect(result.css(".doorkeeper-container").to_html).to match "<p>the page</p>"
+      end
+    end
+
+    context "organized" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:options) do
+        {controller_namespace: "organized", controller_name: "bikes", action_name: "index",
+         current_organization: organization}
+      end
+
+      it "renders the organization menu beside the page" do
+        expect(result.css(".organized-wrap").to_html).to match "<p>the page</p>"
+        expect(result.text).to match organization.name
+        expect(result.text).to match "Admin Panel"
+      end
     end
   end
 end
