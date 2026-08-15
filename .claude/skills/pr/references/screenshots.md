@@ -19,6 +19,8 @@ You're only here because the diff is frontend (SKILL.md's classifier gates on th
 - New PR → capture every affected page.
 - Existing PR → continue only if the captures in the existing screenshots comment are stale: a commit since the last capture touched a page already screenshotted, or a new affected page now appears in the diff. Limit the capture to those pages. If nothing has moved, return the PR URL.
 
+Reading that comment is `github-upload-image-to-pr`'s job, since it owns it — ask it for the current body before deciding. This costs no browser: it's a `gh api` read.
+
 From the changed files, infer the affected routes. Heuristics:
 - A view at `app/views/bikes/show.html.erb` → `/bikes/:id` (pick a representative id from the dev db, e.g. `Bike.last.id`)
 - A component touched by a specific page → screenshot that page
@@ -31,7 +33,7 @@ From the changed files, infer the affected routes. Heuristics:
 
 Invoke the `frontend-screenshots` skill with the `(url-path, page-slug)` pairs from step 1. It handles dev-server check, sign-in, the seeded-user identity gate, viewport sizing, and per-PNG sanity checks, and returns the local PNG paths.
 
-If it returns failures it couldn't diagnose, report them and leave the PR without screenshots — don't post partial results.
+If it returns failures it couldn't diagnose, report them and leave the PR without screenshots — don't post partial results. Abandoning the phase after a capture is the one path where nothing else closes the browser, so close it yourself.
 
 ## 3. Host the branch screenshots and get inline URLs
 

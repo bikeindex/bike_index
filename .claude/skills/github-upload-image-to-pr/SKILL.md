@@ -10,7 +10,7 @@ description: >-
   one `## Screenshots` comment — finding, creating, editing and verifying it — so other workflows
   (the `pr` skill's screenshot phase) call it to host images and get URLs back, then hand it a
   composed body to post.
-allowed-tools: Bash(gh:*), Bash(cp:*), ToolSearch, Read, mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, mcp__playwright__browser_click, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_take_screenshot
+allowed-tools: Bash(gh:*), Bash(cp:*), ToolSearch, Read, Write, mcp__playwright__browser_navigate, mcp__playwright__browser_snapshot, mcp__playwright__browser_find, mcp__playwright__browser_click, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_close
 ---
 
 # Upload Image to PR
@@ -144,7 +144,7 @@ Use the **standard textarea selector** from step 6, then assign `ta.value = ""`:
 
 **Two ways this skill gets called, decided by whether you were handed a body:**
 
-- **Host only** — no body. Stop here: return the URLs from step 6, keyed however the caller asked. The `pr` skill's screenshot phase calls this twice (branch, then base) before it has anything worth posting. Posting here would land a partial comment.
+- **Host only** — no body. Stop here: return the URLs from step 6, keyed however the caller asked, and **leave the browser open** — only a workflow mid-sequence calls this way, and it has more to do. The `pr` skill's screenshot phase calls this twice (branch, then base) before it has anything worth posting. Posting here would land a partial comment.
 - **Host and post** — the caller handed you a composed body, or the request was a direct "put this image on the PR" with no other workflow involved. Post it as below.
 
 This skill owns the `## Screenshots` comment: finding it, creating it, editing it, checking it rendered. Callers compose bodies; they don't post them.
@@ -199,7 +199,7 @@ Reload the page in the Playwright browser and confirm the images render. **Do no
 
 A non-zero `naturalWidth` on every image is the pass.
 
-Then `browser_close` — same rule `frontend-screenshots` follows, and the reason it hands you an open browser rather than paying the startup twice: whoever is last out closes it, or the profile lock stays held and the next `browser_navigate` anywhere fails with "Browser is already in use". On a host-only call in the middle of a sequence (the `pr` phase hosts branch shots, captures the base, then hosts again), leave it open and close on the last one.
+Then `browser_close`. **Posting is always terminal** — nothing follows it, in this skill or in any caller — so a post always closes, and a host-only call (step 8) always leaves the browser for whoever called it. That pair needs no signal from the caller and leaves no session running: the profile lock would otherwise stay held and the next `browser_navigate` anywhere fails with "Browser is already in use". `frontend-screenshots` hands you an open browser for the same reason rather than paying the startup twice.
 
 ## Tips
 
