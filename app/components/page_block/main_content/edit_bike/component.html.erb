@@ -37,9 +37,9 @@
       <% unless @bike.user? %>
         <p class="mb-0">
           <% if @bike.authorized_by_organization?(u: @current_user, org: @passive_organization) %>
-            <%= translation(".owned_with_permission_to_edit_html", owner_email: @og_email || @bike.owner_email, org_name: @passive_organization&.short_name) %>
+            <%= translation(".owned_with_permission_to_edit_html", owner_email:, org_name: @passive_organization&.short_name) %>
           <% else # it's almost certainly because the user hasn't claimed it %>
-            <%= translation(".owned_but_hasnt_been_claimed_html", owner_email: @og_email || @bike.owner_email) %>
+            <%= translation(".owned_but_hasnt_been_claimed_html", owner_email:) %>
           <% end %>
         </p>
       <% end %>

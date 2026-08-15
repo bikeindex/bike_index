@@ -1,9 +1,6 @@
 <div class="container">
   <div class="row">
-    <%# Unless one of the permitted pages, wrap it in .legacy-content-wrap %>
-    <% additional_class = %w().include?(content_page_type) ? "" : "legacy-content-wrap" %>
-
-    <div class="col-md-8 primary-content-block <%= additional_class %>">
+    <div class="col-md-8 primary-content-block legacy-content-wrap">
       <%= content %>
 
       <div class="d-md-none d-sm-block mb-2 mt-4">
@@ -14,24 +11,23 @@
     <div class="col-md-4 primary-content-menu">
       <%# check if this is a donation info page %>
       <% if render_why_donate? %>
-        <% source = referral_source %>
         <div class="next-steps-wrap donation">
           <header>
             <%= translation(".make_a_difference") %>
-            <%= link_to translation(".donate_today"), donate_path(source:), class: "btn btn-primary" %>
+            <%= link_to translation(".donate_today"), donate_path(source: referral_source), class: "btn btn-primary" %>
           </header>
 
           <ul>
             <li class="mt-3">
-              <%= link_to "Donate $5", donate_path(initial_amount: 5, source:), class: "btn btn-secondary donate-btn" %>
+              <%= link_to "Donate $5", donate_path(initial_amount: 5, source: referral_source), class: "btn btn-secondary donate-btn" %>
             </li>
 
             <li class="mt-2">
-              <%= link_to "Donate $50", donate_path(initial_amount: 50, source:), class: "btn btn-secondary donate-btn" %>
+              <%= link_to "Donate $50", donate_path(initial_amount: 50, source: referral_source), class: "btn btn-secondary donate-btn" %>
             </li>
 
             <li class="mt-2 mb-2">
-              <%= link_to "Donate $200", donate_path(initial_amount: 200, source:), class: "btn btn-secondary donate-btn" %>
+              <%= link_to "Donate $200", donate_path(initial_amount: 200, source: referral_source), class: "btn btn-secondary donate-btn" %>
             </li>
           </ul>
         </div>
@@ -85,7 +81,7 @@
               </li>
             <% end %>
 
-            <% unless content_page_type == 'news' %>
+            <% unless content_page_type == "news" %>
               <li><%= helpers.active_link translation(".help"), help_url %></li>
               <li>
                 <%= helpers.active_link translation(".where"), where_path %>

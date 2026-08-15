@@ -82,7 +82,8 @@ class ApplicationComponent < ViewComponent::Base
   # Wrap `I18n.translate` for use in components, abstracting away
   # scope-setting.
   #
-  # NOTE: There is an equivalent method in ControllerHelpers#translation
+  # NOTE: ControllerHelpers#translation resolves scope the same way, but has no _html
+  # handling - nothing on the controller side passes an _html key
   #
   # :components
   # > [component_namespace] (possibly none)
@@ -94,20 +95,18 @@ class ApplicationComponent < ViewComponent::Base
   #
   # See specs for component_translation_scope in Search::Form::Component
   def translation(key, scope: nil, **kwargs)
-    scope ||= component_translation_scope
-    return I18n.t(key, **kwargs, scope: scope.compact) unless key.to_s.end_with?("_html")
+    scope = (scope || component_translation_scope).compact
+    return I18n.t(key, **kwargs, scope:) unless key.to_s.end_with?("_html")
 
-    # Mark _html translations as html_safe (matching Rails' t() helper behavior)
-    I18n.t(key, **escaped_interpolations(kwargs), scope: scope.compact).html_safe
+    I18n.t(key, **escaped_interpolations(kwargs), scope:).html_safe
   end
 
-  # The other half of Rails' _html handling: it escapes the values interpolated into
-  # one, so a component passing user-entered text doesn't emit it raw. Values that are
-  # already html_safe - a link_to, a rendered component - pass through untouched
+  # Rails escapes what it interpolates into an _html key; match it so a component
+  # passing user-entered text doesn't emit it raw
   def escaped_interpolations(kwargs)
     kwargs.to_h do |name, value|
       skip = I18n::RESERVED_KEYS.include?(name) || (name == :count && value.is_a?(Numeric))
-      [name, skip ? value : ERB::Util.html_escape(value.to_s)]
+      [name, skip ? value : ERB::Util.html_escape(value)]
     end
   end
 

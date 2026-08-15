@@ -104,8 +104,8 @@ module PageBlock
           )
         end
 
-        # Reaching into controller state, which components otherwise don't do - the layout
-        # renders this on every page, so it can't pass each wrapper's subject in
+        # Nine subjects across four wrappers, one route's worth of them set per request -
+        # threading all nine through the layout costs more than reaching for the one that's set
         def controller_ivar(name)
           controller.instance_variable_get(name)
         end
