@@ -1,12 +1,12 @@
 # Screenshot phase
 
-Read this after the PR exists (SKILL.md steps 0–3) when the diff is frontend and screenshots are warranted. It carries over `FRONTEND`, `$EXISTING_PR`, and `$PR_NUMBER` from those steps.
+This is SKILL.md step 10 — read it after the PR exists (steps 1–9) when step 7 classified the diff as frontend. It needs the base branch (step 2) and the PR number (step 6 or 9); substitute both as literals, since shell state doesn't carry between commands.
 
 The flow: decide what to capture → capture the branch → upload → capture the same URLs on the base branch → post one `## Screenshots` PR comment. Screenshots go in a **comment**, never the PR body, so the human-written summary stays first and recaptures don't churn the description.
 
 ## 1. Decide whether screenshots are needed and which URLs to capture
 
-You're only here because `FRONTEND=true` (SKILL.md gates on that before sending you here). Decide scope by PR state:
+You're only here because the diff is frontend (SKILL.md step 7 gates on that). Decide scope by PR state:
 
 - New PR → capture every affected page.
 - Existing PR → continue only if the captures in the existing screenshots comment are stale: a commit since the last capture touched a page already screenshotted, or a new affected page now appears in the diff. Limit the capture to those pages. If nothing has moved, return the PR URL.
@@ -33,33 +33,31 @@ Collect the returned URLs, keyed by `(page-slug, viewport)`.
 
 ## 4. Capture and upload the same URLs on the base branch
 
-Capture the **base-branch** (`$BASE` from SKILL.md step 0.5) version of every screenshot from step 2 so the section becomes a before/after comparison instead of "here's how it looks now." This is the default for every screenshot captured — if you got this far, the diff is frontend, and the comparison is informative (a same-screenshot pair documents visual parity for a refactor; a different pair documents the actual visual change).
+Capture the **base-branch** (SKILL.md step 2) version of every screenshot from step 2 so the section becomes a before/after comparison instead of "here's how it looks now." This is the default for every screenshot captured — if you got this far, the diff is frontend, and the comparison is informative (a same-screenshot pair documents visual parity for a refactor; a different pair documents the actual visual change).
 
-Skip per-page only when the URL didn't exist on `$BASE` (a brand-new route or page added in this PR) — there's nothing to compare to.
+Skip per-page only when the URL didn't exist on the base (a brand-new route or page added in this PR) — there's nothing to compare to.
 
-Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs, passing `origin/$BASE` (`$BASE` from SKILL.md step 0.5) as its `BASE_REF` — its "Cross-branch comparison" section does the rest, whether or not the base is `main`. Then re-invoke `github-upload-image-to-pr` for those PNGs (upload-only, exactly as in step 3 — collect URLs, do not post).
+Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs, passing the base as its `BASE_REF` (`origin/main` unless step 2 chose otherwise) — its "Cross-branch comparison" section does the rest, whether or not the base is `main`. Then re-invoke `github-upload-image-to-pr` for those PNGs (upload-only, exactly as in step 3 — collect URLs, do not post).
 
 ## 5. Post the Screenshots section as a PR comment
 
-On a fresh PR, this comment is naturally the first one. On an update, find the existing screenshots comment (the one authored by you whose body starts with `## Screenshots`) and edit it in place rather than posting a new one:
+On a fresh PR, this comment is naturally the first one. On an update, find your existing screenshots comment and edit it in place rather than posting a new one (substitute the PR number for `<number>`):
 
 ```bash
-SCREENSHOT_COMMENT_ID=$(gh api "repos/{owner}/{repo}/issues/$PR_NUMBER/comments" \
-  --jq '.[] | select(.body | startswith("## Screenshots")) | .id' | head -1)
+ME=$(gh api user --jq .login)
+gh api --paginate "repos/{owner}/{repo}/issues/<number>/comments" \
+  --jq ".[] | select(.user.login == \"$ME\") | select(.body | startswith(\"## Screenshots\")) | .id" | head -1
 ```
 
-`{owner}` and `{repo}` are expanded by `gh api`, but `PR_NUMBER` is not — pass it as the shell variable `$PR_NUMBER` (parsed in SKILL.md step 1 / captured from step 3's create output), not a literal `{PR_NUMBER}`.
+`{owner}` and `{repo}` are expanded by `gh api`; the PR number is not, so write it in. `--paginate` matters — comments come 30 to a page, and a busy PR's screenshots comment is often not on the first.
 
-- If `$SCREENSHOT_COMMENT_ID` is empty: `gh pr comment "$PR_NUMBER" --body-file <tmp-comment-file>`.
-- Otherwise: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -f body="$(cat <tmp-comment-file>)" --jq .html_url`. Don't use `-f body=@<file>` — `gh api`'s `-f` stores the literal string `@<file>` rather than reading it, so the comment gets clobbered with the filename. Re-verify after editing: `gh api repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID --jq .body | head`.
+- No id found: `gh pr comment <number> --body-file <tmp-comment-file>`.
+- Otherwise: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/<comment-id> -F body=@<tmp-comment-file> --jq .html_url`. Use `-F` (which reads a file when the value starts with `@`), not `-f` — `-f` stores the literal string `@<file>` and clobbers the comment with the filename. Re-verify after editing: `gh api repos/{owner}/{repo}/issues/comments/<comment-id> --jq .body | head`.
 
-**Headers are always `| Desktop | Mobile |`** — that stays the same regardless of whether there's a base-branch comparison. The base-branch shots and branch shots stack as additional rows, with a small indicator row between them when both are present.
-
-Default (with base-branch comparison). The indicator row labels the base by its PR when it has one — `#3918 👆` for a stacked base, plain `main 👆` otherwise:
+The base-branch shots and branch shots stack as rows in one table, with a small indicator row between them when both are present. The indicator labels the base by its PR when it has one — `#3918 👆` for a stacked base, plain `main 👆` otherwise:
 
 ```bash
-BASE_PR=$(gh pr list --head "$BASE" --state all --json number --jq '.[0].number // empty')
-BASE_LABEL=${BASE_PR:+#$BASE_PR}; BASE_LABEL=${BASE_LABEL:-$BASE}
+gh pr list --head <base-branch> --state all --json number --jq '.[0].number // empty'
 ```
 
 `// empty` is load-bearing — without it a base with no PR yields the literal `#null`.
@@ -72,11 +70,11 @@ BASE_LABEL=${BASE_PR:+#$BASE_PR}; BASE_LABEL=${BASE_LABEL:-$BASE}
 | Desktop | Mobile |
 | --- | --- |
 | <img src="<base-desktop-url>" width="500"> | <img src="<base-mobile-url>" width="250"> |
-| $BASE_LABEL 👆 | this branch 👇 |
+| <base-label> 👆 | this branch 👇 |
 | <img src="<branch-desktop-url>" width="500"> | <img src="<branch-mobile-url>" width="250"> |
 ```
 
-Brand-new page (URL didn't exist on `$BASE` — see step 4), no comparison row:
+Brand-new page (URL didn't exist on the base — see step 4), no comparison row:
 
 ```markdown
 ### <url-path>
