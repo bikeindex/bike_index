@@ -46,60 +46,11 @@ This has to happen before step 4, which diffs against `origin/main`.
 
 ### 4. Simplify, lint, and conform to CLAUDE.md
 
-Invoke the `/simplify` command to review the changed code for reuse, simplification, and efficiency cleanups and apply them. It's quality-only — it won't touch correctness — so it's safe to run unattended; if it reports nothing to clean up, move on.
-
-Then run `bin/lint` to auto-format (it also picks up whatever `/simplify` just changed). Always `bin/lint`, never another formatter or `standardrb` directly. Scope it to the branch's files rather than walking the whole repo:
-
-```bash
-bin/lint $(git diff --name-only --diff-filter=d origin/main...HEAD)
-```
-
-`--diff-filter=d` drops deleted paths so they don't show up as "Not found". Files with no linter (`.haml`, `.scss`, `.md`) are skipped, so a branch touching none of the lintable types exits cleanly rather than looking like a failure. It takes directories too, so `bin/lint app/components/foo` works while you're still iterating. Never revert what the linter wrote — if a too-broad run reformats files outside the branch, those fixes stay in the diff.
-
-Scope specs the same way — the ones covering what the branch changed, never a bare `bundle exec rspec` or a whole top-level directory (see the `rspec-testing` skill). CI runs the full suite; a green PR isn't your job to prove locally.
-
-Then review the changed files against the repo's `CLAUDE.md` (root and any nested ones in touched directories) and fix what doesn't conform — code style (functional style, no argument mutation, omitted hash values like `{x:}`, private methods, unabbreviated names), testing conventions, and frontend rules. Only touch lines this branch already changed.
-
-Class methods go in a `class << self` block when the class has more than 5 of them, or when any of them should be private — `BugReport` is the pattern.
-
-**Then review every comment the branch adds or edits — this is required, not conditional on the diff looking clean.** List them with their files:
-
-```bash
-git diff origin/main...HEAD -U0 -- '*.rb' '*.erb' '*.js' '*.ts' '*.coffee' '*.scss' '*.css' '*.rake' |
-  grep -E '^(\+\+\+ |\+.*(#|//|<%#|/\*))'
-```
-
-The `+++ b/…` lines keep each hit attached to its file; the code-path filter keeps markdown headings out. It catches trailing comments too, and over-matches on `#{}` interpolation — that's fine, the list is candidates to judge, not verdicts.
-
-Judge each against the **Comments** section of `CLAUDE.md` and reach a verdict of keep / razor / delete on every line — a comment survives only by carrying a *why* the code can't. Deleting is the common outcome, razoring the next most common; leaving a block untouched should be the exception you can justify. Watch hardest for the ones you wrote to explain your own reasoning as you worked: narration of the change, mechanism the code already shows, and a second sentence justifying the first.
-
-Then check the branch's translations for a hardcoded "bike" where the string means the registration's cycle type — a registration is as often an e-scooter, a stroller or a wheelchair:
-
-```bash
-git diff origin/main...HEAD -- '*.en.yml' 'config/locales/en.yml' | grep -in '^+[^+].*bike'
-```
-
-Read each hit. Key names (`about_this_bike:`), the product name ("Bike Index"), and copy that really is bike-only are fine; a value saying "bike" about the registration is not. Fix it by interpolating `%{bike_type}` in the value and passing `bike_type: bike.type` at the call site — `Registrations::Show::CurrentAlerts::ClaimImpound` and `Registrations::Show::WrapperConsumer` are the pattern, and `spec/components/registrations/show/current_alerts/claim_impound/component_spec.rb` shows how to cover it. After hand-editing a `component.en.yml`, run `bundle exec rails prepare_translations` — `bin/lint` doesn't normalize YAML.
-
-Commit these edits before continuing.
+`references/pre-push-cleanup.md` has this step in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `CLAUDE.md`, the required comment audit, and the cycle-type translation check. Commit everything it produces before step 5.
 
 ### 5. Freshen stale migration timestamps
 
-Every migration this branch adds must be dated within the past 2 days.
-
-```bash
-git diff origin/main...HEAD --name-only --diff-filter=A -- db/migrate db/analytics_migrate
-date -d '2 days ago' +%Y%m%d%H%M%S 2>/dev/null || date -v-2d +%Y%m%d%H%M%S
-```
-
-(GNU `date` takes `-d`, BSD/macOS `date` takes `-v` — the fallback covers both.) Compare each filename's leading timestamp against that cutoff. No added migrations, nothing stale, or a timestamp in the *future* → skip this step. The rollback below needs a working local database; if it isn't reachable, say so and leave the timestamps alone rather than failing mid-workflow.
-
-For each stale migration, in this order (rollback must happen while the old version is still on disk):
-
-1. Roll it back: `bin/rails db:migrate:down:primary VERSION=<old-timestamp>` (`db:migrate:down:analytics` for `db/analytics_migrate` files) — the un-namespaced `db:migrate:down` refuses in this multi-database app.
-2. `git mv` the file to the same name with a fresh `date +%Y%m%d%H%M%S` timestamp — when re-dating several, keep their relative order with incrementing timestamps.
-3. `bin/rails db:migrate` to re-apply and regenerate the structure files — never hand-edit `db/structure.sql`.
-4. Commit the renames together with the regenerated structure files.
+Migrations this branch adds have to be dated within the past 2 days, or the rollback/rename/re-migrate order in `references/pre-push-cleanup.md` re-dates them. Skip when the branch adds no migrations.
 
 ### 6. Gather branch state
 
@@ -146,6 +97,7 @@ Rules:
 - **No "Test plan" section unless the user asks.** Never list what CI already covers. Only reviewer-facing manual verification ("click X, confirm Y appears") qualifies, and only on request.
 - **No generic "covered by tests" bullet.** That a change is tested is assumed, and naming test mechanics (a fixture, a cassette) goes stale. Mention tests only when *what* is verified is the reviewer-facing point ("adds a regression test for the UTF-8 download crash").
 - **No Claude Code attribution footer.** The body should read like the human author wrote it.
+- **Link the issue when there is one.** If the branch name, a commit message, or the user's request names an issue, close it from the body — `Closes #4103` on its own line. Don't invent a number.
 
 If a bullet is turning into an essay, compress it to one sentence naming the *kind* of change.
 
@@ -158,6 +110,8 @@ git push -u origin HEAD
 Don't report the local branch name differing from the name in the invocation when the branch has no upstream — pushing `HEAD` creates a matching remote, so it's benign. Only flag a mismatch when the local branch already tracks a differently-named upstream. If the push is rejected as non-fast-forward, go back to step 3.
 
 - **Open PR from step 6**: `gh pr edit <number> --title "..." --body-file <tmp-body-file>`. Refresh the title to match the current diff (that's what "update pr" expects) unless the user gave it a deliberate custom title — if unsure, keep the title and update only the body.
+
+  **Read the current body before you replace it.** A human may have edited it since your last run — added a caveat, a reviewer note, a deploy instruction. Anything you can't account for as your own writing gets carried into the new body, or asked about. Don't overwrite it silently.
 - **Otherwise**: `gh pr create --draft --base main --title "..." --body-file <tmp-body-file>`. Draft by default; only skip `--draft` if the user asks for ready-for-review. Note the new number for step 10.
 
 Always pass the body via `--body-file`, not inline `--body`, to preserve formatting.
