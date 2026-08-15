@@ -19,14 +19,14 @@
   <% end %>
 
   <% table.column(sortable: "enabled", label: "Enabled") do |landing_page| %>
+    <% mismatch_error = landing_page.enabled_mismatch_error %>
     <%= render UI::Badge::Component.new(text: landing_page.enabled? ? "Enabled" : "Disabled", color: landing_page.enabled? ? :success : :gray, size: :sm) %>
 
-    <% if landing_page.enabled_mismatch_error.present? %>
-      <%= render UI::Badge::Component.new(text: "Mismatch", title: landing_page.enabled_mismatch_error, color: :error, size: :sm) %>
+    <% if mismatch_error.present? %>
+      <%= render UI::Badge::Component.new(text: "Mismatch", title: mismatch_error, color: :error, size: :sm) %>
     <% end %>
   <% end %>
 
-  <%# A body is a whole landing page, so its length says more than an excerpt would %>
   <% table.column(label: "Body (characters)", header_classes: "tw:font-normal") do |landing_page| %>
     <%= helpers.number_display(landing_page.body.to_s.size) %>
   <% end %>

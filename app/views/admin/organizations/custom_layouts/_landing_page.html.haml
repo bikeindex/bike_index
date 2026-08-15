@@ -17,7 +17,9 @@
         The register frame names a button color but no hover color. Add
         %code= "&button_hover=#{suggested_button_hover.delete_prefix("#")}"
         to its src to set the shade it currently derives.
-  .row.justify-content-end
+  .row.align-items-center
+    .col
+      = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :enabled, label: "Enabled"))
     .col-auto
       = f.submit 'Save', class: 'btn btn-success float-right'
 // Because somewhere, there is overflow hidden and it cuts off the bottom of the save button

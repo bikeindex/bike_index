@@ -38,12 +38,11 @@ module Admin
         @landing_page ||= @organization.organization_landing_page || @organization.build_organization_landing_page
       end
 
-      # The public page is drawn at boot from LandingPages::ORGANIZATIONS, so an organization
-      # outside it has only the members' preview
+      # Only routed at boot from LandingPages::ORGANIZATIONS; outside it, the members' preview is all there is
       def landing_page_url
-        return organization_landing_url(organization_id: @organization.to_param) unless @landing_page&.env_enabled?
+        return "#{root_url}#{@organization.to_param}" if @landing_page.env_enabled?
 
-        "#{root_url}#{@organization.to_param}"
+        organization_landing_url(organization_id: @organization.to_param)
       end
 
       # Step 1 derives a hover shade from the button color, but a page that names its own
@@ -56,7 +55,7 @@ module Admin
       end
 
       def permitted_parameters
-        return params.require(:organization_landing_page).permit(:body) if landing_page?
+        return params.require(:organization_landing_page).permit(:body, :enabled) if landing_page?
 
         params.require(:organization).permit(mail_snippets_attributes: [:body, :is_enabled, :id])
       end

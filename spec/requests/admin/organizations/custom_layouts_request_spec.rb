@@ -65,6 +65,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
               expect(response.body).to include CGI.escapeHTML(landing_page.enabled_mismatch_error)
               expect(response.body).to_not include "This landing page is enabled"
               expect(response.body).to include "href=\"#{root_url}#{organization.to_param}\""
+              expect(response.body).to include 'name="organization_landing_page[enabled]"'
             end
           end
         end
@@ -89,15 +90,16 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
             let(:landing_page) do
               FactoryBot.create(:organization_landing_page, organization:, body: iframe)
             end
-            let(:iframe) { "<iframe src='/register/embed?organization_id=x&button=c9a227'></iframe>" }
+            # not the seeded body's color, so the suggestion can only come from this iframe
+            let(:iframe) { "<iframe src='/register/embed?organization_id=x&button=336699'></iframe>" }
 
             it "recommends the shade step 1 would derive" do
               get "#{base_url}/landing_page/edit"
-              expect(response.body).to include "<code>&amp;button_hover=a78620</code>"
+              expect(response.body).to include "<code>&amp;button_hover=29527a</code>"
             end
 
             context "one that names its hover too" do
-              let(:iframe) { "<iframe src='/register/embed?button=c9a227&button_hover=a78620'></iframe>" }
+              let(:iframe) { "<iframe src='/register/embed?button=336699&button_hover=29527a'></iframe>" }
 
               it "says nothing" do
                 get "#{base_url}/landing_page/edit"
@@ -139,6 +141,20 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           expect(flash[:error]).to be_blank
         end
 
+        context "with a routed organization" do
+          let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+
+          it "creates the page enabled" do
+            expect(LandingPages::ORGANIZATIONS).to include(organization.slug)
+            expect {
+              put "#{base_url}/landing_page", params: {organization_landing_page: update.merge(enabled: "1")}
+            }.to change(OrganizationLandingPage, :count).by 1
+            landing_page = organization.reload.organization_landing_page
+            expect(landing_page.enabled).to be_truthy
+            expect(landing_page.enabled_mismatch_error).to be_blank
+          end
+        end
+
         context "when enabled disagrees with ORGANIZATIONS_WITH_LANDING_PAGES" do
           let!(:landing_page) { FactoryBot.create(:organization_landing_page, organization:, enabled: true) }
 
@@ -150,6 +166,15 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
 
             follow_redirect!
             expect(response.body).to include CGI.escapeHTML(landing_page.enabled_mismatch_error)
+          end
+
+          it "resolves the mismatch when enabled is unchecked" do
+            put "#{base_url}/landing_page", params: {organization_landing_page: update.merge(enabled: "0")}
+            expect(landing_page.reload.enabled).to be_falsey
+            expect(landing_page.enabled_mismatch_error).to be_blank
+
+            follow_redirect!
+            expect(response.body).to_not include "ORGANIZATIONS_WITH_LANDING_PAGES"
           end
         end
       end
