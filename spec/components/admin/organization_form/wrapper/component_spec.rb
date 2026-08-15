@@ -124,20 +124,22 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
     let!(:location) { FactoryBot.create(:location, organization:, name: "Main Office") }
 
     it "renders the location fields and an add link carrying a blank set of them" do
-      expect(component).to have_css("#admin-locations-fields")
       expect(component).to have_field("organization_locations_attributes_0_name", with: "Main Office")
       expect(component).to have_field("organization_locations_attributes_0_address_record_attributes_city")
 
-      add_link = component.at_css("a.add_fields")
+      add_link = component.at_css("a[data-controller='ui--forms--add-fields']")
       expect(add_link.text).to eq "Add a location"
 
-      # The legacy add_fields handler clones this payload into the page, so it has to be
-      # exactly one blank location
-      add_fields = Nokogiri::HTML.fragment(add_link["data-fields"])
+      # ui--forms--add-fields inserts this payload into the page, so it has to be exactly one
+      # blank location, carrying the child index the controller swaps for a unique one
+      add_fields = Nokogiri::HTML.fragment(add_link["data-ui--forms--add-fields-fields-value"])
       expect(add_fields.css(".card").length).to eq 1
       expect(add_fields.css("input.twinput[name*='locations_attributes']").length).to be > 1
       expect(add_fields.css("[name='organization[name]']")).to be_empty
       expect(add_fields.text).not_to match "Main Office"
+
+      child_index = add_link["data-ui--forms--add-fields-child-index-value"]
+      expect(add_fields.css("[name*='locations_attributes'][name*=\"[#{child_index}]\"]")).to be_present
     end
   end
 
@@ -147,7 +149,7 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
     it "skips the auto user email and the locations" do
       expect(component).to have_field("organization_name")
       expect(component).not_to have_field("organization_embedable_user_email")
-      expect(component).not_to have_css("#admin-locations-fields")
+      expect(component).not_to have_css("[data-controller='ui--forms--add-fields']")
     end
   end
 end

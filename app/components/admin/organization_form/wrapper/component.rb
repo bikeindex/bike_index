@@ -35,6 +35,10 @@ module Admin
             selected: @organization.kind)
         end
 
+        def location_fields(form_builder)
+          render(Admin::OrganizationForm::LocationFields::Component.new(form_builder:, organization: @organization))
+        end
+
         def parent_organization_options
           Organization.with_enabled_feature_slugs("child_organizations").pluck(:name, :id)
         end

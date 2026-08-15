@@ -1,0 +1,10 @@
+<div
+  class="tw:mb-4 tw:rounded tw:border tw:border-gray-200 tw:p-3"
+  data-controller="ui--forms--remove-fields"
+>
+  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name, label_text: "Location name")) %>
+
+  <%# The label checks the hidden _destroy box; ui--forms--remove-fields collapses these fields %>
+  <%= f.check_box :_destroy, class: "tw:hidden" %>
+  <%= f.label :_destroy, "Remove", class: "twlink", data: {action: "click->ui--forms--remove-fields#remove"} %>
+</div>
