@@ -23,6 +23,8 @@ module Admin
 
         private
 
+        def developer? = @current_user.developer?
+
         def domain_uses
           @domain_uses ||= DOMAIN_FEATURES.filter_map { |slug, name| name if @organization.enabled?(slug) }
         end

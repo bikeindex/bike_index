@@ -40,20 +40,35 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
     let(:organization) do
       FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "passwordless_users")
     end
+    let(:domain_field) { component.at_css("#organization_user_email_domain") }
 
     it "renders the permitted domain rather than the invitation count, disabled for a non-developer" do
       expect(component).not_to have_field("organization_available_invitation_count")
       expect(component).to have_content("permitted domain for passwordless sign in")
       expect(component).to have_field("organization_user_email_domain", disabled: true)
       expect(component).to have_content("Ask Seth for help changing this")
+      expect(component.css("##{domain_field["aria-describedby"]}").length).to eq 1
+    end
+
+    context "with saml_sso also enabled" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: %w[passwordless_users saml_sso])
+      end
+
+      it "separates the feature names" do
+        label = component.at_css("label[for='organization_user_email_domain']")
+        expect(label.text.squish).to match(/passwordless sign in feature SAML SSO feature/)
+      end
     end
 
     context "with a developer current_user" do
       let(:current_user) { FactoryBot.create(:superuser_developer) }
 
-      it "enables the domain field" do
+      it "enables the domain field, without pointing it at absent helper text" do
         expect(component).to have_field("organization_user_email_domain", disabled: false)
         expect(component).not_to have_content("Ask Seth for help changing this")
+        expect(domain_field["aria-describedby"]).to be_nil
       end
     end
   end
