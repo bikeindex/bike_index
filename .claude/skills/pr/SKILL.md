@@ -114,7 +114,7 @@ Don't report the local branch name differing from the name in the invocation whe
   **Read the current body before you replace it.** A human may have edited it since your last run — added a caveat, a reviewer note, a deploy instruction. Anything you can't account for as your own writing gets carried into the new body, or asked about. Don't overwrite it silently.
 - **Otherwise**: `gh pr create --draft --base main --title "..." --body-file <tmp-body-file>`. Draft by default; only skip `--draft` if the user asks for ready-for-review. Note the new number for step 10.
 
-Always pass the body via `--body-file`, not inline `--body`, to preserve formatting.
+Always pass the body via `--body-file`, not inline `--body`, to preserve formatting. `mcp__github__create_pull_request` takes the body as a string instead, so there's no file to pass — and its `head` is the bare branch name, unlike the `owner:branch` the step 6 list filter wants.
 
 ### 10. Screenshots (frontend diffs only)
 
