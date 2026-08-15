@@ -11,6 +11,9 @@ description: >-
   like" without naming Playwright. For a component that only renders under an
   env var / feature flag / hard-to-reach state (e.g. the review-app banner),
   screenshot its ViewComponent/Lookbook preview URL instead of a full page.
+  **Also read the filename rule here before any
+  `mcp__playwright__browser_take_screenshot` call**, including a one-off
+  capture of some other site — it's what keeps PNGs out of the working tree.
   Inputs: `(url-path, page-slug)` pairs, optionally with per-URL interaction
   steps. Output: local PNG paths.
 allowed-tools: Bash, Read, ToolSearch, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_evaluate, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot, mcp__playwright__browser_wait_for, mcp__playwright__browser_console_messages, mcp__playwright__browser_click, mcp__playwright__browser_type, mcp__playwright__browser_press_key, mcp__playwright__browser_hover, mcp__playwright__browser_close
@@ -23,6 +26,8 @@ Drive Playwright MCP to capture viewport screenshots of pages served by `bin/dev
 ## Output filenames (load-bearing — callers parse these)
 
 `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`, where `<branch>=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')` and `<timestamp>=$(date +%Y%m%d-%H%M%S)`. Cross-branch shots get an extra `-base-` segment.
+
+**Every `browser_take_screenshot` anywhere passes a `filename:` starting with `tmp/`** — including a one-off `tmp/tooltip-hover.png` for visual verification that has nothing to do with a PR. The MCP tool's root is the project root, so a bare `tooltip.png` lands in the working tree and shows up in `git status`; `tmp/` is gitignored.
 
 ## Preflight
 
