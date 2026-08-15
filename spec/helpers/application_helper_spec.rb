@@ -98,7 +98,7 @@ RSpec.describe ApplicationHelper, type: :helper do
   end
 
   describe "body_class" do
-    context "organized skeleton" do
+    context "organized" do
       before do
         helper.extend(ControllerHelpers)
         helper.extend(Binxtils::ControllerNamespace)

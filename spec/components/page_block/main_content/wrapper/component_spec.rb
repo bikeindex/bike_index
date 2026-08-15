@@ -2,13 +2,13 @@
 
 require "rails_helper"
 
-RSpec.describe PageBlock::Skeletons::Wrapper::Component, type: :component do
-  describe "skeleton_kind" do
+RSpec.describe PageBlock::MainContent::Wrapper::Component, type: :component do
+  describe "kind" do
     let(:controller_namespace) { nil }
     let(:action_name) { "index" }
     let(:force_landing_page_render) { false }
-    subject(:skeleton_kind) do
-      described_class.skeleton_kind(controller_namespace:, controller_name:, action_name:,
+    subject(:kind) do
+      described_class.kind(controller_namespace:, controller_name:, action_name:,
         force_landing_page_render:)
     end
 
@@ -198,7 +198,7 @@ RSpec.describe PageBlock::Skeletons::Wrapper::Component, type: :component do
       described_class.new(controller_namespace: nil, controller_name: "welcome", action_name: "index")
     end
 
-    it "renders the content, without a skeleton" do
+    it "renders the content, unwrapped" do
       result = render_inline(instance) { "<p>the page</p>".html_safe }
       expect(result.to_html.strip).to eq "<p>the page</p>"
     end

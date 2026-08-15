@@ -2,7 +2,7 @@
 en:
   components:
     page_block:
-      skeletons:
+      main_content:
         organized:
           additional_features_html: >-
             Bike Index provides additional features for verified Law Enforcement organizations.

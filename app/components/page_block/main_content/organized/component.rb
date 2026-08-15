@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PageBlock
-  module Skeletons
+  module MainContent
     module Organized
       # The organization admin shell - the left menu, and the content column it's
       # positioned over

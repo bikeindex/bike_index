@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PageBlock
-  module Skeletons
+  module MainContent
     module Content
       # The two column shell for the informational pages, with a menu of related pages -
       # or a donation ask - beside them
@@ -33,10 +33,10 @@ module PageBlock
           @blog&.title_slug == Blog.get_your_stolen_bike_back_slug
         end
 
+        # Only reached from the why-donate post, which the donation funnel counts under
+        # "why-donate" rather than under its own long slug
         def referral_source
-          source = helpers.params[:source].present? if helpers.params[:source].present?
-          source ||= "why-donate" if @blog.title_slug == Blog.why_donate_slug
-          source || @blog.title_slug
+          helpers.params[:source].presence || "why-donate"
         end
       end
     end

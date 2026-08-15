@@ -2,7 +2,7 @@
 en:
   components:
     page_block:
-      skeletons:
+      main_content:
         content:
           about: About
           bicycle_serials: Bicycle serials

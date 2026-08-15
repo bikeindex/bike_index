@@ -29,10 +29,9 @@ module ApplicationHelper
     link_to(raw(link_text), link_path, html_options).html_safe
   end
 
-  # Wraps the page in whichever skeleton its route calls for. Memoized because the
-  # layout asks it about the page before it renders it
-  def page_skeleton_component
-    @page_skeleton_component ||= PageBlock::Skeletons::Wrapper::Component.new(
+  # Memoized because the layout asks this about the page before it renders it
+  def main_content_component
+    @main_content_component ||= PageBlock::MainContent::Wrapper::Component.new(
       controller_namespace:, controller_name:, action_name:,
       force_landing_page_render: @force_landing_page_render
     )
@@ -47,7 +46,7 @@ module ApplicationHelper
       end
     elsif controller_name == "info" && action_name == "resources"
       "kelsey_landing-page-body"
-    elsif page_skeleton_component.organized?
+    elsif main_content_component.organized?
       "organized-body"
     elsif controller_name == "registrations" && action_name == "show"
       "tw:bg-[#f7f6fb]"

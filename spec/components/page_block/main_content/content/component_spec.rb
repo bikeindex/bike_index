@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe PageBlock::Skeletons::Content::Component, type: :component do
+RSpec.describe PageBlock::MainContent::Content::Component, type: :component do
   include Rails.application.routes.url_helpers
 
   let(:options) do

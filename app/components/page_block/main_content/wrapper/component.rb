@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 module PageBlock
-  module Skeletons
+  module MainContent
     module Wrapper
-      # The shell a page renders inside, picked from the route. Pages with no skeleton
-      # lay out the full width themselves and render bare
+      # The wrapper a page's main content renders inside, picked from the route. Pages
+      # with no wrapper lay out the full width themselves and render bare
       class Component < ApplicationComponent
-        def self.skeleton_kind(controller_namespace:, controller_name:, action_name:,
+        def self.kind(controller_namespace:, controller_name:, action_name:,
           force_landing_page_render: false)
           return :organized if controller_namespace == "organized" && action_name != "landing"
           return :oauth_applications if controller_namespace == "oauth" && controller_name == "applications"
@@ -34,26 +34,26 @@ module PageBlock
           force_landing_page_render: false)
           @controller_name = controller_name
           @action_name = action_name
-          @kind = self.class.skeleton_kind(controller_namespace:, controller_name:, action_name:,
+          @kind = self.class.kind(controller_namespace:, controller_name:, action_name:,
             force_landing_page_render:)
         end
 
-        # The organized skeleton renders the general alert itself, in the content column
-        # the menu doesn't cover
+        # Organized renders the general alert itself, in the content column the menu
+        # doesn't cover
         def organized?
           @kind == :organized
         end
 
         def call
-          skeleton = skeleton_component
-          return content if skeleton.nil?
+          wrapper = wrapping_component
+          return content if wrapper.nil?
 
-          render(skeleton) { content }
+          render(wrapper) { content }
         end
 
         private
 
-        def skeleton_component
+        def wrapping_component
           case @kind
           when :content then content_component
           when :edit_bike then edit_bike_component
@@ -63,7 +63,7 @@ module PageBlock
         end
 
         def content_component
-          PageBlock::Skeletons::Content::Component.new(
+          PageBlock::MainContent::Content::Component.new(
             blog: controller_ivar(:@blog),
             related_blogs: controller_ivar(:@related_blogs),
             current_user: helpers.current_user,
@@ -73,7 +73,7 @@ module PageBlock
         end
 
         def edit_bike_component
-          PageBlock::Skeletons::EditBike::Component.new(
+          PageBlock::MainContent::EditBike::Component.new(
             bike: controller_ivar(:@bike),
             bike_og: controller_ivar(:@bike_og),
             og_email: controller_ivar(:@og_email),
@@ -85,7 +85,7 @@ module PageBlock
         end
 
         def oauth_applications_component
-          PageBlock::Skeletons::OauthApplications::Component.new(
+          PageBlock::MainContent::OauthApplications::Component.new(
             oauth_application: controller_ivar(:@application),
             current_user: helpers.current_user,
             action_name: @action_name
@@ -93,7 +93,7 @@ module PageBlock
         end
 
         def organized_component
-          PageBlock::Skeletons::Organized::Component.new(
+          PageBlock::MainContent::Organized::Component.new(
             current_organization: helpers.current_organization,
             current_user: helpers.current_user,
             passive_organization: helpers.passive_organization,
@@ -105,7 +105,7 @@ module PageBlock
         end
 
         # Reaching into controller state, which components otherwise don't do - the layout
-        # renders a skeleton on every page, so it can't pass each one's subject in
+        # renders this on every page, so it can't pass each wrapper's subject in
         def controller_ivar(name)
           controller.instance_variable_get(name)
         end

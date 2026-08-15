@@ -61,10 +61,7 @@
       <%= translation(".edit_pages", bike_type: @bike.type) %>
     </strong>
 
-    <% menu_link_count = @edit_templates.keys.count %>
-
-    <% @edit_templates.each_with_index do |t_d, i| %>
-      <% template, description = t_d[0], t_d[1] %>
+    <% @edit_templates.each do |template, description| %>
       <% is_active = 'active' if @edit_template.match(/#{template}/) %>
 
       <a

@@ -2,7 +2,7 @@
 en:
   components:
     page_block:
-      skeletons:
+      main_content:
         edit_bike:
           edit: Edit
           edit_pages: 'Edit %{bike_type} pages:'

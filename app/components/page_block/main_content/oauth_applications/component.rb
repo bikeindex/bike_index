@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PageBlock
-  module Skeletons
+  module MainContent
     module OauthApplications
       # The shell for managing your own OAuth applications - the authorization prompt
       # uses the doorkeeper layout instead

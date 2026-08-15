@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PageBlock
-  module Skeletons
+  module MainContent
     module EditBike
       # The header and edit-page menu wrapped around every bike edit template
       class Component < ApplicationComponent
