@@ -114,6 +114,8 @@ Diff against `origin/main`, not the local base branch — in a Conductor worktre
 
 `gh pr view` returns MERGED and CLOSED PRs too. **Only a PR whose `state` is `OPEN` counts as existing** — for a merged or closed one, create a new PR in step 9 rather than editing it. Note the number for steps 9 and 10.
 
+Without `gh`, ask for open PRs only — `mcp__github__list_pull_requests` with `state: "open"` and `head: "bikeindex:<branch>"`. Don't list `all` and filter on the `merged` field: the list endpoint reports `merged: false` even for merged PRs (verified against #4122, which `pull_request_read` correctly reports as merged). `state: "open"` sidesteps it.
+
 No `bin/env` eval is needed here — it's only relevant to the screenshot phase, and `frontend-screenshots` runs its own in preflight. Backend-only PRs never touch it.
 
 ### 7. Classify the diff
@@ -133,7 +135,7 @@ Record this as frontend true/false for step 10.
 
 ### 8. Write the summary body
 
-Write 2–5 bullets based on the diff and recent commits to a temp file. Match the repo's style — `gh pr list --state merged --limit 5 --json title,body` shows recent tone and length. Title under ~70 chars.
+Write the body to a temp file. Read the last few merged PRs first (`gh pr list --state merged --limit 5 --json title,body`; without `gh`, `mcp__github__list_pull_requests` with `state: "closed"`) — they're the tone to match. The house shape is a short intro paragraph saying what was broken or what this is, then 2–4 bullets each opening with a bolded clause. Title under ~70 chars.
 
 Rules:
 

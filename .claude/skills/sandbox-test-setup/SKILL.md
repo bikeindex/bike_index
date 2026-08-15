@@ -348,6 +348,10 @@ The GitHub CLI isn't installed. Anything the `pr` skill (or any other) expresses
 open a PR by itself, so the branch may already have one whose body wants updating rather
 than a second PR.
 
+`list_pull_requests` returns `merged: false` on PRs that are merged — the underlying list
+endpoint doesn't populate it. Pass `state: "open"` when you want live PRs; when you need a
+specific PR's true state, `pull_request_read` with `method: "get"` reports it correctly.
+
 ## Running plain specs
 
 After Toolchain + Services + DB above:
