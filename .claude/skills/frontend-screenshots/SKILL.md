@@ -1,7 +1,7 @@
 ---
 name: frontend-screenshots
 description: >-
-  Capture desktop+mobile viewport screenshots of Bike Index pages from the
+  Capture desktop+mobile screenshots of Bike Index pages from the
   local `bin/dev` server via Playwright MCP, with a seeded-user identity gate
   that keeps PII out of uploaded images. Use whenever a task needs screenshots
   of local pages — PR documentation, bug repros, before/after comparisons
@@ -59,9 +59,9 @@ Clear stale shots: `rm -f tmp/pr_screenshots/<branch>-<page>-*.png 2>/dev/null |
 
 Two viewports — resize once each, then walk every URL:
 1. `browser_resize` 1440×900 → for each URL: navigate → settle → hide the footer → `browser_take_screenshot` (`fullPage: true`) to `...-desktop.png`.
-2. `browser_resize` 390×844 → same loop → `...-mobile.png`.
+2. `browser_resize` 390×844 → same loop, also `fullPage: true` → `...-mobile.png`.
 
-**Full page, minus the footer and review-app banner, no `target:` arg.** Capture the whole page (`fullPage: true`) so nothing below the fold is cut off, but first hide the site footer (identical on every page, just padding) and the `#review-app-banner` topbar (dev/review-app-only chrome that isn't part of the real page). After each navigation (hiding doesn't persist across page loads), run:
+**Full page, minus the footer and review-app banner, no `target:` arg.** Capture the whole page (`fullPage: true`) at **both** viewports so nothing below the fold is cut off, but first hide the site footer (identical on every page, just padding) and the `#review-app-banner` topbar (dev/review-app-only chrome that isn't part of the real page). After each navigation (hiding doesn't persist across page loads), run:
 
 ```js
 browser_evaluate: () => {
@@ -72,6 +72,8 @@ browser_evaluate: () => {
 ```
 
 If the returned content height is **less than the viewport height**, `browser_resize` the height down to it before the shot (the `<html>` element's near-black background fills the gap otherwise), then resize back to the standard viewport before the next URL. Taller-than-viewport pages need no resize — `fullPage` scroll-stitches them.
+
+**Viewport-only is the caller's call, never yours.** When the caller asks for it — "viewport only", "above the fold", "just the mobile viewport" — drop `fullPage` for the size they named and leave the other one full page. Absent that, full page is the default at both sizes: a tall page, a sliver in a PR table cell, or a page whose change sits above the fold are none of them reasons to crop on your own.
 
 Element-only crops (`target:`) still slice context off — don't use them for page captures.
 
@@ -93,7 +95,7 @@ $BASE_URL/rails/view_components/<preview_path>/<scenario>
 
 Use this bare route, not Lookbook's `/lookbook/...`, which wraps the component in its own browser chrome.
 
-The preview page loads Tailwind and renders the component standalone (no site chrome), so capture the viewport as usual (`fullPage: false`); a small ViewComponent render-timing line at the bottom is harmless. Everything else still applies — same PII/seed-data gate, same `(url-path, page-slug)` naming (use a slug like `banner-signed-in`).
+The preview page loads Tailwind and renders the component standalone (no site chrome), so this is the one case that captures the viewport rather than the full page (`fullPage: false`); a small ViewComponent render-timing line at the bottom is harmless. Everything else still applies — same PII/seed-data gate, same `(url-path, page-slug)` naming (use a slug like `banner-signed-in`).
 
 Previews that query the dev DB (e.g. `User.admins.first`) render nothing when that data is missing — if the state doesn't appear, seed first with `bundle exec rails db:seed`. This is component-only: a preview can't show layout/stacking against the rest of the page (e.g. a navbar z-index fix), so use a real page for those.
 
