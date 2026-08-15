@@ -224,6 +224,22 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(location1.address_record).to have_attributes(street: "999 New St", city: "New City", postal_code: "99999")
       end
     end
+    context "with a _destroy from the nested-fields remove" do
+      let!(:location1) { FactoryBot.create(:location, organization:, name: "Original") }
+
+      # The hidden field submits blank until the controller sets it, so blank can't destroy
+      it "keeps the location for the untouched hidden field, and destroys it for 1" do
+        put_destroy = lambda { |destroy_value|
+          put "#{base_url}/#{organization.to_param}", params: {
+            organization: {locations_attributes: {"0" => {id: location1.id, _destroy: destroy_value}}}
+          }
+        }
+
+        expect { put_destroy.call("") }.not_to change(Location, :count)
+        expect { put_destroy.call("1") }.to change(Location, :count).by(-1)
+      end
+    end
+
     context "setting to not_set" do
       let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos", lightspeed_register_with_phone: true) }
       it "updates the organization" do

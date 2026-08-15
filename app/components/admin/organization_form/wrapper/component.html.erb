@@ -143,11 +143,7 @@
 </div>
 
 <% if @organization.persisted? %>
-  <div class="row mt-4">
-    <%= @form_builder.fields_for :locations do |location_form| %>
-      <%= location_fields(location_form) %>
-    <% end %>
-
-    <%= render(UI::Forms::AddFields::Component.new(name: "Add a location", form_builder: @form_builder, association: :locations, fields: method(:location_fields), class_name: "mx-auto mt-4")) %>
-  </div>
+  <%= render(UI::Forms::NestedFields::Component.new(form_builder: @form_builder, association: :locations,
+        fields_component: Admin::OrganizationForm::LocationFields::Component, fields_args: {organization: @organization},
+        add_label: "Add a location", class_name: "row mt-4", add_class_name: "twlink mx-auto mt-4")) %>
 <% end %>

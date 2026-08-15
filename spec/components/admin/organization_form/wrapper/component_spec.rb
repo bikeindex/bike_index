@@ -123,20 +123,16 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
   describe "locations" do
     let!(:location) { FactoryBot.create(:location, organization:, name: "Main Office") }
 
-    it "renders the location fields and an add link carrying a blank set of them" do
+    it "renders the location fields, and a blank set in the nested-fields template" do
       expect(component).to have_field("organization_locations_attributes_0_name", with: "Main Office")
       expect(component).to have_field("organization_locations_attributes_0_address_record_attributes_city")
 
-      add_link = component.at_css("a[data-controller='ui--forms--add-fields']")
-      expect(add_link.text).to eq "Add a location"
-
-      # ui--forms--add-fields inserts this payload into the page, so it has to be exactly one
-      # blank location
-      add_fields = Nokogiri::HTML.fragment(add_link["data-ui--forms--add-fields-fields-value"])
-      expect(add_fields.css(".card").length).to eq 1
-      expect(add_fields.css("input.twinput[name*='locations_attributes']").length).to be > 1
-      expect(add_fields.css("[name='organization[name]']")).to be_empty
-      expect(add_fields.text).not_to match "Main Office"
+      # ui--forms--nested-fields clones this into the page, so it has to be exactly one blank location
+      template = Nokogiri::HTML.fragment(component.at_css("template").inner_html)
+      expect(template.css(".card").length).to eq 1
+      expect(template.css("input.twinput[name*='locations_attributes']").length).to be > 1
+      expect(template.css("[name='organization[name]']")).to be_empty
+      expect(template.text).not_to match "Main Office"
     end
   end
 
@@ -146,7 +142,7 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
     it "skips the auto user email and the locations" do
       expect(component).to have_field("organization_name")
       expect(component).not_to have_field("organization_embedable_user_email")
-      expect(component).not_to have_css("[data-controller='ui--forms--add-fields']")
+      expect(component).not_to have_css("[data-controller='ui--forms--nested-fields']")
     end
   end
 end
