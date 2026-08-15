@@ -6,7 +6,8 @@ description: >-
   description, body, summary, or title — including bare phrasings like "update
   pr" or "update the PR" with no other object — for both new PRs and existing
   ones. Note this runs `/simplify`, `bin/lint`, a CLAUDE.md conformance pass and
-  a merge from the base before writing the body, and pushes the result. For
+  a merge from the base before writing the body — skipped when the ask is only to
+  reword the description — and pushes the result. For
   frontend diffs, delegates the screenshot phase to `references/screenshots.md`,
   which captures desktop+mobile shots and posts them as a `## Screenshots` PR
   comment.
@@ -27,16 +28,13 @@ Run the `gh` commands as written. The appendix at the bottom covers the one envi
 - Uncommitted changes you made in this session: commit them now. Otherwise steps 4, 5 and 7 silently skip them and the PR body describes the wrong diff.
 - Uncommitted changes you didn't make: stop and ask. Don't sweep someone else's work into a commit.
 
-Then pick the mode:
-
-- **Body-only** — the user asked to edit/rewrite/fix the description, body, summary or title of an existing PR and nothing else. Skip steps 3, 4 and 5 (no merge, no code edits, no migration re-dating) and go 1 → 2 → 6 → 8 → 9 → 11. A request to reword the description shouldn't rewrite code, and it shouldn't recapture screenshots either — so step 7, which exists only to gate step 10, is skipped too.
-- **Full** — everything else (creating a PR, "get this ready", or an update after new commits). Run every step.
-
 ### 2. Determine the base branch
 
 The base is the branch the PR goes off of — `main` by default. The head is always the current branch (`HEAD`), so the branch that sets the base is a *different* one the user points at: "a PR off of `release-2`", "base this on `release-2`", "onto/target `release-2`", "stacked on `<branch>`", or a `--base <branch>` argument. Naming the branch you're already on only identifies the head — the base stays `main`. If it's genuinely unclear whether a named branch is meant as the base, ask rather than guess. Never silently retarget an explicitly-named base to `main`.
 
 When updating an **existing** PR, leave its base untouched — run `gh pr edit` without `--base`. Only retarget when the user explicitly asks.
+
+**Steps 3–5 ready the branch, and all three are skipped when the ask is only to reword an existing PR's description** — fixing the wording shouldn't rewrite code. Everything else (creating a PR, "get this ready", an update after new commits) runs them.
 
 ### 3. Update from the base
 
@@ -61,7 +59,7 @@ Run in parallel:
 - `git log origin/main..HEAD --oneline`
 - `gh pr view --json number,url,title,state`
 
-Diff against `origin/main`, not the local base branch — in a Conductor worktree the local base often lags the remote, which would inflate or stale the diff. In body-only mode (step 1), `git fetch origin` first, since step 3 didn't run. If the branch has no commits ahead of `origin/main`, stop and tell the user.
+Diff against `origin/main`, not the local base branch — in a Conductor worktree the local base often lags the remote, which would inflate or stale the diff. If you skipped step 3, `git fetch origin` first. If the branch has no commits ahead of `origin/main`, stop and tell the user.
 
 `gh pr view` exits non-zero with "no pull requests found" when the branch has none — that's the answer to step 9's question, not a broken command, and it's the normal case on a first run.
 
