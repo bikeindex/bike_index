@@ -29,11 +29,11 @@ gh pr view --json number,url -q '"\(.number) \(.url)"'
 
 If multiple repos or branches are involved, confirm with the user which PR to target.
 
-Also, normalize the image paths to absolute paths. If a path contains special characters (e.g., Unicode narrow spaces from CleanShot X), copy the file to `/tmp/` first:
+Also, normalize the image paths to absolute paths. If a path contains special characters (e.g., Unicode narrow spaces from CleanShot X), copy the file into the project's `tmp/` first — not the system `/tmp`, which is where scratch files go to be lost:
 
 ```bash
 # e.g., to handle glob-matched paths with special chars
-cp /path/to/CleanShot*keyword*.png /tmp/screenshot.png
+cp /path/to/CleanShot*keyword*.png tmp/screenshot.png
 ```
 
 ## Step 2: Verify Playwright MCP is available
@@ -77,28 +77,35 @@ Take a snapshot and scroll to the bottom to find the comment area. GitHub render
 }
 ```
 
-## Step 5: Upload images one by one
+## Step 5: Upload every image in one call
 
-The `<input type="file">` from step 4 is **CSS-hidden** — calling `browser_file_upload` against its ref directly fails with "can only be used when there is related modal state present." First click the visible **"Paste, drop, or click to add files"** button (or "Attach files" toolbar icon) on the comment form to open the native file chooser, then `browser_file_upload` will satisfy that chooser.
+The `<input type="file">` from step 4 is **CSS-hidden** — calling `browser_file_upload` against its ref directly fails with "can only be used when there is related modal state present." First click the visible attach button on the comment form to open the native file chooser, then `browser_file_upload` will satisfy that chooser. The button's accessible name is **"Add files"**; its full text ("Paste, drop, or click to add files") is in the DOM but isn't what the snapshot matches on, so search for `Add files`.
 
-Upload each image with `browser_file_upload` (takes the element ref and a file paths array). Wait **2–3 seconds between uploads** so GitHub can process each file, then **3–5 seconds after the last upload** before reading URLs in step 6 — GitHub injects the image markup asynchronously after each file finishes processing.
+**Upload every image in one `browser_file_upload` call** — it takes an array of paths, and GitHub processes them together. Don't upload one at a time. Always absolute paths.
 
-For multiple images, upload them all to the same comment textarea before extracting URLs — this is more efficient than navigating between uploads.
+Then poll the textarea until it holds one `user-attachments/assets/` URL per file, rather than sleeping a fixed interval — GitHub injects each image's markup asynchronously as it finishes:
 
-**Important:** Always use absolute file paths.
+```javascript
+async () => {
+  const ta = () => document.getElementById('new_comment_field')
+              || document.querySelector('textarea[id*="comment"]');
+  for (let i = 0; i < 25; i++) {
+    const value = ta()?.value ?? '';
+    if ((value.match(/user-attachments\/assets\//g) || []).length >= EXPECTED) return value;
+    await new Promise(r => setTimeout(r, 1000));
+  }
+  return ta()?.value ?? 'textarea not found';
+}
+```
+
+GitHub sets each image's `alt` to its **filename**, so a batch comes back self-labelling — that's how you map URLs to pages and viewports without uploading singly.
 
 ## Step 6: Retrieve uploaded image URLs
 
-Read the textarea value via `browser_evaluate` — GitHub injects either markdown or HTML referencing the upload after each file finishes processing.
-
-The **standard textarea selector** (referenced again in step 7) prefers the known ID and falls back to a substring match in case GitHub renames it:
+Step 5's poll already returns the textarea value; this is what's in it. The **standard textarea selector** it uses (referenced again in step 7) prefers the known ID and falls back to a substring match in case GitHub renames it:
 
 ```javascript
-() => {
-  const ta = document.getElementById('new_comment_field')
-          || document.querySelector('textarea[id*="comment"]');
-  return ta ? ta.value : 'textarea not found';
-}
+document.getElementById('new_comment_field') || document.querySelector('textarea[id*="comment"]')
 ```
 
 GitHub may inject **either form** depending on image dimensions / file type:
@@ -146,7 +153,7 @@ Write the comment body to a temp file:
 ```
 
 - If `$SCREENSHOT_COMMENT_ID` is empty: `gh pr comment $PR_NUMBER --body-file <tmp-comment-file>`.
-- Otherwise: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -f body="$(cat <tmp-comment-file>)" --jq .html_url`. Don't use `-f body=@<file>` — `gh api`'s `-f` stores the literal string `@<file>` rather than reading it, so the comment gets clobbered with the filename.
+- Otherwise: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -F body=@<tmp-comment-file> --jq .html_url`. `-F` is what reads a file when the value starts with `@`; `-f` is a raw string field and would clobber the comment with the literal `@<file>`. Re-verify after: `gh api repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID --jq .body | head`.
 
 Only edit the PR description instead when the user explicitly asks for it:
 ```bash
@@ -159,21 +166,34 @@ If `$EXISTING_BODY` already contains a `## Screenshots` heading (e.g., on re-run
 
 ## Step 9: Verify the result
 
-Reload the page in the Playwright browser and take a screenshot to confirm the images render correctly. **Do not** verify with `curl` — `user-attachments/assets/` URLs return HTTP 302 to a session-signed S3 URL that 403s for unauthenticated clients. The 302 alone confirms the asset exists; the browser-rendered check is the only authoritative "did it display" signal.
+Reload the page in the Playwright browser and confirm the images render. **Do not** verify with `curl` — `user-attachments/assets/` URLs return HTTP 302 to a session-signed S3 URL that 403s for unauthenticated clients. The 302 alone confirms the asset exists; only the browser can say it displayed.
+
+**The rendered `src` is not the URL you posted.** GitHub rewrites `github.com/user-attachments/assets/…` to `private-user-images.githubusercontent.com`, so a DOM query for the posted URL finds nothing on a comment that is rendering perfectly. Check the images under the heading instead:
+
+```javascript
+() => {
+  const heading = [...document.querySelectorAll('h2')].find(h => h.textContent.trim() === 'Screenshots');
+  return [...heading.closest('td, div').querySelectorAll('img')]
+    .map(i => ({w: i.naturalWidth, h: i.naturalHeight, complete: i.complete}));
+}
+```
+
+A non-zero `naturalWidth` on every image is the pass.
 
 ## Tips
 
 - **Image sizing**: Control display size via HTML `<img>` tags: `<img width="800" alt="description" src="..." />`
-- **Multiple images**: Upload all images in one session to the same textarea; extract all URLs before clearing
+- **Multiple images**: one `browser_file_upload` call with every path; extract all URLs before clearing
 
 ## Troubleshooting
 
 | Issue | Solution |
 |-------|----------|
 | Not logged in | SSO screen may appear — take snapshot, find "Continue" button, click it. Full GitHub login can't be done headless — see [references/headless-relogin.md](references/headless-relogin.md) |
-| File path with special characters (e.g., Unicode narrow spaces from CleanShot) | Copy file to `/tmp/` with a simple name: `cp /path/CleanShot*keyword*.png /tmp/screenshot.png` |
+| File path with special characters (e.g., Unicode narrow spaces from CleanShot) | Copy file into the project's `tmp/` with a simple name: `cp /path/CleanShot*keyword*.png tmp/screenshot.png` |
 | File upload fails | Ensure the file path is absolute |
-| Textarea doesn't contain URLs yet | Wait 3–5 seconds after upload before running JS eval; retry once if needed |
+| Textarea doesn't contain URLs yet | Poll it (step 5) until the count matches the files uploaded, rather than waiting a fixed interval |
+| Attach button not in the snapshot | Its accessible name is "Add files" — searching for "Paste, drop, or click to add files" won't match |
 | Textarea selector not found | GitHub UI changes occasionally — use the multi-selector JS in Step 4 to find the current element |
 | Playwright MCP not registered | Approve the `playwright` server from the project `.mcp.json` (Claude Code prompts on project entry), then restart the session or `/mcp` → reconnect |
 | PR not found / 404 | Private repos return 404 for unauthenticated users — check login state |
@@ -182,5 +202,5 @@ Reload the page in the Playwright browser and take a screenshot to confirm the i
 
 - GitHub `user-attachments/assets/` URLs are **persistent** — images remain accessible even without submitting the comment
 - Editing the description directly in the browser UI is fragile due to GitHub UI structure changes — updating via `gh pr edit` is strongly preferred
-- Multiple images can be uploaded in a single session before extracting URLs
+- Every image goes up in a single `browser_file_upload` call; extract all the URLs before clearing
 - Playwright MCP preserves cookies/login state across calls within a session; across sessions the login comes from the shared `--storage-state` file (`mcp-auth.json`), loaded at startup

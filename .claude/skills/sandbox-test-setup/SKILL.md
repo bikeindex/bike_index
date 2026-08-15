@@ -14,9 +14,9 @@ description: >-
   compile the pinned Ruby (~2 min).
   **(C) Claude Code's Linux web sandbox** (`/home/user/bike_index`) —
   Ruby must be built from GitHub source (~8–10 min, `cache.ruby-lang.org`
-  firewalled); also postgres/redis, tailwind build, Chrome-matching
-  ChromeDriver, and a local jsdelivr proxy for `:js, type: :system`
-  specs. It's also the one environment where Claude starts `bin/dev`
+  firewalled); also postgres/redis, tailwind build, a Chromium the
+  Playwright driver can launch, and a local jsdelivr proxy for
+  `:js, type: :system` specs. It's also the one environment where Claude starts `bin/dev`
   itself rather than asking — nobody else owns that container.
   Trigger whenever a session runs RSpec/bundle/`bin/lint`, needs a
   running dev server, or
@@ -24,7 +24,7 @@ description: >-
   `Bundler::RubyVersionMismatch` /
   `Could not find 'bundler' (4.0.0.beta2)` /
   `command not found: rspec` / `tailwind.css is not present` /
-  chromedriver version-mismatch.
+  a Playwright browser-not-found or build-number mismatch.
 ---
 
 # Running Ruby + RSpec for Bike Index
@@ -209,13 +209,12 @@ cd /home/user/bike_index
 
 ## Toolchain on PATH
 
-The Playwright Chromium directory has a build number that changes
-between sandbox images, so glob it instead of hardcoding. `service`
-lives only on `/usr/sbin`.
+`service` lives only on `/usr/sbin`. The browser doesn't belong on `PATH` —
+Playwright launches it by path, so it wants `PLAYWRIGHT_BROWSERS_PATH`
+instead (see the system-spec section).
 
 ```bash
-CHROME_DIR=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux | sort -V | tail -1)
-export PATH="/opt/ruby-4.0.6/x64/bin:$CHROME_DIR:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
+export PATH="/opt/ruby-4.0.6/x64/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
 export LD_LIBRARY_PATH="/opt/ruby-4.0.6/x64/lib:$LD_LIBRARY_PATH"
 bundle install
 ```
@@ -371,28 +370,34 @@ bundle exec rspec spec/models spec/requests spec/jobs
 
 Two extra hurdles in the sandbox:
 
-### 1. Chrome + matching ChromeDriver
+### 1. A Chromium the Playwright driver can launch
 
-- Chrome binary lives at `/opt/pw-browsers/chromium-*/chrome-linux/chrome`
-  — the `chromium-NNNN` directory has a Playwright build number that
-  changes between sandbox images, so glob it.
-- `/opt/node22/bin/chromedriver` is too new (it tracks current stable;
-  Chrome here is whatever Playwright bundled). Pull the matching driver
-  from Google's CfT bucket — `storage.googleapis.com` is allowed:
+**There is no chromedriver and no Selenium in this repo.** `:js` specs run
+through `capybara-playwright-driver` (`spec/support/capybara.rb`), which
+drives the `playwright` npm package pinned in `package.json` — so
+`bundle install` isn't enough, `npm install` has to have run too, and
+anything that reaches for a CfT chromedriver download is solving a problem
+this repo doesn't have.
+
+- The browser is whichever Chromium that npm package finds. The image ships
+  builds under `/opt/pw-browsers/chromium-*`, so point Playwright there
+  rather than letting it look in `~/.cache/ms-playwright`:
   ```bash
-  CHROME_DIR=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux | sort -V | tail -1)
-  CHROME_VER=$("$CHROME_DIR/chrome" --version | grep -oE "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+")
-  curl -sfL "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VER}/linux64/chromedriver-linux64.zip" \
-    -o /tmp/chromedriver.zip
-  unzip -o -q /tmp/chromedriver.zip -d /tmp
-  cp /tmp/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver
+  export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
   ```
-- Capybara's default `:selenium_chrome_headless` doesn't pass
-  `--no-sandbox` or a unique `--user-data-dir`, both required when
-  Chrome runs as root in a container. `spec/support/local_chrome.rb`
-  re-registers the driver with the right flags, gated on
-  `LOCAL_CHROME_OVERRIDE=1`. Just set that env var when running system
-  specs.
+- The pinned Playwright wants a specific build number and the image may
+  ship a different one. That mismatch, and the symlink that resolves it,
+  are the same ones the MCP section above documents — reuse those, the
+  error names the path it wanted.
+- `spec/support/local_chrome.rb` re-registers the `:playwright` driver with
+  the flags Chromium needs as root in a container (`--no-sandbox`,
+  `--disable-dev-shm-usage`) plus the jsdelivr host-resolver rule below,
+  gated on `LOCAL_CHROME_OVERRIDE=1`. Set that env var when running system
+  specs; the default registration in `spec/support/capybara.rb` passes none
+  of them.
+
+The two browser-location bullets are reasoned from the driver setup rather
+than run in the web sandbox — expect to iterate on the build number.
 
 ### 2. `cdn.jsdelivr.net` is firewalled
 
@@ -443,13 +448,14 @@ Assumes the pinned Ruby is already built (paths below use 4.0.6 — swap for
 the current pin). Combines the steps above:
 
 ```bash
-CHROME_DIR=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux | sort -V | tail -1)
-export PATH="/opt/ruby-4.0.6/x64/bin:$CHROME_DIR:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
+export PATH="/opt/ruby-4.0.6/x64/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin"
 export LD_LIBRARY_PATH="/opt/ruby-4.0.6/x64/lib:$LD_LIBRARY_PATH"
+export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
 service postgresql start && service redis-server start
 apt-get install -y libvips42   # ruby-vips loads at boot; without it every rails/rspec run dies
 cd /home/user/bike_index
 bundle install
+npm install                    # the :js driver is the playwright npm package, not chromedriver
 eval "$(ruby bin/env --export)"
 export RAILS_ENV=test CI=1
 bundle exec rails db:migrate db:test:prepare
