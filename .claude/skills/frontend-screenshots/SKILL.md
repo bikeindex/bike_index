@@ -14,14 +14,14 @@ description: >-
   **Also read the filename rule here before any
   `mcp__playwright__browser_take_screenshot` call**, including a one-off
   capture of some other site — it's what keeps PNGs out of the working tree.
-  Inputs: `(url-path, page-slug)` pairs, optionally with per-URL interaction
-  steps. Output: local PNG paths.
 allowed-tools: Bash, Read, ToolSearch, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_evaluate, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot, mcp__playwright__browser_wait_for, mcp__playwright__browser_console_messages, mcp__playwright__browser_click, mcp__playwright__browser_type, mcp__playwright__browser_press_key, mcp__playwright__browser_hover, mcp__playwright__browser_close
 ---
 
 # Frontend screenshots
 
-Drive Playwright MCP to capture viewport screenshots of pages served by `bin/dev`.
+Drive Playwright MCP to capture screenshots of pages served by `bin/dev`. Callers
+pass `(url-path, page-slug)` pairs, optionally with per-URL interaction steps, and
+get back local PNG paths.
 
 ## Output filenames (load-bearing — callers parse these)
 
