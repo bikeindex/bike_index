@@ -13,7 +13,7 @@ description: >-
   screenshot its ViewComponent/Lookbook preview URL instead of a full page.
   Inputs: `(url-path, page-slug)` pairs, optionally with per-URL interaction
   steps. Output: local PNG paths.
-allowed-tools: Bash, Read
+allowed-tools: Bash, Read, ToolSearch, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_evaluate, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot, mcp__playwright__browser_wait_for, mcp__playwright__browser_console_messages, mcp__playwright__browser_click, mcp__playwright__browser_type, mcp__playwright__browser_press_key, mcp__playwright__browser_hover, mcp__playwright__browser_close
 ---
 
 # Frontend screenshots
@@ -32,10 +32,10 @@ Drive Playwright MCP to capture viewport screenshots of pages served by `bin/dev
 
 ## Sign in (with the PII gate)
 
-Pick the user the caller specified, or default to `user@bikeindex.org` (lowest privilege; most non-org-affiliated pages render for them). All seeded users use password `pleaseplease12`:
+Pick the user the caller specified, or default to `user@bikeindex.org` (lowest privilege; most non-org-affiliated pages render for them). All seeded users use password `pleaseplease12`, and `db/seeds/seed_test_users.rb` is the list of record:
 
 - `user@bikeindex.org` — no org memberships. Default. Use for personal pages (`/my_account`, `/bikes/new`) or to show how an org-less account sees a route.
-- `member@bikeindex.org` — `member` (not admin) of Brakebills. Use to capture the non-admin view of an org.
+- `member@brakebills.edu` — `member` (not admin) of Brakebills; the one seeded login that isn't `@bikeindex.org`. Use to capture the non-admin view of an org.
 - `admin@bikeindex.org` — `SuperuserAbility`; effectively admin of every org. Use when capturing admin-only menu items, `/admin/...` routes, or org pages where you want the fully-loaded sidebar.
 - `:anonymous` — skip sign-in entirely. Use for public pages where the signed-out rendering is the point.
 
