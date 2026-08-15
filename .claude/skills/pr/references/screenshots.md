@@ -1,16 +1,16 @@
 # Screenshot phase
 
-This is SKILL.md step 10 — read it after the PR exists (steps 1–9) when step 7 classified the diff as frontend. It needs the base branch (step 2) and the PR number (step 6 or 9); substitute both as literals, since shell state doesn't carry between commands.
+This is SKILL.md's **Screenshots** section — read it once the PR exists and **Publish** classified the diff as frontend. It needs the base branch from **Orient** and the PR number from **Publish**; substitute both as literals, since shell state doesn't carry between commands. The numbered steps below are this file's own.
 
 The flow: decide what to capture → capture the branch → upload → capture the same URLs on the base branch → post one `## Screenshots` PR comment. Screenshots go in a **comment**, never the PR body, so the human-written summary stays first and recaptures don't churn the description.
 
-**Preflight — the Claude Code web sandbox can't finish this phase.** Capture (steps 1, 2 and 4) works there, but the upload can't: the MCP browser rejects the egress proxy's CA, so github.com fails to load with `ERR_CERT_AUTHORITY_INVALID`, and even past that, uploading needs a logged-in GitHub session that can't be established headlessly. Don't start the capture there — tell the user step 10 needs a machine with a browser signed in to GitHub, and hand back the PR URL.
+**Preflight — the Claude Code web sandbox can't finish this phase.** Capture (steps 1, 2 and 4) works there, but the upload can't: the MCP browser rejects the egress proxy's CA, so github.com fails to load with `ERR_CERT_AUTHORITY_INVALID`, and even past that, uploading needs a logged-in GitHub session that can't be established headlessly. Don't start the capture there — tell the user this phase needs a machine with a browser signed in to GitHub, and hand back the PR URL.
 
 Substituting other evidence is fine when it's genuinely stronger — a rendered-HTML diff against the base says more about a pure move than a screenshot pair does. It goes in the one `## Screenshots` comment under that heading, per step 5, not in a comment of its own.
 
 ## 1. Decide whether screenshots are needed and which URLs to capture
 
-You're only here because the diff is frontend (SKILL.md step 7 gates on that). Decide scope by PR state:
+You're only here because the diff is frontend (SKILL.md's classifier gates on that). Decide scope by PR state:
 
 - New PR → capture every affected page.
 - Existing PR → continue only if the captures in the existing screenshots comment are stale: a commit since the last capture touched a page already screenshotted, or a new affected page now appears in the diff. Limit the capture to those pages. If nothing has moved, return the PR URL.
@@ -37,11 +37,11 @@ Collect the returned URLs, keyed by `(page-slug, viewport)`.
 
 ## 4. Capture and upload the same URLs on the base branch
 
-Capture the **base-branch** (SKILL.md step 2) version of every screenshot from step 2 so the section becomes a before/after comparison instead of "here's how it looks now." This is the default for every screenshot captured — if you got this far, the diff is frontend, and the comparison is informative (a same-screenshot pair documents visual parity for a refactor; a different pair documents the actual visual change).
+Capture the **base-branch** version (the base from SKILL.md's **Orient**) of every screenshot from step 2 so the section becomes a before/after comparison instead of "here's how it looks now." This is the default for every screenshot captured — if you got this far, the diff is frontend, and the comparison is informative (a same-screenshot pair documents visual parity for a refactor; a different pair documents the actual visual change).
 
 Skip per-page only when the URL didn't exist on the base (a brand-new route or page added in this PR) — there's nothing to compare to.
 
-Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs, passing the base as its `BASE_REF` (`origin/main` unless step 2 chose otherwise) — its "Cross-branch comparison" section does the rest, whether or not the base is `main`. Then re-invoke `github-upload-image-to-pr` for those PNGs (upload-only, exactly as in step 3 — collect URLs, do not post).
+Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs, passing the base as its `BASE_REF` (`origin/main` unless **Orient** chose otherwise) — its "Cross-branch comparison" section does the rest, whether or not the base is `main`. Then re-invoke `github-upload-image-to-pr` for those PNGs (upload-only, exactly as in step 3 — collect URLs, do not post).
 
 ## 5. Post the Screenshots section as a PR comment
 

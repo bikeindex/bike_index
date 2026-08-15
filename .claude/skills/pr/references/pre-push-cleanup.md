@@ -1,8 +1,8 @@
 # Pre-push cleanup
 
-SKILL.md steps 4 and 5 in full. Everything here runs against committed work and diffs `origin/main...HEAD` — substitute the base branch from step 2, since shell state doesn't carry between commands.
+The cleanup and migration halves of SKILL.md's **Prepare the branch**, in full. Everything here runs against committed work and diffs `origin/main...HEAD` — substitute the base branch from **Orient**, since shell state doesn't carry between commands.
 
-## Step 4 — simplify, lint, and conform to CLAUDE.md
+## Simplify, lint, and conform to CLAUDE.md
 
 Invoke the `/simplify` command to review the changed code for reuse, simplification, and efficiency cleanups and apply them. It's quality-only — it won't touch correctness — so it's safe to run unattended; if it reports nothing to clean up, move on.
 
@@ -45,9 +45,9 @@ git diff origin/main...HEAD -- '*.en.yml' 'config/locales/en.yml' | grep -in '^+
 
 Read each hit. Key names (`about_this_bike:`), the product name ("Bike Index"), and copy that really is bike-only are fine; a value saying "bike" about the registration is not. `Registrations::Show::CurrentAlerts::ClaimImpound` and `Registrations::Show::WrapperConsumer` are the pattern for fixing one, and `spec/components/registrations/show/current_alerts/claim_impound/component_spec.rb` shows how to cover it.
 
-Commit everything from this step before moving to step 5.
+Commit everything from this before re-dating migrations.
 
-## Step 5 — freshen stale migration timestamps
+## Freshen stale migration timestamps
 
 Every migration this branch adds must be dated within the past 2 days.
 

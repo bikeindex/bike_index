@@ -15,42 +15,54 @@ description: >-
 
 # Pull request workflow
 
-Steps 1–10 run in order. Step 11 always runs last.
+Five sections, run in this order:
 
-**Shell state does not persist between commands.** Each command below runs in its own shell, so a `BASE=main` in one is gone by the next. Substitute the real values into every command — write `origin/main`, not `origin/$BASE` — and carry the base branch and PR number in your head, not in the environment. Every `origin/main` below means "the base branch from step 2".
+1. **Orient** — the working tree, and the base branch
+2. **Prepare the branch** — merge, cleanup, migrations. Skipped for a description-only ask
+3. **Publish** — read the final diff, write the body, push, create or update
+4. **Screenshots** — frontend diffs only
+5. **What this run taught you** — always last, whatever else ran
+
+**Shell state does not persist between commands.** Each command below runs in its own shell, so a `BASE=main` in one is gone by the next. Substitute the real values into every command — write `origin/main`, not `origin/$BASE` — and carry the base branch and PR number in your head, not in the environment. Every `origin/main` below means "the base branch from **Orient**".
 
 Run the `gh` commands as written. The appendix at the bottom covers the one environment that has no `gh`.
 
-### 1. Check the working tree and what's being asked
+## Orient
 
-`git status` (no `-uall`). Every step below diffs `origin/main...HEAD`, which only sees **committed** work, and step 3's merge needs a clean tree — so the tree has to be clean before step 2.
+### Check the working tree
 
-- Uncommitted changes you made in this session: commit them now. Otherwise steps 4, 5 and 7 silently skip them and the PR body describes the wrong diff.
+`git status` (no `-uall`). Everything below diffs `origin/main...HEAD`, which only sees **committed** work, and the merge in **Prepare the branch** needs a clean tree — so the tree has to be clean before you go further.
+
+- Uncommitted changes you made in this session: commit them now. Otherwise the cleanup, the classifier and the diff you describe all silently skip them, and the PR body describes the wrong diff.
 - Uncommitted changes you didn't make: stop and ask. Don't sweep someone else's work into a commit.
 
-### 2. Determine the base branch
+### Determine the base branch
 
 The base is the branch the PR goes off of — `main` by default. The head is always the current branch (`HEAD`), so the branch that sets the base is a *different* one the user points at: "a PR off of `release-2`", "base this on `release-2`", "onto/target `release-2`", "stacked on `<branch>`", or a `--base <branch>` argument. Naming the branch you're already on only identifies the head — the base stays `main`. If it's genuinely unclear whether a named branch is meant as the base, ask rather than guess. Never silently retarget an explicitly-named base to `main`.
 
 When updating an **existing** PR, leave its base untouched — run `gh pr edit` without `--base`. Only retarget when the user explicitly asks.
 
-**Steps 3–5 ready the branch, and all three are skipped when the ask is only to reword an existing PR's description** — fixing the wording shouldn't rewrite code. Everything else (creating a PR, "get this ready", an update after new commits) runs them.
+## Prepare the branch
 
-### 3. Update from the base
+**Skipped in full when the ask is only to reword an existing PR's description** — fixing the wording shouldn't rewrite code. Everything else (creating a PR, "get this ready", an update after new commits) runs it.
+
+### Update from the base
 
 Bring the branch up to date so the PR reflects the current base and merges without surprises. Follow the `merge-conflicts` skill: `git fetch origin` then `git merge --no-edit origin/main`, merge (never rebase), keep the merge commit to just the merge, and resolve conflicts per that skill.
 
-This has to happen before step 4, which diffs against `origin/main`.
+This has to happen before the cleanup below, which diffs against `origin/main`.
 
-### 4. Simplify, lint, and conform to CLAUDE.md
+### Simplify, lint, and conform to CLAUDE.md
 
-`references/pre-push-cleanup.md` has this step in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `CLAUDE.md`, the required comment audit, and the cycle-type translation check. Commit everything it produces before step 5.
+`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `CLAUDE.md`, the required comment audit, and the cycle-type translation check. Commit everything it produces before re-dating migrations.
 
-### 5. Freshen stale migration timestamps
+### Freshen stale migration timestamps
 
 Migrations this branch adds have to be dated within the past 2 days, or the rollback/rename/re-migrate order in `references/pre-push-cleanup.md` re-dates them. Skip when the branch adds no migrations.
 
-### 6. Gather branch state
+## Publish
+
+### Gather branch state
 
 Run in parallel:
 
@@ -59,15 +71,15 @@ Run in parallel:
 - `git log origin/main..HEAD --oneline`
 - `gh pr view --json number,url,title,state`
 
-Diff against `origin/main`, not the local base branch — in a Conductor worktree the local base often lags the remote, which would inflate or stale the diff. If you skipped step 3, `git fetch origin` first. If the branch has no commits ahead of `origin/main`, stop and tell the user.
+Diff against `origin/main`, not the local base branch — in a Conductor worktree the local base often lags the remote, which would inflate or stale the diff. If you skipped **Prepare the branch**, `git fetch origin` first. If the branch has no commits ahead of `origin/main`, stop and tell the user.
 
-`gh pr view` exits non-zero with "no pull requests found" when the branch has none — that's the answer to step 9's question, not a broken command, and it's the normal case on a first run.
+`gh pr view` exits non-zero with "no pull requests found" when the branch has none — that's the answer to the create-or-update question below, not a broken command, and it's the normal case on a first run.
 
-`gh pr view` returns MERGED and CLOSED PRs too. **Only a PR whose `state` is `OPEN` counts as existing** — for a merged or closed one, create a new PR in step 9 rather than editing it. Note the number for steps 9 and 10.
+`gh pr view` returns MERGED and CLOSED PRs too. **Only a PR whose `state` is `OPEN` counts as existing** — for a merged or closed one, create a new PR rather than editing it. Note the number; the push and **Screenshots** both need it.
 
 No `bin/env` eval is needed here — it's only relevant to the screenshot phase, and `frontend-screenshots` runs its own in preflight. Backend-only PRs never touch it.
 
-### 7. Classify the diff
+### Classify the diff
 
 The diff is frontend if a changed path matches one of these **and** renders a page a reviewer could look at:
 
@@ -80,9 +92,9 @@ The diff is frontend if a changed path matches one of these **and** renders a pa
 
 Excluded despite matching: mailer views (`app/views/*_mailer/**`, `app/views/user_emails/**`), API and JSON views (`app/views/api/**`, `*.json*`, `*.jbuilder`), and build config (`app/assets/config/manifest.js`, `esbuild.config.js`). A diff that only changes comments or non-rendering config isn't frontend either.
 
-Record this as frontend true/false for step 10.
+Record this as frontend true/false — it's what **Screenshots** gates on.
 
-### 8. Write the summary body
+### Write the summary body
 
 Write the body to a temp file. Read the last few merged PRs first — `gh pr list --state merged --limit 5 --json title,body` — they're the tone to match. The house shape is a short intro paragraph saying what was broken or what this is, then 2–4 bullets each opening with a bolded clause. Title under ~70 chars.
 
@@ -99,26 +111,26 @@ Rules:
 
 If a bullet is turning into an essay, compress it to one sentence naming the *kind* of change.
 
-### 9. Push and create or update the PR
+### Push and create or update the PR
 
 ```bash
 git push -u origin HEAD
 ```
 
-Don't report the local branch name differing from the name in the invocation when the branch has no upstream — pushing `HEAD` creates a matching remote, so it's benign. Only flag a mismatch when the local branch already tracks a differently-named upstream. If the push is rejected as non-fast-forward, go back to step 3.
+Don't report the local branch name differing from the name in the invocation when the branch has no upstream — pushing `HEAD` creates a matching remote, so it's benign. Only flag a mismatch when the local branch already tracks a differently-named upstream. If the push is rejected as non-fast-forward, go back to **Prepare the branch**.
 
-- **Open PR from step 6**: `gh pr edit <number> --title "..." --body-file <tmp-body-file>`. Refresh the title to match the current diff (that's what "update pr" expects) unless the user gave it a deliberate custom title — if unsure, keep the title and update only the body.
+- **Open PR found above**: `gh pr edit <number> --title "..." --body-file <tmp-body-file>`. Refresh the title to match the current diff (that's what "update pr" expects) unless the user gave it a deliberate custom title — if unsure, keep the title and update only the body.
 
   **Read the current body before you replace it.** A human may have edited it since your last run — added a caveat, a reviewer note, a deploy instruction. Anything you can't account for as your own writing gets carried into the new body, or asked about. Don't overwrite it silently.
-- **Otherwise**: `gh pr create --draft --base main --title "..." --body-file <tmp-body-file>`. Draft by default; only skip `--draft` if the user asks for ready-for-review. Note the new number for step 10.
+- **Otherwise**: `gh pr create --draft --base main --title "..." --body-file <tmp-body-file>`. Draft by default; only skip `--draft` if the user asks for ready-for-review. Note the new number for **Screenshots**.
 
 Always pass the body via `--body-file`, not inline `--body`, to preserve formatting.
 
-### 10. Screenshots (frontend diffs only)
+## Screenshots
 
-If step 7 said not frontend, skip this step. Otherwise read `references/screenshots.md` and follow it to capture before/after screenshots and post them as a PR comment. Screenshot tooling never blocks the PR — if it fails, report the failure and carry on to step 11.
+Frontend diffs only — if the classifier said not frontend, skip this section. Otherwise read `references/screenshots.md` and follow it to capture before/after screenshots and post them as a PR comment. Screenshot tooling never blocks the PR — if it fails, report the failure and carry on to **What this run taught you**.
 
-### 11. Review what this run taught you
+## What this run taught you
 
 Last, before reporting the PR URL. Look back over the whole run and ask whether the repo's own instructions should change:
 
@@ -133,19 +145,19 @@ Then return the PR URL.
 
 ## Appendix: the sandbox with no `gh`
 
-Only the Claude Code web sandbox (`/home/user/bike_index`) lacks the GitHub CLI; everywhere else the steps above run as written, and you shouldn't check. If a `gh` command comes back "command not found", swap in the GitHub MCP equivalents — the rest of the workflow is unchanged, including `git push`.
+Only the Claude Code web sandbox (`/home/user/bike_index`) lacks the GitHub CLI; everywhere else the sections above run as written, and you shouldn't check. If a `gh` command comes back "command not found", swap in the GitHub MCP equivalents — the rest of the workflow is unchanged, including `git push`.
 
-| Step | `gh` | MCP |
+| Where | `gh` | MCP |
 | --- | --- | --- |
-| 6 | `gh pr view --json …,state` | `list_pull_requests`, `state: "open"`, `head: "bikeindex:<branch>"` |
-| 8 | `gh pr list --state merged` | `list_pull_requests`, `state: "closed"` |
-| 9 | `gh pr create --draft` | `create_pull_request`, `draft: true`, `head: "<branch>"` |
-| 9 | `gh pr edit <n> --body-file` | `update_pull_request` |
-| 10 | `gh pr comment` | `add_issue_comment`, `issue_number: <pr>` |
-| 10 | `gh api -X PATCH …/issues/comments/<id>` | check the registered tools before assuming there's none — see below |
+| Publish | `gh pr view --json …,state` | `list_pull_requests`, `state: "open"`, `head: "bikeindex:<branch>"` |
+| Publish | `gh pr list --state merged` | `list_pull_requests`, `state: "closed"` |
+| Publish | `gh pr create --draft` | `create_pull_request`, `draft: true`, `head: "<branch>"` |
+| Publish | `gh pr edit <n> --body-file` | `update_pull_request` |
+| Screenshots | `gh pr comment` | `add_issue_comment`, `issue_number: <pr>` |
+| Screenshots | `gh api -X PATCH …/issues/comments/<id>` | check the registered tools before assuming there's none — see below |
 
-Three traps in that column: `head` takes `owner:branch` when listing but a bare branch name when creating; the body is a string parameter, so `--body-file` has no equivalent; and `list_pull_requests` reports `merged: false` even for merged PRs (verified against #4122, which `pull_request_read` reports correctly) — which is why step 6's query asks for open PRs rather than filtering `all` on that field.
+Three traps in that column: `head` takes `owner:branch` when listing but a bare branch name when creating; the body is a string parameter, so `--body-file` has no equivalent; and `list_pull_requests` reports `merged: false` even for merged PRs (verified against #4122, which `pull_request_read` reports correctly) — which is why the branch-state query asks for open PRs rather than filtering `all` on that field.
 
 **Editing an existing comment: search the registered tools for one before concluding you can't.** An earlier version of this table asserted there was no equivalent and said to post a second comment instead; that is how PR #4126 ended up with three comments telling one story. If a search really turns up nothing, the fallback is to hand the updated text back for a run that has `gh` — not to post a comment beside the one that needed updating.
 
-Step 10 doesn't run here at all — see the preflight in `references/screenshots.md`.
+**Screenshots** doesn't run here at all — see the preflight in `references/screenshots.md`.
