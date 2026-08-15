@@ -29,10 +29,19 @@ module ApplicationHelper
     link_to(raw(link_text), link_path, html_options).html_safe
   end
 
+  def main_content_route
+    {controller_namespace:, controller_name:, action_name:,
+     force_landing_page_render: @force_landing_page_render}
+  end
+
+  # Organized lays out its own general alert, and takes over the body background
+  def main_content_organized?
+    PageBlock::MainContent::Wrapper::Component.kind(**main_content_route) == :organized
+  end
+
   def main_content_component
-    @main_content_component ||= PageBlock::MainContent::Wrapper::Component.new(
-      controller_namespace:, controller_name:, action_name:,
-      force_landing_page_render: @force_landing_page_render,
+    PageBlock::MainContent::Wrapper::Component.new(
+      **main_content_route,
       current_user:, current_organization:, passive_organization:, show_general_alert:,
       blog: @blog, related_blogs: @related_blogs, source: params[:source],
       bike: @bike, bike_og: @bike_og, og_email: @og_email,
@@ -51,7 +60,7 @@ module ApplicationHelper
       end
     elsif controller_name == "info" && action_name == "resources"
       "kelsey_landing-page-body"
-    elsif main_content_component.organized?
+    elsif main_content_organized?
       "organized-body"
     elsif controller_name == "registrations" && action_name == "show"
       "tw:bg-[#f7f6fb]"

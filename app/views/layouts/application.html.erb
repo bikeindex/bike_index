@@ -272,7 +272,7 @@
 
     <%# organized renders its own, inside the content column the menu doesn't cover %>
     <% general_alert = PageBlock::UserAlerts::Wrapper::Component.new(current_user:) if
-      show_general_alert && !main_content_component.organized? %>
+      show_general_alert && !main_content_organized? %>
 
     <% show_general_alert_here = general_alert&.render? %>
 

@@ -177,22 +177,6 @@ RSpec.describe PageBlock::MainContent::Wrapper::Component, type: :component do
     end
   end
 
-  describe "organized?" do
-    let(:instance) do
-      described_class.new(controller_namespace:, controller_name: "bikes", action_name: "index")
-    end
-    subject { instance.organized? }
-
-    context "organized namespace" do
-      let(:controller_namespace) { "organized" }
-      it { is_expected.to be_truthy }
-    end
-    context "no namespace" do
-      let(:controller_namespace) { nil }
-      it { is_expected.to be_falsey }
-    end
-  end
-
   describe "render" do
     let(:page) { "<p>the page</p>".html_safe }
     let(:result) { render_inline(described_class.new(**options)) { page } }

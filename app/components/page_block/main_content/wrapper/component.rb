@@ -57,12 +57,6 @@ module PageBlock
             force_landing_page_render:)
         end
 
-        # Organized renders the general alert itself, in the content column the menu
-        # doesn't cover
-        def organized?
-          @kind == :organized
-        end
-
         def call
           wrapper = wrapping_component
           return content if wrapper.nil?
