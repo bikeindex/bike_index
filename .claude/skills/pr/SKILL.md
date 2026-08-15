@@ -141,5 +141,9 @@ Only the Claude Code web sandbox (`/home/user/bike_index`) lacks the GitHub CLI;
 | 8 | `gh pr list --state merged` | `list_pull_requests`, `state: "closed"` |
 | 9 | `gh pr create --draft` | `create_pull_request`, `draft: true`, `head: "<branch>"` |
 | 9 | `gh pr edit <n> --body-file` | `update_pull_request` |
+| 10 | `gh pr comment` | `add_issue_comment`, `issue_number: <pr>` |
+| 10 | `gh api -X PATCH …/issues/comments/<id>` | **no equivalent** — post a new comment and say the old one is stale |
 
 Three traps in that column: `head` takes `owner:branch` when listing but a bare branch name when creating; the body is a string parameter, so `--body-file` has no equivalent; and `list_pull_requests` reports `merged: false` even for merged PRs (verified against #4122, which `pull_request_read` reports correctly) — which is why step 6's query asks for open PRs rather than filtering `all` on that field.
+
+Step 10 doesn't run here at all — see the preflight in `references/screenshots.md`.

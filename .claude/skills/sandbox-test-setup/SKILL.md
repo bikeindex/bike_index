@@ -332,6 +332,13 @@ honeybadger) fail to load and every page logs `ERR_TUNNEL_CONNECTION_FAILED` for
 plus Google Fonts / GTM / Facebook. **Those console errors are the sandbox, not the
 app** — read past them and treat an app-origin error as the signal.
 
+It also can't reach anything outside localhost: it doesn't trust the egress proxy's CA,
+so github.com fails with `ERR_CERT_AUTHORITY_INVALID` (`curl` is fine — it reads
+`/etc/ssl/certs`, Chromium reads its own NSS db, and `certutil` isn't installed). Local
+pages screenshot fine; `github-upload-image-to-pr` and anything else driving a remote
+site does not work here, and a logged-in GitHub session can't be established headlessly
+either.
+
 Two selector notes for driving pages here: a local `UI::Forms::Combobox` keeps all its
 options in the DOM and hides the non-matching ones, so `.hw-combobox__option` `.first()`
 resolves to a hidden option and the click times out — use

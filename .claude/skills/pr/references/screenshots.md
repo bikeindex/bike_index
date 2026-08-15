@@ -4,6 +4,8 @@ This is SKILL.md step 10 — read it after the PR exists (steps 1–9) when step
 
 The flow: decide what to capture → capture the branch → upload → capture the same URLs on the base branch → post one `## Screenshots` PR comment. Screenshots go in a **comment**, never the PR body, so the human-written summary stays first and recaptures don't churn the description.
 
+**Preflight — the Claude Code web sandbox can't finish this phase.** Capture (steps 1, 2 and 4) works there, but the upload can't: the MCP browser rejects the egress proxy's CA, so github.com fails to load with `ERR_CERT_AUTHORITY_INVALID`, and even past that, uploading needs a logged-in GitHub session that can't be established headlessly. Don't start the capture there — tell the user step 10 needs a machine with a browser signed in to GitHub, and hand back the PR URL.
+
 ## 1. Decide whether screenshots are needed and which URLs to capture
 
 You're only here because the diff is frontend (SKILL.md step 7 gates on that). Decide scope by PR state:
