@@ -18,7 +18,7 @@ Steps 1–10 run in order. Step 11 always runs last.
 
 **Shell state does not persist between commands.** Each command below runs in its own shell, so a `BASE=main` in one is gone by the next. Substitute the real values into every command — write `origin/main`, not `origin/$BASE` — and carry the base branch and PR number in your head, not in the environment. Every `origin/main` below means "the base branch from step 2".
 
-**No `gh` in the Claude Code web sandbox** (`/home/user/bike_index`). Check with `command -v gh`; if it's missing, every `gh` command below becomes its GitHub MCP equivalent — see the "No `gh` in the web sandbox" section of the `sandbox-test-setup` skill for the mapping.
+Run the `gh` commands as written. The appendix at the bottom covers the one environment that has no `gh`.
 
 ### 1. Check the working tree and what's being asked
 
@@ -65,8 +65,6 @@ Diff against `origin/main`, not the local base branch — in a Conductor worktre
 
 `gh pr view` returns MERGED and CLOSED PRs too. **Only a PR whose `state` is `OPEN` counts as existing** — for a merged or closed one, create a new PR in step 9 rather than editing it. Note the number for steps 9 and 10.
 
-Without `gh`, ask for open PRs only — `mcp__github__list_pull_requests` with `state: "open"` and `head: "bikeindex:<branch>"`. Don't list `all` and filter on the `merged` field: the list endpoint reports `merged: false` even for merged PRs (verified against #4122, which `pull_request_read` correctly reports as merged). `state: "open"` sidesteps it.
-
 No `bin/env` eval is needed here — it's only relevant to the screenshot phase, and `frontend-screenshots` runs its own in preflight. Backend-only PRs never touch it.
 
 ### 7. Classify the diff
@@ -86,7 +84,7 @@ Record this as frontend true/false for step 10.
 
 ### 8. Write the summary body
 
-Write the body to a temp file. Read the last few merged PRs first (`gh pr list --state merged --limit 5 --json title,body`; without `gh`, `mcp__github__list_pull_requests` with `state: "closed"`) — they're the tone to match. The house shape is a short intro paragraph saying what was broken or what this is, then 2–4 bullets each opening with a bolded clause. Title under ~70 chars.
+Write the body to a temp file. Read the last few merged PRs first — `gh pr list --state merged --limit 5 --json title,body` — they're the tone to match. The house shape is a short intro paragraph saying what was broken or what this is, then 2–4 bullets each opening with a bolded clause. Title under ~70 chars.
 
 Rules:
 
@@ -114,7 +112,7 @@ Don't report the local branch name differing from the name in the invocation whe
   **Read the current body before you replace it.** A human may have edited it since your last run — added a caveat, a reviewer note, a deploy instruction. Anything you can't account for as your own writing gets carried into the new body, or asked about. Don't overwrite it silently.
 - **Otherwise**: `gh pr create --draft --base main --title "..." --body-file <tmp-body-file>`. Draft by default; only skip `--draft` if the user asks for ready-for-review. Note the new number for step 10.
 
-Always pass the body via `--body-file`, not inline `--body`, to preserve formatting. `mcp__github__create_pull_request` takes the body as a string instead, so there's no file to pass — and its `head` is the bare branch name, unlike the `owner:branch` the step 6 list filter wants.
+Always pass the body via `--body-file`, not inline `--body`, to preserve formatting.
 
 ### 10. Screenshots (frontend diffs only)
 
@@ -132,3 +130,16 @@ Last, before reporting the PR URL. Look back over the whole run and ask whether 
 Most runs turn up nothing — say so and stop. When something does: if it's small and related to this PR, commit it onto the branch, push, and update the body if the change is worth a bullet. If it's larger or unrelated, tell the user what you'd change and where, and let them decide.
 
 Then return the PR URL.
+
+## Appendix: the sandbox with no `gh`
+
+Only the Claude Code web sandbox (`/home/user/bike_index`) lacks the GitHub CLI; everywhere else the steps above run as written, and you shouldn't check. If a `gh` command comes back "command not found", swap in the GitHub MCP equivalents — the rest of the workflow is unchanged, including `git push`.
+
+| Step | `gh` | MCP |
+| --- | --- | --- |
+| 6 | `gh pr view --json …,state` | `list_pull_requests`, `state: "open"`, `head: "bikeindex:<branch>"` |
+| 8 | `gh pr list --state merged` | `list_pull_requests`, `state: "closed"` |
+| 9 | `gh pr create --draft` | `create_pull_request`, `draft: true`, `head: "<branch>"` |
+| 9 | `gh pr edit <n> --body-file` | `update_pull_request` |
+
+Three traps in that column: `head` takes `owner:branch` when listing but a bare branch name when creating; the body is a string parameter, so `--body-file` has no equivalent; and `list_pull_requests` reports `merged: false` even for merged PRs (verified against #4122, which `pull_request_read` reports correctly) — which is why step 6's query asks for open PRs rather than filtering `all` on that field.
