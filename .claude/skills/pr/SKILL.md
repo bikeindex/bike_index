@@ -126,6 +126,12 @@ Don't report the local branch name differing from the name in the invocation whe
 
 Always pass the body via `--body-file`, not inline `--body`, to preserve formatting.
 
+### What goes in a comment
+
+This workflow posts **one kind of comment — the `## Screenshots` one — and at most one per PR**, edited in place on later runs. Everything else you have to say goes in the body when a reviewer needs it, and in your reply to the user otherwise. Findings, caveats, evidence you gathered, what you decided not to fix: none of those earn a comment of their own, however well they'd read as one. Don't invent a comment type because you have something to say.
+
+The one that talks itself into existence is the "still accurate" update — a later push makes you wonder whether an earlier comment went stale, so you post that it hasn't. Re-run whatever produced it and edit that comment, or say nothing. Never reason your way to "it still holds" in place of re-running; whether a claim is still true is something to tell the user in chat.
+
 ## Screenshots
 
 Two gates, either of which skips the section outright:
