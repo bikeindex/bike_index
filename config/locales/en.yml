@@ -440,7 +440,6 @@ en:
         invoices: Invoices
         is_paid: Is paid
         kind: Kind
-        landing_html: Landing html
         locations: Locations
         lock_show_on_map: Lock show on map
         mail_snippets: Mail snippets

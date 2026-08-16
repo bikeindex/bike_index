@@ -131,12 +131,15 @@ RSpec.describe "Bike search", :js, type: :system do
     click_first_bike_and_go_back
   end
 
-  # flaky: 4 (4 attempts): every Turbo navigation here (form submit, go_back,
-  # go_forward) reloads the eager results frame, and under CI load that fetch can
-  # intermittently outlast the 10s wait - or a programmatic go_forward to a
-  # turbo-advance history entry can no-op in WebDriver (the URL stays on the back
-  # entry). Both are harness artifacts a real browser doesn't hit, and they can
-  # recur across attempts on a busy runner, so allow more retries than the default.
+  # flaky: 4 (4 attempts), and a retry rather than a fix: the click at the end lands
+  # on about:blank (a nil current_path, and a blank Capybara screenshot in the CI
+  # artifacts). That click is the example's only real browser navigation - the bike
+  # link opts out of Turbo with data-turbo="false" - so what fails is the browser
+  # abandoning a cross-document navigation started off the tail of a traversal, not
+  # a slow frame fetch or a go_forward that no-ops, both of which leave a real URL.
+  # Ruled out too: the frame being back in flight under the click, since turbo:load
+  # - so reloadFrameIfUrlStale - has already fired by the time the settle in
+  # click_first_bike_and_go_back passes. Unreproduced under local CPU throttling.
   it "keeps results, counts, and form in sync across search and back/forward", flaky: 4 do
     # Search Red, then Blue, then retrace with the browser's back and forward
     # buttons. Each step must leave the frame, form, and kind counts matching the

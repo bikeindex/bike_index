@@ -21,14 +21,13 @@ module Admin
       def update
         if edited_record.update(permitted_parameters)
           flash[:success] = "Layout Saved!"
-          flash[:error] = edited_record.enabled_mismatch_error if landing_page?
           redirect_to edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id])
         else
           render action: :edit, id: params[:id]
         end
       end
 
-      helper_method :layout_kind, :suggested_button_hover
+      helper_method :layout_kind, :suggested_button_hover, :landing_page_url
 
       protected
 
@@ -37,6 +36,13 @@ module Admin
         return @organization unless landing_page?
 
         @landing_page ||= @organization.organization_landing_page || @organization.build_organization_landing_page
+      end
+
+      # Only routed at boot from LandingPages::ORGANIZATIONS; outside it, the members' preview is all there is
+      def landing_page_url
+        return "#{root_url}#{@organization.to_param}" if @landing_page.env_enabled?
+
+        organization_landing_url(organization_id: @organization.to_param)
       end
 
       # Step 1 derives a hover shade from the button color, but a page that names its own
@@ -49,7 +55,7 @@ module Admin
       end
 
       def permitted_parameters
-        return params.require(:organization_landing_page).permit(:body) if landing_page?
+        return params.require(:organization_landing_page).permit(:body, :enabled) if landing_page?
 
         params.require(:organization).permit(mail_snippets_attributes: [:body, :is_enabled, :id])
       end
