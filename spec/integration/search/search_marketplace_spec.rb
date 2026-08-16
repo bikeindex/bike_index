@@ -115,6 +115,26 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     JS
   end
 
+  # turbo:load fires whenever a page's Turbo visit finishes, which on a loaded runner
+  # is after the rider has searched. Force that ordering rather than wait for CI to
+  # produce it: between a frame navigation's response and Turbo advancing the address
+  # bar to it, the frame leads the URL, and search--form must not reconcile it back.
+  def dispatch_turbo_load_once_frame_leads_url
+    page.execute_script(<<~JS)
+      const frame = document.getElementById("marketplace_results_frame")
+      const observer = new MutationObserver(() => {
+        const src = frame.getAttribute("src")
+        if (!src) return
+        const frameUrl = new URL(src, window.location.origin)
+        if (frameUrl.pathname !== window.location.pathname || frameUrl.search === window.location.search) return
+
+        observer.disconnect()
+        document.dispatchEvent(new CustomEvent("turbo:load", {detail: {timing: {}}}))
+      })
+      observer.observe(frame, {attributeFilter: ["src"]})
+    JS
+  end
+
   it "fills the kind counts on load, and keeps a search made before the results arrive" do
     release_initial_results_load = hold_initial_results_load
     visit_marketplace_via_nav
@@ -130,6 +150,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # search_no_js is the first thing its connect does.
     expect(page).to have_no_css("#search_no_js", visible: :all, wait: 10)
 
+    dispatch_turbo_load_once_frame_leads_url
     search_primary_activity("Mountain biking")
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
 
