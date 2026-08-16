@@ -41,30 +41,11 @@ RSpec.describe PageBlock::Navbar::PrimaryMenu::Component, type: :component do
   end
 
   context "with a current_user" do
-    let(:current_user) { FactoryBot.create(:user_confirmed, email: "party@bikeindex.org") }
+    let(:current_user) { FactoryBot.create(:user_confirmed) }
 
-    it "renders the settings submenu rather than the sign up links" do
-      expect(component).to have_css "#setting_submenu"
-      expect(component.css(".primary-submenu a").map { |link| link.text.strip })
-        .to eq(["Your registrations", "Register a new bike", "party@bikeindex.org settings", "Logout"])
-      expect(component).to have_css "#navUserSettingLink[data-email='party@bikeindex.org']"
-    end
-
-    context "with a marketplace message" do
-      let!(:marketplace_message) { FactoryBot.create(:marketplace_message, sender: current_user) }
-
-      it "adds the marketplace messages link" do
-        expect(component).to have_css ".primary-submenu a[href='/my_account/messages']", text: "Marketplace messages"
-      end
-    end
-
-    context "with an organization role" do
-      let(:organization) { FactoryBot.create(:organization, name: "Sweet Shop") }
-      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
-
-      it "links to the organization from the settings submenu" do
-        expect(component).to have_css ".primary-submenu a", text: "View Sweet Shop"
-      end
+    it "renders the settings menu rather than the sign up links" do
+      expect(component).to have_css "li.primary-nav-item #setting_submenu"
+      expect(menu_links).to_not include("Sign up", "log in")
     end
   end
 end

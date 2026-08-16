@@ -5647,17 +5647,18 @@ es:
           donate: Donar
           help: Ayuda
           log_in: conectarse
+          stolen_bike: "¿Bicicleta robada?"
+          search: Buscar
+          marketplace: Mercado
+          sign_up: Inscríbete
+        settings_menu:
           logout: Cierre de sesión
           register_a_new_bike: Registre su bicicleta
-          stolen_bike: "¿Bicicleta robada?"
           user_settings: "%{user_email} ajustes"
           view_org: Ver %{org_name}
-          search: Buscar
           marketplace_messages: Mensajes del mercado
           your_registrations: Sus registros
-          marketplace: Mercado
           settings_menu: Ajustes
-          sign_up: Inscríbete
         wrapper:
           sign_up: Inscríbete
           the_nonprofit_bike_registry: el registro de bicicletas sin ánimo de lucro

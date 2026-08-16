@@ -5395,17 +5395,18 @@ nb:
           donate: Donere
           help: Hjelp
           log_in: Logg Inn
+          stolen_bike: Stjålet sykkel?
+          search: Søk
+          marketplace: Markedsplass
+          sign_up: Registrer deg
+        settings_menu:
           logout: Logg ut
           register_a_new_bike: Registrer en ny sykkel
-          stolen_bike: Stjålet sykkel?
           user_settings: "%{user_email}-innstillinger"
           view_org: Se %{org_name}
-          search: Søk
           marketplace_messages: Markedsplassmeldinger
           your_registrations: Dine registreringer
-          marketplace: Markedsplass
           settings_menu: Innstillinger
-          sign_up: Registrer deg
         wrapper:
           sign_up: Registrer deg
           the_nonprofit_bike_registry: det ideelle sykkelregisteret

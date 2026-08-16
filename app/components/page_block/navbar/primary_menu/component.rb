@@ -48,50 +48,9 @@ module PageBlock
             {label: translation(".log_in"), path: new_session_url}]
         end
 
-        def settings_items
-          [*organization_items,
-            {label: translation(".your_registrations"), path: my_account_path},
-            marketplace_messages_item,
-            {label: translation(".register_a_new_bike"), path: choose_registration_path},
-            {label: translation(".user_settings", user_email: @current_user_or_unconfirmed_user.email),
-             path: edit_my_account_path,
-             html_options: {id: "navUserSettingLink", data: {email: @current_user_or_unconfirmed_user.email}}},
-            {type: :divider},
-            {label: translation(".logout"), path: goodbye_path, active: false}].compact
-        end
-
-        def organization_items
-          organizations = @current_user_or_unconfirmed_user.organization_roles.includes(:organization)
-            .filter_map(&:organization)
-          return [] if organizations.none?
-
-          organizations.map { |organization|
-            {label: translation(".view_org", org_name: organization.name),
-             path: organization_root_path(organization_id: organization.to_param), active: false}
-          } + [{type: :divider}]
-        end
-
-        # .any_for_user? caches
-        def marketplace_messages_item
-          return unless MarketplaceMessage.any_for_user?(@current_user)
-
-          {label: translation(".marketplace_messages"), path: my_account_messages_path}
-        end
-
-        # nil computes active from the path, :match_controller from the controller alone, false
-        # pins it inactive -- swapping nil for false fails silently
-        def menu_link(item)
-          options = {class: link_class(item), **item.fetch(:html_options, {})}
-          case item[:active]
-          when nil, :match_controller
-            helpers.active_link(item[:label], item[:path], match_controller: item[:active] == :match_controller, **options)
-          else
-            link_to(item[:label], item[:path], **options)
-          end
-        end
-
-        def link_class(item)
-          ["nav-link", item[:link_class], ("active" if item[:active] == true)].compact.join(" ")
+        def settings_menu
+          PageBlock::Navbar::SettingsMenu::Component.new(current_user: @current_user,
+            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user)
         end
 
         def search_active?(controller_name)

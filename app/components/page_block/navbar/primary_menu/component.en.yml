@@ -8,14 +8,7 @@ en:
           donate: Donate
           help: Help
           log_in: log in
-          logout: Logout
           marketplace: Marketplace
-          marketplace_messages: Marketplace messages
-          register_a_new_bike: Register a new bike
           search: Search
-          settings_menu: Settings
           sign_up: Sign up
           stolen_bike: Stolen bike?
-          user_settings: "%{user_email} settings"
-          view_org: View %{org_name}
-          your_registrations: Your registrations
