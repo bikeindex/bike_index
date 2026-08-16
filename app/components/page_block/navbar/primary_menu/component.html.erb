@@ -1,0 +1,14 @@
+<ul id="primary-main-menu" class="primary-main-menu tw:m-0 tw:list-none">
+  <% menu_items.each do |item| %>
+    <% case item[:type] %>
+    <% when :divider %>
+      <li class="divider-nav-item <%= item[:item_class] %>" aria-hidden="true"></li>
+    <% when :settings %>
+      <li class="primary-nav-item"><%= render settings_menu %></li>
+    <% else %>
+      <li class="primary-nav-item <%= item[:item_class] %>">
+        <%= render PageBlock::Navbar::MenuLink::Component.new(**item.except(:item_class)) %>
+      </li>
+    <% end %>
+  <% end %>
+</ul>

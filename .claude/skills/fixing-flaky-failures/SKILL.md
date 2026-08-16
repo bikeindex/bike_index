@@ -153,6 +153,20 @@ end
 A rate that leaves the spec green over ~20 runs is evidence, not proof: it stretches
 main-thread work, not the network or a parallel shard's I/O.
 
+Which is why it can't reach a race about *when a response arrives*. The common one here
+is a lazily loaded Stimulus controller, since the module is a fetch — hold it on the
+route and the late connect is deterministic, no loop:
+
+```ruby
+playwright_page.route(%r{serial_controller}, ->(route, request) { held << request.url; sleep 1; route.continue })
+```
+
+Registering a route disables the http cache, so the reload asks again. Assert on what
+the handler held: a route that stops matching (a moved asset path) otherwise leaves the
+example green on a page that held nothing back. Measured against `register--serial`'s
+connect-time reconcile, throttling at 6, 12 and 25 left it green over 30+ runs; the
+route hold failed it every time.
+
 Caveat when measuring locally: after a heavy record-creating run (seeding,
 probe scripts, a big suite), `:js` specs fail spuriously for a while. Re-measure
 in a quiet environment before concluding a spec is flaky.
@@ -194,6 +208,14 @@ combobox returns. The fix is `Autocomplete::Loader.clear_redis` in `before`,
 not a retry. Browser history is the same shape: `reset_browser_history`
 (`spec/support/system_spec_helpers.rb`) drops entries earlier examples left, so
 `go_back`/`go_forward` walk this example's own stack.
+
+**Interacting with a page whose controllers haven't connected.** `application.js`
+lazy loads every Stimulus controller, so a freshly rendered page answers to none of
+them until each module lands: a combobox filters nothing, a one-shot event (like
+form-persist's restore) reaches no listener, and a `fill_in`'s text can end up in
+whatever autofocus left focused. Waiting on any one controller proves nothing about
+the rest — `wait_for_stimulus` (`spec/support/system_spec_helpers.rb`) waits for
+every identifier the page names.
 
 **Clicking something that is being re-rendered.** The dominant `:js` flake.
 A Turbo frame that reloads (an eager frame, `reloadFrameIfUrlStale` on

@@ -19,8 +19,8 @@ export default class extends Controller {
   static values = { key: String }
 
   connect () {
-    // Deferred so sibling controllers have connected before the restore and
-    // its form-persist:restored window event, whatever the connect order.
+    // Deferred so siblings connecting alongside this one hear the restore. A later one
+    // won't, whatever the delay -- it reconciles in its own connect.
     this.restoreTimer = setTimeout(() => this.restore(), 0)
     // Flush a pending debounced write before the page unloads, so quickly
     // typing then reloading doesn't drop the last keystrokes.
