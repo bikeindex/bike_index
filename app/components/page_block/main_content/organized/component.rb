@@ -18,21 +18,6 @@ module PageBlock
           @controller_name = controller_name
           @action_name = action_name
         end
-
-        private
-
-        def menu_items
-          Org::MenuItems::Component.new(organization: @current_organization, current_user: @current_user,
-            controller_namespace: @controller_namespace, controller_name: @controller_name,
-            action_name: @action_name,
-            unregistered_parking_notification: @unregistered_parking_notification)
-        end
-
-        # The dashboard itself shows the link, even for an organization without the feature
-        def show_overview_dashboard?
-          @current_organization.overview_dashboard? ||
-            (@controller_name == "dashboard" && @action_name == "index")
-        end
       end
     end
   end

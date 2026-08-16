@@ -114,8 +114,11 @@ export default class extends Controller {
     this.collapseToggleTarget.setAttribute('aria-label', label)
     this.collapseToggleTarget.setAttribute('title', label)
 
+    // Only ever expanded-or-collapsed: the mobile case is the stylesheet's, which
+    // zeroes the margin below the breakpoint. Reporting 0px here instead would put
+    // the content under the sidebar for as long as this and the media query disagree
     document.documentElement.style.setProperty('--org-sidebar-width',
-      this.mobile ? '0px' : (collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH))
+      collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH)
   }
 
   get mobile () {

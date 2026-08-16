@@ -15,9 +15,9 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # Ensure gear types exist so bike show page doesn't write during readonly mode
     RearGearType.fixed
     FrontGearType.fixed
-    # Pin below the md breakpoint (768px) so the sidebar is hidden and the
-    # mobile org dropdown is the only menu path. Chrome's --window-size flag
-    # is unreliable in headless mode, so resize explicitly.
+    # Below the sidebar's 760px breakpoint, where it's an overlay behind the top
+    # bar's hamburgler. Chrome's --window-size flag is unreliable in headless
+    # mode, so resize explicitly.
     page.current_window.resize_to(720, 2000)
     # The two-step login, the flash and the org submenu all animate, and a click
     # waits for its target to settle before it lands. That wait is Capybara's,
@@ -29,8 +29,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
       fill_in "Password", with: "testthisthing7$"
       click_button "Log in"
       dismiss_flash_messages
-      find("#passive_organization_submenu").click
-      within(".current-organization-submenu") { click_link "#{organization.short_name} Bikes" }
+      # 720px wide, so the sidebar is an overlay behind the top bar's hamburgler.
+      # Its registrations group is the one open on a page no group matches.
+      find("#org_sidebar_hamburgler").click
+      within("#org_sidebar_nav") { click_link "Search Registrations" }
       expect(page).to have_current_path(/\A#{Regexp.escape(bikes_path)}(\?|\z)/)
     end
   end
@@ -382,8 +384,8 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     end
 
     it "searches multiple serials, shows results, and caches rows by updated_at" do
-      find("#passive_organization_submenu").click
-      within(".current-organization-submenu") { click_link "Multi search" }
+      find("#org_sidebar_hamburgler").click
+      within("#org_sidebar_nav") { click_link "Multi search" }
       expect(page).to have_current_path(/\A#{Regexp.escape(multi_serial_path)}(\?|\z)/, wait: 10)
 
       expect(page).to have_content(/multi search/i)

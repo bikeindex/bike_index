@@ -1,7 +1,5 @@
 class BikeIndex.Organized extends BikeIndex
   constructor: ->
-    @setOrganizedWrapHeight()
-
     # Only on the edit organization page, but no real reason to create another
     # coffeescript file
     $('.avatar-upload-field').change (event) ->
@@ -14,7 +12,3 @@ class BikeIndex.Organized extends BikeIndex
        window.setTimeout (->
         $(".stickers-form").submit()
        ), 250
-
-  setOrganizedWrapHeight: ->
-    min_px = $('.organized-menu-wrapper').outerHeight()
-    $('.organized-wrap').css('min-height', "#{min_px + 24}px")

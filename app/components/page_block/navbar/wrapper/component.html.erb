@@ -11,8 +11,6 @@
           <%= translation(".the_nonprofit_bike_registry") %>
         <% end %>
 
-        <%= render organization_menu %>
-
         <% if @current_user.blank? %>
           <div class="center-navbar-signup-link-container">
             <%= link_to translation(".sign_up"), new_user_url, class: "center-navbar-signup-link signup-link upcase" %>

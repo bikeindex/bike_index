@@ -34,9 +34,10 @@ RSpec.describe PageBlock::Navbar::Wrapper::Component, type: :component do
     context "with a passive_organization" do
       let(:passive_organization) { FactoryBot.create(:organization, short_name: "Sweet") }
 
-      it "renders the organization menu" do
-        expect(component).to have_css "#passive_organization_submenu", text: "Sweet"
-        expect(component).to have_css ".current-organization-submenu a"
+      # PageBlock::OrgSidebar renders instead of this whole navbar for those readers
+      it "renders no organization menu" do
+        expect(component).to_not have_css "#passive_organization_submenu"
+        expect(component).to_not have_text "Sweet"
       end
     end
   end

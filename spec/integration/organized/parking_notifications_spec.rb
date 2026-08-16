@@ -18,9 +18,9 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
     # render attempts a write and raises ActiveRecord::ReadOnlyError.
     RearGearType.fixed
     FrontGearType.fixed
-    # Pin below the md breakpoint (768px) so the sidebar is hidden and the
-    # mobile org dropdown is the only menu path. Chrome's --window-size flag
-    # is unreliable in headless mode, so resize explicitly.
+    # Below the sidebar's 760px breakpoint, where it's an overlay behind the top
+    # bar's hamburgler. Chrome's --window-size flag is unreliable in headless
+    # mode, so resize explicitly.
     page.current_window.resize_to(720, 2000)
     visit new_session_path
     fill_in "Email", with: user.email
@@ -40,13 +40,13 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
 
   it "creates a parking notification through the redesigned registration show page" do
     # The redesign is desktop-first; the mobile resize above is only for the
-    # legacy org-dropdown nav the other example needs.
+    # sidebar-as-overlay path the other example needs.
     page.current_window.resize_to(1400, 2000)
     visit registration_path(bike)
 
     # Open the parking-notification card in the org-admin action panel. The org
     # also has impound enabled, so scope to the notification trigger by its label.
-    click_button "Parking Notification"
+    within("main") { click_button "Parking Notification" }
 
     # Skip the geolocation prompt by entering the address by hand; this reveals the
     # address fields and enables the (initially disabled) submit button.
@@ -93,7 +93,7 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
 
       # Opening the panel geolocates, which stamps the hidden coordinate fields and
       # enables the (initially disabled) submit button
-      click_button "Parking Notification"
+      within("main") { click_button "Parking Notification" }
       choose "Parked incorrectly", allow_label_click: true
 
       expect(page).to have_button("Create parking notification", disabled: false, wait: 15)
@@ -141,8 +141,11 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
 
     dismiss_flash_messages
 
-    find("#passive_organization_submenu").click
-    within(".current-organization-submenu") { click_link "Parking notifications" }
+    find("#org_sidebar_hamburgler").click
+    within("#org_sidebar_nav") do
+      click_button "Parking Notifications"
+      click_link "Search Parking Notifications"
+    end
     expect(page).to have_current_path(/\A#{Regexp.escape(base_url)}(\?|\z)/, wait: 10)
 
     # Default view (status=current) loads three current notifications via JSON.

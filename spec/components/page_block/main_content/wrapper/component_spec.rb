@@ -251,10 +251,10 @@ RSpec.describe PageBlock::MainContent::Wrapper::Component, type: :component do
          current_organization: organization}
       end
 
-      it "renders the organization menu beside the page" do
+      # The menu moved to PageBlock::OrgSidebar, which the layout renders alongside
+      it "renders the page without a menu" do
         expect(result.css(".organized-wrap").to_html).to match "<p>the page</p>"
-        expect(result.text).to match organization.name
-        expect(result.text).to match "Admin Panel"
+        expect(result.text).to_not match "Admin Panel"
       end
     end
   end
