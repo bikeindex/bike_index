@@ -43,7 +43,7 @@
 <%= render SearchResults::Frame::Component.new(frame_id: :graduated_notifications_results_frame,
   render_results: @render_results, current_path: request.original_fullpath) do %>
   <div class="tw:mt-4">
-    <%= render_period_select %>
+    <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:) %>
   </div>
 
   <div class="tw:mt-2 tw:text-right">

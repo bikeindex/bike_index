@@ -82,7 +82,6 @@ module AdminHelper
       collection: collection || @collection,
       time_range_column: time_range_column || @time_range_column,
       viewing: viewing || controller_name.humanize,
-      current_header: render_admin_current_header(viewing:),
       sortable_search_params:,
       render_chart: @render_chart,
       render_deleted: @render_deleted,
@@ -92,6 +91,11 @@ module AdminHelper
       period: @period,
       start_time: @start_time,
       end_time: @end_time,
+      user_subject: @user_subject,
+      bike: @bike,
+      marketplace_listing: @marketplace_listing,
+      primary_activity: @primary_activity,
+      current_organization:,
       params:,
       **options
     ))

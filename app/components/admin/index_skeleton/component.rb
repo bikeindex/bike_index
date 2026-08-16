@@ -26,7 +26,11 @@ module Admin
         period: nil,
         start_time: nil,
         end_time: nil,
-        current_header: nil,
+        user_subject: nil,
+        bike: nil,
+        marketplace_listing: nil,
+        primary_activity: nil,
+        current_organization: nil,
         params: {}
       )
         @collection = collection
@@ -51,7 +55,11 @@ module Admin
         @period = period
         @start_time = start_time
         @end_time = end_time
-        @current_header = current_header
+        @user_subject = user_subject
+        @bike = bike
+        @marketplace_listing = marketplace_listing
+        @primary_activity = primary_activity
+        @current_organization = current_organization
         @params = params
       end
 
@@ -64,6 +72,17 @@ module Admin
       def default_chart
         data = UI::Chart::Component.time_range_counts(collection: @chart_collection, time_range: @time_range, column: @time_range_column)
         render(UI::Chart::Component.new(series: [{name: @viewing, data:}], time_range: @time_range))
+      end
+
+      def current_header_component
+        Admin::CurrentHeader::Component.new(
+          params: @params, viewing: @viewing,
+          sortable_search_params: @sortable_search_params,
+          user_subject: @user_subject, bike: @bike,
+          marketplace_listing: @marketplace_listing,
+          primary_activity: @primary_activity,
+          current_organization: @current_organization
+        )
       end
 
       def pagination_component(skip_total: false)
