@@ -137,10 +137,9 @@ RSpec.describe "Bike search", :js, type: :system do
   # link opts out of Turbo with data-turbo="false" - so what fails is the browser
   # abandoning a cross-document navigation started off the tail of a traversal, not
   # a slow frame fetch or a go_forward that no-ops, both of which leave a real URL.
-  # Ruled out: 24 consecutive local runs under 6x CPU throttling
-  # (Emulation.setCPUThrottlingRate) were green, and turbo:load - so
-  # reloadFrameIfUrlStale - has already fired by the time the settle in
-  # click_first_bike_and_go_back passes, so the frame isn't back in flight there.
+  # Ruled out too: the frame being back in flight under the click, since turbo:load
+  # - so reloadFrameIfUrlStale - has already fired by the time the settle in
+  # click_first_bike_and_go_back passes. Unreproduced under local CPU throttling.
   it "keeps results, counts, and form in sync across search and back/forward", flaky: 4 do
     # Search Red, then Blue, then retrace with the browser's back and forward
     # buttons. Each step must leave the frame, form, and kind counts matching the

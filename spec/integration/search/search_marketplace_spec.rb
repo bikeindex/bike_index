@@ -119,16 +119,16 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   # is after the rider has searched. Force that ordering rather than wait for CI to
   # produce it: between a frame navigation's response and Turbo advancing the address
   # bar to it, the frame leads the URL, and search--form must not reconcile it back.
+  # Watching only the first src change keeps a run that never opens that window from
+  # firing turbo:load somewhere later in the example instead.
   def dispatch_turbo_load_once_frame_leads_url
     page.execute_script(<<~JS)
       const frame = document.getElementById("marketplace_results_frame")
       const observer = new MutationObserver(() => {
-        const src = frame.getAttribute("src")
-        if (!src) return
-        const frameUrl = new URL(src, window.location.origin)
+        observer.disconnect()
+        const frameUrl = new URL(frame.getAttribute("src") || "", window.location.href)
         if (frameUrl.pathname !== window.location.pathname || frameUrl.search === window.location.search) return
 
-        observer.disconnect()
         document.dispatchEvent(new CustomEvent("turbo:load", {detail: {timing: {}}}))
       })
       observer.observe(frame, {attributeFilter: ["src"]})

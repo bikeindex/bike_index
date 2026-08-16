@@ -76,8 +76,8 @@ export default class extends Controller {
   // server instead, so missing those (the controller reconnects after the
   // popstate) is harmless.
   handlePopstate = () => {
-    // The address bar is authoritative again -- whatever the frame last asked for
-    // belongs to the entry we just left, so it can't mean the frame is ahead.
+    // Whatever the frame last asked for belongs to the entry we just left, so from
+    // here it can't mean the frame is ahead of the address bar
     this.requestedURL = null
     const params = new URLSearchParams(window.location.search)
     ;['search_email', 'serial', 'search_notes'].forEach(name => {
@@ -95,8 +95,7 @@ export default class extends Controller {
     if (!this.differentSearchOnSamePage(frame?.getAttribute('src'), window.location.href)) return
     // Turbo advances the address bar only once a frame navigation has rendered, so a
     // frame already asking for a different search is ahead of the URL rather than
-    // stale, and reloading here would throw the rider's search away. The page's own
-    // turbo:load lands inside that window whenever its visit finishes late.
+    // stale, and a turbo:load landing in that window would throw the rider's search away.
     if (this.differentSearchOnSamePage(this.requestedURL, window.location.href)) return
 
     frame.setAttribute('src', window.location.href)
@@ -164,17 +163,21 @@ export default class extends Controller {
   // assigns it before a src fetch, but for a form submit only once the response
   // arrives, so a submit in flight leaves src on the query being searched away from.
   handleFetchRequest = (event) => {
-    if (event.target !== this.frameElement && event.target !== this.formTarget) return
+    if (!this.ownsFetch(event)) return
 
     this.requestedURL = event.detail?.url?.toString()
   }
 
+  // Turbo targets the frame for its eager src fetch and the form for a submit;
+  // anything else (the combobox raises these too) isn't ours.
+  ownsFetch (event) {
+    return event.target === this.frameElement || event.target === this.formTarget
+  }
+
   // A fetch that rejects outright when the network drops never comes back with a
   // status, so handleFetchResponse never sees it and the spinner runs forever.
-  // Turbo targets the frame for its eager src fetch and the form for a submit;
-  // anything else (the combobox raises this too) isn't ours.
   handleFetchError = (event) => {
-    if (event.target !== this.frameElement && event.target !== this.formTarget) return
+    if (!this.ownsFetch(event)) return
 
     // A failed submit has to be retried by re-submitting: the frame's src still
     // points at the previous query, so reloading it would show the old results.
