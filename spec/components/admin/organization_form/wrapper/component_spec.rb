@@ -36,15 +36,11 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
     expect(component).not_to have_css(".form-control")
   end
 
-  it "puts every field's qualifying note in the helper_text slot rather than the label" do
-    # A note baked into the label loses the aria-describedby Group wires up for the slot.
-    # [for] picks out the Group labels - a checkbox's wraps its input, read_only_field's
-    # labels no control
-    expect(component.css("label.twlabel[for] small")).to be_empty
+  it "keeps the label's own note in the label, and what followed the field as helper text" do
     expect(component.at_css("label[for='organization_parent_organization_id']").text.squish)
-      .to eq "Parent organization optional"
+      .to eq "Parent organization (probably) do not add parents! Parents must be part of the same organization optional"
     expect(component.at_css("#organization_parent_organization_id_helper").text.squish)
-      .to start_with "(probably) do not add parents!"
+      .to start_with "Use the \"regional\" feature instead."
   end
 
   it "points every field at its helper text" do
@@ -66,10 +62,9 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
     it "renders the permitted domain rather than the invitation count, disabled for a non-developer" do
       expect(component).not_to have_field("organization_available_invitation_count")
       expect(component).to have_field("organization_user_email_domain", disabled: true)
-      # The label is the field's name; everything qualifying it is helper text
       expect(component.at_css("label[for='organization_user_email_domain']").text.squish)
-        .to eq "permitted domain for passwordless sign in optional"
-      expect(domain_helper_text.text.squish).to eq "passwordless sign in feature Ask Seth for help changing this, it's delicate"
+        .to eq "permitted domain for passwordless sign in passwordless sign in feature optional"
+      expect(domain_helper_text.text.squish).to eq "Ask Seth for help changing this, it's delicate"
     end
 
     context "with saml_sso also enabled" do
@@ -79,17 +74,18 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
       end
 
       it "separates the feature names" do
-        expect(domain_helper_text.text.squish).to match(/passwordless sign in feature SAML SSO feature/)
+        label = component.at_css("label[for='organization_user_email_domain']")
+        expect(label.text.squish).to match(/passwordless sign in feature SAML SSO feature/)
       end
     end
 
     context "with a developer current_user" do
       let(:current_user) { FactoryBot.create(:superuser_developer) }
 
-      it "enables the domain field, and keeps the helper text it still has" do
+      it "enables the domain field, without pointing it at absent helper text" do
         expect(component).to have_field("organization_user_email_domain", disabled: false)
         expect(component).not_to have_content("Ask Seth for help changing this")
-        expect(domain_helper_text.text.squish).to eq "passwordless sign in feature"
+        expect(domain_field["aria-describedby"]).to be_nil
       end
     end
   end
