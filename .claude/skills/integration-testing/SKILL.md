@@ -171,6 +171,15 @@ Turbo, the rest of the layout. Behaviour that depends on any of those can pass
 against the preview while the real page stays broken — the preview spec isn't
 wrong, it just can't see the condition.
 
+The layout is `component_preview`, which loads Tailwind and the importmap but
+**not** `application_revised` — no jQuery, no bootstrap — and includes the legacy
+stylesheet only when the URL carries Lookbook's display option
+(`?lookbook%5Bdisplay%5D%5Blegacy_stylesheet%5D=true`, see the
+[`frontend-screenshots`](../frontend-screenshots/SKILL.md) skill). So anything
+driven by legacy JS can't be exercised from a preview at all, and anything styled
+by a legacy stylesheet renders unstyled without that parameter — which makes every
+visibility and responsive assertion meaningless. Cover both on a real page.
+
 A combobox fix keyed off the `focus` event passed
 `spec/components/ui/forms/combobox/component_system_spec.rb` while step 1 of the
 register flow was still mangling its manufacturer field: that form is
