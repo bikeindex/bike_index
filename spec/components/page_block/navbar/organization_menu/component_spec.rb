@@ -6,7 +6,8 @@ RSpec.describe PageBlock::Navbar::OrganizationMenu::Component, type: :component 
   let(:current_user) { FactoryBot.create(:user_confirmed) }
   let(:organization) { FactoryBot.create(:organization, short_name: "Sweet") }
   let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
-  let(:instance) { described_class.new(organization:, current_user:) }
+  let(:page) { {controller_namespace: nil, controller_name: "welcome", action_name: "index"} }
+  let(:instance) { described_class.new(organization:, current_user:, **page) }
   let(:component) { with_request_url("/") { render_inline(instance) } }
 
   it "renders the organization's dropdown" do
@@ -16,7 +17,7 @@ RSpec.describe PageBlock::Navbar::OrganizationMenu::Component, type: :component 
   end
 
   context "without an organization" do
-    let(:instance) { described_class.new(organization: nil, current_user:) }
+    let(:instance) { described_class.new(organization: nil, current_user:, **page) }
 
     it "renders nothing" do
       expect(component.to_html).to be_blank
@@ -24,7 +25,7 @@ RSpec.describe PageBlock::Navbar::OrganizationMenu::Component, type: :component 
   end
 
   context "without a current_user" do
-    let(:instance) { described_class.new(organization:, current_user: nil) }
+    let(:instance) { described_class.new(organization:, current_user: nil, **page) }
 
     it "renders nothing" do
       expect(component.to_html).to be_blank
