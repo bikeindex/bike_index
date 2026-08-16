@@ -73,7 +73,7 @@ Two viewports — resize once each, then walk every URL:
 1. `browser_resize` 1440×900 → for each URL: navigate → settle → hide the footer → `browser_take_screenshot` (`fullPage: true`) to `...-desktop.png`.
 2. `browser_resize` 390×844 → same loop, also `fullPage: true` → `...-mobile.png`.
 
-**Full page, minus the footer, review-app banner and profiler badge, no `target:` arg.** Capture the whole page (`fullPage: true`) at **both** viewports so nothing below the fold is cut off, but first hide the site footer (identical on every page, just padding), the `#review-app-banner` topbar and the `.profiler-results` badge (both dev-only chrome that isn't part of the real page). The profiler badge reports *this request's* timing, so leaving it in makes every before/after pair differ on a number no reviewer cares about. After each navigation (hiding doesn't persist across page loads), run:
+**Full page, minus the footer, review-app banner and profiler badge, no `target:` arg.** Capture the whole page (`fullPage: true`) at **both** viewports so nothing below the fold is cut off, but first hide the site footer (identical on every page, just padding), the `#review-app-banner` topbar and the `.profiler-results` badge (both dev-only chrome that isn't part of the real page). **Keep the footer when the diff changes it** — the reason to hide it is that it carries no information, which stops being true the moment it's the subject. The profiler badge reports *this request's* timing, so leaving it in makes every before/after pair differ on a number no reviewer cares about. After each navigation (hiding doesn't persist across page loads), run:
 
 ```js
 browser_evaluate: () => {
