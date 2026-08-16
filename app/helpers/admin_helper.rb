@@ -77,30 +77,6 @@ module AdminHelper
     theft_alert.recovered? ? text_class + " small" : text_class
   end
 
-  def render_admin_index_skeleton(collection: nil, time_range_column: nil, viewing: nil, **options)
-    render(Admin::IndexSkeleton::Component.new(
-      collection: collection || @collection,
-      time_range_column: time_range_column || @time_range_column,
-      viewing: viewing || controller_name.humanize,
-      sortable_search_params:,
-      render_chart: @render_chart,
-      render_deleted: @render_deleted,
-      pagy: @pagy,
-      per_page: @per_page,
-      time_range: @time_range,
-      period: @period,
-      start_time: @start_time,
-      end_time: @end_time,
-      user_subject: @user_subject,
-      bike: @bike,
-      marketplace_listing: @marketplace_listing,
-      primary_activity: @primary_activity,
-      current_organization:,
-      params:,
-      **options
-    ))
-  end
-
   def render_admin_pagination_with_count(collection:, count: nil, skip_total: false, skip_today: false, skip_pagination: false, humanized_time_range_column_override: nil, viewing: nil)
     render(Admin::PaginationWithCount::Component.new(
       collection:,

@@ -257,7 +257,23 @@
   <%= render Admin::BikesTable::Component.new(bikes: @bikes, sortable_search_params:, display_dev_info: display_dev_info?, show_serial: params[:show_serial].present?, skip_manufacturer_link: params[:search_manufacturer].present?, sort: sort_column, sort_direction:, render_sortable: true, render_multi_check: @multi_delete) %>
 <% end %>
 
-<%= render_admin_index_skeleton(
+<%= render(Admin::IndexSkeleton::Component.new(
+  sortable_search_params:,
+  render_chart: @render_chart,
+  render_deleted: @render_deleted,
+  pagy: @pagy,
+  per_page: @per_page,
+  time_range: @time_range,
+  period: @period,
+  start_time: @start_time,
+  end_time: @end_time,
+  time_range_column: @time_range_column,
+  user_subject: @user_subject,
+  bike: @bike,
+  marketplace_listing: @marketplace_listing,
+  primary_activity: @primary_activity,
+  current_organization:,
+  params:,
   collection: @bikes,
   viewing: "Bikes",
   nav_header_list_items:,
@@ -265,4 +281,4 @@
   admin_search_form:,
   table_view:,
   count_detail:,
-) %>
+)) %>

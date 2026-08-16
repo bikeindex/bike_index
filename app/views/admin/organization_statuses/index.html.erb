@@ -179,11 +179,27 @@
   </div>
 <% end %>
 
-<%= render_admin_index_skeleton(
+<%= render(Admin::IndexSkeleton::Component.new(
+  sortable_search_params:,
+  render_chart: @render_chart,
+  render_deleted: @render_deleted,
+  pagy: @pagy,
+  per_page: @per_page,
+  time_range: @time_range,
+  period: @period,
+  start_time: @start_time,
+  end_time: @end_time,
+  time_range_column: @time_range_column,
+  user_subject: @user_subject,
+  bike: @bike,
+  marketplace_listing: @marketplace_listing,
+  primary_activity: @primary_activity,
+  current_organization:,
+  params:,
   collection: @organization_statuses,
   viewing: "Organization Statuses",
   index_title: "Organization Statuses",
   nav_header_list_items:,
   rendered_chart:,
-  table_view:
-) %>
+  table_view:,
+)) %>
