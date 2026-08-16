@@ -28,9 +28,7 @@
       organization: @organization,
       bikes: displayed_bikes,
       render_sortable: true,
-      sortable_search_params: @sortable_search_params,
-      sort: @sort,
-      sort_direction: @sort_direction
+      sort_state: @sort_state
     )) %>
   <% else %>
     <p class="tw:text-gray-500"><%= translation(".no_matches_found") %></p>

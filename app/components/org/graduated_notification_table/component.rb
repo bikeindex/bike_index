@@ -3,12 +3,10 @@
 module Org
   module GraduatedNotificationTable
     class Component < ApplicationComponent
-      def initialize(graduated_notifications:, current_organization:, sortable_search_params: {}, display_dev_info: false, sort: nil, sort_direction: nil, render_sortable: false, render_remaining_at: false, skip_status: false, skip_email: false, skip_email_search: nil, separate_secondary_notifications: false)
+      def initialize(graduated_notifications:, current_organization:, sort_state: SortState.new, display_dev_info: false, render_sortable: false, render_remaining_at: false, skip_status: false, skip_email: false, skip_email_search: nil, separate_secondary_notifications: false)
         @graduated_notifications = graduated_notifications
-        @sortable_search_params = sortable_search_params
+        @sort_state = sort_state
         @display_dev_info = display_dev_info
-        @sort = sort
-        @sort_direction = sort_direction
         @current_organization = current_organization
         @render_sortable = render_sortable
         @render_remaining_at = render_remaining_at

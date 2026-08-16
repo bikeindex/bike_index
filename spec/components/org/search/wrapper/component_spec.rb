@@ -26,7 +26,6 @@ RSpec.describe Org::Search::Wrapper::Component, type: :component do
       per_page: 10,
       params: {},
       interpreted_params: {},
-      sortable_search_params: {},
       search_stickers:,
       search_address:,
       search_status:,

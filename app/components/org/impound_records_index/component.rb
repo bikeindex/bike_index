@@ -3,7 +3,7 @@
 module Org
   module ImpoundRecordsIndex
     class Component < ApplicationComponent
-      def initialize(pagy:, impound_records:, search_status:, search_unregisteredness:, humanized_time_range:, available_statuses:, current_organization:, current_user: nil, params: {}, sortable_search_params: {}, sort: nil, sort_direction: nil, multi_update_open: false)
+      def initialize(pagy:, impound_records:, search_status:, search_unregisteredness:, humanized_time_range:, available_statuses:, current_organization:, current_user: nil, params: {}, sort_state: SortState.new, multi_update_open: false)
         @pagy = pagy
         @impound_records = impound_records
         @search_status = search_status
@@ -13,9 +13,7 @@ module Org
         @current_organization = current_organization
         @current_user = current_user
         @params = params
-        @sortable_search_params = sortable_search_params
-        @sort = sort
-        @sort_direction = sort_direction
+        @sort_state = sort_state
         @multi_update_open = multi_update_open
       end
 

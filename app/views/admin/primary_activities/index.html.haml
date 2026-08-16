@@ -15,5 +15,5 @@
 
 - table_view = render partial: "table", locals: {collection: @collection, render_sortable: true, show_count: @search_show_count}
 
-= render(Admin::IndexSkeleton::Component.new(collection: @collection, viewing: controller_name.humanize, sortable_search_params:, render_chart: @render_chart, render_deleted: @render_deleted, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, start_time: @start_time, end_time: @end_time, time_range_column: @time_range_column, user_subject: @user_subject, bike: @bike, marketplace_listing: @marketplace_listing, primary_activity: @primary_activity, current_organization:, params:, chart_collection: @render_chart && matching_primary_activities, nav_header_list_items:, table_view:))
+= render(Admin::IndexSkeleton::Component.new(index: admin_index_state, collection: @collection, viewing: controller_name.humanize, chart_collection: @render_chart && matching_primary_activities, nav_header_list_items:, table_view:))
 

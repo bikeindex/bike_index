@@ -96,8 +96,12 @@ When deleting an `id`/`class`, grep the repo for the name before deciding what t
 **Never add a helper method, and don't extend an existing one.** Anything a helper would render belongs in a view component that takes what it needs as explicit keyword arguments. `app/helpers/` is legacy: leave what's there, but move a helper into a component when you touch the line that calls it.
 
 - `Atom::Serial::Component`, not `BikeHelper#render_serial_display`. `UI::PhoneDisplay::Component`, not `number_to_phone`. `UI::Time::Component`, not `l(time, format: :convert_time)`.
-- A helper that only gathers a component's arguments out of controller assigns is still a helper — pass those arguments from the view.
+- A *view helper* that only gathers a component's arguments out of controller assigns is still a helper — pass those arguments from the view.
 - `ApplicationComponentHelper` is the exception (`number_display`, `amount_display`, `check_mark`, `search_emoji`) — value formatters `ApplicationComponent` already includes, so components call them bare.
+
+**What's banned is the component reaching out, not the number of arguments.** State the controller already owns can be named and passed as one value object — `Admin::IndexState` (built in `Admin::BaseController#admin_index_state`) and `SortState` (`ApplicationHelper#sort_state`) are the pattern. The component stays pure either way; a bundle just stops seventy views from re-listing the same seventeen assigns.
+
+Bundle only what's cohesive — one subject, assembled in one place. `IndexState` is "this admin index request"; `SortState` is "how this table is sorted and what its links carry". A grab-bag of unrelated request facts (`display_dev_info`, `current_user`, `current_country_id`) is not a value object, it's `helpers` renamed — those stay individual arguments.
 
 ## ViewComponent rules
 

@@ -2,6 +2,11 @@ module ApplicationHelper
   include Binxtils::NavHelper
   include Binxtils::SortableHelper
 
+  # The three sortable-table values as one, so a table takes one argument rather than three
+  def sort_state
+    SortState.new(search_params: sortable_search_params, sort: sort_column, direction: sort_direction)
+  end
+
   def notification_delivery_display(status)
     text = if status == "delivery_success"
       check_mark

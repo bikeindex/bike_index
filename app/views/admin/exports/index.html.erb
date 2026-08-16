@@ -85,7 +85,7 @@
 <% end %>
 
 <% table_view = capture do %>
-  <%= render(UI::Table::Component.new(records: @collection, render_sortable: true, sort: sort_column, sort_direction:, sortable_search_params:)) do |table| %>
+  <%= render(UI::Table::Component.new(records: @collection, render_sortable: true, sort_state:)) do |table| %>
     <% table.column(sortable: "created_at", label: "Date") do |export| %>
       <%= link_to organization_export_path(export, organization_id: export.organization.to_param) do %>
         <%= render UI::Time::Component.new(time: export.created_at) %>
@@ -162,23 +162,8 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @collection,
-  sortable_search_params:,
-  render_chart: @render_chart,
-  render_deleted: @render_deleted,
-  pagy: @pagy,
-  per_page: @per_page,
-  time_range: @time_range,
-  period: @period,
-  start_time: @start_time,
-  end_time: @end_time,
-  time_range_column: @time_range_column,
-  user_subject: @user_subject,
-  bike: @bike,
-  marketplace_listing: @marketplace_listing,
-  primary_activity: @primary_activity,
-  current_organization:,
-  params:,
   viewing: "Exports",
   nav_header_list_items:,
   table_view:,

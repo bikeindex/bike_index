@@ -12,22 +12,7 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
-  sortable_search_params:,
-  render_chart: @render_chart,
-  render_deleted: @render_deleted,
-  pagy: @pagy,
-  per_page: @per_page,
-  time_range: @time_range,
-  period: @period,
-  start_time: @start_time,
-  end_time: @end_time,
-  time_range_column: @time_range_column,
-  user_subject: @user_subject,
-  bike: @bike,
-  marketplace_listing: @marketplace_listing,
-  primary_activity: @primary_activity,
-  current_organization:,
-  params:,
+  index: admin_index_state,
   collection: @model_attestations,
   viewing: "Model Attestations",
   table_view:,

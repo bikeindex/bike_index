@@ -19,9 +19,9 @@
   <div
     class="mt-4"
     data-controller="update-cached-sortable-links"
-    data-update-cached-sortable-links-base-url-value="<%= url_for(@sortable_search_params) %>"
+    data-update-cached-sortable-links-base-url-value="<%= url_for(@sort_state.search_params) %>"
   >
-    <%= render(UI::Table::Component.new(records: @collection, cache_key:, render_sortable: @render_sortable, sort: @sort, sort_direction: @sort_direction, sortable_search_params: @sortable_search_params)) do |table| %>
+    <%= render(UI::Table::Component.new(records: @collection, cache_key:, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
       <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0", title: "Toggle all checked", aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"}), classes: "display-multi-check tw:w-8", header_classes: "display-multi-check tw:w-8") do |bug_report| %>
         <%= check_box_tag "bug_reports_selected[#{bug_report.id}]", bug_report.id, false, data: {"table-multi-checkbox-target" => "checkbox"} %>
       <% end %>

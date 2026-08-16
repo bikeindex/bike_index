@@ -3,18 +3,13 @@
 module UI
   module Table
     class Component < ApplicationComponent
-      # Cell blocks are instance_exec'd, so this is how they reach the search params
-      attr_reader :sortable_search_params
-
       # Pass cache_key to enable per-row fragment caching (e.g. cache_key: "admin-users").
-      def initialize(records:, cache_key: nil, classes: nil, unbordered: false, sort: nil, sort_direction: nil, sortable_search_params: {}, render_sortable: false, sticky: false)
+      def initialize(records:, sort_state: SortState.new, cache_key: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false)
         @records = records
-        @sortable_search_params = sortable_search_params
+        @sort_state = sort_state
         @cache_key = cache_key
         @classes = classes
         @bordered = !unbordered
-        @sort = sort
-        @sort_direction = sort_direction
         @render_sortable = render_sortable
         @sticky = sticky
         @columns = []
@@ -29,18 +24,21 @@ module UI
         content
       end
 
+      # Cell blocks are instance_exec'd, so this is how they reach the search params
+      def sortable_search_params = @sort_state.search_params
+
       private
 
       def sortable_url(sort, direction)
-        url_for(@sortable_search_params.merge(sort:, direction:))
+        url_for(@sort_state.url_params(sort:, direction:))
       end
 
       def current_sort
-        @current_sort ||= sortable_columns.include?(@sort) ? @sort : default_sort_column
+        @current_sort ||= sortable_columns.include?(@sort_state.sort) ? @sort_state.sort : default_sort_column
       end
 
       def current_direction
-        @sort_direction || "desc"
+        @sort_state.direction || "desc"
       end
 
       def default_sort_column

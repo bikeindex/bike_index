@@ -14,9 +14,8 @@ module Org
           bikes: [],
           current_user: nil,
           interpreted_params: {},
-          sortable_search_params: {},
+          sort_state: SortState.new,
           sort: nil,
-          sort_direction: nil,
           search_stickers: nil,
           search_address: nil,
           search_status: "all",
@@ -34,9 +33,7 @@ module Org
           @bikes = bikes
           @current_user = current_user
           @interpreted_params = interpreted_params
-          @sortable_search_params = sortable_search_params
-          @sort = sort
-          @sort_direction = sort_direction
+          @sort_state = sort_state
           @per_page = per_page
           @params = params
           @search_stickers = search_stickers
@@ -58,7 +55,7 @@ module Org
           @settings_component ||= Org::Search::Settings::Component.new(
             organization: @organization,
             interpreted_params: @interpreted_params,
-            sortable_search_params: @sortable_search_params,
+            sortable_search_params: @sort_state.search_params,
             params: @params,
             search_stickers: @search_stickers,
             search_address: @search_address,

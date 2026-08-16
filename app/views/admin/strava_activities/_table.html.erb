@@ -1,6 +1,6 @@
 <%# locals: (collection:, render_sortable: false, searched_activity_type: nil) %>
 
-<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort: sort_column, sort_direction:, sortable_search_params:)) do |table| %>
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |strava_activity| %>
     <%= render UI::Time::Component.new(time: strava_activity.created_at) %>
   <% end %>

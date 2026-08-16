@@ -5,11 +5,9 @@ module Org
     module MultiResults
       class Component < ApplicationComponent
         def initialize(organization:, query:, chip_id:, pagy:, search_kind: "serials",
-          bikes: nil, close_serials: nil, sortable_search_params: {}, sort: nil, sort_direction: nil)
+          bikes: nil, close_serials: nil, sort_state: SortState.new)
           @organization = organization
-          @sortable_search_params = sortable_search_params
-          @sort = sort
-          @sort_direction = sort_direction
+          @sort_state = sort_state
           @query = query
           @chip_id = chip_id
           @pagy = pagy

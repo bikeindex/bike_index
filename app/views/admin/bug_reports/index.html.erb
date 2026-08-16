@@ -84,25 +84,10 @@
 <% end if searched_terms.any? %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @collection,
   viewing: controller_name.humanize,
-  sortable_search_params:,
-  render_chart: @render_chart,
-  render_deleted: @render_deleted,
-  pagy: @pagy,
-  per_page: @per_page,
-  time_range: @time_range,
-  period: @period,
-  start_time: @start_time,
-  end_time: @end_time,
-  time_range_column: @time_range_column,
-  user_subject: @user_subject,
-  bike: @bike,
-  marketplace_listing: @marketplace_listing,
-  primary_activity: @primary_activity,
-  current_organization:,
-  params:,
   nav_header_list_items:, admin_search_form:, count_detail:,
-  table_view: render(Admin::BugReportsTable::Component.new(collection: @collection, searchable_tags:, sortable_search_params:, display_dev_info: display_dev_info?, sort: sort_column, sort_direction:, render_sortable: true)),
+  table_view: render(Admin::BugReportsTable::Component.new(collection: @collection, searchable_tags:, sort_state:, display_dev_info: display_dev_info?, render_sortable: true)),
   chart_collection: @render_chart && matching_bug_reports,
 )) %>

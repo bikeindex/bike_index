@@ -4,9 +4,9 @@ module Admin
   module IndexSkeleton
     class Component < ApplicationComponent
       def initialize(
-        viewing:,
+        index:,
         collection:,
-        sortable_search_params: {},
+        viewing:,
         index_title: nil,
         nav_header_list_items: nil,
         skip_charting: false,
@@ -17,93 +17,58 @@ module Admin
         table_view: nil,
         chart_collection: nil,
         header_content: nil,
-        count_detail: nil,
-        render_chart: false,
-        render_deleted: nil,
-        pagy: nil,
-        per_page: nil,
-        time_range: nil,
-        period: nil,
-        start_time: nil,
-        end_time: nil,
-        user_subject: nil,
-        bike: nil,
-        marketplace_listing: nil,
-        primary_activity: nil,
-        current_organization: nil,
-        params: {}
+        count_detail: nil
       )
+        @index = index
         @collection = collection
         @viewing = viewing
-        @sortable_search_params = sortable_search_params
         @index_title = index_title
         @nav_header_list_items = nav_header_list_items
         @skip_charting = skip_charting
         @rendered_chart = rendered_chart
         @render_sortable = render_sortable
-        @time_range_column = time_range_column || "created_at"
+        @time_range_column = time_range_column || index.time_range_column || "created_at"
         @admin_search_form = admin_search_form
         @table_view = table_view
         @chart_collection = chart_collection
         @header_content = header_content
         @count_detail = count_detail
-        @render_chart = render_chart
-        @render_deleted = render_deleted
-        @pagy = pagy
-        @per_page = per_page
-        @time_range = time_range
-        @period = period
-        @start_time = start_time
-        @end_time = end_time
-        @user_subject = user_subject
-        @bike = bike
-        @marketplace_listing = marketplace_listing
-        @primary_activity = primary_activity
-        @current_organization = current_organization
-        @params = params
       end
 
       private
 
+      def sortable_search_params = @index.sortable_search_params
+
       def show_chart?
-        !@skip_charting && @render_chart
+        !@skip_charting && @index.render_chart
       end
 
       def default_chart
-        data = UI::Chart::Component.time_range_counts(collection: @chart_collection, time_range: @time_range, column: @time_range_column)
-        render(UI::Chart::Component.new(series: [{name: @viewing, data:}], time_range: @time_range))
+        data = UI::Chart::Component.time_range_counts(collection: @chart_collection, time_range: @index.time_range, column: @time_range_column)
+        render(UI::Chart::Component.new(series: [{name: @viewing, data:}], time_range: @index.time_range))
       end
 
       def current_header_component
-        Admin::CurrentHeader::Component.new(
-          params: @params, viewing: @viewing,
-          sortable_search_params: @sortable_search_params,
-          user_subject: @user_subject, bike: @bike,
-          marketplace_listing: @marketplace_listing,
-          primary_activity: @primary_activity,
-          current_organization: @current_organization
-        )
+        Admin::CurrentHeader::Component.new(index: @index, viewing: @viewing)
       end
 
       def pagination_component(skip_total: false)
         Admin::PaginationWithCount::Component.new(
-          collection: @collection, viewing: @viewing, skip_total:,
-          count_detail: skip_total ? nil : @count_detail,
-          pagy: @pagy, per_page: @per_page, time_range: @time_range,
-          period: @period, time_range_column: @time_range_column, params: @params
+          index: @index, collection: @collection, viewing: @viewing, skip_total:,
+          count_detail: skip_total ? nil : @count_detail, time_range_column: @time_range_column
         )
       end
 
       def show_deleted_link?
-        !@render_deleted.nil?
+        !@index.render_deleted.nil?
       end
 
       def deleted_active?
-        @render_deleted.present? && @render_deleted != false
+        @index.render_deleted.present? && @index.render_deleted != false
       end
 
       def deleted_label
-        case @render_deleted
+        case @index.render_deleted
         when "including" then "Including deleted"
         when "only" then "Only deleted"
         else "deleted"
@@ -111,7 +76,7 @@ module Admin
       end
 
       def deleted_item_active?(value)
-        value.nil? ? !deleted_active? : @render_deleted == value
+        value.nil? ? !deleted_active? : @index.render_deleted == value
       end
 
       def default_table_view

@@ -8,15 +8,13 @@ module Admin
     # checkboxes, and skip_user to drop the owner column.
     class Component < ApplicationComponent
       # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-      MARKUP_DIGEST = "e0ece0aced83"
+      MARKUP_DIGEST = "d97f3b9f5607"
 
-      def initialize(bikes:, sortable_search_params: {}, display_dev_info: false, sort: nil, sort_direction: nil, no_show_header: false,
+      def initialize(bikes:, sort_state: SortState.new, display_dev_info: false, no_show_header: false,
         show_serial: false, skip_manufacturer_link: false, render_sortable: false,
         skip_user: false, render_multi_check: false)
         @bikes = bikes
-        @sort = sort
-        @sort_direction = sort_direction
-        @sortable_search_params = sortable_search_params
+        @sort_state = sort_state
         @display_dev_info = display_dev_info
         @no_show_header = no_show_header
         @show_serial = show_serial

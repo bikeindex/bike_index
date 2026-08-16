@@ -1,6 +1,6 @@
 <%# locals: (bike_sticker_batches:, render_sortable: false, matching_count: false) %>
 
-<%= render(UI::Table::Component.new(records: bike_sticker_batches, render_sortable:, sort: sort_column, sort_direction:, sortable_search_params:)) do |table| %>
+<%= render(UI::Table::Component.new(records: bike_sticker_batches, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "id", label: "Batch") do |batch| %>
     <%= link_to "##{batch.id}", admin_bike_stickers_path(search_bike_sticker_batch_id: batch.id) %>
   <% end %>

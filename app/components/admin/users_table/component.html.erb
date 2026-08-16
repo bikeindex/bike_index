@@ -13,7 +13,7 @@
   tbody td.only-dev-visible {border-top: 0px;}
 </style>
 
-<%= render(UI::Table::Component.new(records: @users, cache_key:, render_sortable: @render_sortable, sort: @sort, sort_direction: @sort_direction, sortable_search_params: @sortable_search_params)) do |table| %>
+<%= render(UI::Table::Component.new(records: @users, cache_key:, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
   <% table.column(sortable: "created_at") do |user| %>
     <%= render UI::Time::Component.new(time: user.created_at) %>
   <% end %>

@@ -1,26 +1,11 @@
 <% table_view = render(Admin::OrganizationLandingPagesTable::Component.new(collection: @collection,
-  sortable_search_params:, sort: sort_column, sort_direction:,
+  sort_state:,
   render_sortable: true, render_search: params[:organization_id].blank?)) %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @collection,
   viewing: controller_name.humanize,
-  sortable_search_params:,
-  render_chart: @render_chart,
-  render_deleted: @render_deleted,
-  pagy: @pagy,
-  per_page: @per_page,
-  time_range: @time_range,
-  period: @period,
-  start_time: @start_time,
-  end_time: @end_time,
-  time_range_column: @time_range_column,
-  user_subject: @user_subject,
-  bike: @bike,
-  marketplace_listing: @marketplace_listing,
-  primary_activity: @primary_activity,
-  current_organization:,
-  params:,
   table_view:,
   chart_collection: @render_chart && matching_organization_landing_pages,
 )) %>

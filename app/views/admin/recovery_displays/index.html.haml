@@ -9,5 +9,5 @@
     %li.nav-item
       = link_to "bust cache", admin_recovery_display_path("bust_cache"), class: "nav-link less-strong"
 
-  = render(Admin::IndexSkeleton::Component.new(viewing: controller_name.humanize, sortable_search_params:, render_chart: @render_chart, render_deleted: @render_deleted, pagy: @pagy, per_page: @per_page, time_range: @time_range, period: @period, start_time: @start_time, end_time: @end_time, user_subject: @user_subject, bike: @bike, marketplace_listing: @marketplace_listing, primary_activity: @primary_activity, current_organization:, params:, chart_collection: @render_chart && matching_recovery_displays, nav_header_list_items:, time_range_column: "recovery_displays.#{@time_range_column}", collection: @recovery_displays))
+  = render(Admin::IndexSkeleton::Component.new(index: admin_index_state, viewing: controller_name.humanize, chart_collection: @render_chart && matching_recovery_displays, nav_header_list_items:, time_range_column: "recovery_displays.#{@time_range_column}", collection: @recovery_displays))
 

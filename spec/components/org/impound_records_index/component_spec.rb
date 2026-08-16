@@ -18,8 +18,7 @@ RSpec.describe Org::ImpoundRecordsIndex::Component, type: :component do
       humanized_time_range: "in the past year",
       available_statuses: %w[current all],
       current_organization: organization,
-      sort: "created_at",
-      sort_direction: "desc"
+      sort_state: SortState.new(sort: "created_at", direction: "desc")
     }
   end
 
