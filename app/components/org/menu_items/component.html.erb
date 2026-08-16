@@ -11,7 +11,8 @@
       <% active = active_state(item) %>
 
       <% if active.nil? %>
-        <%= helpers.active_link item[:label], item[:path], match_controller: item[:active] == :match_controller, class: link_classes(item, false) %>
+        <%= render UI::ActiveLink::Component.new(text: item[:label], path: item[:path],
+              match_controller: item[:active] == :match_controller, html_class: link_classes(item, false)) %>
       <% else %>
         <%= link_to item[:label], item[:path], class: link_classes(item, active) %>
       <% end %>

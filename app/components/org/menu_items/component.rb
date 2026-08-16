@@ -122,7 +122,7 @@ module Org
       end
 
       # Resolves the per-request active state for items the cache marked with a symbol.
-      # Returns true/false for explicit cases, nil to defer to the active_link helper.
+      # Returns true/false for explicit cases, nil to defer to UI::ActiveLink.
       def active_state(item)
         case item[:active]
         when :auto, :match_controller then nil

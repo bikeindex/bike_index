@@ -15,8 +15,8 @@
 # (for superusers).
 #
 # `active:` is one of:
-#   :auto                                  - template uses active_link helper
-#   :match_controller                      - template uses active_link with match_controller: true
+#   :auto                                  - template defers to UI::ActiveLink
+#   :match_controller                      - template passes UI::ActiveLink match_controller: true
 #   :on_registrations_index                - component computes from current request
 #   :on_bikes_new                          - "
 #   :on_bikes_new_with_parking_notification - "

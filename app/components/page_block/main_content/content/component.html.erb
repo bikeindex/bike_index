@@ -77,18 +77,20 @@
               <% end %>
             <% else %>
               <li>
-                <%= helpers.active_link translation(".about"), about_path %>
+                <%= render UI::ActiveLink::Component.new(text: translation(".about"), path: about_path) %>
               </li>
             <% end %>
 
             <% unless content_page_type == "news" %>
-              <li><%= helpers.active_link translation(".help"), help_url %></li>
               <li>
-                <%= helpers.active_link translation(".where"), where_path %>
+                <%= render UI::ActiveLink::Component.new(text: translation(".help"), path: help_url) %>
+              </li>
+              <li>
+                <%= render UI::ActiveLink::Component.new(text: translation(".where"), path: where_path) %>
               </li>
               <% if %w(manufacturers where).include?(content_page_type) %>
                 <li>
-                  <%= helpers.active_link translation(".sign_up_your_organization"), new_organization_path %>
+                  <%= render UI::ActiveLink::Component.new(text: translation(".sign_up_your_organization"), path: new_organization_path) %>
                 </li>
               <% end %>
             <% end %>
@@ -99,41 +101,41 @@
 
           <ul class="tw:m-0 tw:mb-4 tw:list-none">
             <li>
-              <%= helpers.active_link translation(".how_to_get_your_stolen_bike_back"), get_your_stolen_bike_back_path %>
+              <%= render UI::ActiveLink::Component.new(text: translation(".how_to_get_your_stolen_bike_back"), path: get_your_stolen_bike_back_path) %>
             </li>
 
             <% unless content_page_type == "news" %>
               <li>
-                <%= helpers.active_link translation(".bike_index_news"), news_index_path %>
+                <%= render UI::ActiveLink::Component.new(text: translation(".bike_index_news"), path: news_index_path) %>
               </li>
             <% end %>
 
             <li>
-              <%= helpers.active_link translation(".protect_your_bike"), protect_your_bike_path %>
+              <%= render UI::ActiveLink::Component.new(text: translation(".protect_your_bike"), path: protect_your_bike_path) %>
             </li>
 
             <li>
-              <%= helpers.active_link translation(".bicycle_serials"), serials_path %>
+              <%= render UI::ActiveLink::Component.new(text: translation(".bicycle_serials"), path: serials_path) %>
             </li>
 
             <% if %w(news about manufacturers).include?(content_page_type) %>
               <li>
-                <%= helpers.active_link translation(".donate"), why_donate_path %>
+                <%= render UI::ActiveLink::Component.new(text: translation(".donate"), path: why_donate_path) %>
               </li>
             <% end %>
 
             <% if %w(news serials manufacturers).include?(content_page_type) %>
               <li>
-                <%= helpers.active_link translation(".bike_index_store"), store_path %>
+                <%= render UI::ActiveLink::Component.new(text: translation(".bike_index_store"), path: store_path) %>
               </li>
             <% end %>
 
             <li>
-              <%= helpers.active_link translation(".design_and_developer_resources"), resources_path %>
+              <%= render UI::ActiveLink::Component.new(text: translation(".design_and_developer_resources"), path: resources_path) %>
             </li>
 
             <li>
-              <%= helpers.active_link translation(".sign_up_your_organization"), new_organization_path %>
+              <%= render UI::ActiveLink::Component.new(text: translation(".sign_up_your_organization"), path: new_organization_path) %>
             </li>
           </ul>
         </nav>

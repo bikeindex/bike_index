@@ -11,7 +11,7 @@ RSpec.describe PageBlock::Navbar::PrimaryMenu::Component, type: :component do
     described_class.new(current_user:, current_user_or_unconfirmed_user: current_user,
       controller_namespace:, controller_name:, action_name:)
   end
-  # The request drives active_link, which resolves the items that pass no :active
+  # The request drives UI::ActiveLink, which resolves the items that pass no :active
   let(:component) { with_request_url("/") { render_inline(instance) } }
   let(:menu_links) { component.css("#primary-main-menu a").map { |link| link.text.strip } }
 

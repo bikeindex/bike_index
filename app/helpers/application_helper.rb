@@ -22,13 +22,6 @@ module ApplicationHelper
     end
   end
 
-  def active_link(link_text, link_path, html_options = {})
-    match_controller = html_options.delete(:match_controller)
-    html_options[:class] ||= ""
-    html_options[:class] += " active" if current_page_active?(link_path, match_controller)
-    link_to(raw(link_text), link_path, html_options).html_safe
-  end
-
   # Organized lays out its own general alert, and takes over the body background
   def main_content_organized?
     PageBlock::MainContent::Wrapper::Component.kind(
