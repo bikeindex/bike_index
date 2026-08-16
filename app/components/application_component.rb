@@ -79,17 +79,6 @@ class ApplicationComponent < ViewComponent::Base
 
   private
 
-  # Prefer these to controller_name/action_name: they read request.path_parameters, so the
-  # routed controller is reflected in component specs (which dispatch through a generic
-  # vc_test_controller).
-  def routed_controller
-    controller.request.path_parameters[:controller]
-  end
-
-  def routed_action
-    controller.request.path_parameters[:action]
-  end
-
   # Wrap `I18n.translate` for use in components, abstracting away
   # scope-setting.
   #

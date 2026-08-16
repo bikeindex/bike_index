@@ -63,7 +63,7 @@
 
     <%= render(PageBlock::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
 
-    <%= render PageBlock::Navbar::Component.new(current_user:, current_user_or_unconfirmed_user:, passive_organization:, page_id:, unregistered_parking_notification: @unregistered_parking_notification) %>
+    <%= render PageBlock::Navbar::Component.new(current_user:, current_user_or_unconfirmed_user:, passive_organization:, page_id:, controller_namespace:, controller_name:, action_name:, unregistered_parking_notification: @unregistered_parking_notification) %>
 
     <% if render_donation_request? %>
       <%= render PageBlock::LawEnforcementDonation::Component.new(current_user:) %>

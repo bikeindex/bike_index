@@ -6,18 +6,23 @@ module PageBlock
     # authorization prompt.
     class Component < ApplicationComponent
       # Digest of the cached template — the cached_markup_digest spec keeps it current
-      MARKUP_DIGEST = "8b1312f36f4e"
+      MARKUP_DIGEST = "8b31357fe9bc"
 
       # Renders nothing that varies, so it skips the cache and needs none of its key
       def self.logo_only
-        new(page_id: nil, current_user: nil, current_user_or_unconfirmed_user: nil, logo_only: true)
+        new(page_id: nil, current_user: nil, current_user_or_unconfirmed_user: nil,
+          controller_namespace: nil, controller_name: nil, action_name: nil, logo_only: true)
       end
 
-      def initialize(page_id:, current_user:, current_user_or_unconfirmed_user:,
-        passive_organization: nil, logo_only: false, unregistered_parking_notification: nil)
+      def initialize(page_id:, current_user:, current_user_or_unconfirmed_user:, controller_namespace:,
+        controller_name:, action_name:, passive_organization: nil, logo_only: false,
+        unregistered_parking_notification: nil)
         @page_id = page_id
         @current_user = current_user
         @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user
+        @controller_namespace = controller_namespace
+        @controller_name = controller_name
+        @action_name = action_name
         @passive_organization = passive_organization
         @logo_only = logo_only
         @unregistered_parking_notification = unregistered_parking_notification
@@ -47,12 +52,12 @@ module PageBlock
 
       def search_item(item_class)
         {label: translation(".search"), path: helpers.default_bike_search_path,
-         active: index_active?("search/registrations"), item_class:}
+         active: search_active?("registrations"), item_class:}
       end
 
       def marketplace_item(item_class)
         {label: translation(".marketplace"), path: search_marketplace_path,
-         active: index_active?("search/marketplace"), item_class:}
+         active: search_active?("marketplace"), item_class:}
       end
 
       def account_items
@@ -108,8 +113,8 @@ module PageBlock
         ["nav-link", item[:link_class], ("active" if item[:active] == true)].compact.join(" ")
       end
 
-      def index_active?(controller)
-        routed_controller == controller && routed_action == "index"
+      def search_active?(controller_name)
+        @controller_namespace == "search" && @controller_name == controller_name && @action_name == "index"
       end
     end
   end

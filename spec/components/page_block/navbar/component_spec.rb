@@ -8,10 +8,14 @@ RSpec.describe PageBlock::Navbar::Component, type: :component do
   let(:current_user) { nil }
   let(:passive_organization) { nil }
   let(:url) { "/" }
+  let(:controller_namespace) { nil }
+  let(:controller_name) { "welcome" }
+  let(:action_name) { "index" }
   let(:instance) do
-    described_class.new(current_user:, current_user_or_unconfirmed_user: current_user,
-      passive_organization:, page_id: "welcome_index")
+    described_class.new(current_user:, current_user_or_unconfirmed_user: current_user, passive_organization:,
+      page_id: "welcome_index", controller_namespace:, controller_name:, action_name:)
   end
+  # The request drives active_link, which resolves the items that pass no :active
   let(:component) { with_request_url(url) { render_inline(instance) } }
   let(:menu_links) { component.css("#primary-main-menu a").map { |link| link.text.strip } }
 
@@ -25,7 +29,8 @@ RSpec.describe PageBlock::Navbar::Component, type: :component do
   end
 
   context "on the registration search page" do
-    let(:url) { "/search/registrations?stolenness=all" }
+    let(:controller_namespace) { "search" }
+    let(:controller_name) { "registrations" }
 
     it "marks both registration search links active" do
       expect(component.css("#primary-main-menu a.active").map { |link| link.text.strip }).to eq(%w[Search Search])
@@ -33,7 +38,8 @@ RSpec.describe PageBlock::Navbar::Component, type: :component do
   end
 
   context "on the marketplace search page" do
-    let(:url) { "/search/marketplace" }
+    let(:controller_namespace) { "search" }
+    let(:controller_name) { "marketplace" }
 
     it "marks both marketplace links active" do
       expect(component.css("#primary-main-menu a.active").map { |link| link.text.strip }).to eq(%w[Marketplace Marketplace])
