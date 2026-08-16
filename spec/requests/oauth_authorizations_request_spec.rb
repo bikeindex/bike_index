@@ -54,6 +54,8 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
         expect(response.body).to match(/authorize/i)
         expect(response.body).to match(/form action=.\/oauth\/authorize/)
         expect(response.body).to_not include("fbevents.js")
+        expect(response.body).to match(/nav class="primary-header-nav"/)
+        expect(response.body).to_not include("primary-main-menu")
       end
       context "non-https redirect_uri" do
         before { doorkeeper_app.update(redirect_uri:) }
