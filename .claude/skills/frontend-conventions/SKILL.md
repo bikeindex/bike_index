@@ -11,10 +11,7 @@ description: >-
   date/time. Trigger
   when adding or modifying views (`.html.erb`), view components, Stimulus
   controllers, Tailwind classes, or any frontend code that touches styling
-  or interactivity. **Also trigger before any
-  `mcp__playwright__browser_take_screenshot` call** — this skill defines
-  the required `tmp/` filename rule so screenshots don't land in the
-  project root. Stimulus.js is the JavaScript framework; SCSS and
+  or interactivity. Stimulus.js is the JavaScript framework; SCSS and
   CoffeeScript files exist but are deprecated.
 ---
 
@@ -46,7 +43,7 @@ Scope it rather than running bare `bin/lint`: a whole-repo run reformats files o
 
 ## Buttons: always `UI::Button` (and the UI component library generally)
 
-**Every button goes through `UI::Button::Component`** — never a hand-rolled `<button>`, `button_to`, or submit input with ad-hoc Tailwind classes. The component centralizes colors (`:primary`/`:secondary`/`:error`/`:link`), sizes (`:sm`/`:md`/`:lg`), and the focus/active/dark-mode states; a hand-styled button silently drifts from all of that the next time the design changes.
+**Every button goes through `UI::Button::Component`** — never a hand-rolled `<button>`, `button_to`, or submit input with ad-hoc Tailwind classes. The component centralizes colors (`:primary`/`:secondary`/`:error`/`:purple`/`:link` — its `COLORS` is the list of record), sizes (`:sm`/`:md`/`:lg`), and the focus/active/dark-mode states; a hand-styled button silently drifts from all of that the next time the design changes.
 
 - Plain button or form submit: `render UI::Button::Component.new(text: "Save", color: :primary, type: "submit")`. Pass a class as `html_class:` — the component builds its own, so a `class:` raises.
 - A link styled as a button: `UI::ButtonLink::Component.new(href:, text:, color:, size:)` — same palette, renders an `<a>`.
@@ -131,6 +128,6 @@ in, neither of which shows up as an error — the page just behaves oddly:
 
 `RegisterController` and the `Register::` components are the worked example of both.
 
-## Playwright screenshot filenames
+## Screenshots
 
-**Every `mcp__playwright__browser_take_screenshot` call must pass a `filename:` that starts with `tmp/`** (e.g. `tmp/tooltip-hover.png`). The MCP tool's default root is the project root — a bare filename like `tooltip.png` lands in the working tree, shows up in `git status`, and has to be cleaned up by hand. `tmp/` is gitignored, so screenshots there stay out of commits and don't pollute the diff. This rule applies to ad-hoc visual verification, not just PR-screenshot capture.
+Not this skill's — `frontend-screenshots` owns them, including where the files land.
