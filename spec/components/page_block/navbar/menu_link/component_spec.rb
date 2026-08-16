@@ -46,6 +46,14 @@ RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
     it "matches on the controller rather than the path" do
       expect(component).to have_css "a.nav-link.active[href='/news']"
     end
+
+    context "on another controller" do
+      let(:url) { "/help" }
+
+      it "renders inactive" do
+        expect(component.css("a").first["class"]).to eq "nav-link"
+      end
+    end
   end
 
   context "with link_class and html_options" do

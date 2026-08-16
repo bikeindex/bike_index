@@ -5,8 +5,6 @@ module PageBlock
     module MenuLink
       # One menu manifest item, as an anchor
       class Component < ApplicationComponent
-        # active: nil computes it from the path, :match_controller from the controller alone,
-        # false pins the link inactive -- swapping nil for false fails silently
         def initialize(label:, path:, active: nil, link_class: nil, html_options: {})
           @label = label
           @path = path
