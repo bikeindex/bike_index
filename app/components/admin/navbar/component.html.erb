@@ -22,7 +22,7 @@
       <% end %>
     </ul>
     <% if display_view_all? %>
-      <%= link_to active_link[:path], class: "nav-link text-muted em" do %>
+      <%= link_to current_nav_link[:path], class: "nav-link text-muted em" do %>
         All
         <div class="d-none d-sm-inline-block d-lg-none d-xl-inline-block">
           <%= view_all_title %>

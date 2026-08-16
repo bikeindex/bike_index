@@ -42,24 +42,24 @@ module Admin
       end
 
       def placeholder
-        active_link ? "Viewing #{active_link[:title]}" : "Admin navigation"
+        current_nav_link ? "Viewing #{current_nav_link[:title]}" : "Admin navigation"
       end
 
       # Remove "Config:" and "Dev:" from the all link title
       def view_all_title
-        active_link[:title].split(":").last
+        current_nav_link[:title].split(":").last
       end
 
       def display_view_all?
-        return false unless active_link&.dig(:match_controller)
+        return false unless current_nav_link&.dig(:match_controller)
 
-        !helpers.current_page_active?(active_link[:path]) || helpers.admin_search_filtered?
+        !helpers.current_page_active?(current_nav_link[:path]) || helpers.admin_search_filtered?
       end
 
-      def active_link
-        return @active_link if defined?(@active_link)
+      def current_nav_link
+        return @current_nav_link if defined?(@current_nav_link)
 
-        @active_link = nav_select_links
+        @current_nav_link = nav_select_links
           .detect { |link| helpers.current_page_active?(link[:path], link[:match_controller]) } || invoices_edit_link
       end
 

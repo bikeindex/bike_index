@@ -48,25 +48,6 @@ module ApplicationHelper
     end
   end
 
-  def admin_nav_link(link_text, link_path)
-    if controller_name == "dashboard"
-      if action_name == "invitations" && link_text == "Invitations"
-        class_name = "active"
-      elsif action_name == "show" && link_text == "Go hard"
-        class_name = "active"
-      end
-    elsif controller_name == "payments"
-      if action_name == "invoices" && link_text == "Invoices"
-        class_name = "active"
-      elsif link_text == "Payments"
-        class_name = "active"
-      end
-    else
-      class_name = (controller_name == link_text.downcase.tr(" ", "_")) ? "active" : ""
-    end
-    (link_to link_text, link_path, class: class_name).html_safe
-  end
-
   # Deprecated - UI::Forms::NestedFields::Component replaces this. Every set this adds shares one
   # child_index, so clicking twice submits a single record
   def link_to_add_fields(name, f, association, class_name: nil, obj_attrs: {}, filename: nil)

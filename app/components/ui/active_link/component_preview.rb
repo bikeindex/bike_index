@@ -3,8 +3,8 @@
 module UI
   module ActiveLink
     class ComponentPreview < ApplicationComponentPreview
-      # Every preview scenario routes to the same controller, which is what lets the
-      # match_controller pair below differ on a path neither of them is served from
+      # Every scenario routes through one controller, so the match_controller pair below
+      # differs on a path neither is served from
       PREVIEW_PATH = "/rails/view_components/ui/active_link/component"
 
       # @!group Variants
@@ -29,6 +29,12 @@ module UI
       def match_controller_omitted
         render(UI::ActiveLink::Component.new(text: "A sibling preview", path: "#{PREVIEW_PATH}/default",
           html_class: "nav-link"))
+      end
+
+      # A caller that already knows the state passes active:, skipping the current-page check
+      def active_forced
+        render(UI::ActiveLink::Component.new(text: "Forced active", path: "/support",
+          active: true, html_class: "nav-link"))
       end
 
       # Anything beyond html_class passes through to the anchor

@@ -110,10 +110,9 @@ module Org
         @is_dropdown && item[:type] == :disabled
       end
 
-      def link_classes(item, active)
+      def link_classes(item)
         classes = ["nav-link"]
         classes << "secondary-item" if item[:secondary]
-        classes << "active" if active
         classes.join(" ")
       end
 

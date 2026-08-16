@@ -13,7 +13,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
   it "renders a plain link when it isn't the current page" do
     expect(link["href"]).to eq path
     expect(link.text).to eq "Help"
-    expect(link["class"]).to be_blank
+    expect(link.attributes).to_not have_key("class")
   end
 
   context "on the linked page" do
@@ -62,6 +62,33 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
           expect(link["class"]).to be_blank
         end
       end
+    end
+  end
+
+  describe "active" do
+    context "forced true off the linked page" do
+      let(:options) { {active: true} }
+
+      it "skips the current page check" do
+        expect(link["class"]).to eq "active"
+      end
+    end
+
+    context "forced false on the linked page" do
+      let(:request_url) { path }
+      let(:options) { {active: false} }
+
+      it "skips the current page check" do
+        expect(link.attributes).to_not have_key("class")
+      end
+    end
+  end
+
+  context "with a class in html_options" do
+    let(:options) { {class: "nav-link"} }
+
+    it "raises, since the component builds its own" do
+      expect { component }.to raise_error(ArgumentError, /html_class/)
     end
   end
 

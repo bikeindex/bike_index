@@ -5,7 +5,6 @@ module PageBlock
     module MenuLink
       # One menu manifest item, as an anchor
       class Component < ApplicationComponent
-        # :auto and :match_controller resolve through UI::ActiveLink, true and false decide it here
         ACTIVE_STATES = [:auto, :match_controller, true, false].freeze
 
         def initialize(label:, path:, active: :auto, link_class: nil, html_options: {})
@@ -19,16 +18,16 @@ module PageBlock
         end
 
         def call
-          case @active
-          when :auto, :match_controller
-            render(UI::ActiveLink::Component.new(text: @label, path: @path, html_class: css_class,
-              match_controller: @active == :match_controller, **@html_options))
-          else
-            link_to(@label, @path, class: [css_class, ("active" if @active)].compact.join(" "), **@html_options)
-          end
+          render(UI::ActiveLink::Component.new(text: @label, path: @path, html_class: css_class,
+            active: resolved_active, match_controller: @active == :match_controller, **@html_options))
         end
 
         private
+
+        # :auto and :match_controller leave the current-page check to UI::ActiveLink
+        def resolved_active
+          @active unless [:auto, :match_controller].include?(@active)
+        end
 
         def css_class
           ["nav-link", @link_class].compact.join(" ")
