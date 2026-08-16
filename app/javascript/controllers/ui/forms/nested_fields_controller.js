@@ -10,8 +10,7 @@ import { collapse } from 'utils/collapse_utils'
 // sharing an index submit as a single record.
 export default class extends Controller {
   static targets = ['target', 'template']
-  // UI::Forms::NestedFields::Component owns the class, and passes it down rather than
-  // restating it here
+  // UI::Forms::NestedFields::Component owns the class and passes it down
   static values = { wrapperSelector: String }
 
   initialize () {

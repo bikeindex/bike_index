@@ -46,17 +46,20 @@
       <% end %>
     <% end %>
 
-    <% OrganizationFeature.reg_fields_with_customizable_labels.each do |reg_field| %>
-      <%# The email fields aren't features, so paid? is what gates them %>
-      <% email_field = OrganizationFeature.email_customizable_labels.include?(reg_field) %>
-      <% next unless email_field ? @organization.paid? : @organization.enabled?(reg_field) %>
+    <% if customizable_reg_fields.any? %>
+      <p class="less-strong mt-4 mb-1">
+        Custom labels - leave blank unless it's <strong>absolutely</strong>
+        required, default behavior is preferred
+      </p>
+    <% end %>
 
+    <% customizable_reg_fields.each do |reg_field| %>
       <% reg_text = reg_field_text(reg_field) %>
 
       <%= render(UI::Forms::Group::Component.new(attribute: "reg_label-#{reg_field}", label_text: reg_text[:label])) do |group| %>
-        <% group.with_helper_text { reg_text[:note] } %>
+        <% group.with_helper_text { reg_text[:note] } if reg_text[:note] %>
 
-        <%= text_field_tag "reg_label-#{reg_field}", helpers.registration_field_label(@organization, reg_field), class: "twinput", "aria-describedby" => group.helper_text_id %>
+        <%= text_field_tag "reg_label-#{reg_field}", helpers.registration_field_label(@organization, reg_field), class: "twinput", "aria-describedby" => (group.helper_text_id if reg_text[:note]) %>
       <% end %>
     <% end %>
 

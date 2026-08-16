@@ -37,10 +37,9 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
   end
 
   it "puts every field's qualifying note in the helper_text slot rather than the label" do
-    # A note baked into the label renders as a <small> inside it, and loses the
-    # aria-describedby that UI::Forms::Group wires up for the slot. [for] picks out exactly
-    # the Group labels - a checkbox's wraps its input and read_only_field labels no control,
-    # and neither has a slot to move a note into
+    # A note baked into the label loses the aria-describedby Group wires up for the slot.
+    # [for] picks out the Group labels - a checkbox's wraps its input, read_only_field's
+    # labels no control
     expect(component.css("label.twlabel[for] small")).to be_empty
     expect(component.at_css("label[for='organization_parent_organization_id']").text.squish)
       .to eq "Parent organization optional"
@@ -83,6 +82,21 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
         expect(component).not_to have_content("Ask Seth for help changing this")
         expect(domain_helper_text.text.squish).to eq "passwordless sign in feature"
       end
+    end
+  end
+
+  context "with every customizable registration label" do
+    let(:organization) do
+      FactoryBot.create(:organization_with_organization_features,
+        enabled_feature_slugs: OrganizationFeature.reg_fields_with_customizable_labels)
+    end
+
+    it "states the leave-blank advice once for the group, not under every field" do
+      expect(component).to have_field("reg_label-reg_phone")
+      expect(component.text.scan("default behavior is preferred").size).to eq 1
+      # The email fields' notes are their own, so they stay in the slot
+      expect(component.at_css("#reg_label-owner_email_helper").text.squish).to eq "often desired by universities"
+      expect(component.at_css("#reg_label-reg_phone")["aria-describedby"]).to be_nil
     end
   end
 

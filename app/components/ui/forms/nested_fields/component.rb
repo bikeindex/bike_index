@@ -42,8 +42,7 @@ module UI
           end
         end
 
-        # data-new-record is what tells #remove to detach rather than hide, so the wrapper sets
-        # it from the record itself
+        # data-new-record is what tells #remove to detach rather than hide
         def record_fields(builder)
           tag.div(class: [WRAPPER_CLASS, @fields_class_name].compact.join(" "),
             data: {new_record: builder.object.new_record?}) do
