@@ -1,0 +1,236 @@
+# frozen_string_literal: true
+
+# The organization sidebar's menu, grouped the way the design lays it out:
+# collapsible groups that own their children, rather than the flat list of links
+# and dividers OrganizedServices::UserMenuItems returns for the API.
+#
+# Item shapes:
+#   {type: :divider}
+#   {type: :group, key:, label:, icon:, children: [...]}
+#   {type: :link, label:, path:, active:}
+#   {type: :disabled, label:}
+#
+# A group whose children are all gated off doesn't render at all. `key` is what
+# the Stimulus controller opens and closes, and what the component matches the
+# current page against to decide which group starts open.
+#
+# `active:` carries the same vocabulary as UserMenuItems — :auto and
+# :match_controller defer to the active_link helper, the rest the component
+# resolves per request.
+module OrganizedServices
+  module SidebarMenu
+    extend Functionable
+
+    # Messaging, Reports and Add an Impounded Vehicle are in the design with nothing
+    # to link to — organized routes no impound_records#new, and neither of the other
+    # two exists at all. They render greyed rather than being dropped, so the menu
+    # keeps the shape the design gives it.
+    def for(organization:, current_user:)
+      return [] if organization.nil? || current_user.nil?
+
+      Rails.cache.fetch(["organized_sidebar_menu_v1", organization.id, current_user.cache_key_with_version]) do
+        build_items(organization, current_user)
+      end
+    end
+
+    #
+    # private below here
+    #
+
+    def build_items(organization, current_user)
+      strip_dividers([
+        registrations_group(organization),
+        add_bike_link(organization),
+        divider,
+        impounded_group(organization, current_user),
+        parking_group(organization),
+        bulk_group(organization),
+        messaging_link,
+        model_audits_link(organization),
+        graduated_link(organization),
+        hot_sheet_link(organization),
+        reports_link,
+        divider,
+        settings_group(organization, current_user)
+      ].compact)
+    end
+
+    # A gated-off group leaves the divider that separated it behind
+    def strip_dividers(items)
+      items.chunk_while { |a, b| a[:type] == :divider && b[:type] == :divider }
+        .map(&:first)
+        .drop_while { |item| item[:type] == :divider }
+        .reverse.drop_while { |item| item[:type] == :divider }.reverse
+    end
+
+    def registrations_group(organization)
+      children = [
+        link(translation(:search_registrations),
+          routes.organization_registrations_path(organization_id: organization.to_param),
+          active: :on_registrations_index),
+        (if organization.enabled?("show_partial_registrations")
+           link(translation(:incomplete_registrations),
+             routes.incompletes_organization_bikes_path(organization.to_param))
+         end),
+        (if organization.enabled?("bike_search")
+           link(translation(:multi_search),
+             routes.multi_search_organization_registrations_path(organization.to_param))
+         end),
+        (if organization.enabled?("show_recoveries")
+           link(translation(:recoveries), routes.recoveries_organization_bikes_path(organization.to_param))
+         end),
+        (if organization.enabled?("bike_stickers")
+           link(translation(:registration_stickers),
+             routes.organization_stickers_path(organization_id: organization.to_param),
+             active: :match_controller)
+         end)
+      ]
+
+      group(:registrations, translation(:org_registrations, org_name: organization.short_name), "bike", children)
+    end
+
+    def add_bike_link(organization)
+      link(translation(:add_a_bike), routes.new_organization_bike_path(organization.to_param),
+        icon: "plus-circle", active: :on_bikes_new)
+    end
+
+    def impounded_group(organization, current_user)
+      return nil unless organization.enabled?("impound_bikes")
+
+      children = [
+        link(translation(:search_impounded_vehicles),
+          routes.organization_impound_records_path(organization_id: organization.to_param),
+          active: :match_controller),
+        (if organization.impound_claims?
+           link(translation(:impounded_claims),
+             routes.organization_impound_claims_path(organization_id: organization.to_param),
+             active: :match_controller)
+         end),
+        (if admin?(organization, current_user)
+           link(translation(:manage_impounding),
+             routes.edit_organization_manage_impounding_path(organization_id: organization.to_param))
+         end),
+        disabled(translation(:add_an_impounded_vehicle))
+      ]
+
+      group(:impounded, translation(:impounded_vehicles), "impound", children)
+    end
+
+    def parking_group(organization)
+      return nil unless organization.enabled?("parking_notifications")
+
+      children = [
+        link(translation(:search_parking_notifications),
+          routes.organization_parking_notifications_path(organization_id: organization.to_param)),
+        link(translation(:parking_notification_unregistered),
+          routes.new_organization_bike_path(organization.to_param, parking_notification: true),
+          active: :on_bikes_new_with_parking_notification)
+      ]
+
+      group(:parking, translation(:parking_notifications), "map-pin", children)
+    end
+
+    def bulk_group(organization)
+      import_label = organization.ascend_or_broken_ascend? ? translation(:ascend_imports) : translation(:bulk_imports)
+      children = [
+        (if organization.show_bulk_import?
+           link(import_label, routes.organization_bulk_imports_path(organization_id: organization.to_param),
+             active: :match_controller)
+         end),
+        (if organization.enabled?("csv_exports")
+           link(translation(:exports), routes.organization_exports_path(organization_id: organization.to_param),
+             active: :match_controller)
+         end)
+      ]
+
+      group(:bulk, translation(:bulk_import_and_export), "import-export", children)
+    end
+
+    def messaging_link
+      disabled(translation(:messaging), icon: "chat")
+    end
+
+    def model_audits_link(organization)
+      return nil unless organization.enabled?("model_audits")
+
+      link(translation(:model_audits), routes.organization_model_audits_path(organization_id: organization.to_param),
+        icon: "bolt", active: :match_controller)
+    end
+
+    def graduated_link(organization)
+      return nil unless organization.enabled?("graduated_notifications")
+
+      link(translation(:graduated_notifications),
+        routes.organization_graduated_notifications_path(organization_id: organization.to_param),
+        icon: "graduation-cap", active: :match_controller)
+    end
+
+    def hot_sheet_link(organization)
+      return nil unless organization.enabled?("hot_sheet")
+
+      link(translation(:stolen_hot_sheet), routes.organization_hot_sheet_path(organization_id: organization.to_param),
+        icon: "clipboard")
+    end
+
+    def reports_link
+      disabled(translation(:reports), icon: "bar-chart")
+    end
+
+    def settings_group(organization, current_user)
+      return nil unless admin?(organization, current_user)
+
+      children = [
+        link(translation(:org_profile, org_name: organization.short_name),
+          routes.organization_manage_path(organization_id: organization.to_param)),
+        link(translation(:manage_users),
+          routes.organization_users_path(organization_id: organization.to_param), active: :match_controller),
+        (if organization.enabled?("impound_bikes")
+           link(translation(:impounding),
+             routes.edit_organization_manage_impounding_path(organization_id: organization.to_param))
+         end),
+        (if organization.enabled?("hot_sheet")
+           link(translation(:stolen_hot_sheet),
+             routes.edit_organization_hot_sheet_path(organization_id: organization.to_param))
+         end)
+      ]
+
+      group(:settings, translation(:org_settings, org_name: organization.short_name), "gear", children)
+    end
+
+    def admin?(organization, current_user)
+      current_user.admin_of?(organization) || current_user.superuser?
+    end
+
+    def group(key, label, icon, children)
+      present = children.compact
+      return nil if present.none? { |child| child[:type] == :link }
+
+      {type: :group, key:, label:, icon:, children: present}
+    end
+
+    def link(label, path, icon: nil, active: :auto)
+      {type: :link, label:, path:, icon:, active:}
+    end
+
+    def disabled(label, icon: nil)
+      {type: :disabled, label:, icon:}
+    end
+
+    def divider
+      {type: :divider}
+    end
+
+    def translation(key, **interpolations)
+      I18n.t(key, scope: "shared.organized_menu_items", **interpolations)
+    end
+
+    def routes
+      Rails.application.routes.url_helpers
+    end
+
+    conceal :build_items, :strip_dividers, :registrations_group, :add_bike_link, :impounded_group, :parking_group,
+      :bulk_group, :messaging_link, :model_audits_link, :graduated_link, :hot_sheet_link,
+      :reports_link, :settings_group, :admin?, :group, :link, :disabled, :divider,
+      :translation, :routes
+  end
+end
