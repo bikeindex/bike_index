@@ -157,7 +157,7 @@ module Org
 
       # The flow's later steps are on /register, which no organized route matches
       def on_register_flow?
-        @register_flow_organization_id.present? && @register_flow_organization_id == @organization.id
+        @register_flow_organization_id == @organization.id
       end
 
       def on_registrations_new?

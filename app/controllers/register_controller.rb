@@ -230,10 +230,13 @@ class RegisterController < ApplicationController
 
   # A registration started on the organization's own page keeps its menu for the rest of
   # the flow. Only for a member - the origin says where it started, not who's registering
+  # The origin first - it's in memory, and creation_organization is a query every
+  # registration an organization is attached to would otherwise pay on every step
   def assign_organized_render
-    organization = @b_param&.creation_organization
-    return if @b_param&.origin != "register_flow_organized" || organization.blank?
-    return unless current_user&.authorized?(organization)
+    return unless @b_param&.register_flow_organized?
+
+    organization = @b_param.creation_organization
+    return unless organization.present? && current_user&.authorized?(organization)
 
     @current_organization = organization
     @force_organized_render = true

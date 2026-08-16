@@ -900,7 +900,7 @@ RSpec.describe RegisterController, type: :request do
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
       end
 
-      # The origin Organized::RegistrationsController#new starts a registration with
+      # The origin Organized::RegistrationsController#new gives a registration
       context "started from an organization" do
         let(:b_param) do
           BParam.create(origin: "register_flow_organized",
