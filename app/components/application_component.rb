@@ -92,7 +92,8 @@ class ApplicationComponent < ViewComponent::Base
   #
   # See specs for component_translation_scope in Search::Form::Component
   def translation(key, scope: nil, **kwargs)
-    HtmlSafeTranslation.translate(key, scope: scope || component_translation_scope, **kwargs)
+    ActiveSupport::HtmlSafeTranslation
+      .translate(key, **kwargs, scope: (scope || component_translation_scope).compact)
   end
 
   def component_translation_scope

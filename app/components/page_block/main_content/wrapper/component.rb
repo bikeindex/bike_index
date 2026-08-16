@@ -31,7 +31,7 @@ module PageBlock
         end
 
         # Every wrapper's subject, since the layout renders this before knowing which
-        # wrapper it gets - only the matched one's are read
+        # wrapper it gets - only the matched one's args are read
         def initialize(controller_namespace:, controller_name:, action_name:,
           force_landing_page_render: false, current_user: nil, current_organization: nil,
           passive_organization: nil, show_general_alert: false, blog: nil, related_blogs: nil,
@@ -58,22 +58,18 @@ module PageBlock
         end
 
         def call
-          wrapper = wrapping_component
+          wrapper = case @kind
+          when :content then content_component
+          when :edit_bike then edit_bike_component
+          when :oauth_applications then oauth_applications_component
+          when :organized then organized_component
+          end
           return content if wrapper.nil?
 
           render(wrapper) { content }
         end
 
         private
-
-        def wrapping_component
-          case @kind
-          when :content then content_component
-          when :edit_bike then edit_bike_component
-          when :oauth_applications then oauth_applications_component
-          when :organized then organized_component
-          end
-        end
 
         def content_component
           PageBlock::MainContent::Content::Component.new(
