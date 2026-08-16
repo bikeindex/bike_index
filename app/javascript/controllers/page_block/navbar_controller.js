@@ -9,7 +9,7 @@ const TRANSITION_MS = 200
 // primary_header_nav.scss already styles, so `open` lands on a toggle's parent
 // the way bootstrap's did.
 export default class extends Controller {
-  static targets = ['menu', 'backdrop', 'hamburgler', 'hamburglerButton', 'organizationToggle']
+  static targets = ['hamburgler', 'hamburglerButton', 'organizationToggle']
 
   connect () {
     this.truncateOrganizationName()
@@ -44,7 +44,6 @@ export default class extends Controller {
     setTimeout(() => this.element.classList.remove('enabled'), TRANSITION_MS)
   }
 
-  // Opening one dropdown closes the other, so only one is ever open
   toggleDropdown (event) {
     const toggle = event.currentTarget
     const wasOpen = toggle === this.openDropdown
@@ -95,14 +94,13 @@ export default class extends Controller {
     const { bottom, height } = this.hamburglerTarget.getBoundingClientRect()
     if (!height) return
 
-    this.menuTarget.style.top = `${bottom}px`
-    this.backdropTarget.style.top = `${bottom}px`
+    this.element.style.setProperty('--navbar-bottom', `${bottom}px`)
   }
 
   // A wide passive organization name overflows and hides the rest of the small-screen
   // navbar, so cap it at what the logo and hamburgler leave, less its margin and padding
   truncateOrganizationName () {
-    if (window.innerWidth >= 768 || !this.hasOrganizationToggleTarget) return
+    if (!this.hasOrganizationToggleTarget || window.innerWidth >= 768) return
 
     const available = this.element.querySelector('.container').clientWidth -
       this.element.querySelector('.primary-logo').offsetWidth -

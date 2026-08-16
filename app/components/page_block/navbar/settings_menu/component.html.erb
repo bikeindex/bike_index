@@ -1,9 +1,9 @@
-<%# UI::Button's utilities outrank @layer legacy, so the gear's box is set here %>
+<%# UI::Button's utilities outrank @layer legacy, so the gear is styled here %>
 
 <%= render UI::Button::Component.new(
       id: "setting_submenu",
       color: :link,
-      html_class: "nav-link settings-link tw:hidden! tw:navbar:block! tw:px-[15px] tw:py-1.5",
+      html_class: "settings-link tw:hidden! tw:navbar:block! tw:px-[15px] tw:py-1.5",
       aria: {label: translation(".settings_menu"), haspopup: true, expanded: false},
       data: {action: "click->page-block--navbar#toggleDropdown"}
     ) do %>
