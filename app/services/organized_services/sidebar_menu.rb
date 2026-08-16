@@ -127,7 +127,7 @@ module OrganizedServices
           active: :on_bikes_new_with_parking_notification)
       ]
 
-      group(:parking, translation(:parking_notifications), "map-pin", children)
+      group(:parking, translation(:parking_notifications_group), "map-pin", children)
     end
 
     def bulk_group(organization)

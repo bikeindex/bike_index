@@ -5003,6 +5003,7 @@ en:
       org_settings: "%{org_name} Settings"
       parking_notification_unregistered: New unregistered notification
       parking_notifications: Parking notifications
+      parking_notifications_group: Parking Notifications
       recoveries: Recoveries
       registration_stickers: Registration stickers
       reports: Reports

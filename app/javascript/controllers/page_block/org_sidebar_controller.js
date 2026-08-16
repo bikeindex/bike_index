@@ -1,0 +1,139 @@
+import { Controller } from '@hotwired/stimulus'
+
+const EXPANDED_WIDTH = '266px'
+const COLLAPSED_WIDTH = '68px'
+
+// Connects to data-controller="page-block--org-sidebar"
+//
+// Below mobileBreakpoint the sidebar is an overlay behind the top bar's hamburgler;
+// above it, a column that collapses to an icon rail under collapseBreakpoint. Every
+// width and visibility rule is a tailwind variant on data-collapsed / data-mobile-open,
+// so this only sets those two — and the custom property the content column reads.
+export default class extends Controller {
+  static targets = ['mobileToggle', 'collapseToggle', 'accountMenu', 'accountToggle']
+  static values = { collapseBreakpoint: Number, mobileBreakpoint: Number }
+
+  connect () {
+    // Null until the reader collapses or expands it themselves, after which their
+    // choice outranks the breakpoint for the rest of the page
+    this.override = null
+    this.render()
+  }
+
+  disconnect () {
+    document.documentElement.style.removeProperty('--org-sidebar-width')
+  }
+
+  resize () {
+    this.render()
+  }
+
+  toggleCollapse () {
+    this.override = !this.collapsed
+    this.closeAccount()
+    this.render()
+  }
+
+  toggleMobile () {
+    this.setMobileOpen(!this.mobileOpen)
+  }
+
+  closeMobile () {
+    this.setMobileOpen(false)
+  }
+
+  // Collapsed there's nowhere to put the children, so expand before opening
+  toggleGroup (event) {
+    const button = event.currentTarget
+
+    if (this.collapsed) {
+      this.override = false
+      this.render()
+      this.setGroupOpen(button, true)
+      return
+    }
+
+    this.closeAccount()
+    this.setGroupOpen(button, button.getAttribute('aria-expanded') !== 'true')
+  }
+
+  toggleAccount (event) {
+    event.stopPropagation()
+
+    if (this.collapsed) {
+      this.override = false
+      this.render()
+      this.setAccountOpen(true)
+      return
+    }
+
+    this.setAccountOpen(!this.accountOpen)
+  }
+
+  closeAccountOutside (event) {
+    if (this.accountOpen && !this.element.contains(event.target)) this.closeAccount()
+  }
+
+  closeOnEscape () {
+    this.closeAccount()
+    if (!this.mobileOpen) return
+
+    this.closeMobile()
+    this.mobileToggleTarget.focus()
+  }
+
+  setGroupOpen (button, open) {
+    button.setAttribute('aria-expanded', open)
+    const panel = document.getElementById(button.getAttribute('aria-controls'))
+    panel.classList.toggle('tw:hidden', !open)
+    panel.classList.toggle('tw:flex', open)
+  }
+
+  setAccountOpen (open) {
+    this.accountToggleTarget.setAttribute('aria-expanded', open)
+    this.accountMenuTarget.classList.toggle('tw:hidden', !open)
+    this.accountMenuTarget.classList.toggle('tw:flex', open)
+  }
+
+  closeAccount () {
+    this.setAccountOpen(false)
+  }
+
+  setMobileOpen (open) {
+    this.element.dataset.mobileOpen = open
+    this.mobileToggleTarget.setAttribute('aria-expanded', open)
+    if (!open) this.closeAccount()
+  }
+
+  render () {
+    const { collapsed } = this
+    this.element.dataset.collapsed = collapsed
+
+    const { collapseLabel, expandLabel } = this.collapseToggleTarget.dataset
+    const label = collapsed ? expandLabel : collapseLabel
+    this.collapseToggleTarget.setAttribute('aria-label', label)
+    this.collapseToggleTarget.setAttribute('title', label)
+
+    document.documentElement.style.setProperty('--org-sidebar-width',
+      this.mobile ? '0px' : (collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH))
+  }
+
+  get mobile () {
+    return window.innerWidth < this.mobileBreakpointValue
+  }
+
+  get collapsed () {
+    if (this.mobile) return false
+    if (this.override !== null) return this.override
+
+    return window.innerWidth < this.collapseBreakpointValue
+  }
+
+  get mobileOpen () {
+    return this.element.dataset.mobileOpen === 'true'
+  }
+
+  get accountOpen () {
+    return this.accountToggleTarget.getAttribute('aria-expanded') === 'true'
+  }
+}
