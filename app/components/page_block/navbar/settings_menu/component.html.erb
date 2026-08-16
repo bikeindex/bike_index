@@ -9,7 +9,8 @@
       html_class: "nav-link settings-link primary-nav-link-with-submenu " \
         "tw:hidden! tw:[@media(min-width:992px)]:block! tw:px-[15px]! tw:py-1.5!",
       aria: {label: translation(".settings_menu"), haspopup: true, expanded: false},
-      data: {toggle: "dropdown"}
+      data: {action: "click->page-block--navbar#toggleDropdown",
+             "page-block--navbar-target": "dropdownToggle"}
     ) do %>
   <svg
     id="settings-icon"

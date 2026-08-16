@@ -1,4 +1,8 @@
-<ul id="primary-main-menu" class="primary-main-menu tw:m-0 tw:list-none">
+<ul
+  id="primary-main-menu"
+  class="primary-main-menu tw:m-0 tw:list-none"
+  data-page-block--navbar-target="menu"
+>
   <% menu_items.each do |item| %>
     <% case item[:type] %>
     <% when :divider %>

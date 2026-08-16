@@ -149,8 +149,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
     expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
 
-    expect(page).to have_css(".organized-access-panel")
-    expect(page).to have_content(/#{organization.name}\s+Access Panel/i)
+    expect(page).to have_css(".organized-access-panel", text: /Access Panel/i)
+    # The panel heading's organization is hidden below md, so its permission row is
+    # where the name shows at this width
+    expect(page).to have_css(".organized-access-panel", text: organization.name)
 
     # Go back
     page.go_back

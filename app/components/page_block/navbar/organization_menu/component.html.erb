@@ -9,7 +9,8 @@
         color: :link,
         html_class: "tw:block! tw:px-[15px]! tw:py-2! tw:text-white! tw:hover:text-white!",
         aria: {haspopup: true, expanded: false},
-        data: {toggle: "dropdown"}
+        data: {action: "click->page-block--navbar#toggleDropdown",
+               "page-block--navbar-target": "dropdownToggle organizationToggle"}
       ) do %>
     <%= @organization.short_name %>
     <%= render UI::IconChevron::Component.new(direction: :down, html_class: "tw:ml-1") %>
