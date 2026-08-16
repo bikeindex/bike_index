@@ -17,7 +17,7 @@ class BikeIndex.NavHeader extends BikeIndex
         $(".primary-header-nav .primary-logo").outerWidth() -
         $(".primary-header-nav .hamburgler").outerWidth()
       # There is also a 16px margin and a bunch of padding on either side on current-organization-submenu, so subtract that as well
-      $(".primary-header-nav .current-organization-nav-item a").css("max-width", "#{available_width - 102}px")
+      $("#passive_organization_submenu").css("max-width", "#{available_width - 102}px")
 
   # The menu and its backdrop are fixed to the viewport, but the navbar isn't -
   # the review-app banner pushes it down, further still when the PR title wraps.

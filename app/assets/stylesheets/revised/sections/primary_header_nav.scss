@@ -91,7 +91,9 @@ $mobile-nav-height: 4 * $vertical-height;
     margin: 0 0 0 16px;
     padding: $vertical-height 24px 0;
 
-    a {
+    // The dropdown toggle is a button, and a button inherits no font
+    a,
+    button {
       @extend .header-font;
 
       color: #fff;
