@@ -94,6 +94,8 @@ This is what it catches, all of which has actually happened here:
 
 Then run specs for the merged area, **including the browser ones**. The base renaming or moving something your branch calls produces no conflict marker at all: a method that moved to a service, a route reshaped into a query param, copy your specs assert on. Those only surface at runtime.
 
+`bin/rails db:migrate` too, when the merge brought migrations — the test database is maintained from the schema, so the specs stay green while every page in the browser is an `ActiveRecord::PendingMigrationError`.
+
 ## Never force-push
 
 No exceptions, even on a personal branch. If history has already diverged from the remote and you're tempted to force-push, stop — recover with `git reset --soft <origin-branch>` to get the pushed commits back, then add follow-up work as new commits and push normally.
