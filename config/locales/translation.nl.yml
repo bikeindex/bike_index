@@ -627,7 +627,6 @@ nl:
         invoices: Facturen
         is_paid: Is betaald
         kind: Soort
-        landing_html: Landing html
         locations: Locaties
         lock_show_on_map: Show op kaart vergrendelen
         mail_snippets: E-mailfragmenten

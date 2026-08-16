@@ -645,7 +645,6 @@ it:
         invoices: Fatture
         is_paid: È pagato
         kind: Tipo
-        landing_html: Pagina di destinazione HTML
         locations: Luoghi
         lock_show_on_map: Blocco visualizzato sulla mappa
         mail_snippets: Frammenti di email

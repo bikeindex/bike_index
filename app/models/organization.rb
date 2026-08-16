@@ -17,7 +17,6 @@
 #  graduated_notification_interval :bigint
 #  is_paid                         :boolean          default(FALSE), not null
 #  kind                            :integer
-#  landing_html                    :text
 #  lightspeed_register_with_phone  :boolean          default(FALSE)
 #  location_latitude               :float
 #  location_longitude              :float
@@ -295,10 +294,6 @@ class Organization < ApplicationRecord
 
   def to_param
     slug
-  end
-
-  def landing_html?
-    landing_html.present?
   end
 
   def restrict_invitations?
