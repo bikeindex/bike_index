@@ -6,6 +6,9 @@ module Organized
 
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_search, :multi_search_response]
     around_action :set_reading_role, only: :multi_search_response
+    # new renders a component, which takes its content type from the request - and index
+    # answers turbo_stream, so the format is one a link here could ask for
+    before_action :force_html_response, only: :new
 
     def index
       return head(:not_acceptable) unless request.format.html? || request.format.turbo_stream?
@@ -61,7 +64,9 @@ module Organized
       # The form carries this registration's token, and a cached page would carry a stale one
       response.set_header("Cache-Control", "no-store")
       sequence = BikeServices::Register.registration_sequence(@b_param)
-      @steps = BikeServices::Register.steps(@b_param, sequence:)
+      steps = BikeServices::Register.steps(@b_param, sequence:)
+      render Org::RegisterStep1::Component.new(b_param: @b_param, steps:,
+        organization: current_organization, current_user:)
     end
 
     def multi_search
