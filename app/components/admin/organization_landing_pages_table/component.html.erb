@@ -1,0 +1,37 @@
+<%# a local, because the cell blocks below are instance_exec'd and can't see the component's ivars %>
+<% render_search = @render_search %>
+
+<%= render(UI::Table::Component.new(records: @collection, render_sortable: @render_sortable)) do |table| %>
+  <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |landing_page| %>
+    <%= link_to edit_admin_organization_custom_layout_path(organization_id: landing_page.organization_id, id: "landing_page") do %>
+      <%= render UI::Time::Component.new(time: landing_page.created_at) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |landing_page| %>
+    <small>
+      <%= render UI::Time::Component.new(time: landing_page.updated_at) %>
+    </small>
+  <% end %>
+
+  <% table.column(sortable: "organization_id", label: "Organization") do |landing_page| %>
+    <%= render Admin::OrganizationCell::Component.new(organization: landing_page.organization, organization_id: landing_page.organization_id, render_search:) %>
+  <% end %>
+
+  <% table.column(sortable: "enabled", label: "Enabled") do |landing_page| %>
+    <% mismatch_error = landing_page.enabled_mismatch_error %>
+    <%= render UI::Badge::Component.new(text: landing_page.enabled? ? "Enabled" : "Disabled", color: landing_page.enabled? ? :success : :gray, size: :sm) %>
+
+    <% if mismatch_error.present? %>
+      <%= render UI::Badge::Component.new(text: "Mismatch", title: mismatch_error, color: :error, size: :sm) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Body (characters)", header_classes: "tw:font-normal") do |landing_page| %>
+    <%= helpers.number_display(landing_page.body.to_s.size) %>
+  <% end %>
+
+  <% table.column(label: "History", header_classes: "tw:font-normal") do |landing_page| %>
+    <%= link_to "Versions", admin_paper_trail_versions_path(search_item_type: "OrganizationLandingPage", search_item_id: landing_page.id, period: "all"), class: "twlink tw:text-sm" %>
+  <% end %>
+<% end %>
