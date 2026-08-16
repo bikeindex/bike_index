@@ -5653,23 +5653,26 @@ it:
         marketplace: Mercato
         search: Cerca
       navbar:
-        blog: Blog
-        donate: Donare
-        help: Aiuto
-        log_in: accedi
-        logout: Disconnettiti
-        register_a_new_bike: Registra una nuova bicicletta
-        sign_up: Iscriviti
-        stolen_bike: Bicicletta rubata?
-        the_nonprofit_bike_registry: il registro delle biciclette senza scopo di lucro
-        user_settings: "%{user_email} impostazioni"
-        view_org: Visualizza %{org_name}
-        search: Cerca
-        marketplace_messages: Messaggi del mercato
-        your_registrations: Le vostre registrazioni
-        marketplace: Mercato
-        menu: Menu
-        settings_menu: Impostazioni
+        primary_menu:
+          blog: Blog
+          donate: Donare
+          help: Aiuto
+          log_in: accedi
+          logout: Disconnettiti
+          register_a_new_bike: Registra una nuova bicicletta
+          stolen_bike: Bicicletta rubata?
+          user_settings: "%{user_email} impostazioni"
+          view_org: Visualizza %{org_name}
+          search: Cerca
+          marketplace_messages: Messaggi del mercato
+          your_registrations: Le vostre registrazioni
+          marketplace: Mercato
+          settings_menu: Impostazioni
+          sign_up: Iscriviti
+        wrapper:
+          sign_up: Iscriviti
+          the_nonprofit_bike_registry: il registro delle biciclette senza scopo di lucro
+          menu: Menu
     emails:
       confirmation_email:
         click_to_sign_in_html: Fai clic sul pulsante <em>Accedi</em> per completare

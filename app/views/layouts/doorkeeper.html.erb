@@ -30,7 +30,7 @@
     id="<%= page_id %>"
     class="<%= 'organized-body' if main_content_organized? %>"
   >
-    <%= render PageBlock::Navbar::Component.logo_only %>
+    <%= render PageBlock::Navbar::Wrapper::Component.new(logo_only: true) %>
 
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
     <%= render 'layouts/revised_messages' %>

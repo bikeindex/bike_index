@@ -5540,23 +5540,26 @@ nl:
         marketplace: Marktplaats
         search: Zoeken
       navbar:
-        blog: Blog
-        donate: Schenken
-        help: Helpen
-        log_in: Log in
-        logout: Afmelden
-        register_a_new_bike: Registreer een nieuwe fiets
-        sign_up: Registreren
-        the_nonprofit_bike_registry: het fietsregister zonder winstoogmerk
-        user_settings: "%{user_email} instellingen"
-        view_org: Bekijk %{org_name}
-        stolen_bike: Fiets gestolen?
-        search: Zoeken
-        marketplace_messages: Marktplaatsberichten
-        your_registrations: Uw registraties
-        marketplace: Marktplaats
-        menu: Menu
-        settings_menu: Instellingen
+        primary_menu:
+          blog: Blog
+          donate: Schenken
+          help: Helpen
+          log_in: Log in
+          logout: Afmelden
+          register_a_new_bike: Registreer een nieuwe fiets
+          user_settings: "%{user_email} instellingen"
+          view_org: Bekijk %{org_name}
+          stolen_bike: Fiets gestolen?
+          search: Zoeken
+          marketplace_messages: Marktplaatsberichten
+          your_registrations: Uw registraties
+          marketplace: Marktplaats
+          settings_menu: Instellingen
+          sign_up: Registreren
+        wrapper:
+          sign_up: Registreren
+          the_nonprofit_bike_registry: het fietsregister zonder winstoogmerk
+          menu: Menu
     emails:
       confirmation_email:
         click_to_sign_in_html: Klik op de knop <em>Inloggen</em> om het aanmelden te

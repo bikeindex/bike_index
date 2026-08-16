@@ -5390,23 +5390,26 @@ nb:
         marketplace: Markedsplass
         search: Søk
       navbar:
-        blog: Blogg
-        donate: Donere
-        help: Hjelp
-        log_in: Logg Inn
-        logout: Logg ut
-        register_a_new_bike: Registrer en ny sykkel
-        sign_up: Registrer deg
-        stolen_bike: Stjålet sykkel?
-        the_nonprofit_bike_registry: det ideelle sykkelregisteret
-        user_settings: "%{user_email}-innstillinger"
-        view_org: Se %{org_name}
-        search: Søk
-        marketplace_messages: Markedsplassmeldinger
-        your_registrations: Dine registreringer
-        marketplace: Markedsplass
-        menu: Meny
-        settings_menu: Innstillinger
+        primary_menu:
+          blog: Blogg
+          donate: Donere
+          help: Hjelp
+          log_in: Logg Inn
+          logout: Logg ut
+          register_a_new_bike: Registrer en ny sykkel
+          stolen_bike: Stjålet sykkel?
+          user_settings: "%{user_email}-innstillinger"
+          view_org: Se %{org_name}
+          search: Søk
+          marketplace_messages: Markedsplassmeldinger
+          your_registrations: Dine registreringer
+          marketplace: Markedsplass
+          settings_menu: Innstillinger
+          sign_up: Registrer deg
+        wrapper:
+          sign_up: Registrer deg
+          the_nonprofit_bike_registry: det ideelle sykkelregisteret
+          menu: Meny
     emails:
       confirmation_email:
         click_to_sign_in_html: Klikk på <em>Logg på</em>-knappen for å fullføre registreringen!
