@@ -4,7 +4,8 @@
   <%= render UI::Button::Component.new(
         id: "passive_organization_submenu",
         color: :link,
-        html_class: "tw:block! tw:px-[15px] tw:py-2 tw:text-white",
+        html_class: "tw:block! tw:px-[15px] tw:py-2 tw:mb-2 " \
+          "tw:font-header tw:text-xs tw:leading-[18px] tw:uppercase tw:text-white",
         aria: {haspopup: true, expanded: false},
         data: {action: "click->page-block--navbar#toggleDropdown",
                "page-block--navbar-target": "organizationToggle"}

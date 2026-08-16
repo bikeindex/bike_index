@@ -26,12 +26,6 @@ RSpec.describe "Navbar", :js, type: :system do
   # defaults to desktop width
   before { page.current_window.resize_to(390, 844) }
 
-  # The landing page's category buttons repeat their own label in the image alt,
-  # which is the page's violation rather than the navbar's
-  def expect_navbar_axe_clean
-    expect_axe_clean("image-redundant-alt")
-  end
-
   it "opens the menu clear of the hamburgler, with and without the review-app banner" do
     visit root_path
 
@@ -41,7 +35,7 @@ RSpec.describe "Navbar", :js, type: :system do
     expect(page).to have_css(".center-navbar-signup-link")
     within("nav.primary-header-nav") { expect(page).to have_no_link("Search") }
     expect_active_navbar_links([])
-    expect_navbar_axe_clean
+    expect_axe_clean
 
     open_menu_and_search
     expect_active_navbar_links(%w[Search Search])
@@ -89,20 +83,20 @@ RSpec.describe "Navbar", :js, type: :system do
       expect(page).to have_button("Brakebills")
       expect(page).to have_no_link("Logout")
       expect(page).to have_no_link("Brakebills Bikes")
-      expect_navbar_axe_clean
+      expect_axe_clean
 
       click_button "Brakebills"
 
       expect(page).to have_link("Brakebills Bikes")
       expect(find_button("Brakebills")["aria-expanded"]).to eq "true"
-      expect_navbar_axe_clean
+      expect_axe_clean
 
       # Opening one dropdown closes the other
       find(settings_toggle).click
 
       expect(page).to have_link("Logout")
       expect(page).to have_no_link("Brakebills Bikes")
-      expect_navbar_axe_clean
+      expect_axe_clean
 
       find("body").click
 
