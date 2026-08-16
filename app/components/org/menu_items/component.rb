@@ -141,7 +141,7 @@ module Org
       end
 
       def on_registrations_new?
-        routed_controller == "organized/registrations" && routed_action == "new"
+        organized_controller?("registrations") && @action_name == "new"
       end
 
       def on_bikes_new?
