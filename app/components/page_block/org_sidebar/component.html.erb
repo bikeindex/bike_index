@@ -144,7 +144,7 @@
 
           <button
             type="button"
-            class="tw:mx-2 tw:flex tw:items-center tw:gap-[11px] tw:rounded-[11px] tw:px-3 tw:py-[9px] tw:text-sm tw:font-bold tw:group-data-[collapsed=true]/sidebar:justify-center tw:hover:bg-gray-100 tw:max-[760px]:py-3.5 tw:dark:hover:bg-gray-700 <%= active ? "tw:bg-blue-50 tw:text-blue-600 tw:dark:bg-gray-700" : "tw:text-gray-900 tw:dark:text-gray-300" %>"
+            class="<%= row_class(active) %>"
             aria-expanded="<%= open %>"
             aria-controls="org_sidebar_group_<%= item[:key] %>"
             data-action="page-block--org-sidebar#toggleGroup"
@@ -190,13 +190,7 @@
           </div>
         <% when :disabled %>
           <span
-            class="
-              tw:mx-2 tw:flex tw:items-center tw:gap-[11px]
-              tw:rounded-[11px] tw:px-3 tw:py-[9px] tw:text-sm tw:font-bold
-              tw:text-gray-400
-              tw:group-data-[collapsed=true]/sidebar:justify-center
-              tw:max-[760px]:py-3.5
-            "
+            class="tw:text-gray-400 <%= PageBlock::OrgSidebar::Component::ROW %>"
             title="<%= item[:label] %>"
           >
             <span class="tw:flex tw:flex-none"><%= icon(item[:icon], html_class: "tw:h-[17px] tw:w-[17px]") %></span>
@@ -214,7 +208,7 @@
           <% active = active_link?(item) %>
 
           <%= link_to item[:path],
-                class: "tw:mx-2 tw:flex tw:items-center tw:gap-[11px] tw:rounded-[11px] tw:px-3 tw:py-[9px] tw:text-sm tw:font-bold tw:no-underline tw:hover:bg-gray-100 tw:max-[760px]:py-3.5 tw:group-data-[collapsed=true]/sidebar:justify-center tw:dark:hover:bg-gray-700 #{active ? "tw:bg-blue-50 tw:text-blue-600 tw:dark:bg-gray-700" : "tw:text-gray-900 tw:dark:text-gray-300"}",
+                class: "#{row_class(active)} tw:no-underline",
                 aria: {current: active ? "page" : nil} do %>
             <span class="tw:flex tw:flex-none"><%= icon(item[:icon], html_class: "tw:h-[17px] tw:w-[17px]") %></span>
 

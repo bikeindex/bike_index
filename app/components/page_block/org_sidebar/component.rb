@@ -9,6 +9,14 @@ module PageBlock
       COLLAPSE_BREAKPOINT = 1100
       MOBILE_BREAKPOINT = 760
 
+      # A top-level row: the group toggles, the leaf links and the leaves with nothing
+      # to link to all sit on this, so they stay the same height as each other
+      ROW = "tw:mx-2 tw:flex tw:items-center tw:gap-[11px] tw:rounded-[11px] tw:px-3 tw:py-[9px] " \
+        "tw:text-sm tw:font-bold tw:group-data-[collapsed=true]/sidebar:justify-center tw:max-[760px]:py-3.5"
+      ROW_HOVER = "tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700"
+      ROW_CURRENT = "tw:bg-blue-50 tw:text-blue-600 tw:dark:bg-gray-700"
+      ROW_RESTING = "tw:text-gray-900 tw:dark:text-gray-300"
+
       def initialize(organization:, current_user:, current_user_or_unconfirmed_user: nil,
         controller_namespace: nil, controller_name: nil, action_name: nil,
         unregistered_parking_notification: nil)
@@ -43,10 +51,21 @@ module PageBlock
       # The group holding the current page opens on load; with none of them holding it
       # the first one does, the way the design shows it
       def open_group?(group)
-        active_group = items.find { |item| item[:type] == :group && group_active?(item) }
-        return group_active?(group) if active_group
+        group == (active_group || groups.first)
+      end
 
-        group == items.find { |item| item[:type] == :group }
+      def row_class(active)
+        [ROW, ROW_HOVER, active ? ROW_CURRENT : ROW_RESTING].join(" ")
+      end
+
+      def groups
+        @groups ||= items.select { |item| item[:type] == :group }
+      end
+
+      def active_group
+        return @active_group if defined?(@active_group)
+
+        @active_group = groups.find { |group| group_active?(group) }
       end
 
       def group_active?(group)

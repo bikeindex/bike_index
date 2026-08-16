@@ -113,7 +113,6 @@ RSpec.describe "Navbar", :js, type: :system do
       expect(page).to have_button("Brakebills Registrations")
       expect_axe_clean
 
-      # The account block carries what the settings dropdown used to
       expect(page).to have_no_link("Log out")
       find("[data-page-block--org-sidebar-target='accountToggle']").click
 
