@@ -46,6 +46,29 @@ RSpec.describe Org::MenuItems::Component, type: :component do
       expect(component.css("li.divider-nav-item").length).to be < non_dropdown.css("li.divider-nav-item").length
     end
 
+    # It renders inside the navbar's page-agnostic cache, so page-block--navbar resolves it
+    it "describes each link's active rule rather than resolving it" do
+      expect(component).to_not have_css "a.active"
+      labels = ->(selector) { component.css(selector).map { |link| link.text.strip } }
+      expect(labels.call("a[data-active-routes='organized/registrations#index']"))
+        .to eq ["#{organization.short_name} Bikes"]
+      expect(labels.call("a[data-active-routes='organized/bikes#new']")).to eq ["Add a bike"]
+      expect(labels.call("a[data-active-path]")).to include("#{organization.short_name} dashboard")
+    end
+
+    context "with an unregistered parking notification" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["parking_notifications"]) }
+      let(:instance) do
+        described_class.new(organization:, current_user:, controller_namespace:, controller_name:,
+          action_name:, is_dropdown: true, unregistered_parking_notification: true)
+      end
+
+      it "moves the organized/bikes#new rule onto the parking notification link" do
+        expect(component.css("a[data-active-routes='organized/bikes#new']").map { |link| link.text.strip })
+          .to eq ["New unregistered notification"]
+      end
+    end
+
     context "as a superuser" do
       let(:current_user) { FactoryBot.create(:superuser) }
 

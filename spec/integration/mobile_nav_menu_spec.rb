@@ -14,6 +14,14 @@ RSpec.describe "Navbar", :js, type: :system do
     expect(page).to have_current_path(search_registrations_path, ignore_query: true)
   end
 
+  # One cached fragment serves every page, so page-block--navbar is what marks the
+  # link for the page you actually landed on. The menu is closed by then, hence visible: :all
+  def expect_active_navbar_links(labels)
+    within("nav.primary-header-nav") do
+      expect(page.all("a.nav-link.active", visible: :all).map { |link| link.text(:all).strip }).to eq labels
+    end
+  end
+
   # The hamburgler only shows below the lg breakpoint, and the Playwright driver
   # defaults to desktop width
   before { page.current_window.resize_to(390, 844) }
@@ -32,9 +40,19 @@ RSpec.describe "Navbar", :js, type: :system do
     expect(page).to have_link("Sign up", count: 1)
     expect(page).to have_css(".center-navbar-signup-link")
     within("nav.primary-header-nav") { expect(page).to have_no_link("Search") }
+    expect_active_navbar_links([])
     expect_navbar_axe_clean
 
     open_menu_and_search
+    expect_active_navbar_links(%w[Search Search])
+
+    # The whole navbar is re-resolved, so the link for the page you left goes inactive
+    visit help_path
+    expect_active_navbar_links(["Help"])
+
+    # Blog matches its whole controller, so it stays active on a post as well as the index
+    visit news_path(FactoryBot.create(:blog).title_slug)
+    expect_active_navbar_links(["Blog"])
 
     # The banner pushes the navbar down, further still when its title wraps
     stub_const("ENV", ENV.to_hash.merge(

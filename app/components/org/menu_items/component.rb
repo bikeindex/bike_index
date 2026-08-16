@@ -3,6 +3,24 @@
 module Org
   module MenuItems
     class Component < ApplicationComponent
+      BIKES_NEW_ROUTE = "organized/bikes#new"
+      ACTIVE_ROUTES = {on_registrations_index: "organized/registrations#index",
+                       on_registration_sequences: "organized/registration_sequences " \
+                         "organized/registration_sequence_pages"}.freeze
+      private_constant :BIKES_NEW_ROUTE, :ACTIVE_ROUTES
+
+      # The pages with_route_overrides injects a link for. The navbar folds this into its
+      # cache key, so a dropdown cached on one page can't carry another's override.
+      def self.route_override_key(controller_namespace:, controller_name:, action_name:)
+        return nil unless controller_namespace == "organized"
+
+        case controller_name
+        when "dashboard" then ("dashboard" if action_name == "index")
+        when "bulk_imports" then "bulk_imports"
+        when "registration_sequences", "registration_sequence_pages" then "registration_sequences"
+        end
+      end
+
       def initialize(organization:, current_user:, controller_namespace:, controller_name:, action_name:,
         is_dropdown: false, unregistered_parking_notification: nil)
         @organization = organization
@@ -94,20 +112,58 @@ module Org
         @controller_namespace == "organized" && controller_names.include?(@controller_name)
       end
 
+      def route_override_key
+        return @route_override_key if defined?(@route_override_key)
+
+        @route_override_key = self.class.route_override_key(controller_namespace: @controller_namespace,
+          controller_name: @controller_name, action_name: @action_name)
+      end
+
       def on_dashboard?
-        organized_controller?("dashboard") && @action_name == "index"
+        route_override_key == "dashboard"
       end
 
       def on_bulk_imports?
-        organized_controller?("bulk_imports")
+        route_override_key == "bulk_imports"
       end
 
       def on_registration_sequences?
-        organized_controller?("registration_sequences", "registration_sequence_pages")
+        route_override_key == "registration_sequences"
       end
 
       def skip?(item)
         @is_dropdown && item[:type] == :disabled
+      end
+
+      # The dropdown renders inside the navbar's page-agnostic cache, so it ships the rule
+      # to page-block--navbar; the sidebar renders per request and resolves it here
+      def link_tag(item)
+        return link_to(item[:label], item[:path], class: link_classes(item, false), data: active_data(item)) if
+          @is_dropdown
+
+        active = active_state(item)
+        return link_to(item[:label], item[:path], class: link_classes(item, active)) unless active.nil?
+
+        helpers.active_link(item[:label], item[:path], class: link_classes(item, false),
+          match_controller: item[:active] == :match_controller)
+      end
+
+      def active_data(item)
+        return {active_path: true} if item[:active] == :auto
+
+        routes = active_routes(item)
+        routes.present? ? {active_routes: routes} : {}
+      end
+
+      # Both add-bike links route to organized/bikes#new — which of them can be active comes
+      # from the parking notification, which the navbar's cache key already covers
+      def active_routes(item)
+        case item[:active]
+        when :match_controller then NavRoute.controller_for(item[:path])
+        when :on_bikes_new then BIKES_NEW_ROUTE unless @unregistered_parking_notification
+        when :on_bikes_new_with_parking_notification then BIKES_NEW_ROUTE if @unregistered_parking_notification
+        else ACTIVE_ROUTES[item[:active]]
+        end
       end
 
       def link_classes(item, active)

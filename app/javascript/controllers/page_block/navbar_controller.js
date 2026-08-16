@@ -3,16 +3,44 @@ import { Controller } from '@hotwired/stimulus'
 // $mainmenu-transform-speed in primary_header_nav.scss
 const TRANSITION_MS = 200
 
+const trimSlash = (path) => (path.length > 1 ? path.replace(/\/$/, '') : path)
+
+// Rails' current_page?: the query string counts only when the link carries one
+const pathMatches = (link) =>
+  link.origin === window.location.origin &&
+  trimSlash(link.pathname) === trimSlash(window.location.pathname) &&
+  (!link.search || link.search === window.location.search)
+
+// A space separated list of "controller#action", where an action-less entry takes any action
+const routeMatches = (routes, currentRoute = '') => {
+  const [controller, action] = currentRoute.split('#')
+  return routes.split(' ').some((route) => {
+    const [routeController, routeAction] = route.split('#')
+    return routeController === controller && (routeAction === undefined || routeAction === action)
+  })
+}
+
 // Connects to data-controller="page-block--navbar"
 //
-// The hamburgler menu and the two dropdowns. It toggles the classes
-// primary_header_nav.scss already styles, so `open` lands on a toggle's parent
+// The hamburgler menu, the two dropdowns, and which link is active. It toggles the
+// classes primary_header_nav.scss already styles, so `open` lands on a toggle's parent
 // the way bootstrap's did.
 export default class extends Controller {
   static targets = ['menu', 'backdrop', 'hamburgler', 'hamburglerButton', 'organizationToggle']
 
   connect () {
     this.truncateOrganizationName()
+    this.markActiveLinks()
+  }
+
+  // The navbar comes from a fragment cached across every page, so its links arrive carrying
+  // the rule that decides them rather than the answer. See NavRoute.
+  markActiveLinks () {
+    const currentRoute = document.body.dataset.currentRoute
+    this.element.querySelectorAll('[data-active-path], [data-active-routes]').forEach((link) => {
+      const routes = link.dataset.activeRoutes
+      link.classList.toggle('active', routes ? routeMatches(routes, currentRoute) : pathMatches(link))
+    })
   }
 
   toggleMenu () {

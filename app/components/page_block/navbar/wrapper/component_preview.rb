@@ -6,10 +6,7 @@ module PageBlock
       class ComponentPreview < ApplicationComponentPreview
         # @!group Navbar
 
-        # page_id keys the fragment cache — a real page's id would serve this preview's
-        # render to that page when dev caching is on
-        PAGE = {page_id: "lookbook_preview", controller_namespace: nil,
-                controller_name: "welcome", action_name: "index"}.freeze
+        PAGE = {controller_namespace: nil, controller_name: "welcome", action_name: "index"}.freeze
 
         # @display legacy_stylesheet true
         def default

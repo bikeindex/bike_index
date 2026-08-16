@@ -48,7 +48,13 @@
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
   </head>
 
-  <body id="<%= page_id %>" class="<%= body_class %>">
+  <%# data-current-route is what the navbar's cached links compare themselves against %>
+
+  <body
+    id="<%= page_id %>"
+    class="<%= body_class %>"
+    data-current-route="<%= NavRoute.current(controller_namespace:, controller_name:, action_name:) %>"
+  >
     <a
       href="#main-content"
       class="
@@ -63,7 +69,7 @@
 
     <%= render(PageBlock::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
 
-    <%= render PageBlock::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:, passive_organization:, page_id:, controller_namespace:, controller_name:, action_name:, unregistered_parking_notification: @unregistered_parking_notification) %>
+    <%= render PageBlock::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:, passive_organization:, controller_namespace:, controller_name:, action_name:, unregistered_parking_notification: @unregistered_parking_notification) %>
 
     <% if render_donation_request? %>
       <%= render PageBlock::LawEnforcementDonation::Component.new(current_user:) %>

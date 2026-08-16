@@ -3,56 +3,50 @@
 require "rails_helper"
 
 RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
-  let(:component) { with_request_url(url) { render_inline(described_class.new(**args)) } }
-  let(:url) { "/help" }
+  let(:component) { render_inline(described_class.new(**args)) }
   let(:args) { {label: "Help", path: "/help"} }
 
-  it "resolves active from the path when active is omitted" do
-    expect(component).to have_css "a.nav-link.active[href='/help']", text: "Help"
+  # The navbar's cache is shared by every page, so :auto and :match_controller can only
+  # describe what makes the link active — page-block--navbar decides it
+  it "hands the path rule to the navbar controller when active is omitted" do
+    expect(component).to have_css "a.nav-link[href='/help'][data-active-path='true']", text: "Help"
+    expect(component).to_not have_css "a.active"
+    expect(component).to_not have_css "a[data-active-routes]"
   end
 
-  context "on another page" do
-    let(:url) { "/" }
+  context "with active: :match_controller" do
+    let(:args) { {label: "Blog", path: "/news", active: :match_controller} }
 
-    it "renders inactive" do
-      expect(component).to have_css "a.nav-link[href='/help']"
-      expect(component).to_not have_css "a.active"
+    it "hands over the path's controller instead" do
+      expect(component).to have_css "a.nav-link[href='/news'][data-active-routes='news']"
+      expect(component).to_not have_css "a[data-active-path]"
     end
-  end
 
-  context "with active: false" do
-    let(:args) { {label: "Help", path: "/help", active: false} }
+    context "with a path this app does not route" do
+      let(:args) { {label: "Discuss", path: "https://discuss.bikeindex.org", active: :match_controller} }
 
-    # active: false pins the link inactive even on its own page — index.coffee sets
-    # #getStolenBackLink's state, because the navbar renders from a cached fragment
-    it "stays inactive on its own page" do
-      expect(component).to_not have_css "a.active"
+      it "leaves the link with no rule, so it never activates" do
+        expect(component).to have_css "a.nav-link"
+        expect(component).to_not have_css "a[data-active-routes], a[data-active-path]"
+      end
     end
   end
 
   context "with active: true" do
     let(:args) { {label: "Search", path: "/search/registrations", active: true} }
-    let(:url) { "/" }
 
-    it "renders active regardless of the path" do
+    it "renders active without a rule" do
       expect(component).to have_css "a.nav-link.active[href='/search/registrations']"
+      expect(component).to_not have_css "a[data-active-path]"
     end
   end
 
-  context "with active: :match_controller" do
-    let(:args) { {label: "Blog", path: "/news", active: :match_controller} }
-    let(:url) { "/news/some-post" }
+  context "with active: false" do
+    let(:args) { {label: "Logout", path: "/logout", active: false} }
 
-    it "matches on the controller rather than the path" do
-      expect(component).to have_css "a.nav-link.active[href='/news']"
-    end
-
-    context "on another controller" do
-      let(:url) { "/help" }
-
-      it "renders inactive" do
-        expect(component.css("a").first["class"]).to eq "nav-link"
-      end
+    it "pins the link inactive" do
+      expect(component.css("a").first["class"]).to eq "nav-link"
+      expect(component).to_not have_css "a[data-active-path]"
     end
   end
 
@@ -65,11 +59,14 @@ RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
   end
 
   context "with link_class and html_options" do
-    let(:args) { {label: "Sign up", path: "/users/new", link_class: "signup-link", html_options: {id: "signUp"}} }
-    let(:url) { "/" }
+    let(:args) do
+      {label: "Sign up", path: "/users/new", link_class: "signup-link",
+       html_options: {id: "signUp", data: {email: "party@bikeindex.org"}}}
+    end
 
-    it "adds them to the anchor" do
+    it "adds them to the anchor, keeping its own data" do
       expect(component).to have_css "a#signUp.nav-link.signup-link[href='/users/new']"
+      expect(component).to have_css "a[data-email='party@bikeindex.org'][data-active-path='true']"
     end
   end
 end
