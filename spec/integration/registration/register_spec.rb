@@ -319,6 +319,51 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(bike.creator_id).to eq user.id
   end
 
+  # form-persist announces its restore once, and the controllers that draw sections off it
+  # are lazily loaded like everything else - so this holds their two modules back past the
+  # announcement rather than waiting for a loaded CI runner to do it
+  describe "a controller whose module arrives after the draft is restored" do
+    def hold_back_serial_and_color_modules
+      [].tap do |held|
+        page.driver.with_playwright_page do |playwright_page|
+          session = playwright_page.context.new_cdp_session(playwright_page)
+          # Assets carry an hour of cache in test, so the reload would never ask again
+          session.send_message("Network.enable")
+          session.send_message("Network.setCacheDisabled", params: {cacheDisabled: true})
+
+          playwright_page.route(%r{/assets/controllers/register/(serial|additional_colors)_controller},
+            ->(route, request) {
+              held << request.url
+              sleep 1
+              route.continue
+            })
+        end
+      end
+    end
+
+    it "reconciles the sections the restore left to it" do
+      start_registration
+      type_into("#bike_primary_frame_color_id", "Red")
+      click_combobox_option("Red")
+      click_button "+ Add another color"
+      type_into("#bike_secondary_frame_color_id", "Blue")
+      click_combobox_option("Blue")
+      check "Missing serial"
+      expect(page).to have_no_field("bike[serial_number]")
+
+      held = hold_back_serial_and_color_modules
+      visit page.current_url
+
+      # The restored color reveals the row the server collapsed, and the restored
+      # "unknown" hides the serial input again - both a full second after the restore
+      expect(page).to have_field("bike_secondary_frame_color_id", with: "Blue", wait: 10)
+      expect(page).to have_checked_field("Missing serial")
+      expect(page).to have_no_field("bike[serial_number]")
+      # Held on the way in, rather than answered from the cache before the page ran
+      expect(held.length).to eq 2
+    end
+  end
+
   describe "signed in" do
     let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
     let(:friend_email) { "friend@bikeindex.org" }
