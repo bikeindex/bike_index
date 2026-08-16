@@ -12,13 +12,15 @@ description: >-
   build go green. **Equally: any spec that fails intermittently while you verify
   your own work** — deciding whether your change caused a flake, or whether to
   ship past one, is this skill's problem too, and it arrives with no CI run, no
-  `:flaky` tag, and nobody but you calling it flaky. Covers diagnosing the real
-  mechanism, attributing a flake to a change, this repo's `flaky:`
-  retry harness, and the known false-flake causes (missing Tailwind build, shared
-  Redis autocomplete cache, Turbo frame timing, probe-run interference).
+  `:flaky` tag, and nobody but you calling it flaky.
 ---
 
 # Fixing flaky failures
+
+Covers diagnosing the real mechanism, attributing a flake to a change, this
+repo's `flaky:` retry harness, and the known false-flake causes — a missing
+Tailwind build, the shared Redis autocomplete cache, Turbo frame timing,
+probe-run interference.
 
 ## The rule that overrides everything else here
 

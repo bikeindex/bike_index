@@ -19,7 +19,7 @@ description: >-
 
 ## Getting the logs
 
-`binx_logs` downloads production logs; `binx_cat` streams them. Both must be run from the repo root.
+`binx_logs` downloads production logs; `binx_cat` streams them. Both are personal scripts on `PATH` (`~/bin`), not repo `bin/` entries, and both must be run from the repo root.
 
 ```bash
 binx_logs                        # default: web AND worker, yesterday's archive + today's live log
