@@ -39,45 +39,38 @@ RSpec.describe "Navbar", :js, type: :system do
     open_menu_and_search
   end
 
-  context "signed in with an organization" do
-    let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
-    let!(:user) { FactoryBot.create(:organization_admin, organization:) }
+  # The two-step login and the flash both animate, and a click waits for its target
+  # to settle before it lands -- that wait is Capybara's 2s default
+  def sign_in(user)
+    using_wait_time(10) do
+      visit new_session_path
+      fill_in "Email", with: user.email
+      click_button "Continue"
+      fill_in "Password", with: "testthisthing7$"
+      click_button "Log in"
+      expect(page).to have_no_current_path(new_session_path, wait: 10)
+    end
+  end
+
+  context "signed in without an organization" do
+    let!(:user) { FactoryBot.create(:user_confirmed) }
 
     # The gear is icon-only, so its aria-label is the only thing to find it by
     let(:settings_toggle) { "button[aria-label='Settings']" }
 
-    it "opens each dropdown at desktop width, and folds the settings menu into the hamburgler" do
-      # The two-step login and the flash both animate, and a click waits for its target
-      # to settle before it lands -- that wait is Capybara's 2s default
-      using_wait_time(10) do
-        visit new_session_path
-        fill_in "Email", with: user.email
-        click_button "Continue"
-        fill_in "Password", with: "testthisthing7$"
-        click_button "Log in"
-        dismiss_flash_messages
-      end
+    it "opens the settings dropdown at desktop width, and folds it into the hamburgler" do
+      sign_in(user)
 
       page.current_window.resize_to(1440, 900)
       visit root_path
 
-      # The items of both closed dropdowns are rendered, out of view
-      expect(page).to have_button("Brakebills")
+      # The closed dropdown's items are rendered, out of view
       expect(page).to have_no_link("Logout")
-      expect(page).to have_no_link("Brakebills Bikes")
       expect_axe_clean
 
-      click_button "Brakebills"
-
-      expect(page).to have_link("Brakebills Bikes")
-      expect(find_button("Brakebills")["aria-expanded"]).to eq "true"
-      expect_axe_clean
-
-      # Opening one dropdown closes the other
       find(settings_toggle).click
 
       expect(page).to have_link("Logout")
-      expect(page).to have_no_link("Brakebills Bikes")
       expect_axe_clean
 
       find("body").click
@@ -91,8 +84,39 @@ RSpec.describe "Navbar", :js, type: :system do
       find("#primary_nav_hamburgler").click
 
       expect(page).to have_link("Logout")
-      # The organization keeps its own dropdown, and the open menu covers it
-      expect(page).to have_no_button("Brakebills")
+    end
+  end
+
+  context "signed in with an organization" do
+    let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+    let!(:user) { FactoryBot.create(:organization_admin, organization:) }
+
+    it "renders the sidebar in place of the navbar, as a column and then behind the hamburgler" do
+      sign_in(user)
+
+      page.current_window.resize_to(1440, 900)
+      visit root_path
+
+      expect(page).to have_no_css(".primary-header-nav")
+      expect(page).to have_css("#org_sidebar_nav")
+      expect(page).to have_button("Brakebills Registrations")
+      expect_axe_clean
+
+      # The account block carries what the settings dropdown used to
+      expect(page).to have_no_link("Log out")
+      find("[data-page-block--org-sidebar-target='accountToggle']").click
+
+      expect(page).to have_link("Log out")
+      expect(page).to have_link("Your registrations")
+      expect_axe_clean
+
+      page.current_window.resize_to(390, 844)
+
+      # Below the breakpoint it's an overlay, so nothing in it shows until it opens
+      expect(page).to have_no_button("Brakebills Registrations")
+      find("#org_sidebar_hamburgler").click
+
+      expect(page).to have_button("Brakebills Registrations")
     end
   end
 end
