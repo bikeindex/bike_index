@@ -7,11 +7,11 @@ module PageBlock
       # logo_only renders just the logo, for the OAuth authorization prompt.
       class Component < ApplicationComponent
         # Digest of the cached template — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "80ca4e340580"
+        MARKUP_DIGEST = "4e1371773a5a"
 
         def initialize(logo_only: false, page_id: nil, current_user: nil, current_user_or_unconfirmed_user: nil,
           passive_organization: nil, controller_namespace: nil, controller_name: nil, action_name: nil,
-          unregistered_parking_notification: nil)
+          unregistered_parking_notification: nil, old_register_view: false)
           # Everything below keys the fragment cache, so a caller that forgets one would
           # otherwise share a single render across every page
           raise ArgumentError, "page_id is required unless logo_only" if page_id.blank? && !logo_only
@@ -25,20 +25,22 @@ module PageBlock
           @controller_name = controller_name
           @action_name = action_name
           @unregistered_parking_notification = unregistered_parking_notification
+          @old_register_view = old_register_view
         end
 
         private
 
         def cache_key
           [MARKUP_DIGEST, @page_id, @current_user_or_unconfirmed_user, @passive_organization,
-            @unregistered_parking_notification]
+            @unregistered_parking_notification, @old_register_view]
         end
 
         def organization_menu
           PageBlock::Navbar::OrganizationMenu::Component.new(organization: @passive_organization,
             current_user: @current_user, controller_namespace: @controller_namespace,
             controller_name: @controller_name, action_name: @action_name,
-            unregistered_parking_notification: @unregistered_parking_notification)
+            unregistered_parking_notification: @unregistered_parking_notification,
+            old_register_view: @old_register_view)
         end
 
         def primary_menu

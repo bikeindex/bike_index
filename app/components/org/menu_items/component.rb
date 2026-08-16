@@ -4,7 +4,7 @@ module Org
   module MenuItems
     class Component < ApplicationComponent
       def initialize(organization:, current_user:, controller_namespace:, controller_name:, action_name:,
-        is_dropdown: false, unregistered_parking_notification: nil)
+        is_dropdown: false, unregistered_parking_notification: nil, old_register_view: false)
         @organization = organization
         @current_user = current_user
         @controller_namespace = controller_namespace
@@ -12,6 +12,7 @@ module Org
         @action_name = action_name
         @is_dropdown = is_dropdown
         @unregistered_parking_notification = unregistered_parking_notification
+        @old_register_view = old_register_view
       end
 
       def render?
@@ -51,7 +52,18 @@ module Org
         items = [dashboard_link, divider, *items] if needs_dashboard_override?(items)
         items = insert_after_add_bike(items, bulk_import_link) if needs_bulk_import_override?(items)
         items += [registration_sequences_link] if needs_registration_sequences_override?(items)
+        items = with_old_register_view(items) if @old_register_view
         items
+      end
+
+      # Whoever went back to the embed form keeps being sent there, until they take the
+      # register flow's link the other way
+      def with_old_register_view(items)
+        items.map do |item|
+          next item unless item[:active] == :on_bikes_new
+
+          item.merge(path: helpers.new_organization_bike_path(organization_id: @organization.to_param))
+        end
       end
 
       def needs_dashboard_override?(items)

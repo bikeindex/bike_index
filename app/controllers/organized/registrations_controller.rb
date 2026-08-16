@@ -53,6 +53,8 @@ module Organized
     # The /register flow's opening step, rendered here so the organized menu stays
     # alongside it. Its submission, and every step after, continue on /register
     def new
+      # Arriving here is the way back from the embed form, whatever sent them
+      session.delete(:old_register_view)
       @b_param = BikeServices::Register.b_param_for(user: current_user, token_id: session[:register_b_param_token],
         status: BParam.status_hash_from_params(params)[:status], email: params[:email],
         origin: "register_flow_organized")

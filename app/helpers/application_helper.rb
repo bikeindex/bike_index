@@ -39,6 +39,12 @@ module ApplicationHelper
     ) == :organized
   end
 
+  # Set by going back to the embed form, cleared by taking the register flow's link the
+  # other way - the organized menu follows it
+  def old_register_view?
+    session[:old_register_view].present?
+  end
+
   def body_class
     if controller_name == "landing_pages" || @force_landing_page_render
       if %w[for_schools for_law_enforcement].include?(action_name)

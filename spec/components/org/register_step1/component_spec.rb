@@ -18,7 +18,8 @@ RSpec.describe Org::RegisterStep1::Component, type: :component do
     expect(component).to have_css("form[action='/register']")
     expect(component.to_html).to include "Register your vehicle with Brakebills!"
 
+    # old_view is what stores the preference, so the menu keeps linking to the embed form
     expect(component).to have_link("Go back to the old view",
-      href: "/o/#{organization.to_param}/bikes/new")
+      href: "/o/#{organization.to_param}/bikes/new?old_view=true")
   end
 end
