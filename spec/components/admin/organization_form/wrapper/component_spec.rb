@@ -47,6 +47,15 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
       .to start_with "(probably) do not add parents!"
   end
 
+  it "points every field at its helper text" do
+    described = component.css("[aria-describedby]").map { |field| field["aria-describedby"] }
+    expect(described).to include "organization_parent_organization_id_helper"
+    # Every id referenced resolves, and every helper <p> is referenced by something
+    expect(described.reject { |id| component.at_css("##{id}") }).to be_empty
+    helper_ids = component.css("p[id$='_helper']").map { |paragraph| paragraph["id"] }
+    expect(helper_ids - described).to be_empty
+  end
+
   context "with passwordless_users enabled" do
     let(:organization) do
       FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "passwordless_users")
@@ -105,9 +114,11 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
       FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "official_manufacturer")
     end
 
-    it "renders the manufacturer combobox" do
+    it "renders the manufacturer combobox, pointed at its helper text" do
       expect(component).to have_content("Official manufacturer organization")
       expect(component).to have_css("[name='organization[manufacturer_id]']", visible: :all)
+      expect(component.at_css("input[role='combobox'][aria-describedby='organization_manufacturer_id_helper']"))
+        .to be_present
     end
   end
 

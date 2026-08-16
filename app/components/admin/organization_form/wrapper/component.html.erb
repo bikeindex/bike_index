@@ -14,6 +14,7 @@
       <% end %>
     <% else %>
       <div class="d-md-block d-none">
+        <%# The blank label keeps this level with the invitation count field it stands in for %>
         <%= read_only_field("&nbsp;".html_safe, "permitted domain with passwordless sign in, no invite restrictions") %>
       </div>
     <% end %>
@@ -42,12 +43,14 @@
   </div>
 
   <div class="col-6 col-lg-3">
+    <% previous_slug_note = tag.em("Rarely unnecessary", class: "text-warning") %>
+
     <% if helpers.display_dev_info? %>
       <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :previous_slug, label_text: "Previous Slug", html_options: {class: "only-dev-visible"})) do |group| %>
-        <% group.with_helper_text { tag.em("Rarely unnecessary", class: "text-warning") } %>
+        <% group.with_helper_text { previous_slug_note } %>
       <% end %>
     <% else %>
-      <%= read_only_field(label_with_note("Previous Slug", "Rarely unnecessary"), @organization.previous_slug) %>
+      <%= read_only_field("Previous Slug", @organization.previous_slug, note: previous_slug_note) %>
     <% end %>
   </div>
 </div>
@@ -82,7 +85,7 @@
         <em>To add regional organizations rather than child/parent relationships, enable it through a paid invoice for the organization. All organizations with a location in the same area will automatically be associated.</em>
       <% end %>
 
-      <%= render UI::Forms::Combobox::Component.new(name: :parent_organization_id, form: @form_builder, placeholder: "Choose organization", include_blank: true, options: parent_organization_options, data: AMBASSADOR_TARGETS[:input_data]) %>
+      <%= render UI::Forms::Combobox::Component.new(name: :parent_organization_id, form: @form_builder, placeholder: "Choose organization", include_blank: true, options: parent_organization_options, aria: {describedby: group.helper_text_id}, data: AMBASSADOR_TARGETS[:input_data]) %>
     <% end %>
   </div>
 
@@ -110,7 +113,7 @@
           <% end %>
         <% end %>
 
-        <%= render UI::Forms::Combobox::Component.new(name: :embedable_user_email, form: @form_builder, placeholder: "Select email", value: embedable_email, include_blank: true, options: auto_user_emails) %>
+        <%= render UI::Forms::Combobox::Component.new(name: :embedable_user_email, form: @form_builder, placeholder: "Select email", value: embedable_email, include_blank: true, options: auto_user_emails, aria: {describedby: group.helper_text_id}) %>
       <% end %>
     <% end %>
 
@@ -125,7 +128,7 @@
           Select a manufacturer to give them manufacturer access.
         <% end %>
 
-        <%= render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, no_manufacturer_other: true, form: @form_builder, required: true) %>
+        <%= render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, no_manufacturer_other: true, form: @form_builder, required: true, aria: {describedby: group.helper_text_id}) %>
       <% end %>
     <% end %>
 

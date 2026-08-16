@@ -34,8 +34,12 @@ module Admin
           safe_join([text, tag.small(note, class: "less-strong")], " ")
         end
 
-        def read_only_field(label, value)
-          tag.div(class: "tw:mb-4") { tag.label(label, class: "twlabel") + tag.p(value, class: "less-strong") }
+        # Not a UI::Forms::Group - there's no control here, and Group always marks one
+        # required or optional
+        def read_only_field(label, value, note: nil)
+          tag.div(class: "tw:mb-4") do
+            tag.label(label_with_note(label, note), class: "twlabel") + tag.p(value, class: "less-strong")
+          end
         end
 
         def kind_option_tags

@@ -14,7 +14,7 @@ module UI
         # ui--forms--nested-fields swaps this for a distinct index per added record
         CHILD_INDEX = "__INDEX__"
         WRAPPER_CLASS = "nested-fields-wrapper"
-        private_constant :WRAPPER_CLASS
+        private_constant :CHILD_INDEX, :WRAPPER_CLASS
 
         def initialize(form_builder:, association:, fields_component:, add_label:, fields_args: {},
           fields_class_name: nil, obj_attrs: {}, class_name: nil, add_class_name: nil)
