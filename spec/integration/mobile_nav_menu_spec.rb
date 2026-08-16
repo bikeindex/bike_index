@@ -73,6 +73,17 @@ RSpec.describe "Navbar", :js, type: :system do
       expect(page).to have_link("Logout")
       expect_axe_clean
 
+      # Escape from inside the dropdown hands focus back to the toggle, rather than
+      # leaving it on a link that just became display:none
+      find_link("Logout").send_keys(:escape)
+
+      expect(page).to have_no_link("Logout")
+      expect(page.evaluate_script("document.activeElement.id")).to eq "setting_submenu"
+
+      find(settings_toggle).click
+
+      expect(page).to have_link("Logout")
+
       find("body").click
 
       expect(page).to have_no_link("Logout")

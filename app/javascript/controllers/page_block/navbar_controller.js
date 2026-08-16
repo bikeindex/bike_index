@@ -64,12 +64,18 @@ export default class extends Controller {
     if (this.openDropdown && !this.openDropdown.parentElement.contains(event.target)) this.closeDropdowns()
   }
 
+  // Escape returns focus to whatever it closed, the way ui--dropdown does -- otherwise
+  // it lands on a display:none element and the browser drops it to the body
   closeOnEscape () {
-    this.closeDropdowns()
-    if (!this.menuOpen) return
+    const openToggle = this.openDropdown
 
-    this.closeMenu()
-    this.hamburglerButtonTarget.focus()
+    this.closeDropdowns()
+    if (openToggle) {
+      openToggle.focus()
+    } else if (this.menuOpen) {
+      this.closeMenu()
+      this.hamburglerButtonTarget.focus()
+    }
   }
 
   // Rotating or resizing with the menu open changes how tall the banner is
