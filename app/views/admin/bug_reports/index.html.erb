@@ -84,6 +84,7 @@
 <% end if searched_terms.any? %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  collection: @collection,
   viewing: controller_name.humanize,
   sortable_search_params:,
   render_chart: @render_chart,
