@@ -12,9 +12,10 @@ module Organized
       @email_preview = true
       @organization = current_organization
       component = OrganizedServices::EmailPreview.view_component(
-        kind: @kind, organization: current_organization, user: current_user, params: params
+        kind: @kind, organization: current_organization, user: current_user, params:,
+        versioned: Binxtils::InputNormalizer.boolean(params[:versioned])
       )
-      @email_sent_at = component.email_sent_at if Binxtils::InputNormalizer.boolean(params[:versioned])
+      @email_sent_at = component.snippet_time
       render component, layout: "email"
     end
 

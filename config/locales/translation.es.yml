@@ -648,7 +648,6 @@ es:
         invoices: Facturas
         is_paid: Se paga
         kind: Amable
-        landing_html: Página de inicio html
         locations: Ubicaciones
         lock_show_on_map: Bloquear mostrar en el mapa
         mail_snippets: Fragmentos de correo

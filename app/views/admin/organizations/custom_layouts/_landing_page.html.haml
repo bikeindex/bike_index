@@ -1,10 +1,23 @@
-= render(UI::Alerts::ObjectError::Component.new(object: @organization))
+= render(UI::Alerts::ObjectError::Component.new(object: @landing_page))
 
-= form_for @organization, {as: :organization, url: admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id]), action: 'update'} do |f|
+= form_for @landing_page, {url: admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id]), html: {method: :patch}} do |f|
   = hidden_field_tag :kind, "landing_page"
+  - if @landing_page.persisted?
+    .mb-2
+      = link_to "Version history", admin_paper_trail_versions_path(search_item_type: "OrganizationLandingPage", search_item_id: @landing_page.id, period: "all"), class: "twlink"
   .form-group
-    = f.text_area :landing_html, placeholder: 'Landing page (html)', rows: 20, class: "form-control"
-  .row.justify-content-end
+    - enabled_mismatch_error = @landing_page.enabled_mismatch_error
+    - if enabled_mismatch_error.present?
+      = render(UI::Alerts::Base::Component.new(kind: :error, margin_classes: "tw:mb-2", text: enabled_mismatch_error))
+    = f.text_area :body, placeholder: 'Landing page (html)', rows: 20, class: "form-control"
+    - if suggested_button_hover.present?
+      = render(UI::Alerts::Base::Component.new(kind: :notice, margin_classes: "tw:mt-2")) do
+        The register frame names a button color but no hover color. Add
+        %code= "&button_hover=#{suggested_button_hover.delete_prefix("#")}"
+        to its src to set the shade it currently derives.
+  .row.align-items-center
+    .col
+      = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :enabled, label: "Enabled"))
     .col-auto
       = f.submit 'Save', class: 'btn btn-success float-right'
 // Because somewhere, there is overflow hidden and it cuts off the bottom of the save button

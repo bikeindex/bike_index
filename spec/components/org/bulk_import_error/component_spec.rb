@@ -85,4 +85,17 @@ RSpec.describe Org::BulkImportError::Component, type: :component do
       end
     end
   end
+
+  context "when ascend_unprocessable" do
+    let(:bulk_import) { FactoryBot.build(:bulk_import_ascend, import_errors:) }
+    let(:import_errors) { {"ascend" => ["Unable to find an Organization"]} }
+
+    # ascend_name comes out of the uploaded file's name, and lands inside a <strong>
+    it "escapes the name it interpolates into the _html translation" do
+      allow(bulk_import).to receive(:ascend_name) { "<script>alert(1)</script>" }
+
+      expect(component.to_html).to_not include("<script>")
+      expect(component.text).to include("<script>alert(1)</script>")
+    end
+  end
 end

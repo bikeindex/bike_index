@@ -29,41 +29,14 @@ module ApplicationHelper
     link_to(raw(link_text), link_path, html_options).html_safe
   end
 
-  # Used to render the page wrapper
-  # MUST be either:
-  #  - a valid partial file in views/shared
-  #  - nil - which just calls yield directly
-  def current_page_skeleton
-    return "organized_skeleton" if controller_namespace == "organized" && action_name != "landing"
-    return "oauth_applications_skeleton" if controller_namespace == "oauth" && controller_name == "applications"
-    return nil if controller_namespace == "search"
-    return nil if @force_landing_page_render
-
-    case controller_name
-    when "bikes"
-      "edit_bike_skeleton" if %w[update].include?(action_name)
-    when "edits", "theft_alerts", "recovery"
-      "edit_bike_skeleton"
-    when "info"
-      "content_skeleton" unless %w[terms security vendor_terms privacy support_the_index resources].include?(action_name)
-    when "welcome"
-      "content_skeleton" if %w[goodbye].include?(action_name)
-    when "organizations"
-      "content_skeleton" if %w[lightspeed_integration].include?(action_name)
-    when "news", "feedbacks", "manufacturers", "errors"
-      "content_skeleton"
-    when "registrations"
-      "content_skeleton" unless action_name == "show"
-    end
-  end
-
-  # For determining menu items to display on content skeleton
-  def content_page_type
-    if controller_name == "info"
-      action_name
-    elsif controller_name == "news"
-      "news"
-    end
+  # Organized lays out its own general alert, and takes over the body background
+  def main_content_organized?
+    PageBlock::MainContent::Wrapper::Component.kind(
+      controller_namespace:,
+      controller_name:,
+      action_name:,
+      force_landing_page_render: @force_landing_page_render
+    ) == :organized
   end
 
   def body_class
@@ -75,7 +48,7 @@ module ApplicationHelper
       end
     elsif controller_name == "info" && action_name == "resources"
       "kelsey_landing-page-body"
-    elsif current_page_skeleton == "organized_skeleton"
+    elsif main_content_organized?
       # Register::Page's gray only covers the form, and the organized container insets it -
       # so the page paints it instead, behind the whole content column
       if controller_name == "registrations" && action_name == "new"

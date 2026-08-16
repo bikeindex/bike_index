@@ -270,9 +270,9 @@
       <%= render PageBlock::LawEnforcementDonation::Component.new(current_user:) %>
     <% end %>
 
-    <%# organized_skeleton renders its own, inside the content column the menu doesn't cover %>
+    <%# organized renders its own, inside the content column the menu doesn't cover %>
     <% general_alert = PageBlock::UserAlerts::Wrapper::Component.new(current_user:) if
-      show_general_alert && current_page_skeleton != "organized_skeleton" %>
+      show_general_alert && !main_content_organized? %>
 
     <% show_general_alert_here = general_alert&.render? %>
 
@@ -294,9 +294,26 @@
         id="main-content"
         class="<%= "tw:[--nav-gap:0px]" if show_general_alert_here %>"
       >
-        <% if current_page_skeleton.present? %>
-          <%= render partial: "/shared/#{current_page_skeleton}" %>
-        <% else %>
+        <%= render(PageBlock::MainContent::Wrapper::Component.new(
+          controller_namespace:,
+          controller_name:,
+          action_name:,
+          current_user:,
+          current_organization:,
+          passive_organization:,
+          show_general_alert:,
+          source: params[:source],
+          force_landing_page_render: @force_landing_page_render,
+          blog: @blog,
+          related_blogs: @related_blogs,
+          bike: @bike,
+          bike_og: @bike_og,
+          og_email: @og_email,
+          edit_template: @edit_template,
+          edit_templates: @edit_templates,
+          oauth_application: @application,
+          unregistered_parking_notification: @unregistered_parking_notification
+        )) do %>
           <%= yield %>
         <% end %>
       </main>
