@@ -66,13 +66,14 @@ Two viewports — resize once each, then walk every URL:
 1. `browser_resize` 1440×900 → for each URL: navigate → settle → hide the footer → `browser_take_screenshot` (`fullPage: true`) to `...-desktop.png`.
 2. `browser_resize` 390×844 → same loop, also `fullPage: true` → `...-mobile.png`.
 
-**Full page, minus the footer and review-app banner, no `target:` arg.** Capture the whole page (`fullPage: true`) at **both** viewports so nothing below the fold is cut off, but first hide the site footer (identical on every page, just padding) and the `#review-app-banner` topbar (dev/review-app-only chrome that isn't part of the real page). After each navigation (hiding doesn't persist across page loads), run:
+**Full page, minus the footer, review-app banner and profiler badge, no `target:` arg.** Capture the whole page (`fullPage: true`) at **both** viewports so nothing below the fold is cut off, but first hide the site footer (identical on every page, just padding), the `#review-app-banner` topbar and the `.profiler-results` badge (both dev-only chrome that isn't part of the real page). The profiler badge reports *this request's* timing, so leaving it in makes every before/after pair differ on a number no reviewer cares about. After each navigation (hiding doesn't persist across page loads), run:
 
 ```js
 browser_evaluate: () => {
   document.querySelector('.primary-footer, footer, [role="contentinfo"]')?.style.setProperty('display', 'none');
   document.getElementById('review-app-banner')?.style.setProperty('display', 'none');
-  return document.body.scrollHeight; // content height with the footer + banner gone
+  document.querySelector('.profiler-results')?.style.setProperty('display', 'none');
+  return document.body.scrollHeight; // content height with the chrome gone
 }
 ```
 
@@ -115,6 +116,15 @@ When the caller wants before/after, repeat the capture loop against the base ref
 3. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout --detach $BASE_REF` (detached — checking out a branch name fails if a sibling worktree holds it; detached HEAD at the remote ref is allowed concurrently and is the same code), navigate the browser to force Rails to reload the changed files, repeat capture into `...-base-...` filenames, then `git checkout $BRANCH`.
 
 A `Gemfile.lock` diff is **not** a reason to abort.
+
+**Don't call a pair identical with `cmp`.** Two captures of the *same* code routinely differ by a few dozen bytes, so byte-equality reports a change that isn't one (and its absence proves nothing). Compare pixels, and establish the noise floor before reading anything into a number — recapture one page without changing branches, and treat that count as zero:
+
+```bash
+magick compare -metric AE <base>.png <branch>.png null:   # differing pixel count
+magick compare <base>.png <branch>.png -compose src d.png && magick identify -format '%@' d.png   # where they differ
+```
+
+The bounding box is what settles it: dev-only chrome that slipped past the hide step lands in one small box, a real change doesn't.
 
 The seeded DB persists across checkouts, so the existing session usually still works. Preview routes (`/rails/view_components/...`, `/lookbook/...`) reload across the checkout like ordinary pages, so their before/after works against any `$BASE_REF` too.
 

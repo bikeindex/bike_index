@@ -45,6 +45,18 @@ git diff origin/main...HEAD -- '*.en.yml' 'config/locales/en.yml' | grep -in '^+
 
 Read each hit. Key names (`about_this_bike:`), the product name ("Bike Index"), and copy that really is bike-only are fine; a value saying "bike" about the registration is not. `Registrations::Show::CurrentAlerts::ClaimImpound` and `Registrations::Show::WrapperConsumer` are the pattern for fixing one, and `spec/components/registrations/show/current_alerts/claim_impound/component_spec.rb` shows how to cover it.
 
+### Only if you have rtk: check these greps read a diff at all
+
+Skip this section if `rtk` isn't installed — nothing below applies to a plain shell.
+
+rtk's hook rewrites *some* `git diff` invocations into a summarized stat, and `grep` over a stat matches nothing. Both greps above then report clean having read zero lines, which is indistinguishable from passing. Measured on one branch: the cycle-type command was rewritten and found 0 of its 17 hits, while the comment audit's ran through untouched — so which invocations get rewritten isn't predictable from the command, and has to be checked rather than assumed.
+
+`rtk proxy` bypasses the hook. Run the check both ways when it comes back empty; disagreement means you were grepping a stat:
+
+```bash
+rtk proxy git diff origin/main...HEAD -- '*.en.yml' 'config/locales/en.yml' | grep -in '^+[^+].*bike'
+```
+
 Commit everything from this before re-dating migrations.
 
 ## Freshen stale migration timestamps
