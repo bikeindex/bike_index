@@ -45,7 +45,7 @@ Scope it rather than running bare `bin/lint`: a whole-repo run reformats files o
 
 Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesheets/legacy_includes/_css_layers.scss`), which sorts below tailwind's `components` and `utilities`. So a `UI::*` component rendered inside legacy-styled markup **wins over the surrounding stylesheet's rules for every property its own classes set** — `UI::Button`'s `tw:inline-flex`, `tw:p-0` and `twlink` beat `.primary-header-nav`'s `display`, `padding` and `color` no matter how specific those selectors are.
 
-Give the component the box it needs through `html_class`, rather than teaching the legacy stylesheet to reach it — a rule added there for a component's element silently does nothing. Leave in the stylesheet only what tailwind doesn't set (fonts, which a `<button>` doesn't inherit). `PageBlock::Navbar::OrganizationMenu` is the pattern.
+Style it entirely through `html_class` — **including the font**, which a `<button>` doesn't inherit from the markup around it (`tw:font-header tw:text-xs tw:leading-[18px] tw:uppercase`, matching whatever the legacy rule set). Never widen a legacy selector to reach the component's element: for anything tailwind sets that rule silently does nothing, and it splits one element's styling across two files. Leave the legacy stylesheet to the legacy elements beside it. `PageBlock::Navbar::OrganizationMenu` is the pattern.
 
 Two things that fall out of it:
 
