@@ -57,6 +57,10 @@ The same instinct applies beyond buttons: **check `app/components/ui/` and `app/
 
 `Atom::*` (`app/components/atom/`) holds the small value-rendering components — `Atom::Serial`, `Atom::Sticker`, `Atom::ShortId`. Everything else is `UI::*`; older value renderers like `UI::AddressDisplay` predate the split and stay put. Render a serial with `Atom::Serial::Component`, not `BikeHelper#render_serial_display`.
 
+## Dropdowns: escape returns focus to the toggle
+
+**Every dropdown closed by Escape puts focus back on its toggle** — without it focus is sitting on an element that just became `display: none`, and the browser drops it to `<body>`. `UI::Dropdown`'s `handleEscape` and `PageBlock::Navbar`'s `closeOnEscape` are the pattern; `spec/integration/mobile_nav_menu_spec.rb` is how it's covered.
+
 ## Tooltips: default `?` button trigger
 
 **Every `UI::Tooltip` uses the default `?` button trigger** unless the user explicitly says otherwise — never pass a label as the tooltip's trigger content. See `app/components/ui/tooltip/`.
