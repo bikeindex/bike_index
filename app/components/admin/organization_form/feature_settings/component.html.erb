@@ -3,13 +3,10 @@
     <h4 class="mb-4">Settings for organization features</h4>
 
     <% if @organization.enabled?("graduated_notifications") %>
-      <% graduated_label = capture do %>
-        Interval for send graduated notifications, in days
-        <small><span class="text-success">graduated_notifications setting</span></small>
-      <% end %>
-
-      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :graduated_notification_interval_days, kind: :number_field, label_text: graduated_label)) do |group| %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :graduated_notification_interval_days, kind: :number_field, label_text: "Interval for send graduated notifications, in days")) do |group| %>
         <% group.with_helper_text do %>
+          <span class="text-success">graduated_notifications setting</span>
+
           <span class="text-warning">
             Unless this is set, the organization will not send graduated
             notifications - even if they have the feature enabled
@@ -19,30 +16,24 @@
     <% end %>
 
     <% if @organization.enabled?("regional_bike_counts") %>
-      <% radius_label = capture do %>
-        Search radius (<%= search_radius[:unit] %>)
-        <small><span class="text-success">regional bike counts setting</span>, controls how large the region is to associate regional sub-organizations</small>
-      <% end %>
-
-      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: search_radius[:attribute], kind: :number_field, label_text: radius_label)) do |group| %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: search_radius[:attribute], kind: :number_field, label_text: "Search radius (#{search_radius[:unit]})")) do |group| %>
         <% group.with_helper_text do %>
-          <span class="text-warning">
-            <code class="d-inline">nearby_organizations</code> will search
-            within this radius for other organizations in the same area
-          </span>
+          <span class="text-success">regional bike counts setting</span>,
+          controls how large the region is to associate regional
+          sub-organizations
+          <span class="text-warning"><code class="d-inline">nearby_organizations</code> will search within this radius for other organizations in the same area</span>
         <% end %>
       <% end %>
     <% end %>
 
     <% if domain_uses.any? %>
-      <% domain_label = capture do %>
-        permitted domain for <%= domain_uses.to_sentence %>
-        <small><%= safe_join(domain_uses.map { |domain_use| tag.span("#{domain_use} feature", class: "text-success") }, " ") %></small>
-      <% end %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :user_email_domain, label_text: "permitted domain for #{domain_uses.to_sentence}")) do |group| %>
+        <% group.with_helper_text do %>
+          <%= safe_join(domain_uses.map { |domain_use| tag.span("#{domain_use} feature", class: "text-success") }, " ") %>
 
-      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :user_email_domain, label_text: domain_label)) do |group| %>
-        <% unless developer? %>
-          <% group.with_helper_text { "Ask Seth for help changing this, it's delicate" } %>
+          <% unless developer? %>
+            Ask Seth for help changing this, it's delicate
+          <% end %>
         <% end %>
 
         <div class="input-group">
@@ -50,7 +41,7 @@
             <div class="input-group-text">@</div>
           </div>
 
-          <%= render(UI::Forms::Input::Component.new(form_builder: @form_builder, attribute: :user_email_domain, html_options: {placeholder: "something.gov", disabled: !developer?, "aria-describedby" => (group.helper_text_id unless developer?)})) %>
+          <%= render(UI::Forms::Input::Component.new(form_builder: @form_builder, attribute: :user_email_domain, html_options: {placeholder: "something.gov", disabled: !developer?, "aria-describedby" => group.helper_text_id})) %>
         </div>
       <% end %>
     <% end %>
@@ -60,49 +51,39 @@
       <% email_field = OrganizationFeature.email_customizable_labels.include?(reg_field) %>
       <% next unless email_field ? @organization.paid? : @organization.enabled?(reg_field) %>
 
-      <% reg_label = capture do %>
-        <% if reg_field == "owner_email" %>
-          Custom Label for <em>Owner Email</em> (e.g. "uiowa.edu email")
-          <small class="less-strong">often desired by universities</small>
-        <% elsif reg_field == "email_placeholder" %>
-          Custom Placeholder for <em>Owner Email</em> (e.g. "you@uiowa.edu")
-          <small class="less-strong">the greyed out example inside the empty field</small>
-        <% else %>
-          Custom Label for
-          <em><%= OrganizationFeature.reg_field_to_bike_attrs(reg_field).titleize(keep_id_suffix: true) %></em>
+      <% reg_text = reg_field_text(reg_field) %>
 
+      <%= render(UI::Forms::Group::Component.new(attribute: "reg_label-#{reg_field}", label_text: reg_text[:label])) do |group| %>
+        <% group.with_helper_text { reg_text[:note] } %>
 
-          <small class="less-strong">leave blank unless it's <strong>absolutely</strong> required - default behavior is preferred</small>
-        <% end %>
-      <% end %>
-
-      <%= render(UI::Forms::Group::Component.new(attribute: "reg_label-#{reg_field}", label_text: reg_label)) do %>
-        <%= text_field_tag "reg_label-#{reg_field}", helpers.registration_field_label(@organization, reg_field), class: "twinput" %>
+        <%= text_field_tag "reg_label-#{reg_field}", helpers.registration_field_label(@organization, reg_field), class: "twinput", "aria-describedby" => group.helper_text_id %>
       <% end %>
     <% end %>
 
     <% if @organization.enabled?("organization_stolen_message") %>
-      <% stolen_message_label = capture do %>
-        Stolen Message type
-        <small><span class="text-success">Organization Stolen Message setting</span>, edit message in the <%= link_to "orgs own edit page", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param) %></small>
-      <% end %>
-
       <div class="mt-4">
-        <%= render(UI::Forms::Group::Component.new(attribute: :organization_stolen_message_kind, label_text: stolen_message_label)) do %>
-          <%= select_tag :organization_stolen_message_kind, options_for_select(stolen_message_kind_options, selected: organization_stolen_message.kind), class: "twinput", data: {"admin--organization-form-target": "stolenMessageKind", action: "change->admin--organization-form#toggleStolenMessageArea"} %>
+        <%= render(UI::Forms::Group::Component.new(attribute: :organization_stolen_message_kind, label_text: "Stolen Message type")) do |group| %>
+          <% group.with_helper_text do %>
+            <span class="text-success">Organization Stolen Message setting</span>,
+            edit message in the
+            <%= link_to "orgs own edit page", edit_organization_email_path("organization_stolen_message", organization_id: @organization.to_param) %>
+          <% end %>
+
+          <%= select_tag :organization_stolen_message_kind, options_for_select(stolen_message_kind_options, selected: organization_stolen_message.kind), class: "twinput", "aria-describedby" => group.helper_text_id, data: {"admin--organization-form-target": "stolenMessageKind", action: "change->admin--organization-form#toggleStolenMessageArea"} %>
         <% end %>
 
         <div
           class="<%= "tw:hidden!" if organization_stolen_message.kind != "area" %>"
           data-admin--organization-form-target="stolenMessageArea"
         >
-          <% stolen_radius_label = capture do %>
-            Stolen Message radius (<%= stolen_message_radius[:unit] %>)
-            <small><span class="text-success">Organization Stolen Message setting</span> - only available for area type <span class="less-strong">max <%= stolen_message_radius[:max] %></span></small>
-          <% end %>
+          <%= render(UI::Forms::Group::Component.new(attribute: stolen_message_radius[:attribute], label_text: "Stolen Message radius (#{stolen_message_radius[:unit]})")) do |group| %>
+            <% group.with_helper_text do %>
+              <span class="text-success">Organization Stolen Message setting</span>
+              - only available for area type
+              <span class="less-strong">max <%= stolen_message_radius[:max] %></span>
+            <% end %>
 
-          <%= render(UI::Forms::Group::Component.new(attribute: stolen_message_radius[:attribute], label_text: stolen_radius_label)) do %>
-            <%= number_field_tag stolen_message_radius[:attribute], stolen_message_radius[:value], class: "twinput" %>
+            <%= number_field_tag stolen_message_radius[:attribute], stolen_message_radius[:value], class: "twinput", "aria-describedby" => group.helper_text_id %>
           <% end %>
         </div>
       </div>

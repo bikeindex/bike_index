@@ -34,6 +34,22 @@ module Admin
           end
         end
 
+        def reg_field_text(reg_field)
+          case reg_field
+          when "owner_email"
+            {label: safe_join(["Custom Label for ", tag.em("Owner Email"), ' (e.g. "uiowa.edu email")']),
+             note: "often desired by universities"}
+          when "email_placeholder"
+            {label: safe_join(["Custom Placeholder for ", tag.em("Owner Email"), ' (e.g. "you@uiowa.edu")']),
+             note: "the greyed out example inside the empty field"}
+          else
+            {label: safe_join(["Custom Label for ",
+              tag.em(OrganizationFeature.reg_field_to_bike_attrs(reg_field).titleize(keep_id_suffix: true))]),
+             note: safe_join(["leave blank unless it's ", tag.strong("absolutely"),
+               " required - default behavior is preferred"])}
+          end
+        end
+
         def stolen_message_kind_options
           [["Association: Evey associated stolen bike sees message. Default for schools", "association"],
             ["Area: seen by bikes stolen in radius. Default for law enforcement, advocacy", "area"]]

@@ -22,14 +22,13 @@
 
 <div class="row">
   <div class="col-md-6">
-    <% short_name_label = capture do %>
-      Short name (30 letters or less)
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :short_name, label_text: "Short name (30 letters or less)")) do |group| %>
       <% if @organization.block_short_name_edit? %>
-        <small class="em text-danger">warning - will change org URLs (landing pages, embeds)</small>
+        <% group.with_helper_text do %>
+          <span class="em text-danger">warning - will change org URLs (landing pages, embeds)</span>
+        <% end %>
       <% end %>
     <% end %>
-
-    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :short_name, label_text: short_name_label)) %>
   </div>
 
   <%= ambassador_group(:ascend_name) %>
@@ -43,14 +42,12 @@
   </div>
 
   <div class="col-6 col-lg-3">
-    <% previous_slug_label = capture do %>
-      Previous Slug <em class="small text-warning">Rarely unnecessary</em>
-    <% end %>
-
     <% if helpers.display_dev_info? %>
-      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :previous_slug, label_text: previous_slug_label, html_options: {class: "only-dev-visible"})) %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :previous_slug, label_text: "Previous Slug", html_options: {class: "only-dev-visible"})) do |group| %>
+        <% group.with_helper_text { tag.em("Rarely unnecessary", class: "text-warning") } %>
+      <% end %>
     <% else %>
-      <%= read_only_field(previous_slug_label, @organization.previous_slug) %>
+      <%= read_only_field(label_with_note("Previous Slug", "Rarely unnecessary"), @organization.previous_slug) %>
     <% end %>
   </div>
 </div>
@@ -77,13 +74,10 @@
 
     <%= checkbox_field(:direct_unclaimed_notifications, "Send emails directly to unclaimed bike owners", note: "don't require org to forward") %>
 
-    <% parent_org_label = capture do %>
-      Parent organization
-      <small class="less-strong"><strong class="text-danger">(probably) do not add parents!</strong> Parents must be part of the same organization</small>
-    <% end %>
-
-    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :parent_organization_id, label_text: parent_org_label)) do |group| %>
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :parent_organization_id, label_text: "Parent organization")) do |group| %>
       <% group.with_helper_text do %>
+        <strong class="text-danger">(probably) do not add parents!</strong>
+        Parents must be part of the same organization
         <strong>Use the "regional" feature instead.</strong>
         <em>To add regional organizations rather than child/parent relationships, enable it through a paid invoice for the organization. All organizations with a location in the same area will automatically be associated.</em>
       <% end %>
@@ -94,22 +88,23 @@
 
   <div class="col-md-6">
     <% if helpers.display_dev_info? %>
-      <% manual_pos_kind_label = capture do %>
-        Manually set POS kind
-        <span class="text-danger">Warning - you can break things here!</span>
-      <% end %>
-
       <div class="only-dev-visible mt-4">
-        <%= render(UI::Forms::Group::Component.new(attribute: :manual_pos_kind, label_text: manual_pos_kind_label)) do %>
+        <%= render(UI::Forms::Group::Component.new(attribute: :manual_pos_kind, label_text: "Manually set POS kind")) do |group| %>
+          <% group.with_helper_text do %>
+            <span class="text-danger">Warning - you can break things here!</span>
+          <% end %>
+
           <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "organization[manual_pos_kind]", entries: manual_pos_kind_entries, selected: selected_manual_pos_kind)) %>
         <% end %>
       </div>
     <% end %>
 
     <% if @organization.persisted? %>
-      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :embedable_user_email, label_text: label_with_note("Auto user email", "embed registration email"))) do |group| %>
-        <% if @organization.organization_roles.count == 0 %>
-          <% group.with_helper_text do %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :embedable_user_email, label_text: "Auto user email")) do |group| %>
+        <% group.with_helper_text do %>
+          <span class="less-strong">embed registration email</span>
+
+          <% if @organization.organization_roles.count == 0 %>
             You can use <%= ENV["AUTO_ORG_MEMBER"] %> if there are no members of
             the organization
           <% end %>
