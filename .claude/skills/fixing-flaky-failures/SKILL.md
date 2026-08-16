@@ -12,13 +12,15 @@ description: >-
   build go green. **Equally: any spec that fails intermittently while you verify
   your own work** — deciding whether your change caused a flake, or whether to
   ship past one, is this skill's problem too, and it arrives with no CI run, no
-  `:flaky` tag, and nobody but you calling it flaky. Covers diagnosing the real
-  mechanism, attributing a flake to a change, this repo's `flaky:`
-  retry harness, and the known false-flake causes (missing Tailwind build, shared
-  Redis autocomplete cache, Turbo frame timing, probe-run interference).
+  `:flaky` tag, and nobody but you calling it flaky.
 ---
 
 # Fixing flaky failures
+
+Covers diagnosing the real mechanism, attributing a flake to a change, this
+repo's `flaky:` retry harness, and the known false-flake causes — a missing
+Tailwind build, the shared Redis autocomplete cache, Turbo frame timing,
+probe-run interference.
 
 ## The rule that overrides everything else here
 
@@ -116,7 +118,8 @@ page.execute_script(<<~JS)
   })
 JS
 # ...drive the spec...
-page.evaluate_script("window.__events").each { |e| puts e }
+# A file, not puts - rtk's rspec wrapper reports a summary and drops the run's stdout
+File.open("tmp/probe.log", "a") { |f| page.evaluate_script("window.__events").each { |e| f.puts e.inspect } }
 ```
 
 Parameterise the scratch spec over the variable you suspect (`[0, 8].each do |delay|`
@@ -135,6 +138,20 @@ Green locally three times doesn't mean "not reproducible, add a retry". It
 narrows the cause to something CI has and you don't: **contention** (CI runs 5
 parallel shards on one runner) or **ordering** (a different seed, or state left
 by another example). Reason about which, then look for the mechanism.
+
+For contention, slow the renderer rather than the machine — CPU hogs slow the Ruby
+side too, so a loop of runs takes minutes and the extra load is spent where the race
+isn't. CDP throttles the browser alone, and the driver hands you a session:
+
+```ruby
+page.driver.with_playwright_page do |playwright_page|
+  session = playwright_page.context.new_cdp_session(playwright_page)
+  session.send_message("Emulation.setCPUThrottlingRate", params: {rate: 6})
+end
+```
+
+A rate that leaves the spec green over ~20 runs is evidence, not proof: it stretches
+main-thread work, not the network or a parallel shard's I/O.
 
 Caveat when measuring locally: after a heavy record-creating run (seeding,
 probe scripts, a big suite), `:js` specs fail spuriously for a while. Re-measure

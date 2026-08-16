@@ -640,7 +640,6 @@ nb:
         invoices: Fakturaer
         is_paid: Er betalt
         kind: Snill
-        landing_html: Landing html
         locations: Steder
         lock_show_on_map: Lås vis på kartet
         mail_snippets: E-postutdrag
