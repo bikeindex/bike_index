@@ -1,16 +1,13 @@
 <span class="current-organization-nav-item">
-  <%#
-    UI::Button's utilities outrank @layer legacy, so the color and box the nav gives
-    its links have to be restated here to reach this toggle
-  %>
+  <%# UI::Button's utilities outrank @layer legacy, so the toggle's color and box are set here %>
 
   <%= render UI::Button::Component.new(
         id: "passive_organization_submenu",
         color: :link,
-        html_class: "tw:block! tw:px-[15px]! tw:py-2! tw:text-white! tw:hover:text-white!",
+        html_class: "tw:block! tw:px-[15px] tw:py-2 tw:text-white",
         aria: {haspopup: true, expanded: false},
         data: {action: "click->page-block--navbar#toggleDropdown",
-               "page-block--navbar-target": "dropdownToggle organizationToggle"}
+               "page-block--navbar-target": "organizationToggle"}
       ) do %>
     <%= @organization.short_name %>
     <%= render UI::IconChevron::Component.new(direction: :down, html_class: "tw:ml-1") %>

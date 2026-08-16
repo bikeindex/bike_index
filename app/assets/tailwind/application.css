@@ -31,6 +31,7 @@
   --font-sans: "Open Sans", sans-serif;
   --font-header: "Montserrat", sans-serif;
   --breakpoint-xs: 23rem; /* 368px (iphone mini is 375px) */
+  --breakpoint-navbar: 62rem; /* 992px, the $grid-breakpoint-lg the navbar switches at */
 
   /* OG Bike Index brand palettes (formerly config/tailwind.config.js) */
   /* Blue 500 and up carry the redesign's saturation (kelsey_styles.css's
