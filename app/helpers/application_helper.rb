@@ -51,6 +51,12 @@ module ApplicationHelper
     controller_name == "register" || (controller_name == "registrations" && action_name == "new")
   end
 
+  # Which organization's menu the flow's steps highlight add-a-bike in - a member of two
+  # sees the other's menu in the navbar, and it isn't registering anything
+  def register_flow_organization_id
+    current_organization&.id if @force_organized_render
+  end
+
   def body_class
     if controller_name == "landing_pages" || @force_landing_page_render
       if %w[for_schools for_law_enforcement].include?(action_name)

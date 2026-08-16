@@ -114,4 +114,28 @@ RSpec.describe Org::MenuItems::Component, type: :component do
       end
     end
   end
+
+  describe "the register flow's later steps" do
+    # /register, which no organized route matches
+    let(:controller_namespace) { nil }
+    let(:controller_name) { "register" }
+    let(:action_name) { "show" }
+    let(:url) { "/register?step=2" }
+
+    def active_labels(register_flow_organization_id)
+      rendered = with_request_url(url) {
+        render_inline(described_class.new(organization:, current_user:, controller_namespace:,
+          controller_name:, action_name:, register_flow_organization_id:))
+      }
+      rendered.css("a.nav-link.active").map { |a| a.text.strip }
+    end
+
+    it "keeps add-a-bike active, and only in the organization being registered for" do
+      expect(active_labels(organization.id)).to include("Add a bike")
+
+      # A member of two sees the other's menu in the navbar, and it isn't registering anything
+      expect(active_labels(FactoryBot.create(:organization).id)).to_not include("Add a bike")
+      expect(active_labels(nil)).to_not include("Add a bike")
+    end
+  end
 end

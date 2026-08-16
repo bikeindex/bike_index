@@ -4,7 +4,8 @@ module Org
   module MenuItems
     class Component < ApplicationComponent
       def initialize(organization:, current_user:, controller_namespace:, controller_name:, action_name:,
-        is_dropdown: false, unregistered_parking_notification: nil, old_register_view: false)
+        is_dropdown: false, unregistered_parking_notification: nil, old_register_view: false,
+        register_flow_organization_id: nil)
         @organization = organization
         @current_user = current_user
         @controller_namespace = controller_namespace
@@ -13,6 +14,7 @@ module Org
         @is_dropdown = is_dropdown
         @unregistered_parking_notification = unregistered_parking_notification
         @old_register_view = old_register_view
+        @register_flow_organization_id = register_flow_organization_id
       end
 
       def render?
@@ -142,7 +144,8 @@ module Org
           organized_controller?("registrations") && @action_name == "index"
         when :on_bikes_new
           # The register flow links back to the old form, so its row highlights on both
-          on_registrations_new? || (on_bikes_new? && !on_bikes_new_with_parking_notification?)
+          on_registrations_new? || on_register_flow? ||
+            (on_bikes_new? && !on_bikes_new_with_parking_notification?)
         when :on_bikes_new_with_parking_notification
           on_bikes_new_with_parking_notification?
         when :on_registration_sequences
@@ -150,6 +153,11 @@ module Org
         else
           item[:active]
         end
+      end
+
+      # The flow's later steps are on /register, which no organized route matches
+      def on_register_flow?
+        @register_flow_organization_id.present? && @register_flow_organization_id == @organization.id
       end
 
       def on_registrations_new?

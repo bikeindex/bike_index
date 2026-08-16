@@ -7,11 +7,12 @@ module PageBlock
       # logo_only renders just the logo, for the OAuth authorization prompt.
       class Component < ApplicationComponent
         # Digest of the cached template — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "4e1371773a5a"
+        MARKUP_DIGEST = "d09e447e7e6c"
 
         def initialize(logo_only: false, page_id: nil, current_user: nil, current_user_or_unconfirmed_user: nil,
           passive_organization: nil, controller_namespace: nil, controller_name: nil, action_name: nil,
-          unregistered_parking_notification: nil, old_register_view: false)
+          unregistered_parking_notification: nil, old_register_view: false,
+          register_flow_organization_id: nil)
           # Everything below keys the fragment cache, so a caller that forgets one would
           # otherwise share a single render across every page
           raise ArgumentError, "page_id is required unless logo_only" if page_id.blank? && !logo_only
@@ -26,13 +27,14 @@ module PageBlock
           @action_name = action_name
           @unregistered_parking_notification = unregistered_parking_notification
           @old_register_view = old_register_view
+          @register_flow_organization_id = register_flow_organization_id
         end
 
         private
 
         def cache_key
           [MARKUP_DIGEST, @page_id, @current_user_or_unconfirmed_user, @passive_organization,
-            @unregistered_parking_notification, @old_register_view]
+            @unregistered_parking_notification, @old_register_view, @register_flow_organization_id]
         end
 
         def organization_menu
@@ -40,7 +42,8 @@ module PageBlock
             current_user: @current_user, controller_namespace: @controller_namespace,
             controller_name: @controller_name, action_name: @action_name,
             unregistered_parking_notification: @unregistered_parking_notification,
-            old_register_view: @old_register_view)
+            old_register_view: @old_register_view,
+            register_flow_organization_id: @register_flow_organization_id)
         end
 
         def primary_menu

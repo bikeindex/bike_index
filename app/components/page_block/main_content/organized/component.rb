@@ -8,7 +8,8 @@ module PageBlock
       class Component < ApplicationComponent
         def initialize(current_organization:, current_user:, passive_organization:,
           unregistered_parking_notification:, show_general_alert:, controller_namespace:,
-          controller_name:, action_name:, old_register_view: false)
+          controller_name:, action_name:, old_register_view: false,
+          register_flow_organization_id: nil)
           @current_organization = current_organization
           @current_user = current_user
           @passive_organization = passive_organization
@@ -18,6 +19,7 @@ module PageBlock
           @controller_name = controller_name
           @action_name = action_name
           @old_register_view = old_register_view
+          @register_flow_organization_id = register_flow_organization_id
         end
 
         private
@@ -27,7 +29,8 @@ module PageBlock
             controller_namespace: @controller_namespace, controller_name: @controller_name,
             action_name: @action_name,
             unregistered_parking_notification: @unregistered_parking_notification,
-            old_register_view: @old_register_view)
+            old_register_view: @old_register_view,
+            register_flow_organization_id: @register_flow_organization_id)
         end
 
         # The dashboard itself shows the link, even for an organization without the feature

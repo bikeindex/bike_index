@@ -39,7 +39,7 @@ module PageBlock
           passive_organization: nil, show_general_alert: false, blog: nil, related_blogs: nil,
           bike: nil, bike_og: nil, og_email: nil, edit_template: nil, edit_templates: nil,
           oauth_application: nil, unregistered_parking_notification: nil, source: nil,
-          old_register_view: false)
+          old_register_view: false, register_flow_organization_id: nil)
           @controller_namespace = controller_namespace
           @controller_name = controller_name
           @action_name = action_name
@@ -57,6 +57,7 @@ module PageBlock
           @oauth_application = oauth_application
           @unregistered_parking_notification = unregistered_parking_notification
           @old_register_view = old_register_view
+          @register_flow_organization_id = register_flow_organization_id
           @source = source
           @kind = self.class.kind(controller_namespace:, controller_name:, action_name:,
             force_landing_page_render:, force_organized_render:)
@@ -114,6 +115,7 @@ module PageBlock
             passive_organization: @passive_organization,
             unregistered_parking_notification: @unregistered_parking_notification,
             old_register_view: @old_register_view,
+            register_flow_organization_id: @register_flow_organization_id,
             show_general_alert: @show_general_alert,
             controller_namespace: @controller_namespace,
             controller_name: @controller_name,
