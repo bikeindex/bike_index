@@ -44,6 +44,7 @@ module OrganizedServices
         impounded_group(organization, current_user),
         parking_group(organization),
         bulk_group(organization),
+        lightspeed_link(organization),
         messaging_link(organization, current_user),
         model_audits_link(organization),
         graduated_link(organization),
@@ -145,6 +146,14 @@ module OrganizedServices
       group(:bulk, translation(:bulk_import_and_export), "import-export", children)
     end
 
+    # The route redirects to posintegration, which reads the id rather than the slug
+    def lightspeed_link(organization)
+      return nil unless organization.lightspeed_or_broken_lightspeed?
+
+      link(translation(:lightspeed_integration_panel),
+        routes.lightspeed_interface_path(organization_id: organization.id), icon: "lightspeed")
+    end
+
     # Organized::EmailsController only lets a member at #show, so this needs the admin
     # check the settings group gets from being admin-only
     def messaging_link(organization, current_user)
@@ -240,7 +249,7 @@ module OrganizedServices
     end
 
     conceal :build_items, :strip_dividers, :registrations_group, :add_bike_link, :impounded_group, :parking_group,
-      :bulk_group, :messaging_link, :model_audits_link, :graduated_link, :hot_sheet_link,
+      :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link, :graduated_link, :hot_sheet_link,
       :reports_link, :settings_group, :admin?, :group, :link, :disabled, :divider,
       :translation, :routes
   end

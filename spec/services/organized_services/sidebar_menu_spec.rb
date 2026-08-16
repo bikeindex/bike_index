@@ -117,6 +117,19 @@ RSpec.describe OrganizedServices::SidebarMenu do
       end
     end
 
+    context "with a lightspeed organization" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["csv_exports"], pos_kind: :lightspeed_pos)
+      end
+
+      it "adds the integration panel as a row of its own, keyed by id" do
+        expect(items.find { |item| item[:icon] == "lightspeed" })
+          .to eq(link_item("Lightspeed Integration Panel",
+            "/lightspeed_interface?organization_id=#{organization.id}", icon: "lightspeed"))
+      end
+    end
+
     context "with an ascend organization" do
       let(:organization) do
         FactoryBot.create(:organization_with_organization_features,
