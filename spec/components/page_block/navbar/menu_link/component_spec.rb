@@ -56,6 +56,14 @@ RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
     end
   end
 
+  context "with an unrecognized active" do
+    # nil used to mean :auto, so a caller reaching for a falsey value has to say which
+    it "raises rather than picking a state" do
+      expect { described_class.new(label: "Help", path: "/help", active: nil) }
+        .to raise_error(ArgumentError, /Invalid active/)
+    end
+  end
+
   context "with link_class and html_options" do
     let(:args) { {label: "Sign up", path: "/users/new", link_class: "signup-link", html_options: {id: "signUp"}} }
     let(:url) { "/" }

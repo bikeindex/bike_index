@@ -5,7 +5,12 @@ module PageBlock
     module MenuLink
       # One menu manifest item, as an anchor
       class Component < ApplicationComponent
-        def initialize(label:, path:, active: nil, link_class: nil, html_options: {})
+        # :auto and :match_controller resolve through active_link, true and false decide it here
+        ACTIVE_STATES = [:auto, :match_controller, true, false].freeze
+
+        def initialize(label:, path:, active: :auto, link_class: nil, html_options: {})
+          raise_if_invalid_value!(:active, active, ACTIVE_STATES)
+
           @label = label
           @path = path
           @active = active
@@ -14,19 +19,19 @@ module PageBlock
         end
 
         def call
-          options = {class: css_class, **@html_options}
           case @active
-          when nil, :match_controller
-            helpers.active_link(@label, @path, match_controller: @active == :match_controller, **options)
+          when :auto, :match_controller
+            helpers.active_link(@label, @path, class: css_class,
+              match_controller: @active == :match_controller, **@html_options)
           else
-            link_to(@label, @path, **options)
+            link_to(@label, @path, class: [css_class, ("active" if @active)].compact.join(" "), **@html_options)
           end
         end
 
         private
 
         def css_class
-          ["nav-link", @link_class, ("active" if @active == true)].compact.join(" ")
+          ["nav-link", @link_class].compact.join(" ")
         end
       end
     end
