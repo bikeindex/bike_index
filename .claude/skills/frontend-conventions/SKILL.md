@@ -45,13 +45,6 @@ Scope it rather than running bare `bin/lint`: a whole-repo run reformats files o
 
 Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesheets/legacy_includes/_css_layers.scss`), which sorts below tailwind's `components` and `utilities`. So a `UI::*` component rendered inside legacy-styled markup **wins over the surrounding stylesheet's rules for every property its own classes set** — `UI::Button`'s `tw:inline-flex`, `tw:p-0` and `twlink` beat `.primary-header-nav`'s `display`, `padding` and `color` no matter how specific those selectors are.
 
-Give the component the box it needs through `html_class`, rather than teaching the legacy stylesheet to reach it — a rule added there for a component's element silently does nothing. Leave in the stylesheet only what tailwind doesn't set (fonts, which a `<button>` doesn't inherit). `PageBlock::Navbar::OrganizationMenu` is the pattern.
-
-Two things that fall out of it:
-
-- **`!` only where a utility collides with one the component already sets.** `tw:block!` is needed to beat `tw:inline-flex`; `tw:px-4` beats `tw:p-0` on its own, and any utility beats a `@layer components` class like `twlink`.
-- **Legacy breakpoints get a name in `@theme`, not a literal media query.** Bootstrap's `$grid-breakpoint-lg` is 992px and tailwind's `lg:` is 1024px — `--breakpoint-navbar` in `app/assets/tailwind/application.css` is what makes `tw:navbar:block!` line up with the stylesheet.
-
 ## Buttons: always `UI::Button` (and the UI component library generally)
 
 **Every button goes through `UI::Button::Component`** — never a hand-rolled `<button>`, `button_to`, or submit input with ad-hoc Tailwind classes. The component centralizes colors (`:primary`/`:secondary`/`:error`/`:purple`/`:link` — its `COLORS` is the list of record), sizes (`:sm`/`:md`/`:lg`), and the focus/active/dark-mode states; a hand-styled button silently drifts from all of that the next time the design changes.
