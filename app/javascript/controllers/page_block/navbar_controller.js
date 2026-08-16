@@ -66,7 +66,7 @@ export default class extends Controller {
   }
 
   closeDropdownsOutside (event) {
-    if (this.openDropdown && !this.element.contains(event.target)) this.closeDropdowns()
+    if (this.openDropdown && !this.openDropdown.parentElement.contains(event.target)) this.closeDropdowns()
   }
 
   closeOnEscape () {
