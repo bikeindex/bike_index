@@ -100,12 +100,13 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
         enabled_feature_slugs: OrganizationFeature.reg_fields_with_customizable_labels)
     end
 
-    it "states the leave-blank advice once for the group, not under every field" do
+    it "gives each one its own helper text" do
       expect(component).to have_field("reg_label-reg_phone")
-      expect(component.text.scan("default behavior is preferred").size).to eq 1
-      # The email fields' notes are their own, so they stay in the slot
+      expect(component.at_css("#reg_label-reg_phone_helper").text.squish)
+        .to eq "leave blank unless it's absolutely required - default behavior is preferred"
+      expect(component.at_css("#reg_label-reg_phone")["aria-describedby"]).to eq "reg_label-reg_phone_helper"
+      # The email fields say something different
       expect(component.at_css("#reg_label-owner_email_helper").text.squish).to eq "often desired by universities"
-      expect(component.at_css("#reg_label-reg_phone")["aria-describedby"]).to be_nil
     end
   end
 

@@ -45,7 +45,6 @@ module Admin
           end
         end
 
-        # Only the email fields get a note - the rest share one, above the whole group
         def reg_field_text(reg_field)
           case reg_field
           when "owner_email"
@@ -56,7 +55,9 @@ module Admin
              note: "the greyed out example inside the empty field"}
           else
             {label: safe_join(["Custom Label for ",
-              tag.em(OrganizationFeature.reg_field_to_bike_attrs(reg_field).titleize(keep_id_suffix: true))])}
+              tag.em(OrganizationFeature.reg_field_to_bike_attrs(reg_field).titleize(keep_id_suffix: true))]),
+             note: safe_join(["leave blank unless it's ", tag.strong("absolutely"),
+               " required - default behavior is preferred"])}
           end
         end
 
