@@ -37,6 +37,7 @@ module PageBlock
           passive_organization: nil, show_general_alert: false, blog: nil, related_blogs: nil,
           bike: nil, bike_og: nil, og_email: nil, edit_template: nil, edit_templates: nil,
           oauth_application: nil, unregistered_parking_notification: nil, source: nil)
+          @controller_namespace = controller_namespace
           @controller_name = controller_name
           @action_name = action_name
           @current_user = current_user
@@ -109,6 +110,7 @@ module PageBlock
             passive_organization: @passive_organization,
             unregistered_parking_notification: @unregistered_parking_notification,
             show_general_alert: @show_general_alert,
+            controller_namespace: @controller_namespace,
             controller_name: @controller_name,
             action_name: @action_name
           )
