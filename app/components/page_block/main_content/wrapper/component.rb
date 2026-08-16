@@ -7,8 +7,10 @@ module PageBlock
       # with no wrapper lay out the full width themselves and render bare
       class Component < ApplicationComponent
         def self.kind(controller_namespace:, controller_name:, action_name:,
-          force_landing_page_render: false)
+          force_landing_page_render: false, force_organized_render: false)
           return :organized if controller_namespace == "organized" && action_name != "landing"
+          # The register flow, when the registration it's on belongs to an organization
+          return :organized if force_organized_render
           return :oauth_applications if controller_namespace == "oauth" && controller_name == "applications"
           return nil if controller_namespace == "search" || force_landing_page_render
 
@@ -33,7 +35,7 @@ module PageBlock
         # Every wrapper's subject, since the layout renders this before knowing which
         # wrapper it gets - only the matched one's args are read
         def initialize(controller_namespace:, controller_name:, action_name:,
-          force_landing_page_render: false, current_user: nil, current_organization: nil,
+          force_landing_page_render: false, force_organized_render: false, current_user: nil, current_organization: nil,
           passive_organization: nil, show_general_alert: false, blog: nil, related_blogs: nil,
           bike: nil, bike_og: nil, og_email: nil, edit_template: nil, edit_templates: nil,
           oauth_application: nil, unregistered_parking_notification: nil, source: nil,
@@ -57,7 +59,7 @@ module PageBlock
           @old_register_view = old_register_view
           @source = source
           @kind = self.class.kind(controller_namespace:, controller_name:, action_name:,
-            force_landing_page_render:)
+            force_landing_page_render:, force_organized_render:)
         end
 
         def call

@@ -11,6 +11,7 @@ class RegisterController < ApplicationController
   # confirm renders a self-posting form and nothing else, so it reads neither
   before_action :assign_organization, except: %i[new confirm]
   before_action :find_registration_sequence, except: %i[new confirm]
+  before_action :assign_organized_render, except: %i[new embed confirm]
   before_action :redirect_finished, only: %i[create update report acknowledge]
   # The step shown is server state - a cached page could show one the registration is past
   # (register--revalidate covers Safari's bfcache, Register::Page Turbo's own snapshots)
@@ -225,6 +226,17 @@ class RegisterController < ApplicationController
 
   def assign_organization
     BikeServices::Register.assign_organization(@b_param, current_organization)
+  end
+
+  # A registration started on the organization's own page keeps its menu for the rest of
+  # the flow. Only for a member - the origin says where it started, not who's registering
+  def assign_organized_render
+    organization = @b_param&.creation_organization
+    return if @b_param&.origin != "register_flow_organized" || organization.blank?
+    return unless current_user&.authorized?(organization)
+
+    @current_organization = organization
+    @force_organized_render = true
   end
 
   # Resolved once - the step math, the progress bar and the pages themselves all read it

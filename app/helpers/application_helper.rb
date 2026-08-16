@@ -35,7 +35,8 @@ module ApplicationHelper
       controller_namespace:,
       controller_name:,
       action_name:,
-      force_landing_page_render: @force_landing_page_render
+      force_landing_page_render: @force_landing_page_render,
+      force_organized_render: @force_organized_render
     ) == :organized
   end
 
@@ -43,6 +44,11 @@ module ApplicationHelper
   # other way - the organized menu follows it
   def old_register_view?
     session[:old_register_view].present?
+  end
+
+  # Its opening step, then every step after it on /register
+  def register_flow_page?
+    controller_name == "register" || (controller_name == "registrations" && action_name == "new")
   end
 
   def body_class
@@ -57,7 +63,7 @@ module ApplicationHelper
     elsif main_content_organized?
       # Register::Page's gray only covers the form, and the organized container insets it -
       # so the page paints it instead, behind the whole content column
-      if controller_name == "registrations" && action_name == "new"
+      if register_flow_page?
         "organized-body tw:bg-gray-100 tw:dark:bg-gray-900"
       else
         "organized-body"

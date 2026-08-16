@@ -711,6 +711,27 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: 2)
     end
 
+    # Started on Organized::RegistrationsController#new, which the rest of the flow continues
+    context "started from an organization" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:b_param) do
+        BParam.create(origin: "register_flow_organized",
+          params: {bike: {owner_email:, manufacturer_id: "Trek",
+                          creation_organization_id: organization.id}}.as_json)
+      end
+
+      it "keeps the organization's menu, for a member" do
+        get register_path(b_param_token: b_param.id_token, step: 2)
+        expect(response.body).to_not include("organized-left-menu")
+
+        # The token is the owner's to finish with - the menu is the organization's
+        current_user = FactoryBot.create(:organization_user, organization:)
+        log_in(current_user)
+        get register_path(b_param_token: b_param.id_token, step: 2)
+        expect(response.body).to include("organized-left-menu")
+      end
+    end
+
     context "unknown token" do
       it "redirects to the start" do
         get register_path(b_param_token: "unknown-token")
