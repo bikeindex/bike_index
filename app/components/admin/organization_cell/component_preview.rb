@@ -14,7 +14,7 @@ module Admin
       end
 
       def with_search_link
-        render(Admin::OrganizationCell::Component.new(organization:, search_url: admin_organizations_path(organization_id: organization.id)))
+        render(Admin::OrganizationCell::Component.new(organization:, search_url: admin_organizations_path(organization_id: organization.id), render_search: true))
       end
 
       def missing_organization

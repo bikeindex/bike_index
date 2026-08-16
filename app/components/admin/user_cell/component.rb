@@ -10,7 +10,7 @@ module Admin
         user_link_path: nil,
         search_url: nil,
         sortable_search_params: nil,
-        render_search: true
+        render_search: false
       )
         @user = user
         @user_id = user_id || user&.id

@@ -27,6 +27,7 @@ module Admin
       def with_search_link
         render(Admin::BikeCell::Component.new(
           bike:,
+          render_search: true,
           search_url: admin_bikes_path(search_bike_id: bike.id)
         ))
       end

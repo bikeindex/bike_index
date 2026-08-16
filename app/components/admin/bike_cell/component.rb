@@ -9,7 +9,7 @@ module Admin
         bike_link_path: nil,
         search_url: nil,
         sortable_search_params: nil,
-        render_search: true,
+        render_search: false,
         skip_status: false
       )
         @bike = bike

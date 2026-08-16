@@ -3,7 +3,7 @@
 module Admin
   module OrganizationCell
     class Component < ApplicationComponent
-      def initialize(organization: nil, organization_id: nil, search_url: nil, sortable_search_params: nil, render_search: true)
+      def initialize(organization: nil, organization_id: nil, search_url: nil, sortable_search_params: nil, render_search: false)
         @organization = organization
         @organization_id = organization_id || organization&.id
         @search_url = search_url
