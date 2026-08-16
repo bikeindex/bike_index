@@ -95,12 +95,11 @@ module AdminHelper
     ))
   end
 
-  def render_admin_current_header(viewing: nil, kind_humanized: nil)
+  def render_admin_current_header(viewing:)
     render(Admin::CurrentHeader::Component.new(
       params:,
       sortable_search_params:,
-      viewing: viewing || controller_name.humanize,
-      kind_humanized:,
+      viewing:,
       user_subject: @user_subject,
       bike: @bike,
       marketplace_listing: @marketplace_listing,

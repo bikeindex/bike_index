@@ -14,12 +14,8 @@ module Admin
       private
 
       def computed_search_url
-        return @computed_search_url if defined?(@computed_search_url)
-        return @computed_search_url = @search_url if @search_url.present?
-
-        @computed_search_url = if @sortable_search_params.present?
-          url_for(@sortable_search_params.merge(organization_id: @organization_id))
-        end
+        @computed_search_url ||= @search_url.presence ||
+          (url_for(@sortable_search_params.merge(organization_id: @organization_id)) if @sortable_search_params.present?)
       end
 
       def organization_present?

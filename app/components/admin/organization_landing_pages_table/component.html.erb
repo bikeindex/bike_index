@@ -1,6 +1,5 @@
 <%# a local, because the cell blocks below are instance_exec'd and can't see the component's ivars %>
 <% render_search = @render_search %>
-<% sortable_search_params = @sortable_search_params %>
 
 <%= render(UI::Table::Component.new(records: @collection, render_sortable: @render_sortable, sort: @sort, sort_direction: @sort_direction, sortable_search_params: @sortable_search_params)) do |table| %>
   <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |landing_page| %>

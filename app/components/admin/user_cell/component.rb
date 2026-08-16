@@ -28,14 +28,11 @@ module Admin
       private
 
       def computed_search_url
-        return @computed_search_url if defined?(@computed_search_url)
-
-        @computed_search_url = search_url_from_params
+        @computed_search_url ||= @search_url.presence || search_url_from_params
       end
 
       def search_url_from_params
-        return @search_url if @search_url.present?
-        return nil if @sortable_search_params.blank?
+        return if @sortable_search_params.blank?
 
         if @user_id.present?
           url_for(@sortable_search_params.merge(user_id: @user_id))

@@ -5,7 +5,7 @@ module Admin
     class Component < ApplicationComponent
       def initialize(
         viewing:,
-        collection: nil,
+        collection:,
         sortable_search_params: {},
         index_title: nil,
         nav_header_list_items: nil,

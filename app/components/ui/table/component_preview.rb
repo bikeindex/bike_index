@@ -20,7 +20,7 @@ module UI
 
       def sortable_with_cache
         colors = enthusiasm_colors
-        render(UI::Table::Component.new(records: sample_records, cache_key: "preview-cryptids", sort: "name", sort_direction: "desc", render_sortable: true)) do |table|
+        render(UI::Table::Component.new(records: sample_records, cache_key: "preview-cryptids", sort: "name", sort_direction: "desc", sortable_search_params: {period: "all"}, render_sortable: true)) do |table|
           table.column(sortable: "name") { |r| r.name }
           table.column(label: "Region", header_classes: "tw:font-normal") { |r| r.region }
           table.column(label: "Credibility", header_classes: "tw:font-normal") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }

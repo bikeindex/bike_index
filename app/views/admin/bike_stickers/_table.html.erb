@@ -30,7 +30,7 @@
   <% end %>
 
   <% table.column(sortable: "organization_id") do |bike_sticker| %>
-    <%= render Admin::OrganizationCell::Component.new(sortable_search_params:, organization: bike_sticker.organization, render_search: true) %>
+    <%= render Admin::OrganizationCell::Component.new(sortable_search_params:, organization: bike_sticker.organization) %>
   <% end %>
 
   <% table.column(sortable: "bike_sticker_batch_id", label: "Batch") do |bike_sticker| %>
