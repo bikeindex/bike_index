@@ -2,7 +2,10 @@
     "register--heading-names-value": cycle_type_names.to_json,
     action: "hw-combobox:selection->register--heading#update"}) do %>
   <%= render Register::Progress::Component.new(steps: @steps, step: 1) %>
-  <%= render UI::Header::Component.new(text: heading_text, subtitle: translation(".just_the_essentials")) %>
+
+  <% unless @skip_heading %>
+    <%= render UI::Header::Component.new(text: heading_text, subtitle: translation(".just_the_essentials")) %>
+  <% end %>
 
   <% if @b_param.errors.any? %>
     <%= render UI::Alerts::Base::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>

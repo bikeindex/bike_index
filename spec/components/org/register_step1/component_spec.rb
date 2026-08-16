@@ -16,7 +16,8 @@ RSpec.describe Org::RegisterStep1::Component, type: :component do
 
   it "renders step 1 above the way back to the embed form" do
     expect(component).to have_css("form[action='/register']")
-    expect(component.to_html).to include "Register your vehicle with Brakebills!"
+    # The organized menu names the organization, so the step doesn't
+    expect(component.to_html).to_not include "Register your vehicle"
 
     # old_view is what stores the preference, so the menu keeps linking to the embed form
     expect(component).to have_link("Go back to the old view",
