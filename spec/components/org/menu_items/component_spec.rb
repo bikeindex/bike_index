@@ -3,12 +3,15 @@
 require "rails_helper"
 
 RSpec.describe Org::MenuItems::Component, type: :component do
-  let(:instance) { described_class.new(organization:, current_user:, routed_controller:, routed_action:) }
-  let(:routed_controller) { "organized/dashboard" }
-  let(:routed_action) { "index" }
-  let(:component) do
-    with_request_url("/o/#{organization.to_param}/dashboard") { render_inline(instance) }
+  let(:controller_namespace) { "organized" }
+  let(:controller_name) { "dashboard" }
+  let(:action_name) { "index" }
+  let(:instance) do
+    described_class.new(organization:, current_user:, controller_namespace:, controller_name:, action_name:)
   end
+  # The request drives active_link, which resolves the items the cache didn't mark
+  let(:url) { "/o/#{organization.to_param}/#{controller_name}" }
+  let(:component) { with_request_url(url) { render_inline(instance) } }
   let(:organization) { FactoryBot.create(:organization) }
   let(:current_user) { FactoryBot.create(:organization_user, organization:) }
 
@@ -27,10 +30,14 @@ RSpec.describe Org::MenuItems::Component, type: :component do
   end
 
   context "is_dropdown: true" do
-    let(:instance) { described_class.new(organization:, current_user:, routed_controller:, routed_action:, is_dropdown: true) }
+    let(:instance) do
+      described_class.new(organization:, current_user:, controller_namespace:, controller_name:,
+        action_name:, is_dropdown: true)
+    end
     let(:non_dropdown) do
-      with_request_url("/o/#{organization.to_param}/dashboard") {
-        render_inline(described_class.new(organization:, current_user:, routed_controller:, routed_action:))
+      with_request_url(url) {
+        render_inline(described_class.new(organization:, current_user:, controller_namespace:,
+          controller_name:, action_name:))
       }
     end
 
@@ -50,7 +57,8 @@ RSpec.describe Org::MenuItems::Component, type: :component do
 
   context "with no organization" do
     it "does not render" do
-      expect(described_class.new(organization: nil, current_user: nil).render?).to be false
+      expect(described_class.new(organization: nil, current_user: nil, controller_namespace:,
+        controller_name:, action_name:).render?).to be false
     end
   end
 
@@ -65,10 +73,7 @@ RSpec.describe Org::MenuItems::Component, type: :component do
 
   describe "route overrides" do
     context "on bulk_imports without show_bulk_import?" do
-      let(:routed_controller) { "organized/bulk_imports" }
-      let(:component) do
-        with_request_url("/o/#{organization.to_param}/bulk_imports") { render_inline(instance) }
-      end
+      let(:controller_name) { "bulk_imports" }
 
       it "renders the injected bulk imports link with a divider above it" do
         expect(organization.show_bulk_import?).to be false
@@ -80,10 +85,7 @@ RSpec.describe Org::MenuItems::Component, type: :component do
     end
 
     context "on a normal page" do
-      let(:routed_controller) { "organized/registrations" }
-      let(:component) do
-        with_request_url("/o/#{organization.to_param}/registrations") { render_inline(instance) }
-      end
+      let(:controller_name) { "registrations" }
 
       it "does not inject the dashboard or bulk imports link" do
         labels = component.css("a.nav-link").map(&:text).map(&:strip)
@@ -97,20 +99,17 @@ RSpec.describe Org::MenuItems::Component, type: :component do
 
       it "injects an active Manage Registration sequences link on the sequences and pages controllers" do
         expect(organization.enabled?("registration_sequences")).to be false
-        {"organized/registration_sequences" => "/o/#{organization.to_param}/registration_sequences",
-         "organized/registration_sequence_pages" => "/o/#{organization.to_param}/registration_sequence_pages/1/edit"}.each do |controller, path|
-          rendered = with_request_url(path) do
-            render_inline(described_class.new(organization:, current_user:, routed_controller: controller, routed_action: "index"))
-          end
+        %w[registration_sequences registration_sequence_pages].each do |sequences_controller|
+          rendered = with_request_url(url) {
+            render_inline(described_class.new(organization:, current_user:, controller_namespace:,
+              controller_name: sequences_controller, action_name:))
+          }
           active = rendered.css("a.nav-link.active").map { |a| a.text.strip }
           expect(active).to include("Manage Registration sequences")
         end
       end
 
       it "does not inject it on other pages" do
-        component = with_request_url("/o/#{organization.to_param}/registrations") do
-          render_inline(described_class.new(organization:, current_user:, routed_controller: "organized/registrations", routed_action: "index"))
-        end
         expect(component.css("a.nav-link").map { |a| a.text.strip }).not_to include("Manage Registration sequences")
       end
     end

@@ -4005,23 +4005,6 @@ it:
       year: anno
   layouts:
     application:
-      blog: Blog
-      donate: Donare
-      help: Aiuto
-      log_in: accedi
-      logout: Disconnettiti
-      register_a_new_bike: Registra una nuova bicicletta
-      sign_up: Iscriviti
-      stolen_bike: Bicicletta rubata?
-      the_nonprofit_bike_registry: il registro delle biciclette senza scopo di lucro
-      user_settings: "%{user_email} impostazioni"
-      view_org: Visualizza %{org_name}
-      search: Cerca
-      marketplace_messages: Messaggi del mercato
-      your_registrations: Le vostre registrazioni
-      marketplace: Mercato
-      menu: Menu
-      settings_menu: Impostazioni
       skip_to_main_content: Vai al contenuto principale
     application_bikehub:
       accounts_powered_by_bike_index: Gli account BikeHub sono gestiti da Bike Index,
@@ -5669,6 +5652,28 @@ it:
         register_a_bike: Registra una bici
         marketplace: Mercato
         search: Cerca
+      navbar:
+        primary_menu:
+          blog: Blog
+          donate: Donare
+          help: Aiuto
+          log_in: accedi
+          stolen_bike: Bicicletta rubata?
+          search: Cerca
+          marketplace: Mercato
+          sign_up: Iscriviti
+        settings_menu:
+          logout: Disconnettiti
+          register_a_new_bike: Registra una nuova bicicletta
+          user_settings: "%{user_email} impostazioni"
+          view_org: Visualizza %{org_name}
+          marketplace_messages: Messaggi del mercato
+          your_registrations: Le vostre registrazioni
+          settings_menu: Impostazioni
+        wrapper:
+          sign_up: Iscriviti
+          the_nonprofit_bike_registry: il registro delle biciclette senza scopo di lucro
+          menu: Menu
     emails:
       confirmation_email:
         click_to_sign_in_html: Fai clic sul pulsante <em>Accedi</em> per completare

@@ -1,0 +1,19 @@
+<span class="current-organization-nav-item">
+  <a
+    id="passive_organization_submenu"
+    href="#"
+    aria-haspopup="true"
+    aria-expanded="false"
+    data-toggle="dropdown"
+  >
+    <%= @organization.short_name %>
+    <%= render UI::IconChevron::Component.new(direction: :down, html_class: "tw:ml-1") %>
+  </a>
+
+  <ul
+    class="current-organization-submenu"
+    aria-labelledby="passive_organization_submenu"
+  >
+    <%= render menu_items %>
+  </ul>
+</span>
