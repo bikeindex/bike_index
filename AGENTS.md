@@ -57,9 +57,9 @@ None of this governs magic comments, `# rubocop:disable` (keep its justification
 
 ### Translations
 
-A registration is as often an e-scooter, a stroller or a wheelchair — **never hardcode "bike" in a translation value that means the registration's cycle type.** Interpolate `%{bike_type}` and pass `bike_type: bike.type` at the call site; `Registrations::Show::CurrentAlerts::ClaimImpound` and `Registrations::Show::WrapperConsumer` are the pattern. Key names (`about_this_bike:`), the product name ("Bike Index"), and copy that really is bike-only are fine.
+A registration is as often an e-scooter, a stroller or a wheelchair, so **never hardcode "bike" in a value that means the cycle type** — interpolate `%{bike_type}` and pass `bike_type: bike.type`. `Registrations::Show::CurrentAlerts::ClaimImpound` is the pattern. Key names (`about_this_bike:`), the product name, and copy that really is bike-only are fine.
 
-After hand-editing a `component.en.yml`, run `bundle exec rails prepare_translations` — `bin/lint` doesn't normalize YAML.
+Run `bundle exec rails prepare_translations` after hand-editing a `component.en.yml`; `bin/lint` doesn't normalize YAML.
 
 ## Subagents
 
