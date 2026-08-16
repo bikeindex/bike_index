@@ -227,7 +227,8 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     context "with a _destroy from the nested-fields remove" do
       let!(:location1) { FactoryBot.create(:location, organization:, name: "Original") }
 
-      # The hidden field submits blank until the controller sets it, so blank can't destroy
+      # The hidden field renders `false` (Rails reads `_destroy` off the record), so it takes
+      # the controller setting 1 to destroy
       it "keeps the location for the untouched hidden field, and destroys it for 1" do
         put_destroy = lambda { |destroy_value|
           put "#{base_url}/#{organization.to_param}", params: {
@@ -235,7 +236,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
           }
         }
 
-        expect { put_destroy.call("") }.not_to change(Location, :count)
+        expect { put_destroy.call("false") }.not_to change(Location, :count)
         expect { put_destroy.call("1") }.to change(Location, :count).by(-1)
       end
     end

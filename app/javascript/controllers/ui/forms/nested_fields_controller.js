@@ -3,15 +3,16 @@ import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='ui--forms--nested-fields'
 //
-// Adds and removes a nested-attributes association's fields, following the contract
-// @stimulus-components/rails-nested-form established: a [target=template] holding one blank
-// set, a [target=target] marking where added ones go, and a wrapper per set.
+// Follows the contract @stimulus-components/rails-nested-form established: a [target=template]
+// holding one blank set, a [target=target] marking where added ones go, and a wrapper per set.
 //
 // Every added set swaps the server's __INDEX__ placeholder for a distinct one - two sets
 // sharing an index submit as a single record.
 export default class extends Controller {
   static targets = ['target', 'template']
-  static values = { wrapperSelector: { type: String, default: '.nested-fields-wrapper' } }
+  // UI::Forms::NestedFields::Component owns the class, and passes it down rather than
+  // restating it here
+  static values = { wrapperSelector: String }
 
   initialize () {
     this.nextIndex = Date.now()

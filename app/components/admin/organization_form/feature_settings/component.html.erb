@@ -20,12 +20,11 @@
 
     <% if @organization.enabled?("regional_bike_counts") %>
       <% radius_label = capture do %>
-        Search radius
-        (<%= @organization.search_radius_metric_units? ? "km" : "mi" %>)
+        Search radius (<%= search_radius[:unit] %>)
         <small><span class="text-success">regional bike counts setting</span>, controls how large the region is to associate regional sub-organizations</small>
       <% end %>
 
-      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: search_radius_attribute, kind: :number_field, label_text: radius_label)) do |group| %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: search_radius[:attribute], kind: :number_field, label_text: radius_label)) do |group| %>
         <% group.with_helper_text do %>
           <span class="text-warning">
             <code class="d-inline">nearby_organizations</code> will search
@@ -98,13 +97,12 @@
           data-admin--organization-form-target="stolenMessageArea"
         >
           <% stolen_radius_label = capture do %>
-            Stolen Message radius
-            (<%= organization_stolen_message.search_radius_metric_units? ? "km" : "mi" %>)
-            <small><span class="text-success">Organization Stolen Message setting</span> - only available for area type <span class="less-strong">max <%= stolen_message_radius_max %></span></small>
+            Stolen Message radius (<%= stolen_message_radius[:unit] %>)
+            <small><span class="text-success">Organization Stolen Message setting</span> - only available for area type <span class="less-strong">max <%= stolen_message_radius[:max] %></span></small>
           <% end %>
 
-          <%= render(UI::Forms::Group::Component.new(attribute: stolen_message_radius_attribute, label_text: stolen_radius_label)) do %>
-            <%= number_field_tag stolen_message_radius_attribute, stolen_message_radius_value, class: "twinput" %>
+          <%= render(UI::Forms::Group::Component.new(attribute: stolen_message_radius[:attribute], label_text: stolen_radius_label)) do %>
+            <%= number_field_tag stolen_message_radius[:attribute], stolen_message_radius[:value], class: "twinput" %>
           <% end %>
         </div>
       </div>

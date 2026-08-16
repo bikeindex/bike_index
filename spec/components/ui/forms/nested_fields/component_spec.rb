@@ -25,6 +25,9 @@ RSpec.describe UI::Forms::NestedFields::Component, type: :component do
   it "renders the saved records, a blank set in the template, and the add link" do
     expect(component.at_css("a[data-action='click->ui--forms--nested-fields#add']").text).to eq "Add a location"
     expect(component).to have_css("[data-ui--forms--nested-fields-target='target']")
+    # The wrapper class is the component's, so it hands the controller the selector for it
+    expect(component.at_css("[data-controller]")["data-ui--forms--nested-fields-wrapper-selector-value"])
+      .to eq ".nested-fields-wrapper"
 
     saved = rendered_fields.css(".nested-fields-wrapper")
     expect(saved.map { |wrapper| wrapper["data-new-record"] }).to eq ["false"]
@@ -39,12 +42,16 @@ RSpec.describe UI::Forms::NestedFields::Component, type: :component do
     expect(template.at_css("input[name$='[_destroy]']")).to be_present
   end
 
-  context "with class_name and obj_attrs" do
-    let(:options) { {class_name: "row mt-4", add_class_name: "twlink", obj_attrs: {name: "New location"}} }
+  context "with class_name, fields_class_name and obj_attrs" do
+    let(:options) do
+      {class_name: "row mt-4", add_class_name: "twlink", fields_class_name: "col-md-6",
+       obj_attrs: {name: "New location"}}
+    end
 
     it "passes them through" do
-      expect(component.at_css("[data-controller='ui--forms--nested-fields']")["class"]).to eq "row mt-4"
+      expect(component.at_css("[data-controller]")["class"]).to eq "row mt-4"
       expect(component.at_css("a[data-action*='#add']")["class"]).to eq "twlink"
+      expect(rendered_fields.at_css(".nested-fields-wrapper")["class"]).to eq "nested-fields-wrapper col-md-6"
       expect(template.at_css("input[name$='[name]']")["value"]).to eq "New location"
     end
   end

@@ -10,9 +10,9 @@ module Admin
           "user_role_for_user_email_domain" => "automatic user role"
         }.freeze
 
-        def initialize(form_builder:, organization:, current_user:)
+        def initialize(form_builder:, current_user:)
           @form_builder = form_builder
-          @organization = organization
+          @organization = form_builder.object
           @current_user = current_user
         end
 
@@ -26,8 +26,12 @@ module Admin
           @domain_uses ||= DOMAIN_FEATURES.filter_map { |slug, name| name if @organization.enabled?(slug) }
         end
 
-        def search_radius_attribute
-          @organization.search_radius_metric_units? ? :search_radius_kilometers : :search_radius_miles
+        def search_radius
+          @search_radius ||= if @organization.search_radius_metric_units?
+            {attribute: :search_radius_kilometers, unit: "km"}
+          else
+            {attribute: :search_radius_miles, unit: "mi"}
+          end
         end
 
         def stolen_message_kind_options
@@ -39,20 +43,16 @@ module Admin
           @organization_stolen_message ||= OrganizationStolenMessage.for(@organization)
         end
 
-        def stolen_message_radius_units
-          organization_stolen_message.search_radius_metric_units? ? "kilometers" : "miles"
-        end
-
-        # A top-level param rather than an organization attribute
-        def stolen_message_radius_attribute = :"organization_stolen_message_search_radius_#{stolen_message_radius_units}"
-
-        def stolen_message_radius_value = organization_stolen_message.send(:"search_radius_#{stolen_message_radius_units}")
-
-        def stolen_message_radius_max
-          if organization_stolen_message.search_radius_metric_units?
-            "#{OrganizationStolenMessage.max_search_radius_kilometers} km"
+        # attribute is a top-level param rather than an organization attribute
+        def stolen_message_radius
+          @stolen_message_radius ||= if organization_stolen_message.search_radius_metric_units?
+            {attribute: :organization_stolen_message_search_radius_kilometers, unit: "km",
+             value: organization_stolen_message.search_radius_kilometers,
+             max: "#{OrganizationStolenMessage.max_search_radius_kilometers} km"}
           else
-            "#{OrganizationStolenMessage::MAX_SEARCH_RADIUS} miles"
+            {attribute: :organization_stolen_message_search_radius_miles, unit: "mi",
+             value: organization_stolen_message.search_radius_miles,
+             max: "#{OrganizationStolenMessage::MAX_SEARCH_RADIUS} miles"}
           end
         end
 

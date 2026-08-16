@@ -9,7 +9,7 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
   def rendered_component(organization, current_user)
     render_in_view_context do
       form_for [:admin, organization] do |f|
-        render(Admin::OrganizationForm::Wrapper::Component.new(form_builder: f, organization:, current_user:))
+        render(Admin::OrganizationForm::Wrapper::Component.new(form_builder: f, current_user:))
       end
     end
   end

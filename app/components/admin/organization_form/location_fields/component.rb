@@ -9,14 +9,14 @@ module Admin
           @form_builder = form_builder
           @organization = organization
           @location = form_builder.object
-
-          # A location the "Add a location" link just cloned has none of these set
-          @location.organization_id ||= @organization.id
-          @location.name ||= @organization.name
-          @location.address_record = @location.find_or_build_address_record
         end
 
         private
+
+        def checkbox(attribute, label = Location.human_attribute_name(attribute))
+          render(UI::Forms::Checkbox::Component.new(form_builder: @form_builder, attribute:,
+            label:, class_name: "tw:mb-2"))
+        end
 
         def publicly_visible_label
           return Location.human_attribute_name(:publicly_visible) if @organization.allowed_show?

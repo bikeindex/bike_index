@@ -1,4 +1,4 @@
-<%= tag.div(class: @class_name, data: {controller: UI::Forms::NestedFields::Component::CONTROLLER}) do %>
+<%= tag.div(class: @class_name, data: controller_data) do %>
   <%= saved_fields %>
 
   <%= tag.template(blank_fields, data: target_data("template")) %>
