@@ -33,12 +33,12 @@ RSpec.describe "Register flow", :js, type: :system do
     click_button "Next"
   end
 
-  # fill_in focuses the field, then sends its text a round trip later - so autofocus
-  # connecting in between lands the text in the field filled just before. Its focus is
-  # also the signal that the form's controllers have connected.
+  # fill_in focuses the field, then sends its text a round trip later - so a controller
+  # connecting in between lands the text in the field filled just before
   def wait_for_details_step(wait: Capybara.default_max_wait_time)
     expect(page).to have_content("Add your bike", wait:)
     expect(page).to have_css("input[name='bike[frame_model]']:focus", wait:)
+    wait_for_stimulus(timeout: wait)
   end
 
   # Answers every submission in the browser, the way an edge that never reaches the app
@@ -317,6 +317,36 @@ RSpec.describe "Register flow", :js, type: :system do
     user = User.last
     expect(user).to have_attributes(email: owner_email, confirmed: true, terms_of_service: true)
     expect(bike.creator_id).to eq user.id
+  end
+
+  # form-persist announces its restore once, and controllers are lazily loaded - so a
+  # module that lands after the announcement never hears it
+  it "reconciles a restored draft into the controllers whose modules arrive after it" do
+    start_registration
+    click_button "+ Add another color"
+    type_into("#bike_secondary_frame_color_id", "Blue")
+    click_combobox_option("Blue")
+    check "Missing serial"
+    expect(page).to have_no_field("bike[serial_number]")
+
+    held = []
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.route(%r{(serial|additional_colors)_controller}, ->(route, request) {
+        held << request.url
+        sleep 1
+        route.continue
+      })
+    end
+
+    visit page.current_url
+
+    # Both a full second after the restore
+    expect(page).to have_field("bike_secondary_frame_color_id", with: "Blue", wait: 10)
+    expect(page).to have_checked_field("Missing serial")
+    expect(page).to have_no_field("bike[serial_number]")
+    # A route that never fired would pass vacuously
+    expect(held).to include(a_string_matching(/serial_controller/),
+      a_string_matching(/additional_colors_controller/))
   end
 
   describe "signed in" do

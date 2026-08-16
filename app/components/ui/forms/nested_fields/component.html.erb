@@ -1,0 +1,10 @@
+<%= tag.div(class: @class_name, data: controller_data) do %>
+  <%= saved_fields %>
+
+  <%= tag.template(blank_fields, data: target_data("template")) %>
+
+  <%# Added records go in ahead of this, so they stay above the add link %>
+  <%= tag.span(nil, data: target_data("target")) %>
+
+  <%= link_to @add_label, "#", class: @add_class_name, data: add_link_data %>
+<% end %>

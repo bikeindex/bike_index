@@ -1,0 +1,147 @@
+<%= render(UI::Alerts::ObjectError::Component.new(object: @organization)) %>
+
+<div class="row">
+  <div class="col-md-6">
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :name, required: true)) %>
+  </div>
+
+  <div class="col-md-6">
+    <% if @organization.restrict_invitations? %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :available_invitation_count, kind: :number_field, label_text: "Available invitations")) do |group| %>
+        <% group.with_helper_text do %>
+          Invitations sent: <%= @organization.sent_invitation_count %>
+        <% end %>
+      <% end %>
+    <% else %>
+      <div class="d-md-block d-none">
+        <%# The blank label keeps this level with the invitation count field it stands in for %>
+        <%= read_only_field("&nbsp;".html_safe, "permitted domain with passwordless sign in, no invite restrictions") %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :short_name, label_text: "Short name (30 letters or less)")) do |group| %>
+      <% if @organization.block_short_name_edit? %>
+        <% group.with_helper_text do %>
+          <span class="em text-danger">warning - will change org URLs (landing pages, embeds)</span>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%= ambassador_group(:ascend_name) %>
+</div>
+
+<div class="row">
+  <%= ambassador_group(:website) %>
+
+  <div class="col-6 col-lg-3">
+    <%= read_only_field("Slug:", @organization.slug) %>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <% previous_slug_note = tag.em("Rarely unnecessary", class: "text-warning") %>
+
+    <% if helpers.display_dev_info? %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :previous_slug, label_text: "Previous Slug", html_options: {class: "only-dev-visible"})) do |group| %>
+        <% group.with_helper_text { previous_slug_note } %>
+      <% end %>
+    <% else %>
+      <%= read_only_field("Previous Slug", @organization.previous_slug, note: previous_slug_note) %>
+    <% end %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :kind, label_text: "Organization Type")) do %>
+      <%= render(UI::Forms::Select::Component.new(form_builder: @form_builder, attribute: :kind, option_tags: kind_option_tags, html_options: {data: {"admin--organization-form-target": "kind", action: "change->admin--organization-form#toggleAmbassadorFields"}})) %>
+    <% end %>
+
+    <% if @organization.bike_shop? %>
+      <%= checkbox_field(:lightspeed_register_with_phone, "Lightspeed POS registrations include phone", note: "originally for Edmonton") %>
+    <% end %>
+
+    <%= checkbox_field(:show_on_map, Organization.human_attribute_name(:show_on_map), ambassador: true) %>
+
+    <%= checkbox_field(:lock_show_on_map, "Lock shown on map", note: "restrict org from updating show on map above (e.g. they're known bad actors)", ambassador: true) %>
+
+    <%= checkbox_field(:spam_registrations, "High spam registrations", note: "don't email suspicious registrations") %>
+
+    <%= checkbox_field(:api_access_approved, "API V1 access approved", note: "to be able to post updates via legacy API (rarely necessary)", ambassador: true) %>
+
+    <%= checkbox_field(:approved, "Validated & approved", ambassador: true) %>
+
+    <%= checkbox_field(:direct_unclaimed_notifications, "Send emails directly to unclaimed bike owners", note: "don't require org to forward") %>
+
+    <% parent_org_note = capture do %>
+      <strong class="text-danger">(probably) do not add parents!</strong>
+      Parents must be part of the same organization
+    <% end %>
+
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :parent_organization_id, label_text: label_with_note("Parent organization", parent_org_note))) do |group| %>
+      <% group.with_helper_text do %>
+        <strong>Use the "regional" feature instead.</strong>
+        <em>To add regional organizations rather than child/parent relationships, enable it through a paid invoice for the organization. All organizations with a location in the same area will automatically be associated.</em>
+      <% end %>
+
+      <%= render UI::Forms::Combobox::Component.new(name: :parent_organization_id, form: @form_builder, placeholder: "Choose organization", include_blank: true, options: parent_organization_options, aria: {describedby: group.helper_text_id}, data: AMBASSADOR_TARGETS[:input_data]) %>
+    <% end %>
+  </div>
+
+  <div class="col-md-6">
+    <% if helpers.display_dev_info? %>
+      <div class="only-dev-visible mt-4">
+        <%= render(UI::Forms::Group::Component.new(attribute: :manual_pos_kind, label_text: "Manually set POS kind")) do |group| %>
+          <% group.with_helper_text do %>
+            <span class="text-danger">Warning - you can break things here!</span>
+          <% end %>
+
+          <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "organization[manual_pos_kind]", entries: manual_pos_kind_entries, selected: selected_manual_pos_kind)) %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if @organization.persisted? %>
+      <% no_members = @organization.organization_roles.count == 0 %>
+
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :embedable_user_email, label_text: label_with_note("Auto user email", "embed registration email"))) do |group| %>
+        <% if no_members %>
+          <% group.with_helper_text do %>
+            You can use <%= ENV["AUTO_ORG_MEMBER"] %> if there are no members of
+            the organization
+          <% end %>
+        <% end %>
+
+        <%= render UI::Forms::Combobox::Component.new(name: :embedable_user_email, form: @form_builder, placeholder: "Select email", value: embedable_email, include_blank: true, options: auto_user_emails, aria: {describedby: (group.helper_text_id if no_members)}) %>
+      <% end %>
+    <% end %>
+
+    <% if @organization.bike_shop? %>
+      <%= checkbox_field(:opted_into_theft_survey_2023, "Opted into theft survey 2023", note: "if checked, we will start email their customers theft surveys") %>
+    <% end %>
+
+    <% if @organization.official_manufacturer? %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :manufacturer_id, label_text: Organization.human_attribute_name(:manufacturer), required: true)) do |group| %>
+        <% group.with_helper_text do %>
+          <strong>This organization has <code>Official manufacturer organization</code> enabled.</strong>
+          Select a manufacturer to give them manufacturer access.
+        <% end %>
+
+        <%= render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, no_manufacturer_other: true, form: @form_builder, required: true, aria: {describedby: group.helper_text_id}) %>
+      <% end %>
+    <% end %>
+
+    <%= render(Admin::OrganizationForm::FeatureSettings::Component.new(form_builder: @form_builder, current_user: @current_user)) %>
+  </div>
+</div>
+
+<% if @organization.persisted? %>
+  <%= render(UI::Forms::NestedFields::Component.new(form_builder: @form_builder, association: :locations,
+        fields_component: Admin::OrganizationForm::LocationFields::Component, fields_args: {organization: @organization},
+        fields_class_name: "col-md-6 mt-4", obj_attrs: blank_location_attrs,
+        add_label: "Add a location", class_name: "row mt-4", add_class_name: "twlink mx-auto mt-4")) %>
+<% end %>
