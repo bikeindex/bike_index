@@ -35,6 +35,7 @@ export default class extends Controller {
     // Surface throttling: the eager results frame and the kind-count fetch can
     // both come back 429 during active searching. Catch the frame's response
     // here; the count fetch signals via the search:rate-limited window event.
+    document.addEventListener('turbo:before-fetch-request', this.handleFetchRequest)
     document.addEventListener('turbo:before-fetch-response', this.handleFetchResponse)
     document.addEventListener('turbo:fetch-request-error', this.handleFetchError)
     window.addEventListener('search:rate-limited', this.showRateLimited)
@@ -47,6 +48,7 @@ export default class extends Controller {
   disconnect () {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
     document.removeEventListener('turbo:load', this.handleTurboLoad)
+    document.removeEventListener('turbo:before-fetch-request', this.handleFetchRequest)
     document.removeEventListener('turbo:before-fetch-response', this.handleFetchResponse)
     document.removeEventListener('turbo:fetch-request-error', this.handleFetchError)
     window.removeEventListener('search:rate-limited', this.showRateLimited)
@@ -74,6 +76,9 @@ export default class extends Controller {
   // server instead, so missing those (the controller reconnects after the
   // popstate) is harmless.
   handlePopstate = () => {
+    // Whatever the frame last asked for belongs to the entry we just left, so from
+    // here it can't mean the frame is ahead of the address bar
+    this.requestedURL = null
     const params = new URLSearchParams(window.location.search)
     ;['search_email', 'serial', 'search_notes'].forEach(name => {
       const input = this.formTarget.querySelector(`input[name="${name}"]`)
@@ -88,6 +93,10 @@ export default class extends Controller {
   reloadFrameIfUrlStale () {
     const frame = this.frameElement
     if (!this.differentSearchOnSamePage(frame?.getAttribute('src'), window.location.href)) return
+    // Turbo advances the address bar only once a frame navigation has rendered, so a
+    // frame already asking for a different search is ahead of the URL rather than
+    // stale, and a turbo:load landing in that window would throw the rider's search away.
+    if (this.differentSearchOnSamePage(this.requestedURL, window.location.href)) return
 
     frame.setAttribute('src', window.location.href)
   }
@@ -145,18 +154,30 @@ export default class extends Controller {
   // The frame's eager src fetch and a search submitted while it's still in flight
   // race each other. Turbo renders whichever lands last and rewrites history from
   // the frame, so the older response would drag the address bar back to the query
-  // the rider searched away from. A src fetch assigns src before it is sent, so a
-  // response that no longer matches it is one the frame has moved on from.
+  // the rider searched away from.
   frameResponseSuperseded (url) {
-    return this.differentSearchOnSamePage(url, this.frameElement?.getAttribute('src'))
+    return this.differentSearchOnSamePage(url, this.requestedURL)
+  }
+
+  // What the frame is currently after. The frame's own src can't answer that: Turbo
+  // assigns it before a src fetch, but for a form submit only once the response
+  // arrives, so a submit in flight leaves src on the query being searched away from.
+  handleFetchRequest = (event) => {
+    if (!this.ownsFetch(event)) return
+
+    this.requestedURL = event.detail?.url?.toString()
+  }
+
+  // Turbo targets the frame for its eager src fetch and the form for a submit;
+  // anything else (the combobox raises these too) isn't ours.
+  ownsFetch (event) {
+    return event.target === this.frameElement || event.target === this.formTarget
   }
 
   // A fetch that rejects outright when the network drops never comes back with a
   // status, so handleFetchResponse never sees it and the spinner runs forever.
-  // Turbo targets the frame for its eager src fetch and the form for a submit;
-  // anything else (the combobox raises this too) isn't ours.
   handleFetchError = (event) => {
-    if (event.target !== this.frameElement && event.target !== this.formTarget) return
+    if (!this.ownsFetch(event)) return
 
     // A failed submit has to be retried by re-submitting: the frame's src still
     // points at the previous query, so reloading it would show the old results.

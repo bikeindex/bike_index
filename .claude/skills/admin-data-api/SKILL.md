@@ -2,10 +2,7 @@
 name: admin-data-api
 description: >-
   Read live production data from Bike Index through the admin OAuth token —
-  Sidekiq and PgHero status (`GET /api/admin_data/sidekiq`,
-  `GET /api/admin_data/pghero`) and the user-submitted bug reports (`GET
-  /admin/bug_reports.json`, `GET /admin/bug_reports/:id.json`, `PATCH
-  /admin/bug_reports/:id`) — the same
+  Sidekiq and PgHero status, and the user-submitted bug reports — the same
   data as the cookie-gated dashboards, but agent-friendly JSON. Trigger when
   the user asks about production queue depth, job backlog, retries/dead jobs,
   running Sidekiq processes, or Postgres health (slow/blocked queries, index
