@@ -39,7 +39,6 @@ RSpec.describe OrganizedServices::SidebarMenu do
           link_item("Add a bike", "/o/#{organization.to_param}/bikes/new",
             icon: "plus-circle", active: :on_bikes_new),
           {type: :divider},
-          {type: :disabled, label: "Messaging", icon: "chat"},
           {type: :disabled, label: "Reports", icon: "bar-chart"}
         ]
       end
@@ -55,7 +54,7 @@ RSpec.describe OrganizedServices::SidebarMenu do
       let(:slug) { organization.to_param }
 
       it "groups the menu the way the design lays it out" do
-        expect(items.map { |item| item[:type] }).to eq(%i[group link divider group group group disabled
+        expect(items.map { |item| item[:type] }).to eq(%i[group link divider group group group link
           link link link disabled divider group])
 
         groups = items.select { |item| item[:type] == :group }
@@ -77,23 +76,31 @@ RSpec.describe OrganizedServices::SidebarMenu do
         ])
       end
 
-      it "renders the three rows with nowhere to link as disabled" do
+      it "renders the two rows with nowhere to link as disabled" do
         impounded = items.find { |item| item[:key] == :impounded }
 
         expect(impounded[:children].last).to eq({type: :disabled, label: "Add an Impounded Vehicle", icon: nil})
         expect(items.select { |item| item[:type] == :disabled }.map { |item| item[:label] })
-          .to eq(["Messaging", "Reports"])
+          .to eq(["Reports"])
       end
 
-      it "puts profile, users, impounding and the hot sheet config under settings" do
+      it "points messaging at the custom emails index" do
+        expect(items.find { |item| item[:label] == "Messaging" })
+          .to eq(link_item("Messaging", "/o/#{slug}/emails", icon: "chat", active: :match_controller))
+      end
+
+      it "puts every organization-admin page under settings" do
         settings = items.find { |item| item[:key] == :settings }
 
         expect(settings[:label]).to eq "Brakebills Settings"
         expect(settings[:children]).to eq([
           link_item("Brakebills profile", "/o/#{slug}/manage"),
+          link_item("Brakebills locations", "/o/#{slug}/manage/locations"),
           link_item("Manage users", "/o/#{slug}/users", active: :match_controller),
           link_item("Impounding", "/o/#{slug}/manage_impounding/edit"),
-          link_item("Stolen Bike Hot Sheet", "/o/#{slug}/hot_sheet/edit")
+          link_item("Stolen Bike Hot Sheet", "/o/#{slug}/hot_sheet/edit"),
+          link_item("Manage Registration sequences", "/o/#{slug}/registration_sequences",
+            active: :on_registration_sequences)
         ])
       end
     end

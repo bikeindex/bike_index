@@ -62,6 +62,8 @@ module PageBlock
         when :on_registrations_index then organized_controller?("registrations") && @action_name == "index"
         when :on_bikes_new then on_bikes_new? && @unregistered_parking_notification.blank?
         when :on_bikes_new_with_parking_notification then on_bikes_new? && @unregistered_parking_notification.present?
+        when :on_registration_sequences
+          organized_controller?("registration_sequences", "registration_sequence_pages")
         else item[:active] == true
         end
       end

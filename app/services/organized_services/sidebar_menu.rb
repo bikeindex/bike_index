@@ -21,10 +21,9 @@ module OrganizedServices
   module SidebarMenu
     extend Functionable
 
-    # Messaging, Reports and Add an Impounded Vehicle are in the design with nothing
-    # to link to — organized routes no impound_records#new, and neither of the other
-    # two exists at all. They render greyed rather than being dropped, so the menu
-    # keeps the shape the design gives it.
+    # Reports and Add an Impounded Vehicle are in the design with nothing to link to —
+    # organized routes no impound_records#new, and nothing corresponds to Reports. They
+    # render greyed rather than being dropped, so the menu keeps the design's shape.
     def for(organization:, current_user:)
       return [] if organization.nil? || current_user.nil?
 
@@ -45,7 +44,7 @@ module OrganizedServices
         impounded_group(organization, current_user),
         parking_group(organization),
         bulk_group(organization),
-        messaging_link,
+        messaging_link(organization, current_user),
         model_audits_link(organization),
         graduated_link(organization),
         hot_sheet_link(organization),
@@ -146,8 +145,13 @@ module OrganizedServices
       group(:bulk, translation(:bulk_import_and_export), "import-export", children)
     end
 
-    def messaging_link
-      disabled(translation(:messaging), icon: "chat")
+    # Organized::EmailsController only lets a member at #show, so this needs the admin
+    # check the settings group gets from being admin-only
+    def messaging_link(organization, current_user)
+      return nil unless organization.enabled?("customize_emails") && admin?(organization, current_user)
+
+      link(translation(:messaging), routes.organization_emails_path(organization_id: organization.to_param),
+        icon: "chat", active: :match_controller)
     end
 
     def model_audits_link(organization)
@@ -182,6 +186,8 @@ module OrganizedServices
       children = [
         link(translation(:org_profile, org_name: organization.short_name),
           routes.organization_manage_path(organization_id: organization.to_param)),
+        link(translation(:org_locations, org_name: organization.short_name),
+          routes.locations_organization_manage_path(organization_id: organization.to_param)),
         link(translation(:manage_users),
           routes.organization_users_path(organization_id: organization.to_param), active: :match_controller),
         (if organization.enabled?("impound_bikes")
@@ -191,6 +197,11 @@ module OrganizedServices
         (if organization.enabled?("hot_sheet")
            link(translation(:stolen_hot_sheet),
              routes.edit_organization_hot_sheet_path(organization_id: organization.to_param))
+         end),
+        (if organization.enabled?("registration_sequences")
+           link(translation(:manage_registration_sequences),
+             routes.organization_registration_sequences_path(organization_id: organization.to_param),
+             active: :on_registration_sequences)
          end)
       ]
 

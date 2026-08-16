@@ -45,6 +45,22 @@ RSpec.describe PageBlock::OrgSidebar::Component, type: :component do
     end
   end
 
+  # The sequence's pages are their own controller, and the menu has no row of their own
+  context "on a registration sequence's pages" do
+    let(:page) do
+      {controller_namespace: "organized", controller_name: "registration_sequence_pages", action_name: "edit"}
+    end
+    let(:component) do
+      with_request_url("/o/#{organization.to_param}/registration_sequence_pages/2/edit") { render_inline(instance) }
+    end
+
+    it "keeps the sequences row current, and its group open" do
+      expect(component.css("[aria-controls^='org_sidebar_group_'][aria-expanded='true']").map { |b| b.text.strip })
+        .to eq(["Brakebills Settings"])
+      expect(component).to have_css "a[aria-current='page']", text: "Manage Registration sequences"
+    end
+  end
+
   context "without an organization" do
     let(:instance) { described_class.new(organization: nil, current_user:, **page) }
 
