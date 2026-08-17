@@ -51,9 +51,14 @@
       data-page-block--org-sidebar-target="mobileToggle"
       data-action="page-block--org-sidebar#toggleMobile"
     >
-      <span class="tw:h-0.5 tw:w-5 tw:rounded-sm tw:bg-gray-900 tw:dark:bg-gray-300"></span>
-      <span class="tw:h-0.5 tw:w-5 tw:rounded-sm tw:bg-gray-900 tw:dark:bg-gray-300"></span>
-      <span class="tw:h-0.5 tw:w-5 tw:rounded-sm tw:bg-gray-900 tw:dark:bg-gray-300"></span>
+      <%#
+        7px is a bar plus the gap below it, so the outer two meet on the middle one.
+        Spelled out rather than interpolated -- tailwind only emits a utility it can
+        see literally in the source
+      %>
+      <span class="tw:group-data-[mobile-open=true]/sidebar:translate-y-[7px] tw:group-data-[mobile-open=true]/sidebar:rotate-45 <%= PageBlock::OrgSidebar::Component::BAR %>"></span>
+      <span class="tw:group-data-[mobile-open=true]/sidebar:opacity-0 <%= PageBlock::OrgSidebar::Component::BAR %>"></span>
+      <span class="tw:group-data-[mobile-open=true]/sidebar:-translate-y-[7px] tw:group-data-[mobile-open=true]/sidebar:-rotate-45 <%= PageBlock::OrgSidebar::Component::BAR %>"></span>
     </button>
   </div>
 

@@ -17,6 +17,10 @@ module PageBlock
       ROW_CURRENT = "tw:bg-blue-50 tw:text-blue-600 tw:dark:bg-gray-700"
       ROW_RESTING = "tw:text-gray-900 tw:dark:text-gray-300"
 
+      # One bar of the hamburgler, which folds into an X while the menu is open
+      BAR = "tw:h-0.5 tw:w-5 tw:rounded-sm tw:bg-gray-900 tw:transition-all " \
+        "tw:duration-200 tw:dark:bg-gray-300"
+
       def initialize(organization:, current_user:, current_user_or_unconfirmed_user: nil,
         controller_namespace: nil, controller_name: nil, action_name: nil,
         unregistered_parking_notification: nil)
