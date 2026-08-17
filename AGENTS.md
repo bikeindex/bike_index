@@ -75,6 +75,8 @@ Worth delegating enumeration at all rather than eyeballing a grep: in that same 
 
 Uses RSpec. All business logic should be tested. The `rspec-testing` skill covers project-specific style (`context`+`let`, request specs over controller specs, avoiding mocks). A test that fails intermittently is the `fixing-flaky-failures` skill — coverage is never what gives way to make CI green.
 
+**`bin/ci` runs locally what CI runs** — use it rather than hand-rolling an equivalent `rspec` command.
+
 **Never hand-edit a VCR cassette**, and never `git checkout` away one a spec run re-recorded — cassettes only change by being recorded, and a re-recording gets committed on whatever branch you're on. To clear stale contents, `rm` the file and re-run the spec.
 
 ## Frontend Development

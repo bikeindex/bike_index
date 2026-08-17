@@ -47,6 +47,7 @@ en:
         optional: optional
         or: or
         owner_name: Owner name
+        owner_name_placeholder: First & Last name
         owner_registration: Owner Registration
         owner_registration_description: Registering for myself or on behalf of owner
         phone: Phone

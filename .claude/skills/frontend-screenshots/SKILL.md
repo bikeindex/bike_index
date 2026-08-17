@@ -115,13 +115,19 @@ $BASE_URL/rails/view_components/<preview_path>/<scenario>
 
 Use this bare route, not Lookbook's `/lookbook/...`, which wraps the component in its own browser chrome.
 
-The preview page loads Tailwind and renders the component standalone (no site chrome), so this is the one case that captures the viewport rather than the full page (`fullPage: false`); a small ViewComponent render-timing line at the bottom is harmless.
+The preview page loads Tailwind and renders the component standalone (no site chrome), so a preview that fits the viewport captures at `fullPage: false`; a small ViewComponent render-timing line at the bottom is harmless. **A preview taller than the viewport still captures `fullPage: true`** — page-sized components (a whole registration step, a long form) put the changed field below 900px, and cropping it out is the one thing the shot exists to show. Measure before choosing:
+
+```js
+() => document.querySelector('<selector for what changed>').getBoundingClientRect().top + window.scrollY
+```
 
 **A legacy-styled component needs the display option in the URL.** `layouts/component_preview` only includes `revised`/`kelsey_styles` when Lookbook passes it, and the bare route passes nothing — so a preview whose class carries `# @display legacy_stylesheet true` renders *unstyled* (the navbar's logo fills the viewport) unless you append it yourself:
 
 ```
 $BASE_URL/rails/view_components/<preview_path>/<scenario>?lookbook%5Bdisplay%5D%5Blegacy_stylesheet%5D=true
-``` Everything else still applies — same PII/seed-data gate, same `(url-path, page-slug)` naming (use a slug like `banner-signed-in`).
+```
+
+Everything else still applies — same PII/seed-data gate, same `(url-path, page-slug)` naming (use a slug like `banner-signed-in`).
 
 Previews that query the dev DB (e.g. `User.admins.first`) render nothing when that data is missing — if the state doesn't appear, seed first with `bundle exec rails db:seed`. This is component-only: a preview can't show layout/stacking against the rest of the page (e.g. a navbar z-index fix), so use a real page for those.
 
