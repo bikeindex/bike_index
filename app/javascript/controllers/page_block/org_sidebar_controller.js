@@ -1,7 +1,10 @@
 import { Controller } from '@hotwired/stimulus'
+import { collapse } from 'utils/collapse_utils'
 
 const EXPANDED_WIDTH = '266px'
 const COLLAPSED_WIDTH = '68px'
+// ui--collapse's default, so the account block and the groups animate at one speed
+const TRANSITION_MS = 200
 
 // Connects to data-controller="page-block--org-sidebar"
 //
@@ -73,10 +76,11 @@ export default class extends Controller {
     this.mobileToggleTarget.focus()
   }
 
+  // The same animation the groups get from ui--collapse, so the account block expands
+  // like the rows above it rather than appearing
   setAccountOpen (open) {
     this.accountToggleTarget.setAttribute('aria-expanded', open)
-    this.accountMenuTarget.classList.toggle('tw:hidden', !open)
-    this.accountMenuTarget.classList.toggle('tw:flex', open)
+    collapse(open ? 'show' : 'hide', [this.accountMenuTarget], TRANSITION_MS)
   }
 
   closeAccount () {

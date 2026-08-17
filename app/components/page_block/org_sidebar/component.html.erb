@@ -259,28 +259,6 @@
         tw:dark:border-gray-700
       "
     >
-      <div
-        class="
-          tw:absolute tw:right-2 tw:bottom-full tw:left-2 tw:z-70 tw:mb-2
-          tw:hidden tw:min-w-[212px] tw:flex-col tw:overflow-hidden
-          tw:rounded-xl tw:border tw:border-gray-200 tw:bg-white
-          tw:shadow-lg tw:dark:border-gray-700 tw:dark:bg-gray-900
-        "
-        data-page-block--org-sidebar-target="accountMenu"
-      >
-        <% account_items.each do |account_item| %>
-          <% if account_item[:type] == :divider %>
-            <div
-              class="tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700"
-              aria-hidden="true"
-            ></div>
-          <% else %>
-            <%= link_to account_item[:label], account_item[:path],
-                  class: "tw:block tw:px-3.5 tw:py-2.5 tw:text-[13.5px] tw:font-semibold tw:whitespace-nowrap tw:no-underline tw:max-[760px]:p-3.5 #{account_item[:danger] ? "tw:font-bold tw:text-red-700 tw:hover:bg-red-50 tw:hover:text-red-600" : "tw:text-gray-900 tw:hover:bg-gray-100 tw:hover:text-blue-600 tw:dark:text-gray-300 tw:dark:hover:bg-gray-700"}" %>
-          <% end %>
-        <% end %>
-      </div>
-
       <button
         type="button"
         class="
@@ -319,6 +297,37 @@
 
         <%= render UI::IconChevron::Component.new(direction: :down, html_class: "twdropdown-chevron tw:text-gray-400 tw:transition-transform tw:duration-150 tw:group-data-[collapsed=true]/sidebar:hidden") %>
       </button>
+
+      <%#
+        Below the toggle so it expands downward like the rows above it. The column has
+        no room under the account block, so above the breakpoint it floats over it
+      %>
+
+      <div
+        class="
+          tw:hidden! tw:flex-col tw:overflow-hidden tw:min-[760px]:absolute
+          tw:min-[760px]:right-2 tw:min-[760px]:bottom-full
+          tw:min-[760px]:left-2 tw:min-[760px]:z-70 tw:min-[760px]:mb-2
+          tw:min-[760px]:min-w-[212px] tw:min-[760px]:rounded-xl
+          tw:min-[760px]:border tw:min-[760px]:border-gray-200
+          tw:min-[760px]:bg-white tw:min-[760px]:shadow-lg
+          tw:dark:min-[760px]:border-gray-700
+          tw:dark:min-[760px]:bg-gray-900
+        "
+        data-page-block--org-sidebar-target="accountMenu"
+      >
+        <% account_items.each do |account_item| %>
+          <% if account_item[:type] == :divider %>
+            <div
+              class="tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700"
+              aria-hidden="true"
+            ></div>
+          <% else %>
+            <%= link_to account_item[:label], account_item[:path],
+                  class: "tw:block tw:px-3.5 tw:py-2.5 tw:text-[13.5px] tw:font-semibold tw:whitespace-nowrap tw:no-underline tw:max-[760px]:p-3.5 #{account_item[:danger] ? "tw:font-bold tw:text-red-700 tw:hover:bg-red-50 tw:hover:text-red-600" : "tw:text-gray-900 tw:hover:bg-gray-100 tw:hover:text-blue-600 tw:dark:text-gray-300 tw:dark:hover:bg-gray-700"}" %>
+          <% end %>
+        <% end %>
+      </div>
     </div>
   </nav>
 </div>
