@@ -71,6 +71,12 @@ module API
     use API::ErrorResponder
     use ::APIAuthorization::OAuth2
 
+    format :json
+    default_error_formatter :json
+    content_type :json, "application/json"
+
+    # API::ErrorResponder handles everything raised below it, which is every endpoint. This
+    # is the net for what it can't reach: non-StandardError, and the logger above it.
     rescue_from :all do |e|
       API::Base.respond_to_error(e)
     end
@@ -79,16 +85,15 @@ module API
     mount API::V2::RootV2
 
     class << self
-      # Anything raised in here escapes as a bare 500 with no JSON body and no
-      # Honeybadger notify - the shape that makes API 500s invisible. Every path out
-      # returns a Rack::Response, and every 5xx reports.
+      # Returns a Rack::Response - API::ErrorResponder .finishes it, rescue_from returns it
+      # bare. Anything raised in here escapes as a status-only 500 with no JSON body and no
+      # Honeybadger notify, so every path out answers.
       def respond_to_error(e)
-        message = error_message(e)
+        message = API::ErrorResponse.message_for(e)
         # Rails.logger, since Grape's own logger writes to $stdout and never reaches production.log
         Rails.logger.error "#{e.class}: #{message}" unless Rails.env.test? # Breaks tests...
-        status_code = status_code_for(e, message)
-        notify_error(e) if status_code > 450 # Only notify for 500s
-        message = "OAuth error: #{message}" if /APIAuthorization::Errors/.match?(e.class.to_s)
+        status_code = API::ErrorResponse.status_for(e)
+        notify_error(e) if API::ErrorResponse.report?(status_code)
         opts = {error: message}
         opts[:trace] = e.backtrace&.first(10) unless Rails.env.production?
         error_response(opts, status_code)
@@ -109,37 +114,12 @@ module API
         nil
       end
 
-      # Exception messages can carry invalid UTF-8 (scanner probe URLs, malformed
-      # params), and #message can raise outright. Falling back to the class name keeps
-      # status_code_for's mapping intact, so a RecordNotFound stays a 404.
-      def error_message(e)
-        e.message.to_s.dup.force_encoding(Encoding::UTF_8).scrub
-      rescue => message_error
-        notify_error(message_error, context: {handling: e.class.to_s})
-        e.class.to_s
-      end
-
       def error_response(opts, status_code)
         Rack::Response.new(opts.to_json, status_code, {
           "Content-Type" => "application/json",
           "Access-Control-Allow-Origin" => "*",
           "Access-Control-Request-Method" => "*"
         })
-      end
-
-      def status_code_for(error, message)
-        eclass = error.class.to_s
-        if /OAuthUnauthorizedError/.match?(eclass)
-          401
-        elsif /OAuthForbiddenError/.match?(eclass)
-          403
-        elsif eclass.match?(/RecordNotFound/) || message.match?(/unable to find/i)
-          404
-        elsif error.is_a?(Rack::BadRequest) # malformed request body (e.g. empty multipart)
-          400
-        else
-          (error.respond_to?(:status) && error.status) || 500
-        end
       end
     end
   end

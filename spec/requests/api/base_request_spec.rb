@@ -2,8 +2,8 @@ require "rails_helper"
 
 # The API error-handler behaviors the endpoint request specs don't exercise - each
 # is an exception that breaks respond_to_error itself, which used to escape as a
-# bare 500 with no JSON body and no Honeybadger notify. Status mapping, the
-# {"error": …} envelope, and CORS headers are covered by the v2/v3 request specs.
+# bare 500 with no JSON body and no Honeybadger notify. Status and message mapping
+# is API::ErrorResponse's spec; the envelope and CORS the v2/v3 request specs.
 RSpec.describe API::Base do
   describe ".respond_to_error" do
     let(:response) { described_class.respond_to_error(error) }
@@ -23,25 +23,6 @@ RSpec.describe API::Base do
         expect(invalid_utf8).not_to be_valid_encoding
         expect(response.status).to eq 500
         expect(JSON.parse(response.body.first)["error"]).to include "is not a valid frame_material"
-      end
-    end
-
-    context "with an exception whose message raises" do
-      # named, because the class name is what the fallback maps the status from
-      let(:error_class) do
-        stub_const("ActiveRecord::RecordNotFoundProbe", Class.new(ActiveRecord::RecordNotFound) {
-          def message = raise("message blew up")
-        })
-      end
-      let(:error) do
-        raise error_class
-      rescue => e
-        e
-      end
-
-      it "falls back to the class name, keeping the status mapping" do
-        expect(response.status).to eq 404
-        expect(JSON.parse(response.body.first)["error"]).to eq "ActiveRecord::RecordNotFoundProbe"
       end
     end
 
