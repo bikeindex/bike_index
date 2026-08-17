@@ -217,6 +217,14 @@ whatever autofocus left focused. Waiting on any one controller proves nothing ab
 the rest — `wait_for_stimulus` (`spec/support/system_spec_helpers.rb`) waits for
 every identifier the page names.
 
+**Interacting before the legacy page script has bound.** The same shape, one era
+back: `init.coffee`'s `loadPageScript` constructs the per-page class in
+`$(document).ready`, while `click_link` returns with the new document still
+parsing — so an interaction landing between the two is swallowed with nothing on
+the page to say so. `wait_for_page_script`
+(`spec/support/system_spec_helpers.rb`) waits on `window.pageScript`; reach for
+it after any navigation into a jQuery-driven control.
+
 **Clicking something that is being re-rendered.** The dominant `:js` flake.
 A Turbo frame that reloads (an eager frame, `reloadFrameIfUrlStale` on
 `turbo:load`, a broadcast morph) detaches the element mid-click, and the click
