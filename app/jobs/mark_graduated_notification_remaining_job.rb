@@ -3,16 +3,21 @@
 class MarkGraduatedNotificationRemainingJob < ApplicationJob
   sidekiq_options queue: "high_priority", retry: 2
 
-  def perform(graduated_notification_id, marked_remaining_by_id = nil)
+  # marking_ids terminates the mutual recursion between a notification and its matches -
+  # each marks the others, and none reaches marked_remaining until after those loops
+  def perform(graduated_notification_id, marked_remaining_by_id = nil, marking_ids = [])
+    return if marking_ids.include?(graduated_notification_id)
+
     graduated_notification = GraduatedNotification.find(graduated_notification_id)
     if graduated_notification.marked_remaining?
       return unless graduated_notification.user_registration_organization&.deleted_at.present?
     end
+    marking_ids += [graduated_notification_id]
 
     graduated_notification.bike_organization.update(deleted_at: nil)
     if graduated_notification.primary_notification?
       graduated_notification.associated_notifications.each do |n|
-        n.mark_remaining!(marked_remaining_by_id: marked_remaining_by_id, skip_async: true)
+        perform(n.id, marked_remaining_by_id, marking_ids)
       end
     end
     # Update notification after bike organization restored and other notifications updated (in case of an error)
@@ -27,7 +32,7 @@ class MarkGraduatedNotificationRemainingJob < ApplicationJob
           graduated_notification.bike_organization.destroy
         end
       end
-      match_notification.mark_remaining!(marked_remaining_by_id: marked_remaining_by_id, skip_async: true)
+      perform(match_notification.id, marked_remaining_by_id, marking_ids)
     end
     # Update user_registration_organization only once, after everything has already been updated
     if graduated_notification.primary_notification? && graduated_notification.user_registration_organization&.deleted?
