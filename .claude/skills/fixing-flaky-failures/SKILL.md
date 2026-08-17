@@ -134,6 +134,9 @@ misread it", and it tells you *when* things happened, which is usually the answe
 for i in 1 2 3; do bundle exec rspec <the spec file> 2>&1 | grep -E "examples, " | tail -1; done
 ```
 
+Keep that loop on the one spec file — escalating it to `bin/ci` costs minutes of
+parallel workers and browsers per iteration, and answers the same question no better.
+
 Green locally three times doesn't mean "not reproducible, add a retry". It
 narrows the cause to something CI has and you don't: **contention** (CI runs 5
 parallel shards on one runner) or **ordering** (a different seed, or state left
@@ -141,11 +144,8 @@ by another example). Reason about which, then look for the mechanism.
 
 For contention, slow the renderer rather than the machine — CPU hogs slow the Ruby
 side too, so a loop of runs takes minutes and the extra load is spent where the race
-isn't. They also outlive you: a spin loop backgrounded from a non-interactive shell
-survives `kill $(jobs -p)` (that shell has no jobs), so it keeps burning cores long
-after the command returns, and every measurement taken meanwhile is garbage — `pgrep -f`
-its command line rather than trusting the kill. CDP throttles the browser alone, and
-the driver hands you a session:
+isn't, and one backgrounded from a non-interactive shell survives `kill $(jobs -p)` —
+`pgrep -f` it. CDP throttles the browser alone, and the driver hands you a session:
 
 ```ruby
 page.driver.with_playwright_page do |playwright_page|
