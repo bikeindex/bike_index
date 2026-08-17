@@ -134,6 +134,9 @@ misread it", and it tells you *when* things happened, which is usually the answe
 for i in 1 2 3; do bundle exec rspec <the spec file> 2>&1 | grep -E "examples, " | tail -1; done
 ```
 
+Keep that loop on the one spec file — escalating it to `bin/ci` costs minutes of
+parallel workers and browsers per iteration, and answers the same question no better.
+
 Green locally three times doesn't mean "not reproducible, add a retry". It
 narrows the cause to something CI has and you don't: **contention** (CI runs 5
 parallel shards on one runner) or **ordering** (a different seed, or state left
@@ -141,7 +144,8 @@ by another example). Reason about which, then look for the mechanism.
 
 For contention, slow the renderer rather than the machine — CPU hogs slow the Ruby
 side too, so a loop of runs takes minutes and the extra load is spent where the race
-isn't. CDP throttles the browser alone, and the driver hands you a session:
+isn't, and one backgrounded from a non-interactive shell survives `kill $(jobs -p)` —
+`pgrep -f` it. CDP throttles the browser alone, and the driver hands you a session:
 
 ```ruby
 page.driver.with_playwright_page do |playwright_page|
@@ -216,6 +220,14 @@ form-persist's restore) reaches no listener, and a `fill_in`'s text can end up i
 whatever autofocus left focused. Waiting on any one controller proves nothing about
 the rest — `wait_for_stimulus` (`spec/support/system_spec_helpers.rb`) waits for
 every identifier the page names.
+
+**Interacting before the legacy page script has bound.** The same shape, one era
+back: `init.coffee`'s `loadPageScript` constructs the per-page class in
+`$(document).ready`, while `click_link` returns with the new document still
+parsing — so an interaction landing between the two is swallowed with nothing on
+the page to say so. `wait_for_page_script`
+(`spec/support/system_spec_helpers.rb`) waits on `window.pageScript`; reach for
+it after any navigation into a jQuery-driven control.
 
 **Clicking something that is being re-rendered.** The dominant `:js` flake.
 A Turbo frame that reloads (an eager frame, `reloadFrameIfUrlStale` on
