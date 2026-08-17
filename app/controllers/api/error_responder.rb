@@ -1,7 +1,8 @@
 module API
-  # grape_logging logs a hardcoded 500 for every exception it re-raises, so a handled error
-  # was recorded as a 500 in production.log while the client got the real status. Responding
-  # here - inside the logger, unlike Grape's own error middleware - keeps the two in agreement.
+  # grape_logging logs a re-raised exception's own #status, falling back to 500 - so app
+  # exceptions that carry no status (RecordNotFound, OAuthUnauthorizedError) were recorded
+  # as 500s while the client got the mapped one. Responding here - inside the logger, unlike
+  # Grape's own error middleware - is what keeps the two in agreement.
   class ErrorResponder
     def initialize(app)
       @app = app
