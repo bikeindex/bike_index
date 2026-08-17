@@ -92,6 +92,7 @@ RSpec.describe "Signup", :js, type: :system do
     expect(page).to have_link("set a password to sign in", wait: 10)
 
     click_link "Update your profile"
+    wait_for_page_script
     click_link "Add additional email"
     fill_in "Additional email", with: additional_email
 
