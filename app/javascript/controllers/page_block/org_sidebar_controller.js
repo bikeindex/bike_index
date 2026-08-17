@@ -1,19 +1,17 @@
 import { Controller } from '@hotwired/stimulus'
-import { collapse } from 'utils/collapse_utils'
 
 const EXPANDED_WIDTH = '266px'
 const COLLAPSED_WIDTH = '68px'
-// ui--collapse's default, so the account block and the groups animate at one speed
-const TRANSITION_MS = 200
 
 // Connects to data-controller="page-block--org-sidebar"
 //
-// Below mobileBreakpoint the sidebar is an overlay behind the top bar's hamburgler;
-// above it, a column that collapses to an icon rail under collapseBreakpoint. Every
-// width and visibility rule is a tailwind variant on data-collapsed / data-mobile-open,
-// so this only sets those two — and the custom property the content column reads.
+// Below mobileBreakpoint the sidebar is a top bar in the flow whose menu the hamburgler
+// opens; above it, a column that collapses to an icon rail under collapseBreakpoint.
+// Every width and visibility rule is a tailwind variant on data-collapsed /
+// data-mobile-open, so this only sets those two — and the custom property the content
+// column reads. The account menu is a UI::Dropdown and looks after itself.
 export default class extends Controller {
-  static targets = ['mobileToggle', 'collapseToggle', 'accountMenu', 'accountToggle']
+  static targets = ['mobileToggle', 'collapseToggle']
   static values = { collapseBreakpoint: Number, mobileBreakpoint: Number }
 
   connect () {
@@ -33,7 +31,6 @@ export default class extends Controller {
 
   toggleCollapse () {
     this.override = !this.collapsed
-    this.closeAccount()
     this.render()
   }
 
@@ -44,53 +41,22 @@ export default class extends Controller {
   // Collapsed there's nowhere to put a group's children -- ui--collapse animates them
   // open right after this, so the rail has to be expanded by then
   expandForGroup () {
-    if (this.collapsed) {
-      this.override = false
-      this.render()
-    }
-    this.closeAccount()
-  }
+    if (!this.collapsed) return
 
-  toggleAccount (event) {
-    event.stopPropagation()
-
-    if (this.collapsed) {
-      this.override = false
-      this.render()
-      this.setAccountOpen(true)
-      return
-    }
-
-    this.setAccountOpen(!this.accountOpen)
-  }
-
-  closeAccountOutside (event) {
-    if (this.accountOpen && !this.element.contains(event.target)) this.closeAccount()
+    this.override = false
+    this.render()
   }
 
   closeOnEscape () {
-    this.closeAccount()
     if (!this.mobileOpen) return
 
     this.setMobileOpen(false)
     this.mobileToggleTarget.focus()
   }
 
-  // The same animation the groups get from ui--collapse, so the account block expands
-  // like the rows above it rather than appearing
-  setAccountOpen (open) {
-    this.accountToggleTarget.setAttribute('aria-expanded', open)
-    collapse(open ? 'show' : 'hide', [this.accountMenuTarget], TRANSITION_MS)
-  }
-
-  closeAccount () {
-    this.setAccountOpen(false)
-  }
-
   setMobileOpen (open) {
     this.element.dataset.mobileOpen = open
     this.mobileToggleTarget.setAttribute('aria-expanded', open)
-    if (!open) this.closeAccount()
   }
 
   render () {
@@ -122,9 +88,5 @@ export default class extends Controller {
 
   get mobileOpen () {
     return this.element.dataset.mobileOpen === 'true'
-  }
-
-  get accountOpen () {
-    return this.accountToggleTarget.getAttribute('aria-expanded') === 'true'
   }
 }

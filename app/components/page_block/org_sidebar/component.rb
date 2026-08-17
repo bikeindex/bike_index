@@ -62,6 +62,15 @@ module PageBlock
         [ROW, ROW_HOVER, active ? ROW_CURRENT : ROW_RESTING].join(" ")
       end
 
+      # Replaces UI::Button's classes entirely -- this trigger is a sidebar row, not a button.
+      # The chevron is the dropdown's own, so collapsing hides it by class rather than by slot
+      def account_button_class
+        "tw:flex tw:w-full tw:items-center tw:gap-2.5 tw:rounded-[11px] tw:px-2.5 tw:py-2 " \
+          "tw:group-data-[collapsed=true]/sidebar:justify-center " \
+          "tw:group-data-[collapsed=true]/sidebar:[&_.twdropdown-chevron]:hidden " \
+          "tw:hover:bg-gray-100 tw:aria-expanded:bg-gray-100 tw:dark:hover:bg-gray-700"
+      end
+
       def groups
         @groups ||= items.select { |item| item[:type] == :group }
       end

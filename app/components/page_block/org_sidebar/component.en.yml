@@ -3,7 +3,6 @@ en:
   components:
     page_block:
       org_sidebar:
-        account_menu: Account menu
         admin_panel: ADMIN PANEL
         collapse_sidebar: Collapse sidebar
         expand_sidebar: Expand sidebar

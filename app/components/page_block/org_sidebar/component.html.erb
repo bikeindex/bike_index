@@ -19,7 +19,6 @@
   data-action="
     resize@window->page-block--org-sidebar#resize
     keydown.esc@window->page-block--org-sidebar#closeOnEscape
-    click@window->page-block--org-sidebar#closeAccountOutside
   "
 >
   <div
@@ -259,72 +258,48 @@
         tw:dark:border-gray-700
       "
     >
-      <button
-        type="button"
-        class="
-          tw:flex tw:w-full tw:items-center tw:gap-2.5 tw:rounded-[11px]
-          tw:px-2.5 tw:py-2
-          tw:group-data-[collapsed=true]/sidebar:justify-center
-          tw:hover:bg-gray-100 tw:aria-expanded:bg-gray-100
-          tw:max-[760px]:px-3 tw:max-[760px]:py-2.5
-          tw:dark:hover:bg-gray-700
-        "
-        aria-expanded="false"
-        aria-label="<%= translation(".account_menu") %>"
-        data-page-block--org-sidebar-target="accountToggle"
-        data-action="page-block--org-sidebar#toggleAccount"
-      >
-        <span
-          class="
-            tw:flex tw:h-[30px] tw:w-[30px] tw:flex-none tw:items-center
-            tw:justify-center tw:rounded-full tw:border tw:border-gray-200
-            tw:bg-white tw:text-blue-600 tw:dark:border-gray-700
-            tw:dark:bg-gray-900
-          "
-        >
-          <%= icon("user-circle", html_class: "tw:h-[17px] tw:w-[17px]") %>
-        </span>
-
-        <span
-          class="
-            tw:flex-1 tw:overflow-hidden tw:text-left tw:text-[13px]
-            tw:font-bold tw:overflow-ellipsis tw:whitespace-nowrap
-            tw:group-data-[collapsed=true]/sidebar:hidden
-          "
-        >
-          <%= @current_user_or_unconfirmed_user.email %>
-        </span>
-
-        <%= render UI::IconChevron::Component.new(direction: :down, html_class: "twdropdown-chevron tw:text-gray-400 tw:transition-transform tw:duration-150 tw:group-data-[collapsed=true]/sidebar:hidden") %>
-      </button>
-
       <%#
-        Below the toggle so it expands downward like the rows above it. The column has
-        no room under the account block, so above the breakpoint it floats over it
+        UI::Dropdown's wrapper is inline-block, so the flex column stretches it to the
+        sidebar's width; collapsed, the label and its chevron go and the icon centres
       %>
 
-      <div
-        class="
-          tw:hidden! tw:flex-col tw:overflow-hidden tw:min-[760px]:absolute
-          tw:min-[760px]:right-2 tw:min-[760px]:bottom-full
-          tw:min-[760px]:left-2 tw:min-[760px]:z-70 tw:min-[760px]:mb-2
-          tw:min-[760px]:min-w-[212px] tw:min-[760px]:rounded-xl
-          tw:min-[760px]:border tw:min-[760px]:border-gray-200
-          tw:min-[760px]:bg-white tw:min-[760px]:shadow-lg
-          tw:dark:min-[760px]:border-gray-700
-          tw:dark:min-[760px]:bg-gray-900
-        "
-        data-page-block--org-sidebar-target="accountMenu"
-      >
-        <% account_items.each do |account_item| %>
-          <% if account_item[:type] == :divider %>
-            <div
-              class="tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700"
-              aria-hidden="true"
-            ></div>
-          <% else %>
-            <%= link_to account_item[:label], account_item[:path],
-                  class: "tw:block tw:px-3.5 tw:py-2.5 tw:text-[13.5px] tw:font-semibold tw:whitespace-nowrap tw:no-underline tw:max-[760px]:p-3.5 #{account_item[:danger] ? "tw:font-bold tw:text-red-700 tw:hover:bg-red-50 tw:hover:text-red-600" : "tw:text-gray-900 tw:hover:bg-gray-100 tw:hover:text-blue-600 tw:dark:text-gray-300 tw:dark:hover:bg-gray-700"}" %>
+      <div class="tw:flex tw:flex-col">
+        <%= render UI::Dropdown::Component.new(
+              name: @current_user_or_unconfirmed_user.email,
+              button_class: account_button_class
+            ) do |dropdown| %>
+          <% dropdown.with_button do %>
+            <span
+              class="
+                tw:flex tw:h-[30px] tw:w-[30px] tw:flex-none tw:items-center
+                tw:justify-center tw:rounded-full tw:border
+                tw:border-gray-200 tw:bg-white tw:text-blue-600
+                tw:dark:border-gray-700 tw:dark:bg-gray-900
+              "
+            >
+              <%= icon("user-circle", html_class: "tw:h-[17px] tw:w-[17px]") %>
+            </span>
+
+            <span
+              class="
+                tw:flex-1 tw:overflow-hidden tw:text-left tw:text-[13px]
+                tw:font-bold tw:overflow-ellipsis tw:whitespace-nowrap
+                tw:group-data-[collapsed=true]/sidebar:hidden
+              "
+            >
+              <%= @current_user_or_unconfirmed_user.email %>
+            </span>
+          <% end %>
+
+          <% account_items.each do |account_item| %>
+            <% if account_item[:type] == :divider %>
+              <% dropdown.with_entry_divider %>
+            <% else %>
+              <% dropdown.with_entry_item do %>
+                <%= link_to account_item[:label], account_item[:path],
+                      class: account_item[:danger] ? "tw:text-red-700! tw:hover:bg-red-50! tw:hover:text-red-600!" : nil %>
+              <% end %>
+            <% end %>
           <% end %>
         <% end %>
       </div>

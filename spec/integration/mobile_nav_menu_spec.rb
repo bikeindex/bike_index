@@ -113,8 +113,9 @@ RSpec.describe "Navbar", :js, type: :system do
       expect(page).to have_button("Brakebills Registrations")
       expect_axe_clean
 
+      # The account block is a UI::Dropdown, so its items are hidden until it opens
       expect(page).to have_no_link("Log out")
-      find("[data-page-block--org-sidebar-target='accountToggle']").click
+      find("button[data-ui--dropdown-target='button']", text: user.email).click
 
       expect(page).to have_link("Log out")
       expect(page).to have_link("Your registrations")
@@ -122,7 +123,7 @@ RSpec.describe "Navbar", :js, type: :system do
 
       page.current_window.resize_to(390, 844)
 
-      # Below the breakpoint it's an overlay, so nothing in it shows until it opens
+      # Below the breakpoint the menu is behind the hamburgler
       expect(page).to have_no_button("Brakebills Registrations")
       find("#org_sidebar_hamburgler").click
 

@@ -21,9 +21,8 @@ RSpec.describe PageBlock::OrgSidebar::Component, type: :component do
       .to eq(["Brakebills Registrations", "Impounded Vehicles", "Parking Notifications",
         "Bulk Import & Export", "Brakebills Settings"])
 
-    expect(component).to have_css "[data-page-block--org-sidebar-target='accountToggle']",
-      text: "kdewey@brakebills.edu"
-    expect(component.css("[data-page-block--org-sidebar-target='accountMenu'] a").map(&:text))
+    expect(component).to have_css "button[data-ui--dropdown-target='button']", text: "kdewey@brakebills.edu"
+    expect(component.css("ul[role='menu'] li[role='menuitem'] a").map(&:text))
       .to eq(["Your registrations", "Register a new bike", "kdewey@brakebills.edu settings", "Log out"])
   end
 
