@@ -141,7 +141,11 @@ by another example). Reason about which, then look for the mechanism.
 
 For contention, slow the renderer rather than the machine — CPU hogs slow the Ruby
 side too, so a loop of runs takes minutes and the extra load is spent where the race
-isn't. CDP throttles the browser alone, and the driver hands you a session:
+isn't. They also outlive you: a spin loop backgrounded from a non-interactive shell
+survives `kill $(jobs -p)` (that shell has no jobs), so it keeps burning cores long
+after the command returns, and every measurement taken meanwhile is garbage — `pgrep -f`
+its command line rather than trusting the kill. CDP throttles the browser alone, and
+the driver hands you a session:
 
 ```ruby
 page.driver.with_playwright_page do |playwright_page|
