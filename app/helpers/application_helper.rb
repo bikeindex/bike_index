@@ -36,7 +36,7 @@ module ApplicationHelper
       controller_name:,
       action_name:,
       force_landing_page_render: @force_landing_page_render,
-      force_organized_render: @force_organized_render
+      register_flow_organization_id: @register_flow_organization_id
     ) == :organized
   end
 
@@ -51,12 +51,6 @@ module ApplicationHelper
     controller_name == "register" || (controller_name == "registrations" && action_name == "new")
   end
 
-  # Which organization's menu the flow's steps highlight add-a-bike in - a member of two
-  # sees the other's menu in the navbar, and it isn't registering anything
-  def register_flow_organization_id
-    current_organization&.id if @force_organized_render
-  end
-
   def body_class
     if controller_name == "landing_pages" || @force_landing_page_render
       if %w[for_schools for_law_enforcement].include?(action_name)
@@ -69,11 +63,7 @@ module ApplicationHelper
     elsif main_content_organized?
       # Register::Page's gray only covers the form, and the organized container insets it -
       # so the page paints it instead, behind the whole content column
-      if register_flow_page?
-        "organized-body tw:bg-gray-100 tw:dark:bg-gray-900"
-      else
-        "organized-body"
-      end
+      register_flow_page? ? "organized-body tw:bg-gray-100 tw:dark:bg-gray-900" : "organized-body"
     elsif controller_name == "registrations" && action_name == "show"
       "tw:bg-[#f7f6fb]"
     end

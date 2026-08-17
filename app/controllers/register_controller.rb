@@ -230,8 +230,7 @@ class RegisterController < ApplicationController
 
   # A registration started on the organization's own page keeps its menu for the rest of
   # the flow. Only for a member - the origin says where it started, not who's registering
-  # The origin first - it's in memory, and creation_organization is a query every
-  # registration an organization is attached to would otherwise pay on every step
+  # The origin first: it's in memory, creation_organization is a query
   def assign_organized_render
     return unless @b_param&.register_flow_organized?
 
@@ -239,7 +238,8 @@ class RegisterController < ApplicationController
     return unless organization.present? && current_user&.authorized?(organization)
 
     @current_organization = organization
-    @force_organized_render = true
+    # The navbar's menu can be another organization's, and it isn't registering anything
+    @register_flow_organization_id = organization.id
   end
 
   # Resolved once - the step math, the progress bar and the pages themselves all read it
