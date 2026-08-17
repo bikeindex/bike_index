@@ -5,7 +5,12 @@
 %>
 
 <div
-  class="tw:group/sidebar tw:font-sans"
+  <%#
+    Above the review-app banner's z-index (1040), so the banner can never render over the
+    menu. Vertically the two don't fight: on mobile the bar is in the flow after the
+    banner, and on desktop the body's margin holds the banner clear of the column
+  %>
+  class="tw:group/sidebar tw:relative tw:z-[1050] tw:font-sans"
   data-controller="page-block--org-sidebar"
   data-collapsed="false"
   data-mobile-open="false"
@@ -19,10 +24,9 @@
 >
   <div
     class="
-      tw:fixed tw:top-[var(--org-sidebar-top,0px)] tw:right-0 tw:left-0
-      tw:z-60 tw:flex tw:h-[60px] tw:items-center tw:gap-2.5 tw:border-b
-      tw:border-gray-200 tw:bg-gray-50 tw:px-3 tw:min-[760px]:hidden
-      tw:dark:border-gray-700 tw:dark:bg-gray-800
+      tw:relative tw:z-20 tw:flex tw:h-[60px] tw:w-full tw:items-center
+      tw:gap-2.5 tw:border-b tw:border-gray-200 tw:bg-gray-50 tw:px-3
+      tw:min-[760px]:hidden tw:dark:border-gray-700 tw:dark:bg-gray-800
     "
   >
     <% if avatar_url %>
@@ -55,8 +59,7 @@
 
   <div
     class="
-      tw:fixed tw:top-[calc(var(--org-sidebar-top,0px)+60px)] tw:right-0
-      tw:bottom-0 tw:left-0 tw:z-39 tw:hidden tw:bg-slate-950/30
+      tw:fixed tw:inset-0 tw:z-10 tw:hidden tw:bg-slate-950/30
       tw:group-data-[mobile-open=true]/sidebar:block
       tw:min-[760px]:group-data-[mobile-open=true]/sidebar:hidden
     "
@@ -67,12 +70,13 @@
   <nav
     id="org_sidebar_nav"
     class="
-      tw:fixed tw:top-[calc(var(--org-sidebar-top,0px)+60px)] tw:bottom-0
-      tw:left-0 tw:z-40 tw:hidden tw:w-full tw:flex-col tw:bg-gray-50
+      tw:absolute tw:top-full tw:right-0 tw:left-0 tw:z-20 tw:hidden
+      tw:max-h-[80vh] tw:w-full tw:flex-col tw:overflow-y-auto tw:bg-gray-50
       tw:transition-[width] tw:duration-200
-      tw:group-data-[mobile-open=true]/sidebar:flex
-      tw:min-[760px]:top-[var(--org-sidebar-top,0px)] tw:min-[760px]:flex
-      tw:min-[760px]:w-[266px] tw:min-[760px]:border-r
+      tw:group-data-[mobile-open=true]/sidebar:flex tw:min-[760px]:fixed
+      tw:min-[760px]:top-0 tw:min-[760px]:bottom-0 tw:min-[760px]:left-0
+      tw:min-[760px]:flex tw:min-[760px]:max-h-none tw:min-[760px]:w-[266px]
+      tw:min-[760px]:overflow-visible tw:min-[760px]:border-r
       tw:min-[760px]:border-gray-200
       tw:group-data-[collapsed=true]/sidebar:min-[760px]:w-[68px]
       tw:dark:border-gray-700 tw:dark:bg-gray-800

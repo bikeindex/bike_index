@@ -93,17 +93,9 @@ export default class extends Controller {
     if (!open) this.closeAccount()
   }
 
-  // The review-app banner is in the flow above us with a z-index over ours, so a
-  // sidebar pinned to 0 slides under it. Its height rather than its viewport bottom:
-  // that's scroll-independent, so scrolling can't drag the sidebar up under it
-  bannerOffset () {
-    return document.getElementById('review-app-banner')?.offsetHeight ?? 0
-  }
-
   render () {
     const { collapsed } = this
     this.element.dataset.collapsed = collapsed
-    this.element.style.setProperty('--org-sidebar-top', `${this.bannerOffset()}px`)
 
     const { collapseLabel, expandLabel } = this.collapseToggleTarget.dataset
     const label = collapsed ? expandLabel : collapseLabel
