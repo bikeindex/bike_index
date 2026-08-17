@@ -21,9 +21,9 @@ module OrganizedServices
   module SidebarMenu
     extend Functionable
 
-    # Reports and Add an Impounded Vehicle are in the design with nothing to link to —
-    # organized routes no impound_records#new, and nothing corresponds to Reports. They
-    # render greyed rather than being dropped, so the menu keeps the design's shape.
+    # Add an Impounded Vehicle is in the design with nothing to link to — organized
+    # routes no impound_records#new — so it renders greyed rather than being dropped,
+    # and the menu keeps the design's shape.
     def for(organization:, current_user:)
       return [] if organization.nil? || current_user.nil?
 
@@ -49,7 +49,7 @@ module OrganizedServices
         model_audits_link(organization),
         graduated_link(organization),
         hot_sheet_link(organization),
-        reports_link,
+        reports_link(organization),
         divider,
         settings_group(organization, current_user)
       ].compact)
@@ -183,8 +183,13 @@ module OrganizedServices
         icon: "clipboard")
     end
 
-    def reports_link
-      disabled(translation(:reports), icon: "bar-chart")
+    # The overview dashboard is what the design's Reports row describes
+    def reports_link(organization)
+      return nil unless organization.overview_dashboard?
+
+      link(translation(:reports),
+        routes.organization_dashboard_index_path(organization_id: organization.to_param),
+        icon: "bar-chart", active: :match_controller)
     end
 
     def settings_group(organization, current_user)

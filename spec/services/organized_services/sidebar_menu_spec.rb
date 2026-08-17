@@ -37,9 +37,7 @@ RSpec.describe OrganizedServices::SidebarMenu do
               active: :on_registrations_index)
           ]),
           link_item("Add a bike", "/o/#{organization.to_param}/bikes/new",
-            icon: "plus-circle", active: :on_bikes_new),
-          {type: :divider},
-          {type: :disabled, label: "Reports", icon: "bar-chart"}
+            icon: "plus-circle", active: :on_bikes_new)
         ]
       end
 
@@ -55,7 +53,7 @@ RSpec.describe OrganizedServices::SidebarMenu do
 
       it "groups the menu the way the design lays it out" do
         expect(items.map { |item| item[:type] }).to eq(%i[group link divider group group group link
-          link link link disabled divider group])
+          link link link link divider group])
 
         groups = items.select { |item| item[:type] == :group }
         expect(groups.map { |group| group[:key] }).to eq(%i[registrations impounded parking bulk settings])
@@ -76,12 +74,16 @@ RSpec.describe OrganizedServices::SidebarMenu do
         ])
       end
 
-      it "renders the two rows with nowhere to link as disabled" do
+      it "renders the one row with nowhere to link as disabled" do
         impounded = items.find { |item| item[:key] == :impounded }
 
         expect(impounded[:children].last).to eq({type: :disabled, label: "Add an Impounded Vehicle", icon: nil})
-        expect(items.select { |item| item[:type] == :disabled }.map { |item| item[:label] })
-          .to eq(["Reports"])
+        expect(items.select { |item| item[:type] == :disabled }).to eq([])
+      end
+
+      it "points reports at the overview dashboard" do
+        expect(items.find { |item| item[:label] == "Reports" })
+          .to eq(link_item("Reports", "/o/#{slug}/dashboard", icon: "bar-chart", active: :match_controller))
       end
 
       # Managing impounding is the settings group's, so this one is only the vehicles
