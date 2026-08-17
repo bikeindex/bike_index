@@ -1,7 +1,6 @@
 module API
-  # Raised by each root's catch-all route. A type rather than a message, so the 404 doesn't
-  # depend on prose - matching /unable to find/ also caught real bugs worded that way, and
-  # silently dropped them from Honeybadger along with the status.
+  # Raised by each root's catch-all route. A type, so the 404 doesn't depend on the message -
+  # matching /unable to find/ turned real bugs worded that way into unreported 404s.
   class EndpointNotFound < StandardError
   end
 end
