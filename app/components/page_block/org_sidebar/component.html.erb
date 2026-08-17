@@ -19,10 +19,10 @@
 >
   <div
     class="
-      tw:fixed tw:top-0 tw:right-0 tw:left-0 tw:z-60 tw:flex tw:h-[60px]
-      tw:items-center tw:gap-2.5 tw:border-b tw:border-gray-200
-      tw:bg-gray-50 tw:px-3 tw:min-[760px]:hidden tw:dark:border-gray-700
-      tw:dark:bg-gray-800
+      tw:fixed tw:top-[var(--org-sidebar-top,0px)] tw:right-0 tw:left-0
+      tw:z-60 tw:flex tw:h-[60px] tw:items-center tw:gap-2.5 tw:border-b
+      tw:border-gray-200 tw:bg-gray-50 tw:px-3 tw:min-[760px]:hidden
+      tw:dark:border-gray-700 tw:dark:bg-gray-800
     "
   >
     <% if avatar_url %>
@@ -55,7 +55,8 @@
 
   <div
     class="
-      tw:fixed tw:inset-[60px_0_0_0] tw:z-39 tw:hidden tw:bg-slate-950/30
+      tw:fixed tw:top-[calc(var(--org-sidebar-top,0px)+60px)] tw:right-0
+      tw:bottom-0 tw:left-0 tw:z-39 tw:hidden tw:bg-slate-950/30
       tw:group-data-[mobile-open=true]/sidebar:block
       tw:min-[760px]:group-data-[mobile-open=true]/sidebar:hidden
     "
@@ -66,11 +67,13 @@
   <nav
     id="org_sidebar_nav"
     class="
-      tw:fixed tw:top-[60px] tw:bottom-0 tw:left-0 tw:z-40 tw:hidden
-      tw:w-full tw:flex-col tw:bg-gray-50 tw:transition-[width]
-      tw:duration-200 tw:group-data-[mobile-open=true]/sidebar:flex
-      tw:min-[760px]:top-0 tw:min-[760px]:flex tw:min-[760px]:w-[266px]
-      tw:min-[760px]:border-r tw:min-[760px]:border-gray-200
+      tw:fixed tw:top-[calc(var(--org-sidebar-top,0px)+60px)] tw:bottom-0
+      tw:left-0 tw:z-40 tw:hidden tw:w-full tw:flex-col tw:bg-gray-50
+      tw:transition-[width] tw:duration-200
+      tw:group-data-[mobile-open=true]/sidebar:flex
+      tw:min-[760px]:top-[var(--org-sidebar-top,0px)] tw:min-[760px]:flex
+      tw:min-[760px]:w-[266px] tw:min-[760px]:border-r
+      tw:min-[760px]:border-gray-200
       tw:group-data-[collapsed=true]/sidebar:min-[760px]:w-[68px]
       tw:dark:border-gray-700 tw:dark:bg-gray-800
     "
@@ -122,7 +125,8 @@
       data-page-block--org-sidebar-target="collapseToggle"
       data-action="page-block--org-sidebar#toggleCollapse"
     >
-      <%= render UI::IconChevron::Component.new(direction: :left, html_class: "tw:transition-transform tw:duration-200 tw:group-data-[collapsed=true]/sidebar:rotate-180") %>
+      <%# :left is already rotate-180, so collapsed unrotates rather than rotating again %>
+      <%= render UI::IconChevron::Component.new(direction: :left, html_class: "tw:transition-transform tw:duration-200 tw:group-data-[collapsed=true]/sidebar:rotate-0") %>
     </button>
 
     <div
@@ -142,51 +146,62 @@
           <% open = open_group?(item) %>
           <% active = group_active?(item) %>
 
-          <button
-            type="button"
-            class="<%= row_class(active) %>"
-            aria-expanded="<%= open %>"
-            aria-controls="org_sidebar_group_<%= item[:key] %>"
-            data-action="page-block--org-sidebar#toggleGroup"
-          >
-            <span class="tw:flex tw:flex-none"><%= icon(item[:icon], html_class: "tw:h-[18px] tw:w-[18px]") %></span>
-
-            <span
-              class="
-                tw:flex-1 tw:text-left tw:whitespace-nowrap
-                tw:group-data-[collapsed=true]/sidebar:hidden
-              "
+          <div data-controller="ui--collapse" class="tw:contents">
+            <%# expandForGroup first, so the rail is open by the time the panel animates %>
+            <button
+              type="button"
+              class="<%= row_class(active) %>"
+              aria-expanded="<%= open %>"
+              aria-controls="org_sidebar_group_<%= item[:key] %>"
+              data-ui--collapse-target="trigger"
+              data-action="page-block--org-sidebar#expandForGroup ui--collapse#toggle"
             >
-              <%= item[:label] %>
-            </span>
+              <span class="tw:flex tw:flex-none"><%= icon(item[:icon], html_class: "tw:h-[18px] tw:w-[18px]") %></span>
 
-            <%= render UI::IconChevron::Component.new(direction: :down, html_class: "twdropdown-chevron tw:text-gray-400 tw:transition-transform tw:duration-150 tw:group-data-[collapsed=true]/sidebar:hidden") %>
-          </button>
+              <span
+                class="
+                  tw:flex-1 tw:text-left tw:whitespace-nowrap
+                  tw:group-data-[collapsed=true]/sidebar:hidden
+                "
+              >
+                <%= item[:label] %>
+              </span>
 
-          <div
-            id="org_sidebar_group_<%= item[:key] %>"
-            class="tw:flex-col tw:gap-px tw:group-data-[collapsed=true]/sidebar:hidden <%= open ? "tw:flex" : "tw:hidden" %>"
-          >
-            <% item[:children].each do |child| %>
-              <% if child[:type] == :disabled %>
-                <span
-                  class="
-                    tw:mx-2 tw:block tw:rounded-[10px] tw:py-2 tw:pr-3
-                    tw:pl-11 tw:text-[13.5px] tw:font-bold
-                    tw:whitespace-nowrap tw:text-gray-400
-                    tw:max-[760px]:py-3.5
-                  "
-                >
-                  <%= child[:label] %>
-                </span>
-              <% else %>
-                <% child_active = active_link?(child) %>
+              <%# ui--collapse toggles rotate-90, so an already-open group starts rotated %>
+              <span
+                class="tw:flex tw:text-gray-400 tw:transition-transform tw:duration-200 tw:group-data-[collapsed=true]/sidebar:hidden <%= "tw:rotate-90" if open %>"
+                data-ui--collapse-target="chevron"
+              >
+                <%= render UI::IconChevron::Component.new %>
+              </span>
+            </button>
 
-                <%= link_to child[:label], child[:path],
+            <div
+              id="org_sidebar_group_<%= item[:key] %>"
+              class="tw:flex tw:flex-col tw:gap-px tw:group-data-[collapsed=true]/sidebar:hidden <%= "tw:hidden!" unless open %>"
+              data-ui--collapse-target="content"
+            >
+              <% item[:children].each do |child| %>
+                <% if child[:type] == :disabled %>
+                  <span
+                    class="
+                      tw:mx-2 tw:block tw:rounded-[10px] tw:py-2 tw:pr-3
+                      tw:pl-11 tw:text-[13.5px] tw:font-bold
+                      tw:whitespace-nowrap tw:text-gray-400
+                      tw:max-[760px]:py-3.5
+                    "
+                  >
+                    <%= child[:label] %>
+                  </span>
+                <% else %>
+                  <% child_active = active_link?(child) %>
+
+                  <%= link_to child[:label], child[:path],
                       class: "tw:mx-2 tw:block tw:rounded-[10px] tw:py-2 tw:pr-3 tw:pl-11 tw:text-[13.5px] tw:font-bold tw:whitespace-nowrap tw:no-underline tw:hover:text-blue-600 tw:max-[760px]:py-3.5 #{child_active ? "tw:bg-blue-50 tw:text-blue-600 tw:dark:bg-gray-700" : "tw:text-purple-500 tw:dark:text-purple-300"}",
                       aria: {current: child_active ? "page" : nil} %>
+                <% end %>
               <% end %>
-            <% end %>
+            </div>
           </div>
         <% when :disabled %>
           <span

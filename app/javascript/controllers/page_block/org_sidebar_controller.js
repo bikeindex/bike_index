@@ -42,19 +42,14 @@ export default class extends Controller {
     this.setMobileOpen(false)
   }
 
-  // Collapsed there's nowhere to put the children, so expand before opening
-  toggleGroup (event) {
-    const button = event.currentTarget
-
+  // Collapsed there's nowhere to put a group's children -- ui--collapse animates them
+  // open right after this, so the rail has to be expanded by then
+  expandForGroup () {
     if (this.collapsed) {
       this.override = false
       this.render()
-      this.setGroupOpen(button, true)
-      return
     }
-
     this.closeAccount()
-    this.setGroupOpen(button, button.getAttribute('aria-expanded') !== 'true')
   }
 
   toggleAccount (event) {
@@ -82,13 +77,6 @@ export default class extends Controller {
     this.mobileToggleTarget.focus()
   }
 
-  setGroupOpen (button, open) {
-    button.setAttribute('aria-expanded', open)
-    const panel = document.getElementById(button.getAttribute('aria-controls'))
-    panel.classList.toggle('tw:hidden', !open)
-    panel.classList.toggle('tw:flex', open)
-  }
-
   setAccountOpen (open) {
     this.accountToggleTarget.setAttribute('aria-expanded', open)
     this.accountMenuTarget.classList.toggle('tw:hidden', !open)
@@ -105,9 +93,17 @@ export default class extends Controller {
     if (!open) this.closeAccount()
   }
 
+  // The review-app banner is in the flow above us with a z-index over ours, so a
+  // sidebar pinned to 0 slides under it. Its height rather than its viewport bottom:
+  // that's scroll-independent, so scrolling can't drag the sidebar up under it
+  bannerOffset () {
+    return document.getElementById('review-app-banner')?.offsetHeight ?? 0
+  }
+
   render () {
     const { collapsed } = this
     this.element.dataset.collapsed = collapsed
+    this.element.style.setProperty('--org-sidebar-top', `${this.bannerOffset()}px`)
 
     const { collapseLabel, expandLabel } = this.collapseToggleTarget.dataset
     const label = collapsed ? expandLabel : collapseLabel
