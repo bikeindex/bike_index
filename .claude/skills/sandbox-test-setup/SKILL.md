@@ -52,6 +52,17 @@ bundle exec rails tailwindcss:build
 (See the `integration-testing` skill — same rule applies to
 layout-rendering request specs, not just system specs.)
 
+A build that is **present but stale** fails differently, and worse. Switching
+branches under a running `bin/dev` leaves its watcher serving the old CSS — a
+class keyed off a new `@theme` token (`tw:navbar:block!`) is simply absent — so
+a `:js` spec fails with Capybara `Unable to find visible css`, which reads as a
+code bug rather than an asset one. `bundle exec rails tailwindcss:build` fixes
+it; check the class is really in `app/assets/builds/tailwind.css` before
+believing the failure. **The watcher can clobber that rebuild again** the next
+time it wakes, so a spec that passed can start failing mid-session — re-run the
+build rather than re-debugging the code, and ask the user to restart `bin/dev`
+if it keeps happening.
+
 ## Whose machine it is decides who starts `bin/dev`
 
 `CLAUDE.md` says to stop and ask rather than starting a dev server. That holds on

@@ -162,6 +162,14 @@ SCREENSHOT_COMMENT_ID=$(gh api --paginate "repos/{owner}/{repo}/issues/$PR_NUMBE
 
 `--paginate` matters — comments come 30 to a page, and on a busy PR the screenshots comment often isn't on the first. The author filter keeps someone else's `## Screenshots` comment from being overwritten.
 
+**A transient `gh` 503 turns that lookup into a silent double-post.** `ME=$(gh api user --jq .login)` captures GitHub's error JSON instead of a login, the `select(.user.login == …)` filter then dies on a jq parse error, and `$SCREENSHOT_COMMENT_ID` comes back **empty** — indistinguishable from "no comment yet", so the run posts a second one. Guard the login and re-check afterwards:
+
+```bash
+ME=$(gh api user --jq .login) || { echo "GitHub unavailable — retry"; exit 1; }
+# after posting:
+gh api "repos/{owner}/{repo}/issues/$PR_NUMBER/comments" --jq '.[] | select(.body | startswith("## Screenshots")) | .id'
+```
+
 A caller updating one page of a multi-page comment needs the current body to edit — hand it back on request: `gh api repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID --jq .body`.
 
 Write the comment body to a temp file — the caller's, or, when you're composing it yourself:
