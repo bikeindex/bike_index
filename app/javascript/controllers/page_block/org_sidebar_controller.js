@@ -38,10 +38,6 @@ export default class extends Controller {
     this.setMobileOpen(!this.mobileOpen)
   }
 
-  closeMobile () {
-    this.setMobileOpen(false)
-  }
-
   // Collapsed there's nowhere to put a group's children -- ui--collapse animates them
   // open right after this, so the rail has to be expanded by then
   expandForGroup () {
@@ -73,7 +69,7 @@ export default class extends Controller {
     this.closeAccount()
     if (!this.mobileOpen) return
 
-    this.closeMobile()
+    this.setMobileOpen(false)
     this.mobileToggleTarget.focus()
   }
 
