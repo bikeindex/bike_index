@@ -9,6 +9,45 @@ module UI
     class Component < ApplicationComponent
       MATCHES = [:path, :controller, :controller_action].freeze
 
+      class << self
+        # A menu whose manifest names its own active states translates them here, mapping each
+        # onto a match. The matches map to themselves, so either vocabulary reaches the same
+        # place and a renamed match takes its aliases with it.
+        def match_table(**aliases)
+          MATCHES.index_by(&:itself).merge(aliases).freeze
+        end
+
+        # A caller that needs the answer without a link — a menu picking out its current
+        # entry — asks here rather than rendering one to find out
+        def active?(path:, match:, view:)
+          case match
+          when :path then view.current_page_active?(path)
+          when :controller then view.current_page_active?(path, true)
+          else controller_action_match?(path, view)
+          end
+        end
+
+        private
+
+        # Recognizing each end once yields both halves, where going through current_page_active?
+        # first would recognize both again for the controller alone. The request is recognized
+        # under its own verb: a page rendered by a failed PATCH dispatched #update, and the GET
+        # route for that same URL is #show.
+        def controller_action_match?(path, view)
+          target = recognized(path)
+          current = recognized(view.request.url, view.request.request_method)
+          return false if target.nil? || current.nil?
+
+          target[:controller] == current[:controller] && target[:action] == current[:action]
+        end
+
+        def recognized(url, verb = :get)
+          Rails.application.routes.recognize_path(url, method: verb)
+        rescue ActionController::RoutingError
+          nil
+        end
+      end
+
       def initialize(path:, text: nil, active: nil, match: :path, html_class: nil, **html_options)
         raise_if_invalid_value!(:match, match, MATCHES)
         # The component builds its own class, so a passed one is dropped rather than merged
@@ -23,10 +62,17 @@ module UI
       end
 
       def call
-        link_to(@text || content, @path, **@html_options, class: link_class)
+        link_to(link_text, @path, **@html_options, class: link_class)
       end
 
       private
+
+      # link_to labels a link with its own URL when the label is empty, so a caller that
+      # forgot text: would ship an anchor reading "/o/example/dashboard"
+      def link_text
+        @text.presence || content.presence ||
+          raise(ArgumentError, "text: or block content is required")
+      end
 
       def link_class
         [@html_class, ("active" if active?)].compact.join(" ").presence
@@ -35,23 +81,7 @@ module UI
       def active?
         return @active unless @active.nil?
 
-        case @match
-        when :path then helpers.current_page_active?(@path)
-        when :controller then helpers.current_page_active?(@path, true)
-        else helpers.current_page_active?(@path, true) && actions_match?
-        end
-      end
-
-      # current_page_active? has compared the controllers by here, memoizing the request's on
-      # the view context, so this only adds the action
-      def actions_match?
-        routed_action(@path) == routed_action(helpers.request.url)
-      end
-
-      def routed_action(url)
-        Rails.application.routes.recognize_path(url)[:action]
-      rescue ActionController::RoutingError
-        nil
+        self.class.active?(path: @path, match: @match, view: helpers)
       end
     end
   end

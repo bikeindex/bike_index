@@ -6,7 +6,7 @@ module PageBlock
       # One menu manifest item, as an anchor
       class Component < ApplicationComponent
         # The symbol states leave the current-page check to UI::ActiveLink, at these granularities
-        MATCHES = {auto: :path, match_controller: :controller, controller_action: :controller_action}.freeze
+        MATCHES = UI::ActiveLink::Component.match_table(auto: :path, match_controller: :controller)
         ACTIVE_STATES = (MATCHES.keys + [true, false]).freeze
 
         def initialize(label:, path:, active: :auto, link_class: nil, html_options: {})

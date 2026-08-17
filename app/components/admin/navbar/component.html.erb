@@ -5,9 +5,9 @@
 
   <% if @current_user.superuser? %>
     <ul class="navbar-nav d-none d-lg-flex">
-      <% shortcut_links.each do |title, path| %>
+      <% shortcut_links.each do |link| %>
         <li class="nav-item">
-          <%= render UI::ActiveLink::Component.new(text: title, path:, html_class: "nav-link", match: :controller) %>
+          <%= render UI::ActiveLink::Component.new(text: link[:title], path: link[:path], html_class: "nav-link", match: link[:match]) %>
         </li>
       <% end %>
 

@@ -12,13 +12,15 @@ module Admin
 
       private
 
-      # Shorter labels and a deliberate order, so these don't derive from nav_select_links
+      # Shorter labels and a deliberate order, so the titles don't derive from nav_select_links.
+      # The match does, so a shortcut can't disagree with the picker about which page it's on.
       def shortcut_links
-        [["Users", admin_users_path],
-          ["Bikes", admin_bikes_path],
-          ["Organizations", admin_organizations_path],
-          ["News", admin_news_index_path],
-          ["Stolen", admin_stolen_bikes_path]]
+        {"Users" => admin_users_path,
+         "Bikes" => admin_bikes_path,
+         "Organizations" => admin_organizations_path,
+         "News" => admin_news_index_path,
+         "Stolen" => admin_stolen_bikes_path}
+          .map { |title, path| {title:, path:, match: match_for(nav_link_for(path))} }
       end
 
       # letter_opener_web_path only exists where the engine is mounted, so the guard
@@ -51,16 +53,38 @@ module Admin
       end
 
       def display_view_all?
-        return false unless current_nav_link&.dig(:match_controller)
+        return false unless current_link_has_sub_pages?
 
-        !helpers.current_page_active?(current_nav_link[:path]) || helpers.admin_search_filtered?
+        !on_page?(current_nav_link, :path) || helpers.admin_search_filtered?
+      end
+
+      # Only a controller-matched link goes active on pages other than its own, so it's the
+      # only kind with anywhere to offer a way back from
+      def current_link_has_sub_pages?
+        current_nav_link.present? && match_for(current_nav_link) == :controller
       end
 
       def current_nav_link
         return @current_nav_link if defined?(@current_nav_link)
 
         @current_nav_link = nav_select_links
-          .detect { |link| helpers.current_page_active?(link[:path], link[:match_controller]) } || invoices_edit_link
+          .detect { |link| on_page?(link, match_for(link)) } || invoices_edit_link
+      end
+
+      def on_page?(link, match)
+        UI::ActiveLink::Component.active?(path: link[:path], match:, view: helpers)
+      end
+
+      def nav_link_for(path)
+        nav_select_links.detect { |link| link[:path] == path }
+      end
+
+      # Links match their whole controller, so they stay current on a section's sub-pages.
+      # match: :path marks the entries that are one action on a controller another entry owns
+      # -- most of admin/dashboard's pages, duplicates on admin/bikes -- which would otherwise
+      # all go active at once.
+      def match_for(link)
+        link&.dig(:match) || :controller
       end
 
       # Because organization invoices edit doesn't match controller
@@ -72,62 +96,62 @@ module Admin
 
       def nav_select_links
         @nav_select_links ||= ([
-          {title: "Users", path: admin_users_path, match_controller: true},
-          {title: "Bikes", path: admin_bikes_path, match_controller: true},
-          {title: "Bike Versions", path: admin_bike_versions_path, match_controller: true},
-          {title: "Stolen Bikes", path: admin_stolen_bikes_path, match_controller: true},
-          {title: "Stolen Notifications", path: admin_stolen_notifications_url, match_controller: true},
-          {title: "External Registry Bikes", path: admin_external_registry_bikes_path, match_controller: true},
-          {title: "Config: External Registry Credentials", path: admin_external_registry_credentials_path, match_controller: true},
-          {title: "Organizations", path: admin_organizations_path, match_controller: true},
-          {title: "News", path: admin_news_index_path, match_controller: true},
-          {title: "Content Tags", path: admin_content_tags_path, match_controller: true},
-          {title: "POS Integration", path: lightspeed_interface_path, match_controller: false},
-          {title: "Ambassador Activities", path: admin_ambassador_tasks_path, match_controller: true},
-          {title: "Completed Ambassador Activities", path: admin_ambassador_task_assignments_path, match_controller: true},
-          {title: "Promoted Alerts", path: admin_theft_alerts_path, match_controller: true},
-          {title: "Promoted Alert Plans", path: admin_theft_alert_plans_path, match_controller: true},
-          {title: "Memberships", path: admin_memberships_path, match_controller: true},
-          {title: "Payments", path: admin_payments_path, match_controller: true},
-          {title: "Organization Features", path: admin_organization_features_path, match_controller: true},
-          {title: "Registration Sequences", path: admin_registration_sequences_path, match_controller: true},
-          {title: "Invoices", path: admin_invoices_path(query: "active", direction: "asc", sort: "subscription_end_at"), match_controller: true},
-          {title: "Impound Records", path: admin_impound_records_path, match_controller: true},
-          {title: "Parking Notifications", path: admin_parking_notifications_path, match_controller: true},
-          {title: "Recoveries", path: admin_recoveries_path, match_controller: true},
-          {title: "Recovery Displays", path: admin_recovery_displays_path, match_controller: true},
-          {title: "Organization Roles", path: admin_organization_roles_path, match_controller: true},
-          {title: "Manufacturers", path: admin_manufacturers_path, match_controller: true},
-          {title: "Config: TSV Exports", path: admin_tsvs_path, match_controller: false},
-          {title: "Credibility badges", path: admin_credibility_badges_path, match_controller: false},
-          {title: "Maintenance", path: admin_maintenance_path, match_controller: false},
-          {title: "Partial Bikes", path: admin_b_params_path, match_controller: true},
-          {title: "Component Types", path: admin_ctypes_path, match_controller: true},
-          {title: "Graphs", path: admin_graphs_path, match_controller: true},
-          {title: "Paints", path: admin_paints_path, match_controller: true},
-          {title: "Feedback & Messages", path: admin_feedbacks_path, match_controller: true},
-          {title: "Bug Reports", path: admin_bug_reports_path, match_controller: true},
-          {title: "Social Accounts", path: admin_social_accounts_path, match_controller: true},
-          {title: "Social Posts", path: admin_social_posts_path, match_controller: true},
-          {title: "Stickers", path: admin_bike_stickers_path, match_controller: true},
-          {title: "Sticker Updates", path: admin_bike_sticker_updates_path, match_controller: true},
-          {title: "Exports", path: admin_exports_path, match_controller: true},
-          {title: "Bulk Imports", path: admin_bulk_imports_path, match_controller: true},
-          {title: "Duplicate Bikes", path: duplicates_admin_bikes_path, match_controller: false},
-          {title: "Model Audits", path: admin_model_audits_path, match_controller: true},
-          {title: "Marketplace Listings", path: admin_marketplace_listings_path, match_controller: true},
-          {title: "Marketplace Messages", path: admin_marketplace_messages_path, match_controller: true},
-          {title: "Sales", path: admin_sales_path, match_controller: true},
-          {title: "Logged bike searches", path: admin_logged_searches_path, match_controller: true},
-          {title: "Organization statuses", path: admin_organization_statuses_path, match_controller: true},
-          {title: "Config: Email Domains", path: admin_email_domains_path, match_controller: true},
-          {title: "Config: Email Bans", path: admin_email_bans_path, match_controller: true},
-          {title: "Config: Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false},
-          {title: "Config: Exchange Rates", path: admin_exchange_rates_path, match_controller: true},
-          {title: "Config: Primary Activities", path: admin_primary_activities_path, match_controller: true},
-          {title: "Bike Organization Notes", path: admin_bike_organization_notes_path, match_controller: true},
-          {title: "Strava Integrations", path: admin_strava_integrations_path, match_controller: true},
-          {title: "Exit Admin", path: root_path, match_controller: false}
+          {title: "Users", path: admin_users_path},
+          {title: "Bikes", path: admin_bikes_path},
+          {title: "Bike Versions", path: admin_bike_versions_path},
+          {title: "Stolen Bikes", path: admin_stolen_bikes_path},
+          {title: "Stolen Notifications", path: admin_stolen_notifications_url},
+          {title: "External Registry Bikes", path: admin_external_registry_bikes_path},
+          {title: "Config: External Registry Credentials", path: admin_external_registry_credentials_path},
+          {title: "Organizations", path: admin_organizations_path},
+          {title: "News", path: admin_news_index_path},
+          {title: "Content Tags", path: admin_content_tags_path},
+          {title: "POS Integration", path: lightspeed_interface_path, match: :path},
+          {title: "Ambassador Activities", path: admin_ambassador_tasks_path},
+          {title: "Completed Ambassador Activities", path: admin_ambassador_task_assignments_path},
+          {title: "Promoted Alerts", path: admin_theft_alerts_path},
+          {title: "Promoted Alert Plans", path: admin_theft_alert_plans_path},
+          {title: "Memberships", path: admin_memberships_path},
+          {title: "Payments", path: admin_payments_path},
+          {title: "Organization Features", path: admin_organization_features_path},
+          {title: "Registration Sequences", path: admin_registration_sequences_path},
+          {title: "Invoices", path: admin_invoices_path(query: "active", direction: "asc", sort: "subscription_end_at")},
+          {title: "Impound Records", path: admin_impound_records_path},
+          {title: "Parking Notifications", path: admin_parking_notifications_path},
+          {title: "Recoveries", path: admin_recoveries_path},
+          {title: "Recovery Displays", path: admin_recovery_displays_path},
+          {title: "Organization Roles", path: admin_organization_roles_path},
+          {title: "Manufacturers", path: admin_manufacturers_path},
+          {title: "Config: TSV Exports", path: admin_tsvs_path, match: :path},
+          {title: "Credibility badges", path: admin_credibility_badges_path, match: :path},
+          {title: "Maintenance", path: admin_maintenance_path, match: :path},
+          {title: "Partial Bikes", path: admin_b_params_path},
+          {title: "Component Types", path: admin_ctypes_path},
+          {title: "Graphs", path: admin_graphs_path},
+          {title: "Paints", path: admin_paints_path},
+          {title: "Feedback & Messages", path: admin_feedbacks_path},
+          {title: "Bug Reports", path: admin_bug_reports_path},
+          {title: "Social Accounts", path: admin_social_accounts_path},
+          {title: "Social Posts", path: admin_social_posts_path},
+          {title: "Stickers", path: admin_bike_stickers_path},
+          {title: "Sticker Updates", path: admin_bike_sticker_updates_path},
+          {title: "Exports", path: admin_exports_path},
+          {title: "Bulk Imports", path: admin_bulk_imports_path},
+          {title: "Duplicate Bikes", path: duplicates_admin_bikes_path, match: :path},
+          {title: "Model Audits", path: admin_model_audits_path},
+          {title: "Marketplace Listings", path: admin_marketplace_listings_path},
+          {title: "Marketplace Messages", path: admin_marketplace_messages_path},
+          {title: "Sales", path: admin_sales_path},
+          {title: "Logged bike searches", path: admin_logged_searches_path},
+          {title: "Organization statuses", path: admin_organization_statuses_path},
+          {title: "Config: Email Domains", path: admin_email_domains_path},
+          {title: "Config: Email Bans", path: admin_email_bans_path},
+          {title: "Config: Scheduled Jobs", path: admin_scheduled_jobs_path, match: :path},
+          {title: "Config: Exchange Rates", path: admin_exchange_rates_path},
+          {title: "Config: Primary Activities", path: admin_primary_activities_path},
+          {title: "Bike Organization Notes", path: admin_bike_organization_notes_path},
+          {title: "Strava Integrations", path: admin_strava_integrations_path},
+          {title: "Exit Admin", path: root_path, match: :path}
         ] + dev_nav_select_links).sort_by { |link| link[:title] }
       end
 
@@ -136,29 +160,29 @@ module Admin
 
         [
           # Impound claims index is currently busted, so ignoring for now
-          {title: "Dev: Impound Claims", path: admin_impound_claims_path, match_controller: true},
-          {title: "Dev: Stripe Subscriptions", path: admin_stripe_subscriptions_path, match_controller: true},
-          {title: "Dev: Stripe Prices", path: admin_stripe_prices_path, match_controller: true},
-          {title: "Dev: Feature Flags", path: admin_feature_flags_path, match_controller: false},
-          {title: "Dev: Mail Snippets", path: admin_mail_snippets_path, match_controller: true},
-          {title: "Dev: Mailchimp Values", path: admin_mailchimp_values_path, match_controller: true},
-          {title: "Dev: Mailchimp Data", path: admin_mailchimp_data_path, match_controller: true},
-          {title: "Dev: User Alerts", path: admin_user_alerts_path, match_controller: true},
-          {title: "Dev: Ownerships", path: admin_ownerships_path, match_controller: true},
-          {title: "Dev: User Bans", path: admin_user_bans_path, match_controller: true},
-          {title: "Dev: User Reg Organizations", path: admin_user_registration_organizations_path, match_controller: true},
-          {title: "Dev: Autocomplete Status", path: admin_autocomplete_status_path, match_controller: false},
-          {title: "Dev: OAuth Applications", path: oauth_applications_path(search_all: true), match_controller: true},
-          {title: "Dev: Notifications", path: admin_notifications_path, match_controller: true},
-          {title: "Dev: Organization Landing Pages", path: admin_organization_landing_pages_path, match_controller: true},
-          {title: "Dev: Superuser Abilities", path: admin_superuser_abilities_path, match_controller: true},
-          {title: "Dev: Model Attestations", path: admin_model_attestations_path, match_controller: true},
-          {title: "Dev: IP Location", path: admin_ip_location_path, match_controller: false},
-          {title: "Dev: Strava Requests", path: admin_strava_requests_path, match_controller: true},
-          {title: "Dev: Strava Activities", path: admin_strava_activities_path, match_controller: true},
-          {title: "Dev: Strava Gear", path: admin_strava_gears_path, match_controller: true},
-          {title: "Dev: Paper Trail Versions", path: admin_paper_trail_versions_path, match_controller: true},
-          {title: "Dev: Public Images", path: admin_public_images_path, match_controller: true}
+          {title: "Dev: Impound Claims", path: admin_impound_claims_path},
+          {title: "Dev: Stripe Subscriptions", path: admin_stripe_subscriptions_path},
+          {title: "Dev: Stripe Prices", path: admin_stripe_prices_path},
+          {title: "Dev: Feature Flags", path: admin_feature_flags_path, match: :path},
+          {title: "Dev: Mail Snippets", path: admin_mail_snippets_path},
+          {title: "Dev: Mailchimp Values", path: admin_mailchimp_values_path},
+          {title: "Dev: Mailchimp Data", path: admin_mailchimp_data_path},
+          {title: "Dev: User Alerts", path: admin_user_alerts_path},
+          {title: "Dev: Ownerships", path: admin_ownerships_path},
+          {title: "Dev: User Bans", path: admin_user_bans_path},
+          {title: "Dev: User Reg Organizations", path: admin_user_registration_organizations_path},
+          {title: "Dev: Autocomplete Status", path: admin_autocomplete_status_path, match: :path},
+          {title: "Dev: OAuth Applications", path: oauth_applications_path(search_all: true)},
+          {title: "Dev: Notifications", path: admin_notifications_path},
+          {title: "Dev: Organization Landing Pages", path: admin_organization_landing_pages_path},
+          {title: "Dev: Superuser Abilities", path: admin_superuser_abilities_path},
+          {title: "Dev: Model Attestations", path: admin_model_attestations_path},
+          {title: "Dev: IP Location", path: admin_ip_location_path, match: :path},
+          {title: "Dev: Strava Requests", path: admin_strava_requests_path},
+          {title: "Dev: Strava Activities", path: admin_strava_activities_path},
+          {title: "Dev: Strava Gear", path: admin_strava_gears_path},
+          {title: "Dev: Paper Trail Versions", path: admin_paper_trail_versions_path},
+          {title: "Dev: Public Images", path: admin_public_images_path}
         ]
       end
     end

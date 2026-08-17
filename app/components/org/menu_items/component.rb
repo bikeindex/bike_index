@@ -4,8 +4,8 @@ module Org
   module MenuItems
     class Component < ApplicationComponent
       # The cache marks these for UI::ActiveLink to resolve per request, at these granularities
-      MATCHES = {auto: :path, match_controller: :controller,
-                 on_registrations_index: :controller_action}.freeze
+      MATCHES = UI::ActiveLink::Component.match_table(auto: :path, match_controller: :controller,
+        on_registrations_index: :controller_action)
 
       def initialize(organization:, current_user:, controller_namespace:, controller_name:, action_name:,
         is_dropdown: false, unregistered_parking_notification: nil)

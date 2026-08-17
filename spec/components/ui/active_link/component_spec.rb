@@ -89,6 +89,21 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
           expect(link["class"]).to be_blank
         end
       end
+
+      # A failed update re-renders the form, so the page is a PATCH dispatching bikes#update.
+      # Recognizing that URL as a GET compares bikes#show, and the link goes active on a page
+      # it doesn't point at
+      context "on a page rendered by a non-GET request" do
+        let(:path) { "/bikes/12" }
+
+        it "compares the action the request dispatched, not the GET route's" do
+          on_get = with_request_url(path) { render_inline(instance) }
+          expect(on_get.css("a").first["class"]).to eq "active"
+
+          on_patch = with_request_url(path, method: "PATCH") { render_inline(instance) }
+          expect(on_patch.css("a").first["class"]).to be_blank
+        end
+      end
     end
   end
 
@@ -144,6 +159,22 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
 
     it "renders the block inside the link" do
       expect(link.css("strong").text).to eq "Block"
+    end
+  end
+
+  context "with neither text nor block content" do
+    let(:instance) { described_class.new(path:) }
+
+    it "raises rather than labelling the link with its own URL" do
+      expect { component }.to raise_error(ArgumentError, /text:/)
+    end
+
+    context "with a block that renders blank" do
+      let(:component) { with_request_url(request_url) { render_inline(instance) { "" } } }
+
+      it "raises too" do
+        expect { component }.to raise_error(ArgumentError, /text:/)
+      end
     end
   end
 
