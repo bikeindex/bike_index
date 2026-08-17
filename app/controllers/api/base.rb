@@ -68,6 +68,7 @@ module API
     use GrapeLogging::Middleware::RequestLogger, instrumentation_key: "grape_key",
       include: [GrapeLogging::Loggers::BinxLogger.new,
         GrapeLogging::Loggers::FilterParameters.new]
+    use API::ErrorResponder
     use ::APIAuthorization::OAuth2
 
     rescue_from :all do |e|

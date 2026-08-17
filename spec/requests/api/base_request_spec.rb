@@ -85,4 +85,31 @@ RSpec.describe API::Base do
       end
     end
   end
+
+  # grape_logging records the status of the exception it re-raises rather than of the
+  # response the error handler builds, which recorded every handled error as a 500
+  describe "logged status", type: :request do
+    let(:logged_statuses) { [] }
+    let(:subscription) do
+      ActiveSupport::Notifications.subscribe("grape_key") do |*args|
+        logged_statuses << ActiveSupport::Notifications::Event.new(*args).payload[:status]
+      end
+    end
+    before { subscription }
+    after { ActiveSupport::Notifications.unsubscribe(subscription) }
+
+    it "matches the status the client received" do
+      get "/api/v3/bikes/999999999"
+      expect(response.status).to eq 404
+      expect(logged_statuses.last).to eq 404
+
+      get "/api/v3/unknown_endpoint"
+      expect(response.status).to eq 404
+      expect(logged_statuses.last).to eq 404
+
+      get "/api/v3/me"
+      expect(response.status).to eq 401
+      expect(logged_statuses.last).to eq 401
+    end
+  end
 end
