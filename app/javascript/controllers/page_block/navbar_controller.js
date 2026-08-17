@@ -11,7 +11,7 @@ const pathMatches = (link) =>
   trimSlash(link.pathname) === trimSlash(window.location.pathname) &&
   (!link.search || link.search === window.location.search)
 
-// A space separated list of "controller#action", where an action-less entry takes any action
+// NavRoute#matches?, in the language the links are read in
 const routeMatches = (routes, currentRoute = '') => {
   const [controller, action] = currentRoute.split('#')
   return routes.split(' ').some((route) => {
@@ -33,8 +33,7 @@ export default class extends Controller {
     this.markActiveLinks()
   }
 
-  // The navbar comes from a fragment cached across every page, so its links arrive carrying
-  // the rule that decides them rather than the answer. See NavRoute.
+  // Links arrive carrying the rule that decides them, not the answer — see NavRoute
   markActiveLinks () {
     const currentRoute = document.body.dataset.currentRoute
     this.element.querySelectorAll('[data-active-path], [data-active-routes]').forEach((link) => {

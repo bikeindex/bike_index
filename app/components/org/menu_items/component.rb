@@ -9,8 +9,8 @@ module Org
                          "organized/registration_sequence_pages"}.freeze
       private_constant :BIKES_NEW_ROUTE, :ACTIVE_ROUTES
 
-      # The pages with_route_overrides injects a link for. The navbar folds this into its
-      # cache key, so a dropdown cached on one page can't carry another's override.
+      # The navbar folds this into its cache key, so a dropdown cached on one page can't
+      # carry another page's injected link
       def self.route_override_key(controller_namespace:, controller_name:, action_name:)
         return nil unless controller_namespace == "organized"
 
@@ -108,10 +108,6 @@ module Org
         {type: :divider}
       end
 
-      def organized_controller?(*controller_names)
-        @controller_namespace == "organized" && controller_names.include?(@controller_name)
-      end
-
       def route_override_key
         return @route_override_key if defined?(@route_override_key)
 
@@ -136,34 +132,39 @@ module Org
       end
 
       # The dropdown renders inside the navbar's page-agnostic cache, so it ships the rule
-      # to page-block--navbar; the sidebar renders per request and resolves it here
+      # to page-block--navbar; the sidebar renders per request and resolves the same rule here
       def link_tag(item)
         return link_to(item[:label], item[:path], class: link_classes(item, false), data: active_data(item)) if
           @is_dropdown
 
-        active = active_state(item)
-        return link_to(item[:label], item[:path], class: link_classes(item, active)) unless active.nil?
-
-        helpers.active_link(item[:label], item[:path], class: link_classes(item, false),
-          match_controller: item[:active] == :match_controller)
+        link_to(item[:label], item[:path], class: link_classes(item, active?(item)))
       end
 
       def active_data(item)
-        return {active_path: true} if item[:active] == :auto
+        routes = override_routes(item)
+        routes ? {active_routes: routes} : NavRoute.data(item[:active], item[:path])
+      end
 
-        routes = active_routes(item)
-        routes.present? ? {active_routes: routes} : {}
+      def active?(item)
+        data = active_data(item)
+        return helpers.current_page?(item[:path]) if data[:active_path]
+
+        NavRoute.matches?(data[:active_routes], current_route)
       end
 
       # Both add-bike links route to organized/bikes#new — which of them can be active comes
       # from the parking notification, which the navbar's cache key already covers
-      def active_routes(item)
+      def override_routes(item)
         case item[:active]
-        when :match_controller then NavRoute.controller_for(item[:path])
         when :on_bikes_new then BIKES_NEW_ROUTE unless @unregistered_parking_notification
         when :on_bikes_new_with_parking_notification then BIKES_NEW_ROUTE if @unregistered_parking_notification
         else ACTIVE_ROUTES[item[:active]]
         end
+      end
+
+      def current_route
+        @current_route ||= NavRoute.current(controller_namespace: @controller_namespace,
+          controller_name: @controller_name, action_name: @action_name)
       end
 
       def link_classes(item, active)
@@ -175,32 +176,6 @@ module Org
 
       def disabled_classes(item)
         item[:secondary] ? "disabled-menu-item menu-item secondary-item" : "disabled-menu-item menu-item"
-      end
-
-      # Resolves the per-request active state for items the cache marked with a symbol.
-      # Returns true/false for explicit cases, nil to defer to the active_link helper.
-      def active_state(item)
-        case item[:active]
-        when :auto, :match_controller then nil
-        when :on_registrations_index
-          organized_controller?("registrations") && @action_name == "index"
-        when :on_bikes_new
-          on_bikes_new? && !on_bikes_new_with_parking_notification?
-        when :on_bikes_new_with_parking_notification
-          on_bikes_new_with_parking_notification?
-        when :on_registration_sequences
-          on_registration_sequences?
-        else
-          item[:active]
-        end
-      end
-
-      def on_bikes_new?
-        organized_controller?("bikes") && @action_name == "new"
-      end
-
-      def on_bikes_new_with_parking_notification?
-        on_bikes_new? && @unregistered_parking_notification.present?
       end
     end
   end

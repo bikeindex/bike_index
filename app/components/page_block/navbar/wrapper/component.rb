@@ -7,7 +7,7 @@ module PageBlock
       # logo_only renders just the logo, for the OAuth authorization prompt.
       class Component < ApplicationComponent
         # Digest of the cached template — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "62803f302cec"
+        MARKUP_DIGEST = "efdeaadee149"
 
         def initialize(logo_only: false, current_user: nil, current_user_or_unconfirmed_user: nil,
           passive_organization: nil, controller_namespace: nil, controller_name: nil, action_name: nil,
@@ -32,13 +32,12 @@ module PageBlock
                   action: "click@window->page-block--navbar#closeDropdownsOutside " \
                     "keydown.esc@window->page-block--navbar#closeOnEscape " \
                     "resize@window->page-block--navbar#reposition " \
-                    "turbo:load@document->page-block--navbar#markActiveLinks " \
                     "turbo:frame-load@document->page-block--navbar#markActiveLinks " \
                     "popstate@window->page-block--navbar#markActiveLinks"}}
         end
 
-        # Every page shares one entry: the links resolve their own active state in
-        # page-block--navbar, and the org dropdown's route overrides are all this key holds
+        # No page_id: the links resolve their own active state, so the org dropdown's
+        # injected links are the only markup left that varies by page
         def cache_key
           [MARKUP_DIGEST, @current_user_or_unconfirmed_user, @passive_organization,
             @unregistered_parking_notification, organization_menu_route_key]

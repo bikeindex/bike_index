@@ -6,8 +6,7 @@ RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
   let(:component) { render_inline(described_class.new(**args)) }
   let(:args) { {label: "Help", path: "/help"} }
 
-  # The navbar's cache is shared by every page, so :auto and :match_controller can only
-  # describe what makes the link active — page-block--navbar decides it
+  # The navbar's cache is shared by every page, so a link can only describe what activates it
   it "hands the path rule to the navbar controller when active is omitted" do
     expect(component).to have_css "a.nav-link[href='/help'][data-active-path='true']", text: "Help"
     expect(component).to_not have_css "a.active"
@@ -32,15 +31,6 @@ RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
     end
   end
 
-  context "with active: true" do
-    let(:args) { {label: "Search", path: "/search/registrations", active: true} }
-
-    it "renders active without a rule" do
-      expect(component).to have_css "a.nav-link.active[href='/search/registrations']"
-      expect(component).to_not have_css "a[data-active-path]"
-    end
-  end
-
   context "with active: false" do
     let(:args) { {label: "Logout", path: "/logout", active: false} }
 
@@ -54,6 +44,8 @@ RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
     # nil used to mean :auto, so a caller reaching for a falsey value has to say which
     it "raises rather than picking a state" do
       expect { described_class.new(label: "Help", path: "/help", active: nil) }
+        .to raise_error(ArgumentError, /Invalid active/)
+      expect { described_class.new(label: "Help", path: "/help", active: true) }
         .to raise_error(ArgumentError, /Invalid active/)
     end
   end

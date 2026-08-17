@@ -5,9 +5,8 @@ module PageBlock
     module MenuLink
       # One menu manifest item, as an anchor
       class Component < ApplicationComponent
-        # :auto and :match_controller ship their rule to page-block--navbar, true and false
-        # decide it here — see NavRoute for why the page can't be consulted
-        ACTIVE_STATES = [:auto, :match_controller, true, false].freeze
+        # Nothing in the navbar is active at render — see NavRoute; false opts a link out
+        ACTIVE_STATES = [:auto, :match_controller, false].freeze
 
         def initialize(label:, path:, active: :auto, link_class: nil, html_options: {})
           raise_if_invalid_value!(:active, active, ACTIVE_STATES)
@@ -26,19 +25,11 @@ module PageBlock
         private
 
         def css_class
-          ["nav-link", @link_class, ("active" if @active == true)].compact.join(" ")
+          ["nav-link", @link_class].compact.join(" ")
         end
 
         def data_attributes
-          @html_options.fetch(:data, {}).merge(active_data)
-        end
-
-        def active_data
-          case @active
-          when :auto then {active_path: true}
-          when :match_controller then {active_routes: NavRoute.controller_for(@path)}
-          else {}
-          end
+          @html_options.fetch(:data, {}).merge(NavRoute.data(@active, @path))
         end
       end
     end

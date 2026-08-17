@@ -14,8 +14,7 @@ RSpec.describe "Navbar", :js, type: :system do
     expect(page).to have_current_path(search_registrations_path, ignore_query: true)
   end
 
-  # One cached fragment serves every page, so page-block--navbar is what marks the
-  # link for the page you actually landed on. The menu is closed by then, hence visible: :all
+  # The menu is closed by the time these run, hence visible: :all
   def expect_active_navbar_links(labels)
     within("nav.primary-header-nav") do
       expect(page.all("a.nav-link.active", visible: :all).map { |link| link.text(:all).strip }).to eq labels
@@ -40,7 +39,6 @@ RSpec.describe "Navbar", :js, type: :system do
     open_menu_and_search
     expect_active_navbar_links(%w[Search Search])
 
-    # The whole navbar is re-resolved, so the link for the page you left goes inactive
     visit help_path
     expect_active_navbar_links(["Help"])
 

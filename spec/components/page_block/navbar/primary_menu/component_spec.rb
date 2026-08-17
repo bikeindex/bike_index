@@ -14,7 +14,6 @@ RSpec.describe PageBlock::Navbar::PrimaryMenu::Component, type: :component do
       "Stolen bike?", "Donate", "Blog", "Marketplace", "Search"])
     expect(component).to_not have_css "#setting_submenu"
     expect(component).to_not have_css "#primary-main-menu a.active"
-    # Both search links stay active across their whole controller, whatever the rider narrowed to
     expect(labels_for.call("a[data-active-routes='search/registrations']")).to eq %w[Search Search]
     expect(labels_for.call("a[data-active-routes='search/marketplace']")).to eq %w[Marketplace Marketplace]
     expect(labels_for.call("a[data-active-routes='news']")).to eq %w[Blog]
