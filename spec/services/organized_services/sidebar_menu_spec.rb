@@ -84,6 +84,14 @@ RSpec.describe OrganizedServices::SidebarMenu do
           .to eq(["Reports"])
       end
 
+      # Managing impounding is the settings group's, so this one is only the vehicles
+      it "keeps configuration out of the impounded group" do
+        impounded = items.find { |item| item[:key] == :impounded }
+
+        expect(impounded[:children].map { |child| child[:label] })
+          .to eq(["Search Impounded Vehicles", "Impounded claims", "Add an Impounded Vehicle"])
+      end
+
       it "points messaging at the custom emails index" do
         expect(items.find { |item| item[:label] == "Messaging" })
           .to eq(link_item("Messaging", "/o/#{slug}/emails", icon: "chat", active: :match_controller))
@@ -108,12 +116,9 @@ RSpec.describe OrganizedServices::SidebarMenu do
     context "with every feature, for a member" do
       let(:organization) { FactoryBot.create(:organization_brakebills) }
 
-      it "drops the settings group and manage impounding" do
+      it "drops the settings group and messaging" do
         expect(items.map { |item| item[:key] }.compact).to eq(%i[registrations impounded parking bulk])
-
-        impounded = items.find { |item| item[:key] == :impounded }
-        expect(impounded[:children].map { |child| child[:label] })
-          .to eq(["Search Impounded Vehicles", "Impounded claims", "Add an Impounded Vehicle"])
+        expect(items.map { |item| item[:label] }).to_not include("Messaging")
       end
     end
 

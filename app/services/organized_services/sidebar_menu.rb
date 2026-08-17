@@ -41,7 +41,7 @@ module OrganizedServices
         registrations_group(organization),
         add_bike_link(organization),
         divider,
-        impounded_group(organization, current_user),
+        impounded_group(organization),
         parking_group(organization),
         bulk_group(organization),
         lightspeed_link(organization),
@@ -94,7 +94,9 @@ module OrganizedServices
         icon: "plus-circle", active: :on_bikes_new)
     end
 
-    def impounded_group(organization, current_user)
+    # Managing impounding is the settings group's, which is where the org's other
+    # configuration lives -- this group is for the vehicles themselves
+    def impounded_group(organization)
       return nil unless organization.enabled?("impound_bikes")
 
       children = [
@@ -105,10 +107,6 @@ module OrganizedServices
            link(translation(:impounded_claims),
              routes.organization_impound_claims_path(organization_id: organization.to_param),
              active: :match_controller)
-         end),
-        (if admin?(organization, current_user)
-           link(translation(:manage_impounding),
-             routes.edit_organization_manage_impounding_path(organization_id: organization.to_param))
          end),
         disabled(translation(:add_an_impounded_vehicle))
       ]
