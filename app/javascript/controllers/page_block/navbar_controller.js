@@ -26,7 +26,7 @@ const routeMatches = (routes, currentRoute = '') => {
 // classes primary_header_nav.scss already styles, so `open` lands on a toggle's parent
 // the way bootstrap's did.
 export default class extends Controller {
-  static targets = ['menu', 'backdrop', 'hamburgler', 'hamburglerButton', 'organizationToggle']
+  static targets = ['hamburgler', 'hamburglerButton', 'organizationToggle']
 
   connect () {
     this.truncateOrganizationName()
@@ -71,7 +71,6 @@ export default class extends Controller {
     setTimeout(() => this.element.classList.remove('enabled'), TRANSITION_MS)
   }
 
-  // Opening one dropdown closes the other, so only one is ever open
   toggleDropdown (event) {
     const toggle = event.currentTarget
     const wasOpen = toggle === this.openDropdown
@@ -93,15 +92,21 @@ export default class extends Controller {
   }
 
   closeDropdownsOutside (event) {
-    if (this.openDropdown && !this.element.contains(event.target)) this.closeDropdowns()
+    if (this.openDropdown && !this.openDropdown.parentElement.contains(event.target)) this.closeDropdowns()
   }
 
+  // Escape returns focus to whatever it closed, the way ui--dropdown does -- otherwise
+  // it lands on a display:none element and the browser drops it to the body
   closeOnEscape () {
-    this.closeDropdowns()
-    if (!this.menuOpen) return
+    const openToggle = this.openDropdown
 
-    this.closeMenu()
-    this.hamburglerButtonTarget.focus()
+    this.closeDropdowns()
+    if (openToggle) {
+      openToggle.focus()
+    } else if (this.menuOpen) {
+      this.closeMenu()
+      this.hamburglerButtonTarget.focus()
+    }
   }
 
   // Rotating or resizing with the menu open changes how tall the banner is
@@ -122,14 +127,13 @@ export default class extends Controller {
     const { bottom, height } = this.hamburglerTarget.getBoundingClientRect()
     if (!height) return
 
-    this.menuTarget.style.top = `${bottom}px`
-    this.backdropTarget.style.top = `${bottom}px`
+    this.element.style.setProperty('--navbar-bottom', `${bottom}px`)
   }
 
   // A wide passive organization name overflows and hides the rest of the small-screen
   // navbar, so cap it at what the logo and hamburgler leave, less its margin and padding
   truncateOrganizationName () {
-    if (window.innerWidth >= 768 || !this.hasOrganizationToggleTarget) return
+    if (!this.hasOrganizationToggleTarget || window.innerWidth >= 768) return
 
     const available = this.element.querySelector('.container').clientWidth -
       this.element.querySelector('.primary-logo').offsetWidth -

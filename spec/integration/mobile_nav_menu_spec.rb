@@ -89,7 +89,15 @@ RSpec.describe "Navbar", :js, type: :system do
       expect(find_button("Brakebills")["aria-expanded"]).to eq "true"
       expect_axe_clean
 
+      # Escape from inside the dropdown hands focus back to the toggle, rather than
+      # leaving it on a link that just became display:none
+      find_link("Brakebills Bikes").send_keys(:escape)
+
+      expect(page).to have_no_link("Brakebills Bikes")
+      expect(page.evaluate_script("document.activeElement.id")).to eq "passive_organization_submenu"
+
       # Opening one dropdown closes the other
+      click_button "Brakebills"
       find(settings_toggle).click
 
       expect(page).to have_link("Logout")
