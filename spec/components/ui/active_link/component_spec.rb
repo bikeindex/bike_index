@@ -40,16 +40,16 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     end
   end
 
-  describe "match_controller" do
+  describe "match" do
     let(:path) { "/bikes/new" }
     let(:request_url) { "/bikes/12" }
 
-    it "isn't active on another page of the same controller" do
+    it "defaults to :path, so another page of the controller isn't active" do
       expect(link["class"]).to be_blank
     end
 
-    context "with match_controller" do
-      let(:options) { {match_controller: true} }
+    context ":controller" do
+      let(:options) { {match: :controller} }
 
       it "is active on another page of the same controller" do
         expect(link["class"]).to eq "active"
@@ -62,6 +62,41 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
           expect(link["class"]).to be_blank
         end
       end
+    end
+
+    context ":controller_action" do
+      let(:options) { {match: :controller_action} }
+
+      it "isn't active on a different action of the same controller" do
+        expect(link["class"]).to be_blank
+      end
+
+      # What a link carrying query params needs — the URL won't compare equal
+      context "on the same action, reached with different params" do
+        let(:path) { "/search/registrations?stolenness=all" }
+        let(:request_url) { "/search/registrations?query=trek" }
+
+        it "is active" do
+          expect(link["class"]).to eq "active"
+        end
+      end
+
+      context "on a different controller's index" do
+        let(:path) { "/search/registrations?stolenness=all" }
+        let(:request_url) { "/search/marketplace" }
+
+        it "isn't active" do
+          expect(link["class"]).to be_blank
+        end
+      end
+    end
+  end
+
+  context "with an unknown match" do
+    let(:options) { {match: :nonsense} }
+
+    it "raises" do
+      expect { component }.to raise_error(ArgumentError, /match/)
     end
   end
 

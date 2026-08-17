@@ -7,7 +7,7 @@
     <ul class="navbar-nav d-none d-lg-flex">
       <% shortcut_links.each do |title, path| %>
         <li class="nav-item">
-          <%= render UI::ActiveLink::Component.new(text: title, path:, html_class: "nav-link", match_controller: true) %>
+          <%= render UI::ActiveLink::Component.new(text: title, path:, html_class: "nav-link", match: :controller) %>
         </li>
       <% end %>
 
