@@ -1,7 +1,10 @@
 module API
   module V3
     class RootV3 < API::Base
+      format :json
       version "v3"
+      default_error_formatter :json
+      content_type :json, "application/json"
 
       mount API::V3::Organizations
       mount API::V3::Search
@@ -12,7 +15,7 @@ module API
       mount API::V3::SwaggerDoc
 
       route :any, "*path" do
-        raise API::EndpointNotFound, "Unable to find endpoint"
+        raise GrapeErrors::EndpointNotFound, "Unable to find endpoint"
       end
     end
   end

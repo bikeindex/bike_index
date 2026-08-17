@@ -68,59 +68,16 @@ module API
     use GrapeLogging::Middleware::RequestLogger, instrumentation_key: "grape_key",
       include: [GrapeLogging::Loggers::BinxLogger.new,
         GrapeLogging::Loggers::FilterParameters.new]
-    use API::ErrorResponder
+    use GrapeErrors::Responder
     use ::APIAuthorization::OAuth2
 
-    format :json
-    default_error_formatter :json
-    content_type :json, "application/json"
-
-    # API::ErrorResponder handles everything raised below it, which is every endpoint. This
-    # is the net for what it can't reach: non-StandardError, and the logger above it.
+    # The Responder handles everything raised below it, which is every endpoint. This is the
+    # net for what it can't reach: non-StandardError, and the logger above it.
     rescue_from :all do |e|
-      API::Base.respond_to_error(e)
+      GrapeErrors.response_for(e)
     end
 
     mount API::V3::RootV3
     mount API::V2::RootV2
-
-    class << self
-      # Returns a Rack::Response - API::ErrorResponder .finishes it, rescue_from returns it
-      # bare. Anything raised in here escapes as a status-only 500 with no JSON body and no
-      # Honeybadger notify, so every path out answers.
-      def respond_to_error(e)
-        message = API::ErrorResponse.message_for(e)
-        # Rails.logger, since Grape's own logger writes to $stdout and never reaches production.log
-        Rails.logger.error "#{e.class}: #{message}" unless Rails.env.test? # Breaks tests...
-        status_code = API::ErrorResponse.status_for(e)
-        notify_error(e) if API::ErrorResponse.report?(status_code)
-        opts = {error: message}
-        opts[:trace] = e.backtrace&.first(10) unless Rails.env.production?
-        error_response(opts, status_code)
-      rescue => handler_error
-        # Nothing fallible on this path - e.backtrace is what raised for some of the
-        # exceptions that land here.
-        notify_error(handler_error, context: {handling: e.class.to_s})
-        error_response({error: "Internal Server Error"}, 500)
-      end
-
-      private
-
-      # Reporting must never cost the response - notify is the last fallible call before
-      # the fallback returns, and it reads e.message to build the notice.
-      def notify_error(error, **opts)
-        Honeybadger.notify(error, **opts) if Rails.env.production?
-      rescue
-        nil
-      end
-
-      def error_response(opts, status_code)
-        Rack::Response.new(opts.to_json, status_code, {
-          "Content-Type" => "application/json",
-          "Access-Control-Allow-Origin" => "*",
-          "Access-Control-Request-Method" => "*"
-        })
-      end
-    end
   end
 end
