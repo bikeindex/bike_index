@@ -65,15 +65,29 @@ export default class extends Controller {
   }
 
   // A group near the bottom unrolls past the fold, which is no use to whoever opened it.
-  // Measured after ui--collapse animates, and only moved when the rows really don't fit --
-  // the limit is the sidebar's own scroller on a column, the viewport once it's in the flow
+  // Measured after ui--collapse animates the rows in, rather than against a panel that
+  // is still zero-height. Scrolls by exactly what overflows, so the row clicked stays put
+  // where the whole group can fit; only a group taller than the view gives that up to
+  // show its start. The sidebar scrolls as a column and the page does once it's in the flow
   revealGroup (trigger) {
     setTimeout(() => {
       const panel = document.getElementById(trigger.getAttribute('aria-controls'))
-      const limit = Math.min(this.scrollerTarget.getBoundingClientRect().bottom, window.innerHeight)
-      if (panel.getBoundingClientRect().bottom <= limit) return
+      const scroller = this.scrollerTarget
+      const scrolls = scroller.scrollHeight > scroller.clientHeight
+      const view = scroller.getBoundingClientRect()
+      const viewTop = scrolls ? view.top : 0
+      const viewBottom = scrolls ? view.bottom : window.innerHeight
+      const groupTop = trigger.getBoundingClientRect().top
+      const groupBottom = panel.getBoundingClientRect().bottom
 
-      trigger.scrollIntoView({ block: 'start', behavior: 'smooth' })
+      if (groupTop >= viewTop && groupBottom <= viewBottom) return
+
+      const delta = (groupBottom - groupTop > viewBottom - viewTop)
+        ? groupTop - viewTop
+        : groupBottom - viewBottom
+
+      const target = scrolls ? scroller : window
+      target.scrollBy({ top: delta, behavior: 'smooth' })
     }, TRANSITION_MS)
   }
 
