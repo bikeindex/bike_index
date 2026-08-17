@@ -4,7 +4,7 @@
   <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "This is an Organization Message Snippet!")) do %>
     <em class="small d-block">
       This should actually be
-      <%= link_to "edited though the organization!", edit_mail_snippet_path_for(@mail_snippet) %>
+      <%= link_to "edited though the organization!", edit_mail_snippet_path_for(@mail_snippet), class: "twlink-underlined" %>
     </em>
   <% end %>
 <% end %>

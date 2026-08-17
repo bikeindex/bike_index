@@ -108,13 +108,38 @@
 
   /* Guarded so a disabled UI::Button/UI::ButtonLink in link color holds its color.
    * Every other color guards its hover in the utilities; link color's lives here. */
-  .twlink:not(:disabled, [aria-disabled="true"]):hover {
+  .twlink:not(:disabled, [aria-disabled="true"]):hover,
+  .twlink.active,
+  .twlink:not(:disabled, [aria-disabled="true"]):active {
     @apply tw:text-blue-700 tw:underline tw:dark:text-blue-300;
   }
 
   .twlink.active,
   .twlink:not(:disabled, [aria-disabled="true"]):active {
-    @apply tw:text-blue-700 tw:dark:text-blue-300 tw:font-bold tw:underline;
+    @apply tw:font-bold;
+  }
+
+  /* For places where the link should inherit the color of the text - use .twlink-underlined */
+  .twlink-underlined {
+    @apply tw:underline tw:transition-colors;
+  }
+
+  /* currentColor in a `color` declaration resolves to the inherited color, so the
+   * hover deepens whatever the link sits in. Away from black on a dark background,
+   * where deepening would sink it into the background instead */
+  .twlink-underlined:not(:disabled, [aria-disabled="true"]):hover,
+  .twlink-underlined.active,
+  .twlink-underlined:not(:disabled, [aria-disabled="true"]):active {
+    color: color-mix(in oklab, currentColor 75%, black);
+
+    @variant dark {
+      color: color-mix(in oklab, currentColor 75%, white);
+    }
+  }
+
+  .twlink-underlined.active,
+  .twlink-underlined:not(:disabled, [aria-disabled="true"]):active {
+    @apply tw:font-bold;
   }
 
   /* Legacy's `.container` reaches into an alert two ways tailwind can't answer on
@@ -126,11 +151,6 @@
 
   .twalert-body :is(p, ul, ol, dl) {
     @apply tw:m-0;
-  }
-
-  /* Links inherit the alert's own color, so the underline is what marks them as links */
-  .twalert-body .twlink {
-    @apply tw:underline tw:hover:text-blue-800;
   }
 
   .twless-strong {
