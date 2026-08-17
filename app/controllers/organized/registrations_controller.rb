@@ -55,8 +55,10 @@ module Organized
     def new
       # Arriving here is the way back from the embed form, whatever sent them
       session.delete(:old_register_view)
+      # "false" rather than nothing: the member here is registering someone else's vehicle,
+      # so owner_email starts empty (and shows the organization's placeholder)
       @b_param = BikeServices::Register.b_param_for(user: current_user, token_id: session[:register_b_param_token],
-        status: BParam.status_hash_from_params(params)[:status], email: params[:email],
+        status: BParam.status_hash_from_params(params)[:status], email: params[:email].presence || "false",
         origin: "register_flow_organized")
       BikeServices::Register.assign_organization(@b_param, current_organization)
       session[:register_b_param_token] = @b_param.id_token

@@ -273,6 +273,8 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(b_param).to have_attributes(origin: "register_flow_organized",
         creation_organization_id: current_organization.id)
       expect(assigns(:b_param)&.id).to eq b_param.id
+      # The member is registering someone else's vehicle, so it isn't seeded with their email
+      expect(b_param.owner_email).to be_blank
       expect(response.body).to include("organized-left-menu")
       expect(response.body).to include(b_param.id_token)
       expect(response.body).to include(new_organization_bike_path(organization_id: current_organization.to_param))
@@ -291,6 +293,14 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get "#{base_url}/new", params: {status: "stolen"}
         expect(response.status).to eq(200)
         expect(BParam.last.status).to eq "status_stolen"
+      end
+    end
+
+    context "email param" do
+      it "seeds the owner it names" do
+        get "#{base_url}/new", params: {email: "customer@bikeindex.org"}
+        expect(response.status).to eq(200)
+        expect(BParam.last.owner_email).to eq "customer@bikeindex.org"
       end
     end
 
