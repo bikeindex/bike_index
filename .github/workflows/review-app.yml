@@ -62,7 +62,7 @@ jobs:
     # is best-effort, so an app can be live with no label on it (docs/review-apps.md).
     runs-on: ubuntu-latest
     outputs:
-      # Empty for sandbox — the flag every PR-side step below gates on.
+      # Empty for sandbox.
       pr_number: ${{ steps.set.outputs.pr_number }}
       slug:      ${{ steps.set.outputs.slug }}
       head_sha:  ${{ steps.set.outputs.head_sha }}
@@ -161,11 +161,12 @@ jobs:
       # Empty only for destroy — every other action leaves the app serving that URL.
       environment_url: ${{ needs.resolve.outputs.action != 'destroy' && format('https://{0}.review.bikeindex.org', needs.resolve.outputs.slug) || '' }}
 
-  # PR-side follow-ups the generic reusable workflow can't own.
+  # PR-side follow-ups the generic reusable workflow can't own. Every step needs a
+  # PR, so the whole job sits out a sandbox run.
   post:
     name: Post-op PR updates
     needs: [resolve, op]
-    if: ${{ !cancelled() && needs.resolve.outputs.proceed == 'true' }}
+    if: ${{ !cancelled() && needs.resolve.outputs.proceed == 'true' && needs.resolve.outputs.pr_number }}
     runs-on: ubuntu-latest
     steps:
       # The reusable `run` job's environment attaches the deployment to this run's
@@ -177,7 +178,7 @@ jobs:
         uses: actions/github-script@v9
         env:
           HEAD_SHA: ${{ needs.resolve.outputs.head_sha }}
-          DEPLOY_URL: https://pr-${{ needs.resolve.outputs.pr_number }}.review.bikeindex.org
+          DEPLOY_URL: https://${{ needs.resolve.outputs.slug }}.review.bikeindex.org
         with:
           script: |
             const {data: deployment} = await github.rest.repos.createDeployment({
@@ -200,7 +201,7 @@ jobs:
       # A successful op makes the `report` job's failure comment stale. Hide it
       # (minimize as OUTDATED) rather than delete — the record stays on the PR.
       - name: Hide stale failure comment
-        if: needs.resolve.outputs.pr_number && needs.resolve.outputs.action != 'destroy' && needs.op.result == 'success'
+        if: needs.resolve.outputs.action != 'destroy' && needs.op.result == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ needs.resolve.outputs.pr_number }}

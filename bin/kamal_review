@@ -54,8 +54,7 @@ Usage:
   3594   pr-3594   pr-3594.review.bikeindex.org   https://pr-3594.review.bikeindex.org
 
 Passthrough defaults --app to the persistent 'sandbox' app; the lifecycle commands
-require it. sandbox accepts reload_database only — it deploys from its own workflow
-and is never destroyed.
+require it, and only reload_database accepts sandbox.
 
 Examples:
   bin/kamal_review app logs -f                       # sandbox (default)
@@ -71,17 +70,21 @@ Env:  REVIEW_APP_HOST (default host.review.bikeindex.org); secrets via .kamal/se
 USAGE
 }
 
-# Pull the PR number out of any accepted form: drop the scheme, then any path,
-# then the .review.bikeindex.org domain, leaving the host label (pr-<n> or <n>);
-# drop the pr- prefix. Returns non-zero if what's left isn't a number.
-review_app_pr_number() {
+# Reduce any accepted form to its host label (`pr-<n>`, `<n>` or `sandbox`).
+normalize_app_id() {
   local s
   s="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
   s="${s#http://}"
   s="${s#https://}"
   s="${s%%/*}"   # drop any /path
-  s="${s%%.*}"   # drop the .review.bikeindex.org domain
-  s="${s#pr-}"   # drop the pr- prefix
+  printf '%s' "${s%%.*}"   # drop the .review.bikeindex.org domain
+}
+
+# Returns non-zero if the app id isn't a PR.
+review_app_pr_number() {
+  local s
+  s="$(normalize_app_id "$1")"
+  s="${s#pr-}"
   [[ "$s" =~ ^[0-9]+$ ]] || return 1
   printf '%s' "$s"
 }
@@ -106,16 +109,22 @@ export_sandbox_env() {
   export REVIEW_APP_REDIS_DB="0"
 }
 
-# True when the app id refers to sandbox, in any of review_app_pr_number's forms
-# (bare `sandbox`, host, or URL).
-is_sandbox() {
-  local s
-  s="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
-  s="${s#http://}"
-  s="${s#https://}"
-  s="${s%%/*}"   # drop any /path
-  s="${s%%.*}"   # drop the .review.bikeindex.org domain
-  [[ "$s" == "sandbox" ]]
+is_sandbox() { [[ "$(normalize_app_id "$1")" == "sandbox" ]]; }
+
+# Sets pr_number (empty for sandbox), slug and db_prefix, and exports the
+# REVIEW_APP_* env for whichever target `$1` names.
+resolve_app() {
+  if is_sandbox "$1"; then
+    export_sandbox_env
+    pr_number=""
+    slug="sandbox"
+    db_prefix="bike_index_sandbox"
+  else
+    pr_number="$(review_app_pr_number "$1")" || not_a_review_app "$1"
+    export_review_app_env "$pr_number"
+    slug="pr-${pr_number}"
+    db_prefix="bike_index_review_pr_${pr_number}"
+  fi
 }
 
 not_a_review_app() {
@@ -147,14 +156,7 @@ if [[ -z "$mode" ]]; then
       *) kamal_args+=("$1"); shift ;;
     esac
   done
-  if is_sandbox "$app"; then
-    export_sandbox_env
-    slug="sandbox"
-  else
-    pr_number="$(review_app_pr_number "$app")" || not_a_review_app "$app"
-    export_review_app_env "$pr_number"
-    slug="pr-${pr_number}"
-  fi
+  resolve_app "$app"
   echo "==> [${slug} on ${REVIEW_APP_HOST}] kamal ${kamal_args[*]} --config-file ${CONFIG}" >&2
   exec kamal "${kamal_args[@]}" --config-file "$CONFIG"
 fi
@@ -173,18 +175,9 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 [[ -n "$app" ]] || { echo "Error: $mode requires --app <review-app>" >&2; echo >&2; usage >&2; exit 1; }
-if is_sandbox "$app"; then
-  [[ "$mode" == "reload_database" ]] || { echo "Error: sandbox accepts reload_database only, not $mode" >&2; echo >&2; usage >&2; exit 1; }
-  export_sandbox_env
-  pr_number=""   # kamal_accessory keys off this being empty
-  slug="sandbox"
-  db_prefix="bike_index_sandbox"
-else
-  pr_number="$(review_app_pr_number "$app")" || not_a_review_app "$app"
-  export_review_app_env "$pr_number"
-  slug="pr-${pr_number}"
-  db_prefix="bike_index_review_pr_${pr_number}"
-fi
+resolve_app "$app"
+[[ -n "$pr_number" || "$mode" == "reload_database" ]] ||
+  { echo "Error: sandbox accepts reload_database only, not $mode" >&2; echo >&2; usage >&2; exit 1; }
 
 # Role/database/volume names must stay in lockstep with config/deploy.review.yml
 # — destroy drops whatever names are derived here.
@@ -199,14 +192,10 @@ drop_databases_sql="-c 'DROP DATABASE IF EXISTS ${primary_db} WITH (FORCE)' \
 kamal() { command kamal "$@" --config-file "$CONFIG"; }
 
 # The shared-db / shared-redis accessories are emitted for pr-* configs only, so
-# sandbox borrows pr-0's to reach the same shared containers.
-kamal_accessory() {
-  if [[ -n "$pr_number" ]]; then
-    kamal accessory "$@"
-  else
-    (export REVIEW_APP_PR_NUMBER=0; kamal accessory "$@")
-  fi
-}
+# sandbox borrows pr-0's to reach the same shared containers. Not
+# `export_review_app_env 0` — that would move REVIEW_APP_REDIS_DB off the logical
+# DB the flush targets.
+kamal_accessory() { (export REVIEW_APP_PR_NUMBER="${pr_number:-0}"; kamal accessory "$@"); }
 
 review_host_unreachable() {
   echo "Error: can't reach the review host; $slug was left untouched." >&2

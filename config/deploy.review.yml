@@ -193,6 +193,8 @@ builder:
     Emitted for review-app deploys ONLY (pr present): sandbox must never carry
     this block, or a sandbox deploy could reboot/remove the shared infra that
     every PR app depends on. This is the one real fork between the two targets.
+    A sandbox reload_database does need them, so bin/kamal_review's
+    kamal_accessory re-renders with pr=0 for those two commands alone.
     WARNING: do not run `kamal accessory stop/remove` from a review-app deploy —
     it would tear down the shared infra and all in-flight PRs. %>
 <% if pr %>
