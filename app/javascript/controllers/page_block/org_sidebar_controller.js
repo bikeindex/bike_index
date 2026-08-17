@@ -38,13 +38,26 @@ export default class extends Controller {
     this.setMobileOpen(!this.mobileOpen)
   }
 
-  // Collapsed there's nowhere to put a group's children -- ui--collapse animates them
-  // open right after this, so the rail has to be expanded by then
-  expandForGroup () {
-    if (!this.collapsed) return
+  // Collapsed, the rail hides a group's children with a css variant rather than the
+  // class ui--collapse reads, so a group left open before the rail collapsed would
+  // toggle *shut* on the way back out. Opening explicitly is what the reader asked for
+  // by clicking it, so this owns the decision rather than letting a second action race it
+  toggleGroup (event) {
+    const group = this.groupFor(event.currentTarget)
+
+    if (!this.collapsed) {
+      group.toggle()
+      return
+    }
 
     this.override = false
     this.render()
+    group.show()
+  }
+
+  groupFor (trigger) {
+    return this.application.getControllerForElementAndIdentifier(
+      trigger.closest('[data-controller~="ui--collapse"]'), 'ui--collapse')
   }
 
   closeOnEscape () {

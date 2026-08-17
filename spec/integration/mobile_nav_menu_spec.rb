@@ -129,5 +129,41 @@ RSpec.describe "Navbar", :js, type: :system do
 
       expect(page).to have_button("Brakebills Registrations")
     end
+
+    # The rail hides a group's children with a css variant rather than the class
+    # ui--collapse reads, so toggling from the rail used to shut the group it opened
+    context "with a second group to open" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features, short_name: "Brakebills",
+          enabled_feature_slugs: ["impound_bikes"])
+      end
+
+      it "opens the group it was asked for when the collapsed rail expands" do
+        sign_in(user)
+
+        page.current_window.resize_to(1440, 900)
+        visit root_path
+
+        registrations = find("button[aria-controls='org_sidebar_group_registrations']")
+        expect(registrations["aria-expanded"]).to eq "true"
+
+        find("[data-page-block--org-sidebar-target='collapseToggle']").click
+
+        # Clicking the group that was already open has to leave it open, not toggle it shut
+        registrations.click
+
+        expect(page).to have_link("Search Registrations")
+        expect(registrations["aria-expanded"]).to eq "true"
+
+        find("[data-page-block--org-sidebar-target='collapseToggle']").click
+        impounded = find("button[aria-controls='org_sidebar_group_impounded']")
+        expect(impounded["aria-expanded"]).to eq "false"
+
+        impounded.click
+
+        expect(page).to have_link("Search Impounded Vehicles")
+        expect(impounded["aria-expanded"]).to eq "true"
+      end
+    end
   end
 end

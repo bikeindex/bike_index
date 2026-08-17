@@ -158,14 +158,13 @@
             <% active = group_active?(item) %>
 
             <div data-controller="ui--collapse" class="tw:contents">
-              <%# expandForGroup first, so the rail is open by the time the panel animates %>
               <button
                 type="button"
                 class="<%= row_class(active) %>"
                 aria-expanded="<%= open %>"
                 aria-controls="org_sidebar_group_<%= item[:key] %>"
                 data-ui--collapse-target="trigger"
-                data-action="page-block--org-sidebar#expandForGroup ui--collapse#toggle"
+                data-action="page-block--org-sidebar#toggleGroup"
               >
                 <span class="tw:flex tw:flex-none"><%= icon(item[:icon], html_class: "tw:h-[18px] tw:w-[18px]") %></span>
 
