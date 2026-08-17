@@ -1,12 +1,12 @@
-<a
-  href="#"
-  class="nav-link settings-link primary-nav-link-with-submenu"
-  id="setting_submenu"
-  aria-label="<%= translation(".settings_menu") %>"
-  aria-haspopup="true"
-  aria-expanded="false"
-  data-toggle="dropdown"
->
+<%# UI::Button's utilities outrank @layer legacy, so the gear is styled here %>
+
+<%= render UI::Button::Component.new(
+      id: "setting_submenu",
+      color: :link,
+      html_class: "settings-link tw:hidden! tw:navbar:block! tw:px-[15px] tw:py-1.5",
+      aria: {label: translation(".settings_menu"), haspopup: true, expanded: false},
+      data: {action: "click->page-block--navbar#toggleDropdown"}
+    ) do %>
   <svg
     id="settings-icon"
     data-name="Layer 13"
@@ -45,7 +45,7 @@
       transform="translate(-4882.07 -1486.66)"
     />
   </svg>
-</a>
+<% end %>
 
 <ul class="primary-submenu" aria-labelledby="setting_submenu">
   <% items.each do |item| %>
