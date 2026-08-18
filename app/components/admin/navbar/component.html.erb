@@ -7,15 +7,15 @@
     <ul class="navbar-nav d-none d-lg-flex">
       <% shortcut_links.each do |link| %>
         <li class="nav-item">
-          <%# bootstrap's .nav-link.active color, keyed off a class this component doesn't emit %>
           <%= render UI::ActiveLink::Component.new(text: link[:title], path: link[:path],
-                html_class: "nav-link tw:is-active:text-black/90", match: link[:match]) %>
+                html_class: Admin::Navbar::Component::NAV_LINK_CLASS, match: link[:match]) %>
         </li>
       <% end %>
 
       <% if mailer_links.any? %>
         <li class="nav-item">
-          <%= render(UI::Dropdown::Component.new(name: "Mailers", button_class: "nav-link tw:mr-1 tw:cursor-pointer")) do |dropdown| %>
+          <%= render(UI::Dropdown::Component.new(name: "Mailers",
+                button_class: "#{Admin::Navbar::Component::NAV_LINK_CLASS} tw:mr-1 tw:cursor-pointer")) do |dropdown| %>
             <% mailer_links.each do |title, path| %>
               <% dropdown.with_entry_item { link_to title, path } %>
             <% end %>
@@ -24,7 +24,7 @@
       <% end %>
     </ul>
     <% if display_view_all? %>
-      <%= link_to current_nav_link[:path], class: "nav-link text-muted em" do %>
+      <%= link_to current_nav_link[:path], class: "#{Admin::Navbar::Component::VIEW_ALL_LINK_CLASS} text-muted em" do %>
         All
         <div class="d-none d-sm-inline-block d-lg-none d-xl-inline-block">
           <%= view_all_title %>
