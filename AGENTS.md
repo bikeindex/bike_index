@@ -61,6 +61,8 @@ A registration is as often an e-scooter, a stroller or a wheelchair, so **never 
 
 Run `bundle exec rails prepare_translations` after hand-editing a `component.en.yml`; `bin/lint` doesn't normalize YAML.
 
+A spec that renders in another locale — `spec/components/page_block/footer/component_spec.rb` does, in `:nl` — fails on a key the sync-generated `config/locales/translation.*.yml` don't carry yet, since `raise_on_missing_translations` is on in test. Add the key inline to all four; the next sync overwrites them.
+
 ## Subagents
 
 When a command fans out to subagents — `/simplify`, `/code-review`, or an ad-hoc fan-out — pick the model by how much of the *search* the agent has to invent, not by how simple the task sounds:
