@@ -216,21 +216,20 @@ $mobile-nav-height: 4 * $vertical-height;
           text-decoration: none;
         }
 
-        &:active {
-        }
-
+        // The two states the is-active variant folds together stay apart here:
+        // :active is the press, [data-active] the open menu, and they rotate differently
         &:active,
-        &.active {
+        &[data-active="true"] {
           color: #fff;
           text-decoration: none;
         }
 
         &:active,
-        &.active:active {
+        &[data-active="true"]:active {
           transform: rotate(45deg);
         }
 
-        &.active {
+        &[data-active="true"] {
           transform: rotate(90deg);
         }
       }
