@@ -119,9 +119,11 @@
     @apply tw:font-bold;
   }
 
-  /* For places where the link should inherit the color of the text - use .twlink-underlined */
+  /* For places where the link should inherit the color of the text - use .twlink-underlined.
+   * text-inherit rather than nothing: legacy's `a { color: #3498db }` would otherwise
+   * supply the color, since this layer only beats it where it declares the property */
   .twlink-underlined {
-    @apply tw:underline tw:transition-colors;
+    @apply tw:text-inherit tw:underline tw:transition-colors;
   }
 
   /* currentColor in a `color` declaration resolves to the inherited color, so the
