@@ -44,9 +44,7 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
   end
 
   context "with a selection already made" do
-    # Typing used to insert wherever the click left the caret, mangling the display into a
-    # query matching no option -- which cleared the hidden field, and the selection with it
-    it "replaces the display rather than typing into the middle of it" do
+    it "keeps the selection under an arrow key, and replaces it whole when typing" do
       visit "/rails/view_components/ui/forms/combobox/component/default"
 
       expect(page).to have_css('[aria-expanded="false"]', wait: 10)
@@ -56,31 +54,21 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
 
       expect(find_field("Cycle type").value).to eq "Unicycle"
 
-      # Clicking in selects the display, so the first keystroke replaces it
+      # ArrowUp doesn't open a closed listbox, so it used to pick out of an empty one and
+      # throw -- past the deselect that starts a selection, which had emptied the field
+      find_field("Cycle type").send_keys(:up)
+
+      expect(find_field("Cycle type").value).to eq "Unicycle"
+      expect(find("input[name='cycle_type']", visible: :hidden).value).to eq "Unicycle"
+
+      # Typing used to insert wherever the click left the caret, mangling the display into
+      # a query matching no option -- which cleared the hidden field. Clicking in selects
+      # the display now, so the first keystroke replaces it.
       find_field("Cycle type").click
       send_keys("tand")
 
       expect(find_field("Cycle type").value).to eq "Tandem"
       expect(find("input[name='cycle_type']", visible: :hidden).value).to eq "Tandem"
-    end
-
-    # ArrowUp doesn't open a closed listbox the way ArrowDown does, so it used to pick out
-    # of an empty one -- throwing partway through, with the selection already cleared
-    it "keeps the selection when an arrow key has nothing to move through" do
-      visit "/rails/view_components/ui/forms/combobox/component/default"
-
-      expect(page).to have_css('[aria-expanded="false"]', wait: 10)
-
-      find_field("Cycle type").click
-      find('[role="option"]', text: "Unicycle", exact_text: true).click
-
-      expect(page).to have_css('[aria-expanded="false"]')
-
-      # Focuses without clicking, the way tabbing in does -- a click would reopen it
-      find_field("Cycle type").send_keys(:up)
-
-      expect(find_field("Cycle type").value).to eq "Unicycle"
-      expect(find("input[name='cycle_type']", visible: :hidden).value).to eq "Unicycle"
     end
   end
 

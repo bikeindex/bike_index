@@ -22,9 +22,8 @@ HwComboboxController.prototype.navigate = function (event) {
   navigate.call(this, event)
 }
 
-// The arrow keys pick an option by index, and the gem's wrap-around hands back `undefined`
-// for an empty list -- so ArrowUp on a closed combobox (only ArrowDown opens one first)
-// throws, after the deselect every selection begins with has blanked the field.
+// ArrowUp doesn't open a closed combobox the way ArrowDown does, so it picks out of a
+// hidden listbox -- and the gem's wrap-around hands back `undefined` for an empty list.
 const selectIndex = HwComboboxController.prototype._selectIndex
 HwComboboxController.prototype._selectIndex = function (index) {
   if (this._visibleOptionElements.length) selectIndex.call(this, index)
