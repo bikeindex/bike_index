@@ -18,11 +18,9 @@ module PageBlock
             {type: :divider, item_class: "d-lg-none"},
             *account_items,
             {label: translation(".help"), path: help_path},
-            # Because of caching, this needs to be set to be active with JS (welcome/index.coffee)
-            {label: translation(".stolen_bike"), path: get_your_stolen_bike_back_path, active: false,
-             html_options: {id: "getStolenBackLink"}},
+            {label: translation(".stolen_bike"), path: get_your_stolen_bike_back_path},
             {label: translation(".donate"), path: why_donate_path},
-            {label: translation(".blog"), path: news_index_path, active: :match_controller},
+            {label: translation(".blog"), path: news_index_path, match: :controller},
             marketplace_item("d-lg-block"),
             search_item("d-none d-lg-block")]
         end
@@ -31,12 +29,12 @@ module PageBlock
         # route is what matches, not the stolenness this happens to link to
         def search_item(item_class)
           {label: translation(".search"), path: helpers.default_bike_search_path,
-           active: :controller_action, item_class:}
+           match: :controller_action, item_class:}
         end
 
         def marketplace_item(item_class)
           {label: translation(".marketplace"), path: search_marketplace_path,
-           active: :controller_action, item_class:}
+           match: :controller_action, item_class:}
         end
 
         def account_items
