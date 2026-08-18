@@ -149,8 +149,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
     expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
 
-    expect(page).to have_css(".organized-access-panel")
-    expect(page).to have_content(/#{organization.name}\s+Access Panel/i)
+    expect(page).to have_css(".organized-access-panel", text: /Access Panel/i)
+    # Scoped to the panel: unscoped, this matched the navbar's organization name against
+    # the panel's heading, whose own organization is hidden below md
+    expect(page).to have_css(".organized-access-panel", text: organization.name)
 
     # Go back
     page.go_back
