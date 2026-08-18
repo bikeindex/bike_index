@@ -5,13 +5,9 @@ module PageBlock
     module PrimaryMenu
       # The navbar's main menu, rendered from a manifest of items rather than repeated markup
       class Component < ApplicationComponent
-        def initialize(current_user:, current_user_or_unconfirmed_user:, controller_namespace:,
-          controller_name:, action_name:)
+        def initialize(current_user:, current_user_or_unconfirmed_user:)
           @current_user = current_user
           @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user
-          @controller_namespace = controller_namespace
-          @controller_name = controller_name
-          @action_name = action_name
         end
 
         private
@@ -31,14 +27,16 @@ module PageBlock
             search_item("d-none d-lg-block")]
         end
 
+        # Active anywhere in the registration search — any stolenness, a query, page 2 — so the
+        # route is what matches, not the stolenness this happens to link to
         def search_item(item_class)
           {label: translation(".search"), path: helpers.default_bike_search_path,
-           active: search_active?("registrations"), item_class:}
+           active: :controller_action, item_class:}
         end
 
         def marketplace_item(item_class)
           {label: translation(".marketplace"), path: search_marketplace_path,
-           active: search_active?("marketplace"), item_class:}
+           active: :controller_action, item_class:}
         end
 
         def account_items
@@ -51,10 +49,6 @@ module PageBlock
         def settings_menu
           PageBlock::Navbar::SettingsMenu::Component.new(current_user: @current_user,
             current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user)
-        end
-
-        def search_active?(controller_name)
-          @controller_namespace == "search" && @controller_name == controller_name && @action_name == "index"
         end
       end
     end
