@@ -23,7 +23,7 @@ module Sessionable
       flash.now[:error] = translation(:user_is_banned, scope: SIGN_IN_SCOPE)
       redirect_back(fallback_location: new_session_url) && return
     end
-    return if !via_saml && redirect_forced_saml_for(user)
+    return if !via_saml && redirect_forced_saml(user.email)
     sign_in_user(user)
 
     if sign_in_partner.present?
@@ -63,21 +63,11 @@ module Sessionable
 
   private
 
-  # SSO orgs force SSO: hand an SSO-managed email off to the IdP rather than let it sign in
-  # or sign up any other way. Redirecting halts the filter chain, so the guarded action
-  # never runs for a forced-SSO email.
-  def redirect_forced_saml
-    redirect_saml_init(Organization.saml_email_matching(submitted_email))
-  end
-
-  # Redeeming a token submits no email, so those flows match on the user the token resolved
-  def redirect_forced_saml_for(user)
-    return false if user.blank?
-
-    redirect_saml_init(Organization.saml_email_matching(user.email))
-  end
-
-  def redirect_saml_init(organization)
+  # SSO orgs force SSO: hand an SSO-managed email off to the IdP rather than let it sign in or
+  # sign up any other way. As a before_action the redirect halts the chain; called inline it
+  # reports whether it redirected, since a token flow has no email until the token resolves one.
+  def redirect_forced_saml(email = submitted_email)
+    organization = Organization.saml_email_matching(email)
     return false if organization.blank?
 
     redirect_to saml_init_path(org_slug: organization.to_param)

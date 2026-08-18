@@ -201,13 +201,8 @@ RSpec.describe UsersController, type: :request do
   end
 
   describe "confirm" do
-    context "sso organization domain" do
+    context "sso organization domain", :sso_organization do
       let(:user) { FactoryBot.create(:user, email: "student@sso.edu") }
-      let!(:organization) do
-        FactoryBot.create(:organization_with_organization_features,
-          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
-      end
-      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
 
       # The account predates the organization going SSO - create blocks new ones
       it "confirms the account but sends the sign in to the IdP" do
@@ -352,13 +347,8 @@ RSpec.describe UsersController, type: :request do
       user.reload
       expect(user.token_for_password_reset).to be_present
     end
-    context "sso organization domain" do
+    context "sso organization domain", :sso_organization do
       let(:user) { FactoryBot.create(:user_confirmed, email: "student@sso.edu") }
-      let!(:organization) do
-        FactoryBot.create(:organization_with_organization_features,
-          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
-      end
-      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
 
       it "hands the reset off to the IdP rather than minting a token" do
         expect {
@@ -526,17 +516,12 @@ RSpec.describe UsersController, type: :request do
       jar = ActionDispatch::Cookies::CookieJar.build(request, cookies.to_hash)
       expect(jar.signed["auth"]).to eq([user.id, user.auth_token])
     end
-    context "sso organization domain" do
+    context "sso organization domain", :sso_organization do
       let(:user) do
         FactoryBot.create(:user_confirmed, email: "student@sso.edu",
           password: og_password, password_confirmation: og_password)
       end
       let(:og_password) { "old-password-4bf03ab1" }
-      let!(:organization) do
-        FactoryBot.create(:organization_with_organization_features,
-          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
-      end
-      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
 
       # The token predates the organization going SSO - issuance is blocked, redemption catches the rest
       it "neither changes the password nor signs in" do

@@ -144,7 +144,17 @@ RSpec.shared_context "saml_env" do
   end
 end
 
+# An organization that forces SSO for sso.edu, for any example tagged `:sso_organization`.
+RSpec.shared_context "sso_organization" do
+  let!(:organization) do
+    FactoryBot.create(:organization_with_organization_features,
+      enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
+  end
+  let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+end
+
 RSpec.configure do |config|
   config.include SamlHelpers, type: :request
   config.include_context "saml_env", :saml_env
+  config.include_context "sso_organization", :sso_organization
 end

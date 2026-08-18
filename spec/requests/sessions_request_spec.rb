@@ -315,15 +315,9 @@ RSpec.describe SessionsController, type: :request do
       expect(superadmin.reload.magic_link_token).to be_nil
     end
 
-    context "sso organization email" do
+    context "sso organization email", :sso_organization do
       let(:user) { FactoryBot.create(:user_confirmed, email: "student@sso.edu") }
-      let!(:organization) do
-        FactoryBot.create(:organization_with_organization_features,
-          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
-      end
-      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
 
-      # The link predates the organization going SSO - create_magic_link blocks new ones
       it "hands a link minted before SSO off to the IdP" do
         post "/session/sign_in_with_magic_link", params: {token: user.refreshed_magic_link_token}
         expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))

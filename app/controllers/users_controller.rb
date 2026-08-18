@@ -2,8 +2,9 @@ class UsersController < ApplicationController
   include Sessionable
 
   before_action :skip_if_signed_in, only: %i[new]
-  # An SSO org owns its domain's accounts, so signing up is the IdP's job too — otherwise
-  # the sign-in guard is bypassed by whatever link or bookmark lands on the signup form.
+  # An SSO org owns its domain's accounts, so signing up and asking for a password reset are
+  # the IdP's job too — otherwise the sign-in guard is bypassed by whatever link or bookmark
+  # lands on one of the other forms.
   before_action :redirect_forced_saml, only: %i[new create send_password_reset_email]
   before_action :find_user_from_token_for_password_reset!, only: %i[update_password_form_with_reset_token update_password_with_reset_token]
   # RFC 8058 one-click POSTs arrive from the mail provider's servers, with no session or token
@@ -222,7 +223,7 @@ class UsersController < ApplicationController
     return @user = current_user if @token.blank? && current_user.present?
 
     @user = User.find_for_auth_token("token_for_password_reset", @token)
-    return redirect_forced_saml_for(@user) if @user.present? && !@user.auth_token_expired?("token_for_password_reset")
+    return redirect_forced_saml(@user.email) if @user.present? && !@user.auth_token_expired?("token_for_password_reset")
 
     remove_session
     flash[:error] = @user.blank? ? translation(:does_not_match_token) : translation(:token_expired)
