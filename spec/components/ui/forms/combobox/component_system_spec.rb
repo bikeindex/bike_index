@@ -63,6 +63,25 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
       expect(find_field("Cycle type").value).to eq "Tandem"
       expect(find("input[name='cycle_type']", visible: :hidden).value).to eq "Tandem"
     end
+
+    # ArrowUp doesn't open a closed listbox the way ArrowDown does, so it used to pick out
+    # of an empty one -- throwing partway through, with the selection already cleared
+    it "keeps the selection when an arrow key has nothing to move through" do
+      visit "/rails/view_components/ui/forms/combobox/component/default"
+
+      expect(page).to have_css('[aria-expanded="false"]', wait: 10)
+
+      find_field("Cycle type").click
+      find('[role="option"]', text: "Unicycle", exact_text: true).click
+
+      expect(page).to have_css('[aria-expanded="false"]')
+
+      # Focuses without clicking, the way tabbing in does -- a click would reopen it
+      find_field("Cycle type").send_keys(:up)
+
+      expect(find_field("Cycle type").value).to eq "Unicycle"
+      expect(find("input[name='cycle_type']", visible: :hidden).value).to eq "Unicycle"
+    end
   end
 
   context "inside a form" do

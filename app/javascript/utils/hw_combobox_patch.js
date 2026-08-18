@@ -22,6 +22,14 @@ HwComboboxController.prototype.navigate = function (event) {
   navigate.call(this, event)
 }
 
+// The arrow keys pick an option by index, and the gem's wrap-around hands back `undefined`
+// for an empty list -- so ArrowUp on a closed combobox (only ArrowDown opens one first)
+// throws, after the deselect every selection begins with has blanked the field.
+const selectIndex = HwComboboxController.prototype._selectIndex
+HwComboboxController.prototype._selectIndex = function (index) {
+  if (this._visibleOptionElements.length) selectIndex.call(this, index)
+}
+
 // A combobox holding a selection shows its display text, and the caret lands wherever
 // the click did -- so typing inserts into the middle, matches no option, and the gem
 // clears the hidden field along with the selection the user had
