@@ -263,7 +263,9 @@ The reason is the real one — ruby-saml's validation errors are passed through,
   submitted email, so it cannot fire on paths that authenticate by redeeming a token.
   `send_password_reset_email` is unguarded, so a user on an SSO domain can request a reset
   and end up with a working password and a session, never meeting the IdP — an MFA bypass
-  where the IdP enforces one. Magic links minted pre-SSO also work until they expire (2h).
+  where the IdP enforces one, and the exposure is open-ended because a fresh token can be
+  minted at any time. Magic links minted pre-SSO also work, but only for `AUTH_TOKEN_EXPIRY`
+  (10 minutes).
   These grant an account and session, not organization access. Fix is a follow-up.
 - **Nothing deprovisions.** Removing someone in the IdP stops them signing in again; it does not
   remove a role they already hold.
