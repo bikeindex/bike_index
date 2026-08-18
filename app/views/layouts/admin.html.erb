@@ -38,7 +38,7 @@
   <% admin_body_class = "vendor-signup-page" if current_page?(:vendor_signup) %>
   <% admin_body_class = "news-page" if controller_name == "news" %>
 
-  <%= body_tag(html_class: admin_body_class || body_class) do %>
+  <%= body_tag(html_class: admin_body_class) do %>
     <%= render(PageBlock::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
 
     <%= render(Admin::Navbar::Component.new(current_user:)) %>

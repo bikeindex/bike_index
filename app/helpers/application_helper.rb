@@ -8,7 +8,7 @@ module ApplicationHelper
   # goes current. The route isn't page_id, which controllers override to borrow another page's
   # styles.
   def body_tag(html_class: nil, **html_options, &block)
-    tag.body(id: page_id, class: html_class, **html_options,
+    tag.body(id: page_id, class: html_class.presence || body_class, **html_options,
       data: {page_route: "#{controller_path}##{action_name}"}, &block)
   end
 
@@ -40,22 +40,6 @@ module ApplicationHelper
       action_name:,
       force_landing_page_render: @force_landing_page_render
     ) == :organized
-  end
-
-  def body_class
-    if controller_name == "landing_pages" || @force_landing_page_render
-      if %w[for_schools for_law_enforcement].include?(action_name)
-        "kelsey_landing-page-body"
-      else
-        "landing-page-body"
-      end
-    elsif controller_name == "info" && action_name == "resources"
-      "kelsey_landing-page-body"
-    elsif main_content_organized?
-      "organized-body"
-    elsif controller_name == "registrations" && action_name == "show"
-      "tw:bg-[#f7f6fb]"
-    end
   end
 
   # Deprecated - UI::Forms::NestedFields::Component replaces this. Every set this adds shares one
@@ -143,5 +127,23 @@ module ApplicationHelper
       data
     end
     CodeRay.scan(JSON.pretty_generate(cleaned_data), :json).div.html_safe
+  end
+
+  private
+
+  def body_class
+    if controller_name == "landing_pages" || @force_landing_page_render
+      if %w[for_schools for_law_enforcement].include?(action_name)
+        "kelsey_landing-page-body"
+      else
+        "landing-page-body"
+      end
+    elsif controller_name == "info" && action_name == "resources"
+      "kelsey_landing-page-body"
+    elsif main_content_organized?
+      "organized-body"
+    elsif controller_name == "registrations" && action_name == "show"
+      "tw:bg-[#f7f6fb]"
+    end
   end
 end
