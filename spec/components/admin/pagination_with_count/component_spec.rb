@@ -8,6 +8,25 @@ RSpec.describe Admin::PaginationWithCount::Component, type: :component do
   let(:options) { {collection:, index: ComponentStates::IndexState.new} }
   let(:collection) { Bike.limit(10) }
 
+  describe "time range" do
+    let(:options) do
+      {collection:, viewing: "Bikes",
+       index: ComponentStates::IndexState.new(period: "week", time_range: (Time.current - 1.week)..Time.current)}
+    end
+
+    it "renders the humanized range" do
+      expect(component.text).to include("in the past week")
+    end
+
+    context "with period all" do
+      let(:options) { super().merge(index: ComponentStates::IndexState.new(period: "all", time_range: (Time.current - 1.week)..Time.current)) }
+
+      it "renders no range" do
+        expect(component.text).to_not include("in the past")
+      end
+    end
+  end
+
   describe "count display" do
     context "with explicit count and skip_pagination" do
       let(:options) { {collection:, count: 42, skip_pagination: true, index: ComponentStates::IndexState.new} }

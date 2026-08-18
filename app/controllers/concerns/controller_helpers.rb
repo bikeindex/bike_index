@@ -14,7 +14,7 @@ module ControllerHelpers
       :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
       :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
-      :render_donation_request?, :sort_state
+      :render_donation_request?, :sort_state, :admin_index_state
     before_action :enable_rack_profiler
 
     before_action do
@@ -52,11 +52,22 @@ module ControllerHelpers
     currency_from_params || Currency.default
   end
 
-  # The three sortable-table values as one, so a table takes one argument rather than three.
-  # Memoized because an admin index reads it twice: once here, once inside admin_index_state
   def sort_state
     @sort_state ||= ComponentStates::SortState.new(search_params: helpers.sortable_search_params,
       sort: helpers.sort_column, direction: helpers.sort_direction)
+  end
+
+  # Built lazily rather than in a before_action, because the subjects below are set by the action
+  def admin_index_state
+    @admin_index_state ||= ComponentStates::IndexState.new(
+      params:, sort_state:,
+      render_chart: @render_chart, render_deleted: @render_deleted,
+      pagy: @pagy, per_page: @per_page, time_range: @time_range,
+      period: @period, start_time: @start_time, end_time: @end_time,
+      time_range_column: @time_range_column, current_organization:,
+      user_subject: @user_subject, bike: @bike,
+      marketplace_listing: @marketplace_listing, primary_activity: @primary_activity
+    )
   end
 
   def current_country_id

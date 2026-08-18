@@ -13,17 +13,6 @@ module Oauth
     before_action :ensure_app_owner!, except: %i[index new create]
     before_action :set_period, only: %i[index]
 
-    helper_method :admin_index_state
-
-    # The superuser branch of #index renders the admin skeleton, which takes this whole
-    def admin_index_state
-      @admin_index_state ||= ComponentStates::IndexState.new(
-        params:, sort_state:, render_chart: @render_chart,
-        pagy: @pagy, per_page: @per_page, time_range: @time_range,
-        period: @period, start_time: @start_time, end_time: @end_time, time_range_column: @time_range_column
-      )
-    end
-
     def index
       if Binxtils::InputNormalizer.boolean(params[:search_all]) && current_user.superuser?
         @max_per_page = 500

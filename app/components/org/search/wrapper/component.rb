@@ -15,7 +15,6 @@ module Org
           current_user: nil,
           interpreted_params: {},
           sort_state: ComponentStates::SortState.new,
-          sort: nil,
           search_stickers: nil,
           search_address: nil,
           search_status: "all",

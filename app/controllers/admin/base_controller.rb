@@ -6,20 +6,6 @@ module Admin
       stolen with_owner abandoned impounded unregistered_parking_notification
     ].freeze
 
-    helper_method :admin_index_state
-
-    # Built lazily rather than in a before_action, because the subjects below are set by the action
-    def admin_index_state
-      @admin_index_state ||= ComponentStates::IndexState.new(
-        params:, sort_state:,
-        render_chart: @render_chart, render_deleted: @render_deleted,
-        pagy: @pagy, per_page: @per_page, time_range: @time_range,
-        period: @period, start_time: @start_time, end_time: @end_time, time_range_column: @time_range_column,
-        current_organization:, user_subject: @user_subject, bike: @bike,
-        marketplace_listing: @marketplace_listing, primary_activity: @primary_activity
-      )
-    end
-
     # Permit viewing deleted organizations
     def current_organization
       return @current_organization if defined?(@current_organization)

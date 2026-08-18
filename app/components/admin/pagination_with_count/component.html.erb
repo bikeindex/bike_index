@@ -12,7 +12,7 @@
               <strong><%= humanized_time_range_column_display %></strong>
             <% end %>
 
-            <%= humanized_time_range(@index.time_range) %>
+            <%= humanized_time_range(@index.time_range, period: @index.period) %>
           </em>
         <% elsif show_today_count? %>
           <em class="less-strong">
