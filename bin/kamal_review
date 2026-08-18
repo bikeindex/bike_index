@@ -19,7 +19,7 @@
 # shared-redis accessories live only in the pr-* config, not sandbox's.
 #   bin/kamal_review accessory reboot db --app 0
 #
-# deploy/destroy/reload_database require an explicit --app and run the per-PR lifecycle:
+# deploy/destroy/reload_database require an explicit --app and run the lifecycle:
 #   deploy  — kamal deploy --version <tag> --skip-push (tag via --version or IMAGE_TAG)
 #   destroy — purge the PR's ActiveStorage objects from the shared R2 bucket, kamal
 #             app remove, drop the per-PR databases + role, flush its redis db
@@ -27,6 +27,7 @@
 #   reload_database — reset the app's data in place (containers, image and role are
 #             left alone): purge its R2 objects, flush its redis db, drop both
 #             databases, then db:prepare (create, load schema, seed) in the app
+# deploy and destroy are per-PR; reload_database also takes `--app sandbox`.
 # deploy is idempotent — same path on first and subsequent deploys;
 # bin/docker-entrypoint creates the per-PR Postgres role on first boot and
 # db:prepare handles schema/seed-or-migrate.
@@ -52,7 +53,8 @@ Usage:
 <review-app> is a PR, in any of these equivalent forms:
   3594   pr-3594   pr-3594.review.bikeindex.org   https://pr-3594.review.bikeindex.org
 
-Passthrough defaults --app to the persistent 'sandbox' app; the lifecycle commands require it.
+Passthrough defaults --app to the persistent 'sandbox' app; the lifecycle commands
+require it, and only reload_database accepts sandbox.
 
 Examples:
   bin/kamal_review app logs -f                       # sandbox (default)
@@ -62,22 +64,27 @@ Examples:
   bin/kamal_review deploy  --app 3594 --version pr-3594-abc123
   bin/kamal_review destroy --app 3594
   bin/kamal_review reload_database --app 3594
+  bin/kamal_review reload_database --app sandbox
 
 Env:  REVIEW_APP_HOST (default host.review.bikeindex.org); secrets via .kamal/secrets.
 USAGE
 }
 
-# Pull the PR number out of any accepted form: drop the scheme, then any path,
-# then the .review.bikeindex.org domain, leaving the host label (pr-<n> or <n>);
-# drop the pr- prefix. Returns non-zero if what's left isn't a number.
-review_app_pr_number() {
+# Reduce any accepted form to its host label (`pr-<n>`, `<n>` or `sandbox`).
+normalize_app_id() {
   local s
   s="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
   s="${s#http://}"
   s="${s#https://}"
   s="${s%%/*}"   # drop any /path
-  s="${s%%.*}"   # drop the .review.bikeindex.org domain
-  s="${s#pr-}"   # drop the pr- prefix
+  printf '%s' "${s%%.*}"   # drop the .review.bikeindex.org domain
+}
+
+# Returns non-zero if the app id isn't a PR.
+review_app_pr_number() {
+  local s
+  s="$(normalize_app_id "$1")"
+  s="${s#pr-}"
   [[ "$s" =~ ^[0-9]+$ ]] || return 1
   printf '%s' "$s"
 }
@@ -102,16 +109,22 @@ export_sandbox_env() {
   export REVIEW_APP_REDIS_DB="0"
 }
 
-# True when the app id refers to sandbox, in any of review_app_pr_number's forms
-# (bare `sandbox`, host, or URL).
-is_sandbox() {
-  local s
-  s="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
-  s="${s#http://}"
-  s="${s#https://}"
-  s="${s%%/*}"   # drop any /path
-  s="${s%%.*}"   # drop the .review.bikeindex.org domain
-  [[ "$s" == "sandbox" ]]
+is_sandbox() { [[ "$(normalize_app_id "$1")" == "sandbox" ]]; }
+
+# Sets pr_number (empty for sandbox), slug and db_prefix, and exports the
+# REVIEW_APP_* env for whichever target `$1` names.
+resolve_app() {
+  if is_sandbox "$1"; then
+    export_sandbox_env
+    pr_number=""
+    slug="sandbox"
+    db_prefix="bike_index_sandbox"
+  else
+    pr_number="$(review_app_pr_number "$1")" || not_a_review_app "$1"
+    export_review_app_env "$pr_number"
+    slug="pr-${pr_number}"
+    db_prefix="bike_index_review_pr_${pr_number}"
+  fi
 }
 
 not_a_review_app() {
@@ -143,14 +156,7 @@ if [[ -z "$mode" ]]; then
       *) kamal_args+=("$1"); shift ;;
     esac
   done
-  if is_sandbox "$app"; then
-    export_sandbox_env
-    slug="sandbox"
-  else
-    pr_number="$(review_app_pr_number "$app")" || not_a_review_app "$app"
-    export_review_app_env "$pr_number"
-    slug="pr-${pr_number}"
-  fi
+  resolve_app "$app"
   echo "==> [${slug} on ${REVIEW_APP_HOST}] kamal ${kamal_args[*]} --config-file ${CONFIG}" >&2
   exec kamal "${kamal_args[@]}" --config-file "$CONFIG"
 fi
@@ -169,21 +175,27 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 [[ -n "$app" ]] || { echo "Error: $mode requires --app <review-app>" >&2; echo >&2; usage >&2; exit 1; }
-pr_number="$(review_app_pr_number "$app")" || not_a_review_app "$app"
-export_review_app_env "$pr_number"
+resolve_app "$app"
+[[ -n "$pr_number" || "$mode" == "reload_database" ]] ||
+  { echo "Error: sandbox accepts reload_database only, not $mode" >&2; echo >&2; usage >&2; exit 1; }
 
 # Role/database/volume names must stay in lockstep with config/deploy.review.yml
 # — destroy drops whatever names are derived here.
-slug="pr-${pr_number}"
 appname="bike-index-${slug}"
-role="bike_index_pr_${pr_number}"
-primary_db="bike_index_review_pr_${pr_number}_primary"
-analytics_db="bike_index_review_pr_${pr_number}_analytics"
+role="bike_index_${slug//-/_}"
+primary_db="${db_prefix}_primary"
+analytics_db="${db_prefix}_analytics"
 # FORCE terminates the connections the running app holds open.
 drop_databases_sql="-c 'DROP DATABASE IF EXISTS ${primary_db} WITH (FORCE)' \
   -c 'DROP DATABASE IF EXISTS ${analytics_db} WITH (FORCE)'"
 
 kamal() { command kamal "$@" --config-file "$CONFIG"; }
+
+# The shared-db / shared-redis accessories are emitted for pr-* configs only, so
+# sandbox borrows pr-0's to reach the same shared containers. Not
+# `export_review_app_env 0` — that would move REVIEW_APP_REDIS_DB off the logical
+# DB the flush targets.
+kamal_accessory() { (export REVIEW_APP_PR_NUMBER="${pr_number:-0}"; kamal accessory "$@"); }
 
 review_host_unreachable() {
   echo "Error: can't reach the review host; $slug was left untouched." >&2
@@ -211,17 +223,17 @@ flush_redis_db() {
     echo "==> Skipping the redis flush: logical DB $REVIEW_APP_REDIS_DB is still in use by$1"
   else
     echo "==> Flushing redis logical DB $REVIEW_APP_REDIS_DB"
-    kamal accessory exec redis --reuse "redis-cli -n ${REVIEW_APP_REDIS_DB} FLUSHDB" || true
+    kamal_accessory exec redis --reuse "redis-cli -n ${REVIEW_APP_REDIS_DB} FLUSHDB" || true
   fi
 }
 
-# The PR's ActiveStorage blobs live in the shared R2 dev bucket (cloudflare_dev) at
-# the bucket root with random keys — no per-PR prefix to drop — so delete them
-# through the running app, whose database lists exactly this PR's blobs (keys are
+# Every app's ActiveStorage blobs live in the shared R2 dev bucket (cloudflare_dev)
+# at the bucket root with random keys — no per-app prefix to drop — so delete them
+# through the running app, whose database lists exactly its own blobs (keys are
 # globally unique, so no other app's objects are touched). Best-effort: a broken or
 # already-gone app just leaves the blobs.
 purge_r2_objects() {
-  echo "==> Purging this PR's ActiveStorage objects from R2"
+  echo "==> Purging ${slug}'s ActiveStorage objects from R2"
   kamal app exec --reuse --roles web \
     "bin/rails runner 'ActiveStorage::Blob.find_each { |blob| blob.service.delete(blob.key) }'" || true
 }
@@ -266,7 +278,7 @@ case "$mode" in
     # One SSH round-trip, ordered so the databases drop before the role that owns
     # them. Best-effort (|| true) with no ON_ERROR_STOP, so a failed DROP (e.g. a
     # db that was never created) doesn't skip the rest.
-    kamal accessory exec db --reuse \
+    kamal_accessory exec db --reuse \
       "psql -U postgres -d postgres $drop_databases_sql \
         -c 'DROP ROLE IF EXISTS ${role}'" || true
 
@@ -296,7 +308,7 @@ case "$mode" in
     # Strict, unlike destroy's drop — a half-dropped database must not be reported
     # as a reload. Rails reconnects the connections FORCE terminates.
     echo "==> Dropping databases ($primary_db, $analytics_db)"
-    kamal accessory exec db --reuse \
+    kamal_accessory exec db --reuse \
       "psql -U postgres -d postgres -v ON_ERROR_STOP=1 $drop_databases_sql"
 
     # The task bin/docker-entrypoint runs at boot; it seeds because the databases

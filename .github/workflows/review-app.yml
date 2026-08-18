@@ -18,12 +18,17 @@ name: Review App
 #
 # Fork PRs never auto-deploy (their pushes don't run ci.yml in this repo); a
 # maintainer reviews the diff, then deploys via workflow_dispatch.
+#
+# `pr_number: sandbox` targets the persistent sandbox app instead of a PR, and is
+# accepted for reload_database only — sandbox deploys from sandbox.yml and is never
+# destroyed. With no PR, everything PR-side here (labels, deployment link, failure
+# comment) is skipped, so a sandbox failure surfaces only in the run itself.
 
 on:
   workflow_dispatch:
     inputs:
       pr_number:
-        description: "Pull request number"
+        description: "Pull request number, or 'sandbox' (reload_database only)"
         required: true
         type: string
       action:
@@ -57,7 +62,9 @@ jobs:
     # is best-effort, so an app can be live with no label on it (docs/review-apps.md).
     runs-on: ubuntu-latest
     outputs:
+      # Empty for sandbox.
       pr_number: ${{ steps.set.outputs.pr_number }}
+      slug:      ${{ steps.set.outputs.slug }}
       head_sha:  ${{ steps.set.outputs.head_sha }}
       action:    ${{ steps.set.outputs.action }}
       proceed:   ${{ steps.set.outputs.proceed }}
@@ -79,9 +86,19 @@ jobs:
           if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
             pr="$INPUT_PR"
             action="$INPUT_ACTION"
-            head_sha=$(gh pr view "$pr" --repo "$REPO" --json headRefOid -q .headRefOid)
-            title=$(gh pr view "$pr" --repo "$REPO" --json title -q .title)
             proceed=true
+            if [[ "$pr" == "sandbox" ]]; then
+              if [[ "$action" != "reload_database" ]]; then
+                echo "::error::sandbox accepts reload_database only; deploy runs from sandbox.yml and it is never destroyed."
+                exit 1
+              fi
+              pr=""
+              head_sha=""
+              title=""
+            else
+              head_sha=$(gh pr view "$pr" --repo "$REPO" --json headRefOid -q .headRefOid)
+              title=$(gh pr view "$pr" --repo "$REPO" --json title -q .title)
+            fi
           else
             pr="$PR_NUMBER_EVENT"
             head_sha="$PR_HEAD_SHA_EVENT"
@@ -94,7 +111,9 @@ jobs:
               proceed=true
             fi
           fi
+          if [[ -n "$pr" ]]; then slug="pr-$pr"; else slug="sandbox"; fi
           echo "pr_number=$pr"   >> "$GITHUB_OUTPUT"
+          echo "slug=$slug"      >> "$GITHUB_OUTPUT"
           echo "head_sha=$head_sha" >> "$GITHUB_OUTPUT"
           echo "action=$action"  >> "$GITHUB_OUTPUT"
           echo "proceed=$proceed" >> "$GITHUB_OUTPUT"
@@ -122,7 +141,7 @@ jobs:
   # they act on the PR by number and need none of its code, and a PR predating a
   # bin/kamal_review change would otherwise fail on its stale checkout.
   op:
-    name: ${{ needs.resolve.outputs.action }} ${{ needs.resolve.outputs.pr_number }}
+    name: ${{ needs.resolve.outputs.action }} ${{ needs.resolve.outputs.slug }}
     needs: resolve
     if: needs.resolve.outputs.proceed == 'true'
     uses: ./.github/workflows/kamal-deploy.yml
@@ -131,21 +150,23 @@ jobs:
       build: ${{ needs.resolve.outputs.action == 'deploy' }}
       ref: ${{ needs.resolve.outputs.action == 'deploy' && needs.resolve.outputs.head_sha || github.event.repository.default_branch }}
       # Each action is also the bin/kamal_review subcommand of the same name.
-      command: ${{ format('bin/kamal_review {0} --app {1}', needs.resolve.outputs.action, needs.resolve.outputs.pr_number) }}
-      image_tag: pr-${{ needs.resolve.outputs.pr_number }}-${{ needs.resolve.outputs.head_sha }}
-      service_label: bike-index-pr-${{ needs.resolve.outputs.pr_number }}
+      command: ${{ format('bin/kamal_review {0} --app {1}', needs.resolve.outputs.action, needs.resolve.outputs.slug) }}
+      image_tag: ${{ needs.resolve.outputs.slug }}-${{ needs.resolve.outputs.head_sha }}
+      service_label: bike-index-${{ needs.resolve.outputs.slug }}
       sprockets_cache_prefix: review-app-sprockets
       pr_title: ${{ needs.resolve.outputs.pr_title }}
-      concurrency_prefix: review-app-${{ needs.resolve.outputs.pr_number }}
+      # A sandbox reload joins sandbox.yml's group, so it can't run mid-deploy.
+      concurrency_prefix: ${{ needs.resolve.outputs.pr_number && format('review-app-{0}', needs.resolve.outputs.pr_number) || 'sandbox-deploy' }}
       environment_name: review-app
       # Empty only for destroy — every other action leaves the app serving that URL.
-      environment_url: ${{ needs.resolve.outputs.action != 'destroy' && format('https://pr-{0}.review.bikeindex.org', needs.resolve.outputs.pr_number) || '' }}
+      environment_url: ${{ needs.resolve.outputs.action != 'destroy' && format('https://{0}.review.bikeindex.org', needs.resolve.outputs.slug) || '' }}
 
-  # PR-side follow-ups the generic reusable workflow can't own.
+  # PR-side follow-ups the generic reusable workflow can't own. Every step needs a
+  # PR, so the whole job sits out a sandbox run.
   post:
     name: Post-op PR updates
     needs: [resolve, op]
-    if: ${{ !cancelled() && needs.resolve.outputs.proceed == 'true' }}
+    if: ${{ !cancelled() && needs.resolve.outputs.proceed == 'true' && needs.resolve.outputs.pr_number }}
     runs-on: ubuntu-latest
     steps:
       # The reusable `run` job's environment attaches the deployment to this run's
@@ -157,7 +178,7 @@ jobs:
         uses: actions/github-script@v9
         env:
           HEAD_SHA: ${{ needs.resolve.outputs.head_sha }}
-          DEPLOY_URL: https://pr-${{ needs.resolve.outputs.pr_number }}.review.bikeindex.org
+          DEPLOY_URL: https://${{ needs.resolve.outputs.slug }}.review.bikeindex.org
         with:
           script: |
             const {data: deployment} = await github.rest.repos.createDeployment({
@@ -244,7 +265,7 @@ jobs:
     needs: [resolve, op, post]
     if: >-
       !cancelled() && needs.resolve.outputs.proceed == 'true' &&
-      contains(needs.*.result, 'failure')
+      needs.resolve.outputs.pr_number && contains(needs.*.result, 'failure')
     runs-on: ubuntu-latest
     steps:
       - name: Comment failure on PR
