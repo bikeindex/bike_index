@@ -15,10 +15,10 @@ module UI
       # What sortable_search_params? counts as a search, for :unfiltered_path to ask in the
       # browser. period is the exception it makes for itself: only a period other than "all"
       # narrows the page, so the controller reads that one's value rather than its presence.
-      FILTER_PARAMS = (Binxtils::SortableHelper::BASE_SEARCH_KEYS +
+      FILTER_PARAMS = ((Binxtils::SortableHelper::BASE_SEARCH_KEYS +
         Binxtils::SortableHelper.extra_search_keys)
-        .flat_map { |key| key.is_a?(Hash) ? key.keys : [key] }
-        .-(%i[direction sort period per_page]).map(&:to_s).freeze
+        .flat_map { |key| key.is_a?(Hash) ? key.keys : [key] } -
+        %i[direction sort period per_page]).map(&:to_s).freeze
 
       def initialize(path:, text: nil, match: :path, matching_controllers: [], html_class: nil,
         data: {}, **html_options)

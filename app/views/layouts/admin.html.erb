@@ -41,7 +41,7 @@
   <body
     id="<%= page_id %>"
     class="<%= admin_body_class || body_class %>"
-    data-page-route="<%= page_route %>"
+    <%= tag.attributes(body_attributes) %>
   >
     <%= render(PageBlock::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
 

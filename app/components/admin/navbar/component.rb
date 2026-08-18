@@ -20,7 +20,8 @@ module Admin
       private
 
       # Shorter labels and a deliberate order, so the titles don't derive from nav_select_links.
-      # The match does, so a shortcut can't disagree with the picker about which page it's on.
+      # The match does, so a shortcut and the picker agree on how wide the current page is,
+      # even though one resolves in the browser and the other here.
       def shortcut_links
         {"Users" => admin_users_path,
          "Bikes" => admin_bikes_path,

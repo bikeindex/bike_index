@@ -12,7 +12,7 @@ module ControllerHelpers
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
       :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
-      :page_id, :page_route, :implicit_locale, :default_bike_search_path, :bikehub_url, :show_general_alert,
+      :page_id, :body_attributes, :page_route, :implicit_locale, :default_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
       :render_donation_request?
     before_action :enable_rack_profiler
@@ -269,8 +269,15 @@ module ControllerHelpers
     ActiveSupport::HtmlSafeTranslation.translate(key, **kwargs, scope: scope.compact)
   end
 
-  # The browser's half of UI::ActiveLink's controller matching. Not page_id, which two
-  # controllers override to borrow another page's styles.
+  # What the browser reads off the page rather than off an element, for the components whose
+  # markup is a fragment cache shared by every page. A layout that renders one and forgets
+  # these fails silently -- the link just never goes current -- so they travel together.
+  def body_attributes
+    {data: {page_route:, implicit_locale:}}
+  end
+
+  # The browser's half of UI::ActiveLink's controller matching. Not page_id, which controllers
+  # override to borrow another page's styles.
   def page_route
     "#{controller_path}##{action_name}"
   end
@@ -302,6 +309,11 @@ module ControllerHelpers
   def available_locale(locale)
     I18n.available_locales.include?(locale.to_s.to_sym) ? locale : I18n.default_locale
   end
+
+  # Private in ApplicationController before the move here, and only implicit_locale is a
+  # helper_method -- which reaches a private one anyway
+  private :locale_from_request_header, :locale_from_request_params, :requested_locale,
+    :available_locale
 
   # This is overridden in FeedbacksController and InfoController
   def page_id
