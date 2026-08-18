@@ -6,14 +6,16 @@
   }
 
   /* Guarded so a disabled UI::Button/UI::ButtonLink in link color holds its color.
-   * Every other color guards its hover in the utilities; link color's lives here. */
+   * Every other color guards its hover in the utilities; link color's lives here.
+   * Both active markers, as the is-active variant: UI::TableColumn's sort link flags
+   * itself with the class, UI::ActiveLink with the attribute. */
   .twlink:not(:disabled, [aria-disabled="true"]):hover,
-  .twlink.active,
+  .twlink:is(.active, [aria-current]),
   .twlink:not(:disabled, [aria-disabled="true"]):active {
     @apply tw:text-blue-700 tw:underline tw:dark:text-blue-300;
   }
 
-  .twlink.active,
+  .twlink:is(.active, [aria-current]),
   .twlink:not(:disabled, [aria-disabled="true"]):active {
     @apply tw:font-bold;
   }
@@ -30,7 +32,7 @@
    * it into the background. Clamped, so text already at the floor lifts rather than hovering
    * to itself; a browser too old for relative color syntax still gets the thicker underline */
   .twlink-underlined:not(:disabled, [aria-disabled="true"]):hover,
-  .twlink-underlined.active,
+  .twlink-underlined:is(.active, [aria-current]),
   .twlink-underlined:not(:disabled, [aria-disabled="true"]):active {
     @apply tw:decoration-2;
 
@@ -41,7 +43,7 @@
     }
   }
 
-  .twlink-underlined.active,
+  .twlink-underlined:is(.active, [aria-current]),
   .twlink-underlined:not(:disabled, [aria-disabled="true"]):active {
     @apply tw:font-bold;
   }

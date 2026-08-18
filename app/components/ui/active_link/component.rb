@@ -63,7 +63,7 @@ module UI
       end
 
       def call
-        link_to(link_text, @path, **@html_options, class: @html_class.presence, aria: aria_attributes)
+        link_to(link_text, @path, **@html_options.except(:aria), class: @html_class.presence, aria: aria_attributes)
       end
 
       private
@@ -75,9 +75,8 @@ module UI
           raise(ArgumentError, "text: or block content is required")
       end
 
-      # Merged rather than passed beside @html_options, so a caller's aria: keeps its attributes
       def aria_attributes
-        {**@html_options[:aria].to_h, current: ("page" if active?)}
+        @html_options[:aria].to_h.merge(current: ("page" if active?))
       end
 
       def active?

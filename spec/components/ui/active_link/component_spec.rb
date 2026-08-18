@@ -139,7 +139,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
   context "with a class in html_options" do
     let(:options) { {class: "nav-link"} }
 
-    it "raises, since the component builds its own" do
+    it "raises, since html_class is the way in" do
       expect { component }.to raise_error(ArgumentError, /html_class/)
     end
   end
