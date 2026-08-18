@@ -127,7 +127,7 @@ RSpec.describe Org::MenuItems::Component, type: :component do
         render_inline(described_class.new(organization:, current_user:, controller_namespace:,
           controller_name:, action_name:, register_flow_organization_id:))
       }
-      rendered.css("a.nav-link.active").map { |a| a.text.strip }
+      rendered.css("a.nav-link[aria-current]").map { |a| a.text.strip }
     end
 
     it "keeps add-a-bike active, and only in the organization being registered for" do
