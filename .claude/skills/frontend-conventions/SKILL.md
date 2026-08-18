@@ -67,12 +67,6 @@ The same instinct applies beyond buttons: **check `app/components/ui/` and `app/
 
 **A `UI::Forms::*` field renders no label of its own** — render it inside a `UI::Forms::Group` block, passing `form_builder:` when there is one. Holds for `Combobox`, `Select`, and `TextEditor`. A visually hidden label is the exception — `Group`'s label always carries a required/optional suffix, so use a bare `label_tag` with `twlabel tw:sr-only`, the way `Search::Form` does. See `app/components/ui/forms/group/component_preview/` and `app/components/ui/forms/combobox/component_preview/`.
 
-## A radio or checkbox styled through its label is `tw:sr-only`, never `tw:hidden`
-
-**When the visible control is the `<label>` (icon squares, chips, segmented switchers) the input keeps `tw:sr-only`** — `tw:hidden` is `display: none`, which drops it out of the tab order and the a11y tree, so the control can't be reached or changed by keyboard and any `change->` action on it never fires. Pair it with a focus ring on the label, since the input's own is invisible. `UI::Forms::RadioButtonGroup::Component` is the pattern (`tw:sr-only` input, `tw:has-[:focus-visible]:ring-3` on the chip), and `Search::ResultViewSelect` applies it to a label the whole component hangs off.
-
-`expect_axe_clean` won't catch a `tw:hidden` one — axe skips `display: none` subtrees entirely.
-
 ## Typeaheads: always `UI::Forms::Combobox`
 
 **Every typeahead / autocomplete / combobox goes through `UI::Forms::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. See `app/components/ui/forms/combobox/` (component + `component_preview.rb`) and `spec/components/ui/forms/combobox` for how to invoke it.

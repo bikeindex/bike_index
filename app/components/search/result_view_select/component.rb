@@ -7,21 +7,28 @@ module Search
         @selected_result_view = SearchResults::Container::Component.permitted_result_view(result_view)
       end
 
+      def call
+        tag.div(class: "tw:mt-2 tw:flex tw:justify-end") do
+          render(UI::Forms::RadioButtonGroup::Component.new(
+            name: :search_result_view,
+            entries: view_entries,
+            selected: @selected_result_view,
+            # The result component is chosen server-side, so switching layout re-runs the search
+            data: {action: "change->search--form#submit"}
+          ))
+        end
+      end
+
       private
 
-      def view_options
-        [[:thumbnail, "icons/image.svg", translation(".thumbnail_view")],
-          [:bike_box, "icons/list.svg", translation(".bike_box_view")]]
+      def view_entries
+        [[:bike_box, "icons/list.svg", translation(".bike_box_view")],
+          [:thumbnail, "icons/image.svg", translation(".thumbnail_view")]]
+          .map { |value, icon, label| {value:, label: icon_label(icon, label)} }
       end
 
-      def selected?(option)
-        @selected_result_view == option
-      end
-
-      def label_classes
-        "tw:cursor-pointer tw:p-2 tw:rounded tw:block tw:has-checked:bg-gray-100 " \
-        "tw:has-checked:dark:bg-gray-800 tw:border tw:border-gray-200 tw:dark:border-gray-600 " \
-        "tw:has-[:focus-visible]:ring-3 tw:has-[:focus-visible]:ring-purple-500/40"
+      def icon_label(icon, label)
+        helpers.inline_svg_tag(icon, class: "tw:block tw:h-5 tw:w-5") + tag.span(label, class: "tw:sr-only")
       end
     end
   end
