@@ -56,6 +56,17 @@ RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
     end
   end
 
+  # The manifests' vocabulary is an alias layer over UI::ActiveLink's own match names, which
+  # a caller can pass straight through
+  context "with active: :controller, UI::ActiveLink's name for it" do
+    let(:args) { {label: "Blog", path: "/news", active: :controller} }
+    let(:url) { "/news/some-post" }
+
+    it "matches the same as :match_controller" do
+      expect(component).to have_css "a.nav-link.active[href='/news']"
+    end
+  end
+
   context "with an unrecognized active" do
     # nil used to mean :auto, so a caller reaching for a falsey value has to say which
     it "raises rather than picking a state" do

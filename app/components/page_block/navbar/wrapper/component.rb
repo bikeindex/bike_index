@@ -44,9 +44,7 @@ module PageBlock
 
         def primary_menu
           PageBlock::Navbar::PrimaryMenu::Component.new(current_user: @current_user,
-            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user,
-            controller_namespace: @controller_namespace, controller_name: @controller_name,
-            action_name: @action_name)
+            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user)
         end
       end
     end

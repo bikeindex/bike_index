@@ -11,6 +11,7 @@ vendor/bundle
 .DS_Store
 coverage/*
 public/uploads/*
+public/test_uploads*
 public/caches
 public/partner
 .vagrant
