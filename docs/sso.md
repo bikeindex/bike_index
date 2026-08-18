@@ -111,7 +111,8 @@ for everyone on the domain immediately, with no staged rollout.
 disagree. Routing keys off the single submitted string; linking searches confirmed
 `user_emails` first (`User.fuzzy_confirmed_or_unconfirmed_email_find`). So a user whose primary
 address is off-domain but who holds a confirmed secondary on the SSO domain is *not* forced to
-SSO — they type their primary and get a password prompt as always. Forced SSO is effectively
+SSO — they type their primary and get a password prompt as always. The token-redemption guards
+match the primary too, so they don't close it either. Forced SSO is effectively
 opt-out for anyone willing to make a personal address primary. If that same user does go
 through the IdP, they link to the existing account rather than getting a duplicate.
 
@@ -259,14 +260,6 @@ The reason is the real one — ruby-saml's validation errors are passed through,
 
 ## Accepted gaps
 
-- **Forced SSO doesn't cover token-redemption sign-ins.** `redirect_forced_saml` keys off a
-  submitted email, so it cannot fire on paths that authenticate by redeeming a token.
-  `send_password_reset_email` is unguarded, so a user on an SSO domain can request a reset
-  and end up with a working password and a session, never meeting the IdP — an MFA bypass
-  where the IdP enforces one, and the exposure is open-ended because a fresh token can be
-  minted at any time. Magic links minted pre-SSO also work, but only for `AUTH_TOKEN_EXPIRY`
-  (10 minutes).
-  These grant an account and session, not organization access. Fix is a follow-up.
 - **Nothing deprovisions.** Removing someone in the IdP stops them signing in again; it does not
   remove a role they already hold.
 - **Unconfirmed accounts are force-confirmed by the first assertion.** Deliberate — otherwise
