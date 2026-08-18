@@ -194,21 +194,11 @@
               >
                 <% item[:children].each do |child| %>
                   <% if child[:type] == :disabled %>
-                    <span
-                      class="
-                        tw:mx-2 tw:block tw:rounded-[10px] tw:py-2 tw:pr-3
-                        tw:pl-11 tw:text-[13.5px] tw:font-bold
-                        tw:whitespace-nowrap tw:text-gray-400
-                        tw:max-[760px]:py-3.5
-                      "
-                    >
-                      <%= child[:label] %>
-                    </span>
+                    <span class="tw:text-gray-400 <%= PageBlock::OrgSidebar::Component::CHILD %>"><%= child[:label] %></span>
                   <% else %>
                     <% child_active = active_link?(child) %>
 
-                    <%= link_to child[:label], child[:path],
-                      class: "tw:mx-2 tw:block tw:rounded-[10px] tw:py-2 tw:pr-3 tw:pl-11 tw:text-[13.5px] tw:font-bold tw:whitespace-nowrap tw:no-underline tw:hover:text-blue-600 tw:max-[760px]:py-3.5 #{child_active ? "tw:bg-blue-50 tw:text-blue-600 tw:dark:bg-gray-700" : "tw:text-purple-500 tw:dark:text-purple-300"}",
+                    <%= link_to child[:label], child[:path], class: child_class(child_active),
                       aria: {current: child_active ? "page" : nil} %>
                   <% end %>
                 <% end %>

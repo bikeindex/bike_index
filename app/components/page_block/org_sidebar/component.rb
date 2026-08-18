@@ -2,9 +2,8 @@
 
 module PageBlock
   module OrgSidebar
-    # The organization admin sidebar. It stands in for the whole navbar on every
-    # page a member with a passive organization sees, so it carries the account
-    # links the settings dropdown used to.
+    # The organization admin sidebar. It stands in for the whole navbar on every page a
+    # member with a passive organization sees, so it carries their account links too.
     class Component < ApplicationComponent
       COLLAPSE_BREAKPOINT = 1100
       MOBILE_BREAKPOINT = 760
@@ -21,6 +20,11 @@ module PageBlock
       ROW_HOVER = "tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700"
       ROW_CURRENT = "tw:bg-blue-50 tw:text-blue-600 tw:dark:bg-gray-700"
       ROW_RESTING = "tw:text-gray-900 tw:dark:text-gray-300"
+
+      # A row inside a group, indented past its parent's icon
+      CHILD = "tw:mx-2 tw:block tw:rounded-[10px] tw:py-2 tw:pr-3 tw:pl-11 tw:text-[13.5px] " \
+        "tw:font-bold tw:whitespace-nowrap tw:max-[760px]:py-3.5"
+      CHILD_RESTING = "tw:text-purple-500 tw:dark:text-purple-300"
 
       # One bar of the hamburgler, which folds into an X while the menu is open
       BAR = "tw:h-0.5 tw:w-5 tw:rounded-sm tw:bg-gray-900 tw:transition-all " \
@@ -65,6 +69,10 @@ module PageBlock
 
       def row_class(active)
         [ROW, ROW_HOVER, active ? ROW_CURRENT : ROW_RESTING].join(" ")
+      end
+
+      def child_class(active)
+        [CHILD, "tw:no-underline tw:hover:text-blue-600", active ? ROW_CURRENT : CHILD_RESTING].join(" ")
       end
 
       # Replaces UI::Button's classes entirely -- this trigger is a sidebar row, not a button.
