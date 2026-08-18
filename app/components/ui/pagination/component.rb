@@ -40,8 +40,8 @@ module UI
       end
 
       # Multiline classes strings here were confusing tailwind somehow :(
-      # relative, because -space-x-px overlaps each border with its neighbor's — only a
-      # positioned item can raise its own above them with z-10
+      # relative, so the z-10s below lift an item's border above the neighbors
+      # -space-x-px overlaps it with
       def disabled_classes
         "tw:disabled:cursor-default tw:relative tw:px-3 tw:py-1 tw:leading-tight tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:text-gray-500 tw:dark:text-gray-400 tw:no-underline "
       end
