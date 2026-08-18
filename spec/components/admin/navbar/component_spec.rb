@@ -41,7 +41,7 @@ RSpec.describe Admin::Navbar::Component, type: :component do
   end
 
   describe "the shortcut links" do
-    let(:active_shortcut) { "ul.navbar-nav a.active" }
+    let(:active_shortcut) { "ul.navbar-nav a[aria-current]" }
 
     context "on a shortcut's own page" do
       let(:url) { admin_bikes }

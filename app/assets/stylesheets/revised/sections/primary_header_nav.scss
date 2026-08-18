@@ -57,7 +57,7 @@ $mobile-nav-height: 4 * $vertical-height;
 
       &:hover,
       &:active,
-      &.active {
+      &[aria-current] {
         color: #fff;
       }
     }
@@ -104,7 +104,7 @@ $mobile-nav-height: 4 * $vertical-height;
 
       &:hover,
       &:active,
-      &.active {
+      &[aria-current] {
         color: #fff;
 
         .caret-down {
@@ -176,7 +176,7 @@ $mobile-nav-height: 4 * $vertical-height;
 
     &:hover,
     &:active,
-    &.active {
+    &[aria-current] {
       color: #fff;
       text-decoration: none;
     }
@@ -256,7 +256,7 @@ $mobile-nav-height: 4 * $vertical-height;
         padding: $vertical-height (2 * $vertical-height);
 
         &:active,
-        &.active {
+        &[aria-current] {
           background: $gray-light;
           text-decoration: none;
         }
@@ -357,14 +357,14 @@ $mobile-nav-height: 4 * $vertical-height;
       a {
         padding: 8px (0.5 * $grid-gutter-width);
 
-        &.active,
+        &[aria-current],
         &:active {
           text-decoration: none;
         }
       }
 
       // Only apply to primary nav items, not submenus
-      & > a.active::after {
+      & > a[aria-current]::after {
         content: "";
         position: absolute;
         left: 50%;
@@ -386,7 +386,7 @@ $mobile-nav-height: 4 * $vertical-height;
           color: $primary-nav-text-color;
         }
 
-        &.active::after {
+        &[aria-current]::after {
           display: none;
         }
       }
@@ -439,7 +439,7 @@ $mobile-nav-height: 4 * $vertical-height;
       padding: (0.5 * ($primary-logo-fullsize-height - 34px)) 0
         (2 * $vertical-height);
 
-      a.active::after {
+      a[aria-current]::after {
         bottom: 2 * $vertical-height;
       }
     }

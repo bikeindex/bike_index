@@ -2,10 +2,11 @@
 
 module UI
   module ActiveLink
-    # Adds "active" to the link's class on the page it points at. match: widens what counts as
-    # that page — the target's controller, or its controller and action, which is what a link
-    # carrying query params (a search, a filtered index) needs. A caller that already knows the
-    # answer passes active: rather than being routed around the component.
+    # Marks the link aria-current on the page it points at, which the is-active variant
+    # (application.css) styles. match: widens what counts as that page — the target's controller,
+    # or its controller and action, which is what a link carrying query params (a search, a
+    # filtered index) needs. A caller that already knows the answer passes active: rather than
+    # being routed around the component.
     class Component < ApplicationComponent
       MATCHES = [:path, :controller, :controller_action].freeze
 
@@ -50,7 +51,7 @@ module UI
 
       def initialize(path:, text: nil, active: nil, match: :path, html_class: nil, **html_options)
         raise_if_invalid_value!(:match, match, MATCHES)
-        # The component builds its own class, so a passed one is dropped rather than merged
+        # html_class is what reaches the anchor, so a passed class would be dropped rather than merged
         raise ArgumentError, "class is not supported, you must use the keyword arg html_class" if html_options.key?(:class)
 
         @path = path
@@ -62,7 +63,7 @@ module UI
       end
 
       def call
-        link_to(link_text, @path, **@html_options, class: link_class)
+        link_to(link_text, @path, **@html_options, class: @html_class.presence, aria: aria_attributes)
       end
 
       private
@@ -74,8 +75,9 @@ module UI
           raise(ArgumentError, "text: or block content is required")
       end
 
-      def link_class
-        [@html_class, ("active" if active?)].compact.join(" ").presence
+      # Merged rather than passed beside @html_options, so a caller's aria: keeps its attributes
+      def aria_attributes
+        {**@html_options[:aria].to_h, current: ("page" if active?)}
       end
 
       def active?
