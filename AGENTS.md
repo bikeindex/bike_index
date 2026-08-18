@@ -75,7 +75,7 @@ Worth delegating enumeration at all rather than eyeballing a grep: in that same 
 
 Uses RSpec. All business logic should be tested. The `rspec-testing` skill covers project-specific style (`context`+`let`, request specs over controller specs, avoiding mocks). A test that fails intermittently is the `fixing-flaky-failures` skill — coverage is never what gives way to make CI green.
 
-**Run specs through `bin/turbo_tests <the paths your change touches>`** — it compiles assets and keeps the test Redis off the dev database, and a serial `bundle exec rspec` over a directory takes many times longer. **Don't run `bin/ci`** (the whole suite, whole-repo lint) unless you're asked to or a specific problem needs it — CI runs the full suite on push, and a local one pins the machine you're sharing. A suite failure is not a reason to re-run the suite: re-run the failing spec file.
+**Run `bundle exec rspec <the spec paths your change touches>`** — not `bin/turbo_tests`, which is the parallel runner for the whole suite. **Don't run `bin/ci`** (the whole suite, plus whole-repo lint and scan) unless you're asked to or a specific problem needs it: CI runs the full suite on push, and a local run pins the machine you're sharing. A suite failure is not a reason to re-run the suite — re-run the failing spec file.
 
 **Never hand-edit a VCR cassette**, and never `git checkout` away one a spec run re-recorded — cassettes only change by being recorded, and a re-recording gets committed on whatever branch you're on. To clear stale contents, `rm` the file and re-run the spec.
 
