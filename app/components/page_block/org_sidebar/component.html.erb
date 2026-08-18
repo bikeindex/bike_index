@@ -19,6 +19,7 @@
   data-action="
     resize@window->page-block--org-sidebar#resize
     keydown.esc@window->page-block--org-sidebar#closeOnEscape
+    ui--active-link:current->page-block--org-sidebar#openCurrentGroup
   "
 >
   <div
@@ -165,14 +166,17 @@
               aria-hidden="true"
             ></div>
           <% when :group %>
-            <% open = open_group?(item) %>
+            <%#
+              The first group opens, the way the design shows a page no row matches --
+              page-block--org-sidebar moves that to another group once ui--active-link
+              says the current row is in one
+            %>
+            <% open = item == first_group %>
 
             <div data-controller="ui--collapse" class="tw:contents">
-              <%# A button can't be aria-current, so the is-active variant reads data-active here %>
               <button
                 type="button"
                 class="<%= row_class %>"
-                data-active="<%= item == active_group %>"
                 aria-expanded="<%= open %>"
                 aria-controls="org_sidebar_group_<%= item[:key] %>"
                 data-ui--collapse-target="trigger"
@@ -207,16 +211,13 @@
                   <% if child[:type] == :disabled %>
                     <span class="tw:text-gray-400 <%= PageBlock::OrgSidebar::Component::CHILD %>"><%= child[:label] %></span>
                   <% else %>
-                    <%= link_to child[:label], child[:path], class: child_class,
-                      aria: {current: ("page" if active_link?(child))} %>
+                    <%= render active_link(child, row_class: child_class, text: child[:label]) %>
                   <% end %>
                 <% end %>
               </div>
             </div>
           <% when :link %>
-            <%= link_to item[:path],
-                class: row_class,
-                aria: {current: ("page" if active_link?(item))} do %>
+            <%= render active_link(item, row_class:) do %>
               <span class="tw:flex tw:flex-none"><%= icon(item[:icon], html_class: "tw:h-[17px] tw:w-[17px]") %></span>
 
               <span

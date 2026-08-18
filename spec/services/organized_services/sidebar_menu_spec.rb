@@ -6,8 +6,8 @@ RSpec.describe OrganizedServices::SidebarMenu do
   describe "for" do
     subject(:items) { described_class.for(organization:, current_user:) }
 
-    define_method(:link_item) do |label, path, icon: nil, match: :path, routes: []|
-      {type: :link, label:, path:, icon:, match:, routes:}
+    define_method(:link_item) do |label, path, icon: nil, match: :path, matching_controllers: []|
+      {type: :link, label:, path:, icon:, match:, matching_controllers:}
     end
 
     define_method(:group_item) do |key, label, icon, children|
@@ -52,7 +52,7 @@ RSpec.describe OrganizedServices::SidebarMenu do
         [
           group_item(:registrations, "#{organization.short_name} Registrations", "bike", [
             link_item("Search Registrations", "/o/#{organization.to_param}/registrations",
-              match: :controller_action, routes: ["organized/registrations#index"])
+              match: :controller_action)
           ]),
           link_item("Add a bike", "/o/#{organization.to_param}/bikes/new",
             icon: "plus-circle", match: :full_path)
@@ -84,11 +84,11 @@ RSpec.describe OrganizedServices::SidebarMenu do
 
         expect(registrations[:label]).to eq "Brakebills Registrations"
         expect(registrations[:children]).to eq([
-          link_item("Search Registrations", "/o/#{slug}/registrations", match: :controller_action, routes: ["organized/registrations#index"]),
+          link_item("Search Registrations", "/o/#{slug}/registrations", match: :controller_action),
           link_item("Incomplete registrations", "/o/#{slug}/bikes/incompletes"),
           link_item("Multi search", "/o/#{slug}/registrations/multi_search"),
           link_item("Recoveries", "/o/#{slug}/bikes/recoveries"),
-          link_item("Registration stickers", "/o/#{slug}/stickers", match: :controller, routes: ["organized/stickers"])
+          link_item("Registration stickers", "/o/#{slug}/stickers", match: :controller)
         ])
       end
 
@@ -101,7 +101,7 @@ RSpec.describe OrganizedServices::SidebarMenu do
 
       it "points reports at the overview dashboard" do
         expect(items.find { |item| item[:label] == "Reports" })
-          .to eq(link_item("Reports", "/o/#{slug}/dashboard", icon: "bar-chart", match: :controller, routes: ["organized/dashboard"]))
+          .to eq(link_item("Reports", "/o/#{slug}/dashboard", icon: "bar-chart", match: :controller))
       end
 
       # Managing impounding is the settings group's, so this one is only the vehicles
@@ -114,7 +114,7 @@ RSpec.describe OrganizedServices::SidebarMenu do
 
       it "points messaging at the custom emails index, rather than at a single email" do
         expect(items.find { |item| item[:label] == "Messaging" })
-          .to eq(link_item("Messaging", "/o/#{slug}/emails", icon: "chat", match: :controller, routes: ["organized/emails"]))
+          .to eq(link_item("Messaging", "/o/#{slug}/emails", icon: "chat", match: :controller))
         expect(organization.enabled?("organization_stolen_message")).to be true
         expect(items.map { |item| item[:label] }).to_not include("Stolen Message")
       end
@@ -126,11 +126,11 @@ RSpec.describe OrganizedServices::SidebarMenu do
         expect(settings[:children]).to eq([
           link_item("Brakebills profile", "/o/#{slug}/manage"),
           link_item("Brakebills locations", "/o/#{slug}/manage/locations"),
-          link_item("Manage users", "/o/#{slug}/users", match: :controller, routes: ["organized/users"]),
+          link_item("Manage users", "/o/#{slug}/users", match: :controller),
           link_item("Impounding", "/o/#{slug}/manage_impounding/edit"),
           link_item("Stolen Bike Hot Sheet", "/o/#{slug}/hot_sheet/edit"),
           link_item("Manage Registration sequences", "/o/#{slug}/registration_sequences",
-            match: :controller, routes: ["organized/registration_sequences", "organized/registration_sequence_pages"])
+            match: :controller, matching_controllers: ["organized/registration_sequence_pages"])
         ])
       end
     end

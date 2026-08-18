@@ -30,14 +30,10 @@ module PageBlock
       BAR = "tw:h-0.5 tw:w-5 tw:rounded-sm tw:bg-gray-900 tw:transition-all " \
         "tw:duration-200 tw:dark:bg-gray-300"
 
-      def initialize(organization:, current_user:, current_user_or_unconfirmed_user: nil,
-        controller_namespace: nil, controller_name: nil, action_name: nil)
+      def initialize(organization:, current_user:, current_user_or_unconfirmed_user: nil)
         @organization = organization
         @current_user = current_user
         @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user || current_user
-        @controller_namespace = controller_namespace
-        @controller_name = controller_name
-        @action_name = action_name
       end
 
       def render?
@@ -59,10 +55,14 @@ module PageBlock
           {label: translation(".logout"), path: goodbye_path, danger: true}]
       end
 
-      # The group holding the current page opens on load; with none of them holding it
-      # the first one does, the way the design shows it
-      def open_group?(group)
-        group == (active_group || groups.first)
+      def first_group
+        @first_group ||= items.find { |item| item[:type] == :group }
+      end
+
+      # text: is the caller's, since a top-level row's label sits inside a block with its icon
+      def active_link(item, row_class:, text: nil)
+        UI::ActiveLink::Component.new(path: item[:path], text:, match: item[:match],
+          matching_controllers: item[:matching_controllers], class: row_class)
       end
 
       def row_class
@@ -80,39 +80,6 @@ module PageBlock
           "tw:group-data-[collapsed=true]/sidebar:justify-center " \
           "tw:group-data-[collapsed=true]/sidebar:[&_.twdropdown-chevron]:hidden " \
           "tw:hover:bg-gray-100 tw:aria-expanded:bg-gray-100 tw:dark:hover:bg-gray-700"
-      end
-
-      def groups
-        @groups ||= items.select { |item| item[:type] == :group }
-      end
-
-      def active_group
-        return @active_group if defined?(@active_group)
-
-        @active_group = groups.find { |group|
-          group[:children].any? { |child| child[:type] == :link && active_link?(child) }
-        }
-      end
-
-      # Memoized because the template asks again for every row the scan above resolved
-      def active_link?(item)
-        (@active_links ||= Hash.new { |cache, link| cache[link] = resolve_active(link) })[item]
-      end
-
-      # UI::ActiveLink's matches, resolved here rather than in its controller: the group
-      # holding the current page is the one that starts open, before the rows render
-      def resolve_active(item)
-        case item[:match]
-        when :path then helpers.current_page_active?(item[:path])
-        # Both add-a-bike rows are organized/bikes#new, told apart by the query param
-        when :full_path then request.fullpath == item[:path]
-        when :controller then item[:routes].include?(current_controller)
-        when :controller_action then item[:routes].include?("#{current_controller}##{@action_name}")
-        end
-      end
-
-      def current_controller
-        [@controller_namespace, @controller_name].compact.join("/")
       end
 
       def avatar_url

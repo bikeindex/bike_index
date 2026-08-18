@@ -8,17 +8,14 @@
 # Item shapes:
 #   {type: :divider}
 #   {type: :group, key:, label:, icon:, children: [...]}
-#   {type: :link, label:, path:, icon:, match:, routes:}
+#   {type: :link, label:, path:, icon:, match:, matching_controllers:}
 #   {type: :disabled, label:}
 #
 # A group whose children are all gated off doesn't render at all. `key` is what
-# the Stimulus controller opens and closes, and what the component matches the
-# current page against to decide which group starts open.
+# the Stimulus controller opens and closes.
 #
-# `match:` is UI::ActiveLink's, but PageBlock::OrgSidebar resolves it itself -- it
-# needs the answer before the rows render, to open the group holding the current
-# page. `routes:` is what a controller-granularity match compares against, its own
-# and any second controller the section spans.
+# `match:` and `matching_controllers:` are UI::ActiveLink's, which resolves them in
+# the browser.
 module OrganizedServices
   module SidebarMenu
     extend Functionable
@@ -158,19 +155,8 @@ module OrganizedServices
     def link(entry, label, icon: nil, ignore_enabled: false)
       return nil unless entry[:enabled] || ignore_enabled
 
-      {type: :link, label:, path: entry[:path], icon:, match: entry[:match], routes: link_routes(entry)}
-    end
-
-    # Recognized here rather than by the component, which would pay a route recognition
-    # per row on every render; this payload is built once per [organization, user]
-    def link_routes(entry)
-      return [] unless entry[:match].in?(%i[controller controller_action])
-
-      recognized = Rails.application.routes.recognize_path(entry[:path])
-      route = (entry[:match] == :controller) ? recognized[:controller] : "#{recognized[:controller]}##{recognized[:action]}"
-      [route, *entry[:matching_controllers]]
-    rescue ActionController::RoutingError
-      entry[:matching_controllers]
+      {type: :link, label:, path: entry[:path], icon:, match: entry[:match],
+       matching_controllers: entry[:matching_controllers]}
     end
 
     def disabled(label)
@@ -186,7 +172,7 @@ module OrganizedServices
     end
 
     conceal :build_items, :ambassador_items, :registrations_group, :impounded_group, :parking_group,
-      :bulk_group, :messaging_link, :settings_group, :group, :link, :link_routes, :disabled,
+      :bulk_group, :messaging_link, :settings_group, :group, :link, :disabled,
       :divider, :translation
   end
 end

@@ -50,7 +50,7 @@
 
   <%# The sidebar stands in for the navbar entirely, so it decides which one renders %>
   <% org_sidebar = PageBlock::OrgSidebar::Component.new(organization: passive_organization, current_user:,
-    current_user_or_unconfirmed_user:, controller_namespace:, controller_name:, action_name:) %>
+    current_user_or_unconfirmed_user:) %>
 
   <% show_org_sidebar = org_sidebar.render? %>
 

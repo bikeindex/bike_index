@@ -1,5 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 
+/* global requestAnimationFrame */
+
 const EXPANDED_WIDTH = '266px'
 const COLLAPSED_WIDTH = '68px'
 // ui--collapse's default, so a group's rows are in place before they're measured
@@ -21,6 +23,10 @@ export default class extends Controller {
     // choice outranks the breakpoint for the rest of the page
     this.override = null
     this.render()
+    // ui--active-link may have marked the current row before this controller existed to
+    // hear it say so
+    const current = this.element.querySelector('[aria-current]')
+    if (current) this.openGroupFor(current)
   }
 
   disconnect () {
@@ -62,6 +68,40 @@ export default class extends Controller {
   groupFor (trigger) {
     return this.application.getControllerForElementAndIdentifier(
       trigger.closest('[data-controller~="ui--collapse"]'), 'ui--collapse')
+  }
+
+  // ui--active-link announces the current row as it marks it
+  openCurrentGroup (event) {
+    this.openGroupFor(event.target)
+  }
+
+  // The template opens the first group, the way the design shows a page no row matches,
+  // so this only moves that open state when the current row is in another one. Without
+  // animating: it's the state the page loads in rather than something the reader asked for.
+  //
+  // ui--collapse owns the opening and registers whenever its module resolves, which is not
+  // ordered against this one -- so a group that isn't connected yet is waited for rather
+  // than skipped, and the row is read from the DOM in case its event fired first
+  openGroupFor (link, attempt = 0) {
+    const group = link.closest('[data-controller~="ui--collapse"]')
+    if (!group) return
+
+    const collapse = this.collapseFor(group)
+    if (!collapse) {
+      if (attempt < 30) requestAnimationFrame(() => this.openGroupFor(link, attempt + 1))
+      return
+    }
+
+    const open = [...this.element.querySelectorAll('[data-ui--collapse-target="trigger"]')]
+      .find((trigger) => trigger.getAttribute('aria-expanded') === 'true')
+    if (open && group.contains(open)) return
+
+    collapse.setExpanded(true, 0)
+    if (open) this.groupFor(open)?.setExpanded(false, 0)
+  }
+
+  collapseFor (element) {
+    return this.application.getControllerForElementAndIdentifier(element, 'ui--collapse')
   }
 
   // A group near the bottom unrolls past the fold, which is no use to whoever opened it.
