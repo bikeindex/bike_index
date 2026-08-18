@@ -269,39 +269,6 @@ module ControllerHelpers
     ActiveSupport::HtmlSafeTranslation.translate(key, **kwargs, scope: scope.compact)
   end
 
-  def locale_from_request_header
-    request.env.fetch("HTTP_ACCEPT_LANGUAGE", "").scan(/^[a-z]{2}/).first
-  end
-
-  def locale_from_request_params
-    params[:locale].to_s.strip
-  end
-
-  # The locale a request carrying no locale param renders in. The footer's language switcher
-  # leaves the param off for this one, and has to add it for every other -- dropping it would
-  # land the visitor back here. Doorkeeper's controllers reach it through the layout.
-  def implicit_locale
-    @implicit_locale ||= available_locale(current_user&.preferred_language.presence ||
-      locale_from_request_header.presence)
-  end
-
-  def requested_locale
-    @requested_locale ||= if locale_from_request_params.present?
-      available_locale(locale_from_request_params)
-    else
-      implicit_locale
-    end
-  end
-
-  def available_locale(locale)
-    I18n.available_locales.include?(locale.to_s.to_sym) ? locale : I18n.default_locale
-  end
-
-  # Private in ApplicationController before the move here, and only implicit_locale is a
-  # helper_method -- which reaches a private one anyway
-  private :locale_from_request_header, :locale_from_request_params, :requested_locale,
-    :available_locale
-
   # This is overridden in FeedbacksController and InfoController
   def page_id
     @page_id ||= [
@@ -332,6 +299,34 @@ module ControllerHelpers
   end
 
   private
+
+  def locale_from_request_header
+    request.env.fetch("HTTP_ACCEPT_LANGUAGE", "").scan(/^[a-z]{2}/).first
+  end
+
+  def locale_from_request_params
+    params[:locale].to_s.strip
+  end
+
+  # The locale a request carrying no locale param renders in. The footer's language switcher
+  # leaves the param off for this one, and has to add it for every other -- dropping it would
+  # land the visitor back here. Doorkeeper's controllers reach it through the layout.
+  def implicit_locale
+    @implicit_locale ||= available_locale(current_user&.preferred_language.presence ||
+      locale_from_request_header.presence)
+  end
+
+  def requested_locale
+    @requested_locale ||= if locale_from_request_params.present?
+      available_locale(locale_from_request_params)
+    else
+      implicit_locale
+    end
+  end
+
+  def available_locale(locale)
+    I18n.available_locales.include?(locale.to_s.to_sym) ? locale : I18n.default_locale
+  end
 
   # passive_organization is the organization set for the user - which is persisted in session
   # The user may or may not be interacting with the current_organization in any given request
