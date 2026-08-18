@@ -16,7 +16,7 @@ RSpec.describe PageBlock::Navbar::PrimaryMenu::Component, type: :component do
     expect(menu_links).to eq(["Search", "Marketplace", "Sign up", "log in", "Help",
       "Stolen bike?", "Donate", "Blog", "Marketplace", "Search"])
     expect(component).to_not have_css "#setting_submenu"
-    expect(component).to_not have_css "#primary-main-menu a.active"
+    expect(component).to_not have_css "#primary-main-menu a[aria-current]"
   end
 
   # The links carry query params the page won't, which is why they match on controller and action
@@ -24,14 +24,14 @@ RSpec.describe PageBlock::Navbar::PrimaryMenu::Component, type: :component do
     let(:request_url) { "/search/registrations?query=trek" }
 
     it "marks both registration search links active" do
-      expect(component.css("#primary-main-menu a.active").map { |link| link.text.strip }).to eq(%w[Search Search])
+      expect(component.css("#primary-main-menu a[aria-current]").map { |link| link.text.strip }).to eq(%w[Search Search])
     end
 
     context "on page 2" do
       let(:request_url) { "/search/registrations?stolenness=all&page=2" }
 
       it "marks them active" do
-        expect(component.css("#primary-main-menu a.active").map { |link| link.text.strip }).to eq(%w[Search Search])
+        expect(component.css("#primary-main-menu a[aria-current]").map { |link| link.text.strip }).to eq(%w[Search Search])
       end
     end
 
@@ -40,7 +40,7 @@ RSpec.describe PageBlock::Navbar::PrimaryMenu::Component, type: :component do
       let(:request_url) { "/search/registrations?stolenness=stolen" }
 
       it "marks them active" do
-        expect(component.css("#primary-main-menu a.active").map { |link| link.text.strip }).to eq(%w[Search Search])
+        expect(component.css("#primary-main-menu a[aria-current]").map { |link| link.text.strip }).to eq(%w[Search Search])
       end
     end
   end
@@ -49,7 +49,7 @@ RSpec.describe PageBlock::Navbar::PrimaryMenu::Component, type: :component do
     let(:request_url) { "/search/marketplace" }
 
     it "marks both marketplace links active" do
-      expect(component.css("#primary-main-menu a.active").map { |link| link.text.strip }).to eq(%w[Marketplace Marketplace])
+      expect(component.css("#primary-main-menu a[aria-current]").map { |link| link.text.strip }).to eq(%w[Marketplace Marketplace])
     end
   end
 
