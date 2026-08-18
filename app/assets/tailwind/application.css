@@ -210,8 +210,11 @@ body.with-org-sidebar {
 }
 
 /* The sidebar runs the height of the window, so the content does too -- a short page
-   would otherwise end partway down it, with the footer riding up beside the rows */
+   would otherwise end partway down it, with the footer riding up beside the rows.
+   The inset stands in for the navbar gap these pages no longer have */
 body.with-org-sidebar main {
+  @apply tw:pt-4 tw:min-[760px]:pt-7;
+
   min-height: 100vh;
 }
 
