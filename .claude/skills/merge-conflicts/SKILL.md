@@ -87,7 +87,7 @@ This is what it catches, all of which has actually happened here:
 - **Deleted code coming back.** A constant, predicate, or callback the base removed reappears, along with the call sites that reference it — reintroducing behavior the base decided against.
 - **Another branch's change riding along.** A retention window, a flag, a tweak that came in when you merged a sibling branch and the base never took. Not yours to carry; reset it.
 - **Committed churn in generated files.** `git checkout --` reverts to HEAD, not to the base — so once churn is committed it survives every later revert. Check VCR cassettes and lockfiles specifically; a diff that's only timestamps/nonces should be reset to the base.
-- **Your side calling an API the base deleted.** Nothing conflicts: your file is untouched by the merge and the base's deletion lands cleanly, so the break is a `NoMethodError` at load. Run `git show <base-commit> --stat` over what the base changed, and grep your branch's files for every method it removed — `git grep -n 'MethodName' -- app spec`. #4131 kept calling `UI::ActiveLink::Component.match_table`/`.active?` after #4140 deleted both.
+- **Your side calling an API the base deleted.** Nothing conflicts: your file is untouched by the merge and the base's deletion lands cleanly, so the break is a `NoMethodError` at load. Run `git show <base-commit> --stat` over what the base changed, and grep your branch's files for every method it removed — `git grep -n 'MethodName' -- app spec`. Fix it in the commit after the merge, never in it. #4131 wrote a replacement into its merge commit after #4140 deleted `UI::ActiveLink::Component.match_table`/`.active?`.
 
 ## Run the linter, not just the specs
 
