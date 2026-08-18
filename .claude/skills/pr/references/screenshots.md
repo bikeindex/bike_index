@@ -53,6 +53,8 @@ Skip per-page only when the URL didn't exist on the base (a brand-new route or p
 
 Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs, passing the base as its `BASE_REF` (`origin/main` unless **Orient** chose otherwise) — its "Cross-branch comparison" section does the rest, whether or not the base is `main`. Then re-invoke `github-pr-images` for those PNGs, host-only exactly as in step 3.
 
+`git rev-list --count HEAD..origin/main` first: **Prepare the branch**'s merge normally leaves it 0, but on a long run the remote moves after that merge, and the "before" then shows base commits the branch never saw.
+
 Two things the checkout itself does, either side of it:
 
 - **`bin/rails tailwindcss:build` after each checkout when the diff touches `app/assets/tailwind/**`.** The watcher doesn't rebuild on a checkout, so the base capture otherwise renders the branch's CSS — a before/after that silently shows the same styling twice. Verify by grepping `app/assets/builds/tailwind.css` for a class the branch adds; build again on the way back.

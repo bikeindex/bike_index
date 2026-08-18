@@ -29,7 +29,7 @@
 
     <span class="<%= text_classes(street?) %>">
       <%= translation(:report_theft_html,
-            edit_bike_link: link_to(translation(:location_where_the_theft_occurred), edit_path("theft_details"))) %>
+            edit_bike_link: link_to(translation(:location_where_the_theft_occurred), edit_path("theft_details"), class: "twlink-underlined")) %>
     </span>
   </li>
 
@@ -38,7 +38,7 @@
 
     <span class="<%= text_classes(images?) %>">
       <%= translation(:add) %>
-      <%= link_to translation(:a_photo_of_your_bike_type, bike_type: @bike.type), edit_path("photos") %>
+      <%= link_to translation(:a_photo_of_your_bike_type, bike_type: @bike.type), edit_path("photos"), class: "twlink-underlined" %>
     </span>
   </li>
 
@@ -61,7 +61,7 @@
 
               <%= link_to translation(:nl_website_link_text),
                     "https://www.politie.nl/aangifte-of-melding-doen/voorbereiding-aangifte/diefstal-fiets.html",
-                    target: "_blank", rel: "noopener" %>
+                    target: "_blank", rel: "noopener", class: "twlink-underlined" %>
 
               <em><%= translation(:nl_digid_required) %></em>
             </span>
@@ -82,7 +82,7 @@
             <span class="checklist-text">
               <strong><%= translation(:nl_person) %></strong>
               <%= translation(:nl_person_report) %>
-              <%= link_to "www.politie.nl/mijn-buurt/politiebureaus", "https://www.politie.nl/mijn-buurt/politiebureaus" %>
+              <%= link_to "www.politie.nl/mijn-buurt/politiebureaus", "https://www.politie.nl/mijn-buurt/politiebureaus", class: "twlink-underlined" %>
             </span>
           </li>
         </ul>
@@ -95,7 +95,7 @@
 
     <span class="<%= text_classes(police_report?) %>">
       <%= translation(:add_bike_link_to_your_theft_report_html,
-            bike_link: link_to(translation(:your_police_report), edit_path("theft_details", anchor: "policeReportNumber"))) %>
+            bike_link: link_to(translation(:your_police_report), edit_path("theft_details", anchor: "policeReportNumber"), class: "twlink-underlined")) %>
     </span>
 
     <ul class="tw:m-0 tw:list-none tw:p-0">
@@ -104,7 +104,7 @@
 
         <span class="<%= text_classes(submitted_to_police_services?) %>">
           <%= translation(:push_bike_info_to) %>
-          <%= link_to translation(:leads_online), translation(:leads_online_url) %>
+          <%= link_to translation(:leads_online), translation(:leads_online_url), class: "twlink-underlined" %>
           <%= translation(:bike_index_does_this) %>
         </span>
 
@@ -141,7 +141,7 @@
     <%= box(false) %>
 
     <span class="<%= text_classes(false) %>">
-      <%= link_to translation(:share_widely_on_your_personal_social), edit_path("publicize") %>
+      <%= link_to translation(:share_widely_on_your_personal_social), edit_path("publicize"), class: "twlink-underlined" %>
       <%= translation(:facebook_instagram_etc) %>
     </span>
   </li>
@@ -151,7 +151,7 @@
 
     <span class="<%= text_classes(theft_alert?) %>">
       <%= translation(:supercharge_sharing_on_facebook) %>
-      <%= link_to translation(:promoted_stolen_bike_alerts), edit_path("alert") %>
+      <%= link_to translation(:promoted_stolen_bike_alerts), edit_path("alert"), class: "twlink-underlined" %>
     </span>
   </li>
 </ul>

@@ -392,6 +392,56 @@ RSpec.describe "Register flow", :js, type: :system do
       # hidden field that submitted from one that didn't
       expect(BParam.last.bike["serial_number"]).to eq "unknown"
     end
+
+    # The one organization they're in, assigned without any link naming it
+    context "a member of one organization" do
+      let(:organization) do
+        FactoryBot.create(:organization, short_name: "Brakebills").tap do
+          # set_calculated_attributes recomputes the slugs from the invoices, so assigning them won't hold
+          it.update_column :enabled_feature_slugs, %w[reg_student_id require_reg_student_id]
+        end
+      end
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
+
+      it "registers with it unless the rider says otherwise, taking its asks with it" do
+        start_registration
+        expect(page).to have_checked_field("register_with_organization")
+        expect(page).to have_content(/information for brakebills/i)
+        expect(page).to have_field("bike[student_id]")
+        # It heads the section whose contents it decides
+        expect(page.text.index(/information for brakebills/i))
+          .to be < page.text.index("Register with Brakebills")
+
+        type_into("#bike_primary_frame_color_id", "Red")
+        click_combobox_option("Red")
+        fill_in "bike[serial_number]", with: "XYZ 123"
+
+        # Student ID is required, so the browser holds the submit while the organization is on
+        click_button "Complete Bike Registration"
+        expect(page).to have_current_path(/step=2/, url: true)
+        expect(Bike.count).to eq 0
+
+        # Dropping the organization drops what it asks for, required and all - and the
+        # heading, which can't go with them, the checkbox being under it
+        uncheck "Register with Brakebills"
+        expect(page).to have_no_field("bike[student_id]")
+        expect(page).to have_content(/contact info/i)
+        expect(page).to have_no_content(/information for brakebills/i)
+
+        # Collapsed rather than dropped, so changing their mind brings all of it back
+        check "Register with Brakebills"
+        expect(page).to have_field("bike[student_id]")
+        expect(page).to have_content(/information for brakebills/i)
+
+        uncheck "Register with Brakebills"
+        expect(page).to have_no_field("bike[student_id]")
+
+        click_button "Complete Bike Registration"
+        expect(page).to have_content("Registration complete")
+        expect(Bike.last.creation_organization_id).to be_blank
+        expect(Bike.last.organizations.pluck(:id)).to eq([])
+      end
+    end
   end
 
   # The Disk service answers instantly, so what happens between picking a file and the blob

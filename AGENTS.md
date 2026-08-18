@@ -75,7 +75,7 @@ Worth delegating enumeration at all rather than eyeballing a grep: in that same 
 
 Uses RSpec. All business logic should be tested. The `rspec-testing` skill covers project-specific style (`context`+`let`, request specs over controller specs, avoiding mocks). A test that fails intermittently is the `fixing-flaky-failures` skill — coverage is never what gives way to make CI green.
 
-**Anything broader than a handful of files goes through `bin/ci`** — it runs locally what CI runs. A serial `bundle exec rspec` over a directory takes many times longer, and `bin/turbo_tests`, which it runs the suite through, is also what compiles assets and keeps the test Redis off the dev database.
+**Verify with `bundle exec rspec` over the spec paths your change touches** — not `bin/turbo_tests` or `bin/ci`, whole-suite runners CI already does on push. A `:js` spec failing on a missing Tailwind build is the `sandbox-test-setup` skill, not a reason to switch runners.
 
 **Never hand-edit a VCR cassette**, and never `git checkout` away one a spec run re-recorded — cassettes only change by being recorded, and a re-recording gets committed on whatever branch you're on. To clear stale contents, `rm` the file and re-run the spec.
 

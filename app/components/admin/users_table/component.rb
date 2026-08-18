@@ -6,7 +6,7 @@ module Admin
     # render_deleted to show the deleted_at column.
     class Component < ApplicationComponent
       # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-      MARKUP_DIGEST = "6c2fa40e1357"
+      MARKUP_DIGEST = "bb84763e1250"
 
       def initialize(users:, sort_state: ComponentStates::SortState.new, display_dev_info: false, render_sortable: false, render_deleted: false)
         @users = users

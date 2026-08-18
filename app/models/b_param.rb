@@ -455,6 +455,10 @@ class BParam < ApplicationRecord
     Organization.friendly_find(creation_organization_id)
   end
 
+  def auto_organization
+    Organization.friendly_find(auto_organization_id)
+  end
+
   def manufacturer
     bike["manufacturer_id"] && Manufacturer.friendly_find(bike["manufacturer_id"])
   end
@@ -535,6 +539,19 @@ class BParam < ApplicationRecord
 
   def creation_organization_id
     bike && bike["creation_organization_id"] || params && params["creation_organization_id"]
+  end
+
+  # Assigned from who the registrant is rather than named by a link, so step 2 offers to
+  # drop it. Kept once offered, so declining survives the next request's assignment
+  def auto_organization_id
+    id = auto_organization_assigned? ? params["auto_organization_id"].to_i : 0
+    id if id.positive?
+  end
+
+  # 0 for a registrant no organization could be assigned from - the assignment was made
+  # either way, so it isn't made again
+  def auto_organization_assigned?
+    (params && params["auto_organization_id"]).present?
   end
 
   def owner_email
