@@ -29,6 +29,10 @@
   .twlink-underlined:not(:disabled, [aria-disabled="true"]):hover,
   .twlink-underlined.active,
   .twlink-underlined:not(:disabled, [aria-disabled="true"]):active {
+    /* The channel that shows on every surface — a link pinned to black on a bright
+       accent only has the clamp below to move by, which is subtle on its own */
+    @apply tw:decoration-2;
+
     color: color-mix(in oklab, currentColor 75%, black);
 
     @variant dark {

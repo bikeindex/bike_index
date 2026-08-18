@@ -69,12 +69,6 @@ module PageBlock
         "https://github.com/bikeindex/bike_index/commit/#{@commit}"
       end
 
-      # Black text only lifts to .twlink-underlined's floor on hover, which is subtle on an
-      # accent this bright — the pills' background tint carries the rest of the feedback
-      def banner_link_class
-        "twlink-underlined tw:rounded-sm tw:px-1 tw:-mx-1 tw:hover:bg-black/15"
-      end
-
       # Pill styling shared by the commit and email-outbox "?" tooltip triggers,
       # matching the banner accent (purple in dev, green on review apps)
       def pill_button_class
