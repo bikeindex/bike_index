@@ -63,7 +63,7 @@ RSpec.describe UI::Alerts::Base::Component, type: :component do
     context "default_header_color" do
       let(:options) { {text: "some text", header: "Banned user", kind: "error", default_header_color: true} }
       it "renders the header in the default text color" do
-        expect(component).to have_css("h4", class: "tw:twtext-color", text: "Banned user")
+        expect(component).to have_css("h4.tw\\:twtext-color", text: "Banned user")
         expect(component).to_not have_css("h4.tw:text-red-800")
       end
     end
