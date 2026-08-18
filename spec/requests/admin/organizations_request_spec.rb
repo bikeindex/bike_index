@@ -75,6 +75,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(response.body).to include("/sso/#{organization.to_param}/metadata")
         expect(response.body).to include("permitted domain for SAML SSO")
         expect(response.body).to include('name="organization[user_email_domain]"')
+        expect(response.body).to include('name="organization[organization_saml_configuration_attributes][name_id_format]"')
       end
     end
   end
@@ -279,7 +280,8 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       let(:saml_attributes) do
         {enabled: "1", idp_entity_id: "https://idp.example.edu/",
          idp_sso_target_url: "https://idp.example.edu/idp/profile/SAML2/POST/SSO",
-         idp_cert: File.read(Rails.root.join("spec/fixtures/saml/idp_cert.pem"))}
+         idp_cert: File.read(Rails.root.join("spec/fixtures/saml/idp_cert.pem")),
+         name_id_format: OrganizationSamlConfiguration::NAME_ID_FORMATS["persistent"]}
       end
       it "creates the nested configuration" do
         expect do
@@ -288,6 +290,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         saml_configuration = organization.reload.organization_saml_configuration
         expect(saml_configuration.enabled?).to be_truthy
         expect(saml_configuration.idp_entity_id).to eq "https://idp.example.edu/"
+        expect(saml_configuration.name_id_format).to eq OrganizationSamlConfiguration::NAME_ID_FORMATS["persistent"]
         expect(saml_configuration.configured?).to be_truthy
       end
     end
