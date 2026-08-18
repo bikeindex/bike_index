@@ -14,13 +14,14 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     expect(link["href"]).to eq path
     expect(link.text).to eq "Help"
     expect(link.attributes).to_not have_key("class")
+    expect(link.attributes).to_not have_key("aria-current")
   end
 
   context "on the linked page" do
     let(:request_url) { path }
 
     it "marks the link active" do
-      expect(link["class"]).to eq "active"
+      expect(link["aria-current"]).to eq "page"
     end
   end
 
@@ -34,32 +35,35 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     context "on the linked page" do
       let(:request_url) { path }
 
-      it "appends active" do
-        expect(link["class"]).to eq "nav-link active"
+      it "keeps the class, and marks it active" do
+        expect(link["class"]).to eq "nav-link"
+        expect(link["aria-current"]).to eq "page"
       end
     end
   end
 
+  # Only :path can say "page" — the widened matches go active on a page the link doesn't
+  # point at, so they say "true"
   describe "match" do
     let(:path) { "/bikes/new" }
     let(:request_url) { "/bikes/12" }
 
     it "defaults to :path, so another page of the controller isn't active" do
-      expect(link["class"]).to be_blank
+      expect(link["aria-current"]).to be_blank
     end
 
     context ":controller" do
       let(:options) { {match: :controller} }
 
-      it "is active on another page of the same controller" do
-        expect(link["class"]).to eq "active"
+      it "is active on another page of the same controller, without claiming to be it" do
+        expect(link["aria-current"]).to eq "true"
       end
 
       context "on a page of a different controller" do
         let(:request_url) { "/help" }
 
         it "isn't active" do
-          expect(link["class"]).to be_blank
+          expect(link["aria-current"]).to be_blank
         end
       end
     end
@@ -68,7 +72,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
       let(:options) { {match: :controller_action} }
 
       it "isn't active on a different action of the same controller" do
-        expect(link["class"]).to be_blank
+        expect(link["aria-current"]).to be_blank
       end
 
       # What a link carrying query params needs — the URL won't compare equal
@@ -77,7 +81,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
         let(:request_url) { "/search/registrations?query=trek" }
 
         it "is active" do
-          expect(link["class"]).to eq "active"
+          expect(link["aria-current"]).to eq "true"
         end
       end
 
@@ -86,7 +90,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
         let(:request_url) { "/search/marketplace" }
 
         it "isn't active" do
-          expect(link["class"]).to be_blank
+          expect(link["aria-current"]).to be_blank
         end
       end
 
@@ -98,10 +102,10 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
 
         it "compares the action the request dispatched, not the GET route's" do
           on_get = with_request_url(path) { render_inline(instance) }
-          expect(on_get.css("a").first["class"]).to eq "active"
+          expect(on_get.css("a").first["aria-current"]).to eq "true"
 
           on_patch = with_request_url(path, method: "PATCH") { render_inline(instance) }
-          expect(on_patch.css("a").first["class"]).to be_blank
+          expect(on_patch.css("a").first["aria-current"]).to be_blank
         end
       end
     end
@@ -120,7 +124,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
       let(:options) { {active: true} }
 
       it "skips the current page check" do
-        expect(link["class"]).to eq "active"
+        expect(link["aria-current"]).to eq "page"
       end
     end
 
@@ -129,7 +133,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
       let(:options) { {active: false} }
 
       it "skips the current page check" do
-        expect(link.attributes).to_not have_key("class")
+        expect(link.attributes).to_not have_key("aria-current")
       end
     end
   end
@@ -137,7 +141,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
   context "with a class in html_options" do
     let(:options) { {class: "nav-link"} }
 
-    it "raises, since the component builds its own" do
+    it "raises, since html_class is the way in" do
       expect { component }.to raise_error(ArgumentError, /html_class/)
     end
   end
@@ -148,6 +152,16 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     it "passes them through to the anchor" do
       expect(link["id"]).to eq "footer-help"
       expect(link["target"]).to eq "_blank"
+    end
+
+    context "including aria" do
+      let(:request_url) { path }
+      let(:options) { {aria: {label: "Help center"}} }
+
+      it "keeps them, alongside the current it marks" do
+        expect(link["aria-label"]).to eq "Help center"
+        expect(link["aria-current"]).to eq "page"
+      end
     end
   end
 

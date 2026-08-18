@@ -5,7 +5,7 @@ const TRANSITION_MS = 200
 
 // Connects to data-controller="page-block--navbar"
 //
-// The hamburgler menu and the settings dropdown. It toggles the classes
+// The hamburgler menu and the settings dropdown. It toggles the markers
 // primary_header_nav.scss already styles, so `open` lands on a toggle's parent
 // the way bootstrap's did.
 export default class extends Controller {
@@ -22,7 +22,7 @@ export default class extends Controller {
   openMenu () {
     this.positionMenu()
     this.element.classList.add('enabled')
-    this.hamburglerButtonTarget.classList.add('active')
+    this.hamburglerButtonTarget.dataset.active = 'true'
     this.hamburglerButtonTarget.setAttribute('aria-expanded', 'true')
     // So that it animates in, rather than appearing
     setTimeout(() => {
@@ -32,7 +32,7 @@ export default class extends Controller {
   }
 
   closeMenu () {
-    this.hamburglerButtonTarget.classList.remove('active')
+    this.hamburglerButtonTarget.dataset.active = 'false'
     this.hamburglerButtonTarget.setAttribute('aria-expanded', 'false')
     this.element.classList.remove('menu-in')
     document.body.classList.remove('menu-in')
