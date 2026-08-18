@@ -48,11 +48,11 @@ module UI
         return @button_class if @button_class
 
         classes = UI::Button::Component.new(color: @button_color, size: @button_size).button_classes
-        if @button_color == :link
-          # button_content underlines the label span, so the trigger itself never does.
-          classes = classes.sub("tw:is-active:underline", "").squeeze(" ").strip + " tw:px-1"
-        end
-        classes
+        return classes unless @button_color == :link
+
+        # button_content underlines the label span, so the trigger itself never does — and
+        # .twlink's underline is in the components layer, which only a utility outranks
+        "#{classes} tw:is-active:no-underline tw:px-1"
       end
 
       def button_id
