@@ -8,11 +8,6 @@ module PageBlock
       COLLAPSE_BREAKPOINT = 1100
       MOBILE_BREAKPOINT = 760
 
-      # The menu's own active vocabulary, at the granularities UI::ActiveLink resolves.
-      # A filtered index carries query params, so its row matches on controller and action
-      MATCHES = UI::ActiveLink::Component.match_table(auto: :path, match_controller: :controller,
-        on_registrations_index: :controller_action)
-
       # A top-level row -- the group toggles and the leaf links share it, so they stay
       # the same height as each other
       ROW = "tw:mx-2 tw:flex tw:items-center tw:gap-[11px] tw:rounded-[11px] tw:px-3 tw:py-[9px] " \
@@ -34,15 +29,13 @@ module PageBlock
         "tw:duration-200 tw:dark:bg-gray-300"
 
       def initialize(organization:, current_user:, current_user_or_unconfirmed_user: nil,
-        controller_namespace: nil, controller_name: nil, action_name: nil,
-        unregistered_parking_notification: nil)
+        controller_namespace: nil, controller_name: nil, action_name: nil)
         @organization = organization
         @current_user = current_user
         @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user || current_user
         @controller_namespace = controller_namespace
         @controller_name = controller_name
         @action_name = action_name
-        @unregistered_parking_notification = unregistered_parking_notification
       end
 
       def render?
@@ -99,23 +92,23 @@ module PageBlock
         }
       end
 
-      # Memoized because the template asks again for every row the scan above resolved,
-      # and a :controller_action row costs two recognize_path calls
+      # Memoized because the template asks again for every row the scan above resolved
       def active_link?(item)
         cache = (@active_links ||= {})
         key = [item[:path], item[:active]]
         cache.fetch(key) { cache[key] = resolve_active(item) }
       end
 
-      # The per-request state the cached payload deferred. Only two are left that a path
-      # can't answer: add-a-bike has to stay dark on the notification's variant of its own
-      # url, and a sequence's pages are their own controller
+      # UI::ActiveLink leaves this to the browser, which the sidebar can't: the group
+      # holding the current page is the one that starts open, and that has to be decided
+      # before the rows render
       def resolve_active(item)
-        match = MATCHES[item[:active]]
-        return UI::ActiveLink::Component.active?(path: item[:path], match:, view: helpers) if match
-
         case item[:active]
-        when :on_bikes_new then on_bikes_new? && @unregistered_parking_notification.blank?
+        when :auto then helpers.current_page_active?(item[:path])
+        when :match_controller then helpers.current_page_active?(item[:path], true)
+        when :on_registrations_index then organized_controller?("registrations") && @action_name == "index"
+        # Both add-a-bike rows are organized/bikes#new, told apart by the query param
+        when :on_bikes_new then request.fullpath == item[:path]
         when :on_registration_sequences
           organized_controller?("registration_sequences", "registration_sequence_pages")
         end
@@ -123,10 +116,6 @@ module PageBlock
 
       def organized_controller?(*controller_names)
         @controller_namespace == "organized" && controller_names.include?(@controller_name)
-      end
-
-      def on_bikes_new?
-        organized_controller?("bikes") && @action_name == "new"
       end
 
       def avatar_url

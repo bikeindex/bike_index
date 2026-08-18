@@ -50,15 +50,11 @@
 
   <%# The sidebar stands in for the navbar entirely, so it decides which one renders %>
   <% org_sidebar = PageBlock::OrgSidebar::Component.new(organization: passive_organization, current_user:,
-    current_user_or_unconfirmed_user:, controller_namespace:, controller_name:, action_name:,
-    unregistered_parking_notification: @unregistered_parking_notification) %>
+    current_user_or_unconfirmed_user:, controller_namespace:, controller_name:, action_name:) %>
 
   <% show_org_sidebar = org_sidebar.render? %>
 
-  <body
-    id="<%= page_id %>"
-    class="<%= [body_class, ("with-org-sidebar" if show_org_sidebar)].compact.join(" ") %>"
-  >
+  <%= body_tag(html_class: class_names(body_class, "with-org-sidebar" => show_org_sidebar)) do %>
     <a
       href="#main-content"
       class="
@@ -76,7 +72,7 @@
     <% if show_org_sidebar %>
       <%= render org_sidebar %>
     <% else %>
-      <%= render PageBlock::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:, page_id:) %>
+      <%= render PageBlock::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:) %>
     <% end %>
 
     <% if render_donation_request? %>
@@ -138,14 +134,14 @@
     <% end %>
 
     <%# Skip the Meta pixel on org/oauth pages and when blocked params are present (search_email is PII, and the pixel %>
-    <%# auto-sends the URL query string). In the cache key too, since page_id ignores query params. %>
+    <%# auto-sends the URL query string) %>
     <% skip_facebook = controller_namespace.in?(%w[organized org_public oauth]) || controller_name == "organizations" || params.key?(:search_email) || params.key?(:proximity) %>
 
-    <%= render PageBlock::Footer::Component.new(current_user:, skip_facebook:, page_id:, passive_organization:) %>
+    <%= render PageBlock::Footer::Component.new(current_user:, skip_facebook:, passive_organization:) %>
 
     <script>
   I18n.defaultLocale = <%== I18n.default_locale.to_json %>
   I18n.locale = <%== I18n.locale.to_json %>
 </script>
-  </body>
+  <% end %>
 </html>

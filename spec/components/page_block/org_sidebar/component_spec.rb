@@ -60,10 +60,6 @@ RSpec.describe PageBlock::OrgSidebar::Component, type: :component do
     end
 
     context "with the parking notification param" do
-      let(:instance) do
-        described_class.new(organization:, current_user:, **page,
-          unregistered_parking_notification: FactoryBot.create(:parking_notification, organization:))
-      end
       let(:component) do
         with_request_url("/o/#{organization.to_param}/bikes/new?parking_notification=true") { render_inline(instance) }
       end

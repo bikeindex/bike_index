@@ -3,67 +3,33 @@
 module UI
   module ActiveLink
     # Marks the link aria-current on the page it points at, which the is-active variant
-    # (application.css) styles. match: widens what counts as that page — the target's controller,
-    # or its controller and action, which is what a link carrying query params (a search, a
-    # filtered index) needs. A caller that already knows the answer passes active: rather than
-    # being routed around the component.
+    # (application.css) styles. The browser decides, in ui/active_link_controller.js, so a link
+    # rendered into a fragment cache doesn't carry the answer for whichever page filled it.
+    # match: widens or narrows what counts as the page it points at: its query string too, or
+    # only its controller, or its controller and action — which is what a link carrying query
+    # params (a search, a filtered index) needs.
     class Component < ApplicationComponent
-      MATCHES = [:path, :controller, :controller_action].freeze
+      MATCHES = [:path, :full_path, :controller, :controller_action].freeze
+      # The matches the browser answers with a route rather than with the URL
+      ROUTE_MATCHES = [:controller, :controller_action].freeze
 
-      class << self
-        # A menu whose manifest names its own active states translates them here, mapping each
-        # onto a match. The matches map to themselves, so either vocabulary reaches the same
-        # place and a renamed match takes its aliases with it.
-        def match_table(**aliases)
-          MATCHES.index_by(&:itself).merge(aliases).freeze
-        end
-
-        # A caller that needs the answer without a link — a menu picking out its current
-        # entry — asks here rather than rendering one to find out
-        def active?(path:, match:, view:)
-          case match
-          when :path then view.current_page_active?(path)
-          when :controller then view.current_page_active?(path, true)
-          else controller_action_match?(path, view)
-          end
-        end
-
-        private
-
-        # Recognizing each end once yields both halves, where going through current_page_active?
-        # first would recognize both again for the controller alone. The request is recognized
-        # under its own verb: a page rendered by a failed PATCH dispatched #update, and the GET
-        # route for that same URL is #show.
-        def controller_action_match?(path, view)
-          target = recognized(path)
-          current = recognized(view.request.url, view.request.request_method)
-          return false if target.nil? || current.nil?
-
-          target[:controller] == current[:controller] && target[:action] == current[:action]
-        end
-
-        def recognized(url, verb = :get)
-          Rails.application.routes.recognize_path(url, method: verb)
-        rescue ActionController::RoutingError
-          nil
-        end
-      end
-
-      def initialize(path:, text: nil, active: nil, match: :path, html_class: nil, **html_options)
+      def initialize(path:, text: nil, match: :path, matching_controllers: [], data: {}, **html_options)
         raise_if_invalid_value!(:match, match, MATCHES)
-        # html_class is what reaches the anchor, so a passed class would be dropped rather than merged
-        raise ArgumentError, "class is not supported, you must use the keyword arg html_class" if html_options.key?(:class)
+        # Only a :controller match compares controllers, so anywhere else these would be
+        # compared against a controller#action and never hit
+        raise ArgumentError, "matching_controllers: needs match: :controller" if
+          matching_controllers.any? && match != :controller
 
         @path = path
         @text = text
-        @active = active
         @match = match
-        @html_class = html_class
+        @matching_controllers = matching_controllers
+        @data = data
         @html_options = html_options
       end
 
       def call
-        link_to(link_text, @path, **@html_options.except(:aria), class: @html_class.presence, aria: aria_attributes)
+        link_to(link_text, @path, **@html_options, data: link_data)
       end
 
       private
@@ -75,23 +41,28 @@ module UI
           raise(ArgumentError, "text: or block content is required")
       end
 
-      def aria_attributes
-        @html_options[:aria].to_h.merge(current: aria_current)
+      def link_data
+        @data.merge(controller: [@data[:controller], "ui--active-link"].compact.join(" "),
+          "ui--active-link-match-value": @match,
+          "ui--active-link-routes-value": link_routes).compact
       end
 
-      # "page" is reserved for the link whose own path is the current one. A widened match
-      # means the current page sits inside what the link points at, not that it is it —
-      # aria-current's "true", so a reader isn't told a link elsewhere is where it already is
-      def aria_current
-        return unless active?
+      # What the browser compares the page against — it can't resolve a route itself. One
+      # controller#action, or one controller per entry when that's what the match compares,
+      # so a menu entry whose section spans two of them lists the other too.
+      def link_routes
+        return unless @match.in?(ROUTE_MATCHES)
 
-        (@match == :path) ? "page" : "true"
+        [route(@path), *@matching_controllers].compact.join(" ").presence
       end
 
-      def active?
-        return @active unless @active.nil?
+      def route(url)
+        recognized = Rails.application.routes.recognize_path(url)
+        return recognized[:controller] if @match == :controller
 
-        self.class.active?(path: @path, match: @match, view: helpers)
+        "#{recognized[:controller]}##{recognized[:action]}"
+      rescue ActionController::RoutingError
+        nil
       end
     end
   end

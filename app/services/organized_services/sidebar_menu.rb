@@ -14,10 +14,13 @@
 # the Stimulus controller opens and closes, and what the component matches the
 # current page against to decide which group starts open.
 #
-# `active:` names how the current page is recognized. Most of the vocabulary is
-# UserMenuItems', and PageBlock::OrgSidebar::Component::MATCHES hands it to
-# UI::ActiveLink as a match granularity; only :on_bikes_new and
-# :on_registration_sequences are left for the component to resolve itself.
+# `active:` names how the current page is recognized, since nothing here knows what
+# it is -- PageBlock::OrgSidebar::Component resolves them:
+#   :auto                       - the path
+#   :match_controller           - the path's controller
+#   :on_registrations_index     - its controller and action
+#   :on_bikes_new               - the path and its query params
+#   :on_registration_sequences  - also matches the pages controller
 module OrganizedServices
   module SidebarMenu
     extend Functionable
