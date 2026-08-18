@@ -46,7 +46,7 @@
   - if @marketplace_preview
     = render(UI::Alerts::Base::Component.new(kind: :notice)) do
       = t(".viewing_listing_preview")
-      #{link_to(t(".view_public_non_listing"), bike_path(@bike))}.
+      #{link_to(t(".view_public_non_listing"), bike_path(@bike), class: "twlink-underlined")}.
   .row
     .col-md-8
       %h1.bike-title

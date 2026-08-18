@@ -24,7 +24,7 @@
     </p>
   <% elsif !signed_in? %>
     <p class="tw:mt-2">
-      <%= translation(".to_see_your_bike_sign_up_html", bike_type: @bike.type, sign_up_link: link_to(translation(".sign_up"), claim_path, class: "twlink")) %>
+      <%= translation(".to_see_your_bike_sign_up_html", bike_type: @bike.type, sign_up_link: link_to(translation(".sign_up"), claim_path, class: "twlink-underlined")) %>
     </p>
   <% end %>
 

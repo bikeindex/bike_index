@@ -70,7 +70,7 @@ module Registrations
 
           # Parens included, so they're sized with the link rather than the sentence
           def read_more_link
-            link = link_to(translation(".read_more"), about_path, target: "_blank", rel: "noopener", class: "twlink")
+            link = link_to(translation(".read_more"), about_path, target: "_blank", rel: "noopener", class: "twlink-underlined")
             tag.span(safe_join(["(", link, ")"]), class: "tw:text-sm")
           end
         end

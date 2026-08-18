@@ -5,7 +5,7 @@
   <% @bikes.each do |bike| %>
     <p class="tw:mb-3">
       <%= link_to translation(".add_photo_theft_bike_title_html", bike_title: bike.title_string),
-            edit_bike_path(bike.to_param, edit_template: "photos"), class: "twlink" %>
+            edit_bike_path(bike.to_param, edit_template: "photos"), class: "twlink-underlined" %>
     </p>
   <% end %>
 <% end %>

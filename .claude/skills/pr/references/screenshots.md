@@ -12,6 +12,10 @@ The Claude Code web sandbox is the case that has neither: no GitHub CLI, and an 
 
 **Skipping means posting nothing at all**, not posting something else. Substitute evidence — a rendered-HTML diff, a note about what couldn't be captured — reads as a fine idea in the moment and leaves a comment the next run can't find or replace, because it isn't the `## Screenshots` comment. That's how #4126 ended up with three comments telling one story. If the evidence is worth having, put it in your summary to the user and let them decide where it goes.
 
+## Preflight: a CSS diff needs a fresh tailwind build
+
+When the diff touches `app/assets/tailwind/**`, check that `app/assets/builds/tailwind.css` contains the branch's new rules before capturing — another checkout's watcher can leave it stale for hours, and the capture then documents the bug the PR fixes. Ask the user to restart `bin/dev`; never rebuild it yourself.
+
 ## 1. Decide whether screenshots are needed and which URLs to capture
 
 You're only here because the diff is frontend (SKILL.md's classifier gates on that). Decide scope by PR state:
@@ -48,6 +52,11 @@ Capture the **base-branch** version (the base from SKILL.md's **Orient**) of eve
 Skip per-page only when the URL didn't exist on the base (a brand-new route or page added in this PR) — there's nothing to compare to.
 
 Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs, passing the base as its `BASE_REF` (`origin/main` unless **Orient** chose otherwise) — its "Cross-branch comparison" section does the rest, whether or not the base is `main`. Then re-invoke `github-pr-images` for those PNGs, host-only exactly as in step 3.
+
+Two things the checkout itself does, either side of it:
+
+- **`bin/rails tailwindcss:build` after each checkout when the diff touches `app/assets/tailwind/**`.** The watcher doesn't rebuild on a checkout, so the base capture otherwise renders the branch's CSS — a before/after that silently shows the same styling twice. Verify by grepping `app/assets/builds/tailwind.css` for a class the branch adds; build again on the way back.
+- **`bin/dev` restarts, so the first navigate after a checkout can hit `ERR_CONNECTION_REFUSED`.** Poll `curl -fs "$BASE_URL/"` until it answers rather than treating it as a failed capture.
 
 ## 5. Compose the Screenshots comment and hand it back
 

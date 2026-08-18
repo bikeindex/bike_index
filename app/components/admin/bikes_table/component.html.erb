@@ -84,8 +84,8 @@
           <%= "(#{bike.type})" unless bike.type == 'bike' %>
 
           <% if bike.stolen_recovery? %>
-            <small>
-              <%= link_to "recovery!", edit_admin_recovery_url(bike.recovered_records.first.id), class: "#{UI::Alerts::Base::Component::TEXT_CLASSES[:success]} tw:underline" %>
+            <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">
+              <%= link_to "recovery!", edit_admin_recovery_url(bike.recovered_records.first.id), class: "twlink-underlined" %>
             </small>
           <% end %>
 
