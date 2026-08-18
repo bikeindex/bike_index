@@ -10,9 +10,11 @@ module PageBlock
       MOBILE_BREAKPOINT = 760
 
       # The menu's own active vocabulary, at the granularities UI::ActiveLink resolves.
-      # A filtered index carries query params, so its row matches on controller and action
+      # A filtered index carries query params, so its row matches on controller and action;
+      # the unregistered notification's row is a path *with* one, which current_page?
+      # compares in full, so it lights only on its own variant of bikes#new
       MATCHES = UI::ActiveLink::Component.match_table(auto: :path, match_controller: :controller,
-        on_registrations_index: :controller_action)
+        on_registrations_index: :controller_action, on_bikes_new_with_parking_notification: :path)
 
       # A top-level row: the group toggles, the leaf links and the leaves with nothing
       # to link to all sit on this, so they stay the same height as each other
@@ -91,17 +93,15 @@ module PageBlock
       end
 
       # Resolves the per-request active state the cached payload deferred, returning
-      # true/false so the template never has to ask. The three states below are the ones
-      # a path can't answer on its own: both bikes#new links recognize the same
-      # controller and action, differing only by a query param, and a sequence's pages
-      # are their own controller
+      # true/false so the template never has to ask. Only two states are left that a path
+      # can't answer: add-a-bike has to stay dark on the notification's variant of its own
+      # url, and a sequence's pages are their own controller
       def active_link?(item)
         match = MATCHES[item[:active]]
         return UI::ActiveLink::Component.active?(path: item[:path], match:, view: helpers) if match
 
         case item[:active]
         when :on_bikes_new then on_bikes_new? && @unregistered_parking_notification.blank?
-        when :on_bikes_new_with_parking_notification then on_bikes_new? && @unregistered_parking_notification.present?
         when :on_registration_sequences
           organized_controller?("registration_sequences", "registration_sequence_pages")
         else item[:active] == true

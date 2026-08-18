@@ -44,6 +44,35 @@ RSpec.describe PageBlock::OrgSidebar::Component, type: :component do
     end
   end
 
+  # Both rows point at bikes#new and differ only by the query param, so exactly one of
+  # them lights on each variant of that url
+  context "on the new bike page" do
+    let(:page) { {controller_namespace: "organized", controller_name: "bikes", action_name: "new"} }
+    let(:component) do
+      with_request_url("/o/#{organization.to_param}/bikes/new") { render_inline(instance) }
+    end
+
+    it "lights add a bike, not the unregistered notification" do
+      expect(component).to have_css "a[aria-current='page']", text: "Add a bike"
+      expect(component).to have_no_css "a[aria-current='page']", text: "New unregistered notification"
+    end
+
+    context "with the parking notification param" do
+      let(:instance) do
+        described_class.new(organization:, current_user:, **page,
+          unregistered_parking_notification: FactoryBot.create(:parking_notification, organization:))
+      end
+      let(:component) do
+        with_request_url("/o/#{organization.to_param}/bikes/new?parking_notification=true") { render_inline(instance) }
+      end
+
+      it "lights the unregistered notification, not add a bike" do
+        expect(component).to have_css "a[aria-current='page']", text: "New unregistered notification"
+        expect(component).to have_no_css "a[aria-current='page']", text: "Add a bike"
+      end
+    end
+  end
+
   # A filtered index is the same controller and action carrying query params, which is
   # why that row matches on controller_action rather than on the path
   context "on a filtered registrations index" do
