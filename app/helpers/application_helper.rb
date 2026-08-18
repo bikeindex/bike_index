@@ -2,13 +2,12 @@ module ApplicationHelper
   include Binxtils::NavHelper
   include Binxtils::SortableHelper
 
-  # What the browser reads off the page rather than off an element, for the components whose
-  # markup is a fragment cache shared by every page. A layout that renders one and forgets
-  # these fails silently -- the link just never goes current -- so they travel together.
-  # The route is UI::ActiveLink's controller matching, not page_id, which controllers override
-  # to borrow another page's styles.
+  # UI::ActiveLink's controller matching reads the route off the page rather than off the link,
+  # since the link's markup is a fragment cache shared by every page. A layout that renders one
+  # and forgets this fails silently -- the link just never goes current. Not page_id, which
+  # controllers override to borrow another page's styles.
   def body_attributes
-    {data: {page_route: "#{controller_path}##{action_name}", implicit_locale:}}
+    {data: {page_route: "#{controller_path}##{action_name}"}}
   end
 
   def notification_delivery_display(status)

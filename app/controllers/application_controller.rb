@@ -74,6 +74,30 @@ class ApplicationController < ActionController::Base
       .to_h # Use to_h here to prevent unpermitted params logs over and over
   end
 
+  def locale_from_request_header
+    request.env.fetch("HTTP_ACCEPT_LANGUAGE", "").scan(/^[a-z]{2}/).first
+  end
+
+  def locale_from_request_params
+    params[:locale].to_s.strip
+  end
+
+  def requested_locale
+    return @requested_locale if defined?(@requested_locale)
+
+    requested_locale =
+      locale_from_request_params.presence ||
+      current_user&.preferred_language.presence ||
+      locale_from_request_header.presence
+
+    @requested_locale =
+      if I18n.available_locales.include?(requested_locale.to_s.to_sym)
+        requested_locale
+      else
+        I18n.default_locale
+      end
+  end
+
   def default_url_options(options = {})
     # forward locale param when provided
     params.permit(:locale).merge(options)

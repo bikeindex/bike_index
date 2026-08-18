@@ -128,15 +128,6 @@ RSpec.describe "Locale detection", type: :request do
         expect(current_user.reload.preferred_language).to eq nil
       end
 
-      # The footer's language switcher only adds ?locale= for a language other than this one,
-      # so it has to be the locale a param-less request lands on rather than the rendered one
-      it "hands the browser the locale a param-less request would render in" do
-        current_user.update_attribute :preferred_language, :nl
-        get "/", params: {locale: :en}, headers: {"HTTP_ACCEPT_LANGUAGE" => "en-US,en;q=0.9"}
-        expect(response.body).to match(/bike registration/i)
-        expect(response.body).to include(%(data-implicit-locale="nl"))
-      end
-
       it "falls back to the app default if no other locales are provided or recognized" do
         allow(I18n).to receive(:default_locale).and_return(:nl)
         current_user.update(preferred_language: nil)

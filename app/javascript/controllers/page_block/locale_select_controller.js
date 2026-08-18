@@ -9,13 +9,7 @@ export default class extends Controller {
     event.preventDefault()
     const locale = event.currentTarget.querySelector('[name="locale"]').value
     const url = new URL(window.location.href)
-    // The locale the page already renders in without a param -- a preference or the browser's
-    // language, not necessarily the default one, so the server hands it down on the body
-    if (locale === document.body.dataset.implicitLocale) {
-      url.searchParams.delete('locale')
-    } else {
-      url.searchParams.set('locale', locale)
-    }
+    url.searchParams.set('locale', locale)
     window.location.href = url.pathname + url.search
   }
 }
