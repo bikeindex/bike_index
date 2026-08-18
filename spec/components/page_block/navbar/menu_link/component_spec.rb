@@ -20,7 +20,7 @@ RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
 
     it "matches on the controller rather than the path" do
       expect(link["data-ui--active-link-match-value"]).to eq "controller"
-      expect(link["data-ui--active-link-routes-value"]).to eq "news#index"
+      expect(link["data-ui--active-link-routes-value"]).to eq "news"
     end
   end
 

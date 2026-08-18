@@ -108,7 +108,7 @@ RSpec.describe Org::MenuItems::Component, type: :component do
           }
           link = rendered.css("a.nav-link").detect { |a| a.text.strip == "Manage Registration sequences" }
           expect(link["data-ui--active-link-routes-value"])
-            .to eq "organized/registration_sequences#index organized/registration_sequence_pages"
+            .to eq "organized/registration_sequences organized/registration_sequence_pages"
         end
       end
 

@@ -19,15 +19,19 @@ export default class extends Controller {
     else this.element.removeAttribute('aria-current')
   }
 
+  get routeMatch () {
+    return ROUTE_MATCHES.includes(this.matchValue)
+  }
+
   // "page" is reserved for the link whose own URL is the current one. A widened match means
   // the current page sits inside what the link points at, not that it is it -- aria-current's
   // "true", so a reader isn't told a link elsewhere is where it already is
   ariaCurrent () {
-    return ROUTE_MATCHES.includes(this.matchValue) ? 'true' : 'page'
+    return this.routeMatch ? 'true' : 'page'
   }
 
   isActive () {
-    return ROUTE_MATCHES.includes(this.matchValue) ? this.routeMatches() : this.pathMatches()
+    return this.routeMatch ? this.routeMatches() : this.pathMatches()
   }
 
   // Mirrors current_page?: the query string counts when the link carries one, so a search
@@ -49,8 +53,7 @@ export default class extends Controller {
     const pageRoute = document.body.dataset.pageRoute
     if (!pageRoute || !this.hasRoutesValue) return false
 
-    return this.routesValue.split(' ').some((route) => this.matchValue === 'controller_action'
-      ? route === pageRoute
-      : controllerOf(route) === controllerOf(pageRoute))
+    return this.routesValue.split(' ')
+      .includes(this.matchValue === 'controller_action' ? pageRoute : controllerOf(pageRoute))
   }
 }

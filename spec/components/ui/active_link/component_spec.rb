@@ -27,6 +27,13 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     end
   end
 
+  # The controller can't read the constant, so the copy in it drifts silently otherwise
+  it "keeps the browser's ROUTE_MATCHES list in step with its own" do
+    js = Rails.root.join("app/javascript/controllers/ui/active_link_controller.js").read
+    expect(js[/const ROUTE_MATCHES = \[(.*?)\]/m, 1].scan(/'([a-z_]+)'/).flatten)
+      .to eq described_class::ROUTE_MATCHES.map(&:to_s)
+  end
+
   # Only :path can say "page" — the widened matches go active on a page the link doesn't
   # point at, so they say "true"
   describe "match" do
@@ -46,7 +53,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
 
       it "carries the link's own route, which the page's is compared against" do
         expect(link["data-ui--active-link-match-value"]).to eq "controller"
-        expect(link["data-ui--active-link-routes-value"]).to eq "news#index"
+        expect(link["data-ui--active-link-routes-value"]).to eq "news"
       end
 
       context "with matching_controllers" do
@@ -54,7 +61,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
 
         it "adds them to the routes the browser compares" do
           expect(link["data-ui--active-link-routes-value"])
-            .to eq "news#index organized/registration_sequence_pages"
+            .to eq "news organized/registration_sequence_pages"
         end
       end
     end
@@ -66,6 +73,14 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
       it "carries the route the params are dropped from" do
         expect(link["data-ui--active-link-match-value"]).to eq "controller_action"
         expect(link["data-ui--active-link-routes-value"]).to eq "search/registrations#index"
+      end
+    end
+
+    context "with matching_controllers on a match that can't use them" do
+      let(:options) { {match: :controller_action, matching_controllers: ["news"]} }
+
+      it "raises rather than rendering entries the browser will never compare" do
+        expect { component }.to raise_error(ArgumentError, /matching_controllers/)
       end
     end
 
