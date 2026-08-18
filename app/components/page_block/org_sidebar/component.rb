@@ -43,7 +43,7 @@ module PageBlock
       private
 
       def items
-        @items ||= OrganizedServices::SidebarMenu.for(organization: @organization, current_user: @current_user)
+        @items ||= OrganizedServices::UserMenuItems.for(organization: @organization, current_user: @current_user)
       end
 
       def account_items
