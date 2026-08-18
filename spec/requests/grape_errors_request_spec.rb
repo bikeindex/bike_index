@@ -76,14 +76,12 @@ RSpec.describe GrapeErrors do
     end
   end
 
-  # Each of these is an exception that breaks response_for itself, which used to escape as
-  # a bare 500 with no JSON body and no Honeybadger notify
+  # Each of these breaks response_for itself; it used to escape as a bare, unnotified 500
   describe "response_for" do
     let(:response) { described_class.response_for(error) }
 
     context "with an invalid-UTF-8 message" do
-      # enum errors interpolate the raw param value - "'\xC3(' is not a valid
-      # frame_material" - and scanners send probe bytes
+      # enum errors interpolate the raw param value, and scanners send invalid UTF-8 probe bytes
       let(:invalid_utf8) { "'\xC3\x28' is not a valid frame_material".dup.force_encoding(Encoding::UTF_8) }
       # response_for reads error.backtrace, so raise the exception for real
       let(:error) do
@@ -140,8 +138,8 @@ RSpec.describe GrapeErrors do
     end
   end
 
-  # grape_logging logs a re-raised exception's own #status, so the errors below - which
-  # carry none - were recorded as 500s while the client got the mapped status
+  # These errors carry no #status of their own; grape_logging used to log them as 500
+  # while the client got the mapped status
   describe "logged status", type: :request do
     def logged_status(path)
       statuses = []

@@ -14,9 +14,8 @@ class MarkGraduatedNotificationRemainingJob < ApplicationJob
 
   private
 
-  # A notification and its matches each mark the others, and none reaches marked_remaining
-  # until after the loops below - so marking_ids, threaded through every branch, is the only
-  # thing ending the recursion. Returns it so siblings don't re-traverse each other.
+  # marked_remaining? doesn't flip true until after the loops below, so marking_ids -
+  # threaded through every branch - is what stops the mutual recursion between matches
   def mark_remaining(graduated_notification_id, marked_remaining_by_id, marking_ids)
     return marking_ids if marking_ids.include?(graduated_notification_id)
 

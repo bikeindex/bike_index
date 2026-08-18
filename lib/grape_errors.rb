@@ -1,5 +1,3 @@
-# Everything the Grape API does with an exception: what status it means, what the client is
-# told, whether we hear about it, and the middleware that answers with it.
 module GrapeErrors
   extend Functionable
 
@@ -11,8 +9,8 @@ module GrapeErrors
   OAUTH_ERRORS = [APIAuthorization::Errors::OAuthUnauthorizedError,
     APIAuthorization::Errors::OAuthForbiddenError].freeze
 
-  # Ordered - the first match wins, so anything carrying its own #status (every Grape
-  # exception) falls through to status_for's default
+  # Ordered by ancestry match - first entry wins. Grape's own exceptions carry #status, so
+  # they're deliberately absent; status_for falls back to that.
   STATUSES = {
     APIAuthorization::Errors::OAuthUnauthorizedError => 401,
     APIAuthorization::Errors::OAuthForbiddenError => 403,
@@ -21,9 +19,8 @@ module GrapeErrors
     Rack::BadRequest => 400 # malformed request body (e.g. empty multipart)
   }.freeze
 
-  # grape_logging logs a re-raised exception's own #status, falling back to 500 - so app
-  # exceptions carrying none were logged as 500s while the client got the mapped status.
-  # Answering here, inside that middleware, is what keeps the log and the response agreed.
+  # grape_logging logs an exception's own #status, defaulting to 500 when there isn't one -
+  # answering here, before it re-raises, keeps the logged status and the response agreed.
   class Responder
     def initialize(app)
       @app = app
@@ -36,9 +33,7 @@ module GrapeErrors
     end
   end
 
-  # Returns a Rack::Response - Responder .finishes it, Grape's rescue_from returns it bare.
-  # Anything raised in here escapes as a status-only 500 with no JSON body and no
-  # Honeybadger notify, so every path out answers.
+  # A Rack::Response, unfinished - Responder .finishes it, Grape's rescue_from returns it bare
   def response_for(error)
     message = message_for(error)
     # Rails.logger, since Grape's own logger writes to $stdout and never reaches production.log
@@ -75,8 +70,7 @@ module GrapeErrors
 
   def oauth_error?(error) = OAUTH_ERRORS.any? { |klass| error.is_a?(klass) }
 
-  # Exception messages can carry invalid UTF-8 (scanner probe URLs, malformed params),
-  # and #message can raise outright.
+  # Exception messages can carry invalid UTF-8 (scanner probes, malformed params) or raise outright
   def scrubbed_message(error)
     error.message.to_s.dup.force_encoding(Encoding::UTF_8).scrub
   rescue

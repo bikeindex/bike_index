@@ -71,8 +71,8 @@ module API
     use GrapeErrors::Responder
     use ::APIAuthorization::OAuth2
 
-    # The Responder handles everything raised below it, which is every endpoint. This is the
-    # net for what it can't reach: non-StandardError, and the logger above it.
+    # Responder catches everything below it (every endpoint); this net only catches what it
+    # can't reach - non-StandardError, and errors from the logger above.
     rescue_from :all do |e|
       GrapeErrors.response_for(e)
     end
