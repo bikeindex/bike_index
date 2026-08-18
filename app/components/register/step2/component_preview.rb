@@ -20,6 +20,12 @@ module Register
           creation_organization_id: lookbook_organization&.id)
       end
 
+      # The same registration once the checkbox is unchecked - what the organization asks
+      # for renders collapsed, so checking it again brings it back
+      def with_auto_organization_dropped
+        step_2(auto_organization_id: lookbook_organization&.id)
+      end
+
       # Someone else's registration: it asks for their name, and the confirmation
       # link is still out
       def for_someone_else

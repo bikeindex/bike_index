@@ -390,6 +390,14 @@ RSpec.describe "Register flow", :js, type: :system do
         expect(page).to have_content(/contact info/i)
         expect(page).to have_no_content(/information for brakebills/i)
 
+        # Collapsed rather than dropped, so changing their mind brings all of it back
+        check "Register with Brakebills"
+        expect(page).to have_field("bike[student_id]")
+        expect(page).to have_content(/information for brakebills/i)
+
+        uncheck "Register with Brakebills"
+        expect(page).to have_no_field("bike[student_id]")
+
         click_button "Complete Bike Registration"
         expect(page).to have_content("Registration complete")
         expect(Bike.last.creation_organization_id).to be_blank

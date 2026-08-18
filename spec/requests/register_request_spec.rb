@@ -954,7 +954,11 @@ RSpec.describe RegisterController, type: :request do
       end
 
       context "with an automatically assigned organization" do
-        let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+        let(:organization) do
+          FactoryBot.create(:organization, short_name: "Brakebills").tap do
+            it.update_column :enabled_feature_slugs, %w[reg_student_id]
+          end
+        end
         let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
         let(:b_param) do
           BParam.create(origin: "register_flow", creator_id: current_user.id,
@@ -990,6 +994,8 @@ RSpec.describe RegisterController, type: :request do
           checkbox = Nokogiri::HTML(response.body).at_css("input[name='register_with_organization']")
           expect(checkbox["checked"]).to be_blank
           expect(response.body).to include "Register with Brakebills"
+          # Collapsed rather than dropped, so checking the box again has it to bring back
+          expect(response.body).to include "bike[student_id]"
 
           patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details,
                                    register_with_organization: "1"}

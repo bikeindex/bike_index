@@ -375,7 +375,10 @@
     <% end %>
 
     <%# The organization's own asks sit under its heading, alongside the contact fields %>
-    <div data-register--organization-target="field">
+    <div
+      class="<%= "tw:hidden" if organization_dropped? %>"
+      data-register--organization-target="field"
+    >
       <% if show_extra_registration_number? %>
         <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :extra_registration_number,
             label_text: reg_label("reg_extra_registration_number", translation(".additional_serial_sticker_number")),
@@ -384,9 +387,9 @@
 
       <% if show_organization_affiliation? %>
         <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_affiliation,
-            label_text: reg_label("reg_organization_affiliation", translation(".affiliation", org_name: organization.short_name)))) do %>
+            label_text: reg_label("reg_organization_affiliation", translation(".affiliation", org_name: reg_organization.short_name)))) do %>
           <%= render UI::Forms::Select::Component.new(form_builder: f, attribute: :organization_affiliation,
-              option_tags: organization.organization_affiliation_options,
+              option_tags: reg_organization.organization_affiliation_options,
               options: {selected: bike["organization_affiliation"], include_blank: true}) %>
         <% end %>
       <% end %>
@@ -394,7 +397,7 @@
       <% if show_student_id? %>
         <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :student_id,
             label_text: reg_label("reg_student_id", translation(".student_id")),
-            required: organization.enabled?("require_reg_student_id"),
+            required: reg_organization.enabled?("require_reg_student_id"),
             html_options: {value: bike["student_id"], autocomplete: "off"}) %>
       <% end %>
     </div>
@@ -426,12 +429,13 @@
         class="tw:mb-6 <%= "tw:hidden" unless show_address? %>"
         data-register--status-fields-target="field"
         data-register--organization-target="statusField"
+        data-organization-off="<%= "true" if organization_dropped? %>"
         data-statuses="<%= address_statuses.to_json %>"
       >
         <%# _attributes explicitly: form_with has no model to infer nested attributes from %>
         <%= f.fields_for :address_record_attributes, address_record do |address_form| %>
           <%= render UI::Forms::AddressGroup::Component.new(form_builder: address_form,
-              required: organization.enabled?("require_reg_address")) %>
+              required: reg_organization.enabled?("require_reg_address")) %>
         <% end %>
       </div>
     <% end %>
