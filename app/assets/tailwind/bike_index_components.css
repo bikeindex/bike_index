@@ -1,5 +1,12 @@
 /* Bike Index's own tw* classes. Rules that style one component's markup — .ui-table,
  * .search-results-frame-wrapper — stay in application.css */
+
+/* A utility rather than a class in the layer below, because `@apply` only takes
+ * utilities and base-font applies this one for the body */
+@utility twtext-color {
+  @apply tw:text-gray-900 tw:dark:text-gray-400;
+}
+
 @layer components {
   .twlink {
     @apply tw:text-blue-600 tw:dark:text-blue-400 tw:transition-colors;
