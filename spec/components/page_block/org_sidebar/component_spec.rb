@@ -43,6 +43,8 @@ RSpec.describe PageBlock::OrgSidebar::Component, type: :component do
       expect(component.css("[aria-controls^='org_sidebar_group_'][aria-expanded='true']").map { |b| b.text.strip })
         .to eq(["Impounded Vehicles"])
       expect(component).to have_css "a[aria-current='page']", text: "Search Impounded Vehicles"
+      # The is-active variant styles the group's own row off this, having no aria-current
+      expect(component.css("button[data-active='true']").map { |b| b.text.strip }).to eq(["Impounded Vehicles"])
     end
   end
 

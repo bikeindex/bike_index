@@ -166,12 +166,13 @@
             ></div>
           <% when :group %>
             <% open = open_group?(item) %>
-            <% active = item == active_group %>
 
             <div data-controller="ui--collapse" class="tw:contents">
+              <%# A button can't be aria-current, so the is-active variant reads data-active here %>
               <button
                 type="button"
-                class="<%= row_class(active) %>"
+                class="<%= row_class %>"
+                data-active="<%= item == active_group %>"
                 aria-expanded="<%= open %>"
                 aria-controls="org_sidebar_group_<%= item[:key] %>"
                 data-ui--collapse-target="trigger"
@@ -206,20 +207,16 @@
                   <% if child[:type] == :disabled %>
                     <span class="tw:text-gray-400 <%= PageBlock::OrgSidebar::Component::CHILD %>"><%= child[:label] %></span>
                   <% else %>
-                    <% child_active = active_link?(child) %>
-
-                    <%= link_to child[:label], child[:path], class: child_class(child_active),
-                      aria: {current: child_active ? "page" : nil} %>
+                    <%= link_to child[:label], child[:path], class: child_class,
+                      aria: {current: ("page" if active_link?(child))} %>
                   <% end %>
                 <% end %>
               </div>
             </div>
           <% when :link %>
-            <% active = active_link?(item) %>
-
             <%= link_to item[:path],
-                class: row_class(active),
-                aria: {current: active ? "page" : nil} do %>
+                class: row_class,
+                aria: {current: ("page" if active_link?(item))} do %>
               <span class="tw:flex tw:flex-none"><%= icon(item[:icon], html_class: "tw:h-[17px] tw:w-[17px]") %></span>
 
               <span

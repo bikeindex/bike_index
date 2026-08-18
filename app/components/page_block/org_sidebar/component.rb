@@ -13,7 +13,9 @@ module PageBlock
       ROW = "tw:mx-2 tw:flex tw:items-center tw:gap-[11px] tw:rounded-[11px] tw:px-3 tw:py-[9px] " \
         "tw:text-sm tw:font-bold tw:group-data-[collapsed=true]/sidebar:justify-center tw:max-[760px]:py-3.5"
       ROW_HOVER = "tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700"
-      ROW_CURRENT = "tw:bg-blue-50 tw:text-blue-600 tw:dark:bg-gray-700"
+      # The is-active variant reads the aria-current the row already carries, so the
+      # current page is styled off the markup that states it rather than off a second flag
+      ROW_CURRENT = "tw:is-active:bg-blue-50 tw:is-active:text-blue-600 tw:is-active:dark:bg-gray-700"
       ROW_RESTING = "tw:text-gray-900 tw:dark:text-gray-300"
 
       # A row inside a group, indented past its parent's icon
@@ -63,12 +65,12 @@ module PageBlock
         group == (active_group || groups.first)
       end
 
-      def row_class(active)
-        [ROW, ROW_HOVER, "tw:no-underline", active ? ROW_CURRENT : ROW_RESTING].join(" ")
+      def row_class
+        [ROW, ROW_HOVER, "tw:no-underline", ROW_RESTING, ROW_CURRENT].join(" ")
       end
 
-      def child_class(active)
-        [CHILD, "tw:no-underline tw:hover:text-blue-600", active ? ROW_CURRENT : CHILD_RESTING].join(" ")
+      def child_class
+        [CHILD, "tw:no-underline tw:hover:text-blue-600", CHILD_RESTING, ROW_CURRENT].join(" ")
       end
 
       # Replaces UI::Button's classes entirely -- this trigger is a sidebar row, not a button.
@@ -94,28 +96,23 @@ module PageBlock
 
       # Memoized because the template asks again for every row the scan above resolved
       def active_link?(item)
-        cache = (@active_links ||= {})
-        key = [item[:path], item[:active]]
-        cache.fetch(key) { cache[key] = resolve_active(item) }
+        (@active_links ||= Hash.new { |cache, link| cache[link] = resolve_active(link) })[item]
       end
 
-      # UI::ActiveLink leaves this to the browser, which the sidebar can't: the group
-      # holding the current page is the one that starts open, and that has to be decided
-      # before the rows render
+      # UI::ActiveLink's matches, resolved here rather than in its controller: the group
+      # holding the current page is the one that starts open, before the rows render
       def resolve_active(item)
-        case item[:active]
-        when :auto then helpers.current_page_active?(item[:path])
-        when :match_controller then helpers.current_page_active?(item[:path], true)
-        when :on_registrations_index then organized_controller?("registrations") && @action_name == "index"
+        case item[:match]
+        when :path then helpers.current_page_active?(item[:path])
         # Both add-a-bike rows are organized/bikes#new, told apart by the query param
-        when :on_bikes_new then request.fullpath == item[:path]
-        when :on_registration_sequences
-          organized_controller?("registration_sequences", "registration_sequence_pages")
+        when :full_path then request.fullpath == item[:path]
+        when :controller then item[:routes].include?(current_controller)
+        when :controller_action then item[:routes].include?("#{current_controller}##{@action_name}")
         end
       end
 
-      def organized_controller?(*controller_names)
-        @controller_namespace == "organized" && controller_names.include?(@controller_name)
+      def current_controller
+        [@controller_namespace, @controller_name].compact.join("/")
       end
 
       def avatar_url

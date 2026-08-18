@@ -2,7 +2,8 @@
 
 # The organization menu api/v3/me serves to API clients, cached per
 # [organization, user]. OrganizedServices::SidebarMenu is what the site's own
-# sidebar renders from.
+# sidebar renders from; both build on OrganizedServices::OrganizationMenuLinks,
+# which owns every path and feature gate.
 #
 # Item shapes:
 #   {type: :divider}
@@ -21,7 +22,7 @@ module OrganizedServices
     def for(organization:, current_user:)
       return [] if organization.nil? || current_user.nil?
 
-      Rails.cache.fetch(["organized_menu_items_v2", organization.id, current_user.cache_key_with_version]) do
+      Rails.cache.fetch(["organized_menu_items_v3", organization.id, current_user.cache_key_with_version]) do
         build_items(organization, current_user)
       end
     end
@@ -30,62 +31,41 @@ module OrganizedServices
     # private below here
     #
 
-    def add_bike_link(organization)
-      link(translation(:add_a_bike),
-        routes.new_organization_bike_path(organization.to_param), match: :full_path)
-    end
-
-    def dashboard_link(organization)
-      link("#{organization.short_name} dashboard",
-        routes.organization_dashboard_index_path(organization_id: organization.to_param))
-    end
-
-    def bulk_import_link(organization)
-      bulk_label = organization.ascend_or_broken_ascend? ? translation(:ascend_imports) : translation(:bulk_imports)
-      link(bulk_label,
-        routes.organization_bulk_imports_path(organization_id: organization.to_param),
-        match: :controller)
-    end
-
-    # Editing a page of a sequence is the same section of the menu, on its own controller
-    def registration_sequences_link(organization)
-      link(translation(:manage_registration_sequences),
-        routes.organization_registration_sequences_path(organization_id: organization.to_param),
-        match: :controller, matching_controllers: ["organized/registration_sequence_pages"])
-    end
-
     def build_items(organization, current_user)
-      organization.ambassador? ? ambassador_items(organization) : standard_items(organization, current_user)
+      links = OrganizationMenuLinks.for(organization)
+
+      if organization.ambassador?
+        ambassador_items(organization, links)
+      else
+        standard_items(organization, current_user, links)
+      end
     end
 
-    def ambassador_items(organization)
+    def ambassador_items(organization, links)
       [
-        link(translation(:org_dashboard, org_name: organization.short_name),
-          routes.organization_ambassador_dashboard_path(organization_id: organization.to_param)),
-        link(translation(:resources),
-          routes.resources_organization_ambassador_dashboard_path(organization_id: organization.to_param)),
-        link(translation(:getting_started),
-          routes.getting_started_organization_ambassador_dashboard_path(organization_id: organization.to_param)),
-        link(translation(:multi_search),
-          routes.multi_search_organization_registrations_path(organization_id: organization.to_param)),
-        link(translation(:discuss), "https://discuss.bikeindex.org")
+        link(links[:ambassador_dashboard], translation(:org_dashboard, org_name: organization.short_name)),
+        link(links[:ambassador_resources], translation(:resources)),
+        link(links[:ambassador_getting_started], translation(:getting_started)),
+        link(links[:multi_search], translation(:multi_search), ignore_enabled: true),
+        link(links[:discuss], translation(:discuss))
       ]
     end
 
-    def standard_items(organization, current_user)
+    def standard_items(organization, current_user, links)
       items = []
 
-      if organization.overview_dashboard?
-        items << dashboard_link(organization)
+      if links[:dashboard][:enabled]
+        items << link(links[:dashboard], "#{organization.short_name} dashboard", match: :path)
         items << divider
       end
 
-      items.concat(registration_items(organization))
-      items.concat(add_bike_items(organization))
+      items.concat(registration_items(organization, links))
+      items.concat(add_bike_items(organization, links))
       items << divider
 
-      items.concat(feature_items(organization))
-      items.concat(admin_items(organization, current_user, additional_divider: additional_divider?(organization)))
+      items.concat(feature_items(links))
+      items.concat(admin_items(organization, current_user, links,
+        additional_divider: additional_divider?(organization)))
 
       items
     end
@@ -96,149 +76,73 @@ module OrganizedServices
       end
     end
 
-    def registration_items(organization)
-      items = [
-        link(translation(:org_bikes, org_name: organization.short_name),
-          routes.organization_registrations_path(organization_id: organization.to_param),
-          match: :controller_action)
-      ]
-
-      if organization.enabled?("impound_bikes")
-        items << link(translation(:impounded_bikes),
-          routes.organization_impound_records_path(organization_id: organization.to_param),
-          secondary: true, match: :controller)
-      end
-
-      if organization.enabled?("show_partial_registrations")
-        items << link(translation(:incomplete_registrations),
-          routes.incompletes_organization_bikes_path(organization.to_param), secondary: true)
+    def registration_items(organization, links)
+      incompletes = if links[:incompletes][:enabled]
+        link(links[:incompletes], translation(:incomplete_registrations), secondary: true)
       elsif !organization.bike_shop?
-        items << {type: :disabled, label: translation(:incomplete_registrations), secondary: true}
+        {type: :disabled, label: translation(:incomplete_registrations), secondary: true}
       end
 
-      if organization.enabled?("bike_search")
-        items << link(translation(:multi_search),
-          routes.multi_search_organization_registrations_path(organization.to_param), secondary: true)
-      end
-
-      if organization.enabled?("show_recoveries")
-        items << link(translation(:recoveries),
-          routes.recoveries_organization_bikes_path(organization.to_param), secondary: true)
-      end
-
-      items
+      [link(links[:registrations], translation(:org_bikes, org_name: organization.short_name)),
+        link(links[:impound_records], translation(:impounded_bikes), secondary: true),
+        incompletes,
+        link(links[:multi_search], translation(:multi_search), secondary: true),
+        link(links[:recoveries], translation(:recoveries), secondary: true)].compact
     end
 
     # Both add-a-bike links are organized/bikes#new, told apart by the parking_notification
     # param — so they match on the full path rather than on the page they share
-    def add_bike_items(organization)
-      items = [add_bike_link(organization)]
+    def add_bike_items(organization, links)
+      items = [link(links[:add_bike], translation(:add_a_bike))]
 
-      divider_below = organization.show_bulk_import? || organization.lightspeed_or_broken_lightspeed? ||
-        organization.enabled?("parking_notifications")
+      divider_below = links[:bulk_imports][:enabled] || links[:lightspeed][:enabled] ||
+        links[:parking_notifications][:enabled]
       items << divider if divider_below
 
-      items << bulk_import_link(organization) if organization.show_bulk_import?
+      bulk_label = organization.ascend_or_broken_ascend? ? translation(:ascend_imports) : translation(:bulk_imports)
 
-      if organization.lightspeed_or_broken_lightspeed?
-        items << link(translation(:lightspeed_integration_panel),
-          routes.lightspeed_interface_path(organization_id: organization.id))
-      end
-
-      if organization.enabled?("parking_notifications")
-        items << link(translation(:parking_notifications),
-          routes.organization_parking_notifications_path(organization_id: organization.to_param))
-        items << link(translation(:parking_notification_unregistered),
-          routes.new_organization_bike_path(organization.to_param, parking_notification: true),
-          secondary: true, match: :full_path)
-      end
-
-      items
+      items.concat([link(links[:bulk_imports], bulk_label),
+        link(links[:lightspeed], translation(:lightspeed_integration_panel)),
+        link(links[:parking_notifications], translation(:parking_notifications)),
+        link(links[:unregistered_notification], translation(:parking_notification_unregistered),
+          secondary: true)].compact)
     end
 
-    def feature_items(organization)
-      items = []
-
-      items << if organization.enabled?("bike_stickers")
-        link(translation(:registration_stickers),
-          routes.organization_stickers_path(organization_id: organization.to_param),
-          match: :controller)
-      else
+    def feature_items(links)
+      stickers = link(links[:stickers], translation(:registration_stickers)) ||
         {type: :disabled, label: translation(:registration_stickers), secondary: false}
-      end
 
-      if organization.enabled?("hot_sheet")
-        items << link(translation(:stolen_hot_sheet),
-          routes.organization_hot_sheet_path(organization_id: organization.to_param))
-      end
-
-      if organization.enabled?("csv_exports")
-        items << link(translation(:exports),
-          routes.organization_exports_path(organization_id: organization.to_param),
-          match: :controller)
-      end
-
-      if organization.enabled?("graduated_notifications")
-        items << link(translation(:graduated_notifications),
-          routes.organization_graduated_notifications_path(organization_id: organization.to_param),
-          match: :controller)
-      end
-
-      if organization.enabled?("model_audits")
-        items << link(translation(:model_audits),
-          routes.organization_model_audits_path(organization_id: organization.to_param),
-          match: :controller)
-      end
-
-      if organization.impound_claims?
-        items << link(translation(:impounded_claims),
-          routes.organization_impound_claims_path(organization_id: organization.to_param),
-          match: :controller)
-      end
-
-      items
+      [stickers,
+        link(links[:hot_sheet], translation(:stolen_hot_sheet)),
+        link(links[:exports], translation(:exports)),
+        link(links[:graduated_notifications], translation(:graduated_notifications)),
+        link(links[:model_audits], translation(:model_audits)),
+        link(links[:impound_claims], translation(:impounded_claims))].compact
     end
 
-    def admin_items(organization, current_user, additional_divider:)
+    def admin_items(organization, current_user, links, additional_divider:)
       return [] unless current_user.admin_of?(organization) || current_user.superuser?
 
-      items = []
-      items << divider if additional_divider
-      items << link(translation(:manage_users),
-        routes.organization_users_path(organization_id: organization.to_param), match: :controller)
+      emails = link(links[:emails], translation(:custom_emails)) ||
+        link(links[:stolen_message], translation(:stolen_message))
 
-      if organization.enabled?("impound_bikes")
-        items << link(translation(:manage_impounding, org_name: organization.short_name),
-          routes.edit_organization_manage_impounding_path(organization_id: organization.to_param))
-      end
-
-      items << link(translation(:org_profile, org_name: organization.short_name),
-        routes.organization_manage_path(organization_id: organization.to_param))
-      items << link(translation(:org_locations, org_name: organization.short_name),
-        routes.locations_organization_manage_path(organization_id: organization.to_param))
-
-      if organization.enabled?("customize_emails")
-        items << link(translation(:custom_emails),
-          routes.organization_emails_path(organization_id: organization.to_param), match: :controller)
-      elsif organization.enabled?("organization_stolen_message")
-        items << link(translation(:stolen_message),
-          routes.edit_organization_email_path("organization_stolen_message", organization_id: organization.to_param))
-      end
-
-      if organization.enabled?("hot_sheet")
-        items << link(translation(:stolen_hot_sheet_configuration),
-          routes.edit_organization_hot_sheet_path(organization_id: organization.to_param))
-      end
-
-      if organization.enabled?("registration_sequences")
-        items << registration_sequences_link(organization)
-      end
-
-      items
+      [(divider if additional_divider),
+        link(links[:manage_users], translation(:manage_users)),
+        link(links[:manage_impounding], translation(:manage_impounding, org_name: organization.short_name)),
+        link(links[:org_profile], translation(:org_profile, org_name: organization.short_name)),
+        link(links[:org_locations], translation(:org_locations, org_name: organization.short_name)),
+        emails,
+        link(links[:hot_sheet_configuration], translation(:stolen_hot_sheet_configuration)),
+        link(links[:registration_sequences], translation(:manage_registration_sequences))].compact
     end
 
-    def link(label, path, secondary: false, match: :path, matching_controllers: [])
-      {type: :link, label:, path:, secondary:, match:, matching_controllers:}
+    # An ambassador organization reaches multi_search without the feature the standard
+    # menu gates it on, so its row asks for the link regardless
+    def link(entry, label, secondary: false, match: nil, ignore_enabled: false)
+      return nil unless entry[:enabled] || ignore_enabled
+
+      {type: :link, label:, path: entry[:path], secondary:, match: match || entry[:match],
+       matching_controllers: entry[:matching_controllers]}
     end
 
     def divider
@@ -249,13 +153,8 @@ module OrganizedServices
       I18n.t(key, scope: "shared.organized_menu_items", **interpolations)
     end
 
-    def routes
-      Rails.application.routes.url_helpers
-    end
-
-    conceal :add_bike_link, :dashboard_link, :bulk_import_link, :registration_sequences_link,
-      :build_items, :ambassador_items, :standard_items, :registration_items,
+    conceal :build_items, :ambassador_items, :standard_items, :registration_items,
       :add_bike_items, :feature_items, :admin_items, :additional_divider?,
-      :link, :divider, :translation, :routes
+      :link, :divider, :translation
   end
 end
