@@ -209,6 +209,12 @@ body.with-org-sidebar {
   transition: margin-left 0.18s ease;
 }
 
+/* The sidebar runs the height of the window, so the content does too -- a short page
+   would otherwise end partway down it, with the footer riding up beside the rows */
+body.with-org-sidebar main {
+  min-height: 100vh;
+}
+
 /* PageBlock::OrgSidebar::Component::MOBILE_BREAKPOINT, below which the sidebar is
    a top bar in the flow -- which takes its own space, so there's nothing to hold
    open for it. `width <` rather than a max-width of 759px, so a fractional viewport
@@ -216,6 +222,10 @@ body.with-org-sidebar {
 @media (width < 760px) {
   body.with-org-sidebar {
     margin-left: 0;
+  }
+
+  body.with-org-sidebar main {
+    min-height: 0;
   }
 }
 

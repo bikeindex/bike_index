@@ -103,9 +103,15 @@
         by --nav-gap would slide under it
       %>
 
+      <%#
+        PageBlock::MainContent::Organized carries this inset itself; every other page
+        under the sidebar has neither it nor the navbar gap to start below
+      %>
+      <% sidebar_inset = "tw:pt-4 tw:min-[760px]:pt-7" if show_org_sidebar && !main_content_organized? %>
+
       <main
         id="main-content"
-        class="<%= "tw:[--nav-gap:0px]" if show_general_alert_here %>"
+        class="<%= [("tw:[--nav-gap:0px]" if show_general_alert_here), sidebar_inset].compact.join(" ") %>"
       >
         <%= render(PageBlock::MainContent::Wrapper::Component.new(
           controller_namespace:,
