@@ -66,9 +66,7 @@
           <ul class="tw:m-0 tw:mb-4 tw:list-none">
             <% if content_page_type == "news" %>
               <li>
-                <%# A search is a narrower page than this link points at; paging isn't %>
-                <%= render UI::ActiveLink::Component.new(text: translation(".bike_index_news"),
-                      path: news_index_path, match: :unfiltered_path) %>
+                <%= render UI::ActiveLink::Component.new(text: translation(".bike_index_news"), path: news_index_path) %>
               </li>
             <% end %>
 

@@ -40,20 +40,6 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
       end
     end
 
-    context ":unfiltered_path" do
-      let(:path) { "/news" }
-      let(:options) { {match: :unfiltered_path} }
-
-      # The browser can't ask sortable_search_params?, so it gets the names it asks about
-      it "carries the params that count as a search" do
-        expect(link["data-ui--active-link-match-value"]).to eq "unfiltered_path"
-        filters = link["data-ui--active-link-filters-value"].split(" ")
-        expect(filters).to include("query", "stolenness", "serial")
-        # Paging and sorting don't narrow the page, so they aren't searches
-        expect(filters).to_not include("page", "per_page", "sort", "direction", "period")
-      end
-    end
-
     context ":controller" do
       let(:path) { "/news" }
       let(:options) { {match: :controller} }

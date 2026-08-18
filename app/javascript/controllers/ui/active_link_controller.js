@@ -12,7 +12,7 @@ const ROUTE_MATCHES = ['controller', 'controller_action']
 // Renders UI::ActiveLink::Component's aria-current, which the server can't: these links are
 // cached fragments, so the markup is shared by every page it was rendered for.
 export default class extends Controller {
-  static values = { match: String, routes: String, filters: String }
+  static values = { match: String, routes: String }
 
   connect () {
     if (this.isActive()) this.element.setAttribute('aria-current', this.ariaCurrent())
@@ -27,49 +27,20 @@ export default class extends Controller {
   }
 
   isActive () {
-    if (ROUTE_MATCHES.includes(this.matchValue)) return this.routeMatches()
-    if (this.matchValue === 'unfiltered_path') return this.unfilteredPathMatches()
-
-    return this.pathMatches()
-  }
-
-  // Null off-site, where the page can never be what the link points at
-  linkUrl () {
-    const url = new URL(this.element.href, window.location.href)
-
-    return url.origin === window.location.origin ? url : null
+    return ROUTE_MATCHES.includes(this.matchValue) ? this.routeMatches() : this.pathMatches()
   }
 
   // Mirrors current_page?: the query string counts when the link carries one, so a search
   // link stays active on page 2. full_path counts it either way.
   pathMatches () {
-    const url = this.linkUrl()
-    if (!url) return false
+    const url = new URL(this.element.href, window.location.href)
+    // Off-site, the page can never be what the link points at
+    if (url.origin !== window.location.origin) return false
     if (url.search || this.matchValue === 'full_path') {
       return url.pathname + url.search === window.location.pathname + window.location.search
     }
 
     return trimSlash(url.pathname) === trimSlash(window.location.pathname)
-  }
-
-  // Mirrors sortable_search_params?: the index stays this link's page while paging or sorting
-  // it, and stops being it once a search narrows it. The names come from the server, which is
-  // where the list of them lives.
-  unfilteredPathMatches () {
-    const url = new URL(this.element.href, window.location.href)
-    if (url.origin !== window.location.origin) return false
-    if (trimSlash(url.pathname) !== trimSlash(window.location.pathname)) return false
-
-    const params = new URLSearchParams(window.location.search)
-    const filters = this.filtersValue.split(' ')
-    // A blank value isn't a search, the way `.reject(&:blank?)` doesn't count one
-    for (const [name, value] of params) {
-      if (!value) continue
-      if (name.startsWith('search_') || filters.includes(name.replace(/\[\]$/, ''))) return false
-      if (name === 'period' && value !== 'all') return false
-    }
-
-    return true
   }
 
   // The page's route comes off the body, since only the server can resolve one. A link whose
