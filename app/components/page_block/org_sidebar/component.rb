@@ -21,7 +21,7 @@ module PageBlock
         "tw:font-bold tw:whitespace-nowrap tw:max-[760px]:py-3.5"
       CHILD_RESTING = "tw:text-purple-500 tw:dark:text-purple-300"
 
-      # The tracked-out gray caption above the org's name -- POWERED BY and ADMIN PANEL
+      # The tracked-out gray ADMIN PANEL caption, beside the logo and above the org's name
       ADMIN_PANEL = "tw:text-[10.5px] tw:font-bold tw:tracking-[0.14em] tw:text-gray-400"
 
       # One bar of the hamburgler, which folds into an X while the menu is open
