@@ -9,7 +9,7 @@
     <%= render(UI::DefinitionList::Row::Component.new(label: translation(".location"), value: stolen_record.formatted_address_string.presence || "No location given")) %>
 
     <% if owner_phone.present? %>
-      <%= render(UI::DefinitionList::Row::Component.new(label: StolenRecord.human_attribute_name(:phone))) { link_to(owner_phone, "tel:#{owner_phone}", class: "twlink tw:font-mono") } %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: StolenRecord.human_attribute_name(:phone))) { render UI::PhoneDisplay::Component.new(phone: owner_phone) } %>
     <% end %>
 
     <%= render(UI::DefinitionList::Row::Component.new(label: translation(".locking_description"), value: stolen_record.locking_description)) %>

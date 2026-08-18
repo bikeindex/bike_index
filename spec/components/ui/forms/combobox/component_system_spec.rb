@@ -41,6 +41,41 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
     send_keys(:escape)
 
     expect(page).to have_css('[aria-expanded="false"]')
+
+    # ArrowUp opens onto the last option, the mirror of ArrowDown's first
+    find_field("Cycle type").send_keys(:up)
+
+    expect(page).to have_css('[aria-expanded="true"]')
+    expect(find_field("Cycle type").value).to eq all('[role="option"]').last.text
+  end
+
+  context "with a selection already made" do
+    it "keeps the selection under End, and replaces it whole when typing" do
+      visit "/rails/view_components/ui/forms/combobox/component/default"
+
+      expect(page).to have_css('[aria-expanded="false"]', wait: 10)
+
+      find_field("Cycle type").click
+      find('[role="option"]', text: "Unicycle", exact_text: true).click
+
+      expect(find_field("Cycle type").value).to eq "Unicycle"
+
+      # The gem takes End too, and opens nothing for it -- so it used to throw picking out
+      # of the closed listbox, past the deselect that had already emptied the hidden field
+      find_field("Cycle type").send_keys(:end)
+
+      expect(find_field("Cycle type").value).to eq "Unicycle"
+      expect(find("input[name='cycle_type']", visible: :hidden).value).to eq "Unicycle"
+
+      # Typing used to insert wherever the click left the caret, mangling the display into
+      # a query matching no option -- which cleared the hidden field. Clicking in selects
+      # the display now, so the first keystroke replaces it.
+      find_field("Cycle type").click
+      send_keys("tand")
+
+      expect(find_field("Cycle type").value).to eq "Tandem"
+      expect(find("input[name='cycle_type']", visible: :hidden).value).to eq "Tandem"
+    end
   end
 
   context "inside a form" do
@@ -135,7 +170,8 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
 
     # The gem swaps to a full screen dialog below its mobile breakpoint, and
     # selecting there fills the input after the selection event, never focusing it
-    it "mirrors a selection made in the small viewport dialog" do
+    it "mirrors a selection made in the small viewport dialog, and always unlocks the page" do
+      emulate_ios_platform
       page.current_window.resize_to(390, 844)
       visit "/rails/view_components/ui/forms/combobox/component/stacked"
 
@@ -144,11 +180,64 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
       find_field("Registration type").click
 
       expect(page).to have_css("dialog[open]")
+      expect(page).to have_css(scroll_locked_body)
+      expect(touch_scroll_blocked?).to be true
+
+      # Type a query that matches nothing, so dismissing has something to clean up
+      type_into(".hw-combobox__dialog__input", "zzz")
+
+      # Android's back gesture closes the dialog with a close request rather than a
+      # keypress, which nothing on the page can synthesize
+      page.execute_script("document.querySelector('dialog[open]').close()")
+
+      expect(page).to have_no_css("dialog[open]")
+      expect(page).to have_no_css(scroll_locked_body)
+      # Where escape lands, the browser having sent the same close request: the query
+      # is gone rather than stranded in the field with an empty value behind it
+      expect(find_field("Registration type").value).to eq ""
+      expect(find("input[name='status']", visible: :hidden).value).to eq ""
+
+      find_field("Registration type").click
+
+      expect(page).to have_css("dialog[open]")
+
+      # iOS's back swipe navigates rather than dismissing, so Turbo discards the dialog
+      # without ever closing it - again nothing on the page can synthesize the gesture
+      page.execute_script("document.dispatchEvent(new CustomEvent('turbo:before-render'))")
+
+      expect(page).to have_no_css("dialog[open]")
+      expect(page).to have_no_css(scroll_locked_body)
+      expect(touch_scroll_blocked?).to be false
+
+      find_field("Registration type").click
+
+      expect(page).to have_css("dialog[open]")
 
       find('[role="option"]', text: "It was stolen").click
 
       expect(page).to have_no_css("dialog[open]")
+      expect(page).to have_no_css(scroll_locked_body)
       expect(page).to have_css("#{overlay} span", text: "It was stolen")
+
+      # Leaving in the same frame the dialog opened in, which is a rider swiping back the
+      # instant the picker appears. iOS pins the body from inside its own animation frame,
+      # so a release that doesn't wait for it leaves the pin on with nothing left to lift it
+      page.execute_script(<<~JS)
+        const dialog = document.querySelector(".hw-combobox dialog")
+        new MutationObserver((_records, observer) => {
+          if (!dialog.open) return
+          observer.disconnect()
+          document.dispatchEvent(new CustomEvent("turbo:before-render"))
+          // The frame the pin lands in, so the assertions below can't run ahead of it
+          requestAnimationFrame(() => requestAnimationFrame(() => { window.tornDownMidFrame = true }))
+        }).observe(dialog, {attributes: true, attributeFilter: ["open"]})
+        document.querySelector(".hw-combobox__input").click()
+      JS
+      wait_for { page.evaluate_script("window.tornDownMidFrame") }
+
+      expect(page).to have_no_css("dialog[open]")
+      expect(page).to have_no_css(scroll_locked_body)
+      expect(touch_scroll_blocked?).to be false
     end
   end
 end

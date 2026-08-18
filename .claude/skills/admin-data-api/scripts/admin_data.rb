@@ -2,7 +2,8 @@
 # frozen_string_literal: true
 
 #
-# Helper for the AdminData production API (Sidekiq / PgHero status).
+# Helper for the production endpoints the admin OAuth app reaches: Sidekiq / PgHero
+# status and the admin bug reports.
 # Reads/writes token values in .env.development (located relative to this script,
 # so it works from any cwd). Run it directly, e.g.
 #   .claude/skills/admin-data-api/scripts/admin_data.rb check
@@ -19,6 +20,13 @@ require "dotenv"
 BASE = "https://bikeindex.org"
 REPO_ROOT = File.expand_path("../../../..", __dir__)
 ENV_FILE = File.join(REPO_ROOT, ".env.development")
+
+BUG_REPORTS = "/admin/bug_reports" # Admin pages rather than API routes, same admin token
+PATHS = {
+  "sidekiq" => "/api/admin_data/sidekiq",
+  "pghero" => "/api/admin_data/pghero",
+  "bug_reports" => "#{BUG_REPORTS}.json"
+}.freeze
 
 def env_get(key)
   return nil unless File.exist?(ENV_FILE)
@@ -43,10 +51,17 @@ def request(method, url, headers: {}, form: nil)
   uri = URI(url)
   http = Net::HTTP.new(uri.host, uri.port)
   http.use_ssl = uri.scheme == "https"
-  req = (method == :post) ? Net::HTTP::Post.new(uri) : Net::HTTP::Get.new(uri)
+  req = {get: Net::HTTP::Get, post: Net::HTTP::Post, patch: Net::HTTP::Patch}.fetch(method).new(uri)
   headers.each { |k, v| req[k] = v }
   req.set_form_data(form) if form
   http.request(req)
+end
+
+def parse_params(args)
+  args.to_h do |arg|
+    abort("params are key=value, got: #{arg}") unless arg.include?("=")
+    arg.split("=", 2)
+  end
 end
 
 # Exchange ADMIN_DATA_REFRESH for a new token pair and store it. Returns true on success.
@@ -83,28 +98,38 @@ def warn_false(message)
   false
 end
 
-# GET the endpoint with the current token. Returns [status(Integer or nil), body].
-def get_status(endpoint)
+# Returns [status(Integer or nil), body] - a nil status is having no token to send
+def token_request(method, path, form: nil)
   token = env_get("ADMIN_DATA_TOKEN")
   if token.to_s.empty?
     warn "ADMIN_DATA_TOKEN missing from #{ENV_FILE} — run the authorize flow (see SKILL.md)"
     return [nil, nil]
   end
-  res = request(:get, "#{BASE}/api/admin_data/#{endpoint}", headers: {"Authorization" => "Bearer #{token}"})
+  res = request(method, "#{BASE}#{path}", headers: {"Authorization" => "Bearer #{token}"}, form:)
   warn "HTTP #{res.code}"
   [res.code.to_i, res.body]
 end
 
-# get_status with a one-shot refresh + retry on failure (typically a 401). Returns body or nil.
-def get_or_refresh(endpoint)
-  status, body = get_status(endpoint)
+# token_request, refreshing the token and retrying once on a 401. Returns body or nil -
+# anything else (403, a 422 from update) is reported rather than retried.
+def with_token(method, path, form: nil)
+  status, body = token_request(method, path, form:)
   return body if status == 200
+  if status && status != 401
+    warn body.to_s[0, 500]
+    return nil
+  end
 
-  warn "Token rejected — refreshing and retrying…" if status
+  warn "Token rejected — refreshing and retrying…" if status == 401
   return nil unless refresh_token!
 
-  status, body = get_status(endpoint)
+  status, body = token_request(method, path, form:)
   (status == 200) ? body : nil
+end
+
+def get_endpoint(endpoint, params = {})
+  path = PATHS.fetch(endpoint) { abort("unknown endpoint #{endpoint} — one of: #{PATHS.keys.join(", ")}") }
+  with_token(:get, params.any? ? "#{path}?#{URI.encode_www_form(params)}" : path)
 end
 
 def array_length(value)
@@ -167,17 +192,30 @@ when "authorize-url"
   redirect = "https%3A%2F%2Fbikeindex.org%2Fdocumentation%2Fauthorize"
   puts "#{BASE}/oauth/authorize?client_id=#{client_id}&redirect_uri=#{redirect}&response_type=code&scope=public"
 
-when "get" # get <sidekiq|pghero> — auto-refreshes and retries once on a 401
-  endpoint = ARGV[1] or abort("usage: get <sidekiq|pghero>")
-  body = get_or_refresh(endpoint) or exit(22)
+when "get" # get <endpoint> [param=value …] — auto-refreshes and retries once on a 401
+  endpoint = ARGV[1] or abort("usage: get <#{PATHS.keys.join("|")}> [param=value …]")
+  body = get_endpoint(endpoint, parse_params(ARGV.drop(2))) or exit(22)
+  puts body
+
+when "show-bug-report" # show-bug-report <id>
+  id = ARGV[1] or abort("usage: show-bug-report <id>")
+  body = with_token(:get, "#{BUG_REPORTS}/#{id}.json") or exit(22)
+  puts body
+
+when "update-bug-report" # update-bug-report <id> tags=a,b github_pull_request=4064
+  id = ARGV[1] or abort("usage: update-bug-report <id> [tags=a,b] [github_pull_request=N]")
+  attributes = parse_params(ARGV.drop(2))
+  abort("nothing to update") if attributes.empty?
+  body = with_token(:patch, "#{BUG_REPORTS}/#{id}.json",
+    form: attributes.transform_keys { "bug_report[#{it}]" }) or exit(22)
   puts body
 
 when "check" # full health check: sidekiq, then pghero — summary + OK/ABNORMAL verdict each
   puts "== SIDEKIQ =="
-  body = get_or_refresh("sidekiq") or exit(22)
+  body = get_endpoint("sidekiq") or exit(22)
   puts sidekiq_verdict(JSON.parse(body))
   puts "\n== PGHERO =="
-  body = get_or_refresh("pghero") or exit(22)
+  body = get_endpoint("pghero") or exit(22)
   puts pghero_verdict(JSON.parse(body))
 
 when "set-tokens" # set-tokens <access_token> <refresh_token> — for the browser authorize flow
@@ -191,6 +229,8 @@ when "refresh" # refresh the token pair now (needs ADMIN_DOORKEEPER_APP_CLIENT_S
   exit(refresh_token! ? 0 : 1)
 
 else
-  warn "usage: admin_data.rb {check | get <sidekiq|pghero> | authorize-url | set-tokens <access> <refresh> | refresh}"
+  warn "usage: admin_data.rb {check | get <#{PATHS.keys.join("|")}> [param=value …] | " \
+    "show-bug-report <id> | update-bug-report <id> [param=value …] | " \
+    "authorize-url | set-tokens <access> <refresh> | refresh}"
   exit 64
 end

@@ -28,12 +28,14 @@ module UI
       # until the element flags itself active (see the is-active variant in application.css,
       # which sorts last, so these override the resting colors with no `!` important).
       # Literal strings so Tailwind's scanner generates them; the spec enforces the prefix.
+      #
+      # No :link — .twlink states its own active look under the same variant, and a utility
+      # here would win over it, so link color would stop following the class it's built from.
       ACTIVE_COLORS = {
         primary: "tw:is-active:bg-blue-800 tw:is-active:ring-2 tw:is-active:ring-blue-500/40 tw:is-active:dark:bg-blue-700",
         secondary: "tw:is-active:text-white tw:is-active:bg-purple-500 tw:is-active:border-purple-500 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
         error: "tw:is-active:bg-red-100 tw:is-active:border-[#c0392b] tw:is-active:ring-2 tw:is-active:ring-red-500/40 tw:is-active:dark:bg-red-950 tw:is-active:dark:border-red-700",
-        purple: "tw:is-active:bg-purple-700 tw:is-active:border-purple-700 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
-        link: "tw:is-active:text-blue-700 tw:is-active:dark:text-blue-300 tw:is-active:font-bold tw:is-active:underline"
+        purple: "tw:is-active:bg-purple-700 tw:is-active:border-purple-700 tw:is-active:ring-2 tw:is-active:ring-purple-500/40"
       }.freeze
 
       # No pointer-events-none: with pointer events off the browser takes the cursor from

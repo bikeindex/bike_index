@@ -33,6 +33,14 @@ RSpec.describe "Register flow", :js, type: :system do
     click_button "Next"
   end
 
+  # fill_in focuses the field, then sends its text a round trip later - so a controller
+  # connecting in between lands the text in the field filled just before
+  def wait_for_details_step(wait: Capybara.default_max_wait_time)
+    expect(page).to have_content("Add your bike", wait:)
+    expect(page).to have_css("input[name='bike[frame_model]']:focus", wait:)
+    wait_for_stimulus(timeout: wait)
+  end
+
   # Answers every submission in the browser, the way an edge that never reaches the app
   # would, and collects what it turned away
   def fail_submissions(status:, headers: {})
@@ -57,7 +65,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
     submit_step_1
 
-    expect(page).to have_content("Add your bike")
+    wait_for_details_step
   end
 
   # An async combobox carries no options to map a saved id back to a name, so the server
@@ -74,6 +82,13 @@ RSpec.describe "Register flow", :js, type: :system do
     # The manufacturer itself, rather than Manufacturer.other with the id as free text
     expect(BParam.last.manufacturer_id).to eq manufacturer.id
     expect(BParam.last.manufacturer_other).to be_blank
+
+    # This field is autofocused, so the click into it brings no focus event of its own -
+    # typing still replaces the restored name rather than mashing into the middle of it
+    find_field("b_param_manufacturer_id").click
+    send_keys("Kona")
+
+    expect(page).to have_field("b_param_manufacturer_id", with: "Kona")
   end
 
   it "starts a registration, keeps a full details draft across a reload, and completes" do
@@ -88,7 +103,7 @@ RSpec.describe "Register flow", :js, type: :system do
     fill_in "b_param[owner_email]", with: owner_email
     click_button "Next"
 
-    expect(page).to have_content("Add your bike")
+    wait_for_details_step
     details_url = page.current_url
     expect(details_url).to match(/register\?b_param_token=.+&step=2/)
 
@@ -114,7 +129,7 @@ RSpec.describe "Register flow", :js, type: :system do
     click_combobox_option("Surly")
     fill_in "b_param[owner_email]", with: owner_email
     click_button "Next"
-    expect(page).to have_content("Add your bike")
+    wait_for_details_step
     details_url = page.current_url
 
     # Fill every field: text, chip radio, unit select, comboboxes (including the
@@ -133,9 +148,18 @@ RSpec.describe "Register flow", :js, type: :system do
     find("label", text: "M", exact_text: true).click
     select "cm", from: "bike[frame_size_unit]"
     check "Missing serial"
-    # readonly rather than disabled, so "unknown" still submits
-    expect(page).to have_field("bike[serial_number]", with: "unknown", readonly: true)
-    fill_in "bike[bike_sticker]", with: "A 471 829"
+    # Hidden rather than removed, so "unknown" still submits
+    expect(page).to have_no_field("bike[serial_number]")
+    expect(page).to have_field("bike[serial_number]", with: "unknown", visible: :all)
+    # No organization with stickers, and nothing scanned, so there is no sticker to give
+    expect(page).to have_no_field("bike[bike_sticker]")
+
+    # Unchecking has to undo the animated hide, not just its display:none
+    uncheck "Missing serial"
+    fill_in "bike[serial_number]", with: "SERIAL9"
+
+    check "Missing serial"
+    expect(page).to have_no_field("bike[serial_number]")
 
     # Nothing submitted yet - the reload restores the whole draft from form-persist
     visit details_url
@@ -154,11 +178,11 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(find("input[name='bike[frame_size]'][value='m']", visible: :all)).to be_checked
     # A select always has a value, so it restores from the draft rather than the server default
     expect(page).to have_select("bike[frame_size_unit]", selected: "cm")
-    # The restored missing serial re-reveals the made-without link
-    expect(page).to have_field("bike[serial_number]", with: "unknown", readonly: true)
+    # The restored missing serial hides the input again and re-reveals the made-without link
+    expect(page).to have_no_field("bike[serial_number]")
+    expect(page).to have_field("bike[serial_number]", with: "unknown", visible: :all)
     expect(page).to have_checked_field("Missing serial")
     expect(page).to have_button("This bike was made without a serial number")
-    expect(page).to have_field("bike[bike_sticker]", with: "A 471 829")
 
     # The modal's made-without confirm mutates fields programmatically - that
     # state survives a reload too
@@ -170,6 +194,22 @@ RSpec.describe "Register flow", :js, type: :system do
 
     expect(page).to have_checked_field("This bike was made without a serial")
     expect(page).to have_no_field("bike[serial_number]") # the serial section stays swapped out
+
+    # The input was hidden twice getting here - by the missing checkbox, then by the
+    # made-without swap - so unchecking has to bring it back from both
+    uncheck "This bike was made without a serial"
+
+    expect(page).to have_field("bike[serial_number]", with: "")
+    expect(page).to have_unchecked_field("Missing serial")
+
+    check "Missing serial"
+
+    expect(page).to have_no_field("bike[serial_number]")
+
+    click_button "This bike was made without a serial number"
+    click_button "I'm 100% sure"
+
+    expect(page).to have_checked_field("This bike was made without a serial")
 
     # Like bikes/new, phone is only asked for once the status calls for it
     expect(page).to have_no_field("bike[phone]")
@@ -279,6 +319,36 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(bike.creator_id).to eq user.id
   end
 
+  # form-persist announces its restore once, and controllers are lazily loaded - so a
+  # module that lands after the announcement never hears it
+  it "reconciles a restored draft into the controllers whose modules arrive after it" do
+    start_registration
+    click_button "+ Add another color"
+    type_into("#bike_secondary_frame_color_id", "Blue")
+    click_combobox_option("Blue")
+    check "Missing serial"
+    expect(page).to have_no_field("bike[serial_number]")
+
+    held = []
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.route(%r{(serial|additional_colors)_controller}, ->(route, request) {
+        held << request.url
+        sleep 1
+        route.continue
+      })
+    end
+
+    visit page.current_url
+
+    # Both a full second after the restore
+    expect(page).to have_field("bike_secondary_frame_color_id", with: "Blue", wait: 10)
+    expect(page).to have_checked_field("Missing serial")
+    expect(page).to have_no_field("bike[serial_number]")
+    # A route that never fired would pass vacuously
+    expect(held).to include(a_string_matching(/serial_controller/),
+      a_string_matching(/additional_colors_controller/))
+  end
+
   describe "signed in" do
     let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
     let(:friend_email) { "friend@bikeindex.org" }
@@ -298,9 +368,13 @@ RSpec.describe "Register flow", :js, type: :system do
 
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
-      fill_in "bike[serial_number]", with: "GIFT1234"
 
-      # Required, so the browser holds the submit without any js of ours
+      # Marking it missing hides the input, which still has to submit the "unknown" it holds
+      check "Missing serial"
+      expect(page).to have_no_field("bike[serial_number]")
+
+      # user_name is required, so the browser holds the submit without any js of ours -
+      # and holds it on that alone, not on the serial it can no longer see
       click_button "Complete Bike Registration"
       expect(page).to have_current_path(/step=2/, url: true)
       expect(Bike.count).to eq 0
@@ -311,7 +385,62 @@ RSpec.describe "Register flow", :js, type: :system do
       expect(page).to have_content("Registration complete")
       # Their friend's registration to claim, not theirs
       expect(page).to have_content("We've emailed #{friend_email} so they can claim")
-      expect(Bike.last).to have_attributes(owner_email: friend_email, owner_name: user_name)
+      expect(Bike.last).to have_attributes(owner_email: friend_email, owner_name: user_name,
+        serial_number: "unknown")
+      # What the browser actually posted: a bike built without any serial at all is
+      # given "unknown" too (BikeServices::Builder), so the bike alone can't tell a
+      # hidden field that submitted from one that didn't
+      expect(BParam.last.bike["serial_number"]).to eq "unknown"
+    end
+
+    # The one organization they're in, assigned without any link naming it
+    context "a member of one organization" do
+      let(:organization) do
+        FactoryBot.create(:organization, short_name: "Brakebills").tap do
+          # set_calculated_attributes recomputes the slugs from the invoices, so assigning them won't hold
+          it.update_column :enabled_feature_slugs, %w[reg_student_id require_reg_student_id]
+        end
+      end
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
+
+      it "registers with it unless the rider says otherwise, taking its asks with it" do
+        start_registration
+        expect(page).to have_checked_field("register_with_organization")
+        expect(page).to have_content(/information for brakebills/i)
+        expect(page).to have_field("bike[student_id]")
+        # It heads the section whose contents it decides
+        expect(page.text.index(/information for brakebills/i))
+          .to be < page.text.index("Register with Brakebills")
+
+        type_into("#bike_primary_frame_color_id", "Red")
+        click_combobox_option("Red")
+        fill_in "bike[serial_number]", with: "XYZ 123"
+
+        # Student ID is required, so the browser holds the submit while the organization is on
+        click_button "Complete Bike Registration"
+        expect(page).to have_current_path(/step=2/, url: true)
+        expect(Bike.count).to eq 0
+
+        # Dropping the organization drops what it asks for, required and all - and the
+        # heading, which can't go with them, the checkbox being under it
+        uncheck "Register with Brakebills"
+        expect(page).to have_no_field("bike[student_id]")
+        expect(page).to have_content(/contact info/i)
+        expect(page).to have_no_content(/information for brakebills/i)
+
+        # Collapsed rather than dropped, so changing their mind brings all of it back
+        check "Register with Brakebills"
+        expect(page).to have_field("bike[student_id]")
+        expect(page).to have_content(/information for brakebills/i)
+
+        uncheck "Register with Brakebills"
+        expect(page).to have_no_field("bike[student_id]")
+
+        click_button "Complete Bike Registration"
+        expect(page).to have_content("Registration complete")
+        expect(Bike.last.creation_organization_id).to be_blank
+        expect(Bike.last.organizations.pluck(:id)).to eq([])
+      end
     end
   end
 
@@ -504,7 +633,7 @@ RSpec.describe "Register flow", :js, type: :system do
       click_combobox_option("Surly Bikes 0")
       click_button "Next"
 
-      expect(page).to have_content("Add your bike")
+      wait_for_details_step
       expect(submissions.length).to eq 1
     end
   end
@@ -529,7 +658,10 @@ RSpec.describe "Register flow", :js, type: :system do
 
     before { sequence.make_active! }
 
-    it "gates each page of rules, then the acknowledgment, before completing" do
+    # flaky: the color combobox below is typed into right after step 1's Turbo navigation,
+    # and filters nothing when its controller hasn't connected yet. wait_for_details_step
+    # proves hydration now - the retries stay until CI has run green a few times
+    it "gates each page of rules, then the acknowledgment, before completing", flaky: 4 do
       visit "/register/new?organization_id=#{organization.slug}"
 
       type_into("#b_param_manufacturer_id", "Surly")
@@ -538,6 +670,7 @@ RSpec.describe "Register flow", :js, type: :system do
       fill_in "b_param[owner_email]", with: owner_email
       click_button "Next"
 
+      wait_for_details_step
       fill_in "bike[user_name]", with: user_name
       type_into("#bike_primary_frame_color_id", "Red")
       click_combobox_option("Red")
@@ -637,7 +770,7 @@ RSpec.describe "Register flow", :js, type: :system do
         expect(page).to have_button("Next", disabled: true)
 
         # The rider never sees the failure, only the retry - waited out past Capybara's default
-        expect(page).to have_content("Add your bike", wait: 10)
+        wait_for_details_step(wait: 10)
 
         fill_in "bike[user_name]", with: user_name
         type_into("#bike_primary_frame_color_id", "Red")

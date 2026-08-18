@@ -5,7 +5,7 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
 
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
-    before { current_organization.update_columns(enabled_feature_slugs: ["registration_sequences"]) }
+    before { current_organization.update_columns(enabled_feature_slugs: %w[registration_sequences registration_sequences_edit]) }
 
     describe "index" do
       it "renders without creating a draft" do
@@ -148,6 +148,56 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
         expect { delete "#{base_url}/#{active.id}" }.to_not change(RegistrationSequence, :count)
         expect(response.status).to eq(404)
       end
+    end
+  end
+
+  context "logged_in_as_organization_admin with registration_sequences but not registration_sequences_edit" do
+    include_context :request_spec_logged_in_as_organization_admin
+    before { current_organization.update_columns(enabled_feature_slugs: ["registration_sequences"]) }
+
+    let!(:draft) { FactoryBot.create(:registration_sequence, :with_pages, organization: current_organization) }
+    let!(:active) { FactoryBot.create(:registration_sequence_active, :with_pages, organization: current_organization) }
+
+    it "renders the index without any sign of the draft" do
+      get base_url
+      expect(response.status).to eq(200)
+      expect(response.body).to include("This is the active version your registrants see")
+      expect(response.body).to include(active.registration_sequence_pages.first.title)
+      # The whole draft section is gone - not an empty-state, not a read-only listing
+      expect(response.body).to_not include(">Draft</h2>")
+      expect(response.body).to_not include("You don't have a draft sequence")
+      expect(response.body).to_not include(">Edit<")
+      expect(response.body).to_not include("Discard draft")
+    end
+
+    it "renders the preview of the active sequence" do
+      get "#{base_url}/#{active.id}"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:show)
+    end
+
+    it "blocks previewing the draft" do
+      get "#{base_url}/#{draft.id}"
+      expect(response).to redirect_to(organization_root_path)
+      expect(flash[:error]).to be_present
+    end
+
+    it "blocks opening a draft" do
+      expect { post base_url }.to_not change(RegistrationSequence, :count)
+      expect(response).to redirect_to(organization_root_path)
+      expect(flash[:error]).to be_present
+    end
+
+    it "blocks editing, updating and discarding" do
+      get "#{base_url}/#{draft.id}/edit"
+      expect(response).to redirect_to(organization_root_path)
+
+      patch "#{base_url}/#{draft.id}", params: {registration_sequence: {faq_url: "https://example.com/faq"}}
+      expect(response).to redirect_to(organization_root_path)
+      expect(draft.reload.faq_url).to_not eq("https://example.com/faq")
+
+      expect { delete "#{base_url}/#{draft.id}" }.to_not change(RegistrationSequence, :count)
+      expect(response).to redirect_to(organization_root_path)
     end
   end
 

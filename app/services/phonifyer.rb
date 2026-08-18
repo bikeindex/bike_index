@@ -28,6 +28,13 @@ module Phonifyer
     end
   end
 
+  # Unescaped, so markup renders UI::PhoneDisplay::Component instead
+  def display(string)
+    phone_components = components(string).to_h
+
+    ActiveSupport::NumberHelper.number_to_phone(phone_components[:number], phone_components.except(:number)).to_s
+  end
+
   #
   # private below here
   #

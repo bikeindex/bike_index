@@ -305,10 +305,12 @@ class BParam < ApplicationRecord
 
   # Step 1 was submitted (manufacturer is required there), so it's more than the shell
   # new creates, and the token still resumes it. A destroyed one is false so that the
-  # after_commit a destroy fires resolves its alert rather than re-saving it
-  def unfinished_registration?
+  # after_commit a destroy fires resolves its alert rather than re-saving it.
+  # self_made? last, and taking the user callers already hold, since it's the only clause
+  # that queries: one made for someone else isn't the creator's bike to alert about
+  def unfinished_registration?(user = creator)
     !destroyed? && origin == "register_flow" && !with_bike? && manufacturer_id.present? &&
-      created_at.present? && created_at > Time.current - TOKEN_EXPIRATION
+      created_at.present? && created_at > Time.current - TOKEN_EXPIRATION && self_made?(user)
   end
 
   # Get it unscoped, because unregistered_bike notifications
@@ -453,6 +455,10 @@ class BParam < ApplicationRecord
     Organization.friendly_find(creation_organization_id)
   end
 
+  def auto_organization
+    Organization.friendly_find(auto_organization_id)
+  end
+
   def manufacturer
     bike["manufacturer_id"] && Manufacturer.friendly_find(bike["manufacturer_id"])
   end
@@ -533,6 +539,19 @@ class BParam < ApplicationRecord
 
   def creation_organization_id
     bike && bike["creation_organization_id"] || params && params["creation_organization_id"]
+  end
+
+  # Assigned from who the registrant is rather than named by a link, so step 2 offers to
+  # drop it. Kept once offered, so declining survives the next request's assignment
+  def auto_organization_id
+    id = auto_organization_assigned? ? params["auto_organization_id"].to_i : 0
+    id if id.positive?
+  end
+
+  # 0 for a registrant no organization could be assigned from - the assignment was made
+  # either way, so it isn't made again
+  def auto_organization_assigned?
+    (params && params["auto_organization_id"]).present?
   end
 
   def owner_email

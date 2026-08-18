@@ -13,7 +13,8 @@ module ControllerHelpers
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
       :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
       :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert,
-      :display_dev_info?, :current_country_id, :current_currency, :turbo_request?
+      :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
+      :render_donation_request?
     before_action :enable_rack_profiler
 
     before_action do
@@ -151,8 +152,17 @@ module ControllerHelpers
     end
   end
 
+  # Deletes, so the donation modal only ever shows once - memoized because
+  # show_general_alert asks too, being what it gives way to
+  def render_donation_request?
+    return @render_donation_request if defined?(@render_donation_request)
+
+    @render_donation_request = session.delete(:render_donation_request).present?
+  end
+
   def show_general_alert
-    return @show_general_alert = false if @skip_general_alert || current_user.blank?
+    return @show_general_alert = false if @skip_general_alert || current_user.blank? ||
+      render_donation_request?
 
     return @show_general_alert = false unless (current_user.alert_slugs - UserAlert.disabled_kinds).any?
 
@@ -256,7 +266,7 @@ module ControllerHelpers
     end
 
     scope ||= [:controllers, controller_namespace, controller_name, controller_method.to_sym]
-    I18n.t(key, **kwargs, scope: scope.compact)
+    ActiveSupport::HtmlSafeTranslation.translate(key, **kwargs, scope: scope.compact)
   end
 
   # This is overridden in FeedbacksController and InfoController
@@ -288,7 +298,7 @@ module ControllerHelpers
     request.format.turbo_stream? || turbo_frame_request?
   end
 
-  protected
+  private
 
   # passive_organization is the organization set for the user - which is persisted in session
   # The user may or may not be interacting with the current_organization in any given request

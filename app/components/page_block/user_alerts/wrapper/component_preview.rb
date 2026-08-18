@@ -24,10 +24,12 @@ module PageBlock
 
         private
 
-        # manufacturer_id is what makes it resumable rather than a blank shell
+        # manufacturer_id is what makes it resumable rather than a blank shell, and
+        # owner_email matching the creator is what makes it theirs to be alerted about
         def preview_b_param
+          creator = ::User.new(email: "preview@bikeindex.org")
           ::BParam.new(id_token: "preview-token", origin: "register_flow", created_at: Time.current,
-            params: {bike: {manufacturer_id: 1, cycle_type: "cargo"}})
+            creator:, params: {bike: {manufacturer_id: 1, cycle_type: "cargo", owner_email: creator.email}})
         end
 
         def preview_bikes

@@ -1,13 +1,7 @@
 = render partial: "/admin/organizations/display_header", locals: {}
 
 = form_for [:admin, @organization], html: {data: {controller: "admin--organization-form"}} do |f|
-  = render partial: 'form', locals: { f: f }
-  .row.mt-4#admin-locations-fields
-    = f.fields_for :locations do |builder|
-      = render '/admin/organizations/location_fields', f: builder
-
-    = link_to_add_fields "Add a location", f, :locations, class_name: "mx-auto mt-4"
+  = render(Admin::OrganizationForm::Wrapper::Component.new(form_builder: f, current_user:))
 
   .mt-4
     = f.submit "Update", class: 'btn-lg btn-success float-right'
-

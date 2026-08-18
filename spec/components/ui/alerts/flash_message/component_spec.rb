@@ -42,7 +42,7 @@ RSpec.describe UI::Alerts::FlashMessage::Component, type: :component do
 
     it "translates the message and links the url" do
       expect(component).to have_text("You're signed in!")
-      expect(component).to have_link("set a password to sign in", href: url, class: "twlink")
+      expect(component).to have_link("set a password to sign in", href: url, class: "twlink-underlined")
     end
 
     context "round-tripped through the flash cookie" do

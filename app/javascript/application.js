@@ -7,7 +7,7 @@ import { lazyLoadControllersFrom } from '@hotwired/stimulus-loading'
 
 import TimeLocalizer from '@bikeindex/time-localizer'
 
-// Escape option-value lookups so quoted search terms don't crash the combobox
+// Fixes for hotwire_combobox 0.4.1's option lookup, Enter handling and typing over a selection
 import 'utils/hw_combobox_patch'
 
 /* global Turbo */

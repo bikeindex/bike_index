@@ -43,7 +43,7 @@
       <h2 class="uncap tw:mb-3 tw:text-xl">Preview</h2>
 
       <%# pt and mb cancel the flow shell's negative margins; padding doesn't collapse %>
-      <div class="tw:mb-24 tw:pt-9 tw:min-[992px]:pt-15">
+      <div class="tw:mb-24 tw:pt-(--nav-gap)">
         <%= render Register::Page::Component.new do %>
           <%= render Register::PageContent::Component.new(page: @page, first: @page.listing_order.to_i.zero?) %>
         <% end %>

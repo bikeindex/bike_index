@@ -28,7 +28,7 @@
 
   <%= render(current_alerts_component) %>
 
-  <%= render(Registrations::Show::OrgTopActions::Wrapper::Component.new(bike: @bike, organization: @organization, org_role: @org_role)) %>
+  <%= render(Registrations::Show::OrgTopActions::Wrapper::Component.new(bike: @bike, organization: @organization, org_role: @org_role, current_user: @current_user)) %>
 
   <%# tw:contents collapses the column wrappers on mobile, so tw:order can interleave them %>
 
@@ -171,7 +171,7 @@
                     <%= link_to(@bike.owner_email, "mailto:#{@bike.owner_email}", class: "twlink") %>
                   <% end %>
                 <% end %>
-                <%= info_row(translation(".owner_phone")) { helpers.phone_link(owner_phone, class: "twlink tw:font-mono") } %>
+                <%= info_row(translation(".owner_phone")) { render UI::PhoneDisplay::Component.new(phone: owner_phone) } %>
                 <% owner_reg_field_rows.each do |label, value| %>
                   <%= info_row(label, value) %>
                 <% end %>
@@ -340,7 +340,7 @@
     </div>
   </div>
 
-  <% if show_other_registrations? && other_registrations_count.positive? %>
+  <% if show_other_registrations? %>
     <%= render(UI::Card::Component.new) do %>
       <div class="tw:flex tw:items-baseline tw:justify-between">
         <h2
@@ -353,16 +353,22 @@
         </h2>
 
         <span class="tw:text-xs tw:opacity-65">
-          <%= translation(".other_registrations_count_html", count: helpers.number_display(other_registrations_count)) %>
+          <% if other_registrations_count.positive? %>
+            <%= translation(".other_registrations_count_html", count: helpers.number_display(other_registrations_count)) %>
+          <% else %>
+            <%= translation(".no_other_registrations") %>
+          <% end %>
         </span>
       </div>
 
-      <%= tag.div(class: "org-search-component tw:mt-3", data: other_registrations_settings.column_toggle_data_attributes) do %>
-        <%= render(other_registrations_settings) %>
+      <% if other_registrations_count.positive? %>
+        <%= tag.div(class: "org-search-component tw:mt-3", data: other_registrations_settings.column_toggle_data_attributes) do %>
+          <%= render(other_registrations_settings) %>
 
-        <div class="tw:mt-3">
-          <%= render(Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, current_user: @current_user, settings_component: other_registrations_settings)) %>
-        </div>
+          <div class="tw:mt-3">
+            <%= render(Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, current_user: @current_user, settings_component: other_registrations_settings)) %>
+          </div>
+        <% end %>
       <% end %>
 
       <% if more_other_registrations? %>

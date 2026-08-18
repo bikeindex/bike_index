@@ -2,9 +2,8 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='register--heading'
 //
-// Keeps "Register your bike!" in step with the vehicle type combobox. The
-// heading sits outside the form, so it's scoped to the whole page rather than
-// re-rendered - names maps each cycle_type slug to the word the heading uses.
+// Keeps "Bike info" in step with the vehicle type combobox, which is a section label
+// away rather than re-rendered - names maps each cycle_type slug to the word it uses.
 export default class extends Controller {
   static targets = ['cycleType']
   static values = { names: Object }

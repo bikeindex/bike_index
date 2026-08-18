@@ -1,9 +1,11 @@
 module Organized
   class RegistrationSequencesController < Organized::AdminController
     before_action :ensure_access_to_registration_sequences!
+    before_action :ensure_access_to_edit_registration_sequences!, except: %i[index show]
+    helper_method :can_edit_registration_sequences?
 
     def index
-      @draft = current_organization.registration_sequences.draft.first
+      @draft = current_organization.registration_sequences.draft.first if can_edit_registration_sequences?
       @active = RegistrationSequence.active_for(current_organization)
       @previous = current_organization.registration_sequences.archived.order(end_at: :desc).to_a
     end
@@ -12,6 +14,8 @@ module Organized
     # they end on. page is 1-indexed (Pagy); the preview component's index is 0-based.
     def show
       @registration_sequence = current_organization.registration_sequences.find(params[:id])
+      return raise_do_not_have_access! if @registration_sequence.draft? && !can_edit_registration_sequences?
+
       screen_count = BikeServices::Register.acknowledgment_step_count(@registration_sequence)
       @preview_pagy = Pagy::Offset.new(count: screen_count, limit: 1, page: permitted_page(max: screen_count))
     end
@@ -62,6 +66,16 @@ module Organized
       return true if current_organization.enabled?("registration_sequences") || current_user.superuser?
 
       raise_do_not_have_access!
+    end
+
+    def ensure_access_to_edit_registration_sequences!
+      return true if can_edit_registration_sequences?
+
+      raise_do_not_have_access!
+    end
+
+    def can_edit_registration_sequences?
+      current_organization.enabled?("registration_sequences_edit") || current_user.superuser?
     end
   end
 end

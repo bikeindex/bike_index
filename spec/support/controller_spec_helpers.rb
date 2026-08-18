@@ -45,6 +45,17 @@ module ControllerSpecHelpers
     after { ActionController::Base.allow_forgery_protection = false }
   end
 
+  # A token for the admin Doorkeeper app, which the admin token endpoints require
+  RSpec.shared_context :admin_doorkeeper_token do
+    let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
+    let(:token_user) { FactoryBot.create(:user_confirmed) }
+    let(:doorkeeper_token) do
+      Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: token_user.id)
+    end
+    let(:token_param) { {access_token: doorkeeper_token.token} }
+    before { stub_const("API::TokenAuthenticatable::ADMIN_DOORKEEPER_APP_ID", doorkeeper_app.id) }
+  end
+
   RSpec.shared_context :existing_doorkeeper_app do
     let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app, owner: application_owner) }
     let(:application_owner) { FactoryBot.create(:user_confirmed) }

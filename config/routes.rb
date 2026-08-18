@@ -180,6 +180,7 @@ Rails.application.routes.draw do
   # new makes an empty registration and redirects into show, which renders
   # ?step=1|2|report|3…|review|finished (and handles the emailed confirmation link)
   resource :register, only: %i[new create show update], controller: :register do
+    get :embed
     patch :report
     patch :acknowledge
     # The emailed confirmation link, and the form it posts itself to
@@ -298,7 +299,8 @@ Rails.application.routes.draw do
     %i[
       bike_sticker_updates email_bans exports graduated_notifications invoices logged_searches
       mailchimp_data model_attestations model_audits
-      notifications organization_statuses paper_trail_versions parking_notifications public_images
+      notifications organization_landing_pages organization_statuses paper_trail_versions
+      parking_notifications public_images
       strava_activities strava_gears strava_requests
       stripe_prices stripe_subscriptions user_alerts user_bans user_registration_organizations
     ].each { resources it, only: %i[index] }
@@ -418,6 +420,14 @@ Rails.application.routes.draw do
       get "current_tsv_rapid"
     end
   end
+
+  # stolen#index's vendored multi_serial_search bundle still asks for its icon at
+  # webpacker's publicPath, which has served nothing since packs went away, so the
+  # search button renders a broken image. The bundle can't be rebuilt.
+  # 302 because the target carries the asset digest, which a 301 would pin in caches
+  # past the next edit of the icon
+  get "/packs/media/stolen/search-583a6c1f.svg",
+    to: redirect(status: 302) { ActionController::Base.helpers.image_path("stolen/search.svg") }
 
   resources :manufacturers, only: %i[index] do
     collection { get "tsv" } # TODO: can we delete this?

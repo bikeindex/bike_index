@@ -313,7 +313,8 @@ GEM
     fog-xml (0.1.4)
       fog-core
       nokogiri (>= 1.5.11, < 2.0.0)
-    foreman (0.86.0)
+    foreman (0.90.0)
+      thor (~> 1.4)
     formatador (1.2.3)
       reline
     forwardable (1.4.0)
@@ -522,7 +523,7 @@ GEM
       money (~> 6.13)
       railties (>= 3.0)
     msgpack (1.8.3)
-    multi_json (1.20.1)
+    multi_json (1.21.1)
     multipart-post (2.4.1)
     mustermann (4.0.0)
     mustermann-grape (1.1.0)

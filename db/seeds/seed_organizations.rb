@@ -28,7 +28,8 @@ feature_name_and_slugs = [
   {name: "Organization Dashboard: Claimed ownerships", feature_slugs: ["claimed_ownerships"]},
   {name: "Organization Dashboard: Regional bike counts", feature_slugs: ["regional_bike_counts"]},
   {name: "Organization Registration Notes", feature_slugs: ["registration_notes"]},
-  {name: "Organization Registration Sequences", feature_slugs: ["registration_sequences"]},
+  {name: "Organization Registration Sequences", feature_slugs: ["registration_sequences", "registration_sequences_edit"]},
+  {name: "Organization Registration Sequences: view only", feature_slugs: ["registration_sequences"]},
   {name: "Organization Views: Bike recoveries", feature_slugs: ["show_recoveries"]},
   {name: "Organization Views: Bulk Import - standard", feature_slugs: ["show_bulk_import"]},
   {name: "Organization Views: Bulk Import impounded", feature_slugs: ["show_bulk_import_impound"]},
@@ -84,6 +85,14 @@ if brakebills.avatar.blank?
   brakebills.save!
 end
 
+brakebills.update!(registration_field_labels: {owner_email: "Brakebills email"})
+
+landing_page_template = File.read(Rails.root.join("db/seeds/organization_landing_page.html.erb"))
+OrganizationLandingPage.find_or_initialize_by(organization_id: brakebills.id).tap do |landing_page|
+  landing_page.update!(body: ERB.new(landing_page_template).result_with_hash(organization: brakebills),
+    enabled: landing_page.env_enabled?)
+end
+
 # --- Ike's Bikes ---
 ikes = Organization.find_by_name("Ikes Bike's") || Organization.create(name: "Ikes Bike's", website: "", short_name: "Ikes", show_on_map: true)
 ikes.save
@@ -100,9 +109,16 @@ cannondale_user.save
 OrganizationRole.create(organization_id: cannondale.id, user_id: cannondale_user.id, role: "admin")
 
 # --- Bike Recovery Team: Law Enforcement functionality ---
+# phoneable_by?'s police check reads Organization.law_enforcement — the kind, not the feature slugs
 recovery_team = Organization.find_by_name("Bike Recovery Team") || Organization.create!(name: "Bike Recovery Team")
+recovery_team.update(kind: :law_enforcement)
 recovery_team_invoice = Invoice.create(organization: recovery_team, amount_due: 0, start_at: Time.current - 1.hour, subscription_end_at: 1.year.from_now)
 recovery_team_invoice.update(organization_feature_ids: [law_enforcement_feature_id].compact)
+
+recovery_team_user = User.find_by_email("recovery@bikeindex.org") ||
+  User.create(name: "Recovery Team Member", email: "recovery@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true)
+recovery_team_user.confirm(recovery_team_user.confirmation_token) unless recovery_team_user.confirmed?
+OrganizationRole.create(organization_id: recovery_team.id, user_id: recovery_team_user.id, role: "member")
 
 # Make sure example organization exists
 Organization.example

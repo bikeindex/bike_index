@@ -8,12 +8,13 @@ en:
         electric_motorized: "⚡️ Electric (motorized)"
         email: Email
         email_placeholder: you@example.com
+        email_school: "%{org_name} email"
         just_the_essentials: Just the essentials to start.
         next: Next
         no_need_to_wait: We'll email a confirmation link — you don't have to wait
           for it to continue.
-        register_your_bike_html: Register your %{cycle_type}!
-        register_your_bike_with_org_html: Register your %{cycle_type} with %{org_name}!
+        register_your_vehicle: Register your vehicle!
+        register_your_vehicle_with_org: Register your vehicle with %{org_name}!
         start_over: Start over
         start_over_certain: Start over?
         start_over_discards: This begins a new registration — nothing you've entered

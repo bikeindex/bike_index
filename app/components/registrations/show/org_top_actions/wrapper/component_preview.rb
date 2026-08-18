@@ -28,7 +28,7 @@ module Registrations
           end
 
           def component(bike, org_role: :staff, organization: lookbook_organization)
-            Component.new(bike:, organization:, org_role:)
+            Component.new(bike:, organization:, org_role:, current_user: lookbook_user)
           end
 
           def preview_bike(status)

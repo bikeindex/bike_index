@@ -1,0 +1,4 @@
+<%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :name, label_text: "Location name")) %>
+
+<%= @form_builder.hidden_field :_destroy %>
+<%= render(UI::Button::Component.new(text: "Remove", color: :error, data: {action: "click->#{UI::Forms::NestedFields::Component::CONTROLLER}#remove"})) %>

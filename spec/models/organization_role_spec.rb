@@ -92,6 +92,33 @@ RSpec.describe OrganizationRole, type: :model do
     end
   end
 
+  describe "organization_access_token" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:organization_role) { FactoryBot.create(:organization_role, organization:, role:) }
+
+    context "admin" do
+      let(:role) { "admin" }
+      it "returns the organization's token" do
+        expect(organization_role.organization_access_token).to eq organization.access_token
+      end
+    end
+
+    context "member" do
+      let(:role) { "member" }
+      it "returns the organization's token" do
+        expect(organization_role.organization_access_token).to eq organization.access_token
+      end
+    end
+
+    context "member_no_bike_edit" do
+      let(:role) { "member_no_bike_edit" }
+      it "returns nil" do
+        expect(organization.access_token).to be_present
+        expect(organization_role.organization_access_token).to be_nil
+      end
+    end
+  end
+
   describe "admin_text_search" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:user) { FactoryBot.create(:user_confirmed, name: "Jane Smith", email: "JANE@Example.COM") }

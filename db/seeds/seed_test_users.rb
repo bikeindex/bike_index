@@ -16,9 +16,10 @@ user_attrs.values.each do |attributes|
   new_user.save
 end
 
-# Create superuser ability for admin user
-admin = User.find_by(email: "admin@bikeindex.org")
-SuperuserAbility.create!(user: admin)
+# dev is a superuser too - some admin pages require both
+user_attrs.values_at(:admin, :dev).each do |attributes|
+  SuperuserAbility.create!(user: User.find_by(email: attributes[:email]))
+end
 
 # Group gate rather than per-actor — opting out writes users.feature_registration_show_legacy
 Flipper.enable_group(:bike_show_redesign_toggle, :superusers)

@@ -3,12 +3,17 @@
 module Emails
   module ImpoundClaimApprovedOrDenied
     class Component < ApplicationComponent
-      def initialize(impound_claim:)
+      def initialize(impound_claim:, versioned: true)
         @impound_claim = impound_claim
+        @versioned = versioned
       end
 
       def email_sent_at
         @impound_claim&.resolved_at
+      end
+
+      def snippet_time
+        email_sent_at if @versioned
       end
 
       private
@@ -28,7 +33,7 @@ module Emails
       def organization_message_snippet_body
         return nil unless @impound_claim.organized? && snippet_kind.present?
 
-        MailSnippet.for_organization(organization_id: organization.id, kind: snippet_kind, time: email_sent_at)&.body
+        MailSnippet.for_organization(organization_id: organization.id, kind: snippet_kind, time: snippet_time)&.body
       end
 
       def snippet_kind

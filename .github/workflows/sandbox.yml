@@ -38,6 +38,8 @@ jobs:
       # post-deploy Honeybadger hook target the same config.
       kamal_config: config/deploy.review.yml
       command: REVIEW_APP_REDIS_DB=0 kamal deploy --version "$IMAGE_TAG" --skip-push --config-file config/deploy.review.yml
+      # review-app.yml's sandbox reload_database joins this group to stay off a
+      # deploy that's mid-boot, so renaming it here un-serializes the two.
       concurrency_prefix: sandbox-deploy
       environment_name: review-app
       environment_url: https://sandbox.review.bikeindex.org

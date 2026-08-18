@@ -211,7 +211,7 @@
                 %td
                   Phone
                 %td
-                  = phone_display(bike.phone)
+                  = render UI::PhoneDisplay::Component.new(phone: bike.phone, skip_link: true)
 
   - if stolen_record.present?
     %h4.mt-2
@@ -284,12 +284,12 @@
               %td
                 Phone
               %td
-                = phone_display(stolen_record.phone)
+                = render UI::PhoneDisplay::Component.new(phone: stolen_record.phone, skip_link: true)
                 - if stolen_record.secondary_phone.present?
                   %br
                   %small
                     %span.less-strong secondary:
-                    = phone_display(stolen_record.secondary_phone)
+                    = render UI::PhoneDisplay::Component.new(phone: stolen_record.secondary_phone, skip_link: true)
             %tr
               %td
                 Police Department

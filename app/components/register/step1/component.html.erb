@@ -1,4 +1,4 @@
-<%= render Register::Page::Component.new(data: {controller: "register--heading",
+<%= render Register::Page::Component.new(embed: @embed, data: {controller: "register--heading",
     "register--heading-names-value": cycle_type_names.to_json,
     action: "hw-combobox:selection->register--heading#update"}) do %>
   <%= render Register::Progress::Component.new(steps: @steps, step: 1) %>
@@ -8,8 +8,7 @@
     <%= render UI::Alerts::Base::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
   <% end %>
 
-  <%= form_with(model: @b_param, url: register_path, method: :post, scope: :b_param,
-      data: {turbo: true, controller: "autofocus register--retry"}) do |f| %>
+  <%= form_with(model: @b_param, url: register_path, method: :post, scope: :b_param, **form_options) do |f| %>
     <%= hidden_field_tag :b_param_token, @b_param.id_token %>
 
     <%# So the organization survives a submission that has to build a registration %>
@@ -60,13 +59,13 @@
     <%= render Register::SectionLabel::Component.new(text: translation(".your_info"), divider: true) %>
 
     <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :owner_email,
-        label_text: translation(".email"), required: true, wrapper_class: "tw:mb-6")) do %>
+        label_text: email_label, required: true, wrapper_class: "tw:mb-6")) do %>
       <%= render UI::Forms::Email::Component.new(form_builder: f, attribute: :owner_email, required: true,
-          html_options: {value: @b_param.owner_email, placeholder: translation(".email_placeholder")}) %>
+          html_options: {value: @b_param.owner_email, placeholder: email_placeholder}) %>
     <% end %>
 
     <%= render UI::Button::Component.new(text: translation(".next"), color: :primary, size: :lg,
-        type: "submit", spinner: true, html_class: "tw:w-full") %>
+        type: "submit", spinner: true, **button_options) %>
 
     <% if BikeServices::Register.confirmation_email_pending?(@b_param, user: @current_user) %>
       <p

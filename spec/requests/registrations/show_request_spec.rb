@@ -42,6 +42,27 @@ RSpec.describe "RegistrationsController#show", type: :request do
       end
     end
 
+    context "current_user has a general alert" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      let!(:b_param) { FactoryBot.create(:b_param_unfinished_registration, creator: current_user) }
+
+      def main_class
+        Nokogiri::HTML(response.body).at_css("main#main-content")[:class]
+      end
+
+      # The page pulls up by --nav-gap to sit flush under the navbar, so the alert
+      # standing in that gap has to zero it or the photos render underneath
+      it "zeroes the pull up, and restores it once the alert is gone" do
+        get "#{base_url}/#{bike.id}"
+        expect(whitespace_normalized_body_text).to match("isn't registered yet!")
+        expect(main_class).to eq "tw:[--nav-gap:0px]"
+
+        b_param.destroy
+        get "#{base_url}/#{bike.id}"
+        expect(main_class).to be_blank
+      end
+    end
+
     context "current_user is a superuser" do
       let(:current_user) { FactoryBot.create(:superuser) }
       it "offers a View Super Admin link to the admin bike page" do
@@ -109,7 +130,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
         # Theft details always show a location row, even with no location on file
         expect(body).to match("No location given")
         # Owner phone shows when phone visibility permits
-        expect(body).to match("3025551234")
+        expect(body).to match("302-555-1234")
       end
     end
 

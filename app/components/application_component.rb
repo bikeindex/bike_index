@@ -82,8 +82,6 @@ class ApplicationComponent < ViewComponent::Base
   # Wrap `I18n.translate` for use in components, abstracting away
   # scope-setting.
   #
-  # NOTE: There is an equivalent method in ControllerHelpers#translation
-  #
   # :components
   # > [component_namespace] (possibly none)
   # > [component_name]
@@ -94,11 +92,8 @@ class ApplicationComponent < ViewComponent::Base
   #
   # See specs for component_translation_scope in Search::Form::Component
   def translation(key, scope: nil, **kwargs)
-    scope ||= component_translation_scope
-    result = I18n.t(key, **kwargs, scope: scope.compact)
-
-    # Mark _html translations as html_safe (matching Rails' t() helper behavior)
-    key.to_s.end_with?("_html") ? result.html_safe : result
+    ActiveSupport::HtmlSafeTranslation
+      .translate(key, **kwargs, scope: (scope || component_translation_scope).compact)
   end
 
   def component_translation_scope

@@ -130,8 +130,7 @@ RSpec.describe UserAlert, type: :model do
   describe "update_unfinished_registrations" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let!(:b_param) do
-      FactoryBot.create(:b_param, creator: user, origin: "register_flow",
-        params: {bike: {manufacturer_id: 1}})
+      FactoryBot.create(:b_param_unfinished_registration, creator: user)
     end
 
     it "leaves the alert the b_param created alone" do

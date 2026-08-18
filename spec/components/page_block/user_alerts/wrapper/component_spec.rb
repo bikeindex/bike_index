@@ -15,7 +15,7 @@ RSpec.describe PageBlock::UserAlerts::Wrapper::Component, type: :component do
   it "has a component, a preview scenario and a spec for every kind of alert" do
     # The rest of the directory is the chrome the alerts share
     alert_names = Rails.root.glob("app/components/page_block/user_alerts/*").select(&:directory?)
-      .map { |dir| dir.basename.to_s }.sort - %w[banner bike_list_modal wrapper]
+      .map { |dir| dir.basename.to_s }.sort - %w[bike_list_modal wrapper]
     scenarios = PageBlock::UserAlerts::Wrapper::ComponentPreview.public_instance_methods(false).map(&:to_s)
 
     expect(alert_names).to eq UserAlert.general_kinds.sort
@@ -67,10 +67,7 @@ RSpec.describe PageBlock::UserAlerts::Wrapper::Component, type: :component do
   end
 
   context "with unfinished_registration" do
-    let!(:b_param) do
-      FactoryBot.create(:b_param, creator: user, origin: "register_flow",
-        params: {bike: {manufacturer_id: 1, cycle_type: "cargo"}})
-    end
+    let!(:b_param) { FactoryBot.create(:b_param_unfinished_registration, creator: user) }
 
     # The b_param's own callback puts the alert on the user, so nothing else has to run
     it "renders the resume link" do

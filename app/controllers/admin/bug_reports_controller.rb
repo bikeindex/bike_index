@@ -1,6 +1,7 @@
 module Admin
   class BugReportsController < Admin::BaseController
     include Binxtils::SortableTable
+    include API::TokenAuthenticatable
 
     # Keyed by the BugReport scope each filter applies
     MEMBERSHIP_FILTERS = {"member" => "Only members", "paid_organization" => "Only paid org",
@@ -8,12 +9,14 @@ module Admin
     STATUS_FILTER_ALL = "all"
     STATUS_FILTER_INVESTIGATE = "investigate"
 
+    # Token requests carry no CSRF token, they authenticate with the token alone
+    skip_before_action :verify_authenticity_token, if: :token_request?
     before_action :find_bug_report, only: %i[show update]
 
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
-        matching_bug_reports.includes(:user)
+        matching_bug_reports.includes(:user).with_attached_images
           .reorder("bug_reports.#{sort_column} #{sort_direction}"),
         limit: @per_page,
         page: permitted_page)
@@ -28,6 +31,10 @@ module Admin
     end
 
     def show
+      respond_to do |format|
+        format.html
+        format.json { render json: {bug_report: bug_report_json(@bug_report)} }
+      end
     end
 
     def update
@@ -140,6 +147,11 @@ module Admin
 
     private
 
+    # Token requests get the API's JSON errors rather than a flash + redirect
+    def require_index_admin!
+      token_request? ? require_token_superuser! : super
+    end
+
     def find_bug_report
       @bug_report = BugReport.find(params[:id])
     end
@@ -152,8 +164,15 @@ module Admin
     end
 
     def bug_report_json(bug_report)
-      bug_report.as_json(only: %w[id user_id email from_name receiver subject body tags github_pull_request
+      bug_report.as_json(only: %w[id user_id email from_name receiver subject body tags status github_pull_request
         is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
+        .merge("images" => bug_report.images.map { image_json(it) })
+    end
+
+    # BlobUrl serves the CDN rather than a signed redirect, so the url doesn't expire
+    def image_json(image)
+      {filename: image.filename.to_s, byte_size: image.byte_size,
+       content_type: image.content_type, url: BlobUrl.for(image.blob)}
     end
   end
 end

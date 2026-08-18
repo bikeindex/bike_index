@@ -20,6 +20,8 @@ RSpec.describe Search::Form::Component, type: :component do
     expect(component).to have_css "div"
     expect(component).to have_css("#serial")
     expect(component).to_not have_css("#primary_activity")
+    # The icon is the button's only content, so an unsized one leaves a blank blue box
+    expect(component).to have_css("#search-button[width='29'].tw\\:w-full.tw\\:h-auto")
   end
 
   context "with primary_activity" do

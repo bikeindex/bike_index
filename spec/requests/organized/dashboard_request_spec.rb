@@ -127,4 +127,19 @@ RSpec.describe Organized::BaseController, type: :request do
       end
     end
   end
+
+  describe "general alert" do
+    include_context :request_spec_logged_in_as_organization_user
+    let!(:b_param) { FactoryBot.create(:b_param_unfinished_registration, creator: current_user) }
+
+    # The organization menu is positioned over the layout's usual spot for the alert
+    it "renders once, inside the organization's content column" do
+      get "/o/#{current_organization.to_param}/registrations"
+      alerts = Nokogiri::HTML(response.body).css("[role=alert]")
+        .select { |alert| alert.text.include?("isn't registered yet!") }
+
+      expect(alerts.count).to eq 1
+      expect(alerts.first.ancestors(".organized-wrap")).to be_present
+    end
+  end
 end

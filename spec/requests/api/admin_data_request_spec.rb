@@ -3,43 +3,16 @@
 require "rails_helper"
 
 RSpec.describe "Admin Data API", type: :request do
-  let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
-  let(:user) { FactoryBot.create(:user_confirmed) }
-  let(:doorkeeper_token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }
-  let(:token_param) { {access_token: doorkeeper_token.token} }
-  before { stub_const("API::AdminDataController::ADMIN_DOORKEEPER_APP_ID", doorkeeper_app.id) }
+  include_context :admin_doorkeeper_token
 
   shared_examples "requires admin_data superuser" do
+    include_examples "rejects_unauthorized_token"
+
     context "no token" do
       it "returns 401" do
         get url
         expect(response.status).to eq 401
         expect(json_result[:error]).to eq "OAuth token required"
-      end
-    end
-
-    context "token from the wrong app" do
-      before { stub_const("API::AdminDataController::ADMIN_DOORKEEPER_APP_ID", doorkeeper_app.id + 1) }
-      it "returns 403" do
-        get url, params: token_param
-        expect(response.status).to eq 403
-        expect(json_result[:error]).to eq "Unauthorized application"
-      end
-    end
-
-    context "token for a non-superuser" do
-      it "returns 403" do
-        get url, params: token_param
-        expect(response.status).to eq 403
-        expect(json_result[:error]).to eq "Not permitted"
-      end
-    end
-
-    context "token for a user with an unrelated superuser ability" do
-      before { FactoryBot.create(:superuser_ability, user:, controller_name: "bikes") }
-      it "returns 403" do
-        get url, params: token_param
-        expect(response.status).to eq 403
       end
     end
   end
@@ -49,7 +22,7 @@ RSpec.describe "Admin Data API", type: :request do
     include_examples "requires admin_data superuser"
 
     context "token for an admin_data superuser" do
-      before { FactoryBot.create(:superuser_ability, user:, controller_name: "admin_data") }
+      before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "admin_data") }
       it "returns the sidekiq payload" do
         get url, params: token_param
         expect(response.status).to eq 200
@@ -59,7 +32,7 @@ RSpec.describe "Admin Data API", type: :request do
     end
 
     context "universal superuser" do
-      let(:user) { FactoryBot.create(:superuser) }
+      let(:token_user) { FactoryBot.create(:superuser) }
       it "returns 200" do
         get url, params: token_param
         expect(response.status).to eq 200
@@ -72,7 +45,7 @@ RSpec.describe "Admin Data API", type: :request do
     include_examples "requires admin_data superuser"
 
     context "token for an admin_data superuser" do
-      before { FactoryBot.create(:superuser_ability, user:, controller_name: "admin_data") }
+      before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "admin_data") }
       it "returns the pghero payload" do
         get url, params: token_param
         expect(response.status).to eq 200

@@ -43,6 +43,11 @@ RSpec.describe "Bike search", :js, type: :system do
     expect(page).to have_css(".bike-box-item", wait: 10)
   end
 
+  # The whole param value, so a search for c_9 isn't satisfied by a URL holding c_90
+  def searched_for(color)
+    /=#{Regexp.escape(color.search_id)}(&|$)/
+  end
+
   def search_color_and_submit(color)
     type_into(".hw-combobox__input", color)
     expect(page).to have_css(".hw-combobox__option", text: "that are", wait: 5)
@@ -126,12 +131,15 @@ RSpec.describe "Bike search", :js, type: :system do
     click_first_bike_and_go_back
   end
 
-  # flaky: 4 (4 attempts): every Turbo navigation here (form submit, go_back,
-  # go_forward) reloads the eager results frame, and under CI load that fetch can
-  # intermittently outlast the 10s wait - or a programmatic go_forward to a
-  # turbo-advance history entry can no-op in WebDriver (the URL stays on the back
-  # entry). Both are harness artifacts a real browser doesn't hit, and they can
-  # recur across attempts on a busy runner, so allow more retries than the default.
+  # flaky: 4 (4 attempts), and a retry rather than a fix: the click at the end lands
+  # on about:blank (a nil current_path, and a blank Capybara screenshot in the CI
+  # artifacts). That click is the example's only real browser navigation - the bike
+  # link opts out of Turbo with data-turbo="false" - so what fails is the browser
+  # abandoning a cross-document navigation started off the tail of a traversal, not
+  # a slow frame fetch or a go_forward that no-ops, both of which leave a real URL.
+  # Ruled out too: the frame being back in flight under the click, since turbo:load
+  # - so reloadFrameIfUrlStale - has already fired by the time the settle in
+  # click_first_bike_and_go_back passes. Unreproduced under local CPU throttling.
   it "keeps results, counts, and form in sync across search and back/forward", flaky: 4 do
     # Search Red, then Blue, then retrace with the browser's back and forward
     # buttons. Each step must leave the frame, form, and kind counts matching the
@@ -173,7 +181,7 @@ RSpec.describe "Bike search", :js, type: :system do
     # snapshot must show this query's counts, not a stale or blank carry-over.
     page.execute_script("window.__submitStarts = 0; document.addEventListener('turbo:submit-start', () => { window.__submitStarts += 1 })")
     page.go_back
-    expect(page).to have_current_path(/query_items/, wait: 10)
+    expect(page).to have_current_path(searched_for(red), wait: 10)
     expect_results_frame_color("Red", "Blue")
     expect(page).to have_css(".hw-combobox__chip", text: "Red")
     expect(page).to have_no_css(".hw-combobox__chip", text: "Blue")
@@ -182,6 +190,11 @@ RSpec.describe "Bike search", :js, type: :system do
 
     # Forward to the Blue search - frame, form, and counts reconcile back to Blue.
     page.go_forward
+    # Pin the address bar before anything below starts a navigation of its own. The
+    # frame, chips and counts all restore from the page snapshot, so they settle
+    # while the traversal itself may not have, and the click at the end of this
+    # example is where the about:blank failures land.
+    expect(page).to have_current_path(searched_for(blue), wait: 10)
     expect_results_frame_color("Blue", "Red")
     expect(page).to have_css(".hw-combobox__chip", text: "Blue")
     expect(page).to have_no_css(".hw-combobox__chip", text: "Red")

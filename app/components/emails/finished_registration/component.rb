@@ -9,14 +9,19 @@ module Emails
           ownership.organization_id.blank?
       end
 
-      def initialize(ownership:, bike: nil, email_preview: false)
+      def initialize(ownership:, bike: nil, email_preview: false, versioned: true)
         @ownership = ownership
         @bike = bike
         @email_preview = email_preview
+        @versioned = versioned
       end
 
       def email_sent_at
         @ownership&.created_at if @ownership&.persisted?
+      end
+
+      def snippet_time
+        email_sent_at if @versioned
       end
 
       private
@@ -39,6 +44,10 @@ module Emails
 
       def show_default_security_section?
         !show_security_snippet? && !bike.status_impounded?
+      end
+
+      def show_view_bike_cta?
+        claimed? && !bike.status_impounded?
       end
 
       def show_whats_next_section?
@@ -81,7 +90,8 @@ module Emails
         end
       end
 
-      def claim_cta_text
+      def cta_text
+        return translation("view_your_bike") if claimed?
         return translation("claim_the_bike_type", bike_type: bike.type) if registered_by_owner?
 
         translation("confirm_this_bike_type", bike_type: bike.type)
@@ -92,7 +102,7 @@ module Emails
       end
 
       def organization_snippet_body(kind)
-        @organization_snippet_bodies ||= Hash.new { |h, k| h[k] = organization&.mail_snippet_body(k, time: email_sent_at) }
+        @organization_snippet_bodies ||= Hash.new { |h, k| h[k] = organization&.mail_snippet_body(k, time: snippet_time) }
         @organization_snippet_bodies[kind]
       end
 

@@ -59,15 +59,28 @@ RSpec.describe LandingPagesController, type: :request do
 
   describe "organization show" do
     let(:title) { response.body[/<title[^>]*>([^<]*)/, 1] }
-    let!(:organization) { FactoryBot.create(:organization, short_name: "University") }
+    let!(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+    let!(:organization_landing_page) do
+      FactoryBot.create(:organization_landing_page, organization:, body: "<p>Brakebills welcomes you</p>")
+    end
 
     it "renders" do
       expect(LandingPages::ORGANIZATIONS).to include(organization.slug)
-      get "/university"
+      get "/#{organization.slug}"
       expect(response.status).to eq(200)
       expect(response).to render_template("show")
-      expect(title).to eq "University Bike Registration"
+      expect(title).to eq "Brakebills Bike Registration"
       expect(assigns(:page_id)).to eq "landing_pages_show"
+      expect(response.body).to include "<p>Brakebills welcomes you</p>"
+    end
+
+    context "without a landing page" do
+      let(:organization_landing_page) { nil }
+
+      it "renders empty" do
+        get "/#{organization.slug}"
+        expect(response.status).to eq(200)
+      end
     end
 
     context "xml request format" do
@@ -75,7 +88,7 @@ RSpec.describe LandingPagesController, type: :request do
         get "/#{organization.slug}.xml"
         expect(response.status).to eq(200)
         expect(response).to render_template("show")
-        expect(title).to eq "University Bike Registration"
+        expect(title).to eq "Brakebills Bike Registration"
       end
     end
   end

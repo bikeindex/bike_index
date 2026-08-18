@@ -43,6 +43,28 @@ RSpec.describe "Me API V2", type: :request do
       expect(result["memberships"].is_a?(Array)).to be_truthy
     end
 
+    context "organization membership" do
+      let(:role) { "member" }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user:, role:) }
+      before { token.update_attribute :scopes, all_scopes }
+
+      it "includes the organization access_token" do
+        get "#{base_url}/me", params: {access_token: token.token, format: :json}
+        expect(response.response_code).to eq(200)
+        expect(json_result["memberships"].first["organization_access_token"])
+          .to eq(organization_role.organization.access_token)
+      end
+
+      context "member_no_bike_edit" do
+        let(:role) { "member_no_bike_edit" }
+        it "doesn't include the organization access_token" do
+          get "#{base_url}/me", params: {access_token: token.token, format: :json}
+          expect(response.response_code).to eq(200)
+          expect(json_result["memberships"].first["organization_access_token"]).to be_nil
+        end
+      end
+    end
+
     it "doesn't include bikes if no bikes scoped" do
       expect(token.scopes.to_s.match("read_bikes").present?).to be_falsey
       get "#{base_url}/me", params: {access_token: token.token, format: :json}

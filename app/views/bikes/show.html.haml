@@ -46,7 +46,7 @@
   - if @marketplace_preview
     = render(UI::Alerts::Base::Component.new(kind: :notice)) do
       = t(".viewing_listing_preview")
-      #{link_to(t(".view_public_non_listing"), bike_path(@bike))}.
+      #{link_to(t(".view_public_non_listing"), bike_path(@bike), class: "twlink-underlined")}.
   .row
     .col-md-8
       %h1.bike-title
@@ -122,7 +122,7 @@
                 = t(".or_call")
               %strong
                 = t(".owners_phone_number")
-              = phone_link(@stolen_record.phone)
+              = render UI::PhoneDisplay::Component.new(phone: @stolen_record.phone)
 
       -# Don't show if contact_owner is open - because then we're rendering impound_claim in the main page
       - if BikeServices::Displayer.display_impound_claim?(@bike, current_user) && !@contact_owner_open

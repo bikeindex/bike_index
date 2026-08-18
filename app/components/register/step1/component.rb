@@ -4,13 +4,42 @@ module Register
   module Step1
     # Step 1 of the registration flow: the quick-start form
     class Component < ApplicationComponent
-      def initialize(b_param:, steps:, current_user: nil)
+      def initialize(b_param:, steps:, current_user: nil, embed: false, button_color: nil,
+        button_hover_color: nil)
         @b_param = b_param
         @steps = steps
         @current_user = current_user
+        @embed = embed
+        @button_color = button_color
+        @button_hover_color = button_hover_color
       end
 
       private
+
+      # Turbo ignores a form's target unless it names an iframe, so a Turbo submission would
+      # render step 2 back inside the frame. Nor does autofocus belong in one - it scrolls
+      # the embedding page down to the frame on load
+      def form_options
+        return {data: {turbo: false}, html: {target: "_top"}} if @embed
+
+        {data: {turbo: true, controller: "autofocus register--retry"}}
+      end
+
+      # Derived when the frame's src doesn't name one
+      def button_hover_color
+        @button_hover_color.presence || HexColor.darken_hex(@button_color)
+      end
+
+      # The shade rides a variable because Tailwind only generates classes it can read
+      # literally, and is !important because the inline color outranks a class
+      def button_options
+        return {html_class: "tw:w-full"} unless @button_color
+
+        {html_class: "tw:w-full tw:not-disabled:not-aria-disabled:hover:bg-[var(--button-hover-color)]! " \
+          "tw:not-disabled:not-aria-disabled:hover:border-[var(--button-hover-color)]!",
+         style: "background-color: #{@button_color}; border-color: #{@button_color}; " \
+           "--button-hover-color: #{button_hover_color}"}
+      end
 
       def cycle_type
         @b_param.type
@@ -20,17 +49,29 @@ module Register
         @organization ||= @b_param.creation_organization
       end
 
-      # Every rendering of the cycle type is its own span, so register--heading
-      # can swap them all when the combobox changes
+      # Its own span, so register--heading can swap the word when the combobox changes
       def cycle_type_tag
         tag.span(cycle_type, data: {"register--heading-target": "cycleType"})
       end
 
-      def heading_text
-        return translation(".register_your_bike_html", cycle_type: cycle_type_tag) if organization.blank?
+      # owner_email is the setting bikes/new labels its email field with
+      def email_label
+        helpers.registration_field_label(organization, "owner_email", strip_tags: true) ||
+          (translation(".email_school", org_name: organization.short_name) if organization&.school?) ||
+          translation(".email")
+      end
 
-        translation(".register_your_bike_with_org_html", cycle_type: cycle_type_tag,
-          org_name: ERB::Util.html_escape(organization.short_name))
+      def email_placeholder
+        helpers.registration_field_label(organization, "email_placeholder", strip_tags: true) ||
+          translation(".email_placeholder")
+      end
+
+      # The step is still asking what's being registered, so the heading can't name the
+      # type. Framed, the page around it already says whose registration this is
+      def heading_text
+        return translation(".register_your_vehicle") if @embed || organization.blank?
+
+        translation(".register_your_vehicle_with_org", org_name: organization.short_name)
       end
 
       # Names this registration rather than leaving it to the session, which another tab
@@ -42,7 +83,7 @@ module Register
                            status: @b_param.bike["status"]}.compact)
       end
 
-      # slug => the word the heading uses, for register--heading to swap in
+      # slug => the word the section label uses, for register--heading to swap in
       # (the same map bikes/new hands its JS as window.cycleTypeTranslations)
       def cycle_type_names
         CycleType.slug_translation_hash_lowercase_short

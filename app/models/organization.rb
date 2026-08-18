@@ -17,7 +17,6 @@
 #  graduated_notification_interval :bigint
 #  is_paid                         :boolean          default(FALSE), not null
 #  kind                            :integer
-#  landing_html                    :text
 #  lightspeed_register_with_phone  :boolean          default(FALSE)
 #  location_latitude               :float
 #  location_longitude              :float
@@ -124,6 +123,7 @@ class Organization < ApplicationRecord
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other organization features
   has_one :hot_sheet_configuration
   has_one :organization_stolen_message
+  has_one :organization_landing_page
   has_one :impound_configuration
   has_one :organization_saml_configuration
   has_many :hot_sheets
@@ -294,10 +294,6 @@ class Organization < ApplicationRecord
 
   def to_param
     slug
-  end
-
-  def landing_html?
-    landing_html.present?
   end
 
   def restrict_invitations?
@@ -678,6 +674,8 @@ class Organization < ApplicationRecord
     end
     # If it has stickers, add reg_bike_sticker field
     fslugs += ["reg_bike_sticker"] if fslugs.include?("bike_stickers")
+    # Alone, the edit feature would lock the organization out - viewing is gated separately
+    fslugs += ["registration_sequences"] if fslugs.include?("registration_sequences_edit")
 
     if fslugs.include?("impound_bikes")
       # If impound_bikes enabled and there is a default location for impounding bikes, add impound_bikes_locations

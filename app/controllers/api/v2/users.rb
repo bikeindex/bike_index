@@ -26,8 +26,8 @@ module API
               {
                 organization_name: organization_role.organization.name,
                 organization_slug: organization_role.organization.slug,
-                organization_access_token: organization_role.organization.access_token,
-                user_is_organization_admin: organization_role.role == "admin"
+                organization_access_token: organization_role.organization_access_token,
+                user_is_organization_admin: organization_role.admin?
               }
             }
           end

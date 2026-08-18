@@ -105,4 +105,23 @@ RSpec.describe Phonifyer do
       expect(Phonifyer.components("0000000 x89999")).to eq({number: "0000000", extension: "89999"})
     end
   end
+
+  describe "display" do
+    it "displays phone with an area code and country code" do
+      expect(Phonifyer.display("999 999 9999")).to eq "999-999-9999"
+      expect(Phonifyer.display("+91 8041505583")).to eq "+91-804-150-5583"
+    end
+    context "with extension" do
+      it "displays the extension" do
+        expect(Phonifyer.display("+11 1211111 x2929222")).to eq "+11-121-1111 x 2929222"
+        expect(Phonifyer.display("777 777 7777 ext. 2929222")).to eq "777-777-7777 x 2929222"
+      end
+    end
+    context "no number" do
+      it "is blank" do
+        expect(Phonifyer.display(nil)).to eq ""
+        expect(Phonifyer.display("+1")).to eq ""
+      end
+    end
+  end
 end

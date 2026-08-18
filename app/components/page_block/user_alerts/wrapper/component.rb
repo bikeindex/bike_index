@@ -6,16 +6,28 @@ module PageBlock
       # The general alert shown below the navbar on every page. Only ever one: the first
       # kind the user has wins, even when it turns out to have nothing to show
       class Component < ApplicationComponent
-        def initialize(current_user:)
+        # container lines it up with the navbar above; z-20 because the homepage and
+        # landing page bike tile grids are positioned, so they'd otherwise paint over
+        # this in-flow banner; general-alert is what the landing pages hang their own
+        # spacing on. Blank where the page already places it - MainContent::Organized
+        # renders this inside its content column, which the menu doesn't cover
+        def initialize(current_user:, wrapper_class: "general-alert container tw:relative tw:z-20")
           @current_user = current_user
+          @wrapper_class = wrapper_class
         end
 
+        # Memoized, and deferring to the kind's own component, so the layout can ask
+        # whether an alert is really going to show before it makes room for one
         def render?
-          @current_user.present? && alert_component.present?
+          return @render if defined?(@render)
+
+          @render = @current_user.present? && alert_component&.render?
         end
 
         def call
-          render(alert_component)
+          return render(alert_component) if @wrapper_class.blank?
+
+          tag.div(render(alert_component), class: @wrapper_class)
         end
 
         private
@@ -28,7 +40,7 @@ module PageBlock
           when "theft_alert_without_photo"
             TheftAlertWithoutPhoto::Component.new(bikes: stolen_bikes(:theft_alert_missing_photo?))
           when "unfinished_registration"
-            UnfinishedRegistration::Component.new(b_param: unfinished_b_param)
+            UnfinishedRegistration::Component.new(b_param: unfinished_b_param, current_user: @current_user)
           end
         end
 

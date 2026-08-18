@@ -3,11 +3,14 @@
 module Org
   module MenuItems
     class Component < ApplicationComponent
-      def initialize(organization:, current_user:, is_dropdown: false, unregistered_parking_notification: nil)
+      def initialize(organization:, current_user:, controller_namespace:, controller_name:, action_name:,
+        is_dropdown: false)
         @organization = organization
         @current_user = current_user
+        @controller_namespace = controller_namespace
+        @controller_name = controller_name
+        @action_name = action_name
         @is_dropdown = is_dropdown
-        @unregistered_parking_notification = unregistered_parking_notification
       end
 
       def render?
@@ -65,9 +68,13 @@ module Org
       # Always emits a divider above `item` so the injected link is visually
       # separated from the add-bike row, regardless of what's already in `items`.
       def insert_after_add_bike(items, item)
-        index = items.index { |i| i[:active] == :on_bikes_new }
+        index = items.index { |i| i[:path] == add_bike_link[:path] }
         return items + [divider, item] unless index
         items.dup.insert(index + 1, divider, item)
+      end
+
+      def add_bike_link
+        @add_bike_link ||= OrganizedServices::UserMenuItems.add_bike_link(@organization)
       end
 
       def dashboard_link
@@ -86,68 +93,34 @@ module Org
         {type: :divider}
       end
 
-      # Use request.path_parameters rather than controller.controller_name so the
-      # routed controller is reflected in component specs (which dispatch through
-      # a generic vc_test_controller).
-      def routed_controller
-        controller.request.path_parameters[:controller]
-      end
-
-      def routed_action
-        controller.request.path_parameters[:action]
+      def organized_controller?(*controller_names)
+        @controller_namespace == "organized" && controller_names.include?(@controller_name)
       end
 
       def on_dashboard?
-        routed_controller == "organized/dashboard" && routed_action == "index"
+        organized_controller?("dashboard") && @action_name == "index"
       end
 
       def on_bulk_imports?
-        routed_controller == "organized/bulk_imports"
+        organized_controller?("bulk_imports")
       end
 
       def on_registration_sequences?
-        %w[organized/registration_sequences organized/registration_sequence_pages].include?(routed_controller)
+        organized_controller?("registration_sequences", "registration_sequence_pages")
       end
 
       def skip?(item)
         @is_dropdown && item[:type] == :disabled
       end
 
-      def link_classes(item, active)
+      def link_classes(item)
         classes = ["nav-link"]
         classes << "secondary-item" if item[:secondary]
-        classes << "active" if active
         classes.join(" ")
       end
 
       def disabled_classes(item)
         item[:secondary] ? "disabled-menu-item menu-item secondary-item" : "disabled-menu-item menu-item"
-      end
-
-      # Resolves the per-request active state for items the cache marked with a symbol.
-      # Returns true/false for explicit cases, nil to defer to the active_link helper.
-      def active_state(item)
-        case item[:active]
-        when :auto, :match_controller then nil
-        when :on_registrations_index
-          routed_controller == "organized/registrations" && routed_action == "index"
-        when :on_bikes_new
-          on_bikes_new? && !on_bikes_new_with_parking_notification?
-        when :on_bikes_new_with_parking_notification
-          on_bikes_new_with_parking_notification?
-        when :on_registration_sequences
-          on_registration_sequences?
-        else
-          item[:active]
-        end
-      end
-
-      def on_bikes_new?
-        routed_controller == "organized/bikes" && routed_action == "new"
-      end
-
-      def on_bikes_new_with_parking_notification?
-        on_bikes_new? && @unregistered_parking_notification.present?
       end
     end
   end

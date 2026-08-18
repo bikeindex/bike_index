@@ -1,0 +1,51 @@
+<nav class="primary-header-nav" <%= tag.attributes(controller_attributes) %>>
+  <div class="container">
+    <a href="<%= helpers.user_root_url %>" class="primary-logo">
+      <%= image_tag "revised/logo.svg", class: "primary-nav", alt: "Bike Index home" %>
+    </a>
+
+    <% unless @logo_only %>
+      <%= link_to news_path("bike-index--now-a-nonprofit"), class: "nonprofit-subtitle" do %>
+        <%= translation(".the_nonprofit_bike_registry") %>
+      <% end %>
+
+      <%#
+        The one part of the navbar that varies by page: it re-adds a feature-gated link
+        on that link's own page. Rendering it outside the cache is what lets the cache
+        key be the user alone.
+      %>
+      <%= render organization_menu %>
+
+      <% cache(cache_key) do %>
+        <% if @current_user.blank? %>
+          <div class="center-navbar-signup-link-container">
+            <%= link_to translation(".sign_up"), new_user_url, class: "center-navbar-signup-link signup-link upcase" %>
+          </div>
+        <% end %>
+
+        <div
+          id="menu-opened-backdrop"
+          aria-hidden="true"
+          data-action="click->page-block--navbar#closeMenu"
+        ></div>
+
+        <div
+          class="hamburgler"
+          data-page-block--navbar-target="hamburgler"
+          data-action="click->page-block--navbar#toggleMenu"
+        >
+          <button
+            id="primary_nav_hamburgler"
+            type="button"
+            aria-label="<%= translation(".menu") %>"
+            aria-expanded="false"
+            aria-controls="primary-main-menu"
+            data-page-block--navbar-target="hamburglerButton"
+          ></button>
+        </div>
+
+        <%= render primary_menu %>
+      <% end %>
+    <% end %>
+  </div>
+</nav>

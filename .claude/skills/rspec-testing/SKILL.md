@@ -22,7 +22,7 @@ When something fails outside the files you changed, re-run that spec file on its
 ## What to test (and what not to)
 
 - Tests should either: help make the code correct now, or prevent bugs in the future. Don't add tests that don't do one of those things.
-- Use **request specs**, not controller specs — request specs go through the full middleware/routing stack, so they catch breakage controller specs can't see. Everything making the same request should be in a single test.
+- Use **request specs**, not controller specs — request specs go through the full middleware/routing stack, so they catch breakage controller specs can't see. Everything making the same request should be in a single test. For markup a component owns, see [A component's own markup](#a-components-own-markup-is-tested-in-its-component-spec).
 - Avoid testing private methods.
 - Avoid mocking objects.
   - If making external requests, use VCR. Never write or edit a cassette by hand — record them by running the tests (see [VCR cassettes](#vcr-cassettes-never-hand-edit-always-re-record)).
@@ -44,6 +44,12 @@ let!(:bike_transferred) do
   end
 end
 ```
+
+## A component's own markup is tested in its component spec
+
+What a component decides about its markup — a label, a placeholder, a class, whether a field renders at all — belongs in `spec/components/**/component_spec.rb`, not in the request spec for a page that happens to render it. Request specs cover the request: status, redirects, what was saved, what the page is wired to.
+
+A component having no spec yet isn't a reason to put it in the request spec instead. `spec/components/register/step2/component_spec.rb` is the pattern, including the `render_x` helper that reloads the record so an object updated mid-example isn't answered from the copy the previous render left behind.
 
 ## VCR cassettes: never hand-edit, always re-record
 

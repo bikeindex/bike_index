@@ -3,6 +3,11 @@ require "rails_helper"
 base_url = "/admin/bug_reports"
 RSpec.describe Admin::BugReportsController, type: :request do
   let(:bug_report) { FactoryBot.create(:bug_report, tags: ["parking"]) }
+  let(:target_json) do
+    bug_report.as_json(only: %w[id user_id email from_name receiver subject body tags status github_pull_request
+      is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
+      .merge("images" => [])
+  end
   include_context :request_spec_logged_in_as_superuser
 
   describe "index" do
@@ -14,11 +19,6 @@ RSpec.describe Admin::BugReportsController, type: :request do
     end
 
     context "json" do
-      let(:target_json) do
-        bug_report.as_json(only: %w[id user_id email from_name receiver subject body tags github_pull_request
-          is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
-      end
-
       it "renders a paginated list" do
         expect(bug_report).to be_present
         get "#{base_url}.json", params: {per_page: 1, search_status: "all"}
@@ -132,6 +132,29 @@ RSpec.describe Admin::BugReportsController, type: :request do
       expect(response).to render_template(:show)
     end
 
+    context "json" do
+      it "renders the bug report" do
+        get "#{base_url}/#{bug_report.to_param}.json"
+        expect(response.status).to eq(200)
+        expect(json_result["bug_report"]).to eq(target_json)
+      end
+
+      context "with an attached image" do
+        before do
+          bug_report.images.attach(io: StringIO.new("fake image"), filename: "broken.png",
+            content_type: "image/png")
+        end
+
+        it "renders each image with a url that doesn't expire" do
+          get "#{base_url}/#{bug_report.to_param}.json"
+          expect(json_result.dig("bug_report", "images")).to eq([{
+            "filename" => "broken.png", "byte_size" => 10, "content_type" => "image/png",
+            "url" => BlobUrl.for(bug_report.reload.images.first.blob)
+          }])
+        end
+      end
+    end
+
     context "with a user" do
       let(:bug_report) { FactoryBot.create(:bug_report, user: FactoryBot.create(:user)) }
 
@@ -161,6 +184,18 @@ RSpec.describe Admin::BugReportsController, type: :request do
         patch "#{base_url}/#{bug_report.to_param}", params: {bug_report: {status: "nonsense", tags: "parking"}}
         expect(response).to redirect_to(admin_bug_report_path(bug_report))
         expect(bug_report.reload).to have_attributes(status: "unprioritized", tags: ["parking"])
+      end
+    end
+
+    context "session without a CSRF token" do
+      include_context :test_csrf_token
+      it "does not update" do
+        patch "#{base_url}/#{bug_report.to_param}", params: {
+          bug_report: {github_pull_request: "3805"}
+        }
+        expect(response.status).to eq 302
+        expect(flash[:error]).to be_present
+        expect(bug_report.reload.github_pull_request).to be_blank
       end
     end
 
@@ -217,6 +252,89 @@ RSpec.describe Admin::BugReportsController, type: :request do
         expect(response).to redirect_to(admin_bug_reports_path)
         expect(flash[:error]).to be_present
         expect(bug_report.reload.tags).to eq(["parking"])
+      end
+    end
+  end
+
+  describe "authenticated with an API token" do
+    let(:current_user) { false } # No session - the token is the authentication
+    include_context :admin_doorkeeper_token
+    include_context :test_csrf_token
+
+    let(:url) { "#{base_url}.json" }
+    include_examples "rejects_unauthorized_token"
+
+    context "without a token or a session" do
+      it "redirects" do
+        get url
+        expect(response.status).to eq 302
+        expect(flash[:error]).to be_present
+      end
+    end
+
+    context "token for a bug_reports superuser" do
+      before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "bug_reports") }
+
+      it "renders the index" do
+        expect(bug_report).to be_present
+        get url, params: token_param.merge(search_status: "all")
+        expect(response.status).to eq 200
+        expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report.id])
+      end
+
+      it "renders a single report" do
+        get "#{base_url}/#{bug_report.to_param}.json", params: token_param
+        expect(response.status).to eq 200
+        expect(json_result.dig("bug_report", "id")).to eq bug_report.id
+      end
+
+      it "updates" do
+        patch "#{base_url}/#{bug_report.to_param}", params: token_param.merge(
+          bug_report: {tags: %w[search], github_pull_request: 3805}
+        ), as: :json
+        expect(response.status).to eq 200
+        expect(bug_report.reload).to have_attributes(tags: %w[search], github_pull_request: 3805)
+      end
+
+      it "assigns tags" do
+        post "#{base_url}/assign_tags", params: token_param.merge(
+          tags: "search", bug_reports_selected: {bug_report.id.to_s => bug_report.id}
+        )
+        expect(response).to redirect_to(admin_bug_reports_path)
+        expect(bug_report.reload.tags).to eq(%w[parking search])
+      end
+    end
+
+    context "universal superuser token" do
+      let(:token_user) { FactoryBot.create(:superuser) }
+      it "renders the index" do
+        get url, params: token_param
+        expect(response.status).to eq 200
+      end
+    end
+
+    # Presenting a token skips CSRF, so a forged write reaches the action with any
+    # token at all - what stops it is that the token, not the session, authorizes
+    context "a junk token forged onto a superuser's session" do
+      let(:current_user) { FactoryBot.create(:superuser) }
+      let(:forged_param) { {access_token: "not-a-real-token"} }
+
+      it "does not update" do
+        patch "#{base_url}/#{bug_report.to_param}", params: forged_param.merge(
+          bug_report: {github_pull_request: "3805"}
+        )
+        expect(response.status).to eq 401
+        expect(json_result[:error]).to eq "OAuth token required"
+        expect(bug_report.reload.github_pull_request).to be_blank
+      end
+
+      it "does not assign tags" do
+        post "#{base_url}/assign_tags", params: forged_param.merge(
+          tags: "forged", bug_reports_selected: {bug_report.id.to_s => bug_report.id}
+        )
+        expect(response.status).to eq 401
+        expect(json_result[:error]).to eq "OAuth token required"
+        expect(bug_report.reload.tags).to eq(%w[parking])
       end
     end
   end

@@ -17,10 +17,11 @@ module Registrations
             amber: ["tw:bg-[#fff8e1]", "tw:text-[#caa11a]"]
           }.freeze
 
-          def initialize(bike:, organization:, org_role:)
+          def initialize(bike:, organization:, org_role:, current_user: nil)
             @bike = bike
             @organization = organization
             @org_role = org_role
+            @current_user = current_user
           end
 
           private

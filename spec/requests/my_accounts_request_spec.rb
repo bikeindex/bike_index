@@ -124,6 +124,32 @@ RSpec.describe MyAccountsController, type: :request do
         end
       end
     end
+
+    # Signing a law enforcement organization's user in is what raises the donation
+    # request, and the general alert is what gives way to it
+    context "with a donation request and a general alert" do
+      let(:password) { "example_password2" }
+      let(:organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
+      let(:user) do
+        FactoryBot.create(:organization_user, organization:, password:, password_confirmation: password)
+      end
+      let!(:b_param) { FactoryBot.create(:b_param_unfinished_registration, creator: user) }
+
+      it "shows the donation modal rather than the alert, and the alert once it's spent" do
+        post "/session", params: {session: {email: user.email, password:}}
+        expect(session[:render_donation_request]).to eq "law_enforcement"
+        expect(user.reload.alert_slugs).to eq ["unfinished_registration"]
+
+        get base_url
+        expect(whitespace_normalized_body_text).to match("Thanks for using Bike Index")
+        expect(whitespace_normalized_body_text).to_not match("isn't registered yet!")
+
+        # The session only carries it once, so the alert has the spot back
+        get base_url
+        expect(whitespace_normalized_body_text).to_not match("Thanks for using Bike Index")
+        expect(whitespace_normalized_body_text).to match("isn't registered yet!")
+      end
+    end
   end
 
   describe "/edit" do

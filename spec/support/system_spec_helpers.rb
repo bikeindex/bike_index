@@ -89,6 +89,25 @@ module SystemSpecHelpers
     field
   end
 
+  # Stimulus lazy loads controller modules, so a rendered page can have none of them
+  # connected yet -- a combobox filters no options, a restored draft reaches no listener
+  def wait_for_stimulus(timeout: Capybara.default_max_wait_time)
+    wait_for(timeout:) do
+      page.evaluate_script(<<~JS)
+        [...document.querySelectorAll('[data-controller]')].every((element) =>
+          element.dataset.controller.split(' ').filter(Boolean).every((identifier) =>
+            window.Stimulus?.getControllerForElementAndIdentifier(element, identifier)))
+      JS
+    end
+  end
+
+  # init.coffee assigns window.pageScript once the page's class has bound its handlers, in
+  # $(document).ready -- but click_link returns while the new document is still parsing, so
+  # an interaction landing before then is swallowed with nothing on the page to say so
+  def wait_for_page_script
+    wait_for { page.evaluate_script("!!window.pageScript") }
+  end
+
   # search--form#handlePopstate reconciles these to the address bar on a
   # back/forward; the results frame reloads separately and faster.
   RESTORED_FILTER_FIELDS = %w[search_email serial search_notes].freeze
@@ -126,6 +145,33 @@ module SystemSpecHelpers
     element = trigger.is_a?(Capybara::Node::Element) ? trigger : find(trigger)
     retry_on_detach { element.click }
     expect(page).to have_css("##{element["commandfor"]}[open]")
+  end
+
+  # A dialog holding the page behind it pins the body - with overflow everywhere
+  # except iOS, where only position sticks. Pass to have_css/have_no_css, so the
+  # unlock gets Capybara's wait: closing a dialog fires `close` a task later.
+  def scroll_locked_body
+    "body[style*='overflow: hidden'], body[style*='position: fixed']"
+  end
+
+  # hotwire_combobox's scroll lock picks its mechanism at import from
+  # navigator.platform, and only its iOS branch reaches document. Call before `visit`.
+  def emulate_ios_platform
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.add_init_script(script: "Object.defineProperty(navigator, 'platform', {get: () => 'iPhone'})")
+    end
+  end
+
+  # iOS locks the page by preventing document's touchmove, which leaves no mark on
+  # the body for scroll_locked_body to catch - and outlives the body it was taken for
+  def touch_scroll_blocked?
+    page.evaluate_script(<<~JS)
+      (() => {
+        const event = new TouchEvent('touchmove', {bubbles: true, cancelable: true, touches: [], targetTouches: [], changedTouches: []})
+        document.body.dispatchEvent(event)
+        return event.defaultPrevented
+      })()
+    JS
   end
 
   # The registration's emailed link, minus the mailer's host - the app is on Capybara's

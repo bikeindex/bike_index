@@ -2,7 +2,7 @@
 
 
 = form_for [:admin, @organization], html: {data: {controller: "admin--organization-form"}} do |f|
-  = render partial: 'form', locals: { f: f }
+  = render(Admin::OrganizationForm::Wrapper::Component.new(form_builder: f, current_user:))
 
   .row
     .col-sm-10

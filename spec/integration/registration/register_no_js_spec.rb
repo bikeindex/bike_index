@@ -17,7 +17,7 @@ RSpec.describe "Register flow without JavaScript", type: :system, driver: :playw
 
     # All redirects up to here, so it works the same either way
     expect(page).to have_current_path(/register\?b_param_token=.+&step=1/, url: true)
-    expect(page).to have_content("Register your bike!")
+    expect(page).to have_content("Register your vehicle!")
 
     # Really hidden: the stylesheet ships inside the noscript, so only a browser with
     # scripting off renders it this way

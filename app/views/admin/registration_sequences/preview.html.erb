@@ -2,7 +2,7 @@
   <%= render Admin::RegistrationSequence::Header::Component.new(registration_sequence: @registration_sequence, mode: :preview) %>
 
   <%# pt cancels the flow shell's negative top margin; padding doesn't collapse %>
-  <div class="tw:pt-9 tw:min-[992px]:pt-15">
+  <div class="tw:pt-(--nav-gap)">
     <%= render Org::RegistrationSequence::Preview::Component.new(registration_sequence: @registration_sequence, index: @preview_pagy.page - 1, admin: true) %>
   </div>
 
