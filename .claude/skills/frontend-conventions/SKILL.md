@@ -32,6 +32,7 @@ Scope it rather than running bare `bin/lint`: a whole-repo run reformats files o
 - Form fields should use the `twinput` class.
 - Labels should use the `twlabel` class.
 - Basic links should use the `twlink` class.
+- A link that should take the color of the text around it — inside an alert, a colored `<small>`, the review-app banner — uses `twlink-underlined` instead. Never hand-roll `tw:text-inherit tw:underline`. Its color must come from an ancestor, not a `tw:text-*` on the link itself, which would outrank the class at every state.
 - **Every number** should be rendered with `number_display(number)`. This applies even when a number is composed into a string with non-numeric values — wrap the number itself, not the surrounding string.
   - Good: `[number_display(@bike.year), @bike.mnfg_name].join(" ")`
   - Bad: `[@bike.year, @bike.mnfg_name].join(" ")`

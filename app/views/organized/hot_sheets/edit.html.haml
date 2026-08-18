@@ -7,7 +7,7 @@
 
 .row
   .col-md-6
-    - unless current_organization.search_coordinates.reject(&:blank?).count == 2
+    - unless current_organization.search_coordinates_set?
       = render UI::Alerts::Base::Component.new(kind: :error, header: "Organization does not have a base location", margin_classes: "tw:mb-8") do
         = link_to "Add a location", locations_organization_manage_path(organization_id: current_organization.to_param), class: "twlink-underlined"
         to be able to enable Hot Sheet
