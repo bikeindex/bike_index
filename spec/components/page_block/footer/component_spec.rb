@@ -19,6 +19,14 @@ RSpec.describe PageBlock::Footer::Component, type: :component do
     expect(component.to_html).to_not include("&quot;")
   end
 
+  # One cached render serves every page, so an action would send the language switch to
+  # whichever page filled the cache
+  it "renders the locale form without an action" do
+    form = component.css("form.locale-form").first
+    expect(form.attributes).to_not have_key("action")
+    expect(form["data-controller"]).to eq "page-block--locale-select"
+  end
+
   context "with skip_facebook" do
     let(:skip_facebook) { true }
     it "renders the footer without the facebook pixel" do

@@ -12,7 +12,7 @@ module ControllerHelpers
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
       :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
-      :page_id, :page_route, :default_bike_search_path, :bikehub_url, :show_general_alert,
+      :page_id, :page_route, :implicit_locale, :default_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
       :render_donation_request?
     before_action :enable_rack_profiler
@@ -273,6 +273,34 @@ module ControllerHelpers
   # controllers override to borrow another page's styles.
   def page_route
     "#{controller_path}##{action_name}"
+  end
+
+  def locale_from_request_header
+    request.env.fetch("HTTP_ACCEPT_LANGUAGE", "").scan(/^[a-z]{2}/).first
+  end
+
+  def locale_from_request_params
+    params[:locale].to_s.strip
+  end
+
+  # The locale a request carrying no locale param renders in. The footer's language switcher
+  # leaves the param off for this one, and has to add it for every other -- dropping it would
+  # land the visitor back here. Doorkeeper's controllers reach it through the layout.
+  def implicit_locale
+    @implicit_locale ||= available_locale(current_user&.preferred_language.presence ||
+      locale_from_request_header.presence)
+  end
+
+  def requested_locale
+    @requested_locale ||= if locale_from_request_params.present?
+      available_locale(locale_from_request_params)
+    else
+      implicit_locale
+    end
+  end
+
+  def available_locale(locale)
+    I18n.available_locales.include?(locale.to_s.to_sym) ? locale : I18n.default_locale
   end
 
   # This is overridden in FeedbacksController and InfoController

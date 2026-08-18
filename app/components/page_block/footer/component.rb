@@ -5,7 +5,7 @@ module PageBlock
     class Component < ApplicationComponent
       FACEBOOK_PIXEL_ID = "199066297131941"
       # Digest of the cached template — the cached_markup_digest spec keeps it current
-      MARKUP_DIGEST = "b2673dcab47a"
+      MARKUP_DIGEST = "4f63f67897ab"
 
       def initialize(current_user:, skip_facebook:, passive_organization: nil)
         @current_user = current_user
@@ -15,8 +15,8 @@ module PageBlock
 
       private
 
-      # No page_id: the links resolve their own active state in the browser, so one render
-      # serves every page
+      # No page_id: the links resolve their own active state in the browser and the locale
+      # form submits to whatever URL it's on, so one render serves every page
       def cache_key
         [MARKUP_DIGEST, @current_user, @passive_organization, @skip_facebook]
       end

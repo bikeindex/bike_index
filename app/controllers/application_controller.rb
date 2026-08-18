@@ -79,30 +79,6 @@ class ApplicationController < ActionController::Base
     params.permit(:locale).merge(options)
   end
 
-  def locale_from_request_header
-    request.env.fetch("HTTP_ACCEPT_LANGUAGE", "").scan(/^[a-z]{2}/).first
-  end
-
-  def locale_from_request_params
-    params[:locale].to_s.strip
-  end
-
-  def requested_locale
-    return @requested_locale if defined?(@requested_locale)
-
-    requested_locale =
-      locale_from_request_params.presence ||
-      current_user&.preferred_language.presence ||
-      locale_from_request_header.presence
-
-    @requested_locale =
-      if I18n.available_locales.include?(requested_locale.to_s.to_sym)
-        requested_locale
-      else
-        I18n.default_locale
-      end
-  end
-
   # Around filter to ensure locale (language and timezone) are set only per request
   def set_locale(&action)
     # Parse the timezone params if they are passed (tested in admin#dashboard#index)
