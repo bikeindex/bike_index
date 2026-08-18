@@ -37,7 +37,7 @@ RSpec.describe PageBlock::MainContent::Content::Component, type: :component do
       # The browser marks it current, and only on the index with no search of its own
       link = component.css("a[href='#{news_index_path}']")
       expect(link.count).to eq 1
-      expect(link.first["data-ui--active-link-match-value"]).to eq "full_path"
+      expect(link.first["data-ui--active-link-match-value"]).to eq "unfiltered_path"
       expect(component.text).to match "Bike Index Store"
     end
   end

@@ -40,6 +40,26 @@ RSpec.describe UI::ActiveLink::Component, :js, type: :system do
     expect(page).to have_css "a[aria-current='page']", text: "This preview"
   end
 
+  # What sortable_search_params? draws the line at: paging and sorting leave the index this
+  # link's page, a search doesn't
+  it "keeps an unfiltered_path link current through paging, but not through a search" do
+    visit "#{preview_path}/match_unfiltered_path"
+    expect(page).to have_css "a[aria-current='page']", text: "This preview, unsearched"
+
+    visit "#{preview_path}/match_unfiltered_path?page=2&sort=title&direction=asc&period=all"
+    expect(page).to have_css "a[aria-current='page']", text: "This preview, unsearched"
+
+    visit "#{preview_path}/match_unfiltered_path?query=trek"
+    expect(page).to have_css "a.twlink", text: "This preview, unsearched"
+    expect(page).to_not have_css "a[aria-current]"
+
+    visit "#{preview_path}/match_unfiltered_path?period=week"
+    expect(page).to_not have_css "a[aria-current]"
+
+    visit "#{preview_path}/match_unfiltered_path?search_tags=commuting"
+    expect(page).to_not have_css "a[aria-current]"
+  end
+
   # The navbar renders from a fragment cache shared by every page it was rendered for, so
   # the current page can't be in the cached markup
   it "marks the navbar's link to the page being viewed" do

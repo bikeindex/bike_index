@@ -12,7 +12,7 @@ const ROUTE_MATCHES = ['controller', 'controller_action']
 // Renders UI::ActiveLink::Component's aria-current, which the server can't: these links are
 // cached fragments, so the markup is shared by every page it was rendered for.
 export default class extends Controller {
-  static values = { match: String, routes: String }
+  static values = { match: String, routes: String, filters: String }
 
   connect () {
     if (this.isActive()) this.element.setAttribute('aria-current', this.ariaCurrent())
@@ -27,7 +27,10 @@ export default class extends Controller {
   }
 
   isActive () {
-    return ROUTE_MATCHES.includes(this.matchValue) ? this.routeMatches() : this.pathMatches()
+    if (ROUTE_MATCHES.includes(this.matchValue)) return this.routeMatches()
+    if (this.matchValue === 'unfiltered_path') return this.unfilteredPathMatches()
+
+    return this.pathMatches()
   }
 
   // Mirrors current_page?: the query string counts when the link carries one, so a search
@@ -40,6 +43,26 @@ export default class extends Controller {
     }
 
     return trimSlash(url.pathname) === trimSlash(window.location.pathname)
+  }
+
+  // Mirrors sortable_search_params?: the index stays this link's page while paging or sorting
+  // it, and stops being it once a search narrows it. The names come from the server, which is
+  // where the list of them lives.
+  unfilteredPathMatches () {
+    const url = new URL(this.element.href, window.location.href)
+    if (url.origin !== window.location.origin) return false
+    if (trimSlash(url.pathname) !== trimSlash(window.location.pathname)) return false
+
+    const params = new URLSearchParams(window.location.search)
+    const filters = this.filtersValue.split(' ')
+    // A blank value isn't a search, the way `.reject(&:blank?)` doesn't count one
+    for (const [name, value] of params) {
+      if (!value) continue
+      if (name.startsWith('search_') || filters.includes(name.replace(/\[\]$/, ''))) return false
+      if (name === 'period' && value !== 'all') return false
+    }
+
+    return true
   }
 
   // The page's route comes off the body, since only the server can resolve one. A link whose

@@ -46,6 +46,13 @@ module UI
           path: "#{PREVIEW_PATH}/match_full_path", match: :full_path, html_class: "twlink"))
       end
 
+      # The index this link points at, still current while it's paged or sorted and no longer
+      # current once a search narrows it. Add ?page=2, then ?query=x, to see the two apart.
+      def match_unfiltered_path
+        render(UI::ActiveLink::Component.new(text: "This preview, unsearched",
+          path: "#{PREVIEW_PATH}/match_unfiltered_path", match: :unfiltered_path, html_class: "twlink"))
+      end
+
       # Anything beyond html_class passes through to the anchor
       def with_html_options
         render(UI::ActiveLink::Component.new(text: "Opens in a new tab", path: "#{PREVIEW_PATH}/with_html_options",

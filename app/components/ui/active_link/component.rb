@@ -6,12 +6,19 @@ module UI
     # (application.css) styles. The browser decides, in ui/active_link_controller.js, so a link
     # rendered into a fragment cache doesn't carry the answer for whichever page filled it.
     # match: widens or narrows what counts as the page it points at: its query string too, or
-    # only its controller, or its controller and action — which is what a link carrying query
-    # params (a search, a filtered index) needs.
+    # everything but a search of it, or only its controller, or its controller and action —
+    # which is what a link carrying query params (a search, a filtered index) needs.
     class Component < ApplicationComponent
-      MATCHES = [:path, :full_path, :controller, :controller_action].freeze
+      MATCHES = [:path, :full_path, :unfiltered_path, :controller, :controller_action].freeze
       # The matches the browser answers with a route rather than with the URL
       ROUTE_MATCHES = [:controller, :controller_action].freeze
+      # What sortable_search_params? counts as a search, for :unfiltered_path to ask in the
+      # browser. period is the exception it makes for itself: only a period other than "all"
+      # narrows the page, so the controller reads that one's value rather than its presence.
+      FILTER_PARAMS = (Binxtils::SortableHelper::BASE_SEARCH_KEYS +
+        Binxtils::SortableHelper.extra_search_keys)
+        .flat_map { |key| key.is_a?(Hash) ? key.keys : [key] }
+        .-(%i[direction sort period per_page]).map(&:to_s).freeze
 
       def initialize(path:, text: nil, match: :path, matching_controllers: [], html_class: nil,
         data: {}, **html_options)
@@ -44,7 +51,12 @@ module UI
       def link_data
         @data.merge(controller: [@data[:controller], "ui--active-link"].compact.join(" "),
           "ui--active-link-match-value": @match,
-          "ui--active-link-routes-value": link_routes).compact
+          "ui--active-link-routes-value": link_routes,
+          "ui--active-link-filters-value": link_filters).compact
+      end
+
+      def link_filters
+        FILTER_PARAMS.join(" ") if @match == :unfiltered_path
       end
 
       # The link's own route, which the browser compares the page's against — it can't resolve
