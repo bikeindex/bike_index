@@ -14,8 +14,8 @@
   data-controller="page-block--org-sidebar"
   data-collapsed="false"
   data-mobile-open="false"
-  data-page-block--org-sidebar-collapse-breakpoint-value="<%= PageBlock::OrgSidebar::Component::COLLAPSE_BREAKPOINT %>"
-  data-page-block--org-sidebar-mobile-breakpoint-value="<%= PageBlock::OrgSidebar::Component::MOBILE_BREAKPOINT %>"
+  data-page-block--org-sidebar-collapse-breakpoint-value="<%= PageBlock::Navbar::OrgSidebar::Component::COLLAPSE_BREAKPOINT %>"
+  data-page-block--org-sidebar-mobile-breakpoint-value="<%= PageBlock::Navbar::OrgSidebar::Component::MOBILE_BREAKPOINT %>"
   data-action="
     resize@window->page-block--org-sidebar#resize
     keydown.esc@window->page-block--org-sidebar#closeOnEscape
@@ -41,7 +41,7 @@
     <% end %>
 
     <div class="tw:flex tw:flex-col tw:gap-px">
-      <span class="<%= PageBlock::OrgSidebar::Component::ADMIN_PANEL %>"><%= translation(".admin_panel") %></span>
+      <span class="<%= PageBlock::Navbar::OrgSidebar::Component::ADMIN_PANEL %>"><%= translation(".admin_panel") %></span>
 
       <span class="tw:text-base tw:font-extrabold tw:tracking-tight"><%= @organization.short_name %></span>
     </div>
@@ -67,9 +67,9 @@
         Spelled out rather than interpolated -- tailwind only emits a utility it can
         see literally in the source
       %>
-      <span class="tw:group-data-[mobile-open=true]/sidebar:translate-y-[7px] tw:group-data-[mobile-open=true]/sidebar:rotate-45 <%= PageBlock::OrgSidebar::Component::BAR %>"></span>
-      <span class="tw:group-data-[mobile-open=true]/sidebar:opacity-0 <%= PageBlock::OrgSidebar::Component::BAR %>"></span>
-      <span class="tw:group-data-[mobile-open=true]/sidebar:-translate-y-[7px] tw:group-data-[mobile-open=true]/sidebar:-rotate-45 <%= PageBlock::OrgSidebar::Component::BAR %>"></span>
+      <span class="tw:group-data-[mobile-open=true]/sidebar:translate-y-[7px] tw:group-data-[mobile-open=true]/sidebar:rotate-45 <%= PageBlock::Navbar::OrgSidebar::Component::BAR %>"></span>
+      <span class="tw:group-data-[mobile-open=true]/sidebar:opacity-0 <%= PageBlock::Navbar::OrgSidebar::Component::BAR %>"></span>
+      <span class="tw:group-data-[mobile-open=true]/sidebar:-translate-y-[7px] tw:group-data-[mobile-open=true]/sidebar:-rotate-45 <%= PageBlock::Navbar::OrgSidebar::Component::BAR %>"></span>
     </button>
   </div>
 
@@ -135,7 +135,7 @@
         <div class="tw:flex tw:items-center tw:gap-2">
           <%= image_tag "/icon-dark.svg", alt: "Bike Index", class: "tw:h-[28px] tw:w-auto" %>
 
-          <span class="tw:group-data-[collapsed=true]/sidebar:hidden <%= PageBlock::OrgSidebar::Component::ADMIN_PANEL %>">
+          <span class="tw:group-data-[collapsed=true]/sidebar:hidden <%= PageBlock::Navbar::OrgSidebar::Component::ADMIN_PANEL %>">
             <%= translation(".admin_panel") %>
           </span>
         </div>
@@ -209,7 +209,7 @@
               >
                 <% item[:children].each do |child| %>
                   <% if child[:type] == :disabled %>
-                    <span class="tw:text-gray-400 <%= PageBlock::OrgSidebar::Component::CHILD %>"><%= child[:label] %></span>
+                    <span class="tw:text-gray-400 <%= PageBlock::Navbar::OrgSidebar::Component::CHILD %>"><%= child[:label] %></span>
                   <% else %>
                     <%= render active_link(child, row_class: child_class, text: child[:label]) %>
                   <% end %>

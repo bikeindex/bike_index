@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe PageBlock::OrgSidebar::Component, type: :component do
+RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
   let(:current_user) { FactoryBot.create(:user_confirmed, email: "kdewey@brakebills.edu") }
   let(:organization) { FactoryBot.create(:organization_brakebills) }
   let!(:organization_role) do

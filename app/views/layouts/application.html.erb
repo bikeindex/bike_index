@@ -48,13 +48,11 @@
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
   </head>
 
-  <%# The sidebar stands in for the navbar entirely, so it decides which one renders %>
-  <% org_sidebar = PageBlock::OrgSidebar::Component.new(organization: passive_organization, current_user:,
-    current_user_or_unconfirmed_user:) %>
+  <%# The navbar picks between the bar and the sidebar; the body is laid out around whichever %>
+  <% navbar = PageBlock::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:,
+    passive_organization:) %>
 
-  <% show_org_sidebar = org_sidebar.render? %>
-
-  <%= body_tag(html_class: class_names(body_class, "with-org-sidebar" => show_org_sidebar)) do %>
+  <%= body_tag(html_class: class_names(body_class, "with-org-sidebar" => navbar.org_sidebar?)) do %>
     <a
       href="#main-content"
       class="
@@ -69,11 +67,7 @@
 
     <%= render(PageBlock::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
 
-    <% if show_org_sidebar %>
-      <%= render org_sidebar %>
-    <% else %>
-      <%= render PageBlock::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:) %>
-    <% end %>
+    <%= render navbar %>
 
     <% if render_donation_request? %>
       <%= render PageBlock::LawEnforcementDonation::Component.new(current_user:) %>

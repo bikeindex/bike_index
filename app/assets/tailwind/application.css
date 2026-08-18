@@ -218,7 +218,7 @@ body.with-org-sidebar main {
   min-height: 100vh;
 }
 
-/* PageBlock::OrgSidebar::Component::MOBILE_BREAKPOINT, below which the sidebar is
+/* PageBlock::Navbar::OrgSidebar::Component::MOBILE_BREAKPOINT, below which the sidebar is
    a top bar in the flow -- which takes its own space, so there's nothing to hold
    open for it. `width <` rather than a max-width of 759px, so a fractional viewport
    between the two doesn't land outside both this and the template's min-[760px] */

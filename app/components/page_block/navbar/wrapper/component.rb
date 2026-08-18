@@ -3,20 +3,33 @@
 module PageBlock
   module Navbar
     module Wrapper
-      # The site-wide header nav: the logo and the primary menu. Readers with a passive
-      # organization get PageBlock::OrgSidebar in its place, so it never has to carry one.
+      # The site-wide header nav: the logo and the primary menu. A reader with a passive
+      # organization gets PageBlock::Navbar::OrgSidebar in its place, which this picks.
       # logo_only renders just the logo, for the OAuth authorization prompt.
       class Component < ApplicationComponent
         # Digest of the cached template — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "369410c292c4"
+        MARKUP_DIGEST = "31b5dea773e5"
 
-        def initialize(logo_only: false, current_user: nil, current_user_or_unconfirmed_user: nil)
+        def initialize(logo_only: false, current_user: nil, current_user_or_unconfirmed_user: nil,
+          passive_organization: nil)
           @logo_only = logo_only
           @current_user = current_user
           @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user
+          @passive_organization = passive_organization
+        end
+
+        # The layout asks, since the sidebar is a column the page is laid out around
+        # rather than a bar above it
+        def org_sidebar?
+          org_sidebar.render?
         end
 
         private
+
+        def org_sidebar
+          @org_sidebar ||= PageBlock::Navbar::OrgSidebar::Component.new(organization: @passive_organization,
+            current_user: @current_user, current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user)
+        end
 
         # logo_only renders none of the elements the controller drives
         def controller_attributes

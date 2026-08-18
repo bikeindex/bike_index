@@ -20,12 +20,27 @@ RSpec.describe PageBlock::Navbar::Wrapper::Component, type: :component do
   context "with a current_user" do
     let(:current_user) { FactoryBot.create(:user_confirmed) }
 
-    # PageBlock::OrgSidebar renders instead of this whole navbar for a reader with a
-    # passive organization, so the navbar no longer takes one at all
     it "drops the signup link without adding an organization menu" do
       expect(component).to_not have_css "a.center-navbar-signup-link"
       expect(component).to_not have_css "#passive_organization_submenu"
       expect(component).to have_css "#setting_submenu"
+      expect(instance.org_sidebar?).to be false
+    end
+
+    # The sidebar stands in for the whole bar, so this renders one or the other
+    context "with a passive_organization" do
+      let(:organization) { FactoryBot.create(:organization, short_name: "Sweet") }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
+      let(:instance) do
+        described_class.new(current_user:, current_user_or_unconfirmed_user: current_user,
+          passive_organization: organization)
+      end
+
+      it "renders the sidebar in place of the navbar" do
+        expect(instance.org_sidebar?).to be true
+        expect(component).to have_css "nav#org_sidebar_nav", text: "Sweet"
+        expect(component).to have_no_css "nav.primary-header-nav"
+      end
     end
   end
 

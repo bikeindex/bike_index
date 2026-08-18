@@ -3,7 +3,7 @@
 module PageBlock
   module MainContent
     module Organized
-      # The organization admin shell - the content column PageBlock::OrgSidebar sits
+      # The organization admin shell - the content column PageBlock::Navbar::OrgSidebar sits
       # beside, and the organization-wide alerts above it
       class Component < ApplicationComponent
         def initialize(current_organization:, current_user:, passive_organization:,

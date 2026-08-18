@@ -1,45 +1,50 @@
-<%# logo_only renders one link -- not worth a cache round trip %>
-<% cache_if(!@logo_only, cache_key) do %>
-  <nav class="primary-header-nav" <%= tag.attributes(controller_attributes) %>>
-    <div class="container">
-      <a href="<%= helpers.user_root_url %>" class="primary-logo">
-        <%= image_tag "revised/logo.svg", class: "primary-nav", alt: "Bike Index home" %>
-      </a>
+<%# Outside the cache below, which is keyed on the user rather than the organization %>
+<% if org_sidebar? %>
+  <%= render org_sidebar %>
+<% else %>
+  <%# logo_only renders one link -- not worth a cache round trip %>
+  <% cache_if(!@logo_only, cache_key) do %>
+    <nav class="primary-header-nav" <%= tag.attributes(controller_attributes) %>>
+      <div class="container">
+        <a href="<%= helpers.user_root_url %>" class="primary-logo">
+          <%= image_tag "revised/logo.svg", class: "primary-nav", alt: "Bike Index home" %>
+        </a>
 
-      <% unless @logo_only %>
-        <%= link_to news_path("bike-index--now-a-nonprofit"), class: "nonprofit-subtitle" do %>
-          <%= translation(".the_nonprofit_bike_registry") %>
-        <% end %>
+        <% unless @logo_only %>
+          <%= link_to news_path("bike-index--now-a-nonprofit"), class: "nonprofit-subtitle" do %>
+            <%= translation(".the_nonprofit_bike_registry") %>
+          <% end %>
 
-        <% if @current_user.blank? %>
-          <div class="center-navbar-signup-link-container">
-            <%= link_to translation(".sign_up"), new_user_url, class: "center-navbar-signup-link signup-link upcase" %>
+          <% if @current_user.blank? %>
+            <div class="center-navbar-signup-link-container">
+              <%= link_to translation(".sign_up"), new_user_url, class: "center-navbar-signup-link signup-link upcase" %>
+            </div>
+          <% end %>
+
+          <div
+            id="menu-opened-backdrop"
+            aria-hidden="true"
+            data-action="click->page-block--navbar#closeMenu"
+          ></div>
+
+          <div
+            class="hamburgler"
+            data-page-block--navbar-target="hamburgler"
+            data-action="click->page-block--navbar#toggleMenu"
+          >
+            <button
+              id="primary_nav_hamburgler"
+              type="button"
+              aria-label="<%= translation(".menu") %>"
+              aria-expanded="false"
+              aria-controls="primary-main-menu"
+              data-page-block--navbar-target="hamburglerButton"
+            ></button>
           </div>
+
+          <%= render primary_menu %>
         <% end %>
-
-        <div
-          id="menu-opened-backdrop"
-          aria-hidden="true"
-          data-action="click->page-block--navbar#closeMenu"
-        ></div>
-
-        <div
-          class="hamburgler"
-          data-page-block--navbar-target="hamburgler"
-          data-action="click->page-block--navbar#toggleMenu"
-        >
-          <button
-            id="primary_nav_hamburgler"
-            type="button"
-            aria-label="<%= translation(".menu") %>"
-            aria-expanded="false"
-            aria-controls="primary-main-menu"
-            data-page-block--navbar-target="hamburglerButton"
-          ></button>
-        </div>
-
-        <%= render primary_menu %>
-      <% end %>
-    </div>
-  </nav>
+      </div>
+    </nav>
+  <% end %>
 <% end %>

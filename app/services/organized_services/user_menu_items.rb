@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # The organization menu, grouped the way the design lays it out: collapsible groups
-# that own their children. PageBlock::OrgSidebar renders it and api/v3/me serves it,
+# that own their children. PageBlock::Navbar::OrgSidebar renders it and api/v3/me serves it,
 # cached per [organization, user].
 #
 # Item shapes:
