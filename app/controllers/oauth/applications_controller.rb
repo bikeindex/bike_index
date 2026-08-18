@@ -17,7 +17,7 @@ module Oauth
 
     # The superuser branch of #index renders the admin skeleton, which takes this whole
     def admin_index_state
-      @admin_index_state ||= Admin::IndexState.new(
+      @admin_index_state ||= ComponentStates::IndexState.new(
         params:, sort_state: helpers.sort_state, render_chart: @render_chart,
         pagy: @pagy, per_page: @per_page, time_range: @time_range,
         period: @period, start_time: @start_time, end_time: @end_time, time_range_column: @time_range_column

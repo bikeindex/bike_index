@@ -23,7 +23,7 @@ module Admin
       private
 
       def index_state(params: {}, **attrs)
-        Admin::IndexState.new(params: ActionController::Parameters.new(params), **attrs)
+        ComponentStates::IndexState.new(params: ActionController::Parameters.new(params), **attrs)
       end
     end
   end

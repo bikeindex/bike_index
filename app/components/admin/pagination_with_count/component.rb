@@ -5,7 +5,7 @@ module Admin
     class Component < ApplicationComponent
       include GraphingHelper # for humanized_time_range_column
 
-      def initialize(collection:, index: Admin::IndexState.new, count: nil, count_detail: nil, skip_total: false,
+      def initialize(collection:, index: ComponentStates::IndexState.new, count: nil, count_detail: nil, skip_total: false,
         skip_today: false, skip_pagination: false, humanized_time_range_column_override: nil,
         viewing: nil, time_range_column: nil)
         @collection = collection

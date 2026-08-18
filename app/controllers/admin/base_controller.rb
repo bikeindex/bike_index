@@ -10,7 +10,7 @@ module Admin
 
     # Built lazily rather than in a before_action, because the subjects below are set by the action
     def admin_index_state
-      @admin_index_state ||= Admin::IndexState.new(
+      @admin_index_state ||= ComponentStates::IndexState.new(
         params:, sort_state: helpers.sort_state,
         render_chart: @render_chart, render_deleted: @render_deleted,
         pagy: @pagy, per_page: @per_page, time_range: @time_range,

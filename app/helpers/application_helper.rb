@@ -4,7 +4,7 @@ module ApplicationHelper
 
   # The three sortable-table values as one, so a table takes one argument rather than three
   def sort_state
-    SortState.new(search_params: sortable_search_params, sort: sort_column, direction: sort_direction)
+    ComponentStates::SortState.new(search_params: sortable_search_params, sort: sort_column, direction: sort_direction)
   end
 
   def notification_delivery_display(status)

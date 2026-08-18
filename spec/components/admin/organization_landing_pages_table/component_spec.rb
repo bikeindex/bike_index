@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Admin::OrganizationLandingPagesTable::Component, type: :component do
-  let(:component) { with_request_url("/admin/organization_landing_pages") { render_inline(described_class.new(collection: [landing_page], sort_state: SortState.new(search_params: {period: "all"}), render_search:)) } }
+  let(:component) { with_request_url("/admin/organization_landing_pages") { render_inline(described_class.new(collection: [landing_page], sort_state: ComponentStates::SortState.new(search_params: {period: "all"}), render_search:)) } }
   let(:organization) { FactoryBot.create(:organization) }
   let(:landing_page) { FactoryBot.create(:organization_landing_page, organization:) }
   let(:render_search) { true }
