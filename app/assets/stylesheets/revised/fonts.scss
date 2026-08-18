@@ -36,9 +36,12 @@ $btn-font-size: 15px;
     color: $link-color;
     text-decoration: none;
 
+    // .container extends this, so both markers: the class the legacy views emit, and the
+    // attribute UI::ActiveLink does — the info sidebar's current link is styled from here
     &:hover,
     &:active,
-    &.active {
+    &.active,
+    &[aria-current] {
       text-decoration: underline;
       color: $link-color;
     }

@@ -14,6 +14,15 @@ module UI
         end
       end
 
+      # Link color, where only the label is underlined — hover and press it to see the
+      # chevron stay clear of the underline .twlink would otherwise put across both
+      def link_button
+        render(UI::Dropdown::Component.new(name: "Mailers", button_color: :link, active: true)) do |dropdown|
+          dropdown.with_entry_item { content_tag(:a, "Organized", href: "#") }
+          dropdown.with_entry_item { content_tag(:a, "Customer", href: "#") }
+        end
+      end
+
       def custom_button
         render(UI::Dropdown::Component.new(
           name: "User",
