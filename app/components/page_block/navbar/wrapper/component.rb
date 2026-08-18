@@ -8,10 +8,10 @@ module PageBlock
       # logo_only renders just the logo, for the OAuth authorization prompt.
       class Component < ApplicationComponent
         # Digest of the cached template — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "d8e96382eb48"
+        MARKUP_DIGEST = "da694536d447"
 
         def initialize(logo_only: false, page_id: nil, current_user: nil, current_user_or_unconfirmed_user: nil,
-          passive_organization: nil, controller_namespace: nil, controller_name: nil, action_name: nil)
+          passive_organization: nil)
           # Everything below keys the fragment cache, so a caller that forgets one would
           # otherwise share a single render across every page
           raise ArgumentError, "page_id is required unless logo_only" if page_id.blank? && !logo_only
@@ -21,9 +21,6 @@ module PageBlock
           @current_user = current_user
           @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user
           @passive_organization = passive_organization
-          @controller_namespace = controller_namespace
-          @controller_name = controller_name
-          @action_name = action_name
         end
 
         private

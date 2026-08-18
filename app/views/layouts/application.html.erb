@@ -76,7 +76,7 @@
     <% if show_org_sidebar %>
       <%= render org_sidebar %>
     <% else %>
-      <%= render PageBlock::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:, passive_organization:, page_id:, controller_namespace:, controller_name:, action_name:) %>
+      <%= render PageBlock::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:, passive_organization:, page_id:) %>
     <% end %>
 
     <% if render_donation_request? %>

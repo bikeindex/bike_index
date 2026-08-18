@@ -9,7 +9,7 @@ RSpec.describe PageBlock::Navbar::Wrapper::Component, type: :component do
   let(:passive_organization) { nil }
   let(:instance) do
     described_class.new(current_user:, current_user_or_unconfirmed_user: current_user, passive_organization:,
-      page_id: "welcome_index", controller_namespace: nil, controller_name: "welcome", action_name: "index")
+      page_id: "welcome_index")
   end
   # The request drives UI::ActiveLink, which resolves the items that pass no :active
   let(:component) { with_request_url("/") { render_inline(instance) } }
