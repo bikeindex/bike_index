@@ -22,8 +22,21 @@ HwComboboxController.prototype.navigate = function (event) {
   navigate.call(this, event)
 }
 
-// ArrowUp doesn't open a closed combobox the way ArrowDown does, so it picks out of a
-// hidden listbox -- and the gem's wrap-around hands back `undefined` for an empty list.
+// The gem opens a closed combobox on ArrowDown but not ArrowUp, which WAI-ARIA's pattern
+// opens onto the last option. `_expand` follows `open` because stimulus delivers the
+// `expandedValue` callback too late for the keystroke that set it -- the gem does the same.
+const prepareToFilter = HwComboboxController.prototype.prepareToFilter
+HwComboboxController.prototype.prepareToFilter = function (event) {
+  if (event.key === 'ArrowUp' && this._isClosed) {
+    this.open()
+    this._expand()
+  }
+
+  prepareToFilter.call(this, event)
+}
+
+// Home and End pick by index without opening anything, so they reach the empty option list
+// a closed combobox has -- and the gem's wrap-around hands back `undefined` for that.
 const selectIndex = HwComboboxController.prototype._selectIndex
 HwComboboxController.prototype._selectIndex = function (index) {
   if (this._visibleOptionElements.length) selectIndex.call(this, index)
