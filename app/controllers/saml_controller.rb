@@ -45,7 +45,7 @@ class SamlController < ApplicationController
       raw_response: params[:SAMLResponse], request_id: saml_request[:request_id])
     return saml_failure(result.error) unless result.success?
 
-    sign_in_and_redirect(result.user)
+    sign_in_and_redirect(result.user, via_saml: true)
   end
 
   private
