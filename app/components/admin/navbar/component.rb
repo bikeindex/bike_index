@@ -71,8 +71,10 @@ module Admin
           .detect { |link| on_page?(link, match_for(link)) } || invoices_edit_link
       end
 
+      # The picker names the current page in prose, which UI::ActiveLink can't answer for it —
+      # the links themselves go active in the browser
       def on_page?(link, match)
-        UI::ActiveLink::Component.active?(path: link[:path], match:, view: helpers)
+        helpers.current_page_active?(link[:path], match == :controller)
       end
 
       def nav_link_for(path)

@@ -9,7 +9,7 @@
   <% when :link %>
     <li>
       <%= render UI::ActiveLink::Component.new(text: item[:label], path: item[:path],
-            active: active_state(item), match: MATCHES.fetch(item[:active], :path),
+            match: item[:match], matching_controllers: item[:matching_controllers],
             html_class: link_classes(item)) %>
     </li>
   <% when :super_admin_link %>

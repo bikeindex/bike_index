@@ -8,21 +8,14 @@
 # Item shapes:
 #   {type: :divider}
 #   {type: :disabled, label:, secondary:} # component drops these in dropdown
-#   {type: :link, label:, path:, secondary:, active:}
+#   {type: :link, label:, path:, secondary:, match:, matching_controllers:}
 #
 # The component appends a trailing divider (for non-ambassador orgs, unless
 # rendering as a dropdown for a non-superuser) and a super_admin_link
 # (for superusers).
 #
-# `active:` is one of these, which Org::MenuItems::Component::MATCHES hands to
-# UI::ActiveLink as the match: granularity for the browser to resolve:
-#   :auto                                  - match: :path
-#   :match_controller                      - match: :controller
-#   :on_registrations_index                - match: :controller_action
-# or one of these, which the component computes from the current request:
-#   :on_bikes_new
-#   :on_bikes_new_with_parking_notification
-#   :on_registration_sequences             - also matches the pages controller
+# `match:` and `matching_controllers:` are UI::ActiveLink's, which resolves them
+# in the browser. Nothing here depends on which page is current.
 module OrganizedServices
   module UserMenuItems
     extend Functionable
@@ -33,14 +26,20 @@ module OrganizedServices
     def for(organization:, current_user:)
       return [] if organization.nil? || current_user.nil?
 
-      Rails.cache.fetch(["organized_menu_items_v1", organization.id, current_user.cache_key_with_version]) do
+      Rails.cache.fetch(["organized_menu_items_v2", organization.id, current_user.cache_key_with_version]) do
         build_items(organization, current_user)
       end
     end
 
     # Public helpers for the component to inject route-specific overrides
     # (so the menu still shows the dashboard / bulk-imports link when the
-    # user is on those pages, even if the org doesn't have the feature).
+    # user is on those pages, even if the org doesn't have the feature),
+    # and to find where in the menu to inject them.
+    def add_bike_link(organization)
+      link(translation(:add_a_bike),
+        routes.new_organization_bike_path(organization.to_param), match: :full_path)
+    end
+
     def dashboard_link(organization)
       link("#{organization.short_name} dashboard",
         routes.organization_dashboard_index_path(organization_id: organization.to_param))
@@ -50,13 +49,14 @@ module OrganizedServices
       bulk_label = organization.ascend_or_broken_ascend? ? translation(:ascend_imports) : translation(:bulk_imports)
       link(bulk_label,
         routes.organization_bulk_imports_path(organization_id: organization.to_param),
-        active: :match_controller)
+        match: :controller)
     end
 
+    # Editing a page of a sequence is the same section of the menu, on its own controller
     def registration_sequences_link(organization)
       link(translation(:manage_registration_sequences),
         routes.organization_registration_sequences_path(organization_id: organization.to_param),
-        active: :on_registration_sequences)
+        match: :controller, matching_controllers: ["organized/registration_sequence_pages"])
     end
 
     #
@@ -109,13 +109,13 @@ module OrganizedServices
       items = [
         link(translation(:org_bikes, org_name: organization.short_name),
           routes.organization_registrations_path(organization_id: organization.to_param),
-          active: :on_registrations_index)
+          match: :controller_action)
       ]
 
       if organization.enabled?("impound_bikes")
         items << link(translation(:impounded_bikes),
           routes.organization_impound_records_path(organization_id: organization.to_param),
-          secondary: true, active: :match_controller)
+          secondary: true, match: :controller)
       end
 
       if organization.enabled?("show_partial_registrations")
@@ -138,9 +138,10 @@ module OrganizedServices
       items
     end
 
+    # Both add-a-bike links are organized/bikes#new, told apart by the parking_notification
+    # param — so they match on the full path rather than on the page they share
     def add_bike_items(organization)
-      items = [link(translation(:add_a_bike),
-        routes.new_organization_bike_path(organization.to_param), active: :on_bikes_new)]
+      items = [add_bike_link(organization)]
 
       divider_below = organization.show_bulk_import? || organization.lightspeed_or_broken_lightspeed? ||
         organization.enabled?("parking_notifications")
@@ -158,7 +159,7 @@ module OrganizedServices
           routes.organization_parking_notifications_path(organization_id: organization.to_param))
         items << link(translation(:parking_notification_unregistered),
           routes.new_organization_bike_path(organization.to_param, parking_notification: true),
-          secondary: true, active: :on_bikes_new_with_parking_notification)
+          secondary: true, match: :full_path)
       end
 
       items
@@ -170,7 +171,7 @@ module OrganizedServices
       items << if organization.enabled?("bike_stickers")
         link(translation(:registration_stickers),
           routes.organization_stickers_path(organization_id: organization.to_param),
-          active: :match_controller)
+          match: :controller)
       else
         {type: :disabled, label: translation(:registration_stickers), secondary: false}
       end
@@ -183,25 +184,25 @@ module OrganizedServices
       if organization.enabled?("csv_exports")
         items << link(translation(:exports),
           routes.organization_exports_path(organization_id: organization.to_param),
-          active: :match_controller)
+          match: :controller)
       end
 
       if organization.enabled?("graduated_notifications")
         items << link(translation(:graduated_notifications),
           routes.organization_graduated_notifications_path(organization_id: organization.to_param),
-          active: :match_controller)
+          match: :controller)
       end
 
       if organization.enabled?("model_audits")
         items << link(translation(:model_audits),
           routes.organization_model_audits_path(organization_id: organization.to_param),
-          active: :match_controller)
+          match: :controller)
       end
 
       if organization.impound_claims?
         items << link(translation(:impounded_claims),
           routes.organization_impound_claims_path(organization_id: organization.to_param),
-          active: :match_controller)
+          match: :controller)
       end
 
       items
@@ -213,7 +214,7 @@ module OrganizedServices
       items = []
       items << divider if additional_divider
       items << link(translation(:manage_users),
-        routes.organization_users_path(organization_id: organization.to_param), active: :match_controller)
+        routes.organization_users_path(organization_id: organization.to_param), match: :controller)
 
       if organization.enabled?("impound_bikes")
         items << link(translation(:manage_impounding, org_name: organization.short_name),
@@ -227,7 +228,7 @@ module OrganizedServices
 
       if organization.enabled?("customize_emails")
         items << link(translation(:custom_emails),
-          routes.organization_emails_path(organization_id: organization.to_param), active: :match_controller)
+          routes.organization_emails_path(organization_id: organization.to_param), match: :controller)
       elsif organization.enabled?("organization_stolen_message")
         items << link(translation(:stolen_message),
           routes.edit_organization_email_path("organization_stolen_message", organization_id: organization.to_param))
@@ -245,8 +246,8 @@ module OrganizedServices
       items
     end
 
-    def link(label, path, secondary: false, active: :auto)
-      {type: :link, label:, path:, secondary:, active:}
+    def link(label, path, secondary: false, match: :path, matching_controllers: [])
+      {type: :link, label:, path:, secondary:, match:, matching_controllers:}
     end
 
     def divider

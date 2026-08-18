@@ -7,56 +7,27 @@ RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
   let(:args) { {label: "Help", path: "/help"} }
   let(:link) { component.css("a").first }
 
-  # UI::ActiveLink resolves the state in the browser, so an item that passes no :active
-  # renders the controller rather than a class
-  it "leaves the current-page check to the path when active is omitted" do
+  # UI::ActiveLink resolves the state in the browser, so the item renders the controller
+  # rather than a class
+  it "matches on the path by default" do
     expect(component).to have_css "a.nav-link[href='/help']", text: "Help"
     expect(link["data-controller"]).to eq "ui--active-link"
     expect(link["data-ui--active-link-match-value"]).to eq "path"
   end
 
-  context "with active: false" do
-    let(:args) { {label: "Help", path: "/help", active: false} }
-
-    it "pins the link inactive, without the browser resolving it" do
-      expect(component).to_not have_css "a.active"
-      expect(link.attributes).to_not have_key("data-controller")
-    end
-  end
-
-  context "with active: true" do
-    let(:args) { {label: "Search", path: "/search/registrations", active: true} }
-
-    it "renders active regardless of the path" do
-      expect(component).to have_css "a.nav-link.active[href='/search/registrations']"
-      expect(link.attributes).to_not have_key("data-controller")
-    end
-  end
-
-  context "with active: :match_controller" do
-    let(:args) { {label: "Blog", path: "/news", active: :match_controller} }
+  context "with match: :controller" do
+    let(:args) { {label: "Blog", path: "/news", match: :controller} }
 
     it "matches on the controller rather than the path" do
       expect(link["data-ui--active-link-match-value"]).to eq "controller"
-      expect(link["data-ui--active-link-route-value"]).to eq "news#index"
+      expect(link["data-ui--active-link-routes-value"]).to eq "news#index"
     end
   end
 
-  # The manifests' vocabulary is an alias layer over UI::ActiveLink's own match names, which
-  # a caller can pass straight through
-  context "with active: :controller, UI::ActiveLink's name for it" do
-    let(:args) { {label: "Blog", path: "/news", active: :controller} }
-
-    it "matches the same as :match_controller" do
-      expect(link["data-ui--active-link-match-value"]).to eq "controller"
-    end
-  end
-
-  context "with an unrecognized active" do
-    # nil used to mean :auto, so a caller reaching for a falsey value has to say which
+  context "with an unrecognized match" do
     it "raises rather than picking a state" do
-      expect { described_class.new(label: "Help", path: "/help", active: nil) }
-        .to raise_error(ArgumentError, /Invalid active/)
+      expect { render_inline(described_class.new(label: "Help", path: "/help", match: :nonsense)) }
+        .to raise_error(ArgumentError, /match/)
     end
   end
 

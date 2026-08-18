@@ -26,6 +26,19 @@ RSpec.describe UI::ActiveLink::Component, :js, type: :system do
     expect(page).to_not have_css "a.active"
   end
 
+  # The param the page carries is what :path ignores and :full_path doesn't
+  it "counts the query string only where the match says to" do
+    visit "#{preview_path}/match_full_path"
+    expect(page).to have_css "a.active", text: "This preview, exactly"
+
+    visit "#{preview_path}/match_full_path?example=1"
+    expect(page).to have_css "a.nav-link", text: "This preview, exactly"
+    expect(page).to_not have_css "a.active"
+
+    visit "#{preview_path}/current_page?example=1"
+    expect(page).to have_css "a.active", text: "This preview"
+  end
+
   # The navbar renders from a fragment cache shared by every page it was rendered for, so
   # the active link can't be in the cached markup
   it "marks the navbar's link to the page being viewed" do

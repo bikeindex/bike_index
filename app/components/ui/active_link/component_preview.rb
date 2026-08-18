@@ -13,7 +13,7 @@ module UI
         render(UI::ActiveLink::Component.new(text: "Support", path: "/support", html_class: "nav-link"))
       end
 
-      # The path this scenario is served from — active, with no match_controller needed
+      # The path this scenario is served from — active, with no wider match needed
       def current_page
         render(UI::ActiveLink::Component.new(text: "This preview", path: "#{PREVIEW_PATH}/current_page",
           html_class: "nav-link"))
@@ -39,10 +39,11 @@ module UI
           match: :controller_action, html_class: "nav-link"))
       end
 
-      # A caller that already knows the state passes active:, skipping the current-page check
-      def active_forced
-        render(UI::ActiveLink::Component.new(text: "Forced active", path: "/support",
-          active: true, html_class: "nav-link"))
+      # The path this scenario is served from, active only while the page carries no params of
+      # its own — match: :path ignores them. Add ?example=1 to the URL to see the difference.
+      def match_full_path
+        render(UI::ActiveLink::Component.new(text: "This preview, exactly",
+          path: "#{PREVIEW_PATH}/match_full_path", match: :full_path, html_class: "nav-link"))
       end
 
       # Anything beyond html_class passes through to the anchor

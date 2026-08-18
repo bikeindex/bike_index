@@ -48,7 +48,7 @@ RSpec.describe Admin::Navbar::Component, type: :component do
     # against the route rendered here.
     it "matches each shortcut on its controller" do
       expect(shortcuts.map { |link| link["data-ui--active-link-match-value"] }.uniq).to eq(["controller"])
-      expect(shortcuts.map { |link| link["data-ui--active-link-route-value"] })
+      expect(shortcuts.map { |link| link["data-ui--active-link-routes-value"] })
         .to eq(%w[admin/users#index admin/bikes#index admin/organizations#index admin/news#index
           admin/stolen_bikes#index])
     end

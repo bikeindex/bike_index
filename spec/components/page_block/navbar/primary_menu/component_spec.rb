@@ -23,9 +23,9 @@ RSpec.describe PageBlock::Navbar::PrimaryMenu::Component, type: :component do
   # The links carry a stolenness the page won't, and the page carries a query and a page
   # number they don't, so the route is what matches
   it "matches the search and marketplace links on their route" do
-    expect(links_named("Search").map { |link| link["data-ui--active-link-route-value"] })
+    expect(links_named("Search").map { |link| link["data-ui--active-link-routes-value"] })
       .to eq(["search/registrations#index"] * 2)
-    expect(links_named("Marketplace").map { |link| link["data-ui--active-link-route-value"] })
+    expect(links_named("Marketplace").map { |link| link["data-ui--active-link-routes-value"] })
       .to eq(["search/marketplace#index"] * 2)
     expect(links_named("Blog").map { |link| link["data-ui--active-link-match-value"] })
       .to eq(["controller"])

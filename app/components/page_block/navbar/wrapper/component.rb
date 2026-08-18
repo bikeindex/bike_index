@@ -7,11 +7,10 @@ module PageBlock
       # logo_only renders just the logo, for the OAuth authorization prompt.
       class Component < ApplicationComponent
         # Digest of the cached template — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "d9b817ef9c1c"
+        MARKUP_DIGEST = "619cb9def56c"
 
         def initialize(logo_only: false, page_id: nil, current_user: nil, current_user_or_unconfirmed_user: nil,
-          passive_organization: nil, controller_namespace: nil, controller_name: nil, action_name: nil,
-          unregistered_parking_notification: nil)
+          passive_organization: nil, controller_namespace: nil, controller_name: nil, action_name: nil)
           # Everything below keys the fragment cache, so a caller that forgets one would
           # otherwise share a single render across every page
           raise ArgumentError, "page_id is required unless logo_only" if page_id.blank? && !logo_only
@@ -24,7 +23,6 @@ module PageBlock
           @controller_namespace = controller_namespace
           @controller_name = controller_name
           @action_name = action_name
-          @unregistered_parking_notification = unregistered_parking_notification
         end
 
         private
@@ -40,15 +38,13 @@ module PageBlock
         end
 
         def cache_key
-          [MARKUP_DIGEST, @page_id, @current_user_or_unconfirmed_user, @passive_organization,
-            @unregistered_parking_notification]
+          [MARKUP_DIGEST, @page_id, @current_user_or_unconfirmed_user, @passive_organization]
         end
 
         def organization_menu
           PageBlock::Navbar::OrganizationMenu::Component.new(organization: @passive_organization,
             current_user: @current_user, controller_namespace: @controller_namespace,
-            controller_name: @controller_name, action_name: @action_name,
-            unregistered_parking_notification: @unregistered_parking_notification)
+            controller_name: @controller_name, action_name: @action_name)
         end
 
         def primary_menu

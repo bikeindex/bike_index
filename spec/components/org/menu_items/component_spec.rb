@@ -9,7 +9,7 @@ RSpec.describe Org::MenuItems::Component, type: :component do
   let(:instance) do
     described_class.new(organization:, current_user:, controller_namespace:, controller_name:, action_name:)
   end
-  # The request drives UI::ActiveLink, which resolves the items the cache didn't mark
+  # The controller and action decide which links are injected, not which one is active
   let(:url) { "/o/#{organization.to_param}/#{controller_name}" }
   let(:component) { with_request_url(url) { render_inline(instance) } }
   let(:organization) { FactoryBot.create(:organization) }
@@ -97,15 +97,18 @@ RSpec.describe Org::MenuItems::Component, type: :component do
     context "as a superuser, with the org lacking the registration_sequences feature" do
       let(:current_user) { FactoryBot.create(:superuser) }
 
-      it "injects an active Manage Registration sequences link on the sequences and pages controllers" do
+      # The link covers both controllers, so the browser keeps it active while a page of a
+      # sequence is being edited
+      it "injects a Manage Registration sequences link on the sequences and pages controllers" do
         expect(organization.enabled?("registration_sequences")).to be false
         %w[registration_sequences registration_sequence_pages].each do |sequences_controller|
           rendered = with_request_url(url) {
             render_inline(described_class.new(organization:, current_user:, controller_namespace:,
               controller_name: sequences_controller, action_name:))
           }
-          active = rendered.css("a.nav-link.active").map { |a| a.text.strip }
-          expect(active).to include("Manage Registration sequences")
+          link = rendered.css("a.nav-link").detect { |a| a.text.strip == "Manage Registration sequences" }
+          expect(link["data-ui--active-link-routes-value"])
+            .to eq "organized/registration_sequences#index organized/registration_sequence_pages"
         end
       end
 
