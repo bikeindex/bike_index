@@ -1,0 +1,164 @@
+@layer components {
+  .twlink {
+    @apply tw:text-blue-600 tw:dark:text-blue-400 tw:transition-colors;
+  }
+
+  /* Guarded so a disabled UI::Button/UI::ButtonLink in link color holds its color.
+   * Every other color guards its hover in the utilities; link color's lives here. */
+  .twlink:not(:disabled, [aria-disabled="true"]):hover,
+  .twlink.active,
+  .twlink:not(:disabled, [aria-disabled="true"]):active {
+    @apply tw:text-blue-700 tw:underline tw:dark:text-blue-300;
+  }
+
+  .twlink.active,
+  .twlink:not(:disabled, [aria-disabled="true"]):active {
+    @apply tw:font-bold;
+  }
+
+  /* For links that should inherit the color of the text they sit in. text-inherit rather
+   * than nothing: this layer beats legacy only where it declares the property, so legacy's
+   * `a { color: #3498db }` would otherwise supply the color */
+  .twlink-underlined {
+    @apply tw:text-inherit tw:underline tw:transition-colors;
+  }
+
+  /* currentColor in a `color` declaration resolves to the inherited color, so the
+   * hover deepens whatever the link sits in. Away from black on a dark background,
+   * where deepening would sink it into the background instead */
+  .twlink-underlined:not(:disabled, [aria-disabled="true"]):hover,
+  .twlink-underlined.active,
+  .twlink-underlined:not(:disabled, [aria-disabled="true"]):active {
+    color: color-mix(in oklab, currentColor 75%, black);
+
+    @variant dark {
+      color: color-mix(in oklab, currentColor 75%, white);
+    }
+  }
+
+  .twlink-underlined.active,
+  .twlink-underlined:not(:disabled, [aria-disabled="true"]):active {
+    @apply tw:font-bold;
+  }
+
+  /* Legacy's `.container` reaches into an alert two ways tailwind can't answer on
+   * its own: `font-size: 15px; line-height: 2em` by inheritance, and `p, ul, ol,
+   * dl` margins from a layer that beats preflight. Own both here. */
+  .twalert-body {
+    @apply tw:text-base;
+  }
+
+  .twalert-body :is(p, ul, ol, dl) {
+    @apply tw:m-0;
+  }
+
+  .twless-strong {
+    @apply tw:opacity-65 tw:decoration-gray-900/65 tw:dark:decoration-gray-400/65;
+  }
+
+  .twinput {
+    @apply tw:bg-white tw:border tw:border-gray-200 tw:dark:bg-gray-700 tw:dark:border-gray-700 tw:rounded-sm
+      tw:placeholder-gray-500 tw:text-gray-900 tw:text-base tw:dark:placeholder-gray-400 tw:dark:text-gray-200
+      tw:focus-visible:outline-0 tw:focus-visible:ring tw:focus-visible:ring-blue-400 tw:focus-visible:border-blue-400 tw:dark:focus-visible:ring-blue-500 tw:dark:focus-visible:border-blue-500
+      tw:w-full tw:py-1.5 tw:px-2.5 tw:block;
+  }
+  /* block + the gap to its field, so a label spaces the same whatever renders
+   * below it. Bootstrap's `.container label` is inline-block with a .5rem
+   * margin, and it only applies inside a container -- owning both here is what
+   * stops the spacing depending on where the field sits. Utilities still win,
+   * so `twlabel tw:m-0` and the checkbox's `tw:flex` override as before. */
+  .twlabel {
+    @apply tw:block tw:mb-1 tw:text-sm tw:font-medium tw:text-gray-800 tw:dark:text-gray-500 tw:cursor-pointer;
+  }
+
+  [aria-expanded="true"] .twdropdown-chevron {
+    @apply tw:rotate-180;
+  }
+
+  .twdropdown {
+    @apply tw:flex-col tw:list-none tw:py-0 tw:mb-0;
+  }
+
+  .twdropdown li[role="menuitem"]:first-child > a {
+    @apply tw:pt-2 tw:rounded-t-lg;
+  }
+
+  .twdropdown li[role="menuitem"]:last-child > a {
+    @apply tw:pb-2 tw:rounded-b-lg;
+  }
+
+  .twdropdown li[role="menuitem"] > a {
+    @apply tw:block tw:px-4 tw:py-1 tw:text-left tw:text-base tw:text-gray-700 tw:no-underline
+      tw:hover:bg-gray-100 tw:hover:text-gray-900
+      tw:dark:text-gray-200 tw:dark:hover:bg-gray-700 tw:dark:hover:text-gray-100;
+  }
+
+  .twdropdown li[role="menuitem"]:has(+ li[role="separator"]) > a {
+    @apply tw:pb-2;
+  }
+
+  .twdropdown li[role="separator"] + li[role="menuitem"] > a {
+    @apply tw:pt-2;
+  }
+
+  .twdropdown li[role="separator"] {
+    @apply tw:border-t tw:border-gray-200 tw:dark:border-gray-700;
+  }
+
+  .twhr {
+    @apply tw:border-0 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700 tw:my-8;
+  }
+
+  /* Style tables with CSS selectors to prevent caching issues */
+  .ui-table tbody tr:nth-child(odd) {
+    @apply tw:bg-white tw:dark:bg-gray-900;
+  }
+  .ui-table tbody tr:nth-child(even) {
+    @apply tw:bg-gray-100 tw:dark:bg-gray-800;
+  }
+  /* Default first/last column rounding/borders. ui_table_controller.js
+     reapplies these to the first/last *visible* column when columns are hidden. */
+  .ui-table thead tr th:first-child {
+    @apply tw:rounded-tl-sm;
+  }
+  .ui-table thead tr th:last-child {
+    @apply tw:rounded-tr-sm;
+  }
+  .ui-table tbody tr:last-child td:first-child {
+    @apply tw:rounded-bl-sm;
+  }
+  .ui-table tbody tr:last-child td:last-child {
+    @apply tw:rounded-br-sm;
+  }
+  .ui-table-bordered tbody tr td:first-child {
+    @apply tw:ui-table-bordered-td-first;
+  }
+  .ui-table-bordered tbody tr td:last-child {
+    @apply tw:ui-table-bordered-td-last;
+  }
+  .ui-table-bordered thead tr th:first-child {
+    @apply tw:ui-table-bordered-th-first;
+  }
+  .ui-table-bordered thead tr th:last-child {
+    @apply tw:ui-table-bordered-th-last;
+  }
+
+  /* Turbo sets [busy] on the results frame during requests. Hide the existing
+     results and overlay a spinner; min-height gives the spinner a place to
+     land on the initial auto-submit when the frame is still empty. */
+  .search-results-frame-wrapper {
+    @apply tw:relative;
+  }
+  .search-results-frame-wrapper > turbo-frame[busy] {
+    @apply tw:opacity-0 tw:pointer-events-none;
+  }
+  .search-results-frame-wrapper > .search-loading-overlay {
+    @apply tw:hidden tw:absolute tw:top-0 tw:left-0 tw:right-0 tw:pointer-events-none tw:z-1;
+  }
+  .search-results-frame-wrapper:has(> turbo-frame[busy]) {
+    @apply tw:min-h-48;
+  }
+  .search-results-frame-wrapper:has(> turbo-frame[busy]) > .search-loading-overlay {
+    @apply tw:block;
+  }
+}
