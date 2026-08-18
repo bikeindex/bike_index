@@ -605,8 +605,12 @@ RSpec.describe User, type: :model do
       end
       it "uses input time, and expires once past the window" do
         user = FactoryBot.create(:user)
-        user.update_auth_token("magic_link_token", 1.minute.ago.to_i)
-        expect(user.reload.auth_token_time("magic_link_token")).to be_within(1.second).of(1.minute.ago)
+        # The token stores whole seconds, so compare against what was passed in rather
+        # than a second reading of the clock: that gap is the truncation plus however
+        # long the write took, which on a loaded runner overran the old 1 second window
+        token_time = 1.minute.ago.to_i
+        user.update_auth_token("magic_link_token", token_time)
+        expect(user.reload.auth_token_time("magic_link_token")).to eq Time.at(token_time)
         expect(user.auth_token_expired?("magic_link_token")).to be_falsey
 
         user.update_auth_token("magic_link_token", (User::AUTH_TOKEN_EXPIRY + 1.minute).ago.to_i)
