@@ -8,7 +8,7 @@
       <% if redesign_enabled? %>
         <%= render(UI::ButtonLink::Component.new(text: translation(".switch_to_classic"), href: toggle_show_redesign_my_account_path, method: :post, params: {bike_id: @bike.id}, form: {data: {controller: "csrf-refresh"}}, color: :secondary, size: :sm)) %>
       <% else %>
-        <%= link_to translation(".view_in_legacy", bike_type: @bike.type), bike_path(@bike), class: "twlink tw:text-sm" %>
+        <%= link_to translation(".view_in_legacy", bike_type: @bike.type), bike_path(@bike), class: "twlink-underlined tw:text-sm" %>
       <% end %>
     </div>
   <% end %>
