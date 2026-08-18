@@ -6,15 +6,12 @@ module Admin
     # preceded by an "All" link back to the active page's index when this isn't it.
     # Picking an option navigates -- see admin/navbar_controller.js.
     class Component < ApplicationComponent
-      # The vendored dump's .navbar-light .navbar-nav .nav-link, as utilities — it keys its
-      # active color off a class UI::ActiveLink doesn't emit, and the dump isn't ours to edit.
-      # Horizontal padding is the navbar-expand-md value, the only one the d-lg-flex list is
-      # ever visible at.
+      # The vendored dump's .navbar-light .navbar-nav .nav-link, as utilities. admin.scss
+      # imports the dump unlayered, so it outranks every tailwind layer — dropping .nav-link
+      # is what lets a utility reach these links at all. Horizontal padding is the
+      # navbar-expand-md value, the only one the d-lg-flex list is ever visible at.
       NAV_LINK_CLASS = "tw:block tw:p-2 tw:no-underline tw:text-black/50 " \
         "tw:hover:text-black/70 tw:focus:text-black/70 tw:is-active:text-black/90"
-
-      # The same .nav-link outside the list, so it keeps the padding .navbar-nav overrode
-      VIEW_ALL_LINK_CLASS = "tw:block tw:py-2 tw:px-4 tw:no-underline"
 
       def initialize(current_user:)
         @current_user = current_user
