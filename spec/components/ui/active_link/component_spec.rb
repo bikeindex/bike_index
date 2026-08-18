@@ -42,6 +42,8 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     end
   end
 
+  # Only :path can say "page" — the widened matches go active on a page the link doesn't
+  # point at, so they say "true"
   describe "match" do
     let(:path) { "/bikes/new" }
     let(:request_url) { "/bikes/12" }
@@ -53,8 +55,8 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     context ":controller" do
       let(:options) { {match: :controller} }
 
-      it "is active on another page of the same controller" do
-        expect(link["aria-current"]).to eq "page"
+      it "is active on another page of the same controller, without claiming to be it" do
+        expect(link["aria-current"]).to eq "true"
       end
 
       context "on a page of a different controller" do
@@ -79,7 +81,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
         let(:request_url) { "/search/registrations?query=trek" }
 
         it "is active" do
-          expect(link["aria-current"]).to eq "page"
+          expect(link["aria-current"]).to eq "true"
         end
       end
 
@@ -100,7 +102,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
 
         it "compares the action the request dispatched, not the GET route's" do
           on_get = with_request_url(path) { render_inline(instance) }
-          expect(on_get.css("a").first["aria-current"]).to eq "page"
+          expect(on_get.css("a").first["aria-current"]).to eq "true"
 
           on_patch = with_request_url(path, method: "PATCH") { render_inline(instance) }
           expect(on_patch.css("a").first["aria-current"]).to be_blank

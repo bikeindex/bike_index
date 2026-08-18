@@ -76,7 +76,16 @@ module UI
       end
 
       def aria_attributes
-        @html_options[:aria].to_h.merge(current: ("page" if active?))
+        @html_options[:aria].to_h.merge(current: aria_current)
+      end
+
+      # "page" is reserved for the link whose own path is the current one. A widened match
+      # means the current page sits inside what the link points at, not that it is it —
+      # aria-current's "true", so a reader isn't told a link elsewhere is where it already is
+      def aria_current
+        return unless active?
+
+        (@match == :path) ? "page" : "true"
       end
 
       def active?
