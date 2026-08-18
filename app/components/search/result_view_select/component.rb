@@ -7,15 +7,34 @@ module Search
         @selected_result_view = SearchResults::Container::Component.permitted_result_view(result_view)
       end
 
-      private
-
-      def selected?(option)
-        @selected_result_view == option
+      def call
+        tag.div(class: "tw:mt-2 tw:flex tw:justify-end") do
+          render(UI::Forms::RadioButtonGroup::Component.new(
+            name: :search_result_view,
+            entries: view_entries,
+            selected: @selected_result_view,
+            # The result component is chosen server-side, so switching layout re-runs the search
+            data: {action: "change->search--form#submit"}
+          ))
+        end
       end
 
-      def label_classes
-        "tw:cursor-pointer tw:p-2 tw:rounded tw:block tw:has-checked:bg-gray-100 " \
-        "tw:has-checked:dark:bg-gray-800 tw:border tw:border-gray-200 tw:dark:border-gray-600"
+      private
+
+      def view_entries
+        [[:bike_box, "icons/list.svg", translation(".bike_box_view")],
+          [:thumbnail, "icons/image.svg", translation(".thumbnail_view")]]
+          .map { |value, icon, label| {value:, label: icon_label(icon, label)} }
+      end
+
+      # The chip is icon-only, so title carries the hint a visible label would - but not
+      # inline_svg_tag's title:, whose <title> child would double the accessible name
+      # against the sr-only span. aria-hidden keeps the tooltip mouse-only, so the title
+      # isn't read out beside the text it repeats.
+      def icon_label(icon, label)
+        tag.span(title: label, aria: {hidden: true}) do
+          helpers.inline_svg_tag(icon, class: "tw:block tw:h-5 tw:w-5")
+        end + tag.span(label, class: "tw:sr-only")
       end
     end
   end

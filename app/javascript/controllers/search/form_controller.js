@@ -60,6 +60,10 @@ export default class extends Controller {
     this.refreshResults()
   }
 
+  submit () {
+    this.formTarget.requestSubmit()
+  }
+
   // Clear any stale loading state, then bring the results frame in line with the
   // address bar. Runs on initial connect and after every Turbo page load.
   refreshResults () {
@@ -193,7 +197,7 @@ export default class extends Controller {
   retryResults = () => {
     this.hideNotices()
     this.showLoading()
-    if (this.failedSubmit) this.formTarget.requestSubmit()
+    if (this.failedSubmit) this.submit()
     else this.frameElement?.reload()
   }
 

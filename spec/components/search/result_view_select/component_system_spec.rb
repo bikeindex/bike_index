@@ -8,7 +8,7 @@ RSpec.describe Search::ResultViewSelect::Component, :js, type: :system do
   it "default preview" do
     visit(preview_path)
 
-    expect(page).to have_css "ul"
+    expect(page).to have_css "label", count: 2
     expect_axe_clean
   end
 end
