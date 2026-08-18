@@ -44,6 +44,21 @@ RSpec.describe PageBlock::OrgSidebar::Component, type: :component do
     end
   end
 
+  # A filtered index is the same controller and action carrying query params, which is
+  # why that row matches on controller_action rather than on the path
+  context "on a filtered registrations index" do
+    let(:page) do
+      {controller_namespace: "organized", controller_name: "registrations", action_name: "index"}
+    end
+    let(:component) do
+      with_request_url("/o/#{organization.to_param}/registrations?search_status=stolen") { render_inline(instance) }
+    end
+
+    it "keeps the registrations row current" do
+      expect(component).to have_css "a[aria-current='page']", text: "Search Registrations"
+    end
+  end
+
   # The sequence's pages are their own controller, and the menu has no row of their own
   context "on a registration sequence's pages" do
     let(:page) do

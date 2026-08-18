@@ -9,6 +9,11 @@ module PageBlock
       COLLAPSE_BREAKPOINT = 1100
       MOBILE_BREAKPOINT = 760
 
+      # The menu's own active vocabulary, at the granularities UI::ActiveLink resolves.
+      # A filtered index carries query params, so its row matches on controller and action
+      MATCHES = UI::ActiveLink::Component.match_table(auto: :path, match_controller: :controller,
+        on_registrations_index: :controller_action)
+
       # A top-level row: the group toggles, the leaf links and the leaves with nothing
       # to link to all sit on this, so they stay the same height as each other
       ROW = "tw:mx-2 tw:flex tw:items-center tw:gap-[11px] tw:rounded-[11px] tw:px-3 tw:py-[9px] " \
@@ -85,32 +90,22 @@ module PageBlock
         group[:children].any? { |child| child[:type] == :link && active_link?(child) }
       end
 
-      # Resolves the per-request active state the cached payload deferred. Returns
-      # true/false, so the template never has to ask the active_link helper.
+      # Resolves the per-request active state the cached payload deferred, returning
+      # true/false so the template never has to ask. The three states below are the ones
+      # a path can't answer on its own: both bikes#new links recognize the same
+      # controller and action, differing only by a query param, and a sequence's pages
+      # are their own controller
       def active_link?(item)
+        match = MATCHES[item[:active]]
+        return UI::ActiveLink::Component.active?(path: item[:path], match:, view: helpers) if match
+
         case item[:active]
-        when :auto then current_path?(item[:path])
-        when :match_controller then current_controller?(item[:path])
-        when :on_registrations_index then organized_controller?("registrations") && @action_name == "index"
         when :on_bikes_new then on_bikes_new? && @unregistered_parking_notification.blank?
         when :on_bikes_new_with_parking_notification then on_bikes_new? && @unregistered_parking_notification.present?
         when :on_registration_sequences
           organized_controller?("registration_sequences", "registration_sequence_pages")
         else item[:active] == true
         end
-      end
-
-      def current_path?(path)
-        request_path == path.split("?").first
-      end
-
-      # match_controller items stay lit across a controller's member and edit pages
-      def current_controller?(path)
-        request_path.start_with?(path.split("?").first)
-      end
-
-      def request_path
-        @request_path ||= request&.path.to_s
       end
 
       def organized_controller?(*controller_names)
