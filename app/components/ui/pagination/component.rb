@@ -40,12 +40,14 @@ module UI
       end
 
       # Multiline classes strings here were confusing tailwind somehow :(
+      # relative, because -space-x-px overlaps each border with its neighbor's — only a
+      # positioned item can raise its own above them with z-10
       def disabled_classes
-        "tw:disabled:cursor-default tw:px-3 tw:py-1 tw:leading-tight tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:text-gray-500 tw:dark:text-gray-400 "
+        "tw:disabled:cursor-default tw:relative tw:px-3 tw:py-1 tw:leading-tight tw:border tw:border-gray-200 tw:dark:border-gray-700 tw:bg-white tw:dark:bg-gray-800 tw:text-gray-500 tw:dark:text-gray-400 tw:no-underline "
       end
 
-      def active_classes(current = false)
-        disabled_classes + "tw:hover:border-purple-500 tw:hover:bg-purple-50 tw:hover:text-gray-800 tw:dark:hover:border-purple-500 tw:dark:hover:bg-purple-950 tw:dark:hover:text-white "
+      def active_classes
+        disabled_classes + "tw:hover:z-10 tw:hover:border-purple-500 tw:hover:bg-purple-50 tw:hover:text-gray-800 tw:dark:hover:border-purple-500 tw:dark:hover:bg-purple-950 tw:dark:hover:text-white "
       end
 
       def current_link_class
@@ -59,7 +61,7 @@ module UI
         end
         # The current page fills like an active UI::Button secondary
         extra_classes +
-          "tw:disabled:cursor-default tw:px-3 tw:py-1 tw:leading-tight tw:border tw:border-purple-500 tw:bg-purple-500 tw:text-white "
+          "tw:disabled:cursor-default tw:relative tw:z-10 tw:px-3 tw:py-1 tw:leading-tight tw:border tw:border-purple-500 tw:bg-purple-500 tw:text-white "
       end
 
       def pagy_series
