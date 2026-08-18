@@ -27,13 +27,14 @@ module Search
           .map { |value, icon, label| {value:, label: icon_label(icon, label)} }
       end
 
-      # The chip is icon-only, so title carries the hint a visible label would. Not
-      # inline_svg_tag's title:, which injects a <title> child - that one counts toward
-      # the label's accessible name, doubling it against the sr-only span.
+      # The chip is icon-only, so title carries the hint a visible label would - but not
+      # inline_svg_tag's title:, whose <title> child would double the accessible name
+      # against the sr-only span. aria-hidden keeps the tooltip mouse-only, so the title
+      # isn't read out beside the text it repeats.
       def icon_label(icon, label)
-        tag.span(title: label) do
-          helpers.inline_svg_tag(icon, class: "tw:block tw:h-5 tw:w-5") + tag.span(label, class: "tw:sr-only")
-        end
+        tag.span(title: label, aria: {hidden: true}) do
+          helpers.inline_svg_tag(icon, class: "tw:block tw:h-5 tw:w-5")
+        end + tag.span(label, class: "tw:sr-only")
       end
     end
   end
