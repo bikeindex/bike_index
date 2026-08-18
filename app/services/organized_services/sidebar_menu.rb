@@ -38,6 +38,8 @@ module OrganizedServices
     #
 
     def build_items(organization, current_user)
+      return ambassador_items(organization) if organization.ambassador?
+
       strip_dividers([
         registrations_group(organization),
         add_bike_link(organization),
@@ -54,6 +56,27 @@ module OrganizedServices
         divider,
         settings_group(organization, current_user)
       ].compact)
+    end
+
+    # Organized::BaseController bars an ambassador organization from every controller
+    # below except registrations#multi_search, so its menu is its own list rather than
+    # the standard one with rows that only redirect
+    def ambassador_items(organization)
+      [
+        link(translation(:org_dashboard, org_name: organization.short_name),
+          routes.organization_ambassador_dashboard_path(organization_id: organization.to_param),
+          icon: "bar-chart"),
+        link(translation(:resources),
+          routes.resources_organization_ambassador_dashboard_path(organization_id: organization.to_param),
+          icon: "list"),
+        link(translation(:getting_started),
+          routes.getting_started_organization_ambassador_dashboard_path(organization_id: organization.to_param),
+          icon: "graduation-cap"),
+        link(translation(:multi_search),
+          routes.multi_search_organization_registrations_path(organization_id: organization.to_param),
+          icon: "searcher"),
+        link(translation(:discuss), "https://discuss.bikeindex.org", icon: "chat")
+      ]
     end
 
     # A gated-off group leaves the divider that separated it behind
@@ -153,12 +176,19 @@ module OrganizedServices
     end
 
     # Organized::EmailsController only lets a member at #show, so this needs the admin
-    # check the settings group gets from being admin-only
+    # check the settings group gets from being admin-only. Without customize_emails there
+    # is no index to send them to, and the stolen message is the one email they can edit
     def messaging_link(organization, current_user)
-      return nil unless organization.enabled?("customize_emails") && admin?(organization, current_user)
+      return nil unless admin?(organization, current_user)
 
-      link(translation(:messaging), routes.organization_emails_path(organization_id: organization.to_param),
-        icon: "chat", active: :match_controller)
+      if organization.enabled?("customize_emails")
+        link(translation(:messaging), routes.organization_emails_path(organization_id: organization.to_param),
+          icon: "chat", active: :match_controller)
+      elsif organization.enabled?("organization_stolen_message")
+        link(translation(:stolen_message),
+          routes.edit_organization_email_path("organization_stolen_message", organization_id: organization.to_param),
+          icon: "chat")
+      end
     end
 
     def model_audits_link(organization)
@@ -251,9 +281,9 @@ module OrganizedServices
       Rails.application.routes.url_helpers
     end
 
-    conceal :build_items, :strip_dividers, :registrations_group, :add_bike_link, :impounded_group, :parking_group,
-      :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link, :graduated_link, :hot_sheet_link,
-      :reports_link, :settings_group, :admin?, :group, :link, :disabled, :divider,
-      :translation, :routes
+    conceal :build_items, :ambassador_items, :strip_dividers, :registrations_group, :add_bike_link,
+      :impounded_group, :parking_group, :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link,
+      :graduated_link, :hot_sheet_link, :reports_link, :settings_group, :admin?, :group, :link, :disabled,
+      :divider, :translation, :routes
   end
 end

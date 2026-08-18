@@ -104,6 +104,20 @@ RSpec.describe PageBlock::OrgSidebar::Component, type: :component do
     end
   end
 
+  context "with an ambassador organization" do
+    let(:organization) { FactoryBot.create(:organization_ambassador, short_name: "Fillory") }
+    let(:component) do
+      with_request_url("/o/#{organization.to_param}/ambassador_dashboard") { render_inline(instance) }
+    end
+
+    it "renders the ambassador's flat rows, with no group to open" do
+      expect(component).to have_no_css "[aria-controls^='org_sidebar_group_']"
+      expect(component.css("nav a[href^='/o/'], nav a[href^='https://discuss']").map(&:text).map(&:strip))
+        .to eq(["Fillory Dashboard", "Resources", "Getting started", "Multi search", "Discuss"])
+      expect(component).to have_css "a[aria-current='page']", text: "Fillory Dashboard"
+    end
+  end
+
   context "without an organization" do
     let(:instance) { described_class.new(organization: nil, current_user:, **page) }
 

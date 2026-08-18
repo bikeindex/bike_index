@@ -1,25 +1,19 @@
 # frozen_string_literal: true
 
-# Returns the canonical organization menu item data — the same payload regardless
-# of how the menu is being rendered (sidebar vs. dropdown) or which page is current.
-# Cached per [organization, user]; the component handles per-request concerns
-# (dropdown filtering, active-link resolution).
+# The organization menu api/v3/me serves to API clients, cached per
+# [organization, user]. OrganizedServices::SidebarMenu is what the site's own
+# sidebar renders from.
 #
 # Item shapes:
 #   {type: :divider}
-#   {type: :disabled, label:, secondary:} # component drops these in dropdown
+#   {type: :disabled, label:, secondary:}
 #   {type: :link, label:, path:, secondary:, active:}
 #
-# The component appends a trailing divider (for non-ambassador orgs, unless
-# rendering as a dropdown for a non-superuser) and a super_admin_link
-# (for superusers).
-#
-# `active:` is one of these, which Org::MenuItems::Component::MATCHES hands to
-# UI::ActiveLink as the match: granularity to resolve per request:
-#   :auto                                  - match: :path
-#   :match_controller                      - match: :controller
-#   :on_registrations_index                - match: :controller_action
-# or one of these, which the component computes from the current request:
+# `active:` names how a client should recognize the current page, since nothing
+# here knows what it is:
+#   :auto                                  - the path
+#   :match_controller                      - the path's controller
+#   :on_registrations_index                - its controller and action
 #   :on_bikes_new
 #   :on_bikes_new_with_parking_notification
 #   :on_registration_sequences             - also matches the pages controller
@@ -38,9 +32,10 @@ module OrganizedServices
       end
     end
 
-    # Public helpers for the component to inject route-specific overrides
-    # (so the menu still shows the dashboard / bulk-imports link when the
-    # user is on those pages, even if the org doesn't have the feature).
+    #
+    # private below here
+    #
+
     def dashboard_link(organization)
       link("#{organization.short_name} dashboard",
         routes.organization_dashboard_index_path(organization_id: organization.to_param))
@@ -58,10 +53,6 @@ module OrganizedServices
         routes.organization_registration_sequences_path(organization_id: organization.to_param),
         active: :on_registration_sequences)
     end
-
-    #
-    # private below here
-    #
 
     def build_items(organization, current_user)
       organization.ambassador? ? ambassador_items(organization) : standard_items(organization, current_user)
@@ -261,8 +252,8 @@ module OrganizedServices
       Rails.application.routes.url_helpers
     end
 
-    conceal :build_items, :ambassador_items, :standard_items, :registration_items,
-      :add_bike_items, :feature_items, :admin_items, :additional_divider?,
-      :link, :divider, :translation, :routes
+    conceal :dashboard_link, :bulk_import_link, :registration_sequences_link, :build_items,
+      :ambassador_items, :standard_items, :registration_items, :add_bike_items, :feature_items,
+      :admin_items, :additional_divider?, :link, :divider, :translation, :routes
   end
 end

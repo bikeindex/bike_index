@@ -28,6 +28,24 @@ RSpec.describe OrganizedServices::SidebarMenu do
       it { expect(items).to eq([]) }
     end
 
+    # Every standard row is a controller Organized::BaseController redirects an
+    # ambassador organization away from, so none of them belong in its menu
+    context "with an ambassador organization" do
+      let(:organization) { FactoryBot.create(:organization_ambassador, short_name: "Fillory") }
+      let(:slug) { organization.to_param }
+
+      it "renders the ambassador's own rows instead of the standard ones" do
+        expect(items).to eq([
+          link_item("Fillory Dashboard", "/o/#{slug}/ambassador_dashboard", icon: "bar-chart"),
+          link_item("Resources", "/o/#{slug}/ambassador_dashboard/resources", icon: "list"),
+          link_item("Getting started", "/o/#{slug}/ambassador_dashboard/getting_started",
+            icon: "graduation-cap"),
+          link_item("Multi search", "/o/#{slug}/registrations/multi_search", icon: "searcher"),
+          link_item("Discuss", "https://discuss.bikeindex.org", icon: "chat")
+        ])
+      end
+    end
+
     context "with a basic organization" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:target) do
@@ -94,9 +112,11 @@ RSpec.describe OrganizedServices::SidebarMenu do
           .to eq(["Search Impounded Vehicles", "Impounded claims", "Add an Impounded Vehicle"])
       end
 
-      it "points messaging at the custom emails index" do
+      it "points messaging at the custom emails index, rather than at a single email" do
         expect(items.find { |item| item[:label] == "Messaging" })
           .to eq(link_item("Messaging", "/o/#{slug}/emails", icon: "chat", active: :match_controller))
+        expect(organization.enabled?("organization_stolen_message")).to be true
+        expect(items.map { |item| item[:label] }).to_not include("Stolen Message")
       end
 
       it "puts every organization-admin page under settings" do
@@ -121,6 +141,30 @@ RSpec.describe OrganizedServices::SidebarMenu do
       it "drops the settings group and messaging" do
         expect(items.map { |item| item[:key] }.compact).to eq(%i[registrations impounded parking bulk])
         expect(items.map { |item| item[:label] }).to_not include("Messaging")
+      end
+    end
+
+    # Its edit page is the only way in, so without it the feature is unreachable
+    context "with organization_stolen_message but not customize_emails" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["organization_stolen_message"])
+      end
+      let(:stolen_message) do
+        link_item("Stolen Message", "/o/#{organization.to_param}/emails/organization_stolen_message/edit",
+          icon: "chat")
+      end
+
+      context "for an admin" do
+        let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
+
+        it "stands the stolen message in for messaging" do
+          expect(items).to include(stolen_message)
+        end
+      end
+
+      it "drops it for a member, who can't edit it" do
+        expect(items).to_not include(stolen_message)
       end
     end
 
