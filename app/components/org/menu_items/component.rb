@@ -3,6 +3,10 @@
 module Org
   module MenuItems
     class Component < ApplicationComponent
+      # The cache marks these for UI::ActiveLink to resolve per request, at these granularities
+      MATCHES = UI::ActiveLink::Component.match_table(auto: :path, match_controller: :controller,
+        on_registrations_index: :controller_action)
+
       def initialize(organization:, current_user:, controller_namespace:, controller_name:, action_name:,
         is_dropdown: false, unregistered_parking_notification: nil)
         @organization = organization
@@ -110,10 +114,9 @@ module Org
         @is_dropdown && item[:type] == :disabled
       end
 
-      def link_classes(item, active)
+      def link_classes(item)
         classes = ["nav-link"]
         classes << "secondary-item" if item[:secondary]
-        classes << "active" if active
         classes.join(" ")
       end
 
@@ -122,12 +125,11 @@ module Org
       end
 
       # Resolves the per-request active state for items the cache marked with a symbol.
-      # Returns true/false for explicit cases, nil to defer to the active_link helper.
+      # Returns true/false for explicit cases, nil to defer to UI::ActiveLink.
       def active_state(item)
+        return nil if MATCHES.key?(item[:active])
+
         case item[:active]
-        when :auto, :match_controller then nil
-        when :on_registrations_index
-          organized_controller?("registrations") && @action_name == "index"
         when :on_bikes_new
           on_bikes_new? && !on_bikes_new_with_parking_notification?
         when :on_bikes_new_with_parking_notification

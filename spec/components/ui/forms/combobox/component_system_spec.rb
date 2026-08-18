@@ -41,12 +41,16 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
     send_keys(:escape)
 
     expect(page).to have_css('[aria-expanded="false"]')
+
+    # ArrowUp opens onto the last option, the mirror of ArrowDown's first
+    find_field("Cycle type").send_keys(:up)
+
+    expect(page).to have_css('[aria-expanded="true"]')
+    expect(find_field("Cycle type").value).to eq all('[role="option"]').last.text
   end
 
   context "with a selection already made" do
-    # Typing used to insert wherever the click left the caret, mangling the display into a
-    # query matching no option -- which cleared the hidden field, and the selection with it
-    it "replaces the display rather than typing into the middle of it" do
+    it "keeps the selection under End, and replaces it whole when typing" do
       visit "/rails/view_components/ui/forms/combobox/component/default"
 
       expect(page).to have_css('[aria-expanded="false"]', wait: 10)
@@ -56,7 +60,16 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
 
       expect(find_field("Cycle type").value).to eq "Unicycle"
 
-      # Clicking in selects the display, so the first keystroke replaces it
+      # The gem takes End too, and opens nothing for it -- so it used to throw picking out
+      # of the closed listbox, past the deselect that had already emptied the hidden field
+      find_field("Cycle type").send_keys(:end)
+
+      expect(find_field("Cycle type").value).to eq "Unicycle"
+      expect(find("input[name='cycle_type']", visible: :hidden).value).to eq "Unicycle"
+
+      # Typing used to insert wherever the click left the caret, mangling the display into
+      # a query matching no option -- which cleared the hidden field. Clicking in selects
+      # the display now, so the first keystroke replaces it.
       find_field("Cycle type").click
       send_keys("tand")
 

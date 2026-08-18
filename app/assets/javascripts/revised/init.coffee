@@ -27,7 +27,6 @@ class window.BikeIndex
 # This file initializes scripts for the application
 class BikeIndex.Init extends BikeIndex
   constructor: ->
-    new BikeIndex.NavHeader
     @loadFancySelects()
     @initializeNoTabLinks()
     @initializeScrollToRef()

@@ -342,7 +342,8 @@
     <% if user_name_required? %>
       <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :user_name,
           label_text: translation(".owner_name"), required: true,
-          html_options: {value: bike["user_name"], autocomplete: "name"}) %>
+          html_options: {value: bike["user_name"], autocomplete: "name",
+            placeholder: translation(".owner_name_placeholder")}) %>
     <% end %>
 
     <%# The organization's own asks sit under its heading, alongside the contact fields %>

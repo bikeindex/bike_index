@@ -101,6 +101,13 @@ module SystemSpecHelpers
     end
   end
 
+  # init.coffee assigns window.pageScript once the page's class has bound its handlers, in
+  # $(document).ready -- but click_link returns while the new document is still parsing, so
+  # an interaction landing before then is swallowed with nothing on the page to say so
+  def wait_for_page_script
+    wait_for { page.evaluate_script("!!window.pageScript") }
+  end
+
   # search--form#handlePopstate reconciles these to the address bar on a
   # back/forward; the results frame reloads separately and faster.
   RESTORED_FILTER_FIELDS = %w[search_email serial search_notes].freeze

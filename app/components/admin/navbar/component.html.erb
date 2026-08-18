@@ -5,9 +5,9 @@
 
   <% if @current_user.superuser? %>
     <ul class="navbar-nav d-none d-lg-flex">
-      <% shortcut_links.each do |title, path| %>
+      <% shortcut_links.each do |link| %>
         <li class="nav-item">
-          <%= helpers.active_link title, path, class: "nav-link", match_controller: true %>
+          <%= render UI::ActiveLink::Component.new(text: link[:title], path: link[:path], html_class: "nav-link", match: link[:match]) %>
         </li>
       <% end %>
 
@@ -22,7 +22,7 @@
       <% end %>
     </ul>
     <% if display_view_all? %>
-      <%= link_to active_link[:path], class: "nav-link text-muted em" do %>
+      <%= link_to current_nav_link[:path], class: "nav-link text-muted em" do %>
         All
         <div class="d-none d-sm-inline-block d-lg-none d-xl-inline-block">
           <%= view_all_title %>

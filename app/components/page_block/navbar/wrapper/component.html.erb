@@ -1,6 +1,6 @@
 <%# logo_only renders one link -- not worth a cache round trip %>
 <% cache_if(!@logo_only, cache_key) do %>
-  <nav class="primary-header-nav">
+  <nav class="primary-header-nav" <%= tag.attributes(controller_attributes) %>>
     <div class="container">
       <a href="<%= helpers.user_root_url %>" class="primary-logo">
         <%= image_tag "revised/logo.svg", class: "primary-nav", alt: "Bike Index home" %>
@@ -19,15 +19,24 @@
           </div>
         <% end %>
 
-        <div id="menu-opened-backdrop" aria-hidden="true"></div>
+        <div
+          id="menu-opened-backdrop"
+          aria-hidden="true"
+          data-action="click->page-block--navbar#closeMenu"
+        ></div>
 
-        <div class="hamburgler">
+        <div
+          class="hamburgler"
+          data-page-block--navbar-target="hamburgler"
+          data-action="click->page-block--navbar#toggleMenu"
+        >
           <button
             id="primary_nav_hamburgler"
             type="button"
             aria-label="<%= translation(".menu") %>"
             aria-expanded="false"
             aria-controls="primary-main-menu"
+            data-page-block--navbar-target="hamburglerButton"
           ></button>
         </div>
 

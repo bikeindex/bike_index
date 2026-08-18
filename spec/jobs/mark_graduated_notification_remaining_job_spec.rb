@@ -56,5 +56,34 @@ RSpec.describe MarkGraduatedNotificationRemainingJob, type: :job do
         expect(UserRegistrationOrganization.unscoped.count).to eq 1
       end
     end
+
+    context "a second bike_graduated notification for the same bike" do
+      let!(:graduated_notification2) do
+        FactoryBot.create(:graduated_notification, :with_user, organization: organization,
+          user: user, bike: bike1)
+      end
+      # A notification reaches bike_graduated by having delivered its email
+      def deliver!(graduated_notification)
+        FactoryBot.create(:notification, notifiable: graduated_notification, user: user,
+          kind: :graduated_notification, delivery_status: :delivery_success)
+        graduated_notification.tap(&:save).reload
+      end
+      it "marks both remaining rather than recursing between them" do
+        graduated_notification1.save
+        deliver!(graduated_notification1)
+        deliver!(graduated_notification2)
+        expect(graduated_notification1.reload.status).to eq "bike_graduated"
+        expect(graduated_notification2.reload.status).to eq "bike_graduated"
+        expect(instance.matching_notifications(graduated_notification1).pluck(:id))
+          .to eq([graduated_notification2.id])
+        expect(instance.matching_notifications(graduated_notification2).pluck(:id))
+          .to eq([graduated_notification1.id])
+
+        instance.perform(graduated_notification1.id)
+
+        expect(graduated_notification1.reload.status).to eq "marked_remaining"
+        expect(graduated_notification2.reload.status).to eq "marked_remaining"
+      end
+    end
   end
 end
