@@ -9,7 +9,7 @@ RSpec.describe Org::MenuItems::Component, type: :component do
   let(:instance) do
     described_class.new(organization:, current_user:, controller_namespace:, controller_name:, action_name:)
   end
-  # The request drives active_link, which resolves the items the cache didn't mark
+  # The request drives UI::ActiveLink, which resolves the items the cache didn't mark
   let(:url) { "/o/#{organization.to_param}/#{controller_name}" }
   let(:component) { with_request_url(url) { render_inline(instance) } }
   let(:organization) { FactoryBot.create(:organization) }

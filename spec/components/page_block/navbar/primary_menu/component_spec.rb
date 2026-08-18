@@ -4,15 +4,12 @@ require "rails_helper"
 
 RSpec.describe PageBlock::Navbar::PrimaryMenu::Component, type: :component do
   let(:current_user) { nil }
-  let(:controller_namespace) { nil }
-  let(:controller_name) { "welcome" }
-  let(:action_name) { "index" }
+  let(:request_url) { "/" }
   let(:instance) do
-    described_class.new(current_user:, current_user_or_unconfirmed_user: current_user,
-      controller_namespace:, controller_name:, action_name:)
+    described_class.new(current_user:, current_user_or_unconfirmed_user: current_user)
   end
-  # The request drives active_link, which resolves the items that pass no :active
-  let(:component) { with_request_url("/") { render_inline(instance) } }
+  # The request drives UI::ActiveLink, which resolves every item that passes no :active
+  let(:component) { with_request_url(request_url) { render_inline(instance) } }
   let(:menu_links) { component.css("#primary-main-menu a").map { |link| link.text.strip } }
 
   it "renders the signed out menu" do
@@ -22,18 +19,34 @@ RSpec.describe PageBlock::Navbar::PrimaryMenu::Component, type: :component do
     expect(component).to_not have_css "#primary-main-menu a.active"
   end
 
+  # The links carry query params the page won't, which is why they match on controller and action
   context "on the registration search page" do
-    let(:controller_namespace) { "search" }
-    let(:controller_name) { "registrations" }
+    let(:request_url) { "/search/registrations?query=trek" }
 
     it "marks both registration search links active" do
       expect(component.css("#primary-main-menu a.active").map { |link| link.text.strip }).to eq(%w[Search Search])
     end
+
+    context "on page 2" do
+      let(:request_url) { "/search/registrations?stolenness=all&page=2" }
+
+      it "marks them active" do
+        expect(component.css("#primary-main-menu a.active").map { |link| link.text.strip }).to eq(%w[Search Search])
+      end
+    end
+
+    # The link points at stolenness=all, but every stolenness is the same search page
+    context "searching a different stolenness" do
+      let(:request_url) { "/search/registrations?stolenness=stolen" }
+
+      it "marks them active" do
+        expect(component.css("#primary-main-menu a.active").map { |link| link.text.strip }).to eq(%w[Search Search])
+      end
+    end
   end
 
   context "on the marketplace search page" do
-    let(:controller_namespace) { "search" }
-    let(:controller_name) { "marketplace" }
+    let(:request_url) { "/search/marketplace" }
 
     it "marks both marketplace links active" do
       expect(component.css("#primary-main-menu a.active").map { |link| link.text.strip }).to eq(%w[Marketplace Marketplace])

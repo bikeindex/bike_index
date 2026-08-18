@@ -8,13 +8,9 @@
     </li>
   <% when :link %>
     <li>
-      <% active = active_state(item) %>
-
-      <% if active.nil? %>
-        <%= helpers.active_link item[:label], item[:path], match_controller: item[:active] == :match_controller, class: link_classes(item, false) %>
-      <% else %>
-        <%= link_to item[:label], item[:path], class: link_classes(item, active) %>
-      <% end %>
+      <%= render UI::ActiveLink::Component.new(text: item[:label], path: item[:path],
+            active: active_state(item), match: MATCHES.fetch(item[:active], :path),
+            html_class: link_classes(item)) %>
     </li>
   <% when :super_admin_link %>
     <li class="less-strong mt-4">

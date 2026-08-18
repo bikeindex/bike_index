@@ -14,13 +14,15 @@
 # rendering as a dropdown for a non-superuser) and a super_admin_link
 # (for superusers).
 #
-# `active:` is one of:
-#   :auto                                  - template uses active_link helper
-#   :match_controller                      - template uses active_link with match_controller: true
-#   :on_registrations_index                - component computes from current request
-#   :on_bikes_new                          - "
-#   :on_bikes_new_with_parking_notification - "
-#   :on_registration_sequences             - " (also matches the pages controller)
+# `active:` is one of these, which Org::MenuItems::Component::MATCHES hands to
+# UI::ActiveLink as the match: granularity to resolve per request:
+#   :auto                                  - match: :path
+#   :match_controller                      - match: :controller
+#   :on_registrations_index                - match: :controller_action
+# or one of these, which the component computes from the current request:
+#   :on_bikes_new
+#   :on_bikes_new_with_parking_notification
+#   :on_registration_sequences             - also matches the pages controller
 module OrganizedServices
   module UserMenuItems
     extend Functionable

@@ -22,13 +22,6 @@ module ApplicationHelper
     end
   end
 
-  def active_link(link_text, link_path, html_options = {})
-    match_controller = html_options.delete(:match_controller)
-    html_options[:class] ||= ""
-    html_options[:class] += " active" if current_page_active?(link_path, match_controller)
-    link_to(raw(link_text), link_path, html_options).html_safe
-  end
-
   # Organized lays out its own general alert, and takes over the body background
   def main_content_organized?
     PageBlock::MainContent::Wrapper::Component.kind(
@@ -67,25 +60,6 @@ module ApplicationHelper
     elsif controller_name == "registrations" && action_name == "show"
       "tw:bg-[#f7f6fb]"
     end
-  end
-
-  def admin_nav_link(link_text, link_path)
-    if controller_name == "dashboard"
-      if action_name == "invitations" && link_text == "Invitations"
-        class_name = "active"
-      elsif action_name == "show" && link_text == "Go hard"
-        class_name = "active"
-      end
-    elsif controller_name == "payments"
-      if action_name == "invoices" && link_text == "Invoices"
-        class_name = "active"
-      elsif link_text == "Payments"
-        class_name = "active"
-      end
-    else
-      class_name = (controller_name == link_text.downcase.tr(" ", "_")) ? "active" : ""
-    end
-    (link_to link_text, link_path, class: class_name).html_safe
   end
 
   # Deprecated - UI::Forms::NestedFields::Component replaces this. Every set this adds shares one

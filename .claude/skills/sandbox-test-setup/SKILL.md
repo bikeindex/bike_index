@@ -9,6 +9,7 @@ description: >-
   `bundle` or `bin/lint`, needs a running dev server, or hits any of these:
   `env: 'ruby': No such file or directory`, `Could not find 'bundler' (4.0.0.beta2)`,
   `Bundler::RubyVersionMismatch`, `command not found: rspec`,
+  `uninitialized constant Pathname` from a `bin/` script,
   `Sprockets::Rails::Helper::AssetNotFound`, `tailwind.css is not present`,
   `LoadError: Could not open library 'vips.so.42'`, or a Playwright
   browser-not-found or build-number mismatch. The fix is almost never a reinstall
