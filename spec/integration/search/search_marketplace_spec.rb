@@ -237,6 +237,26 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     expect(find("#primary_activity").value).to eq "Mountain biking"
   end
 
+  it "switches between the thumbnail and list layouts, keeping the search" do
+    visit_marketplace_via_nav
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
+
+    search_primary_activity("Mountain biking")
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
+
+    choose("search_result_view_bike_box", allow_label_click: true)
+    expect(page).to have_css(".bike-box-item", wait: 10, count: 6)
+    expect(page).to have_no_css("[data-test-id^='vehicle-thumbnail-linkspan-']")
+    expect(page).to have_current_path(/search_result_view=bike_box/)
+    # The layout switch re-runs the search rather than dropping its filters
+    expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/)
+    expect(find("#primary_activity").value).to eq "Mountain biking"
+
+    choose("search_result_view_thumbnail", allow_label_click: true)
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
+    expect(page).to have_no_css(".bike-box-item")
+  end
+
   # search_no_js reaches riders who do have JS: Search::RegistrationsController
   # forwards it on the marketplace redirect, and it survives in any URL shared
   # before search--form strips the hidden field. Those renders can't tell, so they

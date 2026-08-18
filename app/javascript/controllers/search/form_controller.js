@@ -60,6 +60,12 @@ export default class extends Controller {
     this.refreshResults()
   }
 
+  // The result-view radios are form fields rather than links, so switching layout
+  // has to re-run the search to pick up the other result component
+  submit () {
+    this.formTarget.requestSubmit()
+  }
+
   // Clear any stale loading state, then bring the results frame in line with the
   // address bar. Runs on initial connect and after every Turbo page load.
   refreshResults () {

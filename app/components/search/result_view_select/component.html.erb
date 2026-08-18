@@ -10,7 +10,8 @@
         :search_result_view,
         :thumbnail,
         selected?(:thumbnail),
-        class: "tw:hidden",
+        :class => "tw:hidden",
+        "data-action" => "change->search--form#submit",
       ) %>
     <% end %>
   </li>
@@ -26,7 +27,8 @@
         :search_result_view,
         :bike_box,
         selected?(:bike_box),
-        class: "tw:hidden",
+        :class => "tw:hidden",
+        "data-action" => "change->search--form#submit",
       ) %>
     <% end %>
   </li>
