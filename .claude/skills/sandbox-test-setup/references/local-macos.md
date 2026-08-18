@@ -38,12 +38,6 @@ If `rails_helper` aborts complaining about a pending migration, run
 `bundle exec rails db:create db:migrate` first
 (`ActiveRecord::Migration.maintain_test_schema!`).
 
-`bin/turbo_tests` (and so `bin/ci`) runs each worker against its own
-`bikeindex_test_<WORKSPACE_ID>` database, which nothing creates on
-demand — a fresh workspace fails with `ActiveRecord::NoDatabaseError:
-Database not found`. `bin/rake parallel:prepare` creates them, and
-`bin/ci` runs it as its own step.
-
 Lint with `bin/lint` (same PATH prefix if needed). Postgres, redis,
 and the jsdelivr proxy are handled by your local dev environment, so
 nothing else here applies **except** the Tailwind build in SKILL.md,
