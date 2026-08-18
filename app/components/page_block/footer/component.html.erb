@@ -19,19 +19,15 @@
               </li>
 
               <li>
-                <%= render UI::ActiveLink::Component.new(text: translation(".register_a_bike"), path: new_register_path) %>
+                <%= render UI::ActiveLink::Component.new(text: translation(".register_a_bike"), path: new_register_path, match: :controller) %>
               </li>
 
               <li>
-                <%= render UI::ActiveLink::Component.new(text: translation(".faq"), path: support_path) %>
+                <%= render UI::ActiveLink::Component.new(text: translation(".faq_and_help"), path: help_path) %>
               </li>
 
               <li>
                 <%= render UI::ActiveLink::Component.new(text: translation(".blog"), path: news_index_path) %>
-              </li>
-
-              <li>
-                <%= render UI::ActiveLink::Component.new(text: translation(".help"), path: help_path) %>
               </li>
 
               <li>
