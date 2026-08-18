@@ -15,7 +15,7 @@ module PageBlock
 
         def call
           render(UI::ActiveLink::Component.new(text: @label, path: @path, match: @match,
-            html_class: css_class, **@html_options))
+            class: css_class, **@html_options))
         end
 
         private

@@ -13,23 +13,19 @@ module UI
       # The matches the browser answers with a route rather than with the URL
       ROUTE_MATCHES = [:controller, :controller_action].freeze
 
-      def initialize(path:, text: nil, match: :path, matching_controllers: [], html_class: nil,
-        data: {}, **html_options)
+      def initialize(path:, text: nil, match: :path, matching_controllers: [], data: {}, **html_options)
         raise_if_invalid_value!(:match, match, MATCHES)
-        # html_class is what reaches the anchor, so a passed class would be dropped rather than merged
-        raise ArgumentError, "class is not supported, you must use the keyword arg html_class" if html_options.key?(:class)
 
         @path = path
         @text = text
         @match = match
         @matching_controllers = matching_controllers
-        @html_class = html_class
         @data = data
         @html_options = html_options
       end
 
       def call
-        link_to(link_text, @path, **@html_options, class: @html_class.presence, data: link_data)
+        link_to(link_text, @path, **@html_options, data: link_data)
       end
 
       private

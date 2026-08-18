@@ -19,10 +19,10 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     expect(link.attributes).to_not have_key("data-ui--active-link-routes-value")
   end
 
-  context "with html_class" do
-    let(:options) { {html_class: "nav-link"} }
+  context "with a class" do
+    let(:options) { {class: "nav-link"} }
 
-    it "renders the class on its own, for the controller to append to" do
+    it "renders it untouched -- the browser marks current with aria-current, not a class" do
       expect(link["class"]).to eq "nav-link"
     end
   end
@@ -84,14 +84,6 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
       it "raises" do
         expect { component }.to raise_error(ArgumentError, /match/)
       end
-    end
-  end
-
-  context "with a class in html_options" do
-    let(:options) { {class: "nav-link"} }
-
-    it "raises, since html_class is the way in" do
-      expect { component }.to raise_error(ArgumentError, /html_class/)
     end
   end
 

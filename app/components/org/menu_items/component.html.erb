@@ -10,7 +10,7 @@
     <li>
       <%= render UI::ActiveLink::Component.new(text: item[:label], path: item[:path],
             match: item[:match], matching_controllers: item[:matching_controllers],
-            html_class: link_classes(item)) %>
+            class: link_classes(item)) %>
     </li>
   <% when :super_admin_link %>
     <li class="less-strong mt-4">
