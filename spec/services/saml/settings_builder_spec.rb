@@ -32,7 +32,6 @@ RSpec.describe Saml::SettingsBuilder, :saml_env do
     expect(settings.idp_cert).to include("BEGIN CERTIFICATE")
   end
 
-  # ruby-saml omits NameIDPolicy entirely when the format is nil
   it "requests no NameID format by default" do
     expect(settings.name_identifier_format).to be_nil
     expect(OneLogin::RubySaml::Authrequest.new.create_authentication_xml_doc(settings).to_s)

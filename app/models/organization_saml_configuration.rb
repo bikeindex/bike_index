@@ -25,7 +25,7 @@ class OrganizationSamlConfiguration < ApplicationRecord
   PROVIDER = "saml"
   # Asserted attribute that carries the user's email, when it isn't the NameID
   DEFAULT_EMAIL_ATTRIBUTE = "urn:oid:0.9.2342.19200300.100.1.3"
-  # NameIDPolicy for the AuthnRequest; blank sends none, leaving the choice to the IdP
+  # NameIDPolicy for the AuthnRequest; blank omits the element
   NAME_ID_FORMATS = {
     "persistent" => "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
     "transient" => "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",

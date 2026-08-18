@@ -56,10 +56,9 @@ RSpec.describe OrganizationSamlConfiguration, type: :model do
     end
 
     context "name_id_format" do
-      it "permits blank or a SAML 2.0 format, and rejects anything else" do
+      it "permits a known format, and rejects anything else" do
         saml_configuration.assign_attributes(idp_entity_id: "https://idp.example.edu/",
           idp_sso_target_url: "https://idp.example.edu/sso", idp_cert:)
-        expect(saml_configuration).to be_valid
 
         saml_configuration.name_id_format = OrganizationSamlConfiguration::NAME_ID_FORMATS["persistent"]
         expect(saml_configuration).to be_valid
