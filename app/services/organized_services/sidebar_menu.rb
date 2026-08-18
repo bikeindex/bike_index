@@ -14,9 +14,10 @@
 # the Stimulus controller opens and closes, and what the component matches the
 # current page against to decide which group starts open.
 #
-# `active:` carries the same vocabulary as UserMenuItems — :auto and
-# :match_controller defer to the active_link helper, the rest the component
-# resolves per request.
+# `active:` names how the current page is recognized. Most of the vocabulary is
+# UserMenuItems', and PageBlock::OrgSidebar::Component::MATCHES hands it to
+# UI::ActiveLink as a match granularity; only :on_bikes_new and
+# :on_registration_sequences are left for the component to resolve itself.
 module OrganizedServices
   module SidebarMenu
     extend Functionable
@@ -121,8 +122,7 @@ module OrganizedServices
         link(translation(:search_parking_notifications),
           routes.organization_parking_notifications_path(organization_id: organization.to_param)),
         link(translation(:parking_notification_unregistered),
-          routes.new_organization_bike_path(organization.to_param, parking_notification: true),
-          active: :on_bikes_new_with_parking_notification)
+          routes.new_organization_bike_path(organization.to_param, parking_notification: true))
       ]
 
       group(:parking, translation(:parking_notifications_group), "map-pin", children)

@@ -10,11 +10,9 @@ module PageBlock
       MOBILE_BREAKPOINT = 760
 
       # The menu's own active vocabulary, at the granularities UI::ActiveLink resolves.
-      # A filtered index carries query params, so its row matches on controller and action;
-      # the unregistered notification's row is a path *with* one, which current_page?
-      # compares in full, so it lights only on its own variant of bikes#new
+      # A filtered index carries query params, so its row matches on controller and action
       MATCHES = UI::ActiveLink::Component.match_table(auto: :path, match_controller: :controller,
-        on_registrations_index: :controller_action, on_bikes_new_with_parking_notification: :path)
+        on_registrations_index: :controller_action)
 
       # A top-level row: the group toggles, the leaf links and the leaves with nothing
       # to link to all sit on this, so they stay the same height as each other
