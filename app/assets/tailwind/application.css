@@ -173,7 +173,7 @@
 }
 
 @utility base-font {
-  @apply tw:antialiased tw:font-sans tw:text-gray-900 tw:dark:text-gray-400;
+  @apply tw:antialiased tw:font-sans tw:twtext-color;
 }
 
 @layer base {
@@ -185,7 +185,7 @@
 }
 
 body {
-  @apply tw:base-font;
+  @apply tw:base-font tw:dark:bg-gray-900;
 
   /* .primary-header-nav's margin-bottom, which the full-bleed pages pull up by to sit
      flush under the navbar. Defined here rather than beside the nav in revised.scss,
@@ -198,13 +198,6 @@ body {
     --nav-gap: 60px;
   }
 }
-/*
-  'dark:' syntax isn't working for the body element, unclear why - hacking with this for now
-*/
-body.dark {
-  @apply tw:bg-gray-900 tw:text-gray-400;
-}
-
 /* The org sidebar is fixed, so the page it covers is pushed over instead. The
    controller narrows --org-sidebar-width as it collapses; defaulting to the
    expanded width keeps the content still until stimulus connects. There's no
@@ -224,15 +217,6 @@ body.with-org-sidebar {
   body.with-org-sidebar {
     margin-left: 0;
   }
-}
-
-/* TODO: use this in the body instead of separately */
-.twtext-color {
-  @apply tw:text-gray-900 tw:dark:text-gray-400;
-}
-
-.twtext-color\! {
-  @apply tw:text-gray-900! tw:dark:text-gray-400!;
 }
 
 /* select2 is used by everythingcombox. Here are styles to make it look like the other inputs */

@@ -75,7 +75,7 @@ module UI
         end
 
         def header_color_classes
-          @default_header_color ? "twtext-color" : text_color_classes
+          @default_header_color ? "tw:twtext-color" : text_color_classes
         end
 
         def dismissable_color_classes
