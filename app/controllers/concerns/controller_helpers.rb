@@ -344,7 +344,7 @@ module ControllerHelpers
     request.format.turbo_stream? || turbo_frame_request?
   end
 
-  protected
+  private
 
   # passive_organization is the organization set for the user - which is persisted in session
   # The user may or may not be interacting with the current_organization in any given request
