@@ -18,9 +18,7 @@ module PageBlock
             {type: :divider, item_class: "d-lg-none"},
             *account_items,
             {label: translation(".help"), path: help_path},
-            # Because of caching, this needs to be set to be active with JS (welcome/index.coffee)
-            {label: translation(".stolen_bike"), path: get_your_stolen_bike_back_path, active: false,
-             html_options: {id: "getStolenBackLink"}},
+            {label: translation(".stolen_bike"), path: get_your_stolen_bike_back_path},
             {label: translation(".donate"), path: why_donate_path},
             {label: translation(".blog"), path: news_index_path, active: :match_controller},
             marketplace_item("d-lg-block"),

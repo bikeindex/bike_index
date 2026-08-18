@@ -12,7 +12,7 @@ module ControllerHelpers
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
       :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
-      :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert,
+      :page_id, :page_route, :default_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
       :render_donation_request?
     before_action :enable_rack_profiler
@@ -267,6 +267,12 @@ module ControllerHelpers
 
     scope ||= [:controllers, controller_namespace, controller_name, controller_method.to_sym]
     ActiveSupport::HtmlSafeTranslation.translate(key, **kwargs, scope: scope.compact)
+  end
+
+  # The browser's half of UI::ActiveLink's controller matching. Not page_id, which two
+  # controllers override to borrow another page's styles.
+  def page_route
+    "#{controller_path}##{action_name}"
   end
 
   # This is overridden in FeedbacksController and InfoController

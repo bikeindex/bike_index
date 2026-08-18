@@ -15,7 +15,7 @@
 # (for superusers).
 #
 # `active:` is one of these, which Org::MenuItems::Component::MATCHES hands to
-# UI::ActiveLink as the match: granularity to resolve per request:
+# UI::ActiveLink as the match: granularity for the browser to resolve:
 #   :auto                                  - match: :path
 #   :match_controller                      - match: :controller
 #   :on_registrations_index                - match: :controller_action

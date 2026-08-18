@@ -29,6 +29,7 @@
   <body
     id="<%= page_id %>"
     class="<%= 'organized-body' if main_content_organized? %>"
+    data-page-route="<%= page_route %>"
   >
     <%= render PageBlock::Navbar::Wrapper::Component.new(logo_only: true) %>
 

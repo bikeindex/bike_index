@@ -3,7 +3,7 @@
 module Org
   module MenuItems
     class Component < ApplicationComponent
-      # The cache marks these for UI::ActiveLink to resolve per request, at these granularities
+      # The cache marks these for UI::ActiveLink to resolve in the browser, at these granularities
       MATCHES = UI::ActiveLink::Component.match_table(auto: :path, match_controller: :controller,
         on_registrations_index: :controller_action)
 

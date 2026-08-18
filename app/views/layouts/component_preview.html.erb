@@ -39,6 +39,7 @@
   <body
     class="<%= params.dig(:lookbook, :display, :theme) %>"
     style="padding: 0;"
+    data-page-route="<%= page_route %>"
   >
     <%# NOTE: at some point, make the padding optional %>
     <div class="tw:p-4"><%= yield %></div>

@@ -3,56 +3,42 @@
 require "rails_helper"
 
 RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
-  let(:component) { with_request_url(url) { render_inline(described_class.new(**args)) } }
-  let(:url) { "/help" }
+  let(:component) { render_inline(described_class.new(**args)) }
   let(:args) { {label: "Help", path: "/help"} }
+  let(:link) { component.css("a").first }
 
-  it "resolves active from the path when active is omitted" do
-    expect(component).to have_css "a.nav-link.active[href='/help']", text: "Help"
-  end
-
-  context "on another page" do
-    let(:url) { "/" }
-
-    it "renders inactive" do
-      expect(component).to have_css "a.nav-link[href='/help']"
-      expect(component).to_not have_css "a.active"
-    end
+  # UI::ActiveLink resolves the state in the browser, so an item that passes no :active
+  # renders the controller rather than a class
+  it "leaves the current-page check to the path when active is omitted" do
+    expect(component).to have_css "a.nav-link[href='/help']", text: "Help"
+    expect(link["data-controller"]).to eq "ui--active-link"
+    expect(link["data-ui--active-link-match-value"]).to eq "path"
   end
 
   context "with active: false" do
     let(:args) { {label: "Help", path: "/help", active: false} }
 
-    # active: false pins the link inactive even on its own page — index.coffee sets
-    # #getStolenBackLink's state, because the navbar renders from a cached fragment
-    it "stays inactive on its own page" do
+    it "pins the link inactive, without the browser resolving it" do
       expect(component).to_not have_css "a.active"
+      expect(link.attributes).to_not have_key("data-controller")
     end
   end
 
   context "with active: true" do
     let(:args) { {label: "Search", path: "/search/registrations", active: true} }
-    let(:url) { "/" }
 
     it "renders active regardless of the path" do
       expect(component).to have_css "a.nav-link.active[href='/search/registrations']"
+      expect(link.attributes).to_not have_key("data-controller")
     end
   end
 
   context "with active: :match_controller" do
     let(:args) { {label: "Blog", path: "/news", active: :match_controller} }
-    let(:url) { "/news/some-post" }
 
     it "matches on the controller rather than the path" do
-      expect(component).to have_css "a.nav-link.active[href='/news']"
-    end
-
-    context "on another controller" do
-      let(:url) { "/help" }
-
-      it "renders inactive" do
-        expect(component.css("a").first["class"]).to eq "nav-link"
-      end
+      expect(link["data-ui--active-link-match-value"]).to eq "controller"
+      expect(link["data-ui--active-link-route-value"]).to eq "news#index"
     end
   end
 
@@ -60,10 +46,9 @@ RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
   # a caller can pass straight through
   context "with active: :controller, UI::ActiveLink's name for it" do
     let(:args) { {label: "Blog", path: "/news", active: :controller} }
-    let(:url) { "/news/some-post" }
 
     it "matches the same as :match_controller" do
-      expect(component).to have_css "a.nav-link.active[href='/news']"
+      expect(link["data-ui--active-link-match-value"]).to eq "controller"
     end
   end
 
@@ -77,7 +62,6 @@ RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
 
   context "with link_class and html_options" do
     let(:args) { {label: "Sign up", path: "/users/new", link_class: "signup-link", html_options: {id: "signUp"}} }
-    let(:url) { "/" }
 
     it "adds them to the anchor" do
       expect(component).to have_css "a#signUp.nav-link.signup-link[href='/users/new']"

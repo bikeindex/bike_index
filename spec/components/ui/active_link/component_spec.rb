@@ -4,89 +4,144 @@ require "rails_helper"
 
 RSpec.describe UI::ActiveLink::Component, type: :component do
   let(:path) { "/help" }
-  let(:request_url) { "/" }
   let(:options) { {} }
   let(:instance) { described_class.new(text: "Help", path:, **options) }
-  let(:component) { with_request_url(request_url) { render_inline(instance) } }
+  let(:component) { render_inline(instance) }
   let(:link) { component.css("a").first }
 
-  it "renders a plain link when it isn't the current page" do
+  it "renders a link the browser resolves the state of" do
     expect(link["href"]).to eq path
     expect(link.text).to eq "Help"
     expect(link.attributes).to_not have_key("class")
-  end
-
-  context "on the linked page" do
-    let(:request_url) { path }
-
-    it "marks the link active" do
-      expect(link["class"]).to eq "active"
-    end
+    expect(link["data-controller"]).to eq "ui--active-link"
+    expect(link["data-ui--active-link-match-value"]).to eq "path"
+    # :path compares the URL the browser is already on, so there's no route to compare
+    expect(link.attributes).to_not have_key("data-ui--active-link-route-value")
   end
 
   context "with html_class" do
     let(:options) { {html_class: "nav-link"} }
 
-    it "renders the class on its own" do
+    it "renders the class on its own, for the controller to append to" do
       expect(link["class"]).to eq "nav-link"
+    end
+  end
+
+  describe "match" do
+    context ":controller" do
+      let(:path) { "/news" }
+      let(:options) { {match: :controller} }
+
+      it "carries the link's own route, which the page's is compared against" do
+        expect(link["data-ui--active-link-match-value"]).to eq "controller"
+        expect(link["data-ui--active-link-route-value"]).to eq "news#index"
+      end
+    end
+
+    context ":controller_action" do
+      let(:path) { "/search/registrations?stolenness=all" }
+      let(:options) { {match: :controller_action} }
+
+      it "carries the route the params are dropped from" do
+        expect(link["data-ui--active-link-match-value"]).to eq "controller_action"
+        expect(link["data-ui--active-link-route-value"]).to eq "search/registrations#index"
+      end
+    end
+
+    context "with a path that isn't a route" do
+      let(:path) { "/not-a-route" }
+      let(:options) { {match: :controller} }
+
+      it "renders no route, so the link never goes active" do
+        expect(link.attributes).to_not have_key("data-ui--active-link-route-value")
+      end
+    end
+
+    context "with an unknown match" do
+      let(:options) { {match: :nonsense} }
+
+      it "raises" do
+        expect { component }.to raise_error(ArgumentError, /match/)
+      end
+    end
+  end
+
+  describe "active" do
+    context "true" do
+      let(:options) { {active: true, html_class: "nav-link"} }
+
+      it "renders the class, and no controller to resolve what it already knows" do
+        expect(link["class"]).to eq "nav-link active"
+        expect(link.attributes).to_not have_key("data-controller")
+      end
+    end
+
+    context "false" do
+      let(:options) { {active: false} }
+
+      it "renders neither" do
+        expect(link.attributes).to_not have_key("class")
+        expect(link.attributes).to_not have_key("data-controller")
+      end
+    end
+  end
+
+  # A menu picking out its current entry asks the class method, rather than rendering a link
+  # to find out — Admin::Navbar's picker does
+  describe ".active?" do
+    let(:match) { :path }
+    let(:request_url) { "/" }
+    let(:active) do
+      with_request_url(request_url) do
+        described_class.active?(path:, match:, view: vc_test_controller.view_context)
+      end
+    end
+
+    it "is false off the page the link points at" do
+      expect(active).to be false
     end
 
     context "on the linked page" do
       let(:request_url) { path }
 
-      it "appends active" do
-        expect(link["class"]).to eq "nav-link active"
+      it "is true" do
+        expect(active).to be true
       end
     end
-  end
 
-  describe "match" do
-    let(:path) { "/bikes/new" }
-    let(:request_url) { "/bikes/12" }
+    context "with match: :controller" do
+      let(:match) { :controller }
+      let(:path) { "/bikes/new" }
+      let(:request_url) { "/bikes/12" }
 
-    it "defaults to :path, so another page of the controller isn't active" do
-      expect(link["class"]).to be_blank
-    end
-
-    context ":controller" do
-      let(:options) { {match: :controller} }
-
-      it "is active on another page of the same controller" do
-        expect(link["class"]).to eq "active"
+      it "is true on another page of the same controller" do
+        expect(active).to be true
       end
 
       context "on a page of a different controller" do
         let(:request_url) { "/help" }
 
-        it "isn't active" do
-          expect(link["class"]).to be_blank
+        it "is false" do
+          expect(active).to be false
         end
       end
     end
 
-    context ":controller_action" do
-      let(:options) { {match: :controller_action} }
-
-      it "isn't active on a different action of the same controller" do
-        expect(link["class"]).to be_blank
-      end
+    context "with match: :controller_action" do
+      let(:match) { :controller_action }
+      let(:path) { "/search/registrations?stolenness=all" }
+      let(:request_url) { "/search/registrations?query=trek" }
 
       # What a link carrying query params needs — the URL won't compare equal
-      context "on the same action, reached with different params" do
-        let(:path) { "/search/registrations?stolenness=all" }
-        let(:request_url) { "/search/registrations?query=trek" }
-
-        it "is active" do
-          expect(link["class"]).to eq "active"
-        end
+      it "is true on the same action, reached with different params" do
+        expect(active).to be true
       end
 
       context "on a different controller's index" do
-        let(:path) { "/search/registrations?stolenness=all" }
         let(:request_url) { "/search/marketplace" }
 
-        it "isn't active" do
-          expect(link["class"]).to be_blank
+        it "is false" do
+          expect(active).to be false
         end
       end
 
@@ -95,41 +150,16 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
       # it doesn't point at
       context "on a page rendered by a non-GET request" do
         let(:path) { "/bikes/12" }
+        let(:request_url) { path }
 
         it "compares the action the request dispatched, not the GET route's" do
-          on_get = with_request_url(path) { render_inline(instance) }
-          expect(on_get.css("a").first["class"]).to eq "active"
+          expect(active).to be true
 
-          on_patch = with_request_url(path, method: "PATCH") { render_inline(instance) }
-          expect(on_patch.css("a").first["class"]).to be_blank
+          on_patch = with_request_url(request_url, method: "PATCH") do
+            described_class.active?(path:, match:, view: vc_test_controller.view_context)
+          end
+          expect(on_patch).to be false
         end
-      end
-    end
-  end
-
-  context "with an unknown match" do
-    let(:options) { {match: :nonsense} }
-
-    it "raises" do
-      expect { component }.to raise_error(ArgumentError, /match/)
-    end
-  end
-
-  describe "active" do
-    context "forced true off the linked page" do
-      let(:options) { {active: true} }
-
-      it "skips the current page check" do
-        expect(link["class"]).to eq "active"
-      end
-    end
-
-    context "forced false on the linked page" do
-      let(:request_url) { path }
-      let(:options) { {active: false} }
-
-      it "skips the current page check" do
-        expect(link.attributes).to_not have_key("class")
       end
     end
   end
@@ -142,20 +172,20 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     end
   end
 
-  context "with html_options" do
-    let(:options) { {id: "footer-help", target: "_blank"} }
+  context "with html_options and data" do
+    let(:options) { {id: "footer-help", target: "_blank", data: {turbo: false}} }
 
-    it "passes them through to the anchor" do
+    it "passes them through to the anchor, alongside the controller" do
       expect(link["id"]).to eq "footer-help"
       expect(link["target"]).to eq "_blank"
+      expect(link["data-turbo"]).to eq "false"
+      expect(link["data-controller"]).to eq "ui--active-link"
     end
   end
 
   context "with block content in place of text" do
     let(:instance) { described_class.new(path:) }
-    let(:component) do
-      with_request_url(request_url) { render_inline(instance) { "<strong>Block</strong>".html_safe } }
-    end
+    let(:component) { render_inline(instance) { "<strong>Block</strong>".html_safe } }
 
     it "renders the block inside the link" do
       expect(link.css("strong").text).to eq "Block"
@@ -170,7 +200,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     end
 
     context "with a block that renders blank" do
-      let(:component) { with_request_url(request_url) { render_inline(instance) { "" } } }
+      let(:component) { render_inline(instance) { "" } }
 
       it "raises too" do
         expect { component }.to raise_error(ArgumentError, /text:/)
