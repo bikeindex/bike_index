@@ -73,7 +73,7 @@ The same instinct applies beyond buttons: **check `app/components/ui/` and `app/
 
 ## Current-page links: always `UI::ActiveLink`
 
-**Every link that goes `aria-current` on the page it points at goes through `UI::ActiveLink::Component`** — never `current_page?` in a template, and never a Stimulus controller of your own comparing `window.location`. It always derives the state in the browser (`app/javascript/controllers/ui/active_link_controller.js`), so there's no way to pass the answer in: `match:` is the only control over what counts as the page it points at. Any layout rendering one needs `<%= tag.attributes(body_attributes) %>` on its `<body>`. See `app/components/ui/active_link/`.
+**Every link that goes `aria-current` on the page it points at goes through `UI::ActiveLink::Component`** — never `current_page?` in a template, and never a Stimulus controller of your own comparing `window.location`. It always derives the state in the browser (`app/javascript/controllers/ui/active_link_controller.js`), so there's no way to pass the answer in: `match:` is the only control over what counts as the page it points at. Any layout rendering one opens its `<body>` with `body_tag`. See `app/components/ui/active_link/`.
 
 ## Showing and hiding elements: always use the collapse helpers
 
