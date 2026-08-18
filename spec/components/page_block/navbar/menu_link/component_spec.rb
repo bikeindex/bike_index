@@ -8,7 +8,7 @@ RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
   let(:args) { {label: "Help", path: "/help"} }
 
   it "resolves active from the path when active is omitted" do
-    expect(component).to have_css "a.nav-link.active[href='/help']", text: "Help"
+    expect(component).to have_css "a.nav-link[aria-current][href='/help']", text: "Help"
   end
 
   context "on another page" do
@@ -16,7 +16,7 @@ RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
 
     it "renders inactive" do
       expect(component).to have_css "a.nav-link[href='/help']"
-      expect(component).to_not have_css "a.active"
+      expect(component).to_not have_css "a[aria-current]"
     end
   end
 
@@ -26,7 +26,7 @@ RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
     # active: false pins the link inactive even on its own page — index.coffee sets
     # #getStolenBackLink's state, because the navbar renders from a cached fragment
     it "stays inactive on its own page" do
-      expect(component).to_not have_css "a.active"
+      expect(component).to_not have_css "a[aria-current]"
     end
   end
 
@@ -35,7 +35,7 @@ RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
     let(:url) { "/" }
 
     it "renders active regardless of the path" do
-      expect(component).to have_css "a.nav-link.active[href='/search/registrations']"
+      expect(component).to have_css "a.nav-link[aria-current][href='/search/registrations']"
     end
   end
 
@@ -44,7 +44,7 @@ RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
     let(:url) { "/news/some-post" }
 
     it "matches on the controller rather than the path" do
-      expect(component).to have_css "a.nav-link.active[href='/news']"
+      expect(component).to have_css "a.nav-link[aria-current][href='/news']"
     end
 
     context "on another controller" do
@@ -63,7 +63,7 @@ RSpec.describe PageBlock::Navbar::MenuLink::Component, type: :component do
     let(:url) { "/news/some-post" }
 
     it "matches the same as :match_controller" do
-      expect(component).to have_css "a.nav-link.active[href='/news']"
+      expect(component).to have_css "a.nav-link[aria-current][href='/news']"
     end
   end
 

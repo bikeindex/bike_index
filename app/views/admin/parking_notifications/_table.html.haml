@@ -44,9 +44,10 @@
         %td
           - if parking_notification.status == "impounded"
             - if parking_notification.impound_record_id.present?
-              = link_to "Impounded", admin_impound_record_path(parking_notification.impound_record_id), class: "text-danger small tw:underline!"
+              %small{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]}
+                = link_to "Impounded", admin_impound_record_path(parking_notification.impound_record_id), class: "twlink-underlined"
             - else
-              %span.text-danger no impound record!
+              %span{class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]} no impound record!
           - else
             %em.small
               = status_display(parking_notification.status)

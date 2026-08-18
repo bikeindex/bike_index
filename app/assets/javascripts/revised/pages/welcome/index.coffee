@@ -24,8 +24,8 @@ class BikeIndex.WelcomeIndex extends BikeIndex
 
   updateActiveLink: ->
     if window.location.pathname.match("info/how-to-get-your-stolen-bike-back")
-      $(".primary-nav-item .active").removeClass("active")
-      $("#getStolenBackLink").addClass("active")
+      $(".primary-nav-item [aria-current]").removeAttr("aria-current")
+      $("#getStolenBackLink").attr("aria-current", "page")
 
   # Return the DOM node for the slide with index `index` in the slides
   # container element.

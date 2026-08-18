@@ -237,11 +237,18 @@ RSpec.describe UI::Button::Component, type: :component do
   describe "ACTIVE_COLORS" do
     # Every active class is variant-prefixed, so it can never compete with the resting
     # color it overrides — that's what lets both sets be emitted without `!` important.
-    it "covers every color, prefixed with tw:is-active:" do
-      expect(described_class::ACTIVE_COLORS.keys).to eq(described_class::COLORS.keys)
+    it "covers every color but link, prefixed with tw:is-active:" do
+      expect(described_class::ACTIVE_COLORS.keys).to eq(described_class::COLORS.keys - [:link])
       described_class::ACTIVE_COLORS.each_value do |classes|
         expect(classes.split.grep_v(/\Atw:is-active:/)).to eq([])
       end
+    end
+
+    # A utility here would outrank .twlink's own is-active rule, so link color would stop
+    # following the class it's built from
+    it "leaves link color to .twlink" do
+      expect(described_class.build_classes(color: :link, size: :md).split).to include("twlink")
+        .and(satisfy { |tokens| tokens.grep(/\Atw:is-active:(?!focus:)/).empty? })
     end
   end
 

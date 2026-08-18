@@ -28,7 +28,7 @@ module UI
 
           message = message.with_indifferent_access
           key = message[:translation_key]
-          link = link_to(translation(".#{key}_link"), message[:url], class: "twlink")
+          link = link_to(translation(".#{key}_link"), message[:url], class: "twlink-underlined")
           translation(".#{key}_html", link:)
         end
       end

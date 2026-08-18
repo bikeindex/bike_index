@@ -34,7 +34,7 @@ RSpec.describe PageBlock::MainContent::Content::Component, type: :component do
 
     it "swaps the info links for the news links" do
       expect(component.text).to_not match "Where"
-      expect(component.css("a[href='#{news_index_path}'].active").count).to eq 1
+      expect(component.css("a[href='#{news_index_path}'][aria-current]").count).to eq 1
       expect(component.text).to match "Bike Index Store"
     end
   end

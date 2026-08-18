@@ -104,7 +104,7 @@ RSpec.describe Org::MenuItems::Component, type: :component do
             render_inline(described_class.new(organization:, current_user:, controller_namespace:,
               controller_name: sequences_controller, action_name:))
           }
-          active = rendered.css("a.nav-link.active").map { |a| a.text.strip }
+          active = rendered.css("a.nav-link[aria-current]").map { |a| a.text.strip }
           expect(active).to include("Manage Registration sequences")
         end
       end

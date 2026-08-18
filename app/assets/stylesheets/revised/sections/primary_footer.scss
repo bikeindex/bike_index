@@ -15,7 +15,7 @@ $primary-footer-top-margin: 6 * $vertical-height;
 
     &:hover,
     &:active,
-    &.active {
+    &[aria-current] {
       text-decoration: underline;
     }
   }

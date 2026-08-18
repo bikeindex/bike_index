@@ -18,6 +18,46 @@ RSpec.describe Register::Step2::Component, type: :component do
       steps: BikeServices::Register.steps(reloaded, sequence: nil)))
   end
 
+  describe "the organization checkbox" do
+    # tw:hidden rather than absent, so checking the box again has something to bring back
+    def organization_target(name) = page.find("[data-register--organization-target='#{name}']", visible: :all)
+
+    it "isn't offered for an organization a link named" do
+      render_step_2
+      expect(page).to_not have_field("register_with_organization")
+    end
+
+    context "assigned automatically" do
+      let(:params) { super().merge(auto_organization_id: organization.id) }
+      before { organization.update_column :enabled_feature_slugs, %w[reg_student_id reg_address] }
+
+      it "offers it checked, heading the fields it decides" do
+        render_step_2
+        expect(page).to have_checked_field("register_with_organization")
+        expect(page).to have_field("bike[student_id]")
+        expect(organization_target("field")[:class]).to_not include "tw:hidden"
+        expect(organization_target("statusField")["data-organization-off"]).to be_blank
+        expect(organization_target("label").text).to match(/information for/i)
+      end
+
+      context "dropped" do
+        let(:params) { {bike: {owner_email: "owner@bikeindex.org", manufacturer_id: 12}, auto_organization_id: organization.id} }
+
+        it "offers it unchecked, with what it asks for collapsed rather than gone" do
+          render_step_2
+          expect(page).to have_unchecked_field("register_with_organization")
+          expect(page).to have_field("bike[student_id]")
+          expect(organization_target("field")[:class]).to include "tw:hidden"
+          expect(organization_target("statusField")["data-organization-off"]).to eq "true"
+
+          label = organization_target("label")
+          expect(label.text).to match(/contact info/i)
+          expect(JSON.parse(label["data-texts"])["on"]).to match(/information for/i)
+        end
+      end
+    end
+  end
+
   describe "the bike sticker field" do
     # reg_bike_sticker rides along with bike_stickers (Organization#enabled_feature_slugs),
     # which update_column skips - so both are set here the way it would leave them
