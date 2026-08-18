@@ -27,6 +27,8 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     end
   end
 
+  # Only :path can say "page" — the widened matches go active on a page the link doesn't
+  # point at, so they say "true"
   describe "match" do
     context ":full_path" do
       let(:path) { "/o/example/bikes/new?parking_notification=true" }
@@ -88,7 +90,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
   context "with a class in html_options" do
     let(:options) { {class: "nav-link"} }
 
-    it "raises, since the component builds its own" do
+    it "raises, since html_class is the way in" do
       expect { component }.to raise_error(ArgumentError, /html_class/)
     end
   end
@@ -101,6 +103,16 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
       expect(link["target"]).to eq "_blank"
       expect(link["data-turbo"]).to eq "false"
       expect(link["data-controller"]).to eq "ui--dropdown ui--active-link"
+    end
+
+    context "including aria" do
+      let(:request_url) { path }
+      let(:options) { {aria: {label: "Help center"}} }
+
+      it "keeps them, alongside the current it marks" do
+        expect(link["aria-label"]).to eq "Help center"
+        expect(link["aria-current"]).to eq "page"
+      end
     end
   end
 

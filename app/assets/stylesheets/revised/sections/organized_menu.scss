@@ -108,7 +108,7 @@ $organized-menu-bg: $gray-lighter;
         color: $less-strong-font-color;
       }
 
-      .active {
+      [aria-current] {
         color: $blue;
         position: relative;
         font-weight: bold;

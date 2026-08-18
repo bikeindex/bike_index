@@ -15,7 +15,7 @@ module UI
       def initialize(path:, text: nil, match: :path, matching_controllers: [], html_class: nil,
         data: {}, **html_options)
         raise_if_invalid_value!(:match, match, MATCHES)
-        # The component builds its own class, so a passed one is dropped rather than merged
+        # html_class is what reaches the anchor, so a passed class would be dropped rather than merged
         raise ArgumentError, "class is not supported, you must use the keyword arg html_class" if html_options.key?(:class)
 
         @path = path
@@ -28,7 +28,7 @@ module UI
       end
 
       def call
-        link_to(link_text, @path, **@html_options, class: @html_class, data: link_data)
+        link_to(link_text, @path, **@html_options, class: @html_class.presence, data: link_data)
       end
 
       private
