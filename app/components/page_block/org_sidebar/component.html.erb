@@ -132,29 +132,25 @@
         "
       >
         <div class="tw:flex tw:items-center tw:gap-2">
-          <span class="tw:group-data-[collapsed=true]/sidebar:hidden <%= PageBlock::OrgSidebar::Component::ADMIN_PANEL %>">
-            <%= translation(".powered_by") %>
-          </span>
-
           <%= image_tag "logos/logo_backgrounded_black.svg", alt: "Bike Index", class: "tw:h-[28px] tw:w-auto" %>
+
+          <span class="tw:group-data-[collapsed=true]/sidebar:hidden <%= PageBlock::OrgSidebar::Component::ADMIN_PANEL %>">
+            <%= translation(".admin_panel") %>
+          </span>
         </div>
 
         <% if avatar_url %>
           <%= image_tag avatar_url, alt: translation(".organization_crest", org_name: @organization.name), class: "tw:h-[112px] tw:w-[112px] tw:object-contain tw:transition-all tw:duration-200 tw:group-data-[collapsed=true]/sidebar:h-[38px] tw:group-data-[collapsed=true]/sidebar:w-[38px]" %>
         <% end %>
 
-        <div
+        <span
           class="
-            tw:flex tw:flex-col tw:items-center tw:gap-px
+            tw:text-[19px] tw:font-extrabold tw:tracking-tight
             tw:group-data-[collapsed=true]/sidebar:hidden
           "
         >
-          <span class="<%= PageBlock::OrgSidebar::Component::ADMIN_PANEL %>">
-            <%= translation(".admin_panel") %>
-          </span>
-
-          <span class="tw:text-[19px] tw:font-extrabold tw:tracking-tight"><%= @organization.name %></span>
-        </div>
+          <%= @organization.name %>
+        </span>
       </div>
 
       <div class="tw:flex tw:flex-none tw:flex-col tw:gap-px tw:pt-1.5 tw:pb-2.5">
