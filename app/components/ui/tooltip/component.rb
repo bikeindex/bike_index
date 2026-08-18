@@ -75,7 +75,7 @@ module UI
           role: "tooltip",
           id: tooltip_id,
           data: {"ui--tooltip-target": "tooltip"},
-          class: "twtext-color tw:hidden #{pointer} tw:whitespace-nowrap tw:rounded " \
+          class: "tw:twtext-color tw:hidden #{pointer} tw:whitespace-nowrap tw:rounded " \
             "tw:bg-white tw:px-2 tw:py-1 tw:text-xs tw:font-normal tw:border tw:border-gray-200 tw:shadow-lg tw:z-50 " \
             "tw:dark:bg-gray-800 tw:dark:border-gray-700"
         )

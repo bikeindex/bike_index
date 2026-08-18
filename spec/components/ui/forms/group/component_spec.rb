@@ -207,7 +207,7 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
   # has to beat Bootstrap's `.container label`, which is inline-block with a
   # .5rem margin and only applies inside a container.
   describe ".twlabel" do
-    let(:rule) { Rails.root.join("app/assets/tailwind/application.css").read[/^\s*\.twlabel \{(.*?)\}/m, 1] }
+    let(:rule) { Rails.root.join("app/assets/tailwind/bike_index_components.css").read[/^\s*\.twlabel \{(.*?)\}/m, 1] }
 
     it "is block, with the gap to its field" do
       expect(rule).to include("tw:block")

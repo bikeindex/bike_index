@@ -35,7 +35,7 @@
     </p>
     <% if organization_email.present? %>
       <p class="tw:mt-1 tw:text-sm tw:opacity-65">
-        <%= translation(".please_email_organization_with_questions_html", email_link: mail_to(organization_email, class: "twlink")) %>
+        <%= translation(".please_email_organization_with_questions_html", email_link: mail_to(organization_email, class: "twlink-underlined")) %>
       </p>
     <% end %>
   <% end %>
