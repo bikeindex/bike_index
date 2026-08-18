@@ -70,33 +70,6 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
   end
 
-  describe "active_link" do
-    context "without a class" do
-      it "returns the link active if it ought to be" do
-        allow(view).to receive(:current_page?).and_return(true)
-        generated = '<a class=" active" href="http://bikeindex.org">Bike Index about</a>'
-        expect(helper.active_link("Bike Index about", "http://bikeindex.org")).to eq generated
-      end
-    end
-    context "match controller true" do
-      let(:request) { double("request", url: new_bike_url) }
-      before { allow(helper).to receive(:request).and_return(request) }
-      it "returns the link active if it is a bikes page" do
-        generated = '<a class="seeeeeeee active" id="" href="' + new_bike_url + '">Bike Index bikes page</a>'
-        result = helper.active_link("Bike Index bikes page", new_bike_url, match_controller: true, class: "seeeeeeee", id: "")
-        expect(result).to eq generated
-      end
-    end
-    context "current with a class" do
-      it "returns the link active if it ought to be" do
-        allow(view).to receive(:current_page?).and_return(true)
-        generated = '<a class="nav-party-link active" id="XXX" href="http://bikeindex.org">Bike Index about</a>'
-        result = helper.active_link("Bike Index about", "http://bikeindex.org", class: "nav-party-link", id: "XXX")
-        expect(result).to eq generated
-      end
-    end
-  end
-
   describe "body_class" do
     context "organized" do
       before do

@@ -282,10 +282,8 @@ class GraduatedNotification < ApplicationRecord
     pending_period_ends_at > Time.current
   end
 
-  def mark_remaining!(marked_remaining_by_id: nil, skip_async: false)
-    unless skip_async
-      MarkGraduatedNotificationRemainingJob.perform_in(5, id, marked_remaining_by_id)
-    end
+  def mark_remaining!(marked_remaining_by_id: nil)
+    MarkGraduatedNotificationRemainingJob.perform_in(5, id, marked_remaining_by_id)
     MarkGraduatedNotificationRemainingJob.new.perform(id, marked_remaining_by_id)
   end
 
