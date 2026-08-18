@@ -12,6 +12,10 @@ The Claude Code web sandbox is the case that has neither: no GitHub CLI, and an 
 
 **Skipping means posting nothing at all**, not posting something else. Substitute evidence — a rendered-HTML diff, a note about what couldn't be captured — reads as a fine idea in the moment and leaves a comment the next run can't find or replace, because it isn't the `## Screenshots` comment. That's how #4126 ended up with three comments telling one story. If the evidence is worth having, put it in your summary to the user and let them decide where it goes.
 
+## Preflight: a CSS diff needs a fresh tailwind build
+
+When the diff touches `app/assets/tailwind/**`, check that `app/assets/builds/tailwind.css` contains the branch's new rules before capturing — another checkout's watcher can leave it stale for hours, and the capture then documents the bug the PR fixes. Ask the user to restart `bin/dev`; never rebuild it yourself.
+
 ## 1. Decide whether screenshots are needed and which URLs to capture
 
 You're only here because the diff is frontend (SKILL.md's classifier gates on that). Decide scope by PR state:
