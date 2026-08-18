@@ -33,7 +33,7 @@ Scope it rather than running bare `bin/lint`: a whole-repo run reformats files o
 - Labels should use the `twlabel` class.
 - Basic links should use the `twlink` class.
 - A link that should take the color of the text around it — inside an alert, a colored `<small>`, the review-app banner — uses `twlink-underlined` instead. Never hand-roll `tw:text-inherit tw:underline`. Its color must come from an ancestor, not a `tw:text-*` on the link itself, which would outrank the class at every state.
-- The default text color is `tw:twtext-color` (`tw:twtext-color!` to force it). Prefixed because it's an `@utility`, not a class in the `@layer components` block: **a Bike Index class that anything `@apply`s has to be an `@utility`** — v4's `@apply` rejects a components-layer class with "Cannot apply unknown utility class". Both live in `app/assets/tailwind/bike_index_components.css`; `tw:base-font` is the other one.
+- The default text color is `tw:twtext-color` (`tw:twtext-color!` to force it). It's an `@utility`, hence the `tw:` prefix — **any Bike Index class that something `@apply`s has to be an `@utility`**; v4's `@apply` rejects a `@layer components` class with "Cannot apply unknown utility class".
 - **Every number** should be rendered with `number_display(number)`. This applies even when a number is composed into a string with non-numeric values — wrap the number itself, not the surrounding string.
   - Good: `[number_display(@bike.year), @bike.mnfg_name].join(" ")`
   - Bad: `[@bike.year, @bike.mnfg_name].join(" ")`

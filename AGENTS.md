@@ -75,7 +75,7 @@ Worth delegating enumeration at all rather than eyeballing a grep: in that same 
 
 Uses RSpec. All business logic should be tested. The `rspec-testing` skill covers project-specific style (`context`+`let`, request specs over controller specs, avoiding mocks). A test that fails intermittently is the `fixing-flaky-failures` skill — coverage is never what gives way to make CI green.
 
-**Verify with `bundle exec rspec` over the spec paths your change touches.** Not `bin/turbo_tests`, whose eight parallel workers are for the whole suite, and **not `bin/ci`** unless you're asked for it or a specific question needs the full suite — CI runs that on push. `bin/turbo_tests` is also what precompiles assets, so a `:js` spec run in a workspace where `bin/dev` has never run raises `Sprockets::Rails::Helper::AssetNotFound`; the fix is `bundle exec rails tailwindcss:build`, not switching runners.
+**Verify with `bundle exec rspec` over the spec paths your change touches** — not `bin/turbo_tests` or `bin/ci`, whole-suite runners CI already does on push. A `:js` spec failing on a missing Tailwind build is the `sandbox-test-setup` skill, not a reason to switch runners.
 
 **Never hand-edit a VCR cassette**, and never `git checkout` away one a spec run re-recorded — cassettes only change by being recorded, and a re-recording gets committed on whatever branch you're on. To clear stale contents, `rm` the file and re-run the spec.
 
