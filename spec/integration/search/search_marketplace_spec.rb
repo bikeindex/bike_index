@@ -78,6 +78,9 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   # matching option, then submit. Works whether the combobox starts empty or
   # already has a selection (set replaces the existing text).
   def search_primary_activity(display_name)
+    # Each call follows a page load, and a combobox typed into before its controller connects
+    # swallows the first character
+    wait_for_stimulus
     type_into("#primary_activity", display_name)
     expect(page).to have_css(".hw-combobox__option", text: display_name, wait: 5)
     click_combobox_option(display_name)

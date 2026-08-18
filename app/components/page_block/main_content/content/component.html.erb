@@ -66,8 +66,7 @@
           <ul class="tw:m-0 tw:mb-4 tw:list-none">
             <% if content_page_type == "news" %>
               <li>
-                <%= render UI::ActiveLink::Component.new(text: translation(".bike_index_news"), path: news_index_path,
-                      active: @action_name == "index" && !helpers.sortable_search_params?) %>
+                <%= render UI::ActiveLink::Component.new(text: translation(".bike_index_news"), path: news_index_path) %>
               </li>
             <% end %>
 

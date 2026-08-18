@@ -21,7 +21,7 @@ module PageBlock
              path: edit_my_account_path,
              html_options: {id: "navUserSettingLink", data: {email: @current_user_or_unconfirmed_user.email}}},
             {type: :divider},
-            {label: translation(".logout"), path: goodbye_path, active: false}].compact
+            {label: translation(".logout"), path: goodbye_path}].compact
         end
 
         def organization_items
@@ -31,7 +31,7 @@ module PageBlock
 
           organizations.map { |organization|
             {label: translation(".view_org", org_name: organization.name),
-             path: organization_root_path(organization_id: organization.to_param), active: false}
+             path: organization_root_path(organization_id: organization.to_param)}
           } + [{type: :divider}]
         end
 
