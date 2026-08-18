@@ -69,11 +69,9 @@ before debugging the code:
 grep -o "controllers/page_block/[a-z_]*controller[^\"]*" public/assets/.sprockets-manifest.json | head
 ```
 
-Then refresh it the way CI does (`.github/workflows/ci.yml` precompiles before
-the suite) — or delete `public/assets`, which is gitignored and which neither
-`bin/dev` nor the test environment needs, since both compile live without it.
-Deleting is the lighter fix; **it's the user's tree, so ask first** rather than
-removing build output on your own.
+Then delete `public/assets`. It's gitignored, and neither `bin/dev` nor the test
+environment needs it — both compile live without it. **It's the user's tree, so
+ask first.**
 
 ## Whose machine it is decides who starts `bin/dev`
 
