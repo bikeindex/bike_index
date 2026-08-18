@@ -9,6 +9,7 @@ en:
         logout: Log out
         menu: Menu
         organization_crest: "%{org_name} crest"
+        powered_by: POWERED BY
         register_a_new_bike: Register a new bike
         user_settings: "%{user_email} settings"
         your_registrations: Your registrations

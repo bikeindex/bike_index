@@ -28,11 +28,22 @@
       tw:min-[760px]:hidden tw:dark:border-gray-700 tw:dark:bg-gray-800
     "
   >
+    <%= image_tag "logos/logo_backgrounded_black.svg", alt: "Bike Index", class: "tw:h-[34px] tw:w-auto" %>
+
     <% if avatar_url %>
+      <div
+        class="tw:h-[30px] tw:w-px tw:bg-gray-200 tw:dark:bg-gray-700"
+        aria-hidden="true"
+      ></div>
+
       <%= image_tag avatar_url, alt: translation(".organization_crest", org_name: @organization.name), class: "tw:h-[34px] tw:w-[34px] tw:object-contain" %>
     <% end %>
 
-    <span class="tw:text-base tw:font-extrabold tw:tracking-tight"><%= @organization.short_name %></span>
+    <div class="tw:flex tw:flex-col tw:gap-px">
+      <span class="<%= PageBlock::OrgSidebar::Component::ADMIN_PANEL %>"><%= translation(".admin_panel") %></span>
+
+      <span class="tw:text-base tw:font-extrabold tw:tracking-tight"><%= @organization.short_name %></span>
+    </div>
 
     <div class="tw:flex-1"></div>
 
@@ -120,6 +131,14 @@
           tw:group-data-[collapsed=true]/sidebar:pb-2.5 tw:min-[760px]:flex
         "
       >
+        <div class="tw:flex tw:items-center tw:gap-2">
+          <span class="tw:group-data-[collapsed=true]/sidebar:hidden <%= PageBlock::OrgSidebar::Component::ADMIN_PANEL %>">
+            <%= translation(".powered_by") %>
+          </span>
+
+          <%= image_tag "logos/logo_backgrounded_black.svg", alt: "Bike Index", class: "tw:h-[28px] tw:w-auto" %>
+        </div>
+
         <% if avatar_url %>
           <%= image_tag avatar_url, alt: translation(".organization_crest", org_name: @organization.name), class: "tw:h-[112px] tw:w-[112px] tw:object-contain tw:transition-all tw:duration-200 tw:group-data-[collapsed=true]/sidebar:h-[38px] tw:group-data-[collapsed=true]/sidebar:w-[38px]" %>
         <% end %>
@@ -130,12 +149,7 @@
             tw:group-data-[collapsed=true]/sidebar:hidden
           "
         >
-          <span
-            class="
-              tw:text-[10.5px] tw:font-bold tw:tracking-[0.14em]
-              tw:text-gray-400
-            "
-          >
+          <span class="<%= PageBlock::OrgSidebar::Component::ADMIN_PANEL %>">
             <%= translation(".admin_panel") %>
           </span>
 

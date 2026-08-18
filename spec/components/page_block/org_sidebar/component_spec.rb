@@ -16,6 +16,8 @@ RSpec.describe PageBlock::OrgSidebar::Component, type: :component do
     expect(component).to have_css "nav#org_sidebar_nav"
     expect(component).to have_text "ADMIN PANEL"
     expect(component).to have_text "Brakebills"
+    # The mobile bar carries its own copy of the logo
+    expect(component).to have_css "img[alt='Bike Index']", count: 2
 
     expect(component.css("[aria-controls^='org_sidebar_group_']").map { |button| button.text.strip })
       .to eq(["Brakebills Registrations", "Impounded Vehicles", "Parking Notifications",
