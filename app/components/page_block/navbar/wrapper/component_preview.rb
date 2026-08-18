@@ -22,12 +22,6 @@ module PageBlock
         end
 
         # @display legacy_stylesheet true
-        def with_organization
-          render(PageBlock::Navbar::Wrapper::Component.new(**PAGE, current_user: lookbook_user,
-            current_user_or_unconfirmed_user: lookbook_user, passive_organization: lookbook_organization))
-        end
-
-        # @display legacy_stylesheet true
         def logo_only
           render(PageBlock::Navbar::Wrapper::Component.new(logo_only: true))
         end

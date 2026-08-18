@@ -5014,7 +5014,6 @@ en:
       stolen_hot_sheet: Stolen Bike Hot Sheet
       stolen_hot_sheet_configuration: Stolen Bike Hot Sheet configuration
       stolen_message: Stolen Message
-      super_admin_view: Super Admin for %{org_name}
     recovery_display:
       bike: Bike
       recovered_date: recovered %{date}

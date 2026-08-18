@@ -6,10 +6,8 @@ RSpec.describe PageBlock::Navbar::Wrapper::Component, type: :component do
   it_behaves_like "cached_markup_digest"
 
   let(:current_user) { nil }
-  let(:passive_organization) { nil }
   let(:instance) do
-    described_class.new(current_user:, current_user_or_unconfirmed_user: current_user, passive_organization:,
-      page_id: "welcome_index")
+    described_class.new(current_user:, current_user_or_unconfirmed_user: current_user, page_id: "welcome_index")
   end
   # The request drives UI::ActiveLink, which resolves the items that pass no :active
   let(:component) { with_request_url("/") { render_inline(instance) } }
@@ -25,20 +23,12 @@ RSpec.describe PageBlock::Navbar::Wrapper::Component, type: :component do
   context "with a current_user" do
     let(:current_user) { FactoryBot.create(:user_confirmed) }
 
+    # PageBlock::OrgSidebar renders instead of this whole navbar for a reader with a
+    # passive organization, so the navbar no longer takes one at all
     it "drops the signup link without adding an organization menu" do
       expect(component).to_not have_css "a.center-navbar-signup-link"
       expect(component).to_not have_css "#passive_organization_submenu"
       expect(component).to have_css "#setting_submenu"
-    end
-
-    context "with a passive_organization" do
-      let(:passive_organization) { FactoryBot.create(:organization, short_name: "Sweet") }
-
-      # PageBlock::OrgSidebar renders instead of this whole navbar for those readers
-      it "renders no organization menu" do
-        expect(component).to_not have_css "#passive_organization_submenu"
-        expect(component).to_not have_text "Sweet"
-      end
     end
   end
 

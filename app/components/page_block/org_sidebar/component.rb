@@ -13,8 +13,8 @@ module PageBlock
       MATCHES = UI::ActiveLink::Component.match_table(auto: :path, match_controller: :controller,
         on_registrations_index: :controller_action)
 
-      # A top-level row: the group toggles, the leaf links and the leaves with nothing
-      # to link to all sit on this, so they stay the same height as each other
+      # A top-level row -- the group toggles and the leaf links share it, so they stay
+      # the same height as each other
       ROW = "tw:mx-2 tw:flex tw:items-center tw:gap-[11px] tw:rounded-[11px] tw:px-3 tw:py-[9px] " \
         "tw:text-sm tw:font-bold tw:group-data-[collapsed=true]/sidebar:justify-center tw:max-[760px]:py-3.5"
       ROW_HOVER = "tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700"
@@ -68,7 +68,7 @@ module PageBlock
       end
 
       def row_class(active)
-        [ROW, ROW_HOVER, active ? ROW_CURRENT : ROW_RESTING].join(" ")
+        [ROW, ROW_HOVER, "tw:no-underline", active ? ROW_CURRENT : ROW_RESTING].join(" ")
       end
 
       def child_class(active)
@@ -91,18 +91,23 @@ module PageBlock
       def active_group
         return @active_group if defined?(@active_group)
 
-        @active_group = groups.find { |group| group_active?(group) }
+        @active_group = groups.find { |group|
+          group[:children].any? { |child| child[:type] == :link && active_link?(child) }
+        }
       end
 
-      def group_active?(group)
-        group[:children].any? { |child| child[:type] == :link && active_link?(child) }
+      # Memoized because the template asks again for every row the scan above resolved,
+      # and a :controller_action row costs two recognize_path calls
+      def active_link?(item)
+        cache = (@active_links ||= {})
+        key = [item[:path], item[:active]]
+        cache.fetch(key) { cache[key] = resolve_active(item) }
       end
 
-      # Resolves the per-request active state the cached payload deferred, returning
-      # true/false so the template never has to ask. Only two states are left that a path
+      # The per-request state the cached payload deferred. Only two are left that a path
       # can't answer: add-a-bike has to stay dark on the notification's variant of its own
       # url, and a sequence's pages are their own controller
-      def active_link?(item)
+      def resolve_active(item)
         match = MATCHES[item[:active]]
         return UI::ActiveLink::Component.active?(path: item[:path], match:, view: helpers) if match
 
@@ -110,7 +115,6 @@ module PageBlock
         when :on_bikes_new then on_bikes_new? && @unregistered_parking_notification.blank?
         when :on_registration_sequences
           organized_controller?("registration_sequences", "registration_sequence_pages")
-        else item[:active] == true
         end
       end
 
@@ -123,7 +127,9 @@ module PageBlock
       end
 
       def avatar_url
-        OrganizationDisplayer.avatar?(@organization) ? @organization.avatar.url(:medium) : nil
+        return @avatar_url if defined?(@avatar_url)
+
+        @avatar_url = OrganizationDisplayer.avatar?(@organization) ? @organization.avatar.url(:medium) : nil
       end
 
       def icon(name, html_class:)

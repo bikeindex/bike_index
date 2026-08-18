@@ -95,7 +95,7 @@ RSpec.describe OrganizedServices::SidebarMenu do
       it "renders the one row with nowhere to link as disabled" do
         impounded = items.find { |item| item[:key] == :impounded }
 
-        expect(impounded[:children].last).to eq({type: :disabled, label: "Add an Impounded Vehicle", icon: nil})
+        expect(impounded[:children].last).to eq({type: :disabled, label: "Add an Impounded Vehicle"})
         expect(items.select { |item| item[:type] == :disabled }).to eq([])
       end
 

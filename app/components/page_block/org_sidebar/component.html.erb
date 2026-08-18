@@ -156,7 +156,7 @@
             ></div>
           <% when :group %>
             <% open = open_group?(item) %>
-            <% active = group_active?(item) %>
+            <% active = item == active_group %>
 
             <div data-controller="ui--collapse" class="tw:contents">
               <button
@@ -204,27 +204,11 @@
                 <% end %>
               </div>
             </div>
-          <% when :disabled %>
-            <span
-              class="tw:text-gray-400 <%= PageBlock::OrgSidebar::Component::ROW %>"
-              title="<%= item[:label] %>"
-            >
-              <span class="tw:flex tw:flex-none"><%= icon(item[:icon], html_class: "tw:h-[17px] tw:w-[17px]") %></span>
-
-              <span
-                class="
-                  tw:flex-1 tw:whitespace-nowrap
-                  tw:group-data-[collapsed=true]/sidebar:hidden
-                "
-              >
-                <%= item[:label] %>
-              </span>
-            </span>
           <% when :link %>
             <% active = active_link?(item) %>
 
             <%= link_to item[:path],
-                class: "#{row_class(active)} tw:no-underline",
+                class: row_class(active),
                 aria: {current: active ? "page" : nil} do %>
               <span class="tw:flex tw:flex-none"><%= icon(item[:icon], html_class: "tw:h-[17px] tw:w-[17px]") %></span>
 

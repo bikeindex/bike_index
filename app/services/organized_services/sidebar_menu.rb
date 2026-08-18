@@ -22,9 +22,6 @@ module OrganizedServices
   module SidebarMenu
     extend Functionable
 
-    # Add an Impounded Vehicle is in the design with nothing to link to — organized
-    # routes no impound_records#new — so it renders greyed rather than being dropped,
-    # and the menu keeps the design's shape.
     def for(organization:, current_user:)
       return [] if organization.nil? || current_user.nil?
 
@@ -37,25 +34,26 @@ module OrganizedServices
     # private below here
     #
 
+    # Sections rather than a flat list, so a section gated off entirely takes the
+    # divider above it with it
     def build_items(organization, current_user)
       return ambassador_items(organization) if organization.ambassador?
 
-      strip_dividers([
-        registrations_group(organization),
-        add_bike_link(organization),
-        divider,
-        impounded_group(organization),
-        parking_group(organization),
-        bulk_group(organization),
-        lightspeed_link(organization),
-        messaging_link(organization, current_user),
-        model_audits_link(organization),
-        graduated_link(organization),
-        hot_sheet_link(organization),
-        reports_link(organization),
-        divider,
-        settings_group(organization, current_user)
-      ].compact)
+      admin = current_user.admin_of?(organization)
+
+      [[registrations_group(organization), add_bike_link(organization)],
+        [impounded_group(organization),
+          parking_group(organization),
+          bulk_group(organization),
+          lightspeed_link(organization),
+          messaging_link(organization, admin),
+          model_audits_link(organization),
+          graduated_link(organization),
+          hot_sheet_link(organization),
+          reports_link(organization)],
+        [settings_group(organization, admin)]]
+        .map(&:compact).reject(&:empty?)
+        .inject { |items, section| items + [divider] + section }
     end
 
     # Organized::BaseController bars an ambassador organization from every controller
@@ -79,35 +77,19 @@ module OrganizedServices
       ]
     end
 
-    # A gated-off group leaves the divider that separated it behind
-    def strip_dividers(items)
-      items.chunk_while { |a, b| a[:type] == :divider && b[:type] == :divider }
-        .map(&:first)
-        .drop_while { |item| item[:type] == :divider }
-        .reverse.drop_while { |item| item[:type] == :divider }.reverse
-    end
-
     def registrations_group(organization)
       children = [
         link(translation(:search_registrations),
           routes.organization_registrations_path(organization_id: organization.to_param),
           active: :on_registrations_index),
-        (if organization.enabled?("show_partial_registrations")
-           link(translation(:incomplete_registrations),
-             routes.incompletes_organization_bikes_path(organization.to_param))
-         end),
-        (if organization.enabled?("bike_search")
-           link(translation(:multi_search),
-             routes.multi_search_organization_registrations_path(organization.to_param))
-         end),
-        (if organization.enabled?("show_recoveries")
-           link(translation(:recoveries), routes.recoveries_organization_bikes_path(organization.to_param))
-         end),
-        (if organization.enabled?("bike_stickers")
-           link(translation(:registration_stickers),
-             routes.organization_stickers_path(organization_id: organization.to_param),
-             active: :match_controller)
-         end)
+        enabled_link(organization, "show_partial_registrations", translation(:incomplete_registrations),
+          routes.incompletes_organization_bikes_path(organization.to_param)),
+        enabled_link(organization, "bike_search", translation(:multi_search),
+          routes.multi_search_organization_registrations_path(organization.to_param)),
+        enabled_link(organization, "show_recoveries", translation(:recoveries),
+          routes.recoveries_organization_bikes_path(organization.to_param)),
+        enabled_link(organization, "bike_stickers", translation(:registration_stickers),
+          routes.organization_stickers_path(organization_id: organization.to_param), active: :match_controller)
       ]
 
       group(:registrations, translation(:org_registrations, org_name: organization.short_name), "bike", children)
@@ -119,7 +101,9 @@ module OrganizedServices
     end
 
     # Managing impounding is the settings group's, which is where the org's other
-    # configuration lives -- this group is for the vehicles themselves
+    # configuration lives -- this group is for the vehicles themselves. Add an Impounded
+    # Vehicle is in the design with nothing to link to, since organized routes no
+    # impound_records#new, so it renders greyed rather than the menu losing the row
     def impounded_group(organization)
       return nil unless organization.enabled?("impound_bikes")
 
@@ -158,10 +142,8 @@ module OrganizedServices
            link(import_label, routes.organization_bulk_imports_path(organization_id: organization.to_param),
              active: :match_controller)
          end),
-        (if organization.enabled?("csv_exports")
-           link(translation(:exports), routes.organization_exports_path(organization_id: organization.to_param),
-             active: :match_controller)
-         end)
+        enabled_link(organization, "csv_exports", translation(:exports),
+          routes.organization_exports_path(organization_id: organization.to_param), active: :match_controller)
       ]
 
       group(:bulk, translation(:bulk_import_and_export), "import-export", children)
@@ -178,8 +160,8 @@ module OrganizedServices
     # Organized::EmailsController only lets a member at #show, so this needs the admin
     # check the settings group gets from being admin-only. Without customize_emails there
     # is no index to send them to, and the stolen message is the one email they can edit
-    def messaging_link(organization, current_user)
-      return nil unless admin?(organization, current_user)
+    def messaging_link(organization, admin)
+      return nil unless admin
 
       if organization.enabled?("customize_emails")
         link(translation(:messaging), routes.organization_emails_path(organization_id: organization.to_param),
@@ -222,8 +204,8 @@ module OrganizedServices
         icon: "bar-chart", active: :match_controller)
     end
 
-    def settings_group(organization, current_user)
-      return nil unless admin?(organization, current_user)
+    def settings_group(organization, admin)
+      return nil unless admin
 
       children = [
         link(translation(:org_profile, org_name: organization.short_name),
@@ -232,26 +214,16 @@ module OrganizedServices
           routes.locations_organization_manage_path(organization_id: organization.to_param)),
         link(translation(:manage_users),
           routes.organization_users_path(organization_id: organization.to_param), active: :match_controller),
-        (if organization.enabled?("impound_bikes")
-           link(translation(:impounding),
-             routes.edit_organization_manage_impounding_path(organization_id: organization.to_param))
-         end),
-        (if organization.enabled?("hot_sheet")
-           link(translation(:stolen_hot_sheet),
-             routes.edit_organization_hot_sheet_path(organization_id: organization.to_param))
-         end),
-        (if organization.enabled?("registration_sequences")
-           link(translation(:manage_registration_sequences),
-             routes.organization_registration_sequences_path(organization_id: organization.to_param),
-             active: :on_registration_sequences)
-         end)
+        enabled_link(organization, "impound_bikes", translation(:impounding),
+          routes.edit_organization_manage_impounding_path(organization_id: organization.to_param)),
+        enabled_link(organization, "hot_sheet", translation(:stolen_hot_sheet),
+          routes.edit_organization_hot_sheet_path(organization_id: organization.to_param)),
+        enabled_link(organization, "registration_sequences", translation(:manage_registration_sequences),
+          routes.organization_registration_sequences_path(organization_id: organization.to_param),
+          active: :on_registration_sequences)
       ]
 
       group(:settings, translation(:org_settings, org_name: organization.short_name), "gear", children)
-    end
-
-    def admin?(organization, current_user)
-      current_user.admin_of?(organization) || current_user.superuser?
     end
 
     def group(key, label, icon, children)
@@ -265,8 +237,12 @@ module OrganizedServices
       {type: :link, label:, path:, icon:, active:}
     end
 
-    def disabled(label, icon: nil)
-      {type: :disabled, label:, icon:}
+    def enabled_link(organization, feature, label, path, **options)
+      link(label, path, **options) if organization.enabled?(feature)
+    end
+
+    def disabled(label)
+      {type: :disabled, label:}
     end
 
     def divider
@@ -281,9 +257,9 @@ module OrganizedServices
       Rails.application.routes.url_helpers
     end
 
-    conceal :build_items, :ambassador_items, :strip_dividers, :registrations_group, :add_bike_link,
-      :impounded_group, :parking_group, :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link,
-      :graduated_link, :hot_sheet_link, :reports_link, :settings_group, :admin?, :group, :link, :disabled,
+    conceal :build_items, :ambassador_items, :registrations_group, :add_bike_link, :impounded_group,
+      :parking_group, :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link, :graduated_link,
+      :hot_sheet_link, :reports_link, :settings_group, :group, :link, :enabled_link, :disabled,
       :divider, :translation, :routes
   end
 end

@@ -103,8 +103,13 @@ export default class extends Controller {
     this.mobileToggleTarget.setAttribute('aria-expanded', open)
   }
 
+  // resize fires continuously through a drag, where collapsed crosses a breakpoint at
+  // most twice -- and every write here invalidates style for the whole document
   render () {
     const { collapsed } = this
+    if (collapsed === this.rendered) return
+
+    this.rendered = collapsed
     this.element.dataset.collapsed = collapsed
 
     const { collapseLabel, expandLabel } = this.collapseToggleTarget.dataset
