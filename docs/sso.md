@@ -17,10 +17,9 @@ Code: `saml_controller.rb`, `app/services/saml/`, `app/models/organization_saml_
 Deterministic coverage lives in `spec/requests/saml_callback_request_spec.rb`, which signs
 (and encrypts) its own assertions in-process.
 
-## Trust: two certificates, neither bought from a CA
+## Trust: two certificates
 
-SAML trust comes from the metadata two parties exchange, not from a CA chain — a self-signed
-certificate is correct here, not a shortcut.
+SAML trust comes from the metadata two parties exchange, not from a CA chain.
 
 | | Ours (the SP) | Theirs (the IdP) |
 |---|---|---|
@@ -86,6 +85,45 @@ Two jobs, and the second is a security boundary:
   address, including a superuser's, and be believed.
 
 One SSO organization per domain (uniqueness-guarded), and step 6 won't save without it.
+
+### Before you flip it live
+
+What changes under people who already have accounts. Nothing here is a production count — these
+are the cohorts to go count.
+
+**Announce it first.** `redirect_forced_saml` fires on submit, not on render: the login form
+still draws, and the redirect happens once the email is posted. Nobody is emailed. Anyone on
+that domain who has been using a password just starts landing at the IdP. This is the cohort
+most likely to generate support tickets.
+
+**Check for superusers on the domain.** The guard has no bypass. If the IdP config is wrong or
+the IdP is down, an admin whose address is on that domain cannot get in with a password. Move
+the address, or keep at least one admin account off-domain.
+
+**Sweep the data first.** `user_email_domain` predates its own validations, so a row containing
+`@`, missing a `.`, or duplicating another organization makes that record unsaveable — an admin
+editing an unrelated field gets a validation error they didn't cause. Duplicates across SSO orgs
+resolve by query order. Check for consumer domains (`gmail.com`) sitting in that column, and for
+organizations with a domain set but neither feature enabled — enabling either changes behavior
+for everyone on the domain immediately, with no staged rollout.
+
+**The secondary-email asymmetry** is the likeliest thing to be missed, because the two halves
+disagree. Routing keys off the single submitted string; linking searches confirmed
+`user_emails` first (`User.fuzzy_confirmed_or_unconfirmed_email_find`). So a user whose primary
+address is off-domain but who holds a confirmed secondary on the SSO domain is *not* forced to
+SSO — they type their primary and get a password prompt as always. Forced SSO is effectively
+opt-out for anyone willing to make a personal address primary. If that same user does go
+through the IdP, they link to the existing account rather than getting a duplicate.
+
+**Pin the NameID format with the IdP.** `SsoIdentity` is unique on
+`(organization_id, provider, uid)` where `uid` is the asserted NameID. A **transient** NameID
+mints a new identity row on every login. `name_id_format` is stored but never enforced — and
+there is no field for it on the admin form, though it is in the strong params.
+
+**Capture before you change anything**, so it's reversible: the org's `enabled_feature_slugs`,
+the ids of existing `organization_roles`, accounts on the domain split by has-a-password /
+passwordless / unconfirmed / banned / superuser, accounts whose confirmed secondary is on the
+domain but whose primary isn't, and outstanding password-reset tokens on any of them.
 
 ### Verifying
 
@@ -219,101 +257,14 @@ The reason is the real one — ruby-saml's validation errors are passed through,
 | `Not match the saml-schema-protocol-2.0.xsd` | the IdP emitted structurally invalid XML |
 | signature failures mentioning no certificate | the SP keypair didn't survive deploy — check metadata |
 
-## Before flipping an organization live
-
-What changes under people who already have accounts. Nothing here is a production count — these
-are the cohorts to go count.
-
-**Announce it first.** `redirect_forced_saml` fires on submit, not on render: the login form
-still draws, and the redirect happens once the email is posted. Nobody is emailed. Anyone on
-that domain who has been using a password just starts landing at the IdP. This is the cohort
-most likely to generate support tickets.
-
-**Check for superusers on the domain.** The guard has no bypass. If the IdP config is wrong or
-the IdP is down, an admin whose address is on that domain cannot get in with a password. Move
-the address, or keep at least one admin account off-domain.
-
-**Sweep the data first.** `user_email_domain` predates its own validations, so a row containing
-`@`, missing a `.`, or duplicating another organization makes that record unsaveable — an admin
-editing an unrelated field gets a validation error they didn't cause. Duplicates across SSO orgs
-resolve by query order. Check for consumer domains (`gmail.com`) sitting in that column, and for
-organizations with a domain set but neither feature enabled — enabling either changes behavior
-for everyone on the domain immediately, with no staged rollout.
-
-**The secondary-email asymmetry** is the likeliest thing to be missed, because the two halves
-disagree. Routing keys off the single submitted string; linking searches confirmed
-`user_emails` first (`User.fuzzy_confirmed_or_unconfirmed_email_find`). So a user whose primary
-address is off-domain but who holds a confirmed secondary on the SSO domain is *not* forced to
-SSO — they type their primary and get a password prompt as always. Forced SSO is effectively
-opt-out for anyone willing to make a personal address primary. If that same user does go
-through the IdP, they link to the existing account rather than getting a duplicate.
-
-**Pin the NameID format with the IdP.** `SsoIdentity` is unique on
-`(organization_id, provider, uid)` where `uid` is the asserted NameID. A **transient** NameID
-mints a new identity row on every login. `name_id_format` is stored but never enforced — and
-there is no field for it on the admin form, though it is in the strong params.
-
-**Capture before you change anything**, so it's reversible: the org's `enabled_feature_slugs`,
-the ids of existing `organization_roles`, accounts on the domain split by has-a-password /
-passwordless / unconfirmed / banned / superuser, accounts whose confirmed secondary is on the
-domain but whose primary isn't, and outstanding password-reset tokens on any of them.
-
-## Open decisions
-
-Things code cannot settle, ordered by what blocks rollout soonest.
-
-**What role, if any, does a first SSO login grant?** This is the hard gate. SSO provisioning
-itself grants nothing — `provision_user` calls `UserServices::PasswordlessCreator` directly.
-Roles come from the separate opt-in `user_role_for_user_email_domain` feature, which grants a
-hardcoded `member` (`OrganizationRole.create_for_user_email_domain`). `member` carries edit
-rights, which is wrong for a school; `member_no_bike_edit` grants search without edit, which is
-the student case. A single hardcoded value cannot serve both, so the default has to come from
-somewhere: per-organization configuration, organization `kind`, or nothing at all. Changing it
-is a code change, not config.
-
-Worth knowing when this gets discussed: organization permissions have three axes, and roles are
-the weakest. Only `admin` / `member` / `member_no_bike_edit` exist, and for access purposes
-there are effectively two levels — `Organized::BaseController` gates on `ensure_member!`, so
-**any** claimed role gets the org's bike list and search. `member_no_bike_edit` restricts
-editing, not visibility. Most real capability lives in organization *features* (bought per
-organization, not per user), and organization `kind` gates nothing at all.
-
-**What does "forced SSO" mean — the IdP is the only way in, or we just don't hand out
-passwords?** `redirect_forced_saml` keys off a submitted email, so it structurally cannot fire
-on paths that authenticate by redeeming a **token**. One is live: `send_password_reset_email` is
-unguarded, so a user on an SSO domain can request a reset at any time and end up with a working
-password *and* a session. Two are bounded — magic links minted before the org moved to SSO keep
-working for 2h, and confirmation tokens can no longer be minted for an SSO email. The unifying
-property is that all of them authenticate on **mailbox possession**, which is exactly what
-forced SSO is meant to take out of the loop; the sharp consequence is MFA bypass, since an IdP
-may enforce Duo or a hardware key and none of these paths do. Guarding the live path has a real
-cost: it strands anyone holding a pre-SSO local account. Impact is bounded to the *identity* —
-these paths grant an account and session, not organization access.
-
-**Who provisions and rotates the production SP keypair?** Not a code task, and on the critical
-path: until `SAML_SP_CERTIFICATE` / `SAML_SP_PRIVATE_KEY` exist in the production environment,
-metadata advertises no certificate at all and an IdP has nothing to encrypt to. Per standing
-arrangement the private key lives with Seth, not with us. Also needs a rotation answer — how
-much notice before expiry, and whether rollover uses overlapping certificates (the code change
-above) or a flag day.
-
-**What does an SSO user see instead of a signup form?** A silent redirect to the IdP, or an
-interstitial explaining their organization manages sign-in. Industry norm is home-realm
-discovery: one email box, SSO-managed domains never see a password field, and the account comes
-into existence via JIT provisioning. We already have the mechanism — identifier-first login is
-merged and `redirect_forced_saml` already covers registration.
-
-**Deprovisioning.** JIT provisioning has no offboarding story: when someone leaves, the IdP
-stops authenticating them but their account and role persist. SCIM is the usual answer and
-enterprise buyers ask for it. Combined with the mailbox-possession paths above, a departed
-employee keeps a usable account indefinitely.
-
-**One email domain per organization?** `user_email_domain` is a single column with a uniqueness
-guard, so an org with several domains (`example.edu` + `alumni.example.edu`) can't be expressed.
-Not blocking unless a customer needs it.
-
 ## Accepted gaps
 
+- **Forced SSO doesn't cover token-redemption sign-ins.** `redirect_forced_saml` keys off a
+  submitted email, so it cannot fire on paths that authenticate by redeeming a token.
+  `send_password_reset_email` is unguarded, so a user on an SSO domain can request a reset
+  and end up with a working password and a session, never meeting the IdP — an MFA bypass
+  where the IdP enforces one. Magic links minted pre-SSO also work until they expire (2h).
+  These grant an account and session, not organization access. Fix is a follow-up.
 - **Nothing deprovisions.** Removing someone in the IdP stops them signing in again; it does not
   remove a role they already hold.
 - **Unconfirmed accounts are force-confirmed by the first assertion.** Deliberate — otherwise
@@ -335,6 +286,10 @@ Not blocking unless a customer needs it.
 
 ## Settled — don't re-litigate
 
+- **SSO grants no organization role.** Signing in links the account and signs it in; it
+  never adds anyone to the organization. That is the intended behavior, not a gap — roles
+  are the organization admin's to hand out, through the separate opt-in
+  `user_role_for_user_email_domain` feature.
 - **Fall-through when the config isn't live.** An org with `saml_sso` but an unconfigured
   `organization_saml_configuration` returns nil from `saml_email_matching`, the guard doesn't
   fire, and the user signs up normally. Deliberate, specced, endorsed.
