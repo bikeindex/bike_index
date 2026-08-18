@@ -27,11 +27,13 @@ Then review the changed files against `CLAUDE.md` (root and any nested ones in t
 **Required, not conditional on the diff looking clean.** List the comments the branch adds or edits:
 
 ```bash
-git diff origin/main...HEAD -U0 -- '*.rb' '*.erb' '*.js' '*.ts' '*.coffee' '*.scss' '*.css' '*.rake' |
+git diff origin/main...HEAD -U0 -- '*.rb' '*.erb' '*.js' '*.ts' '*.coffee' '*.scss' '*.css' '*.rake' '*.yml' 'bin/*' |
   grep -E '^(\+\+\+ |\+.*(#|//|<%#|/\*))'
 ```
 
 The `+++ b/…` lines keep each hit attached to its file; the code-path filter keeps markdown headings out. It catches trailing comments too, and over-matches on `#{}` interpolation — that's fine, the list is candidates to judge, not verdicts.
+
+**An empty result on a non-empty diff means the pathspec missed the branch, not that the branch is clean** — the same silent-pass the rtk section below describes, from a different cause. `bin/kamal_review` (no extension) and `.github/workflows/*.yml` are why `bin/*` and `*.yml` are on the list; add whatever else the branch touches and re-run rather than reading the blank as a verdict.
 
 Judge each against the **Comments** section of `CLAUDE.md` and reach a verdict of keep / razor / delete on every line — a comment survives only by carrying a *why* the code can't. Deleting is the common outcome, razoring the next most common; leaving a block untouched should be the exception you can justify. Watch hardest for the ones you wrote to explain your own reasoning as you worked: narration of the change, mechanism the code already shows, and a second sentence justifying the first.
 
