@@ -60,8 +60,6 @@ export default class extends Controller {
     this.refreshResults()
   }
 
-  // The result-view radios are form fields rather than links, so switching layout
-  // has to re-run the search to pick up the other result component
   submit () {
     this.formTarget.requestSubmit()
   }
@@ -199,7 +197,7 @@ export default class extends Controller {
   retryResults = () => {
     this.hideNotices()
     this.showLoading()
-    if (this.failedSubmit) this.formTarget.requestSubmit()
+    if (this.failedSubmit) this.submit()
     else this.frameElement?.reload()
   }
 

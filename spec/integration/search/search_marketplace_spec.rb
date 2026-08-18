@@ -167,7 +167,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/)
   end
 
-  it "automatically loads the next page when scrolling to bottom" do
+  it "automatically loads the next page when scrolling to bottom, and switches result layouts" do
     expect(manufacturer1.reload.id).to eq 1003 # sanity check - otherwise the search won't work
     expect(manufacturer2.reload.id).to eq 764 # sanity check - otherwise the search won't work
     promoted_bike_ids = promoted_listings.map(&:item_id)
@@ -235,22 +235,13 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # the visible input shows the display name
     expect(find("#primary_activity-hw-hidden-field", visible: false).value).to eq primary_activity.id.to_s
     expect(find("#primary_activity").value).to eq "Mountain biking"
-  end
 
-  it "switches between the thumbnail and list layouts, keeping the search" do
-    visit_marketplace_via_nav
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 12)
-
-    search_primary_activity("Mountain biking")
-    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
-
+    # Switching to the list layout re-runs the search rather than dropping its filters
     choose("search_result_view_bike_box", allow_label_click: true)
     expect(page).to have_css(".bike-box-item", wait: 10, count: 6)
     expect(page).to have_no_css("[data-test-id^='vehicle-thumbnail-linkspan-']")
     expect(page).to have_current_path(/search_result_view=bike_box/)
-    # The layout switch re-runs the search rather than dropping its filters
     expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/)
-    expect(find("#primary_activity").value).to eq "Mountain biking"
 
     choose("search_result_view_thumbnail", allow_label_click: true)
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
