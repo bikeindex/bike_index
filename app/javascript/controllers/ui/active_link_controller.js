@@ -9,13 +9,21 @@ const controllerOf = (route) => route.split('#')[0]
 const ROUTE_MATCHES = ['controller', 'controller_action']
 
 // Connects to data-controller='ui--active-link'
-// Renders UI::ActiveLink::Component's active state, which the server can't: these links are
+// Renders UI::ActiveLink::Component's aria-current, which the server can't: these links are
 // cached fragments, so the markup is shared by every page it was rendered for.
 export default class extends Controller {
   static values = { match: String, routes: String }
 
   connect () {
-    this.element.classList.toggle('active', this.isActive())
+    if (this.isActive()) this.element.setAttribute('aria-current', this.ariaCurrent())
+    else this.element.removeAttribute('aria-current')
+  }
+
+  // "page" is reserved for the link whose own URL is the current one. A widened match means
+  // the current page sits inside what the link points at, not that it is it -- aria-current's
+  // "true", so a reader isn't told a link elsewhere is where it already is
+  ariaCurrent () {
+    return ROUTE_MATCHES.includes(this.matchValue) ? 'true' : 'page'
   }
 
   isActive () {

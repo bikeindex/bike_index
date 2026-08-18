@@ -2,11 +2,12 @@
 
 module UI
   module ActiveLink
-    # Adds "active" to the link's class on the page it points at. The browser decides, in
-    # ui/active_link_controller.js, so a link rendered into a fragment cache doesn't carry the
-    # answer for whichever page filled it. match: widens or narrows what counts as the page it
-    # points at: its query string too, or only its controller, or its controller and action —
-    # which is what a link carrying query params (a search, a filtered index) needs.
+    # Marks the link aria-current on the page it points at, which the is-active variant
+    # (application.css) styles. The browser decides, in ui/active_link_controller.js, so a link
+    # rendered into a fragment cache doesn't carry the answer for whichever page filled it.
+    # match: widens or narrows what counts as the page it points at: its query string too, or
+    # only its controller, or its controller and action — which is what a link carrying query
+    # params (a search, a filtered index) needs.
     class Component < ApplicationComponent
       MATCHES = [:path, :full_path, :controller, :controller_action].freeze
       # The matches the browser answers with a route rather than with the URL

@@ -16,7 +16,7 @@ RSpec.describe PageBlock::Navbar::PrimaryMenu::Component, type: :component do
     expect(menu_links).to eq(["Search", "Marketplace", "Sign up", "log in", "Help",
       "Stolen bike?", "Donate", "Blog", "Marketplace", "Search"])
     expect(component).to_not have_css "#setting_submenu"
-    expect(component).to_not have_css "#primary-main-menu a.active"
+    expect(component).to_not have_css "#primary-main-menu a[aria-current]"
     expect(component.css("#primary-main-menu a[data-controller='ui--active-link']").count).to eq menu_links.count
   end
 

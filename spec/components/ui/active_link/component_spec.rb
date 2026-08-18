@@ -105,13 +105,13 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
       expect(link["data-controller"]).to eq "ui--dropdown ui--active-link"
     end
 
+    # aria-current is the browser's to set, so the server leaves the caller's aria alone
     context "including aria" do
-      let(:request_url) { path }
       let(:options) { {aria: {label: "Help center"}} }
 
-      it "keeps them, alongside the current it marks" do
+      it "keeps them, and marks no current" do
         expect(link["aria-label"]).to eq "Help center"
-        expect(link["aria-current"]).to eq "page"
+        expect(link.attributes).to_not have_key("aria-current")
       end
     end
   end
