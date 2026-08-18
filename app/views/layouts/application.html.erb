@@ -67,7 +67,7 @@
 
     <%= render(PageBlock::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
 
-    <%= render PageBlock::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:, passive_organization:, page_id:, controller_namespace:, controller_name:, action_name:) %>
+    <%= render PageBlock::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:, passive_organization:, controller_namespace:, controller_name:, action_name:) %>
 
     <% if render_donation_request? %>
       <%= render PageBlock::LawEnforcementDonation::Component.new(current_user:) %>
@@ -122,7 +122,7 @@
     <% end %>
 
     <%# Skip the Meta pixel on org/oauth pages and when blocked params are present (search_email is PII, and the pixel %>
-    <%# auto-sends the URL query string). In the cache key too, since page_id ignores query params. %>
+    <%# auto-sends the URL query string) %>
     <% skip_facebook = controller_namespace.in?(%w[organized org_public oauth]) || controller_name == "organizations" || params.key?(:search_email) || params.key?(:proximity) %>
 
     <%= render PageBlock::Footer::Component.new(current_user:, skip_facebook:, passive_organization:) %>
