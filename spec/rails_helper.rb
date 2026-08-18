@@ -237,12 +237,14 @@ RSpec.configure do |config|
 end
 
 CarrierWave.configure do |config|
+  test_uploads = "test_uploads#{ENV["TEST_ENV_NUMBER"]}"
   config.cache_dir = Rails.root.join("tmp", "cache", "carrierwave#{ENV["TEST_ENV_NUMBER"]}")
   # store_dir keys on the record id, and each parallel worker hands out the same ids from its
   # own database — one shared root has a worker asserting against another's file, and leaves
-  # every run's files for the next one. base_path keeps the rendered URL pointing at the file.
-  config.root = Rails.root.join("public", "test_uploads#{ENV["TEST_ENV_NUMBER"]}")
-  config.base_path = "/test_uploads#{ENV["TEST_ENV_NUMBER"]}"
+  # every run's files for the next one. The segment goes on asset_host rather than base_path,
+  # which CarrierWave only reads when asset_host is blank, so the url still resolves to the file.
+  config.root = Rails.root.join("public", test_uploads)
+  config.asset_host = "#{ENV["BASE_URL"]}/#{test_uploads}"
   config.enable_processing = false
 end
 
