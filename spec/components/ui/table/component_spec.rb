@@ -64,9 +64,9 @@ RSpec.describe UI::Table::Component, type: :component do
         table.column(sortable: "email") { |r| r.email }
       end
 
-      expect(result).to have_css("th a.twlink.active", text: /Name/)
+      expect(result).to have_css("th a.twlink[data-active='true']", text: /Name/)
       expect(result).to have_css("th a.twlink", text: /Email/)
-      expect(result).not_to have_css("th a.active", text: /Email/)
+      expect(result).not_to have_css("th a[data-active]", text: /Email/)
     end
 
     context "with custom label" do
@@ -76,7 +76,7 @@ RSpec.describe UI::Table::Component, type: :component do
           table.column(sortable: "code_integer", label: "Code #") { |r| r.email }
         end
 
-        expect(result).to have_css("th a.twlink.active", text: /Batch/)
+        expect(result).to have_css("th a.twlink[data-active='true']", text: /Batch/)
         expect(result).not_to have_css("th a", text: /Bike Sticker Batch/)
         expect(result).to have_css("th a.twlink", text: /Code #/)
         expect(result).not_to have_css("th a", text: /Code Integer/)
@@ -129,8 +129,8 @@ RSpec.describe UI::Table::Component, type: :component do
           table.column(sortable: "email") { |r| r.email }
         end
 
-        expect(result).to have_css("th a.twlink.active", text: /Created/)
-        expect(result).not_to have_css("th a.active", text: /Email/)
+        expect(result).to have_css("th a.twlink[data-active='true']", text: /Created/)
+        expect(result).not_to have_css("th a[data-active]", text: /Email/)
       end
     end
   end

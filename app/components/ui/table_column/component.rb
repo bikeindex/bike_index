@@ -73,22 +73,19 @@ module UI
 
       def render_sort_link(current_sort:, current_direction:, sortable_url:, sort_icon:)
         title = header_label
-        direction = (@sortable == current_sort && current_direction == "desc") ? "asc" : "desc"
-        css = "twlink"
+        sorted_by_this = @sortable == current_sort
+        direction = (sorted_by_this && current_direction == "desc") ? "asc" : "desc"
 
-        if @sortable == current_sort
-          css += " active"
-          arrow_spans = [
-            content_tag(:span, sort_icon.call(current_direction), class: "tw:group-hover:hidden"),
-            content_tag(:span, sort_icon.call(direction), class: "tw:hidden tw:group-hover:inline tw:opacity-50")
-          ]
+        arrow_spans = if sorted_by_this
+          [content_tag(:span, sort_icon.call(current_direction), class: "tw:group-hover:hidden"),
+            content_tag(:span, sort_icon.call(direction), class: "tw:hidden tw:group-hover:inline tw:opacity-50")]
         else
-          arrow_spans = [
-            content_tag(:span, sort_icon.call(direction), class: "tw:opacity-0 tw:group-hover:opacity-50 tw:transition-opacity")
-          ]
+          [content_tag(:span, sort_icon.call(direction), class: "tw:opacity-0 tw:group-hover:opacity-50 tw:transition-opacity")]
         end
 
-        link_to(sortable_url.call(@sortable, direction), class: "#{css} tw:group") do
+        # data-active rather than an `active` class: that's what the is-active variant matches
+        link_to(sortable_url.call(@sortable, direction), class: "twlink tw:group",
+          data: {active: sorted_by_this || nil}) do
           safe_join([title, NBSP, *arrow_spans])
         end
       end

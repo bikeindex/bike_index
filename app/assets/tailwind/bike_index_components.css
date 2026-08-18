@@ -3,21 +3,18 @@
 @layer components {
   .twlink {
     @apply tw:text-blue-600 tw:dark:text-blue-400 tw:transition-colors;
+
+    /* Outranks the hover below on specificity, so a selected link doesn't take the
+     * hover color when the pointer is over it */
+    @variant is-active {
+      @apply tw:text-blue-700 tw:underline tw:font-bold tw:dark:text-blue-300;
+    }
   }
 
   /* Guarded so a disabled UI::Button/UI::ButtonLink in link color holds its color.
-   * Every other color guards its hover in the utilities; link color's lives here.
-   * Both active markers, as the is-active variant: UI::TableColumn's sort link flags
-   * itself with the class, UI::ActiveLink with the attribute. */
-  .twlink:not(:disabled, [aria-disabled="true"]):hover,
-  .twlink:is(.active, [aria-current]),
-  .twlink:not(:disabled, [aria-disabled="true"]):active {
+   * Every other color guards its hover in the utilities; link color's lives here. */
+  .twlink:not(:disabled, [aria-disabled="true"]):hover {
     @apply tw:text-blue-700 tw:underline tw:dark:text-blue-300;
-  }
-
-  .twlink:is(.active, [aria-current]),
-  .twlink:not(:disabled, [aria-disabled="true"]):active {
-    @apply tw:font-bold;
   }
 
   /* For links that should inherit the color of the text they sit in. text-inherit rather
@@ -25,27 +22,29 @@
    * `a { color: #3498db }` would otherwise supply the color */
   .twlink-underlined {
     @apply tw:text-inherit tw:underline tw:transition-colors;
-  }
 
-  /* currentColor in a `color` declaration resolves to the inherited color, so the hover
-   * shifts whatever the link sits in — lightening in dark mode, where deepening would sink
-   * it into the background. Clamped, so text already at the floor lifts rather than hovering
-   * to itself; a browser too old for relative color syntax still gets the thicker underline */
-  .twlink-underlined:not(:disabled, [aria-disabled="true"]):hover,
-  .twlink-underlined:is(.active, [aria-current]),
-  .twlink-underlined:not(:disabled, [aria-disabled="true"]):active {
-    @apply tw:decoration-2;
-
-    color: oklch(from currentColor max(calc(l - 0.12), 0.2) c h);
+    /* Substituted into `color` rather than resolved here: currentColor in a `color`
+     * declaration is the inherited color, so hover and is-active below shift whatever the
+     * link sits in — lightening in dark mode, where deepening would sink it into the
+     * background. Clamped, so text already at the floor lifts rather than shifting to
+     * itself; a browser too old for relative color syntax still gets the thicker underline */
+    --twlink-underlined-shifted: oklch(from currentColor max(calc(l - 0.12), 0.2) c h);
 
     @variant dark {
-      color: oklch(from currentColor min(calc(l + 0.12), 0.8) c h);
+      --twlink-underlined-shifted: oklch(from currentColor min(calc(l + 0.12), 0.8) c h);
+    }
+
+    @variant is-active {
+      @apply tw:decoration-2 tw:font-bold;
+
+      color: var(--twlink-underlined-shifted);
     }
   }
 
-  .twlink-underlined:is(.active, [aria-current]),
-  .twlink-underlined:not(:disabled, [aria-disabled="true"]):active {
-    @apply tw:font-bold;
+  .twlink-underlined:not(:disabled, [aria-disabled="true"]):hover {
+    @apply tw:decoration-2;
+
+    color: var(--twlink-underlined-shifted);
   }
 
   /* Legacy's `.container` reaches into an alert two ways tailwind can't answer on
