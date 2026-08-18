@@ -1,3 +1,5 @@
+/* Bike Index's own tw* classes. Rules that style one component's markup — .ui-table,
+ * .search-results-frame-wrapper — stay in application.css */
 @layer components {
   .twlink {
     @apply tw:text-blue-600 tw:dark:text-blue-400 tw:transition-colors;
@@ -23,30 +25,19 @@
     @apply tw:text-inherit tw:underline tw:transition-colors;
   }
 
-  /* currentColor in a `color` declaration resolves to the inherited color, so the
-   * hover deepens whatever the link sits in. Away from black on a dark background,
-   * where deepening would sink it into the background instead */
+  /* currentColor in a `color` declaration resolves to the inherited color, so the hover
+   * shifts whatever the link sits in — lightening in dark mode, where deepening would sink
+   * it into the background. Clamped, so text already at the floor lifts rather than hovering
+   * to itself; a browser too old for relative color syntax still gets the thicker underline */
   .twlink-underlined:not(:disabled, [aria-disabled="true"]):hover,
   .twlink-underlined.active,
   .twlink-underlined:not(:disabled, [aria-disabled="true"]):active {
-    /* The channel that shows on every surface — a link pinned to black on a bright
-       accent only has the clamp below to move by, which is subtle on its own */
     @apply tw:decoration-2;
 
-    color: color-mix(in oklab, currentColor 75%, black);
+    color: oklch(from currentColor max(calc(l - 0.12), 0.2) c h);
 
     @variant dark {
-      color: color-mix(in oklab, currentColor 75%, white);
-    }
-
-    /* Same shift for every color a link actually inherits, but clamped: text already at
-       the floor (the review app banner's black) lifts instead of hovering to itself */
-    @supports (color: oklch(from red l c h)) {
-      color: oklch(from currentColor max(calc(l - 0.12), 0.2) c h);
-
-      @variant dark {
-        color: oklch(from currentColor min(calc(l + 0.12), 0.8) c h);
-      }
+      color: oklch(from currentColor min(calc(l + 0.12), 0.8) c h);
     }
   }
 
