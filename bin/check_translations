@@ -59,17 +59,12 @@ else
   if [ -n "$CI" ]; then
     output "${YELLOW}" "On CI — creating translation sync PR"
 
-    # The test job's container (.github/ci/Dockerfile) ships neither gh nor jq
-    github_api() {
-      curl --silent --show-error --fail-with-body \
-        --header "Authorization: Bearer ${GH_TOKEN}" \
-        --header "Accept: application/vnd.github+json" "$@"
-    }
-
-    # Branches are named translations-sync-<timestamp>, so there's no exact head
-    # for the API to filter the open PRs on
-    existing_pr=$(github_api "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls?state=open&per_page=100" |
-      ruby -rjson -e 'puts JSON.parse($stdin.read).find { it.dig("head", "ref").start_with?("translations-sync") }&.dig("number")')
+    # Branches are named translations-sync-<timestamp>, so `gh pr list --head`
+    # can't be used — it wants an exact branch name.
+    # Deliberately not failure-tolerant: a swallowed error reads as "no open sync
+    # PR" and opens a duplicate.
+    existing_pr=$(gh pr list --state open --limit 100 --json number,headRefName \
+      --jq 'map(select(.headRefName | startswith("translations-sync")))[0].number')
     if [ -n "$existing_pr" ]; then
       output "${YELLOW}" "Translation sync PR already exists: #${existing_pr} — skipping PR creation"
       exit 1
@@ -90,9 +85,11 @@ else
     # PR its required checks. A default-token push triggers no workflows at all.
     git push origin "$branch_name"
 
-    github_api --request POST "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls" \
-      --data "{\"title\":\"Automated translations sync from CI\",\"base\":\"main\",\"head\":\"${branch_name}\"}" |
-      ruby -rjson -e 'r = JSON.parse($stdin.read); abort r.to_s unless r["html_url"]; puts r["html_url"]'
+    gh pr create \
+      --title "Automated translations sync from CI" \
+      --body "" \
+      --base main \
+      --head "$branch_name"
 
     output "${YELLOW}" "PR created with CI running. Build will fail until the PR is merged."
   fi
