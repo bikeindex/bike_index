@@ -70,11 +70,10 @@
                   = submit_tag "Create notification", class: "btn btn-success btn-md-lg"
 
 - if related_notifications.any?
-  %div{ style: "margin-top: 60px;" }
-    = render(UI::Header::Component.new(tag: :h2, html_class: "uncap")) do
-      Related Notifications
-      %em
-        (#{related_notifications.count + 1} total)
+  = render(UI::Header::Component.new(tag: :h2, html_class: "uncap tw:mt-15")) do
+    Related Notifications
+    %em
+      (#{related_notifications.count + 1} total)
   = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: related_notifications, skip_bike: true, skip_map_cell: true }
 
 - if @parking_notification.send_email?

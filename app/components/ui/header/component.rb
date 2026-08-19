@@ -3,10 +3,9 @@
 module UI
   module Header
     class Component < ApplicationComponent
+      # Body copy is 15px, so h4 and below floor at text-base rather than rendering
+      # smaller than the paragraph under them
       TAG_CLASSES = {h1: "tw:text-2xl", h2: "tw:text-xl", h3: "tw:text-lg"}.freeze
-      # Body copy is 15px, so the scale floors at text-base rather than carrying on
-      # down - an h4 that renders smaller than the paragraph under it isn't a heading
-      SMALLEST_TAG_CLASS = "tw:text-base"
 
       def initialize(text: nil, subtitle: nil, tag: :h1, html_class: nil)
         @text = text
@@ -32,7 +31,7 @@ module UI
       end
 
       def header_classes
-        [TAG_CLASSES.fetch(@tag, SMALLEST_TAG_CLASS), @subtitle.present? ? "tw:mb-1" : "tw:mb-6",
+        [TAG_CLASSES.fetch(@tag, "tw:text-base"), @subtitle.present? ? "tw:mb-1" : "tw:mb-6",
           "tw:font-extrabold tw:tracking-tight tw:text-gray-900 tw:dark:text-gray-100",
           @html_class].compact.join(" ")
       end

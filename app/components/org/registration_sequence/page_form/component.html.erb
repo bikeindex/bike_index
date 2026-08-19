@@ -2,7 +2,7 @@
   <div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
     <%# A step below admin's own h1 %>
     <% if @admin %>
-      <%= render(UI::Header::Component.new(text: editing? ? "Edit page" : "Add page", tag: :h2, html_class: "uncap tw:mb-0! tw:font-normal tw:text-gray-500")) %>
+      <%= render(UI::Header::Component.new(text: editing? ? "Edit page" : "Add page", tag: :h2, html_class: "uncap tw:mb-0! tw:font-normal! tw:text-gray-500!")) %>
     <% else %>
       <%= render(UI::Header::Component.new(text: editing? ? "Edit page" : "Add page", html_class: "uncap tw:mb-0!")) %>
     <% end %>

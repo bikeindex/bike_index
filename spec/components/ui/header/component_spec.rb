@@ -44,22 +44,15 @@ RSpec.describe UI::Header::Component, type: :component do
     end
   end
 
-  context "with h4 tag" do
-    let(:options) { {text: "Minor section", tag: :h4} }
+  %i[h4 h5 h6].each do |tag|
+    context "with #{tag} tag" do
+      let(:options) { {text: "Minor section", tag:} }
 
-    it "renders an h4" do
-      expect(component).to have_css("h4")
-      expect(component.to_html).to include("tw:text-base")
-    end
-  end
-
-  context "with h5 tag" do
-    let(:options) { {text: "Minor section", tag: :h5} }
-
-    it "stays at the body-copy floor rather than rendering smaller" do
-      expect(component).to have_css("h5")
-      expect(component.to_html).to include("tw:text-base")
-      expect(component.to_html).to_not include("tw:text-sm")
+      it "stays at the body-copy floor rather than rendering smaller" do
+        expect(component).to have_css(tag.to_s)
+        expect(component.to_html).to include("tw:text-base")
+        expect(component.to_html).to_not include("tw:text-sm")
+      end
     end
   end
 

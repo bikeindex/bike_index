@@ -111,7 +111,7 @@
 
 -# We can't preview impound_claims unless there are impound records
 - if @impound_claim_kind && @impound_claim.blank?
-  = render(UI::Header::Component.new(text: "Can't preview email", tag: :h3, html_class: "uncap mt-5 text-warning"))
+  = render(UI::Header::Component.new(text: "Can't preview email", tag: :h3, html_class: "uncap mt-5 text-warning tw:mb-1!"))
   %p.mt-0
     You have to have an <em>impounded record</em> to be able to see a preview of an impounded claim email
 - else
