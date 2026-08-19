@@ -160,9 +160,8 @@
   <hr style="margin-top: 60px;">
   <div class="mt-4 mb-4 row">
     <div class="col-sm-6 mb-4">
-      <%# onsubmit, not turbo_confirm: Turbo Drive is off app-wide, so it never fires %>
       <%= render UI::ButtonLink::Component.new(text: "Delete #{@user.email}!", href: admin_user_path(@user.id), method: :delete, color: :error,
-        form: {onsubmit: "return confirm('#{j "Are you sure? Generally it's better to delete than ban"}')"}) %>
+        form: {onsubmit: "return confirm('#{j "Are you sure? Generally it's better to ban than delete"}')"}) %>
     </div>
 
     <div class="col-sm-6 mb-4">
