@@ -1046,8 +1046,8 @@ it:
           community_member: Membro della comunità
           employee: Dipendente
           graduate_student: Studente laureato
-          postdoc: Postdoc
           student: Studente universitario
+          postdoc: Ricercatore post-dottorato
       stolen_record:
         bike_was_not_locked: La bicicletta non era legata
         cable_lock: Lucchetto a cavo
