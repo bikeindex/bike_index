@@ -14,6 +14,8 @@ RSpec.describe PageBlock::Navbar::SettingsMenu::Component, type: :component do
     expect(component).to have_css "button#settings[data-ui--dropdown-target='button']"
     expect(links).to eq(["Your registrations", "Register a new bike", "party@bikeindex.org settings", "Log out"])
     expect(component).to have_css "#navUserSettingLink[data-email='party@bikeindex.org']"
+    # Logging out is the only row that doesn't go somewhere, so it's the only one in red
+    expect(component.css("a[class]").map(&:text)).to eq(["Log out"])
   end
 
   context "with a marketplace message" do
