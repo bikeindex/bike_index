@@ -27,6 +27,14 @@ module PageBlock
         # The tracked-out gray ADMIN PANEL caption, beside the logo and above the org's name
         ADMIN_PANEL = "tw:text-[10.5px] tw:font-bold tw:tracking-[0.14em] tw:text-gray-400"
 
+        # Set off from the organization's own rows, which the super admin one isn't
+        SUPER_ADMIN_ROW = "tw:mt-4"
+        # Stands in for an icon so the label lines up with the rows that carry one, and
+        # becomes what the row is recognizable by once there's no label to read
+        SUPER_ADMIN_ICON = "tw:flex tw:h-[17px] tw:w-[17px] tw:flex-none tw:items-center " \
+          "tw:justify-center tw:rounded-full tw:text-[8px] " \
+          "tw:group-data-[collapsed=true]/sidebar:border tw:group-data-[collapsed=true]/sidebar:border-current"
+
         # One bar of the hamburgler, which folds into an X while the menu is open
         BAR = "tw:h-0.5 tw:w-5 tw:rounded-sm tw:bg-gray-900 tw:transition-all " \
           "tw:duration-200 tw:dark:bg-gray-300"
@@ -53,7 +61,7 @@ module PageBlock
         def super_admin_items
           return [] unless @current_user.superuser?
 
-          [{type: :link, icon: nil, match: :path, matching_controllers: [],
+          [{type: :link, icon: nil, match: :path, matching_controllers: [], super_admin: true,
             label: translation(".in_super_admin", org_name: @organization.short_name),
             path: admin_organization_path(@organization.to_param)}]
         end
@@ -77,6 +85,10 @@ module PageBlock
 
         def row_class
           [ROW, ROW_HOVER, "tw:no-underline", ROW_RESTING, ROW_CURRENT].join(" ")
+        end
+
+        def link_row_class(item)
+          [row_class, (SUPER_ADMIN_ROW if item[:super_admin])].compact.join(" ")
         end
 
         def child_class

@@ -217,8 +217,12 @@
               </div>
             </div>
           <% when :link %>
-            <%= render active_link(item, row_class:) do %>
-              <% if item[:icon].present? %>
+            <%= render active_link(item, row_class: link_row_class(item)) do %>
+              <% if item[:super_admin] %>
+                <span class="<%= PageBlock::Navbar::OrgSidebar::Component::SUPER_ADMIN_ICON %>">
+                  <span class="tw:hidden tw:group-data-[collapsed=true]/sidebar:inline">SA</span>
+                </span>
+              <% elsif item[:icon].present? %>
                 <span class="tw:flex tw:flex-none"><%= icon(item[:icon], html_class: "tw:h-[17px] tw:w-[17px]") %></span>
               <% end %>
 

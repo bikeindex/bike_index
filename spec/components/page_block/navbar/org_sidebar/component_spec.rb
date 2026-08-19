@@ -92,8 +92,11 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
     it "ends with the super admin link" do
       rows = component.css("[data-page-block--org-sidebar-target='scroller'] a")
 
-      expect(rows.last.text.strip).to eq "Brakebills in super admin"
       expect(rows.last["href"]).to eq "/admin/organizations/#{organization.to_param}"
+      expect(rows.last.text).to include "Brakebills in super admin"
+      # Stands in for an icon, so the label lines up with the rows that carry one -- and is
+      # all that's left of the row once it collapses
+      expect(rows.last.css("span").first.text.strip).to eq "SA"
     end
 
     # They reach the organization without being a member of it
