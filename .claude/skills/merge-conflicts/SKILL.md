@@ -82,6 +82,8 @@ git diff origin/<base> -- app/ lib/ config/   # then account for every file list
 
 Every differing file must be explainable as *this branch's work* (or a sibling branch you're intentionally stacked on). Anything else is a resurrection or a stray. For a file that's mostly wrong, don't hand-patch hunks — `git checkout origin/<base> -- <file>` and re-apply your change on top.
 
+**Resolving two files to opposite sides breaks the interface between them**, and neither one looks wrong on its own. Taking the base's version of a component while the helper that calls it auto-merges keeping your argument is an unknown-keyword error on every render, past a file-level audit that reports both as expected. Whenever you `checkout --theirs` something with callers, grep the arguments you dropped: `git grep -n '<kwarg>' -- app` should come back empty, or come back only where the base still accepts it.
+
 This is what it catches, all of which has actually happened here:
 
 - **Deleted code coming back.** A constant, predicate, or callback the base removed reappears, along with the call sites that reference it — reintroducing behavior the base decided against.
