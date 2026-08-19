@@ -12,9 +12,10 @@ module PageBlock
       # trigger at all.
       class Component < ApplicationComponent
         # Logout is the only row that isn't somewhere to go. red-700 against the navbar's
-        # near-black panel is unreadable, so that one takes the tint that carries on dark
+        # near-black panel is unreadable, so that one takes the tint that carries on dark --
+        # and its own hover, since the important it needs there beats the submenu's
         LOGOUT = "tw:text-red-700! tw:hover:bg-red-50! tw:hover:text-red-600!"
-        LOGOUT_NAVBAR = "tw:text-red-400!"
+        LOGOUT_NAVBAR = "tw:text-red-400! tw:hover:text-red-300!"
 
         def initialize(current_user:, current_user_or_unconfirmed_user:, dropdown:,
           current_organization: nil, name: nil, button_class: nil, open: false)
