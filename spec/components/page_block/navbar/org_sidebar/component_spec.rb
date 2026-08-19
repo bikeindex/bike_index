@@ -84,6 +84,31 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
     expect(closed.map { |content| content["class"] }).to all(include("tw:hidden!"))
   end
 
+  # It's the only row that isn't the organization's own, so it sits after them all. Outside
+  # MenuItemsOrg's cache, since granting the ability doesn't touch the user record it's keyed on
+  context "with a superuser" do
+    let(:current_user) { FactoryBot.create(:superuser, email: "kdewey@brakebills.edu") }
+
+    it "ends with the super admin link" do
+      rows = component.css("[data-page-block--org-sidebar-target='scroller'] a")
+
+      expect(rows.last.text.strip).to eq "View Brakebills in super admin"
+      expect(rows.last["href"]).to eq "/admin/organizations/#{organization.to_param}"
+    end
+
+    # They reach the organization without being a member of it
+    context "in no organization" do
+      let!(:organization_role) { nil }
+
+      it "still carries the switcher's rows" do
+        expect(component.css("ul[role='menu'] li[role='menuitem'] a").map(&:text))
+          .to include("View without any organization")
+        expect(component.css("ul[role='menu'] li[role='menuitem'] span").map(&:text))
+          .to eq(["Viewing in Brakebills"])
+      end
+    end
+  end
+
   context "with an ambassador organization" do
     let(:organization) { FactoryBot.create(:organization_ambassador, short_name: "Fillory") }
 

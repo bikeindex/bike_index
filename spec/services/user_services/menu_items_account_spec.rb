@@ -10,6 +10,20 @@ RSpec.describe UserServices::MenuItemsAccount do
       expect(described_class.organization_switcher(user)).to eq([])
     end
 
+    # A superuser reaches an organization without being a member of it
+    context "viewing an organization they're no member of" do
+      let(:organization) { FactoryBot.create(:organization, name: "Brakebills") }
+
+      it "carries the row for it, and the one out of it" do
+        expect(described_class.organization_switcher(user, current_organization: organization))
+          .to eq([{type: :link, label: "View without any organization",
+                   path: "http://test.host/?organization_id=false",
+                   icon: nil, match: :path, matching_controllers: []},
+            {type: :disabled, label: "Viewing in Brakebills"},
+            {type: :divider}])
+      end
+    end
+
     context "with one organization" do
       let(:organization) { FactoryBot.create(:organization, name: "Brakebills") }
       let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user:, organization:) }

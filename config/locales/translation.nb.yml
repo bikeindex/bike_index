@@ -5456,6 +5456,7 @@ nb:
           logout: Logg ut
           menu: Meny
           organization_crest: "%{org_name} våpenskjold"
+          view_in_super_admin: View %{org_name} in super admin
           register_a_new_bike: Registrer en ny sykkel
           user_settings: "%{user_email}-innstillinger"
           your_registrations: Dine registreringer

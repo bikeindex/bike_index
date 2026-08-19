@@ -5711,6 +5711,7 @@ es:
           logout: Finalizar la sesión
           menu: Menú
           organization_crest: "%{org_name} cresta"
+          view_in_super_admin: View %{org_name} in super admin
           register_a_new_bike: Registre su bicicleta
           user_settings: "%{user_email} ajustes"
           your_registrations: Sus registros

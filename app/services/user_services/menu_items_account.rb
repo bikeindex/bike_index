@@ -18,6 +18,10 @@ module UserServices
     # they're already viewing has nowhere to go, so it's a label rather than a link
     def organization_switcher(user, current_organization: nil)
       organizations = switchable_organizations(user)
+      # A superuser can be viewing one they're no member of, which is still where they are
+      # and still something to leave
+      organizations += [current_organization] if current_organization.present? &&
+        organizations.exclude?(current_organization)
       return [] if organizations.none?
 
       [without_organization(current_organization)] + organizations.map { |organization|

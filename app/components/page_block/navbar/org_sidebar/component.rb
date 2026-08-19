@@ -44,7 +44,18 @@ module PageBlock
         private
 
         def items
-          @items ||= UserServices::MenuItemsOrg.for(organization: @organization, current_user: @current_user)
+          @items ||= UserServices::MenuItemsOrg.for(organization: @organization, current_user: @current_user) +
+            super_admin_items
+        end
+
+        # Outside MenuItemsOrg's cache, which is keyed on the user record -- granting a
+        # SuperuserAbility doesn't touch it, and api/v3/me has no use for an admin link
+        def super_admin_items
+          return [] unless @current_user.superuser?
+
+          [{type: :link, icon: "settings_slider", match: :path, matching_controllers: [],
+            label: translation(".view_in_super_admin", org_name: @organization.short_name),
+            path: admin_organization_path(@organization.to_param)}]
         end
 
         def account_menu

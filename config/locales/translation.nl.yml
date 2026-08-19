@@ -5608,6 +5608,7 @@ nl:
           logout: Uitloggen
           menu: Menu
           organization_crest: "%{org_name} wapen"
+          view_in_super_admin: View %{org_name} in super admin
           register_a_new_bike: Registreer een nieuwe fiets
           user_settings: "%{user_email} instellingen"
           your_registrations: Uw registraties
