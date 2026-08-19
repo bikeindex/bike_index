@@ -12,11 +12,9 @@
     %p= t(".automatic_passwordless")
 
     - if current_organization.user_email_domain.present?
-      .alert.alert-info.mt-4.col-md-8.offset-md-1
-        %strong
-          = t(".you_have_a_permitted_domain")
-        %br
-        = t(".signing_in_with_permitted_domain_html", email_suffix: "@#{current_organization.user_email_domain}", org_name: current_organization.short_name)
+      .col-md-8.offset-md-1
+        = render(UI::Alerts::Base::Component.new(header: t(".you_have_a_permitted_domain"), margin_classes: "tw:mt-4",
+          text: t(".signing_in_with_permitted_domain_html", email_suffix: "@#{current_organization.user_email_domain}", org_name: current_organization.short_name)))
 
 = form_for @organization_role, { as: :organization_role, url: organization_users_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form' } } do |f|
 

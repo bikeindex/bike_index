@@ -3,32 +3,17 @@
 module PageBlock
   module MainContent
     module Organized
-      # The organization admin shell - the left menu, and the content column it's
-      # positioned over
+      # The organization admin shell - the content column PageBlock::Navbar::OrgSidebar sits
+      # beside, and the organization-wide alerts above it
       class Component < ApplicationComponent
         def initialize(current_organization:, current_user:, passive_organization:,
-          show_general_alert:, controller_namespace:, controller_name:, action_name:)
+          show_general_alert:, controller_name:, action_name:)
           @current_organization = current_organization
           @current_user = current_user
           @passive_organization = passive_organization
           @show_general_alert = show_general_alert
-          @controller_namespace = controller_namespace
           @controller_name = controller_name
           @action_name = action_name
-        end
-
-        private
-
-        def menu_items
-          Org::MenuItems::Component.new(organization: @current_organization, current_user: @current_user,
-            controller_namespace: @controller_namespace, controller_name: @controller_name,
-            action_name: @action_name)
-        end
-
-        # The dashboard itself shows the link, even for an organization without the feature
-        def show_overview_dashboard?
-          @current_organization.overview_dashboard? ||
-            (@controller_name == "dashboard" && @action_name == "index")
         end
       end
     end

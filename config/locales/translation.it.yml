@@ -1047,6 +1047,7 @@ it:
           employee: Dipendente
           graduate_student: Studente laureato
           student: Studente universitario
+          postdoc: Ricercatore post-dottorato
       stolen_record:
         bike_was_not_locked: La bicicletta non era legata
         cable_lock: Lucchetto a cavo
@@ -1145,17 +1146,12 @@ it:
       more_pages:
         display_entries: "%{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> di <b>%{total}</b>
           totali"
-    bike_helper:
-      hidden: nascosto
-      hidden_because_status: perché %{bike_type} è %{status}
-      hidden_for_unauthorized_users: nascosto agli utenti non autorizzati
-      made_without_serial: realizzato senza numero di serie
-      unknown: sconosciuto
-      deleted: Eliminato
     organization_helper:
       address: Indirizzo stradale
       address_school: Indirizzo postale del campus
       your_full_address_is_required: Il tuo indirizzo completo è richiesto da %{org_name}
+    bike_helper:
+      deleted: Eliminato
   grape:
     errors:
       format: "%{attributes} %{message}"
@@ -4600,6 +4596,7 @@ it:
         sent_to: Inviato a
         sent_to_a_new_owner: inviato a un nuovo proprietario
         sticker: Adesivo
+        stickers: Adesivi
       recoveries:
         description: Descrizione
         mfg_model_color_html: produttore, modello, <span class="less-strong">colore</span>
@@ -5229,34 +5226,38 @@ it:
       add_a_bike: Aggiungi una bicicletta
       ascend_imports: Ascend Imports
       bulk_imports: Importazioni alla rinfusa
-      custom_emails: Email personalizzate
       discuss: Discutere
       exports: Esportazioni
       getting_started: Iniziare
       graduated_notifications: Notifiche graduali
-      impounded_bikes: Biciclette sequestrate
       impounded_claims: crediti sequestrati
       incomplete_registrations: Iscrizioni incomplete
       lightspeed_integration_panel: Pannello di integrazione Lightspeed
-      manage_impounding: Gestire il sequestro
       manage_users: Gestisci utenti
       model_audits: Audit dei veicoli elettrici
-      org_bikes: "%{org_name} Biciclette"
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} posizioni"
       org_profile: "%{org_name} profilo"
       parking_notification_unregistered: Nuova notifica non registrata
-      parking_notifications: Notifiche di parcheggio
       recoveries: Recuperi
       registration_stickers: Adesivi di registrazione
       resources: Risorse
       stolen_hot_sheet: Foglio informativo sui furti di biciclette
-      stolen_hot_sheet_configuration: Configurazione del foglio di calcolo per la
-        bicicletta rubata
       stolen_message: Messaggio di furto
-      super_admin_view: Super Amministratore per %{org_name}
       multi_search: Ricerca multipla
-      manage_registration_sequences: Gestire le sequenze di registrazione
+      add_an_impounded_vehicle: Aggiungi un veicolo sequestrato
+      bulk_import_and_export: Importazione ed esportazione all'ingrosso
+      impounded_vehicles: Veicoli sequestrati
+      impounding: Sequestro
+      messaging: Messaggistica
+      org_registrations: "%{org_name} Registrazioni"
+      org_settings: "%{org_name} Impostazioni"
+      parking_notifications_group: Notifiche di parcheggio
+      registration_sequences: Sequenze di registrazione
+      reports: Rapporti
+      search_impounded_vehicles: Perquisizione dei veicoli sequestrati
+      search_parking_notifications: Cerca avvisi di parcheggio
+      search_registrations: Cerca registrazioni
     recovery_display:
       bike: Bicicletta
       recovered_date: recuperato %{date}
@@ -5272,6 +5273,9 @@ it:
       manufacturer_required: Il produttore è tenuto a registrarsi
       name_required: Per registrarsi è necessario indicare il nome del proprietario.
       unable_to_save: Non è stato possibile salvare la registrazione, riprova.
+    account_menu_items:
+      marketplace_messages: Messaggi del mercato
+      switch_to_org: Passa all'amministratore %{org_name}.
   stolen:
     index:
       ambassador: ambasciatore
@@ -5697,17 +5701,25 @@ it:
           stolen_bike: Bicicletta rubata?
         settings_menu:
           logout: Disconnettiti
-          marketplace_messages: Messaggi del mercato
           register_a_new_bike: Registra una nuova bicicletta
           settings_menu: Impostazioni
           user_settings: "%{user_email} impostazioni"
-          view_org: Visualizza %{org_name}
           your_registrations: Le vostre registrazioni
         wrapper:
           menu: Menu
           sign_up: Iscriviti
           the_nonprofit_bike_registry: il registro delle biciclette senza scopo di
             lucro
+        org_sidebar:
+          admin_panel: PANNELLO DI AMMINISTRAZIONE
+          collapse_sidebar: Riduci la barra laterale
+          expand_sidebar: Espandi la barra laterale
+          logout: Disconnettiti
+          menu: Menu
+          organization_crest: "%{org_name} cresta"
+          register_a_new_bike: Registra una nuova bicicletta
+          user_settings: "%{user_email} impostazioni"
+          your_registrations: Le vostre registrazioni
       user_alerts:
         phone_waiting_confirmation:
           confirm_your_phone_number: Conferma il numero di telefono

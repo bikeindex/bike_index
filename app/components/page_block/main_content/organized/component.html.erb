@@ -1,32 +1,8 @@
-<nav class="organized-left-menu bootstrapstyle">
-  <div class="organized-menu-wrapper">
-    <header class="<%= show_overview_dashboard? ? "with-dashboard-link" : "with-divider-below" %>">
-      <% if OrganizationDisplayer.avatar?(@current_organization) %>
-        <%= image_tag @current_organization.avatar.url(:medium), alt: @current_organization.name %>
-      <% end %>
-
-      <h3>
-        <%= translation(".admin_panel") %>
-        <span><%= @current_organization.name %></span>
-      </h3>
-    </header>
-
-    <ul class="organized-mainmenu">
-      <%# unless we're showing overview_dashboard, we want to start off with a divider - which is not true of the header menu %>
-      <% unless show_overview_dashboard? %>
-        <li class="divider-nav-item"></li>
-      <% end %>
-
-      <%= render menu_items %>
-    </ul>
-  </div>
-</nav>
-
 <div class="organized-wrap">
   <div class="<%= helpers.organized_container %>">
-    <%# the layout skips its own spot for this - the menu is positioned over it %>
+    <%# the layout skips its own spot for this, so it lands inside the content column %>
     <% if @show_general_alert %>
-      <%= render PageBlock::UserAlerts::Wrapper::Component.new(current_user: @current_user, wrapper_class: nil) %>
+      <%= render PageBlock::UserAlerts::Wrapper::Component.new(current_user: @current_user, wrapper_class: "tw:my-4") %>
     <% end %>
 
     <% if OrganizationDisplayer.law_enforcement_missing_verified_features?(@current_organization) %>

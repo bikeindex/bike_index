@@ -76,7 +76,7 @@
                 %td
                   Serial number
                 %td
-                  = render_serial_display(@bike, current_user, skip_explanation: true)
+                  = render(Atom::Serial::Component.new(bike: @bike, user: current_user, skip_explanation: true))
               %tr
                 %td
                   Colors

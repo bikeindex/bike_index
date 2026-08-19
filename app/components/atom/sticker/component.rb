@@ -7,9 +7,10 @@ module Atom
     class Component < ApplicationComponent
       BASE_CLASSES = "#{ShortId::Component::BASE_CLASSES} tw:font-semibold"
 
-      def initialize(bike_sticker: nil, pretty_code: nil, url: nil)
+      def initialize(bike_sticker: nil, pretty_code: nil, url: nil, html_class: nil)
         @pretty_code = pretty_code || bike_sticker&.pretty_code
         @url = url
+        @html_class = html_class
       end
 
       def render?
@@ -25,7 +26,7 @@ module Atom
       private
 
       def code_block
-        content_tag(:code, @pretty_code, class: BASE_CLASSES)
+        content_tag(:code, @pretty_code, class: [BASE_CLASSES, @html_class])
       end
     end
   end

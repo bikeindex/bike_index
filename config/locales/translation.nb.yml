@@ -1041,6 +1041,7 @@ nb:
           employee: Ansatt
           graduate_student: Utdannet student
           student: Bachelorstudent
+          postdoc: Postdoktor
       stolen_record:
         bike_was_not_locked: Sykkelen var ikke låst
         cable_lock: Kabellås
@@ -1137,17 +1138,12 @@ nb:
       more_pages:
         display_entries: Viser %{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> av
           <b>%{total}</b> totalt
-    bike_helper:
-      hidden: skjult
-      hidden_because_status: fordi %{bike_type} er %{status}
-      hidden_for_unauthorized_users: skjult for uautoriserte brukere
-      made_without_serial: laget uten serie
-      unknown: ukjent
-      deleted: Slettet
     organization_helper:
       address: gateadresse
       address_school: Campus postadresse
       your_full_address_is_required: Den fullstendige adressen din kreves av %{org_name}
+    bike_helper:
+      deleted: Slettet
   grape:
     errors:
       format: "%{attributes} %{message}"
@@ -4375,6 +4371,7 @@ nb:
         sent_to: Sendt til
         sent_to_a_new_owner: sendt til ny eier
         sticker: Klistremerke
+        stickers: Klistremerker
       recoveries:
         description: Beskrivelse
         mfg_model_color_html: produsent, modell, <span class="less-strong">farge</span>
@@ -4975,33 +4972,38 @@ nb:
       add_a_bike: Legg til en sykkel
       ascend_imports: Ascend Import
       bulk_imports: Bulk import
-      custom_emails: Egendefinerte e-poster
       discuss: Diskutere
       exports: Eksport
       getting_started: Starter
       graduated_notifications: Graderte varsler
-      impounded_bikes: Beslaglagte sykler
       impounded_claims: Beslaglagte krav
       incomplete_registrations: Ufullstendige registreringer
       lightspeed_integration_panel: Lightspeed-integrasjonspanel
-      manage_impounding: Håndtere beslaglegging
       manage_users: Administrer brukere
       model_audits: E-kjøretøyrevisjon
-      org_bikes: "%{org_name} Sykler"
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} steder"
       org_profile: "%{org_name} profil"
       parking_notification_unregistered: Ny uregistrert melding
-      parking_notifications: Parkeringsmeldinger
       recoveries: Gjenopprettinger
       registration_stickers: Registreringsklistremerker
       resources: Ressurser
       stolen_hot_sheet: Stjålet Bike Hot Sheet
-      stolen_hot_sheet_configuration: Stolen Bike Hot Sheet-konfigurasjon
       stolen_message: Stjålet melding
-      super_admin_view: Superadministrator for %{org_name}
       multi_search: Multisøk
-      manage_registration_sequences: Administrer registreringssekvenser
+      add_an_impounded_vehicle: Legg til et beslaglagt kjøretøy
+      bulk_import_and_export: Import og eksport av store mengder
+      impounded_vehicles: Beslaglagte kjøretøy
+      impounding: Beslagleggelse
+      messaging: Meldinger
+      org_registrations: "%{org_name} Registreringer"
+      org_settings: "%{org_name} Innstillinger"
+      parking_notifications_group: Parkeringsvarsler
+      registration_sequences: Registreringssekvenser
+      reports: Rapporter
+      search_impounded_vehicles: Søk etter beslaglagte kjøretøy
+      search_parking_notifications: Søk etter parkeringsvarsler
+      search_registrations: Søk etter registreringer
     recovery_display:
       bike: Sykkel
       recovered_date: gjenopprettet %{date}
@@ -5017,6 +5019,9 @@ nb:
       manufacturer_required: Produsenten er pålagt å registrere seg
       name_required: Eiernavn kreves for registrering
       unable_to_save: Vi kan ikke lagre registreringen. Prøv på nytt.
+    account_menu_items:
+      marketplace_messages: Markedsplassmeldinger
+      switch_to_org: Bytt til %{org_name}-administrator
   stolen:
     index:
       ambassador: ambassadør
@@ -5433,16 +5438,24 @@ nb:
           stolen_bike: Stjålet sykkel?
         settings_menu:
           logout: Logg ut
-          marketplace_messages: Markedsplassmeldinger
           register_a_new_bike: Registrer en ny sykkel
           settings_menu: Innstillinger
           user_settings: "%{user_email}-innstillinger"
-          view_org: Se %{org_name}
           your_registrations: Dine registreringer
         wrapper:
           menu: Meny
           sign_up: Melde deg på
           the_nonprofit_bike_registry: det ideelle sykkelregisteret
+        org_sidebar:
+          admin_panel: ADMINISTRASJONSPANEL
+          collapse_sidebar: Skjul sidefeltet
+          expand_sidebar: Utvid sidefeltet
+          logout: Logg ut
+          menu: Meny
+          organization_crest: "%{org_name} våpenskjold"
+          register_a_new_bike: Registrer en ny sykkel
+          user_settings: "%{user_email}-innstillinger"
+          your_registrations: Dine registreringer
       user_alerts:
         phone_waiting_confirmation:
           confirm_your_phone_number: Bekreft telefonnummeret ditt

@@ -4,10 +4,11 @@ module Org
   module SearchResults
     module MultiResultChip
       class Component < ApplicationComponent
-        def initialize(chip_id:, result_count:, label:, error: false, error_message: nil)
+        def initialize(chip_id:, result_count:, label:, search_kind: "serials", error: false, error_message: nil)
           @chip_id = chip_id
           @result_count = result_count
           @label = label
+          @search_kind = search_kind
           @error = error
           @error_message = error_message
         end
@@ -15,18 +16,24 @@ module Org
         def call
           content_tag(:span, id: @chip_id, class: badge_classes) do
             if has_results?
-              content_tag(:a, href: "#result_#{@chip_id.delete_prefix("chip_")}", class: serial_span_classes) do
-                @label
-              end
+              link_to(label_atom(html_class: link_text_classes), "#result_#{@chip_id.delete_prefix("chip_")}", class: "tw:py-1 tw:px-2")
             else
-              inner = content_tag(:span, @label, class: "serial-span")
-              inner += trailing_label
-              inner
+              label_atom + trailing_label
             end
           end
         end
 
         private
+
+        def label_atom(html_class: nil)
+          return render(Atom::Sticker::Component.new(pretty_code: @label, html_class:)) if sticker_search?
+
+          render(Atom::Serial::Component.new(serial: @label, html_class:))
+        end
+
+        def sticker_search?
+          @search_kind == "stickers"
+        end
 
         def trailing_label
           label = content_tag(:small, @error ? "error" : translation(".no_results"), class: "tw:block tw:text-2xs tw:leading-none tw:ml-3")
@@ -38,8 +45,11 @@ module Org
           !@error && @result_count > 0
         end
 
-        def serial_span_classes
-          "serial-span tw:underline! tw:hover:font-bold! tw:text-emerald-900! tw:dark:text-emerald-200! tw:py-1 tw:px-2"
+        # The atom sets its own color and weight, so these can't sit on the link.
+        # The padding has to, though - the badge is a flex row, and an inline
+        # element's vertical padding doesn't grow the line box
+        def link_text_classes
+          "tw:underline! tw:hover:font-bold! tw:text-emerald-900! tw:dark:text-emerald-200!"
         end
 
         def badge_classes
