@@ -1,0 +1,19 @@
+<%# The bar's own markup, since the gear and its submenu are styled and opened through it %>
+
+<nav
+  class="primary-header-nav"
+  data-controller="page-block--navbar"
+  data-action="
+    click@window->page-block--navbar#closeDropdownsOutside
+    keydown.esc@window->page-block--navbar#closeOnEscape
+  "
+>
+  <div class="container">
+    <ul class="primary-main-menu tw:m-0 tw:list-none">
+      <li class="primary-nav-item">
+        <%= render PageBlock::Navbar::UserSettingsMenu::Component.new(current_user: user,
+              current_user_or_unconfirmed_user: user, dropdown: false) %>
+      </li>
+    </ul>
+  </div>
+</nav>

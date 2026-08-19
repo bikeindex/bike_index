@@ -6,7 +6,8 @@ module PageBlock
       # Each scenario searches out a real user with that many memberships, rather than one
       # deliberate account -- so an arbitrary real person, and their email, in production
       class ComponentPreview < ApplicationComponentPreview
-        # @!group Organizations
+        # The org sidebar's rendering, where the switcher is what varies
+        # @!group Dropdown
 
         # The shortest the menu gets -- no switcher, and no divider above the account rows
         def no_organizations
@@ -22,18 +23,34 @@ module PageBlock
         end
         # @endgroup
 
+        # The navbar's rendering, inside the bar it's styled by -- primary_header_nav.scss
+        # scopes the submenu to .primary-header-nav, and page-block--navbar is what opens it
+        # @display legacy_stylesheet true
+        def navbar
+          with_user(1, "user in one organization") do |user|
+            render_with_template(template: "page_block/navbar/user_settings_menu/component_preview/navbar",
+              locals: {user:})
+          end
+        end
+
         private
+
+        def render_menu(count, needed)
+          with_user(count, needed) do |user|
+            render(PageBlock::Navbar::UserSettingsMenu::Component.new(current_user: user,
+              current_user_or_unconfirmed_user: user, dropdown: true, name: user.email)) { user.email }
+          end
+        end
 
         # Lookbook is mounted unconstrained, so the count has to stay behind the guard --
         # over a production-sized users table it's a seq scan
-        def render_menu(count, needed)
+        def with_user(count, needed)
           return production_notice("user") if Rails.env.production?
 
           user = user_with_organizations(count)
           return missing_notice(needed) if user.blank?
 
-          render(PageBlock::Navbar::UserSettingsMenu::Component.new(current_user: user,
-            current_user_or_unconfirmed_user: user, name: user.email)) { user.email }
+          yield(user)
         end
 
         def user_with_organizations(count)
