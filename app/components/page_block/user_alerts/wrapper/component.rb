@@ -9,8 +9,7 @@ module PageBlock
         # container lines it up with the navbar above; z-20 because the homepage and
         # landing page bike tile grids are positioned, so they'd otherwise paint over
         # this in-flow banner; general-alert is what the landing pages hang their own
-        # spacing on. Blank where the page already places it - MainContent::Organized
-        # renders this inside its content column, which the menu doesn't cover
+        # spacing on
         def initialize(current_user:, wrapper_class: "general-alert container tw:relative tw:z-20")
           @current_user = current_user
           @wrapper_class = wrapper_class
@@ -25,8 +24,6 @@ module PageBlock
         end
 
         def call
-          return render(alert_component) if @wrapper_class.blank?
-
           tag.div(render(alert_component), class: @wrapper_class)
         end
 
