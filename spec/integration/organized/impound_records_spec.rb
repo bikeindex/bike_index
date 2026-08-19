@@ -60,8 +60,8 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     fill_in "Password", with: "testthisthing7$"
     click_button "Log in"
     dismiss_flash_messages
-    find("#passive_organization_submenu").click
-    within(".current-organization-submenu") { click_link "Impounded Bikes" }
+    click_button "Impounded Vehicles"
+    click_link "Search Impounded Vehicles"
     expect(page).to have_current_path(/\A#{Regexp.escape(base_url)}(\?|\z)/, wait: 10)
   end
 
