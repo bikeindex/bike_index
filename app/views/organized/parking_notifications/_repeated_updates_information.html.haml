@@ -1,15 +1,8 @@
 -# There is too much information to display using a flash notification, so use this template
 - if @notifications_failed_resolved&.any?
-  .alert.alert-warning.mt-4.mb-4
-    %h3.uncap
-      Unable to
-      - if @repeated_kind == "mark_retrieved"
-        Mark
-        = pluralize @notifications_failed_resolved.count, "notification"
-        retrieved
-      - else
-        send
-        = pluralize @notifications_failed_resolved.count, "notification"
+  - failed_count = pluralize(@notifications_failed_resolved.count, "notification")
+  - header = (@repeated_kind == "mark_retrieved") ? "Unable to mark #{failed_count} retrieved" : "Unable to send #{failed_count}"
+  = render(UI::Alerts::Base::Component.new(kind: :warning, header:, margin_classes: "tw:mt-4 tw:mb-4")) do
     %ul
       - @notifications_failed_resolved.each do |parking_notification|
         %li.mt-2{ style: "color: #666; line-height: 1.5;" }
