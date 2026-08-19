@@ -1061,6 +1061,7 @@ nl:
           employee: Werknemer
           student: Student
           graduate_student: Afgestudeerde student
+          postdoc: Postdoc
     bike_attributable:
       drivetrain_attributes:
         belt_drive: Riemaandrijving
