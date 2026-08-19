@@ -8,7 +8,8 @@
 <div class="row mt-4 mb-4">
   <div class="col-sm-8">
     <p>
-      <%= t(".num_bikes_registered_html", num_bikes: pluralize(number_with_delimiter(@pagy.count), t(".bike"))) %>
+      <% num_bikes = safe_join([number_display(@pagy.count), " ", t(".bike").pluralize(@pagy.count)]) %>
+      <%= t(".num_bikes_registered_html", num_bikes:) %>
       <em><%= humanized_time_range(@time_range) %></em>
     </p>
   </div>
@@ -17,9 +18,7 @@
     <div class="col-sm-4">
       <%= render(UI::Dropdown::Component.new(name: "#{@search_claimedness.titleize} registrations", active: @search_claimedness != "all")) do |dropdown| %>
         <% %w[all initial transferred].each do |claimedness| %>
-          <% dropdown.with_entry_item(active: claimedness == @search_claimedness) { link_to "#{claimedness.titleize} registrations", organization_registrations_path(search_claimedness: claimedness) } %>
-
-          <%# Divider after "all" %>
+          <% dropdown.with_entry_item(active: claimedness == @search_claimedness) { link_to "#{claimedness.titleize} registrations", organization_registrations_path(sortable_search_params.merge(search_claimedness: claimedness)) } %>
           <% dropdown.with_entry_divider if claimedness == "all" %>
         <% end %>
       <% end %>
@@ -53,6 +52,8 @@
     </small>
   <% end %>
 
+  <%# table.column(label: "Claimed") %>
+
   <% if organization.enabled?("bike_stickers") %>
     <% table.column(label: t(".stickers")) do |bike| %>
       <% bike.bike_stickers.each do |sticker| %>
@@ -64,9 +65,8 @@
 
   <% if bike_sticker.present? %>
     <% table.column(label: safe_join([link_label, tag.br, t(".sticker")])) do |bike| %>
-      <small>
-        <%= link_to link_label, bike_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization_id, bike_id: bike.id), method: "PUT" %>
-      </small>
+      <%= render(UI::ButtonLink::Component.new(text: link_label, method: :put, color: :link,
+        href: bike_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization_id, bike_id: bike.id))) %>
     <% end %>
   <% end %>
 <% end %>
