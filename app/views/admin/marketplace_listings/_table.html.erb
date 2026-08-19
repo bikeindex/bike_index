@@ -93,14 +93,14 @@
 
             <td>
               <%= cache(marketplace_listing.seller) do %>
-                <%= render Admin::UserCell::Component.new(sortable_search_params:, user: marketplace_listing.seller, render_search: true) %>
+                <%= render Admin::UserCell::Component.new(sort_state:, user: marketplace_listing.seller, render_search: true) %>
               <% end %>
             </td>
 
             <td>
               <% if marketplace_listing.buyer_id.present? %>
                 <%= cache(marketplace_listing.buyer_id) do %>
-                  <%= render Admin::UserCell::Component.new(sortable_search_params:, user: marketplace_listing.buyer_id, render_search: true) %>
+                  <%= render Admin::UserCell::Component.new(sort_state:, user: marketplace_listing.buyer_id, render_search: true) %>
                 <% end %>
               <% end %>
             </td>

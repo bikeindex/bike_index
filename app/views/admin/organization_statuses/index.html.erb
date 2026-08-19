@@ -149,7 +149,7 @@
             </td>
 
             <td>
-              <%= render Admin::OrganizationCell::Component.new(sortable_search_params:, organization: organization_status.organization, organization_id: organization_status.organization_id, render_search: params[:organization_id].blank?) %>
+              <%= render Admin::OrganizationCell::Component.new(sort_state:, organization: organization_status.organization, organization_id: organization_status.organization_id, render_search: params[:organization_id].blank?) %>
             </td>
 
             <td>

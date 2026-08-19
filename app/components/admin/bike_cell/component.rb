@@ -8,7 +8,7 @@ module Admin
         bike_id: nil,
         bike_link_path: nil,
         search_url: nil,
-        sortable_search_params: nil,
+        sort_state: ComponentStates::SortState.new,
         render_search: false,
         skip_status: false
       )
@@ -19,7 +19,7 @@ module Admin
         # Store the raw bike_link_path value (can be false, nil, or a path)
         @bike_link_path_arg = bike_link_path
         @search_url = search_url
-        @sortable_search_params = sortable_search_params
+        @sort_state = sort_state
         @render_search = render_search
         @skip_status = skip_status
       end
@@ -43,7 +43,7 @@ module Admin
 
       def computed_search_url
         @computed_search_url ||= @search_url.presence ||
-          (url_for(@sortable_search_params.merge(search_bike_id: @bike_id)) if @sortable_search_params.present?)
+          (url_for(@sort_state.search_params.merge(search_bike_id: @bike_id)) if @sort_state.search_params.present?)
       end
 
       def bike_content

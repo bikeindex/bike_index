@@ -3,11 +3,11 @@
 module Admin
   module OrganizationCell
     class Component < ApplicationComponent
-      def initialize(organization: nil, organization_id: nil, search_url: nil, sortable_search_params: nil, render_search: false)
+      def initialize(organization: nil, organization_id: nil, search_url: nil, sort_state: ComponentStates::SortState.new, render_search: false)
         @organization = organization
         @organization_id = organization_id || organization&.id
         @search_url = search_url
-        @sortable_search_params = sortable_search_params
+        @sort_state = sort_state
         @render_search = render_search
       end
 
@@ -15,7 +15,7 @@ module Admin
 
       def computed_search_url
         @computed_search_url ||= @search_url.presence ||
-          (url_for(@sortable_search_params.merge(organization_id: @organization_id)) if @sortable_search_params.present?)
+          (url_for(@sort_state.search_params.merge(organization_id: @organization_id)) if @sort_state.search_params.present?)
       end
 
       def organization_present?

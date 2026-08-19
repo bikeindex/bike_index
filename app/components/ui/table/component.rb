@@ -3,6 +3,9 @@
 module UI
   module Table
     class Component < ApplicationComponent
+      # Cell blocks are instance_exec'd, so this is how they reach the sort state
+      attr_reader :sort_state
+
       # Pass cache_key to enable per-row fragment caching (e.g. cache_key: "admin-users").
       def initialize(records:, sort_state: ComponentStates::SortState.new, cache_key: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false)
         @records = records
@@ -23,9 +26,6 @@ module UI
       def before_render
         content
       end
-
-      # Cell blocks are instance_exec'd, so this is how they reach the search params
-      def sortable_search_params = @sort_state.search_params
 
       private
 

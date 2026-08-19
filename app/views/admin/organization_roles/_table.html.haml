@@ -43,7 +43,7 @@
               = organization_role.invited_email
           - unless skip_organization
             %td
-              = render Admin::OrganizationCell::Component.new(sortable_search_params:, organization: organization_role.organization, organization_id: organization_role.organization_id, render_search: params[:organization_id].blank?)
+              = render Admin::OrganizationCell::Component.new(sort_state:, organization: organization_role.organization, organization_id: organization_role.organization_id, render_search: params[:organization_id].blank?)
           %td
             - if organization_role.claimed_at.present?
               %span.localizeTime

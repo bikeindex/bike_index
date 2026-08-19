@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe Admin::OrganizationCell::Component, type: :component do
   let(:component) { with_request_url("/admin") { render_inline(described_class.new(**options)) } }
-  let(:options) { {organization:, organization_id:, render_search:, sortable_search_params: {period: "all"}} }
+  let(:options) { {organization:, organization_id:, render_search:, sort_state: ComponentStates::SortState.new(search_params: {period: "all"})} }
   let(:organization) { nil }
   let(:organization_id) { nil }
   let(:render_search) { true }

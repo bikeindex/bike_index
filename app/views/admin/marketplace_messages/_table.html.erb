@@ -84,7 +84,7 @@
 
           <td>
             <% cache(marketplace_message.sender) do %>
-              <%= render Admin::UserCell::Component.new(sortable_search_params:, user: marketplace_message.sender, render_search: render_sortable) %>
+              <%= render Admin::UserCell::Component.new(sort_state:, user: marketplace_message.sender, render_search: render_sortable) %>
             <% end %>
           </td>
         </tr>

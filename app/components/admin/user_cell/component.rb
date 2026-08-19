@@ -9,14 +9,14 @@ module Admin
         email: nil,
         user_link_path: nil,
         search_url: nil,
-        sortable_search_params: nil,
+        sort_state: ComponentStates::SortState.new,
         render_search: false
       )
         @user = user
         @user_id = user_id || user&.id
         @email = email || user&.email
         @search_url = search_url
-        @sortable_search_params = sortable_search_params
+        @sort_state = sort_state
         @user_link_path_arg = user_link_path
         @render_search = render_search
       end
@@ -32,12 +32,12 @@ module Admin
       end
 
       def search_url_from_params
-        return if @sortable_search_params.blank?
+        return if @sort_state.search_params.blank?
 
         if @user_id.present?
-          url_for(@sortable_search_params.merge(user_id: @user_id))
+          url_for(@sort_state.search_params.merge(user_id: @user_id))
         elsif @email.present?
-          url_for(@sortable_search_params.merge(search_email: @email))
+          url_for(@sort_state.search_params.merge(search_email: @email))
         end
       end
 

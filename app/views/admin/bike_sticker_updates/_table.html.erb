@@ -11,7 +11,7 @@
 
   <% table.column(sortable: "user_id") do |update| %>
     <% if update.user_id.present? %>
-      <%= render Admin::UserCell::Component.new(sortable_search_params:, user: update.user, render_search: true) %>
+      <%= render Admin::UserCell::Component.new(sort_state:, user: update.user, render_search: true) %>
     <% end %>
   <% end %>
 
@@ -19,7 +19,7 @@
     <% bike_sticker = update.bike_sticker %>
 
     <strong>
-      <%= link_to bike_sticker.pretty_code, admin_bike_sticker_updates_path(sortable_search_params.merge(search_query: bike_sticker.code)) %>
+      <%= link_to bike_sticker.pretty_code, admin_bike_sticker_updates_path(sort_state.search_params.merge(search_query: bike_sticker.code)) %>
     </strong>
 
     <% unless bike_sticker.sticker? %>
@@ -51,7 +51,7 @@
   <% end %>
 
   <% table.column(sortable: "organization_id", label: "Update org") do |update| %>
-    <%= render Admin::OrganizationCell::Component.new(sortable_search_params:, organization: update.organization, render_search: true) %>
+    <%= render Admin::OrganizationCell::Component.new(sort_state:, organization: update.organization, render_search: true) %>
   <% end %>
 
   <% table.column(sortable: "organization_kind", label: "Org kind") do |update| %>

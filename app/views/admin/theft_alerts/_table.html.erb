@@ -84,7 +84,7 @@
 
           <td>
             <%= cache(theft_alert.user) do %>
-              <%= render Admin::UserCell::Component.new(sortable_search_params:, user: theft_alert.user, render_search: true, user_id: theft_alert.user_id) %>
+              <%= render Admin::UserCell::Component.new(sort_state:, user: theft_alert.user, render_search: true, user_id: theft_alert.user_id) %>
             <% end %>
           </td>
 

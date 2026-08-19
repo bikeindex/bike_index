@@ -15,7 +15,7 @@
   <% end %>
 
   <% table.column(sortable: "organization_id", label: "Organization") do |landing_page| %>
-    <%= render Admin::OrganizationCell::Component.new(organization: landing_page.organization, organization_id: landing_page.organization_id, sortable_search_params:, render_search:) %>
+    <%= render Admin::OrganizationCell::Component.new(organization: landing_page.organization, organization_id: landing_page.organization_id, sort_state:, render_search:) %>
   <% end %>
 
   <% table.column(sortable: "enabled", label: "Enabled") do |landing_page| %>
