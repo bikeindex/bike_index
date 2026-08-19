@@ -22,6 +22,8 @@ bin/lint $({ git diff --name-only --diff-filter=d origin/main...HEAD; git diff -
 
 Scope specs the same way — the ones covering what the branch changed, never a bare `bundle exec rspec` or a whole top-level directory (see the `rspec-testing` skill). CI runs the full suite; a green PR isn't your job to prove locally.
 
+One scoping trap: `MARKUP_DIGEST` covers a component's markup *and everything it renders*, so editing one component — a comment in its `.rb` counts — goes stale on the `cached_markup_digest` spec of whichever cached component renders it, which the branch may never have touched. `bin/update_component_digests` rewrites them all.
+
 Then review the changed files against `CLAUDE.md` (root and any nested ones in touched directories) and fix what doesn't conform — code style, testing conventions, and frontend rules. Only touch lines this branch already changed.
 
 ### The comment audit
