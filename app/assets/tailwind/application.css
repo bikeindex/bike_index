@@ -200,28 +200,33 @@ body {
 }
 /* The org sidebar is fixed, so the page it covers is pushed over instead. The
    controller narrows --org-sidebar-width as it collapses; defaulting to the
-   expanded width keeps the content still until stimulus connects. */
+   expanded width keeps the content still until stimulus connects. There's no
+   navbar here, so main's inset stands in for its gap -- named the same so a
+   full-bleed page pulls up under it with the same -mt-(--nav-gap) */
 body.with-org-sidebar {
-  /* main's inset below, which stands in for the navbar gap these pages don't have.
-     Not 0: a full-bleed page pulls up by --nav-gap to sit flush, and it's the inset
-     it has to cancel here */
-  --nav-gap: 16px;
+  --nav-gap: 28px;
 
   margin-left: var(--org-sidebar-width, 266px);
   transition: margin-left 0.18s ease;
-}
-@media (min-width: 760px) {
-  body.with-org-sidebar {
-    --nav-gap: 28px;
-  }
 }
 
 /* The sidebar runs the height of the window, so the content does too -- a short page
    would otherwise end partway down it, with the footer riding up beside the rows */
 body.with-org-sidebar main {
-  padding-top: var(--nav-gap);
+  @apply tw:pt-(--nav-gap);
 
   min-height: 100vh;
+}
+
+/* A page that is one shell stretches to fill that height, so a full-bleed background
+   reaches the bottom rather than stopping at its content. Guarded on :only-child so
+   a multi-element page keeps block layout, where its margins still collapse */
+body.with-org-sidebar main:has(> :only-child) {
+  @apply tw:flex tw:flex-col;
+}
+
+body.with-org-sidebar main > :only-child {
+  flex-grow: 1;
 }
 
 /* PageBlock::Navbar::OrgSidebar::Component::MOBILE_BREAKPOINT, below which the sidebar is
@@ -230,6 +235,8 @@ body.with-org-sidebar main {
    between the two doesn't land outside both this and the template's min-[760px] */
 @media (width < 760px) {
   body.with-org-sidebar {
+    --nav-gap: 16px;
+
     margin-left: 0;
   }
 

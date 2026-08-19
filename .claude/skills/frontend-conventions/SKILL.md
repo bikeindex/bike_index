@@ -73,6 +73,12 @@ The same instinct applies beyond buttons: **check `app/components/ui/` and `app/
 
 **Every typeahead / autocomplete / combobox goes through `UI::Forms::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. See `app/components/ui/forms/combobox/` (component + `component_preview.rb`) and `spec/components/ui/forms/combobox` for how to invoke it.
 
+## Form drafts: always `form-persist`
+
+**A form worth not retyping mirrors itself to localStorage through the `form-persist` controller** — never one of your own. It takes a `data-form-persist-key-value` unique per record, since the derived key is the form's action. See `app/components/register/step1/component.rb` and `app/components/register/step2/component.html.erb`.
+
+**A controller whose UI hangs off a restored field reconciles in two places** — a `form-persist:restored@window->…` entry in the element's `data-action`, and the same call in its own `connect`. A hand-rolled `window.addEventListener` is the older idiom; don't add more. See `app/components/register/step1/component.html.erb` with `app/javascript/controllers/register/heading_controller.js`.
+
 ## Current-page links: always `UI::ActiveLink`
 
 **Every link that goes `aria-current` on the page it points at goes through `UI::ActiveLink::Component`** — never `current_page?` in a template, and never a Stimulus controller of your own comparing `window.location`. It always derives the state in the browser (`app/javascript/controllers/ui/active_link_controller.js`), so there's no way to pass the answer in: `match:` is the only control over what counts as the page it points at. Any layout rendering one opens its `<body>` with `body_tag`. See `app/components/ui/active_link/`.
