@@ -15,7 +15,7 @@ module UI
         }
       }
 
-      # open: renders it already showing, for a preview of what's inside it
+      # open: renders it already expanded
       def initialize(name:, button_class: nil, button_color: :secondary, button_size: :md, active: false,
         open: false)
         @name = name
