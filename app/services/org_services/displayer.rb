@@ -1,6 +1,3 @@
-# Values an organization is displayed with. OrganizedHelper is where the
-# methods that build HTML live.
-
 module OrgServices
   module Displayer
     extend Functionable
@@ -39,7 +36,7 @@ module OrgServices
       end
     end
 
-    def registration_field_label(organization = nil, field_slug = nil, strip_tags: false)
+    def registration_field_label(organization, field_slug, strip_tags: false)
       txt = organization&.registration_field_labels&.dig(field_slug.to_s)
       return nil unless txt.present?
 
