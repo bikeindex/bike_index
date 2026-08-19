@@ -84,12 +84,15 @@ export default class extends Controller {
 
   persist (item) {
     if (!item.dataset.url) return
-    const position = this.itemTargets.indexOf(item)
+    this.patch(item.dataset.url, { position: this.itemTargets.indexOf(item) })
+  }
+
+  patch (url, body) {
     const token = document.querySelector('meta[name="csrf-token"]')?.content
-    fetch(item.dataset.url, {
+    fetch(url, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token },
-      body: JSON.stringify({ position })
+      body: JSON.stringify(body)
     })
   }
 

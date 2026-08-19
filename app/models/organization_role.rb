@@ -10,6 +10,7 @@
 #  email_invitation_sent_at :datetime
 #  hot_sheet_notification   :integer          default("notification_never")
 #  invited_email            :string(255)
+#  priority                 :integer          default(0), not null
 #  receive_hot_sheet        :boolean          default(FALSE)
 #  role                     :integer
 #  created_at               :datetime         not null
@@ -53,6 +54,11 @@ class OrganizationRole < ApplicationRecord
 
   def self.role_types
     ROLE_TYPES
+  end
+
+  # Every listing of a user's roles goes through here, so they're in the order the user put them in
+  def self.ordered_for(user)
+    where(user_id: user.id).order(:priority, :id)
   end
 
   # The role an organization grants to anyone on its user_email_domain. Nobody invited them, so
@@ -120,6 +126,22 @@ class OrganizationRole < ApplicationRecord
     end
   end
 
+  # Priority 0 is the organization the user has on by default - without one, their list starts at 1
+  def on_by_default?
+    priority.zero?
+  end
+
+  # Reorders the user's roles to put this one at position, counting from the first
+  def reorder_to!(position)
+    others = self.class.ordered_for(user).where.not(id:).to_a
+    renumber(others.insert(position.clamp(0, others.length), self), priority_offset)
+  end
+
+  # The whole list renumbers, because on by default is the first organization being priority 0
+  def update_on_by_default!(on_by_default)
+    renumber(self.class.ordered_for(user).to_a, on_by_default ? 0 : 1)
+  end
+
   def set_calculated_attributes
     self.invited_email = if invited_email.present?
       EmailNormalizer.normalize(invited_email)
@@ -127,5 +149,25 @@ class OrganizationRole < ApplicationRecord
       user&.email # Basically, just for auto_user in orgs
     end
     self.claimed_at ||= Time.current if user_id.present?
+    self.priority = calculated_priority if user_id_changed? && !priority_changed?
+  end
+
+  private
+
+  # A newly joined organization goes to the end of the user's list
+  def calculated_priority
+    return 0 if user_id.blank?
+
+    (self.class.where(user_id:).where.not(id:).maximum(:priority) || -1) + 1
+  end
+
+  def priority_offset
+    self.class.ordered_for(user).limit(1).pick(:priority)&.clamp(0, 1) || 0
+  end
+
+  def renumber(organization_roles, offset)
+    organization_roles.each_with_index do |organization_role, index|
+      self.class.where(id: organization_role.id).update_all(priority: index + offset)
+    end
   end
 end

@@ -1,0 +1,63 @@
+<div class="form-wrap">
+  <div class="form-well-form-header-always-visible">
+    <h3><%= t(".organization_roles") %></h3>
+  </div>
+
+  <div class="col-xs-12">
+    <p><%= t(".organization_role_information") %></p>
+
+    <div
+      class="tw:divide-y tw:divide-gray-200"
+      data-controller="my-account--organization-roles"
+    >
+      <% @organization_roles.each_with_index do |organization_role, index| %>
+        <% organization = organization_role.organization %>
+
+        <div
+          class="tw:flex tw:items-start tw:gap-2 tw:py-2"
+          data-my-account--organization-roles-target="item"
+          data-url="<%= my_account_organization_role_path(organization_role) %>"
+        >
+          <%= render UI::DragHandle::Component.new(controller: "my-account--organization-roles") %>
+
+          <%# Always rendered, so the organizations without an avatar line up with the ones that have one %>
+          <div class="tw:size-8 tw:shrink-0">
+            <% if OrganizationDisplayer.avatar?(organization) %>
+              <%= image_tag organization.avatar.url(:thumb), alt: "", class: "tw:size-8 tw:object-contain" %>
+            <% end %>
+          </div>
+
+          <div class="tw:min-w-0 tw:flex-1">
+            <%= link_to organization.short_name, organization_root_path(organization_id: organization.to_param), class: "twlink" %>
+
+            <div class="tw:text-sm tw:text-gray-600">
+              <%= t(".joined") %>
+              <%= render UI::Time::Component.new(time: organization_role.claimed_at) %>
+            </div>
+
+            <div data-my-account--organization-roles-target="defaultSlot">
+              <% if index == 0 %>
+                <%= render UI::Forms::Checkbox::Component.new(label: t(".on_by_default"),
+                      name: "on_by_default", checked: organization_role.on_by_default?, class_name: "tw:mt-1",
+                      data: {"my-account--organization-roles-target": "defaultCheckbox"},
+                      input_data: {action: "change->my-account--organization-roles#toggleDefault"}) %>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="tw:shrink-0">
+            <%= render UI::Badge::Component.new(text: t(".roles.#{organization_role.role}"), size: :sm,
+                  color: organization_role.admin? ? :notice : :gray) %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<%# Nothing on this page is saved by the form - reordering persists as it happens %>
+<script>
+  $(document).ready(function () {
+    $(".primary-edit-form-well-menu").addClass("no-save-button")
+  })
+</script>

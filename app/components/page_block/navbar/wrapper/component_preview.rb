@@ -45,7 +45,7 @@ module PageBlock
 
           render(PageBlock::Navbar::Wrapper::Component.new(current_user: switcher_user,
             current_user_or_unconfirmed_user: switcher_user,
-            passive_organization: switcher_user.organization_roles.order(:id).first.organization))
+            passive_organization: OrganizationRole.ordered_for(switcher_user).first.organization))
         end
 
         private

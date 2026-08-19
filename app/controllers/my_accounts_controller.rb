@@ -19,6 +19,8 @@ class MyAccountsController < ApplicationController
 
     if @edit_template&.to_sym == :root
       @user.find_or_build_address_record(country_id: current_country_id)
+    elsif @edit_template&.to_sym == :organization_roles
+      @organization_roles = OrganizationRole.ordered_for(@user).includes(:organization)
     end
   end
 
@@ -89,7 +91,13 @@ class MyAccountsController < ApplicationController
       sharing: translation(:sharing, scope: [:controllers, :my_accounts, :edit]),
       delete_account: translation(:delete_account, scope: [:controllers, :my_accounts, :edit]),
       membership: translation(:membership, scope: [:controllers, :my_accounts, :edit])
-    }.merge(registration_organization_template).as_json
+    }.merge(organization_role_template).merge(registration_organization_template).as_json
+  end
+
+  def organization_role_template
+    return {} unless current_user&.organization_roles.present?
+
+    {organization_roles: translation(:organization_roles, scope: [:controllers, :my_accounts, :edit])}
   end
 
   def registration_organization_template
