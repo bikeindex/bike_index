@@ -1040,8 +1040,8 @@ nb:
           community_member: Fellesskapsmedlem
           employee: Ansatt
           graduate_student: Utdannet student
-          postdoc: Postdoktor
           student: Bachelorstudent
+          postdoc: Postdoktor
       stolen_record:
         bike_was_not_locked: Sykkelen var ikke låst
         cable_lock: Kabellås
@@ -1138,17 +1138,17 @@ nb:
       more_pages:
         display_entries: Viser %{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> av
           <b>%{total}</b> totalt
+    organization_helper:
+      address: gateadresse
+      address_school: Campus postadresse
+      your_full_address_is_required: Den fullstendige adressen din kreves av %{org_name}
     bike_helper:
+      deleted: Slettet
       hidden: skjult
       hidden_because_status: fordi %{bike_type} er %{status}
       hidden_for_unauthorized_users: skjult for uautoriserte brukere
       made_without_serial: laget uten serie
       unknown: ukjent
-      deleted: Slettet
-    organization_helper:
-      address: gateadresse
-      address_school: Campus postadresse
-      your_full_address_is_required: Den fullstendige adressen din kreves av %{org_name}
   grape:
     errors:
       format: "%{attributes} %{message}"

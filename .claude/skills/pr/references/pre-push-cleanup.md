@@ -55,6 +55,8 @@ Skip this section if `rtk` isn't installed — nothing below applies to a plain 
 
 rtk's hook rewrites *some* `git diff` invocations into a summarized stat, and `grep` over a stat matches nothing. Both greps above then report clean having read zero lines, which is indistinguishable from passing. Measured on one branch: the cycle-type command was rewritten and found 0 of its 17 hits, while the comment audit's ran through untouched — so which invocations get rewritten isn't predictable from the command, and has to be checked rather than assumed.
 
+Counting is worse than grepping, because the stat isn't empty. It ends with a `Changes:` line, so `git diff --name-only … | wc -l` reports **1** for a diff that touches none of the paths — the migration and cycle-type checks both read as one hit rather than zero, and chasing a migration the branch never added is a slower failure than missing one. Pipe to `wc -l` only through `rtk proxy`, or read the file list itself.
+
 `rtk proxy` bypasses the hook. Run the check both ways when it comes back empty; disagreement means you were grepping a stat:
 
 ```bash
