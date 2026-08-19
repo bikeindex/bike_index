@@ -191,8 +191,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ci_node_total: [5]
-        ci_node_index: [0, 1, 2, 3, 4]
+        ci_node_total: [6]
+        ci_node_index: [0, 1, 2, 3, 4, 5]
     env:
       REDIS_URL: redis://127.0.0.1:6379
       PGHOST: 127.0.0.1
