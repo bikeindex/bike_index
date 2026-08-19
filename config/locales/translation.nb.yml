@@ -4375,6 +4375,7 @@ nb:
         sent_to: Sendt til
         sent_to_a_new_owner: sendt til ny eier
         sticker: Klistremerke
+        stickers: Klistremerker
       recoveries:
         description: Beskrivelse
         mfg_model_color_html: produsent, modell, <span class="less-strong">farge</span>
