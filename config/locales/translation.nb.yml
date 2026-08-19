@@ -1040,8 +1040,8 @@ nb:
           community_member: Fellesskapsmedlem
           employee: Ansatt
           graduate_student: Utdannet student
-          postdoc: Postdoktor
           student: Bachelorstudent
+          postdoc: Postdoktor
       stolen_record:
         bike_was_not_locked: Sykkelen var ikke låst
         cable_lock: Kabellås
