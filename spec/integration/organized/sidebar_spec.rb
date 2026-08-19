@@ -54,14 +54,6 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     JS
   end
 
-  # The reveal scrolls smoothly, so the row lands over the next few frames
-  def expect_scrolled_into_view
-    deadline = Time.current + Capybara.default_max_wait_time
-    sleep(0.05) until current_row_in_view? || Time.current > deadline
-
-    expect(current_row_in_view?).to be true
-  end
-
   it "opens the group holding the page, follows a row, and moves the current row with it" do
     visit "/o/#{slug}/impound_records"
 
@@ -87,6 +79,16 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect_current_group("#{organization.short_name} Registrations")
     expect(page).to have_css "#org_sidebar_nav a[aria-current='true']", text: "Search Registrations"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Search Impounded Vehicles"
+
+    # Short enough that the menu scrolls, with Manage users past its fold
+    page.current_window.resize_to(1280, 400)
+    visit "/o/#{slug}/users"
+
+    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Manage users"
+    # The reveal scrolls smoothly, so the row lands over the next few frames
+    wait_for { current_row_in_view? }
+    # Guards this against going vacuous on a menu that turns out to fit
+    expect(scroller_top).to be > 0
   end
 
   # Both rows are organized/bikes#new, told apart only by the query string
@@ -111,16 +113,5 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", visible: :all
     # Open, but no more the page than any other group
     expect(page).to have_no_css "#org_sidebar_nav button[data-active='true']"
-  end
-
-  # A window short enough that the menu scrolls, with the current row past its fold
-  it "scrolls the current row into view when the menu is taller than the column" do
-    page.current_window.resize_to(1280, 400)
-    visit "/o/#{slug}/users"
-
-    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Manage users"
-    expect_scrolled_into_view
-    # Guards the example against going vacuous on a menu that turns out to fit
-    expect(scroller_top).to be > 0
   end
 end

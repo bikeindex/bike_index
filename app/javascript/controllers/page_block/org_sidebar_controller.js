@@ -9,9 +9,12 @@ const TRANSITION_MS = 200
 // What a reader moving the page themselves looks like -- a plain scroll event won't do,
 // since revealCurrentRow's own scrolling raises one
 const READER_SCROLL_EVENTS = ['wheel', 'touchmove', 'keydown']
-// Gap left below a revealed row, so it doesn't land against the edge -- and so a
-// fractional row height can't leave it a subpixel short of the fold
+// Gap below a revealed row, so a fractional row height can't leave it a subpixel
+// short of the fold
 const REVEAL_MARGIN = 8
+// Matched by the panel it opens rather than by ui--collapse's target, so a collapse
+// nested in the sidebar keeps the data-active that controller gives it
+const GROUP_TRIGGER = '[aria-controls^="org_sidebar_group_"]'
 
 // Connects to data-controller="page-block--org-sidebar"
 //
@@ -34,8 +37,6 @@ export default class extends Controller {
     // hear it say so
     const current = this.element.querySelector('[aria-current]')
     if (current) this.openGroupFor(current)
-    this.flagCurrentGroup()
-    this.revealCurrentRow()
   }
 
   disconnect () {
@@ -77,11 +78,10 @@ export default class extends Controller {
   }
 
   // ui--collapse flags its trigger data-active while the group is open, which is the
-  // is-active variant the current row is styled with -- so every group the reader opened
-  // would read as the page they're on. Restated after each toggle as what the row means
-  // on a group: the one holding the current row, open or not
+  // is-active variant the current row is styled with -- so restated after each toggle as
+  // what that styling means on a group: it holds the current row, open or not
   flagCurrentGroup () {
-    this.element.querySelectorAll('[data-ui--collapse-target="trigger"]').forEach((trigger) => {
+    this.element.querySelectorAll(GROUP_TRIGGER).forEach((trigger) => {
       const group = trigger.closest('[data-controller~="ui--collapse"]')
       trigger.dataset.active = String(group?.querySelector('[aria-current]') != null)
     })
@@ -95,8 +95,6 @@ export default class extends Controller {
   // ui--active-link announces the current row as it marks it
   openCurrentGroup (event) {
     this.openGroupFor(event.target)
-    this.flagCurrentGroup()
-    this.revealCurrentRow()
   }
 
   // The template opens the first group, the way the design shows a page no row matches,
@@ -108,7 +106,8 @@ export default class extends Controller {
   // than skipped, and the row is read from the DOM in case its event fired first
   openGroupFor (link, attempt = 0) {
     const group = link.closest('[data-controller~="ui--collapse"]')
-    if (!group) return
+    // A top-level row has no group to open, but is still a row to settle around
+    if (!group) return this.settleCurrentRow()
 
     const collapse = this.collapseFor(group)
     if (!collapse) {
@@ -124,6 +123,10 @@ export default class extends Controller {
       if (open) this.groupFor(open)?.setExpanded(false, 0)
     }
 
+    this.settleCurrentRow()
+  }
+
+  settleCurrentRow () {
     this.flagCurrentGroup()
     this.revealCurrentRow()
   }
@@ -138,10 +141,9 @@ export default class extends Controller {
       window.addEventListener(name, this.noteReaderScroll, { passive: true, once: true }))
   }
 
-  // A menu long enough to scroll can load with the current row below its fold. Only from
-  // rest, and once: a reader who has already moved the column is looking at what they
-  // chose, and pulling them off it is worse than the row sitting out of sight. On mobile
-  // the menu is closed behind the hamburgler, so there's nothing to bring into view
+  // Only from rest, and once: a reader who has already moved the column is looking at
+  // what they chose, and pulling them off it is worse than the row sitting out of sight.
+  // On mobile the menu is closed behind the hamburgler, so there's nothing to reveal
   revealCurrentRow () {
     if (this.revealed || this.readerScrolled || this.mobile) return
 
