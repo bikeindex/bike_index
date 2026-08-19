@@ -579,6 +579,18 @@ RSpec.describe Organization, type: :model do
       expect(organization.slug).to eq(slug)
     end
 
+    # A blank short_name slugs to "", which OrganizationNameValidator rejects - so it
+    # has to fall back to the name, like an absent one does
+    context "blank short_name" do
+      let(:organization) { Organization.new(name:, short_name: " ") }
+
+      it "falls back to the name" do
+        expect(organization).to be_valid
+        expect(organization.short_name).to eq "something"
+        expect(organization.slug).to eq "something"
+      end
+    end
+
     context "tags" do
       let(:name) { "<script>alert(document.cookie)</script>" }
       it "doesn't xss" do
