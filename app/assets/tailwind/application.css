@@ -198,6 +198,40 @@ body {
     --nav-gap: 60px;
   }
 }
+/* The org sidebar is fixed, so the page it covers is pushed over instead. The
+   controller narrows --org-sidebar-width as it collapses; defaulting to the
+   expanded width keeps the content still until stimulus connects. There's no
+   navbar on these pages for a full-bleed page to pull up under. */
+body.with-org-sidebar {
+  --nav-gap: 0px;
+
+  margin-left: var(--org-sidebar-width, 266px);
+  transition: margin-left 0.18s ease;
+}
+
+/* The sidebar runs the height of the window, so the content does too -- a short page
+   would otherwise end partway down it, with the footer riding up beside the rows.
+   The inset stands in for the navbar gap these pages no longer have */
+body.with-org-sidebar main {
+  @apply tw:pt-4 tw:min-[760px]:pt-7;
+
+  min-height: 100vh;
+}
+
+/* PageBlock::Navbar::OrgSidebar::Component::MOBILE_BREAKPOINT, below which the sidebar is
+   a top bar in the flow -- which takes its own space, so there's nothing to hold
+   open for it. `width <` rather than a max-width of 759px, so a fractional viewport
+   between the two doesn't land outside both this and the template's min-[760px] */
+@media (width < 760px) {
+  body.with-org-sidebar {
+    margin-left: 0;
+  }
+
+  body.with-org-sidebar main {
+    min-height: 0;
+  }
+}
+
 /* select2 is used by everythingcombox. Here are styles to make it look like the other inputs */
 .select2 .select2-selection--multiple {
   /* There is some funky padding stuff that goes on in select2. This makes it mostly match */

@@ -409,6 +409,18 @@ RSpec.describe Organized::EmailsController, type: :request do
           end
         end
       end
+      # Only a superuser reaches a kind the organization can't view - find_mail_snippets
+      # swaps @kind for a viewable one otherwise
+      context "kind the organization can't view" do
+        let(:enabled_feature_slugs) { %w[customize_emails] }
+        it "renders the not-normally-viewable alert" do
+          get "#{base_url}/graduated_notification/edit"
+          expect(response.status).to eq(200)
+          expect(assigns(:kind)).to eq "graduated_notification"
+          expect(assigns(:viewable_email_kinds)).to_not include("graduated_notification")
+          expect(response.body).to include("normally viewable by normal users")
+        end
+      end
       context "partial_registration without access" do
         let(:enabled_feature_slugs) { %w[customize_emails graduated_notifications] }
         it "redirects" do

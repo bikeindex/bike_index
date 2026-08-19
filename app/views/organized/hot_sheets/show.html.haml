@@ -74,8 +74,8 @@
             .bike-display
               .bike-info
                 - if stolen_record.recovered?
-                  .recovered-alert
-                    %h3.uncap Bike was recovered!
+                  %div{ class: "tw:mb-2" }
+                    = render(UI::Badge::Component.new(text: "Bike was recovered!", color: :success, solid: true, size: :lg))
                 %table.table-list.mb-0
                   %tr.bike-main-info
                     %td{ colspan: 2 }
