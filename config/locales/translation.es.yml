@@ -5213,33 +5213,38 @@ es:
       add_a_bike: Añade una bicicleta
       ascend_imports: Importaciones Ascend
       bulk_imports: Importaciones a granel
-      custom_emails: Correos electrónicos personalizados
       discuss: Conversar
       exports: Exportaciones
       getting_started: Empezando
       graduated_notifications: Notificaciones graduales
-      impounded_bikes: Bicicletas confiscadas
       impounded_claims: Reclamaciones incautadas
       incomplete_registrations: Registros incompletos
       lightspeed_integration_panel: Panel de integración Lightspeed
-      manage_impounding: Gestionar el depósito
       manage_users: Gestionar usuarios
       model_audits: Auditorías de vehículos eléctricos
-      org_bikes: "%{org_name} Bicicletas"
       org_dashboard: "%{org_name} Panel de control"
       org_locations: "%{org_name} ubicaciones"
       org_profile: Perfil %{org_name}
       parking_notification_unregistered: Nueva notificación no registrada
-      parking_notifications: notificaciones de estacionamiento
       recoveries: Recuperaciones
       registration_stickers: pegatinas de registro
       resources: Recursos
       stolen_hot_sheet: Lista de bicicletas robadas
-      stolen_hot_sheet_configuration: Configuración de la lista de bicicletas robadas
       stolen_message: Mensaje robado
-      super_admin_view: Superadministrador de %{org_name}
       multi_search: Búsqueda múltiple
-      manage_registration_sequences: Gestionar secuencias de registro
+      add_an_impounded_vehicle: Agregar un vehículo incautado
+      bulk_import_and_export: Importación y exportación a granel
+      impounded_vehicles: Vehículos incautados
+      impounding: Incautación
+      messaging: Mensajería
+      org_registrations: "%{org_name} Registros"
+      org_settings: "%{org_name} Configuración"
+      parking_notifications_group: Avisos de estacionamiento
+      registration_sequences: Secuencias de registro
+      reports: Informes
+      search_impounded_vehicles: Registro de vehículos incautados
+      search_parking_notifications: Buscar notificaciones de estacionamiento
+      search_registrations: Buscar registros
     recovery_display:
       bike: Bicicleta
       recovered_date: recuperado %{date}
@@ -5255,6 +5260,9 @@ es:
       manufacturer_required: El fabricante está obligado a registrarse.
       name_required: Se requiere el nombre del propietario para registrarse.
       unable_to_save: No podemos guardar ese registro, por favor inténtelo de nuevo.
+    account_menu_items:
+      marketplace_messages: Mensajes del mercado
+      switch_to_org: Cambiar a %{org_name} administrador
   stolen:
     index:
       ambassador: embajador
@@ -5689,16 +5697,24 @@ es:
           stolen_bike: "¿Bicicleta robada?"
         settings_menu:
           logout: Cierre de sesión
-          marketplace_messages: Mensajes del mercado
           register_a_new_bike: Registre su bicicleta
           settings_menu: Ajustes
           user_settings: "%{user_email} ajustes"
-          view_org: Ver %{org_name}
           your_registrations: Sus registros
         wrapper:
           menu: Menú
           sign_up: Inscríbete
           the_nonprofit_bike_registry: el registro de bicicletas sin ánimo de lucro
+        org_sidebar:
+          admin_panel: PANEL DE ADMINISTRACIÓN
+          collapse_sidebar: Contraer la barra lateral
+          expand_sidebar: Expandir barra lateral
+          logout: Finalizar la sesión
+          menu: Menú
+          organization_crest: "%{org_name} cresta"
+          register_a_new_bike: Registre su bicicleta
+          user_settings: "%{user_email} ajustes"
+          your_registrations: Sus registros
       user_alerts:
         phone_waiting_confirmation:
           confirm_your_phone_number: Confirma tu número de teléfono
