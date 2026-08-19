@@ -50,8 +50,11 @@ export default class extends Controller {
 
   get searchQuery () {
     if (!this.form) { return '' }
-    const formData = new FormData(this.form)
-    return new URLSearchParams(formData).toString()
+    const params = new URLSearchParams(new FormData(this.form))
+    // Not a counts input, and leaving it in would change setKindCounts' dedupe
+    // key on every layout switch, refetching counts that can't have moved
+    params.delete('search_result_view')
+    return params.toString()
   }
 
   // Previews get their own keys, so they don't clobber a real search's saved location
