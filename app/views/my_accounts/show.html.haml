@@ -44,7 +44,7 @@
                       %ul.attr-list
                         %li
                           %strong.attr-title #{t(".serial")}:
-                          = render_serial_display(bike, current_user, skip_explanation: true)
+                          = render(Atom::Serial::Component.new(bike:, user: current_user, skip_explanation: true))
                         = attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
                         %li.less-strong
                           %strong.attr-title #{t(".registered")}:

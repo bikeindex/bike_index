@@ -33,7 +33,7 @@
       <li>
         <strong class="attr-title"><%= translation(".serial") %>:</strong>
         <%# current_user is only present if not cached %>
-        <%= render_serial_display(@bike, @current_user) %>
+        <%= render(Atom::Serial::Component.new(bike: @bike, user: @current_user)) %>
       </li>
 
       <%= attr_list_item(@bike.frame_colors.to_sentence, translation(".primary_colors")) %>

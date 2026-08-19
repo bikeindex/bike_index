@@ -1061,6 +1061,7 @@ nl:
           employee: Werknemer
           student: Student
           graduate_student: Afgestudeerde student
+          postdoc: Postdoc
     bike_attributable:
       drivetrain_attributes:
         belt_drive: Riemaandrijving
@@ -1139,17 +1140,12 @@ nl:
       more_pages:
         display_entries: "%{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> van de
           <b>%{total}</b> getoond"
-    bike_helper:
-      hidden: verborgen
-      hidden_because_status: omdat %{bike_type} %{status} is
-      hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
-      made_without_serial: gemaakt zonder serie
-      unknown: Onbekend
-      deleted: Verwijderd
     organization_helper:
       address: Adres
       address_school: Postadres van de campus
       your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
+    bike_helper:
+      deleted: Verwijderd
   i18n_tasks:
     add_missing:
       added:
@@ -4397,33 +4393,38 @@ nl:
       add_a_bike: Voeg een fiets toe
       ascend_imports: Opvoer importeren
       bulk_imports: Bulkinvoer
-      custom_emails: Aangepaste e-mails
       discuss: Bespreken
       exports: Uitvoer
       getting_started: Ermee beginnen
       graduated_notifications: Gegradueerde meldingen
-      impounded_bikes: In beslag genomen fietsen
       impounded_claims: In beslag genomen vorderingen
       incomplete_registrations: Onvolledige registraties
       lightspeed_integration_panel: Lightspeed-integratiepaneel
-      manage_impounding: Beheer inbeslagname
       manage_users: Gebruikers beheren
-      org_bikes: "%{org_name} Fietsen"
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} locaties"
       org_profile: "%{org_name} profiel"
       parking_notification_unregistered: Niet-geregistreerde fietsmelding
-      parking_notifications: Verlaten records
       recoveries: terugvorderingen
       registration_stickers: Registratie stickers
       resources: Middelen
       stolen_hot_sheet: Stolen Bike Hot Sheet
-      stolen_hot_sheet_configuration: Stolen Bike Hot Sheet-configuratie
-      super_admin_view: Superbeheerder voor %{org_name}
       stolen_message: Gestolen bericht
       model_audits: Audits van e-voertuigen
       multi_search: Meerdere zoekopdrachten
-      manage_registration_sequences: Beheer registratiereeksen
+      add_an_impounded_vehicle: Voeg een in beslag genomen voertuig toe
+      bulk_import_and_export: Import en export van grote hoeveelheden
+      impounded_vehicles: In beslag genomen voertuigen
+      impounding: Inbeslagname
+      messaging: Berichten
+      org_registrations: "%{org_name} Registraties"
+      org_settings: "%{org_name} Instellingen"
+      parking_notifications_group: Parkeermeldingen
+      registration_sequences: Registratiesequenties
+      reports: Rapporten
+      search_impounded_vehicles: Doorzoek in beslag genomen voertuigen
+      search_parking_notifications: Zoek naar parkeermeldingen
+      search_registrations: Zoek registraties
     bike_search_form:
       anywhere: Overal
       doesnt_look_like_serial: Het serienummer dat je hebt ingevoerd, lijkt niet op
@@ -4450,6 +4451,9 @@ nl:
       name_required: De naam van de eigenaar is vereist voor registratie.
       unable_to_save: Het is ons niet gelukt om uw registratie op te slaan. Probeer
         het later opnieuw.
+    account_menu_items:
+      marketplace_messages: Marktplaatsberichten
+      switch_to_org: Schakel over naar %{org_name} admin
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -5586,16 +5590,24 @@ nl:
           stolen_bike: Fiets gestolen?
         settings_menu:
           logout: Afmelden
-          marketplace_messages: Marktplaatsberichten
           register_a_new_bike: Registreer een nieuwe fiets
           settings_menu: Instellingen
           user_settings: "%{user_email} instellingen"
-          view_org: Bekijk %{org_name}
           your_registrations: Uw registraties
         wrapper:
           menu: Menu
           sign_up: Registreren
           the_nonprofit_bike_registry: het fietsregister zonder winstoogmerk
+        org_sidebar:
+          admin_panel: ADMINISTRATIEPANEEL
+          collapse_sidebar: Zijbalk inklappen
+          expand_sidebar: Zijbalk uitklappen
+          logout: Uitloggen
+          menu: Menu
+          organization_crest: "%{org_name} wapen"
+          register_a_new_bike: Registreer een nieuwe fiets
+          user_settings: "%{user_email} instellingen"
+          your_registrations: Uw registraties
       user_alerts:
         phone_waiting_confirmation:
           confirm_your_phone_number: Bevestig uw telefoonnummer

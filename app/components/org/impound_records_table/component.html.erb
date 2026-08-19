@@ -29,7 +29,7 @@
         <%= link_to helpers.organized_bike_text(impound_record.bike), bike_path(impound_record.bike, organization_id: current_organization.id), data: {turbo_frame: "_top"} %>
         <% unless impound_record.bike.no_serial? %>
           <small>
-            <%= helpers.render_serial_display(impound_record.bike, helpers.current_user) %>
+            <%= render(Atom::Serial::Component.new(bike: impound_record.bike, user: helpers.current_user)) %>
           </small>
         <% end %>
       <% end %>
