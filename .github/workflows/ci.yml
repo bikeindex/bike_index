@@ -160,7 +160,12 @@ jobs:
             RUBY_VERSION=${{ steps.image.outputs.ruby_version }}
             NODE_VERSION=${{ steps.image.outputs.node_version }}
           # Every test shard pulls this image, and zstd unpacks faster than gzip.
-          outputs: type=image,compression=${{ steps.image.outputs.compression }}
+          # force-compression is what converts the ruby base's own layers, which
+          # arrive gzip and stay that way without it — measured at 77MB of 746MB
+          # still gzip. It costs ~200s per rebuild, re-compressing and re-pushing
+          # every layer rather than reusing blobs the registry already has, but a
+          # rebuild only follows a lockfile change while the pull is every run.
+          outputs: type=image,compression=${{ steps.image.outputs.compression }},force-compression=true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
