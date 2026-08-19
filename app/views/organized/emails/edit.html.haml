@@ -1,7 +1,7 @@
 -# TODO: add translations
 
 .organized-page-header
-  %h1
+  = render(UI::Header::Component.new) do
     Edit
     %em
       = MailSnippet.kind_humanized(@kind)
@@ -52,7 +52,7 @@
           %small.less-strong shown to all users who report a stolen bike
         = f.text_field :report_url, class: "form-control"
 
-    %h3.uncap.mt-4
+    = render(UI::Header::Component.new(tag: :h3, html_class: "uncap mt-4")) do
       Edit the
       = @kind == "organization_stolen_message" ? "stolen message" : "email"
 
@@ -111,19 +111,18 @@
 
 -# We can't preview impound_claims unless there are impound records
 - if @impound_claim_kind && @impound_claim.blank?
-  %h3.uncap.mt-5.mb-1.text-warning
-    Can't preview email
+  = render(UI::Header::Component.new(text: "Can't preview email", tag: :h3, html_class: "uncap mt-5 text-warning"))
   %p.mt-0
     You have to have an <em>impounded record</em> to be able to see a preview of an impounded claim email
 - else
   #emailPreview.collapse.show.in
-    %h3.uncap.mt-4 Preview of email sent:
+    = render(UI::Header::Component.new(text: "Preview of email sent:", tag: :h3, html_class: "uncap mt-4"))
     .email-preview.parking-notification-email-preview
       .text-center.small.less-strong email for preview only
       <iframe src="#{organization_email_url(@kind, organization_id: current_organization.to_param)}"></iframe>
 
   #emailPreviewUpdated.collapse
-    %h3.uncap.mt-4 Save the email to see the preview
+    = render(UI::Header::Component.new(text: "Save the email to see the preview", tag: :h3, html_class: "uncap mt-4"))
 
   -# Tiny little thing to make the preview show and collapse
   :coffee

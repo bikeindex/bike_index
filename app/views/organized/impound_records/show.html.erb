@@ -6,14 +6,14 @@
 
 <%# TODO: add translations %>
 <div class="organized-page-header">
-  <h1>
+  <%= render(UI::Header::Component.new) do %>
     Impound Record
     <% if @bike.present? && @bike.creator_unregistered_parking_notification? %>
       <small class="text-warning">
         for <em>unregistered <%= @bike.type %></em>
       </small>
     <% end %>
-  </h1>
+  <% end %>
 </div>
 
 <div class="row">
@@ -175,17 +175,17 @@
 
   <% if impound_record_updates.any? %>
     <div class="<%= @impound_record.active? ? "col-xl-6" : "col-xl-10" %>">
-      <h3 class="uncap mt-2 mb-2">Updates to this record</h3>
+      <%= render(UI::Header::Component.new(text: "Updates to this record", tag: :h3, html_class: "uncap mt-2")) %>
       <%= render partial: "/organized/impound_records/impound_record_updates_table", locals: {impound_record_updates:} %>
     </div>
   <% end %>
 </div>
 
 <% if current_organization.impound_claims? %>
-  <h3 class="uncap mt-4 pt-4">
+  <%= render(UI::Header::Component.new(tag: :h3, html_class: "uncap mt-4 pt-4")) do %>
     Active claims for this <%= @impound_record.bike.type %>
     <small><%= link_to "view all claims (#{@impound_record.impound_claims.count})", organization_impound_claims_path(sortable_search_params.merge(search_impound_record_id: @impound_record.id, search_status: "all")), class: "gray-link" %></small>
-  </h3>
+  <% end %>
   <% if @impound_record.impound_claims.any? %>
     <div class="full-screen-table">
       <% impound_claims = @impound_record.impound_claims.reorder(created_at: :desc) %>
@@ -198,9 +198,9 @@
 
 <% if @parking_notification.present? %>
   <hr class="mt-4">
-  <h2 class="uncap">
+  <%= render(UI::Header::Component.new(tag: :h2, html_class: "uncap")) do %>
     Impounded by
     <em><%= link_to "this notification", organization_parking_notification_path(@parking_notification, organization_id: current_organization.to_param) %></em>
-  </h2>
+  <% end %>
   <%= render partial: "/organized/parking_notifications/show_details", locals: {viewing_impound_record: true} %>
 <% end %>

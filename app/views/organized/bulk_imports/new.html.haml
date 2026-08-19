@@ -1,8 +1,8 @@
 .organized-page-header.mb-4
-  %h1.uncap= t(".register_bikes_from_a_csv")
+  = render(UI::Header::Component.new(text: t(".register_bikes_from_a_csv"), html_class: "uncap"))
 
 .mt-4.pt-4.mb-4.pb-4
-  %h5= t(".notes_on_successfully_importing")
+  = render(UI::Header::Component.new(text: t(".notes_on_successfully_importing"), tag: :h5))
   %ul
     %li= t(".you_must_upload_a_dot_csv_html")
     %li= t(".for_best_results")
@@ -23,7 +23,7 @@
             #{BulkImport.kind_humanized(kind).titleize} bikes
 - elsif @permitted_kinds.count == 1
   - kind = @permitted_kinds.first
-  %h2.uncap.mt-4.mt-4
+  = render(UI::Header::Component.new(tag: :h2, html_class: "uncap mt-4")) do
     Importing
     - if kind == "organization_import"
       Bikes with their owner
@@ -155,8 +155,7 @@
 
 
 %hr.mt-4
-%h5.mt-4
-  = t(".optional_additions")
+= render(UI::Header::Component.new(text: t(".optional_additions"), tag: :h5, html_class: "mt-4"))
 %ul
   %li= t(".we_support_a_few_additional")
   %li= t(".if_only_some_of_your_bikes_html")

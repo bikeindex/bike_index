@@ -1,6 +1,5 @@
 .mb-4
-  %h1
-    = t(".invite_user")
+  = render(UI::Header::Component.new(text: t(".invite_user")))
   - if current_organization.restrict_invitations?
     %p
       - count = number_with_delimiter(current_organization.sent_invitation_count)
