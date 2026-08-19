@@ -6,17 +6,17 @@ RSpec.describe OrganizedServices::UserMenuItems do
   describe "for" do
     subject(:items) { described_class.for(organization:, current_user:) }
 
-    define_method(:link_item) do |label, path, secondary: false, active: :auto|
-      {type: :link, label:, path:, secondary:, active:}
+    define_method(:link_item) do |label, path, secondary: false, match: :path, matching_controllers: []|
+      {type: :link, label:, path:, secondary:, match:, matching_controllers:}
     end
 
     context "with a basic organization" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:target) do
         [
-          link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", active: :on_registrations_index),
+          link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", match: :controller_action),
           {type: :disabled, label: "Incomplete registrations", secondary: true},
-          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
+          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", match: :full_path),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false}
         ]
@@ -47,10 +47,10 @@ RSpec.describe OrganizedServices::UserMenuItems do
       end
       let(:target) do
         [
-          link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", active: :on_registrations_index),
-          link_item("Impounded Bikes", "/o/#{organization.to_param}/impound_records", secondary: true, active: :match_controller),
+          link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", match: :controller_action),
+          link_item("Impounded Bikes", "/o/#{organization.to_param}/impound_records", secondary: true, match: :controller),
           {type: :disabled, label: "Incomplete registrations", secondary: true},
-          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
+          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", match: :full_path),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false}
         ]
@@ -64,12 +64,12 @@ RSpec.describe OrganizedServices::UserMenuItems do
       let(:current_user) { FactoryBot.create(:superuser) }
       let(:target) do
         [
-          link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", active: :on_registrations_index),
+          link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", match: :controller_action),
           {type: :disabled, label: "Incomplete registrations", secondary: true},
-          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
+          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", match: :full_path),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false},
-          link_item("Manage users", "/o/#{organization.to_param}/users", active: :match_controller),
+          link_item("Manage users", "/o/#{organization.to_param}/users", match: :controller),
           link_item("#{organization.short_name} profile", "/o/#{organization.to_param}/manage"),
           link_item("#{organization.short_name} locations", "/o/#{organization.to_param}/manage/locations")
         ]
@@ -83,12 +83,12 @@ RSpec.describe OrganizedServices::UserMenuItems do
       let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
       let(:target) do
         [
-          link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", active: :on_registrations_index),
+          link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", match: :controller_action),
           {type: :disabled, label: "Incomplete registrations", secondary: true},
-          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
+          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", match: :full_path),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false},
-          link_item("Manage users", "/o/#{organization.to_param}/users", active: :match_controller),
+          link_item("Manage users", "/o/#{organization.to_param}/users", match: :controller),
           link_item("#{organization.short_name} profile", "/o/#{organization.to_param}/manage"),
           link_item("#{organization.short_name} locations", "/o/#{organization.to_param}/manage/locations")
         ]
@@ -105,15 +105,15 @@ RSpec.describe OrganizedServices::UserMenuItems do
       let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
       let(:target) do
         [
-          link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", active: :on_registrations_index),
+          link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", match: :controller_action),
           {type: :disabled, label: "Incomplete registrations", secondary: true},
-          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", active: :on_bikes_new),
+          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", match: :full_path),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false},
-          link_item("Manage users", "/o/#{organization.to_param}/users", active: :match_controller),
+          link_item("Manage users", "/o/#{organization.to_param}/users", match: :controller),
           link_item("#{organization.short_name} profile", "/o/#{organization.to_param}/manage"),
           link_item("#{organization.short_name} locations", "/o/#{organization.to_param}/manage/locations"),
-          link_item("Manage Registration sequences", "/o/#{organization.to_param}/registration_sequences", active: :on_registration_sequences)
+          link_item("Manage Registration sequences", "/o/#{organization.to_param}/registration_sequences", match: :controller, matching_controllers: ["organized/registration_sequence_pages"])
         ]
       end
 

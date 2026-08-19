@@ -41,24 +41,15 @@ RSpec.describe Admin::Navbar::Component, type: :component do
   end
 
   describe "the shortcut links" do
-    let(:active_shortcut) { "ul.navbar-nav a[aria-current]" }
-
-    context "on a shortcut's own page" do
-      let(:url) { admin_bikes }
-
-      it "marks only that shortcut active" do
-        expect(component.css(active_shortcut).map(&:text)).to eq(["Bikes"])
-      end
-    end
+    let(:shortcuts) { component.css("ul.navbar-nav a[data-controller='ui--active-link']") }
 
     # The shortcuts take their match from nav_select_links, so they stay active across a
-    # section rather than only on its index
-    context "on another page of the shortcut's controller" do
-      let(:url) { "#{admin_bikes}/duplicates" }
-
-      it "keeps that shortcut active" do
-        expect(component.css(active_shortcut).map(&:text)).to eq(["Bikes"])
-      end
+    # section rather than only on its index. UI::ActiveLink resolves that in the browser,
+    # against the route rendered here.
+    it "matches each shortcut on its controller" do
+      expect(shortcuts.map { |link| link["data-ui--active-link-match-value"] }.uniq).to eq(["controller"])
+      expect(shortcuts.map { |link| link["data-ui--active-link-routes-value"] })
+        .to eq(%w[admin/users admin/bikes admin/organizations admin/news admin/stolen_bikes])
     end
   end
 

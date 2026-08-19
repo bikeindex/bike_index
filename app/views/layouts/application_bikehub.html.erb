@@ -33,7 +33,7 @@
     </script>
   </head>
 
-  <body id="<%= page_id %>" class="<%= body_class %>" style="padding-top: 0;">
+  <%= body_tag(style: "padding-top: 0;") do %>
     <%# This is either the signup or signin page %>
     <% signup_page = controller_name != "sessions" %>
 
@@ -129,7 +129,7 @@
         </div>
       </div>
     </div>
-  </body>
+  <% end %>
 
   <%= render "/shared/analytics" %>
 
