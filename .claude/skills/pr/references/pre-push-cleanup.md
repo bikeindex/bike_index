@@ -18,7 +18,7 @@ bin/lint $({ git diff --name-only --diff-filter=d origin/main...HEAD; git diff -
 
 **Check that substitution produced something first.** With no arguments `bin/lint` lints the whole repo (`bin/lint:64` falls through to a bare `standardrb --fix`), so an empty diff turns the scoped command into exactly the whole-repo run it's avoiding.
 
-`--diff-filter=d` drops deleted paths so they don't show up as "Not found". Files with no linter (`.haml`, `.scss`, `.md`) are skipped, so a branch touching none of the lintable types exits cleanly rather than looking like a failure. It takes directories too, so `bin/lint app/components/foo` works while you're still iterating. Never revert what the linter wrote — if a too-broad run reformats files outside the branch, those fixes stay in the diff.
+A clean run over Ruby-only paths prints **nothing at all** — the summary table comes from the ERB formatter, so silence plus exit 0 is the pass, not a swallowed error. `--diff-filter=d` drops deleted paths so they don't show up as "Not found". Files with no linter (`.haml`, `.scss`, `.md`) are skipped, so a branch touching none of the lintable types exits cleanly rather than looking like a failure. It takes directories too, so `bin/lint app/components/foo` works while you're still iterating. Never revert what the linter wrote — if a too-broad run reformats files outside the branch, those fixes stay in the diff.
 
 Scope specs the same way — the ones covering what the branch changed, never a bare `bundle exec rspec` or a whole top-level directory (see the `rspec-testing` skill). CI runs the full suite; a green PR isn't your job to prove locally.
 
