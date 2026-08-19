@@ -1146,11 +1146,6 @@ nl:
       your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
     bike_helper:
       deleted: Verwijderd
-      hidden: verborgen
-      hidden_because_status: omdat %{bike_type} %{status} is
-      hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
-      made_without_serial: gemaakt zonder serie
-      unknown: Onbekend
   i18n_tasks:
     add_missing:
       added:

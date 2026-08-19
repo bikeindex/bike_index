@@ -20,6 +20,11 @@ module Org
         def error
           render(Component.new(chip_id: "chip_3", result_count: 0, label: "SERIAL333", error: true, error_message: "Server error 500"))
         end
+
+        # @label sticker code rather than a serial
+        def sticker_code
+          render(Component.new(chip_id: "chip_4", result_count: 1, label: "BR 000 1", search_kind: "stickers"))
+        end
         # @!endgroup
       end
     end
