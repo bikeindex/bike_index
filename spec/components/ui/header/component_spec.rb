@@ -53,6 +53,16 @@ RSpec.describe UI::Header::Component, type: :component do
     end
   end
 
+  context "with h5 tag" do
+    let(:options) { {text: "Minor section", tag: :h5} }
+
+    it "stays at the body-copy floor rather than rendering smaller" do
+      expect(component).to have_css("h5")
+      expect(component.to_html).to include("tw:text-base")
+      expect(component.to_html).to_not include("tw:text-sm")
+    end
+  end
+
   context "with custom html_class" do
     let(:options) { {text: "Custom", html_class: "tw:text-red-500"} }
 
