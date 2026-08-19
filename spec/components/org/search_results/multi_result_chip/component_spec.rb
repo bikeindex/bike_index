@@ -13,7 +13,7 @@ RSpec.describe Org::SearchResults::MultiResultChip::Component, type: :component 
   context "with results" do
     it "renders badge with link inside" do
       expect(component).to have_css("span#chip_0")
-      expect(component).to have_css("span#chip_0 a[href='#result_0']", text: "SERIAL111")
+      expect(component).to have_css("span#chip_0 a[href='#result_0'] span.serial-span", text: "SERIAL111")
     end
 
     it "uses success badge classes" do

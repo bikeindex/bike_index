@@ -19,7 +19,7 @@
 
           <li>
             <strong><%= translation("serial") %></strong>
-            <%= helpers.render_serial_display(@bike, skip_explanation: true) %>
+            <%= render(Atom::Serial::Component.new(bike: @bike, skip_explanation: true)) %>
           </li>
 
           <li>

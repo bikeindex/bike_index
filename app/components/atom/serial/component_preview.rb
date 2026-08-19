@@ -44,6 +44,12 @@ module Atom
         render(Atom::Serial::Component.new(bike: hidden_bike, user: lookbook_user, skip_explanation: true))
       end
 
+      # @label a serial string rather than a bike
+      # @param serial text "Serial to render"
+      def serial_string(serial: "FFF333")
+        render(Atom::Serial::Component.new(serial:))
+      end
+
       # @label no serial (renders nothing)
       def blank
         render(Atom::Serial::Component.new(bike: ::Bike.new))

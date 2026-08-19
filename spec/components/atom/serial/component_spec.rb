@@ -2,8 +2,6 @@
 
 require "rails_helper"
 
-# The rendered HTML matches BikeHelper#render_serial_display exactly - this replaces
-# that helper in the redesign, so the assertions mirror spec/helpers/bike_helper_spec
 RSpec.describe Atom::Serial::Component, type: :component do
   let(:instance) { described_class.new(bike:, **options) }
   let(:component) { render_inline(instance) }
@@ -70,6 +68,38 @@ RSpec.describe Atom::Serial::Component, type: :component do
 
     it "renders nothing" do
       expect(component.to_html).to be_blank
+    end
+  end
+
+  context "with a bike_version" do
+    let(:bike) { FactoryBot.create(:bike_version, bike: FactoryBot.create(:bike, serial_number: "FFF333")) }
+
+    it "renders the serial" do
+      expect(component.to_html.strip).to eq '<span class="serial-span">FFF333</span>'
+    end
+  end
+
+  context "with a serial rather than a bike" do
+    let(:instance) { described_class.new(serial: "FFF333", **options) }
+
+    it "renders the serial" do
+      expect(component.to_html.strip).to eq '<span class="serial-span">FFF333</span>'
+    end
+
+    context "with html_class" do
+      let(:options) { {html_class: "tw:mr-3"} }
+
+      it "adds the class to the span" do
+        expect(component.to_html.strip).to eq '<span class="serial-span tw:mr-3">FFF333</span>'
+      end
+    end
+
+    context "blank" do
+      let(:instance) { described_class.new(serial: "") }
+
+      it "renders nothing" do
+        expect(component.to_html).to be_blank
+      end
     end
   end
 end

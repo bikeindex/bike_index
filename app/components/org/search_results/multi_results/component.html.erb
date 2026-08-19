@@ -6,7 +6,7 @@
 >
   <h4 class="uncap tw:mt-4 tw:mb-0 tw:px-1">
     <%= translation(sticker_search? ? ".sticker_label" : ".serial_label") %>
-    <span class="serial-span"><%= @query %></span>
+    <%= render(Atom::Serial::Component.new(serial: @query)) %>
 
     <span class="tw:text-sm tw:font-normal tw:text-gray-500">
       <%= translation(".result_count_html", count: helpers.number_display(@pagy.count), results: "result".pluralize(@pagy.count)) %>

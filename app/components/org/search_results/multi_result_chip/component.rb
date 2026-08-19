@@ -15,18 +15,18 @@ module Org
         def call
           content_tag(:span, id: @chip_id, class: badge_classes) do
             if has_results?
-              content_tag(:a, href: "#result_#{@chip_id.delete_prefix("chip_")}", class: serial_span_classes) do
-                @label
-              end
+              content_tag(:a, serial(html_class: link_classes), href: "#result_#{@chip_id.delete_prefix("chip_")}")
             else
-              inner = content_tag(:span, @label, class: "serial-span")
-              inner += trailing_label
-              inner
+              serial + trailing_label
             end
           end
         end
 
         private
+
+        def serial(html_class: nil)
+          render(Atom::Serial::Component.new(serial: @label, html_class:))
+        end
 
         def trailing_label
           label = content_tag(:small, @error ? "error" : translation(".no_results"), class: "tw:block tw:text-2xs tw:leading-none tw:ml-3")
@@ -38,8 +38,8 @@ module Org
           !@error && @result_count > 0
         end
 
-        def serial_span_classes
-          "serial-span tw:underline! tw:hover:font-bold! tw:text-emerald-900! tw:dark:text-emerald-200! tw:py-1 tw:px-2"
+        def link_classes
+          "tw:underline! tw:hover:font-bold! tw:text-emerald-900! tw:dark:text-emerald-200! tw:py-1 tw:px-2"
         end
 
         def badge_classes

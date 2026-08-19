@@ -27,7 +27,7 @@
 
           <li>
             <strong><%= t(".serial") %></strong>
-            <%= render_serial_display(@bike, skip_explanation: true) %>
+            <%= render(Atom::Serial::Component.new(bike: @bike, skip_explanation: true)) %>
           </li>
 
           <li>
