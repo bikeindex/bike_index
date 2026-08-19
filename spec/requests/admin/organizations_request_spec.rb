@@ -77,6 +77,30 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(response.body).to include('name="organization[user_email_domain]"')
         expect(response.body).to include('name="organization[organization_saml_configuration_attributes][name_id_format]"')
       end
+
+      # The IdP fields decide where a domain's logins go and which key signs them, so they
+      # follow user_email_domain in being visible to every superuser but developer-only to edit
+      it "renders the IdP fields disabled" do
+        Country.united_states
+        get "#{base_url}/#{organization.to_param}/edit"
+        expect(response.status).to eq(200)
+        saml_inputs = response.body.scan(/<[^>]*organization_saml_configuration_attributes\]\[[^>]*>/)
+        expect(saml_inputs).to be_present
+        expect(saml_inputs.select { |input| input.exclude?("disabled") }).to eq([])
+      end
+
+      context "current_user is a developer" do
+        # admin access and the developer flag are separate - editing these needs both
+        let(:current_user) { FactoryBot.create(:superuser_developer) }
+        it "renders the IdP fields editable, and required because it isn't enabled yet" do
+          Country.united_states
+          get "#{base_url}/#{organization.to_param}/edit"
+          expect(response.status).to eq(200)
+          expect(response.body).to include('name="organization[organization_saml_configuration_attributes][idp_entity_id]"')
+          saml_inputs = response.body.scan(/<[^>]*organization_saml_configuration_attributes\]\[[^>]*>/)
+          expect(saml_inputs.select { |input| input.include?("disabled") }).to eq([])
+        end
+      end
     end
   end
 

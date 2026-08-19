@@ -82,11 +82,6 @@ module Admin
              max: "#{OrganizationStolenMessage::MAX_SEARCH_RADIUS} miles"}
           end
         end
-
-        def saml_configuration
-          @saml_configuration ||= @organization.organization_saml_configuration ||
-            @organization.build_organization_saml_configuration
-        end
       end
     end
   end

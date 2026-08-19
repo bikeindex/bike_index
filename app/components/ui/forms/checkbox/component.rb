@@ -11,7 +11,7 @@ module UI
       # defaults to the model's value unless overridden.
       class Component < ApplicationComponent
         def initialize(label:, form_builder: nil, attribute: nil, name: nil, checked: nil, value: "1",
-          class_name: nil, data: {}, input_data: {})
+          class_name: nil, disabled: false, data: {}, input_data: {})
           scoped = form_builder && attribute
           raise ArgumentError, "pass form_builder + attribute, or name" unless scoped || name
 
@@ -22,6 +22,7 @@ module UI
           @checked = checked
           @value = value
           @class_name = class_name
+          @disabled = disabled
           @data = data
           @input_data = input_data
         end
@@ -35,7 +36,7 @@ module UI
         private
 
         def checkbox_input
-          base = {class: "tw:h-4 tw:w-4 tw:cursor-pointer", data: @input_data}
+          base = {class: "tw:h-4 tw:w-4 tw:cursor-pointer", data: @input_data, disabled: @disabled}
           if @form_builder
             @form_builder.check_box(@attribute, base.merge(@checked.nil? ? {} : {checked: @checked}), @value, "0")
           else

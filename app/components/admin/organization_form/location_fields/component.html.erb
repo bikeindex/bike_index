@@ -23,7 +23,6 @@
 
           <% if @organization.enabled?("impound_bikes") %>
             <%= checkbox(:impound_location) %>
-
             <%= checkbox(:default_impound_location) %>
           <% end %>
         </div>
@@ -31,7 +30,9 @@
         <div class="col-lg-6">
           <div class="form-group text-center">
             <% if @location.destroy_forbidden? %>
-              <small class="less-strong">can't remove, has impounded bikes</small>
+              <small class="less-strong">
+                can't remove, has impounded bikes
+              </small>
             <% else %>
               <%= @form_builder.hidden_field :_destroy %>
               <%= render(UI::Button::Component.new(text: "Remove", color: :error, data: {action: "click->#{UI::Forms::NestedFields::Component::CONTROLLER}#remove"})) %>

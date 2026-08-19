@@ -7,18 +7,22 @@ import { collapse } from 'utils/collapse_utils'
 // (`#admin_organizations_(new|edit)` dispatch is no-op'd there). Two behaviors:
 //   1. When the organization "kind" is "ambassador", grey out the ambassador-irrelevant fields.
 //   2. When the stolen-message "kind" is "area", reveal the radius field.
+//   3. When SAML SSO is enabled, star the IdP fields the model then requires.
 export default class extends Controller {
   static targets = [
     'kind',
     'stolenMessageKind',
     'stolenMessageArea',
     'ambassadorField',
-    'ambassadorLabel'
+    'ambassadorLabel',
+    'samlEnabled',
+    'samlRequiredFields'
   ]
 
   connect () {
     this.toggleAmbassadorFields()
     this.toggleStolenMessageArea()
+    this.toggleSamlRequired()
   }
 
   toggleAmbassadorFields () {
@@ -32,5 +36,16 @@ export default class extends Controller {
     if (!this.hasStolenMessageKindTarget || !this.hasStolenMessageAreaTarget) return
     const action = this.stolenMessageKindTarget.value === 'area' ? 'show' : 'hide'
     collapse(action, this.stolenMessageAreaTarget)
+  }
+
+  // OrganizationSamlConfiguration validates these present when enabled, so an unchecked
+  // box is the one state where a half-filled configuration saves
+  toggleSamlRequired () {
+    if (!this.hasSamlEnabledTarget || !this.hasSamlRequiredFieldsTarget) return
+    const required = this.samlEnabledTarget.checked
+    const fields = this.samlRequiredFieldsTarget
+    fields.querySelectorAll('input, textarea').forEach((el) => { el.required = required })
+    fields.querySelectorAll('[data-required-marker]').forEach((el) => { el.hidden = !required })
+    fields.querySelectorAll('[data-optional-marker]').forEach((el) => { el.hidden = required })
   }
 }

@@ -26,7 +26,9 @@
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :short_name, label_text: "Short name (30 letters or less)")) do |group| %>
       <% if @organization.block_short_name_edit? %>
         <% group.with_helper_text do %>
-          <span class="em text-danger">warning - will change org URLs (landing pages, embeds)</span>
+          <span class="em text-danger">
+            warning - will change org URLs (landing pages, embeds)
+          </span>
         <% end %>
       <% end %>
     <% end %>
@@ -85,7 +87,13 @@
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :parent_organization_id, label_text: label_with_note("Parent organization", parent_org_note))) do |group| %>
       <% group.with_helper_text do %>
         <strong>Use the "regional" feature instead.</strong>
-        <em>To add regional organizations rather than child/parent relationships, enable it through a paid invoice for the organization. All organizations with a location in the same area will automatically be associated.</em>
+
+        <em>
+          To add regional organizations rather than child/parent relationships,
+          enable it through a paid invoice for the organization. All
+          organizations with a location in the same area will automatically be
+          associated.
+        </em>
       <% end %>
 
       <%= render UI::Forms::Combobox::Component.new(name: :parent_organization_id, form: @form_builder, placeholder: "Choose organization", include_blank: true, options: parent_organization_options, aria: {describedby: group.helper_text_id}, data: AMBASSADOR_TARGETS[:input_data]) %>
@@ -97,7 +105,9 @@
       <div class="only-dev-visible mt-4">
         <%= render(UI::Forms::Group::Component.new(attribute: :manual_pos_kind, label_text: "Manually set POS kind")) do |group| %>
           <% group.with_helper_text do %>
-            <span class="text-danger">Warning - you can break things here!</span>
+            <span class="text-danger">
+              Warning - you can break things here!
+            </span>
           <% end %>
 
           <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "organization[manual_pos_kind]", entries: manual_pos_kind_entries, selected: selected_manual_pos_kind)) %>
@@ -107,7 +117,6 @@
 
     <% if @organization.persisted? %>
       <% no_members = @organization.organization_roles.count == 0 %>
-
       <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :embedable_user_email, label_text: label_with_note("Auto user email", "embed registration email"))) do |group| %>
         <% if no_members %>
           <% group.with_helper_text do %>
@@ -136,6 +145,8 @@
     <% end %>
 
     <%= render(Admin::OrganizationForm::FeatureSettings::Component.new(form_builder: @form_builder, current_user: @current_user)) %>
+
+    <%= render(Admin::OrganizationForm::SamlConfiguration::Component.new(form_builder: @form_builder, current_user: @current_user)) %>
   </div>
 </div>
 

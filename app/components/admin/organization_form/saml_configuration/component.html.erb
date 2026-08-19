@@ -1,0 +1,58 @@
+<div class="card mt-4">
+  <div class="card-body">
+    <h4 class="mb-4">SAML SSO</h4>
+
+    <% unless developer? %>
+      <p class="text-warning">
+        These decide which identity provider the permitted domain's logins are
+        sent to, and which key their assertions are trusted against. Ask a
+        developer to change them.
+      </p>
+    <% end %>
+
+    <p class="text-success">
+      Service Provider details for the organization's IdP admin — or just share
+      the metadata URL, which contains all of them.
+    </p>
+
+    <ul>
+      <li>Metadata URL: <%= link_to metadata_url, metadata_url %></li>
+
+      <li>
+        SP entityID:
+        <code><%= Saml::SettingsBuilder.sp_entity_id(saml_configuration) %></code>
+      </li>
+
+      <li>
+        ACS (callback) URL:
+        <code><%= Saml::SettingsBuilder.assertion_consumer_service_url(saml_configuration) %></code>
+      </li>
+    </ul>
+
+    <%= @form_builder.fields_for :organization_saml_configuration, saml_configuration do |saml_f| %>
+      <%= render(UI::Forms::Checkbox::Component.new(form_builder: saml_f, attribute: :enabled, label: "Enable live SAML login for this organization", class_name: "tw:mb-4", disabled: !developer?, input_data: {"admin--organization-form-target": "samlEnabled", action: "change->admin--organization-form#toggleSamlRequired"})) %>
+
+      <%# Required only once it's live - the model validates the same condition %>
+      <div data-admin--organization-form-target="samlRequiredFields">
+        <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_entity_id, label_text: "IdP entityID", required: saml_configuration.enabled?, required_toggleable: true, html_options: field_options)) %>
+
+        <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_sso_target_url, label_text: "IdP SSO target URL", required: saml_configuration.enabled?, required_toggleable: true, html_options: field_options)) %>
+
+        <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_cert, kind: :text_area, label_text: "IdP certificate (PEM or base64)", required: saml_configuration.enabled?, required_toggleable: true, html_options: field_options.merge(rows: 4))) %>
+      </div>
+
+      <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_slo_target_url, label_text: "IdP SLO target URL", html_options: field_options)) %>
+
+      <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_cert_fingerprint, label_text: "IdP certificate fingerprint", html_options: field_options)) %>
+
+      <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :email_attribute_name, label_text: "Email attribute name", html_options: field_options.merge(placeholder: OrganizationSamlConfiguration::DEFAULT_EMAIL_ATTRIBUTE))) %>
+
+      <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :name_id_format, label_text: "NameID format")) do %>
+        <%= render(UI::Forms::Select::Component.new(form_builder: saml_f, attribute: :name_id_format,
+          option_tags: OrganizationSamlConfiguration::NAME_ID_FORMATS,
+          options: {include_blank: "No preference - the IdP chooses"},
+          html_options: field_options)) %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
