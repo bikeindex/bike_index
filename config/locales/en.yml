@@ -4971,7 +4971,10 @@ en:
       your_preferences: Your preferences
     menu_items_account:
       marketplace_messages: Marketplace messages
-      switch_to_org: Switch to %{org_name} admin
+      view_in_org: View in %{org_name}
+      view_without_org: View without any organization
+      viewing_in_org: Viewing in %{org_name}
+      viewing_without_org: Viewing without any organization
     menu_items_org:
       add_a_bike: Add a bike
       add_an_impounded_vehicle: Add an Impounded Vehicle

@@ -1,4 +1,8 @@
-<div class="tw:relative tw:inline-block" data-controller="ui--dropdown">
+<div
+  class="tw:relative tw:inline-block"
+  data-controller="ui--dropdown"
+  data-ui--dropdown-open-value="<%= @open %>"
+>
   <%= tag.button(**button_attributes) do %>
     <span class="tw:sr-only">Open <%= @name %> menu</span>
     <%= button_content %>

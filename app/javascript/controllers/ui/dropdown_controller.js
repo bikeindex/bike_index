@@ -10,7 +10,9 @@ export default class extends Controller {
     open: Boolean
   }
 
-  connect () {
+  // Bound here rather than in connect: openValueChanged runs first, so a dropdown rendered
+  // open would add listeners these hadn't replaced yet, and never remove them
+  initialize () {
     this.clickOutside = this.clickOutside.bind(this)
     this.handleEscape = this.handleEscape.bind(this)
     this.handleResize = this.handleResize.bind(this)

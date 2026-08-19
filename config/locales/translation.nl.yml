@@ -4453,7 +4453,10 @@ nl:
         het later opnieuw.
     menu_items_account:
       marketplace_messages: Marktplaatsberichten
-      switch_to_org: Schakel over naar %{org_name} admin
+      view_in_org: View in %{org_name}
+      view_without_org: View without any organization
+      viewing_in_org: Viewing in %{org_name}
+      viewing_without_org: Viewing without any organization
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>

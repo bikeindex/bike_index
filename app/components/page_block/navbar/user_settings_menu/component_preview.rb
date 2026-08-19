@@ -3,59 +3,55 @@
 module PageBlock
   module Navbar
     module UserSettingsMenu
-      # Each scenario searches out a real user with that many memberships, rather than one
-      # deliberate account -- so an arbitrary real person, and their email, in production
+      # The reader is built rather than found, so every scenario renders on any database --
+      # and no real person's email reaches a preview
       class ComponentPreview < ApplicationComponentPreview
-        # The org sidebar's rendering, where the switcher is what varies
-        # @!group Dropdown
+        # organization_switcher reads the association through a query, which a built user's
+        # answers nothing from, so this stands in for the chain it makes
+        PreviewRoles = Struct.new(:roles) do
+          def includes(*) = self
+
+          def order(*) = self
+
+          def filter_map(&block) = roles.filter_map(&block)
+        end
+
+        # Rendered open, since the rows are what there is to look at
+        # @!group Organizations
 
         # The shortest the menu gets -- no switcher, and no divider above the account rows
         def no_organizations
-          render_menu(0, "user outside an organization")
+          render_menu(0)
         end
 
         def one_organization
-          render_menu(1, "user in one organization")
+          render_menu(1)
         end
 
+        # Viewing in one of them, so the row for it is the disabled one
         def three_organizations
-          render_menu(3, "user in three organizations")
+          render_menu(3, viewing: 1)
         end
         # @endgroup
 
-        # The navbar's rendering, inside the bar it's styled by -- primary_header_nav.scss
-        # scopes the submenu to .primary-header-nav, and page-block--navbar is what opens it
-        # @display legacy_stylesheet true
-        def navbar
-          with_user(1, "user in one organization") do |user|
-            render_with_template(template: "page_block/navbar/user_settings_menu/component_preview/navbar",
-              locals: {user:})
-          end
-        end
-
         private
 
-        def render_menu(count, needed)
-          with_user(count, needed) do |user|
-            render(PageBlock::Navbar::UserSettingsMenu::Component.new(current_user: user,
-              current_user_or_unconfirmed_user: user, dropdown: true, name: user.email)) { user.email }
+        def render_menu(organization_count, viewing: nil)
+          organizations = Array.new(organization_count) do |i|
+            Organization.new(name: "Preview Organization #{i + 1}", short_name: "Preview #{i + 1}",
+              slug: "preview-organization-#{i + 1}")
           end
+
+          render_with_template(template: "page_block/navbar/user_settings_menu/component_preview/menu",
+            locals: {user: built_user(organizations), current_organization: viewing && organizations[viewing]})
         end
 
-        # Lookbook is mounted unconstrained, so the count has to stay behind the guard --
-        # over a production-sized users table it's a seq scan
-        def with_user(count, needed)
-          return production_notice("user") if Rails.env.production?
+        def built_user(organizations)
+          roles = organizations.map { |organization| OrganizationRole.new(organization:) }
 
-          user = user_with_organizations(count)
-          return missing_notice(needed) if user.blank?
-
-          yield(user)
-        end
-
-        def user_with_organizations(count)
-          User.left_joins(:organization_roles).group("users.id")
-            .having("count(organization_roles.id) = ?", count).order("users.id asc").first
+          User.new(email: "preview@bikeindex.org").tap do |user|
+            user.define_singleton_method(:organization_roles) { PreviewRoles.new(roles) }
+          end
         end
       end
     end

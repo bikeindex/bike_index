@@ -6,6 +6,7 @@
 # Item shapes are UserServices::MenuItemsOrg's, so the two menus read alike:
 #   {type: :divider}
 #   {type: :link, label:, path:, icon:, match:, matching_controllers:}
+#   {type: :disabled, label:}
 module UserServices
   module MenuItemsAccount
     extend Functionable
@@ -13,14 +14,19 @@ module UserServices
     # A reader in dozens of organizations would otherwise push logout off the menu
     SWITCHER_ORGANIZATIONS = 5
 
-    # Trailing divider included, so a reader in no organization takes it with them
-    def organization_switcher(user)
+    # Trailing divider included, so a reader in no organization takes it with them. Whichever
+    # they're already viewing has nowhere to go, so it's a label rather than a link
+    def organization_switcher(user, current_organization: nil)
       organizations = switchable_organizations(user)
       return [] if organizations.none?
 
-      organizations.map { |organization|
-        link(translation(:switch_to_org, org_name: organization.name),
-          routes.organization_root_path(organization_id: organization.to_param))
+      [without_organization(current_organization)] + organizations.map { |organization|
+        if organization == current_organization
+          disabled(translation(:viewing_in_org, org_name: organization.name))
+        else
+          link(translation(:view_in_org, org_name: organization.name),
+            routes.organization_root_path(organization_id: organization.to_param))
+        end
       } + [divider]
     end
 
@@ -45,6 +51,17 @@ module UserServices
       {type: :link, label:, path:, icon:, match:, matching_controllers:}
     end
 
+    # organization_id=false is what clears the one held in the session
+    def without_organization(current_organization)
+      return disabled(translation(:viewing_without_org)) if current_organization.blank?
+
+      link(translation(:view_without_org), routes.root_url(organization_id: false))
+    end
+
+    def disabled(label)
+      {type: :disabled, label:}
+    end
+
     def divider
       {type: :divider}
     end
@@ -57,6 +74,6 @@ module UserServices
       Rails.application.routes.url_helpers
     end
 
-    conceal :switchable_organizations, :link, :divider, :translation, :routes
+    conceal :switchable_organizations, :without_organization, :link, :disabled, :divider, :translation, :routes
   end
 end

@@ -67,8 +67,22 @@ RSpec.describe PageBlock::Navbar::UserSettingsMenu::Component, type: :component 
     let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
 
     it "links to the organization above a divider" do
-      expect(links.first).to eq "Switch to Sweet Shop admin"
+      expect(links.first).to eq "View in Sweet Shop"
       expect(component).to have_css "ul.primary-submenu li.divider-nav-item"
+    end
+
+    # It's the page they're on, so the row is a label rather than a link
+    context "viewing that organization" do
+      let(:instance) do
+        described_class.new(current_user:, current_user_or_unconfirmed_user: current_user,
+          dropdown: false, current_organization: organization)
+      end
+
+      it "renders it disabled" do
+        expect(links).to_not include("View in Sweet Shop")
+        expect(component.css("ul.primary-submenu span").map { |span| span.text.strip })
+          .to eq(["Viewing in Sweet Shop"])
+      end
     end
   end
 

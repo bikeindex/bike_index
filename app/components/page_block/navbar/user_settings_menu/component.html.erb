@@ -1,5 +1,5 @@
 <% if @dropdown %>
-  <%= render UI::Dropdown::Component.new(name: @name, button_class: @button_class) do |dropdown| %>
+  <%= render UI::Dropdown::Component.new(name: @name, button_class: @button_class, open: @open) do |dropdown| %>
     <% dropdown.with_button { content } %>
 
     <% items.each do |item| %>
@@ -9,6 +9,10 @@
       <% when :link %>
         <% dropdown.with_entry_item do %>
           <%= render entry(item) %>
+        <% end %>
+      <% when :disabled %>
+        <% dropdown.with_entry_item do %>
+          <span data-active="true"><%= item[:label] %></span>
         <% end %>
       <% end %>
     <% end %>
@@ -71,6 +75,10 @@
       <% when :link %>
         <li>
           <%= render entry(item) %>
+        </li>
+      <% when :disabled %>
+        <li>
+          <span class="nav-link tw:text-gray-400!" data-active="true"><%= item[:label] %></span>
         </li>
       <% end %>
     <% end %>

@@ -5021,7 +5021,10 @@ nb:
       unable_to_save: Vi kan ikke lagre registreringen. Prøv på nytt.
     menu_items_account:
       marketplace_messages: Markedsplassmeldinger
-      switch_to_org: Bytt til %{org_name}-administrator
+      view_in_org: View in %{org_name}
+      view_without_org: View without any organization
+      viewing_in_org: Viewing in %{org_name}
+      viewing_without_org: Viewing without any organization
   stolen:
     index:
       ambassador: ambassadør

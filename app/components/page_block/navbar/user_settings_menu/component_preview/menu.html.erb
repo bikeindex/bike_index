@@ -1,0 +1,12 @@
+<%#
+  The group renders its scenarios into one document, and an open menu is absolutely
+  positioned -- so each needs room below its trigger to sit clear of the next
+%>
+
+<div class="tw:pb-80">
+  <%= render PageBlock::Navbar::UserSettingsMenu::Component.new(current_user: user,
+        current_user_or_unconfirmed_user: user, dropdown: true, current_organization:,
+        name: user.email, open: true) do %>
+    <%= user.email %>
+  <% end %>
+</div>

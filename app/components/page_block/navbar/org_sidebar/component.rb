@@ -50,6 +50,7 @@ module PageBlock
         def account_menu
           PageBlock::Navbar::UserSettingsMenu::Component.new(current_user: @current_user,
             current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user, dropdown: true,
+            current_organization: @organization,
             name: @current_user_or_unconfirmed_user.email, button_class: account_button_class)
         end
 

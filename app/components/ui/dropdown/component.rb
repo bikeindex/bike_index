@@ -15,12 +15,15 @@ module UI
         }
       }
 
-      def initialize(name:, button_class: nil, button_color: :secondary, button_size: :md, active: false)
+      # open: renders it already showing, for a preview of what's inside it
+      def initialize(name:, button_class: nil, button_color: :secondary, button_size: :md, active: false,
+        open: false)
         @name = name
         @button_class = button_class
         @button_color = button_color
         @button_size = button_size
         @active = active
+        @open = open
       end
 
       private

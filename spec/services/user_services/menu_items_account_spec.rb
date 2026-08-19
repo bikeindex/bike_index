@@ -15,11 +15,22 @@ RSpec.describe UserServices::MenuItemsAccount do
       let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user:, organization:) }
 
       # The shape is UserServices::MenuItemsOrg's, so one renderer takes either list
-      it "labels the row for the organization's admin, above a divider" do
+      it "leads with the no-organization row, which is where they already are" do
         expect(described_class.organization_switcher(user))
-          .to eq([{type: :link, label: "Switch to Brakebills admin", path: "/o/#{organization.to_param}",
-                   icon: nil, match: :path, matching_controllers: []},
+          .to eq([{type: :disabled, label: "Viewing without any organization"},
+            {type: :link, label: "View in Brakebills", path: "/o/#{organization.to_param}",
+             icon: nil, match: :path, matching_controllers: []},
             {type: :divider}])
+      end
+
+      # Whichever they're on has nowhere to go, so the label moves with them
+      it "labels the one they're viewing, and links back out of it" do
+        items = described_class.organization_switcher(user, current_organization: organization)
+
+        expect(items.first[:label]).to eq "View without any organization"
+        expect(items.first[:path]).to match(/organization_id=false\z/)
+        expect(items[1]).to eq({type: :disabled, label: "Viewing in Brakebills"})
+        expect(items.last).to eq({type: :divider})
       end
     end
 
@@ -37,9 +48,9 @@ RSpec.describe UserServices::MenuItemsAccount do
         items = described_class.organization_switcher(user)
 
         expect(items.last).to eq({type: :divider})
-        expect(items[0...-1].map { |item| item[:label] })
+        expect(items[1...-1].map { |item| item[:label] })
           .to eq(organizations.first(described_class::SWITCHER_ORGANIZATIONS)
-            .map { |organization| "Switch to #{organization.name} admin" })
+            .map { |organization| "View in #{organization.name}" })
       end
     end
   end
