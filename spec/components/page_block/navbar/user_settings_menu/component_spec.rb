@@ -24,11 +24,13 @@ RSpec.describe PageBlock::Navbar::UserSettingsMenu::Component, type: :component 
   context "with dropdown" do
     let(:dropdown) { true }
 
-    it "renders the account links as dropdown entries instead" do
+    # The sidebar hangs it off the account block at the foot of the column, so it reads
+    # outward from there -- the navbar's order, inverted
+    it "renders the account links as dropdown entries, in the other order" do
       expect(component).to have_css "button#settings[data-ui--dropdown-target='button']"
       expect(component).to have_no_css "ul.primary-submenu"
       expect(component.css("ul[role='menu'] a").map { |link| link.text.strip })
-        .to eq(["Your registrations", "Register a new bike", "party@bikeindex.org settings", "Log out"])
+        .to eq(["Log out", "party@bikeindex.org settings", "Register a new bike", "Your registrations"])
       expect(component).to have_css "#navUserSettingLink[data-email='party@bikeindex.org']"
     end
   end
@@ -66,9 +68,11 @@ RSpec.describe PageBlock::Navbar::UserSettingsMenu::Component, type: :component 
     let(:organization) { FactoryBot.create(:organization, name: "Sweet Shop") }
     let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
 
-    it "links to the organization above a divider" do
-      expect(links.first).to eq "Switch to Sweet Shop"
-      expect(component).to have_css "ul.primary-submenu li.divider-nav-item"
+    # Its own section between the account rows and logout, set off on both sides
+    it "links to the organization between the dividers" do
+      expect(links).to eq(["Your registrations", "Register a new bike",
+        "party@bikeindex.org settings", "Switch to Sweet Shop", "Log out"])
+      expect(component.css("ul.primary-submenu li.divider-nav-item").count).to eq 2
     end
 
     # It's the page they're on, so the row is a label rather than a link

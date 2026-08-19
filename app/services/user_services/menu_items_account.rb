@@ -4,7 +4,6 @@
 # the rows PageBlock::Navbar::UserSettingsMenu carries beyond its own.
 #
 # Item shapes are UserServices::MenuItemsOrg's, so the two menus read alike:
-#   {type: :divider}
 #   {type: :link, label:, path:, icon:, match:, matching_controllers:}
 #   {type: :disabled, label:}
 module UserServices
@@ -14,8 +13,8 @@ module UserServices
     # A reader in dozens of organizations would otherwise push logout off the menu
     SWITCHER_ORGANIZATIONS = 5
 
-    # Trailing divider included, so a reader in no organization takes it with them. Whichever
-    # they're already viewing has nowhere to go, so it's a label rather than a link
+    # Its own section, which the caller sets off -- the two menus put it in different places.
+    # Whichever they're already viewing has nowhere to go, so it's a label rather than a link
     def organization_switcher(user, current_organization: nil)
       organizations = switchable_organizations(user)
       # A superuser can be viewing one they're no member of, which is still where they are
@@ -31,7 +30,7 @@ module UserServices
           link(translation(:switch_to_org, org_name: organization.name),
             routes.organization_root_path(organization_id: organization.to_param))
         end
-      } + [divider]
+      }
     end
 
     def marketplace_messages(user)
@@ -69,10 +68,6 @@ module UserServices
       {type: :disabled, label:}
     end
 
-    def divider
-      {type: :divider}
-    end
-
     def translation(key, **interpolations)
       I18n.t(key, scope: "shared.menu_items_account", **interpolations)
     end
@@ -81,6 +76,6 @@ module UserServices
       Rails.application.routes.url_helpers
     end
 
-    conceal :switchable_organizations, :without_organization, :link, :disabled, :divider, :translation, :routes
+    conceal :switchable_organizations, :without_organization, :link, :disabled, :translation, :routes
   end
 end

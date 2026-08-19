@@ -31,16 +31,34 @@ module PageBlock
         private
 
         def items
-          [*UserServices::MenuItemsAccount.organization_switcher(@current_user_or_unconfirmed_user,
-            current_organization: @current_organization),
-            link(translation(".your_registrations"), my_account_path),
+          sections.reject(&:empty?).inject { |rows, section| rows + [{type: :divider}] + section }
+        end
+
+        # The navbar hangs the menu off the gear above the page and the sidebar off the account
+        # block below it, so each reads outward from its trigger. The switcher holds its own
+        # order either way -- leaving the organization behind leads it
+        def sections
+          return [account_rows, switcher_rows, logout_rows] unless @dropdown
+
+          [logout_rows, switcher_rows, account_rows.reverse]
+        end
+
+        def account_rows
+          [link(translation(".your_registrations"), my_account_path),
             UserServices::MenuItemsAccount.marketplace_messages(@current_user),
             link(translation(".register_a_new_bike"), choose_registration_path),
             link(translation(".user_settings", user_email: @current_user_or_unconfirmed_user.email),
               edit_my_account_path, id: "navUserSettingLink",
-              data: {email: @current_user_or_unconfirmed_user.email}),
-            {type: :divider},
-            link(translation(".logout"), goodbye_path, logout: true)].compact
+              data: {email: @current_user_or_unconfirmed_user.email})].compact
+        end
+
+        def switcher_rows
+          UserServices::MenuItemsAccount.organization_switcher(@current_user_or_unconfirmed_user,
+            current_organization: @current_organization)
+        end
+
+        def logout_rows
+          [link(translation(".logout"), goodbye_path, logout: true)]
         end
 
         def link(label, path, match: :path, matching_controllers: [], **attributes)

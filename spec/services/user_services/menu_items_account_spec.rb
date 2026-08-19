@@ -20,8 +20,7 @@ RSpec.describe UserServices::MenuItemsAccount do
                    path: "http://test.host/?organization_id=false",
                    icon: nil, match: :path, matching_controllers: [],
                    data: {controller: "page-block--without-organization"}},
-            {type: :disabled, label: "Viewing Brakebills"},
-            {type: :divider}])
+            {type: :disabled, label: "Viewing Brakebills"}])
       end
     end
 
@@ -34,8 +33,7 @@ RSpec.describe UserServices::MenuItemsAccount do
         expect(described_class.organization_switcher(user))
           .to eq([{type: :disabled, label: "Viewing without any organization"},
             {type: :link, label: "Switch to Brakebills", path: "/o/#{organization.to_param}",
-             icon: nil, match: :path, matching_controllers: []},
-            {type: :divider}])
+             icon: nil, match: :path, matching_controllers: []}])
       end
 
       # Whichever they're on has nowhere to go, so the label moves with them
@@ -44,8 +42,7 @@ RSpec.describe UserServices::MenuItemsAccount do
 
         expect(items.first[:label]).to eq "View without any organization"
         expect(items.first[:path]).to match(/organization_id=false\z/)
-        expect(items[1]).to eq({type: :disabled, label: "Viewing Brakebills"})
-        expect(items.last).to eq({type: :divider})
+        expect(items.last).to eq({type: :disabled, label: "Viewing Brakebills"})
       end
     end
 
@@ -59,11 +56,10 @@ RSpec.describe UserServices::MenuItemsAccount do
       end
 
       # A reader in dozens of them would otherwise push logout off the menu
-      it "takes the oldest memberships, in order, and still leaves the divider" do
+      it "takes the oldest memberships, in order" do
         items = described_class.organization_switcher(user)
 
-        expect(items.last).to eq({type: :divider})
-        expect(items[1...-1].map { |item| item[:label] })
+        expect(items.drop(1).map { |item| item[:label] })
           .to eq(organizations.first(described_class::SWITCHER_ORGANIZATIONS)
             .map { |organization| "Switch to #{organization.name}" })
       end

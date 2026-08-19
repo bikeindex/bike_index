@@ -26,8 +26,8 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
     # The sidebar stands in for the navbar, so the account menu carries the organization
     # switcher and marketplace messages PageBlock::Navbar::UserSettingsMenu builds too
     expect(component.css("ul[role='menu'] li[role='menuitem'] a").map(&:text))
-      .to eq(["View without any organization", "Your registrations", "Register a new bike",
-        "kdewey@brakebills.edu settings", "Log out"])
+      .to eq(["Log out", "View without any organization",
+        "kdewey@brakebills.edu settings", "Register a new bike", "Your registrations"])
     # Brakebills is the organization it's the sidebar for, so its row has nowhere to go
     expect(component.css("ul[role='menu'] li[role='menuitem'] span").map(&:text))
       .to eq(["Viewing Brakebills"])
