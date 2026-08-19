@@ -3,22 +3,14 @@
 module Org
   module MenuItems
     class Component < ApplicationComponent
-      # The cache marks these for UI::ActiveLink to resolve per request, at these granularities
-      MATCHES = UI::ActiveLink::Component.match_table(auto: :path, match_controller: :controller,
-        on_registrations_index: :controller_action)
-
       def initialize(organization:, current_user:, controller_namespace:, controller_name:, action_name:,
-        is_dropdown: false, unregistered_parking_notification: nil, old_register_view: false,
-        register_flow_organization_id: nil)
+        is_dropdown: false)
         @organization = organization
         @current_user = current_user
         @controller_namespace = controller_namespace
         @controller_name = controller_name
         @action_name = action_name
         @is_dropdown = is_dropdown
-        @unregistered_parking_notification = unregistered_parking_notification
-        @old_register_view = old_register_view
-        @register_flow_organization_id = register_flow_organization_id
       end
 
       def render?
@@ -58,18 +50,7 @@ module Org
         items = [dashboard_link, divider, *items] if needs_dashboard_override?(items)
         items = insert_after_add_bike(items, bulk_import_link) if needs_bulk_import_override?(items)
         items += [registration_sequences_link] if needs_registration_sequences_override?(items)
-        items = with_old_register_view(items) if @old_register_view
         items
-      end
-
-      # Whoever went back to the embed form keeps being sent there, until they take the
-      # register flow's link the other way
-      def with_old_register_view(items)
-        items.map do |item|
-          next item unless item[:active] == :on_bikes_new
-
-          item.merge(path: helpers.new_organization_bike_path(organization_id: @organization.to_param))
-        end
       end
 
       def needs_dashboard_override?(items)
@@ -87,9 +68,13 @@ module Org
       # Always emits a divider above `item` so the injected link is visually
       # separated from the add-bike row, regardless of what's already in `items`.
       def insert_after_add_bike(items, item)
-        index = items.index { |i| i[:active] == :on_bikes_new }
+        index = items.index { |i| i[:path] == add_bike_link[:path] }
         return items + [divider, item] unless index
         items.dup.insert(index + 1, divider, item)
+      end
+
+      def add_bike_link
+        @add_bike_link ||= OrganizedServices::UserMenuItems.add_bike_link(@organization)
       end
 
       def dashboard_link
@@ -136,42 +121,6 @@ module Org
 
       def disabled_classes(item)
         item[:secondary] ? "disabled-menu-item menu-item secondary-item" : "disabled-menu-item menu-item"
-      end
-
-      # Resolves the per-request active state for items the cache marked with a symbol.
-      # Returns true/false for explicit cases, nil to defer to UI::ActiveLink.
-      def active_state(item)
-        return nil if MATCHES.key?(item[:active])
-
-        case item[:active]
-        when :on_bikes_new
-          # The register flow links back to the old form, so its row highlights on both
-          on_registrations_new? || on_register_flow? ||
-            (on_bikes_new? && !on_bikes_new_with_parking_notification?)
-        when :on_bikes_new_with_parking_notification
-          on_bikes_new_with_parking_notification?
-        when :on_registration_sequences
-          on_registration_sequences?
-        else
-          item[:active]
-        end
-      end
-
-      # The flow's later steps are on /register, which no organized route matches
-      def on_register_flow?
-        @register_flow_organization_id == @organization.id
-      end
-
-      def on_registrations_new?
-        organized_controller?("registrations") && @action_name == "new"
-      end
-
-      def on_bikes_new?
-        organized_controller?("bikes") && @action_name == "new"
-      end
-
-      def on_bikes_new_with_parking_notification?
-        on_bikes_new? && @unregistered_parking_notification.present?
       end
     end
   end

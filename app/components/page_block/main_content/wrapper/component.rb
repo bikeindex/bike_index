@@ -7,10 +7,8 @@ module PageBlock
       # with no wrapper lay out the full width themselves and render bare
       class Component < ApplicationComponent
         def self.kind(controller_namespace:, controller_name:, action_name:,
-          force_landing_page_render: false, register_flow_organization_id: nil)
+          force_landing_page_render: false)
           return :organized if controller_namespace == "organized" && action_name != "landing"
-          # The register flow, when the registration it's on belongs to an organization
-          return :organized if register_flow_organization_id.present?
           return :oauth_applications if controller_namespace == "oauth" && controller_name == "applications"
           return nil if controller_namespace == "search" || force_landing_page_render
 
@@ -38,8 +36,7 @@ module PageBlock
           force_landing_page_render: false, current_user: nil, current_organization: nil,
           passive_organization: nil, show_general_alert: false, blog: nil, related_blogs: nil,
           bike: nil, bike_og: nil, og_email: nil, edit_template: nil, edit_templates: nil,
-          oauth_application: nil, unregistered_parking_notification: nil, source: nil,
-          old_register_view: false, register_flow_organization_id: nil)
+          oauth_application: nil, source: nil)
           @controller_namespace = controller_namespace
           @controller_name = controller_name
           @action_name = action_name
@@ -55,12 +52,9 @@ module PageBlock
           @edit_template = edit_template
           @edit_templates = edit_templates
           @oauth_application = oauth_application
-          @unregistered_parking_notification = unregistered_parking_notification
-          @old_register_view = old_register_view
-          @register_flow_organization_id = register_flow_organization_id
           @source = source
           @kind = self.class.kind(controller_namespace:, controller_name:, action_name:,
-            force_landing_page_render:, register_flow_organization_id:)
+            force_landing_page_render:)
         end
 
         def call
@@ -113,9 +107,6 @@ module PageBlock
             current_organization: @current_organization,
             current_user: @current_user,
             passive_organization: @passive_organization,
-            unregistered_parking_notification: @unregistered_parking_notification,
-            old_register_view: @old_register_view,
-            register_flow_organization_id: @register_flow_organization_id,
             show_general_alert: @show_general_alert,
             controller_namespace: @controller_namespace,
             controller_name: @controller_name,

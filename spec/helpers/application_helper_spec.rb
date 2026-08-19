@@ -79,7 +79,7 @@ RSpec.describe ApplicationHelper, type: :helper do
         allow(view).to receive(:controller_namespace) { "organized" }
       end
       it "returns organized-body" do
-        expect(helper.body_class).to eq "organized-body"
+        expect(helper.send(:body_class)).to eq "organized-body"
       end
       context "the register flow" do
         it "adds the gray the flow's page renders on" do
@@ -92,7 +92,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     context "landing_page controller" do
       before { allow(view).to receive(:controller_name) { "landing_pages" } }
       it "returns organized-body" do
-        expect(helper.body_class).to eq "landing-page-body"
+        expect(helper.send(:body_class)).to eq "landing-page-body"
       end
     end
     context "bikes controller" do
@@ -103,7 +103,7 @@ RSpec.describe ApplicationHelper, type: :helper do
         allow(view).to receive(:controller_namespace) { nil }
       end
       it "returns nil" do
-        expect(helper.body_class).to be_nil
+        expect(helper.send(:body_class)).to be_nil
       end
     end
     context "info controller resources" do
@@ -112,7 +112,7 @@ RSpec.describe ApplicationHelper, type: :helper do
         allow(view).to receive(:action_name) { "resources" }
       end
       it "returns kelsey_landing-page-body" do
-        expect(helper.body_class).to eq "kelsey_landing-page-body"
+        expect(helper.send(:body_class)).to eq "kelsey_landing-page-body"
       end
     end
   end

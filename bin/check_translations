@@ -23,9 +23,18 @@ fi
 
 output "${CYAN}" "Checking Translations"
 
-# Quit as success if not on the branch to be synced
-if ! git branch --list | grep --silent "^* ${TRANSLATION_BRANCH}$"; then
-  output "${GREEN}" "Skipping: Not on TRANSLATION_BRANCH: ${TRANSLATION_BRANCH}"
+# The job runs as root over a workspace the runner owns, so git refuses to read the
+# repo at all without this. Only under $CI — locally it would write ~/.gitconfig.
+if [ -n "$CI" ]; then
+  git config --global --add safe.directory "$PWD"
+fi
+
+# Assigned rather than tested inline, so a git that can't answer aborts under `set -e`
+# instead of reading as "some other branch" and skipping green
+current_branch="$(git rev-parse --abbrev-ref HEAD)"
+
+if [ "$current_branch" != "$TRANSLATION_BRANCH" ]; then
+  output "${GREEN}" "Skipping: on ${current_branch}, not TRANSLATION_BRANCH: ${TRANSLATION_BRANCH}"
   exit 0
 fi
 
@@ -50,11 +59,12 @@ else
   if [ -n "$CI" ]; then
     output "${YELLOW}" "On CI — creating translation sync PR"
 
-    # Check for existing open translation sync PRs.
-    # Branches are named translations-sync-<timestamp>, so we can't use
-    # `gh pr list --head` (it requires an exact branch name) — match the prefix instead.
-    existing_pr=$(gh pr list --state open --json number,headRefName \
-      --jq 'map(select(.headRefName | startswith("translations-sync")))[0].number' 2>/dev/null || true)
+    # Branches are named translations-sync-<timestamp>, so `gh pr list --head`
+    # can't be used — it wants an exact branch name.
+    # Deliberately not failure-tolerant: a swallowed error reads as "no open sync
+    # PR" and opens a duplicate.
+    existing_pr=$(gh pr list --state open --limit 100 --json number,headRefName \
+      --jq 'map(select(.headRefName | startswith("translations-sync")))[0].number')
     if [ -n "$existing_pr" ]; then
       output "${YELLOW}" "Translation sync PR already exists: #${existing_pr} — skipping PR creation"
       exit 1

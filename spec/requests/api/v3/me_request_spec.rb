@@ -27,11 +27,11 @@ RSpec.describe "Me API V3", type: :request do
         [
           {type: "link", label: "#{organization.short_name} Bikes",
            path: "/o/#{organization.slug}/registrations",
-           secondary: false, active: "on_registrations_index"},
+           secondary: false, match: "controller_action", matching_controllers: []},
           {type: "disabled", label: "Incomplete registrations", secondary: true},
           {type: "link", label: "Add a bike",
-           path: "/o/#{organization.slug}/registrations/new",
-           secondary: false, active: "on_bikes_new"},
+           path: "/o/#{organization.slug}/bikes/new",
+           secondary: false, match: "full_path", matching_controllers: []},
           {type: "divider"},
           {type: "disabled", label: "Registration stickers", secondary: false}
         ]

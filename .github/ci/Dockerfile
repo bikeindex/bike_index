@@ -58,6 +58,14 @@ RUN curl -fsSLo /tmp/node.tar.xz "https://nodejs.org/dist/v${NODE_VERSION}/node-
     tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1 && \
     rm /tmp/node.tar.xz
 
+# The GitHub CLI, which every other job and bin/ script in this repo reaches for
+# — those run on the runner, which ships it; a container job has to bake it.
+# bin/check_translations is the one that needs it here. Man pages left behind.
+ARG GH_VERSION=2.97.0
+RUN curl -fsSLo /tmp/gh.tar.gz "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz" && \
+    tar -xzf /tmp/gh.tar.gz -C /usr/local --strip-components=1 --wildcards '*/bin/gh' && \
+    rm /tmp/gh.tar.gz
+
 # Playwright's Chromium + its OS-level deps, pinned to package.json's version.
 # PLAYWRIGHT_BROWSERS_PATH is fixed (not under $HOME): GitHub Actions
 # container jobs remap HOME to a runner-mounted path at job time, so a

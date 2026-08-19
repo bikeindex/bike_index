@@ -11,8 +11,10 @@ Skip it when the diff has no code in it — a docs-, skill- or config-only branc
 Then run `bin/lint` to auto-format (it also picks up whatever `/simplify` just changed). Always `bin/lint`, never another formatter or `standardrb` directly. Scope it to the branch's files rather than walking the whole repo:
 
 ```bash
-bin/lint $(git diff --name-only --diff-filter=d origin/main...HEAD)
+bin/lint $({ git diff --name-only --diff-filter=d origin/main...HEAD; git diff --name-only --diff-filter=d HEAD; } | sort -u)
 ```
+
+**Both halves are load-bearing.** `origin/main...HEAD` sees only *committed* work, and `/simplify` ran immediately above — so its edits are uncommitted, and a file it touched that the branch hadn't committed yet (a shared controller it reached into, say) is invisible to that range and goes unlinted. The second `git diff HEAD` picks up the working tree. Same union applies to the spec scoping below.
 
 **Check that substitution produced something first.** With no arguments `bin/lint` lints the whole repo (`bin/lint:64` falls through to a bare `standardrb --fix`), so an empty diff turns the scoped command into exactly the whole-repo run it's avoiding.
 
