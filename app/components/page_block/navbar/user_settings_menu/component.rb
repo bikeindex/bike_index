@@ -7,6 +7,9 @@ module PageBlock
       # navbar hangs them off its gear and the org sidebar off its account block, so the
       # trigger is the caller's and only the rows are here.
       class Component < ApplicationComponent
+        # UI::Dropdown puts its active colors on the li, for an entry that knows whether it's
+        # current when it renders. These resolve in the browser, so the row wears them itself
+        CURRENT = "tw:is-active:bg-purple-500 tw:is-active:text-white"
         # Logout is the only row that isn't somewhere to go
         LOGOUT = "tw:text-red-700! tw:hover:bg-red-50! tw:hover:text-red-600!"
 
@@ -31,8 +34,14 @@ module PageBlock
             link(translation(".logout"), goodbye_path, logout: true)].compact
         end
 
-        def link(label, path, **attributes)
-          {type: :link, label:, path:, **attributes}
+        def link(label, path, match: :path, matching_controllers: [], **attributes)
+          {type: :link, label:, path:, match:, matching_controllers:, **attributes}
+        end
+
+        def entry(item)
+          UI::ActiveLink::Component.new(text: item[:label], path: item[:path], match: item[:match],
+            matching_controllers: item[:matching_controllers], data: item[:data] || {},
+            id: item[:id], class: item[:logout] ? LOGOUT : CURRENT)
         end
       end
     end

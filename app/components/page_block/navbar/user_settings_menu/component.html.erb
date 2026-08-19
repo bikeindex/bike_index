@@ -7,8 +7,7 @@
       <% dropdown.with_entry_divider %>
     <% when :link %>
       <% dropdown.with_entry_item do %>
-        <%= link_to item[:label], item[:path], id: item[:id], data: item[:data],
-              class: (PageBlock::Navbar::UserSettingsMenu::Component::LOGOUT if item[:logout]) %>
+        <%= render entry(item) %>
       <% end %>
     <% end %>
   <% end %>

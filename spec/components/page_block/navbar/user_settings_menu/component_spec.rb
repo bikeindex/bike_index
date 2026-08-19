@@ -15,7 +15,17 @@ RSpec.describe PageBlock::Navbar::UserSettingsMenu::Component, type: :component 
     expect(links).to eq(["Your registrations", "Register a new bike", "party@bikeindex.org settings", "Log out"])
     expect(component).to have_css "#navUserSettingLink[data-email='party@bikeindex.org']"
     # Logging out is the only row that doesn't go somewhere, so it's the only one in red
-    expect(component.css("a[class]").map(&:text)).to eq(["Log out"])
+    expect(component.css("a[class*='text-red']").map(&:text)).to eq(["Log out"])
+  end
+
+  # Which row is current is ui--active-link's, in the browser -- the navbar renders inside a
+  # fragment cache, so it can't carry the answer for whichever page filled it
+  it "hands every row to UI::ActiveLink to resolve" do
+    rows = component.css("ul[role='menu'] a[data-controller~='ui--active-link']")
+
+    expect(rows.map(&:text)).to eq(links)
+    expect(component).to have_no_css "ul[role='menu'] a[aria-current]"
+    expect(rows.map { |row| row["data-ui--active-link-match-value"] }).to all(eq("path"))
   end
 
   context "with a marketplace message" do
