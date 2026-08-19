@@ -30,7 +30,7 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
         "kdewey@brakebills.edu settings", "Log out"])
     # Brakebills is the organization it's the sidebar for, so its row has nowhere to go
     expect(component.css("ul[role='menu'] li[role='menuitem'] span").map(&:text))
-      .to eq(["Viewing in Brakebills"])
+      .to eq(["Viewing Brakebills"])
   end
 
   # The switcher and the messages row are UserServices::MenuItemsAccount's, which its own
@@ -104,7 +104,7 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
         expect(component.css("ul[role='menu'] li[role='menuitem'] a").map(&:text))
           .to include("View without any organization")
         expect(component.css("ul[role='menu'] li[role='menuitem'] span").map(&:text))
-          .to eq(["Viewing in Brakebills"])
+          .to eq(["Viewing Brakebills"])
       end
     end
   end

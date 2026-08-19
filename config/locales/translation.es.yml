@@ -5258,9 +5258,9 @@ es:
       unable_to_save: No podemos guardar ese registro, por favor inténtelo de nuevo.
     menu_items_account:
       marketplace_messages: Mensajes del mercado
-      view_in_org: View in %{org_name}
+      switch_to_org: Switch to %{org_name}
       view_without_org: View without any organization
-      viewing_in_org: Viewing in %{org_name}
+      viewing_org: Viewing %{org_name}
       viewing_without_org: Viewing without any organization
   stolen:
     index:

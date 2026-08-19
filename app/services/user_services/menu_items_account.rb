@@ -26,9 +26,9 @@ module UserServices
 
       [without_organization(current_organization)] + organizations.map { |organization|
         if organization == current_organization
-          disabled(translation(:viewing_in_org, org_name: organization.name))
+          disabled(translation(:viewing_org, org_name: organization.name))
         else
-          link(translation(:view_in_org, org_name: organization.name),
+          link(translation(:switch_to_org, org_name: organization.name),
             routes.organization_root_path(organization_id: organization.to_param))
         end
       } + [divider]

@@ -67,7 +67,7 @@ RSpec.describe PageBlock::Navbar::UserSettingsMenu::Component, type: :component 
     let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
 
     it "links to the organization above a divider" do
-      expect(links.first).to eq "View in Sweet Shop"
+      expect(links.first).to eq "Switch to Sweet Shop"
       expect(component).to have_css "ul.primary-submenu li.divider-nav-item"
     end
 
@@ -79,9 +79,9 @@ RSpec.describe PageBlock::Navbar::UserSettingsMenu::Component, type: :component 
       end
 
       it "renders it disabled" do
-        expect(links).to_not include("View in Sweet Shop")
+        expect(links).to_not include("Switch to Sweet Shop")
         expect(component.css("ul.primary-submenu span").map { |span| span.text.strip })
-          .to eq(["Viewing in Sweet Shop"])
+          .to eq(["Viewing Sweet Shop"])
       end
     end
   end

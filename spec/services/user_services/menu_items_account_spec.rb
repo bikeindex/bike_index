@@ -20,7 +20,7 @@ RSpec.describe UserServices::MenuItemsAccount do
                    path: "http://test.host/?organization_id=false",
                    icon: nil, match: :path, matching_controllers: [],
                    data: {controller: "page-block--without-organization"}},
-            {type: :disabled, label: "Viewing in Brakebills"},
+            {type: :disabled, label: "Viewing Brakebills"},
             {type: :divider}])
       end
     end
@@ -33,7 +33,7 @@ RSpec.describe UserServices::MenuItemsAccount do
       it "leads with the no-organization row, which is where they already are" do
         expect(described_class.organization_switcher(user))
           .to eq([{type: :disabled, label: "Viewing without any organization"},
-            {type: :link, label: "View in Brakebills", path: "/o/#{organization.to_param}",
+            {type: :link, label: "Switch to Brakebills", path: "/o/#{organization.to_param}",
              icon: nil, match: :path, matching_controllers: []},
             {type: :divider}])
       end
@@ -44,7 +44,7 @@ RSpec.describe UserServices::MenuItemsAccount do
 
         expect(items.first[:label]).to eq "View without any organization"
         expect(items.first[:path]).to match(/organization_id=false\z/)
-        expect(items[1]).to eq({type: :disabled, label: "Viewing in Brakebills"})
+        expect(items[1]).to eq({type: :disabled, label: "Viewing Brakebills"})
         expect(items.last).to eq({type: :divider})
       end
     end
@@ -65,7 +65,7 @@ RSpec.describe UserServices::MenuItemsAccount do
         expect(items.last).to eq({type: :divider})
         expect(items[1...-1].map { |item| item[:label] })
           .to eq(organizations.first(described_class::SWITCHER_ORGANIZATIONS)
-            .map { |organization| "View in #{organization.name}" })
+            .map { |organization| "Switch to #{organization.name}" })
       end
     end
   end
