@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # The organizations the reader can switch between, and their marketplace messages --
-# the rows PageBlock::Navbar::SettingsMenu carries beyond its own.
+# the rows PageBlock::Navbar::UserSettingsMenu carries beyond its own.
 #
 # Item shapes are UserServices::MenuItemsOrg's, so one renderer takes either list:
 #   {type: :divider}

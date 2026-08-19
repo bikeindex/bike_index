@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe PageBlock::Navbar::SettingsMenu::Component, type: :component do
+RSpec.describe PageBlock::Navbar::UserSettingsMenu::Component, type: :component do
   let(:current_user) { FactoryBot.create(:user_confirmed, email: "party@bikeindex.org") }
   let(:instance) do
     described_class.new(current_user:, current_user_or_unconfirmed_user: current_user, name: "Settings")

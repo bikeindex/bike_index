@@ -2,7 +2,7 @@
 
 module PageBlock
   module Navbar
-    module SettingsMenu
+    module UserSettingsMenu
       # The account rows: the user's organizations, their account links and logout. The
       # navbar hangs them off its gear and the org sidebar off its account block, so the
       # trigger is the caller's and only the rows are here.

@@ -51,7 +51,7 @@ module PageBlock
         end
 
         def settings_menu
-          PageBlock::Navbar::SettingsMenu::Component.new(current_user: @current_user,
+          PageBlock::Navbar::UserSettingsMenu::Component.new(current_user: @current_user,
             current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user,
             name: translation(".settings_menu"), button_class: SETTINGS_BUTTON)
         end

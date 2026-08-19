@@ -9,7 +9,7 @@
     <% when :link %>
       <% dropdown.with_entry_item do %>
         <%= link_to item[:label], item[:path], id: item[:id], data: item[:data],
-              class: (PageBlock::Navbar::SettingsMenu::Component::LOGOUT if item[:logout]) %>
+              class: (PageBlock::Navbar::UserSettingsMenu::Component::LOGOUT if item[:logout]) %>
       <% end %>
     <% end %>
   <% end %>
