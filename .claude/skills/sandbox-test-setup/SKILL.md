@@ -69,9 +69,9 @@ before debugging the code:
 grep -o "controllers/page_block/[a-z_]*controller[^\"]*" public/assets/.sprockets-manifest.json | head
 ```
 
-Then delete `public/assets`. It's gitignored, and neither `bin/dev` nor the test
-environment needs it — both compile live without it. **It's the user's tree, so
-ask first.**
+Then delete `public/assets` — `rm -rf public/assets`, no need to ask. It's
+gitignored, and neither `bin/dev` nor the test environment needs it: both compile
+live without it.
 
 ## Whose machine it is decides who starts `bin/dev`
 

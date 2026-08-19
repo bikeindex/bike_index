@@ -89,7 +89,7 @@ browser_evaluate: () => {
 
 The donation modal is why that starts with a dismiss: a seeded user who hasn't donated gets it over the page on `/my_account` and friends, and it covers the whole shot rather than sitting in a corner.
 
-If the returned content height is **less than the viewport height**, the `<html>` element's near-black background fills the gap. Prefer painting over it — `document.documentElement.style.setProperty('background-color', getComputedStyle(document.body).backgroundColor || '#fff')` — rather than shrinking the viewport to the content. **Shrinking clips any full-height fixed element**, and on a page with a sidebar that means cutting off the very thing being reviewed: its `overflow-y-auto` nav gets the shorter viewport and silently drops half its rows. Taller-than-viewport pages need neither — `fullPage` scroll-stitches them.
+If the returned content height is **less than the viewport height**, `browser_resize` the height down to it before the shot (the `<html>` element's near-black background fills the gap otherwise), then resize back to the standard viewport before the next URL. Taller-than-viewport pages need no resize — `fullPage` scroll-stitches them.
 
 **Viewport-only is the caller's call, never yours.** When the caller asks for it — "viewport only", "above the fold", "just the mobile viewport" — drop `fullPage` for the size they named and leave the other one full page. Absent that, full page is the default at both sizes: a tall page, a sliver in a PR table cell, or a page whose change sits above the fold are none of them reasons to crop on your own.
 
