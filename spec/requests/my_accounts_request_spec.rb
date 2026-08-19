@@ -189,7 +189,7 @@ RSpec.describe MyAccountsController, type: :request do
       end
     end
     context "with organization_role" do
-      let(:target_templates) { default_edit_templates.merge(organization_roles: "Organizations") }
+      let(:target_templates) { default_edit_templates.merge(organization_roles: "Organization Roles") }
       let(:avatar) { Rack::Test::UploadedFile.new(File.open(Rails.root.join("spec/fixtures/bike.jpg"))) }
       let(:organization) { FactoryBot.create(:organization, short_name: "Bike Coop", avatar:) }
       let!(:organization_role) { FactoryBot.create(:organization_role_claimed, organization:, user: current_user) }
@@ -210,12 +210,12 @@ RSpec.describe MyAccountsController, type: :request do
         expect(rows.first["data-url"]).to eq my_account_organization_role_path(organization_role)
         expect(rows.last["data-url"]).to eq my_account_organization_role_path(organization_role2)
 
-        # Only the top organization has the checkbox
-        expect(rows.first).to have_css("input[name='on_by_default']")
-        expect(rows.last).to_not have_css("input[name='on_by_default']")
+        # The checkbox saves with the form below the list, rather than sitting in a row
+        expect(rows.first).to_not have_css("input[name='on_by_default']")
+        expect(body).to have_css("input[type='checkbox'][name='on_by_default'][checked]")
 
         # Both rows reserve the avatar's space, so their names line up
-        expect(body).to have_css("[class~='tw:size-8'][class~='tw:shrink-0']", count: 2)
+        expect(body).to have_css("[class~='tw:w-11'][class~='tw:shrink-0']", count: 2)
         expect(rows.first).to have_css("img[src*='bike']")
         expect(rows.last).to_not have_css("img")
       end
@@ -246,6 +246,19 @@ RSpec.describe MyAccountsController, type: :request do
     let!(:current_user) { FactoryBot.create(:user_confirmed, password: "old_password", password_confirmation: "old_password", username: "something") }
     # force skip_update to be false, like it is in reality (unblocks updating)
     before { current_user.skip_update = false }
+
+    context "on_by_default" do
+      let!(:organization_roles) { Array.new(2) { FactoryBot.create(:organization_role_claimed, user: current_user) } }
+
+      it "renumbers the user's roles from 1, and back from 0" do
+        patch base_url, params: {on_by_default: "0", edit_template: "organization_roles"}
+        expect(response).to redirect_to edit_my_account_url(edit_template: "organization_roles")
+        expect(OrganizationRole.ordered_for(current_user).pluck(:priority)).to eq([1, 2])
+
+        patch base_url, params: {on_by_default: "1", edit_template: "organization_roles"}
+        expect(OrganizationRole.ordered_for(current_user).pluck(:priority)).to eq([0, 1])
+      end
+    end
 
     context "reserved username" do
       it "doesn't update username" do

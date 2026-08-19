@@ -1748,7 +1748,7 @@ en:
       edit:
         delete_account: Delete account
         membership: Membership
-        organization_roles: Organizations
+        organization_roles: Organization Roles
         password: Password
         registration_organizations: Registration Organizations
         sharing: Sharing + Personal Page
@@ -3911,16 +3911,20 @@ en:
       index:
         marketplace_messages: Marketplace messages
     organization_roles:
+      automatically_show_organization_menu_html: >-
+        Automatically show the first organization (%{org_name}) menu when you visit
+        Bike Index
       joined: Joined
-      on_by_default: On by default
       organization_role_information: >-
-        The organizations you're a member of. Drag them into the order you want them
-        prioritized in.
-      organization_roles: Your organizations
+        Organizations you have a role in. Drag them into the order you want them prioritized
+        in.
+      organization_roles: Your organization roles
+      role_html: 'Role: %{role}'
       roles:
         admin: Admin
         member: Member
         member_no_bike_edit: Member - no bike editing
+      use_on_login: Use on login
     password:
       better_password: better
       for_password_update: For password update

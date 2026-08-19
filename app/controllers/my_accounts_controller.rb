@@ -32,7 +32,8 @@ class MyAccountsController < ApplicationController
       end
     end
     unless @user.errors.any?
-      successfully_updated = update_hot_sheet_notifications || update_user_registration_organizations
+      successfully_updated = update_hot_sheet_notifications || update_user_registration_organizations ||
+        update_organization_role_on_by_default
 
       if params[:user].present?
         successfully_updated = update_user_from_params(@user, permitted_parameters)
@@ -121,6 +122,17 @@ class MyAccountsController < ApplicationController
       organization_role.update(hot_sheet_notification: notify ? "notification_daily" : "notification_never")
       flash[:success] ||= "Notification setting updated"
     end
+    true
+  end
+
+  # The checkbox is the first organization holding priority 0, so the whole list renumbers
+  def update_organization_role_on_by_default
+    return false unless params.key?(:on_by_default)
+
+    organization_role = OrganizationRole.ordered_for(@user).first
+    return false if organization_role.blank?
+
+    organization_role.update_on_by_default!(Binxtils::InputNormalizer.boolean(params[:on_by_default]))
     true
   end
 

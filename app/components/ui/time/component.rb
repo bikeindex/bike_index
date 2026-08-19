@@ -7,10 +7,11 @@ module UI
 
       strip_trailing_whitespace
 
-      def initialize(time: nil, format: nil, timezone_if_different: false)
+      def initialize(time: nil, format: nil, timezone_if_different: false, preposition: false)
         @time = time
         @format = PERMITTED_FORMATS.include?(format&.to_sym) ? format.to_sym : PERMITTED_FORMATS.first
         @timezone = time&.zone
+        @preposition = preposition
 
         # Raise error in dev for invalid format
         if Rails.env.development? && format.present? && @format != format.to_sym
@@ -19,11 +20,16 @@ module UI
       end
 
       def call
-        extra_class = (@format == :localize_time_precise) ? "preciseTime" : nil
-        content_tag(:span, l(@time, format: :convert_time), class: "localizeTime #{extra_class}")
+        content_tag(:span, l(@time, format: :convert_time), class: css_class)
       end
 
       private
+
+      # The localizer reads both off the class list, preposition rendering "at 5:12pm" / "on Jan 15"
+      def css_class
+        ["localizeTime", ("preciseTime" if @format == :localize_time_precise),
+          ("withPreposition" if @preposition)].compact.join(" ")
+      end
 
       def render?
         @time.present?

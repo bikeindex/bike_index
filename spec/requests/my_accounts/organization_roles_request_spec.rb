@@ -15,18 +15,6 @@ RSpec.describe MyAccounts::OrganizationRolesController, type: :request do
         .to eq([organization_roles[2].id, organization_roles[0].id, organization_roles[1].id])
     end
 
-    context "on_by_default" do
-      it "renumbers the user's roles from 1, and back from 0" do
-        patch "#{base_url}/#{organization_roles.first.id}", params: {on_by_default: false}
-        expect(response).to be_ok
-        expect(OrganizationRole.ordered_for(current_user).pluck(:priority)).to eq([1, 2, 3])
-
-        patch "#{base_url}/#{organization_roles.first.id}", params: {on_by_default: true}
-        expect(response).to be_ok
-        expect(OrganizationRole.ordered_for(current_user).pluck(:priority)).to eq([0, 1, 2])
-      end
-    end
-
     context "another user's role" do
       let!(:other_organization_role) { FactoryBot.create(:organization_role_claimed) }
 

@@ -3,17 +3,13 @@
 import Sortable from 'controllers/sortable_controller'
 
 // Connects to data-controller='my-account--organization-roles'
-// "On by default" is a property of the list's first organization rather than of any one row,
-// so the checkbox moves into whichever row a drag leaves on top, and patches that row's URL.
+// The "use on login" checkbox names whichever organization is first, so a drag that changes
+// which one that is rewrites the name -- the row order is already what the server was sent.
 export default class extends Sortable {
-  static targets = ['defaultCheckbox', 'defaultSlot']
+  static targets = ['organizationName']
 
   reorder (target, after) {
     super.reorder(target, after)
-    this.defaultSlotTargets[0].append(this.defaultCheckboxTarget)
-  }
-
-  toggleDefault (event) {
-    this.patch(this.itemTargets[0].dataset.url, { on_by_default: event.target.checked })
+    this.organizationNameTarget.textContent = this.itemTargets[0].dataset.organizationName
   }
 }
