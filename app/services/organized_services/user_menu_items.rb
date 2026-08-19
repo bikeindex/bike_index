@@ -159,7 +159,7 @@ module OrganizedServices
           routes.organization_parking_notifications_path(organization_id: organization.to_param))
         items << link(translation(:parking_notification_unregistered),
           routes.new_organization_bike_path(organization.to_param, parking_notification: true),
-          secondary: true, match: :full_path)
+          secondary: true)
       end
 
       items

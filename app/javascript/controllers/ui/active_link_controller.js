@@ -35,12 +35,12 @@ export default class extends Controller {
   }
 
   // Mirrors current_page?: the query string counts when the link carries one, so a search
-  // link stays active on page 2. full_path counts it either way.
+  // link stays active on page 2
   pathMatches () {
     const url = new URL(this.element.href, window.location.href)
     // Off-site, the page can never be what the link points at
     if (url.origin !== window.location.origin) return false
-    if (url.search || this.matchValue === 'full_path') {
+    if (url.search) {
       return url.pathname + url.search === window.location.pathname + window.location.search
     }
 

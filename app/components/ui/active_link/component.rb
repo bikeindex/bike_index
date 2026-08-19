@@ -5,11 +5,11 @@ module UI
     # Marks the link aria-current on the page it points at, which the is-active variant
     # (application.css) styles. The browser decides, in ui/active_link_controller.js, so a link
     # rendered into a fragment cache doesn't carry the answer for whichever page filled it.
-    # match: widens or narrows what counts as the page it points at: its query string too, or
-    # only its controller, or its controller and action — which is what a link carrying query
-    # params (a search, a filtered index) needs.
+    # match: widens what counts as the page it points at: only its controller, or its
+    # controller and action — which is what a link carrying query params (a search, a
+    # filtered index) needs.
     class Component < ApplicationComponent
-      MATCHES = [:path, :full_path, :controller, :controller_action].freeze
+      MATCHES = [:path, :controller, :controller_action].freeze
       # The matches the browser answers with a route rather than with the URL
       ROUTE_MATCHES = [:controller, :controller_action].freeze
 

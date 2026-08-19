@@ -37,16 +37,6 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
   # Only :path can say "page" — the widened matches go active on a page the link doesn't
   # point at, so they say "true"
   describe "match" do
-    context ":full_path" do
-      let(:path) { "/o/example/bikes/new?parking_notification=true" }
-      let(:options) { {match: :full_path} }
-
-      it "compares in the browser, like :path" do
-        expect(link["data-ui--active-link-match-value"]).to eq "full_path"
-        expect(link.attributes).to_not have_key("data-ui--active-link-routes-value")
-      end
-    end
-
     context ":controller" do
       let(:path) { "/news" }
       let(:options) { {match: :controller} }

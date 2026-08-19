@@ -39,13 +39,6 @@ module UI
           match: :controller_action, class: "twlink"))
       end
 
-      # The path this scenario is served from, active only while the page carries no params of
-      # its own — match: :path ignores them. Add ?example=1 to the URL to see the difference.
-      def match_full_path
-        render(UI::ActiveLink::Component.new(text: "This preview, exactly",
-          path: "#{PREVIEW_PATH}/match_full_path", match: :full_path, class: "twlink"))
-      end
-
       # Anything beyond class passes through to the anchor
       def with_html_options
         render(UI::ActiveLink::Component.new(text: "Opens in a new tab", path: "#{PREVIEW_PATH}/with_html_options",
