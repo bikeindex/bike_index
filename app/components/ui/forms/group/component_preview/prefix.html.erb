@@ -1,3 +1,5 @@
 <%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
-  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :user_email_domain, label_text: "Permitted domain", prefix: "@", html_options: {placeholder: "something.gov"})) %>
+  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :user_email_domain, label_text: "Permitted domain")) do %>
+    <%= render(UI::Forms::Input::Component.new(form_builder: f, attribute: :user_email_domain, prefix: "@", html_options: {placeholder: "something.gov"})) %>
+  <% end %>
 <% end %>

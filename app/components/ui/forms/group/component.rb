@@ -16,13 +16,12 @@ module UI
         # both markers with the inactive one hidden - it can't be rebuilt from JS. They're
         # [data-required-marker] and [data-optional-marker] for whichever controller flips them
         def initialize(attribute:, form_builder: nil, kind: :text_field, label_text: nil, required: false,
-          required_toggleable: false, prefix: nil, wrapper_class: "tw:mb-4", html_options: {})
+          required_toggleable: false, wrapper_class: "tw:mb-4", html_options: {})
           @form_builder = form_builder
           @attribute = attribute
           @kind = Input::Component.validate_kind!(kind)
           @label_text = label_text || attribute.to_s.humanize
           @required = required
-          @prefix = prefix
           @required_toggleable = required_toggleable
           @wrapper_class = wrapper_class
           @html_options = html_options

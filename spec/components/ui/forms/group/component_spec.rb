@@ -79,15 +79,6 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     end
   end
 
-  context "with a prefix" do
-    let(:component) { render_inline(described_class.new(form_builder:, attribute:, prefix: "@")) }
-
-    it "passes it to the input" do
-      expect(component).to have_css("span", text: "@")
-      expect(component).to have_css("input.twinput[class~='tw:rounded-l-none']")
-    end
-  end
-
   context "when text_area" do
     let(:kind) { :text_area }
 
