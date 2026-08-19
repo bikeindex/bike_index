@@ -87,18 +87,18 @@ RSpec.describe Atom::Serial::Component, type: :component do
     end
 
     context "with html_class" do
-      let(:options) { {html_class: "tw:mr-3"} }
+      let(:options) { {html_class: "tw:underline!"} }
 
       it "adds the class to the span" do
-        expect(component.to_html.strip).to eq '<span class="serial-span tw:mr-3">FFF333</span>'
+        expect(component.to_html.strip).to eq '<span class="serial-span tw:underline!">FFF333</span>'
       end
     end
 
-    context "blank" do
-      let(:instance) { described_class.new(serial: "") }
+    context "matching a placeholder" do
+      let(:instance) { described_class.new(serial: "unknown", **options) }
 
-      it "renders nothing" do
-        expect(component.to_html).to be_blank
+      it "renders the serial rather than the placeholder" do
+        expect(component.to_html.strip).to eq '<span class="serial-span">unknown</span>'
       end
     end
   end

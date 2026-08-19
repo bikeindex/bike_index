@@ -12,14 +12,14 @@ module Atom
 
       def initialize(bike: nil, serial: nil, user: nil, skip_explanation: false, html_class: nil)
         @bike = bike
-        @serial = serial || bike&.serial_display(user)
+        @serial = serial
         @user = user
         @skip_explanation = skip_explanation
         @html_class = html_class
       end
 
       def render?
-        @serial.present?
+        serial.present?
       end
 
       def call
@@ -30,14 +30,19 @@ module Atom
 
       private
 
+      def serial
+        @serial ||= @bike&.serial_display(@user)
+      end
+
+      # A passed serial is whatever was searched for, so "unknown" means the number
       def placeholder?
-        PLACEHOLDERS.include?(@serial.downcase)
+        @bike.present? && PLACEHOLDERS.include?(serial.downcase)
       end
 
       def serial_block
-        return content_tag(:span, @serial, class: ["serial-span", @html_class]) unless placeholder?
+        return content_tag(:span, serial, class: ["serial-span", @html_class]) unless placeholder?
 
-        content_tag(:span, translation(".#{@serial.downcase.tr(" ", "_")}"), class: ["less-strong", @html_class])
+        content_tag(:span, translation(".#{serial.downcase.tr(" ", "_")}"), class: ["less-strong", @html_class])
       end
 
       def explanation?

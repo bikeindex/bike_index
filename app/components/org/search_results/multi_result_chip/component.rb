@@ -15,7 +15,7 @@ module Org
         def call
           content_tag(:span, id: @chip_id, class: badge_classes) do
             if has_results?
-              content_tag(:a, serial(html_class: link_classes), href: "#result_#{@chip_id.delete_prefix("chip_")}")
+              link_to(serial(html_class: link_classes), "#result_#{@chip_id.delete_prefix("chip_")}")
             else
               serial + trailing_label
             end
@@ -38,6 +38,7 @@ module Org
           !@error && @result_count > 0
         end
 
+        # `.serial-span` sets its own color and weight, so these can't sit on the link
         def link_classes
           "tw:underline! tw:hover:font-bold! tw:text-emerald-900! tw:dark:text-emerald-200! tw:py-1 tw:px-2"
         end
