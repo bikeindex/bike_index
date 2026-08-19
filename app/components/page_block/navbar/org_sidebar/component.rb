@@ -14,8 +14,8 @@ module PageBlock
         ROW = "tw:mx-2 tw:flex tw:items-center tw:gap-[11px] tw:rounded-[11px] tw:px-3 tw:py-[9px] " \
           "tw:text-sm tw:font-bold tw:group-data-[collapsed=true]/sidebar:justify-center tw:max-[760px]:py-3.5"
         ROW_HOVER = "tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700"
-        # The is-active variant reads the aria-current the row already carries, so the
-        # current page is styled off the markup that states it rather than off a second flag
+        # A link goes current off the aria-current the is-active variant already reads; a group
+        # toggle off the data-active page-block--org-sidebar puts on the one holding that link
         ROW_CURRENT = "tw:is-active:bg-blue-50 tw:is-active:text-blue-600 tw:is-active:dark:bg-gray-700"
         ROW_RESTING = "tw:text-gray-900 tw:dark:text-gray-300"
 

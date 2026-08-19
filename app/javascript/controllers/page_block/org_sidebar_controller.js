@@ -6,6 +6,12 @@ const EXPANDED_WIDTH = '266px'
 const COLLAPSED_WIDTH = '68px'
 // ui--collapse's default, so a group's rows are in place before they're measured
 const TRANSITION_MS = 200
+// What a reader moving the page themselves looks like -- a plain scroll event won't do,
+// since revealCurrentRow's own scrolling raises one
+const READER_SCROLL_EVENTS = ['wheel', 'touchmove', 'keydown']
+// Gap left below a revealed row, so it doesn't land against the edge -- and so a
+// fractional row height can't leave it a subpixel short of the fold
+const REVEAL_MARGIN = 8
 
 // Connects to data-controller="page-block--org-sidebar"
 //
@@ -23,14 +29,18 @@ export default class extends Controller {
     // choice outranks the breakpoint for the rest of the page
     this.override = null
     this.render()
+    this.watchForReaderScroll()
     // ui--active-link may have marked the current row before this controller existed to
     // hear it say so
     const current = this.element.querySelector('[aria-current]')
     if (current) this.openGroupFor(current)
+    this.flagCurrentGroup()
+    this.revealCurrentRow()
   }
 
   disconnect () {
     document.documentElement.style.removeProperty('--org-sidebar-width')
+    READER_SCROLL_EVENTS.forEach((name) => window.removeEventListener(name, this.noteReaderScroll))
   }
 
   resize () {
@@ -62,7 +72,19 @@ export default class extends Controller {
       group.show()
     }
 
+    this.flagCurrentGroup()
     this.revealGroup(trigger)
+  }
+
+  // ui--collapse flags its trigger data-active while the group is open, which is the
+  // is-active variant the current row is styled with -- so every group the reader opened
+  // would read as the page they're on. Restated after each toggle as what the row means
+  // on a group: the one holding the current row, open or not
+  flagCurrentGroup () {
+    this.element.querySelectorAll('[data-ui--collapse-target="trigger"]').forEach((trigger) => {
+      const group = trigger.closest('[data-controller~="ui--collapse"]')
+      trigger.dataset.active = String(group?.querySelector('[aria-current]') != null)
+    })
   }
 
   groupFor (trigger) {
@@ -73,6 +95,8 @@ export default class extends Controller {
   // ui--active-link announces the current row as it marks it
   openCurrentGroup (event) {
     this.openGroupFor(event.target)
+    this.flagCurrentGroup()
+    this.revealCurrentRow()
   }
 
   // The template opens the first group, the way the design shows a page no row matches,
@@ -94,14 +118,45 @@ export default class extends Controller {
 
     const open = [...this.element.querySelectorAll('[data-ui--collapse-target="trigger"]')]
       .find((trigger) => trigger.getAttribute('aria-expanded') === 'true')
-    if (open && group.contains(open)) return
 
-    collapse.setExpanded(true, 0)
-    if (open) this.groupFor(open)?.setExpanded(false, 0)
+    if (!open || !group.contains(open)) {
+      collapse.setExpanded(true, 0)
+      if (open) this.groupFor(open)?.setExpanded(false, 0)
+    }
+
+    this.flagCurrentGroup()
+    this.revealCurrentRow()
   }
 
   collapseFor (element) {
     return this.application.getControllerForElementAndIdentifier(element, 'ui--collapse')
+  }
+
+  watchForReaderScroll () {
+    this.noteReaderScroll = () => { this.readerScrolled = true }
+    READER_SCROLL_EVENTS.forEach((name) =>
+      window.addEventListener(name, this.noteReaderScroll, { passive: true, once: true }))
+  }
+
+  // A menu long enough to scroll can load with the current row below its fold. Only from
+  // rest, and once: a reader who has already moved the column is looking at what they
+  // chose, and pulling them off it is worse than the row sitting out of sight. On mobile
+  // the menu is closed behind the hamburgler, so there's nothing to bring into view
+  revealCurrentRow () {
+    if (this.revealed || this.readerScrolled || this.mobile) return
+
+    const scroller = this.scrollerTarget
+    if (scroller.scrollTop !== 0) return
+
+    const row = this.element.querySelector('[aria-current]')?.getBoundingClientRect()
+    // A row whose group is still closed has no box to measure -- wait for the group
+    if (!row?.height) return
+
+    this.revealed = true
+    const view = scroller.getBoundingClientRect()
+    if (row.top >= view.top && row.bottom <= view.bottom) return
+
+    scroller.scrollBy({ top: row.bottom - view.bottom + REVEAL_MARGIN, behavior: 'smooth' })
   }
 
   // A group near the bottom unrolls past the fold, which is no use to whoever opened it.
