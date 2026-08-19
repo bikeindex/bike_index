@@ -18,11 +18,15 @@ module Register
 
       # Turbo ignores a form's target unless it names an iframe, so a Turbo submission would
       # render step 2 back inside the frame. Nor does autofocus belong in one - it scrolls
-      # the embedding page down to the frame on load
+      # the embedding page down to the frame on load. Nor does form-persist - a frame's
+      # localStorage is partitioned per embedding site, and blocked outright in Safari
       def form_options
         return {data: {turbo: false}, html: {target: "_top"}} if @embed
 
-        {data: {turbo: true, controller: "autofocus register--retry"}}
+        {data: {turbo: true, controller: "autofocus form-persist register--retry",
+                form_persist_key_value: "register-start-#{@b_param.id_token}",
+                action: "input->form-persist#save hw-combobox:selection->form-persist#save " \
+                  "submit->form-persist#clear"}}
       end
 
       # Derived when the frame's src doesn't name one

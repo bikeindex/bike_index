@@ -91,6 +91,37 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_field("b_param_manufacturer_id", with: "Kona")
   end
 
+  # Step 1 saves nothing until it submits, so a reload before then has only the draft to go on
+  it "keeps a step 1 draft across a reload" do
+    visit "/register/new"
+    type_into("#b_param_manufacturer_id", "Surly")
+    click_combobox_option("Surly")
+    type_into("#b_param_cycle_type", "e-Scooter")
+    click_combobox_option("e-Scooter")
+    fill_in "b_param[owner_email]", with: owner_email
+    expect(page).to have_content("E-SCOOTER INFO")
+    # An always-motorized type answers the electric question itself
+    expect(page).to have_checked_field("Electric (motorized)", disabled: true)
+
+    visit page.current_url
+
+    expect(page).to have_field("b_param_manufacturer_id", with: "Surly")
+    # The id is what submits, and it restores alongside the name it displays
+    expect(find("input[name='b_param[manufacturer_id]']", visible: :all).value).to eq manufacturer.id.to_s
+    expect(page).to have_field("b_param_cycle_type", with: "e-Scooter")
+    expect(page).to have_field("b_param[owner_email]", with: owner_email)
+    # A restored type reaches the section label a step away, and the electric checkbox
+    expect(page).to have_content("E-SCOOTER INFO")
+    expect(page).to have_checked_field("Electric (motorized)", disabled: true)
+
+    click_button "Next"
+
+    expect(page).to have_content("Add your e-scooter", wait: 10)
+    # The draft is what submits, not just what showed
+    expect(BParam.last).to have_attributes(manufacturer_id: manufacturer.id, owner_email:,
+      cycle_type: "e-scooter", motorized?: true)
+  end
+
   it "starts a registration, keeps a full details draft across a reload, and completes" do
     ActionMailer::Base.deliveries = []
     visit "/register/new"

@@ -1,6 +1,7 @@
 <%= render Register::Page::Component.new(embed: @embed, data: {controller: "register--heading",
     "register--heading-names-value": cycle_type_names.to_json,
-    action: "hw-combobox:selection->register--heading#update"}) do %>
+    action: "hw-combobox:selection->register--heading#update " \
+      "form-persist:restored@window->register--heading#update"}) do %>
   <%= render Register::Progress::Component.new(steps: @steps, step: 1) %>
   <%= render UI::Header::Component.new(text: heading_text, subtitle: translation(".just_the_essentials")) %>
 
@@ -26,6 +27,7 @@
     <div
       class="tw:mb-4"
       data-controller="register--propulsion"
+      data-action="form-persist:restored@window->register--propulsion#update"
       data-register--propulsion-always-motorized-value="<%= CycleType::ALWAYS_MOTORIZED.to_json %>"
       data-register--propulsion-never-motorized-value="<%= CycleType::NEVER_MOTORIZED.to_json %>"
     >
