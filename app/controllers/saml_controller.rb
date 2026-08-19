@@ -8,16 +8,24 @@ class SamlController < ApplicationController
   # SP metadata is public by design — it carries only our entityID, ACS URL, and the
   # public SP certificate (never the private key). IdP admins consume it during onboarding.
   def metadata
-    organization = Organization.friendly_find(params[:org_slug])
-    raise ActiveRecord::RecordNotFound unless organization&.enabled?("saml_sso")
+    # The entityID stays extensionless: it identifies us and is never fetched, so it must not
+    # move. Only the extension picks the rendering, and application/samlmetadata+xml downloads
+    # rather than displaying — so send the type browsers show, as university IdPs do
+    return redirect_to saml_metadata_path(org_slug: params[:org_slug], format: :xml) unless request.format.xml?
 
-    # build_ (not fetch_) so a GET never persists a configuration record
-    saml_configuration = organization.organization_saml_configuration ||
-      organization.build_organization_saml_configuration
-    settings = Saml::SettingsBuilder.build(saml_configuration)
-
+    settings = Saml::SettingsBuilder.build(published_saml_configuration)
     render body: OneLogin::RubySaml::Metadata.new.generate(settings, true),
-      content_type: "application/samlmetadata+xml"
+      content_type: "application/xml"
+  end
+
+  # The SP certificate alone, for IdP tooling that registers a bare certificate rather than
+  # reading one out of our metadata. App-wide, so every organization serves the same bytes;
+  # the .crt path names the download, which is how the IdPs that publish one do it
+  def certificate
+    settings = Saml::SettingsBuilder.build(published_saml_configuration)
+    raise ActiveRecord::RecordNotFound if settings.certificate.blank?
+
+    render body: settings.certificate, content_type: "application/pem-certificate-chain"
   end
 
   # SP-initiated login: redirect to the IdP with a signed AuthnRequest, parking the request id
@@ -49,6 +57,16 @@ class SamlController < ApplicationController
   end
 
   private
+
+  # The public endpoints, which any IdP admin may read. build_ (not fetch_) so a GET
+  # never persists a configuration record
+  def published_saml_configuration
+    organization = Organization.friendly_find(params[:org_slug])
+    raise ActiveRecord::RecordNotFound unless organization&.enabled?("saml_sso")
+
+    organization.organization_saml_configuration ||
+      organization.build_organization_saml_configuration
+  end
 
   def configured_saml_configuration
     organization = Organization.friendly_find(params[:org_slug])

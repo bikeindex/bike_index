@@ -6,12 +6,20 @@ them in. Everything is per-organization and slug-scoped:
 
 | Endpoint | Purpose |
 |---|---|
-| `/sso/<slug>/metadata` | our SP metadata — the URL you hand an IdP admin |
+| `/sso/<slug>/metadata.xml` | our SP metadata — the URL you hand an IdP admin |
+| `/sso/<slug>/sp.crt` | the SP certificate alone, for IdP tooling that wants a file |
 | `/sso/<slug>/init` | SP-initiated login |
 | `/sso/<slug>/callback` | Assertion Consumer Service |
 
-All three 404 unless the organization has the `saml_sso` feature. `init` and `callback`
+All of them 404 unless the organization has the `saml_sso` feature. `init` and `callback`
 additionally need the configuration marked live.
+
+`/sso/<slug>/metadata` redirects to the `.xml` url, which is served as `application/xml` so a
+browser displays it rather than downloading it. **The entityID stays the extensionless
+`/sso/<slug>/metadata`** — it identifies us to the IdP and is never fetched, so it must not
+move once an IdP has registered it. `sp.crt` is `application/pem-certificate-chain`, which
+browsers download; it is the same certificate for every organization, and the `.crt` path is
+what names the saved file.
 
 Code: `saml_controller.rb`, `app/services/saml/`, `app/models/organization_saml_configuration.rb`.
 Deterministic coverage lives in `spec/requests/saml_callback_request_spec.rb`, which signs
@@ -29,7 +37,7 @@ SAML trust comes from the metadata two parties exchange, not from a CA chain.
 | Secret? | certificate is public; **the private key is the only secret** | public |
 | Stored | environment variables (raw PEM, or base64 of one) | database, pasted in the admin SAML card |
 
-Our certificate is published at `/sso/<slug>/metadata` for anyone to fetch — that is its
+Our certificate is published at `/sso/<slug>/metadata.xml` for anyone to fetch — that is its
 entire job. The one keypair appears there twice, under a `signing` and an `encryption`
 KeyDescriptor: the first is what an IdP checks our AuthnRequest signatures against, the
 second is what an IdP that encrypts assertions encrypts to.
@@ -56,7 +64,7 @@ the table.
    updates and nothing downstream appears.
 2. **Set `user_email_domain`** — bare domain, no `@`, must contain a dot. The field only
    renders once a domain feature is enabled, which is why it comes after the invoice.
-3. **Send them `https://bikeindex.org/sso/<slug>/metadata`.**
+3. **Send them `https://bikeindex.org/sso/<slug>/metadata.xml`.**
 4. **Take their IdP metadata** and fill the SAML card on the organization's admin edit page
    (superadmin only): IdP entityID, IdP SSO target URL, signing certificate.
 5. **Set the email attribute if needed.** We default to the `mail` OID
@@ -128,7 +136,7 @@ domain but whose primary isn't, and outstanding password-reset tokens on any of 
 ### Verifying
 
 ```bash
-curl -s "https://<host>/sso/<slug>/metadata" | grep -o "KeyDescriptor use='[a-z]*'" | sort -u
+curl -s "https://<host>/sso/<slug>/metadata.xml" | grep -o "KeyDescriptor use='[a-z]*'" | sort -u
 ```
 
 Expect both `encryption` and `signing`, carrying the same certificate. No output means no
@@ -250,7 +258,7 @@ The reason is the real one — ruby-saml's validation errors are passed through,
 
 | Reason | Cause |
 |---|---|
-| `/sso/<slug>/metadata` 404s | feature not enabled, or `UpdateOrganizationAssociationsJob` hasn't run |
+| `/sso/<slug>/metadata.xml` 404s | feature not enabled, or `UpdateOrganizationAssociationsJob` hasn't run |
 | `/sso/<slug>/init` 404s | config incomplete — needs enabled + entityID + SSO URL + cert |
 | `this login has expired` | RelayState token already claimed or older than 10 minutes |
 | `SAML session mismatch` | the `org_slug` in RelayState isn't the org being called back |

@@ -7,7 +7,6 @@
         Interval for send graduated notifications, in days
         <small><span class="text-success">graduated_notifications setting</span></small>
       <% end %>
-
       <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :graduated_notification_interval_days, kind: :number_field, label_text: graduated_label)) do |group| %>
         <% group.with_helper_text do %>
           <span class="text-warning">
@@ -23,7 +22,6 @@
         Search radius (<%= search_radius[:unit] %>)
         <small><span class="text-success">regional bike counts setting</span>, controls how large the region is to associate regional sub-organizations</small>
       <% end %>
-
       <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: search_radius[:attribute], kind: :number_field, label_text: radius_label)) do |group| %>
         <% group.with_helper_text do %>
           <span class="text-warning">
@@ -39,7 +37,6 @@
         permitted domain for <%= domain_uses.to_sentence %>
         <small><%= safe_join(domain_uses.map { |domain_use| tag.span("#{domain_use} feature", class: "text-success") }, " ") %></small>
       <% end %>
-
       <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :user_email_domain, label_text: domain_label)) do |group| %>
         <% unless developer? %>
           <% group.with_helper_text { "Ask Seth for help changing this, it's delicate" } %>
@@ -100,7 +97,14 @@
         <ul>
           <li>
             Metadata URL:
-            <%= link_to saml_metadata_url(org_slug: @organization.to_param), saml_metadata_url(org_slug: @organization.to_param) %>
+            <%= link_to saml_metadata_url(org_slug: @organization.to_param, format: :xml), saml_metadata_url(org_slug: @organization.to_param, format: :xml) %>
+          </li>
+
+          <li>
+            SP certificate:
+            <%= link_to saml_certificate_url(org_slug: @organization.to_param), saml_certificate_url(org_slug: @organization.to_param) %>
+            
+            <small>only for an IdP that wants the certificate on its own</small>
           </li>
 
           <li>
