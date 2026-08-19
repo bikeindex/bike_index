@@ -429,6 +429,20 @@ RSpec.describe SessionsController, type: :request do
       end
     end
 
+    # Deleting in admin has to end the session it deletes, not just hide the user from lists
+    context "deleted after signing in" do
+      it "signs the user out, and won't sign them back in" do
+        post "/session", params: {session: {email: user.email, password:}}
+        get "/my_account"
+        expect(response).to render_template("my_accounts/show")
+        user.destroy
+        get "/my_account"
+        expect(response).to redirect_to new_session_path
+        post "/session", params: {session: {email: user.email, password:}}
+        expect(response).to render_template(:new)
+      end
+    end
+
     context "sso organization email" do
       let(:user) { FactoryBot.create(:user_confirmed, email: "student@sso.edu", password:, password_confirmation: password) }
       let!(:organization) do
