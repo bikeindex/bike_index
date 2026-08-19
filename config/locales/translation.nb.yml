@@ -5434,12 +5434,12 @@ nb:
           log_in: Logg Inn
           marketplace: Markedsplass
           search: Søk
-          settings_menu: Innstillinger
           sign_up: Melde deg på
           stolen_bike: Stjålet sykkel?
         user_settings_menu:
           logout: Logg ut
           register_a_new_bike: Registrer en ny sykkel
+          settings_menu: Innstillinger
           user_settings: "%{user_email}-innstillinger"
           your_registrations: Dine registreringer
         wrapper:

@@ -5,11 +5,6 @@ module PageBlock
     module PrimaryMenu
       # The navbar's main menu, rendered from a manifest of items rather than repeated markup
       class Component < ApplicationComponent
-        # Replaces UI::Dropdown's button classes entirely. Shown at every width -- below the
-        # navbar breakpoint this row sits inside the open hamburgler menu, and is the only
-        # way to reach the account links there
-        SETTINGS_BUTTON = "settings-link tw:block tw:px-[15px] tw:py-1.5"
-
         def initialize(current_user:, current_user_or_unconfirmed_user:)
           @current_user = current_user
           @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user
@@ -51,8 +46,7 @@ module PageBlock
 
         def settings_menu
           PageBlock::Navbar::UserSettingsMenu::Component.new(current_user: @current_user,
-            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user,
-            name: translation(".settings_menu"), button_class: SETTINGS_BUTTON)
+            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user, dropdown: false)
         end
       end
     end

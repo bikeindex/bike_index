@@ -5586,12 +5586,12 @@ nl:
           log_in: Log in
           marketplace: Marktplaats
           search: Zoeken
-          settings_menu: Instellingen
           sign_up: Registreren
           stolen_bike: Fiets gestolen?
         user_settings_menu:
           logout: Afmelden
           register_a_new_bike: Registreer een nieuwe fiets
+          settings_menu: Instellingen
           user_settings: "%{user_email} instellingen"
           your_registrations: Uw registraties
         wrapper:

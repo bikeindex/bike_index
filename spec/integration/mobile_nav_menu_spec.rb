@@ -55,8 +55,8 @@ RSpec.describe "Navbar", :js, type: :system do
   context "signed in without an organization" do
     let!(:user) { FactoryBot.create(:user_confirmed) }
 
-    # The gear is icon-only, and UI::Dropdown names its trigger off the menu's name
-    let(:settings_toggle) { "button#settings" }
+    # The gear is icon-only, so its aria-label is the only thing to find it by
+    let(:settings_toggle) { "button[aria-label='Settings']" }
 
     it "opens the settings dropdown at desktop width, and folds it into the hamburgler" do
       sign_in(user)
@@ -78,7 +78,7 @@ RSpec.describe "Navbar", :js, type: :system do
       find_link("Log out").send_keys(:escape)
 
       expect(page).to have_no_link("Log out")
-      expect(page.evaluate_script("document.activeElement.id")).to eq "settings"
+      expect(page.evaluate_script("document.activeElement.id")).to eq "setting_submenu"
 
       find(settings_toggle).click
 
@@ -90,12 +90,9 @@ RSpec.describe "Navbar", :js, type: :system do
 
       page.current_window.resize_to(390, 844)
 
-      # The gear is behind the hamburgler on a phone, and opens the same dropdown there
+      # No room for the gear on a phone, so its items sit in the hamburgler menu
       expect(page).to have_no_css(settings_toggle)
       find("#primary_nav_hamburgler").click
-      expect(page).to have_css("nav.primary-header-nav.menu-in", wait: 5)
-
-      find(settings_toggle).click
 
       expect(page).to have_link("Log out")
     end

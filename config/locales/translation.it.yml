@@ -5697,12 +5697,12 @@ it:
           log_in: accedi
           marketplace: Mercato
           search: Cerca
-          settings_menu: Impostazioni
           sign_up: Iscriviti
           stolen_bike: Bicicletta rubata?
         user_settings_menu:
           logout: Disconnettiti
           register_a_new_bike: Registra una nuova bicicletta
+          settings_menu: Impostazioni
           user_settings: "%{user_email} impostazioni"
           your_registrations: Le vostre registrazioni
         wrapper:

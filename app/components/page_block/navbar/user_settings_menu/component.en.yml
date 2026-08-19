@@ -6,5 +6,6 @@ en:
         user_settings_menu:
           logout: Log out
           register_a_new_bike: Register a new bike
+          settings_menu: Settings
           user_settings: "%{user_email} settings"
           your_registrations: Your registrations

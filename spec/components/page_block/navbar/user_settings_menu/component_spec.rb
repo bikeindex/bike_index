@@ -4,35 +4,59 @@ require "rails_helper"
 
 RSpec.describe PageBlock::Navbar::UserSettingsMenu::Component, type: :component do
   let(:current_user) { FactoryBot.create(:user_confirmed, email: "party@bikeindex.org") }
+  let(:dropdown) { false }
   let(:instance) do
-    described_class.new(current_user:, current_user_or_unconfirmed_user: current_user, name: "Settings")
+    described_class.new(current_user:, current_user_or_unconfirmed_user: current_user, dropdown:,
+      name: "Settings")
   end
   let(:component) { with_request_url("/") { render_inline(instance) } }
-  let(:links) { component.css("ul[role='menu'] a").map { |link| link.text.strip } }
+  let(:links) { component.css("a").map { |link| link.text.strip } }
 
-  it "renders the account links as dropdown entries" do
-    expect(component).to have_css "button#settings[data-ui--dropdown-target='button']"
+  it "renders the navbar's gear and its own list" do
+    expect(component).to have_css "#setting_submenu"
+    expect(component).to have_css "ul.primary-submenu"
     expect(links).to eq(["Your registrations", "Register a new bike", "party@bikeindex.org settings", "Log out"])
     expect(component).to have_css "#navUserSettingLink[data-email='party@bikeindex.org']"
-    # Logging out is the only row that doesn't go somewhere, so it's the only one in red
-    expect(component.css("a[class*='text-red']").map(&:text)).to eq(["Log out"])
+  end
+
+  context "with dropdown" do
+    let(:dropdown) { true }
+
+    it "renders the account links as dropdown entries instead" do
+      expect(component).to have_css "button#settings[data-ui--dropdown-target='button']"
+      expect(component).to have_no_css "ul.primary-submenu"
+      expect(component.css("ul[role='menu'] a").map { |link| link.text.strip })
+        .to eq(["Your registrations", "Register a new bike", "party@bikeindex.org settings", "Log out"])
+      expect(component).to have_css "#navUserSettingLink[data-email='party@bikeindex.org']"
+    end
   end
 
   # Which row is current is ui--active-link's, in the browser -- the navbar renders inside a
   # fragment cache, so it can't carry the answer for whichever page filled it
   it "hands every row to UI::ActiveLink to resolve" do
-    rows = component.css("ul[role='menu'] a[data-controller~='ui--active-link']")
+    rows = component.css("a[data-controller~='ui--active-link']")
 
-    expect(rows.map(&:text)).to eq(links)
-    expect(component).to have_no_css "ul[role='menu'] a[aria-current]"
+    expect(rows.map { |row| row.text.strip }).to eq(links)
+    expect(component).to have_no_css "a[aria-current]"
     expect(rows.map { |row| row["data-ui--active-link-match-value"] }).to all(eq("path"))
+  end
+
+  # Logging out is the only row that doesn't go somewhere, so it's the only one in red
+  it "marks logout in both renderings" do
+    expect(component.css("a[class*='text-red']").map { |link| link.text.strip }).to eq(["Log out"])
+
+    with_dropdown = with_request_url("/") do
+      render_inline(described_class.new(current_user:, current_user_or_unconfirmed_user: current_user,
+        dropdown: true, name: "Settings"))
+    end
+    expect(with_dropdown.css("a[class*='text-red']").map { |link| link.text.strip }).to eq(["Log out"])
   end
 
   context "with a marketplace message" do
     let!(:marketplace_message) { FactoryBot.create(:marketplace_message, sender: current_user) }
 
     it "adds the marketplace messages link" do
-      expect(component).to have_css "ul[role='menu'] a[href='/my_account/messages']", text: "Marketplace messages"
+      expect(component).to have_css "a[href='/my_account/messages']", text: "Marketplace messages"
     end
   end
 
@@ -42,14 +66,15 @@ RSpec.describe PageBlock::Navbar::UserSettingsMenu::Component, type: :component 
 
     it "links to the organization above a divider" do
       expect(links.first).to eq "Switch to Sweet Shop admin"
-      expect(component).to have_css "ul[role='menu'] li[role='separator']"
+      expect(component).to have_css "ul.primary-submenu li.divider-nav-item"
     end
   end
 
   context "with an unconfirmed user" do
     let(:unconfirmed_user) { FactoryBot.create(:user) }
     let(:instance) do
-      described_class.new(current_user: nil, current_user_or_unconfirmed_user: unconfirmed_user, name: "Settings")
+      described_class.new(current_user: nil, current_user_or_unconfirmed_user: unconfirmed_user,
+        dropdown: false, name: "Settings")
     end
 
     it "renders their settings and logout" do
