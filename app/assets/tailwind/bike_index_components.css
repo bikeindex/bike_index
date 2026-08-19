@@ -112,14 +112,11 @@
     }
   }
 
-  /* The entry for what's already being viewed: a label rather than a link, flagged active
-   * so it fills the same way one that points at the current page would */
+  /* The entry for what's already being viewed: a label rather than a link, so it takes the
+   * links' layout and a fill that reads as where-you-are without the pull of a destination */
   .twdropdown li[role="menuitem"] > span[data-active="true"] {
-    @apply tw:block tw:px-4 tw:py-1 tw:text-left tw:text-base;
-
-    @variant is-active {
-      @apply tw:bg-purple-500 tw:text-white;
-    }
+    @apply tw:block tw:px-4 tw:py-1 tw:text-left tw:text-base tw:text-gray-700
+      tw:bg-gray-100 tw:dark:bg-gray-700 tw:dark:text-gray-200;
   }
 
   .twdropdown li[role="menuitem"]:has(+ li[role="separator"]) > a {
