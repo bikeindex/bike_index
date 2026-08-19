@@ -5222,7 +5222,7 @@ it:
       you: Voi
       your_bikes: Le tue biciclette
       your_preferences: Le tue preferenze
-    organized_menu_items:
+    menu_items_org:
       add_a_bike: Aggiungi una bicicletta
       ascend_imports: Ascend Imports
       bulk_imports: Importazioni alla rinfusa
@@ -5273,7 +5273,7 @@ it:
       manufacturer_required: Il produttore è tenuto a registrarsi
       name_required: Per registrarsi è necessario indicare il nome del proprietario.
       unable_to_save: Non è stato possibile salvare la registrazione, riprova.
-    account_menu_items:
+    menu_items_account:
       marketplace_messages: Messaggi del mercato
       switch_to_org: Passa all'amministratore %{org_name}.
   stolen:

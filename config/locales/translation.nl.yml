@@ -4389,7 +4389,7 @@ nl:
       subheader_2: Selecteer een bedrag (in USD)
     donation_modal:
       donation_header: Red een fiets in 2021
-    organized_menu_items:
+    menu_items_org:
       add_a_bike: Voeg een fiets toe
       ascend_imports: Opvoer importeren
       bulk_imports: Bulkinvoer
@@ -4451,7 +4451,7 @@ nl:
       name_required: De naam van de eigenaar is vereist voor registratie.
       unable_to_save: Het is ons niet gelukt om uw registratie op te slaan. Probeer
         het later opnieuw.
-    account_menu_items:
+    menu_items_account:
       marketplace_messages: Marktplaatsberichten
       switch_to_org: Schakel over naar %{org_name} admin
   users:

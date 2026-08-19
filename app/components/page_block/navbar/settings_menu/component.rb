@@ -13,9 +13,9 @@ module PageBlock
         private
 
         def items
-          [*UserServices::AccountMenuItems.organization_switcher(@current_user_or_unconfirmed_user),
+          [*UserServices::MenuItemsAccount.organization_switcher(@current_user_or_unconfirmed_user),
             {label: translation(".your_registrations"), path: my_account_path},
-            UserServices::AccountMenuItems.marketplace_messages(@current_user),
+            UserServices::MenuItemsAccount.marketplace_messages(@current_user),
             {label: translation(".register_a_new_bike"), path: choose_registration_path},
             {label: translation(".user_settings", user_email: @current_user_or_unconfirmed_user.email),
              path: edit_my_account_path,

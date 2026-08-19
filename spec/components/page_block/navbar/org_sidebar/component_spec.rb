@@ -30,7 +30,7 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
         "kdewey@brakebills.edu settings", "Log out"])
   end
 
-  # The switcher and the messages row are UserServices::AccountMenuItems', which its own
+  # The switcher and the messages row are UserServices::MenuItemsAccount', which its own
   # spec covers -- this is that they reach the menu
   context "with a marketplace message" do
     let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }

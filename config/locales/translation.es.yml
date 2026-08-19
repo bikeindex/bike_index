@@ -5205,7 +5205,7 @@ es:
       you: Tú
       your_bikes: Tus bicicletas
       your_preferences: Tus preferencias
-    organized_menu_items:
+    menu_items_org:
       add_a_bike: Añade una bicicleta
       ascend_imports: Importaciones Ascend
       bulk_imports: Importaciones a granel
@@ -5256,7 +5256,7 @@ es:
       manufacturer_required: El fabricante está obligado a registrarse.
       name_required: Se requiere el nombre del propietario para registrarse.
       unable_to_save: No podemos guardar ese registro, por favor inténtelo de nuevo.
-    account_menu_items:
+    menu_items_account:
       marketplace_messages: Mensajes del mercado
       switch_to_org: Cambiar a %{org_name} administrador
   stolen:

@@ -1,4 +1,4 @@
-module OrganizedServices
+module OrgServices
   module EmailPreview
     extend Functionable
 

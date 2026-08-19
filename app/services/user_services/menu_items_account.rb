@@ -9,7 +9,7 @@
 #   {type: :divider}
 #   {label:, path:}
 module UserServices
-  module AccountMenuItems
+  module MenuItemsAccount
     extend Functionable
 
     # A reader in dozens of organizations would otherwise push logout off the menu
@@ -44,7 +44,7 @@ module UserServices
     end
 
     def translation(key, **interpolations)
-      I18n.t(key, scope: "shared.account_menu_items", **interpolations)
+      I18n.t(key, scope: "shared.menu_items_account", **interpolations)
     end
 
     def routes

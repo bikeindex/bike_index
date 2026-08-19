@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe UserServices::AccountMenuItems do
+RSpec.describe UserServices::MenuItemsAccount do
   let(:user) { FactoryBot.create(:user_confirmed) }
 
   describe "organization_switcher" do

@@ -44,15 +44,15 @@ module PageBlock
         private
 
         def items
-          @items ||= OrganizedServices::UserMenuItems.for(organization: @organization, current_user: @current_user)
+          @items ||= UserServices::MenuItemsOrg.for(organization: @organization, current_user: @current_user)
         end
 
         # PageBlock::Navbar::SettingsMenu's rows, in its order — the sidebar stands in for the
         # whole navbar, so this is the only place a reader with an organization reaches them
         def account_items
-          [*UserServices::AccountMenuItems.organization_switcher(@current_user_or_unconfirmed_user),
+          [*UserServices::MenuItemsAccount.organization_switcher(@current_user_or_unconfirmed_user),
             {label: translation(".your_registrations"), path: my_account_path},
-            UserServices::AccountMenuItems.marketplace_messages(@current_user),
+            UserServices::MenuItemsAccount.marketplace_messages(@current_user),
             {label: translation(".register_a_new_bike"), path: choose_registration_path},
             {label: translation(".user_settings", user_email: @current_user_or_unconfirmed_user.email),
              path: edit_my_account_path},
@@ -90,7 +90,7 @@ module PageBlock
         def avatar_url
           return @avatar_url if defined?(@avatar_url)
 
-          @avatar_url = OrganizationDisplayer.avatar?(@organization) ? @organization.avatar.url(:medium) : nil
+          @avatar_url = OrgServices::Displayer.avatar?(@organization) ? @organization.avatar.url(:medium) : nil
         end
 
         def icon(name, html_class:)

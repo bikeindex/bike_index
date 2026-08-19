@@ -174,8 +174,8 @@ ignore_unused:
   - "activerecord.models.*"
   - "controllers.*" # our translation helper component blocks detection
   - "components.*" # our translation helper component blocks detection
-  - "shared.account_menu_items.*" # used dynamically by UserServices::AccountMenuItems
-  - "shared.organized_menu_items.*" # used dynamically by OrganizedServices::UserMenuItems
+  - "shared.menu_items_account.*" # used dynamically by UserServices::MenuItemsAccount
+  - "shared.menu_items_org.*" # used dynamically by UserServices::MenuItemsOrg
   - "shared.register_flow.*" # used dynamically by BikeServices::Register
   - "bikes.stolen_checklist.*" # Bikes::StolenChecklist reads these with an explicit scope,
     # so they stay here rather than moving to the component and orphaning their translations
