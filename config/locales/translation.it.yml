@@ -4600,6 +4600,7 @@ it:
         sent_to: Inviato a
         sent_to_a_new_owner: inviato a un nuovo proprietario
         sticker: Adesivo
+        stickers: Adesivi
       recoveries:
         description: Descrizione
         mfg_model_color_html: produttore, modello, <span class="less-strong">colore</span>
