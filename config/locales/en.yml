@@ -997,6 +997,7 @@ en:
           community_member: Community Member
           employee: Employee
           graduate_student: Graduate Student
+          postdoc: Postdoc
           student: Undergraduate Student
       stolen_record:
         bike_was_not_locked: Bike was not locked

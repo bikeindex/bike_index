@@ -7,15 +7,14 @@
 <% unless current_organization.deliver_graduated_notifications? %>
   <div class="row mt-5 mb-5">
     <div class="col-md-6">
-      <div class="alert alert-info">
-        <h3>Not delivering graduated notifications</h3>
+      <%= render(UI::Alerts::Base::Component.new(header: "Not delivering graduated notifications", margin_classes: "")) do %>
         <%= current_organization.name %> doesn't have a notification time period
-        set, <span class="text-warning">bikes are not being graduated.</span>
+        set, <strong>bikes are not being graduated.</strong>
         <br>
         Please email
-        <%= link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org" %> to
-        set up graduated notifications.
-      </div>
+        <%= link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org", class: "twlink-underlined" %>
+        to set up graduated notifications.
+      <% end %>
     </div>
   </div>
 <% end %>

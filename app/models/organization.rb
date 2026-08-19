@@ -483,7 +483,7 @@ class Organization < ApplicationRecord
     translation_scope =
       [:activerecord, :select_options, self.class.name.underscore, __method__]
 
-    %w[student graduate_student employee community_member]
+    %w[student graduate_student postdoc employee community_member]
       .map { |e| [I18n.t(e, scope: translation_scope), e] }
   end
 
