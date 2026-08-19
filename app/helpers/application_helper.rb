@@ -38,8 +38,7 @@ module ApplicationHelper
       controller_namespace:,
       controller_name:,
       action_name:,
-      force_landing_page_render: @force_landing_page_render,
-      register_flow_organization_id: @register_flow_organization_id
+      force_landing_page_render: @force_landing_page_render
     ) == :organized
   end
 
