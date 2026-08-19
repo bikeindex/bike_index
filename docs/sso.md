@@ -14,10 +14,11 @@ them in. Everything is per-organization and slug-scoped:
 All of them 404 unless the organization has the `saml_sso` feature. `init` and `callback`
 additionally need the configuration marked live.
 
-`/sso/<slug>/metadata` redirects to the `.xml` url, which is served as `application/xml` so a
-browser displays it rather than downloading it. **The entityID stays the extensionless
-`/sso/<slug>/metadata`** — it identifies us to the IdP and is never fetched, so it must not
-move once an IdP has registered it. `sp.crt` is `application/pem-certificate-chain`, which
+Metadata is served as `application/xml`, which browsers display; the registered
+`application/samlmetadata+xml` is an unknown type, so they download it instead. Both
+`/sso/<slug>/metadata` and `/sso/<slug>/metadata.xml` return it — **the extensionless one is
+the entityID**, so it has to keep working, and IdP admins paste it into a metadata-url field
+because we hand them the same string. `sp.crt` is `application/pem-certificate-chain`, which
 browsers download; it is the same certificate for every organization, and the `.crt` path is
 what names the saved file.
 

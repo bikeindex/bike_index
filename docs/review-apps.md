@@ -163,7 +163,8 @@ HONEYBADGER_API_KEY          SAML_SP_CERTIFICATE          SAML_SP_PRIVATE_KEY
 
 The two `SAML_SP_*` fields hold a **base64-encoded** PEM, not the PEM itself — kamal writes
 each secret to the host as one `KEY=value` line, so the newlines have to go. Mint a throwaway
-pair (never production's) and encode each with `base64`:
+pair (never production's); the task prints the one-line form under "One-line form, for a
+deploy environment":
 
 ```bash
 BASE_URL=https://sandbox.review.bikeindex.org bundle exec rails saml:generate_sp_keypair

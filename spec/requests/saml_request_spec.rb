@@ -4,9 +4,18 @@ RSpec.describe SamlController, :saml_env, type: :request do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
 
   describe "GET /sso/:org_slug/metadata" do
-    it "redirects to the .xml url, which browsers display" do
+    # The entityID is this url, so it has to keep serving metadata itself - and IdP admins
+    # paste it into a metadata-url field, since we hand them the same string
+    it "serves the same document with and without the .xml extension" do
       get "/sso/#{organization.to_param}/metadata"
-      expect(response).to redirect_to("/sso/#{organization.to_param}/metadata.xml")
+      expect(response).to have_http_status(:ok)
+      extensionless = response.body
+
+      get "/sso/#{organization.to_param}/metadata.xml"
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq "application/xml"
+      # the metadata carries a per-request ID, so compare everything else
+      expect(response.body.sub(/ID='[^']*'/, "")).to eq extensionless.sub(/ID='[^']*'/, "")
     end
 
     it "returns SP metadata XML advertising both key uses, and never the private key" do
@@ -29,14 +38,14 @@ RSpec.describe SamlController, :saml_env, type: :request do
     context "organization without the saml_sso feature" do
       let(:organization) { FactoryBot.create(:organization) }
       it "is not found" do
-        get "/sso/#{organization.to_param}/metadata.xml"
+        get "/sso/#{organization.to_param}/metadata"
         expect(response).to have_http_status(:not_found)
       end
     end
 
     context "unknown organization" do
       it "is not found" do
-        get "/sso/does-not-exist/metadata.xml"
+        get "/sso/does-not-exist/metadata"
         expect(response).to have_http_status(:not_found)
       end
     end

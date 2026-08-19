@@ -95,15 +95,15 @@
         </p>
 
         <ul>
+          <% metadata_url = saml_metadata_url(org_slug: @organization.to_param, format: :xml) %>
+          <% certificate_url = saml_certificate_url(org_slug: @organization.to_param) %>
+
           <li>
-            Metadata URL:
-            <%= link_to saml_metadata_url(org_slug: @organization.to_param, format: :xml), saml_metadata_url(org_slug: @organization.to_param, format: :xml) %>
+            Metadata URL: <%= link_to metadata_url, metadata_url %>
           </li>
 
           <li>
-            SP certificate:
-            <%= link_to saml_certificate_url(org_slug: @organization.to_param), saml_certificate_url(org_slug: @organization.to_param) %>
-            
+            SP certificate: <%= link_to certificate_url, certificate_url %>
             <small>only for an IdP that wants the certificate on its own</small>
           </li>
 

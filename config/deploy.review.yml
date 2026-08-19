@@ -165,10 +165,8 @@ env:
     - R2_DEV_ACCESS_KEY_SECRET
     - HONEYBADGER_API_KEY
     - HONEYBADGER_FRONTEND_API_KEY
-    # SAML SP keypair, base64-encoded (Saml::SettingsBuilder decodes) — kamal writes
-    # each secret as one KEY=value line, which a raw multi-line PEM would break.
-    # Throwaway per-environment keypair from `rake saml:generate_sp_keypair`; the IdP
-    # trusts whichever cert our published metadata carries, so it need not match production.
+    # Base64-encoded (Saml::SettingsBuilder decodes). Throwaway per-environment keypair
+    # from `rake saml:generate_sp_keypair`, never production's.
     - SAML_SP_CERTIFICATE
     - SAML_SP_PRIVATE_KEY
 

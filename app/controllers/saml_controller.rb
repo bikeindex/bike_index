@@ -8,24 +8,22 @@ class SamlController < ApplicationController
   # SP metadata is public by design — it carries only our entityID, ACS URL, and the
   # public SP certificate (never the private key). IdP admins consume it during onboarding.
   def metadata
-    # The entityID stays extensionless: it identifies us and is never fetched, so it must not
-    # move. Only the extension picks the rendering, and application/samlmetadata+xml downloads
-    # rather than displaying — so send the type browsers show, as university IdPs do
-    return redirect_to saml_metadata_path(org_slug: params[:org_slug], format: :xml) unless request.format.xml?
-
     settings = Saml::SettingsBuilder.build(published_saml_configuration)
+    # application/samlmetadata+xml is the registered type, but browsers download an unknown
+    # type instead of showing it, and this url is one we hand to a person. The route takes
+    # `.xml` too, so the extension an IdP admin expects reaches the same place
     render body: OneLogin::RubySaml::Metadata.new.generate(settings, true),
       content_type: "application/xml"
   end
 
-  # The SP certificate alone, for IdP tooling that registers a bare certificate rather than
-  # reading one out of our metadata. App-wide, so every organization serves the same bytes;
-  # the .crt path names the download, which is how the IdPs that publish one do it
+  # Some IdP tooling registers a bare certificate rather than reading one out of metadata.
+  # The keypair is app-wide, so the org-scoped path serves the same bytes for every org
   def certificate
-    settings = Saml::SettingsBuilder.build(published_saml_configuration)
-    raise ActiveRecord::RecordNotFound if settings.certificate.blank?
+    saml_organization # gate only - the certificate itself is not per-organization
+    sp_certificate = Saml::SettingsBuilder.sp_certificate
+    raise ActiveRecord::RecordNotFound if sp_certificate.blank?
 
-    render body: settings.certificate, content_type: "application/pem-certificate-chain"
+    render body: sp_certificate, content_type: "application/pem-certificate-chain"
   end
 
   # SP-initiated login: redirect to the IdP with a signed AuthnRequest, parking the request id
@@ -58,20 +56,22 @@ class SamlController < ApplicationController
 
   private
 
-  # The public endpoints, which any IdP admin may read. build_ (not fetch_) so a GET
-  # never persists a configuration record
-  def published_saml_configuration
+  def saml_organization
     organization = Organization.friendly_find(params[:org_slug])
     raise ActiveRecord::RecordNotFound unless organization&.enabled?("saml_sso")
 
-    organization.organization_saml_configuration ||
-      organization.build_organization_saml_configuration
+    organization
+  end
+
+  # build_ (not fetch_) so a GET never persists a configuration record
+  def published_saml_configuration
+    organization = saml_organization
+    organization.organization_saml_configuration || organization.build_organization_saml_configuration
   end
 
   def configured_saml_configuration
-    organization = Organization.friendly_find(params[:org_slug])
-    saml_configuration = organization&.organization_saml_configuration
-    raise ActiveRecord::RecordNotFound unless organization&.enabled?("saml_sso") && saml_configuration&.configured?
+    saml_configuration = saml_organization.organization_saml_configuration
+    raise ActiveRecord::RecordNotFound unless saml_configuration&.configured?
 
     saml_configuration
   end
