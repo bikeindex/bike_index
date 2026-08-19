@@ -5,4 +5,4 @@
   %h2.uncap{class: "tw:-mt-4 tw:mb-8 tw:pl-4 tw:text-lg tw:font-semibold tw:italic tw:text-gray-900 tw:dark:text-gray-100"}
     Try
     = link_to "the new registration flow", new_organization_registration_path(organization_id: current_organization.to_param), class: "twlink"
-<iframe src="#{iframe_url}"></iframe>
+<iframe src="#{iframe_url}" data-controller="org--embed-iframe"></iframe>
