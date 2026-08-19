@@ -27,7 +27,15 @@ RSpec.describe UI::ActiveLink::Component, :js, type: :system do
     expect(page).to_not have_css "a[aria-current]"
   end
 
-  it "ignores a query string the page carries but the link doesn't" do
+  # The param the page carries is what :path ignores and :full_path doesn't
+  it "counts the query string only where the match says to" do
+    visit "#{preview_path}/match_full_path"
+    expect(page).to have_css "a[aria-current='page']", text: "This preview, exactly"
+
+    visit "#{preview_path}/match_full_path?example=1"
+    expect(page).to have_css "a.twlink", text: "This preview, exactly"
+    expect(page).to_not have_css "a[aria-current]"
+
     visit "#{preview_path}/current_page?example=1"
     expect(page).to have_css "a[aria-current='page']", text: "This preview"
   end

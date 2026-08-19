@@ -4335,6 +4335,7 @@ en:
         sent_to: Sent to
         sent_to_a_new_owner: sent to a new owner
         sticker: Sticker
+        stickers: Stickers
       recoveries:
         description: Description
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
@@ -4793,6 +4794,9 @@ en:
       passwordless_help: We'll email you a secure link to sign in.
       sign_in_without_password: Sign in without a password
   shared:
+    account_menu_items:
+      marketplace_messages: Marketplace messages
+      switch_to_org: Switch to %{org_name} admin
     bike_search_form:
       anywhere: Anywhere
       doesnt_look_like_serial: >-
@@ -4974,35 +4978,40 @@ en:
       your_preferences: Your preferences
     organized_menu_items:
       add_a_bike: Add a bike
+      add_an_impounded_vehicle: Add an Impounded Vehicle
       ascend_imports: Ascend Imports
+      bulk_import_and_export: Bulk Import & Export
       bulk_imports: Bulk Imports
-      custom_emails: Custom emails
       discuss: Discuss
       exports: Exports
       getting_started: Getting started
       graduated_notifications: Graduated notifications
-      impounded_bikes: Impounded Bikes
       impounded_claims: Impounded claims
+      impounded_vehicles: Impounded Vehicles
+      impounding: Impounding
       incomplete_registrations: Incomplete registrations
       lightspeed_integration_panel: Lightspeed Integration Panel
-      manage_impounding: Manage impounding
-      manage_registration_sequences: Manage Registration sequences
       manage_users: Manage users
+      messaging: Messaging
       model_audits: E-Vehicle audits
       multi_search: Multi search
-      org_bikes: "%{org_name} Bikes"
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} locations"
       org_profile: "%{org_name} profile"
+      org_registrations: "%{org_name} Registrations"
+      org_settings: "%{org_name} Settings"
       parking_notification_unregistered: New unregistered notification
-      parking_notifications: Parking notifications
+      parking_notifications_group: Parking Notifications
       recoveries: Recoveries
+      registration_sequences: Registration sequences
       registration_stickers: Registration stickers
+      reports: Reports
       resources: Resources
+      search_impounded_vehicles: Search Impounded Vehicles
+      search_parking_notifications: Search Parking Notifications
+      search_registrations: Search Registrations
       stolen_hot_sheet: Stolen Bike Hot Sheet
-      stolen_hot_sheet_configuration: Stolen Bike Hot Sheet configuration
       stolen_message: Stolen Message
-      super_admin_view: Super Admin for %{org_name}
     recovery_display:
       bike: Bike
       recovered_date: recovered %{date}

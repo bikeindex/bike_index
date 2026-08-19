@@ -257,6 +257,21 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(assigns(:bikes).pluck(:id)).to match_array([bike.id])
       end
     end
+    context "bike_stickers without bike_search" do
+      let(:enabled_feature_slugs) { %w[bike_stickers] }
+      let!(:claimed_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: current_organization, bike:) }
+      let(:unclaimed_sticker) { FactoryBot.create(:bike_sticker, organization: current_organization) }
+
+      it "renders the sticker columns" do
+        get base_url, params: {bike_sticker: unclaimed_sticker.code}
+        expect(response.status).to eq(200)
+        expect(response).to render_template :index
+        expect(assigns(:bike_sticker)).to eq unclaimed_sticker
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+        expect(response.body).to include(claimed_sticker.pretty_code)
+        expect(response.body).to include(CGI.escapeHTML(bike_sticker_path(id: unclaimed_sticker.code, organization_id: current_organization.id, bike_id: bike.id)))
+      end
+    end
     context "unsupported format" do
       it "returns 406 for json" do
         get "#{base_url}.json", params: {period: "custom", start_time: "2025-04-01", end_time: "2026-04-30", per_page: "1"}

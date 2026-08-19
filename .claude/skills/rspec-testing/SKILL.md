@@ -51,6 +51,10 @@ What a component decides about its markup — a label, a placeholder, a class, w
 
 A component having no spec yet isn't a reason to put it in the request spec instead. `spec/components/register/step2/component_spec.rb` is the pattern, including the `render_x` helper that reloads the record so an object updated mid-example isn't answered from the copy the previous render left behind.
 
+## `log_in` stubs the auth lookup, so it can't answer whether a session ends
+
+`spec/support/request_spec_helpers.rb`'s `log_in` (and every `:request_spec_logged_in_as_*` context) stubs `User.from_auth` to return the user, so the cookie is never read and the session outlives anything done to that user — deleting, banning, rotating their `auth_token`. A spec asserting a request signs someone *out* has to sign in for real: `post "/session", params: {session: {email:, password:}}`, then make the request. `spec/requests/sessions_request_spec.rb`'s "deleted after signing in" is the pattern.
+
 ## VCR cassettes: never hand-edit, always re-record
 
 **Never open a cassette and change it.** Not a URL, not a token, not a timestamp, not an interaction — no matter how small or how obviously right the edit looks. A cassette is a recording of what a real service actually said; an edited one asserts something no service ever returned, and the spec passes against a fiction. This has no exceptions.
