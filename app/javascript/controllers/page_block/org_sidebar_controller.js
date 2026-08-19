@@ -9,7 +9,7 @@ const TRANSITION_MS = 200
 // What a reader moving the page themselves looks like -- a plain scroll event won't do,
 // since revealCurrentRow's own scrolling raises one
 const READER_SCROLL_EVENTS = ['wheel', 'touchmove', 'keydown']
-// Gap below a revealed row, so a fractional row height can't leave it a subpixel
+// Gap below whatever is revealed, so a fractional row height can't leave it a subpixel
 // short of the fold
 const REVEAL_MARGIN = 8
 // Matched by the panel it opens rather than by ui--collapse's target, so a collapse
@@ -163,7 +163,7 @@ export default class extends Controller {
 
   // A group near the bottom unrolls past the fold, which is no use to whoever opened it.
   // Measured after ui--collapse animates the rows in, rather than against a panel that
-  // is still zero-height. Scrolls by exactly what overflows, so the row clicked stays put
+  // is still zero-height. Scrolls by what overflows, so the row clicked stays put
   // where the whole group can fit; only a group taller than the view gives that up to
   // show its start. The sidebar scrolls as a column and the page does once it's in the flow
   revealGroup (trigger) {
@@ -181,7 +181,7 @@ export default class extends Controller {
 
       const delta = (groupBottom - groupTop > viewBottom - viewTop)
         ? groupTop - viewTop
-        : groupBottom - viewBottom
+        : groupBottom - viewBottom + REVEAL_MARGIN
 
       const target = scrolls ? scroller : window
       target.scrollBy({ top: delta, behavior: 'smooth' })
