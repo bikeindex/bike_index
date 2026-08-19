@@ -31,10 +31,12 @@ module PageBlock
         BAR = "tw:h-0.5 tw:w-5 tw:rounded-sm tw:bg-gray-900 tw:transition-all " \
           "tw:duration-200 tw:dark:bg-gray-300"
 
-        def initialize(organization:, current_user:, current_user_or_unconfirmed_user: nil)
+        def initialize(organization:, current_user:, current_user_or_unconfirmed_user: nil,
+          old_register_view: false)
           @organization = organization
           @current_user = current_user
           @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user || current_user
+          @old_register_view = old_register_view
         end
 
         def render?
@@ -44,7 +46,8 @@ module PageBlock
         private
 
         def items
-          @items ||= OrganizedServices::UserMenuItems.for(organization: @organization, current_user: @current_user)
+          @items ||= OrganizedServices::UserMenuItems.for(organization: @organization,
+            current_user: @current_user, old_register_view: @old_register_view)
         end
 
         # PageBlock::Navbar::SettingsMenu's rows, in its order — the sidebar stands in for the

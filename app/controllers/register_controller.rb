@@ -237,9 +237,9 @@ class RegisterController < ApplicationController
     organization = @b_param.creation_organization
     return unless organization.present? && current_user&.authorized?(organization)
 
-    @current_organization = organization
-    # The navbar's menu can be another organization's, and it isn't registering anything
-    @register_flow_organization_id = organization.id
+    # What the navbar picks its sidebar from, and the session's can be another organization.
+    # Not set_passive_organization - registering through this one doesn't move theirs
+    @passive_organization = organization
   end
 
   # Resolved once - the step math, the progress bar and the pages themselves all read it

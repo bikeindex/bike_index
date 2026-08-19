@@ -290,7 +290,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect(assigns(:b_param)&.id).to eq b_param.id
       # The member is registering someone else's vehicle, so it isn't seeded with their email
       expect(b_param.owner_email).to be_blank
-      expect(response.body).to include("organized-left-menu")
+      expect(response.body).to include("org_sidebar_nav")
       expect(response.body).to include(b_param.id_token)
       expect(response.body).to include(new_organization_bike_path(organization_id: current_organization.to_param))
 
@@ -327,7 +327,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       let(:old_view_path) { new_organization_bike_path(organization_id: current_organization.to_param) }
       # Not a let - it's read after each request in turn, and a let would memoize the first
       def menu_add_bike_path
-        Nokogiri::HTML(response.body).css(".organized-mainmenu a")
+        Nokogiri::HTML(response.body).css("#org_sidebar_nav a")
           .find { |a| a.text.strip == "Add a bike" }&.[]("href")
       end
 

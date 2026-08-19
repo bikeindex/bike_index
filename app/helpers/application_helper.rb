@@ -48,11 +48,6 @@ module ApplicationHelper
     session[:old_register_view].present?
   end
 
-  # Its opening step, then every step after it on /register
-  def register_flow_page?
-    controller_name == "register" || (controller_name == "registrations" && action_name == "new")
-  end
-
   # Deprecated - UI::Forms::NestedFields::Component replaces this. Every set this adds shares one
   # child_index, so clicking twice submits a single record
   def link_to_add_fields(name, f, association, class_name: nil, obj_attrs: {}, filename: nil)
@@ -142,6 +137,12 @@ module ApplicationHelper
 
   private
 
+  # The flow's opening step, which organized renders. Every step after it is on /register,
+  # which lays itself out and paints its own gray
+  def organized_register_flow?
+    controller_name == "registrations" && action_name == "new"
+  end
+
   def body_class
     if controller_name == "landing_pages" || @force_landing_page_render
       if %w[for_schools for_law_enforcement].include?(action_name)
@@ -154,7 +155,7 @@ module ApplicationHelper
     elsif main_content_organized?
       # Register::Page's gray only covers the form, and the organized container insets it -
       # so the page paints it instead, behind the whole content column
-      register_flow_page? ? "organized-body tw:bg-gray-100 tw:dark:bg-gray-900" : "organized-body"
+      organized_register_flow? ? "organized-body tw:bg-gray-100 tw:dark:bg-gray-900" : "organized-body"
     elsif controller_name == "registrations" && action_name == "show"
       "tw:bg-[#f7f6fb]"
     end

@@ -54,13 +54,22 @@ RSpec.describe OrganizedServices::UserMenuItems do
             link_item("Search Registrations", "/o/#{organization.to_param}/registrations",
               match: :controller_action)
           ]),
-          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new",
+          link_item("Add a bike", "/o/#{organization.to_param}/registrations/new",
             icon: "plus-circle", match: :full_path)
         ]
       end
 
       it "drops every group whose features are off, and the divider left behind" do
         expect(items).to eq(target)
+      end
+
+      context "gone back to the old view" do
+        subject(:items) { described_class.for(organization:, current_user:, old_register_view: true) }
+
+        it "points add a bike at the embed form" do
+          expect(items.last).to eq(link_item("Add a bike", "/o/#{organization.to_param}/bikes/new",
+            icon: "plus-circle", match: :full_path))
+        end
       end
     end
 

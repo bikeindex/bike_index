@@ -62,12 +62,13 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
       .to eq "organized/registration_sequences organized/registration_sequence_pages"
   end
 
-  # Both point at organized/bikes#new, so only the query string tells them apart
+  # Gone back to the old view both point at organized/bikes#new, so only the query
+  # string tells them apart
   it "matches the two add-a-bike rows on their full path" do
     rows = component.css("nav a[data-ui--active-link-match-value='full_path']")
 
     expect(rows.map { |row| row["href"] })
-      .to eq(["/o/#{organization.to_param}/bikes/new",
+      .to eq(["/o/#{organization.to_param}/registrations/new",
         "/o/#{organization.to_param}/bikes/new?parking_notification=true"])
   end
 
