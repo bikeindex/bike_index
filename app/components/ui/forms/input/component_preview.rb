@@ -17,6 +17,10 @@ module UI
           {template: "ui/forms/input/component_preview/datetime_local_field"}
         end
         # @!endgroup
+
+        def prefix
+          {template: "ui/forms/input/component_preview/prefix"}
+        end
       end
     end
   end

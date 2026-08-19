@@ -68,6 +68,22 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
     end
   end
 
+  # The prefix sits against the field's left edge, rather than on a line of its own
+  context "with a prefix" do
+    let(:component) { render_inline(described_class.new(form_builder:, attribute:, prefix: "@", html_options:)) }
+
+    it "renders it beside the field, squaring the field's left corners" do
+      expect(component).to have_css("div[class~='tw:flex'] > span", text: "@")
+      expect(component).to have_css("div[class~='tw:flex'] > input.twinput[class~='tw:rounded-l-none']")
+    end
+  end
+
+  it "renders no wrapper without a prefix" do
+    expect(component).to have_css("input.twinput")
+    expect(component).to_not have_css("div")
+    expect(component).to_not have_css("input[class~='tw:rounded-l-none']")
+  end
+
   context "when required" do
     let(:component) { render_inline(described_class.new(form_builder:, attribute:, kind:, required: true)) }
 

@@ -4,7 +4,7 @@
   <% if content_field? %>
     <%= content %>
   <% else %>
-    <%= render(UI::Forms::Input::Component.new(form_builder: @form_builder, attribute: @attribute, kind: @kind, required: required?, html_options: input_html_options)) %>
+    <%= render(UI::Forms::Input::Component.new(form_builder: @form_builder, attribute: @attribute, kind: @kind, required: required?, prefix: @prefix, html_options: input_html_options)) %>
   <% end %>
 
   <% if helper_text? %>
