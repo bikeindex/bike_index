@@ -200,20 +200,26 @@ body {
 }
 /* The org sidebar is fixed, so the page it covers is pushed over instead. The
    controller narrows --org-sidebar-width as it collapses; defaulting to the
-   expanded width keeps the content still until stimulus connects. There's no
-   navbar on these pages for a full-bleed page to pull up under. */
+   expanded width keeps the content still until stimulus connects. */
 body.with-org-sidebar {
-  --nav-gap: 0px;
+  /* main's inset below, which stands in for the navbar gap these pages don't have.
+     Not 0: a full-bleed page pulls up by --nav-gap to sit flush, and it's the inset
+     it has to cancel here */
+  --nav-gap: 16px;
 
   margin-left: var(--org-sidebar-width, 266px);
   transition: margin-left 0.18s ease;
 }
+@media (min-width: 760px) {
+  body.with-org-sidebar {
+    --nav-gap: 28px;
+  }
+}
 
 /* The sidebar runs the height of the window, so the content does too -- a short page
-   would otherwise end partway down it, with the footer riding up beside the rows.
-   The inset stands in for the navbar gap these pages no longer have */
+   would otherwise end partway down it, with the footer riding up beside the rows */
 body.with-org-sidebar main {
-  @apply tw:pt-4 tw:min-[760px]:pt-7;
+  padding-top: var(--nav-gap);
 
   min-height: 100vh;
 }
