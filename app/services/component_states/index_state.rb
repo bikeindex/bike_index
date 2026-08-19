@@ -2,9 +2,9 @@
 
 module ComponentStates
   # Everything an admin index page knows about its own request — the same values on every
-  # one of them, so `Admin::BaseController#admin_index_state` builds it once and each index
-  # view hands it over whole. What varies per page (the collection, what it's called, the
-  # table) stays an argument of its own.
+  # one of them, so `ControllerHelpers#admin_index_state` builds it once and each index view
+  # hands it over whole. What varies per page (the collection, what it's called, the table)
+  # stays an argument of its own.
   IndexState = Data.define(
     :params, :sort_state, :render_chart, :render_deleted, :pagy, :per_page, :time_range,
     :period, :start_time, :end_time, :current_organization, :user_subject, :bike,

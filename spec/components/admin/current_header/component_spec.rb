@@ -101,15 +101,6 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
         expect(component.text).to include("Bike shop")
         expect(component).to have_css("a", text: "view for all kinds")
       end
-
-      context "with custom kind_humanized" do
-        let(:options) { {index: index_state, kind_humanized: "Special Kind", viewing: "Thing"} }
-
-        it "renders custom kind humanized text" do
-          expect(component.text).to include("Special Kind")
-          expect(component).to have_css("a", text: "view for all kinds")
-        end
-      end
     end
 
     context "with search_membership_id param" do

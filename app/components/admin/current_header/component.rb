@@ -14,10 +14,9 @@ module Admin
         search_strava_integration_id
       ].freeze
 
-      def initialize(index:, viewing:, kind_humanized: nil)
+      def initialize(index:, viewing:)
         @index = index
         @viewing = viewing
-        @kind_humanized = kind_humanized
       end
 
       def render?
@@ -81,9 +80,7 @@ module Admin
         @strava_integration = StravaIntegration.find_by_id(strava_integration_id)
       end
 
-      def kind_humanized
-        @kind_humanized || @index.params[:search_kind]&.humanize
-      end
+      def kind_humanized = @index.params[:search_kind]&.humanize
 
       def show_primary_activity?
         @index.params[:primary_activity].present? || primary_activity_subject.present?

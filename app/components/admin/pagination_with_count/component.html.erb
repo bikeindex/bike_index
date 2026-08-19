@@ -27,7 +27,7 @@
     </div>
   <% end %>
 
-  <% unless @skip_pagination || @index.pagy.blank? %>
+  <% if @index.pagy.present? %>
     <div class="tw:flex tw:flex-wrap tw:justify-end tw:gap-4 tw:md:text-right tw:lg:flex-nowrap <%= (@skip_total ? "col-12" : "col-md-7") %>">
       <%= render(UI::Pagination::Component.new(pagy: @index.pagy, page_params: @index.params)) %>
 

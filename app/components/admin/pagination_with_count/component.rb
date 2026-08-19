@@ -6,13 +6,12 @@ module Admin
       include GraphingHelper # for humanized_time_range_column
 
       def initialize(collection:, index:, count: nil, count_detail: nil, skip_total: false,
-        skip_pagination: false, viewing: nil, time_range_column: nil)
+        viewing: nil, time_range_column: nil)
         @collection = collection
         @index = index
         @count = count
         @count_detail = count_detail
         @skip_total = skip_total
-        @skip_pagination = skip_pagination
         @viewing = viewing
         @time_range_column = time_range_column || index.time_range_column
       end
