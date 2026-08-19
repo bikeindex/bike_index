@@ -82,6 +82,17 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
         expect(response.body).to include("role=\"alert\"")
       end
     end
+    context "organization no longer delivering" do
+      it "renders the no-email-sent alert" do
+        current_organization.update(graduated_notification_interval: nil)
+        expect(graduated_notification.reload.send_email?).to be_falsey
+        expect(graduated_notification.primary_notification?).to be_truthy
+        get "#{base_url}/#{graduated_notification.id}"
+        expect(response.status).to eq(200)
+        expect(response.body).to include("No email will be sent for unknown reason")
+        expect(response.body).to include("role=\"alert\"")
+      end
+    end
     context "different organization's" do
       let!(:graduated_notification) { FactoryBot.create(:graduated_notification_bike_graduated) }
       it "raises not found" do

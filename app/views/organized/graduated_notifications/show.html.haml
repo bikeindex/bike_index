@@ -115,21 +115,21 @@
   .row.mt-4
     .col-md-6
       - if @graduated_notification.primary_notification?
-        .alert.alert-danger
+        = render(UI::Alerts::Base::Component.new(kind: :error)) do
           No email will be sent for unknown reason!
           %br
           Please contact support
       - else
-        .alert.alert-warning
+        = render(UI::Alerts::Base::Component.new(kind: :warning)) do
           This notification didn't send an email because it isn't the
           - if @graduated_notification.primary_notification_id.present?
-            = link_to "primary notification", organization_graduated_notification_path(@graduated_notification.primary_notification, organization_id: current_organization.to_param), class: "text-underline"
+            = link_to "primary notification", organization_graduated_notification_path(@graduated_notification.primary_notification, organization_id: current_organization.to_param), class: "twlink-underlined"
           - else
             primary notification
           for #{@graduated_notification.user_display_name}
           - if !@graduated_notification.primary_notification? && @graduated_notification.primary_bike.present?
             - primary_bike = @graduated_notification.primary_bike
-            .mt-4.text-muted
+            %div{ class: "tw:mt-4" }
               %strong The primary notification is for
-              = link_to organized_bike_text(primary_bike), bike_path(primary_bike, organization_id: current_organization.to_param)
+              = link_to organized_bike_text(primary_bike), bike_path(primary_bike, organization_id: current_organization.to_param), class: "twlink-underlined"
 
