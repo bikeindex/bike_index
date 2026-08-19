@@ -96,9 +96,8 @@ module OrganizedServices
       group(:registrations, translation(:org_registrations, org_name: organization.short_name), "bike", children)
     end
 
-    # The register flow, until they take its way back to the embed form. That's
-    # organized/bikes#new, which the parking notification row also links - told apart by
-    # the query param, so both rows match on the full path
+    # The embed form is organized/bikes#new, which the parking notification row also
+    # links - told apart by the query param, which is why both match on the full path
     def add_bike_link(organization, old_register_view)
       path = if old_register_view
         routes.new_organization_bike_path(organization.to_param)

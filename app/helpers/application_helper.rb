@@ -131,8 +131,7 @@ module ApplicationHelper
 
   private
 
-  # The flow's opening step, which organized renders. Every step after it is on /register,
-  # which lays itself out and paints its own gray
+  # Only the opening step: every step after it is on /register, which paints its own gray
   def organized_register_flow?
     controller_name == "registrations" && action_name == "new"
   end

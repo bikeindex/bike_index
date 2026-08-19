@@ -237,8 +237,8 @@ class RegisterController < ApplicationController
     organization = @b_param.creation_organization
     return unless organization.present? && current_user&.authorized?(organization)
 
-    # What the navbar picks its sidebar from, and the session's can be another organization.
-    # Not set_passive_organization - registering through this one doesn't move theirs
+    # The navbar picks its sidebar off this. Not set_passive_organization - registering
+    # through an organization doesn't move the session's own
     @passive_organization = organization
   end
 
