@@ -55,8 +55,8 @@ RSpec.describe "Navbar", :js, type: :system do
   context "signed in without an organization" do
     let!(:user) { FactoryBot.create(:user_confirmed) }
 
-    # The gear is icon-only, so its aria-label is the only thing to find it by
-    let(:settings_toggle) { "button[aria-label='Settings']" }
+    # The gear is icon-only, and UI::Dropdown names its trigger off the menu's name
+    let(:settings_toggle) { "button#settings" }
 
     it "opens the settings dropdown at desktop width, and folds it into the hamburgler" do
       sign_in(user)
@@ -65,36 +65,39 @@ RSpec.describe "Navbar", :js, type: :system do
       visit root_path
 
       # The closed dropdown's items are rendered, out of view
-      expect(page).to have_no_link("Logout")
+      expect(page).to have_no_link("Log out")
       expect_axe_clean
 
       find(settings_toggle).click
 
-      expect(page).to have_link("Logout")
+      expect(page).to have_link("Log out")
       expect_axe_clean
 
       # Escape from inside the dropdown hands focus back to the toggle, rather than
       # leaving it on a link that just became display:none
-      find_link("Logout").send_keys(:escape)
+      find_link("Log out").send_keys(:escape)
 
-      expect(page).to have_no_link("Logout")
-      expect(page.evaluate_script("document.activeElement.id")).to eq "setting_submenu"
+      expect(page).to have_no_link("Log out")
+      expect(page.evaluate_script("document.activeElement.id")).to eq "settings"
 
       find(settings_toggle).click
 
-      expect(page).to have_link("Logout")
+      expect(page).to have_link("Log out")
 
       find("body").click
 
-      expect(page).to have_no_link("Logout")
+      expect(page).to have_no_link("Log out")
 
       page.current_window.resize_to(390, 844)
 
-      # No room for the gear on a phone, so its items sit in the hamburgler menu
+      # The gear is behind the hamburgler on a phone, and opens the same dropdown there
       expect(page).to have_no_css(settings_toggle)
       find("#primary_nav_hamburgler").click
+      expect(page).to have_css("nav.primary-header-nav.menu-in", wait: 5)
 
-      expect(page).to have_link("Logout")
+      find(settings_toggle).click
+
+      expect(page).to have_link("Log out")
     end
   end
 

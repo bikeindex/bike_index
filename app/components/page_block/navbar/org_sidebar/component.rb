@@ -47,17 +47,11 @@ module PageBlock
           @items ||= UserServices::MenuItemsOrg.for(organization: @organization, current_user: @current_user)
         end
 
-        # PageBlock::Navbar::SettingsMenu's rows, in its order — the sidebar stands in for the
-        # whole navbar, so this is the only place a reader with an organization reaches them
-        def account_items
-          [*UserServices::MenuItemsAccount.organization_switcher(@current_user_or_unconfirmed_user),
-            {label: translation(".your_registrations"), path: my_account_path},
-            UserServices::MenuItemsAccount.marketplace_messages(@current_user),
-            {label: translation(".register_a_new_bike"), path: choose_registration_path},
-            {label: translation(".user_settings", user_email: @current_user_or_unconfirmed_user.email),
-             path: edit_my_account_path},
-            {type: :divider},
-            {label: translation(".logout"), path: goodbye_path, danger: true}].compact
+        # The sidebar stands in for the whole navbar, so it carries the gear's rows too
+        def account_menu
+          PageBlock::Navbar::SettingsMenu::Component.new(current_user: @current_user,
+            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user,
+            name: @current_user_or_unconfirmed_user.email, button_class: account_button_class)
         end
 
         def first_group

@@ -8,7 +8,7 @@ module PageBlock
       # logo_only renders just the logo, for the OAuth authorization prompt.
       class Component < ApplicationComponent
         # Digest of the cached template — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "797d4c94a9ab"
+        MARKUP_DIGEST = "5aa9d891997d"
 
         def initialize(logo_only: false, current_user: nil, current_user_or_unconfirmed_user: nil,
           passive_organization: nil)
@@ -36,8 +36,7 @@ module PageBlock
           return {} if @logo_only
 
           {data: {controller: "page-block--navbar",
-                  action: "click@window->page-block--navbar#closeDropdownsOutside " \
-                    "keydown.esc@window->page-block--navbar#closeOnEscape " \
+                  action: "keydown.esc@window->page-block--navbar#closeOnEscape " \
                     "resize@window->page-block--navbar#reposition"}}
         end
 

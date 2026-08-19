@@ -246,43 +246,27 @@
       %>
 
       <div class="tw:flex tw:flex-col">
-        <%= render UI::Dropdown::Component.new(
-              name: @current_user_or_unconfirmed_user.email,
-              button_class: account_button_class
-            ) do |dropdown| %>
-          <% dropdown.with_button do %>
-            <span
-              class="
-                tw:flex tw:h-[30px] tw:w-[30px] tw:flex-none tw:items-center
-                tw:justify-center tw:rounded-full tw:border
-                tw:border-gray-200 tw:bg-white tw:text-blue-600
-                tw:dark:border-gray-700 tw:dark:bg-gray-900
-              "
-            >
-              <%= icon("user-circle", html_class: "tw:h-[17px] tw:w-[17px]") %>
-            </span>
+        <%= render account_menu do %>
+          <span
+            class="
+              tw:flex tw:h-[30px] tw:w-[30px] tw:flex-none tw:items-center
+              tw:justify-center tw:rounded-full tw:border tw:border-gray-200
+              tw:bg-white tw:text-blue-600 tw:dark:border-gray-700
+              tw:dark:bg-gray-900
+            "
+          >
+            <%= icon("user-circle", html_class: "tw:h-[17px] tw:w-[17px]") %>
+          </span>
 
-            <span
-              class="
-                tw:flex-1 tw:overflow-hidden tw:text-left tw:text-[13px]
-                tw:font-bold tw:overflow-ellipsis tw:whitespace-nowrap
-                tw:group-data-[collapsed=true]/sidebar:hidden
-              "
-            >
-              <%= @current_user_or_unconfirmed_user.email %>
-            </span>
-          <% end %>
-
-          <% account_items.each do |account_item| %>
-            <% if account_item[:type] == :divider %>
-              <% dropdown.with_entry_divider %>
-            <% else %>
-              <% dropdown.with_entry_item do %>
-                <%= link_to account_item[:label], account_item[:path],
-                      class: account_item[:danger] ? "tw:text-red-700! tw:hover:bg-red-50! tw:hover:text-red-600!" : nil %>
-              <% end %>
-            <% end %>
-          <% end %>
+          <span
+            class="
+              tw:flex-1 tw:overflow-hidden tw:text-left tw:text-[13px]
+              tw:font-bold tw:overflow-ellipsis tw:whitespace-nowrap
+              tw:group-data-[collapsed=true]/sidebar:hidden
+            "
+          >
+            <%= @current_user_or_unconfirmed_user.email %>
+          </span>
         <% end %>
       </div>
     </div>

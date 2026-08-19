@@ -3,11 +3,18 @@
 module PageBlock
   module Navbar
     module SettingsMenu
-      # The gear dropdown: the user's organizations, their account links and logout
+      # The account rows: the user's organizations, their account links and logout. The
+      # navbar hangs them off its gear and the org sidebar off its account block, so the
+      # trigger is the caller's and only the rows are here.
       class Component < ApplicationComponent
-        def initialize(current_user:, current_user_or_unconfirmed_user:)
+        # Logout is the only row that isn't somewhere to go
+        DANGER = "tw:text-red-700! tw:hover:bg-red-50! tw:hover:text-red-600!"
+
+        def initialize(current_user:, current_user_or_unconfirmed_user:, name:, button_class: nil)
           @current_user = current_user
           @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user
+          @name = name
+          @button_class = button_class
         end
 
         private
@@ -21,7 +28,11 @@ module PageBlock
              path: edit_my_account_path,
              html_options: {id: "navUserSettingLink", data: {email: @current_user_or_unconfirmed_user.email}}},
             {type: :divider},
-            {label: translation(".logout"), path: goodbye_path}].compact
+            {label: translation(".logout"), path: goodbye_path, danger: true}].compact
+        end
+
+        def link_options(item)
+          {class: (DANGER if item[:danger])}.merge(item.fetch(:html_options, {}))
         end
       end
     end

@@ -23,7 +23,7 @@ RSpec.describe PageBlock::Navbar::Wrapper::Component, type: :component do
     it "drops the signup link without adding an organization menu" do
       expect(component).to_not have_css "a.center-navbar-signup-link"
       expect(component).to_not have_css "#passive_organization_submenu"
-      expect(component).to have_css "#setting_submenu"
+      expect(component).to have_css "button#settings"
       expect(instance.org_sidebar?).to be false
     end
 

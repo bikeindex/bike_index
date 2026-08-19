@@ -15,7 +15,7 @@ RSpec.describe PageBlock::Navbar::PrimaryMenu::Component, type: :component do
   it "renders the signed out menu, with every item's state left to the browser" do
     expect(menu_links).to eq(["Search", "Marketplace", "Sign up", "log in", "Help",
       "Stolen bike?", "Donate", "Blog", "Marketplace", "Search"])
-    expect(component).to_not have_css "#setting_submenu"
+    expect(component).to_not have_css "#settings"
     expect(component).to_not have_css "#primary-main-menu a[aria-current]"
     expect(component.css("#primary-main-menu a[data-controller='ui--active-link']").count).to eq menu_links.count
   end
@@ -35,7 +35,7 @@ RSpec.describe PageBlock::Navbar::PrimaryMenu::Component, type: :component do
     let(:current_user) { FactoryBot.create(:user_confirmed) }
 
     it "renders the settings menu rather than the sign up links" do
-      expect(component).to have_css "li.primary-nav-item #setting_submenu"
+      expect(component).to have_css "li.primary-nav-item button#settings svg#settings-icon"
       expect(menu_links).to_not include("Sign up", "log in")
     end
   end

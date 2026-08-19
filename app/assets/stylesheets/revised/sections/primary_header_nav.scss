@@ -68,13 +68,6 @@ $mobile-nav-height: 4 * $vertical-height;
     display: none;
   }
 
-  .primary-submenu .divider-nav-item {
-    display: block;
-    width: 94%;
-    margin: 6px auto;
-    border-top: 1px solid #666;
-  }
-
   .hamburgler {
     font-family: courier;
 
@@ -84,20 +77,11 @@ $mobile-nav-height: 4 * $vertical-height;
     }
   }
 
-  .primary-submenu a {
-    font-family: $body-font-family;
-    color: $primary-nav-text-color;
-    font-weight: 400;
-    font-style: normal;
-    font-size: 15px;
-    text-transform: none;
-
-    &:hover,
-    &:active,
-    &[aria-current] {
-      color: #fff;
-      text-decoration: none;
-    }
+  // The gear carries no width or height of its own, so an unsized svg lays out at 300x150
+  .settings-link svg {
+    display: block;
+    height: 2 * $vertical-height;
+    width: auto;
   }
 }
 
@@ -185,10 +169,6 @@ $mobile-nav-height: 4 * $vertical-height;
       width: 94%;
       margin: 6px auto;
       border-top: 1px solid #666;
-    }
-
-    .primary-submenu {
-      padding-left: 0;
     }
 
     #menu-opened-backdrop {
@@ -293,40 +273,6 @@ $mobile-nav-height: 4 * $vertical-height;
         }
       }
 
-      .settings-link {
-        svg {
-          display: block;
-          height: 2 * $vertical-height;
-          width: auto;
-        }
-      }
-    }
-  }
-
-  .open > .primary-submenu {
-    display: block;
-    z-index: 10000; // Override to fix issues with safari not opening links
-  }
-
-  .primary-submenu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    display: none;
-    float: left;
-    min-width: 400px;
-    padding: 5px 0;
-    margin: 2px 0 0;
-    font-size: 1rem;
-    text-align: left;
-    background-color: $primary-nav-background;
-    background-clip: padding-box;
-    border: 1px solid rgba($gray, 0.3);
-    border-radius: $border-radius;
-    z-index: 1;
-
-    li {
-      font-size: 80%;
     }
   }
 

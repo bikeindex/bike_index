@@ -5,9 +5,7 @@ const TRANSITION_MS = 200
 
 // Connects to data-controller="page-block--navbar"
 //
-// The hamburgler menu and the settings dropdown. It toggles the markers
-// primary_header_nav.scss already styles, so `open` lands on a toggle's parent
-// the way bootstrap's did.
+// The hamburgler menu. The settings dropdown it used to open too is UI::Dropdown's now.
 export default class extends Controller {
   static targets = ['hamburgler', 'hamburglerButton']
 
@@ -40,42 +38,13 @@ export default class extends Controller {
     setTimeout(() => this.element.classList.remove('enabled'), TRANSITION_MS)
   }
 
-  toggleDropdown (event) {
-    const toggle = event.currentTarget
-    const wasOpen = toggle === this.openDropdown
-
-    this.closeDropdowns()
-    if (wasOpen) return
-
-    toggle.setAttribute('aria-expanded', 'true')
-    toggle.parentElement.classList.add('open')
-    this.openDropdown = toggle
-  }
-
-  closeDropdowns () {
-    if (!this.openDropdown) return
-
-    this.openDropdown.setAttribute('aria-expanded', 'false')
-    this.openDropdown.parentElement.classList.remove('open')
-    this.openDropdown = null
-  }
-
-  closeDropdownsOutside (event) {
-    if (this.openDropdown && !this.openDropdown.parentElement.contains(event.target)) this.closeDropdowns()
-  }
-
-  // Escape returns focus to whatever it closed, the way ui--dropdown does -- otherwise
-  // it lands on a display:none element and the browser drops it to the body
+  // Escape returns focus to what it closed -- otherwise it lands on a display:none
+  // element and the browser drops it to the body
   closeOnEscape () {
-    const openToggle = this.openDropdown
+    if (!this.menuOpen) return
 
-    this.closeDropdowns()
-    if (openToggle) {
-      openToggle.focus()
-    } else if (this.menuOpen) {
-      this.closeMenu()
-      this.hamburglerButtonTarget.focus()
-    }
+    this.closeMenu()
+    this.hamburglerButtonTarget.focus()
   }
 
   // Rotating or resizing with the menu open changes how tall the banner is
