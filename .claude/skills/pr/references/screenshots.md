@@ -14,7 +14,7 @@ The Claude Code web sandbox is the case that has neither: no GitHub CLI, and an 
 
 ## Preflight: a CSS diff needs a fresh tailwind build
 
-When the diff touches `app/assets/tailwind/**`, check that `app/assets/builds/tailwind.css` contains the branch's new rules before capturing — another checkout's watcher can leave it stale for hours, and the capture then documents the bug the PR fixes. Ask the user to restart `bin/dev`; never rebuild it yourself.
+When the diff touches `app/assets/tailwind/**`, check that `app/assets/builds/tailwind.css` contains the branch's new rules before capturing — another checkout's watcher can leave it stale for hours, and the capture then documents the bug the PR fixes. Grep the built file for a value the branch adds rather than trusting its mtime. `bin/rails tailwindcss:build` is the fix, the same command step 4 runs on each checkout — it writes only `app/assets/builds/`, and is neither `assets:precompile` nor a `bin/dev` restart.
 
 ## 1. Decide whether screenshots are needed and which URLs to capture
 

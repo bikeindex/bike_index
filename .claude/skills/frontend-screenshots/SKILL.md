@@ -91,6 +91,10 @@ The donation modal is why that starts with a dismiss: a seeded user who hasn't d
 
 If the returned content height is **less than the viewport height**, `browser_resize` the height down to it before the shot (the `<html>` element's near-black background fills the gap otherwise), then resize back to the standard viewport before the next URL. Taller-than-viewport pages need no resize — `fullPage` scroll-stitches them.
 
+**An org-sidebar page taller than the viewport needs the same resize, upward.** The sidebar is `position: fixed`, so `fullPage` stitching leaves it at viewport height with that same near-black background under it for the rest of the column. Resize the height *up* to the content height before the shot.
+
+**Re-hide the profiler badge immediately before the screenshot.** rack-mini-profiler injects `.profiler-results` after load, so a hide that ran right after `browser_navigate` misses it and the badge lands in the shot — with a different millisecond count on each side of a before/after.
+
 **Viewport-only is the caller's call, never yours.** When the caller asks for it — "viewport only", "above the fold", "just the mobile viewport" — drop `fullPage` for the size they named and leave the other one full page. Absent that, full page is the default at both sizes: a tall page, a sliver in a PR table cell, or a page whose change sits above the fold are none of them reasons to crop on your own.
 
 Element-only crops (`target:`) still slice context off — don't use them for page captures.
@@ -151,6 +155,8 @@ magick compare <base>.png <branch>.png -compose src d.png && magick identify -fo
 ```
 
 The bounding box is what settles it: dev-only chrome that slipped past the hide step lands in one small box, a real change doesn't.
+
+**Records you created while poking at the feature show up as a difference the branch didn't make.** Walking a flow to find a bug leaves rows behind — an abandoned registration puts a "your bike isn't registered yet" alert on every later page for that user, so it lands in the branch shot and not the base one. Capture as a seeded user who hasn't been driven through the flow, or drop the page; don't ship the pair.
 
 The seeded DB persists across checkouts, so the existing session usually still works. Preview routes (`/rails/view_components/...`, `/lookbook/...`) reload across the checkout like ordinary pages, so their before/after works against any `$BASE_REF` too.
 
