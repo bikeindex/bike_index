@@ -3,8 +3,8 @@ en:
   components:
     page_block:
       navbar:
-        settings_menu:
-          logout: Logout
+        user_settings_menu:
+          logout: Log out
           register_a_new_bike: Register a new bike
           settings_menu: Settings
           user_settings: "%{user_email} settings"

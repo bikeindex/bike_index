@@ -3,6 +3,8 @@
 module UI
   module Dropdown
     class ComponentPreview < ApplicationComponentPreview
+      PREVIEW_PATH = "/rails/view_components/ui/dropdown/component"
+
       # @!group Variants
 
       def default
@@ -23,17 +25,10 @@ module UI
         end
       end
 
+      # A template, so the entries can render UI::ActiveLink -- the marked one points at the
+      # page it's shown on, so the browser fills it
       def custom_button
-        render(UI::Dropdown::Component.new(
-          name: "User",
-          button_class: avatar_button_class
-        )) do |dropdown|
-          dropdown.with_button { avatar_button }
-          dropdown.with_entry_item { content_tag(:span, "Last synced: 2 minutes ago", class: "tw:block tw:px-4 tw:py-2 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400") }
-          dropdown.with_entry_divider
-          dropdown.with_entry_item { icon_link("⚙", "Settings") }
-          dropdown.with_entry_item(active: true) { icon_link("↻", "Sync (active)") }
-        end
+        {template: "ui/dropdown/component_preview/custom_button"}
       end
 
       # An entry wider than the button, which the menu sizes to rather than wrapping

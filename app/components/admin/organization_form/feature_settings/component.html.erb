@@ -55,7 +55,7 @@
       <%= render(UI::Forms::Group::Component.new(attribute: "reg_label-#{reg_field}", label_text: reg_text[:label])) do |group| %>
         <% group.with_helper_text { reg_text[:note] } %>
 
-        <%= text_field_tag "reg_label-#{reg_field}", helpers.registration_field_label(@organization, reg_field), class: "twinput", "aria-describedby" => group.helper_text_id %>
+        <%= text_field_tag "reg_label-#{reg_field}", OrgServices::Displayer.registration_field_label(@organization, reg_field), class: "twinput", "aria-describedby" => group.helper_text_id %>
       <% end %>
     <% end %>
 

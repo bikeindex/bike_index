@@ -5205,7 +5205,7 @@ es:
       you: Tú
       your_bikes: Tus bicicletas
       your_preferences: Tus preferencias
-    organized_menu_items:
+    menu_items_org:
       add_a_bike: Añade una bicicleta
       ascend_imports: Importaciones Ascend
       bulk_imports: Importaciones a granel
@@ -5256,9 +5256,12 @@ es:
       manufacturer_required: El fabricante está obligado a registrarse.
       name_required: Se requiere el nombre del propietario para registrarse.
       unable_to_save: No podemos guardar ese registro, por favor inténtelo de nuevo.
-    account_menu_items:
+    menu_items_account:
       marketplace_messages: Mensajes del mercado
-      switch_to_org: Cambiar a %{org_name} administrador
+      switch_to_org: Switch to %{org_name}
+      view_without_org: View without any organization
+      viewing_org: Viewing %{org_name}
+      viewing_without_org: Viewing without any organization
   stolen:
     index:
       ambassador: embajador
@@ -5691,7 +5694,7 @@ es:
           search: Buscar
           sign_up: Inscríbete
           stolen_bike: "¿Bicicleta robada?"
-        settings_menu:
+        user_settings_menu:
           logout: Cierre de sesión
           register_a_new_bike: Registre su bicicleta
           settings_menu: Ajustes
@@ -5708,6 +5711,7 @@ es:
           logout: Finalizar la sesión
           menu: Menú
           organization_crest: "%{org_name} cresta"
+          in_super_admin: "%{org_name} in super admin"
           register_a_new_bike: Registre su bicicleta
           user_settings: "%{user_email} ajustes"
           your_registrations: Sus registros

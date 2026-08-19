@@ -45,8 +45,13 @@ module PageBlock
         end
 
         def settings_menu
-          PageBlock::Navbar::SettingsMenu::Component.new(current_user: @current_user,
-            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user)
+          PageBlock::Navbar::UserSettingsMenu::Component.new(current_user: @current_user,
+            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user, dropdown: false)
+        end
+
+        def nav_link(item)
+          UI::ActiveLink::Component.new(text: item[:label], path: item[:path],
+            match: item[:match] || :path, class: ["nav-link", item[:link_class]].compact.join(" "))
         end
       end
     end

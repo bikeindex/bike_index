@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe OrganizedServices::UserMenuItems do
+RSpec.describe UserServices::MenuItemsOrg do
   let(:current_user) { FactoryBot.create(:organization_user, organization:) }
 
   describe "for" do

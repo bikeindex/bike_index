@@ -191,7 +191,7 @@
           <% if @bike.status_stolen? || BikeServices::Displayer.include_reg_field?(:phone, @organization, current_user) || @bike.status_impounded? && !current_user.phone_confirmed? %>
             <div class="form-group row unnested-field">
               <%= f.label :phone,
-                registration_field_label(@organization, "reg_phone") || t(".phone"),
+                OrgServices::Displayer.registration_field_label(@organization, "reg_phone") || t(".phone"),
                 class: "form-well-label" %>
 
               <div class="form-well-input">
@@ -223,7 +223,7 @@
           <% if BikeServices::Displayer.include_reg_field?(:extra_registration_number, @organization, current_user) %>
             <div class="form-group row unnested-field no-divider-row">
               <%= f.label :extra_registration_number,
-                registration_field_label(@organization, "reg_extra_registration_number") || t(".additional_serial_sticker_number"),
+                OrgServices::Displayer.registration_field_label(@organization, "reg_extra_registration_number") || t(".additional_serial_sticker_number"),
                 class: "form-well-label" %>
 
               <div class="form-well-input">
@@ -244,7 +244,7 @@
               "
             >
               <%= f.label :organization_affiliation,
-                registration_field_label(@organization, "reg_organization_affiliation") || t(".affiliation", org_name: @organization.short_name),
+                OrgServices::Displayer.registration_field_label(@organization, "reg_organization_affiliation") || t(".affiliation", org_name: @organization.short_name),
                 class: "form-well-label" %>
 
               <div class="form-well-input">
@@ -258,7 +258,7 @@
           <% if BikeServices::Displayer.include_reg_field?(:student_id, @organization, current_user) %>
             <div class="form-group row unnested-field no-divider-row">
               <%= f.label :student_id,
-                registration_field_label(@organization, "reg_student_id") || t(".student_id"),
+                OrgServices::Displayer.registration_field_label(@organization, "reg_student_id") || t(".student_id"),
                 class: "form-well-label" %>
 
               <div class="form-well-input">
@@ -295,7 +295,7 @@
           <% else %>
             <div class="form-group row unnested-field no-divider-row">
               <%= f.label :owner_email,
-                registration_field_label(@organization, "owner_email") || t(".owner_email"),
+                OrgServices::Displayer.registration_field_label(@organization, "owner_email") || t(".owner_email"),
                 class: 'form-well-label' %>
 
               <div class="form-well-input">
