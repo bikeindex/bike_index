@@ -5,7 +5,5 @@ en:
       user_alerts:
         unfinished_registration:
           finish_the_required_steps: finish the required steps
-          not_registered_yet_html: Your %{cycle_type} isn't registered yet! Please
-            %{finish_link}
-          not_registered_yet_manufacturer_html: Your %{manufacturer} %{cycle_type}
-            isn't registered yet! Please %{finish_link}
+          not_registered_yet_html: Your %{manufacturer} %{cycle_type} isn't registered
+            yet! Please %{finish_link}

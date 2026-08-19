@@ -18,19 +18,12 @@ module PageBlock
         end
 
         def call
-          render(UI::Alerts::Base::Component.new) { alert_text }
-        end
-
-        private
-
-        # No manufacturer to name once the one step 1 named has been destroyed
-        def alert_text
-          manufacturer = @b_param.mnfg_name
-          key = manufacturer.blank? ? ".not_registered_yet_html" : ".not_registered_yet_manufacturer_html"
-
-          translation(key, manufacturer:, cycle_type: @b_param.type,
-            finish_link: link_to(translation(".finish_the_required_steps"),
-              register_path(b_param_token: @b_param.id_token), class: "twlink-underlined"))
+          render(UI::Alerts::Base::Component.new) do
+            translation(".not_registered_yet_html", manufacturer: @b_param.mnfg_name,
+              cycle_type: @b_param.type,
+              finish_link: link_to(translation(".finish_the_required_steps"),
+                register_path(b_param_token: @b_param.id_token), class: "twlink-underlined"))
+          end
         end
       end
     end
