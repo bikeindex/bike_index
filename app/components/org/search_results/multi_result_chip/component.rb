@@ -15,7 +15,7 @@ module Org
         def call
           content_tag(:span, id: @chip_id, class: badge_classes) do
             if has_results?
-              link_to(serial(html_class: link_classes), "#result_#{@chip_id.delete_prefix("chip_")}")
+              link_to(serial(html_class: link_text_classes), "#result_#{@chip_id.delete_prefix("chip_")}", class: "tw:py-1 tw:px-2")
             else
               serial + trailing_label
             end
@@ -38,9 +38,11 @@ module Org
           !@error && @result_count > 0
         end
 
-        # `.serial-span` sets its own color and weight, so these can't sit on the link
-        def link_classes
-          "tw:underline! tw:hover:font-bold! tw:text-emerald-900! tw:dark:text-emerald-200! tw:py-1 tw:px-2"
+        # `.serial-span` sets its own color and weight, so these can't sit on the link.
+        # Its padding has to, though - the badge is a flex row, and an inline span's
+        # vertical padding doesn't grow the line box
+        def link_text_classes
+          "tw:underline! tw:hover:font-bold! tw:text-emerald-900! tw:dark:text-emerald-200!"
         end
 
         def badge_classes

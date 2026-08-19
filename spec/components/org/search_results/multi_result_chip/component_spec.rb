@@ -23,6 +23,10 @@ RSpec.describe Org::SearchResults::MultiResultChip::Component, type: :component 
     it "underlines the link" do
       expect(component.to_html).to include("tw:underline!")
     end
+
+    it "pads the link rather than the serial, which is inline" do
+      expect(component).to have_css("a.tw\\:py-1.tw\\:px-2 > span.serial-span")
+    end
   end
 
   context "with no results" do
