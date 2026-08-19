@@ -3,8 +3,9 @@
 require "rails_helper"
 
 RSpec.describe Org::SearchResults::MultiResultChip::Component, type: :component do
-  let(:component) { render_inline(described_class.new(chip_id:, result_count:, label:, error:, error_message:)) }
+  let(:component) { render_inline(described_class.new(chip_id:, result_count:, label:, search_kind:, error:, error_message:)) }
   let(:label) { "SERIAL111" }
+  let(:search_kind) { "serials" }
   let(:chip_id) { "chip_0" }
   let(:result_count) { 1 }
   let(:error) { false }
@@ -47,11 +48,22 @@ RSpec.describe Org::SearchResults::MultiResultChip::Component, type: :component 
     end
   end
 
-  context "with a sticker code label" do
-    let(:label) { "STKR100" }
+  context "searching stickers" do
+    let(:label) { "STKR 100" }
+    let(:search_kind) { "stickers" }
 
-    it "uses the label as the chip text" do
-      expect(component).to have_css("span#chip_0 a", text: "STKR100")
+    it "renders the code through the sticker atom" do
+      expect(component).to have_css("span#chip_0 a[href='#result_0'] code", text: label)
+      expect(component).to have_no_css("span.serial-span")
+    end
+
+    context "with no results" do
+      let(:result_count) { 0 }
+
+      it "renders the code without a link" do
+        expect(component).to have_css("span#chip_0 code", text: label)
+        expect(component).to have_no_css("a")
+      end
     end
   end
 

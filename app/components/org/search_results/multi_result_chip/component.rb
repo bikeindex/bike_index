@@ -4,10 +4,11 @@ module Org
   module SearchResults
     module MultiResultChip
       class Component < ApplicationComponent
-        def initialize(chip_id:, result_count:, label:, error: false, error_message: nil)
+        def initialize(chip_id:, result_count:, label:, search_kind: "serials", error: false, error_message: nil)
           @chip_id = chip_id
           @result_count = result_count
           @label = label
+          @search_kind = search_kind
           @error = error
           @error_message = error_message
         end
@@ -15,17 +16,23 @@ module Org
         def call
           content_tag(:span, id: @chip_id, class: badge_classes) do
             if has_results?
-              link_to(serial(html_class: link_text_classes), "#result_#{@chip_id.delete_prefix("chip_")}", class: "tw:py-1 tw:px-2")
+              link_to(label_atom(html_class: link_text_classes), "#result_#{@chip_id.delete_prefix("chip_")}", class: "tw:py-1 tw:px-2")
             else
-              serial + trailing_label
+              label_atom + trailing_label
             end
           end
         end
 
         private
 
-        def serial(html_class: nil)
+        def label_atom(html_class: nil)
+          return render(Atom::Sticker::Component.new(pretty_code: @label, html_class:)) if sticker_search?
+
           render(Atom::Serial::Component.new(serial: @label, html_class:))
+        end
+
+        def sticker_search?
+          @search_kind == "stickers"
         end
 
         def trailing_label
@@ -38,9 +45,9 @@ module Org
           !@error && @result_count > 0
         end
 
-        # `.serial-span` sets its own color and weight, so these can't sit on the link.
-        # Its padding has to, though - the badge is a flex row, and an inline span's
-        # vertical padding doesn't grow the line box
+        # The atom sets its own color and weight, so these can't sit on the link.
+        # The padding has to, though - the badge is a flex row, and an inline
+        # element's vertical padding doesn't grow the line box
         def link_text_classes
           "tw:underline! tw:hover:font-bold! tw:text-emerald-900! tw:dark:text-emerald-200!"
         end

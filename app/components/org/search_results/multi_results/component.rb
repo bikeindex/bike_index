@@ -23,6 +23,12 @@ module Org
           @search_kind == "stickers"
         end
 
+        def query_atom
+          return Atom::Sticker::Component.new(pretty_code: @query) if sticker_search?
+
+          Atom::Serial::Component.new(serial: @query)
+        end
+
         def result_index
           @chip_id&.delete_prefix("chip_")
         end
