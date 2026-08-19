@@ -4987,7 +4987,6 @@ en:
       impounding: Impounding
       incomplete_registrations: Incomplete registrations
       lightspeed_integration_panel: Lightspeed Integration Panel
-      manage_registration_sequences: Manage Registration sequences
       manage_users: Manage users
       messaging: Messaging
       model_audits: E-Vehicle audits
@@ -5000,6 +4999,7 @@ en:
       parking_notification_unregistered: New unregistered notification
       parking_notifications_group: Parking Notifications
       recoveries: Recoveries
+      registration_sequences: Registration sequences
       registration_stickers: Registration stickers
       reports: Reports
       resources: Resources

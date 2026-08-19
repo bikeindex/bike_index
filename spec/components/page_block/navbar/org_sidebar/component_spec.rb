@@ -39,7 +39,7 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
     expect(search["data-ui--active-link-match-value"]).to eq "controller_action"
     expect(search["data-ui--active-link-routes-value"]).to eq "organized/registrations#index"
 
-    sequences = rows.find { |row| row.text.strip == "Manage Registration sequences" }
+    sequences = rows.find { |row| row.text.strip == "Registration sequences" }
     expect(sequences["data-ui--active-link-match-value"]).to eq "controller"
     expect(sequences["data-ui--active-link-routes-value"])
       .to eq "organized/registration_sequences organized/registration_sequence_pages"

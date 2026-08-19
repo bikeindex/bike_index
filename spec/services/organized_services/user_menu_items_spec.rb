@@ -129,7 +129,7 @@ RSpec.describe OrganizedServices::UserMenuItems do
           link_item("Manage users", "/o/#{slug}/users", match: :controller),
           link_item("Impounding", "/o/#{slug}/manage_impounding/edit"),
           link_item("Stolen Bike Hot Sheet", "/o/#{slug}/hot_sheet/edit"),
-          link_item("Manage Registration sequences", "/o/#{slug}/registration_sequences",
+          link_item("Registration sequences", "/o/#{slug}/registration_sequences",
             match: :controller, matching_controllers: ["organized/registration_sequence_pages"])
         ])
       end

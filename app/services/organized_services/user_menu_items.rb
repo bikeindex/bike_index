@@ -216,7 +216,7 @@ module OrganizedServices
         enabled_link(organization, "hot_sheet", translation(:stolen_hot_sheet),
           routes.edit_organization_hot_sheet_path(organization_id: organization.to_param)),
         # Editing a page of a sequence is the same section of the menu, on its own controller
-        enabled_link(organization, "registration_sequences", translation(:manage_registration_sequences),
+        enabled_link(organization, "registration_sequences", translation(:registration_sequences),
           routes.organization_registration_sequences_path(organization_id: organization.to_param),
           match: :controller, matching_controllers: ["organized/registration_sequence_pages"])
       ]
