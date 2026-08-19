@@ -57,7 +57,7 @@ module SystemSpecHelpers
     Promise.race([
       new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
         .then(() => Promise.all(this.getAnimations().map((animation) => animation.finished.catch(() => {})))),
-      new Promise((resolve) => setTimeout(resolve, %{cap}))
+      new Promise((resolve) => setTimeout(resolve, arguments[0]))
     ])
   JS
 
@@ -72,7 +72,7 @@ module SystemSpecHelpers
   # rejects on a cancelled transition and never settles for an infinite animation, and the
   # cap is what stops either hanging the example.
   def settle_animations(element, cap: 400)
-    element.evaluate_script(format(SETTLE_JS, cap:))
+    element.evaluate_script(SETTLE_JS, cap)
   end
 
   # Point at an element and hold the mouse down, yielding at each state so the caller
