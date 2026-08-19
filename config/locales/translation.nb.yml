@@ -1144,11 +1144,6 @@ nb:
       your_full_address_is_required: Den fullstendige adressen din kreves av %{org_name}
     bike_helper:
       deleted: Slettet
-      hidden: skjult
-      hidden_because_status: fordi %{bike_type} er %{status}
-      hidden_for_unauthorized_users: skjult for uautoriserte brukere
-      made_without_serial: laget uten serie
-      unknown: ukjent
   grape:
     errors:
       format: "%{attributes} %{message}"

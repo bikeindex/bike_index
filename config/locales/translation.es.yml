@@ -1159,11 +1159,6 @@ es:
       your_full_address_is_required: "%{org_name} requiere su dirección completa."
     bike_helper:
       deleted: Eliminado
-      hidden: oculto
-      hidden_because_status: porque %{bike_type} es %{status}
-      hidden_for_unauthorized_users: oculto para usuarios no autorizados
-      made_without_serial: hecho sin número de serie
-      unknown: desconocido
   grape:
     errors:
       format: "%{attributes} %{message}"

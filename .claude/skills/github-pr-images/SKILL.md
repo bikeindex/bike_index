@@ -57,7 +57,9 @@ The project ships a `.mcp.json` registering Playwright MCP (isolated, shared sto
 
 ## Step 3: Navigate to PR page and check login state
 
-Navigate and immediately take a snapshot to verify login state:
+`browser_resize` to 1440×900 first. `frontend-screenshots` hands the browser over at whatever viewport its last shot needed — often a few dozen pixels tall, to fit a short component preview — and in that window GitHub's sticky header covers the comment form, so step 5's click times out on "intercepts pointer events".
+
+Then navigate and immediately take a snapshot to verify login state:
 
 ```js
 browser_navigate({ url: "https://github.com/{owner}/{repo}/pull/{number}" })
