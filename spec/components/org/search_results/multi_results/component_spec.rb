@@ -6,10 +6,11 @@ RSpec.describe Org::SearchResults::MultiResults::Component, type: :component do
   let(:organization) { FactoryBot.create(:organization) }
   let(:serial) { "SERIAL111" }
   let(:chip_id) { "chip_0" }
+  let(:search_kind) { "serials" }
   let(:component) do
     with_request_url("/o/#{organization.to_param}/registrations") do
       render_inline(described_class.new(
-        organization:, query: serial, chip_id:, pagy:, bikes:, close_serials:
+        organization:, query: serial, chip_id:, pagy:, bikes:, close_serials:, search_kind:
       ))
     end
   end
@@ -33,6 +34,16 @@ RSpec.describe Org::SearchResults::MultiResults::Component, type: :component do
       it "shows view all link" do
         expect(component).to have_text("first 10 shown")
         expect(component).to have_link("view all")
+      end
+    end
+
+    context "searching stickers" do
+      let(:search_kind) { "stickers" }
+      let(:serial) { "BR 000 1" }
+
+      it "renders the query as a sticker code" do
+        expect(component).to have_css("code", text: serial)
+        expect(component).to have_no_css("span.serial-span", text: serial)
       end
     end
   end

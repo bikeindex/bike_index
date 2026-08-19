@@ -112,17 +112,19 @@ jobs:
         uses: actions/checkout@v7
       # Tag + build-args are both derived from the same tracked files, so a
       # version bump always produces a new tag AND a matching rebuild —
-      # nothing to manually keep in sync.
+      # nothing to manually keep in sync. Compression isn't one of those files,
+      # so it leads the tag: changing it has to reach a tag that doesn't exist
+      # yet, or the already-exists skip below serves the old compression back.
       - name: Resolve build args and image tag
         id: image
         run: |
+          compression=zstd
           ruby_version=$(awk '$1=="ruby"{print $2}' .tool-versions)
           node_version=$(awk '$1=="nodejs"{print $2}' .tool-versions)
-          playwright_version=$(node -p "require('./package.json').devDependencies.playwright")
-          tag=${{ hashFiles('.github/ci/Dockerfile', '.tool-versions', 'package.json') }}
+          tag=$compression-${{ hashFiles('.github/ci/Dockerfile', '.tool-versions', 'package.json', 'Gemfile.lock', 'package-lock.json') }}
+          echo "compression=$compression" >> "$GITHUB_OUTPUT"
           echo "ruby_version=$ruby_version" >> "$GITHUB_OUTPUT"
           echo "node_version=$node_version" >> "$GITHUB_OUTPUT"
-          echo "playwright_version=$playwright_version" >> "$GITHUB_OUTPUT"
           echo "image=$REGISTRY/$IMAGE_NAME:$tag" >> "$GITHUB_OUTPUT"
       - name: Log in to GHCR
         uses: docker/login-action@v4.6.0
@@ -157,7 +159,13 @@ jobs:
           build-args: |
             RUBY_VERSION=${{ steps.image.outputs.ruby_version }}
             NODE_VERSION=${{ steps.image.outputs.node_version }}
-            PLAYWRIGHT_VERSION=${{ steps.image.outputs.playwright_version }}
+          # Every test shard pulls this image, and zstd unpacks faster than gzip.
+          # force-compression is what converts the ruby base's own layers, which
+          # arrive gzip and stay that way without it — measured at 77MB of 746MB
+          # still gzip. It costs ~200s per rebuild, re-compressing and re-pushing
+          # every layer rather than reusing blobs the registry already has, but a
+          # rebuild only follows a lockfile change while the pull is every run.
+          outputs: type=image,compression=${{ steps.image.outputs.compression }},force-compression=true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -174,52 +182,20 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    services:
-      # Service images pull from Google's pull-through cache of Docker Hub's
-      # official images. Anonymous pulls from Docker Hub (and from AWS's
-      # public.ecr.aws mirror) are rate-limited per source IP; Actions runners
-      # share egress IPs, so on a busy push the parallel shards exhaust the
-      # quota and the job fails at "Initialize containers" with
-      # "toomanyrequests: Rate exceeded". mirror.gcr.io serves the identical
-      # official images without imposing that limit, and needs no credentials.
-      postgres:
-        image: mirror.gcr.io/library/postgres:16-alpine
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: rails
-          POSTGRES_PASSWORD: password
-        # needed because the postgres container does not provide a healthcheck
-        # tmpfs makes DB faster by using RAM
-        #
-        # health-interval 1s, not 10s: docker runs the FIRST check only after the
-        # interval elapses, so 10s meant every job idled ~10s+ waiting on a database
-        # that was ready in ~3s. pg_isready is cheap enough to poll every second.
-        # `-h 127.0.0.1` forces TCP — the entrypoint's temporary initdb-phase server
-        # listens only on the unix socket, so a plain pg_isready reports ready
-        # before the real server is up.
-        options: >-
-          --mount type=tmpfs,destination=/var/lib/postgresql/data
-          --health-cmd "pg_isready -h 127.0.0.1"
-          --health-interval 1s
-          --health-retries 60
-      redis:
-        # 7-alpine: pinned to match the review-app host's redis:7 accessory, and
-        # the alpine variant is a much smaller pull than debian-based latest.
-        image: mirror.gcr.io/library/redis:7-alpine
-        ports:
-          - 6379:6379
-        options: --entrypoint redis-server
+      # Postgres and redis are baked into the image and started in-job (below)
+      # rather than run as service containers, whose two registry pulls cost
+      # ~10s on every shard. tmpfs for the data directory is what the postgres
+      # service container used it for — RAM beats the overlay filesystem, and
+      # nothing here outlives the job.
+      options: --mount type=tmpfs,destination=/pgdata
     strategy:
       fail-fast: false
       matrix:
-        ci_node_total: [5]
-        ci_node_index: [0, 1, 2, 3, 4]
+        ci_node_total: [6]
+        ci_node_index: [0, 1, 2, 3, 4, 5]
     env:
-      # `test` now runs inside the CI image (container:), so services are
-      # sibling containers reachable by name, not localhost.
-      REDIS_URL: redis://redis:6379
-      PGHOST: postgres
+      REDIS_URL: redis://127.0.0.1:6379
+      PGHOST: 127.0.0.1
       RAILS_ENV: test
       TZ: "America/Chicago"
       COVERAGE: false # additional configuration is needed for parallelized tests
@@ -239,9 +215,11 @@ jobs:
       KNAPSACK_PRO_CI_NODE_INDEX: ${{ matrix.ci_node_index }}
       KNAPSACK_PRO_LOG_LEVEL: warn
     steps:
-      - name: Get CPU cores
-        id: cpu-info
-        run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
+      # Nothing reads steps.cpu-info.outputs.cpu-cores yet — kept for when the
+      # shards run rspec multi-process.
+      # - name: Get CPU cores
+      #   id: cpu-info
+      #   run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
       # Checkout persists this App token (below) as the git creds so the sync
       # branch is pushed as the App — only a non-default-token push fires
       # `on: push`, which is what attaches the required checks to the PR.
@@ -257,27 +235,28 @@ jobs:
         uses: actions/checkout@v7
         with:
           token: ${{ steps.translations_token.outputs.token || github.token }}
-      # Ruby itself is baked into the CI image (.github/ci/Dockerfile) —
-      # ruby/setup-ruby's own toolcache binary can't dynamically link inside
-      # a minimal container. Gems still need their own cache: BUNDLE_PATH is
-      # baked as /usr/local/bundle so this restores/saves the same directory
-      # bundle install writes to.
-      - name: Restore gem cache
-        uses: actions/cache@v6
-        with:
-          path: /usr/local/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
-      - run: bundle install --jobs 4
-      # :js system specs run through capybara-playwright-driver, which drives the
-      # `playwright` npm package against the Chromium baked into the CI image
-      # (.github/ci/Dockerfile) at PLAYWRIGHT_BROWSERS_PATH.
-      - name: Set up Node
-        uses: actions/setup-node@v7
-        with:
-          cache: 'npm'
-      - run: npm install
+      # Ruby, the gems and node_modules are all baked into the CI image
+      # (.github/ci/Dockerfile), whose tag hashes both lockfiles — so a checkout
+      # can't disagree with what's installed, and `check` says so in one line
+      # rather than failing obscurely part-way through a native compile the
+      # final image no longer carries a toolchain for.
+      - run: bundle check
+      # node_modules lives at / in the image, because the runner mounts this
+      # workspace over the checkout path at job time. `npx playwright` and
+      # spec/support/axe.rb both ask for it by relative path.
+      - name: Link node_modules into the workspace
+        run: ln -sfn /node_modules node_modules
+      # `rails` as the initdb superuser and trust auth together satisfy the
+      # username/password config/database.yml hardcodes under CI. fsync off
+      # because a database on tmpfs has nothing to flush to.
+      - name: Start postgres and redis
+        run: |
+          redis-server --daemonize yes --save '' --appendonly no
+          chown postgres:postgres /pgdata && chmod 700 /pgdata
+          # Spelled out rather than left to PATH: su resets it for the target user
+          pgbin=$(echo /usr/lib/postgresql/*/bin)
+          su postgres -c "$pgbin/initdb -D /pgdata --username=rails --auth-local=trust --auth-host=trust --encoding=UTF8 --locale=C.UTF-8 --no-sync"
+          su postgres -c "$pgbin/pg_ctl -D /pgdata -l /tmp/postgres.log -w -o '-c listen_addresses=127.0.0.1 -c fsync=off -c full_page_writes=off -c synchronous_commit=off' start"
       - name: Set up database
         run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate
       - name: Sync translations (only on main by default)

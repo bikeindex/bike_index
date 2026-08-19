@@ -65,6 +65,9 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
       expect(component.at_css("label[for='organization_user_email_domain']").text.squish)
         .to eq "permitted domain for passwordless sign in passwordless sign in feature optional"
       expect(domain_helper_text.text.squish).to eq "Ask Seth for help changing this, it's delicate"
+      # the "@" is a prefix on the field, not a line of its own above it
+      expect(domain_field.parent.name).to eq "div"
+      expect(domain_field.parent.at_css("span").text).to eq "@"
     end
 
     context "with saml_sso also enabled" do

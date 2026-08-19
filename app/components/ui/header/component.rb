@@ -3,9 +3,10 @@
 module UI
   module Header
     class Component < ApplicationComponent
-      TAG_CLASSES = {h2: "tw:text-xl", h3: "tw:text-lg"}.freeze
+      TAG_CLASSES = {h2: "tw:text-xl", h3: "tw:text-lg", h4: "tw:text-base",
+                     h5: "tw:text-sm", h6: "tw:text-xs"}.freeze
 
-      def initialize(text:, subtitle: nil, tag: :h1, html_class: nil)
+      def initialize(text: nil, subtitle: nil, tag: :h1, html_class: nil)
         @text = text
         @subtitle = subtitle
         @tag = tag
@@ -13,7 +14,7 @@ module UI
       end
 
       def call
-        heading = content_tag(@tag, @text, class: header_classes)
+        heading = content_tag(@tag, heading_text, class: header_classes)
         return heading if @subtitle.blank?
 
         safe_join([heading,
@@ -21,6 +22,12 @@ module UI
       end
 
       private
+
+      # An empty heading renders as an invisible, unannounced landmark rather than failing
+      def heading_text
+        @text.presence || content.presence ||
+          raise(ArgumentError, "text: or block content is required")
+      end
 
       def header_classes
         [TAG_CLASSES.fetch(@tag, "tw:text-2xl"), @subtitle.present? ? "tw:mb-1" : "tw:mb-6",

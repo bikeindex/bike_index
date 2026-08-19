@@ -94,6 +94,15 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         approved: true
       }
     end
+    context "without a short_name" do
+      it "creates, shortening the name" do
+        post base_url, params: {organization: create_attributes.merge(short_name: "")}
+        expect(Organization.count).to eq 1
+        expect(Organization.last).to have_attributes(name: "Organization name", short_name: "Organization name",
+          slug: "organization-name")
+      end
+    end
+
     context "privileged kinds" do
       Organization.admin_required_kinds.each do |kind|
         it "prevents creating privileged #{kind}" do

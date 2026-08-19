@@ -39,7 +39,7 @@
     = render(UI::DefinitionList::Container::Component.new(multi_columns: true)) do
       - unless @bike.version?
         = render(UI::DefinitionList::Row::Component.new(label: t(".serial"))) do
-          = render_serial_display(@bike, current_user)
+          = render(Atom::Serial::Component.new(bike: @bike, user: current_user))
         - unless @bike.serial_hidden?
           = render(UI::DefinitionList::Row::Component.new(label: t(".other_serial"), value: @bike.extra_registration_number))
       - unless @bike.type == "bike"

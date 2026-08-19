@@ -454,6 +454,10 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(assigns(:notifications_failed_resolved).pluck(:id)).to eq([parking_notification_initial.id])
           expect(assigns(:notifications_repeated)).to eq([])
         end
+        # The failed ids round-trip through the session to the redirected page
+        follow_redirect!
+        expect(response.body).to include("Unable to send 1 notification")
+        expect(response.body).to include("role=\"alert\"")
       end
     end
     context "replaced" do
