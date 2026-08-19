@@ -10,6 +10,9 @@ import { Controller } from '@hotwired/stimulus'
 // hw-combobox:selection->form-persist#save submit->form-persist#clear".
 // The storage key defaults to pathname + the form's action (see derivedKey);
 // set data-form-persist-key-value only when that isn't unique per form.
+// A restore is announced as form-persist:restored on window - a controller whose
+// UI hangs off restored fields listens for it and reconciles in its own connect,
+// since a lazily loaded module can arrive after the announcement.
 // Writes are debounced (DEBOUNCE_MS) and a restored draft is discarded once
 // older than TTL_MS.
 const DEBOUNCE_MS = 400
