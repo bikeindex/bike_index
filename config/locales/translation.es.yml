@@ -1153,17 +1153,12 @@ es:
       more_pages:
         display_entries: Mostrando <b>%{first}&nbsp;-&nbsp;%{last}</b> %{entry_name}
           de <b>%{total}</b> en total
-    bike_helper:
-      hidden: oculto
-      hidden_because_status: porque %{bike_type} es %{status}
-      hidden_for_unauthorized_users: oculto para usuarios no autorizados
-      made_without_serial: hecho sin número de serie
-      unknown: desconocido
-      deleted: Eliminado
     organization_helper:
       address: Dirección de la calle
       address_school: Dirección postal del campus
       your_full_address_is_required: "%{org_name} requiere su dirección completa."
+    bike_helper:
+      deleted: Eliminado
   grape:
     errors:
       format: "%{attributes} %{message}"

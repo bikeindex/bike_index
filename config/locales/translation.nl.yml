@@ -1140,17 +1140,12 @@ nl:
       more_pages:
         display_entries: "%{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> van de
           <b>%{total}</b> getoond"
-    bike_helper:
-      hidden: verborgen
-      hidden_because_status: omdat %{bike_type} %{status} is
-      hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
-      made_without_serial: gemaakt zonder serie
-      unknown: Onbekend
-      deleted: Verwijderd
     organization_helper:
       address: Adres
       address_school: Postadres van de campus
       your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
+    bike_helper:
+      deleted: Verwijderd
   i18n_tasks:
     add_missing:
       added:
