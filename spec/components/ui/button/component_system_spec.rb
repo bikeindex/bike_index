@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# TEMPORARY: touches a spec file to time a representative CI run. Reverted next commit.
-
 require "rails_helper"
 
 RSpec.describe UI::Button::Component, :js, type: :system do
