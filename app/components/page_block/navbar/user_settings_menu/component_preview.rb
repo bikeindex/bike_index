@@ -16,7 +16,6 @@ module PageBlock
           def filter_map(&block) = roles.filter_map(&block)
         end
 
-        # Rendered open, since the rows are what there is to look at
         # @!group Organizations
 
         # The shortest the menu gets -- no switcher, and no divider above the account rows
@@ -24,8 +23,10 @@ module PageBlock
           render_menu(0)
         end
 
+        # The one rendered open: the group stacks them, and an open menu is absolutely
+        # positioned, so a second would render over whatever follows it
         def one_organization
-          render_menu(1)
+          render_menu(1, open: true)
         end
 
         # Viewing in one of them, so the row for it is the disabled one
@@ -36,14 +37,15 @@ module PageBlock
 
         private
 
-        def render_menu(organization_count, viewing: nil)
+        def render_menu(organization_count, viewing: nil, open: false)
           organizations = Array.new(organization_count) do |i|
             Organization.new(name: "Preview Organization #{i + 1}", short_name: "Preview #{i + 1}",
               slug: "preview-organization-#{i + 1}")
           end
 
           render_with_template(template: "page_block/navbar/user_settings_menu/component_preview/menu",
-            locals: {user: built_user(organizations), current_organization: viewing && organizations[viewing]})
+            locals: {user: built_user(organizations), open:,
+                     current_organization: viewing && organizations[viewing]})
         end
 
         def built_user(organizations)

@@ -18,7 +18,8 @@ RSpec.describe UserServices::MenuItemsAccount do
         expect(described_class.organization_switcher(user, current_organization: organization))
           .to eq([{type: :link, label: "View without any organization",
                    path: "http://test.host/?organization_id=false",
-                   icon: nil, match: :path, matching_controllers: []},
+                   icon: nil, match: :path, matching_controllers: [],
+                   data: {controller: "page-block--without-organization"}},
             {type: :disabled, label: "Viewing in Brakebills"},
             {type: :divider}])
       end

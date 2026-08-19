@@ -51,15 +51,18 @@ module UserServices
         .filter_map(&:organization).first(SWITCHER_ORGANIZATIONS)
     end
 
-    def link(label, path, icon: nil, match: :path, matching_controllers: [])
-      {type: :link, label:, path:, icon:, match:, matching_controllers:}
+    def link(label, path, icon: nil, match: :path, matching_controllers: [], **attributes)
+      {type: :link, label:, path:, icon:, match:, matching_controllers:, **attributes}
     end
 
-    # organization_id=false is what clears the one held in the session
+    # organization_id=false is what clears the one held in the session. The homepage is where
+    # that lands from inside the organization interface; page-block--without-organization
+    # points it at the current page anywhere else
     def without_organization(current_organization)
       return disabled(translation(:viewing_without_org)) if current_organization.blank?
 
-      link(translation(:view_without_org), routes.root_url(organization_id: false))
+      link(translation(:view_without_org), routes.root_url(organization_id: false),
+        data: {controller: "page-block--without-organization"})
     end
 
     def disabled(label)

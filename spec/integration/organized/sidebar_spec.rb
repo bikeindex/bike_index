@@ -116,4 +116,20 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     # Open, but no more the page than any other group
     expect(page).to have_no_css "#org_sidebar_nav button[data-active='true']"
   end
+
+  # Leaving the organization shouldn't also leave the page, anywhere the page survives it
+  it "drops the organization without moving, outside the organization interface" do
+    visit "/my_account"
+
+    expect(leave_link[:href]).to eq "#{page.server_url}/my_account?organization_id=false"
+
+    # Inside it there's no page to stay on, so it keeps the homepage it renders pointing at
+    visit organization_registrations_path(organization_id: organization.to_param)
+
+    expect(leave_link[:href]).to match(%r{\Ahttps?://[^/]+/\?organization_id=false\z})
+  end
+
+  def leave_link
+    find("#org_sidebar_nav a", text: "View without any organization", visible: :all)
+  end
 end
