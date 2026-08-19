@@ -19,6 +19,13 @@ RSpec.describe PageBlock::Footer::Component, type: :component do
     expect(component.to_html).to_not include("&quot;")
   end
 
+  # Every post is the blog, not only its index
+  it "marks the blog link on any news page" do
+    link = component.css("a[href='/news']").first
+    expect(link["data-ui--active-link-match-value"]).to eq "controller"
+    expect(link["data-ui--active-link-routes-value"]).to eq "news"
+  end
+
   # One cached render serves every page, so an action would send the language switch to
   # whichever page filled the cache
   it "renders the locale form without an action" do
