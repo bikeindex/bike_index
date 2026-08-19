@@ -8,7 +8,7 @@ en:
         electric_motorized: "⚡️ Electric (motorized)"
         email: Email
         email_placeholder: you@example.com
-        email_placeholder_school: "%{org_name} email"
+        email_school: "%{org_name} email"
         just_the_essentials: Just the essentials to start.
         next: Next
         no_need_to_wait: We'll email a confirmation link — you don't have to wait

@@ -13,8 +13,12 @@ RSpec.describe RegisterController, type: :request do
 
   # Where Register::Step1::Component's start over link goes - it names the registration
   # it was rendered on, rather than leaving it to the session
-  def start_over_path(b_param)
-    new_register_path(discard_token: b_param.id_token)
+  def start_over_path(b_param, **params)
+    new_register_path(discard_token: b_param.id_token, **params)
+  end
+
+  def submit_button_style
+    Nokogiri::HTML(response.body).at_css("form button[type=submit]")["style"]
   end
 
   describe "new" do
@@ -83,6 +87,53 @@ RSpec.describe RegisterController, type: :request do
         # Arriving on the organization's link shouldn't quietly go unattributed
         expect { get "/register/new?organization_id=#{organization.slug}" }.to_not change(BParam, :count)
         expect(session_b_param.reload.creation_organization_id).to eq organization.id
+      end
+    end
+
+    context "signed in, with no organization named" do
+      include_context :request_spec_logged_in_as_user
+      let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+
+      it "assigns nothing - they're in no organization and have no registrations" do
+        get "/register/new"
+        expect(BParam.last.creation_organization_id).to be_blank
+        expect(BParam.last.auto_organization_id).to be_blank
+      end
+
+      context "a member of one organization" do
+        let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
+
+        it "registers with it, and step 1 names it" do
+          get "/register/new"
+          expect(BParam.last).to have_attributes(creation_organization_id: organization.id,
+            auto_organization_id: organization.id, organization_id: organization.id)
+          follow_redirect!
+          expect(response.body).to include "Brakebills"
+        end
+      end
+
+      context "a member of two organizations" do
+        let!(:organization_roles) do
+          [organization, FactoryBot.create(:organization)]
+            .map { FactoryBot.create(:organization_role_claimed, user: current_user, organization: it) }
+        end
+
+        it "assigns neither - nothing says which this registration is for" do
+          get "/register/new"
+          expect(BParam.last.creation_organization_id).to be_blank
+        end
+      end
+
+      context "their other bike is registered with an organization" do
+        let!(:bike) do
+          FactoryBot.create(:bike_organized, :with_ownership_claimed,
+            creation_organization: organization, user: current_user)
+        end
+
+        it "registers with that organization" do
+          get "/register/new"
+          expect(BParam.last.auto_organization_id).to eq organization.id
+        end
       end
     end
 
@@ -254,6 +305,18 @@ RSpec.describe RegisterController, type: :request do
       # The session's still-blank registration, rather than one per view
       expect { get "/register/embed?organization_id=#{organization.slug}" }.to_not change(BParam, :count)
     end
+
+    it "colors the button with the frame's ?button=, which the flow's own pages ignore" do
+      get "/register/embed?organization_id=#{organization.slug}&button=c9a227"
+      expect(submit_button_style).to include("background-color: #c9a227", "--button-hover-color: #a78620")
+
+      # The derived shade, unless the frame names the one it wants
+      get "/register/embed?organization_id=#{organization.slug}&button=c9a227&button_hover=123456"
+      expect(submit_button_style).to include("--button-hover-color: #123456")
+
+      get register_path(b_param_token: BParam.last.id_token, step: 1, button: "c9a227")
+      expect(submit_button_style).to be_nil
+    end
   end
 
   describe "show step: 1" do
@@ -340,7 +403,7 @@ RSpec.describe RegisterController, type: :request do
         it "carries the organization and status onto the start over link" do
           get register_path(b_param_token: b_param.id_token, step: 1)
           start_over = Nokogiri::HTML(response.body).at_css("#start-over-modal a")["href"]
-          expect(start_over).to eq new_register_path(discard_token: b_param.id_token,
+          expect(start_over).to eq start_over_path(b_param,
             organization_id: organization.slug, status: "status_stolen")
         end
       end
@@ -903,6 +966,56 @@ RSpec.describe RegisterController, type: :request do
           # Their own registration, so the completion card is addressed to them
           expect(response.body).to include "keep watch"
           expect(response.body).to include "View your registration"
+        end
+      end
+
+      context "with an automatically assigned organization" do
+        let(:organization) do
+          FactoryBot.create(:organization, short_name: "Brakebills").tap do
+            it.update_column :enabled_feature_slugs, %w[reg_student_id]
+          end
+        end
+        let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
+        let(:b_param) do
+          BParam.create(origin: "register_flow", creator_id: current_user.id,
+            params: {bike: {owner_email:, manufacturer_id: "Trek", creation_organization_id: organization.id},
+                     auto_organization_id: organization.id}.as_json)
+        end
+
+        it "offers the organization checked, and registers with it" do
+          get register_path(b_param_token: b_param.id_token, step: 2)
+          checkbox = Nokogiri::HTML(response.body).at_css("input[name='register_with_organization']")
+          expect(checkbox["checked"]).to be_present
+          expect(response.body).to include "Register with Brakebills"
+
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details,
+                                   register_with_organization: "1"}
+          expect(Bike.last.creation_organization_id).to eq organization.id
+          expect(Bike.last.organizations.pluck(:id)).to eq([organization.id])
+        end
+
+        it "registers without the organization when it's unchecked" do
+          expect {
+            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          }.to change(Bike, :count).by 1
+          expect(b_param.reload.creation_organization_id).to be_blank
+          expect(Bike.last.creation_organization_id).to be_blank
+          expect(Bike.last.organizations.pluck(:id)).to eq([])
+        end
+
+        it "keeps offering it after it's dropped, so it can be taken back" do
+          patch base_url, params: {b_param_token: b_param.id_token,
+                                   bike: bike_details.merge(user_name: " ")}
+          expect(response.status).to eq 422
+          checkbox = Nokogiri::HTML(response.body).at_css("input[name='register_with_organization']")
+          expect(checkbox["checked"]).to be_blank
+          expect(response.body).to include "Register with Brakebills"
+          # Collapsed rather than dropped, so checking the box again has it to bring back
+          expect(response.body).to include "bike[student_id]"
+
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details,
+                                   register_with_organization: "1"}
+          expect(Bike.last.creation_organization_id).to eq organization.id
         end
       end
 

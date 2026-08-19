@@ -74,11 +74,6 @@ class ApplicationController < ActionController::Base
       .to_h # Use to_h here to prevent unpermitted params logs over and over
   end
 
-  def default_url_options(options = {})
-    # forward locale param when provided
-    params.permit(:locale).merge(options)
-  end
-
   def locale_from_request_header
     request.env.fetch("HTTP_ACCEPT_LANGUAGE", "").scan(/^[a-z]{2}/).first
   end
@@ -88,19 +83,25 @@ class ApplicationController < ActionController::Base
   end
 
   def requested_locale
-    return @requested_locale if defined?(@requested_locale)
+    @requested_locale ||= available_locale(locale_from_request_params.presence || implicit_locale)
+  end
 
-    requested_locale =
-      locale_from_request_params.presence ||
-      current_user&.preferred_language.presence ||
-      locale_from_request_header.presence
+  # The locale the request would render in without its locale param, which is what makes the
+  # param redundant -- default_url_options drops one rather than trailing it across every link
+  def implicit_locale
+    @implicit_locale ||= available_locale(current_user&.preferred_language.presence ||
+      locale_from_request_header.presence)
+  end
 
-    @requested_locale =
-      if I18n.available_locales.include?(requested_locale.to_s.to_sym)
-        requested_locale
-      else
-        I18n.default_locale
-      end
+  def available_locale(locale)
+    I18n.available_locales.include?(locale.to_s.to_sym) ? locale : I18n.default_locale
+  end
+
+  def default_url_options(options = {})
+    return options if locale_from_request_params.blank? ||
+      locale_from_request_params == implicit_locale.to_s
+
+    {locale: locale_from_request_params}.merge(options)
   end
 
   # Around filter to ensure locale (language and timezone) are set only per request

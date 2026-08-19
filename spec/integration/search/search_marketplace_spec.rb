@@ -78,6 +78,9 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
   # matching option, then submit. Works whether the combobox starts empty or
   # already has a selection (set replaces the existing text).
   def search_primary_activity(display_name)
+    # Each call follows a page load, and a combobox typed into before its controller connects
+    # swallows the first character
+    wait_for_stimulus
     type_into("#primary_activity", display_name)
     expect(page).to have_css(".hw-combobox__option", text: display_name, wait: 5)
     click_combobox_option(display_name)
@@ -115,6 +118,26 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     JS
   end
 
+  # turbo:load fires whenever a page's Turbo visit finishes, which on a loaded runner
+  # is after the rider has searched. Force that ordering rather than wait for CI to
+  # produce it: between a frame navigation's response and Turbo advancing the address
+  # bar to it, the frame leads the URL, and search--form must not reconcile it back.
+  # Watching only the first src change keeps a run that never opens that window from
+  # firing turbo:load somewhere later in the example instead.
+  def dispatch_turbo_load_once_frame_leads_url
+    page.execute_script(<<~JS)
+      const frame = document.getElementById("marketplace_results_frame")
+      const observer = new MutationObserver(() => {
+        observer.disconnect()
+        const frameUrl = new URL(frame.getAttribute("src") || "", window.location.href)
+        if (frameUrl.pathname !== window.location.pathname || frameUrl.search === window.location.search) return
+
+        document.dispatchEvent(new CustomEvent("turbo:load", {detail: {timing: {}}}))
+      })
+      observer.observe(frame, {attributeFilter: ["src"]})
+    JS
+  end
+
   it "fills the kind counts on load, and keeps a search made before the results arrive" do
     release_initial_results_load = hold_initial_results_load
     visit_marketplace_via_nav
@@ -130,6 +153,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # search_no_js is the first thing its connect does.
     expect(page).to have_no_css("#search_no_js", visible: :all, wait: 10)
 
+    dispatch_turbo_load_once_frame_leads_url
     search_primary_activity("Mountain biking")
     expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
 
@@ -146,7 +170,7 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/)
   end
 
-  it "automatically loads the next page when scrolling to bottom" do
+  it "automatically loads the next page when scrolling to bottom, and switches result layouts" do
     expect(manufacturer1.reload.id).to eq 1003 # sanity check - otherwise the search won't work
     expect(manufacturer2.reload.id).to eq 764 # sanity check - otherwise the search won't work
     promoted_bike_ids = promoted_listings.map(&:item_id)
@@ -214,6 +238,17 @@ RSpec.describe "Marketplace infinite scroll", :js, type: :system do
     # the visible input shows the display name
     expect(find("#primary_activity-hw-hidden-field", visible: false).value).to eq primary_activity.id.to_s
     expect(find("#primary_activity").value).to eq "Mountain biking"
+
+    # Switching to the list layout re-runs the search rather than dropping its filters
+    choose("search_result_view_bike_box", allow_label_click: true)
+    expect(page).to have_css(".bike-box-item", wait: 10, count: 6)
+    expect(page).to have_no_css("[data-test-id^='vehicle-thumbnail-linkspan-']")
+    expect(page).to have_current_path(/search_result_view=bike_box/)
+    expect(page).to have_current_path(/primary_activity=#{primary_activity.id}/)
+
+    choose("search_result_view_thumbnail", allow_label_click: true)
+    expect(page).to have_css("[data-test-id^='vehicle-thumbnail-linkspan-']", wait: 10, count: 6)
+    expect(page).to have_no_css(".bike-box-item")
   end
 
   # search_no_js reaches riders who do have JS: Search::RegistrationsController

@@ -2715,6 +2715,39 @@ ALTER SEQUENCE public.organization_features_id_seq OWNED BY public.organization_
 
 
 --
+-- Name: organization_landing_pages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_landing_pages (
+    id bigint NOT NULL,
+    organization_id bigint NOT NULL,
+    body text,
+    enabled boolean DEFAULT false NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_landing_pages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_landing_pages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_landing_pages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_landing_pages_id_seq OWNED BY public.organization_landing_pages.id;
+
+
+--
 -- Name: organization_manufacturers; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2925,7 +2958,6 @@ CREATE TABLE public.organizations (
     avatar character varying(255),
     is_paid boolean DEFAULT false NOT NULL,
     lock_show_on_map boolean DEFAULT false NOT NULL,
-    landing_html text,
     enabled_feature_slugs jsonb,
     parent_organization_id integer,
     kind integer,
@@ -4956,6 +4988,13 @@ ALTER TABLE ONLY public.organization_features ALTER COLUMN id SET DEFAULT nextva
 
 
 --
+-- Name: organization_landing_pages id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_landing_pages ALTER COLUMN id SET DEFAULT nextval('public.organization_landing_pages_id_seq'::regclass);
+
+
+--
 -- Name: organization_manufacturers id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5799,6 +5838,14 @@ ALTER TABLE ONLY public.oauth_applications
 
 ALTER TABLE ONLY public.organization_features
     ADD CONSTRAINT organization_features_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_landing_pages organization_landing_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_landing_pages
+    ADD CONSTRAINT organization_landing_pages_pkey PRIMARY KEY (id);
 
 
 --
@@ -7076,6 +7123,13 @@ CREATE UNIQUE INDEX index_oauth_applications_on_uid ON public.oauth_applications
 
 
 --
+-- Name: index_organization_landing_pages_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_organization_landing_pages_on_organization_id ON public.organization_landing_pages USING btree (organization_id);
+
+
+--
 -- Name: index_organization_manufacturers_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7206,6 +7260,13 @@ CREATE INDEX index_ownerships_on_doorkeeper_app_id ON public.ownerships USING bt
 --
 
 CREATE INDEX index_ownerships_on_organization_id ON public.ownerships USING btree (organization_id);
+
+
+--
+-- Name: index_ownerships_on_owner_email_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ownerships_on_owner_email_trgm ON public.ownerships USING gin (owner_email public.gin_trgm_ops);
 
 
 --
@@ -7743,6 +7804,9 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260815152851'),
+('20260813100000'),
+('20260812200000'),
 ('20260812104500'),
 ('20260811085030'),
 ('20260808224655'),

@@ -12,13 +12,15 @@ description: >-
   build go green. **Equally: any spec that fails intermittently while you verify
   your own work** — deciding whether your change caused a flake, or whether to
   ship past one, is this skill's problem too, and it arrives with no CI run, no
-  `:flaky` tag, and nobody but you calling it flaky. Covers diagnosing the real
-  mechanism, attributing a flake to a change, this repo's `flaky:`
-  retry harness, and the known false-flake causes (missing Tailwind build, shared
-  Redis autocomplete cache, Turbo frame timing, probe-run interference).
+  `:flaky` tag, and nobody but you calling it flaky.
 ---
 
 # Fixing flaky failures
+
+Covers diagnosing the real mechanism, attributing a flake to a change, this
+repo's `flaky:` retry harness, and the known false-flake causes — a missing
+Tailwind build, the shared Redis autocomplete cache, Turbo frame timing,
+probe-run interference.
 
 ## The rule that overrides everything else here
 
@@ -116,7 +118,8 @@ page.execute_script(<<~JS)
   })
 JS
 # ...drive the spec...
-page.evaluate_script("window.__events").each { |e| puts e }
+# A file, not puts - rtk's rspec wrapper reports a summary and drops the run's stdout
+File.open("tmp/probe.log", "a") { |f| page.evaluate_script("window.__events").each { |e| f.puts e.inspect } }
 ```
 
 Parameterise the scratch spec over the variable you suspect (`[0, 8].each do |delay|`
@@ -131,10 +134,42 @@ misread it", and it tells you *when* things happened, which is usually the answe
 for i in 1 2 3; do bundle exec rspec <the spec file> 2>&1 | grep -E "examples, " | tail -1; done
 ```
 
+Keep that loop on the one spec file — escalating it to `bin/ci` costs minutes of
+parallel workers and browsers per iteration, and answers the same question no better.
+
 Green locally three times doesn't mean "not reproducible, add a retry". It
 narrows the cause to something CI has and you don't: **contention** (CI runs 5
 parallel shards on one runner) or **ordering** (a different seed, or state left
 by another example). Reason about which, then look for the mechanism.
+
+For contention, slow the renderer rather than the machine — CPU hogs slow the Ruby
+side too, so a loop of runs takes minutes and the extra load is spent where the race
+isn't, and one backgrounded from a non-interactive shell survives `kill $(jobs -p)` —
+`pgrep -f` it. CDP throttles the browser alone, and the driver hands you a session:
+
+```ruby
+page.driver.with_playwright_page do |playwright_page|
+  session = playwright_page.context.new_cdp_session(playwright_page)
+  session.send_message("Emulation.setCPUThrottlingRate", params: {rate: 6})
+end
+```
+
+A rate that leaves the spec green over ~20 runs is evidence, not proof: it stretches
+main-thread work, not the network or a parallel shard's I/O.
+
+Which is why it can't reach a race about *when a response arrives*. The common one here
+is a lazily loaded Stimulus controller, since the module is a fetch — hold it on the
+route and the late connect is deterministic, no loop:
+
+```ruby
+playwright_page.route(%r{serial_controller}, ->(route, request) { held << request.url; sleep 1; route.continue })
+```
+
+Registering a route disables the http cache, so the reload asks again. Assert on what
+the handler held: a route that stops matching (a moved asset path) otherwise leaves the
+example green on a page that held nothing back. Measured against `register--serial`'s
+connect-time reconcile, throttling at 6, 12 and 25 left it green over 30+ runs; the
+route hold failed it every time.
 
 Caveat when measuring locally: after a heavy record-creating run (seeding,
 probe scripts, a big suite), `:js` specs fail spuriously for a while. Re-measure
@@ -177,6 +212,22 @@ combobox returns. The fix is `Autocomplete::Loader.clear_redis` in `before`,
 not a retry. Browser history is the same shape: `reset_browser_history`
 (`spec/support/system_spec_helpers.rb`) drops entries earlier examples left, so
 `go_back`/`go_forward` walk this example's own stack.
+
+**Interacting with a page whose controllers haven't connected.** `application.js`
+lazy loads every Stimulus controller, so a freshly rendered page answers to none of
+them until each module lands: a combobox filters nothing, a one-shot event (like
+form-persist's restore) reaches no listener, and a `fill_in`'s text can end up in
+whatever autofocus left focused. Waiting on any one controller proves nothing about
+the rest — `wait_for_stimulus` (`spec/support/system_spec_helpers.rb`) waits for
+every identifier the page names.
+
+**Interacting before the legacy page script has bound.** The same shape, one era
+back: `init.coffee`'s `loadPageScript` constructs the per-page class in
+`$(document).ready`, while `click_link` returns with the new document still
+parsing — so an interaction landing between the two is swallowed with nothing on
+the page to say so. `wait_for_page_script`
+(`spec/support/system_spec_helpers.rb`) waits on `window.pageScript`; reach for
+it after any navigation into a jQuery-driven control.
 
 **Clicking something that is being re-rendered.** The dominant `:js` flake.
 A Turbo frame that reloads (an eager frame, `reloadFrameIfUrlStale` on

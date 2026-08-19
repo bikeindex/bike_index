@@ -55,6 +55,16 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template("admin/organizations/edit")
     end
+    context "paid" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "reg_address") }
+      it "renders the email label and placeholder fields" do
+        Country.united_states
+        get "#{base_url}/#{organization.to_param}/edit"
+        expect(response.status).to eq(200)
+        expect(response.body).to include('name="reg_label-owner_email"')
+        expect(response.body).to include('name="reg_label-email_placeholder"')
+      end
+    end
     context "saml_sso enabled" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
       it "renders the SAML configuration section" do
@@ -83,6 +93,15 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         approved: true
       }
     end
+    context "without a short_name" do
+      it "creates, shortening the name" do
+        post base_url, params: {organization: create_attributes.merge(short_name: "")}
+        expect(Organization.count).to eq 1
+        expect(Organization.last).to have_attributes(name: "Organization name", short_name: "Organization name",
+          slug: "organization-name")
+      end
+    end
+
     context "privileged kinds" do
       Organization.admin_required_kinds.each do |kind|
         it "prevents creating privileged #{kind}" do
@@ -214,6 +233,23 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(location1.address_record).to have_attributes(street: "999 New St", city: "New City", postal_code: "99999")
       end
     end
+    context "with a _destroy from the nested-fields remove" do
+      let!(:location1) { FactoryBot.create(:location, organization:, name: "Original") }
+
+      # The hidden field renders `false` (Rails reads `_destroy` off the record), so it takes
+      # the controller setting 1 to destroy
+      it "keeps the location for the untouched hidden field, and destroys it for 1" do
+        put_destroy = lambda { |destroy_value|
+          put "#{base_url}/#{organization.to_param}", params: {
+            organization: {locations_attributes: {"0" => {id: location1.id, _destroy: destroy_value}}}
+          }
+        }
+
+        expect { put_destroy.call("false") }.not_to change(Location, :count)
+        expect { put_destroy.call("1") }.to change(Location, :count).by(-1)
+      end
+    end
+
     context "setting to not_set" do
       let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos", lightspeed_register_with_phone: true) }
       it "updates the organization" do
@@ -290,7 +326,10 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       end
     end
     context "updating registration labels" do
-      let(:target) { {reg_student_id: "party label", reg_address: "useful label", owner_email: "<p>stuff</p> again", unknown_attr: "Whoop"} }
+      let(:target) do
+        {reg_student_id: "party label", reg_address: "useful label", owner_email: "<p>stuff</p> again",
+         email_placeholder: "you@party.edu", unknown_attr: "Whoop"}
+      end
       let(:update_params) do
         {
           :organization => {name: "new name"},
@@ -298,6 +337,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
           "reg_label-reg_address" => "useful label",
           "reg_label-reg_organization_affiliation" => "  ",
           "reg_label-owner_email" => "<p>stuff</p> again ",
+          "reg_label-email_placeholder" => "you@party.edu",
           "reg_label-unknown_attr" => "Whoop"
 
         }

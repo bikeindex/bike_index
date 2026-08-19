@@ -1,0 +1,13 @@
+---
+en:
+  components:
+    page_block:
+      navbar:
+        settings_menu:
+          logout: Logout
+          marketplace_messages: Marketplace messages
+          register_a_new_bike: Register a new bike
+          settings_menu: Settings
+          user_settings: "%{user_email} settings"
+          view_org: View %{org_name}
+          your_registrations: Your registrations

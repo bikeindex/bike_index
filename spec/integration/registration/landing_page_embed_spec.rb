@@ -6,14 +6,15 @@ RSpec.describe "Organization landing page registration embed", :js, type: :syste
   let(:owner_email) { "owner@bikeindex.org" }
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
   # The slug LandingPages::ORGANIZATIONS routes by default, so /brakebills is the landing page
-  let!(:organization) { FactoryBot.create(:organization, name: "Brakebills", landing_html:) }
+  let!(:organization) { FactoryBot.create(:organization, name: "Brakebills") }
+  let!(:organization_landing_page) { FactoryBot.create(:organization_landing_page, organization:, body:) }
   # The column the seeded page frames it in, which is narrower than the combobox's
   # mobile breakpoint
-  let(:landing_html) do
+  let(:body) do
     <<~HTML
       <h1>Brakebills University Bicycle Registration</h1>
       <div class="container"><div class="row"><div class="col-md-5">
-        <iframe src="/register/embed?organization_id=brakebills"
+        <iframe src="/register/embed?organization_id=brakebills&button=c9a227"
           title="Register your bike with Brakebills University"
           style="width: 100%; border: none; height: 620px;"></iframe>
       </div></div></div>
@@ -34,6 +35,8 @@ RSpec.describe "Organization landing page registration embed", :js, type: :syste
       # The page around the frame names the organization, so the heading doesn't
       expect(page).to have_content("Register your vehicle!")
       expect(page).to have_no_css("nav.primary-header-nav")
+      # Matches the page it's framed on
+      expect(page).to have_css("button[type=submit][style*='#c9a227']")
 
       type_into("#b_param_manufacturer_id", "Surly")
       # The frame is under the combobox's mobile breakpoint but the screen isn't, so it

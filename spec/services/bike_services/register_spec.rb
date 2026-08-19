@@ -84,6 +84,121 @@ RSpec.describe BikeServices::Register do
     end
   end
 
+  describe "assign_organization" do
+    let(:b_param) { BParam.create(origin: "register_flow", params: {bike: bike_params}.as_json) }
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:user) { FactoryBot.create(:user_confirmed) }
+
+    it "doesn't assign anything without an organization or a user" do
+      described_class.assign_organization(b_param, nil, user: nil)
+      expect(b_param.reload.creation_organization_id).to be_blank
+      expect(b_param.auto_organization_id).to be_blank
+    end
+
+    # Marked assigned so the next request doesn't look the registrant up again
+    it "assigns nothing for a user in no organization with no bikes, and says so" do
+      described_class.assign_organization(b_param, nil, user:)
+      expect(b_param.reload.creation_organization_id).to be_blank
+      expect(b_param.auto_organization_id).to be_blank
+      expect(b_param.auto_organization_assigned?).to be_truthy
+
+      expect { described_class.assign_organization(b_param, nil, user:) }
+        .to_not change { b_param.reload.updated_at }
+    end
+
+    context "with a user in one organization" do
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user:, organization:) }
+
+      it "assigns it, and marks it as the automatic assignment step 2 can drop" do
+        described_class.assign_organization(b_param, nil, user:)
+        expect(b_param.reload.creation_organization_id).to eq organization.id
+        expect(b_param.auto_organization_id).to eq organization.id
+        expect(b_param.organization_id).to eq organization.id
+      end
+
+      it "doesn't reassign once step 2 dropped it" do
+        described_class.assign_organization(b_param, nil, user:)
+        described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil,
+          bike_params: {"user_name" => "Sarah Rider"}, register_with_organization: nil)
+        expect(b_param.reload.creation_organization_id).to be_blank
+        expect(b_param.auto_organization_id).to eq organization.id
+        expect(b_param.organization_id).to be_blank
+
+        described_class.assign_organization(b_param, nil, user:)
+        expect(b_param.reload.creation_organization_id).to be_blank
+      end
+
+      it "takes it back when step 2 is resubmitted with the box checked" do
+        described_class.assign_organization(b_param, nil, user:)
+        described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil,
+          bike_params: {"user_name" => "Sarah Rider"}, register_with_organization: nil)
+        described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil,
+          bike_params: {"user_name" => "Sarah Rider"}, register_with_organization: "1")
+
+        expect(b_param.reload.creation_organization_id).to eq organization.id
+        expect(b_param.organization_id).to eq organization.id
+      end
+
+      context "with a link naming a different organization" do
+        let(:link_organization) { FactoryBot.create(:organization) }
+
+        it "takes the link's, and stops offering to drop it" do
+          described_class.assign_organization(b_param, nil, user:)
+          described_class.assign_organization(b_param, link_organization, user:)
+
+          expect(b_param.reload.creation_organization_id).to eq link_organization.id
+          expect(b_param.auto_organization_id).to be_blank
+        end
+      end
+
+      context "once the bike exists" do
+        it "doesn't assign" do
+          b_param.update(created_bike_id: FactoryBot.create(:bike).id)
+          described_class.assign_organization(b_param, nil, user:)
+          expect(b_param.reload.auto_organization_id).to be_blank
+        end
+      end
+    end
+
+    context "with a user in two organizations" do
+      let!(:organization_roles) do
+        [organization, FactoryBot.create(:organization)]
+          .map { FactoryBot.create(:organization_role_claimed, user:, organization: it) }
+      end
+
+      it "doesn't assign either of them" do
+        described_class.assign_organization(b_param, nil, user:)
+        expect(b_param.reload.creation_organization_id).to be_blank
+        expect(b_param.auto_organization_id).to be_blank
+      end
+    end
+
+    context "with a user whose other bike is registered with an organization" do
+      let!(:bike) do
+        FactoryBot.create(:bike_organized, :with_ownership_claimed,
+          creation_organization: organization, user:)
+      end
+
+      it "assigns that organization" do
+        described_class.assign_organization(b_param, nil, user:)
+        expect(b_param.reload.creation_organization_id).to eq organization.id
+        expect(b_param.auto_organization_id).to eq organization.id
+      end
+
+      context "and another bike with a second organization" do
+        let!(:bike_2) do
+          FactoryBot.create(:bike_organized, :with_ownership_claimed,
+            creation_organization: FactoryBot.create(:organization), user:)
+        end
+
+        it "doesn't assign either of them" do
+          described_class.assign_organization(b_param, nil, user:)
+          expect(b_param.reload.creation_organization_id).to be_blank
+        end
+      end
+    end
+  end
+
   describe "save_step_2" do
     let(:b_param) { BParam.create(origin: "register_flow", params: {bike: bike_params}.as_json) }
     # user_name unless a test says otherwise - an anonymous registration is for someone else

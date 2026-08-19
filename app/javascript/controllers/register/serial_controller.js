@@ -17,6 +17,7 @@ export default class extends Controller {
   connect () {
     this.boundSync = this.syncRestored.bind(this)
     window.addEventListener('form-persist:restored', this.boundSync)
+    this.syncRestored()
   }
 
   disconnect () {

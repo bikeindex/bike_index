@@ -8,8 +8,8 @@ RSpec.describe Admin::Navbar::Component, type: :component do
   let(:url) { "/bikes/new" }
   let(:current_user) { FactoryBot.create(:superuser) }
   let(:component) { with_request_url(url) { render_inline(described_class.new(current_user:)) } }
-  # The picker's "All" link, which the shortcuts also match on nav-link alone
-  let(:view_all_link) { "a.nav-link.text-muted" }
+  # The picker's "All" link
+  let(:view_all_link) { "a.text-muted" }
 
   it "renders the shortcut links and an option per admin page, minus the dev pages" do
     expect(component.css("ul.navbar-nav a").map(&:text)).to eq(%w[Users Bikes Organizations News Stolen])
@@ -36,7 +36,20 @@ RSpec.describe Admin::Navbar::Component, type: :component do
     it "renders only the brand and the exit link" do
       expect(component).to have_css("a", text: "Exit Admin")
       expect(component).to_not have_css("[role='option']", visible: :all)
-      expect(component).to_not have_css("a.nav-link")
+      expect(component).to_not have_css("ul.navbar-nav")
+    end
+  end
+
+  describe "the shortcut links" do
+    let(:shortcuts) { component.css("ul.navbar-nav a[data-controller='ui--active-link']") }
+
+    # The shortcuts take their match from nav_select_links, so they stay active across a
+    # section rather than only on its index. UI::ActiveLink resolves that in the browser,
+    # against the route rendered here.
+    it "matches each shortcut on its controller" do
+      expect(shortcuts.map { |link| link["data-ui--active-link-match-value"] }.uniq).to eq(["controller"])
+      expect(shortcuts.map { |link| link["data-ui--active-link-routes-value"] })
+        .to eq(%w[admin/users admin/bikes admin/organizations admin/news admin/stolen_bikes])
     end
   end
 

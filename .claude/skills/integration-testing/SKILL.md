@@ -4,7 +4,7 @@ description: >-
   Bike Index conventions for browser specs (`type: :system, :js`)
   — **drive every step through the real UI** (no FactoryBot or
   `execute_script` shortcuts to skip what a user would do), every
-  example pays a Selenium boot cost so bias toward fewer, denser
+  example pays a browser boot cost so bias toward fewer, denser
   examples that walk through state via clicks, prefer named-element
   matchers over CSS selectors, and combine same-setup work into one
   `it` even when scenarios feel independent. **Consult this skill
@@ -17,7 +17,7 @@ description: >-
 
 # Integration testing in Bike Index
 
-Browser specs (`type: :system, :js`) live in two places: feature flows under `spec/integration/` and component-level interaction specs at `spec/components/**/*_system_spec.rb`. Both run full Chrome sessions via Capybara/Selenium and pay a real Selenium boot cost per example, so the same conventions apply to both: optimize for fewer, denser examples and high-level Capybara helpers. Always tag new specs with `:js, type: :system`.
+Browser specs (`type: :system, :js`) live in two places: feature flows under `spec/integration/` and component-level interaction specs at `spec/components/**/*_system_spec.rb`. Both drive a real Chromium session through `capybara-playwright-driver` (`spec/support/capybara.rb`) and pay a browser boot cost per example, so the same conventions apply to both: optimize for fewer, denser examples and high-level Capybara helpers. Always tag new specs with `:js, type: :system`.
 
 The general `context`/`let` style and "what to test" rules are in the [`rspec-testing`](../rspec-testing/SKILL.md) skill — the rules below extend it for the system-spec case.
 
@@ -35,7 +35,7 @@ Unit specs prefer one assertion per example. **Integration specs prefer the oppo
 
 Use `context` only when the *setup* differs — a different `let!`, a different page, a different feature flag. Don't split a single user flow across sibling `it` blocks just because each step has its own assertion.
 
-**Combine same-setup work, even when scenarios feel independent.** Before writing a new `describe`/`context`/`it`, read the existing file and find an example whose fixtures and initial `visit` match what you need — then append your clicks/assertions to it. It's tempting to leave a separate `it` for things that feel like different concerns ("button-state test", "filter-persistence test", "URL-param test", "mobile-layout test"). Don't. A long, sectioned-with-comments example pays one Selenium boot; four short examples pay four. Failure attribution is fine — the failed line number tells you exactly which phase broke. Only add a new block when the setup genuinely differs.
+**Combine same-setup work, even when scenarios feel independent.** Before writing a new `describe`/`context`/`it`, read the existing file and find an example whose fixtures and initial `visit` match what you need — then append your clicks/assertions to it. It's tempting to leave a separate `it` for things that feel like different concerns ("button-state test", "filter-persistence test", "URL-param test", "mobile-layout test"). Don't. A long, sectioned-with-comments example pays one browser boot; four short examples pay four. Failure attribution is fine — the failed line number tells you exactly which phase broke. Only add a new block when the setup genuinely differs.
 
 ### Good
 
@@ -170,6 +170,15 @@ contributes is absent: `autofocus` on the form, sibling Stimulus controllers,
 Turbo, the rest of the layout. Behaviour that depends on any of those can pass
 against the preview while the real page stays broken — the preview spec isn't
 wrong, it just can't see the condition.
+
+The layout is `component_preview`, which loads Tailwind and the importmap but
+**not** `application_revised` — no jQuery, no bootstrap — and includes the legacy
+stylesheet only when the URL carries Lookbook's display option
+(`?lookbook%5Bdisplay%5D%5Blegacy_stylesheet%5D=true`, see the
+[`frontend-screenshots`](../frontend-screenshots/SKILL.md) skill). So anything
+driven by legacy JS can't be exercised from a preview at all, and anything styled
+by a legacy stylesheet renders unstyled without that parameter — which makes every
+visibility and responsive assertion meaningless. Cover both on a real page.
 
 A combobox fix keyed off the `focus` event passed
 `spec/components/ui/forms/combobox/component_system_spec.rb` while step 1 of the

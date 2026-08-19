@@ -58,11 +58,18 @@ module BikeServices
     end
 
     # An organization can be named in the URL after the registration starts
-    # (/register?...&organization_id=slug), right up until the bike is created
-    def assign_organization(b_param, organization)
-      return if organization.blank? || b_param.with_bike? ||
-        b_param.creation_organization_id.to_s == organization.id.to_s
+    # (/register?...&organization_id=slug), right up until the bike is created. Without one
+    # named, who the registrant is stands in - which step 2 offers to drop, so a link's
+    # organization clears the marker that puts the offer there
+    def assign_organization(b_param, organization, user: nil)
+      return if b_param.with_bike?
+      # Step 1 posts back the organization it rendered with, which doesn't make an
+      # automatic assignment into the named kind
+      return assign_auto_organization(b_param, user) if organization.blank? ||
+        organization.id == b_param.auto_organization_id
+      return if b_param.creation_organization_id.to_s == organization.id.to_s
 
+      b_param.params = b_param.params.except("auto_organization_id")
       b_param.clean_params({bike: {creation_organization_id: organization.id}}.as_json)
       b_param.save
     end
@@ -245,12 +252,13 @@ module BikeServices
     # file field, or as the signed id of a blob the browser already uploaded.
     # Returns whether the step passed - a registration for someone else needs their name.
     # A failed step still saves, it just isn't marked complete, so nothing entered is lost
-    def save_step_2(b_param, user:, image:, image_signed_id:, bike_params:)
+    def save_step_2(b_param, user:, image:, image_signed_id:, bike_params:, register_with_organization: nil)
       b_param.creator_id ||= user&.id
       b_param.image = image if image.present?
       bike_params = bike_params.to_h
       completed = b_param.self_made?(user) || bike_params["user_name"].present?
       clear_stale_report(b_param, bike_params["status"])
+      set_auto_organization(b_param, register_with_organization)
       b_param.clean_params(step_2_params(bike_params, image_signed_id:, completed:).as_json)
       b_param.save
       b_param.errors.add(:base, translation(:name_required)) unless completed
@@ -286,6 +294,39 @@ module BikeServices
     #
     # private below here
     #
+
+    # The one the registrant belongs to, or failing that the one their other bikes are
+    # registered with. Two of either says nothing about this bike, so it stays unattributed
+    def auto_organization(user)
+      organizations = user.organizations.limit(2).to_a
+      organizations = user.bike_organizations.limit(2).to_a if organizations.none?
+      organizations.first if organizations.one?
+    end
+
+    # Once, and not past step 2 - step 2's checkbox is the only chance to decline, and
+    # dropping it there leaves the marker behind saying the organization was taken
+    def assign_auto_organization(b_param, user)
+      return if user.blank? || b_param.auto_organization_assigned? ||
+        b_param.creation_organization_id.present? || details_completed?(b_param)
+
+      organization = auto_organization(user)
+      bike = {creation_organization_id: organization.id} if organization.present?
+      b_param.clean_params({auto_organization_id: organization&.id || 0, bike:}.compact.as_json)
+      b_param.save
+    end
+
+    # Step 2's "register with" checkbox, which only an automatic assignment gets. The
+    # marker stays when it's unchecked, so the checkbox is still there to change their
+    # mind. Runs before clean_params, which is what puts the organization_id column in step
+    def set_auto_organization(b_param, register_with_organization)
+      return if b_param.auto_organization_id.blank?
+
+      if Binxtils::InputNormalizer.boolean(register_with_organization)
+        b_param.creation_organization_id = b_param.auto_organization_id
+      else
+        b_param.params = b_param.params.merge("bike" => b_param.bike.except("creation_organization_id"))
+      end
+    end
 
     # Ownership requires a creator, and signing in can happen anywhere in the flow -
     # e.g. partway through the acknowledgment pages
@@ -433,7 +474,8 @@ module BikeServices
 
     def translation(key) = I18n.t(key, scope: "shared.register_flow")
 
-    conceal :claim_creator, :create_bike_if_ready, :create_bike, :ready_for_bike?,
+    conceal :auto_organization, :assign_auto_organization, :set_auto_organization,
+      :claim_creator, :create_bike_if_ready, :create_bike, :ready_for_bike?,
       :details_and_acknowledged?, :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
       :impound_report_attrs, :reusable?, :permitted_steps, :step_completed?,
       :confirmed_email_creator_id, :owner_email_for, :assign_start_params, :reused_owner_email, :details_completed?,

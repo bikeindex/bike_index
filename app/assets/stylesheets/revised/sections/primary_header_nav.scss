@@ -4,8 +4,8 @@ $primary-logo-padding-mobile: $vertical-height;
 $mainmenu-transform-speed: 200ms;
 $mainmenu-width: 80%;
 $mainmenu-open-zindex: 10;
-// Approximately where the small screen navbar ends. positionMainMenu
-// (nav_header.coffee) measures the real value when the menu opens
+// Fallback for --navbar-bottom, which positionMenu (page_block/navbar_controller.js)
+// sets to where the small screen navbar really ends when the menu opens
 $mobile-nav-height: 4 * $vertical-height;
 
 // Header nav
@@ -57,7 +57,7 @@ $mobile-nav-height: 4 * $vertical-height;
 
       &:hover,
       &:active,
-      &.active {
+      &[aria-current] {
         color: #fff;
       }
     }
@@ -78,10 +78,11 @@ $mobile-nav-height: 4 * $vertical-height;
 
   .hamburgler {
     font-family: courier;
-  }
 
-  .primary-nav-item .settings-link {
-    display: none;
+    // Generated rather than markup, so it isn't rendered for lynx
+    button::before {
+      content: "\2630";
+    }
   }
 
   // Current org nav and dropdown
@@ -103,7 +104,7 @@ $mobile-nav-height: 4 * $vertical-height;
 
       &:hover,
       &:active,
-      &.active {
+      &[aria-current] {
         color: #fff;
 
         .caret-down {
@@ -157,7 +158,7 @@ $mobile-nav-height: 4 * $vertical-height;
     }
   }
 
-  // If it overflows, hide the extra text. Explicit width is set in coffeescript
+  // If it overflows, hide the extra text. truncateOrganizationName sets the width
   #passive_organization_submenu {
     text-overflow: ellipsis;
     overflow: hidden;
@@ -175,7 +176,7 @@ $mobile-nav-height: 4 * $vertical-height;
 
     &:hover,
     &:active,
-    &.active {
+    &[aria-current] {
       color: #fff;
       text-decoration: none;
     }
@@ -215,21 +216,20 @@ $mobile-nav-height: 4 * $vertical-height;
           text-decoration: none;
         }
 
-        &:active {
-        }
-
+        // The two states the is-active variant folds together stay apart here:
+        // :active is the press, [data-active] the open menu, and they rotate differently
         &:active,
-        &.active {
+        &[data-active="true"] {
           color: #fff;
           text-decoration: none;
         }
 
         &:active,
-        &.active:active {
+        &[data-active="true"]:active {
           transform: rotate(45deg);
         }
 
-        &.active {
+        &[data-active="true"] {
           transform: rotate(90deg);
         }
       }
@@ -240,7 +240,7 @@ $mobile-nav-height: 4 * $vertical-height;
       background: $primary-nav-background;
       position: fixed;
       right: 0;
-      top: $mobile-nav-height;
+      top: var(--navbar-bottom, #{$mobile-nav-height});
       bottom: 0;
       transform: translate(100%, 0);
       width: $mainmenu-width;
@@ -251,22 +251,11 @@ $mobile-nav-height: 4 * $vertical-height;
     }
 
     .primary-nav-item {
-      a.primary-nav-link-with-submenu {
-        // headers of lists aren't links on small screens
-        cursor: default;
-
-        &:hover,
-        &:active {
-          background: $primary-nav-background;
-          color: $primary-nav-text-color;
-        }
-      }
-
       a {
         padding: $vertical-height (2 * $vertical-height);
 
         &:active,
-        &.active {
+        &[aria-current] {
           background: $gray-light;
           text-decoration: none;
         }
@@ -293,7 +282,7 @@ $mobile-nav-height: 4 * $vertical-height;
     #menu-opened-backdrop {
       display: none;
       position: fixed;
-      top: $mobile-nav-height;
+      top: var(--navbar-bottom, #{$mobile-nav-height});
       left: 0;
       width: 100%;
       height: 100%;
@@ -367,14 +356,14 @@ $mobile-nav-height: 4 * $vertical-height;
       a {
         padding: 8px (0.5 * $grid-gutter-width);
 
-        &.active,
+        &[aria-current],
         &:active {
           text-decoration: none;
         }
       }
 
       // Only apply to primary nav items, not submenus
-      & > a.active::after {
+      & > a[aria-current]::after {
         content: "";
         position: absolute;
         left: 50%;
@@ -396,16 +385,12 @@ $mobile-nav-height: 4 * $vertical-height;
           color: $primary-nav-text-color;
         }
 
-        &.active::after {
+        &[aria-current]::after {
           display: none;
         }
       }
 
       .settings-link {
-        display: block;
-        padding-top: 0.5 * $vertical-height;
-        padding-bottom: 0.5 * $vertical-height;
-
         svg {
           display: block;
           height: 2 * $vertical-height;
@@ -453,7 +438,7 @@ $mobile-nav-height: 4 * $vertical-height;
       padding: (0.5 * ($primary-logo-fullsize-height - 34px)) 0
         (2 * $vertical-height);
 
-      a.active::after {
+      a[aria-current]::after {
         bottom: 2 * $vertical-height;
       }
     }

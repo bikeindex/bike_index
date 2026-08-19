@@ -17,7 +17,6 @@
 #  graduated_notification_interval :bigint
 #  is_paid                         :boolean          default(FALSE), not null
 #  kind                            :integer
-#  landing_html                    :text
 #  lightspeed_register_with_phone  :boolean          default(FALSE)
 #  location_latitude               :float
 #  location_longitude              :float
@@ -124,6 +123,7 @@ class Organization < ApplicationRecord
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other organization features
   has_one :hot_sheet_configuration
   has_one :organization_stolen_message
+  has_one :organization_landing_page
   has_one :impound_configuration
   has_one :organization_saml_configuration
   has_many :hot_sheets
@@ -294,10 +294,6 @@ class Organization < ApplicationRecord
 
   def to_param
     slug
-  end
-
-  def landing_html?
-    landing_html.present?
   end
 
   def restrict_invitations?
@@ -560,7 +556,7 @@ class Organization < ApplicationRecord
     self.name = strip_name_tags(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
-    self.short_name = name_shortener(short_name || name)
+    self.short_name = name_shortener(short_name.presence || name)
     self.ascend_name = nil if ascend_name.blank?
     self.is_paid = current_invoices.any? || current_parent_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...

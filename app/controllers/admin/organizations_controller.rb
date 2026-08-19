@@ -34,10 +34,6 @@ module Admin
       @organization = Organization.new
     end
 
-    def edit
-      @embedable_email = @organization.auto_user.email if @organization.auto_user
-    end
-
     def update
       # Needs to update approved before saving so set_locations_shown is applied on save
 

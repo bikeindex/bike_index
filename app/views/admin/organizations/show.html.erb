@@ -320,7 +320,7 @@
             <td>Landing Page</td>
 
             <td>
-              <% if @organization.landing_html.present? %>
+              <% if @organization.organization_landing_page&.body? %>
                 <% if LandingPages::ORGANIZATIONS.include?(@organization.slug) %>
                   <%= link_to 'public landing page', "#{ENV['BASE_URL']}/#{@organization.slug}" %>
                 <% else %>

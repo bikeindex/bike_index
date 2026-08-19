@@ -17,6 +17,7 @@ class UpdateOrganizationAssociationsJob < ApplicationJob
       organization.update(skip_update: true, updated_at: Time.current)
       add_organization_manufacturers(organization)
       update_organization_stolen_message(organization)
+      update_email_placeholder(organization)
 
       if organization.enabled?("impound_bikes_locations")
         # If there is isn't a default impound bikes location and there should be, set one
@@ -76,6 +77,28 @@ class UpdateOrganizationAssociationsJob < ApplicationJob
       OrganizationManufacturer.create(manufacturer_id: manufacturer_id,
         organization_id: organization.id)
     end
+  end
+
+  # Whatever domain the organization's own people sign in with is the one its
+  # registrations ask for
+  def update_email_placeholder(organization)
+    return if organization.registration_field_labels["email_placeholder"].present?
+
+    domain = organization.user_email_domain.presence || auto_user_email_domain(organization)
+    return if domain.blank?
+
+    organization.update(skip_update: true, registration_field_labels:
+      organization.registration_field_labels.merge("email_placeholder" => "you@#{domain}"))
+  end
+
+  # The auto user is Bike Index's own account when an organization has no members of
+  # its own, which says nothing about the organization's domain
+  def auto_user_email_domain(organization)
+    email = organization.auto_user&.email
+    return if email.blank? || email == ENV["AUTO_ORG_MEMBER"]
+
+    domain = email.split("@").last
+    domain unless domain == "bikeindex.org"
   end
 
   def update_organization_stolen_message(organization)

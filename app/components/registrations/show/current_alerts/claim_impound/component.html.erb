@@ -37,7 +37,7 @@
     <% if submitting_impound_claim.bike_claimed.present? %>
       <p class="tw:mt-2">
         <%= link_to translation(".view_claimed_bike_type", kind: submitting_impound_claim.kind, bike_type: submitting_impound_claim.bike_claimed.type),
-            registration_path(submitting_impound_claim.bike_claimed), class: "twlink" %>
+            registration_path(submitting_impound_claim.bike_claimed), class: "twlink-underlined" %>
       </p>
     <% end %>
   <% elsif sign_in_redirect %>
@@ -72,8 +72,7 @@
     </div>
   <% else %>
     <p class="tw:text-sm tw:opacity-65">
-      <%# underlined because it sits in a text block, where color alone doesn't distinguish it %>
-      <%= translation(".need_stolen_bike_html", bike_type: @bike.type, add_link: link_to(translation(".add_a_stolen_bike", bike_type: @bike.type), new_register_path(status: "status_stolen"), class: "twlink tw:underline", target: "_blank", rel: "noopener")) %>
+      <%= translation(".need_stolen_bike_html", bike_type: @bike.type, add_link: link_to(translation(".add_a_stolen_bike", bike_type: @bike.type), new_register_path(status: "status_stolen"), class: "twlink-underlined", target: "_blank", rel: "noopener")) %>
     </p>
   <% end %>
 <% end %>

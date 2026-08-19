@@ -266,7 +266,7 @@ module ControllerHelpers
     end
 
     scope ||= [:controllers, controller_namespace, controller_name, controller_method.to_sym]
-    I18n.t(key, **kwargs, scope: scope.compact)
+    ActiveSupport::HtmlSafeTranslation.translate(key, **kwargs, scope: scope.compact)
   end
 
   # This is overridden in FeedbacksController and InfoController
@@ -298,7 +298,7 @@ module ControllerHelpers
     request.format.turbo_stream? || turbo_frame_request?
   end
 
-  protected
+  private
 
   # passive_organization is the organization set for the user - which is persisted in session
   # The user may or may not be interacting with the current_organization in any given request

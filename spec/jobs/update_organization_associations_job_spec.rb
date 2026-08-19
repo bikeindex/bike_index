@@ -162,4 +162,53 @@ RSpec.describe UpdateOrganizationAssociationsJob, type: :job do
       expect(organization_stolen_message.reload.is_enabled).to be_falsey
     end
   end
+
+  describe "email_placeholder" do
+    let(:organization) { FactoryBot.create(:organization) }
+
+    def email_placeholder
+      organization.reload.registration_field_labels["email_placeholder"]
+    end
+
+    it "takes the user_email_domain, and doesn't overwrite an existing placeholder" do
+      instance.perform(organization.id)
+      expect(email_placeholder).to be_blank
+
+      organization.update(user_email_domain: "uiowa.edu", skip_update: true)
+      instance.perform(organization.id)
+      expect(email_placeholder).to eq "you@uiowa.edu"
+
+      organization.update(user_email_domain: "brakebills.edu", skip_update: true)
+      instance.perform(organization.id)
+      expect(email_placeholder).to eq "you@uiowa.edu"
+    end
+
+    context "with an auto_user" do
+      let(:user) { FactoryBot.create(:user_confirmed, email: "sarah@uiowa.edu") }
+      let(:organization) { FactoryBot.create(:organization_with_auto_user, user:) }
+
+      it "takes the auto_user's domain" do
+        instance.perform(organization.id)
+        expect(email_placeholder).to eq "you@uiowa.edu"
+      end
+
+      context "auto_user is the AUTO_ORG_MEMBER" do
+        let(:user) { FactoryBot.create(:user_confirmed, email: ENV["AUTO_ORG_MEMBER"]) }
+
+        it "doesn't set a placeholder" do
+          instance.perform(organization.id)
+          expect(email_placeholder).to be_blank
+        end
+      end
+
+      context "auto_user is a bikeindex.org address" do
+        let(:user) { FactoryBot.create(:user_confirmed, email: "seth@bikeindex.org") }
+
+        it "doesn't set a placeholder" do
+          instance.perform(organization.id)
+          expect(email_placeholder).to be_blank
+        end
+      end
+    end
+  end
 end

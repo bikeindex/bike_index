@@ -36,11 +36,8 @@
   </head>
 
   <%# NOTE: This sets the theme. Padding set to 0 because revised stylesheet in bike box %>
-  <body
-    class="<%= params.dig(:lookbook, :display, :theme) %>"
-    style="padding: 0;"
-  >
+  <%= body_tag(html_class: params.dig(:lookbook, :display, :theme), style: "padding: 0;") do %>
     <%# NOTE: at some point, make the padding optional %>
     <div class="tw:p-4"><%= yield %></div>
-  </body>
+  <% end %>
 </html>

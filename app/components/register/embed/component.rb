@@ -5,17 +5,20 @@ module Register
     # The whole document for step 1 framed on an organization's landing page - no analytics
     # among them, which the page around the frame counts.
     class Component < ApplicationComponent
-      def initialize(b_param:, steps:, current_user: nil)
+      def initialize(b_param:, steps:, current_user: nil, button_color: nil, button_hover_color: nil)
         @b_param = b_param
         @steps = steps
         @current_user = current_user
+        @button_color = button_color
+        @button_hover_color = button_hover_color
       end
 
       # Rendered before the document, so Register::Page's content_for(:header) is in the
       # buffer by the time <head> reads it
       def before_render
         @body = render Register::Step1::Component.new(b_param: @b_param, steps: @steps,
-          current_user: @current_user, embed: true)
+          current_user: @current_user, embed: true, button_color: @button_color,
+          button_hover_color: @button_hover_color)
       end
     end
   end

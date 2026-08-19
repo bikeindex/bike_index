@@ -113,9 +113,14 @@ class OrganizationFeature < ApplicationRecord
       REG_FIELDS
     end
 
+    # Customizable by any paid organization, unlike the reg fields
+    def email_customizable_labels
+      %w[owner_email email_placeholder]
+    end
+
     def reg_fields_with_customizable_labels
       # Can't rename bike_stickers
-      %w[owner_email] + reg_fields - %w[reg_bike_sticker]
+      email_customizable_labels + reg_fields - %w[reg_bike_sticker]
     end
 
     def reg_fields_organization_uniq

@@ -69,6 +69,7 @@ RSpec.describe "Editing a registration", :js, type: :system do
       end
     end
     click_link text
+    wait_for_page_script
   end
 
   it "registers a bike then edits every section of the registration" do

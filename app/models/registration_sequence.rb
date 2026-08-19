@@ -8,7 +8,7 @@
 #  deleted_at          :datetime
 #  end_at              :datetime
 #  faq_url             :string
-#  kind                :integer          default(0), not null
+#  kind                :integer          default("e_vehicle"), not null
 #  start_at            :datetime
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null

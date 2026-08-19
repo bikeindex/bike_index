@@ -22,7 +22,9 @@ module UI
       # depth either way -- add your own wrapper for the parent's layout.
       #
       # Any other keyword (id:, value:, open:, free_text:, autocomplete:,
-      # placeholder:, etc.) is forwarded to `hw_combobox_tag`.
+      # placeholder:, etc.) is forwarded to `hw_combobox_tag`. That includes
+      # `aria:` - `aria: {describedby: group.helper_text_id}` reaches the real
+      # input, which is how this pairs with UI::Forms::Group's helper text.
       class Component < ApplicationComponent
         RICH_DISPLAYS = %i[inline stacked].freeze
 

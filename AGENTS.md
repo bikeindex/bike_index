@@ -27,6 +27,7 @@ Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't us
 - Default to no comment — see **Comments** below for when one earns its place
 - **Prefer composition over inheritance and `include`.** Share behavior by calling an object that owns it, not by mixing a module into several classes or adding a base class. A `module` extracted only to be `include`d in two classes is usually one of those classes with a parameter — pass the difference in as an argument instead. Rails' own extension points (`ApplicationRecord`, `ApplicationJob`, `ActiveSupport::Concern` for controller filters) are fine; new mixins of our own are what to avoid.
 - **Service objects** (`app/services/`): a stateless service is a `module` with `extend Functionable` (see the `functionable` gem) — inputs passed as args, no instance state, private methods via `conceal` + a `# private below here` block. Don't write a stateless service as a `class` with `def self.` methods.
+- **Class methods go in a `class << self` block** when the class has more than 5 of them, or when any of them should be private — `BugReport` is the pattern.
 
 ### Comments
 
@@ -54,6 +55,14 @@ Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't us
 
 None of this governs magic comments, `# rubocop:disable` (keep its justification), or `TODO:`/`HACK:`/`NOTE:` markers.
 
+### Translations
+
+A registration is as often an e-scooter, a stroller or a wheelchair, so **never hardcode "bike" in a value that means the cycle type** — interpolate `%{bike_type}` and pass `bike_type: bike.type`. `Registrations::Show::CurrentAlerts::ClaimImpound` is the pattern. Key names (`about_this_bike:`), the product name, and copy that really is bike-only are fine.
+
+Run `bundle exec rails prepare_translations` after hand-editing a `component.en.yml`; `bin/lint` doesn't normalize YAML.
+
+A spec that renders in another locale — `spec/components/page_block/footer/component_spec.rb` does, in `:nl` — fails on a key the sync-generated `config/locales/translation.*.yml` don't carry yet, since `raise_on_missing_translations` is on in test. Add the key inline to all four; the next sync overwrites them.
+
 ## Subagents
 
 When a command fans out to subagents — `/simplify`, `/code-review`, or an ad-hoc fan-out — pick the model by how much of the *search* the agent has to invent, not by how simple the task sounds:
@@ -68,6 +77,8 @@ Worth delegating enumeration at all rather than eyeballing a grep: in that same 
 
 Uses RSpec. All business logic should be tested. The `rspec-testing` skill covers project-specific style (`context`+`let`, request specs over controller specs, avoiding mocks). A test that fails intermittently is the `fixing-flaky-failures` skill — coverage is never what gives way to make CI green.
 
+**Verify with `bundle exec rspec` over the spec files covering what you changed — usually one to three.** Not `bin/turbo_tests` or `bin/ci`. CI runs the whole suite on push; yours is a smoke test, and every extra minute of it delays the next fix. A whole directory — `spec/integration`, `spec/components` — is a suite run by another name, whichever runner you use. "It renders on every page, so anything could break" is the rationalization to watch for: run the specs that assert the behaviour you changed and let CI find the rest. A red example is not a reason to re-run its directory — re-run that example. Say which specs you ran and why those. A `:js` spec failing on a missing Tailwind build is the `sandbox-test-setup` skill, not a reason to switch runners.
+
 **Never hand-edit a VCR cassette**, and never `git checkout` away one a spec run re-recorded — cassettes only change by being recorded, and a re-recording gets committed on whatever branch you're on. To clear stale contents, `rm` the file and re-run the spec.
 
 ## Frontend Development
@@ -78,8 +89,8 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 
 ## Pull requests
 
-- When creating a PR, run the `/pr` workflow rather than calling `gh pr create` directly — `/pr` detects frontend diffs, captures desktop+mobile screenshots, and embeds them in the PR body.
-- To attach a local image (screenshot, .png/.jpg, CleanShot capture) to an existing GitHub PR, the `gh` CLI **cannot upload images** — use the `github-upload-image-to-pr` skill, which drives a real browser to GitHub's user-attachments uploader.
+- When creating a PR, run the `/pr` workflow rather than calling `gh pr create` directly — `/pr` detects frontend diffs and captures desktop+mobile screenshots, which it posts as a `## Screenshots` comment (never in the body, so the summary stays first).
+- To attach a local image (screenshot, .png/.jpg, CleanShot capture) to an existing GitHub PR, the `gh` CLI **cannot upload images** — use the `github-pr-images` skill, which drives a real browser to GitHub's user-attachments uploader.
 
 ## Architecture notes
 

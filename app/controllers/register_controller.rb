@@ -37,7 +37,9 @@ class RegisterController < ApplicationController
   # a tokenized step, so the frame is one request and nothing past step 1 is embeddable
   def embed
     @page_title = I18n.t("meta_titles.register_step_1")
-    render Register::Embed::Component.new(b_param: @b_param, steps: flow_steps, current_user:), layout: false
+    render Register::Embed::Component.new(b_param: @b_param, steps: flow_steps, current_user:,
+      button_color: HexColor.normalize(params[:button]),
+      button_hover_color: HexColor.normalize(params[:button_hover])), layout: false
   end
 
   # The whole flow after the start: ?step=1, ?step=2, ?step=report for a theft or a
@@ -87,7 +89,7 @@ class RegisterController < ApplicationController
     # Both read straight from params - update_params is stored as json, which an upload can't be
     saved = BikeServices::Register.save_step_2(@b_param, user: current_user,
       image: params.dig(:bike, :image), image_signed_id: params.dig(:bike, :image_signed_id),
-      bike_params: update_params)
+      bike_params: update_params, register_with_organization: params[:register_with_organization])
     # Saved either way, so the re-render has everything they entered
     unless saved
       return render(Register::Step2::Component.new(b_param: @b_param, steps: flow_steps, current_user:),
@@ -222,7 +224,7 @@ class RegisterController < ApplicationController
   end
 
   def assign_organization
-    BikeServices::Register.assign_organization(@b_param, current_organization)
+    BikeServices::Register.assign_organization(@b_param, current_organization, user: current_user)
   end
 
   # Resolved once - the step math, the progress bar and the pages themselves all read it

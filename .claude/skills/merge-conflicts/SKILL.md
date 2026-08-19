@@ -11,7 +11,7 @@ description: >-
   including bare phrasings like "fix the conflicts", "merge main in", or "this
   branch is behind". Not for merging data/files (PDFs, CSVs) or algorithms
   (merge sort) — this is strictly about git branch integration.
-allowed-tools: Bash, Read, Glob, Grep
+allowed-tools: Bash, Read, Edit, Write, Glob, Grep
 ---
 
 # Resolving merge conflicts

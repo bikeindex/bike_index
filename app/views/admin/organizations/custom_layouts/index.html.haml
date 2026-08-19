@@ -34,7 +34,7 @@
         %td.small
           = link_to "landing page preview", organization_landing_path(organization_id: @organization.to_param)
         %td.table-cell-check
-          = check_mark if @organization.landing_html.present?
+          = check_mark if @organization.organization_landing_page&.body?
         %td.table-cell-check
           = check_mark if LandingPages::ORGANIZATIONS.include?(@organization.slug)
       %tr

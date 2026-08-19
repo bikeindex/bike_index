@@ -13,9 +13,9 @@
   <% end %>
 
   <%= form_with(url: register_path, method: :patch, scope: :bike,
-      data: {turbo: true, controller: "autofocus form-persist register--status-fields register--retry",
+      data: {turbo: true, controller: "autofocus form-persist register--status-fields register--organization register--retry",
         form_persist_key_value: "register-details-#{@b_param.id_token}",
-        action: "input->form-persist#save hw-combobox:selection->form-persist#save hw-combobox:selection->register--status-fields#update submit->form-persist#clear"}) do |f| %>
+        action: "input->form-persist#save hw-combobox:selection->form-persist#save hw-combobox:selection->register--status-fields#update register--organization:changed->register--status-fields#update submit->form-persist#clear"}) do |f| %>
     <%= hidden_field_tag :b_param_token, @b_param.id_token %>
 
     <% bike = @b_param.bike %>
@@ -318,7 +318,36 @@
           dialog_label: translation(".registration_type"), no_js: true) %>
     <% end %>
 
-    <%= render Register::SectionLabel::Component.new(text: contact_section_text, divider: true) %>
+    <%= render Register::SectionLabel::Component.new(text: contact_section_label, divider: true) %>
+
+    <%#
+      Heads the section it decides the contents of. Only an organization assigned
+      automatically - one a link named isn't up for debate
+    %>
+
+    <% if auto_organization.present? %>
+      <div
+        class="
+          tw:mb-4 tw:rounded-sm tw:border tw:border-gray-300 tw:bg-gray-50
+          tw:p-3 tw:dark:border-gray-600 tw:dark:bg-gray-700
+        "
+      >
+        <%= render UI::Forms::Checkbox::Component.new(name: :register_with_organization,
+            checked: organization.present?,
+            label: translation(".register_with_org", org_name: auto_organization.short_name),
+            input_data: {"register--organization-target": "checkbox",
+              action: "change->register--organization#toggle"}) %>
+
+        <p
+          class="
+            tw:mt-1 tw:mb-0 tw:pl-6 tw:text-xs tw:text-gray-500
+            tw:dark:text-gray-400
+          "
+        >
+          <%= translation(".register_with_org_description", org_name: auto_organization.short_name) %>
+        </p>
+      </div>
+    <% end %>
 
     <div class="tw:mb-4">
       <span class="twlabel"><%= translation(".email") %></span>
@@ -342,31 +371,37 @@
     <% if user_name_required? %>
       <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :user_name,
           label_text: translation(".owner_name"), required: true,
-          html_options: {value: bike["user_name"], autocomplete: "name"}) %>
+          html_options: {value: bike["user_name"], autocomplete: "name",
+            placeholder: translation(".owner_name_placeholder")}) %>
     <% end %>
 
     <%# The organization's own asks sit under its heading, alongside the contact fields %>
-    <% if show_extra_registration_number? %>
-      <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :extra_registration_number,
-          label_text: reg_label("reg_extra_registration_number", translation(".additional_serial_sticker_number")),
-          html_options: {value: bike["extra_registration_number"], autocomplete: "off", class: "tw:font-mono"}) %>
-    <% end %>
-
-    <% if show_organization_affiliation? %>
-      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_affiliation,
-          label_text: reg_label("reg_organization_affiliation", translation(".affiliation", org_name: organization.short_name)))) do %>
-        <%= render UI::Forms::Select::Component.new(form_builder: f, attribute: :organization_affiliation,
-            option_tags: organization.organization_affiliation_options,
-            options: {selected: bike["organization_affiliation"], include_blank: true}) %>
+    <div
+      class="<%= "tw:hidden" if organization_dropped? %>"
+      data-register--organization-target="field"
+    >
+      <% if show_extra_registration_number? %>
+        <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :extra_registration_number,
+            label_text: reg_label("reg_extra_registration_number", translation(".additional_serial_sticker_number")),
+            html_options: {value: bike["extra_registration_number"], autocomplete: "off", class: "tw:font-mono"}) %>
       <% end %>
-    <% end %>
 
-    <% if show_student_id? %>
-      <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :student_id,
-          label_text: reg_label("reg_student_id", translation(".student_id")),
-          required: organization.enabled?("require_reg_student_id"),
-          html_options: {value: bike["student_id"], autocomplete: "off"}) %>
-    <% end %>
+      <% if show_organization_affiliation? %>
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_affiliation,
+            label_text: reg_label("reg_organization_affiliation", translation(".affiliation", org_name: reg_organization.short_name)))) do %>
+          <%= render UI::Forms::Select::Component.new(form_builder: f, attribute: :organization_affiliation,
+              option_tags: reg_organization.organization_affiliation_options,
+              options: {selected: bike["organization_affiliation"], include_blank: true}) %>
+        <% end %>
+      <% end %>
+
+      <% if show_student_id? %>
+        <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :student_id,
+            label_text: reg_label("reg_student_id", translation(".student_id")),
+            required: reg_organization.enabled?("require_reg_student_id"),
+            html_options: {value: bike["student_id"], autocomplete: "off"}) %>
+      <% end %>
+    </div>
 
     <div
       class="<%= "tw:hidden" unless show_phone? %>"
@@ -394,12 +429,14 @@
       <div
         class="tw:mb-6 <%= "tw:hidden" unless show_address? %>"
         data-register--status-fields-target="field"
+        data-register--organization-target="statusField"
+        data-organization-off="<%= "true" if organization_dropped? %>"
         data-statuses="<%= address_statuses.to_json %>"
       >
         <%# _attributes explicitly: form_with has no model to infer nested attributes from %>
         <%= f.fields_for :address_record_attributes, address_record do |address_form| %>
           <%= render UI::Forms::AddressGroup::Component.new(form_builder: address_form,
-              required: organization.enabled?("require_reg_address")) %>
+              required: reg_organization.enabled?("require_reg_address")) %>
         <% end %>
       </div>
     <% end %>

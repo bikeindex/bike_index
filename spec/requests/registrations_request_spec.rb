@@ -166,7 +166,7 @@ RSpec.describe RegistrationsController, type: :request do
             expect(assigns(:selectable_child_organizations)).to eq []
             expect(assigns(:creator)).to be_nil
             expect(assigns(:simple_header)).to be_truthy
-            expect(assigns(:button)).to eq "#user12"
+            expect(assigns(:button)).to be_nil
             expect(assigns(:button_and_header)).to be_nil
           end
         end
