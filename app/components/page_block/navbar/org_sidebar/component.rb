@@ -8,6 +8,8 @@ module PageBlock
       class Component < ApplicationComponent
         COLLAPSE_BREAKPOINT = 1100
         MOBILE_BREAKPOINT = 760
+        # A reader in dozens of organizations would otherwise push logout off the dropdown
+        SWITCHER_ORGANIZATIONS = 5
 
         # A top-level row -- the group toggles and the leaf links share it, so they stay
         # the same height as each other
@@ -47,13 +49,37 @@ module PageBlock
           @items ||= OrganizedServices::UserMenuItems.for(organization: @organization, current_user: @current_user)
         end
 
+        # PageBlock::Navbar::SettingsMenu's rows, in its order — the sidebar stands in for the
+        # whole navbar, so this is the only place a reader with an organization reaches them
         def account_items
-          [{label: translation(".your_registrations"), path: my_account_path},
+          [*organization_items,
+            {label: translation(".your_registrations"), path: my_account_path},
+            marketplace_messages_item,
             {label: translation(".register_a_new_bike"), path: choose_registration_path},
             {label: translation(".user_settings", user_email: @current_user_or_unconfirmed_user.email),
              path: edit_my_account_path},
             {type: :divider},
-            {label: translation(".logout"), path: goodbye_path, danger: true}]
+            {label: translation(".logout"), path: goodbye_path, danger: true}].compact
+        end
+
+        # Ordered so the switcher is the same five every time it's opened, rather than
+        # whatever the planner returns
+        def organization_items
+          organizations = @current_user_or_unconfirmed_user.organization_roles.includes(:organization)
+            .order(:id).filter_map(&:organization).first(SWITCHER_ORGANIZATIONS)
+          return [] if organizations.none?
+
+          organizations.map { |organization|
+            {label: translation(".view_org", org_name: organization.name),
+             path: organization_root_path(organization_id: organization.to_param)}
+          } + [{type: :divider}]
+        end
+
+        # .any_for_user? caches
+        def marketplace_messages_item
+          return unless MarketplaceMessage.any_for_user?(@current_user)
+
+          {label: translation(".marketplace_messages"), path: my_account_messages_path}
         end
 
         def first_group

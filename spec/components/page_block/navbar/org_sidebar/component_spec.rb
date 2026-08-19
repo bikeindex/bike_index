@@ -23,8 +23,41 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
         "Bulk Import & Export", "Brakebills Settings"])
 
     expect(component).to have_css "button[data-ui--dropdown-target='button']", text: "kdewey@brakebills.edu"
+    # The sidebar stands in for the navbar, so the account menu carries the organization
+    # switcher and marketplace messages PageBlock::Navbar::SettingsMenu builds too
     expect(component.css("ul[role='menu'] li[role='menuitem'] a").map(&:text))
-      .to eq(["Your registrations", "Register a new bike", "kdewey@brakebills.edu settings", "Log out"])
+      .to eq(["View Brakebills", "Your registrations", "Register a new bike",
+        "kdewey@brakebills.edu settings", "Log out"])
+  end
+
+  context "with more organizations than the switcher shows" do
+    let!(:other_roles) do
+      (1..6).map do |i|
+        FactoryBot.create(:organization_role_claimed, user: current_user,
+          organization: FactoryBot.create(:organization, short_name: "Physical Kids #{i}"))
+      end
+    end
+
+    it "switches between the first five, and still reaches logout" do
+      switcher = component.css("ul[role='menu'] li[role='menuitem'] a").map(&:text)
+
+      expect(switcher.count { |label| label.start_with?("View ") })
+        .to eq described_class::SWITCHER_ORGANIZATIONS
+      expect(switcher.first).to eq "View Brakebills"
+      expect(switcher.last).to eq "Log out"
+    end
+  end
+
+  context "with a marketplace message" do
+    let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
+    let!(:marketplace_message) do
+      FactoryBot.create(:marketplace_message, marketplace_listing:, sender: current_user)
+    end
+
+    it "reaches the messages from the account menu" do
+      expect(component.css("ul[role='menu'] li[role='menuitem'] a").map(&:text))
+        .to include("Marketplace messages")
+    end
   end
 
   # Which row is current is ui--active-link's, in the browser, so every row states what
@@ -69,7 +102,8 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
 
     it "renders the ambassador's flat rows, with no group to open" do
       expect(component).to have_no_css "[aria-controls^='org_sidebar_group_']"
-      expect(component.css("nav a[href^='/o/'], nav a[href^='https://discuss']").map(&:text).map(&:strip))
+      # The scroller holds the menu rows; the account menu below it has its own /o/ links
+      expect(component.css("[data-page-block--org-sidebar-target='scroller'] a").map(&:text).map(&:strip))
         .to eq(["Fillory Dashboard", "Resources", "Getting started", "Multi search", "Discuss"])
     end
   end
