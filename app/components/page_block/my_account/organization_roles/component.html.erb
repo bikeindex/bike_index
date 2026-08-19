@@ -36,7 +36,7 @@
           %>
 
           <div class="tw:relative tw:w-11 tw:shrink-0 tw:self-stretch">
-            <% if OrganizationDisplayer.avatar?(organization) %>
+            <% if OrgServices::Displayer.avatar?(organization) %>
               <%= image_tag organization.avatar.url(:thumb), alt: "",
                     class: "tw:absolute tw:inset-0 tw:size-full tw:object-contain" %>
             <% end %>
