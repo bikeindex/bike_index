@@ -17,6 +17,8 @@ RSpec.describe PageBlock::Navbar::UserSettingsMenu::Component, type: :component 
     expect(component).to have_css "ul.primary-submenu"
     expect(links).to eq(["Your registrations", "Register a new bike", "party@bikeindex.org settings", "Log out"])
     expect(component).to have_css "#navUserSettingLink[data-email='party@bikeindex.org']"
+    # The submenu's rows are the navbar's own links, so they take .nav-link with the rest
+    expect(component.css("ul.primary-submenu a.nav-link").count).to eq links.count
   end
 
   context "with dropdown" do

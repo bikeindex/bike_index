@@ -46,15 +46,15 @@ module PageBlock
         def entry(item)
           UI::ActiveLink::Component.new(text: item[:label], path: item[:path], match: item[:match],
             matching_controllers: item[:matching_controllers], data: item[:data] || {},
-            id: item[:id], class: (LOGOUT if item[:logout]))
+            id: item[:id], class: entry_class(item))
         end
 
-        # MenuLink carries the navbar's own link classes, and hands the rest to UI::ActiveLink
-        def menu_link(item)
-          PageBlock::Navbar::MenuLink::Component.new(label: item[:label], path: item[:path],
-            match: item[:match], link_class: (LOGOUT_NAVBAR if item[:logout]),
-            html_options: {id: item[:id], data: item[:data] || {},
-                           matching_controllers: item[:matching_controllers]}.compact)
+        # .nav-link is the navbar's own, which the submenu's rows take with the rest of its
+        # links. .twdropdown styles the entries in the sidebar, so they need nothing
+        def entry_class(item)
+          return (LOGOUT if item[:logout]) if @dropdown
+
+          ["nav-link", (LOGOUT_NAVBAR if item[:logout])].compact.join(" ")
         end
       end
     end
