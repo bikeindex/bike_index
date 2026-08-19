@@ -77,6 +77,23 @@ RSpec.describe Admin::UsersController, type: :request do
       get "#{base_url}/#{user_subject.id}/edit"
       expect(response).to render_template :edit
     end
+
+    # It rendered a link with ?method=delete, so deleting quietly did nothing but show the user again
+    it "deletes through a form, rather than a GET" do
+      get "#{base_url}/#{user_subject.id}/edit"
+      expect(response.body).to match(%r{<form[^>]*action="/admin/users/#{user_subject.id}"[^>]*>\s*<input type="hidden" name="_method" value="delete"})
+      expect(response.body).to_not include("method=delete")
+    end
+  end
+
+  describe "destroy" do
+    it "deletes the user" do
+      expect(user_subject).to be_present
+      delete "#{base_url}/#{user_subject.id}"
+      expect(flash[:notice]).to be_present
+      expect(User.unscoped.find(user_subject.id).deleted_at).to be_present
+      expect(User.where(id: user_subject.id)).to be_empty
+    end
   end
 
   describe "update" do

@@ -45,13 +45,7 @@
           <% group.with_helper_text { "Ask Seth for help changing this, it's delicate" } %>
         <% end %>
 
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <div class="input-group-text">@</div>
-          </div>
-
-          <%= render(UI::Forms::Input::Component.new(form_builder: @form_builder, attribute: :user_email_domain, html_options: {placeholder: "something.gov", disabled: !developer?, "aria-describedby" => (group.helper_text_id unless developer?)})) %>
-        </div>
+        <%= render(UI::Forms::Input::Component.new(form_builder: @form_builder, attribute: :user_email_domain, prefix: "@", html_options: {placeholder: "something.gov", disabled: !developer?, "aria-describedby" => (group.helper_text_id unless developer?)})) %>
       <% end %>
     <% end %>
 

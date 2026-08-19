@@ -68,8 +68,7 @@ $mobile-nav-height: 4 * $vertical-height;
     display: none;
   }
 
-  .primary-submenu .divider-nav-item,
-  .current-organization-submenu .divider-nav-item {
+  .primary-submenu .divider-nav-item {
     display: block;
     width: 94%;
     margin: 6px auto;
@@ -85,87 +84,6 @@ $mobile-nav-height: 4 * $vertical-height;
     }
   }
 
-  // Current org nav and dropdown
-  .current-organization-nav-item {
-    float: left;
-    display: block;
-    margin: 0 0 0 16px;
-    padding: $vertical-height 24px 0;
-
-    a {
-      @extend .header-font;
-
-      color: #fff;
-      font-size: 12px;
-      line-height: 18px;
-      cursor: pointer;
-      display: block;
-      padding: 8px 15px;
-
-      &:hover,
-      &:active,
-      &[aria-current] {
-        color: #fff;
-
-        .caret-down {
-          color: #fff;
-        }
-      }
-    }
-
-    .caret-down {
-      color: darken($primary-nav-text-color, 10%);
-      display: inline-block;
-      font-size: 90%;
-      font-weight: 800;
-      margin-left: 0.2rem;
-    }
-  }
-
-  .open > .current-organization-submenu {
-    display: block;
-    z-index: 10000; // Override to fix issues with safari not opening links
-  }
-
-  .current-organization-submenu {
-    position: absolute;
-    top: 100%;
-    display: none;
-    min-width: 400px;
-    padding: 5px 0;
-    margin: 0;
-    font-size: 1rem;
-    text-align: left;
-    background-color: #222222;
-    background-clip: padding-box;
-    border: 1px solid rgba($gray, 0.3);
-    border-radius: $border-radius;
-    z-index: 1;
-
-    li {
-      font-size: 80%;
-    }
-    .nav-link.secondary-item {
-      padding-left: 30px;
-      &:before {
-        content: "-";
-        display: block;
-        height: 0;
-        width: 15px;
-        left: 15px;
-        position: absolute;
-      }
-    }
-  }
-
-  // If it overflows, hide the extra text. truncateOrganizationName sets the width
-  #passive_organization_submenu {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-
-  .current-organization-submenu a,
   .primary-submenu a {
     font-family: $body-font-family;
     color: $primary-nav-text-color;
@@ -273,12 +191,6 @@ $mobile-nav-height: 4 * $vertical-height;
       padding-left: 0;
     }
 
-    .current-organization-submenu {
-      min-width: 0;
-      width: calc(100vw - 30px);
-      max-width: 400px;
-    }
-
     #menu-opened-backdrop {
       display: none;
       position: fixed;
@@ -300,15 +212,6 @@ $mobile-nav-height: 4 * $vertical-height;
   // Mobile menu visible
   body.menu-in {
     overflow: hidden;
-
-    .current-organization-nav-item {
-      display: none;
-    }
-  }
-
-  .current-organization-nav-item {
-    // Somehow, makes things lineup more
-    padding-top: (2px + $vertical-height) !important;
   }
 
   .primary-header-nav.menu-in {
@@ -432,7 +335,6 @@ $mobile-nav-height: 4 * $vertical-height;
       height: $primary-logo-fullsize-height - 2 * $primary-logo-padding;
     }
 
-    .current-organization-nav-item,
     .primary-nav-item {
       // nav-items are 34px tall.
       padding: (0.5 * ($primary-logo-fullsize-height - 34px)) 0
