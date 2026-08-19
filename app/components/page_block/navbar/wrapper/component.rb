@@ -8,7 +8,7 @@ module PageBlock
       # logo_only renders just the logo, for the OAuth authorization prompt.
       class Component < ApplicationComponent
         # Digest of the cached template — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "2a11dbe079c8"
+        MARKUP_DIGEST = "4da6990fe033"
 
         def initialize(logo_only: false, current_user: nil, current_user_or_unconfirmed_user: nil,
           passive_organization: nil)
