@@ -76,6 +76,8 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(response.body).to include("permitted domain for SAML SSO")
         expect(response.body).to include('name="organization[user_email_domain]"')
         expect(response.body).to include('name="organization[organization_saml_configuration_attributes][name_id_format]"')
+        # permitted by the controller since SSO shipped, but never rendered
+        expect(response.body).to include('name="organization[organization_saml_configuration_attributes][idp_cert_multi]"')
       end
 
       # The IdP fields decide where a domain's logins go and which key signs them, so they

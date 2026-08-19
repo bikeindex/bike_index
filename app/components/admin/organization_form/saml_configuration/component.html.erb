@@ -41,6 +41,14 @@
         <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_cert, kind: :text_area, label_text: "IdP certificate (PEM or base64)", required: saml_configuration.enabled?, required_toggleable: true, html_options: field_options.merge(rows: 4))) %>
       </div>
 
+      <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_cert_multi, kind: :text_area, label_text: "IdP certificate, second", html_options: field_options.merge(rows: 4))) do |group| %>
+        <% group.with_helper_text do %>
+          Only during a rotation — assertions signed by <em>either</em>
+          certificate validate while the IdP switches over. Clear it once
+          they've finished.
+        <% end %>
+      <% end %>
+
       <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_slo_target_url, label_text: "IdP SLO target URL", html_options: field_options)) %>
 
       <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_cert_fingerprint, label_text: "IdP certificate fingerprint", html_options: field_options)) %>
