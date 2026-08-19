@@ -160,9 +160,7 @@ jobs:
             RUBY_VERSION=${{ steps.image.outputs.ruby_version }}
             NODE_VERSION=${{ steps.image.outputs.node_version }}
           # Every test shard pulls this image, and zstd unpacks faster than gzip.
-          # force-compression, or layers restored from the cache below keep
-          # whatever they were built with.
-          outputs: type=image,compression=${{ steps.image.outputs.compression }},force-compression=true
+          outputs: type=image,compression=${{ steps.image.outputs.compression }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

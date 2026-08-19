@@ -2,9 +2,9 @@
 # check=error=true
 
 # Tooling image for CI's `test` job (see ../workflows/ci.yml). Bakes Ruby, the OS
-# packages, Node, the gems, node_modules, and Playwright's Chromium + OS deps —
-# everything that otherwise gets reinstalled or restored from cache on each of
-# the 5 parallel test shards.
+# packages, Node, the gems, node_modules, postgres, redis, and Playwright's
+# Chromium + OS deps — everything that otherwise gets reinstalled, restored from
+# cache, or pulled as a service image on each of the 5 parallel test shards.
 #
 # Ruby is baked here (not left to ruby/setup-ruby) because that action
 # downloads a prebuilt binary sized for the full GitHub-hosted runner image —
