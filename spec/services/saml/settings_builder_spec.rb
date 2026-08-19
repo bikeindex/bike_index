@@ -26,6 +26,19 @@ RSpec.describe Saml::SettingsBuilder, :saml_env do
     expect(settings.private_key).to eq sp_key
   end
 
+  # Deploy environments store base64 - kamal writes each secret as one KEY=value line
+  context "with a base64-encoded keypair in ENV" do
+    let(:pem_cert) { File.read(Rails.root.join("spec/fixtures/saml/sp_cert.pem")) }
+    let(:pem_key) { File.read(Rails.root.join("spec/fixtures/saml/sp_key.pem")) }
+    let(:sp_cert) { Base64.strict_encode64(pem_cert) }
+    let(:sp_key) { Base64.strict_encode64(pem_key) }
+
+    it "decodes both back to PEM" do
+      expect(settings.certificate).to eq pem_cert
+      expect(settings.private_key).to eq pem_key
+    end
+  end
+
   it "carries the IdP config" do
     expect(settings.idp_entity_id).to eq saml_configuration.idp_entity_id
     expect(settings.idp_sso_service_url).to eq saml_configuration.idp_sso_target_url

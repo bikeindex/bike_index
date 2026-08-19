@@ -158,7 +158,15 @@ POSTGRES_PASSWORD            SECRET_KEY_BASE              SESSION_SECRET
 VERIFICATION_SECRET          GOOGLE_MAPS                  GOOGLE_MAPS_STATIC
 GOOGLE_GEOCODER              MAPBOX_GEOCODER              MAPBOX_MAPPING
 R2_DEV_ENDPOINT              R2_DEV_ACCESS_KEY            R2_DEV_ACCESS_KEY_SECRET
-HONEYBADGER_API_KEY
+HONEYBADGER_API_KEY          SAML_SP_CERTIFICATE          SAML_SP_PRIVATE_KEY
+```
+
+The two `SAML_SP_*` fields hold a **base64-encoded** PEM, not the PEM itself — kamal writes
+each secret to the host as one `KEY=value` line, so the newlines have to go. Mint a throwaway
+pair (never production's) and encode each with `base64`:
+
+```bash
+BASE_URL=https://sandbox.review.bikeindex.org bundle exec rails saml:generate_sp_keypair
 ```
 
 These are the same values as the `REVIEW_APP_*` GitHub Environment secrets ([Initial host setup step 6](#6-ssh-key--github-config)) — keep them in sync. Then:

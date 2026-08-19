@@ -27,11 +27,20 @@ module Saml
     # private below here
     #
     def sp_certificate
-      ENV["SAML_SP_CERTIFICATE"].presence
+      pem_from_env("SAML_SP_CERTIFICATE")
     end
 
     def sp_private_key
-      ENV["SAML_SP_PRIVATE_KEY"].presence
+      pem_from_env("SAML_SP_PRIVATE_KEY")
+    end
+
+    # Kamal writes every secret to the host as one `KEY=value` line, so deploy environments
+    # carry the PEM base64-encoded; `.env.local` keeps the raw multi-line form for local dev
+    def pem_from_env(name)
+      value = ENV[name].presence
+      return value if value.nil? || value.include?("-----BEGIN")
+
+      Base64.decode64(value)
     end
 
     def slug(saml_configuration)
@@ -76,7 +85,7 @@ module Saml
       settings.security[:signature_method] = XMLSecurity::Document::RSA_SHA256
     end
 
-    conceal :sp_certificate, :sp_private_key, :slug,
+    conceal :sp_certificate, :sp_private_key, :pem_from_env, :slug,
       :base_url, :assign_sp, :assign_idp, :assign_security
   end
 end

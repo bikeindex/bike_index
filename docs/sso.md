@@ -27,7 +27,7 @@ SAML trust comes from the metadata two parties exchange, not from a CA chain.
 | Scope | one keypair, app-wide | one per organization |
 | Source | we generate it | they hand it to us from their metadata |
 | Secret? | certificate is public; **the private key is the only secret** | public |
-| Stored | environment variables | database, pasted in the admin SAML card |
+| Stored | environment variables (raw PEM, or base64 of one) | database, pasted in the admin SAML card |
 
 Our certificate is published at `/sso/<slug>/metadata` for anyone to fetch — that is its
 entire job. The one keypair appears there twice, under a `signing` and an `encryption`
@@ -203,6 +203,10 @@ published key, which is the one thing the hosted test IdPs cannot do.
 login with `SigAlg was null`. Keep those names out of `.env`: `bin/dev` runs foreman, which
 injects `.env` into every process, and dotenv won't overwrite an already-set name — so even a
 blank value there silently wins.
+
+Either variable also accepts a base64-encoded PEM, which is how the deploy environments carry
+it — kamal writes every secret to the host as one `KEY=value` line, so the newlines have to go.
+Review apps and sandbox get their own throwaway keypair, not production's.
 
 **Full rehearsal against a public IdP.** Use [mocksaml.com](https://mocksaml.com). Nothing to
 create: it has no accounts and no per-SP registration, reading the ACS URL and audience
