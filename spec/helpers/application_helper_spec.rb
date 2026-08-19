@@ -85,7 +85,7 @@ RSpec.describe ApplicationHelper, type: :helper do
         it "adds the gray the flow's page renders on" do
           allow(view).to receive(:controller_name) { "registrations" }
           allow(view).to receive(:action_name) { "new" }
-          expect(helper.body_class).to eq "organized-body tw:bg-gray-100 tw:dark:bg-gray-900"
+          expect(helper.send(:body_class)).to eq "organized-body tw:bg-gray-100 tw:dark:bg-gray-900"
         end
       end
     end

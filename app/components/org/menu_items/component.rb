@@ -4,13 +4,15 @@ module Org
   module MenuItems
     class Component < ApplicationComponent
       def initialize(organization:, current_user:, controller_namespace:, controller_name:, action_name:,
-        is_dropdown: false)
+        is_dropdown: false, old_register_view: false, register_flow_organization_id: nil)
         @organization = organization
         @current_user = current_user
         @controller_namespace = controller_namespace
         @controller_name = controller_name
         @action_name = action_name
         @is_dropdown = is_dropdown
+        @old_register_view = old_register_view
+        @register_flow_organization_id = register_flow_organization_id
       end
 
       def render?
@@ -50,7 +52,31 @@ module Org
         items = [dashboard_link, divider, *items] if needs_dashboard_override?(items)
         items = insert_after_add_bike(items, bulk_import_link) if needs_bulk_import_override?(items)
         items += [registration_sequences_link] if needs_registration_sequences_override?(items)
+        items = with_add_bike_override(items) if add_bike_override.any?
         items
+      end
+
+      # The link's own page is all the browser can match it against, so the flow's later
+      # steps - on /register, which no organized route matches - widen it to that
+      # controller, and only in the organization being registered for
+      def add_bike_override
+        return @add_bike_override if defined?(@add_bike_override)
+
+        @add_bike_override = if @old_register_view
+          # Whoever went back to the embed form keeps being sent there, until they take
+          # the register flow's link the other way
+          {path: helpers.new_organization_bike_path(organization_id: @organization.to_param)}
+        elsif @register_flow_organization_id == @organization.id
+          {match: :controller, matching_controllers: ["register"]}
+        else
+          {}
+        end
+      end
+
+      def with_add_bike_override(items)
+        items.map do |item|
+          (item[:path] == add_bike_link[:path]) ? item.merge(add_bike_override) : item
+        end
       end
 
       def needs_dashboard_override?(items)

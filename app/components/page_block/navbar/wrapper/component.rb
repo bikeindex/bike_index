@@ -7,10 +7,11 @@ module PageBlock
       # logo_only renders just the logo, for the OAuth authorization prompt.
       class Component < ApplicationComponent
         # Digest of the cached template — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "a75c37da8ae7"
+        MARKUP_DIGEST = "3ff1bfd13ef7"
 
         def initialize(logo_only: false, current_user: nil, current_user_or_unconfirmed_user: nil,
-          passive_organization: nil, controller_namespace: nil, controller_name: nil, action_name: nil)
+          passive_organization: nil, controller_namespace: nil, controller_name: nil, action_name: nil,
+          old_register_view: false, register_flow_organization_id: nil)
           @logo_only = logo_only
           @current_user = current_user
           @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user
@@ -18,6 +19,8 @@ module PageBlock
           @controller_namespace = controller_namespace
           @controller_name = controller_name
           @action_name = action_name
+          @old_register_view = old_register_view
+          @register_flow_organization_id = register_flow_organization_id
         end
 
         private
@@ -41,7 +44,9 @@ module PageBlock
         def organization_menu
           PageBlock::Navbar::OrganizationMenu::Component.new(organization: @passive_organization,
             current_user: @current_user, controller_namespace: @controller_namespace,
-            controller_name: @controller_name, action_name: @action_name)
+            controller_name: @controller_name, action_name: @action_name,
+            old_register_view: @old_register_view,
+            register_flow_organization_id: @register_flow_organization_id)
         end
 
         def primary_menu

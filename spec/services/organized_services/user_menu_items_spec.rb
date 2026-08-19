@@ -16,7 +16,7 @@ RSpec.describe OrganizedServices::UserMenuItems do
         [
           link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", match: :controller_action),
           {type: :disabled, label: "Incomplete registrations", secondary: true},
-          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", match: :full_path),
+          link_item("Add a bike", "/o/#{organization.to_param}/registrations/new"),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false}
         ]
@@ -50,7 +50,7 @@ RSpec.describe OrganizedServices::UserMenuItems do
           link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", match: :controller_action),
           link_item("Impounded Bikes", "/o/#{organization.to_param}/impound_records", secondary: true, match: :controller),
           {type: :disabled, label: "Incomplete registrations", secondary: true},
-          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", match: :full_path),
+          link_item("Add a bike", "/o/#{organization.to_param}/registrations/new"),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false}
         ]
@@ -66,7 +66,7 @@ RSpec.describe OrganizedServices::UserMenuItems do
         [
           link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", match: :controller_action),
           {type: :disabled, label: "Incomplete registrations", secondary: true},
-          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", match: :full_path),
+          link_item("Add a bike", "/o/#{organization.to_param}/registrations/new"),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false},
           link_item("Manage users", "/o/#{organization.to_param}/users", match: :controller),
@@ -85,7 +85,7 @@ RSpec.describe OrganizedServices::UserMenuItems do
         [
           link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", match: :controller_action),
           {type: :disabled, label: "Incomplete registrations", secondary: true},
-          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", match: :full_path),
+          link_item("Add a bike", "/o/#{organization.to_param}/registrations/new"),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false},
           link_item("Manage users", "/o/#{organization.to_param}/users", match: :controller),
@@ -107,7 +107,7 @@ RSpec.describe OrganizedServices::UserMenuItems do
         [
           link_item("#{organization.short_name} Bikes", "/o/#{organization.to_param}/registrations", match: :controller_action),
           {type: :disabled, label: "Incomplete registrations", secondary: true},
-          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new", match: :full_path),
+          link_item("Add a bike", "/o/#{organization.to_param}/registrations/new"),
           {type: :divider},
           {type: :disabled, label: "Registration stickers", secondary: false},
           link_item("Manage users", "/o/#{organization.to_param}/users", match: :controller),

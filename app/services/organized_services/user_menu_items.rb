@@ -26,7 +26,7 @@ module OrganizedServices
     def for(organization:, current_user:)
       return [] if organization.nil? || current_user.nil?
 
-      Rails.cache.fetch(["organized_menu_items_v2", organization.id, current_user.cache_key_with_version]) do
+      Rails.cache.fetch(["organized_menu_items_v3", organization.id, current_user.cache_key_with_version]) do
         build_items(organization, current_user)
       end
     end
@@ -37,7 +37,7 @@ module OrganizedServices
     # and to find where in the menu to inject them.
     def add_bike_link(organization)
       link(translation(:add_a_bike),
-        routes.new_organization_bike_path(organization.to_param), match: :full_path)
+        routes.new_organization_registration_path(organization.to_param))
     end
 
     def dashboard_link(organization)

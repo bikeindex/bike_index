@@ -119,26 +119,40 @@ RSpec.describe Org::MenuItems::Component, type: :component do
   end
 
   describe "the register flow's later steps" do
-    # /register, which no organized route matches
+    # /register, which no organized route matches - so the link widens to that controller
     let(:controller_namespace) { nil }
     let(:controller_name) { "register" }
     let(:action_name) { "show" }
     let(:url) { "/register?step=2" }
 
-    def active_labels(register_flow_organization_id)
+    def add_bike_link(register_flow_organization_id)
       rendered = with_request_url(url) {
         render_inline(described_class.new(organization:, current_user:, controller_namespace:,
           controller_name:, action_name:, register_flow_organization_id:))
       }
-      rendered.css("a.nav-link[aria-current]").map { |a| a.text.strip }
+      rendered.css("a.nav-link").detect { |a| a.text.strip == "Add a bike" }
     end
 
-    it "keeps add-a-bike active, and only in the organization being registered for" do
-      expect(active_labels(organization.id)).to include("Add a bike")
+    it "matches the register controller, and only in the organization being registered for" do
+      expect(add_bike_link(organization.id)["data-ui--active-link-routes-value"])
+        .to eq "organized/registrations register"
 
       # A member of two sees the other's menu in the navbar, and it isn't registering anything
-      expect(active_labels(FactoryBot.create(:organization).id)).to_not include("Add a bike")
-      expect(active_labels(nil)).to_not include("Add a bike")
+      other = add_bike_link(FactoryBot.create(:organization).id)
+      expect(other["data-ui--active-link-routes-value"]).to be_blank
+      expect(other["data-ui--active-link-match-value"]).to eq "path"
+      expect(add_bike_link(nil)["data-ui--active-link-match-value"]).to eq "path"
+    end
+  end
+
+  describe "gone back to the old view" do
+    it "points add-a-bike at the embed form" do
+      rendered = with_request_url(url) {
+        render_inline(described_class.new(organization:, current_user:, controller_namespace:,
+          controller_name:, action_name:, old_register_view: true))
+      }
+      link = rendered.css("a.nav-link").detect { |a| a.text.strip == "Add a bike" }
+      expect(link["href"]).to eq "/o/#{organization.to_param}/bikes/new"
     end
   end
 end

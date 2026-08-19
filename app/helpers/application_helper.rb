@@ -38,8 +38,20 @@ module ApplicationHelper
       controller_namespace:,
       controller_name:,
       action_name:,
-      force_landing_page_render: @force_landing_page_render
+      force_landing_page_render: @force_landing_page_render,
+      register_flow_organization_id: @register_flow_organization_id
     ) == :organized
+  end
+
+  # Set by going back to the embed form, cleared by taking the register flow's link the
+  # other way - the organized menu follows it
+  def old_register_view?
+    session[:old_register_view].present?
+  end
+
+  # Its opening step, then every step after it on /register
+  def register_flow_page?
+    controller_name == "register" || (controller_name == "registrations" && action_name == "new")
   end
 
   # Deprecated - UI::Forms::NestedFields::Component replaces this. Every set this adds shares one
@@ -141,7 +153,9 @@ module ApplicationHelper
     elsif controller_name == "info" && action_name == "resources"
       "kelsey_landing-page-body"
     elsif main_content_organized?
-      "organized-body"
+      # Register::Page's gray only covers the form, and the organized container insets it -
+      # so the page paints it instead, behind the whole content column
+      register_flow_page? ? "organized-body tw:bg-gray-100 tw:dark:bg-gray-900" : "organized-body"
     elsif controller_name == "registrations" && action_name == "show"
       "tw:bg-[#f7f6fb]"
     end
