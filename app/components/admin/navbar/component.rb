@@ -24,7 +24,7 @@ module Admin
       private
 
       # Shorter labels and a deliberate order, so the titles don't derive from nav_select_links.
-      # The match does, so a shortcut can't disagree with the picker about which page it's on.
+      # The match does, so a shortcut and the picker agree on how wide the current page is.
       def shortcut_links
         {"Users" => admin_users_path,
          "Bikes" => admin_bikes_path,
@@ -82,8 +82,10 @@ module Admin
           .detect { |link| on_page?(link, match_for(link)) } || invoices_edit_link
       end
 
+      # The picker names the current page in prose, which UI::ActiveLink can't answer for it —
+      # the links themselves go active in the browser
       def on_page?(link, match)
-        UI::ActiveLink::Component.active?(path: link[:path], match:, view: helpers)
+        helpers.current_page_active?(link[:path], match == :controller)
       end
 
       def nav_link_for(path)

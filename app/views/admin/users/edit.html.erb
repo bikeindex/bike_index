@@ -160,7 +160,8 @@
   <hr style="margin-top: 60px;">
   <div class="mt-4 mb-4 row">
     <div class="col-sm-6 mb-4">
-      <%= link_to "Delete #{@user.email}!", admin_user_url(@user.id, method: :delete), data: { confirm: "Are you sure? Generally it's better to delete than ban" }, class: "btn btn-danger less-strong" %>
+      <%= render UI::ButtonLink::Component.new(text: "Delete #{@user.email}!", href: admin_user_path(@user.id), method: :delete, color: :error,
+        form: {onsubmit: "return confirm('#{j "Are you sure? Generally it's better to ban than delete"}')"}) %>
     </div>
 
     <div class="col-sm-6 mb-4">

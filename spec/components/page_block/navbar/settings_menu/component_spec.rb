@@ -27,7 +27,7 @@ RSpec.describe PageBlock::Navbar::SettingsMenu::Component, type: :component do
     let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
 
     it "links to the organization above a divider" do
-      expect(links.first).to eq "View Sweet Shop"
+      expect(links.first).to eq "Switch to Sweet Shop admin"
       expect(component).to have_css ".primary-submenu li.divider-nav-item"
     end
   end

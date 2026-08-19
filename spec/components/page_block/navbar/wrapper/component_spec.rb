@@ -6,12 +6,7 @@ RSpec.describe PageBlock::Navbar::Wrapper::Component, type: :component do
   it_behaves_like "cached_markup_digest"
 
   let(:current_user) { nil }
-  let(:passive_organization) { nil }
-  let(:instance) do
-    described_class.new(current_user:, current_user_or_unconfirmed_user: current_user, passive_organization:,
-      page_id: "welcome_index", controller_namespace: nil, controller_name: "welcome", action_name: "index")
-  end
-  # The request drives UI::ActiveLink, which resolves the items that pass no :active
+  let(:instance) { described_class.new(current_user:, current_user_or_unconfirmed_user: current_user) }
   let(:component) { with_request_url("/") { render_inline(instance) } }
 
   it "renders the logo, the primary menu and the signed out signup link" do
@@ -29,14 +24,22 @@ RSpec.describe PageBlock::Navbar::Wrapper::Component, type: :component do
       expect(component).to_not have_css "a.center-navbar-signup-link"
       expect(component).to_not have_css "#passive_organization_submenu"
       expect(component).to have_css "#setting_submenu"
+      expect(instance.org_sidebar?).to be false
     end
 
+    # The sidebar stands in for the whole bar, so this renders one or the other
     context "with a passive_organization" do
-      let(:passive_organization) { FactoryBot.create(:organization, short_name: "Sweet") }
+      let(:organization) { FactoryBot.create(:organization, short_name: "Sweet") }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
+      let(:instance) do
+        described_class.new(current_user:, current_user_or_unconfirmed_user: current_user,
+          passive_organization: organization)
+      end
 
-      it "renders the organization menu" do
-        expect(component).to have_css "#passive_organization_submenu", text: "Sweet"
-        expect(component).to have_css ".current-organization-submenu a"
+      it "renders the sidebar in place of the navbar" do
+        expect(instance.org_sidebar?).to be true
+        expect(component).to have_css "nav#org_sidebar_nav", text: "Sweet"
+        expect(component).to have_no_css "nav.primary-header-nav"
       end
     end
   end
@@ -49,13 +52,6 @@ RSpec.describe PageBlock::Navbar::Wrapper::Component, type: :component do
       expect(component).to_not have_css "#primary-main-menu"
       expect(component).to_not have_css ".hamburgler"
       expect(component).to_not have_css ".nonprofit-subtitle"
-    end
-  end
-
-  context "without page_id" do
-    it "raises rather than caching every page under one key" do
-      expect { described_class.new(current_user: nil, current_user_or_unconfirmed_user: nil) }
-        .to raise_error(ArgumentError, /page_id/)
     end
   end
 

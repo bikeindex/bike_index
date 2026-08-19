@@ -1,0 +1,76 @@
+<%# UI::Table instance_execs cell blocks against itself — @ivars and lazy t(".key") don't resolve inside them %>
+<% organization = current_organization %>
+<% claimed_ownerships = organization.enabled?("claimed_ownerships") %>
+<% bike_sticker = @bike_sticker %>
+<% sent_to_a_new_owner = t(".sent_to_a_new_owner") %>
+<% link_label = t(".link") %>
+
+<div class="row mt-4 mb-4">
+  <div class="col-sm-8">
+    <p>
+      <% num_bikes = safe_join([number_display(@pagy.count), " ", t(".bike").pluralize(@pagy.count)]) %>
+      <%= t(".num_bikes_registered_html", num_bikes:) %>
+      <em><%= humanized_time_range(@time_range) %></em>
+    </p>
+  </div>
+
+  <% if claimed_ownerships %>
+    <div class="col-sm-4">
+      <%= render(UI::Dropdown::Component.new(name: "#{@search_claimedness.titleize} registrations", active: @search_claimedness != "all")) do |dropdown| %>
+        <% %w[all initial transferred].each do |claimedness| %>
+          <% dropdown.with_entry_item(active: claimedness == @search_claimedness) { link_to "#{claimedness.titleize} registrations", organization_registrations_path(sortable_search_params.merge(search_claimedness: claimedness)) } %>
+          <% dropdown.with_entry_divider if claimedness == "all" %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<%= render(UI::Table::Component.new(records: @bikes)) do |table| %>
+  <% table.column(label: safe_join([t(".added"), " ", tag.small(class: "localizeTimezone")])) do |bike| %>
+    <%= link_to bike_path(bike, organization_id: organization.to_param), class: "twlink" do %>
+      <%= render(UI::Time::Component.new(time: bike.created_at)) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: t(".manufacturer")) { |bike| bike.mnfg_name } %>
+
+  <% table.column(label: t(".model")) { |bike| bike.frame_model } %>
+
+  <% table.column(label: t(".color")) { |bike| bike.frame_colors.to_sentence } %>
+
+  <% table.column(label: t(".sent_to")) do |bike| %>
+    <% first_owner_email = bike.first_owner_email %>
+    <%= claimed_ownerships ? bike.owner_email : first_owner_email %>
+
+    <small class="less-strong">
+      <% if bike.creation_description %>
+        <%= render(Org::OriginDisplay::Component.new(creation_description: bike.creation_description)) %>
+      <% end %>
+
+      <%= "(#{sent_to_a_new_owner})" unless bike.owner_email == first_owner_email %>
+    </small>
+  <% end %>
+
+  <%# table.column(label: "Claimed") %>
+
+  <% if organization.enabled?("bike_stickers") %>
+    <% table.column(label: t(".stickers")) do |bike| %>
+      <% bike.bike_stickers.each do |sticker| %>
+        <% url = edit_organization_sticker_path(id: sticker.code, organization_id: organization.to_param) if sticker.organization_id == organization.id %>
+        <%= render(Atom::Sticker::Component.new(bike_sticker: sticker, url:)) %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% if bike_sticker.present? %>
+    <% table.column(label: safe_join([link_label, tag.br, t(".sticker")])) do |bike| %>
+      <%= render(UI::ButtonLink::Component.new(text: link_label, method: :put, color: :link,
+        href: bike_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization_id, bike_id: bike.id))) %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<div class="pt-4 pb-4">
+  <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg)) %>
+</div>

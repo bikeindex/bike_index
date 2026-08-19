@@ -45,6 +45,8 @@ Scope it rather than running bare `bin/lint`: a whole-repo run reformats files o
 - **Every date/time** renders through `UI::Time::Component` — `render(UI::Time::Component.new(time: some_time))`. It emits the client-localized `localizeTime` span the frontend JS converts to the viewer's timezone. This is the *only* way to show a time: never `l(time, ...)`, `strftime`, `time_ago_in_words`, or a hand-written `localizeTime` span. Pass `format: :localize_time_precise` when you need seconds precision (default is `:localize_time`). It self-hides when `time` is nil, so no surrounding `if` guard is needed.
   - Legacy `l(time, format: :convert_time)` inside a `localizeTime` span predates the component and is still all over the admin tables. Convert one to `UI::Time::Component` whenever you touch the line it's on — including when it's the body of a `link_to`.
 
+**Building markup to pass into a component argument uses `capture`** — a component keyword like `UI::Alerts::Base`'s `header:` or `UI::Header`'s `text:` takes a string, so a heading that wraps a link or an `<em>` has to be captured first.
+
 ## A component dropped into legacy markup is styled on the component
 
 Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesheets/legacy_includes/_css_layers.scss`), which sorts below tailwind's `components` and `utilities`. So a `UI::*` component rendered inside legacy-styled markup **wins over the surrounding stylesheet's rules for every property its own classes set** — `UI::Button`'s `tw:inline-flex`, `tw:p-0` and `twlink` beat `.primary-header-nav`'s `display`, `padding` and `color` no matter how specific those selectors are.
@@ -72,6 +74,10 @@ The same instinct applies beyond buttons: **check `app/components/ui/` and `app/
 ## Typeaheads: always `UI::Forms::Combobox`
 
 **Every typeahead / autocomplete / combobox goes through `UI::Forms::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. See `app/components/ui/forms/combobox/` (component + `component_preview.rb`) and `spec/components/ui/forms/combobox` for how to invoke it.
+
+## Current-page links: always `UI::ActiveLink`
+
+**Every link that goes `aria-current` on the page it points at goes through `UI::ActiveLink::Component`** — never `current_page?` in a template, and never a Stimulus controller of your own comparing `window.location`. It always derives the state in the browser (`app/javascript/controllers/ui/active_link_controller.js`), so there's no way to pass the answer in: `match:` is the only control over what counts as the page it points at. Any layout rendering one opens its `<body>` with `body_tag`. See `app/components/ui/active_link/`.
 
 ## Showing and hiding elements: always use the collapse helpers
 
@@ -124,7 +130,7 @@ This project uses the ViewComponent gem to render components.
 - **Run `bin/update_component_digests` after editing markup that a cached component renders**, rather than computing a digest by hand. Components with a `MARKUP_DIGEST` (`PageBlock::Footer`, `PageBlock::Navbar::Wrapper`) fold it into their fragment cache key, and it follows `render X::Component` transitively — so editing any component they render, however far down, moves theirs too. The `cached_markup_digest` shared example is what catches a stale one.
 - **Change a component's signature, then open its `component_preview.rb`** — nothing renders previews in the suite, so a stale one raises `ArgumentError: unknown keyword` on its Lookbook page with the whole suite green. `curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/rails/view_components/<path>/component/<scenario>"` is the check.
 - **A component that `include`s a helper is coupled to whatever ivars that helper reads.** `GraphingHelper#humanized_time_range` reads `@period` off the object it's mixed into, so moving that ivar out of the component silently returns nil rather than failing. Pass the value as an argument when converting a component to explicit arguments.
-- **Converting a partial to a component is a faithful move, not a cleanup.** Carry the markup over verbatim — including comments and commented-out code. Those lines are often a deliberate stash (a link that's temporarily disabled, a snippet someone expects to restore), so dropping them silently loses intent and surprises the reviewer, who expects the diff to read as "same content, new home." The only changes a conversion should introduce are the mechanical ones the move *requires*: `t(".x")` → `translation(".x")`, adding `helpers.` where a helper now needs it, and the like. If you spot something that genuinely looks like dead code worth removing, that's a separate judgment call — raise it with the user or do it in its own commit, don't fold it into the move.
+- **Converting a partial — to a component, or from haml to ERB — is a faithful move, not a cleanup.** Carry the markup over verbatim — including comments and commented-out code. Those lines are often a deliberate stash (a link that's temporarily disabled, a snippet someone expects to restore), so dropping them silently loses intent and surprises the reviewer, who expects the diff to read as "same content, new home." The only changes a conversion should introduce are the mechanical ones the move *requires*: `t(".x")` → `translation(".x")`, adding `helpers.` where a helper now needs it, and the like. If you spot something that genuinely looks like dead code worth removing, that's a separate judgment call — raise it with the user or do it in its own commit, don't fold it into the move.
 
 ## Turbo is opt-in, and opting a form in has two consequences
 

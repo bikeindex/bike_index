@@ -579,6 +579,17 @@ RSpec.describe Organization, type: :model do
       expect(organization.slug).to eq(slug)
     end
 
+    # A blank short_name slugs to "", which OrganizationNameValidator rejects
+    context "blank short_name" do
+      let(:organization) { Organization.new(name:, short_name: " ") }
+
+      it "falls back to the name" do
+        expect(organization).to be_valid
+        expect(organization.short_name).to eq "something"
+        expect(organization.slug).to eq "something"
+      end
+    end
+
     context "tags" do
       let(:name) { "<script>alert(document.cookie)</script>" }
       it "doesn't xss" do
@@ -795,7 +806,7 @@ RSpec.describe Organization, type: :model do
         expect(organization.additional_registration_fields.include?("reg_student_id")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_bike_sticker")).to be_truthy
 
-        expect(organization.organization_affiliation_options).to eq([["Undergraduate Student", "student"], ["Graduate Student", "graduate_student"], ["Employee", "employee"], ["Community Member", "community_member"]])
+        expect(organization.organization_affiliation_options).to eq([["Undergraduate Student", "student"], ["Graduate Student", "graduate_student"], ["Postdoc", "postdoc"], ["Employee", "employee"], ["Community Member", "community_member"]])
       end
     end
   end

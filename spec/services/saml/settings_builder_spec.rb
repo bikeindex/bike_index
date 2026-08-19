@@ -15,6 +15,12 @@ RSpec.describe Saml::SettingsBuilder, :saml_env do
     expect(settings.assertion_consumer_service_binding).to eq Saml::SettingsBuilder::HTTP_POST
   end
 
+  # routes.rb has no /slo, so advertising one hands the IdP a URL that 404s
+  it "advertises no SLO endpoint" do
+    expect(settings.single_logout_service_url).to be_blank
+    expect(OneLogin::RubySaml::Metadata.new.generate(settings)).to_not include("SingleLogoutService")
+  end
+
   it "loads the SP keypair from ENV" do
     expect(settings.certificate).to eq sp_cert
     expect(settings.private_key).to eq sp_key
@@ -26,9 +32,10 @@ RSpec.describe Saml::SettingsBuilder, :saml_env do
     expect(settings.idp_cert).to include("BEGIN CERTIFICATE")
   end
 
-  it "enforces signed assertions + SHA-256" do
+  it "enforces signed assertions + SHA-256, and offers an encryption key" do
     expect(settings.security[:want_assertions_signed]).to be true
     expect(settings.security[:authn_requests_signed]).to be true
+    expect(settings.security[:want_assertions_encrypted]).to be true
     expect(settings.security[:digest_method]).to eq XMLSecurity::Document::SHA256
     expect(settings.security[:signature_method]).to eq XMLSecurity::Document::RSA_SHA256
   end

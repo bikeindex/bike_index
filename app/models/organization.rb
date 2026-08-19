@@ -483,7 +483,7 @@ class Organization < ApplicationRecord
     translation_scope =
       [:activerecord, :select_options, self.class.name.underscore, __method__]
 
-    %w[student graduate_student employee community_member]
+    %w[student graduate_student postdoc employee community_member]
       .map { |e| [I18n.t(e, scope: translation_scope), e] }
   end
 
@@ -556,7 +556,7 @@ class Organization < ApplicationRecord
     self.name = strip_name_tags(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
-    self.short_name = name_shortener(short_name || name)
+    self.short_name = name_shortener(short_name.presence || name)
     self.ascend_name = nil if ascend_name.blank?
     self.is_paid = current_invoices.any? || current_parent_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...

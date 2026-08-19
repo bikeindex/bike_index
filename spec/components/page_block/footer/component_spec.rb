@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe PageBlock::Footer::Component, type: :component do
   it_behaves_like "cached_markup_digest"
 
-  let(:instance) { described_class.new(current_user: nil, skip_facebook:, page_id: "welcome_index") }
+  let(:instance) { described_class.new(current_user: nil, skip_facebook:) }
   let(:component) { with_request_url("/") { render_inline(instance) } }
   let(:skip_facebook) { false }
   let(:pixel_id) { PageBlock::Footer::Component::FACEBOOK_PIXEL_ID }
@@ -17,6 +17,21 @@ RSpec.describe PageBlock::Footer::Component, type: :component do
     # produces a SyntaxError inside the inline <script> (entities aren't decoded there).
     expect(component.to_html).to include(%(fbq('init', "#{pixel_id}")))
     expect(component.to_html).to_not include("&quot;")
+  end
+
+  # Every post is the blog, not only its index
+  it "marks the blog link on any news page" do
+    link = component.css("a[href='/news']").first
+    expect(link["data-ui--active-link-match-value"]).to eq "controller"
+    expect(link["data-ui--active-link-routes-value"]).to eq "news"
+  end
+
+  # One cached render serves every page, so an action would send the language switch to
+  # whichever page filled the cache
+  it "renders the locale form without an action" do
+    form = component.css("form.locale-form").first
+    expect(form.attributes).to_not have_key("action")
+    expect(form["data-controller"]).to eq "page-block--locale-select"
   end
 
   context "with skip_facebook" do
@@ -34,7 +49,7 @@ RSpec.describe PageBlock::Footer::Component, type: :component do
     # one language serves the footer cached in another. See ApplicationComponentHelper#cache.
     it "varies the cached fragment by locale" do
       en = with_request_url("/") { render_inline(instance) }.to_html
-      nl = I18n.with_locale(:nl) { with_request_url("/") { render_inline(described_class.new(current_user: nil, skip_facebook:, page_id: "welcome_index")) } }.to_html
+      nl = I18n.with_locale(:nl) { with_request_url("/") { render_inline(described_class.new(current_user: nil, skip_facebook:)) } }.to_html
       expect(en).to include("Privacy policy")
       expect(nl).to_not include("Privacy policy")
     end

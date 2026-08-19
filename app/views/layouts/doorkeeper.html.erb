@@ -26,10 +26,7 @@
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
   </head>
 
-  <body
-    id="<%= page_id %>"
-    class="<%= 'organized-body' if main_content_organized? %>"
-  >
+  <%= body_tag do %>
     <%= render PageBlock::Navbar::Wrapper::Component.new(logo_only: true) %>
 
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
@@ -44,7 +41,7 @@
     </div>
 
     <%# OAuth pages never load the marketing pixel %>
-    <%= render PageBlock::Footer::Component.new(current_user:, skip_facebook: true, page_id:) %>
+    <%= render PageBlock::Footer::Component.new(current_user:, skip_facebook: true) %>
     <%= render "/shared/analytics" %>
-  </body>
+  <% end %>
 </html>

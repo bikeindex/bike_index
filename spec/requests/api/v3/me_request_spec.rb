@@ -23,17 +23,17 @@ RSpec.describe "Me API V3", type: :request do
       let(:role) { "member" }
       let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user:, role:) }
       let(:organization) { organization_role.organization }
+      # The grouped menu the sidebar renders, which is what this serves now
       let(:target_menu) do
         [
-          {type: "link", label: "#{organization.short_name} Bikes",
-           path: "/o/#{organization.slug}/registrations",
-           secondary: false, active: "on_registrations_index"},
-          {type: "disabled", label: "Incomplete registrations", secondary: true},
-          {type: "link", label: "Add a bike",
-           path: "/o/#{organization.slug}/bikes/new",
-           secondary: false, active: "on_bikes_new"},
-          {type: "divider"},
-          {type: "disabled", label: "Registration stickers", secondary: false}
+          {type: "group", key: "registrations", label: "#{organization.short_name} Registrations",
+           icon: "bike",
+           children: [
+             {type: "link", label: "Search Registrations", path: "/o/#{organization.slug}/registrations",
+              icon: nil, match: "controller_action", matching_controllers: []}
+           ]},
+          {type: "link", label: "Add a bike", path: "/o/#{organization.slug}/bikes/new",
+           icon: "plus-circle", match: "full_path", matching_controllers: []}
         ]
       end
       let(:target_membership) do

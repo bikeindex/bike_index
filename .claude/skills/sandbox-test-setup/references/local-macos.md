@@ -7,7 +7,9 @@ installed; the PATH just isn't right** — don't reinstall, don't edit
 the Gemfile. It surfaces differently depending on the entry point:
 
 - `bundle` / `bundle exec` → `Could not find 'bundler' (4.0.x)`
-- a `bin/` script (`bin/rspec`, `bin/lint`) → `uninitialized constant Pathname`
+- a `bin/` script (`bin/rspec`, `bin/lint`) → `uninitialized constant Pathname`,
+  or the same `Could not find 'bundler'` when it boots Rails
+  (`bin/update_component_digests`)
 
 Check first; only prefix PATH if `ruby -v` doesn't already print 4.0.6
 (`mise exec -- ruby`/`bundle` are unreliable in this harness — they

@@ -3,31 +3,33 @@
 module PageBlock
   module Navbar
     module Wrapper
-      # The site-wide header nav: the logo, then the organization menu and the primary menu.
+      # The site-wide header nav: the logo and the primary menu. A reader with a passive
+      # organization gets PageBlock::Navbar::OrgSidebar in its place, which this picks.
       # logo_only renders just the logo, for the OAuth authorization prompt.
       class Component < ApplicationComponent
         # Digest of the cached template — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "ee0cccd39559"
+        MARKUP_DIGEST = "797d4c94a9ab"
 
-        def initialize(logo_only: false, page_id: nil, current_user: nil, current_user_or_unconfirmed_user: nil,
-          passive_organization: nil, controller_namespace: nil, controller_name: nil, action_name: nil,
-          unregistered_parking_notification: nil)
-          # Everything below keys the fragment cache, so a caller that forgets one would
-          # otherwise share a single render across every page
-          raise ArgumentError, "page_id is required unless logo_only" if page_id.blank? && !logo_only
-
+        def initialize(logo_only: false, current_user: nil, current_user_or_unconfirmed_user: nil,
+          passive_organization: nil)
           @logo_only = logo_only
-          @page_id = page_id
           @current_user = current_user
           @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user
           @passive_organization = passive_organization
-          @controller_namespace = controller_namespace
-          @controller_name = controller_name
-          @action_name = action_name
-          @unregistered_parking_notification = unregistered_parking_notification
+        end
+
+        # The layout asks, since the sidebar is a column the page is laid out around
+        # rather than a bar above it
+        def org_sidebar?
+          org_sidebar.render?
         end
 
         private
+
+        def org_sidebar
+          @org_sidebar ||= PageBlock::Navbar::OrgSidebar::Component.new(organization: @passive_organization,
+            current_user: @current_user, current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user)
+        end
 
         # logo_only renders none of the elements the controller drives
         def controller_attributes
@@ -39,16 +41,9 @@ module PageBlock
                     "resize@window->page-block--navbar#reposition"}}
         end
 
+        # The whole nav renders the same on every page a user sees, so the user is the key
         def cache_key
-          [MARKUP_DIGEST, @page_id, @current_user_or_unconfirmed_user, @passive_organization,
-            @unregistered_parking_notification]
-        end
-
-        def organization_menu
-          PageBlock::Navbar::OrganizationMenu::Component.new(organization: @passive_organization,
-            current_user: @current_user, controller_namespace: @controller_namespace,
-            controller_name: @controller_name, action_name: @action_name,
-            unregistered_parking_notification: @unregistered_parking_notification)
+          [MARKUP_DIGEST, @current_user_or_unconfirmed_user]
         end
 
         def primary_menu

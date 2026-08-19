@@ -48,7 +48,11 @@
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
   </head>
 
-  <body id="<%= page_id %>" class="<%= body_class %>">
+  <%# The navbar picks between the bar and the sidebar; the body is laid out around whichever %>
+  <% navbar = PageBlock::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:,
+    passive_organization:) %>
+
+  <%= body_tag(html_class: class_names(body_class, "with-org-sidebar" => navbar.org_sidebar?)) do %>
     <a
       href="#main-content"
       class="
@@ -63,7 +67,7 @@
 
     <%= render(PageBlock::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
 
-    <%= render PageBlock::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:, passive_organization:, page_id:, controller_namespace:, controller_name:, action_name:, unregistered_parking_notification: @unregistered_parking_notification) %>
+    <%= render navbar %>
 
     <% if render_donation_request? %>
       <%= render PageBlock::LawEnforcementDonation::Component.new(current_user:) %>
@@ -110,8 +114,7 @@
           og_email: @og_email,
           edit_template: @edit_template,
           edit_templates: @edit_templates,
-          oauth_application: @application,
-          unregistered_parking_notification: @unregistered_parking_notification
+          oauth_application: @application
         )) do %>
           <%= yield %>
         <% end %>
@@ -119,14 +122,14 @@
     <% end %>
 
     <%# Skip the Meta pixel on org/oauth pages and when blocked params are present (search_email is PII, and the pixel %>
-    <%# auto-sends the URL query string). In the cache key too, since page_id ignores query params. %>
+    <%# auto-sends the URL query string) %>
     <% skip_facebook = controller_namespace.in?(%w[organized org_public oauth]) || controller_name == "organizations" || params.key?(:search_email) || params.key?(:proximity) %>
 
-    <%= render PageBlock::Footer::Component.new(current_user:, skip_facebook:, page_id:, passive_organization:) %>
+    <%= render PageBlock::Footer::Component.new(current_user:, skip_facebook:, passive_organization:) %>
 
     <script>
   I18n.defaultLocale = <%== I18n.default_locale.to_json %>
   I18n.locale = <%== I18n.locale.to_json %>
 </script>
-  </body>
+  <% end %>
 </html>

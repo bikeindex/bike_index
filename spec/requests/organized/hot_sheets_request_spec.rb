@@ -46,6 +46,20 @@ RSpec.describe Organized::HotSheetsController, type: :request do
           expect(assigns(:day)).to eq Time.current.to_date
         end
       end
+      context "with a bike recovered since the sheet was built" do
+        let(:stolen_record) { FactoryBot.create(:stolen_record_recovered) }
+        let!(:hot_sheet) do
+          FactoryBot.create(:hot_sheet, organization: current_organization,
+            stolen_record_ids: [stolen_record.id])
+        end
+        it "badges the recovery" do
+          get "#{base_url}?day=#{Time.current.to_date}"
+          expect(response.status).to eq(200)
+          expect(assigns(:hot_sheet)).to eq hot_sheet
+          expect(stolen_record.reload.recovered?).to be_truthy
+          expect(response.body).to include("Bike was recovered!")
+        end
+      end
       context "organization doesn't have location" do
         let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["hot_sheet"]) }
         it "redirects with error" do
