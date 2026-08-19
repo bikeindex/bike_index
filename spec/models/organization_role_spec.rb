@@ -163,6 +163,35 @@ RSpec.describe OrganizationRole, type: :model do
     end
   end
 
+  describe "leavable?" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:organization_role) { FactoryBot.create(:organization_role_claimed, organization:, role:) }
+    let(:role) { "member" }
+
+    it "is true for a member" do
+      expect(organization_role).to be_leavable
+    end
+
+    context "admin" do
+      let(:role) { "admin" }
+
+      it "is false" do
+        expect(organization_role).to_not be_leavable
+      end
+    end
+
+    context "organization grants the role by email domain" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["user_role_for_user_email_domain"])
+      end
+
+      it "is false" do
+        expect(organization_role).to_not be_leavable
+      end
+    end
+  end
+
   describe "reorder_to!" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let!(:organization_roles) { Array.new(3) { FactoryBot.create(:organization_role_claimed, user:) } }

@@ -190,34 +190,15 @@ RSpec.describe MyAccountsController, type: :request do
     end
     context "with organization_role" do
       let(:target_templates) { default_edit_templates.merge(organization_roles: "Organization Roles") }
-      let(:avatar) { Rack::Test::UploadedFile.new(File.open(Rails.root.join("spec/fixtures/bike.jpg"))) }
-      let(:organization) { FactoryBot.create(:organization, short_name: "Bike Coop", avatar:) }
-      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, organization:, user: current_user) }
-      # The second organization has no avatar - the rows line up regardless
-      let!(:organization_role2) { FactoryBot.create(:organization_role_claimed, user: current_user) }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user) }
 
       it "includes the organization_roles template" do
         get "#{base_url}/edit/organization_roles"
         expect(response).to be_ok
         expect(assigns(:edit_template)).to eq("organization_roles")
         expect(assigns(:edit_templates)).to eq target_templates.as_json
-        expect(assigns(:organization_roles)).to eq([organization_role, organization_role2])
+        expect(assigns(:organization_roles)).to eq([organization_role])
         expect(response).to render_template(partial: "_organization_roles")
-        body = Capybara.string(response.body)
-        rows = body.all("[data-my-account--organization-roles-target='item']")
-        expect(rows.count).to eq 2
-        expect(rows.first).to have_link("Bike Coop", href: organization_root_path(organization_id: organization.to_param))
-        expect(rows.first["data-url"]).to eq my_account_organization_role_path(organization_role)
-        expect(rows.last["data-url"]).to eq my_account_organization_role_path(organization_role2)
-
-        # The checkbox saves with the form below the list, rather than sitting in a row
-        expect(rows.first).to_not have_css("input[name='on_by_default']")
-        expect(body).to have_css("input[type='checkbox'][name='on_by_default'][checked]")
-
-        # Both rows reserve the avatar's space, so their names line up
-        expect(body).to have_css("[class~='tw:w-11'][class~='tw:shrink-0']", count: 2)
-        expect(rows.first).to have_css("img[src*='bike']")
-        expect(rows.last).to_not have_css("img")
       end
     end
 

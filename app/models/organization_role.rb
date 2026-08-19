@@ -131,6 +131,14 @@ class OrganizationRole < ApplicationRecord
     priority.zero?
   end
 
+  # An admin leaving could strand the organization, and a role the organization grants by email
+  # domain would only come back
+  def leavable?
+    return false if admin?
+
+    !organization.enabled?("user_role_for_user_email_domain")
+  end
+
   # Reorders the user's roles to put this one at position, counting from the first
   def reorder_to!(position)
     others = self.class.ordered_for(user).where.not(id:).to_a

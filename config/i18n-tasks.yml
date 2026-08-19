@@ -31,6 +31,7 @@ data:
     - ['components.emails.partials.{:}.*', 'app/components/emails/partials/\1/component.%{locale}.yml']
     - ['components.org.registration_sequence.{:}.*', 'app/components/org/registration_sequence/\1/component.%{locale}.yml']
     - ['components.page_block.main_content.{:}.*', 'app/components/page_block/main_content/\1/component.%{locale}.yml']
+    - ['components.page_block.my_account.{:}.*', 'app/components/page_block/my_account/\1/component.%{locale}.yml']
     - ['components.page_block.navbar.{:}.*', 'app/components/page_block/navbar/\1/component.%{locale}.yml']
     - ['components.page_block.user_alerts.{:}.*', 'app/components/page_block/user_alerts/\1/component.%{locale}.yml']
     - ['components.registrations.show.current_alerts.{:}.*', 'app/components/registrations/show/current_alerts/\1/component.%{locale}.yml']

@@ -135,7 +135,7 @@ Rails.application.routes.draw do
     post :toggle_show_redesign
     resources :messages, only: %i[index show create], controller: "my_accounts/messages"
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
-    resources :organization_roles, only: %i[update], controller: "my_accounts/organization_roles"
+    resources :organization_roles, only: %i[update destroy], controller: "my_accounts/organization_roles"
   end
   get "my_account/edit(/:edit_template)", to: "my_accounts#edit", as: :edit_my_account
 

@@ -26,6 +26,43 @@ RSpec.describe MyAccounts::OrganizationRolesController, type: :request do
     end
   end
 
+  describe "destroy" do
+    include_context :request_spec_logged_in_as_user
+    let(:organization) { FactoryBot.create(:organization, short_name: "Bike Coop") }
+    let!(:organization_role) { FactoryBot.create(:organization_role_claimed, organization:, user: current_user, role:) }
+    let(:role) { "member" }
+
+    it "leaves the organization" do
+      expect {
+        delete "#{base_url}/#{organization_role.id}"
+      }.to change(OrganizationRole, :count).by(-1)
+      expect(response).to redirect_to edit_my_account_url(edit_template: "organization_roles")
+      expect(flash[:success]).to match("Bike Coop")
+    end
+
+    context "admin of the organization" do
+      let(:role) { "admin" }
+
+      it "doesn't leave" do
+        expect {
+          delete "#{base_url}/#{organization_role.id}"
+        }.to_not change(OrganizationRole, :count)
+        expect(flash[:error]).to match("Bike Coop")
+      end
+    end
+
+    context "another user's role" do
+      let!(:other_organization_role) { FactoryBot.create(:organization_role_claimed) }
+
+      it "doesn't leave it" do
+        expect {
+          delete "#{base_url}/#{other_organization_role.id}"
+        }.to_not change(OrganizationRole, :count)
+        expect(response).to be_not_found
+      end
+    end
+  end
+
   context "not logged in" do
     let!(:organization_role) { FactoryBot.create(:organization_role_claimed) }
 
