@@ -27,7 +27,10 @@
     <div
       class="tw:mb-4"
       data-controller="register--propulsion"
-      data-action="form-persist:restored@window->register--propulsion#update"
+      data-action="
+        hw-combobox:selection->register--propulsion#update
+        form-persist:restored@window->register--propulsion#update
+      "
       data-register--propulsion-always-motorized-value="<%= CycleType::ALWAYS_MOTORIZED.to_json %>"
       data-register--propulsion-never-motorized-value="<%= CycleType::NEVER_MOTORIZED.to_json %>"
     >

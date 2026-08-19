@@ -68,49 +68,24 @@ RSpec.describe "Register flow", :js, type: :system do
     wait_for_details_step
   end
 
-  # An async combobox carries no options to map a saved id back to a name, so the server
-  # renders the display itself - and back to step 1 is where a raw id would show up instead
-  it "shows the manufacturer by name, not by id, when back returns to step 1" do
-    start_registration
-    page.go_back
-
-    expect(page).to have_field("b_param_manufacturer_id", with: "Surly")
-    # The id is what submits, and only ever from the hidden field
-    expect(find("input[name='b_param[manufacturer_id]']", visible: :all).value).to eq manufacturer.id.to_s
-    expect(page).to have_no_field("b_param_manufacturer_id", with: manufacturer.id.to_s)
-
-    # The manufacturer itself, rather than Manufacturer.other with the id as free text
-    expect(BParam.last.manufacturer_id).to eq manufacturer.id
-    expect(BParam.last.manufacturer_other).to be_blank
-
-    # This field is autofocused, so the click into it brings no focus event of its own -
-    # typing still replaces the restored name rather than mashing into the middle of it
-    find_field("b_param_manufacturer_id").click
-    send_keys("Kona")
-
-    expect(page).to have_field("b_param_manufacturer_id", with: "Kona")
-  end
-
-  # Step 1 saves nothing until it submits, so a reload before then has only the draft to go on
-  it "keeps a step 1 draft across a reload" do
+  it "keeps a step 1 draft across a reload, and comes back to what it submitted" do
     visit "/register/new"
     type_into("#b_param_manufacturer_id", "Surly")
     click_combobox_option("Surly")
     type_into("#b_param_cycle_type", "e-Scooter")
     click_combobox_option("e-Scooter")
     fill_in "b_param[owner_email]", with: owner_email
-    expect(page).to have_content("E-SCOOTER INFO")
     # An always-motorized type answers the electric question itself
     expect(page).to have_checked_field("Electric (motorized)", disabled: true)
 
+    # Nothing is saved until step 1 submits, so the reload has only the draft to go on
     visit page.current_url
 
     expect(page).to have_field("b_param_manufacturer_id", with: "Surly")
-    # The id is what submits, and it restores alongside the name it displays
-    expect(find("input[name='b_param[manufacturer_id]']", visible: :all).value).to eq manufacturer.id.to_s
     expect(page).to have_field("b_param_cycle_type", with: "e-Scooter")
     expect(page).to have_field("b_param[owner_email]", with: owner_email)
-    # A restored type reaches the section label a step away, and the electric checkbox
+    # The restored type reaches the section label and the electric checkbox, each of which
+    # is a controller away from the combobox that changed
     expect(page).to have_content("E-SCOOTER INFO")
     expect(page).to have_checked_field("Electric (motorized)", disabled: true)
 
@@ -120,6 +95,24 @@ RSpec.describe "Register flow", :js, type: :system do
     # The draft is what submits, not just what showed
     expect(BParam.last).to have_attributes(manufacturer_id: manufacturer.id, owner_email:,
       cycle_type: "e-scooter", motorized?: true)
+
+    # An async combobox carries no options to map a saved id back to a name, so the server
+    # renders the display itself - and back to step 1 is where a raw id would show up instead
+    page.go_back
+
+    expect(page).to have_field("b_param_manufacturer_id", with: "Surly")
+    # The id is what submits, and only ever from the hidden field
+    expect(find("input[name='b_param[manufacturer_id]']", visible: :all).value).to eq manufacturer.id.to_s
+    expect(page).to have_no_field("b_param_manufacturer_id", with: manufacturer.id.to_s)
+    # The manufacturer itself, rather than Manufacturer.other with the id as free text
+    expect(BParam.last.manufacturer_other).to be_blank
+
+    # This field is autofocused, so the click into it brings no focus event of its own -
+    # typing still replaces the restored name rather than mashing into the middle of it
+    find_field("b_param_manufacturer_id").click
+    send_keys("Kona")
+
+    expect(page).to have_field("b_param_manufacturer_id", with: "Kona")
   end
 
   it "starts a registration, keeps a full details draft across a reload, and completes" do

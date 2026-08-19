@@ -16,10 +16,10 @@ module Register
 
       private
 
-      # Turbo ignores a form's target unless it names an iframe, so a Turbo submission would
-      # render step 2 back inside the frame. Nor does autofocus belong in one - it scrolls
-      # the embedding page down to the frame on load. Nor does form-persist - a frame's
-      # localStorage is partitioned per embedding site, and blocked outright in Safari
+      # What a frame can't have: a Turbo submission, which Turbo would render back inside it
+      # (the target is ignored unless it names an iframe); autofocus, which scrolls the
+      # embedding page down to the frame on load; and form-persist, whose localStorage is
+      # partitioned per embedding site and blocked outright in Safari
       def form_options
         return {data: {turbo: false}, html: {target: "_top"}} if @embed
 
