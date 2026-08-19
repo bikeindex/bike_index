@@ -139,6 +139,7 @@ class Organization < ApplicationRecord
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_uniqueness_of :manufacturer_id, allow_blank: true
   validate :user_email_domain_format
+  validate :slug_stable_while_saml_live
   # Two SSO orgs on one domain would make saml_email_matching's pick arbitrary (name order),
   # silently sending logins to the wrong org's IdP. Non-SSO orgs may still share a domain.
   validates_uniqueness_of :user_email_domain, allow_blank: true,
@@ -628,6 +629,16 @@ class Organization < ApplicationRecord
   end
 
   private
+
+  # The SP entityID and ACS URL are built from the slug, and the IdP has them registered from
+  # onboarding - renaming silently breaks every login until someone re-registers the metadata
+  def slug_stable_while_saml_live
+    return unless persisted? && slug_changed? && slug_was.present?
+    return unless organization_saml_configuration&.enabled?
+
+    errors.add(:short_name, "can't change while SAML SSO is live - it would move the " \
+      "entityID and callback URL the IdP has registered. Disable SAML SSO first.")
+  end
 
   def user_email_domain_format
     return if user_email_domain.blank?

@@ -503,6 +503,31 @@ RSpec.describe Organization, type: :model do
     end
   end
 
+  describe "slug stability while SAML is live" do
+    let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled) }
+    let(:organization) { saml_configuration.organization }
+
+    it "blocks a short_name change, which would move the entityID the IdP has registered" do
+      original_slug = organization.slug
+      organization.short_name = "something-else"
+      expect(organization).to_not be_valid
+      expect(organization.errors.attribute_names).to include(:short_name)
+      expect(organization.reload.slug).to eq original_slug
+    end
+
+    it "permits changes that don't move the slug" do
+      expect(organization.update(name: "Renamed but same short_name")).to be_truthy
+    end
+
+    context "saml configuration not enabled" do
+      let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration) }
+      it "permits the change, since no IdP has the urls yet" do
+        expect(organization.update(short_name: "something-else")).to be_truthy
+        expect(organization.reload.slug).to eq "something-else"
+      end
+    end
+  end
+
   describe "user_email_domain uniqueness" do
     let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled) }
     let!(:sso_organization) { saml_configuration.organization }
