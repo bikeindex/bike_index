@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
-# The rows both account menus carry: the organizations the reader can switch between, and
-# their marketplace messages. PageBlock::Navbar::SettingsMenu renders them in the gear
-# dropdown and PageBlock::Navbar::OrgSidebar in its account block -- only one of the two is
-# ever on a page, and they'd read as different menus if each named these itself.
+# The organizations the reader can switch between, and their marketplace messages --
+# the rows PageBlock::Navbar::SettingsMenu carries beyond its own.
 #
-# Item shapes, which each component renders its own way:
+# Item shapes are UserServices::MenuItemsOrg's, so one renderer takes either list:
 #   {type: :divider}
-#   {label:, path:}
+#   {type: :link, label:, path:, icon:, match:, matching_controllers:}
 module UserServices
   module MenuItemsAccount
     extend Functionable
@@ -21,15 +19,15 @@ module UserServices
       return [] if organizations.none?
 
       organizations.map { |organization|
-        {label: translation(:switch_to_org, org_name: organization.name),
-         path: routes.organization_root_path(organization_id: organization.to_param)}
-      } + [{type: :divider}]
+        link(translation(:switch_to_org, org_name: organization.name),
+          routes.organization_root_path(organization_id: organization.to_param))
+      } + [divider]
     end
 
     def marketplace_messages(user)
       return nil unless MarketplaceMessage.any_for_user?(user)
 
-      {label: translation(:marketplace_messages), path: routes.my_account_messages_path}
+      link(translation(:marketplace_messages), routes.my_account_messages_path)
     end
 
     #
@@ -43,6 +41,14 @@ module UserServices
         .filter_map(&:organization).first(SWITCHER_ORGANIZATIONS)
     end
 
+    def link(label, path, icon: nil, match: :path, matching_controllers: [])
+      {type: :link, label:, path:, icon:, match:, matching_controllers:}
+    end
+
+    def divider
+      {type: :divider}
+    end
+
     def translation(key, **interpolations)
       I18n.t(key, scope: "shared.menu_items_account", **interpolations)
     end
@@ -51,6 +57,6 @@ module UserServices
       Rails.application.routes.url_helpers
     end
 
-    conceal :switchable_organizations, :translation, :routes
+    conceal :switchable_organizations, :link, :divider, :translation, :routes
   end
 end

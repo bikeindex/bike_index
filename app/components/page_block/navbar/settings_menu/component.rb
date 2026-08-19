@@ -21,14 +21,18 @@ module PageBlock
 
         def items
           [*UserServices::MenuItemsAccount.organization_switcher(@current_user_or_unconfirmed_user),
-            {label: translation(".your_registrations"), path: my_account_path},
+            link(translation(".your_registrations"), my_account_path),
             UserServices::MenuItemsAccount.marketplace_messages(@current_user),
-            {label: translation(".register_a_new_bike"), path: choose_registration_path},
-            {label: translation(".user_settings", user_email: @current_user_or_unconfirmed_user.email),
-             path: edit_my_account_path, id: "navUserSettingLink",
-             data: {email: @current_user_or_unconfirmed_user.email}},
+            link(translation(".register_a_new_bike"), choose_registration_path),
+            link(translation(".user_settings", user_email: @current_user_or_unconfirmed_user.email),
+              edit_my_account_path, id: "navUserSettingLink",
+              data: {email: @current_user_or_unconfirmed_user.email}),
             {type: :divider},
-            {label: translation(".logout"), path: goodbye_path, logout: true}].compact
+            link(translation(".logout"), goodbye_path, logout: true)].compact
+        end
+
+        def link(label, path, **attributes)
+          {type: :link, label:, path:, **attributes}
         end
       end
     end

@@ -14,9 +14,11 @@ RSpec.describe UserServices::MenuItemsAccount do
       let(:organization) { FactoryBot.create(:organization, name: "Brakebills") }
       let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user:, organization:) }
 
+      # The shape is UserServices::MenuItemsOrg's, so one renderer takes either list
       it "labels the row for the organization's admin, above a divider" do
         expect(described_class.organization_switcher(user))
-          .to eq([{label: "Switch to Brakebills admin", path: "/o/#{organization.to_param}"},
+          .to eq([{type: :link, label: "Switch to Brakebills admin", path: "/o/#{organization.to_param}",
+                   icon: nil, match: :path, matching_controllers: []},
             {type: :divider}])
       end
     end
@@ -55,7 +57,8 @@ RSpec.describe UserServices::MenuItemsAccount do
 
       it "links to the messages" do
         expect(described_class.marketplace_messages(user))
-          .to eq({label: "Marketplace messages", path: "/my_account/messages"})
+          .to eq({type: :link, label: "Marketplace messages", path: "/my_account/messages",
+                  icon: nil, match: :path, matching_controllers: []})
       end
     end
   end

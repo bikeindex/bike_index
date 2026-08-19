@@ -3,9 +3,10 @@
   <% dropdown.with_button { content } %>
 
   <% items.each do |item| %>
-    <% if item[:type] == :divider %>
+    <% case item[:type] %>
+    <% when :divider %>
       <% dropdown.with_entry_divider %>
-    <% else %>
+    <% when :link %>
       <% dropdown.with_entry_item do %>
         <%= link_to item[:label], item[:path], id: item[:id], data: item[:data],
               class: (PageBlock::Navbar::SettingsMenu::Component::LOGOUT if item[:logout]) %>
