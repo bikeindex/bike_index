@@ -70,7 +70,7 @@ module PageBlock
           return [] if organizations.none?
 
           organizations.map { |organization|
-            {label: translation(".view_org", org_name: organization.name),
+            {label: translation(".switch_to_org", org_name: organization.name),
              path: organization_root_path(organization_id: organization.to_param)}
           } + [{type: :divider}]
         end

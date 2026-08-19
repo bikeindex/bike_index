@@ -12,6 +12,6 @@ en:
           menu: Menu
           organization_crest: "%{org_name} crest"
           register_a_new_bike: Register a new bike
+          switch_to_org: Switch to %{org_name} admin
           user_settings: "%{user_email} settings"
-          view_org: View %{org_name}
           your_registrations: Your registrations

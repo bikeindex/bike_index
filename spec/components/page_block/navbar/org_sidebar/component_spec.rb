@@ -26,7 +26,7 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
     # The sidebar stands in for the navbar, so the account menu carries the organization
     # switcher and marketplace messages PageBlock::Navbar::SettingsMenu builds too
     expect(component.css("ul[role='menu'] li[role='menuitem'] a").map(&:text))
-      .to eq(["View Brakebills", "Your registrations", "Register a new bike",
+      .to eq(["Switch to Brakebills admin", "Your registrations", "Register a new bike",
         "kdewey@brakebills.edu settings", "Log out"])
   end
 
@@ -41,9 +41,9 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
     it "switches between the first five, and still reaches logout" do
       switcher = component.css("ul[role='menu'] li[role='menuitem'] a").map(&:text)
 
-      expect(switcher.count { |label| label.start_with?("View ") })
+      expect(switcher.count { |label| label.start_with?("Switch to ") })
         .to eq described_class::SWITCHER_ORGANIZATIONS
-      expect(switcher.first).to eq "View Brakebills"
+      expect(switcher.first).to eq "Switch to Brakebills admin"
       expect(switcher.last).to eq "Log out"
     end
   end
