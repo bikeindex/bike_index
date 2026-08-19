@@ -179,52 +179,20 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    services:
-      # Service images pull from Google's pull-through cache of Docker Hub's
-      # official images. Anonymous pulls from Docker Hub (and from AWS's
-      # public.ecr.aws mirror) are rate-limited per source IP; Actions runners
-      # share egress IPs, so on a busy push the parallel shards exhaust the
-      # quota and the job fails at "Initialize containers" with
-      # "toomanyrequests: Rate exceeded". mirror.gcr.io serves the identical
-      # official images without imposing that limit, and needs no credentials.
-      postgres:
-        image: mirror.gcr.io/library/postgres:16-alpine
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: rails
-          POSTGRES_PASSWORD: password
-        # needed because the postgres container does not provide a healthcheck
-        # tmpfs makes DB faster by using RAM
-        #
-        # health-interval 1s, not 10s: docker runs the FIRST check only after the
-        # interval elapses, so 10s meant every job idled ~10s+ waiting on a database
-        # that was ready in ~3s. pg_isready is cheap enough to poll every second.
-        # `-h 127.0.0.1` forces TCP — the entrypoint's temporary initdb-phase server
-        # listens only on the unix socket, so a plain pg_isready reports ready
-        # before the real server is up.
-        options: >-
-          --mount type=tmpfs,destination=/var/lib/postgresql/data
-          --health-cmd "pg_isready -h 127.0.0.1"
-          --health-interval 1s
-          --health-retries 60
-      redis:
-        # 7-alpine: pinned to match the review-app host's redis:7 accessory, and
-        # the alpine variant is a much smaller pull than debian-based latest.
-        image: mirror.gcr.io/library/redis:7-alpine
-        ports:
-          - 6379:6379
-        options: --entrypoint redis-server
+      # Postgres and redis are baked into the image and started in-job (below)
+      # rather than run as service containers, whose two registry pulls cost
+      # ~10s on every shard. tmpfs for the data directory is what the postgres
+      # service container used it for — RAM beats the overlay filesystem, and
+      # nothing here outlives the job.
+      options: --mount type=tmpfs,destination=/pgdata
     strategy:
       fail-fast: false
       matrix:
         ci_node_total: [5]
         ci_node_index: [0, 1, 2, 3, 4]
     env:
-      # `test` now runs inside the CI image (container:), so services are
-      # sibling containers reachable by name, not localhost.
-      REDIS_URL: redis://redis:6379
-      PGHOST: postgres
+      REDIS_URL: redis://127.0.0.1:6379
+      PGHOST: 127.0.0.1
       RAILS_ENV: test
       TZ: "America/Chicago"
       COVERAGE: false # additional configuration is needed for parallelized tests
@@ -275,6 +243,17 @@ jobs:
       # spec/support/axe.rb both ask for it by relative path.
       - name: Link node_modules into the workspace
         run: ln -sfn /node_modules node_modules
+      # `rails` as the initdb superuser and trust auth together satisfy the
+      # username/password config/database.yml hardcodes under CI. fsync off
+      # because a database on tmpfs has nothing to flush to.
+      - name: Start postgres and redis
+        run: |
+          redis-server --daemonize yes --save '' --appendonly no
+          chown postgres:postgres /pgdata && chmod 700 /pgdata
+          # Spelled out rather than left to PATH: su resets it for the target user
+          pgbin=$(echo /usr/lib/postgresql/*/bin)
+          su postgres -c "$pgbin/initdb -D /pgdata --username=rails --auth-local=trust --auth-host=trust --encoding=UTF8 --locale=C.UTF-8 --no-sync"
+          su postgres -c "$pgbin/pg_ctl -D /pgdata -l /tmp/postgres.log -w -o '-c listen_addresses=127.0.0.1 -c fsync=off -c full_page_writes=off -c synchronous_commit=off' start"
       - name: Set up database
         run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate
       - name: Sync translations (only on main by default)

@@ -38,7 +38,6 @@ RUN apt-get update -qq && \
       imagemagick \
       libvips \
       libyaml-0-2 \
-      postgresql-client \
       ripgrep \
       xz-utils && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
@@ -79,9 +78,6 @@ RUN npm ci --no-audit --no-fund
 
 FROM base AS final
 
-COPY --from=dependencies /usr/local/bundle /usr/local/bundle
-COPY --from=dependencies /node_modules /node_modules
-
 # The GitHub CLI, which every other job and bin/ script in this repo reaches for
 # — those run on the runner, which ships it; a container job has to bake it.
 # bin/check_translations is the one that needs it here. Man pages left behind.
@@ -89,6 +85,29 @@ ARG GH_VERSION=2.97.0
 RUN curl -fsSLo /tmp/gh.tar.gz "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz" && \
     tar -xzf /tmp/gh.tar.gz -C /usr/local --strip-components=1 --wildcards '*/bin/gh' && \
     rm /tmp/gh.tar.gz
+
+# Postgres and redis run inside this container rather than as service
+# containers, which cost ~10s of registry pulls per shard. Postgres comes from
+# PGDG because trixie ships 17 and this has to be the 16 that development and
+# production run — it also supplies the psql and pg_dump that db:schema:load
+# and the structure.sql dump shell out to, which have to match the server.
+# Redis is trixie's own 8; the service container pinned 7 to match the
+# review-app accessory, and CI is free to move ahead of it.
+ARG PG_VERSION=16
+RUN install -d /usr/share/postgresql-common/pgdg && \
+    curl -fsSLo /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+      https://www.postgresql.org/media/keys/ACCC4CF8.asc && \
+    echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt trixie-pgdg main" \
+      > /etc/apt/sources.list.d/pgdg.list && \
+    apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+      "postgresql-${PG_VERSION}" \
+      redis-server && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+ENV PATH="/usr/lib/postgresql/${PG_VERSION}/bin:${PATH}"
+
+COPY --from=dependencies /usr/local/bundle /usr/local/bundle
+COPY --from=dependencies /node_modules /node_modules
 
 # Driven by the playwright baked above rather than `npx playwright@<version>`, so
 # the browser can't drift from the package-lock.json the gems were built against.
