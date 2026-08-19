@@ -5,15 +5,11 @@ const TRANSITION_MS = 200
 
 // Connects to data-controller="page-block--navbar"
 //
-// The hamburgler menu and the two dropdowns. It toggles the markers
+// The hamburgler menu and the settings dropdown. It toggles the markers
 // primary_header_nav.scss already styles, so `open` lands on a toggle's parent
 // the way bootstrap's did.
 export default class extends Controller {
-  static targets = ['hamburgler', 'hamburglerButton', 'organizationToggle']
-
-  connect () {
-    this.truncateOrganizationName()
-  }
+  static targets = ['hamburgler', 'hamburglerButton']
 
   toggleMenu () {
     if (this.menuOpen) {
@@ -101,16 +97,5 @@ export default class extends Controller {
     if (!height) return
 
     this.element.style.setProperty('--navbar-bottom', `${bottom}px`)
-  }
-
-  // A wide passive organization name overflows and hides the rest of the small-screen
-  // navbar, so cap it at what the logo and hamburgler leave, less its margin and padding
-  truncateOrganizationName () {
-    if (!this.hasOrganizationToggleTarget || window.innerWidth >= 768) return
-
-    const available = this.element.querySelector('.container').clientWidth -
-      this.element.querySelector('.primary-logo').offsetWidth -
-      this.hamburglerTarget.offsetWidth
-    this.organizationToggleTarget.style.maxWidth = `${available - 102}px`
   }
 }

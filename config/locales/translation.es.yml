@@ -4577,6 +4577,7 @@ es:
         sent_to: Enviado a
         sent_to_a_new_owner: enviado a un nuevo propietario
         sticker: Etiqueta engomada
+        stickers: Pegatinas
       recoveries:
         description: Descripción
         mfg_model_color_html: fabricante, modelo, <span class="less-strong">color</span>

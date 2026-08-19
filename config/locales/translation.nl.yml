@@ -3866,6 +3866,7 @@ nl:
         sent_to: Verzonden naar
         sent_to_a_new_owner: verzonden naar een nieuwe eigenaar
         sticker: Sticker
+        stickers: stickers
       recoveries:
         description: Beschrijving
         mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>

@@ -15,8 +15,13 @@ export default class extends Controller {
   static values = { match: String, routes: String }
 
   connect () {
-    if (this.isActive()) this.element.setAttribute('aria-current', this.ariaCurrent())
-    else this.element.removeAttribute('aria-current')
+    if (!this.isActive()) return this.element.removeAttribute('aria-current')
+
+    this.element.setAttribute('aria-current', this.ariaCurrent())
+    // Announced for a menu that has to react to which of its links is the current one --
+    // a collapsed section opening around it. Fired from connect, which for a link runs
+    // after its ancestors', so a listener up the tree is already wired
+    this.dispatch('current')
   }
 
   get routeMatch () {

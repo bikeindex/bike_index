@@ -48,7 +48,11 @@
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
   </head>
 
-  <%= body_tag do %>
+  <%# The navbar picks between the bar and the sidebar; the body is laid out around whichever %>
+  <% navbar = PageBlock::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:,
+    passive_organization:) %>
+
+  <%= body_tag(html_class: class_names(body_class, "with-org-sidebar" => navbar.org_sidebar?)) do %>
     <a
       href="#main-content"
       class="
@@ -63,7 +67,7 @@
 
     <%= render(PageBlock::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
 
-    <%= render PageBlock::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:, passive_organization:, controller_namespace:, controller_name:, action_name:) %>
+    <%= render navbar %>
 
     <% if render_donation_request? %>
       <%= render PageBlock::LawEnforcementDonation::Component.new(current_user:) %>

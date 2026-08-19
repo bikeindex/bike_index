@@ -53,6 +53,26 @@ bundle exec rails tailwindcss:build
 (See the `integration-testing` skill — same rule applies to
 layout-rendering request specs, not just system specs.)
 
+## A `:js` spec runs precompiled JS when `public/assets` exists
+
+`public/assets/.sprockets-manifest.json` — left behind by any `bin/ci` or
+`bin/rails assets:precompile` run — is what the test environment resolves
+`controllers/**/*.js` through, so a Stimulus controller you just edited is
+served at whatever digest that manifest names. **The spec then exercises the
+old JavaScript and fails as if the change were wrong**, while the same page in
+`bin/dev` (which compiles live) behaves correctly.
+
+That split — works in the browser, fails under `rspec` — is the tell. Confirm
+before debugging the code:
+
+```bash
+grep -o "controllers/page_block/[a-z_]*controller[^\"]*" public/assets/.sprockets-manifest.json | head
+```
+
+Then delete `public/assets` — `rm -rf public/assets`, no need to ask. It's
+gitignored, and neither `bin/dev` nor the test environment needs it: both compile
+live without it.
+
 ## Whose machine it is decides who starts `bin/dev`
 
 `CLAUDE.md` says to stop and ask rather than starting a dev server. That holds on
