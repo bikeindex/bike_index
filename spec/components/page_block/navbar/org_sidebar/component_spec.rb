@@ -92,7 +92,7 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
     it "ends with the super admin link" do
       rows = component.css("[data-page-block--org-sidebar-target='scroller'] a")
 
-      expect(rows.last.text.strip).to eq "View Brakebills in super admin"
+      expect(rows.last.text.strip).to eq "Brakebills in super admin"
       expect(rows.last["href"]).to eq "/admin/organizations/#{organization.to_param}"
     end
 

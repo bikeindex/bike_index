@@ -218,7 +218,9 @@
             </div>
           <% when :link %>
             <%= render active_link(item, row_class:) do %>
-              <span class="tw:flex tw:flex-none"><%= icon(item[:icon], html_class: "tw:h-[17px] tw:w-[17px]") %></span>
+              <% if item[:icon].present? %>
+                <span class="tw:flex tw:flex-none"><%= icon(item[:icon], html_class: "tw:h-[17px] tw:w-[17px]") %></span>
+              <% end %>
 
               <span
                 class="

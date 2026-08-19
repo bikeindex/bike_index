@@ -53,8 +53,8 @@ module PageBlock
         def super_admin_items
           return [] unless @current_user.superuser?
 
-          [{type: :link, icon: "settings_slider", match: :path, matching_controllers: [],
-            label: translation(".view_in_super_admin", org_name: @organization.short_name),
+          [{type: :link, icon: nil, match: :path, matching_controllers: [],
+            label: translation(".in_super_admin", org_name: @organization.short_name),
             path: admin_organization_path(@organization.to_param)}]
         end
 

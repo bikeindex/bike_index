@@ -7,6 +7,6 @@ en:
           admin_panel: ADMIN PANEL
           collapse_sidebar: Collapse sidebar
           expand_sidebar: Expand sidebar
+          in_super_admin: "%{org_name} in super admin"
           menu: Menu
           organization_crest: "%{org_name} crest"
-          view_in_super_admin: View %{org_name} in super admin
