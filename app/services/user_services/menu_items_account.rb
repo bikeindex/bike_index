@@ -3,7 +3,7 @@
 # The organizations the reader can switch between, and their marketplace messages --
 # the rows PageBlock::Navbar::UserSettingsMenu carries beyond its own.
 #
-# Item shapes are UserServices::MenuItemsOrg's, so one renderer takes either list:
+# Item shapes are UserServices::MenuItemsOrg's, so the two menus read alike:
 #   {type: :divider}
 #   {type: :link, label:, path:, icon:, match:, matching_controllers:}
 module UserServices

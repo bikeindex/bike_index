@@ -47,7 +47,6 @@ module PageBlock
           @items ||= UserServices::MenuItemsOrg.for(organization: @organization, current_user: @current_user)
         end
 
-        # The sidebar stands in for the whole navbar, so it carries the gear's rows too
         def account_menu
           PageBlock::Navbar::UserSettingsMenu::Component.new(current_user: @current_user,
             current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user,

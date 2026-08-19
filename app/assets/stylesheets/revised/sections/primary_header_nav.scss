@@ -46,7 +46,9 @@ $mobile-nav-height: 4 * $vertical-height;
     display: block;
     margin: 0;
 
-    a {
+    // Direct children only -- the settings row holds a UI::Dropdown, whose entries
+    // would otherwise take the navbar's uppercased .h4
+    & > a {
       @extend .h4;
 
       margin: 0;
@@ -153,7 +155,7 @@ $mobile-nav-height: 4 * $vertical-height;
     }
 
     .primary-nav-item {
-      a {
+      & > a {
         padding: $vertical-height (2 * $vertical-height);
 
         &:active,
@@ -236,7 +238,7 @@ $mobile-nav-height: 4 * $vertical-height;
       float: right;
       position: relative;
 
-      a {
+      & > a {
         padding: 8px (0.5 * $grid-gutter-width);
 
         &[aria-current],

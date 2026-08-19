@@ -1,5 +1,4 @@
 <%= render UI::Dropdown::Component.new(name: @name, button_class: @button_class) do |dropdown| %>
-  <%# The caller's trigger, as content rather than a slot -- a slot this deep goes unevaluated %>
   <% dropdown.with_button { content } %>
 
   <% items.each do |item| %>
