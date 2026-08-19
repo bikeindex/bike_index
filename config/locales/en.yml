@@ -4793,6 +4793,9 @@ en:
       passwordless_help: We'll email you a secure link to sign in.
       sign_in_without_password: Sign in without a password
   shared:
+    account_menu_items:
+      marketplace_messages: Marketplace messages
+      switch_to_org: Switch to %{org_name} admin
     bike_search_form:
       anywhere: Anywhere
       doesnt_look_like_serial: >-

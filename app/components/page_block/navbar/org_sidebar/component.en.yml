@@ -8,10 +8,8 @@ en:
           collapse_sidebar: Collapse sidebar
           expand_sidebar: Expand sidebar
           logout: Log out
-          marketplace_messages: Marketplace messages
           menu: Menu
           organization_crest: "%{org_name} crest"
           register_a_new_bike: Register a new bike
-          switch_to_org: Switch to %{org_name} admin
           user_settings: "%{user_email} settings"
           your_registrations: Your registrations

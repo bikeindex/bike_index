@@ -30,24 +30,8 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
         "kdewey@brakebills.edu settings", "Log out"])
   end
 
-  context "with more organizations than the switcher shows" do
-    let!(:other_roles) do
-      (1..6).map do |i|
-        FactoryBot.create(:organization_role_claimed, user: current_user,
-          organization: FactoryBot.create(:organization, short_name: "Physical Kids #{i}"))
-      end
-    end
-
-    it "switches between the first five, and still reaches logout" do
-      switcher = component.css("ul[role='menu'] li[role='menuitem'] a").map(&:text)
-
-      expect(switcher.count { |label| label.start_with?("Switch to ") })
-        .to eq described_class::SWITCHER_ORGANIZATIONS
-      expect(switcher.first).to eq "Switch to Brakebills admin"
-      expect(switcher.last).to eq "Log out"
-    end
-  end
-
+  # The switcher and the messages row are UserServices::AccountMenuItems', which its own
+  # spec covers -- this is that they reach the menu
   context "with a marketplace message" do
     let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
     let!(:marketplace_message) do
