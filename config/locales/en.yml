@@ -4335,6 +4335,7 @@ en:
         sent_to: Sent to
         sent_to_a_new_owner: sent to a new owner
         sticker: Sticker
+        stickers: Stickers
       recoveries:
         description: Description
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
