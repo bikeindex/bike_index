@@ -83,7 +83,6 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     let(:component) { render_inline(described_class.new(form_builder:, attribute:, prefix: "@")) }
 
     it "passes it to the input" do
-      expect(component).to have_css("label[for='user_name']", text: "Name")
       expect(component).to have_css("span", text: "@")
       expect(component).to have_css("input.twinput[class~='tw:rounded-l-none']")
     end

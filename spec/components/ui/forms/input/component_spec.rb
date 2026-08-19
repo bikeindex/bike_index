@@ -12,9 +12,11 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
   let(:kind) { :text_field }
   let(:html_options) { {} }
 
-  it "renders a text field" do
+  it "renders a text field, unwrapped" do
     expect(component).to have_css("input[type='text'][name='user[name]']")
     expect(component.to_html).to include("twinput")
+    expect(component).to_not have_css("div")
+    expect(component).to_not have_css("input[class~='tw:rounded-l-none']")
   end
 
   context "when text_area" do
@@ -68,7 +70,6 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
     end
   end
 
-  # The prefix sits against the field's left edge, rather than on a line of its own
   context "with a prefix" do
     let(:component) { render_inline(described_class.new(form_builder:, attribute:, prefix: "@", html_options:)) }
 
@@ -76,12 +77,6 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
       expect(component).to have_css("div[class~='tw:flex'] > span", text: "@")
       expect(component).to have_css("div[class~='tw:flex'] > input.twinput[class~='tw:rounded-l-none']")
     end
-  end
-
-  it "renders no wrapper without a prefix" do
-    expect(component).to have_css("input.twinput")
-    expect(component).to_not have_css("div")
-    expect(component).to_not have_css("input[class~='tw:rounded-l-none']")
   end
 
   context "when required" do

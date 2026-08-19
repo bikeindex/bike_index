@@ -579,8 +579,7 @@ RSpec.describe Organization, type: :model do
       expect(organization.slug).to eq(slug)
     end
 
-    # A blank short_name slugs to "", which OrganizationNameValidator rejects - so it
-    # has to fall back to the name, like an absent one does
+    # A blank short_name slugs to "", which OrganizationNameValidator rejects
     context "blank short_name" do
       let(:organization) { Organization.new(name:, short_name: " ") }
 
