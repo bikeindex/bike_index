@@ -1053,6 +1053,7 @@ es:
           community_member: Miembro de la comunidad
           employee: Empleado
           graduate_student: Estudiante de posgrado
+          postdoc: Investigador postdoctoral
           student: Estudiante de pregrado
       stolen_record:
         bike_was_not_locked: La bicicleta no estaba cerrada con llave.
