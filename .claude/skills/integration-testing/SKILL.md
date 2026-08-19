@@ -95,12 +95,12 @@ most of the runtime, and merging examples doesn't touch it. Consolidating the tw
 settle saved the other ~32s.
 
 Wait on the condition instead, capped so a cancelled or infinite animation can't hang the
-example. `SETTLE_JS` in `spec/support/system_spec_helpers.rb` is the pattern — it awaits the
-element's own CSS transitions and races them against the old fixed duration as a ceiling.
-This is *stricter* than the sleep it replaced, not a trade: a state that transitions nothing
-returns in two frames, and one that transitions for longer than the old sleep is no longer
-measured mid-flight. Prove the wait is load-bearing before trusting it — drop the cap to 1ms
-and the assertions it protects should fail.
+example. `settle_animations` in `spec/support/system_spec_helpers.rb` is the one to reach for
+when a measurement follows a state change — it awaits the element's own transitions and races
+them against the cap as a ceiling. This is *stricter* than a sleep, not a trade: a state that
+transitions nothing returns in two frames, and one that runs longer than the sleep would have
+been is no longer measured mid-flight. Prove the wait is load-bearing before trusting it —
+drop the cap to 1ms and the assertions it protects should fail.
 
 `element.evaluate_script` may return a Promise; the driver awaits it before handing back.
 

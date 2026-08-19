@@ -53,15 +53,6 @@ module SystemSpecHelpers
     [computed_colors(element), computed_ring(element)]
   end
 
-  # Two frames for the new state's style to apply and create its transitions, then the
-  # transitions themselves -- these elements carry transition-colors, and a measurement
-  # taken the instant the state changes reads the color it's transitioning *from*, which
-  # makes an assertion that nothing changed pass no matter what the CSS says. A state
-  # that transitions nothing settles in those two frames rather than the full cap.
-  #
-  # Capped, and never merely slept: `finished` rejects when a transition is cancelled and
-  # never settles at all for an infinite animation, so the cap is what keeps either from
-  # hanging the example.
   SETTLE_JS = <<~JS
     Promise.race([
       new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
@@ -70,6 +61,20 @@ module SystemSpecHelpers
     ])
   JS
 
+  # Block until an element's transitions and animations have finished, for anything that
+  # measures what a state change left behind -- a measurement taken the instant the state
+  # changes reads the value it's transitioning *from*, which makes an assertion that
+  # nothing changed pass no matter what the CSS says. Two frames for the new style to
+  # apply and create the transitions, so a state that transitions nothing costs only those.
+  #
+  # Prefer this to a fixed sleep, which has to be as long as the slowest case and is still
+  # wrong when something outruns it. `cap` is the ceiling rather than the wait: `finished`
+  # rejects on a cancelled transition and never settles for an infinite animation, and the
+  # cap is what stops either hanging the example.
+  def settle_animations(element, cap: 400)
+    element.evaluate_script(format(SETTLE_JS, cap:))
+  end
+
   # Point at an element and hold the mouse down, yielding at each state so the caller
   # can measure. Capybara can hover but has no press-and-hold, and :active is only
   # reachable by actually holding the button down, the way a rider does.
@@ -77,14 +82,14 @@ module SystemSpecHelpers
   # Each yield is outside the driver block on purpose: Capybara's evaluate_script
   # returns nil while the raw page is checked out, which silently turns a caller's
   # measurement into nil == nil. The mouse holds its state between blocks.
-  def hover_then_press(element, settle: 400)
+  def hover_then_press(element, cap: 400)
     box = element.native.bounding_box
     x, y = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
-    move_mouse(element, settle:) { |mouse| mouse.move(x, y) }
+    move_mouse(element, cap:) { |mouse| mouse.move(x, y) }
     yield :hover
-    move_mouse(element, settle:, &:down)
+    move_mouse(element, cap:, &:down)
     yield :press
-    move_mouse(element, settle:) { |mouse| mouse.up.tap { mouse.move(0, 0) } }
+    move_mouse(element, cap:) { |mouse| mouse.up.tap { mouse.move(0, 0) } }
   end
 
   def browser_cookie_value(name)
@@ -223,12 +228,11 @@ module SystemSpecHelpers
 
   private
 
-  # Drive the raw mouse, then let the new state settle before the caller measures.
   # The settle is outside the driver block because evaluate_script returns nil while
   # the raw page is checked out -- the same trap the yields in hover_then_press avoid.
-  def move_mouse(element, settle:)
+  def move_mouse(element, cap:)
     page.driver.with_playwright_page { |playwright_page| yield playwright_page.mouse }
-    element.evaluate_script(format(SETTLE_JS, cap: settle))
+    settle_animations(element, cap:)
   end
 
   # Retry a Playwright action when the node detaches mid-action -- the raw
