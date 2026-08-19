@@ -42,12 +42,6 @@ module ApplicationHelper
     ) == :organized
   end
 
-  # Set by going back to the embed form, cleared by taking the register flow's link the
-  # other way - the organized menu follows it
-  def old_register_view?
-    session[:old_register_view].present?
-  end
-
   # Deprecated - UI::Forms::NestedFields::Component replaces this. Every set this adds shares one
   # child_index, so clicking twice submits a single record
   def link_to_add_fields(name, f, association, class_name: nil, obj_attrs: {}, filename: nil)
