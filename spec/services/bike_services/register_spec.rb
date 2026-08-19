@@ -51,14 +51,19 @@ RSpec.describe BikeServices::Register do
       end
 
       context "once step 1 is submitted" do
-        let!(:blank_b_param) do
-          BParam.create(origin: "register_flow", params: {bike: {manufacturer_id: 12}}.as_json)
+        let!(:started_b_param) do
+          BParam.create(origin: "register_flow", params: {bike: {manufacturer_id: 12, status: "status_with_owner"}}.as_json)
         end
 
-        it "creates a fresh registration" do
+        # What a link names would overwrite what step 1 was submitted with
+        it "returns it as it stands, rather than starting over on top of it" do
           expect {
-            expect(described_class.b_param_for(user:, token_id: blank_b_param.id_token)).to_not eq blank_b_param
-          }.to change(BParam, :count).by 1
+            expect(described_class.b_param_for(user:, token_id: started_b_param.id_token,
+              status: "status_stolen", email: "someone@example.com")).to eq started_b_param
+          }.to_not change(BParam, :count)
+
+          expect(started_b_param.reload.status).to eq "status_with_owner"
+          expect(started_b_param.owner_email).to be_blank
         end
       end
     end
@@ -80,6 +85,34 @@ RSpec.describe BikeServices::Register do
           # A prefilled email doesn't mark step 1 submitted
           expect(described_class.permitted_step(blank_b_param, "2", sequence: nil)).to eq "1"
         end
+      end
+    end
+  end
+
+  describe "discard_extra" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let!(:oldest) do
+      FactoryBot.create(:b_param_unfinished_registration, creator: user, updated_at: Time.current - 2.hours)
+    end
+    let!(:middle) do
+      FactoryBot.create(:b_param_unfinished_registration, creator: user, updated_at: Time.current - 1.hour)
+    end
+    let!(:most_recent) { FactoryBot.create(:b_param_unfinished_registration, creator: user) }
+
+    it "destroys every started registration but the most recent" do
+      expect { described_class.discard_extra(user:) }.to change(BParam, :count).by(-2)
+      expect(BParam.pluck(:id)).to eq([most_recent.id])
+    end
+
+    context "with a confirmation email out on one" do
+      before do
+        middle.generate_email_confirmation_token!
+        middle.update(updated_at: Time.current - 1.hour)
+      end
+
+      it "keeps it - the email promises the address it can still finish that registration" do
+        expect { described_class.discard_extra(user:) }.to change(BParam, :count).by(-1)
+        expect(BParam.pluck(:id)).to match_array([middle.id, most_recent.id])
       end
     end
   end

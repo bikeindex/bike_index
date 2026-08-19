@@ -72,7 +72,7 @@ RSpec.describe PageBlock::UserAlerts::Wrapper::Component, type: :component do
     # The b_param's own callback puts the alert on the user, so nothing else has to run
     it "renders the resume link" do
       expect(user.reload.alert_slugs).to eq ["unfinished_registration"]
-      expect(render_inline(component).text).to include("Your cargo bike isn't registered yet!")
+      expect(render_inline(component).text).to include("Your Surly cargo bike isn't registered yet!")
     end
 
     context "with a stolen bike missing its location too" do

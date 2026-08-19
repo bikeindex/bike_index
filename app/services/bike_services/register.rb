@@ -22,12 +22,14 @@ module BikeServices
       estimated_value locking_description lock_defeat_description proof_of_ownership
       receive_notifications phone_for_users phone_for_shops phone_for_police].freeze
 
-    # The token's registration when step 1 was never submitted (redirecting into
-    # it can't surprise anyone), otherwise a new one. A signed-in user's email
-    # prefills owner_email - manufacturer_id is the submitted-step-1 marker.
+    # The token's registration, which "Register a bike" goes back to rather than starting
+    # over on top of - as it stands once step 1 is submitted, since the status and email a
+    # link names would overwrite what was entered there. A new one once it has its bike.
+    # A signed-in user's email prefills owner_email.
     def b_param_for(user:, token_id: nil, status: nil, email: nil)
       status = nil unless Bike.statuses.include?(status)
       existing = find_token(session_token: token_id, user:)
+      return existing if in_progress?(existing)
       return assign_start_params(existing, user, email:, status:) if reusable?(existing)
 
       bike_params = {owner_email: owner_email_for(user, email), status:}.compact
@@ -46,26 +48,30 @@ module BikeServices
     end
 
     # The start over link. Destroyed rather than left behind: its token would still resume
-    # it, and it would go on alerting its creator to come back to what they discarded.
-    # Kept once a confirmation link is out - that email promises the address it can still
-    # finish this registration
+    # it, and it would go on alerting its creator to come back to what they discarded
     def discard(token:, user:)
-      b_param = find_token(params_token: token, user:)
-      return unless b_param&.origin == "register_flow" && !b_param.with_bike? &&
-        b_param.email_confirmation_sent_at.blank?
+      destroy_discardable(find_token(params_token: token, user:))
+    end
 
-      b_param.destroy
+    # Two waiting at most - the one new lands on and the one before it. Ordered the way
+    # the unfinished_registration alert picks its one, so what goes is what it would
+    # never have pointed at
+    def discard_extra(user:)
+      return if user.blank?
+
+      user.b_params.unfinished_registrations.reorder(:updated_at).to_a[0..-2]
+        .each { |b_param| destroy_discardable(b_param) }
     end
 
     # An organization can be named in the URL after the registration starts
     # (/register?...&organization_id=slug), right up until the bike is created. Without one
     # named, who the registrant is stands in - which step 2 offers to drop, so a link's
     # organization clears the marker that puts the offer there
-    def assign_organization(b_param, organization, user: nil)
+    def assign_organization(b_param, organization, user: nil, passive_organization: nil)
       return if b_param.with_bike?
       # Step 1 posts back the organization it rendered with, which doesn't make an
       # automatic assignment into the named kind
-      return assign_auto_organization(b_param, user) if organization.blank? ||
+      return assign_auto_organization(b_param, user, passive_organization) if organization.blank? ||
         organization.id == b_param.auto_organization_id
       return if b_param.creation_organization_id.to_s == organization.id.to_s
 
@@ -301,12 +307,14 @@ module BikeServices
     end
 
     # Once, and not past step 2 - step 2's checkbox is the only chance to decline, and
-    # dropping it there leaves the marker behind saying the organization was taken
-    def assign_auto_organization(b_param, user)
+    # dropping it there leaves the marker behind saying the organization was taken.
+    # The passive organization is the one they're currently acting as, which says which
+    # of several theirs this registration is for
+    def assign_auto_organization(b_param, user, passive_organization = nil)
       return if user.blank? || b_param.auto_organization_assigned? ||
         b_param.creation_organization_id.present? || details_completed?(b_param)
 
-      organization = auto_organization(user)
+      organization = passive_organization || auto_organization(user)
       bike = {creation_organization_id: organization.id} if organization.present?
       b_param.clean_params({auto_organization_id: organization&.id || 0, bike:}.compact.as_json)
       b_param.save
@@ -398,6 +406,20 @@ module BikeServices
       b_param.present? && !b_param.with_bike? && b_param.manufacturer_id.blank?
     end
 
+    # manufacturer_id is the submitted-step-1 marker
+    def in_progress?(b_param)
+      b_param.present? && !b_param.with_bike? && b_param.manufacturer_id.present?
+    end
+
+    # Kept once a confirmation link is out - that email promises the address it can still
+    # finish this registration
+    def destroy_discardable(b_param)
+      return unless b_param&.origin == "register_flow" && !b_param.with_bike? &&
+        b_param.email_confirmation_sent_at.blank?
+
+      b_param.destroy
+    end
+
     # Every step the registration has reached, in order - each one opens the next, so the
     # flow stops at the first that hasn't been done
     def permitted_steps(b_param, sequence, steps)
@@ -474,7 +496,7 @@ module BikeServices
     conceal :auto_organization, :assign_auto_organization, :set_auto_organization,
       :claim_creator, :create_bike_if_ready, :create_bike, :ready_for_bike?,
       :details_and_acknowledged?, :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
-      :impound_report_attrs, :reusable?, :permitted_steps, :step_completed?,
+      :impound_report_attrs, :reusable?, :in_progress?, :destroy_discardable, :permitted_steps, :step_completed?,
       :confirmed_email_creator_id, :owner_email_for, :assign_start_params, :reused_owner_email, :details_completed?,
       :step_2_params, :translation
   end

@@ -22,15 +22,16 @@ class RegisterController < ApplicationController
   # flow: the two stolen bike alerts open their modal on load, over a registration in progress
   before_action { @skip_general_alert = true }
 
-  # Redirects into step 1 with a token (reusing the session's registration when
-  # it's still blank), so going back from step 2 lands on the same registration
+  # Redirects into the session's registration with a token, at the step it reached, so
+  # "Register a bike" goes back to one in progress rather than starting over on top of it
   def new
     BikeServices::Register.discard(token: params[:discard_token], user: current_user)
+    BikeServices::Register.discard_extra(user: current_user)
     start_registration
     # The same filter every other action runs, so reusing the session's
     # registration can't quietly drop the organization the URL named
     assign_organization
-    redirect_to step_path(1)
+    redirect_to step_path(resumed_step)
   end
 
   # Step 1 framed on an organization's landing page. It renders rather than redirecting into
@@ -199,8 +200,8 @@ class RegisterController < ApplicationController
     register_path(b_param_token: @b_param.id_token, step:)
   end
 
-  # The registration new and embed start from - the session's still-blank one when it has
-  # one, so going back from step 2 (or reloading the frame) lands on the same registration
+  # The registration new and embed start from - the session's when it has one, so going
+  # back from step 2 (or reloading the frame) lands on the same registration
   def start_registration
     @b_param = BikeServices::Register.b_param_for(user: current_user, token_id: reusable_token,
       status: start_status, email: params[:email])
@@ -224,7 +225,14 @@ class RegisterController < ApplicationController
   end
 
   def assign_organization
-    BikeServices::Register.assign_organization(@b_param, current_organization, user: current_user)
+    BikeServices::Register.assign_organization(@b_param, current_organization,
+      user: current_user, passive_organization:)
+  end
+
+  # Where a resumed registration left off - a new one has only step 1
+  def resumed_step
+    BikeServices::Register.permitted_step(@b_param, nil,
+      sequence: BikeServices::Register.registration_sequence(@b_param))
   end
 
   # Resolved once - the step math, the progress bar and the pages themselves all read it

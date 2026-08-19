@@ -145,8 +145,10 @@ module ControllerHelpers
     return admin_root_url if current_user.superuser?
     return my_account_url unless current_user.default_organization.present?
 
+    # Every bike rather than default_bike_search_path: law enforcement is here to search
+    # the whole registry, not the handful their own organization registered
     if user_root_bike_search?
-      default_bike_search_path
+      every_bike_search_path
     else
       organization_root_url(organization_id: current_user.default_organization.to_param)
     end
@@ -171,6 +173,12 @@ module ControllerHelpers
   end
 
   def default_bike_search_path
+    return every_bike_search_path if passive_organization.blank?
+
+    organization_registrations_path(organization_id: passive_organization.to_param)
+  end
+
+  def every_bike_search_path
     search_registrations_path(stolenness: "all")
   end
 
