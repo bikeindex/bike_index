@@ -18,14 +18,13 @@ module PageBlock
         LOGOUT_NAVBAR = "tw:text-red-400! tw:hover:text-red-300!"
 
         def initialize(current_user:, current_user_or_unconfirmed_user:, dropdown:,
-          current_organization: nil, name: nil, button_class: nil, open: false)
+          current_organization: nil, name: nil, button_class: nil)
           @current_user = current_user
           @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user
           @dropdown = dropdown
           @current_organization = current_organization
           @name = name
           @button_class = button_class
-          @open = open
         end
 
         private

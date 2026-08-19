@@ -15,15 +15,12 @@ module UI
         }
       }
 
-      # open: renders it already expanded
-      def initialize(name:, button_class: nil, button_color: :secondary, button_size: :md, active: false,
-        open: false)
+      def initialize(name:, button_class: nil, button_color: :secondary, button_size: :md, active: false)
         @name = name
         @button_class = button_class
         @button_color = button_color
         @button_size = button_size
         @active = active
-        @open = open
       end
 
       private

@@ -23,10 +23,8 @@ module PageBlock
           render_menu(0)
         end
 
-        # The one rendered open: the group stacks them, and an open menu is absolutely
-        # positioned, so a second would render over whatever follows it
         def one_organization
-          render_menu(1, open: true)
+          render_menu(1)
         end
 
         # Viewing in one of them, so the row for it is the disabled one
@@ -37,14 +35,14 @@ module PageBlock
 
         private
 
-        def render_menu(organization_count, viewing: nil, open: false)
+        def render_menu(organization_count, viewing: nil)
           organizations = Array.new(organization_count) do |i|
             Organization.new(name: "Preview Organization #{i + 1}", short_name: "Preview #{i + 1}",
               slug: "preview-organization-#{i + 1}")
           end
 
           render_with_template(template: "page_block/navbar/user_settings_menu/component_preview/menu",
-            locals: {user: built_user(organizations), open:,
+            locals: {user: built_user(organizations),
                      current_organization: viewing && organizations[viewing]})
         end
 

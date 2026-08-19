@@ -1,5 +1,5 @@
 <% if @dropdown %>
-  <%= render UI::Dropdown::Component.new(name: @name, button_class: @button_class, open: @open) do |dropdown| %>
+  <%= render UI::Dropdown::Component.new(name: @name, button_class: @button_class) do |dropdown| %>
     <% dropdown.with_button { content } %>
 
     <% items.each do |item| %>
