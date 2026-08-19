@@ -2,7 +2,7 @@
   <div class="<%= helpers.organized_container %>">
     <%# the layout skips its own spot for this, so it lands inside the content column %>
     <% if @show_general_alert %>
-      <%= render PageBlock::UserAlerts::Wrapper::Component.new(current_user: @current_user, wrapper_class: nil) %>
+      <%= render PageBlock::UserAlerts::Wrapper::Component.new(current_user: @current_user, wrapper_class: "tw:my-4") %>
     <% end %>
 
     <% if OrganizationDisplayer.law_enforcement_missing_verified_features?(@current_organization) %>
