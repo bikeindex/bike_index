@@ -104,10 +104,6 @@ module Admin
         end
       end
 
-      def deleted_item_active?(value)
-        value.nil? ? !deleted_active? : @render_deleted == value
-      end
-
       def default_table_view
         helpers.render(partial: "table", locals: {collection: @collection, render_sortable: @render_sortable})
       end

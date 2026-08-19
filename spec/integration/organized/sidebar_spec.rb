@@ -110,7 +110,9 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     visit "/my_account"
 
     expect_open("#{organization.short_name} Registrations")
-    expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", visible: :all
+    # The scroller holds the menu rows -- the account block below it points at /my_account,
+    # so one of its own rows is current here
+    expect(page).to have_no_css "[data-page-block--org-sidebar-target='scroller'] a[aria-current]", visible: :all
     # Open, but no more the page than any other group
     expect(page).to have_no_css "#org_sidebar_nav button[data-active='true']"
   end

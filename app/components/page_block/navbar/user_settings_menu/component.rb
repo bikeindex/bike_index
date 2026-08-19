@@ -11,9 +11,6 @@ module PageBlock
       # below the navbar breakpoint sits inline in the hamburgler menu rather than behind a
       # trigger at all.
       class Component < ApplicationComponent
-        # UI::Dropdown puts its active colors on the li, for an entry that knows whether it's
-        # current when it renders. These resolve in the browser, so the row wears them itself
-        CURRENT = "tw:is-active:bg-purple-500 tw:is-active:text-white"
         # Logout is the only row that isn't somewhere to go. red-700 against the navbar's
         # near-black panel is unreadable, so that one takes the tint that carries on dark
         LOGOUT = "tw:text-red-700! tw:hover:bg-red-50! tw:hover:text-red-600!"
@@ -49,7 +46,7 @@ module PageBlock
         def entry(item)
           UI::ActiveLink::Component.new(text: item[:label], path: item[:path], match: item[:match],
             matching_controllers: item[:matching_controllers], data: item[:data] || {},
-            id: item[:id], class: item[:logout] ? LOGOUT : CURRENT)
+            id: item[:id], class: (LOGOUT if item[:logout]))
         end
 
         # MenuLink carries the navbar's own link classes, and hands the rest to UI::ActiveLink
