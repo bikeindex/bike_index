@@ -14,7 +14,7 @@ module UI
       end
 
       def call
-        heading = content_tag(@tag, @text.presence || content, class: header_classes)
+        heading = content_tag(@tag, heading_text, class: header_classes)
         return heading if @subtitle.blank?
 
         safe_join([heading,
@@ -22,6 +22,12 @@ module UI
       end
 
       private
+
+      # An empty heading renders as an invisible, unannounced landmark rather than failing
+      def heading_text
+        @text.presence || content.presence ||
+          raise(ArgumentError, "text: or block content is required")
+      end
 
       def header_classes
         [TAG_CLASSES.fetch(@tag, "tw:text-2xl"), @subtitle.present? ? "tw:mb-1" : "tw:mb-6",
