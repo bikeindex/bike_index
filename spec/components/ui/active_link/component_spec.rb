@@ -149,6 +149,46 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     end
   end
 
+  # Every menu renders its manifest's links through this, so the defaults are what a manifest
+  # that leaves a key out gets
+  describe "from_item" do
+    let(:item) { {type: :link, label: "Help", path: "/help"} }
+    let(:component) { render_inline(described_class.from_item(item, **options)) }
+
+    it "fills in the match, and renders no class" do
+      expect(link["href"]).to eq "/help"
+      expect(link.text).to eq "Help"
+      expect(link["data-ui--active-link-match-value"]).to eq "path"
+      expect(link.attributes).to_not have_key("class")
+      expect(link.attributes).to_not have_key("id")
+    end
+
+    context "with the keys a menu item can carry" do
+      let(:item) do
+        {type: :link, label: "Blog", path: "/news", match: :controller,
+         matching_controllers: ["blogs"], id: "navBlog", data: {email: "party@bikeindex.org"}}
+      end
+      let(:options) { {link_class: "nav-link"} }
+
+      it "passes each of them through" do
+        expect(link["class"]).to eq "nav-link"
+        expect(link["id"]).to eq "navBlog"
+        expect(link["data-email"]).to eq "party@bikeindex.org"
+        expect(link["data-ui--active-link-routes-value"]).to eq "news blogs"
+      end
+    end
+
+    # A sidebar row's label sits inside a block with its icon, so it isn't the link's text
+    context "with text: nil" do
+      let(:options) { {text: nil} }
+      let(:component) { render_inline(described_class.from_item(item, **options)) { "Block" } }
+
+      it "takes the block's content over the item's label" do
+        expect(link.text).to eq "Block"
+      end
+    end
+  end
+
   context "with html_options and data" do
     let(:options) { {id: "footer-help", target: "_blank", data: {turbo: false, controller: "ui--dropdown"}} }
 

@@ -14,6 +14,15 @@ module UI
       # The matches the browser answers with a route rather than with the URL
       ROUTE_MATCHES = [:controller, :controller_action].freeze
 
+      # A menu manifest — UserServices::MenuItemsOrg's or MenuItemsAccount's — carries a link as
+      # a hash, and every menu rendering one turns it into this component the same way. What
+      # differs is the class, and text: for a row whose label sits inside a block with its icon.
+      def self.from_item(item, link_class: nil, text: item[:label])
+        new(path: item[:path], text:, match: item[:match] || :path,
+          matching_controllers: item[:matching_controllers] || [], data: item[:data] || {},
+          id: item[:id], class: link_class)
+      end
+
       def initialize(path:, text: nil, match: :path, matching_controllers: [], query: {}, data: {},
         **html_options)
         raise_if_invalid_value!(:match, match, MATCHES)

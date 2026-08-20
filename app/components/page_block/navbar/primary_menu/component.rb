@@ -50,8 +50,8 @@ module PageBlock
         end
 
         def nav_link(item)
-          UI::ActiveLink::Component.new(text: item[:label], path: item[:path],
-            match: item[:match] || :path, class: ["nav-link", item[:link_class]].compact.join(" "))
+          UI::ActiveLink::Component.from_item(item,
+            link_class: ["nav-link", item[:link_class]].compact.join(" "))
         end
       end
     end

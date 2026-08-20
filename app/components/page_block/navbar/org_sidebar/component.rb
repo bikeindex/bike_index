@@ -61,7 +61,7 @@ module PageBlock
         def super_admin_items
           return [] unless @current_user.superuser?
 
-          [{type: :link, icon: nil, match: :path, matching_controllers: [], super_admin: true,
+          [{type: :link, super_admin: true,
             label: translation(".in_super_admin", org_name: @organization.short_name),
             path: admin_organization_path(@organization.to_param)}]
         end
@@ -79,8 +79,7 @@ module PageBlock
 
         # text: is the caller's, since a top-level row's label sits inside a block with its icon
         def active_link(item, row_class:, text: nil)
-          UI::ActiveLink::Component.new(path: item[:path], text:, match: item[:match],
-            matching_controllers: item[:matching_controllers], class: row_class)
+          UI::ActiveLink::Component.from_item(item, link_class: row_class, text:)
         end
 
         def row_class

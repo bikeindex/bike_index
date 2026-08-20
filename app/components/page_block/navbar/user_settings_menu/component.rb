@@ -27,9 +27,8 @@ module PageBlock
 
         # .nav-link is the navbar's own, which the submenu's rows take with the rest of its links
         def entry(item)
-          UI::ActiveLink::Component.new(text: item[:label], path: item[:path], match: item[:match],
-            matching_controllers: item[:matching_controllers], data: item[:data] || {},
-            id: item[:id], class: ["nav-link", (LOGOUT if item[:danger])].compact.join(" "))
+          UI::ActiveLink::Component.from_item(item,
+            link_class: ["nav-link", (LOGOUT if item[:danger])].compact.join(" "))
         end
       end
     end
