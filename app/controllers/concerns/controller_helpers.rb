@@ -11,7 +11,7 @@ module ControllerHelpers
 
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
-      :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
+      :current_organization, :passive_organization, :current_location,
       :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
       :render_donation_request?
@@ -133,10 +133,6 @@ module ControllerHelpers
     else
       render layout: layout
     end
-  end
-
-  def user_root_bike_search?
-    OrganizationRole.default_organization(current_user)&.law_enforcement?
   end
 
   def user_root_url
