@@ -1,0 +1,27 @@
+<div class="admin-subnav">
+  <div class="col">
+    <h1>
+      <%= @title %>
+
+      <% if @subtitle.present? %>
+        <small><%= @subtitle %></small>
+      <% end %>
+    </h1>
+  </div>
+
+  <div class="col">
+    <ul>
+      <% links.each do |link| %>
+        <li class="nav-item"><%= link %></li>
+      <% end %>
+    </ul>
+  </div>
+
+  <% if alert? %>
+    <div class="col-md-6 mt-4"><%= alert %></div>
+  <% end %>
+</div>
+
+<nav class="tw:mb-4" aria-label="<%= @nav_label %>">
+  <%= render(UI::ButtonGroup::Component.new(entries: @tabs)) %>
+</nav>

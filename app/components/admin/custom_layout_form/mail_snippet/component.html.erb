@@ -1,0 +1,46 @@
+<div class="form form-horizontal clearfix">
+  <%= render(UI::Alerts::ObjectError::Component.new(object: @organization)) %>
+
+  <%= form_for @organization, as: :organization, url: form_url, action: "update" do |f| %>
+    <%= f.fields_for :mail_snippets do |snippet| %>
+      <% if snippet.object.kind == @edit_template %>
+        <div class="form-group">
+          <%= snippet.label :body, "#{snippet.object.kind.titleize} snippet" %>
+          <%= snippet.text_area :body, placeholder: description_for(snippet.object.kind), rows: 10, class: "form-control" %>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-check">
+              <label>
+                <%= snippet.check_box :is_enabled, class: "form-check-input" %>
+                Enable <strong><%= @edit_template.titleize %></strong> snippet
+                <em>only possible if there is content</em>
+              </label>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <%= f.submit "Save", class: "btn btn-success float-right" %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <div class="mt-4"></div>
+</div>
+
+<ul
+  id="public_images"
+  class="list-unstyled mt-4 not-blog-public-images"
+  data-order-url="<%= order_public_images_url %>"
+>
+  <% if @mail_snippet.public_images %>
+    <%= render partial: "public_images/admin_public_image", collection: @mail_snippet.public_images, as: :public_image, locals: {skip_order: true} %>
+  <% end %>
+</ul>
+
+<section class="custom-layouts">
+  <%= render partial: "public_images/admin_new_form", locals: {imageable_type: "MailSnippet"} %>
+</section>

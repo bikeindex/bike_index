@@ -1,5 +1,4 @@
 <%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :edit)) %>
 
-<%= render layout: "tab_form", locals: {tab: "edit"} do |form_builder| %>
-  <%= render(Admin::OrganizationForm::Wrapper::Component.new(form_builder:)) %>
-<% end %>
+<%= render(Admin::OrganizationForm::TabForm::Component.new(organization: @organization, tab: "edit",
+      fields_component: Admin::OrganizationForm::Wrapper::Component)) %>

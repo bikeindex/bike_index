@@ -1,31 +1,14 @@
-<div class="admin-subnav">
-  <div class="col">
-    <h1>
-      <%= @organization.name %>
-
-      <% if @subtitle.present? %>
-        <small><%= @subtitle %></small>
-      <% end %>
-    </h1>
-  </div>
-
-  <div class="col">
-    <ul>
-      <% top_right_links.each do |link| %>
-        <li class="nav-item"><%= link %></li>
-      <% end %>
-    </ul>
-  </div>
+<%= render(Admin::RecordTabs::Component.new(title: @organization.name, subtitle: @subtitle,
+      tabs:, nav_label: "Organization sections")) do |record_tabs| %>
+  <% top_right_links.each do |top_right_link| %>
+    <% record_tabs.with_link { top_right_link } %>
+  <% end %>
 
   <% if @organization.deleted? %>
-    <div class="col-md-6 mt-4">
+    <% record_tabs.with_alert do %>
       <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "Organization deleted")) do %>
         <%= render(UI::Time::Component.new(time: @organization.deleted_at, format: :localize_time_precise, preposition: true)) %>
       <% end %>
-    </div>
+    <% end %>
   <% end %>
-</div>
-
-<nav class="tw:mb-4" aria-label="Organization sections">
-  <%= render(UI::ButtonGroup::Component.new(entries: tabs)) %>
-</nav>
+<% end %>

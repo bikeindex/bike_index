@@ -1,0 +1,54 @@
+<%= render(UI::Alerts::ObjectError::Component.new(object: @landing_page)) %>
+
+<%= form_for @landing_page, url: form_url, html: {method: :patch} do |f| %>
+  <%= hidden_field_tag :kind, "landing_page" %>
+
+  <% if @landing_page.persisted? %>
+    <div class="mb-2">
+      <%= link_to "Version history", version_history_path, class: "twlink" %>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <% enabled_mismatch_error = @landing_page.enabled_mismatch_error %>
+
+    <% if enabled_mismatch_error.present? %>
+      <%= render(UI::Alerts::Base::Component.new(kind: :error, margin_classes: "tw:mb-2", text: enabled_mismatch_error)) %>
+    <% end %>
+
+    <%= f.text_area :body, placeholder: "Landing page (html)", rows: 20, class: "form-control" %>
+
+    <% if @suggested_button_hover.present? %>
+      <%= render(UI::Alerts::Base::Component.new(kind: :notice, margin_classes: "tw:mt-2")) do %>
+        The register frame names a button color but no hover color. Add
+        <code><%= hover_param %></code> to its src to set the shade it currently
+        derives.
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="row align-items-center">
+    <div class="col">
+      <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :enabled, label: "Enabled")) %>
+    </div>
+
+    <div class="col-auto">
+      <%= f.submit "Save", class: "btn btn-success float-right" %>
+    </div>
+  </div>
+<% end %>
+
+<%# Because somewhere, there is overflow hidden and it cuts off the bottom of the save button %>
+<ul
+  id="public_images"
+  class="list-unstyled mt-4 not-blog-public-images"
+  data-order-url="<%= order_public_images_url %>"
+>
+  <% if @organization.public_images %>
+    <%= render partial: "public_images/admin_public_image", collection: @organization.public_images, as: :public_image, locals: {skip_order: true} %>
+  <% end %>
+</ul>
+
+<section class="custom-layouts">
+  <%= render partial: "public_images/admin_new_form", locals: {imageable_type: "Organization"} %>
+</section>

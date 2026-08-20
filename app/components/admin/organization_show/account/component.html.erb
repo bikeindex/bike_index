@@ -1,0 +1,108 @@
+<div class="col-md-6">
+  <table class="table-list">
+    <tr>
+      <td>Auto user email</td>
+
+      <td>
+        <%= @organization.auto_user.email if @organization.auto_user.present? %>
+      </td>
+    </tr>
+
+    <% if helpers.display_dev_info? %>
+      <tr class="small">
+        <td class="only-dev-visible">API V1 token</td>
+
+        <td class="only-dev-visible">
+          <div id="stupidLegacyToken" style="overflow-x: scroll;">
+            <code class="small"><%= @organization.access_token %></code>
+          </div>
+        </td>
+      </tr>
+      <tr class="small">
+        <td class="only-dev-visible">User Reg all bikes?</td>
+
+        <td class="only-dev-visible">
+          <%= @organization.user_registration_all_bikes? %>
+        </td>
+      </tr>
+    <% end %>
+
+    <tr>
+      <td>Users</td>
+
+      <td>
+        <%= link_to @organization.users.count, admin_users_path(organization_id: @organization.to_param) %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Sent Invites</td>
+
+      <td>
+        <%= number_with_delimiter @organization.sent_invitation_count %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Remaining invites</td>
+
+      <td>
+        <% if @organization.restrict_invitations? %>
+          <%= number_with_delimiter @organization.remaining_invitation_count %>
+        <% else %>
+          <em>permitted domain, no invite restrictions</em>
+        <% end %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Website</td>
+
+      <td>
+        <%= @organization.website %>
+
+        <% if @organization.website.present? %>
+          <%= link_to @organization.website, class: "strong" do %>
+            &#128279;
+          <% end %>
+        <% end %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>POS integration:</td>
+
+      <td>
+        <% if @organization.no_pos? %>
+          <em class="small less-strong">no integration</em>
+        <% elsif @organization.ascend_or_broken_ascend? %>
+          <%= link_to "Ascend POS", organization_bulk_imports_path(organization_id: @organization.to_param) %>
+          <small>Ascend name: <em><%= @organization.ascend_name %></em></small>
+        <% elsif @organization.broken_pos? %>
+          <span class="text-danger">POS Integration broken!</span>
+          <%= @organization.pos_kind.humanize %>
+        <% elsif @organization.does_not_need_pos? %>
+          <small class="less-strong">Does not need POS integration</small>
+        <% end %>
+
+        <% if @organization.lightspeed_pos? || @organization.broken_pos? && @organization.bikes.lightspeed_pos.any? %>
+          <%= link_to "Lightspeed POS", "https://posintegration.bikeindex.org/admin/organizations/#{@organization.id}" %>
+        <% end %>
+
+        <% if helpers.display_dev_info? && @organization.manual_pos_kind.present? %>
+          <small class="only-dev-visible d-inline-block ml-2">
+            <em class="less-strong">manual POS kind set:</em>
+            <%= @organization.manual_pos_kind %>
+          </small>
+        <% end %>
+
+        <% if !@organization.no_pos? || @organization.opted_into_theft_survey_2023 %>
+          <small class="ml-3">
+            <span class="less-strong">theft survey?</span>
+            <%= @organization.opted_into_theft_survey_2023 %>
+          </small>
+        <% end %>
+      </td>
+    </tr>
+  </table>
+</div>

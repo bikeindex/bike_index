@@ -1,0 +1,104 @@
+<div class="col-md-6">
+  <table class="table-list">
+    <% if helpers.display_dev_info? %>
+      <tr class="small only-dev-visible">
+        <td>ID</td>
+        <td><%= @organization.id %></td>
+      </tr>
+    <% end %>
+
+    <tr>
+      <td>Short Name</td>
+
+      <td>
+        <%= @organization.short_name %>
+
+        <% if CredibilityScorer.organization_trusted?(@organization) %>
+          <span class="badge badge-success ml-2">Trusted credibility</span>
+        <% elsif CredibilityScorer.organization_suspicious?(@organization) %>
+          <span class="badge badge-warning ml-2">Suspicious credibility</span>
+        <% end %>
+
+        <% if @organization.spam_registrations %>
+          <small class="ml-1 text-danger">high spam registrations</small>
+        <% end %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Map</td>
+
+      <td>
+        <% unless @organization.approved %>
+          <strong>Not approved</strong>
+          <small>therefor hidden</small>
+          <em>Would be</em>
+        <% end %>
+
+        <% if @organization.show_on_map %>
+          <span class="less-strong">Shown on map</span>
+        <% else %>
+          <strong>Not Shown</strong>
+        <% end %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Kind</td>
+
+      <td>
+        <%= @organization.kind_humanized %>
+
+        <% if @organization.enabled?("official_manufacturer") %>
+          <% unless @organization.kind == "bike_manufacturer" %>
+            <span class="text-warning">
+              Kind should be "Bike Manufacturer"
+            </span>
+          <% end %>
+          <br>
+          <% if @organization.manufacturer_id.present? %>
+            <strong><%= @organization.manufacturer.name %></strong>
+            <em class="less-strong">Manufacturer official account of</em>
+          <% else %>
+            <strong class="text-danger">No Manufacturer assigned</strong>
+            <span class="less-strong">
+              <%= link_to "edit organization", edit_admin_organization_path(@organization) %>
+              to add
+            </span>
+          <% end %>
+        <% end %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Slug</td>
+
+      <td>
+        <%= @organization.slug %> |
+        <%= link_to "embed", embed_registrations_url(organization_id: @organization.to_param) %>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Created</td>
+
+      <td>
+        <span class="localizeTime preciseTime">
+          <%= l @organization.created_at, format: :convert_time %>
+        </span>
+
+        <small class="localizeTimezone"></small>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Updated</td>
+
+      <td>
+        <span class="localizeTime preciseTime">
+          <%= l @organization.updated_at, format: :convert_time %>
+        </span>
+      </td>
+    </tr>
+  </table>
+</div>

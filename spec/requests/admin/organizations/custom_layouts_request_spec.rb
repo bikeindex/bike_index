@@ -38,7 +38,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           }.to_not change(OrganizationLandingPage, :count)
           expect(response.status).to eq(200)
           expect(response).to render_template(:edit)
-          expect(response).to render_template("_landing_page")
+          expect(response.body).to include 'placeholder="Landing page (html)"'
           expect(response.body).to_not match("search_item_type=OrganizationLandingPage")
           expect(response.body).to_not include "button_hover"
           expect(response.body).to include organization_landing_path(organization_id: organization.to_param)
@@ -118,7 +118,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
               get "#{base_url}/#{snippet_kind}/edit"
               expect(response.status).to eq(200)
               expect(response).to render_template(:edit)
-              expect(response).to render_template("_mail_snippet")
+              expect(response.body).to include "#{snippet_kind.titleize} snippet"
               organization.reload
               expect(organization.mail_snippets.count).to eq 1
               expect(organization.mail_snippets.where(kind: snippet_kind).count).to eq 1

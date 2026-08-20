@@ -1,0 +1,93 @@
+<% unless @render_deleted %>
+  <style>.deleted-col { display: none; }</style>
+<% end %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light sortable">
+      <th><%= column("name") %></th>
+      <th class="small"><%= column("approved") %></th>
+      <th><%= column("created_at") %></th>
+      <th><%= column("bikes") %></th>
+      <th>OrganizationRoles</th>
+      <th>Type</th>
+      <th><%= column("pos_kind", "POS") %></th>
+      <th class="deleted-col"><%= column("deleted_at") %></th>
+      <th>Locations</th>
+    </thead>
+
+    <tbody>
+      <% @organizations.each do |organization| %>
+        <% cache([organization, MARKUP_DIGEST]) do %>
+          <tr>
+            <td>
+              <%= link_to organization.name, admin_organization_url(organization) %>
+
+              <small class="less-strong"><%= "paid" if organization.paid? %></small>
+
+              <% parent_names = regional_parent_names(organization) %>
+
+              <% if parent_names.any? %>
+                <div class="small mt-1">
+                  <em class="less-strong"><%= "region parent".pluralize(parent_names.count) %>:</em>
+                  <%= safe_join(parent_names.map { |name| link_to(name, admin_organization_url(name), class: "gray-link") }, ", ") %>
+                </div>
+              <% end %>
+
+              <% if organization.parent_organization.present? %>
+                <div class="small mt-1">
+                  <em class="less-strong text-warning">parent:</em>
+                  <%= link_to organization.parent_organization.short_name, admin_organization_url(organization.parent_organization), class: "less-strong" %>
+                </div>
+              <% end %>
+            </td>
+
+            <td class="table-cell-check">
+              <%= check_mark if organization.approved %>
+            </td>
+
+            <td>
+              <%= render(UI::Time::Component.new(time: organization.created_at)) %>
+            </td>
+
+            <td><%= number_display(organization.bikes.count) %></td>
+
+            <td>
+              <%= number_display(organization.organization_roles.count) %>
+            </td>
+
+            <td>
+              <%= link_to organization.kind_humanized, kind_path(organization) %>
+            </td>
+
+            <td>
+              <% if organization.bike_shop? || organization.pos? %>
+                <small>
+                  <%= link_to pos_kind_display(organization).humanize, pos_path(organization), class: pos_link_class(organization) %>
+                </small>
+              <% end %>
+            </td>
+
+            <td class="deleted-col">
+              <% if organization.deleted_at.present? %>
+                <small class="text-danger">
+                  <%= render(UI::Time::Component.new(time: organization.deleted_at)) %>
+                </small>
+              <% end %>
+            </td>
+
+            <td>
+              <div class="less-strong-hold">
+                <%= number_display(organization.locations.count) %>
+
+                <% if organization.show_on_map %>
+                  <span class="less-strong-right">Mapped</span>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

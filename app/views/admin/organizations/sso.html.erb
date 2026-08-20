@@ -1,9 +1,8 @@
 <%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :sso)) %>
 
 <% if @organization.enabled?("saml_sso") %>
-  <%= render layout: "tab_form", locals: {tab: "sso"} do |form_builder| %>
-    <%= render(Admin::OrganizationForm::SamlSso::Component.new(form_builder:)) %>
-  <% end %>
+  <%= render(Admin::OrganizationForm::TabForm::Component.new(organization: @organization, tab: "sso",
+        fields_component: Admin::OrganizationForm::SamlSso::Component)) %>
 <% else %>
   <p class="less-strong">
     SAML SSO is not enabled for this organization. Enable it through

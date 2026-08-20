@@ -1,0 +1,41 @@
+<div class="col-sm-6">
+  <table class="table-list">
+    <tr>
+      <td>Active:</td>
+
+      <td>
+        <strong>
+          <% if @invoice.active? %>
+            "Yes"
+          <% elsif @invoice.expired? %>
+            <em class="small text-danger">Expired</em>
+          <% elsif @invoice.future? %>
+            <em class="small text-danger">Starts in the future</em>
+          <% else %>
+            no
+          <% end %>
+        </strong>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <% if @invoice.expired? %>
+          Expired:
+        <% else %>
+          Expires:
+        <% end %>
+      </td>
+
+      <td>
+        <% if @invoice.endless? %>
+          <span class="text-warning">Endless</span> (invoice never ends)
+        <% elsif @invoice.subscription_end_at.present? %>
+          <span class="localizeTime preciseTimeSeconds">
+            <%= l @invoice.subscription_end_at, format: :convert_time %>
+          </span>
+        <% end %>
+      </td>
+    </tr>
+  </table>
+</div>

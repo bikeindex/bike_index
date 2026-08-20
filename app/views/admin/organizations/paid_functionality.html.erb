@@ -1,9 +1,8 @@
 <%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :paid_functionality)) %>
 
 <% if @organization.paid? %>
-  <%= render layout: "tab_form", locals: {tab: "paid_functionality"} do |form_builder| %>
-    <%= render(Admin::OrganizationForm::FeatureSettings::Component.new(form_builder:, current_user:)) %>
-  <% end %>
+  <%= render(Admin::OrganizationForm::TabForm::Component.new(organization: @organization, tab: "paid_functionality",
+        fields_component: Admin::OrganizationForm::FeatureSettings::Component, fields_args: {current_user:})) %>
 <% else %>
   <p class="less-strong">
     This organization has no paid functionality to configure. Features are

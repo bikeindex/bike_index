@@ -1,0 +1,78 @@
+<div class="col-sm-6">
+  <table class="table-list">
+    <tr>
+      <td>Associated invoices:</td>
+
+      <td>
+        <ul>
+          <li>
+            Previous:
+            <% if @invoice.previous_invoice.present? %>
+              <%= link_to @invoice.previous_invoice.display_name, edit_admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.previous_invoice.id) %>
+            <% end %>
+          </li>
+
+          <li>
+            Next:
+            <% if @invoice.following_invoice.present? %>
+              <%= link_to @invoice.following_invoice.display_name, edit_admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.following_invoice.id) %>
+            <% else %>
+              <% if @invoice.paid_in_full? %>
+                <strong>
+                  <%= link_to "create following invoice", admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.id, create_following_invoice: true), method: "PUT", action: "update" %>
+                </strong>
+              <% else %>
+                Invoice must be paid before you can create a following invoice
+              <% end %>
+            <% end %>
+          </li>
+
+          <li>
+            <small class="less-strong">
+              <%= link_to "all organization invoices", admin_organization_invoices_path(@invoice.organization) %>
+            </small>
+          </li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td>Paid in full:</td>
+
+      <td>
+        <strong><%= @invoice.paid_in_full? ? "Yes" : "No" %></strong>
+
+        <span class="less-strong">
+          <%= MoneyFormatter.money_format(@invoice.amount_paid_cents, @invoice.currency_name) %>
+        </span>
+
+        <ul class="mb-2">
+          <% @invoice.payments.each do |payment| %>
+            <li>
+              <%= link_to "#{payment.amount_formatted}", admin_payment_path(payment) %>
+
+              <%= render(UI::Time::Component.new(time: payment.created_at, preposition: true)) %>
+            </li>
+          <% end %>
+        </ul>
+
+        <% if @invoice.law_enforcement_functionality_invoice? %>
+          <strong class="less-strong"> Verified Law Enforcement functionality </strong>
+          invoice
+        <% end %>
+
+        <% if @invoice.paid_money_but_no_cost? %>
+          <strong class="less-strong">Amount due is $0</strong> this invoice
+          doesn't make the organization "Paid"
+          <% if @invoice.payments.any? %>
+            <span class="d-block mt-1">
+              <strong class="text-danger">This invoice has a payment,</strong>
+              but because amount due is $0, this doesn't make the organization
+              isn't marked "paid"
+            </span>
+          <% end %>
+        <% end %>
+      </td>
+    </tr>
+  </table>
+</div>

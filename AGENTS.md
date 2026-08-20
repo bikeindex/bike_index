@@ -99,6 +99,7 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 - **Multi-database**: primary (`ApplicationRecord`) + analytics (`AnalyticsRecord`). Use `db:migrate:down:analytics` for analytics migrations
 - **Soft delete**: some models use `acts_as_paranoid` with `deleted_at` column; use `unscoped` in admin controllers when needed
 - **Admin search**: `sortable_search_params` auto-includes any param starting with `search_`
+- **Admin record screens are tabs**: a record with more than one super-admin page gets `Admin::RecordTabs::Component` — the header, the top-right links, and one `UI::ButtonGroup` row of tabs. A section names its tabs in a component of its own (`Admin::OrganizationTabs` is the pattern) rather than in each view, and passes `active:` explicitly, since a failed `update` renders its tab while `action_name` is still `"update"`. Don't hand-roll `.admin-subnav` markup for a new one; the ~40 views that still do predate this.
 
 # Initial setup
 

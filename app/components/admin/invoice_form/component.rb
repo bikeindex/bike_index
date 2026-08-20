@@ -1,0 +1,43 @@
+# frozen_string_literal: true
+
+module Admin
+  module InvoiceForm
+    # The invoice form, on both new and edit. The feature checkboxes and the running totals
+    # are driven by the vendored admin bundle, which finds them by id.
+    class Component < ApplicationComponent
+      def initialize(organization:, invoice:, organization_features:)
+        @organization = organization
+        @invoice = invoice
+        @organization_features = organization_features
+      end
+
+      private
+
+      def selected_feature_ids = @invoice.organization_feature_ids
+
+      def feature_checkbox(organization_feature)
+        check_box_tag "organization_feature_ids_#{organization_feature.id}", organization_feature.id,
+          selected_feature_ids.include?(organization_feature.id),
+          :class => organization_feature.one_time? ? "oneTime" : "recurring",
+          "data-amount" => organization_feature.amount, "data-id" => organization_feature.id
+      end
+
+      def show_feature_slugs?(organization_feature)
+        helpers.display_dev_info? && organization_feature.feature_slugs_string.present?
+      end
+
+      # The datetime fields need a value to render, and Rails won't round for them
+      def start_at
+        Binxtils::TimeParser.round(@invoice.subscription_start_at || Time.current.beginning_of_day, "seconds")
+      end
+
+      def end_at
+        Binxtils::TimeParser.round(@invoice.subscription_end_at || Time.current + 1.year, "seconds")
+      end
+
+      def top_border = "border-top: 2px solid black;"
+
+      def right = "text-align: right;"
+    end
+  end
+end
