@@ -76,10 +76,6 @@ module PageBlock
           @first_group ||= items.find { |item| item[:type] == :group }
         end
 
-        def active_link(item, row_class:, **options)
-          UI::ActiveLink::Component.from_item(item, html_class: row_class, **options)
-        end
-
         def row_class
           [ROW, ROW_HOVER, "tw:no-underline", ROW_RESTING, ROW_CURRENT].join(" ")
         end

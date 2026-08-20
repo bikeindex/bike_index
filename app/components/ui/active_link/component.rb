@@ -8,7 +8,7 @@ module UI
     # match: widens or narrows what counts as the page it points at: its query string too, or
     # only its controller, or its controller and action — which is what a link carrying query
     # params (a search, a filtered index) needs. :query is for a filter entry, which stands for
-    # the params it applies rather than for a URL — see query: below.
+    # the params it applies rather than for a URL.
     class Component < ApplicationComponent
       MATCHES = [:path, :full_path, :controller, :controller_action, :query].freeze
       # The matches the browser answers with a route rather than with the URL
@@ -16,13 +16,12 @@ module UI
 
       # What a menu item hash can carry through to the link. The rest of an item is the menu's
       # own — its type, icon, children — and an absent key here takes initialize's default
-      ITEM_KEYS = [:path, :match, :matching_controllers, :query, :data, :id].freeze
+      ITEM_KEYS = [:path, :match, :matching_controllers, :data, :id].freeze
 
-      # A menu builds its links as hashes; this is the one place one becomes a link. text: is
-      # the caller's for a row whose label sits inside a block with its icon
+      # A menu manifest carries a link as a hash; what differs between the menus rendering one
+      # is the class, and text: for a row whose label sits inside a block with its icon
       def self.from_item(item, html_class: nil, text: item[:label])
-        new(**item.slice(*ITEM_KEYS), text:,
-          class: [html_class, item[:html_class]].compact.join(" ").presence)
+        new(**item.slice(*ITEM_KEYS), text:, class: html_class)
       end
 
       def initialize(path:, text: nil, match: :path, matching_controllers: [], query: {}, data: {},
@@ -63,14 +62,10 @@ module UI
           "ui--active-link-query-value": link_query).compact
       end
 
-      # Each param the entry applies, and the values of it that mean the entry is the one in
-      # force. A nil among those values is the entry a controller falls back to with the param
-      # absent, which is "" once the browser reads the param off the URL
+      # A nil among a param's values is the entry a controller falls back to with the param
+      # absent, which is "" once the browser reads it off the URL
       def link_query
-        return unless @match == :query
-
-        @query.to_h { |param, values| [param, (values.is_a?(Array) ? values : [values]).map(&:to_s)] }
-          .to_json
+        @query.presence&.transform_values { |values| [values].flatten.map(&:to_s) }
       end
 
       # What the browser compares the page against — it can't resolve a route itself. One

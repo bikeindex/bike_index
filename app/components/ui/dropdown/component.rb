@@ -5,7 +5,7 @@ module UI
     class Component < ApplicationComponent
       renders_one :button
       # Which entry is current is UI::ActiveLink's, on the entry's own link -- .twdropdown
-      # (bike_index_components.css) styles whichever one it marks
+      # styles whichever one it marks
       renders_many :entries, types: {
         item: lambda { |&block|
           content_tag(:li, capture(&block), role: "menuitem")

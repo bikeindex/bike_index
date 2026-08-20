@@ -40,7 +40,7 @@ module PageBlock
         def account_items
           return [{type: :settings}, {type: :divider}] if @current_user_or_unconfirmed_user.present?
 
-          [{label: translation(".sign_up"), path: new_user_url, html_class: "signup-link"},
+          [{label: translation(".sign_up"), path: new_user_url, link_class: "signup-link"},
             {label: translation(".log_in"), path: new_session_url}]
         end
 
@@ -49,8 +49,10 @@ module PageBlock
             current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user)
         end
 
+        # item_class dresses the <li>, link_class the anchor inside it
         def nav_link(item)
-          UI::ActiveLink::Component.from_item(item, html_class: "nav-link")
+          UI::ActiveLink::Component.from_item(item,
+            html_class: ["nav-link", item[:link_class]].compact.join(" "))
         end
       end
     end
