@@ -19,7 +19,8 @@
               </li>
 
               <li>
-                <%= render UI::ActiveLink::Component.new(text: translation(".register_a_bike"), path: new_register_path, match: :controller) %>
+                <%# show rather than new: it resumes a registration in progress, and falls through to new when there isn't one %>
+                <%= render UI::ActiveLink::Component.new(text: translation(".register_a_bike"), path: register_path, match: :controller) %>
               </li>
 
               <li>

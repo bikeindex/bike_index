@@ -55,15 +55,12 @@ RSpec.describe BikeServices::Register do
           BParam.create(origin: "register_flow", params: {bike: {manufacturer_id: 12, status: "status_with_owner"}}.as_json)
         end
 
-        # What a link names would overwrite what step 1 was submitted with
-        it "returns it as it stands, rather than starting over on top of it" do
+        # Redirecting into a started registration would surprise - RegisterController#show
+        # is what goes back to one, by its token
+        it "creates a fresh registration" do
           expect {
-            expect(described_class.b_param_for(user:, token_id: started_b_param.id_token,
-              status: "status_stolen", email: "someone@example.com")).to eq started_b_param
-          }.to_not change(BParam, :count)
-
-          expect(started_b_param.reload.status).to eq "status_with_owner"
-          expect(started_b_param.owner_email).to be_blank
+            expect(described_class.b_param_for(user:, token_id: started_b_param.id_token)).to_not eq started_b_param
+          }.to change(BParam, :count).by 1
         end
       end
     end

@@ -22,14 +22,12 @@ module BikeServices
       estimated_value locking_description lock_defeat_description proof_of_ownership
       receive_notifications phone_for_users phone_for_shops phone_for_police].freeze
 
-    # The token's registration, which "Register a bike" goes back to rather than starting
-    # over on top of - as it stands once step 1 is submitted, since the status and email a
-    # link names would overwrite what was entered there. A new one once it has its bike.
-    # A signed-in user's email prefills owner_email.
+    # The token's registration when step 1 was never submitted (redirecting into
+    # it can't surprise anyone), otherwise a new one. A signed-in user's email
+    # prefills owner_email - manufacturer_id is the submitted-step-1 marker.
     def b_param_for(user:, token_id: nil, status: nil, email: nil)
       status = nil unless Bike.statuses.include?(status)
       existing = find_token(session_token: token_id, user:)
-      return existing if in_progress?(existing)
       return assign_start_params(existing, user, email:, status:) if reusable?(existing)
 
       bike_params = {owner_email: owner_email_for(user, email), status:}.compact
@@ -406,11 +404,6 @@ module BikeServices
       b_param.present? && !b_param.with_bike? && b_param.manufacturer_id.blank?
     end
 
-    # manufacturer_id is the submitted-step-1 marker
-    def in_progress?(b_param)
-      b_param.present? && !b_param.with_bike? && b_param.manufacturer_id.present?
-    end
-
     # Kept once a confirmation link is out - that email promises the address it can still
     # finish this registration
     def destroy_discardable(b_param)
@@ -496,7 +489,7 @@ module BikeServices
     conceal :auto_organization, :assign_auto_organization, :set_auto_organization,
       :claim_creator, :create_bike_if_ready, :create_bike, :ready_for_bike?,
       :details_and_acknowledged?, :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
-      :impound_report_attrs, :reusable?, :in_progress?, :destroy_discardable, :permitted_steps, :step_completed?,
+      :impound_report_attrs, :reusable?, :destroy_discardable, :permitted_steps, :step_completed?,
       :confirmed_email_creator_id, :owner_email_for, :assign_start_params, :reused_owner_email, :details_completed?,
       :step_2_params, :translation
   end

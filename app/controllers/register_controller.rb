@@ -22,14 +22,14 @@ class RegisterController < ApplicationController
   # flow: the two stolen bike alerts open their modal on load, over a registration in progress
   before_action { @skip_general_alert = true }
 
-  # Redirects into the session's registration with a token, at the step it reached, so
-  # "Register a bike" goes back to one in progress rather than starting over on top of it
+  # Always a new registration - show is what goes back to one in progress, so the two
+  # entry points don't have to be told apart by what the session happens to hold
   def new
     BikeServices::Register.discard(token: params[:discard_token], user: current_user)
     BikeServices::Register.discard_extra(user: current_user)
-    start_registration
-    # The filters every other action runs, so reusing the session's registration
-    # can't quietly drop the organization the URL named
+    start_registration(reuse: false)
+    # The filters new is excluded from: the organization the URL names has to land on the
+    # registration, and the redirect below asks which step it's at
     assign_organization
     find_registration_sequence
     redirect_to_current_step
@@ -201,11 +201,11 @@ class RegisterController < ApplicationController
     register_path(b_param_token: @b_param.id_token, step:)
   end
 
-  # The registration new and embed start from - the session's when it has one, so going
-  # back from step 2 (or reloading the frame) lands on the same registration
-  def start_registration
-    @b_param = BikeServices::Register.b_param_for(user: current_user, token_id: reusable_token,
-      status: start_status, email: params[:email])
+  # The registration new and embed start from. reuse: the session's still-blank one, so
+  # reloading the embed frame lands on the same registration rather than piling them up
+  def start_registration(reuse: true)
+    @b_param = BikeServices::Register.b_param_for(user: current_user,
+      token_id: (session[:register_b_param_token] if reuse), status: start_status, email: params[:email])
     session[:register_b_param_token] = @b_param.id_token
   end
 
@@ -218,12 +218,6 @@ class RegisterController < ApplicationController
   # ?status=stolen and ?stolen=true as well as the full status_stolen - a link to report
   # a theft takes the same shorthand everywhere else in the app does
   def start_status = BParam.status_hash_from_params(params)[:status]
-
-  # Starting over lands on a blank registration, not whatever the session was left on -
-  # which would drop the organization and status the link carries
-  def reusable_token
-    session[:register_b_param_token] if params[:discard_token].blank?
-  end
 
   def assign_organization
     BikeServices::Register.assign_organization(@b_param, current_organization,

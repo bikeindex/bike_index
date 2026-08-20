@@ -28,38 +28,49 @@ RSpec.describe RegisterController, type: :request do
       expect(new_b_param.origin).to eq "register_flow"
       expect(response).to redirect_to register_path(b_param_token: new_b_param.id_token, step: 1)
 
-      # Revisiting reuses the session's still-blank registration
-      expect { get "/register/new" }.to_not change(BParam, :count)
-      expect(response).to redirect_to register_path(b_param_token: new_b_param.id_token, step: 1)
+      # new always starts one, whatever the session is holding - the bare /register is
+      # what goes back to a registration in progress
+      expect { get "/register/new" }.to change(BParam, :count).by 1
+      expect(BParam.last.id).to_not eq new_b_param.id
+      expect(response).to redirect_to register_path(b_param_token: BParam.last.id_token, step: 1)
+    end
 
-      # Once step 1 is submitted (manufacturer is the marker), register/new goes back to
-      # the registration in progress, at the step it reached
-      new_b_param.clean_params({bike: {manufacturer_id: manufacturer.id, owner_email:}}.as_json)
-      new_b_param.save
-      expect { get "/register/new" }.to_not change(BParam, :count)
-      expect(response).to redirect_to register_path(b_param_token: new_b_param.id_token, step: 2)
+    it "goes back to the session's registration from the bare /register, at the step it reached" do
+      get "/register/new"
+      b_param = BParam.last
+      b_param.clean_params({bike: {manufacturer_id: manufacturer.id, owner_email:}}.as_json)
+      b_param.save
+
+      expect { get base_url }.to_not change(BParam, :count)
+      expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: 2)
+    end
+
+    it "falls through to new when the session has no registration" do
+      expect { get base_url }.to_not change(BParam, :count)
+      expect(response).to redirect_to new_register_path
+
+      expect { follow_redirect! }.to change(BParam, :count).by 1
+      expect(response).to redirect_to register_path(b_param_token: BParam.last.id_token, step: 1)
     end
 
     context "status and organization params" do
       let(:organization) { FactoryBot.create(:organization) }
 
-      it "stores them on the registration it creates, and takes what a later link names" do
+      it "stores them on the registration it creates" do
         # The slug resolves to the organization, rather than being stored as-is
         get "/register/new?status=stolen&organization_id=#{organization.slug}"
         stolen_b_param = BParam.last
         expect(stolen_b_param).to have_attributes(status: "status_stolen",
           creation_organization_id: organization.id, organization_id: organization.id)
 
-        # The same registration, so nothing entered is lost - but a link that says what
-        # this is says it again, the way the organization's does
+        # Each visit starts its own, so what this is comes from the link rather than
+        # from whatever the session was left on
         get "/register/new?status=found"
-        expect(BParam.last.id).to eq stolen_b_param.id
-        expect(stolen_b_param.reload.status).to eq "status_impounded"
+        expect(BParam.last.id).to_not eq stolen_b_param.id
+        expect(BParam.last.status).to eq "status_impounded"
 
-        # A link that names no status leaves the one it has
         get "/register/new"
-        expect(BParam.last.id).to eq stolen_b_param.id
-        expect(stolen_b_param.reload.status).to eq "status_impounded"
+        expect(BParam.last.status).to eq "status_with_owner" # the default, not the last link's
       end
 
       # ?status=stolen, ?status=found and ?stolen=true, not just the full enum value
@@ -80,14 +91,13 @@ RSpec.describe RegisterController, type: :request do
       end
 
       # Only the create branch of b_param_for seeds status, so this is the org path
-      it "attaches the organization to a blank registration already in the session" do
+      it "attaches the organization to the registration it starts" do
         get "/register/new" # a blank shell, no organization
-        session_b_param = BParam.last
-        expect(session_b_param.creation_organization_id).to be_blank
+        expect(BParam.last.creation_organization_id).to be_blank
 
         # Arriving on the organization's link shouldn't quietly go unattributed
-        expect { get "/register/new?organization_id=#{organization.slug}" }.to_not change(BParam, :count)
-        expect(session_b_param.reload.creation_organization_id).to eq organization.id
+        expect { get "/register/new?organization_id=#{organization.slug}" }.to change(BParam, :count).by 1
+        expect(BParam.last.creation_organization_id).to eq organization.id
       end
     end
 
@@ -230,18 +240,16 @@ RSpec.describe RegisterController, type: :request do
     end
 
     context "email param" do
-      it "uses the passed address, and blanks it for false" do
+      # Signed out there's no address to blank, so false is the signed-in context's to cover
+      it "uses the passed address on the registration it starts" do
         get "/register/new?email=someone@example.com"
         passed = BParam.last
         expect(passed.owner_email).to eq "someone@example.com"
 
-        # A blank param leaves the reused registration's address alone
+        # Each visit starts its own, so the next one doesn't inherit the address
         get "/register/new"
-        expect(passed.reload.owner_email).to eq "someone@example.com"
-
-        # false blanks it, even though it's already set
-        get "/register/new?email=false"
-        expect(passed.reload.owner_email).to be_nil
+        expect(BParam.last.id).to_not eq passed.id
+        expect(BParam.last.owner_email).to be_nil
       end
 
       context "signed in" do
@@ -268,8 +276,9 @@ RSpec.describe RegisterController, type: :request do
       expect(BParam.where(id: session_b_param.id)).to be_empty
       expect(response).to redirect_to register_path(b_param_token: BParam.last.id_token, step: 1)
 
-      # The new registration is now the session's, so /register/new reuses it again
-      expect { get "/register/new" }.to_not change(BParam, :count)
+      # The new registration is now the session's, which the bare /register goes back to
+      expect { get base_url }.to_not change(BParam, :count)
+      expect(response).to redirect_to register_path(b_param_token: BParam.last.id_token, step: 1)
     end
 
     # The emailed link is the only way an anonymous registration finishes, so start
