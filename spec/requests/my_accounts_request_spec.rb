@@ -61,6 +61,19 @@ RSpec.describe MyAccountsController, type: :request do
             expect(assigns[:passive_organization]).to eq organization
           end
         end
+        context "with an organization, viewing without one" do
+          let(:organization) { FactoryBot.create(:organization) }
+          let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+
+          it "leaves passive_organization nil" do
+            OrganizationRole.ordered_for(current_user).first.update_on_by_default!(false)
+            expect(OrganizationRole.default_organization(current_user)).to be_nil
+            get base_url
+            expect(response.status).to eq(200)
+            expect(session[:passive_organization_id]).to eq "0"
+            expect(assigns[:passive_organization]).to be_nil
+          end
+        end
         context "with stuff" do
           let!(:bike1) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
           let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }

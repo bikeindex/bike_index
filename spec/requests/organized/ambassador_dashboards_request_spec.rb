@@ -19,7 +19,7 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
     describe "index" do
       it "redirects to organization root path" do
         current_user.reload
-        expect(current_user.default_organization).to be_present
+        expect(OrganizationRole.default_organization(current_user)).to be_present
         get organization_ambassador_dashboard_path(current_organization)
         expect(response).to redirect_to organization_root_path(organization_id: current_organization)
       end

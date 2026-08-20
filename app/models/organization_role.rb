@@ -61,6 +61,17 @@ class OrganizationRole < ApplicationRecord
     where(user_id: user.id).order(:priority, :id)
   end
 
+  # The organization the user views Bike Index as, which is their first role when it's on by
+  # default. Nil when they've chosen to view without an organization, or hold no role at all
+  def self.default_organization(user)
+    return nil if user.blank?
+
+    organization_role = ordered_for(user).first
+    return nil unless organization_role&.on_by_default?
+
+    organization_role.organization
+  end
+
   # The role an organization grants to anyone on its user_email_domain. Nobody invited them, so
   # stamp email_invitation_sent_at to suppress the invitation - it would otherwise arrive
   # alongside whatever email the signup itself is already sending them.

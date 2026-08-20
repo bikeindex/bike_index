@@ -510,12 +510,6 @@ class User < ApplicationRecord
     !superuser? && organization_roles.admin.limit(1).none?
   end
 
-  def default_organization
-    return @default_organization if defined?(@default_organization) # Memoize, permit nil
-
-    @default_organization = organizations&.first # Maybe at some point use organization_roles to get the most recent, for now, speed
-  end
-
   def partner_sign_up
     (partner_data && partner_data["sign_up"].present?) ? partner_data["sign_up"] : nil
   end

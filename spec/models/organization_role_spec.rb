@@ -163,6 +163,35 @@ RSpec.describe OrganizationRole, type: :model do
     end
   end
 
+  describe ".default_organization" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+
+    it "is nil for a user with no roles" do
+      expect(OrganizationRole.default_organization(user)).to be_nil
+      expect(OrganizationRole.default_organization(nil)).to be_nil
+    end
+
+    context "with roles" do
+      let!(:organization_roles) { Array.new(2) { FactoryBot.create(:organization_role_claimed, user:) } }
+
+      it "is the first organization" do
+        expect(OrganizationRole.default_organization(user)).to eq organization_roles.first.organization
+      end
+
+      it "follows a reorder" do
+        organization_roles.last.reorder_to!(0)
+        expect(OrganizationRole.default_organization(user)).to eq organization_roles.last.organization
+      end
+
+      context "viewing without an organization" do
+        it "is nil" do
+          organization_roles.first.update_on_by_default!(false)
+          expect(OrganizationRole.default_organization(user)).to be_nil
+        end
+      end
+    end
+  end
+
   describe "leavable?" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:organization_role) { FactoryBot.create(:organization_role_claimed, organization:, role:) }
