@@ -4452,11 +4452,15 @@ nl:
       unable_to_save: Het is ons niet gelukt om uw registratie op te slaan. Probeer
         het later opnieuw.
     menu_items_account:
+      logout: Afmelden
       marketplace_messages: Marktplaatsberichten
+      register_a_new_bike: Registreer een nieuwe fiets
       switch_to_org: Switch to %{org_name}
+      user_settings: "%{user_email} instellingen"
       view_without_org: View without any organization
       viewing_org: Viewing %{org_name}
       viewing_without_org: Viewing without any organization
+      your_registrations: Uw registraties
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -5592,11 +5596,7 @@ nl:
           sign_up: Registreren
           stolen_bike: Fiets gestolen?
         user_settings_menu:
-          logout: Afmelden
-          register_a_new_bike: Registreer een nieuwe fiets
           settings_menu: Instellingen
-          user_settings: "%{user_email} instellingen"
-          your_registrations: Uw registraties
         wrapper:
           menu: Menu
           sign_up: Registreren

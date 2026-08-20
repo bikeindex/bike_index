@@ -3,17 +3,16 @@
 module PageBlock
   module Navbar
     module AccountMenu
-      # UserServices::MenuItemsAccount's rows as the org sidebar's account block: a UI::Dropdown
-      # whose trigger is the caller's content. It opens upward, off the foot of the column, so
-      # the rows run the other way from PageBlock::Navbar::UserSettingsMenu's.
+      # UserServices::MenuItemsAccount's rows as the org sidebar's account block, which sits at
+      # the foot of the column -- so they open upward, the other way from the navbar's gear.
       class Component < ApplicationComponent
+        # The tint PageBlock::Navbar::UserSettingsMenu::LOGOUT deviates from, for its darker panel
         LOGOUT = "tw:text-red-700! tw:hover:bg-red-50! tw:hover:text-red-600!"
 
-        def initialize(current_user:, current_user_or_unconfirmed_user:, name:,
+        def initialize(current_user:, current_user_or_unconfirmed_user:,
           current_organization: nil, button_class: nil)
           @current_user = current_user
           @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user
-          @name = name
           @current_organization = current_organization
           @button_class = button_class
         end
@@ -24,6 +23,10 @@ module PageBlock
           UserServices::MenuItemsAccount.for(current_user: @current_user,
             current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user,
             current_organization: @current_organization, opens: :up)
+        end
+
+        def name
+          @current_user_or_unconfirmed_user.email
         end
 
         # .twdropdown (bike_index_components.css) styles the entries, so they need nothing

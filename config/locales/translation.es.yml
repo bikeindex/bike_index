@@ -5257,11 +5257,15 @@ es:
       name_required: Se requiere el nombre del propietario para registrarse.
       unable_to_save: No podemos guardar ese registro, por favor inténtelo de nuevo.
     menu_items_account:
+      logout: Cierre de sesión
       marketplace_messages: Mensajes del mercado
+      register_a_new_bike: Registre su bicicleta
       switch_to_org: Switch to %{org_name}
+      user_settings: "%{user_email} ajustes"
       view_without_org: View without any organization
       viewing_org: Viewing %{org_name}
       viewing_without_org: Viewing without any organization
+      your_registrations: Sus registros
   stolen:
     index:
       ambassador: embajador
@@ -5695,11 +5699,7 @@ es:
           sign_up: Inscríbete
           stolen_bike: "¿Bicicleta robada?"
         user_settings_menu:
-          logout: Cierre de sesión
-          register_a_new_bike: Registre su bicicleta
           settings_menu: Ajustes
-          user_settings: "%{user_email} ajustes"
-          your_registrations: Sus registros
         wrapper:
           menu: Menú
           sign_up: Inscríbete

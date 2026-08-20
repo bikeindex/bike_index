@@ -69,17 +69,15 @@ module PageBlock
         def account_menu
           PageBlock::Navbar::AccountMenu::Component.new(current_user: @current_user,
             current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user,
-            current_organization: @organization,
-            name: @current_user_or_unconfirmed_user.email, button_class: account_button_class)
+            current_organization: @organization, button_class: account_button_class)
         end
 
         def first_group
           @first_group ||= items.find { |item| item[:type] == :group }
         end
 
-        # text: is the caller's, since a top-level row's label sits inside a block with its icon
-        def active_link(item, row_class:, text: nil)
-          UI::ActiveLink::Component.from_item(item, html_class: row_class, text:)
+        def active_link(item, row_class:, **options)
+          UI::ActiveLink::Component.from_item(item, html_class: row_class, **options)
         end
 
         def row_class

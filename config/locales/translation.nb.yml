@@ -5020,11 +5020,15 @@ nb:
       name_required: Eiernavn kreves for registrering
       unable_to_save: Vi kan ikke lagre registreringen. Prøv på nytt.
     menu_items_account:
+      logout: Logg ut
       marketplace_messages: Markedsplassmeldinger
+      register_a_new_bike: Registrer en ny sykkel
       switch_to_org: Switch to %{org_name}
+      user_settings: "%{user_email}-innstillinger"
       view_without_org: View without any organization
       viewing_org: Viewing %{org_name}
       viewing_without_org: Viewing without any organization
+      your_registrations: Dine registreringer
   stolen:
     index:
       ambassador: ambassadør
@@ -5440,11 +5444,7 @@ nb:
           sign_up: Melde deg på
           stolen_bike: Stjålet sykkel?
         user_settings_menu:
-          logout: Logg ut
-          register_a_new_bike: Registrer en ny sykkel
           settings_menu: Innstillinger
-          user_settings: "%{user_email}-innstillinger"
-          your_registrations: Dine registreringer
         wrapper:
           menu: Meny
           sign_up: Melde deg på
