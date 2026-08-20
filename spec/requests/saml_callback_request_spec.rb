@@ -26,8 +26,11 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
     [saml_request_id_from_redirect(location), Rack::Utils.parse_query(URI(location).query)["RelayState"]]
   end
 
-  def post_callback(relay_state: :from_init, **overrides)
+  def post_callback(relay_state: :from_init, drop_session: false, **overrides)
     request_id, initiated_relay_state = initiate_login
+    # Rack::Test sends cookies whatever their SameSite, so a spec that needs the browser's
+    # actual behaviour on the IdP's cross-site POST has to withhold the session itself
+    cookies.delete(Rails.application.config.session_options[:key]) if drop_session
     params = {audience: settings.sp_entity_id, recipient: settings.assertion_consumer_service_url,
               in_response_to: request_id, issuer: saml_configuration.idp_entity_id, email:}.merge(overrides)
     post "/sso/#{slug}/callback", params: {SAMLResponse: signed_saml_response(**params),
@@ -68,6 +71,14 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
         expect(identity.user).to eq user
         expect(user.last_login_at).to be_within(5.seconds).of Time.current
         expect(signed_in?).to be true
+      end
+
+      # The session that stored return_to is withheld on the IdP's cross-site POST, so the
+      # destination has to survive in the RelayState transaction instead
+      it "returns the user to where they were headed" do
+        get "/session/new", params: {return_to: "/bikes/new"}
+        post_callback(drop_session: true)
+        expect(response).to redirect_to "/bikes/new"
       end
 
       context "existing Bike Index user with the asserted email" do

@@ -43,9 +43,10 @@ assertion; turning it on does not require one.
 
 **No session cookie is involved.** The ACS is a cross-site POST, and a `SameSite=Lax` cookie
 isn't sent on one — so the SAML transaction rides in `RelayState`, with the state in Redis
-(`Saml::RequestStore`, single-use via `GETDEL`, 10-minute TTL). The accepted tradeoff is
-recorded in `saml_controller.rb#callback` above the `claim` call. `SameSite=None` is not on
-the table.
+(`Saml::RequestStore`, single-use via `GETDEL`, 10-minute TTL). `session[:return_to]` rides
+along for the same reason — the callback would otherwise send everyone to `user_root_url`
+regardless of the link they followed in. The accepted tradeoff is recorded in
+`saml_controller.rb#callback` above the `claim` call. `SameSite=None` is not on the table.
 
 ## Onboarding an organization
 
