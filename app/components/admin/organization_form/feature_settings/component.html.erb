@@ -7,7 +7,6 @@
         Interval for send graduated notifications, in days
         <small><span class="text-success">graduated_notifications setting</span></small>
       <% end %>
-
       <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :graduated_notification_interval_days, kind: :number_field, label_text: graduated_label)) do |group| %>
         <% group.with_helper_text do %>
           <span class="text-warning">
@@ -23,7 +22,6 @@
         Search radius (<%= search_radius[:unit] %>)
         <small><span class="text-success">regional bike counts setting</span>, controls how large the region is to associate regional sub-organizations</small>
       <% end %>
-
       <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: search_radius[:attribute], kind: :number_field, label_text: radius_label)) do |group| %>
         <% group.with_helper_text do %>
           <span class="text-warning">
@@ -39,7 +37,6 @@
         permitted domain for <%= domain_uses.to_sentence %>
         <small><%= safe_join(domain_uses.map { |domain_use| tag.span("#{domain_use} feature", class: "text-success") }, " ") %></small>
       <% end %>
-
       <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :user_email_domain, label_text: domain_label)) do |group| %>
         <% unless developer? %>
           <% group.with_helper_text { "Ask Seth for help changing this, it's delicate" } %>
@@ -128,6 +125,12 @@
           <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_cert_fingerprint, label_text: "IdP certificate fingerprint")) %>
 
           <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :email_attribute_name, label_text: "Email attribute name", html_options: {placeholder: OrganizationSamlConfiguration::DEFAULT_EMAIL_ATTRIBUTE})) %>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :name_id_format, label_text: "NameID format")) do %>
+            <%= render(UI::Forms::Select::Component.new(form_builder: saml_f, attribute: :name_id_format,
+              option_tags: OrganizationSamlConfiguration::NAME_ID_FORMATS,
+              options: {include_blank: "No preference - the IdP chooses"})) %>
+          <% end %>
         <% end %>
       </div>
     <% end %>
