@@ -25,8 +25,7 @@ module UI
         end
       end
 
-      # A template, so the entries can render UI::ActiveLink -- the marked one points at the
-      # page it's shown on, so the browser fills it
+      # A template, so the entries can render UI::ActiveLink
       def custom_button
         {template: "ui/dropdown/component_preview/custom_button"}
       end
