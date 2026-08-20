@@ -7,7 +7,6 @@ RSpec.describe Admin::OrganizationForm::SamlSso::Component, type: :component do
     FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso")
   end
 
-  # render_in_view_context instance_execs its block, so the organization comes in as a local
   def rendered_component(organization)
     render_in_view_context do
       form_for [:admin, organization] do |f|

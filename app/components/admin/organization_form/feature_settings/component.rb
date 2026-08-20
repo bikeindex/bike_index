@@ -10,13 +10,6 @@ module Admin
           "user_role_for_user_email_domain" => "automatic user role"
         }.freeze
 
-        # Whether the tab has anything to render: the reg label fields are the ones a paid
-        # organization gets without a feature of its own
-        def self.any_settings?(organization)
-          organization.paid? ||
-            organization.any_enabled?(OrganizationFeature.with_admin_organization_attributes)
-        end
-
         def initialize(form_builder:, current_user:)
           @form_builder = form_builder
           @organization = form_builder.object

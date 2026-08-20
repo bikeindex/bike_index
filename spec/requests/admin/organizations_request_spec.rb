@@ -45,6 +45,15 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     end
   end
 
+  describe "new" do
+    it "renders" do
+      Country.united_states # Read replica
+      get "#{base_url}/new"
+      expect(response.status).to eq(200)
+      expect(response).to render_template("admin/organizations/new")
+    end
+  end
+
   describe "locations" do
     let!(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization:, name: "Main Office") }
 
@@ -284,6 +293,17 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(response).to redirect_to(sso_admin_organization_url(organization))
         put "#{base_url}/#{organization.to_param}", params: {tab: "not-a-tab", organization: {name: "newer name"}}
         expect(response).to redirect_to(admin_organization_url(organization))
+      end
+
+      # Each tab submits the whole organization, so one that doesn't render a field would
+      # otherwise blank it
+      it "leaves the fields its tab doesn't render alone" do
+        organization.update(kind: "bike_shop", registration_field_labels: {reg_student_id: "Cool label"})
+        put "#{base_url}/#{organization.to_param}", params: {tab: "sso", organization: {name: "new name"}}
+        organization.reload
+        expect(organization.name).to eq "new name"
+        expect(organization.kind).to eq "bike_shop"
+        expect(organization.registration_field_labels).to eq({"reg_student_id" => "Cool label"})
       end
     end
     context "setting to not_set" do

@@ -1,6 +1,6 @@
 <%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :paid_functionality)) %>
 
-<% if Admin::OrganizationForm::FeatureSettings::Component.any_settings?(@organization) %>
+<% if @organization.paid? %>
   <%= render layout: "tab_form", locals: {tab: "paid_functionality"} do |form_builder| %>
     <%= render(Admin::OrganizationForm::FeatureSettings::Component.new(form_builder:, current_user:)) %>
   <% end %>

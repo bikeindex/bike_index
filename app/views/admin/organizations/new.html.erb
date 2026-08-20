@@ -1,0 +1,5 @@
+<h1>New Organizaton</h1>
+
+<%= render layout: "tab_form", locals: {submit_text: "Create"} do |form_builder| %>
+  <%= render(Admin::OrganizationForm::Wrapper::Component.new(form_builder:)) %>
+<% end %>

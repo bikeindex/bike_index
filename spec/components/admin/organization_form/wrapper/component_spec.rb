@@ -4,17 +4,16 @@ require "rails_helper"
 
 RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
   let(:organization) { FactoryBot.create(:organization) }
-  let(:current_user) { FactoryBot.create(:superuser) }
 
-  def rendered_component(organization, current_user)
+  def rendered_component(organization)
     render_in_view_context do
       form_for [:admin, organization] do |f|
-        render(Admin::OrganizationForm::Wrapper::Component.new(form_builder: f, current_user:))
+        render(Admin::OrganizationForm::Wrapper::Component.new(form_builder: f))
       end
     end
   end
 
-  let(:component) { rendered_component(organization, current_user) }
+  let(:component) { rendered_component(organization) }
 
   it "renders the organization fields" do
     expect(component).to have_field("organization_name")

@@ -10,15 +10,15 @@ RSpec.describe Admin::OrganizationTabs::Component, type: :component do
 
   it "renders the organization and every tab, with the active one marked" do
     expect(component).to have_content("Cool Bikes")
-    expect(component.css(".nav-tabs .nav-link").map { |link| link.text.squish })
+    expect(component.css("nav a").map { |chip| chip.text.squish })
       .to eq ["Show", "Edit", "Locations 0", "Edit paid functionality", "SSO", "Org invoices"]
-    expect(component.css(".nav-tabs .nav-link.active").map { |link| link.text.squish }).to eq ["Show"]
+    expect(component.css("nav a[aria-current]").map { |chip| chip.text.squish }).to eq ["Show"]
     expect(component).to have_link("Edit", href: "/admin/organizations/#{organization.to_param}/edit")
     expect(component).to have_link("SSO", href: "/admin/organizations/#{organization.to_param}/sso")
   end
 
   describe "the top right link" do
-    let(:organized_view) { component.at_css(".admin-subnav a") }
+    let(:organized_view) { component.at_css(".admin-subnav .nav-item a") }
 
     context "on show" do
       it "links to the organization's dashboard" do
@@ -66,7 +66,7 @@ RSpec.describe Admin::OrganizationTabs::Component, type: :component do
     before { FactoryBot.create_list(:location, 2, organization:) }
 
     it "counts them in the tab" do
-      expect(component.css(".nav-tabs .nav-link").map { |link| link.text.squish }).to include "Locations 2"
+      expect(component.css("nav a").map { |chip| chip.text.squish }).to include "Locations 2"
     end
   end
 
@@ -82,7 +82,7 @@ RSpec.describe Admin::OrganizationTabs::Component, type: :component do
     let(:active) { :custom_layouts }
 
     it "renders it, though display_dev_info? is false in test" do
-      expect(component.css(".nav-tabs .nav-link.active").map { |link| link.text.squish }).to eq ["Custom layouts"]
+      expect(component.css("nav a[aria-current]").map { |chip| chip.text.squish }).to eq ["Custom layouts"]
     end
   end
 

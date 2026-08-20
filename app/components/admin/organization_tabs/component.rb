@@ -5,9 +5,8 @@ module Admin
     class Component < ApplicationComponent
       TABS = %i[show edit locations paid_functionality sso invoices custom_layouts].freeze
 
-      # Where each tab sends you to see the organization's own side of it. Nothing in
-      # organized covers paid functionality or SSO, so both land on the profile the
-      # admin edit tab mirrors
+      # paid_functionality and sso have no organized page of their own, so both land on the
+      # profile the edit tab mirrors
       ORGANIZED_VIEWS = {show: :organization_root_path, edit: :organization_manage_path,
                          locations: :locations_organization_manage_path,
                          paid_functionality: :organization_manage_path, sso: :organization_manage_path,
@@ -27,48 +26,37 @@ module Admin
       private
 
       def tabs
-        entries = [
-          {tab: :show, text: "Show", path: admin_organization_path(@organization)},
-          {tab: :edit, text: "Edit", path: edit_admin_organization_path(@organization)},
-          {tab: :locations, text: locations_text, path: locations_admin_organization_path(@organization)},
-          {tab: :paid_functionality, text: "Edit paid functionality",
-           path: paid_functionality_admin_organization_path(@organization)},
-          {tab: :sso, text: "SSO", path: sso_admin_organization_path(@organization)},
-          {tab: :invoices, text: "Org invoices", path: admin_organization_invoices_path(organization_id: organization_param)}
-        ]
-        return entries unless helpers.display_dev_info? || @active == :custom_layouts
-
-        entries + [{tab: :custom_layouts, text: "Custom layouts", class_name: "only-dev-visible less-strong",
-                    path: admin_organization_custom_layouts_path(organization_id: organization_param)}]
+        [[:show, "Show", admin_organization_path(@organization)],
+          [:edit, "Edit", edit_admin_organization_path(@organization)],
+          [:locations, locations_label, locations_admin_organization_path(@organization)],
+          [:paid_functionality, "Edit paid functionality", paid_functionality_admin_organization_path(@organization)],
+          [:sso, "SSO", sso_admin_organization_path(@organization)],
+          [:invoices, "Org invoices", admin_organization_invoices_path(organization_id: @organization)],
+          ([:custom_layouts, "Custom layouts", admin_organization_custom_layouts_path(organization_id: @organization)] if custom_layouts?)]
+          .compact.map { |tab, label, href| {label:, href:, active: @active == tab} }
       end
 
-      def link_class(entry)
-        ["nav-link", entry[:class_name], ("active" if entry[:tab] == @active)].compact.join(" ")
+      def custom_layouts? = helpers.display_dev_info? || @active == :custom_layouts
+
+      def locations_label
+        safe_join(["Locations", helpers.number_display(@organization.locations.size)], " ")
       end
 
-      def locations_text
-        safe_join(["Locations", helpers.number_display(@organization.locations.count)], " ")
-      end
-
-      # The invoices tab's own action rather than a view of the organization - except on the
-      # page that link would point at
       def new_invoice_link
-        return if helpers.action_name == "new"
+        path = new_admin_organization_invoice_path(organization_id: @organization)
+        return if helpers.current_page_active?(path)
 
-        link_to "New Invoice", new_admin_organization_invoice_path(organization_id: organization_param),
-          class: "nav-link btn btn-success btn-sm mr-2"
+        render(UI::ButtonLink::Component.new(text: "New Invoice", href: path, color: :primary, size: :sm))
       end
 
       def organization_view_link
-        link_to "organization's view", public_send(ORGANIZED_VIEWS[@active], organization_id: organization_param),
-          class: "btn btn-outline-info btn-sm nav-link"
+        render(UI::ButtonLink::Component.new(text: "organization's view", size: :sm,
+          href: public_send(ORGANIZED_VIEWS[@active], organization_id: @organization)))
       end
 
-      def top_right_link
-        (@active == :invoices) ? new_invoice_link : organization_view_link
+      def top_right_links
+        [@additional_link, (@active == :invoices) ? new_invoice_link : organization_view_link].compact
       end
-
-      def organization_param = @organization.to_param
     end
   end
 end

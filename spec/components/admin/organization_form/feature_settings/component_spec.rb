@@ -6,7 +6,6 @@ RSpec.describe Admin::OrganizationForm::FeatureSettings::Component, type: :compo
   let(:organization) { FactoryBot.create(:organization) }
   let(:current_user) { FactoryBot.create(:superuser) }
 
-  # render_in_view_context instance_execs its block, so the let values come in as locals
   def rendered_component(organization, current_user)
     render_in_view_context do
       form_for [:admin, organization] do |f|
@@ -16,14 +15,6 @@ RSpec.describe Admin::OrganizationForm::FeatureSettings::Component, type: :compo
   end
 
   let(:component) { rendered_component(organization, current_user) }
-
-  describe ".any_settings?" do
-    it "is false without features, and true for a paid organization" do
-      expect(described_class.any_settings?(organization)).to be_falsey
-      expect(described_class.any_settings?(FactoryBot.create(:organization_with_organization_features)))
-        .to be_truthy
-    end
-  end
 
   context "with passwordless_users enabled" do
     let(:organization) do

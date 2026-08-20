@@ -6,7 +6,6 @@ RSpec.describe Admin::OrganizationForm::Locations::Component, type: :component d
   let(:organization) { FactoryBot.create(:organization) }
   let!(:location) { FactoryBot.create(:location, organization:, name: "Main Office") }
 
-  # render_in_view_context instance_execs its block, so the organization comes in as a local
   def rendered_component(organization)
     render_in_view_context do
       form_for [:admin, organization] do |f|

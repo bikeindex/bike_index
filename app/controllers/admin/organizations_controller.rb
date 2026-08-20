@@ -2,11 +2,11 @@ module Admin
   class OrganizationsController < Admin::BaseController
     include Binxtils::SortableTable
 
-    # The tabs that edit the organization, each rendering its own slice of the form
+    # Each renders its own slice of the organization form
     FORM_TABS = %w[edit locations paid_functionality sso].freeze
 
-    before_action :find_organization, only: %i[show edit locations paid_functionality sso update destroy]
-    before_action :set_admin_form_page_id, only: %w[new] + FORM_TABS
+    before_action :find_organization, only: FORM_TABS + %w[show update destroy]
+    before_action :set_admin_form_page_id, only: FORM_TABS + %w[new]
 
     def index
       @per_page = permitted_per_page
@@ -91,12 +91,9 @@ module Admin
 
     protected
 
-    # Which tab's form was submitted, so update returns to it rather than to show
     def form_tab = params[:tab].presence_in(FORM_TABS)
 
     def permitted_parameters
-      approved_kind = params.dig(:organization, :kind)
-      approved_kind = "other" unless Organization.kinds.include?(approved_kind)
       params
         .require(:organization)
         .permit(
@@ -130,8 +127,22 @@ module Admin
           organization_saml_configuration_attributes: %i[id enabled idp_entity_id
             idp_sso_target_url idp_slo_target_url idp_cert idp_cert_fingerprint
             idp_cert_multi email_attribute_name name_id_format]
-        ).merge(kind: approved_kind)
-        .merge(registration_field_labels: registration_field_labels_val)
+        ).merge(approved_kind).merge(registration_field_labels_param)
+    end
+
+    # A tab that doesn't render the field mustn't clear it - only the kind select answers
+    # for kind, and only the tab holding the label fields can blank a label
+    def approved_kind
+      kind = params.dig(:organization, :kind)
+      return {} if kind.blank?
+
+      {kind: Organization.kinds.include?(kind) ? kind : "other"}
+    end
+
+    def registration_field_labels_param
+      return {} unless form_tab.nil? || form_tab == "paid_functionality"
+
+      {registration_field_labels: registration_field_labels_val}
     end
 
     def matching_organizations

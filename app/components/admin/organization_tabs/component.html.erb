@@ -11,35 +11,21 @@
 
   <div class="col">
     <ul>
-      <% if @additional_link.present? %>
-        <li class="nav-item"><%= @additional_link %></li>
-      <% end %>
-
-      <% if top_right_link.present? %>
-        <li class="nav-item"><%= top_right_link %></li>
+      <% top_right_links.each do |link| %>
+        <li class="nav-item"><%= link %></li>
       <% end %>
     </ul>
   </div>
 
   <% if @organization.deleted? %>
     <div class="col-md-6 mt-4">
-      <div class="alert alert-danger">
-        <h4>
-          <span class="text-danger">Organization deleted</span>
-
-          <small class="localizeTime preciseTime withPreposition">
-            <%= l @organization.deleted_at, format: :convert_time %>
-          </small>
-        </h4>
-      </div>
+      <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "Organization deleted")) do %>
+        <%= render(UI::Time::Component.new(time: @organization.deleted_at, format: :localize_time_precise, preposition: true)) %>
+      <% end %>
     </div>
   <% end %>
 </div>
 
-<ul class="nav nav-tabs mb-4">
-  <% tabs.each do |entry| %>
-    <li class="nav-item">
-      <%= link_to entry[:text], entry[:path], class: link_class(entry) %>
-    </li>
-  <% end %>
-</ul>
+<nav class="tw:mb-4" aria-label="Organization sections">
+  <%= render(UI::ButtonGroup::Component.new(entries: tabs)) %>
+</nav>
