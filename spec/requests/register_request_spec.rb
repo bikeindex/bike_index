@@ -90,6 +90,17 @@ RSpec.describe RegisterController, type: :request do
         expect(BParam.last.creation_organization_id).to eq organization.id
       end
 
+      # The organized add-a-bike page links here with its slug, and a member is as likely
+      # to have one going as not
+      it "attaches the organization to the registration /register goes back to" do
+        get "/register/new"
+        b_param = BParam.last
+        expect(b_param.creation_organization_id).to be_blank
+
+        expect { get "#{base_url}?organization_id=#{organization.slug}" }.to_not change(BParam, :count)
+        expect(b_param.reload.creation_organization_id).to eq organization.id
+      end
+
       # Only the create branch of b_param_for seeds status, so this is the org path
       it "attaches the organization to the registration it starts" do
         get "/register/new" # a blank shell, no organization
