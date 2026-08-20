@@ -33,7 +33,7 @@ RSpec.describe Organized::BaseController, type: :request do
         get "/o/#{current_organization.to_param}"
         expect(response).to redirect_to(organization_registrations_path(organization_id: current_organization.to_param))
         get "/user_root_url_redirect"
-        # default_bike_search_path
+        # every_bike_search_path, not the organization's own registrations
         expect(response).to redirect_to(search_registrations_path(stolenness: "all"))
       end
     end
