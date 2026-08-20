@@ -66,8 +66,7 @@ module PageBlock
 
         # text: is the caller's, since a top-level row's label sits inside a block with its icon
         def active_link(item, row_class:, text: nil)
-          UI::ActiveLink::Component.new(path: item[:path], text:, match: item[:match],
-            matching_controllers: item[:matching_controllers], class: row_class)
+          UI::ActiveLink::Component.from_item(item, html_class: row_class, text:)
         end
 
         def row_class
