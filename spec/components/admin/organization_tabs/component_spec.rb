@@ -10,15 +10,41 @@ RSpec.describe Admin::OrganizationTabs::Component, type: :component do
 
   it "renders the organization and every tab, with the active one marked" do
     expect(component).to have_content("Cool Bikes")
-    expect(component.css("nav a").map { |chip| chip.text.squish })
-      .to eq ["Show", "Edit", "Locations 0", "Edit paid functionality", "SSO", "Org invoices"]
-    expect(component.css("nav a[aria-current]").map { |chip| chip.text.squish }).to eq ["Show"]
+    expect(component.css(".nav-tabs .nav-link").map { |tab| tab.text.squish })
+      .to eq ["Show", "Edit", "Locations 0", "Edit paid functionality", "Org invoices"]
+    expect(component.css(".nav-tabs .nav-link.active").map { |tab| tab.text.squish }).to eq ["Show"]
     expect(component).to have_link("Edit", href: "/admin/organizations/#{organization.to_param}/edit")
-    expect(component).to have_link("SSO", href: "/admin/organizations/#{organization.to_param}/sso")
+  end
+
+  describe "the SSO tab" do
+    it "is absent without the feature" do
+      expect(component).to_not have_link("SSO")
+    end
+
+    context "with saml_sso enabled" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features, name: "Cool Bikes",
+          enabled_feature_slugs: "saml_sso")
+      end
+
+      it "renders" do
+        expect(component).to have_link("SSO", href: "/admin/organizations/#{organization.to_param}/sso")
+      end
+    end
+
+    # The page renders either way, saying the feature is off - so it can't be the one page
+    # in the section without its own tab
+    context "on the SSO tab without the feature" do
+      let(:active) { :sso }
+
+      it "renders it, active" do
+        expect(component.css(".nav-tabs .nav-link.active").map { |tab| tab.text.squish }).to eq ["SSO"]
+      end
+    end
   end
 
   describe "the top right link" do
-    let(:organized_view) { component.at_css(".admin-subnav .nav-item a") }
+    let(:organized_view) { component.at_css(".admin-subnav ul .nav-item a") }
 
     context "on show" do
       it "links to the organization's dashboard" do
@@ -66,7 +92,7 @@ RSpec.describe Admin::OrganizationTabs::Component, type: :component do
     before { FactoryBot.create_list(:location, 2, organization:) }
 
     it "counts them in the tab" do
-      expect(component.css("nav a").map { |chip| chip.text.squish }).to include "Locations 2"
+      expect(component.css(".nav-tabs .nav-link").map { |tab| tab.text.squish }).to include "Locations 2"
     end
   end
 
@@ -82,7 +108,7 @@ RSpec.describe Admin::OrganizationTabs::Component, type: :component do
     let(:active) { :custom_layouts }
 
     it "renders it, though display_dev_info? is false in test" do
-      expect(component.css("nav a[aria-current]").map { |chip| chip.text.squish }).to eq ["Custom layouts"]
+      expect(component.css(".nav-tabs .nav-link.active").map { |tab| tab.text.squish }).to eq ["Custom layouts"]
     end
   end
 

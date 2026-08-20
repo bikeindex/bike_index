@@ -12,12 +12,21 @@ module Admin
       # What's wrong with the record - that it's deleted, that it can't be edited
       renders_one :alert
 
-      # tabs: UI::ButtonGroup entries, [{label:, href:, active:}, …]
+      # tabs: [{label:, href:, active:}, …]
       def initialize(title:, tabs:, nav_label:, subtitle: nil)
         @title = title
         @tabs = tabs
         @nav_label = nav_label
         @subtitle = subtitle
+      end
+
+      private
+
+      attr_reader :tabs
+
+      # .admin-subnav .nav-item a shrinks the padding to .25rem - too tight to read as a tab
+      def link_classes(tab)
+        ["nav-link tw:px-4! tw:py-2!", ("active" if tab[:active])].compact.join(" ")
       end
     end
   end

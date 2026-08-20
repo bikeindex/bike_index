@@ -30,13 +30,16 @@ module Admin
           [:edit, "Edit", edit_admin_organization_path(@organization)],
           [:locations, locations_label, locations_admin_organization_path(@organization)],
           [:paid_functionality, "Edit paid functionality", paid_functionality_admin_organization_path(@organization)],
-          [:sso, "SSO", sso_admin_organization_path(@organization)],
+          ([:sso, "SSO", sso_admin_organization_path(@organization)] if shown?(:sso, @organization.enabled?("saml_sso"))),
           [:invoices, "Org invoices", admin_organization_invoices_path(organization_id: @organization)],
-          ([:custom_layouts, "Custom layouts", admin_organization_custom_layouts_path(organization_id: @organization)] if custom_layouts?)]
+          ([:custom_layouts, "Custom layouts", admin_organization_custom_layouts_path(organization_id: @organization)] if
+            shown?(:custom_layouts, helpers.display_dev_info?))]
           .compact.map { |tab, label, href| {label:, href:, active: @active == tab} }
       end
 
-      def custom_layouts? = helpers.display_dev_info? || @active == :custom_layouts
+      # A tab with nothing behind it is dropped - except on its own page, which still
+      # renders (saying the feature is off) and shouldn't lose its place in the row
+      def shown?(tab, enabled) = enabled || @active == tab
 
       def locations_label
         safe_join(["Locations", helpers.number_display(@organization.locations.size)], " ")

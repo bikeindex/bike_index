@@ -1,4 +1,4 @@
-<div class="admin-subnav">
+<div class="admin-subnav tw:pb-0!">
   <div class="col">
     <h1>
       <%= @title %>
@@ -20,8 +20,22 @@
   <% if alert? %>
     <div class="col-md-6 mt-4"><%= alert %></div>
   <% end %>
-</div>
 
-<nav class="tw:mb-4" aria-label="<%= @nav_label %>">
-  <%= render(UI::ButtonGroup::Component.new(entries: @tabs)) %>
-</nav>
+  <%#
+    Divs rather than a ul: .admin-subnav ul is force-right-aligned, and its .active is a
+    blue pill. The -1px pulls the tabs onto the subnav's border-bottom, so the active
+    tab's white lower edge breaks the line the way a tab should
+  %>
+
+  <nav
+    class="col-12 nav nav-tabs tw:mt-3 tw:-mb-px tw:border-b-0!"
+    aria-label="<%= @nav_label %>"
+  >
+    <% tabs.each do |tab| %>
+      <div class="nav-item">
+        <%# "page" rather than tab[:active] - a false renders aria-current="false", which counts as current %>
+        <%= link_to tab[:label], tab[:href], class: link_classes(tab), aria: {current: ("page" if tab[:active])} %>
+      </div>
+    <% end %>
+  </nav>
+</div>
