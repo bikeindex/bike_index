@@ -168,7 +168,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
         {type: :link, label: "Blog", path: "/news", match: :controller,
          matching_controllers: ["blogs"], id: "navBlog", data: {email: "party@bikeindex.org"}}
       end
-      let(:options) { {link_class: "nav-link"} }
+      let(:options) { {html_class: "nav-link"} }
 
       it "passes each of them through" do
         expect(link["class"]).to eq "nav-link"

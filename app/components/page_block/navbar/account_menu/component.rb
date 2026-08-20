@@ -28,7 +28,7 @@ module PageBlock
 
         # .twdropdown (bike_index_components.css) styles the entries, so they need nothing
         def entry(item)
-          UI::ActiveLink::Component.from_item(item, link_class: (LOGOUT if item[:danger]))
+          UI::ActiveLink::Component.from_item(item, html_class: (LOGOUT if item[:danger]))
         end
       end
     end
