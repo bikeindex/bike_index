@@ -5,6 +5,63 @@ require "rails_helper"
 RSpec.describe UserServices::MenuItemsAccount do
   let(:user) { FactoryBot.create(:user_confirmed) }
 
+  describe "for" do
+    let(:items) { described_class.for(current_user: user, current_user_or_unconfirmed_user: user, **options) }
+    let(:options) { {} }
+    let(:labels) { items.map { |item| item[:label] } }
+
+    it "leads with the account rows, logout last" do
+      expect(labels).to eq(["Your registrations", "Register a new bike", "#{user.email} settings",
+        nil, "Log out"])
+      expect(items.map { |item| item[:type] }).to eq(%i[link link link divider link])
+    end
+
+    # Each menu tints it for itself, so the row only says which one it is
+    it "marks logout danger, and nothing else" do
+      expect(items.select { |item| item[:danger] }.map { |item| item[:label] }).to eq(["Log out"])
+    end
+
+    # navUserSettingLink is how the signed-in email is read off a page
+    it "carries the email on the settings row" do
+      settings = items.find { |item| item[:id] == "navUserSettingLink" }
+
+      expect(settings[:label]).to eq "#{user.email} settings"
+      expect(settings[:data]).to eq({email: user.email})
+    end
+
+    # The sidebar's menu unrolls upward off the account block, so it reads the other way
+    context "opens: :up" do
+      let(:options) { {opens: :up} }
+
+      it "leads with logout, the account rows reversed" do
+        expect(labels).to eq(["Log out", nil, "#{user.email} settings", "Register a new bike",
+          "Your registrations"])
+      end
+    end
+
+    context "with an organization" do
+      let(:organization) { FactoryBot.create(:organization, name: "Brakebills") }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user:, organization:) }
+
+      # Its own section, set off on both sides, and it holds its order whichever way the
+      # rest of the menu runs
+      it "sets the switcher off between the account rows and logout" do
+        expect(labels).to eq(["Your registrations", "Register a new bike", "#{user.email} settings",
+          nil, "Viewing without any organization", "Switch to Brakebills", nil, "Log out"])
+      end
+
+      context "opens: :up" do
+        let(:options) { {opens: :up} }
+
+        it "keeps the switcher's own order" do
+          expect(labels).to eq(["Log out", nil, "Viewing without any organization",
+            "Switch to Brakebills", nil, "#{user.email} settings", "Register a new bike",
+            "Your registrations"])
+        end
+      end
+    end
+  end
+
   describe "organization_switcher" do
     it "is empty for a user in no organization" do
       expect(described_class.organization_switcher(user)).to eq([])
@@ -66,9 +123,11 @@ RSpec.describe UserServices::MenuItemsAccount do
     end
   end
 
-  describe "marketplace_messages" do
-    it "is nil for a user with none" do
-      expect(described_class.marketplace_messages(user)).to be_nil
+  describe "marketplace messages" do
+    let(:items) { described_class.for(current_user: user, current_user_or_unconfirmed_user: user) }
+
+    it "is absent for a user with none" do
+      expect(items.map { |item| item[:label] }).to_not include("Marketplace messages")
     end
 
     context "with a message" do
@@ -77,10 +136,11 @@ RSpec.describe UserServices::MenuItemsAccount do
         FactoryBot.create(:marketplace_message, marketplace_listing:, sender: user)
       end
 
+      # Second, among the account rows -- the messages sit with the registrations they're about
       it "links to the messages" do
-        expect(described_class.marketplace_messages(user))
-          .to eq({type: :link, label: "Marketplace messages", path: "/my_account/messages",
-                  icon: nil, match: :path, matching_controllers: []})
+        expect(items[1]).to eq({type: :link, label: "Marketplace messages",
+                                path: "/my_account/messages", icon: nil, match: :path,
+                                matching_controllers: []})
       end
     end
   end

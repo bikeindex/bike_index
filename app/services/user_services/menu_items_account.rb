@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
-# The organizations the reader can switch between, and their marketplace messages --
-# the rows PageBlock::Navbar::UserSettingsMenu carries beyond its own.
+# The account menu: the reader's account links, the organizations they can switch between,
+# and logout. PageBlock::Navbar::UserSettingsMenu renders it as the navbar's gear submenu and
+# PageBlock::Navbar::AccountMenu as the org sidebar's dropdown -- only one of the two is ever
+# on a page, and they'd read as different menus if each built its own rows.
 #
 # Item shapes are UserServices::MenuItemsOrg's, so the two menus read alike:
+#   {type: :divider}
 #   {type: :link, label:, path:, icon:, match:, matching_controllers:}
 #   {type: :disabled, label:}
 module UserServices
@@ -13,7 +16,19 @@ module UserServices
     # A reader in dozens of organizations would otherwise push logout off the menu
     SWITCHER_ORGANIZATIONS = 5
 
-    # Its own section, which the caller sets off -- the two menus put it in different places.
+    # opens: which way the menu unrolls from whatever opens it, so it reads outward from there
+    # either way -- down from the navbar's gear above the page, up from the sidebar's account
+    # block below it. The switcher holds its own order regardless: leaving the organization
+    # behind leads it
+    def for(current_user:, current_user_or_unconfirmed_user:, current_organization: nil, opens: :down)
+      account = account_rows(current_user, current_user_or_unconfirmed_user)
+      switcher = organization_switcher(current_user_or_unconfirmed_user, current_organization:)
+
+      sections = (opens == :up) ? [[logout_row], switcher, account.reverse] : [account, switcher, [logout_row]]
+      sections.reject(&:empty?).inject { |rows, section| rows + [divider] + section }
+    end
+
+    # Its own section, which `for` sets off -- the two menus put it in different places.
     # Whichever they're already viewing has nowhere to go, so it's a label rather than a link
     def organization_switcher(user, current_organization: nil)
       organizations = switchable_organizations(user)
@@ -33,15 +48,30 @@ module UserServices
       }
     end
 
+    #
+    # private below here
+    #
+
+    # navUserSettingLink is how the signed-in email is read off a page -- by
+    # .claude/skills/frontend-screenshots' identity gate, among others
+    def account_rows(current_user, user)
+      [link(translation(:your_registrations), routes.my_account_path),
+        marketplace_messages(current_user),
+        link(translation(:register_a_new_bike), routes.choose_registration_path),
+        link(translation(:user_settings, user_email: user.email), routes.edit_my_account_path,
+          id: "navUserSettingLink", data: {email: user.email})].compact
+    end
+
+    # The one row that isn't somewhere to go, which each menu tints for itself
+    def logout_row
+      link(translation(:logout), routes.goodbye_path, danger: true)
+    end
+
     def marketplace_messages(user)
       return nil unless MarketplaceMessage.any_for_user?(user)
 
       link(translation(:marketplace_messages), routes.my_account_messages_path)
     end
-
-    #
-    # private below here
-    #
 
     # Ordered, so the switcher is the same five every time it's opened rather than
     # whatever the planner returns
@@ -68,6 +98,10 @@ module UserServices
       {type: :disabled, label:}
     end
 
+    def divider
+      {type: :divider}
+    end
+
     def translation(key, **interpolations)
       I18n.t(key, scope: "shared.menu_items_account", **interpolations)
     end
@@ -76,6 +110,7 @@ module UserServices
       Rails.application.routes.url_helpers
     end
 
-    conceal :switchable_organizations, :without_organization, :link, :disabled, :translation, :routes
+    conceal :account_rows, :logout_row, :marketplace_messages, :switchable_organizations,
+      :without_organization, :link, :disabled, :divider, :translation, :routes
   end
 end

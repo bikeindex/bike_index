@@ -4970,11 +4970,15 @@ en:
       your_bikes: Your bikes
       your_preferences: Your preferences
     menu_items_account:
+      logout: Log out
       marketplace_messages: Marketplace messages
+      register_a_new_bike: Register a new bike
       switch_to_org: Switch to %{org_name}
+      user_settings: "%{user_email} settings"
       view_without_org: View without any organization
       viewing_org: Viewing %{org_name}
       viewing_without_org: Viewing without any organization
+      your_registrations: Your registrations
     menu_items_org:
       add_a_bike: Add a bike
       add_an_impounded_vehicle: Add an Impounded Vehicle

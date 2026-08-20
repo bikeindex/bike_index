@@ -46,7 +46,7 @@ module PageBlock
 
         def settings_menu
           PageBlock::Navbar::UserSettingsMenu::Component.new(current_user: @current_user,
-            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user, dropdown: false)
+            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user)
         end
 
         def nav_link(item)

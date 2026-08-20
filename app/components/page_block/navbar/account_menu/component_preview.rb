@@ -2,7 +2,7 @@
 
 module PageBlock
   module Navbar
-    module UserSettingsMenu
+    module AccountMenu
       # The reader is built rather than found, so every scenario renders on any database --
       # and no real person's email reaches a preview
       class ComponentPreview < ApplicationComponentPreview
@@ -41,7 +41,7 @@ module PageBlock
               slug: "preview-organization-#{i + 1}")
           end
 
-          render_with_template(template: "page_block/navbar/user_settings_menu/component_preview/menu",
+          render_with_template(template: "page_block/navbar/account_menu/component_preview/menu",
             locals: {user: built_user(organizations),
                      current_organization: viewing && organizations[viewing]})
         end
