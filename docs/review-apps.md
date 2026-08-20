@@ -158,7 +158,24 @@ POSTGRES_PASSWORD            SECRET_KEY_BASE              SESSION_SECRET
 VERIFICATION_SECRET          GOOGLE_MAPS                  GOOGLE_MAPS_STATIC
 GOOGLE_GEOCODER              MAPBOX_GEOCODER              MAPBOX_MAPPING
 R2_DEV_ENDPOINT              R2_DEV_ACCESS_KEY            R2_DEV_ACCESS_KEY_SECRET
-HONEYBADGER_API_KEY
+HONEYBADGER_API_KEY          HONEYBADGER_FRONTEND_API_KEY
+```
+
+Those come from one `kamal secrets fetch`, so a field missing from the item fails every kamal
+command, not just deploy. Two more are read separately and are **optional** — without them a
+review app deploys normally, and only the SSO metadata and `sp.crt` endpoints 404:
+
+```
+SAML_SP_CERTIFICATE          SAML_SP_PRIVATE_KEY
+```
+
+Both hold a **base64-encoded** PEM, not the PEM itself — kamal writes
+each secret to the host as one `KEY=value` line, so the newlines have to go. Mint a throwaway
+pair (never production's); the task prints the one-line form under "One-line form, for a
+deploy environment":
+
+```bash
+BASE_URL=https://sandbox.review.bikeindex.org bundle exec rails saml:generate_sp_keypair
 ```
 
 These are the same values as the `REVIEW_APP_*` GitHub Environment secrets ([Initial host setup step 6](#6-ssh-key--github-config)) — keep them in sync. Then:

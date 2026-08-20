@@ -213,11 +213,11 @@ RSpec.describe "BikesController#show", type: :request do
         FactoryBot.create(:superuser_ability, user:)
         user
       end
-      let!(:organization) { current_user.default_organization }
+      let!(:organization) { OrganizationRole.default_organization(current_user) }
       let!(:organization2) { FactoryBot.create(:organization) }
       it "responds with success" do
         current_user.reload
-        expect(current_user.default_organization).to be_present
+        expect(OrganizationRole.default_organization(current_user)).to be_present
         expect(current_user.superuser?).to be_truthy
         get "#{base_url}/#{bike.id}"
         expect(response.status).to eq(200)

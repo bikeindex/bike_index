@@ -26,10 +26,36 @@ RSpec.describe Saml::SettingsBuilder, :saml_env do
     expect(settings.private_key).to eq sp_key
   end
 
+  context "with a base64-encoded keypair in ENV" do
+    let(:sp_cert) { Base64.strict_encode64(sp_cert_pem) }
+    let(:sp_key) { Base64.strict_encode64(sp_key_pem) }
+
+    it "decodes both back to PEM" do
+      expect(settings.certificate).to eq sp_cert_pem
+      expect(settings.private_key).to eq sp_key_pem
+    end
+  end
+
   it "carries the IdP config" do
     expect(settings.idp_entity_id).to eq saml_configuration.idp_entity_id
     expect(settings.idp_sso_service_url).to eq saml_configuration.idp_sso_target_url
     expect(settings.idp_cert).to include("BEGIN CERTIFICATE")
+  end
+
+  it "requests no NameID format by default" do
+    expect(settings.name_identifier_format).to be_nil
+    expect(OneLogin::RubySaml::Authrequest.new.create_authentication_xml_doc(settings).to_s)
+      .to_not include("NameIDPolicy")
+  end
+
+  context "with a configured name_id_format" do
+    let(:name_id_format) { OrganizationSamlConfiguration::NAME_ID_FORMATS["persistent"] }
+    let(:saml_configuration) do
+      FactoryBot.create(:organization_saml_configuration, :enabled, organization:, name_id_format:)
+    end
+    it "asks the IdP for it" do
+      expect(settings.name_identifier_format).to eq name_id_format
+    end
   end
 
   it "enforces signed assertions + SHA-256, and offers an encryption key" do

@@ -24,4 +24,16 @@ RSpec.describe Registrations::Show::ViewSwitcher::Component, type: :component do
       expect(page).to have_link("View in Legacy Viewer", href: "/bikes/#{bike.id}?no_redesign=true")
     end
   end
+
+  context "with another view available" do
+    let(:available_views) { [[:owner, nil], [:public, nil]] }
+
+    # The view already showing has nowhere to go, so .twdropdown renders it as the label
+    it "links the other view and leaves the current one unclickable" do
+      render_inline(component)
+      expect(page).to have_link("View as owner of bike", href: "/registrations/#{bike.id}?view_as=owner")
+      expect(page).to have_css("li[role='menuitem'] span[data-active='true']", text: "Viewing as Public")
+      expect(page).to have_no_css("a", text: "Viewing as")
+    end
+  end
 end

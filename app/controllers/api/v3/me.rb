@@ -34,14 +34,14 @@ module API
               organization_access_token: membership.organization_access_token,
               organization_logo_url: (membership.organization.avatar_url if membership.organization.avatar?),
               user_is_organization_admin: membership.admin?,
-              menu: OrganizedServices::UserMenuItems.for(organization: membership.organization, current_user:)
+              menu: UserServices::MenuItemsOrg.for(organization: membership.organization, current_user:)
             }
           end
 
           def organization_memberships
             return {} unless current_scopes.include?("read_organization_membership")
 
-            {memberships: current_user.organization_roles.map { |m| serialized_membership(m) }}
+            {memberships: OrganizationRole.ordered_for(current_user).includes(:organization).map { |m| serialized_membership(m) }}
           end
 
           private

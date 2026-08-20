@@ -11,7 +11,7 @@ module ControllerHelpers
 
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
-      :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
+      :current_organization, :passive_organization, :current_location,
       :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
       :render_donation_request?
@@ -135,21 +135,17 @@ module ControllerHelpers
     end
   end
 
-  def user_root_bike_search?
-    current_user.present? && current_user.default_organization.present? &&
-      current_user.default_organization.law_enforcement?
-  end
-
   def user_root_url
     return root_url unless current_user.present? && current_user.confirmed?
     return admin_root_url if current_user.superuser?
-    return my_account_url unless current_user.default_organization.present?
 
-    if user_root_bike_search?
-      default_bike_search_path
-    else
-      organization_root_url(organization_id: current_user.default_organization.to_param)
-    end
+    default_organization = OrganizationRole.default_organization(current_user)
+    return my_account_url if default_organization.blank?
+    # Every bike rather than default_bike_search_path: law enforcement is here to search
+    # the whole registry, not the handful their own organization registered
+    return every_bike_search_path if default_organization.law_enforcement?
+
+    organization_root_url(organization_id: default_organization.to_param)
   end
 
   # Deletes, so the donation modal only ever shows once - memoized because
@@ -171,6 +167,12 @@ module ControllerHelpers
   end
 
   def default_bike_search_path
+    return every_bike_search_path if passive_organization.blank?
+
+    organization_registrations_path(organization_id: passive_organization.to_param)
+  end
+
+  def every_bike_search_path
     search_registrations_path(stolenness: "all")
   end
 
@@ -310,7 +312,7 @@ module ControllerHelpers
 
       @passive_organization = Organization.friendly_find(session[:passive_organization_id])
     end
-    @passive_organization ||= set_passive_organization(current_user&.default_organization)
+    @passive_organization ||= set_passive_organization(OrganizationRole.default_organization(current_user))
   end
 
   # current_organization is the organization currently being used.

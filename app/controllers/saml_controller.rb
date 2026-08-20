@@ -8,16 +8,20 @@ class SamlController < ApplicationController
   # SP metadata is public by design — it carries only our entityID, ACS URL, and the
   # public SP certificate (never the private key). IdP admins consume it during onboarding.
   def metadata
-    organization = Organization.friendly_find(params[:org_slug])
-    raise ActiveRecord::RecordNotFound unless organization&.enabled?("saml_sso")
-
-    # build_ (not fetch_) so a GET never persists a configuration record
-    saml_configuration = organization.organization_saml_configuration ||
-      organization.build_organization_saml_configuration
-    settings = Saml::SettingsBuilder.build(saml_configuration)
-
+    settings = Saml::SettingsBuilder.build(published_saml_configuration)
+    # application/samlmetadata+xml is the registered type, but browsers download an unknown
+    # type instead of showing it, and this url is one we hand to a person
     render body: OneLogin::RubySaml::Metadata.new.generate(settings, true),
-      content_type: "application/samlmetadata+xml"
+      content_type: "application/xml"
+  end
+
+  # Some IdP tooling registers a bare certificate rather than reading one out of metadata.
+  # The keypair is app-wide, so the org-scoped path serves the same bytes for every org
+  def certificate
+    sp_certificate = Saml::SettingsBuilder.build(published_saml_configuration).certificate
+    raise ActiveRecord::RecordNotFound if sp_certificate.blank?
+
+    render body: sp_certificate, content_type: "application/pem-certificate-chain"
   end
 
   # SP-initiated login: redirect to the IdP with a signed AuthnRequest, parking the request id
@@ -25,8 +29,10 @@ class SamlController < ApplicationController
   def init
     settings = Saml::SettingsBuilder.build(configured_saml_configuration)
     auth_request = OneLogin::RubySaml::Authrequest.new
+    # This leg is same-site, so the session is readable here; the callback's isn't, so where
+    # the user was headed has to travel with the rest of the transaction
     relay_state = Saml::RequestStore.create(request_id: auth_request.request_id,
-      org_slug: params[:org_slug])
+      org_slug: params[:org_slug], return_to: session[:return_to])
     redirect_to auth_request.create(settings, RelayState: relay_state), allow_other_host: true
   end
 
@@ -45,15 +51,28 @@ class SamlController < ApplicationController
       raw_response: params[:SAMLResponse], request_id: saml_request[:request_id])
     return saml_failure(result.error) unless result.success?
 
-    sign_in_and_redirect(result.user)
+    session[:return_to] = saml_request[:return_to]
+    sign_in_and_redirect(result.user, via_saml: true)
   end
 
   private
 
-  def configured_saml_configuration
+  def saml_organization
     organization = Organization.friendly_find(params[:org_slug])
-    saml_configuration = organization&.organization_saml_configuration
-    raise ActiveRecord::RecordNotFound unless organization&.enabled?("saml_sso") && saml_configuration&.configured?
+    raise ActiveRecord::RecordNotFound unless organization&.enabled?("saml_sso")
+
+    organization
+  end
+
+  # build_ (not fetch_) so a GET never persists a configuration record
+  def published_saml_configuration
+    organization = saml_organization
+    organization.organization_saml_configuration || organization.build_organization_saml_configuration
+  end
+
+  def configured_saml_configuration
+    saml_configuration = saml_organization.organization_saml_configuration
+    raise ActiveRecord::RecordNotFound unless saml_configuration&.configured?
 
     saml_configuration
   end

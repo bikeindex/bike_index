@@ -84,7 +84,7 @@
               "
             >
               <%= label_tag "reg_field-organization_affiliation_#{organization.id}",
-                registration_field_label(organization, "reg_organization_affiliation") || t(".affiliation", org_name: organization.short_name),
+                OrgServices::Displayer.registration_field_label(organization, "reg_organization_affiliation") || t(".affiliation", org_name: organization.short_name),
                 class: "form-well-label" %>
 
               <div class="form-well-input">
@@ -96,7 +96,7 @@
           <% if registration_field == "reg_student_id" %>
             <div class="form-group row unnested-field no-divider-row">
               <%= label_tag "reg_field-student_id_#{organization.id}",
-                registration_field_label(organization, "reg_student_id") || t(".student_id"),
+                OrgServices::Displayer.registration_field_label(organization, "reg_student_id") || t(".student_id"),
                 class: "form-well-label" %>
 
               <div class="form-well-input">
@@ -106,7 +106,7 @@
           <% elsif registration_field == "reg_address" %>
             <div class="form-group row unnested-field no-divider-row">
               <%= label_tag "reg_field-eg_address_#{organization.id}",
-                registration_field_label(organization, "reg_address") || t(".mailing_address"),
+                OrgServices::Displayer.registration_field_label(organization, "reg_address") || t(".mailing_address"),
                 class: "form-well-label" %>
 
               <div class="form-well-input-large mt-1">
@@ -116,7 +116,7 @@
           <% elsif registration_field == "reg_phone" %>
             <div class="form-group row unnested-field no-divider-row">
               <%= label_tag "reg_field-reg_phone_#{organization.id}",
-                registration_field_label(organization, "reg_phone") || t(".phone"),
+                OrgServices::Displayer.registration_field_label(organization, "reg_phone") || t(".phone"),
                 class: "form-well-label" %>
 
               <div class="form-well-input-large mt-1">

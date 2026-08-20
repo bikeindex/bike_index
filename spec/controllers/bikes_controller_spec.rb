@@ -28,7 +28,7 @@ RSpec.describe BikesController, type: :controller do
     context "illegally set passive_organization" do
       include_context :logged_in_as_user
       it "renders, resets passive_organization_id" do
-        expect(user.default_organization).to be_nil
+        expect(OrganizationRole.default_organization(user)).to be_nil
         session[:passive_organization_id] = organization.id
         get :show, params: {id: bike.id}
         expect(response.status).to eq(200)
@@ -74,9 +74,9 @@ RSpec.describe BikesController, type: :controller do
         user
       end
       it "renders, sets passive_organization_id to be passed organization" do
-        expect(user.default_organization).to be_present
-        expect(user.default_organization).to_not eq organization
-        session[:passive_organization_id] = user.default_organization.id
+        expect(OrganizationRole.default_organization(user)).to be_present
+        expect(OrganizationRole.default_organization(user)).to_not eq organization
+        session[:passive_organization_id] = OrganizationRole.default_organization(user).id
         get :show, params: {id: bike.id, organization_id: organization.name}
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)

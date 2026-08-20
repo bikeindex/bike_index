@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe OrganizedServices::EmailPreview do
+RSpec.describe OrgServices::EmailPreview do
   let(:organization) { FactoryBot.create(:organization) }
   let(:user) { FactoryBot.create(:user) }
   let(:params) { ActionController::Parameters.new }

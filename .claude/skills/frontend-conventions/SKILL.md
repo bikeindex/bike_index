@@ -57,6 +57,8 @@ Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesh
 - A link styled as a button: `UI::ButtonLink::Component.new(href:, text:, color:, size:)` — same palette, renders an `<a>`.
 - A standalone action button (POST/DELETE/etc. to a URL) — a link that performs an action: pass `method:` to `ButtonLink` and it renders `button_to` for you (`render UI::ButtonLink::Component.new(text: "Delete", color: :error, href: bike_path(@bike), method: :delete)`), so don't hand-roll a `button_to` or wrap a submit button in a bare form. Extra `html_options` flow through: pass `params:` for a POST that carries params (they render as hidden fields — no manual `form_with`/`hidden_field_tag` needed), and `form: {onsubmit: …}` for a confirm on the wrapping form.
 
+  - **Not inside another form** — `button_to` renders a `<form>`, and the parser drops a nested one, hoisting its button and hidden inputs into the outer form. The button then submits *that* form, and the `form: {onsubmit: …}` confirm goes with the dropped tag. Nothing errors; it just does the wrong thing when clicked. On a page that is itself a form (the my_account edit templates, every `form_well`), pass `data: {method: :delete, confirm: "…"}` to `ButtonLink` instead — jquery_ujs handles it, and `my_accounts/_root.html.haml` has done it that way for years. `PageBlock::MyAccount::OrganizationRoles` is the worked example.
+
 The same instinct applies beyond buttons: **check `app/components/ui/` and `app/components/atom/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, form fields → `UI::Forms::*`, badges, modals, pagination, tables…). If a component exists for the pattern, use it; if it almost fits, extend it rather than forking its markup inline.
 
 `Atom::*` (`app/components/atom/`) holds the small value-rendering components — `Atom::Serial`, `Atom::Sticker`, `Atom::ShortId`. Everything else is `UI::*`; older value renderers like `UI::AddressDisplay` predate the split and stay put. Render a serial with `Atom::Serial::Component`, not `BikeHelper#render_serial_display`.
@@ -72,6 +74,12 @@ The same instinct applies beyond buttons: **check `app/components/ui/` and `app/
 ## Typeaheads: always `UI::Forms::Combobox`
 
 **Every typeahead / autocomplete / combobox goes through `UI::Forms::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. See `app/components/ui/forms/combobox/` (component + `component_preview.rb`) and `spec/components/ui/forms/combobox` for how to invoke it.
+
+## Form drafts: always `form-persist`
+
+**A form worth not retyping mirrors itself to localStorage through the `form-persist` controller** — never one of your own. It takes a `data-form-persist-key-value` unique per record, since the derived key is the form's action. See `app/components/register/step1/component.rb` and `app/components/register/step2/component.html.erb`.
+
+**A controller whose UI hangs off a restored field reconciles in two places** — a `form-persist:restored@window->…` entry in the element's `data-action`, and the same call in its own `connect`. A hand-rolled `window.addEventListener` is the older idiom; don't add more. See `app/components/register/step1/component.html.erb` with `app/javascript/controllers/register/heading_controller.js`.
 
 ## Current-page links: always `UI::ActiveLink`
 

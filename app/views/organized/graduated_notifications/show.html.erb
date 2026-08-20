@@ -100,7 +100,7 @@
               <% elsif @graduated_notification.bike_graduated? && current_user.admin_of?(current_organization) %>
                 <small class="less-strong">
                   Mark <%= @graduated_notification.bike.type %>
-                  <%= link_to "not graduated", retrieval_link_url(@graduated_notification), data: {confirm: "Are you sure? It's better for the user do this. You should only mark it not graduated if the user has lost the email."} %>
+                  <%= link_to "not graduated", OrgServices::Displayer.retrieval_link_url(@graduated_notification), data: {confirm: "Are you sure? It's better for the user do this. You should only mark it not graduated if the user has lost the email."} %>
                   for the user
                 </small>
               <% end %>
