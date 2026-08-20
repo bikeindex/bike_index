@@ -16,13 +16,12 @@ module UI
 
       # What a menu item hash can carry through to the link. The rest of an item is the menu's
       # own — its type, icon, children — and an absent key here takes initialize's default
-      ITEM_KEYS = [:path, :match, :matching_controllers, :query, :data, :id].freeze
+      ITEM_KEYS = [:path, :match, :matching_controllers, :data, :id].freeze
 
       # A menu manifest carries a link as a hash; what differs between the menus rendering one
       # is the class, and text: for a row whose label sits inside a block with its icon
       def self.from_item(item, html_class: nil, text: item[:label])
-        new(**item.slice(*ITEM_KEYS), text:,
-          class: [html_class, item[:html_class]].compact.join(" ").presence)
+        new(**item.slice(*ITEM_KEYS), text:, class: html_class)
       end
 
       def initialize(path:, text: nil, match: :path, matching_controllers: [], query: {}, data: {},
