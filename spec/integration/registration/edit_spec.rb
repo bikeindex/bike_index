@@ -89,8 +89,7 @@ RSpec.describe "Editing a registration", :js, type: :system do
     find("#donationModal .close").click
     expect(page).to have_no_css("#donationModal.in", wait: 5)
 
-    # The form the edit pages open out of, registered to the logged in user
-    # (owner_email defaults to their email)
+    # The form the edit pages open out of - owner_email defaults to the logged in user's
     visit new_bike_path
     fill_in "Serial number", with: "SERIAL-ORIGINAL-1"
     pick_remote_selectize(selectize_for("bike_manufacturer_id"), "Surly")

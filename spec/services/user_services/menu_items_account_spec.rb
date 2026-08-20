@@ -16,8 +16,6 @@ RSpec.describe UserServices::MenuItemsAccount do
       expect(items.map { |item| item[:type] }).to eq(%i[link link link divider link])
     end
 
-    # The registration flow itself, where the footer's link leads too - and every step of
-    # it is the page that row points at
     it "sends the registration row into the flow, matching on its controller" do
       registration = items.find { |item| item[:label] == "Register a new bike" }
 
