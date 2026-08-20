@@ -29,8 +29,10 @@ class SamlController < ApplicationController
   def init
     settings = Saml::SettingsBuilder.build(configured_saml_configuration)
     auth_request = OneLogin::RubySaml::Authrequest.new
+    # This leg is same-site, so the session is readable here; the callback's isn't, so where
+    # the user was headed has to travel with the rest of the transaction
     relay_state = Saml::RequestStore.create(request_id: auth_request.request_id,
-      org_slug: params[:org_slug])
+      org_slug: params[:org_slug], return_to: session[:return_to])
     redirect_to auth_request.create(settings, RelayState: relay_state), allow_other_host: true
   end
 
@@ -49,7 +51,8 @@ class SamlController < ApplicationController
       raw_response: params[:SAMLResponse], request_id: saml_request[:request_id])
     return saml_failure(result.error) unless result.success?
 
-    sign_in_and_redirect(result.user)
+    session[:return_to] = saml_request[:return_to]
+    sign_in_and_redirect(result.user, via_saml: true)
   end
 
   private

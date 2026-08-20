@@ -5,8 +5,8 @@ class SessionsController < ApplicationController
   before_action :skip_if_signed_in, only: [:new, :magic_link]
   # SSO orgs force SSO: every entry point that submits an email redirects an SSO-managed one
   # to the IdP before the action runs, so no password or new magic link gets issued for it.
-  # sign_in_with_magic_link is absent because it submits a token rather than an email — a link
-  # issued before the org moved to SSO still signs in until that token expires.
+  # sign_in_with_magic_link submits a token rather than an email, so it is caught downstream in
+  # sign_in_and_redirect instead, once the token has resolved a user.
   before_action :redirect_forced_saml, only: %i[identify create create_magic_link]
 
   def new
