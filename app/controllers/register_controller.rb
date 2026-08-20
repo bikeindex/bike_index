@@ -257,9 +257,14 @@ class RegisterController < ApplicationController
       return redirect_to(new_register_path(start_params))
     end
 
-    # The session follows whichever registration the token named, so the next
-    # tokenless request stays on it
-    session[:register_b_param_token] = @b_param.id_token
+    # The session follows whichever registration the token named, so the next tokenless
+    # request stays on it - until its bike exists, when there's nothing left to go back
+    # to and the bare /register should start the next registration instead
+    if @b_param.with_bike?
+      session.delete(:register_b_param_token)
+    else
+      session[:register_b_param_token] = @b_param.id_token
+    end
   end
 
   # A finished registration (bike created, or awaiting the email) only shows

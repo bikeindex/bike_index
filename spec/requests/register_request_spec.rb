@@ -300,6 +300,19 @@ RSpec.describe RegisterController, type: :request do
       expect { get base_url }.to_not change(BParam, :count)
       expect(response).to redirect_to register_path(b_param_token: session_b_param.id_token, step: 2)
     end
+
+    it "stops resuming a registration once its bike exists" do
+      get "/register/new"
+      finished = BParam.last
+      finished.update(created_bike_id: FactoryBot.create(:bike).id)
+
+      # Its own token still reaches the completion page, which is what drops it
+      get register_path(b_param_token: finished.id_token)
+      expect(response).to redirect_to register_path(b_param_token: finished.id_token, step: "finished")
+
+      expect { get base_url }.to_not change(BParam, :count)
+      expect(response).to redirect_to new_register_path
+    end
   end
 
   describe "embed" do
