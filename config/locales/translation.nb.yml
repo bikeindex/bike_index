@@ -2202,6 +2202,7 @@ nb:
         user_settings: Brukerinstillinger
         delete_account: Slett konto
         membership: Medlemskap
+        organization_roles: Organisasjonsroller
       update:
         current_password_doesnt_match: Nåværende passord stemmer ikke, det er nødvendig
           for å oppdatere passordet ditt.
@@ -2222,6 +2223,11 @@ nb:
           marketplace_listing_updated: Markedsplassoppføringen din er oppdatert!
           unable_to_publish: 'Kan ikke publisere %{item_type} for salg: %{errors}'
           unable_to_update: 'Kan ikke lagre %{item_type}: %{errors}'
+      organization_roles:
+        destroy:
+          left_organization: Du har forlatt %{org_name}
+          unable_to_leave: 'Kan ikke forlate %{org_name}: kontakt support@bikeindex.org
+            for hjelp'
     oauth:
       applications:
         ensure_app_owner!:
@@ -5480,6 +5486,30 @@ nb:
           finish_the_required_steps: fullfør de nødvendige trinnene
           not_registered_yet_html: Din %{cycle_type} er ikke registrert ennå! Vennligst
             %{finish_link}
+      my_account:
+        organization_roles:
+          automatically_view_in_organization: Vis automatisk med navigasjonsfeltet
+            %{org_name} når du logger deg på Bike Index.
+          joined: Ble med
+          leave_confirm: Advarsel! Du må be en administrator fra %{org_name} om å
+            få tilbake denne organisasjonsrollen! Du kan ikke angre dette selv.
+          leave_organization: Forlat organisasjonen
+          organization_role_information: Organisasjoner du har en rolle i. Dra dem
+            til den rekkefølgen du vil prioritere dem i.
+          organization_roles:
+            one: Din organisasjonsrolle
+            other: Dine organisasjonsroller
+          role_html: 'Rolle: %{role}'
+          roles:
+            admin: Admin
+            member: Medlem
+            member_no_bike_edit: Medlem - ingen sykkelredigering
+          view_after_log_in: Etter innlogging
+          view_as_html: Vis som %{org_name}
+          view_without_an_organization: Vis uten en organisasjon
+          you_can_still_switch: Du kan fortsatt bytte til visning med eller uten organisasjonen
+            i innstillingene dine i navigasjonsfeltet.
+          your_first_organization: din første organisasjon
     emails:
       partials:
         bike_box:
