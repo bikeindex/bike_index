@@ -165,6 +165,10 @@ env:
     - R2_DEV_ACCESS_KEY_SECRET
     - HONEYBADGER_API_KEY
     - HONEYBADGER_FRONTEND_API_KEY
+    # Base64-encoded (Saml::SettingsBuilder decodes). Throwaway per-environment keypair
+    # from `rake saml:generate_sp_keypair`, never production's.
+    - SAML_SP_CERTIFICATE
+    - SAML_SP_PRIVATE_KEY
 
 aliases:
   console: app exec --interactive --reuse "bin/rails console"

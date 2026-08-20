@@ -19,6 +19,8 @@ class MyAccountsController < ApplicationController
 
     if @edit_template&.to_sym == :root
       @user.find_or_build_address_record(country_id: current_country_id)
+    elsif @edit_template&.to_sym == :organization_roles
+      @organization_roles = OrganizationRole.ordered_for(@user).includes(:organization).load
     end
   end
 
@@ -30,7 +32,8 @@ class MyAccountsController < ApplicationController
       end
     end
     unless @user.errors.any?
-      successfully_updated = update_hot_sheet_notifications || update_user_registration_organizations
+      successfully_updated = update_hot_sheet_notifications || update_user_registration_organizations ||
+        update_organization_role_on_by_default
 
       if params[:user].present?
         successfully_updated = update_user_from_params(@user, permitted_parameters)
@@ -89,7 +92,13 @@ class MyAccountsController < ApplicationController
       sharing: translation(:sharing, scope: [:controllers, :my_accounts, :edit]),
       delete_account: translation(:delete_account, scope: [:controllers, :my_accounts, :edit]),
       membership: translation(:membership, scope: [:controllers, :my_accounts, :edit])
-    }.merge(registration_organization_template).as_json
+    }.merge(organization_role_template).merge(registration_organization_template).as_json
+  end
+
+  def organization_role_template
+    return {} unless current_user&.organization_roles&.exists?
+
+    {organization_roles: translation(:organization_roles, scope: [:controllers, :my_accounts, :edit])}
   end
 
   def registration_organization_template
@@ -113,6 +122,17 @@ class MyAccountsController < ApplicationController
       organization_role.update(hot_sheet_notification: notify ? "notification_daily" : "notification_never")
       flash[:success] ||= "Notification setting updated"
     end
+    true
+  end
+
+  # Viewing as an organization is the first one holding priority 0, so the whole list renumbers
+  def update_organization_role_on_by_default
+    return false unless params.key?(:on_by_default)
+
+    organization_role = OrganizationRole.ordered_for(@user).first
+    return false if organization_role.blank?
+
+    organization_role.update_on_by_default!(Binxtils::InputNormalizer.boolean(params[:on_by_default]))
     true
   end
 

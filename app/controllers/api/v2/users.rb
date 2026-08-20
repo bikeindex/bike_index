@@ -20,9 +20,7 @@ module API
           end
 
           def organization_memberships
-            return [] unless current_user.organization_roles.any?
-
-            current_user.organization_roles.map { |organization_role|
+            OrganizationRole.ordered_for(current_user).includes(:organization).map { |organization_role|
               {
                 organization_name: organization_role.organization.name,
                 organization_slug: organization_role.organization.slug,

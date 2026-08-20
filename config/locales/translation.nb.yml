@@ -2202,6 +2202,7 @@ nb:
         user_settings: Brukerinstillinger
         delete_account: Slett konto
         membership: Medlemskap
+        organization_roles: Organisasjonsroller
       update:
         current_password_doesnt_match: Nåværende passord stemmer ikke, det er nødvendig
           for å oppdatere passordet ditt.
@@ -2222,6 +2223,11 @@ nb:
           marketplace_listing_updated: Markedsplassoppføringen din er oppdatert!
           unable_to_publish: 'Kan ikke publisere %{item_type} for salg: %{errors}'
           unable_to_update: 'Kan ikke lagre %{item_type}: %{errors}'
+      organization_roles:
+        destroy:
+          left_organization: Du har forlatt %{org_name}
+          unable_to_leave: 'Kan ikke forlate %{org_name}: kontakt support@bikeindex.org
+            for hjelp'
     oauth:
       applications:
         ensure_app_owner!:
@@ -4968,42 +4974,6 @@ nb:
       you: Du
       your_bikes: Syklene dine
       your_preferences: Dine preferanser
-    menu_items_org:
-      add_a_bike: Legg til en sykkel
-      ascend_imports: Ascend Import
-      bulk_imports: Bulk import
-      discuss: Diskutere
-      exports: Eksport
-      getting_started: Starter
-      graduated_notifications: Graderte varsler
-      impounded_claims: Beslaglagte krav
-      incomplete_registrations: Ufullstendige registreringer
-      lightspeed_integration_panel: Lightspeed-integrasjonspanel
-      manage_users: Administrer brukere
-      model_audits: E-kjøretøyrevisjon
-      org_dashboard: "%{org_name} Dashboard"
-      org_locations: "%{org_name} steder"
-      org_profile: "%{org_name} profil"
-      parking_notification_unregistered: Ny uregistrert melding
-      recoveries: Gjenopprettinger
-      registration_stickers: Registreringsklistremerker
-      resources: Ressurser
-      stolen_hot_sheet: Stjålet Bike Hot Sheet
-      stolen_message: Stjålet melding
-      multi_search: Multisøk
-      add_an_impounded_vehicle: Legg til et beslaglagt kjøretøy
-      bulk_import_and_export: Import og eksport av store mengder
-      impounded_vehicles: Beslaglagte kjøretøy
-      impounding: Beslagleggelse
-      messaging: Meldinger
-      org_registrations: "%{org_name} Registreringer"
-      org_settings: "%{org_name} Innstillinger"
-      parking_notifications_group: Parkeringsvarsler
-      registration_sequences: Registreringssekvenser
-      reports: Rapporter
-      search_impounded_vehicles: Søk etter beslaglagte kjøretøy
-      search_parking_notifications: Søk etter parkeringsvarsler
-      search_registrations: Søk etter registreringer
     recovery_display:
       bike: Sykkel
       recovered_date: gjenopprettet %{date}
@@ -5023,12 +4993,48 @@ nb:
       logout: Logg ut
       marketplace_messages: Markedsplassmeldinger
       register_a_new_bike: Registrer en ny sykkel
-      switch_to_org: Switch to %{org_name}
+      switch_to_org: Bytt til %{org_name}
       user_settings: "%{user_email}-innstillinger"
-      view_without_org: View without any organization
-      viewing_org: Viewing %{org_name}
-      viewing_without_org: Viewing without any organization
+      view_without_org: Vis uten organisering
+      viewing_org: Viser %{org_name}
+      viewing_without_org: Visning uten organisering
       your_registrations: Dine registreringer
+    menu_items_org:
+      add_a_bike: Legg til en sykkel
+      add_an_impounded_vehicle: Legg til et beslaglagt kjøretøy
+      ascend_imports: Ascend Import
+      bulk_import_and_export: Import og eksport av store mengder
+      bulk_imports: Bulk import
+      discuss: Diskutere
+      exports: Eksport
+      getting_started: Starter
+      graduated_notifications: Graderte varsler
+      impounded_claims: Beslaglagte krav
+      impounded_vehicles: Beslaglagte kjøretøy
+      impounding: Beslagleggelse
+      incomplete_registrations: Ufullstendige registreringer
+      lightspeed_integration_panel: Lightspeed-integrasjonspanel
+      manage_users: Administrer brukere
+      messaging: Meldinger
+      model_audits: E-kjøretøyrevisjon
+      multi_search: Multisøk
+      org_dashboard: "%{org_name} Dashboard"
+      org_locations: "%{org_name} steder"
+      org_profile: "%{org_name} profil"
+      org_registrations: "%{org_name} Registreringer"
+      org_settings: "%{org_name} Innstillinger"
+      parking_notification_unregistered: Ny uregistrert melding
+      parking_notifications_group: Parkeringsvarsler
+      recoveries: Gjenopprettinger
+      registration_sequences: Registreringssekvenser
+      registration_stickers: Registreringsklistremerker
+      reports: Rapporter
+      resources: Ressurser
+      search_impounded_vehicles: Søk etter beslaglagte kjøretøy
+      search_parking_notifications: Søk etter parkeringsvarsler
+      search_registrations: Søk etter registreringer
+      stolen_hot_sheet: Stjålet Bike Hot Sheet
+      stolen_message: Stjålet melding
   stolen:
     index:
       ambassador: ambassadør
@@ -5443,8 +5449,6 @@ nb:
           search: Søk
           sign_up: Melde deg på
           stolen_bike: Stjålet sykkel?
-        user_settings_menu:
-          settings_menu: Innstillinger
         wrapper:
           menu: Meny
           sign_up: Melde deg på
@@ -5453,13 +5457,11 @@ nb:
           admin_panel: ADMINISTRASJONSPANEL
           collapse_sidebar: Skjul sidefeltet
           expand_sidebar: Utvid sidefeltet
-          logout: Logg ut
           menu: Meny
           organization_crest: "%{org_name} våpenskjold"
-          in_super_admin: "%{org_name} in super admin"
-          register_a_new_bike: Registrer en ny sykkel
-          user_settings: "%{user_email}-innstillinger"
-          your_registrations: Dine registreringer
+          in_super_admin: "%{org_name} i superadministrator"
+        user_settings_menu:
+          settings_menu: Innstillinger
       user_alerts:
         phone_waiting_confirmation:
           confirm_your_phone_number: Bekreft telefonnummeret ditt
@@ -5484,6 +5486,30 @@ nb:
           finish_the_required_steps: fullfør de nødvendige trinnene
           not_registered_yet_html: Din %{cycle_type} er ikke registrert ennå! Vennligst
             %{finish_link}
+      my_account:
+        organization_roles:
+          automatically_view_in_organization: Vis automatisk med navigasjonsfeltet
+            %{org_name} når du logger deg på Bike Index.
+          joined: Ble med
+          leave_confirm: Advarsel! Du må be en administrator fra %{org_name} om å
+            få tilbake denne organisasjonsrollen! Du kan ikke angre dette selv.
+          leave_organization: Forlat organisasjonen
+          organization_role_information: Organisasjoner du har en rolle i. Dra dem
+            til den rekkefølgen du vil prioritere dem i.
+          organization_roles:
+            one: Din organisasjonsrolle
+            other: Dine organisasjonsroller
+          role_html: 'Rolle: %{role}'
+          roles:
+            admin: Admin
+            member: Medlem
+            member_no_bike_edit: Medlem - ingen sykkelredigering
+          view_after_log_in: Etter innlogging
+          view_as_html: Vis som %{org_name}
+          view_without_an_organization: Vis uten en organisasjon
+          you_can_still_switch: Du kan fortsatt bytte til visning med eller uten organisasjonen
+            i innstillingene dine i navigasjonsfeltet.
+          your_first_organization: din første organisasjon
     emails:
       partials:
         bike_box:

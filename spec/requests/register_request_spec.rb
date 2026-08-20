@@ -143,7 +143,7 @@ RSpec.describe RegisterController, type: :request do
 
         # Which of the two is answered by the one they're acting as, rather than left unassigned
         it "registers with the passive organization" do
-          expect(current_user.default_organization).to eq organization
+          expect(OrganizationRole.default_organization(current_user)).to eq organization
           get "/register/new"
           expect(BParam.last.auto_organization_id).to eq organization.id
 

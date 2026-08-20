@@ -26,6 +26,16 @@ RSpec.describe Saml::SettingsBuilder, :saml_env do
     expect(settings.private_key).to eq sp_key
   end
 
+  context "with a base64-encoded keypair in ENV" do
+    let(:sp_cert) { Base64.strict_encode64(sp_cert_pem) }
+    let(:sp_key) { Base64.strict_encode64(sp_key_pem) }
+
+    it "decodes both back to PEM" do
+      expect(settings.certificate).to eq sp_cert_pem
+      expect(settings.private_key).to eq sp_key_pem
+    end
+  end
+
   it "carries the IdP config" do
     expect(settings.idp_entity_id).to eq saml_configuration.idp_entity_id
     expect(settings.idp_sso_service_url).to eq saml_configuration.idp_sso_target_url

@@ -22,5 +22,10 @@ namespace :saml do
     puts "# Set these as env vars (never commit the private key):\n\n"
     puts "SAML_SP_CERTIFICATE:\n#{cert.to_pem}"
     puts "SAML_SP_PRIVATE_KEY:\n#{key.to_pem}"
+
+    # Kamal and Cloud 66 store one line per secret, so a deploy environment takes these instead
+    puts "# One-line form, for a deploy environment:\n\n"
+    puts "SAML_SP_CERTIFICATE:\n#{Base64.strict_encode64(cert.to_pem)}\n\n"
+    puts "SAML_SP_PRIVATE_KEY:\n#{Base64.strict_encode64(key.to_pem)}\n\n"
   end
 end
