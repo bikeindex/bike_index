@@ -5274,11 +5274,15 @@ it:
       name_required: Per registrarsi è necessario indicare il nome del proprietario.
       unable_to_save: Non è stato possibile salvare la registrazione, riprova.
     menu_items_account:
+      logout: Disconnettiti
       marketplace_messages: Messaggi del mercato
+      register_a_new_bike: Registra una nuova bicicletta
       switch_to_org: Switch to %{org_name}
+      user_settings: "%{user_email} impostazioni"
       view_without_org: View without any organization
       viewing_org: Viewing %{org_name}
       viewing_without_org: Viewing without any organization
+      your_registrations: Le vostre registrazioni
   stolen:
     index:
       ambassador: ambasciatore
