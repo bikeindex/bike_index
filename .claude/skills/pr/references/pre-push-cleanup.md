@@ -8,6 +8,8 @@ Invoke the `/simplify` command to review the changed code for reuse, simplificat
 
 Skip it when the diff has no code in it — a docs-, skill- or config-only branch gives it nothing to review, and it fans out subagents to find that out.
 
+**On a second run against the same branch, scope it to the commits since the last one** — `/simplify` defaults to the whole branch diff, so re-running it resurfaces every finding already triaged, including the ones deliberately declined. Pass the range (`git diff <last-simplify-commit>..HEAD`) as its argument.
+
 Then run `bin/lint` to auto-format (it also picks up whatever `/simplify` just changed). Always `bin/lint`, never another formatter or `standardrb` directly. Scope it to the branch's files rather than walking the whole repo:
 
 ```bash
