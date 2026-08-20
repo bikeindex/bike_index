@@ -65,10 +65,10 @@ RSpec.describe "RegistrationsController#show", type: :request do
 
     context "current_user is a superuser" do
       let(:current_user) { FactoryBot.create(:superuser) }
-      it "offers a View Super Admin link to the admin bike page" do
+      it "offers a View in Super Admin link to the admin bike page" do
         get "#{base_url}/#{bike.id}"
         body = whitespace_normalized_body_text
-        expect(body).to match("View Super Admin")
+        expect(body).to match("View in Super Admin")
         expect(response.body).to match(admin_bike_path(bike.id))
       end
     end
@@ -209,7 +209,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
       it "renders" do
         get "#{base_url}/#{bike.id}"
         expect(response.status).to eq(200)
-        expect(whitespace_normalized_body_text).to match("View Super Admin")
+        expect(whitespace_normalized_body_text).to match("View in Super Admin")
       end
     end
 

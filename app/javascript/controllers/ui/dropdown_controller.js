@@ -1,7 +1,9 @@
 import { Controller } from '@hotwired/stimulus'
 import { computePosition, flip, shift, offset } from '@floating-ui/dom'
 
-let zCounter = 50
+// Above PageBlock::Navbar::OrgSidebar's 1050 - a menu opened at the left edge of the
+// content column extends over the sidebar, which otherwise paints on top of it
+let zCounter = 1050
 
 // Connects to data-controller="ui--dropdown"
 export default class extends Controller {

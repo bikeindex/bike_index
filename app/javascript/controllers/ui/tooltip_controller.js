@@ -1,7 +1,9 @@
 import { Controller } from '@hotwired/stimulus'
 import { computePosition, flip, shift, offset, autoUpdate } from '@floating-ui/dom'
 
-let topZIndex = 50
+// Above PageBlock::Navbar::OrgSidebar's 1050, which otherwise paints over a tooltip
+// opened near the left edge of the content column
+let topZIndex = 1050
 
 // Connects to data-controller="ui--tooltip"
 //

@@ -52,7 +52,7 @@ module Registrations
         # Superusers get a link to the admin bike page, ahead of the audience views
         def super_admin_link
           link_to(admin_bike_path(@bike.id), class: entry_class) do
-            safe_join(["View ", content_tag(:span, "Super Admin", class: "tw:font-bold")])
+            safe_join(["View in ", content_tag(:span, "Super Admin", class: "tw:font-bold")])
           end
         end
 
@@ -73,14 +73,25 @@ module Registrations
         end
 
         def entry_link(view)
-          active = view == @current_view
-          link_to(registration_path(@bike, view_as: BikeServices::ShowViews.view_param(view)), "aria-current": (active ? "true" : nil), class: entry_class(active:)) do
-            safe_join([(active ? "Viewing as" : "View as"), " ", entry_label(view)])
+          return current_entry(view) if view == @current_view
+
+          link_to(registration_path(@bike, view_as: BikeServices::ShowViews.view_param(view)), class: entry_class) do
+            safe_join(["View as ", entry_label(view)])
           end
         end
 
+        # The view already showing, so there's nowhere to go - a span rather than a link
+        # to the page it's on, and no hover to invite the click
+        def current_entry(view)
+          content_tag(:span, safe_join(["Viewing as ", entry_label(view)]),
+            class: entry_class(active: true), "aria-current": "true")
+        end
+
         def entry_class(active: false)
-          "tw:block tw:whitespace-nowrap tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700 tw:no-underline tw:hover:bg-gray-100 tw:dark:text-gray-200 tw:dark:hover:bg-gray-800 #{"tw:bg-gray-100 tw:dark:bg-gray-800" if active}"
+          base = "tw:block tw:whitespace-nowrap tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700 tw:no-underline tw:dark:text-gray-200"
+          return "#{base} tw:bg-gray-100 tw:dark:bg-gray-800" if active
+
+          "#{base} tw:hover:bg-gray-100 tw:dark:hover:bg-gray-800"
         end
 
         def button_class
