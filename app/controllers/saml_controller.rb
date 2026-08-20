@@ -10,8 +10,7 @@ class SamlController < ApplicationController
   def metadata
     settings = Saml::SettingsBuilder.build(published_saml_configuration)
     # application/samlmetadata+xml is the registered type, but browsers download an unknown
-    # type instead of showing it, and this url is one we hand to a person. The route takes
-    # `.xml` too, so the extension an IdP admin expects reaches the same place
+    # type instead of showing it, and this url is one we hand to a person
     render body: OneLogin::RubySaml::Metadata.new.generate(settings, true),
       content_type: "application/xml"
   end

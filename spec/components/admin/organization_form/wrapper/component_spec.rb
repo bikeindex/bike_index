@@ -129,7 +129,8 @@ RSpec.describe Admin::OrganizationForm::Wrapper::Component, type: :component do
 
     it "renders the SAML configuration fields" do
       expect(component).to have_content("SAML SSO")
-      expect(component).to have_link(href: /sso\/#{organization.to_param}\/metadata/)
+      # the linked url is the entityID, so it carries no extension
+      expect(component).to have_link(href: "http://test.host/sso/#{organization.to_param}/metadata")
       expect(component).to have_field("organization_organization_saml_configuration_attributes_idp_entity_id")
       expect(component).to have_field("organization_organization_saml_configuration_attributes_idp_cert")
     end

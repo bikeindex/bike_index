@@ -4,22 +4,15 @@ RSpec.describe SamlController, :saml_env, type: :request do
   let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
 
   describe "GET /sso/:org_slug/metadata" do
-    # The entityID is this url, so it has to keep serving metadata itself - and IdP admins
-    # paste it into a metadata-url field, since we hand them the same string
-    it "serves the same document with and without the .xml extension" do
-      get "/sso/#{organization.to_param}/metadata"
-      expect(response).to have_http_status(:ok)
-      extensionless = response.body
-
+    # This url is the entityID, and IdP admins paste the same string into a metadata-url
+    # field - an extension that also served metadata would be a second thing to register
+    it "is not found with an extension" do
       get "/sso/#{organization.to_param}/metadata.xml"
-      expect(response).to have_http_status(:ok)
-      expect(response.media_type).to eq "application/xml"
-      # the metadata carries a per-request ID, so compare everything else
-      expect(response.body.sub(/ID='[^']*'/, "")).to eq extensionless.sub(/ID='[^']*'/, "")
+      expect(response).to have_http_status(:not_found)
     end
 
     it "returns SP metadata XML advertising both key uses, and never the private key" do
-      get "/sso/#{organization.to_param}/metadata.xml"
+      get "/sso/#{organization.to_param}/metadata"
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq "application/xml"
       document = Nokogiri::XML(response.body)
