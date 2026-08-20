@@ -125,8 +125,9 @@ through the IdP, they link to the existing account rather than getting a duplica
 
 **Pin the NameID format with the IdP.** `SsoIdentity` is unique on
 `(organization_id, provider, uid)` where `uid` is the asserted NameID. A **transient** NameID
-mints a new identity row on every login. `name_id_format` is stored but never enforced — and
-there is no field for it on the admin form, though it is in the strong params.
+mints a new identity row on every login. The admin form's **NameID format** select is what asks
+for one; blank sends no `NameIDPolicy` at all, leaving the choice to the IdP. What the IdP
+actually returned is recorded on each `SsoIdentity` — nothing enforces a match.
 
 **Capture before you change anything**, so it's reversible: the org's `enabled_feature_slugs`,
 the ids of existing `organization_roles`, accounts on the domain split by has-a-password /

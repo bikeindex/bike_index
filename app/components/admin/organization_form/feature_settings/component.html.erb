@@ -129,6 +129,12 @@
           <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_cert_fingerprint, label_text: "IdP certificate fingerprint")) %>
 
           <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :email_attribute_name, label_text: "Email attribute name", html_options: {placeholder: OrganizationSamlConfiguration::DEFAULT_EMAIL_ATTRIBUTE})) %>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :name_id_format, label_text: "NameID format")) do %>
+            <%= render(UI::Forms::Select::Component.new(form_builder: saml_f, attribute: :name_id_format,
+              option_tags: OrganizationSamlConfiguration::NAME_ID_FORMATS,
+              options: {include_blank: "No preference - the IdP chooses"})) %>
+          <% end %>
         <% end %>
       </div>
     <% end %>
