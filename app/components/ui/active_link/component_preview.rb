@@ -46,6 +46,21 @@ module UI
           path: "#{PREVIEW_PATH}/match_full_path", match: :full_path, class: "twlink"))
       end
 
+      # A filter entry, which stands for the param it applies rather than for a URL: it points
+      # away from its own filter, the way one already in force clears itself, and goes active
+      # on the param alone. Add &page=2 to see a param it doesn't name ignored.
+      def match_query
+        render(UI::ActiveLink::Component.new(text: "Filter: on", path: "#{PREVIEW_PATH}/match_query",
+          match: :query, query: {filter: "on"}, class: "twlink"))
+      end
+
+      # The entry a controller falls back to with the param absent, so "" is among its values
+      def match_query_default
+        render(UI::ActiveLink::Component.new(text: "Filter: off",
+          path: "#{PREVIEW_PATH}/match_query_default?filter=off", match: :query,
+          query: {filter: ["off", nil]}, class: "twlink"))
+      end
+
       # Anything beyond class passes through to the anchor
       def with_html_options
         render(UI::ActiveLink::Component.new(text: "Opens in a new tab", path: "#{PREVIEW_PATH}/with_html_options",

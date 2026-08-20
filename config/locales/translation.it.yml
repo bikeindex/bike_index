@@ -2250,6 +2250,7 @@ it:
         sharing: Condivisione + Pagina personale
         user_settings: Impostazioni utente
         membership: Iscrizione
+        organization_roles: Ruoli organizzativi
       update:
         current_password_doesnt_match: La password attuale non corrisponde, è necessaria
           per aggiornarla.
@@ -2271,6 +2272,11 @@ it:
           marketplace_listing_updated: La tua inserzione sul marketplace è stata aggiornata!
           unable_to_publish: 'Impossibile pubblicare %{item_type} in vendita: %{errors}'
           unable_to_update: 'Impossibile salvare %{item_type}: %{errors}'
+      organization_roles:
+        destroy:
+          left_organization: Hai lasciato %{org_name}
+          unable_to_leave: 'Impossibile uscire da %{org_name}: contattare support@bikeindex.org
+            per assistenza.'
     oauth:
       applications:
         ensure_app_owner!:
@@ -5222,42 +5228,6 @@ it:
       you: Voi
       your_bikes: Le tue biciclette
       your_preferences: Le tue preferenze
-    organized_menu_items:
-      add_a_bike: Aggiungi una bicicletta
-      ascend_imports: Ascend Imports
-      bulk_imports: Importazioni alla rinfusa
-      discuss: Discutere
-      exports: Esportazioni
-      getting_started: Iniziare
-      graduated_notifications: Notifiche graduali
-      impounded_claims: crediti sequestrati
-      incomplete_registrations: Iscrizioni incomplete
-      lightspeed_integration_panel: Pannello di integrazione Lightspeed
-      manage_users: Gestisci utenti
-      model_audits: Audit dei veicoli elettrici
-      org_dashboard: "%{org_name} Dashboard"
-      org_locations: "%{org_name} posizioni"
-      org_profile: "%{org_name} profilo"
-      parking_notification_unregistered: Nuova notifica non registrata
-      recoveries: Recuperi
-      registration_stickers: Adesivi di registrazione
-      resources: Risorse
-      stolen_hot_sheet: Foglio informativo sui furti di biciclette
-      stolen_message: Messaggio di furto
-      multi_search: Ricerca multipla
-      add_an_impounded_vehicle: Aggiungi un veicolo sequestrato
-      bulk_import_and_export: Importazione ed esportazione all'ingrosso
-      impounded_vehicles: Veicoli sequestrati
-      impounding: Sequestro
-      messaging: Messaggistica
-      org_registrations: "%{org_name} Registrazioni"
-      org_settings: "%{org_name} Impostazioni"
-      parking_notifications_group: Notifiche di parcheggio
-      registration_sequences: Sequenze di registrazione
-      reports: Rapporti
-      search_impounded_vehicles: Perquisizione dei veicoli sequestrati
-      search_parking_notifications: Cerca avvisi di parcheggio
-      search_registrations: Cerca registrazioni
     recovery_display:
       bike: Bicicletta
       recovered_date: recuperato %{date}
@@ -5273,9 +5243,52 @@ it:
       manufacturer_required: Il produttore è tenuto a registrarsi
       name_required: Per registrarsi è necessario indicare il nome del proprietario.
       unable_to_save: Non è stato possibile salvare la registrazione, riprova.
-    account_menu_items:
+    menu_items_account:
+      logout: Disconnettiti
       marketplace_messages: Messaggi del mercato
-      switch_to_org: Passa all'amministratore %{org_name}.
+      register_a_new_bike: Registra una nuova bicicletta
+      switch_to_org: Passa a %{org_name}
+      user_settings: "%{user_email} impostazioni"
+      view_without_org: Visualizzazione senza alcuna organizzazione
+      viewing_org: Visualizzazione %{org_name}
+      viewing_without_org: Visione senza alcuna organizzazione
+      your_registrations: Le vostre registrazioni
+    menu_items_org:
+      add_a_bike: Aggiungi una bicicletta
+      add_an_impounded_vehicle: Aggiungi un veicolo sequestrato
+      ascend_imports: Ascend Imports
+      bulk_import_and_export: Importazione ed esportazione all'ingrosso
+      bulk_imports: Importazioni alla rinfusa
+      discuss: Discutere
+      exports: Esportazioni
+      getting_started: Iniziare
+      graduated_notifications: Notifiche graduali
+      impounded_claims: crediti sequestrati
+      impounded_vehicles: Veicoli sequestrati
+      impounding: Sequestro
+      incomplete_registrations: Iscrizioni incomplete
+      lightspeed_integration_panel: Pannello di integrazione Lightspeed
+      manage_users: Gestisci utenti
+      messaging: Messaggistica
+      model_audits: Audit dei veicoli elettrici
+      multi_search: Ricerca multipla
+      org_dashboard: "%{org_name} Dashboard"
+      org_locations: "%{org_name} posizioni"
+      org_profile: "%{org_name} profilo"
+      org_registrations: "%{org_name} Registrazioni"
+      org_settings: "%{org_name} Impostazioni"
+      parking_notification_unregistered: Nuova notifica non registrata
+      parking_notifications_group: Notifiche di parcheggio
+      recoveries: Recuperi
+      registration_sequences: Sequenze di registrazione
+      registration_stickers: Adesivi di registrazione
+      reports: Rapporti
+      resources: Risorse
+      search_impounded_vehicles: Perquisizione dei veicoli sequestrati
+      search_parking_notifications: Cerca avvisi di parcheggio
+      search_registrations: Cerca registrazioni
+      stolen_hot_sheet: Foglio informativo sui furti di biciclette
+      stolen_message: Messaggio di furto
   stolen:
     index:
       ambassador: ambasciatore
@@ -5699,12 +5712,6 @@ it:
           search: Cerca
           sign_up: Iscriviti
           stolen_bike: Bicicletta rubata?
-        settings_menu:
-          logout: Disconnettiti
-          register_a_new_bike: Registra una nuova bicicletta
-          settings_menu: Impostazioni
-          user_settings: "%{user_email} impostazioni"
-          your_registrations: Le vostre registrazioni
         wrapper:
           menu: Menu
           sign_up: Iscriviti
@@ -5714,12 +5721,11 @@ it:
           admin_panel: PANNELLO DI AMMINISTRAZIONE
           collapse_sidebar: Riduci la barra laterale
           expand_sidebar: Espandi la barra laterale
-          logout: Disconnettiti
           menu: Menu
           organization_crest: "%{org_name} cresta"
-          register_a_new_bike: Registra una nuova bicicletta
-          user_settings: "%{user_email} impostazioni"
-          your_registrations: Le vostre registrazioni
+          in_super_admin: "%{org_name} in super amministratore"
+        user_settings_menu:
+          settings_menu: Impostazioni
       user_alerts:
         phone_waiting_confirmation:
           confirm_your_phone_number: Conferma il numero di telefono
@@ -5744,6 +5750,31 @@ it:
           finish_the_required_steps: completare i passaggi richiesti
           not_registered_yet_html: Il tuo %{cycle_type} non è ancora registrato! Per
             favore %{finish_link}
+      my_account:
+        organization_roles:
+          automatically_view_in_organization: Visualizzazione automatica con barra
+            di navigazione %{org_name} all'accesso a Bike Index.
+          joined: Partecipato
+          leave_confirm: Attenzione! Dovrai chiedere a un amministratore di %{org_name}
+            di riottenere questo ruolo nell'organizzazione! Non potrai annullare questa
+            operazione autonomamente.
+          leave_organization: Lasciare l'organizzazione
+          organization_role_information: Organizzazioni in cui ricopri un ruolo. Trascinale
+            nell'ordine in cui desideri visualizzarle in ordine di priorità.
+          organization_roles:
+            one: Il tuo ruolo nell'organizzazione
+            other: I vostri ruoli all'interno dell'organizzazione
+          role_html: 'Ruolo: %{role}'
+          roles:
+            admin: Amministratore
+            member: Membro
+            member_no_bike_edit: Membro - nessuna modifica alla bicicletta
+          view_after_log_in: Dopo aver effettuato l'accesso
+          view_as_html: Visualizza come %{org_name}
+          view_without_an_organization: Visualizzare senza un'organizzazione
+          you_can_still_switch: Potrai comunque passare alla visualizzazione con o
+            senza l'organizzazione nelle impostazioni della barra di navigazione.
+          your_first_organization: la tua prima organizzazione
     emails:
       partials:
         bike_box:

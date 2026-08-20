@@ -49,11 +49,16 @@
 
 <ul class="primary-submenu" aria-labelledby="setting_submenu">
   <% items.each do |item| %>
-    <% if item[:type] == :divider %>
+    <% case item[:type] %>
+    <% when :divider %>
       <li class="divider-nav-item" aria-hidden="true"></li>
-    <% else %>
+    <% when :link %>
       <li>
-        <%= render PageBlock::Navbar::MenuLink::Component.new(**item) %>
+        <%= render entry(item) %>
+      </li>
+    <% when :disabled %>
+      <li>
+        <span class="nav-link tw:text-gray-400! tw:italic" data-active="true"><%= item[:label] %></span>
       </li>
     <% end %>
   <% end %>

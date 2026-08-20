@@ -1,6 +1,6 @@
 <%= render partial: "/admin/organizations/display_header", locals: {current_action: "", show_custom_layouts: true, organization_view_path: organization_root_path(organization_id: @organization.to_param), show_edit: true} %>
 
-<% if OrganizationDisplayer.law_enforcement_missing_verified_features?(@organization) %>
+<% if OrgServices::Displayer.law_enforcement_missing_verified_features?(@organization) %>
   <div class="alert alert-info">
     This is a law enforcement organization without unstolen notifications. To
     enable unstolen notifications,
@@ -238,7 +238,7 @@
         <%= link_to "#{pluralize(@organization.invoices.count, 'invoice')} total", admin_organization_invoices_path(organization_id: @organization) %>
       </em>
 
-      <% if OrganizationDisplayer.subscription_expired_alert?(@organization) %>
+      <% if OrgServices::Displayer.subscription_expired_alert?(@organization) %>
         <span
           class="text-danger"
           title="the subscription expired message will be shown to them in their portal"

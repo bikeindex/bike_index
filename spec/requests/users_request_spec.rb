@@ -128,7 +128,7 @@ RSpec.describe UsersController, type: :request do
         organization = FactoryBot.create(:organization)
         FactoryBot.create(:organization_role_claimed, organization: organization, user: current_user)
         current_user.reload
-        expect(current_user.default_organization).to eq organization
+        expect(OrganizationRole.default_organization(current_user)).to eq organization
         patch "#{base_url}/#{current_user.username}", params: {id: current_user.username, user: {vendor_terms_of_service: "1", notification_newsletters: true}}
         expect(response.code).to eq("302")
         expect(response).to redirect_to organization_root_url(organization_id: organization.to_param)

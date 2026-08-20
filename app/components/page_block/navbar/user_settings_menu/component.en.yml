@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    page_block:
+      navbar:
+        user_settings_menu:
+          settings_menu: Settings

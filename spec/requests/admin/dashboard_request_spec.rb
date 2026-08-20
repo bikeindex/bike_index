@@ -14,7 +14,7 @@ RSpec.describe Admin::DashboardController, type: :request do
       it "redirects" do
         get "/admin"
         expect(response.code).to eq("302")
-        expect(response).to redirect_to organization_root_path(organization_id: current_user.default_organization.to_param)
+        expect(response).to redirect_to organization_root_path(organization_id: OrganizationRole.default_organization(current_user).to_param)
       end
     end
   end
