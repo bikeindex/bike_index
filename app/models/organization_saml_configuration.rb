@@ -25,11 +25,19 @@ class OrganizationSamlConfiguration < ApplicationRecord
   PROVIDER = "saml"
   # Asserted attribute that carries the user's email, when it isn't the NameID
   DEFAULT_EMAIL_ATTRIBUTE = "urn:oid:0.9.2342.19200300.100.1.3"
+  # NameIDPolicy for the AuthnRequest; blank omits the element
+  NAME_ID_FORMATS = {
+    "persistent" => "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+    "transient" => "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
+    "emailAddress" => "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+    "unspecified" => "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
+  }.freeze
 
   belongs_to :organization
 
   validates :organization_id, presence: true, uniqueness: true
   validates :idp_entity_id, :idp_sso_target_url, :idp_cert, presence: true, if: :enabled?
+  validates :name_id_format, inclusion: {in: NAME_ID_FORMATS.values}, allow_blank: true
   validate :idp_certificates_parseable
   validate :organization_claims_a_domain, if: :enabled?
 

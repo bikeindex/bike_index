@@ -32,6 +32,22 @@ RSpec.describe Saml::SettingsBuilder, :saml_env do
     expect(settings.idp_cert).to include("BEGIN CERTIFICATE")
   end
 
+  it "requests no NameID format by default" do
+    expect(settings.name_identifier_format).to be_nil
+    expect(OneLogin::RubySaml::Authrequest.new.create_authentication_xml_doc(settings).to_s)
+      .to_not include("NameIDPolicy")
+  end
+
+  context "with a configured name_id_format" do
+    let(:name_id_format) { OrganizationSamlConfiguration::NAME_ID_FORMATS["persistent"] }
+    let(:saml_configuration) do
+      FactoryBot.create(:organization_saml_configuration, :enabled, organization:, name_id_format:)
+    end
+    it "asks the IdP for it" do
+      expect(settings.name_identifier_format).to eq name_id_format
+    end
+  end
+
   it "enforces signed assertions + SHA-256, and offers an encryption key" do
     expect(settings.security[:want_assertions_signed]).to be true
     expect(settings.security[:authn_requests_signed]).to be true
