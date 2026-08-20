@@ -5,7 +5,7 @@ module PageBlock
     class Component < ApplicationComponent
       FACEBOOK_PIXEL_ID = "199066297131941"
       # Digest of the cached template — the cached_markup_digest spec keeps it current
-      MARKUP_DIGEST = "29cf3c8eecc5"
+      MARKUP_DIGEST = "dc17950e978e"
 
       def initialize(current_user:, skip_facebook:, passive_organization: nil)
         @current_user = current_user
