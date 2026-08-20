@@ -24,13 +24,16 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
 
     expect(component).to have_css "button[data-ui--dropdown-target='button']", text: "kdewey@brakebills.edu"
     # The sidebar stands in for the navbar, so the account menu carries the organization
-    # switcher and marketplace messages PageBlock::Navbar::SettingsMenu builds too
+    # switcher and marketplace messages PageBlock::Navbar::UserSettingsMenu carries too
     expect(component.css("ul[role='menu'] li[role='menuitem'] a").map(&:text))
-      .to eq(["Switch to Brakebills admin", "Your registrations", "Register a new bike",
-        "kdewey@brakebills.edu settings", "Log out"])
+      .to eq(["Log out", "View without any organization",
+        "kdewey@brakebills.edu settings", "Register a new bike", "Your registrations"])
+    # Brakebills is the organization it's the sidebar for, so its row has nowhere to go
+    expect(component.css("ul[role='menu'] li[role='menuitem'] span").map(&:text))
+      .to eq(["Viewing Brakebills"])
   end
 
-  # The switcher and the messages row are UserServices::AccountMenuItems', which its own
+  # The switcher and the messages row are UserServices::MenuItemsAccount's, which its own
   # spec covers -- this is that they reach the menu
   context "with a marketplace message" do
     let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
@@ -79,6 +82,34 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
 
     closed = component.css("[data-ui--collapse-target='content']").drop(1)
     expect(closed.map { |content| content["class"] }).to all(include("tw:hidden!"))
+  end
+
+  # It's the only row that isn't the organization's own, so it sits after them all. Outside
+  # MenuItemsOrg's cache, since granting the ability doesn't touch the user record it's keyed on
+  context "with a superuser" do
+    let(:current_user) { FactoryBot.create(:superuser, email: "kdewey@brakebills.edu") }
+
+    it "ends with the super admin link" do
+      rows = component.css("[data-page-block--org-sidebar-target='scroller'] a")
+
+      expect(rows.last["href"]).to eq "/admin/organizations/#{organization.to_param}"
+      expect(rows.last.text).to include "Brakebills in super admin"
+      # Stands in for an icon, so the label lines up with the rows that carry one -- and is
+      # all that's left of the row once it collapses
+      expect(rows.last.css("span").first.text.strip).to eq "SA"
+    end
+
+    # They reach the organization without being a member of it
+    context "in no organization" do
+      let!(:organization_role) { nil }
+
+      it "still carries the switcher's rows" do
+        expect(component.css("ul[role='menu'] li[role='menuitem'] a").map(&:text))
+          .to include("View without any organization")
+        expect(component.css("ul[role='menu'] li[role='menuitem'] span").map(&:text))
+          .to eq(["Viewing Brakebills"])
+      end
+    end
   end
 
   context "with an ambassador organization" do

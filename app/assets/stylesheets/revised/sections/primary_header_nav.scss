@@ -84,14 +84,18 @@ $mobile-nav-height: 4 * $vertical-height;
     }
   }
 
-  .primary-submenu a {
+  // The organization being viewed is a label rather than a link, so span is here for it
+  .primary-submenu a,
+  .primary-submenu span {
     font-family: $body-font-family;
     color: $primary-nav-text-color;
     font-weight: 400;
     font-style: normal;
     font-size: 15px;
     text-transform: none;
+  }
 
+  .primary-submenu a {
     &:hover,
     &:active,
     &[aria-current] {
@@ -169,9 +173,12 @@ $mobile-nav-height: 4 * $vertical-height;
     }
 
     .primary-nav-item {
-      a {
+      a,
+      .primary-submenu span {
         padding: $vertical-height (2 * $vertical-height);
+      }
 
+      a {
         &:active,
         &[aria-current] {
           background: $gray-light;
@@ -256,9 +263,12 @@ $mobile-nav-height: 4 * $vertical-height;
       float: right;
       position: relative;
 
-      a {
+      a,
+      .primary-submenu span {
         padding: 8px (0.5 * $grid-gutter-width);
+      }
 
+      a {
         &[aria-current],
         &:active {
           text-decoration: none;

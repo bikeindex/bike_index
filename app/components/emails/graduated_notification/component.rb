@@ -33,7 +33,7 @@ module Emails
       end
 
       def tokenized_url
-        @email_preview ? OrganizedServices::EmailPreview::TOKEN_PATH : helpers.retrieval_link_url(@graduated_notification)
+        @email_preview ? OrgServices::EmailPreview::TOKEN_PATH : OrgServices::Displayer.retrieval_link_url(@graduated_notification)
       end
     end
   end

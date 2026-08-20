@@ -11,8 +11,12 @@ Skip it when the diff has no code in it — a docs-, skill- or config-only branc
 Then run `bin/lint` to auto-format (it also picks up whatever `/simplify` just changed). Always `bin/lint`, never another formatter or `standardrb` directly. Scope it to the branch's files rather than walking the whole repo:
 
 ```bash
-bin/lint $({ git diff --name-only --diff-filter=d origin/main...HEAD; git diff --name-only --diff-filter=d HEAD; } | sort -u)
+{ rtk proxy git diff --name-only --diff-filter=d origin/main...HEAD
+  rtk proxy git diff --name-only --diff-filter=d HEAD
+} | sort -u | xargs bin/lint
 ```
+
+`xargs` rather than `bin/lint $(…)`, because zsh doesn't word-split an unquoted command substitution — the interpolated form hands the whole list over as one argument and reports `Not found:` followed by every file. `rtk proxy` for the same reason the greps below need it: the hook rewrites these into a stat whose trailing `Changes:` line then arrives as a filename.
 
 **Both halves are load-bearing.** `origin/main...HEAD` sees only *committed* work, and `/simplify` ran immediately above — so its edits are uncommitted, and a file it touched that the branch hadn't committed yet (a shared controller it reached into, say) is invisible to that range and goes unlinted. The second `git diff HEAD` picks up the working tree. Same union applies to the spec scoping below.
 
@@ -23,6 +27,8 @@ A clean run over Ruby-only paths prints **nothing at all** — the summary table
 Scope specs the same way — the ones covering what the branch changed, never a bare `bundle exec rspec` or a whole top-level directory (see the `rspec-testing` skill). CI runs the full suite; a green PR isn't your job to prove locally.
 
 Then review the changed files against `CLAUDE.md` (root and any nested ones in touched directories) and fix what doesn't conform — code style, testing conventions, and frontend rules. Only touch lines this branch already changed.
+
+**`bin/update_component_digests` goes after the last code edit, not before.** A `MARKUP_DIGEST` covers everything its cached tree renders out into, so editing a shared component (`UI::ActiveLink`, `UI::Button`) stales the digest of every component that renders it — `PageBlock::Navbar::Wrapper` and `PageBlock::Footer` both, for one edit — and regenerating before `/simplify`'s or the CLAUDE.md pass's own edits just means doing it twice.
 
 ### The comment audit
 
