@@ -5699,11 +5699,7 @@ es:
           sign_up: Inscríbete
           stolen_bike: "¿Bicicleta robada?"
         user_settings_menu:
-          logout: Cierre de sesión
-          register_a_new_bike: Registre su bicicleta
           settings_menu: Ajustes
-          user_settings: "%{user_email} ajustes"
-          your_registrations: Sus registros
         wrapper:
           menu: Menú
           sign_up: Inscríbete

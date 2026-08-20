@@ -1,26 +1,27 @@
 # frozen_string_literal: true
 
 # The account menu: the reader's account links, the organizations they can switch between,
-# and logout. PageBlock::Navbar::UserSettingsMenu renders it as the navbar's gear submenu and
-# PageBlock::Navbar::AccountMenu as the org sidebar's dropdown -- only one of the two is ever
-# on a page, and they'd read as different menus if each built its own rows.
+# and logout. PageBlock::Navbar::UserSettingsMenu renders it as the navbar's gear submenu,
+# PageBlock::Navbar::AccountMenu as the org sidebar's dropdown.
 #
 # Item shapes are UserServices::MenuItemsOrg's, so the two menus read alike:
 #   {type: :divider}
-#   {type: :link, label:, path:, icon:, match:, matching_controllers:}
+#   {type: :link, label:, path:, icon:, match:, matching_controllers:, id:, data:, danger:}
 #   {type: :disabled, label:}
 module UserServices
   module MenuItemsAccount
     extend Functionable
 
+    OPENS = [:down, :up].freeze
+
     # A reader in dozens of organizations would otherwise push logout off the menu
     SWITCHER_ORGANIZATIONS = 5
 
-    # opens: which way the menu unrolls from whatever opens it, so it reads outward from there
-    # either way -- down from the navbar's gear above the page, up from the sidebar's account
-    # block below it. The switcher holds its own order regardless: leaving the organization
-    # behind leads it
+    # opens: which way the menu unrolls from its trigger, so it reads outward from there either
+    # way. The switcher holds its own order regardless: leaving the organization behind leads it
     def for(current_user:, current_user_or_unconfirmed_user:, current_organization: nil, opens: :down)
+      raise ArgumentError, "opens: must be one of #{OPENS}" unless OPENS.include?(opens)
+
       account = account_rows(current_user, current_user_or_unconfirmed_user)
       switcher = organization_switcher(current_user_or_unconfirmed_user, current_organization:)
 
@@ -28,8 +29,12 @@ module UserServices
       sections.reject(&:empty?).inject { |rows, section| rows + [divider] + section }
     end
 
-    # Its own section, which `for` sets off -- the two menus put it in different places.
-    # Whichever they're already viewing has nowhere to go, so it's a label rather than a link
+    #
+    # private below here
+    #
+
+    # Whichever organization they're already viewing has nowhere to go, so it's a label
+    # rather than a link
     def organization_switcher(user, current_organization: nil)
       organizations = switchable_organizations(user)
       # A superuser can be viewing one they're no member of, which is still where they are
@@ -48,10 +53,6 @@ module UserServices
       }
     end
 
-    #
-    # private below here
-    #
-
     # navUserSettingLink is how the signed-in email is read off a page -- by
     # .claude/skills/frontend-screenshots' identity gate, among others
     def account_rows(current_user, user)
@@ -62,7 +63,7 @@ module UserServices
           id: "navUserSettingLink", data: {email: user.email})].compact
     end
 
-    # The one row that isn't somewhere to go, which each menu tints for itself
+    # The one row that isn't somewhere to go
     def logout_row
       link(translation(:logout), routes.goodbye_path, danger: true)
     end
@@ -110,7 +111,8 @@ module UserServices
       Rails.application.routes.url_helpers
     end
 
-    conceal :account_rows, :logout_row, :marketplace_messages, :switchable_organizations,
-      :without_organization, :link, :disabled, :divider, :translation, :routes
+    conceal :organization_switcher, :account_rows, :logout_row, :marketplace_messages,
+      :switchable_organizations, :without_organization, :link, :disabled, :divider,
+      :translation, :routes
   end
 end

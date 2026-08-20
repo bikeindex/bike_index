@@ -25,6 +25,8 @@ You're only here because the diff is frontend (SKILL.md's classifier gates on th
 - New PR → capture every affected page.
 - Existing PR → continue only if the captures in the existing screenshots comment are stale: a commit since the last capture touched a page already screenshotted, or a new affected page now appears in the diff. Limit the capture to those pages. If nothing has moved, return the PR URL.
 
+**A page the diff no longer touches loses its block rather than gaining a recapture.** When work lands on the base separately — the branch's own commits merged as another PR, say — `git diff origin/main -- <path>` for those files comes back empty, and their before/after now documents a change this PR doesn't make, with a "main 👆" shot taken before the base moved. Drop the `### <url-path>` block; don't recapture it to show two identical images.
+
 Reading that comment is `github-pr-images`'s job, since it owns it — ask it for the current body before deciding. This costs no browser: it's a `gh api` read.
 
 From the changed files, infer the affected routes. Heuristics:

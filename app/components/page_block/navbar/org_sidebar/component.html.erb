@@ -211,13 +211,14 @@
                   <% if child[:type] == :disabled %>
                     <span class="tw:text-gray-400 <%= PageBlock::Navbar::OrgSidebar::Component::CHILD %>"><%= child[:label] %></span>
                   <% else %>
-                    <%= render active_link(child, row_class: child_class, text: child[:label]) %>
+                    <%= render UI::ActiveLink::Component.from_item(child, html_class: child_class) %>
                   <% end %>
                 <% end %>
               </div>
             </div>
           <% when :link %>
-            <%= render active_link(item, row_class: link_row_class(item)) do %>
+            <%# text: nil, since a top-level row's label sits inside the block with its icon %>
+            <%= render UI::ActiveLink::Component.from_item(item, html_class: link_row_class(item), text: nil) do %>
               <% if item[:super_admin] %>
                 <span class="<%= PageBlock::Navbar::OrgSidebar::Component::SUPER_ADMIN_ICON %>">
                   <span class="tw:hidden tw:group-data-[collapsed=true]/sidebar:inline">SA</span>
