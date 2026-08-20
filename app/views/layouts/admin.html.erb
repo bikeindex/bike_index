@@ -45,8 +45,10 @@
 
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
 
-    <section id="admin-content" class="pb-4 mb-4">
-      <div class="container-fluid mt-4 pb-4"><%= yield %></div>
+    <section id="admin-content">
+      <%= render(UI::Container::Component.new(full_width: true)) do %>
+        <%= yield %>
+      <% end %>
     </section>
   <% end %>
 </html>

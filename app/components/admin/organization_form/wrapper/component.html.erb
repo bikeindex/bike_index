@@ -94,7 +94,8 @@
 
   <div class="col-md-6">
     <% if helpers.display_dev_info? %>
-      <div class="only-dev-visible mt-4">
+      <%# .only-dev-visible is a border and a tint with no padding of its own %>
+      <div class="only-dev-visible mt-4 tw:mb-2 tw:p-2">
         <%= render(UI::Forms::Group::Component.new(attribute: :manual_pos_kind, label_text: "Manually set POS kind")) do |group| %>
           <% group.with_helper_text do %>
             <span class="text-danger">Warning - you can break things here!</span>

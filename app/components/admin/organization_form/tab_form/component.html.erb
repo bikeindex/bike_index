@@ -1,9 +1,11 @@
 <%= form_for [:admin, @organization], html: {data: {controller: "admin--organization-form"}} do |form_builder| %>
-  <%= hidden_field_tag :tab, @tab if @tab.present? %>
+  <%= render(UI::Container::Component.new(columns: @columns)) do %>
+    <%= hidden_field_tag :tab, @tab if @tab.present? %>
 
-  <%= render(@fields_component.new(form_builder:, **@fields_args)) %>
+    <%= render(@fields_component.new(form_builder:, **@fields_args)) %>
 
-  <div class="mt-4">
-    <%= form_builder.submit @submit_text, class: "btn-lg btn-success float-right" %>
-  </div>
+    <div class="mt-4">
+      <%= form_builder.submit @submit_text, class: "btn-lg btn-success float-right" %>
+    </div>
+  <% end %>
 <% end %>
