@@ -4,8 +4,8 @@ en:
     page_block:
       my_account:
         organization_roles:
-          automatically_view_in_organization: Automatically view in %{org_name} when
-            you log in to Bike Index.
+          automatically_view_in_organization: Automatically view with %{org_name}
+            navbar when you log in to Bike Index.
           joined: Joined
           leave_confirm: >-
             Warning! You will have to ask an Admin from %{org_name} to regain this
@@ -26,6 +26,6 @@ en:
           view_as_html: View as %{org_name}
           view_without_an_organization: View without an organization
           you_can_still_switch: >-
-            you'll still be able to switch to view with or without the organization
+            You'll still be able to switch to view with or without the organization
             in your settings in the navbar.
           your_first_organization: your first organization

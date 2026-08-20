@@ -42,7 +42,7 @@ RSpec.describe PageBlock::MyAccount::OrganizationRoles::Component, type: :compon
       expect(component.css("h3").text.strip).to eq "Your organization role"
       expect(component.text).to_not match("Drag them into the order")
       # The organization is named, rather than "your first organization"
-      expect(component.text).to match("Automatically view in Bike Coop when you log in")
+      expect(component.text).to match("Automatically view with Bike Coop navbar when you log in")
     end
   end
 

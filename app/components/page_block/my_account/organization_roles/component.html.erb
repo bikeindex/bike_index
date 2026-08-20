@@ -76,7 +76,7 @@
                 <%# twlink is in the components layer, so the red utilities outrank it %>
                 <%= render UI::ButtonLink::Component.new(text: translation(".leave_organization"),
                       href: my_account_organization_role_path(organization_role), color: :link,
-                      html_class: "tw:text-sm tw:text-red-700 tw:hover:text-red-800 tw:dark:text-red-400",
+                      html_class: "tw:text-xs tw:text-red-700 tw:hover:text-red-800 tw:dark:text-red-400",
                       data: {method: :delete,
                              confirm: translation(".leave_confirm", org_name: organization.short_name)}) %>
               </div>
