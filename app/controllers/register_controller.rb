@@ -28,10 +28,11 @@ class RegisterController < ApplicationController
     BikeServices::Register.discard(token: params[:discard_token], user: current_user)
     BikeServices::Register.discard_extra(user: current_user)
     start_registration
-    # The same filter every other action runs, so reusing the session's
-    # registration can't quietly drop the organization the URL named
+    # The filters every other action runs, so reusing the session's registration
+    # can't quietly drop the organization the URL named
     assign_organization
-    redirect_to step_path(resumed_step)
+    find_registration_sequence
+    redirect_to_current_step
   end
 
   # Step 1 framed on an organization's landing page. It renders rather than redirecting into
@@ -227,12 +228,6 @@ class RegisterController < ApplicationController
   def assign_organization
     BikeServices::Register.assign_organization(@b_param, current_organization,
       user: current_user, passive_organization:)
-  end
-
-  # Where a resumed registration left off - a new one has only step 1
-  def resumed_step
-    BikeServices::Register.permitted_step(@b_param, nil,
-      sequence: BikeServices::Register.registration_sequence(@b_param))
   end
 
   # Resolved once - the step math, the progress bar and the pages themselves all read it

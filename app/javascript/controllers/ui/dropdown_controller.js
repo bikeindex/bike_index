@@ -1,9 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { computePosition, flip, shift, offset } from '@floating-ui/dom'
-
-// Above PageBlock::Navbar::OrgSidebar's 1050 - a menu opened at the left edge of the
-// content column extends over the sidebar, which otherwise paints on top of it
-let zCounter = 1050
+import { claimFloatingZIndex, releaseFloatingZIndex } from 'utils/floating_z_index'
 
 // Connects to data-controller="ui--dropdown"
 export default class extends Controller {
@@ -37,13 +34,14 @@ export default class extends Controller {
 
   async open () {
     this.menuTarget.classList.remove('tw:hidden')
-    this.menuTarget.style.zIndex = ++zCounter
+    this.menuTarget.style.zIndex = claimFloatingZIndex(this.menuTarget)
     this.buttonTarget.setAttribute('aria-expanded', 'true')
     await this.updatePosition()
     this.addEventListeners()
   }
 
   close () {
+    releaseFloatingZIndex(this.menuTarget)
     this.menuTarget.classList.add('tw:hidden')
     this.buttonTarget.setAttribute('aria-expanded', 'false')
     this.removeEventListeners()

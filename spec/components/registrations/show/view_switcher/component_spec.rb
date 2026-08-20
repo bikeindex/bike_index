@@ -28,12 +28,12 @@ RSpec.describe Registrations::Show::ViewSwitcher::Component, type: :component do
   context "with another view available" do
     let(:available_views) { [[:owner, nil], [:public, nil]] }
 
-    # The view already showing has nowhere to go, so it isn't a link
+    # The view already showing has nowhere to go, so .twdropdown renders it as the label
     it "links the other view and leaves the current one unclickable" do
       render_inline(component)
       expect(page).to have_link("View as owner of bike", href: "/registrations/#{bike.id}?view_as=owner")
-      expect(page).to have_css("span[aria-current='true']", text: "Viewing as Public")
-      expect(page).to have_css("a", text: "Viewing as", count: 0)
+      expect(page).to have_css("li[role='menuitem'] span[data-active='true']", text: "Viewing as Public")
+      expect(page).to have_no_css("a", text: "Viewing as")
     end
   end
 end

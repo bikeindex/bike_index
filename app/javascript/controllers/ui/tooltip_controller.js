@@ -1,9 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { computePosition, flip, shift, offset, autoUpdate } from '@floating-ui/dom'
-
-// Above PageBlock::Navbar::OrgSidebar's 1050, which otherwise paints over a tooltip
-// opened near the left edge of the content column
-let topZIndex = 1050
+import { claimFloatingZIndex, releaseFloatingZIndex } from 'utils/floating_z_index'
 
 // Connects to data-controller="ui--tooltip"
 //
@@ -73,8 +70,7 @@ export default class extends Controller {
   open () {
     if (this.isOpen) return
     this.isOpen = true
-    topZIndex += 1
-    this.tooltipTarget.style.zIndex = topZIndex
+    this.tooltipTarget.style.zIndex = claimFloatingZIndex(this.tooltipTarget)
     this.tooltipTarget.classList.remove('tw:hidden')
     document.addEventListener('keydown', this.keydownEscape)
     this.cleanup = autoUpdate(this.triggerTarget, this.tooltipTarget, () => this.updatePosition())
@@ -83,6 +79,7 @@ export default class extends Controller {
   close () {
     if (!this.isOpen) return
     this.isOpen = false
+    releaseFloatingZIndex(this.tooltipTarget)
     this.tooltipTarget.classList.add('tw:hidden')
     document.removeEventListener('click', this.clickOutside)
     document.removeEventListener('keydown', this.keydownEscape)

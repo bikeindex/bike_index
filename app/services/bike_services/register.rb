@@ -59,8 +59,8 @@ module BikeServices
     def discard_extra(user:)
       return if user.blank?
 
-      user.b_params.unfinished_registrations.reorder(:updated_at).to_a[0..-2]
-        .each { |b_param| destroy_discardable(b_param) }
+      user.b_params.unfinished_registrations.reorder(updated_at: :desc).offset(1)
+        .each { destroy_discardable(it) }
     end
 
     # An organization can be named in the URL after the registration starts

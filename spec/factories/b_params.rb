@@ -16,7 +16,7 @@ FactoryBot.define do
     # the Other manufacturer named after it
     factory :b_param_unfinished_registration do
       transient do
-        manufacturer { Manufacturer.find_by(name: "Surly") || FactoryBot.create(:manufacturer, name: "Surly") }
+        manufacturer { Manufacturer.find_or_create_by(name: "Surly") }
       end
       origin { "register_flow" }
       owner_email { creator.email }
