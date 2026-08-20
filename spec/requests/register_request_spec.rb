@@ -166,6 +166,17 @@ RSpec.describe RegisterController, type: :request do
         expect(response).to redirect_to register_path(b_param_token: new_b_param.id_token, step: 1)
       end
 
+      # /stolen and the FAQ link at the bare /register with a status, so nothing in
+      # progress has to reach new still naming it
+      it "sends the bare /register into new with the status it named" do
+        get "#{base_url}?status=status_stolen"
+        expect(response).to redirect_to new_register_path(status: "status_stolen")
+
+        follow_redirect!
+        expect(BParam.last.status).to eq "status_stolen"
+        expect(response).to redirect_to register_path(b_param_token: BParam.last.id_token, step: 1)
+      end
+
       # Each one waiting goes on alerting its creator to come back to a registration
       # they've moved on from
       it "leaves two waiting at most - the most recent, and the one it starts" do
