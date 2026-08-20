@@ -46,8 +46,6 @@ module Org
         end
       end
 
-      # Organized::ImpoundRecordsController falls back to the first status with the param
-      # absent, so that entry is the one in force on a URL naming it and on one that doesn't
       def status_query(status)
         {search_status: (status == @available_statuses.first) ? [status, nil] : status}
       end

@@ -21,8 +21,7 @@ module UI
         # compared against a controller#action and never hit
         raise ArgumentError, "matching_controllers: needs match: :controller" if
           matching_controllers.any? && match != :controller
-        raise ArgumentError, "query: needs match: :query" if query.any? && match != :query
-        raise ArgumentError, "match: :query needs query:" if match == :query && query.none?
+        raise ArgumentError, "query: and match: :query go together" if query.any? != (match == :query)
 
         @path = path
         @text = text
@@ -54,8 +53,8 @@ module UI
       end
 
       # Each param the entry applies, and the values of it that mean the entry is the one in
-      # force — "" among them where the entry is the fallback a controller reaches for with
-      # the param absent, since that reads as no param at all in the URL
+      # force. A nil among those values is the entry a controller falls back to with the param
+      # absent, which is "" once the browser reads the param off the URL
       def link_query
         return unless @match == :query
 
