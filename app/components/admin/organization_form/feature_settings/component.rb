@@ -87,6 +87,10 @@ module Admin
           @saml_configuration ||= @organization.organization_saml_configuration ||
             @organization.build_organization_saml_configuration
         end
+
+        def metadata_url = saml_metadata_url(org_slug: @organization.to_param)
+
+        def certificate_url = saml_certificate_url(org_slug: @organization.to_param)
       end
     end
   end

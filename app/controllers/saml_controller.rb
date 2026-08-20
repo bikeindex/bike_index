@@ -18,8 +18,7 @@ class SamlController < ApplicationController
   # Some IdP tooling registers a bare certificate rather than reading one out of metadata.
   # The keypair is app-wide, so the org-scoped path serves the same bytes for every org
   def certificate
-    saml_organization # gate only - the certificate itself is not per-organization
-    sp_certificate = Saml::SettingsBuilder.sp_certificate
+    sp_certificate = Saml::SettingsBuilder.build(published_saml_configuration).certificate
     raise ActiveRecord::RecordNotFound if sp_certificate.blank?
 
     render body: sp_certificate, content_type: "application/pem-certificate-chain"

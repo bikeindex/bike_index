@@ -2,8 +2,6 @@ require "rails_helper"
 
 RSpec.describe Saml::SettingsBuilder, :saml_env do
   let(:idp_cert) { File.read(Rails.root.join("spec/fixtures/saml/idp_cert.pem")) }
-  let(:pem_cert) { File.read(Rails.root.join("spec/fixtures/saml/sp_cert.pem")) }
-  let(:pem_key) { File.read(Rails.root.join("spec/fixtures/saml/sp_key.pem")) }
   let(:organization) do
     FactoryBot.create(:organization_with_organization_features,
       enabled_feature_slugs: "saml_sso", user_email_domain: "example.edu")
@@ -29,12 +27,12 @@ RSpec.describe Saml::SettingsBuilder, :saml_env do
   end
 
   context "with a base64-encoded keypair in ENV" do
-    let(:sp_cert) { Base64.strict_encode64(pem_cert) }
-    let(:sp_key) { Base64.strict_encode64(pem_key) }
+    let(:sp_cert) { Base64.strict_encode64(sp_cert_pem) }
+    let(:sp_key) { Base64.strict_encode64(sp_key_pem) }
 
     it "decodes both back to PEM" do
-      expect(settings.certificate).to eq pem_cert
-      expect(settings.private_key).to eq pem_key
+      expect(settings.certificate).to eq sp_cert_pem
+      expect(settings.private_key).to eq sp_key_pem
     end
   end
 

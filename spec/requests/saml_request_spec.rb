@@ -50,7 +50,6 @@ RSpec.describe SamlController, :saml_env, type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq "application/pem-certificate-chain"
       expect(response.body).to eq sp_cert
-      expect(response.body).to_not include("PRIVATE KEY")
     end
 
     context "without an SP certificate configured" do

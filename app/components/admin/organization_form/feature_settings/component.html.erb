@@ -95,9 +95,6 @@
         </p>
 
         <ul>
-          <% metadata_url = saml_metadata_url(org_slug: @organization.to_param) %>
-          <% certificate_url = saml_certificate_url(org_slug: @organization.to_param) %>
-
           <li>
             Metadata URL: <%= link_to metadata_url, metadata_url %>
           </li>
