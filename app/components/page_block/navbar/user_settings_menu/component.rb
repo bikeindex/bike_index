@@ -8,9 +8,8 @@ module PageBlock
       # navbar breakpoint sits inline in the hamburgler menu rather than behind a trigger.
       # PageBlock::Navbar::AccountMenu is the same rows in the org sidebar.
       class Component < ApplicationComponent
-        # red-700 against the navbar's near-black panel is unreadable, so logout takes the
-        # tint that carries on dark -- and its own hover, since the important it needs
-        # there beats the submenu's
+        # red-700 against the navbar's near-black panel is unreadable, so logout takes a tint
+        # that carries on dark
         LOGOUT = "tw:text-red-400! tw:hover:text-red-300!"
 
         def initialize(current_user:, current_user_or_unconfirmed_user:)

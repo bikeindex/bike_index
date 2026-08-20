@@ -50,8 +50,7 @@ module PageBlock
         end
 
         def nav_link(item)
-          UI::ActiveLink::Component.from_item(item,
-            html_class: ["nav-link", item[:html_class]].compact.join(" "))
+          UI::ActiveLink::Component.from_item(item, html_class: "nav-link")
         end
       end
     end

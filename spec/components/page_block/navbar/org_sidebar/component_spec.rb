@@ -22,12 +22,9 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
       .to eq(["Brakebills Registrations", "Impounded Vehicles", "Parking Notifications",
         "Bulk Import & Export", "Brakebills Settings"])
 
+    # The sidebar stands in for the navbar, so it carries the account menu too -- whose rows
+    # are PageBlock::Navbar::AccountMenu's spec's, not this one's
     expect(component).to have_css "button[data-ui--dropdown-target='button']", text: "kdewey@brakebills.edu"
-    # The sidebar stands in for the navbar, so the account menu carries the organization
-    # switcher and marketplace messages PageBlock::Navbar::UserSettingsMenu carries too
-    expect(component.css("ul[role='menu'] li[role='menuitem'] a").map(&:text))
-      .to eq(["Log out", "View without any organization",
-        "kdewey@brakebills.edu settings", "Register a new bike", "Your registrations"])
     # Brakebills is the organization it's the sidebar for, so its row has nowhere to go
     expect(component.css("ul[role='menu'] li[role='menuitem'] span").map(&:text))
       .to eq(["Viewing Brakebills"])

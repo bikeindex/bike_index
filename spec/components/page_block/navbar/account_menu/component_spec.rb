@@ -7,7 +7,7 @@ RSpec.describe PageBlock::Navbar::AccountMenu::Component, type: :component do
   let(:current_organization) { nil }
   let(:instance) do
     described_class.new(current_user:, current_user_or_unconfirmed_user: current_user,
-      current_organization:, name: "party@bikeindex.org")
+      current_organization:)
   end
   let(:component) { with_request_url("/") { render_inline(instance) } }
   let(:links) { component.css("ul[role='menu'] a").map { |link| link.text.strip } }
@@ -22,9 +22,10 @@ RSpec.describe PageBlock::Navbar::AccountMenu::Component, type: :component do
     expect(component).to have_css "#navUserSettingLink[data-email='party@bikeindex.org']"
   end
 
+  # .twdropdown styles every other entry, so logout is the only one carrying a class
   it "marks logout, and leaves the rest to .twdropdown" do
-    expect(component.css("a[class*='text-red']").map { |link| link.text.strip }).to eq(["Log out"])
-    expect(component.css("ul[role='menu'] a").count { |link| link["class"].blank? }).to eq(links.count - 1)
+    expect(component.css("ul[role='menu'] a[class]").map { |link| link.text.strip }).to eq(["Log out"])
+    expect(component.css("ul[role='menu'] a[class*='text-red']").count).to eq 1
   end
 
   it "hands every row to UI::ActiveLink to resolve" do

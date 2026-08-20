@@ -62,17 +62,22 @@ RSpec.describe UserServices::MenuItemsAccount do
     end
   end
 
-  describe "organization_switcher" do
-    it "is empty for a user in no organization" do
-      expect(described_class.organization_switcher(user)).to eq([])
+  describe "the organization switcher" do
+    let(:items) { described_class.for(current_user: user, current_user_or_unconfirmed_user: user, **options) }
+    let(:options) { {} }
+    let(:switcher) { items.select { |item| item[:label].to_s.match?(/organization|Brakebills|Physical Kids/) } }
+
+    it "is absent for a user in no organization" do
+      expect(switcher).to eq([])
     end
 
     # A superuser reaches an organization without being a member of it
     context "viewing an organization they're no member of" do
       let(:organization) { FactoryBot.create(:organization, name: "Brakebills") }
+      let(:options) { {current_organization: organization} }
 
       it "carries the row for it, and the one out of it" do
-        expect(described_class.organization_switcher(user, current_organization: organization))
+        expect(switcher)
           .to eq([{type: :link, label: "View without any organization",
                    path: "http://test.host/?organization_id=false",
                    icon: nil, match: :path, matching_controllers: [],
@@ -87,19 +92,21 @@ RSpec.describe UserServices::MenuItemsAccount do
 
       # The shape is UserServices::MenuItemsOrg's, so one renderer takes either list
       it "leads with the no-organization row, which is where they already are" do
-        expect(described_class.organization_switcher(user))
+        expect(switcher)
           .to eq([{type: :disabled, label: "Viewing without any organization"},
             {type: :link, label: "Switch to Brakebills", path: "/o/#{organization.to_param}",
              icon: nil, match: :path, matching_controllers: []}])
       end
 
       # Whichever they're on has nowhere to go, so the label moves with them
-      it "labels the one they're viewing, and links back out of it" do
-        items = described_class.organization_switcher(user, current_organization: organization)
+      context "viewing it" do
+        let(:options) { {current_organization: organization} }
 
-        expect(items.first[:label]).to eq "View without any organization"
-        expect(items.first[:path]).to match(/organization_id=false\z/)
-        expect(items.last).to eq({type: :disabled, label: "Viewing Brakebills"})
+        it "labels the one they're viewing, and links back out of it" do
+          expect(switcher.first[:label]).to eq "View without any organization"
+          expect(switcher.first[:path]).to match(/organization_id=false\z/)
+          expect(switcher.last).to eq({type: :disabled, label: "Viewing Brakebills"})
+        end
       end
     end
 
@@ -114,12 +121,18 @@ RSpec.describe UserServices::MenuItemsAccount do
 
       # A reader in dozens of them would otherwise push logout off the menu
       it "takes the oldest memberships, in order" do
-        items = described_class.organization_switcher(user)
-
-        expect(items.drop(1).map { |item| item[:label] })
+        expect(switcher.drop(1).map { |item| item[:label] })
           .to eq(organizations.first(described_class::SWITCHER_ORGANIZATIONS)
             .map { |organization| "Switch to #{organization.name}" })
       end
+    end
+  end
+
+  describe "opens" do
+    it "raises on a direction it can't order by" do
+      expect {
+        described_class.for(current_user: user, current_user_or_unconfirmed_user: user, opens: :upward)
+      }.to raise_error(ArgumentError, /opens/)
     end
   end
 

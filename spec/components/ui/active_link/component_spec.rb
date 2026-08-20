@@ -149,8 +149,6 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     end
   end
 
-  # Every menu renders its manifest's links through this, so the defaults are what a manifest
-  # that leaves a key out gets
   describe "from_item" do
     let(:item) { {type: :link, label: "Help", path: "/help"} }
     let(:component) { render_inline(described_class.from_item(item, **options)) }
