@@ -2250,6 +2250,7 @@ es:
         user_settings: Configuración de usuario
         delete_account: Eliminar cuenta
         membership: Afiliación
+        organization_roles: Roles de la organización
       update:
         current_password_doesnt_match: La contraseña actual no coincide; es necesaria
           para actualizarla.
@@ -2271,6 +2272,11 @@ es:
           marketplace_listing_updated: "¡Tu anuncio en el mercado se ha actualizado!"
           unable_to_publish: 'No se puede publicar %{item_type} para la venta: %{errors}'
           unable_to_update: 'No se pudo guardar %{item_type}: %{errors}'
+      organization_roles:
+        destroy:
+          left_organization: Has salido %{org_name}
+          unable_to_leave: 'No se puede salir de %{org_name}: contacte con support@bikeindex.org
+            para obtener ayuda.'
     oauth:
       applications:
         ensure_app_owner!:
@@ -5736,6 +5742,31 @@ es:
           finish_the_required_steps: completar los pasos requeridos
           not_registered_yet_html: "¡Tu %{cycle_type} aún no está registrado! Por
             favor %{finish_link}"
+      my_account:
+        organization_roles:
+          automatically_view_in_organization: Visualización automática con la barra
+            de navegación %{org_name} al iniciar sesión en Bike Index.
+          joined: Unido
+          leave_confirm: "¡Advertencia! Tendrás que pedirle a un administrador de
+            %{org_name} que recupere este rol de organización. No podrás deshacer
+            esto tú mismo."
+          leave_organization: Organización de salida
+          organization_role_information: Organizaciones en las que participas. Arrástralas
+            para ordenarlas según la prioridad que desees.
+          organization_roles:
+            one: Su rol en la organización
+            other: Funciones de su organización
+          role_html: 'Función: %{role}'
+          roles:
+            admin: Administración
+            member: Miembro
+            member_no_bike_edit: Miembro - sin edición de bicicletas
+          view_after_log_in: Después de iniciar sesión
+          view_as_html: Ver como %{org_name}
+          view_without_an_organization: Ver sin una organización
+          you_can_still_switch: Podrás seguir cambiando la vista para mostrar u ocultar
+            la organización en la configuración de la barra de navegación.
+          your_first_organization: tu primera organización
     emails:
       partials:
         bike_box:

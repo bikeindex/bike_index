@@ -2181,6 +2181,7 @@ nl:
         registration_organizations: Registratie Organisaties
         delete_account: Account verwijderen
         membership: Lidmaatschap
+        organization_roles: Organisatierollen
       update:
         current_password_doesnt_match: Het huidige wachtwoord komt niet overeen, het
           is vereist voor het bijwerken van uw wachtwoord.
@@ -2201,6 +2202,11 @@ nl:
           marketplace_listing_updated: Uw marktplaatsvermelding is bijgewerkt!
           unable_to_publish: 'Kan %{item_type} niet te koop aanbieden: %{errors}'
           unable_to_update: 'Kan %{item_type} niet opslaan: %{errors}'
+      organization_roles:
+        destroy:
+          left_organization: Je hebt %{org_name} verlaten.
+          unable_to_leave: 'Kan %{org_name} niet verlaten: neem contact op met support@bikeindex.org
+            voor hulp.'
     memberships:
       edit:
         free_membership: Bike Index heeft u een gratis lidmaatschap gegeven. Stuur
@@ -5634,6 +5640,31 @@ nl:
           finish_the_required_steps: Voltooi de vereiste stappen.
           not_registered_yet_html: Uw %{cycle_type} is nog niet geregistreerd! Gelieve
             %{finish_link}
+      my_account:
+        organization_roles:
+          automatically_view_in_organization: Automatisch weergeven met de %{org_name}-navigatiebalk
+            wanneer u inlogt op Bike Index.
+          joined: Lid geworden
+          leave_confirm: Waarschuwing! U moet een beheerder van %{org_name} vragen
+            om deze organisatierol terug te krijgen! U kunt dit niet zelf ongedaan
+            maken.
+          leave_organization: Organisatie verlaten
+          organization_role_information: Organisaties waar je een rol in speelt. Sleep
+            ze in de gewenste volgorde.
+          organization_roles:
+            one: Jouw rol binnen de organisatie
+            other: Uw rol binnen de organisatie
+          role_html: 'Rol: %{role}'
+          roles:
+            admin: Beheerder
+            member: Lid
+            member_no_bike_edit: Lid - geen fietsbewerkingen
+          view_after_log_in: Na het inloggen
+          view_as_html: Weergave als %{org_name}
+          view_without_an_organization: Weergave zonder organisatie
+          you_can_still_switch: Je kunt in de navigatiebalk nog steeds wisselen tussen
+            de weergave met en zonder de organisatie in je instellingen.
+          your_first_organization: uw eerste organisatie
     emails:
       partials:
         bike_box:

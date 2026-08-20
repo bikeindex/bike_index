@@ -2250,6 +2250,7 @@ it:
         sharing: Condivisione + Pagina personale
         user_settings: Impostazioni utente
         membership: Iscrizione
+        organization_roles: Ruoli organizzativi
       update:
         current_password_doesnt_match: La password attuale non corrisponde, è necessaria
           per aggiornarla.
@@ -2271,6 +2272,11 @@ it:
           marketplace_listing_updated: La tua inserzione sul marketplace è stata aggiornata!
           unable_to_publish: 'Impossibile pubblicare %{item_type} in vendita: %{errors}'
           unable_to_update: 'Impossibile salvare %{item_type}: %{errors}'
+      organization_roles:
+        destroy:
+          left_organization: Hai lasciato %{org_name}
+          unable_to_leave: 'Impossibile uscire da %{org_name}: contattare support@bikeindex.org
+            per assistenza.'
     oauth:
       applications:
         ensure_app_owner!:
@@ -5744,6 +5750,31 @@ it:
           finish_the_required_steps: completare i passaggi richiesti
           not_registered_yet_html: Il tuo %{cycle_type} non è ancora registrato! Per
             favore %{finish_link}
+      my_account:
+        organization_roles:
+          automatically_view_in_organization: Visualizzazione automatica con barra
+            di navigazione %{org_name} all'accesso a Bike Index.
+          joined: Partecipato
+          leave_confirm: Attenzione! Dovrai chiedere a un amministratore di %{org_name}
+            di riottenere questo ruolo nell'organizzazione! Non potrai annullare questa
+            operazione autonomamente.
+          leave_organization: Lasciare l'organizzazione
+          organization_role_information: Organizzazioni in cui ricopri un ruolo. Trascinale
+            nell'ordine in cui desideri visualizzarle in ordine di priorità.
+          organization_roles:
+            one: Il tuo ruolo nell'organizzazione
+            other: I vostri ruoli all'interno dell'organizzazione
+          role_html: 'Ruolo: %{role}'
+          roles:
+            admin: Amministratore
+            member: Membro
+            member_no_bike_edit: Membro - nessuna modifica alla bicicletta
+          view_after_log_in: Dopo aver effettuato l'accesso
+          view_as_html: Visualizza come %{org_name}
+          view_without_an_organization: Visualizzare senza un'organizzazione
+          you_can_still_switch: Potrai comunque passare alla visualizzazione con o
+            senza l'organizzazione nelle impostazioni della barra di navigazione.
+          your_first_organization: la tua prima organizzazione
     emails:
       partials:
         bike_box:

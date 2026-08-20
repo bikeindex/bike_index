@@ -74,10 +74,10 @@ module UserServices
       link(translation(:marketplace_messages), routes.my_account_messages_path)
     end
 
-    # Ordered, so the switcher is the same five every time it's opened rather than
-    # whatever the planner returns
+    # In the user's own order, so the switcher is the same five every time it's opened
+    # rather than whatever the planner returns
     def switchable_organizations(user)
-      user.organization_roles.includes(:organization).order(:id)
+      OrganizationRole.ordered_for(user).includes(:organization)
         .filter_map(&:organization).first(SWITCHER_ORGANIZATIONS)
     end
 

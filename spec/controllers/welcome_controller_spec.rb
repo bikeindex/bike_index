@@ -25,7 +25,7 @@ RSpec.describe WelcomeController, type: :controller do
       it "renders" do
         org_id = organization.id
         session[:passive_organization_id] = org_id
-        expect(user.default_organization).to be_present
+        expect(OrganizationRole.default_organization(user)).to be_present
         organization.destroy
         user.reload
         expect(Organization.unscoped.find(org_id)).to be_present

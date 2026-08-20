@@ -1748,6 +1748,7 @@ en:
       edit:
         delete_account: Delete account
         membership: Membership
+        organization_roles: Organization Roles
         password: Password
         registration_organizations: Registration Organizations
         sharing: Sharing + Personal Page
@@ -1770,6 +1771,11 @@ en:
         show:
           sorry_that_is_you: That's your listing! You can't start a new message to
             yourself.
+      organization_roles:
+        destroy:
+          left_organization: You've left %{org_name}
+          unable_to_leave: 'Unable to leave %{org_name}: contact support@bikeindex.org
+            for help'
       update:
         current_password_doesnt_match: Current password doesn't match, it's required
           for updating your password.
