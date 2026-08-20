@@ -55,13 +55,13 @@ module UserServices
     end
 
     # organization_id=false is what clears the one held in the session. The homepage is where
-    # that lands from inside the organization interface; page-block--without-organization
+    # that lands from inside the organization interface; page-block--navbar-switch-no-organization
     # points it at the current page anywhere else
     def without_organization(current_organization)
       return disabled(translation(:viewing_without_org)) if current_organization.blank?
 
       link(translation(:view_without_org), routes.root_url(organization_id: false),
-        data: {controller: "page-block--without-organization"})
+        data: {controller: "page-block--navbar-switch-no-organization"})
     end
 
     def disabled(label)

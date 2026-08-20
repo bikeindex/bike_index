@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller="page-block--without-organization"
+// Connects to data-controller="page-block--navbar-switch-no-organization"
 //
 // The account menu's row for leaving the organization behind. Inside the organization
 // interface there's nowhere to stay, so it keeps the homepage it was rendered pointing at;
