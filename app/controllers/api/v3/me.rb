@@ -34,7 +34,7 @@ module API
               organization_access_token: membership.organization_access_token,
               organization_logo_url: (membership.organization.avatar_url if membership.organization.avatar?),
               user_is_organization_admin: membership.admin?,
-              menu: OrganizedServices::UserMenuItems.for(organization: membership.organization, current_user:)
+              menu: UserServices::MenuItemsOrg.for(organization: membership.organization, current_user:)
             }
           end
 

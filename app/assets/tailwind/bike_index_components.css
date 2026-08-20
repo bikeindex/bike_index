@@ -91,30 +91,44 @@
     @apply tw:flex-col tw:list-none tw:py-0 tw:mb-0;
   }
 
-  .twdropdown li[role="menuitem"]:first-child > a {
+  /* An entry is a link, or -- for what's already being viewed, which is nowhere to go -- a
+   * label. The rules below that lay entries out take both; only the colors tell them apart */
+  .twdropdown li[role="menuitem"]:first-child > :is(a, span[data-active="true"]) {
     @apply tw:pt-2 tw:rounded-t-lg;
   }
 
-  .twdropdown li[role="menuitem"]:last-child > a {
+  .twdropdown li[role="menuitem"]:last-child > :is(a, span[data-active="true"]) {
     @apply tw:pb-2 tw:rounded-b-lg;
   }
 
-  .twdropdown li[role="menuitem"] > a {
-    @apply tw:block tw:px-4 tw:py-1 tw:text-left tw:text-base tw:text-gray-700 tw:no-underline
-      tw:hover:bg-gray-100 tw:hover:text-gray-900
-      tw:dark:text-gray-200 tw:dark:hover:bg-gray-700 tw:dark:hover:text-gray-100;
+  .twdropdown li[role="menuitem"] > :is(a, span[data-active="true"]) {
+    @apply tw:block tw:px-4 tw:py-1 tw:text-left tw:text-base tw:text-gray-700
+      tw:dark:text-gray-200;
+  }
 
-    /* UI::Button's secondary active fill, minus the border and ring a menu item has no room for */
+  .twdropdown li[role="menuitem"] > a {
+    @apply tw:no-underline tw:hover:bg-gray-100 tw:hover:text-gray-900
+      tw:dark:hover:bg-gray-700 tw:dark:hover:text-gray-100;
+
+    /* ui--active-link marks the link itself, so the entry reads its own state rather than
+     * the li's. The fill is UI::Button's secondary active, minus the border and ring a
+     * menu item has no room for */
     @variant is-active {
       @apply tw:bg-purple-500 tw:text-white;
     }
   }
 
-  .twdropdown li[role="menuitem"]:has(+ li[role="separator"]) > a {
+  /* Where-you-are, without the pull of somewhere to go -- under the fill hovering an entry
+   * takes, so the row a pointer is on still reads as the live one */
+  .twdropdown li[role="menuitem"] > span[data-active="true"] {
+    @apply tw:italic tw:bg-gray-50 tw:dark:bg-gray-700/50;
+  }
+
+  .twdropdown li[role="menuitem"]:has(+ li[role="separator"]) > :is(a, span[data-active="true"]) {
     @apply tw:pb-2;
   }
 
-  .twdropdown li[role="separator"] + li[role="menuitem"] > a {
+  .twdropdown li[role="separator"] + li[role="menuitem"] > :is(a, span[data-active="true"]) {
     @apply tw:pt-2;
   }
 
