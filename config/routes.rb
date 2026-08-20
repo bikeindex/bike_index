@@ -69,9 +69,14 @@ Rails.application.routes.draw do
 
   # Organization SAML SSO (Service Provider). Metadata is public for IdP onboarding;
   # init begins SP-initiated login, callback is the Assertion Consumer Service.
-  get "/sso/:org_slug/metadata", to: "saml#metadata", as: :saml_metadata
-  get "/sso/:org_slug/init", to: "saml#init", as: :saml_init
-  post "/sso/:org_slug/callback", to: "saml#callback", as: :saml_callback
+  # Every path here is a string an IdP has registered - `/metadata` is our entityID - so an
+  # extension has to 404 rather than reach the same action under a second name
+  scope format: false do
+    get "/sso/:org_slug/metadata", to: "saml#metadata", as: :saml_metadata
+    get "/sso/:org_slug/sp.crt", to: "saml#certificate", as: :saml_certificate
+    get "/sso/:org_slug/init", to: "saml#init", as: :saml_init
+    post "/sso/:org_slug/callback", to: "saml#callback", as: :saml_callback
+  end
 
   resources :payments, only: %i[new create] do
     collection { get :success }
