@@ -46,9 +46,12 @@ RSpec.describe UI::Dropdown::Component, :js, type: :system do
       expect(page).to have_text("Last synced: 2 minutes ago")
       expect(page).to have_text("Settings")
       expect(page).to have_text("Sync")
-      # The active item is marked aria-current; inactive items are not
-      expect(page).to have_css('li[role="menuitem"][aria-current]', text: "Sync")
-      expect(page).to have_css('li[role="menuitem"]:not([aria-current])', text: "Settings")
+      # ui--active-link marks the link that points at this page, and .twdropdown fills it
+      expect(page).to have_css('li[role="menuitem"] a[aria-current]', text: "Sync (active)")
+      expect(page).to have_no_css('li[role="menuitem"] a[aria-current]', text: "Settings")
+      expect(page.evaluate_script(<<~JS)).to eq "rgb(255, 255, 255)"
+        getComputedStyle(document.querySelector('li[role="menuitem"] a[aria-current]')).color
+      JS
       expect_axe_clean
 
       send_keys(:escape)
