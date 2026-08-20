@@ -16,6 +16,8 @@ The Claude Code web sandbox is the case that has neither: no GitHub CLI, and an 
 
 When the diff touches `app/assets/tailwind/**`, check that `app/assets/builds/tailwind.css` contains the branch's new rules before capturing — another checkout's watcher can leave it stale for hours, and the capture then documents the bug the PR fixes. Ask the user to restart `bin/dev`; never rebuild it yourself.
 
+**Count occurrences, not lines.** The built file is minified onto very few lines, so `grep -c '<selector>'` reports `0` or `1` for a selector that's present many times, and a fresh build reads as a missing one. Use `grep -o '<selector>' app/assets/builds/tailwind.css | wc -l`, and compare the file's mtime against the source's before concluding anything.
+
 ## 1. Decide whether screenshots are needed and which URLs to capture
 
 You're only here because the diff is frontend (SKILL.md's classifier gates on that). Decide scope by PR state:

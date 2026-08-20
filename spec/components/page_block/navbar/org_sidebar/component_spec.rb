@@ -24,7 +24,7 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
 
     expect(component).to have_css "button[data-ui--dropdown-target='button']", text: "kdewey@brakebills.edu"
     # The sidebar stands in for the navbar, so the account menu carries the organization
-    # switcher and marketplace messages PageBlock::Navbar::UserSettingsMenu builds too
+    # switcher and marketplace messages PageBlock::Navbar::UserSettingsMenu carries too
     expect(component.css("ul[role='menu'] li[role='menuitem'] a").map(&:text))
       .to eq(["Log out", "View without any organization",
         "kdewey@brakebills.edu settings", "Register a new bike", "Your registrations"])

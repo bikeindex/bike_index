@@ -1,0 +1,6 @@
+<div class="tw:pb-5">
+  <%= render PageBlock::Navbar::AccountMenu::Component.new(current_user: user,
+        current_user_or_unconfirmed_user: user, current_organization:, name: user.email) do %>
+    <%= user.email %>
+  <% end %>
+</div>
