@@ -3,8 +3,8 @@
 import Sortable from 'controllers/sortable_controller'
 
 // Connects to data-controller='page-block--my-account--organization-roles'
-// The "use on login" checkbox names whichever organization is first, so a drag that changes
-// which one that is rewrites the name -- the row order is already what the server was sent.
+// The "view as" radio names whichever organization is first, so a drag that changes which
+// one that is rewrites the name -- the row order is already what the server was sent.
 export default class extends Sortable {
   static targets = ['organizationName']
 

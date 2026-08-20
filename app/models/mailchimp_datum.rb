@@ -84,7 +84,8 @@ class MailchimpDatum < ApplicationRecord
     return @mailchimp_organization_role if defined?(@mailchimp_organization_role)
     return nil if user.blank?
 
-    organization_roles = OrganizationRole.ordered_for(user).admin.reject { |m| m.organization.ambassador? }
+    organization_roles = OrganizationRole.ordered_for(user).admin.includes(:organization)
+      .reject { |m| m.organization.ambassador? }
     return nil unless organization_roles.any?
 
     existing_name = data&.dig("merge_fields", "organization_name")

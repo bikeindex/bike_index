@@ -136,7 +136,7 @@ module ControllerHelpers
   end
 
   def user_root_bike_search?
-    OrganizationRole.default_organization(current_user)&.law_enforcement? || false
+    OrganizationRole.default_organization(current_user)&.law_enforcement?
   end
 
   def user_root_url
@@ -145,12 +145,9 @@ module ControllerHelpers
 
     default_organization = OrganizationRole.default_organization(current_user)
     return my_account_url if default_organization.blank?
+    return default_bike_search_path if default_organization.law_enforcement?
 
-    if user_root_bike_search?
-      default_bike_search_path
-    else
-      organization_root_url(organization_id: default_organization.to_param)
-    end
+    organization_root_url(organization_id: default_organization.to_param)
   end
 
   # Deletes, so the donation modal only ever shows once - memoized because

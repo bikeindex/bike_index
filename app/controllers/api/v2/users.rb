@@ -20,7 +20,7 @@ module API
           end
 
           def organization_memberships
-            OrganizationRole.ordered_for(current_user).map { |organization_role|
+            OrganizationRole.ordered_for(current_user).includes(:organization).map { |organization_role|
               {
                 organization_name: organization_role.organization.name,
                 organization_slug: organization_role.organization.slug,

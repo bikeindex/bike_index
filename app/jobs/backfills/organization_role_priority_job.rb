@@ -8,16 +8,16 @@ module Backfills
     sidekiq_options queue: "low_priority", retry: false
 
     def perform
-      User.joins(:organization_roles).distinct.find_each(batch_size: 500) do |user|
-        renumber(user)
+      User.joins(:organization_roles).distinct.select(:id).find_each(batch_size: 500) do |user|
+        renumber(user.id)
       end
     end
 
     private
 
     # update_all rather than update, to skip the processing worker every role would enqueue
-    def renumber(user)
-      OrganizationRole.where(user_id: user.id).order(:created_at, :id)
+    def renumber(user_id)
+      OrganizationRole.where(user_id:).order(:created_at, :id)
         .each_with_index do |organization_role, index|
         next if organization_role.priority == index
 

@@ -20,7 +20,7 @@ class MyAccountsController < ApplicationController
     if @edit_template&.to_sym == :root
       @user.find_or_build_address_record(country_id: current_country_id)
     elsif @edit_template&.to_sym == :organization_roles
-      @organization_roles = OrganizationRole.ordered_for(@user).includes(:organization)
+      @organization_roles = OrganizationRole.ordered_for(@user).includes(:organization).load
     end
   end
 
@@ -96,7 +96,7 @@ class MyAccountsController < ApplicationController
   end
 
   def organization_role_template
-    return {} unless current_user&.organization_roles.present?
+    return {} unless current_user&.organization_roles&.exists?
 
     {organization_roles: translation(:organization_roles, scope: [:controllers, :my_accounts, :edit])}
   end
@@ -125,7 +125,7 @@ class MyAccountsController < ApplicationController
     true
   end
 
-  # The checkbox is the first organization holding priority 0, so the whole list renumbers
+  # Viewing as an organization is the first one holding priority 0, so the whole list renumbers
   def update_organization_role_on_by_default
     return false unless params.key?(:on_by_default)
 

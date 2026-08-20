@@ -24,6 +24,11 @@ module PageBlock
         def first_organization
           first_organization_role.organization
         end
+
+        # With more than one, the drag decides which is first, so the copy can't name it
+        def first_organization_name
+          single_role? ? first_organization.short_name : translation(".your_first_organization")
+        end
       end
     end
   end

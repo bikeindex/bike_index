@@ -66,10 +66,7 @@ class OrganizationRole < ApplicationRecord
   def self.default_organization(user)
     return nil if user.blank?
 
-    organization_role = ordered_for(user).first
-    return nil unless organization_role&.on_by_default?
-
-    organization_role.organization
+    ordered_for(user).where(priority: 0).eager_load(:organization).first&.organization
   end
 
   # The role an organization grants to anyone on its user_email_domain. Nobody invited them, so
@@ -153,7 +150,8 @@ class OrganizationRole < ApplicationRecord
   # Reorders the user's roles to put this one at position, counting from the first
   def reorder_to!(position)
     others = self.class.ordered_for(user).where.not(id:).to_a
-    renumber(others.insert(position.clamp(0, others.length), self), priority_offset)
+    ordered = others.insert(position.clamp(0, others.length), self)
+    renumber(ordered, ordered.map(&:priority).min.clamp(0, 1))
   end
 
   # The whole list renumbers, because on by default is the first organization being priority 0
@@ -180,12 +178,10 @@ class OrganizationRole < ApplicationRecord
     (self.class.where(user_id:).where.not(id:).maximum(:priority) || -1) + 1
   end
 
-  def priority_offset
-    self.class.ordered_for(user).limit(1).pick(:priority)&.clamp(0, 1) || 0
-  end
-
   def renumber(organization_roles, offset)
     organization_roles.each_with_index do |organization_role, index|
+      next if organization_role.priority == index + offset
+
       self.class.where(id: organization_role.id).update_all(priority: index + offset)
     end
   end

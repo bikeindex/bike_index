@@ -3,7 +3,7 @@
     <div class="row choose-registration-items">
       <div class="choose-links col-sm-6">
         <ul>
-          <% organization_roles = OrganizationRole.ordered_for(current_user) %>
+          <% organization_roles = OrganizationRole.ordered_for(current_user).includes(:organization).to_a %>
 
           <% if organization_roles.any? %>
             <% organization_roles.each do |organization_role| %>

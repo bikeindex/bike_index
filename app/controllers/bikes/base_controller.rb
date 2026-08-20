@@ -23,8 +23,8 @@ module Bikes
 
       # If there was an organization_id passed, and the user isn't authorized for that org, reset passive_organization to something they can access
       # ... Particularly relevant for scanned stickers, which may be scanned by child orgs - but I think it's the behavior users expect regardless
-      default_organization = OrganizationRole.default_organization(current_user)
-      if default_organization.present? && params[:organization_id].present?
+      default_organization = OrganizationRole.default_organization(current_user) if params[:organization_id].present?
+      if default_organization.present?
         return true if org.present? && current_user.authorized?(org)
 
         set_passive_organization(default_organization)

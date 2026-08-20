@@ -91,9 +91,7 @@
 
   <div class="col-xs-12">
     <p>
-      <%# Only one organization is a name that can't change - any more and the drag decides it %>
-      <%= translation(".automatically_view_in_organization", org_name: (single_role? ?
-              first_organization.short_name : translation(".your_first_organization"))) %>
+      <%= translation(".automatically_view_in_organization", org_name: first_organization_name) %>
 
       <span class="less-strong"><%= translation(".you_can_still_switch") %></span>
     </p>

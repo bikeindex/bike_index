@@ -41,7 +41,7 @@ module API
           def organization_memberships
             return {} unless current_scopes.include?("read_organization_membership")
 
-            {memberships: OrganizationRole.ordered_for(current_user).map { |m| serialized_membership(m) }}
+            {memberships: OrganizationRole.ordered_for(current_user).includes(:organization).map { |m| serialized_membership(m) }}
           end
 
           private
