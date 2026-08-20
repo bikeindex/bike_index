@@ -136,20 +136,18 @@ module ControllerHelpers
   end
 
   def user_root_bike_search?
-    current_user.present? && current_user.default_organization.present? &&
-      current_user.default_organization.law_enforcement?
+    OrganizationRole.default_organization(current_user)&.law_enforcement?
   end
 
   def user_root_url
     return root_url unless current_user.present? && current_user.confirmed?
     return admin_root_url if current_user.superuser?
-    return my_account_url unless current_user.default_organization.present?
 
-    if user_root_bike_search?
-      default_bike_search_path
-    else
-      organization_root_url(organization_id: current_user.default_organization.to_param)
-    end
+    default_organization = OrganizationRole.default_organization(current_user)
+    return my_account_url if default_organization.blank?
+    return default_bike_search_path if default_organization.law_enforcement?
+
+    organization_root_url(organization_id: default_organization.to_param)
   end
 
   # Deletes, so the donation modal only ever shows once - memoized because
@@ -316,7 +314,7 @@ module ControllerHelpers
 
       @passive_organization = Organization.friendly_find(session[:passive_organization_id])
     end
-    @passive_organization ||= set_passive_organization(current_user&.default_organization)
+    @passive_organization ||= set_passive_organization(OrganizationRole.default_organization(current_user))
   end
 
   # current_organization is the organization currently being used.

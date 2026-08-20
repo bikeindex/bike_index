@@ -5,7 +5,7 @@
       <%= render PageBlock::UserAlerts::Wrapper::Component.new(current_user: @current_user, wrapper_class: "tw:my-4") %>
     <% end %>
 
-    <% if OrganizationDisplayer.law_enforcement_missing_verified_features?(@current_organization) %>
+    <% if OrgServices::Displayer.law_enforcement_missing_verified_features?(@current_organization) %>
       <div class="organization-wide-alert alert alert-info in">
         <button
           class="close"
@@ -22,7 +22,7 @@
       </div>
     <% end %>
 
-    <% if OrganizationDisplayer.subscription_expired_alert?(@current_organization) %>
+    <% if OrgServices::Displayer.subscription_expired_alert?(@current_organization) %>
       <div class="organization-wide-alert alert alert-info in">
         <button
           class="close"
@@ -39,7 +39,7 @@
       </div>
     <% end %>
 
-    <% if OrganizationDisplayer.bike_shop_display_integration_alert?(@current_organization) %>
+    <% if OrgServices::Displayer.bike_shop_display_integration_alert?(@current_organization) %>
       <div class="organization-wide-alert alert alert-info in">
         <button
           class="close"

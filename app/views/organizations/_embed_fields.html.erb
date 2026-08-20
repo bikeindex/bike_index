@@ -20,7 +20,7 @@
     </div>
 
     <% if BikeServices::Displayer.include_reg_field?(:extra_registration_number, @organization) %>
-      <% label_secondary_serial = registration_field_label(@organization, "reg_extra_registration_number") || t(".additional_serial") %>
+      <% label_secondary_serial = OrgServices::Displayer.registration_field_label(@organization, "reg_extra_registration_number") || t(".additional_serial") %>
       <%= f.label :extra_registration_number, label_secondary_serial %>
       <div class="controls">
         <%= f.text_field :extra_registration_number, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off' %>
@@ -282,7 +282,7 @@
 <% end %>
 
 <% if BikeServices::Displayer.include_reg_field?(:phone, @organization) %>
-  <% label_phone = registration_field_label(@organization, "reg_phone") || t(".phone_number_#{label_reference}") %>
+  <% label_phone = OrgServices::Displayer.registration_field_label(@organization, "reg_phone") || t(".phone_number_#{label_reference}") %>
   <div class="input-group">
     <%= f.label :phone, label_phone %>
 
@@ -291,7 +291,7 @@
 <% end %>
 
 <% if BikeServices::Displayer.include_reg_field?(:organization_affiliation, @organization) %>
-  <% label_affiliation = registration_field_label(@organization, "reg_organization_affiliation") || t(".org_affiliation", org_name: @organization.short_name) %>
+  <% label_affiliation = OrgServices::Displayer.registration_field_label(@organization, "reg_organization_affiliation") || t(".org_affiliation", org_name: @organization.short_name) %>
   <div class="input-group">
     <%= f.label :organization_affiliation, label_affiliation %>
 
@@ -306,7 +306,7 @@
   <div class="input-group">
     <div class="control-group">
       <%= f.label :student_id do %>
-        <%= registration_field_label(@organization, "reg_student_id") || t(".student_id") %>
+        <%= OrgServices::Displayer.registration_field_label(@organization, "reg_student_id") || t(".student_id") %>
 
         <% unless student_id_required %>
           <small class="less-strong"><%= t(".optional") %></small>
@@ -339,7 +339,7 @@
 <div class="input-group form-foot">
   <div class="control-group">
     <%= f.label :owner_email do %>
-      <%= registration_field_label(@organization, "owner_email") || t(".email_address_#{label_reference}") %>
+      <%= OrgServices::Displayer.registration_field_label(@organization, "owner_email") || t(".email_address_#{label_reference}") %>
     <% end %>
 
     <div class="controls">

@@ -131,8 +131,10 @@ end
 # Point the SP keypair + BASE_URL at fixtures for any example tagged `:saml_env`,
 # restoring the originals afterward.
 RSpec.shared_context "saml_env" do
-  let(:sp_cert) { File.read(Rails.root.join("spec/fixtures/saml/sp_cert.pem")) }
-  let(:sp_key) { File.read(Rails.root.join("spec/fixtures/saml/sp_key.pem")) }
+  let(:sp_cert_pem) { File.read(Rails.root.join("spec/fixtures/saml/sp_cert.pem")) }
+  let(:sp_key_pem) { File.read(Rails.root.join("spec/fixtures/saml/sp_key.pem")) }
+  let(:sp_cert) { sp_cert_pem }
+  let(:sp_key) { sp_key_pem }
 
   around do |example|
     original = ENV.values_at("SAML_SP_CERTIFICATE", "SAML_SP_PRIVATE_KEY", "BASE_URL")

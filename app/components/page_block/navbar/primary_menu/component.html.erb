@@ -7,7 +7,7 @@
       <li class="primary-nav-item"><%= render settings_menu %></li>
     <% else %>
       <li class="primary-nav-item <%= item[:item_class] %>">
-        <%= render PageBlock::Navbar::MenuLink::Component.new(**item.except(:item_class)) %>
+        <%= render nav_link(item) %>
       </li>
     <% end %>
   <% end %>

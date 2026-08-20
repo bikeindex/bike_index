@@ -16,12 +16,16 @@ The Claude Code web sandbox is the case that has neither: no GitHub CLI, and an 
 
 When the diff touches `app/assets/tailwind/**`, check that `app/assets/builds/tailwind.css` contains the branch's new rules before capturing — another checkout's watcher can leave it stale for hours, and the capture then documents the bug the PR fixes. Grep the built file for a value the branch adds rather than trusting its mtime. `bin/rails tailwindcss:build` is the fix, the same command step 4 runs on each checkout — it writes only `app/assets/builds/`, and is neither `assets:precompile` nor a `bin/dev` restart.
 
+**Count occurrences, not lines.** The built file is minified onto very few lines, so `grep -c '<selector>'` reports `0` or `1` for a selector that's present many times, and a fresh build reads as a missing one. Use `grep -o '<selector>' app/assets/builds/tailwind.css | wc -l`, and compare the file's mtime against the source's before concluding anything.
+
 ## 1. Decide whether screenshots are needed and which URLs to capture
 
 You're only here because the diff is frontend (SKILL.md's classifier gates on that). Decide scope by PR state:
 
 - New PR → capture every affected page.
 - Existing PR → continue only if the captures in the existing screenshots comment are stale: a commit since the last capture touched a page already screenshotted, or a new affected page now appears in the diff. Limit the capture to those pages. If nothing has moved, return the PR URL.
+
+**A page the diff no longer touches loses its block rather than gaining a recapture.** When work lands on the base separately — the branch's own commits merged as another PR, say — `git diff origin/main -- <path>` for those files comes back empty, and their before/after now documents a change this PR doesn't make, with a "main 👆" shot taken before the base moved. Drop the `### <url-path>` block; don't recapture it to show two identical images.
 
 Reading that comment is `github-pr-images`'s job, since it owns it — ask it for the current body before deciding. This costs no browser: it's a `gh api` read.
 

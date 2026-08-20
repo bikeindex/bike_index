@@ -162,6 +162,8 @@ jobs:
       R2_DEV_ACCESS_KEY_SECRET: ${{ secrets.REVIEW_APP_R2_DEV_ACCESS_KEY_SECRET }}
       HONEYBADGER_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_API_KEY }}
       HONEYBADGER_FRONTEND_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_FRONTEND_API_KEY }}
+      SAML_SP_CERTIFICATE: ${{ secrets.REVIEW_APP_SAML_SP_CERTIFICATE }}
+      SAML_SP_PRIVATE_KEY: ${{ secrets.REVIEW_APP_SAML_SP_PRIVATE_KEY }}
     steps:
       - name: Checkout the ref
         uses: actions/checkout@v7

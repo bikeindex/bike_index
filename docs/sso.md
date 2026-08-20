@@ -7,11 +7,19 @@ them in. Everything is per-organization and slug-scoped:
 | Endpoint | Purpose |
 |---|---|
 | `/sso/<slug>/metadata` | our SP metadata — the URL you hand an IdP admin |
+| `/sso/<slug>/sp.crt` | the SP certificate alone, for IdP tooling that wants a file |
 | `/sso/<slug>/init` | SP-initiated login |
 | `/sso/<slug>/callback` | Assertion Consumer Service |
 
-All three 404 unless the organization has the `saml_sso` feature. `init` and `callback`
+All of them 404 unless the organization has the `saml_sso` feature. `init` and `callback`
 additionally need the configuration marked live.
+
+Metadata is served as `application/xml`, which browsers display; the registered
+`application/samlmetadata+xml` is an unknown type, so they download it instead. The path takes
+no extension — it **is** the entityID, and `.xml` 404s, so there is exactly one string to hand
+an IdP admin whether they register it as a metadata URL or as an entityID. `sp.crt` is
+`application/pem-certificate-chain`, which browsers download; it is the same certificate for
+every organization, and the `.crt` path is what names the saved file.
 
 Code: `saml_controller.rb`, `app/services/saml/`, `app/models/organization_saml_configuration.rb`.
 Deterministic coverage lives in `spec/requests/saml_callback_request_spec.rb`, which signs
@@ -27,7 +35,7 @@ SAML trust comes from the metadata two parties exchange, not from a CA chain.
 | Scope | one keypair, app-wide | one per organization |
 | Source | we generate it | they hand it to us from their metadata |
 | Secret? | certificate is public; **the private key is the only secret** | public |
-| Stored | environment variables | database, pasted in the admin SAML card |
+| Stored | environment variables (raw PEM, or base64 of one) | database, pasted in the admin SAML card |
 
 Our certificate is published at `/sso/<slug>/metadata` for anyone to fetch — that is its
 entire job. The one keypair appears there twice, under a `signing` and an `encryption`
@@ -117,8 +125,9 @@ through the IdP, they link to the existing account rather than getting a duplica
 
 **Pin the NameID format with the IdP.** `SsoIdentity` is unique on
 `(organization_id, provider, uid)` where `uid` is the asserted NameID. A **transient** NameID
-mints a new identity row on every login. `name_id_format` is stored but never enforced — and
-there is no field for it on the admin form, though it is in the strong params.
+mints a new identity row on every login. The admin form's **NameID format** select is what asks
+for one; blank sends no `NameIDPolicy` at all, leaving the choice to the IdP. What the IdP
+actually returned is recorded on each `SsoIdentity` — nothing enforces a match.
 
 **Capture before you change anything**, so it's reversible: the org's `enabled_feature_slugs`,
 the ids of existing `organization_roles`, accounts on the domain split by has-a-password /
@@ -204,6 +213,10 @@ login with `SigAlg was null`. Keep those names out of `.env`: `bin/dev` runs for
 injects `.env` into every process, and dotenv won't overwrite an already-set name — so even a
 blank value there silently wins.
 
+Either variable also accepts a base64-encoded PEM, which is how the deploy environments carry
+it — kamal writes every secret to the host as one `KEY=value` line, so the newlines have to go.
+Review apps and sandbox get their own throwaway keypair, not production's.
+
 **Full rehearsal against a public IdP.** Use [mocksaml.com](https://mocksaml.com). Nothing to
 create: it has no accounts and no per-SP registration, reading the ACS URL and audience
 straight out of the AuthnRequest.
@@ -246,7 +259,7 @@ The reason is the real one — ruby-saml's validation errors are passed through,
 
 | Reason | Cause |
 |---|---|
-| `/sso/<slug>/metadata` 404s | feature not enabled, or `UpdateOrganizationAssociationsJob` hasn't run |
+| `/sso/<slug>/metadata` 404s | feature not enabled, `UpdateOrganizationAssociationsJob` hasn't run, or the url carries a `.xml` extension |
 | `/sso/<slug>/init` 404s | config incomplete — needs enabled + entityID + SSO URL + cert |
 | `this login has expired` | RelayState token already claimed or older than 10 minutes |
 | `SAML session mismatch` | the `org_slug` in RelayState isn't the org being called back |

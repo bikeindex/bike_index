@@ -2833,7 +2833,8 @@ CREATE TABLE public.organization_roles (
     created_by_magic_link boolean DEFAULT false,
     receive_hot_sheet boolean DEFAULT false,
     hot_sheet_notification integer DEFAULT 0,
-    role integer
+    role integer,
+    priority integer DEFAULT 0 NOT NULL
 );
 
 
@@ -7803,6 +7804,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260819120000'),
 ('20260815152851'),
 ('20260813100000'),
 ('20260812200000'),

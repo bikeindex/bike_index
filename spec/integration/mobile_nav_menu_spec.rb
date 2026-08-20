@@ -65,28 +65,28 @@ RSpec.describe "Navbar", :js, type: :system do
       visit root_path
 
       # The closed dropdown's items are rendered, out of view
-      expect(page).to have_no_link("Logout")
+      expect(page).to have_no_link("Log out")
       expect_axe_clean
 
       find(settings_toggle).click
 
-      expect(page).to have_link("Logout")
+      expect(page).to have_link("Log out")
       expect_axe_clean
 
       # Escape from inside the dropdown hands focus back to the toggle, rather than
       # leaving it on a link that just became display:none
-      find_link("Logout").send_keys(:escape)
+      find_link("Log out").send_keys(:escape)
 
-      expect(page).to have_no_link("Logout")
+      expect(page).to have_no_link("Log out")
       expect(page.evaluate_script("document.activeElement.id")).to eq "setting_submenu"
 
       find(settings_toggle).click
 
-      expect(page).to have_link("Logout")
+      expect(page).to have_link("Log out")
 
       find("body").click
 
-      expect(page).to have_no_link("Logout")
+      expect(page).to have_no_link("Log out")
 
       page.current_window.resize_to(390, 844)
 
@@ -94,7 +94,7 @@ RSpec.describe "Navbar", :js, type: :system do
       expect(page).to have_no_css(settings_toggle)
       find("#primary_nav_hamburgler").click
 
-      expect(page).to have_link("Logout")
+      expect(page).to have_link("Log out")
     end
   end
 

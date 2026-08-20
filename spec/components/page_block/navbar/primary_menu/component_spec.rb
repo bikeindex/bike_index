@@ -18,6 +18,9 @@ RSpec.describe PageBlock::Navbar::PrimaryMenu::Component, type: :component do
     expect(component).to_not have_css "#setting_submenu"
     expect(component).to_not have_css "#primary-main-menu a[aria-current]"
     expect(component.css("#primary-main-menu a[data-controller='ui--active-link']").count).to eq menu_links.count
+    # Every row is a nav-link; only the signup one carries a second class
+    expect(component.css("#primary-main-menu a.nav-link").count).to eq menu_links.count
+    expect(component.css("#primary-main-menu a.signup-link").map { |link| link.text.strip }).to eq(["Sign up"])
   end
 
   # The links carry a stolenness the page won't, and the page carries a query and a page

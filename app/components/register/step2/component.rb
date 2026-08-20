@@ -95,7 +95,7 @@ module Register
 
       # Organizations can rename the fields they require
       def reg_label(field, default)
-        helpers.registration_field_label(reg_organization, field) || default
+        OrgServices::Displayer.registration_field_label(reg_organization, field) || default
       end
 
       # Mirrors bikes/new: stolen needs a contact number, impounded needs one

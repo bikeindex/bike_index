@@ -15,8 +15,8 @@
 #
 # `match:` and `matching_controllers:` are UI::ActiveLink's, which resolves them in
 # the browser. Nothing here depends on which page is current.
-module OrganizedServices
-  module UserMenuItems
+module UserServices
+  module MenuItemsOrg
     extend Functionable
 
     # UpdateOrganizationAssociationsJob touches every member user when an org
@@ -25,7 +25,7 @@ module OrganizedServices
     def for(organization:, current_user:, old_register_view: false)
       return [] if organization.nil? || current_user.nil?
 
-      Rails.cache.fetch(["organized_menu_items_v4", organization.id, current_user.cache_key_with_version,
+      Rails.cache.fetch(["menu_items_org_v4", organization.id, current_user.cache_key_with_version,
         old_register_view]) do
         build_items(organization, current_user, old_register_view)
       end
@@ -254,7 +254,7 @@ module OrganizedServices
     end
 
     def translation(key, **interpolations)
-      I18n.t(key, scope: "shared.organized_menu_items", **interpolations)
+      I18n.t(key, scope: "shared.menu_items_org", **interpolations)
     end
 
     def routes
