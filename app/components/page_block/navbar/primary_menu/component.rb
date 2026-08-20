@@ -40,7 +40,7 @@ module PageBlock
         def account_items
           return [{type: :settings}, {type: :divider}] if @current_user_or_unconfirmed_user.present?
 
-          [{label: translation(".sign_up"), path: new_user_url, link_class: "signup-link"},
+          [{label: translation(".sign_up"), path: new_user_url, html_class: "signup-link"},
             {label: translation(".log_in"), path: new_session_url}]
         end
 
@@ -50,8 +50,8 @@ module PageBlock
         end
 
         def nav_link(item)
-          UI::ActiveLink::Component.new(text: item[:label], path: item[:path],
-            match: item[:match] || :path, class: ["nav-link", item[:link_class]].compact.join(" "))
+          UI::ActiveLink::Component.from_item(item,
+            html_class: ["nav-link", item[:html_class]].compact.join(" "))
         end
       end
     end
