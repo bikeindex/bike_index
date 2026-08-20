@@ -58,11 +58,8 @@ export default class extends Controller {
     return trimSlash(url.pathname) === trimSlash(window.location.pathname)
   }
 
-  // A filter entry stands for the params it applies, which is not the same as pointing at the
-  // page they're applied on: the entry already in force links away from itself, to clear it,
-  // and the page carries a number and an organization slug the link needn't. So only the
-  // params the entry names are compared -- '' for one the URL leaves out, which is a filter
-  // sitting at whatever the controller falls back to
+  // The entry already in force links away from itself, to clear the filter, so its own href
+  // can't be what's compared -- only the params it names, with '' for one the URL leaves out
   queryMatches () {
     const current = new URLSearchParams(window.location.search)
 
