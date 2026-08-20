@@ -43,9 +43,11 @@
               <small class="text-success d-block">Active</small>
             <% end %>
 
-            <% if invoice.previous_invoice.present? %>
+            <% previous_invoice = invoice.previous_invoice %>
+
+            <% if previous_invoice.present? %>
               <small class="less-strong d-block mt-1">
-                Follows #<%= invoice.previous_invoice.id %>
+                Follows #<%= previous_invoice.id %>
               </small>
             <% end %>
           </td>
@@ -55,7 +57,7 @@
               <%= link_to organization.short_name, admin_organization_path(organization.to_param) %>
               <%= link_to search_emoji, admin_invoices_path(organization_id: organization.to_param) %>
 
-              <% if invoice.organization.blank? %>
+              <% if organization.deleted? %>
                 <small class="text-danger">organization is deleted!</small>
               <% end %>
             </td>
@@ -87,7 +89,7 @@
             <% if invoice.payments.any? %>
               <ul class="tw:list-disc tw:pl-2">
                 <% invoice.payments.each do |payment| %>
-                  <li style="font-size: 80%;">
+                  <li>
                     <%= link_to "#{payment.amount_formatted} #{payment.payment_method}", admin_payment_path(payment) %>,
                     <%= render(UI::Time::Component.new(time: payment.created_at)) %>
                   </li>
@@ -112,7 +114,7 @@
           <% end %>
 
           <td>
-            <ul class="mt-1 mb-1 pl-3" style="font-size: 80%;">
+            <ul class="small mt-1 mb-1 pl-3">
               <% invoice.organization_features.each do |organization_feature| %>
                 <li>
                   <%= link_to organization_feature.name, edit_admin_organization_feature_path(organization_feature) %>

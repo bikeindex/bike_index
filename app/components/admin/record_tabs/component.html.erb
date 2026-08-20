@@ -11,7 +11,7 @@
 
   <div class="col">
     <ul>
-      <% links.each do |link| %>
+      <% @links.each do |link| %>
         <li class="nav-item"><%= link %></li>
       <% end %>
     </ul>
@@ -31,7 +31,7 @@
     class="col-12 nav nav-tabs tw:mt-3 tw:-mb-px tw:border-b-0!"
     aria-label="<%= @nav_label %>"
   >
-    <% tabs.each do |tab| %>
+    <% @tabs.each do |tab| %>
       <div class="nav-item">
         <%# "page" rather than tab[:active] - a false renders aria-current="false", which counts as current %>
         <%= link_to tab[:label], tab[:href], class: link_classes(tab), aria: {current: ("page" if tab[:active])} %>

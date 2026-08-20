@@ -24,10 +24,9 @@ RSpec.describe Admin::RecordTabs::Component, type: :component do
 
   context "with a subtitle, links and an alert" do
     let(:component) do
+      links = ["<a href='/one'>One</a>".html_safe, "<a href='/two'>Two</a>".html_safe]
       render_inline(described_class.new(title: "A Thing", tabs:, nav_label: "Thing sections",
-        subtitle: "Editing")) do |record_tabs|
-        record_tabs.with_link { "<a href='/one'>One</a>".html_safe }
-        record_tabs.with_link { "<a href='/two'>Two</a>".html_safe }
+        subtitle: "Editing", links:)) do |record_tabs|
         record_tabs.with_alert { "<p>Thing deleted</p>".html_safe }
       end
     end

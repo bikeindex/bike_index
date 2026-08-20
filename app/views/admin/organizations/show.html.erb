@@ -10,15 +10,23 @@
 <% end %>
 
 <div class="row">
-  <%= render(Admin::OrganizationShow::Details::Component.new(organization: @organization)) %>
+  <div class="col-md-6">
+    <%= render(Admin::OrganizationShow::Details::Component.new(organization: @organization)) %>
+  </div>
 
-  <%= render(Admin::OrganizationShow::Account::Component.new(organization: @organization)) %>
+  <div class="col-md-6">
+    <%= render(Admin::OrganizationShow::Account::Component.new(organization: @organization)) %>
+  </div>
 </div>
 
 <div class="row mt-4">
-  <%= render(Admin::OrganizationShow::Invoices::Component.new(organization: @organization)) %>
+  <div class="col-md-6">
+    <%= render(Admin::OrganizationShow::Invoices::Component.new(organization: @organization)) %>
+  </div>
 
-  <%= render(Admin::OrganizationShow::Features::Component.new(organization: @organization)) %>
+  <div class="col-md-6">
+    <%= render(Admin::OrganizationShow::Features::Component.new(organization: @organization)) %>
+  </div>
 </div>
 
 <%= render(Admin::OrganizationShow::Bikes::Component.new(organization: @organization, bikes: @bikes, bikes_count: @bikes_count)) %>

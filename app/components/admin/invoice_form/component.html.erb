@@ -36,22 +36,25 @@
           <% end %>
 
           <tr>
-            <td style="<%= top_border %>"></td>
-            <td style="<%= top_border %>"></td>
+            <td class="tw:border-t-2 tw:border-black"></td>
+            <td class="tw:border-t-2 tw:border-black"></td>
 
-            <td style="<%= right %> <%= top_border %>">
+            <td class="text-right tw:border-t-2 tw:border-black">
               One Time Features
               <small class="less-strong" id="oneTimeCount"></small>
             </td>
 
-            <td style="<%= top_border %>">$<span id="oneTimeCost"></span></td>
+            <td class="tw:border-t-2 tw:border-black">
+              $
+              <span id="oneTimeCost"></span>
+            </td>
           </tr>
 
           <tr>
             <td></td>
             <td></td>
 
-            <td style="<%= right %>">
+            <td class="text-right">
               Recurring Features
               <small class="less-strong" id="recurringCount"></small>
             </td>
@@ -62,7 +65,7 @@
           <tr>
             <td></td>
             <td></td>
-            <td style="<%= right %>">Total</td>
+            <td class="text-right">Total</td>
             <td>$<span id="totalCost"></span></td>
           </tr>
 
@@ -70,7 +73,7 @@
             <td></td>
             <td></td>
 
-            <td style="<%= right %>">
+            <td class="text-right">
               <%= f.label :amount_due, "Amount due $" %>
             </td>
 
@@ -82,7 +85,7 @@
           <tr>
             <td></td>
             <td></td>
-            <td style="<%= right %>">Discount</td>
+            <td class="text-right">Discount</td>
             <td>$<span id="discountCost"></span></td>
           </tr>
         </tbody>

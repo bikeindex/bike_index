@@ -8,7 +8,6 @@ module Admin
       class Component < ApplicationComponent
         include Binxtils::SortableHelper
 
-        # broken_pos sits with the three groupings rather than with the individual kinds
         POS_GROUPINGS = %w[with_pos without_pos broken_pos].freeze
 
         def initialize(search_paid:)

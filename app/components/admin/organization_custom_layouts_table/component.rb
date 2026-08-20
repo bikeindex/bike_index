@@ -13,12 +13,16 @@ module Admin
 
       def organization_param = @organization.to_param
 
-      # Reading a message that doesn't exist yet shouldn't create one, so only an
-      # organization with the feature gets OrganizationStolenMessage.for
+      # OrganizationStolenMessage.for creates the message, so it runs once and only for an
+      # organization with the feature - reading this page shouldn't bring one into being
       def organization_stolen_message
-        return @organization.organization_stolen_message unless @organization.enabled?("organization_stolen_message")
+        return @organization_stolen_message if defined?(@organization_stolen_message)
 
-        OrganizationStolenMessage.for(@organization)
+        @organization_stolen_message = if @organization.enabled?("organization_stolen_message")
+          OrganizationStolenMessage.for(@organization)
+        else
+          @organization.organization_stolen_message
+        end
       end
 
       def stolen_message_path
@@ -29,7 +33,9 @@ module Admin
 
       def email_path(kind) = edit_organization_email_path(kind, organization_id: organization_param)
 
-      def snippet_for(kind) = @organization.mail_snippets.where(kind:).first
+      def snippet_for(kind) = snippets_by_kind[kind]
+
+      def snippets_by_kind = @snippets_by_kind ||= @organization.mail_snippets.index_by(&:kind)
 
       def preview_label(emails)
         case emails

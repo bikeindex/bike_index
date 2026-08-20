@@ -13,7 +13,8 @@ module Admin
 
       private
 
-      def selected_feature_ids = @invoice.organization_feature_ids
+      # Memoized - read once per checkbox otherwise, and it's a query each time
+      def selected_feature_ids = @selected_feature_ids ||= @invoice.organization_feature_ids
 
       def feature_checkbox(organization_feature)
         check_box_tag "organization_feature_ids_#{organization_feature.id}", organization_feature.id,
@@ -26,7 +27,8 @@ module Admin
         helpers.display_dev_info? && organization_feature.feature_slugs_string.present?
       end
 
-      # The datetime fields need a value to render, and Rails won't round for them
+      # Passed to the fields rather than assigned onto the invoice - rendering it
+      # shouldn't write to it
       def start_at
         Binxtils::TimeParser.round(@invoice.subscription_start_at || Time.current.beginning_of_day, "seconds")
       end
@@ -34,10 +36,6 @@ module Admin
       def end_at
         Binxtils::TimeParser.round(@invoice.subscription_end_at || Time.current + 1.year, "seconds")
       end
-
-      def top_border = "border-top: 2px solid black;"
-
-      def right = "text-align: right;"
     end
   end
 end

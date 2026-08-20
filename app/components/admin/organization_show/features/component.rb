@@ -11,9 +11,12 @@ module Admin
 
         private
 
+        # regional_ids has no index, so each call is a seq scan - the template asks four times
+        def regional_parents = @regional_parents ||= @organization.regional_parents.to_a
+
         def associated_organizations?
           @organization.parent_organization.present? || @organization.parent? ||
-            @organization.regional? || @organization.regional_parents.any?
+            @organization.regional? || regional_parents.any?
         end
       end
     end

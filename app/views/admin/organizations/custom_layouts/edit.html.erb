@@ -3,23 +3,19 @@
 <% if layout_kind == "landing_page" %>
   <% subtitle = "Landing Page" %>
   <% additional_link = link_to("landing page", landing_page_url, class: classes) %>
+  <% layout_form = Admin::CustomLayoutForm::LandingPage::Component.new(organization: @organization,
+    landing_page: @landing_page, suggested_button_hover:) %>
 <% else %>
   <% subtitle = capture do %>
     <strong><%= @edit_template.titleize %></strong> email snippet
   <% end %>
   <% snippet_kind = @mail_snippet.which_organization_email %>
   <% additional_link = link_to("#{snippet_kind.titleize} email", edit_organization_email_path(snippet_kind, organization_id: @organization.to_param), class: classes) %>
+  <% layout_form = Admin::CustomLayoutForm::MailSnippet::Component.new(organization: @organization,
+    mail_snippet: @mail_snippet, edit_template: @edit_template) %>
 <% end %>
 
 <%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :custom_layouts,
       subtitle:, additional_link:)) %>
 
-<% if layout_kind == "landing_page" %>
-  <%= render(Admin::CustomLayoutForm::LandingPage::Component.new(organization: @organization,
-        landing_page: @landing_page, suggested_button_hover:)) %>
-<% else %>
-  <%= render(Admin::CustomLayoutForm::MailSnippet::Component.new(organization: @organization,
-        mail_snippet: @mail_snippet, edit_template: @edit_template)) %>
-<% end %>
-
-<div class="mt-4"></div>
+<%= render(layout_form) %>
