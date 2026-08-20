@@ -1,0 +1,13 @@
+<%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :paid_functionality)) %>
+
+<% if Admin::OrganizationForm::FeatureSettings::Component.any_settings?(@organization) %>
+  <%= render layout: "tab_form", locals: {tab: "paid_functionality"} do |form_builder| %>
+    <%= render(Admin::OrganizationForm::FeatureSettings::Component.new(form_builder:, current_user:)) %>
+  <% end %>
+<% else %>
+  <p class="less-strong">
+    This organization has no paid functionality to configure. Features are
+    enabled through
+    <%= link_to "its invoices", admin_organization_invoices_path(organization_id: @organization.to_param) %>.
+  </p>
+<% end %>

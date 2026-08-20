@@ -10,13 +10,18 @@ module Admin
           "user_role_for_user_email_domain" => "automatic user role"
         }.freeze
 
+        # Whether the tab has anything to render: the reg label fields are the ones a paid
+        # organization gets without a feature of its own
+        def self.any_settings?(organization)
+          organization.paid? ||
+            organization.any_enabled?(OrganizationFeature.with_admin_organization_attributes)
+        end
+
         def initialize(form_builder:, current_user:)
           @form_builder = form_builder
           @organization = form_builder.object
           @current_user = current_user
         end
-
-        def render? = @organization.any_enabled?(OrganizationFeature.with_admin_organization_attributes)
 
         private
 
@@ -82,15 +87,6 @@ module Admin
              max: "#{OrganizationStolenMessage::MAX_SEARCH_RADIUS} miles"}
           end
         end
-
-        def saml_configuration
-          @saml_configuration ||= @organization.organization_saml_configuration ||
-            @organization.build_organization_saml_configuration
-        end
-
-        def metadata_url = saml_metadata_url(org_slug: @organization.to_param)
-
-        def certificate_url = saml_certificate_url(org_slug: @organization.to_param)
       end
     end
   end

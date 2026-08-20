@@ -34,18 +34,6 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(response.status).to eq 404
       end
     end
-    context "with location" do
-      let!(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization:, name: "Main Office") }
-      it "renders location with address" do
-        expect(location.address_record).to be_present
-        get "#{base_url}/#{organization.to_param}"
-        expect(response.status).to eq(200)
-        expect(response.body).to include("Main Office")
-        # AddressDisplay component renders with HTML spans, so check for address parts
-        expect(response.body).to include("1300 W 14th Pl")
-        expect(response.body).to include("Chicago")
-      end
-    end
   end
 
   describe "edit" do
@@ -55,11 +43,36 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template("admin/organizations/edit")
     end
+  end
+
+  describe "locations" do
+    let!(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization:, name: "Main Office") }
+
+    it "renders the locations, which show and edit no longer do" do
+      Country.united_states # Read replica
+      get "#{base_url}/#{organization.to_param}/locations"
+      expect(response.status).to eq(200)
+      expect(response).to render_template("admin/organizations/locations")
+      expect(response.body).to include("Main Office")
+      expect(response.body).to include("1300 W 14th Pl")
+
+      get "#{base_url}/#{organization.to_param}"
+      expect(response.body).to_not include("Main Office")
+      get "#{base_url}/#{organization.to_param}/edit"
+      expect(response.body).to_not include("Main Office")
+    end
+  end
+
+  describe "paid_functionality" do
+    it "renders nothing to configure" do
+      get "#{base_url}/#{organization.to_param}/paid_functionality"
+      expect(response.status).to eq(200)
+      expect(response.body).to include("no paid functionality to configure")
+    end
     context "paid" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "reg_address") }
       it "renders the email label and placeholder fields" do
-        Country.united_states
-        get "#{base_url}/#{organization.to_param}/edit"
+        get "#{base_url}/#{organization.to_param}/paid_functionality"
         expect(response.status).to eq(200)
         expect(response.body).to include('name="reg_label-owner_email"')
         expect(response.body).to include('name="reg_label-email_placeholder"')
@@ -67,14 +80,28 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     end
     context "saml_sso enabled" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
-      it "renders the SAML configuration section" do
-        Country.united_states
-        get "#{base_url}/#{organization.to_param}/edit"
+      it "renders the permitted domain, which the SSO tab doesn't own" do
+        get "#{base_url}/#{organization.to_param}/paid_functionality"
         expect(response.status).to eq(200)
-        expect(response.body).to include("SAML SSO")
-        expect(response.body).to include("/sso/#{organization.to_param}/metadata")
         expect(response.body).to include("permitted domain for SAML SSO")
         expect(response.body).to include('name="organization[user_email_domain]"')
+      end
+    end
+  end
+
+  describe "sso" do
+    it "renders that the feature isn't enabled" do
+      get "#{base_url}/#{organization.to_param}/sso"
+      expect(response.status).to eq(200)
+      expect(response.body).to include("SAML SSO is not enabled")
+    end
+    context "saml_sso enabled" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
+      it "renders the SAML configuration section" do
+        get "#{base_url}/#{organization.to_param}/sso"
+        expect(response.status).to eq(200)
+        expect(response).to render_template("admin/organizations/sso")
+        expect(response.body).to include("/sso/#{organization.to_param}/metadata")
         expect(response.body).to include('name="organization[organization_saml_configuration_attributes][name_id_format]"')
       end
     end
@@ -251,6 +278,14 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       end
     end
 
+    context "submitted from a tab" do
+      it "returns to the tab, and to show without one" do
+        put "#{base_url}/#{organization.to_param}", params: {tab: "sso", organization: {name: "new name"}}
+        expect(response).to redirect_to(sso_admin_organization_url(organization))
+        put "#{base_url}/#{organization.to_param}", params: {tab: "not-a-tab", organization: {name: "newer name"}}
+        expect(response).to redirect_to(admin_organization_url(organization))
+      end
+    end
     context "setting to not_set" do
       let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos", lightspeed_register_with_phone: true) }
       it "updates the organization" do

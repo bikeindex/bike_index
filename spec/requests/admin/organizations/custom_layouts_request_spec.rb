@@ -20,10 +20,12 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
     let(:current_user) { FactoryBot.create(:superuser_developer) }
 
     describe "index" do
-      it "renders" do
+      it "renders in the organization tabs, with the organization's view top right" do
         get base_url
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
+        expect(response.body).to include("nav-tabs")
+        expect(response.body).to include("href=\"#{organization_emails_path(organization_id: organization.to_param)}\"")
       end
     end
 

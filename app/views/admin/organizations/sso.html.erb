@@ -1,0 +1,12 @@
+<%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :sso)) %>
+
+<% if @organization.enabled?("saml_sso") %>
+  <%= render layout: "tab_form", locals: {tab: "sso"} do |form_builder| %>
+    <%= render(Admin::OrganizationForm::SamlSso::Component.new(form_builder:)) %>
+  <% end %>
+<% else %>
+  <p class="less-strong">
+    SAML SSO is not enabled for this organization. Enable it through
+    <%= link_to "its invoices", admin_organization_invoices_path(organization_id: @organization.to_param) %>.
+  </p>
+<% end %>

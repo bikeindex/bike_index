@@ -4,7 +4,8 @@
   <% additional_link = nil %>
 <% end %>
 
-<%= render partial: "/admin/organizations/display_header", locals: {current_action: "Edit #{@invoice.display_name} for", additional_link: additional_link} %>
+<%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :invoices,
+      subtitle: "Edit #{@invoice.display_name}", additional_link:)) %>
 
 <div class="row">
   <div class="col-sm-6">

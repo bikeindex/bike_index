@@ -1,0 +1,9 @@
+<%= form_for [:admin, @organization], html: {data: {controller: "admin--organization-form"}} do |form_builder| %>
+  <%= hidden_field_tag :tab, tab %>
+
+  <%= yield form_builder %>
+
+  <div class="mt-4">
+    <%= form_builder.submit "Update", class: "btn-lg btn-success float-right" %>
+  </div>
+<% end %>

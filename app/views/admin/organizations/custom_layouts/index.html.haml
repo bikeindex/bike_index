@@ -1,4 +1,4 @@
-= render partial: "/admin/organizations/display_header", locals: {current_action: "Custom layouts", organization_view_path: organization_emails_path(organization_id: @organization.to_param)}
+= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :custom_layouts))
 
 .row
   .col-lg-6

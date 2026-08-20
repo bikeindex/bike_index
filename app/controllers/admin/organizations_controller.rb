@@ -2,8 +2,11 @@ module Admin
   class OrganizationsController < Admin::BaseController
     include Binxtils::SortableTable
 
-    before_action :find_organization, only: %i[show edit update destroy]
-    before_action :set_admin_form_page_id, only: %i[new edit]
+    # The tabs that edit the organization, each rendering its own slice of the form
+    FORM_TABS = %w[edit locations paid_functionality sso].freeze
+
+    before_action :find_organization, only: %i[show edit locations paid_functionality sso update destroy]
+    before_action :set_admin_form_page_id, only: %w[new] + FORM_TABS
 
     def index
       @per_page = permitted_per_page
@@ -18,11 +21,19 @@ module Admin
     end
 
     def show
-      @locations = @organization.locations
       @deleted_organization_roles = @organization.deleted? || Binxtils::InputNormalizer.boolean(params[:deleted_organization_roles])
       bikes = @organization.bikes.reorder("created_at desc")
       @bikes_count = bikes.size
       @pagy, @bikes = pagy(:countish, bikes, limit: 10, page: permitted_page)
+    end
+
+    def locations
+    end
+
+    def paid_functionality
+    end
+
+    def sso
     end
 
     def recover
@@ -54,9 +65,9 @@ module Admin
         update_organization_stolen_message
         flash[:success] = "Organization Saved!"
         UpdateOrganizationPosKindJob.perform_async(@organization.id) if run_update_pos_kind
-        redirect_to admin_organization_url(@organization)
+        redirect_to url_for(action: form_tab || "show", id: @organization.to_param)
       else
-        render action: :edit
+        render action: form_tab || "edit"
       end
     end
 
@@ -79,6 +90,9 @@ module Admin
     helper_method :matching_organizations
 
     protected
+
+    # Which tab's form was submitted, so update returns to it rather than to show
+    def form_tab = params[:tab].presence_in(FORM_TABS)
 
     def permitted_parameters
       approved_kind = params.dig(:organization, :kind)

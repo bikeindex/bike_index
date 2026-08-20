@@ -1,0 +1,5 @@
+<%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :locations)) %>
+
+<%= render layout: "tab_form", locals: {tab: "locations"} do |form_builder| %>
+  <%= render(Admin::OrganizationForm::Locations::Component.new(form_builder:)) %>
+<% end %>

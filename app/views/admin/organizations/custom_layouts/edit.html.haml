@@ -1,4 +1,4 @@
-- current_action = capture_haml do
+- subtitle = capture_haml do
   - if (layout_kind == "mail_snippet")
     %strong
       = @edit_template.titleize
@@ -14,7 +14,7 @@
   - snippet_kind = @mail_snippet.which_organization_email
   - additional_link = link_to("#{snippet_kind.titleize} email", edit_organization_email_path(snippet_kind, organization_id: @organization.to_param), class: classes)
 
-= render partial: "/admin/organizations/display_header", locals: {current_action: current_action, additional_link: additional_link, show_custom_layouts: true}
+= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :custom_layouts, subtitle:, additional_link:))
 
 = render layout_kind
 .mt-4

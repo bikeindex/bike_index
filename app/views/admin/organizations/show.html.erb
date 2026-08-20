@@ -1,4 +1,4 @@
-<%= render partial: "/admin/organizations/display_header", locals: {current_action: "", show_custom_layouts: true, organization_view_path: organization_root_path(organization_id: @organization.to_param), show_edit: true} %>
+<%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :show)) %>
 
 <% if OrgServices::Displayer.law_enforcement_missing_verified_features?(@organization) %>
   <div class="alert alert-info">
@@ -614,60 +614,8 @@
 
 <hr class="mt-4">
 
-<h4>Locations</h4>
-
-<% if @locations.any? %>
-  <% if @locations.count > 1 %>
-    <h4 class="mt-4"><%= pluralize(@locations.count, "Location") %></h4>
-  <% end %>
-  <div class="row">
-    <% @locations.each do |location| %>
-      <div class="col-lg-4 col-sm-6 mb-4">
-        <div class="card">
-          <div class="card-body">
-            <% if display_dev_info? %>
-              <p>
-                ID: <code class="only-dev-visible"><%= location.id %></code>
-              </p>
-            <% end %>
-
-            <% if location.impound_location %>
-              <strong>
-                <% if location.default_impound_location %>
-                  <span class="text-info">Default</span>
-                <% end %>
-                Impound location
-              </strong>
-            <% elsif !location.shown && @organization.allowed_show? %>
-              <strong class="text-warning">
-                Location is not visible! Try updating the organization
-              </strong>
-            <% end %>
-
-            <p>Name: <%= location.name %></p>
-
-            <p>
-              Phone:
-              <%= render UI::PhoneDisplay::Component.new(phone: location.phone, skip_link: true) %>
-            </p>
-
-            <p>
-              Address:
-              <%= render(UI::AddressDisplay::Component.new(address_record: location.address_record, visible_attribute: :street)) %>
-            </p>
-          </div>
-        </div>
-      </div>
-    <% end %>
-  </div>
-<% end %>
-
 <div class="row">
-  <div class="col-6">
-    <%= link_to "Edit", edit_admin_organization_url(@organization), class: "btn btn-success" %>
-  </div>
-
-  <div class="col-6 text-right">
+  <div class="col-12 text-right">
     <% if @organization.deleted? %>
       <%= link_to "Un-Delete organization", admin_recover_organization_path(id: @organization.id), data: {confirm: "Are you sure?"}, class: "btn btn-outline-warning" %>
     <% else %>

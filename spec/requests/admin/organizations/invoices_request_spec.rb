@@ -19,18 +19,22 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
   include_context :request_spec_logged_in_as_superuser
 
   describe "index" do
-    it "renders" do
+    it "renders in the organization tabs, with New Invoice top right" do
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
+      expect(response.body).to include("nav-tabs")
+      expect(response.body).to include("href=\"#{base_url}/new\"")
     end
   end
 
   describe "new" do
-    it "renders" do
+    it "renders, without a New Invoice link to the page it's on" do
       get "#{base_url}/new"
       expect(response.status).to eq(200)
       expect(response).to render_template(:new)
+      expect(response.body).to include("nav-tabs")
+      expect(response.body).to_not include("href=\"#{base_url}/new\"")
     end
     context "passed end_at" do
       let(:end_at) { Time.current + 10.years }
