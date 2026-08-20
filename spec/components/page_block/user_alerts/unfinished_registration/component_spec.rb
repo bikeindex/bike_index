@@ -6,11 +6,20 @@ RSpec.describe PageBlock::UserAlerts::UnfinishedRegistration::Component, type: :
   let(:b_param) { FactoryBot.create(:b_param_unfinished_registration) }
   let(:component) { render_inline(described_class.new(b_param:)) }
 
-  it "links back into the flow, naming the cycle type" do
-    expect(component.text.squish).to eq "Notice Your cargo bike isn't registered yet! Please finish the required steps"
+  it "links back into the flow, naming the manufacturer and cycle type" do
+    expect(component.text.squish).to eq "Notice Your Surly cargo bike isn't registered yet! Please finish the required steps"
     link = component.css("a").first
     expect(link.text.strip).to eq "finish the required steps"
     expect(link[:href]).to eq "/register?b_param_token=#{b_param.id_token}"
+  end
+
+  # Manufacturers are deletable, so step 1's may be gone by the time this renders
+  context "with the manufacturer destroyed" do
+    before { b_param.manufacturer.destroy }
+
+    it "names the cycle type alone" do
+      expect(component.text.squish).to eq "Notice Your cargo bike isn't registered yet! Please finish the required steps"
+    end
   end
 
   it "doesn't render without a b_param" do

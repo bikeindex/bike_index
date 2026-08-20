@@ -44,16 +44,16 @@ module Registrations
         end
 
         def legacy_view_link
-          link_to(bike_path(@bike, no_redesign: true), class: entry_class) do
-            safe_join(["View in ", content_tag(:span, "Legacy Viewer", class: "tw:font-bold")])
-          end
+          view_in_link(bike_path(@bike, no_redesign: true), "Legacy Viewer")
         end
 
         # Superusers get a link to the admin bike page, ahead of the audience views
         def super_admin_link
-          link_to(admin_bike_path(@bike.id), class: entry_class) do
-            safe_join(["View ", content_tag(:span, "Super Admin", class: "tw:font-bold")])
-          end
+          view_in_link(admin_bike_path(@bike.id), "Super Admin")
+        end
+
+        def view_in_link(path, label)
+          link_to(path) { safe_join(["View in ", content_tag(:span, label, class: "tw:font-bold")]) }
         end
 
         # Organization perspectives ([role, organization] pairs) lead the dropdown,
@@ -72,15 +72,16 @@ module Registrations
           @available_views.reject { |_kind, organization| organization }
         end
 
+        # .twdropdown lays out either shape; the view already showing is the label, since
+        # there's nowhere for it to go
         def entry_link(view)
-          active = view == @current_view
-          link_to(registration_path(@bike, view_as: BikeServices::ShowViews.view_param(view)), "aria-current": (active ? "true" : nil), class: entry_class(active:)) do
-            safe_join([(active ? "Viewing as" : "View as"), " ", entry_label(view)])
+          if view == @current_view
+            return content_tag(:span, safe_join(["Viewing as ", entry_label(view)]), data: {active: true})
           end
-        end
 
-        def entry_class(active: false)
-          "tw:block tw:whitespace-nowrap tw:px-4 tw:py-2 tw:text-sm tw:text-gray-700 tw:no-underline tw:hover:bg-gray-100 tw:dark:text-gray-200 tw:dark:hover:bg-gray-800 #{"tw:bg-gray-100 tw:dark:bg-gray-800" if active}"
+          link_to(registration_path(@bike, view_as: BikeServices::ShowViews.view_param(view))) do
+            safe_join(["View as ", entry_label(view)])
+          end
         end
 
         def button_class
