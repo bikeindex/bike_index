@@ -17,6 +17,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     expect(link["data-ui--active-link-match-value"]).to eq "path"
     # :path compares the URL the browser is already on, so there's no route to compare
     expect(link.attributes).to_not have_key("data-ui--active-link-routes-value")
+    expect(link.attributes).to_not have_key("data-ui--active-link-query-value")
   end
 
   context "with a class" do
@@ -76,11 +77,57 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
       end
     end
 
+    context ":query" do
+      let(:path) { "/o/example/impound_records" }
+      let(:options) { {match: :query, query: {search_status: "resolved"}} }
+
+      it "carries the params the browser compares the page's against" do
+        expect(link["data-ui--active-link-match-value"]).to eq "query"
+        expect(link["data-ui--active-link-query-value"]).to eq({search_status: ["resolved"]}.to_json)
+        expect(link.attributes).to_not have_key("data-ui--active-link-routes-value")
+      end
+
+      # An entry that's the fallback a controller reaches for is in force with the param
+      # absent, which is "" once the browser reads it off the URL
+      context "with a nil among the values" do
+        let(:options) { {match: :query, query: {search_status: ["current", nil]}} }
+
+        it "renders it as the empty string" do
+          expect(link["data-ui--active-link-query-value"])
+            .to eq({search_status: ["current", ""]}.to_json)
+        end
+      end
+
+      context "with a bare nil" do
+        let(:options) { {match: :query, query: {search_deleted: nil}} }
+
+        it "renders the one empty string, rather than no values at all" do
+          expect(link["data-ui--active-link-query-value"]).to eq({search_deleted: [""]}.to_json)
+        end
+      end
+    end
+
     context "with matching_controllers on a match that can't use them" do
       let(:options) { {match: :controller_action, matching_controllers: ["news"]} }
 
       it "raises rather than rendering entries the browser will never compare" do
         expect { component }.to raise_error(ArgumentError, /matching_controllers/)
+      end
+    end
+
+    context "with query on a match that can't use it" do
+      let(:options) { {match: :full_path, query: {search_status: "all"}} }
+
+      it "raises rather than rendering params the browser will never compare" do
+        expect { component }.to raise_error(ArgumentError, /query/)
+      end
+    end
+
+    context "with match: :query and nothing to compare" do
+      let(:options) { {match: :query} }
+
+      it "raises rather than going active on every page" do
+        expect { component }.to raise_error(ArgumentError, /query/)
       end
     end
 

@@ -43,8 +43,14 @@
         <% status_active = @search_status == status %>
         <% status_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (status_active ? nil : status)) %>
 
+        <%#
+          The controller falls back to current with the param absent, so that entry is in
+          force on a URL naming it and on one that doesn't
+        %>
+        <% status_query = {search_status: (status == "current") ? [status, nil] : status} %>
+
         <% dropdown.with_entry_item do %>
-          <%= render UI::ActiveLink::Component.new(text: status_display.call(status), path: organization_graduated_notifications_path(status_link_params), match: :full_path, data: {turbo_action: "advance"}) %>
+          <%= render UI::ActiveLink::Component.new(text: status_display.call(status), path: organization_graduated_notifications_path(status_link_params), match: :query, query: status_query, data: {turbo_action: "advance"}) %>
         <% end %>
       <% end %>
     <% end %>
