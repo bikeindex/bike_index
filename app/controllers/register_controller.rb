@@ -5,7 +5,9 @@ class RegisterController < ApplicationController
   # An expired token starts a registration rather than bouncing and losing the
   # submission. assign_organization runs next, so the form's organization_id lands on it
   before_action -> { find_b_param(build: true) }, only: %i[create]
-  before_action :start_registration, only: %i[embed]
+  # The session's, so reloading the frame lands on the same registration rather than
+  # piling them up - new is the entry point that always starts one
+  before_action -> { start_registration(token_id: session[:register_b_param_token]) }, only: %i[embed]
   # The emailed link resumes a registration the session knows nothing about
   before_action :find_b_param_for_confirmation, only: %i[confirm confirm_email]
   # confirm renders a self-posting form and nothing else, so it reads neither
@@ -22,12 +24,11 @@ class RegisterController < ApplicationController
   # flow: the two stolen bike alerts open their modal on load, over a registration in progress
   before_action { @skip_general_alert = true }
 
-  # Always a new registration - show is what goes back to one in progress, so the two
-  # entry points don't have to be told apart by what the session happens to hold
+  # Always a new registration - show is what goes back to one in progress
   def new
     BikeServices::Register.discard(token: params[:discard_token], user: current_user)
     BikeServices::Register.discard_extra(user: current_user)
-    start_registration(reuse: false)
+    start_registration
     # The filters new is excluded from: the organization the URL names has to land on the
     # registration, and the redirect below asks which step it's at
     assign_organization
@@ -201,11 +202,11 @@ class RegisterController < ApplicationController
     register_path(b_param_token: @b_param.id_token, step:)
   end
 
-  # The registration new and embed start from. reuse: the session's still-blank one, so
-  # reloading the embed frame lands on the same registration rather than piling them up
-  def start_registration(reuse: true)
-    @b_param = BikeServices::Register.b_param_for(user: current_user,
-      token_id: (session[:register_b_param_token] if reuse), status: start_status, email: params[:email])
+  # The registration new and embed start from - token_id reuses the one it names, when
+  # step 1 was never submitted on it
+  def start_registration(token_id: nil)
+    @b_param = BikeServices::Register.b_param_for(user: current_user, token_id:,
+      status: start_status, email: params[:email])
     session[:register_b_param_token] = @b_param.id_token
   end
 
@@ -244,6 +245,8 @@ class RegisterController < ApplicationController
     redirect_to(new_register_path) if @b_param.blank?
   end
 
+  # What the bare /register resumes on, so falling through to new is an entry point rather
+  # than only a not-found. start_params is what carries an organization across that.
   # build: only step 1's submission, which carries everything a registration needs
   def find_b_param(build: false)
     @b_param = BikeServices::Register.find_token(params_token: params[:b_param_token],

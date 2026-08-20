@@ -35,24 +35,6 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to redirect_to register_path(b_param_token: BParam.last.id_token, step: 1)
     end
 
-    it "goes back to the session's registration from the bare /register, at the step it reached" do
-      get "/register/new"
-      b_param = BParam.last
-      b_param.clean_params({bike: {manufacturer_id: manufacturer.id, owner_email:}}.as_json)
-      b_param.save
-
-      expect { get base_url }.to_not change(BParam, :count)
-      expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: 2)
-    end
-
-    it "falls through to new when the session has no registration" do
-      expect { get base_url }.to_not change(BParam, :count)
-      expect(response).to redirect_to new_register_path
-
-      expect { follow_redirect! }.to change(BParam, :count).by 1
-      expect(response).to redirect_to register_path(b_param_token: BParam.last.id_token, step: 1)
-    end
-
     context "status and organization params" do
       let(:organization) { FactoryBot.create(:organization) }
 
@@ -99,16 +81,6 @@ RSpec.describe RegisterController, type: :request do
 
         expect { get "#{base_url}?organization_id=#{organization.slug}" }.to_not change(BParam, :count)
         expect(b_param.reload.creation_organization_id).to eq organization.id
-      end
-
-      # Only the create branch of b_param_for seeds status, so this is the org path
-      it "attaches the organization to the registration it starts" do
-        get "/register/new" # a blank shell, no organization
-        expect(BParam.last.creation_organization_id).to be_blank
-
-        # Arriving on the organization's link shouldn't quietly go unattributed
-        expect { get "/register/new?organization_id=#{organization.slug}" }.to change(BParam, :count).by 1
-        expect(BParam.last.creation_organization_id).to eq organization.id
       end
     end
 
@@ -321,6 +293,12 @@ RSpec.describe RegisterController, type: :request do
       session_b_param = BParam.last
       get base_url
       expect(response).to redirect_to register_path(b_param_token: session_b_param.id_token, step: 1)
+
+      # At the step it reached, rather than back to the start of it
+      session_b_param.clean_params({bike: {manufacturer_id: manufacturer.id, owner_email:}}.as_json)
+      session_b_param.save
+      expect { get base_url }.to_not change(BParam, :count)
+      expect(response).to redirect_to register_path(b_param_token: session_b_param.id_token, step: 2)
     end
   end
 

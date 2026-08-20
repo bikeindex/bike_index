@@ -22,9 +22,8 @@ module BikeServices
       estimated_value locking_description lock_defeat_description proof_of_ownership
       receive_notifications phone_for_users phone_for_shops phone_for_police].freeze
 
-    # The token's registration when step 1 was never submitted (redirecting into
-    # it can't surprise anyone), otherwise a new one. A signed-in user's email
-    # prefills owner_email - manufacturer_id is the submitted-step-1 marker.
+    # The token's registration when step 1 was never submitted, otherwise a new one.
+    # A signed-in user's email prefills owner_email
     def b_param_for(user:, token_id: nil, status: nil, email: nil)
       status = nil unless Bike.statuses.include?(status)
       existing = find_token(session_token: token_id, user:)
@@ -400,6 +399,7 @@ module BikeServices
        "address_record_attributes" => attrs["address_record_attributes"]}.compact
     end
 
+    # manufacturer_id is the submitted-step-1 marker
     def reusable?(b_param)
       b_param.present? && !b_param.with_bike? && b_param.manufacturer_id.blank?
     end
