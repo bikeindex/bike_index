@@ -15,7 +15,7 @@ module Admin
           @bike = bike
           @active = active
           @stolen_record = stolen_record || bike.fetch_current_stolen_record
-          @display_recovery = display_recovery || @stolen_record&.recovered? || false
+          @display_recovery = display_recovery || @stolen_record&.recovered?
         end
 
         private
@@ -39,7 +39,6 @@ module Admin
             .compact.map { |tab, label, href, count| {label:, href:, count:, active: @active == tab} }
         end
 
-        # Whether the theft is approved is what the tab is most often opened to find out
         def stolen_tab
           [:stolen, "Stolen #{@stolen_record.approved? ? "✅" : "❌"}",
             edit_admin_stolen_bike_url(@stolen_record.id, stolen_record_id: true)]
@@ -58,7 +57,8 @@ module Admin
             href: bike_path(@bike.to_param, organization_id: @bike.creation_organization&.to_param)))
         end
 
-        def alerts? = @bike.deleted? || @bike.likely_spam? || @bike.example? || @bike.user_hidden
+        # Bike.current is the scope that drops all four of the states the alerts explain
+        def alerts? = !@bike.current?
 
         def unregistered_parking_notification
           @unregistered_parking_notification ||= @bike.parking_notifications.reorder(:created_at).first

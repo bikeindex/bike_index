@@ -13656,23 +13656,19 @@ table .photo-cell img {
   border-radius: none
 }
 
-.admin-bike-tabs {
-  margin-top: 1.5rem
-}
-
 @media(min-width:768px) {
-  .admin-bike-tabs .admin-image-thumb {
+  .admin-bike-summary .admin-image-thumb {
     max-width: 220px
   }
 }
 
-.admin-bike-tabs .admin-image-thumb img {
+.admin-bike-summary .admin-image-thumb img {
   max-width: 100%;
   width: 180px;
   height: auto
 }
 
-.admin-bike-tabs .admin-image-thumb h3 {
+.admin-bike-summary .admin-image-thumb h3 {
   text-align: center
 }
 

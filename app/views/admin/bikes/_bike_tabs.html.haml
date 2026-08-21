@@ -1,18 +1,17 @@
-- stolen_record ||= bike.present? && bike.fetch_current_stolen_record
-- display_recovery ||= stolen_record.present? && stolen_record.recovered?
+- stolen_record ||= bike&.fetch_current_stolen_record
+- display_recovery ||= stolen_record&.recovered?
 
 -# require inline CSS setting because of caching
 - unless display_dev_info?
   <style>.only-dev-visible {display: none !important;} </style>
 
-- if bike.present?
-  = render Admin::Bikes::Tabs::Component.new(bike:, active:, stolen_record: stolen_record.presence, display_recovery:)
+- if bike.blank?
+  %h1.text-danger
+    No Bike present
+- else
+  = render Admin::Bikes::Tabs::Component.new(bike:, active:, stolen_record:, display_recovery:)
 
-.admin-bike-tabs
-  - if bike.blank?
-    %h1.text-danger
-      No Bike present
-  - else
+  .admin-bike-summary{ class: "tw:mt-6" }
     .row
       - cache(["admin_bike_main", bike, stolen_record]) do
         .col-lg-2.col-3.mt-auto.mb-2.admin-image-thumb
@@ -263,7 +262,7 @@
                 Police Report
               %td
                 = stolen_record.police_report_number
-  - if display_recovery && stolen_record.present? && stolen_record.recovered?
+  - if stolen_record&.recovered?
     %h4.mt-2.text-success
       Recovery Information
       = link_to "view", admin_recovery_path(stolen_record.to_param), class: "small"

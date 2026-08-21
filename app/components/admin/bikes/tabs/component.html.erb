@@ -1,11 +1,5 @@
-<%#
-  turbo: false because every tab here lands on a legacy admin screen - the selectizes on
-  the edit form, and chartkick on the promoted alerts, come from the vendored bundle in
-  the head, which a Drive visit never re-runs
-%>
-
 <%= render(Admin::Headers::Tabs::Component.new(title:, tabs:, links: [non_admin_view_link],
-      nav_label: "Registration sections", turbo: false)) do |header| %>
+      nav_label: "Registration sections")) do |header| %>
   <% if alerts? %>
     <% header.with_alert do %>
       <% if @bike.deleted? %>
@@ -39,9 +33,7 @@
 
 
             <small class="tw:mt-2 tw:block">
-              This is also known as an
-              <span class="tw:text-yellow-800 tw:dark:text-yellow-400">unregistered</span>
-              <%= @bike.type %>
+              This is also known as an unregistered <%= @bike.type %>
             </small>
           <% else %>
             <strong class="tw:mb-1 tw:block">Hidden by the user</strong> No one

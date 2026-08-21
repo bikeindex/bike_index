@@ -58,11 +58,15 @@ RSpec.describe Admin::Bikes::Tabs::Component, type: :component do
       expect(tab_labels).to_not include(a_string_starting_with("Impoundings"))
     end
 
-    context "with an impound record" do
-      before { FactoryBot.create(:impound_record, bike:) }
+    # The count is two tables added together, so one of each
+    context "with an impound record and a claim" do
+      before do
+        FactoryBot.create(:impound_claim_with_stolen_record, bike:)
+        FactoryBot.create(:impound_record, bike:)
+      end
 
-      it "counts them" do
-        expect(tab_labels).to include "Impoundings 1"
+      it "counts both" do
+        expect(tab_labels).to include "Impoundings 2"
       end
     end
 
@@ -101,7 +105,7 @@ RSpec.describe Admin::Bikes::Tabs::Component, type: :component do
 
   describe "alerts" do
     it "renders none" do
-      expect(component.css(".admin-subnav [role='alert']").count).to eq 0
+      expect(component.css("[role='alert']")).to be_empty
     end
 
     context "with a deleted bike" do

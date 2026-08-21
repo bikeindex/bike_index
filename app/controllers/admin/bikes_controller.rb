@@ -2,8 +2,7 @@ module Admin
   class BikesController < Admin::BaseController
     include Binxtils::SortableTable
 
-    # The Admin::Bikes::Tabs tabs show renders - every other tab is another controller's
-    # screen, filtered to the bike
+    # The Admin::Bikes::Tabs tabs show renders; the rest are other controllers' screens
     SHOW_TABS = %w[duplicates messages ownerships stickers recoveries impound].freeze
 
     before_action :find_bike, only: %i[edit update show]
