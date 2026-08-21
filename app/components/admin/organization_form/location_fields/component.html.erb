@@ -11,7 +11,7 @@
 
       <div class="tw:lg:col-span-2">
         <%= @form_builder.fields_for :address_record, @location.find_or_build_address_record do |address_form| %>
-          <%= render(Org::LocationAddressFields::Component.new(form_builder: address_form)) %>
+          <%= render(UI::Forms::AddressGroup::Component.new(form_builder: address_form)) %>
         <% end %>
       </div>
     </div>
@@ -27,7 +27,7 @@
         <% end %>
       </div>
 
-      <div class="tw:text-center">
+      <div class="tw:text-right">
         <% if @location.destroy_forbidden? %>
           <small class="less-strong">can't remove, has impounded bikes</small>
         <% else %>
