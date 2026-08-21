@@ -77,7 +77,7 @@ class BParam < ApplicationRecord
   # emailed confirmation link works - and how long it's worth alerting about
   TOKEN_EXPIRATION = 90.days
   # Ownership::ORIGIN_ENUM keys - the created bike's ownership takes the same string
-  REGISTER_FLOW_ORIGINS = %w[register_flow register_flow_organized].freeze
+  REGISTER_FLOW_ORIGINS = %w[register_flow register_flow_organized register_flow_landing_page].freeze
   mount_uploader :image, ImageUploaderBackgrounded
   process_in_background :image, CarrierWaveProcessJob # Defer version generation so large uploads don't hit the 30s Rack::Timeout
 

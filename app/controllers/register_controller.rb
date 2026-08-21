@@ -7,7 +7,9 @@ class RegisterController < ApplicationController
   before_action -> { find_b_param(build: true) }, only: %i[create]
   # The session's, so reloading the frame lands on the same registration rather than
   # piling them up - new is the entry point that always starts one
-  before_action -> { start_registration(token_id: session[:register_b_param_token]) }, only: %i[embed]
+  before_action -> {
+    start_registration(token_id: session[:register_b_param_token], origin: "register_flow_landing_page")
+  }, only: %i[embed]
   # The emailed link resumes a registration the session knows nothing about
   before_action :find_b_param_for_confirmation, only: %i[confirm confirm_email]
   # confirm renders a self-posting form and nothing else, so it reads neither
@@ -205,9 +207,10 @@ class RegisterController < ApplicationController
   end
 
   # The registration new and embed start from - token_id reuses the one it names, when
-  # step 1 was never submitted on it
-  def start_registration(token_id: nil)
-    @b_param = BikeServices::Register.b_param_for(user: current_user, token_id:,
+  # step 1 was never submitted on it and it started the same way. An origin the token's
+  # doesn't match starts a new registration, so the embed's is only ever a framed one
+  def start_registration(token_id: nil, origin: "register_flow")
+    @b_param = BikeServices::Register.b_param_for(user: current_user, token_id:, origin:,
       status: start_status, email: params[:email])
     session[:register_b_param_token] = @b_param.id_token
   end
