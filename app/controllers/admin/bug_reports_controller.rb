@@ -16,7 +16,7 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       bug_reports = matching_bug_reports.includes(user: %i[membership_active email_bans_active])
-      # Only the JSON reaches for images, the HTML table renders the user badges instead
+      # Only the JSON serializes images
       bug_reports = bug_reports.with_attached_images if request.format.json?
       @pagy, @collection = pagy(:countish,
         bug_reports.reorder("bug_reports.#{sort_column} #{sort_direction}"),
