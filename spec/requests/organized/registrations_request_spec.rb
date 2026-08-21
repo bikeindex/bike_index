@@ -229,22 +229,17 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
       before { FactoryBot.create(:bike_organization_note, bike:, body: "important note") }
 
-      it "filters by notes" do
-        get base_url, params: {search_no_js: true, search_notes: "important"}
+      it "filters by notes, and carries the terms back into the form" do
+        get base_url, params: {search_no_js: true, search_notes: "important", search_email: bike.owner_email}
         expect(response.status).to eq(200)
         expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+        body = Capybara.string(response.body)
+        expect(body).to have_css("input[name='search_notes'][value='important']")
+        expect(body).to have_css("input[name='search_email'][value='#{bike.owner_email}']")
 
         get base_url, params: {search_no_js: true, search_notes: "nonexistent"}
         expect(response.status).to eq(200)
         expect(assigns(:bikes).pluck(:id)).to eq([])
-      end
-
-      it "carries the terms back into the form fields" do
-        get base_url, params: {search_no_js: true, search_email: "someone@example.com", search_notes: "important"}
-        expect(response.status).to eq(200)
-        body = Capybara.string(response.body)
-        expect(body).to have_css("input[name='search_email'][value='someone@example.com']")
-        expect(body).to have_css("input[name='search_notes'][value='important']")
       end
     end
     context "claimed_ownerships without bike_search" do
