@@ -53,7 +53,7 @@ A component having no spec yet isn't a reason to put it in the request spec inst
 
 ## `display_dev_info?` is false in test, so nothing it gates is verifiable
 
-`ControllerHelpers#display_dev_info?` opens with `!Rails.env.test?`. Every `only-dev-visible` block it wraps is unrendered in the suite, so threading the flag through a component — a wrong default, a missed hop — passes green and is wrong only in development. Assert the surrounding markup and read the call sites by hand; don't take a green run as coverage.
+`ControllerHelpers#display_dev_info?` opens with `!Rails.env.test?`. Every `only-dev-visible` block it wraps is unrendered in the suite, so threading the flag through a component — a wrong default, a missed hop — passes green and is wrong only in development. Reading the call sites isn't enough either — it can't show that a `UI::Table` cell block is `instance_exec`'d, so an `@ivar` in one resolves against the table and is always nil. Check it in the browser signed in as `dev@bikeindex.org`; the flag needs `developer?` *and* MiniProfiler, so the superadmin banner button won't do it.
 
 ## `log_in` stubs the auth lookup, so it can't answer whether a session ends
 
