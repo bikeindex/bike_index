@@ -30,27 +30,32 @@ module Admin
         private
 
         def tabs
-          [[:show, "Show", admin_organization_path(@organization)],
-            [:edit, "Edit", edit_admin_organization_path(@organization)],
-            [:locations, "Locations", edit_admin_organization_path(@organization, tab: "locations"),
-              @organization.locations.size],
-            ([:paid_functionality, "Edit paid functionality", edit_admin_organization_path(@organization, tab: "paid_functionality")] if paid_functionality?),
-            ([:sso, "SSO", edit_admin_organization_path(@organization, tab: "sso")] if sso?),
-            [:invoices, "Invoices", admin_organization_invoices_path(organization_id: @organization)],
-            (if custom_layouts?
-               [:custom_layouts, "Custom layouts", admin_organization_custom_layouts_path(organization_id: @organization),
-                 nil, "only-dev-visible"]
-             end)]
-            .compact.map { |tab, label, href, count, classes| {label:, href:, count:, classes:, active: @active == tab} }
+          [{tab: :show, label: "Show", href: admin_organization_path(@organization)},
+            {tab: :edit, label: "Edit", href: edit_tab_path},
+            {tab: :locations, label: "Locations", href: edit_tab_path(:locations),
+             count: @organization.locations.size},
+            {tab: :paid_functionality, label: "Edit paid functionality", href: edit_tab_path(:paid_functionality)},
+            {tab: :sso, label: "SSO", href: edit_tab_path(:sso)},
+            {tab: :invoices, label: "Invoices", href: admin_organization_invoices_path(organization_id: @organization)},
+            {tab: :custom_layouts, label: "Custom layouts", classes: "tw:twdev-only",
+             href: admin_organization_custom_layouts_path(organization_id: @organization)}]
+            .select { render_tab?(it[:tab]) }
+            .map { it.except(:tab).merge(active: @active == it[:tab]) }
         end
 
+        def edit_tab_path(tab = nil) = edit_admin_organization_path(@organization, tab:)
+
         # A tab with nothing behind it is dropped - except on its own page, which still
-        # renders (saying the feature is off) and shouldn't lose its place in the row
-        def paid_functionality? = @organization.paid? || @active == :paid_functionality
-
-        def sso? = @organization.enabled?("saml_sso") || @active == :sso
-
-        def custom_layouts? = @display_dev_info || @active == :custom_layouts
+        # renders (saying so) and shouldn't lose its place in the row
+        def render_tab?(tab)
+          case tab
+          when :paid_functionality then @organization.paid?
+          when :sso then @organization.enabled?("saml_sso")
+          # Not "nothing behind it" - the page is developer-only, so its tab follows dev info
+          when :custom_layouts then @display_dev_info
+          else true
+          end || @active == tab
+        end
 
         def new_invoice_link
           path = new_admin_organization_invoice_path(organization_id: @organization)

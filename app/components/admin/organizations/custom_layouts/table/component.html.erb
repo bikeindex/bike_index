@@ -1,4 +1,4 @@
-<%= render(UI::Table::Component.new(records: rows, classes: "only-dev-visible")) do |table| %>
+<%= render(UI::Table::Component.new(records: rows, classes: "tw:twdev-only")) do |table| %>
   <% table.column(label: "Snippet Kind") { |row| tag.small(row[:kind_label]) } %>
 
   <% table.column(label: "Link to edit") { |row| link_to(row[:edit_label], row[:edit_path]) } %>

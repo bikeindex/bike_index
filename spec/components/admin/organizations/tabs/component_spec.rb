@@ -134,7 +134,7 @@ RSpec.describe Admin::Organizations::Tabs::Component, type: :component do
 
     it "renders it, though display_dev_info? is false in test" do
       expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Custom layouts"]
-      expect(component.at_css("nav a[aria-current]")["class"]).to match(/only-dev-visible/)
+      expect(component.at_css("nav a[aria-current]")["class"]).to match(/tw:twdev-only/)
     end
   end
 
