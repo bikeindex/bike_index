@@ -259,6 +259,10 @@ what they actually run, and the only way to exercise real attribute mapping on t
 Failures surface as a flash on `/session/new` reading `Unable to sign in via SSO: <reason>`.
 The reason is the real one — ruby-saml's validation errors are passed through, not swallowed.
 
+A configured but inactive organization is excluded from automatic email-domain routing. A direct
+`/sso/<slug>/init` transaction still reaches the normal callback, which can provision or link an
+account. Use that flow only for integration validation until a dry-run diagnostic flow is available.
+
 | Reason | Cause |
 |---|---|
 | `/sso/<slug>/metadata` 404s | feature not enabled, `UpdateOrganizationAssociationsJob` hasn't run, or the url carries a `.xml` extension |

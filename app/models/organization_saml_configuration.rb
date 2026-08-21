@@ -32,6 +32,7 @@ class OrganizationSamlConfiguration < ApplicationRecord
     "emailAddress" => "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
     "unspecified" => "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
   }.freeze
+  CONFIGURED_ATTRIBUTES = %i[idp_entity_id idp_sso_target_url idp_cert].freeze
 
   belongs_to :organization
 
@@ -45,9 +46,9 @@ class OrganizationSamlConfiguration < ApplicationRecord
   after_commit :update_organization
 
   scope :configured, -> {
-    where.not(idp_entity_id: [nil, ""])
-      .where.not(idp_sso_target_url: [nil, ""])
-      .where.not(idp_cert: [nil, ""])
+    CONFIGURED_ATTRIBUTES.reduce(all) do |relation, attribute|
+      relation.where.not(attribute => [nil, ""])
+    end
   }
   scope :configured_inactive, -> { configured.where(active: false) }
 
@@ -57,7 +58,7 @@ class OrganizationSamlConfiguration < ApplicationRecord
   end
 
   def configured?
-    idp_entity_id.present? && idp_sso_target_url.present? && idp_cert.present?
+    CONFIGURED_ATTRIBUTES.all? { |attribute| self[attribute].present? }
   end
 
   def email_attribute
