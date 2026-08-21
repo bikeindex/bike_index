@@ -26,13 +26,12 @@ RSpec.describe Org::Search::Wrapper::Component, type: :component do
       per_page: 10,
       params: {},
       interpreted_params: {},
-      sortable_search_params: {},
       search_stickers:,
       search_address:,
       search_status:,
       skip_search_and_filters:,
       stolenness: "all",
-      time_range: 1.year.ago..Time.current
+      humanized_time_range: "in the past year"
     }
   end
 

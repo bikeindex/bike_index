@@ -1,9 +1,9 @@
 <%# require inline CSS setting because of caching %>
-<% unless helpers.display_dev_info? %>
+<% unless @display_dev_info %>
   <style>.only-dev-visible {display: none !important;} </style>
 <% end %>
 
-<% if skip_manufacturer_link? %>
+<% if @skip_manufacturer_link %>
   <style>.display-mnfg-link {display: none !important;}</style>
 <% end %>
 
@@ -30,9 +30,9 @@
 
   <div
     data-controller="update-cached-sortable-links"
-    data-update-cached-sortable-links-base-url-value="<%= url_for(helpers.sortable_search_params) %>"
+    data-update-cached-sortable-links-base-url-value="<%= url_for(@sort_state.search_params) %>"
   >
-    <%= render(UI::Table::Component.new(records: @bikes, cache_key:, render_sortable: @render_sortable, classes: show_serial? ? "show-admin-bike-table-serial-cell" : nil)) do |table| %>
+    <%= render(UI::Table::Component.new(records: @bikes, cache_key:, render_sortable: @render_sortable, sort_state: @sort_state, classes: @show_serial ? "show-admin-bike-table-serial-cell" : nil)) do |table| %>
       <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:bg-transparent tw:border-0 tw:p-0 tw:cursor-pointer", title: "Toggle all checked", aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"}), classes: "display-multi-check tw:w-8", header_classes: "display-multi-check tw:w-8") do |bike| %>
         <%= check_box_tag "bikes_selected[#{bike.id}]", bike.id, false, data: {"table-multi-checkbox-target" => "checkbox"} %>
       <% end %>
@@ -49,7 +49,7 @@
         <div class="tw:relative">
           <%# Pass in search_url because caching breaks with url_for %>
           <% search_url = bike.user.present? ? admin_bikes_path(user_id: bike.user.id) : admin_bikes_path(search_email: bike.owner_email) %>
-          <%= render Admin::Users::Cell::Component.new(email: bike.owner_email, user: bike.user, search_url:) %>
+          <%= render Admin::Users::Cell::Component.new(email: bike.owner_email, user: bike.user, search_url:, render_search: true) %>
 
           <% if bike.claimed? %>
             <span

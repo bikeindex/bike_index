@@ -26,7 +26,8 @@
   <%= render(Admin::Organizations::Show::Features::Component.new(organization: @organization)) %>
 </div>
 
-<%= render(Admin::Organizations::Show::Bikes::Component.new(organization: @organization, bikes: @bikes, bikes_count: @bikes_count)) %>
+<%= render(Admin::Organizations::Show::Bikes::Component.new(organization: @organization, bikes: @bikes, bikes_count: @bikes_count,
+      sort_state:, display_dev_info: display_dev_info?)) %>
 
 <%= render(Admin::Organizations::Show::Roles::Component.new(organization: @organization, deleted: @deleted_organization_roles)) %>
 

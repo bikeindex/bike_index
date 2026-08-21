@@ -113,9 +113,10 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @bulk_imports,
   viewing: "Bulk imports",
   rendered_chart:,
   nav_header_list_items:,
-  table_view:
+  table_view:,
 )) %>

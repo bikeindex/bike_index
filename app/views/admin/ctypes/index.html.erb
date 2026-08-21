@@ -13,10 +13,11 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @ctypes,
   viewing: "Component Types",
   skip_charting: true,
   nav_header_list_items:,
   header_content:,
-  table_view:
+  table_view:,
 )) %>

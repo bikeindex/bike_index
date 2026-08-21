@@ -4,8 +4,6 @@ module Admin
   module Headers
     module CurrentInfo
       class Component < ApplicationComponent
-        include Binxtils::SortableHelper
-
         HEADER_KEYS = %i[
           organization_id
           primary_activity
@@ -17,54 +15,44 @@ module Admin
           search_strava_integration_id
         ].freeze
 
-        def initialize(params:, viewing: nil, kind_humanized: nil, user_subject: nil, bike: nil, marketplace_listing: nil, primary_activity: nil, current_organization: nil)
-          @params = params
+        def initialize(index:, viewing:)
+          @index = index
           @viewing = viewing
-          @kind_humanized = kind_humanized
-          @user_subject = user_subject
-          @bike = bike
-          @marketplace_listing = marketplace_listing
-          @primary_activity = primary_activity
-          @current_organization = current_organization
         end
 
         def render?
-          (@params.keys.map(&:to_sym) & HEADER_KEYS).any? || show_user? || show_marketplace_listing? ||
+          (@index.params.keys.map(&:to_sym) & HEADER_KEYS).any? || show_user? || show_marketplace_listing? ||
             show_organization?
         end
 
         private
 
-        def viewing
-          @viewing || controller_name.humanize
-        end
-
         def show_user?
-          @user_subject.present? || @params[:user_id].present?
+          @index.user_subject.present? || @index.params[:user_id].present?
         end
 
         def show_bike?
-          bike_subject.present? || @params[:search_bike_id].present?
+          bike_subject.present? || @index.params[:search_bike_id].present?
         end
 
         def bike_subject
-          @bike_subject ||= @bike || Bike.unscoped.find_by_id(@params[:search_bike_id])
+          @bike_subject ||= @index.bike || Bike.unscoped.find_by_id(@index.params[:search_bike_id])
         end
 
         def show_marketplace_listing?
-          @params[:search_marketplace_listing_id].present? || @marketplace_listing.present?
+          @index.params[:search_marketplace_listing_id].present? || @index.marketplace_listing.present?
         end
 
         def marketplace_listing_subject
-          @marketplace_listing || MarketplaceListing.find_by_id(@params[:search_marketplace_listing_id])
+          @index.marketplace_listing || MarketplaceListing.find_by_id(@index.params[:search_marketplace_listing_id])
         end
 
         def show_organization?
-          @params[:organization_id].present? || organization_subject.present?
+          @index.params[:organization_id].present? || organization_subject.present?
         end
 
         def organization_subject
-          @current_organization
+          @index.current_organization
         end
 
         def show_membership?
@@ -72,11 +60,11 @@ module Admin
         end
 
         def membership_id
-          @params[:search_membership_id]
+          @index.params[:search_membership_id]
         end
 
         def show_kind?
-          @params[:search_kind].present?
+          @index.params[:search_kind].present?
         end
 
         def show_strava_integration?
@@ -84,7 +72,7 @@ module Admin
         end
 
         def strava_integration_id
-          @params[:search_strava_integration_id]
+          @index.params[:search_strava_integration_id]
         end
 
         def strava_integration
@@ -93,16 +81,14 @@ module Admin
           @strava_integration = StravaIntegration.find_by_id(strava_integration_id)
         end
 
-        def kind_humanized
-          @kind_humanized || @params[:search_kind]&.humanize
-        end
+        def kind_humanized = @index.params[:search_kind]&.humanize
 
         def show_primary_activity?
-          @params[:primary_activity].present? || primary_activity_subject.present?
+          @index.params[:primary_activity].present? || primary_activity_subject.present?
         end
 
         def primary_activity_subject
-          @primary_activity_subject ||= @primary_activity || PrimaryActivity.find_by_id(@params[:primary_activity])
+          @primary_activity_subject ||= @index.primary_activity || PrimaryActivity.find_by_id(@index.params[:primary_activity])
         end
 
         def error_text_class

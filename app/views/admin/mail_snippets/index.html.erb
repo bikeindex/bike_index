@@ -102,4 +102,8 @@
   </table>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(collection: @mail_snippets, nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_mail_snippets)) %>
+<%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  viewing: controller_name.humanize,
+  collection: @mail_snippets, nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_mail_snippets,
+)) %>

@@ -45,10 +45,10 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @user_registration_organizations,
   viewing: "User Registration Organizations",
   chart_collection: @render_chart && matching_user_registration_organizations,
-  time_range_column: @time_range_column,
   nav_header_list_items:,
-  table_view:
+  table_view:,
 )) %>

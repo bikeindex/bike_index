@@ -13,7 +13,7 @@ module Org
             bikes:,
             per_page: 10,
             params: {},
-            time_range: 1.year.ago..Time.current
+            humanized_time_range: "in the past year"
           )
         end
 

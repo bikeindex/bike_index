@@ -122,11 +122,11 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @recoveries,
   viewing: "Recoveries",
   rendered_chart:,
   nav_header_list_items:,
   admin_search_form:,
   table_view:,
-  time_range_column: @time_range_column
 )) %>

@@ -12,7 +12,7 @@
     Recent <%= link_to "Bikes", admin_bikes_url %>
   </h2>
 
-  <%= render Admin::Bikes::Table::Component.new(bikes: @bikes) %>
+  <%= render Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:, display_dev_info: display_dev_info?) %>
 
   <% today = Bike.where("created_at >= ?", Time.current.beginning_of_day).count %>
   <% yesterday = (Bike.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today %>
@@ -36,7 +36,7 @@
       Recent <%= link_to "Users", admin_users_url %>
     </h2>
 
-    <%= render Admin::Users::Table::Component.new(users: @users) %>
+    <%= render Admin::Users::Table::Component.new(users: @users, display_dev_info: display_dev_info?) %>
 
     <div class="row justify-content-end">
       <div class="col-auto">

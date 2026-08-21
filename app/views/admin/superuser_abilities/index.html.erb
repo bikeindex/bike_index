@@ -9,7 +9,10 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @collection,
+  viewing: controller_name.humanize,
   index_title: "Superuser Abilities",
   nav_header_list_items:,
-  chart_collection: @render_chart && searched_superuser_abilities
+  chart_collection: @render_chart && searched_superuser_abilities,
 )) %>

@@ -86,7 +86,7 @@
         </td>
 
         <td>
-          <%= render Admin::Users::Cell::Component.new(user: impound_record.user, render_search: render_sortable) %>
+          <%= render Admin::Users::Cell::Component.new(sort_state:, user: impound_record.user, render_search: render_sortable) %>
         </td>
 
         <% unless skip_status %>

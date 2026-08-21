@@ -37,7 +37,7 @@
     Recent example bikes
     = link_to "Delete example bikes", admin_destroy_example_bikes_url
   - if @bikes.any?
-    = render Admin::Bikes::Table::Component.new(bikes: @bikes)
+    = render Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:, display_dev_info: display_dev_info?)
     .row.justify-content-end
       .col-auto
         %p

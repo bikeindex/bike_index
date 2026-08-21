@@ -34,6 +34,8 @@ Then review the changed files against `CLAUDE.md` (root and any nested ones in t
 
 **`bin/update_component_digests` goes after the last code edit, not before.** A `MARKUP_DIGEST` covers everything its cached tree renders out into, so editing a shared component (`UI::ActiveLink`, `UI::Button`) stales the digest of every component that renders it — `PageBlock::Navbar::Wrapper` and `PageBlock::Footer` both, for one edit — and regenerating before `/simplify`'s or the CLAUDE.md pass's own edits just means doing it twice.
 
+It hashes the component's *files*, not its output, and globs the whole directory — so a comment that renders nothing bumps the digest just the same, whether you put it in the template or in `component.rb`. A `<%# … %>` explaining one line can therefore flush every cached row of every organization. Somewhere outside the component directory (`.herb.yml`, the PR body) is the free place to say it.
+
 ### The spec audit
 
 **Required, same as the comment audit below.** List the examples the branch adds:

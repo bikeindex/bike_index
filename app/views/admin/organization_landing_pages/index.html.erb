@@ -1,4 +1,11 @@
 <% table_view = render(Admin::Organizations::LandingPagesTable::Component.new(collection: @collection,
+  sort_state:,
   render_sortable: true, render_search: params[:organization_id].blank?)) %>
 
-<%= render(Admin::IndexSkeleton::Component.new(table_view:, chart_collection: @render_chart && matching_organization_landing_pages)) %>
+<%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @collection,
+  viewing: controller_name.humanize,
+  table_view:,
+  chart_collection: @render_chart && matching_organization_landing_pages,
+)) %>

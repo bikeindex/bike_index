@@ -194,10 +194,11 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  viewing: controller_name.humanize,
   collection: @invoices,
   index_title:,
   nav_header_list_items:,
   rendered_chart:,
   table_view:,
-  time_range_column: @time_range_column
 )) %>
