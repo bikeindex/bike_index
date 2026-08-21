@@ -9,22 +9,20 @@
   </div>
 <% end %>
 
-<div class="row">
-  <div class="col-md-6">
+<div class="tw:grid tw:gap-x-8 tw:gap-y-6 tw:md:grid-cols-2">
+  <div>
     <%= render(Admin::OrganizationShow::Details::Component.new(organization: @organization)) %>
   </div>
 
-  <div class="col-md-6">
+  <div>
     <%= render(Admin::OrganizationShow::Account::Component.new(organization: @organization)) %>
   </div>
-</div>
 
-<div class="row mt-4">
-  <div class="col-md-6">
+  <div>
     <%= render(Admin::OrganizationShow::Invoices::Component.new(organization: @organization)) %>
   </div>
 
-  <div class="col-md-6">
+  <div>
     <%= render(Admin::OrganizationShow::Features::Component.new(organization: @organization)) %>
   </div>
 </div>

@@ -1,27 +1,23 @@
-<div class="form form-horizontal clearfix">
-  <%= render(UI::Alerts::ObjectError::Component.new(object: @organization)) %>
+<%= render(UI::Alerts::ObjectError::Component.new(object: @organization)) %>
 
-  <%= form_for @organization, as: :organization, url: form_url, action: "update" do |f| %>
+<%= form_for @organization, as: :organization, url: form_url, action: "update" do |f| %>
+  <%= render(UI::Container::Component.new(columns: 2)) do %>
     <%= f.fields_for :mail_snippets do |snippet| %>
       <% if snippet.object.kind == @edit_template %>
         <%= render(UI::Forms::Group::Component.new(form_builder: snippet, attribute: :body, kind: :text_area,
           label_text: "#{snippet.object.kind.titleize} snippet",
           html_options: {rows: 10, placeholder: description_for(snippet.object.kind)})) %>
 
-        <div class="row">
-          <div class="col-md-6">
-            <%= render(UI::Forms::Checkbox::Component.new(form_builder: snippet, attribute: :is_enabled,
-              label: enable_label)) %>
-          </div>
+        <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+          <%= render(UI::Forms::Checkbox::Component.new(form_builder: snippet, attribute: :is_enabled,
+            label: enable_label)) %>
 
-          <div class="col-md-6">
-            <%= f.submit "Save", class: "btn btn-success float-right" %>
-          </div>
+          <%= f.submit "Save", class: "btn btn-success tw:ml-auto" %>
         </div>
       <% end %>
     <% end %>
   <% end %>
-</div>
+<% end %>
 
 <ul
   id="public_images"

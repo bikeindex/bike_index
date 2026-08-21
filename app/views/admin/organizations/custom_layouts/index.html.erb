@@ -1,20 +1,16 @@
 <%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :custom_layouts)) %>
 
-<div class="row">
-  <div class="col-lg-6">
-    <p>
-      <%= link_to "Custom layouts version history", ENV["CUSTOM_CODE_SOURCE"] %>
-    </p>
-  </div>
+<div class="tw:grid tw:gap-x-8 tw:lg:grid-cols-2">
+  <p>
+    <%= link_to "Custom layouts version history", ENV["CUSTOM_CODE_SOURCE"] %>
+  </p>
 
-  <div class="col-lg-6">
-    <table class="table-list">
-      <tr>
-        <td>Paid</td>
-        <td><strong><%= @organization.paid? %></strong></td>
-      </tr>
-    </table>
-  </div>
+  <table class="table-list">
+    <tr>
+      <td>Paid</td>
+      <td><strong><%= @organization.paid? %></strong></td>
+    </tr>
+  </table>
 </div>
 
 <%= render(Admin::OrganizationCustomLayoutsTable::Component.new(organization: @organization)) %>

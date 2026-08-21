@@ -3,14 +3,9 @@
 <%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :invoices,
       subtitle: "Edit #{@invoice.display_name}", additional_link:)) %>
 
-<div class="row">
-  <div class="col-sm-6">
-    <%= render(Admin::InvoiceShow::Associated::Component.new(invoice: @invoice)) %>
-  </div>
-
-  <div class="col-sm-6">
-    <%= render(Admin::InvoiceShow::Status::Component.new(invoice: @invoice)) %>
-  </div>
+<div class="tw:grid tw:gap-x-8 tw:sm:grid-cols-2">
+  <%= render(Admin::InvoiceShow::Associated::Component.new(invoice: @invoice)) %>
+  <%= render(Admin::InvoiceShow::Status::Component.new(invoice: @invoice)) %>
 </div>
 
 <%= render(Admin::InvoiceForm::Component.new(organization: @organization, invoice: @invoice, organization_features: @organization_features)) %>

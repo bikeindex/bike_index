@@ -1,5 +1,10 @@
-<div class="admin-subnav tw:pb-0!">
-  <div class="col">
+<%#
+  -mx-4/px-4 keeps .admin-subnav's border-bottom running to the viewport edge, which it
+  got from a -15px margin the .col padding used to cancel
+%>
+
+<div class="admin-subnav tw:-mx-4! tw:px-4 tw:pb-0!">
+  <div class="tw:grow tw:basis-0">
     <h1>
       <%= @title %>
 
@@ -9,7 +14,7 @@
     </h1>
   </div>
 
-  <div class="col">
+  <div class="tw:grow tw:basis-0">
     <ul>
       <% @links.each do |link| %>
         <li class="nav-item"><%= link %></li>
@@ -18,7 +23,7 @@
   </div>
 
   <% if alert? %>
-    <div class="col-md-6 mt-4"><%= alert %></div>
+    <div class="tw:mt-6 tw:w-full tw:md:w-1/2"><%= alert %></div>
   <% end %>
 
   <%#
@@ -28,7 +33,7 @@
   %>
 
   <nav
-    class="col-12 nav nav-tabs tw:mt-3 tw:-mb-px tw:border-b-0!"
+    class="nav nav-tabs tw:mt-3 tw:-mb-px tw:w-full tw:border-b-0!"
     aria-label="<%= @nav_label %>"
   >
     <% @tabs.each do |tab| %>
