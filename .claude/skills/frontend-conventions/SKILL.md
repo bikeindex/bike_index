@@ -59,6 +59,7 @@ Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesh
 ## Two Tailwind v4 traps
 
 - **`tw:mx-(--var)` generates nothing.** The bare-parenthesis shorthand for a CSS variable doesn't compile under this setup; `tw:mx-[var(--gutter)]` does. Both look right in a template, and the one that doesn't work fails silently — grep `app/assets/builds/tailwind.css` for the escaped class after `bin/rails tailwindcss:build`.
+- **A build that was right can go wrong under you.** Each workspace runs its own `tailwindcss:watch`, and one can overwrite `app/assets/builds/tailwind.css` with a scan from before your edit — so a rule you just wrote is served, then isn't. Before believing a CSS change doesn't work, count it in the build (`grep -o '<class>' app/assets/builds/tailwind.css | wc -l`, since the file is minified onto few lines) and check the built file's mtime against the source's. `bin/rails tailwindcss:build` restores it.
 - **A grid item stretches to its row.** For a `<div>` that's invisible, but a bare `<table>` grid item spreads the extra height across its own rows, so two `table-list` panels side by side pull each other's rows tall. `tw:items-start` on the grid, or wrap the table in a `<div>`.
 
 ## Buttons: always `UI::Button` (and the UI component library generally)
