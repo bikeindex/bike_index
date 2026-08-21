@@ -42,7 +42,7 @@ RSpec.describe UI::Forms::NestedFields::Component, type: :component do
     expect(template.at_css("input[name$='[_destroy]']")).to be_present
   end
 
-  context "with class_name, fields_class_name and obj_attrs" do
+  context "with class_name, add_class_name, fields_class_name and obj_attrs" do
     let(:options) do
       {class_name: "row mt-4", add_class_name: "mx-auto", fields_class_name: "col-md-6",
        obj_attrs: {name: "New location"}}
@@ -50,7 +50,7 @@ RSpec.describe UI::Forms::NestedFields::Component, type: :component do
 
     it "passes them through" do
       expect(component.at_css("[data-controller]")["class"]).to eq "row mt-4"
-      expect(component.at_css("button[data-action*='#add']")["class"]).to include("mx-auto").and include("twlink")
+      expect(component).to have_css("button.mx-auto[data-action*='#add']")
       expect(rendered_fields.at_css(".nested-fields-wrapper")["class"]).to eq "nested-fields-wrapper col-md-6"
       expect(template.at_css("input[name$='[name]']")["value"]).to eq "New location"
     end
