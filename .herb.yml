@@ -86,12 +86,11 @@ linter:
 
     # The legacy views are full of these; components are clean, so hold the line there
     html-anchor-require-href:
-      enabled: true
       only:
         - 'app/components/**/*'
-      # org--assign-bike-sticker sets this table's href, because the sticker isn't in the
-      # row cache key. Excluded by file rather than herb:disable: the formatter relocates
-      # an inline disable comment onto the first <a> in the file
+      # org--assign-bike-sticker supplies that table's hrefs, because the sticker is a
+      # query param and the rows are cached without it. Excluded by file rather than
+      # herb:disable, which the formatter relocates onto an unrelated <a>
       exclude:
         - 'app/components/org/search_results/bikes_table/component.html.erb'
   #

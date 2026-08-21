@@ -92,7 +92,7 @@
                 </td>
               </tr>
 
-              <% if @organization.enabled?("bike_stickers") %>
+              <% if show_sticker_modal? %>
                 <tr>
                   <td><%= translation(".sticker") %></td>
 
@@ -825,13 +825,11 @@
         <%= f.hidden_field :bike_id, value: @bike.id %>
 
         <div class="form-group">
-          <%= f.label :code, translation(".sticker_code"), class: "org-form-label" %>
+          <%= f.label :code, translation(".sticker_code") %>
           <%= f.text_field :code, required: true, class: "form-control" %>
         </div>
 
-        <div class="form-submit-button">
-          <%= f.submit translation(".assign_sticker"), class: "btn btn-success btn-lg" %>
-        </div>
+        <%= f.submit translation(".assign_sticker"), class: "btn btn-success btn-lg" %>
       <% end %>
     <% end %>
   <% end %>
