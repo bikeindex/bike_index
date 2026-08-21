@@ -60,6 +60,10 @@ module UI
         def target_data(name) = {"#{CONTROLLER}-target": name}
 
         def add_button_data = {action: "click->#{CONTROLLER}#add"}
+
+        # The button is inline-flex, so a flex or grid class_name would otherwise stretch it
+        # to the row and center its label
+        def add_button_class = ["tw:self-start", @add_class_name].compact.join(" ")
       end
     end
   end
