@@ -2,7 +2,7 @@
   <style>.deleted-cell {display: none !important;}</style>
 <% end %>
 
-<% unless helpers.display_dev_info? %>
+<% unless @display_dev_info %>
   <style>
     .only-dev-visible {display: none !important;}
   </style>
@@ -13,7 +13,7 @@
   tbody td.only-dev-visible {border-top: 0px;}
 </style>
 
-<%= render(UI::Table::Component.new(records: @users, cache_key:, render_sortable: @render_sortable)) do |table| %>
+<%= render(UI::Table::Component.new(records: @users, cache_key:, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
   <% table.column(sortable: "created_at") do |user| %>
     <%= render UI::Time::Component.new(time: user.created_at) %>
   <% end %>

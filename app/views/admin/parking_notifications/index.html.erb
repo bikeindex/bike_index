@@ -66,9 +66,10 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @parking_notifications,
   viewing: "Parking notifications",
   nav_header_list_items:,
   rendered_chart:,
-  table_view:
+  table_view:,
 )) %>

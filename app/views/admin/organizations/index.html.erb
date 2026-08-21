@@ -1,4 +1,6 @@
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  viewing: controller_name.humanize,
   collection: @organizations,
   nav_header_list_items: render(Admin::Organizations::Index::Filters::Component.new(search_paid: @search_paid)),
   chart_collection: @render_chart && matching_organizations,

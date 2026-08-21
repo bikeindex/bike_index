@@ -80,9 +80,10 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @impound_claims,
   viewing: "Impound Claims",
   nav_header_list_items:,
   rendered_chart:,
-  table_view:
+  table_view:,
 )) %>

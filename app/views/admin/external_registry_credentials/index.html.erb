@@ -5,8 +5,10 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  viewing: controller_name.humanize,
   collection: @external_registry_credentials,
   index_title: "External Registry Credentials",
   nav_header_list_items:,
-  skip_charting: true
+  skip_charting: true,
 )) %>

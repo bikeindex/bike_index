@@ -4,15 +4,20 @@ module Admin
   module Organizations
     module Cell
       class Component < ApplicationComponent
-        include Binxtils::SortableHelper
-
-        def initialize(organization: nil, organization_id: nil, render_search: false)
+        def initialize(organization: nil, organization_id: nil, search_url: nil, sort_state: ComponentStates::SortState.new, render_search: false)
           @organization = organization
           @organization_id = organization_id || organization&.id
+          @search_url = search_url
+          @sort_state = sort_state
           @render_search = render_search
         end
 
         private
+
+        def computed_search_url
+          @computed_search_url ||= @search_url.presence ||
+            (url_for(@sort_state.search_params.merge(organization_id: @organization_id)) if @sort_state.search_params.present?)
+        end
 
         def organization_present?
           @organization_id.present?

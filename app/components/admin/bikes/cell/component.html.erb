@@ -23,6 +23,6 @@
   <% end %>
 <% end %>
 
-<% if @render_search %>
-  <%= link_to search_emoji, search_url, class: "display-sortable-link small ml-1" %>
+<% if @render_search && computed_search_url.present? %>
+  <%= link_to search_emoji, computed_search_url, class: "display-sortable-link small ml-1" %>
 <% end %>

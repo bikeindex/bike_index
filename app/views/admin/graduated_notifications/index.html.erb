@@ -41,8 +41,10 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  viewing: controller_name.humanize,
   collection: @graduated_notifications,
   index_title: "Graduated notifications",
   nav_header_list_items:,
-  rendered_chart:
+  rendered_chart:,
 )) %>

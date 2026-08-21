@@ -5,8 +5,12 @@ require "rails_helper"
 RSpec.describe Admin::CurrentHeader::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { with_request_url("/admin") { render_inline(instance) } }
-  let(:options) { {params:} }
+  let(:options) { {index: index_state, viewing: "Notifications"} }
   let(:params) { {} }
+
+  def index_state(**attrs)
+    ComponentStates::IndexState.new(params:, sort_state: ComponentStates::SortState.new(search_params: params), **attrs)
+  end
 
   describe "rendering" do
     context "without header params" do
@@ -19,7 +23,7 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
       context "when user exists" do
         let(:user_subject) { FactoryBot.create(:user, name: "Test User") }
         let(:params) { {user_id: user_subject.id} }
-        let(:options) { {params:, user_subject:, viewing: "Activity"} }
+        let(:options) { {index: index_state(user_subject:), viewing: "Activity"} }
 
         it "renders user information with link" do
           expect(component.text).to match(/Activities\s+for/)
@@ -43,7 +47,7 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
       context "when organization exists" do
         let(:organization) { FactoryBot.create(:organization) }
         let(:params) { {organization_id: organization.id} }
-        let(:options) { {params:, current_organization: organization, viewing: "Bike"} }
+        let(:options) { {index: index_state(current_organization: organization), viewing: "Bike"} }
 
         it "renders organization information" do
           expect(component.text).to match(/Bikes\s+for/)
@@ -54,7 +58,7 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
 
       context "when no organization provided" do
         let(:params) { {organization_id: 123} }
-        let(:options) { {params:, viewing: "Bike"} }
+        let(:options) { {index: index_state, viewing: "Bike"} }
 
         it "renders no organization message" do
           expect(component.text).to match(/Bikes\s+for/)
@@ -68,7 +72,7 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
       context "when bike exists" do
         let(:bike) { FactoryBot.create(:bike) }
         let(:params) { {search_bike_id: bike.id} }
-        let(:options) { {params:, bike:, viewing: "Recovery"} }
+        let(:options) { {index: index_state(bike:), viewing: "Recovery"} }
 
         it "renders bike information" do
           expect(component.text).to match(/Recoveries\s+for/)
@@ -90,27 +94,18 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
 
     context "with search_kind param" do
       let(:params) { {search_kind: "bike_shop"} }
-      let(:options) { {params:, viewing: "Organization"} }
+      let(:options) { {index: index_state, viewing: "Organization"} }
 
       it "renders humanized kind" do
         expect(component.text).to match(/Organizations\s+for/)
         expect(component.text).to include("Bike shop")
         expect(component).to have_css("a", text: "view for all kinds")
       end
-
-      context "with custom kind_humanized" do
-        let(:options) { {params:, kind_humanized: "Special Kind", viewing: "Thing"} }
-
-        it "renders custom kind humanized text" do
-          expect(component.text).to include("Special Kind")
-          expect(component).to have_css("a", text: "view for all kinds")
-        end
-      end
     end
 
     context "with search_membership_id param" do
       let(:params) { {search_membership_id: 42} }
-      let(:options) { {params:, viewing: "Transaction"} }
+      let(:options) { {index: index_state, viewing: "Transaction"} }
 
       it "renders membership information" do
         expect(component.text).to match(/Transactions\s+for/)

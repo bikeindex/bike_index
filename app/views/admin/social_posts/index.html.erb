@@ -74,10 +74,11 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @social_posts,
   viewing: "Posts",
   nav_header_list_items:,
   chart_collection: @render_chart && matching_social_posts,
   admin_search_form:,
-  table_view:
+  table_view:,
 )) %>

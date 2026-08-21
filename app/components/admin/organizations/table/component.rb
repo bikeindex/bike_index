@@ -6,7 +6,7 @@ module Admin
       # The admin organizations index table, also rendered on the admin dashboard.
       class Component < ApplicationComponent
         # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "4c3467b402d4"
+        MARKUP_DIGEST = "ee382a47a5bc"
 
         def initialize(organizations:, render_sortable: false, render_deleted: false)
           @organizations = organizations

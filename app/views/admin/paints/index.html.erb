@@ -19,10 +19,11 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @paints,
   viewing: "Paints",
   chart_collection: @render_chart && matching_paints,
   nav_header_list_items:,
   admin_search_form:,
-  count_detail:
+  count_detail:,
 )) %>

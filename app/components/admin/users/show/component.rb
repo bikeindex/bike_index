@@ -4,10 +4,12 @@ module Admin
   module Users
     module Show
       class Component < ApplicationComponent
-        def initialize(user:, bikes:, bikes_count:)
+        def initialize(user:, bikes:, bikes_count:, current_country_id: nil, display_dev_info: false)
           @user = user
           @bikes = bikes
           @bikes_count = bikes_count
+          @current_country_id = current_country_id
+          @display_dev_info = display_dev_info
         end
 
         private

@@ -207,10 +207,11 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @bike_sticker_updates,
   viewing: "Sticker updates",
   rendered_chart:,
   nav_header_list_items:,
   admin_search_form:,
-  table_view:
+  table_view:,
 )) %>

@@ -5,8 +5,10 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  viewing: controller_name.humanize,
   collection: @theft_alert_plans,
   index_title: "Promoted Alert Plans",
   nav_header_list_items:,
-  skip_charting: true
+  skip_charting: true,
 )) %>

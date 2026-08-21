@@ -3,10 +3,9 @@
 module Org
   module GraduatedNotificationTable
     class Component < ApplicationComponent
-      include Binxtils::SortableHelper
-
-      def initialize(graduated_notifications:, current_organization:, display_dev_info: false, render_sortable: false, render_remaining_at: false, skip_status: false, skip_email: false, skip_email_search: nil, separate_secondary_notifications: false)
+      def initialize(graduated_notifications:, current_organization:, sort_state: ComponentStates::SortState.new, display_dev_info: false, render_sortable: false, render_remaining_at: false, skip_status: false, skip_email: false, skip_email_search: nil, separate_secondary_notifications: false)
         @graduated_notifications = graduated_notifications
+        @sort_state = sort_state
         @display_dev_info = display_dev_info
         @current_organization = current_organization
         @render_sortable = render_sortable

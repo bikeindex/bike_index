@@ -6,7 +6,9 @@ description: >-
   `number_display` helper for numbers, the UI component library rule
   (every button is `UI::Button`/`UI::ButtonLink`, every
   typeahead/autocomplete is `UI::Forms::Combobox`, never hand-rolled
-  markup), ViewComponent rules (keyword arguments, instance variables,
+  markup), that **helpers are deprecated — render a view component
+  taking full keyword arguments instead of adding or extending one**,
+  ViewComponent rules (keyword arguments, instance variables,
   `helpers.` prefix in templates), and `UI::Time::Component` for every
   date/time. Trigger
   when adding or modifying views (`.html.erb`), view components, Stimulus
@@ -119,6 +121,18 @@ When deleting an `id`/`class`, grep the repo for the name before deciding what t
 - Zero consumers: delete it, don't rename it.
 - Consumers exist: either update them, or leave the hook in place — the consumers are the *reason* it earns its spot in the markup.
 
+## Helpers are deprecated — render a view component instead
+
+**Never add a helper method, and don't extend an existing one.** Anything a helper would render belongs in a view component that takes what it needs as explicit keyword arguments. `app/helpers/` is legacy: leave what's there, but move a helper into a component when you touch the line that calls it.
+
+- `Atom::Serial::Component`, not `BikeHelper#render_serial_display`. `UI::PhoneDisplay::Component`, not `number_to_phone`. `UI::Time::Component`, not `l(time, format: :convert_time)`.
+- A *view helper* that only gathers a component's arguments out of controller assigns is still a helper — pass those arguments from the view.
+- `ApplicationComponentHelper` is the exception (`number_display`, `amount_display`, `check_mark`, `search_emoji`) — value formatters `ApplicationComponent` already includes, so components call them bare.
+
+**What's banned is the component reaching out, not the number of arguments.** State the controller already owns can be named and passed as one value object — `ComponentStates::IndexState` (built in `ControllerHelpers#admin_index_state`) and `ComponentStates::SortState` (`ControllerHelpers#sort_state`) are the pattern — value objects live in `app/services/component_states/`. The component stays pure either way; a bundle just stops seventy views from re-listing the same seventeen assigns.
+
+Bundle only what's cohesive — one subject, assembled in one place. `IndexState` is "this admin index request"; `ComponentStates::SortState` is "how this table is sorted and what its links carry". A grab-bag of unrelated request facts (`display_dev_info`, `current_user`, `current_country_id`) is not a value object, it's `helpers` renamed — those stay individual arguments.
+
 ## ViewComponent rules
 
 This project uses the ViewComponent gem to render components.
@@ -128,10 +142,13 @@ This project uses the ViewComponent gem to render components.
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`.
 - View components must initialize with keyword arguments. Everything the component needs must be passed in explicitly by the caller — never reach into controller state from inside a component (e.g. `controller.instance_variable_get(:@bike)`). If the component needs `@bike`, the caller renders `Component.new(bike: @bike)`.
 - In view components, use instance variables directly — don't add `attr_reader`/`attr_accessor`. Reference `@foo` everywhere, including in the template (`@current_user`, not `current_user`).
-- In ViewComponent templates, use the `helpers.` prefix for view helpers (e.g. `helpers.time_ago_in_words`).
+- In ViewComponent templates, use the `helpers.` prefix for view helpers (e.g. `helpers.time_ago_in_words`) — a legacy bridge, and a sign the helper wants to be a component.
   - Rule of thumb: try the bare call first. Only add `helpers.` if it fails with `NoMethodError` — route helpers (`new_bike_path`) and ActionView tag/url builders (`tag.span`, `content_tag`, `link_to`) are mixed into `ViewComponent::Base` directly, so they don't need it.
 - **Never nest a component inside a folder that already holds a `component.rb`.** Each component lives in `app/components/<path>/component.rb` (and `spec/components/<path>/component_spec.rb`); siblings go in sibling folders, not subfolders. If you have `search/everything_combobox/component.rb` and need a related component, place it at `search/everything_combobox_options/component.rb` (module `Search::EverythingComboboxOptions`), not `search/everything_combobox/options/component.rb`.
 - **Run `bin/update_component_digests` after editing markup that a cached component renders**, rather than computing a digest by hand. Components with a `MARKUP_DIGEST` (`PageBlock::Footer`, `PageBlock::Navbar::Wrapper`) fold it into their fragment cache key, and it follows `render X::Component` transitively — so editing any component they render, however far down, moves theirs too. It hashes each of those components' *paths* alongside their contents, so moving or renaming one stales every digest above it even though the markup is byte-identical. The `cached_markup_digest` shared example is what catches a stale one.
+- **Change a component's signature, then open its `component_preview.rb`** — nothing renders previews in the suite, so a stale one raises `ArgumentError: unknown keyword` on its Lookbook page with the whole suite green. `curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/rails/view_components/<path>/component/<scenario>"` is the check.
+- **A `UI::Table` cell block is `instance_exec`'d against the component.** Inside `table.column ... do`, bare calls and `@ivar`s resolve on `UI::Table::Component`, not the view. A bare call raises, but **an `@ivar` fails silently** — it reads `nil`, or worse, an identically-named ivar the table happens to hold. Reach state through the readers the table exposes (`sort_state.search_params`, not `sortable_search_params`), and for anything else assign a local above the block, the way `Org::ImpoundRecordsTable` carries `current_organization` and `current_user`. Above the `UI::Table::Component.new` block the view's own helpers work; rewriting those too is churn.
+- **A component that `include`s a helper is coupled to whatever ivars that helper reads.** `GraphingHelper#humanized_time_range` reads `@period` off the object it's mixed into, so moving that ivar out of the component silently returns nil rather than failing. Pass the value as an argument when converting a component to explicit arguments.
 - **Converting a partial — to a component, or from haml to ERB — is a faithful move, not a cleanup.** Carry the markup over verbatim — including comments and commented-out code. Those lines are often a deliberate stash (a link that's temporarily disabled, a snippet someone expects to restore), so dropping them silently loses intent and surprises the reviewer, who expects the diff to read as "same content, new home." The only changes a conversion should introduce are the mechanical ones the move *requires*: `t(".x")` → `translation(".x")`, adding `helpers.` where a helper now needs it, and the like. If you spot something that genuinely looks like dead code worth removing, that's a separate judgment call — raise it with the user or do it in its own commit, don't fold it into the move.
 
 ## Turbo is opt-in, and opting a form in has two consequences

@@ -134,10 +134,11 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @notifications,
   viewing: "Notifications",
   nav_header_list_items:,
   rendered_chart:,
   admin_search_form:,
-  table_view:
+  table_view:,
 )) %>

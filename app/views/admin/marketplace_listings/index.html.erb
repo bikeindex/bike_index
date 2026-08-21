@@ -34,5 +34,10 @@
       </div>
     </li>
   <% end %>
-  <%= render(Admin::IndexSkeleton::Component.new(chart_collection: @render_chart && matching_marketplace_listings, nav_header_list_items:)) %>
+  <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @collection,
+  viewing: controller_name.humanize,
+  chart_collection: @render_chart && matching_marketplace_listings, nav_header_list_items:,
+)) %>
 <% end %>

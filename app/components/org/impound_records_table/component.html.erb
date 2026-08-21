@@ -1,6 +1,8 @@
+<%# Cell blocks are instance_exec'd against UI::Table, so locals rather than ivars %>
 <% current_organization = @current_organization %>
+<% current_user = @current_user %>
 
-<%= render(UI::Table::Component.new(records: @impound_records, render_sortable: @render_sortable)) do |table| %>
+<%= render(UI::Table::Component.new(records: @impound_records, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
   <% table.column(sortable: "display_id_integer", label: "ID") do |impound_record| %>
     <%= impound_record.display_id %>
   <% end %>
@@ -29,7 +31,7 @@
         <%= link_to helpers.organized_bike_text(impound_record.bike), bike_path(impound_record.bike, organization_id: current_organization.id), data: {turbo_frame: "_top"} %>
         <% unless impound_record.bike.no_serial? %>
           <small>
-            <%= render(Atom::Serial::Component.new(bike: impound_record.bike, user: helpers.current_user)) %>
+            <%= render(Atom::Serial::Component.new(bike: impound_record.bike, user: current_user)) %>
           </small>
         <% end %>
       <% end %>

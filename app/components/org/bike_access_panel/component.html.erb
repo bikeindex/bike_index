@@ -92,7 +92,7 @@
                 </td>
               </tr>
 
-              <% if @organization.enabled?("bike_stickers") %>
+              <% if show_sticker_modal? %>
                 <tr>
                   <td><%= translation(".sticker") %></td>
 
@@ -122,15 +122,8 @@
                     <% end %>
 
                     <div class="small text-right">
-                      <a
-                        class="less-strong"
-                        href="#"
-                        style="opacity: 0.8; text-align: right;"
-                        data-toggle="modal"
-                        data-target="#assignStickerModal"
-                      >
-                        <%= translation(".link_sticker") %>
-                      </a>
+                      <%= render(UI::Button::Component.new(text: translation(".link_sticker"), color: :link,
+                            commandfor: "assignStickerModal", command: "show-modal")) %>
                     </div>
                   </td>
                 </tr>
@@ -826,23 +819,18 @@
 <% end %>
 
 <% if show_sticker_modal? %>
-  <% sticker_modal_body = capture do %>
-    <div class="modal-body">
+  <%= render(UI::Modal::Component.new(title: translation(".assign_sticker"), id: "assignStickerModal")) do |modal| %>
+    <% modal.with_body do %>
       <%= form_for BikeSticker.new, url: organization_sticker_path(id: "code", organization_id: @organization.to_param), action: "update", method: "PUT" do |f| %>
         <%= f.hidden_field :bike_id, value: @bike.id %>
 
         <div class="form-group">
-          <%= f.label :code, translation(".sticker_code"), class: "org-form-label" %>
+          <%= f.label :code, translation(".sticker_code") %>
           <%= f.text_field :code, required: true, class: "form-control" %>
         </div>
 
-        <div class="modal-btn-footer">
-          <div class="form-submit-button">
-            <%= f.submit translation(".assign_sticker"), class: "btn btn-success btn-lg" %>
-          </div>
-        </div>
+        <%= f.submit translation(".assign_sticker"), class: "btn btn-success btn-lg" %>
       <% end %>
-    </div>
+    <% end %>
   <% end %>
-  <%= render partial: "shared/modal", locals: {title: translation(".assign_sticker"), modal_body: sticker_modal_body, id: "assignStickerModal"} %>
 <% end %>

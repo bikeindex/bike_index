@@ -18,11 +18,11 @@ module Admin
         end
 
         def with_search
-          render(Admin::Users::Cell::Component.new(user: lookbook_user, render_search: true))
+          render(Admin::Users::Cell::Component.new(user: lookbook_user, search_url: admin_users_path(user_id: lookbook_user.id), render_search: true))
         end
 
         def without_search
-          render(Admin::Users::Cell::Component.new(user: lookbook_user, render_search: false))
+          render(Admin::Users::Cell::Component.new(user: lookbook_user, search_url: admin_users_path(user_id: lookbook_user.id), render_search: false))
         end
       end
     end
