@@ -9,6 +9,9 @@ module UI
       # fields_component renders one record into the wrapper this builds, and owes it a
       # `_destroy` input and a remove trigger actioning `#remove`.
       # UI::Forms::NestedFields::PreviewFields is the minimal example.
+      #
+      # A grid class_name gets an extra cell it didn't ask for: the insertion target is an
+      # empty span, so leave the grid's row gap off or it opens above the add link.
       class Component < ApplicationComponent
         CONTROLLER = "ui--forms--nested-fields"
         # ui--forms--nested-fields swaps this for a distinct index per added record

@@ -2,20 +2,24 @@
 
 module UI
   module Container
-    # A single column of labelled inputs stops being readable before a wide screen runs
-    # out - the eye has to cross empty space from the label to its field - so a form that
-    # needs more room splits into columns rather than growing. The page owns its gutter
-    # (.twgutter); this only caps width, so containers nest without doubling padding.
+    # Caps how wide the content inside it gets. A single column of labelled inputs stops
+    # being readable before a wide screen runs out - the eye has to cross empty space from
+    # the label to its field - so :form is the width one column should stop at, and :wide
+    # the width for content that earns more (two columns of fields, a table, an HTML
+    # editor). Laying those columns out is the caller's job.
+    #
+    # The page owns its gutter (.twgutter); this only caps width, so containers nest
+    # without doubling padding.
     class Component < ApplicationComponent
-      MAX_WIDTHS = {1 => "tw:max-w-3xl", 2 => "tw:max-w-7xl"}.freeze
-      COLUMNS = MAX_WIDTHS.keys.freeze
+      MAX_WIDTHS = {form: "tw:max-w-3xl", wide: "tw:max-w-7xl"}.freeze
+      WIDTHS = MAX_WIDTHS.keys.freeze
       ALIGNMENTS = %i[center left].freeze
 
-      def initialize(columns: 1, alignment: :center)
-        raise_if_invalid_value!(:columns, columns, COLUMNS)
+      def initialize(width: :form, alignment: :center)
+        raise_if_invalid_value!(:width, width, WIDTHS)
         raise_if_invalid_value!(:alignment, alignment, ALIGNMENTS)
 
-        @columns = columns
+        @width = width
         @alignment = alignment
       end
 
@@ -24,7 +28,7 @@ module UI
       private
 
       def classes
-        ["tw:w-full", MAX_WIDTHS[@columns], centering].compact.join(" ")
+        ["tw:w-full", MAX_WIDTHS[@width], centering].compact.join(" ")
       end
 
       def centering

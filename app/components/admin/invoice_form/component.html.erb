@@ -1,6 +1,6 @@
 <div class="mt-4" data-controller="admin--invoice-form">
   <%= form_for [:admin, @organization, @invoice] do |f| %>
-    <%= render(UI::Container::Component.new(columns: 2)) do %>
+    <%= render(UI::Container::Component.new(width: :wide)) do %>
       <%= f.hidden_field :organization_feature_ids, data: {"admin--invoice-form-target": "featureIds"} %>
       <%= render(UI::Alerts::ObjectError::Component.new(object: @invoice)) %>
 
@@ -93,7 +93,7 @@
 
               <td>
                 <%= render(UI::Forms::Input::Component.new(form_builder: f, attribute: :amount_due, kind: :number_field,
-                html_options: {data: {"admin--invoice-form-target": "amountDue", action: "input->admin--invoice-form#recalculate"}})) %>
+                  html_options: {data: {"admin--invoice-form-target": "amountDue", action: "input->admin--invoice-form#recalculate"}})) %>
               </td>
             </tr>
 
@@ -116,7 +116,7 @@
           <%= f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
 
           <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :start_at, kind: :datetime_local_field,
-          label_text: "Coverage starts", required: true, html_options: {value: start_at, step: 60})) %>
+            label_text: "Coverage starts", required: true, html_options: {value: start_at, step: 60})) %>
         </div>
 
         <div
@@ -124,20 +124,20 @@
           data-admin--invoice-form-target="endsAt"
         >
           <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :end_at, kind: :datetime_local_field,
-          label_text: "Coverage ends", required: true, html_options: {value: end_at, step: 60})) %>
+            label_text: "Coverage ends", required: true, html_options: {value: end_at, step: 60})) %>
         </div>
       </div>
 
       <div class="tw:grid tw:gap-x-8 tw:md:grid-cols-2">
         <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :notes, kind: :text_area,
-        html_options: {rows: 4})) %>
+          html_options: {rows: 4})) %>
 
         <div class="tw:mt-6 tw:flex tw:flex-col tw:items-start tw:gap-4">
           <%= f.submit "Save", class: "btn btn-lg btn-success" %>
 
           <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :is_endless,
-          label: "Coverage never ends",
-          input_data: {"admin--invoice-form-target": "isEndless", action: "change->admin--invoice-form#toggleEndsAt"})) %>
+            label: "Coverage never ends",
+            input_data: {"admin--invoice-form-target": "isEndless", action: "change->admin--invoice-form#toggleEndsAt"})) %>
         </div>
       </div>
 
@@ -145,8 +145,8 @@
 
       <div class="tw:mt-6 tw:md:w-1/2">
         <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :child_enabled_feature_slugs_string,
-        kind: :text_area, label_text: child_slugs_label,
-        html_options: {rows: 2, placeholder: "comma separated list of features"})) do |group| %>
+          kind: :text_area, label_text: child_slugs_label,
+          html_options: {rows: 2, placeholder: "comma separated list of features"})) do |group| %>
           <% group.with_helper_text do %>
             <em>available features in current invoice:</em>
             <%= safe_join(@invoice.feature_slugs.map { |slug| content_tag(:code, slug) }, ", ") %>

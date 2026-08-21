@@ -1,7 +1,7 @@
 <%= render(UI::Alerts::ObjectError::Component.new(object: @organization)) %>
 
 <%= form_for @organization, as: :organization, url: form_url, action: "update" do |f| %>
-  <%= render(UI::Container::Component.new(columns: 2)) do %>
+  <%= render(UI::Container::Component.new(width: :wide)) do %>
     <%= f.fields_for :mail_snippets do |snippet| %>
       <% if snippet.object.kind == @edit_template %>
         <%= render(UI::Forms::Group::Component.new(form_builder: snippet, attribute: :body, kind: :text_area,

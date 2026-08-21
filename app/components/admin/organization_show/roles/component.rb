@@ -17,8 +17,11 @@ module Admin
             @organization.organization_roles.deleted.reorder(deleted_at: :asc)
           else
             @organization.organization_roles.reorder(created_at: :asc)
-          end.load
+          end
         end
+
+        # Relation#count queries however loaded the relation is, and the heading asks twice
+        def organization_roles_count = @organization_roles_count ||= organization_roles.count
       end
     end
   end

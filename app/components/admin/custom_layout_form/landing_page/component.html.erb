@@ -1,7 +1,7 @@
 <%= render(UI::Alerts::ObjectError::Component.new(object: @landing_page)) %>
 
 <%= form_for @landing_page, url: form_url, html: {method: :patch} do |f| %>
-  <%= render(UI::Container::Component.new(columns: 2)) do %>
+  <%= render(UI::Container::Component.new(width: :wide)) do %>
     <%= hidden_field_tag :kind, "landing_page" %>
 
     <% if @landing_page.persisted? %>

@@ -1,5 +1,3 @@
-<%# ml-auto rather than justify-between: it also holds the link right once it wraps below %>
-
 <div class="tw:mt-6 tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
   <h2>
     <%= number_with_delimiter(@bikes_count) %>
@@ -10,6 +8,7 @@
     </em>
   </h2>
 
+  <%# ml-auto rather than justify-between, which drops the link to the left once it wraps %>
   <%= link_to "org bikes view", organization_registrations_path(organization_id: @organization.to_param), class: "gray-link tw:ml-auto" %>
 </div>
 

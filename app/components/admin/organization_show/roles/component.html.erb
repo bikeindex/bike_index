@@ -1,14 +1,12 @@
-<%# ml-auto rather than justify-between: it also holds the link right once it wraps below %>
-
 <div class="tw:mt-6 tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
   <h4>
-    <%= number_with_delimiter(organization_roles.count) %>
+    <%= number_with_delimiter(organization_roles_count) %>
 
     <% if @deleted %>
       <span class="text-danger">Deleted</span>
     <% end %>
 
-    <%= "OrganizationRole".pluralize(organization_roles.count) %>
+    <%= "OrganizationRole".pluralize(organization_roles_count) %>
 
     <small>
       <% if @deleted %>
@@ -30,9 +28,10 @@
     </small>
   </h4>
 
+  <%# ml-auto rather than justify-between, which drops the link to the left once it wraps %>
   <%= link_to "View all organization_roles", admin_organization_roles_path(organization_id: @organization.to_param), class: "tw:ml-auto" %>
 </div>
 
-<% if organization_roles.count > 0 %>
+<% if organization_roles_count > 0 %>
   <%= render partial: "/admin/organization_roles/table", locals: { organization_roles: organization_roles.limit(25), skip_organization: true, render_deleted: @deleted} %>
 <% end %>

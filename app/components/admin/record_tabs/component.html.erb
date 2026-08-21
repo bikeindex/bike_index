@@ -1,10 +1,11 @@
 <%#
-  -mx-4/px-4 keeps .admin-subnav's border-bottom running to the viewport edge, which it
-  got from a -15px margin the .col padding used to cancel
+  .admin-subnav already bleeds -15px; matching --gutter exactly is what lets everything
+  inside drop .col's compensating padding. .twgutter-bleed can't do it - it's in a layer,
+  and admin_unvendored is imported outside one, so it wins whatever the specificity
 %>
 
-<div class="admin-subnav tw:-mx-4! tw:px-4 tw:pb-0!">
-  <div class="tw:grow tw:basis-0">
+<div class="admin-subnav tw:-mx-[var(--gutter)]! tw:px-[var(--gutter)] tw:pb-0!">
+  <div class="tw:flex-1">
     <h1>
       <%= @title %>
 
@@ -14,7 +15,7 @@
     </h1>
   </div>
 
-  <div class="tw:grow tw:basis-0">
+  <div class="tw:flex-1">
     <ul>
       <% @links.each do |link| %>
         <li class="nav-item"><%= link %></li>
@@ -28,12 +29,12 @@
 
   <%#
     Divs rather than a ul: .admin-subnav ul is force-right-aligned, and its .active is a
-    blue pill. The -1px pulls the tabs onto the subnav's border-bottom, so the active
-    tab's white lower edge breaks the line the way a tab should
+    blue pill. .nav-tabs .nav-item still reaches these, which is what pulls them the -1px
+    onto the subnav's border
   %>
 
   <nav
-    class="nav nav-tabs tw:mt-3 tw:-mb-px tw:w-full tw:border-b-0!"
+    class="nav nav-tabs tw:mt-3 tw:w-full tw:border-b-0!"
     aria-label="<%= @nav_label %>"
   >
     <% @tabs.each do |tab| %>

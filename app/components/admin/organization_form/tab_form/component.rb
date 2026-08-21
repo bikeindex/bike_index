@@ -11,13 +11,13 @@ module Admin
       # its fields - the form builder doesn't exist until form_for yields it.
       class Component < ApplicationComponent
         def initialize(organization:, fields_component:, fields_args: {}, tab: nil,
-          submit_text: "Update", columns: 1)
+          submit_text: "Update", width: :form)
           @organization = organization
           @fields_component = fields_component
           @fields_args = fields_args
           @tab = tab
           @submit_text = submit_text
-          @columns = columns
+          @width = width
         end
       end
     end

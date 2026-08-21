@@ -9,22 +9,21 @@
   </div>
 <% end %>
 
-<div class="tw:grid tw:gap-x-8 tw:gap-y-6 tw:md:grid-cols-2">
-  <div>
-    <%= render(Admin::OrganizationShow::Details::Component.new(organization: @organization)) %>
-  </div>
+<%#
+  items-start because a bare <table> grid item stretches to the row and spreads the extra
+  height across its own rows
+%>
 
-  <div>
-    <%= render(Admin::OrganizationShow::Account::Component.new(organization: @organization)) %>
-  </div>
+<div class="tw:grid tw:items-start tw:gap-x-8 tw:gap-y-6 tw:md:grid-cols-2">
+  <%= render(Admin::OrganizationShow::Details::Component.new(organization: @organization)) %>
+  <%= render(Admin::OrganizationShow::Account::Component.new(organization: @organization)) %>
 
+  <%# Invoices is the one with more than one root element, so it needs the cell wrapper %>
   <div>
     <%= render(Admin::OrganizationShow::Invoices::Component.new(organization: @organization)) %>
   </div>
 
-  <div>
-    <%= render(Admin::OrganizationShow::Features::Component.new(organization: @organization)) %>
-  </div>
+  <%= render(Admin::OrganizationShow::Features::Component.new(organization: @organization)) %>
 </div>
 
 <%= render(Admin::OrganizationShow::Bikes::Component.new(organization: @organization, bikes: @bikes, bikes_count: @bikes_count)) %>

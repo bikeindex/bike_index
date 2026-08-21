@@ -1,5 +1,5 @@
 <%= form_for [:admin, @organization], html: {data: {controller: "admin--organization-form"}} do |form_builder| %>
-  <%= render(UI::Container::Component.new(columns: @columns)) do %>
+  <%= render(UI::Container::Component.new(width: @width)) do %>
     <%= hidden_field_tag :tab, @tab if @tab.present? %>
 
     <%= render(@fields_component.new(form_builder:, **@fields_args)) %>

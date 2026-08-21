@@ -7,12 +7,12 @@ RSpec.describe UI::Container::Component, type: :component do
     render_inline(described_class.new(**options)) { "content".html_safe }.at_css("div")["class"]
   end
 
-  it "centers one column at the narrower width" do
+  it "centers a form at the narrower width" do
     expect(classes).to eq "tw:w-full tw:max-w-3xl tw:mx-auto"
   end
 
-  it "gives two columns the wider one to share" do
-    expect(classes(columns: 2)).to eq "tw:w-full tw:max-w-7xl tw:mx-auto"
+  it "gives wide content more to work with" do
+    expect(classes(width: :wide)).to eq "tw:w-full tw:max-w-7xl tw:mx-auto"
   end
 
   it "leaves the slack on the right when aligned left" do
@@ -21,11 +21,11 @@ RSpec.describe UI::Container::Component, type: :component do
 
   # The page owns the gutter (.twgutter), so nesting these can't compound padding
   it "adds no padding at any width" do
-    expect(described_class::COLUMNS.map { |columns| classes(columns:) }.join).to_not include("px-")
+    expect(described_class::WIDTHS.map { |width| classes(width:) }.join).to_not include("px-")
   end
 
   it "raises on values it has no layout for" do
-    expect { described_class.new(columns: 3) }.to raise_error(ArgumentError, /3/)
+    expect { described_class.new(width: :huge) }.to raise_error(ArgumentError, /huge/)
     expect { described_class.new(alignment: :justify) }.to raise_error(ArgumentError, /justify/)
   end
 end
