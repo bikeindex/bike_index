@@ -9,10 +9,8 @@ module PageBlock
         # The tint PageBlock::Navbar::UserSettingsMenu::LOGOUT deviates from, for its darker panel
         LOGOUT = "tw:text-red-700! tw:hover:bg-red-50! tw:hover:text-red-600!"
 
-        def initialize(current_user:, current_user_or_unconfirmed_user:,
-          current_organization: nil, button_class: nil)
+        def initialize(current_user:, current_organization: nil, button_class: nil)
           @current_user = current_user
-          @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user
           @current_organization = current_organization
           @button_class = button_class
         end
@@ -21,12 +19,12 @@ module PageBlock
 
         def items
           UserServices::MenuItemsAccount.for(current_user: @current_user,
-            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user,
+            current_user_or_unconfirmed_user: @current_user,
             current_organization: @current_organization, opens: :up)
         end
 
         def name
-          @current_user_or_unconfirmed_user.email
+          @current_user.email
         end
 
         # .twdropdown (bike_index_components.css) styles the entries, so they need nothing
