@@ -40,7 +40,7 @@
         <em>Marketplace Listing <%= render(Admin::Badges::MarketplaceListing::Component.new(status: marketplace_listing_subject.status, status_humanized: marketplace_listing_subject.status_humanized, kind: :marketplace_listing)) %> #<%= marketplace_listing_subject.id %>,</em>
 
 
-        <%= render Admin::BikeCell::Component.new(bike: marketplace_listing_subject.item, bike_id: marketplace_listing_subject.item_id) %>
+        <%= render Admin::Bikes::Cell::Component.new(bike: marketplace_listing_subject.item, bike_id: marketplace_listing_subject.item_id) %>
       <% else %>
         <span class="<%= error_text_class %>">
           Marketplace #<%= @params[:search_marketplace_listing_id] %>
@@ -90,7 +90,7 @@
       <% if strava_integration.present? %>
         <small>
           for
-          <%= render(Admin::UserCell::Component.new(user: strava_integration.user, user_id: strava_integration.user_id,
+          <%= render(Admin::Users::Cell::Component.new(user: strava_integration.user, user_id: strava_integration.user_id,
             user_link_path: admin_strava_integration_path(strava_integration_id))) %>
         </small>
       <% end %>

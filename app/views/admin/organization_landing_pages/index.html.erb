@@ -1,4 +1,4 @@
-<% table_view = render(Admin::OrganizationLandingPagesTable::Component.new(collection: @collection,
+<% table_view = render(Admin::Organizations::LandingPagesTable::Component.new(collection: @collection,
   render_sortable: true, render_search: params[:organization_id].blank?)) %>
 
 <%= render(Admin::IndexSkeleton::Component.new(table_view:, chart_collection: @render_chart && matching_organization_landing_pages)) %>

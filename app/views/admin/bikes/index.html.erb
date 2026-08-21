@@ -254,7 +254,7 @@
 <% end unless admin_search_filtered? %>
 
 <% table_view = capture do %>
-  <%= render Admin::BikesTable::Component.new(bikes: @bikes, render_sortable: true, render_multi_check: @multi_delete) %>
+  <%= render Admin::Bikes::Table::Component.new(bikes: @bikes, render_sortable: true, render_multi_check: @multi_delete) %>
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
