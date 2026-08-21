@@ -107,9 +107,12 @@ module Admin
       edit_admin_organization_url(@organization, tab: (form_tab unless form_tab == "edit"))
     end
 
+    # fetch rather than require: a tab that renders none of these still submits - the reg
+    # labels are top-level params, and a locations tab for an organization without any posts
+    # nothing but the blank-fields template, which the browser leaves behind
     def permitted_parameters
       params
-        .require(:organization)
+        .fetch(:organization, {})
         .permit(
           :access_token,
           :api_access_approved,

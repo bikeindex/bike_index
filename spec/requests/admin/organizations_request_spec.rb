@@ -296,6 +296,29 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       end
     end
 
+    # A tab that renders no organization[...] field still has to save - the reg labels are
+    # top-level params, and a location-less locations tab posts nothing but the template
+    context "submitted from a tab with nothing under organization" do
+      context "paid_functionality, whose only fields are the reg labels" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "reg_address") }
+
+        it "saves the labels" do
+          put "#{base_url}/#{organization.to_param}", params: {:tab => "paid_functionality",
+                                                               "reg_label-owner_email" => "Your email"}
+          expect(response).to redirect_to(edit_admin_organization_url(organization, tab: "paid_functionality"))
+          expect(organization.reload.registration_field_labels).to eq({"owner_email" => "Your email"})
+        end
+      end
+
+      context "locations, for an organization with none" do
+        it "redirects rather than raising" do
+          expect(organization.locations.count).to eq 0
+          put "#{base_url}/#{organization.to_param}", params: {tab: "locations"}
+          expect(response).to redirect_to(edit_admin_organization_url(organization, tab: "locations"))
+        end
+      end
+    end
+
     context "submitted from a tab" do
       it "returns to the tab, and to show without one" do
         put "#{base_url}/#{organization.to_param}", params: {tab: "sso", organization: {name: "new name"}}
