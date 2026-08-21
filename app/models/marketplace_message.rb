@@ -112,7 +112,7 @@ class MarketplaceMessage < ApplicationRecord
 
     # Cached because this is called on every page load, to determine whether to show the messages menu item
     def any_for_user?(user = nil)
-      return false unless user.present? && user.confirmed?
+      return false unless user.present?
 
       Rails.cache.fetch(["any_marketplace_messages", user]) { for_user(user).any? }
     end

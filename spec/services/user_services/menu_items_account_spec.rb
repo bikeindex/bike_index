@@ -162,18 +162,6 @@ RSpec.describe UserServices::MenuItemsAccount do
                                 path: "/my_account/messages", icon: nil, match: :path,
                                 matching_controllers: []})
       end
-
-      # Every authenticated route bounces them to please_confirm_email, so the row would
-      # only lead somewhere they can't read
-      context "unconfirmed" do
-        let(:user) { FactoryBot.create(:user) }
-
-        it "is absent, though the message is theirs" do
-          expect(user.confirmed?).to be_falsey
-          expect(MarketplaceMessage.for_user(user).pluck(:id)).to eq([marketplace_message.id])
-          expect(items.map { |item| item[:label] }).to_not include("Marketplace messages")
-        end
-      end
     end
   end
 end

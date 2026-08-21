@@ -16,19 +16,6 @@ RSpec.describe MarketplaceMessage, type: :model do
       expect(MarketplaceMessage.any_for_user?(marketplace_message.sender)).to be_truthy
       expect(MarketplaceMessage.any_for_user?(marketplace_message.receiver)).to be_truthy
     end
-    context "unconfirmed sender" do
-      let(:sender) { FactoryBot.create(:user) }
-      let(:marketplace_message) { FactoryBot.create(:marketplace_message, sender:) }
-
-      # Every authenticated route bounces them to please_confirm_email, so they have
-      # nowhere to read these - and the account menu skips the row without a lookup
-      it "has none for them" do
-        expect(marketplace_message.sender_id).to eq sender.id
-        expect(sender.confirmed?).to be_falsey
-        expect(MarketplaceMessage.for_user(sender).pluck(:id)).to eq([marketplace_message.id])
-        expect(MarketplaceMessage.any_for_user?(sender)).to be_falsey
-      end
-    end
     context "reply" do
       let(:marketplace_message_reply) { FactoryBot.create(:marketplace_message_reply, initial_record: marketplace_message) }
       it "is valid" do
