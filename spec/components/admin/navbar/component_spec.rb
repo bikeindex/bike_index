@@ -7,7 +7,13 @@ RSpec.describe Admin::Navbar::Component, type: :component do
   # Somewhere outside admin, so no nav link is the active one
   let(:url) { "/bikes/new" }
   let(:current_user) { FactoryBot.create(:superuser) }
-  let(:component) { with_request_url(url) { render_inline(described_class.new(current_user:)) } }
+  let(:controller_name) { "bikes" }
+  let(:action_name) { "index" }
+  let(:search_filtered) { false }
+  let(:instance) do
+    described_class.new(current_user:, user_root_url: "/admin", controller_name:, action_name:, search_filtered:)
+  end
+  let(:component) { with_request_url(url) { render_inline(instance) } }
   # The picker's "All" link
   let(:view_all_link) { "a.text-muted" }
 
@@ -73,6 +79,7 @@ RSpec.describe Admin::Navbar::Component, type: :component do
 
     context "with period != all" do
       let(:url) { "#{admin_bikes}?period=week&timezone=Party" }
+      let(:search_filtered) { true }
 
       it "links to the unfiltered page" do
         expect(component).to have_css("#{view_all_link}[href='#{admin_bikes}']", text: /All\s+Bikes/)
@@ -81,6 +88,7 @@ RSpec.describe Admin::Navbar::Component, type: :component do
 
     context "with a search param" do
       let(:url) { "#{admin_bikes}?search_email=party@example.com" }
+      let(:search_filtered) { true }
 
       it "links to the unfiltered page" do
         expect(component).to have_css("#{view_all_link}[href='#{admin_bikes}']", text: /All\s+Bikes/)
@@ -97,6 +105,8 @@ RSpec.describe Admin::Navbar::Component, type: :component do
 
     context "on a Config: page" do
       let(:url) { "/admin/email_domains?search_status=banned" }
+      let(:search_filtered) { true }
+      let(:controller_name) { "email_domains" }
 
       it "drops the prefix from the title" do
         expect(component).to have_css("#{view_all_link}[href='/admin/email_domains']", text: /All\s+Email Domains/)

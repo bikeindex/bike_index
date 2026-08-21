@@ -1,6 +1,6 @@
 <div class="organized-exports">
   <div class="organized-page-header">
-    <h1><%= t(".org_exports_html", org_name: current_organization.name) %></h1>
+    <%= render(UI::Header::Component.new(text: t(".org_exports_html", org_name: current_organization.name))) %>
   </div>
 
   <div class="text-right">

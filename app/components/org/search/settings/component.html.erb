@@ -3,9 +3,7 @@
   data-org--search-target="settings"
 >
   <div class="tw:mb-1 tw:flex tw:items-baseline tw:gap-2">
-    <h3 class="header-font-alt tw:mb-4! tw:pr-1">
-      <%= translation(".visible_columns") %>
-    </h3>
+    <%= render(UI::Header::Component.new(text: translation(".visible_columns"), tag: :h3, html_class: "header-font-alt tw:mb-4! tw:pr-1")) %>
 
     <%= render UI::Button::Component.new(text: translation(".all"), color: :link,
           data: { action: "click->org--search-column-toggle#selectAll" }) %>

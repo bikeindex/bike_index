@@ -16,6 +16,13 @@ module Org
         # A new page has nothing to preview or delete yet
         def editing? = @page.persisted?
 
+        # Admin already has its own h1 on the page, so its copy of this drops a level
+        def heading_options
+          return {html_class: "uncap tw:mb-0!"} unless @admin
+
+          {tag: :h2, html_class: "uncap tw:mb-0! tw:font-normal! tw:text-gray-500!"}
+        end
+
         def form_url
           editing? ? page_path : RegistrationSequencePaths.pages(@registration_sequence, admin: @admin)
         end

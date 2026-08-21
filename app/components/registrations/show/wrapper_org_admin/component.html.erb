@@ -28,7 +28,7 @@
 
   <%= render(current_alerts_component) %>
 
-  <%= render(Registrations::Show::OrgTopActions::Wrapper::Component.new(bike: @bike, organization: @organization, org_role: @org_role, current_user: @current_user)) %>
+  <%= render(Registrations::Show::OrgTopActions::Wrapper::Component.new(bike: @bike, organization: @organization, org_role: @org_role, current_user: @current_user, display_dev_info: @display_dev_info)) %>
 
   <%# tw:contents collapses the column wrappers on mobile, so tw:order can interleave them %>
 

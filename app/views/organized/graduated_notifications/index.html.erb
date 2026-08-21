@@ -1,7 +1,7 @@
 <%# TODO: add translations %>
 
 <div class="organized-page-header">
-  <h1>Graduated notifications</h1>
+  <%= render(UI::Header::Component.new(text: "Graduated notifications")) %>
 </div>
 
 <% unless current_organization.deliver_graduated_notifications? %>
@@ -24,7 +24,7 @@
   doesn't include them). Reads params, not @search_status, which is unset on
   non-turbo renders.
 %>
-<% form_interpreted_params = @interpreted_params.merge(search_status: params[:search_status], search_secondary: params[:search_secondary]).compact %>
+<% form_interpreted_params = @interpreted_params.merge(search_status: params[:search_status], search_secondary: params[:search_secondary], search_email: params[:search_email]).compact %>
 
 <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
 <% unless turbo_frame_request? %>

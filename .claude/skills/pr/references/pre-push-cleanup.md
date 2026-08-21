@@ -61,8 +61,8 @@ This applies to the branch's specs, not the suite's. Don't delete pre-existing e
 **Required, not conditional on the diff looking clean.** List the comments the branch adds or edits:
 
 ```bash
-git diff origin/main...HEAD -U0 -- '*.rb' '*.erb' '*.js' '*.ts' '*.coffee' '*.scss' '*.css' '*.rake' '*.yml' 'bin/*' |
-  grep -E '^(\+\+\+ |\+.*(#|//|<%#|/\*))'
+git diff origin/main...HEAD -U0 -- '*.rb' '*.erb' '*.haml' '*.js' '*.ts' '*.coffee' '*.scss' '*.css' '*.rake' '*.yml' 'bin/*' |
+  grep -E '^(\+\+\+ |\+.*(#|//|<%#|-#|/\*))'
 ```
 
 The `+++ b/…` lines keep each hit attached to its file; the code-path filter keeps markdown headings out. It catches trailing comments too, and over-matches on `#{}` interpolation — that's fine, the list is candidates to judge, not verdicts.

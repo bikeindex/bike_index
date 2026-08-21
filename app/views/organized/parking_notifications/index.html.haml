@@ -1,6 +1,5 @@
 .organized-page-header
-  %h1
-    = t(".parking_notifications")
+  = render(UI::Header::Component.new(text: t(".parking_notifications")))
 
 = render partial: "repeated_updates_information" # Render information about the result of create_and_send_repeats
 
@@ -127,7 +126,7 @@
       Update
 
   .mt-4
-    = render(Org::Search::Form::Component.new(target_search_path: organization_parking_notifications_path(organization_id: current_organization.to_param), interpreted_params: @interpreted_params))
+    = render(Org::Search::Form::Component.new(target_search_path: organization_parking_notifications_path(organization_id: current_organization.to_param), interpreted_params: @interpreted_params.merge(search_email: params[:search_email]).compact))
 
   .row.mt-4.mb-2
     .col-sm-6

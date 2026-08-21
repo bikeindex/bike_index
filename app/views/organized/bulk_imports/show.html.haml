@@ -1,5 +1,5 @@
 .mb-4
-  %h1.uncap
+  = render(UI::Header::Component.new(html_class: "uncap")) do
     - if @bulk_import.ascend?
       = t(".ascend_import")
     - elsif @bulk_import.impounded?
@@ -52,7 +52,7 @@
 
 
 - if @bulk_import.import_errors?
-  %h2.mt-2.mb-2= t(".errors")
-  = render(Org::BulkImportError::Component.new(bulk_import: @bulk_import))
+  = render(UI::Header::Component.new(text: t(".errors"), tag: :h2, html_class: "mt-2 tw:mb-2!"))
+  = render(Org::BulkImportError::Component.new(bulk_import: @bulk_import, display_dev_info: display_dev_info?))
 
 = render(Org::Search::Wrapper::Component.new(organization: current_organization, current_user:, pagy: @pagy, bikes: @bikes, per_page: @per_page, params: params, skip_search_and_filters: true))
