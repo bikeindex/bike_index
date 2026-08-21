@@ -1,21 +1,3 @@
-<% classes = "nav-link btn btn-sm btn-outline-info" %>
-
-<% if layout_kind == "landing_page" %>
-  <% subtitle = "Landing Page" %>
-  <% additional_link = link_to("landing page", landing_page_url, class: classes) %>
-  <% layout_form = Admin::CustomLayoutForm::LandingPage::Component.new(organization: @organization,
-    landing_page: @landing_page, suggested_button_hover:) %>
-<% else %>
-  <% subtitle = capture do %>
-    <strong><%= @edit_template.titleize %></strong> email snippet
-  <% end %>
-  <% snippet_kind = @mail_snippet.which_organization_email %>
-  <% additional_link = link_to("#{snippet_kind.titleize} email", edit_organization_email_path(snippet_kind, organization_id: @organization.to_param), class: classes) %>
-  <% layout_form = Admin::CustomLayoutForm::MailSnippet::Component.new(organization: @organization,
-    mail_snippet: @mail_snippet, edit_template: @edit_template) %>
-<% end %>
-
-<%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :custom_layouts,
-      subtitle:, additional_link:)) %>
-
-<%= render(layout_form) %>
+<%= render(Admin::CustomLayoutForm::Wrapper::Component.new(organization: @organization,
+      edit_template: @edit_template, landing_page: @landing_page, mail_snippet: @mail_snippet,
+      landing_page_url:, suggested_button_hover:)) %>

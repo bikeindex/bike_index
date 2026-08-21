@@ -1,0 +1,22 @@
+<%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :custom_layouts)) %>
+
+<div class="tw:grid tw:items-start tw:gap-x-8 tw:md:grid-cols-2">
+  <p>
+    <%= link_to "Custom layouts version history", version_history_url %>
+  </p>
+
+  <table class="table-list">
+    <tr>
+      <td>Paid</td>
+      <td><strong><%= @organization.paid? %></strong></td>
+    </tr>
+  </table>
+</div>
+
+<%= render(Admin::OrganizationCustomLayoutsTable::Component.new(organization: @organization)) %>
+
+<div class="mt-4">
+  <strong>Note:</strong> Custom Layouts (other than landing pages), are
+  <%= link_to "Mail Snippets", admin_mail_snippets_path %>. You can view and
+  edit all the active ones there.
+</div>
