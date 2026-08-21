@@ -22,7 +22,7 @@ RSpec.describe Admin::OrganizationForm::Locations::Component, type: :component d
 
     # ui--forms--nested-fields clones this into the page, so it has to be exactly one blank location
     template = Nokogiri::HTML.fragment(component.at_css("template").inner_html)
-    expect(template.css(".card").length).to eq 1
+    expect(template.css("fieldset").length).to eq 1
     expect(template.css("input.twinput[name*='locations_attributes']").length).to be > 1
     expect(template.css("[name='organization[name]']")).to be_empty
     expect(template.text).not_to match "Main Office"
