@@ -48,6 +48,15 @@ RSpec.describe Admin::Bikes::Edit::Component, type: :component do
       expect(component).to have_content("Cool Org")
     end
 
+    # UI::Table instance_execs its cells, so an ivar read inside one is silently nil
+    context "with display_dev_info" do
+      let(:options) { {display_dev_info: true} }
+
+      it "renders the id in the row" do
+        expect(component).to have_content("ID: #{bike_organization.id}")
+      end
+    end
+
     # Deleted bike_organizations still matter to admins, so the table unscopes
     context "when deleted" do
       before { bike_organization.destroy }

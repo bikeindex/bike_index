@@ -209,6 +209,9 @@
   <% if bike_organizations.none? %>
     <em class="twless-strong">No organizations</em>
   <% else %>
+    <%# instance_exec'd cell blocks can't see the ivar, so it comes across as a local %>
+    <% display_dev_info = @display_dev_info %>
+
     <%= render(UI::Table::Component.new(records: bike_organizations)) do |table| %>
       <% table.column(label: "Organizations") do |bike_organization| %>
         <%= render(Admin::Organizations::Cell::Component.new(organization: bike_organization.organization,
@@ -218,7 +221,7 @@
       <% table.column(label: "Created") do |bike_organization| %>
         <%= render(UI::Time::Component.new(time: bike_organization.created_at)) %>
 
-        <% if @display_dev_info %>
+        <% if display_dev_info %>
           <code class="tw:ml-2 tw:text-xs">ID: <%= bike_organization.id %></code>
         <% end %>
       <% end %>
