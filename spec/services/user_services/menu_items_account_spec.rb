@@ -6,7 +6,7 @@ RSpec.describe UserServices::MenuItemsAccount do
   let(:user) { FactoryBot.create(:user_confirmed) }
 
   describe "for" do
-    let(:items) { described_class.for(current_user: user, current_user_or_unconfirmed_user: user, **options) }
+    let(:items) { described_class.for(current_user_or_unconfirmed_user: user, **options) }
     let(:options) { {} }
     let(:labels) { items.map { |item| item[:label] } }
 
@@ -70,7 +70,7 @@ RSpec.describe UserServices::MenuItemsAccount do
   end
 
   describe "the organization switcher" do
-    let(:items) { described_class.for(current_user: user, current_user_or_unconfirmed_user: user, **options) }
+    let(:items) { described_class.for(current_user_or_unconfirmed_user: user, **options) }
     let(:options) { {} }
     let(:switcher) { items.select { |item| item[:label].to_s.match?(/organization|Brakebills|Physical Kids/) } }
 
@@ -138,13 +138,13 @@ RSpec.describe UserServices::MenuItemsAccount do
   describe "opens" do
     it "raises on a direction it can't order by" do
       expect {
-        described_class.for(current_user: user, current_user_or_unconfirmed_user: user, opens: :upward)
+        described_class.for(current_user_or_unconfirmed_user: user, opens: :upward)
       }.to raise_error(ArgumentError, /opens/)
     end
   end
 
   describe "marketplace messages" do
-    let(:items) { described_class.for(current_user: user, current_user_or_unconfirmed_user: user) }
+    let(:items) { described_class.for(current_user_or_unconfirmed_user: user) }
 
     it "is absent for a user with none" do
       expect(items.map { |item| item[:label] }).to_not include("Marketplace messages")
