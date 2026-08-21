@@ -49,8 +49,6 @@ Scope it rather than running bare `bin/lint`: a whole-repo run reformats files o
 
 Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesheets/legacy_includes/_css_layers.scss`), which sorts below tailwind's `components` and `utilities`. So a `UI::*` component rendered inside legacy-styled markup **wins over the surrounding stylesheet's rules for every property its own classes set** — `UI::Button`'s `tw:inline-flex`, `tw:p-0` and `twlink` beat `.primary-header-nav`'s `display`, `padding` and `color` no matter how specific those selectors are.
 
-**Bootstrap's utility classes only exist on admin pages.** `align-self-start`, `mx-auto` and the rest come from `admin.css`; `application.css` carries none of them, so a shared `UI::*` component that reaches for one works in admin and silently does nothing everywhere else. Use the `tw:` equivalent (`tw:self-start`) in anything rendered outside admin — `UI::Forms::NestedFields::Component#add_button_class` is the worked example.
-
 ## Buttons: always `UI::Button` (and the UI component library generally)
 
 **Every button goes through `UI::Button::Component`** — never a hand-rolled `<button>`, `button_to`, or submit input with ad-hoc Tailwind classes. The component centralizes colors (`:primary`/`:secondary`/`:error`/`:purple`/`:link` — its `COLORS` is the list of record), sizes (`:sm`/`:md`/`:lg`), and the focus/active/dark-mode states; a hand-styled button silently drifts from all of that the next time the design changes.
