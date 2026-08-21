@@ -7,7 +7,7 @@ module Admin
       # the whole screen right-aligned beside it. Block content is the list's items, so a
       # caller passes <li>s.
       class Component < ApplicationComponent
-        BORDER_CLASSES = "tw:mb-6 tw:border-b tw:border-gray-300 tw:pb-4 tw:dark:border-gray-700"
+        BORDER_CLASSES = "tw:mb-6 tw:border-b tw:border-gray-300 tw:dark:border-gray-700"
 
         def initialize(title:, subtitle: nil, border: true)
           @title = title
@@ -19,7 +19,7 @@ module Admin
 
         def wrapper_classes
           ["tw:mt-6 tw:flex tw:flex-row tw:flex-wrap tw:items-baseline tw:gap-x-4 tw:gap-y-2",
-            @border ? BORDER_CLASSES : "tw:mb-4"].join(" ")
+            (BORDER_CLASSES if @border)].compact.join(" ")
         end
       end
     end
