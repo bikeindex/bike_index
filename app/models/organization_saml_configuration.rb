@@ -46,7 +46,9 @@ class OrganizationSamlConfiguration < ApplicationRecord
   after_commit :update_organization
 
   scope :configured, -> {
-    CONFIGURED_ATTRIBUTES.reduce(all) do |relation, attribute|
+    CONFIGURED_ATTRIBUTES.reduce(
+      joins(:organization).where.not(organizations: {user_email_domain: [nil, ""]})
+    ) do |relation, attribute|
       relation.where.not(attribute => [nil, ""])
     end
   }
@@ -58,7 +60,7 @@ class OrganizationSamlConfiguration < ApplicationRecord
   end
 
   def configured?
-    CONFIGURED_ATTRIBUTES.all? { |attribute| self[attribute].present? }
+    organization&.user_email_domain.present? && CONFIGURED_ATTRIBUTES.all? { |attribute| self[attribute].present? }
   end
 
   def email_attribute

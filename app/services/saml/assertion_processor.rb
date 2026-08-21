@@ -27,8 +27,9 @@ module Saml
       organization = saml_configuration.organization
       # Guards the whole resolution, not just provisioning: otherwise an assertion for any address -
       # another org's admin, a superadmin - links or returns an existing account and signs it in.
+      asserted_domain = Organization.email_domain(email)
       return failure("#{email} is not on this organization's SSO domain") unless
-        Organization.email_domain(email) == organization.user_email_domain
+        asserted_domain.present? && asserted_domain == organization.user_email_domain
 
       # One lookup drives both the returning-user short-circuit and the post-login update.
       identity = SsoIdentity.for(organization:, provider:, uid: name_id) ||

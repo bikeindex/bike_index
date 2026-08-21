@@ -63,16 +63,26 @@ RSpec.describe OrganizationSamlConfiguration, type: :model do
       let!(:configured) { FactoryBot.create(:organization_saml_configuration, :active, organization:) }
       let!(:inactive) do
         FactoryBot.create(:organization_saml_configuration, organization: FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: "saml_sso", user_email_domain: "inactive.example.com"), idp_entity_id: "https://idp.example.edu/",
+          idp_sso_target_url: "https://idp.example.edu/sso", idp_cert: idp_cert)
+      end
+      let!(:without_domain) do
+        FactoryBot.create(:organization_saml_configuration, organization: FactoryBot.create(:organization_with_organization_features,
           enabled_feature_slugs: "saml_sso"), idp_entity_id: "https://idp.example.edu/",
           idp_sso_target_url: "https://idp.example.edu/sso", idp_cert: idp_cert)
       end
 
       it "matches configurations with all IdP essentials" do
         expect(described_class.configured).to include(configured, inactive)
+        expect(described_class.configured).to_not include(without_domain)
       end
 
       it "matches configured inactive configurations" do
         expect(described_class.configured_inactive).to eq [inactive]
+      end
+
+      it "does not count a configuration without an organization domain" do
+        expect(without_domain).to_not be_configured
       end
     end
 
