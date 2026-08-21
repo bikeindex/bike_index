@@ -1,6 +1,5 @@
 .organized-page-header
-  %h1.uncap
-    Impound Claims
+  = render(UI::Header::Component.new(text: "Impound Claims", html_class: "uncap"))
 
 - if @render_chart
   = render(UI::Chart::Component.new(series: time_range_counts(collection: available_impound_claims), time_range: @time_range, stacked: true))

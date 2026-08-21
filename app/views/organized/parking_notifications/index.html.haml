@@ -1,6 +1,5 @@
 .organized-page-header
-  %h1
-    = t(".parking_notifications")
+  = render(UI::Header::Component.new(text: t(".parking_notifications")))
 
 = render partial: "repeated_updates_information" # Render information about the result of create_and_send_repeats
 

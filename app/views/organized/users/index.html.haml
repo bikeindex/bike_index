@@ -1,5 +1,4 @@
-%h1.uncap
-  = t(".manage_users")
+= render(UI::Header::Component.new(text: t(".manage_users"), html_class: "uncap"))
 
 
 - unless @show_matching_count

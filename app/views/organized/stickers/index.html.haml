@@ -1,5 +1,5 @@
 .organized-page-header.mb-4
-  %h1
+  = render(UI::Header::Component.new) do
     %em= current_organization.name
     = t(".stickers")
 

@@ -1,12 +1,12 @@
 -# TODO: translations
 
-%h1.uncap
-  Stolen Bike Hot Sheet
+= render(UI::Header::Component.new(text: "Stolen Bike Hot Sheet", html_class: "uncap"))
 
 - if current_organization.hot_sheet_on?
   .row
     .col-md-8
-      %h3.hot-sheet-current-title
+      -# The day-link arrows are absolutely positioned against this box, so it keeps its size and leading
+      = render(UI::Header::Component.new(tag: :h3, html_class: "hot-sheet-current-title tw:text-xl! tw:leading-none!")) do
         - unless @current
           -# Link to current sheet if no next sheet
           - next_day = @hot_sheet.next_sheet.blank? ? nil : @hot_sheet.next_sheet.sheet_date
@@ -52,7 +52,7 @@
         - else
           ask a #{current_organization.short_name} administrator to turn them on.
 
-      %h2.uncap
+      = render(UI::Header::Component.new(tag: :h2, html_class: "uncap")) do
         %span.text-danger
           Preview of
         Stolen Bike Hot Sheet
