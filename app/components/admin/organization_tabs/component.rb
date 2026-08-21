@@ -28,9 +28,9 @@ module Admin
       def tabs
         [[:show, "Show", admin_organization_path(@organization)],
           [:edit, "Edit", edit_admin_organization_path(@organization)],
-          [:locations, locations_label, locations_admin_organization_path(@organization)],
-          [:paid_functionality, "Edit paid functionality", paid_functionality_admin_organization_path(@organization)],
-          ([:sso, "SSO", sso_admin_organization_path(@organization)] if sso?),
+          [:locations, locations_label, edit_admin_organization_path(@organization, tab: "locations")],
+          [:paid_functionality, "Edit paid functionality", edit_admin_organization_path(@organization, tab: "paid_functionality")],
+          ([:sso, "SSO", edit_admin_organization_path(@organization, tab: "sso")] if sso?),
           [:invoices, "Invoices", admin_organization_invoices_path(organization_id: @organization)],
           ([:custom_layouts, "Custom layouts", admin_organization_custom_layouts_path(organization_id: @organization)] if custom_layouts?)]
           .compact.map { |tab, label, href| {label:, href:, active: @active == tab} }

@@ -23,7 +23,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
-      expect(response.body).to include(locations_admin_organization_path(organization))
+      expect(response.body).to include(edit_admin_organization_path(organization, tab: "locations"))
       expect(response.body).to include("href=\"#{base_url}/new\"")
     end
   end
@@ -33,7 +33,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
       get "#{base_url}/new"
       expect(response.status).to eq(200)
       expect(response).to render_template(:new)
-      expect(response.body).to include(locations_admin_organization_path(organization))
+      expect(response.body).to include(edit_admin_organization_path(organization, tab: "locations"))
       expect(response.body).to_not include("href=\"#{base_url}/new\"")
     end
     context "passed end_at" do

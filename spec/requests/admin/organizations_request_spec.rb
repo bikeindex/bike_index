@@ -43,6 +43,15 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template("admin/organizations/edit")
     end
+
+    # tab names the template to render, so anything but one of FORM_TABS has to fall back
+    # rather than reach a template of the request's choosing
+    it "falls back to the edit tab for a tab it doesn't have" do
+      Country.united_states # Read replica
+      get "#{base_url}/#{organization.to_param}/edit", params: {tab: "../show"}
+      expect(response.status).to eq(200)
+      expect(response).to render_template("admin/organizations/edit")
+    end
   end
 
   describe "new" do
@@ -59,7 +68,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
 
     it "renders the locations, which show and edit no longer do" do
       Country.united_states # Read replica
-      get "#{base_url}/#{organization.to_param}/locations"
+      get "#{base_url}/#{organization.to_param}/edit", params: {tab: "locations"}
       expect(response.status).to eq(200)
       expect(response).to render_template("admin/organizations/locations")
       expect(response.body).to include("Main Office")
@@ -74,14 +83,14 @@ RSpec.describe Admin::OrganizationsController, type: :request do
 
   describe "paid_functionality" do
     it "renders nothing to configure" do
-      get "#{base_url}/#{organization.to_param}/paid_functionality"
+      get "#{base_url}/#{organization.to_param}/edit", params: {tab: "paid_functionality"}
       expect(response.status).to eq(200)
       expect(response.body).to include("no paid functionality to configure")
     end
     context "paid" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "reg_address") }
       it "renders the email label and placeholder fields" do
-        get "#{base_url}/#{organization.to_param}/paid_functionality"
+        get "#{base_url}/#{organization.to_param}/edit", params: {tab: "paid_functionality"}
         expect(response.status).to eq(200)
         expect(response.body).to include('name="reg_label-owner_email"')
         expect(response.body).to include('name="reg_label-email_placeholder"')
@@ -90,7 +99,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     context "saml_sso enabled" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
       it "renders the permitted domain, which the SSO tab doesn't own" do
-        get "#{base_url}/#{organization.to_param}/paid_functionality"
+        get "#{base_url}/#{organization.to_param}/edit", params: {tab: "paid_functionality"}
         expect(response.status).to eq(200)
         expect(response.body).to include("permitted domain for SAML SSO")
         expect(response.body).to include('name="organization[user_email_domain]"')
@@ -100,14 +109,14 @@ RSpec.describe Admin::OrganizationsController, type: :request do
 
   describe "sso" do
     it "renders that the feature isn't enabled" do
-      get "#{base_url}/#{organization.to_param}/sso"
+      get "#{base_url}/#{organization.to_param}/edit", params: {tab: "sso"}
       expect(response.status).to eq(200)
       expect(response.body).to include("SAML SSO is not enabled")
     end
     context "saml_sso enabled" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
       it "renders the SAML configuration section" do
-        get "#{base_url}/#{organization.to_param}/sso"
+        get "#{base_url}/#{organization.to_param}/edit", params: {tab: "sso"}
         expect(response.status).to eq(200)
         expect(response).to render_template("admin/organizations/sso")
         expect(response.body).to include("/sso/#{organization.to_param}/metadata")
@@ -290,7 +299,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     context "submitted from a tab" do
       it "returns to the tab, and to show without one" do
         put "#{base_url}/#{organization.to_param}", params: {tab: "sso", organization: {name: "new name"}}
-        expect(response).to redirect_to(sso_admin_organization_url(organization))
+        expect(response).to redirect_to(edit_admin_organization_url(organization, tab: "sso"))
         put "#{base_url}/#{organization.to_param}", params: {tab: "not-a-tab", organization: {name: "newer name"}}
         expect(response).to redirect_to(admin_organization_url(organization))
       end

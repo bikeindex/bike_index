@@ -2,11 +2,12 @@ module Admin
   class OrganizationsController < Admin::BaseController
     include Binxtils::SortableTable
 
-    # Each renders its own slice of the organization form
+    # Each has a template of its own rendering its slice of the organization form; #edit
+    # picks between them, so only "edit" is an action
     FORM_TABS = %w[edit locations paid_functionality sso].freeze
 
-    before_action :find_organization, only: FORM_TABS + %w[show update destroy]
-    before_action :set_admin_form_page_id, only: FORM_TABS + %w[new]
+    before_action :find_organization, only: %w[show edit update destroy]
+    before_action :set_admin_form_page_id, only: %w[edit new]
 
     def index
       @per_page = permitted_per_page
@@ -27,13 +28,8 @@ module Admin
       @pagy, @bikes = pagy(:countish, bikes, limit: 10, page: permitted_page)
     end
 
-    def locations
-    end
-
-    def paid_functionality
-    end
-
-    def sso
+    def edit
+      render action: form_tab || "edit"
     end
 
     def recover
@@ -65,7 +61,7 @@ module Admin
         update_organization_stolen_message
         flash[:success] = "Organization Saved!"
         UpdateOrganizationPosKindJob.perform_async(@organization.id) if run_update_pos_kind
-        redirect_to url_for(action: form_tab || "show", id: @organization.to_param)
+        redirect_to form_tab_url
       else
         render action: form_tab || "edit"
       end
@@ -92,6 +88,13 @@ module Admin
     protected
 
     def form_tab = params[:tab].presence_in(FORM_TABS)
+
+    # "edit" is the tab #edit renders by default, so it stays out of the URL
+    def form_tab_url
+      return admin_organization_url(@organization) if form_tab.blank?
+
+      edit_admin_organization_url(@organization, tab: (form_tab unless form_tab == "edit"))
+    end
 
     def permitted_parameters
       params

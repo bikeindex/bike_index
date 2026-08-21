@@ -336,11 +336,6 @@ Rails.application.routes.draw do
     end
 
     resources :organizations do
-      member do
-        get :locations
-        get :paid_functionality
-        get :sso
-      end
       resources :custom_layouts, only: %i[index edit update], controller: "organizations/custom_layouts"
       resources :invoices, controller: "organizations/invoices"
     end

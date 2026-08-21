@@ -28,7 +28,7 @@ RSpec.describe Admin::OrganizationTabs::Component, type: :component do
       end
 
       it "renders" do
-        expect(component).to have_link("SSO", href: "/admin/organizations/#{organization.to_param}/sso")
+        expect(component).to have_link("SSO", href: "/admin/organizations/#{organization.to_param}/edit?tab=sso")
       end
     end
 
