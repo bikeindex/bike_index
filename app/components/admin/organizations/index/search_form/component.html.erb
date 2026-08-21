@@ -3,18 +3,34 @@
   <%= hidden_field_tag :search_paid, @search_paid %>
   <%= hidden_field_tag :search_pos, @index.params[:search_pos] %>
 
-  <div class="mt-4 mb-4 d-flex justify-content-md-end flex-wrap">
-    <div class="tw:mt-2 tw:w-full tw:md:w-1/3">
+  <%#
+    The combobox is a taller control than the two bootstrap ones, so the fields line up on
+    their text rather than on an edge. gap rather than a margin on each: the combobox is
+    full width on mobile, and a margin on top of that would overflow the row
+  %>
+
+  <div
+    class="
+      tw:my-4 tw:flex tw:flex-wrap tw:items-baseline tw:gap-2
+      tw:md:justify-end
+    "
+  >
+    <div class="tw:w-full tw:md:w-1/3">
       <%= render(UI::Forms::Combobox::Component.new(name: :search_features_and_settings,
         options: self.class.option_groups, value: selected_value, placeholder: "With features",
         multiselect_chip_src: feature_chips_admin_organizations_path)) %>
     </div>
 
-    <div class="align-self-end mt-2 mr-2">
+    <%#
+      Both keep a wrapper: .form-control is width:100%, which as a direct flex child would
+      claim a whole row of its own
+    %>
+
+    <div>
       <%= text_field_tag :search_query, @index.params[:search_query], placeholder: "Name/Location", class: "form-control" %>
     </div>
 
-    <div class="mt-2 mr-2">
+    <div>
       <%= submit_tag "Search", name: "search", class: "btn btn-primary" %>
     </div>
   </div>
