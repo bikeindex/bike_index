@@ -51,6 +51,10 @@ What a component decides about its markup — a label, a placeholder, a class, w
 
 A component having no spec yet isn't a reason to put it in the request spec instead. `spec/components/register/step2/component_spec.rb` is the pattern, including the `render_x` helper that reloads the record so an object updated mid-example isn't answered from the copy the previous render left behind.
 
+## `render_in_view_context` takes its subjects as method arguments
+
+A component needing a `form_builder` renders inside `render_in_view_context { form_for … }`, which `instance_exec`s its block in the view context — so `let` values aren't in scope and a bare `organization` raises `NameError`. Wrap it in a `def rendered_component(organization, current_user)` and call that from the `let(:component)`; the block closes over the method's locals. `spec/components/admin/organizations/form/wrapper/component_spec.rb` is the pattern.
+
 ## `display_dev_info?` is false in test, so nothing it gates is verifiable
 
 `ControllerHelpers#display_dev_info?` opens with `!Rails.env.test?`. Every `only-dev-visible` block it wraps is unrendered in the suite, so threading the flag through a component — a wrong default, a missed hop — passes green and is wrong only in development. Reading the call sites isn't enough either — it can't show that a `UI::Table` cell block is `instance_exec`'d, so an `@ivar` in one resolves against the table and is always nil. Check it in the browser signed in as `dev@bikeindex.org`; the flag needs `developer?` *and* MiniProfiler, so the superadmin banner button won't do it.

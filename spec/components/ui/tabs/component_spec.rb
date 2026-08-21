@@ -15,13 +15,15 @@ RSpec.describe UI::Tabs::Component, type: :component do
     expect(component.css("a").last.text.squish).to eq "Duplicates 3"
     expect(component.css("a").first.css("small")).to be_empty
     # Turbo Drive is off app-wide and opted into per element, so a shared component that
-    # switched it on by default would turn it on wherever it was dropped
-    expect(component.css("a[data-turbo]")).to be_empty
+    # switched it on by default would turn it on wherever it was dropped. Absent rather than
+    # "false": Turbo reads any value but that as opt-in
+    expect(component.css("[data-turbo]")).to be_empty
   end
 
-  it "opts its tabs into turbo when asked" do
+  # One attribute on the nav, which Turbo finds from each link by closest()
+  it "opts into turbo on the nav when asked" do
     turbo = render_inline(described_class.new(tabs:, nav_label: "Thing sections", turbo: true))
 
-    expect(turbo.css("a[data-turbo='true']").length).to eq tabs.length
+    expect(turbo.css("nav[data-turbo='true']").length).to eq 1
   end
 end

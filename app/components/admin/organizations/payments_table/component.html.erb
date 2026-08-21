@@ -1,0 +1,34 @@
+<% organization_id = @organization.to_param %>
+
+<%= render(UI::Table::Component.new(records: payments)) do |table| %>
+  <% table.column(label: "Paid at") do |payment| %>
+    <%= link_to edit_admin_payment_path(payment) do %>
+      <%= render(UI::Time::Component.new(time: payment.created_at)) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "User") do |payment| %>
+    <% if payment.user_id.present? %>
+      <%= link_to payment.user.display_name, edit_admin_user_path(payment.user) %>
+    <% elsif payment.email.present? %>
+      <%= payment.email %>
+      <small class="twless-strong">no user</small>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Invoice") do |payment| %>
+    <% if payment.invoice_id.present? %>
+      <%= link_to payment.invoice.display_name, edit_admin_organization_invoice_path(organization_id:, id: payment.invoice.to_param) %>
+
+      <% if payment.invoice.subscription_start_at %>
+        <small><%= render(UI::Time::Component.new(time: payment.invoice.subscription_start_at)) %></small>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Kind") do |payment| %>
+    <small><%= payment.payment_method.humanize %></small>
+  <% end %>
+
+  <% table.column(label: "Amount") { |payment| payment.amount_formatted } %>
+<% end %>

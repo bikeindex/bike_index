@@ -1,0 +1,20 @@
+<div class="twwiderow tw:items-start">
+  <p>
+    <%= link_to "Custom layouts version history", version_history_url %>
+  </p>
+
+  <table class="table-list">
+    <tr>
+      <td>Paid</td>
+      <td><strong><%= @organization.paid? %></strong></td>
+    </tr>
+  </table>
+</div>
+
+<%= render(Admin::Organizations::CustomLayouts::Table::Component.new(organization: @organization)) %>
+
+<div class="mt-4">
+  <strong>Note:</strong> Custom Layouts (other than landing pages), are
+  <%= link_to "Mail Snippets", admin_mail_snippets_path %>. You can view and
+  edit all the active ones there.
+</div>

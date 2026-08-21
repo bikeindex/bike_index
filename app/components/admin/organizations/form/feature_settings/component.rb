@@ -17,8 +17,6 @@ module Admin
             @current_user = current_user
           end
 
-          def render? = @organization.any_enabled?(OrganizationFeature.with_admin_organization_attributes)
-
           private
 
           def developer? = @current_user.developer?
@@ -83,15 +81,6 @@ module Admin
                max: "#{OrganizationStolenMessage::MAX_SEARCH_RADIUS} miles"}
             end
           end
-
-          def saml_configuration
-            @saml_configuration ||= @organization.organization_saml_configuration ||
-              @organization.build_organization_saml_configuration
-          end
-
-          def metadata_url = saml_metadata_url(org_slug: @organization.to_param)
-
-          def certificate_url = saml_certificate_url(org_slug: @organization.to_param)
         end
       end
     end

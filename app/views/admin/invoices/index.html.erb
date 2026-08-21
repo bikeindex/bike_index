@@ -190,7 +190,7 @@
     Go to individual organizations to create new invoices
   </p>
 
-  <%= render partial: "/admin/organizations/invoices/table", locals: {invoices: @invoices, render_sortable: true, display_organization: true} %>
+  <%= render(Admin::Invoices::Table::Component.new(invoices: @invoices, render_sortable: true, display_organization: true)) %>
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(

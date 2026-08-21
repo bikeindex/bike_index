@@ -16,11 +16,10 @@ module UI
         end
       end
 
-      # Narrow the preview to see the sides go, so the content meets the page's gutter
-      def mobile_flush
-        render(UI::Card::Component.new(mobile_flush: true)) do
-          "Man braid sustainable solarpunk vexillologist grailed marxism schlitz big mood shabby chic cornhole yuccie PBR&B vegan."
-        end
+      # The template supplies the .twwiderow full_bleed is keyed to. Narrow the preview until
+      # the row drops to one column to see the cards lose their sides and meet the gutter
+      def full_bleed
+        {template: "ui/card/component_preview/full_bleed"}
       end
 
       def divided

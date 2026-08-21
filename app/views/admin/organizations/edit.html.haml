@@ -1,7 +1,0 @@
-= render partial: "/admin/organizations/display_header", locals: {}
-
-= form_for [:admin, @organization], html: {data: {controller: "admin--organization-form"}} do |f|
-  = render(Admin::Organizations::Form::Wrapper::Component.new(form_builder: f, current_user:))
-
-  .mt-4
-    = f.submit "Update", class: 'btn-lg btn-success float-right'

@@ -8,10 +8,10 @@ module Admin
           AMBASSADOR_TARGETS = {data: {"admin--organization-form-target": "ambassadorLabel"},
                                 input_data: {"admin--organization-form-target": "ambassadorField"}}.freeze
 
-          def initialize(form_builder:, current_user:)
+          def initialize(form_builder:, display_dev_info: false)
             @form_builder = form_builder
             @organization = form_builder.object
-            @current_user = current_user
+            @display_dev_info = display_dev_info
           end
 
           private
@@ -21,9 +21,9 @@ module Admin
               label: label_with_note(label, note), class_name: "tw:mb-4", **(ambassador ? AMBASSADOR_TARGETS : {})))
           end
 
-          # The target goes on the column, since UI::Forms::Group renders the label itself
-          def ambassador_group(attribute)
-            tag.div(class: "col-md-6", data: AMBASSADOR_TARGETS[:data]) do
+          # The target goes on the grid cell, since UI::Forms::Group renders the label itself
+          def ambassador_group(attribute, class_name: nil)
+            tag.div(class: class_name, data: AMBASSADOR_TARGETS[:data]) do
               render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute:,
                 html_options: {data: AMBASSADOR_TARGETS[:input_data]}))
             end
@@ -55,9 +55,6 @@ module Admin
           def auto_user_emails = @organization.users.pluck(:email).presence || [ENV["AUTO_ORG_MEMBER"]]
 
           def embedable_email = @organization.auto_user&.email
-
-          # A cloned location has neither set
-          def blank_location_attrs = {organization_id: @organization.id, name: @organization.name}
 
           def manual_pos_kind_entries
             [{value: "not_set", label: "not set"}] +

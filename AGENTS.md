@@ -29,6 +29,8 @@ Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't us
 - **Prefer composition over inheritance and `include`.** Share behavior by calling an object that owns it, not by mixing a module into several classes or adding a base class. A `module` extracted only to be `include`d in two classes is usually one of those classes with a parameter — pass the difference in as an argument instead. Rails' own extension points (`ApplicationRecord`, `ApplicationJob`, `ActiveSupport::Concern` for controller filters) are fine; new mixins of our own are what to avoid.
 - **Service objects** (`app/services/`): a stateless service is a `module` with `extend Functionable` (see the `functionable` gem) — inputs passed as args, no instance state, private methods via `conceal` + a `# private below here` block. Don't write a stateless service as a `class` with `def self.` methods.
 - **Class methods go in a `class << self` block** when the class has more than 5 of them, or when any of them should be private — `BugReport` is the pattern.
+- **An endless method takes a trailing `if`/`unless` on the *definition*, not the body.** `def centering = "mx-auto" if @alignment == :center` evaluates the condition once, in the class body where the ivar is still nil, so the method is never defined and every call raises `NameError`. Give it a real body when the result is conditional.
+- **Moving a view into a component turns its locals into methods.** A `<% x = … %>` computed once per template becomes a method run once per *call site* — which is how a single pluck becomes one per table row. Memoize anything that queries as you move it.
 
 ### Comments
 
@@ -100,6 +102,7 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 - **Multi-database**: primary (`ApplicationRecord`) + analytics (`AnalyticsRecord`). Use `db:migrate:down:analytics` for analytics migrations
 - **Soft delete**: some models use `acts_as_paranoid` with `deleted_at` column; use `unscoped` in admin controllers when needed
 - **Admin search**: `sortable_search_params` auto-includes any param starting with `search_`
+- **Admin record screens are tabs**: a record with more than one super-admin page gets `Admin::Headers::Tabs::Component`, with the section's own tabs named in a component of its own (`Admin::Organizations::Tabs` is the pattern) rather than in each view.
 
 # Initial setup
 
