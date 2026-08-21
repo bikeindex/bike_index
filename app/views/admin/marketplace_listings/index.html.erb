@@ -1,5 +1,5 @@
 <% if @bike.present? %>
-  <%= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "marketplace_listings-index"} %>
+  <%= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active: :listings} %>
   <h1 class="mt-5 mb-4">Marketplace Listings</h1>
   <%= render(partial: "table", locals: {collection: @collection, render_sortable: false, skip_item: true}) %>
 <% else %>

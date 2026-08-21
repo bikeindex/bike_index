@@ -1,7 +1,4 @@
-= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "bikes-#{@active_tab}", display_recovery: @active_tab == "recoveries" }
-
-%h1.mt-5.mb-4
-  = @active_tab.titleize
+= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active: @active_tab.to_sym, display_recovery: @active_tab == "recoveries"}
 
 - if @active_tab == "ownerships"
   = render partial: "/admin/ownerships/table", locals: {ownerships: @bike.ownerships.reorder(created_at: :desc), skip_bike: true}

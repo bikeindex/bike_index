@@ -1,50 +1,18 @@
-- stolen_record ||= stolen_record || bike.present? && bike.fetch_current_stolen_record
+- stolen_record ||= bike.present? && bike.fetch_current_stolen_record
 - display_recovery ||= stolen_record.present? && stolen_record.recovered?
-- active_tab ||= "#{controller_name}-#{action_name}"
 
 -# require inline CSS setting because of caching
 - unless display_dev_info?
   <style>.only-dev-visible {display: none !important;} </style>
+
+- if bike.present?
+  = render Admin::Bikes::Tabs::Component.new(bike:, active:, stolen_record: stolen_record.presence, display_recovery:)
 
 .admin-bike-tabs
   - if bike.blank?
     %h1.text-danger
       No Bike present
   - else
-    - if bike.deleted? || bike.likely_spam? || bike.example? || bike.user_hidden
-      .row.mb-4
-        .col-sm-10.offset-sm-1.col-md-6.offset-md-3
-          - if bike.deleted?
-            .alert.alert-danger.mb-4
-              %h4.text-danger #{bike.type_titleize} Deleted
-              Deleted:
-              %span.localizeTime.preciseTime
-                = l bike.deleted_at, format: :convert_time
-          - if bike.likely_spam?
-            .alert.alert-danger.mb-4
-              %h4.text-danger This #{bike.type_titleize} is likely spam
-              No need to remove, this doesn't show up in searches and will be deleted, automatically
-          - if bike.example?
-            .alert.alert-danger.mb-4
-              %h4.text-danger #{bike.type_titleize} is a test registration
-              No need to remove, this doesn't show up in searches and will be deleted, automatically
-              %small.d-block.mt-1 This is also known as an <em>example bike</em>
-          - if bike.user_hidden
-            .alert.alert-warning.mb-4
-              %h4.text-warning
-                Marked HIDDEN
-              - if @bike.unregistered_parking_notification?
-                %span.d-block.mb-2
-                  %strong Hidden because it was created by parking notification.
-                  Only members of the organization (and Bike Index superadmins) can see it.
-                Creation notification:
-                - unregistered_parking_notification = @bike.parking_notifications.reorder(:created_at).first
-                = link_to unregistered_parking_notification.kind_humanized.downcase, organization_parking_notification_path(unregistered_parking_notification, organization_id: unregistered_parking_notification.organization.to_param), class: "text-underline"
-                %small.d-block.mt-2 This is also known as an <span class="text-warning">unregistered</span> bike
-
-              - else
-                %strong.d-block.mb-1 Hidden by the user
-                No one but the user (and Bike Index superadmins) can see it
     .row
       - cache(["admin_bike_main", bike, stolen_record]) do
         .col-lg-2.col-3.mt-auto.mb-2.admin-image-thumb
@@ -55,11 +23,6 @@
               %h3.less-strong
                 No Image
         .col-lg-5.col-9.mt-auto.mb-2.pr-lg-0
-          %p.strong.mb-0
-            = link_to edit_admin_bike_path(bike.to_param) do
-              = bike_status_span(@bike)
-              = bike.title_string
-            = link_to "non-admin view", bike_path(bike.to_param, organization_id: bike.creation_organization.to_param), class: "text-muted float-right"
           %table.table-list.mb-0
             %tbody
               %tr.small.only-dev-visible
@@ -351,64 +314,3 @@
             %tr
               %td.full-width-data{ colspan: 2 }
                 = stolen_record.recovered_description
-  - if bike.present?
-    #bike-tab-wrapper{"data-activetab" => active_tab}
-      .nav.nav-tabs
-        - cache(["admin_bike_tabs-1", bike, stolen_record]) do
-          - impound_count = bike.impound_records.count + ImpoundClaim.involving_bike_id(bike.id).count
-
-          .nav-item
-            = link_to "Edit", edit_admin_bike_path(bike), class: "nav-link bikes-edit"
-          .nav-item
-            = link_to admin_bike_path(bike, active_tab: "duplicates"), class: "nav-link bikes-duplicates" do
-              D<span class="d-none d-md-inline">uplicates</span>
-              %small
-                (#{number_display(bike.duplicate_bike_groups.count)})
-          .nav-item
-            = link_to admin_bike_path(bike, active_tab: "messages"), class: "nav-link bikes-messages" do
-              M<span class="d-none d-md-inline">essages</span>
-              %small
-                (#{number_display(bike.messages_count)})
-          .nav-item
-            = link_to admin_marketplace_listings_path(search_bike_id: bike.id), class: "nav-link marketplace_listings-index" do
-              L<span class="d-none d-md-inline">istings</span>
-              %small
-                (#{number_display(bike.marketplace_listings.count)})
-          .nav-item
-            = link_to admin_bike_path(bike.id, active_tab: "ownerships"), class: "nav-link bikes-ownerships" do
-              O<span class="d-none d-md-inline">wnerships</span>
-              %small
-                (#{number_display(bike.ownerships.count)})
-          .nav-item
-            = link_to admin_bike_path(bike, active_tab: "stickers"), class: "nav-link bikes-stickers" do
-              S<span class="d-none d-md-inline">tickers</span>
-              %small
-                (#{number_display(bike.bike_stickers.count)})
-          - if stolen_record.present?
-            .nav-item
-              = link_to edit_admin_stolen_bike_url(stolen_record.id, stolen_record_id: true), class: "nav-link stolen_bikes-edit" do
-                Stolen
-                %span{ class: (stolen_record.approved? ? "text-success" : "text-danger")}
-                  = stolen_record.approved? ? "✅" : "❌"
-          .nav-item
-            = link_to admin_theft_alerts_path(search_bike_id: bike.id), class: "nav-link theft_alerts" do
-              P<span class="d-none d-md-inline">romoted alerts</span>
-              %small
-                (#{number_display(bike.theft_alerts.count)})
-          .nav-item
-            = link_to admin_bike_path(bike, active_tab: "recoveries"), class: "nav-link bikes-recoveries" do
-              R<span class="d-none d-md-inline">ecoveries</span>
-              %small
-                (#{number_display(bike.recovered_records.count)})
-          - if impound_count > 0
-            .nav-item
-              = link_to admin_bike_path(bike, active_tab: "impound"), class: "nav-link bikes-impound" do
-                I<span class="d-none d-md-inline">mpoundings</span>
-                %small
-                  (#{number_display(impound_count)})
-
-        -# NOTE: not cached, only renders when looking at recoveries
-        - if display_recovery
-          .nav-item
-            = link_to admin_recovery_displays_path(search_bike_id: bike.id), class: "nav-link recovery_displays" do
-              Recovery displays

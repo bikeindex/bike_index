@@ -1,5 +1,5 @@
 <% if @bike.present? %>
-  <%= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "theft_alerts", display_recovery: true} %>
+  <%= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active: :theft_alerts, display_recovery: true} %>
   <h1 class="mt-5 mb-4">
     Promoted Alerts
     <%= link_to "New Promoted alert", new_admin_theft_alert_path(bike_id: @bike.id), class: "small btn btn-outline-success btn-sm ml-2" %>

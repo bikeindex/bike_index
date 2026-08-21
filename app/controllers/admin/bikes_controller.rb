@@ -2,6 +2,10 @@ module Admin
   class BikesController < Admin::BaseController
     include Binxtils::SortableTable
 
+    # The Admin::Bikes::Tabs tabs show renders - every other tab is another controller's
+    # screen, filtered to the bike
+    SHOW_TABS = %w[duplicates messages ownerships stickers recoveries impound].freeze
+
     before_action :find_bike, only: %i[edit update show]
     before_action :set_period, only: %i[index missing_manufacturer]
     around_action :set_reading_role, only: %i[index show]
@@ -78,11 +82,9 @@ module Admin
 
     def show
       @active_tab = params[:active_tab]
-      if @active_tab.present?
-        @page_title = "#{@active_tab.titleize}: #{@bike.title_string}"
-      else
-        redirect_to edit_admin_bike_path and return
-      end
+      return redirect_to(edit_admin_bike_path) unless SHOW_TABS.include?(@active_tab)
+
+      @page_title = "#{@active_tab.titleize}: #{@bike.title_string}"
     end
 
     def edit

@@ -13657,23 +13657,7 @@ table .photo-cell img {
 }
 
 .admin-bike-tabs {
-  margin: -1.5rem -15px 0;
-  padding: 1.5rem 15px 0;
-  overflow-x: scroll;
-  background: #212529;
-  position: relative
-}
-
-.admin-bike-tabs h1,
-.admin-bike-tabs h2,
-.admin-bike-tabs h3,
-.admin-bike-tabs h4,
-.admin-bike-tabs h5 {
-  color: #fff
-}
-
-.admin-bike-tabs table {
-  background: #fff
+  margin-top: 1.5rem
 }
 
 @media(min-width:768px) {
@@ -13689,41 +13673,7 @@ table .photo-cell img {
 }
 
 .admin-bike-tabs .admin-image-thumb h3 {
-  text-align: center;
-  color: #ccc
-}
-
-.admin-bike-tabs #bike-tab-wrapper {
-  padding-top: .5rem;
-  margin-top: .5rem;
-  margin-left: -15px;
-  margin-right: -15px;
-  overflow-x: scroll
-}
-
-.admin-bike-tabs .nav-tabs {
-  padding: .5rem .5rem 0;
-  border-bottom: 2px solid hsla(0, 0%, 80%, .8);
-  margin-bottom: 0
-}
-
-.admin-bike-tabs .nav-tabs .nav-link {
-  border-bottom: 2px solid hsla(0, 0%, 80%, .8);
-  background: #fff;
-  margin-top: .5rem;
-  margin-bottom: -2px;
-  margin-right: 3px
-}
-
-@media(max-width:991.98px) {
-  .admin-bike-tabs .nav-tabs .nav-link {
-    padding-bottom: 1rem
-  }
-}
-
-.admin-bike-tabs .nav-tabs .nav-link.active,
-.admin-bike-tabs .nav-tabs .nav-link:active {
-  border-bottom-color: #fff
+  text-align: center
 }
 
 .credibility-score {
