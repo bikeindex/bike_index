@@ -301,23 +301,16 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect { get "/register/new?discard_token=#{b_param.id_token}" }.to change(BParam, :count).by 0
       expect(BParam.last.origin).to eq "register_flow"
       expect { get "#{base_url}/new" }.to change(BParam, :count).by 1
-      expect(BParam.last.origin).to eq "register_flow_organized"
-    end
+      b_param = BParam.last
+      expect(b_param.origin).to eq "register_flow_organized"
 
-    context "status param" do
-      it "starts a theft report" do
-        get "#{base_url}/new", params: {status: "stolen"}
-        expect(response.status).to eq(200)
-        expect(BParam.last.status).to eq "status_stolen"
-      end
-    end
-
-    context "email param" do
-      it "seeds the owner it names" do
-        get "#{base_url}/new", params: {email: "customer@bikeindex.org"}
-        expect(response.status).to eq(200)
-        expect(BParam.last.owner_email).to eq "customer@bikeindex.org"
-      end
+      # A link naming a status or an owner seeds the shell it lands on, rather than
+      # starting another one
+      expect { get "#{base_url}/new", params: {status: "stolen"} }.to_not change(BParam, :count)
+      expect { get "#{base_url}/new", params: {email: "customer@bikeindex.org"} }
+        .to_not change(BParam, :count)
+      expect(b_param.reload).to have_attributes(status: "status_stolen",
+        owner_email: "customer@bikeindex.org")
     end
 
     context "gone back to the old view" do
@@ -348,9 +341,8 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         get "#{base_url}/new"
         expect(session[:old_register_view]).to be_blank
         expect(menu_add_bike_path).to eq "#{base_url}/new"
-      end
 
-      it "is not set by landing on the old view any other way" do
+        # Landing on the old view any other way isn't a preference
         get old_view_path
         expect(session[:old_register_view]).to be_blank
         expect(menu_add_bike_path).to eq "#{base_url}/new"
@@ -379,15 +371,13 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     let!(:bike) { FactoryBot.create(:bike_organized, serial_number: "ABCD1234", creation_organization: current_organization) }
     let!(:other_bike) { FactoryBot.create(:bike, serial_number: "WXYZ9999") }
 
-    it "searches and returns matching org bikes" do
+    it "returns matching org bikes, and none from other orgs" do
       get "#{base_url}/multi_search_response", params: {serial: "ABCD1234"},
         headers: {"Accept" => "text/vnd.turbo-stream.html"}
       expect(response.status).to eq(200)
       expect(response.media_type).to eq("text/vnd.turbo-stream.html")
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
-    end
 
-    it "does not return bikes from other orgs" do
       get "#{base_url}/multi_search_response", params: {serial: "WXYZ9999"},
         headers: {"Accept" => "text/vnd.turbo-stream.html"}
       expect(response.status).to eq(200)
@@ -431,7 +421,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     let!(:unclaimed_sticker) { FactoryBot.create(:bike_sticker, code: "CA113", organization: current_organization) }
     let!(:other_sticker) { FactoryBot.create(:bike_sticker_claimed, code: "ZZ999", bike: other_bike) }
 
-    it "returns claimed-sticker bikes (own + cross-org with redaction), skips unclaimed, 400s without query" do
+    it "returns claimed-sticker bikes (own + cross-org with redaction), skips unclaimed, 400s or blanks on a bad query" do
       # Own-org claimed sticker → bike returned
       get "#{base_url}/multi_search_response", params: {search_kind: "stickers", query: "CA112"}, headers: turbo_headers
       expect(response.status).to eq(200)
@@ -453,9 +443,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       # Missing query → bad request
       get "#{base_url}/multi_search_response", params: {search_kind: "stickers"}, headers: turbo_headers
       expect(response.status).to eq(400)
-    end
 
-    it "returns no bikes when the query normalizes to a blank code" do
       # bike and other_bike both have claimed stickers; a query that normalizes to a blank code
       # must not fall through to sticker_code_search's `all` and surface every organization's bikes
       get "#{base_url}/multi_search_response", params: {search_kind: "stickers", query: "bikeindex.org/bikes/"}, headers: turbo_headers
