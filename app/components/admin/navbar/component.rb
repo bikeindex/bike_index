@@ -13,11 +13,10 @@ module Admin
       NAV_LINK_CLASS = "tw:block tw:p-2 tw:no-underline tw:text-black/50 " \
         "tw:hover:text-black/70 tw:focus:text-black/70 tw:is-active:text-black/90"
 
-      def initialize(current_user:, user_root_url:, controller_name:, action_name:, search_filtered: false)
+      def initialize(current_user:, user_root_url:, controller_path:, search_filtered: false)
         @current_user = current_user
         @user_root_url = user_root_url
-        @controller_name = controller_name
-        @action_name = action_name
+        @controller_path = controller_path
         @search_filtered = search_filtered
       end
 
@@ -79,7 +78,7 @@ module Admin
         return @current_nav_link if defined?(@current_nav_link)
 
         @current_nav_link = nav_select_links
-          .detect { |link| on_page?(link, match_for(link)) } || invoices_edit_link
+          .detect { |link| on_page?(link, match_for(link)) } || nested_nav_link
       end
 
       # The picker names the current page in prose, which UI::ActiveLink can't answer for it —
@@ -100,11 +99,25 @@ module Admin
         link&.dig(:match) || :controller
       end
 
-      # Because organization invoices edit doesn't match controller
-      def invoices_edit_link
-        return unless @controller_name == "invoices" && @action_name == "edit"
+      # A controller nested under another - admin/organizations/invoices, and custom layouts -
+      # matches no link, since the links are all top level. It borrows the link for the same
+      # section where there is one (admin/invoices), and the one it's nested under otherwise
+      def nested_nav_link
+        segments = @controller_path.split("/")
+        return if segments.size < 3
 
-        nav_select_links.detect { |link| link[:title].match(/invoices/i) }
+        link_for_controller([segments.first, segments.last].join("/")) ||
+          link_for_controller(segments[..-2].join("/"))
+      end
+
+      def link_for_controller(controller_path)
+        nav_select_links.detect { |link| controller_for(link[:path]) == controller_path }
+      end
+
+      def controller_for(path)
+        Rails.application.routes.recognize_path(path)[:controller]
+      rescue ActionController::RoutingError
+        nil
       end
 
       def nav_select_links
