@@ -58,7 +58,7 @@
     Recent <%= link_to "Organizations", admin_organizations_url %>
   </h2>
 
-  <%= render(Admin::Organizations::Table::Component.new(organizations: @organizations)) %>
+  <%= render(Admin::Organizations::Table::Component.new(organizations: @organizations, sort_state:)) %>
 
   <div class="row justify-content-end">
     <div class="col-auto">

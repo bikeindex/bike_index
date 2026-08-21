@@ -1,4 +1,4 @@
-<%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :show)) %>
+<%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :show, display_dev_info: display_dev_info?)) %>
 
 <% if OrgServices::Displayer.law_enforcement_missing_verified_features?(@organization) %>
   <div class="alert alert-info">
@@ -15,8 +15,8 @@
 %>
 
 <div class="twwiderow tw:items-start tw:gap-y-6">
-  <%= render(Admin::Organizations::Show::Details::Component.new(organization: @organization)) %>
-  <%= render(Admin::Organizations::Show::Account::Component.new(organization: @organization)) %>
+  <%= render(Admin::Organizations::Show::Details::Component.new(organization: @organization, display_dev_info: display_dev_info?)) %>
+  <%= render(Admin::Organizations::Show::Account::Component.new(organization: @organization, display_dev_info: display_dev_info?)) %>
 
   <%# Invoices is the one with more than one root element, so it needs the cell wrapper %>
   <div>

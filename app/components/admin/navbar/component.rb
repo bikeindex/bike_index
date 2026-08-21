@@ -13,11 +13,10 @@ module Admin
       NAV_LINK_CLASS = "tw:block tw:p-2 tw:no-underline tw:text-black/50 " \
         "tw:hover:text-black/70 tw:focus:text-black/70 tw:is-active:text-black/90"
 
-      def initialize(current_user:, user_root_url:, controller_name:, action_name:, search_filtered: false)
+      def initialize(current_user:, user_root_url:, controller_path:, search_filtered: false)
         @current_user = current_user
         @user_root_url = user_root_url
-        @controller_name = controller_name
-        @action_name = action_name
+        @controller_path = controller_path
         @search_filtered = search_filtered
       end
 
@@ -79,13 +78,16 @@ module Admin
         return @current_nav_link if defined?(@current_nav_link)
 
         @current_nav_link = nav_select_links
-          .detect { |link| on_page?(link, match_for(link)) } || invoices_edit_link
+          .detect { |link| on_page?(link, match_for(link)) } || nested_nav_link
       end
 
       # The picker names the current page in prose, which UI::ActiveLink can't answer for it —
-      # the links themselves go active in the browser
+      # the links themselves go active in the browser. A :path entry is one action on another
+      # entry's controller, so only the request can say whether we're on it
       def on_page?(link, match)
-        helpers.current_page_active?(link[:path], match == :controller)
+        return controller_for(link[:path]) == @controller_path if match == :controller
+
+        helpers.current_page_active?(link[:path])
       end
 
       def nav_link_for(path)
@@ -100,11 +102,30 @@ module Admin
         link&.dig(:match) || :controller
       end
 
-      # Because organization invoices edit doesn't match controller
-      def invoices_edit_link
-        return unless @controller_name == "invoices" && @action_name == "edit"
+      # The links are all top level, so a controller nested under another - an organization's
+      # invoices, and its custom layouts - matches none of them
+      def nested_nav_link
+        section, parent, nested = @controller_path.split("/")
+        return if nested.blank?
 
-        nav_select_links.detect { |link| link[:title].match(/invoices/i) }
+        link_for_controller("#{section}/#{nested}") || link_for_controller("#{section}/#{parent}")
+      end
+
+      def link_for_controller(controller_path)
+        nav_select_links.detect { |link| controller_for(link[:path]) == controller_path }
+      end
+
+      # Every link gets asked about twice over on a nested page, and recognizing a path costs
+      # ~20µs against the whole route set
+      def controller_for(path)
+        @controller_for ||= {}
+        return @controller_for[path] if @controller_for.key?(path)
+
+        @controller_for[path] = begin
+          Rails.application.routes.recognize_path(path)[:controller]
+        rescue ActionController::RoutingError
+          nil
+        end
       end
 
       def nav_select_links

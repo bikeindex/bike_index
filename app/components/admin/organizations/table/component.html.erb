@@ -3,10 +3,9 @@
   <style>.deleted-col { display: none; }</style>
 <% end %>
 
-<% search_params = helpers.sortable_search_params %>
 <% pos_link = method(:pos_link) %>
 
-<%= render(UI::Table::Component.new(records: @organizations, cache_key:, render_sortable: @render_sortable)) do |table| %>
+<%= render(UI::Table::Component.new(records: @organizations, cache_key:, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
   <% table.column(sortable: "name") do |organization| %>
     <%= link_to organization.name, admin_organization_url(organization) %>
 
@@ -46,7 +45,8 @@
   <% end %>
 
   <% table.column(label: "Type") do |organization| %>
-    <%= link_to organization.kind_humanized, admin_organizations_path(search_params.merge(search_kind: organization.kind)) %>
+    <%# A fixed path rather than the current search params, which the row cache would bake in %>
+    <%= link_to organization.kind_humanized, admin_organizations_path(search_kind: organization.kind) %>
   <% end %>
 
   <% table.column(sortable: "pos_kind", label: "POS") do |organization| %>

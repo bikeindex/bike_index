@@ -16,9 +16,10 @@ module Admin
                .map { |display, value| {display:, value: value.to_s} }}
           end
 
-          def initialize(search_paid:, features_and_settings_ids:)
+          def initialize(search_paid:, features_and_settings_ids:, index:)
             @search_paid = search_paid
             @features_and_settings_ids = features_and_settings_ids
+            @index = index
           end
 
           private

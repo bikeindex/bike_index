@@ -6,10 +6,11 @@ module Admin
       # The invoice form, on both new and edit. The feature checkboxes and the running totals
       # are driven by the vendored admin bundle, which finds them by id.
       class Component < ApplicationComponent
-        def initialize(organization:, invoice:, organization_features:)
+        def initialize(organization:, invoice:, organization_features:, display_dev_info: false)
           @organization = organization
           @invoice = invoice
           @organization_features = organization_features
+          @display_dev_info = display_dev_info
         end
 
         private
@@ -34,7 +35,7 @@ module Admin
         end
 
         def show_feature_slugs?(organization_feature)
-          helpers.display_dev_info? && organization_feature.feature_slugs_string.present?
+          @display_dev_info && organization_feature.feature_slugs_string.present?
         end
 
         # Passed to the fields rather than assigned onto the invoice - rendering it

@@ -15,7 +15,8 @@ module Admin
 
         # active: is passed rather than read off the route because a failed update renders the
         # tab it was submitted from, while the action is still "update"
-        def initialize(organization:, active:, subtitle: nil, additional_link: nil, turbo: true)
+        def initialize(organization:, active:, subtitle: nil, additional_link: nil, turbo: true,
+          display_dev_info: false)
           raise_if_invalid_value!(:active, active, TABS)
 
           @organization = organization
@@ -23,6 +24,7 @@ module Admin
           @subtitle = subtitle
           @additional_link = additional_link
           @turbo = turbo
+          @display_dev_info = display_dev_info
         end
 
         private
@@ -43,7 +45,7 @@ module Admin
         # renders (saying the feature is off) and shouldn't lose its place in the row
         def sso? = @organization.enabled?("saml_sso") || @active == :sso
 
-        def custom_layouts? = helpers.display_dev_info? || @active == :custom_layouts
+        def custom_layouts? = @display_dev_info || @active == :custom_layouts
 
         def new_invoice_link
           path = new_admin_organization_invoice_path(organization_id: @organization)

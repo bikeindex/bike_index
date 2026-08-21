@@ -8,9 +8,10 @@ module Admin
           AMBASSADOR_TARGETS = {data: {"admin--organization-form-target": "ambassadorLabel"},
                                 input_data: {"admin--organization-form-target": "ambassadorField"}}.freeze
 
-          def initialize(form_builder:)
+          def initialize(form_builder:, display_dev_info: false)
             @form_builder = form_builder
             @organization = form_builder.object
+            @display_dev_info = display_dev_info
           end
 
           private

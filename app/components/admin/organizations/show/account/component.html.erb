@@ -7,7 +7,7 @@
     </td>
   </tr>
 
-  <% if helpers.display_dev_info? %>
+  <% if @display_dev_info %>
     <tr class="small">
       <td class="only-dev-visible">API V1 token</td>
 
@@ -88,7 +88,7 @@
         <%= link_to "Lightspeed POS", "https://posintegration.bikeindex.org/admin/organizations/#{@organization.id}" %>
       <% end %>
 
-      <% if helpers.display_dev_info? && @organization.manual_pos_kind.present? %>
+      <% if @display_dev_info && @organization.manual_pos_kind.present? %>
         <small class="only-dev-visible d-inline-block ml-2">
           <em class="less-strong">manual POS kind set:</em>
           <%= @organization.manual_pos_kind %>
