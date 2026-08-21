@@ -1,6 +1,5 @@
 .mb-4
-  %h1.uncap
-    = t(".edit_organization_role_html", email: @organization_role.invited_email)
+  = render(UI::Header::Component.new(text: t(".edit_organization_role_html", email: @organization_role.invited_email), html_class: "uncap"))
 
 %p.text-right
   = link_to t(".remove_from_organization"),

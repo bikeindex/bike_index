@@ -44,12 +44,11 @@ RSpec.describe UI::Header::Component, type: :component do
     end
   end
 
-  context "with h4 tag" do
+  context "with an unsupported tag" do
     let(:options) { {text: "Minor section", tag: :h4} }
 
-    it "renders an h4" do
-      expect(component).to have_css("h4")
-      expect(component.to_html).to include("tw:text-base")
+    it "raises rather than rendering off-scale" do
+      expect { component }.to raise_error(KeyError)
     end
   end
 

@@ -42,6 +42,7 @@ class RegisterController < ApplicationController
   def embed
     @page_title = I18n.t("meta_titles.register_step_1")
     render Register::Embed::Component.new(b_param: @b_param, steps: flow_steps, current_user:,
+      header_tags_options: helpers.header_tags_component_options,
       button_color: HexColor.normalize(params[:button]),
       button_hover_color: HexColor.normalize(params[:button_hover])), layout: false
   end

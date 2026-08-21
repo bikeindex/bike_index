@@ -28,7 +28,7 @@
 
   <%= render(current_alerts_component) %>
 
-  <%= render(Registrations::Show::OrgTopActions::Wrapper::Component.new(bike: @bike, organization: @organization, org_role: @org_role, current_user: @current_user)) %>
+  <%= render(Registrations::Show::OrgTopActions::Wrapper::Component.new(bike: @bike, organization: @organization, org_role: @org_role, current_user: @current_user, display_dev_info: @display_dev_info)) %>
 
   <%# tw:contents collapses the column wrappers on mobile, so tw:order can interleave them %>
 
@@ -171,7 +171,7 @@
                     <%= link_to(@bike.owner_email, "mailto:#{@bike.owner_email}", class: "twlink") %>
                   <% end %>
                 <% end %>
-                <%= info_row(translation(".owner_phone")) { render UI::PhoneDisplay::Component.new(phone: owner_phone) } %>
+                <%= info_row(translation(".owner_phone")) { render Atom::Phone::Component.new(phone: owner_phone) } %>
                 <% owner_reg_field_rows.each do |label, value| %>
                   <%= info_row(label, value) %>
                 <% end %>

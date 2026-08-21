@@ -3,8 +3,9 @@
 module Org
   module BulkImportError
     class Component < ApplicationComponent
-      def initialize(bulk_import:, short_display: false, in_admin: false)
+      def initialize(bulk_import:, short_display: false, in_admin: false, display_dev_info: false)
         @bulk_import = bulk_import
+        @display_dev_info = display_dev_info
         @short_display = short_display
         @in_admin = in_admin
       end

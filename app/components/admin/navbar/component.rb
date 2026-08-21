@@ -13,8 +13,12 @@ module Admin
       NAV_LINK_CLASS = "tw:block tw:p-2 tw:no-underline tw:text-black/50 " \
         "tw:hover:text-black/70 tw:focus:text-black/70 tw:is-active:text-black/90"
 
-      def initialize(current_user:)
+      def initialize(current_user:, user_root_url:, controller_name:, action_name:, search_filtered: false)
         @current_user = current_user
+        @user_root_url = user_root_url
+        @controller_name = controller_name
+        @action_name = action_name
+        @search_filtered = search_filtered
       end
 
       private
@@ -62,7 +66,7 @@ module Admin
       def display_view_all?
         return false unless current_link_has_sub_pages?
 
-        !on_page?(current_nav_link, :path) || helpers.admin_search_filtered?
+        !on_page?(current_nav_link, :path) || @search_filtered
       end
 
       # Only a controller-matched link goes active on pages other than its own, so it's the
@@ -98,7 +102,7 @@ module Admin
 
       # Because organization invoices edit doesn't match controller
       def invoices_edit_link
-        return unless controller_name == "invoices" && action_name == "edit"
+        return unless @controller_name == "invoices" && @action_name == "edit"
 
         nav_select_links.detect { |link| link[:title].match(/invoices/i) }
       end

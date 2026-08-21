@@ -1,7 +1,7 @@
-<h1 class="uncap tw:mb-6 tw:text-2xl tw:font-semibold">
+<%= render(UI::Header::Component.new(html_class: "uncap")) do %>
   Previewing <strong><%= @registration_sequence.status_display %></strong>
   registration sequence
-</h1>
+<% end %>
 
 <%#
   Full-bleed on mobile so the gray runs edge to edge, past the org page's padding. pt

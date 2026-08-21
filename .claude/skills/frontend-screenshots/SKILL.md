@@ -139,6 +139,8 @@ Previews that query the dev DB (e.g. `User.admins.first`) render nothing when th
 
 When the caller wants before/after, repeat the capture loop against the base ref. The caller passes the base — `origin/main` by default, or the PR's actual base when it isn't `main` (a stacked PR's base often isn't). Set `BASE_REF` to that remote ref (e.g. `origin/main`, `origin/sethherr/feature-x`) and use it throughout; `git fetch origin` first so it's current.
 
+**Capture the base at what the branch actually merged, not at the ref's tip.** A fetch moves `origin/main` to commits the branch hasn't taken, so a base capture there renders *the base's newer work* and the diff attributes it to this PR. Check `git rev-list --count HEAD..$BASE_REF` before detaching: non-zero means merge first, or detach at `$(git merge-base HEAD $BASE_REF)` instead. On a busy repo the base can move between the branch capture and the base capture of the same run.
+
 **The detached checkout in step 3 is a sanctioned exception to "never change branch" — don't stop and ask for it.** It is the only one: it detaches at a *remote* ref, reads, and returns to the same branch within this section, committing nothing. The return to the original branch is part of that sequence, not a second exception. Every other reason to leave the current branch still needs the user's say-so — nothing here licenses checking out some other branch, `git checkout -b`, or a checkout that outlives the capture.
 
 1. `git status` — abort if there are uncommitted changes.

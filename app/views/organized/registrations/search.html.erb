@@ -14,7 +14,9 @@
 <% form_interpreted_params = @interpreted_params.merge(
   search_stickers: @search_stickers.presence,
   search_address: @search_address.presence,
-  search_status: @search_status
+  search_status: @search_status,
+  search_email: params[:search_email],
+  search_notes: params[:search_notes]
 ).compact %>
 
 <div

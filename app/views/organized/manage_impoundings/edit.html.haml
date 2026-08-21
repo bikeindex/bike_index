@@ -1,6 +1,5 @@
 .mb-4
-  %h1.uncap
-    = t(".impound_settings_html", org_name: @organization.name)
+  = render(UI::Header::Component.new(text: t(".impound_settings_html", org_name: @organization.name), html_class: "uncap"))
 
 = form_for @impound_configuration, { url: organization_manage_impounding_path(id: @organization.id, organization_id: @organization.to_param), action: "update", html: { class: "organized-form" } } do |f|
 
