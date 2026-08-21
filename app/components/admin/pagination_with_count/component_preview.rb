@@ -46,7 +46,7 @@ module Admin
       private
 
       def index_state(count:, limit:, page: 1, **attrs)
-        ComponentStates::IndexState.new(
+        ComponentStructs::IndexState.new(
           pagy: Pagy::Offset.new(count:, page:, limit:), per_page: limit, **attrs
         )
       end

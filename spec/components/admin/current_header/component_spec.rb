@@ -9,7 +9,7 @@ RSpec.describe Admin::CurrentHeader::Component, type: :component do
   let(:params) { {} }
 
   def index_state(**attrs)
-    ComponentStates::IndexState.new(params:, sort_state: ComponentStates::SortState.new(search_params: params), **attrs)
+    ComponentStructs::IndexState.new(params:, sort_state: ComponentStructs::SortState.new(search_params: params), **attrs)
   end
 
   describe "rendering" do

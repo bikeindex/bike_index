@@ -131,9 +131,9 @@ When deleting an `id`/`class`, grep the repo for the name before deciding what t
 - A *view helper* that only gathers a component's arguments out of controller assigns is still a helper — pass those arguments from the view.
 - `ApplicationComponentHelper` is the exception (`number_display`, `amount_display`, `check_mark`, `search_emoji`) — value formatters `ApplicationComponent` already includes, so components call them bare.
 
-**What's banned is the component reaching out, not the number of arguments.** State the controller already owns can be named and passed as one value object — `ComponentStates::IndexState` (built in `ControllerHelpers#admin_index_state`) and `ComponentStates::SortState` (`ControllerHelpers#sort_state`) are the pattern — value objects live in `app/services/component_states/`. The component stays pure either way; a bundle just stops seventy views from re-listing the same seventeen assigns.
+**What's banned is the component reaching out, not the number of arguments.** State the controller already owns can be named and passed as one value object — `ComponentStructs::IndexState` (built in `ControllerHelpers#admin_index_state`) and `ComponentStructs::SortState` (`ControllerHelpers#sort_state`) are the pattern — value objects live in `app/services/component_structs/`. The component stays pure either way; a bundle just stops seventy views from re-listing the same seventeen assigns.
 
-Bundle only what's cohesive — one subject, assembled in one place. `IndexState` is "this admin index request"; `ComponentStates::SortState` is "how this table is sorted and what its links carry". A grab-bag of unrelated request facts (`display_dev_info`, `current_user`, `current_country_id`) is not a value object, it's `helpers` renamed — those stay individual arguments.
+Bundle only what's cohesive — one subject, assembled in one place. `IndexState` is "this admin index request"; `ComponentStructs::SortState` is "how this table is sorted and what its links carry". A grab-bag of unrelated request facts (`display_dev_info`, `current_user`, `current_country_id`) is not a value object, it's `helpers` renamed — those stay individual arguments.
 
 ## ViewComponent rules
 

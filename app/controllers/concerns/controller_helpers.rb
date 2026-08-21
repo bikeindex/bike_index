@@ -53,13 +53,13 @@ module ControllerHelpers
   end
 
   def sort_state
-    @sort_state ||= ComponentStates::SortState.new(search_params: helpers.sortable_search_params,
+    @sort_state ||= ComponentStructs::SortState.new(search_params: helpers.sortable_search_params,
       sort: helpers.sort_column, direction: helpers.sort_direction)
   end
 
   # Built lazily rather than in a before_action, because the subjects below are set by the action
   def admin_index_state
-    @admin_index_state ||= ComponentStates::IndexState.new(
+    @admin_index_state ||= ComponentStructs::IndexState.new(
       params:, sort_state:,
       render_chart: @render_chart, render_deleted: @render_deleted,
       pagy: @pagy, per_page: @per_page, time_range: @time_range,

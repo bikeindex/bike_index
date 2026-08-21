@@ -7,7 +7,7 @@ RSpec.describe Admin::IndexSkeleton::Component, type: :component do
   # Always provide table_view to avoid needing a _table partial in tests
   let(:options) do
     {table_view: "<div>table</div>".html_safe, collection: Bike.none, viewing: "Bikes",
-     index: ComponentStates::IndexState.new(per_page: 25, period: "all", start_time: Time.current - 1.year,
+     index: ComponentStructs::IndexState.new(per_page: 25, period: "all", start_time: Time.current - 1.year,
        end_time: Time.current)}
   end
 
