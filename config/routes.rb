@@ -271,6 +271,8 @@ Rails.application.routes.draw do
         get :missing_manufacturer
         post :update_manufacturers
         put :unrecover
+        # Selection chips for the organizations combobox on the edit form
+        post :organization_chips
       end
       member { get :get_destroy }
     end

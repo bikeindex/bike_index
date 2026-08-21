@@ -118,6 +118,20 @@ module Admin
       end
     end
 
+    # The organizations picker is a multiselect combobox, which renders its selections
+    # through this rather than holding them itself
+    def organization_chips
+      organizations = Organization.unscoped.where(id: combobox_values).index_by { it.id.to_s }
+
+      chips = combobox_values.filter_map do |value|
+        next if organizations[value].blank?
+
+        helpers.hw_combobox_selection_chip(display: organizations[value].name, value:, for_id: params[:for_id])
+      end
+
+      render turbo_stream: helpers.safe_join(chips)
+    end
+
     def unrecover
       stolen_record = StolenRecord.unscoped.where(bike_id: params[:bike_id],
         id: params[:stolen_record_id]).first
@@ -133,6 +147,11 @@ module Admin
     helper_method :available_bikes
 
     protected
+
+    # Selection order, so adding an organization appends its chip
+    def combobox_values
+      @combobox_values ||= params[:combobox_values].to_s.split(",")
+    end
 
     def sortable_columns
       %w[id owner_email manufacturer_id updated_by_user_at]
