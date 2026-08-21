@@ -3,7 +3,7 @@
 module UI
   module Forms
     module NestedFields
-      # Rendering the saved records, the blank set and the add link together is what keeps an
+      # Rendering the saved records, the blank set and the add button together is what keeps an
       # added record identical to a saved one.
       #
       # fields_component renders one record into the wrapper this builds, and owes it a
@@ -56,7 +56,7 @@ module UI
 
         def target_data(name) = {"#{CONTROLLER}-target": name}
 
-        def add_link_data = {action: "click->#{CONTROLLER}#add"}
+        def add_button_data = {action: "click->#{CONTROLLER}#add"}
       end
     end
   end

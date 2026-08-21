@@ -55,7 +55,7 @@ module Admin
 
         def embedable_email = @organization.auto_user&.email
 
-        # A location the "Add a location" link just cloned has neither set
+        # A location the "Add a location" button just cloned has neither set
         def blank_location_attrs = {organization_id: @organization.id, name: @organization.name}
 
         def manual_pos_kind_entries

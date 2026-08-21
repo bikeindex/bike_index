@@ -22,8 +22,8 @@ RSpec.describe UI::Forms::NestedFields::Component, type: :component do
   # Nokogiri treats a template's content as ordinary children, so drop it to see only what renders
   let(:rendered_fields) { component.dup.tap { |fragment| fragment.css("template").remove } }
 
-  it "renders the saved records, a blank set in the template, and the add link" do
-    expect(component.at_css("a[data-action='click->ui--forms--nested-fields#add']").text).to eq "Add a location"
+  it "renders the saved records, a blank set in the template, and the add button" do
+    expect(component.at_css("button[data-action='click->ui--forms--nested-fields#add']").text).to eq "Add a location"
     expect(component).to have_css("[data-ui--forms--nested-fields-target='target']")
     # The wrapper class is the component's, so it hands the controller the selector for it
     expect(component.at_css("[data-controller]")["data-ui--forms--nested-fields-wrapper-selector-value"])
@@ -44,13 +44,13 @@ RSpec.describe UI::Forms::NestedFields::Component, type: :component do
 
   context "with class_name, fields_class_name and obj_attrs" do
     let(:options) do
-      {class_name: "row mt-4", add_class_name: "twlink", fields_class_name: "col-md-6",
+      {class_name: "row mt-4", add_class_name: "mx-auto", fields_class_name: "col-md-6",
        obj_attrs: {name: "New location"}}
     end
 
     it "passes them through" do
       expect(component.at_css("[data-controller]")["class"]).to eq "row mt-4"
-      expect(component.at_css("a[data-action*='#add']")["class"]).to eq "twlink"
+      expect(component.at_css("button[data-action*='#add']")["class"]).to include("mx-auto").and include("twlink")
       expect(rendered_fields.at_css(".nested-fields-wrapper")["class"]).to eq "nested-fields-wrapper col-md-6"
       expect(template.at_css("input[name$='[name]']")["value"]).to eq "New location"
     end
