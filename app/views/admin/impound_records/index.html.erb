@@ -1,23 +1,13 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @search_status == available_statuses.first ? '' : 'active' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <% if @search_status != "current" && ImpoundRecord.statuses.include?(@search_status) %>
-        <%= ImpoundRecord.statuses_humanized[@search_status.to_sym] %>
-      <% elsif @search_status == "all" %>
-        All statuses
-      <% else %>
-        <%= @search_status.titleize %> records
-      <% end %>
-    </a>
+  <li>
+    <% status_filter_name = if @search_status != "current" && ImpoundRecord.statuses.include?(@search_status)
+         ImpoundRecord.statuses_humanized[@search_status.to_sym]
+       else
+         @search_status == "all" ? "All statuses" : "#{@search_status.titleize} records"
+       end %>
 
-    <div class="dropdown-menu">
+    <%= render(UI::Dropdown::Component.new(name: status_filter_name, button_size: :sm,
+          active: @search_status != available_statuses.first)) do |dropdown| %>
       <% available_statuses.each do |status| %>
         <% if status != "current" && ImpoundRecord.statuses.include?(status) %>
           <% display_status = ImpoundRecord.statuses_humanized[status.to_sym] %>
@@ -29,18 +19,17 @@
 
         <% status_active = @search_status == status %>
         <% status_link_params = sortable_search_params.merge(search_status: (status_active ? nil : status)) %>
-
-        <%= link_to display_status, url_for(status_link_params), class: "dropdown-item #{status_active ? 'active' : ''}" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: display_status, path: url_for(status_link_params), match: :query, query: {search_status: status}) } %>
 
         <% if status == "resolved" %>
-          <div class="dropdown-divider"></div>
+          <% dropdown.with_entry_divider %>
         <% end %>
       <% end %>
-    </div>
+    <% end %>
   </li>
 
-  <li class="nav-item">
-    <%= link_to "with claims", url_for(sortable_search_params.merge(search_with_claims: !@with_claims)), class: "nav-link #{@with_claims ? 'active' : ''}" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "with claims", href: url_for(sortable_search_params.merge(search_with_claims: !@with_claims)), size: :sm, active: @with_claims)) %>
   </li>
 <% end %>
 

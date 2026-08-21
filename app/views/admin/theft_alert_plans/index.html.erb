@@ -1,6 +1,6 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item">
-    <%= link_to "New Promoted Alert Plan", new_admin_theft_alert_plan_path, class: "nav-link" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "New Promoted Alert Plan", href: new_admin_theft_alert_plan_path, color: :primary, size: :sm)) %>
   </li>
 <% end %>
 

@@ -1,6 +1,6 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item">
-    <%= link_to "New Manufacturer", new_admin_manufacturer_url, class: "nav-link" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "New Manufacturer", href: new_admin_manufacturer_url, color: :primary, size: :sm)) %>
   </li>
 <% end %>
 

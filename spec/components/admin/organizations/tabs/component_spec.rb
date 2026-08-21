@@ -69,7 +69,7 @@ RSpec.describe Admin::Organizations::Tabs::Component, type: :component do
   end
 
   describe "the top right link" do
-    let(:organized_view) { component.at_css(".admin-subnav ul .nav-item a") }
+    let(:organized_view) { component.at_css("ul li a") }
 
     context "on show" do
       it "links to the organization's dashboard" do
@@ -145,7 +145,8 @@ RSpec.describe Admin::Organizations::Tabs::Component, type: :component do
     end
 
     it "renders them alongside the organization's view" do
-      expect(component.at_css("h1").text.squish).to eq "Cool Bikes Finished Registration"
+      expect(component.at_css("h1").text.squish).to eq "Cool Bikes"
+      expect(component).to have_content("Finished Registration")
       expect(component).to have_link("Party", href: "/somewhere")
       expect(component).to have_link("organization's view", href: "/o/#{organization.to_param}/emails")
     end
