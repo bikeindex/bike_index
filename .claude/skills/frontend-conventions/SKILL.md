@@ -55,6 +55,8 @@ Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesh
 
 **Admin is the exception, and it inverts the rule.** `app/assets/stylesheets/admin.scss` imports `legacy_includes/admin_unvendored` *outside* its `@layer legacy` block, so those rules are unlayered and beat every tailwind utility whatever the specificity. On an admin page a utility that collides with one needs `!` — and without it the class is inert, not merely outranked: `tw:-mb-px` on `.nav-tabs` looked like it was doing the work `.nav { margin-bottom: 0 }` was actually overriding. Check `getComputedStyle` rather than assuming the class landed.
 
+**`!important` reverses layer order**, so a legacy-layer `!important` beats a tailwind utility that isn't. A rule kept "just in case" in `revised.scss` is not inert — it is what paints, silently overriding the token the utility resolves. Delete the legacy rule rather than leaving it alongside; `revised.scss` is fully inside the layer, so the utility already wins without it. Only `admin_unvendored` genuinely needs an `!important` companion, because it is unlayered.
+
 ## Two Tailwind v4 traps
 
 - **`tw:mx-(--var)` generates nothing.** The bare-parenthesis shorthand for a CSS variable doesn't compile under this setup; `tw:mx-[var(--gutter)]` does. Both look right in a template, and the one that doesn't work fails silently — grep `app/assets/builds/tailwind.css` for the escaped class after `bin/rails tailwindcss:build`.
