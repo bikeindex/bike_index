@@ -3,8 +3,6 @@
 module UI
   module Header
     class Component < ApplicationComponent
-      # Body copy is 15px, so h4 and below floor at text-base rather than rendering
-      # smaller than the paragraph under them
       TAG_CLASSES = {h1: "tw:text-2xl", h2: "tw:text-xl", h3: "tw:text-lg"}.freeze
 
       def initialize(text: nil, subtitle: nil, tag: :h1, html_class: nil)

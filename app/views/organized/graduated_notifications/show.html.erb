@@ -6,7 +6,7 @@
   <% end %>
 </div>
 
-<%= render(UI::Header::Component.new(tag: :h5, html_class: "uncap")) do %>
+<%= render(UI::Header::Component.new(tag: :h3, html_class: "uncap")) do %>
   View
   <% user_search_param = @graduated_notification.user_id.present? ? {user_id: @graduated_notification.user_id} : {search_email: @graduated_notification.email} %>
 

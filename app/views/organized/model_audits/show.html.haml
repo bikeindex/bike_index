@@ -64,7 +64,7 @@
     %a.btn.btn-sm.btn-secondary.updateModelCert{data: {toggle: "modal", target: "#update-model-cert-modal", modelauditid: @model_audit.id, mnfgname: @model_audit.mnfg_name, framemodel: @model_audit.frame_model}}
       submit new
 - if @model_attestations.none?
-  = render(UI::Header::Component.new(text: "No Attestations", tag: :h4, html_class: "mt-2 uncap"))
+  = render(UI::Header::Component.new(text: "No Attestations", tag: :h3, html_class: "mt-2 uncap"))
 - else
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
     %thead.small-header.hidden-md-down
