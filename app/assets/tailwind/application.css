@@ -100,8 +100,7 @@
   --color-purple-900: #2c244b;
   --color-purple-950: #1c162f;
 
-  /* The dev-info marking, the legacy stylesheets' $dev-color. Nothing else is this
-     violet, which is the point - it reads as "not for a normal admin" */
+  /* The dev-info marking, the legacy stylesheets' $dev-color */
   --color-dev: #9400d3;
 }
 

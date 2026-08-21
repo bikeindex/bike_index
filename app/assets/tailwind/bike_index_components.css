@@ -24,19 +24,17 @@
   }
 }
 
-/* Marks something only a developer is shown. A utility, not a class in the layer below, so
- * it outranks the resting background of whatever it marks - a UI::Tabs tab's tw:bg-white,
- * a UI::Table row's striping. Background only: a border would fight the shape it marks,
- * and the tab's white lower edge is what breaks the row's underline */
+/* Background only, unlike the legacy .only-dev-visible: a border would fight the shape it
+ * marks, and a UI::Tabs tab's white lower edge is what breaks the row's underline */
 @utility twdev-only {
-  /* A table paints its rows over its own background, so mark those too */
+  /* A striped table paints its rows over its own background */
   &,
   & tbody tr {
     @apply tw:bg-dev/10;
   }
 
-  /* Custom utilities sort ahead of the core ones rather than after, so a tab's resting
-   * tw:bg-white would otherwise cover the marking on the page that tab points at */
+  /* Custom utilities sort ahead of the core ones rather than after, so a resting background
+   * utility - an active UI::Tabs tab's tw:bg-white - would otherwise cover the marking */
   @variant is-active {
     @apply tw:bg-dev/10;
   }

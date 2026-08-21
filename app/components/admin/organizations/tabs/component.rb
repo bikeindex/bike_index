@@ -48,13 +48,15 @@ module Admin
         # A tab with nothing behind it is dropped - except on its own page, which still
         # renders (saying so) and shouldn't lose its place in the row
         def render_tab?(tab)
+          return true if @active == tab
+
           case tab
           when :paid_functionality then @organization.paid?
           when :sso then @organization.enabled?("saml_sso")
           # Not "nothing behind it" - the page is developer-only, so its tab follows dev info
           when :custom_layouts then @display_dev_info
           else true
-          end || @active == tab
+          end
         end
 
         def new_invoice_link
