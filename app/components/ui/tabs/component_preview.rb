@@ -3,6 +3,7 @@
 module UI
   module Tabs
     class ComponentPreview < ApplicationComponentPreview
+      # @!group Variants
       def default
         render(UI::Tabs::Component.new(nav_label: "Bike sections", tabs: [
           {label: "Show", href: "#", active: true},
@@ -11,7 +12,8 @@ module UI
         ]))
       end
 
-      # Narrow the preview to see the row scroll rather than wrap
+      # Narrow the preview to see the row scroll rather than wrap, and the active tab
+      # scrolled into view
       def many_tabs
         render(UI::Tabs::Component.new(nav_label: "Organization sections", tabs: [
           {label: "Show", href: "#"},
@@ -23,6 +25,7 @@ module UI
           {label: "Custom layouts", href: "#", active: true}
         ]))
       end
+      # @!endgroup
     end
   end
 end
