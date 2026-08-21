@@ -17,6 +17,11 @@ module Admin
           admin_organization_custom_layout_path(organization_id: @organization.to_param, id: @edit_template)
         end
 
+        def enable_label
+          safe_join(["Enable", tag.strong(@edit_template.titleize), "snippet",
+            tag.em("only possible if there is content")], " ")
+        end
+
         def description_for(kind)
           ::MailSnippet.organization_snippets.dig(kind.to_sym, :description)
         end

@@ -78,7 +78,7 @@
             </td>
 
             <td class="inputTriggerRecalculation">
-              <%= f.number_field :amount_due, class: "form-control" %>
+              <%= render(UI::Forms::Input::Component.new(form_builder: f, attribute: :amount_due, kind: :number_field)) %>
             </td>
           </tr>
 
@@ -94,43 +94,38 @@
 
     <div class="row">
       <div class="col-md-6">
-        <div class="form-group">
-          <%= f.label :start_at, "Coverage starts" %>
-          <%= f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
-          <%= f.datetime_local_field :start_at, value: start_at, step: 60, required: true, class: "form-control" %>
-        </div>
+        <%= f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
+
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :start_at, kind: :datetime_local_field,
+          label_text: "Coverage starts", required: true, html_options: {value: start_at, step: 60})) %>
       </div>
 
       <div class="col-md-6">
         <div
           id="subscriptionEndsAt"
-          class="form-group collapse <%= "show" unless @invoice.endless? %>"
+          class="collapse <%= "show" unless @invoice.endless? %>"
         >
-          <%= f.label :end_at, "Coverage ends" %>
-          <%= f.datetime_local_field :end_at, value: end_at, step: 60, required: true, class: "form-control" %>
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :end_at, kind: :datetime_local_field,
+            label_text: "Coverage ends", required: true, html_options: {value: end_at, step: 60})) %>
         </div>
       </div>
     </div>
 
     <div class="row">
       <div class="col-md-6">
-        <div class="form-group">
-          <%= f.label :notes %>
-          <%= f.text_area :notes, rows: 4, class: "form-control" %>
-        </div>
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :notes, kind: :text_area,
+          html_options: {rows: 4})) %>
       </div>
 
       <div class="col-md-3 col-6">
-        <div class="form-group">
-          <%= f.submit "Save", class: "btn btn-lg btn-success mt-4" %>
-        </div>
+        <%= f.submit "Save", class: "btn btn-lg btn-success mt-4" %>
       </div>
 
       <div class="col-md-3 col-6">
-        <div id="endlessCheckBox" class="form-group text-right">
-          <div class="form-check mt-4 mr-2">
-            <%= f.check_box :is_endless %>
-            <%= f.label :is_endless, "Coverage never ends" %>
+        <div id="endlessCheckBox" class="text-right">
+          <div class="mt-4 mr-2">
+            <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :is_endless,
+              label: "Coverage never ends")) %>
           </div>
         </div>
       </div>
@@ -140,19 +135,14 @@
 
     <div class="row mt-4">
       <div class="col-md-6">
-        <div class="form-group">
-          <%= f.label :child_enabled_feature_slugs_string do %>
-            Features passed on to children
-            <small class="em"> If this is for a parent organization, choose which features from this invoice should apply to the child organizations </small>
-          <% end %>
-
-          <%= f.text_area :child_enabled_feature_slugs_string, rows: 2, placeholder: "comma separated list of features", class: "form-control" %>
-
-          <small class="below-input-help">
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :child_enabled_feature_slugs_string,
+          kind: :text_area, label_text: child_slugs_label,
+          html_options: {rows: 2, placeholder: "comma separated list of features"})) do |group| %>
+          <% group.with_helper_text do %>
             <em>available features in current invoice:</em>
             <%= safe_join(@invoice.feature_slugs.map { |slug| content_tag(:code, slug) }, ", ") %>
-          </small>
-        </div>
+          <% end %>
+        <% end %>
       </div>
     </div>
   <% end %>

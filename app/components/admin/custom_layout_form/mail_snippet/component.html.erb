@@ -4,20 +4,14 @@
   <%= form_for @organization, as: :organization, url: form_url, action: "update" do |f| %>
     <%= f.fields_for :mail_snippets do |snippet| %>
       <% if snippet.object.kind == @edit_template %>
-        <div class="form-group">
-          <%= snippet.label :body, "#{snippet.object.kind.titleize} snippet" %>
-          <%= snippet.text_area :body, placeholder: description_for(snippet.object.kind), rows: 10, class: "form-control" %>
-        </div>
+        <%= render(UI::Forms::Group::Component.new(form_builder: snippet, attribute: :body, kind: :text_area,
+          label_text: "#{snippet.object.kind.titleize} snippet",
+          html_options: {rows: 10, placeholder: description_for(snippet.object.kind)})) %>
 
         <div class="row">
           <div class="col-md-6">
-            <div class="form-check">
-              <label>
-                <%= snippet.check_box :is_enabled, class: "form-check-input" %>
-                Enable <strong><%= @edit_template.titleize %></strong> snippet
-                <em>only possible if there is content</em>
-              </label>
-            </div>
+            <%= render(UI::Forms::Checkbox::Component.new(form_builder: snippet, attribute: :is_enabled,
+              label: enable_label)) %>
           </div>
 
           <div class="col-md-6">

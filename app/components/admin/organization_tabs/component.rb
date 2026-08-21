@@ -31,7 +31,7 @@ module Admin
           [:locations, locations_label, locations_admin_organization_path(@organization)],
           [:paid_functionality, "Edit paid functionality", paid_functionality_admin_organization_path(@organization)],
           ([:sso, "SSO", sso_admin_organization_path(@organization)] if sso?),
-          [:invoices, "Org invoices", admin_organization_invoices_path(organization_id: @organization)],
+          [:invoices, "Invoices", admin_organization_invoices_path(organization_id: @organization)],
           ([:custom_layouts, "Custom layouts", admin_organization_custom_layouts_path(organization_id: @organization)] if custom_layouts?)]
           .compact.map { |tab, label, href| {label:, href:, active: @active == tab} }
       end

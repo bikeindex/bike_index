@@ -11,7 +11,7 @@ RSpec.describe Admin::OrganizationTabs::Component, type: :component do
   it "renders the organization and every tab, with the active one marked" do
     expect(component).to have_content("Cool Bikes")
     expect(component.css(".nav-tabs .nav-link").map { |tab| tab.text.squish })
-      .to eq ["Show", "Edit", "Locations 0", "Edit paid functionality", "Org invoices"]
+      .to eq ["Show", "Edit", "Locations 0", "Edit paid functionality", "Invoices"]
     expect(component.css(".nav-tabs .nav-link.active").map { |tab| tab.text.squish }).to eq ["Show"]
     expect(component).to have_link("Edit", href: "/admin/organizations/#{organization.to_param}/edit")
   end

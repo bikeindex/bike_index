@@ -23,6 +23,12 @@ module Admin
           "data-amount" => organization_feature.amount, "data-id" => organization_feature.id
       end
 
+      def child_slugs_label
+        safe_join(["Features passed on to children",
+          tag.small("If this is for a parent organization, choose which features from this invoice " \
+            "should apply to the child organizations", class: "em")], " ")
+      end
+
       def show_feature_slugs?(organization_feature)
         helpers.display_dev_info? && organization_feature.feature_slugs_string.present?
       end
