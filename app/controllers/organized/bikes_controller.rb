@@ -57,6 +57,9 @@ module Organized
         redirect_to(organization_manage_path(organization_id: current_organization.to_param)) && return
       end
 
+      # Only the register flow's link, so landing here any other way isn't a preference
+      session[:old_register_view] = true if params[:old_view].present?
+
       @unregistered_parking_notification = current_organization.enabled?("parking_notifications") && params[:parking_notification].present?
       if @unregistered_parking_notification
         @page_title = "#{current_organization.short_name} New parking notification"

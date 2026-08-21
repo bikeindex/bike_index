@@ -6,7 +6,7 @@ RSpec.describe PageBlock::Navbar::AccountMenu::Component, type: :component do
   let(:current_user) { FactoryBot.create(:user_confirmed, email: "party@bikeindex.org") }
   let(:current_organization) { nil }
   let(:instance) do
-    described_class.new(current_user:, current_user_or_unconfirmed_user: current_user,
+    described_class.new(current_user:,
       current_organization:)
   end
   let(:component) { with_request_url("/") { render_inline(instance) } }
