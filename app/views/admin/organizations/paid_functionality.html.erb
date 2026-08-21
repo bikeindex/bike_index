@@ -1,8 +1,8 @@
-<%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :paid_functionality)) %>
+<%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :paid_functionality)) %>
 
 <% if @organization.paid? %>
-  <%= render(Admin::OrganizationForm::TabForm::Component.new(organization: @organization, tab: "paid_functionality",
-        fields_component: Admin::OrganizationForm::FeatureSettings::Component, fields_args: {current_user:})) %>
+  <%= render(Admin::Organizations::Form::TabForm::Component.new(organization: @organization, tab: "paid_functionality",
+        fields_component: Admin::Organizations::Form::FeatureSettings::Component, fields_args: {current_user:})) %>
 <% else %>
   <p class="less-strong">
     This organization has no paid functionality to configure. Features are

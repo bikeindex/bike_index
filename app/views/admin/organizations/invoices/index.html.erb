@@ -1,4 +1,4 @@
-<%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :invoices)) %>
+<%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :invoices)) %>
 
 <%= render(Admin::InvoicesTable::Component.new(invoices: @invoices)) %>
 
@@ -13,4 +13,4 @@
   add it by editing it.
 </p>
 
-<%= render(Admin::OrganizationPaymentsTable::Component.new(organization: @organization)) %>
+<%= render(Admin::Organizations::PaymentsTable::Component.new(organization: @organization)) %>

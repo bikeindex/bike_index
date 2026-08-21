@@ -149,7 +149,7 @@
             </td>
 
             <td>
-              <%= render Admin::OrganizationCell::Component.new(organization: organization_status.organization, organization_id: organization_status.organization_id, render_search: params[:organization_id].blank?) %>
+              <%= render Admin::Organizations::Cell::Component.new(organization: organization_status.organization, organization_id: organization_status.organization_id, render_search: params[:organization_id].blank?) %>
             </td>
 
             <td>

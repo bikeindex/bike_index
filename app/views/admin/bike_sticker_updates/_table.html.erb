@@ -51,7 +51,7 @@
   <% end %>
 
   <% table.column(sortable: "organization_id", label: "Update org") do |update| %>
-    <%= render Admin::OrganizationCell::Component.new(organization: update.organization, render_search: true) %>
+    <%= render Admin::Organizations::Cell::Component.new(organization: update.organization, render_search: true) %>
   <% end %>
 
   <% table.column(sortable: "organization_kind", label: "Org kind") do |update| %>

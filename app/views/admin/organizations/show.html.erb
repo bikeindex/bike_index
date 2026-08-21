@@ -1,4 +1,4 @@
-<%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :show)) %>
+<%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :show)) %>
 
 <% if OrgServices::Displayer.law_enforcement_missing_verified_features?(@organization) %>
   <div class="alert alert-info">
@@ -15,20 +15,20 @@
 %>
 
 <div class="tw:grid tw:items-start tw:gap-x-8 tw:gap-y-6 tw:md:grid-cols-2">
-  <%= render(Admin::OrganizationShow::Details::Component.new(organization: @organization)) %>
-  <%= render(Admin::OrganizationShow::Account::Component.new(organization: @organization)) %>
+  <%= render(Admin::Organizations::Show::Details::Component.new(organization: @organization)) %>
+  <%= render(Admin::Organizations::Show::Account::Component.new(organization: @organization)) %>
 
   <%# Invoices is the one with more than one root element, so it needs the cell wrapper %>
   <div>
-    <%= render(Admin::OrganizationShow::Invoices::Component.new(organization: @organization)) %>
+    <%= render(Admin::Organizations::Show::Invoices::Component.new(organization: @organization)) %>
   </div>
 
-  <%= render(Admin::OrganizationShow::Features::Component.new(organization: @organization)) %>
+  <%= render(Admin::Organizations::Show::Features::Component.new(organization: @organization)) %>
 </div>
 
-<%= render(Admin::OrganizationShow::Bikes::Component.new(organization: @organization, bikes: @bikes, bikes_count: @bikes_count)) %>
+<%= render(Admin::Organizations::Show::Bikes::Component.new(organization: @organization, bikes: @bikes, bikes_count: @bikes_count)) %>
 
-<%= render(Admin::OrganizationShow::Roles::Component.new(organization: @organization, deleted: @deleted_organization_roles)) %>
+<%= render(Admin::Organizations::Show::Roles::Component.new(organization: @organization, deleted: @deleted_organization_roles)) %>
 
 <hr class="mt-4">
 

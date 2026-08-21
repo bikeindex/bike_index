@@ -18,7 +18,7 @@
   <% end %>
 
   <% table.column(sortable: "organization_id") do |batch| %>
-    <%= render Admin::OrganizationCell::Component.new(organization: batch.organization, render_search: true) %>
+    <%= render Admin::Organizations::Cell::Component.new(organization: batch.organization, render_search: true) %>
   <% end %>
 
   <% if matching_count %>

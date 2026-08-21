@@ -1,4 +1,4 @@
-<%= render(Admin::OrganizationTabs::Component.new(organization: @organization, active: :custom_layouts)) %>
+<%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :custom_layouts)) %>
 
 <div class="tw:grid tw:items-start tw:gap-x-8 tw:md:grid-cols-2">
   <p>
@@ -13,7 +13,7 @@
   </table>
 </div>
 
-<%= render(Admin::OrganizationCustomLayoutsTable::Component.new(organization: @organization)) %>
+<%= render(Admin::Organizations::CustomLayoutsTable::Component.new(organization: @organization)) %>
 
 <div class="mt-4">
   <strong>Note:</strong> Custom Layouts (other than landing pages), are

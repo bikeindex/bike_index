@@ -1,7 +1,7 @@
 <%= render(Admin::IndexSkeleton::Component.new(
   collection: @organizations,
-  nav_header_list_items: render(Admin::OrganizationsIndex::Filters::Component.new(search_paid: @search_paid)),
+  nav_header_list_items: render(Admin::Organizations::Index::Filters::Component.new(search_paid: @search_paid)),
   chart_collection: @render_chart && matching_organizations,
-  admin_search_form: render(Admin::OrganizationsIndex::SearchForm::Component.new(search_paid: @search_paid, features_and_settings_ids: @features_and_settings_ids)),
-  table_view: render(Admin::OrganizationsTable::Component.new(organizations: @organizations, render_sortable: true, render_deleted: @render_deleted))
+  admin_search_form: render(Admin::Organizations::Index::SearchForm::Component.new(search_paid: @search_paid, features_and_settings_ids: @features_and_settings_ids)),
+  table_view: render(Admin::Organizations::Table::Component.new(organizations: @organizations, render_sortable: true, render_deleted: @render_deleted))
 )) %>

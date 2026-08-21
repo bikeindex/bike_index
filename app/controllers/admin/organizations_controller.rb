@@ -87,7 +87,7 @@ module Admin
     # this rather than holding them itself
     def feature_chips
       chips = params[:combobox_values].to_s.split(",").filter_map do |value|
-        display = Admin::OrganizationsIndex::SearchForm::Component.display_for(value)
+        display = Admin::Organizations::Index::SearchForm::Component.display_for(value)
         helpers.hw_combobox_selection_chip(display:, value:, for_id: params[:for_id]) if display
       end
 
