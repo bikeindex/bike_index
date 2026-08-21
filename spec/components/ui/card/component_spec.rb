@@ -18,6 +18,16 @@ RSpec.describe UI::Card::Component, type: :component do
     expect(page).to have_content("in the card")
   end
 
+  context "mobile_flush" do
+    it "drops the side borders and padding below md, keeping the top and bottom" do
+      render_inline(described_class.new(mobile_flush: true)) { "in the card" }
+
+      expect(page).to have_css("div[class~='tw:max-md:border-x-0'][class~='tw:max-md:px-0']")
+      # the sides go, not the card - it still separates itself from what's above and below
+      expect(page).to have_css("div[class~='tw:border'][class~='tw:p-4']")
+    end
+  end
+
   context "divided" do
     it "divides its rows instead of padding" do
       render_inline(described_class.new(divided: true)) { "<p>row one</p><p>row two</p>".html_safe }

@@ -7,12 +7,18 @@ module UI
       # A divided card's rows bring their own padding, so it has none of its own
       DIVIDED_CLASSES = "tw:rounded-xl tw:divide-y tw:divide-gray-200 tw:dark:divide-gray-700"
       UNDIVIDED_CLASSES = "tw:p-4 tw:rounded-sm"
+      # A card whose content should meet the page's own gutter rather than sit inset inside
+      # it twice over. Only the sides go - the top and bottom still separate it from
+      # whatever it sits between
+      MOBILE_FLUSH_CLASSES = "tw:max-md:border-x-0 tw:max-md:px-0"
 
       # divided: separate the direct children with row dividers, for a checklist
-      def initialize(additional_classes: nil, shadow: false, divided: false)
+      # mobile_flush: drop the side borders and padding below md
+      def initialize(additional_classes: nil, shadow: false, divided: false, mobile_flush: false)
         @additional_classes = additional_classes
         @shadow = shadow
         @divided = divided
+        @mobile_flush = mobile_flush
       end
 
       def call
@@ -23,7 +29,8 @@ module UI
 
       def card_classes
         [BASE_CLASSES, @divided ? DIVIDED_CLASSES : UNDIVIDED_CLASSES,
-          ("tw:shadow-sm" if @shadow), @additional_classes].compact.join(" ")
+          ("tw:shadow-sm" if @shadow), (MOBILE_FLUSH_CLASSES if @mobile_flush),
+          @additional_classes].compact.join(" ")
       end
     end
   end
