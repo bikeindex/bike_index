@@ -30,7 +30,6 @@ Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't us
 - **Service objects** (`app/services/`): a stateless service is a `module` with `extend Functionable` (see the `functionable` gem) — inputs passed as args, no instance state, private methods via `conceal` + a `# private below here` block. Don't write a stateless service as a `class` with `def self.` methods.
 - **Class methods go in a `class << self` block** when the class has more than 5 of them, or when any of them should be private — `BugReport` is the pattern.
 - **An endless method takes a trailing `if`/`unless` on the *definition*, not the body.** `def centering = "mx-auto" if @alignment == :center` evaluates the condition once, in the class body where the ivar is still nil, so the method is never defined and every call raises `NameError`. Give it a real body when the result is conditional.
-- **Moving a view into a component turns its locals into methods.** A `<% x = … %>` computed once per template becomes a method run once per *call site* — which is how a single pluck becomes one per table row. Memoize anything that queries as you move it.
 
 ### Comments
 
@@ -88,7 +87,7 @@ Uses RSpec. All business logic should be tested. The `rspec-testing` skill cover
 
 ## Frontend Development
 
-Uses Stimulus.js for JavaScript and Tailwind CSS for styling. SCSS and CoffeeScript files exist but are deprecated. The `bin/dev` command handles Tailwind and JS builds. The `frontend-conventions` skill covers project-specific class prefixes (`tw:`, `twinput`, `twlabel`, `twlink`), the `number_display` helper, ViewComponent rules, and that helpers are deprecated in favor of view components taking full keyword arguments.
+Uses Stimulus.js for JavaScript and Tailwind CSS for styling. SCSS and CoffeeScript files exist but are deprecated. The `bin/dev` command handles Tailwind and JS builds. The `frontend-conventions` skill has the conventions.
 
 Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it isn't, **stop and ask the user to start it** so Tailwind and JS asset watchers are running before any frontend work.
 

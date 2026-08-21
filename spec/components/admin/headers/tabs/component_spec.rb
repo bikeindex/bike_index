@@ -24,7 +24,8 @@ RSpec.describe Admin::Headers::Tabs::Component, type: :component do
     end
 
     it "renders the links and the alert slot" do
-      expect(component.css(".admin-subnav ul .nav-item a").map { |link| link.text }).to eq %w[One Two]
+      expect(component.css("ul li a").map { |link| link.text }).to eq %w[One Two]
+      expect(component).to have_content("Editing")
       expect(component).to have_content("Thing deleted")
     end
   end

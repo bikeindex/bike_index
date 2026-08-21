@@ -1,5 +1,5 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item tw:text-sm">
+  <li>
     <%= render(UI::Dropdown::Component.new(
       name: @status.present? ? "#{@status.titleize} only" : "All statuses",
       button_size: :sm,
@@ -13,9 +13,9 @@
     end %>
   </li>
 
-  <li class="nav-item tw:text-sm">
+  <li>
     <% if @template.present? %>
-      <%= link_to "#{@template.display_name} sequence", RegistrationSequencePaths.sequence(@template, admin: true), class: "nav-link" %>
+      <%= render(UI::ButtonLink::Component.new(text: "#{@template.display_name} sequence", href: RegistrationSequencePaths.sequence(@template, admin: true), size: :sm)) %>
     <% else %>
       <%# Nothing for organizations to clone yet - the first template is drafted here %>
       <%= render UI::ButtonLink::Component.new(text: "Create template", href: RegistrationSequencePaths.create_draft(nil), method: :post, color: :primary, size: :sm) %>

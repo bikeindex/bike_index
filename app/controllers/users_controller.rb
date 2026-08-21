@@ -92,7 +92,7 @@ class UsersController < ApplicationController
   def send_password_reset_email
     @user = User.fuzzy_confirmed_or_unconfirmed_email_find(params[:email])
     if @user.present?
-      flash[:error] = translation(:reset_just_sent_wait_a_sec) unless @user.send_password_reset_email
+      flash[:error] = translation(:reset_just_sent_wait_a_sec) unless @user.send_password_reset_email(return_to: emailable_return_to)
     else
       flash[:error] = translation(:email_not_found)
       redirect_to request_password_reset_form_users_path
@@ -210,7 +210,13 @@ class UsersController < ApplicationController
     params.require(:user)
       .permit(:name, :email, :notification_newsletters, :notification_unstolen, :terms_of_service,
         :preferred_language, :additional)
-      .merge(sign_in_partner.present? ? {partner_data: {sign_up: sign_in_partner}} : {})
+      .merge(signup_context.present? ? {partner_data: signup_context} : {})
+  end
+
+  # The confirmation email is built from the user record alone - it's enqueued from an
+  # after_commit callback, two jobs from here - so anything it needs has to be stored
+  def signup_context
+    {sign_up: sign_in_partner, return_to: emailable_return_to}.compact_blank
   end
 
   def permitted_password_reset_parameters

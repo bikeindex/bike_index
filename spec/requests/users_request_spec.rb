@@ -376,7 +376,7 @@ RSpec.describe UsersController, type: :request do
           expect(response).to render_template(:send_password_reset_email)
           expect(flash).to be_blank
         }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
-        expect(Email::ResetPasswordJob).to have_enqueued_sidekiq_job(user.id)
+        expect(Email::ResetPasswordJob).to have_enqueued_sidekiq_job(user.id, nil)
         user.reload
         expect(user.token_for_password_reset).to be_present
       end

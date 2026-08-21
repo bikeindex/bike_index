@@ -1,5 +1,5 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item tw:text-sm">
+  <li>
     <%= render(UI::Dropdown::Component.new(
       name: @searched_tag.present? ? "Tagged: #{@searched_tag}" : "All tags",
       button_size: :sm,
@@ -13,7 +13,7 @@
     end %>
   </li>
 
-  <li class="nav-item tw:text-sm">
+  <li>
     <%= render(UI::Dropdown::Component.new(
       name: @searched_receiver.present? ? "To: #{BugReport.display_receiver(@searched_receiver)}" : "All receivers",
       button_size: :sm,
@@ -27,7 +27,7 @@
     end %>
   </li>
 
-  <li class="nav-item tw:text-sm">
+  <li>
     <%= render(UI::Dropdown::Component.new(
       name: @searched_membership.present? ? membership_filters[@searched_membership] : "All membership status",
       button_size: :sm,
@@ -41,7 +41,7 @@
     end %>
   </li>
 
-  <li class="nav-item tw:text-sm">
+  <li>
     <%= render(UI::Dropdown::Component.new(
       name: status_filters[@searched_status],
       button_size: :sm,
