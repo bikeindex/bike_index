@@ -1,4 +1,4 @@
-<li class="nav-item tw:text-sm">
+<li>
   <%= render(UI::Dropdown::Component.new(name: kind_name, button_size: :sm, active: kind.present?)) do |dropdown|
     dropdown.with_entry_item { filter_link("All Kinds", :search_kind, nil) }
     dropdown.with_entry_divider
@@ -8,7 +8,7 @@
   end %>
 </li>
 
-<li class="nav-item tw:text-sm">
+<li>
   <%= render(UI::Dropdown::Component.new(name: pos_name, button_size: :sm, active: pos_kind.present?)) do |dropdown|
     dropdown.with_entry_item { filter_link("All POS", :search_pos, nil) }
     dropdown.with_entry_divider
@@ -19,10 +19,10 @@
   end %>
 </li>
 
-<li class="nav-item">
-  <%= link_to "Paid", paid_path, class: "nav-link #{"active" if @search_paid}" %>
+<li>
+  <%= render(UI::ButtonLink::Component.new(text: "Paid", href: paid_path, size: :sm, active: @search_paid)) %>
 </li>
 
-<li class="nav-item">
-  <%= link_to "New Organization", new_admin_organization_url, class: "nav-link" %>
+<li>
+  <%= render(UI::ButtonLink::Component.new(text: "New Organization", href: new_admin_organization_url, color: :primary, size: :sm)) %>
 </li>
