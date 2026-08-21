@@ -385,25 +385,22 @@ RSpec.describe SessionsController, type: :request do
 
   describe "the return_to carried by the magic link email" do
     let!(:user) { FactoryBot.create(:user_confirmed) }
-    let(:emailed_url) do
+
+    # Without clearing the token no second mail is sent within the minute, and the
+    # assertion reads the previous one. reload - the token was minted on another copy.
+    def emailed_url_after(return_to)
+      user.reload.update(magic_link_token: nil)
+      get "/session/new?return_to=#{CGI.escape(return_to)}"
       Sidekiq::Testing.inline! { post "/session/create_magic_link", params: {email: user.email} }
       ActionMailer::Base.deliveries.last.body.parts.first.decoded[%r{https?://\S+/session/magic_link\S*}]
     end
 
-    it "carries a path this app owns" do
-      get "/session/new?return_to=%2Fbikes%2F12"
-      expect(emailed_url).to include CGI.escape("/bikes/12")
-    end
-
-    # Not an open redirect - handle_target refuses it - but it shouldn't reach the mail
-    it "drops an off-site one" do
-      get "/session/new?return_to=#{CGI.escape("https://evil.example/steal")}"
-      expect(emailed_url).to_not include "evil.example"
-    end
-
-    it "drops a protocol-relative one" do
-      get "/session/new?return_to=#{CGI.escape("//evil.example/steal")}"
-      expect(emailed_url).to_not include "evil.example"
+    # An off-site target isn't an open redirect - handle_target refuses it on arrival -
+    # but it shouldn't reach the mail. "//host" is off-site despite the leading slash.
+    it "carries a path this app owns, and drops anything else" do
+      expect(emailed_url_after("/bikes/12")).to include CGI.escape("/bikes/12")
+      expect(emailed_url_after("https://evil.example/steal")).to_not include "evil.example"
+      expect(emailed_url_after("//evil.example/steal")).to_not include "evil.example"
     end
   end
 

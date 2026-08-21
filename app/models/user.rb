@@ -420,13 +420,14 @@ class User < ApplicationRecord
     self.when_vendor_terms_of_service = Time.current
   end
 
-  def send_password_reset_email
+  # return_to rides in the link for the same reason it does on send_magic_link_email
+  def send_password_reset_email(return_to: nil)
     # If the auth token was just created, don't create a new one, it's too error prone
     return false if password_reset_just_sent?
 
     update_auth_token("token_for_password_reset")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    Email::ResetPasswordJob.perform_async(id)
+    Email::ResetPasswordJob.perform_async(id, return_to)
     true
   end
 
@@ -514,6 +515,11 @@ class User < ApplicationRecord
 
   def partner_sign_up
     (partner_data && partner_data["sign_up"].present?) ? partner_data["sign_up"] : nil
+  end
+
+  # Read by the confirmation email, which is built from the user record alone
+  def signup_return_to
+    partner_data && partner_data["return_to"].presence
   end
 
   def bikes(user_hidden = true)
