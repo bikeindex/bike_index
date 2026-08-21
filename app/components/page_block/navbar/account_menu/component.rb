@@ -18,7 +18,7 @@ module PageBlock
         private
 
         def items
-          UserServices::MenuItemsAccount.for(current_user_or_unconfirmed_user: @current_user,
+          UserServices::MenuItemsAccount.for(user: @current_user,
             current_organization: @current_organization, opens: :up)
         end
 

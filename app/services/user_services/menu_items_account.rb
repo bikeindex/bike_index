@@ -19,11 +19,11 @@ module UserServices
 
     # opens: which way the menu unrolls from its trigger, so it reads outward from there either
     # way. The switcher holds its own order regardless: leaving the organization behind leads it
-    def for(current_user_or_unconfirmed_user:, current_organization: nil, opens: :down)
+    def for(user:, current_organization: nil, opens: :down)
       raise ArgumentError, "opens: must be one of #{OPENS}" unless OPENS.include?(opens)
 
-      account = account_rows(current_user_or_unconfirmed_user)
-      switcher = organization_switcher(current_user_or_unconfirmed_user, current_organization:)
+      account = account_rows(user)
+      switcher = organization_switcher(user, current_organization:)
 
       sections = (opens == :up) ? [[logout_row], switcher, account.reverse] : [account, switcher, [logout_row]]
       sections.reject(&:empty?).inject { |rows, section| rows + [divider] + section }

@@ -298,7 +298,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       expect { get "#{base_url}/new" }.to_not change(BParam, :count)
 
       # ... but a shell started on /register isn't taken over, so it stays attributed there
-      expect { get "/register/new?discard_token=#{b_param.id_token}" }.to change(BParam, :count).by 0
+      expect { get "/register/new?discard_token=#{b_param.id_token}" }.to_not change(BParam, :count)
       expect(BParam.last.origin).to eq "register_flow"
       expect { get "#{base_url}/new" }.to change(BParam, :count).by 1
       b_param = BParam.last
