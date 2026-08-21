@@ -7,9 +7,8 @@ module Admin
         # The custom layouts tab's listing: every template the organization can customize,
         # and where the ones that aren't landing pages are edited from.
         class Component < ApplicationComponent
-          def initialize(organization:, display_dev_info: false)
+          def initialize(organization:)
             @organization = organization
-            @display_dev_info = display_dev_info
           end
 
           private

@@ -7,7 +7,7 @@ RSpec.describe Admin::Navbar::Component, type: :component do
   # Somewhere outside admin, so no nav link is the active one
   let(:url) { "/bikes/new" }
   let(:current_user) { FactoryBot.create(:superuser) }
-  let(:controller_path) { "admin/bikes" }
+  let(:controller_path) { "bikes" }
   let(:search_filtered) { false }
   let(:instance) do
     described_class.new(current_user:, user_root_url: "/admin", controller_path:, search_filtered:)
@@ -59,6 +59,8 @@ RSpec.describe Admin::Navbar::Component, type: :component do
   end
 
   describe "the view all link" do
+    let(:controller_path) { "admin/bikes" }
+
     context "period all" do
       let(:url) { "#{admin_bikes}?period=all&timezone=Party" }
 

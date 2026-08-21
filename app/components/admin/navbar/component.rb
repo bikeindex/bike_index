@@ -82,9 +82,12 @@ module Admin
       end
 
       # The picker names the current page in prose, which UI::ActiveLink can't answer for it —
-      # the links themselves go active in the browser
+      # the links themselves go active in the browser. A :path entry is one action on another
+      # entry's controller, so only the request can say whether we're on it
       def on_page?(link, match)
-        helpers.current_page_active?(link[:path], match == :controller)
+        return controller_for(link[:path]) == @controller_path if match == :controller
+
+        helpers.current_page_active?(link[:path])
       end
 
       def nav_link_for(path)
@@ -99,25 +102,30 @@ module Admin
         link&.dig(:match) || :controller
       end
 
-      # A controller nested under another - admin/organizations/invoices, and custom layouts -
-      # matches no link, since the links are all top level. It borrows the link for the same
-      # section where there is one (admin/invoices), and the one it's nested under otherwise
+      # The links are all top level, so a controller nested under another - an organization's
+      # invoices, and its custom layouts - matches none of them
       def nested_nav_link
-        segments = @controller_path.split("/")
-        return if segments.size < 3
+        section, parent, nested = @controller_path.split("/")
+        return if nested.blank?
 
-        link_for_controller([segments.first, segments.last].join("/")) ||
-          link_for_controller(segments[..-2].join("/"))
+        link_for_controller("#{section}/#{nested}") || link_for_controller("#{section}/#{parent}")
       end
 
       def link_for_controller(controller_path)
         nav_select_links.detect { |link| controller_for(link[:path]) == controller_path }
       end
 
+      # Every link gets asked about twice over on a nested page, and recognizing a path costs
+      # ~20µs against the whole route set
       def controller_for(path)
-        Rails.application.routes.recognize_path(path)[:controller]
-      rescue ActionController::RoutingError
-        nil
+        @controller_for ||= {}
+        return @controller_for[path] if @controller_for.key?(path)
+
+        @controller_for[path] = begin
+          Rails.application.routes.recognize_path(path)[:controller]
+        rescue ActionController::RoutingError
+          nil
+        end
       end
 
       def nav_select_links
