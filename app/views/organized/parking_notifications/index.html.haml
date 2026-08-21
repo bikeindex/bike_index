@@ -127,7 +127,7 @@
       Update
 
   .mt-4
-    = render(Org::Search::Form::Component.new(target_search_path: organization_parking_notifications_path(organization_id: current_organization.to_param), interpreted_params: @interpreted_params, search_email: params[:search_email], search_notes: params[:search_notes]))
+    = render(Org::Search::Form::Component.new(target_search_path: organization_parking_notifications_path(organization_id: current_organization.to_param), interpreted_params: @interpreted_params.merge(search_email: params[:search_email]).compact))
 
   .row.mt-4.mb-2
     .col-sm-6

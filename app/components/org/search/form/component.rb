@@ -4,11 +4,9 @@ module Org
   module Search
     module Form
       class Component < ApplicationComponent
-        def initialize(target_search_path:, interpreted_params:, search_email: nil, search_notes: nil, target_frame: nil, skip_serial_field: false, settings_component: nil)
+        def initialize(target_search_path:, interpreted_params:, target_frame: nil, skip_serial_field: false, settings_component: nil)
           @target_search_path = target_search_path
           @interpreted_params = interpreted_params
-          @search_email = search_email
-          @search_notes = search_notes
           @target_frame = target_frame
           @skip_serial_field = skip_serial_field
           @settings_component = settings_component

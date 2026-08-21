@@ -5,8 +5,7 @@ require "rails_helper"
 RSpec.describe Org::Search::Form::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
-  let(:options) { {target_search_path:, interpreted_params:, search_email:} }
-  let(:search_email) { nil }
+  let(:options) { {target_search_path:, interpreted_params:} }
   let(:target_search_path) { "/bikes" }
   let(:interpreted_params) { {} }
 
@@ -25,9 +24,9 @@ RSpec.describe Org::Search::Form::Component, type: :component do
   end
 
   context "with interpreted_params values" do
-    let(:search_email) { "test@example.com" }
     let(:interpreted_params) do
       {
+        search_email: "test@example.com",
         raw_serial: "ABC123",
         serial: "ABC123",
         search_stickers: "sticker1",

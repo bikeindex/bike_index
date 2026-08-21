@@ -7,7 +7,7 @@
   doesn't include it). Reads params, not @search_status, which is unset on
   non-turbo renders.
 %>
-<% form_interpreted_params = @interpreted_params.merge(search_status: params[:search_status]).compact %>
+<% form_interpreted_params = @interpreted_params.merge(search_status: params[:search_status], search_email: params[:search_email]).compact %>
 
 <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
 <% unless turbo_frame_request? %>
@@ -15,9 +15,7 @@
     <%= render(Org::Search::Form::Component.new(
       target_search_path: organization_impound_records_path(organization_id: current_organization.to_param),
       target_frame: :impound_records_results_frame,
-      interpreted_params: form_interpreted_params,
-      search_email: params[:search_email],
-      search_notes: params[:search_notes]
+      interpreted_params: form_interpreted_params
     )) do %>
       <% if params[:search_unregisteredness].present? %>
         <%= hidden_field_tag :search_unregisteredness, params[:search_unregisteredness] %>
