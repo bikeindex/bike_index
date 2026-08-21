@@ -36,6 +36,14 @@ RSpec.describe Saml::RequestStore do
         expect(described_class.claim("not-a-real-token")).to be_nil
       end
     end
+
+    context "a payload create no longer writes" do
+      it "is nil rather than raising, the same as a token we never issued" do
+        RedisPool.conn { |r| r.set("saml_request:stale-format", "some-university\n_abc-123") }
+
+        expect(described_class.claim("stale-format")).to be_nil
+      end
+    end
   end
 
   describe "mode" do

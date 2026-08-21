@@ -1,15 +1,9 @@
 <div class="tw:mx-auto tw:max-w-3xl tw:p-4">
-  <h1 class="tw:mb-2 tw:text-2xl tw:font-bold">SAML configuration test</h1>
-
-  <p class="tw:mb-6">
-    <%= @organization.short_name %> —
-    <code><%= @organization.user_email_domain %></code>
-  </p>
+  <%= render(UI::Header::Component.new(text: "SAML configuration test",
+        subtitle: safe_join([@organization.short_name, " — ", tag.code(@organization.user_email_domain)]))) %>
 
   <%= render(UI::Alerts::Base::Component.new(kind: summary_kind)) do %>
-    <% if @error.present? %>
-      <%= @error %>
-    <% elsif @result.blank? %>
+    <% if @result.blank? %>
       Signing in here validates the IdP's assertion and reports what it
       contained. No account is created and nobody is signed in, so this is safe
       to run before the configuration is activated.
@@ -23,21 +17,21 @@
   <% end %>
 
   <% if @result.blank? %>
-    <%= form_with url: saml_test_start_path(org_slug: @organization.to_param), method: :post do |f| %>
+    <%= form_with url: saml_test_path(org_slug: @organization.to_param) do |f| %>
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true,
             label_text: "Email address to sign in with")) do %>
         <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true,
-              html_options: {value: @email, name: :email, autofocus: true})) %>
+              html_options: {autofocus: true})) %>
       <% end %>
 
       <%= render(UI::Button::Component.new(text: "Start test login", color: :primary, type: "submit")) %>
     <% end %>
   <% else %>
-    <h2 class="tw:mb-3 tw:text-xl tw:font-semibold">Assertion</h2>
+    <%= render(UI::Header::Component.new(text: "Assertion", tag: :h2)) %>
     <dl class="tw:mb-8 tw:grid tw:grid-cols-[auto_1fr] tw:gap-x-4 tw:gap-y-2">
-      <% if @email.present? %>
+      <% if @expected_email.present? %>
         <dt class="tw:font-semibold">Address entered</dt>
-        <dd><code><%= @email %></code></dd>
+        <dd><code><%= @expected_email %></code></dd>
       <% end %>
 
       <% if diagnostic? %>
@@ -53,7 +47,7 @@
         <dd>
           <code><%= @result.email.presence || "(missing)" %></code>
 
-          <% if @email.present? %>
+          <% if @expected_email.present? %>
             <%= asserted_expected_email? ? "— matches the address entered" : "— the IdP released a different address" %>
           <% end %>
         </dd>
@@ -62,11 +56,7 @@
           <code><%= @result.email_domain.presence || "(missing)" %></code>
         </dd>
         <dt class="tw:font-semibold">Organization domain</dt>
-        <dd>
-          <code>
-            <%= @organization.user_email_domain.presence || "(missing)" %>
-          </code>
-        </dd>
+        <dd><code><%= @organization.user_email_domain %></code></dd>
         <dt class="tw:font-semibold">Matching account</dt>
         <dd><code><%= @result.user&.email || "(none)" %></code></dd>
         <dt class="tw:font-semibold">Matching account has a password</dt>
@@ -76,7 +66,7 @@
       <% end %>
     </dl>
     <% if diagnostic? %>
-      <h2 class="tw:mb-3 tw:text-xl tw:font-semibold">Received attributes</h2>
+      <%= render(UI::Header::Component.new(text: "Received attributes", tag: :h2)) %>
       <% if @result.attributes.present? %>
         <dl class="tw:mb-8 tw:grid tw:grid-cols-[auto_1fr] tw:gap-x-4 tw:gap-y-2">
           <% @result.attributes.each do |name, values| %>

@@ -15,11 +15,12 @@ module Saml
     # intercepted RelayState is worthless by the time it's used.
     TTL = 10.minutes
 
+    DEFAULTS = {org_slug: nil, request_id: nil, return_to: nil, mode: NORMAL_MODE, expected_email: nil}.freeze
+
     def create(request_id:, org_slug:, return_to: nil, mode: NORMAL_MODE, expected_email: nil)
       SecureRandom.urlsafe_base64(24).tap do |token|
-        RedisPool.conn do |r|
-          r.set(key(token), [org_slug, request_id, return_to, mode, expected_email].join(SEPARATOR), ex: TTL.to_i)
-        end
+        payload = {org_slug:, request_id:, return_to:, mode:, expected_email:}.compact_blank
+        RedisPool.conn { |r| r.set(key(token), payload.to_json, ex: TTL.to_i) }
       end
     end
 
@@ -31,15 +32,16 @@ module Saml
       raw = RedisPool.conn { |r| r.getdel(key(token)) }
       return nil if raw.blank?
 
-      org_slug, request_id, return_to, mode, expected_email = raw.split(SEPARATOR, 5)
-      {org_slug:, request_id:, return_to: return_to.presence, mode: mode.presence || NORMAL_MODE,
-       expected_email: expected_email.presence}
+      DEFAULTS.merge(JSON.parse(raw, symbolize_names: true))
+    rescue JSON::ParserError
+      # Same answer as a token we never issued: create is the only writer, so an
+      # unparseable value is one it wrote in an older payload format
+      nil
     end
 
     #
     # private below here
     #
-    SEPARATOR = "\n"
 
     def key(token)
       "saml_request:#{token}"

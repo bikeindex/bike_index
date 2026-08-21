@@ -290,6 +290,10 @@ inactive; it reaches the same callback but never provisions or signs anyone in.
 
 ## Accepted gaps
 
+- **`/sso/<slug>/test` is unauthenticated**, like `init`. Anyone can start a test transaction,
+  but the diagnostic it renders needs a valid signed assertion — so reading it means holding IdP
+  credentials for that organization. Deliberate: the person rehearsing an integration is often
+  the partner's IT contact, who has no superadmin account here.
 - **Nothing deprovisions.** Removing someone in the IdP stops them signing in again; it does not
   remove a role they already hold.
 - **Unconfirmed accounts are force-confirmed by the first assertion.** Deliberate — otherwise

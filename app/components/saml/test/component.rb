@@ -3,11 +3,10 @@
 module Saml
   module Test
     class Component < ApplicationComponent
-      def initialize(organization:, result: nil, email: nil, error: nil)
+      def initialize(organization:, result: nil, expected_email: nil)
         @organization = organization
         @result = result
-        @email = email
-        @error = error
+        @expected_email = expected_email
       end
 
       private
@@ -15,12 +14,9 @@ module Saml
       def diagnostic? = @result.is_a?(Saml::AssertionProcessor::DiagnosticResult)
 
       # The assertion carries whoever the IdP decided to release, not who was typed in
-      def asserted_expected_email?
-        diagnostic? && @email.present? && @email == @result.email
-      end
+      def asserted_expected_email? = @expected_email == @result.email
 
       def summary_kind
-        return :error if @error.present?
         return :notice if @result.blank?
 
         @result.success? ? :success : :error
