@@ -4,9 +4,8 @@
   <%= hidden_field_tag :search_pos, @index.params[:search_pos] %>
 
   <%#
-    The combobox is a taller control than the two bootstrap ones, so the fields line up on
-    their text rather than on an edge. gap rather than a margin on each: the combobox is
-    full width on mobile, and a margin on top of that would overflow the row
+    gap rather than a margin on each: the combobox is full width on mobile, and a margin
+    on top of that would overflow the row
   %>
 
   <div
@@ -22,8 +21,9 @@
     </div>
 
     <%#
-      Both keep a wrapper: .form-control is width:100%, which as a direct flex child would
-      claim a whole row of its own
+      Wrapped because .form-control is width:100% and comes from the unlayered admin
+      stylesheet - as a direct flex child it claims a whole row, and a tw:w-* on the input
+      would need ! to beat it
     %>
 
     <div>
