@@ -1,6 +1,6 @@
 <fieldset>
   <%= render(UI::Card::Component.new) do %>
-    <div class="tw:grid tw:gap-x-6 tw:lg:grid-cols-2">
+    <div class="twfieldrow">
       <div>
         <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :name)) %>
       </div>
@@ -8,13 +8,11 @@
       <div>
         <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :phone, kind: :telephone_field)) %>
       </div>
-
-      <div class="tw:lg:col-span-2">
-        <%= @form_builder.fields_for :address_record, @location.find_or_build_address_record do |address_form| %>
-          <%= render(UI::Forms::AddressGroup::Component.new(form_builder: address_form)) %>
-        <% end %>
-      </div>
     </div>
+
+    <%= @form_builder.fields_for :address_record, @location.find_or_build_address_record do |address_form| %>
+      <%= render(UI::Forms::AddressGroup::Component.new(form_builder: address_form)) %>
+    <% end %>
 
     <div class="tw:grid tw:gap-x-6 tw:lg:grid-cols-2">
       <div>

@@ -89,6 +89,14 @@
     @apply tw:block tw:mb-1 tw:text-sm tw:font-medium tw:text-gray-800 tw:dark:text-gray-500 tw:cursor-pointer;
   }
 
+  /* Fields that read as one control -- a city and its state, a name and its phone. The
+   * gutter is tighter than a page-level grid's, and auto-fit means the break to full width
+   * comes from the row running out of room rather than from a viewport breakpoint, so a row
+   * inside a narrow card breaks at the same width it would anywhere else. */
+  .twfieldrow {
+    @apply tw:grid tw:gap-x-2 tw:grid-cols-[repeat(auto-fit,minmax(140px,1fr))];
+  }
+
   [aria-expanded="true"] .twdropdown-chevron {
     @apply tw:rotate-180;
   }
