@@ -265,7 +265,10 @@ class Organization < ApplicationRecord
 
       permitted_domain_signin("saml_sso").where(user_email_domain: domain)
         .includes(:organization_saml_configuration)
-        .detect { |org| org.organization_saml_configuration&.configured? }
+        .detect do |org|
+          configuration = org.organization_saml_configuration
+          configuration&.active? && configuration.configured?
+        end
     end
 
     def example

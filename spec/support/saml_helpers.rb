@@ -152,7 +152,7 @@ RSpec.shared_context "sso_organization" do
     FactoryBot.create(:organization_with_organization_features,
       enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
   end
-  let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+  let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :active, organization:) }
 end
 
 RSpec.configure do |config|

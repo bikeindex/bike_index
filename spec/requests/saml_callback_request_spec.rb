@@ -10,7 +10,7 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
     FactoryBot.create(:organization_with_organization_features,
       enabled_feature_slugs: "saml_sso", user_email_domain: domain)
   end
-  let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+  let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :active, organization:) }
   let(:slug) { organization.to_param }
   let(:settings) { Saml::SettingsBuilder.build(saml_configuration) }
   let(:email) { "newperson@#{domain}" }
@@ -49,7 +49,7 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
       expect(response.headers["Location"]).to include("SAMLRequest=")
     end
 
-    context "configuration not enabled" do
+    context "configuration inactive" do
       let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, organization:) }
       it "is not found" do
         get "/sso/#{slug}/init"
@@ -71,6 +71,16 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
         expect(identity.user).to eq user
         expect(user.last_login_at).to be_within(5.seconds).of Time.current
         expect(signed_in?).to be true
+      end
+
+      context "inactive configuration" do
+        before { saml_configuration.update!(active: false) }
+
+        it "accepts an assertion for the organization's domain" do
+          expect { post_callback }.to change(User, :count).by(1)
+          expect(response).to have_http_status(:found)
+          expect(signed_in?).to be true
+        end
       end
 
       # The session that stored return_to is withheld on the IdP's cross-site POST, so the

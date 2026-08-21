@@ -22,6 +22,10 @@ RSpec.describe Admin::Organizations::Form::SamlSso::Component, type: :component 
     expect(component).to have_link(href: "http://test.host/sso/#{organization.to_param}/sp.crt")
   end
 
+  it "warns that active SSO forces every domain user through the IdP" do
+    expect(component).to have_text("Force every user at this domain through live SAML SSO")
+  end
+
   context "with an existing configuration" do
     before { organization.create_organization_saml_configuration(idp_entity_id: "https://idp.example.edu/") }
 
