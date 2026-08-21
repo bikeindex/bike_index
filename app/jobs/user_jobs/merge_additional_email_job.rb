@@ -1,4 +1,4 @@
-module Users
+module UserJobs
   class MergeAdditionalEmailJob < ApplicationJob
     sidekiq_options queue: "high_priority"
 

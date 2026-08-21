@@ -1,4 +1,4 @@
-module Users
+module UserJobs
   class RemoveUnconfirmedJob < ScheduledJob
     prepend ScheduledJobRecorder
 

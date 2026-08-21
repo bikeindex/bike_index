@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Users::CreateOrUpdateMembershipFromPaymentJob, type: :job do
+RSpec.describe UserJobs::CreateOrUpdateMembershipFromPaymentJob, type: :job do
   let(:instance) { described_class.new }
 
   let(:user) { FactoryBot.create(:user_confirmed) }

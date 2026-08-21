@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Users::SeoSpamCheckJob, type: :job do
+RSpec.describe UserJobs::SeoSpamCheckJob, type: :job do
   let(:instance) { described_class.new }
 
   describe "perform" do

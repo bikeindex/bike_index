@@ -1,4 +1,4 @@
-module Users
+module UserJobs
   # Bans a likely SEO-spam public-profile (show_bikes) user — crypto/gambling link
   # farms and gibberish profiles. Run inline from AfterUserChangeJob.
   class SeoSpamCheckJob < ApplicationJob

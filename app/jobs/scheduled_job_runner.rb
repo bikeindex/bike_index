@@ -64,7 +64,7 @@ class ScheduledJobRunner < ScheduledJob
       UpdateInvoiceJob,
       UpdateManufacturerLogoAndPriorityJob,
       UpdateOrganizationPosKindJob,
-      Users::RemoveUnconfirmedJob,
+      UserJobs::RemoveUnconfirmedJob,
       self
     ].freeze
   end

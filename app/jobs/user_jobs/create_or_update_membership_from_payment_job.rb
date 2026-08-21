@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # NOTE: This job creates admin managed memberships
-module Users
+module UserJobs
   class CreateOrUpdateMembershipFromPaymentJob < ApplicationJob
     def perform(payment_id, admin_id = nil)
       payment = Payment.find(payment_id)
