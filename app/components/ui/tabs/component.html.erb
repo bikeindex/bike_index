@@ -2,14 +2,13 @@
   twgutter-bleed rather than w-full: the row scrolls the whole width of the page, and a
   width:100% border box with negative margins would slide left instead of bleeding both sides.
 
-  pb-4 for the reason UI::Table's scroll wrapper has pb-3: overflow-x makes overflow-y auto
-  too, so a horizontal scrollbar that takes up space shortens the box and the tabs start
-  scrolling vertically. 16px is the room one takes; macOS's overlay scrollbars take none,
-  which is why this only shows up on some machines
+  overflow-x makes overflow-y auto too, and the row picks up a little vertical scroll
+  without padding to sit in. It needs room at the top as well as the bottom - pb alone
+  doesn't settle it
 %>
 
 <nav
-  class="twgutter-bleed tw:overflow-x-auto tw:pb-4"
+  class="twgutter-bleed tw:overflow-x-auto tw:pt-1 tw:pb-3"
   aria-label="<%= @nav_label %>"
   data-controller="ui--tabs"
 >
