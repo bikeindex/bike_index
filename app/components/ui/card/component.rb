@@ -9,10 +9,13 @@ module UI
       UNDIVIDED_CLASSES = "tw:p-4 tw:rounded-sm"
 
       # divided: separate the direct children with row dividers, for a checklist
-      def initialize(additional_classes: nil, shadow: false, divided: false)
+      # full_bleed: meet the page's gutter once the .twwiderow holding it is single-column,
+      #   and nothing outside such a row
+      def initialize(additional_classes: nil, shadow: false, divided: false, full_bleed: false)
         @additional_classes = additional_classes
         @shadow = shadow
         @divided = divided
+        @full_bleed = full_bleed
       end
 
       def call
@@ -23,7 +26,8 @@ module UI
 
       def card_classes
         [BASE_CLASSES, @divided ? DIVIDED_CLASSES : UNDIVIDED_CLASSES,
-          ("tw:shadow-sm" if @shadow), @additional_classes].compact.join(" ")
+          ("tw:shadow-sm" if @shadow), ("tw:twfullbleed" if @full_bleed),
+          @additional_classes].compact.join(" ")
       end
     end
   end

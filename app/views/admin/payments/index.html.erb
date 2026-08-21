@@ -195,10 +195,11 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @payments,
   viewing: "Payments",
   rendered_chart:,
   nav_header_list_items:,
   admin_search_form:,
-  table_view:
+  table_view:,
 )) %>

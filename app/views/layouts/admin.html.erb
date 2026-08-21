@@ -41,12 +41,10 @@
   <%= body_tag(html_class: admin_body_class) do %>
     <%= render(PageBlock::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
 
-    <%= render(Admin::Navbar::Component.new(current_user:, user_root_url:, controller_name:, action_name:, search_filtered: admin_search_filtered?)) %>
+    <%= render(Admin::Navbar::Component.new(current_user:, user_root_url:, controller_path:, search_filtered: admin_search_filtered?)) %>
 
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
 
-    <section id="admin-content" class="pb-4 mb-4">
-      <div class="container-fluid mt-4 pb-4"><%= yield %></div>
-    </section>
+    <section id="admin-content" class="twgutter tw:pb-16"><%= yield %></section>
   <% end %>
 </html>

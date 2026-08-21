@@ -1,0 +1,5 @@
+<%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :edit, display_dev_info: display_dev_info?)) %>
+
+<%= render(Admin::Organizations::Form::TabForm::Component.new(organization: @organization, tab: "edit",
+      fields_component: Admin::Organizations::Form::Wrapper::Component,
+      fields_args: {display_dev_info: display_dev_info?}, width: :wide)) %>

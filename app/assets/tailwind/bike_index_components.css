@@ -1,9 +1,27 @@
 /* Bike Index's own tw* classes. Rules that style one component's markup — .ui-table,
  * .search-results-frame-wrapper — stay in application.css */
 
+/* A plain custom property rather than @theme: a theme variable takes the tw prefix, and
+ * is dropped unless a generated utility references it */
+:root {
+  --gutter: calc(var(--tw-spacing) * 4);
+}
+
 /* A utility rather than a class in the layer below: `@apply` only takes utilities */
 @utility twtext-color {
   @apply tw:text-gray-900 tw:dark:text-gray-400;
+}
+
+/* A card that meets the page's own gutter rather than sitting inset inside it twice over,
+ * once the .twwiderow holding it has dropped to one column. Keyed to the row rather than the
+ * viewport so it can't disagree with the column count - 672px is where .twwiderow's second
+ * 320px column stops fitting, and a container query can't read that from a var(). A utility,
+ * not a class in the layer below, so it outranks the card's own tw:border. */
+@utility twfullbleed {
+  @container twwiderow (width < 672px) {
+    /* px-0 forced: the card's own tw:p-4 is the padding shorthand, which wins outright */
+    @apply tw:border-x-0 tw:border-t-0 tw:px-0!;
+  }
 }
 
 @layer components {
@@ -83,6 +101,25 @@
     @apply tw:block tw:mb-1 tw:text-sm tw:font-medium tw:text-gray-800 tw:dark:text-gray-500 tw:cursor-pointer;
   }
 
+  /* Fields that read as one control -- a city and its state, a name and its phone. The
+   * gutter is tighter than a page-level grid's, and auto-fit means the break to full width
+   * comes from the row running out of room rather than from a viewport breakpoint, so a row
+   * inside a narrow card breaks at the same width it would anywhere else. */
+  .twfieldrow {
+    @apply tw:grid tw:gap-x-2 tw:grid-cols-[repeat(auto-fit,minmax(140px,1fr))];
+  }
+
+  /* Two columns of cards or sections, breaking on the row's own width like .twfieldrow
+   * rather than at a viewport breakpoint. The max() caps it at two, which repeat() alone
+   * would not do - a wide row fits four 320px tracks. auto-fill rather than auto-fit so a
+   * column whose only child is hidden holds its place instead of handing the whole row to
+   * its neighbour. */
+  .twwiderow {
+    @apply tw:grid tw:gap-x-8;
+    container: twwiderow / inline-size;
+    grid-template-columns: repeat(auto-fill, minmax(max(320px, calc((100% - var(--tw-spacing) * 8) / 2)), 1fr));
+  }
+
   [aria-expanded="true"] .twdropdown-chevron {
     @apply tw:rotate-180;
   }
@@ -138,5 +175,15 @@
 
   .twhr {
     @apply tw:border-0 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700 tw:my-8;
+  }
+
+  .twgutter {
+    padding-inline: var(--gutter);
+  }
+
+  /* Edge to edge, then the gutter back inside it - what a wide table scrolls in */
+  .twgutter-bleed {
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
   }
 }

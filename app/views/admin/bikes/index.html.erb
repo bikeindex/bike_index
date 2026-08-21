@@ -254,10 +254,11 @@
 <% end unless admin_search_filtered? %>
 
 <% table_view = capture do %>
-  <%= render Admin::BikesTable::Component.new(bikes: @bikes, render_sortable: true, render_multi_check: @multi_delete) %>
+  <%= render Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:, display_dev_info: display_dev_info?, show_serial: params[:show_serial].present?, skip_manufacturer_link: params[:search_manufacturer].present?, render_sortable: true, render_multi_check: @multi_delete) %>
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @bikes,
   viewing: "Bikes",
   nav_header_list_items:,

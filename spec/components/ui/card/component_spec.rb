@@ -18,6 +18,22 @@ RSpec.describe UI::Card::Component, type: :component do
     expect(page).to have_content("in the card")
   end
 
+  context "full_bleed" do
+    # What it drops, and the width it drops them at, are .twfullbleed's under a container
+    # query on the row - all the card owes is the class
+    it "marks the card for the row to bleed, without unsetting anything itself" do
+      render_inline(described_class.new(full_bleed: true)) { "in the card" }
+
+      expect(page).to have_css("div[class~='tw:twfullbleed'][class~='tw:border'][class~='tw:p-4']")
+    end
+
+    it "leaves the class off otherwise" do
+      render_inline(described_class.new) { "in the card" }
+
+      expect(page).to have_no_css("div[class~='tw:twfullbleed']")
+    end
+  end
+
   context "divided" do
     it "divides its rows instead of padding" do
       render_inline(described_class.new(divided: true)) { "<p>row one</p><p>row two</p>".html_safe }

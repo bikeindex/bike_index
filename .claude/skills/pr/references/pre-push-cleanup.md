@@ -10,6 +10,8 @@ Skip it when the diff has no code in it — a docs-, skill- or config-only branc
 
 **On a second run against the same branch, scope it to the commits since the last one** — `/simplify` defaults to the whole branch diff, so re-running it resurfaces every finding already triaged, including the ones deliberately declined. Pass the range (`git diff <last-simplify-commit>..HEAD`) as its argument.
 
+**That range breaks when earlier branch work was split into its own PRs and merged.** Those commits return through a merge from the base, so `<last-simplify-commit>..HEAD` includes all of them plus everything else the base gained — hundreds of files, none of it yours. Check with `git log --oneline <last-simplify-commit>..HEAD`; if it lists the base's merges, scope to your own commits instead (`git show` each) rather than a range.
+
 Then run `bin/lint` to auto-format (it also picks up whatever `/simplify` just changed). Always `bin/lint`, never another formatter or `standardrb` directly. Scope it to the branch's files rather than walking the whole repo:
 
 ```bash
@@ -33,6 +35,30 @@ Scope specs the same way — the ones covering what the branch changed, never a 
 Then review the changed files against `CLAUDE.md` (root and any nested ones in touched directories) and fix what doesn't conform — code style, testing conventions, and frontend rules. Only touch lines this branch already changed.
 
 **`bin/update_component_digests` goes after the last code edit, not before.** A `MARKUP_DIGEST` covers everything its cached tree renders out into, so editing a shared component (`UI::ActiveLink`, `UI::Button`) stales the digest of every component that renders it — `PageBlock::Navbar::Wrapper` and `PageBlock::Footer` both, for one edit — and regenerating before `/simplify`'s or the CLAUDE.md pass's own edits just means doing it twice.
+
+It hashes the component's *files*, not its output, and globs the whole directory — so a comment that renders nothing bumps the digest just the same, whether you put it in the template or in `component.rb`. A `<%# … %>` explaining one line can therefore flush every cached row of every organization. Somewhere outside the component directory (`.herb.yml`, the PR body) is the free place to say it.
+
+### The spec audit
+
+**Required, same as the comment audit below.** List the examples the branch adds:
+
+```bash
+rtk proxy git diff origin/main...HEAD -U0 -- 'spec/**/*_spec.rb' |
+  grep -E '^(\+\+\+ |\+\s*(it|scenario|specify) )'
+```
+
+Judge each one against a single question: **what bug does this fail on?** If you can't name a plausible edit that breaks the example *and* is wrong, delete it — a green assertion that can only go red when someone deliberately changes the thing it restates is a change-detector, and it costs a re-edit on every future change while catching nothing.
+
+The ones to cut, all of which have been written here:
+
+- **Framework behaviour.** `render_inline(described_class.new) { "content" }` then asserting the content rendered — that's ViewComponent's job, not the component's.
+- **Passing an argument through.** Handing the component `title:` and asserting the title appears. Nothing between the input and the output can be wrong; assert what the component *decides* instead — which tab is active, which column is dropped.
+- **A class list the template writes literally.** Pinning `class="tw:w-full tw:max-w-3xl"` re-asserts the source. The exception is a class the component *computes* — a conditional `active`, a width chosen from an argument — where the branch is the point.
+- **What a request spec already covers.** A component spec listing the fields a form renders, next to a request spec that asserts the same names, is one of them maintained for nothing. Keep the one closest to the logic.
+
+Keep, without hesitating, the ones tied to a failure mode: a conditional branch, a computed value, an argument guard that would otherwise fail silently, `it_behaves_like "cached_markup_digest"`, and any example written *because* something broke — say so in a comment above it, so the next audit doesn't mistake it for a change-detector.
+
+This applies to the branch's specs, not the suite's. Don't delete pre-existing examples you merely moved between files.
 
 ### The comment audit
 

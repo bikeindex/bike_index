@@ -9,18 +9,18 @@ module Org
       # registrations on the show page). Pass render_sortable to enable sort links.
       class Component < ApplicationComponent
         # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "c78f8a73b547"
+        MARKUP_DIGEST = "3e71483d5f4c"
 
         delegate :additional_registration_fields, :column_renames, to: :settings_component
 
         def initialize(organization:, bikes:, current_user: nil, render_sortable: false,
-          cache_key: nil, sortable_search_params: {}, bike_sticker: nil, settings_component: nil)
+          cache_key: nil, sort_state: ComponentStates::SortState.new, bike_sticker: nil, settings_component: nil)
           @organization = organization
           @bikes = bikes
           @current_user = current_user
           @render_sortable = render_sortable
           @cache_key = cache_key || "org-#{organization.id}-#{MARKUP_DIGEST}"
-          @sortable_search_params = sortable_search_params
+          @sort_state = sort_state
           @bike_sticker = bike_sticker
           @settings_component = settings_component
         end
@@ -45,7 +45,7 @@ module Org
           return {} unless @render_sortable
           attrs = {
             controller: "update-cached-sortable-links org--assign-bike-sticker",
-            "update-cached-sortable-links-base-url-value": url_for(@sortable_search_params.merge(organization_id: @organization.to_param))
+            "update-cached-sortable-links-base-url-value": url_for(@sort_state.search_params.merge(organization_id: @organization.to_param))
           }
           if @bike_sticker.present?
             attrs[:"org--assign-bike-sticker-sticker-path-value"] = bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id)

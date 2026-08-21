@@ -4,7 +4,7 @@
 <% current_user = @current_user %>
 
 <%= tag.div(data: table_wrapper_data_attributes) do %>
-  <%= render(UI::Table::Component.new(records: @bikes, cache_key: @cache_key, render_sortable: @render_sortable)) do |table| %>
+  <%= render(UI::Table::Component.new(records: @bikes, cache_key: @cache_key, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
     <% hidden_html = hidden_not_registered_tag %>
     <% email_hidden = translation(".email_hidden") %>
 

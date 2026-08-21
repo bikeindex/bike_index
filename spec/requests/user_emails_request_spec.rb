@@ -61,7 +61,7 @@ RSpec.describe UserEmailsController, type: :request do
         it "renders the interstitial without spending the token" do
           expect {
             get "#{base_url}/#{user_email.id}/confirm", params: {confirmation_token: user_email.confirmation_token}
-          }.to change(Users::MergeAdditionalEmailJob.jobs, :size).by 0
+          }.to change(UserJobs::MergeAdditionalEmailJob.jobs, :size).by 0
           expect(response.code).to eq("200")
           expect(response).to render_template("user_emails/confirm")
           expect(Capybara.string(response.body))
@@ -76,7 +76,7 @@ RSpec.describe UserEmailsController, type: :request do
         it "confirms and enqueues merge job" do
           expect {
             post "#{base_url}/#{user_email.id}/confirm", params: {confirmation_token: user_email.confirmation_token}
-          }.to change(Users::MergeAdditionalEmailJob.jobs, :size).by 1
+          }.to change(UserJobs::MergeAdditionalEmailJob.jobs, :size).by 1
           user_email.reload
           expect(user_email.confirmed?).to be_truthy
           expect(flash[:success]).to be_present
@@ -87,7 +87,7 @@ RSpec.describe UserEmailsController, type: :request do
           user_email.confirm(user_email.confirmation_token)
           expect {
             post "#{base_url}/#{user_email.id}/confirm", params: {confirmation_token: "sometoken-or-something"}
-          }.to change(Users::MergeAdditionalEmailJob.jobs, :size).by 0
+          }.to change(UserJobs::MergeAdditionalEmailJob.jobs, :size).by 0
           expect(flash[:notice]).to be_present
         end
       end
@@ -95,7 +95,7 @@ RSpec.describe UserEmailsController, type: :request do
         it "sets flash error and does not add job" do
           expect {
             post "#{base_url}/#{user_email.id}/confirm", params: {confirmation_token: "somethingelse-"}
-          }.to change(Users::MergeAdditionalEmailJob.jobs, :size).by 0
+          }.to change(UserJobs::MergeAdditionalEmailJob.jobs, :size).by 0
           expect(flash[:error]).to be_present
         end
       end

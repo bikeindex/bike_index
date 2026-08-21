@@ -1,0 +1,38 @@
+<%#
+  .admin-subnav bleeds -15px of its own; matching --gutter exactly is what lets
+  everything inside drop .col's compensating padding. UI::Tabs draws the line under
+  itself, so the subnav's own border would double it
+%>
+
+<div
+  class="
+    admin-subnav tw:-mx-[var(--gutter)]! tw:border-b-0!
+    tw:px-[var(--gutter)] tw:pb-0!
+  "
+>
+  <div class="tw:flex-1">
+    <h1>
+      <%= @title %>
+
+      <% if @subtitle.present? %>
+        <small><%= @subtitle %></small>
+      <% end %>
+    </h1>
+  </div>
+
+  <div class="tw:flex-1">
+    <ul>
+      <% @links.each do |link| %>
+        <li class="nav-item"><%= link %></li>
+      <% end %>
+    </ul>
+  </div>
+
+  <% if alert? %>
+    <div class="tw:mt-6 tw:w-full tw:md:w-1/2"><%= alert %></div>
+  <% end %>
+
+  <div class="tw:mt-3 tw:w-full">
+    <%= render(UI::Tabs::Component.new(tabs: @tabs, nav_label: @nav_label, turbo: @turbo)) %>
+  </div>
+</div>

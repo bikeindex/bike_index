@@ -42,7 +42,7 @@
           </td>
 
           <td>
-            <%= render Admin::OrganizationCell::Component.new(organization: registration_sequence.organization, render_search: true) %>
+            <%= render Admin::Organizations::Cell::Component.new(sort_state:, organization: registration_sequence.organization, render_search: true) %>
           </td>
 
           <td><%= registration_sequence.status.titleize %></td>

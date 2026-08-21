@@ -1,0 +1,18 @@
+<%= render(UI::Table::Component.new(records: rows)) do |table| %>
+  <% table.column(label: "Snippet Kind") { |row| tag.small(row[:kind_label]) } %>
+
+  <% table.column(label: "Link to edit") { |row| link_to(row[:edit_label], row[:edit_path]) } %>
+
+  <% table.column(label: "Preview") do |row| %>
+    <% if row[:preview_label].present? %>
+      <%= row[:preview_prefix] %>
+      <%= link_to row[:preview_label], row[:preview_path], class: "tw:text-sm" %>
+    <% else %>
+      <span class="text-warning">Unknown email kind: "<%= row[:emails] %>"</span>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Has content", classes: "tw:text-center") { |row| check_mark if row[:content] } %>
+
+  <% table.column(label: "Enabled", classes: "tw:text-center") { |row| check_mark if row[:enabled] } %>
+<% end %>

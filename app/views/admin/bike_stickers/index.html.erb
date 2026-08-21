@@ -133,11 +133,11 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @bike_stickers,
   viewing: "Stickers",
   chart_collection: @render_chart && matching_bike_stickers,
-  time_range_column: @time_range_column,
   nav_header_list_items:,
   admin_search_form:,
-  table_view:
+  table_view:,
 )) %>

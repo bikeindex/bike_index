@@ -33,8 +33,10 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  viewing: controller_name.humanize,
   collection: @ambassador_task_assignments,
   index_title: "Completed Ambassador Activities",
   nav_header_list_items:,
-  skip_charting: true
+  skip_charting: true,
 )) %>

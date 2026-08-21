@@ -17,8 +17,7 @@ export default class extends Controller {
     this.nextIndex = Date.now()
   }
 
-  add (event) {
-    event.preventDefault()
+  add () {
     const fields = this.templateTarget.innerHTML.replaceAll('__INDEX__', this.nextIndex++)
     this.targetTarget.insertAdjacentHTML('beforebegin', fields)
     this.dispatch('add')

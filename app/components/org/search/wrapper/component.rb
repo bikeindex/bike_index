@@ -4,8 +4,6 @@ module Org
   module Search
     module Wrapper
       class Component < ApplicationComponent
-        include Binxtils::SortableHelper
-
         delegate :initially_checked_columns, :cycle_type, :active_search_filter_descriptions,
           to: :settings_component
         def initialize(
@@ -16,12 +14,12 @@ module Org
           bikes: [],
           current_user: nil,
           interpreted_params: {},
-          sortable_search_params: {},
+          sort_state: ComponentStates::SortState.new,
           search_stickers: nil,
           search_address: nil,
           search_status: "all",
           search_query_present: false,
-          time_range: nil,
+          humanized_time_range: nil,
           stolenness: "all",
           bike_sticker: nil,
           model_audit: nil,
@@ -34,14 +32,14 @@ module Org
           @bikes = bikes
           @current_user = current_user
           @interpreted_params = interpreted_params
-          @sortable_search_params = sortable_search_params
+          @sort_state = sort_state
           @per_page = per_page
           @params = params
           @search_stickers = search_stickers
           @search_address = search_address
           @search_status = search_status
           @search_query_present = search_query_present
-          @time_range = time_range
+          @humanized_time_range = humanized_time_range
           @stolenness = stolenness
           @bike_sticker = bike_sticker
           @model_audit = model_audit
@@ -56,7 +54,7 @@ module Org
           @settings_component ||= Org::Search::Settings::Component.new(
             organization: @organization,
             interpreted_params: @interpreted_params,
-            sortable_search_params: @sortable_search_params,
+            sortable_search_params: @sort_state.search_params,
             params: @params,
             search_stickers: @search_stickers,
             search_address: @search_address,

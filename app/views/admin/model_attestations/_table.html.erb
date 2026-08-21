@@ -89,7 +89,7 @@
           </td>
 
           <td>
-            <%= render Admin::UserCell::Component.new(user: model_attestation.user, render_search: true) %>
+            <%= render Admin::Users::Cell::Component.new(sort_state:, user: model_attestation.user, render_search: true) %>
           </td>
 
           <td>

@@ -76,12 +76,12 @@ module CallbackJobs
       return false unless organization_roles.any?
 
       first, *rest = organization_roles.pluck(:id)
-      Users::ProcessOrganizationRoleJob.new.perform(first, user.id)
+      UserJobs::ProcessOrganizationRoleJob.new.perform(first, user.id)
 
       # We want to do the first one inline so we can redirect
       # the user to the org page
       rest.each do |organization_role_id|
-        Users::ProcessOrganizationRoleJob.perform_async(organization_role_id, user.id)
+        UserJobs::ProcessOrganizationRoleJob.perform_async(organization_role_id, user.id)
       end
 
       user.confirm(user.confirmation_token) unless skip_confirm

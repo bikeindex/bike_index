@@ -20,14 +20,26 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
     let(:current_user) { FactoryBot.create(:superuser_developer) }
 
     describe "index" do
-      it "renders" do
+      it "renders in the organization tabs, with the organization's view top right" do
         get base_url
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
+        expect(response.body).to include(edit_admin_organization_path(organization, tab: "locations"))
+        expect(response.body).to include("href=\"#{organization_emails_path(organization_id: organization.to_param)}\"")
       end
     end
 
     describe "edit" do
+      # The uppy uploader on these pages is set up by the legacy admin bundle on DOM ready,
+      # which a turbo restoration visit doesn't re-run - it restores a clone of its snapshot,
+      # so coming back would find live-looking markup nothing is bound to
+      it "doesn't send the tabs through turbo, from a page carrying the uploader" do
+        get "#{base_url}/landing_page/edit"
+        expect(response.status).to eq(200)
+        expect(response.body).to include("UppyForm")
+        expect(response.body).to_not include('data-turbo="true"')
+      end
+
       context "landing_page" do
         it "renders without creating a landing page, and links to the preview" do
           expect(LandingPages::ORGANIZATIONS).to_not include(organization.slug)
@@ -36,7 +48,8 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           }.to_not change(OrganizationLandingPage, :count)
           expect(response.status).to eq(200)
           expect(response).to render_template(:edit)
-          expect(response).to render_template("_landing_page")
+          expect(response.body).to include ">Landing page (html)"
+          expect(response.body).to include 'name="organization_landing_page[body]"'
           expect(response.body).to_not match("search_item_type=OrganizationLandingPage")
           expect(response.body).to_not include "button_hover"
           expect(response.body).to include organization_landing_path(organization_id: organization.to_param)
@@ -116,7 +129,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
               get "#{base_url}/#{snippet_kind}/edit"
               expect(response.status).to eq(200)
               expect(response).to render_template(:edit)
-              expect(response).to render_template("_mail_snippet")
+              expect(response.body).to include "#{snippet_kind.titleize} snippet"
               organization.reload
               expect(organization.mail_snippets.count).to eq 1
               expect(organization.mail_snippets.where(kind: snippet_kind).count).to eq 1

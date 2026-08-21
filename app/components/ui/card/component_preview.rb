@@ -16,6 +16,12 @@ module UI
         end
       end
 
+      # The template supplies the .twwiderow full_bleed is keyed to. Narrow the preview until
+      # the row drops to one column to see the cards lose their sides and meet the gutter
+      def full_bleed
+        {template: "ui/card/component_preview/full_bleed"}
+      end
+
       def divided
         render(UI::Card::Component.new(divided: true)) do
           safe_join(["Man braid sustainable solarpunk", "Vexillologist grailed marxism schlitz", "Big mood shabby chic cornhole"]

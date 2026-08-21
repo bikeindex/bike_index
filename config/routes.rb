@@ -336,6 +336,9 @@ Rails.application.routes.draw do
     end
 
     resources :organizations do
+      # Selection chips for the features filter combobox on the index
+      post :feature_chips, on: :collection
+
       resources :custom_layouts, only: %i[index edit update], controller: "organizations/custom_layouts"
       resources :invoices, controller: "organizations/invoices"
     end

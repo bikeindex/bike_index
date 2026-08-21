@@ -1,0 +1,69 @@
+<%# Inline CSS rather than omitting the column, because the rows are cached %>
+<% unless @render_deleted %>
+  <style>.deleted-col { display: none; }</style>
+<% end %>
+
+<% pos_link = method(:pos_link) %>
+
+<%= render(UI::Table::Component.new(records: @organizations, cache_key:, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
+  <% table.column(sortable: "name") do |organization| %>
+    <%= link_to organization.name, admin_organization_url(organization) %>
+
+    <small class="twless-strong"><%= "paid" if organization.paid? %></small>
+
+    <% parent_names = organization.regional_parents.pluck(:short_name) %>
+
+    <% if parent_names.any? %>
+      <div class="tw:mt-1 tw:text-sm">
+        <em class="twless-strong"><%= "region parent".pluralize(parent_names.count) %>:</em>
+        <%= safe_join(parent_names.map { |name| link_to(name, admin_organization_url(name), class: "gray-link") }, ", ") %>
+      </div>
+    <% end %>
+
+    <% if organization.parent_organization.present? %>
+      <div class="tw:mt-1 tw:text-sm">
+        <em class="text-warning twless-strong">parent:</em>
+        <%= link_to organization.parent_organization.short_name, admin_organization_url(organization.parent_organization), class: "twless-strong" %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "approved", classes: "tw:text-center") do |organization| %>
+    <%= check_mark if organization.approved %>
+  <% end %>
+
+  <% table.column(sortable: "created_at") do |organization| %>
+    <%= render(UI::Time::Component.new(time: organization.created_at)) %>
+  <% end %>
+
+  <% table.column(sortable: "bikes") do |organization| %>
+    <%= number_display(organization.bikes.count) %>
+  <% end %>
+
+  <% table.column(label: "OrganizationRoles") do |organization| %>
+    <%= number_display(organization.organization_roles.count) %>
+  <% end %>
+
+  <% table.column(label: "Type") do |organization| %>
+    <%# A fixed path rather than the current search params, which the row cache would bake in %>
+    <%= link_to organization.kind_humanized, admin_organizations_path(search_kind: organization.kind) %>
+  <% end %>
+
+  <% table.column(sortable: "pos_kind", label: "POS") do |organization| %>
+    <% if organization.bike_shop? || organization.pos? %>
+      <small><%= pos_link.call(organization) %></small>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "deleted_at", classes: "deleted-col") do |organization| %>
+    <% if organization.deleted_at.present? %>
+      <small class="text-danger">
+        <%= render(UI::Time::Component.new(time: organization.deleted_at)) %>
+      </small>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Locations", lower_right: ->(organization) { "Mapped" if organization.show_on_map }) do |organization| %>
+    <%= number_display(organization.locations.count) %>
+  <% end %>
+<% end %>

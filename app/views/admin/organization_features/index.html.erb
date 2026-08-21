@@ -5,8 +5,9 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @organization_features,
   viewing: "Organization Features",
   skip_charting: true,
-  nav_header_list_items:
+  nav_header_list_items:,
 )) %>

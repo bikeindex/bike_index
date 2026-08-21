@@ -78,13 +78,13 @@
 
           <% unless skip_bike %>
             <td>
-              <%= render Admin::BikeCell::Component.new(bike: theft_alert.bike, bike_id: theft_alert.bike_id) %>
+              <%= render Admin::Bikes::Cell::Component.new(bike: theft_alert.bike, bike_id: theft_alert.bike_id) %>
             </td>
           <% end %>
 
           <td>
             <%= cache(theft_alert.user) do %>
-              <%= render Admin::UserCell::Component.new(user: theft_alert.user, render_search: true, user_id: theft_alert.user_id) %>
+              <%= render Admin::Users::Cell::Component.new(sort_state:, user: theft_alert.user, render_search: true, user_id: theft_alert.user_id) %>
             <% end %>
           </td>
 

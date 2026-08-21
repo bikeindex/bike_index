@@ -37,6 +37,8 @@ From the changed files, infer the affected routes. Heuristics:
 - Admin views → `/admin/...`
 - If unclear, ask the user which URLs to capture before proceeding. Do not guess blindly — 1–3 well-chosen URLs beats 10 random ones.
 
+**Confirm the page renders what changed, before capturing it.** A page that looks like the obvious home for a component often isn't — `/admin/organizations/:id/edit` has seven tables and none of them is `UI::Table`, and its address fields aren't `UI::Forms::AddressGroup` either. One `browser_evaluate` counting the component's own marker class settles it; a shot that turns out not to contain the change is a whole capture round wasted, base branch included. A component with a preview is the reliable fallback.
+
 ## 2. Capture branch screenshots
 
 Invoke the `frontend-screenshots` skill with the `(url-path, page-slug)` pairs from step 1. It handles dev-server check, sign-in, the seeded-user identity gate, viewport sizing, and per-PNG sanity checks, and returns the local PNG paths.

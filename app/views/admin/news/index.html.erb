@@ -42,10 +42,11 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @blogs,
   viewing: "News/Blogs/Info",
   nav_header_list_items:,
   table_view:,
   count_detail:,
-  chart_collection: @render_chart && available_blogs
+  chart_collection: @render_chart && available_blogs,
 )) %>

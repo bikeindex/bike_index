@@ -311,13 +311,13 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "3dbb49d6d861b8ab8334653febf197377376f6f397dc46cdc94c6b4096da3849",
+      "fingerprint": "ca1b827a35382eca8c5dc1df522f3fcf5e06ddf1b64bbe78ea51d840876bcc91",
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/components/admin/pagination_with_count/component.rb",
-      "line": 59,
+      "line": 51,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "collection.where(\"#{collection.table_name}.#{(time_range_column or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
+      "code": "collection.where(\"#{collection.table_name}.#{((time_range_column or index.time_range_column) or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
       "render_path": null,
       "location": {
         "type": "method",
@@ -329,7 +329,7 @@
       "cwe_id": [
         89
       ],
-      "note": "time_range_column is set during component initialization by the developer, not from user params"
+      "note": "time_range_column is set during component initialization by the developer, not from user params - admin/invoices is the only controller that reads it from params, and whitelists it against %w[subscription_start_at subscription_end_at]"
     },
     {
       "warning_type": "Dangerous Send",
