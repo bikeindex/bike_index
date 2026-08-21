@@ -1,0 +1,20 @@
+<%= render(Admin::Headers::Nav::Component.new(title: "Manage Invoices")) do %>
+  <li class="nav-item">
+    <%= link_to "Paid", "#", class: "nav-link active" %>
+  </li>
+
+  <li class="nav-item">
+    <%= link_to "Unpaid", "#", class: "nav-link" %>
+  </li>
+
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: "All statuses", button_size: :sm)) do |dropdown| %>
+      <% dropdown.with_entry_item { link_to "All statuses", "#" } %>
+      <% dropdown.with_entry_item { link_to "Overdue only", "#" } %>
+    <% end %>
+  </li>
+
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "New Invoice", href: "#", color: :primary, size: :sm)) %>
+  </li>
+<% end %>

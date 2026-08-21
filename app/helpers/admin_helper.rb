@@ -95,8 +95,8 @@ module AdminHelper
     ))
   end
 
-  def render_admin_current_header(viewing: nil, kind_humanized: nil)
-    render(Admin::CurrentHeader::Component.new(
+  def render_admin_current_info(viewing: nil, kind_humanized: nil)
+    render(Admin::Headers::CurrentInfo::Component.new(
       params:,
       viewing:,
       kind_humanized:,

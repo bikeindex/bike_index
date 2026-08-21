@@ -1,0 +1,11 @@
+<div class="<%= wrapper_classes %>">
+  <%# UI::Header's own bottom margins would space the flex row rather than the heading %>
+  <div class="tw:mr-auto tw:[&_p]:mb-0">
+    <%= render(UI::Header::Component.new(text: @title, subtitle: @subtitle,
+          html_class: "tw:mb-0! tw:md:text-3xl")) %>
+  </div>
+
+  <% if content.present? %>
+    <ul class="<%= list_classes %>"><%= content %></ul>
+  <% end %>
+</div>

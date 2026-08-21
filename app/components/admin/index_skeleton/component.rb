@@ -60,6 +60,13 @@ module Admin
         @viewing || helpers.controller_name.humanize
       end
 
+      # "Manage" is the sentence the screen name finishes, and the first thing a narrow
+      # screen can spare
+      def index_title
+        @index_title.presence ||
+          safe_join([tag.span("Manage", class: "tw:hidden tw:lg:inline"), " ", viewing])
+      end
+
       def show_chart?
         !@skip_charting && @render_chart
       end
@@ -69,8 +76,8 @@ module Admin
         render(UI::Chart::Component.new(series: [{name: viewing, data:}], time_range: @time_range))
       end
 
-      def current_header_component
-        Admin::CurrentHeader::Component.new(
+      def current_info_component
+        Admin::Headers::CurrentInfo::Component.new(
           params: @params, viewing: @viewing,
           user_subject: @user_subject, bike: @bike,
           marketplace_listing: @marketplace_listing,

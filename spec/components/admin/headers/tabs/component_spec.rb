@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Admin::RecordTabs::Component, type: :component do
+RSpec.describe Admin::Headers::Tabs::Component, type: :component do
   let(:tabs) do
     [{label: "Show", href: "/admin/things/1", active: true},
       {label: "Edit", href: "/admin/things/1/edit", active: false}]
@@ -18,13 +18,14 @@ RSpec.describe Admin::RecordTabs::Component, type: :component do
     let(:component) do
       links = ["<a href='/one'>One</a>".html_safe, "<a href='/two'>Two</a>".html_safe]
       render_inline(described_class.new(title: "A Thing", tabs:, nav_label: "Thing sections",
-        subtitle: "Editing", links:)) do |record_tabs|
-        record_tabs.with_alert { "<p>Thing deleted</p>".html_safe }
+        subtitle: "Editing", links:)) do |tabs_header|
+        tabs_header.with_alert { "<p>Thing deleted</p>".html_safe }
       end
     end
 
     it "renders the links and the alert slot" do
-      expect(component.css(".admin-subnav ul .nav-item a").map { |link| link.text }).to eq %w[One Two]
+      expect(component.css("ul li a").map { |link| link.text }).to eq %w[One Two]
+      expect(component).to have_content("Editing")
       expect(component).to have_content("Thing deleted")
     end
   end

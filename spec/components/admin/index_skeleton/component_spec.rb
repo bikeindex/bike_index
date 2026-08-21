@@ -48,14 +48,10 @@ RSpec.describe Admin::IndexSkeleton::Component, type: :component do
     end
   end
 
-  describe "admin-subnav layout" do
-    it "uses tailwind flex-row layout" do
-      expect(component).to have_css("div.tw\\:flex.tw\\:flex-row.tw\\:items-baseline")
-    end
-
-    it "renders h1 and ul" do
-      expect(component).to have_css("h1")
-      expect(component).to have_css("ul")
+  describe "header" do
+    it "renders through Admin::Headers::Nav" do
+      expect(component).to have_css("div.tw\\:flex.tw\\:flex-row.tw\\:items-baseline h1")
+      expect(component).not_to have_css(".admin-subnav")
     end
   end
 
