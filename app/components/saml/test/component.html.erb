@@ -1,0 +1,61 @@
+<div class="tw:mx-auto tw:max-w-3xl tw:p-4">
+  <h1 class="tw:mb-6 tw:text-2xl tw:font-bold">SAML configuration test</h1>
+
+  <%= render(UI::Alerts::Base::Component.new(kind: @result.success? ? :success : :error)) do %>
+    <% if @result.success? %>
+      The assertion signature and SAML response validation passed. No account
+      was provisioned or signed in.
+    <% else %>
+      The assertion was not accepted:
+      <%= @result.error %>
+    <% end %>
+  <% end %>
+
+  <% if diagnostic? %>
+    <h2 class="tw:mb-3 tw:text-xl tw:font-semibold">Assertion</h2>
+    <dl class="tw:mb-8 tw:grid tw:grid-cols-[auto_1fr] tw:gap-x-4 tw:gap-y-2">
+      <dt class="tw:font-semibold">Signature certificate</dt>
+      <dd><code><%= @result.certificate %></code></dd>
+      <dt class="tw:font-semibold">NameID</dt>
+      <dd><code><%= @result.name_id.presence || "(missing)" %></code></dd>
+      <dt class="tw:font-semibold">NameID format</dt>
+
+      <dd>
+        <code><%= @result.name_id_format.presence || "(missing)" %></code>
+      </dd>
+
+      <dt class="tw:font-semibold">Configured email attribute</dt>
+      <dd><code><%= @result.email_attribute %></code></dd>
+      <dt class="tw:font-semibold">Asserted email</dt>
+      <dd><code><%= @result.email.presence || "(missing)" %></code></dd>
+      <dt class="tw:font-semibold">Asserted email domain</dt>
+      <dd><code><%= @result.email_domain.presence || "(missing)" %></code></dd>
+      <dt class="tw:font-semibold">Organization domain</dt>
+
+      <dd>
+        <code>
+          <%= @organization.user_email_domain.presence || "(missing)" %>
+        </code>
+      </dd>
+
+      <dt class="tw:font-semibold">Matching account</dt>
+      <dd><code><%= @result.user&.email || "(none)" %></code></dd>
+      <dt class="tw:font-semibold">Matching account has a password</dt>
+
+      <dd>
+        <%= @result.user ? (@result.user_has_password ? "Yes" : "No") : "(none)" %>
+      </dd>
+    </dl>
+    <h2 class="tw:mb-3 tw:text-xl tw:font-semibold">Received attributes</h2>
+    <% if @result.attributes.present? %>
+      <dl class="tw:grid tw:grid-cols-[auto_1fr] tw:gap-x-4 tw:gap-y-2">
+        <% @result.attributes.each do |name, values| %>
+          <dt class="tw:font-semibold"><code><%= name %></code></dt>
+          <dd><code><%= Array(values).join(", ") %></code></dd>
+        <% end %>
+      </dl>
+    <% else %>
+      <p>No attributes were received.</p>
+    <% end %>
+  <% end %>
+</div>

@@ -9,10 +9,12 @@ them in. Everything is per-organization and slug-scoped:
 | `/sso/<slug>/metadata` | our SP metadata — the URL you hand an IdP admin |
 | `/sso/<slug>/sp.crt` | the SP certificate alone, for IdP tooling that wants a file |
 | `/sso/<slug>/init` | SP-initiated login |
+| `/sso/<slug>/test` | signed-assertion diagnostic flow; configured but inactive only |
 | `/sso/<slug>/callback` | Assertion Consumer Service |
 
-All of them 404 unless the organization has the `saml_sso` feature. `init` and `callback`
-additionally need the configuration marked live.
+All of them 404 unless the organization has the `saml_sso` feature. Metadata and certificate
+need no SAML configuration; `init` and `callback` need the IdP fields and permitted email
+domain; `test` additionally requires the configuration to be inactive.
 
 Metadata is served as `application/xml`, which browsers display; the registered
 `application/samlmetadata+xml` is an unknown type, so they download it instead. The path takes
@@ -72,7 +74,7 @@ regardless of the link they followed in. The accepted tradeoff is recorded in
    (`urn:oid:0.9.2342.19200300.100.1.3`). Some IdPs release an empty `mail` and carry the
    address in `eduPersonPrincipalName` (`urn:oid:1.3.6.1.4.1.5923.1.1.1.6`) instead — check
    their attribute release policy. With no attribute match we fall back to the NameID.
-6. **Tick "Enable live SAML login."**
+6. **Tick "Force every user at this domain through live SAML SSO."**
 
 Two things to know before promising anyone a smooth setup:
 
@@ -223,6 +225,13 @@ Review apps and sandbox get their own throwaway keypair, not production's.
 create: it has no accounts and no per-SP registration, reading the ACS URL and audience
 straight out of the AuthnRequest.
 
+Keep the configuration inactive while testing. Open `/sso/<slug>/test` to start the flow; the
+callback validates the signed assertion and shows its certificate, NameID, attributes, email
+domain, and matching account without provisioning or signing anyone in. The test endpoint is
+available only for a complete, inactive configuration. Activate SAML only when the diagnostic
+result is correct; `/sso/<slug>/init` is the live sign-in path and can provision an account even
+while the configuration is inactive.
+
 | Bike Index field | Value |
 |---|---|
 | IdP entityID | `https://saml.example.com/entityid` |
@@ -235,13 +244,10 @@ as `<username>@<domain>` with `id` / `email` / `firstName` / `lastName` attribut
 names, not the OIDs a university IdP sends, so the NameID fallback is what carries the email
 unless you set the attribute to `email`.
 
-**Last verified 8/15** on the Railway staging box against mocksaml over real HTTPS: a first
-login provisioned and confirmed a new account, a second login on the same address reused it,
-and a third linked to a pre-existing account. That exercises the signed AuthnRequest, the
-cross-site POST, RelayState claim, signature validation, `InResponseTo` matching, and
-provisioning. What it does **not** cover: encryption (mocksaml publishes only a signing key and
-never ingests an SP certificate, so it structurally cannot encrypt to us) and attribute
-mapping.
+The test flow exercises the signed AuthnRequest, cross-site POST, RelayState claim, signature
+validation, `InResponseTo` matching, and attribute mapping without creating an account. It does
+not cover encryption; mocksaml publishes only a signing key and never ingests an SP certificate,
+so it cannot encrypt to us.
 
 **Don't test IdP-initiated login.** Starting at the IdP produces an assertion with no
 `InResponseTo` and the callback rejects it. That is deliberate replay protection.
@@ -261,12 +267,14 @@ The reason is the real one — ruby-saml's validation errors are passed through,
 
 A configured but inactive organization is excluded from automatic email-domain routing. A direct
 `/sso/<slug>/init` transaction still reaches the normal callback, which can provision or link an
-account. Use that flow only for integration validation until a dry-run diagnostic flow is available.
+account. Use `/sso/<slug>/test` for integration validation while the configuration is inactive;
+it reaches the same callback but never provisions or signs anyone in.
 
 | Reason | Cause |
 |---|---|
 | `/sso/<slug>/metadata` 404s | feature not enabled, `UpdateOrganizationAssociationsJob` hasn't run, or the url carries a `.xml` extension |
-| `/sso/<slug>/init` 404s | config incomplete — needs entityID + SSO URL + cert |
+| `/sso/<slug>/init` 404s | config incomplete — needs entityID + SSO URL + cert + permitted email domain |
+| `/sso/<slug>/test` 404s | config incomplete, SAML feature disabled, or configuration is active |
 | `this login has expired` | RelayState token already claimed or older than 10 minutes |
 | `SAML session mismatch` | the `org_slug` in RelayState isn't the org being called back |
 | audience / destination errors | `BASE_URL` doesn't match the host you're browsing |

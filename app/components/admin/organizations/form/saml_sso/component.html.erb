@@ -28,6 +28,17 @@
       </li>
     </ul>
 
+    <% unless saml_configuration.active? %>
+      <%= render(UI::Alerts::Base::Component.new(kind: :notice)) do %>
+        A complete SAML configuration requires the IdP entityID, SSO target URL,
+        certificate, and the organization's permitted email domain. Use the
+        <%= link_to "SAML test page", saml_test_path(org_slug: saml_configuration.organization.to_param), class: "twlink-underlined" %>
+        to validate an inactive configuration without provisioning or signing
+        anyone in. Activating it forces every user at that domain through the
+        IdP.
+      <% end %>
+    <% end %>
+
     <%= @form_builder.fields_for :organization_saml_configuration, saml_configuration do |saml_f| %>
       <%= render(UI::Forms::Checkbox::Component.new(form_builder: saml_f, attribute: :active, label: "Force every user at this domain through live SAML SSO", class_name: "tw:mb-4")) %>
 

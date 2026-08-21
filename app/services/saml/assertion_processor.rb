@@ -12,11 +12,20 @@ module Saml
       end
     end
 
-    def call(saml_configuration:, raw_response:, request_id:)
+    DiagnosticResult = Struct.new(:certificate, :name_id, :name_id_format, :attributes,
+      :email_attribute, :email, :email_domain, :user, :user_has_password, :error) do
+      def success?
+        error.nil?
+      end
+    end
+
+    def call(saml_configuration:, raw_response:, request_id:, dry_run: false)
       return failure("missing SAML response") if raw_response.blank?
 
       response = parse_response(saml_configuration, raw_response, request_id)
       return failure(response.errors.join("; ").presence || "invalid SAML response") unless response.is_valid?
+
+      return diagnostic(response, saml_configuration) if dry_run
 
       name_id = response.name_id.presence
       return failure("assertion is missing a NameID") if name_id.blank?
@@ -65,6 +74,45 @@ module Saml
       EmailNormalizer.normalize(raw)
     end
 
+    def diagnostic(response, saml_configuration)
+      organization = saml_configuration.organization
+      name_id = response.name_id.presence
+      email = asserted_email(response, saml_configuration)
+      email_domain = Organization.email_domain(email)
+      user = User.fuzzy_confirmed_or_unconfirmed_email_find(email) if email.present? &&
+        email_domain == organization.user_email_domain
+
+      DiagnosticResult.new(
+        certificate: certificate_source(response, saml_configuration),
+        name_id:, name_id_format: response.name_id_format,
+        attributes: response.attributes.all,
+        email_attribute: saml_configuration.email_attribute,
+        email:, email_domain:, user:, user_has_password: user&.password_digest.present?,
+        error: diagnostic_error(name_id:, email:, email_domain:, organization:)
+      )
+    end
+
+    def certificate_source(response, saml_configuration)
+      document = response.decrypted_document || response.document
+      certificate_element = REXML::XPath.first(document, "//ds:X509Certificate", {"ds" => OneLogin::RubySaml::Response::DSIG})
+      return "idp_cert" if saml_configuration.idp_certificates.one?
+      return "idp_cert_multi" if certificate_element.blank?
+
+      certificate = OpenSSL::X509::Certificate.new(Base64.decode64(certificate_element.text))
+      saml_configuration.idp_certificates.each_with_index do |configured_certificate, index|
+        return index.zero? ? "idp_cert" : "idp_cert_multi" if
+          certificate.to_pem == OpenSSL::X509::Certificate.new(configured_certificate).to_pem
+      end
+      "idp_cert_multi"
+    end
+
+    def diagnostic_error(name_id:, email:, email_domain:, organization:)
+      return "assertion is missing a NameID" if name_id.blank?
+      return "assertion is missing an email" if email.blank?
+      "#{email} is not on this organization's SSO domain" unless
+        email_domain.present? && email_domain == organization.user_email_domain
+    end
+
     # Provisioning grants no organization role - that is user_role_for_user_email_domain's job.
     def provision_user(email)
       UserServices::PasswordlessCreator.find_or_create(email).first
@@ -74,6 +122,7 @@ module Saml
       Result.new(error: message)
     end
 
-    conceal :provider, :parse_response, :asserted_email, :provision_user, :failure
+    conceal :provider, :parse_response, :asserted_email, :diagnostic, :certificate_source,
+      :diagnostic_error, :provision_user, :failure
   end
 end

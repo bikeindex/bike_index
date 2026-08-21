@@ -26,6 +26,13 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
     [saml_request_id_from_redirect(location), Rack::Utils.parse_query(URI(location).query)["RelayState"]]
   end
 
+  def initiate_test_login
+    get "/sso/#{slug}/test"
+    expect(response).to have_http_status(:found)
+    location = response.headers["Location"]
+    [saml_request_id_from_redirect(location), Rack::Utils.parse_query(URI(location).query)["RelayState"]]
+  end
+
   def post_callback(relay_state: :from_init, drop_session: false, **overrides)
     request_id, initiated_relay_state = initiate_login
     # Rack::Test sends cookies whatever their SameSite, so a spec that needs the browser's
@@ -35,6 +42,13 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
               in_response_to: request_id, issuer: saml_configuration.idp_entity_id, email:}.merge(overrides)
     post "/sso/#{slug}/callback", params: {SAMLResponse: signed_saml_response(**params),
                                            RelayState: (relay_state == :from_init) ? initiated_relay_state : relay_state}
+  end
+
+  def post_test_callback(**overrides)
+    request_id, relay_state = initiate_test_login
+    params = {audience: settings.sp_entity_id, recipient: settings.assertion_consumer_service_url,
+              in_response_to: request_id, issuer: saml_configuration.idp_entity_id, email:}.merge(overrides)
+    post "/sso/#{slug}/callback", params: {SAMLResponse: signed_saml_response(**params), RelayState: relay_state}
   end
 
   def signed_in?
@@ -50,9 +64,47 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
     end
 
     context "configuration inactive" do
-      let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, organization:) }
-      it "is not found" do
+      let(:saml_configuration) do
+        FactoryBot.create(:organization_saml_configuration, :active, organization:).tap do |configuration|
+          configuration.update!(active: false)
+        end
+      end
+
+      it "redirects to the IdP" do
         get "/sso/#{slug}/init"
+        expect(response).to have_http_status(:found)
+      end
+    end
+  end
+
+  describe "GET /sso/:org_slug/test" do
+    it "is not available for an active configuration" do
+      get "/sso/#{slug}/test"
+      expect(response).to have_http_status(:not_found)
+    end
+
+    context "configuration inactive" do
+      let(:saml_configuration) do
+        FactoryBot.create(:organization_saml_configuration, :active, organization:).tap do |configuration|
+          configuration.update!(active: false)
+        end
+      end
+
+      it "redirects to the IdP" do
+        get "/sso/#{slug}/test"
+        expect(response).to have_http_status(:found)
+        expect(response.headers["Location"]).to start_with(saml_configuration.idp_sso_target_url)
+      end
+    end
+
+    context "configuration incomplete" do
+      let(:saml_configuration) do
+        FactoryBot.create(:organization_saml_configuration, organization:, idp_entity_id: nil,
+          idp_sso_target_url: nil, idp_cert: nil)
+      end
+
+      it "is not found" do
+        get "/sso/#{slug}/test"
         expect(response).to have_http_status(:not_found)
       end
     end
@@ -301,6 +353,51 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
         expect { post_callback(relay_state: foreign_relay_state) }.not_to change(User, :count)
         expect(response).to redirect_to(new_session_path)
         expect(signed_in?).to be false
+      end
+    end
+  end
+
+  describe "POST /sso/:org_slug/callback in test mode" do
+    context "configuration inactive" do
+      let(:saml_configuration) do
+        FactoryBot.create(:organization_saml_configuration, :active, organization:).tap do |configuration|
+          configuration.update!(active: false)
+        end
+      end
+
+      it "reports a valid assertion without provisioning or signing in" do
+        identity_count = SsoIdentity.count
+        expect { post_test_callback }.not_to change(User, :count)
+        expect(response).to have_http_status(:ok)
+        expect(SsoIdentity.count).to eq identity_count
+        expect(response.headers["X-Robots-Tag"]).to eq "noindex, nofollow"
+        expect(response.body).to include("SAML configuration test", email)
+        expect(signed_in?).to be false
+      end
+
+      it "reports a malformed email without provisioning" do
+        malformed_email = "attacker@evil.com@#{domain}"
+
+        expect { post_test_callback(email: malformed_email) }.not_to change(User, :count)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("not on this organization")
+        expect(signed_in?).to be false
+      end
+
+      it "does not show assertion fields when signature validation fails" do
+        expect { post_test_callback(tamper: true) }.not_to change(User, :count)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("Invalid SAML Response")
+        expect(response.body).not_to include(email)
+      end
+    end
+
+    context "configuration active" do
+      it "rejects a test transaction" do
+        relay_state = Saml::RequestStore.create(request_id: "_test", org_slug: slug,
+          mode: Saml::RequestStore::TEST_MODE)
+        post "/sso/#{slug}/callback", params: {RelayState: relay_state}
+        expect(response).to have_http_status(:not_found)
       end
     end
   end

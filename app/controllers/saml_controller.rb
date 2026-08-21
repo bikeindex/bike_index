@@ -27,18 +27,15 @@ class SamlController < ApplicationController
   # SP-initiated login: redirect to the IdP with a signed AuthnRequest, parking the request id
   # (replay protection) and org slug (cross-tenant binding) in RelayState for the callback.
   def init
-    settings = Saml::SettingsBuilder.build(configured_saml_configuration)
-    auth_request = OneLogin::RubySaml::Authrequest.new
-    # This leg is same-site, so the session is readable here; the callback's isn't, so where
-    # the user was headed has to travel with the rest of the transaction
-    relay_state = Saml::RequestStore.create(request_id: auth_request.request_id,
-      org_slug: params[:org_slug], return_to: session[:return_to])
-    redirect_to auth_request.create(settings, RelayState: relay_state), allow_other_host: true
+    redirect_to_saml(configured_saml_configuration)
+  end
+
+  def test
+    redirect_to_saml(configured_inactive_saml_configuration, mode: Saml::RequestStore::TEST_MODE)
   end
 
   # Assertion Consumer Service: validate the IdP's response and sign the user in.
   def callback
-    saml_configuration = configured_saml_configuration
     # RelayState is a bearer token, not bound to the browser that began the login, so an attacker
     # can hand their own token and assertion to a victim and land them in the attacker's account.
     # Accepted: binding it needs a cookie that survives the IdP's cross-site POST, and that
@@ -47,9 +44,15 @@ class SamlController < ApplicationController
     return saml_failure("this login has expired, please try again") if saml_request.blank?
     return saml_failure("SAML session mismatch") if saml_request[:org_slug] != params[:org_slug]
 
+    saml_configuration = saml_configuration_for(saml_request)
+    test_mode = saml_request[:mode] == Saml::RequestStore::TEST_MODE
+
     result = Saml::AssertionProcessor.call(saml_configuration:,
-      raw_response: params[:SAMLResponse], request_id: saml_request[:request_id])
+      raw_response: params[:SAMLResponse], request_id: saml_request[:request_id], dry_run: test_mode)
+    return render_test_result(saml_configuration, result) if test_mode && !result.success?
     return saml_failure(result.error) unless result.success?
+
+    return render_test_result(saml_configuration, result) if test_mode
 
     session[:return_to] = saml_request[:return_to]
     sign_in_and_redirect(result.user, via_saml: true)
@@ -75,6 +78,33 @@ class SamlController < ApplicationController
     raise ActiveRecord::RecordNotFound unless saml_configuration&.configured?
 
     saml_configuration
+  end
+
+  def configured_inactive_saml_configuration
+    saml_configuration = saml_organization.organization_saml_configuration
+    raise ActiveRecord::RecordNotFound unless saml_configuration &&
+      OrganizationSamlConfiguration.configured_inactive.where(id: saml_configuration.id).exists?
+
+    saml_configuration
+  end
+
+  def saml_configuration_for(saml_request)
+    return configured_inactive_saml_configuration if saml_request[:mode] == Saml::RequestStore::TEST_MODE
+
+    configured_saml_configuration
+  end
+
+  def redirect_to_saml(saml_configuration, mode: Saml::RequestStore::NORMAL_MODE)
+    settings = Saml::SettingsBuilder.build(saml_configuration)
+    auth_request = OneLogin::RubySaml::Authrequest.new
+    relay_state = Saml::RequestStore.create(request_id: auth_request.request_id,
+      org_slug: params[:org_slug], return_to: session[:return_to], mode:)
+    redirect_to auth_request.create(settings, RelayState: relay_state), allow_other_host: true
+  end
+
+  def render_test_result(saml_configuration, result)
+    response.headers["X-Robots-Tag"] = "noindex, nofollow"
+    render Saml::Test::Component.new(organization: saml_configuration.organization, result:)
   end
 
   def saml_failure(message)
