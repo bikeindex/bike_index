@@ -45,10 +45,6 @@
 
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
 
-    <section id="admin-content">
-      <%= render(UI::Container::Component.new(full_width: true)) do %>
-        <%= yield %>
-      <% end %>
-    </section>
+    <section id="admin-content" class="twgutter"><%= yield %></section>
   <% end %>
 </html>

@@ -1,48 +1,38 @@
-<div class="full-screen-table">
-  <table class="table table-striped table-bordered">
-    <thead class="thead-light">
-      <th>Paid&nbsp;at</th>
-      <th>User</th>
-      <th>Invoice</th>
-      <th>Kind</th>
-      <th>Amount</th>
-    </thead>
+<%#
+  A cell block is instance_exec'd in UI::Table, so it can't reach this component's
+  methods - this local is the bridge
+%>
+<% invoice_path = method(:invoice_path) %>
 
-    <tbody>
-      <% payments.each do |payment| %>
-        <tr>
-          <td>
-            <%= link_to edit_admin_payment_path(payment) do %>
-              <%= render(UI::Time::Component.new(time: payment.created_at)) %>
-            <% end %>
-          </td>
+<%= render(UI::Table::Component.new(records: payments)) do |table| %>
+  <% table.column(label: "Paid at") do |payment| %>
+    <%= link_to edit_admin_payment_path(payment) do %>
+      <%= render(UI::Time::Component.new(time: payment.created_at)) %>
+    <% end %>
+  <% end %>
 
-          <td>
-            <% if payment.user_id.present? %>
-              <%= link_to payment.user.display_name, edit_admin_user_path(payment.user) %>
-            <% elsif payment.email.present? %>
-              <%= payment.email %>
-              <small class="less-strong">no user</small>
-            <% end %>
-          </td>
+  <% table.column(label: "User") do |payment| %>
+    <% if payment.user_id.present? %>
+      <%= link_to payment.user.display_name, edit_admin_user_path(payment.user) %>
+    <% elsif payment.email.present? %>
+      <%= payment.email %>
+      <small class="twless-strong">no user</small>
+    <% end %>
+  <% end %>
 
-          <td>
-            <% if payment.invoice_id.present? %>
-              <%= link_to payment.invoice.display_name, invoice_path(payment) %>
+  <% table.column(label: "Invoice") do |payment| %>
+    <% if payment.invoice_id.present? %>
+      <%= link_to payment.invoice.display_name, invoice_path.call(payment) %>
 
-              <% if payment.invoice.subscription_start_at %>
-                <small>
-                  <%= render(UI::Time::Component.new(time: payment.invoice.subscription_start_at)) %>
-                </small>
-              <% end %>
-            <% end %>
-          </td>
-
-          <td><small><%= payment.payment_method.humanize %></small></td>
-
-          <td><%= payment.amount_formatted %></td>
-        </tr>
+      <% if payment.invoice.subscription_start_at %>
+        <small><%= render(UI::Time::Component.new(time: payment.invoice.subscription_start_at)) %></small>
       <% end %>
-    </tbody>
-  </table>
-</div>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Kind") do |payment| %>
+    <small><%= payment.payment_method.humanize %></small>
+  <% end %>
+
+  <% table.column(label: "Amount") { |payment| payment.amount_formatted } %>
+<% end %>

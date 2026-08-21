@@ -2,9 +2,10 @@
 
 module Admin
   module OrganizationsTable
+    # The admin organizations index table, also rendered on the admin dashboard.
     class Component < ApplicationComponent
       # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-      MARKUP_DIGEST = "365f1baad39f"
+      MARKUP_DIGEST = "48bae88f2131"
 
       def initialize(organizations:, render_sortable: false, render_deleted: false)
         @organizations = organizations
@@ -14,9 +15,7 @@ module Admin
 
       private
 
-      def column(attribute, label = nil)
-        helpers.sortable(attribute, label, render_sortable: @render_sortable)
-      end
+      def cache_key = "admin-organizations-#{MARKUP_DIGEST}"
 
       def regional_parent_names(organization)
         organization.regional_parents.pluck(:short_name)

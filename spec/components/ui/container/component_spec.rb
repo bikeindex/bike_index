@@ -7,7 +7,7 @@ RSpec.describe UI::Container::Component, type: :component do
     render_inline(described_class.new(**options)) { "content".html_safe }.at_css("div")["class"]
   end
 
-  it "centers a single column at the narrower width" do
+  it "centers one column at the narrower width" do
     expect(classes).to eq "tw:w-full tw:max-w-3xl tw:mx-auto"
   end
 
@@ -19,9 +19,9 @@ RSpec.describe UI::Container::Component, type: :component do
     expect(classes(alignment: :left)).to eq "tw:w-full tw:max-w-3xl"
   end
 
-  # It's the page's outermost container, so it carries the gutter the capped ones nest inside
-  it "caps nothing when full width, so there is nothing to center, and owns the gutter" do
-    expect(classes(full_width: true)).to eq "tw:w-full tw:px-4"
+  # The page owns the gutter (.twgutter), so nesting these can't compound padding
+  it "adds no padding at any width" do
+    expect(described_class::COLUMNS.map { |columns| classes(columns:) }.join).to_not include("px-")
   end
 
   it "renders its content" do

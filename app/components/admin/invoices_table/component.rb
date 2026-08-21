@@ -15,9 +15,8 @@ module Admin
 
       private
 
-      def column(attribute, label)
-        helpers.sortable(attribute, label, render_sortable: @render_sortable)
-      end
+      # An invoice whose organization row is gone entirely has nothing to link to
+      def records = @invoices.reject { |invoice| organization_for(invoice).blank? }
 
       # An invoice outlives its organization being deleted, so unscoped for that - but the
       # association first, or this defeats the callers' includes(:organization)
@@ -25,8 +24,9 @@ module Admin
         invoice.organization || Organization.unscoped.find_by_id(invoice.organization_id)
       end
 
-      def invoice_path(invoice, organization)
-        edit_admin_organization_invoice_path(organization_id: organization.to_param, id: invoice.to_param)
+      def invoice_path(invoice)
+        edit_admin_organization_invoice_path(organization_id: organization_for(invoice).to_param,
+          id: invoice.to_param)
       end
 
       def invoice_number(invoice) = invoice.display_name.gsub(/invoice\s?/i, "")

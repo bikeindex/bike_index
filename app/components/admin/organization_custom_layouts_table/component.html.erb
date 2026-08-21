@@ -1,78 +1,18 @@
-<div class="full-screen-table">
-  <table class="table table-striped table-bordered table-sm">
-    <thead class="thead-light">
-      <th class="small">Snipped Kind</th>
-      <th>Link to edit</th>
-      <th>Preview</th>
-      <th>Has content</th>
-      <th>Enabled</th>
-    </thead>
+<%= render(UI::Table::Component.new(records: rows)) do |table| %>
+  <% table.column(label: "Snippet Kind") { |row| tag.small(row[:kind_label]) } %>
 
-    <tbody>
-      <tr>
-        <td></td>
+  <% table.column(label: "Link to edit") { |row| link_to(row[:edit_label], row[:edit_path]) } %>
 
-        <td><%= link_to "Landing page", layout_path("landing_page") %></td>
+  <% table.column(label: "Preview") do |row| %>
+    <% if row[:preview_label].present? %>
+      <%= row[:preview_prefix] %>
+      <%= link_to row[:preview_label], row[:preview_path], class: "tw:text-sm" %>
+    <% else %>
+      <span class="text-warning">Unknown email kind: "<%= row[:emails] %>"</span>
+    <% end %>
+  <% end %>
 
-        <td class="small">
-          <%= link_to "landing page preview", organization_landing_path(organization_id: organization_param) %>
-        </td>
+  <% table.column(label: "Has content", classes: "tw:text-center") { |row| check_mark if row[:content] } %>
 
-        <td class="table-cell-check">
-          <%= check_mark if @organization.organization_landing_page&.body? %>
-        </td>
-
-        <td class="table-cell-check">
-          <%= check_mark if LandingPages::ORGANIZATIONS.include?(@organization.slug) %>
-        </td>
-      </tr>
-
-      <tr>
-        <td></td>
-
-        <td>
-          <%= link_to "Organization Stolen Message", stolen_message_path %>
-        </td>
-
-        <td class="small">
-          <%= link_to "preview message", stolen_message_path %>
-        </td>
-
-        <td class="table-cell-check">
-          <%= check_mark if organization_stolen_message&.body.present? %>
-        </td>
-
-        <td class="table-cell-check">
-          <%= check_mark if organization_stolen_message&.is_enabled %>
-        </td>
-      </tr>
-
-      <% MailSnippet.organization_snippets.each do |kind, snippet_attrs| %>
-        <% snippet = snippet_for(kind) %>
-
-        <tr>
-          <td><small><%= MailSnippet.kind_humanized(kind) %></small></td>
-
-          <td><%= link_to snippet_attrs[:description], layout_path(kind) %></td>
-
-          <td>
-            <% if preview_label(snippet_attrs[:emails]).present? %>
-              <%= "All emails" if snippet_attrs[:emails] == "all" %>
-              <%= link_to preview_label(snippet_attrs[:emails]), email_path(kind), class: "small" %>
-            <% else %>
-              <span class="text-warning">Unknown email kind: "<%= snippet_attrs[:emails] %>"</span>
-            <% end %>
-          </td>
-
-          <td class="table-cell-check">
-            <%= check_mark if snippet&.body.present? %>
-          </td>
-
-          <td class="table-cell-check">
-            <%= check_mark if snippet&.is_enabled %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-</div>
+  <% table.column(label: "Enabled", classes: "tw:text-center") { |row| check_mark if row[:enabled] } %>
+<% end %>
