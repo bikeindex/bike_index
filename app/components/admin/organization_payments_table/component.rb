@@ -11,10 +11,6 @@ module Admin
       private
 
       def payments = @organization.payments.includes(:user, :invoice)
-
-      def invoice_path(payment)
-        edit_admin_organization_invoice_path(organization_id: @organization.to_param, id: payment.invoice.to_param)
-      end
     end
   end
 end

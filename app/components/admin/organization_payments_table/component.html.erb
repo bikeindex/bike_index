@@ -1,8 +1,4 @@
-<%#
-  A cell block is instance_exec'd in UI::Table, so it can't reach this component's
-  methods - this local is the bridge
-%>
-<% invoice_path = method(:invoice_path) %>
+<% organization_id = @organization.to_param %>
 
 <%= render(UI::Table::Component.new(records: payments)) do |table| %>
   <% table.column(label: "Paid at") do |payment| %>
@@ -22,7 +18,7 @@
 
   <% table.column(label: "Invoice") do |payment| %>
     <% if payment.invoice_id.present? %>
-      <%= link_to payment.invoice.display_name, invoice_path.call(payment) %>
+      <%= link_to payment.invoice.display_name, edit_admin_organization_invoice_path(organization_id:, id: payment.invoice.to_param) %>
 
       <% if payment.invoice.subscription_start_at %>
         <small><%= render(UI::Time::Component.new(time: payment.invoice.subscription_start_at)) %></small>

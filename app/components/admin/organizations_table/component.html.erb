@@ -3,15 +3,8 @@
   <style>.deleted-col { display: none; }</style>
 <% end %>
 
-<%#
-  A cell block is instance_exec'd in UI::Table, so it can't reach this component's
-  methods - these locals are the bridge
-%>
-<% regional_parent_names = method(:regional_parent_names) %>
-<% pos_kind_display = method(:pos_kind_display) %>
-<% pos_link_class = method(:pos_link_class) %>
-<% kind_path = method(:kind_path) %>
-<% pos_path = method(:pos_path) %>
+<% search_params = helpers.sortable_search_params %>
+<% pos_link = method(:pos_link) %>
 
 <%= render(UI::Table::Component.new(records: @organizations, cache_key:, render_sortable: @render_sortable)) do |table| %>
   <% table.column(sortable: "name") do |organization| %>
@@ -19,7 +12,7 @@
 
     <small class="twless-strong"><%= "paid" if organization.paid? %></small>
 
-    <% parent_names = regional_parent_names.call(organization) %>
+    <% parent_names = organization.regional_parents.pluck(:short_name) %>
 
     <% if parent_names.any? %>
       <div class="tw:mt-1 tw:text-sm">
@@ -53,14 +46,12 @@
   <% end %>
 
   <% table.column(label: "Type") do |organization| %>
-    <%= link_to organization.kind_humanized, kind_path.call(organization) %>
+    <%= link_to organization.kind_humanized, admin_organizations_path(search_params.merge(search_kind: organization.kind)) %>
   <% end %>
 
   <% table.column(sortable: "pos_kind", label: "POS") do |organization| %>
     <% if organization.bike_shop? || organization.pos? %>
-      <small>
-        <%= link_to pos_kind_display.call(organization).humanize, pos_path.call(organization), class: pos_link_class.call(organization) %>
-      </small>
+      <small><%= pos_link.call(organization) %></small>
     <% end %>
   <% end %>
 
@@ -72,11 +63,7 @@
     <% end %>
   <% end %>
 
-  <% table.column(label: "Locations") do |organization| %>
+  <% table.column(label: "Locations", lower_right: ->(organization) { "Mapped" if organization.show_on_map }) do |organization| %>
     <%= number_display(organization.locations.count) %>
-
-    <% if organization.show_on_map %>
-      <small class="twless-strong">Mapped</small>
-    <% end %>
   <% end %>
 <% end %>

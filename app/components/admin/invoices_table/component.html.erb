@@ -1,15 +1,10 @@
-<%#
-  A cell block is instance_exec'd in UI::Table, so it can't reach this component's
-  methods - these locals are the bridge
-%>
 <% organization_for = method(:organization_for) %>
-<% invoice_path = method(:invoice_path) %>
-<% invoice_number = method(:invoice_number) %>
+<% invoice_link = method(:invoice_link) %>
 <% end_at_class = method(:end_at_class) %>
 
 <%= render(UI::Table::Component.new(records:, render_sortable: @render_sortable)) do |table| %>
   <% table.column(sortable: "id", label: "#") do |invoice| %>
-    <%= link_to invoice_number.call(invoice), invoice_path.call(invoice) %>
+    <%= invoice_link.call(invoice) %>
   <% end %>
 
   <% table.column(label: "Active") do |invoice| %>

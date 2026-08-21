@@ -38,7 +38,8 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           }.to_not change(OrganizationLandingPage, :count)
           expect(response.status).to eq(200)
           expect(response).to render_template(:edit)
-          expect(response.body).to include 'placeholder="Landing page (html)"'
+          expect(response.body).to include ">Landing page (html)"
+          expect(response.body).to include 'name="organization_landing_page[body]"'
           expect(response.body).to_not match("search_item_type=OrganizationLandingPage")
           expect(response.body).to_not include "button_hover"
           expect(response.body).to include organization_landing_path(organization_id: organization.to_param)

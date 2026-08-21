@@ -121,13 +121,9 @@
         <%= f.submit "Save", class: "btn btn-lg btn-success mt-4" %>
       </div>
 
-      <div class="col-md-3 col-6">
-        <div id="endlessCheckBox" class="text-right">
-          <div class="mt-4 mr-2">
-            <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :is_endless,
-              label: "Coverage never ends")) %>
-          </div>
-        </div>
+      <div class="col-md-3 col-6 mt-4 mr-2">
+        <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :is_endless,
+          label: "Coverage never ends")) %>
       </div>
     </div>
 

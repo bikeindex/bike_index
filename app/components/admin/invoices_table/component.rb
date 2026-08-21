@@ -21,15 +21,16 @@ module Admin
       # An invoice outlives its organization being deleted, so unscoped for that - but the
       # association first, or this defeats the callers' includes(:organization)
       def organization_for(invoice)
-        invoice.organization || Organization.unscoped.find_by_id(invoice.organization_id)
+        @organizations_by_id ||= {}
+        @organizations_by_id[invoice.organization_id] ||=
+          invoice.organization || Organization.unscoped.find_by_id(invoice.organization_id)
       end
 
-      def invoice_path(invoice)
-        edit_admin_organization_invoice_path(organization_id: organization_for(invoice).to_param,
-          id: invoice.to_param)
+      def invoice_link(invoice)
+        link_to invoice.display_name.gsub(/invoice\s?/i, ""),
+          edit_admin_organization_invoice_path(organization_id: organization_for(invoice).to_param,
+            id: invoice.to_param)
       end
-
-      def invoice_number(invoice) = invoice.display_name.gsub(/invoice\s?/i, "")
 
       def end_at_class(invoice)
         "text-danger" if invoice.subscription_end_at < Time.current

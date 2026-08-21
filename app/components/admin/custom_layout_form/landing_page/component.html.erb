@@ -17,7 +17,7 @@
     <% end %>
 
     <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area,
-      label_text: "Landing page (html)", html_options: {rows: 20, placeholder: "Landing page (html)"})) %>
+      label_text: "Landing page (html)", html_options: {rows: 20})) %>
 
     <% if @suggested_button_hover.present? %>
       <%= render(UI::Alerts::Base::Component.new(kind: :notice, margin_classes: "tw:mt-2")) do %>

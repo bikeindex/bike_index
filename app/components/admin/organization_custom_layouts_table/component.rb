@@ -11,8 +11,6 @@ module Admin
 
       private
 
-      # The three kinds are different records with the same five columns, so they're
-      # flattened into rows rather than branched over in the markup
       def rows
         [landing_page_row, stolen_message_row] +
           MailSnippet.organization_snippets.map { |kind, attributes| snippet_row(kind, attributes) }

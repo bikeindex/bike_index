@@ -1,11 +1,8 @@
 /* Bike Index's own tw* classes. Rules that style one component's markup — .ui-table,
  * .search-results-frame-wrapper — stay in application.css */
 
-/* The page's horizontal gutter: .twgutter applies it, .twgutter-bleed reaches back out
- * through it, and one value is what stops those two drifting apart. A plain custom
- * property rather than @theme — a theme variable takes the tw prefix and is dropped
- * unless a generated utility references it, which nothing here does. Off --tw-spacing so
- * it stays on the scale. */
+/* A plain custom property rather than @theme: a theme variable takes the tw prefix, and
+ * is dropped unless a generated utility references it */
 :root {
   --gutter: calc(var(--tw-spacing) * 4);
 }
@@ -149,14 +146,11 @@
     @apply tw:border-0 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700 tw:my-8;
   }
 
-  /* The page's gutter, applied once at its top level. UI::Container only caps width, so
-   * any nesting of containers sits inside this one padding rather than compounding it. */
   .twgutter {
     padding-inline: var(--gutter);
   }
 
-  /* Edge to edge, then the gutter back inside it — what a wide table scrolls in, so its
-   * rows reach the screen edges while its content still lines up with the page */
+  /* Edge to edge, then the gutter back inside it - what a wide table scrolls in */
   .twgutter-bleed {
     margin-inline: calc(var(--gutter) * -1);
     padding-inline: var(--gutter);
