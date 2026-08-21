@@ -15,15 +15,8 @@ RSpec.describe UI::Tabs::Component, type: :component do
     expect(component.css("a[aria-current]").map { |tab| tab.text.squish }).to eq ["Show"]
   end
 
-  # Below md only the first letter renders, so the rest has to stay announceable
-  it "splits the label without losing it, and keeps the count beside it" do
-    duplicates = component.css("a").last
-
-    expect(duplicates.text.squish).to eq "Duplicates 3"
-    expect(duplicates.at_css("span span").text).to eq "uplicates"
-    expect(duplicates.at_css("span span")["class"]).to include "sr-only"
-    # no whitespace between the letter and the rest, or the word breaks once both show
-    expect(duplicates.at_css("span").inner_html).to start_with "D<span"
+  it "renders a tab's count beside its label" do
+    expect(component.css("a").last.text.squish).to eq "Duplicates 3"
   end
 
   it "renders no count when a tab has none" do

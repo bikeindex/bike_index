@@ -11,7 +11,7 @@ module UI
         ]))
       end
 
-      # Narrow the preview to see the row scroll, and each tab drop to its first letter
+      # Narrow the preview to see the row scroll rather than wrap
       def many_tabs
         render(UI::Tabs::Component.new(nav_label: "Organization sections", tabs: [
           {label: "Show", href: "#"},
