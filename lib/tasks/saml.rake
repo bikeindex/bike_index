@@ -16,6 +16,14 @@ namespace :saml do
     cert.public_key = key.public_key
     cert.not_before = Time.current
     cert.not_after = cert.not_before + years.years
+
+    # Metadata publishes this as the encryption key too, and an IdP may check keyUsage
+    # before it will encrypt to it
+    extensions = OpenSSL::X509::ExtensionFactory.new(nil, cert)
+    cert.add_extension(extensions.create_extension("basicConstraints", "CA:FALSE", true))
+    cert.add_extension(extensions.create_extension("keyUsage", "digitalSignature, keyEncipherment", true))
+    cert.add_extension(extensions.create_extension("subjectKeyIdentifier", "hash", false))
+
     cert.sign(key, OpenSSL::Digest.new("SHA256"))
 
     puts "# Self-signed SP keypair valid until #{cert.not_after.utc.iso8601}."
