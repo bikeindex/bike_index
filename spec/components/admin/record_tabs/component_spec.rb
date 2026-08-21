@@ -12,8 +12,8 @@ RSpec.describe Admin::RecordTabs::Component, type: :component do
   # aria-current took the tab's own boolean once, so every inactive tab rendered
   # aria-current="false" - which counts as current
   it "marks only the active tab, in the class and in aria" do
-    expect(component.css(".nav-tabs .nav-link.active").map { |tab| tab.text.squish }).to eq ["Show"]
-    expect(component.css(".nav-tabs .nav-link[aria-current]").map { |tab| tab.text.squish }).to eq ["Show"]
+    expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Show"]
+    expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Show"]
   end
 
   context "with a subtitle, links and an alert" do

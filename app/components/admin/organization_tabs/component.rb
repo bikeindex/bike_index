@@ -28,12 +28,13 @@ module Admin
       def tabs
         [[:show, "Show", admin_organization_path(@organization)],
           [:edit, "Edit", edit_admin_organization_path(@organization)],
-          [:locations, locations_label, edit_admin_organization_path(@organization, tab: "locations")],
+          [:locations, "Locations", edit_admin_organization_path(@organization, tab: "locations"),
+            @organization.locations.size],
           [:paid_functionality, "Edit paid functionality", edit_admin_organization_path(@organization, tab: "paid_functionality")],
           ([:sso, "SSO", edit_admin_organization_path(@organization, tab: "sso")] if sso?),
           [:invoices, "Invoices", admin_organization_invoices_path(organization_id: @organization)],
           ([:custom_layouts, "Custom layouts", admin_organization_custom_layouts_path(organization_id: @organization)] if custom_layouts?)]
-          .compact.map { |tab, label, href| {label:, href:, active: @active == tab} }
+          .compact.map { |tab, label, href, count| {label:, href:, count:, active: @active == tab} }
       end
 
       # A tab with nothing behind it is dropped - except on its own page, which still
@@ -41,10 +42,6 @@ module Admin
       def sso? = @organization.enabled?("saml_sso") || @active == :sso
 
       def custom_layouts? = helpers.display_dev_info? || @active == :custom_layouts
-
-      def locations_label
-        safe_join(["Locations", helpers.number_display(@organization.locations.size)], " ")
-      end
 
       def new_invoice_link
         path = new_admin_organization_invoice_path(organization_id: @organization)

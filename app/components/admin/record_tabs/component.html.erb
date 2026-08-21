@@ -27,21 +27,25 @@
     <div class="tw:mt-6 tw:w-full tw:md:w-1/2"><%= alert %></div>
   <% end %>
 
-  <%#
-    Divs rather than a ul: .admin-subnav ul is force-right-aligned, and its .active is a
-    blue pill. .nav-tabs .nav-item still reaches these, which is what pulls them the -1px
-    onto the subnav's border
-  %>
+  <%# Scrolls rather than wraps, so a row too wide for the screen stays one row %>
 
   <nav
-    class="nav nav-tabs tw:mt-3 tw:w-full tw:border-b-0!"
+    class="tw:mt-3 tw:w-full tw:overflow-x-auto"
     aria-label="<%= @nav_label %>"
+    data-controller="admin--record-tabs"
   >
-    <% @tabs.each do |tab| %>
-      <div class="nav-item">
+    <div class="tw:-mb-px tw:flex tw:w-max tw:gap-1">
+      <% @tabs.each do |tab| %>
         <%# "page" rather than tab[:active] - a false renders aria-current="false", which counts as current %>
-        <%= link_to tab[:label], tab[:href], class: link_classes(tab), aria: {current: ("page" if tab[:active])} %>
-      </div>
-    <% end %>
+        <%= link_to tab[:href], class: link_classes(tab), aria: {current: ("page" if tab[:active])},
+              data: {"admin--record-tabs-target": ("active" if tab[:active])} do %>
+          <%= tab_label(tab) %>
+
+          <% if tab[:count].present? %>
+            <small><%= helpers.number_display(tab[:count]) %></small>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
   </nav>
 </div>
