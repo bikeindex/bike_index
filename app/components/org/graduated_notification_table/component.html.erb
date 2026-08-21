@@ -59,7 +59,7 @@
 
       <% unless skip_email_search %>
         <small>
-          <%= link_to "🔎", url_for(@sort_state.search_params.merge(search_email: graduated_notification.email)), data: {turbo_frame: "_top"} %>
+          <%= link_to "🔎", url_for(sort_state.search_params.merge(search_email: graduated_notification.email)), data: {turbo_frame: "_top"} %>
         </small>
       <% end %>
     <% end %>
