@@ -148,13 +148,34 @@ in, neither of which shows up as an error — the page just behaves oddly:
   resolved with `closest("[data-turbo]")`, so it isn't scoped to the submission. A link that
   leaves for a legacy jQuery page needs `data: {turbo: false}`, or it gets Turbo-rendered into
   a body whose `loadPageScript` never runs. Links to pages the Stimulus redesign owns are fine.
+- **`data-turbo` is opt-*out* on any value but `"false"`** — an empty `data-turbo=""`, from
+  interpolating a false into the attribute, reads as opted in. Render the attribute
+  conditionally (`tag.attributes(data: {turbo: (true if @turbo)})`) rather than its value;
+  `UI::Tabs` is the example.
 - **Turbo restores its own snapshot on back/forward**, which `Cache-Control: no-store` can't
   reach. If what a page renders depends on server state, opt out with
-  `<meta name="turbo-cache-control" content="no-cache">` — the layout renders it when the
-  controller sets `@turbo_no_cache` — and a restoration re-fetches instead of showing a page
-  the user has moved past.
+  `helpers.content_for(:header) { tag.meta(name: "turbo-cache-control", content: "no-cache") }`
+  — `Register::Page` and `SearchResults::Frame` are the examples — and a restoration re-fetches
+  instead of showing a page the user has moved past.
 
 `RegisterController` and the `Register::` components are the worked example of both.
+
+## Admin pages that carry legacy JS can't be Turbo-visited
+
+`application_standalone.js` is a plain `<script src>` in the admin layout, and everything it
+sets up binds once inside one `$(document).ready` gated on `#admin-content` — the per-page
+select, the selectize filters, the nested location fields, the uppy uploader. Turbo Drive
+doesn't re-execute an unchanged script tag, and a back/forward restoration hands back a
+*clone* of its snapshot, so that markup comes back looking live with nothing bound to it.
+
+Two things follow. `turbo-cache-control` doesn't help — a restoration that re-fetches still
+renders through Drive, and the admin layout doesn't yield `:header` to set it with anyway.
+And it's the page you navigate *away from* that breaks, not just the one you land on.
+
+So a screen carrying any of it passes `turbo: false` — `Admin::RecordTabs` takes it, and
+`Admin::CustomLayouts::Form::Wrapper` is the one that does. Before opting a new section in,
+check its tab targets for `#per_page_select`, `.fancy-select`, `.add_fields`,
+`#multipleUserSelect` and `.UppyForm`.
 
 ## Screenshots
 
