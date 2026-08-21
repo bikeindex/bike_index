@@ -963,6 +963,21 @@ RSpec.describe RegisterController, type: :request do
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
       end
 
+      # The origin Organized::RegistrationsController#new gives a registration
+      context "started from an organization" do
+        let(:b_param) do
+          BParam.create(origin: "register_flow_organized",
+            params: {bike: {owner_email:, manufacturer_id: "Trek"}}.as_json)
+        end
+
+        it "creates the bike, attributing it to the organized flow" do
+          expect {
+            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          }.to change(Bike, :count).by 1
+          expect(Bike.last.current_ownership.origin).to eq "register_flow_organized"
+        end
+      end
+
       context "blank serial" do
         let(:bike_details) { {primary_frame_color_id: color.id, status: "status_with_owner", user_name:} }
 

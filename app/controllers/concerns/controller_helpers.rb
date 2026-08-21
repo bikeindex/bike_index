@@ -14,7 +14,7 @@ module ControllerHelpers
       :current_organization, :passive_organization, :current_location,
       :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
-      :render_donation_request?, :sort_state, :admin_index_state
+      :render_donation_request?, :old_register_view?, :sort_state, :admin_index_state
     before_action :enable_rack_profiler
 
     before_action do
@@ -172,6 +172,12 @@ module ControllerHelpers
     return @render_donation_request if defined?(@render_donation_request)
 
     @render_donation_request = session.delete(:render_donation_request).present?
+  end
+
+  # Set by going back to the embed form, cleared by taking the register flow's link the
+  # other way - the organized menu follows it
+  def old_register_view?
+    session[:old_register_view].present?
   end
 
   def show_general_alert

@@ -91,9 +91,8 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(scroller_top).to be > 0
   end
 
-  # Both rows are organized/bikes#new, told apart only by the query string
   it "tells the two add-a-bike rows apart by their full path" do
-    visit "/o/#{slug}/bikes/new"
+    visit "/o/#{slug}/registrations/new"
 
     expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a bike"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "New unregistered notification"
@@ -102,6 +101,15 @@ RSpec.describe "Organization sidebar", :js, type: :system do
 
     expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "New unregistered notification"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Add a bike"
+
+    # Going back to the old view moves add-a-bike onto organized/bikes#new alongside the
+    # notification's row, where the query string is all that tells the two apart
+    visit "/o/#{slug}/registrations/new"
+    click_link "Go back to the old view"
+    click_link "Add a bike"
+
+    expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a bike"
+    expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "New unregistered notification"
   end
 
   # The sidebar stands in for the navbar on every page a member sees, including ones no
