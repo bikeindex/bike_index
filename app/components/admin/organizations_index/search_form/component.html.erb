@@ -4,13 +4,10 @@
   <%= hidden_field_tag :search_pos, helpers.params[:search_pos] %>
 
   <div class="mt-4 mb-4 d-flex justify-content-md-end flex-wrap">
-    <div
-      class="
-        fancy-select no-restore-on-backspace unfancy tw:mt-2 tw:-mb-[0.4rem]
-        tw:w-full tw:md:w-1/3
-      "
-    >
-      <%= select_tag :search_features_and_settings, grouped_options_for_select(option_groups, selected: @features_and_settings_ids), placeholder: "With features", class: "form-control", include_blank: true, multiple: true %>
+    <div class="tw:mt-2 tw:w-full tw:md:w-1/3">
+      <%= render(UI::Forms::Combobox::Component.new(name: :search_features_and_settings,
+        options: option_groups, value: selected_value, placeholder: "With features",
+        multiselect_chip_src: helpers.feature_chips_admin_organizations_path)) %>
     </div>
 
     <div class="align-self-end mt-2 mr-2">

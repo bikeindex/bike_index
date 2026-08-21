@@ -83,6 +83,17 @@ module Admin
       redirect_to admin_organizations_url
     end
 
+    # The features filter is a multiselect combobox, which renders its selections through
+    # this rather than holding them itself
+    def feature_chips
+      chips = params[:combobox_values].to_s.split(",").filter_map do |value|
+        display = Admin::OrganizationsIndex::SearchForm::Component.display_for(value)
+        helpers.hw_combobox_selection_chip(display:, value:, for_id: params[:for_id]) if display
+      end
+
+      render turbo_stream: helpers.safe_join(chips)
+    end
+
     helper_method :matching_organizations
 
     protected
@@ -157,11 +168,13 @@ module Admin
       matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
 
       @features_and_settings_ids = []
-      features_and_settings = Array(params[:search_features_and_settings]).reject(&:blank?)
+      # The combobox posts one comma-joined value; bookmarked URLs still carry an array
+      features_and_settings = Array(params[:search_features_and_settings])
+        .flat_map { it.to_s.split(",") }.reject(&:blank?)
       organization_features = OrganizationFeature.where(id: features_and_settings)
       if organization_features.any? # HACK - doesn't search InvoiceOrganizationFeature, just feature slugs
         matching_organizations = matching_organizations.with_enabled_feature_slugs(organization_features.feature_slugs)
-        @features_and_settings_ids += organization_features.pluck(:id)
+        @features_and_settings_ids += organization_features.pluck(:id).map(&:to_s)
       end
       selected_settings = organization_settings & features_and_settings
       if selected_settings.include?("theft_survey")
