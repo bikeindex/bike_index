@@ -317,9 +317,6 @@ class BParam < ApplicationRecord
 
   def register_flow? = REGISTER_FLOW_ORIGINS.include?(origin)
 
-  # Started on the organization's own page, rather than /register
-  def register_flow_organized? = origin == "register_flow_organized"
-
   # Get it unscoped, because unregistered_bike notifications
   def created_bike
     @created_bike ||= created_bike_id.present? ? Bike.unscoped.find_by_id(created_bike_id) : nil
