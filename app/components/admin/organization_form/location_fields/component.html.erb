@@ -14,7 +14,12 @@
       <%= render(UI::Forms::AddressGroup::Component.new(form_builder: address_form)) %>
     <% end %>
 
-    <div class="tw:grid tw:gap-x-6 tw:lg:grid-cols-2">
+    <%#
+      items-baseline so Remove sits on the first checkbox's baseline rather than the top
+      of a block three checkboxes tall
+    %>
+
+    <div class="tw:flex tw:items-baseline tw:gap-2">
       <div>
         <%= checkbox(:publicly_visible, publicly_visible_label) %>
 
@@ -25,14 +30,16 @@
         <% end %>
       </div>
 
-      <div class="tw:text-right">
-        <% if @location.destroy_forbidden? %>
-          <small class="less-strong">can't remove, has impounded bikes</small>
-        <% else %>
-          <%= @form_builder.hidden_field :_destroy %>
-          <%= render(UI::Button::Component.new(text: "Remove", color: :error, data: {action: "click->#{UI::Forms::NestedFields::Component::CONTROLLER}#remove"})) %>
-        <% end %>
-      </div>
+      <% if @location.destroy_forbidden? %>
+        <small class="less-strong tw:ml-auto">can't remove, has impounded bikes</small>
+      <% else %>
+        <%= @form_builder.hidden_field :_destroy %>
+
+        <%# twlink is in the components layer, so the red utilities outrank it %>
+        <%= render(UI::Button::Component.new(text: "Remove", color: :link,
+              html_class: "tw:ml-auto tw:text-red-700 tw:hover:text-red-800 tw:dark:text-red-400",
+              data: {action: "click->#{UI::Forms::NestedFields::Component::CONTROLLER}#remove"})) %>
+      <% end %>
     </div>
   <% end %>
 </fieldset>
