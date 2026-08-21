@@ -34,6 +34,6 @@
   <% end %>
 
   <div class="tw:mt-3 tw:w-full">
-    <%= render(UI::Tabs::Component.new(tabs: @tabs, nav_label: @nav_label, turbo: true)) %>
+    <%= render(UI::Tabs::Component.new(tabs: @tabs, nav_label: @nav_label, turbo: @turbo)) %>
   </div>
 </div>

@@ -15,13 +15,14 @@ module Admin
 
         # active: is passed rather than read off the route because a failed update renders the
         # tab it was submitted from, while the action is still "update"
-        def initialize(organization:, active:, subtitle: nil, additional_link: nil)
+        def initialize(organization:, active:, subtitle: nil, additional_link: nil, turbo: true)
           raise_if_invalid_value!(:active, active, TABS)
 
           @organization = organization
           @active = active
           @subtitle = subtitle
           @additional_link = additional_link
+          @turbo = turbo
         end
 
         private

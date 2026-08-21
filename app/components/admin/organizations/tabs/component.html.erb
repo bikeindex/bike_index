@@ -1,5 +1,5 @@
 <%= render(Admin::RecordTabs::Component.new(title: @organization.name, subtitle: @subtitle,
-      tabs:, links: top_right_links, nav_label: "Organization sections")) do |record_tabs| %>
+      tabs:, links: top_right_links, nav_label: "Organization sections", turbo: @turbo)) do |record_tabs| %>
   <% if @organization.deleted? %>
     <% record_tabs.with_alert do %>
       <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "Organization deleted")) do %>

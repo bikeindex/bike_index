@@ -1,4 +1,9 @@
+<%#
+  turbo: false - the uppy uploader below is set up by the legacy admin bundle, which a
+  turbo restoration visit doesn't re-run, so coming back to this page would find it dead
+%>
+
 <%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :custom_layouts,
-      subtitle:, additional_link:)) %>
+      subtitle:, additional_link:, turbo: false)) %>
 
 <%= render(layout_form) %>
