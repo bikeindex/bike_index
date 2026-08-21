@@ -72,7 +72,7 @@
 <% if @render_chart %>
   <% rendered_chart = capture do %>
     <% if sort_column != "created_at" %>
-      <%= render(Admin::ChartOrganizationStatuses::Component.new(
+      <%= render(Admin::OrganizationStatusesChart::Component.new(
         matching_organization_statuses:,
         matching_organization_statuses_untimed:,
         time_range: @time_range,
@@ -149,7 +149,7 @@
             </td>
 
             <td>
-              <%= render Admin::OrganizationCell::Component.new(sort_state:, organization: organization_status.organization, organization_id: organization_status.organization_id, render_search: params[:organization_id].blank?) %>
+              <%= render Admin::Organizations::Cell::Component.new(sort_state:, organization: organization_status.organization, organization_id: organization_status.organization_id, render_search: params[:organization_id].blank?) %>
             </td>
 
             <td>

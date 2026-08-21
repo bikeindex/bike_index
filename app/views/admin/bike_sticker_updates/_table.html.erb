@@ -11,7 +11,7 @@
 
   <% table.column(sortable: "user_id") do |update| %>
     <% if update.user_id.present? %>
-      <%= render Admin::UserCell::Component.new(sort_state:, user: update.user, render_search: true) %>
+      <%= render Admin::Users::Cell::Component.new(sort_state:, user: update.user, render_search: true) %>
     <% end %>
   <% end %>
 
@@ -51,7 +51,7 @@
   <% end %>
 
   <% table.column(sortable: "organization_id", label: "Update org") do |update| %>
-    <%= render Admin::OrganizationCell::Component.new(sort_state:, organization: update.organization, render_search: true) %>
+    <%= render Admin::Organizations::Cell::Component.new(sort_state:, organization: update.organization, render_search: true) %>
   <% end %>
 
   <% table.column(sortable: "organization_kind", label: "Org kind") do |update| %>

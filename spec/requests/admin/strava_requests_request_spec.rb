@@ -68,7 +68,7 @@ RSpec.describe Admin::StravaRequestsController, type: :request do
   end
 end
 
-RSpec.describe Admin::StravaRequestsChart::Component do
+RSpec.describe Admin::Strava::RequestsChart::Component do
   describe "integration_counts" do
     let(:strava_integration) { FactoryBot.create(:strava_integration) }
     let(:time_range) { 1.week.ago..Time.current }

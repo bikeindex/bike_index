@@ -67,7 +67,7 @@
 
   = render(Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state))
 
-  = render Admin::BikesTable::Component.new(bikes: @bikes, sort_state:, display_dev_info: display_dev_info?)
+  = render Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:, display_dev_info: display_dev_info?)
 
 - else
   = link_to "Delete!", admin_paint_url(@paint), method: :delete, class: "btn btn-danger"

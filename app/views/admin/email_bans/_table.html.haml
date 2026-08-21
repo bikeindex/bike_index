@@ -34,4 +34,4 @@
           %td
             - if email_ban.user_id.present?
               = cache(email_ban.user) do
-                = render Admin::UserCell::Component.new(sort_state:, user: email_ban.user, render_search: true)
+                = render Admin::Users::Cell::Component.new(sort_state:, user: email_ban.user, render_search: true)

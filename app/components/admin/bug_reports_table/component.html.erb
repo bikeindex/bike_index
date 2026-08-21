@@ -33,7 +33,7 @@
 
       <% table.column(sortable: "email", label: "Sender") do |bug_report| %>
         <% if bug_report.user_id.present? %>
-          <%= render Admin::UserCell::Component.new(user: bug_report.user, user_id: bug_report.user_id) %>
+          <%= render Admin::Users::Cell::Component.new(user: bug_report.user, user_id: bug_report.user_id) %>
         <% else %>
           <span class="tw:block tw:xl:inline"><%= bug_report.from_name %></span>
           <%= content_tag(:code, bug_report.email, class: "small") %>
