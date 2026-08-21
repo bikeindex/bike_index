@@ -21,7 +21,7 @@
     <% @tabs.each do |tab| %>
       <%# "page" rather than tab[:active] - a false renders aria-current="false", which counts as current %>
       <%= link_to tab[:href], class: link_classes(tab), aria: {current: ("page" if tab[:active])},
-            data: {"ui--tabs-target": ("active" if tab[:active])} do %>
+            data: link_data(tab) do %>
         <%= tab[:label] %>
 
         <% if tab[:count].present? %>

@@ -15,15 +15,23 @@ module UI
       ACTIVE_CLASSES = "tw:border-gray-300 tw:border-b-white tw:bg-white tw:font-semibold tw:text-gray-900"
       INACTIVE_CLASSES = "twlink tw:border-transparent tw:hover:bg-gray-100"
 
-      def initialize(tabs:, nav_label:)
+      # turbo: visit tabs through Turbo Drive, which is off app-wide and opted into per
+      # element. Only for a section whose tab targets don't need the legacy admin JS -
+      # it binds once on DOM ready, and a Drive visit doesn't re-run it
+      def initialize(tabs:, nav_label:, turbo: false)
         @tabs = tabs
         @nav_label = nav_label
+        @turbo = turbo
       end
 
       private
 
       def link_classes(tab)
         [TAB_CLASSES, tab[:active] ? ACTIVE_CLASSES : INACTIVE_CLASSES].join(" ")
+      end
+
+      def link_data(tab)
+        {"ui--tabs-target": ("active" if tab[:active]), turbo: (true if @turbo)}.compact
       end
     end
   end
