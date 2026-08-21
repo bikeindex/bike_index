@@ -1,15 +1,6 @@
 <div class="tw:py-6" data-controller="page-preview">
   <div class="tw:mb-6 tw:flex tw:items-center tw:justify-between">
-    <%# A step below admin's own h1 %>
-    <% if @admin %>
-      <h2 class="uncap tw:mb-0 tw:text-xl tw:font-normal tw:text-gray-500">
-        <%= editing? ? "Edit page" : "Add page" %>
-      </h2>
-    <% else %>
-      <h1 class="uncap tw:text-2xl tw:font-semibold">
-        <%= editing? ? "Edit page" : "Add page" %>
-      </h1>
-    <% end %>
+    <%= render(UI::Header::Component.new(text: editing? ? "Edit page" : "Add page", **heading_options)) %>
 
     <%= link_to "Back to sequence overview", sequence_path, class: "twlink" %>
   </div>
@@ -40,7 +31,7 @@
       Save the page to see the updated preview.
     </p>
     <div data-page-preview-target="preview" class="tw:mt-8">
-      <h2 class="uncap tw:mb-3 tw:text-xl">Preview</h2>
+      <%= render(UI::Header::Component.new(text: "Preview", tag: :h2, html_class: "uncap")) %>
 
       <%# pt and mb cancel the flow shell's negative margins; padding doesn't collapse %>
       <div class="tw:mb-24 tw:pt-(--nav-gap)">

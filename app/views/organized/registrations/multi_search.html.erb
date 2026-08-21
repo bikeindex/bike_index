@@ -35,7 +35,7 @@
   data-org--search-column-toggle-default-columns-value="<%= settings.initially_checked_columns.to_json %>"
 >
   <div class="tw:mx-auto tw:mb-6 tw:max-w-2xl">
-    <h3 class="uncap tw:mb-4">Multi Search</h3>
+    <%= render(UI::Header::Component.new(text: "Multi Search", tag: :h3, html_class: "uncap tw:mb-4!")) %>
 
     <% if current_organization.enabled?("bike_stickers") %>
       <div class="tw:mb-4">

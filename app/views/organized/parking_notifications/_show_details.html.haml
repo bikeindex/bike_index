@@ -70,14 +70,14 @@
                   = submit_tag "Create notification", class: "btn btn-success btn-md-lg"
 
 - if related_notifications.any?
-  %h2.uncap{ style: "margin-top: 60px;" }
+  = render(UI::Header::Component.new(tag: :h2, html_class: "uncap tw:mt-15")) do
     Related Notifications
     %em
       (#{related_notifications.count + 1} total)
   = render partial: "/organized/parking_notifications/table", locals: { parking_notifications: related_notifications, skip_bike: true, skip_map_cell: true }
 
 - if @parking_notification.send_email?
-  %h2.uncap.mt-4 Preview of email sent:
+  = render(UI::Header::Component.new(text: "Preview of email sent:", tag: :h2, html_class: "uncap mt-4"))
   .email-preview.parking-notification-email-preview
     .text-center.small.less-strong email for preview only
     <iframe src="#{organization_email_path(@parking_notification.kind, parking_notification_id: @parking_notification.id, organization_id: current_organization.to_param, versioned: true)}"></iframe>

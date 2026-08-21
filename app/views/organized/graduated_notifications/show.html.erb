@@ -1,17 +1,17 @@
 <%# TODO: add translations %>
 <div class="organized-page-header">
-  <h1>
+  <%= render(UI::Header::Component.new) do %>
     Graduated notification
     <small class="less-strong">for <%= @graduated_notification.user_display_name %></small>
-  </h1>
+  <% end %>
 </div>
 
-<h5 class="uncap mb-4">
+<%= render(UI::Header::Component.new(tag: :h3, html_class: "uncap")) do %>
   View
   <% user_search_param = @graduated_notification.user_id.present? ? {user_id: @graduated_notification.user_id} : {search_email: @graduated_notification.email} %>
 
   <%= link_to "all user's graduated notifications", organization_graduated_notifications_path(user_search_param.merge(organization_id: current_organization.to_param, search_status: "all")) %>
-</h5>
+<% end %>
 
 <div class="row">
   <div class="col-md-6">
@@ -124,10 +124,10 @@
   </div>
 
   <div class="col-md-6">
-    <h3 class="uncap">
+    <%= render(UI::Header::Component.new(tag: :h3, html_class: "uncap")) do %>
       User Bikes
       <small class="less-strong">(<%= @graduated_notification.associated_bikes.count %>)</small>
-    </h3>
+    <% end %>
 
     <table class="table-list">
       <tbody>
@@ -158,14 +158,14 @@
 </div>
 
 <% if @graduated_notification.send_email? %>
-  <h2 class="uncap mt-4">
+  <%= render(UI::Header::Component.new(tag: :h2, html_class: "uncap mt-4")) do %>
     Preview of email
     <% if @graduated_notification.email_success? %>
       sent:
     <% else %>
       to send:
     <% end %>
-  </h2>
+  <% end %>
   <% mail_snippet = @graduated_notification.mail_snippet %>
   <% if @graduated_notification.processed_at.present? && mail_snippet.present? && @graduated_notification.processed_at < mail_snippet.updated_at %>
     <div class="row">

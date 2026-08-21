@@ -2,7 +2,7 @@
 - @bike_submitting = @impound_claim.bike_submitting
 
 .organized-page-header
-  %h1.uncap
+  = render(UI::Header::Component.new(html_class: "uncap")) do
     #{@impound_claim.claim_kind_humanized.titleize} for
     = link_to "impound record ##{@impound_record.display_id}", organization_impound_record_path(@impound_record.display_id, organization_id: current_organization.id)
 
@@ -10,7 +10,7 @@
 
 - if @parking_notification.present?
   %hr.mt-4
-  %h2.uncap
+  = render(UI::Header::Component.new(tag: :h2, html_class: "uncap")) do
     Impounded by
     %em
       = link_to "this notification", organization_parking_notification_path(@parking_notification, organization_id: current_organization.to_param)

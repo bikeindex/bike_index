@@ -1,8 +1,7 @@
 -# TODO: add translations
 
 .organized-page-header
-  %h1
-    Custom Emails
+  = render(UI::Header::Component.new(text: "Custom Emails"))
 
 - all_snippet_kinds = current_organization.mail_snippets.where(kind: MailSnippet.organization_snippets_in_all).pluck(:kind)
 - if all_snippet_kinds.any?
