@@ -1,17 +1,11 @@
 #!/bin/bash
-# Clear out logs (they balloon) and tmp (mainly used by tests). log:clear only
-# knows the per-environment logs - bullet.log and the .0 files newsyslog rotates
-# out grow to hundreds of MB behind it
+# Clear out logs (they balloon) and tmp (mainly used by tests)
 bin/rails log:clear tmp:clear
-rm -f log/bullet.log log/*.log.[0-9]*
 
-# Start Redis, if it isn't started already. --daemonize detaches it from this
-# shell's process group, so quitting bin/dev can't take Redis down under the
-# other workspaces sharing port 6379
-if ! redis-cli ping >/dev/null 2>&1; then
-  > log/redis.log
-  redis-server --daemonize yes --logfile "$PWD/log/redis.log"
-fi
+# Start Redis in the background, if it isn't started already
+touch log/redis.log
+> log/redis.log
+redis-server > log/redis.log &
 
 eval "$(ruby bin/env --export)"
 echo "Starting server on http://localhost:$DEV_PORT"
