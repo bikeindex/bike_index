@@ -24,18 +24,15 @@
   }
 }
 
-/* Background only, unlike the legacy .only-dev-visible: a border would fight the shape it
- * marks, and a UI::Tabs tab's white lower edge is what breaks the row's underline */
-@utility twdev-only {
-  /* A striped table paints its rows over its own background */
-  &,
-  & tbody tr {
-    @apply tw:bg-dev/10;
-  }
-
-  /* twdev-only emits before tw:bg-white, so it loses that tie on source order - the extra
-   * specificity here is what holds the marking on an active UI::Tabs tab */
-  @variant is-active {
+/* The dev-info marking, formerly admin_unvendored's unlayered copy. A hand-written block
+ * rather than @utility, which would take the tw: prefix and so match none of the ~95
+ * existing .only-dev-visible sites - nor the `<style>.only-dev-visible {display: none}`
+ * hooks several admin tables hide it with. Emitted after tailwind's own utilities, so it
+ * takes ties against a resting background like an active UI::Tabs tab's tw:bg-white.
+ * The legacy rule's border is dropped: it fought the shape it marked, and the tab's white
+ * lower edge is what breaks the row's underline */
+@layer utilities {
+  .only-dev-visible {
     @apply tw:bg-dev/10;
   }
 }

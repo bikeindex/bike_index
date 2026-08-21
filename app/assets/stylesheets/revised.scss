@@ -373,10 +373,7 @@ body {
 }
 
 $dev-color: #9400d3;
-.only-dev-visible {
-  border: 1px solid $dev-color;
-  background: rgba($dev-color, 0.1);
-}
+// .only-dev-visible's own background is in bike_index_components.css
 // This is frequently used in display-tables, make it work
 .table-list {
   tr.only-dev-visible {

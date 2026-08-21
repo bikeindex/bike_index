@@ -13949,11 +13949,8 @@ table .photo-cell img {
   display: none
 }
 
-.only-dev-visible {
-  border: 1px solid #9400d3;
-  background: rgba(148, 0, 211, .1)
-}
-
+/* .only-dev-visible's own background is in bike_index_components.css. The two rules below
+   stay: this file is unlayered, so .table-list's striping would otherwise beat it */
 .table-list tr.only-dev-visible {
   background: rgba(148, 0, 211, .1) !important
 }

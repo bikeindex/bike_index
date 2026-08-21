@@ -37,7 +37,7 @@ module Admin
             {tab: :paid_functionality, label: "Edit paid functionality", href: edit_tab_path(:paid_functionality)},
             {tab: :sso, label: "SSO", href: edit_tab_path(:sso)},
             {tab: :invoices, label: "Invoices", href: admin_organization_invoices_path(organization_id: @organization)},
-            {tab: :custom_layouts, label: "Custom layouts", classes: "tw:twdev-only",
+            {tab: :custom_layouts, label: "Custom layouts", classes: "only-dev-visible",
              href: admin_organization_custom_layouts_path(organization_id: @organization)}]
             .select { render_tab?(it[:tab]) }
             .map { it.except(:tab).merge(active: @active == it[:tab]) }
