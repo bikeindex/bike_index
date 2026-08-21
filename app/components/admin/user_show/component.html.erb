@@ -326,7 +326,7 @@
             <ul class="mb-0">
               <% @user.user_phones.each do |user_phone| %>
                 <li>
-                  <%= render UI::PhoneDisplay::Component.new(phone: user_phone.phone, skip_link: true) %>
+                  <%= render Atom::Phone::Component.new(phone: user_phone.phone, skip_link: true) %>
 
                   <small class="less-strong <%= user_phone.confirmed? ? "text-success" : "text-warning" %>">
                     <%= user_phone.confirmed? ? "confirmed" : "unconfirmed" %>
@@ -344,7 +344,7 @@
 
               <% if display_phone %>
                 <li>
-                  <%= render UI::PhoneDisplay::Component.new(phone: @user.phone, skip_link: true) %>
+                  <%= render Atom::Phone::Component.new(phone: @user.phone, skip_link: true) %>
                   <small class="less-strong text-warning">unconfirmed</small>
                 </li>
               <% end %>
