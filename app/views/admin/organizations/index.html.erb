@@ -92,9 +92,11 @@
 <% table_view = render(partial: "/admin/organizations/table", locals: {render_sortable: true}) %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  viewing: controller_name.humanize,
   collection: @organizations,
   nav_header_list_items:,
   chart_collection: @render_chart && matching_organizations,
   admin_search_form:,
-  table_view:
+  table_view:,
 )) %>

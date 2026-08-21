@@ -116,8 +116,11 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @collection,
+  viewing: controller_name.humanize,
   index_title: "User Alerts",
   rendered_chart:,
   nav_header_list_items:,
-  table_view:
+  table_view:,
 )) %>

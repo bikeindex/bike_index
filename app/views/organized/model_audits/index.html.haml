@@ -3,7 +3,7 @@
 .organized-page-header
   = render(UI::Header::Component.new(text: "E-Vehicle audits"))
 
-= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
+= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:)
 
 .mt-4.mb-4
   = pluralize(number_with_delimiter(@pagy.count), "matching models")

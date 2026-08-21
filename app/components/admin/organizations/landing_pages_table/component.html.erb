@@ -1,7 +1,7 @@
 <%# a local, because the cell blocks below are instance_exec'd and can't see the component's ivars %>
 <% render_search = @render_search %>
 
-<%= render(UI::Table::Component.new(records: @collection, render_sortable: @render_sortable)) do |table| %>
+<%= render(UI::Table::Component.new(records: @collection, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
   <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |landing_page| %>
     <%= link_to edit_admin_organization_custom_layout_path(organization_id: landing_page.organization_id, id: "landing_page") do %>
       <%= render UI::Time::Component.new(time: landing_page.created_at) %>
@@ -15,7 +15,7 @@
   <% end %>
 
   <% table.column(sortable: "organization_id", label: "Organization") do |landing_page| %>
-    <%= render Admin::Organizations::Cell::Component.new(organization: landing_page.organization, organization_id: landing_page.organization_id, render_search:) %>
+    <%= render Admin::Organizations::Cell::Component.new(organization: landing_page.organization, organization_id: landing_page.organization_id, sort_state:, render_search:) %>
   <% end %>
 
   <% table.column(sortable: "enabled", label: "Enabled") do |landing_page| %>

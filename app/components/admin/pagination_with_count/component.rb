@@ -5,28 +5,22 @@ module Admin
     class Component < ApplicationComponent
       include GraphingHelper # for humanized_time_range_column
 
-      def initialize(collection:, count: nil, count_detail: nil, skip_total: false, skip_today: false, skip_pagination: false, humanized_time_range_column_override: nil, viewing: nil, pagy: nil, per_page: nil, time_range: nil, period: nil, time_range_column: nil, params: {})
+      def initialize(collection:, index:, count: nil, count_detail: nil, skip_total: false,
+        viewing: nil, time_range_column: nil)
         @collection = collection
+        @index = index
         @count = count
         @count_detail = count_detail
         @skip_total = skip_total
-        @skip_today = skip_today
-        @skip_pagination = skip_pagination
-        @humanized_time_range_column_override = humanized_time_range_column_override
         @viewing = viewing
-        @pagy = pagy
-        @per_page = per_page
-        @time_range = time_range
-        @period = period
-        @time_range_column = time_range_column
-        @params = params
+        @time_range_column = time_range_column || index.time_range_column
       end
 
       private
 
       def count
         return @count if @count.present?
-        return @pagy.count if @pagy.respond_to?(:count)
+        return @index.pagy.count if @index.pagy.respond_to?(:count)
         @collection.count
       end
 
@@ -42,15 +36,11 @@ module Admin
       end
 
       def humanized_time_range_column_display
-        if @humanized_time_range_column_override.present?
-          @humanized_time_range_column_override
-        else
-          humanized_time_range_column(@time_range_column)
-        end
+        humanized_time_range_column(@time_range_column, period: @index.period, render_chart: @index.render_chart)
       end
 
       def show_time_range?
-        @time_range.present? && @period != "all"
+        @index.time_range.present? && @index.period != "all"
       end
 
       def show_today_count?
@@ -62,7 +52,7 @@ module Admin
       end
 
       def per_pages
-        [10, 25, 50, 100, @per_page.to_i].uniq.sort
+        [10, 25, 50, 100, @index.per_page.to_i].uniq.sort
       end
 
       def per_page_select_id

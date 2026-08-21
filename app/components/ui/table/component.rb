@@ -3,16 +3,16 @@
 module UI
   module Table
     class Component < ApplicationComponent
-      include Binxtils::SortableHelper
+      # Cell blocks are instance_exec'd, so this is how they reach the sort state
+      attr_reader :sort_state
 
       # Pass cache_key to enable per-row fragment caching (e.g. cache_key: "admin-users").
-      def initialize(records:, cache_key: nil, classes: nil, unbordered: false, sort: nil, sort_direction: nil, render_sortable: false, sticky: false)
+      def initialize(records:, sort_state: ComponentStates::SortState.new, cache_key: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false)
         @records = records
+        @sort_state = sort_state
         @cache_key = cache_key
         @classes = classes
         @bordered = !unbordered
-        @sort = sort
-        @sort_direction = sort ? (sort_direction || "desc") : sort_direction
         @render_sortable = render_sortable
         @sticky = sticky
         @columns = []
@@ -31,18 +31,16 @@ module UI
 
       private
 
+      def sortable_url(sort, direction)
+        url_for(@sort_state.url_params(sort:, direction:))
+      end
+
       def current_sort
-        @current_sort ||= @sort || helper_sort_column || default_sort_column
+        @current_sort ||= sortable_columns.include?(@sort_state.sort) ? @sort_state.sort : default_sort_column
       end
 
       def current_direction
-        @sort_direction || (helpers.respond_to?(:sort_direction) ? helpers.sort_direction : nil) || "desc"
-      end
-
-      def helper_sort_column
-        return unless helpers.respond_to?(:sort_column)
-        col = helpers.sort_column
-        sortable_columns.include?(col) ? col : nil
+        @sort_state.direction || "desc"
       end
 
       def default_sort_column

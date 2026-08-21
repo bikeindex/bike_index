@@ -62,4 +62,9 @@
 
 <% table_view = render(partial: "table", locals: {collection: @collection, render_sortable: true, searched_activity_type: @searched_activity_type}) %>
 
-<%= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_strava_activities)) %>
+<%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @collection,
+  viewing: controller_name.humanize,
+  nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_strava_activities,
+)) %>

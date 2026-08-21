@@ -6,24 +6,24 @@ module Admin
       # @!group Header Variants
 
       def default
-        render(Admin::CurrentHeader::Component.new(params: passed_params))
+        render(Admin::CurrentHeader::Component.new(index: index_state, viewing: "Notifications"))
       end
 
       def with_current_organization
         current_organization = Organization.friendly_find "brakebills"
         primary_activity = PrimaryActivity.friendly_find "Gravel"
-        render(Admin::CurrentHeader::Component.new(current_organization:, params: passed_params, primary_activity:, viewing: "Notifications"))
+        render(Admin::CurrentHeader::Component.new(index: index_state(current_organization:, primary_activity:), viewing: "Notifications"))
       end
 
       def with_bike
         bike = Bike.first
-        render(Admin::CurrentHeader::Component.new(params: passed_params(search_bike_id: bike.id), bike:, viewing: "Activities"))
+        render(Admin::CurrentHeader::Component.new(index: index_state(params: {search_bike_id: bike.id}, bike:), viewing: "Activities"))
       end
 
       private
 
-      def passed_params(hash = {})
-        ActionController::Parameters.new(hash)
+      def index_state(params: {}, **attrs)
+        ComponentStates::IndexState.new(params: ActionController::Parameters.new(params), **attrs)
       end
     end
   end

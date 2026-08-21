@@ -12,13 +12,13 @@
       <%= number_with_delimiter(@pagy.count) %>
       <%= translation(".matching_impound_record", count: @pagy.count) %>
 
-      <em><%= helpers.humanized_time_range(@time_range) %></em>
+      <em><%= @humanized_time_range %></em>
 
       <div class="tw:ml-2 tw:inline-block">
         <%= render(UI::Dropdown::Component.new(name: status_dropdown_text, button_color: :primary, active: @search_status != "current")) do |dropdown| %>
           <% @available_statuses.each do |status| %>
             <% status_active = @search_status == status %>
-            <% status_link_params = sortable_search_params.merge(organization_id: @current_organization.id, search_status: (status_active ? nil : status)) %>
+            <% status_link_params = @sort_state.search_params.merge(organization_id: @current_organization.id, search_status: (status_active ? nil : status)) %>
             <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: display_status_for(status), path: organization_impound_records_path(status_link_params), match: :query, query: status_query(status), data: {turbo_action: "advance"}) } %>
 
             <%# Divider after "all" %>
@@ -29,9 +29,9 @@
 
       <div class="tw:ml-2 tw:inline-block">
         <%= render(UI::Dropdown::Component.new(name: unregisteredness_dropdown_text, button_size: :sm, active: @search_unregisteredness != "all")) do |dropdown| %>
-          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: translation(".all_bikes"), path: organization_impound_records_path(sortable_search_params.except(:search_unregisteredness)), match: :query, query: {search_unregisteredness: nil}, data: {turbo_action: "advance"}) } %>
-          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: translation(".only_unregistered"), path: organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_unregistered")), match: :query, query: {search_unregisteredness: "only_unregistered"}, data: {turbo_action: "advance"}) } %>
-          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: translation(".only_user_registered"), path: organization_impound_records_path(sortable_search_params.merge(search_unregisteredness: "only_registered")), match: :query, query: {search_unregisteredness: "only_registered"}, data: {turbo_action: "advance"}) } %>
+          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: translation(".all_bikes"), path: organization_impound_records_path(@sort_state.search_params.except(:search_unregisteredness)), match: :query, query: {search_unregisteredness: nil}, data: {turbo_action: "advance"}) } %>
+          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: translation(".only_unregistered"), path: organization_impound_records_path(@sort_state.search_params.merge(search_unregisteredness: "only_unregistered")), match: :query, query: {search_unregisteredness: "only_unregistered"}, data: {turbo_action: "advance"}) } %>
+          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: translation(".only_user_registered"), path: organization_impound_records_path(@sort_state.search_params.merge(search_unregisteredness: "only_registered")), match: :query, query: {search_unregisteredness: "only_registered"}, data: {turbo_action: "advance"}) } %>
         <% end %>
       </div>
     </div>
@@ -49,10 +49,10 @@
 
   <%# The form wraps the table too, so checked rows submit with it %>
   <%= render(Org::ImpoundRecordUpdateForm::Component.new(current_organization: @current_organization, multi_update_open: @multi_update_open)) do %>
-    <%= render(Org::ImpoundRecordsTable::Component.new(impound_records: @impound_records, current_organization: @current_organization, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status, multiselect_visible: @multi_update_open)) %>
+    <%= render(Org::ImpoundRecordsTable::Component.new(impound_records: @impound_records, current_organization: @current_organization, current_user: @current_user, sort_state: @sort_state, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status, multiselect_visible: @multi_update_open)) %>
   <% end %>
 </div>
 
 <div class="pt-4 pb-4">
-  <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg)) %>
+  <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: @params, size: :lg)) %>
 </div>

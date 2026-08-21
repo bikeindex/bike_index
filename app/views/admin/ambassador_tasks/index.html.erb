@@ -5,8 +5,9 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @ambassador_tasks,
   viewing: "Ambassador Activities",
   skip_charting: true,
-  nav_header_list_items:
+  nav_header_list_items:,
 )) %>

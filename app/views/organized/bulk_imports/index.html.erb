@@ -22,7 +22,7 @@
 </div>
 
 <div class="mt-2">
-  <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time) %>
+  <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:) %>
 </div>
 
 <div
@@ -114,7 +114,7 @@
         </td>
 
         <td>
-          <%= render(Org::BulkImportError::Component.new(bulk_import:, short_display: true)) %>
+          <%= render(Org::BulkImportError::Component.new(bulk_import:, short_display: true, display_dev_info: display_dev_info?)) %>
         </td>
 
         <td>

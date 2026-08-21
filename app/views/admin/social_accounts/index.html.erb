@@ -5,8 +5,10 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  viewing: controller_name.humanize,
   collection: @social_accounts,
   index_title: "Social Accounts",
   nav_header_list_items:,
-  skip_charting: true
+  skip_charting: true,
 )) %>

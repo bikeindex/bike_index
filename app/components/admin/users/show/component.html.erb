@@ -98,7 +98,7 @@
       <small>Editing</small>
       <%= @user.display_name %>
 
-      <% if helpers.display_dev_info? %>
+      <% if @display_dev_info %>
         <em class="small less-strong only-dev-visible">id: <%= @user.id %></em>
       <% end %>
     </h1>
@@ -145,7 +145,7 @@
           </td>
         </tr>
 
-        <% if helpers.display_dev_info? %>
+        <% if @display_dev_info %>
           <tr class="only-dev-visible">
             <td>No Address</td>
 
@@ -369,7 +369,7 @@
 
         <td>
           <small>
-            <%= @user.formatted_address_string(visible_attribute: :street, current_country_id: helpers.current_country_id) %>
+            <%= @user.formatted_address_string(visible_attribute: :street, current_country_id: @current_country_id) %>
           </small>
         </td>
       </tr>
@@ -427,7 +427,7 @@
 </h4>
 
 <% if @bikes_count > 0 %>
-  <%= render Admin::Bikes::Table::Component.new(bikes: @bikes, skip_user: true) %>
+  <%= render Admin::Bikes::Table::Component.new(bikes: @bikes, display_dev_info: @display_dev_info, skip_user: true) %>
 <% end %>
 
 <h4 class="mt-4">
@@ -581,7 +581,7 @@
     <div class="col-md-6">
       <table class="table-list">
         <tbody>
-          <% if helpers.display_dev_info? %>
+          <% if @display_dev_info %>
             <tr class="only-dev-visible collapse mailchimpRawData">
               <td class="small">ID</td>
               <td class="small"><%= mailchimp_datum.id %></td>

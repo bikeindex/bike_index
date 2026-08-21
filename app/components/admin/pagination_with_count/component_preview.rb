@@ -5,63 +5,51 @@ module Admin
     class ComponentPreview < ApplicationComponentPreview
       # @!group PaginationWithCount Variants
       def default
-        pagy = Pagy::Offset.new(count: 100, page: 1, limit: 25)
         render(Admin::PaginationWithCount::Component.new(
-          collection: collection,
-          pagy:,
-          per_page: 25,
-          params: {}
+          collection:,
+          index: index_state(count: 100, limit: 25)
         ))
       end
 
       def many_pages
-        pagy = Pagy::Offset.new(count: 559, page: 1, limit: 50)
         render(Admin::PaginationWithCount::Component.new(
-          collection: collection,
+          collection:,
           viewing: "application",
-          pagy:,
-          per_page: 50,
-          params: {}
+          index: index_state(count: 559, limit: 50)
         ))
       end
 
       def with_viewing_override
-        pagy = Pagy::Offset.new(count: 50, page: 1, limit: 25)
         render(Admin::PaginationWithCount::Component.new(
-          collection: collection,
+          collection:,
           viewing: "Custom Items",
-          pagy:,
-          per_page: 25,
-          params: {}
+          index: index_state(count: 50, limit: 25)
         ))
       end
 
       def skip_total
-        pagy = Pagy::Offset.new(count: 100, page: 2, limit: 50)
         render(Admin::PaginationWithCount::Component.new(
-          collection: collection,
+          collection:,
           skip_total: true,
-          pagy:,
-          per_page: 50,
-          params: {}
+          index: index_state(count: 100, limit: 50, page: 2)
         ))
       end
 
       def with_time_range
-        pagy = Pagy::Offset.new(count: 75, page: 1, limit: 25)
-        time_range = (1.week.ago..Time.current)
         render(Admin::PaginationWithCount::Component.new(
-          collection: collection,
-          pagy:,
-          per_page: 25,
-          time_range:,
-          period: "week",
-          time_range_column: "created_at",
-          params: {}
+          collection:,
+          index: index_state(count: 75, limit: 25, period: "week",
+            time_range: 1.week.ago..Time.current, time_range_column: "created_at")
         ))
       end
 
       private
+
+      def index_state(count:, limit:, page: 1, **attrs)
+        ComponentStates::IndexState.new(
+          pagy: Pagy::Offset.new(count:, page:, limit:), per_page: limit, **attrs
+        )
+      end
 
       def collection
         Bike.all

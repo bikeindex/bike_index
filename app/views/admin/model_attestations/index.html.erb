@@ -12,8 +12,9 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @model_attestations,
   viewing: "Model Attestations",
   table_view:,
-  chart_collection: @render_chart && matching_model_attestations
+  chart_collection: @render_chart && matching_model_attestations,
 )) %>

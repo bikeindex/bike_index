@@ -1,1 +1,1 @@
-= render(Admin::IndexSkeleton::Component.new(chart_collection: @render_chart && matching_email_bans))
+= render(Admin::IndexSkeleton::Component.new(index: admin_index_state, collection: @collection, viewing: controller_name.humanize, chart_collection: @render_chart && matching_email_bans))
