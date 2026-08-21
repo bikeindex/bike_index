@@ -26,17 +26,29 @@ module Admin
 
         def tabs
           [[:edit, "Edit", edit_admin_bike_path(@bike)],
-            [:duplicates, "Duplicates", admin_bike_path(@bike, active_tab: "duplicates"), @bike.duplicate_bike_groups.count],
-            [:messages, "Messages", admin_bike_path(@bike, active_tab: "messages"), @bike.messages_count],
-            [:listings, "Listings", admin_marketplace_listings_path(search_bike_id: @bike.id), @bike.marketplace_listings.count],
-            [:ownerships, "Ownerships", admin_bike_path(@bike, active_tab: "ownerships"), @bike.ownerships.count],
-            [:stickers, "Stickers", admin_bike_path(@bike, active_tab: "stickers"), @bike.bike_stickers.count],
+            [:duplicates, "Duplicates", admin_bike_path(@bike, active_tab: "duplicates"), tab_counts[:duplicates]],
+            [:messages, "Messages", admin_bike_path(@bike, active_tab: "messages"), tab_counts[:messages]],
+            [:listings, "Listings", admin_marketplace_listings_path(search_bike_id: @bike.id), tab_counts[:listings]],
+            [:ownerships, "Ownerships", admin_bike_path(@bike, active_tab: "ownerships"), tab_counts[:ownerships]],
+            [:stickers, "Stickers", admin_bike_path(@bike, active_tab: "stickers"), tab_counts[:stickers]],
             (stolen_tab if @stolen_record.present?),
-            [:theft_alerts, "Promoted alerts", admin_theft_alerts_path(search_bike_id: @bike.id), @bike.theft_alerts.count],
-            [:recoveries, "Recoveries", admin_bike_path(@bike, active_tab: "recoveries"), @bike.recovered_records.count],
-            ([:impound, "Impoundings", admin_bike_path(@bike, active_tab: "impound"), impound_count] if impound?),
+            [:theft_alerts, "Promoted alerts", admin_theft_alerts_path(search_bike_id: @bike.id), tab_counts[:theft_alerts]],
+            [:recoveries, "Recoveries", admin_bike_path(@bike, active_tab: "recoveries"), tab_counts[:recoveries]],
+            ([:impound, "Impoundings", admin_bike_path(@bike, active_tab: "impound"), tab_counts[:impound]] if impound?),
             ([:recovery_displays, "Recovery displays", admin_recovery_displays_path(search_bike_id: @bike.id)] if @display_recovery)]
             .compact.map { |tab, label, href, count| {label:, href:, count:, active: @active == tab} }
+        end
+
+        # Cache the counts rather than the markup: which tab is active varies per screen and
+        # comes from an unvalidated param, so it can't go in a cache key
+        def tab_counts
+          @tab_counts ||= Rails.cache.fetch(["admin_bike_tab_counts-1", @bike]) do
+            {duplicates: @bike.duplicate_bike_groups.count, messages: @bike.messages_count,
+             listings: @bike.marketplace_listings.count, ownerships: @bike.ownerships.count,
+             stickers: @bike.bike_stickers.count, theft_alerts: @bike.theft_alerts.count,
+             recoveries: @bike.recovered_records.count,
+             impound: @bike.impound_records.count + ImpoundClaim.involving_bike_id(@bike.id).count}
+          end
         end
 
         def stolen_tab
@@ -46,11 +58,7 @@ module Admin
 
         # A tab with nothing behind it is dropped - except on its own page, which still
         # renders and shouldn't lose its place in the row
-        def impound? = impound_count > 0 || @active == :impound
-
-        def impound_count
-          @impound_count ||= @bike.impound_records.count + ImpoundClaim.involving_bike_id(@bike.id).count
-        end
+        def impound? = tab_counts[:impound] > 0 || @active == :impound
 
         def non_admin_view_link
           render(UI::ButtonLink::Component.new(text: "non-admin view", size: :sm,

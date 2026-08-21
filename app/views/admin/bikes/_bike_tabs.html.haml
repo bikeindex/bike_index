@@ -106,13 +106,6 @@
                   %small.only-dev-visible.localizeTime
                     = l bike.updated_at, format: :convert_time
 
-              - pdf ||= false
-              - if pdf
-                %tr
-                  %td
-                    PDF
-                  %td
-                    = link_to "Printable registration", pdf_bike_url(bike)
         .col-lg-5
           %table.table-list
             %tr
