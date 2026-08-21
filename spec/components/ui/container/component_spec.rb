@@ -7,20 +7,11 @@ RSpec.describe UI::Container::Component, type: :component do
     render_inline(described_class.new(**options)) { "content".html_safe }.at_css("div")["class"]
   end
 
-  it "centers a form at the narrower width" do
+  it "caps the width, centering unless aligned left, and adds no padding" do
     expect(classes).to eq "tw:w-full tw:max-w-3xl tw:mx-auto"
-  end
-
-  it "gives wide content more to work with" do
     expect(classes(width: :wide)).to eq "tw:w-full tw:max-w-7xl tw:mx-auto"
-  end
-
-  it "leaves the slack on the right when aligned left" do
     expect(classes(alignment: :left)).to eq "tw:w-full tw:max-w-3xl"
-  end
-
-  # The page owns the gutter (.twgutter), so nesting these can't compound padding
-  it "adds no padding at any width" do
+    # The page owns the gutter (.twgutter), so nesting these can't compound padding
     expect(described_class::WIDTHS.map { |width| classes(width:) }.join).to_not include("px-")
   end
 
