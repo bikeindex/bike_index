@@ -34,15 +34,20 @@ module Admin
             [:edit, "Edit", edit_admin_organization_path(@organization)],
             [:locations, "Locations", edit_admin_organization_path(@organization, tab: "locations"),
               @organization.locations.size],
-            [:paid_functionality, "Edit paid functionality", edit_admin_organization_path(@organization, tab: "paid_functionality")],
+            ([:paid_functionality, "Edit paid functionality", edit_admin_organization_path(@organization, tab: "paid_functionality")] if paid_functionality?),
             ([:sso, "SSO", edit_admin_organization_path(@organization, tab: "sso")] if sso?),
             [:invoices, "Invoices", admin_organization_invoices_path(organization_id: @organization)],
-            ([:custom_layouts, "Custom layouts", admin_organization_custom_layouts_path(organization_id: @organization)] if custom_layouts?)]
-            .compact.map { |tab, label, href, count| {label:, href:, count:, active: @active == tab} }
+            (if custom_layouts?
+               [:custom_layouts, "Custom layouts", admin_organization_custom_layouts_path(organization_id: @organization),
+                 nil, "only-dev-visible"]
+             end)]
+            .compact.map { |tab, label, href, count, classes| {label:, href:, count:, classes:, active: @active == tab} }
         end
 
         # A tab with nothing behind it is dropped - except on its own page, which still
         # renders (saying the feature is off) and shouldn't lose its place in the row
+        def paid_functionality? = @organization.paid? || @active == :paid_functionality
+
         def sso? = @organization.enabled?("saml_sso") || @active == :sso
 
         def custom_layouts? = @display_dev_info || @active == :custom_layouts
