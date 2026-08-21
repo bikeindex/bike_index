@@ -7,19 +7,18 @@ module Admin
         # The organizations index's nav header: the kind and POS pickers, plus the paid
         # toggle and the link to a new organization.
         class Component < ApplicationComponent
-          include Binxtils::SortableHelper
-
           POS_GROUPINGS = %w[with_pos without_pos broken_pos].freeze
 
-          def initialize(search_paid:)
+          def initialize(search_paid:, index:)
             @search_paid = search_paid
+            @index = index
           end
 
           private
 
-          def kind = helpers.params[:search_kind]
+          def kind = @index.params[:search_kind]
 
-          def pos_kind = helpers.params[:search_pos]
+          def pos_kind = @index.params[:search_pos]
 
           def kind_name = kind.present? ? kind.humanize : "Kind"
 
@@ -31,10 +30,10 @@ module Admin
           # clear the filter - which is what match: :query compares
           def filter_link(text, param, value)
             render(UI::ActiveLink::Component.new(text:, match: :query, query: {param => value},
-              path: url_for(sortable_search_params.merge(param => value))))
+              path: url_for(@index.sortable_search_params.merge(param => value))))
           end
 
-          def paid_path = url_for(sortable_search_params.merge(search_paid: !@search_paid))
+          def paid_path = url_for(@index.sortable_search_params.merge(search_paid: !@search_paid))
         end
       end
     end

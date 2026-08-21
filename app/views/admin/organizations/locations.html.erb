@@ -1,4 +1,4 @@
-<%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :locations)) %>
+<%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :locations, display_dev_info: display_dev_info?)) %>
 
 <%= render(Admin::Organizations::Form::TabForm::Component.new(organization: @organization, tab: "locations",
       fields_component: Admin::Organizations::Form::Locations::Component, width: :wide)) %>

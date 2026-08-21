@@ -1,6 +1,7 @@
 <%# turbo: false - the uppy uploader below is one of Admin::Headers::Tabs' legacy-JS cases %>
 
 <%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :custom_layouts,
+      display_dev_info: @display_dev_info,
       subtitle:, additional_link:, turbo: false)) %>
 
 <%= render(layout_form) %>

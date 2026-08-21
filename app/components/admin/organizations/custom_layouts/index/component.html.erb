@@ -1,4 +1,5 @@
-<%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :custom_layouts)) %>
+<%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :custom_layouts,
+      display_dev_info: @display_dev_info)) %>
 
 <div class="twwiderow tw:items-start">
   <p>

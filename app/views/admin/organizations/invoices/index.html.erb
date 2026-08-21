@@ -1,4 +1,4 @@
-<%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :invoices)) %>
+<%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :invoices, display_dev_info: display_dev_info?)) %>
 
 <%= render(Admin::Invoices::Table::Component.new(invoices: @invoices)) %>
 

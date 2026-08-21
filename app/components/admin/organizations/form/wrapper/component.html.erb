@@ -50,7 +50,7 @@
   <div>
     <% previous_slug_note = tag.em("Rarely unnecessary", class: "text-warning") %>
 
-    <% if helpers.display_dev_info? %>
+    <% if @display_dev_info %>
       <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :previous_slug, label_text: "Previous Slug", html_options: {class: "only-dev-visible"})) do |group| %>
         <% group.with_helper_text { previous_slug_note } %>
       <% end %>
@@ -98,7 +98,7 @@
   </div>
 
   <div>
-    <% if helpers.display_dev_info? %>
+    <% if @display_dev_info %>
       <div class="only-dev-visible mt-4 tw:mb-2 tw:p-2">
         <%= render(UI::Forms::Group::Component.new(attribute: :manual_pos_kind, label_text: "Manually set POS kind")) do |group| %>
           <% group.with_helper_text do %>

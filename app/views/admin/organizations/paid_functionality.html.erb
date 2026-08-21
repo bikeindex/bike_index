@@ -1,4 +1,4 @@
-<%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :paid_functionality)) %>
+<%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :paid_functionality, display_dev_info: display_dev_info?)) %>
 
 <% if @organization.paid? %>
   <%= render(Admin::Organizations::Form::TabForm::Component.new(organization: @organization, tab: "paid_functionality",

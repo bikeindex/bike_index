@@ -13,8 +13,9 @@ module Admin
             LINK_CLASSES = "nav-link btn btn-sm btn-outline-info"
 
             def initialize(organization:, edit_template:, landing_page: nil, mail_snippet: nil,
-              landing_page_url: nil, suggested_button_hover: nil)
+              landing_page_url: nil, suggested_button_hover: nil, display_dev_info: false)
               @organization = organization
+              @display_dev_info = display_dev_info
               @edit_template = edit_template
               @landing_page = landing_page
               @mail_snippet = mail_snippet

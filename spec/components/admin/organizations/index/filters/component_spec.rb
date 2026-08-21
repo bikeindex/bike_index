@@ -3,9 +3,14 @@
 require "rails_helper"
 
 RSpec.describe Admin::Organizations::Index::Filters::Component, type: :component do
+  let(:search_params) { {search_kind: "bike_shop", search_pos: "lightspeed_pos"} }
+  let(:index) do
+    ComponentStates::IndexState.new(params: search_params,
+      sort_state: ComponentStates::SortState.new(search_params:))
+  end
   let(:component) do
-    with_request_url("/admin/organizations?search_kind=bike_shop&search_pos=lightspeed_pos") do
-      render_inline(described_class.new(search_paid: false))
+    with_request_url("/admin/organizations") do
+      render_inline(described_class.new(search_paid: false, index:))
     end
   end
 
