@@ -30,8 +30,6 @@
       <%= text_field_tag :search_query, @index.params[:search_query], placeholder: "Name/Location", class: "form-control" %>
     </div>
 
-    <div>
-      <%= submit_tag "Search", name: "search", class: "btn btn-primary" %>
-    </div>
+    <%= submit_tag "Search", name: "search", class: "btn btn-primary" %>
   </div>
 <% end %>

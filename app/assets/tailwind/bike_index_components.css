@@ -35,6 +35,11 @@
   .only-dev-visible {
     @apply tw:bg-dev/10;
   }
+
+  /* Frequently marks one value inside a display-table cell, which has no padding of its own */
+  .table-list td .only-dev-visible {
+    @apply tw:px-1 tw:py-0.5;
+  }
 }
 
 @layer components {
