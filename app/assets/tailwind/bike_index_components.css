@@ -33,8 +33,8 @@
     @apply tw:bg-dev/10;
   }
 
-  /* Custom utilities sort ahead of the core ones rather than after, so a resting background
-   * utility - an active UI::Tabs tab's tw:bg-white - would otherwise cover the marking */
+  /* twdev-only emits before tw:bg-white, so it loses that tie on source order - the extra
+   * specificity here is what holds the marking on an active UI::Tabs tab */
   @variant is-active {
     @apply tw:bg-dev/10;
   }
