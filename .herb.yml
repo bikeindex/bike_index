@@ -62,9 +62,6 @@ linter:
     #
     erb-no-instance-variables-in-partials:
       enabled: false
-    # Legacy bootstrap code uses this - new code does not. Just let it be for now
-    html-anchor-require-href:
-      enabled: false
     # Disabled: herb-format adds indentation to blank lines, conflicting with this rule
     erb-no-trailing-whitespace:
       enabled: false
@@ -86,6 +83,17 @@ linter:
     erb-prefer-image-tag-helper:
       exclude:
         - 'db/seeds/**/*'
+
+    # The legacy views are full of these; components are clean, so hold the line there
+    html-anchor-require-href:
+      enabled: true
+      only:
+        - 'app/components/**/*'
+      # org--assign-bike-sticker sets this table's href, because the sticker isn't in the
+      # row cache key. Excluded by file rather than herb:disable: the formatter relocates
+      # an inline disable comment onto the first <a> in the file
+      exclude:
+        - 'app/components/org/search_results/bikes_table/component.html.erb'
   #
   #   # Rules can have 'include', 'only', and 'exclude' patterns
   #   some-rule:

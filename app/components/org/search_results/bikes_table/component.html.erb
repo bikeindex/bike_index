@@ -178,6 +178,11 @@
       <% end %>
       <% table.column(label: translation(".assign_bike_sticker"), classes: "assign_bike_sticker_cell tw:hidden") do |bike| %>
         <small>
+          <%#
+            org--assign-bike-sticker sets the href: the sticker isn't in @cache_key, so a
+            cached row can't carry it
+          %>
+
           <a data-bike-id="<%= bike.id %>">
             <%= t("components.org.search_results.bikes_table.link_sticker") %>
           </a>
