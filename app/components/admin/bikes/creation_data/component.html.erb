@@ -73,7 +73,9 @@
             <% end %>
           </div>
 
-          <div><%= helpers.pretty_print_json(b_param.params, true) %></div>
+          <div class="twjson-box">
+            <%= helpers.pretty_print_json(b_param.params, true) %>
+          </div>
         <% end %>
       </div>
     <% end %>

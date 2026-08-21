@@ -105,6 +105,16 @@
    * gutter is tighter than a page-level grid's, and auto-fit means the break to full width
    * comes from the row running out of room rather than from a viewport breakpoint, so a row
    * inside a narrow card breaks at the same width it would anywhere else. */
+  /* CodeRay renders the admin JSON dumps as a .code div inside its own wrapper, so the
+   * box belongs to the container rather than to what it holds */
+  .twjson-box .code {
+    @apply tw:max-h-72 tw:overflow-auto tw:border tw:border-gray-300 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-900;
+  }
+
+  .twjson-box pre {
+    @apply tw:m-0;
+  }
+
   .twfieldrow {
     @apply tw:grid tw:gap-x-2 tw:grid-cols-[repeat(auto-fit,minmax(140px,1fr))];
   }

@@ -9736,8 +9736,7 @@ button.bg-dark:hover {
   justify-content: flex-end !important
 }
 
-.justify-content-center,
-.stolen-bike-image-editing-list-group {
+.justify-content-center {
   justify-content: center !important
 }
 
@@ -13758,48 +13757,6 @@ table .photo-cell img {
 
 #recovery-bike-image-text.bike-image-added .not-using-bike-image {
   display: none
-}
-
-.stolen-bike-image-editing-list-group-wrapper {
-  overflow-x: scroll
-}
-
-.stolen-bike-image-editing-list-group {
-  min-width: 100%;
-  padding: 10px;
-  flex-direction: row
-}
-
-.stolen-bike-image-editing-list-group li {
-  padding: 20px;
-  width: 190px
-}
-
-.stolen-bike-image-editing-list-group img {
-  display: block;
-  width: 150px;
-  height: auto;
-  margin: 0 auto;
-  border: 1px solid #ced4da
-}
-
-.stolen-bike-image-editing-list-group#promoted-images-display li {
-  width: 340px
-}
-
-.stolen-bike-image-editing-list-group#promoted-images-display img {
-  width: 300px
-}
-
-#BParamsView pre {
-  margin: 0
-}
-
-#BParamsView .code {
-  border: 1px solid #ced4da;
-  background: #f8f9fa;
-  max-height: 300px;
-  overflow: scroll
 }
 
 #timeSelectionBtnGroup .period-select-standard {
