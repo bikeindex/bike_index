@@ -114,4 +114,4 @@
           = link_to "organization view", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param)
           for paginated list
 
-= render Admin::BikesTable::Component.new(bikes: @bulk_import.bikes.reorder(id: :desc).limit(25))
+= render Admin::Bikes::Table::Component.new(bikes: @bulk_import.bikes.reorder(id: :desc).limit(25))
