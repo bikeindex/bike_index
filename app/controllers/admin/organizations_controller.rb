@@ -86,9 +86,13 @@ module Admin
     # The features filter is a multiselect combobox, which renders its selections through
     # this rather than holding them itself
     def feature_chips
+      displays = Admin::Organizations::Index::SearchForm::Component.option_groups
+        .values.flatten.to_h { [it[:value], it[:display]] }
+
       chips = params[:combobox_values].to_s.split(",").filter_map do |value|
-        display = Admin::Organizations::Index::SearchForm::Component.display_for(value)
-        helpers.hw_combobox_selection_chip(display:, value:, for_id: params[:for_id]) if display
+        next if displays[value].blank?
+
+        helpers.hw_combobox_selection_chip(display: displays[value], value:, for_id: params[:for_id])
       end
 
       render turbo_stream: helpers.safe_join(chips)

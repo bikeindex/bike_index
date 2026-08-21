@@ -31,7 +31,7 @@
       </div>
 
       <% if @location.destroy_forbidden? %>
-        <small class="less-strong tw:ml-auto">can't remove, has impounded bikes</small>
+        <small class="twless-strong tw:ml-auto">can't remove, has impounded bikes</small>
       <% else %>
         <%= @form_builder.hidden_field :_destroy %>
 

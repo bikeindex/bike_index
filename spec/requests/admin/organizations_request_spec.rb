@@ -125,6 +125,22 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     end
   end
 
+  describe "feature_chips" do
+    let!(:organization_feature) { FactoryBot.create(:organization_feature, name: "Bike Stickers") }
+
+    # The values are ids and setting keys; the chip has to carry the name back, and a value
+    # that matches neither has no name to show
+    it "names each selected filter, and drops one it doesn't recognise" do
+      post "#{base_url}/feature_chips", as: :turbo_stream,
+        params: {combobox_values: "#{organization_feature.id},with_stolen_message,nonsense",
+                 for_id: "search_features_and_settings"}
+
+      expect(response.status).to eq(200)
+      expect(response.body.scan(/<span>([^<]+)<\/span>/).flatten)
+        .to eq(["Bike Stickers", "With Stolen Message"])
+    end
+  end
+
   describe "create" do
     let(:create_attributes) do
       {

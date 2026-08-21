@@ -6,7 +6,7 @@
   <div class="mt-4 mb-4 d-flex justify-content-md-end flex-wrap">
     <div class="tw:mt-2 tw:w-full tw:md:w-1/3">
       <%= render(UI::Forms::Combobox::Component.new(name: :search_features_and_settings,
-        options: option_groups, value: selected_value, placeholder: "With features",
+        options: self.class.option_groups, value: selected_value, placeholder: "With features",
         multiselect_chip_src: helpers.feature_chips_admin_organizations_path)) %>
     </div>
 

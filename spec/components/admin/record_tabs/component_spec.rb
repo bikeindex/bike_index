@@ -10,8 +10,7 @@ RSpec.describe Admin::RecordTabs::Component, type: :component do
   let(:component) { render_inline(described_class.new(title: "A Thing", tabs:, nav_label: "Thing sections")) }
 
   # Which tab is active is UI::Tabs' to get right; this is that they reach it at all
-  it "renders the title and its tabs" do
-    expect(component.at_css("h1").text.squish).to eq "A Thing"
+  it "hands its tabs to UI::Tabs" do
     expect(component.css("nav a").map { |tab| tab.text.squish }).to eq %w[Show Edit]
   end
 

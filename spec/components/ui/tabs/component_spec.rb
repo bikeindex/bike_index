@@ -20,15 +20,17 @@ RSpec.describe UI::Tabs::Component, type: :component do
   end
 
   # Turbo Drive is off app-wide and opted into per element, so a shared component that
-  # switched it on by default would turn it on wherever it was dropped
+  # switched it on by default would turn it on wherever it was dropped. Absent rather than
+  # "false": Turbo reads any other value as opt-in
   it "leaves turbo alone unless asked" do
-    expect(component.css("a[data-turbo]")).to be_empty
+    expect(component.css("[data-turbo]")).to be_empty
   end
 
-  it "opts its tabs into turbo when asked" do
+  # One attribute on the nav, which Turbo finds from each link by closest()
+  it "opts into turbo on the nav when asked" do
     turbo = render_inline(described_class.new(tabs:, nav_label: "Thing sections", turbo: true))
 
-    expect(turbo.css("a[data-turbo='true']").length).to eq tabs.length
+    expect(turbo.css("nav[data-turbo='true']").length).to eq 1
   end
 
   it "renders no count when a tab has none" do

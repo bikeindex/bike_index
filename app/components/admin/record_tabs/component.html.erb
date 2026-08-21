@@ -1,8 +1,7 @@
 <%#
-  .admin-subnav already bleeds -15px; matching --gutter exactly is what lets everything
-  inside drop .col's compensating padding. .twgutter-bleed can't do it - it's in a layer,
-  and admin_unvendored is imported outside one, so it wins whatever the specificity.
-  UI::Tabs draws the line under itself, so the subnav's own border would double it
+  .admin-subnav bleeds -15px of its own; matching --gutter exactly is what lets
+  everything inside drop .col's compensating padding. UI::Tabs draws the line under
+  itself, so the subnav's own border would double it
 %>
 
 <div
