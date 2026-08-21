@@ -35,7 +35,7 @@ module CallbackJobs
 
       user.user_ban.delete if user.user_ban.present? && !user.banned?
 
-      Users::SeoSpamCheckJob.new.perform(user.id, user) if user.show_bikes? && !user.banned?
+      UserJobs::SeoSpamCheckJob.new.perform(user.id, user) if user.show_bikes? && !user.banned?
 
       # Update current Marketplace Listings that don't match the user's membership status
       user.marketplace_listings.current.where.not(seller_member: user.member?)

@@ -117,7 +117,7 @@
     <% end %>
 
     <% table.column(label: "Organization", header_classes: "tw:font-normal") do |export| %>
-      <%= render Admin::OrganizationCell::Component.new(organization: export.organization, render_search: true) %>
+      <%= render Admin::Organizations::Cell::Component.new(organization: export.organization, render_search: true) %>
     <% end %>
 
     <% table.column(label: "File", header_classes: "tw:font-normal") do |export| %>

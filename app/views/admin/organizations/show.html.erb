@@ -566,7 +566,7 @@
   </div>
 </div>
 
-<%= render Admin::BikesTable::Component.new(bikes: @bikes) %>
+<%= render Admin::Bikes::Table::Component.new(bikes: @bikes) %>
 
 <% organization_roles = @deleted_organization_roles ? @organization.organization_roles.deleted.reorder(deleted_at: :asc) : @organization.organization_roles.reorder(created_at: :asc) %>
 

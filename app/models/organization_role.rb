@@ -83,7 +83,7 @@ class OrganizationRole < ApplicationRecord
     end
     organization_role = create!(default_attrs.merge(create_attrs))
     # Process inline so the caller gets back a role already linked to its user
-    Users::ProcessOrganizationRoleJob.new.perform(organization_role.id)
+    UserJobs::ProcessOrganizationRoleJob.new.perform(organization_role.id)
     organization_role.reload
     organization_role
   end
@@ -126,11 +126,11 @@ class OrganizationRole < ApplicationRecord
   def enqueue_processing_worker
     return true if skip_processing
 
-    # We manually update the user, because Users::ProcessOrganizationRoleJob won't find this organization_role
+    # We manually update the user, because UserJobs::ProcessOrganizationRoleJob won't find this organization_role
     if deleted? && user_id.present?
       CallbackJobs::AfterUserChangeJob.perform_async(user_id)
     else
-      Users::ProcessOrganizationRoleJob.perform_async(id)
+      UserJobs::ProcessOrganizationRoleJob.perform_async(id)
     end
   end
 

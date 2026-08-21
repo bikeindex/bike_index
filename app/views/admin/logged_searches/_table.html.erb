@@ -94,7 +94,7 @@
           <td>
             <% if logged_search.user_id.present? %>
               <%= cache(logged_search.user) do %>
-                <%= render Admin::UserCell::Component.new(user: logged_search.user, render_search: true, user_id: logged_search.user_id) %>
+                <%= render Admin::Users::Cell::Component.new(user: logged_search.user, render_search: true, user_id: logged_search.user_id) %>
               <% end %>
             <% end %>
           </td>
