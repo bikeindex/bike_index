@@ -262,7 +262,7 @@ The reason is the real one — ruby-saml's validation errors are passed through,
 | Reason | Cause |
 |---|---|
 | `/sso/<slug>/metadata` 404s | feature not enabled, `UpdateOrganizationAssociationsJob` hasn't run, or the url carries a `.xml` extension |
-| `/sso/<slug>/init` 404s | config incomplete — needs enabled + entityID + SSO URL + cert |
+| `/sso/<slug>/init` 404s | config incomplete — needs entityID + SSO URL + cert |
 | `this login has expired` | RelayState token already claimed or older than 10 minutes |
 | `SAML session mismatch` | the `org_slug` in RelayState isn't the org being called back |
 | audience / destination errors | `BASE_URL` doesn't match the host you're browsing |

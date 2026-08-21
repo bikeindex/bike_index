@@ -271,6 +271,13 @@ class Organization < ApplicationRecord
         end
     end
 
+    def email_domain(str)
+      normalized = EmailNormalizer.normalize(str)
+      return nil unless normalized.present? && normalized.count("@") == 1 && normalized.match?(/.@.*\../)
+
+      normalized.split("@").last
+    end
+
     def example
       # In test, ids climb across examples so a factory org can land on 92 - look up by name instead
       found = Rails.env.test? ? Organization.find_by(name: "Example Bike Shop") : Organization.find_by_id(92)
@@ -281,13 +288,6 @@ class Organization < ApplicationRecord
 
     def permitted_domain_signin(feature_slug)
       where.not(user_email_domain: nil).with_enabled_feature_slugs(feature_slug)
-    end
-
-    def email_domain(str)
-      normalized = EmailNormalizer.normalize(str)
-      return nil unless normalized.present? && normalized.count("@") == 1 && normalized.match?(/.@.*\../)
-
-      normalized.split("@").last
     end
   end
   # never geocode, use default_location lat/long
