@@ -6,6 +6,8 @@
       <%= render(Org::Search::Form::Component.new(
         target_search_path: organization_registrations_path(organization_id: @organization.to_param),
         interpreted_params: @interpreted_params,
+        search_email: @params[:search_email],
+        search_notes: @params[:search_notes],
         settings_component: @skip_settings ? nil : settings_component
       )) %>
     </div>

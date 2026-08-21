@@ -6,10 +6,12 @@ module Org
       include OrganizedHelper
       include VehicleHelper
 
-      def initialize(bike: nil, organization: nil, current_user: nil)
+      def initialize(bike: nil, organization: nil, current_user: nil, display_dev_info: false, parking_notification_open: false)
         @bike = bike
         @organization = organization
         @user = current_user
+        @display_dev_info = display_dev_info
+        @parking_notification_open = parking_notification_open
       end
 
       def render?

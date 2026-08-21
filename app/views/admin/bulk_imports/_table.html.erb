@@ -38,7 +38,7 @@
             </td>
 
             <td>
-              <%= render(Org::BulkImportError::Component.new(bulk_import:, short_display: true, in_admin: true)) %>
+              <%= render(Org::BulkImportError::Component.new(bulk_import:, short_display: true, in_admin: true, display_dev_info: display_dev_info?)) %>
             </td>
 
             <td>

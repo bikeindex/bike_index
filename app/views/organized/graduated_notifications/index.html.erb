@@ -32,7 +32,9 @@
     <%= render(Org::Search::Form::Component.new(
       target_search_path: organization_graduated_notifications_path(organization_id: current_organization.to_param),
       target_frame: :graduated_notifications_results_frame,
-      interpreted_params: form_interpreted_params
+      interpreted_params: form_interpreted_params,
+      search_email: params[:search_email],
+      search_notes: params[:search_notes]
     )) %>
   </div>
 <% end %>
