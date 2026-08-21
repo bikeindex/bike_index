@@ -26,6 +26,16 @@ RSpec.describe UI::Header::Component, type: :component do
     end
   end
 
+  # html_class only reaches the heading, so the subtitle's margin is what margin: takes
+  context "with margin: false and a subtitle" do
+    let(:options) { {text: "Page Title", subtitle: "The finer print", margin: false} }
+
+    it "flattens the subtitle, keeping the gap under the heading" do
+      expect(component.css("h1").first["class"]).to include("tw:mb-1")
+      expect(component.css("p").first["class"]).to include("tw:mb-0")
+    end
+  end
+
   context "with h2 tag" do
     let(:options) { {text: "Section", tag: :h2} }
 

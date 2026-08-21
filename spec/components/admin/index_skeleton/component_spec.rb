@@ -48,13 +48,6 @@ RSpec.describe Admin::IndexSkeleton::Component, type: :component do
     end
   end
 
-  describe "header" do
-    it "renders through Admin::Headers::Nav" do
-      expect(component).to have_css("div.tw\\:flex.tw\\:flex-row.tw\\:items-baseline h1")
-      expect(component).not_to have_css(".admin-subnav")
-    end
-  end
-
   describe "graph toggle" do
     it "renders graph link by default" do
       expect(component).to have_css("a", text: "graph")

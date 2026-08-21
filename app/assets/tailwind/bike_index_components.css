@@ -175,6 +175,26 @@
     @apply tw:border-t tw:border-gray-200 tw:dark:border-gray-700;
   }
 
+  /* The pill .admin-subnav gave the .nav-links the un-migrated admin index views still hand
+   * into Admin::Headers::Nav -- without it an applied filter stops looking applied. The fill
+   * is UI::Button's secondary active, the same one .twdropdown borrows, so a legacy item and
+   * the UI::Dropdown beside it agree. Goes with the last .nav-link under app/views/admin. */
+  .twadmin-nav :is(a, span).nav-link {
+    @apply tw:rounded tw:no-underline;
+
+    /* admin.scss imports admin_unvendored outside its @layer legacy, so those rules are
+     * unlayered and outrank this whatever the specificity */
+    padding: 0.25rem 0.5rem !important;
+  }
+
+  .twadmin-nav a.nav-link:hover {
+    @apply tw:bg-gray-100 tw:dark:bg-gray-700;
+  }
+
+  .twadmin-nav a.nav-link.active {
+    @apply tw:bg-purple-500 tw:text-white;
+  }
+
   .twhr {
     @apply tw:border-0 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700 tw:my-8;
   }

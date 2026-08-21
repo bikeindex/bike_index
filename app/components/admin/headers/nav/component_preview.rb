@@ -18,7 +18,6 @@ module Admin
           {template: "admin/headers/nav/component_preview/with_items"}
         end
 
-        # What Admin::Headers::Tabs passes, so its tab row draws the only rule
         def without_border
           render(Admin::Headers::Nav::Component.new(title: "Brakebills", border: false))
         end

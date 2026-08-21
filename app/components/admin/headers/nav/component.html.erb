@@ -1,11 +1,18 @@
 <div class="<%= wrapper_classes %>">
-  <%# UI::Header's own bottom margins would space the flex row rather than the heading %>
-  <div class="tw:mr-auto tw:[&_p]:mb-0">
-    <%= render(UI::Header::Component.new(text: @title, subtitle: @subtitle,
-          html_class: "tw:mb-0! tw:md:text-3xl")) %>
+  <%# A wrapper, so a heading and its subtitle are one flex item rather than two %>
+  <div class="tw:mr-auto">
+    <%= render(UI::Header::Component.new(text: @title, subtitle: @subtitle, margin: false)) %>
   </div>
 
+  <%# not content?, which is true for a caller whose items all render to nothing %>
   <% if content.present? %>
-    <ul class="<%= list_classes %>"><%= content %></ul>
+    <ul
+      class="
+        twadmin-nav tw:mb-0 tw:flex tw:list-none tw:flex-row tw:flex-wrap
+        tw:items-baseline tw:gap-1 tw:pl-0 tw:text-sm
+      "
+    >
+      <%= content %>
+    </ul>
   <% end %>
 </div>
