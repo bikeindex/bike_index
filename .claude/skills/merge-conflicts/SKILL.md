@@ -90,6 +90,15 @@ This is what it catches, all of which has actually happened here:
 - **Committed churn in generated files.** `git checkout --` reverts to HEAD, not to the base — so once churn is committed it survives every later revert. Check VCR cassettes and lockfiles specifically; a diff that's only timestamps/nonces should be reset to the base.
 - **Your side calling an API the base deleted.** Nothing conflicts: your file is untouched by the merge and the base's deletion lands cleanly, so the break is a `NoMethodError` at load. Fix it in the commit after the merge, never in it.
 
+## Extracting a slice of another branch: `git checkout <branch> -- <file>` overwrites, it doesn't merge
+
+Pulling part of a feature branch into a fresh one takes the file *whole*, so for anything `main` has moved since that branch last merged, you silently revert the newer work — no conflict, no warning. List the overlap first, and hand-apply those hunks:
+
+```bash
+MB=$(git merge-base origin/main origin/<branch>)
+comm -12 <(git diff --name-only $MB origin/main | sort) <(git diff --name-only $MB origin/<branch> | sort)
+```
+
 ## Run the linter, not just the specs
 
 `bin/lint` after every merge. A bad auto-merge that duplicates a method or strands a constant parses fine and passes its specs — `Lint/DuplicateMethods` is what catches it.
