@@ -4,7 +4,7 @@ module Admin
   module BugReportsTable
     class Component < ApplicationComponent
       # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-      MARKUP_DIGEST = "e4f2c51c037e"
+      MARKUP_DIGEST = "310af7d068d4"
 
       def initialize(collection:, render_sortable: false)
         @collection = collection
