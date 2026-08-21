@@ -3,7 +3,7 @@
 <%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :invoices,
       subtitle: "Edit #{@invoice.display_name}", additional_link:)) %>
 
-<div class="tw:grid tw:items-start tw:gap-x-8 tw:md:grid-cols-2">
+<div class="twwiderow tw:items-start">
   <%= render(Admin::Invoices::Show::Associated::Component.new(invoice: @invoice)) %>
   <%= render(Admin::Invoices::Show::Status::Component.new(invoice: @invoice)) %>
 </div>

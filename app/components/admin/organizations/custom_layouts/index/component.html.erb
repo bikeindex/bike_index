@@ -1,6 +1,6 @@
 <%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :custom_layouts)) %>
 
-<div class="tw:grid tw:items-start tw:gap-x-8 tw:md:grid-cols-2">
+<div class="twwiderow tw:items-start">
   <p>
     <%= link_to "Custom layouts version history", version_history_url %>
   </p>

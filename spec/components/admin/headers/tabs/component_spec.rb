@@ -18,8 +18,8 @@ RSpec.describe Admin::Headers::Tabs::Component, type: :component do
     let(:component) do
       links = ["<a href='/one'>One</a>".html_safe, "<a href='/two'>Two</a>".html_safe]
       render_inline(described_class.new(title: "A Thing", tabs:, nav_label: "Thing sections",
-        subtitle: "Editing", links:)) do |tabs_header|
-        tabs_header.with_alert { "<p>Thing deleted</p>".html_safe }
+        subtitle: "Editing", links:)) do |header|
+        header.with_alert { "<p>Thing deleted</p>".html_safe }
       end
     end
 
