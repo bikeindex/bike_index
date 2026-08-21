@@ -2,6 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 
 /* global ResizeObserver */
 
+// TODO: #4185 - remove when removing the legacy org new bike iframe
 // Connects to data-controller='org--embed-iframe'
 // The embedded registration form is served from this host, so the frame can be sized to
 // what it actually renders rather than to a guessed min-height that clips the form once
