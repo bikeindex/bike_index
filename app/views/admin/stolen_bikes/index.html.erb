@@ -4,11 +4,9 @@
   </li>
 
   <li>
-    <% if @unapproved_only %>
-      <%= render(UI::ButtonLink::Component.new(text: "All stolen (not just unverified)", href: admin_stolen_bikes_url(sortable_search_params.merge(search_unapproved: true)), size: :sm)) %>
-    <% else %>
-      <%= render(UI::ButtonLink::Component.new(text: "Only unverified bikes", href: admin_stolen_bikes_url(sortable_search_params.merge(search_unapproved: false)), size: :sm)) %>
-    <% end %>
+    <%= render(UI::ButtonLink::Component.new(size: :sm,
+          text: @unapproved_only ? "All stolen (not just unverified)" : "Only unverified bikes",
+          href: admin_stolen_bikes_url(sortable_search_params.merge(search_unapproved: @unapproved_only)))) %>
   </li>
 <% end %>
 

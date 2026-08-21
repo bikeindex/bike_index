@@ -8,7 +8,7 @@
   </li>
 
   <li>
-    <%= render(UI::Dropdown::Component.new(name: (params[:search_request_type].blank?) ? "All types" : params[:search_request_type].humanize, button_size: :sm,
+    <%= render(UI::Dropdown::Component.new(name: params[:search_request_type].blank? ? "All types" : params[:search_request_type].humanize, button_size: :sm,
           active: params[:search_request_type].present?)) do |dropdown| %>
       <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All types", path: url_for(sortable_search_params.merge(search_request_type: nil)), match: :query, query: {search_request_type: nil}) } %>
       <% dropdown.with_entry_divider %>
@@ -20,7 +20,7 @@
   </li>
 
   <li>
-    <%= render(UI::Dropdown::Component.new(name: (params[:search_response_status].blank?) ? "All statuses" : params[:search_response_status].humanize, button_size: :sm,
+    <%= render(UI::Dropdown::Component.new(name: params[:search_response_status].blank? ? "All statuses" : params[:search_response_status].humanize, button_size: :sm,
           active: params[:search_response_status].present?)) do |dropdown| %>
       <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All statuses", path: url_for(sortable_search_params.merge(search_response_status: nil)), match: :query, query: {search_response_status: nil}) } %>
       <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Pending or successful", path: url_for(sortable_search_params.merge(search_response_status: "pending_or_success")), match: :query, query: {search_response_status: "pending_or_success"}) } %>
@@ -35,7 +35,7 @@
   </li>
 
   <li>
-    <%= render(UI::Dropdown::Component.new(name: (params[:search_responder].blank?) ? "Any responder" : params[:search_responder].humanize, button_size: :sm,
+    <%= render(UI::Dropdown::Component.new(name: params[:search_responder].blank? ? "Any responder" : params[:search_responder].humanize, button_size: :sm,
           active: params[:search_responder].present?)) do |dropdown| %>
       <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Any responder", path: url_for(sortable_search_params.merge(search_responder: nil)), match: :query, query: {search_responder: nil}) } %>
       <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only Binx response", path: url_for(sortable_search_params.merge(search_responder: "only_binx_response")), match: :query, query: {search_responder: "only_binx_response"}) } %>

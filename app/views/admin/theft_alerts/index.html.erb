@@ -2,7 +2,7 @@
   <%= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "theft_alerts", display_recovery: true} %>
   <h1 class="mt-5 mb-4">
     Promoted Alerts
-    <%= link_to "New Promoted alert", new_admin_theft_alert_path(bike_id: @bike.id), class: "small btn btn-outline-success btn-sm ml-2" %>
+    <%= render(UI::ButtonLink::Component.new(text: "New Promoted alert", href: new_admin_theft_alert_path(bike_id: @bike.id), color: :primary, size: :sm, html_class: "tw:ml-2")) %>
   </h1>
   <%= render partial: "table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: true} %>
 <% else %>

@@ -5,9 +5,9 @@
 <% else %>
   <% nav_header_list_items = capture do %>
     <li>
-      <% filter_name_1 = (@status.blank?) ? "All statuses" : (@status == "removed_or_sold") ? "Removed or sold" : "#{@status.titleize} only" %>
+      <% status_filter_name = @status.blank? ? "All statuses" : ({"removed_or_sold" => "Removed or sold"}[@status] || "#{@status.titleize} only") %>
 
-      <%= render(UI::Dropdown::Component.new(name: filter_name_1, button_size: :sm,
+      <%= render(UI::Dropdown::Component.new(name: status_filter_name, button_size: :sm,
             active: @status.present?)) do |dropdown| %>
         <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All statuses", path: url_for(sortable_search_params.merge(search_status: nil)), match: :query, query: {search_status: nil}) } %>
         <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Removed or sold", path: url_for(sortable_search_params.merge(search_status: "removed_or_sold")), match: :query, query: {search_status: "removed_or_sold"}) } %>

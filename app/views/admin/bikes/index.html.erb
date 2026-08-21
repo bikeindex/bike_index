@@ -4,13 +4,15 @@
   <% if show_search_statuses %>
     <li>
       <%#
-        the legacy admin bundle finds this by id and toggles .active on it as it opens
-        the collapse, so the active look has to key off that class rather than is-active
+        The legacy admin bundle toggles .active here as it opens the collapse, so that
+        class is the only thing that can say whether the panel is open -- data-active
+        would be stuck at whatever the server rendered. Fill mirrors ACTIVE_COLORS[:secondary].
       %>
 
       <%= render(UI::Button::Component.new(text: "Search statuses", size: :sm, id: "showStatusesSearch",
-            active: @not_default_statuses,
-            html_class: "tw:[&.active]:bg-purple-500 tw:[&.active]:text-white")) %>
+            html_class: "#{"active" if @not_default_statuses} tw:[&.active]:bg-purple-500 " \
+              "tw:[&.active]:text-white tw:[&.active]:border-purple-500 " \
+              "tw:[&.active]:ring-2 tw:[&.active]:ring-purple-500/40")) %>
     </li>
   <% end %>
 
@@ -27,34 +29,32 @@
   </li>
 
   <li>
-    <% any_origin_active = @origin_search_type.blank? %>
-
-    <%= render(UI::Dropdown::Component.new(name: (any_origin_active) ? "Origin" : @origin_search_type.humanize, button_size: :sm,
-          active: !(any_origin_active))) do |dropdown| %>
+    <%= render(UI::Dropdown::Component.new(name: @origin_search_type.presence&.humanize || "Origin", button_size: :sm,
+          active: @origin_search_type.present?)) do |dropdown| %>
       <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Any Origin", path: url_for(sortable_search_params.merge(search_origin: nil)), match: :query, query: {search_origin: nil}) } %>
       <% dropdown.with_entry_divider %>
 
       <% Ownership.origins.each do |origin| %>
         <% origin_active = @origin_search_type == origin %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: origin.humanize, path: url_for(sortable_search_params.merge(search_origin: origin_active ? nil : origin)), match: :query, query: {search_origin: origin_active ? nil : origin}) } %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: origin.humanize, path: url_for(sortable_search_params.merge(search_origin: origin_active ? nil : origin)), match: :query, query: {search_origin: origin}) } %>
       <% end %>
     <% end %>
   </li>
 
   <li>
-    <% filter_name_1 = (@pos_search_type == "any_pos") ? "POS of any type" : (@pos_search_type.present?) ? @pos_search_type.humanize : "POS" %>
+    <% pos_filter_name = {"any_pos" => "POS of any type"}[@pos_search_type] || @pos_search_type.presence&.humanize || "POS" %>
 
-    <%= render(UI::Dropdown::Component.new(name: filter_name_1, button_size: :sm,
+    <%= render(UI::Dropdown::Component.new(name: pos_filter_name, button_size: :sm,
           active: @pos_search_type.present?)) do |dropdown| %>
       <% ascend_active = @pos_search_type == "ascend_pos" %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Ascend", path: url_for(sortable_search_params.merge(search_pos: ascend_active ? nil : "ascend_pos")), match: :query, query: {search_pos: ascend_active ? nil : "ascend_pos"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Ascend", path: url_for(sortable_search_params.merge(search_pos: ascend_active ? nil : "ascend_pos")), match: :query, query: {search_pos: "ascend_pos"}) } %>
       <% lightspeed_active = @pos_search_type == "lightspeed_pos" %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Lightspeed", path: url_for(sortable_search_params.merge(search_pos: lightspeed_active ? nil : "lightspeed_pos")), match: :query, query: {search_pos: lightspeed_active ? nil : "lightspeed_pos"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Lightspeed", path: url_for(sortable_search_params.merge(search_pos: lightspeed_active ? nil : "lightspeed_pos")), match: :query, query: {search_pos: "lightspeed_pos"}) } %>
       <% dropdown.with_entry_divider %>
       <% any_pos_active = @pos_search_type == "any_pos" %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "POS of any type", path: url_for(sortable_search_params.merge(search_pos: any_pos_active ? nil : "any_pos")), match: :query, query: {search_pos: any_pos_active ? nil : "any_pos"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "POS of any type", path: url_for(sortable_search_params.merge(search_pos: any_pos_active ? nil : "any_pos")), match: :query, query: {search_pos: "any_pos"}) } %>
       <% no_pos_active = @pos_search_type == "no_pos" %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "<strong>Not</strong> POS".html_safe, path: url_for(sortable_search_params.merge(search_pos: no_pos_active ? nil : "no_pos")), match: :query, query: {search_pos: no_pos_active ? nil : "no_pos"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: safe_join([tag.strong("Not"), " POS"]), path: url_for(sortable_search_params.merge(search_pos: no_pos_active ? nil : "no_pos")), match: :query, query: {search_pos: "no_pos"}) } %>
       <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "any (POS or not)", path: url_for(sortable_search_params.merge(search_pos: nil)), match: :query, query: {search_pos: nil}) } %>
     <% end %>
   </li>

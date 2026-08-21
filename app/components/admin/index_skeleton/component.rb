@@ -39,8 +39,7 @@ module Admin
 
       def sortable_search_params = @index.sortable_search_params
 
-      # "Manage" is the sentence the screen name finishes, and the first thing a narrow
-      # screen can spare
+      # "Manage" is the first thing a narrow screen can spare
       def index_title
         @index_title.presence ||
           safe_join([tag.span("Manage", class: "tw:hidden tw:lg:inline"), " ", @viewing])
