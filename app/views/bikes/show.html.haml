@@ -122,7 +122,7 @@
                 = t(".or_call")
               %strong
                 = t(".owners_phone_number")
-              = render UI::PhoneDisplay::Component.new(phone: @stolen_record.phone)
+              = render Atom::Phone::Component.new(phone: @stolen_record.phone)
 
       -# Don't show if contact_owner is open - because then we're rendering impound_claim in the main page
       - if BikeServices::Displayer.display_impound_claim?(@bike, current_user) && !@contact_owner_open

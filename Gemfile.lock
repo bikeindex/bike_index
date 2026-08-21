@@ -457,7 +457,7 @@ GEM
       letter_opener (~> 1.9)
       railties (>= 6.1)
       rexml
-    lexxy (0.9.27)
+    lexxy (0.9.29)
       rails (>= 8.0.2)
     lint_roller (1.1.0)
     listen (3.10.0)
@@ -614,7 +614,7 @@ GEM
     puma (8.0.2)
       nio4r (~> 2.0)
     racc (1.8.1)
-    rack (3.2.6)
+    rack (3.2.7)
     rack-attack (6.8.0)
       rack (>= 1.0, < 4)
     rack-mini-profiler (4.0.1)
@@ -690,7 +690,7 @@ GEM
     redcarpet (3.6.1)
     redis (5.4.1)
       redis-client (>= 0.22.0)
-    redis-client (0.29.0)
+    redis-client (0.30.1)
       connection_pool
     redlock (2.1.0)
       redis-client (>= 0.14.1, < 1.0.0)
@@ -964,7 +964,7 @@ DEPENDENCIES
   knapsack_pro
   kramdown
   letter_opener_web (~> 3.0)
-  lexxy (~> 0.9.27)
+  lexxy (~> 0.9.29)
   lograge
   logstash-event
   lookbook
@@ -995,7 +995,7 @@ DEPENDENCIES
   rails-controller-testing
   rails-i18n
   reactionview
-  redis
+  redis (< 6)
   redlock
   rerun
   responders

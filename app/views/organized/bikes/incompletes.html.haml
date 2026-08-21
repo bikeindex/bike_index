@@ -1,5 +1,5 @@
 .organized-page-header
-  %h1= t(".org_incomplete_registrations_html", org_name: current_organization.name)
+  = render(UI::Header::Component.new(text: t(".org_incomplete_registrations_html", org_name: current_organization.name)))
 
 - if @render_chart
   = render(UI::Chart::Component.new(series: time_range_counts(collection: @b_params_total, column: "b_params.created_at"), time_range: @time_range, stacked: true))

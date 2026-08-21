@@ -131,8 +131,10 @@ end
 # Point the SP keypair + BASE_URL at fixtures for any example tagged `:saml_env`,
 # restoring the originals afterward.
 RSpec.shared_context "saml_env" do
-  let(:sp_cert) { File.read(Rails.root.join("spec/fixtures/saml/sp_cert.pem")) }
-  let(:sp_key) { File.read(Rails.root.join("spec/fixtures/saml/sp_key.pem")) }
+  let(:sp_cert_pem) { File.read(Rails.root.join("spec/fixtures/saml/sp_cert.pem")) }
+  let(:sp_key_pem) { File.read(Rails.root.join("spec/fixtures/saml/sp_key.pem")) }
+  let(:sp_cert) { sp_cert_pem }
+  let(:sp_key) { sp_key_pem }
 
   around do |example|
     original = ENV.values_at("SAML_SP_CERTIFICATE", "SAML_SP_PRIVATE_KEY", "BASE_URL")
@@ -144,7 +146,17 @@ RSpec.shared_context "saml_env" do
   end
 end
 
+# An organization that forces SSO for sso.edu, for any example tagged `:sso_organization`.
+RSpec.shared_context "sso_organization" do
+  let!(:organization) do
+    FactoryBot.create(:organization_with_organization_features,
+      enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
+  end
+  let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+end
+
 RSpec.configure do |config|
   config.include SamlHelpers, type: :request
   config.include_context "saml_env", :saml_env
+  config.include_context "sso_organization", :sso_organization
 end

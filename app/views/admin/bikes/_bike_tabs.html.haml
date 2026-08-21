@@ -76,7 +76,7 @@
                 %td
                   Serial number
                 %td
-                  = render_serial_display(@bike, current_user, skip_explanation: true)
+                  = render(Atom::Serial::Component.new(bike: @bike, user: current_user, skip_explanation: true))
               %tr
                 %td
                   Colors
@@ -211,7 +211,7 @@
                 %td
                   Phone
                 %td
-                  = render UI::PhoneDisplay::Component.new(phone: bike.phone, skip_link: true)
+                  = render Atom::Phone::Component.new(phone: bike.phone, skip_link: true)
 
   - if stolen_record.present?
     %h4.mt-2
@@ -284,12 +284,12 @@
               %td
                 Phone
               %td
-                = render UI::PhoneDisplay::Component.new(phone: stolen_record.phone, skip_link: true)
+                = render Atom::Phone::Component.new(phone: stolen_record.phone, skip_link: true)
                 - if stolen_record.secondary_phone.present?
                   %br
                   %small
                     %span.less-strong secondary:
-                    = render UI::PhoneDisplay::Component.new(phone: stolen_record.secondary_phone, skip_link: true)
+                    = render Atom::Phone::Component.new(phone: stolen_record.secondary_phone, skip_link: true)
             %tr
               %td
                 Police Department

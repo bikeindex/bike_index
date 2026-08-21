@@ -7,23 +7,37 @@ module UI
     # rendered into a fragment cache doesn't carry the answer for whichever page filled it.
     # match: widens or narrows what counts as the page it points at: its query string too, or
     # only its controller, or its controller and action — which is what a link carrying query
-    # params (a search, a filtered index) needs.
+    # params (a search, a filtered index) needs. :query is for a filter entry, which stands for
+    # the params it applies rather than for a URL.
     class Component < ApplicationComponent
-      MATCHES = [:path, :full_path, :controller, :controller_action].freeze
+      MATCHES = [:path, :full_path, :controller, :controller_action, :query].freeze
       # The matches the browser answers with a route rather than with the URL
       ROUTE_MATCHES = [:controller, :controller_action].freeze
 
-      def initialize(path:, text: nil, match: :path, matching_controllers: [], data: {}, **html_options)
+      # What a menu item hash can carry through to the link. The rest of an item is the menu's
+      # own — its type, icon, children — and an absent key here takes initialize's default
+      ITEM_KEYS = [:path, :match, :matching_controllers, :data, :id].freeze
+
+      # A menu manifest carries a link as a hash; what differs between the menus rendering one
+      # is the class, and text: for a row whose label sits inside a block with its icon
+      def self.from_item(item, html_class: nil, text: item[:label])
+        new(**item.slice(*ITEM_KEYS), text:, class: html_class)
+      end
+
+      def initialize(path:, text: nil, match: :path, matching_controllers: [], query: {}, data: {},
+        **html_options)
         raise_if_invalid_value!(:match, match, MATCHES)
         # Only a :controller match compares controllers, so anywhere else these would be
         # compared against a controller#action and never hit
         raise ArgumentError, "matching_controllers: needs match: :controller" if
           matching_controllers.any? && match != :controller
+        raise ArgumentError, "query: and match: :query go together" if query.any? != (match == :query)
 
         @path = path
         @text = text
         @match = match
         @matching_controllers = matching_controllers
+        @query = query
         @data = data
         @html_options = html_options
       end
@@ -44,7 +58,14 @@ module UI
       def link_data
         @data.merge(controller: [@data[:controller], "ui--active-link"].compact.join(" "),
           "ui--active-link-match-value": @match,
-          "ui--active-link-routes-value": link_routes).compact
+          "ui--active-link-routes-value": link_routes,
+          "ui--active-link-query-value": link_query).compact
+      end
+
+      # A nil among a param's values is the entry a controller falls back to with the param
+      # absent, which is "" once the browser reads it off the URL
+      def link_query
+        @query.presence&.transform_values { |values| [values].flatten.map(&:to_s) }
       end
 
       # What the browser compares the page against — it can't resolve a route itself. One

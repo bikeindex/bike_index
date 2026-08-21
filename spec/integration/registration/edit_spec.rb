@@ -93,17 +93,28 @@ RSpec.describe "Editing a registration", :js, type: :system do
     # logged in user (owner_email defaults to their email)
     find("#primary_nav_hamburgler").click
     click_link "Register a new bike"
-    click_link "Register bike"
-    fill_in "Serial number", with: "SERIAL-ORIGINAL-1"
-    pick_remote_selectize(selectize_for("bike_manufacturer_id"), "Surly")
-    pick_selectize("bike_primary_frame_color_id", "Black")
-    click_button "Register"
-    expect(page).to have_content("Bike successfully added to the index!", wait: 10)
+
+    type_into("#b_param_manufacturer_id", "Surly")
+    click_combobox_option("Surly")
+    click_button "Next"
+
+    # Step 2 autofocuses the model, which is the render the pickings below need
+    expect(page).to have_css("input[name='bike[frame_model]']:focus", wait: 10)
+    wait_for_stimulus
+    fill_in "bike[serial_number]", with: "SERIAL-ORIGINAL-1"
+    type_into("#bike_primary_frame_color_id", "Black")
+    click_combobox_option("Black")
+    click_button "Complete Bike Registration"
+    expect(page).to have_content("Registration complete", wait: 10)
 
     bike = Bike.reorder(:created_at).last
     expect(bike.owner_email).to eq owner.email
     expect(bike.current_ownership.claimed?).to be_truthy
     expect(bike.manufacturer).to eq surly
+
+    # The registration itself is what the edit pages open out of
+    click_link "View your registration"
+    click_link "Edit"
 
     # ---- Details: fill every available field ----
     pick_selectize("bike_year", "2020")

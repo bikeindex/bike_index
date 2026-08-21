@@ -1,11 +1,11 @@
 <div class="organized-page-header mb-4">
-  <h1 class="uncap">
+  <%= render(UI::Header::Component.new(html_class: "uncap")) do %>
     <% if current_organization.ascend_or_broken_ascend? %>
       <%= t(".org_ascend_imports_html", org_name: current_organization.name) %>
     <% else %>
       <%= t(".org_bulk_imports_html", org_name: current_organization.name) %>
     <% end %>
-  </h1>
+  <% end %>
 </div>
 
 <% if @render_chart %>

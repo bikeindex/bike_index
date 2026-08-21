@@ -11,7 +11,7 @@ module Organized
       # @email_sent_at, @email_preview and @organization are read by the email layout
       @email_preview = true
       @organization = current_organization
-      component = OrganizedServices::EmailPreview.view_component(
+      component = OrgServices::EmailPreview.view_component(
         kind: @kind, organization: current_organization, user: current_user, params:,
         versioned: Binxtils::InputNormalizer.boolean(params[:versioned])
       )
@@ -23,7 +23,7 @@ module Organized
       # Attempt to build an impound claim if it's an impound_claim kind - sometimes we can't
       # and we want to render that on the frontend
       if @impound_claim_kind
-        @impound_claim = OrganizedServices::EmailPreview.find_or_build_impound_claim(
+        @impound_claim = OrgServices::EmailPreview.find_or_build_impound_claim(
           kind: @kind, organization: @organization, params: params
         )
       end

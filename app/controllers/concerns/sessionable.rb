@@ -18,11 +18,12 @@ module Sessionable
     end
   end
 
-  def sign_in_and_redirect(user, signed_up: false)
+  def sign_in_and_redirect(user, signed_up: false, via_saml: false)
     if user.banned? # If user is banned, tell them about it.
       flash.now[:error] = translation(:user_is_banned, scope: SIGN_IN_SCOPE)
       redirect_back(fallback_location: new_session_url) && return
     end
+    return if !via_saml && redirect_forced_saml(user.email)
     sign_in_user(user)
 
     if sign_in_partner.present?
@@ -43,7 +44,7 @@ module Sessionable
     confirm_user_from_claim_token(user)
     session[:last_seen] = Time.current
     session[:render_donation_request] = user.render_donation_request if user&.render_donation_request
-    set_passive_organization(user.default_organization) # Set that organization!
+    set_passive_organization(OrganizationRole.default_organization(user)) # Set that organization!
     user.update_last_login(forwarded_ip_address)
     if Binxtils::InputNormalizer.boolean(params.dig(:session, :remember_me)) || session.delete(:magic_link_remember_me)
       cookies.permanent.signed[ControllerHelpers::AUTH_COOKIE_KEY] = cookie_options(user)
@@ -62,12 +63,15 @@ module Sessionable
 
   private
 
-  # SSO orgs force SSO: hand an SSO-managed email off to the IdP rather than let it sign in
-  # or sign up any other way. Redirecting halts the filter chain, so the guarded action
-  # never runs for a forced-SSO email.
-  def redirect_forced_saml
-    organization = Organization.saml_email_matching(submitted_email)
-    redirect_to saml_init_path(org_slug: organization.to_param) if organization.present?
+  # SSO orgs force SSO: hand an SSO-managed email off to the IdP rather than let it sign in or
+  # sign up any other way. As a before_action the redirect halts the chain; called inline it
+  # reports whether it redirected, since a token flow has no email until the token resolves one.
+  def redirect_forced_saml(email = submitted_email)
+    organization = Organization.saml_email_matching(email)
+    return false if organization.blank?
+
+    redirect_to saml_init_path(org_slug: organization.to_param)
+    true
   end
 
   # The email an unauthenticated request is offering up, wherever its form puts it:

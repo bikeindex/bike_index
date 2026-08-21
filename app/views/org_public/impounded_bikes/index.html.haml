@@ -1,8 +1,8 @@
 -# TODO: add translations
 
 .container.public-impounded-bikes
-  %h1.cleafix.impounded-bikes-header{ class: (OrganizationDisplayer.avatar?(current_organization) ? "with-avatar" : "") }
-    - if OrganizationDisplayer.avatar?(current_organization)
+  %h1.cleafix.impounded-bikes-header{ class: (OrgServices::Displayer.avatar?(current_organization) ? "with-avatar" : "") }
+    - if OrgServices::Displayer.avatar?(current_organization)
       = image_tag current_organization.avatar.url(:large)
     %strong.uncap= current_organization.name
     Impounded bikes

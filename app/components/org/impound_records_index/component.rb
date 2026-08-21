@@ -47,6 +47,10 @@ module Org
         end
       end
 
+      def status_query(status)
+        {search_status: (status == @available_statuses.first) ? [status, nil] : status}
+      end
+
       def unregisteredness_dropdown_text
         case @search_unregisteredness
         when "only_registered" then translation(".only_user_registered")

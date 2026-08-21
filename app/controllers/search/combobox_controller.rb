@@ -13,7 +13,7 @@ module Search
     def options
       matches = Autocomplete::Matcher.search(autocomplete_params)
 
-      render turbo_stream: helpers.render(
+      render(
         Search::EverythingComboboxOptions::Component.new(
           matches:,
           search_obj_name: params[:search_obj_name].presence || "Registrations",
@@ -27,7 +27,7 @@ module Search
     def manufacturers
       matches = Autocomplete::Matcher.search(manufacturer_params)
 
-      render turbo_stream: helpers.render(
+      render(
         UI::Forms::ComboboxManufacturerOptions::Component.new(
           matches:,
           next_page: next_page_for(matches),

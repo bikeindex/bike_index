@@ -29,11 +29,11 @@ RSpec.describe Organized::BaseController, type: :request do
       let(:current_organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
 
       it "redirects to the ambassador dashboard" do
-        expect(current_user.default_organization.law_enforcement?).to be_truthy
+        expect(OrganizationRole.default_organization(current_user).law_enforcement?).to be_truthy
         get "/o/#{current_organization.to_param}"
         expect(response).to redirect_to(organization_registrations_path(organization_id: current_organization.to_param))
         get "/user_root_url_redirect"
-        # default_bike_search_path
+        # every_bike_search_path, not the organization's own registrations
         expect(response).to redirect_to(search_registrations_path(stolenness: "all"))
       end
     end
@@ -116,7 +116,7 @@ RSpec.describe Organized::BaseController, type: :request do
           expect(current_organization.reload.invoices.active.count).to eq 1
           expect(current_organization.official_manufacturer?).to be_truthy
           expect(current_organization.overview_dashboard?).to be_truthy
-          expect(OrganizationDisplayer.bike_shop_display_integration_alert?(current_organization)).to be_falsey
+          expect(OrgServices::Displayer.bike_shop_display_integration_alert?(current_organization)).to be_falsey
           get "/o/#{current_organization.to_param}/dashboard"
           expect(response).to render_template(:manufacturer)
           expect(assigns(:period)).to eq "year"

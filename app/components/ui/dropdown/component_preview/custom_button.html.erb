@@ -1,0 +1,35 @@
+<% avatar_class = "tw:flex tw:items-center tw:gap-1 tw:rounded-full tw:bg-gray-100 tw:pr-3 tw:pl-1 tw:py-1 tw:text-sm tw:font-medium tw:text-gray-700 tw:hover:bg-gray-200 tw:dark:bg-gray-700 tw:dark:text-gray-200 tw:dark:hover:bg-gray-600" %>
+
+<%= render(UI::Dropdown::Component.new(name: "User", button_class: avatar_class)) do |dropdown| %>
+  <% dropdown.with_button do %>
+    <span class="tw:flex tw:items-center tw:gap-2">
+      <%= image_tag "kelsey/illustrations/comic-assets_bike-love-1.png", class: "tw:rounded-full tw:w-8 tw:h-8 tw:object-cover", alt: "Avatar" %>
+
+      <span>seth herr</span>
+    </span>
+  <% end %>
+
+  <% dropdown.with_entry_item do %>
+    <span
+      class="
+        tw:block tw:px-4 tw:py-2 tw:text-sm tw:text-gray-500
+        tw:dark:text-gray-400
+      "
+    >
+      Last synced: 2 minutes ago
+    </span>
+  <% end %>
+
+  <% dropdown.with_entry_divider %>
+
+  <% dropdown.with_entry_item do %>
+    <%= render UI::ActiveLink::Component.new(text: "Settings",
+          path: "#{UI::Dropdown::ComponentPreview::PREVIEW_PATH}/default") %>
+  <% end %>
+
+  <%# Points at the page it's rendered on, so ui--active-link marks it and .twdropdown fills it %>
+  <% dropdown.with_entry_item do %>
+    <%= render UI::ActiveLink::Component.new(text: "Sync (active)",
+          path: "#{UI::Dropdown::ComponentPreview::PREVIEW_PATH}/custom_button") %>
+  <% end %>
+<% end %>

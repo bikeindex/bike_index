@@ -1,6 +1,6 @@
 .mb-4
 
-%h1= t(".org_recoveries_html", org_name: current_organization.name)
+= render(UI::Header::Component.new(text: t(".org_recoveries_html", org_name: current_organization.name)))
 
 - if @render_chart
   = render(UI::Chart::Component.new(series: time_range_counts(collection: @matching_recoveries, column: "stolen_records.recovered_at"), time_range: @time_range, stacked: true))

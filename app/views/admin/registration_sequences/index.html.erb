@@ -5,10 +5,10 @@
       button_size: :sm,
       active: @status.present?
     )) do |dropdown|
-      dropdown.with_entry_item(active: @status.blank?) { link_to "All statuses", url_for(sortable_search_params.merge(search_status: nil)) }
+      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All statuses", path: url_for(sortable_search_params.merge(search_status: nil)), match: :query, query: {search_status: nil}) }
       dropdown.with_entry_divider
       searchable_statuses.each do |kind|
-        dropdown.with_entry_item(active: @status == kind) { link_to "#{kind.titleize} only", url_for(sortable_search_params.merge(search_status: kind)) }
+        dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.titleize} only", path: url_for(sortable_search_params.merge(search_status: kind)), match: :query, query: {search_status: kind}) }
       end
     end %>
   </li>

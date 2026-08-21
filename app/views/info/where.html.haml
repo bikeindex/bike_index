@@ -49,7 +49,7 @@
                   = t(".show_location_on_map", location_name: location.display_name)
                 %p= [location.address_record.street, location.address_record.city, "#{location.address_record.region_record&.abbreviation} #{location.address_record.postal_code}"].compact.join(", ")
               - if location.phone.present?
-                %p= render UI::PhoneDisplay::Component.new(phone: location.phone)
+                %p= render Atom::Phone::Component.new(phone: location.phone)
               - if location&.organization&.website.present?
                 %p= link_to t(".website_for_organization", org_name: location.organization.name), location.organization.website, target: "_blank", class: "shop-site"
               .map-window
@@ -61,7 +61,7 @@
                     = [location.address_record&.city, "#{location.address_record&.region_record&.abbreviation} #{location.address_record&.postal_code}"].compact.join(", ")
                   - if location.phone.present?
                     .map-telephone
-                      = render UI::PhoneDisplay::Component.new(phone: location.phone)
+                      = render Atom::Phone::Component.new(phone: location.phone)
     %h3.padded
       = t(".international_partner_organizations")
 
@@ -87,7 +87,7 @@
                 %p= [location.address_record.street, location.address_record.city, location.address_record.postal_code, location.address_record.country&.name].compact.join(", ")
 
               - if location.phone.present?
-                %p= render UI::PhoneDisplay::Component.new(phone: location.phone)
+                %p= render Atom::Phone::Component.new(phone: location.phone)
 
               - if location&.organization&.website.present?
                 %p= link_to t(".website_for_organization", org_name: location.organization.name), location.organization.website, target: "_blank", class: "shop-site"
@@ -102,7 +102,7 @@
 
                   - if location.phone.present?
                     .map-telephone
-                      = render UI::PhoneDisplay::Component.new(phone: location.phone)
+                      = render Atom::Phone::Component.new(phone: location.phone)
 
 
   %hr.where-add-shops
