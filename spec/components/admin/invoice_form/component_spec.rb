@@ -19,20 +19,27 @@ RSpec.describe Admin::InvoiceForm::Component, type: :component do
     expect(invoice.subscription_end_at).to be_nil
   end
 
-  it "renders a checkbox per feature, and the totals the admin bundle fills in" do
+  it "renders a checkbox per feature, and the totals admin--invoice-form fills in" do
     expect(component).to have_field("organization_feature_ids_#{organization_feature.id}", type: "checkbox")
     expect(component).to have_link("Parking notifications")
-    expect(component).to have_css("#oneTimeCost")
-    expect(component).to have_css("#recurringCost")
-    expect(component).to have_css("#totalCost")
+    %w[oneTimeCost recurringCost totalCost discountCost].each do |total|
+      expect(component).to have_css("[data-admin--invoice-form-target='#{total}']")
+    end
+  end
+
+  # The controller totals from these rather than from the DOM text
+  it "gives each checkbox its amount, id and whether it recurs" do
+    checkbox = component.at_css("[data-admin--invoice-form-target='feature']")
+    expect(checkbox["data-amount"]).to eq organization_feature.amount.to_s
+    expect(checkbox["data-id"]).to eq organization_feature.id.to_s
+    expect(checkbox["data-recurring"]).to eq "true"
   end
 
   context "with an endless invoice" do
     let(:invoice) { FactoryBot.create(:invoice, organization:, is_endless: true) }
 
-    it "collapses the coverage-ends field" do
-      expect(component).to have_css("#subscriptionEndsAt.collapse")
-      expect(component).to_not have_css("#subscriptionEndsAt.show")
+    it "hides the coverage-ends field" do
+      expect(component.at_css("[data-admin--invoice-form-target='endsAt']")["class"]).to include("tw:hidden!")
     end
   end
 end

@@ -1,6 +1,6 @@
-<div id="invoiceForm" class="mt-4">
+<div class="mt-4" data-controller="admin--invoice-form">
   <%= form_for [:admin, @organization, @invoice] do |f| %>
-    <%= f.hidden_field :organization_feature_ids %>
+    <%= f.hidden_field :organization_feature_ids, data: {"admin--invoice-form-target": "featureIds"} %>
     <%= render(UI::Alerts::ObjectError::Component.new(object: @invoice)) %>
 
     <div class="full-screen-table">
@@ -15,9 +15,7 @@
         <tbody>
           <% @organization_features.each do |organization_feature| %>
             <tr>
-              <td class="organizationFeatureCheck">
-                <%= feature_checkbox(organization_feature) %>
-              </td>
+              <td><%= feature_checkbox(organization_feature) %></td>
 
               <td>
                 <%= link_to organization_feature.name, edit_admin_organization_feature_url(organization_feature) %>
@@ -41,12 +39,15 @@
 
             <td class="text-right tw:border-t-2 tw:border-black">
               One Time Features
-              <small class="less-strong" id="oneTimeCount"></small>
+              <small
+                class="less-strong"
+                data-admin--invoice-form-target="oneTimeCount"
+              ></small>
             </td>
 
             <td class="tw:border-t-2 tw:border-black">
               $
-              <span id="oneTimeCost"></span>
+              <span data-admin--invoice-form-target="oneTimeCost"></span>
             </td>
           </tr>
 
@@ -56,17 +57,23 @@
 
             <td class="text-right">
               Recurring Features
-              <small class="less-strong" id="recurringCount"></small>
+              <small
+                class="less-strong"
+                data-admin--invoice-form-target="recurringCount"
+              ></small>
             </td>
 
-            <td>$<span id="recurringCost"></span></td>
+            <td>
+              $
+              <span data-admin--invoice-form-target="recurringCost"></span>
+            </td>
           </tr>
 
           <tr>
             <td></td>
             <td></td>
             <td class="text-right">Total</td>
-            <td>$<span id="totalCost"></span></td>
+            <td>$<span data-admin--invoice-form-target="totalCost"></span></td>
           </tr>
 
           <tr>
@@ -77,8 +84,9 @@
               <%= f.label :amount_due, "Amount due $" %>
             </td>
 
-            <td class="inputTriggerRecalculation">
-              <%= render(UI::Forms::Input::Component.new(form_builder: f, attribute: :amount_due, kind: :number_field)) %>
+            <td>
+              <%= render(UI::Forms::Input::Component.new(form_builder: f, attribute: :amount_due, kind: :number_field,
+                html_options: {data: {"admin--invoice-form-target": "amountDue", action: "input->admin--invoice-form#recalculate"}})) %>
             </td>
           </tr>
 
@@ -86,7 +94,11 @@
             <td></td>
             <td></td>
             <td class="text-right">Discount</td>
-            <td>$<span id="discountCost"></span></td>
+
+            <td>
+              $
+              <span data-admin--invoice-form-target="discountCost"></span>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -102,8 +114,8 @@
 
       <div class="col-md-6">
         <div
-          id="subscriptionEndsAt"
-          class="collapse <%= "show" unless @invoice.endless? %>"
+          class="<%= "tw:hidden!" if @invoice.endless? %>"
+          data-admin--invoice-form-target="endsAt"
         >
           <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :end_at, kind: :datetime_local_field,
             label_text: "Coverage ends", required: true, html_options: {value: end_at, step: 60})) %>
@@ -123,7 +135,8 @@
 
       <div class="col-md-3 col-6 mt-4 mr-2">
         <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :is_endless,
-          label: "Coverage never ends")) %>
+          label: "Coverage never ends",
+          input_data: {"admin--invoice-form-target": "isEndless", action: "change->admin--invoice-form#toggleEndsAt"})) %>
       </div>
     </div>
 

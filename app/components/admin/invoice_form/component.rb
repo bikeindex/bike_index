@@ -16,11 +16,14 @@ module Admin
       # Memoized - read once per checkbox otherwise, and it's a query each time
       def selected_feature_ids = @selected_feature_ids ||= @invoice.organization_feature_ids
 
+      # Named individually rather than as an array, so the ids ride in a hidden field the
+      # controller rewrites - see admin--invoice-form
       def feature_checkbox(organization_feature)
         check_box_tag "organization_feature_ids_#{organization_feature.id}", organization_feature.id,
           selected_feature_ids.include?(organization_feature.id),
-          :class => organization_feature.one_time? ? "oneTime" : "recurring",
-          "data-amount" => organization_feature.amount, "data-id" => organization_feature.id
+          data: {"admin--invoice-form-target": "feature", action: "change->admin--invoice-form#recalculate",
+                 amount: organization_feature.amount, id: organization_feature.id,
+                 recurring: !organization_feature.one_time?}
       end
 
       def child_slugs_label
