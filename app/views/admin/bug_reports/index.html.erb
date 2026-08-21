@@ -59,7 +59,7 @@
 
 <% admin_search_form = capture do %>
   <%= form_with(url: admin_bug_reports_path, method: :get,
-    html: {class: "tw:my-4 tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-3"}) do |f| %>
+    html: {class: "tw:my-4 tw:flex tw:flex-wrap tw:items-baseline tw:justify-end tw:gap-2"}) do |f| %>
     <%= hidden_field_tag :search_tag, params[:search_tag] %>
     <%= hidden_field_tag :search_receiver, params[:search_receiver] %>
     <%= hidden_field_tag :search_membership, params[:search_membership] %>
