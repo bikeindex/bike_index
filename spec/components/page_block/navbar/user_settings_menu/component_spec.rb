@@ -24,7 +24,9 @@ RSpec.describe PageBlock::Navbar::UserSettingsMenu::Component, type: :component 
 
     expect(rows.map { |row| row.text.strip }).to eq(links)
     expect(component).to have_no_css "a[aria-current]"
-    expect(rows.map { |row| row["data-ui--active-link-match-value"] }).to all(eq("path"))
+    # The registration row stays current across every step of the flow, so it matches wider
+    expect(rows.map { |row| row["data-ui--active-link-match-value"] })
+      .to eq(%w[path controller path path])
   end
 
   # Logging out is the only row that doesn't go somewhere, so it's the only one tinted

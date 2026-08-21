@@ -16,6 +16,13 @@ RSpec.describe UserServices::MenuItemsAccount do
       expect(items.map { |item| item[:type] }).to eq(%i[link link link divider link])
     end
 
+    it "sends the registration row into the flow, matching on its controller" do
+      registration = items.find { |item| item[:label] == "Register a new bike" }
+
+      expect(registration[:path]).to eq "/register"
+      expect(registration[:match]).to eq :controller
+    end
+
     # Each menu tints it for itself, so the row only says which one it is
     it "marks logout danger, and nothing else" do
       expect(items.select { |item| item[:danger] }.map { |item| item[:label] }).to eq(["Log out"])
