@@ -28,7 +28,12 @@
     <% end %>
   <% else %>
     <%= render(UI::Header::Component.new(text: "Assertion", tag: :h2)) %>
-    <dl class="tw:mb-8 tw:grid tw:grid-cols-[auto_1fr] tw:gap-x-4 tw:gap-y-2">
+    <dl
+      class="
+        tw:mb-8 tw:grid tw:grid-cols-1 tw:gap-x-4 tw:gap-y-1
+        tw:wrap-anywhere tw:sm:grid-cols-[auto_1fr] tw:sm:gap-y-2
+      "
+    >
       <% if @expected_email.present? %>
         <dt class="tw:font-semibold">Address entered</dt>
         <dd><code><%= @expected_email %></code></dd>
@@ -68,7 +73,12 @@
     <% if diagnostic? %>
       <%= render(UI::Header::Component.new(text: "Received attributes", tag: :h2)) %>
       <% if @result.attributes.present? %>
-        <dl class="tw:mb-8 tw:grid tw:grid-cols-[auto_1fr] tw:gap-x-4 tw:gap-y-2">
+        <dl
+          class="
+            tw:mb-8 tw:grid tw:grid-cols-1 tw:gap-x-4 tw:gap-y-1
+            tw:wrap-anywhere tw:sm:grid-cols-[auto_1fr] tw:sm:gap-y-2
+          "
+        >
           <% @result.attributes.each do |name, values| %>
             <dt class="tw:font-semibold"><code><%= name %></code></dt>
             <dd><code><%= Array(values).join(", ") %></code></dd>
