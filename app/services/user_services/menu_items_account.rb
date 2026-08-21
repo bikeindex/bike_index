@@ -58,7 +58,7 @@ module UserServices
     def account_rows(current_user, user)
       [link(translation(:your_registrations), routes.my_account_path),
         marketplace_messages(current_user),
-        link(translation(:register_a_new_bike), routes.choose_registration_path),
+        link(translation(:register_a_new_bike), routes.register_path, match: :controller),
         link(translation(:user_settings, user_email: user.email), routes.edit_my_account_path,
           id: "navUserSettingLink", data: {email: user.email})].compact
     end

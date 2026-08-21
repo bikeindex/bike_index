@@ -160,9 +160,15 @@ RSpec.describe RegisterController, type: :request do
       include_context :request_spec_logged_in_as_user
 
       it "prefills owner_email with the user's email, still landing on step 1" do
-        get "/register/new"
+        # /stolen and the FAQ link at the bare /register with a status, so nothing in
+        # progress has to reach new still naming it
+        get "#{base_url}?status=status_stolen"
+        expect(response).to redirect_to new_register_path(status: "status_stolen")
+
+        follow_redirect!
         new_b_param = BParam.last
-        expect(new_b_param.owner_email).to eq current_user.email
+        expect(new_b_param).to have_attributes(owner_email: current_user.email,
+          status: "status_stolen")
         expect(response).to redirect_to register_path(b_param_token: new_b_param.id_token, step: 1)
       end
 
