@@ -2,7 +2,7 @@
 
 <% nav_header_list_items = capture do %>
   <%= render(Admin::Bikes::Index::Filters::Component.new(index: admin_index_state, motorized: @motorized,
-        multi_delete: @multi_delete, unknown: @unknown, origin_search_type: @origin_search_type,
+        multi_delete: @multi_delete, origin_search_type: @origin_search_type,
         pos_search_type: @pos_search_type, not_default_statuses: @not_default_statuses,
         show_search_statuses:, period: @period)) %>
 <% end %>

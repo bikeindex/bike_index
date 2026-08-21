@@ -11,13 +11,12 @@ module Admin
           POS_TYPES = {"ascend_pos" => "Ascend", "lightspeed_pos" => "Lightspeed",
                        "any_pos" => "POS of any type", "no_pos" => "Not POS"}.freeze
 
-          def initialize(index:, motorized: false, multi_delete: false, unknown: false,
+          def initialize(index:, motorized: false, multi_delete: false,
             origin_search_type: nil, pos_search_type: nil, not_default_statuses: false,
             show_search_statuses: true, period: nil)
             @index = index
             @motorized = motorized
             @multi_delete = multi_delete
-            @unknown = unknown
             @origin_search_type = origin_search_type
             @pos_search_type = pos_search_type
             @not_default_statuses = not_default_statuses
@@ -28,6 +27,8 @@ module Admin
           private
 
           def search_params = @index.sortable_search_params
+
+          def nav_link_class(active) = active ? "nav-link active" : "nav-link"
 
           def any_origin_active? = @origin_search_type.blank?
 

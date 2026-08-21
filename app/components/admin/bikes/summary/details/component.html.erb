@@ -35,7 +35,10 @@
         <% end %>
 
         <%= render(UI::DefinitionList::Row::Component.new(label: "Created")) do %>
-          <%= render(UI::Time::Component.new(time: @bike.created_at, timezone_if_different: true)) %>
+          <%= render(UI::Time::Component.new(time: @bike.created_at)) %>
+
+          <%# the localizer fills this with the viewer's timezone %>
+          <small class="localizeTimezone"></small>
         <% end %>
 
         <%= render(UI::DefinitionList::Row::Component.new(label: "Creation")) do %>

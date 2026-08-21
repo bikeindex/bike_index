@@ -9,35 +9,40 @@
         <%= link_to "all bikes", admin_bikes_path, class: "nav-link" %>
       </li>
 
+      <%#
+        Each of these is controller or session state, so it carries .active itself -
+        UI::ActiveLink resolves from the URL, which can't see the session, and only sets
+        aria-current, which the admin row doesn't style
+      %>
+
+      <% nav_link_class = ->(active) { active ? "nav-link active" : "nav-link" } %>
+
       <li class="nav-item">
-        <%= render(UI::ActiveLink::Component.new(text: "motorized", html_class: "nav-link", match: :query,
-              query: {search_motorized: true},
-              path: url_for(sortable_search_params.merge(search_motorized: !@motorized)))) %>
+        <%= link_to "motorized", url_for(sortable_search_params.merge(search_motorized: !@motorized)),
+              class: nav_link_class.call(@motorized) %>
       </li>
 
       <li class="nav-item">
         <% include_spam = Binxtils::InputNormalizer.boolean(params[:search_spam]) %>
 
-        <%= render(UI::ActiveLink::Component.new(text: "spam & deleted", html_class: "nav-link", match: :query,
-              query: {search_spam: true},
-              path: url_for(sortable_search_params.merge(search_spam: !include_spam, search_deleted: !include_spam)))) %>
+        <%= link_to "spam & deleted",
+              url_for(sortable_search_params.merge(search_spam: !include_spam, search_deleted: !include_spam)),
+              class: nav_link_class.call(include_spam) %>
       </li>
 
       <li class="nav-item">
-        <%= render(UI::ActiveLink::Component.new(text: "Include blank", html_class: "nav-link", match: :query,
-              query: {search_include_blank: true},
-              path: url_for(sortable_search_params.merge(search_include_blank: !@include_blank)))) %>
+        <%= link_to "Include blank", url_for(sortable_search_params.merge(search_include_blank: !@include_blank)),
+              class: nav_link_class.call(@include_blank) %>
       </li>
 
       <li class="nav-item">
-        <%= render(UI::ActiveLink::Component.new(text: "Alphabetical view", html_class: "nav-link", match: :query,
-              query: {reset_view: true}, path: url_for(sortable_search_params.merge(reset_view: true)))) %>
+        <%= link_to "Alphabetical view", url_for(sortable_search_params.merge(reset_view: true)),
+              class: nav_link_class.call(!session[:missing_manufacturer_time_order]) %>
       </li>
 
       <li class="nav-item">
-        <%= render(UI::ActiveLink::Component.new(text: "Time ordered view", html_class: "nav-link", match: :query,
-              query: {search_time_ordered: true},
-              path: url_for(sortable_search_params.merge(search_time_ordered: true)))) %>
+        <%= link_to "Time ordered view", url_for(sortable_search_params.merge(search_time_ordered: true)),
+              class: nav_link_class.call(session[:missing_manufacturer_time_order]) %>
       </li>
     </ul>
   </div>

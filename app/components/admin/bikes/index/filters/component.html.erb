@@ -12,21 +12,24 @@
   </li>
 <% end %>
 
+<%#
+  These read their state off the controller, so they carry .active themselves - UI::ActiveLink
+  resolves it from the URL for cached fragments, and only sets aria-current, which the
+  admin row doesn't style
+%>
+
 <li class="nav-item tw:text-sm">
-  <%= render(UI::ActiveLink::Component.new(text: "motorized", html_class: "nav-link", match: :query,
-        query: {search_motorized: true},
-        path: url_for(search_params.merge(search_motorized: !@motorized)))) %>
+  <%= link_to "motorized", url_for(search_params.merge(search_motorized: !@motorized)),
+        class: nav_link_class(@motorized) %>
 </li>
 
 <li class="nav-item tw:text-sm">
-  <%= render(UI::ActiveLink::Component.new(text: "multi-delete", html_class: "nav-link", match: :query,
-        query: {search_multi_delete: true},
-        path: url_for(search_params.merge(search_multi_delete: !@multi_delete)))) %>
+  <%= link_to "multi-delete", url_for(search_params.merge(search_multi_delete: !@multi_delete)),
+        class: nav_link_class(@multi_delete) %>
 </li>
 
 <li class="nav-item tw:text-sm">
-  <%= render(UI::ActiveLink::Component.new(text: "Unknown Mnfgs", html_class: "nav-link",
-        path: missing_manufacturer_admin_bikes_path)) %>
+  <%= link_to "Unknown Mnfgs", missing_manufacturer_admin_bikes_path, class: nav_link_class(false) %>
 </li>
 
 <li class="nav-item tw:text-sm">
