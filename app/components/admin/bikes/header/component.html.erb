@@ -1,0 +1,16 @@
+<% if @bike.blank? %>
+  <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "No registration present",
+        text: "This screen is scoped to a registration, and it no longer exists")) %>
+<% else %>
+  <%= render(Admin::Bikes::Tabs::Component.new(bike: @bike, active: @active, stolen_record: @stolen_record,
+        display_recovery: @display_recovery)) %>
+
+  <%= render(Admin::Bikes::Summary::Details::Component.new(bike: @bike, user: @user,
+        stolen_record: @stolen_record, display_dev_info: @display_dev_info)) %>
+
+  <%= render(Admin::Bikes::Summary::Theft::Component.new(stolen_record: @stolen_record, bike: @bike,
+        display_dev_info: @display_dev_info)) %>
+
+  <%= render(Admin::Bikes::Summary::Recovery::Component.new(stolen_record: @stolen_record,
+        display_recovery: @display_recovery)) %>
+<% end %>

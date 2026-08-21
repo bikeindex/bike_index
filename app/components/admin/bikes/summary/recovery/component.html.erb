@@ -1,0 +1,31 @@
+<h3 class="tw:mt-6 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">
+  Recovery information
+  <%= link_to "view", admin_recovery_path(@stolen_record.to_param), class: "twlink tw:ml-2 tw:text-sm" %>
+</h3>
+
+<div class="twwiderow">
+  <div>
+    <%= render(UI::DefinitionList::Container::Component.new) do %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: "Recovered at")) do %>
+        <%= render(UI::Time::Component.new(time: @stolen_record.recovered_at)) %>
+      <% end %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: "Recovered by", value: recovering_user_cell)) %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: "We helped")) do %>
+        <%= check_mark if @stolen_record.index_helped_recovery %>
+      <% end %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: "Can share")) do %>
+        <%= check_mark if @stolen_record.can_share_recovery %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div>
+    <%= render(UI::DefinitionList::Container::Component.new) do %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: "Description", full_width: true,
+            value: @stolen_record.recovered_description)) %>
+    <% end %>
+  </div>
+</div>

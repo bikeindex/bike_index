@@ -1,0 +1,82 @@
+<h3 class="tw:mt-6 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">
+  Theft information
+</h3>
+
+<div class="twwiderow">
+  <div>
+    <%= render(UI::DefinitionList::Container::Component.new) do %>
+      <% if @display_dev_info %>
+        <%= render(UI::DefinitionList::Row::Component.new(label: "ID")) do %>
+          <code><%= @stolen_record.id %></code>
+        <% end %>
+      <% end %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: "Theft description",
+            value: @stolen_record.theft_description)) %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: "Stolen record created")) do %>
+        <%= render(UI::Time::Component.new(time: @stolen_record.created_at)) %>
+      <% end %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: "Stolen at")) do %>
+        <%= render(UI::Time::Component.new(time: @stolen_record.date_stolen)) %>
+      <% end %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: "Callable by", value: callable_by)) %>
+
+      <% unless @stolen_record.recovered? %>
+        <%= render(UI::DefinitionList::Row::Component.new(label: "Link to recover")) do %>
+          <input
+            type="text"
+            class="twinput"
+            readonly
+            autocomplete="off"
+            value="<%= recovery_link %>"
+          >
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div>
+    <%= render(UI::DefinitionList::Container::Component.new) do %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: "Approved?")) do %>
+        <% if @stolen_record.approved %>
+          <%= check_mark %>
+        <% else %>
+          <small class="twless-strong">nope</small>
+        <% end %>
+      <% end %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: "Estimated $",
+            value: @stolen_record.estimated_value)) %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: "Location")) do %>
+        <%= @stolen_record.formatted_address_string(visible_attribute: :street) %>
+
+        <% if @stolen_record.without_street? %>
+          <em class="tw:text-sm <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
+            missing address (user alerted)
+          </em>
+        <% end %>
+      <% end %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: "Phone")) do %>
+        <%= render(Atom::Phone::Component.new(phone: @stolen_record.phone, skip_link: true)) %>
+
+        <% if @stolen_record.secondary_phone.present? %>
+          <small class="tw:block">
+            <span class="twless-strong">secondary:</span>
+            <%= render(Atom::Phone::Component.new(phone: @stolen_record.secondary_phone, skip_link: true)) %>
+          </small>
+        <% end %>
+      <% end %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: "Police department",
+            value: @stolen_record.police_report_department)) %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: "Police report",
+            value: @stolen_record.police_report_number)) %>
+    <% end %>
+  </div>
+</div>

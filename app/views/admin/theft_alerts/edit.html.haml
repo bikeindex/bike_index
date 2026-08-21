@@ -1,4 +1,4 @@
-= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active: :theft_alerts, stolen_record: @stolen_record}
+= render Admin::Bikes::Header::Component.new(bike: @bike, active: :theft_alerts, stolen_record: @stolen_record, user: current_user, display_dev_info: display_dev_info?)
 
 %h2.mt-4
   Facebook data

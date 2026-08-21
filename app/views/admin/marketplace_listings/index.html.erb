@@ -1,5 +1,5 @@
 <% if @bike.present? %>
-  <%= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active: :listings} %>
+  <%= render Admin::Bikes::Header::Component.new(bike: @bike, active: :listings, user: current_user, display_dev_info: display_dev_info?) %>
   <h1 class="mt-5 mb-4">Marketplace Listings</h1>
   <%= render(partial: "table", locals: {collection: @collection, render_sortable: false, skip_item: true}) %>
 <% else %>

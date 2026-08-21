@@ -1,4 +1,4 @@
-<%= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active: :edit} %>
+<%= render Admin::Bikes::Header::Component.new(bike: @bike, active: :edit, user: current_user, display_dev_info: display_dev_info?) %>
 
 <%= render(Admin::Bikes::Edit::Component.new(bike: @bike, organizations: @organizations,
       display_dev_info: display_dev_info?)) %>

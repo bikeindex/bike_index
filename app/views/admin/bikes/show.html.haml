@@ -1,4 +1,4 @@
-= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active: @active_tab.to_sym, display_recovery: @active_tab == "recoveries"}
+= render Admin::Bikes::Header::Component.new(bike: @bike, active: @active_tab.to_sym, display_recovery: @active_tab == "recoveries", user: current_user, display_dev_info: display_dev_info?)
 
 - if @active_tab == "ownerships"
   = render partial: "/admin/ownerships/table", locals: {ownerships: @bike.ownerships.reorder(created_at: :desc), skip_bike: true}
