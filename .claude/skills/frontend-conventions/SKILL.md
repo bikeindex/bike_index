@@ -52,8 +52,6 @@ Scope it rather than running bare `bin/lint`: a whole-repo run reformats files o
 
 Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesheets/legacy_includes/_css_layers.scss`), which sorts below tailwind's `components` and `utilities`. So a `UI::*` component rendered inside legacy-styled markup **wins over the surrounding stylesheet's rules for every property its own classes set** — `UI::Button`'s `tw:inline-flex`, `tw:p-0` and `twlink` beat `.primary-header-nav`'s `display`, `padding` and `color` no matter how specific those selectors are.
 
-**Styling legacy markup a component's *callers* own is a class in `app/assets/tailwind/bike_index_components.css`**, not an arbitrary-variant blob (`tw:[&_a.nav-link]:…`) in the component's Ruby — `.twdropdown`'s entry rules are the pattern. Take its resting and active fills from `UI::Button::Component::COLORS`/`ACTIVE_COLORS`, the way `UI::ButtonGroup::Component::CHIP_CLASSES` composes them, so a legacy item and the `UI::` component beside it agree.
-
 **Admin is the exception, and it inverts the rule.** `app/assets/stylesheets/admin.scss` imports `legacy_includes/admin_unvendored` *outside* its `@layer legacy` block, so those rules are unlayered and beat every tailwind utility whatever the specificity. On an admin page a utility that collides with one needs `!` — and without it the class is inert, not merely outranked: `tw:-mb-px` on `.nav-tabs` looked like it was doing the work `.nav { margin-bottom: 0 }` was actually overriding. Check `getComputedStyle` rather than assuming the class landed.
 
 ## Two Tailwind v4 traps
@@ -100,7 +98,7 @@ The same instinct applies beyond buttons: **check `app/components/ui/` and `app/
 
 **Every link that goes `aria-current` on the page it points at goes through `UI::ActiveLink::Component`** — never `current_page?` in a template, and never a Stimulus controller of your own comparing `window.location`. It always derives the state in the browser (`app/javascript/controllers/ui/active_link_controller.js`), so there's no way to pass the answer in: `match:` is the only control over what counts as the page it points at. Any layout rendering one opens its `<body>` with `body_tag`. See `app/components/ui/active_link/`.
 
-**`match: :query` names what the entry *stands for*, not what its href sets.** A filter entry that toggles links *away* from itself to clear the filter, so its `path:` merges `nil` while `query:` still names the value — `path: …merge(kind: active ? nil : kind), query: {kind: kind}`. Passing the same ternary to both is silent: `queryMatches()` compares `{kind: nil}` against a URL holding the value, so the one entry that *is* current is the only one that never highlights. Worth a `grep -n 'query: {[a-z_]*: .* ? '` after any bulk conversion.
+With `match: :query`, **`query:` is the params the entry stands for, not the ones its `path:` sets** — a filter entry that toggles links *away* from itself to clear the filter, so the two differ. Passing `path:`'s value to both fails silently, and only on the entry that is currently applied.
 
 ## Showing and hiding elements: always use the collapse helpers
 
