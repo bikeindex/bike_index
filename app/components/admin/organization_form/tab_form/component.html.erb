@@ -4,8 +4,8 @@
 
     <%= render(@fields_component.new(form_builder:, **@fields_args)) %>
 
-    <div class="mt-4">
-      <%= form_builder.submit @submit_text, class: "btn-lg btn-success float-right" %>
+    <div class="tw:mt-6 tw:flex tw:justify-end">
+      <%= render(UI::Button::Component.new(text: @submit_text, color: :primary, size: :lg, type: "submit")) %>
     </div>
   <% end %>
 <% end %>

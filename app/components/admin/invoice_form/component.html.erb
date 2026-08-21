@@ -133,7 +133,7 @@
           html_options: {rows: 4})) %>
 
         <div class="tw:mt-6 tw:flex tw:flex-col tw:items-start tw:gap-4">
-          <%= f.submit "Save", class: "btn btn-lg btn-success" %>
+          <%= render(UI::Button::Component.new(text: "Save", color: :primary, size: :lg, type: "submit")) %>
 
           <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :is_endless,
             label: "Coverage never ends",

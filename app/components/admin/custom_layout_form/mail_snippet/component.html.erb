@@ -12,7 +12,7 @@
           <%= render(UI::Forms::Checkbox::Component.new(form_builder: snippet, attribute: :is_enabled,
             label: enable_label)) %>
 
-          <%= f.submit "Save", class: "btn btn-success tw:ml-auto" %>
+          <%= render(UI::Button::Component.new(text: "Save", color: :primary, type: "submit", html_class: "tw:ml-auto")) %>
         </div>
       <% end %>
     <% end %>
