@@ -182,6 +182,16 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
           expect(signed_in?).to be false
         end
       end
+
+      context "asserted email has multiple @ characters" do
+        let(:email) { "attacker@evil.com@#{domain}" }
+
+        it "does not provision or sign in" do
+          expect { post_callback }.not_to change(User, :count)
+          expect(response).to redirect_to(new_session_path)
+          expect(signed_in?).to be false
+        end
+      end
     end
 
     context "invalid assertions" do
