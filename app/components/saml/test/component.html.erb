@@ -14,8 +14,6 @@
   <% if diagnostic? %>
     <h2 class="tw:mb-3 tw:text-xl tw:font-semibold">Assertion</h2>
     <dl class="tw:mb-8 tw:grid tw:grid-cols-[auto_1fr] tw:gap-x-4 tw:gap-y-2">
-      <dt class="tw:font-semibold">Signature certificate</dt>
-      <dd><code><%= @result.certificate %></code></dd>
       <dt class="tw:font-semibold">NameID</dt>
       <dd><code><%= @result.name_id.presence || "(missing)" %></code></dd>
       <dt class="tw:font-semibold">NameID format</dt>

@@ -55,6 +55,11 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
     cookies[ControllerHelpers::AUTH_COOKIE_KEY].present?
   end
 
+  def diagnostic_value(label)
+    Capybara.string(response.body)
+      .find(:xpath, "//dt[normalize-space()=#{label.inspect}]/following-sibling::dd[1]").text.strip
+  end
+
   describe "GET /sso/:org_slug/init" do
     it "redirects to the IdP" do
       get "/sso/#{slug}/init"
@@ -64,11 +69,7 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
     end
 
     context "configuration inactive" do
-      let(:saml_configuration) do
-        FactoryBot.create(:organization_saml_configuration, :active, organization:).tap do |configuration|
-          configuration.update!(active: false)
-        end
-      end
+      let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :configured, organization:) }
 
       it "redirects to the IdP" do
         get "/sso/#{slug}/init"
@@ -84,11 +85,7 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
     end
 
     context "configuration inactive" do
-      let(:saml_configuration) do
-        FactoryBot.create(:organization_saml_configuration, :active, organization:).tap do |configuration|
-          configuration.update!(active: false)
-        end
-      end
+      let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :configured, organization:) }
 
       it "redirects to the IdP" do
         get "/sso/#{slug}/test"
@@ -98,10 +95,7 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
     end
 
     context "configuration incomplete" do
-      let(:saml_configuration) do
-        FactoryBot.create(:organization_saml_configuration, organization:, idp_entity_id: nil,
-          idp_sso_target_url: nil, idp_cert: nil)
-      end
+      let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, organization:) }
 
       it "is not found" do
         get "/sso/#{slug}/test"
@@ -359,11 +353,7 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
 
   describe "POST /sso/:org_slug/callback in test mode" do
     context "configuration inactive" do
-      let(:saml_configuration) do
-        FactoryBot.create(:organization_saml_configuration, :active, organization:).tap do |configuration|
-          configuration.update!(active: false)
-        end
-      end
+      let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :configured, organization:) }
 
       it "reports a valid assertion without provisioning or signing in" do
         identity_count = SsoIdentity.count
@@ -373,6 +363,21 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
         expect(response.headers["X-Robots-Tag"]).to eq "noindex, nofollow"
         expect(response.body).to include("SAML configuration test", email)
         expect(signed_in?).to be false
+      end
+
+      it "reports a passwordless account as having no password of its own" do
+        FactoryBot.create(:user_confirmed, email:, passwordless_user: true)
+
+        post_test_callback
+        expect(diagnostic_value("Matching account")).to eq email
+        expect(diagnostic_value("Matching account has a password")).to eq "No"
+      end
+
+      it "reports a self-created account as having a password" do
+        FactoryBot.create(:user_confirmed, email:)
+
+        post_test_callback
+        expect(diagnostic_value("Matching account has a password")).to eq "Yes"
       end
 
       it "reports a malformed email without provisioning" do

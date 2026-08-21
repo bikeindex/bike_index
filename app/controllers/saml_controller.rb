@@ -49,10 +49,8 @@ class SamlController < ApplicationController
 
     result = Saml::AssertionProcessor.call(saml_configuration:,
       raw_response: params[:SAMLResponse], request_id: saml_request[:request_id], dry_run: test_mode)
-    return render_test_result(saml_configuration, result) if test_mode && !result.success?
-    return saml_failure(result.error) unless result.success?
-
     return render_test_result(saml_configuration, result) if test_mode
+    return saml_failure(result.error) unless result.success?
 
     session[:return_to] = saml_request[:return_to]
     sign_in_and_redirect(result.user, via_saml: true)
@@ -82,8 +80,7 @@ class SamlController < ApplicationController
 
   def configured_inactive_saml_configuration
     saml_configuration = saml_organization.organization_saml_configuration
-    raise ActiveRecord::RecordNotFound unless saml_configuration &&
-      OrganizationSamlConfiguration.configured_inactive.where(id: saml_configuration.id).exists?
+    raise ActiveRecord::RecordNotFound unless saml_configuration&.configured? && !saml_configuration.active?
 
     saml_configuration
   end

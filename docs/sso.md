@@ -226,11 +226,11 @@ create: it has no accounts and no per-SP registration, reading the ACS URL and a
 straight out of the AuthnRequest.
 
 Keep the configuration inactive while testing. Open `/sso/<slug>/test` to start the flow; the
-callback validates the signed assertion and shows its certificate, NameID, attributes, email
-domain, and matching account without provisioning or signing anyone in. The test endpoint is
-available only for a complete, inactive configuration. Activate SAML only when the diagnostic
-result is correct; `/sso/<slug>/init` is the live sign-in path and can provision an account even
-while the configuration is inactive.
+callback validates the signed assertion and shows its NameID, attributes, email domain, and
+matching account without provisioning or signing anyone in. The test endpoint is available only
+for a complete, inactive configuration. Activate SAML only when the diagnostic result is correct;
+`/sso/<slug>/init` is the live sign-in path and can provision an account even while the
+configuration is inactive.
 
 | Bike Index field | Value |
 |---|---|
@@ -244,10 +244,13 @@ as `<username>@<domain>` with `id` / `email` / `firstName` / `lastName` attribut
 names, not the OIDs a university IdP sends, so the NameID fallback is what carries the email
 unless you set the attribute to `email`.
 
-The test flow exercises the signed AuthnRequest, cross-site POST, RelayState claim, signature
-validation, `InResponseTo` matching, and attribute mapping without creating an account. It does
-not cover encryption; mocksaml publishes only a signing key and never ingests an SP certificate,
-so it cannot encrypt to us.
+**Last verified 8/15** against mocksaml over real HTTPS, before `/sso/<slug>/test` existed: a
+first login provisioned and confirmed a new account, a second on the same address reused it, and
+a third linked to a pre-existing account. That covers the signed AuthnRequest, the cross-site
+POST, RelayState claim, signature validation and `InResponseTo` matching — every leg the test
+flow shares with `init`. The test flow itself has only been exercised by specs, and neither run
+covers encryption: mocksaml publishes only a signing key and never ingests an SP certificate, so
+it structurally cannot encrypt to us.
 
 **Don't test IdP-initiated login.** Starting at the IdP produces an assertion with no
 `InResponseTo` and the callback rejects it. That is deliberate replay protection.

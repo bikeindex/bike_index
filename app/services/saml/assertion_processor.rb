@@ -12,7 +12,7 @@ module Saml
       end
     end
 
-    DiagnosticResult = Struct.new(:certificate, :name_id, :name_id_format, :attributes,
+    DiagnosticResult = Struct.new(:name_id, :name_id_format, :attributes,
       :email_attribute, :email, :email_domain, :user, :user_has_password, :error) do
       def success?
         error.nil?
@@ -25,20 +25,12 @@ module Saml
       response = parse_response(saml_configuration, raw_response, request_id)
       return failure(response.errors.join("; ").presence || "invalid SAML response") unless response.is_valid?
 
-      return diagnostic(response, saml_configuration) if dry_run
-
-      name_id = response.name_id.presence
-      return failure("assertion is missing a NameID") if name_id.blank?
-
-      email = asserted_email(response, saml_configuration)
-      return failure("assertion is missing an email") if email.blank?
-
       organization = saml_configuration.organization
-      # Guards the whole resolution, not just provisioning: otherwise an assertion for any address -
-      # another org's admin, a superadmin - links or returns an existing account and signs it in.
-      asserted_domain = Organization.email_domain(email)
-      return failure("#{email} is not on this organization's SSO domain") unless
-        asserted_domain.present? && asserted_domain == organization.user_email_domain
+      name_id = response.name_id.presence
+      email = asserted_email(response, saml_configuration)
+      error = resolution_error(name_id:, email:, organization:)
+      return diagnostic(response, saml_configuration, name_id:, email:, error:) if dry_run
+      return failure(error) if error
 
       # One lookup drives both the returning-user short-circuit and the post-login update.
       identity = SsoIdentity.for(organization:, provider:, uid: name_id) ||
@@ -74,43 +66,30 @@ module Saml
       EmailNormalizer.normalize(raw)
     end
 
-    def diagnostic(response, saml_configuration)
-      organization = saml_configuration.organization
-      name_id = response.name_id.presence
-      email = asserted_email(response, saml_configuration)
+    def resolution_error(name_id:, email:, organization:)
+      return "assertion is missing a NameID" if name_id.blank?
+      return "assertion is missing an email" if email.blank?
+
+      # Guards the whole resolution, not just provisioning: otherwise an assertion for any address -
+      # another org's admin, a superadmin - links or returns an existing account and signs it in.
+      asserted_domain = Organization.email_domain(email)
+      "#{email} is not on this organization's SSO domain" unless
+        asserted_domain.present? && asserted_domain == organization.user_email_domain
+    end
+
+    def diagnostic(response, saml_configuration, name_id:, email:, error:)
       email_domain = Organization.email_domain(email)
-      user = User.fuzzy_confirmed_or_unconfirmed_email_find(email) if email.present? &&
-        email_domain == organization.user_email_domain
+      # Looked up only once the domain guard clears it, as the live path does
+      user = User.fuzzy_confirmed_or_unconfirmed_email_find(email) if
+        email_domain.present? && email_domain == saml_configuration.organization.user_email_domain
 
       DiagnosticResult.new(
-        certificate: certificate_source(response, saml_configuration),
         name_id:, name_id_format: response.name_id_format,
         attributes: response.attributes.all,
         email_attribute: saml_configuration.email_attribute,
-        email:, email_domain:, user:, user_has_password: user&.password_digest.present?,
-        error: diagnostic_error(name_id:, email:, email_domain:, organization:)
+        email:, email_domain:, user:,
+        user_has_password: user.present? && !user.passwordless_user?, error:
       )
-    end
-
-    def certificate_source(response, saml_configuration)
-      document = response.decrypted_document || response.document
-      certificate_element = REXML::XPath.first(document, "//ds:X509Certificate", {"ds" => OneLogin::RubySaml::Response::DSIG})
-      return "idp_cert" if saml_configuration.idp_certificates.one?
-      return "idp_cert_multi" if certificate_element.blank?
-
-      certificate = OpenSSL::X509::Certificate.new(Base64.decode64(certificate_element.text))
-      saml_configuration.idp_certificates.each_with_index do |configured_certificate, index|
-        return index.zero? ? "idp_cert" : "idp_cert_multi" if
-          certificate.to_pem == OpenSSL::X509::Certificate.new(configured_certificate).to_pem
-      end
-      "idp_cert_multi"
-    end
-
-    def diagnostic_error(name_id:, email:, email_domain:, organization:)
-      return "assertion is missing a NameID" if name_id.blank?
-      return "assertion is missing an email" if email.blank?
-      "#{email} is not on this organization's SSO domain" unless
-        email_domain.present? && email_domain == organization.user_email_domain
     end
 
     # Provisioning grants no organization role - that is user_role_for_user_email_domain's job.
@@ -122,7 +101,7 @@ module Saml
       Result.new(error: message)
     end
 
-    conceal :provider, :parse_response, :asserted_email, :diagnostic, :certificate_source,
-      :diagnostic_error, :provision_user, :failure
+    conceal :provider, :parse_response, :asserted_email, :resolution_error, :diagnostic,
+      :provision_user, :failure
   end
 end

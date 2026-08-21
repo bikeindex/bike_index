@@ -9,7 +9,7 @@ module Saml
       end
 
       def diagnostic?
-        @result.respond_to?(:attributes)
+        @result.is_a?(Saml::AssertionProcessor::DiagnosticResult)
       end
     end
   end
