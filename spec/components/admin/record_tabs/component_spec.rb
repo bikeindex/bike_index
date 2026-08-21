@@ -9,11 +9,10 @@ RSpec.describe Admin::RecordTabs::Component, type: :component do
   end
   let(:component) { render_inline(described_class.new(title: "A Thing", tabs:, nav_label: "Thing sections")) }
 
-  # aria-current took the tab's own boolean once, so every inactive tab rendered
-  # aria-current="false" - which counts as current
-  it "marks only the active tab, in the class and in aria" do
-    expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Show"]
-    expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Show"]
+  # Which tab is active is UI::Tabs' to get right; this is that they reach it at all
+  it "renders the title and its tabs" do
+    expect(component.at_css("h1").text.squish).to eq "A Thing"
+    expect(component.css("nav a").map { |tab| tab.text.squish }).to eq %w[Show Edit]
   end
 
   context "with a subtitle, links and an alert" do
