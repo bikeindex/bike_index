@@ -26,22 +26,22 @@
     </a>
 
     <div class="dropdown-menu">
-      <%= link_to "All kinds", url_for(sort_state.search_params.merge(search_kind: nil)), class: "dropdown-item #{params[:search_kind].present? ? '' : 'active'}" %>
+      <%= link_to "All kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{params[:search_kind].present? ? '' : 'active'}" %>
 
       <div class="dropdown-divider"></div>
 
       <% Export::VALID_KINDS.each_key do |kind| %>
-        <%= link_to kind.to_s.humanize, url_for(sort_state.search_params.merge(search_kind: kind)), class: "dropdown-item #{params[:search_kind] == kind.to_s ? 'active' : ''}" %>
+        <%= link_to kind.to_s.humanize, url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{params[:search_kind] == kind.to_s ? 'active' : ''}" %>
       <% end %>
 
       <div class="dropdown-divider"></div>
 
-      <%= link_to "Avery", url_for(sort_state.search_params.merge(search_kind: "avery")), class: "dropdown-item #{params[:search_kind] == 'avery' ? 'active' : ''}" %>
+      <%= link_to "Avery", url_for(sortable_search_params.merge(search_kind: "avery")), class: "dropdown-item #{params[:search_kind] == 'avery' ? 'active' : ''}" %>
     </div>
   </li>
 
   <li class="nav-item">
-    <%= link_to "Dates", url_for(sort_state.search_params.merge(search_with_dates: !@with_dates)), class: "nav-link #{@with_dates ? 'active' : ''}" %>
+    <%= link_to "Dates", url_for(sortable_search_params.merge(search_with_dates: !@with_dates)), class: "nav-link #{@with_dates ? 'active' : ''}" %>
   </li>
 
   <li class="nav-item dropdown">
@@ -61,26 +61,26 @@
     </a>
 
     <div class="dropdown-menu">
-      <%= link_to "All registrations", url_for(sort_state.search_params.merge(search_registrations: nil)), class: "dropdown-item #{params[:search_registrations].present? ? '' : 'active'}" %>
+      <%= link_to "All registrations", url_for(sortable_search_params.merge(search_registrations: nil)), class: "dropdown-item #{params[:search_registrations].present? ? '' : 'active'}" %>
 
       <div class="dropdown-divider"></div>
 
-      <%= link_to "Registered", url_for(sort_state.search_params.merge(search_registrations: "registered")), class: "dropdown-item #{params[:search_registrations] == 'registered' ? 'active' : ''}" %>
-      <%= link_to "Incomplete", url_for(sort_state.search_params.merge(search_registrations: "incomplete")), class: "dropdown-item #{params[:search_registrations] == 'incomplete' ? 'active' : ''}" %>
+      <%= link_to "Registered", url_for(sortable_search_params.merge(search_registrations: "registered")), class: "dropdown-item #{params[:search_registrations] == 'registered' ? 'active' : ''}" %>
+      <%= link_to "Incomplete", url_for(sortable_search_params.merge(search_registrations: "incomplete")), class: "dropdown-item #{params[:search_registrations] == 'incomplete' ? 'active' : ''}" %>
 
       <%# link_to escapes the label, so writing &amp; here would double-escape %>
-      <%= link_to "Incompletes & registrations", url_for(sort_state.search_params.merge(search_registrations: "incompletes_and_registrations")), class: "dropdown-item #{params[:search_registrations] == 'incompletes_and_registrations' ? 'active' : ''}" %> <%# herb:disable html-no-unescaped-entities %>
-      <%= link_to "Specific", url_for(sort_state.search_params.merge(search_registrations: "specific")), class: "dropdown-item #{params[:search_registrations] == 'specific' ? 'active' : ''}" %>
-      <%= link_to "Impounded", url_for(sort_state.search_params.merge(search_registrations: "impounded")), class: "dropdown-item #{params[:search_registrations] == 'impounded' ? 'active' : ''}" %>
+      <%= link_to "Incompletes & registrations", url_for(sortable_search_params.merge(search_registrations: "incompletes_and_registrations")), class: "dropdown-item #{params[:search_registrations] == 'incompletes_and_registrations' ? 'active' : ''}" %> <%# herb:disable html-no-unescaped-entities %>
+      <%= link_to "Specific", url_for(sortable_search_params.merge(search_registrations: "specific")), class: "dropdown-item #{params[:search_registrations] == 'specific' ? 'active' : ''}" %>
+      <%= link_to "Impounded", url_for(sortable_search_params.merge(search_registrations: "impounded")), class: "dropdown-item #{params[:search_registrations] == 'impounded' ? 'active' : ''}" %>
     </div>
   </li>
 
   <li class="nav-item">
-    <%= link_to "Stickers", url_for(sort_state.search_params.merge(search_stickers: !@stickers)), class: "nav-link #{@stickers ? 'active' : ''}" %>
+    <%= link_to "Stickers", url_for(sortable_search_params.merge(search_stickers: !@stickers)), class: "nav-link #{@stickers ? 'active' : ''}" %>
   </li>
 
   <li class="nav-item">
-    <%= link_to "Impounded", url_for(sort_state.search_params.merge(search_impounded: !@impounded)), class: "nav-link #{@impounded ? 'active' : ''}" %>
+    <%= link_to "Impounded", url_for(sortable_search_params.merge(search_impounded: !@impounded)), class: "nav-link #{@impounded ? 'active' : ''}" %>
   </li>
 <% end %>
 

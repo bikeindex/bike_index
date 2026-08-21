@@ -43,7 +43,7 @@ module Admin
         end
 
         def user_link_path
-          # bike_link_path can be false to not link
+          # user_link_path can be false to not link
           return if @user_link_path_arg == false
           return @user_link_path_arg if @user_link_path_arg.present?
           return admin_user_path(@user_id) if @user_id.present?
