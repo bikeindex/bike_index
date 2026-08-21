@@ -24,10 +24,6 @@ RSpec.describe UI::Container::Component, type: :component do
     expect(described_class::COLUMNS.map { |columns| classes(columns:) }.join).to_not include("px-")
   end
 
-  it "renders its content" do
-    expect(render_inline(described_class.new) { "content".html_safe }).to have_content("content")
-  end
-
   it "raises on values it has no layout for" do
     expect { described_class.new(columns: 3) }.to raise_error(ArgumentError, /3/)
     expect { described_class.new(alignment: :justify) }.to raise_error(ArgumentError, /justify/)

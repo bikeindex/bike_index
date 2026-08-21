@@ -19,15 +19,8 @@ RSpec.describe Admin::InvoiceForm::Component, type: :component do
     expect(invoice.subscription_end_at).to be_nil
   end
 
-  it "renders a checkbox per feature, and the totals admin--invoice-form fills in" do
-    expect(component).to have_field("organization_feature_ids_#{organization_feature.id}", type: "checkbox")
-    expect(component).to have_link("Parking notifications")
-    %w[oneTimeCost recurringCost totalCost discountCost].each do |total|
-      expect(component).to have_css("[data-admin--invoice-form-target='#{total}']")
-    end
-  end
-
-  # The controller totals from these rather than from the DOM text
+  # admin--invoice-form totals from these rather than from the DOM text, and recurring is
+  # the inverse of the feature's own predicate
   it "gives each checkbox its amount, id and whether it recurs" do
     checkbox = component.at_css("[data-admin--invoice-form-target='feature']")
     expect(checkbox["data-amount"]).to eq organization_feature.amount.to_s

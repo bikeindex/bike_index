@@ -17,13 +17,9 @@ RSpec.describe Admin::OrganizationForm::SamlSso::Component, type: :component do
 
   let(:component) { rendered_component(organization) }
 
-  it "renders the service provider details and the SAML configuration fields" do
-    expect(component).to have_content("SAML SSO")
+  it "gives the IdP admin the service provider URLs" do
     expect(component).to have_link(href: "http://test.host/sso/#{organization.to_param}/metadata")
     expect(component).to have_link(href: "http://test.host/sso/#{organization.to_param}/sp.crt")
-    expect(component).to have_field("organization_organization_saml_configuration_attributes_idp_entity_id")
-    expect(component).to have_field("organization_organization_saml_configuration_attributes_idp_cert")
-    expect(component).to have_select("organization_organization_saml_configuration_attributes_name_id_format")
   end
 
   context "with an existing configuration" do

@@ -9,17 +9,11 @@ RSpec.describe Admin::RecordTabs::Component, type: :component do
   end
   let(:component) { render_inline(described_class.new(title: "A Thing", tabs:, nav_label: "Thing sections")) }
 
-  it "renders the title and the tabs, marking the active one" do
-    expect(component.at_css("h1").text.squish).to eq "A Thing"
-    expect(component.css(".nav-tabs .nav-link").map { |tab| tab.text.squish }).to eq %w[Show Edit]
+  # aria-current took the tab's own boolean once, so every inactive tab rendered
+  # aria-current="false" - which counts as current
+  it "marks only the active tab, in the class and in aria" do
     expect(component.css(".nav-tabs .nav-link.active").map { |tab| tab.text.squish }).to eq ["Show"]
     expect(component.css(".nav-tabs .nav-link[aria-current]").map { |tab| tab.text.squish }).to eq ["Show"]
-    expect(component.at_css("nav")["aria-label"]).to eq "Thing sections"
-  end
-
-  it "renders no links and no alert when it's given neither" do
-    expect(component.css(".admin-subnav ul .nav-item")).to be_empty
-    expect(component).not_to have_css("[role='alert']")
   end
 
   context "with a subtitle, links and an alert" do
@@ -31,8 +25,7 @@ RSpec.describe Admin::RecordTabs::Component, type: :component do
       end
     end
 
-    it "renders each of them" do
-      expect(component.at_css("h1").text.squish).to eq "A Thing Editing"
+    it "renders the links and the alert slot" do
       expect(component.css(".admin-subnav ul .nav-item a").map { |link| link.text }).to eq %w[One Two]
       expect(component).to have_content("Thing deleted")
     end

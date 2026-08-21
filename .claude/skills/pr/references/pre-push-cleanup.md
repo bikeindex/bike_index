@@ -34,6 +34,28 @@ Then review the changed files against `CLAUDE.md` (root and any nested ones in t
 
 **`bin/update_component_digests` goes after the last code edit, not before.** A `MARKUP_DIGEST` covers everything its cached tree renders out into, so editing a shared component (`UI::ActiveLink`, `UI::Button`) stales the digest of every component that renders it — `PageBlock::Navbar::Wrapper` and `PageBlock::Footer` both, for one edit — and regenerating before `/simplify`'s or the CLAUDE.md pass's own edits just means doing it twice.
 
+### The spec audit
+
+**Required, same as the comment audit below.** List the examples the branch adds:
+
+```bash
+rtk proxy git diff origin/main...HEAD -U0 -- 'spec/**/*_spec.rb' |
+  grep -E '^(\+\+\+ |\+\s*(it|scenario|specify) )'
+```
+
+Judge each one against a single question: **what bug does this fail on?** If you can't name a plausible edit that breaks the example *and* is wrong, delete it — a green assertion that can only go red when someone deliberately changes the thing it restates is a change-detector, and it costs a re-edit on every future change while catching nothing.
+
+The ones to cut, all of which have been written here:
+
+- **Framework behaviour.** `render_inline(described_class.new) { "content" }` then asserting the content rendered — that's ViewComponent's job, not the component's.
+- **Passing an argument through.** Handing the component `title:` and asserting the title appears. Nothing between the input and the output can be wrong; assert what the component *decides* instead — which tab is active, which column is dropped.
+- **A class list the template writes literally.** Pinning `class="tw:w-full tw:max-w-3xl"` re-asserts the source. The exception is a class the component *computes* — a conditional `active`, a width chosen from an argument — where the branch is the point.
+- **What a request spec already covers.** A component spec listing the fields a form renders, next to a request spec that asserts the same names, is one of them maintained for nothing. Keep the one closest to the logic.
+
+Keep, without hesitating, the ones tied to a failure mode: a conditional branch, a computed value, an argument guard that would otherwise fail silently, `it_behaves_like "cached_markup_digest"`, and any example written *because* something broke — say so in a comment above it, so the next audit doesn't mistake it for a change-detector.
+
+This applies to the branch's specs, not the suite's. Don't delete pre-existing examples you merely moved between files.
+
 ### The comment audit
 
 **Required, not conditional on the diff looking clean.** List the comments the branch adds or edits:
