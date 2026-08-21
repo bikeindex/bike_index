@@ -18,14 +18,19 @@ RSpec.describe UI::Card::Component, type: :component do
     expect(page).to have_content("in the card")
   end
 
-  context "mobile_flush" do
-    it "drops the top and side borders and the padding below md, keeping the bottom" do
-      render_inline(described_class.new(mobile_flush: true)) { "in the card" }
+  context "full_bleed" do
+    # What it drops, and the width it drops them at, are .twfullbleed's under a container
+    # query on the row - all the card owes is the class
+    it "marks the card for the row to bleed, without unsetting anything itself" do
+      render_inline(described_class.new(full_bleed: true)) { "in the card" }
 
-      expect(page).to have_css("div[class~='tw:max-md:border-x-0'][class~='tw:max-md:border-t-0'][class~='tw:max-md:px-0']")
-      # one rule below each card is what separates a stack of them
-      expect(page).to have_no_css("div[class~='tw:max-md:border-b-0']")
-      expect(page).to have_css("div[class~='tw:border'][class~='tw:p-4']")
+      expect(page).to have_css("div[class~='tw:twfullbleed'][class~='tw:border'][class~='tw:p-4']")
+    end
+
+    it "leaves the class off otherwise" do
+      render_inline(described_class.new) { "in the card" }
+
+      expect(page).to have_no_css("div[class~='tw:twfullbleed']")
     end
   end
 

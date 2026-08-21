@@ -7,18 +7,18 @@ module UI
       # A divided card's rows bring their own padding, so it has none of its own
       DIVIDED_CLASSES = "tw:rounded-xl tw:divide-y tw:divide-gray-200 tw:dark:divide-gray-700"
       UNDIVIDED_CLASSES = "tw:p-4 tw:rounded-sm"
-      # A card whose content should meet the page's own gutter rather than sit inset inside
-      # it twice over. The top goes with the sides, so a stack of these reads as one rule
-      # between each pair rather than two
-      MOBILE_FLUSH_CLASSES = "tw:max-md:border-x-0 tw:max-md:border-t-0 tw:max-md:px-0"
+      # Drops the side and top borders and the padding once the .twwiderow holding the card
+      # is down to one column - the class carries no width of its own, so a card outside
+      # such a row never bleeds
+      FULL_BLEED_CLASSES = "tw:twfullbleed"
 
       # divided: separate the direct children with row dividers, for a checklist
-      # mobile_flush: drop the top and side borders, and the padding, below md
-      def initialize(additional_classes: nil, shadow: false, divided: false, mobile_flush: false)
+      # full_bleed: meet the page's gutter once the row is single-column
+      def initialize(additional_classes: nil, shadow: false, divided: false, full_bleed: false)
         @additional_classes = additional_classes
         @shadow = shadow
         @divided = divided
-        @mobile_flush = mobile_flush
+        @full_bleed = full_bleed
       end
 
       def call
@@ -29,7 +29,7 @@ module UI
 
       def card_classes
         [BASE_CLASSES, @divided ? DIVIDED_CLASSES : UNDIVIDED_CLASSES,
-          ("tw:shadow-sm" if @shadow), (MOBILE_FLUSH_CLASSES if @mobile_flush),
+          ("tw:shadow-sm" if @shadow), (FULL_BLEED_CLASSES if @full_bleed),
           @additional_classes].compact.join(" ")
       end
     end

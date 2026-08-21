@@ -12,6 +12,18 @@
   @apply tw:text-gray-900 tw:dark:text-gray-400;
 }
 
+/* A card that meets the page's own gutter rather than sitting inset inside it twice over,
+ * once the .twwiderow holding it has dropped to one column. Keyed to the row rather than
+ * the viewport so it can't disagree with the column count - keep 672px in step with
+ * .twwiderow's minmax, where the second column stops fitting. A utility, not a class in the
+ * layer below, so it outranks the card's own tw:border and tw:p-4. */
+@utility twfullbleed {
+  @container twwiderow (width < 672px) {
+    /* px-0 forced: the card's own tw:p-4 is the padding shorthand, which wins outright */
+    @apply tw:border-x-0 tw:border-t-0 tw:px-0!;
+  }
+}
+
 @layer components {
   .twlink {
     @apply tw:text-blue-600 tw:dark:text-blue-400 tw:transition-colors;
@@ -105,8 +117,10 @@
    * 2rem in step with gap-x-8. */
   .twwiderow {
     @apply tw:grid tw:gap-x-8;
+    container: twwiderow / inline-size;
     grid-template-columns: repeat(auto-fill, minmax(max(320px, calc((100% - 2rem) / 2)), 1fr));
   }
+
 
   [aria-expanded="true"] .twdropdown-chevron {
     @apply tw:rotate-180;
