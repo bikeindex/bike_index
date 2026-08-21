@@ -1,0 +1,56 @@
+<% if @show_search_statuses %>
+  <li class="nav-item tw:text-sm">
+    <%#
+      The panel this opens is Admin::Bikes::Index::SearchStatuses, inside the search form -
+      a different branch of the skeleton, so the two talk over a window event
+    %>
+
+    <%= render(UI::Button::Component.new(text: "Search statuses", color: :secondary, size: :sm,
+          active: @not_default_statuses,
+          data: {controller: "admin--search-statuses",
+                 action: "click->admin--search-statuses#dispatchToggle"})) %>
+  </li>
+<% end %>
+
+<li class="nav-item tw:text-sm">
+  <%= render(UI::ActiveLink::Component.new(text: "motorized", html_class: "nav-link", match: :query,
+        query: {search_motorized: true},
+        path: url_for(search_params.merge(search_motorized: !@motorized)))) %>
+</li>
+
+<li class="nav-item tw:text-sm">
+  <%= render(UI::ActiveLink::Component.new(text: "multi-delete", html_class: "nav-link", match: :query,
+        query: {search_multi_delete: true},
+        path: url_for(search_params.merge(search_multi_delete: !@multi_delete)))) %>
+</li>
+
+<li class="nav-item tw:text-sm">
+  <%= render(UI::ActiveLink::Component.new(text: "Unknown Mnfgs", html_class: "nav-link",
+        path: missing_manufacturer_admin_bikes_path)) %>
+</li>
+
+<li class="nav-item tw:text-sm">
+  <%= render(UI::Dropdown::Component.new(name: origin_name, button_size: :sm,
+        active: !any_origin_active?)) do |dropdown|
+    dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Any Origin", match: :query, query: {search_origin: nil}, path: url_for(search_params.merge(search_origin: nil))) }
+    dropdown.with_entry_divider
+    Ownership.origins.each do |origin|
+      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: origin.humanize, match: :query, query: {search_origin: origin}, path: origin_path(origin)) }
+    end
+  end %>
+</li>
+
+<li class="nav-item tw:text-sm">
+  <%= render(UI::Dropdown::Component.new(name: pos_name, button_size: :sm,
+        active: @pos_search_type.present?)) do |dropdown|
+    Admin::Bikes::Index::Filters::Component::POS_TYPES.each do |value, label|
+      dropdown.with_entry_divider if value == "any_pos"
+      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: label, match: :query, query: {search_pos: value}, path: pos_path(value)) }
+    end
+    dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "any (POS or not)", match: :query, query: {search_pos: nil}, path: url_for(search_params.merge(search_pos: nil))) }
+  end %>
+</li>
+
+<li class="nav-item tw:text-sm">
+  <%= link_to "Detailed graphs", graphs_path, class: "nav-link" %>
+</li>

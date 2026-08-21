@@ -1,0 +1,43 @@
+<div
+  class="tw:mb-2 <%= "tw:hidden" unless @not_default_statuses %>"
+  data-controller="admin--search-statuses"
+  data-action="admin--search-statuses:toggle@window->admin--search-statuses#toggle
+               change->admin--search-statuses#lock"
+>
+  <p class="tw:mb-1"><em>Include bikes that are:</em></p>
+
+  <div class="twfieldrow">
+    <div>
+      <% Admin::Bikes::Index::SearchStatuses::Component::PLAIN_STATUSES.each do |status, label| %>
+        <%= render(UI::Forms::Checkbox::Component.new(name: :"search_status_#{status}",
+              label: label || with_owner_label, checked: searched?(status))) %>
+      <% end %>
+    </div>
+
+    <div>
+      <% Admin::Bikes::Index::SearchStatuses::Component::ONLY_STATUSES.each do |status, label| %>
+        <% if only?(status) %>
+          <%= render(UI::Forms::Checkbox::Component.new(name: :"search_status_#{status}_only",
+                label: safe_join([label, tag.strong("Only")], " "), checked: true)) %>
+        <% else %>
+          <div class="tw:flex tw:items-baseline tw:gap-2">
+            <%= render(UI::Forms::Checkbox::Component.new(name: :"search_status_#{status}",
+                  label:, checked: searched?(status))) %>
+
+            <%= link_to "only", only_path(status), class: "twlink tw:text-sm" %>
+
+            <% if status == "spam" && spam_note? %>
+              <small class="twless-strong">on by default because <code>su_option</code></small>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+
+      <% if @not_default_statuses %>
+        <div class="tw:mt-1 tw:text-right tw:text-sm">
+          <%= link_to "reset to default statuses", reset_path, class: "twlink" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

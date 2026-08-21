@@ -1,102 +1,10 @@
 <% show_search_statuses = !@ignored_only %>
 
 <% nav_header_list_items = capture do %>
-  <% if show_search_statuses %>
-    <li class="nav-item">
-      <a
-        class="nav-link <%= @not_default_statuses ? "active" : "" %>"
-        id="showStatusesSearch"
-        href="#"
-      >
-        Search statuses
-      </a>
-    </li>
-  <% end %>
-
-  <li class="nav-item">
-    <%= link_to "motorized", url_for(sortable_search_params.merge(search_motorized: !@motorized)), class: "nav-link #{@motorized ? 'active' : ''}" %>
-  </li>
-
-  <li class="nav-item">
-    <%= link_to "multi-delete", url_for(sortable_search_params.merge(search_multi_delete: !@multi_delete)), class: "nav-link #{@multi_delete ? 'active' : ''}" %>
-  </li>
-
-  <li class="nav-item">
-    <%= link_to "Unknown Mnfgs", missing_manufacturer_admin_bikes_path, class: "nav-link #{@unknown ? 'active' : ''}" %>
-  </li>
-
-  <li class="nav-item">
-    <% any_origin_active = @origin_search_type.blank? %>
-
-    <a
-      class="nav-link dropdown-toggle <%= any_origin_active ? "" : "active" %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <% if any_origin_active %>
-        Origin
-      <% else %>
-        <%= @origin_search_type.humanize %>
-      <% end %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "Any Origin", url_for(sortable_search_params.merge(search_origin: nil)), class: "dropdown-item #{any_origin_active ? 'active' : ''}" %>
-
-      <div class="dropdown-divider"></div>
-
-      <% Ownership.origins.each do |origin| %>
-        <% origin_active = @origin_search_type == origin %>
-        <%= link_to origin.humanize, url_for(sortable_search_params.merge(search_origin: origin_active ? nil : origin)), class: "dropdown-item #{origin_active ? 'active' : ''}" %>
-      <% end %>
-    </div>
-  </li>
-
-  <li class="nav-item">
-    <a
-      class="nav-link dropdown-toggle <%= @pos_search_type.present? ? "active" : "" %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <% if @pos_search_type == "any_pos" %>
-        POS of any type
-      <% elsif @pos_search_type.present? %>
-        <%= @pos_search_type.humanize %>
-      <% else %>
-        POS
-      <% end %>
-    </a>
-
-    <div class="dropdown-menu">
-      <% ascend_active = @pos_search_type == "ascend_pos" %>
-      <%= link_to "Ascend", url_for(sortable_search_params.merge(search_pos: ascend_active ? nil : "ascend_pos")), class: "dropdown-item #{ascend_active ? 'active' : ''}" %>
-      <% lightspeed_active = @pos_search_type == "lightspeed_pos" %>
-      <%= link_to "Lightspeed", url_for(sortable_search_params.merge(search_pos: lightspeed_active ? nil : "lightspeed_pos")), class: "dropdown-item #{lightspeed_active ? 'active' : ''}" %>
-
-      <div class="dropdown-divider"></div>
-      <% any_pos_active = @pos_search_type == "any_pos" %>
-      <%= link_to "POS of any type", url_for(sortable_search_params.merge(search_pos: any_pos_active ? nil : "any_pos")), class: "dropdown-item #{any_pos_active ? 'active' : ''}" %>
-      <% no_pos_active = @pos_search_type == "no_pos" %>
-
-      <%= link_to url_for(sortable_search_params.merge(search_pos: no_pos_active ? nil : "no_pos")), class: "dropdown-item #{no_pos_active ? 'active' : ''}" do %>
-        <strong>Not</strong> POS
-      <% end %>
-
-      <%= link_to "any (POS or not)", url_for(sortable_search_params.merge(search_pos: nil)), class: "dropdown-item #{@pos_search_type.blank? ? 'active' : ''}" %>
-    </div>
-  </li>
-
-  <li class="nav-item">
-    <%# If looking at year or all period, graphs aren't detailed %>
-    <% search_period = %w[all year].include?(@period) ? "month" : @period %>
-    <%= link_to "Detailed graphs", admin_graphs_path(sortable_search_params.merge(search_kind: "bikes", period: search_period)), class: "nav-link" %>
-  </li>
+  <%= render(Admin::Bikes::Index::Filters::Component.new(index: admin_index_state, motorized: @motorized,
+        multi_delete: @multi_delete, unknown: @unknown, origin_search_type: @origin_search_type,
+        pos_search_type: @pos_search_type, not_default_statuses: @not_default_statuses,
+        show_search_statuses:, period: @period)) %>
 <% end %>
 
 <% rendered_chart = nil %>
@@ -109,8 +17,8 @@
 <% end %>
 
 <% admin_search_form = capture do %>
-  <div class="row mt-4">
-    <div class="col-md-6 order-2 order-md-1">
+  <div class="twwiderow tw:mt-4">
+    <div>
       <% if current_organization.present? %>
         <p>
           <% if params[:search_only_creation_organization].present? %>
@@ -131,7 +39,7 @@
         <p>
           Viewing only <strong>ignored</strong> bikes
           <em>(deleted, test, spam)</em>
-          <%= link_to "view not ignored bikes", url_for(sortable_search_params.merge(search_ignored: false)), class: "gray-link small" %>
+          <%= link_to "view not ignored bikes", url_for(sortable_search_params.merge(search_ignored: false)), class: "twlink tw:text-sm" %>
         </p>
       <% end %>
 
@@ -139,7 +47,7 @@
         <p>
           Viewing only bikes <strong>sent to</strong>
           <code><%= @search_email %></code>
-          <%= link_to "view sent to any emails", url_for(sortable_search_params.merge(search_email: nil)), class: "gray-link small" %>
+          <%= link_to "view sent to any emails", url_for(sortable_search_params.merge(search_email: nil)), class: "twlink tw:text-sm" %>
         </p>
       <% end %>
 
@@ -147,7 +55,7 @@
         <p>
           Viewing only bikes <strong>from the domain</strong>
           <code><%= @search_domain %></code>
-          <%= link_to "view sent to any domain", url_for(sortable_search_params.merge(search_domain: nil)), class: "gray-link small" %>
+          <%= link_to "view sent to any domain", url_for(sortable_search_params.merge(search_domain: nil)), class: "twlink tw:text-sm" %>
         </p>
       <% end %>
 
@@ -159,7 +67,7 @@
           <% else %>
             <code>ID: <%= params[:search_model_audit_id] %></code>
           <% end %>
-          <%= link_to "view for any model audit", url_for(sortable_search_params.merge(search_model_audit_id: nil)), class: "gray-link small" %>
+          <%= link_to "view for any model audit", url_for(sortable_search_params.merge(search_model_audit_id: nil)), class: "twlink tw:text-sm" %>
         </p>
       <% end %>
 
@@ -170,10 +78,10 @@
             <%= link_to @doorkeeper_app.name, oauth_application_path(@doorkeeper_app) %>
           <% else %>
             <code>ID: <%= params[:search_doorkeeper_app_id] %></code>
-            <span class="less-strong">(no app with that ID)</span>
+            <span class="twless-strong">(no app with that ID)</span>
           <% end %>
-          <%= link_to "view for any API Application", url_for(sortable_search_params.merge(search_doorkeeper_app_id: nil)), class: "gray-link small" %>
-          <em class="less-strong tw:text-xs">
+          <%= link_to "view for any API Application", url_for(sortable_search_params.merge(search_doorkeeper_app_id: nil)), class: "twlink tw:text-sm" %>
+          <em class="twless-strong tw:text-xs">
             NOTE: only tracked since
             <span class="localizeTime"><%= START_TRACKING_REGISTRATION_APP_ID_AT %></span>
           </em>
@@ -184,7 +92,7 @@
         <p>
           Viewing only bikes <strong>with normalized serials matching</strong>
           <code><%= @serial_normalized %></code>
-          <%= link_to "view with any serial", url_for(sortable_search_params.merge(serial: nil)), class: "gray-link small" %>
+          <%= link_to "view with any serial", url_for(sortable_search_params.merge(serial: nil)), class: "twlink tw:text-sm" %>
         </p>
       <% end %>
 
@@ -194,7 +102,7 @@
             Made by
             <%= link_to @manufacturer.name, admin_manufacturer_path(@manufacturer) %>
             <% if @manufacturer.official_organization.present? %>
-              <small class="less-strong">
+              <small class="twless-strong">
                 (view
                 <%= link_to "official org", admin_organization_path(@manufacturer.official_organization.to_param) %>)
               </small>
@@ -204,12 +112,12 @@
             <code><%= params[:search_manufacturer] %></code>
           <% end %>
 
-          <%= link_to "view all manufacturer bikes", url_for(sortable_search_params.merge(search_manufacturer: nil)), class: "gray-link small" %>
+          <%= link_to "view all manufacturer bikes", url_for(sortable_search_params.merge(search_manufacturer: nil)), class: "twlink tw:text-sm" %>
         </p>
       <% end %>
     </div>
 
-    <div class="col-md-6 order-1 order-md-2">
+    <div>
       <%= form_tag admin_bikes_path, method: :get do %>
         <%= render partial: "/shared/hidden_search_fields", locals: {include_primary_activity: true} %>
 
@@ -218,27 +126,24 @@
         <%= hidden_field_tag :search_only_creation_organization, params[:search_only_creation_organization] %>
 
         <% if show_search_statuses %>
-          <%= render partial: "/admin/bikes/search_statuses" %>
+          <%= render(Admin::Bikes::Index::SearchStatuses::Component.new(index: admin_index_state,
+                searched_statuses: @searched_statuses, default_statuses: @default_statuses,
+                not_default_statuses: @not_default_statuses, display_dev_info: display_dev_info?,
+                spam_by_su_option: current_user.su_option?(:no_hide_spam))) %>
         <% end %>
 
-        <div class="form-inline">
-          <div class="form-group ml-auto mr-1 mb-2">
-            <%= text_field_tag :serial, params[:serial], placeholder: "Find by serial", class: "form-control" %>
-          </div>
+        <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-2">
+          <%= text_field_tag :serial, params[:serial], placeholder: "Find by serial", class: "twinput tw:w-auto" %>
 
-          <div class="form-group mr-1 mb-2">
-            <%= text_field_tag :search_phone, params[:search_phone], placeholder: "Find by phone", class: "form-control" %>
-          </div>
+          <%= text_field_tag :search_phone, params[:search_phone], placeholder: "Find by phone", class: "twinput tw:w-auto" %>
 
-          <div class="form-group mr-1 mb-2">
-            <% if @search_domain.present? %>
-              <%= text_field_tag :search_domain, @search_domain, placeholder: "Search bikes by domain", class: "form-control" %>
-            <% else %>
-              <%= text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by email", class: "form-control" %>
-            <% end %>
-          </div>
+          <% if @search_domain.present? %>
+            <%= text_field_tag :search_domain, @search_domain, placeholder: "Search bikes by domain", class: "twinput tw:w-auto" %>
+          <% else %>
+            <%= text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by email", class: "twinput tw:w-auto" %>
+          <% end %>
 
-          <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
+          <%= render(UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search")) %>
         </div>
       <% end %>
     </div>
