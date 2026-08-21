@@ -49,6 +49,13 @@ Scope it rather than running bare `bin/lint`: a whole-repo run reformats files o
 
 Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesheets/legacy_includes/_css_layers.scss`), which sorts below tailwind's `components` and `utilities`. So a `UI::*` component rendered inside legacy-styled markup **wins over the surrounding stylesheet's rules for every property its own classes set** — `UI::Button`'s `tw:inline-flex`, `tw:p-0` and `twlink` beat `.primary-header-nav`'s `display`, `padding` and `color` no matter how specific those selectors are.
 
+**Admin is the exception, and it inverts the rule.** `app/assets/stylesheets/admin.scss` imports `legacy_includes/admin_unvendored` *outside* its `@layer legacy` block, so those rules are unlayered and beat every tailwind utility whatever the specificity. On an admin page a utility that collides with one needs `!` — and without it the class is inert, not merely outranked: `tw:-mb-px` on `.nav-tabs` looked like it was doing the work `.nav { margin-bottom: 0 }` was actually overriding. Check `getComputedStyle` rather than assuming the class landed.
+
+## Two Tailwind v4 traps
+
+- **`tw:mx-(--var)` generates nothing.** The bare-parenthesis shorthand for a CSS variable doesn't compile under this setup; `tw:mx-[var(--gutter)]` does. Both look right in a template, and the one that doesn't work fails silently — grep `app/assets/builds/tailwind.css` for the escaped class after `bin/rails tailwindcss:build`.
+- **A grid item stretches to its row.** For a `<div>` that's invisible, but a bare `<table>` grid item spreads the extra height across its own rows, so two `table-list` panels side by side pull each other's rows tall. `tw:items-start` on the grid, or wrap the table in a `<div>`.
+
 ## Buttons: always `UI::Button` (and the UI component library generally)
 
 **Every button goes through `UI::Button::Component`** — never a hand-rolled `<button>`, `button_to`, or submit input with ad-hoc Tailwind classes. The component centralizes colors (`:primary`/`:secondary`/`:error`/`:purple`/`:link` — its `COLORS` is the list of record), sizes (`:sm`/`:md`/`:lg`), and the focus/active/dark-mode states; a hand-styled button silently drifts from all of that the next time the design changes.
