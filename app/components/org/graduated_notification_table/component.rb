@@ -5,8 +5,9 @@ module Org
     class Component < ApplicationComponent
       include Binxtils::SortableHelper
 
-      def initialize(graduated_notifications:, current_organization:, render_sortable: false, render_remaining_at: false, skip_status: false, skip_email: false, skip_email_search: nil, separate_secondary_notifications: false)
+      def initialize(graduated_notifications:, current_organization:, display_dev_info: false, render_sortable: false, render_remaining_at: false, skip_status: false, skip_email: false, skip_email_search: nil, separate_secondary_notifications: false)
         @graduated_notifications = graduated_notifications
+        @display_dev_info = display_dev_info
         @current_organization = current_organization
         @render_sortable = render_sortable
         @render_remaining_at = render_remaining_at

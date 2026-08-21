@@ -24,9 +24,9 @@ RSpec.describe Org::Search::Form::Component, type: :component do
   end
 
   context "with interpreted_params values" do
-    let(:component) { with_request_url("/?search_email=test@example.com") { render_inline(instance) } }
     let(:interpreted_params) do
       {
+        search_email: "test@example.com",
         raw_serial: "ABC123",
         serial: "ABC123",
         search_stickers: "sticker1",

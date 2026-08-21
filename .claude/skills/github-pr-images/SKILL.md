@@ -174,7 +174,7 @@ Write the comment body to a temp file — the caller's, or, when you're composin
 ```
 
 - If `$SCREENSHOT_COMMENT_ID` is empty: `gh pr comment $PR_NUMBER --body-file <tmp-comment-file>`.
-- Otherwise: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -F body=@<tmp-comment-file> --jq .html_url`. `-F` is what reads a file when the value starts with `@`; `-f` is a raw string field and would clobber the comment with the literal `@<file>`. Re-verify after: `gh api repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID --jq .body | head`.
+- Otherwise: `gh api -X PATCH repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID -F body=@<tmp-comment-file> --jq .html_url`. `-F` is what reads a file when the value starts with `@`; `-f` is a raw string field and would clobber the comment with the literal `@<file>`. Give it an **absolute** path — `gh` resolves `@` against the shell's cwd, not the repo root, and fails with "no such file or directory" if an earlier `cd` moved it. Re-verify after: `gh api repos/{owner}/{repo}/issues/comments/$SCREENSHOT_COMMENT_ID --jq .body | head`.
 
 Only edit the PR description instead when the user explicitly asks for it:
 ```bash

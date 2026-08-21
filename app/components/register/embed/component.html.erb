@@ -2,7 +2,7 @@
 
 <html lang="<%= I18n.locale %>">
   <head>
-    <%= render(PageBlock::HeaderTags::Component.new(**helpers.header_tags_component_options)) %>
+    <%= render(PageBlock::HeaderTags::Component.new(**@header_tags_options)) %>
 
     <%# The frame's src is crawlable from the embedding page, and it self-canonicalizes %>
     <%= tag.meta name: "robots", content: "noindex" %>
