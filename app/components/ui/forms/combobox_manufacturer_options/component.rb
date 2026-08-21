@@ -8,8 +8,9 @@ module UI
       # synthetic "Unknown manufacturer" option that free text is entered through.
       # Sibling to the form control; this is the turbo-stream response backing it.
       class Component < ApplicationComponent
-        def initialize(matches:, next_page:, q: nil, no_manufacturer_other: false)
+        def initialize(matches:, next_page:, first_page:, q: nil, no_manufacturer_other: false)
           @matches = matches
+          @first_page = first_page
           @next_page = next_page
           @q = q.presence
           @no_manufacturer_other = no_manufacturer_other
@@ -38,7 +39,7 @@ module UI
         end
 
         def unknown_manufacturer?
-          return false if @no_manufacturer_other || @q.blank? || !helpers.hw_first_page?
+          return false if @no_manufacturer_other || @q.blank? || !@first_page
 
           manufacturer_matches.none? { |match| match["text"].casecmp?(@q) }
         end

@@ -2,7 +2,7 @@
   <div class="form-well-header container" data-template="<%= @edit_template %>">
     <% unless @bike.version? %>
       <%# Show alerts if bike is impounded or has current notifications %>
-      <%= helpers.render partial: "/bikes/owner_bike_status_alerts" %>
+      <%= render partial: "/bikes/owner_bike_status_alerts" %>
     <% end %>
 
     <div class="edit-bike-header">

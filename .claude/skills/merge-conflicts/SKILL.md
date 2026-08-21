@@ -68,6 +68,7 @@ When git leaves `<<<<<<<` / `=======` / `>>>>>>>` markers:
 - **Ask when it isn't clear-cut.** If you can't confidently tell which side should win, or the two changes are semantically entangled, stop and ask the user rather than guessing. A wrong silent resolution is worse than a question.
 - **Both sides added at the same spot? Order matters.** Keeping both isn't enough when either block has side effects. If the incoming block ends by reloading the page, anything of yours that depends on unsaved state has to come *after* it — concatenated the other way it still passes while testing nothing.
 - **Don't blanket-replace a renamed string.** Two call sites that shared a string can have legitimately diverged; `sed`-ing the whole file changes the one that shouldn't move.
+- **A conflicted `MARKUP_DIGEST` has no side to pick.** Both branches bumped it because both edited the cached markup, so neither literal describes the merge. Take either, then run `bin/update_component_digests` and commit what it writes. Expect these on any component with a digest, and on components whose digest covers a tree the other side edited — the constant that conflicts is often not in a file you touched.
 - After resolving, verify the result actually makes sense — the merged code should reflect both intents, not just parse. Run the relevant tests if the conflict touched logic.
 
 ## The dangerous part is what merged *cleanly*
@@ -88,6 +89,15 @@ This is what it catches, all of which has actually happened here:
 - **Another branch's change riding along.** A retention window, a flag, a tweak that came in when you merged a sibling branch and the base never took. Not yours to carry; reset it.
 - **Committed churn in generated files.** `git checkout --` reverts to HEAD, not to the base — so once churn is committed it survives every later revert. Check VCR cassettes and lockfiles specifically; a diff that's only timestamps/nonces should be reset to the base.
 - **Your side calling an API the base deleted.** Nothing conflicts: your file is untouched by the merge and the base's deletion lands cleanly, so the break is a `NoMethodError` at load. Fix it in the commit after the merge, never in it.
+
+## Extracting a slice of another branch: `git checkout <branch> -- <file>` overwrites, it doesn't merge
+
+Pulling part of a feature branch into a fresh one takes the file *whole*, so for anything `main` has moved since that branch last merged, you silently revert the newer work — no conflict, no warning. List the overlap first, and hand-apply those hunks:
+
+```bash
+MB=$(git merge-base origin/main origin/<branch>)
+comm -12 <(git diff --name-only $MB origin/main | sort) <(git diff --name-only $MB origin/<branch> | sort)
+```
 
 ## Run the linter, not just the specs
 

@@ -56,15 +56,12 @@ RSpec.describe Registrations::Show::OrgTopActions::Wrapper::Component, :js, type
   context "with a parking notification" do
     let!(:parking_notification) { FactoryBot.create(:parking_notification, organization:) }
 
-    # ParkingNotificationDetails calls display_dev_info? - the canary for a preview
-    # reaching the controller helpers
     it "renders the notification, through helpers the preview has to supply" do
       visit preview_path
 
       within(scenario("With parking notification")) { click_button "View Notifications" }
 
       expect(page).to have_content("Parked incorrectly notification")
-      # display_dev_info? is what supplies the id, and it's off for this viewer
       expect(page).to have_content("Notification#")
       expect_axe_clean
     end

@@ -7,9 +7,10 @@ module Registrations
         # Accordion panel opened from the org-admin "View notifications" action — a
         # summary of the bike's current parking notification, with a link to all
         class Component < ApplicationComponent
-          def initialize(bike:, organization:)
+          def initialize(bike:, organization:, display_dev_info: false)
             @bike = bike
             @organization = organization
+            @display_dev_info = display_dev_info
           end
 
           private
