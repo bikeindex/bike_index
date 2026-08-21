@@ -30,8 +30,18 @@ class SamlController < ApplicationController
     redirect_to_saml(configured_saml_configuration)
   end
 
+  # A rehearsal of the login the organization's users will get, minus the sign-in: the form
+  # collects the address to sign in with so the result can say whether the IdP asserted it.
   def test
-    redirect_to_saml(configured_inactive_saml_configuration, mode: Saml::RequestStore::TEST_MODE)
+    render_test_form(configured_inactive_saml_configuration)
+  end
+
+  def test_start
+    saml_configuration = configured_inactive_saml_configuration
+    email = EmailNormalizer.normalize(params[:email])
+    return render_test_form(saml_configuration, email:, error: "Enter the email address to sign in with") if email.blank?
+
+    redirect_to_saml(saml_configuration, mode: Saml::RequestStore::TEST_MODE, expected_email: email)
   end
 
   # Assertion Consumer Service: validate the IdP's response and sign the user in.
@@ -49,7 +59,9 @@ class SamlController < ApplicationController
 
     result = Saml::AssertionProcessor.call(saml_configuration:,
       raw_response: params[:SAMLResponse], request_id: saml_request[:request_id], dry_run: test_mode)
-    return render_test_result(saml_configuration, result) if test_mode
+    if test_mode
+      return render_test_result(saml_configuration, result, expected_email: saml_request[:expected_email])
+    end
     return saml_failure(result.error) unless result.success?
 
     session[:return_to] = saml_request[:return_to]
@@ -91,17 +103,30 @@ class SamlController < ApplicationController
     configured_saml_configuration
   end
 
-  def redirect_to_saml(saml_configuration, mode: Saml::RequestStore::NORMAL_MODE)
+  def redirect_to_saml(saml_configuration, mode: Saml::RequestStore::NORMAL_MODE, expected_email: nil)
     settings = Saml::SettingsBuilder.build(saml_configuration)
     auth_request = OneLogin::RubySaml::Authrequest.new
+    # This leg is same-site, so the session is readable here; the callback's isn't, so where
+    # the user was headed has to travel with the rest of the transaction
     relay_state = Saml::RequestStore.create(request_id: auth_request.request_id,
-      org_slug: params[:org_slug], return_to: session[:return_to], mode:)
+      org_slug: params[:org_slug], return_to: session[:return_to], mode:, expected_email:)
     redirect_to auth_request.create(settings, RelayState: relay_state), allow_other_host: true
   end
 
-  def render_test_result(saml_configuration, result)
+  def render_test_form(saml_configuration, email: nil, error: nil)
+    render_test_page(Saml::Test::Component.new(organization: saml_configuration.organization,
+      email:, error:))
+  end
+
+  def render_test_result(saml_configuration, result, expected_email:)
+    render_test_page(Saml::Test::Component.new(organization: saml_configuration.organization,
+      result:, email: expected_email))
+  end
+
+  def render_test_page(component)
+    @page_title = "SAML configuration test"
     response.headers["X-Robots-Tag"] = "noindex, nofollow"
-    render Saml::Test::Component.new(organization: saml_configuration.organization, result:)
+    render component
   end
 
   def saml_failure(message)

@@ -26,8 +26,8 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
     [saml_request_id_from_redirect(location), Rack::Utils.parse_query(URI(location).query)["RelayState"]]
   end
 
-  def initiate_test_login
-    get "/sso/#{slug}/test"
+  def initiate_test_login(test_email: email)
+    post "/sso/#{slug}/test", params: {email: test_email}
     expect(response).to have_http_status(:found)
     location = response.headers["Location"]
     [saml_request_id_from_redirect(location), Rack::Utils.parse_query(URI(location).query)["RelayState"]]
@@ -44,8 +44,8 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
                                            RelayState: (relay_state == :from_init) ? initiated_relay_state : relay_state}
   end
 
-  def post_test_callback(**overrides)
-    request_id, relay_state = initiate_test_login
+  def post_test_callback(test_email: email, **overrides)
+    request_id, relay_state = initiate_test_login(test_email:)
     params = {audience: settings.sp_entity_id, recipient: settings.assertion_consumer_service_url,
               in_response_to: request_id, issuer: saml_configuration.idp_entity_id, email:}.merge(overrides)
     post "/sso/#{slug}/callback", params: {SAMLResponse: signed_saml_response(**params), RelayState: relay_state}
@@ -87,10 +87,27 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
     context "configuration inactive" do
       let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :configured, organization:) }
 
-      it "redirects to the IdP" do
+      it "renders the form rather than leaving for the IdP" do
         get "/sso/#{slug}/test"
+        expect(response).to have_http_status(:ok)
+        expect(response.headers["X-Robots-Tag"]).to eq "noindex, nofollow"
+        expect(response.body).to include("SAML configuration test")
+        expect(Capybara.string(response.body))
+          .to have_css("form[action='/sso/#{slug}/test'] input[name=email]")
+      end
+
+      it "leaves for the IdP once the form is submitted" do
+        post "/sso/#{slug}/test", params: {email:}
         expect(response).to have_http_status(:found)
         expect(response.headers["Location"]).to start_with(saml_configuration.idp_sso_target_url)
+      end
+
+      it "re-renders the form without an email, having nothing to compare the assertion against" do
+        post "/sso/#{slug}/test", params: {email: " "}
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("Enter the email address to sign in with")
+        expect(Capybara.string(response.body))
+          .to have_css("form[action='/sso/#{slug}/test'] input[name=email]")
       end
     end
 
@@ -99,6 +116,11 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
 
       it "is not found" do
         get "/sso/#{slug}/test"
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "is not found for the form submission either" do
+        post "/sso/#{slug}/test", params: {email:}
         expect(response).to have_http_status(:not_found)
       end
     end
@@ -380,6 +402,13 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
         expect(diagnostic_value("Matching account has a password")).to eq "Yes"
       end
 
+      it "reports that the IdP released an address other than the one entered" do
+        post_test_callback(test_email: "someoneelse@#{domain}")
+        expect(response).to have_http_status(:ok)
+        expect(diagnostic_value("Address entered")).to eq "someoneelse@#{domain}"
+        expect(diagnostic_value("Asserted email")).to include "the IdP released a different address"
+      end
+
       it "reports a malformed email without provisioning" do
         malformed_email = "attacker@evil.com@#{domain}"
 
@@ -390,9 +419,12 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
       end
 
       it "does not show assertion fields when signature validation fails" do
-        expect { post_test_callback(tamper: true) }.not_to change(User, :count)
+        # a different address than the assertion carries, so echoing the form back
+        # can't be mistaken for the assertion having been read
+        expect { post_test_callback(test_email: "typed@#{domain}", tamper: true) }.not_to change(User, :count)
         expect(response).to have_http_status(:ok)
         expect(response.body).to include("Invalid SAML Response")
+        expect(diagnostic_value("Address entered")).to eq "typed@#{domain}"
         expect(response.body).not_to include(email)
       end
     end

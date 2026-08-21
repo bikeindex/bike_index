@@ -15,9 +15,11 @@ module Saml
     # intercepted RelayState is worthless by the time it's used.
     TTL = 10.minutes
 
-    def create(request_id:, org_slug:, return_to: nil, mode: NORMAL_MODE)
+    def create(request_id:, org_slug:, return_to: nil, mode: NORMAL_MODE, expected_email: nil)
       SecureRandom.urlsafe_base64(24).tap do |token|
-        RedisPool.conn { |r| r.set(key(token), [org_slug, request_id, return_to, mode].join(SEPARATOR), ex: TTL.to_i) }
+        RedisPool.conn do |r|
+          r.set(key(token), [org_slug, request_id, return_to, mode, expected_email].join(SEPARATOR), ex: TTL.to_i)
+        end
       end
     end
 
@@ -29,8 +31,9 @@ module Saml
       raw = RedisPool.conn { |r| r.getdel(key(token)) }
       return nil if raw.blank?
 
-      org_slug, request_id, return_to, mode = raw.split(SEPARATOR, 4)
-      {org_slug:, request_id:, return_to: return_to.presence, mode: mode.presence || NORMAL_MODE}
+      org_slug, request_id, return_to, mode, expected_email = raw.split(SEPARATOR, 5)
+      {org_slug:, request_id:, return_to: return_to.presence, mode: mode.presence || NORMAL_MODE,
+       expected_email: expected_email.presence}
     end
 
     #

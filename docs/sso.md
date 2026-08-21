@@ -9,7 +9,7 @@ them in. Everything is per-organization and slug-scoped:
 | `/sso/<slug>/metadata` | our SP metadata — the URL you hand an IdP admin |
 | `/sso/<slug>/sp.crt` | the SP certificate alone, for IdP tooling that wants a file |
 | `/sso/<slug>/init` | SP-initiated login |
-| `/sso/<slug>/test` | signed-assertion diagnostic flow; configured but inactive only |
+| `/sso/<slug>/test` | diagnostic sign-in form; configured but inactive only |
 | `/sso/<slug>/callback` | Assertion Consumer Service |
 
 All of them 404 unless the organization has the `saml_sso` feature. Metadata and certificate
@@ -225,12 +225,13 @@ Review apps and sandbox get their own throwaway keypair, not production's.
 create: it has no accounts and no per-SP registration, reading the ACS URL and audience
 straight out of the AuthnRequest.
 
-Keep the configuration inactive while testing. Open `/sso/<slug>/test` to start the flow; the
-callback validates the signed assertion and shows its NameID, attributes, email domain, and
-matching account without provisioning or signing anyone in. The test endpoint is available only
-for a complete, inactive configuration. Activate SAML only when the diagnostic result is correct;
-`/sso/<slug>/init` is the live sign-in path and can provision an account even while the
-configuration is inactive.
+Keep the configuration inactive while testing. `/sso/<slug>/test` is a form: enter the address
+you'll sign in with, and it starts the same transaction `init` does. The callback then validates
+the signed assertion and reports its NameID, attributes, email domain, matching account, and
+whether the IdP released the address you entered — provisioning nobody and signing nobody in.
+The endpoint is available only for a complete, inactive configuration. Activate SAML only once
+the result is correct; `/sso/<slug>/init` is the live sign-in path and can provision an account
+even while the configuration is inactive.
 
 | Bike Index field | Value |
 |---|---|
@@ -244,13 +245,13 @@ as `<username>@<domain>` with `id` / `email` / `firstName` / `lastName` attribut
 names, not the OIDs a university IdP sends, so the NameID fallback is what carries the email
 unless you set the attribute to `email`.
 
-**Last verified 8/15** against mocksaml over real HTTPS, before `/sso/<slug>/test` existed: a
-first login provisioned and confirmed a new account, a second on the same address reused it, and
-a third linked to a pre-existing account. That covers the signed AuthnRequest, the cross-site
-POST, RelayState claim, signature validation and `InResponseTo` matching — every leg the test
-flow shares with `init`. The test flow itself has only been exercised by specs, and neither run
-covers encryption: mocksaml publishes only a signing key and never ingests an SP certificate, so
-it structurally cannot encrypt to us.
+**Last verified 8/21** against the local Keycloak IdP: `/sso/<slug>/test` on a configured,
+inactive organization redirected to the IdP, and the callback reported a matching NameID,
+released attributes, and `(none)` for the account — with no user or `SsoIdentity` created. An
+earlier 8/15 run against mocksaml covered the live `init` path end to end: a first login
+provisioned and confirmed an account, a second reused it, a third linked a pre-existing one.
+Neither run covers encryption — mocksaml publishes only a signing key and never ingests an SP
+certificate, so it structurally cannot encrypt to us.
 
 **Don't test IdP-initiated login.** Starting at the IdP produces an assertion with no
 `InResponseTo` and the callback rejects it. That is deliberate replay protection.
@@ -270,8 +271,8 @@ The reason is the real one — ruby-saml's validation errors are passed through,
 
 A configured but inactive organization is excluded from automatic email-domain routing. A direct
 `/sso/<slug>/init` transaction still reaches the normal callback, which can provision or link an
-account. Use `/sso/<slug>/test` for integration validation while the configuration is inactive;
-it reaches the same callback but never provisions or signs anyone in.
+account. Use the `/sso/<slug>/test` form for integration validation while the configuration is
+inactive; it reaches the same callback but never provisions or signs anyone in.
 
 | Reason | Cause |
 |---|---|
