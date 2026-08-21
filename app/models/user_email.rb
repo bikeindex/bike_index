@@ -106,7 +106,7 @@ class UserEmail < ActiveRecord::Base
     return false if token != confirmation_token
 
     update_attribute :confirmation_token, nil
-    Users::MergeAdditionalEmailJob.perform_async(id)
+    UserJobs::MergeAdditionalEmailJob.perform_async(id)
     true
   end
 

@@ -25,7 +25,7 @@
           - unless skip_user
             %td
               = cache(feedback.user) do
-                = render Admin::UserCell::Component.new(email: feedback.email, user: feedback.user, render_search: render_sortable)
+                = render Admin::Users::Cell::Component.new(email: feedback.email, user: feedback.user, render_search: render_sortable)
             %td
               = feedback.name
           %td

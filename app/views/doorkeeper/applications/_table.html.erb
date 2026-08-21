@@ -77,7 +77,7 @@
               <% cache(application.owner) do %>
                 <%# Pass in search_url because caching breaks with url_for %>
                 <% search_url = oauth_applications_path(user_id: application.owner_id, search_all: true) %>
-                <%= render Admin::UserCell::Component.new(user: application.owner, user_id: application.owner_id, search_url:) %>
+                <%= render Admin::Users::Cell::Component.new(user: application.owner, user_id: application.owner_id, search_url:) %>
               <% end %>
             </td>
 

@@ -21,7 +21,7 @@
           <td>Sender</td>
 
           <td>
-            <%= render Admin::UserCell::Component.new(user: @marketplace_message.sender, user_id: @marketplace_message.sender_id) %>
+            <%= render Admin::Users::Cell::Component.new(user: @marketplace_message.sender, user_id: @marketplace_message.sender_id) %>
 
             <small class="tw:ml-2">
               <% sender_count = MarketplaceMessage.where(sender_id: @marketplace_message.sender_id).count %>
@@ -38,7 +38,7 @@
           <td>Receiver</td>
 
           <td>
-            <%= render Admin::UserCell::Component.new(user: @marketplace_message.receiver, user_id: @marketplace_message.receiver_id) %>
+            <%= render Admin::Users::Cell::Component.new(user: @marketplace_message.receiver, user_id: @marketplace_message.receiver_id) %>
 
             <small class="tw:ml-2">
               <% receiver_count = MarketplaceMessage.where(sender_id: @marketplace_message.receiver_id).count %>

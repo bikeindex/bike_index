@@ -19,7 +19,7 @@
           <td>Seller</td>
 
           <td>
-            <%= render Admin::UserCell::Component.new(user: @sale.seller, user_id: @sale.seller_id) %>
+            <%= render Admin::Users::Cell::Component.new(user: @sale.seller, user_id: @sale.seller_id) %>
           </td>
         </tr>
 
@@ -28,7 +28,7 @@
 
           <td>
             <% if @sale.buyer.present? %>
-              <%= render Admin::UserCell::Component.new(user: @sale.buyer, user_id: @sale.buyer&.id) %>
+              <%= render Admin::Users::Cell::Component.new(user: @sale.buyer, user_id: @sale.buyer&.id) %>
             <% else %>
               <span class="less-strong"><%= @sale.new_owner_email %></span>
             <% end %>

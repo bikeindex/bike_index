@@ -11,7 +11,7 @@
 
   <% table.column(sortable: "user_id") do |update| %>
     <% if update.user_id.present? %>
-      <%= render Admin::UserCell::Component.new(user: update.user, render_search: true) %>
+      <%= render Admin::Users::Cell::Component.new(user: update.user, render_search: true) %>
     <% end %>
   <% end %>
 

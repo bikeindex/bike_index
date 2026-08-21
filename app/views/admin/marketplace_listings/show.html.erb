@@ -27,7 +27,7 @@
           <td>Seller</td>
 
           <td>
-            <%= render Admin::UserCell::Component.new(user: @marketplace_listing.seller, user_id: @marketplace_listing.seller_id) %>
+            <%= render Admin::Users::Cell::Component.new(user: @marketplace_listing.seller, user_id: @marketplace_listing.seller_id) %>
           </td>
         </tr>
 
@@ -36,7 +36,7 @@
             <td>Buyer</td>
 
             <td>
-              <%= render Admin::UserCell::Component.new(user: @marketplace_listing.buyer, user_id: @marketplace_listing.buyer_id) %>
+              <%= render Admin::Users::Cell::Component.new(user: @marketplace_listing.buyer, user_id: @marketplace_listing.buyer_id) %>
             </td>
           </tr>
         <% end %>

@@ -28,7 +28,7 @@ class ApplicationComponent < ViewComponent::Base
     private
 
     # This component's own files, plus the markup of every component they render, followed
-    # transitively — an admin cell renders Admin::UserCell, which renders
+    # transitively — an admin cell renders Admin::Users::Cell, which renders
     # Admin::Badges::User, which renders UI::Badge, and any of the three going stale is
     # the same bug.
     def markup_files

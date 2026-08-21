@@ -61,14 +61,14 @@
 
           <td>
             <% cache(sale.seller) do %>
-              <%= render Admin::UserCell::Component.new(user: sale.seller, render_search: true) %>
+              <%= render Admin::Users::Cell::Component.new(user: sale.seller, render_search: true) %>
             <% end %>
           </td>
 
           <td>
             <% if sale.buyer.present? %>
               <% cache(sale.buyer) do %>
-                <%= render Admin::UserCell::Component.new(user: sale.buyer, render_search: true) %>
+                <%= render Admin::Users::Cell::Component.new(user: sale.buyer, render_search: true) %>
               <% end %>
             <% else %>
               <small class="less-strong">
