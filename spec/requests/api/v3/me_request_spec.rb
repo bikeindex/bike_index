@@ -30,10 +30,10 @@ RSpec.describe "Me API V3", type: :request do
            icon: "bike",
            children: [
              {type: "link", label: "Search Registrations", path: "/o/#{organization.slug}/registrations",
-              icon: nil, match: "controller_action", matching_controllers: []}
+              icon: nil}
            ]},
           {type: "link", label: "Add a bike", path: "/o/#{organization.slug}/bikes/new",
-           icon: "plus-circle", match: "full_path", matching_controllers: []}
+           icon: "plus-circle", match_params: {parking_notification: "blank"}}
         ]
       end
       let(:target_membership) do

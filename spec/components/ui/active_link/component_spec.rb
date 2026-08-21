@@ -14,10 +14,10 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     expect(link.text).to eq "Help"
     expect(link.attributes).to_not have_key("class")
     expect(link["data-controller"]).to eq "ui--active-link"
-    expect(link["data-ui--active-link-match-value"]).to eq "path"
-    # :path compares the URL the browser is already on, so there's no route to compare
-    expect(link.attributes).to_not have_key("data-ui--active-link-routes-value")
-    expect(link.attributes).to_not have_key("data-ui--active-link-query-value")
+    expect(link["data-ui--active-link-match-paths-value"]).to eq "/help"
+    # Naming no params is what leaves the page's own ignored
+    expect(link.attributes).to_not have_key("data-ui--active-link-match-params-value")
+    expect(link.attributes).to_not have_key("data-ui--active-link-exact-params-value")
   end
 
   context "with a class" do
@@ -29,123 +29,121 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
   end
 
   # The controller can't read the constant, so the copy in it drifts silently otherwise
-  it "keeps the browser's ROUTE_MATCHES list in step with its own" do
+  it "keeps the browser's BLANK in step with its own" do
     js = Rails.root.join("app/javascript/controllers/ui/active_link_controller.js").read
-    expect(js[/const ROUTE_MATCHES = \[(.*?)\]/m, 1].scan(/'([a-z_]+)'/).flatten)
-      .to eq described_class::ROUTE_MATCHES.map(&:to_s)
+    expect(js[/const BLANK = '(\w+)'/, 1]).to eq described_class::BLANK
   end
 
-  # Only :path can say "page" — the widened matches go active on a page the link doesn't
-  # point at, so they say "true"
-  describe "match" do
-    context ":full_path" do
-      let(:path) { "/o/example/bikes/new?parking_notification=true" }
-      let(:options) { {match: :full_path} }
+  describe "match_paths" do
+    context "with an href carrying an origin, params and an anchor" do
+      let(:path) { "http://test.host/search/registrations?stolenness=all#results" }
 
-      it "compares in the browser, like :path" do
-        expect(link["data-ui--active-link-match-value"]).to eq "full_path"
-        expect(link.attributes).to_not have_key("data-ui--active-link-routes-value")
+      it "falls back to the page it points at, which is none of them" do
+        expect(link["data-ui--active-link-match-paths-value"]).to eq "/search/registrations"
+        expect(link["href"]).to eq path
       end
     end
 
-    context ":controller" do
-      let(:path) { "/news" }
-      let(:options) { {match: :controller} }
+    context "with patterns of its own" do
+      let(:options) { {match_paths: ["/o/example/registration_sequences/**", "/bikes/*/edit"]} }
 
-      it "carries the link's own route, which the page's is compared against" do
-        expect(link["data-ui--active-link-match-value"]).to eq "controller"
-        expect(link["data-ui--active-link-routes-value"]).to eq "news"
-      end
-
-      context "with matching_controllers" do
-        let(:options) { {match: :controller, matching_controllers: ["organized/registration_sequence_pages"]} }
-
-        it "adds them to the routes the browser compares" do
-          expect(link["data-ui--active-link-routes-value"])
-            .to eq "news organized/registration_sequence_pages"
-        end
+      it "carries them in place of the href's page" do
+        expect(link["data-ui--active-link-match-paths-value"])
+          .to eq "/o/example/registration_sequences/** /bikes/*/edit"
       end
     end
 
-    context ":controller_action" do
-      let(:path) { "/search/registrations?stolenness=all" }
-      let(:options) { {match: :controller_action} }
+    context "with an origin in a pattern" do
+      let(:options) { {match_paths: ["http://test.host/news/**"]} }
 
-      it "carries the route the params are dropped from" do
-        expect(link["data-ui--active-link-match-value"]).to eq "controller_action"
-        expect(link["data-ui--active-link-routes-value"]).to eq "search/registrations#index"
+      it "drops it, since a pattern is compared against a pathname" do
+        expect(link["data-ui--active-link-match-paths-value"]).to eq "/news/**"
       end
     end
 
-    context ":query" do
-      let(:path) { "/o/example/impound_records" }
-      let(:options) { {match: :query, query: {search_status: "resolved"}} }
+    context "with a relative pattern" do
+      let(:options) { {match_paths: ["news/**"]} }
 
-      it "carries the params the browser compares the page's against" do
-        expect(link["data-ui--active-link-match-value"]).to eq "query"
-        expect(link["data-ui--active-link-query-value"]).to eq({search_status: ["resolved"]}.to_json)
-        expect(link.attributes).to_not have_key("data-ui--active-link-routes-value")
-      end
-
-      # An entry that's the fallback a controller reaches for is in force with the param
-      # absent, which is "" once the browser reads it off the URL
-      context "with a nil among the values" do
-        let(:options) { {match: :query, query: {search_status: ["current", nil]}} }
-
-        it "renders it as the empty string" do
-          expect(link["data-ui--active-link-query-value"])
-            .to eq({search_status: ["current", ""]}.to_json)
-        end
-      end
-
-      context "with a bare nil" do
-        let(:options) { {match: :query, query: {search_deleted: nil}} }
-
-        it "renders the one empty string, rather than no values at all" do
-          expect(link["data-ui--active-link-query-value"]).to eq({search_deleted: [""]}.to_json)
-        end
+      it "raises rather than comparing it against a path that always leads with /" do
+        expect { component }.to raise_error(ArgumentError, %r{must start with /})
       end
     end
 
-    context "with matching_controllers on a match that can't use them" do
-      let(:options) { {match: :controller_action, matching_controllers: ["news"]} }
+    # A route helper interpolated into a pattern carries the locale param
+    context "with a pattern built around a helper's params" do
+      let(:options) { {match_paths: ["/news?locale=nl/**"]} }
 
-      it "raises rather than rendering entries the browser will never compare" do
-        expect { component }.to raise_error(ArgumentError, /matching_controllers/)
+      it "drops them, leaving the rest of the pattern where it was written" do
+        expect(link["data-ui--active-link-match-paths-value"]).to eq "/news/**"
       end
     end
 
-    context "with query on a match that can't use it" do
-      let(:options) { {match: :full_path, query: {search_status: "all"}} }
+    # The ambassador menu's Discuss row, which the browser rules out on the origin instead
+    context "with an href that has no path of its own" do
+      let(:path) { "https://discuss.bikeindex.org" }
 
-      it "raises rather than rendering params the browser will never compare" do
-        expect { component }.to raise_error(ArgumentError, /query/)
+      it "roots it, rather than falling back to nothing" do
+        expect(link["data-ui--active-link-match-paths-value"]).to eq "/"
       end
     end
 
-    context "with match: :query and nothing to compare" do
-      let(:options) { {match: :query} }
+    context "with ** anywhere but the end" do
+      let(:options) { {match_paths: ["/o/**/exports"]} }
 
-      it "raises rather than going active on every page" do
-        expect { component }.to raise_error(ArgumentError, /query/)
+      it "raises rather than matching only what a single * would" do
+        expect { component }.to raise_error(ArgumentError, /\*\* only ends/)
+      end
+    end
+  end
+
+  describe "match_params" do
+    let(:options) { {match_params: {search_status: "resolved"}} }
+
+    it "carries the params the browser compares the page's against" do
+      expect(link["data-ui--active-link-match-params-value"]).to eq({search_status: ["resolved"]}.to_json)
+    end
+
+    # An entry that's the fallback a controller reaches for is in force with the param absent
+    context "with BLANK among the values" do
+      let(:options) { {match_params: {search_status: ["current", described_class::BLANK]}} }
+
+      it "carries it alongside them" do
+        expect(link["data-ui--active-link-match-params-value"])
+          .to eq({search_status: ["current", "blank"]}.to_json)
       end
     end
 
-    context "with a path that isn't a route" do
-      let(:path) { "/not-a-route" }
-      let(:options) { {match: :controller} }
+    context "with a value that isn't a string" do
+      let(:options) { {match_params: {parking_notification: true}} }
 
-      it "renders no route, so the link never goes active" do
-        expect(link.attributes).to_not have_key("data-ui--active-link-routes-value")
+      it "renders it as one, since that's what the browser reads off the URL" do
+        expect(link["data-ui--active-link-match-params-value"])
+          .to eq({parking_notification: ["true"]}.to_json)
       end
     end
 
-    context "with an unknown match" do
-      let(:options) { {match: :nonsense} }
+    context "with nil in place of BLANK" do
+      let(:options) { {match_params: {search_deleted: nil}} }
 
-      it "raises" do
-        expect { component }.to raise_error(ArgumentError, /match/)
+      it "raises rather than rendering a param with no values, which never matches" do
+        expect { component }.to raise_error(ArgumentError, /blank/)
       end
+    end
+
+    context "with an empty list of values" do
+      let(:options) { {match_params: {search_deleted: []}} }
+
+      it "raises too" do
+        expect { component }.to raise_error(ArgumentError, /blank/)
+      end
+    end
+  end
+
+  describe "exact_params" do
+    let(:options) { {exact_params: true} }
+
+    it "carries the flag, so the browser leaves the page room for no params of its own" do
+      expect(link["data-ui--active-link-exact-params-value"]).to eq "true"
     end
   end
 
@@ -155,18 +153,19 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     let(:item) { {type: :link, label: "Help", path: "/help"} }
     let(:component) { render_inline(described_class.from_item(item, **options)) }
 
-    it "fills in the match, and renders no class" do
+    it "falls back to the item's own path, and renders no class" do
       expect(link["href"]).to eq "/help"
       expect(link.text).to eq "Help"
-      expect(link["data-ui--active-link-match-value"]).to eq "path"
+      expect(link["data-ui--active-link-match-paths-value"]).to eq "/help"
       expect(link.attributes).to_not have_key("class")
       expect(link.attributes).to_not have_key("id")
     end
 
     context "with the keys a menu item can carry" do
       let(:item) do
-        {type: :link, label: "Blog", path: "/news", match: :controller,
-         matching_controllers: ["blogs"], id: "navBlog", data: {email: "party@bikeindex.org"}}
+        {type: :link, label: "Blog", path: "/news", match_paths: ["/news/**"],
+         match_params: {sort: "recent"}, exact_params: true, id: "navBlog",
+         data: {email: "party@bikeindex.org"}}
       end
       let(:options) { {html_class: "nav-link"} }
 
@@ -174,7 +173,9 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
         expect(link["class"]).to eq "nav-link"
         expect(link["id"]).to eq "navBlog"
         expect(link["data-email"]).to eq "party@bikeindex.org"
-        expect(link["data-ui--active-link-routes-value"]).to eq "news blogs"
+        expect(link["data-ui--active-link-match-paths-value"]).to eq "/news/**"
+        expect(link["data-ui--active-link-match-params-value"]).to eq({sort: ["recent"]}.to_json)
+        expect(link["data-ui--active-link-exact-params-value"]).to eq "true"
       end
     end
 

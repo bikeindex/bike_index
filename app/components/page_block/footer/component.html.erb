@@ -19,7 +19,7 @@
               </li>
 
               <li>
-                <%= render UI::ActiveLink::Component.new(text: translation(".register_a_bike"), path: register_path, match: :controller) %>
+                <%= render UI::ActiveLink::Component.new(text: translation(".register_a_bike"), path: register_path, match_paths: "#{register_path}/**") %>
               </li>
 
               <li>
@@ -27,7 +27,7 @@
               </li>
 
               <li>
-                <%= render UI::ActiveLink::Component.new(text: translation(".blog"), path: news_index_path, match: :controller) %>
+                <%= render UI::ActiveLink::Component.new(text: translation(".blog"), path: news_index_path, match_paths: "#{news_index_path}/**") %>
               </li>
 
               <li>

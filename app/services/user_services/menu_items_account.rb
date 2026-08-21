@@ -6,7 +6,7 @@
 #
 # Item shapes are UserServices::MenuItemsOrg's, so the two menus read alike:
 #   {type: :divider}
-#   {type: :link, label:, path:, icon:, match:, matching_controllers:, id:, data:, danger:}
+#   {type: :link, label:, path:, icon:, match_paths:, match_params:, id:, data:, danger:}
 #   {type: :disabled, label:}
 module UserServices
   module MenuItemsAccount
@@ -58,7 +58,8 @@ module UserServices
     def account_rows(current_user, user)
       [link(translation(:your_registrations), routes.my_account_path),
         marketplace_messages(current_user),
-        link(translation(:register_a_new_bike), routes.register_path, match: :controller),
+        link(translation(:register_a_new_bike), routes.register_path,
+          match_paths: "#{routes.register_path}/**"),
         link(translation(:user_settings, user_email: user.email), routes.edit_my_account_path,
           id: "navUserSettingLink", data: {email: user.email})].compact
     end
@@ -81,8 +82,8 @@ module UserServices
         .filter_map(&:organization).first(SWITCHER_ORGANIZATIONS)
     end
 
-    def link(label, path, icon: nil, match: :path, matching_controllers: [], **attributes)
-      {type: :link, label:, path:, icon:, match:, matching_controllers:, **attributes}
+    def link(label, path, icon: nil, **attributes)
+      {type: :link, label:, path:, icon:, **attributes}
     end
 
     # organization_id=false is what clears the one held in the session. The homepage is where

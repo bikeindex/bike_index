@@ -3,16 +3,29 @@ import { Controller } from '@hotwired/stimulus'
 // Rails' current_page? ignores a trailing slash on either side
 const trimSlash = (path) => path.length > 1 ? path.replace(/\/$/, '') : path
 
-const controllerOf = (route) => route.split('#')[0]
+const segmentsOf = (path) => trimSlash(path).split('/')
 
-// UI::ActiveLink::Component::ROUTE_MATCHES — the rest compare the URL
-const ROUTE_MATCHES = ['controller', 'controller_action']
+// UI::ActiveLink::Component::BLANK
+const BLANK = 'blank'
+
+// '*' stands for one segment and a trailing '**' for the rest, so /bikes/*/edit can't span a
+// slash and /o/x/exports/** covers the index it's rooted at as well as everything below it
+const matchesPath = (pattern, path) => {
+  const patternSegments = segmentsOf(pattern)
+  const pathSegments = segmentsOf(path)
+  const stopped = patternSegments.findIndex((segment, index) =>
+    segment === '**' || (segment === '*' ? !pathSegments[index] : segment !== pathSegments[index]))
+
+  if (stopped === -1) return patternSegments.length === pathSegments.length
+
+  return patternSegments[stopped] === '**'
+}
 
 // Connects to data-controller='ui--active-link'
 // Renders UI::ActiveLink::Component's aria-current, which the server can't: these links are
 // cached fragments, so the markup is shared by every page it was rendered for.
 export default class extends Controller {
-  static values = { match: String, routes: String, query: Object }
+  static values = { matchPaths: String, matchParams: Object, exactParams: Boolean }
 
   connect () {
     if (!this.isActive()) return this.element.removeAttribute('aria-current')
@@ -24,56 +37,46 @@ export default class extends Controller {
     this.dispatch('current')
   }
 
-  get routeMatch () {
-    return ROUTE_MATCHES.includes(this.matchValue)
-  }
-
-  get queryMatch () {
-    return this.matchValue === 'query'
-  }
-
-  // "page" is reserved for the link whose own URL is the current one. A widened match means
-  // the current page sits inside what the link points at, not that it is it -- aria-current's
-  // "true", so a reader isn't told a link elsewhere is where it already is
-  ariaCurrent () {
-    return (this.routeMatch || this.queryMatch) ? 'true' : 'page'
-  }
-
   isActive () {
-    if (this.queryMatch) return this.queryMatches()
-
-    return this.routeMatch ? this.routeMatches() : this.pathMatches()
+    return this.sameOrigin() && this.coversPath() && this.paramsMatch()
   }
 
-  // Mirrors current_page?: the query string counts when the link carries one, so a search
-  // link stays active on page 2. full_path counts it either way.
-  pathMatches () {
-    const url = new URL(this.element.href, window.location.href)
-    // Off-site, the page can never be what the link points at
-    if (url.origin !== window.location.origin) return false
-    if (url.search || this.matchValue === 'full_path') {
-      return url.pathname + url.search === window.location.pathname + window.location.search
-    }
-
-    return trimSlash(url.pathname) === trimSlash(window.location.pathname)
+  // Off-site, the page can never be one the link covers
+  sameOrigin () {
+    return new URL(this.element.href, window.location.href).origin === window.location.origin
   }
 
-  // The entry already in force links away from itself, to clear the filter, so its own href
-  // can't be what's compared -- only the params it names, with '' for one the URL leaves out
-  queryMatches () {
+  // Space-separated, since a path can't carry a space and JSON would escape every quote
+  get patterns () {
+    return this.matchPathsValue.split(' ')
+  }
+
+  coversPath () {
+    return this.patterns.some((pattern) => matchesPath(pattern, window.location.pathname))
+  }
+
+  // A link naming no params ignores the query string; exactParams then leaves it room for none
+  paramsMatch () {
     const current = new URLSearchParams(window.location.search)
 
-    return Object.entries(this.queryValue)
-      .every(([param, values]) => values.includes(current.get(param) ?? ''))
+    return (!this.exactParamsValue || this.noExtraParams(current)) &&
+      Object.entries(this.matchParamsValue).every(([param, values]) => values.some((value) =>
+        (value === BLANK) ? !current.get(param) : value === current.get(param)))
   }
 
-  // The page's route comes off the body, since only the server can resolve one. A link whose
-  // own path didn't resolve renders no routes, and matches nothing rather than falling back.
-  routeMatches () {
-    const pageRoute = document.body.dataset.pageRoute
-    if (!pageRoute || !this.hasRoutesValue) return false
+  // A param the URL leaves empty is one the page doesn't carry, the way BLANK reads it
+  noExtraParams (current) {
+    return [...current].every(([param, value]) =>
+      !value || Object.hasOwn(this.matchParamsValue, param))
+  }
 
-    return this.routesValue.split(' ')
-      .includes(this.matchValue === 'controller_action' ? pageRoute : controllerOf(pageRoute))
+  // "page" is reserved for the link whose own path is the current one. A wildcard, or params
+  // the link stands for rather than points at, means the page sits inside what it covers --
+  // aria-current's "true", so a reader isn't told a link elsewhere is where they already are
+  ariaCurrent () {
+    const isPage = !this.hasMatchParamsValue && this.patterns.some((pattern) =>
+      !pattern.includes('*') && trimSlash(pattern) === trimSlash(window.location.pathname))
+
+    return isPage ? 'page' : 'true'
   }
 }

@@ -20,21 +20,19 @@ module PageBlock
             {label: translation(".help"), path: help_path},
             {label: translation(".stolen_bike"), path: get_your_stolen_bike_back_path},
             {label: translation(".donate"), path: why_donate_path},
-            {label: translation(".blog"), path: news_index_path, match: :controller},
+            {label: translation(".blog"), path: news_index_path, match_paths: "#{news_index_path}/**"},
             marketplace_item("d-lg-block"),
             search_item("d-none d-lg-block")]
         end
 
-        # Active anywhere in the registration search — any stolenness, a query, page 2 — so the
-        # route is what matches, not the stolenness this happens to link to
+        # Active anywhere in the registration search — any stolenness, a query, page 2 — which
+        # naming no match_params gets: the stolenness this happens to link to isn't compared
         def search_item(item_class)
-          {label: translation(".search"), path: helpers.default_bike_search_path,
-           match: :controller_action, item_class:}
+          {label: translation(".search"), path: helpers.default_bike_search_path, item_class:}
         end
 
         def marketplace_item(item_class)
-          {label: translation(".marketplace"), path: search_marketplace_path,
-           match: :controller_action, item_class:}
+          {label: translation(".marketplace"), path: search_marketplace_path, item_class:}
         end
 
         def account_items
