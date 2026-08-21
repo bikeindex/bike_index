@@ -14,6 +14,30 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
       expect(session[:partner]).to be_nil
       expect(flash).to be_blank
     end
+    # A native app hands OAuth to a webview, then the magic link opens in the phone's browser,
+    # which has none of that session — so the authorize URL has to travel in the link itself
+    context "signing in with a magic link opened in another browser" do
+      let(:user) { FactoryBot.create(:user_confirmed, passwordless_user: true) }
+
+      it "resumes the authorization" do
+        get authorization_url
+        ActionMailer::Base.deliveries = []
+        Sidekiq::Testing.inline! do
+          post "/session/identify", params: {session: {email: user.email}}
+        end
+        emailed_url = ActionMailer::Base.deliveries.last.body.parts.first.decoded[%r{https?://\S+/session/magic_link\S*}]
+        expect(emailed_url).to include CGI.escape("client_id=#{doorkeeper_app.uid}")
+
+        reset! # Wipe the session, as opening the link in a different browser does
+        get emailed_url
+        hidden_fields = Capybara.string(response.body).all("form input[type=hidden]", visible: :all)
+          .to_h { |input| [input[:name], input[:value]] }.except("authenticity_token")
+        expect(hidden_fields["return_to"]).to match(/#{doorkeeper_app.uid}/)
+
+        post "/session/sign_in_with_magic_link", params: hidden_fields
+        expect(response).to redirect_to(/#{doorkeeper_app.uid}/)
+      end
+    end
     context "partner parameter" do
       it "redirects to sign in with the partners parameter included" do
         get "#{authorization_url}&partner=bikehub"

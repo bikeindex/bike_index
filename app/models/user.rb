@@ -430,13 +430,16 @@ class User < ApplicationRecord
     true
   end
 
-  def send_magic_link_email
+  # return_to travels in the emailed link because the link is often opened somewhere
+  # else (a native app hands OAuth to a webview, the email opens in Safari), where
+  # the session holding the pending destination isn't there to be read
+  def send_magic_link_email(return_to: nil)
     # If the auth token was just created, don't create a new one, it's too error prone
     return true if auth_token_time("magic_link_token") > Time.current - 1.minutes
 
     update_auth_token("magic_link_token")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    Email::MagicLoginLinkJob.perform_async(id)
+    Email::MagicLoginLinkJob.perform_async(id, return_to)
   end
 
   # Unlike send_magic_link_email, reuses an unexpired token and sends no email

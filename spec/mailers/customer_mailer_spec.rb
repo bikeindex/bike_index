@@ -64,6 +64,12 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.tag).to eq "magic_login_link_email"
       expect(mail.deliver_now.text_part.body.to_s).to include(user.magic_link_token).and include("Sign in")
     end
+
+    it "carries return_to, for a link opened in a browser without the session" do
+      user.update_auth_token("magic_link_token")
+      mail = CustomerMailer.magic_login_link_email(user, return_to: "/oauth/authorize?client_id=xYz")
+      expect(mail.body.encoded).to match(CGI.escape("/oauth/authorize?client_id=xYz"))
+    end
   end
 
   describe "additional_email_confirmation" do
