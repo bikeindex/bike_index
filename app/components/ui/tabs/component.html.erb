@@ -1,5 +1,10 @@
+<%#
+  twgutter-bleed rather than w-full: the row scrolls the whole width of the page, and a
+  width:100% border box with negative margins would slide left instead of bleeding both sides
+%>
+
 <nav
-  class="tw:w-full tw:overflow-x-auto"
+  class="twgutter-bleed tw:overflow-x-auto"
   aria-label="<%= @nav_label %>"
   data-controller="ui--tabs"
 >
