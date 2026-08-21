@@ -55,7 +55,7 @@
             <% bike = sale.ownership&.bike %>
 
             <% if bike.present? %>
-              <%= render Admin::BikeCell::Component.new(bike: bike, bike_id: bike.id) %>
+              <%= render Admin::Bikes::Cell::Component.new(bike: bike, bike_id: bike.id) %>
             <% end %>
           </td>
 

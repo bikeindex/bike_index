@@ -78,7 +78,7 @@
             </td>
 
             <td class="item-cell">
-              <%= render Admin::BikeCell::Component.new(bike: marketplace_listing.item, bike_id: marketplace_listing.item_id, bike_link_path: bike_path(marketplace_listing.item_id, show_marketplace_preview: true), search_url: admin_marketplace_listings_path(search_bike_id: marketplace_listing.item_id)) %>
+              <%= render Admin::Bikes::Cell::Component.new(bike: marketplace_listing.item, bike_id: marketplace_listing.item_id, bike_link_path: bike_path(marketplace_listing.item_id, show_marketplace_preview: true), search_url: admin_marketplace_listings_path(search_bike_id: marketplace_listing.item_id)) %>
             </td>
 
             <td>

@@ -427,7 +427,7 @@
 </h4>
 
 <% if @bikes_count > 0 %>
-  <%= render Admin::BikesTable::Component.new(bikes: @bikes, skip_user: true) %>
+  <%= render Admin::Bikes::Table::Component.new(bikes: @bikes, skip_user: true) %>
 <% end %>
 
 <h4 class="mt-4">

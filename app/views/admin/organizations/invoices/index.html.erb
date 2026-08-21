@@ -1,6 +1,6 @@
 <%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :invoices)) %>
 
-<%= render(Admin::InvoicesTable::Component.new(invoices: @invoices)) %>
+<%= render(Admin::Invoices::Table::Component.new(invoices: @invoices)) %>
 
 <h2 class="mt-5">
   <%= @organization.name %> has

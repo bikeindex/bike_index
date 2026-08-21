@@ -31,4 +31,4 @@
   </p>
 <% end %>
 
-<%= render(Admin::InvoicesTable::Component.new(invoices: @organization.invoices.order(id: :desc).limit(3), skip_discount_due: true)) %>
+<%= render(Admin::Invoices::Table::Component.new(invoices: @organization.invoices.order(id: :desc).limit(3), skip_discount_due: true)) %>

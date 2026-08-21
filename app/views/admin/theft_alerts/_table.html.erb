@@ -78,7 +78,7 @@
 
           <% unless skip_bike %>
             <td>
-              <%= render Admin::BikeCell::Component.new(bike: theft_alert.bike, bike_id: theft_alert.bike_id) %>
+              <%= render Admin::Bikes::Cell::Component.new(bike: theft_alert.bike, bike_id: theft_alert.bike_id) %>
             </td>
           <% end %>
 

@@ -78,7 +78,7 @@
         <td><small><%= impound_record.location&.name %></small></td>
 
         <td>
-          <%= render Admin::BikeCell::Component.new(bike: impound_record.bike, bike_id: impound_record.bike_id) %>
+          <%= render Admin::Bikes::Cell::Component.new(bike: impound_record.bike, bike_id: impound_record.bike_id) %>
         </td>
 
         <td>

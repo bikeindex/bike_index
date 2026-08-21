@@ -12,4 +12,4 @@
   <%= link_to "org bikes view", organization_registrations_path(organization_id: @organization.to_param), class: "gray-link tw:ml-auto" %>
 </div>
 
-<%= render Admin::BikesTable::Component.new(bikes: @bikes) %>
+<%= render Admin::Bikes::Table::Component.new(bikes: @bikes) %>

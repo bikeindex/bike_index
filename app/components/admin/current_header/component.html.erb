@@ -40,7 +40,7 @@
         <em>Marketplace Listing <%= render(Admin::Badges::MarketplaceListing::Component.new(status: marketplace_listing_subject.status, status_humanized: marketplace_listing_subject.status_humanized, kind: :marketplace_listing)) %> #<%= marketplace_listing_subject.id %>,</em>
 
 
-        <%= render Admin::BikeCell::Component.new(bike: marketplace_listing_subject.item, bike_id: marketplace_listing_subject.item_id) %>
+        <%= render Admin::Bikes::Cell::Component.new(bike: marketplace_listing_subject.item, bike_id: marketplace_listing_subject.item_id) %>
       <% else %>
         <span class="<%= error_text_class %>">
           Marketplace #<%= @params[:search_marketplace_listing_id] %>

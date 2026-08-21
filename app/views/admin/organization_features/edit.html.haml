@@ -18,4 +18,4 @@
   %span.less-strong
     = number_display(@invoices.active.count)
     active
-= render(Admin::InvoicesTable::Component.new(invoices: @invoices, display_organization: true))
+= render(Admin::Invoices::Table::Component.new(invoices: @invoices, display_organization: true))

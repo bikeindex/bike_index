@@ -40,7 +40,7 @@
           <td><small><%= bike_version.name&.truncate(30) %></small></td>
 
           <td>
-            <%= render Admin::BikeCell::Component.new(bike: bike_version.bike, bike_id: bike_version.bike_id) %>
+            <%= render Admin::Bikes::Cell::Component.new(bike: bike_version.bike, bike_id: bike_version.bike_id) %>
           </td>
 
           <td>
