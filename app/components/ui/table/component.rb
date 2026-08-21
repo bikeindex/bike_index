@@ -18,6 +18,8 @@ module UI
         @columns = []
       end
 
+      # A cell block is instance_exec'd here, so it can't reach the calling component's
+      # methods - a caller that needs one binds it to a local first
       def column(label: nil, sortable: nil, sort_indicator: nil, classes: nil, header_classes: nil, lower_right: nil, &block)
         @columns << UI::TableColumn::Component.new(label:, sortable:, sort_indicator:, classes:, header_classes:, lower_right:, &block)
         nil

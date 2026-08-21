@@ -8,7 +8,7 @@
     <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :street_2, kind: :text_field, label_text: translation(".street_2"))) %>
   <% end %>
 
-  <div class="tw:grid tw:grid-cols-2 tw:gap-x-2">
+  <div class="twfieldrow">
     <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :city, kind: :text_field, label_text: translation(".city"), required: @required)) %>
 
     <div
@@ -31,7 +31,7 @@
     </div>
   </div>
 
-  <div class="tw:grid tw:grid-cols-2 tw:gap-x-2">
+  <div class="twfieldrow">
     <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :postal_code, kind: :text_field, label_text: translation(".postal_code"), required: @required)) %>
 
     <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :country_id, label_text: translation(".country"), required: @required)) do %>
