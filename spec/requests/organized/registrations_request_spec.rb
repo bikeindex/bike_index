@@ -245,15 +245,13 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     context "claimed_ownerships without bike_search" do
       let(:enabled_feature_slugs) { %w[claimed_ownerships] }
 
-      it "renders the claimedness dropdown, defaulting to all" do
+      it "renders the claimedness dropdown defaulting to all, and filters by it" do
         get base_url
         expect(response.status).to eq(200)
         expect(response).to render_template :index
         expect(assigns(:search_claimedness)).to eq "all"
         expect(assigns(:bikes).pluck(:id)).to match_array([bike.id])
-      end
 
-      it "filters by search_claimedness" do
         get base_url, params: {search_claimedness: "initial"}
         expect(response.status).to eq(200)
         expect(assigns(:search_claimedness)).to eq "initial"
