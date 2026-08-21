@@ -5,16 +5,15 @@ require "rails_helper"
 RSpec.describe UI::Tabs::Component, type: :component do
   let(:tabs) do
     [{label: "Show", href: "/things/1", active: true},
-      {label: "Duplicates", href: "/things/1/duplicates", count: 3, classes: "only-dev-visible"}]
+      {label: "Duplicates", href: "/things/1/duplicates", count: 3}]
   end
   let(:component) { render_inline(described_class.new(tabs:, nav_label: "Thing sections")) }
 
-  it "marks only the active tab, gives a tab only the count and classes it has, and leaves turbo alone" do
+  it "marks only the active tab, counts only a tab that has one, and leaves turbo alone" do
     # "page" rather than the tab's own boolean - aria-current="false" counts as current
     expect(component.css("a[aria-current]").map { |tab| tab.text.squish }).to eq ["Show"]
     expect(component.css("a").last.text.squish).to eq "Duplicates 3"
     expect(component.css("a").first.css("small")).to be_empty
-    expect(component.css("a").map { |tab| tab["class"].include?("only-dev-visible") }).to eq [false, true]
     # Turbo Drive is off app-wide and opted into per element, so a shared component that
     # switched it on by default would turn it on wherever it was dropped. Absent rather than
     # "false": Turbo reads any value but that as opt-in

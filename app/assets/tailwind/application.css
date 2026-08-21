@@ -111,9 +111,8 @@
   .ui-table tbody tr:nth-child(even) {
     @apply tw:bg-gray-100 tw:dark:bg-gray-800;
   }
-  /* .only-dev-visible paints the element it's on, which the striped rows then cover -
-     so a dev-only table's rows carry it instead. Ties the striping on specificity,
-     and has to follow it to win */
+  /* .only-dev-visible's own background is on the table, which the striped rows paint
+     over. Same specificity as the striping, so this has to follow it */
   .ui-table.only-dev-visible tbody tr {
     background: rgba(148, 0, 211, 0.1);
   }
