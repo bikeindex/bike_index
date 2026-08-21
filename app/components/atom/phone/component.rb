@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module UI
-  module PhoneDisplay
+module Atom
+  module Phone
     class Component < ApplicationComponent
       LINK_CLASS = "twlink tw:font-mono"
       TEXT_CLASS = "tw:font-mono"

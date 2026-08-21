@@ -120,7 +120,7 @@
                         %td
                           Phone
                         %td
-                          = render UI::PhoneDisplay::Component.new(phone: stolen_record.phone)
+                          = render Atom::Phone::Component.new(phone: stolen_record.phone)
               .bike-image{ class: thumbclass }
                 %a{ href:  bike_link }
                   %img{ src: thumb_url }

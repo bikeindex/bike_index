@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe UI::PhoneDisplay::Component, type: :component do
+RSpec.describe Atom::Phone::Component, type: :component do
   let(:phone) { "999 999 9999" }
   let(:options) { {phone:} }
   let(:instance) { described_class.new(**options) }

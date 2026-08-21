@@ -28,7 +28,7 @@ module Phonifyer
     end
   end
 
-  # Unescaped, so markup renders UI::PhoneDisplay::Component instead
+  # Unescaped, so markup renders Atom::Phone::Component instead
   def display(string)
     phone_components = components(string).to_h
 
