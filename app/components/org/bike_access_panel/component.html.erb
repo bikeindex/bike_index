@@ -385,7 +385,7 @@
               <% if @bike.phoneable_by?(@user) %>
                 <p class="phoneable-by mt-4">
                   <%= translation(".or_call_owner_html").html_safe %>
-                  <%= render UI::PhoneDisplay::Component.new(phone: @bike.phone) %>
+                  <%= render Atom::Phone::Component.new(phone: @bike.phone) %>
                 </p>
               <% end %>
             <% else %>
