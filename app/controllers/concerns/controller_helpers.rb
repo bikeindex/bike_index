@@ -238,6 +238,13 @@ module ControllerHelpers
     end
   end
 
+  # handle_target refuses an off-site target on arrival, too late to keep a caller-chosen
+  # URL out of mail we send. "//host" is off-site despite the leading slash.
+  def emailable_return_to
+    target = session[:return_to]
+    target if target&.start_with?("/") && !target.start_with?("//")
+  end
+
   def permitted_return_to
     target = (session[:return_to] || cookies[:return_to] || params[:return_to])&.downcase
     return nil if invalid_return_to?(target)

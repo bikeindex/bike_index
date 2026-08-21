@@ -42,6 +42,7 @@ class SessionsController < ApplicationController
 
   def magic_link
     @token = params[:token]
+    @return_to = params[:return_to]
     @failure = magic_link_failure(params[:incorrect_token]) if params[:incorrect_token].present?
   end
 
@@ -100,6 +101,7 @@ class SessionsController < ApplicationController
     case action_name
     when "sign_in_with_magic_link"
       @token = params[:token]
+      @return_to = params[:return_to]
       render_partner_or_default_signin_layout(render_action: :magic_link)
     when "identify", "create", "create_magic_link"
       @email = submitted_email
@@ -144,7 +146,7 @@ class SessionsController < ApplicationController
     # Stash the remember-me choice so the emailed-link GET (which carries no form
     # params) can still honor it in sign_in_and_redirect.
     session[:magic_link_remember_me] = Binxtils::InputNormalizer.boolean(submitted_remember_me)
-    user.send_magic_link_email
+    user.send_magic_link_email(return_to: emailable_return_to)
     redirect_to magic_link_sent_session_path(partner: sign_in_partner)
   end
 
