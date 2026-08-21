@@ -174,7 +174,7 @@ Two things follow. `turbo-cache-control` doesn't help — a restoration that re-
 renders through Drive, and the admin layout doesn't yield `:header` to set it with anyway.
 And it's the page you navigate *away from* that breaks, not just the one you land on.
 
-So a screen carrying any of it passes `turbo: false` — `Admin::RecordTabs` takes it, and
+So a screen carrying any of it passes `turbo: false` — `Admin::Headers::Tabs` takes it, and
 `Admin::CustomLayouts::Form::Wrapper` is the one that does. Before opting a new section in,
 check its tab targets for `#per_page_select`, `.fancy-select`, `.add_fields`,
 `#multipleUserSelect` and `.UppyForm`.
