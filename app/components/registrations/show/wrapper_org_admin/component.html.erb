@@ -171,7 +171,7 @@
                     <%= link_to(@bike.owner_email, "mailto:#{@bike.owner_email}", class: "twlink") %>
                   <% end %>
                 <% end %>
-                <%= info_row(translation(".owner_phone")) { render UI::PhoneDisplay::Component.new(phone: owner_phone) } %>
+                <%= info_row(translation(".owner_phone")) { render Atom::Phone::Component.new(phone: owner_phone) } %>
                 <% owner_reg_field_rows.each do |label, value| %>
                   <%= info_row(label, value) %>
                 <% end %>
