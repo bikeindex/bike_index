@@ -430,9 +430,8 @@ class User < ApplicationRecord
     true
   end
 
-  # return_to travels in the emailed link because the link is often opened somewhere
-  # else (a native app hands OAuth to a webview, the email opens in Safari), where
-  # the session holding the pending destination isn't there to be read
+  # The emailed link is often opened in another browser, which has no session
+  # holding where the user was headed - so return_to rides along in the link
   def send_magic_link_email(return_to: nil)
     # If the auth token was just created, don't create a new one, it's too error prone
     return true if auth_token_time("magic_link_token") > Time.current - 1.minutes

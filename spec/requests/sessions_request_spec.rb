@@ -371,6 +371,40 @@ RSpec.describe SessionsController, type: :request do
       expect(Capybara.string(response.body))
         .to have_css("form[action='/session/sign_in_with_magic_link'] input[name='token'][value='#{token}']", visible: :hidden)
     end
+
+    # The retry re-renders without the before_action that stores return_to, so the form
+    # is the only thing still holding where the user was headed
+    it "hands the magic link back where it was headed" do
+      post "/session/sign_in_with_magic_link",
+        params: {token: user.refreshed_magic_link_token, return_to: "/oauth/authorize?client_id=xYz"},
+        headers: {"HTTP_ORIGIN" => "null"}
+      expect(Capybara.string(response.body))
+        .to have_css("input[name='return_to'][value='/oauth/authorize?client_id=xYz']", visible: :hidden)
+    end
+  end
+
+  describe "the return_to carried by the magic link email" do
+    let!(:user) { FactoryBot.create(:user_confirmed) }
+    let(:emailed_url) do
+      Sidekiq::Testing.inline! { post "/session/create_magic_link", params: {email: user.email} }
+      ActionMailer::Base.deliveries.last.body.parts.first.decoded[%r{https?://\S+/session/magic_link\S*}]
+    end
+
+    it "carries a path this app owns" do
+      get "/session/new?return_to=%2Fbikes%2F12"
+      expect(emailed_url).to include CGI.escape("/bikes/12")
+    end
+
+    # Not an open redirect - handle_target refuses it - but it shouldn't reach the mail
+    it "drops an off-site one" do
+      get "/session/new?return_to=#{CGI.escape("https://evil.example/steal")}"
+      expect(emailed_url).to_not include "evil.example"
+    end
+
+    it "drops a protocol-relative one" do
+      get "/session/new?return_to=#{CGI.escape("//evil.example/steal")}"
+      expect(emailed_url).to_not include "evil.example"
+    end
   end
 
   describe "remember_me across the magic-link round-trip" do
