@@ -44,15 +44,11 @@ RSpec.describe UI::Header::Component, type: :component do
     end
   end
 
-  %i[h4 h5 h6].each do |tag|
-    context "with #{tag} tag" do
-      let(:options) { {text: "Minor section", tag:} }
+  context "with an unsupported tag" do
+    let(:options) { {text: "Minor section", tag: :h4} }
 
-      it "stays at the body-copy floor rather than rendering smaller" do
-        expect(component).to have_css(tag.to_s)
-        expect(component.to_html).to include("tw:text-base")
-        expect(component.to_html).to_not include("tw:text-sm")
-      end
+    it "raises rather than rendering off-scale" do
+      expect { component }.to raise_error(KeyError)
     end
   end
 

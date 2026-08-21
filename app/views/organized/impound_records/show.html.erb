@@ -175,7 +175,7 @@
 
   <% if impound_record_updates.any? %>
     <div class="<%= @impound_record.active? ? "col-xl-6" : "col-xl-10" %>">
-      <%= render(UI::Header::Component.new(text: "Updates to this record", tag: :h3, html_class: "uncap mt-2 mb-2")) %>
+      <%= render(UI::Header::Component.new(text: "Updates to this record", tag: :h3, html_class: "uncap mt-2 tw:mb-2!")) %>
       <%= render partial: "/organized/impound_records/impound_record_updates_table", locals: {impound_record_updates:} %>
     </div>
   <% end %>

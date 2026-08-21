@@ -23,7 +23,7 @@
 %div{ style: "margin-top: 50px;" }
   = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
 
-= render(UI::Header::Component.new(tag: :h3, html_class: "mt-4 uncap")) do
+= render(UI::Header::Component.new(tag: :h3, html_class: "uncap mt-4")) do
   Registrations
   = humanized_time_range(@time_range)
 .full-screen-table.mt-4
@@ -65,7 +65,7 @@
           bikes
         %td= number_with_delimiter(@recovered_records.count)
 
-  = render(UI::Header::Component.new(tag: :h3, html_class: "mt-5 uncap")) do
+  = render(UI::Header::Component.new(tag: :h3, html_class: "uncap mt-5")) do
     Registrations by organizations granting #{current_organization.name} visibility
     = humanized_time_range(@time_range)
   .full-screen-table.mt-4

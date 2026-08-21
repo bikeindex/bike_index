@@ -18,7 +18,7 @@
 %div{ style: "margin-top: 50px;" }
   = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time)
 
-= render(UI::Header::Component.new(tag: :h3, html_class: "mt-4 uncap")) do
+= render(UI::Header::Component.new(tag: :h3, html_class: "uncap mt-4")) do
   - if current_organization.regional?
     Local registrations
   - else
@@ -76,7 +76,7 @@
       may be different than the sum of all rows because bikes can be registered with multiple organizations
 
 - if current_organization.parent?
-  = render(UI::Header::Component.new(tag: :h3, html_class: "mt-4 uncap")) do
+  = render(UI::Header::Component.new(tag: :h3, html_class: "uncap mt-4")) do
     Registrations by related organizations
     = humanized_time_range(@time_range)
   - render_regional_nearby = current_organization.child_organizations.first.regional?
@@ -104,7 +104,7 @@
                 = number_with_delimiter(organization.nearby_bikes.where(created_at: @time_range).count)
 
 - if current_organization.nearby_organizations.any?
-  = render(UI::Header::Component.new(tag: :h3, html_class: "mt-4 uncap")) do
+  = render(UI::Header::Component.new(tag: :h3, html_class: "uncap mt-4")) do
     Registrations by local bike shops or other organizations
     = humanized_time_range(@time_range)
   .full-screen-table.mt-4

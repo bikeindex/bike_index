@@ -29,7 +29,7 @@ module UI
       end
 
       def header_classes
-        [TAG_CLASSES.fetch(@tag, "tw:text-base"), @subtitle.present? ? "tw:mb-1" : "tw:mb-6",
+        [TAG_CLASSES.fetch(@tag), @subtitle.present? ? "tw:mb-1" : "tw:mb-6",
           "tw:font-extrabold tw:tracking-tight tw:text-gray-900 tw:dark:text-gray-100",
           @html_class].compact.join(" ")
       end
