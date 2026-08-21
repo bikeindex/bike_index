@@ -106,40 +106,6 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
-      "fingerprint": "19b9ab344f9415ecf19709e9ee5b955e59227e5a0c9a89a935b00fed02ed9f2f",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped parameter value",
-      "file": "app/views/organized/graduated_notifications/show.html.haml",
-      "line": 24,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_class(true, status_display_class(graduated_notifications.find(params[:id]).status_humanized))",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Organized::GraduatedNotificationsController",
-          "method": "show",
-          "line": 19,
-          "file": "app/controllers/organized/graduated_notifications_controller.rb",
-          "rendered": {
-            "name": "organized/graduated_notifications/show",
-            "file": "app/views/organized/graduated_notifications/show.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "organized/graduated_notifications/show"
-      },
-      "user_input": "params[:id]",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "status_display_class() returns only hardcoded CSS class names from a case/when allowlist"
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
       "fingerprint": "1c38bf4538d2bd40ff76d4b6dc8068e03beb4663a925aac6497502023792bcb7",
       "check_name": "CrossSiteScripting",
       "message": "Unescaped parameter value",
