@@ -19,9 +19,9 @@ module Admin
             label: label_with_note(label, note), class_name: "tw:mb-4", **(ambassador ? AMBASSADOR_TARGETS : {})))
         end
 
-        # The target goes on the column, since UI::Forms::Group renders the label itself
-        def ambassador_group(attribute)
-          tag.div(class: "col-md-6", data: AMBASSADOR_TARGETS[:data]) do
+        # The target goes on the grid cell, since UI::Forms::Group renders the label itself
+        def ambassador_group(attribute, class_name: nil)
+          tag.div(class: class_name, data: AMBASSADOR_TARGETS[:data]) do
             render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute:,
               html_options: {data: AMBASSADOR_TARGETS[:input_data]}))
           end

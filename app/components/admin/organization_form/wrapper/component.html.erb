@@ -1,11 +1,11 @@
 <%= render(UI::Alerts::ObjectError::Component.new(object: @organization)) %>
 
-<div class="row">
-  <div class="col-md-6">
+<div class="tw:grid tw:gap-x-8 tw:md:grid-cols-2">
+  <div>
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :name, required: true)) %>
   </div>
 
-  <div class="col-md-6">
+  <div>
     <% if @organization.restrict_invitations? %>
       <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :available_invitation_count, kind: :number_field, label_text: "Available invitations")) do |group| %>
         <% group.with_helper_text do %>
@@ -13,7 +13,7 @@
         <% end %>
       <% end %>
     <% else %>
-      <div class="d-md-block d-none">
+      <div class="tw:hidden tw:md:block">
         <%# The blank label keeps this level with the invitation count field it stands in for %>
         <%= read_only_field("&nbsp;".html_safe, "permitted domain with passwordless sign in, no invite restrictions") %>
       </div>
@@ -21,8 +21,8 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-md-6">
+<div class="tw:grid tw:gap-x-8 tw:md:grid-cols-2">
+  <div>
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :short_name, label_text: "Short name (30 letters or less)")) do |group| %>
       <% if @organization.block_short_name_edit? %>
         <% group.with_helper_text do %>
@@ -35,14 +35,19 @@
   <%= ambassador_group(:ascend_name) %>
 </div>
 
-<div class="row">
-  <%= ambassador_group(:website) %>
+<%#
+  website is half the row until lg splits the two slugs off it, so its span tracks the
+  column count rather than staying put
+%>
 
-  <div class="col-6 col-lg-3">
+<div class="tw:grid tw:grid-cols-2 tw:gap-x-8 tw:lg:grid-cols-4">
+  <%= ambassador_group(:website, class_name: "tw:col-span-2 tw:md:col-span-1 tw:lg:col-span-2") %>
+
+  <div>
     <%= read_only_field("Slug:", @organization.slug) %>
   </div>
 
-  <div class="col-6 col-lg-3">
+  <div>
     <% previous_slug_note = tag.em("Rarely unnecessary", class: "text-warning") %>
 
     <% if helpers.display_dev_info? %>
@@ -55,8 +60,8 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-md-6">
+<div class="tw:grid tw:gap-x-8 tw:md:grid-cols-2">
+  <div>
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :kind, label_text: "Organization Type")) do %>
       <%= render(UI::Forms::Select::Component.new(form_builder: @form_builder, attribute: :kind, option_tags: kind_option_tags, html_options: {data: {"admin--organization-form-target": "kind", action: "change->admin--organization-form#toggleAmbassadorFields"}})) %>
     <% end %>
@@ -92,7 +97,7 @@
     <% end %>
   </div>
 
-  <div class="col-md-6">
+  <div>
     <% if helpers.display_dev_info? %>
       <div class="only-dev-visible mt-4 tw:mb-2 tw:p-2">
         <%= render(UI::Forms::Group::Component.new(attribute: :manual_pos_kind, label_text: "Manually set POS kind")) do |group| %>
