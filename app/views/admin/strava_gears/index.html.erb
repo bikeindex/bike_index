@@ -1,29 +1,14 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @searched_gear_type.present? ? "active" : "" %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <% if @searched_gear_type.blank? %>
-        All types
-      <% else %>
-        <%= @searched_gear_type %>
-      <% end %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "All types", url_for(sortable_search_params.merge(search_gear_type: nil)), class: "dropdown-item #{@searched_gear_type.present? ? '' : 'active'}" %>
-
-      <div class="dropdown-divider"></div>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: (@searched_gear_type.blank?) ? "All types" : @searched_gear_type, button_size: :sm,
+          active: @searched_gear_type.present?)) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All types", path: url_for(sortable_search_params.merge(search_gear_type: nil)), match: :query, query: {search_gear_type: nil}) } %>
+      <% dropdown.with_entry_divider %>
 
       <% StravaGear::GEAR_TYPE_ENUM.each_key do |gear_type| %>
-        <%= link_to gear_type.to_s.titleize, url_for(sortable_search_params.merge(search_gear_type: gear_type)), class: "dropdown-item #{@searched_gear_type == gear_type.to_s ? 'active' : ''}" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: gear_type.to_s.titleize, path: url_for(sortable_search_params.merge(search_gear_type: gear_type)), match: :query, query: {search_gear_type: gear_type}) } %>
       <% end %>
-    </div>
+    <% end %>
   </li>
 <% end %>
 

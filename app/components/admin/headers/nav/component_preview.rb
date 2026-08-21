@@ -12,8 +12,7 @@ module Admin
           render(Admin::Headers::Nav::Component.new(title: "Brakebills", subtitle: "Editing paid functionality"))
         end
 
-        # A template, so the items can render UI:: components. The .nav-link pair is the
-        # bootstrap markup the un-migrated index views still hand in
+        # A template, so the items can render UI:: components
         def with_items
           {template: "admin/headers/nav/component_preview/with_items"}
         end

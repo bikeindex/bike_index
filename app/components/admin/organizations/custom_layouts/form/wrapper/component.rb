@@ -10,7 +10,6 @@ module Admin
           # renders here rather than leaving the view to answer that three times.
           class Component < ApplicationComponent
             LANDING_PAGE = "landing_page"
-            LINK_CLASSES = "nav-link btn btn-sm btn-outline-info"
 
             def initialize(organization:, edit_template:, landing_page: nil, mail_snippet: nil,
               landing_page_url: nil, suggested_button_hover: nil)
@@ -33,12 +32,15 @@ module Admin
             end
 
             def additional_link
-              return link_to("landing page", @landing_page_url, class: LINK_CLASSES) if landing_page?
+              return tab_link("landing page", @landing_page_url) if landing_page?
 
               snippet_kind = @mail_snippet.which_organization_email
-              link_to("#{snippet_kind.titleize} email",
-                edit_organization_email_path(snippet_kind, organization_id: @organization.to_param),
-                class: LINK_CLASSES)
+              tab_link("#{snippet_kind.titleize} email",
+                edit_organization_email_path(snippet_kind, organization_id: @organization.to_param))
+            end
+
+            def tab_link(text, href)
+              render(UI::ButtonLink::Component.new(text:, href:, size: :sm))
             end
 
             def layout_form
