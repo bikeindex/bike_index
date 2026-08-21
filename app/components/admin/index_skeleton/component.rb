@@ -55,8 +55,8 @@ module Admin
         render(UI::Chart::Component.new(series: [{name: @viewing, data:}], time_range: @index.time_range))
       end
 
-      def current_info_component
-        Admin::Headers::CurrentInfo::Component.new(index: @index, viewing: @viewing)
+      def index_info_component
+        Admin::Headers::IndexInfo::Component.new(index: @index, viewing: @viewing)
       end
 
       def pagination_component(skip_total: false)

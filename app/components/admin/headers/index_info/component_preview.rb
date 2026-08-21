@@ -2,23 +2,23 @@
 
 module Admin
   module Headers
-    module CurrentInfo
+    module IndexInfo
       class ComponentPreview < ApplicationComponentPreview
         # @!group Header Variants
 
         def default
-          render(Admin::Headers::CurrentInfo::Component.new(index: index_state, viewing: "Notifications"))
+          render(Admin::Headers::IndexInfo::Component.new(index: index_state, viewing: "Notifications"))
         end
 
         def with_current_organization
           current_organization = Organization.friendly_find "brakebills"
           primary_activity = PrimaryActivity.friendly_find "Gravel"
-          render(Admin::Headers::CurrentInfo::Component.new(index: index_state(current_organization:, primary_activity:), viewing: "Notifications"))
+          render(Admin::Headers::IndexInfo::Component.new(index: index_state(current_organization:, primary_activity:), viewing: "Notifications"))
         end
 
         def with_bike
           bike = Bike.first
-          render(Admin::Headers::CurrentInfo::Component.new(index: index_state(params: {search_bike_id: bike.id}, bike:), viewing: "Activities"))
+          render(Admin::Headers::IndexInfo::Component.new(index: index_state(params: {search_bike_id: bike.id}, bike:), viewing: "Activities"))
         end
 
         private

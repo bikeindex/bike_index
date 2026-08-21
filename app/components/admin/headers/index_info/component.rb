@@ -2,7 +2,7 @@
 
 module Admin
   module Headers
-    module CurrentInfo
+    module IndexInfo
       class Component < ApplicationComponent
         HEADER_KEYS = %i[
           organization_id
