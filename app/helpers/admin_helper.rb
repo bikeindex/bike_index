@@ -76,14 +76,4 @@ module AdminHelper
     end
     theft_alert.recovered? ? text_class + " small" : text_class
   end
-
-  def render_admin_pagination_with_count(collection:, count: nil, skip_total: false, viewing: nil)
-    render(Admin::PaginationWithCount::Component.new(
-      collection:, index: admin_index_state, count:, skip_total:, viewing:
-    ))
-  end
-
-  def render_admin_current_header(viewing:)
-    render(Admin::CurrentHeader::Component.new(index: admin_index_state, viewing:))
-  end
 end

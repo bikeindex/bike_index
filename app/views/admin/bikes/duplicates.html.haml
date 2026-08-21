@@ -1,7 +1,7 @@
 %h1
   Possible duplicate bikes
 
-= render_admin_pagination_with_count(collection: @duplicate_groups, count: @duplicate_groups_count)
+= render(Admin::PaginationWithCount::Component.new(collection: @duplicate_groups, index: admin_index_state, count: @duplicate_groups_count))
 
 - @duplicate_groups.each do |duplicate_group|
   .row
@@ -15,4 +15,4 @@
   = render Admin::BikesTable::Component.new(bikes: duplicate_group.bikes, sort_state:, display_dev_info: display_dev_info?, no_show_header: true, show_serial: true)
 
 
-= render_admin_pagination_with_count(collection: @duplicate_groups, skip_total: true)
+= render(Admin::PaginationWithCount::Component.new(collection: @duplicate_groups, index: admin_index_state, skip_total: true))

@@ -65,7 +65,7 @@
     = number_with_delimiter(@bikes_count)
     Bikes with this paint
 
-  = render_admin_pagination_with_count(collection: @bikes)
+  = render(Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state))
 
   = render Admin::BikesTable::Component.new(bikes: @bikes, sort_state:, display_dev_info: display_dev_info?)
 
