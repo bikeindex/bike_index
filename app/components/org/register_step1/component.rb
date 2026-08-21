@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# TODO: #4185 - remove this component when removing the legacy org new bike iframe
+
 module Org
   module RegisterStep1
     # The register flow's opening step on an organization's own page, with the way
