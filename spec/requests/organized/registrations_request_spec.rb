@@ -238,6 +238,14 @@ RSpec.describe Organized::RegistrationsController, type: :request do
         expect(response.status).to eq(200)
         expect(assigns(:bikes).pluck(:id)).to eq([])
       end
+
+      it "carries the terms back into the form fields" do
+        get base_url, params: {search_no_js: true, search_email: "someone@example.com", search_notes: "important"}
+        expect(response.status).to eq(200)
+        body = Capybara.string(response.body)
+        expect(body).to have_css("input[name='search_email'][value='someone@example.com']")
+        expect(body).to have_css("input[name='search_notes'][value='important']")
+      end
     end
     context "claimed_ownerships without bike_search" do
       let(:enabled_feature_slugs) { %w[claimed_ownerships] }
