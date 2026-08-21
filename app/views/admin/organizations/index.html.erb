@@ -1,5 +1,3 @@
-<style>.form-control.selectize-control { width: 100%; }</style>
-
 <%= render(Admin::IndexSkeleton::Component.new(
   collection: @organizations,
   nav_header_list_items: render(Admin::OrganizationsIndex::Filters::Component.new(search_paid: @search_paid)),

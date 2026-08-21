@@ -10,6 +10,8 @@
 
 <li class="nav-item tw:text-sm">
   <%= render(UI::Dropdown::Component.new(name: pos_name, button_size: :sm, active: pos_kind.present?)) do |dropdown|
+    dropdown.with_entry_item { filter_link("All POS", :search_pos, nil) }
+    dropdown.with_entry_divider
     pos_entries.each do |entry|
       dropdown.with_entry_item { filter_link(entry.humanize, :search_pos, entry) }
       dropdown.with_entry_divider if entry == "broken_pos"
