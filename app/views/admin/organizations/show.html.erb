@@ -14,7 +14,7 @@
   height across its own rows
 %>
 
-<div class="tw:grid tw:items-start tw:gap-x-8 tw:gap-y-6 tw:md:grid-cols-2">
+<div class="twwiderow tw:items-start tw:gap-y-6">
   <%= render(Admin::Organizations::Show::Details::Component.new(organization: @organization)) %>
   <%= render(Admin::Organizations::Show::Account::Component.new(organization: @organization)) %>
 

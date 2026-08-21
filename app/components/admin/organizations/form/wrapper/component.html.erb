@@ -1,6 +1,6 @@
 <%= render(UI::Alerts::ObjectError::Component.new(object: @organization)) %>
 
-<div class="tw:grid tw:gap-x-8 tw:md:grid-cols-2">
+<div class="twwiderow">
   <div>
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :name, required: true)) %>
   </div>
@@ -21,7 +21,7 @@
   </div>
 </div>
 
-<div class="tw:grid tw:gap-x-8 tw:md:grid-cols-2">
+<div class="twwiderow">
   <div>
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :short_name, label_text: "Short name (30 letters or less)")) do |group| %>
       <% if @organization.block_short_name_edit? %>
@@ -60,7 +60,7 @@
   </div>
 </div>
 
-<div class="tw:grid tw:gap-x-8 tw:md:grid-cols-2">
+<div class="twwiderow">
   <div>
     <%= render(UI::Forms::Group::Component.new(form_builder: @form_builder, attribute: :kind, label_text: "Organization Type")) do %>
       <%= render(UI::Forms::Select::Component.new(form_builder: @form_builder, attribute: :kind, option_tags: kind_option_tags, html_options: {data: {"admin--organization-form-target": "kind", action: "change->admin--organization-form#toggleAmbassadorFields"}})) %>

@@ -97,6 +97,17 @@
     @apply tw:grid tw:gap-x-2 tw:grid-cols-[repeat(auto-fit,minmax(140px,1fr))];
   }
 
+  /* Two columns of cards or sections, breaking on the row's own width like .twfieldrow
+   * rather than at a viewport breakpoint. The max() caps it at two, which repeat() alone
+   * would not do - a wide row would fit four 320px tracks and a four-card row would stop
+   * wrapping into a 2x2. auto-fill rather than auto-fit so a column whose only child is
+   * hidden holds its place instead of handing the whole row to its neighbour. Keep the
+   * 2rem in step with gap-x-8. */
+  .twwiderow {
+    @apply tw:grid tw:gap-x-8;
+    grid-template-columns: repeat(auto-fill, minmax(max(320px, calc((100% - 2rem) / 2)), 1fr));
+  }
+
   [aria-expanded="true"] .twdropdown-chevron {
     @apply tw:rotate-180;
   }
