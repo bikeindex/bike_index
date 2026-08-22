@@ -127,6 +127,12 @@
     @apply tw:grid tw:gap-x-2 tw:grid-cols-[repeat(auto-fit,minmax(140px,1fr))];
   }
 
+  /* An admin index's search form. Baseline rather than centre: the rows mix a combobox
+   * with shorter inputs and buttons, so they line up on their text or on nothing. */
+  .twsearchrow {
+    @apply tw:my-4 tw:flex tw:flex-wrap tw:items-baseline tw:justify-end tw:gap-2;
+  }
+
   /* Two columns of cards or sections, breaking on the row's own width like .twfieldrow
    * rather than at a viewport breakpoint. The max() caps it at two, which repeat() alone
    * would not do - a wide row fits four 320px tracks. auto-fill rather than auto-fit so a

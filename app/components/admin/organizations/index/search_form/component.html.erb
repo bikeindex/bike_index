@@ -1,5 +1,5 @@
 <%= form_with(url: admin_organizations_path, method: :get,
-  html: {class: "tw:my-4 tw:flex tw:flex-wrap tw:items-baseline tw:justify-end tw:gap-2"}) do |form| %>
+  html: {class: "twsearchrow"}) do |form| %>
   <%= render partial: "/shared/hidden_search_fields" %>
   <%= hidden_field_tag :search_paid, @search_paid %>
   <%= hidden_field_tag :search_pos, @index.params[:search_pos] %>
