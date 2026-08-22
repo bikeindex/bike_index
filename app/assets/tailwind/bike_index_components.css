@@ -123,11 +123,12 @@
    * rather than at a viewport breakpoint. The max() caps it at two, which repeat() alone
    * would not do - a wide row fits four 320px tracks. auto-fill rather than auto-fit so a
    * column whose only child is hidden holds its place instead of handing the whole row to
-   * its neighbour. */
+   * its neighbour. The min(100%) is what keeps that 320px floor from overflowing a row
+   * nested in something narrower than it. */
   .twwiderow {
     @apply tw:grid tw:gap-x-8;
     container: twwiderow / inline-size;
-    grid-template-columns: repeat(auto-fill, minmax(max(320px, calc((100% - var(--tw-spacing) * 8) / 2)), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, max(320px, calc((100% - var(--tw-spacing) * 8) / 2))), 1fr));
   }
 
   [aria-expanded="true"] .twdropdown-chevron {

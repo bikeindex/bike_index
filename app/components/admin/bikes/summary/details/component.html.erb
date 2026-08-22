@@ -10,7 +10,8 @@
     <% end %>
   </a>
 
-  <div class="twwiderow tw:min-w-0 tw:flex-1">
+  <%# basis over flex-1 so the lists wrap under the thumbnail rather than squeezing beside it %>
+  <div class="twwiderow tw:min-w-0 tw:grow tw:basis-72">
     <div>
       <%= render(UI::DefinitionList::Container::Component.new) do %>
         <% if @display_dev_info %>
