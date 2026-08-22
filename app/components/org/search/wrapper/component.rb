@@ -14,7 +14,7 @@ module Org
           bikes: [],
           current_user: nil,
           interpreted_params: {},
-          sort_state: ComponentStates::SortState.new,
+          sort_state: ComponentStructs::SortState.new,
           search_stickers: nil,
           search_address: nil,
           search_status: "all",

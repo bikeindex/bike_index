@@ -3,7 +3,7 @@
 module Org
   module ImpoundRecordsIndex
     class Component < ApplicationComponent
-      def initialize(pagy:, impound_records:, search_status:, search_unregisteredness:, humanized_time_range:, available_statuses:, current_organization:, current_user: nil, params: {}, sort_state: ComponentStates::SortState.new, multi_update_open: false)
+      def initialize(pagy:, impound_records:, search_status:, search_unregisteredness:, humanized_time_range:, available_statuses:, current_organization:, current_user: nil, params: {}, sort_state: ComponentStructs::SortState.new, multi_update_open: false)
         @pagy = pagy
         @impound_records = impound_records
         @search_status = search_status
