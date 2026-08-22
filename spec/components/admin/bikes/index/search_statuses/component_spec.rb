@@ -50,11 +50,18 @@ RSpec.describe Admin::Bikes::Index::SearchStatuses::Component, type: :component 
     end
   end
 
-  context "with spam on by su_option" do
-    let(:options) { {display_dev_info: true, spam_by_su_option: true, default_statuses: %w[spam]} }
+  # Spam is only in the defaults for a superuser with the no_hide_spam option
+  context "with spam among the defaults" do
+    let(:options) { {default_statuses: %w[spam]} }
 
-    it "says why it is on" do
-      expect(component).to have_content("on by default because")
+    it "marks it default on, and says why in a tooltip" do
+      expect(component).to have_content("default on")
+      expect(component.at_css("[data-controller='ui--tooltip'] [role='tooltip']").text.squish)
+        .to eq "enabled because of your superuser settings"
     end
+  end
+
+  it "marks nothing default on when the defaults don't include it" do
+    expect(component).to_not have_content("default on")
   end
 end

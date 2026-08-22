@@ -17,13 +17,12 @@ module Admin
                            "example" => "Test / Example"}.freeze
 
           def initialize(index:, searched_statuses:, default_statuses: [], not_default_statuses: false,
-            display_dev_info: false, spam_by_su_option: false)
+            display_dev_info: false)
             @index = index
             @searched_statuses = searched_statuses
             @default_statuses = default_statuses
             @not_default_statuses = not_default_statuses
             @display_dev_info = display_dev_info
-            @spam_by_su_option = spam_by_su_option
           end
 
           private
@@ -43,9 +42,8 @@ module Admin
             url_for(@index.sortable_search_params.merge(status_keys.index_with(nil)))
           end
 
-          def spam_note?
-            @spam_by_su_option && @display_dev_info && @default_statuses.include?("spam")
-          end
+          # Spam is only ever in the defaults for a superuser with the no_hide_spam option
+          def default_on?(status) = @default_statuses.include?(status)
 
           def with_owner_label
             safe_join(["With owner", tag.small("(not stolen)", class: "twless-strong")], " ")

@@ -26,8 +26,10 @@
 
             <%= link_to "only", only_path(status), class: "twlink tw:text-sm" %>
 
-            <% if status == "spam" && spam_note? %>
-              <small class="twless-strong">on by default because <code>su_option</code></small>
+            <% if default_on?(status) %>
+              <small class="twless-strong tw:text-xs">default on</small>
+
+              <%= render(UI::Tooltip::Component.new(text: "enabled because of your superuser settings")) %>
             <% end %>
           </div>
         <% end %>

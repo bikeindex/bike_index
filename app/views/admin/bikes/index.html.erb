@@ -127,8 +127,7 @@
         <% if show_search_statuses %>
           <%= render(Admin::Bikes::Index::SearchStatuses::Component.new(index: admin_index_state,
                 searched_statuses: @searched_statuses, default_statuses: @default_statuses,
-                not_default_statuses: @not_default_statuses, display_dev_info: display_dev_info?,
-                spam_by_su_option: current_user.su_option?(:no_hide_spam))) %>
+                not_default_statuses: @not_default_statuses, display_dev_info: display_dev_info?)) %>
         <% end %>
 
         <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-2">
