@@ -1,20 +1,25 @@
 <%#
   twgutter-bleed, not w-full: a width:100% border box slides left under negative margins
-  rather than bleeding both sides. The block padding is room for the scroll to sit in -
-  overflow-x makes overflow-y auto too
+  rather than bleeding both sides. No overflow-x here - a scroll container makes overflow-y
+  auto too, so the controller adds it only when the tabs are wider than the row. The block
+  padding is the room that scroll sits in
 %>
 
 <nav
-  class="twgutter-bleed tw:overflow-x-auto tw:pt-1 tw:pb-3"
+  class="twgutter-bleed tw:pt-1 tw:pb-3"
   aria-label="<%= @nav_label %>"
-  <%= tag.attributes(data: {controller: "ui--tabs", turbo: (true if @turbo)}) %>
+  <%= tag.attributes(data: {controller: "ui--tabs", "ui--tabs-scrollable-class": "tw:overflow-x-auto",
+        turbo: (true if @turbo)}) %>
 >
   <%#
     min-w-full so the underline still spans the row when the tabs don't fill it, w-max so
     it follows them out past the edge when they do
   %>
 
-  <div class="tw:flex tw:w-max tw:min-w-full tw:gap-1 tw:border-b tw:border-gray-300">
+  <div
+    class="tw:flex tw:w-max tw:min-w-full tw:gap-1 tw:border-b tw:border-gray-300"
+    data-ui--tabs-target="row"
+  >
     <% @tabs.each do |tab| %>
       <%# "page" rather than tab[:active] - a false renders aria-current="false", which counts as current %>
       <%= link_to tab[:href], class: link_classes(tab), aria: {current: ("page" if tab[:active])},
