@@ -5,7 +5,9 @@ class RegisterController < ApplicationController
   # An expired token starts a registration rather than bouncing and losing the
   # submission. assign_organization runs next, so the form's organization_id lands on it
   before_action -> { find_b_param(build: true) }, only: %i[create]
-  before_action :start_registration, only: %i[embed]
+  # The session's, so reloading the frame lands on the same registration rather than
+  # piling them up - new is the entry point that always starts one
+  before_action -> { start_registration(token_id: session[:register_b_param_token]) }, only: %i[embed]
   # The emailed link resumes a registration the session knows nothing about
   before_action :find_b_param_for_confirmation, only: %i[confirm confirm_email]
   # confirm renders a self-posting form and nothing else, so it reads neither
@@ -22,15 +24,16 @@ class RegisterController < ApplicationController
   # flow: the two stolen bike alerts open their modal on load, over a registration in progress
   before_action { @skip_general_alert = true }
 
-  # Redirects into step 1 with a token (reusing the session's registration when
-  # it's still blank), so going back from step 2 lands on the same registration
+  # Always a new registration - show is what goes back to one in progress
   def new
     BikeServices::Register.discard(token: params[:discard_token], user: current_user)
+    BikeServices::Register.discard_extra(user: current_user)
     start_registration
-    # The same filter every other action runs, so reusing the session's
-    # registration can't quietly drop the organization the URL named
+    # The filters new is excluded from: the organization the URL names has to land on the
+    # registration, and the redirect below asks which step it's at
     assign_organization
-    redirect_to step_path(1)
+    find_registration_sequence
+    redirect_to_current_step
   end
 
   # Step 1 framed on an organization's landing page. It renders rather than redirecting into
@@ -38,6 +41,7 @@ class RegisterController < ApplicationController
   def embed
     @page_title = I18n.t("meta_titles.register_step_1")
     render Register::Embed::Component.new(b_param: @b_param, steps: flow_steps, current_user:,
+      header_tags_options: helpers.header_tags_component_options,
       button_color: HexColor.normalize(params[:button]),
       button_hover_color: HexColor.normalize(params[:button_hover])), layout: false
   end
@@ -199,10 +203,10 @@ class RegisterController < ApplicationController
     register_path(b_param_token: @b_param.id_token, step:)
   end
 
-  # The registration new and embed start from - the session's still-blank one when it has
-  # one, so going back from step 2 (or reloading the frame) lands on the same registration
-  def start_registration
-    @b_param = BikeServices::Register.b_param_for(user: current_user, token_id: reusable_token,
+  # The registration new and embed start from - token_id reuses the one it names, when
+  # step 1 was never submitted on it
+  def start_registration(token_id: nil)
+    @b_param = BikeServices::Register.b_param_for(user: current_user, token_id:,
       status: start_status, email: params[:email])
     session[:register_b_param_token] = @b_param.id_token
   end
@@ -217,14 +221,9 @@ class RegisterController < ApplicationController
   # a theft takes the same shorthand everywhere else in the app does
   def start_status = BParam.status_hash_from_params(params)[:status]
 
-  # Starting over lands on a blank registration, not whatever the session was left on -
-  # which would drop the organization and status the link carries
-  def reusable_token
-    session[:register_b_param_token] if params[:discard_token].blank?
-  end
-
   def assign_organization
-    BikeServices::Register.assign_organization(@b_param, current_organization, user: current_user)
+    BikeServices::Register.assign_organization(@b_param, current_organization,
+      user: current_user, passive_organization:)
   end
 
   # Resolved once - the step math, the progress bar and the pages themselves all read it
@@ -247,6 +246,8 @@ class RegisterController < ApplicationController
     redirect_to(new_register_path) if @b_param.blank?
   end
 
+  # What the bare /register resumes on, so falling through to new is an entry point rather
+  # than only a not-found. start_params is what carries an organization across that.
   # build: only step 1's submission, which carries everything a registration needs
   def find_b_param(build: false)
     @b_param = BikeServices::Register.find_token(params_token: params[:b_param_token],
@@ -257,9 +258,14 @@ class RegisterController < ApplicationController
       return redirect_to(new_register_path(start_params))
     end
 
-    # The session follows whichever registration the token named, so the next
-    # tokenless request stays on it
-    session[:register_b_param_token] = @b_param.id_token
+    # The session follows whichever registration the token named, so the next tokenless
+    # request stays on it - until its bike exists, when there's nothing left to go back
+    # to and the bare /register should start the next registration instead
+    if @b_param.with_bike?
+      session.delete(:register_b_param_token)
+    else
+      session[:register_b_param_token] = @b_param.id_token
+    end
   end
 
   # A finished registration (bike created, or awaiting the email) only shows

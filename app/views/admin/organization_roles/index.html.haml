@@ -1,12 +1,12 @@
 - nav_header_list_items = capture_haml do
   - if current_organization.present?
-    %li.nav-item
-      = link_to "Organization view", organization_users_path(organization_id: current_organization.id), class: "nav-link less-strong"
-  %li.nav-item
-    = link_to "New Role", new_admin_organization_role_url(organization_id: current_organization&.to_param), class: "nav-link"
+    %li
+      = render(UI::ButtonLink::Component.new(text: "Organization view", href: organization_users_path(organization_id: current_organization.id), color: :link, html_class: "twless-strong"))
+  %li
+    = render(UI::ButtonLink::Component.new(text: "New Role", href: new_admin_organization_role_url(organization_id: current_organization&.to_param), color: :primary, size: :sm))
 
 - table_view = render partial: "/admin/organization_roles/table", locals: {organization_roles: @collection, render_sortable: true, render_deleted: @render_deleted}
 
-= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_organization_roles))
+= render(Admin::IndexSkeleton::Component.new(index: admin_index_state, collection: @collection, viewing: controller_name.humanize, nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_organization_roles))
 
 

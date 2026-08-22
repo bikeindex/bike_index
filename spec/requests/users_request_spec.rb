@@ -128,7 +128,7 @@ RSpec.describe UsersController, type: :request do
         organization = FactoryBot.create(:organization)
         FactoryBot.create(:organization_role_claimed, organization: organization, user: current_user)
         current_user.reload
-        expect(current_user.default_organization).to eq organization
+        expect(OrganizationRole.default_organization(current_user)).to eq organization
         patch "#{base_url}/#{current_user.username}", params: {id: current_user.username, user: {vendor_terms_of_service: "1", notification_newsletters: true}}
         expect(response.code).to eq("302")
         expect(response).to redirect_to organization_root_url(organization_id: organization.to_param)
@@ -197,6 +197,20 @@ RSpec.describe UsersController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:accept_vendor_terms)
       expect(response).to render_template("layouts/application")
+    end
+  end
+
+  describe "confirm" do
+    context "sso organization domain", :sso_organization do
+      let(:user) { FactoryBot.create(:user, email: "student@sso.edu") }
+
+      # The account predates the organization going SSO - create blocks new ones
+      it "confirms the account but sends the sign in to the IdP" do
+        post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token}
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+        expect(user.reload.confirmed?).to be_truthy
+        expect(response.cookies["auth"]).to be_blank
+      end
     end
   end
 
@@ -333,6 +347,17 @@ RSpec.describe UsersController, type: :request do
       user.reload
       expect(user.token_for_password_reset).to be_present
     end
+    context "sso organization domain", :sso_organization do
+      let(:user) { FactoryBot.create(:user_confirmed, email: "student@sso.edu") }
+
+      it "hands the reset off to the IdP rather than minting a token" do
+        expect {
+          post "#{base_url}/send_password_reset_email", params: {email: user.email}
+        }.to_not change(Email::ResetPasswordJob.jobs, :size)
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+        expect(user.reload.token_for_password_reset).to be_blank
+      end
+    end
     context "unknown user" do
       it "redirects back and flash errors if unable to find user" do
         expect {
@@ -351,7 +376,7 @@ RSpec.describe UsersController, type: :request do
           expect(response).to render_template(:send_password_reset_email)
           expect(flash).to be_blank
         }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
-        expect(Email::ResetPasswordJob).to have_enqueued_sidekiq_job(user.id)
+        expect(Email::ResetPasswordJob).to have_enqueued_sidekiq_job(user.id, nil)
         user.reload
         expect(user.token_for_password_reset).to be_present
       end
@@ -490,6 +515,24 @@ RSpec.describe UsersController, type: :request do
       expect(user.authenticate(valid_params.dig(:user, :password))).to be_truthy
       jar = ActionDispatch::Cookies::CookieJar.build(request, cookies.to_hash)
       expect(jar.signed["auth"]).to eq([user.id, user.auth_token])
+    end
+    context "sso organization domain", :sso_organization do
+      let(:user) do
+        FactoryBot.create(:user_confirmed, email: "student@sso.edu",
+          password: og_password, password_confirmation: og_password)
+      end
+      let(:og_password) { "old-password-4bf03ab1" }
+
+      # The token predates the organization going SSO - issuance is blocked, redemption catches the rest
+      it "neither changes the password nor signs in" do
+        user.send_password_reset_email
+        user.reload
+        post "#{base_url}/update_password_with_reset_token", params: valid_params
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+        expect(user.reload.authenticate(og_password)).to be_truthy
+        jar = ActionDispatch::Cookies::CookieJar.build(request, cookies.to_hash)
+        expect(jar.signed["auth"]).to be_blank
+      end
     end
     context "unconfirmed user" do
       let(:user) { FactoryBot.create(:user) }

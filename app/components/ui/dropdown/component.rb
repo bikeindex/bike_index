@@ -3,16 +3,12 @@
 module UI
   module Dropdown
     class Component < ApplicationComponent
-      # Applied to the <li>; the `[&>a]` variant colors the item's link (the surface).
-      # The item flags itself aria-current rather than aria-pressed, which is invalid on
-      # role="menuitem" — the is-active variant (application.css) covers both.
-      # The fill is UI::Button's secondary active, minus the border and ring a menu item has no room for.
-      ACTIVE_COLORS = "tw:is-active:[&>a]:bg-purple-500 tw:is-active:[&>a]:text-white"
-
       renders_one :button
+      # Which entry is current is UI::ActiveLink's, on the entry's own link -- .twdropdown
+      # styles whichever one it marks
       renders_many :entries, types: {
-        item: lambda { |active: false, &block|
-          content_tag(:li, capture(&block), role: "menuitem", class: ACTIVE_COLORS, aria: {current: active || nil})
+        item: lambda { |&block|
+          content_tag(:li, capture(&block), role: "menuitem")
         },
         divider: lambda {
           content_tag(:li, "", role: "separator")

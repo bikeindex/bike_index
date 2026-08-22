@@ -1,75 +1,39 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @list != 'all' ? 'active' : '' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <%= @list.titleize %> <%= @list == "all" ? "lists" : "list" %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "All lists", url_for(sortable_search_params.merge(search_list: nil)), class: "dropdown-item #{@list == 'all' ? 'active' : ''}" %>
-      <%= link_to "Organization list", url_for(sortable_search_params.merge(search_list: "organization")), class: "dropdown-item #{@list == 'organization' ? 'active' : ''}" %>
-      <%= link_to "Individual list", url_for(sortable_search_params.merge(search_list: "individual")), class: "dropdown-item #{@list == 'individual' ? 'active' : ''}" %>
-    </div>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: "#{@list.titleize} #{@list == "all" ? "lists" : "list"}", button_size: :sm,
+          active: @list != "all")) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All lists", path: url_for(sortable_search_params.merge(search_list: nil)), match: :query, query: {search_list: nil}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Organization list", path: url_for(sortable_search_params.merge(search_list: "organization")), match: :query, query: {search_list: "organization"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Individual list", path: url_for(sortable_search_params.merge(search_list: "individual")), match: :query, query: {search_list: "individual"}) } %>
+    <% end %>
   </li>
 
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @status != 'all' ? 'active' : '' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <%= @status.titleize %> <%= @status == "all" ? "statuses" : "status" %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "All statuses", url_for(sortable_search_params.merge(search_status: nil)), class: "dropdown-item #{@status == 'all' ? 'active' : ''}" %>
-      <%= link_to "Not subscribed status", url_for(sortable_search_params.merge(search_status: "not_subscribed")), class: "dropdown-item #{@status == 'not_subscribed' ? 'active' : ''}" %>
-
-      <div class="dropdown-divider"></div>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: "#{@status.titleize} #{@status == "all" ? "statuses" : "status"}", button_size: :sm,
+          active: @status != "all")) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All statuses", path: url_for(sortable_search_params.merge(search_status: nil)), match: :query, query: {search_status: nil}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Not subscribed status", path: url_for(sortable_search_params.merge(search_status: "not_subscribed")), match: :query, query: {search_status: "not_subscribed"}) } %>
+      <% dropdown.with_entry_divider %>
 
       <% MailchimpDatum.statuses.each do |status| %>
-        <%= link_to "#{status.humanize} status", url_for(sortable_search_params.merge(search_status: status)), class: "dropdown-item #{@status == status ? 'active' : ''}" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{status.humanize} status", path: url_for(sortable_search_params.merge(search_status: status)), match: :query, query: {search_status: status}) } %>
       <% end %>
-    </div>
+    <% end %>
   </li>
 
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @search_users == 'all' ? '' : 'active' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <% if @search_users == "all" %>
-        With and without users
-      <% else %>
-        <%= @search_users.humanize %>
-      <% end %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "With and without users", url_for(sortable_search_params.merge(search_users: nil)), class: "dropdown-item #{@search_users == 'all' ? 'active' : ''}" %>
-
-      <div class="dropdown-divider"></div>
-      <%= link_to "With user", url_for(sortable_search_params.merge(search_users: "with_user")), class: "dropdown-item #{@search_users == 'with_user' ? 'active' : ''}" %>
-      <%= link_to "No user", url_for(sortable_search_params.merge(search_users: "no_user")), class: "dropdown-item #{@search_users == 'no_user' ? 'active' : ''}" %>
-    </div>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: @search_users == "all" ? "With and without users" : @search_users.humanize, button_size: :sm,
+          active: @search_users != "all")) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "With and without users", path: url_for(sortable_search_params.merge(search_users: nil)), match: :query, query: {search_users: nil}) } %>
+      <% dropdown.with_entry_divider %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "With user", path: url_for(sortable_search_params.merge(search_users: "with_user")), match: :query, query: {search_users: "with_user"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "No user", path: url_for(sortable_search_params.merge(search_users: "no_user")), match: :query, query: {search_users: "no_user"}) } %>
+    <% end %>
   </li>
 
-  <li class="nav-item">
+  <li>
     <a
-      class="nav-link"
+      class="tw:px-2.5 tw:py-1 tw:text-xs"
       href=".data-cell-collapsed"
       aria-expanded="false"
       data-toggle="collapse"
@@ -94,9 +58,10 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @mailchimp_data,
   viewing: "Mailchimp Data",
   nav_header_list_items:,
   admin_search_form:,
-  chart_collection: @render_chart && matching_mailchimp_data
+  chart_collection: @render_chart && matching_mailchimp_data,
 )) %>

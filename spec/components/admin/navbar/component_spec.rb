@@ -7,7 +7,12 @@ RSpec.describe Admin::Navbar::Component, type: :component do
   # Somewhere outside admin, so no nav link is the active one
   let(:url) { "/bikes/new" }
   let(:current_user) { FactoryBot.create(:superuser) }
-  let(:component) { with_request_url(url) { render_inline(described_class.new(current_user:)) } }
+  let(:controller_path) { "bikes" }
+  let(:search_filtered) { false }
+  let(:instance) do
+    described_class.new(current_user:, user_root_url: "/admin", controller_path:, search_filtered:)
+  end
+  let(:component) { with_request_url(url) { render_inline(instance) } }
   # The picker's "All" link
   let(:view_all_link) { "a.text-muted" }
 
@@ -54,6 +59,8 @@ RSpec.describe Admin::Navbar::Component, type: :component do
   end
 
   describe "the view all link" do
+    let(:controller_path) { "admin/bikes" }
+
     context "period all" do
       let(:url) { "#{admin_bikes}?period=all&timezone=Party" }
 
@@ -73,6 +80,7 @@ RSpec.describe Admin::Navbar::Component, type: :component do
 
     context "with period != all" do
       let(:url) { "#{admin_bikes}?period=week&timezone=Party" }
+      let(:search_filtered) { true }
 
       it "links to the unfiltered page" do
         expect(component).to have_css("#{view_all_link}[href='#{admin_bikes}']", text: /All\s+Bikes/)
@@ -81,6 +89,7 @@ RSpec.describe Admin::Navbar::Component, type: :component do
 
     context "with a search param" do
       let(:url) { "#{admin_bikes}?search_email=party@example.com" }
+      let(:search_filtered) { true }
 
       it "links to the unfiltered page" do
         expect(component).to have_css("#{view_all_link}[href='#{admin_bikes}']", text: /All\s+Bikes/)
@@ -97,9 +106,34 @@ RSpec.describe Admin::Navbar::Component, type: :component do
 
     context "on a Config: page" do
       let(:url) { "/admin/email_domains?search_status=banned" }
+      let(:search_filtered) { true }
+      let(:controller_path) { "admin/email_domains" }
 
       it "drops the prefix from the title" do
         expect(component).to have_css("#{view_all_link}[href='/admin/email_domains']", text: /All\s+Email Domains/)
+      end
+    end
+
+    # Nested under organizations, so no link matches it by controller
+    context "on an organization's invoices" do
+      let(:url) { "/admin/organizations/bike-shop/invoices" }
+      let(:controller_path) { "admin/organizations/invoices" }
+
+      it "names the section itself, and links to every invoice" do
+        expect(component).to have_css("input[role='combobox'][placeholder='Viewing Invoices']")
+        expect(component).to have_css("#{view_all_link}[href^='/admin/invoices']", text: /All\s+Invoices/)
+      end
+    end
+
+    context "on an organization's custom layouts" do
+      let(:url) { "/admin/organizations/bike-shop/custom_layouts" }
+      let(:controller_path) { "admin/organizations/custom_layouts" }
+
+      # There is no admin index of custom layouts to be "all" of, so it falls back to the
+      # section it's nested under rather than naming nothing
+      it "falls back to the organizations it's nested under" do
+        expect(component).to have_css("input[role='combobox'][placeholder='Viewing Organizations']")
+        expect(component).to have_css("#{view_all_link}[href='/admin/organizations']", text: /All\s+Organizations/)
       end
     end
   end

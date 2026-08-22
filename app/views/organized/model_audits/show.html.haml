@@ -1,7 +1,7 @@
 -# TODO: add translations
 
 .organized-page-header
-  %h1
+  = render(UI::Header::Component.new) do
     %strong= @model_audit.mnfg_name
     %em= model_audit_frame_model_display(@model_audit)
     &nbsp;
@@ -58,13 +58,13 @@
               %code
                 = link_to @model_audit&.id, admin_bikes_path(search_model_audit_id: @model_audit&.id)
 
-%h2.uncap.mt-4
+= render(UI::Header::Component.new(tag: :h2, html_class: "uncap mt-4")) do
   Attestations
   %small
     %a.btn.btn-sm.btn-secondary.updateModelCert{data: {toggle: "modal", target: "#update-model-cert-modal", modelauditid: @model_audit.id, mnfgname: @model_audit.mnfg_name, framemodel: @model_audit.frame_model}}
       submit new
 - if @model_attestations.none?
-  %h4.mt-2.uncap No Attestations
+  %p.twless-strong.mt-4 No Attestations
 - else
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
     %thead.small-header.hidden-md-down
@@ -106,7 +106,7 @@
           %td
             = model_attestation.info
 
-%h2.uncap.pt-3.pb-2.mt-4.mb-0
+= render(UI::Header::Component.new(tag: :h2, html_class: "uncap pt-3 pb-2 mt-4 tw:mb-0!")) do
   Vehicles
   - if @bikes_count > @per_page
     %small

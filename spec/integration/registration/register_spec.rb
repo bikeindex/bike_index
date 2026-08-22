@@ -68,19 +68,45 @@ RSpec.describe "Register flow", :js, type: :system do
     wait_for_details_step
   end
 
-  # An async combobox carries no options to map a saved id back to a name, so the server
-  # renders the display itself - and back to step 1 is where a raw id would show up instead
-  it "shows the manufacturer by name, not by id, when back returns to step 1" do
-    start_registration
+  it "keeps a step 1 draft across a reload, and comes back to what it submitted" do
+    visit "/register/new"
+    type_into("#b_param_manufacturer_id", "Surly")
+    click_combobox_option("Surly")
+    type_into("#b_param_cycle_type", "e-Scooter")
+    click_combobox_option("e-Scooter")
+    fill_in "b_param[owner_email]", with: owner_email
+    # An always-motorized type answers the electric question itself
+    expect(page).to have_checked_field("Electric (motorized)", disabled: true)
+
+    # Nothing is saved until step 1 submits, so the reload has only the draft to go on.
+    # The restore runs in form-persist's connect, and its module is lazily loaded - so
+    # the first assertion after a reload waits for the fetch, not just for a render
+    visit page.current_url
+
+    expect(page).to have_field("b_param_manufacturer_id", with: "Surly", wait: 10)
+    expect(page).to have_field("b_param_cycle_type", with: "e-Scooter")
+    expect(page).to have_field("b_param[owner_email]", with: owner_email)
+    # The restored type reaches the section label and the electric checkbox, each of which
+    # is a controller away from the combobox that changed
+    expect(page).to have_content("E-SCOOTER INFO")
+    expect(page).to have_checked_field("Electric (motorized)", disabled: true)
+
+    click_button "Next"
+
+    expect(page).to have_content("Add your e-scooter", wait: 10)
+    # The draft is what submits, not just what showed
+    expect(BParam.last).to have_attributes(manufacturer_id: manufacturer.id, owner_email:,
+      cycle_type: "e-scooter", motorized?: true)
+
+    # An async combobox carries no options to map a saved id back to a name, so the server
+    # renders the display itself - and back to step 1 is where a raw id would show up instead
     page.go_back
 
     expect(page).to have_field("b_param_manufacturer_id", with: "Surly")
     # The id is what submits, and only ever from the hidden field
     expect(find("input[name='b_param[manufacturer_id]']", visible: :all).value).to eq manufacturer.id.to_s
     expect(page).to have_no_field("b_param_manufacturer_id", with: manufacturer.id.to_s)
-
     # The manufacturer itself, rather than Manufacturer.other with the id as free text
-    expect(BParam.last.manufacturer_id).to eq manufacturer.id
     expect(BParam.last.manufacturer_other).to be_blank
 
     # This field is autofocused, so the click into it brings no focus event of its own -
@@ -164,7 +190,7 @@ RSpec.describe "Register flow", :js, type: :system do
     # Nothing submitted yet - the reload restores the whole draft from form-persist
     visit details_url
 
-    expect(page).to have_field("bike[user_name]", with: user_name)
+    expect(page).to have_field("bike[user_name]", with: user_name, wait: 10)
     expect(page).to have_field("bike[frame_model]", with: "Marlin 7")
     expect(page).to have_field("bike[year]", with: "2023")
     expect(page).to have_field("bike_primary_frame_color_id", with: "Red")
@@ -192,7 +218,7 @@ RSpec.describe "Register flow", :js, type: :system do
 
     visit details_url
 
-    expect(page).to have_checked_field("This bike was made without a serial")
+    expect(page).to have_checked_field("This bike was made without a serial", wait: 10)
     expect(page).to have_no_field("bike[serial_number]") # the serial section stays swapped out
 
     # The input was hidden twice getting here - by the missing checkbox, then by the
@@ -225,7 +251,7 @@ RSpec.describe "Register flow", :js, type: :system do
     # reload - and the fields it gates reopen with it
     visit details_url
 
-    expect(page).to have_field("bike_status", with: "Stolen")
+    expect(page).to have_field("bike_status", with: "Stolen", wait: 10)
     expect(find("input[name='bike[status]']", visible: :all).value).to eq "status_stolen"
     fill_in "bike[phone]", with: "(555) 000-0000"
 

@@ -24,10 +24,12 @@ Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't us
 - Prefer less code, by character count (excluding whitespace and comments). Use `bin/char_count {FILE OR FOLDER}` to get the non-whitespace character count
 - prefer un-abbreviated variable names
 - Use full class/module names everywhere — `UI::Forms::Combobox::Component`, not the `Combobox::Component` that lexical scope also resolves from inside `UI::Forms`
+- **A namespace under `Admin::` shadows a top-level one of the same name** — admin controllers and components all nest in `module Admin`, so `Admin::Users` hides the `Users::` jobs from every one of them. Rename the collision away rather than prefixing call sites with `::`: job namespaces carry the `*_jobs` suffix (`app/jobs/user_jobs`, `bike_jobs`, `callback_jobs`, `image_jobs`, `strava_jobs`).
 - Default to no comment — see **Comments** below for when one earns its place
 - **Prefer composition over inheritance and `include`.** Share behavior by calling an object that owns it, not by mixing a module into several classes or adding a base class. A `module` extracted only to be `include`d in two classes is usually one of those classes with a parameter — pass the difference in as an argument instead. Rails' own extension points (`ApplicationRecord`, `ApplicationJob`, `ActiveSupport::Concern` for controller filters) are fine; new mixins of our own are what to avoid.
 - **Service objects** (`app/services/`): a stateless service is a `module` with `extend Functionable` (see the `functionable` gem) — inputs passed as args, no instance state, private methods via `conceal` + a `# private below here` block. Don't write a stateless service as a `class` with `def self.` methods.
 - **Class methods go in a `class << self` block** when the class has more than 5 of them, or when any of them should be private — `BugReport` is the pattern.
+- **An endless method takes a trailing `if`/`unless` on the *definition*, not the body.** `def centering = "mx-auto" if @alignment == :center` evaluates the condition once, in the class body where the ivar is still nil, so the method is never defined and every call raises `NameError`. Give it a real body when the result is conditional.
 
 ### Comments
 
@@ -63,6 +65,8 @@ Run `bundle exec rails prepare_translations` after hand-editing a `component.en.
 
 A spec that renders in another locale — `spec/components/page_block/footer/component_spec.rb` does, in `:nl` — fails on a key the sync-generated `config/locales/translation.*.yml` don't carry yet, since `raise_on_missing_translations` is on in test. Add the key inline to all four; the next sync overwrites them.
 
+**Moving a key to another scope means moving its translations too.** Renaming a component or a service relocates its keys in `en.yml`, but the four `translation.*.yml` still hold the old scope — so every non-English reader silently drops back to English until the next sync re-translates. Nothing catches it: `prepare_translations` reports clean (`en.yml` is complete, and the orphans sit under the `ignore_unused` scopes), and no spec renders those rows in another locale. Carry the existing values across by hand, in all four, in the same commit as the rename.
+
 ## Subagents
 
 When a command fans out to subagents — `/simplify`, `/code-review`, or an ad-hoc fan-out — pick the model by how much of the *search* the agent has to invent, not by how simple the task sounds:
@@ -83,7 +87,7 @@ Uses RSpec. All business logic should be tested. The `rspec-testing` skill cover
 
 ## Frontend Development
 
-Uses Stimulus.js for JavaScript and Tailwind CSS for styling. SCSS and CoffeeScript files exist but are deprecated. The `bin/dev` command handles Tailwind and JS builds. The `frontend-conventions` skill covers project-specific class prefixes (`tw:`, `twinput`, `twlabel`, `twlink`), the `number_display` helper, and ViewComponent rules.
+Uses Stimulus.js for JavaScript and Tailwind CSS for styling. SCSS and CoffeeScript files exist but are deprecated. The `bin/dev` command handles Tailwind and JS builds. The `frontend-conventions` skill has the conventions.
 
 Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it isn't, **stop and ask the user to start it** so Tailwind and JS asset watchers are running before any frontend work.
 
@@ -97,6 +101,7 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 - **Multi-database**: primary (`ApplicationRecord`) + analytics (`AnalyticsRecord`). Use `db:migrate:down:analytics` for analytics migrations
 - **Soft delete**: some models use `acts_as_paranoid` with `deleted_at` column; use `unscoped` in admin controllers when needed
 - **Admin search**: `sortable_search_params` auto-includes any param starting with `search_`
+- **Admin record screens are tabs**: a record with more than one super-admin page gets `Admin::Headers::Tabs::Component`, with the section's own tabs named in a component of its own (`Admin::Organizations::Tabs` is the pattern) rather than in each view.
 
 # Initial setup
 

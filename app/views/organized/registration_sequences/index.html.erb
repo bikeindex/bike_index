@@ -1,7 +1,5 @@
 <div class="tw:mx-auto tw:max-w-3xl tw:py-6">
-  <h1 class="uncap tw:mb-6 tw:text-2xl tw:font-semibold">
-    Registration sequences
-  </h1>
+  <%= render(UI::Header::Component.new(text: "Registration sequences", html_class: "uncap")) %>
 
   <% RegistrationSequence::KINDS.each do |kind| %>
     <%= render Org::RegistrationSequence::KindSection::Component.new(organization: current_organization, kind:, editable: can_edit_registration_sequences?) %>

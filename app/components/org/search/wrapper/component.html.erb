@@ -5,7 +5,7 @@
     <div class="mb-4">
       <%= render(Org::Search::Form::Component.new(
         target_search_path: organization_registrations_path(organization_id: @organization.to_param),
-        interpreted_params: @interpreted_params,
+        interpreted_params: @interpreted_params.merge(search_email: @params[:search_email], search_notes: @params[:search_notes]).compact,
         settings_component: @skip_settings ? nil : settings_component
       )) %>
     </div>
@@ -29,7 +29,7 @@
           <em>— <%= safe_join(active_search_filter_descriptions, " · ") %></em>
         <% end %>
 
-        <em><%= helpers.humanized_time_range(@time_range) %></em>
+        <em><%= @humanized_time_range %></em>
       </p>
     </div>
   <% end %>
@@ -41,7 +41,7 @@
         <a class="gray-link" href="<%= organization_model_audit_path(@model_audit.to_param, organization_id: @organization.to_param) %>"><%= model_audit_display(@model_audit) %></a>
         &nbsp;
         <%= link_to translation(".view_matching_any_audit"),
-            url_for(@sortable_search_params.merge(search_model_audit_id: nil)),
+            url_for(@sort_state.search_params.merge(search_model_audit_id: nil)),
             class: "gray-link small" %>
       </p>
     <% end %>
@@ -52,7 +52,7 @@
     bikes: @bikes,
     current_user: @current_user,
     render_sortable: true,
-    sortable_search_params: @sortable_search_params,
+    sort_state: @sort_state,
     bike_sticker: @bike_sticker,
     settings_component:
   )) %>

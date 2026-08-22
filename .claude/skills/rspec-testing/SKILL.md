@@ -51,6 +51,14 @@ What a component decides about its markup — a label, a placeholder, a class, w
 
 A component having no spec yet isn't a reason to put it in the request spec instead. `spec/components/register/step2/component_spec.rb` is the pattern, including the `render_x` helper that reloads the record so an object updated mid-example isn't answered from the copy the previous render left behind.
 
+## `render_in_view_context` takes its subjects as method arguments
+
+A component needing a `form_builder` renders inside `render_in_view_context { form_for … }`, which `instance_exec`s its block in the view context — so `let` values aren't in scope and a bare `organization` raises `NameError`. Wrap it in a `def rendered_component(organization, current_user)` and call that from the `let(:component)`; the block closes over the method's locals. `spec/components/admin/organizations/form/wrapper/component_spec.rb` is the pattern.
+
+## `display_dev_info?` is false in test, so nothing it gates is verifiable
+
+`ControllerHelpers#display_dev_info?` opens with `!Rails.env.test?`. Every `only-dev-visible` block it wraps is unrendered in the suite, so threading the flag through a component — a wrong default, a missed hop — passes green and is wrong only in development. Reading the call sites isn't enough either — it can't show that a `UI::Table` cell block is `instance_exec`'d, so an `@ivar` in one resolves against the table and is always nil. Check it in the browser signed in as `dev@bikeindex.org`; the flag needs `developer?` *and* MiniProfiler, so the superadmin banner button won't do it.
+
 ## `log_in` stubs the auth lookup, so it can't answer whether a session ends
 
 `spec/support/request_spec_helpers.rb`'s `log_in` (and every `:request_spec_logged_in_as_*` context) stubs `User.from_auth` to return the user, so the cookie is never read and the session outlives anything done to that user — deleting, banning, rotating their `auth_token`. A spec asserting a request signs someone *out* has to sign in for real: `post "/session", params: {session: {email:, password:}}`, then make the request. `spec/requests/sessions_request_spec.rb`'s "deleted after signing in" is the pattern.
@@ -208,6 +216,8 @@ The bad version repeats setup, mocks the object, and doesn't communicate what ea
 This is the same instinct as "everything making the same request should be in a single test", generalized: splitting same-setup assertions across sibling `it` blocks re-runs identical setup (factories, HTTP requests, renders) once per block for zero isolation benefit, and scatters one logical behavior across the file. Two `it` blocks that differ *only* in the request params or the assertion — with identical `let`s and no `before` between them — are one example.
 
 After writing a spec, scan each `context`/`describe`: if it holds multiple `it` blocks and they don't each sit behind a distinct `context`/`before`/`let`, merge them.
+
+**A helper that reads the response has to be a `def`, not a `let`.** One example making several requests is exactly where a `let` that parses `response.body` bites: it memoizes the first response and every later assertion re-reads it, so the example fails while the code is right (or worse, passes while the code is wrong). `def` re-evaluates.
 
 ### Good
 

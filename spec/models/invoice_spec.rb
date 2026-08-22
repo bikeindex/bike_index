@@ -121,7 +121,7 @@ RSpec.describe Invoice, type: :model do
       expect(invoice.law_enforcement_functionality_invoice?).to be_truthy
       expect(organization.reload.paid_money?).to be_falsey
       expect(organization.law_enforcement_features_enabled?).to be_truthy
-      expect(OrganizationDisplayer.law_enforcement_missing_verified_features?(organization)).to be_falsey
+      expect(OrgServices::Displayer.law_enforcement_missing_verified_features?(organization)).to be_falsey
     end
     context "paid_money_in_full" do
       let(:amount_due) { 5000 }
@@ -130,7 +130,7 @@ RSpec.describe Invoice, type: :model do
         expect(invoice.law_enforcement_functionality_invoice?).to be_truthy
         expect(organization.reload.paid_money?).to be_truthy
         expect(organization.law_enforcement_features_enabled?).to be_truthy
-        expect(OrganizationDisplayer.law_enforcement_missing_verified_features?(organization)).to be_falsey
+        expect(OrgServices::Displayer.law_enforcement_missing_verified_features?(organization)).to be_falsey
       end
     end
   end

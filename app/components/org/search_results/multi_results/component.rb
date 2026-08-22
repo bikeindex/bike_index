@@ -4,11 +4,10 @@ module Org
   module SearchResults
     module MultiResults
       class Component < ApplicationComponent
-        include Binxtils::SortableHelper
-
         def initialize(organization:, query:, chip_id:, pagy:, search_kind: "serials",
-          bikes: nil, close_serials: nil)
+          bikes: nil, close_serials: nil, sort_state: ComponentStates::SortState.new)
           @organization = organization
+          @sort_state = sort_state
           @query = query
           @chip_id = chip_id
           @pagy = pagy
@@ -21,6 +20,12 @@ module Org
 
         def sticker_search?
           @search_kind == "stickers"
+        end
+
+        def query_atom
+          return Atom::Sticker::Component.new(pretty_code: @query) if sticker_search?
+
+          Atom::Serial::Component.new(serial: @query)
         end
 
         def result_index

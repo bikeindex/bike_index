@@ -43,8 +43,10 @@
         <% status_active = @search_status == status %>
         <% status_link_params = sortable_search_params.merge(organization_id: current_organization.id, search_status: (status_active ? nil : status)) %>
 
-        <% dropdown.with_entry_item(active: status_active) do %>
-          <%= link_to status_display.call(status), organization_graduated_notifications_path(status_link_params), data: {turbo_action: "advance"} %>
+        <% status_query = {search_status: (status == "current") ? [status, nil] : status} %>
+
+        <% dropdown.with_entry_item do %>
+          <%= render UI::ActiveLink::Component.new(text: status_display.call(status), path: organization_graduated_notifications_path(status_link_params), match: :query, query: status_query, data: {turbo_action: "advance"}) %>
         <% end %>
       <% end %>
     <% end %>
@@ -53,7 +55,7 @@
 
 <% skip_remaining = (GraduatedNotification.current_statuses + ["current"]).include?(@search_status) %>
 
-<%= render(Org::GraduatedNotificationTable::Component.new(graduated_notifications: @graduated_notifications, current_organization:, render_sortable: true, render_remaining_at: !skip_remaining, separate_secondary_notifications: separate_secondary_notifications?)) %>
+<%= render(Org::GraduatedNotificationTable::Component.new(graduated_notifications: @graduated_notifications, current_organization:, sort_state:, display_dev_info: display_dev_info?, render_sortable: true, render_remaining_at: !skip_remaining, separate_secondary_notifications: separate_secondary_notifications?)) %>
 
 <div class="pt-4 pb-4">
   <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg)) %>

@@ -997,6 +997,7 @@ en:
           community_member: Community Member
           employee: Employee
           graduate_student: Graduate Student
+          postdoc: Postdoc
           student: Undergraduate Student
       stolen_record:
         bike_was_not_locked: Bike was not locked
@@ -1747,6 +1748,7 @@ en:
       edit:
         delete_account: Delete account
         membership: Membership
+        organization_roles: Organization Roles
         password: Password
         registration_organizations: Registration Organizations
         sharing: Sharing + Personal Page
@@ -1769,6 +1771,11 @@ en:
         show:
           sorry_that_is_you: That's your listing! You can't start a new message to
             yourself.
+      organization_roles:
+        destroy:
+          left_organization: You've left %{org_name}
+          unable_to_leave: 'Unable to leave %{org_name}: contact support@bikeindex.org
+            for help'
       update:
         current_password_doesnt_match: Current password doesn't match, it's required
           for updating your password.
@@ -2400,11 +2407,6 @@ en:
   helpers:
     bike_helper:
       deleted: Deleted
-      hidden: hidden
-      hidden_because_status: because %{bike_type} is %{status}
-      hidden_for_unauthorized_users: hidden for unauthorized users
-      made_without_serial: made without serial
-      unknown: unknown
     organization_helper:
       address: Street address
       address_school: Campus mailing address
@@ -4973,37 +4975,52 @@ en:
       you: You
       your_bikes: Your bikes
       your_preferences: Your preferences
-    organized_menu_items:
+    menu_items_account:
+      logout: Log out
+      marketplace_messages: Marketplace messages
+      register_a_new_bike: Register a new bike
+      switch_to_org: Switch to %{org_name}
+      user_settings: "%{user_email} settings"
+      view_without_org: View without any organization
+      viewing_org: Viewing %{org_name}
+      viewing_without_org: Viewing without any organization
+      your_registrations: Your registrations
+    menu_items_org:
       add_a_bike: Add a bike
+      add_an_impounded_vehicle: Add an Impounded Vehicle
       ascend_imports: Ascend Imports
+      bulk_import_and_export: Bulk Import & Export
       bulk_imports: Bulk Imports
-      custom_emails: Custom emails
       discuss: Discuss
       exports: Exports
       getting_started: Getting started
       graduated_notifications: Graduated notifications
-      impounded_bikes: Impounded Bikes
       impounded_claims: Impounded claims
+      impounded_vehicles: Impounded Vehicles
+      impounding: Impounding
       incomplete_registrations: Incomplete registrations
       lightspeed_integration_panel: Lightspeed Integration Panel
-      manage_impounding: Manage impounding
-      manage_registration_sequences: Manage Registration sequences
       manage_users: Manage users
+      messaging: Messaging
       model_audits: E-Vehicle audits
       multi_search: Multi search
-      org_bikes: "%{org_name} Bikes"
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} locations"
       org_profile: "%{org_name} profile"
+      org_registrations: "%{org_name} Registrations"
+      org_settings: "%{org_name} Settings"
       parking_notification_unregistered: New unregistered notification
-      parking_notifications: Parking notifications
+      parking_notifications_group: Parking Notifications
       recoveries: Recoveries
+      registration_sequences: Registration sequences
       registration_stickers: Registration stickers
+      reports: Reports
       resources: Resources
+      search_impounded_vehicles: Search Impounded Vehicles
+      search_parking_notifications: Search Parking Notifications
+      search_registrations: Search Registrations
       stolen_hot_sheet: Stolen Bike Hot Sheet
-      stolen_hot_sheet_configuration: Stolen Bike Hot Sheet configuration
       stolen_message: Stolen Message
-      super_admin_view: Super Admin for %{org_name}
     recovery_display:
       bike: Bike
       recovered_date: recovered %{date}

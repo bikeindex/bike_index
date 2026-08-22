@@ -11,11 +11,16 @@ FactoryBot.define do
     end
 
     # What BParam#unfinished_registration? requires: step 1 submitted (manufacturer_id),
-    # registered to an address of the creator's rather than for someone else
+    # registered to an address of the creator's rather than for someone else. A real
+    # manufacturer, since set_manufacturer_key turns an id that resolves to nothing into
+    # the Other manufacturer named after it
     factory :b_param_unfinished_registration do
+      transient do
+        manufacturer { Manufacturer.find_or_create_by(name: "Surly") }
+      end
       origin { "register_flow" }
       owner_email { creator.email }
-      params { {bike: {manufacturer_id: 1, cycle_type: "cargo", owner_email: owner_email}} }
+      params { {bike: {manufacturer_id: manufacturer.id, cycle_type: "cargo", owner_email: owner_email}} }
     end
 
     factory :organized do

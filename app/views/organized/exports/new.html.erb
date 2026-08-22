@@ -1,6 +1,8 @@
 <div class="organized-exports">
   <div class="organized-page-header">
-    <h1><em><%= current_organization.name %></em> new export</h1>
+    <%= render(UI::Header::Component.new) do %>
+      <em><%= current_organization.name %></em> new export
+    <% end %>
   </div>
 
   <%= form_for @export, url: organization_exports_path(organization_id: current_organization.to_param), html: { class: "organized-form" } do |f| %>

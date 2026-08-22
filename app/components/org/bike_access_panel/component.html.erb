@@ -92,7 +92,7 @@
                 </td>
               </tr>
 
-              <% if @organization.enabled?("bike_stickers") %>
+              <% if show_sticker_modal? %>
                 <tr>
                   <td><%= translation(".sticker") %></td>
 
@@ -122,15 +122,8 @@
                     <% end %>
 
                     <div class="small text-right">
-                      <a
-                        class="less-strong"
-                        href="#"
-                        style="opacity: 0.8; text-align: right;"
-                        data-toggle="modal"
-                        data-target="#assignStickerModal"
-                      >
-                        <%= translation(".link_sticker") %>
-                      </a>
+                      <%= render(UI::Button::Component.new(text: translation(".link_sticker"), color: :link,
+                            commandfor: "assignStickerModal", command: "show-modal")) %>
                     </div>
                   </td>
                 </tr>
@@ -385,7 +378,7 @@
               <% if @bike.phoneable_by?(@user) %>
                 <p class="phoneable-by mt-4">
                   <%= translation(".or_call_owner_html").html_safe %>
-                  <%= render UI::PhoneDisplay::Component.new(phone: @bike.phone) %>
+                  <%= render Atom::Phone::Component.new(phone: @bike.phone) %>
                 </p>
               <% end %>
             <% else %>
@@ -573,7 +566,7 @@
   <% if graduated_notifications.any? %>
     <div class="parking-notifications-wrap">
       <h3 class="mt-2 mb-3">Graduated notifications</h3>
-      <%= render(Org::GraduatedNotificationTable::Component.new(graduated_notifications:, current_organization: @organization, skip_email: true, render_remaining_at: true)) %>
+      <%= render(Org::GraduatedNotificationTable::Component.new(graduated_notifications:, current_organization: @organization, display_dev_info: @display_dev_info, skip_email: true, render_remaining_at: true)) %>
     </div>
   <% end %>
 <% end %>
@@ -657,9 +650,8 @@
     <% end %>
 
     <% unless @bike.status_impounded? %>
-      <% parking_notification_open = params[:parking_notification].present? %>
       <div
-        class="text-center collapse <%= "in" unless parking_notification_open %>"
+        class="text-center collapse <%= "in" unless @parking_notification_open %>"
         id="openNewParkingNotification"
       >
         <a class="btn btn-primary btn-lg" href="#newParkingNotificationFields">
@@ -668,7 +660,7 @@
       </div>
       <div
         id="newParkingNotificationFields"
-        class="collapse <%= "in" if parking_notification_open %>"
+        class="collapse <%= "in" if @parking_notification_open %>"
       >
         <hr>
 
@@ -827,23 +819,18 @@
 <% end %>
 
 <% if show_sticker_modal? %>
-  <% sticker_modal_body = capture do %>
-    <div class="modal-body">
+  <%= render(UI::Modal::Component.new(title: translation(".assign_sticker"), id: "assignStickerModal")) do |modal| %>
+    <% modal.with_body do %>
       <%= form_for BikeSticker.new, url: organization_sticker_path(id: "code", organization_id: @organization.to_param), action: "update", method: "PUT" do |f| %>
         <%= f.hidden_field :bike_id, value: @bike.id %>
 
         <div class="form-group">
-          <%= f.label :code, translation(".sticker_code"), class: "org-form-label" %>
+          <%= f.label :code, translation(".sticker_code") %>
           <%= f.text_field :code, required: true, class: "form-control" %>
         </div>
 
-        <div class="modal-btn-footer">
-          <div class="form-submit-button">
-            <%= f.submit translation(".assign_sticker"), class: "btn btn-success btn-lg" %>
-          </div>
-        </div>
+        <%= f.submit translation(".assign_sticker"), class: "btn btn-success btn-lg" %>
       <% end %>
-    </div>
+    <% end %>
   <% end %>
-  <%= render partial: "shared/modal", locals: {title: translation(".assign_sticker"), modal_body: sticker_modal_body, id: "assignStickerModal"} %>
 <% end %>

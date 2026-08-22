@@ -4,67 +4,35 @@
 <% end %>
 
 <% nav_header_list_items = capture do %>
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @query.present? ? 'active' : '' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <%= @query.present? ? "#{@query.titleize} only" : "All invoices" %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "All", admin_invoices_path(sortable_search_params.merge(query: nil)), class: "dropdown-item #{@query.blank? ? 'active' : ''}" %>
-
-      <div class="dropdown-divider"></div>
-      <%= link_to "Active only", admin_invoices_path(sortable_search_params.merge(query: "active")), class: "dropdown-item #{@query == 'active' ? 'active' : ''}" %>
-      <%= link_to "Inactive only", admin_invoices_path(sortable_search_params.merge(query: "inactive")), class: "dropdown-item #{@query == 'inactive' ? 'active' : ''}" %>
-      <%= link_to "First invoices only", admin_invoices_path(sortable_search_params.merge(query: "first_invoice")), class: "dropdown-item #{@query == 'first_invoice' ? 'active' : ''}" %>
-      <%= link_to "Renewal invoices only", admin_invoices_path(sortable_search_params.merge(query: "renewal_invoice")), class: "dropdown-item #{@query == 'renewal_invoice' ? 'active' : ''}" %>
-    </div>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: @query.present? ? "#{@query.titleize} only" : "All invoices", button_size: :sm,
+          active: @query.present?)) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All", path: admin_invoices_path(sortable_search_params.merge(query: nil)), match: :query, query: {query: nil}) } %>
+      <% dropdown.with_entry_divider %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Active only", path: admin_invoices_path(sortable_search_params.merge(query: "active")), match: :query, query: {query: "active"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Inactive only", path: admin_invoices_path(sortable_search_params.merge(query: "inactive")), match: :query, query: {query: "inactive"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "First invoices only", path: admin_invoices_path(sortable_search_params.merge(query: "first_invoice")), match: :query, query: {query: "first_invoice"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Renewal invoices only", path: admin_invoices_path(sortable_search_params.merge(query: "renewal_invoice")), match: :query, query: {query: "renewal_invoice"}) } %>
+    <% end %>
   </li>
 
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @time_range_column == 'created_at' ? '' : 'active' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <%= humanized_time_range_column(@time_range_column, return_value_for_all: true) %>
-      in timerange
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "Created in timerange", admin_invoices_path(sortable_search_params.merge(time_range_column: "created_at")), class: "dropdown-item #{@time_range_column == 'created_at' ? 'active' : ''}" %>
-      <%= link_to "Subscription ends in timerange", admin_invoices_path(sortable_search_params.merge(time_range_column: "subscription_end_at")), class: "dropdown-item #{@time_range_column == 'subscription_end_at' ? 'active' : ''}" %>
-      <%= link_to "Subscription starts in timerange", admin_invoices_path(sortable_search_params.merge(time_range_column: "subscription_start_at")), class: "dropdown-item #{@time_range_column == 'subscription_start_at' ? 'active' : ''}" %>
-    </div>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: "#{humanized_time_range_column(@time_range_column, return_value_for_all: true)} in timerange", button_size: :sm,
+          active: @time_range_column != "created_at")) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Created in timerange", path: admin_invoices_path(sortable_search_params.merge(time_range_column: "created_at")), match: :query, query: {time_range_column: "created_at"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Subscription ends in timerange", path: admin_invoices_path(sortable_search_params.merge(time_range_column: "subscription_end_at")), match: :query, query: {time_range_column: "subscription_end_at"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Subscription starts in timerange", path: admin_invoices_path(sortable_search_params.merge(time_range_column: "subscription_start_at")), match: :query, query: {time_range_column: "subscription_start_at"}) } %>
+    <% end %>
   </li>
 
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @search_endless.present? ? 'active' : '' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <%= @search_endless.present? ? @search_endless.humanize : "endless-ness" %>
-    </a>
-
-    <div class="dropdown-menu">
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: @search_endless.present? ? @search_endless.humanize : "endless-ness", button_size: :sm,
+          active: @search_endless.present?)) do |dropdown| %>
       <% endless_only_active = @search_endless == "endless_only" %>
-      <%= link_to "Endless only", admin_invoices_path(sortable_search_params.merge(search_endless: endless_only_active ? nil : "endless_only")), class: "dropdown-item #{endless_only_active ? 'active' : ''}" %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Endless only", path: admin_invoices_path(sortable_search_params.merge(search_endless: endless_only_active ? nil : "endless_only")), match: :query, query: {search_endless: "endless_only"}) } %>
       <% not_endless_active = @search_endless == "not_endless" %>
-      <%= link_to "Not Endless", admin_invoices_path(sortable_search_params.merge(search_endless: not_endless_active ? nil : "not_endless")), class: "dropdown-item #{not_endless_active ? 'active' : ''}" %>
-    </div>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Not Endless", path: admin_invoices_path(sortable_search_params.merge(search_endless: not_endless_active ? nil : "not_endless")), match: :query, query: {search_endless: "not_endless"}) } %>
+    <% end %>
   </li>
 <% end %>
 
@@ -190,14 +158,15 @@
     Go to individual organizations to create new invoices
   </p>
 
-  <%= render partial: "/admin/organizations/invoices/table", locals: {invoices: @invoices, render_sortable: true, display_organization: true} %>
+  <%= render(Admin::Invoices::Table::Component.new(invoices: @invoices, render_sortable: true, display_organization: true)) %>
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  viewing: controller_name.humanize,
   collection: @invoices,
   index_title:,
   nav_header_list_items:,
   rendered_chart:,
   table_view:,
-  time_range_column: @time_range_column
 )) %>

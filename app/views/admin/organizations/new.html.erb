@@ -1,0 +1,5 @@
+<h1>New Organizaton</h1>
+
+<%= render(Admin::Organizations::Form::TabForm::Component.new(organization: @organization, submit_text: "Create",
+      fields_component: Admin::Organizations::Form::Wrapper::Component,
+      fields_args: {display_dev_info: display_dev_info?}, width: :wide)) %>

@@ -139,7 +139,7 @@
           </ul>
         </nav>
         <div class="ad-block ad-binx ad300x600 d-none d-md-block"></div>
-        <%= helpers.render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google ad300x600 mt-3 d-none d-md-block"} %>
+        <%= render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google ad300x600 mt-3 d-none d-md-block"} %>
       <% end %>
     </div>
   </div>
@@ -147,7 +147,7 @@
   <% if render_get_your_stolen_bike_back? %>
     <div class="root-landing-recovery-stories mt-4">
       <div id="recovery-stories-container" class="extras-hidden">
-        <%= helpers.render partial: "shared/recovery_display", collection: RecoveryDisplay.limit(5) %>
+        <%= render partial: "shared/recovery_display", collection: RecoveryDisplay.limit(5) %>
 
         <div class="recovery-block recovery-see-more">
           <%= link_to "read more recovery stories",

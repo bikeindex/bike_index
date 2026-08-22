@@ -33,7 +33,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           components = rendered_view_component_names { get "#{base_url}/appears_abandoned_notification" }
           expect(response.status).to eq(200)
           expect(components).to include("Emails::ParkingNotification::Component")
-          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
+          expect(response.body).to include(OrgServices::EmailPreview::TOKEN_PATH)
           expect(response.body).to_not match(parking_notification.retrieval_link_token)
         end
       end
@@ -71,7 +71,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           components = rendered_view_component_names { get "#{base_url}/appears_abandoned_notification" }
           expect(response.status).to eq(200)
           expect(components).to include("Emails::ParkingNotification::Component")
-          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
+          expect(response.body).to include(OrgServices::EmailPreview::TOKEN_PATH)
           # Layout/helper hooks: @email_preview enables the preview-only CSS and suppresses
           # the supporters block; @organization makes the layout render org snippets even
           # though controller_path is "organized/emails", not "organized_mailer".
@@ -91,7 +91,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           end
           expect(response.status).to eq(200)
           expect(components).to include("Emails::ParkingNotification::Component")
-          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
+          expect(response.body).to include(OrgServices::EmailPreview::TOKEN_PATH)
           expect(assigns(:kind)).to eq "parked_incorrectly_notification"
           expect(response.body).to_not match(parking_notification.retrieval_link_token)
         end
@@ -167,7 +167,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           components = rendered_view_component_names { get "#{base_url}/appears_abandoned_notification" }
           expect(response.status).to eq(200)
           expect(components).to include("Emails::ParkingNotification::Component")
-          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
+          expect(response.body).to include(OrgServices::EmailPreview::TOKEN_PATH)
           expect(assigns(:kind)).to eq "appears_abandoned_notification"
           current_organization.reload
           expect(current_organization.parking_notifications.appears_abandoned_notification.count).to eq 0
@@ -181,7 +181,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           end
           expect(response.status).to eq(200)
           expect(components).to include("Emails::GraduatedNotification::Component")
-          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
+          expect(response.body).to include(OrgServices::EmailPreview::TOKEN_PATH)
           expect(response.body).to_not match(graduated_notification.marked_remaining_link_token)
           expect(assigns(:kind)).to eq "graduated_notification"
         end
@@ -201,7 +201,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(components).to include("Emails::FinishedRegistration::Component")
           expect(response.body).to include("Bike details")
           expect(response.body).to include("Protect your bike by following these locking guidelines")
-          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
+          expect(response.body).to include(OrgServices::EmailPreview::TOKEN_PATH)
           expect(assigns(:viewable_email_kinds)).to eq(["finished_registration"])
           # And it defaults to finished registration, if unable to parse kind
           components = rendered_view_component_names { get "#{base_url}/whateverrrrr" }
@@ -209,7 +209,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(components).to include("Emails::FinishedRegistration::Component")
           expect(response.body).to include("Bike details")
           expect(response.body).to include("Protect your bike by following these locking guidelines")
-          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
+          expect(response.body).to include(OrgServices::EmailPreview::TOKEN_PATH)
           expect(assigns(:viewable_email_kinds)).to eq(["finished_registration"])
         end
 
@@ -264,7 +264,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           components = rendered_view_component_names { get "#{base_url}/partial_registration" }
           expect(response.status).to eq(200)
           expect(components).to include("Emails::PartialRegistration::Component")
-          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
+          expect(response.body).to include(OrgServices::EmailPreview::TOKEN_PATH)
           expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration partial_registration graduated_notification])
         end
       end
@@ -279,7 +279,7 @@ RSpec.describe Organized::EmailsController, type: :request do
           expect(components).to include("Emails::FinishedRegistration::Component")
           # Fake bike doesn't have status_stolen, so it renders the normal registration message
           expect(response.body).to include("Protect your bike by following these locking guidelines")
-          expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
+          expect(response.body).to include(OrgServices::EmailPreview::TOKEN_PATH)
           expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration organization_stolen_message])
         end
         context "with a stolen bike" do
@@ -304,7 +304,7 @@ RSpec.describe Organized::EmailsController, type: :request do
             expect(bike.reload.current_stolen_record).to be_present
             expect(bike.current_stolen_record.organization_stolen_message_id).to eq organization_stolen_message.id
             expect(assigns(:viewable_email_kinds)).to match_array(%w[finished_registration organization_stolen_message])
-            expect(response.body).to include(OrganizedServices::EmailPreview::TOKEN_PATH)
+            expect(response.body).to include(OrgServices::EmailPreview::TOKEN_PATH)
             expect(response.body).to_not match(bike.current_ownership.token)
           end
         end
@@ -407,6 +407,18 @@ RSpec.describe Organized::EmailsController, type: :request do
           unless %w[partial_registration finished_registration].include?(kind)
             expect(assigns(:can_edit)).to be_truthy
           end
+        end
+      end
+      # Only a superuser reaches a kind the organization can't view - find_mail_snippets
+      # swaps @kind for a viewable one otherwise
+      context "kind the organization can't view" do
+        let(:enabled_feature_slugs) { %w[customize_emails] }
+        it "renders the not-normally-viewable alert" do
+          get "#{base_url}/graduated_notification/edit"
+          expect(response.status).to eq(200)
+          expect(assigns(:kind)).to eq "graduated_notification"
+          expect(assigns(:viewable_email_kinds)).to_not include("graduated_notification")
+          expect(response.body).to include("normally viewable by normal users")
         end
       end
       context "partial_registration without access" do

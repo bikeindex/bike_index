@@ -1,12 +1,13 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item">
-    <%= link_to "New Activity", new_admin_ambassador_task_path, class: "nav-link" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "New Activity", href: new_admin_ambassador_task_path, color: :primary, size: :sm)) %>
   </li>
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @ambassador_tasks,
   viewing: "Ambassador Activities",
   skip_charting: true,
-  nav_header_list_items:
+  nav_header_list_items:,
 )) %>

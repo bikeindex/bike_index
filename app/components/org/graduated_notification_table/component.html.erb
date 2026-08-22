@@ -1,10 +1,11 @@
 <% component = self %>
 <% separate_secondary = @separate_secondary_notifications %>
 <% skip_email_search = @skip_email_search %>
+<% display_dev_info = @display_dev_info %>
 
-<%= render(UI::Table::Component.new(records: @graduated_notifications, render_sortable: @render_sortable)) do |table| %>
+<%= render(UI::Table::Component.new(records: @graduated_notifications, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
   <% table.column(sortable: "created_at") do |graduated_notification| %>
-    <% if helpers.display_dev_info? %>
+    <% if display_dev_info %>
       <small class="only-dev-visible"><%= graduated_notification.id %></small>
     <% end %>
 
@@ -58,7 +59,7 @@
 
       <% unless skip_email_search %>
         <small>
-          <%= link_to "🔎", url_for(sortable_search_params.merge(search_email: graduated_notification.email)), data: {turbo_frame: "_top"} %>
+          <%= link_to "🔎", url_for(sort_state.search_params.merge(search_email: graduated_notification.email)), data: {turbo_frame: "_top"} %>
         </small>
       <% end %>
     <% end %>

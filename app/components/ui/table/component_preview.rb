@@ -9,7 +9,7 @@ module UI
 
       def default
         colors = enthusiasm_colors
-        render(UI::Table::Component.new(records: sample_records, sort: "first_seen", sort_direction: "desc")) do |table|
+        render(UI::Table::Component.new(records: sample_records, sort_state: preview_sort_state("first_seen"))) do |table|
           table.column(label: "Cryptid", lower_right: ->(r) { r.region }) { |r| r.name }
           table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
           table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: colors[r.enthusiasm], size: :sm)) }
@@ -20,7 +20,7 @@ module UI
 
       def sortable_with_cache
         colors = enthusiasm_colors
-        render(UI::Table::Component.new(records: sample_records, cache_key: "preview-cryptids", sort: "name", sort_direction: "desc", render_sortable: true)) do |table|
+        render(UI::Table::Component.new(records: sample_records, cache_key: "preview-cryptids", sort_state: preview_sort_state("name"), render_sortable: true)) do |table|
           table.column(sortable: "name") { |r| r.name }
           table.column(label: "Region", header_classes: "tw:font-normal") { |r| r.region }
           table.column(label: "Credibility", header_classes: "tw:font-normal") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
@@ -33,7 +33,7 @@ module UI
       def sticky
         colors = enthusiasm_colors
         many = sample_records * 8
-        render(UI::Table::Component.new(records: many, sticky: true, sort: "first_seen", sort_direction: "desc")) do |table|
+        render(UI::Table::Component.new(records: many, sticky: true, sort_state: preview_sort_state("first_seen"))) do |table|
           table.column(label: "Cryptid", lower_right: ->(r) { r.region }) { |r| r.name }
           table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
           table.column(label: "Enthusiasm") { |r| render(UI::Badge::Component.new(text: r.enthusiasm, color: colors[r.enthusiasm], size: :sm)) }
@@ -44,7 +44,7 @@ module UI
 
       def unbordered
         colors = enthusiasm_colors
-        render(UI::Table::Component.new(records: sample_records, unbordered: true, sort: "first_seen", sort_direction: "desc")) do |table|
+        render(UI::Table::Component.new(records: sample_records, unbordered: true, sort_state: preview_sort_state("first_seen"))) do |table|
           table.column(label: "Cryptid") { |r| r.name }
           table.column(label: "Region") { |r| r.region }
           table.column(label: "Credibility") { |r| render(UI::Badge::Component.new(text: r.credibility, color: (r.credibility == "Confirmed") ? :success : :gray, size: :sm)) }
@@ -67,6 +67,10 @@ module UI
           OpenStruct.new(name: "Jersey Devil", region: "Pine Barrens, NJ", credibility: "Low", enthusiasm: "Low", sightings: 53, first_seen: ::Time.zone.parse("1909-01-16")),
           OpenStruct.new(name: "Okapi", region: "Congo", credibility: "Confirmed", enthusiasm: "None", sightings: 1, first_seen: ::Time.zone.parse("1901-06-01"))
         ]
+      end
+
+      def preview_sort_state(sort)
+        ComponentStates::SortState.new(search_params: {period: "all"}, sort:, direction: "desc")
       end
 
       def enthusiasm_colors

@@ -68,6 +68,7 @@ When git leaves `<<<<<<<` / `=======` / `>>>>>>>` markers:
 - **Ask when it isn't clear-cut.** If you can't confidently tell which side should win, or the two changes are semantically entangled, stop and ask the user rather than guessing. A wrong silent resolution is worse than a question.
 - **Both sides added at the same spot? Order matters.** Keeping both isn't enough when either block has side effects. If the incoming block ends by reloading the page, anything of yours that depends on unsaved state has to come *after* it — concatenated the other way it still passes while testing nothing.
 - **Don't blanket-replace a renamed string.** Two call sites that shared a string can have legitimately diverged; `sed`-ing the whole file changes the one that shouldn't move.
+- **A conflicted `MARKUP_DIGEST` has no side to pick.** Both branches bumped it because both edited the cached markup, so neither literal describes the merge. Take either, then run `bin/update_component_digests` and commit what it writes. Expect these on any component with a digest, and on components whose digest covers a tree the other side edited — the constant that conflicts is often not in a file you touched.
 - After resolving, verify the result actually makes sense — the merged code should reflect both intents, not just parse. Run the relevant tests if the conflict touched logic.
 
 ## The dangerous part is what merged *cleanly*
@@ -82,17 +83,31 @@ git diff origin/<base> -- app/ lib/ config/   # then account for every file list
 
 Every differing file must be explainable as *this branch's work* (or a sibling branch you're intentionally stacked on). Anything else is a resurrection or a stray. For a file that's mostly wrong, don't hand-patch hunks — `git checkout origin/<base> -- <file>` and re-apply your change on top.
 
+**Resolving two files to opposite sides breaks the interface between them**, and neither looks wrong on its own. Taking the base's version of a component while the helper that calls it auto-merges keeping your argument is an unknown-keyword error on every render, past an audit that reports both files as expected. Whenever you reset a file that has callers, grep the arguments you dropped: `git grep -n '<kwarg>' -- app` should come back empty, or only where the base still accepts it.
+
 This is what it catches, all of which has actually happened here:
 
 - **Deleted code coming back.** A constant, predicate, or callback the base removed reappears, along with the call sites that reference it — reintroducing behavior the base decided against.
 - **Another branch's change riding along.** A retention window, a flag, a tweak that came in when you merged a sibling branch and the base never took. Not yours to carry; reset it.
 - **Committed churn in generated files.** `git checkout --` reverts to HEAD, not to the base — so once churn is committed it survives every later revert. Check VCR cassettes and lockfiles specifically; a diff that's only timestamps/nonces should be reset to the base.
+- **Your side calling an API the base deleted.** Nothing conflicts: your file is untouched by the merge and the base's deletion lands cleanly, so the break is a `NoMethodError` at load. Fix it in the commit after the merge, never in it.
+
+## Extracting a slice of another branch: `git checkout <branch> -- <file>` overwrites, it doesn't merge
+
+Pulling part of a feature branch into a fresh one takes the file *whole*, so for anything `main` has moved since that branch last merged, you silently revert the newer work — no conflict, no warning. List the overlap first, and hand-apply those hunks:
+
+```bash
+MB=$(git merge-base origin/main origin/<branch>)
+comm -12 <(git diff --name-only $MB origin/main | sort) <(git diff --name-only $MB origin/<branch> | sort)
+```
 
 ## Run the linter, not just the specs
 
 `bin/lint` after every merge. A bad auto-merge that duplicates a method or strands a constant parses fine and passes its specs — `Lint/DuplicateMethods` is what catches it.
 
 Then run specs for the merged area, **including the browser ones**. The base renaming or moving something your branch calls produces no conflict marker at all: a method that moved to a service, a route reshaped into a query param, copy your specs assert on. Those only surface at runtime.
+
+`bin/rails db:migrate` too, when the merge brought migrations — the test database is maintained from the schema, so the specs stay green while every page in the browser is an `ActiveRecord::PendingMigrationError`.
 
 ## Never force-push
 

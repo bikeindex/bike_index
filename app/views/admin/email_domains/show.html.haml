@@ -12,7 +12,7 @@
           %td
             Creator
           %td
-            = render Admin::UserCell::Component.new(user: @email_domain.creator, user_id: @email_domain.creator_id)
+            = render Admin::Users::Cell::Component.new(user: @email_domain.creator, user_id: @email_domain.creator_id)
         %tr.small
           %td
             Created

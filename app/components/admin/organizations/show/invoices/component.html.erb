@@ -1,0 +1,34 @@
+<p>
+  <% if @organization.invoices.count > 0 %>
+    <strong><%= @organization.invoices.active.count %> active</strong> and
+  <% end %>
+
+  <em class="less-strong">
+    <%= link_to "#{pluralize(@organization.invoices.count, 'invoice')} total", admin_organization_invoices_path(organization_id: @organization) %>
+  </em>
+
+  <% if OrgServices::Displayer.subscription_expired_alert?(@organization) %>
+    <span
+      class="text-danger"
+      title="the subscription expired message will be shown to them in their portal"
+    >
+      Subscription expired
+    </span>
+  <% end %>
+</p>
+
+<% if @organization.parent_organization.present? %>
+  <p>
+    Parent
+    <strong class="em"><%= @organization.parent_organization.short_name %></strong>
+    has
+    <%= link_to admin_organization_invoices_path(organization_id: @organization.parent_organization.to_param) do %>
+      <%= pluralize(@organization.parent_organization.invoices.count, "invoice") %>
+    <% end %>
+    <small class="less-strong">
+      which may add features to this organization
+    </small>
+  </p>
+<% end %>
+
+<%= render(Admin::Invoices::Table::Component.new(invoices: @organization.invoices.order(id: :desc).limit(3), skip_discount_due: true)) %>

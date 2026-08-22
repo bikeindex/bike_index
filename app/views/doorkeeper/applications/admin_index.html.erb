@@ -15,4 +15,9 @@
   <% end %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(admin_search_form:, chart_collection: @render_chart && @matching_applications)) %>
+<%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @collection,
+  viewing: controller_name.humanize,
+  admin_search_form:, chart_collection: @render_chart && @matching_applications,
+)) %>

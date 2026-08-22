@@ -38,12 +38,12 @@
           %td
             - if organization_role.user.present?
               = cache(organization_role.user) do
-                = render Admin::UserCell::Component.new(user: organization_role.user, render_search: false)
+                = render Admin::Users::Cell::Component.new(user: organization_role.user, render_search: false)
             - else
               = organization_role.invited_email
           - unless skip_organization
             %td
-              = render Admin::OrganizationCell::Component.new(organization: organization_role.organization, organization_id: organization_role.organization_id, render_search: params[:organization_id].blank?)
+              = render Admin::Organizations::Cell::Component.new(sort_state:, organization: organization_role.organization, organization_id: organization_role.organization_id, render_search: params[:organization_id].blank?)
           %td
             - if organization_role.claimed_at.present?
               %span.localizeTime
@@ -51,7 +51,7 @@
           %td
             - if organization_role.sender.present?
               = cache(organization_role.sender) do
-                = render Admin::UserCell::Component.new(user: organization_role.sender, render_search: false)
+                = render Admin::Users::Cell::Component.new(user: organization_role.sender, render_search: false)
             - else
               = organization_role.sender_id
           %td

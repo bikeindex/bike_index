@@ -1054,6 +1054,7 @@ es:
           employee: Empleado
           graduate_student: Estudiante de posgrado
           student: Estudiante de pregrado
+          postdoc: Investigador postdoctoral
       stolen_record:
         bike_was_not_locked: La bicicleta no estaba cerrada con llave.
         cable_lock: candado de cable
@@ -1152,17 +1153,12 @@ es:
       more_pages:
         display_entries: Mostrando <b>%{first}&nbsp;-&nbsp;%{last}</b> %{entry_name}
           de <b>%{total}</b> en total
-    bike_helper:
-      hidden: oculto
-      hidden_because_status: porque %{bike_type} es %{status}
-      hidden_for_unauthorized_users: oculto para usuarios no autorizados
-      made_without_serial: hecho sin número de serie
-      unknown: desconocido
-      deleted: Eliminado
     organization_helper:
       address: Dirección de la calle
       address_school: Dirección postal del campus
       your_full_address_is_required: "%{org_name} requiere su dirección completa."
+    bike_helper:
+      deleted: Eliminado
   grape:
     errors:
       format: "%{attributes} %{message}"
@@ -2254,6 +2250,7 @@ es:
         user_settings: Configuración de usuario
         delete_account: Eliminar cuenta
         membership: Afiliación
+        organization_roles: Roles de la organización
       update:
         current_password_doesnt_match: La contraseña actual no coincide; es necesaria
           para actualizarla.
@@ -2275,6 +2272,11 @@ es:
           marketplace_listing_updated: "¡Tu anuncio en el mercado se ha actualizado!"
           unable_to_publish: 'No se puede publicar %{item_type} para la venta: %{errors}'
           unable_to_update: 'No se pudo guardar %{item_type}: %{errors}'
+      organization_roles:
+        destroy:
+          left_organization: Has salido %{org_name}
+          unable_to_leave: 'No se puede salir de %{org_name}: contacte con support@bikeindex.org
+            para obtener ayuda.'
     oauth:
       applications:
         ensure_app_owner!:
@@ -4577,6 +4579,7 @@ es:
         sent_to: Enviado a
         sent_to_a_new_owner: enviado a un nuevo propietario
         sticker: Etiqueta engomada
+        stickers: Pegatinas
       recoveries:
         description: Descripción
         mfg_model_color_html: fabricante, modelo, <span class="less-strong">color</span>
@@ -5208,37 +5211,6 @@ es:
       you: Tú
       your_bikes: Tus bicicletas
       your_preferences: Tus preferencias
-    organized_menu_items:
-      add_a_bike: Añade una bicicleta
-      ascend_imports: Importaciones Ascend
-      bulk_imports: Importaciones a granel
-      custom_emails: Correos electrónicos personalizados
-      discuss: Conversar
-      exports: Exportaciones
-      getting_started: Empezando
-      graduated_notifications: Notificaciones graduales
-      impounded_bikes: Bicicletas confiscadas
-      impounded_claims: Reclamaciones incautadas
-      incomplete_registrations: Registros incompletos
-      lightspeed_integration_panel: Panel de integración Lightspeed
-      manage_impounding: Gestionar el depósito
-      manage_users: Gestionar usuarios
-      model_audits: Auditorías de vehículos eléctricos
-      org_bikes: "%{org_name} Bicicletas"
-      org_dashboard: "%{org_name} Panel de control"
-      org_locations: "%{org_name} ubicaciones"
-      org_profile: Perfil %{org_name}
-      parking_notification_unregistered: Nueva notificación no registrada
-      parking_notifications: notificaciones de estacionamiento
-      recoveries: Recuperaciones
-      registration_stickers: pegatinas de registro
-      resources: Recursos
-      stolen_hot_sheet: Lista de bicicletas robadas
-      stolen_hot_sheet_configuration: Configuración de la lista de bicicletas robadas
-      stolen_message: Mensaje robado
-      super_admin_view: Superadministrador de %{org_name}
-      multi_search: Búsqueda múltiple
-      manage_registration_sequences: Gestionar secuencias de registro
     recovery_display:
       bike: Bicicleta
       recovered_date: recuperado %{date}
@@ -5254,6 +5226,52 @@ es:
       manufacturer_required: El fabricante está obligado a registrarse.
       name_required: Se requiere el nombre del propietario para registrarse.
       unable_to_save: No podemos guardar ese registro, por favor inténtelo de nuevo.
+    menu_items_account:
+      logout: Finalizar la sesión
+      marketplace_messages: Mensajes del mercado
+      register_a_new_bike: Registre su bicicleta
+      switch_to_org: Cambiar a %{org_name}
+      user_settings: "%{user_email} ajustes"
+      view_without_org: Ver sin ninguna organización
+      viewing_org: Visualizando %{org_name}
+      viewing_without_org: Visualización sin ninguna organización
+      your_registrations: Sus registros
+    menu_items_org:
+      add_a_bike: Añade una bicicleta
+      add_an_impounded_vehicle: Agregar un vehículo incautado
+      ascend_imports: Importaciones Ascend
+      bulk_import_and_export: Importación y exportación a granel
+      bulk_imports: Importaciones a granel
+      discuss: Conversar
+      exports: Exportaciones
+      getting_started: Empezando
+      graduated_notifications: Notificaciones graduales
+      impounded_claims: Reclamaciones incautadas
+      impounded_vehicles: Vehículos incautados
+      impounding: Incautación
+      incomplete_registrations: Registros incompletos
+      lightspeed_integration_panel: Panel de integración Lightspeed
+      manage_users: Gestionar usuarios
+      messaging: Mensajería
+      model_audits: Auditorías de vehículos eléctricos
+      multi_search: Búsqueda múltiple
+      org_dashboard: "%{org_name} Panel de control"
+      org_locations: "%{org_name} ubicaciones"
+      org_profile: Perfil %{org_name}
+      org_registrations: "%{org_name} Registros"
+      org_settings: "%{org_name} Configuración"
+      parking_notification_unregistered: Nueva notificación no registrada
+      parking_notifications_group: Avisos de estacionamiento
+      recoveries: Recuperaciones
+      registration_sequences: Secuencias de registro
+      registration_stickers: pegatinas de registro
+      reports: Informes
+      resources: Recursos
+      search_impounded_vehicles: Registro de vehículos incautados
+      search_parking_notifications: Buscar notificaciones de estacionamiento
+      search_registrations: Buscar registros
+      stolen_hot_sheet: Lista de bicicletas robadas
+      stolen_message: Mensaje robado
   stolen:
     index:
       ambassador: embajador
@@ -5686,18 +5704,19 @@ es:
           search: Buscar
           sign_up: Inscríbete
           stolen_bike: "¿Bicicleta robada?"
-        settings_menu:
-          logout: Cierre de sesión
-          marketplace_messages: Mensajes del mercado
-          register_a_new_bike: Registre su bicicleta
-          settings_menu: Ajustes
-          user_settings: "%{user_email} ajustes"
-          view_org: Ver %{org_name}
-          your_registrations: Sus registros
         wrapper:
           menu: Menú
           sign_up: Inscríbete
           the_nonprofit_bike_registry: el registro de bicicletas sin ánimo de lucro
+        org_sidebar:
+          admin_panel: PANEL DE ADMINISTRACIÓN
+          collapse_sidebar: Contraer la barra lateral
+          expand_sidebar: Expandir barra lateral
+          menu: Menú
+          organization_crest: "%{org_name} cresta"
+          in_super_admin: "%{org_name} en superadministrador"
+        user_settings_menu:
+          settings_menu: Ajustes
       user_alerts:
         phone_waiting_confirmation:
           confirm_your_phone_number: Confirma tu número de teléfono
@@ -5723,6 +5742,31 @@ es:
           finish_the_required_steps: completar los pasos requeridos
           not_registered_yet_html: "¡Tu %{cycle_type} aún no está registrado! Por
             favor %{finish_link}"
+      my_account:
+        organization_roles:
+          automatically_view_in_organization: Visualización automática con la barra
+            de navegación %{org_name} al iniciar sesión en Bike Index.
+          joined: Unido
+          leave_confirm: "¡Advertencia! Tendrás que pedirle a un administrador de
+            %{org_name} que recupere este rol de organización. No podrás deshacer
+            esto tú mismo."
+          leave_organization: Organización de salida
+          organization_role_information: Organizaciones en las que participas. Arrástralas
+            para ordenarlas según la prioridad que desees.
+          organization_roles:
+            one: Su rol en la organización
+            other: Funciones de su organización
+          role_html: 'Función: %{role}'
+          roles:
+            admin: Administración
+            member: Miembro
+            member_no_bike_edit: Miembro - sin edición de bicicletas
+          view_after_log_in: Después de iniciar sesión
+          view_as_html: Ver como %{org_name}
+          view_without_an_organization: Ver sin una organización
+          you_can_still_switch: Podrás seguir cambiando la vista para mostrar u ocultar
+            la organización en la configuración de la barra de navegación.
+          your_first_organization: tu primera organización
     emails:
       partials:
         bike_box:

@@ -63,7 +63,7 @@ module Registrations
 
           def organization_avatar
             organization = ownership.organization
-            return unless OrganizationDisplayer.avatar?(organization)
+            return unless OrgServices::Displayer.avatar?(organization)
 
             image_tag(organization.avatar.url(:medium), alt: organization.name, class: "tw:h-10 tw:w-10 tw:rounded-full")
           end

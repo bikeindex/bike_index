@@ -86,6 +86,24 @@ it "clears filters when Clear is clicked" do
 end
 ```
 
+## Measure before consolidating — a fixed sleep usually outweighs the boots
+
+Browser boot is real, but it is rarely what makes a slow file slow. Time the file before
+merging anything: a `wait_for_timeout`/`sleep` sized to cover the slowest case is typically
+most of the runtime, and merging examples doesn't touch it. Consolidating the two
+`ui/button*` specs from 7 examples to 3 saved ~2s of the 44s they took; replacing one 400ms
+settle saved the other ~32s.
+
+Wait on the condition instead, capped so a cancelled or infinite animation can't hang the
+example. `settle_animations` in `spec/support/system_spec_helpers.rb` is the one to reach for
+when a measurement follows a state change — it awaits the element's own transitions and races
+them against the cap as a ceiling. This is *stricter* than a sleep, not a trade: a state that
+transitions nothing returns in two frames, and one that runs longer than the sleep would have
+been is no longer measured mid-flight. Prove the wait is load-bearing before trusting it —
+drop the cap to 1ms and the assertions it protects should fail.
+
+`element.evaluate_script` may return a Promise; the driver awaits it before handing back.
+
 ## Carry state forward, don't reset between phases
 
 You know what state the page is in after each click — write the next assertion against that state. Don't click a "Reset" / "Clear" between phases just to get a clean slate; resets cost a click (often two — clear, then re-establish), obscure what's actually happening, and tempt you to think of each phase as an isolated scenario rather than as one continuous user flow.

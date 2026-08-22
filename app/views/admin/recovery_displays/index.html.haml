@@ -4,10 +4,10 @@
 
 - else
   - nav_header_list_items = capture_haml do
-    %li.nav-item
-      = link_to "New recovery display", new_admin_recovery_display_url, class: "nav-link btn btn-outline-success"
-    %li.nav-item
-      = link_to "bust cache", admin_recovery_display_path("bust_cache"), class: "nav-link less-strong"
+    %li
+      = render(UI::ButtonLink::Component.new(text: "New recovery display", href: new_admin_recovery_display_url, color: :primary, size: :sm))
+    %li
+      = render(UI::ButtonLink::Component.new(text: "bust cache", href: admin_recovery_display_path("bust_cache"), color: :link, html_class: "twless-strong"))
 
-  = render(Admin::IndexSkeleton::Component.new(chart_collection: @render_chart && matching_recovery_displays, nav_header_list_items:, time_range_column: "recovery_displays.#{@time_range_column}", collection: @recovery_displays))
+  = render(Admin::IndexSkeleton::Component.new(index: admin_index_state, viewing: controller_name.humanize, chart_collection: @render_chart && matching_recovery_displays, nav_header_list_items:, time_range_column: "recovery_displays.#{@time_range_column}", collection: @recovery_displays))
 

@@ -61,6 +61,19 @@ RSpec.describe MyAccountsController, type: :request do
             expect(assigns[:passive_organization]).to eq organization
           end
         end
+        context "with an organization, viewing without one" do
+          let(:organization) { FactoryBot.create(:organization) }
+          let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+
+          it "leaves passive_organization nil" do
+            OrganizationRole.ordered_for(current_user).first.update_on_by_default!(false)
+            expect(OrganizationRole.default_organization(current_user)).to be_nil
+            get base_url
+            expect(response.status).to eq(200)
+            expect(session[:passive_organization_id]).to eq "0"
+            expect(assigns[:passive_organization]).to be_nil
+          end
+        end
         context "with stuff" do
           let!(:bike1) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
           let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
@@ -152,6 +165,37 @@ RSpec.describe MyAccountsController, type: :request do
     end
   end
 
+  # default_bike_search_path resolves off passive_organization, so a member's Search link
+  # follows them to their own registrations away from the organization's own pages
+  describe "the footer's Search link" do
+    def footer_search_href
+      Nokogiri::HTML(response.body).css("footer.primary-footer a")
+        .find { |link| link.text.strip == "Search" }&.attr("href")
+    end
+
+    context "with an organization" do
+      include_context :request_spec_logged_in_as_organization_user
+
+      it "points at the organization's registrations" do
+        get base_url
+        expect(assigns[:passive_organization]).to eq current_organization
+        expect(footer_search_href)
+          .to eq organization_registrations_path(organization_id: current_organization.to_param)
+      end
+    end
+
+    context "without an organization" do
+      include_context :request_spec_logged_in_as_user
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+
+      it "points at every registration" do
+        get base_url
+        expect(assigns[:passive_organization]).to be_nil
+        expect(footer_search_href).to eq search_registrations_path(stolenness: "all")
+      end
+    end
+  end
+
   describe "/edit" do
     include_context :request_spec_logged_in_as_user
     let(:default_edit_templates) do
@@ -188,6 +232,20 @@ RSpec.describe MyAccountsController, type: :request do
         end
       end
     end
+    context "with organization_role" do
+      let(:target_templates) { default_edit_templates.merge(organization_roles: "Organization Roles") }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user) }
+
+      it "includes the organization_roles template" do
+        get "#{base_url}/edit/organization_roles"
+        expect(response).to be_ok
+        expect(assigns(:edit_template)).to eq("organization_roles")
+        expect(assigns(:edit_templates)).to eq target_templates.as_json
+        expect(assigns(:organization_roles)).to eq([organization_role])
+        expect(response).to render_template(partial: "_organization_roles")
+      end
+    end
+
     context "with user_registration_organization" do
       let(:target_templates) { default_edit_templates.merge(registration_organizations: "Registration Organizations") }
       let!(:user_registration_organization) { FactoryBot.create(:user_registration_organization, user: current_user) }
@@ -213,6 +271,19 @@ RSpec.describe MyAccountsController, type: :request do
     let!(:current_user) { FactoryBot.create(:user_confirmed, password: "old_password", password_confirmation: "old_password", username: "something") }
     # force skip_update to be false, like it is in reality (unblocks updating)
     before { current_user.skip_update = false }
+
+    context "on_by_default" do
+      let!(:organization_roles) { Array.new(2) { FactoryBot.create(:organization_role_claimed, user: current_user) } }
+
+      it "renumbers the user's roles from 1, and back from 0" do
+        patch base_url, params: {on_by_default: "0", edit_template: "organization_roles"}
+        expect(response).to redirect_to edit_my_account_url(edit_template: "organization_roles")
+        expect(OrganizationRole.ordered_for(current_user).pluck(:priority)).to eq([1, 2])
+
+        patch base_url, params: {on_by_default: "1", edit_template: "organization_roles"}
+        expect(OrganizationRole.ordered_for(current_user).pluck(:priority)).to eq([0, 1])
+      end
+    end
 
     context "reserved username" do
       it "doesn't update username" do

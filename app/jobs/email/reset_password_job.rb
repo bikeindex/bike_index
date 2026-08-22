@@ -6,7 +6,7 @@ module Email
 
     NOTIFICATION_KIND = "password_reset"
 
-    def perform(user_id)
+    def perform(user_id, return_to = nil)
       user = User.find(user_id)
       unless user.token_for_password_reset.present?
         raise StandardError, "User #{user_id} does not have a token_for_password_reset"
@@ -15,7 +15,7 @@ module Email
       return if user.banned?
 
       notification_for_password_reset_token(user).track_email_delivery do
-        CustomerMailer.password_reset_email(user).deliver_now
+        CustomerMailer.password_reset_email(user, return_to:).deliver_now
       end
     end
 

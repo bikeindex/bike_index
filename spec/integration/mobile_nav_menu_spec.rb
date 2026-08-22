@@ -39,58 +39,54 @@ RSpec.describe "Navbar", :js, type: :system do
     open_menu_and_search
   end
 
-  context "signed in with an organization" do
-    let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
-    let!(:user) { FactoryBot.create(:organization_admin, organization:) }
+  # The two-step login and the flash both animate, and a click waits for its target
+  # to settle before it lands -- that wait is Capybara's 2s default
+  def sign_in(user)
+    using_wait_time(10) do
+      visit new_session_path
+      fill_in "Email", with: user.email
+      click_button "Continue"
+      fill_in "Password", with: "testthisthing7$"
+      click_button "Log in"
+      expect(page).to have_no_current_path(new_session_path, wait: 10)
+    end
+  end
+
+  context "signed in without an organization" do
+    let!(:user) { FactoryBot.create(:user_confirmed) }
 
     # The gear is icon-only, so its aria-label is the only thing to find it by
     let(:settings_toggle) { "button[aria-label='Settings']" }
 
-    it "opens each dropdown at desktop width, and folds the settings menu into the hamburgler" do
-      # The two-step login and the flash both animate, and a click waits for its target
-      # to settle before it lands -- that wait is Capybara's 2s default
-      using_wait_time(10) do
-        visit new_session_path
-        fill_in "Email", with: user.email
-        click_button "Continue"
-        fill_in "Password", with: "testthisthing7$"
-        click_button "Log in"
-        dismiss_flash_messages
-      end
+    it "opens the settings dropdown at desktop width, and folds it into the hamburgler" do
+      sign_in(user)
 
       page.current_window.resize_to(1440, 900)
       visit root_path
 
-      # The items of both closed dropdowns are rendered, out of view
-      expect(page).to have_button("Brakebills")
-      expect(page).to have_no_link("Logout")
-      expect(page).to have_no_link("Brakebills Bikes")
+      # The closed dropdown's items are rendered, out of view
+      expect(page).to have_no_link("Log out")
       expect_axe_clean
 
-      click_button "Brakebills"
+      find(settings_toggle).click
 
-      expect(page).to have_link("Brakebills Bikes")
-      expect(find_button("Brakebills")["aria-expanded"]).to eq "true"
+      expect(page).to have_link("Log out")
       expect_axe_clean
 
       # Escape from inside the dropdown hands focus back to the toggle, rather than
       # leaving it on a link that just became display:none
-      find_link("Brakebills Bikes").send_keys(:escape)
+      find_link("Log out").send_keys(:escape)
 
-      expect(page).to have_no_link("Brakebills Bikes")
-      expect(page.evaluate_script("document.activeElement.id")).to eq "passive_organization_submenu"
+      expect(page).to have_no_link("Log out")
+      expect(page.evaluate_script("document.activeElement.id")).to eq "setting_submenu"
 
-      # Opening one dropdown closes the other
-      click_button "Brakebills"
       find(settings_toggle).click
 
-      expect(page).to have_link("Logout")
-      expect(page).to have_no_link("Brakebills Bikes")
-      expect_axe_clean
+      expect(page).to have_link("Log out")
 
       find("body").click
 
-      expect(page).to have_no_link("Logout")
+      expect(page).to have_no_link("Log out")
 
       page.current_window.resize_to(390, 844)
 
@@ -98,9 +94,76 @@ RSpec.describe "Navbar", :js, type: :system do
       expect(page).to have_no_css(settings_toggle)
       find("#primary_nav_hamburgler").click
 
-      expect(page).to have_link("Logout")
-      # The organization keeps its own dropdown, and the open menu covers it
-      expect(page).to have_no_button("Brakebills")
+      expect(page).to have_link("Log out")
+    end
+  end
+
+  context "signed in with an organization" do
+    let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+    let!(:user) { FactoryBot.create(:organization_admin, organization:) }
+
+    it "renders the sidebar in place of the navbar, as a column and then behind the hamburgler" do
+      sign_in(user)
+
+      page.current_window.resize_to(1440, 900)
+      visit root_path
+
+      expect(page).to have_no_css(".primary-header-nav")
+      expect(page).to have_css("#org_sidebar_nav")
+      expect(page).to have_button("Brakebills Registrations")
+      expect_axe_clean
+
+      # The account block is a UI::Dropdown, so its items are hidden until it opens
+      expect(page).to have_no_link("Log out")
+      find("button[data-ui--dropdown-target='button']", text: user.email).click
+
+      expect(page).to have_link("Log out")
+      expect(page).to have_link("Your registrations")
+      expect_axe_clean
+
+      page.current_window.resize_to(390, 844)
+
+      # Below the breakpoint the menu is behind the hamburgler
+      expect(page).to have_no_button("Brakebills Registrations")
+      find("#org_sidebar_hamburgler").click
+
+      expect(page).to have_button("Brakebills Registrations")
+    end
+
+    # The rail hides a group's children with a css variant rather than the class
+    # ui--collapse reads, so toggling from the rail used to shut the group it opened
+    context "with a second group to open" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features, short_name: "Brakebills",
+          enabled_feature_slugs: ["impound_bikes"])
+      end
+
+      it "opens the group it was asked for when the collapsed rail expands" do
+        sign_in(user)
+
+        page.current_window.resize_to(1440, 900)
+        visit root_path
+
+        registrations = find("button[aria-controls='org_sidebar_group_registrations']")
+        expect(registrations["aria-expanded"]).to eq "true"
+
+        find("[data-page-block--org-sidebar-target='collapseToggle']").click
+
+        # Clicking the group that was already open has to leave it open, not toggle it shut
+        registrations.click
+
+        expect(page).to have_link("Search Registrations")
+        expect(registrations["aria-expanded"]).to eq "true"
+
+        find("[data-page-block--org-sidebar-target='collapseToggle']").click
+        impounded = find("button[aria-controls='org_sidebar_group_impounded']")
+        expect(impounded["aria-expanded"]).to eq "false"
+
+        impounded.click
+
+        expect(page).to have_link("Search Impounded Vehicles")
+        expect(impounded["aria-expanded"]).to eq "true"
+      end
     end
   end
 end

@@ -106,40 +106,6 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
-      "fingerprint": "19b9ab344f9415ecf19709e9ee5b955e59227e5a0c9a89a935b00fed02ed9f2f",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped parameter value",
-      "file": "app/views/organized/graduated_notifications/show.html.haml",
-      "line": 24,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_class(true, status_display_class(graduated_notifications.find(params[:id]).status_humanized))",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Organized::GraduatedNotificationsController",
-          "method": "show",
-          "line": 19,
-          "file": "app/controllers/organized/graduated_notifications_controller.rb",
-          "rendered": {
-            "name": "organized/graduated_notifications/show",
-            "file": "app/views/organized/graduated_notifications/show.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "organized/graduated_notifications/show"
-      },
-      "user_input": "params[:id]",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "status_display_class() returns only hardcoded CSS class names from a case/when allowlist"
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
       "fingerprint": "1c38bf4538d2bd40ff76d4b6dc8068e03beb4663a925aac6497502023792bcb7",
       "check_name": "CrossSiteScripting",
       "message": "Unescaped parameter value",
@@ -174,19 +140,19 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
-      "fingerprint": "67519e799469c98c168cfb32b4a5968ccb9395fd175571b1e1723c4e513376c2",
+      "fingerprint": "6c283be8294e8e310b00cbf0797aab7fbe201645005ea45618e9273f053f5f76",
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/shared/_recovery_display.html.erb",
       "line": 38,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(safe_join([((Unresolved Model).new.bike.type_titleize or t(\".bike\")), content_tag(:span, t(\".recovered_date\", :date => l((Unresolved Model).new.recovered_at, :format => :dotted)), :class => \"recover-date\")], \" \"), (Unresolved Model).new.link, :class => \"recover-date\")",
+      "code": "link_to(safe_join([(RecoveryDisplay.new.bike.type_titleize or t(\".bike\")), content_tag(:span, t(\".recovered_date\", :date => l(RecoveryDisplay.new.recovered_at, :format => :dotted)), :class => \"recover-date\")], \" \"), RecoveryDisplay.new.link, :class => \"recover-date\")",
       "render_path": [
         {
           "type": "template",
-          "name": "welcome/recovery_stories",
-          "line": 12,
-          "file": "app/views/welcome/recovery_stories.html.erb",
+          "name": "app/components/page_block/main_content/content/component",
+          "line": 150,
+          "file": "app/components/page_block/main_content/content/component.html.erb",
           "rendered": {
             "name": "shared/_recovery_display",
             "file": "app/views/shared/_recovery_display.html.erb"
@@ -197,7 +163,7 @@
         "type": "template",
         "template": "shared/_recovery_display"
       },
-      "user_input": "(Unresolved Model).new.link",
+      "user_input": "RecoveryDisplay.new.link",
       "confidence": "Weak",
       "cwe_id": [
         79
@@ -345,13 +311,13 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "3dbb49d6d861b8ab8334653febf197377376f6f397dc46cdc94c6b4096da3849",
+      "fingerprint": "ca1b827a35382eca8c5dc1df522f3fcf5e06ddf1b64bbe78ea51d840876bcc91",
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/components/admin/pagination_with_count/component.rb",
-      "line": 59,
+      "line": 51,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "collection.where(\"#{collection.table_name}.#{(time_range_column or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
+      "code": "collection.where(\"#{collection.table_name}.#{((time_range_column or index.time_range_column) or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
       "render_path": null,
       "location": {
         "type": "method",
@@ -363,7 +329,7 @@
       "cwe_id": [
         89
       ],
-      "note": "time_range_column is set during component initialization by the developer, not from user params"
+      "note": "time_range_column is set during component initialization by the developer, not from user params - admin/invoices is the only controller that reads it from params, and whitelists it against %w[subscription_start_at subscription_end_at]"
     },
     {
       "warning_type": "Dangerous Send",

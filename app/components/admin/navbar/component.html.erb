@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-md navbar-light bg-light admin-navbar">
   <span class="navbar-brand">
-    <%= link_to image_tag("logo.svg"), helpers.user_root_url %>
+    <%= link_to image_tag("logo.svg"), @user_root_url %>
   </span>
 
   <% if @current_user.superuser? %>

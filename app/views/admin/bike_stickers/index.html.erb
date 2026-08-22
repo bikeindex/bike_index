@@ -1,11 +1,11 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item">
-    <%= link_to "New batch", new_admin_bike_sticker_path, class: "btn btn-outline-success btn-sm" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "New batch", href: new_admin_bike_sticker_path, color: :primary, size: :sm)) %>
   </li>
 
-  <li class="nav-item">
+  <li>
     <small>
-      <%= link_to "reassign", reassign_admin_bike_stickers_path, class: "btn btn-outline-secondary btn-sm less-strong ml-2" %>
+      <%= render(UI::ButtonLink::Component.new(text: "reassign", href: reassign_admin_bike_stickers_path, color: :link, html_class: "twless-strong")) %>
     </small>
   </li>
 <% end %>
@@ -133,11 +133,11 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @bike_stickers,
   viewing: "Stickers",
   chart_collection: @render_chart && matching_bike_stickers,
-  time_range_column: @time_range_column,
   nav_header_list_items:,
   admin_search_form:,
-  table_view:
+  table_view:,
 )) %>

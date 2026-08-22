@@ -13,11 +13,10 @@ RSpec.describe UI::Dropdown::Component, type: :component do
     expect(component).to have_css("[data-ui--dropdown-target='menu'].tw\\:w-max.tw\\:max-w-\\[75vw\\]", visible: :all)
   end
 
-  # The current entry fills like an active UI::Button, whose trigger sits right above it
-  it "fills the current entry with the button's active color" do
-    fill = UI::Button::Component::ACTIVE_COLORS[:secondary][/bg-purple-\d+/]
-    expect(fill).to be_present
-    expect(described_class::ACTIVE_COLORS).to include(fill)
+  # Which entry is current is UI::ActiveLink's, on the link -- the li carries neither the
+  # state nor the styling for it
+  it "leaves the entry unflagged" do
+    expect(component.css("li[role='menuitem']").first.attributes.keys).to eq(["role"])
   end
 
   context "with button_color: :link" do

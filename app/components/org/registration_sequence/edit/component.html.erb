@@ -1,15 +1,15 @@
 <div class="tw:mb-3 tw:flex tw:items-baseline tw:justify-between tw:gap-4">
   <%# Admin's header names the sequence %>
   <% if @admin %>
-    <h2 class="uncap tw:mb-0 tw:text-xl tw:font-normal tw:text-gray-500">
+    <%= render(UI::Header::Component.new(tag: :h2, html_class: "uncap tw:mb-0! tw:font-normal! tw:text-gray-500!")) do %>
       <%= helpers.number_display(pages.size) %> <%= "page".pluralize(pages.size) %>
-    </h2>
+    <% end %>
   <% else %>
-    <h1 class="uncap">
+    <%= render(UI::Header::Component.new(html_class: "uncap tw:mb-0!")) do %>
       <%= @registration_sequence.status_display %>
       <%= @registration_sequence.kind_display %> registration sequence
       <span class="tw:text-xl tw:font-normal tw:whitespace-nowrap tw:text-gray-500">· <%= helpers.number_display(pages.size) %> <%= "page".pluralize(pages.size) %></span>
-    </h1>
+    <% end %>
   <% end %>
 
   <% if @editable %>

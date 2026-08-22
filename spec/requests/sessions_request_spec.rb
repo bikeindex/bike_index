@@ -315,6 +315,16 @@ RSpec.describe SessionsController, type: :request do
       expect(superadmin.reload.magic_link_token).to be_nil
     end
 
+    context "sso organization email", :sso_organization do
+      let(:user) { FactoryBot.create(:user_confirmed, email: "student@sso.edu") }
+
+      it "hands a link minted before SSO off to the IdP" do
+        post "/session/sign_in_with_magic_link", params: {token: user.refreshed_magic_link_token}
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+        expect(response.cookies["auth"]).to be_blank
+      end
+    end
+
     context "passwordless user" do
       let(:user) { FactoryBot.create(:user_confirmed, passwordless_user: true) }
 
@@ -360,6 +370,37 @@ RSpec.describe SessionsController, type: :request do
       expect(user.reload.magic_link_token).to eq token
       expect(Capybara.string(response.body))
         .to have_css("form[action='/session/sign_in_with_magic_link'] input[name='token'][value='#{token}']", visible: :hidden)
+    end
+
+    # The retry re-renders without the before_action that stores return_to, so the form
+    # is the only thing still holding where the user was headed
+    it "hands the magic link back where it was headed" do
+      post "/session/sign_in_with_magic_link",
+        params: {token: user.refreshed_magic_link_token, return_to: "/oauth/authorize?client_id=xYz"},
+        headers: {"HTTP_ORIGIN" => "null"}
+      expect(Capybara.string(response.body))
+        .to have_css("input[name='return_to'][value='/oauth/authorize?client_id=xYz']", visible: :hidden)
+    end
+  end
+
+  describe "the return_to carried by the magic link email" do
+    let!(:user) { FactoryBot.create(:user_confirmed) }
+
+    # Without clearing the token no second mail is sent within the minute, and the
+    # assertion reads the previous one. reload - the token was minted on another copy.
+    def emailed_url_after(return_to)
+      user.reload.update(magic_link_token: nil)
+      get "/session/new?return_to=#{CGI.escape(return_to)}"
+      Sidekiq::Testing.inline! { post "/session/create_magic_link", params: {email: user.email} }
+      ActionMailer::Base.deliveries.last.body.parts.first.decoded[%r{https?://\S+/session/magic_link\S*}]
+    end
+
+    # An off-site target isn't an open redirect - handle_target refuses it on arrival -
+    # but it shouldn't reach the mail. "//host" is off-site despite the leading slash.
+    it "carries a path this app owns, and drops anything else" do
+      expect(emailed_url_after("/bikes/12")).to include CGI.escape("/bikes/12")
+      expect(emailed_url_after("https://evil.example/steal")).to_not include "evil.example"
+      expect(emailed_url_after("//evil.example/steal")).to_not include "evil.example"
     end
   end
 

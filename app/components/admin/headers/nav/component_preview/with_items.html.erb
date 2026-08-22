@@ -1,0 +1,20 @@
+<%= render(Admin::Headers::Nav::Component.new(title: "Manage Invoices")) do %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Paid", href: admin_invoices_path(search_paid: true), size: :sm, active: true)) %>
+  </li>
+
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Unpaid", href: admin_invoices_path, size: :sm)) %>
+  </li>
+
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: "All statuses", button_size: :sm)) do |dropdown| %>
+      <% dropdown.with_entry_item { link_to "All statuses", admin_invoices_path } %>
+      <% dropdown.with_entry_item { link_to "Overdue only", admin_invoices_path(search_status: "overdue") } %>
+    <% end %>
+  </li>
+
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "New Invoice", href: new_admin_organization_invoice_path(organization_id: "brakebills"), color: :primary, size: :sm)) %>
+  </li>
+<% end %>

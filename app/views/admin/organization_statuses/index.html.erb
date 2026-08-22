@@ -1,69 +1,44 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item">
-    <a
-      class="nav-link dropdown-toggle <%= @kind != "all" ? "active" : "" %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <% if @kind == "all" %>
-        All org kinds
-      <% else %>
-        <%= Organization.kind_humanized(@kind) %>
-      <% end %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "All kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{@kind == "all" ? "active" : ""}" %>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: @kind == "all" ? "All org kinds" : Organization.kind_humanized(@kind), button_size: :sm,
+          active: @kind != "all")) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All kinds", path: url_for(sortable_search_params.merge(search_kind: nil)), match: :query, query: {search_kind: nil}) } %>
       <% not_bike_shop_active = @kind == "not_bike_shop" %>
-      <%= link_to "NOT bike shops", url_for(sortable_search_params.merge(search_kind: not_bike_shop_active ? "" : "not_bike_shop")), class: "dropdown-item #{not_bike_shop_active ? "active" : ""}" %>
-
-      <div class="dropdown-divider"></div>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "NOT bike shops", path: url_for(sortable_search_params.merge(search_kind: not_bike_shop_active ? "" : "not_bike_shop")), match: :query, query: {search_kind: "not_bike_shop"}) } %>
+      <% dropdown.with_entry_divider %>
 
       <% Organization.kinds.each do |kind| %>
         <% kind_active = @kind == kind %>
-        <%= link_to Organization.kind_humanized(kind), url_for(sortable_search_params.merge(search_kind: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? "active" : ""}" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: Organization.kind_humanized(kind), path: url_for(sortable_search_params.merge(search_kind: kind_active ? nil : kind)), match: :query, query: {search_kind: kind}) } %>
       <% end %>
-    </div>
+    <% end %>
   </li>
 
-  <li class="nav-item">
-    <a
-      class="nav-link dropdown-toggle <%= @pos_kind != "all" ? "active" : "" %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <%= humanize_pos_kind(@pos_kind) %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to humanize_pos_kind("all"), url_for(sortable_search_params.merge(search_pos_kind: nil)), class: "dropdown-item #{@pos_kind == "all" ? "active" : ""}" %>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: humanize_pos_kind(@pos_kind), button_size: :sm,
+          active: @pos_kind != "all")) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: humanize_pos_kind("all"), path: url_for(sortable_search_params.merge(search_pos_kind: nil)), match: :query, query: {search_pos_kind: nil}) } %>
 
       <% grouped_pos_kinds.each do |pos_kind| %>
         <% pos_kind_active = @pos_kind == pos_kind %>
-        <%= link_to humanize_pos_kind(pos_kind), url_for(sortable_search_params.merge(search_pos_kind: pos_kind_active ? nil : pos_kind)), class: "dropdown-item #{pos_kind_active ? "active" : ""}" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: humanize_pos_kind(pos_kind), path: url_for(sortable_search_params.merge(search_pos_kind: pos_kind_active ? nil : pos_kind)), match: :query, query: {search_pos_kind: pos_kind}) } %>
       <% end %>
 
-      <div class="dropdown-divider"></div>
+      <% dropdown.with_entry_divider %>
 
       <% Organization.pos_kinds.each do |pos_kind| %>
         <% pos_kind_active = @pos_kind == pos_kind %>
-        <%= link_to pos_kind.humanize, url_for(sortable_search_params.merge(search_pos_kind: pos_kind_active ? nil : pos_kind)), class: "dropdown-item #{pos_kind_active ? "active" : ""}" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: pos_kind.humanize, path: url_for(sortable_search_params.merge(search_pos_kind: pos_kind_active ? nil : pos_kind)), match: :query, query: {search_pos_kind: pos_kind}) } %>
       <% end %>
-    </div>
+    <% end %>
   </li>
 
-  <li class="nav-item">
-    <%= link_to "current", url_for(sortable_search_params.merge(search_current: !@current)), class: "nav-link #{@current ? "active" : ""}" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "current", href: url_for(sortable_search_params.merge(search_current: !@current)), size: :sm, active: @current)) %>
   </li>
 
-  <li class="nav-item">
-    <%= link_to "ended", url_for(sortable_search_params.merge(search_ended: !@ended)), class: "nav-link #{@ended ? "active" : ""}" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "ended", href: url_for(sortable_search_params.merge(search_ended: !@ended)), size: :sm, active: @ended)) %>
   </li>
 <% end %>
 
@@ -72,7 +47,7 @@
 <% if @render_chart %>
   <% rendered_chart = capture do %>
     <% if sort_column != "created_at" %>
-      <%= render(Admin::ChartOrganizationStatuses::Component.new(
+      <%= render(Admin::OrganizationStatusesChart::Component.new(
         matching_organization_statuses:,
         matching_organization_statuses_untimed:,
         time_range: @time_range,
@@ -149,7 +124,7 @@
             </td>
 
             <td>
-              <%= render Admin::OrganizationCell::Component.new(organization: organization_status.organization, organization_id: organization_status.organization_id, render_search: params[:organization_id].blank?) %>
+              <%= render Admin::Organizations::Cell::Component.new(sort_state:, organization: organization_status.organization, organization_id: organization_status.organization_id, render_search: params[:organization_id].blank?) %>
             </td>
 
             <td>
@@ -180,10 +155,11 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @organization_statuses,
   viewing: "Organization Statuses",
   index_title: "Organization Statuses",
   nav_header_list_items:,
   rendered_chart:,
-  table_view:
+  table_view:,
 )) %>

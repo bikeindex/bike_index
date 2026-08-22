@@ -17,6 +17,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     expect(link["data-ui--active-link-match-value"]).to eq "path"
     # :path compares the URL the browser is already on, so there's no route to compare
     expect(link.attributes).to_not have_key("data-ui--active-link-routes-value")
+    expect(link.attributes).to_not have_key("data-ui--active-link-query-value")
   end
 
   context "with a class" do
@@ -76,11 +77,57 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
       end
     end
 
+    context ":query" do
+      let(:path) { "/o/example/impound_records" }
+      let(:options) { {match: :query, query: {search_status: "resolved"}} }
+
+      it "carries the params the browser compares the page's against" do
+        expect(link["data-ui--active-link-match-value"]).to eq "query"
+        expect(link["data-ui--active-link-query-value"]).to eq({search_status: ["resolved"]}.to_json)
+        expect(link.attributes).to_not have_key("data-ui--active-link-routes-value")
+      end
+
+      # An entry that's the fallback a controller reaches for is in force with the param
+      # absent, which is "" once the browser reads it off the URL
+      context "with a nil among the values" do
+        let(:options) { {match: :query, query: {search_status: ["current", nil]}} }
+
+        it "renders it as the empty string" do
+          expect(link["data-ui--active-link-query-value"])
+            .to eq({search_status: ["current", ""]}.to_json)
+        end
+      end
+
+      context "with a bare nil" do
+        let(:options) { {match: :query, query: {search_deleted: nil}} }
+
+        it "renders the one empty string, rather than no values at all" do
+          expect(link["data-ui--active-link-query-value"]).to eq({search_deleted: [""]}.to_json)
+        end
+      end
+    end
+
     context "with matching_controllers on a match that can't use them" do
       let(:options) { {match: :controller_action, matching_controllers: ["news"]} }
 
       it "raises rather than rendering entries the browser will never compare" do
         expect { component }.to raise_error(ArgumentError, /matching_controllers/)
+      end
+    end
+
+    context "with query on a match that can't use it" do
+      let(:options) { {match: :full_path, query: {search_status: "all"}} }
+
+      it "raises rather than rendering params the browser will never compare" do
+        expect { component }.to raise_error(ArgumentError, /query/)
+      end
+    end
+
+    context "with match: :query and nothing to compare" do
+      let(:options) { {match: :query} }
+
+      it "raises rather than going active on every page" do
+        expect { component }.to raise_error(ArgumentError, /query/)
       end
     end
 
@@ -98,6 +145,46 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
 
       it "raises" do
         expect { component }.to raise_error(ArgumentError, /match/)
+      end
+    end
+  end
+
+  # Every menu renders its manifest's links through this, so the defaults are what a manifest
+  # that leaves a key out gets
+  describe "from_item" do
+    let(:item) { {type: :link, label: "Help", path: "/help"} }
+    let(:component) { render_inline(described_class.from_item(item, **options)) }
+
+    it "fills in the match, and renders no class" do
+      expect(link["href"]).to eq "/help"
+      expect(link.text).to eq "Help"
+      expect(link["data-ui--active-link-match-value"]).to eq "path"
+      expect(link.attributes).to_not have_key("class")
+      expect(link.attributes).to_not have_key("id")
+    end
+
+    context "with the keys a menu item can carry" do
+      let(:item) do
+        {type: :link, label: "Blog", path: "/news", match: :controller,
+         matching_controllers: ["blogs"], id: "navBlog", data: {email: "party@bikeindex.org"}}
+      end
+      let(:options) { {html_class: "nav-link"} }
+
+      it "passes each of them through" do
+        expect(link["class"]).to eq "nav-link"
+        expect(link["id"]).to eq "navBlog"
+        expect(link["data-email"]).to eq "party@bikeindex.org"
+        expect(link["data-ui--active-link-routes-value"]).to eq "news blogs"
+      end
+    end
+
+    # A sidebar row's label sits inside a block with its icon, so it isn't the link's text
+    context "with text: nil" do
+      let(:options) { {text: nil} }
+      let(:component) { render_inline(described_class.from_item(item, **options)) { "Block" } }
+
+      it "takes the block's content over the item's label" do
+        expect(link.text).to eq "Block"
       end
     end
   end

@@ -1,6 +1,6 @@
 <%# locals: (collection:, render_sortable: false, render_deleted: false) %>
 
-<%= render(UI::Table::Component.new(records: collection, render_sortable:)) do |table| %>
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |strava_integration| %>
     <%= link_to admin_strava_integration_path(strava_integration) do %>
       <%= render UI::Time::Component.new(time: strava_integration.created_at) %>
@@ -24,7 +24,7 @@
   <% end %>
 
   <% table.column(sortable: "user_id") do |strava_integration| %>
-    <%= render Admin::UserCell::Component.new(user: strava_integration.user, user_id: strava_integration.user_id, render_search: render_sortable) %>
+    <%= render Admin::Users::Cell::Component.new(sort_state:, user: strava_integration.user, user_id: strava_integration.user_id, render_search: render_sortable) %>
   <% end %>
 
   <% table.column(sortable: "status") do |strava_integration| %>

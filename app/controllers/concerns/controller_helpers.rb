@@ -11,10 +11,10 @@ module ControllerHelpers
 
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
-      :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
+      :current_organization, :passive_organization, :current_location,
       :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
-      :render_donation_request?
+      :render_donation_request?, :old_register_view?, :sort_state, :admin_index_state
     before_action :enable_rack_profiler
 
     before_action do
@@ -50,6 +50,24 @@ module ControllerHelpers
   # TODO: make this actually use the request location
   def current_currency
     currency_from_params || Currency.default
+  end
+
+  def sort_state
+    @sort_state ||= ComponentStates::SortState.new(search_params: helpers.sortable_search_params,
+      sort: helpers.sort_column, direction: helpers.sort_direction)
+  end
+
+  # Built lazily rather than in a before_action, because the subjects below are set by the action
+  def admin_index_state
+    @admin_index_state ||= ComponentStates::IndexState.new(
+      params:, sort_state:,
+      render_chart: @render_chart, render_deleted: @render_deleted,
+      pagy: @pagy, per_page: @per_page, time_range: @time_range,
+      period: @period, start_time: @start_time, end_time: @end_time,
+      time_range_column: @time_range_column, current_organization:,
+      user_subject: @user_subject, bike: @bike,
+      marketplace_listing: @marketplace_listing, primary_activity: @primary_activity
+    )
   end
 
   def current_country_id
@@ -135,21 +153,17 @@ module ControllerHelpers
     end
   end
 
-  def user_root_bike_search?
-    current_user.present? && current_user.default_organization.present? &&
-      current_user.default_organization.law_enforcement?
-  end
-
   def user_root_url
     return root_url unless current_user.present? && current_user.confirmed?
     return admin_root_url if current_user.superuser?
-    return my_account_url unless current_user.default_organization.present?
 
-    if user_root_bike_search?
-      default_bike_search_path
-    else
-      organization_root_url(organization_id: current_user.default_organization.to_param)
-    end
+    default_organization = OrganizationRole.default_organization(current_user)
+    return my_account_url if default_organization.blank?
+    # Every bike rather than default_bike_search_path: law enforcement is here to search
+    # the whole registry, not the handful their own organization registered
+    return every_bike_search_path if default_organization.law_enforcement?
+
+    organization_root_url(organization_id: default_organization.to_param)
   end
 
   # Deletes, so the donation modal only ever shows once - memoized because
@@ -158,6 +172,12 @@ module ControllerHelpers
     return @render_donation_request if defined?(@render_donation_request)
 
     @render_donation_request = session.delete(:render_donation_request).present?
+  end
+
+  # Set by going back to the embed form, cleared by taking the register flow's link the
+  # other way - the organized menu follows it
+  def old_register_view?
+    session[:old_register_view].present?
   end
 
   def show_general_alert
@@ -171,6 +191,12 @@ module ControllerHelpers
   end
 
   def default_bike_search_path
+    return every_bike_search_path if passive_organization.blank?
+
+    organization_registrations_path(organization_id: passive_organization.to_param)
+  end
+
+  def every_bike_search_path
     search_registrations_path(stolenness: "all")
   end
 
@@ -216,6 +242,13 @@ module ControllerHelpers
     when "https://facebook.com/bikeindex"
       redirect_to(target, allow_other_host: true) && (return true)
     end
+  end
+
+  # handle_target refuses an off-site target on arrival, too late to keep a caller-chosen
+  # URL out of mail we send. "//host" is off-site despite the leading slash.
+  def emailable_return_to
+    target = session[:return_to]
+    target if target&.start_with?("/") && !target.start_with?("//")
   end
 
   def permitted_return_to
@@ -310,7 +343,7 @@ module ControllerHelpers
 
       @passive_organization = Organization.friendly_find(session[:passive_organization_id])
     end
-    @passive_organization ||= set_passive_organization(current_user&.default_organization)
+    @passive_organization ||= set_passive_organization(OrganizationRole.default_organization(current_user))
   end
 
   # current_organization is the organization currently being used.

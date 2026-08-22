@@ -1,67 +1,45 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item">
-    <%= link_to "org count", url_for(sortable_search_params.merge(search_org_count: !@org_count)), class: "nav-link #{@org_count ? 'active' : ''}" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "org count", href: url_for(sortable_search_params.merge(search_org_count: !@org_count)), size: :sm, active: @org_count)) %>
   </li>
 
-  <li class="nav-item dropdown">
+  <li>
     <% search_errors_text = @search_errors || "With and without errors" %>
 
-    <a
-      class="nav-link dropdown-toggle <%= @search_errors.present? ? 'active' : '' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <%= search_errors_text.titleize %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "With and without errors", url_for(sortable_search_params.merge(search_errors: nil)), class: "dropdown-item #{@search_errors.blank? ? 'active' : ''}" %>
-      <%= link_to "Without errors", url_for(sortable_search_params.merge(search_errors: "no_error")), class: "dropdown-item #{@search_errors == 'no_error' ? 'active' : ''}" %>
-
-      <div class="dropdown-divider"></div>
-      <%= link_to "File Error (fully blocks import)", url_for(sortable_search_params.merge(search_errors: "file_error")), class: "dropdown-item #{@search_errors == 'file_error' ? 'active' : ''}" %>
-      <%= link_to "Line Error", url_for(sortable_search_params.merge(search_errors: "line_error")), class: "dropdown-item #{@search_errors == 'line_error' ? 'active' : ''}" %>
-      <%= link_to "Ascend error", url_for(sortable_search_params.merge(search_errors: "ascend_error")), class: "dropdown-item #{@search_errors == 'ascend_error' ? 'active' : ''}" %>
-      <%= link_to "Any Error", url_for(sortable_search_params.merge(search_errors: "any_error")), class: "dropdown-item #{@search_errors == 'any_error' ? 'active' : ''}" %>
-    </div>
+    <%= render(UI::Dropdown::Component.new(name: search_errors_text.titleize, button_size: :sm,
+          active: @search_errors.present?)) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "With and without errors", path: url_for(sortable_search_params.merge(search_errors: nil)), match: :query, query: {search_errors: nil}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Without errors", path: url_for(sortable_search_params.merge(search_errors: "no_error")), match: :query, query: {search_errors: "no_error"}) } %>
+      <% dropdown.with_entry_divider %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "File Error (fully blocks import)", path: url_for(sortable_search_params.merge(search_errors: "file_error")), match: :query, query: {search_errors: "file_error"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Line Error", path: url_for(sortable_search_params.merge(search_errors: "line_error")), match: :query, query: {search_errors: "line_error"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Ascend error", path: url_for(sortable_search_params.merge(search_errors: "ascend_error")), match: :query, query: {search_errors: "ascend_error"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Any Error", path: url_for(sortable_search_params.merge(search_errors: "any_error")), match: :query, query: {search_errors: "any_error"}) } %>
+    <% end %>
   </li>
 
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @progress != 'all' ? 'active' : '' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <%= @progress.titleize %> <%= "progresses" if @progress == "all" %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "All progresses", url_for(sortable_search_params.merge(search_progress: nil)), class: "dropdown-item #{@progress == 'all' ? 'active' : ''}" %>
-
-      <div class="dropdown-divider"></div>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: "#{@progress.titleize} #{"progresses" if @progress == "all"}", button_size: :sm,
+          active: @progress != "all")) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All progresses", path: url_for(sortable_search_params.merge(search_progress: nil)), match: :query, query: {search_progress: nil}) } %>
+      <% dropdown.with_entry_divider %>
 
       <% BulkImport.progresses.each do |progress| %>
-        <%= link_to progress.humanize, url_for(sortable_search_params.merge(search_progress: progress)), class: "dropdown-item #{@progress == progress ? 'active' : ''}" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: progress.humanize, path: url_for(sortable_search_params.merge(search_progress: progress)), match: :query, query: {search_progress: progress}) } %>
       <% end %>
-    </div>
+    <% end %>
   </li>
 
-  <li class="nav-item">
-    <%= link_to "Only Ascend", admin_bulk_imports_path(sortable_search_params.merge(search_ascend: @only_ascend ? nil : "only_ascend")), class: "nav-link #{@only_ascend ? 'active' : ''}" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Only Ascend", href: admin_bulk_imports_path(sortable_search_params.merge(search_ascend: @only_ascend ? nil : "only_ascend")), size: :sm, active: @only_ascend)) %>
   </li>
 
-  <li class="nav-item">
-    <%= link_to "Not Ascend", admin_bulk_imports_path(sortable_search_params.merge(search_ascend: @not_ascend ? nil : "not_ascend")), class: "nav-link #{@not_ascend ? 'active' : ''}" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Not Ascend", href: admin_bulk_imports_path(sortable_search_params.merge(search_ascend: @not_ascend ? nil : "not_ascend")), size: :sm, active: @not_ascend)) %>
   </li>
 
-  <li class="nav-item">
-    <%= link_to "New bulk import", new_admin_bulk_import_url, class: "nav-link" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "New bulk import", href: new_admin_bulk_import_url, color: :primary, size: :sm)) %>
   </li>
 <% end %>
 
@@ -113,9 +91,10 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @bulk_imports,
   viewing: "Bulk imports",
   rendered_chart:,
   nav_header_list_items:,
-  table_view:
+  table_view:,
 )) %>

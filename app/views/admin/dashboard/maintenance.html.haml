@@ -30,14 +30,14 @@
               = l bike.created_at, format: :convert_time
 
           %td
-            = render Admin::BikeCell::Component.new(bike: bike)
+            = render Admin::Bikes::Cell::Component.new(bike: bike)
 
 .full-screen-table
   %h2
     Recent example bikes
     = link_to "Delete example bikes", admin_destroy_example_bikes_url
   - if @bikes.any?
-    = render Admin::BikesTable::Component.new(bikes: @bikes)
+    = render Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:, display_dev_info: display_dev_info?)
     .row.justify-content-end
       .col-auto
         %p

@@ -1,5 +1,5 @@
 <%# require inline CSS setting because of caching %>
-<% unless helpers.display_dev_info? %>
+<% unless @display_dev_info %>
   <style>.only-dev-visible {display: none !important;}</style>
 <% end %>
 
@@ -7,7 +7,7 @@
   <div class="row align-items-end">
     <div class="col-md-4">
       <%= render(UI::Forms::Group::Component.new(attribute: :tags, label_text: "Tag to assign", wrapper_class: "tw:mb-0")) do %>
-        <%= render UI::Forms::Combobox::Component.new(name: :tags, free_text: true, options: helpers.searchable_tags, placeholder: "Select or create a tag") %>
+        <%= render UI::Forms::Combobox::Component.new(name: :tags, free_text: true, options: @searchable_tags, placeholder: "Select or create a tag") %>
       <% end %>
     </div>
 
@@ -19,9 +19,9 @@
   <div
     class="mt-4"
     data-controller="update-cached-sortable-links"
-    data-update-cached-sortable-links-base-url-value="<%= url_for(helpers.sortable_search_params) %>"
+    data-update-cached-sortable-links-base-url-value="<%= url_for(@sort_state.search_params) %>"
   >
-    <%= render(UI::Table::Component.new(records: @collection, cache_key:, render_sortable: @render_sortable)) do |table| %>
+    <%= render(UI::Table::Component.new(records: @collection, cache_key:, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
       <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0", title: "Toggle all checked", aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"}), classes: "display-multi-check tw:w-8", header_classes: "display-multi-check tw:w-8") do |bug_report| %>
         <%= check_box_tag "bug_reports_selected[#{bug_report.id}]", bug_report.id, false, data: {"table-multi-checkbox-target" => "checkbox"} %>
       <% end %>
@@ -33,7 +33,7 @@
 
       <% table.column(sortable: "email", label: "Sender") do |bug_report| %>
         <% if bug_report.user_id.present? %>
-          <%= render Admin::UserCell::Component.new(user: bug_report.user, user_id: bug_report.user_id) %>
+          <%= render Admin::Users::Cell::Component.new(user: bug_report.user, user_id: bug_report.user_id) %>
         <% else %>
           <span class="tw:block tw:xl:inline"><%= bug_report.from_name %></span>
           <%= content_tag(:code, bug_report.email, class: "small") %>

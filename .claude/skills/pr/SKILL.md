@@ -54,7 +54,9 @@ This has to happen before the cleanup below, which diffs against `origin/main`.
 
 ### Simplify, lint, and conform to CLAUDE.md
 
-`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `CLAUDE.md`, the required comment audit, and the cycle-type translation check. Commit everything it produces before re-dating migrations.
+`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `CLAUDE.md`, the required spec and comment audits, and the cycle-type translation check. Commit everything it produces before re-dating migrations.
+
+Both audits are required every run, not just when the diff looks messy. The spec one asks of every example the branch adds: *what bug does this fail on?* — and deletes the ones that only restate the code.
 
 ### Freshen stale migration timestamps
 
@@ -83,7 +85,7 @@ No `bin/env` eval is needed here — it's only relevant to the screenshot phase,
 
 The diff is frontend if a changed path matches one of these **and** renders a page a reviewer could look at:
 
-- `app/views/**` (`.erb`, `.html.erb`)
+- `app/views/**` (`.erb`, `.html.erb`, `.haml` — deprecated, but still most of the directory)
 - `app/components/**` (ViewComponent templates or Ruby)
 - `app/javascript/**`
 - `app/assets/**`

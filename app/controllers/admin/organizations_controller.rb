@@ -2,8 +2,12 @@ module Admin
   class OrganizationsController < Admin::BaseController
     include Binxtils::SortableTable
 
-    before_action :find_organization, only: %i[show edit update destroy]
-    before_action :set_admin_form_page_id, only: %i[new edit]
+    # Each has a template of its own rendering its slice of the organization form; #edit
+    # picks between them, so only "edit" is an action
+    FORM_TABS = %w[edit locations paid_functionality sso].freeze
+
+    before_action :find_organization, only: %w[show edit update destroy]
+    before_action :set_admin_form_page_id, only: %w[edit new]
 
     def index
       @per_page = permitted_per_page
@@ -18,11 +22,14 @@ module Admin
     end
 
     def show
-      @locations = @organization.locations
       @deleted_organization_roles = @organization.deleted? || Binxtils::InputNormalizer.boolean(params[:deleted_organization_roles])
       bikes = @organization.bikes.reorder("created_at desc")
       @bikes_count = bikes.size
       @pagy, @bikes = pagy(:countish, bikes, limit: 10, page: permitted_page)
+    end
+
+    def edit
+      render action: form_tab || "edit"
     end
 
     def recover
@@ -54,9 +61,9 @@ module Admin
         update_organization_stolen_message
         flash[:success] = "Organization Saved!"
         UpdateOrganizationPosKindJob.perform_async(@organization.id) if run_update_pos_kind
-        redirect_to admin_organization_url(@organization)
+        redirect_to form_tab_url
       else
-        render action: :edit
+        render action: form_tab || "edit"
       end
     end
 
@@ -76,15 +83,40 @@ module Admin
       redirect_to admin_organizations_url
     end
 
+    # The features filter is a multiselect combobox, which renders its selections through
+    # this rather than holding them itself
+    def feature_chips
+      displays = Admin::Organizations::Index::SearchForm::Component.option_groups
+        .values.flatten.to_h { [it[:value], it[:display]] }
+
+      chips = params[:combobox_values].to_s.split(",").filter_map do |value|
+        next if displays[value].blank?
+
+        helpers.hw_combobox_selection_chip(display: displays[value], value:, for_id: params[:for_id])
+      end
+
+      render turbo_stream: helpers.safe_join(chips)
+    end
+
     helper_method :matching_organizations
 
     protected
 
+    def form_tab = params[:tab].presence_in(FORM_TABS)
+
+    # "edit" is the tab #edit renders by default, so it stays out of the URL
+    def form_tab_url
+      return admin_organization_url(@organization) if form_tab.blank?
+
+      edit_admin_organization_url(@organization, tab: (form_tab unless form_tab == "edit"))
+    end
+
+    # fetch rather than require: a tab that renders none of these still submits - the reg
+    # labels are top-level params, and a locations tab for an organization without any posts
+    # nothing but the blank-fields template, which the browser leaves behind
     def permitted_parameters
-      approved_kind = params.dig(:organization, :kind)
-      approved_kind = "other" unless Organization.kinds.include?(approved_kind)
       params
-        .require(:organization)
+        .fetch(:organization, {})
         .permit(
           :access_token,
           :api_access_approved,
@@ -116,8 +148,22 @@ module Admin
           organization_saml_configuration_attributes: %i[id enabled idp_entity_id
             idp_sso_target_url idp_slo_target_url idp_cert idp_cert_fingerprint
             idp_cert_multi email_attribute_name name_id_format]
-        ).merge(kind: approved_kind)
-        .merge(registration_field_labels: registration_field_labels_val)
+        ).merge(approved_kind).merge(registration_field_labels_param)
+    end
+
+    # A tab that doesn't render the field mustn't clear it - only the kind select answers
+    # for kind, and only the tab holding the label fields can blank a label
+    def approved_kind
+      kind = params.dig(:organization, :kind)
+      return {} if kind.blank?
+
+      {kind: Organization.kinds.include?(kind) ? kind : "other"}
+    end
+
+    def registration_field_labels_param
+      return {} unless form_tab.nil? || form_tab == "paid_functionality"
+
+      {registration_field_labels: registration_field_labels_val}
     end
 
     def matching_organizations
@@ -129,11 +175,13 @@ module Admin
       matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
 
       @features_and_settings_ids = []
-      features_and_settings = Array(params[:search_features_and_settings]).reject(&:blank?)
+      # The combobox posts one comma-joined value; bookmarked URLs still carry an array
+      features_and_settings = Array(params[:search_features_and_settings])
+        .flat_map { it.to_s.split(",") }.reject(&:blank?)
       organization_features = OrganizationFeature.where(id: features_and_settings)
       if organization_features.any? # HACK - doesn't search InvoiceOrganizationFeature, just feature slugs
         matching_organizations = matching_organizations.with_enabled_feature_slugs(organization_features.feature_slugs)
-        @features_and_settings_ids += organization_features.pluck(:id)
+        @features_and_settings_ids += organization_features.pluck(:id).map(&:to_s)
       end
       selected_settings = organization_settings & features_and_settings
       if selected_settings.include?("theft_survey")

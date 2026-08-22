@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe PageBlock::Navbar::PrimaryMenu::Component, type: :component do
   let(:current_user) { nil }
   let(:instance) do
-    described_class.new(current_user:, current_user_or_unconfirmed_user: current_user)
+    described_class.new(current_user_or_unconfirmed_user: current_user)
   end
   let(:component) { render_inline(instance) }
   let(:menu_links) { component.css("#primary-main-menu a").map { |link| link.text.strip } }
@@ -18,6 +18,9 @@ RSpec.describe PageBlock::Navbar::PrimaryMenu::Component, type: :component do
     expect(component).to_not have_css "#setting_submenu"
     expect(component).to_not have_css "#primary-main-menu a[aria-current]"
     expect(component.css("#primary-main-menu a[data-controller='ui--active-link']").count).to eq menu_links.count
+    # Every row is a nav-link; only the signup one carries a second class
+    expect(component.css("#primary-main-menu a.nav-link").count).to eq menu_links.count
+    expect(component.css("#primary-main-menu a.signup-link").map { |link| link.text.strip }).to eq(["Sign up"])
   end
 
   # The links carry a stolenness the page won't, and the page carries a query and a page

@@ -45,7 +45,7 @@ Pick the user the caller specified, or default to `user@bikeindex.org` (lowest p
 - `dev@bikeindex.org` — `SuperuserAbility` **and** `developer`. Use for the pages gated on both: the `Dev:` navbar entries and `/admin/organizations/:slug/custom_layouts/...`, which redirect for `admin@`.
 - `:anonymous` — skip sign-in entirely. Use for public pages where the signed-out rendering is the point.
 
-Signed-out is the normal starting state, **not** a blocker: if a page redirects to `/session/new` or `/session/magic_link` (or `#navUserSettingLink` has no email), sign in. In development every page carries a **"sign in as superadmin"** button in the top banner — one click, no credentials, and it lands on `/admin`; use it whenever the target needs a superuser. Otherwise drive the sign-in form via Playwright with the seed credentials above — don't ask the user to sign in manually, and don't skip the screenshot for lack of a session. **Only ever authenticate against the local dev server** (`$BASE_URL` / localhost) — never sign in to any other host, and never create, promote, or impersonate users to bypass auth.
+Signed-out is the normal starting state, **not** a blocker: if a page redirects to `/session/new` or `/session/magic_link` (or `#navUserSettingLink` has no email), sign in. In development every page carries a **"sign in as superadmin"** button in the top banner — one click, no credentials, and it lands on `/admin`; use it whenever the target needs a superuser. Otherwise drive the sign-in form via Playwright with the seed credentials above — don't ask the user to sign in manually, and don't skip the screenshot for lack of a session. It's two steps (email → Continue → password), and **both** submits need addressing by value — `input[name='commit'][value='Continue']` then `input[name='commit'][value='Log in']`. A `[type=submit]` selector fails strict mode on either, and so does `input[name='commit']` alone on the first step, where the banner's "sign in as superadmin" is the other match. **Only ever authenticate against the local dev server** (`$BASE_URL` / localhost) — never sign in to any other host, and never create, promote, or impersonate users to bypass auth.
 
 **Picking an org slug.** When the URL is org-scoped (`/o/<slug>/...`) and the caller didn't specify a slug, default to `brakebills`
 
@@ -73,10 +73,13 @@ Two viewports — resize once each, then walk every URL:
 1. `browser_resize` 1440×900 → for each URL: navigate → settle → hide the footer → `browser_take_screenshot` (`fullPage: true`) to `...-desktop.png`.
 2. `browser_resize` 390×844 → same loop, also `fullPage: true` → `...-mobile.png`.
 
-**Full page, minus the footer, review-app banner and profiler badge, no `target:` arg.** Capture the whole page (`fullPage: true`) at **both** viewports so nothing below the fold is cut off, but first hide the site footer (identical on every page, just padding), the `#review-app-banner` topbar and the `.profiler-results` badge (both dev-only chrome that isn't part of the real page). **Keep the footer when the diff changes it** — the reason to hide it is that it carries no information, which stops being true the moment it's the subject. The profiler badge reports *this request's* timing, so leaving it in makes every before/after pair differ on a number no reviewer cares about. After each navigation (hiding doesn't persist across page loads), run:
+**Full page, minus the footer, review-app banner and profiler badge, no `target:` arg.** Capture the whole page (`fullPage: true`) at **both** viewports so nothing below the fold is cut off, but first hide the site footer (identical on every page, just padding), the `#review-app-banner` topbar and the `.profiler-results` badge (both dev-only chrome that isn't part of the real page). **Keep the footer when the diff changes it** — the reason to hide it is that it carries no information, which stops being true the moment it's the subject. The profiler badge reports *this request's* timing, so leaving it in makes every before/after pair differ on a number no reviewer cares about. After each navigation — and again immediately before the shot, since rack-mini-profiler injects `.profiler-results` after load — run:
 
 ```js
 browser_evaluate: () => {
+  document.querySelectorAll('.close, [data-dismiss="modal"], [aria-label="Close"]').forEach(c => c.click());
+  document.querySelectorAll('.modal-backdrop').forEach(b => b.style.setProperty('display', 'none'));
+  document.body.classList.remove('modal-open');
   document.querySelector('.primary-footer, footer, [role="contentinfo"]')?.style.setProperty('display', 'none');
   document.getElementById('review-app-banner')?.style.setProperty('display', 'none');
   document.querySelector('.profiler-results')?.style.setProperty('display', 'none');
@@ -84,7 +87,11 @@ browser_evaluate: () => {
 }
 ```
 
+The donation modal is why that starts with a dismiss: a seeded user who hasn't donated gets it over the page on `/my_account` and friends, and it covers the whole shot rather than sitting in a corner.
+
 If the returned content height is **less than the viewport height**, `browser_resize` the height down to it before the shot (the `<html>` element's near-black background fills the gap otherwise), then resize back to the standard viewport before the next URL. Taller-than-viewport pages need no resize — `fullPage` scroll-stitches them.
+
+**An org-sidebar page taller than the viewport needs that resize upward instead.** The sidebar is `position: fixed`, so `fullPage` stitching leaves it at viewport height over the same near-black background — resize up to the content height before the shot.
 
 **Viewport-only is the caller's call, never yours.** When the caller asks for it — "viewport only", "above the fold", "just the mobile viewport" — drop `fullPage` for the size they named and leave the other one full page. Absent that, full page is the default at both sizes: a tall page, a sliver in a PR table cell, or a page whose change sits above the fold are none of them reasons to crop on your own.
 
@@ -97,6 +104,8 @@ Element-only crops (`target:`) still slice context off — don't use them for pa
 **An element missing from the shot may be a stale asset build, not the code.** `bin/dev`'s watchers don't pick up a new `@theme` token, so a class keyed off one (`tw:navbar:block!`) is absent from what the server serves while the specs — whose builds you regenerated — pass. Confirm with `getComputedStyle` on the element, then run `bin/rails tailwindcss:build` (or `dartsass:build` for a `.scss` edit); sprockets serves the new digest on the next request, so this needs no `bin/dev` restart and isn't `assets:precompile`.
 
 Sanity-check each PNG: under ~5 KB usually means the page errored. Pull `browser_console_messages` and look only for **uncaught exceptions from app code** (Stimulus registration failures, `TypeError`s in `app/javascript/**`) — Webpacker logs, asset 404s, third-party deprecation warnings are noise. To diagnose a failed capture: HTTP status via `curl -s -o /dev/null -w "%{http_code}\n" "$BASE_URL/<path>"`, response body via `curl -s "$BASE_URL/<path>" | head -200`, full backtrace via `tail -200 log/development.log`.
+
+**A 429 mid-capture is rack-attack, not a broken page.** `requests/ip` allows a burst per 20 seconds (`config/initializers/rack_attack.rb`), which a loop of `fetch`es from `browser_evaluate` blows through — navigate the pages you're capturing rather than probing them in bulk, and wait the window out rather than retrying.
 
 ## Component previews (when no page shows the state)
 
@@ -129,6 +138,8 @@ Previews that query the dev DB (e.g. `User.admins.first`) render nothing when th
 ## Cross-branch comparison (optional)
 
 When the caller wants before/after, repeat the capture loop against the base ref. The caller passes the base — `origin/main` by default, or the PR's actual base when it isn't `main` (a stacked PR's base often isn't). Set `BASE_REF` to that remote ref (e.g. `origin/main`, `origin/sethherr/feature-x`) and use it throughout; `git fetch origin` first so it's current.
+
+**Capture the base at what the branch actually merged, not at the ref's tip.** A fetch moves `origin/main` to commits the branch hasn't taken, so a base capture there renders *the base's newer work* and the diff attributes it to this PR. Check `git rev-list --count HEAD..$BASE_REF` before detaching: non-zero means merge first, or detach at `$(git merge-base HEAD $BASE_REF)` instead. On a busy repo the base can move between the branch capture and the base capture of the same run.
 
 **The detached checkout in step 3 is a sanctioned exception to "never change branch" — don't stop and ask for it.** It is the only one: it detaches at a *remote* ref, reads, and returns to the same branch within this section, committing nothing. The return to the original branch is part of that sequence, not a second exception. Every other reason to leave the current branch still needs the user's say-so — nothing here licenses checking out some other branch, `git checkout -b`, or a checkout that outlives the capture.
 

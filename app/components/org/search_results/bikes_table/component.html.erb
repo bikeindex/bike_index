@@ -4,7 +4,7 @@
 <% current_user = @current_user %>
 
 <%= tag.div(data: table_wrapper_data_attributes) do %>
-  <%= render(UI::Table::Component.new(records: @bikes, cache_key: @cache_key, render_sortable: @render_sortable)) do |table| %>
+  <%= render(UI::Table::Component.new(records: @bikes, cache_key: @cache_key, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
     <% hidden_html = hidden_not_registered_tag %>
     <% email_hidden = translation(".email_hidden") %>
 
@@ -36,7 +36,7 @@
     <% end %>
 
     <% table.column(label: translation(".serial"), classes: "hideableColumn serial_number_cell") do |bike| %>
-      <%= helpers.render_serial_display(bike, current_user) %>
+      <%= render(Atom::Serial::Component.new(bike:, user: current_user)) %>
     <% end %>
 
     <% table.column(sortable: "propulsion_type", label: translation(".propulsion_type"), classes: "hideableColumn propulsion_type_cell") do |bike| %>

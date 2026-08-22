@@ -54,7 +54,7 @@
           - @user.user_phones.each do |user_phone|
             %li.row
               .col-sm-8
-                = render UI::PhoneDisplay::Component.new(phone: user_phone.phone, skip_link: true)
+                = render Atom::Phone::Component.new(phone: user_phone.phone, skip_link: true)
                 - if Flipper.enabled?(:phone_verification)
                   - if user_phone.confirmed?
                     %small.less-strong= t(".verified")

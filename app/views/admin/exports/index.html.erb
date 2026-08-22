@@ -1,7 +1,7 @@
 <% nav_header_list_items = capture do %>
   <% if current_organization.present? %>
-    <li class="nav-item">
-      <span class="nav-link">
+    <li>
+      <span class="tw:px-2.5 tw:py-1 tw:text-xs">
         <%= link_to current_organization.name, admin_organization_path(current_organization) %>
         Exports
         <small><%= link_to "view orgs view", organization_exports_path(organization_id: current_organization.to_param), class: "less-strong" %></small>
@@ -9,83 +9,51 @@
     </li>
   <% end %>
 
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= params[:search_kind].present? ? "active" : "" %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <% if params[:search_kind].blank? %>
-        All kinds
-      <% else %>
-        <%= params[:search_kind].humanize %>
-      <% end %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "All kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{params[:search_kind].present? ? '' : 'active'}" %>
-
-      <div class="dropdown-divider"></div>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: params[:search_kind].blank? ? "All kinds" : params[:search_kind].humanize, button_size: :sm,
+          active: params[:search_kind].present?)) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All kinds", path: url_for(sortable_search_params.merge(search_kind: nil)), match: :query, query: {search_kind: nil}) } %>
+      <% dropdown.with_entry_divider %>
 
       <% Export::VALID_KINDS.each_key do |kind| %>
-        <%= link_to kind.to_s.humanize, url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{params[:search_kind] == kind.to_s ? 'active' : ''}" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind.to_s.humanize, path: url_for(sortable_search_params.merge(search_kind: kind)), match: :query, query: {search_kind: kind}) } %>
       <% end %>
 
-      <div class="dropdown-divider"></div>
-
-      <%= link_to "Avery", url_for(sortable_search_params.merge(search_kind: "avery")), class: "dropdown-item #{params[:search_kind] == 'avery' ? 'active' : ''}" %>
-    </div>
+      <% dropdown.with_entry_divider %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Avery", path: url_for(sortable_search_params.merge(search_kind: "avery")), match: :query, query: {search_kind: "avery"}) } %>
+    <% end %>
   </li>
 
-  <li class="nav-item">
-    <%= link_to "Dates", url_for(sortable_search_params.merge(search_with_dates: !@with_dates)), class: "nav-link #{@with_dates ? 'active' : ''}" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Dates", href: url_for(sortable_search_params.merge(search_with_dates: !@with_dates)), size: :sm, active: @with_dates)) %>
   </li>
 
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= params[:search_registrations].present? ? "active" : "" %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <% if params[:search_registrations].blank? %>
-        All registrations
-      <% else %>
-        <%= params[:search_registrations].humanize %>
-      <% end %>
-    </a>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: params[:search_registrations].blank? ? "All registrations" : params[:search_registrations].humanize, button_size: :sm,
+          active: params[:search_registrations].present?)) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All registrations", path: url_for(sortable_search_params.merge(search_registrations: nil)), match: :query, query: {search_registrations: nil}) } %>
+      <% dropdown.with_entry_divider %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Registered", path: url_for(sortable_search_params.merge(search_registrations: "registered")), match: :query, query: {search_registrations: "registered"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Incomplete", path: url_for(sortable_search_params.merge(search_registrations: "incomplete")), match: :query, query: {search_registrations: "incomplete"}) } %>
 
-    <div class="dropdown-menu">
-      <%= link_to "All registrations", url_for(sortable_search_params.merge(search_registrations: nil)), class: "dropdown-item #{params[:search_registrations].present? ? '' : 'active'}" %>
-
-      <div class="dropdown-divider"></div>
-
-      <%= link_to "Registered", url_for(sortable_search_params.merge(search_registrations: "registered")), class: "dropdown-item #{params[:search_registrations] == 'registered' ? 'active' : ''}" %>
-      <%= link_to "Incomplete", url_for(sortable_search_params.merge(search_registrations: "incomplete")), class: "dropdown-item #{params[:search_registrations] == 'incomplete' ? 'active' : ''}" %>
-
-      <%# link_to escapes the label, so writing &amp; here would double-escape %>
-      <%= link_to "Incompletes & registrations", url_for(sortable_search_params.merge(search_registrations: "incompletes_and_registrations")), class: "dropdown-item #{params[:search_registrations] == 'incompletes_and_registrations' ? 'active' : ''}" %> <%# herb:disable html-no-unescaped-entities %>
-      <%= link_to "Specific", url_for(sortable_search_params.merge(search_registrations: "specific")), class: "dropdown-item #{params[:search_registrations] == 'specific' ? 'active' : ''}" %>
-      <%= link_to "Impounded", url_for(sortable_search_params.merge(search_registrations: "impounded")), class: "dropdown-item #{params[:search_registrations] == 'impounded' ? 'active' : ''}" %>
-    </div>
+      <%# the component escapes the label, so writing &amp; here would double-escape %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Incompletes & registrations", path: url_for(sortable_search_params.merge(search_registrations: "incompletes_and_registrations")), match: :query, query: {search_registrations: "incompletes_and_registrations"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Specific", path: url_for(sortable_search_params.merge(search_registrations: "specific")), match: :query, query: {search_registrations: "specific"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Impounded", path: url_for(sortable_search_params.merge(search_registrations: "impounded")), match: :query, query: {search_registrations: "impounded"}) } %>
+    <% end %>
   </li>
 
-  <li class="nav-item">
-    <%= link_to "Stickers", url_for(sortable_search_params.merge(search_stickers: !@stickers)), class: "nav-link #{@stickers ? 'active' : ''}" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Stickers", href: url_for(sortable_search_params.merge(search_stickers: !@stickers)), size: :sm, active: @stickers)) %>
   </li>
 
-  <li class="nav-item">
-    <%= link_to "Impounded", url_for(sortable_search_params.merge(search_impounded: !@impounded)), class: "nav-link #{@impounded ? 'active' : ''}" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Impounded", href: url_for(sortable_search_params.merge(search_impounded: !@impounded)), size: :sm, active: @impounded)) %>
   </li>
 <% end %>
 
 <% table_view = capture do %>
-  <%= render(UI::Table::Component.new(records: @collection, render_sortable: true)) do |table| %>
+  <%= render(UI::Table::Component.new(records: @collection, render_sortable: true, sort_state:)) do |table| %>
     <% table.column(sortable: "created_at", label: "Date") do |export| %>
       <%= link_to organization_export_path(export, organization_id: export.organization.to_param) do %>
         <%= render UI::Time::Component.new(time: export.created_at) %>
@@ -117,7 +85,7 @@
     <% end %>
 
     <% table.column(label: "Organization", header_classes: "tw:font-normal") do |export| %>
-      <%= render Admin::OrganizationCell::Component.new(organization: export.organization, render_search: true) %>
+      <%= render Admin::Organizations::Cell::Component.new(sort_state:, organization: export.organization, render_search: true) %>
     <% end %>
 
     <% table.column(label: "File", header_classes: "tw:font-normal") do |export| %>
@@ -130,10 +98,10 @@
 
     <% table.column(label: "Kind", header_classes: "tw:font-normal") do |export| %>
       <% display_kind = export.avery_export? ? "avery" : export.kind %>
-      <%= link_to display_kind, url_for(sortable_search_params.merge(search_kind: display_kind)) %>
+      <%= link_to display_kind, url_for(sort_state.search_params.merge(search_kind: display_kind)) %>
 
       <% if export.assign_bike_codes? %>
-        <%= link_to url_for(sortable_search_params.merge(search_stickers: true)) do %>
+        <%= link_to url_for(sort_state.search_params.merge(search_stickers: true)) do %>
           <%= render UI::Badge::Component.new(text: "sticker", title: "Assigned stickers", color: :cyan, size: :sm) %>
         <% end %>
       <% end %>
@@ -153,7 +121,7 @@
       <% end %>
 
       <% if export.start_at.present? || export.end_at.present? %>
-        <%= link_to url_for(sortable_search_params.merge(search_with_dates: true)) do %>
+        <%= link_to url_for(sort_state.search_params.merge(search_with_dates: true)) do %>
           <%= render UI::Badge::Component.new(text: "dates", color: :yellow, size: :sm) %>
         <% end %>
       <% end %>
@@ -162,8 +130,10 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @collection,
   viewing: "Exports",
   nav_header_list_items:,
   table_view:,
-  chart_collection: @render_chart && matching_exports
+  chart_collection: @render_chart && matching_exports,
 )) %>

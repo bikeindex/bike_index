@@ -69,9 +69,14 @@ Rails.application.routes.draw do
 
   # Organization SAML SSO (Service Provider). Metadata is public for IdP onboarding;
   # init begins SP-initiated login, callback is the Assertion Consumer Service.
-  get "/sso/:org_slug/metadata", to: "saml#metadata", as: :saml_metadata
-  get "/sso/:org_slug/init", to: "saml#init", as: :saml_init
-  post "/sso/:org_slug/callback", to: "saml#callback", as: :saml_callback
+  # Every path here is a string an IdP has registered - `/metadata` is our entityID - so an
+  # extension has to 404 rather than reach the same action under a second name
+  scope format: false do
+    get "/sso/:org_slug/metadata", to: "saml#metadata", as: :saml_metadata
+    get "/sso/:org_slug/sp.crt", to: "saml#certificate", as: :saml_certificate
+    get "/sso/:org_slug/init", to: "saml#init", as: :saml_init
+    post "/sso/:org_slug/callback", to: "saml#callback", as: :saml_callback
+  end
 
   resources :payments, only: %i[new create] do
     collection { get :success }
@@ -135,6 +140,7 @@ Rails.application.routes.draw do
     post :toggle_show_redesign
     resources :messages, only: %i[index show create], controller: "my_accounts/messages"
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
+    resources :organization_roles, only: %i[update destroy], controller: "my_accounts/organization_roles"
   end
   get "my_account/edit(/:edit_template)", to: "my_accounts#edit", as: :edit_my_account
 
@@ -330,6 +336,9 @@ Rails.application.routes.draw do
     end
 
     resources :organizations do
+      # Selection chips for the features filter combobox on the index
+      post :feature_chips, on: :collection
+
       resources :custom_layouts, only: %i[index edit update], controller: "organizations/custom_layouts"
       resources :invoices, controller: "organizations/invoices"
     end
@@ -474,7 +483,7 @@ Rails.application.routes.draw do
     get "/", to: "dashboard#root", as: :root
     resources :dashboard, only: %i[index]
     get "landing", to: "manages#landing", as: :landing
-    resources :registrations, only: %i[index] do
+    resources :registrations, only: %i[index new] do
       collection do
         get :multi_search
         get :multi_search_response

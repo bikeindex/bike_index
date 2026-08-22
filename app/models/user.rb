@@ -420,23 +420,26 @@ class User < ApplicationRecord
     self.when_vendor_terms_of_service = Time.current
   end
 
-  def send_password_reset_email
+  # return_to rides in the link for the same reason it does on send_magic_link_email
+  def send_password_reset_email(return_to: nil)
     # If the auth token was just created, don't create a new one, it's too error prone
     return false if password_reset_just_sent?
 
     update_auth_token("token_for_password_reset")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    Email::ResetPasswordJob.perform_async(id)
+    Email::ResetPasswordJob.perform_async(id, return_to)
     true
   end
 
-  def send_magic_link_email
+  # The emailed link is often opened in another browser, which has no session
+  # holding where the user was headed - so return_to rides along in the link
+  def send_magic_link_email(return_to: nil)
     # If the auth token was just created, don't create a new one, it's too error prone
     return true if auth_token_time("magic_link_token") > Time.current - 1.minutes
 
     update_auth_token("magic_link_token")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    Email::MagicLoginLinkJob.perform_async(id)
+    Email::MagicLoginLinkJob.perform_async(id, return_to)
   end
 
   # Unlike send_magic_link_email, reuses an unexpired token and sends no email
@@ -510,14 +513,13 @@ class User < ApplicationRecord
     !superuser? && organization_roles.admin.limit(1).none?
   end
 
-  def default_organization
-    return @default_organization if defined?(@default_organization) # Memoize, permit nil
-
-    @default_organization = organizations&.first # Maybe at some point use organization_roles to get the most recent, for now, speed
-  end
-
   def partner_sign_up
     (partner_data && partner_data["sign_up"].present?) ? partner_data["sign_up"] : nil
+  end
+
+  # Read by the confirmation email, which is built from the user record alone
+  def signup_return_to
+    partner_data && partner_data["return_to"].presence
   end
 
   def bikes(user_hidden = true)

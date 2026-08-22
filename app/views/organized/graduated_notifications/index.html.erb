@@ -1,21 +1,20 @@
 <%# TODO: add translations %>
 
 <div class="organized-page-header">
-  <h1>Graduated notifications</h1>
+  <%= render(UI::Header::Component.new(text: "Graduated notifications")) %>
 </div>
 
 <% unless current_organization.deliver_graduated_notifications? %>
   <div class="row mt-5 mb-5">
     <div class="col-md-6">
-      <div class="alert alert-info">
-        <h3>Not delivering graduated notifications</h3>
+      <%= render(UI::Alerts::Base::Component.new(header: "Not delivering graduated notifications", margin_classes: "")) do %>
         <%= current_organization.name %> doesn't have a notification time period
-        set, <span class="text-warning">bikes are not being graduated.</span>
+        set, <strong>bikes are not being graduated.</strong>
         <br>
         Please email
-        <%= link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org" %> to
-        set up graduated notifications.
-      </div>
+        <%= link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org", class: "twlink-underlined" %>
+        to set up graduated notifications.
+      <% end %>
     </div>
   </div>
 <% end %>
@@ -25,7 +24,7 @@
   doesn't include them). Reads params, not @search_status, which is unset on
   non-turbo renders.
 %>
-<% form_interpreted_params = @interpreted_params.merge(search_status: params[:search_status], search_secondary: params[:search_secondary]).compact %>
+<% form_interpreted_params = @interpreted_params.merge(search_status: params[:search_status], search_secondary: params[:search_secondary], search_email: params[:search_email]).compact %>
 
 <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
 <% unless turbo_frame_request? %>
@@ -33,7 +32,7 @@
     <%= render(Org::Search::Form::Component.new(
       target_search_path: organization_graduated_notifications_path(organization_id: current_organization.to_param),
       target_frame: :graduated_notifications_results_frame,
-      interpreted_params: form_interpreted_params
+      interpreted_params: form_interpreted_params,
     )) %>
   </div>
 <% end %>
@@ -41,7 +40,7 @@
 <%= render SearchResults::Frame::Component.new(frame_id: :graduated_notifications_results_frame,
   render_results: @render_results, current_path: request.original_fullpath) do %>
   <div class="tw:mt-4">
-    <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time) %>
+    <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:) %>
   </div>
 
   <div class="tw:mt-2 tw:text-right">

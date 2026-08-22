@@ -1,0 +1,28 @@
+<li>
+  <%= render(UI::Dropdown::Component.new(name: kind_name, button_size: :sm, active: kind.present?)) do |dropdown|
+    dropdown.with_entry_item { filter_link("All Kinds", :search_kind, nil) }
+    dropdown.with_entry_divider
+    Organization.kinds.each do |organization_kind|
+      dropdown.with_entry_item { filter_link(organization_kind.humanize, :search_kind, organization_kind) }
+    end
+  end %>
+</li>
+
+<li>
+  <%= render(UI::Dropdown::Component.new(name: pos_name, button_size: :sm, active: pos_kind.present?)) do |dropdown|
+    dropdown.with_entry_item { filter_link("All POS", :search_pos, nil) }
+    dropdown.with_entry_divider
+    pos_entries.each do |entry|
+      dropdown.with_entry_item { filter_link(entry.humanize, :search_pos, entry) }
+      dropdown.with_entry_divider if entry == "broken_pos"
+    end
+  end %>
+</li>
+
+<li>
+  <%= render(UI::ButtonLink::Component.new(text: "Paid", href: paid_path, size: :sm, active: @search_paid)) %>
+</li>
+
+<li>
+  <%= render(UI::ButtonLink::Component.new(text: "New Organization", href: new_admin_organization_url, color: :primary, size: :sm)) %>
+</li>

@@ -16,8 +16,9 @@ RSpec.describe Org::ImpoundRecordsTable::Component, type: :component do
   end
   let(:options) do
     {impound_records: [impound_record], current_organization: organization,
-     render_sortable:, render_resolved_at:, skip_status:, skip_bike:, skip_location:, skip_multiselect:}
+     current_user:, render_sortable:, render_resolved_at:, skip_status:, skip_bike:, skip_location:, skip_multiselect:}
   end
+  let(:current_user) { nil }
   let(:render_sortable) { false }
   let(:render_resolved_at) { false }
   let(:skip_status) { false }
@@ -74,6 +75,23 @@ RSpec.describe Org::ImpoundRecordsTable::Component, type: :component do
 
     it "omits the location column by default" do
       expect(component).not_to have_content("Location")
+    end
+  end
+
+  # The serial cell renders inside a UI::Table cell block, where an ivar resolves against the table
+  context "with an authorized current_user" do
+    let(:current_user) { FactoryBot.create(:superuser) }
+
+    it "renders the serial" do
+      expect(impound_record.bike.serial_hidden?).to be_truthy
+      expect(component).to have_content(impound_record.bike.serial_number.upcase)
+    end
+  end
+
+  context "without a current_user" do
+    it "hides the serial" do
+      expect(component).not_to have_content(impound_record.bike.serial_number.upcase)
+      expect(component).to have_content("hidden")
     end
   end
 

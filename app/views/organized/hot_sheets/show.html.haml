@@ -1,12 +1,12 @@
 -# TODO: translations
 
-%h1.uncap
-  Stolen Bike Hot Sheet
+= render(UI::Header::Component.new(text: "Stolen Bike Hot Sheet", html_class: "uncap"))
 
 - if current_organization.hot_sheet_on?
   .row
     .col-md-8
-      %h3.hot-sheet-current-title
+      -# The day-link arrows are absolutely positioned against this box, so it keeps its size and leading
+      = render(UI::Header::Component.new(tag: :h3, html_class: "hot-sheet-current-title tw:text-xl! tw:leading-none!")) do
         - unless @current
           -# Link to current sheet if no next sheet
           - next_day = @hot_sheet.next_sheet.blank? ? nil : @hot_sheet.next_sheet.sheet_date
@@ -52,7 +52,7 @@
         - else
           ask a #{current_organization.short_name} administrator to turn them on.
 
-      %h2.uncap
+      = render(UI::Header::Component.new(tag: :h2, html_class: "uncap")) do
         %span.text-danger
           Preview of
         Stolen Bike Hot Sheet
@@ -74,15 +74,15 @@
             .bike-display
               .bike-info
                 - if stolen_record.recovered?
-                  .recovered-alert
-                    %h3.uncap Bike was recovered!
+                  %div{ class: "tw:mb-2" }
+                    = render(UI::Badge::Component.new(text: "Bike was recovered!", color: :success, solid: true, size: :lg))
                 %table.table-list.mb-0
                   %tr.bike-main-info
                     %td{ colspan: 2 }
                       = link_to organized_bike_text(bike, skip_creation: true), bike_link
                   %tr
                     %td Serial
-                    %td= render_serial_display(bike, current_user)
+                    %td= render(Atom::Serial::Component.new(bike:, user: current_user))
                   - if stolen_record.recovered?
                     %tr
                       %td
@@ -120,7 +120,7 @@
                         %td
                           Phone
                         %td
-                          = render UI::PhoneDisplay::Component.new(phone: stolen_record.phone)
+                          = render Atom::Phone::Component.new(phone: stolen_record.phone)
               .bike-image{ class: thumbclass }
                 %a{ href:  bike_link }
                   %img{ src: thumb_url }

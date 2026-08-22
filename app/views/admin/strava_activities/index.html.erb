@@ -1,65 +1,43 @@
 <% nav_header_list_items = capture do %>
-  <%= link_to "with gear", url_for(sortable_search_params.merge(search_with_gear: !@with_gear)), class: "nav-link #{@with_gear ? "active" : ""}" %>
-
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @searched_enriched.present? ? "active" : "" %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <% if @searched_enriched == "true" %>
-        Only enriched
-      <% elsif @searched_enriched == "false" %>
-        Only not enriched
-      <% else %>
-        Enriched?
-      <% end %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "All", url_for(sortable_search_params.merge(search_enriched: nil)), class: "dropdown-item #{@searched_enriched.blank? ? 'active' : ''}" %>
-      <%= link_to "Only enriched", url_for(sortable_search_params.merge(search_enriched: "true")), class: "dropdown-item #{@searched_enriched == 'true' ? 'active' : ''}" %>
-      <%= link_to "Only not enriched", url_for(sortable_search_params.merge(search_enriched: "false")), class: "dropdown-item #{@searched_enriched == 'false' ? 'active' : ''}" %>
-    </div>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "with gear", href: url_for(sortable_search_params.merge(search_with_gear: !@with_gear)), size: :sm, active: @with_gear)) %>
   </li>
 
-  <li class="nav-item dropdown dropleft">
-    <a
-      class="nav-link dropdown-toggle <%= @searched_activity_type.present? ? "active" : "" %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <% if @searched_activity_type.blank? %>
-        All types
-      <% else %>
-        <%= @searched_activity_type %>
-      <% end %>
-    </a>
+  <li>
+    <% enriched_filter_name = {"true" => "Only enriched", "false" => "Only not enriched"}[@searched_enriched] || "Enriched?" %>
 
-    <div class="dropdown-menu">
-      <%= link_to "All types", url_for(sortable_search_params.merge(search_activity_type: nil)), class: "dropdown-item #{@searched_activity_type.present? ? '' : 'active'}" %>
+    <%= render(UI::Dropdown::Component.new(name: enriched_filter_name, button_size: :sm,
+          active: @searched_enriched.present?)) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All", path: url_for(sortable_search_params.merge(search_enriched: nil)), match: :query, query: {search_enriched: nil}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only enriched", path: url_for(sortable_search_params.merge(search_enriched: "true")), match: :query, query: {search_enriched: "true"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only not enriched", path: url_for(sortable_search_params.merge(search_enriched: "false")), match: :query, query: {search_enriched: "false"}) } %>
+    <% end %>
+  </li>
 
-      <div class="dropdown-divider"></div>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: @searched_activity_type.blank? ? "All types" : @searched_activity_type, button_size: :sm,
+          active: @searched_activity_type.present?)) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All types", path: url_for(sortable_search_params.merge(search_activity_type: nil)), match: :query, query: {search_activity_type: nil}) } %>
+      <% dropdown.with_entry_divider %>
 
       <% StravaActivity::CYCLING_TYPES.each do |activity_type| %>
-        <%= link_to activity_type, url_for(sortable_search_params.merge(search_activity_type: activity_type)), class: "dropdown-item text-success #{@searched_activity_type == activity_type ? 'active' : ''}" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: activity_type, path: url_for(sortable_search_params.merge(search_activity_type: activity_type)), match: :query, query: {search_activity_type: activity_type}) } %>
       <% end %>
 
-      <div class="dropdown-divider"></div>
+      <% dropdown.with_entry_divider %>
 
       <% (StravaActivity.activity_types - StravaActivity::CYCLING_TYPES).each do |activity_type| %>
-        <%= link_to activity_type, url_for(sortable_search_params.merge(search_activity_type: activity_type)), class: "dropdown-item #{@searched_activity_type == activity_type ? 'active' : ''}" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: activity_type, path: url_for(sortable_search_params.merge(search_activity_type: activity_type)), match: :query, query: {search_activity_type: activity_type}) } %>
       <% end %>
-    </div>
+    <% end %>
   </li>
 <% end %>
 
 <% table_view = render(partial: "table", locals: {collection: @collection, render_sortable: true, searched_activity_type: @searched_activity_type}) %>
 
-<%= render(Admin::IndexSkeleton::Component.new(nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_strava_activities)) %>
+<%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @collection,
+  viewing: controller_name.humanize,
+  nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_strava_activities,
+)) %>

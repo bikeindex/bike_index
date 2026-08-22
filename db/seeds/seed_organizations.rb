@@ -2,11 +2,10 @@
 
 # --- Organization Features ---
 # This list was created with:
-#   OrganizationFeature.has_feature_slugs.map { |of| of.slice(:name, :feature_slugs) }
+#   OrganizationFeature.order(:name).map { |of| of.slice(:name, :feature_slugs) }
 feature_name_and_slugs = [
   {name: "Ad space", feature_slugs: []},
-  {name: "Automatic User Role", description: "Gives every user with a matching email domain this default role", feature_slugs: ["user_role_for_user_email_domain"]},
-  {name: "Avery Export", feature_slugs: ["reg_address", "avery_export"]},
+  {name: "Avery Export", feature_slugs: ["avery_export", "reg_address", "require_reg_address"]},
   {name: "Bike Stickers", feature_slugs: ["bike_stickers", "bike_stickers_user_editable"]},
   {name: "Bike Stickers: NOT user editable", feature_slugs: ["bike_stickers"]},
   {name: "Bike Stickers: Sticker order", feature_slugs: []},
@@ -16,8 +15,8 @@ feature_name_and_slugs = [
   {name: "Co-branded flyer", feature_slugs: []},
   {name: "E-Vehicle Model Audits", feature_slugs: ["model_audits"]},
   {name: "Graduated bikes", feature_slugs: ["graduated_notifications"]},
-  {name: "Impound bikes", feature_slugs: ["impound_bikes"]},
   {name: "Import existing bikes", feature_slugs: []},
+  {name: "Impound bikes", feature_slugs: ["impound_bikes"]},
   {name: "Landing Page", feature_slugs: ["show_partial_registrations"]},
   {name: "Landing Page: Add Custom field(s)", feature_slugs: []},
   {name: "Law Enforcement functionality", feature_slugs: ["unstolen_notifications", "additional_registrations_information", "hot_sheet", "show_recoveries", "credibility_badges", "organization_stolen_message"]},
@@ -28,8 +27,6 @@ feature_name_and_slugs = [
   {name: "Organization Dashboard: Claimed ownerships", feature_slugs: ["claimed_ownerships"]},
   {name: "Organization Dashboard: Regional bike counts", feature_slugs: ["regional_bike_counts"]},
   {name: "Organization Registration Notes", feature_slugs: ["registration_notes"]},
-  {name: "Registration Sequences: Edit", feature_slugs: ["registration_sequences", "registration_sequences_edit"]},
-  {name: "Registration Sequences: View Only", feature_slugs: ["registration_sequences"]},
   {name: "Organization Views: Bike recoveries", feature_slugs: ["show_recoveries"]},
   {name: "Organization Views: Bulk Import - standard", feature_slugs: ["show_bulk_import"]},
   {name: "Organization Views: Bulk Import impounded", feature_slugs: ["show_bulk_import_impound"]},
@@ -38,11 +35,13 @@ feature_name_and_slugs = [
   {name: "Organization Views: Partially registered bikes", feature_slugs: ["show_partial_registrations"]},
   {name: "Organization Views: Search bikes", feature_slugs: ["bike_search"]},
   {name: "Parking Notifications", feature_slugs: ["parking_notifications", "impound_bikes"]},
-  {name: "Passwordless users", feature_slugs: ["passwordless_users"]},
+  {name: "Passwordless users", feature_slugs: ["passwordless_users", "user_role_for_user_email_domain"]},
   {name: "Product review", feature_slugs: []},
+  {name: "Registration Sequences: Edit", feature_slugs: ["registration_sequences", "registration_sequences_edit"]},
+  {name: "Registration Sequences: View only", feature_slugs: ["registration_sequences"]},
+  {name: "Registration field: Additional serial", feature_slugs: ["reg_extra_registration_number"]},
   {name: "Registration field: Address", feature_slugs: ["reg_address"]},
   {name: "Registration field: Address - REQUIRED", feature_slugs: ["reg_address", "require_reg_address"]},
-  {name: "Registration field: Additional serial", feature_slugs: ["reg_extra_registration_number"]},
   {name: "Registration field: Affiliation", feature_slugs: ["reg_organization_affiliation"]},
   {name: "Registration field: Phone number", feature_slugs: ["reg_phone"]},
   {name: "Registration field: Student ID", feature_slugs: ["reg_student_id"]},
@@ -57,7 +56,7 @@ brakebills_feature_ids = []
 official_manufacturer_feature_id = nil
 law_enforcement_feature_id = nil
 
-brakebills_skipped_feature_names = ["Automatic User Role", "Avery Export", "Passwordless users", "Single Sign On (SSO)", "Skip ownership email"]
+brakebills_skipped_feature_names = ["Avery Export", "Passwordless users", "Single Sign On (SSO)", "Skip ownership email"]
 
 feature_name_and_slugs.each do |attrs|
   org_feature = OrganizationFeature.find_by_name(attrs[:name]) ||

@@ -1061,6 +1061,7 @@ nl:
           employee: Werknemer
           student: Student
           graduate_student: Afgestudeerde student
+          postdoc: Postdoc
     bike_attributable:
       drivetrain_attributes:
         belt_drive: Riemaandrijving
@@ -1139,17 +1140,12 @@ nl:
       more_pages:
         display_entries: "%{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> van de
           <b>%{total}</b> getoond"
-    bike_helper:
-      hidden: verborgen
-      hidden_because_status: omdat %{bike_type} %{status} is
-      hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
-      made_without_serial: gemaakt zonder serie
-      unknown: Onbekend
-      deleted: Verwijderd
     organization_helper:
       address: Adres
       address_school: Postadres van de campus
       your_full_address_is_required: Uw volledige adres is vereist door %{org_name}
+    bike_helper:
+      deleted: Verwijderd
   i18n_tasks:
     add_missing:
       added:
@@ -2185,6 +2181,7 @@ nl:
         registration_organizations: Registratie Organisaties
         delete_account: Account verwijderen
         membership: Lidmaatschap
+        organization_roles: Organisatierollen
       update:
         current_password_doesnt_match: Het huidige wachtwoord komt niet overeen, het
           is vereist voor het bijwerken van uw wachtwoord.
@@ -2205,6 +2202,11 @@ nl:
           marketplace_listing_updated: Uw marktplaatsvermelding is bijgewerkt!
           unable_to_publish: 'Kan %{item_type} niet te koop aanbieden: %{errors}'
           unable_to_update: 'Kan %{item_type} niet opslaan: %{errors}'
+      organization_roles:
+        destroy:
+          left_organization: Je hebt %{org_name} verlaten.
+          unable_to_leave: 'Kan %{org_name} niet verlaten: neem contact op met support@bikeindex.org
+            voor hulp.'
     memberships:
       edit:
         free_membership: Bike Index heeft u een gratis lidmaatschap gegeven. Stuur
@@ -3866,6 +3868,7 @@ nl:
         sent_to: Verzonden naar
         sent_to_a_new_owner: verzonden naar een nieuwe eigenaar
         sticker: Sticker
+        stickers: stickers
       recoveries:
         description: Beschrijving
         mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
@@ -4392,37 +4395,6 @@ nl:
       subheader_2: Selecteer een bedrag (in USD)
     donation_modal:
       donation_header: Red een fiets in 2021
-    organized_menu_items:
-      add_a_bike: Voeg een fiets toe
-      ascend_imports: Opvoer importeren
-      bulk_imports: Bulkinvoer
-      custom_emails: Aangepaste e-mails
-      discuss: Bespreken
-      exports: Uitvoer
-      getting_started: Ermee beginnen
-      graduated_notifications: Gegradueerde meldingen
-      impounded_bikes: In beslag genomen fietsen
-      impounded_claims: In beslag genomen vorderingen
-      incomplete_registrations: Onvolledige registraties
-      lightspeed_integration_panel: Lightspeed-integratiepaneel
-      manage_impounding: Beheer inbeslagname
-      manage_users: Gebruikers beheren
-      org_bikes: "%{org_name} Fietsen"
-      org_dashboard: "%{org_name} Dashboard"
-      org_locations: "%{org_name} locaties"
-      org_profile: "%{org_name} profiel"
-      parking_notification_unregistered: Niet-geregistreerde fietsmelding
-      parking_notifications: Verlaten records
-      recoveries: terugvorderingen
-      registration_stickers: Registratie stickers
-      resources: Middelen
-      stolen_hot_sheet: Stolen Bike Hot Sheet
-      stolen_hot_sheet_configuration: Stolen Bike Hot Sheet-configuratie
-      super_admin_view: Superbeheerder voor %{org_name}
-      stolen_message: Gestolen bericht
-      model_audits: Audits van e-voertuigen
-      multi_search: Meerdere zoekopdrachten
-      manage_registration_sequences: Beheer registratiereeksen
     bike_search_form:
       anywhere: Overal
       doesnt_look_like_serial: Het serienummer dat je hebt ingevoerd, lijkt niet op
@@ -4449,6 +4421,52 @@ nl:
       name_required: De naam van de eigenaar is vereist voor registratie.
       unable_to_save: Het is ons niet gelukt om uw registratie op te slaan. Probeer
         het later opnieuw.
+    menu_items_account:
+      logout: Uitloggen
+      marketplace_messages: Marktplaatsberichten
+      register_a_new_bike: Registreer een nieuwe fiets
+      switch_to_org: Schakel over naar %{org_name}
+      user_settings: "%{user_email} instellingen"
+      view_without_org: Weergave zonder enige organisatie
+      viewing_org: "%{org_name} bekijken"
+      viewing_without_org: Kijken zonder enige organisatie
+      your_registrations: Uw registraties
+    menu_items_org:
+      add_a_bike: Voeg een fiets toe
+      add_an_impounded_vehicle: Voeg een in beslag genomen voertuig toe
+      ascend_imports: Opvoer importeren
+      bulk_import_and_export: Import en export van grote hoeveelheden
+      bulk_imports: Bulkinvoer
+      discuss: Bespreken
+      exports: Uitvoer
+      getting_started: Ermee beginnen
+      graduated_notifications: Gegradueerde meldingen
+      impounded_claims: In beslag genomen vorderingen
+      impounded_vehicles: In beslag genomen voertuigen
+      impounding: Inbeslagname
+      incomplete_registrations: Onvolledige registraties
+      lightspeed_integration_panel: Lightspeed-integratiepaneel
+      manage_users: Gebruikers beheren
+      messaging: Berichten
+      model_audits: Audits van e-voertuigen
+      multi_search: Meerdere zoekopdrachten
+      org_dashboard: "%{org_name} Dashboard"
+      org_locations: "%{org_name} locaties"
+      org_profile: "%{org_name} profiel"
+      org_registrations: "%{org_name} Registraties"
+      org_settings: "%{org_name} Instellingen"
+      parking_notification_unregistered: Niet-geregistreerde fietsmelding
+      parking_notifications_group: Parkeermeldingen
+      recoveries: terugvorderingen
+      registration_sequences: Registratiesequenties
+      registration_stickers: Registratie stickers
+      reports: Rapporten
+      resources: Middelen
+      search_impounded_vehicles: Doorzoek in beslag genomen voertuigen
+      search_parking_notifications: Zoek naar parkeermeldingen
+      search_registrations: Zoek registraties
+      stolen_hot_sheet: Stolen Bike Hot Sheet
+      stolen_message: Gestolen bericht
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -5583,18 +5601,19 @@ nl:
           search: Zoeken
           sign_up: Registreren
           stolen_bike: Fiets gestolen?
-        settings_menu:
-          logout: Afmelden
-          marketplace_messages: Marktplaatsberichten
-          register_a_new_bike: Registreer een nieuwe fiets
-          settings_menu: Instellingen
-          user_settings: "%{user_email} instellingen"
-          view_org: Bekijk %{org_name}
-          your_registrations: Uw registraties
         wrapper:
           menu: Menu
           sign_up: Registreren
           the_nonprofit_bike_registry: het fietsregister zonder winstoogmerk
+        org_sidebar:
+          admin_panel: ADMINISTRATIEPANEEL
+          collapse_sidebar: Zijbalk inklappen
+          expand_sidebar: Zijbalk uitklappen
+          menu: Menu
+          organization_crest: "%{org_name} wapen"
+          in_super_admin: "%{org_name} in superbeheerder"
+        user_settings_menu:
+          settings_menu: Instellingen
       user_alerts:
         phone_waiting_confirmation:
           confirm_your_phone_number: Bevestig uw telefoonnummer
@@ -5621,6 +5640,31 @@ nl:
           finish_the_required_steps: Voltooi de vereiste stappen.
           not_registered_yet_html: Uw %{cycle_type} is nog niet geregistreerd! Gelieve
             %{finish_link}
+      my_account:
+        organization_roles:
+          automatically_view_in_organization: Automatisch weergeven met de %{org_name}-navigatiebalk
+            wanneer u inlogt op Bike Index.
+          joined: Lid geworden
+          leave_confirm: Waarschuwing! U moet een beheerder van %{org_name} vragen
+            om deze organisatierol terug te krijgen! U kunt dit niet zelf ongedaan
+            maken.
+          leave_organization: Organisatie verlaten
+          organization_role_information: Organisaties waar je een rol in speelt. Sleep
+            ze in de gewenste volgorde.
+          organization_roles:
+            one: Jouw rol binnen de organisatie
+            other: Uw rol binnen de organisatie
+          role_html: 'Rol: %{role}'
+          roles:
+            admin: Beheerder
+            member: Lid
+            member_no_bike_edit: Lid - geen fietsbewerkingen
+          view_after_log_in: Na het inloggen
+          view_as_html: Weergave als %{org_name}
+          view_without_an_organization: Weergave zonder organisatie
+          you_can_still_switch: Je kunt in de navigatiebalk nog steeds wisselen tussen
+            de weergave met en zonder de organisatie in je instellingen.
+          your_first_organization: uw eerste organisatie
     emails:
       partials:
         bike_box:

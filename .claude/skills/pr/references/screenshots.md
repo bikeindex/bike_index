@@ -14,7 +14,9 @@ The Claude Code web sandbox is the case that has neither: no GitHub CLI, and an 
 
 ## Preflight: a CSS diff needs a fresh tailwind build
 
-When the diff touches `app/assets/tailwind/**`, check that `app/assets/builds/tailwind.css` contains the branch's new rules before capturing — another checkout's watcher can leave it stale for hours, and the capture then documents the bug the PR fixes. Ask the user to restart `bin/dev`; never rebuild it yourself.
+When the diff touches `app/assets/tailwind/**`, check that `app/assets/builds/tailwind.css` contains the branch's new rules before capturing — another checkout's watcher can leave it stale for hours, and the capture then documents the bug the PR fixes. `bin/rails tailwindcss:build` is the fix — the same command step 4 runs on each checkout.
+
+**Count occurrences, not lines.** The built file is minified onto very few lines, so `grep -c '<selector>'` reports `0` or `1` for a selector that's present many times, and a fresh build reads as a missing one. Use `grep -o '<selector>' app/assets/builds/tailwind.css | wc -l`, and compare the file's mtime against the source's before concluding anything.
 
 ## 1. Decide whether screenshots are needed and which URLs to capture
 
@@ -22,6 +24,8 @@ You're only here because the diff is frontend (SKILL.md's classifier gates on th
 
 - New PR → capture every affected page.
 - Existing PR → continue only if the captures in the existing screenshots comment are stale: a commit since the last capture touched a page already screenshotted, or a new affected page now appears in the diff. Limit the capture to those pages. If nothing has moved, return the PR URL.
+
+**A page the diff no longer touches loses its block rather than gaining a recapture.** When work lands on the base separately — the branch's own commits merged as another PR, say — `git diff origin/main -- <path>` for those files comes back empty, and their before/after now documents a change this PR doesn't make, with a "main 👆" shot taken before the base moved. Drop the `### <url-path>` block; don't recapture it to show two identical images.
 
 Reading that comment is `github-pr-images`'s job, since it owns it — ask it for the current body before deciding. This costs no browser: it's a `gh api` read.
 
@@ -32,6 +36,8 @@ From the changed files, infer the affected routes. Heuristics:
 - A component with a ViewComponent/Lookbook preview → its preview URL (`frontend-screenshots` covers the path format) — a real responsive page, captured like any other URL
 - Admin views → `/admin/...`
 - If unclear, ask the user which URLs to capture before proceeding. Do not guess blindly — 1–3 well-chosen URLs beats 10 random ones.
+
+**Confirm the page renders what changed, before capturing it.** A page that looks like the obvious home for a component often isn't — `/admin/organizations/:id/edit` has seven tables and none of them is `UI::Table`, and its address fields aren't `UI::Forms::AddressGroup` either. One `browser_evaluate` counting the component's own marker class settles it; a shot that turns out not to contain the change is a whole capture round wasted, base branch included. A component with a preview is the reliable fallback.
 
 ## 2. Capture branch screenshots
 

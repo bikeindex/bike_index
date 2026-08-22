@@ -5,28 +5,18 @@ require "rails_helper"
 RSpec.describe Admin::IndexSkeleton::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   # Always provide table_view to avoid needing a _table partial in tests
-  let(:options) { {table_view: "<div>table</div>".html_safe} }
-
-  def render_component
-    with_request_url("/admin") do
-      ctrl = vc_test_controller
-      ctrl.instance_variable_set(:@render_chart, false)
-      ctrl.instance_variable_set(:@collection, Bike.none)
-      ctrl.instance_variable_set(:@pagy, nil)
-      ctrl.instance_variable_set(:@per_page, 25)
-      ctrl.instance_variable_set(:@time_range, nil)
-      ctrl.instance_variable_set(:@period, "all")
-      ctrl.instance_variable_set(:@start_time, Time.current - 1.year)
-      ctrl.instance_variable_set(:@end_time, Time.current)
-      render_inline(instance)
-    end
+  let(:options) do
+    {table_view: "<div>table</div>".html_safe, collection: Bike.none, viewing: "Bikes",
+     index: ComponentStates::IndexState.new(per_page: 25, period: "all", start_time: Time.current - 1.year,
+       end_time: Time.current)}
   end
 
-  let(:component) { render_component }
+  let(:component) { with_request_url("/admin") { render_inline(instance) } }
 
   describe "title" do
-    it "renders default Manage title from controller name" do
+    it "renders Manage with the passed viewing" do
       expect(component.text).to include("Manage")
+      expect(component.text).to include("Bikes")
     end
 
     context "with custom viewing" do
@@ -45,17 +35,6 @@ RSpec.describe Admin::IndexSkeleton::Component, type: :component do
         expect(component.text).to include("Custom Title")
         expect(component.text).not_to include("Manage")
       end
-    end
-  end
-
-  describe "admin-subnav layout" do
-    it "uses tailwind flex-row layout" do
-      expect(component).to have_css("div.tw\\:flex.tw\\:flex-row.tw\\:items-baseline")
-    end
-
-    it "renders h1 and ul" do
-      expect(component).to have_css("h1")
-      expect(component).to have_css("ul")
     end
   end
 
@@ -90,7 +69,7 @@ RSpec.describe Admin::IndexSkeleton::Component, type: :component do
   end
 
   describe "table_view" do
-    let(:options) { {table_view: '<div class="custom-table">Table content</div>'.html_safe} }
+    let(:options) { super().merge(table_view: '<div class="custom-table">Table content</div>'.html_safe) }
 
     it "renders the provided table view" do
       expect(component).to have_css("div.custom-table", text: "Table content")

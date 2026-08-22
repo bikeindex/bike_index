@@ -17,7 +17,7 @@
 
     <div class="tw:mt-4">
       <% if parking_notification.present? %>
-        <%= render(Org::ParkingNotificationDetails::Component.new(parking_notification:, organization: @organization, skip_bike: true)) %>
+        <%= render(Org::ParkingNotificationDetails::Component.new(parking_notification:, organization: @organization, skip_bike: true, display_dev_info: @display_dev_info)) %>
         <div class="tw:mt-3">
           <%= render(UI::ButtonLink::Component.new(href: notification_path, text: translation(".view_notification"), color: :secondary)) %>
         </div>

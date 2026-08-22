@@ -1,61 +1,34 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @activeness != 'all' ? 'active' : '' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <% if @activeness == "all" %>
-        Active and Inactive
-      <% else %>
-        <%= @activeness.titleize %>
-      <% end %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "Active and Inactive", url_for(sortable_search_params.merge(search_activeness: nil)), class: "dropdown-item #{@activeness == 'all' ? 'active' : ''}" %>
-      <%= link_to "Only Active", url_for(sortable_search_params.merge(search_activeness: "active")), class: "dropdown-item #{@activeness == 'active' ? 'active' : ''}" %>
-      <%= link_to "Only Inactive", url_for(sortable_search_params.merge(search_activeness: "inactive")), class: "dropdown-item #{@activeness == 'inactive' ? 'active' : ''}" %>
-
-      <div class="dropdown-divider"></div>
-      <%= link_to "Resolved", url_for(sortable_search_params.merge(search_activeness: "resolved")), class: "dropdown-item #{@activeness == 'resolved' ? 'active' : ''}" %>
-      <%= link_to "Dismissed", url_for(sortable_search_params.merge(search_activeness: "dismissed")), class: "dropdown-item #{@activeness == 'dismissed' ? 'active' : ''}" %>
-    </div>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: @activeness == "all" ? "Active and Inactive" : @activeness.titleize, button_size: :sm,
+          active: @activeness != "all")) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Active and Inactive", path: url_for(sortable_search_params.merge(search_activeness: nil)), match: :query, query: {search_activeness: nil}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only Active", path: url_for(sortable_search_params.merge(search_activeness: "active")), match: :query, query: {search_activeness: "active"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only Inactive", path: url_for(sortable_search_params.merge(search_activeness: "inactive")), match: :query, query: {search_activeness: "inactive"}) } %>
+      <% dropdown.with_entry_divider %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Resolved", path: url_for(sortable_search_params.merge(search_activeness: "resolved")), match: :query, query: {search_activeness: "resolved"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Dismissed", path: url_for(sortable_search_params.merge(search_activeness: "dismissed")), match: :query, query: {search_activeness: "dismissed"}) } %>
+    <% end %>
   </li>
 
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @kind != 'all' ? 'active' : '' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <%= @kind.titleize %>
-      <%= @kind == "all" ? "kinds" : "kind" %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "All kinds", url_for(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{@kind == 'all' ? 'active' : ''}" %>
-
-      <div class="dropdown-divider"></div>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: "#{@kind.titleize} #{@kind == "all" ? "kinds" : "kind"}", button_size: :sm,
+          active: @kind != "all")) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All kinds", path: url_for(sortable_search_params.merge(search_kind: nil)), match: :query, query: {search_kind: nil}) } %>
+      <% dropdown.with_entry_divider %>
 
       <% UserAlert.kinds.each do |kind| %>
-        <%= link_to "#{kind.humanize} kind", url_for(sortable_search_params.merge(search_kind: kind)), class: "dropdown-item #{@kind == kind ? 'active' : ''}" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.humanize} kind", path: url_for(sortable_search_params.merge(search_kind: kind)), match: :query, query: {search_kind: kind}) } %>
       <% end %>
-    </div>
+    <% end %>
   </li>
 
-  <li class="nav-item">
-    <%= link_to "Notified", url_for(sortable_search_params.merge(search_with_notification: !@with_notification)), class: "nav-link #{@with_notification ? 'active' : ''}" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Notified", href: url_for(sortable_search_params.merge(search_with_notification: !@with_notification)), size: :sm, active: @with_notification)) %>
   </li>
 
-  <li class="nav-item">
-    <%= link_to "Render kind counts", url_for(sortable_search_params.merge(search_kind_counts: !@render_kind_counts)), class: "nav-link #{@render_kind_counts ? 'active' : ''}" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Render kind counts", href: url_for(sortable_search_params.merge(search_kind_counts: !@render_kind_counts)), size: :sm, active: @render_kind_counts)) %>
   </li>
 <% end %>
 
@@ -116,8 +89,11 @@
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @collection,
+  viewing: controller_name.humanize,
   index_title: "User Alerts",
   rendered_chart:,
   nav_header_list_items:,
-  table_view:
+  table_view:,
 )) %>
