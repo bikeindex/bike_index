@@ -211,6 +211,7 @@ module UserServices
     def settings_group(organization, admin)
       return nil unless admin
 
+      sequences = routes.organization_registration_sequences_path(organization_id: organization.to_param)
       children = [
         link(translation(:org_profile, org_name: organization.short_name),
           routes.organization_manage_path(organization_id: organization.to_param)),
@@ -223,10 +224,8 @@ module UserServices
         enabled_link(organization, "hot_sheet", translation(:stolen_hot_sheet),
           routes.edit_organization_hot_sheet_path(organization_id: organization.to_param)),
         # Editing a page of a sequence is the same section of the menu, on a path of its own
-        enabled_link(organization, "registration_sequences", translation(:registration_sequences),
-          routes.organization_registration_sequences_path(organization_id: organization.to_param),
-          match_paths: ["#{org_root(organization)}/registration_sequences/**",
-            "#{org_root(organization)}/registration_sequence_pages/**"])
+        enabled_link(organization, "registration_sequences", translation(:registration_sequences), sequences,
+          match_paths: ["#{sequences}/**", "#{org_root(organization)}/registration_sequence_pages/**"])
       ]
 
       group(:settings, translation(:org_settings, org_name: organization.short_name), "gear", children)
@@ -239,7 +238,6 @@ module UserServices
       {type: :group, key:, label:, icon:, children: present}
     end
 
-    # Most rows own a whole section, so section: keeps the row current on its sub-pages
     def link(label, path, icon: nil, section: false, **attributes)
       covered = section ? {match_paths: "#{path}/**"} : {}
       {type: :link, label:, path:, icon:, **covered, **attributes}

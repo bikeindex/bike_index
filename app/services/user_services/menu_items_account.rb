@@ -56,10 +56,11 @@ module UserServices
     # navUserSettingLink is how the signed-in email is read off a page -- by
     # .claude/skills/frontend-screenshots' identity gate, among others
     def account_rows(user)
+      register = routes.register_path
+      # The row stays current across every step of the flow, which all live under it
       [link(translation(:your_registrations), routes.my_account_path),
         marketplace_messages(user),
-        link(translation(:register_a_new_bike), routes.register_path,
-          match_paths: "#{routes.register_path}/**"),
+        link(translation(:register_a_new_bike), register, match_paths: "#{register}/**"),
         link(translation(:user_settings, user_email: user.email), routes.edit_my_account_path,
           id: "navUserSettingLink", data: {email: user.email})].compact
     end

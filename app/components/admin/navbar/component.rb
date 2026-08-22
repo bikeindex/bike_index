@@ -93,11 +93,9 @@ module Admin
         nav_select_links.detect { |link| link[:path] == path }
       end
 
-      # Links cover a whole section, so they stay current on its sub-pages. A picker entry
-      # navigates to its path, params and all, and what the link covers is the page those
-      # filter — except for an exact: entry, which is one action on a controller another
-      # entry owns (most of admin/dashboard's pages, duplicates on admin/bikes) and would
-      # otherwise send them all active at once.
+      # An exact: entry is one action on a controller another entry owns -- most of
+      # admin/dashboard's pages, duplicates on admin/bikes -- which would otherwise send
+      # every entry on that controller active at once
       def match_paths_for(link)
         return link[:match_paths] if link[:match_paths]
 

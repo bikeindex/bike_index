@@ -11,8 +11,8 @@ module UI
     # entry needs: it stands for the params it applies rather than for a URL, and links away
     # from itself to clear them.
     class Component < ApplicationComponent
-      # The value a controller reads as its default whether the URL omits the param or
-      # leaves it empty
+      # Stands in for nil, which Array.wrap would drop, leaving a param with no values at
+      # all; it reaches the browser as the empty string the URL reads back either way
       BLANK = :blank
 
       # What a menu item hash can carry through to the link. The rest of an item is the menu's
@@ -28,9 +28,8 @@ module UI
       def initialize(path:, text: nil, match_paths: [], match_params: nil, data: {},
         **html_options)
         @match_paths = Array.wrap(match_paths.presence || path).map { |url| page_path(url) }
-        @match_params = match_params.presence
         @match_paths.each { |pattern| raise_if_invalid_pattern!(pattern) }
-        @match_params&.each { |param, values| raise_if_invalid_values!(param, values) }
+        @match_params = match_params.presence&.to_h { |param, values| [param, param_values(param, values)] }
 
         @path = path
         @text = text
@@ -44,10 +43,9 @@ module UI
 
       private
 
-      # A match_paths: entry is a pattern for a page rather than a URL, so an origin, query and
-      # anchor are no part of one. They arrive mid-pattern as well as at the end, since a route
-      # helper interpolated into a pattern carries the locale param. A URL with no path of its
-      # own points at a root — someone else's, which the browser rules out on the origin.
+      # A query arrives mid-pattern as well as at the end, since a route helper interpolated
+      # into one carries the locale param. A URL with no path of its own points at a root —
+      # someone else's, which the browser rules out on the origin.
       def page_path(url)
         url.to_s.sub(%r{\A[a-z]+://[^/]+}i, "").sub(%r{[?#][^/]*}, "").presence || "/"
       end
@@ -58,13 +56,14 @@ module UI
           pattern.split("/")[0..-2].include?("**")
       end
 
-      # nil is the habit BLANK replaces — it would render no values at all, and so quietly
+      # nil is the habit BLANK replaces — it would wrap to no values at all, and so quietly
       # never match
-      def raise_if_invalid_values!(param, values)
+      def param_values(param, values)
         wrapped = Array.wrap(values)
-        return if wrapped.any? && wrapped.all?(&:present?)
+        raise ArgumentError, "match_params: #{param} needs values — #{BLANK} for an absent one" unless
+          wrapped.any? && wrapped.all?(&:present?)
 
-        raise ArgumentError, "match_params: #{param} needs values — #{BLANK} for an absent one"
+        wrapped.map { |value| (value == BLANK) ? "" : value.to_s }
       end
 
       # link_to labels a link with its own URL when the label is empty, so a caller that
@@ -77,11 +76,7 @@ module UI
       def link_data
         @data.merge(controller: [@data[:controller], "ui--active-link"].compact.join(" "),
           "ui--active-link-match-paths-value": @match_paths.join(" "),
-          "ui--active-link-match-params-value": link_params).compact
-      end
-
-      def link_params
-        @match_params&.transform_values { |values| Array.wrap(values).map(&:to_s) }
+          "ui--active-link-match-params-value": @match_params).compact
       end
     end
   end

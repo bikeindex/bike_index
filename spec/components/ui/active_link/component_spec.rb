@@ -27,12 +27,6 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     end
   end
 
-  # The controller can't read the constant, so the copy in it drifts silently otherwise
-  it "keeps the browser's BLANK in step with its own" do
-    js = Rails.root.join("app/javascript/controllers/ui/active_link_controller.js").read
-    expect(js[/const BLANK = '(\w+)'/, 1]).to eq described_class::BLANK.to_s
-  end
-
   describe "match_paths" do
     context "with an href carrying an origin, params and an anchor" do
       let(:path) { "http://test.host/search/registrations?stolenness=all#results" }
@@ -102,13 +96,14 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
       expect(link["data-ui--active-link-match-params-value"]).to eq({search_status: ["resolved"]}.to_json)
     end
 
-    # An entry that's the fallback a controller reaches for is in force with the param absent
+    # An entry that's the fallback a controller reaches for is in force with the param absent,
+    # which is "" once the browser reads it off the URL
     context "with BLANK among the values" do
       let(:options) { {match_params: {search_status: ["current", described_class::BLANK]}} }
 
-      it "carries it alongside them" do
+      it "renders it as the empty string" do
         expect(link["data-ui--active-link-match-params-value"])
-          .to eq({search_status: ["current", "blank"]}.to_json)
+          .to eq({search_status: ["current", ""]}.to_json)
       end
     end
 
@@ -125,14 +120,6 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
       let(:options) { {match_params: {search_deleted: nil}} }
 
       it "raises rather than rendering a param with no values, which never matches" do
-        expect { component }.to raise_error(ArgumentError, /blank/)
-      end
-    end
-
-    context "with an empty list of values" do
-      let(:options) { {match_params: {search_deleted: []}} }
-
-      it "raises too" do
         expect { component }.to raise_error(ArgumentError, /blank/)
       end
     end

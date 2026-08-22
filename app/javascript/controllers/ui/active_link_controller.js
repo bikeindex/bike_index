@@ -5,16 +5,13 @@ const trimSlash = (path) => path.length > 1 ? path.replace(/\/$/, '') : path
 
 const segmentsOf = (path) => trimSlash(path).split('/')
 
-// UI::ActiveLink::Component::BLANK
-const BLANK = 'blank'
-
 // '*' stands for one segment and a trailing '**' for the rest, so /bikes/*/edit can't span a
 // slash and /o/x/exports/** covers the index it's rooted at as well as everything below it
 const matchesPath = (pattern, path) => {
   const patternSegments = segmentsOf(pattern)
   const pathSegments = segmentsOf(path)
   const stopped = patternSegments.findIndex((segment, index) =>
-    segment === '**' || (segment === '*' ? !pathSegments[index] : segment !== pathSegments[index]))
+    segment === '**' || (segment !== '*' && segment !== pathSegments[index]))
 
   if (stopped === -1) return patternSegments.length === pathSegments.length
 
@@ -43,7 +40,7 @@ export default class extends Controller {
 
   // Off-site, the page can never be one the link covers
   sameOrigin () {
-    return new URL(this.element.href, window.location.href).origin === window.location.origin
+    return this.element.origin === window.location.origin
   }
 
   // Space-separated, since a path can't carry a space and JSON would escape every quote
@@ -55,20 +52,21 @@ export default class extends Controller {
     return this.patterns.some((pattern) => matchesPath(pattern, window.location.pathname))
   }
 
-  // A link naming no params ignores the query string, and one naming some ignores the rest
+  // A link naming no params ignores the query string, and one naming some ignores the rest.
+  // '' is UI::ActiveLink::Component::BLANK, which a URL writes as an empty param or none.
   paramsMatch () {
     const current = new URLSearchParams(window.location.search)
 
-    return Object.entries(this.matchParamsValue).every(([param, values]) => values.some((value) =>
-      (value === BLANK) ? !current.get(param) : value === current.get(param)))
+    return Object.entries(this.matchParamsValue)
+      .every(([param, values]) => values.includes(current.get(param) ?? ''))
   }
 
   // "page" is reserved for the link whose own path is the current one. A wildcard, or params
   // the link stands for rather than points at, means the page sits inside what it covers --
   // aria-current's "true", so a reader isn't told a link elsewhere is where they already are
   ariaCurrent () {
-    const isPage = !this.hasMatchParamsValue && this.patterns.some((pattern) =>
-      !pattern.includes('*') && trimSlash(pattern) === trimSlash(window.location.pathname))
+    const isPage = !this.hasMatchParamsValue &&
+      this.patterns.includes(trimSlash(window.location.pathname))
 
     return isPage ? 'page' : 'true'
   }

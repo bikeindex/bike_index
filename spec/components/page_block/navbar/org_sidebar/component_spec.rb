@@ -71,7 +71,7 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
       .to eq(["/o/#{organization.to_param}/registrations/new",
         "/o/#{organization.to_param}/bikes/new?parking_notification=true"])
     expect(rows.map { |row| row["data-ui--active-link-match-params-value"] })
-      .to eq([{parking_notification: ["blank"]}.to_json, {parking_notification: ["true"]}.to_json])
+      .to eq([{parking_notification: [""]}.to_json, {parking_notification: ["true"]}.to_json])
   end
 
   # Which group holds the current page is the browser's to say, so the server opens the

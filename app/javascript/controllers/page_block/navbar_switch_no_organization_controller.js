@@ -9,15 +9,11 @@ import { Controller } from '@hotwired/stimulus'
 // row from routes alone, with no request to ask.
 export default class extends Controller {
   connect () {
-    if (this.organizationView) return
+    // routes.rb mounts every organized/ controller under path: "o"
+    if (window.location.pathname.startsWith('/o/')) return
 
     const url = new URL(window.location.href)
     url.searchParams.set('organization_id', 'false')
     this.element.href = url.toString()
-  }
-
-  // ApplicationHelper#body_tag renders the route the server resolved
-  get organizationView () {
-    return (document.body.dataset.pageRoute || '').startsWith('organized/')
   }
 }
