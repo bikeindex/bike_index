@@ -24,6 +24,24 @@
   }
 }
 
+/* The dev-info marking, formerly admin_unvendored's unlayered copy. A hand-written block
+ * rather than @utility, which would take the tw: prefix and so match none of the ~95
+ * existing .only-dev-visible sites - nor the `<style>.only-dev-visible {display: none}`
+ * hooks several admin tables hide it with. Emitted after tailwind's own utilities, so it
+ * takes ties against a resting background like an active UI::Tabs tab's tw:bg-white.
+ * The legacy rule's border is dropped: it fought the shape it marked, and the tab's white
+ * lower edge is what breaks the row's underline */
+@layer utilities {
+  .only-dev-visible {
+    @apply tw:bg-dev/10;
+  }
+
+  /* Frequently marks one value inside a display-table cell, which has no padding of its own */
+  .table-list td .only-dev-visible {
+    @apply tw:px-1 tw:py-0.5;
+  }
+}
+
 @layer components {
   .twlink {
     @apply tw:text-blue-600 tw:dark:text-blue-400 tw:transition-colors;
@@ -117,6 +135,12 @@
 
   .twfieldrow {
     @apply tw:grid tw:gap-x-2 tw:grid-cols-[repeat(auto-fit,minmax(140px,1fr))];
+  }
+
+  /* An admin index's search form. Baseline rather than centre: the rows mix a combobox
+   * with shorter inputs and buttons, so they line up on their text or on nothing. */
+  .twsearchrow {
+    @apply tw:my-4 tw:flex tw:flex-wrap tw:items-baseline tw:justify-end tw:gap-2;
   }
 
   /* Two columns of cards or sections, breaking on the row's own width like .twfieldrow

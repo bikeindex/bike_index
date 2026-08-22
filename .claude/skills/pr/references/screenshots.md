@@ -63,7 +63,7 @@ Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs, pa
 
 Two things the checkout itself does, either side of it:
 
-- **`bin/rails tailwindcss:build` after each checkout when the diff touches `app/assets/tailwind/**`.** The watcher doesn't rebuild on a checkout, so the base capture otherwise renders the branch's CSS — a before/after that silently shows the same styling twice. Verify by grepping `app/assets/builds/tailwind.css` for a class the branch adds; build again on the way back.
+- **`bin/rails tailwindcss:build` after each checkout when the diff touches `app/assets/tailwind/**`, and `bin/rails dartsass:build` too when it touches `app/assets/stylesheets/**`.** The watcher doesn't rebuild on a checkout, so the base capture otherwise renders the branch's CSS — a before/after that silently shows the same styling twice. A diff that moves a rule *between* the two pipelines needs both, or the base renders the rule twice over. Verify by grepping `app/assets/builds/{tailwind,revised,admin}.css` for a selector the branch moves; build both again on the way back.
 - **`bin/dev` restarts, so the first navigate after a checkout can hit `ERR_CONNECTION_REFUSED`.** Poll `curl -fs "$BASE_URL/"` until it answers rather than treating it as a failed capture.
 
 ## 5. Compose the Screenshots comment and hand it back

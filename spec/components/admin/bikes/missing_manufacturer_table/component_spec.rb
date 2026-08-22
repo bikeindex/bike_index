@@ -9,8 +9,8 @@ RSpec.describe Admin::Bikes::MissingManufacturerTable::Component, type: :compone
   end
   let(:search_params) { {} }
   let(:index) do
-    ComponentStates::IndexState.new(params: search_params,
-      sort_state: ComponentStates::SortState.new(search_params:))
+    ComponentStructs::IndexState.new(params: search_params,
+      sort_state: ComponentStructs::SortState.new(search_params:))
   end
   let(:options) { {} }
   let(:component) do

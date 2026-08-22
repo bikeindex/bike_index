@@ -59,7 +59,7 @@ RSpec.describe UI::Table::Component, type: :component do
     end
 
     it "renders sortable headers with link class and active state" do
-      result = render_inline(described_class.new(records:, render_sortable: true, sort_state: ComponentStates::SortState.new(sort: "name", direction: "desc"))) do |table|
+      result = render_inline(described_class.new(records:, render_sortable: true, sort_state: ComponentStructs::SortState.new(sort: "name", direction: "desc"))) do |table|
         table.column(sortable: "name") { |r| r.name }
         table.column(sortable: "email") { |r| r.email }
       end
@@ -71,7 +71,7 @@ RSpec.describe UI::Table::Component, type: :component do
 
     context "with custom label" do
       it "uses label instead of derived title" do
-        result = render_inline(described_class.new(records:, render_sortable: true, sort_state: ComponentStates::SortState.new(sort: "bike_sticker_batch_id"))) do |table|
+        result = render_inline(described_class.new(records:, render_sortable: true, sort_state: ComponentStructs::SortState.new(sort: "bike_sticker_batch_id"))) do |table|
           table.column(sortable: "bike_sticker_batch_id", label: "Batch") { |r| r.name }
           table.column(sortable: "code_integer", label: "Code #") { |r| r.email }
         end
@@ -85,7 +85,7 @@ RSpec.describe UI::Table::Component, type: :component do
 
     context "with sort_indicator on a non-sortable column" do
       it "renders the sort arrow without a link when matching current sort" do
-        result = render_inline(described_class.new(records:, render_sortable: true, sort_state: ComponentStates::SortState.new(sort: "created_at", direction: "desc"))) do |table|
+        result = render_inline(described_class.new(records:, render_sortable: true, sort_state: ComponentStructs::SortState.new(sort: "created_at", direction: "desc"))) do |table|
           table.column(sortable: "created_at") { |r| r.name }
           table.column(label: "Date", sort_indicator: "created_at") { |r| r.email }
         end
@@ -99,7 +99,7 @@ RSpec.describe UI::Table::Component, type: :component do
       end
 
       it "does not render an arrow when sort_indicator does not match current sort" do
-        result = render_inline(described_class.new(records:, render_sortable: true, sort_state: ComponentStates::SortState.new(sort: "email"))) do |table|
+        result = render_inline(described_class.new(records:, render_sortable: true, sort_state: ComponentStructs::SortState.new(sort: "email"))) do |table|
           table.column(sortable: "email") { |r| r.email }
           table.column(label: "Date", sort_indicator: "created_at") { |r| r.name }
         end
@@ -227,7 +227,7 @@ RSpec.describe UI::Table::Component, type: :component do
     it "renders an empty th with sortable column when label is empty string" do
       allow_any_instance_of(described_class).to receive(:sortable_url).and_return("/")
 
-      result = render_inline(described_class.new(records:, render_sortable: true, sort_state: ComponentStates::SortState.new(sort: "email"))) do |table|
+      result = render_inline(described_class.new(records:, render_sortable: true, sort_state: ComponentStructs::SortState.new(sort: "email"))) do |table|
         table.column(sortable: "email", label: "") { |r| r.email }
       end
 

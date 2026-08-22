@@ -13852,17 +13852,10 @@ table .photo-cell img {
   display: none
 }
 
-.only-dev-visible {
-  border: 1px solid #9400d3;
-  background: rgba(148, 0, 211, .1)
-}
-
+/* The rest of .only-dev-visible is in bike_index_components.css. This one stays: the file is
+   unlayered, so .table-list's striping would otherwise beat it */
 .table-list tr.only-dev-visible {
-  background: rgba(148, 0, 211, .1) !important
-}
-
-.table-list td .only-dev-visible {
-  padding: 2px .25rem
+  background: color-mix(in oklab, var(--tw-color-dev) 10%, transparent) !important
 }
 
 .link-emoji {

@@ -4,7 +4,7 @@ module Admin
   module Organizations
     module Cell
       class Component < ApplicationComponent
-        def initialize(organization: nil, organization_id: nil, search_url: nil, sort_state: ComponentStates::SortState.new, render_search: false)
+        def initialize(organization: nil, organization_id: nil, search_url: nil, sort_state: ComponentStructs::SortState.new, render_search: false)
           @organization = organization
           @organization_id = organization_id || organization&.id
           @search_url = search_url
