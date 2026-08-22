@@ -85,9 +85,7 @@ RSpec.describe "Editing a registration", :js, type: :system do
     click_button "Log in"
     expect(page).to have_content("Logged in", wait: 5)
 
-    # Dismiss the donation modal that greets logged-in users so it doesn't cover the nav
-    find("#donationModal .close").click
-    expect(page).to have_no_css("#donationModal.in", wait: 5)
+    dismiss_donation_modal
 
     # Navigate to registration through the menus, then register a bike to the
     # logged in user (owner_email defaults to their email)
