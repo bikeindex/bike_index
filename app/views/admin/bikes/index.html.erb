@@ -132,9 +132,12 @@
 
         <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-2">
           <% if show_search_statuses %>
-            <%= render(UI::Button::Component.new(text: "Search statuses", size: :sm,
-                  active: @not_default_statuses,
-                  data: {action: "click->ui--collapse#toggle", "ui--collapse-target": "trigger"})) %>
+            <%= render(UI::Button::Component.new(size: :sm, active: @not_default_statuses,
+                  html_class: "tw:inline-flex tw:items-center tw:gap-1.5",
+                  data: {action: "click->ui--collapse#toggle", "ui--collapse-target": "trigger"})) do %>
+              <span class="tw:inline-block tw:transition-transform tw:duration-200" data-ui--collapse-target="chevron"><span class="tw:flex"><%= render UI::IconChevron::Component.new %></span></span>
+              Search statuses
+            <% end %>
           <% end %>
 
           <%= text_field_tag :serial, params[:serial], placeholder: "Find by serial", class: "twinput tw:w-auto" %>

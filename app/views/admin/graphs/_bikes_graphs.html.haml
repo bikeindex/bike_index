@@ -37,7 +37,11 @@
 
         .form-inline.mt-2
           .mr-auto
-          = render(UI::Button::Component.new(text: "Search statuses", size: :sm, active: @not_default_statuses, data: {action: "click->ui--collapse#toggle", "ui--collapse-target": "trigger"}))
+          = render(UI::Button::Component.new(size: :sm, active: @not_default_statuses, html_class: "tw:inline-flex tw:items-center tw:gap-1.5", data: {action: "click->ui--collapse#toggle", "ui--collapse-target": "trigger"})) do
+            %span{ class: "tw:inline-block tw:transition-transform tw:duration-200", data: { "ui--collapse-target": "chevron" } }
+              %span{ class: "tw:flex" }
+                = render UI::IconChevron::Component.new
+            Search statuses
           = submit_tag "Search", name: "search", class: "btn btn-primary mb-2 ml-2"
 
 
