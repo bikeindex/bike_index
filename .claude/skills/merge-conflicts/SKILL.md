@@ -83,6 +83,8 @@ git diff origin/<base> -- app/ lib/ config/   # then account for every file list
 
 Every differing file must be explainable as *this branch's work* (or a sibling branch you're intentionally stacked on). Anything else is a resurrection or a stray. For a file that's mostly wrong, don't hand-patch hunks — `git checkout origin/<base> -- <file>` and re-apply your change on top.
 
+**Resolving two files to opposite sides breaks the interface between them**, and neither looks wrong on its own. Taking the base's version of a component while the helper that calls it auto-merges keeping your argument is an unknown-keyword error on every render, past an audit that reports both files as expected. Whenever you reset a file that has callers, grep the arguments you dropped: `git grep -n '<kwarg>' -- app` should come back empty, or only where the base still accepts it.
+
 This is what it catches, all of which has actually happened here:
 
 - **Deleted code coming back.** A constant, predicate, or callback the base removed reappears, along with the call sites that reference it — reintroducing behavior the base decided against.
@@ -104,6 +106,8 @@ comm -12 <(git diff --name-only $MB origin/main | sort) <(git diff --name-only $
 `bin/lint` after every merge. A bad auto-merge that duplicates a method or strands a constant parses fine and passes its specs — `Lint/DuplicateMethods` is what catches it.
 
 Then run specs for the merged area, **including the browser ones**. The base renaming or moving something your branch calls produces no conflict marker at all: a method that moved to a service, a route reshaped into a query param, copy your specs assert on. Those only surface at runtime.
+
+`bin/rails db:migrate` too, when the merge brought migrations — the test database is maintained from the schema, so the specs stay green while every page in the browser is an `ActiveRecord::PendingMigrationError`.
 
 ## Never force-push
 

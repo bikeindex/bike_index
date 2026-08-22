@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe PageBlock::Navbar::UserSettingsMenu::Component, type: :component do
   let(:current_user) { FactoryBot.create(:user_confirmed, email: "party@bikeindex.org") }
-  let(:instance) { described_class.new(current_user:, current_user_or_unconfirmed_user: current_user) }
+  let(:instance) { described_class.new(current_user_or_unconfirmed_user: current_user) }
   let(:component) { with_request_url("/") { render_inline(instance) } }
   let(:links) { component.css("a").map { |link| link.text.strip } }
 
@@ -50,7 +50,7 @@ RSpec.describe PageBlock::Navbar::UserSettingsMenu::Component, type: :component 
   context "with an unconfirmed user" do
     let(:unconfirmed_user) { FactoryBot.create(:user) }
     let(:instance) do
-      described_class.new(current_user: nil, current_user_or_unconfirmed_user: unconfirmed_user)
+      described_class.new(current_user_or_unconfirmed_user: unconfirmed_user)
     end
 
     it "renders their settings and logout" do

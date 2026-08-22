@@ -15,8 +15,8 @@ RSpec.describe Admin::Bikes::Index::Filters::Component, type: :component do
     end
   end
 
-  def nav_link(text)
-    component.css("a.nav-link").find { |link| link.text.squish == text }
+  def filter_link(text)
+    component.css("a").find { |link| link.text.squish == text }
   end
 
   # The dropdown button carries an sr-only "Open <name> menu" ahead of its name
@@ -24,19 +24,19 @@ RSpec.describe Admin::Bikes::Index::Filters::Component, type: :component do
     component.css("button").map { |button| button.text.squish }
   end
 
-  # The admin row styles .nav-link.active - UI::ActiveLink only sets aria-current, which
-  # it doesn't style, so these carry the class themselves from the state passed in
+  # These toggle a param off its own current value, so their state is the controller's -
+  # UI::ActiveLink resolves it from the URL, where a default-on filter doesn't appear
   it "marks no toggle active by default" do
-    expect(nav_link("motorized")["class"]).to eq "nav-link"
-    expect(nav_link("multi-delete")["class"]).to eq "nav-link"
+    expect(filter_link("motorized")["data-active"]).to be_nil
+    expect(filter_link("multi-delete")["data-active"]).to be_nil
   end
 
   context "with motorized on" do
     let(:options) { {motorized: true} }
 
     it "marks motorized active, and links to turning it off" do
-      expect(nav_link("motorized")["class"]).to eq "nav-link active"
-      expect(nav_link("motorized")["href"]).to include "search_motorized=false"
+      expect(filter_link("motorized")["data-active"]).to eq "true"
+      expect(filter_link("motorized")["href"]).to include "search_motorized=false"
     end
   end
 
@@ -44,7 +44,7 @@ RSpec.describe Admin::Bikes::Index::Filters::Component, type: :component do
     let(:options) { {multi_delete: true} }
 
     it "marks multi-delete active" do
-      expect(nav_link("multi-delete")["class"]).to eq "nav-link active"
+      expect(filter_link("multi-delete")["data-active"]).to eq "true"
     end
   end
 

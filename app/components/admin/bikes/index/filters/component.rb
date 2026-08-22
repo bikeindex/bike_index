@@ -28,8 +28,6 @@ module Admin
 
           def search_params = @index.sortable_search_params
 
-          def nav_link_class(active) = active ? "nav-link active" : "nav-link"
-
           def any_origin_active? = @origin_search_type.blank?
 
           def origin_name

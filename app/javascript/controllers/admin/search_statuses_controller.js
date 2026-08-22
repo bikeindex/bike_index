@@ -24,6 +24,15 @@ export default class extends Controller {
   toggle () {
     if (this.lockedValue) return
 
-    collapse(this.element.classList.contains('tw:hidden') ? 'show' : 'hide', this.element)
+    const opening = this.element.classList.contains('tw:hidden')
+    collapse(opening ? 'show' : 'hide', this.element)
+    this.dispatch('opened', { detail: { opening }, prefix: 'admin--search-statuses' })
+  }
+
+  // Keeps the trigger's is-active styling in step with the panel. The legacy JS toggled an
+  // .active class for this, which the button had to style around because the server owned
+  // data-active; with the state here, data-active is what it already reads.
+  syncTrigger ({ detail: { opening } }) {
+    this.element.dataset.active = opening
   }
 }

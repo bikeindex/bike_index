@@ -39,6 +39,12 @@ module Admin
 
       def sortable_search_params = @index.sortable_search_params
 
+      # "Manage" is the first thing a narrow screen can spare
+      def index_title
+        @index_title.presence ||
+          safe_join([tag.span("Manage", class: "tw:hidden tw:lg:inline"), " ", @viewing])
+      end
+
       def show_chart?
         !@skip_charting && @index.render_chart
       end
@@ -48,8 +54,8 @@ module Admin
         render(UI::Chart::Component.new(series: [{name: @viewing, data:}], time_range: @index.time_range))
       end
 
-      def current_header_component
-        Admin::CurrentHeader::Component.new(index: @index, viewing: @viewing)
+      def index_info_component
+        Admin::Headers::IndexInfo::Component.new(index: @index, viewing: @viewing)
       end
 
       def pagination_component(skip_total: false)

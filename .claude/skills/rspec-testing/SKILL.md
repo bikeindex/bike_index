@@ -217,6 +217,8 @@ This is the same instinct as "everything making the same request should be in a 
 
 After writing a spec, scan each `context`/`describe`: if it holds multiple `it` blocks and they don't each sit behind a distinct `context`/`before`/`let`, merge them.
 
+**A helper that reads the response has to be a `def`, not a `let`.** One example making several requests is exactly where a `let` that parses `response.body` bites: it memoizes the first response and every later assertion re-reads it, so the example fails while the code is right (or worse, passes while the code is wrong). `def` re-evaluates.
+
 ### Good
 
 ```ruby

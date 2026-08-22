@@ -5,13 +5,14 @@ module Register
     # Step 1 of the registration flow: the quick-start form
     class Component < ApplicationComponent
       def initialize(b_param:, steps:, current_user: nil, embed: false, button_color: nil,
-        button_hover_color: nil)
+        button_hover_color: nil, skip_heading: false)
         @b_param = b_param
         @steps = steps
         @current_user = current_user
         @embed = embed
         @button_color = button_color
         @button_hover_color = button_hover_color
+        @skip_heading = skip_heading
       end
 
       private

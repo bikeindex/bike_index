@@ -5,7 +5,7 @@
       = link_to "Ignored bikes only (deleted, test, spam)", admin_graphs_path(sortable_params.merge(search_ignored: true)), class: "nav-link"
   - if show_search_statuses
     %li.nav-item
-      = render(UI::Button::Component.new(text: "Search statuses", color: :secondary, size: :sm, active: @not_default_statuses, data: {controller: "admin--search-statuses", action: "click->admin--search-statuses#dispatchToggle"}))
+      = render(UI::Button::Component.new(text: "Search statuses", color: :secondary, size: :sm, active: @not_default_statuses, data: {controller: "admin--search-statuses", action: "click->admin--search-statuses#dispatchToggle admin--search-statuses:opened@window->admin--search-statuses#syncTrigger"}))
 .row.mt-4.mb-4
   .col-md-6.order-2.order-md-1
     - if params[:search_manufacturer].present?

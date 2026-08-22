@@ -1,6 +1,6 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item">
-    <%= link_to "New Exchange Rate", new_admin_exchange_rate_path, class: "nav-link" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "New Exchange Rate", href: new_admin_exchange_rate_path, color: :primary, size: :sm)) %>
   </li>
 <% end %>
 
