@@ -9736,8 +9736,7 @@ button.bg-dark:hover {
   justify-content: flex-end !important
 }
 
-.justify-content-center,
-.stolen-bike-image-editing-list-group {
+.justify-content-center {
   justify-content: center !important
 }
 
@@ -13656,74 +13655,20 @@ table .photo-cell img {
   border-radius: none
 }
 
-.admin-bike-tabs {
-  margin: -1.5rem -15px 0;
-  padding: 1.5rem 15px 0;
-  overflow-x: scroll;
-  background: #212529;
-  position: relative
-}
-
-.admin-bike-tabs h1,
-.admin-bike-tabs h2,
-.admin-bike-tabs h3,
-.admin-bike-tabs h4,
-.admin-bike-tabs h5 {
-  color: #fff
-}
-
-.admin-bike-tabs table {
-  background: #fff
-}
-
 @media(min-width:768px) {
-  .admin-bike-tabs .admin-image-thumb {
+  .admin-bike-summary .admin-image-thumb {
     max-width: 220px
   }
 }
 
-.admin-bike-tabs .admin-image-thumb img {
+.admin-bike-summary .admin-image-thumb img {
   max-width: 100%;
   width: 180px;
   height: auto
 }
 
-.admin-bike-tabs .admin-image-thumb h3 {
-  text-align: center;
-  color: #ccc
-}
-
-.admin-bike-tabs #bike-tab-wrapper {
-  padding-top: .5rem;
-  margin-top: .5rem;
-  margin-left: -15px;
-  margin-right: -15px;
-  overflow-x: scroll
-}
-
-.admin-bike-tabs .nav-tabs {
-  padding: .5rem .5rem 0;
-  border-bottom: 2px solid hsla(0, 0%, 80%, .8);
-  margin-bottom: 0
-}
-
-.admin-bike-tabs .nav-tabs .nav-link {
-  border-bottom: 2px solid hsla(0, 0%, 80%, .8);
-  background: #fff;
-  margin-top: .5rem;
-  margin-bottom: -2px;
-  margin-right: 3px
-}
-
-@media(max-width:991.98px) {
-  .admin-bike-tabs .nav-tabs .nav-link {
-    padding-bottom: 1rem
-  }
-}
-
-.admin-bike-tabs .nav-tabs .nav-link.active,
-.admin-bike-tabs .nav-tabs .nav-link:active {
-  border-bottom-color: #fff
+.admin-bike-summary .admin-image-thumb h3 {
+  text-align: center
 }
 
 .credibility-score {
@@ -13812,48 +13757,6 @@ table .photo-cell img {
 
 #recovery-bike-image-text.bike-image-added .not-using-bike-image {
   display: none
-}
-
-.stolen-bike-image-editing-list-group-wrapper {
-  overflow-x: scroll
-}
-
-.stolen-bike-image-editing-list-group {
-  min-width: 100%;
-  padding: 10px;
-  flex-direction: row
-}
-
-.stolen-bike-image-editing-list-group li {
-  padding: 20px;
-  width: 190px
-}
-
-.stolen-bike-image-editing-list-group img {
-  display: block;
-  width: 150px;
-  height: auto;
-  margin: 0 auto;
-  border: 1px solid #ced4da
-}
-
-.stolen-bike-image-editing-list-group#promoted-images-display li {
-  width: 340px
-}
-
-.stolen-bike-image-editing-list-group#promoted-images-display img {
-  width: 300px
-}
-
-#BParamsView pre {
-  margin: 0
-}
-
-#BParamsView .code {
-  border: 1px solid #ced4da;
-  background: #f8f9fa;
-  max-height: 300px;
-  overflow: scroll
 }
 
 #timeSelectionBtnGroup .period-select-standard {

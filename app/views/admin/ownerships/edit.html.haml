@@ -1,4 +1,4 @@
-= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, target: "ownerships" }
+= render Admin::Bikes::Header::Component.new(bike: @bike, active: :ownerships, user: current_user, display_dev_info: display_dev_info?)
 
 %h1.mt-5.mb-4
   Ownerships

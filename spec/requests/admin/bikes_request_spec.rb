@@ -104,6 +104,9 @@ RSpec.describe Admin::BikesController, type: :request do
       expect(response.code).to eq("200")
       get "#{base_url}/#{bike.id}?active_tab=recoveries"
       expect(response.code).to eq("200")
+      # A tab the show action doesn't render would otherwise raise from the tabs component
+      get "#{base_url}/#{bike.id}?active_tab=party"
+      expect(response).to redirect_to("#{base_url}/#{bike.id}/edit")
     end
   end
 

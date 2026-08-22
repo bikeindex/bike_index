@@ -13,7 +13,12 @@ export default class extends Controller {
 
   connect () {
     // Restore the open state from the URL without animating on load.
-    if (this.hasParamValue && this.paramInUrl) this.setExpanded(true, 0)
+    if (this.hasParamValue && this.paramInUrl) return this.setExpanded(true, 0)
+
+    // The server can render the content open -- a panel whose state is part of the
+    // response rather than a preference. Only the trigger needs catching up, and it
+    // mustn't persist: writing the param here would put it in a URL nobody asked it of.
+    this.syncTriggers(!this.collapsed)
   }
 
   toggle () {
@@ -39,12 +44,16 @@ export default class extends Controller {
 
   setExpanded (expanding, duration) {
     collapse(expanding ? 'show' : 'hide', this.contentTargets, duration)
+    this.syncTriggers(expanding)
+    this.persist(expanding)
+  }
+
+  syncTriggers (expanding) {
     this.chevronTargets.forEach((chevron) => chevron.classList.toggle('tw:rotate-90', expanding))
     this.triggerTargets.forEach((trigger) => {
       trigger.setAttribute('aria-expanded', String(expanding))
       trigger.dataset.active = String(expanding)
     })
-    this.persist(expanding)
   }
 
   persist (expanding) {

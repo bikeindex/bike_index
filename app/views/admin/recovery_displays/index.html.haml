@@ -1,5 +1,5 @@
 - if @bike.present?
-  = render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "recovery_displays", display_recovery: true}
+  = render Admin::Bikes::Header::Component.new(bike: @bike, active: :recovery_displays, display_recovery: true, user: current_user, display_dev_info: display_dev_info?)
   %h1.mt-5.mb-4 Recovery displays
 
 - else
