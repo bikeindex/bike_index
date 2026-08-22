@@ -8,7 +8,7 @@
 
     <%= render(UI::Dropdown::Component.new(name: search_errors_text.titleize, button_size: :sm,
           active: @search_errors.present?)) do |dropdown| %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "With and without errors", path: url_for(sortable_search_params.merge(search_errors: nil)), match_params: {search_errors: UI::ActiveLink::Component::BLANK}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "With and without errors", path: url_for(sortable_search_params.merge(search_errors: nil)), match_params: {search_errors: nil}) } %>
       <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Without errors", path: url_for(sortable_search_params.merge(search_errors: "no_error")), match_params: {search_errors: "no_error"}) } %>
       <% dropdown.with_entry_divider %>
       <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "File Error (fully blocks import)", path: url_for(sortable_search_params.merge(search_errors: "file_error")), match_params: {search_errors: "file_error"}) } %>
@@ -21,7 +21,7 @@
   <li>
     <%= render(UI::Dropdown::Component.new(name: "#{@progress.titleize} #{"progresses" if @progress == "all"}", button_size: :sm,
           active: @progress != "all")) do |dropdown| %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All progresses", path: url_for(sortable_search_params.merge(search_progress: nil)), match_params: {search_progress: UI::ActiveLink::Component::BLANK}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All progresses", path: url_for(sortable_search_params.merge(search_progress: nil)), match_params: {search_progress: nil}) } %>
       <% dropdown.with_entry_divider %>
 
       <% BulkImport.progresses.each do |progress| %>

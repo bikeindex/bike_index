@@ -6,7 +6,8 @@ const trimSlash = (path) => path.length > 1 ? path.replace(/\/$/, '') : path
 const segmentsOf = (path) => trimSlash(path).split('/')
 
 // '*' stands for one segment and a trailing '**' for the rest, so /bikes/*/edit can't span a
-// slash and /o/x/exports/** covers the index it's rooted at as well as everything below it
+// slash and /o/x/exports/** covers the index it's rooted at as well as everything below it.
+// UI::ActiveLink::Component.covers? is the copy that answers for prose beside a link.
 const matchesPath = (pattern, path) => {
   const patternSegments = segmentsOf(pattern)
   const pathSegments = segmentsOf(path)
@@ -53,7 +54,7 @@ export default class extends Controller {
   }
 
   // A link naming no params ignores the query string, and one naming some ignores the rest.
-  // '' is UI::ActiveLink::Component::BLANK, which a URL writes as an empty param or none.
+  // A nil among a link's values is '' here, which a URL writes as an empty param or none.
   paramsMatch () {
     const current = new URLSearchParams(window.location.search)
 
@@ -61,12 +62,14 @@ export default class extends Controller {
       .every(([param, values]) => values.includes(current.get(param) ?? ''))
   }
 
-  // "page" is reserved for the link whose own path is the current one. A wildcard, or params
-  // the link stands for rather than points at, means the page sits inside what it covers --
+  // "page" is reserved for the link whose own path is the current one -- a pattern can name a
+  // page the link doesn't point at, so matching one isn't enough. A wildcard, or params the
+  // link stands for rather than points at, means the page sits inside what it covers --
   // aria-current's "true", so a reader isn't told a link elsewhere is where they already are
   ariaCurrent () {
-    const isPage = !this.hasMatchParamsValue &&
-      this.patterns.includes(trimSlash(window.location.pathname))
+    const path = trimSlash(window.location.pathname)
+    const isPage = !this.hasMatchParamsValue && this.patterns.map(trimSlash).includes(path) &&
+      trimSlash(this.element.pathname) === path
 
     return isPage ? 'page' : 'true'
   }

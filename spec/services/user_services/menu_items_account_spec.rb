@@ -83,11 +83,12 @@ RSpec.describe UserServices::MenuItemsAccount do
       let(:organization) { FactoryBot.create(:organization, name: "Brakebills") }
       let(:options) { {current_organization: organization} }
 
+      # The param is what the row goes current on -- its path alone is the homepage
       it "carries the row for it, and the one out of it" do
         expect(switcher)
           .to eq([{type: :link, label: "View without any organization",
                    path: "http://test.host/?organization_id=false",
-                   icon: nil,
+                   icon: nil, match_params: {organization_id: "false"},
                    data: {controller: "page-block--navbar-switch-no-organization"}},
             {type: :disabled, label: "Viewing Brakebills"}])
       end

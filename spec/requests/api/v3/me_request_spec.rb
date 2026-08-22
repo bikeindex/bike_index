@@ -33,7 +33,7 @@ RSpec.describe "Me API V3", type: :request do
               icon: nil}
            ]},
           {type: "link", label: "Add a bike", path: "/o/#{organization.slug}/registrations/new",
-           icon: "plus-circle", match_params: {parking_notification: "blank"}}
+           icon: "plus-circle", match_params: {parking_notification: nil}}
         ]
       end
       let(:target_membership) do

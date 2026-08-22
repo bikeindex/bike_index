@@ -30,6 +30,13 @@ module UI
           class: "twlink"))
       end
 
+      # A pattern names a page rather than the link, so it can name the one being served —
+      # which the link still only covers, since it points somewhere else
+      def match_paths_other_page
+        render(UI::ActiveLink::Component.new(text: "A sibling preview", path: "#{PREVIEW_PATH}/default",
+          match_paths: "#{PREVIEW_PATH}/match_paths_other_page", class: "twlink"))
+      end
+
       # A single * stands for one segment, so a pattern can leave one variable in the middle
       def match_paths_one_segment
         render(UI::ActiveLink::Component.new(text: "This preview, through a wildcard segment",
@@ -45,11 +52,11 @@ module UI
           match_params: {filter: "on"}, class: "twlink"))
       end
 
-      # The entry a controller falls back to with the param absent, so BLANK is among its values
+      # The entry a controller falls back to with the param absent, so nil is among its values
       def match_params_blank
         render(UI::ActiveLink::Component.new(text: "Filter: off",
           path: "#{PREVIEW_PATH}/match_params_blank?filter=off",
-          match_params: {filter: ["off", UI::ActiveLink::Component::BLANK]}, class: "twlink"))
+          match_params: {filter: ["off", nil]}, class: "twlink"))
       end
 
       # Anything beyond class passes through to the anchor

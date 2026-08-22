@@ -32,9 +32,7 @@ RSpec.describe "Signup", :js, type: :system do
     expect(page).to have_link("set a password to sign in", wait: 10)
     expect(user.reload.confirmed?).to be_truthy
 
-    # The account page opens the donation modal over the flash. Closing it sets the
-    # localStorage flag that keeps it closed for the rest of the session
-    click_button "No donation"
+    dismiss_donation_modal
 
     user
   end

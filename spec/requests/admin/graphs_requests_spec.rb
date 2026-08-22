@@ -31,6 +31,35 @@ RSpec.describe Admin::GraphsController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
       end
+
+      context "with bikes registered different ways" do
+        let!(:sticker_bikes) { FactoryBot.create_list(:bike, 2, :with_ownership, creation_state_origin: "sticker") }
+        let!(:web_bike) { FactoryBot.create(:bike, :with_ownership, creation_state_origin: "web") }
+        let(:origin_colors) { Ownership.origins.zip(Admin::GraphsController::ORIGIN_COLORS).to_h }
+        # [origin, swatch color, bike count] per row of the origin table, as rendered
+        let(:origin_rows) do
+          Nokogiri::HTML(response.body).css("td span[style*='background-color']").map do |swatch|
+            [swatch.next_sibling.text.strip, swatch["style"][/#\h{6}/], swatch.parent.next_element.text.strip]
+          end
+        end
+
+        it "sorts the origin table highest count first, each swatch the chart's color for that origin" do
+          get base_url, params: {search_kind: "bikes", period: "week"}
+          expect(response.status).to eq(200)
+          expect(origin_rows.first(2)).to eq([["Sticker", origin_colors["sticker"], "2"],
+            ["Web", origin_colors["web"], "1"]])
+          # The origins with no bikes keep Ownership.origins order, rather than reshuffling
+          expect(origin_rows.map(&:first))
+            .to eq(%w[sticker web].map(&:humanize) + (Ownership.origins - %w[sticker web]).map(&:humanize))
+
+          get "#{base_url}/variable", params: {search_kind: "bikes", period: "week", bike_graph_kind: "origin"}
+          expect(json_result.to_h { [it["name"], it["color"]] })
+            .to eq(origin_colors.transform_keys(&:humanize))
+          # Every origin gets a zero-filled series, not just the ones the grouped query found
+          totals = json_result.to_h { |series| [series["name"], series["data"].sum(&:last)] }
+          expect(totals).to eq(Ownership.origins.to_h { [it.humanize, 0] }.merge("Sticker" => 2, "Web" => 1))
+        end
+      end
     end
   end
 

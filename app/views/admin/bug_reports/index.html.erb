@@ -5,7 +5,7 @@
       button_size: :sm,
       active: @searched_tag.present?
     )) do |dropdown|
-      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All tags", path: url_for(sortable_search_params.merge(search_tag: nil)), match_params: {search_tag: UI::ActiveLink::Component::BLANK}) }
+      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All tags", path: url_for(sortable_search_params.merge(search_tag: nil)), match_params: {search_tag: nil}) }
       dropdown.with_entry_divider
       searchable_tags.each do |tag|
         dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: tag, path: url_for(sortable_search_params.merge(search_tag: tag)), match_params: {search_tag: tag}) }
@@ -19,7 +19,7 @@
       button_size: :sm,
       active: @searched_receiver.present?
     )) do |dropdown|
-      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All receivers", path: url_for(sortable_search_params.merge(search_receiver: nil)), match_params: {search_receiver: UI::ActiveLink::Component::BLANK}) }
+      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All receivers", path: url_for(sortable_search_params.merge(search_receiver: nil)), match_params: {search_receiver: nil}) }
       dropdown.with_entry_divider
       searchable_receivers.each do |receiver|
         dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: BugReport.display_receiver(receiver), path: url_for(sortable_search_params.merge(search_receiver: receiver)), match_params: {search_receiver: receiver}) }
@@ -33,7 +33,7 @@
       button_size: :sm,
       active: @searched_membership.present?
     )) do |dropdown|
-      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All membership status", path: url_for(sortable_search_params.merge(search_membership: nil)), match_params: {search_membership: UI::ActiveLink::Component::BLANK}) }
+      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All membership status", path: url_for(sortable_search_params.merge(search_membership: nil)), match_params: {search_membership: nil}) }
       dropdown.with_entry_divider
       membership_filters.each do |value, label|
         dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: label, path: url_for(sortable_search_params.merge(search_membership: value)), match_params: {search_membership: value}) }
@@ -47,7 +47,7 @@
       button_size: :sm,
       active: @searched_status != "investigate"
     )) do |dropdown|
-      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: status_filters["investigate"], path: url_for(sortable_search_params.merge(search_status: "investigate")), match_params: {search_status: ["investigate", UI::ActiveLink::Component::BLANK]}) }
+      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: status_filters["investigate"], path: url_for(sortable_search_params.merge(search_status: "investigate")), match_params: {search_status: ["investigate", nil]}) }
       dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: status_filters["all"], path: url_for(sortable_search_params.merge(search_status: "all")), match_params: {search_status: "all"}) }
       dropdown.with_entry_divider
       status_only_filters.each do |value, label|

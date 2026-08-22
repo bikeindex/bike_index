@@ -328,6 +328,7 @@ RSpec.describe RegisterController, type: :request do
       expect { get "/register/embed?organization_id=#{organization.slug}" }.to change(BParam, :count).by 1
       expect(response.status).to eq 200
       expect(BParam.last.creation_organization_id).to eq organization.id
+      expect(BParam.last.origin).to eq "register_flow_landing_page"
 
       expect(response.body).to start_with("<!DOCTYPE html>")
       expect(response.body).to_not include("primary-header-nav")
@@ -340,6 +341,14 @@ RSpec.describe RegisterController, type: :request do
 
       # The session's still-blank registration, rather than one per view
       expect { get "/register/embed?organization_id=#{organization.slug}" }.to_not change(BParam, :count)
+    end
+
+    it "starts its own registration, rather than continuing the one /register began" do
+      expect { get new_register_path }.to change(BParam, :count).by 1
+      expect(BParam.last.origin).to eq "register_flow"
+
+      expect { get "/register/embed?organization_id=#{organization.slug}" }.to change(BParam, :count).by 1
+      expect(BParam.last.origin).to eq "register_flow_landing_page"
     end
 
     it "colors the button with the frame's ?button=, which the flow's own pages ignore" do

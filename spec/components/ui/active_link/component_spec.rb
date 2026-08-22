@@ -98,8 +98,8 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
 
     # An entry that's the fallback a controller reaches for is in force with the param absent,
     # which is "" once the browser reads it off the URL
-    context "with BLANK among the values" do
-      let(:options) { {match_params: {search_status: ["current", described_class::BLANK]}} }
+    context "with nil among the values" do
+      let(:options) { {match_params: {search_status: ["current", nil]}} }
 
       it "renders it as the empty string" do
         expect(link["data-ui--active-link-match-params-value"])
@@ -116,11 +116,19 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
       end
     end
 
-    context "with nil in place of BLANK" do
+    context "with a bare nil" do
       let(:options) { {match_params: {search_deleted: nil}} }
 
-      it "raises rather than rendering a param with no values, which never matches" do
-        expect { component }.to raise_error(ArgumentError, /blank/)
+      it "renders the one empty string, which is the param the URL leaves out" do
+        expect(link["data-ui--active-link-match-params-value"]).to eq({search_deleted: [""]}.to_json)
+      end
+    end
+
+    context "with no values at all" do
+      let(:options) { {match_params: {search_deleted: []}} }
+
+      it "raises rather than rendering a param nothing can match" do
+        expect { component }.to raise_error(ArgumentError, /needs values/)
       end
     end
   end
@@ -220,6 +228,41 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     it "escapes it" do
       expect(link.css("script")).to be_empty
       expect(link.text).to eq "<script>alert(1)</script>"
+    end
+  end
+
+  # The link itself is matchesPath's, in ui/active_link_controller.js -- component_system_spec
+  # covers that copy, through the preview. This one answers for Admin::Navbar's prose.
+  describe ".covers?" do
+    def covers?(pattern, path) = described_class.covers?(pattern, path)
+
+    it "takes the path a pattern names, and nothing longer or shorter" do
+      expect(covers?("/admin/bikes", "/admin/bikes")).to be true
+      expect(covers?("/admin/bikes", "/admin/bikes/12")).to be false
+      expect(covers?("/admin/bikes", "/admin")).to be false
+      expect(covers?("/admin/bikes", "/admin/bike_stickers")).to be false
+    end
+
+    it "ignores a trailing slash on either side, the way current_page? does" do
+      expect(covers?("/admin/bikes/", "/admin/bikes")).to be true
+      expect(covers?("/admin/bikes", "/admin/bikes/")).to be true
+      expect(covers?("/", "/")).to be true
+    end
+
+    # The shape every section entry takes, so it covers its index as well as its sub-pages
+    it "takes everything below a trailing **, and the path it is rooted at" do
+      expect(covers?("/admin/bikes/**", "/admin/bikes")).to be true
+      expect(covers?("/admin/bikes/**", "/admin/bikes/12/edit")).to be true
+      expect(covers?("/admin/bikes/**", "/admin")).to be false
+      expect(covers?("/admin/bikes/**", "/admin/bike_stickers")).to be false
+    end
+
+    # The organizations-nested invoices in Admin::Navbar
+    it "takes one segment for a *, which can't span a slash" do
+      expect(covers?("/admin/organizations/*/invoices", "/admin/organizations/bike-shop/invoices")).to be true
+      expect(covers?("/admin/organizations/*/invoices", "/admin/organizations/invoices")).to be false
+      expect(covers?("/admin/organizations/*/invoices", "/admin/organizations/bike-shop/a/invoices")).to be false
+      expect(covers?("/admin/organizations/*", "/admin/organizations")).to be false
     end
   end
 end

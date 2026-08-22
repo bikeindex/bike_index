@@ -96,7 +96,7 @@ module UserServices
         routes.new_organization_registration_path(organization.to_param)
       end
       ComponentStructs::Shapes.link(translation(:add_a_bike), path, icon: "plus-circle",
-        match_params: {parking_notification: UI::ActiveLink::Component::BLANK})
+        match_params: {parking_notification: nil})
     end
 
     # Managing impounding is the settings group's, which is where the org's other

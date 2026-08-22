@@ -19,6 +19,10 @@ RSpec.describe UI::ActiveLink::Component, :js, type: :system do
     visit "#{preview_path}/match_paths_below"
     expect(page).to have_css "a[aria-current='true']", text: "A sibling preview"
 
+    # Naming this page in a pattern doesn't make the link point at it, so it's "true" too
+    visit "#{preview_path}/match_paths_other_page"
+    expect(page).to have_css "a[aria-current='true']", text: "A sibling preview"
+
     # A * stands for the "component" segment this page is served under
     visit "#{preview_path}/match_paths_one_segment"
     expect(page).to have_css "a[aria-current='true']", text: "This preview, through a wildcard segment"
@@ -40,14 +44,14 @@ RSpec.describe UI::ActiveLink::Component, :js, type: :system do
     visit "#{preview_path}/match_params?filter=on&page=2"
     expect(page).to have_css "a[aria-current='true']", text: "Filter: on"
 
-    # BLANK is among the default entry's values, so it's current either way it's written
+    # nil is among the default entry's values, so it's current either way it's written
     visit "#{preview_path}/match_params_blank"
     expect(page).to have_css "a[aria-current='true']", text: "Filter: off"
 
     visit "#{preview_path}/match_params_blank?filter=off"
     expect(page).to have_css "a[aria-current='true']", text: "Filter: off"
 
-    # A param the URL leaves empty is one the page doesn't carry, the way BLANK reads it
+    # A param the URL leaves empty is one the page doesn't carry, the way nil reads it
     visit "#{preview_path}/match_params_blank?filter="
     expect(page).to have_css "a[aria-current='true']", text: "Filter: off"
 

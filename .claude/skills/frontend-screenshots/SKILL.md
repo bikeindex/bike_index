@@ -67,7 +67,7 @@ The admin layout has no `#navUserSettingLink`, so on an `/admin/...` route it re
 
 ## Capture
 
-Clear stale shots: `rm -f tmp/pr_screenshots/<branch>-<page>-*.png 2>/dev/null || true`.
+Make the directory and clear stale shots: `mkdir -p tmp/pr_screenshots && rm -f tmp/pr_screenshots/<branch>-<page>-*.png 2>/dev/null || true`. `browser_take_screenshot` errors with `ENOENT` rather than creating the directory, so a fresh workspace fails on the first capture.
 
 Two viewports — resize once each, then walk every URL:
 1. `browser_resize` 1440×900 → for each URL: navigate → settle → hide the footer → `browser_take_screenshot` (`fullPage: true`) to `...-desktop.png`.

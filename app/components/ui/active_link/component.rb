@@ -11,23 +11,48 @@ module UI
     # entry needs: it stands for the params it applies rather than for a URL, and links away
     # from itself to clear them.
     class Component < ApplicationComponent
-      # Stands in for nil, which Array.wrap would drop, leaving a param with no values at
-      # all; it reaches the browser as the empty string the URL reads back either way
-      BLANK = :blank
-
       # What a menu item hash can carry through to the link. The rest of an item is the menu's
       # own — its type, icon, children — and an absent key here takes initialize's default
       ITEM_KEYS = [:path, :match_paths, :match_params, :data, :id].freeze
 
-      # A menu manifest carries a link as a hash; what differs between the menus rendering one
-      # is the class, and text: for a row whose label sits inside a block with its icon
-      def self.from_item(item, html_class: nil, text: item[:label])
-        new(**item.slice(*ITEM_KEYS), text:, class: html_class)
+      class << self
+        # A menu manifest carries a link as a hash; what differs between the menus rendering
+        # one is the class, and text: for a row whose label sits inside a block with its icon
+        def from_item(item, html_class: nil, text: item[:label])
+          new(**item.slice(*ITEM_KEYS), text:, class: html_class)
+        end
+
+        # The page a URL names — neither its origin nor its query is part of that. A query
+        # arrives mid-pattern as well as at the end, since a route helper interpolated into
+        # one carries the locale param. A URL with no path of its own points at a root —
+        # someone else's, which the browser rules out on the origin.
+        def page_path(url)
+          url.to_s.sub(%r{\A[a-z]+://[^/]+}i, "").sub(%r{[?#][^/]*}, "").presence || "/"
+        end
+
+        # matchesPath in ui/active_link_controller.js, which answers this for a link itself.
+        # The copy is for prose beside one — Admin::Navbar names the current page in the
+        # picker, which no link can go active on its behalf.
+        def covers?(pattern, path)
+          pattern_segments = segments_of(pattern)
+          path_segments = segments_of(path)
+          stopped = pattern_segments.zip(path_segments).find do |segment, actual|
+            segment == "**" || (segment != "*" && segment != actual)
+          end
+          return pattern_segments.length == path_segments.length if stopped.nil?
+
+          stopped.first == "**"
+        end
+
+        private
+
+        # Rails' current_page? ignores a trailing slash on either side
+        def segments_of(path) = ((path.length > 1) ? path.delete_suffix("/") : path).split("/")
       end
 
       def initialize(path:, text: nil, match_paths: [], match_params: nil, data: {},
         **html_options)
-        @match_paths = Array.wrap(match_paths.presence || path).map { |url| page_path(url) }
+        @match_paths = Array.wrap(match_paths.presence || path).map { |url| self.class.page_path(url) }
         @match_paths.each { |pattern| raise_if_invalid_pattern!(pattern) }
         @match_params = match_params.presence&.to_h { |param, values| [param, param_values(param, values)] }
 
@@ -43,27 +68,20 @@ module UI
 
       private
 
-      # A query arrives mid-pattern as well as at the end, since a route helper interpolated
-      # into one carries the locale param. A URL with no path of its own points at a root —
-      # someone else's, which the browser rules out on the origin.
-      def page_path(url)
-        url.to_s.sub(%r{\A[a-z]+://[^/]+}i, "").sub(%r{[?#][^/]*}, "").presence || "/"
-      end
-
       def raise_if_invalid_pattern!(pattern)
         raise ArgumentError, "match_paths: #{pattern} must start with /" unless pattern.start_with?("/")
         raise ArgumentError, "match_paths: ** only ends a pattern, not #{pattern}" if
           pattern.split("/")[0..-2].include?("**")
       end
 
-      # nil is the habit BLANK replaces — it would wrap to no values at all, and so quietly
-      # never match
+      # A nil value is the param absent, which is "" once the browser reads it off the URL —
+      # the same absence url_for writes by dropping the param, which is what the href beside
+      # a filter entry's match_params does with it
       def param_values(param, values)
-        wrapped = Array.wrap(values)
-        raise ArgumentError, "match_params: #{param} needs values — #{BLANK} for an absent one" unless
-          wrapped.any? && wrapped.all?(&:present?)
+        listed = [values].flatten
+        raise ArgumentError, "match_params: #{param} needs values" if listed.empty?
 
-        wrapped.map { |value| (value == BLANK) ? "" : value.to_s }
+        listed.map(&:to_s)
       end
 
       # link_to labels a link with its own URL when the label is empty, so a caller that

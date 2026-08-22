@@ -8,7 +8,7 @@
   <li>
     <%= render(UI::Dropdown::Component.new(name: "#{@kind.titleize} #{(special_kind_scopes + ["all"]).include?(@kind) ? "kinds" : ""}", button_size: :sm,
           active: @kind != "all")) do |dropdown| %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All kinds", path: url_for(sortable_search_params.merge(search_kind: nil)), match_params: {search_kind: UI::ActiveLink::Component::BLANK}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All kinds", path: url_for(sortable_search_params.merge(search_kind: nil)), match_params: {search_kind: nil}) } %>
 
       <% special_kind_scopes.each do |kind| %>
         <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.titleize} kinds", path: url_for(sortable_search_params.merge(search_kind: kind)), match_params: {search_kind: kind}) } %>
