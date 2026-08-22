@@ -19,9 +19,7 @@ module PageBlock
         private
 
         def items
-          UserServices::MenuItemsAccount.for(
-            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user
-          )
+          UserServices::MenuItemsAccount.for(user: @current_user_or_unconfirmed_user)
         end
 
         # .nav-link is the navbar's own, which the submenu's rows take with the rest of its links

@@ -50,8 +50,8 @@ module Organized
       end
     end
 
-    # The /register flow's opening step, rendered here so the organized menu stays
-    # alongside it. Its submission, and every step after, continue on /register
+    # The /register flow's opening step, started here so the registration carries the
+    # organized origin. Its submission, and every step after, continue on /register
     def new
       # Arriving here is the way back from the embed form, whatever sent them
       session.delete(:old_register_view)

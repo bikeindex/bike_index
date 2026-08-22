@@ -131,11 +131,6 @@ module ApplicationHelper
 
   private
 
-  # Only the opening step: every step after it is on /register, which paints its own gray
-  def organized_register_flow?
-    controller_name == "registrations" && action_name == "new"
-  end
-
   def body_class
     if controller_name == "landing_pages" || @force_landing_page_render
       if %w[for_schools for_law_enforcement].include?(action_name)
@@ -146,9 +141,7 @@ module ApplicationHelper
     elsif controller_name == "info" && action_name == "resources"
       "kelsey_landing-page-body"
     elsif main_content_organized?
-      # Register::Page's gray only covers the form, and the organized container insets it -
-      # so the page paints it instead, behind the whole content column
-      organized_register_flow? ? "organized-body tw:bg-gray-100 tw:dark:bg-gray-900" : "organized-body"
+      "organized-body"
     elsif controller_name == "registrations" && action_name == "show"
       "tw:bg-[#f7f6fb]"
     end

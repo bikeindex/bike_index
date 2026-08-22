@@ -158,8 +158,6 @@ magick compare <base>.png <branch>.png -compose src d.png && magick identify -fo
 
 The bounding box is what settles it: dev-only chrome that slipped past the hide step lands in one small box, a real change doesn't.
 
-**Records you created while poking at the feature show up as a difference the branch didn't make.** Walking a flow to find a bug leaves rows behind — an abandoned registration puts a "your bike isn't registered yet" alert on every later page for that user, so it lands in the branch shot and not the base one. Capture as a seeded user who hasn't been driven through the flow, or drop the page.
-
 The seeded DB persists across checkouts, so the existing session usually still works. Preview routes (`/rails/view_components/...`, `/lookbook/...`) reload across the checkout like ordinary pages, so their before/after works against any `$BASE_REF` too.
 
 ## Clean up

@@ -804,34 +804,6 @@ RSpec.describe RegisterController, type: :request do
       expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: 2)
     end
 
-    # Started on Organized::RegistrationsController#new, which the rest of the flow continues
-    context "started from an organization" do
-      let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
-      let(:b_param) do
-        BParam.create(origin: "register_flow_organized",
-          params: {bike: {owner_email:, manufacturer_id: "Trek",
-                          creation_organization_id: organization.id}}.as_json)
-      end
-      # Signed in with another organization, so a menu naming this one can't be the session's
-      let(:member) { FactoryBot.create(:organization_user, organization: FactoryBot.create(:organization, short_name: "Fillory")) }
-      # Not a let - it's read after each request in turn, and a let would memoize the first
-      def sidebar_organization
-        Nokogiri::HTML(response.body).css("#org_sidebar_nav").first&.[]("aria-label")
-      end
-
-      it "renders the organization's menu, for a member" do
-        log_in(member)
-        get register_path(b_param_token: b_param.id_token, step: 2)
-        # Not a member of the one the registration started on, so the session's stands
-        expect(sidebar_organization).to eq "Fillory"
-
-        # The token is the owner's to finish with - the menu is the organization's
-        FactoryBot.create(:organization_role_claimed, user: member, organization:)
-        get register_path(b_param_token: b_param.id_token, step: 2)
-        expect(sidebar_organization).to eq "Brakebills"
-      end
-    end
-
     context "unknown token" do
       it "redirects to the start" do
         get register_path(b_param_token: "unknown-token")

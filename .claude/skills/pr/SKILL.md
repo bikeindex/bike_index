@@ -85,7 +85,7 @@ No `bin/env` eval is needed here — it's only relevant to the screenshot phase,
 
 The diff is frontend if a changed path matches one of these **and** renders a page a reviewer could look at:
 
-- `app/views/**` (`.erb`, `.html.erb`)
+- `app/views/**` (`.erb`, `.html.erb`, `.haml` — deprecated, but still most of the directory)
 - `app/components/**` (ViewComponent templates or Ruby)
 - `app/javascript/**`
 - `app/assets/**`

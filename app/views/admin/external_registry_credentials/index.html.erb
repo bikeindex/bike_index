@@ -1,6 +1,6 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item">
-    <%= link_to "New Credential", new_admin_external_registry_credential_path, class: "nav-link" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "New Credential", href: new_admin_external_registry_credential_path, color: :primary, size: :sm)) %>
   </li>
 <% end %>
 

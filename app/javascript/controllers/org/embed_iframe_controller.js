@@ -2,25 +2,21 @@ import { Controller } from '@hotwired/stimulus'
 
 /* global ResizeObserver */
 
+// TODO: #4185 - remove when removing the legacy org new bike iframe
 // Connects to data-controller='org--embed-iframe'
-// The embedded registration form is served from this host, so the frame can be sized to
-// what it actually renders rather than to a guessed min-height that clips the form once
-// it grows. Framed on someone else's page it's cross-origin and contentDocument throws -
-// the stylesheet's min-height stands in.
+// Sizes the frame to what it renders, rather than to the stylesheet's fixed height
 export default class extends Controller {
+  // The frame may have loaded before this connected, so fit rather than waiting on load
   connect () {
-    this.fit = this.fit.bind(this)
-    this.element.addEventListener('load', this.fit)
     this.fit()
   }
 
   disconnect () {
-    this.element.removeEventListener('load', this.fit)
     this.observer?.disconnect()
   }
 
   fit () {
-    const body = this.contentBody
+    const body = this.element.contentDocument?.body
     if (!body) return
 
     // body rather than documentElement, which can't report less than the height we just
@@ -31,15 +27,10 @@ export default class extends Controller {
     this.setHeight(body)
   }
 
+  // Only when it moves: the write invalidates the parent's layout, and comes back here
+  // through the observer
   setHeight (body) {
-    this.element.style.height = `${body.scrollHeight}px`
-  }
-
-  get contentBody () {
-    try {
-      return this.element.contentDocument?.body
-    } catch {
-      return null
-    }
+    const height = `${body.scrollHeight}px`
+    if (height !== this.element.style.height) this.element.style.height = height
   }
 }

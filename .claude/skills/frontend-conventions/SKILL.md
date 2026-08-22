@@ -56,7 +56,6 @@ Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesh
 
 ## Two Tailwind v4 traps
 
-- **`tw:mx-(--var)` generates nothing.** The bare-parenthesis shorthand for a CSS variable doesn't compile under this setup; `tw:mx-[var(--gutter)]` does. Both look right in a template, and the one that doesn't work fails silently — grep `app/assets/builds/tailwind.css` for the escaped class after `bin/rails tailwindcss:build`.
 - **A build that was right can go wrong under you.** Each workspace runs its own `tailwindcss:watch`, and one can overwrite `app/assets/builds/tailwind.css` with a scan from before your edit — so a rule you just wrote is served, then isn't. Before believing a CSS change doesn't work, count it in the build (`grep -o '<class>' app/assets/builds/tailwind.css | wc -l`, since the file is minified onto few lines) and check the built file's mtime against the source's. `bin/rails tailwindcss:build` restores it.
 - **A grid item stretches to its row.** For a `<div>` that's invisible, but a bare `<table>` grid item spreads the extra height across its own rows, so two `table-list` panels side by side pull each other's rows tall. `tw:items-start` on the grid, or wrap the table in a `<div>`.
 
@@ -64,7 +63,7 @@ Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesh
 
 **Every button goes through `UI::Button::Component`** — never a hand-rolled `<button>`, `button_to`, or submit input with ad-hoc Tailwind classes. The component centralizes colors (`:primary`/`:secondary`/`:error`/`:purple`/`:link` — its `COLORS` is the list of record), sizes (`:sm`/`:md`/`:lg`), and the focus/active/dark-mode states; a hand-styled button silently drifts from all of that the next time the design changes.
 
-**An in-page action trigger that doesn't navigate is a `UI::Button`, not `link_to "#"`** — `.herb.yml` disables `html-anchor-require-href` for the legacy views, so no linter catches it. `UI::Forms::NestedFields::Component`'s add trigger is the worked example.
+**An in-page action trigger that doesn't navigate is a `UI::Button`, not `link_to "#"`** — `.herb.yml` runs `html-anchor-require-href` over `app/components` only, so a component is caught and an `app/views` template isn't. `UI::Forms::NestedFields::Component`'s add trigger is the worked example.
 
 - Plain button or form submit: `render UI::Button::Component.new(text: "Save", color: :primary, type: "submit")`. Pass a class as `html_class:` — the component builds its own, so a `class:` raises.
 - A link styled as a button: `UI::ButtonLink::Component.new(href:, text:, color:, size:)` — same palette, renders an `<a>`.
@@ -74,19 +73,13 @@ Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesh
 
 The same instinct applies beyond buttons: **check `app/components/ui/` and `app/components/atom/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, form fields → `UI::Forms::*`, badges, modals, pagination, tables…). If a component exists for the pattern, use it; if it almost fits, extend it rather than forking its markup inline.
 
+Three of those carry a rule beyond "use the component":
+
+- **`UI::Tooltip` keeps its default `?` button trigger** unless the user explicitly says otherwise — never pass a label as the trigger content.
+- **A `UI::Forms::*` field renders no label of its own** — render it inside a `UI::Forms::Group` block, passing `form_builder:` when there is one. Holds for `Combobox`, `Select`, and `TextEditor`. A visually hidden label is the exception: `Group`'s label always carries a required/optional suffix, so use a bare `label_tag` with `twlabel tw:sr-only`, the way `Search::Form` does.
+- **Every typeahead / autocomplete goes through `UI::Forms::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. `spec/components/ui/forms/combobox` shows how to invoke it.
+
 `Atom::*` (`app/components/atom/`) holds the small value-rendering components — `Atom::Serial`, `Atom::Sticker`, `Atom::ShortId`, `Atom::Phone`. Everything else is `UI::*`; older value renderers like `UI::AddressDisplay` predate the split and stay put. Render a serial with `Atom::Serial::Component`, not `BikeHelper#render_serial_display`.
-
-## Tooltips: default `?` button trigger
-
-**Every `UI::Tooltip` uses the default `?` button trigger** unless the user explicitly says otherwise — never pass a label as the tooltip's trigger content. See `app/components/ui/tooltip/`.
-
-## Form fields: the label comes from `UI::Forms::Group`
-
-**A `UI::Forms::*` field renders no label of its own** — render it inside a `UI::Forms::Group` block, passing `form_builder:` when there is one. Holds for `Combobox`, `Select`, and `TextEditor`. A visually hidden label is the exception — `Group`'s label always carries a required/optional suffix, so use a bare `label_tag` with `twlabel tw:sr-only`, the way `Search::Form` does. See `app/components/ui/forms/group/component_preview/` and `app/components/ui/forms/combobox/component_preview/`.
-
-## Typeaheads: always `UI::Forms::Combobox`
-
-**Every typeahead / autocomplete / combobox goes through `UI::Forms::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. See `app/components/ui/forms/combobox/` (component + `component_preview.rb`) and `spec/components/ui/forms/combobox` for how to invoke it.
 
 ## Form drafts: always `form-persist`
 
@@ -97,6 +90,8 @@ The same instinct applies beyond buttons: **check `app/components/ui/` and `app/
 ## Current-page links: always `UI::ActiveLink`
 
 **Every link that goes `aria-current` on the page it points at goes through `UI::ActiveLink::Component`** — never `current_page?` in a template, and never a Stimulus controller of your own comparing `window.location`. It always derives the state in the browser (`app/javascript/controllers/ui/active_link_controller.js`), so there's no way to pass the answer in: `match:` is the only control over what counts as the page it points at. Any layout rendering one opens its `<body>` with `body_tag`. See `app/components/ui/active_link/`.
+
+With `match: :query`, **`query:` is the params the entry stands for, not the ones its `path:` sets** — a filter entry that toggles links *away* from itself to clear the filter, so the two differ. Passing `path:`'s value to both fails silently, and only on the entry that is currently applied.
 
 ## Showing and hiding elements: always use the collapse helpers
 
@@ -126,7 +121,6 @@ When deleting an `id`/`class`, grep the repo for the name before deciding what t
 
 **Never add a helper method, and don't extend an existing one.** Anything a helper would render belongs in a view component that takes what it needs as explicit keyword arguments. `app/helpers/` is legacy: leave what's there, but move a helper into a component when you touch the line that calls it.
 
-- `Atom::Serial::Component`, not `BikeHelper#render_serial_display`. `UI::PhoneDisplay::Component`, not `number_to_phone`. `UI::Time::Component`, not `l(time, format: :convert_time)`.
 - A *view helper* that only gathers a component's arguments out of controller assigns is still a helper — pass those arguments from the view.
 - `ApplicationComponentHelper` is the exception (`number_display`, `amount_display`, `check_mark`, `search_emoji`) — value formatters `ApplicationComponent` already includes, so components call them bare.
 
@@ -150,6 +144,7 @@ This project uses the ViewComponent gem to render components.
 - **Change a component's signature, then open its `component_preview.rb`** — nothing renders previews in the suite, so a stale one raises `ArgumentError: unknown keyword` on its Lookbook page with the whole suite green. `curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/rails/view_components/<path>/component/<scenario>"` is the check.
 - **A `UI::Table` cell block is `instance_exec`'d against the component.** Inside `table.column ... do`, bare calls and `@ivar`s resolve on `UI::Table::Component`, not the view. A bare call raises, but **an `@ivar` fails silently** — it reads `nil`, or worse, an identically-named ivar the table happens to hold. Reach state through the readers the table exposes (`sort_state.search_params`, not `sortable_search_params`), and for anything else assign a local above the block, the way `Org::ImpoundRecordsTable` carries `current_organization` and `current_user`. Above the `UI::Table::Component.new` block the view's own helpers work; rewriting those too is churn.
 - **A component that `include`s a helper is coupled to whatever ivars that helper reads.** `GraphingHelper#humanized_time_range` reads `@period` off the object it's mixed into, so moving that ivar out of the component silently returns nil rather than failing. Pass the value as an argument when converting a component to explicit arguments.
+- **Moving a view into a component turns its locals into methods.** A `<% x = … %>` computed once per template becomes a method run once per *call site* — which is how a single pluck becomes one per table row. Memoize anything that queries as you move it.
 - **Converting a partial — to a component, or from haml to ERB — is a faithful move, not a cleanup.** Carry the markup over verbatim — including comments and commented-out code. Those lines are often a deliberate stash (a link that's temporarily disabled, a snippet someone expects to restore), so dropping them silently loses intent and surprises the reviewer, who expects the diff to read as "same content, new home." The only changes a conversion should introduce are the mechanical ones the move *requires*: `t(".x")` → `translation(".x")`, adding `helpers.` where a helper now needs it, and the like. If you spot something that genuinely looks like dead code worth removing, that's a separate judgment call — raise it with the user or do it in its own commit, don't fold it into the move.
 
 ## Turbo is opt-in, and opting a form in has two consequences
@@ -194,7 +189,7 @@ renders through Drive, and the admin layout doesn't yield `:header` to set it wi
 And it's the page you navigate *away from* that breaks, not just the one you land on.
 
 So a screen carrying any of it passes `turbo: false` — `Admin::Headers::Tabs` takes it, and
-`Admin::CustomLayouts::Form::Wrapper` is the one that does. Before opting a new section in,
+`Admin::Organizations::CustomLayouts::Form::Wrapper` is the one that does. Before opting a new section in,
 check its tab targets for `#per_page_select`, `.fancy-select`, `.add_fields`,
 `#multipleUserSelect` and `.UppyForm`.
 

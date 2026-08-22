@@ -39,6 +39,7 @@ module PageBlock
         BAR = "tw:h-0.5 tw:w-5 tw:rounded-sm tw:bg-gray-900 tw:transition-all " \
           "tw:duration-200 tw:dark:bg-gray-300"
 
+        # TODO: #4185 - remove old_register_view when removing the legacy org new bike iframe
         def initialize(organization:, current_user:, old_register_view: false)
           @organization = organization
           @current_user = current_user

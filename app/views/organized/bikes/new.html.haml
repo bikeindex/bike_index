@@ -2,7 +2,7 @@
   - iframe_url = new_iframe_organization_bikes_path(organization_id: current_organization)
 - else
   - iframe_url = embed_extended_organization_url(current_organization.slug)
-  = render(UI::Header::Component.new(tag: :h2, html_class: "uncap tw:-mt-4 tw:mb-8! tw:pl-4 tw:font-semibold tw:italic")) do
+  = render(UI::Header::Component.new(tag: :h2, html_class: "uncap tw:-mt-2 tw:mb-8! tw:pl-4 tw:font-semibold tw:italic")) do
     Try
     = link_to "the new registration flow", new_organization_registration_path(organization_id: current_organization.to_param), class: "twlink"
-<iframe src="#{iframe_url}" data-controller="org--embed-iframe"></iframe>
+<iframe src="#{iframe_url}" data-controller="org--embed-iframe" data-action="load->org--embed-iframe#fit"></iframe>

@@ -2,67 +2,46 @@
   <%= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "theft_alerts", display_recovery: true} %>
   <h1 class="mt-5 mb-4">
     Promoted Alerts
-    <%= link_to "New Promoted alert", new_admin_theft_alert_path(bike_id: @bike.id), class: "small btn btn-outline-success btn-sm ml-2" %>
+    <%= render(UI::ButtonLink::Component.new(text: "New Promoted alert", href: new_admin_theft_alert_path(bike_id: @bike.id), color: :primary, size: :sm, html_class: "tw:ml-2")) %>
   </h1>
   <%= render partial: "table", locals: {render_sortable: true, theft_alerts: @theft_alerts, skip_bike: true} %>
 <% else %>
   <% nav_header_list_items = capture do %>
-    <li class="nav-item dropdown dropleft">
-      <a
-        class="nav-link dropdown-toggle <%= @status != "all" ? "active" : "" %>"
-        href="#"
-        role="button"
-        data-toggle="dropdown"
-        aria-haspopup="true"
-        aria-expanded="false"
-      >
-        <%= "#{@status.titleize} #{@status == "all" ? "statuses" : "alerts"}" %>
-      </a>
-
-      <div class="dropdown-menu">
-        <%= link_to "All statuses", url_for(sortable_search_params.merge(search_status: nil)), class: "dropdown-item #{@status == 'all' ? 'active' : ''}" %>
-
-        <div class="dropdown-divider"></div>
+    <li>
+      <%= render(UI::Dropdown::Component.new(name: "#{@status.titleize} #{@status == "all" ? "statuses" : "alerts"}", button_size: :sm,
+            active: @status != "all")) do |dropdown| %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All statuses", path: url_for(sortable_search_params.merge(search_status: nil)), match: :query, query: {search_status: nil}) } %>
+        <% dropdown.with_entry_divider %>
 
         <% available_statuses.each do |status| %>
-          <%= link_to "#{status.humanize} alerts", url_for(sortable_search_params.merge(search_status: status)), class: "dropdown-item #{@status == status ? 'active' : ''}" %>
+          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{status.humanize} alerts", path: url_for(sortable_search_params.merge(search_status: status)), match: :query, query: {search_status: status}) } %>
         <% end %>
-      </div>
+      <% end %>
     </li>
 
-    <li class="nav-item dropdown">
-      <a
-        class="nav-link dropdown-toggle <%= @search_paid_admin.present? ? "active" : "" %>"
-        href="#"
-        role="button"
-        data-toggle="dropdown"
-        aria-haspopup="true"
-        aria-expanded="false"
-      >
-        <%= @search_paid_admin.humanize %>
-      </a>
-
-      <div class="dropdown-menu">
+    <li>
+      <%= render(UI::Dropdown::Component.new(name: @search_paid_admin.humanize, button_size: :sm,
+            active: @search_paid_admin.present?)) do |dropdown| %>
         <% available_paid_admin.each do |paid_admin| %>
           <% if paid_admin == "paid_and_unpaid" %>
-            <div class="dropdown-divider"></div>
+            <% dropdown.with_entry_divider %>
           <% end %>
 
-          <%= link_to paid_admin.humanize, url_for(sortable_search_params.merge(search_paid_admin: paid_admin)), class: "dropdown-item #{@search_paid_admin == paid_admin ? 'active' : ''}" %>
+          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: paid_admin.humanize, path: url_for(sortable_search_params.merge(search_paid_admin: paid_admin)), match: :query, query: {search_paid_admin: paid_admin}) } %>
         <% end %>
-      </div>
+      <% end %>
     </li>
 
-    <li class="nav-item">
-      <%= link_to "fbook data", url_for(sortable_search_params.merge(search_facebook_data: !@search_facebook_data)), class: "nav-link #{@search_facebook_data ? 'active' : ''}" %>
+    <li>
+      <%= render(UI::ButtonLink::Component.new(text: "fbook data", href: url_for(sortable_search_params.merge(search_facebook_data: !@search_facebook_data)), size: :sm, active: @search_facebook_data)) %>
     </li>
 
-    <li class="nav-item">
-      <%= link_to "recovered", url_for(sortable_search_params.merge(search_recovered: !@search_recovered)), class: "nav-link #{@search_recovered ? 'active' : ''}" %>
+    <li>
+      <%= render(UI::ButtonLink::Component.new(text: "recovered", href: url_for(sortable_search_params.merge(search_recovered: !@search_recovered)), size: :sm, active: @search_recovered)) %>
     </li>
 
-    <li class="nav-item">
-      <%= link_to "location counts", admin_theft_alerts_path(sortable_search_params.merge(search_location_counts: !@location_counts)), class: "nav-link #{@location_counts ? 'active' : ''}" %>
+    <li>
+      <%= render(UI::ButtonLink::Component.new(text: "location counts", href: admin_theft_alerts_path(sortable_search_params.merge(search_location_counts: !@location_counts)), size: :sm, active: @location_counts)) %>
     </li>
   <% end %>
   <% theft_alert_plans = TheftAlertPlan.price_ordered_desc.select { |plan| searched_theft_alerts.where(theft_alert_plan: plan).any? } %>
