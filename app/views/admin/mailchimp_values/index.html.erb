@@ -13,21 +13,22 @@
   </li>
 
   <li>
-    <a
-      class="tw:px-2.5 tw:py-1 tw:text-xs"
-      href=".data-cell-collapsed"
-      aria-expanded="false"
-      data-toggle="collapse"
-    >
-      Toggle data
-    </a>
+    <%= render(UI::Button::Component.new(text: "Toggle data", size: :sm, aria: {expanded: false},
+          data: {action: "ui--collapse#toggle", "ui--collapse-target": "trigger"})) %>
   </li>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
-  index: admin_index_state,
-  collection: @mailchimp_values,
-  viewing: "Mailchimp Values",
-  skip_charting: true,
-  nav_header_list_items:,
-)) %>
+<%#
+  The trigger sits in the nav header and the data column in the table, so the
+  controller wraps the whole skeleton to reach both
+%>
+
+<div data-controller="ui--collapse" data-ui--collapse-duration-value="0">
+  <%= render(Admin::IndexSkeleton::Component.new(
+    index: admin_index_state,
+    collection: @mailchimp_values,
+    viewing: "Mailchimp Values",
+    skip_charting: true,
+    nav_header_list_items:,
+  )) %>
+</div>
