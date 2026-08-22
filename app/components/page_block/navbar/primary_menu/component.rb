@@ -5,8 +5,7 @@ module PageBlock
     module PrimaryMenu
       # The navbar's main menu, rendered from a manifest of items rather than repeated markup
       class Component < ApplicationComponent
-        def initialize(current_user:, current_user_or_unconfirmed_user:)
-          @current_user = current_user
+        def initialize(current_user_or_unconfirmed_user:)
           @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user
         end
 
@@ -45,8 +44,9 @@ module PageBlock
         end
 
         def settings_menu
-          PageBlock::Navbar::UserSettingsMenu::Component.new(current_user: @current_user,
-            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user)
+          PageBlock::Navbar::UserSettingsMenu::Component.new(
+            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user
+          )
         end
 
         # item_class dresses the <li>, link_class the anchor inside it

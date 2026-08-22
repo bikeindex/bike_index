@@ -7,7 +7,7 @@ module UI
       attr_reader :sort_state
 
       # Pass cache_key to enable per-row fragment caching (e.g. cache_key: "admin-users").
-      def initialize(records:, sort_state: ComponentStates::SortState.new, cache_key: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false)
+      def initialize(records:, sort_state: ComponentStructs::SortState.new, cache_key: nil, classes: nil, unbordered: false, render_sortable: false, sticky: false)
         @records = records
         @sort_state = sort_state
         @cache_key = cache_key

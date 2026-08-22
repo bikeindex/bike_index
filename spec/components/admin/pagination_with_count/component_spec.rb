@@ -6,13 +6,13 @@ RSpec.describe Admin::PaginationWithCount::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
   # No pagy, so the pagination half doesn't render unless a context supplies one
-  let(:options) { {collection:, index: ComponentStates::IndexState.new} }
+  let(:options) { {collection:, index: ComponentStructs::IndexState.new} }
   let(:collection) { Bike.limit(10) }
 
   describe "time range" do
     let(:options) do
       {collection:, viewing: "Bikes",
-       index: ComponentStates::IndexState.new(period: "week", time_range: (Time.current - 1.week)..Time.current)}
+       index: ComponentStructs::IndexState.new(period: "week", time_range: (Time.current - 1.week)..Time.current)}
     end
 
     it "renders the humanized range" do
@@ -20,7 +20,7 @@ RSpec.describe Admin::PaginationWithCount::Component, type: :component do
     end
 
     context "with period all" do
-      let(:options) { super().merge(index: ComponentStates::IndexState.new(period: "all", time_range: (Time.current - 1.week)..Time.current)) }
+      let(:options) { super().merge(index: ComponentStructs::IndexState.new(period: "all", time_range: (Time.current - 1.week)..Time.current)) }
 
       it "renders no range" do
         expect(component.text).to_not include("in the past")
@@ -72,7 +72,7 @@ RSpec.describe Admin::PaginationWithCount::Component, type: :component do
     context "with a pagy" do
       # The page links resolve against the current route, so this one needs a request
       let(:component) { with_request_url("/admin/bikes") { render_inline(instance) } }
-      let(:options) { super().merge(index: ComponentStates::IndexState.new(pagy: Pagy::Offset.new(count: 100, limit: 25, page: 1), per_page: 25)) }
+      let(:options) { super().merge(index: ComponentStructs::IndexState.new(pagy: Pagy::Offset.new(count: 100, limit: 25, page: 1), per_page: 25)) }
 
       it "renders the per-page select and the page links" do
         expect(component.css("select#per_page_select")).to be_present

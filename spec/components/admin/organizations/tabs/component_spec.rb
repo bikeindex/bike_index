@@ -11,9 +11,34 @@ RSpec.describe Admin::Organizations::Tabs::Component, type: :component do
   it "renders the organization and every tab, with the active one marked" do
     expect(component).to have_content("Cool Bikes")
     expect(component.css("nav a").map { |tab| tab.text.squish })
-      .to eq ["Show", "Edit", "Locations 0", "Edit paid functionality", "Invoices"]
+      .to eq ["Show", "Edit", "Locations 0", "Invoices"]
     expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Show"]
     expect(component).to have_link("Edit", href: "/admin/organizations/#{organization.to_param}/edit")
+  end
+
+  describe "the paid functionality tab" do
+    it "is absent without paid features" do
+      expect(component).to_not have_link("Edit paid functionality")
+    end
+
+    context "with a paid organization" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, name: "Cool Bikes") }
+
+      it "renders" do
+        expect(component).to have_link("Edit paid functionality",
+          href: "/admin/organizations/#{organization.to_param}/edit?tab=paid_functionality")
+      end
+    end
+
+    # The page renders either way, saying there's nothing to configure
+    context "on the paid functionality tab unpaid" do
+      let(:active) { :paid_functionality }
+
+      it "renders it, active" do
+        expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish })
+          .to eq ["Edit paid functionality"]
+      end
+    end
   end
 
   describe "the SSO tab" do
@@ -109,6 +134,7 @@ RSpec.describe Admin::Organizations::Tabs::Component, type: :component do
 
     it "renders it, though display_dev_info? is false in test" do
       expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Custom layouts"]
+      expect(component.at_css("nav a[aria-current]")["class"]).to match(/only-dev-visible/)
     end
   end
 

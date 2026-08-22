@@ -328,6 +328,7 @@ RSpec.describe RegisterController, type: :request do
       expect { get "/register/embed?organization_id=#{organization.slug}" }.to change(BParam, :count).by 1
       expect(response.status).to eq 200
       expect(BParam.last.creation_organization_id).to eq organization.id
+      expect(BParam.last.origin).to eq "register_flow_landing_page"
 
       expect(response.body).to start_with("<!DOCTYPE html>")
       expect(response.body).to_not include("primary-header-nav")
@@ -340,6 +341,14 @@ RSpec.describe RegisterController, type: :request do
 
       # The session's still-blank registration, rather than one per view
       expect { get "/register/embed?organization_id=#{organization.slug}" }.to_not change(BParam, :count)
+    end
+
+    it "starts its own registration, rather than continuing the one /register began" do
+      expect { get new_register_path }.to change(BParam, :count).by 1
+      expect(BParam.last.origin).to eq "register_flow"
+
+      expect { get "/register/embed?organization_id=#{organization.slug}" }.to change(BParam, :count).by 1
+      expect(BParam.last.origin).to eq "register_flow_landing_page"
     end
 
     it "colors the button with the frame's ?button=, which the flow's own pages ignore" do
@@ -961,6 +970,21 @@ RSpec.describe RegisterController, type: :request do
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
         get register_path(b_param_token: b_param.id_token, step: 1)
         expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
+      end
+
+      # The origin Organized::RegistrationsController#new gives a registration
+      context "started from an organization" do
+        let(:b_param) do
+          BParam.create(origin: "register_flow_organized",
+            params: {bike: {owner_email:, manufacturer_id: "Trek"}}.as_json)
+        end
+
+        it "creates the bike, attributing it to the organized flow" do
+          expect {
+            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          }.to change(Bike, :count).by 1
+          expect(Bike.last.current_ownership.origin).to eq "register_flow_organized"
+        end
       end
 
       context "blank serial" do

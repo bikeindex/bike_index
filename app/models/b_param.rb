@@ -101,14 +101,14 @@ class BParam < ApplicationRecord
   scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
   # register/new shells whose step 1 was never submitted (manufacturer is required
   # at submit) - only seeds and a prefilled email, nothing worth keeping
-  scope :without_bike_values, -> { bike_params_empty.or(where(origin: "register_flow").where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
+  scope :without_bike_values, -> { bike_params_empty.or(where(origin: Ownership::ORIGIN_REG_FLOW).where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
   scope :unexpired, -> { where("created_at >= ?", Time.current - TOKEN_EXPIRATION) }
   # Tokenized lookups resume registrations for up to a month
   scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
   scope :unexpired_with_token, ->(toke) { unexpired.where(id_token: toke) }
   # Step 1 submitted, no bike yet, and the token still resumes it
   scope :unfinished_registrations, -> {
-    unexpired.without_bike.where(origin: "register_flow")
+    unexpired.without_bike.where(origin: Ownership::ORIGIN_REG_FLOW)
       .where("(params -> 'bike' -> 'manufacturer_id') IS NOT NULL")
   }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
@@ -309,9 +309,11 @@ class BParam < ApplicationRecord
   # self_made? last, and taking the user callers already hold, since it's the only clause
   # that queries: one made for someone else isn't the creator's bike to alert about
   def unfinished_registration?(user = creator)
-    !destroyed? && origin == "register_flow" && !with_bike? && manufacturer_id.present? &&
+    !destroyed? && register_flow? && !with_bike? && manufacturer_id.present? &&
       created_at.present? && created_at > Time.current - TOKEN_EXPIRATION && self_made?(user)
   end
+
+  def register_flow? = Ownership::ORIGIN_REG_FLOW.include?(origin)
 
   # Get it unscoped, because unregistered_bike notifications
   def created_bike
@@ -773,7 +775,7 @@ class BParam < ApplicationRecord
 
   # origin, so the API and embed forms don't pay for a lookup that can't alert
   def update_creator_alert
-    return if creator_id.blank? || origin != "register_flow"
+    return if creator_id.blank? || !register_flow?
 
     UserAlert.update_unfinished_registration(user: creator, b_param: self)
     UserAlert.refresh_alert_slugs(creator)

@@ -39,10 +39,11 @@ module PageBlock
         BAR = "tw:h-0.5 tw:w-5 tw:rounded-sm tw:bg-gray-900 tw:transition-all " \
           "tw:duration-200 tw:dark:bg-gray-300"
 
-        def initialize(organization:, current_user:, current_user_or_unconfirmed_user: nil)
+        # TODO: #4185 - remove old_register_view when removing the legacy org new bike iframe
+        def initialize(organization:, current_user:, old_register_view: false)
           @organization = organization
           @current_user = current_user
-          @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user || current_user
+          @old_register_view = old_register_view
         end
 
         def render?
@@ -52,8 +53,8 @@ module PageBlock
         private
 
         def items
-          @items ||= UserServices::MenuItemsOrg.for(organization: @organization, current_user: @current_user) +
-            super_admin_items
+          @items ||= UserServices::MenuItemsOrg.for(organization: @organization,
+            current_user: @current_user, old_register_view: @old_register_view) + super_admin_items
         end
 
         # Outside MenuItemsOrg's cache, which is keyed on the user record -- granting a
@@ -68,7 +69,6 @@ module PageBlock
 
         def account_menu
           PageBlock::Navbar::AccountMenu::Component.new(current_user: @current_user,
-            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user,
             current_organization: @organization, button_class: account_button_class)
         end
 

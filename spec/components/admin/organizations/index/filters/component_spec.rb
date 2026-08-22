@@ -5,8 +5,8 @@ require "rails_helper"
 RSpec.describe Admin::Organizations::Index::Filters::Component, type: :component do
   let(:search_params) { {search_kind: "bike_shop", search_pos: "lightspeed_pos"} }
   let(:index) do
-    ComponentStates::IndexState.new(params: search_params,
-      sort_state: ComponentStates::SortState.new(search_params:))
+    ComponentStructs::IndexState.new(params: search_params,
+      sort_state: ComponentStructs::SortState.new(search_params:))
   end
   let(:component) do
     with_request_url("/admin/organizations") do

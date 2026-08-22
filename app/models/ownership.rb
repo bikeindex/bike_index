@@ -64,8 +64,14 @@ class Ownership < ApplicationRecord
     impound_process: 11,
     transferred_ownership: 10,
     sticker: 13,
-    register_flow: 14
+    register_flow: 14,
+    register_flow_organized: 15,
+    register_flow_landing_page: 16
   }.freeze
+  # BParam#origin takes the same strings
+  ORIGIN_REG_FLOW = %w[register_flow register_flow_organized register_flow_landing_page].freeze
+  # Registered on bikeindex.org - not an embed form, the API, an import or a transfer
+  ORIGIN_WEBSITE_REG = (ORIGIN_REG_FLOW + %w[web organization_form sticker]).freeze
 
   enum :status, Bike::STATUS_ENUM
   enum :pos_kind, Organization::POS_KIND_ENUM

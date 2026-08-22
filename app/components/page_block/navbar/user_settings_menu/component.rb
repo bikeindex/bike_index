@@ -12,16 +12,14 @@ module PageBlock
         # that carries on dark
         LOGOUT = "tw:text-red-400! tw:hover:text-red-300!"
 
-        def initialize(current_user:, current_user_or_unconfirmed_user:)
-          @current_user = current_user
+        def initialize(current_user_or_unconfirmed_user:)
           @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user
         end
 
         private
 
         def items
-          UserServices::MenuItemsAccount.for(current_user: @current_user,
-            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user)
+          UserServices::MenuItemsAccount.for(user: @current_user_or_unconfirmed_user)
         end
 
         # .nav-link is the navbar's own, which the submenu's rows take with the rest of its links

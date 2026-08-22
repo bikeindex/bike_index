@@ -67,13 +67,13 @@ The admin layout has no `#navUserSettingLink`, so on an `/admin/...` route it re
 
 ## Capture
 
-Clear stale shots: `rm -f tmp/pr_screenshots/<branch>-<page>-*.png 2>/dev/null || true`.
+Make the directory and clear stale shots: `mkdir -p tmp/pr_screenshots && rm -f tmp/pr_screenshots/<branch>-<page>-*.png 2>/dev/null || true`. `browser_take_screenshot` errors with `ENOENT` rather than creating the directory, so a fresh workspace fails on the first capture.
 
 Two viewports — resize once each, then walk every URL:
 1. `browser_resize` 1440×900 → for each URL: navigate → settle → hide the footer → `browser_take_screenshot` (`fullPage: true`) to `...-desktop.png`.
 2. `browser_resize` 390×844 → same loop, also `fullPage: true` → `...-mobile.png`.
 
-**Full page, minus the footer, review-app banner and profiler badge, no `target:` arg.** Capture the whole page (`fullPage: true`) at **both** viewports so nothing below the fold is cut off, but first hide the site footer (identical on every page, just padding), the `#review-app-banner` topbar and the `.profiler-results` badge (both dev-only chrome that isn't part of the real page). **Keep the footer when the diff changes it** — the reason to hide it is that it carries no information, which stops being true the moment it's the subject. The profiler badge reports *this request's* timing, so leaving it in makes every before/after pair differ on a number no reviewer cares about. After each navigation (hiding doesn't persist across page loads), run:
+**Full page, minus the footer, review-app banner and profiler badge, no `target:` arg.** Capture the whole page (`fullPage: true`) at **both** viewports so nothing below the fold is cut off, but first hide the site footer (identical on every page, just padding), the `#review-app-banner` topbar and the `.profiler-results` badge (both dev-only chrome that isn't part of the real page). **Keep the footer when the diff changes it** — the reason to hide it is that it carries no information, which stops being true the moment it's the subject. The profiler badge reports *this request's* timing, so leaving it in makes every before/after pair differ on a number no reviewer cares about. After each navigation — and again immediately before the shot, since rack-mini-profiler injects `.profiler-results` after load — run:
 
 ```js
 browser_evaluate: () => {
@@ -90,6 +90,8 @@ browser_evaluate: () => {
 The donation modal is why that starts with a dismiss: a seeded user who hasn't donated gets it over the page on `/my_account` and friends, and it covers the whole shot rather than sitting in a corner.
 
 If the returned content height is **less than the viewport height**, `browser_resize` the height down to it before the shot (the `<html>` element's near-black background fills the gap otherwise), then resize back to the standard viewport before the next URL. Taller-than-viewport pages need no resize — `fullPage` scroll-stitches them.
+
+**An org-sidebar page taller than the viewport needs that resize upward instead.** The sidebar is `position: fixed`, so `fullPage` stitching leaves it at viewport height over the same near-black background — resize up to the content height before the shot.
 
 **Viewport-only is the caller's call, never yours.** When the caller asks for it — "viewport only", "above the fold", "just the mobile viewport" — drop `fullPage` for the size they named and leave the other one full page. Absent that, full page is the default at both sizes: a tall page, a sliver in a PR table cell, or a page whose change sits above the fold are none of them reasons to crop on your own.
 

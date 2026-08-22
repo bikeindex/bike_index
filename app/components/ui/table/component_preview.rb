@@ -70,7 +70,7 @@ module UI
       end
 
       def preview_sort_state(sort)
-        ComponentStates::SortState.new(search_params: {period: "all"}, sort:, direction: "desc")
+        ComponentStructs::SortState.new(search_params: {period: "all"}, sort:, direction: "desc")
       end
 
       def enthusiasm_colors
