@@ -4,24 +4,15 @@
 # that own their children. PageBlock::Navbar::OrgSidebar renders it and api/v3/me serves it,
 # cached per [organization, user].
 #
-# Item shapes:
-#   {type: :divider}
-#   {type: :group, key:, label:, icon:, children: [...]}
-#   {type: :link, label:, path:, icon:, match_paths:, match_params:}
-#   {type: :disabled, label:}
-#
-# A group whose children are all gated off doesn't render at all. `key` is what the
-# Stimulus controller opens and closes.
-#
-# `match_paths:` and `match_params:` are UI::ActiveLink's, which resolves them in the browser.
-# Nothing here depends on which page is current.
+# Its rows are ComponentStructs::Shapes'.
 module UserServices
   module MenuItemsOrg
     extend Functionable
 
     # UpdateOrganizationAssociationsJob touches every member user when an org
     # changes, so user.cache_key_with_version covers both per-user changes
-    # and org-feature changes.
+    # and org-feature changes. Nothing here depends on which page is current,
+    # so the key carries no path.
     def for(organization:, current_user:, old_register_view: false)
       return [] if organization.nil? || current_user.nil?
 
@@ -54,7 +45,7 @@ module UserServices
           reports_link(organization)],
         [settings_group(organization, admin)]]
         .map(&:compact).reject(&:empty?)
-        .inject { |items, section| items + [divider] + section }
+        .inject { |rows, section| rows + [shapes.divider] + section }
     end
 
     # Organized::BaseController bars an ambassador organization from every controller
@@ -62,25 +53,25 @@ module UserServices
     # the standard one with rows that only redirect
     def ambassador_items(organization)
       [
-        link(translation(:org_dashboard, org_name: organization.short_name),
+        shapes.link(translation(:org_dashboard, org_name: organization.short_name),
           routes.organization_ambassador_dashboard_path(organization_id: organization.to_param),
           icon: "bar-chart"),
-        link(translation(:resources),
+        shapes.link(translation(:resources),
           routes.resources_organization_ambassador_dashboard_path(organization_id: organization.to_param),
           icon: "list"),
-        link(translation(:getting_started),
+        shapes.link(translation(:getting_started),
           routes.getting_started_organization_ambassador_dashboard_path(organization_id: organization.to_param),
           icon: "graduation-cap"),
-        link(translation(:multi_search),
+        shapes.link(translation(:multi_search),
           routes.multi_search_organization_registrations_path(organization_id: organization.to_param),
           icon: "searcher"),
-        link(translation(:discuss), "https://discuss.bikeindex.org", icon: "chat")
+        shapes.link(translation(:discuss), "https://discuss.bikeindex.org", icon: "chat")
       ]
     end
 
     def registrations_group(organization)
       children = [
-        link(translation(:search_registrations),
+        shapes.link(translation(:search_registrations),
           routes.organization_registrations_path(organization_id: organization.to_param)),
         enabled_link(organization, "show_partial_registrations", translation(:incomplete_registrations),
           routes.incompletes_organization_bikes_path(organization.to_param)),
@@ -92,7 +83,7 @@ module UserServices
           routes.organization_stickers_path(organization_id: organization.to_param), section: true)
       ]
 
-      group(:registrations, translation(:org_registrations, org_name: organization.short_name), "bike", children)
+      shapes.group(:registrations, translation(:org_registrations, org_name: organization.short_name), "bike", children)
     end
 
     # The old view puts this row on organized/bikes#new, which the parking notification row
@@ -103,7 +94,7 @@ module UserServices
       else
         routes.new_organization_registration_path(organization.to_param)
       end
-      link(translation(:add_a_bike), path, icon: "plus-circle",
+      shapes.link(translation(:add_a_bike), path, icon: "plus-circle",
         match_params: {parking_notification: UI::ActiveLink::Component::BLANK})
     end
 
@@ -115,53 +106,53 @@ module UserServices
       return nil unless organization.enabled?("impound_bikes")
 
       children = [
-        link(translation(:search_impounded_vehicles),
+        shapes.link(translation(:search_impounded_vehicles),
           routes.organization_impound_records_path(organization_id: organization.to_param),
           section: true),
         (if organization.impound_claims?
-           link(translation(:impounded_claims),
+           shapes.link(translation(:impounded_claims),
              routes.organization_impound_claims_path(organization_id: organization.to_param),
              section: true)
          end),
-        disabled(translation(:add_an_impounded_vehicle))
+        shapes.disabled(translation(:add_an_impounded_vehicle))
       ]
 
-      group(:impounded, translation(:impounded_vehicles), "impound", children)
+      shapes.group(:impounded, translation(:impounded_vehicles), "impound", children)
     end
 
     def parking_group(organization)
       return nil unless organization.enabled?("parking_notifications")
 
       children = [
-        link(translation(:search_parking_notifications),
+        shapes.link(translation(:search_parking_notifications),
           routes.organization_parking_notifications_path(organization_id: organization.to_param)),
-        link(translation(:parking_notification_unregistered),
+        shapes.link(translation(:parking_notification_unregistered),
           routes.new_organization_bike_path(organization.to_param, parking_notification: true),
           match_params: {parking_notification: true})
       ]
 
-      group(:parking, translation(:parking_notifications_group), "map-pin", children)
+      shapes.group(:parking, translation(:parking_notifications_group), "map-pin", children)
     end
 
     def bulk_group(organization)
       import_label = organization.ascend_or_broken_ascend? ? translation(:ascend_imports) : translation(:bulk_imports)
       children = [
         (if organization.show_bulk_import?
-           link(import_label, routes.organization_bulk_imports_path(organization_id: organization.to_param),
+           shapes.link(import_label, routes.organization_bulk_imports_path(organization_id: organization.to_param),
              section: true)
          end),
         enabled_link(organization, "csv_exports", translation(:exports),
           routes.organization_exports_path(organization_id: organization.to_param), section: true)
       ]
 
-      group(:bulk, translation(:bulk_import_and_export), "import-export", children)
+      shapes.group(:bulk, translation(:bulk_import_and_export), "import-export", children)
     end
 
     # The route redirects to posintegration, which reads the id rather than the slug
     def lightspeed_link(organization)
       return nil unless organization.lightspeed_or_broken_lightspeed?
 
-      link(translation(:lightspeed_integration_panel),
+      shapes.link(translation(:lightspeed_integration_panel),
         routes.lightspeed_interface_path(organization_id: organization.id), icon: "lightspeed")
     end
 
@@ -172,10 +163,10 @@ module UserServices
       return nil unless admin
 
       if organization.enabled?("customize_emails")
-        link(translation(:messaging), routes.organization_emails_path(organization_id: organization.to_param),
+        shapes.link(translation(:messaging), routes.organization_emails_path(organization_id: organization.to_param),
           icon: "chat", section: true)
       elsif organization.enabled?("organization_stolen_message")
-        link(translation(:stolen_message),
+        shapes.link(translation(:stolen_message),
           routes.edit_organization_email_path("organization_stolen_message", organization_id: organization.to_param),
           icon: "chat")
       end
@@ -204,7 +195,7 @@ module UserServices
       return nil unless organization.overview_dashboard?
 
       dashboard = routes.organization_dashboard_index_path(organization_id: organization.to_param)
-      link(translation(:reports), dashboard, icon: "bar-chart",
+      shapes.link(translation(:reports), dashboard, icon: "bar-chart",
         match_paths: ["#{dashboard}/**", org_root(organization)])
     end
 
@@ -213,11 +204,11 @@ module UserServices
 
       sequences = routes.organization_registration_sequences_path(organization_id: organization.to_param)
       children = [
-        link(translation(:org_profile, org_name: organization.short_name),
+        shapes.link(translation(:org_profile, org_name: organization.short_name),
           routes.organization_manage_path(organization_id: organization.to_param)),
-        link(translation(:org_locations, org_name: organization.short_name),
+        shapes.link(translation(:org_locations, org_name: organization.short_name),
           routes.locations_organization_manage_path(organization_id: organization.to_param)),
-        link(translation(:manage_users),
+        shapes.link(translation(:manage_users),
           routes.organization_users_path(organization_id: organization.to_param), section: true),
         enabled_link(organization, "impound_bikes", translation(:impounding),
           routes.edit_organization_manage_impounding_path(organization_id: organization.to_param)),
@@ -228,19 +219,7 @@ module UserServices
           match_paths: ["#{sequences}/**", "#{org_root(organization)}/registration_sequence_pages/**"])
       ]
 
-      group(:settings, translation(:org_settings, org_name: organization.short_name), "gear", children)
-    end
-
-    def group(key, label, icon, children)
-      present = children.compact
-      return nil if present.none? { |child| child[:type] == :link }
-
-      {type: :group, key:, label:, icon:, children: present}
-    end
-
-    def link(label, path, icon: nil, section: false, **attributes)
-      covered = section ? {match_paths: "#{path}/**"} : {}
-      {type: :link, label:, path:, icon:, **covered, **attributes}
+      shapes.group(:settings, translation(:org_settings, org_name: organization.short_name), "gear", children)
     end
 
     def org_root(organization)
@@ -248,16 +227,10 @@ module UserServices
     end
 
     def enabled_link(organization, feature, label, path, **options)
-      link(label, path, **options) if organization.enabled?(feature)
+      shapes.link(label, path, **options) if organization.enabled?(feature)
     end
 
-    def disabled(label)
-      {type: :disabled, label:}
-    end
-
-    def divider
-      {type: :divider}
-    end
+    def shapes = ComponentStructs::Shapes
 
     def translation(key, **interpolations)
       I18n.t(key, scope: "shared.menu_items_org", **interpolations)
@@ -269,7 +242,7 @@ module UserServices
 
     conceal :build_items, :ambassador_items, :registrations_group, :add_bike_link, :impounded_group,
       :parking_group, :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link, :graduated_link,
-      :hot_sheet_link, :reports_link, :settings_group, :group, :link, :org_root, :enabled_link, :disabled,
-      :divider, :translation, :routes
+      :hot_sheet_link, :reports_link, :settings_group, :org_root, :enabled_link, :shapes,
+      :translation, :routes
   end
 end

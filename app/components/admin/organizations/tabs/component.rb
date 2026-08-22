@@ -30,18 +30,21 @@ module Admin
         private
 
         def tabs
-          [{tab: :show, label: "Show", href: admin_organization_path(@organization)},
-            {tab: :edit, label: "Edit", href: edit_tab_path},
-            {tab: :locations, label: "Locations", href: edit_tab_path(:locations),
-             count: @organization.locations.size},
-            {tab: :paid_functionality, label: "Edit paid functionality", href: edit_tab_path(:paid_functionality)},
-            {tab: :sso, label: "SSO", href: edit_tab_path(:sso)},
-            {tab: :invoices, label: "Invoices", href: admin_organization_invoices_path(organization_id: @organization)},
-            {tab: :custom_layouts, label: "Custom layouts", classes: "only-dev-visible",
-             href: admin_organization_custom_layouts_path(organization_id: @organization)}]
+          [shapes.tab("Show", admin_organization_path(@organization), tab: :show),
+            shapes.tab("Edit", edit_tab_path, tab: :edit),
+            shapes.tab("Locations", edit_tab_path(:locations),
+              count: @organization.locations.size, tab: :locations),
+            shapes.tab("Edit paid functionality", edit_tab_path(:paid_functionality), tab: :paid_functionality),
+            shapes.tab("SSO", edit_tab_path(:sso), tab: :sso),
+            shapes.tab("Invoices", admin_organization_invoices_path(organization_id: @organization),
+              tab: :invoices),
+            shapes.tab("Custom layouts", admin_organization_custom_layouts_path(organization_id: @organization),
+              classes: "only-dev-visible", tab: :custom_layouts)]
             .select { render_tab?(it[:tab]) }
             .map { it.except(:tab).merge(active: @active == it[:tab]) }
         end
+
+        def shapes = ComponentStructs::Shapes
 
         def edit_tab_path(tab = nil) = edit_admin_organization_path(@organization, tab:)
 

@@ -62,9 +62,8 @@ module PageBlock
         def super_admin_items
           return [] unless @current_user.superuser?
 
-          [{type: :link, super_admin: true,
-            label: translation(".in_super_admin", org_name: @organization.short_name),
-            path: admin_organization_path(@organization.to_param)}]
+          [ComponentStructs::Shapes.link(translation(".in_super_admin", org_name: @organization.short_name),
+            admin_organization_path(@organization.to_param), super_admin: true)]
         end
 
         def account_menu
