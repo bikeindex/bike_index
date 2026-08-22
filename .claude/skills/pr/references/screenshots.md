@@ -8,6 +8,15 @@ The flow: decide what to capture → capture the branch → upload → capture t
 
 **This phase needs `gh` *and* a browser signed in to GitHub. Missing either, skip the whole thing** — don't capture, don't upload, don't post anything in its place. Say in your summary that screenshots need a machine with both, and hand back the PR URL.
 
+**Check the login before capturing, not after.** The session lives in a storage-state file that expires without warning, so a signed-out browser is the ordinary case on a machine that has `gh` — and discovering it at upload time wastes the whole capture round, base-branch checkout included. One navigate settles it:
+
+```js
+browser_navigate({ url: "https://github.com" })
+browser_evaluate: () => document.querySelector('meta[name="user-login"]')?.content || 'signed out'
+```
+
+Empty or `signed out` → `github-pr-images`' [headless-relogin.md](../../github-pr-images/references/headless-relogin.md), which the user has to run; it can't be driven headlessly.
+
 The Claude Code web sandbox is the case that has neither: no GitHub CLI, and an MCP browser that rejects the egress proxy's CA, so github.com won't even load (`ERR_CERT_AUTHORITY_INVALID`) and a logged-in session can't be established headlessly. Capture alone would work there, which is the trap — PNGs nothing can host, and no way to post them.
 
 **Skipping means posting nothing at all**, not posting something else. Substitute evidence — a rendered-HTML diff, a note about what couldn't be captured — reads as a fine idea in the moment and leaves a comment the next run can't find or replace, because it isn't the `## Screenshots` comment. That's how #4126 ended up with three comments telling one story. If the evidence is worth having, put it in your summary to the user and let them decide where it goes.
