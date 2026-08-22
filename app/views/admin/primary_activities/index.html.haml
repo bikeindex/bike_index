@@ -1,10 +1,10 @@
 - nav_header_list_items = capture_haml do
   %li
     = render(UI::Dropdown::Component.new(name: @scope.blank? ? "All scopes" : "#{@scope.titleize} only", button_size: :sm, active: @scope.present?)) do |dropdown|
-      - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All scopes", path: url_for(sortable_search_params.merge(search_scope: nil)), match: :query, query: {search_scope: nil}) }
+      - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All scopes", path: url_for(sortable_search_params.merge(search_scope: nil)), match_params: {search_scope: nil}) }
       - dropdown.with_entry_divider
       - searchable_scopes.each do |kind|
-        - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.titleize} only", path: url_for(sortable_search_params.merge(search_scope: kind)), match: :query, query: {search_scope: kind}) }
+        - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.titleize} only", path: url_for(sortable_search_params.merge(search_scope: kind)), match_params: {search_scope: kind}) }
   %li
     = render(UI::ButtonLink::Component.new(text: "Show bike count", href: url_for(sortable_search_params.merge(search_show_count: !@search_show_count)), size: :sm, active: @search_show_count))
 
