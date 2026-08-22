@@ -13,10 +13,9 @@ module Admin
       NAV_LINK_CLASS = "tw:block tw:p-2 tw:no-underline tw:text-black/50 " \
         "tw:hover:text-black/70 tw:focus:text-black/70 tw:is-active:text-black/90"
 
-      def initialize(current_user:, user_root_url:, controller_path:, search_filtered: false)
+      def initialize(current_user:, user_root_url:, search_filtered: false)
         @current_user = current_user
         @user_root_url = user_root_url
-        @controller_path = controller_path
         @search_filtered = search_filtered
       end
 
@@ -74,19 +73,24 @@ module Admin
         current_nav_link.present? && !current_nav_link[:exact]
       end
 
+      # The narrowest entry covering the page, so an organization's invoices are the invoices
+      # index's rather than the organizations section they're nested under
       def current_nav_link
         return @current_nav_link if defined?(@current_nav_link)
 
-        @current_nav_link = nav_select_links.detect { |link| on_page?(link) } || nested_nav_link
+        covering = nav_select_links.filter_map do |link|
+          pattern = covering_pattern(link)
+          [link, pattern.count("/")] if pattern
+        end
+        @current_nav_link = covering.max_by(&:last)&.first
       end
 
       # The picker names the current page in prose, which UI::ActiveLink can't answer for it —
-      # the links themselves go active in the browser. An exact: entry is one action on another
-      # entry's controller, so only the request can say whether we're on it
-      def on_page?(link)
-        return helpers.current_page_active?(link[:path]) if link[:exact]
-
-        controller_for(link[:path]) == @controller_path
+      # the entries are picker options rather than links, bar the five shortcuts. What each
+      # covers is the patterns either way, so the two can't disagree about how wide a section is
+      def covering_pattern(link)
+        Array.wrap(match_paths_for(link))
+          .detect { |pattern| UI::ActiveLink::Component.covers?(pattern, request.path) }
       end
 
       def nav_link_for(path)
@@ -95,37 +99,14 @@ module Admin
 
       # An exact: entry is one action on a controller another entry owns -- most of
       # admin/dashboard's pages, duplicates on admin/bikes -- which would otherwise send
-      # every entry on that controller active at once
+      # every entry on that controller active at once. An entry's path is what the picker
+      # navigates to, so it carries the query a page needs and, once, an origin — no part
+      # of the page it names.
       def match_paths_for(link)
         return link[:match_paths] if link[:match_paths]
 
-        link[:exact] ? link[:path] : "#{link[:path]}/**"
-      end
-
-      # The links are all top level, so a controller nested under another - an organization's
-      # invoices, and its custom layouts - matches none of them
-      def nested_nav_link
-        section, parent, nested = @controller_path.split("/")
-        return if nested.blank?
-
-        link_for_controller("#{section}/#{nested}") || link_for_controller("#{section}/#{parent}")
-      end
-
-      def link_for_controller(controller_path)
-        nav_select_links.detect { |link| controller_for(link[:path]) == controller_path }
-      end
-
-      # Every link gets asked about twice over on a nested page, and recognizing a path costs
-      # ~20µs against the whole route set
-      def controller_for(path)
-        @controller_for ||= {}
-        return @controller_for[path] if @controller_for.key?(path)
-
-        @controller_for[path] = begin
-          Rails.application.routes.recognize_path(path)[:controller]
-        rescue ActionController::RoutingError
-          nil
-        end
+        path = UI::ActiveLink::Component.page_path(link[:path])
+        link[:exact] ? path : "#{path}/**"
       end
 
       def nav_select_links
@@ -151,7 +132,9 @@ module Admin
           {title: "Payments", path: admin_payments_path},
           {title: "Organization Features", path: admin_organization_features_path},
           {title: "Registration Sequences", path: admin_registration_sequences_path},
-          {title: "Invoices", path: admin_invoices_path(query: "active", direction: "asc", sort: "subscription_end_at")},
+          # An organization's invoices are the same section, on a path nested under theirs
+          {title: "Invoices", path: admin_invoices_path(query: "active", direction: "asc", sort: "subscription_end_at"),
+           match_paths: ["#{admin_invoices_path}/**", "#{admin_organizations_path}/*/invoices"]},
           {title: "Impound Records", path: admin_impound_records_path},
           {title: "Parking Notifications", path: admin_parking_notifications_path},
           {title: "Recoveries", path: admin_recoveries_path},

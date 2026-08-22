@@ -6,7 +6,8 @@ const trimSlash = (path) => path.length > 1 ? path.replace(/\/$/, '') : path
 const segmentsOf = (path) => trimSlash(path).split('/')
 
 // '*' stands for one segment and a trailing '**' for the rest, so /bikes/*/edit can't span a
-// slash and /o/x/exports/** covers the index it's rooted at as well as everything below it
+// slash and /o/x/exports/** covers the index it's rooted at as well as everything below it.
+// UI::ActiveLink::Component.covers? is the copy that answers for prose beside a link.
 const matchesPath = (pattern, path) => {
   const patternSegments = segmentsOf(pattern)
   const pathSegments = segmentsOf(path)

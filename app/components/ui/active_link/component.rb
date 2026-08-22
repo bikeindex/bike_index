@@ -15,15 +15,44 @@ module UI
       # own — its type, icon, children — and an absent key here takes initialize's default
       ITEM_KEYS = [:path, :match_paths, :match_params, :data, :id].freeze
 
-      # A menu manifest carries a link as a hash; what differs between the menus rendering one
-      # is the class, and text: for a row whose label sits inside a block with its icon
-      def self.from_item(item, html_class: nil, text: item[:label])
-        new(**item.slice(*ITEM_KEYS), text:, class: html_class)
+      class << self
+        # A menu manifest carries a link as a hash; what differs between the menus rendering
+        # one is the class, and text: for a row whose label sits inside a block with its icon
+        def from_item(item, html_class: nil, text: item[:label])
+          new(**item.slice(*ITEM_KEYS), text:, class: html_class)
+        end
+
+        # The page a URL names — neither its origin nor its query is part of that. A query
+        # arrives mid-pattern as well as at the end, since a route helper interpolated into
+        # one carries the locale param. A URL with no path of its own points at a root —
+        # someone else's, which the browser rules out on the origin.
+        def page_path(url)
+          url.to_s.sub(%r{\A[a-z]+://[^/]+}i, "").sub(%r{[?#][^/]*}, "").presence || "/"
+        end
+
+        # matchesPath in ui/active_link_controller.js, which answers this for a link itself.
+        # The copy is for prose beside one — Admin::Navbar names the current page in the
+        # picker, which no link can go active on its behalf.
+        def covers?(pattern, path)
+          patterns = segments_of(pattern)
+          paths = segments_of(path)
+          stopped = patterns.each_with_index.find do |segment, index|
+            segment == "**" || (segment != "*" && segment != paths[index])
+          end
+          return patterns.length == paths.length if stopped.nil?
+
+          stopped.first == "**"
+        end
+
+        private
+
+        # Rails' current_page? ignores a trailing slash on either side
+        def segments_of(path) = ((path.length > 1) ? path.delete_suffix("/") : path).split("/")
       end
 
       def initialize(path:, text: nil, match_paths: [], match_params: nil, data: {},
         **html_options)
-        @match_paths = Array.wrap(match_paths.presence || path).map { |url| page_path(url) }
+        @match_paths = Array.wrap(match_paths.presence || path).map { |url| self.class.page_path(url) }
         @match_paths.each { |pattern| raise_if_invalid_pattern!(pattern) }
         @match_params = match_params.presence&.to_h { |param, values| [param, param_values(param, values)] }
 
@@ -38,13 +67,6 @@ module UI
       end
 
       private
-
-      # A query arrives mid-pattern as well as at the end, since a route helper interpolated
-      # into one carries the locale param. A URL with no path of its own points at a root —
-      # someone else's, which the browser rules out on the origin.
-      def page_path(url)
-        url.to_s.sub(%r{\A[a-z]+://[^/]+}i, "").sub(%r{[?#][^/]*}, "").presence || "/"
-      end
 
       def raise_if_invalid_pattern!(pattern)
         raise ArgumentError, "match_paths: #{pattern} must start with /" unless pattern.start_with?("/")

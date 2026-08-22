@@ -230,4 +230,39 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
       expect(link.text).to eq "<script>alert(1)</script>"
     end
   end
+
+  # The link itself is matchesPath's, in ui/active_link_controller.js -- component_system_spec
+  # covers that copy, through the preview. This one answers for Admin::Navbar's prose.
+  describe ".covers?" do
+    def covers?(pattern, path) = described_class.covers?(pattern, path)
+
+    it "takes the path a pattern names, and nothing longer or shorter" do
+      expect(covers?("/admin/bikes", "/admin/bikes")).to be true
+      expect(covers?("/admin/bikes", "/admin/bikes/12")).to be false
+      expect(covers?("/admin/bikes", "/admin")).to be false
+      expect(covers?("/admin/bikes", "/admin/bike_stickers")).to be false
+    end
+
+    it "ignores a trailing slash on either side, the way current_page? does" do
+      expect(covers?("/admin/bikes/", "/admin/bikes")).to be true
+      expect(covers?("/admin/bikes", "/admin/bikes/")).to be true
+      expect(covers?("/", "/")).to be true
+    end
+
+    # The shape every section entry takes, so it covers its index as well as its sub-pages
+    it "takes everything below a trailing **, and the path it is rooted at" do
+      expect(covers?("/admin/bikes/**", "/admin/bikes")).to be true
+      expect(covers?("/admin/bikes/**", "/admin/bikes/12/edit")).to be true
+      expect(covers?("/admin/bikes/**", "/admin")).to be false
+      expect(covers?("/admin/bikes/**", "/admin/bike_stickers")).to be false
+    end
+
+    # The organizations-nested invoices in Admin::Navbar
+    it "takes one segment for a *, which can't span a slash" do
+      expect(covers?("/admin/organizations/*/invoices", "/admin/organizations/bike-shop/invoices")).to be true
+      expect(covers?("/admin/organizations/*/invoices", "/admin/organizations/invoices")).to be false
+      expect(covers?("/admin/organizations/*/invoices", "/admin/organizations/bike-shop/a/invoices")).to be false
+      expect(covers?("/admin/organizations/*", "/admin/organizations")).to be false
+    end
+  end
 end
