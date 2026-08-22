@@ -1,5 +1,6 @@
 <%= render(UI::Header::Component.new(html_class: "uncap")) do %>
-  Previewing <strong><%= @registration_sequence.status_display %></strong>
+  Previewing
+  <strong><%= @registration_sequence.status_display %> <%= @registration_sequence.kind_display %></strong>
   registration sequence
 <% end %>
 

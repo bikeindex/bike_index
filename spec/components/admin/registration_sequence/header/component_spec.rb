@@ -10,7 +10,7 @@ RSpec.describe Admin::RegistrationSequence::Header::Component, type: :component 
   it "names the organization and status, and links the sequence's three screens" do
     render_inline(described_class.new(registration_sequence:))
 
-    expect(page).to have_content("Viewing Brakebills Draft registration sequence", normalize_ws: true)
+    expect(page).to have_content("Viewing Brakebills E-Vehicle Draft registration sequence", normalize_ws: true)
     expect(page).to have_link("View", href: admin_url)
     expect(page).to have_link("Preview", href: "#{admin_url}/preview")
     expect(page).to have_link("Edit", href: "#{admin_url}/edit")
@@ -26,7 +26,7 @@ RSpec.describe Admin::RegistrationSequence::Header::Component, type: :component 
   it "marks the screen it's on" do
     render_inline(described_class.new(registration_sequence:, mode: :preview))
 
-    expect(page).to have_content("Previewing Brakebills Draft", normalize_ws: true)
+    expect(page).to have_content("Previewing Brakebills E-Vehicle Draft", normalize_ws: true)
     expect(page).to have_css("a[data-active='true']", count: 1)
     expect(page).to have_css("a[data-active='true']", text: "Preview")
   end
@@ -41,7 +41,7 @@ RSpec.describe Admin::RegistrationSequence::Header::Component, type: :component 
     it "offers Edit as a disabled button - activation freezes it" do
       render_inline(described_class.new(registration_sequence:, mode: :edit))
 
-      expect(page).to have_content("Editing Brakebills Current", normalize_ws: true)
+      expect(page).to have_content("Editing Brakebills E-Vehicle Current", normalize_ws: true)
       expect(page).to_not have_link("Edit")
       expect(page).to have_css("button[disabled]", text: "Edit")
       # A disabled button can't be hovered, so the tooltip carries the reason
@@ -50,7 +50,7 @@ RSpec.describe Admin::RegistrationSequence::Header::Component, type: :component 
       expect(page).to have_link("View", href: admin_url)
       expect(page).to have_link("Preview", href: "#{admin_url}/preview")
       # What the inert Edit chip points at instead
-      expect(page).to have_css("form[action='/admin/registration_sequences?organization_id=#{organization.id}'] button",
+      expect(page).to have_css("form[action='/admin/registration_sequences?kind=e_vehicle&organization_id=#{organization.id}'] button",
         text: "Create draft")
       expect(page).to_not have_button("Activate")
     end
@@ -83,7 +83,7 @@ RSpec.describe Admin::RegistrationSequence::Header::Component, type: :component 
     it "names the template's status, with no organization to view it in" do
       render_inline(described_class.new(registration_sequence:))
 
-      expect(page).to have_content("Viewing Template Draft registration sequence", normalize_ws: true)
+      expect(page).to have_content("Viewing Template E-Vehicle Draft registration sequence", normalize_ws: true)
       expect(page).to have_link("Edit", href: "#{admin_url}/edit")
       expect(page).to_not have_link("View in organization")
       expect(page).to have_button("Activate")
@@ -95,9 +95,9 @@ RSpec.describe Admin::RegistrationSequence::Header::Component, type: :component 
       it "is frozen like any live sequence, and drafts without an organization" do
         render_inline(described_class.new(registration_sequence:, mode: :edit))
 
-        expect(page).to have_content("Editing Template Current registration sequence", normalize_ws: true)
+        expect(page).to have_content("Editing Template E-Vehicle Current registration sequence", normalize_ws: true)
         expect(page).to have_css("button[disabled]", text: "Edit")
-        expect(page).to have_css("form[action='/admin/registration_sequences'] button", text: "Create draft")
+        expect(page).to have_css("form[action='/admin/registration_sequences?kind=e_vehicle'] button", text: "Create draft")
       end
     end
   end

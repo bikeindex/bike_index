@@ -2,7 +2,7 @@
 
 module Register
   module StepAcknowledgment
-    # One page of the organization's e-vehicle safety rules. Every rule has to be
+    # One page of the organization's safety rules. Every rule has to be
     # checked before the flow moves on, so the page is agreed to as a whole.
     class Component < ApplicationComponent
       def initialize(b_param:, sequence:, step:, steps:)

@@ -21,9 +21,13 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
   it "builds a draft from the template, then edits a page and the sequence" do
     visit "/o/#{organization.to_param}/registration_sequences"
 
+    # A section per kind, each managed on its own
+    expect(page).to have_css("h2", text: "E-Vehicle registrations")
+    expect(page).to have_css("h2", text: "Non-e-vehicle registrations")
+
     # Build the draft (cloned from the seeded template) and open the management view
-    click_button "Create a sequence"
-    expect(page).to have_content("Draft registration sequence")
+    within("#registration_sequences_e_vehicle") { click_button "Create a sequence" }
+    expect(page).to have_content("Draft E-Vehicle registration sequence")
     expect(page).to have_content("Batteries & charging") # cloned from the template
 
     # --- Edit the sequence: add a page. Done before the page edit so the success flash from a
@@ -80,7 +84,7 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
 
   it "gates each preview page on its rules like the real flow, then finishes to editing" do
     visit "/o/#{organization.to_param}/registration_sequences"
-    click_button "Create a sequence"
+    within("#registration_sequences_e_vehicle") { click_button "Create a sequence" }
 
     click_link "Preview"
     # Continue is disabled until every rule is checked - the same register--acknowledgment
@@ -96,7 +100,7 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
     expect(page).to have_content("almost done") # the review screen
     click_button "Finish preview"
 
-    expect(page).to have_content("Draft registration sequence") # back in the editor
+    expect(page).to have_content("Draft E-Vehicle registration sequence") # back in the editor
   end
 
   # Drives the bullet-editors Stimulus controller end-to-end (add a row, clone the <template>,
@@ -105,7 +109,7 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
   # too. That specific regression is guarded by spec/javascript_controller_imports_spec.rb.
   it "adds a bullet to a page that already has bullets" do
     visit "/o/#{organization.to_param}/registration_sequences"
-    click_button "Create a sequence"
+    within("#registration_sequences_e_vehicle") { click_button "Create a sequence" }
     click_link "Edit", match: :first
     expect(page).to have_css("lexxy-editor lexxy-toolbar", wait: 10) # editors upgrade lazily
 

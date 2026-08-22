@@ -7,20 +7,37 @@
     )) do |dropdown|
       dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All statuses", path: url_for(sortable_search_params.merge(search_status: nil)), match: :query, query: {search_status: nil}) }
       dropdown.with_entry_divider
-      searchable_statuses.each do |kind|
-        dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.titleize} only", path: url_for(sortable_search_params.merge(search_status: kind)), match: :query, query: {search_status: kind}) }
+      searchable_statuses.each do |status|
+        dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{status.titleize} only", path: url_for(sortable_search_params.merge(search_status: status)), match: :query, query: {search_status: status}) }
       end
     end %>
   </li>
 
   <li>
-    <% if @template.present? %>
-      <%= render(UI::ButtonLink::Component.new(text: "#{@template.display_name} sequence", href: RegistrationSequencePaths.sequence(@template, admin: true), size: :sm)) %>
-    <% else %>
-      <%# Nothing for organizations to clone yet - the first template is drafted here %>
-      <%= render UI::ButtonLink::Component.new(text: "Create template", href: RegistrationSequencePaths.create_draft(nil), method: :post, color: :primary, size: :sm) %>
-    <% end %>
+    <%= render(UI::Dropdown::Component.new(
+      name: @kind.present? ? "#{RegistrationSequence.kind_display(@kind)} only" : "All kinds",
+      button_size: :sm,
+      active: @kind.present?
+    )) do |dropdown|
+      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All kinds", path: url_for(sortable_search_params.merge(search_kind: nil)), match: :query, query: {search_kind: nil}) }
+      dropdown.with_entry_divider
+      searchable_kinds.each do |kind|
+        dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{RegistrationSequence.kind_display(kind)} only", path: url_for(sortable_search_params.merge(search_kind: kind)), match: :query, query: {search_kind: kind}) }
+      end
+    end %>
   </li>
+
+  <%# One template per kind - organizations clone whichever matches what they're registering %>
+  <% @templates.each do |kind, template| %>
+    <li>
+      <% if template.present? %>
+        <%= render(UI::ButtonLink::Component.new(text: "#{template.display_name} sequence", href: RegistrationSequencePaths.sequence(template, admin: true), size: :sm)) %>
+      <% else %>
+        <%# Nothing for organizations to clone yet - the first template is drafted here %>
+        <%= render UI::ButtonLink::Component.new(text: "Create #{RegistrationSequence.kind_display(kind)} template", href: RegistrationSequencePaths.create_draft(nil, kind:, admin: true), method: :post, color: :primary, size: :sm) %>
+      <% end %>
+    </li>
+  <% end %>
 <% end %>
 
 <%= render(Admin::IndexSkeleton::Component.new(

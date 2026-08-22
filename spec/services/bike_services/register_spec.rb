@@ -572,10 +572,22 @@ RSpec.describe BikeServices::Register do
       context "not an e-vehicle" do
         let(:bike_params) { super().merge(cycle_type: "bike") }
 
-        it "is nil - only e-vehicles acknowledge safety rules" do
+        it "is nil - the e-vehicle sequence isn't what a bike acknowledges" do
           expect(b_param.motorized?).to be_falsey
           expect(described_class.registration_sequence(b_param)).to be_nil
           expect(described_class.steps(b_param, sequence: nil).count).to eq 2
+        end
+
+        context "with the organization's non-e-vehicle sequence" do
+          let!(:non_e_vehicle_sequence) do
+            FactoryBot.create(:registration_sequence_active, :non_e_vehicle, :with_pages, organization:)
+          end
+
+          it "is that sequence" do
+            expect(described_class.registration_sequence(b_param)).to eq non_e_vehicle_sequence
+            # Two detail steps, a page each and the review
+            expect(described_class.steps(b_param, sequence: non_e_vehicle_sequence).count).to eq 5
+          end
         end
       end
 

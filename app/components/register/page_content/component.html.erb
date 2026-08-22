@@ -1,5 +1,5 @@
 <div class="tw:mb-3">
-  <% if @first %>
+  <% if electric_detected? %>
     <%= render UI::Badge::Component.new(text: translation(".electric_detected"), color: :warning) %>
   <% elsif @page.organization_specific && badge_name.present? %>
     <%= render UI::Badge::Component.new(text: badge_name, color: :notice) %>
@@ -18,7 +18,7 @@
     <%= render UI::Tooltip::Component.new(text: translation(".have_questions")) do |tooltip| %>
       <% tooltip.with_body do %>
         <%= translation(".have_questions") %>
-        <%= link_to translation(".read_the_faq"), sequence.faq_url, target: "_blank", rel: "noopener", class: "twlink" %>
+        <%= link_to translation(".read_the_faq.#{sequence.kind}"), sequence.faq_url, target: "_blank", rel: "noopener", class: "twlink" %>
       <% end %>
     <% end %>
   <% end %>

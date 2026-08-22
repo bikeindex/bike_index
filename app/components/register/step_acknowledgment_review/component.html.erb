@@ -3,7 +3,7 @@
   <%= render Register::Progress::Component.new(steps: @steps, step: "review") %>
 
   <%# The last acknowledgment step, not a finished one - the acknowledgment is still unsigned %>
-  <%= render Register::AcknowledgmentProgress::Component.new(number: acknowledgment_step_count,
+  <%= render Register::AcknowledgmentProgress::Component.new(sequence: @sequence, number: acknowledgment_step_count,
       total: acknowledgment_step_count) %>
 
   <%= render Register::ReviewSummary::Component.new(pages:, page_path: method(:page_path)) %>

@@ -6,7 +6,8 @@
     <% end %>
   <% else %>
     <%= render(UI::Header::Component.new(html_class: "uncap tw:mb-0!")) do %>
-      <%= @registration_sequence.status_display %> registration sequence
+      <%= @registration_sequence.status_display %>
+      <%= @registration_sequence.kind_display %> registration sequence
       <span class="tw:text-xl tw:font-normal tw:whitespace-nowrap tw:text-gray-500">· <%= helpers.number_display(pages.size) %> <%= "page".pluralize(pages.size) %></span>
     <% end %>
   <% end %>
@@ -38,7 +39,7 @@
           <%= f.label :acknowledgment_text, "Final acknowledgment", class: "twlabel" %>
 
           <%= f.text_area :acknowledgment_text, rows: 3, class: "twinput tw:w-full",
-              placeholder: RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT %>
+              placeholder: @registration_sequence.default_acknowledgment %>
 
           <p class="tw:mt-1 tw:mb-0 tw:text-sm tw:text-gray-500">
             Follows "I, <em>registrant's name</em>," on the last page, where the

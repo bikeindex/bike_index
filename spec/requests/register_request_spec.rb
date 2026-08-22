@@ -1423,11 +1423,50 @@ RSpec.describe RegisterController, type: :request do
                           creation_organization_id: organization.id}}.as_json)
       end
 
-      it "completes at step 2, with no safety pages" do
+      it "completes at step 2 - the e-vehicle sequence isn't what a bike acknowledges" do
         expect {
           patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
         }.to change(Bike, :count).by 1
         expect(response).to redirect_to step_path("finished")
+      end
+
+      context "with the organization's non-e-vehicle sequence" do
+        let(:non_e_vehicle_sequence) do
+          FactoryBot.create(:registration_sequence, :non_e_vehicle, organization:,
+            acknowledgment_text: "agree to the bike rules")
+        end
+        let!(:riding_page) do
+          FactoryBot.create(:registration_sequence_page, registration_sequence: non_e_vehicle_sequence,
+            listing_order: 0, title: "Riding practices", heading: "A few campus rules before you finish",
+            body: "<ul><li>Yield to pedestrians</li></ul>")
+        end
+
+        before { non_e_vehicle_sequence.make_active! }
+
+        it "walks that sequence's pages instead" do
+          expect {
+            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          }.to_not change(Bike, :count)
+          expect(response).to redirect_to step_path("3")
+
+          follow_redirect!
+          expect(response.body).to include "A few campus rules before you finish"
+          expect(response.body).to include "Yield to pedestrians"
+          expect(response.body).to include "Registration Acknowledgment · Step 1 of 2"
+          # Nothing about this registration is electric, so it isn't announced as such
+          expect(response.body).to_not include "Electric (motorized) detected"
+
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
+                                                    acknowledged: {"0" => "1"}}
+          expect(response).to redirect_to step_path("review")
+
+          expect {
+            patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
+          }.to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment, :count).by(1)
+          expect(RegistrationSequenceAcknowledgment.last)
+            .to have_attributes(registration_sequence_id: non_e_vehicle_sequence.id,
+              acknowledgment_text: "agree to the bike rules")
+        end
       end
     end
   end

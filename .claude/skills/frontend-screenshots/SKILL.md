@@ -144,7 +144,18 @@ When the caller wants before/after, repeat the capture loop against the base ref
 **The detached checkout in step 3 is a sanctioned exception to "never change branch" — don't stop and ask for it.** It is the only one: it detaches at a *remote* ref, reads, and returns to the same branch within this section, committing nothing. The return to the original branch is part of that sequence, not a second exception. Every other reason to leave the current branch still needs the user's say-so — nothing here licenses checking out some other branch, `git checkout -b`, or a checkout that outlives the capture.
 
 1. `git status` — abort if there are uncommitted changes.
-2. Diff `db/migrate/` between the branch and `$BASE_REF`; abort if it changed — a branch-only migration leaves the DB schema ahead of the base's code, so base pages can error.
+2. Check the branch's migrations, and abort if one takes something away from the base's code rather than adding to it. Read the `up`/`change` body only — nearly every additive migration undoes itself in `down`, so scanning whole files false-aborts on all of them:
+
+   ```bash
+   for f in $(git diff "$BASE_REF"...HEAD --name-only --diff-filter=AM -- db/migrate db/analytics_migrate); do
+     git show "HEAD:$f" | sed -E -n '/def (up|change)/,/^  end/p' |
+       grep -E 'remove_|rename_|drop_|change_column|null: false' | sed "s|^|$f: |"
+   done
+   ```
+
+   Judge the hits, don't count them — this surfaces candidates, it doesn't reach the verdict. Dropping, renaming or retyping a column or table aborts, because the base still selects it. An index change doesn't, since no query names an index. `null: false` aborts only without a `default:`, which would break the base's writes rather than its reads.
+
+   Never roll a migration back to capture the base — that churns the dev DB for a screenshot.
 3. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout --detach $BASE_REF` (detached — checking out a branch name fails if a sibling worktree holds it; detached HEAD at the remote ref is allowed concurrently and is the same code), navigate the browser to force Rails to reload the changed files, repeat capture into `...-base-...` filenames, then `git checkout $BRANCH`.
 
 A `Gemfile.lock` diff is **not** a reason to abort.
@@ -158,7 +169,7 @@ magick compare <base>.png <branch>.png -compose src d.png && magick identify -fo
 
 The bounding box is what settles it: dev-only chrome that slipped past the hide step lands in one small box, a real change doesn't.
 
-The seeded DB persists across checkouts, so the existing session usually still works. Preview routes (`/rails/view_components/...`, `/lookbook/...`) reload across the checkout like ordinary pages, so their before/after works against any `$BASE_REF` too.
+The seeded DB persists across checkouts, so the existing session usually still works — and the base renders rows the branch created, which is worth a line in the PR comment when that makes the base mislabel one. Preview routes (`/rails/view_components/...`, `/lookbook/...`) reload across the checkout like ordinary pages, so their before/after works against any `$BASE_REF` too.
 
 ## Clean up
 

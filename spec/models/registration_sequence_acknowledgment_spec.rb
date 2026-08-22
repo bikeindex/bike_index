@@ -29,7 +29,7 @@ RSpec.describe RegistrationSequenceAcknowledgment, type: :model do
 
       it "falls back to the default" do
         expect(described_class.create_for(b_param, sequence:).acknowledgment_text)
-          .to eq RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT
+          .to eq RegistrationSequence.default_acknowledgment("e_vehicle")
       end
     end
   end

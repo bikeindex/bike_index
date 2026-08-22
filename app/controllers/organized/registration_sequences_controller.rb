@@ -4,10 +4,8 @@ module Organized
     before_action :ensure_access_to_edit_registration_sequences!, except: %i[index show]
     helper_method :can_edit_registration_sequences?
 
+    # The kind sections load their own sequences
     def index
-      @draft = current_organization.registration_sequences.draft.first if can_edit_registration_sequences?
-      @active = RegistrationSequence.active_for(current_organization)
-      @previous = current_organization.registration_sequences.archived.order(end_at: :desc).to_a
     end
 
     # The faked registrant walk-through, one screen (?page=) per rule page plus the review
@@ -39,7 +37,7 @@ module Organized
 
     # Opens the draft the org manages, cloning the live sequence (or the template) on first edit
     def create
-      draft = RegistrationSequence.draft_for(current_organization)
+      draft = RegistrationSequence.draft_for(current_organization, kind: RegistrationSequence.permitted_kind(params[:kind]))
       redirect_to edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: draft.id)
     end
 

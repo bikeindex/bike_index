@@ -4,26 +4,26 @@ RSpec.describe RegistrationSequence, type: :model do
   # The template is the sequence no organization owns, so nil is its organization throughout
   describe ".draft_for(nil) - the template's draft" do
     it "starts an empty draft - nothing sits above the template to clone" do
-      expect { RegistrationSequence.draft_for(nil) }.to change(RegistrationSequence, :count).by(1)
+      expect { RegistrationSequence.draft_for(nil, kind: "e_vehicle") }.to change(RegistrationSequence, :count).by(1)
 
-      template_draft = RegistrationSequence.draft_for(nil)
+      template_draft = RegistrationSequence.draft_for(nil, kind: "e_vehicle")
       expect(template_draft).to be_template
       expect(template_draft).to be_draft
       expect(template_draft.registration_sequence_pages).to be_empty
 
-      expect { RegistrationSequence.draft_for(nil) }.to_not change(RegistrationSequence, :count)
+      expect { RegistrationSequence.draft_for(nil, kind: "e_vehicle") }.to_not change(RegistrationSequence, :count)
     end
 
     context "with a live template" do
       let!(:active) { FactoryBot.create(:registration_sequence_template_active, :with_pages) }
 
       it "clones the live template, and .active_template stays the live one" do
-        template_draft = RegistrationSequence.draft_for(nil)
+        template_draft = RegistrationSequence.draft_for(nil, kind: "e_vehicle")
 
         expect(template_draft).to be_template
         expect(template_draft).to be_draft
         expect(template_draft.registration_sequence_pages.count).to eq 2
-        expect(RegistrationSequence.active_template).to eq active
+        expect(RegistrationSequence.active_template(kind: "e_vehicle")).to eq active
       end
     end
   end
@@ -39,7 +39,7 @@ RSpec.describe RegistrationSequence, type: :model do
         organization_specific: true)
       template.make_active!
 
-      draft = RegistrationSequence.draft_for(organization)
+      draft = RegistrationSequence.draft_for(organization, kind: "e_vehicle")
 
       expect(draft).to be_draft
       expect(draft).to have_attributes(organization:, faq_url: "https://example.com/faq",
@@ -51,8 +51,8 @@ RSpec.describe RegistrationSequence, type: :model do
     end
 
     it "falls back to the default acknowledgment when there's no live template" do
-      expect(RegistrationSequence.draft_for(organization).acknowledgment)
-        .to eq RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT
+      expect(RegistrationSequence.draft_for(organization, kind: "e_vehicle").acknowledgment)
+        .to eq RegistrationSequence.default_acknowledgment("e_vehicle")
     end
 
     it "duplicates template page images into independent blobs" do
@@ -62,7 +62,7 @@ RSpec.describe RegistrationSequence, type: :model do
       template_page.image.attach(io: StringIO.new("fake image"), filename: "battery.jpg", content_type: "image/jpeg")
       template.make_active!
 
-      page = RegistrationSequence.draft_for(organization).registration_sequence_pages.first
+      page = RegistrationSequence.draft_for(organization, kind: "e_vehicle").registration_sequence_pages.first
 
       expect(page.image).to be_attached
       # A distinct blob means destroying the clone won't purge the template's image
@@ -82,7 +82,7 @@ RSpec.describe RegistrationSequence, type: :model do
           body: "<ul><li>from template</li></ul>", listing_order: 0)
         template.make_active!
 
-        draft = RegistrationSequence.draft_for(organization)
+        draft = RegistrationSequence.draft_for(organization, kind: "e_vehicle")
 
         expect(draft.faq_url).to eq "https://example.com/live"
         expect(draft.registration_sequence_pages.pluck(:title))
@@ -95,8 +95,8 @@ RSpec.describe RegistrationSequence, type: :model do
       let!(:existing) { FactoryBot.create(:registration_sequence, organization:) }
 
       it "returns the existing draft without creating another" do
-        expect { RegistrationSequence.draft_for(organization) }.to_not change(RegistrationSequence, :count)
-        expect(RegistrationSequence.draft_for(organization)).to eq(existing)
+        expect { RegistrationSequence.draft_for(organization, kind: "e_vehicle") }.to_not change(RegistrationSequence, :count)
+        expect(RegistrationSequence.draft_for(organization, kind: "e_vehicle")).to eq(existing)
       end
     end
 
@@ -106,10 +106,10 @@ RSpec.describe RegistrationSequence, type: :model do
       it "rescues RecordNotUnique and returns the existing draft" do
         drafts = RegistrationSequence.draft
         allow(RegistrationSequence).to receive(:draft).and_return(drafts)
-        allow(drafts).to receive(:find_by).with(organization:).and_return(nil)
+        allow(drafts).to receive(:find_by).with(organization:, kind: "e_vehicle").and_return(nil)
         allow(RegistrationSequence).to receive(:build_draft_for).and_raise(ActiveRecord::RecordNotUnique)
 
-        expect(RegistrationSequence.draft_for(organization)).to eq(existing)
+        expect(RegistrationSequence.draft_for(organization, kind: "e_vehicle")).to eq(existing)
       end
     end
   end
@@ -170,36 +170,86 @@ RSpec.describe RegistrationSequence, type: :model do
     let!(:template_draft) { FactoryBot.create(:registration_sequence_template, :with_pages) }
 
     it "activates, freezes, and is superseded by the next draft" do
-      expect(template_draft.display_name).to eq "Template Draft"
-      expect(RegistrationSequence.active_template).to be_nil
+      expect(template_draft.display_name).to eq "Template E-Vehicle Draft"
+      expect(RegistrationSequence.active_template(kind: "e_vehicle")).to be_nil
 
       expect(template_draft.make_active!).to be_truthy
       expect(template_draft.reload).to be_active
-      expect(template_draft.display_name).to eq "Template Current"
-      expect(RegistrationSequence.active_template).to eq template_draft
+      expect(template_draft.display_name).to eq "Template E-Vehicle Current"
+      expect(RegistrationSequence.active_template(kind: "e_vehicle")).to eq template_draft
 
       # Frozen like any live sequence - editing means a new draft
       expect(template_draft.update(faq_url: "https://example.com/faq")).to be_falsey
 
-      replacement = RegistrationSequence.draft_for(nil)
+      replacement = RegistrationSequence.draft_for(nil, kind: "e_vehicle")
       expect(replacement.id).to_not eq template_draft.id
       expect(replacement.make_active!).to be_truthy
 
       expect(template_draft.reload).to be_archived
-      expect(RegistrationSequence.active_template).to eq replacement
+      expect(RegistrationSequence.active_template(kind: "e_vehicle")).to eq replacement
       expect(RegistrationSequence.templates.active.count).to eq 1
     end
 
-    it "permits only one template draft" do
+    it "permits only one template draft of the kind" do
       expect { FactoryBot.create(:registration_sequence_template) }
         .to raise_error(ActiveRecord::RecordNotUnique)
+
+      expect(FactoryBot.create(:registration_sequence_template, :non_e_vehicle)).to be_valid
     end
 
-    it "permits only one live template" do
+    it "permits only one live template of the kind" do
       template_draft.make_active!
 
       expect { FactoryBot.create(:registration_sequence_template_active) }
         .to raise_error(ActiveRecord::RecordNotUnique)
+
+      expect(FactoryBot.create(:registration_sequence_template_active, :non_e_vehicle, :with_pages))
+        .to be_active
+    end
+  end
+
+  describe ".permitted_kind" do
+    it "defaults a link without a kind, and refuses one that isn't a kind" do
+      expect(RegistrationSequence.permitted_kind(nil)).to eq "e_vehicle"
+      expect(RegistrationSequence.permitted_kind(:non_e_vehicle)).to eq "non_e_vehicle"
+      expect { RegistrationSequence.permitted_kind("nonevehicle") }
+        .to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
+  describe "the kinds side by side" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:template) { FactoryBot.create(:registration_sequence_template_active, :with_pages) }
+    let!(:non_e_vehicle_template) do
+      FactoryBot.create(:registration_sequence_template_active, :non_e_vehicle, :with_pages,
+        acknowledgment_text: "agree to the bike rules")
+    end
+
+    it "drafts, activates and looks up each kind independently" do
+      draft = RegistrationSequence.draft_for(organization, kind: "non_e_vehicle")
+
+      expect(draft).to be_non_e_vehicle
+      expect(draft.acknowledgment).to eq "agree to the bike rules"
+      expect(draft.display_name).to eq "#{organization.short_name} Non-e-vehicle Draft"
+      # The organization's other kind is untouched by this one's draft
+      expect(RegistrationSequence.existing_draft_for(organization, kind: "e_vehicle")).to be_nil
+
+      expect(draft.make_active!).to be_truthy
+      expect(RegistrationSequence.active_for(organization, kind: "non_e_vehicle")).to eq draft
+      expect(RegistrationSequence.active_for(organization, kind: "e_vehicle")).to be_nil
+      # Without one of its own, an e-vehicle registration still falls back to the template
+      expect(RegistrationSequence.active_or_template_for(organization, kind: "e_vehicle")).to eq template
+    end
+
+    it "permits one active sequence per kind per organization" do
+      FactoryBot.create(:registration_sequence_active, :with_pages, organization:)
+
+      expect { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+        .to raise_error(ActiveRecord::RecordNotUnique)
+
+      expect(FactoryBot.create(:registration_sequence_active, :non_e_vehicle, :with_pages, organization:))
+        .to be_active
+      expect(organization.registration_sequences.active.count).to eq 2
     end
   end
 

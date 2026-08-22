@@ -8,6 +8,7 @@
 #  deleted_at          :datetime
 #  end_at              :datetime
 #  faq_url             :string
+#  kind                :integer          default("e_vehicle"), not null
 #  start_at            :datetime
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
@@ -17,29 +18,39 @@
 #
 #  index_registration_sequences_on_deleted_at        (deleted_at)
 #  index_registration_sequences_on_organization_id   (organization_id)
-#  index_registration_sequences_one_active_per_org   (organization_id) UNIQUE WHERE ((start_at IS NOT NULL) AND (end_at IS NULL) AND (deleted_at IS NULL))
-#  index_registration_sequences_one_active_template  (((organization_id IS NULL))) UNIQUE WHERE ((organization_id IS NULL) AND (start_at IS NOT NULL) AND (end_at IS NULL) AND (deleted_at IS NULL))
-#  index_registration_sequences_one_draft_per_org    (organization_id) UNIQUE WHERE ((start_at IS NULL) AND (organization_id IS NOT NULL) AND (deleted_at IS NULL))
-#  index_registration_sequences_one_draft_template   (((organization_id IS NULL))) UNIQUE WHERE ((organization_id IS NULL) AND (start_at IS NULL) AND (deleted_at IS NULL))
+#  index_registration_sequences_one_active_per_org   (organization_id,kind) UNIQUE WHERE ((start_at IS NOT NULL) AND (end_at IS NULL) AND (deleted_at IS NULL))
+#  index_registration_sequences_one_active_template  (((organization_id IS NULL)), kind) UNIQUE WHERE ((organization_id IS NULL) AND (start_at IS NOT NULL) AND (end_at IS NULL) AND (deleted_at IS NULL))
+#  index_registration_sequences_one_draft_per_org    (organization_id,kind) UNIQUE WHERE ((start_at IS NULL) AND (organization_id IS NOT NULL) AND (deleted_at IS NULL))
+#  index_registration_sequences_one_draft_template   (((organization_id IS NULL)), kind) UNIQUE WHERE ((organization_id IS NULL) AND (start_at IS NULL) AND (deleted_at IS NULL))
 #
 class RegistrationSequence < ApplicationRecord
   acts_as_paranoid
 
+  # An owner has one sequence of each kind, drafted and activated independently
+  KIND_ENUM = {e_vehicle: 0, non_e_vehicle: 1}.freeze
+  KINDS = KIND_ENUM.keys.map(&:to_s).freeze
   # The admin index's filters. "template" is which sequence rather than which status - a
   # template is drafted, activated and archived like an organization's
   STATUS_SCOPES = {"draft" => :draft, "active" => :active, "archived" => :archived, "template" => :templates}.freeze
   STATUSES = STATUS_SCOPES.keys.freeze
   COPIED_PAGE_ATTRS = %w[title heading subtitle body listing_order organization_specific].freeze
-  # Follows "I, <registrant's name>," on the flow's final acknowledgment. Seeded onto the
+  # Follows "I, <registrant's name>," on the flow's final acknowledgment. Seeded onto each
   # template, so an organization edits its own copy
   DEFAULT_ACKNOWLEDGMENT_TEXT = "have read, understood, and agree to comply with all of the " \
-    "e-vehicle safety rules above as a condition of registering my vehicle. I understand that " \
-    "failure to comply may result in revocation of my registration and/or disciplinary action."
+    "%{rules} above as a condition of registering my vehicle. I understand that failure to " \
+    "comply may result in revocation of my registration and/or disciplinary action."
+  DEFAULT_ACKNOWLEDGMENT_RULES = {"e_vehicle" => "e-vehicle safety rules",
+                                  "non_e_vehicle" => "safety rules"}.freeze
 
   # What each status is called on screen
   STATUS_DISPLAY = {"draft" => "Draft", "active" => "Current", "archived" => "Previous"}.freeze
+  # What each kind is called on the admin and organization screens. The registrant flow
+  # names them in its own translations instead
+  KIND_DISPLAY = {"e_vehicle" => "E-Vehicle", "non_e_vehicle" => "Non-e-vehicle"}.freeze
   # Both the admin and the organization screens warn with this before discarding
   DISCARD_DRAFT_CONFIRM = "Discard this draft and its pages? This can't be undone."
+
+  enum :kind, KIND_ENUM
 
   belongs_to :organization
 
@@ -59,25 +70,27 @@ class RegistrationSequence < ApplicationRecord
 
   class << self
     # The template belongs to no organization, so nil is its owner in every lookup here
-    def active_template = active_for(nil)
+    def active_template(kind:) = active_for(nil, kind:)
 
-    def active_for(organization)
-      active.find_by(organization:)
+    def active_for(organization, kind:)
+      active.find_by(organization:, kind:)
     end
 
     # What a draft is cloned from, and what the registration flow shows: the owner's live
     # sequence, falling back to the template every organization starts from
-    def active_or_template_for(organization) = active_for(organization) || active_template
+    def active_or_template_for(organization, kind:)
+      active_for(organization, kind:) || active_template(kind:)
+    end
 
     # The draft as it stands - draft_for opens one when there isn't one
-    def existing_draft_for(organization) = draft.find_by(organization:)
+    def existing_draft_for(organization, kind:) = draft.find_by(organization:, kind:)
 
     # build_draft_for is guarded only by a partial unique index; a concurrent request can
     # win the create race, so re-read the row it inserted.
-    def draft_for(organization)
-      existing_draft_for(organization) || build_draft_for(organization)
+    def draft_for(organization, kind:)
+      existing_draft_for(organization, kind:) || build_draft_for(organization, kind:)
     rescue ActiveRecord::RecordNotUnique
-      draft.find_by!(organization:)
+      draft.find_by!(organization:, kind:)
     end
 
     def for_status(status)
@@ -85,15 +98,30 @@ class RegistrationSequence < ApplicationRecord
       scope ? public_send(scope) : all
     end
 
+    # A link without a kind means e-vehicle; one that isn't a kind 404s rather than
+    # quietly opening the wrong sequence
+    def permitted_kind(kind)
+      return "e_vehicle" if kind.blank?
+
+      KINDS.include?(kind.to_s) ? kind.to_s : raise(ActiveRecord::RecordNotFound)
+    end
+
+    def kind_display(kind) = KIND_DISPLAY[kind.to_s]
+
+    def default_acknowledgment(kind)
+      format(DEFAULT_ACKNOWLEDGMENT_TEXT, rules: DEFAULT_ACKNOWLEDGMENT_RULES[kind.to_s])
+    end
+
     private
 
     # Start the draft from what's live so an edit tweaks the current sequence rather than
     # discarding the organization's customizations. Nothing sits above the template, so its
     # very first draft starts empty.
-    def build_draft_for(organization)
-      source = active_or_template_for(organization)
+    def build_draft_for(organization, kind:)
+      source = active_or_template_for(organization, kind:)
       transaction do
-        draft = create!(organization:, faq_url: source&.faq_url, acknowledgment_text: source&.acknowledgment_text)
+        draft = create!(organization:, kind:, faq_url: source&.faq_url,
+          acknowledgment_text: source&.acknowledgment_text)
         source&.registration_sequence_pages&.each do |source_page|
           page = draft.registration_sequence_pages.create!(source_page.slice(*COPIED_PAGE_ATTRS))
           copy_image(source_page.image, page.image) if source_page.image.attached?
@@ -110,7 +138,9 @@ class RegistrationSequence < ApplicationRecord
     end
   end
 
-  def acknowledgment = acknowledgment_text.presence || DEFAULT_ACKNOWLEDGMENT_TEXT
+  def acknowledgment = acknowledgment_text.presence || default_acknowledgment
+
+  def default_acknowledgment = self.class.default_acknowledgment(kind)
 
   def template? = organization_id.blank?
 
@@ -129,8 +159,10 @@ class RegistrationSequence < ApplicationRecord
 
   def status_display = STATUS_DISPLAY[status]
 
-  # Which sequence this is, e.g. "Brakebills Current" or "Template Draft"
-  def display_name = "#{badge_name} #{status_display}"
+  def kind_display = self.class.kind_display(kind)
+
+  # Which sequence this is, e.g. "Brakebills E-Vehicle Current" or "Template Non-e-vehicle Draft"
+  def display_name = "#{badge_name} #{kind_display} #{status_display}"
 
   # Who this sequence belongs to - badges an organization-specific page, and names the
   # sequence in display_name
@@ -157,7 +189,7 @@ class RegistrationSequence < ApplicationRecord
     return false unless draft? && pages.any? && pages.all?(&:valid?)
 
     transaction do
-      self.class.active_for(organization)&.update!(end_at: Time.current)
+      self.class.active_for(organization, kind:)&.update!(end_at: Time.current)
       update!(start_at: Time.current)
     end
   end

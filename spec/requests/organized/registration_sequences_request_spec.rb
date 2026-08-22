@@ -8,11 +8,12 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
     before { current_organization.update_columns(enabled_feature_slugs: %w[registration_sequences registration_sequences_edit]) }
 
     describe "index" do
-      it "renders without creating a draft" do
+      it "renders a section per kind, without creating a draft" do
         expect { get base_url }.to_not change(RegistrationSequence, :count)
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
-        expect(response.body).to include("There is no active registration sequence")
+        expect(response.body).to include("There is no active e-vehicle registration sequence")
+        expect(response.body).to include("There is no active non-e-vehicle registration sequence")
         expect(response.body).to include("You don't have a draft sequence")
         # Nothing to copy yet, so the button starts a fresh one
         expect(response.body).to include("Create a sequence")
@@ -64,6 +65,15 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
         }.to change { current_organization.registration_sequences.draft.count }.by(1)
         draft = current_organization.registration_sequences.draft.first
         expect(response).to redirect_to(edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: draft.id))
+        expect(draft).to be_e_vehicle
+      end
+
+      it "builds the kind that was asked for" do
+        post base_url, params: {kind: "non_e_vehicle"}
+
+        draft = current_organization.registration_sequences.draft.first
+        expect(draft).to be_non_e_vehicle
+        expect(response).to redirect_to(edit_organization_registration_sequence_path(organization_id: current_organization.to_param, id: draft.id))
       end
     end
 
@@ -74,7 +84,7 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
         get "#{base_url}/#{draft.id}"
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
-        expect(response.body).to match(%r{Previewing.{0,40}<strong>Draft</strong>.{0,20}registration sequence}m)
+        expect(response.body).to match(%r{Previewing.{0,40}<strong>\s*Draft\s+E-Vehicle\s*</strong>.{0,20}registration sequence}m)
         # Back link to the index, next to the pagination
         expect(response.body).to include(">← Registration Sequences</a>")
       end
@@ -95,7 +105,7 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
           get "#{base_url}/#{active.id}"
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
-          expect(response.body).to match(%r{Previewing.{0,40}<strong>Current</strong>.{0,20}registration sequence}m)
+          expect(response.body).to match(%r{Previewing.{0,40}<strong>\s*Current\s+E-Vehicle\s*</strong>.{0,20}registration sequence}m)
         end
       end
     end
@@ -164,7 +174,7 @@ RSpec.describe Organized::RegistrationSequencesController, type: :request do
       expect(response.body).to include("This is the active version your registrants see")
       expect(response.body).to include(active.registration_sequence_pages.first.title)
       # The whole draft section is gone - not an empty-state, not a read-only listing
-      expect(response.body).to_not include(">Draft</h2>")
+      expect(response.body).to_not include(">Draft</h3>")
       expect(response.body).to_not include("You don't have a draft sequence")
       expect(response.body).to_not include(">Edit<")
       expect(response.body).to_not include("Discard draft")

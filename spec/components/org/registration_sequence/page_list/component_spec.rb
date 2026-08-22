@@ -51,7 +51,7 @@ RSpec.describe Org::RegistrationSequence::PageList::Component, type: :component 
         render_inline(described_class.new(registration_sequence:))
 
         expect(page).to have_css("h3", text: "Final acknowledgment")
-        expect(page).to have_content(RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT)
+        expect(page).to have_content(RegistrationSequence.default_acknowledgment("e_vehicle"))
         expect(page).to_not have_link("FAQ link")
       end
     end

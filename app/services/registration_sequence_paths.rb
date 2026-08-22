@@ -33,9 +33,13 @@ module RegistrationSequencePaths
     routes.admin_registration_sequence_path(registration_sequence, activate: true)
   end
 
-  # POSTs open the owner's draft, cloning one if there isn't one. A blank organization
-  # is the template
-  def create_draft(organization_id) = routes.admin_registration_sequences_path(organization_id:)
+  # POSTs open the owner's draft of that kind, cloning one if there isn't one. A blank
+  # organization is the template, which only admin has
+  def create_draft(organization, kind:, admin: false)
+    return routes.admin_registration_sequences_path(organization_id: organization&.id, kind:) if admin
+
+    routes.organization_registration_sequences_path(organization_id: organization.to_param, kind:)
+  end
 
   def edit(registration_sequence, admin: false)
     return routes.edit_admin_registration_sequence_path(registration_sequence) if admin

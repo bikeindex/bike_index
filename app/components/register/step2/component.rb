@@ -16,7 +16,7 @@ module Register
         @b_param.type
       end
 
-      # A theft report and an e-vehicle's safety pages both come after this form, so it
+      # A theft report and the organization's safety pages both come after this form, so it
       # doesn't always finish the registration. Which statuses have one is rechecked
       # client-side, since the status is picked in this form rather than known when it
       # renders - so the label reads off the same answer both times

@@ -17,20 +17,24 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
         expect(assigns(:collection).pluck(:id)).to eq([draft.id])
       end
 
-      it "offers to create the template when there isn't one" do
+      it "offers to create each kind's template when there isn't one" do
         get base_url
-        expect(assigns(:template)).to be_nil
-        expect(response.body).to include("Create template")
+        expect(assigns(:templates).values.compact).to be_empty
+        expect(response.body).to include("Create E-Vehicle template")
+        expect(response.body).to include("Create Non-e-vehicle template")
       end
 
       context "with a live template and a draft above it" do
         let!(:live_template) { FactoryBot.create(:registration_sequence_template_active, :with_pages) }
         let!(:template_draft) { FactoryBot.create(:registration_sequence_template) }
+        let!(:non_e_vehicle_template) { FactoryBot.create(:registration_sequence_template_active, :non_e_vehicle, :with_pages) }
 
-        it "links the template draft - that's what there is to do to it" do
+        it "links each kind's template draft - that's what there is to do to it" do
           get base_url
-          expect(assigns(:template)).to eq template_draft
-          expect(response.body).to include("Template Draft sequence")
+          expect(assigns(:templates)).to eq({"e_vehicle" => template_draft,
+                                             "non_e_vehicle" => non_e_vehicle_template})
+          expect(response.body).to include("Template E-Vehicle Draft sequence")
+          expect(response.body).to include("Template Non-e-vehicle Current sequence")
         end
       end
 
@@ -41,6 +45,16 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
           get base_url, params: {search_status: "draft"}
           expect(response.status).to eq(200)
           expect(assigns(:collection).pluck(:id)).to eq([draft.id])
+        end
+      end
+
+      context "with search_kind" do
+        let!(:non_e_vehicle) { FactoryBot.create(:registration_sequence, :non_e_vehicle, :with_pages, organization:) }
+
+        it "filters by kind" do
+          get base_url, params: {search_kind: "non_e_vehicle"}
+          expect(response.status).to eq(200)
+          expect(assigns(:collection).pluck(:id)).to eq([non_e_vehicle.id])
         end
       end
     end
@@ -138,7 +152,7 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
             patch "#{base_url}/#{template.id}", params: {activate: true}
 
             expect(response).to redirect_to("#{base_url}/#{template.id}")
-            expect(RegistrationSequence.active_template).to eq template
+            expect(RegistrationSequence.active_template(kind: "e_vehicle")).to eq template
             expect(previous_template.reload).to be_archived
           end
         end
@@ -179,9 +193,20 @@ RSpec.describe Admin::RegistrationSequencesController, type: :request do
         it "opens the template's draft, cloning the live template" do
           expect { post base_url }.to change(RegistrationSequence, :count).by(1)
 
-          template_draft = RegistrationSequence.existing_draft_for(nil)
+          template_draft = RegistrationSequence.existing_draft_for(nil, kind: "e_vehicle")
           expect(response).to redirect_to("#{base_url}/#{template_draft.id}/edit")
           expect(template_draft.registration_sequence_pages.count).to eq 2
+        end
+      end
+
+      context "the other kind" do
+        it "opens a draft of its own, alongside the e-vehicle one" do
+          expect { post base_url, params: {organization_id: organization.to_param, kind: "non_e_vehicle"} }
+            .to change(RegistrationSequence, :count).by(1)
+
+          non_e_vehicle_draft = RegistrationSequence.existing_draft_for(organization, kind: "non_e_vehicle")
+          expect(response).to redirect_to("#{base_url}/#{non_e_vehicle_draft.id}/edit")
+          expect(draft.reload).to be_draft
         end
       end
 

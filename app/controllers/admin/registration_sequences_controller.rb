@@ -7,9 +7,11 @@ module Admin
     before_action :find_draft, only: %i[update destroy]
 
     def index
-      # The sequence organizations' drafts are cloned from, reachable without hunting the
-      # table for it. Its draft when there is one - that's what there is to do to it
-      @template = ::RegistrationSequence.existing_draft_for(nil) || ::RegistrationSequence.active_template
+      # The sequences organizations' drafts are cloned from, reachable without hunting the
+      # table for them. Each kind's draft when there is one - that's what there is to do to it
+      @templates = ::RegistrationSequence::KINDS.index_with do |kind|
+        ::RegistrationSequence.existing_draft_for(nil, kind:) || ::RegistrationSequence.active_template(kind:)
+      end
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
         matching_registration_sequences.includes(:organization, :registration_sequence_pages)
@@ -51,7 +53,8 @@ module Admin
     # template - friendly_find! so a typo 404s rather than opening the template's draft
     def create
       organization = ::Organization.friendly_find!(params[:organization_id]) if params[:organization_id].present?
-      redirect_to RegistrationSequencePaths.edit(::RegistrationSequence.draft_for(organization), admin: true)
+      kind = ::RegistrationSequence.permitted_kind(params[:kind])
+      redirect_to RegistrationSequencePaths.edit(::RegistrationSequence.draft_for(organization, kind:), admin: true)
     end
 
     # Throw the draft away to start over; the live sequence is untouched
@@ -61,10 +64,14 @@ module Admin
       redirect_to RegistrationSequencePaths.index(@registration_sequence, admin: true)
     end
 
-    helper_method :matching_registration_sequences, :searchable_statuses
+    helper_method :matching_registration_sequences, :searchable_statuses, :searchable_kinds
 
     def searchable_statuses
       ::RegistrationSequence::STATUSES
+    end
+
+    def searchable_kinds
+      ::RegistrationSequence::KINDS
     end
 
     protected
@@ -81,6 +88,9 @@ module Admin
       registration_sequences = ::RegistrationSequence.all
       @status = searchable_statuses.include?(params[:search_status]) ? params[:search_status] : nil
       registration_sequences = registration_sequences.for_status(@status) if @status.present?
+
+      @kind = searchable_kinds.include?(params[:search_kind]) ? params[:search_kind] : nil
+      registration_sequences = registration_sequences.where(kind: @kind) if @kind.present?
 
       if params[:organization_id].present?
         registration_sequences = registration_sequences.where(organization_id: params[:organization_id])

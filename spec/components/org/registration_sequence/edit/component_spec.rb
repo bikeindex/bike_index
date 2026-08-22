@@ -33,7 +33,7 @@ RSpec.describe Org::RegistrationSequence::Edit::Component, type: :component do
     expect(page).to have_field("registration_sequence[faq_url]", with: "https://example.com/faq")
     # A blank acknowledgment falls back to the default, which the placeholder shows
     expect(page).to have_field("registration_sequence[acknowledgment_text]", with: "",
-      placeholder: RegistrationSequence::DEFAULT_ACKNOWLEDGMENT_TEXT)
+      placeholder: RegistrationSequence.default_acknowledgment("e_vehicle"))
   end
 
   it "badges an organization-specific page with the organization's name" do
