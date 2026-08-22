@@ -54,14 +54,14 @@ RSpec.describe Admin::Bikes::Index::SearchStatuses::Component, type: :component 
   context "with spam among the defaults" do
     let(:options) { {default_statuses: %w[spam]} }
 
-    it "marks it default on, and says why in a tooltip" do
-      expect(component).to have_content("default on")
+    it "marks it on by default, and says why in a tooltip" do
+      expect(component).to have_content("on by default")
       expect(component.at_css("[data-controller='ui--tooltip'] [role='tooltip']").text.squish)
         .to eq "enabled because of your superuser settings"
     end
   end
 
-  it "marks nothing default on when the defaults don't include it" do
-    expect(component).to_not have_content("default on")
+  it "marks nothing on by default when the defaults don't include it" do
+    expect(component).to_not have_content("on by default")
   end
 end

@@ -21,13 +21,20 @@
                 label: safe_join([label, tag.strong("Only")], " "), checked: true)) %>
         <% else %>
           <div class="tw:flex tw:items-baseline tw:gap-2">
+            <%#
+              The checkbox's own label is a flex, so its baseline as a flex item comes from
+              the input unless its contents baseline-align too - without this its text sits
+              3px off "only" and the note. Forced, because the component's own
+              tw:items-center is the same property and wins the tie otherwise.
+            %>
+
             <%= render(UI::Forms::Checkbox::Component.new(name: :"search_status_#{status}",
-                  label:, checked: searched?(status))) %>
+                  label:, checked: searched?(status), class_name: "tw:items-baseline!")) %>
 
             <%= link_to "only", only_path(status), class: "twlink tw:text-sm" %>
 
             <% if default_on?(status) %>
-              <small class="twless-strong tw:text-xs">default on</small>
+              <em class="twless-strong tw:text-xs">on by default</em>
 
               <%= render(UI::Tooltip::Component.new(text: "enabled because of your superuser settings")) %>
             <% end %>
