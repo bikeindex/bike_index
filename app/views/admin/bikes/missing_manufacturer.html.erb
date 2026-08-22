@@ -1,52 +1,39 @@
-<div class="admin-subnav">
-  <div class="tw:flex-1">
-    <h1>Multi manufacturer update</h1>
-  </div>
+<%= render(Admin::Headers::Nav::Component.new(title: "Multi manufacturer update")) do %>
+  <%# active: off the controller and the session, neither of which UI::ActiveLink can read %>
 
-  <div class="tw:flex-1">
-    <ul>
-      <li class="nav-item">
-        <%= link_to "all bikes", admin_bikes_path, class: "nav-link" %>
-      </li>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "all bikes", href: admin_bikes_path, size: :sm)) %>
+  </li>
 
-      <%#
-        Each of these is controller or session state, so it carries .active itself -
-        UI::ActiveLink resolves from the URL, which can't see the session, and only sets
-        aria-current, which the admin row doesn't style
-      %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "motorized", size: :sm, active: @motorized,
+          href: url_for(sortable_search_params.merge(search_motorized: !@motorized)))) %>
+  </li>
 
-      <% nav_link_class = ->(active) { active ? "nav-link active" : "nav-link" } %>
+  <li>
+    <% include_spam = Binxtils::InputNormalizer.boolean(params[:search_spam]) %>
 
-      <li class="nav-item">
-        <%= link_to "motorized", url_for(sortable_search_params.merge(search_motorized: !@motorized)),
-              class: nav_link_class.call(@motorized) %>
-      </li>
+    <%= render(UI::ButtonLink::Component.new(text: "spam & deleted", size: :sm, active: include_spam,
+          href: url_for(sortable_search_params.merge(search_spam: !include_spam, search_deleted: !include_spam)))) %>
+  </li>
 
-      <li class="nav-item">
-        <% include_spam = Binxtils::InputNormalizer.boolean(params[:search_spam]) %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Include blank", size: :sm, active: @include_blank,
+          href: url_for(sortable_search_params.merge(search_include_blank: !@include_blank)))) %>
+  </li>
 
-        <%= link_to "spam & deleted",
-              url_for(sortable_search_params.merge(search_spam: !include_spam, search_deleted: !include_spam)),
-              class: nav_link_class.call(include_spam) %>
-      </li>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Alphabetical view", size: :sm,
+          active: !session[:missing_manufacturer_time_order],
+          href: url_for(sortable_search_params.merge(reset_view: true)))) %>
+  </li>
 
-      <li class="nav-item">
-        <%= link_to "Include blank", url_for(sortable_search_params.merge(search_include_blank: !@include_blank)),
-              class: nav_link_class.call(@include_blank) %>
-      </li>
-
-      <li class="nav-item">
-        <%= link_to "Alphabetical view", url_for(sortable_search_params.merge(reset_view: true)),
-              class: nav_link_class.call(!session[:missing_manufacturer_time_order]) %>
-      </li>
-
-      <li class="nav-item">
-        <%= link_to "Time ordered view", url_for(sortable_search_params.merge(search_time_ordered: true)),
-              class: nav_link_class.call(session[:missing_manufacturer_time_order]) %>
-      </li>
-    </ul>
-  </div>
-</div>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Time ordered view", size: :sm,
+          active: session[:missing_manufacturer_time_order].present?,
+          href: url_for(sortable_search_params.merge(search_time_ordered: true)))) %>
+  </li>
+<% end %>
 
 <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:) %>
 
