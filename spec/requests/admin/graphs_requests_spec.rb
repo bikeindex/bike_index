@@ -39,8 +39,7 @@ RSpec.describe Admin::GraphsController, type: :request do
         # [origin, swatch color, bike count] per row of the origin table, as rendered
         let(:origin_rows) do
           Nokogiri::HTML(response.body).css("td span[style*='background-color']").map do |swatch|
-            [swatch.next_sibling.text.strip, swatch["style"][/border: 1px solid (#\h{6})/, 1],
-              swatch.ancestors("tr").first.css("td").last.text.strip]
+            [swatch.next_sibling.text.strip, swatch["style"][/#\h{6}/], swatch.parent.next_element.text.strip]
           end
         end
 
@@ -52,8 +51,10 @@ RSpec.describe Admin::GraphsController, type: :request do
           # The origins with no bikes keep Ownership.origins order, rather than reshuffling
           expect(origin_rows.map(&:first))
             .to eq(%w[sticker web].map(&:humanize) + (Ownership.origins - %w[sticker web]).map(&:humanize))
-          # The colors the chart is handed, in the order bike_chart_data builds its series
-          expect(response.body).to include(origin_colors.values.to_json)
+
+          get "#{base_url}/variable", params: {search_kind: "bikes", period: "week", bike_graph_kind: "origin"}
+          expect(json_result.to_h { [it["name"], it["color"]] })
+            .to eq(origin_colors.transform_keys(&:humanize))
         end
       end
     end

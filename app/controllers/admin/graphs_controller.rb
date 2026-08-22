@@ -1,9 +1,8 @@
 module Admin
   class GraphsController < Admin::BaseController
-    # Handed to the origin chart as its colors, and read back by the origin table's
-    # swatches, so a row and its columns match
-    ORIGIN_COLORS = %w[#3498db #DC2626 #D97706 #7C3AED #059669 #DB2777 #475569 #0891B2
-      #65A30D #EA580C #4F46E5 #9333EA #0D9488 #CA8A04 #E11D48 #2563EB #16A34A].freeze
+    # The shared chart palette, which runs out well before Ownership.origins does
+    ORIGIN_COLORS = (UI::Chart::Component::COLORS + %w[#0891B2 #65A30D #EA580C #4F46E5
+      #9333EA #0D9488 #CA8A04 #E11D48 #2563EB #16A34A]).freeze
 
     before_action :set_period
     before_action :set_variable_graph_kind
@@ -77,14 +76,14 @@ module Admin
       "year"
     end
 
-    # Ownership.origins order, which is the order bike_chart_data builds the series in
+    # Each series carries its own, so the table's swatches match without the two
+    # agreeing on an order across the chart's separate request
     def origin_colors
-      @origin_colors ||= Ownership.origins.each_with_index
-        .to_h { |origin, index| [origin, ORIGIN_COLORS[index % ORIGIN_COLORS.count]] }
+      @origin_colors ||= Ownership.origins.zip(ORIGIN_COLORS).to_h
     end
 
-    # [origin, count] highest first, with Ownership.origins order breaking ties so the
-    # rows don't reshuffle between loads. Distinct because a bike has an ownership per transfer
+    # Ownership.origins order breaks count ties, so the rows don't reshuffle between
+    # loads. Distinct: a bike has an ownership per transfer
     def origin_bike_counts
       return @origin_bike_counts if defined?(@origin_bike_counts)
 
@@ -124,6 +123,7 @@ module Admin
         Ownership.origins.map do |origin|
           {
             name: origin.humanize,
+            color: origin_colors[origin],
             data: helpers.time_range_counts(collection: bikes.includes(:ownerships).where(ownerships: {origin: origin}))
           }
         end

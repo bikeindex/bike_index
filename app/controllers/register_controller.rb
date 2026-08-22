@@ -206,8 +206,8 @@ class RegisterController < ApplicationController
   end
 
   # The registration new and embed start from - token_id reuses the one it names, when
-  # step 1 was never submitted on it and it started the same way. An origin the token's
-  # doesn't match starts a new registration, so the embed's is only ever a framed one
+  # step 1 was never submitted on it and it started the same way - b_param_for only
+  # reuses a token whose origin matches
   def start_registration(token_id: nil, origin: "register_flow")
     @b_param = BikeServices::Register.b_param_for(user: current_user, token_id:, origin:,
       status: start_status, email: params[:email])
