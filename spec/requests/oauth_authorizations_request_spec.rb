@@ -6,6 +6,16 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
   let(:scope_param) { "scope=read_bikes+read_user" }
   let(:authorization_url) { "/oauth/authorize?redirect_uri=#{CGI.escape(doorkeeper_app.redirect_uri)}&client_id=#{doorkeeper_app.uid}&response_type=code&#{scope_param}" }
 
+  def delivered_url(matcher)
+    ActionMailer::Base.deliveries.last.body.parts.first.decoded[matcher]
+  end
+
+  # What the emailed link's page posts onward - the destination rides in one of these
+  def hidden_fields
+    Capybara.string(response.body).all("form input[type=hidden]", visible: :all)
+      .to_h { |input| [input[:name], input[:value]] }
+  end
+
   context "no current user present" do
     it "redirects to sign in" do
       get authorization_url
@@ -13,6 +23,67 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
       expect(session[:return_to]).to match(/#{doorkeeper_app.uid}/)
       expect(session[:partner]).to be_nil
       expect(flash).to be_blank
+    end
+    # A native app hands OAuth to a webview; the magic link then opens in the phone's browser,
+    # which has none of that session
+    context "signing in with a magic link opened in another browser" do
+      let(:user) { FactoryBot.create(:user_confirmed, passwordless_user: true) }
+
+      it "resumes the authorization" do
+        get authorization_url
+        Sidekiq::Testing.inline! do
+          post "/session/identify", params: {session: {email: user.email}}
+        end
+        emailed_url = delivered_url(%r{https?://\S+/session/magic_link\S*})
+        expect(emailed_url).to include CGI.escape("client_id=#{doorkeeper_app.uid}")
+
+        reset! # Wipe the session, as opening the link in a different browser does
+        get emailed_url
+        post "/session/sign_in_with_magic_link", params: hidden_fields
+        expect(response).to redirect_to(/#{doorkeeper_app.uid}/)
+      end
+    end
+
+    # Reached from this sign-in page's "forgot your password" link
+    context "resetting a password in another browser" do
+      let(:user) { FactoryBot.create(:user_confirmed) }
+      let(:password) { "reasonable_password" }
+
+      it "resumes the authorization" do
+        get authorization_url
+        Sidekiq::Testing.inline! do
+          post "/users/send_password_reset_email", params: {email: user.email}
+        end
+        emailed_url = delivered_url(%r{https?://\S+/users/update_password_form_with_reset_token\S*})
+        expect(emailed_url).to include CGI.escape("client_id=#{doorkeeper_app.uid}")
+
+        reset!
+        get emailed_url
+        post "/users/update_password_with_reset_token",
+          params: hidden_fields.merge(user: {password:, password_confirmation: password})
+        expect(response).to redirect_to(/#{doorkeeper_app.uid}/)
+      end
+    end
+
+    # Reached because identify sends an email with no account to the signup form
+    context "signing up and confirming in another browser" do
+      let(:email) { "newperson@example.com" }
+
+      it "resumes the authorization" do
+        get authorization_url
+        Sidekiq::Testing.inline! do
+          post "/users", params: {user: {email:, name: "New Person", terms_of_service: "1"}}
+        end
+        user = User.find_by(email:)
+        emailed_url = delivered_url(%r{https?://\S+/users/confirm\S*})
+        expect(emailed_url).to include CGI.escape("client_id=#{doorkeeper_app.uid}")
+
+        reset!
+        get emailed_url
+        post "/users/confirm", params: hidden_fields
+        expect(user.reload.confirmed?).to be_truthy
+        expect(response).to redirect_to(/#{doorkeeper_app.uid}/)
+      end
     end
     context "partner parameter" do
       it "redirects to sign in with the partners parameter included" do

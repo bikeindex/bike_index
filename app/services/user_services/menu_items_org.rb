@@ -22,11 +22,12 @@ module UserServices
     # UpdateOrganizationAssociationsJob touches every member user when an org
     # changes, so user.cache_key_with_version covers both per-user changes
     # and org-feature changes.
-    def for(organization:, current_user:)
+    def for(organization:, current_user:, old_register_view: false)
       return [] if organization.nil? || current_user.nil?
 
-      Rails.cache.fetch(["menu_items_org_v4", organization.id, current_user.cache_key_with_version]) do
-        build_items(organization, current_user)
+      Rails.cache.fetch(["menu_items_org_v4", organization.id, current_user.cache_key_with_version,
+        old_register_view]) do
+        build_items(organization, current_user, old_register_view)
       end
     end
 
@@ -36,12 +37,12 @@ module UserServices
 
     # Sections rather than a flat list, so a section gated off entirely takes the
     # divider above it with it
-    def build_items(organization, current_user)
+    def build_items(organization, current_user, old_register_view)
       return ambassador_items(organization) if organization.ambassador?
 
       admin = current_user.admin_of?(organization)
 
-      [[registrations_group(organization), add_bike_link(organization)],
+      [[registrations_group(organization), add_bike_link(organization, old_register_view)],
         [impounded_group(organization),
           parking_group(organization),
           bulk_group(organization),
@@ -95,10 +96,15 @@ module UserServices
       group(:registrations, translation(:org_registrations, org_name: organization.short_name), "bike", children)
     end
 
-    # Both add-a-bike rows are organized/bikes#new, told apart by the query param
-    def add_bike_link(organization)
-      link(translation(:add_a_bike), routes.new_organization_bike_path(organization.to_param),
-        icon: "plus-circle", match: :full_path)
+    # The embed form is organized/bikes#new, which the parking notification row also
+    # links - told apart by the query param, which is why both match on the full path
+    def add_bike_link(organization, old_register_view)
+      path = if old_register_view
+        routes.new_organization_bike_path(organization.to_param)
+      else
+        routes.new_organization_registration_path(organization.to_param)
+      end
+      link(translation(:add_a_bike), path, icon: "plus-circle", match: :full_path)
     end
 
     # Managing impounding is the settings group's, which is where the org's other

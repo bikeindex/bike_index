@@ -483,7 +483,7 @@ Rails.application.routes.draw do
     get "/", to: "dashboard#root", as: :root
     resources :dashboard, only: %i[index]
     get "landing", to: "manages#landing", as: :landing
-    resources :registrations, only: %i[index] do
+    resources :registrations, only: %i[index new] do
       collection do
         get :multi_search
         get :multi_search_response
