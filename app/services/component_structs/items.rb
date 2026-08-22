@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 module ComponentStructs
-  # The hashes the menus and the row components take, and the constructors for the menu ones —
-  # UserServices::MenuItemsAccount and UserServices::MenuItemsOrg read alike because both build
-  # their rows here.
+  # The hashes the menus and the row components take, and the constructors for the menu ones,
+  # which is what makes UserServices::MenuItemsAccount and UserServices::MenuItemsOrg read alike.
   #
   # A menu item, rendered by PageBlock::Navbar::OrgSidebar, ::AccountMenu and
   # ::UserSettingsMenu, and served by api/v3/me:
   #   {type: :divider}
   #   {type: :group, key:, label:, icon:, children: [...]}
-  #   {type: :link, label:, path:, icon:, match_paths:, match_params:, id:, data:, danger:}
+  #   {type: :link, label:, path:, icon:, match_paths:, match_params:} — plus whatever the
+  #     menu rendering it reads back: id:, data:, danger:, super_admin:
   #   {type: :disabled, label:}
   #
   # A UI::Tabs tab, which Admin::Headers::Tabs passes through:
@@ -22,8 +22,8 @@ module ComponentStructs
     extend Functionable
 
     # `match_paths:` and `match_params:` are UI::ActiveLink's, which resolves them in the
-    # browser. Nothing here depends on which page is current. section: is the common case of
-    # match_paths: — the row covers everything under its own path.
+    # browser. section: is the common case of match_paths: — the row covers everything
+    # under its own path.
     def link(label, path, icon: nil, section: false, **attributes)
       covered = section ? {match_paths: "#{path}/**"} : {}
       {type: :link, label:, path:, icon:, **covered, **attributes}

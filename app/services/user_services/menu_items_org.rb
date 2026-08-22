@@ -4,14 +4,15 @@
 # that own their children. PageBlock::Navbar::OrgSidebar renders it and api/v3/me serves it,
 # cached per [organization, user].
 #
-# Its rows are ComponentStructs::Items', where their shapes are.
+# Its rows are ComponentStructs::Items'.
 module UserServices
   module MenuItemsOrg
     extend Functionable
 
     # UpdateOrganizationAssociationsJob touches every member user when an org
     # changes, so user.cache_key_with_version covers both per-user changes
-    # and org-feature changes.
+    # and org-feature changes. Nothing here depends on which page is current,
+    # so the key carries no path.
     def for(organization:, current_user:, old_register_view: false)
       return [] if organization.nil? || current_user.nil?
 

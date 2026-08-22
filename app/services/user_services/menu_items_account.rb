@@ -4,8 +4,7 @@
 # and logout. PageBlock::Navbar::UserSettingsMenu renders it as the navbar's gear submenu,
 # PageBlock::Navbar::AccountMenu as the org sidebar's dropdown.
 #
-# Its rows are ComponentStructs::Items', the same ones UserServices::MenuItemsOrg builds,
-# so the two menus read alike.
+# Its rows are ComponentStructs::Items'.
 module UserServices
   module MenuItemsAccount
     extend Functionable
