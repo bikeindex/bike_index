@@ -13,7 +13,7 @@
           = f.label :kind, "Kind"
           = f.select :kind, [["Import post", "imported_post"], ["Send post", "app_post"]], { prompt: "Choose kind", required: true }, class: "form-control"
 
-    .card.bg-light#kind-app_post{ class: (@social_post.kind == "app_post" ? "" : "tw:hidden") }
+    .card.bg-light{ class: ("tw:hidden" unless @social_post.kind == "app_post") }
       .card-body
         .row
           .col-md-6
@@ -61,7 +61,7 @@
                 = social_account.screen_name
         %em.small.less-strong
           Even if checked, original account won't repost itself (so feel free to leave it checked)
-    .card.bg-light#kind-imported_post{ class: (@social_post.kind == "imported_post" ? "" : "tw:hidden") }
+    .card.bg-light{ class: ("tw:hidden" unless @social_post.kind == "imported_post") }
       .card-body
         %p
           %strong Import a post
