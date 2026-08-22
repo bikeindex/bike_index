@@ -41,7 +41,7 @@
   <%= body_tag(html_class: admin_body_class) do %>
     <%= render(PageBlock::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
 
-    <%= render(Admin::Navbar::Component.new(current_user:, user_root_url:, controller_path:, search_filtered: admin_search_filtered?)) %>
+    <%= render(Admin::Navbar::Component.new(current_user:, user_root_url:, search_filtered: admin_search_filtered?)) %>
 
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
 

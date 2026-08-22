@@ -37,7 +37,7 @@ RSpec.describe PageBlock::MainContent::Content::Component, type: :component do
       # The related section's link replaces the one "Other pages" carries elsewhere
       link = component.css("a[href='#{news_index_path}']")
       expect(link.count).to eq 1
-      expect(link.first["data-ui--active-link-match-value"]).to eq "path"
+      expect(link.first["data-ui--active-link-match-paths-value"]).to eq news_index_path
       expect(component.text).to match "Bike Index Store"
     end
   end

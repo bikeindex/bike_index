@@ -6,7 +6,7 @@
 #
 # Item shapes are UserServices::MenuItemsOrg's, so the two menus read alike:
 #   {type: :divider}
-#   {type: :link, label:, path:, icon:, match:, matching_controllers:, id:, data:, danger:}
+#   {type: :link, label:, path:, icon:, match_paths:, match_params:, id:, data:, danger:}
 #   {type: :disabled, label:}
 module UserServices
   module MenuItemsAccount
@@ -56,9 +56,11 @@ module UserServices
     # navUserSettingLink is how the signed-in email is read off a page -- by
     # .claude/skills/frontend-screenshots' identity gate, among others
     def account_rows(user)
+      register = routes.register_path
+      # The row stays current across every step of the flow, which all live under it
       [link(translation(:your_registrations), routes.my_account_path),
         marketplace_messages(user),
-        link(translation(:register_a_new_bike), routes.register_path, match: :controller),
+        link(translation(:register_a_new_bike), register, match_paths: "#{register}/**"),
         link(translation(:user_settings, user_email: user.email), routes.edit_my_account_path,
           id: "navUserSettingLink", data: {email: user.email})].compact
     end
@@ -81,17 +83,19 @@ module UserServices
         .filter_map(&:organization).first(SWITCHER_ORGANIZATIONS)
     end
 
-    def link(label, path, icon: nil, match: :path, matching_controllers: [], **attributes)
-      {type: :link, label:, path:, icon:, match:, matching_controllers:, **attributes}
+    def link(label, path, icon: nil, **attributes)
+      {type: :link, label:, path:, icon:, **attributes}
     end
 
     # organization_id=false is what clears the one held in the session. The homepage is where
     # that lands from inside the organization interface; page-block--navbar-switch-no-organization
-    # points it at the current page anywhere else
+    # points it at the current page anywhere else. The param is what the row matches on too --
+    # the href's path alone is "/", which would go current on the homepage
     def without_organization(current_organization)
       return disabled(translation(:viewing_without_org)) if current_organization.blank?
 
       link(translation(:view_without_org), routes.root_url(organization_id: false),
+        match_params: {organization_id: "false"},
         data: {controller: "page-block--navbar-switch-no-organization"})
     end
 

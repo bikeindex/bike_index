@@ -2,11 +2,11 @@
   <li>
     <%= render(UI::Dropdown::Component.new(name: @search_kind == "all" ? "All kinds" : "#{@search_kind.humanize} only", button_size: :sm,
           active: @search_kind != "all")) do |dropdown| %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All kinds", path: admin_news_index_path(sortable_search_params.merge(search_kind: nil)), match: :query, query: {search_kind: nil}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All kinds", path: admin_news_index_path(sortable_search_params.merge(search_kind: nil)), match_params: {search_kind: nil}) } %>
       <% dropdown.with_entry_divider %>
 
       <% Blog.kinds.each do |kind| %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.humanize} only", path: admin_news_index_path(sortable_search_params.merge(search_kind: kind)), match: :query, query: {search_kind: kind}) } %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.humanize} only", path: admin_news_index_path(sortable_search_params.merge(search_kind: kind)), match_params: {search_kind: kind}) } %>
       <% end %>
     <% end %>
   </li>

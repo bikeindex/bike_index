@@ -3,7 +3,7 @@
     <%= render(UI::Dropdown::Component.new(name: @invalid.titleize, button_size: :sm,
           active: @invalid != invalid_user_options.first)) do |dropdown| %>
       <% invalid_user_options.each do |kind| %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind.titleize, path: url_for(sortable_search_params.merge(search_invalid: kind)), match: :query, query: {search_invalid: kind}) } %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind.titleize, path: url_for(sortable_search_params.merge(search_invalid: kind)), match_params: {search_invalid: kind}) } %>
       <% end %>
     <% end %>
   </li>
@@ -18,12 +18,12 @@
 
     <%= render(UI::Dropdown::Component.new(name: access_filter_name, button_size: :sm,
           active: access_active)) do |dropdown| %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Any Access", path: url_for(sortable_search_params.merge(clear_access_params)), match: :query, query: clear_access_params) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Any Access", path: url_for(sortable_search_params.merge(clear_access_params)), match_params: clear_access_params) } %>
       <% dropdown.with_entry_divider %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "With Organization Role", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_with_organization: true))), match: :query, query: {search_with_organization: true}) } %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Ambassadors", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_ambassadors: true))), match: :query, query: {search_ambassadors: true}) } %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Superusers", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_superusers: true))), match: :query, query: {search_superusers: true}) } %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Developers", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_developers: true))), match: :query, query: {search_developers: true}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "With Organization Role", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_with_organization: true))), match_params: {search_with_organization: true}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Ambassadors", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_ambassadors: true))), match_params: {search_ambassadors: true}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Superusers", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_superusers: true))), match_params: {search_superusers: true}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Developers", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_developers: true))), match_params: {search_developers: true}) } %>
     <% end %>
   </li>
 
