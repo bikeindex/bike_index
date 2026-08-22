@@ -11,7 +11,7 @@ RSpec.describe Admin::Bikes::Header::Component, type: :component do
     expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Edit"]
     expect(component).to have_content(bike.owner_email)
     expect(component).to_not have_content("Theft information")
-    expect(component).to_not have_content("Recovery information")
+    expect(component).to_not have_content("Recovery Information")
   end
 
   # Every admin screen scoped to a bike reaches it through an unscoped find, which can miss
@@ -31,14 +31,14 @@ RSpec.describe Admin::Bikes::Header::Component, type: :component do
     it "renders the theft information" do
       expect(component).to have_content("Theft information")
       expect(component).to have_content("Taken from the rack")
-      expect(component).to_not have_content("Recovery information")
+      expect(component).to_not have_content("Recovery Information")
     end
 
     context "recovered" do
       before { bike.current_stolen_record.add_recovery_information }
 
       it "renders the recovery information too" do
-        expect(component).to have_content("Recovery information")
+        expect(component).to have_content("Recovery Information")
       end
     end
   end

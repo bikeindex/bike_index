@@ -208,6 +208,26 @@
     @apply tw:border-t tw:border-gray-200 tw:dark:border-gray-700;
   }
 
+  /* The band the admin bike screens open with: what the registration is, set apart from
+   * whichever tab's body follows it. Full bleed and borderless, the way the legacy
+   * .admin-bike-tabs read - its .table-list tables sit on white against it. */
+  .admin-bike-summary {
+    @apply tw:bg-[#212529] tw:pt-6 tw:pb-1 tw:text-white;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+  }
+
+  .admin-bike-summary h1,
+  .admin-bike-summary h2,
+  .admin-bike-summary h3,
+  .admin-bike-summary h4 {
+    @apply tw:text-white;
+  }
+
+  .admin-bike-summary table {
+    @apply tw:bg-white;
+  }
+
   .twhr {
     @apply tw:border-0 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700 tw:my-8;
   }

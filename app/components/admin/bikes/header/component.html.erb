@@ -5,12 +5,7 @@
   <%= render(Admin::Bikes::Tabs::Component.new(bike: @bike, active: @active, stolen_record: @stolen_record,
         display_recovery: @display_recovery)) %>
 
-  <%#
-    One panel, the way the dark .admin-bike-tabs band used to read - what the registration
-    is, set apart from whichever tab's body follows it
-  %>
-
-  <%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:mt-4")) do %>
+  <div class="admin-bike-summary">
     <%= render(Admin::Bikes::Summary::Details::Component.new(bike: @bike, user: @user,
           stolen_record: @stolen_record, display_dev_info: @display_dev_info)) %>
 
@@ -19,5 +14,5 @@
 
     <%= render(Admin::Bikes::Summary::Recovery::Component.new(stolen_record: @stolen_record,
           display_recovery: @display_recovery)) %>
-  <% end %>
+  </div>
 <% end %>
