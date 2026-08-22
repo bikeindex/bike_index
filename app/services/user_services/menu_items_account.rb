@@ -23,7 +23,7 @@ module UserServices
       switcher = organization_switcher(user, current_organization:)
 
       sections = (opens == :up) ? [[logout_row], switcher, account.reverse] : [account, switcher, [logout_row]]
-      sections.reject(&:empty?).inject { |rows, section| rows + [shapes.divider] + section }
+      sections.reject(&:empty?).inject { |rows, section| rows + [ComponentStructs::Shapes.divider] + section }
     end
 
     #
@@ -42,9 +42,9 @@ module UserServices
 
       [without_organization(current_organization)] + organizations.map { |organization|
         if organization == current_organization
-          shapes.disabled(translation(:viewing_org, org_name: organization.name))
+          ComponentStructs::Shapes.disabled(translation(:viewing_org, org_name: organization.name))
         else
-          shapes.link(translation(:switch_to_org, org_name: organization.name),
+          ComponentStructs::Shapes.link(translation(:switch_to_org, org_name: organization.name),
             routes.organization_root_path(organization_id: organization.to_param))
         end
       }
@@ -53,23 +53,23 @@ module UserServices
     # navUserSettingLink is how the signed-in email is read off a page -- by
     # .claude/skills/frontend-screenshots' identity gate, among others
     def account_rows(user)
-      [shapes.link(translation(:your_registrations), routes.my_account_path),
+      [ComponentStructs::Shapes.link(translation(:your_registrations), routes.my_account_path),
         marketplace_messages(user),
         # The row stays current across every step of the flow, which all live under it
-        shapes.link(translation(:register_a_new_bike), routes.register_path, section: true),
-        shapes.link(translation(:user_settings, user_email: user.email), routes.edit_my_account_path,
+        ComponentStructs::Shapes.link(translation(:register_a_new_bike), routes.register_path, section: true),
+        ComponentStructs::Shapes.link(translation(:user_settings, user_email: user.email), routes.edit_my_account_path,
           id: "navUserSettingLink", data: {email: user.email})].compact
     end
 
     # The one row that isn't somewhere to go
     def logout_row
-      shapes.link(translation(:logout), routes.goodbye_path, danger: true)
+      ComponentStructs::Shapes.link(translation(:logout), routes.goodbye_path, danger: true)
     end
 
     def marketplace_messages(user)
       return nil unless MarketplaceMessage.any_for_user?(user)
 
-      shapes.link(translation(:marketplace_messages), routes.my_account_messages_path)
+      ComponentStructs::Shapes.link(translation(:marketplace_messages), routes.my_account_messages_path)
     end
 
     # In the user's own order, so the switcher is the same five every time it's opened
@@ -83,13 +83,11 @@ module UserServices
     # that lands from inside the organization interface; page-block--navbar-switch-no-organization
     # points it at the current page anywhere else
     def without_organization(current_organization)
-      return shapes.disabled(translation(:viewing_without_org)) if current_organization.blank?
+      return ComponentStructs::Shapes.disabled(translation(:viewing_without_org)) if current_organization.blank?
 
-      shapes.link(translation(:view_without_org), routes.root_url(organization_id: false),
+      ComponentStructs::Shapes.link(translation(:view_without_org), routes.root_url(organization_id: false),
         data: {controller: "page-block--navbar-switch-no-organization"})
     end
-
-    def shapes = ComponentStructs::Shapes
 
     def translation(key, **interpolations)
       I18n.t(key, scope: "shared.menu_items_account", **interpolations)
@@ -100,6 +98,6 @@ module UserServices
     end
 
     conceal :organization_switcher, :account_rows, :logout_row, :marketplace_messages,
-      :switchable_organizations, :without_organization, :shapes, :translation, :routes
+      :switchable_organizations, :without_organization, :translation, :routes
   end
 end
