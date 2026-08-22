@@ -1,0 +1,47 @@
+<%#
+  active: off the controller, matching the row #4181 built - these two could take a
+  UI::ActiveLink query: instead, since their state is just a param
+%>
+
+<li>
+  <%= render(UI::ButtonLink::Component.new(text: "motorized", size: :sm, active: @motorized,
+        href: url_for(search_params.merge(search_motorized: !@motorized)))) %>
+</li>
+
+<li>
+  <%= render(UI::ButtonLink::Component.new(text: "multi-delete", size: :sm, active: @multi_delete,
+        href: url_for(search_params.merge(search_multi_delete: !@multi_delete)))) %>
+</li>
+
+<li>
+  <%= render(UI::ButtonLink::Component.new(text: "Unknown Mnfgs", size: :sm,
+        href: missing_manufacturer_admin_bikes_path)) %>
+</li>
+
+<li>
+  <%= render(UI::Dropdown::Component.new(name: origin_name, button_size: :sm,
+        active: !any_origin_active?)) do |dropdown| %>
+    <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Any Origin", match: :query, query: {search_origin: nil}, path: url_for(search_params.merge(search_origin: nil))) } %>
+    <% dropdown.with_entry_divider %>
+
+    <% Ownership.origins.each do |origin| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: origin.humanize, match: :query, query: {search_origin: origin}, path: origin_path(origin)) } %>
+    <% end %>
+  <% end %>
+</li>
+
+<li>
+  <%= render(UI::Dropdown::Component.new(name: pos_name, button_size: :sm,
+        active: @pos_search_type.present?)) do |dropdown| %>
+    <% Admin::Bikes::Index::Filters::Component::POS_TYPES.each do |value, label| %>
+      <% dropdown.with_entry_divider if value == "any_pos" %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: label, match: :query, query: {search_pos: value}, path: pos_path(value)) } %>
+    <% end %>
+
+    <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "any (POS or not)", match: :query, query: {search_pos: nil}, path: url_for(search_params.merge(search_pos: nil))) } %>
+  <% end %>
+</li>
+
+<li>
+  <%= render(UI::ButtonLink::Component.new(text: "Detailed graphs", size: :sm, href: graphs_path)) %>
+</li>

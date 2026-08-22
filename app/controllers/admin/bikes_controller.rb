@@ -2,6 +2,9 @@ module Admin
   class BikesController < Admin::BaseController
     include Binxtils::SortableTable
 
+    # The Admin::Bikes::Tabs tabs show renders; the rest are other controllers' screens
+    SHOW_TABS = %w[duplicates messages ownerships stickers recoveries impound].freeze
+
     before_action :find_bike, only: %i[edit update show]
     before_action :set_period, only: %i[index missing_manufacturer]
     around_action :set_reading_role, only: %i[index show]
@@ -78,11 +81,9 @@ module Admin
 
     def show
       @active_tab = params[:active_tab]
-      if @active_tab.present?
-        @page_title = "#{@active_tab.titleize}: #{@bike.title_string}"
-      else
-        redirect_to edit_admin_bike_path and return
-      end
+      return redirect_to(edit_admin_bike_path) unless SHOW_TABS.include?(@active_tab)
+
+      @page_title = "#{@active_tab.titleize}: #{@bike.title_string}"
     end
 
     def edit
@@ -117,6 +118,20 @@ module Admin
       end
     end
 
+    # The organizations picker is a multiselect combobox, which renders its selections
+    # through this rather than holding them itself
+    def organization_chips
+      organizations = Organization.unscoped.where(id: combobox_values).index_by { it.id.to_s }
+
+      chips = combobox_values.filter_map do |value|
+        next if organizations[value].blank?
+
+        helpers.hw_combobox_selection_chip(display: organizations[value].name, value:, for_id: params[:for_id])
+      end
+
+      render turbo_stream: helpers.safe_join(chips)
+    end
+
     def unrecover
       stolen_record = StolenRecord.unscoped.where(bike_id: params[:bike_id],
         id: params[:stolen_record_id]).first
@@ -132,6 +147,11 @@ module Admin
     helper_method :available_bikes
 
     protected
+
+    # Selection order, so adding an organization appends its chip
+    def combobox_values
+      @combobox_values ||= params[:combobox_values].to_s.split(",")
+    end
 
     def sortable_columns
       %w[id owner_email manufacturer_id updated_by_user_at]

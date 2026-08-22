@@ -1,0 +1,52 @@
+<h4 class="tw:mt-4 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">
+  Recovery Information
+  <%= link_to "view", admin_recovery_path(@stolen_record.to_param), class: "twlink tw:ml-2 tw:text-sm" %>
+</h4>
+
+<div class="tw:flex tw:flex-wrap">
+  <div class="tw:w-full tw:lg:w-1/2 tw:lg:pr-4">
+    <table class="table-list">
+      <tbody>
+        <tr>
+          <td>Recovered at</td>
+
+          <td>
+            <%= render(UI::Time::Component.new(time: @stolen_record.recovered_at)) %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Recovered by</td>
+
+          <td><%= recovering_user_cell %></td>
+        </tr>
+
+        <tr>
+          <td>We Helped</td>
+
+          <td><%= check_mark if @stolen_record.index_helped_recovery %></td>
+        </tr>
+
+        <tr>
+          <td>Can Share</td>
+
+          <td><%= check_mark if @stolen_record.can_share_recovery %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tw:w-full tw:lg:w-1/2">
+    <table class="table-list">
+      <tbody>
+        <tr>
+          <td class="tw:text-left" colspan="2">Description</td>
+        </tr>
+
+        <tr>
+          <td colspan="2"><%= @stolen_record.recovered_description %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
