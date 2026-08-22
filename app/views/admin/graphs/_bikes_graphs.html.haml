@@ -84,12 +84,15 @@
               %th.text-left Origin
               %th.text-right Bikes
             %tbody
-              - Ownership.origins.each do |origin|
+              - origin_bike_counts.each do |origin, bike_count|
+                -# Chartkick fills its columns at half opacity and outlines them; the swatch matches
+                - origin_color = origin_colors[origin]
                 %tr
                   %td.text-left
+                    %span.d-inline-block.mr-1{style: "width: .75rem; height: .75rem; border: 1px solid #{origin_color}; background-color: #{origin_color}80;"}
                     = origin.humanize
                     = link_to search_emoji, admin_bikes_path(sortable_params.merge(search_origin: origin))
-                  %td.text-right= number_display(matching_bikes.includes(:ownerships).where(ownerships: {origin: origin}).count)
+                  %td.text-right= number_display(bike_count)
               -# TODO: make this actually work
               -# %tr
               -#   %td.text-left Transferred pre-registration
