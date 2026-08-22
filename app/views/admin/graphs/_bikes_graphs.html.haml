@@ -3,9 +3,6 @@
   - unless @ignored_only
     %li.nav-item
       = link_to "Ignored bikes only (deleted, test, spam)", admin_graphs_path(sortable_params.merge(search_ignored: true)), class: "nav-link"
-  - if show_search_statuses
-    %li.nav-item
-      = render(UI::Button::Component.new(text: "Search statuses", color: :secondary, size: :sm, active: @not_default_statuses, data: {controller: "admin--search-statuses", action: "click->admin--search-statuses#dispatchToggle admin--search-statuses:opened@window->admin--search-statuses#syncTrigger"}))
 .row.mt-4.mb-4
   .col-md-6.order-2.order-md-1
     - if params[:search_manufacturer].present?
@@ -33,14 +30,19 @@
 
   .col-md-6.order-1.order-md-2
     - if show_search_statuses
-      = form_tag admin_graphs_path(search_kind: "bikes"), method: :get do
+      = form_tag admin_graphs_path(search_kind: "bikes"), method: :get, data: {controller: "ui--collapse"} do
         = render partial: "/shared/hidden_search_fields"
 
         = render(Admin::Bikes::Index::SearchStatuses::Component.new(index: admin_index_state, searched_statuses: @searched_statuses, default_statuses: @default_statuses, not_default_statuses: @not_default_statuses, display_dev_info: display_dev_info?))
 
         .form-inline.mt-2
           .mr-auto
-          = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
+          = render(UI::Button::Component.new(size: :sm, active: @not_default_statuses, html_class: "tw:inline-flex tw:items-center tw:gap-1.5", data: {action: "click->ui--collapse#toggle", "ui--collapse-target": "trigger"})) do
+            %span{ class: "tw:inline-block tw:transition-transform tw:duration-200", data: { "ui--collapse-target": "chevron" } }
+              %span{ class: "tw:flex" }
+                = render UI::IconChevron::Component.new
+            Search statuses
+          = submit_tag "Search", name: "search", class: "btn btn-primary mb-2 ml-2"
 
 
   - if @ignored_only

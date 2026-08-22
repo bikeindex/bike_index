@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { collapse } from 'utils/collapse_utils'
+import { collapseField } from 'utils/collapse_utils'
 
 // Connects to data-controller='admin--bike-edit-form'
 //
@@ -21,9 +21,11 @@ export default class extends Controller {
     this.serialTarget.classList.toggle('fake-disabled', target.checked)
   }
 
+  // collapseField rather than collapse: hiding alone leaves a reason someone typed and
+  // then hid still posting, and any reason at all is what recovers the bike
   stolenChanged () {
     const recovering = !this.stolenTarget.checked
-    collapse(recovering ? 'show' : 'hide', this.recoveryFieldsTarget)
+    collapseField(this.recoveryFieldsTarget, recovering)
     this.recoveryReasonTarget.required = recovering
   }
 }

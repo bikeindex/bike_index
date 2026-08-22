@@ -1,8 +1,8 @@
+<%# ui--collapse lives on the form, which holds this and the trigger that opens it %>
+
 <div
   class="tw:mb-2 <%= "tw:hidden" unless @not_default_statuses %>"
-  data-controller="admin--search-statuses"
-  data-action="admin--search-statuses:toggle@window->admin--search-statuses#toggle
-               change->admin--search-statuses#lock"
+  data-ui--collapse-target="content"
 >
   <p class="tw:mb-1"><em>Include bikes that are:</em></p>
 
