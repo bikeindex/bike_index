@@ -12,15 +12,12 @@ module Admin
                        "any_pos" => "POS of any type", "no_pos" => "Not POS"}.freeze
 
           def initialize(index:, motorized: false, multi_delete: false,
-            origin_search_type: nil, pos_search_type: nil, not_default_statuses: false,
-            show_search_statuses: true, period: nil)
+            origin_search_type: nil, pos_search_type: nil, period: nil)
             @index = index
             @motorized = motorized
             @multi_delete = multi_delete
             @origin_search_type = origin_search_type
             @pos_search_type = pos_search_type
-            @not_default_statuses = not_default_statuses
-            @show_search_statuses = show_search_statuses
             @period = period
           end
 
