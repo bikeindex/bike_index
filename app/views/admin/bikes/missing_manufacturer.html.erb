@@ -1,0 +1,92 @@
+<%= render(Admin::Headers::Nav::Component.new(title: "Multi manufacturer update")) do %>
+  <%#
+    The view-ordering pair reads session[:missing_manufacturer_time_order], which survives
+    with no param in the URL - so active: has to come from the controller, not a
+    UI::ActiveLink query:
+  %>
+
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "all bikes", href: admin_bikes_path, size: :sm)) %>
+  </li>
+
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "motorized", size: :sm, active: @motorized,
+          href: url_for(sortable_search_params.merge(search_motorized: !@motorized)))) %>
+  </li>
+
+  <li>
+    <% include_spam = Binxtils::InputNormalizer.boolean(params[:search_spam]) %>
+
+    <%= render(UI::ButtonLink::Component.new(text: "spam & deleted", size: :sm, active: include_spam,
+          href: url_for(sortable_search_params.merge(search_spam: !include_spam, search_deleted: !include_spam)))) %>
+  </li>
+
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Include blank", size: :sm, active: @include_blank,
+          href: url_for(sortable_search_params.merge(search_include_blank: !@include_blank)))) %>
+  </li>
+
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Alphabetical view", size: :sm,
+          active: !session[:missing_manufacturer_time_order],
+          href: url_for(sortable_search_params.merge(reset_view: true)))) %>
+  </li>
+
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Time ordered view", size: :sm,
+          active: session[:missing_manufacturer_time_order].present?,
+          href: url_for(sortable_search_params.merge(search_time_ordered: true)))) %>
+  </li>
+<% end %>
+
+<%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:) %>
+
+<% if current_organization.present? %>
+  <p>
+    <em>Only including bikes from</em>
+    <%= link_to current_organization.name, admin_organization_path(current_organization.to_param), class: "twlink" %>
+  </p>
+<% elsif @exclude_organizations.present? %>
+  <p>
+    <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
+      Excluding <%= "organization".pluralize(@exclude_organizations.count) %>:
+    </span>
+
+    <% @exclude_organizations.each do |organization| %>
+      <%= link_to organization.name, admin_organization_path(organization.to_param), class: "twlink" %>
+    <% end %>
+  </p>
+<% end %>
+
+<%= form_tag missing_manufacturer_admin_bikes_path, method: :get do %>
+  <%= render partial: "/shared/hidden_search_fields" %>
+  <%= hidden_field_tag :search_exclude_organization_ids, params[:search_exclude_organization_ids] %>
+
+  <div class="tw:my-4 tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-2">
+    <%= text_field_tag :search_other_name, params[:search_other_name], placeholder: "Search Other mnfg",
+          class: "twinput tw:w-auto" %>
+
+    <%= render(UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search")) %>
+  </div>
+<% end %>
+
+<%= render(Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state)) %>
+
+<%= form_tag update_manufacturers_admin_bikes_path, data: {controller: "table-multi-checkbox"} do %>
+  <div class="tw:flex tw:flex-wrap tw:items-end tw:gap-4">
+    <div class="tw:min-w-64">
+      <%= render(UI::Forms::Group::Component.new(attribute: :manufacturer_id, label_text: Manufacturer.model_name.human)) do %>
+        <%= render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, no_manufacturer_other: true) %>
+      <% end %>
+    </div>
+
+    <div class="tw:mb-4">
+      <%= render(UI::Button::Component.new(text: "Update selected", color: :primary, type: "submit")) %>
+    </div>
+  </div>
+
+  <%= render(Admin::Bikes::MissingManufacturerTable::Component.new(bikes: @bikes, index: admin_index_state,
+        searched_other_name: params[:search_other_name])) %>
+<% end %>
+
+<%= render(Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state)) %>

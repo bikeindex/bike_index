@@ -1,0 +1,46 @@
+<%= render(Admin::Headers::Tabs::Component.new(title:, tabs:, links: [non_admin_view_link],
+      nav_label: "Registration sections")) do |header| %>
+  <% if alerts? %>
+    <% header.with_alert do %>
+      <% if @bike.deleted? %>
+        <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "#{@bike.type_titleize} deleted")) do %>
+          <%= render(UI::Time::Component.new(time: @bike.deleted_at, format: :localize_time_precise, preposition: true)) %>
+        <% end %>
+      <% end %>
+
+      <% if @bike.likely_spam? %>
+        <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "This #{@bike.type} is likely spam",
+              text: "No need to remove it - it doesn't show up in searches, and is deleted automatically")) %>
+      <% end %>
+
+      <% if @bike.example? %>
+        <%= render(UI::Alerts::Base::Component.new(kind: :error, header: "#{@bike.type_titleize} is a test registration")) do %>
+          No need to remove it - it doesn't show up in searches, and is deleted
+          automatically
+          <small class="tw:mt-1 tw:block">This is also known as an <em>example bike</em></small>
+        <% end %>
+      <% end %>
+
+      <% if @bike.user_hidden %>
+        <%= render(UI::Alerts::Base::Component.new(kind: :warning, header: "Marked hidden")) do %>
+          <% if @bike.unregistered_parking_notification? %>
+            <span class="tw:mb-2 tw:block"><strong>Hidden because it was created by parking notification.</strong> Only members of the organization (and Bike Index superadmins) can see it.</span>
+            Creation notification:
+            <%= link_to unregistered_parking_notification.kind_humanized.downcase,
+                  organization_parking_notification_path(unregistered_parking_notification,
+                    organization_id: unregistered_parking_notification.organization.to_param),
+                  class: "twlink" %>
+
+
+            <small class="tw:mt-2 tw:block">
+              This is also known as an unregistered <%= @bike.type %>
+            </small>
+          <% else %>
+            <strong class="tw:mb-1 tw:block">Hidden by the user</strong> No one
+            but the user (and Bike Index superadmins) can see it
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

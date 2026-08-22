@@ -1,0 +1,87 @@
+<div
+  class="tw:mt-8"
+  data-controller="ui--collapse"
+  data-ui--collapse-param-value="creation_data"
+>
+  <%# With dev info on this always shows, so the trigger would only ever close it %>
+  <% unless @display_dev_info %>
+    <%= render(UI::Button::Component.new(color: :link,
+          html_class: "tw:inline-flex tw:items-center tw:gap-1.5",
+          data: {action: "click->ui--collapse#toggle", "ui--collapse-target": "trigger"})) do %>
+      <span class="tw:inline-block tw:transition-transform tw:duration-200" data-ui--collapse-target="chevron"><span class="tw:flex"><%= render UI::IconChevron::Component.new %></span></span>
+      Creation data &amp; developer information
+    <% end %>
+  <% end %>
+
+  <div
+    class="<%= "tw:hidden" unless @display_dev_info %>"
+    data-ui--collapse-target="content"
+  >
+    <div class="twwiderow tw:mt-4">
+      <% ownerships.each do |ownership| %>
+        <div>
+          <%= render(UI::DefinitionList::Container::Component.new) do %>
+            <%= render(UI::DefinitionList::Row::Component.new(label: "Kind")) do %>
+              Ownership <%= ownership_kind(ownership) %>
+            <% end %>
+
+            <%= render(UI::DefinitionList::Row::Component.new(label: "Created")) do %>
+              <%= render(UI::Time::Component.new(time: ownership.created_at)) %>
+
+              <% if @display_dev_info %>
+                <code class="tw:ml-2 tw:text-xs">ID: <%= ownership.id %></code>
+              <% end %>
+            <% end %>
+
+            <%= render(UI::DefinitionList::Row::Component.new(label: "Updated")) do %>
+              <%= render(UI::Time::Component.new(time: ownership.updated_at)) %>
+            <% end %>
+
+            <%= render(UI::DefinitionList::Row::Component.new(label: "Organization",
+                  value: organization_link(ownership))) %>
+
+            <%= render(UI::DefinitionList::Row::Component.new(label: "Creator", value: creator_link(ownership))) %>
+
+            <% ownership.registration_info&.each do |key, value| %>
+              <%= render(UI::DefinitionList::Row::Component.new(label: key, value:)) %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <div class="twjson-box">
+          <%= helpers.pretty_print_json(ownership_attributes(ownership), true) %>
+        </div>
+      <% end %>
+    </div>
+
+    <% if b_params.none? %>
+      <p class="tw:mt-4">No <code>BParams</code> exist</p>
+    <% else %>
+      <div class="twwiderow tw:mt-4">
+        <% b_params.each do |b_param| %>
+          <div>
+            <%= render(UI::DefinitionList::Container::Component.new) do %>
+              <%= render(UI::DefinitionList::Row::Component.new(label: "Kind", value: "BParam")) %>
+
+              <%= render(UI::DefinitionList::Row::Component.new(label: "Created")) do %>
+                <%= render(UI::Time::Component.new(time: b_param.created_at)) %>
+
+                <% if @display_dev_info %>
+                  <code class="tw:ml-2 tw:text-xs">ID: <%= b_param.id %></code>
+                <% end %>
+              <% end %>
+
+              <%= render(UI::DefinitionList::Row::Component.new(label: "Updated")) do %>
+                <%= render(UI::Time::Component.new(time: b_param.updated_at)) %>
+              <% end %>
+            <% end %>
+          </div>
+
+          <div class="twjson-box">
+            <%= helpers.pretty_print_json(b_param.params, true) %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
