@@ -8,14 +8,15 @@ module PageBlock
       # logo_only renders just the logo, for the OAuth authorization prompt.
       class Component < ApplicationComponent
         # Digest of the cached template — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "e95abd8afbfe"
+        MARKUP_DIGEST = "b0ec4fdda27a"
 
         def initialize(logo_only: false, current_user: nil, current_user_or_unconfirmed_user: nil,
-          passive_organization: nil)
+          passive_organization: nil, old_register_view: false)
           @logo_only = logo_only
           @current_user = current_user
           @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user
           @passive_organization = passive_organization
+          @old_register_view = old_register_view
         end
 
         # The layout asks, since the sidebar is a column the page is laid out around
@@ -28,7 +29,7 @@ module PageBlock
 
         def org_sidebar
           @org_sidebar ||= PageBlock::Navbar::OrgSidebar::Component.new(organization: @passive_organization,
-            current_user: @current_user, current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user)
+            current_user: @current_user, old_register_view: @old_register_view)
         end
 
         # logo_only renders none of the elements the controller drives
@@ -47,8 +48,9 @@ module PageBlock
         end
 
         def primary_menu
-          PageBlock::Navbar::PrimaryMenu::Component.new(current_user: @current_user,
-            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user)
+          PageBlock::Navbar::PrimaryMenu::Component.new(
+            current_user_or_unconfirmed_user: @current_user_or_unconfirmed_user
+          )
         end
       end
     end

@@ -281,6 +281,84 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     end
   end
 
+  describe "new" do
+    it "renders the register flow's step 1, attributed to the organization, inside the organized menu" do
+      expect { get "#{base_url}/new" }.to change(BParam, :count).by 1
+      expect(response.status).to eq(200)
+      b_param = BParam.last
+      expect(b_param).to have_attributes(origin: "register_flow_organized",
+        creation_organization_id: current_organization.id)
+      expect(assigns(:b_param)&.id).to eq b_param.id
+      # The member is registering someone else's vehicle, so it isn't seeded with their email
+      expect(b_param.owner_email).to be_blank
+      expect(response.body).to include("org_sidebar_nav")
+      expect(response.body).to include(b_param.id_token)
+      expect(response.body).to include(new_organization_bike_path(organization_id: current_organization.to_param))
+
+      expect { get "#{base_url}/new" }.to_not change(BParam, :count)
+
+      # ... but a shell started on /register isn't taken over, so it stays attributed there
+      expect { get "/register/new?discard_token=#{b_param.id_token}" }.to_not change(BParam, :count)
+      expect(BParam.last.origin).to eq "register_flow"
+      expect { get "#{base_url}/new" }.to change(BParam, :count).by 1
+      b_param = BParam.last
+      expect(b_param.origin).to eq "register_flow_organized"
+
+      # A link naming a status or an owner seeds the shell it lands on, rather than
+      # starting another one
+      expect { get "#{base_url}/new", params: {status: "stolen"} }.to_not change(BParam, :count)
+      expect { get "#{base_url}/new", params: {email: "customer@bikeindex.org"} }
+        .to_not change(BParam, :count)
+      expect(b_param.reload).to have_attributes(status: "status_stolen",
+        owner_email: "customer@bikeindex.org")
+    end
+
+    context "gone back to the old view" do
+      # bikes#new redirects without one, so the old view has to be reachable
+      let(:current_organization) do
+        FactoryBot.create(:organization_with_organization_features, :with_auto_user, enabled_feature_slugs:)
+      end
+      let(:old_view_path) { new_organization_bike_path(organization_id: current_organization.to_param) }
+      # Not a let - it's read after each request in turn, and a let would memoize the first
+      def menu_add_bike_path
+        Nokogiri::HTML(response.body).css("#org_sidebar_nav a")
+          .find { |a| a.text.strip == "Add a bike" }&.[]("href")
+      end
+
+      it "keeps the menu on the old view until the register flow is asked for again" do
+        get "#{base_url}/new"
+        expect(menu_add_bike_path).to eq "#{base_url}/new"
+
+        get old_view_path, params: {old_view: true}
+        expect(session[:old_register_view]).to be_truthy
+        expect(menu_add_bike_path).to eq old_view_path
+
+        # Every organized page follows it, not just the one that set it
+        get base_url
+        expect(menu_add_bike_path).to eq old_view_path
+
+        # And the register flow's own link is the way back
+        get "#{base_url}/new"
+        expect(session[:old_register_view]).to be_blank
+        expect(menu_add_bike_path).to eq "#{base_url}/new"
+
+        # Landing on the old view any other way isn't a preference
+        get old_view_path
+        expect(session[:old_register_view]).to be_blank
+        expect(menu_add_bike_path).to eq "#{base_url}/new"
+      end
+    end
+
+    context "not an organization member" do
+      include_context :request_spec_logged_in_as_user
+
+      it "redirects" do
+        expect { get "#{base_url}/new" }.to_not change(BParam, :count)
+        expect(response).to redirect_to user_root_url
+      end
+    end
+  end
+
   describe "multi_search" do
     it "renders" do
       get "#{base_url}/multi_search"
@@ -293,15 +371,13 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     let!(:bike) { FactoryBot.create(:bike_organized, serial_number: "ABCD1234", creation_organization: current_organization) }
     let!(:other_bike) { FactoryBot.create(:bike, serial_number: "WXYZ9999") }
 
-    it "searches and returns matching org bikes" do
+    it "returns matching org bikes, and none from other orgs" do
       get "#{base_url}/multi_search_response", params: {serial: "ABCD1234"},
         headers: {"Accept" => "text/vnd.turbo-stream.html"}
       expect(response.status).to eq(200)
       expect(response.media_type).to eq("text/vnd.turbo-stream.html")
       expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
-    end
 
-    it "does not return bikes from other orgs" do
       get "#{base_url}/multi_search_response", params: {serial: "WXYZ9999"},
         headers: {"Accept" => "text/vnd.turbo-stream.html"}
       expect(response.status).to eq(200)
@@ -345,7 +421,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     let!(:unclaimed_sticker) { FactoryBot.create(:bike_sticker, code: "CA113", organization: current_organization) }
     let!(:other_sticker) { FactoryBot.create(:bike_sticker_claimed, code: "ZZ999", bike: other_bike) }
 
-    it "returns claimed-sticker bikes (own + cross-org with redaction), skips unclaimed, 400s without query" do
+    it "returns claimed-sticker bikes (own + cross-org with redaction), skips unclaimed, 400s or blanks on a bad query" do
       # Own-org claimed sticker → bike returned
       get "#{base_url}/multi_search_response", params: {search_kind: "stickers", query: "CA112"}, headers: turbo_headers
       expect(response.status).to eq(200)
@@ -367,9 +443,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       # Missing query → bad request
       get "#{base_url}/multi_search_response", params: {search_kind: "stickers"}, headers: turbo_headers
       expect(response.status).to eq(400)
-    end
 
-    it "returns no bikes when the query normalizes to a blank code" do
       # bike and other_bike both have claimed stickers; a query that normalizes to a blank code
       # must not fall through to sticker_code_search's `all` and surface every organization's bikes
       get "#{base_url}/multi_search_response", params: {search_kind: "stickers", query: "bikeindex.org/bikes/"}, headers: turbo_headers

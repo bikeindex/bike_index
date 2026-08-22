@@ -1,34 +1,23 @@
 <% nav_header_list_items = capture do %>
   <% if current_organization.present? %>
-    <li class="nav-item">
-      <%= link_to "#{current_organization.short_name} view", organization_graduated_notifications_path({organization_id: current_organization.to_param}.merge(sortable_search_params)), class: "nav-link strong" %>
+    <li>
+      <%= render(UI::ButtonLink::Component.new(text: "#{current_organization.short_name} view", href: organization_graduated_notifications_path({organization_id: current_organization.to_param}.merge(sortable_search_params)), size: :sm)) %>
     </li>
   <% end %>
 
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @search_status == 'all' ? '' : 'active' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <%= @search_status.humanize %> notifications
-    </a>
-
-    <div class="dropdown-menu">
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: "#{@search_status.humanize} notifications", button_size: :sm,
+          active: @search_status != "all")) do |dropdown| %>
       <% (["all"] + GraduatedNotification.statuses).each do |kind| %>
         <% kind_active = @search_status == kind %>
         <% kind_display = "#{GraduatedNotification.status_humanized(kind)} notifications" %>
-
-        <%= link_to kind_display, url_for(sortable_search_params.merge(search_status: (kind_active ? nil : kind))), class: "dropdown-item #{kind_active ? 'active' : ''}" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind_display, path: url_for(sortable_search_params.merge(search_status: (kind_active ? nil : kind))), match_params: {search_status: kind}) } %>
 
         <% if kind == "all" %>
-          <div class="dropdown-divider"></div>
+          <% dropdown.with_entry_divider %>
         <% end %>
       <% end %>
-    </div>
+    <% end %>
   </li>
 <% end %>
 

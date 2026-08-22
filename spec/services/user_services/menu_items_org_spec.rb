@@ -53,13 +53,22 @@ RSpec.describe UserServices::MenuItemsOrg do
           group_item(:registrations, "#{organization.short_name} Registrations", "bike", [
             link_item("Search Registrations", "/o/#{organization.to_param}/registrations")
           ]),
-          link_item("Add a bike", "/o/#{organization.to_param}/bikes/new",
+          link_item("Add a bike", "/o/#{organization.to_param}/registrations/new",
             icon: "plus-circle", match_params: {parking_notification: UI::ActiveLink::Component::BLANK})
         ]
       end
 
       it "drops every group whose features are off, and the divider left behind" do
         expect(items).to eq(target)
+      end
+
+      context "gone back to the old view" do
+        subject(:items) { described_class.for(organization:, current_user:, old_register_view: true) }
+
+        it "points add a bike at the embed form" do
+          expect(items.last).to eq(link_item("Add a bike", "/o/#{organization.to_param}/bikes/new",
+            icon: "plus-circle", match_params: {parking_notification: UI::ActiveLink::Component::BLANK}))
+        end
       end
     end
 

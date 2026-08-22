@@ -1,80 +1,38 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @search_kind != 'all' ? 'active' : '' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <% if @search_kind == "all" %>
-        All Kinds
-      <% else %>
-        <%= @search_kind.humanize %>
-      <% end %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "All kinds", admin_bike_sticker_updates_path(sortable_search_params.merge(search_kind: nil)), class: "dropdown-item #{@search_kind == 'all' ? 'active' : ''}" %>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: @search_kind == "all" ? "All Kinds" : @search_kind.humanize, button_size: :sm,
+          active: @search_kind != "all")) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All kinds", path: admin_bike_sticker_updates_path(sortable_search_params.merge(search_kind: nil)), match_params: {search_kind: UI::ActiveLink::Component::BLANK}) } %>
 
       <% BikeStickerUpdate.kinds.each do |kind| %>
         <% kind_active = @search_kind == kind %>
-        <%= link_to kind.humanize, admin_bike_sticker_updates_path(sortable_search_params.merge(search_kind: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind.humanize, path: admin_bike_sticker_updates_path(sortable_search_params.merge(search_kind: kind_active ? nil : kind)), match_params: {search_kind: kind}) } %>
       <% end %>
-    </div>
+    <% end %>
   </li>
 
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @search_organization_kind != 'all' ? 'active' : '' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <% if @search_organization_kind == "all" %>
-        Organization Kinds
-      <% else %>
-        <%= @search_organization_kind.humanize %>
-      <% end %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "All Organization kinds", admin_bike_sticker_updates_path(sortable_search_params.merge(search_organization_kind: nil)), class: "dropdown-item #{@search_organization_kind == 'all' ? 'active' : ''}" %>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: @search_organization_kind == "all" ? "Organization Kinds" : @search_organization_kind.humanize, button_size: :sm,
+          active: @search_organization_kind != "all")) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All Organization kinds", path: admin_bike_sticker_updates_path(sortable_search_params.merge(search_organization_kind: nil)), match_params: {search_organization_kind: UI::ActiveLink::Component::BLANK}) } %>
 
       <% BikeStickerUpdate.organization_kinds.each do |kind| %>
         <% kind_active = @search_organization_kind == kind %>
-        <%= link_to kind.humanize, admin_bike_sticker_updates_path(sortable_search_params.merge(search_organization_kind: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind.humanize, path: admin_bike_sticker_updates_path(sortable_search_params.merge(search_organization_kind: kind_active ? nil : kind)), match_params: {search_organization_kind: kind}) } %>
       <% end %>
-    </div>
+    <% end %>
   </li>
 
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @search_creator_kind != 'all' ? 'active' : '' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <% if @search_creator_kind == "all" %>
-        All creators
-      <% else %>
-        <%= @search_creator_kind.gsub("creator_", "").humanize %>
-      <% end %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "All creators", admin_bike_sticker_updates_path(sortable_search_params.merge(search_creator_kind: nil)), class: "dropdown-item #{@search_creator_kind == 'all' ? 'active' : ''}" %>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: @search_creator_kind == "all" ? "All creators" : @search_creator_kind.gsub("creator_", "").humanize, button_size: :sm,
+          active: @search_creator_kind != "all")) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All creators", path: admin_bike_sticker_updates_path(sortable_search_params.merge(search_creator_kind: nil)), match_params: {search_creator_kind: UI::ActiveLink::Component::BLANK}) } %>
 
       <% BikeStickerUpdate.creator_kinds.each do |creator_kind| %>
         <% kind_active = @search_creator_kind == creator_kind %>
-        <%= link_to creator_kind.gsub("creator_", "").humanize, admin_bike_sticker_updates_path(sortable_search_params.merge(search_creator_kind: kind_active ? nil : creator_kind)), class: "dropdown-item #{kind_active ? 'active' : ''}" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: creator_kind.gsub("creator_", "").humanize, path: admin_bike_sticker_updates_path(sortable_search_params.merge(search_creator_kind: kind_active ? nil : creator_kind)), match_params: {search_creator_kind: creator_kind}) } %>
       <% end %>
-    </div>
+    <% end %>
   </li>
 <% end %>
 

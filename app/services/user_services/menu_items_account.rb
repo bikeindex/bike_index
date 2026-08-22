@@ -19,11 +19,11 @@ module UserServices
 
     # opens: which way the menu unrolls from its trigger, so it reads outward from there either
     # way. The switcher holds its own order regardless: leaving the organization behind leads it
-    def for(current_user:, current_user_or_unconfirmed_user:, current_organization: nil, opens: :down)
+    def for(user:, current_organization: nil, opens: :down)
       raise ArgumentError, "opens: must be one of #{OPENS}" unless OPENS.include?(opens)
 
-      account = account_rows(current_user, current_user_or_unconfirmed_user)
-      switcher = organization_switcher(current_user_or_unconfirmed_user, current_organization:)
+      account = account_rows(user)
+      switcher = organization_switcher(user, current_organization:)
 
       sections = (opens == :up) ? [[logout_row], switcher, account.reverse] : [account, switcher, [logout_row]]
       sections.reject(&:empty?).inject { |rows, section| rows + [divider] + section }
@@ -55,9 +55,9 @@ module UserServices
 
     # navUserSettingLink is how the signed-in email is read off a page -- by
     # .claude/skills/frontend-screenshots' identity gate, among others
-    def account_rows(current_user, user)
+    def account_rows(user)
       [link(translation(:your_registrations), routes.my_account_path),
-        marketplace_messages(current_user),
+        marketplace_messages(user),
         link(translation(:register_a_new_bike), routes.register_path,
           match_paths: "#{routes.register_path}/**"),
         link(translation(:user_settings, user_email: user.email), routes.edit_my_account_path,

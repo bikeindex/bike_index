@@ -1,56 +1,31 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @recovery_display_status != 'waiting_on_decision' ? 'active' : '' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <%= @recovery_display_status.titleize %> <%= "statuses" if @recovery_display_status == "all" %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "All statuses", url_for(sortable_search_params.merge(search_recovery_display_status: "all")), class: "dropdown-item #{@recovery_display_status == 'all' ? 'active' : ''}" %>
-
-      <div class="dropdown-divider"></div>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: "#{@recovery_display_status.titleize} #{"statuses" if @recovery_display_status == "all"}", button_size: :sm,
+          active: @recovery_display_status != "waiting_on_decision")) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All statuses", path: url_for(sortable_search_params.merge(search_recovery_display_status: "all")), match_params: {search_recovery_display_status: "all"}) } %>
+      <% dropdown.with_entry_divider %>
 
       <% StolenRecord.recovery_display_statuses.each do |recovery_display_status| %>
-        <%= link_to recovery_display_status.to_s.humanize, url_for(sortable_search_params.merge(search_recovery_display_status: recovery_display_status)), class: "dropdown-item #{recovery_display_status == @recovery_display_status ? 'active' : ''}" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: recovery_display_status.to_s.humanize, path: url_for(sortable_search_params.merge(search_recovery_display_status: recovery_display_status)), match_params: {search_recovery_display_status: recovery_display_status}) } %>
       <% end %>
-    </div>
+    <% end %>
   </li>
 
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= params[:search_displayed].present? ? 'active' : '' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <% if params[:search_displayed].present? %>
-        Only <%= params[:search_displayed].titleize %>
-      <% else %>
-        Displayed and not
-      <% end %>
-    </a>
-
-    <div class="dropdown-menu">
-      <%= link_to "Displayed and not", url_for(sortable_search_params.merge(search_displayed: nil)), class: "dropdown-item #{params[:search_displayed].blank? ? 'active' : ''}" %>
-      <%= link_to "Only Displayed", url_for(sortable_search_params.merge(search_displayed: "displayed")), class: "dropdown-item #{params[:search_displayed] == 'posted' ? 'active' : ''}" %>
-      <%= link_to "Only not displayed", url_for(sortable_search_params.merge(search_displayed: "not_displayed")), class: "dropdown-item #{params[:search_displayed] == 'not_displayed' ? 'active' : ''}" %>
-    </div>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: params[:search_displayed].present? ? "Only #{params[:search_displayed].titleize}" : "Displayed and not", button_size: :sm,
+          active: params[:search_displayed].present?)) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Displayed and not", path: url_for(sortable_search_params.merge(search_displayed: nil)), match_params: {search_displayed: UI::ActiveLink::Component::BLANK}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only Displayed", path: url_for(sortable_search_params.merge(search_displayed: "displayed")), match_params: {search_displayed: "displayed"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only not displayed", path: url_for(sortable_search_params.merge(search_displayed: "not_displayed")), match_params: {search_displayed: "not_displayed"}) } %>
+    <% end %>
   </li>
 
-  <li class="nav-item">
-    <%= link_to "Shareable", url_for(sortable_search_params.merge(search_shareable: !@shareable)), class: "nav-link #{@shareable ? 'active' : ''}" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Shareable", href: url_for(sortable_search_params.merge(search_shareable: !@shareable)), size: :sm, active: @shareable)) %>
   </li>
 
-  <li class="nav-item">
-    <%= link_to "Index Helped", url_for(sortable_search_params.merge(search_index_helped_recovery: !@index_helped_recovery)), class: "nav-link #{@index_helped_recovery ? 'active' : ''}" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Index Helped", href: url_for(sortable_search_params.merge(search_index_helped_recovery: !@index_helped_recovery)), size: :sm, active: @index_helped_recovery)) %>
   </li>
 <% end %>
 

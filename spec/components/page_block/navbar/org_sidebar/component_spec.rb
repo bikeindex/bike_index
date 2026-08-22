@@ -63,12 +63,12 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
         "/o/#{organization.to_param}/registration_sequence_pages/**"
   end
 
-  # Both point at organized/bikes#new, so only the param tells them apart
+  # The old view puts both rows on organized/bikes#new, so the param tells them apart
   it "matches the two add-a-bike rows on the param" do
     rows = component.css("nav a[data-ui--active-link-match-params-value]")
 
     expect(rows.map { |row| row["href"] })
-      .to eq(["/o/#{organization.to_param}/bikes/new",
+      .to eq(["/o/#{organization.to_param}/registrations/new",
         "/o/#{organization.to_param}/bikes/new?parking_notification=true"])
     expect(rows.map { |row| row["data-ui--active-link-match-params-value"] })
       .to eq([{parking_notification: ["blank"]}.to_json, {parking_notification: ["true"]}.to_json])

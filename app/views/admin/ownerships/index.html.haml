@@ -1,29 +1,19 @@
 - nav_header_list_items = capture_haml do
-  %li.nav-item.dropdown.dropleft
-    %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_organization_kind.present? ? "active" : "")}
-      - if @search_organization_kind.blank?
-        with and without organization
-      - else
-        = @search_organization_kind.humanize
-    .dropdown-menu
-      = link_to "with and without organizations", url_for(sortable_search_params.merge(search_organization_kind: nil)), class: "dropdown-item #{@search_organization_kind.blank? ? 'active' : ''}"
+  %li
+    = render(UI::Dropdown::Component.new(name: @search_organization_kind.blank? ? "with and without organization" : @search_organization_kind.humanize, button_size: :sm, active: @search_organization_kind.present?)) do |dropdown|
+      - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "with and without organizations", path: url_for(sortable_search_params.merge(search_organization_kind: nil)), match_params: {search_organization_kind: UI::ActiveLink::Component::BLANK}) }
       - organization_kind_options.each do |search_organization_kind|
-        = link_to search_organization_kind.humanize, url_for(sortable_search_params.merge(search_organization_kind:)), class: "dropdown-item #{@search_organization_kind == search_organization_kind ? 'active' : ''}"
+        - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: search_organization_kind.humanize, path: url_for(sortable_search_params.merge(search_organization_kind:)), match_params: {search_organization_kind:}) }
 
-  %li.nav-item.dropdown.dropleft
-    %a.nav-link.dropdown-toggle{href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@search_origin != "all" ? "active" : "")}
-      - if @search_origin == "all"
-        All origins
-      - elsif @search_origin == "only_initial"
-        Only initial
-      - else
-        = Ownership.origin_humanized(@search_origin).titleize
-    .dropdown-menu
-      = link_to "All origins", url_for(sortable_search_params.merge(search_origin: nil)), class: "dropdown-item #{@search_origin == 'all' ? 'active' : ''}"
-      = link_to "Only initial", url_for(sortable_search_params.merge(search_origin: "only_initial")), class: "dropdown-item #{@search_origin == 'only_initial' ? 'active' : ''}"
-      .dropdown-divider
+  %li
+    - origin_name = {"all" => "All origins", "only_initial" => "Only initial"}[@search_origin]
+    - origin_name ||= Ownership.origin_humanized(@search_origin).titleize
+    = render(UI::Dropdown::Component.new(name: origin_name, button_size: :sm, active: @search_origin != "all")) do |dropdown|
+      - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All origins", path: url_for(sortable_search_params.merge(search_origin: nil)), match_params: {search_origin: UI::ActiveLink::Component::BLANK}) }
+      - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only initial", path: url_for(sortable_search_params.merge(search_origin: "only_initial")), match_params: {search_origin: "only_initial"}) }
+      - dropdown.with_entry_divider
       - Ownership.origins.each do |origin|
-        = link_to Ownership.origin_humanized(origin).titleize, url_for(sortable_search_params.merge(search_origin: origin)), class: "dropdown-item #{@search_origin == origin ? 'active' : ''}"
+        - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: Ownership.origin_humanized(origin).titleize, path: url_for(sortable_search_params.merge(search_origin: origin)), match_params: {search_origin: origin}) }
 
 - table_view = render partial: "/admin/ownerships/table", locals: {ownerships: @ownerships, render_sortable: true}
 

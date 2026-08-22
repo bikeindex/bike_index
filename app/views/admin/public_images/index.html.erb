@@ -1,5 +1,5 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item tw:text-sm">
+  <li>
     <%= render(UI::Dropdown::Component.new(
       name: @imageable_type.present? ? "#{@imageable_type} only" : "All types",
       button_size: :sm,
@@ -13,7 +13,7 @@
     end %>
   </li>
 
-  <li class="nav-item tw:text-sm">
+  <li>
     <%= render(UI::Dropdown::Component.new(
       name: @kind.present? ? "#{@kind.titleize} only" : "All kinds",
       button_size: :sm,
@@ -27,7 +27,7 @@
     end %>
   </li>
 
-  <li class="nav-item tw:text-sm">
+  <li>
     <%= render(UI::Dropdown::Component.new(
       name: @storage.present? ? "Only #{storage_filters[@storage]}" : "All storage",
       button_size: :sm,
@@ -41,12 +41,12 @@
     end %>
   </li>
 
-  <li class="nav-item">
-    <%= link_to "Private", url_for(sortable_search_params.merge(search_private: !@private)), class: "nav-link #{@private ? "active" : ""}" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Private", href: url_for(sortable_search_params.merge(search_private: !@private)), size: :sm, active: @private)) %>
   </li>
 
-  <li class="nav-item">
-    <%= link_to "Show size", url_for(sortable_search_params.merge(search_size: !@render_size)), class: "nav-link #{@render_size ? "active" : ""}" %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Show size", href: url_for(sortable_search_params.merge(search_size: !@render_size)), size: :sm, active: @render_size)) %>
   </li>
 <% end %>
 

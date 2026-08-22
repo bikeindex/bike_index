@@ -1,5 +1,5 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item tw:text-sm">
+  <li>
     <%= render UI::ButtonLink::Component.new(
       href: new_admin_superuser_ability_path(user_id: params[:user_id]),
       text: "New Superuser Ability",

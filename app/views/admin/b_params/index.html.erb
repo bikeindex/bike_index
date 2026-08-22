@@ -1,22 +1,12 @@
 <% nav_header_list_items = capture do %>
-  <li class="nav-item dropdown">
-    <a
-      class="nav-link dropdown-toggle <%= @search_completeness != 'all' ? 'active' : '' %>"
-      href="#"
-      role="button"
-      data-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-    >
-      <%= @search_completeness.humanize %>
-    </a>
-
-    <div class="dropdown-menu">
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: @search_completeness.humanize, button_size: :sm,
+          active: @search_completeness != "all")) do |dropdown| %>
       <% %w[all only_incomplete only_complete].each do |kind| %>
         <% kind_active = @search_completeness == kind %>
-        <%= link_to kind.humanize, admin_b_params_path(sortable_search_params.merge(search_completeness: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind.humanize, path: admin_b_params_path(sortable_search_params.merge(search_completeness: kind_active ? nil : kind)), match_params: {search_completeness: kind}) } %>
       <% end %>
-    </div>
+    <% end %>
   </li>
 <% end %>
 

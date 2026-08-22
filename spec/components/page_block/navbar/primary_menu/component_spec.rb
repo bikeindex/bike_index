@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe PageBlock::Navbar::PrimaryMenu::Component, type: :component do
   let(:current_user) { nil }
   let(:instance) do
-    described_class.new(current_user:, current_user_or_unconfirmed_user: current_user)
+    described_class.new(current_user_or_unconfirmed_user: current_user)
   end
   let(:component) { render_inline(instance) }
   let(:menu_links) { component.css("#primary-main-menu a").map { |link| link.text.strip } }
