@@ -10,7 +10,7 @@ module Admin
           email: nil,
           user_link_path: nil,
           search_url: nil,
-          sort_state: ComponentStates::SortState.new,
+          sort_state: ComponentStructs::SortState.new,
           render_search: false
         )
           @user = user

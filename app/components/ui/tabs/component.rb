@@ -5,7 +5,7 @@ module UI
     # A row of tabs with its own underline, which the active tab breaks through. A row too
     # wide for the screen scrolls sideways rather than wrapping.
     #
-    # tabs: [{label:, href:, active:, count:}, …] - count is optional
+    # tabs: [{label:, href:, active:, count:, classes:}, …] - count and classes are optional
     class Component < ApplicationComponent
       TAB_CLASSES = "tw:-mb-px tw:inline-flex tw:items-baseline tw:gap-1 tw:whitespace-nowrap " \
         "tw:rounded-t-md tw:border tw:px-4 tw:py-2 tw:text-sm tw:no-underline"
@@ -26,7 +26,7 @@ module UI
       private
 
       def link_classes(tab)
-        [TAB_CLASSES, tab[:active] ? ACTIVE_CLASSES : INACTIVE_CLASSES].join(" ")
+        [TAB_CLASSES, tab[:active] ? ACTIVE_CLASSES : INACTIVE_CLASSES, tab[:classes]].compact.join(" ")
       end
     end
   end

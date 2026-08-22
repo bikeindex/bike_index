@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module ComponentStates
+module ComponentStructs
   # How a table is sorted, plus the search params its links have to carry. The three
   # travel together everywhere a sortable table is rendered, so they're passed as one.
   SortState = Data.define(:search_params, :sort, :direction) do

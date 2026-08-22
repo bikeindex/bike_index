@@ -4,7 +4,7 @@ module Admin
   module Organizations
     module LandingPagesTable
       class Component < ApplicationComponent
-        def initialize(collection:, sort_state: ComponentStates::SortState.new,
+        def initialize(collection:, sort_state: ComponentStructs::SortState.new,
           render_sortable: false, render_search: true)
           @collection = collection
           @sort_state = sort_state

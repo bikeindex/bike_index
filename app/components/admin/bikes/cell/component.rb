@@ -9,7 +9,7 @@ module Admin
           bike_id: nil,
           bike_link_path: nil,
           search_url: nil,
-          sort_state: ComponentStates::SortState.new,
+          sort_state: ComponentStructs::SortState.new,
           render_search: false,
           skip_status: false
         )

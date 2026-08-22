@@ -99,6 +99,9 @@
   --color-purple-800: #3a2f62;
   --color-purple-900: #2c244b;
   --color-purple-950: #1c162f;
+
+  /* The dev-info marking, the legacy stylesheets' $dev-color */
+  --color-dev: #9400d3;
 }
 
 @import "./bike_index_components.css";
