@@ -68,7 +68,7 @@ export default class extends Controller {
   // aria-current's "true", so a reader isn't told a link elsewhere is where they already are
   ariaCurrent () {
     const path = trimSlash(window.location.pathname)
-    const isPage = !this.hasMatchParamsValue && this.patterns.includes(path) &&
+    const isPage = !this.hasMatchParamsValue && this.patterns.map(trimSlash).includes(path) &&
       trimSlash(this.element.pathname) === path
 
     return isPage ? 'page' : 'true'

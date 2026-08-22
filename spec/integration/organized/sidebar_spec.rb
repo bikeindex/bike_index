@@ -114,7 +114,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
 
   # The sidebar stands in for the navbar on every page a member sees, including ones no
   # row points at — where the design's default of the first group open stands
-  it "opens the first group on a page no row matches" do
+  it "opens the first group on a page no row matches, and leaves the organization from it" do
     visit "/my_account"
 
     expect_open("#{organization.short_name} Registrations")
@@ -146,7 +146,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
 
     # Inside the organization interface there's no page to stay on, so the row keeps the
     # homepage it renders pointing at
-    expect(leave_link[:href]).to match(%r{\Ahttps?://[^/]+/\?organization_id=false\z})
+    expect(leave_link[:href]).to eq "#{page.server_url}/?organization_id=false"
 
     open_account_menu
     click_link "View without any organization"

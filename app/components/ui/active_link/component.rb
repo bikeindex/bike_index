@@ -34,12 +34,12 @@ module UI
         # The copy is for prose beside one — Admin::Navbar names the current page in the
         # picker, which no link can go active on its behalf.
         def covers?(pattern, path)
-          patterns = segments_of(pattern)
-          paths = segments_of(path)
-          stopped = patterns.each_with_index.find do |segment, index|
-            segment == "**" || (segment != "*" && segment != paths[index])
+          pattern_segments = segments_of(pattern)
+          path_segments = segments_of(path)
+          stopped = pattern_segments.zip(path_segments).find do |segment, actual|
+            segment == "**" || (segment != "*" && segment != actual)
           end
-          return patterns.length == paths.length if stopped.nil?
+          return pattern_segments.length == path_segments.length if stopped.nil?
 
           stopped.first == "**"
         end

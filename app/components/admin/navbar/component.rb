@@ -64,7 +64,8 @@ module Admin
       def display_view_all?
         return false unless current_link_has_sub_pages?
 
-        !helpers.current_page_active?(current_nav_link[:path]) || @search_filtered
+        @search_filtered ||
+          request.path != UI::ActiveLink::Component.page_path(current_nav_link[:path])
       end
 
       # Only a section-wide link goes active on pages other than its own, so it's the only
@@ -82,12 +83,11 @@ module Admin
           pattern = covering_pattern(link)
           [link, pattern.count("/")] if pattern
         end
-        @current_nav_link = covering.max_by(&:last)&.first
+        @current_nav_link = covering.max_by { |_link, depth| depth }&.first
       end
 
       # The picker names the current page in prose, which UI::ActiveLink can't answer for it —
-      # the entries are picker options rather than links, bar the five shortcuts. What each
-      # covers is the patterns either way, so the two can't disagree about how wide a section is
+      # bar the five shortcuts, the entries are picker options rather than links
       def covering_pattern(link)
         Array.wrap(match_paths_for(link))
           .detect { |pattern| UI::ActiveLink::Component.covers?(pattern, request.path) }
