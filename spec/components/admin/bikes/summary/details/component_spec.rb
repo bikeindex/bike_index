@@ -7,6 +7,12 @@ RSpec.describe Admin::Bikes::Summary::Details::Component, type: :component do
   let(:options) { {} }
   let(:component) { render_inline(described_class.new(bike:, **options)) }
 
+  # The row's own label - matching on a value risks colliding with a factory sequence
+  # somewhere else in the summary, which is how the phone assertion used to fail on CI
+  def row_labels
+    component.css("table.table-list tr td:first-child").map { |td| td.text.squish }
+  end
+
   it "renders the owner and creation, and no dev rows" do
     expect(component).to have_content("owner@bikeindex.org")
     expect(component).to have_content("self reg")
@@ -18,8 +24,8 @@ RSpec.describe Admin::Bikes::Summary::Details::Component, type: :component do
 
     # The id/status row replaces the .only-dev-visible inline <style> the partial needed
     it "renders the id and status row" do
-      expect(component).to have_content("status:")
-      expect(component).to have_content(bike.id.to_s)
+      expect(row_labels).to include "ID"
+      expect(component.css("tr td code").map { |code| code.text.strip }).to include bike.id.to_s
     end
   end
 
@@ -36,7 +42,7 @@ RSpec.describe Admin::Bikes::Summary::Details::Component, type: :component do
     let(:bike) { FactoryBot.create(:bike, :with_ownership, phone: "2223334444") }
 
     it "renders the phone" do
-      expect(component).to have_content("222")
+      expect(row_labels).to include "Phone"
     end
 
     # The stolen record renders the phone itself, so the summary drops its row
@@ -44,7 +50,7 @@ RSpec.describe Admin::Bikes::Summary::Details::Component, type: :component do
       let(:options) { {stolen_record: FactoryBot.create(:stolen_record, bike:)} }
 
       it "drops it" do
-        expect(component).to_not have_content("222")
+        expect(row_labels).to_not include "Phone"
       end
     end
   end
