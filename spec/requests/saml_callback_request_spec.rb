@@ -10,7 +10,7 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
     FactoryBot.create(:organization_with_organization_features,
       enabled_feature_slugs: "saml_sso", user_email_domain: domain)
   end
-  let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+  let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :active, organization:) }
   let(:slug) { organization.to_param }
   let(:settings) { Saml::SettingsBuilder.build(saml_configuration) }
   let(:email) { "newperson@#{domain}" }
@@ -21,6 +21,13 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
   # RelayState the IdP would hand back to us.
   def initiate_login
     get "/sso/#{slug}/init"
+    expect(response).to have_http_status(:found)
+    location = response.headers["Location"]
+    [saml_request_id_from_redirect(location), Rack::Utils.parse_query(URI(location).query)["RelayState"]]
+  end
+
+  def initiate_test_login(test_email: email)
+    post "/sso/#{slug}/test", params: {email: test_email}
     expect(response).to have_http_status(:found)
     location = response.headers["Location"]
     [saml_request_id_from_redirect(location), Rack::Utils.parse_query(URI(location).query)["RelayState"]]
@@ -37,8 +44,20 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
                                            RelayState: (relay_state == :from_init) ? initiated_relay_state : relay_state}
   end
 
+  def post_test_callback(test_email: email, **overrides)
+    request_id, relay_state = initiate_test_login(test_email:)
+    params = {audience: settings.sp_entity_id, recipient: settings.assertion_consumer_service_url,
+              in_response_to: request_id, issuer: saml_configuration.idp_entity_id, email:}.merge(overrides)
+    post "/sso/#{slug}/callback", params: {SAMLResponse: signed_saml_response(**params), RelayState: relay_state}
+  end
+
   def signed_in?
     cookies[ControllerHelpers::AUTH_COOKIE_KEY].present?
+  end
+
+  def diagnostic_value(label)
+    Capybara.string(response.body)
+      .find(:xpath, "//dt[normalize-space()=#{label.inspect}]/following-sibling::dd[1]").text.strip
   end
 
   describe "GET /sso/:org_slug/init" do
@@ -49,10 +68,59 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
       expect(response.headers["Location"]).to include("SAMLRequest=")
     end
 
-    context "configuration not enabled" do
-      let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, organization:) }
-      it "is not found" do
+    context "configuration inactive" do
+      let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :configured, organization:) }
+
+      it "redirects to the IdP" do
         get "/sso/#{slug}/init"
+        expect(response).to have_http_status(:found)
+      end
+    end
+  end
+
+  describe "GET /sso/:org_slug/test" do
+    it "is not available for an active configuration" do
+      get "/sso/#{slug}/test"
+      expect(response).to have_http_status(:not_found)
+    end
+
+    context "configuration inactive" do
+      let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :configured, organization:) }
+
+      it "renders the form rather than leaving for the IdP" do
+        get "/sso/#{slug}/test"
+        expect(response).to have_http_status(:ok)
+        expect(response.headers["X-Robots-Tag"]).to eq "noindex, nofollow"
+        expect(response.body).to include("SAML configuration test")
+        expect(Capybara.string(response.body))
+          .to have_css("form[action='/sso/#{slug}/test'] input[name=email]")
+      end
+
+      it "leaves for the IdP once the form is submitted" do
+        post "/sso/#{slug}/test", params: {email:}
+        expect(response).to have_http_status(:found)
+        expect(response.headers["Location"]).to start_with(saml_configuration.idp_sso_target_url)
+      end
+
+      it "re-renders the form without an email, having nothing to compare the assertion against" do
+        post "/sso/#{slug}/test", params: {email: " "}
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("Enter the email address to sign in with")
+        expect(Capybara.string(response.body))
+          .to have_css("form[action='/sso/#{slug}/test'] input[name=email]")
+      end
+    end
+
+    context "configuration incomplete" do
+      let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, organization:) }
+
+      it "is not found" do
+        get "/sso/#{slug}/test"
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "is not found for the form submission either" do
+        post "/sso/#{slug}/test", params: {email:}
         expect(response).to have_http_status(:not_found)
       end
     end
@@ -71,6 +139,16 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
         expect(identity.user).to eq user
         expect(user.last_login_at).to be_within(5.seconds).of Time.current
         expect(signed_in?).to be true
+      end
+
+      context "inactive configuration" do
+        before { saml_configuration.update!(active: false) }
+
+        it "accepts an assertion for the organization's domain" do
+          expect { post_callback }.to change(User, :count).by(1)
+          expect(response).to have_http_status(:found)
+          expect(signed_in?).to be true
+        end
       end
 
       # The session that stored return_to is withheld on the IdP's cross-site POST, so the
@@ -161,6 +239,25 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
             expect(response).to redirect_to(new_session_path)
             expect(signed_in?).to be false
           end
+        end
+      end
+
+      context "asserted email has no parseable domain" do
+        it "does not provision or sign in" do
+          expect { post_callback(name_id: "transient-name-id", email_attribute: "unreleased-email") }
+            .not_to change(User, :count)
+          expect(response).to redirect_to(new_session_path)
+          expect(signed_in?).to be false
+        end
+      end
+
+      context "asserted email has multiple @ characters" do
+        let(:email) { "attacker@evil.com@#{domain}" }
+
+        it "does not provision or sign in" do
+          expect { post_callback }.not_to change(User, :count)
+          expect(response).to redirect_to(new_session_path)
+          expect(signed_in?).to be false
         end
       end
     end
@@ -272,6 +369,72 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
         expect { post_callback(relay_state: foreign_relay_state) }.not_to change(User, :count)
         expect(response).to redirect_to(new_session_path)
         expect(signed_in?).to be false
+      end
+    end
+  end
+
+  describe "POST /sso/:org_slug/callback in test mode" do
+    context "configuration inactive" do
+      let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :configured, organization:) }
+
+      it "reports a valid assertion without provisioning or signing in" do
+        identity_count = SsoIdentity.count
+        expect { post_test_callback }.not_to change(User, :count)
+        expect(response).to have_http_status(:ok)
+        expect(SsoIdentity.count).to eq identity_count
+        expect(response.headers["X-Robots-Tag"]).to eq "noindex, nofollow"
+        expect(response.body).to include("SAML configuration test", email)
+        expect(signed_in?).to be false
+      end
+
+      it "reports a passwordless account as having no password of its own" do
+        FactoryBot.create(:user_confirmed, email:, passwordless_user: true)
+
+        post_test_callback
+        expect(diagnostic_value("Matching account")).to eq email
+        expect(diagnostic_value("Matching account has a password")).to eq "No"
+      end
+
+      it "reports a self-created account as having a password" do
+        FactoryBot.create(:user_confirmed, email:)
+
+        post_test_callback
+        expect(diagnostic_value("Matching account has a password")).to eq "Yes"
+      end
+
+      it "reports that the IdP released an address other than the one entered" do
+        post_test_callback(test_email: "someoneelse@#{domain}")
+        expect(response).to have_http_status(:ok)
+        expect(diagnostic_value("Address entered")).to eq "someoneelse@#{domain}"
+        expect(diagnostic_value("Asserted email")).to include "the IdP released a different address"
+      end
+
+      it "reports a malformed email without provisioning" do
+        malformed_email = "attacker@evil.com@#{domain}"
+
+        expect { post_test_callback(email: malformed_email) }.not_to change(User, :count)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("not on this organization")
+        expect(signed_in?).to be false
+      end
+
+      it "does not show assertion fields when signature validation fails" do
+        # a different address than the assertion carries, so echoing the form back
+        # can't be mistaken for the assertion having been read
+        expect { post_test_callback(test_email: "typed@#{domain}", tamper: true) }.not_to change(User, :count)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("Invalid SAML Response")
+        expect(diagnostic_value("Address entered")).to eq "typed@#{domain}"
+        expect(response.body).not_to include(email)
+      end
+    end
+
+    context "configuration active" do
+      it "rejects a test transaction" do
+        relay_state = Saml::RequestStore.create(request_id: "_test", org_slug: slug,
+          mode: Saml::RequestStore::TEST_MODE)
+        post "/sso/#{slug}/callback", params: {RelayState: relay_state}
+        expect(response).to have_http_status(:not_found)
       end
     end
   end

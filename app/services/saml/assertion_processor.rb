@@ -12,23 +12,25 @@ module Saml
       end
     end
 
-    def call(saml_configuration:, raw_response:, request_id:)
+    DiagnosticResult = Struct.new(:name_id, :name_id_format, :attributes,
+      :email_attribute, :email, :email_domain, :user, :user_has_password, :error) do
+      def success?
+        error.nil?
+      end
+    end
+
+    def call(saml_configuration:, raw_response:, request_id:, dry_run: false)
       return failure("missing SAML response") if raw_response.blank?
 
       response = parse_response(saml_configuration, raw_response, request_id)
       return failure(response.errors.join("; ").presence || "invalid SAML response") unless response.is_valid?
 
-      name_id = response.name_id.presence
-      return failure("assertion is missing a NameID") if name_id.blank?
-
-      email = asserted_email(response, saml_configuration)
-      return failure("assertion is missing an email") if email.blank?
-
       organization = saml_configuration.organization
-      # Guards the whole resolution, not just provisioning: otherwise an assertion for any address -
-      # another org's admin, a superadmin - links or returns an existing account and signs it in.
-      return failure("#{email} is not on this organization's SSO domain") unless
-        organization == Organization.saml_email_matching(email)
+      name_id = response.name_id.presence
+      email = asserted_email(response, saml_configuration)
+      error = resolution_error(name_id:, email:, organization:)
+      return diagnostic(response, saml_configuration, name_id:, email:, error:) if dry_run
+      return failure(error) if error
 
       # One lookup drives both the returning-user short-circuit and the post-login update.
       identity = SsoIdentity.for(organization:, provider:, uid: name_id) ||
@@ -64,6 +66,32 @@ module Saml
       EmailNormalizer.normalize(raw)
     end
 
+    def resolution_error(name_id:, email:, organization:)
+      return "assertion is missing a NameID" if name_id.blank?
+      return "assertion is missing an email" if email.blank?
+
+      # Guards the whole resolution, not just provisioning: otherwise an assertion for any address -
+      # another org's admin, a superadmin - links or returns an existing account and signs it in.
+      asserted_domain = Organization.email_domain(email)
+      "#{email} is not on this organization's SSO domain" unless
+        asserted_domain.present? && asserted_domain == organization.user_email_domain
+    end
+
+    def diagnostic(response, saml_configuration, name_id:, email:, error:)
+      email_domain = Organization.email_domain(email)
+      # Looked up only once the domain guard clears it, as the live path does
+      user = User.fuzzy_confirmed_or_unconfirmed_email_find(email) if
+        email_domain.present? && email_domain == saml_configuration.organization.user_email_domain
+
+      DiagnosticResult.new(
+        name_id:, name_id_format: response.name_id_format,
+        attributes: response.attributes.all,
+        email_attribute: saml_configuration.email_attribute,
+        email:, email_domain:, user:,
+        user_has_password: user.present? && !user.passwordless_user?, error:
+      )
+    end
+
     # Provisioning grants no organization role - that is user_role_for_user_email_domain's job.
     def provision_user(email)
       UserServices::PasswordlessCreator.find_or_create(email).first
@@ -73,6 +101,7 @@ module Saml
       Result.new(error: message)
     end
 
-    conceal :provider, :parse_response, :asserted_email, :provision_user, :failure
+    conceal :provider, :parse_response, :asserted_email, :resolution_error, :diagnostic,
+      :provision_user, :failure
   end
 end
