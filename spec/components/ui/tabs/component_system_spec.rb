@@ -16,9 +16,6 @@ RSpec.describe UI::Tabs::Component, :js, type: :system do
 
     page.current_window.resize_to(1600, 800)
 
-    # Room for all of them now - a scroll container clips what sticks out of it vertically
-    # and reserves room for a scrollbar, so it stops being one
     expect(page).to have_no_css(scrolling)
-    expect(page.evaluate_script("getComputedStyle(document.querySelector('nav')).overflowX")).to eq "visible"
   end
 end

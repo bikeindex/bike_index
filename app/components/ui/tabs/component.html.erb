@@ -1,15 +1,13 @@
 <%#
   twgutter-bleed, not w-full: a width:100% border box slides left under negative margins
-  rather than bleeding both sides. No overflow-x here - a scroll container makes overflow-y
-  auto too, so the controller adds it only when the tabs are wider than the row. The block
-  padding is the room that scroll sits in
+  rather than bleeding both sides. No overflow-x here - the controller adds it only when the
+  tabs are wider than the row, and pt-1 is what its overflow-y won't clip the tabs against
 %>
 
 <nav
-  class="twgutter-bleed tw:pt-1 tw:pb-3"
+  class="twgutter-bleed tw:mb-3 tw:pt-1"
   aria-label="<%= @nav_label %>"
-  <%= tag.attributes(data: {controller: "ui--tabs", "ui--tabs-scrollable-class": "tw:overflow-x-auto",
-        turbo: (true if @turbo)}) %>
+  <%= tag.attributes(data: {controller: "ui--tabs", turbo: (true if @turbo)}) %>
 >
   <%#
     min-w-full so the underline still spans the row when the tabs don't fill it, w-max so
