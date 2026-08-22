@@ -3,7 +3,11 @@
     <%#
       The panel this opens is Admin::Bikes::Index::SearchStatuses, inside the search form -
       a different branch of the skeleton, so the two talk over a window event. The
-      controller keeps data-active in step, so the button's own is-active styling applies
+      controller keeps data-active in step, so the button's own is-active styling applies.
+
+      active: rather than a UI::ActiveLink query: because this one really isn't in the URL:
+      it's whether the searched statuses differ from the viewer's default set, and that set
+      depends on their no_hide_spam su_option
     %>
 
     <%= render(UI::Button::Component.new(text: "Search statuses", size: :sm,
@@ -15,8 +19,8 @@
 <% end %>
 
 <%#
-  active: off the controller's own state - UI::ActiveLink resolves it from the URL, which
-  can't see @multi_delete's default or the session
+  active: off the controller, matching the row #4181 built - these two could take a
+  UI::ActiveLink query: instead, since their state is just a param
 %>
 
 <li>

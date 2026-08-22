@@ -1,5 +1,9 @@
 <%= render(Admin::Headers::Nav::Component.new(title: "Multi manufacturer update")) do %>
-  <%# active: off the controller and the session, neither of which UI::ActiveLink can read %>
+  <%#
+    The view-ordering pair reads session[:missing_manufacturer_time_order], which survives
+    with no param in the URL - so active: has to come from the controller, not a
+    UI::ActiveLink query:
+  %>
 
   <li>
     <%= render(UI::ButtonLink::Component.new(text: "all bikes", href: admin_bikes_path, size: :sm)) %>
