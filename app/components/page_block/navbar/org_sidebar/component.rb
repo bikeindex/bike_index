@@ -62,7 +62,7 @@ module PageBlock
         def super_admin_items
           return [] unless @current_user.superuser?
 
-          [ComponentStructs::Items.link(translation(".in_super_admin", org_name: @organization.short_name),
+          [ComponentStructs::Shapes.link(translation(".in_super_admin", org_name: @organization.short_name),
             admin_organization_path(@organization.to_param), super_admin: true)]
         end
 
