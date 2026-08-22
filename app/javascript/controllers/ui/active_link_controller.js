@@ -25,7 +25,7 @@ const matchesPath = (pattern, path) => {
 // Renders UI::ActiveLink::Component's aria-current, which the server can't: these links are
 // cached fragments, so the markup is shared by every page it was rendered for.
 export default class extends Controller {
-  static values = { matchPaths: String, matchParams: Object, exactParams: Boolean }
+  static values = { matchPaths: String, matchParams: Object }
 
   connect () {
     if (!this.isActive()) return this.element.removeAttribute('aria-current')
@@ -55,19 +55,12 @@ export default class extends Controller {
     return this.patterns.some((pattern) => matchesPath(pattern, window.location.pathname))
   }
 
-  // A link naming no params ignores the query string; exactParams then leaves it room for none
+  // A link naming no params ignores the query string, and one naming some ignores the rest
   paramsMatch () {
     const current = new URLSearchParams(window.location.search)
 
-    return (!this.exactParamsValue || this.noExtraParams(current)) &&
-      Object.entries(this.matchParamsValue).every(([param, values]) => values.some((value) =>
-        (value === BLANK) ? !current.get(param) : value === current.get(param)))
-  }
-
-  // A param the URL leaves empty is one the page doesn't carry, the way BLANK reads it
-  noExtraParams (current) {
-    return [...current].every(([param, value]) =>
-      !value || Object.hasOwn(this.matchParamsValue, param))
+    return Object.entries(this.matchParamsValue).every(([param, values]) => values.some((value) =>
+      (value === BLANK) ? !current.get(param) : value === current.get(param)))
   }
 
   // "page" is reserved for the link whose own path is the current one. A wildcard, or params

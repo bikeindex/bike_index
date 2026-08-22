@@ -17,7 +17,6 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     expect(link["data-ui--active-link-match-paths-value"]).to eq "/help"
     # Naming no params is what leaves the page's own ignored
     expect(link.attributes).to_not have_key("data-ui--active-link-match-params-value")
-    expect(link.attributes).to_not have_key("data-ui--active-link-exact-params-value")
   end
 
   context "with a class" do
@@ -31,7 +30,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
   # The controller can't read the constant, so the copy in it drifts silently otherwise
   it "keeps the browser's BLANK in step with its own" do
     js = Rails.root.join("app/javascript/controllers/ui/active_link_controller.js").read
-    expect(js[/const BLANK = '(\w+)'/, 1]).to eq described_class::BLANK
+    expect(js[/const BLANK = '(\w+)'/, 1]).to eq described_class::BLANK.to_s
   end
 
   describe "match_paths" do
@@ -139,14 +138,6 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     end
   end
 
-  describe "exact_params" do
-    let(:options) { {exact_params: true} }
-
-    it "carries the flag, so the browser leaves the page room for no params of its own" do
-      expect(link["data-ui--active-link-exact-params-value"]).to eq "true"
-    end
-  end
-
   # Every menu renders its manifest's links through this, so the defaults are what a manifest
   # that leaves a key out gets
   describe "from_item" do
@@ -164,7 +155,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
     context "with the keys a menu item can carry" do
       let(:item) do
         {type: :link, label: "Blog", path: "/news", match_paths: ["/news/**"],
-         match_params: {sort: "recent"}, exact_params: true, id: "navBlog",
+         match_params: {sort: "recent"}, id: "navBlog",
          data: {email: "party@bikeindex.org"}}
       end
       let(:options) { {html_class: "nav-link"} }
@@ -175,7 +166,6 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
         expect(link["data-email"]).to eq "party@bikeindex.org"
         expect(link["data-ui--active-link-match-paths-value"]).to eq "/news/**"
         expect(link["data-ui--active-link-match-params-value"]).to eq({sort: ["recent"]}.to_json)
-        expect(link["data-ui--active-link-exact-params-value"]).to eq "true"
       end
     end
 

@@ -13,11 +13,11 @@ module UI
     class Component < ApplicationComponent
       # The value a controller reads as its default whether the URL omits the param or
       # leaves it empty
-      BLANK = "blank"
+      BLANK = :blank
 
       # What a menu item hash can carry through to the link. The rest of an item is the menu's
       # own — its type, icon, children — and an absent key here takes initialize's default
-      ITEM_KEYS = [:path, :match_paths, :match_params, :exact_params, :data, :id].freeze
+      ITEM_KEYS = [:path, :match_paths, :match_params, :data, :id].freeze
 
       # A menu manifest carries a link as a hash; what differs between the menus rendering one
       # is the class, and text: for a row whose label sits inside a block with its icon
@@ -25,8 +25,8 @@ module UI
         new(**item.slice(*ITEM_KEYS), text:, class: html_class)
       end
 
-      def initialize(path:, text: nil, match_paths: [], match_params: nil, exact_params: false,
-        data: {}, **html_options)
+      def initialize(path:, text: nil, match_paths: [], match_params: nil, data: {},
+        **html_options)
         @match_paths = Array.wrap(match_paths.presence || path).map { |url| page_path(url) }
         @match_params = match_params.presence
         @match_paths.each { |pattern| raise_if_invalid_pattern!(pattern) }
@@ -34,7 +34,6 @@ module UI
 
         @path = path
         @text = text
-        @exact_params = exact_params
         @data = data
         @html_options = html_options
       end
@@ -78,8 +77,7 @@ module UI
       def link_data
         @data.merge(controller: [@data[:controller], "ui--active-link"].compact.join(" "),
           "ui--active-link-match-paths-value": @match_paths.join(" "),
-          "ui--active-link-match-params-value": link_params,
-          "ui--active-link-exact-params-value": (true if @exact_params)).compact
+          "ui--active-link-match-params-value": link_params).compact
       end
 
       def link_params

@@ -37,13 +37,6 @@ module UI
           match_paths: "/rails/view_components/ui/active_link/*/match_paths_one_segment"))
       end
 
-      # The path this scenario is served from, active only while the page carries no params of
-      # its own — naming none ignores them. Add ?example=1 to the URL to see the difference.
-      def exact_params
-        render(UI::ActiveLink::Component.new(text: "This preview, exactly",
-          path: "#{PREVIEW_PATH}/exact_params", exact_params: true, class: "twlink"))
-      end
-
       # A filter entry, which stands for the param it applies rather than for a URL: it points
       # away from its own filter, the way one already in force clears itself, and goes active
       # on the param alone. Add &page=2 to see a param it doesn't name ignored.

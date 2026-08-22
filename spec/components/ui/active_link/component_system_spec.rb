@@ -26,18 +26,7 @@ RSpec.describe UI::ActiveLink::Component, :js, type: :system do
     visit "#{preview_path}/default"
     expect(page).to_not have_css "a[aria-current]"
 
-    # A param the page carries is what naming none ignores and exact_params doesn't
-    visit "#{preview_path}/exact_params"
-    expect(page).to have_css "a[aria-current='page']", text: "This preview, exactly"
-
-    visit "#{preview_path}/exact_params?example=1"
-    expect(page).to have_css "a.twlink", text: "This preview, exactly"
-    expect(page).to_not have_css "a[aria-current]"
-
-    # An empty param is one the page doesn't carry, the way BLANK reads it
-    visit "#{preview_path}/exact_params?example="
-    expect(page).to have_css "a[aria-current='page']", text: "This preview, exactly"
-
+    # A link naming no params ignores the page's own
     visit "#{preview_path}/current_page?example=1"
     expect(page).to have_css "a[aria-current='page']", text: "This preview"
 
@@ -56,6 +45,10 @@ RSpec.describe UI::ActiveLink::Component, :js, type: :system do
     expect(page).to have_css "a[aria-current='true']", text: "Filter: off"
 
     visit "#{preview_path}/match_params_blank?filter=off"
+    expect(page).to have_css "a[aria-current='true']", text: "Filter: off"
+
+    # A param the URL leaves empty is one the page doesn't carry, the way BLANK reads it
+    visit "#{preview_path}/match_params_blank?filter="
     expect(page).to have_css "a[aria-current='true']", text: "Filter: off"
 
     visit "#{preview_path}/match_params_blank?filter=on"
