@@ -123,6 +123,16 @@
    * gutter is tighter than a page-level grid's, and auto-fit means the break to full width
    * comes from the row running out of room rather than from a viewport breakpoint, so a row
    * inside a narrow card breaks at the same width it would anywhere else. */
+  /* CodeRay renders the admin JSON dumps as a .code div inside its own wrapper, so the
+   * box belongs to the container rather than to what it holds */
+  .twjson-box .code {
+    @apply tw:max-h-72 tw:overflow-auto tw:border tw:border-gray-300 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-900;
+  }
+
+  .twjson-box pre {
+    @apply tw:m-0;
+  }
+
   .twfieldrow {
     @apply tw:grid tw:gap-x-2 tw:grid-cols-[repeat(auto-fit,minmax(140px,1fr))];
   }
@@ -137,11 +147,12 @@
    * rather than at a viewport breakpoint. The max() caps it at two, which repeat() alone
    * would not do - a wide row fits four 320px tracks. auto-fill rather than auto-fit so a
    * column whose only child is hidden holds its place instead of handing the whole row to
-   * its neighbour. */
+   * its neighbour. The min(100%) is what keeps that 320px floor from overflowing a row
+   * nested in something narrower than it. */
   .twwiderow {
     @apply tw:grid tw:gap-x-8;
     container: twwiderow / inline-size;
-    grid-template-columns: repeat(auto-fill, minmax(max(320px, calc((100% - var(--tw-spacing) * 8) / 2)), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, max(320px, calc((100% - var(--tw-spacing) * 8) / 2))), 1fr));
   }
 
   [aria-expanded="true"] .twdropdown-chevron {
@@ -195,6 +206,26 @@
 
   .twdropdown li[role="separator"] {
     @apply tw:border-t tw:border-gray-200 tw:dark:border-gray-700;
+  }
+
+  /* The band the admin bike screens open with: what the registration is, set apart from
+   * whichever tab's body follows it. Full bleed and borderless, the way the legacy
+   * .admin-bike-tabs read - its .table-list tables sit on white against it. */
+  .admin-bike-summary {
+    @apply tw:bg-[#212529] tw:pt-6 tw:pb-1 tw:text-white;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+  }
+
+  .admin-bike-summary h1,
+  .admin-bike-summary h2,
+  .admin-bike-summary h3,
+  .admin-bike-summary h4 {
+    @apply tw:text-white;
+  }
+
+  .admin-bike-summary table {
+    @apply tw:bg-white;
   }
 
   .twhr {

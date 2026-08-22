@@ -48,14 +48,21 @@ BLOCKED_EXTERNAL_HOSTS = %w[
 ].freeze
 
 # Point BASE_URL at Capybara's server for `:js` specs, so `*_url` helpers rendered
-# during the example resolve to it.
+# during the example resolve to it. default_url_options is read off BASE_URL once at
+# boot, so it takes the same treatment -- otherwise a helper called outside a request
+# (a service's, rather than a view's) renders a host the browser can't reach, and the
+# link it's on can't be clicked. Replacing the hash rather than writing through it
+# keeps ActionMailer on the host it was configured with -- test.rb hands both the same one.
 RSpec.configure do |config|
   config.around(:each, :js) do |example|
     original_base_url = ENV["BASE_URL"]
-    ENV["BASE_URL"] = "http://#{Capybara.current_session.server.host}:#{Capybara.current_session.server.port}"
+    original_url_options = Rails.application.routes.default_url_options
+    ENV["BASE_URL"] = Capybara.current_session.server.base_url
+    Rails.application.routes.default_url_options = original_url_options.merge(host: ENV["BASE_URL"])
     example.run
   ensure
     ENV["BASE_URL"] = original_base_url
+    Rails.application.routes.default_url_options = original_url_options
   end
 
   # Any playwright-driven example, scripting or not - rack_test has nothing to block.

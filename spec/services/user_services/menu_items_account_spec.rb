@@ -16,11 +16,11 @@ RSpec.describe UserServices::MenuItemsAccount do
       expect(items.map { |item| item[:type] }).to eq(%i[link link link divider link])
     end
 
-    it "sends the registration row into the flow, matching on its controller" do
+    it "sends the registration row into the flow, covering every step of it" do
       registration = items.find { |item| item[:label] == "Register a new bike" }
 
       expect(registration[:path]).to eq "/register"
-      expect(registration[:match]).to eq :controller
+      expect(registration[:match_paths]).to eq "/register/**"
     end
 
     # Each menu tints it for itself, so the row only says which one it is
@@ -83,11 +83,12 @@ RSpec.describe UserServices::MenuItemsAccount do
       let(:organization) { FactoryBot.create(:organization, name: "Brakebills") }
       let(:options) { {current_organization: organization} }
 
+      # The param is what the row goes current on -- its path alone is the homepage
       it "carries the row for it, and the one out of it" do
         expect(switcher)
           .to eq([{type: :link, label: "View without any organization",
                    path: "http://test.host/?organization_id=false",
-                   icon: nil, match: :path, matching_controllers: [],
+                   icon: nil, match_params: {organization_id: "false"},
                    data: {controller: "page-block--navbar-switch-no-organization"}},
             {type: :disabled, label: "Viewing Brakebills"}])
       end
@@ -102,7 +103,7 @@ RSpec.describe UserServices::MenuItemsAccount do
         expect(switcher)
           .to eq([{type: :disabled, label: "Viewing without any organization"},
             {type: :link, label: "Switch to Brakebills", path: "/o/#{organization.to_param}",
-             icon: nil, match: :path, matching_controllers: []}])
+             icon: nil}])
       end
 
       # Whichever they're on has nowhere to go, so the label moves with them
@@ -159,8 +160,7 @@ RSpec.describe UserServices::MenuItemsAccount do
       # Second, among the account rows -- the messages sit with the registrations they're about
       it "links to the messages" do
         expect(items[1]).to eq({type: :link, label: "Marketplace messages",
-                                path: "/my_account/messages", icon: nil, match: :path,
-                                matching_controllers: []})
+                                path: "/my_account/messages", icon: nil})
       end
     end
   end

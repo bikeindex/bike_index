@@ -7,10 +7,9 @@ RSpec.describe Admin::Navbar::Component, type: :component do
   # Somewhere outside admin, so no nav link is the active one
   let(:url) { "/bikes/new" }
   let(:current_user) { FactoryBot.create(:superuser) }
-  let(:controller_path) { "bikes" }
   let(:search_filtered) { false }
   let(:instance) do
-    described_class.new(current_user:, user_root_url: "/admin", controller_path:, search_filtered:)
+    described_class.new(current_user:, user_root_url: "/admin", search_filtered:)
   end
   let(:component) { with_request_url(url) { render_inline(instance) } }
   # The picker's "All" link
@@ -48,19 +47,18 @@ RSpec.describe Admin::Navbar::Component, type: :component do
   describe "the shortcut links" do
     let(:shortcuts) { component.css("ul.navbar-nav a[data-controller='ui--active-link']") }
 
-    # The shortcuts take their match from nav_select_links, so they stay active across a
+    # The shortcuts take what they cover from nav_select_links, so they stay active across a
     # section rather than only on its index. UI::ActiveLink resolves that in the browser,
-    # against the route rendered here.
-    it "matches each shortcut on its controller" do
-      expect(shortcuts.map { |link| link["data-ui--active-link-match-value"] }.uniq).to eq(["controller"])
-      expect(shortcuts.map { |link| link["data-ui--active-link-routes-value"] })
-        .to eq(%w[admin/users admin/bikes admin/organizations admin/news admin/stolen_bikes])
+    # against the patterns rendered here -- organizations#recover being routed outside its own.
+    it "covers each shortcut's whole section" do
+      expect(shortcuts.map { |link| link["data-ui--active-link-match-paths-value"] })
+        .to eq(["/admin/users/**", "/admin/bikes/**",
+          "/admin/organizations/** /admin/recover_organization",
+          "/admin/news/**", "/admin/stolen_bikes/**"])
     end
   end
 
   describe "the view all link" do
-    let(:controller_path) { "admin/bikes" }
-
     context "period all" do
       let(:url) { "#{admin_bikes}?period=all&timezone=Party" }
 
@@ -107,17 +105,15 @@ RSpec.describe Admin::Navbar::Component, type: :component do
     context "on a Config: page" do
       let(:url) { "/admin/email_domains?search_status=banned" }
       let(:search_filtered) { true }
-      let(:controller_path) { "admin/email_domains" }
 
       it "drops the prefix from the title" do
         expect(component).to have_css("#{view_all_link}[href='/admin/email_domains']", text: /All\s+Email Domains/)
       end
     end
 
-    # Nested under organizations, so no link matches it by controller
+    # Nested under organizations, which the invoices entry names in a pattern of its own
     context "on an organization's invoices" do
       let(:url) { "/admin/organizations/bike-shop/invoices" }
-      let(:controller_path) { "admin/organizations/invoices" }
 
       it "names the section itself, and links to every invoice" do
         expect(component).to have_css("input[role='combobox'][placeholder='Viewing Invoices']")
@@ -127,7 +123,6 @@ RSpec.describe Admin::Navbar::Component, type: :component do
 
     context "on an organization's custom layouts" do
       let(:url) { "/admin/organizations/bike-shop/custom_layouts" }
-      let(:controller_path) { "admin/organizations/custom_layouts" }
 
       # There is no admin index of custom layouts to be "all" of, so it falls back to the
       # section it's nested under rather than naming nothing

@@ -77,7 +77,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(page).to have_current_path("/o/#{slug}/registrations", ignore_query: true)
     expect_open("#{organization.short_name} Registrations")
     expect_current_group("#{organization.short_name} Registrations")
-    expect(page).to have_css "#org_sidebar_nav a[aria-current='true']", text: "Search Registrations"
+    expect(page).to have_css "#org_sidebar_nav a[aria-current='page']", text: "Search Registrations"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Search Impounded Vehicles"
 
     # Short enough that the menu scrolls, with Manage users past its fold
@@ -91,7 +91,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(scroller_top).to be > 0
   end
 
-  it "tells the two add-a-bike rows apart by their full path" do
+  it "tells the two add-a-bike rows apart by the param" do
     visit "/o/#{slug}/registrations/new"
 
     expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a bike"
@@ -114,7 +114,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
 
   # The sidebar stands in for the navbar on every page a member sees, including ones no
   # row points at — where the design's default of the first group open stands
-  it "opens the first group on a page no row matches" do
+  it "opens the first group on a page no row matches, and leaves the organization from it" do
     visit "/my_account"
 
     expect_open("#{organization.short_name} Registrations")
@@ -123,18 +123,40 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(page).to have_no_css "[data-page-block--org-sidebar-target='scroller'] a[aria-current]", visible: :all
     # Open, but no more the page than any other group
     expect(page).to have_no_css "#org_sidebar_nav button[data-active='true']"
-  end
 
-  # Leaving the organization shouldn't also leave the page, anywhere the page survives it
-  it "drops the organization without moving, outside the organization interface" do
-    visit "/my_account"
-
+    # Leaving the organization shouldn't also leave the page, anywhere the page survives it
     expect(leave_link[:href]).to eq "#{page.server_url}/my_account?organization_id=false"
 
-    # Inside it there's no page to stay on, so it keeps the homepage it renders pointing at
-    visit organization_registrations_path(organization_id: organization.to_param)
+    dismiss_donation_modal
 
-    expect(leave_link[:href]).to match(%r{\Ahttps?://[^/]+/\?organization_id=false\z})
+    open_account_menu
+    click_link "View without any organization"
+
+    # The organization is what the sidebar stands in for, so dropping it hands the navbar
+    # back -- on the page they were already reading
+    expect(page).to have_current_path("/my_account", ignore_query: true)
+    expect(page).to have_no_css "#org_sidebar_nav"
+
+    # Back in through the navbar's switcher, which lands on the organization's registrations
+    find("button[aria-label='Settings']").click
+    click_link "Switch to #{organization.name}"
+
+    expect(page).to have_current_path("/o/#{slug}/registrations", ignore_query: true)
+    expect_current_group("#{organization.short_name} Registrations")
+
+    # Inside the organization interface there's no page to stay on, so the row keeps the
+    # homepage it renders pointing at
+    expect(leave_link[:href]).to eq "#{page.server_url}/?organization_id=false"
+
+    open_account_menu
+    click_link "View without any organization"
+
+    expect(page).to have_current_path("/", ignore_query: true)
+  end
+
+  # The account block is a UI::Dropdown, so its rows are hidden until it opens
+  def open_account_menu
+    find("#org_sidebar_nav button[data-ui--dropdown-target='button']", text: user.email).click
   end
 
   def leave_link

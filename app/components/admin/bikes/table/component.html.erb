@@ -25,7 +25,7 @@
 
 <%= form_tag get_destroy_admin_bike_path(id: "multi_delete"), method: :get, data: {controller: "table-multi-checkbox"} do %>
   <div class="display-multi-check mb-3 text-center">
-    <%= submit_tag 'Delete selected', class: 'btn btn-outline-danger' %>
+    <%= render(UI::Button::Component.new(text: "Delete selected", color: :error, type: "submit")) %>
   </div>
 
   <div

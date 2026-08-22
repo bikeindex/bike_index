@@ -47,7 +47,7 @@ module Org
         end
       end
 
-      def status_query(status)
+      def status_params(status)
         {search_status: (status == @available_statuses.first) ? [status, nil] : status}
       end
 

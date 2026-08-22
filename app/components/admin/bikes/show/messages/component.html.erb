@@ -1,0 +1,38 @@
+<h3 class="tw:mt-6">
+  <%= section_heading("Notifications", notifications.size, admin_notifications_path(search_bike_id: @bike.id)) %>
+</h3>
+
+<% if notifications.any? %>
+  <%= render partial: "/admin/notifications/table",
+        locals: {notifications:, skip_bike: true, show_message_preview: true} %>
+<% end %>
+
+<h3 class="tw:mt-6">
+  <%= section_heading("Feedbacks", feedbacks.size, admin_feedbacks_path(search_bike_id: @bike.id)) %>
+</h3>
+
+<% if feedbacks.any? %>
+  <%= render partial: "/admin/feedbacks/table", locals: {feedbacks:, skip_bike: true} %>
+<% end %>
+
+<h3 class="tw:mt-6">
+  <%= section_heading("User alerts", user_alerts.size, admin_user_alerts_path(search_bike_id: @bike.id)) %>
+</h3>
+
+<% if user_alerts.any? %>
+  <%= render partial: "/admin/user_alerts/table", locals: {user_alerts:} %>
+<% end %>
+
+<h3 class="tw:mt-6">
+  <%= section_heading("Parking notifications", parking_notifications.size,
+        admin_parking_notifications_path(search_bike_id: @bike.id)) %>
+</h3>
+
+<% if parking_notifications.any? %>
+  <%= render partial: "/admin/parking_notifications/table", locals: {parking_notifications:} %>
+<% end %>
+
+<h3 class="tw:mt-6">
+  <%= section_heading("Graduated notifications", graduated_notifications_count,
+        admin_graduated_notifications_path(search_bike_id: @bike.id)) %>
+</h3>

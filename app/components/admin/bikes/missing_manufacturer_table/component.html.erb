@@ -1,0 +1,67 @@
+<%#
+  UI::Table instance_execs its cell blocks, so this component's own methods are out of
+  reach inside them - each one it needs comes across as a local
+%>
+
+<% other_name_search = ->(bike) { other_name_search_path(bike) } %>
+<% describe = ->(bike) { description(bike) } %>
+<% paint_for = ->(bike) { unmatched_paint(bike) } %>
+<% searched_other_name = @searched_other_name %>
+
+<%= render(UI::Table::Component.new(records: @bikes)) do |table| %>
+  <% table.column(label: toggle_all_button) do |bike| %>
+    <%= check_box_tag "bikes_selected[#{bike.id}]", bike.id, false,
+          data: {"table-multi-checkbox-target": "checkbox"} %>
+  <% end %>
+
+  <% table.column(label: "Date indexed") do |bike| %>
+    <%= link_to edit_admin_bike_url(bike), class: "twlink" do %>
+      <%= render(UI::Time::Component.new(time: bike.created_at)) %>
+    <% end %>
+
+    <span class="twless-strong tw:ml-2">
+      <% if bike.example %>
+        <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>"><%= bike.id %></span>
+      <% else %>
+        <%= bike.id %>
+      <% end %>
+    </span>
+  <% end %>
+
+  <% table.column(label: "Manufacturer") do |bike| %>
+    <% if bike.manufacturer_other.present? %>
+      <%= bike.manufacturer_other %>
+
+      <% if searched_other_name.blank? %>
+        <%= link_to "search", other_name_search.call(bike), class: "twlink tw:text-sm" %>
+      <% end %>
+    <% else %>
+      <em class="twless-strong"><%= bike.mnfg_name %></em>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Info") do |bike| %>
+    <%= describe.call(bike) %>
+
+    <% if paint_for.call(bike).present? %>
+      <div class="twless-strong">
+        <%= link_to bike.paint_description, edit_admin_paint_url(bike.paint), class: "twlink" %>
+        <%= bike.frame_colors.to_sentence %>
+      </div>
+    <% end %>
+
+    <% if bike.status_stolen? %>
+      <span class="twless-strong tw:ml-2">stolen</span>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Created by") do |bike| %>
+    <% if bike.creation_organization.present? %>
+      <%= link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization), class: "twlink" %>
+    <% end %>
+
+    <% if bike.pos? %>
+      <span class="twless-strong tw:ml-2">pos</span>
+    <% end %>
+  <% end %>
+<% end %>
