@@ -2,7 +2,7 @@
   <li>
     <%= render(UI::Dropdown::Component.new(name: @kind == "all" ? "All org kinds" : Organization.kind_humanized(@kind), button_size: :sm,
           active: @kind != "all")) do |dropdown| %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All kinds", path: url_for(sortable_search_params.merge(search_kind: nil)), match_params: {search_kind: UI::ActiveLink::Component::BLANK}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All kinds", path: url_for(sortable_search_params.merge(search_kind: nil)), match_params: {search_kind: nil}) } %>
       <% not_bike_shop_active = @kind == "not_bike_shop" %>
       <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "NOT bike shops", path: url_for(sortable_search_params.merge(search_kind: not_bike_shop_active ? "" : "not_bike_shop")), match_params: {search_kind: "not_bike_shop"}) } %>
       <% dropdown.with_entry_divider %>
@@ -17,7 +17,7 @@
   <li>
     <%= render(UI::Dropdown::Component.new(name: humanize_pos_kind(@pos_kind), button_size: :sm,
           active: @pos_kind != "all")) do |dropdown| %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: humanize_pos_kind("all"), path: url_for(sortable_search_params.merge(search_pos_kind: nil)), match_params: {search_pos_kind: UI::ActiveLink::Component::BLANK}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: humanize_pos_kind("all"), path: url_for(sortable_search_params.merge(search_pos_kind: nil)), match_params: {search_pos_kind: nil}) } %>
 
       <% grouped_pos_kinds.each do |pos_kind| %>
         <% pos_kind_active = @pos_kind == pos_kind %>

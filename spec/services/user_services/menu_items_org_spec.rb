@@ -54,7 +54,7 @@ RSpec.describe UserServices::MenuItemsOrg do
             link_item("Search Registrations", "/o/#{organization.to_param}/registrations")
           ]),
           link_item("Add a bike", "/o/#{organization.to_param}/registrations/new",
-            icon: "plus-circle", match_params: {parking_notification: UI::ActiveLink::Component::BLANK})
+            icon: "plus-circle", match_params: {parking_notification: nil})
         ]
       end
 
@@ -67,7 +67,7 @@ RSpec.describe UserServices::MenuItemsOrg do
 
         it "points add a bike at the embed form" do
           expect(items.last).to eq(link_item("Add a bike", "/o/#{organization.to_param}/bikes/new",
-            icon: "plus-circle", match_params: {parking_notification: UI::ActiveLink::Component::BLANK}))
+            icon: "plus-circle", match_params: {parking_notification: nil}))
         end
       end
     end

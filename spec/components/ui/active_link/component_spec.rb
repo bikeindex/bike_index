@@ -98,8 +98,8 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
 
     # An entry that's the fallback a controller reaches for is in force with the param absent,
     # which is "" once the browser reads it off the URL
-    context "with BLANK among the values" do
-      let(:options) { {match_params: {search_status: ["current", described_class::BLANK]}} }
+    context "with nil among the values" do
+      let(:options) { {match_params: {search_status: ["current", nil]}} }
 
       it "renders it as the empty string" do
         expect(link["data-ui--active-link-match-params-value"])
@@ -116,11 +116,19 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
       end
     end
 
-    context "with nil in place of BLANK" do
+    context "with a bare nil" do
       let(:options) { {match_params: {search_deleted: nil}} }
 
-      it "raises rather than rendering a param with no values, which never matches" do
-        expect { component }.to raise_error(ArgumentError, /blank/)
+      it "renders the one empty string, which is the param the URL leaves out" do
+        expect(link["data-ui--active-link-match-params-value"]).to eq({search_deleted: [""]}.to_json)
+      end
+    end
+
+    context "with no values at all" do
+      let(:options) { {match_params: {search_deleted: []}} }
+
+      it "raises rather than rendering a param nothing can match" do
+        expect { component }.to raise_error(ArgumentError, /needs values/)
       end
     end
   end

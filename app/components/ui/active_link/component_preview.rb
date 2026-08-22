@@ -52,11 +52,11 @@ module UI
           match_params: {filter: "on"}, class: "twlink"))
       end
 
-      # The entry a controller falls back to with the param absent, so BLANK is among its values
+      # The entry a controller falls back to with the param absent, so nil is among its values
       def match_params_blank
         render(UI::ActiveLink::Component.new(text: "Filter: off",
           path: "#{PREVIEW_PATH}/match_params_blank?filter=off",
-          match_params: {filter: ["off", UI::ActiveLink::Component::BLANK]}, class: "twlink"))
+          match_params: {filter: ["off", nil]}, class: "twlink"))
       end
 
       # Anything beyond class passes through to the anchor

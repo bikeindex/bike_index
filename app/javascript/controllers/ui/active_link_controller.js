@@ -53,7 +53,7 @@ export default class extends Controller {
   }
 
   // A link naming no params ignores the query string, and one naming some ignores the rest.
-  // '' is UI::ActiveLink::Component::BLANK, which a URL writes as an empty param or none.
+  // A nil among a link's values is '' here, which a URL writes as an empty param or none.
   paramsMatch () {
     const current = new URLSearchParams(window.location.search)
 

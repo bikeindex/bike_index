@@ -11,10 +11,6 @@ module UI
     # entry needs: it stands for the params it applies rather than for a URL, and links away
     # from itself to clear them.
     class Component < ApplicationComponent
-      # Stands in for nil, which Array.wrap would drop, leaving a param with no values at
-      # all; it reaches the browser as the empty string the URL reads back either way
-      BLANK = :blank
-
       # What a menu item hash can carry through to the link. The rest of an item is the menu's
       # own — its type, icon, children — and an absent key here takes initialize's default
       ITEM_KEYS = [:path, :match_paths, :match_params, :data, :id].freeze
@@ -56,14 +52,14 @@ module UI
           pattern.split("/")[0..-2].include?("**")
       end
 
-      # nil is the habit BLANK replaces — it would wrap to no values at all, and so quietly
-      # never match
+      # A nil value is the param absent, which is "" once the browser reads it off the URL —
+      # the same absence url_for writes by dropping the param, which is what the href beside
+      # a filter entry's match_params does with it
       def param_values(param, values)
-        wrapped = Array.wrap(values)
-        raise ArgumentError, "match_params: #{param} needs values — #{BLANK} for an absent one" unless
-          wrapped.any? && wrapped.all?(&:present?)
+        listed = [values].flatten
+        raise ArgumentError, "match_params: #{param} needs values" if listed.empty?
 
-        wrapped.map { |value| (value == BLANK) ? "" : value.to_s }
+        listed.map(&:to_s)
       end
 
       # link_to labels a link with its own URL when the label is empty, so a caller that

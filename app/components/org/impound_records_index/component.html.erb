@@ -29,7 +29,7 @@
 
       <div class="tw:ml-2 tw:inline-block">
         <%= render(UI::Dropdown::Component.new(name: unregisteredness_dropdown_text, button_size: :sm, active: @search_unregisteredness != "all")) do |dropdown| %>
-          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: translation(".all_bikes"), path: organization_impound_records_path(@sort_state.search_params.except(:search_unregisteredness)), match_params: {search_unregisteredness: UI::ActiveLink::Component::BLANK}, data: {turbo_action: "advance"}) } %>
+          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: translation(".all_bikes"), path: organization_impound_records_path(@sort_state.search_params.except(:search_unregisteredness)), match_params: {search_unregisteredness: nil}, data: {turbo_action: "advance"}) } %>
           <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: translation(".only_unregistered"), path: organization_impound_records_path(@sort_state.search_params.merge(search_unregisteredness: "only_unregistered")), match_params: {search_unregisteredness: "only_unregistered"}, data: {turbo_action: "advance"}) } %>
           <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: translation(".only_user_registered"), path: organization_impound_records_path(@sort_state.search_params.merge(search_unregisteredness: "only_registered")), match_params: {search_unregisteredness: "only_registered"}, data: {turbo_action: "advance"}) } %>
         <% end %>
