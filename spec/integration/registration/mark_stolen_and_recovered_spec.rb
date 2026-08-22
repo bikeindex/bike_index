@@ -43,9 +43,7 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
     click_button "Log in"
     expect(page).to have_content("Logged in", wait: 5)
 
-    # Dismiss the donation modal that greets logged-in users
-    find("#donationModal .close").click
-    expect(page).to have_no_css("#donationModal.in", wait: 5)
+    dismiss_donation_modal
 
     # ---- Report the bike stolen ----
     expect(bike.status_stolen?).to be_falsey

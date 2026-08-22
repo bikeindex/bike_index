@@ -127,9 +127,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     # Leaving the organization shouldn't also leave the page, anywhere the page survives it
     expect(leave_link[:href]).to eq "#{page.server_url}/my_account?organization_id=false"
 
-    # The account page opens the donation modal over everything; closing it sets the
-    # localStorage flag that keeps it closed
-    click_button "No donation"
+    dismiss_donation_modal
 
     open_account_menu
     click_link "View without any organization"
