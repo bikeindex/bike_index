@@ -226,6 +226,19 @@ module SystemSpecHelpers
     expect(page).to have_no_css("#flash-messages [role='alert']", wait: 1)
   end
 
+  # The donation modal greets a signed-in user on my_accounts#show, over the page and
+  # intercepting every click until it's dismissed -- which sets the localStorage flag
+  # that keeps it closed for the rest of the session. A page that doesn't render it, or
+  # one reached after that flag is set, is a no-op rather than a failure.
+  def dismiss_donation_modal
+    return unless page.has_css?("#donationModal", visible: :all, wait: 0)
+    return unless page.has_css?("#donationModal.in", wait: 5)
+
+    click_button "No donation"
+    # The backdrop outlives the modal's fade, and intercepts clicks while it does
+    expect(page).to have_no_css(".modal-backdrop")
+  end
+
   private
 
   # The settle is outside the driver block because evaluate_script returns nil while

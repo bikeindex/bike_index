@@ -8,26 +8,26 @@
 
     <%= render(UI::Dropdown::Component.new(name: enriched_filter_name, button_size: :sm,
           active: @searched_enriched.present?)) do |dropdown| %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All", path: url_for(sortable_search_params.merge(search_enriched: nil)), match: :query, query: {search_enriched: nil}) } %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only enriched", path: url_for(sortable_search_params.merge(search_enriched: "true")), match: :query, query: {search_enriched: "true"}) } %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only not enriched", path: url_for(sortable_search_params.merge(search_enriched: "false")), match: :query, query: {search_enriched: "false"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All", path: url_for(sortable_search_params.merge(search_enriched: nil)), match_params: {search_enriched: nil}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only enriched", path: url_for(sortable_search_params.merge(search_enriched: "true")), match_params: {search_enriched: "true"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only not enriched", path: url_for(sortable_search_params.merge(search_enriched: "false")), match_params: {search_enriched: "false"}) } %>
     <% end %>
   </li>
 
   <li>
     <%= render(UI::Dropdown::Component.new(name: @searched_activity_type.blank? ? "All types" : @searched_activity_type, button_size: :sm,
           active: @searched_activity_type.present?)) do |dropdown| %>
-      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All types", path: url_for(sortable_search_params.merge(search_activity_type: nil)), match: :query, query: {search_activity_type: nil}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All types", path: url_for(sortable_search_params.merge(search_activity_type: nil)), match_params: {search_activity_type: nil}) } %>
       <% dropdown.with_entry_divider %>
 
       <% StravaActivity::CYCLING_TYPES.each do |activity_type| %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: activity_type, path: url_for(sortable_search_params.merge(search_activity_type: activity_type)), match: :query, query: {search_activity_type: activity_type}) } %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: activity_type, path: url_for(sortable_search_params.merge(search_activity_type: activity_type)), match_params: {search_activity_type: activity_type}) } %>
       <% end %>
 
       <% dropdown.with_entry_divider %>
 
       <% (StravaActivity.activity_types - StravaActivity::CYCLING_TYPES).each do |activity_type| %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: activity_type, path: url_for(sortable_search_params.merge(search_activity_type: activity_type)), match: :query, query: {search_activity_type: activity_type}) } %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: activity_type, path: url_for(sortable_search_params.merge(search_activity_type: activity_type)), match_params: {search_activity_type: activity_type}) } %>
       <% end %>
     <% end %>
   </li>

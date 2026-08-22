@@ -53,22 +53,25 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
     expect(component).to have_no_css "nav a[aria-current]"
 
     search = rows.find { |row| row.text.strip == "Search Registrations" }
-    expect(search["data-ui--active-link-match-value"]).to eq "controller_action"
-    expect(search["data-ui--active-link-routes-value"]).to eq "organized/registrations#index"
+    expect(search["data-ui--active-link-match-paths-value"])
+      .to eq "/o/#{organization.to_param}/registrations"
 
+    # Editing a page of a sequence is its own path, off the sequences one
     sequences = rows.find { |row| row.text.strip == "Registration sequences" }
-    expect(sequences["data-ui--active-link-match-value"]).to eq "controller"
-    expect(sequences["data-ui--active-link-routes-value"])
-      .to eq "organized/registration_sequences organized/registration_sequence_pages"
+    expect(sequences["data-ui--active-link-match-paths-value"])
+      .to eq "/o/#{organization.to_param}/registration_sequences/** " \
+        "/o/#{organization.to_param}/registration_sequence_pages/**"
   end
 
-  # full_path because the old view puts both rows on organized/bikes#new
-  it "matches the two add-a-bike rows on their full path" do
-    rows = component.css("nav a[data-ui--active-link-match-value='full_path']")
+  # The old view puts both rows on organized/bikes#new, so the param tells them apart
+  it "matches the two add-a-bike rows on the param" do
+    rows = component.css("nav a[data-ui--active-link-match-params-value*='parking_notification']")
 
     expect(rows.map { |row| row["href"] })
       .to eq(["/o/#{organization.to_param}/registrations/new",
         "/o/#{organization.to_param}/bikes/new?parking_notification=true"])
+    expect(rows.map { |row| row["data-ui--active-link-match-params-value"] })
+      .to eq([{parking_notification: [""]}.to_json, {parking_notification: ["true"]}.to_json])
   end
 
   # Which group holds the current page is the browser's to say, so the server opens the

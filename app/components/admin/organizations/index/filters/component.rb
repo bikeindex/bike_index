@@ -27,9 +27,9 @@ module Admin
           def pos_entries = POS_GROUPINGS + Organization.pos_kinds
 
           # A filter entry stands for the params it applies, so it links away from itself to
-          # clear the filter - which is what match: :query compares
+          # clear the filter - which is what match_params: compares in the href's place
           def filter_link(text, param, value)
-            render(UI::ActiveLink::Component.new(text:, match: :query, query: {param => value},
+            render(UI::ActiveLink::Component.new(text:, match_params: {param => value},
               path: url_for(@index.sortable_search_params.merge(param => value))))
           end
 
