@@ -4,7 +4,7 @@
           active: @search_completeness != "all")) do |dropdown| %>
       <% %w[all only_incomplete only_complete].each do |kind| %>
         <% kind_active = @search_completeness == kind %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind.humanize, path: admin_b_params_path(sortable_search_params.merge(search_completeness: kind_active ? nil : kind)), match: :query, query: {search_completeness: kind}) } %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind.humanize, path: admin_b_params_path(sortable_search_params.merge(search_completeness: kind_active ? nil : kind)), match_params: {search_completeness: kind}) } %>
       <% end %>
     <% end %>
   </li>

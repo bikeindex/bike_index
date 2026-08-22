@@ -9,7 +9,7 @@ module ComponentStructs
   # ::UserSettingsMenu, and served by api/v3/me:
   #   {type: :divider}
   #   {type: :group, key:, label:, icon:, children: [...]}
-  #   {type: :link, label:, path:, icon:, match:, matching_controllers:, id:, data:, danger:}
+  #   {type: :link, label:, path:, icon:, match_paths:, match_params:, id:, data:, danger:}
   #   {type: :disabled, label:}
   #
   # A UI::Tabs tab, which Admin::Headers::Tabs passes through:
@@ -21,10 +21,12 @@ module ComponentStructs
   module Items
     extend Functionable
 
-    # `match:` and `matching_controllers:` are UI::ActiveLink's, which resolves them in the
-    # browser. Nothing here depends on which page is current.
-    def link(label, path, icon: nil, match: :path, matching_controllers: [], **attributes)
-      {type: :link, label:, path:, icon:, match:, matching_controllers:, **attributes}
+    # `match_paths:` and `match_params:` are UI::ActiveLink's, which resolves them in the
+    # browser. Nothing here depends on which page is current. section: is the common case of
+    # match_paths: — the row covers everything under its own path.
+    def link(label, path, icon: nil, section: false, **attributes)
+      covered = section ? {match_paths: "#{path}/**"} : {}
+      {type: :link, label:, path:, icon:, **covered, **attributes}
     end
 
     # A group whose children are all gated off doesn't render at all. `key` is what the

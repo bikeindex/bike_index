@@ -47,8 +47,8 @@ module Org
         end
       end
 
-      def status_query(status)
-        {search_status: (status == @available_statuses.first) ? [status, nil] : status}
+      def status_params(status)
+        {search_status: (status == @available_statuses.first) ? [status, UI::ActiveLink::Component::BLANK] : status}
       end
 
       def unregisteredness_dropdown_text

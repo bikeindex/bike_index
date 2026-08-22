@@ -2,21 +2,22 @@
 
 module UI
   module ActiveLink
-    # Marks the link aria-current on the page it points at, which the is-active variant
+    # Marks the link aria-current on the page it covers, which the is-active variant
     # (application.css) styles. The browser decides, in ui/active_link_controller.js, so a link
     # rendered into a fragment cache doesn't carry the answer for whichever page filled it.
-    # match: widens or narrows what counts as the page it points at: its query string too, or
-    # only its controller, or its controller and action — which is what a link carrying query
-    # params (a search, a filtered index) needs. :query is for a filter entry, which stands for
-    # the params it applies rather than for a URL.
+    # match_paths: widens what it covers past its own href, as one pattern or a list of them —
+    # "*" stands for one segment and a trailing "**" for the rest, so a section's sub-pages
+    # count. match_params: narrows it to the pages carrying those params, which is what a filter
+    # entry needs: it stands for the params it applies rather than for a URL, and links away
+    # from itself to clear them.
     class Component < ApplicationComponent
-      MATCHES = [:path, :full_path, :controller, :controller_action, :query].freeze
-      # The matches the browser answers with a route rather than with the URL
-      ROUTE_MATCHES = [:controller, :controller_action].freeze
+      # Stands in for nil, which Array.wrap would drop, leaving a param with no values at
+      # all; it reaches the browser as the empty string the URL reads back either way
+      BLANK = :blank
 
       # What a menu item hash can carry through to the link. The rest of an item is the menu's
       # own — its type, icon, children — and an absent key here takes initialize's default
-      ITEM_KEYS = [:path, :match, :matching_controllers, :data, :id].freeze
+      ITEM_KEYS = [:path, :match_paths, :match_params, :data, :id].freeze
 
       # A menu manifest carries a link as a hash; what differs between the menus rendering one
       # is the class, and text: for a row whose label sits inside a block with its icon
@@ -24,20 +25,14 @@ module UI
         new(**item.slice(*ITEM_KEYS), text:, class: html_class)
       end
 
-      def initialize(path:, text: nil, match: :path, matching_controllers: [], query: {}, data: {},
+      def initialize(path:, text: nil, match_paths: [], match_params: nil, data: {},
         **html_options)
-        raise_if_invalid_value!(:match, match, MATCHES)
-        # Only a :controller match compares controllers, so anywhere else these would be
-        # compared against a controller#action and never hit
-        raise ArgumentError, "matching_controllers: needs match: :controller" if
-          matching_controllers.any? && match != :controller
-        raise ArgumentError, "query: and match: :query go together" if query.any? != (match == :query)
+        @match_paths = Array.wrap(match_paths.presence || path).map { |url| page_path(url) }
+        @match_paths.each { |pattern| raise_if_invalid_pattern!(pattern) }
+        @match_params = match_params.presence&.to_h { |param, values| [param, param_values(param, values)] }
 
         @path = path
         @text = text
-        @match = match
-        @matching_controllers = matching_controllers
-        @query = query
         @data = data
         @html_options = html_options
       end
@@ -48,6 +43,29 @@ module UI
 
       private
 
+      # A query arrives mid-pattern as well as at the end, since a route helper interpolated
+      # into one carries the locale param. A URL with no path of its own points at a root —
+      # someone else's, which the browser rules out on the origin.
+      def page_path(url)
+        url.to_s.sub(%r{\A[a-z]+://[^/]+}i, "").sub(%r{[?#][^/]*}, "").presence || "/"
+      end
+
+      def raise_if_invalid_pattern!(pattern)
+        raise ArgumentError, "match_paths: #{pattern} must start with /" unless pattern.start_with?("/")
+        raise ArgumentError, "match_paths: ** only ends a pattern, not #{pattern}" if
+          pattern.split("/")[0..-2].include?("**")
+      end
+
+      # nil is the habit BLANK replaces — it would wrap to no values at all, and so quietly
+      # never match
+      def param_values(param, values)
+        wrapped = Array.wrap(values)
+        raise ArgumentError, "match_params: #{param} needs values — #{BLANK} for an absent one" unless
+          wrapped.any? && wrapped.all?(&:present?)
+
+        wrapped.map { |value| (value == BLANK) ? "" : value.to_s }
+      end
+
       # link_to labels a link with its own URL when the label is empty, so a caller that
       # forgot text: would ship an anchor reading "/o/example/dashboard"
       def link_text
@@ -57,33 +75,8 @@ module UI
 
       def link_data
         @data.merge(controller: [@data[:controller], "ui--active-link"].compact.join(" "),
-          "ui--active-link-match-value": @match,
-          "ui--active-link-routes-value": link_routes,
-          "ui--active-link-query-value": link_query).compact
-      end
-
-      # A nil among a param's values is the entry a controller falls back to with the param
-      # absent, which is "" once the browser reads it off the URL
-      def link_query
-        @query.presence&.transform_values { |values| [values].flatten.map(&:to_s) }
-      end
-
-      # What the browser compares the page against — it can't resolve a route itself. One
-      # controller#action, or one controller per entry when that's what the match compares,
-      # so a menu entry whose section spans two of them lists the other too.
-      def link_routes
-        return unless @match.in?(ROUTE_MATCHES)
-
-        [route(@path), *@matching_controllers].compact.join(" ").presence
-      end
-
-      def route(url)
-        recognized = Rails.application.routes.recognize_path(url)
-        return recognized[:controller] if @match == :controller
-
-        "#{recognized[:controller]}##{recognized[:action]}"
-      rescue ActionController::RoutingError
-        nil
+          "ui--active-link-match-paths-value": @match_paths.join(" "),
+          "ui--active-link-match-params-value": @match_params).compact
       end
     end
   end

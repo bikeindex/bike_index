@@ -77,7 +77,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(page).to have_current_path("/o/#{slug}/registrations", ignore_query: true)
     expect_open("#{organization.short_name} Registrations")
     expect_current_group("#{organization.short_name} Registrations")
-    expect(page).to have_css "#org_sidebar_nav a[aria-current='true']", text: "Search Registrations"
+    expect(page).to have_css "#org_sidebar_nav a[aria-current='page']", text: "Search Registrations"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Search Impounded Vehicles"
 
     # Short enough that the menu scrolls, with Manage users past its fold
@@ -91,7 +91,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(scroller_top).to be > 0
   end
 
-  it "tells the two add-a-bike rows apart by their full path" do
+  it "tells the two add-a-bike rows apart by the param" do
     visit "/o/#{slug}/registrations/new"
 
     expect(page).to have_css "#org_sidebar_nav a[aria-current]", text: "Add a bike"

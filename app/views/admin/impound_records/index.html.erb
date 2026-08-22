@@ -19,7 +19,7 @@
 
         <% status_active = @search_status == status %>
         <% status_link_params = sortable_search_params.merge(search_status: (status_active ? nil : status)) %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: display_status, path: url_for(status_link_params), match: :query, query: {search_status: status}) } %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: display_status, path: url_for(status_link_params), match_params: {search_status: status}) } %>
 
         <% if status == "resolved" %>
           <% dropdown.with_entry_divider %>

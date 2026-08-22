@@ -2,14 +2,8 @@ module ApplicationHelper
   include Binxtils::NavHelper
   include Binxtils::SortableHelper
 
-  # Every layout's <body>. UI::ActiveLink's controller matching reads the route off the page
-  # rather than off the link, since the link's markup is a fragment cache shared by every page,
-  # and a layout that opens its own <body> and forgets it fails silently -- the link just never
-  # goes current. The route isn't page_id, which controllers override to borrow another page's
-  # styles.
   def body_tag(html_class: nil, **html_options, &block)
-    tag.body(id: page_id, class: html_class.presence || body_class, **html_options,
-      data: {page_route: "#{controller_path}##{action_name}"}, &block)
+    tag.body(id: page_id, class: html_class.presence || body_class, **html_options, &block)
   end
 
   def notification_delivery_display(status)

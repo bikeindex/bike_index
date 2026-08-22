@@ -6,8 +6,8 @@ RSpec.describe UserServices::MenuItemsOrg do
   describe "for" do
     subject(:items) { described_class.for(organization:, current_user:) }
 
-    define_method(:link_item) do |label, path, icon: nil, match: :path, matching_controllers: []|
-      {type: :link, label:, path:, icon:, match:, matching_controllers:}
+    define_method(:link_item) do |label, path, icon: nil, **attributes|
+      {type: :link, label:, path:, icon:, **attributes}
     end
 
     define_method(:group_item) do |key, label, icon, children|
@@ -51,11 +51,10 @@ RSpec.describe UserServices::MenuItemsOrg do
       let(:target) do
         [
           group_item(:registrations, "#{organization.short_name} Registrations", "bike", [
-            link_item("Search Registrations", "/o/#{organization.to_param}/registrations",
-              match: :controller_action)
+            link_item("Search Registrations", "/o/#{organization.to_param}/registrations")
           ]),
           link_item("Add a bike", "/o/#{organization.to_param}/registrations/new",
-            icon: "plus-circle", match: :full_path)
+            icon: "plus-circle", match_params: {parking_notification: UI::ActiveLink::Component::BLANK})
         ]
       end
 
@@ -68,7 +67,7 @@ RSpec.describe UserServices::MenuItemsOrg do
 
         it "points add a bike at the embed form" do
           expect(items.last).to eq(link_item("Add a bike", "/o/#{organization.to_param}/bikes/new",
-            icon: "plus-circle", match: :full_path))
+            icon: "plus-circle", match_params: {parking_notification: UI::ActiveLink::Component::BLANK}))
         end
       end
     end
@@ -93,11 +92,11 @@ RSpec.describe UserServices::MenuItemsOrg do
 
         expect(registrations[:label]).to eq "Brakebills Registrations"
         expect(registrations[:children]).to eq([
-          link_item("Search Registrations", "/o/#{slug}/registrations", match: :controller_action),
+          link_item("Search Registrations", "/o/#{slug}/registrations"),
           link_item("Incomplete registrations", "/o/#{slug}/bikes/incompletes"),
           link_item("Multi search", "/o/#{slug}/registrations/multi_search"),
           link_item("Recoveries", "/o/#{slug}/bikes/recoveries"),
-          link_item("Registration stickers", "/o/#{slug}/stickers", match: :controller)
+          link_item("Registration stickers", "/o/#{slug}/stickers", match_paths: "/o/#{slug}/stickers/**")
         ])
       end
 
@@ -110,7 +109,8 @@ RSpec.describe UserServices::MenuItemsOrg do
 
       it "points reports at the overview dashboard" do
         expect(items.find { |item| item[:label] == "Reports" })
-          .to eq(link_item("Reports", "/o/#{slug}/dashboard", icon: "bar-chart", match: :controller))
+          .to eq(link_item("Reports", "/o/#{slug}/dashboard", icon: "bar-chart",
+            match_paths: ["/o/#{slug}/dashboard/**", "/o/#{slug}"]))
       end
 
       # Managing impounding is the settings group's, so this one is only the vehicles
@@ -123,7 +123,7 @@ RSpec.describe UserServices::MenuItemsOrg do
 
       it "points messaging at the custom emails index, rather than at a single email" do
         expect(items.find { |item| item[:label] == "Messaging" })
-          .to eq(link_item("Messaging", "/o/#{slug}/emails", icon: "chat", match: :controller))
+          .to eq(link_item("Messaging", "/o/#{slug}/emails", icon: "chat", match_paths: "/o/#{slug}/emails/**"))
         expect(organization.enabled?("organization_stolen_message")).to be true
         expect(items.map { |item| item[:label] }).to_not include("Stolen Message")
       end
@@ -135,11 +135,11 @@ RSpec.describe UserServices::MenuItemsOrg do
         expect(settings[:children]).to eq([
           link_item("Brakebills profile", "/o/#{slug}/manage"),
           link_item("Brakebills locations", "/o/#{slug}/manage/locations"),
-          link_item("Manage users", "/o/#{slug}/users", match: :controller),
+          link_item("Manage users", "/o/#{slug}/users", match_paths: "/o/#{slug}/users/**"),
           link_item("Impounding", "/o/#{slug}/manage_impounding/edit"),
           link_item("Stolen Bike Hot Sheet", "/o/#{slug}/hot_sheet/edit"),
           link_item("Registration sequences", "/o/#{slug}/registration_sequences",
-            match: :controller, matching_controllers: ["organized/registration_sequence_pages"])
+            match_paths: ["/o/#{slug}/registration_sequences/**", "/o/#{slug}/registration_sequence_pages/**"])
         ])
       end
     end

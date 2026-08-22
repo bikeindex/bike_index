@@ -1,22 +1,22 @@
 - nav_header_list_items = capture_haml do
   %li
     = render(UI::Dropdown::Component.new(name: @status.blank? ? "All statuses" : "#{@status.titleize} only", button_size: :sm, active: @status.present?)) do |dropdown|
-      - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All statuses", path: url_for(sortable_search_params.merge(search_status: nil)), match: :query, query: {search_status: nil}) }
+      - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All statuses", path: url_for(sortable_search_params.merge(search_status: nil)), match_params: {search_status: UI::ActiveLink::Component::BLANK}) }
       - dropdown.with_entry_divider
       - searchable_statuses.each do |kind|
-        - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.titleize} only", path: url_for(sortable_search_params.merge(search_status: kind)), match: :query, query: {search_status: kind}) }
+        - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.titleize} only", path: url_for(sortable_search_params.merge(search_status: kind)), match_params: {search_status: kind}) }
   %li
     = render(UI::Dropdown::Component.new(name: @level.blank? ? "All levels" : "#{@level.titleize} only", button_size: :sm, active: @level.present?)) do |dropdown|
-      - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All levels", path: url_for(sortable_search_params.merge(search_level: nil)), match: :query, query: {search_level: nil}) }
+      - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All levels", path: url_for(sortable_search_params.merge(search_level: nil)), match_params: {search_level: UI::ActiveLink::Component::BLANK}) }
       - dropdown.with_entry_divider
       - searchable_levels.each do |kind|
-        - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.titleize} only", path: url_for(sortable_search_params.merge(search_level: kind)), match: :query, query: {search_level: kind}) }
+        - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.titleize} only", path: url_for(sortable_search_params.merge(search_level: kind)), match_params: {search_level: kind}) }
   %li
     = render(UI::Dropdown::Component.new(name: @manager.blank? ? "Stripe & admin" : "#{@manager.titleize} only", button_size: :sm, active: @manager.present?)) do |dropdown|
-      - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Stripe & admin", path: url_for(sortable_search_params.merge(search_manager: nil)), match: :query, query: {search_manager: nil}) }
+      - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Stripe & admin", path: url_for(sortable_search_params.merge(search_manager: nil)), match_params: {search_manager: UI::ActiveLink::Component::BLANK}) }
       - dropdown.with_entry_divider
       - searchable_managers.each do |kind|
-        - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.titleize} only", path: url_for(sortable_search_params.merge(search_manager: kind)), match: :query, query: {search_manager: kind}) }
+        - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.titleize} only", path: url_for(sortable_search_params.merge(search_manager: kind)), match_params: {search_manager: kind}) }
   %li
     = render(UI::ButtonLink::Component.new(text: "New Membership", href: new_admin_membership_url, color: :primary, size: :sm))
 

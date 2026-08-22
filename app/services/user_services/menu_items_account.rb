@@ -56,7 +56,8 @@ module UserServices
     def account_rows(user)
       [items.link(translation(:your_registrations), routes.my_account_path),
         marketplace_messages(user),
-        items.link(translation(:register_a_new_bike), routes.register_path, match: :controller),
+        # The row stays current across every step of the flow, which all live under it
+        items.link(translation(:register_a_new_bike), routes.register_path, section: true),
         items.link(translation(:user_settings, user_email: user.email), routes.edit_my_account_path,
           id: "navUserSettingLink", data: {email: user.email})].compact
     end
