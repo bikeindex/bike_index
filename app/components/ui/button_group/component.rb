@@ -27,9 +27,7 @@ module UI
         full_width ? "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2" : "tw:flex tw:flex-wrap tw:gap-2"
       end
 
-      # entries: [{label:, href:, active:, disabled:}, …] — an entry without an href
-      # renders a <button>, and anything else in it (data:, title:, target:) becomes
-      # an attribute
+      # entries: ComponentStructs::Items' entries
       def initialize(entries:, full_width: false)
         @entries = entries
         @full_width = full_width
