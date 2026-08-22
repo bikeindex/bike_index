@@ -61,12 +61,14 @@ export default class extends Controller {
       .every(([param, values]) => values.includes(current.get(param) ?? ''))
   }
 
-  // "page" is reserved for the link whose own path is the current one. A wildcard, or params
-  // the link stands for rather than points at, means the page sits inside what it covers --
+  // "page" is reserved for the link whose own path is the current one -- a pattern can name a
+  // page the link doesn't point at, so matching one isn't enough. A wildcard, or params the
+  // link stands for rather than points at, means the page sits inside what it covers --
   // aria-current's "true", so a reader isn't told a link elsewhere is where they already are
   ariaCurrent () {
-    const isPage = !this.hasMatchParamsValue &&
-      this.patterns.includes(trimSlash(window.location.pathname))
+    const path = trimSlash(window.location.pathname)
+    const isPage = !this.hasMatchParamsValue && this.patterns.includes(path) &&
+      trimSlash(this.element.pathname) === path
 
     return isPage ? 'page' : 'true'
   }

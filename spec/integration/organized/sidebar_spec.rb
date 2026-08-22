@@ -127,17 +127,38 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     # Leaving the organization shouldn't also leave the page, anywhere the page survives it
     expect(leave_link[:href]).to eq "#{page.server_url}/my_account?organization_id=false"
 
-    # click the leave link
-    # verify that you are still
-    # use the non org sidebar menu to to to the organization registration page
+    # The account page opens the donation modal over everything; closing it sets the
+    # localStorage flag that keeps it closed
+    click_button "No donation"
 
-    # sidbar open, but no more the page than any other group
-    expect(page).to have_no_css "#org_sidebar_nav button[data-active='true']"
+    open_account_menu
+    click_link "View without any organization"
 
+    # The organization is what the sidebar stands in for, so dropping it hands the navbar
+    # back -- on the page they were already reading
+    expect(page).to have_current_path("/my_account", ignore_query: true)
+    expect(page).to have_no_css "#org_sidebar_nav"
+
+    # Back in through the navbar's switcher, which lands on the organization's registrations
+    find("button[aria-label='Settings']").click
+    click_link "Switch to #{organization.name}"
+
+    expect(page).to have_current_path("/o/#{slug}/registrations", ignore_query: true)
+    expect_current_group("#{organization.short_name} Registrations")
+
+    # Inside the organization interface there's no page to stay on, so the row keeps the
+    # homepage it renders pointing at
     expect(leave_link[:href]).to match(%r{\Ahttps?://[^/]+/\?organization_id=false\z})
 
-    # click the leave link
-    # Verify you are on the root url
+    open_account_menu
+    click_link "View without any organization"
+
+    expect(page).to have_current_path("/", ignore_query: true)
+  end
+
+  # The account block is a UI::Dropdown, so its rows are hidden until it opens
+  def open_account_menu
+    find("#org_sidebar_nav button[data-ui--dropdown-target='button']", text: user.email).click
   end
 
   def leave_link
