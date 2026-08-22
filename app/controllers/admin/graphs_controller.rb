@@ -1,5 +1,10 @@
 module Admin
   class GraphsController < Admin::BaseController
+    # Handed to the origin chart as its colors, and read back by the origin table's
+    # swatches, so a row and its columns match
+    ORIGIN_COLORS = %w[#3498db #DC2626 #D97706 #7C3AED #059669 #DB2777 #475569 #0891B2
+      #65A30D #EA580C #4F46E5 #9333EA #0D9488 #CA8A04 #E11D48 #2563EB #16A34A].freeze
+
     before_action :set_period
     before_action :set_variable_graph_kind
     around_action :set_reading_role
@@ -34,7 +39,8 @@ module Admin
       @kind = ""
     end
 
-    helper_method :shown_bike_graph_kinds, :matching_bikes, :pos_search_kinds, :default_period
+    helper_method :shown_bike_graph_kinds, :matching_bikes, :pos_search_kinds, :default_period,
+      :origin_colors, :origin_bike_counts
 
     protected
 
@@ -69,6 +75,23 @@ module Admin
 
     def default_period
       "year"
+    end
+
+    # Ownership.origins order, which is the order bike_chart_data builds the series in
+    def origin_colors
+      @origin_colors ||= Ownership.origins.each_with_index
+        .to_h { |origin, index| [origin, ORIGIN_COLORS[index % ORIGIN_COLORS.count]] }
+    end
+
+    # [origin, count] highest first, with Ownership.origins order breaking ties so the
+    # rows don't reshuffle between loads. Distinct because a bike has an ownership per transfer
+    def origin_bike_counts
+      return @origin_bike_counts if defined?(@origin_bike_counts)
+
+      origins = Ownership.origins
+      counts = matching_bikes.joins(:ownerships).group("ownerships.origin").distinct.count(:id)
+      @origin_bike_counts = origins.index_with { counts[it] || 0 }
+        .sort_by { |origin, count| [-count, origins.index(origin)] }
     end
 
     def bike_graph_kinds

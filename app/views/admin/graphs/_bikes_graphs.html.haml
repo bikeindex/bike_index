@@ -84,12 +84,15 @@
               %th.text-left Origin
               %th.text-right Bikes
             %tbody
-              - Ownership.origins.each do |origin|
+              - origin_bike_counts.each do |origin, bike_count|
+                -# Chartkick fills the columns at half opacity and outlines them, so the swatch does too
+                - origin_color = origin_colors[origin]
                 %tr
                   %td.text-left
+                    %span.d-inline-block.mr-1{style: "width: .75rem; height: .75rem; border: 1px solid #{origin_color}; background-color: #{origin_color}80;"}
                     = origin.humanize
                     = link_to search_emoji, admin_bikes_path(sortable_params.merge(search_origin: origin))
-                  %td.text-right= number_display(matching_bikes.includes(:ownerships).where(ownerships: {origin: origin}).count)
+                  %td.text-right= number_display(bike_count)
               -# TODO: make this actually work
               -# %tr
               -#   %td.text-left Transferred pre-registration
@@ -102,7 +105,8 @@
                 %td.text-right= number_display(StolenRecord.unscoped.where(recovered_at: @time_range).joins(:bike).merge(matching_bikes).count)
 
     .mt-4
-    = column_chart variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: graph_kind)), stacked: true, thousands: ","
+    - chart_colors = (graph_kind == "origin") ? {colors: origin_colors.values} : {}
+    = column_chart variable_admin_graphs_path(sortable_params.merge(bike_graph_kind: graph_kind)), stacked: true, thousands: ",", **chart_colors
 
   .col-sm-8.offset-sm-2.mt-4
     .full-screen-table
