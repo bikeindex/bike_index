@@ -105,6 +105,20 @@ module Admin
       %w[lightspeed_pos ascend_pos does_not_need_pos no_pos]
     end
 
+    # Grouped by origin as well as by time, so this is one query rather than one per
+    # origin. Groupdate's range only fills the origins it found rows for, so the rest
+    # take the empty series - which none builds without a query of its own.
+    # Distinct: a bike has an ownership per transfer
+    def origin_chart_series(bikes)
+      counts = helpers.time_range_counts(column: "bikes.created_at",
+        collection: bikes.joins(:ownerships).group("ownerships.origin").distinct)
+      series = counts.each_with_object({}) { |((origin, at), count), h| (h[origin] ||= {})[at] = count }
+      empty = helpers.time_range_counts(collection: bikes.none, column: "bikes.created_at")
+      Ownership.origins.map do |origin|
+        {name: origin.humanize, color: origin_colors[origin], data: empty.merge(series[origin] || {})}
+      end
+    end
+
     def bike_chart_data
       bikes = matching_bikes
       bike_graph_kind = bike_graph_kinds.include?(params[:bike_graph_kind]) ? params[:bike_graph_kind] : bike_graph_kinds.first
@@ -120,13 +134,7 @@ module Admin
           }
         ]
       elsif bike_graph_kind == "origin"
-        Ownership.origins.map do |origin|
-          {
-            name: origin.humanize,
-            color: origin_colors[origin],
-            data: helpers.time_range_counts(collection: bikes.includes(:ownerships).where(ownerships: {origin: origin}))
-          }
-        end
+        origin_chart_series(bikes)
       elsif bike_graph_kind == "pos"
         pos_search_kinds.map do |pos_kind|
           {

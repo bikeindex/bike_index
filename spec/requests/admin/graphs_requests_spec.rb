@@ -55,6 +55,9 @@ RSpec.describe Admin::GraphsController, type: :request do
           get "#{base_url}/variable", params: {search_kind: "bikes", period: "week", bike_graph_kind: "origin"}
           expect(json_result.to_h { [it["name"], it["color"]] })
             .to eq(origin_colors.transform_keys(&:humanize))
+          # Every origin gets a zero-filled series, not just the ones the grouped query found
+          totals = json_result.to_h { |series| [series["name"], series["data"].sum(&:last)] }
+          expect(totals).to eq(Ownership.origins.to_h { [it.humanize, 0] }.merge("Sticker" => 2, "Web" => 1))
         end
       end
     end
