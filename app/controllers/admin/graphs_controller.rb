@@ -1,5 +1,9 @@
 module Admin
   class GraphsController < Admin::BaseController
+    # The shared chart palette, which runs out well before Ownership.origins does
+    ORIGIN_COLORS = (UI::Chart::Component::COLORS + %w[#0891B2 #65A30D #EA580C #4F46E5
+      #9333EA #0D9488 #CA8A04 #E11D48 #2563EB #16A34A]).freeze
+
     before_action :set_period
     before_action :set_variable_graph_kind
     around_action :set_reading_role
@@ -34,7 +38,8 @@ module Admin
       @kind = ""
     end
 
-    helper_method :shown_bike_graph_kinds, :matching_bikes, :pos_search_kinds, :default_period
+    helper_method :shown_bike_graph_kinds, :matching_bikes, :pos_search_kinds, :default_period,
+      :origin_colors, :origin_bike_counts
 
     protected
 
@@ -71,6 +76,23 @@ module Admin
       "year"
     end
 
+    # Each series carries its own, so the table's swatches match without the two
+    # agreeing on an order across the chart's separate request
+    def origin_colors
+      @origin_colors ||= Ownership.origins.zip(ORIGIN_COLORS).to_h
+    end
+
+    # Ownership.origins order breaks count ties, so the rows don't reshuffle between
+    # loads. Distinct: a bike has an ownership per transfer
+    def origin_bike_counts
+      return @origin_bike_counts if defined?(@origin_bike_counts)
+
+      origins = Ownership.origins
+      counts = matching_bikes.joins(:ownerships).group("ownerships.origin").distinct.count(:id)
+      @origin_bike_counts = origins.index_with { counts[it] || 0 }
+        .sort_by { |origin, count| [-count, origins.index(origin)] }
+    end
+
     def bike_graph_kinds
       %w[stolen origin pos ignored]
     end
@@ -81,6 +103,20 @@ module Admin
 
     def pos_search_kinds
       %w[lightspeed_pos ascend_pos does_not_need_pos no_pos]
+    end
+
+    # Grouped by origin as well as by time, so this is one query rather than one per
+    # origin. Groupdate's range only fills the origins it found rows for, so the rest
+    # take the empty series - which none builds without a query of its own.
+    # Distinct: a bike has an ownership per transfer
+    def origin_chart_series(bikes)
+      counts = helpers.time_range_counts(column: "bikes.created_at",
+        collection: bikes.joins(:ownerships).group("ownerships.origin").distinct)
+      series = counts.each_with_object({}) { |((origin, at), count), h| (h[origin] ||= {})[at] = count }
+      empty = helpers.time_range_counts(collection: bikes.none, column: "bikes.created_at")
+      Ownership.origins.map do |origin|
+        {name: origin.humanize, color: origin_colors[origin], data: empty.merge(series[origin] || {})}
+      end
     end
 
     def bike_chart_data
@@ -98,12 +134,7 @@ module Admin
           }
         ]
       elsif bike_graph_kind == "origin"
-        Ownership.origins.map do |origin|
-          {
-            name: origin.humanize,
-            data: helpers.time_range_counts(collection: bikes.includes(:ownerships).where(ownerships: {origin: origin}))
-          }
-        end
+        origin_chart_series(bikes)
       elsif bike_graph_kind == "pos"
         pos_search_kinds.map do |pos_kind|
           {
