@@ -214,8 +214,6 @@
    * margin cancels the tab row's mb-3, so the band meets the row it sits under. */
   .admin-bike-summary {
     @apply tw:-mt-3 tw:bg-[#212529] tw:pt-6 tw:pb-1 tw:text-white;
-    margin-inline: calc(var(--gutter) * -1);
-    padding-inline: var(--gutter);
   }
 
   .admin-bike-summary h1,
