@@ -29,9 +29,10 @@ module UserServices
     # Sections rather than a flat list, so a section gated off entirely takes the
     # divider above it with it
     def build_items(organization, current_user, old_register_view)
-      (organization_sections(organization, current_user, old_register_view) +
-        [super_admin_items(organization, current_user)])
-        .map(&:compact).reject(&:empty?)
+      sections = organization_sections(organization, current_user, old_register_view) +
+        [[super_admin_link(organization, current_user)]]
+
+      sections.map(&:compact).reject(&:empty?)
         .inject { |rows, section| rows + [ComponentStructs::Shapes.divider] + section }
     end
 
@@ -55,11 +56,11 @@ module UserServices
 
     # Leaves the organization interface behind, so it's a section of its own rather than
     # one of the organization's rows
-    def super_admin_items(organization, current_user)
-      return [] unless current_user.superuser?
+    def super_admin_link(organization, current_user)
+      return nil unless current_user.superuser?
 
-      [ComponentStructs::Shapes.link(translation(:in_super_admin, org_name: organization.short_name),
-        routes.admin_organization_path(organization.to_param), icon: "shield")]
+      ComponentStructs::Shapes.link(translation(:in_super_admin, org_name: organization.short_name),
+        routes.admin_organization_path(organization.to_param), icon: "shield")
     end
 
     # Organized::BaseController bars an ambassador organization from every controller
@@ -254,7 +255,7 @@ module UserServices
       Rails.application.routes.url_helpers
     end
 
-    conceal :build_items, :organization_sections, :super_admin_items, :ambassador_items,
+    conceal :build_items, :organization_sections, :super_admin_link, :ambassador_items,
       :registrations_group, :add_bike_link, :impounded_group,
       :parking_group, :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link, :graduated_link,
       :hot_sheet_link, :reports_link, :settings_group, :org_root, :enabled_link, :translation, :routes

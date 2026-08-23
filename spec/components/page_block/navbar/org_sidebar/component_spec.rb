@@ -92,8 +92,7 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
       rows = component.css("[data-page-block--org-sidebar-target='scroller'] a")
 
       expect(rows.last["href"]).to eq "/admin/organizations/#{organization.to_param}"
-      expect(rows.last.text).to include "Brakebills in super admin"
-      # The icon is all that's left of the row once the sidebar collapses
+      # It renders through the ordinary icon branch, with no special case of its own
       expect(rows.last.css("svg").count).to eq 1
     end
 

@@ -47,8 +47,7 @@ module ComponentStructs
     end
 
     # An entry without an href renders a <button> rather than a link, so href: is where a
-    # chip driven by a Stimulus action differs from one that navigates. Anything past these
-    # keys becomes an attribute on the chip rather than something the component reads
+    # chip driven by a Stimulus action differs from one that navigates
     def entry(label, href: nil, active: false, disabled: false, **attributes)
       {label:, href:, active:, disabled:, **attributes}
     end

@@ -72,8 +72,6 @@ RSpec.describe UserServices::MenuItemsOrg do
       end
     end
 
-    # The row leaves the organization interface behind, so it follows every organization
-    # row and takes a divider of its own
     context "with a superuser" do
       let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
       let(:current_user) { FactoryBot.create(:superuser) }
