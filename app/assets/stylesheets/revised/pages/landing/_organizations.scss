@@ -87,6 +87,12 @@ ul.org-landing-icon-list {
       width: 100%;
       margin: 0 auto;
     }
+
+    // list-style-type inherits, so a page's own nested list would come out markerless
+    ul {
+      list-style-type: disc;
+      padding-left: 1rem;
+    }
   }
 
   @include media-breakpoint-up(md) {
@@ -151,8 +157,14 @@ ul.org-landing-icon-list {
     margin: 0;
     display: block;
 
+    // twlink, which is layered and so can't outrank this legacy rule on its own
     a {
-      color: $body-font-color;
+      color: var(--tw-color-blue-600);
+      transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+      &:hover {
+        color: var(--tw-color-blue-700);
+      }
     }
   }
 
