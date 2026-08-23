@@ -210,9 +210,10 @@
 
   /* The band the admin bike screens open with: what the registration is, set apart from
    * whichever tab's body follows it. Full bleed and borderless, the way the legacy
-   * .admin-bike-tabs read - its .table-list tables sit on white against it. */
+   * .admin-bike-tabs read - its .table-list tables sit on white against it. The negative top
+   * margin cancels the tab row's mb-3, so the band meets the row it sits under. */
   .admin-bike-summary {
-    @apply tw:bg-[#212529] tw:pt-6 tw:pb-1 tw:text-white;
+    @apply tw:-mt-3 tw:bg-[#212529] tw:pt-6 tw:pb-1 tw:text-white;
     margin-inline: calc(var(--gutter) * -1);
     padding-inline: var(--gutter);
   }
