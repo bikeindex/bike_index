@@ -2,22 +2,23 @@
   <%= render(UI::Header::Component.new(text: "SAML configuration test",
         subtitle: safe_join([@organization.short_name, " — ", tag.code(@organization.user_email_domain)]))) %>
 
-  <%= render(UI::Alerts::Base::Component.new(kind: summary_kind)) do %>
+  <%= render(UI::Alerts::Base::Component.new(kind: summary_kind, header: summary_header)) do %>
     <% if @result.blank? %>
-      Signing in here validates the IdP's assertion and reports what it
-      contained. No account is created and nobody is signed in, so this is safe
-      to run before the configuration is activated.
+      This is the real login: the IdP authenticates you, and Bike Index signs
+      you in — creating an account for the address the IdP releases if there
+      isn't one already. What comes back is reported here rather than dropping
+      you on your account page.
     <% elsif @result.success? %>
-      The assertion signature and SAML response validation passed. No account
-      was provisioned or signed in.
+      <code><%= @result.user.email %></code>
+      is signed in on this browser now — the same session an ordinary SSO login
+      creates.
     <% else %>
-      The assertion was not accepted:
       <%= @result.error %>
     <% end %>
   <% end %>
 
   <% if @result.blank? %>
-    <%= form_with url: saml_test_path(org_slug: @organization.to_param) do |f| %>
+    <%= form_with url: saml_test_start_path(org_slug: @organization.to_param) do |f| %>
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true,
             label_text: "Email address to sign in with")) do %>
         <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true,
@@ -39,7 +40,7 @@
         <dd><code><%= @expected_email %></code></dd>
       <% end %>
 
-      <% if diagnostic? %>
+      <% if asserted? %>
         <dt class="tw:font-semibold">NameID</dt>
         <dd><code><%= @result.name_id.presence || "(missing)" %></code></dd>
         <dt class="tw:font-semibold">NameID format</dt>
@@ -62,15 +63,21 @@
         </dd>
         <dt class="tw:font-semibold">Organization domain</dt>
         <dd><code><%= @organization.user_email_domain %></code></dd>
-        <dt class="tw:font-semibold">Matching account</dt>
-        <dd><code><%= @result.user&.email || "(none)" %></code></dd>
-        <dt class="tw:font-semibold">Matching account has a password</dt>
+      <% end %>
+
+      <% if @result.user.present? %>
+        <dt class="tw:font-semibold">Account</dt>
         <dd>
-          <%= @result.user ? (@result.user_has_password ? "Yes" : "No") : "(none)" %>
+          <code><%= @result.user.email %></code>
+          <%= @result.signed_up ? "— created by this login" : "— already existed" %>
         </dd>
+        <% unless @result.signed_up %>
+          <dt class="tw:font-semibold">Account has a password</dt>
+          <dd><%= @result.user.passwordless_user? ? "No" : "Yes" %></dd>
+        <% end %>
       <% end %>
     </dl>
-    <% if diagnostic? %>
+    <% if asserted? %>
       <%= render(UI::Header::Component.new(text: "Received attributes", tag: :h2)) %>
       <% if @result.attributes.present? %>
         <dl

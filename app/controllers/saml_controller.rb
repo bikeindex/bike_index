@@ -30,13 +30,14 @@ class SamlController < ApplicationController
     redirect_to_saml(configured_saml_configuration)
   end
 
-  # A rehearsal of the login the organization's users will get, minus the sign-in
+  # A rehearsal of the login the organization's users will get: the same transaction,
+  # landing on a page that reports what the IdP sent rather than where they were headed
   def test
-    render_saml_test(configured_inactive_saml_configuration)
+    render_saml_test(configured_saml_configuration)
   end
 
   def test_start
-    saml_configuration = configured_inactive_saml_configuration
+    saml_configuration = configured_saml_configuration
     email = EmailNormalizer.normalize(params[:email])
     if email.blank?
       flash.now[:error] = "Enter the email address to sign in with"
@@ -56,12 +57,14 @@ class SamlController < ApplicationController
     return saml_failure("this login has expired, please try again") if saml_request.blank?
     return saml_failure("SAML session mismatch") if saml_request[:org_slug] != params[:org_slug]
 
-    test_mode = saml_request[:mode] == Saml::RequestStore::TEST_MODE
-    saml_configuration = test_mode ? configured_inactive_saml_configuration : configured_saml_configuration
-
+    saml_configuration = configured_saml_configuration
     result = Saml::AssertionProcessor.call(saml_configuration:,
-      raw_response: params[:SAMLResponse], request_id: saml_request[:request_id], dry_run: test_mode)
-    return render_saml_test(saml_configuration, result:, expected_email: saml_request[:expected_email]) if test_mode
+      raw_response: params[:SAMLResponse], request_id: saml_request[:request_id])
+
+    if saml_request[:mode] == Saml::RequestStore::TEST_MODE
+      sign_in_user(result.user) if result.success?
+      return render_saml_test(saml_configuration, result:, expected_email: saml_request[:expected_email])
+    end
     return saml_failure(result.error) unless result.success?
 
     session[:return_to] = saml_request[:return_to]
@@ -86,13 +89,6 @@ class SamlController < ApplicationController
   def configured_saml_configuration
     saml_configuration = saml_organization.organization_saml_configuration
     raise ActiveRecord::RecordNotFound unless saml_configuration&.configured?
-
-    saml_configuration
-  end
-
-  def configured_inactive_saml_configuration
-    saml_configuration = saml_organization.organization_saml_configuration
-    raise ActiveRecord::RecordNotFound unless saml_configuration&.configured? && !saml_configuration.active?
 
     saml_configuration
   end

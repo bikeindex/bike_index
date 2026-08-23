@@ -26,16 +26,18 @@
         ACS (callback) URL:
         <code><%= Saml::SettingsBuilder.assertion_consumer_service_url(saml_configuration) %></code>
       </li>
+
+      <li>
+        Test page: <%= link_to test_url, test_url %>
+        <small>a real SSO login that reports what the IdP sent, rather than signing in silently</small>
+      </li>
     </ul>
 
     <% unless saml_configuration.active? %>
       <%= render(UI::Alerts::Base::Component.new(kind: :notice)) do %>
         A complete SAML configuration requires the IdP entityID, SSO target URL,
-        certificate, and the organization's permitted email domain. Use the
-        <%= link_to "SAML test page", saml_test_path(org_slug: saml_configuration.organization.to_param), class: "twlink-underlined" %>
-        to validate an inactive configuration without provisioning or signing
-        anyone in. Activating it forces every user at that domain through the
-        IdP.
+        certificate, and the organization's permitted email domain. Activating
+        it forces every user at that domain through the IdP.
       <% end %>
     <% end %>
 

@@ -18,14 +18,11 @@ RSpec.describe Admin::Organizations::Form::SamlSso::Component, type: :component 
 
   let(:component) { rendered_component(organization) }
 
-  it "gives the IdP admin the service provider URLs" do
+  it "gives the IdP admin the service provider URLs, and shows the inactive configuration notice" do
     expect(component).to have_link(href: "http://test.host/sso/#{organization.to_param}/metadata")
     expect(component).to have_link(href: "http://test.host/sso/#{organization.to_param}/sp.crt")
-  end
-
-  it "shows the inactive configuration notice" do
+    expect(component).to have_link(href: "http://test.host/sso/#{organization.to_param}/test")
     expect(component).to have_css("[role=alert]")
-    expect(component).to have_css("[role=alert] a[href='/sso/#{organization.to_param}/test']")
   end
 
   context "with an existing configuration" do

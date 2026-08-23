@@ -45,15 +45,6 @@ class OrganizationSamlConfiguration < ApplicationRecord
   before_validation :set_calculated_attributes
   after_commit :update_organization
 
-  scope :configured, -> {
-    CONFIGURED_ATTRIBUTES.reduce(
-      joins(:organization).where.not(organizations: {user_email_domain: [nil, ""]})
-    ) do |relation, attribute|
-      relation.where.not(attribute => [nil, ""])
-    end
-  }
-  scope :configured_inactive, -> { configured.where(active: false) }
-
   def self.format_cert(cert)
     return nil if cert.blank?
     OneLogin::RubySaml::Utils.format_cert(cert)

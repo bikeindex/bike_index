@@ -6,44 +6,45 @@ module Saml
   module AssertionProcessor
     extend Functionable
 
-    Result = Struct.new(:user, :error) do
+    # The asserted fields are carried whether or not resolution succeeded, so the test page
+    # can tell an attribute-release problem from a domain mismatch. They are set only once
+    # the signature validated, so their absence means there is no assertion to report.
+    Result = Struct.new(:user, :error, :signed_up, :name_id, :name_id_format, :attributes,
+      :email_attribute, :email, :email_domain) do
       def success?
         error.nil?
       end
     end
 
-    DiagnosticResult = Struct.new(:name_id, :name_id_format, :attributes,
-      :email_attribute, :email, :email_domain, :user, :user_has_password, :error) do
-      def success?
-        error.nil?
-      end
-    end
-
-    def call(saml_configuration:, raw_response:, request_id:, dry_run: false)
+    def call(saml_configuration:, raw_response:, request_id:)
       return failure("missing SAML response") if raw_response.blank?
 
       response = parse_response(saml_configuration, raw_response, request_id)
       return failure(response.errors.join("; ").presence || "invalid SAML response") unless response.is_valid?
 
       organization = saml_configuration.organization
-      name_id = response.name_id.presence
-      email = asserted_email(response, saml_configuration)
-      error = resolution_error(name_id:, email:, organization:)
-      return diagnostic(response, saml_configuration, name_id:, email:, error:) if dry_run
-      return failure(error) if error
+      asserted = asserted_fields(response, saml_configuration)
+      error = resolution_error(organization:, **asserted.slice(:name_id, :email))
+      return Result.new(error:, **asserted) if error
 
       # One lookup drives both the returning-user short-circuit and the post-login update.
-      identity = SsoIdentity.for(organization:, provider:, uid: name_id) ||
-        SsoIdentity.new(organization:, provider:, uid: name_id)
-      user = identity.user || User.fuzzy_confirmed_or_unconfirmed_email_find(email) || provision_user(email)
-      return failure("no Bike Index account for #{email}") if user.blank?
+      identity = SsoIdentity.for(organization:, provider:, uid: asserted[:name_id]) ||
+        SsoIdentity.new(organization:, provider:, uid: asserted[:name_id])
+      # Provisioning grants no organization role - that is user_role_for_user_email_domain's job.
+      user, signed_up = identity.user ? [identity.user, false] :
+        UserServices::PasswordlessCreator.find_or_create(asserted[:email])
+      return Result.new(error: "no Bike Index account for #{asserted[:email]}", **asserted) if user.blank?
+      # sign_in_and_redirect refuses a banned user too, but its redirect_back lands on the IdP
+      # for an assertion, and the test page needs a reason it can show
+      return Result.new(error: "#{asserted[:email]} is banned", **asserted) if user.banned?
 
       # The IdP vouched for this email, so confirm the account (as the magic-link path
       # does) — otherwise sign-in bounces an unconfirmed user to the confirm-email page.
       user.confirm(user.confirmation_token) unless user.confirmed?
 
-      identity.update(user:, email:, name_id_format: response.name_id_format, last_sign_in_at: Time.current)
-      Result.new(user:)
+      identity.update(user:, email: asserted[:email], name_id_format: asserted[:name_id_format],
+        last_sign_in_at: Time.current)
+      Result.new(user:, signed_up:, **asserted)
     rescue OneLogin::RubySaml::ValidationError => e
       failure(e.message)
     end
@@ -61,9 +62,12 @@ module Saml
         settings:, matches_request_id: request_id, allowed_clock_drift: 30.seconds)
     end
 
-    def asserted_email(response, saml_configuration)
-      raw = response.attributes[saml_configuration.email_attribute].presence || response.name_id
-      EmailNormalizer.normalize(raw)
+    def asserted_fields(response, saml_configuration)
+      email_attribute = saml_configuration.email_attribute
+      email = EmailNormalizer.normalize(response.attributes[email_attribute].presence || response.name_id)
+      {name_id: response.name_id.presence, name_id_format: response.name_id_format,
+       attributes: response.attributes.all, email_attribute:, email:,
+       email_domain: Organization.email_domain(email)}
     end
 
     def resolution_error(name_id:, email:, organization:)
@@ -77,31 +81,10 @@ module Saml
         asserted_domain.present? && asserted_domain == organization.user_email_domain
     end
 
-    def diagnostic(response, saml_configuration, name_id:, email:, error:)
-      email_domain = Organization.email_domain(email)
-      # Looked up only once the domain guard clears it, as the live path does
-      user = User.fuzzy_confirmed_or_unconfirmed_email_find(email) if
-        email_domain.present? && email_domain == saml_configuration.organization.user_email_domain
-
-      DiagnosticResult.new(
-        name_id:, name_id_format: response.name_id_format,
-        attributes: response.attributes.all,
-        email_attribute: saml_configuration.email_attribute,
-        email:, email_domain:, user:,
-        user_has_password: user.present? && !user.passwordless_user?, error:
-      )
-    end
-
-    # Provisioning grants no organization role - that is user_role_for_user_email_domain's job.
-    def provision_user(email)
-      UserServices::PasswordlessCreator.find_or_create(email).first
-    end
-
     def failure(message)
       Result.new(error: message)
     end
 
-    conceal :provider, :parse_response, :asserted_email, :resolution_error, :diagnostic,
-      :provision_user, :failure
+    conceal :provider, :parse_response, :asserted_fields, :resolution_error, :failure
   end
 end

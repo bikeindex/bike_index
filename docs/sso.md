@@ -9,12 +9,11 @@ them in. Everything is per-organization and slug-scoped:
 | `/sso/<slug>/metadata` | our SP metadata — the URL you hand an IdP admin |
 | `/sso/<slug>/sp.crt` | the SP certificate alone, for IdP tooling that wants a file |
 | `/sso/<slug>/init` | SP-initiated login |
-| `/sso/<slug>/test` | diagnostic sign-in form; configured but inactive only |
+| `/sso/<slug>/test` | the same login, landing on a report of what the IdP sent |
 | `/sso/<slug>/callback` | Assertion Consumer Service |
 
 All of them 404 unless the organization has the `saml_sso` feature. Metadata and certificate
-need no SAML configuration; `init` and `callback` need the IdP fields and permitted email
-domain; `test` additionally requires the configuration to be inactive.
+need no SAML configuration; the rest need the IdP fields and a permitted email domain.
 
 Metadata is served as `application/xml`, which browsers display; the registered
 `application/samlmetadata+xml` is an unknown type, so they download it instead. The path takes
@@ -225,13 +224,8 @@ Review apps and sandbox get their own throwaway keypair, not production's.
 create: it has no accounts and no per-SP registration, reading the ACS URL and audience
 straight out of the AuthnRequest.
 
-Keep the configuration inactive while testing. `/sso/<slug>/test` is a form: enter the address
-you'll sign in with, and it starts the same transaction `init` does. The callback then validates
-the signed assertion and reports its NameID, attributes, email domain, matching account, and
-whether the IdP released the address you entered — provisioning nobody and signing nobody in.
-The endpoint is available only for a complete, inactive configuration. Activate SAML only once
-the result is correct; `/sso/<slug>/init` is the live sign-in path and can provision an account
-even while the configuration is inactive.
+Rehearse on `/sso/<slug>/test` and leave the configuration inactive until the result is right —
+activating it forces everyone at the domain through the IdP. The page explains itself.
 
 | Bike Index field | Value |
 |---|---|
@@ -245,13 +239,12 @@ as `<username>@<domain>` with `id` / `email` / `firstName` / `lastName` attribut
 names, not the OIDs a university IdP sends, so the NameID fallback is what carries the email
 unless you set the attribute to `email`.
 
-**Last verified 8/21** against the local Keycloak IdP: `/sso/<slug>/test` on a configured,
-inactive organization redirected to the IdP, and the callback reported a matching NameID,
-released attributes, and `(none)` for the account — with no user or `SsoIdentity` created. An
-earlier 8/15 run against mocksaml covered the live `init` path end to end: a first login
-provisioned and confirmed an account, a second reused it, a third linked a pre-existing one.
-Neither run covers encryption — mocksaml publishes only a signing key and never ingests an SP
-certificate, so it structurally cannot encrypt to us.
+**Last verified 8/23** against the local Keycloak IdP: `/sso/<slug>/test` on a configured,
+inactive organization provisioned and signed in a new account, and reported the NameID and
+released attributes. An earlier 8/15 run against mocksaml covered `init` end to end: a first
+login provisioned and confirmed an account, a second reused it, a third linked a pre-existing
+one. Neither run covers encryption — mocksaml publishes only a signing key and never ingests an
+SP certificate, so it structurally cannot encrypt to us.
 
 **Don't test IdP-initiated login.** Starting at the IdP produces an assertion with no
 `InResponseTo` and the callback rejects it. That is deliberate replay protection.
@@ -269,16 +262,15 @@ what they actually run, and the only way to exercise real attribute mapping on t
 Failures surface as a flash on `/session/new` reading `Unable to sign in via SSO: <reason>`.
 The reason is the real one — ruby-saml's validation errors are passed through, not swallowed.
 
-A configured but inactive organization is excluded from automatic email-domain routing. A direct
-`/sso/<slug>/init` transaction still reaches the normal callback, which can provision or link an
-account. Use the `/sso/<slug>/test` form for integration validation while the configuration is
-inactive; it reaches the same callback but never provisions or signs anyone in.
+A configured but inactive organization is excluded from automatic email-domain routing, but
+`init` and `test` still work — an inactive configuration is one nobody is *forced* through, not
+one that is switched off.
 
 | Reason | Cause |
 |---|---|
 | `/sso/<slug>/metadata` 404s | feature not enabled, `UpdateOrganizationAssociationsJob` hasn't run, or the url carries a `.xml` extension |
 | `/sso/<slug>/init` 404s | config incomplete — needs entityID + SSO URL + cert + permitted email domain |
-| `/sso/<slug>/test` 404s | config incomplete, SAML feature disabled, or configuration is active |
+| `/sso/<slug>/test` 404s | config incomplete, or the SAML feature is disabled |
 | `this login has expired` | RelayState token already claimed or older than 10 minutes |
 | `SAML session mismatch` | the `org_slug` in RelayState isn't the org being called back |
 | audience / destination errors | `BASE_URL` doesn't match the host you're browsing |
@@ -290,10 +282,9 @@ inactive; it reaches the same callback but never provisions or signs anyone in.
 
 ## Accepted gaps
 
-- **`/sso/<slug>/test` is unauthenticated**, like `init`. Anyone can start a test transaction,
-  but the diagnostic it renders needs a valid signed assertion — so reading it means holding IdP
-  credentials for that organization. Deliberate: the person rehearsing an integration is often
-  the partner's IT contact, who has no superadmin account here.
+- **`/sso/<slug>/test` is unauthenticated**, like `init`, and grants exactly what `init` does —
+  reaching the report means holding IdP credentials for that organization. Deliberate: the person
+  rehearsing an integration is often the partner's IT contact, who has no superadmin account here.
 - **Nothing deprovisions.** Removing someone in the IdP stops them signing in again; it does not
   remove a role they already hold.
 - **Unconfirmed accounts are force-confirmed by the first assertion.** Deliberate — otherwise
