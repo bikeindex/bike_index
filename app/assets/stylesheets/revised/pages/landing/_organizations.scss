@@ -8,6 +8,12 @@
   h6 {
     color: $header-font-nocolor;
   }
+
+  li,
+  p {
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+  }
 }
 
 // Organization landing pages padding (so there can be a background)
