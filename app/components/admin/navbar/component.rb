@@ -193,7 +193,10 @@ module Admin
           {title: "Dev: Autocomplete Status", path: admin_autocomplete_status_path, exact: true},
           {title: "Dev: OAuth Applications", path: oauth_applications_path(search_all: true)},
           {title: "Dev: Notifications", path: admin_notifications_path},
-          {title: "Dev: Organization Landing Pages", path: admin_organization_landing_pages_path},
+          # The landing page's editor is a custom layouts tab, nested under its organization
+          {title: "Dev: Organization Landing Pages", path: admin_organization_landing_pages_path,
+           match_paths: ["#{admin_organization_landing_pages_path}/**",
+             "#{admin_organizations_path}/*/custom_layouts/landing_page/**"]},
           {title: "Dev: Superuser Abilities", path: admin_superuser_abilities_path},
           {title: "Dev: Model Attestations", path: admin_model_attestations_path},
           {title: "Dev: IP Location", path: admin_ip_location_path, exact: true},
