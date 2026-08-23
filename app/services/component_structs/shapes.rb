@@ -4,23 +4,19 @@ module ComponentStructs
   # The hashes the menus and the row components take, and the constructors for them — so
   # UserServices::MenuItemsAccount and UserServices::MenuItemsOrg read alike, and a caller
   # can't spell a shape a way the component doesn't read. Every constructor takes
-  # **attributes, which is how a caller carries a key of its own through: the org sidebar
-  # marks its super admin row, Admin::Organizations::Tabs tags each tab to filter on.
+  # **attributes, which is how a caller carries a key of its own through —
+  # Admin::Organizations::Tabs tags each tab with the one it filters on.
   #
   # A menu item, rendered by PageBlock::Navbar::OrgSidebar, ::AccountMenu and
   # ::UserSettingsMenu, and served by api/v3/me:
   #   {type: :divider}
   #   {type: :group, key:, label:, icon:, children: [...]}
   #   {type: :link, label:, path:, icon:, match_paths:, match_params:} — plus whatever the
-  #     menu rendering it reads back: id:, data:, danger:, super_admin:
+  #     menu rendering it reads back: id:, data:, danger:
   #   {type: :disabled, label:}
   #
-  # A UI::Tabs tab, which Admin::Headers::Tabs passes through:
-  #   {label:, href:, active:, count:, classes:}
-  #
-  # A UI::ButtonGroup entry:
-  #   {label:, href:, active:, disabled:} — anything else in it (data:, title:, target:)
-  #   becomes an attribute on the chip
+  # A tab is rendered by UI::Tabs, which Admin::Headers::Tabs passes it through to; an
+  # entry by UI::ButtonGroup.
   module Shapes
     extend Functionable
 
@@ -51,7 +47,8 @@ module ComponentStructs
     end
 
     # An entry without an href renders a <button> rather than a link, so href: is where a
-    # chip driven by a Stimulus action differs from one that navigates
+    # chip driven by a Stimulus action differs from one that navigates. Anything past these
+    # keys becomes an attribute on the chip rather than something the component reads
     def entry(label, href: nil, active: false, disabled: false, **attributes)
       {label:, href:, active:, disabled:, **attributes}
     end

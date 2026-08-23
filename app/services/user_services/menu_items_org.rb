@@ -9,14 +9,14 @@ module UserServices
   module MenuItemsOrg
     extend Functionable
 
-    # UpdateOrganizationAssociationsJob touches every member user when an org
-    # changes, so user.cache_key_with_version covers both per-user changes
-    # and org-feature changes. Nothing here depends on which page is current,
-    # so the key carries no path.
+    # UpdateOrganizationAssociationsJob touches every member user when an org changes and
+    # SuperuserAbility touches its own, so user.cache_key_with_version covers per-user,
+    # org-feature and super admin changes alike. Nothing here depends on which page is
+    # current, so the key carries no path.
     def for(organization:, current_user:, old_register_view: false)
       return [] if organization.nil? || current_user.nil?
 
-      Rails.cache.fetch(["menu_items_org_v4", organization.id, current_user.cache_key_with_version,
+      Rails.cache.fetch(["menu_items_org_v5", organization.id, current_user.cache_key_with_version,
         old_register_view]) do
         build_items(organization, current_user, old_register_view)
       end
@@ -29,7 +29,14 @@ module UserServices
     # Sections rather than a flat list, so a section gated off entirely takes the
     # divider above it with it
     def build_items(organization, current_user, old_register_view)
-      return ambassador_items(organization) if organization.ambassador?
+      (organization_sections(organization, current_user, old_register_view) +
+        [super_admin_items(organization, current_user)])
+        .map(&:compact).reject(&:empty?)
+        .inject { |rows, section| rows + [ComponentStructs::Shapes.divider] + section }
+    end
+
+    def organization_sections(organization, current_user, old_register_view)
+      return [ambassador_items(organization)] if organization.ambassador?
 
       admin = current_user.admin_of?(organization)
 
@@ -44,8 +51,15 @@ module UserServices
           hot_sheet_link(organization),
           reports_link(organization)],
         [settings_group(organization, admin)]]
-        .map(&:compact).reject(&:empty?)
-        .inject { |rows, section| rows + [ComponentStructs::Shapes.divider] + section }
+    end
+
+    # Leaves the organization interface behind, so it's a section of its own rather than
+    # one of the organization's rows
+    def super_admin_items(organization, current_user)
+      return [] unless current_user.superuser?
+
+      [ComponentStructs::Shapes.link(translation(:in_super_admin, org_name: organization.short_name),
+        routes.admin_organization_path(organization.to_param), icon: "shield")]
     end
 
     # Organized::BaseController bars an ambassador organization from every controller
@@ -240,7 +254,8 @@ module UserServices
       Rails.application.routes.url_helpers
     end
 
-    conceal :build_items, :ambassador_items, :registrations_group, :add_bike_link, :impounded_group,
+    conceal :build_items, :organization_sections, :super_admin_items, :ambassador_items,
+      :registrations_group, :add_bike_link, :impounded_group,
       :parking_group, :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link, :graduated_link,
       :hot_sheet_link, :reports_link, :settings_group, :org_root, :enabled_link, :translation, :routes
   end

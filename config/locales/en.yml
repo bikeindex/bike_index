@@ -4998,6 +4998,7 @@ en:
       impounded_claims: Impounded claims
       impounded_vehicles: Impounded Vehicles
       impounding: Impounding
+      in_super_admin: "%{org_name} in super admin"
       incomplete_registrations: Incomplete registrations
       lightspeed_integration_panel: Lightspeed Integration Panel
       manage_users: Manage users

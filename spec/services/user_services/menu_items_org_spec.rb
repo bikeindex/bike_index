@@ -72,6 +72,27 @@ RSpec.describe UserServices::MenuItemsOrg do
       end
     end
 
+    # The row leaves the organization interface behind, so it follows every organization
+    # row and takes a divider of its own
+    context "with a superuser" do
+      let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+      let(:current_user) { FactoryBot.create(:superuser) }
+
+      it "ends with the super admin row" do
+        expect(items[-2..]).to eq([{type: :divider},
+          link_item("Brakebills in super admin", "/admin/organizations/#{organization.to_param}", icon: "shield")])
+      end
+
+      context "with an ambassador organization" do
+        let(:organization) { FactoryBot.create(:organization_ambassador, short_name: "Fillory") }
+
+        it "follows the ambassador's own rows too" do
+          expect(items[-2..]).to eq([{type: :divider},
+            link_item("Fillory in super admin", "/admin/organizations/#{organization.to_param}", icon: "shield")])
+        end
+      end
+    end
+
     context "with every feature, for an admin" do
       let(:organization) { FactoryBot.create(:organization_brakebills) }
       let(:current_user) { FactoryBot.create(:organization_admin, organization:) }

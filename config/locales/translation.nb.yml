@@ -5035,6 +5035,7 @@ nb:
       search_registrations: Søk etter registreringer
       stolen_hot_sheet: Stjålet Bike Hot Sheet
       stolen_message: Stjålet melding
+      in_super_admin: "%{org_name} i superadministrator"
   stolen:
     index:
       ambassador: ambassadør
@@ -5459,7 +5460,6 @@ nb:
           expand_sidebar: Utvid sidefeltet
           menu: Meny
           organization_crest: "%{org_name} våpenskjold"
-          in_super_admin: "%{org_name} i superadministrator"
         user_settings_menu:
           settings_menu: Innstillinger
       user_alerts:
