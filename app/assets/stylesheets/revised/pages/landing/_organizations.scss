@@ -152,9 +152,9 @@ ul.org-landing-icon-list {
   }
 
   ul {
-    @include list-unstyled;
-
+    list-style-type: disc;
     margin: 0;
+    padding-left: 1rem;
     display: block;
 
     // twlink, which is layered and so can't outrank this legacy rule on its own
