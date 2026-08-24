@@ -75,6 +75,8 @@ Rails.application.routes.draw do
     get "/sso/:org_slug/metadata", to: "saml#metadata", as: :saml_metadata
     get "/sso/:org_slug/sp.crt", to: "saml#certificate", as: :saml_certificate
     get "/sso/:org_slug/init", to: "saml#init", as: :saml_init
+    get "/sso/:org_slug/test", to: "saml#test", as: :saml_test
+    post "/sso/:org_slug/test_start", to: "saml#test_start", as: :saml_test_start
     post "/sso/:org_slug/callback", to: "saml#callback", as: :saml_callback
   end
 

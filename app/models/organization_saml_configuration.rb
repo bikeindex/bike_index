@@ -5,7 +5,7 @@
 #
 #  id                   :bigint           not null, primary key
 #  email_attribute_name :string
-#  enabled              :boolean          default(FALSE), not null
+#  active               :boolean          default(FALSE), not null
 #  idp_cert             :text
 #  idp_cert_fingerprint :string
 #  idp_cert_multi       :text
@@ -32,14 +32,15 @@ class OrganizationSamlConfiguration < ApplicationRecord
     "emailAddress" => "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
     "unspecified" => "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
   }.freeze
+  CONFIGURED_ATTRIBUTES = %i[idp_entity_id idp_sso_target_url idp_cert].freeze
 
   belongs_to :organization
 
   validates :organization_id, presence: true, uniqueness: true
-  validates :idp_entity_id, :idp_sso_target_url, :idp_cert, presence: true, if: :enabled?
+  validates :idp_entity_id, :idp_sso_target_url, :idp_cert, presence: true, if: :active?
   validates :name_id_format, inclusion: {in: NAME_ID_FORMATS.values}, allow_blank: true
   validate :idp_certificates_parseable
-  validate :organization_claims_a_domain, if: :enabled?
+  validate :organization_claims_a_domain, if: :active?
 
   before_validation :set_calculated_attributes
   after_commit :update_organization
@@ -49,9 +50,8 @@ class OrganizationSamlConfiguration < ApplicationRecord
     OneLogin::RubySaml::Utils.format_cert(cert)
   end
 
-  # Ready to drive a live login: enabled and the IdP essentials are present
   def configured?
-    enabled? && idp_entity_id.present? && idp_sso_target_url.present? && idp_cert.present?
+    organization&.user_email_domain.present? && CONFIGURED_ATTRIBUTES.all? { |attribute| self[attribute].present? }
   end
 
   def email_attribute

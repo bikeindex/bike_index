@@ -2864,7 +2864,7 @@ ALTER SEQUENCE public.organization_roles_id_seq OWNED BY public.organization_rol
 CREATE TABLE public.organization_saml_configurations (
     id bigint NOT NULL,
     organization_id bigint NOT NULL,
-    enabled boolean DEFAULT false NOT NULL,
+    active boolean DEFAULT false NOT NULL,
     idp_entity_id character varying,
     idp_sso_target_url character varying,
     idp_slo_target_url character varying,
@@ -7804,6 +7804,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260821100000'),
 ('20260819120000'),
 ('20260815152851'),
 ('20260813100000'),
