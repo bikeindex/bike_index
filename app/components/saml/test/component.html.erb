@@ -9,9 +9,8 @@
       isn't one already. What comes back is reported here rather than dropping
       you on your account page.
     <% elsif @result.success? %>
-      <code><%= @result.user.email %></code>
-      is signed in on this browser now — the same session an ordinary SSO login
-      creates.
+      <code><%= @result.user.email %></code> is signed in on this browser now —
+      the same session an ordinary SSO login creates.
     <% else %>
       <%= @result.error %>
     <% end %>
