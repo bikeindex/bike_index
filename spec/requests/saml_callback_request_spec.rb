@@ -372,23 +372,28 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
     end
   end
 
-  # Test mode is the same login, landing on a report of what the IdP sent
+  # Test mode is the same login, landing on a report of what the IdP sent. test_options
+  # carries what varies: test_email is typed into the form, the rest is what the IdP asserts.
   describe "POST /sso/:org_slug/callback in test mode" do
-    it "signs up and signs in, reporting the assertion" do
-      expect { post_test_callback }.to change(User, :count).by(1)
-      expect(response).to have_http_status(:ok)
-      expect(response.headers["X-Robots-Tag"]).to eq "noindex, nofollow"
-      expect(response.body).to include("You were signed up successfully!")
-      expect(diagnostic_value("Account")).to include(email, "created by this login")
-      expect(SsoIdentity.last.email).to eq email
-      expect(signed_in?).to be true
+    let(:test_options) { {} }
+
+    context "no Bike Index account for the asserted address" do
+      it "signs up and signs in, reporting the assertion" do
+        expect { post_test_callback(**test_options) }.to change(User, :count).by(1)
+        expect(response).to have_http_status(:ok)
+        expect(response.headers["X-Robots-Tag"]).to eq "noindex, nofollow"
+        expect(response.body).to include("You were signed up successfully!")
+        expect(diagnostic_value("Account")).to include(email, "created by this login")
+        expect(SsoIdentity.last.email).to eq email
+        expect(signed_in?).to be true
+      end
     end
 
-    context "an account already exists for the asserted email" do
+    context "an account already exists for the asserted address" do
       let!(:existing) { FactoryBot.create(:user_confirmed, email:) }
 
       it "signs it in, reporting that it has a password of its own" do
-        expect { post_test_callback }.not_to change(User, :count)
+        expect { post_test_callback(**test_options) }.not_to change(User, :count)
         expect(response.body).to include("You were signed in successfully!")
         expect(diagnostic_value("Account")).to include(email, "already existed")
         expect(diagnostic_value("Account has a password")).to eq "Yes"
@@ -399,37 +404,49 @@ RSpec.describe "SAML SSO login", :saml_env, type: :request do
         let!(:existing) { FactoryBot.create(:user_confirmed, email:, passwordless_user: true) }
 
         it "reports it as having no password of its own" do
-          post_test_callback
+          post_test_callback(**test_options)
           expect(diagnostic_value("Account has a password")).to eq "No"
         end
       end
     end
 
-    it "reports that the IdP released an address other than the one entered" do
-      post_test_callback(test_email: "someoneelse@#{domain}")
-      expect(response).to have_http_status(:ok)
-      expect(diagnostic_value("Address entered")).to eq "someoneelse@#{domain}"
-      expect(diagnostic_value("Asserted email")).to include "the IdP released a different address"
+    context "the IdP releases an address other than the one entered" do
+      let(:test_options) { {test_email: "someoneelse@#{domain}"} }
+
+      it "reports both, and that they differ" do
+        post_test_callback(**test_options)
+        expect(response).to have_http_status(:ok)
+        expect(diagnostic_value("Address entered")).to eq "someoneelse@#{domain}"
+        expect(diagnostic_value("Asserted email")).to include "the IdP released a different address"
+      end
     end
 
-    it "reports a malformed email without provisioning or signing in" do
-      expect { post_test_callback(email: "attacker@evil.com@#{domain}") }.not_to change(User, :count)
-      expect(response).to have_http_status(:ok)
-      # Capybara rather than the raw body: the copy has an apostrophe, which ERB escapes
-      expect(Capybara.string(response.body))
-        .to have_content("You couldn't be signed in").and have_content("is not on this organization's SSO domain")
-      expect(signed_in?).to be false
+    context "the asserted address is malformed" do
+      let(:test_options) { {email: "attacker@evil.com@#{domain}"} }
+
+      it "reports the failure without provisioning or signing in" do
+        expect { post_test_callback(**test_options) }.not_to change(User, :count)
+        expect(response).to have_http_status(:ok)
+        # Capybara rather than the raw body: the copy has an apostrophe, which ERB escapes
+        expect(Capybara.string(response.body))
+          .to have_content("You couldn't be signed in").and have_content("is not on this organization's SSO domain")
+        expect(signed_in?).to be false
+      end
     end
 
-    it "does not show assertion fields when signature validation fails" do
+    context "signature validation fails" do
       # a different address than the assertion carries, so echoing the form back
       # can't be mistaken for the assertion having been read
-      expect { post_test_callback(test_email: "typed@#{domain}", tamper: true) }.not_to change(User, :count)
-      expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Invalid SAML Response")
-      expect(diagnostic_value("Address entered")).to eq "typed@#{domain}"
-      expect(response.body).not_to include(email)
-      expect(signed_in?).to be false
+      let(:test_options) { {test_email: "typed@#{domain}", tamper: true} }
+
+      it "shows no assertion fields, and doesn't provision or sign in" do
+        expect { post_test_callback(**test_options) }.not_to change(User, :count)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("Invalid SAML Response")
+        expect(diagnostic_value("Address entered")).to eq "typed@#{domain}"
+        expect(response.body).not_to include(email)
+        expect(signed_in?).to be false
+      end
     end
   end
 end
