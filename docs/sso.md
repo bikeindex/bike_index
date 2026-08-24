@@ -290,9 +290,6 @@ one that is switched off.
 - **Unconfirmed accounts are force-confirmed by the first assertion.** Deliberate — otherwise
   sign-in bounces to the confirm-email page — but an address the organization never verified
   becomes confirmed on the IdP's say-so.
-- **Banned users are rejected only after the identity is written.** `sign_in_and_redirect` blocks
-  them, so this isn't a way back in, but they accumulate `SsoIdentity` rows and a flipped
-  `confirmed` flag.
 - **Users on the domain who belong to a different organization** get routed through this
   organization's IdP. Their other role is untouched, but their login path is now owned by an org
   they may have no relationship with. Most likely with contractors and shared or alumni domains.
