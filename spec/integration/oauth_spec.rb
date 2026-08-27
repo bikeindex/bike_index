@@ -34,6 +34,12 @@ RSpec.describe "OAuth authorization", :js, type: :system do
     click_button "Log in"
 
     expect(page).to have_content("Would you like to authorize", wait: 5)
+    # Hidden inputs have no accessible name to match on. Anything #create reads back and
+    # the form doesn't post is dropped from the grant
+    posted = page.all("form:not(#deny-authorization) input[type=hidden]", visible: :all).map { it[:name] }
+    expect(posted).to include("client_id", "redirect_uri", "state", "response_type",
+      "response_mode", "scope", "code_challenge", "code_challenge_method")
+
     click_button "Authorize"
 
     code = find("#authorization_code").text
