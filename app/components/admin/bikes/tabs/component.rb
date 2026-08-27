@@ -36,7 +36,9 @@ module Admin
             [:recoveries, "Recoveries", admin_bike_path(@bike, active_tab: "recoveries"), tab_counts[:recoveries]],
             ([:impound, "Impoundings", admin_bike_path(@bike, active_tab: "impound"), tab_counts[:impound]] if impound?),
             ([:recovery_displays, "Recovery displays", admin_recovery_displays_path(search_bike_id: @bike.id)] if @display_recovery)]
-            .compact.map { |tab, label, href, count| {label:, href:, count:, active: @active == tab} }
+            .compact.map { |tab, label, href, count|
+              ComponentStructs::Shapes.tab(label, href, count:, active: @active == tab)
+            }
         end
 
         # Cache the counts rather than the markup: which tab is active varies per screen and

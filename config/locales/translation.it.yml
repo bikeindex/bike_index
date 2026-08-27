@@ -5289,6 +5289,7 @@ it:
       search_registrations: Cerca registrazioni
       stolen_hot_sheet: Foglio informativo sui furti di biciclette
       stolen_message: Messaggio di furto
+      in_super_admin: "%{org_name} in super amministratore"
   stolen:
     index:
       ambassador: ambasciatore
@@ -5723,7 +5724,6 @@ it:
           expand_sidebar: Espandi la barra laterale
           menu: Menu
           organization_crest: "%{org_name} cresta"
-          in_super_admin: "%{org_name} in super amministratore"
         user_settings_menu:
           settings_menu: Impostazioni
       user_alerts:

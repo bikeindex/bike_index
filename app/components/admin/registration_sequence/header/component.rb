@@ -22,10 +22,13 @@ module Admin
 
         # Activation freezes a sequence, so its Edit is offered but inert
         def entries
-          [{label: "View", href: RegistrationSequencePaths.sequence(@registration_sequence, admin: true), active: @mode == :view},
-            {label: "Preview", href: RegistrationSequencePaths.preview(@registration_sequence, admin: true), active: @mode == :preview},
-            {label: "Edit", href: RegistrationSequencePaths.edit(@registration_sequence, admin: true),
-             active: @mode == :edit, disabled: !@registration_sequence.draft?}]
+          [ComponentStructs::Shapes.entry("View",
+            href: RegistrationSequencePaths.sequence(@registration_sequence, admin: true), active: @mode == :view),
+            ComponentStructs::Shapes.entry("Preview",
+              href: RegistrationSequencePaths.preview(@registration_sequence, admin: true), active: @mode == :preview),
+            ComponentStructs::Shapes.entry("Edit",
+              href: RegistrationSequencePaths.edit(@registration_sequence, admin: true),
+              active: @mode == :edit, disabled: !@registration_sequence.draft?)]
         end
 
         # Archived sequences are frozen too, so name which one this is

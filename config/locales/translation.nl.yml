@@ -4467,6 +4467,7 @@ nl:
       search_registrations: Zoek registraties
       stolen_hot_sheet: Stolen Bike Hot Sheet
       stolen_message: Gestolen bericht
+      in_super_admin: "%{org_name} in superbeheerder"
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -5611,7 +5612,6 @@ nl:
           expand_sidebar: Zijbalk uitklappen
           menu: Menu
           organization_crest: "%{org_name} wapen"
-          in_super_admin: "%{org_name} in superbeheerder"
         user_settings_menu:
           settings_menu: Instellingen
       user_alerts:

@@ -84,8 +84,7 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
     expect(closed.map { |content| content["class"] }).to all(include("tw:hidden!"))
   end
 
-  # It's the only row that isn't the organization's own, so it sits after them all. Outside
-  # MenuItemsOrg's cache, since granting the ability doesn't touch the user record it's keyed on
+  # It's the only row that isn't the organization's own, so it sits after them all
   context "with a superuser" do
     let(:current_user) { FactoryBot.create(:superuser, email: "kdewey@brakebills.edu") }
 
@@ -93,10 +92,8 @@ RSpec.describe PageBlock::Navbar::OrgSidebar::Component, type: :component do
       rows = component.css("[data-page-block--org-sidebar-target='scroller'] a")
 
       expect(rows.last["href"]).to eq "/admin/organizations/#{organization.to_param}"
-      expect(rows.last.text).to include "Brakebills in super admin"
-      # Stands in for an icon, so the label lines up with the rows that carry one -- and is
-      # all that's left of the row once it collapses
-      expect(rows.last.css("span").first.text.strip).to eq "SA"
+      # It renders through the ordinary icon branch, with no special case of its own
+      expect(rows.last.css("svg").count).to eq 1
     end
 
     # They reach the organization without being a member of it

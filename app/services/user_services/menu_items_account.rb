@@ -4,10 +4,7 @@
 # and logout. PageBlock::Navbar::UserSettingsMenu renders it as the navbar's gear submenu,
 # PageBlock::Navbar::AccountMenu as the org sidebar's dropdown.
 #
-# Item shapes are UserServices::MenuItemsOrg's, so the two menus read alike:
-#   {type: :divider}
-#   {type: :link, label:, path:, icon:, match_paths:, match_params:, id:, data:, danger:}
-#   {type: :disabled, label:}
+# Its rows are ComponentStructs::Shapes'.
 module UserServices
   module MenuItemsAccount
     extend Functionable
@@ -26,7 +23,7 @@ module UserServices
       switcher = organization_switcher(user, current_organization:)
 
       sections = (opens == :up) ? [[logout_row], switcher, account.reverse] : [account, switcher, [logout_row]]
-      sections.reject(&:empty?).inject { |rows, section| rows + [divider] + section }
+      sections.reject(&:empty?).inject { |rows, section| rows + [ComponentStructs::Shapes.divider] + section }
     end
 
     #
@@ -45,9 +42,9 @@ module UserServices
 
       [without_organization(current_organization)] + organizations.map { |organization|
         if organization == current_organization
-          disabled(translation(:viewing_org, org_name: organization.name))
+          ComponentStructs::Shapes.disabled(translation(:viewing_org, org_name: organization.name))
         else
-          link(translation(:switch_to_org, org_name: organization.name),
+          ComponentStructs::Shapes.link(translation(:switch_to_org, org_name: organization.name),
             routes.organization_root_path(organization_id: organization.to_param))
         end
       }
@@ -56,24 +53,23 @@ module UserServices
     # navUserSettingLink is how the signed-in email is read off a page -- by
     # .claude/skills/frontend-screenshots' identity gate, among others
     def account_rows(user)
-      register = routes.register_path
-      # The row stays current across every step of the flow, which all live under it
-      [link(translation(:your_registrations), routes.my_account_path),
+      [ComponentStructs::Shapes.link(translation(:your_registrations), routes.my_account_path),
         marketplace_messages(user),
-        link(translation(:register_a_new_bike), register, match_paths: "#{register}/**"),
-        link(translation(:user_settings, user_email: user.email), routes.edit_my_account_path,
+        # The row stays current across every step of the flow, which all live under it
+        ComponentStructs::Shapes.link(translation(:register_a_new_bike), routes.register_path, section: true),
+        ComponentStructs::Shapes.link(translation(:user_settings, user_email: user.email), routes.edit_my_account_path,
           id: "navUserSettingLink", data: {email: user.email})].compact
     end
 
     # The one row that isn't somewhere to go
     def logout_row
-      link(translation(:logout), routes.goodbye_path, danger: true)
+      ComponentStructs::Shapes.link(translation(:logout), routes.goodbye_path, danger: true)
     end
 
     def marketplace_messages(user)
       return nil unless MarketplaceMessage.any_for_user?(user)
 
-      link(translation(:marketplace_messages), routes.my_account_messages_path)
+      ComponentStructs::Shapes.link(translation(:marketplace_messages), routes.my_account_messages_path)
     end
 
     # In the user's own order, so the switcher is the same five every time it's opened
@@ -83,28 +79,16 @@ module UserServices
         .filter_map(&:organization).first(SWITCHER_ORGANIZATIONS)
     end
 
-    def link(label, path, icon: nil, **attributes)
-      {type: :link, label:, path:, icon:, **attributes}
-    end
-
     # organization_id=false is what clears the one held in the session. The homepage is where
     # that lands from inside the organization interface; page-block--navbar-switch-no-organization
     # points it at the current page anywhere else. The param is what the row matches on too --
     # the href's path alone is "/", which would go current on the homepage
     def without_organization(current_organization)
-      return disabled(translation(:viewing_without_org)) if current_organization.blank?
+      return ComponentStructs::Shapes.disabled(translation(:viewing_without_org)) if current_organization.blank?
 
-      link(translation(:view_without_org), routes.root_url(organization_id: false),
+      ComponentStructs::Shapes.link(translation(:view_without_org), routes.root_url(organization_id: false),
         match_params: {organization_id: "false"},
         data: {controller: "page-block--navbar-switch-no-organization"})
-    end
-
-    def disabled(label)
-      {type: :disabled, label:}
-    end
-
-    def divider
-      {type: :divider}
     end
 
     def translation(key, **interpolations)
@@ -116,7 +100,6 @@ module UserServices
     end
 
     conceal :organization_switcher, :account_rows, :logout_row, :marketplace_messages,
-      :switchable_organizations, :without_organization, :link, :disabled, :divider,
-      :translation, :routes
+      :switchable_organizations, :without_organization, :translation, :routes
   end
 end

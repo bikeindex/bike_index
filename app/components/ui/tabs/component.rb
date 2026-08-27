@@ -5,7 +5,7 @@ module UI
     # A row of tabs with its own underline, which the active tab breaks through. A row too
     # wide for the screen scrolls sideways rather than wrapping.
     #
-    # tabs: [{label:, href:, active:, count:, classes:}, …] - count and classes are optional
+    # tabs: ComponentStructs::Shapes' tabs
     class Component < ApplicationComponent
       # tw:is-active: keys off the aria-current the template sets, and sorts after everything
       # it overrides. The white lower edge is what breaks the row's border, so the tab reads

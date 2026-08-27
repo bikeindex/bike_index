@@ -5272,6 +5272,7 @@ es:
       search_registrations: Buscar registros
       stolen_hot_sheet: Lista de bicicletas robadas
       stolen_message: Mensaje robado
+      in_super_admin: "%{org_name} en superadministrador"
   stolen:
     index:
       ambassador: embajador
@@ -5714,7 +5715,6 @@ es:
           expand_sidebar: Expandir barra lateral
           menu: Menú
           organization_crest: "%{org_name} cresta"
-          in_super_admin: "%{org_name} en superadministrador"
         user_settings_menu:
           settings_menu: Ajustes
       user_alerts:
