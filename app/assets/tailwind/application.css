@@ -228,8 +228,11 @@ body.with-org-sidebar main:has(> :only-child) {
   @apply tw:flex tw:flex-col;
 }
 
+/* Bootstrap's .container has auto side margins, which opt it out of the cross-axis
+   stretch -- unstretched it goes max-content wide, so the width is asked for */
 body.with-org-sidebar main > :only-child {
   flex-grow: 1;
+  width: 100%;
 }
 
 /* PageBlock::Navbar::OrgSidebar::Component::MOBILE_BREAKPOINT, below which the sidebar is
