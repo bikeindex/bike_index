@@ -20,6 +20,8 @@ module Admin
           def metadata_url = saml_metadata_url(org_slug: @organization.to_param)
 
           def certificate_url = saml_certificate_url(org_slug: @organization.to_param)
+
+          def test_url = saml_test_url(org_slug: @organization.to_param)
         end
       end
     end

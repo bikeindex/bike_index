@@ -16,7 +16,7 @@ RSpec.describe UsersController, type: :request do
         FactoryBot.create(:organization_with_organization_features,
           enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
       end
-      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :active, organization:) }
 
       it "hands a claimed email off to the IdP, and renders the form for one it doesn't claim" do
         get "#{base_url}/new", params: {email: "student@sso.edu"}
@@ -72,7 +72,7 @@ RSpec.describe UsersController, type: :request do
         FactoryBot.create(:organization_with_organization_features,
           enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
       end
-      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :active, organization:) }
 
       it "forces SSO instead of creating an account the IdP doesn't know about" do
         expect {

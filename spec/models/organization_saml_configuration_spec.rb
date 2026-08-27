@@ -5,15 +5,15 @@ RSpec.describe OrganizationSamlConfiguration, type: :model do
 
   describe "factory" do
     let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration) }
-    it "is valid and disabled by default" do
+    it "is valid and inactive by default" do
       expect(saml_configuration).to be_valid
-      expect(saml_configuration.enabled?).to be_falsey
+      expect(saml_configuration.active?).to be_falsey
       expect(saml_configuration.configured?).to be_falsey
       expect(saml_configuration.organization.enabled?("saml_sso")).to be_truthy
     end
 
-    context "enabled trait" do
-      let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled) }
+    context "active trait" do
+      let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :active) }
       it "is valid and configured" do
         expect(saml_configuration).to be_valid
         expect(saml_configuration.configured?).to be_truthy
@@ -22,14 +22,14 @@ RSpec.describe OrganizationSamlConfiguration, type: :model do
   end
 
   describe "validations" do
-    let(:saml_configuration) { FactoryBot.build(:organization_saml_configuration, enabled: true) }
-    it "requires idp essentials when enabled" do
+    let(:saml_configuration) { FactoryBot.build(:organization_saml_configuration, active: true) }
+    it "requires idp essentials when active" do
       expect(saml_configuration).to_not be_valid
       expect(saml_configuration.errors.attribute_names).to include(:idp_entity_id, :idp_sso_target_url, :idp_cert)
     end
 
-    it "permits blank idp fields when disabled" do
-      saml_configuration.enabled = false
+    it "permits blank idp fields when inactive" do
+      saml_configuration.active = false
       expect(saml_configuration).to be_valid
     end
 
@@ -43,15 +43,27 @@ RSpec.describe OrganizationSamlConfiguration, type: :model do
     end
 
     context "organization without a permitted domain" do
-      let(:saml_configuration) { FactoryBot.build(:organization_saml_configuration, :enabled, organization:) }
+      let(:saml_configuration) { FactoryBot.build(:organization_saml_configuration, :active, organization:) }
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
-      it "can't be enabled" do
+      it "can't be active" do
         expect(saml_configuration).to_not be_valid
         expect(saml_configuration.errors.full_messages)
           .to include("Organization must have a permitted domain to enable SAML SSO")
 
-        saml_configuration.enabled = false
+        saml_configuration.active = false
         expect(saml_configuration).to be_valid
+      end
+    end
+
+    context "configured?" do
+      let(:organization_without_domain) do
+        FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso")
+      end
+
+      it "doesn't require active, but does require the organization's permitted domain" do
+        expect(FactoryBot.build(:organization_saml_configuration, :configured)).to be_configured
+        expect(FactoryBot.build(:organization_saml_configuration, :configured, organization: organization_without_domain))
+          .to_not be_configured
       end
     end
 

@@ -6,7 +6,7 @@ RSpec.describe Saml::SettingsBuilder, :saml_env do
     FactoryBot.create(:organization_with_organization_features,
       enabled_feature_slugs: "saml_sso", user_email_domain: "example.edu")
   end
-  let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled, organization:) }
+  let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :active, organization:) }
   subject(:settings) { described_class.build(saml_configuration) }
 
   it "sets slug-scoped SP urls" do
@@ -51,7 +51,7 @@ RSpec.describe Saml::SettingsBuilder, :saml_env do
   context "with a configured name_id_format" do
     let(:name_id_format) { OrganizationSamlConfiguration::NAME_ID_FORMATS["persistent"] }
     let(:saml_configuration) do
-      FactoryBot.create(:organization_saml_configuration, :enabled, organization:, name_id_format:)
+      FactoryBot.create(:organization_saml_configuration, :active, organization:, name_id_format:)
     end
     it "asks the IdP for it" do
       expect(settings.name_identifier_format).to eq name_id_format
@@ -68,7 +68,7 @@ RSpec.describe Saml::SettingsBuilder, :saml_env do
 
   context "with a rotation-overlap cert" do
     let(:saml_configuration) do
-      FactoryBot.create(:organization_saml_configuration, :enabled, organization:, idp_cert_multi: idp_cert)
+      FactoryBot.create(:organization_saml_configuration, :active, organization:, idp_cert_multi: idp_cert)
     end
     it "uses idp_cert_multi for signing" do
       expect(settings.idp_cert_multi[:signing].length).to eq 2

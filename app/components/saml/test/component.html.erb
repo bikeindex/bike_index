@@ -1,0 +1,99 @@
+<div class="tw:mx-auto tw:max-w-3xl tw:p-4">
+  <%= render(UI::Header::Component.new(text: "SAML configuration test",
+        subtitle: safe_join([@organization.short_name, " — ", tag.code(@organization.user_email_domain)]))) %>
+
+  <%= render(UI::Alerts::Base::Component.new(kind: summary_kind, header: summary_header)) do %>
+    <% if @result.blank? %>
+      This is the real login: the IdP authenticates you, and Bike Index signs
+      you in — creating an account for the address the IdP releases if there
+      isn't one already. What comes back is reported here rather than dropping
+      you on your account page.
+    <% elsif @result.success? %>
+      <code><%= @result.user.email %></code> is signed in on this browser now —
+      the same session an ordinary SSO login creates.
+    <% else %>
+      <%= @result.error %>
+    <% end %>
+  <% end %>
+
+  <% if @result.blank? %>
+    <%= form_with url: saml_test_start_path(org_slug: @organization.to_param) do |f| %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true,
+            label_text: "Email address to sign in with")) do %>
+        <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true,
+              html_options: {autofocus: true})) %>
+      <% end %>
+
+      <%= render(UI::Button::Component.new(text: "Start test login", color: :primary, type: "submit")) %>
+    <% end %>
+  <% else %>
+    <%= render(UI::Header::Component.new(text: "Assertion", tag: :h2)) %>
+    <dl
+      class="
+        tw:mb-8 tw:grid tw:grid-cols-1 tw:gap-x-4 tw:gap-y-1
+        tw:wrap-anywhere tw:sm:grid-cols-[auto_1fr] tw:sm:gap-y-2
+      "
+    >
+      <% if @expected_email.present? %>
+        <dt class="tw:font-semibold">Address entered</dt>
+        <dd><code><%= @expected_email %></code></dd>
+      <% end %>
+
+      <% if asserted? %>
+        <dt class="tw:font-semibold">NameID</dt>
+        <dd><code><%= @result.name_id.presence || "(missing)" %></code></dd>
+        <dt class="tw:font-semibold">NameID format</dt>
+        <dd>
+          <code><%= @result.name_id_format.presence || "(missing)" %></code>
+        </dd>
+        <dt class="tw:font-semibold">Configured email attribute</dt>
+        <dd><code><%= @result.email_attribute %></code></dd>
+        <dt class="tw:font-semibold">Asserted email</dt>
+        <dd>
+          <code><%= @result.email.presence || "(missing)" %></code>
+
+          <% if @expected_email.present? %>
+            <%= asserted_expected_email? ? "— matches the address entered" : "— the IdP released a different address" %>
+          <% end %>
+        </dd>
+        <dt class="tw:font-semibold">Asserted email domain</dt>
+        <dd>
+          <code><%= @result.email_domain.presence || "(missing)" %></code>
+        </dd>
+        <dt class="tw:font-semibold">Organization domain</dt>
+        <dd><code><%= @organization.user_email_domain %></code></dd>
+      <% end %>
+
+      <% if @result.user.present? %>
+        <dt class="tw:font-semibold">Account</dt>
+        <dd>
+          <code><%= @result.user.email %></code>
+          <%= @result.signed_up ? "— created by this login" : "— already existed" %>
+        </dd>
+        <% unless @result.signed_up %>
+          <dt class="tw:font-semibold">Account has a password</dt>
+          <dd><%= @result.user.passwordless_user? ? "No" : "Yes" %></dd>
+        <% end %>
+      <% end %>
+    </dl>
+    <% if asserted? %>
+      <%= render(UI::Header::Component.new(text: "Received attributes", tag: :h2)) %>
+      <% if @result.attributes.present? %>
+        <dl
+          class="
+            tw:mb-8 tw:grid tw:grid-cols-1 tw:gap-x-4 tw:gap-y-1
+            tw:wrap-anywhere tw:sm:grid-cols-[auto_1fr] tw:sm:gap-y-2
+          "
+        >
+          <% @result.attributes.each do |name, values| %>
+            <dt class="tw:font-semibold"><code><%= name %></code></dt>
+            <dd><code><%= Array(values).join(", ") %></code></dd>
+          <% end %>
+        </dl>
+      <% else %>
+        <p class="tw:mb-8">No attributes were received.</p>
+      <% end %>
+    <% end %>
+    <%= link_to "Run another test", saml_test_path(org_slug: @organization.to_param), class: "twlink-underlined" %>
+  <% end %>
+</div>
