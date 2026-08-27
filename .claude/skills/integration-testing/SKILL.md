@@ -29,6 +29,8 @@ If the UI path is hard, that's a real signal — usually a production bug (stale
 
 Legitimate exceptions: reference data that exists in production via migrations, admin accounts outside the user flow, and stubs for genuinely external services (third-party APIs, Stripe, geocoders).
 
+A step the browser never performs — a server-to-server token exchange, a webhook callback — goes over real HTTP to Capybara's own server rather than through the page: `Net::HTTP.post_form(URI.join(Capybara.current_session.server.base_url, "/oauth/token"), params)`. VCR's `ignore_hosts` covers `localhost`, so it isn't blocked. `spec/integration/oauth_spec.rb` is the pattern.
+
 ## One `it` per setup; many assertions per `it`
 
 Unit specs prefer one assertion per example. **Integration specs prefer the opposite**: when several assertions share the same fixture and the same initial `visit`, fold them into one example that walks through state transitions (click → assert → click → assert).
