@@ -228,8 +228,12 @@ body.with-org-sidebar main:has(> :only-child) {
   @apply tw:flex tw:flex-col;
 }
 
+/* Width asked for rather than left to the cross-axis stretch, which auto side margins
+   turn off -- bootstrap's .container has them, and unstretched it sizes to max-content,
+   which below 576px (where it has no max-width) is every paragraph on one line */
 body.with-org-sidebar main > :only-child {
   flex-grow: 1;
+  width: 100%;
 }
 
 /* PageBlock::Navbar::OrgSidebar::Component::MOBILE_BREAKPOINT, below which the sidebar is
