@@ -31,6 +31,8 @@
               = hidden_field_tag :state, @pre_auth.state
               = hidden_field_tag :response_type, @pre_auth.response_type
               = hidden_field_tag :scope, @pre_auth.scope
+              = hidden_field_tag :code_challenge, @pre_auth.code_challenge
+              = hidden_field_tag :code_challenge_method, @pre_auth.code_challenge_method
               = submit_tag 'Authorize', class: 'btn btn-primary btn-lg'
           .col-xs-6
             = form_tag oauth_authorization_path, method: :delete, id: 'deny-authorization' do
@@ -39,6 +41,8 @@
               = hidden_field_tag :state, @pre_auth.state
               = hidden_field_tag :response_type, @pre_auth.response_type
               = hidden_field_tag :scope, @pre_auth.scope
+              = hidden_field_tag :code_challenge, @pre_auth.code_challenge
+              = hidden_field_tag :code_challenge_method, @pre_auth.code_challenge_method
               = submit_tag 'Deny', class: 'btn btn-secondary btn-lg'
 
 - if OauthRedirectUri.cleartext?(@pre_auth.redirect_uri)

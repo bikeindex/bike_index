@@ -11,8 +11,8 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
   end
 
   # What the emailed link's page posts onward - the destination rides in one of these
-  def hidden_fields
-    Capybara.string(response.body).all("form input[type=hidden]", visible: :all)
+  def hidden_fields(selector = "form")
+    Capybara.string(response.body).all("#{selector} input[type=hidden]", visible: :all)
       .to_h { |input| [input[:name], input[:value]] }
   end
 
@@ -285,6 +285,39 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
           expect(response.code).to eq("400")
           expect(json_result["error"]).to eq "invalid_request"
           expect(Doorkeeper::AccessToken.count).to eq 0
+        end
+      end
+
+      # Everything above skips the prompt by leaving the challenge in the query string.
+      # A real client is sent to the prompt, and only its hidden fields survive to the grant
+      context "granted through the consent prompt" do
+        let(:prompt_fields) do
+          get "/oauth/authorize?#{authorize_params}"
+          expect(response.code).to eq("200")
+          hidden_fields("form:not(#deny-authorization)")
+        end
+        let(:auth_code) do
+          post "/oauth/authorize", params: prompt_fields
+          response.redirect_url[/code=[^&]*/i].gsub(/code=/i, "")
+        end
+
+        it "carries the challenge onto the grant, so only the verifier redeems the code" do
+          expect(prompt_fields).to include("code_challenge" => code_challenge,
+            "code_challenge_method" => code_challenge_method)
+          expect(Doorkeeper::AccessGrant.find_by(token: auth_code).code_challenge).to eq code_challenge
+
+          post "/oauth/token?#{token_params}&code=#{auth_code}"
+          expect(response.code).to eq("400")
+          expect(json_result["error"]).to eq "invalid_request"
+
+          post "/oauth/token?#{token_params}&code=#{auth_code}&code_verifier=#{code_verifier.reverse}"
+          expect(response.code).to eq("400")
+          expect(json_result["error"]).to eq "invalid_grant"
+          expect(Doorkeeper::AccessToken.count).to eq 0
+
+          post "/oauth/token?#{token_params}&code=#{auth_code}&code_verifier=#{code_verifier}"
+          expect(Doorkeeper::AccessToken.count).to eq 1
+          expect(json_result["access_token"]).to eq Doorkeeper::AccessToken.last.token
         end
       end
 
