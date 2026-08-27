@@ -20,6 +20,12 @@ RSpec.describe UI::Tabs::Component, type: :component do
     expect(component.css("[data-turbo]")).to be_empty
   end
 
+  # Without JS the controller never drops it, and a row too wide for the screen would widen
+  # the whole page instead of scrolling in place
+  it "ships overflow-x in the markup" do
+    expect(component.css("nav").attr("class").value).to include "tw:overflow-x-auto"
+  end
+
   # One attribute on the nav, which Turbo finds from each link by closest()
   it "opts into turbo on the nav when asked" do
     turbo = render_inline(described_class.new(tabs:, nav_label: "Thing sections", turbo: true))

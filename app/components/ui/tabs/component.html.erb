@@ -1,11 +1,12 @@
 <%#
   twgutter-bleed, not w-full: a width:100% border box slides left under negative margins
-  rather than bleeding both sides. No overflow-x here - the controller adds it only when the
-  tabs are wider than the row, and pt-1 is what its overflow-y won't clip the tabs against
+  rather than bleeding both sides. overflow-x ships on, so a row too wide still scrolls
+  without JS rather than widening the page; the controller drops it when the tabs fit, since
+  a scroll container's overflow-y clips them against pt-1
 %>
 
 <nav
-  class="twgutter-bleed tw:mb-3 tw:pt-1"
+  class="twgutter-bleed tw:mb-3 tw:overflow-x-auto tw:pt-1"
   aria-label="<%= @nav_label %>"
   <%= tag.attributes(data: {controller: "ui--tabs", turbo: (true if @turbo)}) %>
 >
