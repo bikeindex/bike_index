@@ -9,14 +9,11 @@ module UserServices
   module MenuItemsOrg
     extend Functionable
 
-    # UpdateOrganizationAssociationsJob touches every member user when an org changes and
-    # SuperuserAbility touches its own, so user.cache_key_with_version covers per-user,
-    # org-feature and super admin changes alike. Nothing here depends on which page is
-    # current, so the key carries no path.
+    # Nothing here depends on which page is current
     def for(organization:, current_user:, old_register_view: false)
       return [] if organization.nil? || current_user.nil?
 
-      Rails.cache.fetch(["menu_items_org_v5", organization.id, current_user.cache_key_with_version,
+      Rails.cache.fetch(["menu_items_org_v1", organization, current_user,
         old_register_view]) do
         build_items(organization, current_user, old_register_view)
       end
