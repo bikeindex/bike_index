@@ -78,7 +78,7 @@ RSpec.describe UserServices::MenuItemsOrg do
 
       it "ends with the super admin row" do
         expect(items[-2..]).to eq([{type: :divider},
-          link_item("Brakebills in super admin", "/admin/organizations/#{organization.to_param}", icon: "shield")])
+          link_item("Brakebills in super admin", "/admin/organizations/#{organization.to_param}", icon: "super-admin")])
       end
 
       context "with an ambassador organization" do
@@ -86,7 +86,7 @@ RSpec.describe UserServices::MenuItemsOrg do
 
         it "follows the ambassador's own rows too" do
           expect(items[-2..]).to eq([{type: :divider},
-            link_item("Fillory in super admin", "/admin/organizations/#{organization.to_param}", icon: "shield")])
+            link_item("Fillory in super admin", "/admin/organizations/#{organization.to_param}", icon: "super-admin")])
         end
       end
     end

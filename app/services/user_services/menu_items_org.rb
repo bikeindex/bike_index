@@ -60,7 +60,7 @@ module UserServices
       return nil unless current_user.superuser?
 
       ComponentStructs::Shapes.link(translation(:in_super_admin, org_name: organization.short_name),
-        routes.admin_organization_path(organization.to_param), icon: "shield")
+        routes.admin_organization_path(organization.to_param), icon: "super-admin")
     end
 
     # Organized::BaseController bars an ambassador organization from every controller
