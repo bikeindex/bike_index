@@ -62,14 +62,15 @@ class ProcessParkingNotificationJob < ApplicationJob
     send_notification_if_should(parking_notification)
   end
 
-  # Organizations sometimes send a second impound notification for a bike they've already
-  # impounded - a bike only gets one current impound record, so reuse theirs. Another
-  # organization's record can't be reused: the notification email renders its location
+  # An organization sometimes sends a second impound notification for a bike it already
+  # impounded. Only its own record is reusable - the email renders the record's location
   def impound_record_for(parking_notification)
     return nil unless parking_notification.impound_notification? && parking_notification.impound_record_id.blank?
 
-    current_records = ImpoundRecord.current.where(bike_id: parking_notification.bike_id)
-    return current_records.find_by(organization_id: parking_notification.organization_id) if current_records.any?
+    current_record = ImpoundRecord.current.find_by(bike_id: parking_notification.bike_id)
+    if current_record.present?
+      return (current_record.organization_id == parking_notification.organization_id) ? current_record : nil
+    end
 
     ImpoundRecord.create!(bike_id: parking_notification.bike_id,
       user_id: parking_notification.user_id,
