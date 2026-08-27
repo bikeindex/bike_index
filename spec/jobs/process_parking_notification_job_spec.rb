@@ -180,6 +180,40 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
     end
   end
 
+  describe "second impound notification for an already impounded bike" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+    let(:bike) { FactoryBot.create(:ownership).bike }
+    let(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: organization, bike: bike, kind: "impound_notification") }
+    let!(:parking_notification_duplicate) do
+      FactoryBot.create(:parking_notification_organized, organization: organization, bike: bike,
+        user: parking_notification.user, kind: "impound_notification")
+    end
+    before { instance.perform(parking_notification.id) }
+
+    it "links to the existing impound record" do
+      impound_record = parking_notification.reload.impound_record
+      expect(impound_record).to be_present
+      expect(bike.reload.current_impound_record).to eq impound_record
+
+      expect { instance.perform(parking_notification_duplicate.id) }.to_not change(ImpoundRecord, :count)
+      expect(parking_notification_duplicate.reload.impound_record).to eq impound_record
+      expect(parking_notification_duplicate.status).to eq "impounded"
+    end
+
+    context "impounded by a different organization" do
+      let(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+      let!(:parking_notification_duplicate) do
+        FactoryBot.create(:parking_notification_organized, organization: organization2, bike: bike, kind: "impound_notification")
+      end
+
+      it "doesn't link to the other organization's impound record" do
+        expect { instance.perform(parking_notification_duplicate.id) }.to_not change(ImpoundRecord, :count)
+        expect(parking_notification_duplicate.reload.impound_record_id).to be_blank
+        expect(bike.reload.current_impound_record).to eq parking_notification.reload.impound_record
+      end
+    end
+  end
+
   describe "sending email" do
     let(:bike) { FactoryBot.create(:ownership).bike }
     let(:parking_notification) { FactoryBot.create(:parking_notification_organized, bike: bike) }

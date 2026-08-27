@@ -36,11 +36,8 @@ class ProcessParkingNotificationJob < ApplicationJob
   def run(parking_notification_id)
     parking_notification = ParkingNotification.find(parking_notification_id)
 
-    if parking_notification.impound_notification? && parking_notification.impound_record_id.blank?
-      impound_record = ImpoundRecord.create!(bike_id: parking_notification.bike_id,
-        user_id: parking_notification.user_id,
-        organization_id: parking_notification.organization_id,
-        skip_update: true)
+    impound_record = impound_record_for(parking_notification)
+    if impound_record.present?
       parking_notification.resolved_at ||= Time.current
       parking_notification.update(impound_record_id: impound_record.id)
       ProcessImpoundUpdatesJob.new.perform(impound_record.id)
@@ -63,6 +60,21 @@ class ProcessParkingNotificationJob < ApplicationJob
     end
 
     send_notification_if_should(parking_notification)
+  end
+
+  # Organizations sometimes send a second impound notification for a bike they've already
+  # impounded - a bike only gets one current impound record, so reuse theirs. Another
+  # organization's record can't be reused: the notification email renders its location
+  def impound_record_for(parking_notification)
+    return nil unless parking_notification.impound_notification? && parking_notification.impound_record_id.blank?
+
+    current_records = ImpoundRecord.current.where(bike_id: parking_notification.bike_id)
+    return current_records.find_by(organization_id: parking_notification.organization_id) if current_records.any?
+
+    ImpoundRecord.create!(bike_id: parking_notification.bike_id,
+      user_id: parking_notification.user_id,
+      organization_id: parking_notification.organization_id,
+      skip_update: true)
   end
 
   def send_notification_if_should(parking_notification)
