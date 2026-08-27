@@ -553,8 +553,9 @@ GEM
       ostruct (>= 0.2)
     openssl (4.0.2)
     ostruct (0.6.3)
-    pagy (43.2.1)
+    pagy (43.6.1)
       json
+      uri
       yaml
     paper_trail (17.0.0)
       activerecord (>= 7.1)
