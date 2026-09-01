@@ -12,8 +12,9 @@ module Admin
 
         private
 
+        # admin.css ships .card's display unlayered, where a plain tw:hidden would lose to it
         def kind_hidden_class(kind)
-          "tw:hidden" unless @social_post.kind == kind
+          "tw:hidden!" unless @social_post.kind == kind
         end
 
         def account_options = SocialAccount.all.pluck(:screen_name, :id)

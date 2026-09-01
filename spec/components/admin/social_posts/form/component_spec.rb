@@ -22,7 +22,7 @@ RSpec.describe Admin::SocialPosts::Form::Component, type: :component do
   context "when sending a post" do
     it "shows the app_post fields only" do
       expect(fields_for("app_post")["class"]).to_not match("tw:hidden")
-      expect(fields_for("imported_post")["class"]).to match("tw:hidden")
+      expect(fields_for("imported_post")["class"]).to match("tw:hidden!")
     end
   end
 
@@ -44,7 +44,7 @@ RSpec.describe Admin::SocialPosts::Form::Component, type: :component do
 
     it "shows the imported_post fields only" do
       expect(fields_for("imported_post")["class"]).to_not match("tw:hidden")
-      expect(fields_for("app_post")["class"]).to match("tw:hidden")
+      expect(fields_for("app_post")["class"]).to match("tw:hidden!")
     end
   end
 end
