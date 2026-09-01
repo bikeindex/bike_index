@@ -24,7 +24,8 @@ export default class extends Controller {
     this.open(this.openName === panelName ? null : panelName)
   }
 
-  open (name, duration = 200) {
+  // duration is left to collapse()'s default unless a caller wants it instant
+  open (name, duration) {
     this.panelTargets.forEach((panel) => {
       const show = panel.dataset.panelName.split(' ').includes(name)
       collapse(show ? 'show' : 'hide', panel, duration)
