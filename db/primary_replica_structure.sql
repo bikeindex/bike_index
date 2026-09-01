@@ -2376,6 +2376,52 @@ ALTER SEQUENCE public.marketplace_messages_id_seq OWNED BY public.marketplace_me
 
 
 --
+-- Name: marketplace_orders; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.marketplace_orders (
+    id bigint NOT NULL,
+    marketplace_listing_id bigint NOT NULL,
+    buyer_id bigint,
+    seller_id bigint,
+    sale_id bigint,
+    status integer,
+    fulfillment_kind integer,
+    currency_enum integer,
+    amount_cents integer,
+    item_amount_cents integer,
+    shipping_amount_cents integer,
+    shop_fee_cents integer,
+    platform_fee_cents integer,
+    stripe_payment_intent_id character varying,
+    paid_at timestamp(6) without time zone,
+    completed_at timestamp(6) without time zone,
+    cancelled_at timestamp(6) without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: marketplace_orders_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.marketplace_orders_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: marketplace_orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.marketplace_orders_id_seq OWNED BY public.marketplace_orders.id;
+
+
+--
 -- Name: memberships; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4925,6 +4971,13 @@ ALTER TABLE ONLY public.marketplace_messages ALTER COLUMN id SET DEFAULT nextval
 
 
 --
+-- Name: marketplace_orders id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_orders ALTER COLUMN id SET DEFAULT nextval('public.marketplace_orders_id_seq'::regclass);
+
+
+--
 -- Name: memberships id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5766,6 +5819,14 @@ ALTER TABLE ONLY public.marketplace_listings
 
 ALTER TABLE ONLY public.marketplace_messages
     ADD CONSTRAINT marketplace_messages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: marketplace_orders marketplace_orders_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_orders
+    ADD CONSTRAINT marketplace_orders_pkey PRIMARY KEY (id);
 
 
 --
@@ -7011,6 +7072,34 @@ CREATE INDEX index_marketplace_messages_on_sender_id ON public.marketplace_messa
 
 
 --
+-- Name: index_marketplace_orders_on_buyer_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_orders_on_buyer_id ON public.marketplace_orders USING btree (buyer_id);
+
+
+--
+-- Name: index_marketplace_orders_on_marketplace_listing_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_orders_on_marketplace_listing_id ON public.marketplace_orders USING btree (marketplace_listing_id);
+
+
+--
+-- Name: index_marketplace_orders_on_sale_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_orders_on_sale_id ON public.marketplace_orders USING btree (sale_id);
+
+
+--
+-- Name: index_marketplace_orders_on_seller_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_orders_on_seller_id ON public.marketplace_orders USING btree (seller_id);
+
+
+--
 -- Name: index_memberships_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7804,6 +7893,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260831120000'),
 ('20260821100000'),
 ('20260819120000'),
 ('20260815152851'),
