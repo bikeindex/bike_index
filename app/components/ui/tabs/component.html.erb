@@ -1,11 +1,12 @@
 <%#
   twgutter-bleed, not w-full: a width:100% border box slides left under negative margins
-  rather than bleeding both sides. The block padding is room for the scroll to sit in -
-  overflow-x makes overflow-y auto too
+  rather than bleeding both sides. overflow-x ships on, so a row too wide still scrolls
+  without JS rather than widening the page; the controller drops it when the tabs fit, since
+  a scroll container's overflow-y clips them against pt-1
 %>
 
 <nav
-  class="twgutter-bleed tw:overflow-x-auto tw:pt-1 tw:pb-3"
+  class="twgutter-bleed tw:mb-3 tw:overflow-x-auto tw:pt-1"
   aria-label="<%= @nav_label %>"
   <%= tag.attributes(data: {controller: "ui--tabs", turbo: (true if @turbo)}) %>
 >
@@ -14,7 +15,10 @@
     it follows them out past the edge when they do
   %>
 
-  <div class="tw:flex tw:w-max tw:min-w-full tw:gap-1 tw:border-b tw:border-gray-300">
+  <div
+    class="tw:flex tw:w-max tw:min-w-full tw:gap-1 tw:border-b tw:border-gray-300"
+    data-ui--tabs-target="row"
+  >
     <% @tabs.each do |tab| %>
       <%# "page" rather than tab[:active] - a false renders aria-current="false", which counts as current %>
       <%= link_to tab[:href], class: link_classes(tab), aria: {current: ("page" if tab[:active])},

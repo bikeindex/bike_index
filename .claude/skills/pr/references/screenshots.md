@@ -37,8 +37,6 @@ From the changed files, infer the affected routes. Heuristics:
 - Admin views → `/admin/...`
 - If unclear, ask the user which URLs to capture before proceeding. Do not guess blindly — 1–3 well-chosen URLs beats 10 random ones.
 
-**A fix to a regression the branch introduced has no before.** The base never had the bug, so both captures are the same image and the block documents nothing. Check which side the break arrived on — `git log -S<the marker> origin/main` coming back empty means main is already correct — before spending a round on it, base checkout included.
-
 **Confirm the page renders what changed, before capturing it.** A page that looks like the obvious home for a component often isn't — `/admin/organizations/:id/edit` has seven tables and none of them is `UI::Table`, and its address fields aren't `UI::Forms::AddressGroup` either. One `browser_evaluate` counting the component's own marker class settles it; a shot that turns out not to contain the change is a whole capture round wasted, base branch included. A component with a preview is the reliable fallback.
 
 ## 2. Capture branch screenshots

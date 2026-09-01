@@ -26,10 +26,23 @@
         ACS (callback) URL:
         <code><%= Saml::SettingsBuilder.assertion_consumer_service_url(saml_configuration) %></code>
       </li>
+
+      <li>
+        Test page: <%= link_to test_url, test_url %>
+        <small>a real SSO login that reports what the IdP sent, rather than signing in silently</small>
+      </li>
     </ul>
 
+    <% unless saml_configuration.active? %>
+      <%= render(UI::Alerts::Base::Component.new(kind: :notice)) do %>
+        A complete SAML configuration requires the IdP entityID, SSO target URL,
+        certificate, and the organization's permitted email domain. Activating
+        it forces every user at that domain through the IdP.
+      <% end %>
+    <% end %>
+
     <%= @form_builder.fields_for :organization_saml_configuration, saml_configuration do |saml_f| %>
-      <%= render(UI::Forms::Checkbox::Component.new(form_builder: saml_f, attribute: :enabled, label: "Enable live SAML login for this organization", class_name: "tw:mb-4")) %>
+      <%= render(UI::Forms::Checkbox::Component.new(form_builder: saml_f, attribute: :active, label: "Force every user at this domain through live SAML SSO", class_name: "tw:mb-4")) %>
 
       <%= render(UI::Forms::Group::Component.new(form_builder: saml_f, attribute: :idp_entity_id, label_text: "IdP entityID")) %>
 

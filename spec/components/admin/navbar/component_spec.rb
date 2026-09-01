@@ -130,6 +130,25 @@ RSpec.describe Admin::Navbar::Component, type: :component do
         expect(component).to have_css("input[role='combobox'][placeholder='Viewing Organizations']")
         expect(component).to have_css("#{view_all_link}[href='/admin/organizations']", text: /All\s+Organizations/)
       end
+
+      context "editing the landing page" do
+        let(:current_user) { FactoryBot.create(:superuser_developer) }
+        let(:url) { "/admin/organizations/bike-shop/custom_layouts/landing_page/edit" }
+
+        it "names the landing pages, and links to every one" do
+          expect(component).to have_css("input[role='combobox'][placeholder='Viewing Dev: Organization Landing Pages']")
+          expect(component).to have_css("#{view_all_link}[href='/admin/organization_landing_pages']",
+            text: /All\s+Organization Landing Pages/)
+        end
+      end
+
+      context "editing a mail snippet" do
+        let(:url) { "/admin/organizations/bike-shop/custom_layouts/welcome_email/edit" }
+
+        it "falls back to the organizations it's nested under" do
+          expect(component).to have_css("#{view_all_link}[href='/admin/organizations']", text: /All\s+Organizations/)
+        end
+      end
     end
   end
 end

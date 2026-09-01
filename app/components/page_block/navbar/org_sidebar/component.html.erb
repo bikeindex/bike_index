@@ -218,12 +218,8 @@
             </div>
           <% when :link %>
             <%# text: nil, since a top-level row's label sits inside the block with its icon %>
-            <%= render UI::ActiveLink::Component.from_item(item, html_class: link_row_class(item), text: nil) do %>
-              <% if item[:super_admin] %>
-                <span class="<%= PageBlock::Navbar::OrgSidebar::Component::SUPER_ADMIN_ICON %>">
-                  <span class="tw:hidden tw:group-data-[collapsed=true]/sidebar:inline">SA</span>
-                </span>
-              <% elsif item[:icon].present? %>
+            <%= render UI::ActiveLink::Component.from_item(item, html_class: row_class, text: nil) do %>
+              <% if item[:icon].present? %>
                 <span class="tw:flex tw:flex-none"><%= icon(item[:icon], html_class: "tw:h-[17px] tw:w-[17px]") %></span>
               <% end %>
 

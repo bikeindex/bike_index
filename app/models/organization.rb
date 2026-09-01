@@ -265,7 +265,17 @@ class Organization < ApplicationRecord
 
       permitted_domain_signin("saml_sso").where(user_email_domain: domain)
         .includes(:organization_saml_configuration)
-        .detect { |org| org.organization_saml_configuration&.configured? }
+        .detect do |org|
+          configuration = org.organization_saml_configuration
+          configuration&.active? && configuration.configured?
+        end
+    end
+
+    def email_domain(str)
+      normalized = EmailNormalizer.normalize(str)
+      return nil unless normalized.present? && normalized.count("@") == 1 && normalized.match?(/.@.*\../)
+
+      normalized.split("@").last
     end
 
     def example
@@ -278,13 +288,6 @@ class Organization < ApplicationRecord
 
     def permitted_domain_signin(feature_slug)
       where.not(user_email_domain: nil).with_enabled_feature_slugs(feature_slug)
-    end
-
-    def email_domain(str)
-      normalized = EmailNormalizer.normalize(str)
-      return nil unless normalized.present? && normalized.count("@") == 1 && normalized.match?(/.@.*\../)
-
-      normalized.split("@").last
     end
   end
   # never geocode, use default_location lat/long

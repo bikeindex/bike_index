@@ -30,15 +30,18 @@ module Admin
         private
 
         def tabs
-          [{tab: :show, label: "Show", href: admin_organization_path(@organization)},
-            {tab: :edit, label: "Edit", href: edit_tab_path},
-            {tab: :locations, label: "Locations", href: edit_tab_path(:locations),
-             count: @organization.locations.size},
-            {tab: :paid_functionality, label: "Edit paid functionality", href: edit_tab_path(:paid_functionality)},
-            {tab: :sso, label: "SSO", href: edit_tab_path(:sso)},
-            {tab: :invoices, label: "Invoices", href: admin_organization_invoices_path(organization_id: @organization)},
-            {tab: :custom_layouts, label: "Custom layouts", classes: "only-dev-visible",
-             href: admin_organization_custom_layouts_path(organization_id: @organization)}]
+          [ComponentStructs::Shapes.tab("Show", admin_organization_path(@organization), tab: :show),
+            ComponentStructs::Shapes.tab("Edit", edit_tab_path, tab: :edit),
+            ComponentStructs::Shapes.tab("Locations", edit_tab_path(:locations),
+              count: @organization.locations.size, tab: :locations),
+            ComponentStructs::Shapes.tab("Edit paid functionality", edit_tab_path(:paid_functionality),
+              tab: :paid_functionality),
+            ComponentStructs::Shapes.tab("SSO", edit_tab_path(:sso), tab: :sso),
+            ComponentStructs::Shapes.tab("Invoices", admin_organization_invoices_path(organization_id: @organization),
+              tab: :invoices),
+            ComponentStructs::Shapes.tab("Custom layouts",
+              admin_organization_custom_layouts_path(organization_id: @organization),
+              classes: "only-dev-visible", tab: :custom_layouts)]
             .select { render_tab?(it[:tab]) }
             .map { it.except(:tab).merge(active: @active == it[:tab]) }
         end

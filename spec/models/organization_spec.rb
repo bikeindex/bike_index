@@ -504,7 +504,7 @@ RSpec.describe Organization, type: :model do
   end
 
   describe "user_email_domain uniqueness" do
-    let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled) }
+    let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :active) }
     let!(:sso_organization) { saml_configuration.organization }
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
     before { sso_organization.update!(user_email_domain: "example.edu") }
@@ -514,6 +514,14 @@ RSpec.describe Organization, type: :model do
       expect(organization).to_not be_valid
       expect(organization.errors.attribute_names).to include(:user_email_domain)
       expect(Organization.saml_email_matching("someone@example.edu")).to eq sso_organization
+    end
+
+    context "when the SAML configuration is inactive" do
+      before { saml_configuration.update!(active: false) }
+
+      it "does not match the organization's domain" do
+        expect(Organization.saml_email_matching("someone@example.edu")).to be_nil
+      end
     end
 
     it "permits the claiming organization to keep its own domain" do

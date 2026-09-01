@@ -90,7 +90,15 @@ Take a snapshot and scroll to the bottom to find the comment area. GitHub render
 
 ## Step 5: Upload every image in one call
 
-The `<input type="file">` from step 4 is **CSS-hidden** — calling `browser_file_upload` against its ref directly fails with "can only be used when there is related modal state present." First click the visible attach button on the comment form to open the native file chooser, then `browser_file_upload` will satisfy that chooser. The button's accessible name is **"Add files"**; its full text ("Paste, drop, or click to add files") is in the DOM but isn't what the snapshot matches on, so search for `Add files`.
+The `<input type="file">` from step 4 is **CSS-hidden** — calling `browser_file_upload` against its ref directly fails with "can only be used when there is related modal state present." First click the visible attach button on the comment form to open the native file chooser, then `browser_file_upload` will satisfy that chooser.
+
+Two things hide that button before you can click it. The comment form starts **collapsed** — click `[aria-label="Add a comment"]` to expand it — and it then opens with the **Preview** tab selected, which leaves the whole `.js-write-bucket` (attach button included) at `display: none`. Click the Write tab first; until you do, every search for the button returns nothing and the file input reads as present-but-hidden, which looks like a changed GitHub UI rather than the wrong tab.
+
+Its text is **"Paste, drop, or click to add files"**. `data-file-attachment-for="fc-new_comment_field"` identifies it, but matches the icon-only "Attach files" toolbar button too — add the size class to disambiguate, or Playwright fails strict mode on two elements:
+
+```
+button.Button--small[data-file-attachment-for="fc-new_comment_field"]
+```
 
 **Upload every image in one `browser_file_upload` call** — it takes an array of paths, and GitHub processes them together. Don't upload one at a time. Always absolute paths.
 
@@ -216,7 +224,7 @@ Then `browser_close`. **Posting is always terminal** — nothing follows it, in 
 | File path with special characters (e.g., Unicode narrow spaces from CleanShot) | Copy file into the project's `tmp/` with a simple name: `cp /path/CleanShot*keyword*.png tmp/screenshot.png` |
 | File upload fails | Ensure the file path is absolute |
 | Textarea doesn't contain URLs yet | Poll it (step 5) until the count matches the files uploaded, rather than waiting a fixed interval |
-| Attach button not in the snapshot | Its accessible name is "Add files" — searching for "Paste, drop, or click to add files" won't match |
+| Attach button not in the snapshot | The form is collapsed or on the Preview tab — expand `[aria-label="Add a comment"]`, then click Write |
 | Textarea selector not found | GitHub UI changes occasionally — use the multi-selector JS in Step 4 to find the current element |
 | Playwright MCP not registered | Approve the `playwright` server from the project `.mcp.json` (Claude Code prompts on project entry), then restart the session or `/mcp` → reconnect |
 | PR not found / 404 | Private repos return 404 for unauthenticated users — check login state |

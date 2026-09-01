@@ -93,6 +93,8 @@ If the returned content height is **less than the viewport height**, `browser_re
 
 **An org-sidebar page taller than the viewport needs that resize upward instead.** The sidebar is `position: fixed`, so `fullPage` stitching leaves it at viewport height over the same near-black background — resize up to the content height before the shot.
 
+**The sidebar scrolls inside itself, so `body.scrollHeight` doesn't say whether its lower rows are in the shot.** At 1440×900 its own scroller overflows, and a row near the bottom captures as absent. Measure the row you're there for and resize the viewport height past its `getBoundingClientRect().bottom`. On mobile the sidebar is behind `button[aria-label="Menu"]` — open it, and run the same open-the-menu step on the base branch so the pair compares like for like. That state is an overlay taller than the viewport over a much longer page, which is the one case to capture `fullPage: false`.
+
 **Viewport-only is the caller's call, never yours.** When the caller asks for it — "viewport only", "above the fold", "just the mobile viewport" — drop `fullPage` for the size they named and leave the other one full page. Absent that, full page is the default at both sizes: a tall page, a sliver in a PR table cell, or a page whose change sits above the fold are none of them reasons to crop on your own.
 
 Element-only crops (`target:`) still slice context off — don't use them for page captures.

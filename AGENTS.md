@@ -103,6 +103,7 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 - **Admin search**: `sortable_search_params` auto-includes any param starting with `search_`
 - **Admin record screens are tabs**: a record with more than one super-admin page gets `Admin::Headers::Tabs::Component`, with the section's own tabs named in a component of its own (`Admin::Organizations::Tabs` is the pattern) rather than in each view.
 - **Admin loads a prebuilt legacy JS bundle**: `layouts/admin.html.erb` pulls `/vendored_assets/application_standalone.js` in outside the importmap, and it still wires jQuery/Bootstrap behaviour by id and class (`#userBanFields`, `#infoCheck`). Its source left the repo along with the webpack config, so it can't be rebuilt — grep `public/vendored_assets/*.js` before concluding an admin hook is dead, and remember every handler there is guarded by `$("#hook").length`, so removing the id silently disables it.
+- **Every user has a `password_digest`** — `User#set_calculated_attributes` gives passwordless accounts a random one so `has_secure_password` is satisfied. So it answers nothing about whether someone chose a password; `passwordless_user?` is that question.
 
 # Initial setup
 
