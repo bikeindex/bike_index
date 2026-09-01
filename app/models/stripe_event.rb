@@ -11,7 +11,8 @@
 #
 class StripeEvent < ApplicationRecord
   KNOWN_EVENTS = %w[checkout.session.completed customer.subscription.created
-    customer.subscription.deleted customer.subscription.updated invoice.payment_failed].freeze
+    customer.subscription.deleted customer.subscription.updated invoice.payment_failed
+    account.updated].freeze
 
   attr_accessor :data
 
@@ -47,6 +48,11 @@ class StripeEvent < ApplicationRecord
     name.match(/subscription/)
   end
 
+  # Connect telling us a seller's or shop's payout eligibility changed
+  def connect_account?
+    name == "account.updated"
+  end
+
   def update_bike_index_record!
     # Currently, only handle on creation, when the data object is assigned.
     raise "Stripe Data not assigned, unable to handle" unless @data.present?
@@ -57,6 +63,8 @@ class StripeEvent < ApplicationRecord
       end
     elsif subscription?
       update_stripe_subscription(data_object)
+    elsif connect_account?
+      update_stripe_account
     end
   end
 
@@ -64,5 +72,11 @@ class StripeEvent < ApplicationRecord
 
   def update_stripe_subscription(stripe_subscription_obj, stripe_checkout_session = nil)
     StripeSubscription.create_or_update_from_stripe!(stripe_subscription_obj:, stripe_checkout_session:)
+  end
+
+  # Ignore accounts we don't know about - the same webhook fires for any Connect account,
+  # including ones created outside this flow
+  def update_stripe_account
+    StripeAccount.find_by(stripe_id: data_object["id"])&.update_from_stripe!(data_object)
   end
 end

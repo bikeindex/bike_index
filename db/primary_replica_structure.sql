@@ -4036,6 +4036,43 @@ ALTER SEQUENCE public.strava_integrations_id_seq OWNED BY public.strava_integrat
 
 
 --
+-- Name: stripe_accounts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.stripe_accounts (
+    id bigint NOT NULL,
+    account_holder_type character varying,
+    account_holder_id bigint,
+    stripe_id character varying,
+    charges_enabled boolean DEFAULT false NOT NULL,
+    payouts_enabled boolean DEFAULT false NOT NULL,
+    details_submitted boolean DEFAULT false NOT NULL,
+    onboarded_at timestamp(6) without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: stripe_accounts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.stripe_accounts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: stripe_accounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.stripe_accounts_id_seq OWNED BY public.stripe_accounts.id;
+
+
+--
 -- Name: stripe_events; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -5251,6 +5288,13 @@ ALTER TABLE ONLY public.strava_integrations ALTER COLUMN id SET DEFAULT nextval(
 
 
 --
+-- Name: stripe_accounts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_accounts ALTER COLUMN id SET DEFAULT nextval('public.stripe_accounts_id_seq'::regclass);
+
+
+--
 -- Name: stripe_events id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -6139,6 +6183,14 @@ ALTER TABLE ONLY public.strava_gears
 
 ALTER TABLE ONLY public.strava_integrations
     ADD CONSTRAINT strava_integrations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stripe_accounts stripe_accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_accounts
+    ADD CONSTRAINT stripe_accounts_pkey PRIMARY KEY (id);
 
 
 --
@@ -7625,6 +7677,20 @@ CREATE UNIQUE INDEX index_strava_integrations_on_user_id ON public.strava_integr
 
 
 --
+-- Name: index_stripe_accounts_on_account_holder; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stripe_accounts_on_account_holder ON public.stripe_accounts USING btree (account_holder_type, account_holder_id);
+
+
+--
+-- Name: index_stripe_accounts_on_stripe_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_stripe_accounts_on_stripe_id ON public.stripe_accounts USING btree (stripe_id);
+
+
+--
 -- Name: index_stripe_subscriptions_on_membership_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7893,6 +7959,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260831130000'),
 ('20260831120000'),
 ('20260821100000'),
 ('20260819120000'),
