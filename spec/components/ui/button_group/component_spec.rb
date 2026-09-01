@@ -18,8 +18,7 @@ RSpec.describe UI::ButtonGroup::Component, type: :component do
     expect(render_inline(described_class.new(entries: [{label: "only <strong>not</strong> impounded", href: "/x"}]))).to have_css("a span strong", text: "not")
   end
 
-  # Equality, not include: an extra utility here is a visual difference from the
-  # button, and the radio group's chips are built off the same call
+  # Equality, not include: an extra utility here is a visual difference from the button
   it "styles the chips as UI::Button's secondary" do
     expect(component.css("a").first["class"]).to eq(UI::Button::Component.build_classes(color: :secondary, size: :sm))
   end

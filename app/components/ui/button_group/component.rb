@@ -3,8 +3,7 @@
 module UI
   module ButtonGroup
     # A row of chips that navigate or act — the link/button counterpart of
-    # UI::Forms::RadioButtonGroup, which builds its <label> chips off the same
-    # UI::Button styling.
+    # UI::Forms::RadioButtonGroup, which chips off CHIP_CLASSES too.
     class Component < ApplicationComponent
       CHIP_CLASSES = UI::Button::Component.build_classes(color: :secondary, size: :sm).freeze
 

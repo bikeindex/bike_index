@@ -4,11 +4,10 @@ module UI
   module Forms
     module RadioButtonGroup
       class Component < ApplicationComponent
-        # The chip is UI::Button's secondary, so the two chip groups can't drift
-        # apart. Only checked and focus have to be restated, since those hang off
-        # the radio rather than the label's own :checked/:focus.
+        # Only checked and focus are restated, since those hang off the radio
+        # rather than the <label> the chip classes land on.
         CHIP_CLASSES = [
-          UI::Button::Component.build_classes(color: :secondary, size: :sm),
+          UI::ButtonGroup::Component::CHIP_CLASSES,
           "tw:mb-0", # the chip is a <label>, which legacy CSS gives a bottom margin
           "tw:has-[:checked]:bg-purple-500 tw:has-[:checked]:text-white tw:has-[:checked]:border-purple-500",
           # A <label> is never :disabled — these carry the specificity to beat the hover
