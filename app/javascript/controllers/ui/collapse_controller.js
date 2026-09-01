@@ -9,7 +9,7 @@ import { collapse } from 'utils/collapse_utils'
 // (?param=1) so it survives reloads and navigation.
 export default class extends Controller {
   static targets = ['content', 'chevron', 'trigger']
-  static values = { duration: { type: Number, default: 200 }, param: String }
+  static values = { param: String }
 
   connect () {
     // Restore the open state from the URL without animating on load.
@@ -22,15 +22,15 @@ export default class extends Controller {
   }
 
   toggle () {
-    this.setExpanded(this.collapsed, this.durationValue)
+    this.setExpanded(this.collapsed)
   }
 
   show () {
-    this.setExpanded(true, this.durationValue)
+    this.setExpanded(true)
   }
 
   hide () {
-    this.setExpanded(false, this.durationValue)
+    this.setExpanded(false)
   }
 
   get collapsed () {
@@ -42,6 +42,7 @@ export default class extends Controller {
     return new URLSearchParams(window.location.search).has(this.paramValue)
   }
 
+  // duration is only passed on connect, to restore without animating
   setExpanded (expanding, duration) {
     collapse(expanding ? 'show' : 'hide', this.contentTargets, duration)
     this.syncTriggers(expanding)
