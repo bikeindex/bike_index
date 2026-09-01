@@ -2398,7 +2398,8 @@ CREATE TABLE public.marketplace_orders (
     completed_at timestamp(6) without time zone,
     cancelled_at timestamp(6) without time zone,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    marketplace_partner_shop_id bigint
 );
 
 
@@ -7190,6 +7191,13 @@ CREATE INDEX index_marketplace_orders_on_marketplace_listing_id ON public.market
 
 
 --
+-- Name: index_marketplace_orders_on_marketplace_partner_shop_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_orders_on_marketplace_partner_shop_id ON public.marketplace_orders USING btree (marketplace_partner_shop_id);
+
+
+--
 -- Name: index_marketplace_orders_on_sale_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -8025,6 +8033,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260831150000'),
 ('20260831140000'),
 ('20260831130000'),
 ('20260831120000'),

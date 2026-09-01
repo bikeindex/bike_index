@@ -3,32 +3,34 @@
 # Table name: marketplace_orders
 # Database name: primary
 #
-#  id                       :bigint           not null, primary key
-#  amount_cents             :integer
-#  cancelled_at             :datetime
-#  completed_at             :datetime
-#  currency_enum            :integer
-#  fulfillment_kind         :integer
-#  item_amount_cents        :integer
-#  paid_at                  :datetime
-#  platform_fee_cents       :integer
-#  shipping_amount_cents    :integer
-#  shop_fee_cents           :integer
-#  status                   :integer
-#  created_at               :datetime         not null
-#  updated_at               :datetime         not null
-#  buyer_id                 :bigint
-#  marketplace_listing_id   :bigint           not null
-#  sale_id                  :bigint
-#  seller_id                :bigint
-#  stripe_payment_intent_id :string
+#  id                          :bigint           not null, primary key
+#  amount_cents                :integer
+#  cancelled_at                :datetime
+#  completed_at                :datetime
+#  currency_enum               :integer
+#  fulfillment_kind            :integer
+#  item_amount_cents           :integer
+#  paid_at                     :datetime
+#  platform_fee_cents          :integer
+#  shipping_amount_cents       :integer
+#  shop_fee_cents              :integer
+#  status                      :integer
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  buyer_id                    :bigint
+#  marketplace_listing_id      :bigint           not null
+#  marketplace_partner_shop_id :bigint
+#  sale_id                     :bigint
+#  seller_id                   :bigint
+#  stripe_payment_intent_id    :string
 #
 # Indexes
 #
-#  index_marketplace_orders_on_buyer_id                (buyer_id)
-#  index_marketplace_orders_on_marketplace_listing_id  (marketplace_listing_id)
-#  index_marketplace_orders_on_sale_id                 (sale_id)
-#  index_marketplace_orders_on_seller_id               (seller_id)
+#  index_marketplace_orders_on_buyer_id                     (buyer_id)
+#  index_marketplace_orders_on_marketplace_listing_id       (marketplace_listing_id)
+#  index_marketplace_orders_on_marketplace_partner_shop_id  (marketplace_partner_shop_id)
+#  index_marketplace_orders_on_sale_id                      (sale_id)
+#  index_marketplace_orders_on_seller_id                    (seller_id)
 #
 class MarketplaceOrder < ApplicationRecord
   include Amountable
@@ -50,11 +52,13 @@ class MarketplaceOrder < ApplicationRecord
   belongs_to :buyer, class_name: "User"
   belongs_to :seller, class_name: "User"
   belongs_to :sale
+  belongs_to :marketplace_partner_shop
 
   validates_presence_of :marketplace_listing_id, :status, :fulfillment_kind
   validate :buyer_is_not_seller
   validate :fulfillment_is_available
   validate :status_matches_fulfillment_kind
+  validate :shop_present_once_shipping_starts
 
   before_validation :set_calculated_attributes
 
@@ -111,5 +115,14 @@ class MarketplaceOrder < ApplicationRecord
     return unless SHIPPING_STATUSES.include?(status&.to_sym)
 
     errors.add(:status, "doesn't apply to a local pickup")
+  end
+
+  # The buyer picks a shop at checkout, but an order can sit paid before one is assigned - what
+  # can't happen is a bike being expected at a shop nobody named
+  def shop_present_once_shipping_starts
+    return unless SHIPPING_STATUSES.include?(status&.to_sym)
+    return if marketplace_partner_shop_id.present?
+
+    errors.add(:marketplace_partner_shop, "is needed before a shipment starts")
   end
 end

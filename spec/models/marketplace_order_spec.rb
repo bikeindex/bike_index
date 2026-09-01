@@ -97,6 +97,25 @@ RSpec.describe MarketplaceOrder, type: :model do
     end
   end
 
+  describe "shop_present_once_shipping_starts" do
+    let(:marketplace_order) { FactoryBot.create(:marketplace_order, :shipped) }
+    let(:marketplace_partner_shop) { FactoryBot.create(:marketplace_partner_shop, :active) }
+
+    it "can't await a drop-off at a shop nobody named" do
+      expect(marketplace_order.update(status: "awaiting_drop_off")).to be_falsey
+      expect(marketplace_order.errors.full_messages.join).to match(/before a shipment starts/)
+
+      expect(marketplace_order.update(status: "awaiting_drop_off", marketplace_partner_shop:))
+        .to be_truthy
+      expect(marketplace_partner_shop.reload.marketplace_orders.pluck(:id))
+        .to eq([marketplace_order.id])
+    end
+
+    it "still cancels without one" do
+      expect(marketplace_order.update(status: "cancelled")).to be_truthy
+    end
+  end
+
   describe "current" do
     let!(:marketplace_order) { FactoryBot.create(:marketplace_order) }
     let!(:cancelled) { FactoryBot.create(:marketplace_order, status: "cancelled") }
