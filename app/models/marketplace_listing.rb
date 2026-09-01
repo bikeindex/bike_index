@@ -138,6 +138,12 @@ class MarketplaceListing < ApplicationRecord
     item&.type_titleize || "bike"
   end
 
+  # Motorized is excluded because lithium batteries are regulated dangerous goods, not because
+  # of size - a carrier won't take one in an ordinary bike box however well it's packed
+  def shippable?
+    item&.cycle_type == "bike" && !item.motorized?
+  end
+
   def condition_humanized
     self.class.condition_humanized(condition)
   end
