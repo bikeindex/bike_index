@@ -4,7 +4,7 @@ import { Controller } from '@hotwired/stimulus'
 
 const EXPANDED_WIDTH = '266px'
 const COLLAPSED_WIDTH = '68px'
-// ui--collapse's default, so a group's rows are in place before they're measured
+// What collapse() animates for, so a group's rows are in place before they're measured
 const TRANSITION_MS = 200
 // What a reader moving the page themselves looks like -- a plain scroll event won't do,
 // since revealCurrentRow's own scrolling raises one
