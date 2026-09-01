@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe UI::Forms::RadioButtonGroup::Component, type: :component do
   let(:entries) { [{value: "", label: "All"}, {value: "active", label: "Active"}] }
-  let(:button) { UI::Button::Component.build_classes(color: :secondary, size: :md) }
+  let(:button) { UI::Button::Component.build_classes(color: :secondary, size: :sm) }
   let(:button_active) { UI::Button::Component::ACTIVE_COLORS[:secondary] }
 
   # Every purple-* color utility a class string uses, ignoring variant prefixes
