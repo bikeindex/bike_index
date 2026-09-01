@@ -560,7 +560,7 @@
 <% if mailchimp_datum.blank? %>
   <h4>No Mailchimp data</h4>
 <% else %>
-  <div data-controller="ui--collapse" data-ui--collapse-duration-value="0">
+  <div data-controller="ui--collapse">
     <h4>
       Mailchimp data
       <em class="small"><%= render(UI::Button::Component.new(text: "show raw data", color: :link, html_class: "small", aria: {expanded: false},

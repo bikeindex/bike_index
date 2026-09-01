@@ -52,7 +52,7 @@
 <% end %>
 
 <%# The trigger and the data column are separate skeleton fragments, so the controller wraps the render %>
-<div data-controller="ui--collapse" data-ui--collapse-duration-value="0">
+<div data-controller="ui--collapse">
   <%= render(Admin::IndexSkeleton::Component.new(
     index: admin_index_state,
     collection: @mailchimp_data,
