@@ -105,7 +105,6 @@
   </div>
 
   <% if ban_fields? %>
-    <% @user.build_user_ban if @user.user_ban.blank? %>
     <%= f.fields_for :user_ban do |user_ban| %>
       <div
         class="row <%= "tw:hidden" unless @user.banned? %>"

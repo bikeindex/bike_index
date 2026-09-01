@@ -15,7 +15,7 @@ RSpec.describe Admin::News::Options::Component, type: :component do
   it "wires the info checkbox to both groups" do
     expect(component.css("[data-controller='admin--news-form']").count).to eq 1
     expect(component.css("[data-admin--news-form-target='infoKind']").count).to eq 1
-    expect(blog_only.count).to be > 1
+    expect(blog_only.count).to eq 5
     expect(info_only.count).to eq 1
   end
 
@@ -32,6 +32,25 @@ RSpec.describe Admin::News::Options::Component, type: :component do
     it "hides the blog-only groups and shows the info-only one" do
       expect(blog_only.map { |el| el["class"] }).to all(match("tw:hidden"))
       expect(info_only.first["class"]).to_not match("tw:hidden")
+    end
+  end
+
+  # step: 60 rejects a seeded value carrying seconds, and an unseeded field renders blank
+  it "seeds the post date without seconds" do
+    expect(component.css("#blog_post_date").first["value"]).to end_with(":00")
+  end
+
+  context "when the author has no personal page" do
+    it "asks them to turn one on" do
+      expect(component).to have_content("turn on your personal page")
+    end
+  end
+
+  context "when the author has one" do
+    let(:blog) { FactoryBot.create(:blog, user: FactoryBot.create(:user, show_bikes: true)) }
+
+    it "says nothing" do
+      expect(component).to_not have_content("turn on your personal page")
     end
   end
 

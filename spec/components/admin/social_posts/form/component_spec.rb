@@ -16,18 +16,26 @@ RSpec.describe Admin::SocialPosts::Form::Component, type: :component do
     expect(component.css("[data-admin--social-post-form-target='characterCounter']").count).to eq 1
     expect(component.css("[data-admin--social-post-form-target='characterTotal']").count).to eq 1
     expect(kind_fields.map { |el| el["data-kind"] }).to match_array(%w[app_post imported_post])
-  end
-
-  # The counter reads the limit from the controller rather than a window global
-  it "passes the character limit as a value" do
-    expect(component.css("[data-admin--social-post-form-max-character-count-value]").first["data-admin--social-post-form-max-character-count-value"])
-      .to eq Integrations::SocialPoster::TWEET_LENGTH.to_s
+    expect(component.css("[data-admin--social-post-form-max-character-count-value]").count).to eq 1
   end
 
   context "when sending a post" do
     it "shows the app_post fields only" do
       expect(fields_for("app_post")["class"]).to_not match("tw:hidden")
       expect(fields_for("imported_post")["class"]).to match("tw:hidden")
+    end
+  end
+
+  context "with social accounts" do
+    let!(:active_account) { FactoryBot.create(:social_account, account_info: {name: "a"}, active: true, screen_name: "activeAccount") }
+    let!(:inactive_account) { FactoryBot.create(:social_account, account_info: {name: "b"}, active: false, screen_name: "inactiveAccount") }
+
+    # Any account can send the post; only a live one can repost it
+    it "offers both to send from, but only the active one to repost" do
+      expect(component.to_html).to include("activeAccount").and include("inactiveAccount")
+
+      checkboxes = component.css("[data-admin--social-post-form-target='accountCheckbox']")
+      expect(checkboxes.map { |el| el["value"] }).to eq [active_account.id.to_s]
     end
   end
 

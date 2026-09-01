@@ -3,8 +3,7 @@ import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='admin--user-edit-form'
 //
-// Replaces the toggleUserBanFields the vendored admin bundle bound to #userBanFields:
-// checking "banned" opens the ban panel and makes a reason mandatory. The fields are
+// Checking "banned" opens the ban panel and makes a reason mandatory. The fields are
 // hidden rather than disabled, so an abandoned ban posts what it always did.
 export default class extends Controller {
   static targets = ['banned', 'banFields', 'banReason']

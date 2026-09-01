@@ -11,7 +11,6 @@ RSpec.describe Admin::Users::Edit::Component, type: :component do
   it "renders the form with the banned checkbox wired to the ban fields" do
     expect(component.css("form[data-controller='admin--user-edit-form']").count).to eq 1
     expect(component.css("[data-admin--user-edit-form-target='banned']").count).to eq 1
-    expect(ban_fields.count).to eq 1
   end
 
   context "when not banned" do

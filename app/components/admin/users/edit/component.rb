@@ -15,7 +15,10 @@ module Admin
         # Only offered while there's no reason on record - an existing ban is edited
         # through the user_bans screen
         def ban_fields?
-          @user.user_ban&.reason.blank?
+          return false if @user.user_ban&.reason.present?
+
+          @user.build_user_ban if @user.user_ban.blank?
+          true
         end
 
         def user_ban_reason_options

@@ -1,6 +1,6 @@
 <div
   data-controller="admin--social-post-form"
-  data-admin--social-post-form-max-character-count-value="<%= max_character_count %>"
+  data-admin--social-post-form-max-character-count-value="<%= Integrations::SocialPoster::TWEET_LENGTH %>"
 >
   <%= render(UI::Alerts::ObjectError::Component.new(object: @social_post)) %>
 
@@ -10,7 +10,7 @@
         <div class="form-group mb-4">
           <%= f.label :kind, "Kind" %>
 
-          <%= f.select :kind, Admin::SocialPosts::Form::Component::KINDS, {prompt: "Choose kind", required: true},
+          <%= f.select :kind, kind_options, {prompt: "Choose kind", required: true},
                 class: "form-control", data: {"admin--social-post-form-target": "kind", action: "change->admin--social-post-form#kindChanged"} %>
         </div>
       </div>
@@ -54,7 +54,7 @@
               <% end %>
 
               <%= f.text_area :body, rows: 4, class: "form-control",
-                    data: {"admin--social-post-form-target": "characterCounter", action: "input->admin--social-post-form#updateCharacterCount"} %>
+                    data: {"admin--social-post-form-target": "characterCounter", action: "input->admin--social-post-form#setCharacterCount"} %>
 
               <p
                 class="text-info text-right"
@@ -81,7 +81,7 @@
         </div>
 
         <div class="row mt-2">
-          <% repost_accounts.each do |social_account| %>
+          <% SocialAccount.active.each do |social_account| %>
             <div class="form-check">
               <label>
                 <%= check_box_tag "social_account_ids[]", social_account.id, true, multiple: true,

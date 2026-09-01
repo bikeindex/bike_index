@@ -7,37 +7,26 @@ module Admin
       # decides, plus the fields that apply to both kinds.
       class Component < ApplicationComponent
         def initialize(form_builder:, blog:)
-          @form = form_builder
+          @form_builder = form_builder
           @blog = blog
         end
 
         private
 
-        def blog_only_data
-          {"admin--news-form-target": "blogOnly"}
-        end
+        def blog_only_class = ("tw:hidden" if @blog.info?)
 
-        def info_only_data
-          {"admin--news-form-target": "infoOnly"}
-        end
-
-        def hidden_class(hidden)
-          "tw:hidden" if hidden
-        end
+        def info_only_class = ("tw:hidden" unless @blog.info?)
 
         def content_tag_options
           options_for_select(ContentTag.name_ordered.pluck(:name, :id), selected: @blog.content_tags.pluck(:id))
         end
 
-        # The form posts a rounded value rather than whatever the browser holds
+        # step: 60 rejects a value carrying seconds
         def post_date
           Binxtils::TimeParser.round(@blog.published_at || Time.current, "seconds")
         end
 
-        def author_needs_personal_page?
-          user = User.fuzzy_email_find(@blog.user.email)
-          user.blank? || user.userlink.blank?
-        end
+        def author_needs_personal_page? = @blog.user.userlink.blank?
       end
     end
   end
