@@ -1,11 +1,10 @@
 import { Controller } from '@hotwired/stimulus'
+import { COLLAPSE_DURATION_MS } from 'utils/collapse_utils'
 
 /* global requestAnimationFrame */
 
 const EXPANDED_WIDTH = '266px'
 const COLLAPSED_WIDTH = '68px'
-// collapse()'s default duration, so a group's rows are in place before they're measured
-const TRANSITION_MS = 200
 // What a reader moving the page themselves looks like -- a plain scroll event won't do,
 // since revealCurrentRow's own scrolling raises one
 const READER_SCROLL_EVENTS = ['wheel', 'touchmove', 'keydown']
@@ -185,7 +184,7 @@ export default class extends Controller {
 
       const target = scrolls ? scroller : window
       target.scrollBy({ top: delta, behavior: 'smooth' })
-    }, TRANSITION_MS)
+    }, COLLAPSE_DURATION_MS) // so a group's rows are in place before they're measured
   }
 
   closeOnEscape () {

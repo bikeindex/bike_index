@@ -1,6 +1,10 @@
 // collapse-utils.js
 // Utility class for handling element collapse animations
 
+// How long a collapse animates for. Exported so a caller timing something against the
+// animation waits exactly as long as it runs.
+export const COLLAPSE_DURATION_MS = 200
+
 /**
  * CollapseUtils class providing element collapse/expand functionality
  */
@@ -183,7 +187,7 @@ export class CollapseUtils {
  * @param {number} duration - Animation duration in milliseconds
  * @param {string} direction - 'vertical' (height) or 'horizontal' (width)
  */
-export function collapse (action, element, duration = 200, direction = 'vertical') {
+export function collapse (action, element, duration = COLLAPSE_DURATION_MS, direction = 'vertical') {
   return CollapseUtils.collapse(action, element, duration, direction)
 }
 
