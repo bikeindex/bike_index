@@ -2422,6 +2422,43 @@ ALTER SEQUENCE public.marketplace_orders_id_seq OWNED BY public.marketplace_orde
 
 
 --
+-- Name: marketplace_partner_shops; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.marketplace_partner_shops (
+    id bigint NOT NULL,
+    organization_id bigint NOT NULL,
+    location_id bigint,
+    status integer,
+    booked_by integer,
+    boxing_fee_cents integer,
+    currency_enum integer,
+    weekly_capacity integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: marketplace_partner_shops_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.marketplace_partner_shops_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: marketplace_partner_shops_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.marketplace_partner_shops_id_seq OWNED BY public.marketplace_partner_shops.id;
+
+
+--
 -- Name: memberships; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -5015,6 +5052,13 @@ ALTER TABLE ONLY public.marketplace_orders ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
+-- Name: marketplace_partner_shops id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_partner_shops ALTER COLUMN id SET DEFAULT nextval('public.marketplace_partner_shops_id_seq'::regclass);
+
+
+--
 -- Name: memberships id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5871,6 +5915,14 @@ ALTER TABLE ONLY public.marketplace_messages
 
 ALTER TABLE ONLY public.marketplace_orders
     ADD CONSTRAINT marketplace_orders_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: marketplace_partner_shops marketplace_partner_shops_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_partner_shops
+    ADD CONSTRAINT marketplace_partner_shops_pkey PRIMARY KEY (id);
 
 
 --
@@ -7152,6 +7204,20 @@ CREATE INDEX index_marketplace_orders_on_seller_id ON public.marketplace_orders 
 
 
 --
+-- Name: index_marketplace_partner_shops_on_location_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_partner_shops_on_location_id ON public.marketplace_partner_shops USING btree (location_id);
+
+
+--
+-- Name: index_marketplace_partner_shops_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_marketplace_partner_shops_on_organization_id ON public.marketplace_partner_shops USING btree (organization_id);
+
+
+--
 -- Name: index_memberships_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7959,6 +8025,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260831140000'),
 ('20260831130000'),
 ('20260831120000'),
 ('20260821100000'),

@@ -19,15 +19,16 @@
 #  index_stripe_accounts_on_account_holder  (account_holder_type,account_holder_id)
 #  index_stripe_accounts_on_stripe_id       (stripe_id) UNIQUE
 #
-# A Stripe Connect account belonging to someone we pay out to - a seller, or a partner shop.
-#
-# Separate from the Checkout Sessions in Payment, which is us taking money for memberships and
-# donations. Connect is the other direction: Stripe holds the marketplace funds and carries the
-# money-transmission licensing, so we never take custody of a buyer's money.
-#
-# Nobody can be paid until Stripe says so, and they say so by webhook rather than at the end of
-# the onboarding flow - somebody can finish the form and still not be payable.
 class StripeAccount < ApplicationRecord
+  # A Stripe Connect account belonging to someone we pay out to - a seller, or a partner shop.
+  #
+  # Separate from the Checkout Sessions in Payment, which is us collecting for memberships.
+  # Connect is the other direction: Stripe holds the marketplace funds and carries the
+  # money-transmission licensing, so Bike Index never takes custody of a buyer's money.
+  #
+  # Nobody can be paid until Stripe says so, and they say so by webhook rather than at the end of
+  # the onboarding flow - somebody can finish the form and still not be payable.
+
   belongs_to :account_holder, polymorphic: true
 
   validates_presence_of :account_holder_id, :account_holder_type

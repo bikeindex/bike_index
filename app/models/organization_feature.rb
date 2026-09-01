@@ -58,6 +58,7 @@ class OrganizationFeature < ApplicationRecord
     hot_sheet
     impound_bikes_locations
     impound_bikes_public
+    marketplace_partner
     model_audits
     no_address
     official_manufacturer
