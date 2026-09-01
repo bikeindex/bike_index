@@ -14,8 +14,6 @@ RSpec.describe Admin::Users::Edit::Component, type: :component do
   end
 
   context "when not banned" do
-    # hidden! because .row's display ships unlayered in admin.css, which a plain
-    # tw:hidden loses to however specific it is
     it "renders the ban fields collapsed, with the reason not required" do
       expect(ban_fields.first["class"]).to match("tw:hidden!")
       expect(ban_reason.first["required"]).to be_blank

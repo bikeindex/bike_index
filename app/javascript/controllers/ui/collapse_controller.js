@@ -42,7 +42,7 @@ export default class extends Controller {
     return new URLSearchParams(window.location.search).has(this.paramValue)
   }
 
-  // duration is only passed on connect, to restore without animating
+  // duration 0 restores state without animating
   setExpanded (expanding, duration) {
     collapse(expanding ? 'show' : 'hide', this.contentTargets, duration)
     this.syncTriggers(expanding)

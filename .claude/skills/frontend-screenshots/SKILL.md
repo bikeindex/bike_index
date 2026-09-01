@@ -32,10 +32,11 @@ get back local PNG paths.
 ## Preflight
 
 - `eval "$(ruby bin/env --export)"` so `$BASE_URL` is set.
-- `curl -fs "$BASE_URL/" >/dev/null` — if it isn't, **stop and ask the user to start it**.
-- A 200 there doesn't mean the pages will render: after a merge from the base, an unmigrated dev
-  DB 500s with `ActiveRecord::PendingMigrationError` (the homepage can still answer). `bundle exec
-  rails db:migrate` fixes it — check `log/development.log` before blaming the capture. `bin/env` resolves `$DEV_PORT`/`$BASE_URL` from the workspace ID, so the bin/dev the user starts will bind to the same port and DB this skill expects.
+- `curl -fs "$BASE_URL/" >/dev/null` — if it isn't, **stop and ask the user to start it**. `bin/env` resolves `$DEV_PORT`/`$BASE_URL` from the workspace ID, so the bin/dev the user starts will bind to the same port and DB this skill expects.
+- A 200 there doesn't promise the next page renders. A merge from the base can leave the dev DB
+  unmigrated, and `CheckPending` only re-raises once the evented file watcher notices `db/migrate`
+  moved — so a passing curl can be followed by `ActiveRecord::PendingMigrationError` on every page.
+  `bundle exec rails db:migrate`, and read `log/development.log` before blaming the capture.
 - If `mcp__playwright__*` tools aren't registered, tell the user to run `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart.
 
 ## Sign in (with the PII gate)

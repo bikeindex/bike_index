@@ -107,6 +107,7 @@
   <% if ban_fields? %>
     <%= f.fields_for :user_ban do |user_ban| %>
       <div
+        <%# hidden! because .row sets display in unlayered admin.css, which tw:hidden loses to %>
         class="row <%= "tw:hidden!" unless @user.banned? %>"
         data-admin--user-edit-form-target="banFields"
       >

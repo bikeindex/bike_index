@@ -13,9 +13,9 @@ module Admin
 
         private
 
-        def blog_only_class = ("tw:hidden!" if @blog.info?)
+        def blog_only_class = ("tw:hidden" if @blog.info?)
 
-        def info_only_class = ("tw:hidden!" unless @blog.info?)
+        def info_only_class = ("tw:hidden" unless @blog.info?)
 
         def content_tag_options
           options_for_select(ContentTag.name_ordered.pluck(:name, :id), selected: @blog.content_tags.pluck(:id))
