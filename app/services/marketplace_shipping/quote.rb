@@ -12,10 +12,19 @@ module MarketplaceShipping
       return nil unless marketplace_listing&.shippable?
       return nil if origin(marketplace_listing).blank? || postal_code.blank?
 
+      # Raising out of the fetch rather than rescuing inside it matters: a rescued nil would be
+      # cached, and one blip would suppress quotes on this listing for the next twelve hours.
       Rails.cache.fetch(cache_key(marketplace_listing, postal_code, country_iso),
         expires_in: CACHE_EXPIRY) do
         client.shop_rate(shop_rate_params(marketplace_listing, postal_code, country_iso))
       end
+    rescue Integrations::BikeFlights::Client::Error, Faraday::Error => e
+      # A listing page without a shipping estimate is worth far more than one that errors
+      if Rails.env.production?
+        Honeybadger.notify("BikeFlights rate request failed", error_class: name,
+          context: {marketplace_listing_id: marketplace_listing.id, postal_code:, message: e.message})
+      end
+      nil
     end
 
     #

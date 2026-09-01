@@ -45,6 +45,28 @@ RSpec.describe MarketplaceShipping::Quote do
         "value" => marketplace_listing.amount)
     end
 
+    context "bikeflights errors" do
+      it "returns nil rather than raising, and doesn't cache the failure" do
+        WebMock.stub_request(:post, "#{base_url}/api/ShopRate").to_return(status: 500, body: "boom")
+
+        expect(described_class.for_listing(marketplace_listing, postal_code: "80302")).to be_nil
+
+        WebMock.stub_request(:post, "#{base_url}/api/ShopRate")
+          .to_return(status: 200, body: {requestId: "req-2"}.to_json,
+            headers: {"Content-Type" => "application/json"})
+        expect(described_class.for_listing(marketplace_listing, postal_code: "80302")[:requestId])
+          .to eq "req-2"
+      end
+    end
+
+    context "bikeflights times out" do
+      it "returns nil" do
+        WebMock.stub_request(:post, "#{base_url}/api/ShopRate").to_timeout
+
+        expect(described_class.for_listing(marketplace_listing, postal_code: "80302")).to be_nil
+      end
+    end
+
     context "not shippable" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, cycle_type: "cargo") }
       let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike) }
