@@ -5,7 +5,7 @@ module UI
     # A row of chips that navigate or act — the link/button counterpart of
     # UI::Forms::RadioButtonGroup, which chips off CHIP_CLASSES too.
     class Component < ApplicationComponent
-      CHIP_CLASSES = UI::Button::Component.build_classes(color: :secondary, size: :sm).freeze
+      CHIP_CLASSES = UI::Button::Component.build_classes(color: :secondary, size: :md).freeze
 
       # full_width lays the chips out as equal columns that wrap, staying the same width
       # on every line — flex would size each line independently. auto-fit needs a

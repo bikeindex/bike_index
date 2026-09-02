@@ -20,7 +20,7 @@ RSpec.describe UI::ButtonGroup::Component, type: :component do
 
   # Equality, not include: an extra utility here is a visual difference from the button
   it "styles the chips as UI::Button's secondary" do
-    expect(component.css("a").first["class"]).to eq(UI::Button::Component.build_classes(color: :secondary, size: :sm))
+    expect(component.css("a").first["class"]).to eq(UI::Button::Component.build_classes(color: :secondary, size: :md))
   end
 
   context "entries without an href" do
