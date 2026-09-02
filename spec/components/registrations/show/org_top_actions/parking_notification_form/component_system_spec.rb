@@ -404,6 +404,31 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
     expect_impound_mode
   end
 
+  # Every controller module is a separate fetch, so the accordion can open this
+  # panel before this component's module has landed
+  context "when the form controller's module arrives late" do
+    let(:held_requests) { [] }
+
+    before do
+      requests = held_requests # capture for the cross-thread route handler
+      page.driver.with_playwright_page do |playwright_page|
+        playwright_page.context.route(%r{parking_notification_form_controller}, proc { |route, request|
+          requests << request.url
+          sleep 1.5
+          route.continue
+        })
+      end
+    end
+
+    it "applies the mode the panel was opened as" do
+      visit "#{preview_path}?panel=impound"
+
+      expect_impound_mode
+      # A route that stopped matching would leave this green having held nothing
+      expect(held_requests).to_not be_empty
+    end
+  end
+
   # A bike with an earlier notification can mark the new one as a repeat
   context "when the bike has an earlier notification" do
     let!(:earlier_notification) { FactoryBot.create(:parking_notification, bike:, organization:) }
