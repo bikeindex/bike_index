@@ -34,7 +34,7 @@ Scope specs the same way — the ones covering what the branch changed, never a 
 
 Then review the changed files against `CLAUDE.md` (root and any nested ones in touched directories) and fix what doesn't conform — code style, testing conventions, and frontend rules. Only touch lines this branch already changed.
 
-**`bin/update_component_digests` goes after the last code edit, not before.** A `MARKUP_DIGEST` covers everything its cached tree renders out into, so editing a shared component (`UI::ActiveLink`, `UI::Button`) stales the digest of every component that renders it — `PageBlock::Navbar::Wrapper` and `PageBlock::Footer` both, for one edit — and regenerating before `/simplify`'s or the CLAUDE.md pass's own edits just means doing it twice.
+**`bin/update_component_digests` goes after the last code edit, not before.** A `MARKUP_DIGEST` covers everything its cached tree renders out into, so editing a shared component (`UI::ActiveLink`, `UI::Button`) stales the digest of every component that renders it — `SharedBlocks::Navbar::Wrapper` and `SharedBlocks::Footer` both, for one edit — and regenerating before `/simplify`'s or the CLAUDE.md pass's own edits just means doing it twice.
 
 It hashes the component's *files*, not its output, and globs the whole directory — so a comment that renders nothing bumps the digest just the same, whether you put it in the template or in `component.rb`. A `<%# … %>` explaining one line can therefore flush every cached row of every organization. Somewhere outside the component directory (`.herb.yml`, the PR body) is the free place to say it.
 
@@ -83,7 +83,7 @@ Judge each against the **Comments** section of `CLAUDE.md` and reach a verdict o
 git diff origin/main...HEAD -- '*.en.yml' 'config/locales/en.yml' | grep -in '^+[^+].*bike'
 ```
 
-Read each hit. Key names (`about_this_bike:`), the product name ("Bike Index"), and copy that really is bike-only are fine; a value saying "bike" about the registration is not. `Registrations::Show::CurrentAlerts::ClaimImpound` and `Registrations::Show::WrapperConsumer` are the pattern for fixing one, and `spec/components/registrations/show/current_alerts/claim_impound/component_spec.rb` shows how to cover it.
+Read each hit. Key names (`about_this_bike:`), the product name ("Bike Index"), and copy that really is bike-only are fine; a value saying "bike" about the registration is not. `Pages::Registrations::Show::CurrentAlerts::ClaimImpound` and `Pages::Registrations::Show::WrapperConsumer` are the pattern for fixing one, and `spec/components/pages/registrations/show/current_alerts/claim_impound/component_spec.rb` shows how to cover it.
 
 ### Only if you have rtk: check these greps read a diff at all
 

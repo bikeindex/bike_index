@@ -92,7 +92,7 @@ linter:
       # query param and the rows are cached without it. Excluded by file rather than
       # herb:disable, which the formatter relocates onto an unrelated <a>
       exclude:
-        - 'app/components/org/search_results/bikes_table/component.html.erb'
+        - 'app/components/pages/org/search_results/bikes_table/component.html.erb'
   #
   #   # Rules can have 'include', 'only', and 'exclude' patterns
   #   some-rule:

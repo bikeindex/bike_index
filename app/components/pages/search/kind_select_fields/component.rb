@@ -4,8 +4,6 @@ module Pages
   module Search
     module KindSelectFields
       class Component < ApplicationComponent
-        DEFAULT_DISTANCE = 100
-        MAX_DISTANCE = 2_000 # IDK, seems reasonable
         MARKETPLACE_SCOPES = %w[for_sale_proximity for_sale].freeze
         # TODO: add Found, Found in search area
         STOLENNESS_SCOPES = %w[proximity stolen non all for_sale].freeze
@@ -21,7 +19,7 @@ module Pages
         private
 
         def default_distance
-          @is_marketplace ? ::Search::MarketplaceController::DEFAULT_DISTANCE : GeocodeHelper::DEFAULT_DISTANCE
+          @is_marketplace ? GeocodeHelper::DEFAULT_MARKETPLACE_DISTANCE : GeocodeHelper::DEFAULT_DISTANCE
         end
 
         def api_count_url

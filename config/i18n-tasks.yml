@@ -41,8 +41,8 @@ data:
     - ['components.ui.definition_list.{:}.*', 'app/components/ui/definition_list/\1/component.%{locale}.yml']
     - ['components.ui.forms.legacy_form_well.{:}.*', 'app/components/ui/forms/legacy_form_well/\1/component.%{locale}.yml']
     - ['components.ui.forms.{:}.*', 'app/components/ui/forms/\1/component.%{locale}.yml']
-    # Page components carry an extra `pages` segment, so they need their own generic
-    # rules ahead of the namespace/name ones below.
+    # Page components carry an extra `pages` segment, which the generic rules below
+    # would match one level too shallow.
     - ['components.pages.{:}.{:}.*', 'app/components/pages/\1/\2/component.%{locale}.yml']
     # namespace/name components. `*` (not `:`) so nested/plural keys stay in the sidecar too.
     - ['components.{:}.{:}.*', 'app/components/\1/\2/component.%{locale}.yml']
