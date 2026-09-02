@@ -26,7 +26,7 @@ RSpec.describe Pages::Registrations::Show::CurrentAlerts::ClaimImpound::Componen
       render_inline(component)
       expect(page).to have_button("Claim impounded e-scooter")
       expect(page).to have_css("form[action='/impound_claims'] select[name='impound_claim[stolen_record_id]']", visible: :all)
-      expect(page).to have_text("Select the stolen e-scooter you own")
+      expect(page).to have_text("Select your stolen e-scooter matching this impounded e-scooter")
       expect(page).to have_css("option", text: "Choose stolen e-scooter", visible: :all)
       expect(page).to have_button("Open claim")
     end
