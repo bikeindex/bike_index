@@ -11,7 +11,7 @@ description: >-
   background jobs). Also triggers when chasing a specific incident from logs
   (e.g. "what happened at 04:42 UTC?", "why did `/search/registrations` 500?").
   For one named exception use honeybadger-debugging, and for *aggregated*
-  exception triage across time the Honeybadger MCP; this skill is for ad-hoc
+  exception triage across time `bin/binx_hb`; this skill is for ad-hoc
   analysis of log files already on disk.
 ---
 
@@ -221,7 +221,7 @@ binx_cat web | sed -E 's/^[^{]+//' \
 
 ## Honeybadger vs. log files
 
-For "what's currently broken in production" or "is exception X happening more this week", Honeybadger MCP (`mcp__honeybadger__list_faults`, `get_fault`, `query_insights`) is the right tool — it has aggregation, dedup, and time-series. Reach for this skill when:
+For "what's currently broken in production" or "is exception X happening more this week", Honeybadger is the right source — it has aggregation, dedup, and time-series. Read it with `bin/binx_hb` (`faults`, `fault`, `notice`, `trend`, `counts`), not the MCP. Reach for this skill when:
 
 - The user has already downloaded or pointed you at a specific log file, or
 - The question is about *requests that didn't raise* (slow successful queries, traffic patterns, status-code mix), which Honeybadger doesn't capture, or
