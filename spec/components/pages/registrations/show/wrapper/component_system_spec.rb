@@ -57,7 +57,7 @@ RSpec.describe Pages::Registrations::Show::Wrapper::Component, :js, type: :syste
     expect(alert_names).to eq alert_previews.keys.sort
 
     alert_previews.each do |alert, (path, text)|
-      expect(preview_scenarios).to include("registrations/show/wrapper/#{path}"),
+      expect(preview_scenarios).to include("pages/registrations/show/wrapper/#{path}"),
         "CurrentAlerts::#{alert.camelize} has no preview"
 
       visit "#{preview_path}/#{path}"
@@ -67,7 +67,7 @@ RSpec.describe Pages::Registrations::Show::Wrapper::Component, :js, type: :syste
       expect(page).to have_content(text)
     end
 
-    expect(preview_scenarios).to include("registrations/show/wrapper/component/no_overlay")
+    expect(preview_scenarios).to include("pages/registrations/show/wrapper/component/no_overlay")
 
     visit "#{preview_path}/component/no_overlay"
 

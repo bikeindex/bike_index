@@ -117,6 +117,13 @@ RSpec.describe "Organization sidebar", :js, type: :system do
   it "opens the first group on a page no row matches, and leaves the organization from it" do
     visit "/my_account"
 
+    # Alone among these examples, everything asserted below is an absence -- and the row
+    # count `expect_open` waits for is the template's, not a controller's. So without this
+    # they'd all pass on a page that has connected nothing, then fail whenever the run
+    # lands between ui--collapse flagging the open group data-active and
+    # shared-blocks--org-sidebar clearing it
+    wait_for_stimulus
+
     expect_open("#{organization.short_name} Registrations")
     # The scroller holds the menu rows -- the account block below it points at /my_account,
     # so one of its own rows is current here

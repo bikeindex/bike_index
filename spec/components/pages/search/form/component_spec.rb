@@ -38,8 +38,8 @@ RSpec.describe Pages::Search::Form::Component, type: :component do
   describe "component_translation_scope" do
     it "is expected" do
       expect(instance.send(:component_name)).to eq "form"
-      expect(instance.send(:component_namespace)).to eq(["search"])
-      expect(instance.send(:component_translation_scope)).to eq([:components, "search", "form"])
+      expect(instance.send(:component_namespace)).to eq(["pages", "search"])
+      expect(instance.send(:component_translation_scope)).to eq([:components, "pages", "search", "form"])
     end
   end
 
