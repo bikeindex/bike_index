@@ -21,7 +21,7 @@
           <td>Sender</td>
 
           <td>
-            <%= render Admin::Users::Cell::Component.new(user: @marketplace_message.sender, user_id: @marketplace_message.sender_id) %>
+            <%= render Pages::Admin::Users::Cell::Component.new(user: @marketplace_message.sender, user_id: @marketplace_message.sender_id) %>
 
             <small class="tw:ml-2">
               <% sender_count = MarketplaceMessage.where(sender_id: @marketplace_message.sender_id).count %>
@@ -38,7 +38,7 @@
           <td>Receiver</td>
 
           <td>
-            <%= render Admin::Users::Cell::Component.new(user: @marketplace_message.receiver, user_id: @marketplace_message.receiver_id) %>
+            <%= render Pages::Admin::Users::Cell::Component.new(user: @marketplace_message.receiver, user_id: @marketplace_message.receiver_id) %>
 
             <small class="tw:ml-2">
               <% receiver_count = MarketplaceMessage.where(sender_id: @marketplace_message.receiver_id).count %>
@@ -112,7 +112,7 @@
           <td>Listing status</td>
 
           <td>
-            <%= render Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing) %>
+            <%= render Pages::Admin::Badges::MarketplaceListing::Component.new(status: @marketplace_listing.status, status_humanized: @marketplace_listing.status_humanized, kind: :marketplace_listing) %>
           </td>
         </tr>
 
@@ -163,7 +163,7 @@
           <td>Item</td>
 
           <td>
-            <%= render Admin::Bikes::Cell::Component.new(bike: @marketplace_listing.item, bike_id: @marketplace_listing.item_id, bike_link_path: bike_path(@marketplace_listing.item_id, show_marketplace_preview: true)) %>
+            <%= render Pages::Admin::Bikes::Cell::Component.new(bike: @marketplace_listing.item, bike_id: @marketplace_listing.item_id, bike_link_path: bike_path(@marketplace_listing.item_id, show_marketplace_preview: true)) %>
           </td>
         </tr>
       </tbody>

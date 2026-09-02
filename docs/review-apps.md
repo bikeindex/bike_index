@@ -126,7 +126,7 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 | `.github/workflows/review-app.yml` | `resolve` + `op` (calls `kamal-deploy.yml`) + `post` + `report` jobs handling all triggers (see [How a deploy works](#how-a-deploy-works)) |
 | `.github/workflows/ci.yml` (`dispatch` job) | Auto-dispatches a deploy on every push to a labeled PR — the auto-redeploy half of the label gate |
 | `.kamal/provisioning/` | Ansible playbook for one-time host hardening |
-| `app/components/page_block/review_app_banner/` | ViewComponent shown in the layout when `ENV["REVIEW_APP"]` is set |
+| `app/components/shared_blocks/review_app_banner/` | ViewComponent shown in the layout when `ENV["REVIEW_APP"]` is set |
 
 ## Known limits
 

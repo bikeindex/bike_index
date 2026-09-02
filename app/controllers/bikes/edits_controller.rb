@@ -19,7 +19,7 @@ module Bikes
       elsif @edit_template == "remove"
         @new_email_assigned = params[:owner_email].present? && @bike.owner_email != params[:owner_email]
         if @new_email_assigned
-          @og_email = @bike.owner_email # so that PageBlock::MainContent::EditBike doesn't show the wrong value
+          @og_email = @bike.owner_email # so that SharedBlocks::MainContent::EditBike doesn't show the wrong value
           @bike.owner_email = params[:owner_email]
         end
       end

@@ -2,7 +2,7 @@
 
 <html class="doorkeeper" lang="<%= I18n.locale %>">
   <head>
-    <%= render(PageBlock::HeaderTags::Component.new(**header_tags_component_options)) %>
+    <%= render(SharedBlocks::HeaderTags::Component.new(**header_tags_component_options)) %>
     <%= csrf_meta_tags %>
     <%= stylesheet_link_tag 'tailwind', 'revised', "data-turbo-track": "reload" %>
 
@@ -27,7 +27,7 @@
   </head>
 
   <%= body_tag do %>
-    <%= render PageBlock::Navbar::Wrapper::Component.new(logo_only: true) %>
+    <%= render SharedBlocks::Navbar::Wrapper::Component.new(logo_only: true) %>
 
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
     <%= render 'layouts/revised_messages' %>
@@ -41,7 +41,7 @@
     </div>
 
     <%# OAuth pages never load the marketing pixel %>
-    <%= render PageBlock::Footer::Component.new(current_user:, skip_facebook: true, passive_organization:) %>
+    <%= render SharedBlocks::Footer::Component.new(current_user:, skip_facebook: true, passive_organization:) %>
     <%= render "/shared/analytics" %>
   <% end %>
 </html>

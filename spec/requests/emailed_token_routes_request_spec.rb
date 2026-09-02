@@ -21,7 +21,7 @@ RSpec.describe "emailed token routes", type: :request do
        get_path: "/users/1/unsubscribe", get_endpoint: "users#unsubscribe",
        post_path: "/users/1/unsubscribe_update", post_endpoint: "users#unsubscribe_update",
        shared_component: true},
-      {interstitial: "app/components/register/step_confirm/component.html.erb",
+      {interstitial: "app/components/pages/register/step_confirm/component.html.erb",
        get_path: "/register/confirm", get_endpoint: "register#confirm",
        post_path: "/register/confirm_email", post_endpoint: "register#confirm_email",
        shared_component: false}
@@ -44,7 +44,7 @@ RSpec.describe "emailed token routes", type: :request do
   let(:app_sources) do
     Dir.glob(Rails.root.join("app/**/*.{rb,haml,erb}"))
       .to_h { |file| [Pathname.new(file).relative_path_from(Rails.root).to_s, File.read(file)] }
-      .reject { |path, _| path.start_with?("app/components/sessions/sign_in_interstitial/") }
+      .reject { |path, _| path.start_with?("app/components/pages/sessions/sign_in_interstitial/") }
   end
 
   def templates_matching(pattern)
@@ -56,7 +56,7 @@ RSpec.describe "emailed token routes", type: :request do
   # are held to waiting for a click
   def emailed_form_sources
     paths = flows.map { |flow| flow[:interstitial] } +
-      Dir.glob(Rails.root.join("app/components/sessions/sign_in_interstitial/*.{rb,erb}"))
+      Dir.glob(Rails.root.join("app/components/pages/sessions/sign_in_interstitial/*.{rb,erb}"))
         .map { |file| Pathname.new(file).relative_path_from(Rails.root).to_s }
     paths.uniq.reject { |path| path.end_with?("component_preview.rb") }
   end
@@ -73,7 +73,7 @@ RSpec.describe "emailed token routes", type: :request do
 
   # Separate, so a routing regression doesn't mask these
   it "knows every template rendering the shared interstitial" do
-    expect(templates_matching(/Sessions::SignInInterstitial::Component/))
+    expect(templates_matching(/Pages::Sessions::SignInInterstitial::Component/))
       .to match_array interstitials_where(:shared_component)
   end
 

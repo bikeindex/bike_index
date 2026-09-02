@@ -1,0 +1,102 @@
+<%= render Pages::Register::Page::Component.new do %>
+  <%= render Pages::Register::Progress::Component.new(steps: @steps, step: "report") %>
+
+  <%= render UI::Header::Component.new(text: heading, subtitle:) %>
+
+  <% if @b_param.errors.any? %>
+    <%= render UI::Alerts::Base::Component.new(kind: :error, text: @b_param.errors.full_messages.to_sentence) %>
+  <% end %>
+
+  <%#
+    Keyed per registration: the derived key is the form's action, which every
+    registration shares - and this is the longest form in the flow to lose
+  %>
+
+  <%= form_with(url: report_register_path, method: :patch, scope: :report,
+      data: {turbo: true, controller: "autofocus form-persist register--retry",
+             form_persist_key_value: "register-report-#{@b_param.id_token}",
+             action: "input->form-persist#save change->form-persist#save submit->form-persist#clear"}) do |f| %>
+    <%= hidden_field_tag :b_param_token, @b_param.id_token %>
+
+    <%#
+      A wall-clock time only means something alongside the zone it was entered in.
+      Blank without JavaScript, which reads it back in the zone the field rendered in
+    %>
+    <%= f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
+
+    <%= render Pages::Register::SectionLabel::Component.new(text: translation(".when_and_where")) %>
+
+    <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :date, kind: :datetime_local_field,
+        label_text: date_label, required: true,
+        html_options: {value: date_value, max: Binxtils::TimeParser.round(Time.current + 1.day),
+          class: "dateInputUpdateZone", "data-initialtime": report_date&.iso8601 || ""}) %>
+
+    <%# _attributes explicitly: form_with has no model to infer nested attributes from %>
+    <%= f.fields_for :address_record_attributes, address_record do |address_form| %>
+      <%= render UI::Forms::AddressGroup::Component.new(form_builder: address_form, street_label:, required: true) %>
+    <% end %>
+
+    <% if stolen? %>
+      <%= render Pages::Register::SectionLabel::Component.new(text: translation(".theft_details"), divider: true) %>
+      <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :theft_description, kind: :text_area,
+          label_text: translation(".what_happened"),
+          html_options: {value: report_attrs[:theft_description], rows: 3,
+            placeholder: translation(".what_happened_placeholder")}) %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :locking_description,
+          label_text: translation(".how_was_it_locked", cycle_type:))) do %>
+        <%= render UI::Forms::Select::Component.new(form_builder: f, attribute: :locking_description,
+            option_tags: StolenRecord.locking_description_select_options,
+            options: {selected: report_attrs[:locking_description], include_blank: true},
+            html_options: {class: "tw:w-full"}) %>
+      <% end %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :lock_defeat_description,
+          label_text: translation(".how_was_the_lock_defeated"))) do %>
+        <%= render UI::Forms::Select::Component.new(form_builder: f, attribute: :lock_defeat_description,
+            option_tags: StolenRecord.locking_defeat_description_select_options,
+            options: {selected: report_attrs[:lock_defeat_description], include_blank: true},
+            html_options: {class: "tw:w-full"}) %>
+      <% end %>
+      <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :estimated_value, kind: :number_field,
+          label_text: translation(".estimated_value", currency: t("number.currency.format.unit")),
+          html_options: {value: report_attrs[:estimated_value], min: 1, inputmode: "numeric"}) %>
+      <%= render Pages::Register::SectionLabel::Component.new(text: translation(".police_report"), divider: true) %>
+      <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :police_report_number,
+          label_text: translation(".report_number"),
+          html_options: {value: report_attrs[:police_report_number], autocomplete: "off"}) do |group| %>
+        <% group.with_helper_text do %>
+          <%= translation(".without_a_report", cycle_type:) %>
+        <% end %>
+      <% end %>
+      <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :police_report_department,
+          label_text: translation(".department_city"),
+          html_options: {value: report_attrs[:police_report_department]}) %>
+      <%= render Pages::Register::SectionLabel::Component.new(text: translation(".contact_and_sharing"), divider: true) %>
+      <%# The number itself is step 2's - stolen registrations ask for one there %>
+      <div class="tw:mb-4 tw:flex tw:flex-col tw:gap-2">
+        <span class="twlabel">
+          <%= translation(".who_can_see_your_phone") %>
+        </span>
+
+        <% phone_visibility_entries.each do |attribute, label| %>
+          <%= render UI::Forms::Checkbox::Component.new(form_builder: f, attribute:, label:,
+              checked: checked?(attribute)) %>
+        <% end %>
+      </div>
+      <%= render UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :proof_of_ownership,
+          label: translation(".have_proof_of_ownership", cycle_type:), class_name: "tw:mb-2",
+          checked: checked?(:proof_of_ownership, default: false)) %>
+      <%= render UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :receive_notifications,
+          label: translation(".receive_notifications", cycle_type:), class_name: "tw:mb-6",
+          checked: checked?(:receive_notifications)) %>
+    <% else %>
+      <%= render UI::Forms::Group::Component.new(form_builder: f, attribute: :impounded_description, kind: :text_area,
+          label_text: translation(".how_did_you_find_it", cycle_type:), wrapper_class: "tw:mb-6",
+          html_options: {value: report_attrs[:impounded_description], rows: 3}) %>
+    <% end %>
+
+    <%= render UI::Button::Component.new(text: submit_text,
+        color: :primary, size: :lg, type: "submit", spinner: true, html_class: "tw:w-full") %>
+
+    <%= render Pages::Register::BackLink::Component.new(href: previous_path) %>
+  <% end %>
+<% end %>

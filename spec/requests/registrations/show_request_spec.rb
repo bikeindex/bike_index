@@ -514,7 +514,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
       end
 
       context "more than the display limit" do
-        before { stub_const("Registrations::Show::WrapperOrgAdmin::Component::OTHER_REGISTRATIONS_LIMIT", 1) }
+        before { stub_const("Pages::Registrations::Show::WrapperOrgAdmin::Component::OTHER_REGISTRATIONS_LIMIT", 1) }
         it "caps the table and links to the org search for the full list" do
           get "#{base_url}/#{bike.id}"
           body = whitespace_normalized_body_text

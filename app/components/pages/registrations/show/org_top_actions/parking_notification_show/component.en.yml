@@ -1,0 +1,12 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          org_top_actions:
+            parking_notification_show:
+              no_notifications: No parking notifications for this %{bike_type}
+              parking_notifications: Parking notifications
+              view_all: view all notifications for this %{bike_type}
+              view_notification: View notification

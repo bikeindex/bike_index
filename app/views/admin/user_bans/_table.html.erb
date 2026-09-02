@@ -44,13 +44,13 @@
           <% end %>
 
           <td>
-            <%= render Admin::Users::Cell::Component.new(user: user_ban.user, render_search: false) %>
+            <%= render Pages::Admin::Users::Cell::Component.new(user: user_ban.user, render_search: false) %>
           </td>
 
           <td><%= user_ban.reason_humanized %></td>
 
           <td>
-            <%= render Admin::Users::Cell::Component.new(sort_state:, user: user_ban.creator, render_search: render_sortable) %>
+            <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: user_ban.creator, render_search: render_sortable) %>
           </td>
 
           <td>

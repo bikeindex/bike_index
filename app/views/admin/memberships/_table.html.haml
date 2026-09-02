@@ -32,7 +32,7 @@
           - unless skip_user
             %td
               = cache(membership.user) do
-                = render Admin::Users::Cell::Component.new(user: membership.user, user_id: membership.user_id, render_search: false)
+                = render Pages::Admin::Users::Cell::Component.new(user: membership.user, user_id: membership.user_id, render_search: false)
           %td
             %span.localizeTime
               = l membership.start_at, format: :convert_time
@@ -48,4 +48,4 @@
             - else
               .less-strong
                 = cache(membership.creator) do
-                  = render Admin::Users::Cell::Component.new(user: membership.creator, user_id: membership.creator_id, render_search: false)
+                  = render Pages::Admin::Users::Cell::Component.new(user: membership.creator, user_id: membership.creator_id, render_search: false)

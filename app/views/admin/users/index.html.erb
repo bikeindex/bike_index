@@ -97,14 +97,14 @@
     unconfirmed users
   <% end %>
 
-  <%= render Admin::Users::Table::Component.new(users: @collection, sort_state:, display_dev_info: display_dev_info?, render_sortable: true, render_deleted: @deleted) %>
+  <%= render Pages::Admin::Users::Table::Component.new(users: @collection, sort_state:, display_dev_info: display_dev_info?, render_sortable: true, render_deleted: @deleted) %>
 
   <% unless @collection.present? %>
     <h1 class="mt-4">No users found!</h1>
   <% end %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @collection,
   index_title: index_title,

@@ -163,7 +163,7 @@
 <div class="row mt-4 mb-4">
   <% if @impound_record.active? %>
     <div class="col-md-8 offset-md-2 col-xl-6 offset-xl-0">
-      <%= render(Org::ImpoundRecordUpdateForm::Component.new(
+      <%= render(Pages::Org::ImpoundRecordUpdateForm::Component.new(
         current_organization:,
         impound_record: @impound_record,
         impound_record_update: @impound_record_update,

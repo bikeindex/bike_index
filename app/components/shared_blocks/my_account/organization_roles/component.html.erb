@@ -1,0 +1,120 @@
+<div
+  class="form-wrap"
+  data-controller="shared-blocks--my-account--organization-roles"
+>
+  <div class="form-well-form-header-always-visible">
+    <h3>
+      <%= translation(".organization_roles", count: @organization_roles.size) %>
+    </h3>
+  </div>
+
+  <div class="col-xs-12">
+    <% unless single_role? %>
+      <p><%= translation(".organization_role_information") %></p>
+    <% end %>
+
+    <div class="tw:divide-y tw:divide-gray-200">
+      <% @organization_roles.each do |organization_role| %>
+        <% organization = organization_role.organization %>
+
+        <%# Baseline, so the role sits on the same line as the organization's name %>
+        <div
+          class="tw:flex tw:items-baseline tw:gap-2 tw:py-2"
+          data-shared-blocks--my-account--organization-roles-target="item"
+          data-organization-name="<%= organization.short_name %>"
+          data-url="<%= my_account_organization_role_path(organization_role) %>"
+        >
+          <% unless single_role? %>
+            <%= render UI::DragHandle::Component.new(controller: "shared-blocks--my-account--organization-roles",
+                  html_class: "tw:self-center") %>
+          <% end %>
+
+          <%#
+            Rendered without an avatar too, so every row's name starts in the same place. The
+            image is absolute, so its 100px doesn't set the height of the row - it takes the
+            height of the lines beside it instead
+          %>
+
+          <div class="tw:relative tw:w-11 tw:shrink-0 tw:self-stretch">
+            <% if OrgServices::Displayer.avatar?(organization) %>
+              <%= image_tag organization.avatar.url(:thumb), alt: "",
+                    class: "tw:absolute tw:inset-0 tw:size-full tw:object-contain" %>
+            <% end %>
+          </div>
+
+          <%#
+            Stacked below md, so a long name and a long role each get the width. Above it, two
+            columns: the name over the joined date, the role over the leave button
+          %>
+
+          <div
+            class="
+              tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:md:grid
+              tw:md:grid-cols-[1fr_auto] tw:md:items-baseline tw:md:gap-x-2
+            "
+          >
+            <%= link_to organization.short_name, organization_root_path(organization_id: organization.to_param), class: "twlink" %>
+
+            <%# max-md rather than a size at both ends, so it keeps taking the name's size above %>
+            <div class="tw:max-md:text-sm tw:md:justify-self-end">
+              <%= translation(".role_html", role: content_tag(:strong, translation(".roles.#{organization_role.role}"))) %>
+            </div>
+
+            <div class="tw:text-sm tw:text-gray-600">
+              <%= translation(".joined") %>
+              <%= render UI::Time::Component.new(time: organization_role.claimed_at, preposition: true) %>
+            </div>
+
+            <% if organization_role.leavable? %>
+              <%#
+                A data-method link rather than ButtonLink's method: - the whole page is inside
+                the account form, and a button_to's form nested in another is dropped by the
+                parser, which leaves its button submitting the account form
+              %>
+
+              <div class="tw:flex tw:justify-end tw:max-md:mt-2 tw:md:justify-self-end">
+                <%# twlink is in the components layer, so the red utilities outrank it %>
+                <%= render UI::ButtonLink::Component.new(text: translation(".leave_organization"),
+                      href: my_account_organization_role_path(organization_role), color: :link,
+                      html_class: "tw:text-xs tw:text-red-700 tw:hover:text-red-800 tw:dark:text-red-400",
+                      data: {method: :delete,
+                             confirm: translation(".leave_confirm", org_name: organization.short_name)}) %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="col-xs-12">
+    <p>
+      <%= translation(".automatically_view_in_organization", org_name: first_organization_name) %>
+
+      <span class="less-strong"><%= translation(".you_can_still_switch") %></span>
+    </p>
+
+    <div class="form-group unnested-field row">
+      <label class="form-well-label"><%= translation(".view_after_log_in") %></label>
+
+      <div class="form-well-input form-well-input-checks">
+        <label class="radio-inline tw:block">
+          <%= radio_button_tag :on_by_default, "1", first_organization_role.on_by_default? %>
+
+          <%# The name is its own element, so a drag can rewrite it to the new first organization %>
+          <%= translation(".view_as_html", org_name: content_tag(:span, first_organization.short_name,
+                  data: {"shared-blocks--my-account--organization-roles-target": "organizationName"})) %>
+        </label>
+
+        <label class="radio-inline tw:block">
+          <%= radio_button_tag :on_by_default, "0", !first_organization_role.on_by_default? %>
+          <%= translation(".view_without_an_organization") %>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <%= render "/shared/form_well_footer_save" %>
+</div>

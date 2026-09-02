@@ -1,8 +1,0 @@
----
-en:
-  components:
-    register:
-      page_content:
-        electric_detected: "⚡️ Electric (motorized) detected"
-        have_questions: Have questions about these policies?
-        read_the_faq: E-Vehicle Acknowledgment FAQ

@@ -1,8 +1,0 @@
----
-en:
-  components:
-    register:
-      page:
-        retry_failed: >-
-          We couldn't save that just now — nothing you entered is lost. Please try
-          again in a moment.

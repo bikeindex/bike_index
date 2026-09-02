@@ -1,8 +1,0 @@
----
-en:
-  components:
-    register:
-      step_confirm:
-        confirming_your_email: Confirming your email
-        continue: Continue
-        continue_where_you_left_off: Continue, and we'll pick up where you left off.

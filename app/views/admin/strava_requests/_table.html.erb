@@ -43,7 +43,7 @@
     <%= render UI::Badge::Component.new(
       text: status_text,
       title: strava_request.response_status.humanize,
-      color: Admin::Strava::RequestsChart::Component::RESPONSE_STATUS_BADGE_COLORS[strava_request.response_status.to_sym],
+      color: Pages::Admin::Strava::RequestsChart::Component::RESPONSE_STATUS_BADGE_COLORS[strava_request.response_status.to_sym],
       size: :sm
     ) %>
   <% end %>
@@ -55,7 +55,7 @@
   <% end %>
 
   <% table.column(label: "Rate limit", header_classes: "tw:font-normal") do |strava_request| %>
-    <%= render Admin::Strava::RateLimit::Component.new(rate_limit_json: strava_request.rate_limit) %>
+    <%= render Pages::Admin::Strava::RateLimit::Component.new(rate_limit_json: strava_request.rate_limit) %>
   <% end %>
 
   <% table.column(sortable: "requested_at") do |strava_request| %>
@@ -65,6 +65,6 @@
   <% end %>
 
   <% table.column(label: "User", header_classes: "tw:font-normal") do |strava_request| %>
-    <%= render Admin::Users::Cell::Component.new(user: strava_request.user, user_id: strava_request.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_request.strava_integration_id), search_url: url_for(sort_state.search_params.merge(search_strava_integration_id: strava_request.strava_integration_id))) %>
+    <%= render Pages::Admin::Users::Cell::Component.new(user: strava_request.user, user_id: strava_request.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_request.strava_integration_id), search_url: url_for(sort_state.search_params.merge(search_strava_integration_id: strava_request.strava_integration_id))) %>
   <% end %>
 <% end %>

@@ -54,7 +54,7 @@
   <%= render partial: "/admin/parking_notifications/table", locals: {parking_notifications: @parking_notifications, render_sortable: true} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @parking_notifications,
   viewing: "Parking notifications",

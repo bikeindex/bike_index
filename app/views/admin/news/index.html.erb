@@ -26,7 +26,7 @@
   <%= render partial: "/admin/news/table", locals: {blogs: @blogs, skip_kind: @search_kind != "all"} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @blogs,
   viewing: "News/Blogs/Info",

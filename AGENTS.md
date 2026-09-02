@@ -24,7 +24,7 @@ Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't us
 - Prefer less code, by character count (excluding whitespace and comments). Use `bin/char_count {FILE OR FOLDER}` to get the non-whitespace character count
 - prefer un-abbreviated variable names
 - Use full class/module names everywhere — `UI::Forms::Combobox::Component`, not the `Combobox::Component` that lexical scope also resolves from inside `UI::Forms`
-- **A namespace under `Admin::` shadows a top-level one of the same name** — admin controllers and components all nest in `module Admin`, so `Admin::Users` hides the `Users::` jobs from every one of them. Rename the collision away rather than prefixing call sites with `::`: job namespaces carry the `*_jobs` suffix (`app/jobs/user_jobs`, `bike_jobs`, `callback_jobs`, `image_jobs`, `strava_jobs`).
+- **A namespace under `Admin::` or `Pages::` shadows a top-level one of the same name** — admin controllers and components nest in `module Admin`, and every page component in `module Pages`, so `Admin::Users` hides the `Users::` jobs and `Pages::Search` hides the `Search::` controllers from every file inside them. Rename the collision away rather than prefixing call sites with `::`: job namespaces carry the `*_jobs` suffix (`app/jobs/user_jobs`, `bike_jobs`, `callback_jobs`, `image_jobs`, `strava_jobs`), and `Pages::SamlTest` is flat so it can't hide the `Saml::` services. Only `.rb` files are exposed — ViewComponent compiles a template with a *string* `class_eval`, so `Module.nesting` inside it is the component class alone and a bare `Saml::` there still reaches the top level.
 - Default to no comment — see **Comments** below for when one earns its place
 - **Prefer composition over inheritance and `include`.** Share behavior by calling an object that owns it, not by mixing a module into several classes or adding a base class. A `module` extracted only to be `include`d in two classes is usually one of those classes with a parameter — pass the difference in as an argument instead. Rails' own extension points (`ApplicationRecord`, `ApplicationJob`, `ActiveSupport::Concern` for controller filters) are fine; new mixins of our own are what to avoid.
 - **Service objects** (`app/services/`): a stateless service is a `module` with `extend Functionable` (see the `functionable` gem) — inputs passed as args, no instance state, private methods via `conceal` + a `# private below here` block. Don't write a stateless service as a `class` with `def self.` methods.
@@ -59,11 +59,11 @@ None of this governs magic comments, `# rubocop:disable` (keep its justification
 
 ### Translations
 
-A registration is as often an e-scooter, a stroller or a wheelchair, so **never hardcode "bike" in a value that means the cycle type** — interpolate `%{bike_type}` and pass `bike_type: bike.type`. `Registrations::Show::CurrentAlerts::ClaimImpound` is the pattern. Key names (`about_this_bike:`), the product name, and copy that really is bike-only are fine.
+A registration is as often an e-scooter, a stroller or a wheelchair, so **never hardcode "bike" in a value that means the cycle type** — interpolate `%{bike_type}` and pass `bike_type: bike.type`. `Pages::Registrations::Show::CurrentAlerts::ClaimImpound` is the pattern. Key names (`about_this_bike:`), the product name, and copy that really is bike-only are fine.
 
 Run `bundle exec rails prepare_translations` after hand-editing a `component.en.yml`; `bin/lint` doesn't normalize YAML.
 
-A spec that renders in another locale — `spec/components/page_block/footer/component_spec.rb` does, in `:nl` — fails on a key the sync-generated `config/locales/translation.*.yml` don't carry yet, since `raise_on_missing_translations` is on in test. Add the key inline to all four; the next sync overwrites them.
+A spec that renders in another locale — `spec/components/shared_blocks/footer/component_spec.rb` does, in `:nl` — fails on a key the sync-generated `config/locales/translation.*.yml` don't carry yet, since `raise_on_missing_translations` is on in test. Add the key inline to all four; the next sync overwrites them.
 
 **Moving a key to another scope means moving its translations too.** Renaming a component or a service relocates its keys in `en.yml`, but the four `translation.*.yml` still hold the old scope — so every non-English reader silently drops back to English until the next sync re-translates. Nothing catches it: `prepare_translations` reports clean (`en.yml` is complete, and the orphans sit under the `ignore_unused` scopes), and no spec renders those rows in another locale. Carry the existing values across by hand, in all four, in the same commit as the rename.
 
@@ -98,6 +98,8 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 
 ## Architecture notes
 
+- **`app/components` has five top-level folders, and a new component goes in exactly one of them**: `ui` (the design system — a component whose arguments are only about style), `atoms` (small value renderers — `Atoms::Serial`, `Atoms::Phone`), `pages` (one namespace per route, `Pages::Admin::Bikes::Table`), `shared_blocks` (the chrome around a page — navbar, footer, alerts), and `emails`. Nothing else belongs at the top level.
+- **Moving a file silently un-suppresses whatever was keyed to its old path.** `.herb.yml` excludes lint rules by path, and `brakeman.ignore` hashes the file path into each fingerprint — so a rename re-enables the rule and obsoletes the entry, and neither says so until CI fails. Grep the repo root and `config/` for the old path, not just `app/`; re-fingerprint brakeman from `brakeman -f json` rather than hand-editing the path.
 - **Multi-database**: primary (`ApplicationRecord`) + analytics (`AnalyticsRecord`). Use `db:migrate:down:analytics` for analytics migrations
 - **Soft delete**: some models use `acts_as_paranoid` with `deleted_at` column; use `unscoped` in admin controllers when needed
 - **Every user has a `password_digest`** — `User#set_calculated_attributes` gives passwordless accounts a random one so `has_secure_password` is satisfied. So it answers nothing about whether someone chose a password; `passwordless_user?` is that question.

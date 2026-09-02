@@ -132,7 +132,7 @@
   <%= render partial: "table", locals: {bike_stickers: @bike_stickers, render_sortable: true} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @bike_stickers,
   viewing: "Stickers",

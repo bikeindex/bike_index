@@ -1,0 +1,58 @@
+<% multi_update_open_label = translation(".hide_update").downcase %>
+<% multi_update_closed_label = translation(".update_multiple_records").downcase %>
+
+<div
+  data-controller="org--impound-update-multi"
+  data-org--impound-update-multi-open-label-value="<%= multi_update_open_label %>"
+  data-org--impound-update-multi-closed-label-value="<%= multi_update_closed_label %>"
+  data-org--impound-update-multi-disabled-title-value="<%= translation(".cannot_update_with_kind") %>"
+>
+  <div class="row mt-4 mb-4">
+    <div class="col-sm-9">
+      <%= number_with_delimiter(@pagy.count) %>
+      <%= translation(".matching_impound_record", count: @pagy.count) %>
+
+      <em><%= @humanized_time_range %></em>
+
+      <div class="tw:ml-2 tw:inline-block">
+        <%= render(UI::Dropdown::Component.new(name: status_dropdown_text, button_color: :primary, active: @search_status != "current")) do |dropdown| %>
+          <% @available_statuses.each do |status| %>
+            <% status_active = @search_status == status %>
+            <% status_link_params = @sort_state.search_params.merge(organization_id: @current_organization.id, search_status: (status_active ? nil : status)) %>
+            <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: display_status_for(status), path: organization_impound_records_path(status_link_params), match_params: status_params(status), data: {turbo_action: "advance"}) } %>
+
+            <%# Divider after "all" %>
+            <% dropdown.with_entry_divider if status == "all" %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <div class="tw:ml-2 tw:inline-block">
+        <%= render(UI::Dropdown::Component.new(name: unregisteredness_dropdown_text, button_size: :sm, active: @search_unregisteredness != "all")) do |dropdown| %>
+          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: translation(".all_bikes"), path: organization_impound_records_path(@sort_state.search_params.except(:search_unregisteredness)), match_params: {search_unregisteredness: nil}, data: {turbo_action: "advance"}) } %>
+          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: translation(".only_unregistered"), path: organization_impound_records_path(@sort_state.search_params.merge(search_unregisteredness: "only_unregistered")), match_params: {search_unregisteredness: "only_unregistered"}, data: {turbo_action: "advance"}) } %>
+          <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: translation(".only_user_registered"), path: organization_impound_records_path(@sort_state.search_params.merge(search_unregisteredness: "only_registered")), match_params: {search_unregisteredness: "only_registered"}, data: {turbo_action: "advance"}) } %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="col-lg-3">
+      <div class="text-right">
+        <%= render(UI::Button::Component.new(
+          text: @multi_update_open ? multi_update_open_label : multi_update_closed_label,
+          color: :link,
+          data: {"org--impound-update-multi-target": "toggle", action: "org--impound-update-multi#toggle"}
+        )) %>
+      </div>
+    </div>
+  </div>
+
+  <%# The form wraps the table too, so checked rows submit with it %>
+  <%= render(Pages::Org::ImpoundRecordUpdateForm::Component.new(current_organization: @current_organization, multi_update_open: @multi_update_open)) do %>
+    <%= render(Pages::Org::ImpoundRecordsTable::Component.new(impound_records: @impound_records, current_organization: @current_organization, current_user: @current_user, sort_state: @sort_state, render_sortable: true, render_resolved_at: !skip_resolved, skip_status: !render_status, multiselect_visible: @multi_update_open)) %>
+  <% end %>
+</div>
+
+<div class="pt-4 pb-4">
+  <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: @params, size: :lg)) %>
+</div>

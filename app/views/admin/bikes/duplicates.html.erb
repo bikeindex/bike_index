@@ -1,6 +1,6 @@
 <h1>Possible duplicate bikes</h1>
 
-<%= render(Admin::PaginationWithCount::Component.new(collection: @duplicate_groups, index: admin_index_state, count: @duplicate_groups_count)) %>
+<%= render(Pages::Admin::PaginationWithCount::Component.new(collection: @duplicate_groups, index: admin_index_state, count: @duplicate_groups_count)) %>
 
 <% @duplicate_groups.each do |duplicate_group| %>
   <div
@@ -15,8 +15,8 @@
           method: :put, class: "twlink tw:text-sm" %>
   </div>
 
-  <%= render Admin::Bikes::Table::Component.new(bikes: duplicate_group.bikes, sort_state:,
+  <%= render Pages::Admin::Bikes::Table::Component.new(bikes: duplicate_group.bikes, sort_state:,
         display_dev_info: display_dev_info?, no_show_header: true, show_serial: true) %>
 <% end %>
 
-<%= render(Admin::PaginationWithCount::Component.new(collection: @duplicate_groups, index: admin_index_state, skip_total: true)) %>
+<%= render(Pages::Admin::PaginationWithCount::Component.new(collection: @duplicate_groups, index: admin_index_state, skip_total: true)) %>

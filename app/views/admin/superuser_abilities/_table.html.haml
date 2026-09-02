@@ -38,7 +38,7 @@
             %td
               - if superuser_ability.user_id.present?
                 = cache(superuser_ability.user) do
-                  = render Admin::Users::Cell::Component.new(sort_state:, user_id: superuser_ability.user_id, user: superuser_ability.user, render_search: render_sortable)
+                  = render Pages::Admin::Users::Cell::Component.new(sort_state:, user_id: superuser_ability.user_id, user: superuser_ability.user, render_search: render_sortable)
           %td= superuser_ability.kind.titleize
           %td
             = superuser_ability.controller_name

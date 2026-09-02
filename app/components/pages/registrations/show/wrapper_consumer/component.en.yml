@@ -1,0 +1,17 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          wrapper_consumer:
+            about_this_bike: About this %{bike_type}
+            audience_owner: Your %{bike_type}
+            audience_public: Public view
+            audience_sent_away: No longer your %{bike_type}
+            edit_this_bike: Edit this %{bike_type}
+            mark_stolen: Mark stolen
+            registered_protected: Registered & protected
+            sell_on_marketplace: Sell on Marketplace
+            share: Share
+            share_my_page: Share my page

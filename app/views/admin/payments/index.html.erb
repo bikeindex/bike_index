@@ -150,7 +150,7 @@
   <%= render partial: "table", locals: {payments: @payments, render_sortable: true, skip_paid_at: @incompleteness == "paid", render_method: @render_method} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @payments,
   viewing: "Payments",

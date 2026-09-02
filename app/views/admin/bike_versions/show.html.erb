@@ -24,7 +24,7 @@
           <td>Owner</td>
 
           <td>
-            <%= render Admin::Users::Cell::Component.new(user: @bike_version.owner, user_id: @bike_version.owner_id) %>
+            <%= render Pages::Admin::Users::Cell::Component.new(user: @bike_version.owner, user_id: @bike_version.owner_id) %>
           </td>
         </tr>
 
@@ -45,7 +45,7 @@
           <td>Bike</td>
 
           <td>
-            <%= render Admin::Bikes::Cell::Component.new(bike: @bike, bike_id: @bike_version.bike_id) %>
+            <%= render Pages::Admin::Bikes::Cell::Component.new(bike: @bike, bike_id: @bike_version.bike_id) %>
           </td>
         </tr>
 

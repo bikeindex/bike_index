@@ -43,9 +43,9 @@
               %small.only-dev-visible= impound_claim.impound_record.id
 
         %td
-          = render Admin::Bikes::Cell::Component.new(bike: impound_claim.bike_claimed, bike_id: impound_claim.bike_claimed_id)
+          = render Pages::Admin::Bikes::Cell::Component.new(bike: impound_claim.bike_claimed, bike_id: impound_claim.bike_claimed_id)
         %td
-          = render Admin::Bikes::Cell::Component.new(bike: impound_claim.bike_submitting, bike_id: impound_claim.bike_submitting_id)
+          = render Pages::Admin::Bikes::Cell::Component.new(bike: impound_claim.bike_submitting, bike_id: impound_claim.bike_submitting_id)
         %td
           %em
             = status_display(impound_claim.status_humanized)

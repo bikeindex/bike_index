@@ -27,20 +27,23 @@ data:
     # own sidecar. These must precede the generic rules below, which can't tell a
     # sub-namespace segment from a nested/plural key and would otherwise land
     # these in the parent namespace's directory. Add a line here per sub-namespace.
-    - ['components.admin.badges.{:}.*', 'app/components/admin/badges/\1/component.%{locale}.yml']
+    - ['components.pages.admin.badges.{:}.*', 'app/components/pages/admin/badges/\1/component.%{locale}.yml']
     - ['components.emails.partials.{:}.*', 'app/components/emails/partials/\1/component.%{locale}.yml']
-    - ['components.org.registration_sequence.{:}.*', 'app/components/org/registration_sequence/\1/component.%{locale}.yml']
-    - ['components.page_block.main_content.{:}.*', 'app/components/page_block/main_content/\1/component.%{locale}.yml']
-    - ['components.page_block.my_account.{:}.*', 'app/components/page_block/my_account/\1/component.%{locale}.yml']
-    - ['components.page_block.navbar.{:}.*', 'app/components/page_block/navbar/\1/component.%{locale}.yml']
-    - ['components.page_block.user_alerts.{:}.*', 'app/components/page_block/user_alerts/\1/component.%{locale}.yml']
-    - ['components.registrations.show.current_alerts.{:}.*', 'app/components/registrations/show/current_alerts/\1/component.%{locale}.yml']
-    - ['components.registrations.show.org_top_actions.{:}.*', 'app/components/registrations/show/org_top_actions/\1/component.%{locale}.yml']
-    - ['components.registrations.show.{:}.*', 'app/components/registrations/show/\1/component.%{locale}.yml']
+    - ['components.pages.org.registration_sequence.{:}.*', 'app/components/pages/org/registration_sequence/\1/component.%{locale}.yml']
+    - ['components.shared_blocks.main_content.{:}.*', 'app/components/shared_blocks/main_content/\1/component.%{locale}.yml']
+    - ['components.shared_blocks.my_account.{:}.*', 'app/components/shared_blocks/my_account/\1/component.%{locale}.yml']
+    - ['components.shared_blocks.navbar.{:}.*', 'app/components/shared_blocks/navbar/\1/component.%{locale}.yml']
+    - ['components.shared_blocks.user_alerts.{:}.*', 'app/components/shared_blocks/user_alerts/\1/component.%{locale}.yml']
+    - ['components.pages.registrations.show.current_alerts.{:}.*', 'app/components/pages/registrations/show/current_alerts/\1/component.%{locale}.yml']
+    - ['components.pages.registrations.show.org_top_actions.{:}.*', 'app/components/pages/registrations/show/org_top_actions/\1/component.%{locale}.yml']
+    - ['components.pages.registrations.show.{:}.*', 'app/components/pages/registrations/show/\1/component.%{locale}.yml']
     - ['components.ui.alerts.{:}.*', 'app/components/ui/alerts/\1/component.%{locale}.yml']
     - ['components.ui.definition_list.{:}.*', 'app/components/ui/definition_list/\1/component.%{locale}.yml']
     - ['components.ui.forms.legacy_form_well.{:}.*', 'app/components/ui/forms/legacy_form_well/\1/component.%{locale}.yml']
     - ['components.ui.forms.{:}.*', 'app/components/ui/forms/\1/component.%{locale}.yml']
+    # Page components carry an extra `pages` segment, which the generic rules below
+    # would match one level too shallow.
+    - ['components.pages.{:}.{:}.*', 'app/components/pages/\1/\2/component.%{locale}.yml']
     # namespace/name components. `*` (not `:`) so nested/plural keys stay in the sidecar too.
     - ['components.{:}.{:}.*', 'app/components/\1/\2/component.%{locale}.yml']
     - ['components.{:}.*', 'app/components/\1/component.%{locale}.yml']
@@ -178,7 +181,7 @@ ignore_unused:
   - "shared.menu_items_account.*" # used dynamically by UserServices::MenuItemsAccount
   - "shared.menu_items_org.*" # used dynamically by UserServices::MenuItemsOrg
   - "shared.register_flow.*" # used dynamically by BikeServices::Register
-  - "bikes.stolen_checklist.*" # Bikes::StolenChecklist reads these with an explicit scope,
+  - "bikes.stolen_checklist.*" # Pages::Bikes::StolenChecklist reads these with an explicit scope,
     # so they stay here rather than moving to the component and orphaning their translations
   - "*_mailer.*"
   - "date.*"

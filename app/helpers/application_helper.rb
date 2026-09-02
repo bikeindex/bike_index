@@ -28,7 +28,7 @@ module ApplicationHelper
 
   # Organized lays out its own general alert, and takes over the body background
   def main_content_organized?
-    PageBlock::MainContent::Wrapper::Component.kind(
+    SharedBlocks::MainContent::Wrapper::Component.kind(
       controller_namespace:,
       controller_name:,
       action_name:,
