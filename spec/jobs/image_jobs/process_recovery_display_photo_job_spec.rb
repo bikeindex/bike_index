@@ -1,4 +1,5 @@
 require "rails_helper"
+require "image_processing/vips" # For the unsharpened baseline
 
 RSpec.describe ImageJobs::ProcessRecoveryDisplayPhotoJob, type: :job do
   let(:recovery_display) { FactoryBot.create(:recovery_display) }
@@ -11,6 +12,12 @@ RSpec.describe ImageJobs::ProcessRecoveryDisplayPhotoJob, type: :job do
     end
 
     context "recovery display has photo" do
+      # What the job does, minus the sharpening mask
+      let(:unsharpened) do
+        ImageProcessing::Vips.source(Rails.root.join("spec/fixtures/bike.jpg"))
+          .resize_to_fill(*described_class::DIMENSIONS).convert("jpeg").call.read
+      end
+
       before do
         recovery_display.photo.attach(
           io: File.open(Rails.root.join("spec/fixtures/bike.jpg")),
@@ -19,12 +26,17 @@ RSpec.describe ImageJobs::ProcessRecoveryDisplayPhotoJob, type: :job do
         )
       end
 
-      it "processes the photo" do
+      # image_processing 2.0 turned vips sharpening after resize off by default. The mask is
+      # worth ~33% of the edge energy here, jpeg costs ~13% of it
+      it "processes the photo, sharpening the resize" do
         expect(recovery_display.photo_processed.attached?).to be_falsey
         expect do
           described_class.new.perform(recovery_display.id)
         end.to_not change(described_class.jobs, :count)
         expect(recovery_display.reload.photo_processed.attached?).to be_truthy
+
+        expect(edge_energy(recovery_display.photo_processed.download))
+          .to be > edge_energy(unsharpened) * 1.2
       end
     end
 

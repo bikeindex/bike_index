@@ -118,8 +118,10 @@ module ImageServices
       config = TEMPLATE_CONFIG[template]
       raise "Unknown template (#{template})!" unless config.present?
 
+      # image_processing 2.0 stopped sharpening after resize; these are big downsizes and
+      # the alerts run as ads, so keep the mask on
       bike_image = ImageProcessing::Vips.source(image)
-        .resize_to_limit(*bike_image_dimensions_for(config))
+        .resize_to_limit(*bike_image_dimensions_for(config), sharpen: true)
         .call(save: false)
       # using save: false enables calculating the dimensions & we don't need the intermediary images
 

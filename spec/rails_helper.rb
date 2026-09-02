@@ -54,6 +54,7 @@ RSpec.configure do |config|
 
   # include translation / localization methods
   config.include AbstractController::Translation
+  config.include ImageHelpers
 
   # Add our request/controller spec helpers
   config.include RequestSpecHelpers, type: :request

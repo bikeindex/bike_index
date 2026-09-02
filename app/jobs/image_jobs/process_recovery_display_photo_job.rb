@@ -51,8 +51,9 @@ module ImageJobs
 
     def generate_square_image(photo)
       photo.blob.open do |file|
+        # image_processing 2.0 stopped sharpening after resize, which leaves this soft
         ImageProcessing::Vips.source(file)
-          .resize_to_fill(*DIMENSIONS)
+          .resize_to_fill(*DIMENSIONS, sharpen: true)
           .convert("jpeg")
           .call
       end
