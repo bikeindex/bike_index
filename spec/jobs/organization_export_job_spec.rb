@@ -407,7 +407,6 @@ RSpec.describe OrganizationExportJob, type: :job do
       end
 
       context "header only organization_notes" do
-        let(:enabled_feature_slugs) { %w[csv_exports registration_notes] }
         let(:target_headers) { %w[organization_notes] }
         let(:export_options) { {headers: target_headers} }
         let!(:bike_organization_note) { FactoryBot.create(:bike_organization_note, bike:, organization:, body: "Sold at the fall swap") }

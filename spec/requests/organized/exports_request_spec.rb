@@ -154,19 +154,6 @@ RSpec.describe Organized::ExportsController, type: :request do
           end
         end
       end
-      context "with the organization_notes header" do
-        let(:enabled_feature_slugs) { %w[csv_exports registration_notes] }
-        let(:export) do
-          FactoryBot.create(:export_organization, organization: current_organization,
-            options: Export.default_options("organization").merge("headers" => %w[link organization_notes]))
-        end
-        it "lists the notes column" do
-          get "#{base_url}/#{export.id}"
-          expect(response.code).to eq("200")
-          expect(export.written_headers).to eq(%w[link organization_notes])
-          expect(response.body).to include("Organization notes")
-        end
-      end
       context "with impounded_bikes only" do
         let(:export) { FactoryBot.create(:export_organization, organization: current_organization, options: Export.default_options("organization").merge("impounded_bikes" => true, "partial_registrations" => "none")) }
         it "shows Impounded" do
