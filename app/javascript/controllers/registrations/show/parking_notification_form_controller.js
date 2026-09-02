@@ -42,10 +42,18 @@ export default class extends Controller {
     orgLongitude: Number
   }
 
-  // Fired when the accordion reveals this panel; impound retitles and preselects
-  // that kind
-  applyMode (event) {
-    const impound = event.detail?.name === 'impound'
+  // The accordion opens a panel as soon as its own module lands, so `shown` can be
+  // spent before this lazily loaded one arrives — it records the name it opened as
+  connect () {
+    if (this.element.dataset.openedAs) this.applyMode(this.element.dataset.openedAs)
+  }
+
+  panelShown (event) {
+    this.applyMode(event.detail?.name)
+  }
+
+  applyMode (name) {
+    const impound = name === 'impound'
     if (this.hasHeadingTarget) {
       this.headingTarget.textContent = impound ? this.impoundHeadingValue : this.notificationHeadingValue
     }

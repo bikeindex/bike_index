@@ -171,6 +171,24 @@ example green on a page that held nothing back. Measured against `register--seri
 connect-time reconcile, throttling at 6, 12 and 25 left it green over 30+ runs; the
 route hold failed it every time.
 
+A `sleep` in the handler is still a race — it has to outlast whatever else the page is
+doing, and the duration that wins locally is not the one that wins on a loaded CI
+runner. When the spec can observe the state the module must arrive *after*, block the
+handler on a `Queue` and release it from the example instead:
+
+```ruby
+playwright_page.context.route(%r{parking_notification_form_controller}, proc { |route, request|
+  held << request.url
+  release.pop
+  route.continue
+})
+# ...only the accordion can reveal the panel, so this is it having already opened
+expect(page).to have_content("Set on map", wait: 10)
+release << :continue
+```
+
+Blocking the handler doesn't stall the driver, so Capybara still polls while it waits.
+
 Caveat when measuring locally: after a heavy record-creating run (seeding,
 probe scripts, a big suite), `:js` specs fail spuriously for a while. Re-measure
 in a quiet environment before concluding a spec is flaky.
@@ -193,6 +211,11 @@ a 7% one, so treat a handful of green runs as weak evidence in either direction.
 Ruling ordering out is cheap and worth doing first: RSpec prints `Randomized with
 seed N`, and `--seed N` replays that order. A failing seed that passes on replay
 leaves timing, not ordering or leaked state.
+
+Measure the "without the fix" arm against the base ref by name — `git checkout
+origin/main -- <paths>`. Once the fix is committed, `git checkout -- <paths>` restores
+*it*, so the arm you think is unpatched is the patched one, and a regression test that
+does fail without the fix reads as passing.
 
 ## Known causes in this repo
 
