@@ -13,7 +13,7 @@ description: >-
   status, tag or membership, or tagging one / linking it to the PR that fixes
   it. Also trigger when a request returns 401/expired and the AdminData token
   needs refreshing/re-authorizing. Not for reading log files (use
-  production-log-inspection) or aggregated exception triage (Honeybadger MCP).
+  production-log-inspection) or aggregated exception triage (bin/binx_hb).
 ---
 
 # AdminData production API
