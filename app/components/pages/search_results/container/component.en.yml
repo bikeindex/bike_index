@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    pages:
+      search_results:
+        container:
+          no_results: No registrations exactly matched your search

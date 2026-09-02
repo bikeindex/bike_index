@@ -1,0 +1,14 @@
+---
+en:
+  components:
+    shared_blocks:
+      navbar:
+        primary_menu:
+          blog: Blog
+          donate: Donate
+          help: Help
+          log_in: log in
+          marketplace: Marketplace
+          search: Search
+          sign_up: Sign up
+          stolen_bike: Stolen bike?

@@ -1,0 +1,22 @@
+<%= render(UI::Card::Component.new) do %>
+  <h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">
+    <%= translation(".stolen_details") %>
+  </h2>
+
+  <%= render(Pages::Registrations::Show::Map::Component.new(latitude: stolen_record.latitude_public, longitude: stolen_record.longitude_public, precise: stolen_record.show_address)) %>
+
+  <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+    <%= render(UI::DefinitionList::Row::Component.new(label: translation(".location"), value: stolen_record.formatted_address_string.presence || "No location given")) %>
+
+    <% if owner_phone.present? %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: StolenRecord.human_attribute_name(:phone))) { render Atoms::Phone::Component.new(phone: owner_phone) } %>
+    <% end %>
+
+    <%= render(UI::DefinitionList::Row::Component.new(label: translation(".locking_description"), value: stolen_record.locking_description)) %>
+    <%= render(UI::DefinitionList::Row::Component.new(label: translation(".locking_circumvented"), value: stolen_record.lock_defeat_description)) %>
+    <%= render(UI::DefinitionList::Row::Component.new(label: translation(".stolen_at"), value: stolen_record.date_stolen, time_localizer_settings: %i[preciseTime originalTimeZone])) %>
+    <%= render(UI::DefinitionList::Row::Component.new(label: translation(".police_report"), value: stolen_record.police_report_number)) %>
+    <%= render(UI::DefinitionList::Row::Component.new(label: translation(".department_city"), value: stolen_record.police_report_department)) %>
+    <%= render(UI::DefinitionList::Row::Component.new(label: translation(".description_of_incident"), full_width: true, value: stolen_record.theft_description)) %>
+  <% end %>
+<% end %>

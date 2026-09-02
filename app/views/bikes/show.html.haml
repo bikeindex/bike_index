@@ -1,7 +1,7 @@
 = render partial: "bike_show_overlays"
 
 .container
-  = render(Registrations::Show::ToggleView::Component.new(bike: @bike, current_user:))
+  = render(Pages::Registrations::Show::ToggleView::Component.new(bike: @bike, current_user:))
 
   - if current_user.present? # Header row is super admin stuff and credibility badges
     = render partial: "/bikes/header_row"
@@ -24,7 +24,7 @@
             .col-sm-4.col-lg-2.mt-4
               = submit_tag t(".update"), class: "btn btn-success"
 
-  = render(Org::BikeAccessPanel::Component.new(bike: @bike, organization: passive_organization, current_user:, display_dev_info: display_dev_info?, parking_notification_open: params[:parking_notification].present?))
+  = render(Pages::Org::BikeAccessPanel::Component.new(bike: @bike, organization: passive_organization, current_user:, display_dev_info: display_dev_info?, parking_notification_open: params[:parking_notification].present?))
 
   - if current_user.present? && @bike.user == current_user
     = render partial: "owner_bike_status_alerts"
@@ -122,7 +122,7 @@
                 = t(".or_call")
               %strong
                 = t(".owners_phone_number")
-              = render Atom::Phone::Component.new(phone: @stolen_record.phone)
+              = render Atoms::Phone::Component.new(phone: @stolen_record.phone)
 
       -# Don't show if contact_owner is open - because then we're rendering impound_claim in the main page
       - if BikeServices::Displayer.display_impound_claim?(@bike, current_user) && !@contact_owner_open

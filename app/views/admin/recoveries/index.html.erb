@@ -96,7 +96,7 @@
   <%= render partial: "table", locals: {recoveries: @recoveries, render_sortable: true} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @recoveries,
   viewing: "Recoveries",

@@ -1,0 +1,11 @@
+---
+en:
+  components:
+    pages:
+      messages:
+        thread_show_message:
+          me: Me
+          subject: Subject
+          to: to
+          to_me: to me
+          you_to: you to

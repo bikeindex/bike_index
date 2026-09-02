@@ -1,7 +1,7 @@
 <% show_search_statuses = !@ignored_only %>
 
 <% nav_header_list_items = capture do %>
-  <%= render(Admin::Bikes::Index::Filters::Component.new(index: admin_index_state, motorized: @motorized,
+  <%= render(Pages::Admin::Bikes::Index::Filters::Component.new(index: admin_index_state, motorized: @motorized,
         multi_delete: @multi_delete, origin_search_type: @origin_search_type,
         pos_search_type: @pos_search_type, period: @period)) %>
 <% end %>
@@ -125,7 +125,7 @@
         <%= hidden_field_tag :search_only_creation_organization, params[:search_only_creation_organization] %>
 
         <% if show_search_statuses %>
-          <%= render(Admin::Bikes::Index::SearchStatuses::Component.new(index: admin_index_state,
+          <%= render(Pages::Admin::Bikes::Index::SearchStatuses::Component.new(index: admin_index_state,
                 searched_statuses: @searched_statuses, default_statuses: @default_statuses,
                 not_default_statuses: @not_default_statuses, display_dev_info: display_dev_info?)) %>
         <% end %>
@@ -166,10 +166,10 @@
 <% end unless admin_search_filtered? %>
 
 <% table_view = capture do %>
-  <%= render Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:, display_dev_info: display_dev_info?, show_serial: params[:show_serial].present?, skip_manufacturer_link: params[:search_manufacturer].present?, render_sortable: true, render_multi_check: @multi_delete) %>
+  <%= render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:, display_dev_info: display_dev_info?, show_serial: params[:show_serial].present?, skip_manufacturer_link: params[:search_manufacturer].present?, render_sortable: true, render_multi_check: @multi_delete) %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @bikes,
   viewing: "Bikes",

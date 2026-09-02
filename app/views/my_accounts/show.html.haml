@@ -9,7 +9,7 @@
 
     - if membership.present?
       %div{class: "tw:w-full tw:sm:w-1/3 tw:flex tw:px-[15px]"}
-        = render(MemberBadge::Component.new(level: membership.level, shadow: true, classes: "tw:max-w-1/2! tw:sm:max-w-full! tw:mx-auto"))
+        = render(Atoms::MemberBadge::Component.new(level: membership.level, shadow: true, classes: "tw:max-w-1/2! tw:sm:max-w-full! tw:mx-auto"))
 
 
 .container
@@ -44,7 +44,7 @@
                       %ul.attr-list
                         %li
                           %strong.attr-title #{t(".serial")}:
-                          = render(Atom::Serial::Component.new(bike:, user: current_user, skip_explanation: true))
+                          = render(Atoms::Serial::Component.new(bike:, user: current_user, skip_explanation: true))
                         = attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
                         %li.less-strong
                           %strong.attr-title #{t(".registered")}:
@@ -179,7 +179,7 @@
                   = t(".tell_us_more_about_yourself")
                 = link_to t(".update_your_profile"), edit_my_account_url
           - if Flipper.enabled?(:strava_integration, current_user)
-            = render(PageBlock::StravaIntegration::Component.new(user: current_user))
+            = render(SharedBlocks::StravaIntegration::Component.new(user: current_user))
 
 -# Cache this render callout to avoid allocations
 - cache("donation_modal2") do

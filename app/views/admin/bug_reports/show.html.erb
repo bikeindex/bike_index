@@ -40,7 +40,7 @@
 
           <td>
             <% if @bug_report.user_id.present? %>
-              <%= render Admin::Users::Cell::Component.new(user: @bug_report.user, user_id: @bug_report.user_id) %>
+              <%= render Pages::Admin::Users::Cell::Component.new(user: @bug_report.user, user_id: @bug_report.user_id) %>
             <% else %>
               <span class="less-strong">no user</span>
             <% end %>

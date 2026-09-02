@@ -1,6 +1,6 @@
 .container
   - if @token.present?
-    = render Sessions::SignInInterstitial::Component.new(url: sign_in_with_magic_link_session_path, fields: { token: @token, return_to: @return_to })
+    = render Pages::Sessions::SignInInterstitial::Component.new(url: sign_in_with_magic_link_session_path, fields: { token: @token, return_to: @return_to })
   - else
     %h3= t(".sign_in_with_magic_link")
     - if @failure

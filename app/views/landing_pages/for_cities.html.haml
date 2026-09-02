@@ -62,4 +62,4 @@
               = t(".used_by_municipalities_everywhere")
             = image_tag "landing_pages/logos/law-enforcement.png", alt: "municipal partners"
 
-= render(PageBlock::LandingDemoModal::Component.new(feedback: @feedback, current_user:, name_label: "City", feedback_type: "lead_for_city", modal_id: "cities-demo-modal"))
+= render(SharedBlocks::LandingDemoModal::Component.new(feedback: @feedback, current_user:, name_label: "City", feedback_type: "lead_for_city", modal_id: "cities-demo-modal"))

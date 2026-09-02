@@ -28,8 +28,8 @@ class ApplicationComponent < ViewComponent::Base
     private
 
     # This component's own files, plus the markup of every component they render, followed
-    # transitively — an admin cell renders Admin::Users::Cell, which renders
-    # Admin::Badges::User, which renders UI::Badge, and any of the three going stale is
+    # transitively — an admin cell renders Pages::Admin::Users::Cell, which renders
+    # Pages::Admin::Badges::User, which renders UI::Badge, and any of the three going stale is
     # the same bug.
     def markup_files
       files = component_files(self)
@@ -50,7 +50,7 @@ class ApplicationComponent < ViewComponent::Base
         .reject { |file| file.to_s.match?(%r{/(component_)?preview(\.rb|/)}) }
     end
 
-    # Component references resolve the way Ruby resolves them — Registrations::Show::Wrapper
+    # Component references resolve the way Ruby resolves them — Pages::Registrations::Show::Wrapper
     # renders a bare OrgAdmin::Component — so walk out from the referencing file's own
     # namespace and let the autoloader answer.
     def rendered_in(file)
@@ -90,7 +90,7 @@ class ApplicationComponent < ViewComponent::Base
   # corresponding keyword args, the latter taking precedence if both are
   # provided.
   #
-  # See specs for component_translation_scope in Search::Form::Component
+  # See specs for component_translation_scope in Pages::Search::Form::Component
   def translation(key, scope: nil, **kwargs)
     ActiveSupport::HtmlSafeTranslation
       .translate(key, **kwargs, scope: (scope || component_translation_scope).compact)
@@ -100,7 +100,7 @@ class ApplicationComponent < ViewComponent::Base
     @component_translation_scope ||= [:components] + component_namespace + [component_name]
   end
 
-  # The component name. For example, SearchResults::BikeBox::Component => BikeBox
+  # The component name. For example, Pages::SearchResults::BikeBox::Component => BikeBox
   def component_name
     set_name_and_namespace unless defined?(@component_name)
     @component_name

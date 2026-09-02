@@ -1,4 +1,4 @@
-<%= render(Admin::Headers::Nav::Component.new(title: "Multi manufacturer update")) do %>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title: "Multi manufacturer update")) do %>
   <%#
     The view-ordering pair reads session[:missing_manufacturer_time_order], which survives
     with no param in the URL - so active: has to come from the controller, not a
@@ -70,7 +70,7 @@
   </div>
 <% end %>
 
-<%= render(Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state)) %>
+<%= render(Pages::Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state)) %>
 
 <%= form_tag update_manufacturers_admin_bikes_path, data: {controller: "table-multi-checkbox"} do %>
   <div class="tw:flex tw:flex-wrap tw:items-end tw:gap-4">
@@ -85,8 +85,8 @@
     </div>
   </div>
 
-  <%= render(Admin::Bikes::MissingManufacturerTable::Component.new(bikes: @bikes, index: admin_index_state,
+  <%= render(Pages::Admin::Bikes::MissingManufacturerTable::Component.new(bikes: @bikes, index: admin_index_state,
         searched_other_name: params[:search_other_name])) %>
 <% end %>
 
-<%= render(Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state)) %>
+<%= render(Pages::Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state)) %>

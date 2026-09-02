@@ -85,7 +85,7 @@
     <% end %>
 
     <% table.column(label: "Organization", header_classes: "tw:font-normal") do |export| %>
-      <%= render Admin::Organizations::Cell::Component.new(sort_state:, organization: export.organization, render_search: true) %>
+      <%= render Pages::Admin::Organizations::Cell::Component.new(sort_state:, organization: export.organization, render_search: true) %>
     <% end %>
 
     <% table.column(label: "File", header_classes: "tw:font-normal") do |export| %>
@@ -129,7 +129,7 @@
   <% end %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @collection,
   viewing: "Exports",

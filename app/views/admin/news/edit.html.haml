@@ -31,7 +31,7 @@
   - else
     = render partial: "form", locals: { f: f }
 
-  = render(Admin::News::Options::Component.new(form_builder: f, blog: @blog))
+  = render(Pages::Admin::News::Options::Component.new(form_builder: f, blog: @blog))
 
 .row.mt-2.mb-2
   .col-md-6

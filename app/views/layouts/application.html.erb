@@ -3,7 +3,7 @@
 <html lang="<%= I18n.locale %>">
   <head>
     <%= capybara_lockstep if defined?(Capybara::Lockstep) %>
-    <%= render(PageBlock::HeaderTags::Component.new(**header_tags_component_options)) %>
+    <%= render(SharedBlocks::HeaderTags::Component.new(**header_tags_component_options)) %>
 
     <%# TODO: Cache this ^ %>
     <%= csrf_meta_tags %>
@@ -49,7 +49,7 @@
   </head>
 
   <%# The navbar picks between the bar and the sidebar; the body is laid out around whichever %>
-  <% navbar = PageBlock::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:,
+  <% navbar = SharedBlocks::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:,
     passive_organization:, old_register_view: old_register_view?) %>
 
   <%= body_tag(html_class: class_names(body_class, "with-org-sidebar" => navbar.org_sidebar?)) do %>
@@ -65,16 +65,16 @@
       <%= t(".skip_to_main_content") %>
     </a>
 
-    <%= render(PageBlock::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
+    <%= render(SharedBlocks::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
 
     <%= render navbar %>
 
     <% if render_donation_request? %>
-      <%= render PageBlock::LawEnforcementDonation::Component.new(current_user:) %>
+      <%= render SharedBlocks::LawEnforcementDonation::Component.new(current_user:) %>
     <% end %>
 
     <%# organized renders its own, inside the content column the menu doesn't cover %>
-    <% general_alert = PageBlock::UserAlerts::Wrapper::Component.new(current_user:) if
+    <% general_alert = SharedBlocks::UserAlerts::Wrapper::Component.new(current_user:) if
       show_general_alert && !main_content_organized? %>
 
     <% show_general_alert_here = general_alert&.render? %>
@@ -97,7 +97,7 @@
         id="main-content"
         class="<%= "tw:[--nav-gap:0px]" if show_general_alert_here %>"
       >
-        <%= render(PageBlock::MainContent::Wrapper::Component.new(
+        <%= render(SharedBlocks::MainContent::Wrapper::Component.new(
           controller_namespace:,
           controller_name:,
           action_name:,
@@ -125,7 +125,7 @@
     <%# auto-sends the URL query string) %>
     <% skip_facebook = controller_namespace.in?(%w[organized org_public oauth]) || controller_name == "organizations" || params.key?(:search_email) || params.key?(:proximity) %>
 
-    <%= render PageBlock::Footer::Component.new(current_user:, skip_facebook:, passive_organization:) %>
+    <%= render SharedBlocks::Footer::Component.new(current_user:, skip_facebook:, passive_organization:) %>
 
     <script>
   I18n.defaultLocale = <%== I18n.default_locale.to_json %>

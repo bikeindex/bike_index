@@ -1,0 +1,20 @@
+<div
+  data-registrations--show--action-panels-target="panel"
+  data-panel-name="impound_update"
+  class="tw:hidden"
+>
+  <%= render(UI::Card::Component.new) do %>
+    <h2
+      class="
+        tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+        tw:uppercase
+      "
+    >
+      <%= translation(".title") %>
+    </h2>
+
+    <div class="tw:mt-4">
+      <%= render(Pages::Org::ImpoundRecordUpdateForm::Component.new(current_organization: @organization, impound_record:, card: false)) %>
+    </div>
+  <% end %>
+</div>

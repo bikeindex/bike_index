@@ -1,0 +1,11 @@
+---
+en:
+  components:
+    shared_blocks:
+      navbar:
+        org_sidebar:
+          admin_panel: ADMIN PANEL
+          collapse_sidebar: Collapse sidebar
+          expand_sidebar: Expand sidebar
+          menu: Menu
+          organization_crest: "%{org_name} crest"
