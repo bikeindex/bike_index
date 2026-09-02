@@ -7,17 +7,19 @@ import { collapse } from 'utils/collapse_utils'
 // link) reopens it. Each panel declares the names it answers to via
 // data-panel-name (space-separated); each trigger passes one name through
 // data-panel-name. A panel with several names opens in a variant per name (e.g.
-// the parking form answers to both "parking" and "impound"). The open value names
-// the panel to start on when the URL doesn't.
+// the parking form answers to both "parking" and "impound").
 export default class extends Controller {
   static targets = ['panel', 'trigger']
-  static values = { open: String }
+  static values = { defaultPanel: String }
 
   connect () {
-    const name = new URLSearchParams(window.location.search).get('panel') || this.openValue
+    const param = new URLSearchParams(window.location.search).get('panel')
+    const name = param || this.defaultPanelValue
     // Defer so panel controllers finish connecting and their `shown` listeners
-    // are registered first (e.g. parking-notification's geolocation on open)
-    if (name) window.requestAnimationFrame(() => this.open(name, 0))
+    // are registered first (e.g. parking-notification's geolocation on open).
+    // A default-open panel doesn't persist — that would put the param in a URL
+    // nobody asked it of
+    if (name) window.requestAnimationFrame(() => this.open(name, 0, Boolean(param)))
   }
 
   toggle (event) {
@@ -26,7 +28,7 @@ export default class extends Controller {
     this.open(this.openName === panelName ? null : panelName)
   }
 
-  open (name, duration) {
+  open (name, duration, persist = true) {
     this.panelTargets.forEach((panel) => {
       const show = panel.dataset.panelName.split(' ').includes(name)
       collapse(show ? 'show' : 'hide', panel, duration)
@@ -40,7 +42,7 @@ export default class extends Controller {
       trigger.dataset.active = active
     })
     this.openName = name
-    this.persist(name)
+    if (persist) this.persist(name)
   }
 
   // Reflect the open panel in the URL, preserving history state (Turbo) and

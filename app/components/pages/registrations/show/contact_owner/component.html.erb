@@ -23,14 +23,14 @@
           data: {"ui--collapse-target": "trigger", action: "ui--collapse#toggle"}
         )) %>
         <div data-ui--collapse-target="content" class="tw:hidden">
-          <%= form_with(model: stolen_notification, url: stolen_notifications_path, data: {controller: "csrf-refresh"}) do |form| %>
+          <%= form_with(model: stolen_notification, url: stolen_notifications_path, class: "tw:mt-3", data: {controller: "csrf-refresh"}) do |form| %>
             <%= form.hidden_field :bike_id, value: @bike.id %>
 
             <%= form.text_area :message,
               required: true,
               rows: 6,
               placeholder: translation(".where_did_you_see_this_bike", bike_type: @bike.type),
-              class: "twinput tw:mt-3 tw:w-full" %>
+              class: "twinput tw:w-full" %>
 
             <%= form.text_field :reference_url,
               placeholder: translation(".link_url"),
