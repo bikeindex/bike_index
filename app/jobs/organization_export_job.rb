@@ -40,7 +40,7 @@ class OrganizationExportJob < ApplicationJob
     axlsx_package.workbook.add_worksheet(name: "Basic Worksheet") do |sheet|
       sheet.add_row(export_headers)
       row_index = 0
-      @export.bikes_scoped.find_each(batch_size: 100) do |bike|
+      exported_bikes.find_each(batch_size: 100) do |bike|
         check_export_ebrake(row_index) # Run first thing in case it's already broken
         next unless export_bike?(bike)
 
@@ -67,7 +67,7 @@ class OrganizationExportJob < ApplicationJob
     require "csv"
     file.write(comma_wrapped_string(export_headers))
     row_index = 0
-    @export.bikes_scoped.find_each(batch_size: 100) do |bike|
+    exported_bikes.find_each(batch_size: 100) do |bike|
       check_export_ebrake(row_index) # Run first thing in case it's already broken
       next unless export_bike?(bike)
 
@@ -101,6 +101,12 @@ class OrganizationExportJob < ApplicationJob
     return false unless bike_or_b_param.is_a?(Bike)
 
     bike_or_b_param.avery_exportable?
+  end
+
+  def exported_bikes
+    return @export.bikes_scoped unless export_headers.include?("organization_notes")
+
+    @export.bikes_scoped.includes(:bike_organization_notes)
   end
 
   def bike_to_row(bike)
@@ -171,7 +177,12 @@ class OrganizationExportJob < ApplicationJob
     when "vehicle_type" then bike.type_titleize
     when "motorized" then bike.motorized?
     when "status" then bike.status_humanized_no_with_owner
+    when "organization_notes" then organization_note_body(bike)
     end
+  end
+
+  def organization_note_body(bike)
+    bike.bike_organization_notes.detect { it.organization_id == @export.organization_id }&.body
   end
 
   def assign_bike_code_and_increment(bike)

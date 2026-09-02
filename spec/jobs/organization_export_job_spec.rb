@@ -332,8 +332,9 @@ RSpec.describe OrganizationExportJob, type: :job do
           end
         end
         context "including every available field + stickers" do
-          let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[bike_stickers impound_bikes show_partial_registrations] }
+          let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[bike_stickers impound_bikes registration_notes show_partial_registrations] }
           let(:export_options) { {headers: Export.permitted_headers(organization)} }
+          let!(:bike_organization_note) { FactoryBot.create(:bike_organization_note, bike:, organization:, body: "Sold at the fall swap") }
           let(:bike_row_hash) do
             {
               color: "Black",
@@ -358,6 +359,7 @@ RSpec.describe OrganizationExportJob, type: :job do
               partial_registration: nil,
               is_impounded: nil,
               impounded_at: nil,
+              organization_notes: "Sold at the fall swap",
               address: "717 Market St",
               address_2: nil,
               city: "San Francisco",
@@ -401,6 +403,21 @@ RSpec.describe OrganizationExportJob, type: :job do
             expect(line_hash).to match_hash_indifferently(bike_row_hash)
             expect(generated_csv_string).to eq csv_string
           end
+        end
+      end
+
+      context "header only organization_notes" do
+        let(:enabled_feature_slugs) { %w[csv_exports registration_notes] }
+        let(:target_headers) { %w[organization_notes] }
+        let(:export_options) { {headers: target_headers} }
+        let!(:bike_organization_note) { FactoryBot.create(:bike_organization_note, bike:, organization:, body: "Sold at the fall swap") }
+        let!(:other_organization_note) { FactoryBot.create(:bike_organization_note, bike:, organization: FactoryBot.create(:organization), body: "Not this org") }
+        it "returns the note from the export's organization" do
+          instance.perform(export.id)
+          export.reload
+          expect(instance.export_headers).to eq target_headers
+          expect(export.progress).to eq "finished"
+          expect(export.file.read.split("\n").last).to eq "\"Sold at the fall swap\""
         end
       end
 
