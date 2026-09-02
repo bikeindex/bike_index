@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 import { collapse, COLLAPSE_DURATION_MS } from 'utils/collapse_utils'
 import { ExpandControl, groundRadiusStops, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION } from 'utils/maplibre'
 
-/* global navigator */
+/* global navigator, URLSearchParams */
 
 // Connects to data-controller='registrations--show--parking-notification-form'
 // The whole org-admin parking-notification panel: the accordion says which trigger
@@ -42,11 +42,12 @@ export default class extends Controller {
     orgLongitude: Number
   }
 
-  // The accordion opens a panel as soon as its own module lands, so this one may
-  // already be open — and its `shown` event already spent — by the time this
-  // controller connects
+  // The accordion opens a panel as soon as its own module lands, so `shown` can
+  // be spent before this lazily loaded one arrives. It keeps the open panel's
+  // name in the URL, so reconcile from there
   connect () {
-    if (this.element.dataset.openedAs) this.applyMode(this.element.dataset.openedAs)
+    const name = new URLSearchParams(window.location.search).get('panel')
+    if (this.element.dataset.panelName.split(' ').includes(name)) this.applyMode(name)
   }
 
   panelShown (event) {

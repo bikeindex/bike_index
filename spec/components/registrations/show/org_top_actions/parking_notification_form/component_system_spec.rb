@@ -405,16 +405,19 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
   end
 
   # Every controller module is a separate fetch, so the accordion can open this
-  # panel before this component's module has landed
+  # panel — spending its one-shot `shown` event — before this component's module
+  # has landed. Held until the panel is provably open rather than for a duration,
+  # which only wins the race some of the time
   context "when the form controller's module arrives late" do
+    let(:release) { Queue.new }
     let(:held_requests) { [] }
 
     before do
-      requests = held_requests # capture for the cross-thread route handler
+      queue, requests = release, held_requests # capture for the cross-thread route handler
       page.driver.with_playwright_page do |playwright_page|
         playwright_page.context.route(%r{parking_notification_form_controller}, proc { |route, request|
           requests << request.url
-          sleep 1.5
+          queue.pop
           route.continue
         })
       end
@@ -423,9 +426,14 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
     it "applies the mode the panel was opened as" do
       visit "#{preview_path}?panel=impound"
 
-      expect_impound_mode
-      # A route that stopped matching would leave this green having held nothing
+      # Only the accordion can reveal the panel, so this is it having opened and
+      # dispatched to nobody. A route that stopped matching would hold nothing and
+      # leave the rest of the example green against no race at all
+      expect(page).to have_content("Set on map", wait: 10)
       expect(held_requests).to_not be_empty
+      release << :continue
+
+      expect_impound_mode
     end
   end
 
