@@ -24,6 +24,7 @@ PROJECTS = {"backend" => 35931, "frontend" => 61305, "csp" => 138070}.freeze
 LOOKBACK_UNITS = {"H" => 3600, "h" => 3600, "M" => 60, "d" => 86400}.freeze
 ENV_FILE = ".env.development"
 PARAMS_LIMIT = 500
+ISO8601 = "%Y-%m-%dT%H:%M:%SZ"
 
 options = {all_frames: false, limit: 1}
 
@@ -31,12 +32,13 @@ parser = OptionParser.new do |opts|
   opts.banner = <<~BANNER
     Usage: binx_hb MODE TARGET [WINDOW] [options]
 
-    Read one Honeybadger fault without pulling the whole notice into context.
+    Read Honeybadger without pulling whole notices into context.
 
       MODE    fault | notice | faults | trend | counts
       TARGET  a fault URL, PROJECT/FAULT_ID, or - for the project modes - a project alias
       PROJECT backend | frontend | csp, or a numeric project id
-      WINDOW  faults/trend/counts only: lookback like 24H (default), 30M, 14d
+      WINDOW  faults/counts/trend only: lookback like 30M, 24H, 7d
+              (defaults: 24H, or 14d for `trend`)
 
     Examples:
       binx_hb fault https://app.honeybadger.io/projects/35931/faults/133010748
@@ -99,6 +101,10 @@ def lookback_seconds(window)
   match[1].to_i * LOOKBACK_UNITS.fetch(match[2])
 end
 
+def window_start(window, default)
+  Time.now.utc - lookback_seconds(window || default)
+end
+
 def get(path, token)
   uri = URI("https://app.honeybadger.io/v2#{path}")
   request = Net::HTTP::Get.new(uri)
@@ -152,12 +158,15 @@ def print_notice(notice, all_frames)
   puts
 end
 
+def fault_state(record)
+  "#{record["resolved"] ? "resolved" : "open"}, #{record["ignored"] ? "ignored" : "not ignored"}"
+end
+
 def print_summary(label, summary)
   puts "--- #{label}"
   puts "  total: #{summary["total"]}"
-  Array(summary["environments"]).each do |row|
-    state = [row["resolved"] ? "resolved" : "open", row["ignored"] ? "ignored" : "not ignored"].join(", ")
-    puts "  #{row["environment"]} (#{state}): #{row["count"]}"
+  summary["environments"].each do |row|
+    puts "  #{row["environment"]} (#{fault_state(row)}): #{row["count"]}"
   end
 end
 
@@ -168,7 +177,7 @@ def print_fault(fault)
   puts labelled("created", fault["created_at"], 13)
   puts labelled("last_notice", fault["last_notice_at"], 13)
   puts labelled("counts", "#{fault["notices_count_in_range"] || "-"} in range, #{fault["notices_count"]} lifetime", 13)
-  puts labelled("state", "#{fault["resolved"] ? "resolved" : "open"}, #{fault["ignored"] ? "ignored" : "not ignored"}", 13)
+  puts labelled("state", fault_state(fault), 13)
   puts labelled("url", fault["url"], 13)
 end
 
@@ -180,11 +189,11 @@ case mode
 when "faults"
   # occurred_after is Unix epoch seconds; an ISO8601 value is silently ignored,
   # which returns faults last seen years ago with a null notices_count_in_range.
-  since = Time.now.utc - lookback_seconds(window || "24H")
+  since = window_start(window, "24H")
   body = get("/projects/#{project_id}/faults?limit=25&order=frequent&occurred_after=#{since.to_i}", token)
   path = save(body, "hb-faults-#{project_id}.json")
 
-  puts "PROJECT #{project_name} (#{project_id})   since #{since.strftime("%Y-%m-%dT%H:%M:%SZ")}"
+  puts "PROJECT #{project_name} (#{project_id})   since #{since.strftime(ISO8601)}"
   puts %w[in_window lifetime class component state last_notice url].join("\t")
   JSON.parse(body)["results"].each do |fault|
     puts [fault["notices_count_in_range"], fault["notices_count"], fault["klass"], fault["component"] || "-",
@@ -192,29 +201,27 @@ when "faults"
   end
   puts "raw: #{path}"
 when "counts"
-  # A long tail of new low-count faults crosses no per-fault threshold and never
-  # reaches the top-25 listing - one systemic problem mints a fault per distinct
-  # message. Only the totals see it, so reconcile these against `faults`.
-  since = Time.now.utc - lookback_seconds(window || "24H")
+  # One systemic problem mints a fault per distinct message, so a long tail of
+  # them crosses no per-fault threshold and never reaches the 25-row `faults`
+  # listing. Reconcile against it.
+  since = window_start(window, "24H")
   created = JSON.parse(get("/projects/#{project_id}/faults/summary?created_after=#{since.to_i}", token))
   occurred = JSON.parse(get("/projects/#{project_id}/faults/summary?occurred_after=#{since.to_i}", token))
   path = save(JSON.generate({"created" => created, "occurred" => occurred}), "hb-counts-#{project_id}.json")
 
-  puts "PROJECT #{project_name} (#{project_id})   since #{since.strftime("%Y-%m-%dT%H:%M:%SZ")}"
+  puts "PROJECT #{project_name} (#{project_id})   since #{since.strftime(ISO8601)}"
   print_summary("faults created in window", created)
   print_summary("faults firing in window", occurred)
   puts "raw: #{path}"
 when "trend"
-  # Per-fault listings can't see a project-wide surge: one systemic problem mints
-  # a fault per distinct message, so nothing individually crosses a threshold.
   stop = Time.now.utc
-  start = stop - lookback_seconds(window || "14d")
-  query = "start=#{start.strftime("%Y-%m-%dT%H:%M:%SZ")}&stop=#{stop.strftime("%Y-%m-%dT%H:%M:%SZ")}"
+  start = window_start(window, "14d")
+  query = "start=#{start.strftime(ISO8601)}&stop=#{stop.strftime(ISO8601)}"
   body = get("/projects/#{project_id}/reports/notices_per_day?#{query}", token)
   path = save(body, "hb-trend-#{project_id}.json")
 
   puts "PROJECT #{project_name} (#{project_id})   #{start.strftime("%Y-%m-%d")} -> #{stop.strftime("%Y-%m-%d")}"
-  JSON.parse(body).each { |day, count| puts [day.to_s[0, 10], count].join("\t") }
+  JSON.parse(body).each { |day, count| puts [day[0, 10], count].join("\t") }
   puts "raw: #{path}"
 when "fault"
   abort "Error: #{mode} needs a fault id or URL\n\n#{parser}" if fault_id.nil?
