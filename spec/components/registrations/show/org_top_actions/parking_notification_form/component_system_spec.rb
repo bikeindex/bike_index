@@ -406,8 +406,8 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
 
   # Every controller module is a separate fetch, so the accordion can open this
   # panel — spending its one-shot `shown` event — before this component's module
-  # has landed. Held until the panel is provably open rather than for a duration,
-  # which only wins the race some of the time
+  # has landed. Held until the panel is open rather than for a duration, which
+  # only wins the race some of the time
   context "when the form controller's module arrives late" do
     let(:release) { Queue.new }
     let(:held_requests) { [] }
@@ -427,8 +427,8 @@ RSpec.describe Registrations::Show::OrgTopActions::ParkingNotificationForm::Comp
       visit "#{preview_path}?panel=impound"
 
       # Only the accordion can reveal the panel, so this is it having opened and
-      # dispatched to nobody. A route that stopped matching would hold nothing and
-      # leave the rest of the example green against no race at all
+      # dispatched to nobody — and a route that stopped matching would hold
+      # nothing, leaving the example green against no race
       expect(page).to have_content("Set on map", wait: 10)
       expect(held_requests).to_not be_empty
       release << :continue

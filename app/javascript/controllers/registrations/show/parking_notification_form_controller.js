@@ -42,9 +42,9 @@ export default class extends Controller {
     orgLongitude: Number
   }
 
-  // The accordion opens a panel as soon as its own module lands, so `shown` can
-  // be spent before this lazily loaded one arrives. It keeps the open panel's
-  // name in the URL, so reconcile from there
+  // The accordion opens a panel as soon as its own module lands, so `shown` can be
+  // spent before this lazily loaded one arrives — but it keeps the open panel's
+  // name in the URL
   connect () {
     const name = new URLSearchParams(window.location.search).get('panel')
     if (this.element.dataset.panelName.split(' ').includes(name)) this.applyMode(name)
@@ -54,7 +54,6 @@ export default class extends Controller {
     this.applyMode(event.detail?.name)
   }
 
-  // Impound retitles the panel and preselects that kind
   applyMode (name) {
     const impound = name === 'impound'
     if (this.hasHeadingTarget) {
