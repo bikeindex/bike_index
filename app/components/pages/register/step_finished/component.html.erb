@@ -1,0 +1,78 @@
+<%# The checklist wants room, so a finished theft report is the one wide page here %>
+<%= render Pages::Register::Page::Component.new(wide: stolen_checklist?) do %>
+  <div class="tw:px-1 tw:py-6 tw:text-center">
+    <div
+      class="
+        tw:mx-auto tw:mb-4 tw:flex tw:h-16 tw:w-16 tw:items-center
+        tw:justify-center tw:rounded-full tw:bg-green-100 tw:text-green-600
+        tw:dark:bg-green-950 tw:dark:text-green-400
+      "
+    >
+      <%= helpers.inline_svg_tag("icons/check.svg", class: "tw:h-7.5 tw:w-7.5", aria_hidden: true) %>
+    </div>
+
+    <%= render UI::Header::Component.new(text: heading_text, subtitle: subtitle_text) %>
+
+    <%#
+      What getting it back takes, the same list the theft details page ends on - the
+      report asks for a location, so a theft registered here always has one to show
+    %>
+
+    <% if stolen_checklist? %>
+      <div
+        class="
+          tw:mb-6 tw:rounded-lg tw:bg-white tw:px-4 tw:py-3 tw:text-left
+          tw:dark:bg-gray-800
+        "
+      >
+        <p class="tw:mb-2 tw:text-sm tw:font-semibold">
+          <%= translation(".do_these_things") %>
+        </p>
+
+        <%= render Pages::Bikes::StolenChecklist::Component.new(bike: @bike, stolen_record: @bike.current_stolen_record) %>
+      </div>
+    <% end %>
+
+    <%# What's still locked behind the confirmation, so the link is worth clicking %>
+    <% if @bike.blank? %>
+      <div
+        class="
+          tw:mb-6 tw:rounded-lg tw:bg-white tw:px-4 tw:py-3 tw:text-left
+          tw:dark:bg-gray-800
+        "
+      >
+        <p class="tw:mb-1.5 tw:text-sm tw:font-semibold">
+          <%= translation(".confirming_lets_you") %>
+        </p>
+
+        <ul
+          class="
+            tw:mb-0 tw:list-disc tw:space-y-1 tw:pl-5 tw:text-sm
+            tw:text-gray-600 tw:dark:text-gray-300
+          "
+        >
+          <li>
+            <%= stolen? ? translation(".report_it_stolen", cycle_type:) : translation(".finish_adding", cycle_type:) %>
+          </li>
+
+          <% if found? %>
+            <li><%= translation(".add_impound_details", cycle_type:) %></li>
+          <% end %>
+
+          <li><%= translation(".add_photos", cycle_type:) %></li>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="tw:mx-auto tw:flex tw:max-w-md tw:flex-col tw:gap-2.5">
+      <% if @bike.present? %>
+        <%= render UI::ButtonLink::Component.new(href: bike_path(@bike), color: :primary, size: :lg,
+            text: translation(self_made? ? ".view_your_registration" : ".view_the_registration"),
+            html_class: "tw:w-full") %>
+      <% end %>
+
+      <%= render UI::ButtonLink::Component.new(text: translation(".register_another"), href: register_another_path,
+          color: :secondary, size: :lg, html_class: "tw:w-full tw:font-bold tw:text-blue-600!") %>
+    </div>
+  </div>
+<% end %>

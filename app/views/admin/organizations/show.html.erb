@@ -1,4 +1,4 @@
-<%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :show, display_dev_info: display_dev_info?)) %>
+<%= render(Pages::Admin::Organizations::Tabs::Component.new(organization: @organization, active: :show, display_dev_info: display_dev_info?)) %>
 
 <% if OrgServices::Displayer.law_enforcement_missing_verified_features?(@organization) %>
   <div class="alert alert-info">
@@ -15,21 +15,21 @@
 %>
 
 <div class="twwiderow tw:items-start tw:gap-y-6">
-  <%= render(Admin::Organizations::Show::Details::Component.new(organization: @organization, display_dev_info: display_dev_info?)) %>
-  <%= render(Admin::Organizations::Show::Account::Component.new(organization: @organization, display_dev_info: display_dev_info?)) %>
+  <%= render(Pages::Admin::Organizations::Show::Details::Component.new(organization: @organization, display_dev_info: display_dev_info?)) %>
+  <%= render(Pages::Admin::Organizations::Show::Account::Component.new(organization: @organization, display_dev_info: display_dev_info?)) %>
 
   <%# Invoices is the one with more than one root element, so it needs the cell wrapper %>
   <div>
-    <%= render(Admin::Organizations::Show::Invoices::Component.new(organization: @organization)) %>
+    <%= render(Pages::Admin::Organizations::Show::Invoices::Component.new(organization: @organization)) %>
   </div>
 
-  <%= render(Admin::Organizations::Show::Features::Component.new(organization: @organization)) %>
+  <%= render(Pages::Admin::Organizations::Show::Features::Component.new(organization: @organization)) %>
 </div>
 
-<%= render(Admin::Organizations::Show::Bikes::Component.new(organization: @organization, bikes: @bikes, bikes_count: @bikes_count,
+<%= render(Pages::Admin::Organizations::Show::Bikes::Component.new(organization: @organization, bikes: @bikes, bikes_count: @bikes_count,
       sort_state:, display_dev_info: display_dev_info?)) %>
 
-<%= render(Admin::Organizations::Show::Roles::Component.new(organization: @organization, deleted: @deleted_organization_roles)) %>
+<%= render(Pages::Admin::Organizations::Show::Roles::Component.new(organization: @organization, deleted: @deleted_organization_roles)) %>
 
 <%# forced: admin_unvendored's `hr` rule is unlayered, so plain utilities are inert here %>
 <hr class="tw:mt-8! tw:mb-4!">

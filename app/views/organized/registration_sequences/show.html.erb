@@ -9,7 +9,7 @@
 %>
 
 <div class="tw:mx-[calc(50%_-_50vw)] tw:pt-(--nav-gap) tw:sm:mx-0">
-  <%= render Org::RegistrationSequence::Preview::Component.new(registration_sequence: @registration_sequence, index: @preview_pagy.page - 1) %>
+  <%= render Pages::Org::RegistrationSequence::Preview::Component.new(registration_sequence: @registration_sequence, index: @preview_pagy.page - 1) %>
 </div>
 
 <%# Below the gray. mt-24 clears the flow shell's -mb-18 pull-up. %>

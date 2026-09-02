@@ -5,9 +5,9 @@ module ComponentStructs
   # UserServices::MenuItemsAccount and UserServices::MenuItemsOrg read alike, and a caller
   # can't spell a shape a way the component doesn't read. Every constructor takes
   # **attributes, which is how a caller carries a key of its own through —
-  # Admin::Organizations::Tabs tags each tab with the one it filters on.
+  # Pages::Admin::Organizations::Tabs tags each tab with the one it filters on.
   #
-  # A menu item, rendered by PageBlock::Navbar::OrgSidebar, ::AccountMenu and
+  # A menu item, rendered by SharedBlocks::Navbar::OrgSidebar, ::AccountMenu and
   # ::UserSettingsMenu, and served by api/v3/me:
   #   {type: :divider}
   #   {type: :group, key:, label:, icon:, children: [...]}
@@ -15,7 +15,7 @@ module ComponentStructs
   #     menu rendering it reads back: id:, data:, danger:
   #   {type: :disabled, label:}
   #
-  # A tab is rendered by UI::Tabs, which Admin::Headers::Tabs passes it through to; an
+  # A tab is rendered by UI::Tabs, which Pages::Admin::Headers::Tabs passes it through to; an
   # entry by UI::ButtonGroup.
   module Shapes
     extend Functionable

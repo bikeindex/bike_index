@@ -24,7 +24,7 @@ module OrganizedHelper
         concat(content_tag(:em, " unregistered", class: "small text-warning"))
       elsif !skip_creation && bike.creation_description.present?
         concat(", ")
-        concat(content_tag(:small, render(Org::OriginDisplay::Component.new(creation_description: bike.creation_description)), class: "less-strong"))
+        concat(content_tag(:small, render(Pages::Org::OriginDisplay::Component.new(creation_description: bike.creation_description)), class: "less-strong"))
       end
     end
   end

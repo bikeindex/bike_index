@@ -11,7 +11,7 @@ RSpec.describe RegisterController, type: :request do
       params: {bike: {owner_email:, manufacturer_id: "Trek"}}.as_json)
   end
 
-  # Where Register::Step1::Component's start over link goes - it names the registration
+  # Where Pages::Register::Step1::Component's start over link goes - it names the registration
   # it was rendered on, rather than leaving it to the session
   def start_over_path(b_param, **params)
     new_register_path(discard_token: b_param.id_token, **params)

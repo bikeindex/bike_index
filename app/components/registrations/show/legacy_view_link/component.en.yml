@@ -1,9 +1,0 @@
----
-en:
-  components:
-    registrations:
-      show:
-        legacy_view_link:
-          switch_to_classic: Switch back to the legacy viewer
-          using_new_view: You're trying out the new %{bike_type} viewer.
-          view_in_legacy: view %{bike_type} in legacy viewer

@@ -29,7 +29,7 @@
 <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
 <% unless turbo_frame_request? %>
   <div class="mt-4">
-    <%= render(Org::Search::Form::Component.new(
+    <%= render(Pages::Org::Search::Form::Component.new(
       target_search_path: organization_graduated_notifications_path(organization_id: current_organization.to_param),
       target_frame: :graduated_notifications_results_frame,
       interpreted_params: form_interpreted_params,
@@ -37,7 +37,7 @@
   </div>
 <% end %>
 
-<%= render SearchResults::Frame::Component.new(frame_id: :graduated_notifications_results_frame,
+<%= render Pages::SearchResults::Frame::Component.new(frame_id: :graduated_notifications_results_frame,
   render_results: @render_results, current_path: request.original_fullpath) do %>
   <div class="tw:mt-4">
     <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:) %>

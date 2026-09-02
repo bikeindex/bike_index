@@ -1,0 +1,277 @@
+<%#
+  760px is the design's mobile breakpoint and 1100px its auto-collapse one, neither of
+  which lines up with a tailwind screen -- the controller owns the second, since it only
+  sets data-collapsed, and every collapsed style below follows that attribute
+%>
+
+<div
+  <%#
+    Above the review-app banner's z-index (1040), so the banner can never render over the
+    menu. Vertically the two don't fight: on mobile the bar is in the flow after the
+    banner, and on desktop the body's margin holds the banner clear of the column
+  %>
+  class="tw:group/sidebar tw:relative tw:z-[1050] tw:font-sans"
+  data-controller="shared-blocks--org-sidebar"
+  data-collapsed="false"
+  data-mobile-open="false"
+  data-shared-blocks--org-sidebar-collapse-breakpoint-value="<%= SharedBlocks::Navbar::OrgSidebar::Component::COLLAPSE_BREAKPOINT %>"
+  data-shared-blocks--org-sidebar-mobile-breakpoint-value="<%= SharedBlocks::Navbar::OrgSidebar::Component::MOBILE_BREAKPOINT %>"
+  data-action="
+    resize@window->shared-blocks--org-sidebar#resize
+    keydown.esc@window->shared-blocks--org-sidebar#closeOnEscape
+    ui--active-link:current->shared-blocks--org-sidebar#openCurrentGroup
+  "
+>
+  <div
+    class="
+      tw:relative tw:z-20 tw:flex tw:h-[60px] tw:w-full tw:items-center
+      tw:gap-2.5 tw:border-b tw:border-gray-200 tw:bg-gray-50 tw:px-3
+      tw:min-[760px]:hidden tw:dark:border-gray-700 tw:dark:bg-gray-800
+    "
+  >
+    <%= image_tag "/icon-dark.svg", alt: "Bike Index", class: "tw:h-[34px] tw:w-auto" %>
+
+    <% if avatar_url %>
+      <div
+        class="tw:h-[30px] tw:w-px tw:bg-gray-200 tw:dark:bg-gray-700"
+        aria-hidden="true"
+      ></div>
+
+      <%= image_tag avatar_url, alt: translation(".organization_crest", org_name: @organization.name), class: "tw:h-[34px] tw:w-[34px] tw:object-contain" %>
+    <% end %>
+
+    <div class="tw:flex tw:flex-col tw:gap-px">
+      <span class="<%= SharedBlocks::Navbar::OrgSidebar::Component::ADMIN_PANEL %>"><%= translation(".admin_panel") %></span>
+
+      <span class="tw:text-base tw:font-extrabold tw:tracking-tight"><%= @organization.short_name %></span>
+    </div>
+
+    <div class="tw:flex-1"></div>
+
+    <button
+      type="button"
+      class="
+        tw:flex tw:h-11 tw:w-11 tw:flex-col tw:items-center
+        tw:justify-center tw:gap-[5px] tw:rounded-[10px]
+        tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700
+      "
+      id="org_sidebar_hamburgler"
+      aria-label="<%= translation(".menu") %>"
+      aria-expanded="false"
+      aria-controls="org_sidebar_nav"
+      data-shared-blocks--org-sidebar-target="mobileToggle"
+      data-action="shared-blocks--org-sidebar#toggleMobile"
+    >
+      <%#
+        7px is a bar plus the gap below it, so the outer two meet on the middle one.
+        Spelled out rather than interpolated -- tailwind only emits a utility it can
+        see literally in the source
+      %>
+      <span class="tw:group-data-[mobile-open=true]/sidebar:translate-y-[7px] tw:group-data-[mobile-open=true]/sidebar:rotate-45 <%= SharedBlocks::Navbar::OrgSidebar::Component::BAR %>"></span>
+      <span class="tw:group-data-[mobile-open=true]/sidebar:opacity-0 <%= SharedBlocks::Navbar::OrgSidebar::Component::BAR %>"></span>
+      <span class="tw:group-data-[mobile-open=true]/sidebar:-translate-y-[7px] tw:group-data-[mobile-open=true]/sidebar:-rotate-45 <%= SharedBlocks::Navbar::OrgSidebar::Component::BAR %>"></span>
+    </button>
+  </div>
+
+  <nav
+    id="org_sidebar_nav"
+    class="
+      tw:hidden tw:w-full tw:flex-col tw:bg-gray-50 tw:transition-[width]
+      tw:duration-200 tw:group-data-[mobile-open=true]/sidebar:flex
+      tw:min-[760px]:fixed tw:min-[760px]:top-0 tw:min-[760px]:bottom-0
+      tw:min-[760px]:left-0 tw:min-[760px]:z-20 tw:min-[760px]:flex
+      tw:min-[760px]:w-[266px] tw:min-[760px]:border-r
+      tw:min-[760px]:border-gray-200
+      tw:group-data-[collapsed=true]/sidebar:min-[760px]:w-[68px]
+      tw:dark:border-gray-700 tw:dark:bg-gray-800
+    "
+    aria-label="<%= @organization.short_name %>"
+  >
+    <%#
+      Outside the scroller below, which would both clip it (it sits past the sidebar's
+      right edge) and scroll it out of reach
+    %>
+
+    <button
+      type="button"
+      class="
+        tw:absolute tw:top-[26px] tw:-right-[13px] tw:z-2 tw:hidden
+        tw:h-[26px] tw:w-[26px] tw:items-center tw:justify-center
+        tw:rounded-full tw:border tw:border-gray-200 tw:bg-white
+        tw:text-gray-400 tw:shadow-sm tw:hover:border-blue-200
+        tw:hover:text-blue-600 tw:min-[760px]:flex tw:dark:border-gray-700
+        tw:dark:bg-gray-900
+      "
+      data-collapse-label="<%= translation(".collapse_sidebar") %>"
+      data-expand-label="<%= translation(".expand_sidebar") %>"
+      data-shared-blocks--org-sidebar-target="collapseToggle"
+      data-action="shared-blocks--org-sidebar#toggleCollapse"
+    >
+      <%# :left is already rotate-180, so collapsed unrotates rather than rotating again %>
+      <%= render UI::IconChevron::Component.new(direction: :left, html_class: "tw:transition-transform tw:duration-200 tw:group-data-[collapsed=true]/sidebar:rotate-0") %>
+    </button>
+
+    <%#
+      The crest scrolls with the rows rather than staying put above them, so the scroll
+      boundary is here and not around the rows alone. Only the account block is pinned
+    %>
+
+    <div
+      class="
+        tw:flex tw:flex-1 tw:flex-col tw:overflow-x-hidden
+        tw:min-[760px]:overflow-y-auto
+      "
+      data-shared-blocks--org-sidebar-target="scroller"
+    >
+      <div
+        class="
+          tw:hidden tw:flex-none tw:flex-col tw:items-center tw:gap-2
+          tw:px-4 tw:pt-5 tw:pb-3
+          tw:group-data-[collapsed=true]/sidebar:px-2
+          tw:group-data-[collapsed=true]/sidebar:pt-4
+          tw:group-data-[collapsed=true]/sidebar:pb-2.5 tw:min-[760px]:flex
+        "
+      >
+        <div class="tw:flex tw:items-center tw:gap-2">
+          <%= image_tag "/icon-dark.svg", alt: "Bike Index", class: "tw:h-[28px] tw:w-auto" %>
+
+          <span class="tw:group-data-[collapsed=true]/sidebar:hidden <%= SharedBlocks::Navbar::OrgSidebar::Component::ADMIN_PANEL %>">
+            <%= translation(".admin_panel") %>
+          </span>
+        </div>
+
+        <% if avatar_url %>
+          <%= image_tag avatar_url, alt: translation(".organization_crest", org_name: @organization.name), class: "tw:h-[112px] tw:w-[112px] tw:object-contain tw:transition-all tw:duration-200 tw:group-data-[collapsed=true]/sidebar:h-[38px] tw:group-data-[collapsed=true]/sidebar:w-[38px]" %>
+        <% end %>
+
+        <span
+          class="
+            tw:text-[19px] tw:font-extrabold tw:tracking-tight
+            tw:group-data-[collapsed=true]/sidebar:hidden
+          "
+        >
+          <%= @organization.name %>
+        </span>
+      </div>
+
+      <div class="tw:flex tw:flex-none tw:flex-col tw:gap-px tw:pt-1.5 tw:pb-2.5">
+        <% items.each do |item| %>
+          <% case item[:type] %>
+          <% when :divider %>
+            <div
+              class="
+                tw:mx-3.5 tw:my-2.5 tw:h-px tw:bg-gray-200
+                tw:dark:bg-gray-700
+              "
+              aria-hidden="true"
+            ></div>
+          <% when :group %>
+            <%#
+              The first group opens, the way the design shows a page no row matches --
+              shared-blocks--org-sidebar moves that to another group once ui--active-link
+              says the current row is in one
+            %>
+            <% open = item == first_group %>
+
+            <div data-controller="ui--collapse" class="tw:contents">
+              <button
+                type="button"
+                class="<%= row_class %>"
+                aria-expanded="<%= open %>"
+                aria-controls="org_sidebar_group_<%= item[:key] %>"
+                data-ui--collapse-target="trigger"
+                data-action="shared-blocks--org-sidebar#toggleGroup"
+              >
+                <span class="tw:flex tw:flex-none"><%= icon(item[:icon], html_class: "tw:h-[18px] tw:w-[18px]") %></span>
+
+                <span
+                  class="
+                    tw:flex-1 tw:text-left tw:whitespace-nowrap
+                    tw:group-data-[collapsed=true]/sidebar:hidden
+                  "
+                >
+                  <%= item[:label] %>
+                </span>
+
+                <%# ui--collapse toggles rotate-90, so an already-open group starts rotated %>
+                <span
+                  class="tw:flex tw:text-gray-400 tw:transition-transform tw:duration-200 tw:group-data-[collapsed=true]/sidebar:hidden <%= "tw:rotate-90" if open %>"
+                  data-ui--collapse-target="chevron"
+                >
+                  <%= render UI::IconChevron::Component.new %>
+                </span>
+              </button>
+
+              <div
+                id="org_sidebar_group_<%= item[:key] %>"
+                class="tw:flex tw:flex-col tw:gap-px tw:group-data-[collapsed=true]/sidebar:hidden <%= "tw:hidden!" unless open %>"
+                data-ui--collapse-target="content"
+              >
+                <% item[:children].each do |child| %>
+                  <% if child[:type] == :disabled %>
+                    <span class="tw:text-gray-400 <%= SharedBlocks::Navbar::OrgSidebar::Component::CHILD %>"><%= child[:label] %></span>
+                  <% else %>
+                    <%= render UI::ActiveLink::Component.from_item(child, html_class: child_class) %>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          <% when :link %>
+            <%# text: nil, since a top-level row's label sits inside the block with its icon %>
+            <%= render UI::ActiveLink::Component.from_item(item, html_class: row_class, text: nil) do %>
+              <% if item[:icon].present? %>
+                <span class="tw:flex tw:flex-none"><%= icon(item[:icon], html_class: "tw:h-[17px] tw:w-[17px]") %></span>
+              <% end %>
+
+              <span
+                class="
+                  tw:flex-1 tw:whitespace-nowrap
+                  tw:group-data-[collapsed=true]/sidebar:hidden
+                "
+              >
+                <%= item[:label] %>
+              </span>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <div
+      class="
+        tw:relative tw:flex-none tw:border-t tw:border-gray-200 tw:p-2
+        tw:dark:border-gray-700
+      "
+    >
+      <%#
+        UI::Dropdown's wrapper is inline-block, so the flex column stretches it to the
+        sidebar's width; collapsed, the label and its chevron go and the icon centres
+      %>
+
+      <div class="tw:flex tw:flex-col">
+        <%= render account_menu do %>
+          <span
+            class="
+              tw:flex tw:h-[30px] tw:w-[30px] tw:flex-none tw:items-center
+              tw:justify-center tw:rounded-full tw:border tw:border-gray-200
+              tw:bg-white tw:text-blue-600 tw:dark:border-gray-700
+              tw:dark:bg-gray-900
+            "
+          >
+            <%= icon("user-circle", html_class: "tw:h-[17px] tw:w-[17px]") %>
+          </span>
+
+          <span
+            class="
+              tw:flex-1 tw:overflow-hidden tw:text-left tw:text-[13px]
+              tw:font-bold tw:overflow-ellipsis tw:whitespace-nowrap
+              tw:group-data-[collapsed=true]/sidebar:hidden
+            "
+          >
+            <%= @current_user.email %>
+          </span>
+        <% end %>
+      </div>
+    </div>
+  </nav>
+</div>

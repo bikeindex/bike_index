@@ -33,7 +33,7 @@
       = form_tag admin_graphs_path(search_kind: "bikes"), method: :get, data: {controller: "ui--collapse"} do
         = render partial: "/shared/hidden_search_fields"
 
-        = render(Admin::Bikes::Index::SearchStatuses::Component.new(index: admin_index_state, searched_statuses: @searched_statuses, default_statuses: @default_statuses, not_default_statuses: @not_default_statuses, display_dev_info: display_dev_info?))
+        = render(Pages::Admin::Bikes::Index::SearchStatuses::Component.new(index: admin_index_state, searched_statuses: @searched_statuses, default_statuses: @default_statuses, not_default_statuses: @not_default_statuses, display_dev_info: display_dev_info?))
 
         .form-inline.mt-2
           .mr-auto

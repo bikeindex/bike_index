@@ -1,4 +1,4 @@
-<%= render Admin::Bikes::Header::Component.new(bike: @bike, active: @active_tab.to_sym,
+<%= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: @active_tab.to_sym,
       display_recovery: @active_tab == "recoveries", user: current_user, display_dev_info: display_dev_info?) %>
 
 <% case @active_tab %>
@@ -24,7 +24,7 @@
             class: "twlink tw:text-sm" %>
     </div>
 
-    <%= render Admin::Bikes::Table::Component.new(bikes: duplicate_group.bikes, sort_state:,
+    <%= render Pages::Admin::Bikes::Table::Component.new(bikes: duplicate_group.bikes, sort_state:,
           display_dev_info: display_dev_info?, no_show_header: true, show_serial: true) %>
   <% end %>
 
@@ -32,7 +32,7 @@
     <h3 class="tw:mt-6">No duplicates</h3>
   <% end %>
 <% when "messages" %>
-  <%= render(Admin::Bikes::Show::Messages::Component.new(bike: @bike)) %>
+  <%= render(Pages::Admin::Bikes::Show::Messages::Component.new(bike: @bike)) %>
 <% when "recoveries" %>
   <%= render partial: "/admin/recoveries/table", locals: {recoveries: @bike.recovered_records, skip_bike: true} %>
 

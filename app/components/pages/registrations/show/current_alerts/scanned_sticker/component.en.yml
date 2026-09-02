@@ -1,0 +1,16 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          current_alerts:
+            scanned_sticker:
+              change_the_bike_sticker_linked_to: Change the %{bike_type} it links
+                to
+              is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect
+                %{bike_type}?
+              switch_to_new_bike_id: Switch to a new %{bike_type} ID
+              update: Update
+              you_scanned_this_sticker_html: You scanned %{sticker}, which is assigned
+                to this %{bike_type}.

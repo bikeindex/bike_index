@@ -16,7 +16,7 @@
           %td
             User
           %td
-            = render Admin::Users::Cell::Component.new(user: @membership.user, user_id: @membership.user_id)
+            = render Pages::Admin::Users::Cell::Component.new(user: @membership.user, user_id: @membership.user_id)
         %tr.small
           %td
             Created
@@ -74,7 +74,7 @@
             %td
               - if @membership.creator_id.present?
                 %em Admin:
-                = render Admin::Users::Cell::Component.new(user: @membership.creator, user_id: @membership.creator_id)
+                = render Pages::Admin::Users::Cell::Component.new(user: @membership.creator, user_id: @membership.creator_id)
           - else
             %td Stripe
             %td

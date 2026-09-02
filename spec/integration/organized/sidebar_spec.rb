@@ -35,7 +35,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(page).to have_css("#org_sidebar_nav button[data-active='true']", text: label, count: 1)
   end
 
-  let(:scroller) { "[data-page-block--org-sidebar-target='scroller']" }
+  let(:scroller) { "[data-shared-blocks--org-sidebar-target='scroller']" }
 
   def scroller_top
     page.evaluate_script("document.querySelector(\"#{scroller}\").scrollTop")
@@ -120,7 +120,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect_open("#{organization.short_name} Registrations")
     # The scroller holds the menu rows -- the account block below it points at /my_account,
     # so one of its own rows is current here
-    expect(page).to have_no_css "[data-page-block--org-sidebar-target='scroller'] a[aria-current]", visible: :all
+    expect(page).to have_no_css "[data-shared-blocks--org-sidebar-target='scroller'] a[aria-current]", visible: :all
     # Open, but no more the page than any other group
     expect(page).to have_no_css "#org_sidebar_nav button[data-active='true']"
 

@@ -1,0 +1,12 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          status:
+            found: Found
+            impounded: Impounded
+            not_stolen: Not stolen
+            stolen: Stolen
+            unregistered: Unregistered

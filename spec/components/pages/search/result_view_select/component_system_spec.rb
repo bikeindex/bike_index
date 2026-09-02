@@ -1,0 +1,14 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe Pages::Search::ResultViewSelect::Component, :js, type: :system do
+  let(:preview_path) { "/rails/view_components/pages/search/result_view_select/component/default" }
+
+  it "default preview" do
+    visit(preview_path)
+
+    expect(page).to have_css "label", count: 2
+    expect_axe_clean
+  end
+end

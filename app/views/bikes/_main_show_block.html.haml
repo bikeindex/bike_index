@@ -33,13 +33,13 @@
   .show-bike-details
     - if @show_for_sale
       %div{class: "tw:mt-10 tw:mb-5"}
-        = render(PageBlock::MarketplaceListingPanel::Component.new(marketplace_listing: @bike.current_marketplace_listing))
+        = render(SharedBlocks::MarketplaceListingPanel::Component.new(marketplace_listing: @bike.current_marketplace_listing))
 
     -# Basic bike details
     = render(UI::DefinitionList::Container::Component.new(multi_columns: true)) do
       - unless @bike.version?
         = render(UI::DefinitionList::Row::Component.new(label: t(".serial"))) do
-          = render(Atom::Serial::Component.new(bike: @bike, user: current_user))
+          = render(Atoms::Serial::Component.new(bike: @bike, user: current_user))
         - unless @bike.serial_hidden?
           = render(UI::DefinitionList::Row::Component.new(label: t(".other_serial"), value: @bike.extra_registration_number))
       - unless @bike.type == "bike"

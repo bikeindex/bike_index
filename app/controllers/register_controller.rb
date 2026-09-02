@@ -17,7 +17,7 @@ class RegisterController < ApplicationController
   before_action :find_registration_sequence, except: %i[new confirm]
   before_action :redirect_finished, only: %i[create update report acknowledge]
   # The step shown is server state - a cached page could show one the registration is past
-  # (register--revalidate covers Safari's bfcache, Register::Page Turbo's own snapshots)
+  # (register--revalidate covers Safari's bfcache, Pages::Register::Page Turbo's own snapshots)
   before_action { response.set_header("Cache-Control", "no-store") }
   # Every step is a page, but a component takes its content type from the request - and a
   # Turbo submission asks for a turbo_stream, which grafts the next step onto this one
@@ -42,7 +42,7 @@ class RegisterController < ApplicationController
   # a tokenized step, so the frame is one request and nothing past step 1 is embeddable
   def embed
     @page_title = I18n.t("meta_titles.register_step_1")
-    render Register::Embed::Component.new(b_param: @b_param, steps: flow_steps, current_user:,
+    render Pages::Register::Embed::Component.new(b_param: @b_param, steps: flow_steps, current_user:,
       header_tags_options: helpers.header_tags_component_options,
       button_color: HexColor.normalize(params[:button]),
       button_hover_color: HexColor.normalize(params[:button_hover])), layout: false
@@ -59,22 +59,22 @@ class RegisterController < ApplicationController
     case step
     when "finished"
       @page_title = I18n.t("meta_titles.register_show", cycle_type: @b_param.type)
-      render Register::StepFinished::Component.new(b_param: @b_param, current_user:)
+      render Pages::Register::StepFinished::Component.new(b_param: @b_param, current_user:)
     when "review"
       @page_title = I18n.t("meta_titles.register_review", cycle_type: @b_param.type)
-      render Register::StepAcknowledgmentReview::Component.new(b_param: @b_param, sequence: @registration_sequence, steps:, current_user:)
+      render Pages::Register::StepAcknowledgmentReview::Component.new(b_param: @b_param, sequence: @registration_sequence, steps:, current_user:)
     when "report"
       @page_title = I18n.t("meta_titles.register_report")
-      render Register::StepReport::Component.new(b_param: @b_param, sequence: @registration_sequence, steps:)
+      render Pages::Register::StepReport::Component.new(b_param: @b_param, sequence: @registration_sequence, steps:)
     when "2"
       @page_title = I18n.t("meta_titles.register_step_2", cycle_type: @b_param.type)
-      render Register::Step2::Component.new(b_param: @b_param, steps:, current_user:)
+      render Pages::Register::Step2::Component.new(b_param: @b_param, steps:, current_user:)
     when "1"
       @page_title = I18n.t("meta_titles.register_step_1")
-      render Register::Step1::Component.new(b_param: @b_param, steps:, current_user:)
+      render Pages::Register::Step1::Component.new(b_param: @b_param, steps:, current_user:)
     else
       @page_title = I18n.t("meta_titles.register_acknowledgment", cycle_type: @b_param.type)
-      render Register::StepAcknowledgment::Component.new(b_param: @b_param, sequence: @registration_sequence, step:, steps:)
+      render Pages::Register::StepAcknowledgment::Component.new(b_param: @b_param, sequence: @registration_sequence, step:, steps:)
     end
   end
 
@@ -82,7 +82,7 @@ class RegisterController < ApplicationController
     saved = BikeServices::Register.save_step_1(@b_param, bike_params: create_params,
       propulsion_type_motorized: params[:propulsion_type_motorized])
     unless saved
-      return render(Register::Step1::Component.new(b_param: @b_param, steps: flow_steps, current_user:),
+      return render(Pages::Register::Step1::Component.new(b_param: @b_param, steps: flow_steps, current_user:),
         status: :unprocessable_entity)
     end
 
@@ -98,7 +98,7 @@ class RegisterController < ApplicationController
       bike_params: update_params, register_with_organization: params[:register_with_organization])
     # Saved either way, so the re-render has everything they entered
     unless saved
-      return render(Register::Step2::Component.new(b_param: @b_param, steps: flow_steps, current_user:),
+      return render(Pages::Register::Step2::Component.new(b_param: @b_param, steps: flow_steps, current_user:),
         status: :unprocessable_entity)
     end
 
@@ -116,7 +116,7 @@ class RegisterController < ApplicationController
     # Saved either way, so the re-render has everything they entered
     unless BikeServices::Register.save_report(@b_param, report_params:)
       @page_title = I18n.t("meta_titles.register_report")
-      return render(Register::StepReport::Component.new(b_param: @b_param, sequence: @registration_sequence, steps:),
+      return render(Pages::Register::StepReport::Component.new(b_param: @b_param, sequence: @registration_sequence, steps:),
         status: :unprocessable_entity)
     end
 
@@ -143,7 +143,7 @@ class RegisterController < ApplicationController
 
   def confirm
     @page_title = I18n.t("meta_titles.register_confirm")
-    render Register::StepConfirm::Component.new(b_param: @b_param, token: params[:confirmation_token])
+    render Pages::Register::StepConfirm::Component.new(b_param: @b_param, token: params[:confirmation_token])
   end
 
   # The confirmation itself - the proven address gets an account, created here if

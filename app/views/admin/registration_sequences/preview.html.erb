@@ -1,9 +1,9 @@
 <div class="tw:mx-auto tw:max-w-3xl tw:py-4">
-  <%= render Admin::RegistrationSequence::Header::Component.new(registration_sequence: @registration_sequence, mode: :preview) %>
+  <%= render Pages::Admin::RegistrationSequence::Header::Component.new(registration_sequence: @registration_sequence, mode: :preview) %>
 
   <%# pt cancels the flow shell's negative top margin; padding doesn't collapse %>
   <div class="tw:pt-(--nav-gap)">
-    <%= render Org::RegistrationSequence::Preview::Component.new(registration_sequence: @registration_sequence, index: @preview_pagy.page - 1, admin: true) %>
+    <%= render Pages::Org::RegistrationSequence::Preview::Component.new(registration_sequence: @registration_sequence, index: @preview_pagy.page - 1, admin: true) %>
   </div>
 
   <%# Below the gray. mt-24 clears the flow shell's -mb-18 pull-up. %>
@@ -11,5 +11,5 @@
     <%= render UI::Pagination::Component.new(pagy: @preview_pagy, page_params: {id: @registration_sequence.id}) %>
   </div>
 
-  <%= render Admin::RegistrationSequence::DiscardDraft::Component.new(registration_sequence: @registration_sequence) %>
+  <%= render Pages::Admin::RegistrationSequence::DiscardDraft::Component.new(registration_sequence: @registration_sequence) %>
 </div>

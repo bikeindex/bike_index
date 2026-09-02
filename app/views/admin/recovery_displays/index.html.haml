@@ -1,5 +1,5 @@
 - if @bike.present?
-  = render Admin::Bikes::Header::Component.new(bike: @bike, active: :recovery_displays, display_recovery: true, user: current_user, display_dev_info: display_dev_info?)
+  = render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :recovery_displays, display_recovery: true, user: current_user, display_dev_info: display_dev_info?)
   %h1.mt-5.mb-4 Recovery displays
 
 - else
@@ -9,5 +9,5 @@
     %li
       = render(UI::ButtonLink::Component.new(text: "bust cache", href: admin_recovery_display_path("bust_cache"), color: :link, html_class: "twless-strong"))
 
-  = render(Admin::IndexSkeleton::Component.new(index: admin_index_state, viewing: controller_name.humanize, chart_collection: @render_chart && matching_recovery_displays, nav_header_list_items:, time_range_column: "recovery_displays.#{@time_range_column}", collection: @recovery_displays))
+  = render(Pages::Admin::IndexSkeleton::Component.new(index: admin_index_state, viewing: controller_name.humanize, chart_collection: @render_chart && matching_recovery_displays, nav_header_list_items:, time_range_column: "recovery_displays.#{@time_range_column}", collection: @recovery_displays))
 

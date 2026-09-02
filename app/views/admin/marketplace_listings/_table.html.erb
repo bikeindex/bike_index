@@ -58,7 +58,7 @@
             </td>
 
             <td>
-              <%= render Admin::Badges::MarketplaceListing::Component.new(status: marketplace_listing.status, status_humanized: marketplace_listing.status_humanized, kind: :marketplace_listing) %>
+              <%= render Pages::Admin::Badges::MarketplaceListing::Component.new(status: marketplace_listing.status, status_humanized: marketplace_listing.status_humanized, kind: :marketplace_listing) %>
             </td>
 
             <td>
@@ -78,7 +78,7 @@
             </td>
 
             <td class="item-cell">
-              <%= render Admin::Bikes::Cell::Component.new(bike: marketplace_listing.item, bike_id: marketplace_listing.item_id, bike_link_path: bike_path(marketplace_listing.item_id, show_marketplace_preview: true), search_url: admin_marketplace_listings_path(search_bike_id: marketplace_listing.item_id)) %>
+              <%= render Pages::Admin::Bikes::Cell::Component.new(bike: marketplace_listing.item, bike_id: marketplace_listing.item_id, bike_link_path: bike_path(marketplace_listing.item_id, show_marketplace_preview: true), search_url: admin_marketplace_listings_path(search_bike_id: marketplace_listing.item_id)) %>
             </td>
 
             <td>
@@ -88,19 +88,19 @@
             <td><%= marketplace_listing.condition %></td>
 
             <td>
-              <%= render Admin::AddressRecordCell::Component.new(address_record: marketplace_listing.address_record) %>
+              <%= render Pages::Admin::AddressRecordCell::Component.new(address_record: marketplace_listing.address_record) %>
             </td>
 
             <td>
               <%= cache(marketplace_listing.seller) do %>
-                <%= render Admin::Users::Cell::Component.new(sort_state:, user: marketplace_listing.seller, render_search: true) %>
+                <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: marketplace_listing.seller, render_search: true) %>
               <% end %>
             </td>
 
             <td>
               <% if marketplace_listing.buyer_id.present? %>
                 <%= cache(marketplace_listing.buyer_id) do %>
-                  <%= render Admin::Users::Cell::Component.new(sort_state:, user: marketplace_listing.buyer_id, render_search: true) %>
+                  <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: marketplace_listing.buyer_id, render_search: true) %>
                 <% end %>
               <% end %>
             </td>
