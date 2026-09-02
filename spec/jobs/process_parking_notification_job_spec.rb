@@ -190,14 +190,19 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
     end
     before { instance.perform(parking_notification.id) }
 
-    it "links to the existing impound record" do
+    it "links to the existing impound record without emailing the owner again" do
       impound_record = parking_notification.reload.impound_record
       expect(impound_record).to be_present
       expect(bike.reload.current_impound_record).to eq impound_record
+      expect(ActionMailer::Base.deliveries.count).to eq 1
 
       expect { instance.perform(parking_notification_duplicate.id) }.to_not change(ImpoundRecord, :count)
       expect(parking_notification_duplicate.reload.impound_record).to eq impound_record
       expect(parking_notification_duplicate.status).to eq "impounded"
+      expect(parking_notification_duplicate.notifications.count).to eq 0
+
+      instance.perform(parking_notification_duplicate.id)
+      expect(ActionMailer::Base.deliveries.count).to eq 1
     end
 
     context "impounded by a different organization" do
@@ -206,10 +211,12 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
         FactoryBot.create(:parking_notification_organized, organization: organization2, bike: bike, kind: "impound_notification")
       end
 
-      it "doesn't link to the other organization's impound record" do
+      it "doesn't link to the other organization's impound record, or email" do
         expect { instance.perform(parking_notification_duplicate.id) }.to_not change(ImpoundRecord, :count)
         expect(parking_notification_duplicate.reload.impound_record_id).to be_blank
         expect(bike.reload.current_impound_record).to eq parking_notification.reload.impound_record
+        expect(parking_notification_duplicate.notifications.count).to eq 0
+        expect(ActionMailer::Base.deliveries.count).to eq 1
       end
     end
   end
