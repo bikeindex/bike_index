@@ -82,7 +82,7 @@ Three of those carry a rule beyond "use the component":
 
 - **`UI::Tooltip` keeps its default `?` button trigger** unless the user explicitly says otherwise — never pass a label as the trigger content.
 - **A `UI::Forms::*` field renders no label of its own** — render it inside a `UI::Forms::Group` block, passing `form_builder:` when there is one. Holds for `Combobox`, `Select`, and `TextEditor`. A visually hidden label is the exception: `Group`'s label always carries a required/optional suffix, so use a bare `label_tag` with `twlabel tw:sr-only`, the way `Pages::Search::Form` does.
-- **A form submits with `color: :primary`.** `:purple` is for the button that reveals a form, not the submit inside it. `Pages::Registrations::Show::ContactOwner` and its `CurrentAlerts::ClaimImpound` sibling are the pattern.
+- **A form submits with `color: :primary`.** `Pages::Registrations::Show::ContactOwner` and its `CurrentAlerts::ClaimImpound` sibling are the pattern.
 - **Every typeahead / autocomplete goes through `UI::Forms::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. `spec/components/ui/forms/combobox` shows how to invoke it.
 
 `Atoms::*` (`app/components/atoms/`) holds the small value-rendering components — `Atoms::Serial`, `Atoms::Sticker`, `Atoms::ShortId`, `Atoms::Phone`. Everything else is `UI::*`; older value renderers like `UI::AddressDisplay` predate the split and stay put. Render a serial with `Atoms::Serial::Component`, not `BikeHelper#render_serial_display`.

@@ -11,7 +11,7 @@
 
         <%# The same form, so submitting sends the message rather than dropping an unsaved one %>
         <div class="tw:mt-4">
-          <%= render(UI::Button::Component.new(text: translation(".submit_claim"), color: :purple, type: "submit",
+          <%= render(UI::Button::Component.new(text: translation(".submit_claim"), color: :primary, type: "submit",
             name: form.field_name(:status), value: "submitting")) %>
         </div>
 
