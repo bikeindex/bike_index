@@ -31,7 +31,7 @@ RSpec.describe Pages::Registrations::Show::CurrentAlerts::ClaimImpound::Componen
     click_button "Claim found bike"
 
     expect(page).to have_button("Open claim")
-    expect(page).to have_select("Select the stolen bike you own", options: ["Choose stolen bike", stolen_bike.title_string])
+    expect(page).to have_select("Select your stolen bike matching this impounded bike", options: ["Choose stolen bike", stolen_bike.title_string])
     expect(find_button("Claim found bike")["aria-expanded"]).to eq "true"
     # impound_claims#create redirects back with this param, so the form is open on arrival
     expect(page).to have_current_path(/contact_owner=1/, url: true)

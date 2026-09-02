@@ -7,12 +7,14 @@ import { collapse } from 'utils/collapse_utils'
 // link) reopens it. Each panel declares the names it answers to via
 // data-panel-name (space-separated); each trigger passes one name through
 // data-panel-name. A panel with several names opens in a variant per name (e.g.
-// the parking form answers to both "parking" and "impound").
+// the parking form answers to both "parking" and "impound"). The open value names
+// the panel to start on when the URL doesn't.
 export default class extends Controller {
   static targets = ['panel', 'trigger']
+  static values = { open: String }
 
   connect () {
-    const name = new URLSearchParams(window.location.search).get('panel')
+    const name = new URLSearchParams(window.location.search).get('panel') || this.openValue
     // Defer so panel controllers finish connecting and their `shown` listeners
     // are registered first (e.g. parking-notification's geolocation on open)
     if (name) window.requestAnimationFrame(() => this.open(name, 0))

@@ -6,8 +6,8 @@ module Pages
       module OrgTopActions
         module ParkingNotificationForm
           class ComponentPreview < ApplicationComponentPreview
-            # Wrapped in a minimal action-panels accordion so the trigger opens the
-            # panel and geolocation runs, mirroring the org-admin page
+            # Wrapped in a minimal action-panels accordion, opened on the parking
+            # panel so geolocation runs, mirroring the org-admin page
             def default
               organization = lookbook_organization
               bike = organization.bikes.last || ::Bike.last

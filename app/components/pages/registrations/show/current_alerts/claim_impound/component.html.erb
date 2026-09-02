@@ -59,14 +59,15 @@
           <%= form.hidden_field :impound_record_id, value: impound_record.id %>
 
           <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :stolen_record_id,
-            label_text: translation(".select_your_stolen_bike", bike_type: @bike.type), required: true)) do %>
+            label_text: translation(".select_your_stolen_bike", bike_type: @bike.type), required: true,
+            wrapper_class: "tw:mt-3 tw:mb-4")) do %>
             <%= render(UI::Forms::Select::Component.new(form_builder: form, attribute: :stolen_record_id,
               option_tags: stolen_record_options,
               options: {prompt: translation(".choose_stolen_bike", bike_type: @bike.type)},
               required: true)) %>
           <% end %>
 
-          <%= render(UI::Button::Component.new(text: translation(".open_claim"), color: :purple, type: "submit")) %>
+          <%= render(UI::Button::Component.new(text: translation(".open_claim"), color: :primary, type: "submit")) %>
         <% end %>
       </div>
     </div>

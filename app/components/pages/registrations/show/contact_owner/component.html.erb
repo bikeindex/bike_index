@@ -30,14 +30,14 @@
               required: true,
               rows: 6,
               placeholder: translation(".where_did_you_see_this_bike", bike_type: @bike.type),
-              class: "twinput tw:w-full" %>
+              class: "twinput tw:mt-3 tw:w-full" %>
 
             <%= form.text_field :reference_url,
               placeholder: translation(".link_url"),
               class: "twinput tw:mt-2 tw:w-full" %>
 
             <div class="tw:mt-3">
-              <%= render(UI::Button::Component.new(text: translation(".send_message"), color: :purple, type: "submit")) %>
+              <%= render(UI::Button::Component.new(text: translation(".send_message"), color: :primary, type: "submit")) %>
             </div>
           <% end %>
         </div>
