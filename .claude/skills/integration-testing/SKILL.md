@@ -209,6 +209,15 @@ the component does on its own, and cover page-level behaviour in the flow's own
 spec under `spec/integration/` — where the autofocus, the Turbo frame and the
 other controllers are all present.
 
+A component system spec drives the preview route, so **the preview template is
+that spec's fixture** — editing one changes what the spec starts from. Making the
+parking-notification preview open its panel on load broke
+`spec/components/pages/registrations/show/org_top_actions/parking_notification_form/component_system_spec.rb`,
+which asserts the submit is disabled before the accordion is touched; the failure
+named the button, not the preview. Give the preview a param for the state the
+spec needs (`ComponentPreview#default` takes `panel:`) rather than dropping the
+assertion.
+
 ## ActionCable broadcasts: do the real thing
 
 The test cable adapter is `:async`, so broadcasts in the test process do round-trip to the browser. **Don't synthesize `turbo:morph-element` events with `execute_script` to fake an ActionCable refresh** — call the real broadcaster (`Component.broadcast_replace_to`, `broadcast_refresh_later_to`, etc.) and let Capybara's wait do the synchronization.
