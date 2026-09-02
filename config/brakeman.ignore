@@ -140,7 +140,7 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
-      "fingerprint": "6c283be8294e8e310b00cbf0797aab7fbe201645005ea45618e9273f053f5f76",
+      "fingerprint": "e104117f60e111ef6c71cbcf1a0786cb0a8caa5ba2ac18e692a0053fa403a77c",
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/shared/_recovery_display.html.erb",
@@ -150,9 +150,9 @@
       "render_path": [
         {
           "type": "template",
-          "name": "app/components/page_block/main_content/content/component",
+          "name": "app/components/shared_blocks/main_content/content/component",
           "line": 150,
-          "file": "app/components/page_block/main_content/content/component.html.erb",
+          "file": "app/components/shared_blocks/main_content/content/component.html.erb",
           "rendered": {
             "name": "shared/_recovery_display",
             "file": "app/views/shared/_recovery_display.html.erb"
@@ -311,17 +311,17 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "ca1b827a35382eca8c5dc1df522f3fcf5e06ddf1b64bbe78ea51d840876bcc91",
+      "fingerprint": "b03a4c4d4282f543a01dd22237e2689272e328ce55828bbfdf27dc9fee56332d",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "app/components/admin/pagination_with_count/component.rb",
-      "line": 51,
+      "file": "app/components/pages/admin/pagination_with_count/component.rb",
+      "line": 52,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "collection.where(\"#{collection.table_name}.#{((time_range_column or index.time_range_column) or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "Admin::PaginationWithCount::Component",
+        "class": "Pages::Admin::PaginationWithCount::Component",
         "method": "today_count"
       },
       "user_input": "time_range_column",

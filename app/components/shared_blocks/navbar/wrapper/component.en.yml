@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    shared_blocks:
+      navbar:
+        wrapper:
+          menu: Menu
+          sign_up: Sign up
+          the_nonprofit_bike_registry: the non-profit bike registry

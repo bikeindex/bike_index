@@ -1,5 +1,5 @@
 <% index_title = capture do %>
-  <%= render Admin::Strava::RequestsRateLimitDetails::Component.new %>
+  <%= render Pages::Admin::Strava::RequestsRateLimitDetails::Component.new %>
 <% end %>
 
 <% nav_header_list_items = capture do %>
@@ -46,11 +46,11 @@
 
 <% rendered_chart = capture do %>
   <% if @render_chart %>
-    <%= render(Admin::Strava::RequestsChart::Component.new(collection: matching_strava_requests, time_range: @time_range, time_range_column: @time_range_column, show_integration_chart: params[:search_strava_integration_id].blank?)) %>
+    <%= render(Pages::Admin::Strava::RequestsChart::Component.new(collection: matching_strava_requests, time_range: @time_range, time_range_column: @time_range_column, show_integration_chart: params[:search_strava_integration_id].blank?)) %>
   <% end %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @collection,
   viewing: controller_name.humanize,

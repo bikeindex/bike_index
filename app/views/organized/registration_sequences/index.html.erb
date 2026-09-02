@@ -9,7 +9,7 @@
       <%= link_to "Preview", organization_registration_sequence_path(organization_id: current_organization.to_param, id: @active.id), class: "twlink" %>
     </p>
     <div class="tw:mb-6">
-      <%= render Org::RegistrationSequence::PageList::Component.new(registration_sequence: @active) %>
+      <%= render Pages::Org::RegistrationSequence::PageList::Component.new(registration_sequence: @active) %>
     </div>
   <% else %>
     <p class="tw:mb-2 tw:text-gray-600">
@@ -45,7 +45,7 @@
       </div>
       <%# Read-only, like the active version above - the draft has its own screen %>
       <div class="tw:mb-6">
-        <%= render Org::RegistrationSequence::PageList::Component.new(registration_sequence: @draft, editable: false) %>
+        <%= render Pages::Org::RegistrationSequence::PageList::Component.new(registration_sequence: @draft, editable: false) %>
       </div>
       <%# onsubmit, not turbo_confirm: Turbo Drive is off app-wide %>
       <div class="tw:mb-6 tw:flex">

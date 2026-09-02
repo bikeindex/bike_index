@@ -147,7 +147,7 @@ RSpec.describe "Navbar", :js, type: :system do
         registrations = find("button[aria-controls='org_sidebar_group_registrations']")
         expect(registrations["aria-expanded"]).to eq "true"
 
-        find("[data-page-block--org-sidebar-target='collapseToggle']").click
+        find("[data-shared-blocks--org-sidebar-target='collapseToggle']").click
 
         # Clicking the group that was already open has to leave it open, not toggle it shut
         registrations.click
@@ -155,7 +155,7 @@ RSpec.describe "Navbar", :js, type: :system do
         expect(page).to have_link("Search Registrations")
         expect(registrations["aria-expanded"]).to eq "true"
 
-        find("[data-page-block--org-sidebar-target='collapseToggle']").click
+        find("[data-shared-blocks--org-sidebar-target='collapseToggle']").click
         impounded = find("button[aria-controls='org_sidebar_group_impounded']")
         expect(impounded["aria-expanded"]).to eq "false"
 

@@ -1,0 +1,60 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          wrapper_org_admin:
+            about_this_bike: About this %{bike_type}
+            assign_sticker: Assign sticker
+            audit: E-Vehicle Audit
+            avery_exportable: Avery Exportable
+            claimed: Claimed
+            creation_source: Source
+            creator: Creator
+            credibility: Credibility
+            edit: Edit
+            has_duplicate_serials: has dup. serials
+            internal_notes: Internal notes
+            is_false: 'false'
+            is_true: 'true'
+            link_sticker: Link sticker
+            no_duplicate_serials: no dup. serials
+            no_other_registrations: None found
+            no_registration_information: No registration information visible to %{org_name}
+            not_audited: Not audited
+            not_registered_message: >-
+              Owner contact isn't available for bikes outside your organization. You
+              can still add internal notes.
+            not_registered_title: Not registered with %{org_name}
+            note_by: Note by %{user}
+            notes_placeholder: New internal note — your previous notes are kept in
+              the thread.
+            org_can_edit: "%{org_name} can edit this %{bike_type}"
+            org_can_edit_sub: Including after the %{bike_type} is claimed.
+            organization_registered: Organization
+            other_registrations: Other registrations by this user
+            other_registrations_count_html: "%{count} other registrations"
+            owner_access: Owner & access
+            owner_email: Email
+            owner_name: Name
+            owner_phone: Phone
+            photo_archive: Photo archive
+            post_note: Post note
+            posts_as: Posts as %{user}
+            registration_information: Registration information
+            registration_number: Bike Index Registration
+            restricted_message: >-
+              Owner contact is available to admin & staff. You can add notes and request
+              an impound.
+            restricted_title: Restricted for your role
+            role_limited: Limited
+            role_staff: Staff
+            showing_recent: Showing the %{count} most recent
+            sticker: Sticker
+            sticker_claimed: claimed
+            sticker_code: Sticker code
+            unregistered_owner: >-
+              This %{bike_type} is not registered to a user. It was added to track
+              parking notifications.
+            view_all_registrations: view all →

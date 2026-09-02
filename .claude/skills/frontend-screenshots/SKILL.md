@@ -33,6 +33,10 @@ get back local PNG paths.
 
 - `eval "$(ruby bin/env --export)"` so `$BASE_URL` is set.
 - `curl -fs "$BASE_URL/" >/dev/null` — if it isn't, **stop and ask the user to start it**. `bin/env` resolves `$DEV_PORT`/`$BASE_URL` from the workspace ID, so the bin/dev the user starts will bind to the same port and DB this skill expects.
+- A 200 there doesn't promise the next page renders. A merge from the base can leave the dev DB
+  unmigrated, and `CheckPending` only re-raises once the evented file watcher notices `db/migrate`
+  moved — so a passing curl can be followed by `ActiveRecord::PendingMigrationError` on every page.
+  `bundle exec rails db:migrate`, and read `log/development.log` before blaming the capture.
 - If `mcp__playwright__*` tools aren't registered, tell the user to run `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart.
 
 ## Sign in (with the PII gate)
@@ -117,7 +121,7 @@ Some components only render in a context you can't reproduce on a normal dev pag
 $BASE_URL/rails/view_components/<preview_path>/<scenario>
 ```
 
-`<preview_path>` is the preview class underscored with the `Preview` suffix dropped, and `<scenario>` is the preview method. `PageBlock::ReviewAppBanner::ComponentPreview#superadmin_signed_in` → `/rails/view_components/page_block/review_app_banner/component/superadmin_signed_in`. If a scenario doesn't exist yet, add a method to the component's `*_preview.rb` first — a preview that renders the exact state (pass the args that trigger it) is often the fastest path to a clean shot.
+`<preview_path>` is the preview class underscored with the `Preview` suffix dropped, and `<scenario>` is the preview method. `SharedBlocks::ReviewAppBanner::ComponentPreview#superadmin_signed_in` → `/rails/view_components/shared_blocks/review_app_banner/component/superadmin_signed_in`. If a scenario doesn't exist yet, add a method to the component's `*_preview.rb` first — a preview that renders the exact state (pass the args that trigger it) is often the fastest path to a clean shot.
 
 Use this bare route, not Lookbook's `/lookbook/...`, which wraps the component in its own browser chrome.
 

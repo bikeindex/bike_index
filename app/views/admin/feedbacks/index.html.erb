@@ -101,7 +101,7 @@
   <%= render partial: "/admin/feedbacks/table", locals: {feedbacks: @feedbacks, render_sortable: true} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @feedbacks,
   viewing: "Feedback & Messages",

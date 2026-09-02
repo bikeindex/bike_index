@@ -16,7 +16,7 @@
   </li>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   viewing: controller_name.humanize,
   collection: @ambassador_task_assignments,

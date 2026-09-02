@@ -79,7 +79,7 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
 
     # ---- Send a message through the stolen bike's contact-owner form. The owner
     # doesn't see that card (they don't contact themselves), so view the public
-    # perspective. The form is fragment-cached (Registrations::Show::Wrapper), so its
+    # perspective. The form is fragment-cached (Pages::Registrations::Show::Wrapper), so its
     # session-scoped CSRF token is reissued client-side by the csrf-refresh controller.
     # The stale-token failure itself can't be reproduced here (it needs production
     # fragment caching + forgery protection, both off in test), so this exercises the

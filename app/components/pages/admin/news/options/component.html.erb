@@ -1,0 +1,200 @@
+<div class="card" data-controller="admin--news-form">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6" data-controller="ui--collapse">
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-group">
+              <div class="form-check form-check-inline">
+                <%= @form_builder.check_box :published, class: "form-check-input" %>
+                <%= @form_builder.label :published, "Published", class: "form-check-label" %>
+              </div>
+
+              <div
+                class="<%= info_only_class %>"
+                data-admin--news-form-target="infoOnly"
+              >
+                <small class="less-strong">info posts are published at the most recent edit time</small>
+              </div>
+            </div>
+          </div>
+
+          <% unless @blog.listicle? %>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <div class="form-check form-check-inline">
+                  <%= @form_builder.label :info_kind, class: "form-check-label" do %>
+                    <%= @form_builder.check_box :info_kind, checked: @blog.info?, class: "form-check-input",
+                          data: {"admin--news-form-target": "infoKind", action: "change->admin--news-form#kindChanged"} %>
+                    Info post
+                    <small class="less-strong">static content that's updated</small>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+
+          <div
+            class="col-sm-6 <%= blog_only_class %>"
+            data-admin--news-form-target="blogOnly"
+          >
+            <div class="form-group">
+              <span class="less-strong">Publish Date:</span>
+              <span class="localizeTime"><%= l @blog.published_at, format: :convert_time %></span>
+            </div>
+          </div>
+
+          <div
+            class="col-sm-6 <%= blog_only_class %>"
+            data-admin--news-form-target="blogOnly"
+          >
+            <div class="form-check form-check-inline">
+              <%= @form_builder.check_box :post_now, class: "form-check-input" %>
+              <%= @form_builder.label :post_now, "Publish now", class: "form-check-label" %>
+
+              <%= render(UI::Button::Component.new(text: "manually edit date", color: :link, html_class: "small ml-2",
+                    aria: {expanded: false}, data: {action: "ui--collapse#toggle", "ui--collapse-target": "trigger"})) %>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group tw:hidden" data-ui--collapse-target="content">
+          <%= @form_builder.label :post_date, "Post date", class: "control-label" %>
+
+          <%= @form_builder.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
+
+          <%= @form_builder.datetime_local_field :post_date, value: post_date, max: Time.current + 1.week,
+                step: 60, required: true, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group fancy-select no-restore-on-backspace unfancy">
+          <%= @form_builder.label :content_tag_names, class: "control-label" do %>
+            Tags <small class="less-strong">at least one required</small>
+          <% end %>
+
+          <%= @form_builder.select(:content_tag_names, content_tag_options, {include_blank: true},
+                {multiple: true, class: "form-control", required: true}) %>
+        </div>
+      </div>
+
+      <div
+        class="col-md-6 <%= blog_only_class %>"
+        data-admin--news-form-target="blogOnly"
+      >
+        <div class="form-group">
+          <%= @form_builder.label :user_email, "Author email" %>
+          <%= @form_builder.email_field :user_email, placeholder: "your email", required: true, value: @blog.user.email, class: "form-control" %>
+
+          <% if author_needs_personal_page? %>
+            Please
+            <%= link_to "turn on your personal page", edit_my_account_url, target: "_blank" %>,
+            or link your twitter!
+          <% end %>
+        </div>
+      </div>
+
+      <div
+        class="col-md-6 <%= blog_only_class %>"
+        data-admin--news-form-target="blogOnly"
+      >
+        <div class="form-group">
+          <%= @form_builder.label :canonical_url, class: "control-label" do %>
+            Canonical URL
+            <small class="less-strong">(e.g. https://blogspot.com/post/1)</small>
+          <% end %>
+
+          <%= @form_builder.text_field :canonical_url, class: "form-control" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-2">
+      <div class="col-md-6">
+        <div class="form-group">
+          <div class="controls">
+            <label>
+              <input
+                type="radio"
+                name="index_image_id"
+                value="0"
+                class="index_image_0"
+              >
+              No primary image
+              <small class="less-strong">Otherwise, select a primary image with the radio button next to the image</small>
+            </label>
+
+            <%= @form_builder.hidden_field :index_image_id %>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="col-md-6 <%= blog_only_class %>"
+        data-admin--news-form-target="blogOnly"
+      >
+        <div class="form-group">
+          <div class="form-check form-check-inline">
+            <%= @form_builder.check_box :update_title, class: "form-check-input" %>
+            <%= @form_builder.label :update_title, "Update URL", class: "form-check-label" %>
+          </div>
+
+          <span class="text-danger">This will break existing links!</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-2">
+      <div class="col-md-6">
+        <div class="form-group">
+          <%= @form_builder.label :title, class: "control-label" %>
+          <%= @form_builder.text_field :title, placeholder: "Blog title", class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <%= @form_builder.label :secondary_title, class: "control-label" do %>
+            Secondary title <small class="less-strong">optional</small>
+          <% end %>
+
+          <%= @form_builder.text_field :secondary_title, placeholder: "", class: "form-control" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group mb-4">
+      <%= @form_builder.label :description_abbr, "Abbreviated description", class: "control-label" %>
+
+      <%= @form_builder.text_field :description_abbr, class: "form-control",
+            placeholder: "Description/subtitle shown on the homepage - will be the text below unless you enter something." %>
+
+      <div class="mt-0">
+        Default: <em class="less-strong"><%= @blog.body_abbr %></em>
+      </div>
+    </div>
+
+    <div class="row mt-2">
+      <div class="col-sm-3">
+        <div class="form-group">
+          <%= @form_builder.select :language, options_for_select(helpers.language_choices, selected: @blog.language), {}, class: "form-control" %>
+        </div>
+      </div>
+
+      <div class="col-sm-3 col-6">
+        <a
+          class="btn btn-primary"
+          target="_blank"
+          href="<%= news_url(@blog.to_param) %>"
+        >
+          Preview
+        </a>
+      </div>
+
+      <div class="col-6 text-right">
+        <%= @form_builder.submit "Save", class: "btn btn-success" %>
+      </div>
+    </div>
+  </div>
+</div>

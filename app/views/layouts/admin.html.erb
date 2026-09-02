@@ -2,7 +2,7 @@
 
 <html>
   <head>
-    <%= render(PageBlock::HeaderTags::Component.new(**header_tags_component_options)) %>
+    <%= render(SharedBlocks::HeaderTags::Component.new(**header_tags_component_options)) %>
     <%= csrf_meta_tags %>
 
     <link
@@ -39,9 +39,9 @@
   <% admin_body_class = "news-page" if controller_name == "news" %>
 
   <%= body_tag(html_class: admin_body_class) do %>
-    <%= render(PageBlock::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
+    <%= render(SharedBlocks::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
 
-    <%= render(Admin::Navbar::Component.new(current_user:, user_root_url:, search_filtered: admin_search_filtered?)) %>
+    <%= render(Pages::Admin::Navbar::Component.new(current_user:, user_root_url:, search_filtered: admin_search_filtered?)) %>
 
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
 

@@ -90,7 +90,7 @@
   <%= render partial: "/admin/bulk_imports/table", locals: {collection: @bulk_imports, render_sortable: true} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @bulk_imports,
   viewing: "Bulk imports",

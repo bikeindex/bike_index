@@ -35,7 +35,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(page).to have_css("#org_sidebar_nav button[data-active='true']", text: label, count: 1)
   end
 
-  let(:scroller) { "[data-page-block--org-sidebar-target='scroller']" }
+  let(:scroller) { "[data-shared-blocks--org-sidebar-target='scroller']" }
 
   def scroller_top
     page.evaluate_script("document.querySelector(\"#{scroller}\").scrollTop")
@@ -117,10 +117,17 @@ RSpec.describe "Organization sidebar", :js, type: :system do
   it "opens the first group on a page no row matches, and leaves the organization from it" do
     visit "/my_account"
 
+    # Alone among these examples, everything asserted below is an absence -- and the row
+    # count `expect_open` waits for is the template's, not a controller's. So without this
+    # they'd all pass on a page that has connected nothing, then fail whenever the run
+    # lands between ui--collapse flagging the open group data-active and
+    # shared-blocks--org-sidebar clearing it
+    wait_for_stimulus
+
     expect_open("#{organization.short_name} Registrations")
     # The scroller holds the menu rows -- the account block below it points at /my_account,
     # so one of its own rows is current here
-    expect(page).to have_no_css "[data-page-block--org-sidebar-target='scroller'] a[aria-current]", visible: :all
+    expect(page).to have_no_css "[data-shared-blocks--org-sidebar-target='scroller'] a[aria-current]", visible: :all
     # Open, but no more the page than any other group
     expect(page).to have_no_css "#org_sidebar_nav button[data-active='true']"
 

@@ -1,0 +1,90 @@
+---
+en:
+  components:
+    pages:
+      register:
+        step2:
+          add_another_color: Add another color
+          add_your_bikes_details: Add your %{cycle_type}'s details
+          additional_serial_sticker_number: Additional serial/sticker number
+          affiliation: "%{org_name} affiliation"
+          are_you_certain: Are you certain?
+          attach_photo: Attach photo of %{cycle_type}
+          bike_details: "%{cycle_type} details"
+          bottom_bracket: Bottom bracket
+          cm: cm
+          color: Color
+          complete_registration: Complete %{cycle_type} Registration
+          confirmation_link_sent: >-
+            We've sent a confirmation link to your email. No need to wait — you can
+            finish registering right now.
+          contact_info: Contact info
+          database_public_note: >-
+            Our database is public! You can adjust privacy settings on individual
+            photos from your registration later.
+          email: Email
+          enter_size: Enter size
+          found: Found/Abandoned
+          found_description: I found this %{cycle_type}
+          frame_size: Frame size
+          from_step_1: From step 1
+          head_tube: Head tube
+          how_to_find_serial: how to find your serial number
+          i_just_dont_know_the_serial: I just don't know the serial
+          im_100_sure: I'm 100% sure
+          inches: inches
+          information_for_org: Information for %{org_name}
+          is_a_handmade_frame: Is a handmade frame
+          it_probably_has_a_serial_number: It probably has a serial number.
+          missing_serial: Missing serial
+          model: Model
+          model_placeholder: e.g. Marlin 7
+          model_year: Model year
+          model_year_placeholder: e.g. 2023
+          more_useful_registration: The more you add, the more useful the registration
+            is.
+          nevermind: Nevermind
+          next: Next
+          optional: optional
+          or: or
+          owner_name: Owner name
+          owner_name_placeholder: First & Last name
+          owner_registration: Owner Registration
+          owner_registration_description: Registering for myself or on behalf of owner
+          phone: Phone
+          phone_placeholder: "(555) 000-0000"
+          phone_required_found: Phone is required to register a found %{cycle_type}
+          phone_required_stolen: Phone is required to register a stolen %{cycle_type}
+          primary_color_blank: Primary color — e.g. Black
+          read_how_to_find_html: Read about %{how_to_find_link} <small>(opens in a
+            separate window)</small>
+          rear_dropouts: Rear dropouts
+          register_with_org: Register with %{org_name}
+          register_with_org_description: "%{org_name} will be able to see and help
+            manage this registration."
+          registration_type: Registration type
+          remove_additional_color: Remove color
+          second_color_blank: Second color — e.g. Red
+          serial_help_intro: >-
+            Most bicycles have their serial number engraved on the frame. Look for
+            your serial number:
+          serial_location_bottom_bracket: underside of the bottom bracket
+          serial_location_head_tube: on the head tube
+          serial_location_rear_dropouts: on rear dropouts
+          serial_number: Serial number
+          serial_placeholder: Required — or mark missing
+          sticker_number: Bike Index sticker number
+          sticker_placeholder: e.g. A 471 829
+          stolen: Stolen
+          stolen_description: This %{cycle_type} has been stolen
+          student_id: Student ID
+          third_color_blank: Third color
+          up_to_3: up to 3
+          very_very_few_bikes_html: >-
+            Very <em>very</em> few %{cycle_types} are made without serials. Unless
+            this %{cycle_type}:
+          view_serial_guide: View the full serial number guide
+          was_made_before_1970: Was made before 1970
+          wheres_my_serial: Where's my serial number?
+          without_serial: This %{cycle_type} was made without a serial
+          without_serial_number: This %{cycle_type} was made without a serial number

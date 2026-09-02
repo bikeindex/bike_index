@@ -10,14 +10,14 @@
       Bike Index Marketplace
     </h1>
 
-    <%= render Search::Form::Component.new(target_search_path: search_marketplace_path,
+    <%= render Pages::Search::Form::Component.new(target_search_path: search_marketplace_path,
       target_frame: :marketplace_results_frame, interpreted_params: @interpreted_params,
       currency: @currency, marketplace_scope: @marketplace_scope, price_min_amount: @price_min_amount,
       price_max_amount: @price_max_amount, result_view: @result_view, search_obj_name: @search_obj_name) %>
   </div>
 <% end %>
 
-<%= render SearchResults::Frame::Component.new(frame_id: :marketplace_results_frame,
+<%= render Pages::SearchResults::Frame::Component.new(frame_id: :marketplace_results_frame,
   render_results: @render_results, current_path: request.original_fullpath,
   loading_text: t(".loading_results")) do %>
   <%= turbo_frame_tag "page_#{@pagy.page}" do %>

@@ -1,5 +1,5 @@
 .container
   - unsubscribe_url = unsubscribe_update_user_path(@user.unsubscribe_signed_id)
-  = render Sessions::SignInInterstitial::Component.new(url: unsubscribe_url,
+  = render Pages::Sessions::SignInInterstitial::Component.new(url: unsubscribe_url,
     heading: t(".confirm_unsubscribe"),
     submit_text: t(".unsubscribe"))

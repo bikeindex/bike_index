@@ -4,7 +4,7 @@ $primary-logo-padding-mobile: $vertical-height;
 $mainmenu-transform-speed: 200ms;
 $mainmenu-width: 80%;
 $mainmenu-open-zindex: 10;
-// Fallback for --navbar-bottom, which positionMenu (page_block/navbar_controller.js)
+// Fallback for --navbar-bottom, which positionMenu (shared_blocks/navbar_controller.js)
 // sets to where the small screen navbar really ends when the menu opens
 $mobile-nav-height: 4 * $vertical-height;
 

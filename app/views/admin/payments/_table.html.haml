@@ -42,7 +42,7 @@
           - unless skip_user
             %td
               = cache(payment.user) do
-                = render Admin::Users::Cell::Component.new(sort_state:, email: payment.email, user: payment.user, render_search: render_sortable)
+                = render Pages::Admin::Users::Cell::Component.new(sort_state:, email: payment.email, user: payment.user, render_search: render_sortable)
           %td
             - if payment.referral_source.present?
               %code.small= payment.referral_source

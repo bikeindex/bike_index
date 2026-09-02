@@ -1,0 +1,90 @@
+<li class="bike-box-item tw:odd:bg-gray-100 tw:dark:odd:bg-gray-800">
+  <a
+    class="bike-list-image <%= 'hover-expand' if @bike.thumb_path %>"
+    href="<%= @bike.html_url %>"
+    data-turbo="false"
+  >
+    <%= bike_thumb_image(@bike) %>
+  </a>
+
+  <div class="bike-information <%= 'multi-attr-lists' if render_second_column? %>">
+    <h5 class="title-link">
+      <%= link_to bike_title_html(@bike),
+      @bike.html_url,
+      data: {
+        turbo: false,
+      },
+      class: "tw:cursor-pointer tw:hover:underline" %>
+    </h5>
+
+    <ul class="attr-list">
+      <% if @bike.deleted? %>
+        <li>
+          <strong class="attr-title">
+            <%= translation(".removed_from") %>:
+          </strong>
+
+          <span class="localizeTime">
+            <%= l @bike.deleted_at, format: :convert_time %>
+          </span>
+        </li>
+      <% end %>
+
+      <li>
+        <strong class="attr-title"><%= translation(".serial") %>:</strong>
+        <%# current_user is only present if not cached %>
+        <%= render(Atoms::Serial::Component.new(bike: @bike, user: @current_user)) %>
+      </li>
+
+      <%= attr_list_item(@bike.frame_colors.to_sentence, translation(".primary_colors")) %>
+    </ul>
+
+    <% if render_second_column? %>
+      <ul class="attr-list">
+        <% if render_for_sale_info? %>
+          <li>
+            <%= price_span %>:
+            <%= amount_display(@event_record, currency_name_suffix: true) %>
+          </li>
+          <%= attr_list_item(
+            @event_record.formatted_address_string,
+            translation(".location"),
+          ) %>
+          <li>
+            <strong class="attr-title">
+              <%= translation(".posted_at") %>:
+            </strong>
+
+            <% if @event_record.published_at.present? %>
+              <span class="localizeTime">
+                <%= l @event_record.published_at, format: :convert_time %>
+              </span>
+            <% else %>
+              <%= translation(".not_applicable") %>
+            <% end %>
+          </li>
+          <% if @event_record.end_at.present? %>
+            <li>
+              <strong class="attr-title">
+                <%= translation(".ended_at") %>:
+              </strong>
+
+              <span class="localizeTime">
+                <%= l @event_record.end_at, format: :convert_time %>
+              </span>
+            </li>
+          <% end %>
+        <% else %>
+          <li>
+            <%= bike_status_span(@bike) %>:
+            <span class="localizeTime"><%= l occurred_at_with_fallback, format: :convert_time %></span>
+          </li>
+          <%= attr_list_item(
+            @event_record.formatted_address_string,
+            translation(".location"),
+          ) %>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+</li>

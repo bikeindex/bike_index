@@ -1,0 +1,16 @@
+---
+en:
+  components:
+    shared_blocks:
+      review_app_banner:
+        commit_tooltip: 'current commit:'
+        disclaimer: data is ephemeral
+        label: Review app
+        label_development: Development
+        label_sandbox: Sandbox
+        letter_opener_link: email outbox
+        letter_opener_tooltip: View the email sent by this review app
+        no_superadmin: no superuser (can't signin)
+        pr_link: 'PR #%{number}'
+        superadmin_button: sign in as superadmin
+        superadmin_signed_in: signed in as superadmin

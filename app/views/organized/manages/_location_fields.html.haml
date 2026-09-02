@@ -16,7 +16,7 @@
       = f.label :street, t(".address")
     .col-sm-8
       = f.fields_for :address_record do |address_form|
-        = render(Org::LocationAddressFields::Component.new(form_builder: address_form, show_label: false))
+        = render(Pages::Org::LocationAddressFields::Component.new(form_builder: address_form, show_label: false))
 
 
 - else
@@ -34,7 +34,7 @@
               = f.text_field :phone, class: "form-control"
 
         = f.fields_for :address_record do |address_form|
-          = render(Org::LocationAddressFields::Component.new(form_builder: address_form))
+          = render(Pages::Org::LocationAddressFields::Component.new(form_builder: address_form))
 
         .row
           .col-xs-6

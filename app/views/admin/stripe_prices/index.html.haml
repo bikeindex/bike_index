@@ -1,3 +1,3 @@
 -# table_view = render partial: "/admin/memberships/table", locals: {memberships: @collection, render_sortable: true}
 
-= render(Admin::IndexSkeleton::Component.new(index: admin_index_state, collection: @collection, viewing: controller_name.humanize, chart_collection: @render_chart && matching_stripe_prices))
+= render(Pages::Admin::IndexSkeleton::Component.new(index: admin_index_state, collection: @collection, viewing: controller_name.humanize, chart_collection: @render_chart && matching_stripe_prices))

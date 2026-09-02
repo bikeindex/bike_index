@@ -5,7 +5,7 @@
   )) %>
 <% end %>
 
-<%= render(Org::ImpoundRecordsIndex::Component.new(
+<%= render(Pages::Org::ImpoundRecordsIndex::Component.new(
   pagy: @pagy,
   impound_records: @impound_records,
   search_status: @search_status,
