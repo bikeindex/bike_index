@@ -216,6 +216,15 @@ RSpec.describe Organized::ExportsController, type: :request do
           expect(flash).to_not be_present
         end
       end
+      context "organization with registration_notes" do
+        let(:enabled_feature_slugs) { %w[csv_exports registration_notes] }
+        it "offers the notes column" do
+          get "#{base_url}/new"
+          expect(response.code).to eq("200")
+          expect(response.body).to include("export_headers_organization_notes")
+          expect(response.body).to include("Organization Notes")
+        end
+      end
       context "passed properties" do
         let(:export_properties) do
           {

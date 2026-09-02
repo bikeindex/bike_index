@@ -53,7 +53,7 @@ class Export < ApplicationRecord
     vehicle_type
   ].freeze
   PERMITTED_HEADERS = (DEFAULT_HEADERS + EXTRA_HEADERS).sort.freeze
-  FEATURE_HEADERS = %w[partial_registration is_impounded impounded_at].freeze
+  FEATURE_HEADERS = %w[partial_registration is_impounded impounded_at organization_notes].freeze
   HEADERS_FOR_AVERY_EXPORT = %w[address owner_name].freeze
 
   acts_as_paranoid
@@ -125,6 +125,7 @@ class Export < ApplicationRecord
         additional_headers = reg_field_headers(organization_or_overide.additional_registration_fields)
         additional_headers += %w[partial_registration] if organization_or_overide.enabled?("show_partial_registrations")
         additional_headers += %w[is_impounded impounded_at] if organization_or_overide.enabled?("impound_bikes")
+        additional_headers += %w[organization_notes] if organization_or_overide.enabled?("registration_notes")
       end
       additional_headers ||= []
       # We always give the option to export extra_registration_number, don't double up if org can add too
