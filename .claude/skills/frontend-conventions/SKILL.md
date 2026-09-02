@@ -186,7 +186,7 @@ in, neither of which shows up as an error — the page just behaves oddly:
   — `Pages::Register::Page` and `Pages::SearchResults::Frame` are the examples — and a restoration re-fetches
   instead of showing a page the user has moved past.
 
-`RegisterController` and the `Register::` components are the worked example of both.
+`RegisterController` and the `Pages::Register::` components are the worked example of both.
 
 ## Admin screens
 
