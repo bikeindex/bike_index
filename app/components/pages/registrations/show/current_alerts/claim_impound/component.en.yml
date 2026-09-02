@@ -23,8 +23,8 @@ en:
               prove_its_yours: Verify your ownership — add details that prove this
                 %{bike_type} is yours
               save_message: Save message
-              select_your_stolen_bike: Select the stolen %{bike_type} you own that
-                matches this impound
+              select_your_stolen_bike: Select your stolen %{bike_type} matching this
+                impounded %{bike_type}
               submit_claim: Submit claim
               view_claimed_bike_type: view the claimed %{kind} %{bike_type}
               your_claim: Your claim

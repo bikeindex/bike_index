@@ -22,7 +22,7 @@
         <%= form.text_field :reference_url, placeholder: translation(".link_url"), class: "twinput tw:mt-2 tw:w-full" %>
 
         <div class="tw:mt-3">
-          <%= render(UI::Button::Component.new(text: translation(".send_message"), color: :purple, type: "submit")) %>
+          <%= render(UI::Button::Component.new(text: translation(".send_message"), color: :primary, type: "submit")) %>
         </div>
       <% end %>
     </div>
