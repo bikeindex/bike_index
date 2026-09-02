@@ -25,10 +25,7 @@ export default class extends Controller {
     this.hamburglerButtonTarget.dataset.active = 'true'
     this.hamburglerButtonTarget.setAttribute('aria-expanded', 'true')
     // So that it animates in, rather than appearing
-    this.afterTransition(() => {
-      this.element.classList.add('menu-in')
-      document.body.classList.add('menu-in')
-    }, 50)
+    setTimeout(() => this.syncMenu(), 50)
   }
 
   closeMenu () {
@@ -37,15 +34,17 @@ export default class extends Controller {
     this.element.classList.remove('menu-in')
     document.body.classList.remove('menu-in')
     // Hide it once it has animated out, so it stays hidden even on opera mini
-    this.afterTransition(() => this.element.classList.remove('enabled'), TRANSITION_MS)
+    setTimeout(() => this.syncMenu(), TRANSITION_MS)
   }
 
-  // Both halves of the toggle finish in a timeout, so a second tap arriving before
-  // one ran left it to apply half of the state it had just undone: the backdrop up
-  // over an unscrollable page, or the menu display:none behind an open hamburgler
-  afterTransition (change, delay) {
-    clearTimeout(this.pendingTransition)
-    this.pendingTransition = setTimeout(change, delay)
+  // Both halves of the toggle land in a timeout, so read the state where it runs
+  // rather than where it was scheduled -- a tap in between makes the other stale
+  syncMenu () {
+    const open = this.menuOpen
+
+    this.element.classList.toggle('menu-in', open)
+    document.body.classList.toggle('menu-in', open)
+    this.element.classList.toggle('enabled', open)
   }
 
   toggleDropdown (event) {

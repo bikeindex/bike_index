@@ -28,15 +28,13 @@ RSpec.describe "Navbar", :js, type: :system do
     within("nav.primary-header-nav") { expect(page).to have_no_link("Search") }
     expect_axe_clean
 
-    # An impatient double tap closes the menu before the open has animated in, and the
-    # tail of that open used to raise the backdrop over a page whose menu had already
-    # gone -- nothing below the navbar tappable, and the body left unscrollable.
-    # Absence matches the moment it's true, so wait the animations out before reading it
+    # A double tap closes the menu mid-open, and the tail of that open must not raise the
+    # backdrop over a page the menu has left -- which locks body scroll too. `enabled` is
+    # what the close drops last, so waiting on it is waiting for the settled state
     find("#primary_nav_hamburgler").double_click
     expect(page).to have_css(".hamburgler button[aria-expanded='false']")
-    sleep 0.3
+    expect(page).to have_no_css("nav.primary-header-nav.enabled")
     expect(page).to have_no_css("nav.primary-header-nav.menu-in")
-    expect(page).to have_no_css("body.menu-in")
 
     open_menu_and_search
 

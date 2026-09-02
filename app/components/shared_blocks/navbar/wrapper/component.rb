@@ -8,7 +8,7 @@ module SharedBlocks
       # logo_only renders just the logo, for the OAuth authorization prompt.
       class Component < ApplicationComponent
         # Digest of the cached template — the cached_markup_digest spec keeps it current
-        MARKUP_DIGEST = "9d184aaa2192"
+        MARKUP_DIGEST = "4df279b0c5ca"
 
         def initialize(logo_only: false, current_user: nil, current_user_or_unconfirmed_user: nil,
           passive_organization: nil, old_register_view: false)

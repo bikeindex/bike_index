@@ -5,6 +5,10 @@ module SharedBlocks
     module PrimaryMenu
       # The navbar's main menu, rendered from a manifest of items rather than repeated markup
       class Component < ApplicationComponent
+        # Rows that exist on both sides of the navbar's breakpoint, so each has to hide
+        # on the other -- the desktop side takes two classes, mobile-first
+        SIDE_CLASSES = {mobile: "d-lg-none", desktop: "d-none d-lg-block"}.freeze
+
         def initialize(current_user_or_unconfirmed_user:)
           @current_user_or_unconfirmed_user = current_user_or_unconfirmed_user
         end
@@ -12,26 +16,28 @@ module SharedBlocks
         private
 
         def menu_items
-          [search_item("d-lg-none"),
-            marketplace_item("d-lg-none"),
-            {type: :divider, item_class: "d-lg-none"},
+          [search_item(:mobile),
+            marketplace_item(:mobile),
+            {type: :divider, item_class: SIDE_CLASSES.fetch(:mobile)},
             *account_items,
             {label: translation(".help"), path: help_path},
             {label: translation(".stolen_bike"), path: get_your_stolen_bike_back_path},
             {label: translation(".donate"), path: why_donate_path},
             {label: translation(".blog"), path: news_index_path, match_paths: "#{news_index_path}/**"},
-            marketplace_item("d-none d-lg-block"),
-            search_item("d-none d-lg-block")]
+            marketplace_item(:desktop),
+            search_item(:desktop)]
         end
 
         # Active anywhere in the registration search — any stolenness, a query, page 2 — which
         # naming no match_params gets: the stolenness this happens to link to isn't compared
-        def search_item(item_class)
-          {label: translation(".search"), path: helpers.default_bike_search_path, item_class:}
+        def search_item(side)
+          {label: translation(".search"), path: helpers.default_bike_search_path,
+           item_class: SIDE_CLASSES.fetch(side)}
         end
 
-        def marketplace_item(item_class)
-          {label: translation(".marketplace"), path: search_marketplace_path, item_class:}
+        def marketplace_item(side)
+          {label: translation(".marketplace"), path: search_marketplace_path,
+           item_class: SIDE_CLASSES.fetch(side)}
         end
 
         def account_items

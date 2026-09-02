@@ -89,8 +89,7 @@
   }
 }
 
-// $grid-breakpoint-lg is where the menu stops being the hamburgler's and carries a
-// signup link of its own -- a pixel earlier and neither one shows
+// Below $grid-breakpoint-lg the menu's own signup link is still behind the hamburgler
 @media screen and (min-width: $grid-breakpoint-lg) {
   .center-navbar-signup-link-container {
     display: none;
