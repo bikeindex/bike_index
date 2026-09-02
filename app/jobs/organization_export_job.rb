@@ -171,7 +171,14 @@ class OrganizationExportJob < ApplicationJob
     when "vehicle_type" then bike.type_titleize
     when "motorized" then bike.motorized?
     when "status" then bike.status_humanized_no_with_owner
+    when "organization_notes" then organization_note_bodies[bike.id]
     end
+  end
+
+  # to_h can't collide: unique index on (bike_id, organization_id)
+  def organization_note_bodies
+    @organization_note_bodies ||= BikeOrganizationNote.where(organization_id: @export.organization_id)
+      .pluck(:bike_id, :body).to_h
   end
 
   def assign_bike_code_and_increment(bike)

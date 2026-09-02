@@ -60,6 +60,16 @@ Keep, without hesitating, the ones tied to a failure mode: a conditional branch,
 
 This applies to the branch's specs, not the suite's. Don't delete pre-existing examples you merely moved between files.
 
+### The documentation audit
+
+When the branch adds or edits `CLAUDE.md`/`AGENTS.md` or anything under `.claude/skills/`, check every
+claim it makes against the code before pushing — a doc asserting *why* something is done is as capable of
+being wrong as a comment, and nothing runs it. Two on one branch here: "a `<td>` ignores the height the
+animation drives" (it doesn't — measured 346px → 0), and "the homepage can still answer" a pending
+migration (`migration_error = :page_load` raises for every request; the real cause was the file watcher's
+race). Both read as obvious. Also check what the edit *moved* — a rule relocated into a skill is a rule
+that only loads when that skill triggers.
+
 ### The comment audit
 
 **Required, not conditional on the diff looking clean.** List the comments the branch adds or edits:

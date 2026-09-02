@@ -102,8 +102,6 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 - **Moving a file silently un-suppresses whatever was keyed to its old path.** `.herb.yml` excludes lint rules by path, and `brakeman.ignore` hashes the file path into each fingerprint — so a rename re-enables the rule and obsoletes the entry, and neither says so until CI fails. Grep the repo root and `config/` for the old path, not just `app/`; re-fingerprint brakeman from `brakeman -f json` rather than hand-editing the path.
 - **Multi-database**: primary (`ApplicationRecord`) + analytics (`AnalyticsRecord`). Use `db:migrate:down:analytics` for analytics migrations
 - **Soft delete**: some models use `acts_as_paranoid` with `deleted_at` column; use `unscoped` in admin controllers when needed
-- **Admin search**: `sortable_search_params` auto-includes any param starting with `search_`
-- **Admin record screens are tabs**: a record with more than one super-admin page gets `Pages::Admin::Headers::Tabs::Component`, with the section's own tabs named in a component of its own (`Pages::Admin::Organizations::Tabs` is the pattern) rather than in each view.
 - **Every user has a `password_digest`** — `User#set_calculated_attributes` gives passwordless accounts a random one so `has_secure_password` is satisfied. So it answers nothing about whether someone chose a password; `passwordless_user?` is that question.
 
 # Initial setup
