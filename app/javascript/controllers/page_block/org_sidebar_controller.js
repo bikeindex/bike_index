@@ -184,7 +184,7 @@ export default class extends Controller {
 
       const target = scrolls ? scroller : window
       target.scrollBy({ top: delta, behavior: 'smooth' })
-    }, COLLAPSE_DURATION_MS) // so a group's rows are in place before they're measured
+    }, COLLAPSE_DURATION_MS)
   }
 
   closeOnEscape () {

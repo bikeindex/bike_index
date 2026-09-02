@@ -57,6 +57,8 @@ export default class extends Controller {
     this.applyRepeat(this.repeatSelected, 0)
   }
 
+  // Not collapse()'s default by another name: applyRepeat forwards this to startLocation,
+  // which defaults to 0 and would resize the map before the reveal finished
   selectRepeat (event) {
     this.applyRepeat(event.target.value === 'true', COLLAPSE_DURATION_MS)
   }

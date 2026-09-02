@@ -1,8 +1,9 @@
 // collapse-utils.js
 // Utility class for handling element collapse animations
 
-// How long a collapse animates for. Exported so a caller timing something against the
-// animation waits exactly as long as it runs.
+// show/hide build `tw:duration-${duration}` at runtime, which tailwind's scanner can't see -
+// the build only carries 200/300/500, from ERB that writes them literally. Change this to
+// anything else and the transition silently stops applying while the timers still wait.
 export const COLLAPSE_DURATION_MS = 200
 
 /**
