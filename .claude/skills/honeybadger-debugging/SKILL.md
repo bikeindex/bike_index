@@ -8,10 +8,9 @@ description: >-
   "in production" (`Vips::Error`, `NoMethodError in AfterStolenRecordSaveJob`),
   or phrasings like "fix this Honeybadger error", "why is this erroring in
   prod", "what's causing this exception", "look at this HB fault". Use
-  `bin/binx_hb` for fault and notice detail rather than the Honeybadger MCP,
-  whose notice objects run ~3K tokens each. Not for a broad production health
-  sweep across many sources, and not for reading raw log files (that's
-  production-log-inspection).
+  `bin/binx_hb` for fault and notice detail; it is the only Honeybadger reader
+  this repo uses. Not for a broad production health sweep across many sources,
+  and not for reading raw log files (that's production-log-inspection).
 ---
 
 # Fixing a Honeybadger exception
@@ -32,14 +31,12 @@ line — answer follow-up questions with `jq` against that file rather than
 fetching again.
 
 It reads `HONEYBADGER_PERSONAL_AUTH_TOKEN` from `.env.development`. Without it
-the command exits saying so; fall back to the Honeybadger MCP's
-`list_fault_notices` **through a subagent**, so the payload stays out of the main
-context.
-
-**Why not the MCP directly:** its notice objects carry `backtrace` and
-`application_trace` as byte-identical copies plus full environment blobs — ~3K
-tokens for a backtrace `binx_hb` projects in ~700. The MCP is still right for
-aggregates (`get_project_report`, `get_fault_counts`).
+the command exits saying so — get a new token at honeybadger.io/users/edit and
+ask the user to set it. Don't fall back to the `honeybadger` MCP server: its
+results land in context with no way to redirect them to a file, and a notice's
+`backtrace` field alone can run 130 KB (measured on a Grape API
+`Redis::TimeoutError`, 2026-09-01) against the ~700 tokens `binx_hb` projects it
+into. Aggregates are covered too — `binx_hb trend` and `binx_hb counts`.
 
 ## Read the notice in this order
 
