@@ -18,10 +18,9 @@ RSpec.describe UI::ButtonGroup::Component, type: :component do
     expect(render_inline(described_class.new(entries: [{label: "only <strong>not</strong> impounded", href: "/x"}]))).to have_css("a span strong", text: "not")
   end
 
-  # The chip carries the classes the radio group's <label> chips are built from, so the
-  # two groups can't drift apart
-  it "styles the chips like the radio group's" do
-    expect(component.css("a").first["class"].split).to include(*described_class::RESTING_CHIP_CLASSES.split)
+  # Equality, not include: an extra utility here is a visual difference from the button
+  it "styles the chips as UI::Button's secondary" do
+    expect(component.css("a").first["class"]).to eq(UI::Button::Component.build_classes(color: :secondary, size: :md))
   end
 
   context "entries without an href" do
