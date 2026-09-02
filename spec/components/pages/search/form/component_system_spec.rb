@@ -14,6 +14,8 @@ RSpec.describe Pages::Search::Form::Component, :js, type: :system do
     CGI.parse(uri.query || "")
   end
 
+  # Kept after fixing the combobox's focus steal (search--everything-combobox's
+  # focusMovedOn) — the tag predates it and covers the VCR/geocoder cases too
   describe "EverythingCombobox", :flaky do
     # The combobox autocomplete is served locally by Search::ComboboxController,
     # so load the autocomplete data the combobox queries against.
@@ -34,9 +36,8 @@ RSpec.describe Pages::Search::Form::Component, :js, type: :system do
     end
 
     # Type a query into the combobox, then click the matching autocomplete option.
-    # Selecting refocuses the combobox asynchronously, and anything typed into another
-    # field before that lands goes to the combobox instead - so wait for it to close,
-    # the same as a user who types on once the dropdown has gone.
+    # The open dropdown overlays the rest of the form, so wait for it to close before
+    # touching another field, the same as a user who types on once it has gone.
     def combobox_select(query, option_text)
       type_into(".hw-combobox__input", query)
       expect(page).to have_css(".hw-combobox__option", text: option_text, wait: 30)

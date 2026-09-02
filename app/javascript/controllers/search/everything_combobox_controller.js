@@ -105,8 +105,17 @@ export default class extends Controller {
       this.syncQueryItems()
       window.kindControllerUpdateAfterComboboxChange?.()
       // Keep focus in the field after a mouse selection so enter still submits
-      this.inputElement?.focus()
+      if (!this.focusMovedOn) this.inputElement?.focus()
     })
+  }
+
+  // This runs a task late, by which time the reader may have clicked into another
+  // field -- taking focus back there eats the first characters they type. Nothing
+  // focused (body) means the clicked option was removed, which is still ours to take
+  get focusMovedOn () {
+    const active = document.activeElement
+
+    return Boolean(active) && active !== document.body && !this.element.contains(active)
   }
 
   syncQueryItems () {
