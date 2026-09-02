@@ -89,7 +89,9 @@
   }
 }
 
-@media screen and (min-width: 991px) {
+// $grid-breakpoint-lg is where the menu stops being the hamburgler's and carries a
+// signup link of its own -- a pixel earlier and neither one shows
+@media screen and (min-width: $grid-breakpoint-lg) {
   .center-navbar-signup-link-container {
     display: none;
   }

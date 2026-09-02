@@ -20,7 +20,7 @@ module SharedBlocks
             {label: translation(".stolen_bike"), path: get_your_stolen_bike_back_path},
             {label: translation(".donate"), path: why_donate_path},
             {label: translation(".blog"), path: news_index_path, match_paths: "#{news_index_path}/**"},
-            marketplace_item("d-lg-block"),
+            marketplace_item("d-none d-lg-block"),
             search_item("d-none d-lg-block")]
         end
 
