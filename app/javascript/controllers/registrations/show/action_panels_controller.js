@@ -32,8 +32,15 @@ export default class extends Controller {
     this.panelTargets.forEach((panel) => {
       const show = panel.dataset.panelName.split(' ').includes(name)
       collapse(show ? 'show' : 'hide', panel, duration)
-      // Let the panel react to which name opened it (e.g. impound vs notification)
-      if (show) this.dispatch('shown', { target: panel, detail: { name } })
+      // Let the panel react to which name opened it (e.g. impound vs notification).
+      // `shown` fires once, so a panel controller whose module lands later reads the
+      // name here instead — cleared on hide, or a reconnect would reapply it
+      if (show) {
+        panel.dataset.openedAs = name
+        this.dispatch('shown', { target: panel, detail: { name } })
+      } else {
+        delete panel.dataset.openedAs
+      }
     })
     this.triggerTargets.forEach((trigger) => {
       const active = String(trigger.dataset.panelName === name)
