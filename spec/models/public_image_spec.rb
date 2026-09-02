@@ -1,5 +1,4 @@
 require "rails_helper"
-require "image_processing/vips" # For the unsharpened baseline
 
 RSpec.describe PublicImage, type: :model do
   describe "default_name" do
@@ -208,24 +207,6 @@ RSpec.describe PublicImage, type: :model do
         expect(public_image.image_url("large")).to eq public_image.image_url(:large)
         expect(public_image.image_url(:large)).to_not eq public_image.image_url
       end
-    end
-  end
-
-  describe "variants" do
-    let(:image_path) { "spec/fixtures/bike_photo-landscape.jpeg" }
-    let(:public_image) { FactoryBot.create(:public_image, :with_attached_file, image_path:) }
-    # What the variant does, minus the sharpening mask trailing its dimensions
-    let(:unsharpened) do
-      ImageProcessing::Vips.source(Rails.root.join(image_path))
-        .resize_to_fit(*PublicImage::VARIANTS[:medium][:resize_to_fit].first(2))
-        .convert("webp").call.read
-    end
-
-    # image_processing 2.0 turned vips sharpening after resize off by default, softening every
-    # variant. The mask is worth ~36% of the edge energy
-    it "sharpens after the resize" do
-      expect(edge_energy(public_image.file.variant(:medium).processed.download))
-        .to be > edge_energy(unsharpened) * 1.2
     end
   end
 

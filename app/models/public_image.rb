@@ -34,12 +34,11 @@ class PublicImage < ApplicationRecord
 
   # Sized for display rather than for the source: `large` covers the show page hero at 2x, `small`
   # the search result cards. `small` stays jpeg because `thumb_path` feeds emails, and Outlook
-  # desktop (still the Word rendering engine) won't render webp. They downsize far enough to
-  # need the sharpening mask image_processing 2.0 stopped applying by default.
+  # desktop (still the Word rendering engine) won't render webp.
   VARIANTS = {
-    small: {resize_to_fill: [300, 300, {sharpen: true}], format: :jpeg},
-    medium: {resize_to_fit: [1000, 750, {sharpen: true}], format: :webp},
-    large: {resize_to_fit: [2000, 1600, {sharpen: true}], format: :webp}
+    small: {resize_to_fill: [300, 300], format: :jpeg},
+    medium: {resize_to_fit: [1000, 750], format: :webp},
+    large: {resize_to_fit: [2000, 1600], format: :webp}
   }.freeze
 
   # No browser renders TIFF and only Safari HEIC, so the job rewrites these as webp
