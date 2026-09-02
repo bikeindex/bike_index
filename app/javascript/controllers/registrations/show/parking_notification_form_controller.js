@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { collapse } from 'utils/collapse_utils'
+import { collapse, COLLAPSE_DURATION_MS } from 'utils/collapse_utils'
 import { ExpandControl, groundRadiusStops, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION } from 'utils/maplibre'
 
 /* global navigator */
@@ -57,8 +57,10 @@ export default class extends Controller {
     this.applyRepeat(this.repeatSelected, 0)
   }
 
+  // Not collapse()'s default by another name: applyRepeat forwards this to startLocation,
+  // which defaults to 0 and would resize the map before the reveal finished
   selectRepeat (event) {
-    this.applyRepeat(event.target.value === 'true', 200)
+    this.applyRepeat(event.target.value === 'true', COLLAPSE_DURATION_MS)
   }
 
   get repeatSelected () {

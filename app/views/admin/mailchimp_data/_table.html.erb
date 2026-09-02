@@ -34,7 +34,7 @@
       <%= sortable "mailchimp_updated_at", render_sortable: render_sortable %>
     </th>
 
-    <th class="collapse data-cell-collapsed">Data</th>
+    <th class="tw:hidden" data-ui--collapse-target="content">Data</th>
   </thead>
 
   <tbody>
@@ -94,7 +94,10 @@
           <% end %>
         </td>
 
-        <td class="collapse data-cell data-cell-collapsed small">
+        <td
+          class="data-cell small tw:hidden"
+          data-ui--collapse-target="content"
+        >
           <%= pretty_print_json(mailchimp_datum.data) %>
         </td>
       </tr>

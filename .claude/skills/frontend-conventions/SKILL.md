@@ -13,8 +13,9 @@ description: >-
   date/time. Trigger
   when adding or modifying views (`.html.erb`), view components, Stimulus
   controllers, Tailwind classes, or any frontend code that touches styling
-  or interactivity. Stimulus.js is the JavaScript framework; SCSS and
-  CoffeeScript files exist but are deprecated.
+  or interactivity — including admin screens, whose unlayered legacy CSS and
+  prebuilt jQuery bundle invert several of these rules. Stimulus.js is the
+  JavaScript framework; SCSS and CoffeeScript files exist but are deprecated.
 ---
 
 # Frontend conventions
@@ -101,7 +102,7 @@ With `match: :query`, **`query:` is the params the entry stands for, not the one
 
 Any time you show, hide, or toggle an element in response to interaction, go through the shared collapse helpers. **Never** hand-roll it with the `hidden` attribute, `element.style.display`, `element.hidden = true`, or ad-hoc `classList.add('tw:hidden')` — those skip the shared show/hide animation and the `tw:hidden!`/`tw:hidden` class contract the rest of the app depends on.
 
-- **Markup-only toggle** (a trigger reveals/collapses a panel, no other logic): add `data-controller="ui--collapse"`, mark the collapsible element `data-ui--collapse-target="content"`, and wire the trigger's `data-action` to `ui--collapse#toggle` / `ui--collapse#show` / `ui--collapse#hide` (`app/javascript/controllers/ui/collapse_controller.js`; optional `data-ui--collapse-duration-value`).
+- **Markup-only toggle** (a trigger reveals/collapses a panel, no other logic): add `data-controller="ui--collapse"`, mark the collapsible element `data-ui--collapse-target="content"`, and wire the trigger's `data-action` to `ui--collapse#toggle` / `ui--collapse#show` / `ui--collapse#hide` (`app/javascript/controllers/ui/collapse_controller.js`).
 - **Inside your own Stimulus controller** (you have extra logic — a redirect branch, a query-param check, etc.): import `collapse_utils` and call it directly:
 
   ```js
@@ -110,13 +111,20 @@ Any time you show, hide, or toggle an element in response to interaction, go thr
   collapse('show', this.formTarget)   // 'show' | 'hide' | 'toggle'; optional duration (default 200)
   ```
 
-The collapsible element starts hidden with the **`tw:hidden` class** (not the `hidden` attribute) — `collapse` toggles `tw:hidden`/`tw:hidden!` and runs the height/scale transition for you. Use **`tw:hidden!`** when the element also carries a display utility that sorts after `hidden` — any `inline-*`, which every `UI::Button` has. Because the initial hidden state is a class, component specs assert it by class (`have_css("[…].tw\\:hidden")`), not Capybara visibility — the rack_test driver doesn't evaluate CSS, so it can't tell a class-hidden element is hidden.
+The collapsible element starts hidden with the **`tw:hidden` class** (not the `hidden` attribute) — `collapse` toggles `tw:hidden`/`tw:hidden!` and runs the height/scale transition for you. Use **`tw:hidden!`** when the element also carries a display utility that sorts after `hidden` — any `inline-*`, which every `UI::Button` has — and on an admin page whenever the element carries a legacy class that sets `display` (`.row` and `.card` are the ones that come up), for the unlayered reason above. A plain `tw:hidden` renders that panel open, and no component spec can see it: the class is in the attribute, it just loses the cascade. Because the initial hidden state is a class, component specs assert it by class (`have_css("[…].tw\\:hidden")`), not Capybara visibility — the rack_test driver doesn't evaluate CSS, so it can't tell a class-hidden element is hidden.
 
 ## No dead hooks in markup
 
 Only add an `id` or non-utility `class` when something concrete consumes it — a CSS rule, a JS/Stimulus selector, a test fixture, an accessibility attribute. Don't keep or invent "structural identifier" hooks "in case something needs them later," and don't replace a removed hook with a renamed one out of inertia.
 
 When deleting an `id`/`class`, grep the repo for the name before deciding what to do with it:
+
+**On admin, grep `public/vendored_assets/*.js` as well as `app/`.** `application_standalone.js` still binds
+behaviour by id and class, and its source left the repo with the webpack config, so it can't be rebuilt or
+searched from source — a hook with no consumer in `app/` is routinely live. Its handlers are guarded on a hook being present — minified, so grep the id itself rather than
+`$(`— and the guard is often a *different* id than the one bound: `#blog-image-form` gates the module
+that binds `#infoCheck`. So removing an id silently disables behaviour, sometimes behaviour attached
+to another id entirely.
 
 - Zero consumers: delete it, don't rename it.
 - Consumers exist: either update them, or leave the hook in place — the consumers are the *reason* it earns its spot in the markup.
@@ -180,7 +188,18 @@ in, neither of which shows up as an error — the page just behaves oddly:
 
 `RegisterController` and the `Register::` components are the worked example of both.
 
-## Admin pages that carry legacy JS can't be Turbo-visited
+## Admin screens
+
+A record with more than one super-admin page gets `Admin::Headers::Tabs::Component`, with the
+section's own tabs named in a component of their own — `Admin::Organizations::Tabs` is the
+pattern — rather than restated in each view.
+
+`sortable_search_params` (defined in the binxtils gem, `Binxtils::SortableHelper`) permits every
+param starting with `search_`, plus the sort and period keys — which is how a filter link keeps the
+rest of the table's state. Reach it through the reader, not the bare helper:
+`url_for(@index.sortable_search_params.merge(search_kind: "x"))`.
+
+### Admin pages that carry legacy JS can't be Turbo-visited
 
 `application_standalone.js` is a plain `<script src>` in the admin layout, and everything it
 sets up binds once inside one `$(document).ready` gated on `#admin-content` — the per-page

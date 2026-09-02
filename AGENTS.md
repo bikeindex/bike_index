@@ -100,8 +100,6 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 
 - **Multi-database**: primary (`ApplicationRecord`) + analytics (`AnalyticsRecord`). Use `db:migrate:down:analytics` for analytics migrations
 - **Soft delete**: some models use `acts_as_paranoid` with `deleted_at` column; use `unscoped` in admin controllers when needed
-- **Admin search**: `sortable_search_params` auto-includes any param starting with `search_`
-- **Admin record screens are tabs**: a record with more than one super-admin page gets `Admin::Headers::Tabs::Component`, with the section's own tabs named in a component of its own (`Admin::Organizations::Tabs` is the pattern) rather than in each view.
 - **Every user has a `password_digest`** — `User#set_calculated_attributes` gives passwordless accounts a random one so `has_secure_password` is satisfied. So it answers nothing about whether someone chose a password; `passwordless_user?` is that question.
 
 # Initial setup
