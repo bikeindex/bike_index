@@ -40,7 +40,7 @@ RSpec.describe OrganizationLandingPage, type: :model do
     let(:organization_landing_page) { FactoryBot.create(:organization_landing_page, organization:) }
 
     it "reports a routed organization whose page is disabled" do
-      expect(LandingPages::ORGANIZATIONS).to include(organization.slug)
+      expect(LandingPageOrganizations::SLUGS).to include(organization.slug)
       expect(organization_landing_page.env_enabled?).to be_truthy
       # The factory default, so a routed organization starts out disagreeing
       expect(organization_landing_page.enabled).to be_falsey

@@ -7,7 +7,7 @@
         <% if @organization.paid? %>
           <strong>True</strong>
         <% else %>
-          <% if LandingPages::ORGANIZATIONS.include?(@organization.slug) %>
+          <% if LandingPageOrganizations::SLUGS.include?(@organization.slug) %>
             <p class="text-danger">
               IS NOT MARKED PAID BUT HAS A LANDING PAGE
             </p>
@@ -53,7 +53,7 @@
 
         <td>
           <% if @organization.organization_landing_page&.body? %>
-            <% if LandingPages::ORGANIZATIONS.include?(@organization.slug) %>
+            <% if LandingPageOrganizations::SLUGS.include?(@organization.slug) %>
               <%= link_to 'public landing page', "#{ENV['BASE_URL']}/#{@organization.slug}" %>
             <% else %>
               landing page is not public -
