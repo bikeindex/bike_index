@@ -106,6 +106,14 @@ drop the cap to 1ms and the assertions it protects should fail.
 
 `element.evaluate_script` may return a Promise; the driver awaits it before handing back.
 
+## A negative matcher can't wait for a state to settle
+
+`have_no_css`/`have_no_link` match the instant the condition holds, so a state that arrives
+*late* — a class an orphaned `setTimeout` re-adds — never gets asserted, and the example
+passes against the bug it was written for. Wait on a positive signal the sequence drops last,
+then assert the absence: `spec/integration/mobile_nav_menu_spec.rb` waits out
+`nav.primary-header-nav.enabled` before asserting `menu-in` is gone.
+
 ## Carry state forward, don't reset between phases
 
 You know what state the page is in after each click — write the next assertion against that state. Don't click a "Reset" / "Clear" between phases just to get a clean slate; resets cost a click (often two — clear, then re-establish), obscure what's actually happening, and tempt you to think of each phase as an isolated scenario rather than as one continuous user flow.
@@ -208,6 +216,15 @@ brought no focus event to hang the selection on. Keep the preview spec for what
 the component does on its own, and cover page-level behaviour in the flow's own
 spec under `spec/integration/` — where the autofocus, the Turbo frame and the
 other controllers are all present.
+
+A component system spec drives the preview route, so **the preview template is
+that spec's fixture** — editing one changes what the spec starts from. Making the
+parking-notification preview open its panel on load broke
+`spec/components/pages/registrations/show/org_top_actions/parking_notification_form/component_system_spec.rb`,
+which asserts the submit is disabled before the accordion is touched; the failure
+named the button, not the preview. Give the preview a param for the state the
+spec needs (`ComponentPreview#default` takes `panel:`) rather than dropping the
+assertion.
 
 ## ActionCable broadcasts: do the real thing
 

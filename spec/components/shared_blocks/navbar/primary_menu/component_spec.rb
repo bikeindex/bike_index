@@ -21,6 +21,11 @@ RSpec.describe SharedBlocks::Navbar::PrimaryMenu::Component, type: :component do
     # Every row is a nav-link; only the signup one carries a second class
     expect(component.css("#primary-main-menu a.nav-link").count).to eq menu_links.count
     expect(component.css("#primary-main-menu a.signup-link").map { |link| link.text.strip }).to eq(["Sign up"])
+    # Search and Marketplace render a row per side of the breakpoint, so each hides on the other
+    ["Search", "Marketplace"].each do |label|
+      expect(links_named(label).map { |link| link.parent["class"] })
+        .to eq(["primary-nav-item d-lg-none", "primary-nav-item d-none d-lg-block"])
+    end
   end
 
   # The links carry a stolenness the page won't, and the page carries a query and a page

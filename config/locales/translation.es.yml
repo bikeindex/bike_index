@@ -5479,227 +5479,6 @@ es:
       index:
         loading_results: Cargando resultados...
   components:
-    shared_blocks:
-      homepage_for_buttons:
-        bike_shops: Tiendas de bicicletas
-        cities: Ciudades
-        community_groups: Grupos comunitarios
-        schools: Escuelas
-        theft_victims: Víctimas de robos
-      new_sale_form:
-        record_sale: Venta récord
-        sold_for: Cantidad vendida por
-        transfer_to_html: Esto transferirá el registro a %{buyer_html} y cerrará el
-          listado del mercado.
-      strava_integration:
-        activities_synced:
-          one: actividad sincronizada
-          other: actividades sincronizadas
-        connect_with_strava: Conéctate con Strava
-        connected_to_strava: Conectado a Strava
-        disconnect_confirm: "¿Seguro que quieres desconectar Strava? Esto eliminará
-          todas las actividades sincronizadas."
-        disconnect_strava: Desconectar Strava
-        downloaded: descargado
-        integrate_your_bikes_with_strava: Integra tus bicicletas con Strava y sincroniza
-          tus actividades ciclistas.
-        strava_bikes_connected: Bicicletas de Strava conectadas a bicicletas de Bike
-          Index
-        strava_connected_pending: Conectado a Strava. La sincronización comenzará
-          en breve.
-        strava_integration: Integración con Strava
-        sync_error: Error de sincronización
-        sync_error_description: Se ha producido un error al sincronizar tus actividades
-          de Strava. Intenta desconectarte y volver a conectarte.
-        sync_running_in_background: La sincronización se está ejecutando en segundo
-          plano. Esta página se actualizará automáticamente.
-        syncing_activities: Sincronizando actividades...
-      review_app_banner:
-        disclaimer: Los datos son efímeros.
-        label: Aplicación de reseñas
-        letter_opener_link: Bandeja de salida de correo electrónico
-        letter_opener_tooltip: Vea el correo electrónico enviado por esta aplicación
-          de reseñas.
-        pr_link: 'PR #%{number}'
-        commit_tooltip: 'Commit actual:'
-        superadmin_button: Iniciar sesión como superadministrador
-        superadmin_signed_in: Sesión iniciada como superadministrador
-        label_development: Desarrollo
-        label_sandbox: Salvadera
-        no_superadmin: No hay superusuario (no puede iniciar sesión)
-      footer:
-        about: Acerca
-        ambassadors: Embajadores
-        api_documentation: Documentación API
-        bike_index: Bike Index
-        bike_manufacturer_list: Lista de fabricantes de bicicletas
-        bike_shops: Tiendas de bicicletas
-        blog: Blog
-        change_preferred_language: cambiar el idioma preferido
-        cities: Ciudades
-        community_groups: Grupos comunitarios
-        copyright_html: "%{current_year} &copy; Bike Index, una organización sin ánimo
-          de lucro 501(c)(3) - EIN 81-4296194"
-        dev_and_design_resources: Recursos de desarrollo y diseño
-        donate: Donar
-        how_to_get_your_stolen_bike_back: Recupera su bicicleta
-        language: Idioma
-        law_enforcement: Fuerzas y Cuerpos de Seguridad
-        press_inquiries: Consultas de prensa
-        privacy_policy: Política de privacidad
-        protect_your_bike: Registre su bicicleta
-        resources: Recursos
-        schools_and_universities: Escuelas y universidades
-        security: Seguridad
-        stolen_bike_recoveries: Recuperación de bicicletas robadas
-        store: Tienda
-        strava_search: Búsqueda y actualización de Strava
-        support_us: Apóyanos
-        terms_and_conditions: condiciones generales
-        vendor_terms: condiciones de venta
-        where_we_are: Dónde estamos
-        who_we_serve: A quién servimos
-        legal: Legal
-        social_media: Redes sociales
-        faq_and_help: Preguntas frecuentes y ayuda
-        marketplace: Mercado
-        register_a_bike: Registre su bicicleta
-        search: Buscar
-        status_page: Página de estado
-      law_enforcement_donation:
-        bikeindex_is_a_nonprofit: Bike Index es una organización sin fines de lucro
-          501(c)(3). Dependemos de donaciones para brindar estos servicios. Recomendamos
-          a las agencias policiales como %{org_name} que donen al menos $20 al año
-          para apoyar nuestra labor.
-        contact_bike_owners: Contacta con los propietarios de las bicicletas antes
-          de que sus bicicletas sean marcadas como robadas.
-        email_for_access_html: Para obtener acceso, envíe un correo electrónico a
-          %{email_link}.
-        greeting: Hola %{user_name},
-        law_enforcement_features: 'Contamos con una serie de funciones diseñadas específicamente
-          para agentes del orden:'
-        multiple_serial_search_pane: Panel de búsqueda de múltiples números de serie
-        thank_you: "¡Muchísimas gracias por usar Bike Index!"
-        thanks_for_using_bike_index: "¡Gracias por usar Bike Index!"
-      main_content:
-        content:
-          about: Acerca
-          bicycle_serials: Series de bicicletas
-          bike_index_news: Todas las noticias de Bike Index
-          bike_index_store: Tienda de índices de bicicletas
-          design_and_developer_resources: Recursos de diseño y desarrollo
-          donate: Donar
-          donate_today: Dona hoy
-          help: Ayuda
-          how_to_get_your_stolen_bike_back: Cómo recuperar tu bicicleta robada
-          make_a_difference: Marca la diferencia en la lucha contra el robo de bicicletas.
-          other_pages: Otras páginas
-          protect_your_bike: Registre su bicicleta
-          related: Relacionado
-          sign_up_your_organization: Inscriba su organización
-          where: Dónde
-        edit_bike:
-          edit: Editar
-          edit_pages: 'Editar páginas %{bike_type}:'
-          owned_but_hasnt_been_claimed_html: Es propiedad de <em>%{owner_email}</em>
-            , pero aún no ha sido reclamado.
-          owned_with_permission_to_edit_html: Propiedad de <em>%{owner_email}</em>
-            pero %{org_name} tiene permiso para editar.
-          view_bike: Ver %{bike_type}
-          view_bike_version: Ver %{bike_type} versión
-        organized:
-          additional_features_html: Bike Index ofrece funciones adicionales para organizaciones
-            policiales verificadas. Comuníquese con %{email_link} para activarlas.
-          admin_panel: Panel de administración
-          how_integration_works: cómo funciona la integración
-          integrate_bike_index_with_ascend: Integrar Bike Index con Ascend
-          integrate_bike_index_with_lightspeed: Integra Bike Index con Lightspeed.
-          link_to_register_html: "<strong>%{link}</strong> para registrar automáticamente
-            las bicicletas que vendes a tus clientes."
-          other_point_of_sale_system: "¿Otro sistema de punto de venta?"
-          read_a_full_explanation_html: Lea una explicación completa de %{link}.
-          register_bikes_with_link_html: Registra bicicletas con nuestro <strong>%{link}</strong>
-          streamlined_bike_shop_registration_page: Página de registro simplificada
-            para la tienda de bicicletas
-          subscription_expired_html: Tu suscripción a Bike Index ha caducado. Ponte
-            en contacto con %{email_link} para reactivarla.
-          use_ascend: "¿Usar Ascend?"
-          use_lightspeed_retail_pos: "¿Utilizas el sistema POS Lightspeed Retail?"
-          viewing_our_streamlined_page: Actualmente estás viendo nuestra página de
-            registro simplificada de la tienda de bicicletas, que es la que recomendamos
-            usar.
-      navbar:
-        primary_menu:
-          blog: Blog
-          donate: Donar
-          help: Ayuda
-          log_in: conectarse
-          marketplace: Mercado
-          search: Buscar
-          sign_up: Inscríbete
-          stolen_bike: "¿Bicicleta robada?"
-        wrapper:
-          menu: Menú
-          sign_up: Inscríbete
-          the_nonprofit_bike_registry: el registro de bicicletas sin ánimo de lucro
-        org_sidebar:
-          admin_panel: PANEL DE ADMINISTRACIÓN
-          collapse_sidebar: Contraer la barra lateral
-          expand_sidebar: Expandir barra lateral
-          menu: Menú
-          organization_crest: "%{org_name} cresta"
-        user_settings_menu:
-          settings_menu: Ajustes
-      user_alerts:
-        phone_waiting_confirmation:
-          confirm_your_phone_number: Confirma tu número de teléfono
-          verification_code: Código de verificación
-          verify_number: Verificar %{phone_number}
-        stolen_bike_without_location:
-          add_location_theft_bike_title_html: Agregue la ubicación del robo de su
-            <strong>%{bike_title}</strong>
-          location_critical_html: "<strong>Es fundamental para la recuperación</strong>
-            que incluya la dirección o la calle transversal donde le robaron su %{bike_type}."
-          stolen_missing_location_title: Por favor, añada la ubicación del robo.
-          without_location_all_is_lost: Sin una ubicación no podemos difundir la noticia
-            del robo y la gente no sabrá dónde buscar su %{bike_type}.
-        theft_alert_without_photo:
-          add_photo_theft_bike_title_html: Agrega una foto a tu <strong>%{bike_title}</strong>
-          missing_stolen_photo_title: Por favor, añade una foto.
-          photo_critical_html: Las alertas promocionadas exitosas <strong>deben tener
-            una imagen.</strong>
-          without_photo_all_is_lost: Si no tienes fotos de tu %{bike_type}, busca
-            una imagen de archivo en internet y súbela. Sin una imagen, la alerta
-            promocionada no será efectiva.
-        unfinished_registration:
-          finish_the_required_steps: completar los pasos requeridos
-          not_registered_yet_html: "¡Tu %{cycle_type} aún no está registrado! Por
-            favor %{finish_link}"
-      my_account:
-        organization_roles:
-          automatically_view_in_organization: Visualización automática con la barra
-            de navegación %{org_name} al iniciar sesión en Bike Index.
-          joined: Unido
-          leave_confirm: "¡Advertencia! Tendrás que pedirle a un administrador de
-            %{org_name} que recupere este rol de organización. No podrás deshacer
-            esto tú mismo."
-          leave_organization: Organización de salida
-          organization_role_information: Organizaciones en las que participas. Arrástralas
-            para ordenarlas según la prioridad que desees.
-          organization_roles:
-            one: Su rol en la organización
-            other: Funciones de su organización
-          role_html: 'Función: %{role}'
-          roles:
-            admin: Administración
-            member: Miembro
-            member_no_bike_edit: Miembro - sin edición de bicicletas
-          view_after_log_in: Después de iniciar sesión
-          view_as_html: Ver como %{org_name}
-          view_without_an_organization: Ver sin una organización
-          you_can_still_switch: Podrás seguir cambiando la vista para mostrar u ocultar
-            la organización en la configuración de la barra de navegación.
-          your_first_organization: tu primera organización
     emails:
       partials:
         bike_box:
@@ -5916,76 +5695,19 @@ es:
           description: Descripción
           first_posted_at: Al corriente
           location: Ubicación
+          member_listing: Miembro de Bike Index
+          member_listing_tooltip: Este vendedor es miembro de Bike Index.
           price_is_firm_false: El precio es negociable.
           price_is_firm_true: El precio es fijo.
           still_for_sale_at: Todavía se vende en
-          member_listing: Miembro de Bike Index
-          member_listing_tooltip: Este vendedor es miembro de Bike Index.
-      search:
-        everything_combobox:
-          query_items_description: Cuadro combinado de descripciones de búsqueda
-          search_descriptions: Descripciones de búsqueda
-          made_by: hecho por
-          only_for: solo para
-          search_for: Buscar
-          search_only_for: Buscar solo por
-          that_are: que son
-        form:
-          doesnt_look_like_serial: El número de serie que ingresaste no parece un número
-            de serie válido, por lo que no se está utilizando para la búsqueda.
-          search_for_serial_number: Buscar número de serie
-          submit: entregar
-          search_for_primary_activity: Buscar tipo de actividad principal
-          max: máximo
-          min: min
-          price_maximum: Precio mínimo
-          price_minimum: Precio mínimo
-        kind_select_fields:
-          within: dentro
-          miles_of: millas de
-          search_distance: Distancia de búsqueda
-          search_location: Buscar ubicación
-          stolenness_all: Todo
-          stolenness_for_sale: Se vende
-          stolenness_non: No está marcado como robado
-          stolenness_proximity: Robado en la zona de búsqueda
-          stolenness_stolen: Robado en cualquier lugar
-          marketplace_scope_for_sale: Se vende en cualquier lugar
-          marketplace_scope_for_sale_proximity: Se vende en la zona de búsqueda
-        result_view_select:
-          bike_box_view: Ver como lista
-          thumbnail_view: Ver como miniaturas
-      search_results:
-        bike_box:
-          location: Ubicación
-          posted_at: Listado
-          primary_colors: Colores primarios
-          serial: De serie
-          deleted: Eliminado
-          ended_at: Finalizado
-          not_applicable: N / A
-          price: Precio
-          removed_from: Eliminado del índice de bicicletas
-        vehicle_thumbnail:
-          registered_not_stolen: Registrado, no robado.
-          member: Miembro de Bike Index
-        container:
-          no_results: No se encontraron registros que coincidieran exactamente con su
-            búsqueda.
-        frame:
-          fetch_failed: No se pudieron cargar estos resultados; compruebe su conexión
-            e inténtelo de nuevo.
-          rate_limited: Se han realizado demasiadas búsquedas demasiado rápido; se ha
-            alcanzado el límite de solicitudes. Espere un momento y vuelva a intentarlo.
-          retry: Intentar otra vez
       messages:
         thread_show:
-          can_not_send_new_message: Lo sentimos, no puedes enviar un nuevo mensaje.
-          sold_to: Mark %{item_type} vendió a
           banned_message: Lo sentimos, pero ese usuario ha sido bloqueado y no puede
             recibir nuevos mensajes.
-          deleted_message: Lo sentimos, pero ese usuario ha eliminado su cuenta y no
-            puede recibir nuevos mensajes.
+          can_not_send_new_message: Lo sentimos, no puedes enviar un nuevo mensaje.
+          deleted_message: Lo sentimos, pero ese usuario ha eliminado su cuenta y
+            no puede recibir nuevos mensajes.
+          sold_to: Mark %{item_type} vendió a
         thread_show_message:
           me: A mí
           subject: Sujeto
@@ -5997,38 +5719,14 @@ es:
           me: a mí
           to: A
       org:
-        location_address_fields:
-          address: DIRECCIÓN
-          choose_country: Elige un país
-          city: Ciudad
-          postal_code: Código Postal
-          region: Región/Provincia
-          state: Estado
-          street: Calle
-        impound_records_index:
-          matching_impound_record:
-            one: registro de incautación coincidente
-            other: registros de incautación coincidentes
-          all_bikes: Todas las bicicletas
-          all_statuses: Todos los estados
-          impound_records: Registros incautados
-          interpreted_params: Parámetros interpretados
-          only_unregistered: Solo usuarios no registrados
-          only_user_registered: Solo usuarios registrados
-          pagy: Página
-          per_page: Por página
-          status_records: Registros %{status}
-          update_multiple_records: Actualizar varios registros
-          cannot_update_with_kind: Este registro no se puede actualizar con '{kind}'.
-          hide_update: Ocultar actualización
         bike_access_panel:
           access_panel: Panel de acceso
           added_to_track_parking_notification: Este %{bike_type} no está registrado
             a ningún usuario. Se agregó para realizar un seguimiento de las notificaciones
             de estacionamiento.
           additional_registrations_information: Registros por usuario
-          additional_registrations_information_visible_because: visible con acceso para
-            las fuerzas del orden %{org_name}
+          additional_registrations_information_visible_because: visible con acceso
+            para las fuerzas del orden %{org_name}
           additional_registrations_potential_duplicates: 'Posibles duplicados de bicicletas
             que coincidan con los segmentos de serie:'
           additional_registrations_registered_at: Registrado en
@@ -6047,8 +5745,8 @@ es:
           choose_country: Elige un país
           city: Ciudad
           claimed: Afirmado
-          contact_the_owner_it_is_stolen: al propietario de este %{bike_type} que usted
-            cree que ha sido robado.
+          contact_the_owner_it_is_stolen: al propietario de este %{bike_type} que
+            usted cree que ha sido robado.
           creation_source: Fuente
           creator: Creador
           edit: Editar
@@ -6066,7 +5764,10 @@ es:
           missing_owner_name: Falta el nombre de usuario
           model_audit: Auditoría de vehículos eléctricos
           not_audited: No auditado
-          or_call_owner_html: "<em>O llame</em> <strong>al número de teléfono del propietario:</strong>"
+          note_by: por %{user}
+          notes: Notas de registro
+          or_call_owner_html: "<em>O llame</em> <strong>al número de teléfono del
+            propietario:</strong>"
           org_can_edit_bike: "%{org_name} puede editar esto %{bike_type}"
           org_cannot_edit: "%{org_name} no se puede editar"
           organization_can_edit_after_claimed: y puede editar después de que %{bike_type}
@@ -6078,7 +5779,9 @@ es:
           parking_notification_notes_html: "%{org_name} Las notas internas <small>no
             se muestran al usuario.</small>"
           permission: Permiso
+          region: Región
           registered: Registrado
+          save_notes: Guardar nota
           send_message: Enviar mensaje
           state: Estado
           sticker: Etiqueta engomada
@@ -6091,19 +5794,15 @@ es:
             para contactarlo antes de que su bicicleta fuera marcada como robada.
           waiting_on_device_location: Esperando la ubicación del dispositivo
           where_did_you_see_this_bike: "¿Dónde viste esto %{bike_type}? Si nos contactas
-            por un anuncio que encontraste en línea, incluye un enlace en el campo a
-            continuación."
+            por un anuncio que encontraste en línea, incluye un enlace en el campo
+            a continuación."
           write_a_message: Escribe un mensaje
           zipcode: Código Postal
-          note_by: por %{user}
-          notes: Notas de registro
-          save_notes: Guardar nota
-          region: Región
         bulk_import_error:
           ascend: Ascender
           ascend_unprocessable_html: La importación masiva <span class="text-danger">no
-            se pudo procesar</span> porque no se encontró ninguna organización con el
-            nombre de ascenso <strong>%{ascend_name}.</strong>
+            se pudo procesar</span> porque no se encontró ninguna organización con
+            el nombre de ascenso <strong>%{ascend_name}.</strong>
           contact_to_resolve_html: Comunícate con %{email_link} para resolver esto.
           edit_org_add_ascend_name_html: Edita la organización y añade el nombre de
             ascenso <code>%{ascend_name}</code>
@@ -6118,9 +5817,33 @@ es:
           line_errors: 'Errores de línea:'
           line_label: 'Línea:'
           organizations: organizaciones
-          reprocess_instruction: Regrese aquí y haga clic en el botón "Reprocesar importación"
-            que aparece a continuación.
+          reprocess_instruction: Regrese aquí y haga clic en el botón "Reprocesar
+            importación" que aparece a continuación.
           unknown_ascend_name: Nombre de Ascend desconocido
+        impound_records_index:
+          all_bikes: Todas las bicicletas
+          all_statuses: Todos los estados
+          cannot_update_with_kind: Este registro no se puede actualizar con '{kind}'.
+          hide_update: Ocultar actualización
+          impound_records: Registros incautados
+          interpreted_params: Parámetros interpretados
+          matching_impound_record:
+            one: registro de incautación coincidente
+            other: registros de incautación coincidentes
+          only_unregistered: Solo usuarios no registrados
+          only_user_registered: Solo usuarios registrados
+          pagy: Página
+          per_page: Por página
+          status_records: Registros %{status}
+          update_multiple_records: Actualizar varios registros
+        location_address_fields:
+          address: DIRECCIÓN
+          choose_country: Elige un país
+          city: Ciudad
+          postal_code: Código Postal
+          region: Región/Provincia
+          state: Estado
+          street: Calle
         parking_notification_details:
           address: DIRECCIÓN
           bike: Bicicleta
@@ -6242,8 +5965,8 @@ es:
           i_name_html: Yo, %{name},
           registrants_name: nombre del registrante
         acknowledgment_progress:
-          progress_saved: Progreso guardado · Confirmación del vehículo eléctrico ·
-            Paso %{number} de %{total}
+          progress_saved: Progreso guardado · Confirmación del vehículo eléctrico
+            · Paso %{number} de %{total}
         back_link:
           back: Atrás
         page:
@@ -6252,17 +5975,18 @@ es:
         page_content:
           electric_detected: "⚡️ Se detectó un vehículo eléctrico (motorizado)."
           have_questions: "¿Tiene alguna pregunta sobre estas políticas?"
-          read_the_faq: Preguntas frecuentes sobre el reconocimiento de vehículos eléctricos
+          read_the_faq: Preguntas frecuentes sobre el reconocimiento de vehículos
+            eléctricos
         review_summary:
           a_quick_review: Un breve repaso de todo lo que usted reconoció.
-          a_quick_review_tap: Un breve repaso de todo lo que has confirmado. Pulsa "Revisar"
-            para volver a consultar un protocolo.
+          a_quick_review_tap: Un breve repaso de todo lo que has confirmado. Pulsa
+            "Revisar" para volver a consultar un protocolo.
           review: Revisar
           youre_almost_done: Ya casi terminas.
         step1:
           bike_info_html: "%{cycle_type} información"
-          electric_helper: Verificamos que sean eléctricas para poder marcarlas y comprobar
-            su certificación.
+          electric_helper: Verificamos que sean eléctricas para poder marcarlas y
+            comprobar su certificación.
           electric_motorized: "⚡️ Eléctrico (motorizado)"
           email: Email
           email_placeholder: tú@ejemplo.com
@@ -6275,8 +5999,8 @@ es:
           register_your_vehicle_with_org: "¡Registra tu vehículo con %{org_name}!"
           start_over: Volver a empezar
           start_over_certain: "¿Empezar de nuevo?"
-          start_over_discards: Esto inicia un nuevo registro; nada de lo que haya introducido
-            aquí se conservará.
+          start_over_discards: Esto inicia un nuevo registro; nada de lo que haya
+            introducido aquí se conservará.
           vehicle_type: Tipo de vehículo
           yes_start_over: Sí, empezar de nuevo
           your_info: Tu información
@@ -6292,12 +6016,13 @@ es:
           cm: centímetro
           color: Color
           complete_registration: Registro completo %{cycle_type}
-          confirmation_link_sent: 'Te hemos enviado un enlace de confirmación a tu correo
-            electrónico. No tienes que esperar: puedes finalizar tu registro ahora mismo.'
+          confirmation_link_sent: 'Te hemos enviado un enlace de confirmación a tu
+            correo electrónico. No tienes que esperar: puedes finalizar tu registro
+            ahora mismo.'
           contact_info: Información de contacto
-          database_public_note: "¡Nuestra base de datos es pública! Podrás ajustar la
-            configuración de privacidad de las fotos individuales de tu registro más
-            adelante."
+          database_public_note: "¡Nuestra base de datos es pública! Podrás ajustar
+            la configuración de privacidad de las fotos individuales de tu registro
+            más adelante."
           email: Email
           enter_size: Introduzca el tamaño
           found: Encontrado/Abandonado
@@ -6333,8 +6058,8 @@ es:
           phone_required_stolen: Se requiere el teléfono para registrar un %{cycle_type}
             robado.
           primary_color_blank: Color primario — por ejemplo, negro
-          read_how_to_find_html: Lea sobre %{how_to_find_link} <small>(se abre en una
-            ventana aparte)</small>
+          read_how_to_find_html: Lea sobre %{how_to_find_link} <small>(se abre en
+            una ventana aparte)</small>
           rear_dropouts: punteras traseras
           register_with_org: Regístrate con %{org_name}
           register_with_org_description: "%{org_name} podrá ver y ayudar a gestionar
@@ -6356,8 +6081,8 @@ es:
           student_id: Carné de estudiante
           third_color_blank: Tercer color
           up_to_3: hasta 3
-          very_very_few_bikes_html: "<em>Muy</em> pocos %{cycle_types} se fabrican sin
-            números de serie. A menos que este %{cycle_type}:"
+          very_very_few_bikes_html: "<em>Muy</em> pocos %{cycle_types} se fabrican
+            sin números de serie. A menos que este %{cycle_type}:"
           view_serial_guide: Consulte la guía completa de números de serie.
           was_made_before_1970: Fue fabricado antes de 1970.
           wheres_my_serial: "¿Dónde está mi número de serie?"
@@ -6379,8 +6104,8 @@ es:
           finish_adding: Finaliza la adición de tu %{cycle_type} al Índice de Bicicletas
           listed_as_found: El %{bike_display} aparece en Bike Index.
           listed_as_stolen: Tu %{bike_display} aparece como robada en Bike Index.
-          owner_can_claim: Su propietario puede encontrarlo aquí y reclamarlo; le enviaremos
-            un correo electrónico cuando alguien lo haga.
+          owner_can_claim: Su propietario puede encontrarlo aquí y reclamarlo; le
+            enviaremos un correo electrónico cuando alguien lo haga.
           progress_saved: Progreso guardado
           register_another: Registrar otro vehículo
           registered_for_owner_html: La %{bike_display} está registrada en Bike Index.
@@ -6390,13 +6115,13 @@ es:
           report_it_stolen: Finaliza la denuncia de tu %{cycle_type} robado y aprovecha
             nuestra red comunitaria.
           reported_stolen: Denunciado como robado
-          verify_your_email_html: 'Un paso más: verifica tu correo electrónico. Te enviamos
-            un enlace de confirmación a %{email}; haz clic en él para finalizar tu registro.
-            Toda la información que ingresaste se guardará.'
+          verify_your_email_html: 'Un paso más: verifica tu correo electrónico. Te
+            enviamos un enlace de confirmación a %{email}; haz clic en él para finalizar
+            tu registro. Toda la información que ingresaste se guardará.'
           view_the_registration: Ver el registro
           view_your_registration: Ver su registro
-          we_will_keep_watch: Tu %{bike_display} está registrada en Bike Index. La vigilaremos;
-            si se denuncia como robada, toda la comunidad estará pendiente.
+          we_will_keep_watch: Tu %{bike_display} está registrada en Bike Index. La
+            vigilaremos; si se denuncia como robada, toda la comunidad estará pendiente.
         step_report:
           about_the_one_you_found: Acerca del %{cycle_type} que encontraste
           address_where_you_found_it: Dirección donde lo encontraste
@@ -6404,21 +6129,23 @@ es:
           contact_and_sharing: Contacto y compartición
           department_city: Departamento/ciudad
           estimated_value: Valor estimado (%{currency})
-          have_proof_of_ownership: Tengo pruebas de que soy el propietario de este %{cycle_type}
+          have_proof_of_ownership: Tengo pruebas de que soy el propietario de este
+            %{cycle_type}
           help_us_reunite: Ayúdanos a devolvérselo a su dueño.
           how_did_you_find_it: "¿Cómo encontraste el %{cycle_type}?"
           how_was_it_locked: "¿Cómo se bloqueó %{cycle_type}?"
           how_was_the_lock_defeated: "¿Cómo se logró abrir la cerradura?"
           next: Próximo
           police_report: Informe policial
-          receive_notifications: Envíame un correo electrónico si tuiteamos sobre esto
-            %{cycle_type} o si encontramos una posible coincidencia.
+          receive_notifications: Envíame un correo electrónico si tuiteamos sobre
+            esto %{cycle_type} o si encontramos una posible coincidencia.
           report_number: Número de informe
           report_your_stolen: Denuncie su %{cycle_type} robado
           show_phone_police: Policía
           show_phone_shops: Tiendas de bicicletas
           show_phone_users: Usuarios de Bike Index que han iniciado sesión
-          the_more_we_know: Cuanto más sepamos, mayores serán las posibilidades de recuperarlo.
+          the_more_we_know: Cuanto más sepamos, mayores serán las posibilidades de
+            recuperarlo.
           theft_details: Detalles del robo
           what_happened: "¿Qué pasó?"
           what_happened_placeholder: Por ejemplo, estaba enganchado a un estante fuera
@@ -6490,7 +6217,8 @@ es:
               claim_submitted: Esta reclamación fue presentada
               claim_was_status: Su reclamación era %{status}; debería haber recibido
                 un correo electrónico con los siguientes pasos.
-              claim_with_this_bike_type: Tienes una reclamación %{status} con este %{bike_type}.
+              claim_with_this_bike_type: Tienes una reclamación %{status} con este
+                %{bike_type}.
               does_this_look_like_your_bike: "¿Esto se parece a tu %{bike_type}?"
               need_stolen_bike_html: Necesitas un %{bike_type} robado registrado para
                 presentar una reclamación — %{add_link}.
@@ -6499,8 +6227,8 @@ es:
               prove_its_yours: 'Verifica tu propiedad: agrega detalles que demuestren
                 que este %{bike_type} es tuyo.'
               save_message: Guardar mensaje
-              select_your_stolen_bike: Seleccione el %{bike_type} robado que posee y
-                que coincide con este depósito.
+              select_your_stolen_bike: Seleccione el %{bike_type} robado que posee
+                y que coincide con este depósito.
               submit_claim: Presentar reclamación
               view_claimed_bike_type: ver los %{kind} %{bike_type} reclamados
               your_claim: Su reclamación
@@ -6510,31 +6238,34 @@ es:
                 tu anuncio.
               claim_your_bike_type: Reclama tu %{bike_type}
               read_more: leer más
-              registered_your_bike_on_index_html: Registré mi %{bike_type} en Bike Index,
-                una plataforma gratuita y sin fines de lucro de registro de bicicletas
-                y recuperación de bicicletas robadas %{read_more_link}.
+              registered_your_bike_on_index_html: Registré mi %{bike_type} en Bike
+                Index, una plataforma gratuita y sin fines de lucro de registro de
+                bicicletas y recuperación de bicicletas robadas %{read_more_link}.
               sign_up: inscribirse
               sign_up_to_claim: Inscríbete
-              to_see_your_bike_sign_up_html: Para ver tu %{bike_type} y reclamarlo como
-                tuyo, %{sign_up_link} con la dirección de correo electrónico donde recibiste
-                tu correo electrónico de registro.
+              to_see_your_bike_sign_up_html: Para ver tu %{bike_type} y reclamarlo
+                como tuyo, %{sign_up_link} con la dirección de correo electrónico
+                donde recibiste tu correo electrónico de registro.
               were_honored_to_have_your_bike: Nos sentimos honrados de tener su %{bike_type}
                 en el Índice.
             notification_token:
               mark_graduated_resolved: Marca %{bike_type} restante
               mark_parking_resolved: Marca %{bike_type} recuperada
-              no_futher_action_necessary: "¡No es necesario realizar ninguna otra acción!"
+              no_futher_action_necessary: "¡No es necesario realizar ninguna otra
+                acción!"
               organization_sent_this_message: "%{org_name} envió esta notificación"
               please_email_organization_with_questions_html: Envíe un correo electrónico
                 a %{email_link} si tiene alguna pregunta.
-              you_have_already_marked_remaining: Ya has marcado este %{bike_type} restante
-              you_have_already_marked_resolved: Has marcado esta notificación como resuelta
+              you_have_already_marked_remaining: Ya has marcado este %{bike_type}
+                restante
+              you_have_already_marked_resolved: Has marcado esta notificación como
+                resuelta
             recovery_prompt:
               can_we_share_your_story: "¿Podemos compartir tu historia?"
               did_we_help: "¿Les hemos ayudado?"
               how_did_you_get_it_back: "¿Cómo lo recuperaste?"
-              its_also_how_we_get_better_at_recovering: También es la forma en que mejoramos
-                nuestra capacidad de recuperación %{bike_type}.
+              its_also_how_we_get_better_at_recovering: También es la forma en que
+                mejoramos nuestra capacidad de recuperación %{bike_type}.
               mark_recovered: Mark se recuperó
               mark_your_bike_recovered: "¡Marca tu %{bike_type} recuperado!"
               nevermind: No importa
@@ -6543,15 +6274,15 @@ es:
               when_did_you_recover_it: "¿Cuándo lo recuperaste?"
             scanned_sticker:
               change_the_bike_sticker_linked_to: Cambia el %{bike_type} al que enlaza.
-              is_this_linked_to_incorrect_bike: "¿Está esta pegatina vinculada al %{bike_type}
-                incorrecto?"
+              is_this_linked_to_incorrect_bike: "¿Está esta pegatina vinculada al
+                %{bike_type} incorrecto?"
               switch_to_new_bike_id: Cambiar a un nuevo ID %{bike_type}
               update: Actualizar
               you_scanned_this_sticker_html: Usted escaneó %{sticker}, que está asignado
                 a este %{bike_type}.
             sent_to_new_owner:
-              you_sent_this_bike_html: Enviaste este %{bike_type} a %{owner_email} y
-                aún no ha sido reclamado. Puedes actualizarlo.
+              you_sent_this_bike_html: Enviaste este %{bike_type} a %{owner_email}
+                y aún no ha sido reclamado. Puedes actualizarlo.
           impound_details:
             found_at: Encontrado en
             found_details: Se encontraron detalles
@@ -6570,8 +6301,8 @@ es:
             using_new_view: Estás probando el nuevo visor %{bike_type}.
             view_in_legacy: Ver %{bike_type} en el visor antiguo
           map:
-            unavailable: No se pudo cargar el mapa; es posible que su navegador o dispositivo
-              no lo admita.
+            unavailable: No se pudo cargar el mapa; es posible que su navegador o
+              dispositivo no lo admita.
           org_top_actions:
             impound_update:
               title: Actualizar el registro de incautación
@@ -6579,20 +6310,21 @@ es:
               know_something_about_this_bike_type: "¿Sabes algo sobre esto %{bike_type}?"
               link_url: URL del enlace
               send_message: Enviar mensaje
-              where_did_you_see_this_bike: "¿Dónde viste esto %{bike_type}? Si nos contactas
-                por un anuncio que encontraste en línea, incluye un enlace en el campo
-                a continuación."
+              where_did_you_see_this_bike: "¿Dónde viste esto %{bike_type}? Si nos
+                contactas por un anuncio que encontraste en línea, incluye un enlace
+                en el campo a continuación."
             parking_notification_form:
               address_or_intersection: Dirección o intersección
               create_parking_notification: Crear una nueva notificación de estacionamiento
               impound_this_bike_type: Confiscar esto %{bike_type}
               map_hint: Arrastra el mapa para que el marcador señale el lugar.
-              map_unavailable: No se pudo cargar el mapa; la ubicación aún estaba configurada
-                desde su dispositivo.
+              map_unavailable: No se pudo cargar el mapa; la ubicación aún estaba
+                configurada desde su dispositivo.
               parking_notification_notes_html: "%{org_name} Las notas internas <small>no
                 se muestran al usuario.</small>"
             parking_notification_show:
-              no_notifications: No hay notificaciones de estacionamiento para este %{bike_type}
+              no_notifications: No hay notificaciones de estacionamiento para este
+                %{bike_type}
               parking_notifications: notificaciones de estacionamiento
               view_all: Ver todas las notificaciones para este %{bike_type}
               view_notification: Ver notificación
@@ -6667,9 +6399,9 @@ es:
             no_registration_information: No se muestra información de registro para
               %{org_name}
             not_audited: No auditado
-            not_registered_message: La información de contacto del propietario no está
-              disponible para bicicletas que no pertenezcan a su organización. Sin embargo,
-              puede agregar notas internas.
+            not_registered_message: La información de contacto del propietario no
+              está disponible para bicicletas que no pertenezcan a su organización.
+              Sin embargo, puede agregar notas internas.
             not_registered_title: No está registrado con %{org_name}
             note_by: Nota de %{user}
             notes_placeholder: 'Nueva nota interna: tus notas anteriores se conservan
@@ -6701,11 +6433,289 @@ es:
             unregistered_owner: Este %{bike_type} no está registrado a ningún usuario.
               Se agregó para realizar un seguimiento de las notificaciones de estacionamiento.
             view_all_registrations: ver todo →
+      search:
+        everything_combobox:
+          made_by: hecho por
+          only_for: solo para
+          query_items_description: Cuadro combinado de descripciones de búsqueda
+          search_descriptions: Descripciones de búsqueda
+          search_for: Buscar
+          search_only_for: Buscar solo por
+          that_are: que son
+        form:
+          doesnt_look_like_serial: El número de serie que ingresaste no parece un
+            número de serie válido, por lo que no se está utilizando para la búsqueda.
+          max: máximo
+          min: min
+          price_maximum: Precio mínimo
+          price_minimum: Precio mínimo
+          search_for_primary_activity: Buscar tipo de actividad principal
+          search_for_serial_number: Buscar número de serie
+          submit: entregar
+        kind_select_fields:
+          marketplace_scope_for_sale: Se vende en cualquier lugar
+          marketplace_scope_for_sale_proximity: Se vende en la zona de búsqueda
+          miles_of: millas de
+          search_distance: Distancia de búsqueda
+          search_location: Buscar ubicación
+          stolenness_all: Todo
+          stolenness_for_sale: Se vende
+          stolenness_non: No está marcado como robado
+          stolenness_proximity: Robado en la zona de búsqueda
+          stolenness_stolen: Robado en cualquier lugar
+          within: dentro
+        result_view_select:
+          bike_box_view: Ver como lista
+          thumbnail_view: Ver como miniaturas
+      search_results:
+        bike_box:
+          deleted: Eliminado
+          ended_at: Finalizado
+          location: Ubicación
+          not_applicable: N / A
+          posted_at: Listado
+          price: Precio
+          primary_colors: Colores primarios
+          removed_from: Eliminado del índice de bicicletas
+          serial: De serie
+        container:
+          no_results: No se encontraron registros que coincidieran exactamente con
+            su búsqueda.
+        frame:
+          fetch_failed: No se pudieron cargar estos resultados; compruebe su conexión
+            e inténtelo de nuevo.
+          rate_limited: Se han realizado demasiadas búsquedas demasiado rápido; se
+            ha alcanzado el límite de solicitudes. Espere un momento y vuelva a intentarlo.
+          retry: Intentar otra vez
+        vehicle_thumbnail:
+          member: Miembro de Bike Index
+          registered_not_stolen: Registrado, no robado.
       sessions:
         sign_in_interstitial:
           click_button_to_continue: Haz clic en el botón de abajo para continuar.
           finish_signing_in: Finalizar el registro
           sign_in: Iniciar sesión
+    shared_blocks:
+      footer:
+        about: Acerca
+        ambassadors: Embajadores
+        api_documentation: Documentación API
+        bike_index: Bike Index
+        bike_manufacturer_list: Lista de fabricantes de bicicletas
+        bike_shops: Tiendas de bicicletas
+        blog: Blog
+        change_preferred_language: cambiar el idioma preferido
+        cities: Ciudades
+        community_groups: Grupos comunitarios
+        copyright_html: "%{current_year} &copy; Bike Index, una organización sin ánimo
+          de lucro 501(c)(3) - EIN 81-4296194"
+        dev_and_design_resources: Recursos de desarrollo y diseño
+        donate: Donar
+        faq_and_help: Preguntas frecuentes y ayuda
+        how_to_get_your_stolen_bike_back: Recupera su bicicleta
+        language: Idioma
+        law_enforcement: Fuerzas y Cuerpos de Seguridad
+        legal: Legal
+        marketplace: Mercado
+        press_inquiries: Consultas de prensa
+        privacy_policy: Política de privacidad
+        protect_your_bike: Registre su bicicleta
+        register_a_bike: Registre su bicicleta
+        resources: Recursos
+        schools_and_universities: Escuelas y universidades
+        search: Buscar
+        security: Seguridad
+        social_media: Redes sociales
+        status_page: Página de estado
+        stolen_bike_recoveries: Recuperación de bicicletas robadas
+        store: Tienda
+        strava_search: Búsqueda y actualización de Strava
+        support_us: Apóyanos
+        terms_and_conditions: condiciones generales
+        vendor_terms: condiciones de venta
+        where_we_are: Dónde estamos
+        who_we_serve: A quién servimos
+      homepage_for_buttons:
+        bike_shops: Tiendas de bicicletas
+        cities: Ciudades
+        community_groups: Grupos comunitarios
+        schools: Escuelas
+        theft_victims: Víctimas de robos
+      law_enforcement_donation:
+        bikeindex_is_a_nonprofit: Bike Index es una organización sin fines de lucro
+          501(c)(3). Dependemos de donaciones para brindar estos servicios. Recomendamos
+          a las agencias policiales como %{org_name} que donen al menos $20 al año
+          para apoyar nuestra labor.
+        contact_bike_owners: Contacta con los propietarios de las bicicletas antes
+          de que sus bicicletas sean marcadas como robadas.
+        email_for_access_html: Para obtener acceso, envíe un correo electrónico a
+          %{email_link}.
+        greeting: Hola %{user_name},
+        law_enforcement_features: 'Contamos con una serie de funciones diseñadas específicamente
+          para agentes del orden:'
+        multiple_serial_search_pane: Panel de búsqueda de múltiples números de serie
+        thank_you: "¡Muchísimas gracias por usar Bike Index!"
+        thanks_for_using_bike_index: "¡Gracias por usar Bike Index!"
+      main_content:
+        content:
+          about: Acerca
+          bicycle_serials: Series de bicicletas
+          bike_index_news: Todas las noticias de Bike Index
+          bike_index_store: Tienda de índices de bicicletas
+          design_and_developer_resources: Recursos de diseño y desarrollo
+          donate: Donar
+          donate_today: Dona hoy
+          help: Ayuda
+          how_to_get_your_stolen_bike_back: Cómo recuperar tu bicicleta robada
+          make_a_difference: Marca la diferencia en la lucha contra el robo de bicicletas.
+          other_pages: Otras páginas
+          protect_your_bike: Registre su bicicleta
+          related: Relacionado
+          sign_up_your_organization: Inscriba su organización
+          where: Dónde
+        edit_bike:
+          edit: Editar
+          edit_pages: 'Editar páginas %{bike_type}:'
+          owned_but_hasnt_been_claimed_html: Es propiedad de <em>%{owner_email}</em>
+            , pero aún no ha sido reclamado.
+          owned_with_permission_to_edit_html: Propiedad de <em>%{owner_email}</em>
+            pero %{org_name} tiene permiso para editar.
+          view_bike: Ver %{bike_type}
+          view_bike_version: Ver %{bike_type} versión
+        organized:
+          additional_features_html: Bike Index ofrece funciones adicionales para organizaciones
+            policiales verificadas. Comuníquese con %{email_link} para activarlas.
+          admin_panel: Panel de administración
+          how_integration_works: cómo funciona la integración
+          integrate_bike_index_with_ascend: Integrar Bike Index con Ascend
+          integrate_bike_index_with_lightspeed: Integra Bike Index con Lightspeed.
+          link_to_register_html: "<strong>%{link}</strong> para registrar automáticamente
+            las bicicletas que vendes a tus clientes."
+          other_point_of_sale_system: "¿Otro sistema de punto de venta?"
+          read_a_full_explanation_html: Lea una explicación completa de %{link}.
+          register_bikes_with_link_html: Registra bicicletas con nuestro <strong>%{link}</strong>
+          streamlined_bike_shop_registration_page: Página de registro simplificada
+            para la tienda de bicicletas
+          subscription_expired_html: Tu suscripción a Bike Index ha caducado. Ponte
+            en contacto con %{email_link} para reactivarla.
+          use_ascend: "¿Usar Ascend?"
+          use_lightspeed_retail_pos: "¿Utilizas el sistema POS Lightspeed Retail?"
+          viewing_our_streamlined_page: Actualmente estás viendo nuestra página de
+            registro simplificada de la tienda de bicicletas, que es la que recomendamos
+            usar.
+      my_account:
+        organization_roles:
+          automatically_view_in_organization: Visualización automática con la barra
+            de navegación %{org_name} al iniciar sesión en Bike Index.
+          joined: Unido
+          leave_confirm: "¡Advertencia! Tendrás que pedirle a un administrador de
+            %{org_name} que recupere este rol de organización. No podrás deshacer
+            esto tú mismo."
+          leave_organization: Organización de salida
+          organization_role_information: Organizaciones en las que participas. Arrástralas
+            para ordenarlas según la prioridad que desees.
+          organization_roles:
+            one: Su rol en la organización
+            other: Funciones de su organización
+          role_html: 'Función: %{role}'
+          roles:
+            admin: Administración
+            member: Miembro
+            member_no_bike_edit: Miembro - sin edición de bicicletas
+          view_after_log_in: Después de iniciar sesión
+          view_as_html: Ver como %{org_name}
+          view_without_an_organization: Ver sin una organización
+          you_can_still_switch: Podrás seguir cambiando la vista para mostrar u ocultar
+            la organización en la configuración de la barra de navegación.
+          your_first_organization: tu primera organización
+      navbar:
+        org_sidebar:
+          admin_panel: PANEL DE ADMINISTRACIÓN
+          collapse_sidebar: Contraer la barra lateral
+          expand_sidebar: Expandir barra lateral
+          menu: Menú
+          organization_crest: "%{org_name} cresta"
+        primary_menu:
+          blog: Blog
+          donate: Donar
+          help: Ayuda
+          log_in: conectarse
+          marketplace: Mercado
+          search: Buscar
+          sign_up: Inscríbete
+          stolen_bike: "¿Bicicleta robada?"
+        user_settings_menu:
+          settings_menu: Ajustes
+        wrapper:
+          menu: Menú
+          sign_up: Inscríbete
+          the_nonprofit_bike_registry: el registro de bicicletas sin ánimo de lucro
+      new_sale_form:
+        record_sale: Venta récord
+        sold_for: Cantidad vendida por
+        transfer_to_html: Esto transferirá el registro a %{buyer_html} y cerrará el
+          listado del mercado.
+      review_app_banner:
+        commit_tooltip: 'Commit actual:'
+        disclaimer: Los datos son efímeros.
+        label: Aplicación de reseñas
+        label_development: Desarrollo
+        label_sandbox: Salvadera
+        letter_opener_link: Bandeja de salida de correo electrónico
+        letter_opener_tooltip: Vea el correo electrónico enviado por esta aplicación
+          de reseñas.
+        no_superadmin: No hay superusuario (no puede iniciar sesión)
+        pr_link: 'PR #%{number}'
+        superadmin_button: Iniciar sesión como superadministrador
+        superadmin_signed_in: Sesión iniciada como superadministrador
+      strava_integration:
+        activities_synced:
+          one: actividad sincronizada
+          other: actividades sincronizadas
+        connect_with_strava: Conéctate con Strava
+        connected_to_strava: Conectado a Strava
+        disconnect_confirm: "¿Seguro que quieres desconectar Strava? Esto eliminará
+          todas las actividades sincronizadas."
+        disconnect_strava: Desconectar Strava
+        downloaded: descargado
+        integrate_your_bikes_with_strava: Integra tus bicicletas con Strava y sincroniza
+          tus actividades ciclistas.
+        strava_bikes_connected: Bicicletas de Strava conectadas a bicicletas de Bike
+          Index
+        strava_connected_pending: Conectado a Strava. La sincronización comenzará
+          en breve.
+        strava_integration: Integración con Strava
+        sync_error: Error de sincronización
+        sync_error_description: Se ha producido un error al sincronizar tus actividades
+          de Strava. Intenta desconectarte y volver a conectarte.
+        sync_running_in_background: La sincronización se está ejecutando en segundo
+          plano. Esta página se actualizará automáticamente.
+        syncing_activities: Sincronizando actividades...
+      user_alerts:
+        phone_waiting_confirmation:
+          confirm_your_phone_number: Confirma tu número de teléfono
+          verification_code: Código de verificación
+          verify_number: Verificar %{phone_number}
+        stolen_bike_without_location:
+          add_location_theft_bike_title_html: Agregue la ubicación del robo de su
+            <strong>%{bike_title}</strong>
+          location_critical_html: "<strong>Es fundamental para la recuperación</strong>
+            que incluya la dirección o la calle transversal donde le robaron su %{bike_type}."
+          stolen_missing_location_title: Por favor, añada la ubicación del robo.
+          without_location_all_is_lost: Sin una ubicación no podemos difundir la noticia
+            del robo y la gente no sabrá dónde buscar su %{bike_type}.
+        theft_alert_without_photo:
+          add_photo_theft_bike_title_html: Agrega una foto a tu <strong>%{bike_title}</strong>
+          missing_stolen_photo_title: Por favor, añade una foto.
+          photo_critical_html: Las alertas promocionadas exitosas <strong>deben tener
+            una imagen.</strong>
+          without_photo_all_is_lost: Si no tienes fotos de tu %{bike_type}, busca
+            una imagen de archivo en internet y súbela. Sin una imagen, la alerta
+            promocionada no será efectiva.
+        unfinished_registration:
+          finish_the_required_steps: completar los pasos requeridos
+          not_registered_yet_html: Tu %{manufacturer} %{cycle_type} aún no está registrado.
+            Por favor %{finish_link}
   user_emails:
     confirm:
       confirm_email: Confirmar correo electrónico

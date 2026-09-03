@@ -8,6 +8,8 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::ParkingNotificationFor
   # Defined in utils/maplibre.js since #3954, so there is no Ruby constant to reuse
   let(:maps_host) { "https://maps.bikeindex.org" }
   let(:preview_path) { "/rails/view_components/pages/registrations/show/org_top_actions/parking_notification_form/component/default" }
+  # The preview opens the parking panel on load; an empty panel starts it closed
+  let(:closed_preview_path) { "#{preview_path}?panel=" }
   let(:organization) { FactoryBot.create(:organization) }
   let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
 
@@ -195,7 +197,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::ParkingNotificationFor
   end
 
   it "geolocates, splits the address into fields, toggles modes, and keeps drafts across a reload" do
-    visit preview_path
+    visit closed_preview_path
 
     # Submit is disabled until a location is chosen
     expect(page).to have_button("Create parking notification", disabled: true, visible: :all)
@@ -392,14 +394,38 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::ParkingNotificationFor
   end
 
   # Opening via the Impound trigger preselects the impound kind
-  it "titles for the bike type, preselects impound, hides the reason chooser, and survives a reload" do
-    visit preview_path
+  it "titles for the bike type, preselects impound, hides the reason chooser, and survives a reload or a late module" do
+    visit closed_preview_path
     click_button "Impound"
 
     expect_impound_mode
 
     # The impound trigger's panel name reopens the shared form in impound mode
     visit "#{preview_path}?panel=impound"
+
+    expect_impound_mode
+
+    # Every controller module is a separate fetch, so the accordion can open the
+    # panel — spending its one-shot `shown` event — before this component's module
+    # has landed. Held until the panel is open rather than for a duration, which
+    # only wins the race some of the time
+    release, held_requests = Queue.new, [] # captured by the cross-thread route handler
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.context.route(%r{parking_notification_form_controller}, proc { |route, request|
+        held_requests << request.url
+        release.pop
+        route.continue
+      })
+    end
+
+    visit "#{preview_path}?panel=impound"
+
+    # Only the accordion can reveal the panel, so this is it having opened and
+    # dispatched to nobody — and a route that stopped matching would hold
+    # nothing, leaving the example green against no race
+    expect(page).to have_content("Set on map", wait: 10)
+    expect(held_requests).to_not be_empty
+    release << :continue
 
     expect_impound_mode
   end
@@ -409,7 +435,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::ParkingNotificationFor
     let!(:earlier_notification) { FactoryBot.create(:parking_notification, bike:, organization:) }
 
     it "offers repeat first and collapses the location controls while it's selected" do
-      visit preview_path
+      visit closed_preview_path
       click_button "Parking notification"
 
       # Repeat is offered first, before "First notice"

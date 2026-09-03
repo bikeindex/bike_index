@@ -23,7 +23,7 @@
           data: {"ui--collapse-target": "trigger", action: "ui--collapse#toggle"}
         )) %>
         <div data-ui--collapse-target="content" class="tw:hidden">
-          <%= form_with(model: stolen_notification, url: stolen_notifications_path, data: {controller: "csrf-refresh"}) do |form| %>
+          <%= form_with(model: stolen_notification, url: stolen_notifications_path, class: "tw:mt-3", data: {controller: "csrf-refresh"}) do |form| %>
             <%= form.hidden_field :bike_id, value: @bike.id %>
 
             <%= form.text_area :message,
@@ -37,7 +37,7 @@
               class: "twinput tw:mt-2 tw:w-full" %>
 
             <div class="tw:mt-3">
-              <%= render(UI::Button::Component.new(text: translation(".send_message"), color: :purple, type: "submit")) %>
+              <%= render(UI::Button::Component.new(text: translation(".send_message"), color: :primary, type: "submit")) %>
             </div>
           <% end %>
         </div>
