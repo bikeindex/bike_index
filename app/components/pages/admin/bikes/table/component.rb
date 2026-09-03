@@ -10,7 +10,7 @@ module Pages
         # checkboxes, and skip_user to drop the owner column.
         class Component < ApplicationComponent
           # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-          MARKUP_DIGEST = "1ec53bba12a2"
+          MARKUP_DIGEST = "d6ad3706501d"
 
           def initialize(bikes:, sort_state: ComponentStructs::SortState.new, display_dev_info: false, no_show_header: false,
             show_serial: false, skip_manufacturer_link: false, render_sortable: false,

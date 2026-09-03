@@ -6,7 +6,8 @@ import { claimFloatingZIndex, releaseFloatingZIndex } from 'utils/floating_z_ind
 //
 // State model: two independent flags, OR'd together.
 //   hoverActive       toggled by mouseenter/mouseleave
-//   persistentActive  toggled by focus / cleared by focusout or click-outside
+//   persistentActive  toggled by focus / cleared by a click outside or focus moving
+//                     to another element in the page
 // The tooltip is visible whenever either flag is true.
 export default class extends Controller {
   static targets = ['trigger', 'tooltip']
@@ -44,7 +45,11 @@ export default class extends Controller {
     this.sync()
   }
 
-  hideOnFocusout () {
+  // Only focus landing on another element in the page dismisses. A focusout with
+  // nowhere to go is the browser window losing focus (the rider switched program)
+  // or a click on the tooltip itself - neither means they're done with it.
+  hideOnFocusout (event) {
+    if (!event.relatedTarget || this.element.contains(event.relatedTarget)) return
     this.persistentActive = false
     this.sync()
   }
@@ -63,6 +68,9 @@ export default class extends Controller {
   }
 
   sync () {
+    // Only a held-open tooltip takes pointer events, so its text can be clicked
+    // and selected; a hover-only one stays transparent to the mouse.
+    this.tooltipTarget.classList.toggle('tw:pointer-events-none', !this.persistentActive)
     if (this.hoverActive || this.persistentActive) this.open()
     else this.close()
   }

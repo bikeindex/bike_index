@@ -12,6 +12,10 @@ RSpec.describe UI::Tooltip::Component, type: :component do
     expect(component.text).to include "trigger"
   end
 
+  it "starts the tooltip click-through" do
+    expect(component.css("[role='tooltip']").first["class"]).to include "tw:pointer-events-none"
+  end
+
   it "wires aria-describedby to the tooltip id" do
     tooltip_id = component.css("[role='tooltip']").attr("id").value
     expect(tooltip_id).to be_present
@@ -69,11 +73,10 @@ RSpec.describe UI::Tooltip::Component, type: :component do
       end
     end
 
-    it "keeps the trigger a button and makes the popup clickable, not nested in the button" do
+    it "keeps the trigger a button, with the link in the popup rather than nested in the button" do
       trigger = component.css("[aria-describedby]").first
       expect(trigger.name).to eq "button"
       tooltip = component.css("[role='tooltip']").first
-      expect(tooltip["class"]).to include "tw:pointer-events-auto"
       expect(tooltip.at_css("a")[:href]).to eq "/commit/abc"
       expect(component.css("button a")).to be_empty
     end
