@@ -24,7 +24,7 @@
             .col-sm-4.col-lg-2.mt-4
               = submit_tag t(".update"), class: "btn btn-success"
 
-  = render(Pages::Org::BikeAccessPanel::Component.new(bike: @bike, organization: passive_organization, current_user:, display_dev_info: display_dev_info?, parking_notification_open: params[:parking_notification].present?))
+  = render(Pages::Bikes::Org::BikeAccessPanel::Component.new(bike: @bike, organization: passive_organization, current_user:, display_dev_info: display_dev_info?, parking_notification_open: params[:parking_notification].present?))
 
   - if current_user.present? && @bike.user == current_user
     = render partial: "owner_bike_status_alerts"

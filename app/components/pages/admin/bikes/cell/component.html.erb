@@ -15,7 +15,7 @@
       <%= Bike.status_humanized_translated(@bike.status_humanized).first %>
     </strong>
   <% end %>
-  <%= render Pages::Admin::Badges::BikeHiddenExplanation::Component.new(bike: @bike) %>
+  <%= render Atoms::Admin::Badges::BikeHiddenExplanation::Component.new(bike: @bike) %>
   <% if bike_link_path.present? %>
     <%= link_to bike_content, bike_link_path, class: "twlink" %>
   <% else %>

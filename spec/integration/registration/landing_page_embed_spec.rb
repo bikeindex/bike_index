@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe "Organization landing page registration embed", :js, type: :system do
   let(:owner_email) { "owner@bikeindex.org" }
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
-  # The slug LandingPages::ORGANIZATIONS routes by default, so /brakebills is the landing page
+  # The slug LandingPageOrganizations::SLUGS routes by default, so /brakebills is the landing page
   let!(:organization) { FactoryBot.create(:organization, name: "Brakebills") }
   let!(:organization_landing_page) { FactoryBot.create(:organization_landing_page, organization:, body:) }
   # The column the seeded page frames it in, which is narrower than the combobox's

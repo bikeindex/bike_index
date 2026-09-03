@@ -35,7 +35,7 @@
     <p>
       <% if marketplace_listing_subject.present? %>
         <%= @viewing.pluralize %> for
-        <em>Marketplace Listing <%= render(Pages::Admin::Badges::MarketplaceListing::Component.new(status: marketplace_listing_subject.status, status_humanized: marketplace_listing_subject.status_humanized, kind: :marketplace_listing)) %> #<%= marketplace_listing_subject.id %>,</em>
+        <em>Marketplace Listing <%= render(Atoms::Admin::Badges::MarketplaceListing::Component.new(status: marketplace_listing_subject.status, status_humanized: marketplace_listing_subject.status_humanized, kind: :marketplace_listing)) %> #<%= marketplace_listing_subject.id %>,</em>
 
 
         <%= render Pages::Admin::Bikes::Cell::Component.new(bike: marketplace_listing_subject.item, bike_id: marketplace_listing_subject.item_id) %>

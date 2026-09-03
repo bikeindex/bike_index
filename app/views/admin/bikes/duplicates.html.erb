@@ -1,6 +1,6 @@
 <h1>Possible duplicate bikes</h1>
 
-<%= render(Pages::Admin::PaginationWithCount::Component.new(collection: @duplicate_groups, index: admin_index_state, count: @duplicate_groups_count)) %>
+<%= render(Atoms::Admin::PaginationWithCount::Component.new(collection: @duplicate_groups, index: admin_index_state, count: @duplicate_groups_count)) %>
 
 <% @duplicate_groups.each do |duplicate_group| %>
   <div
@@ -19,4 +19,4 @@
         display_dev_info: display_dev_info?, no_show_header: true, show_serial: true) %>
 <% end %>
 
-<%= render(Pages::Admin::PaginationWithCount::Component.new(collection: @duplicate_groups, index: admin_index_state, skip_total: true)) %>
+<%= render(Atoms::Admin::PaginationWithCount::Component.new(collection: @duplicate_groups, index: admin_index_state, skip_total: true)) %>

@@ -2,7 +2,7 @@
 
 <div class="root-landing-page">
   <% cache("redesigned_homepage-#{@recovery_displays.maximum(:updated_at)}", skip_digest: true) do %>
-    <%= render(SharedBlocks::HomepageTop::Component.new(recoveries_value: Counts.recoveries_value,
+    <%= render(Pages::Homepage::Top::Component.new(recoveries_value: Counts.recoveries_value,
       organization_count: Organization.count,
       recovery_displays: @recovery_displays)) %>
   <% end %>

@@ -1,0 +1,7 @@
+<ul class="tw:flex tw:flex-col tw:gap-2">
+  <% creation_descriptions.each do |creation_description| %>
+    <li>
+      <%= render(Atoms::Org::OriginDisplay::Component.new(creation_description:)) %>
+    </li>
+  <% end %>
+</ul>
