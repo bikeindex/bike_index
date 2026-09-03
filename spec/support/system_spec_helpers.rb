@@ -193,7 +193,15 @@ module SystemSpecHelpers
     JS
   end
 
-  # The registration's emailed link, minus the mailer's host - the app is on Capybara's
+  # The link out of the mail just delivered, minus the mailer's host - the app is on Capybara's
+  def emailed_path(path)
+    body = ActionMailer::Base.deliveries.last.html_part.body.decoded
+    link = Nokogiri::HTML(body).css("a").map { |a| a["href"] }.compact.find { |href| href.include?(path) }
+    expect(link).to be_present
+    URI(link).request_uri
+  end
+
+  # The registration's emailed link, once its job has run
   def confirmation_link
     Email::PartialRegistrationJob.drain
     url = ActionMailer::Base.deliveries.last.html_part.decoded[%r{https?://[^"]*/register/confirm[^"]*}]
@@ -230,8 +238,15 @@ module SystemSpecHelpers
   # intercepting every click until it's dismissed -- which sets the localStorage flag
   # that keeps it closed for the rest of the session. A page that doesn't render it, or
   # one reached after that flag is set, is a no-op rather than a failure.
-  def dismiss_donation_modal
-    return unless page.has_css?("#donationModal", visible: :all, wait: 0)
+  #
+  # `wait` is for a caller that knows the modal renders: my_accounts#show puts it at the
+  # foot of a long page, so the default check can outrun the load and leave the modal to
+  # open over whatever gets clicked next.
+  def dismiss_donation_modal(wait: 0)
+    return unless page.has_css?("#donationModal", visible: :all, wait:)
+    # The element renders whether or not the flag lets it open, so without this the second
+    # visit of a session waits out the whole budget below for a modal that can't appear
+    return if page.evaluate_script('localStorage.getItem("hideDonationModal")') == "true"
     return unless page.has_css?("#donationModal.in", wait: 5)
 
     click_button "No donation"
