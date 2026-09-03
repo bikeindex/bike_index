@@ -76,9 +76,9 @@ RSpec.describe Atoms::Org::OriginDisplay::Component, type: :component do
     context "broken_lightspeed_pos" do
       let(:ownership) { Ownership.new(pos_kind: "broken_lightspeed_pos") }
 
-      it "renders the same, the organization's integration health not being how this was registered" do
-        expect(component).to have_content("lightspeed")
-        expect(component).to have_css("[role=tooltip]", text: "automatically registered by bike shop point of sale (Lightspeed POS)", visible: :all)
+      it "names the POS and its broken integration" do
+        expect(component).to have_content("lightspeed (broken)")
+        expect(component).to have_css("[role=tooltip]", text: "automatically registered by bike shop point of sale (Lightspeed POS), whose integration is marked broken", visible: :all)
       end
     end
   end

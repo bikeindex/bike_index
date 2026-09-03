@@ -579,9 +579,9 @@ RSpec.describe Ownership, type: :model do
       expect(Ownership.new(origin: "organization_form").creation_kind).to eq :organization_form
     end
     # UpdateOrganizationPosKindJob sets broken_* on an organization, never on an ownership
-    it "reads every POS kind as the POS it is" do
-      expect(Ownership.new(pos_kind: "broken_lightspeed_pos").creation_kind).to eq :lightspeed_pos
-      expect(Ownership.new(pos_kind: "broken_ascend_pos").creation_kind).to eq :ascend_pos
+    it "keeps every POS kind, the broken ones included" do
+      expect(Ownership.new(pos_kind: "broken_lightspeed_pos").creation_kind).to eq :broken_lightspeed_pos
+      expect(Ownership.new(pos_kind: "broken_ascend_pos").creation_kind).to eq :broken_ascend_pos
       expect(Ownership.new(pos_kind: "other_pos").creation_kind).to eq :other_pos
     end
     context "bulk" do

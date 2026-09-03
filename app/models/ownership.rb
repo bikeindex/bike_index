@@ -190,10 +190,9 @@ class Ownership < ApplicationRecord
   end
 
   # creation_description humanizes distinct kinds down to a shared string, so anything
-  # that tells them apart has to key off this instead. broken_* is an organization's
-  # integration health, not how a registration was made
+  # that tells them apart has to key off this instead
   def creation_kind
-    return pos_kind.delete_prefix("broken_").to_sym if pos?
+    return pos_kind.to_sym if pos?
     return :bulk_import if bulk?
 
     origin&.to_sym

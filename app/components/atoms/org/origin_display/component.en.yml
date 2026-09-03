@@ -10,6 +10,12 @@ en:
             api_v3: registered through the API (v3)
             ascend_pos: automatically registered by bike shop point of sale (Ascend
               POS)
+            broken_ascend_pos: >-
+              automatically registered by bike shop point of sale (Ascend POS), whose
+              integration is marked broken
+            broken_lightspeed_pos: >-
+              automatically registered by bike shop point of sale (Lightspeed POS),
+              whose integration is marked broken
             bulk_import: registered by spreadsheet import
             bulk_import_worker: registered by spreadsheet import
             creator_unregistered_parking_notification: registered via the Unregistered
@@ -38,6 +44,8 @@ en:
             api_v2: api v2
             api_v3: api v3
             ascend_pos: ascend
+            broken_ascend_pos: ascend (broken)
+            broken_lightspeed_pos: lightspeed (broken)
             bulk_import: bulk import
             bulk_import_worker: bulk import worker
             creator_unregistered_parking_notification: unregistered parking notification
