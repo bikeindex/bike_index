@@ -22,9 +22,7 @@ RSpec.describe LandingPagesController, type: :request do
     ascend: "Ascend POS on Bike Index",
     ambassadors_current: "Bike Index Ambassadors",
     ambassadors_how_to: "Become a Bike Index Ambassador",
-    bike_shop_packages: "Bike Index for Bike Shops - Features and Pricing",
-    campus_packages: "Bike Index for Schools - Features and Pricing",
-    cities_packages: "Bike Index for Cities - Features and Pricing"
+    bike_shop_packages: "Bike Index for Bike Shops - Features and Pricing"
   }.each_pair do |controller_action, page_title|
     describe "##{controller_action}" do
       it "renders the correct template with the correct title" do
@@ -33,7 +31,7 @@ RSpec.describe LandingPagesController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(controller_action)
         expect(response.body).to match("<title>#{page_title}</title>")
-        expect(response.body).to match("<html lang='en'>") # Accessibility
+        expect(response.body).to match('<html lang="en">') # Accessibility
       end
     end
   end
@@ -47,17 +45,42 @@ RSpec.describe LandingPagesController, type: :request do
     end
   end
 
+  describe "review app banner" do
+    it "renders the banner, and suppresses it with NO_REVIEW_TOPBAR" do
+      stub_const("ENV", ENV.to_hash.merge("REVIEW_APP" => "1"))
+      get "/for_bike_shops"
+      expect(response.body).to include("review-app-banner")
+
+      stub_const("ENV", ENV.to_hash.merge("REVIEW_APP" => "1", "NO_REVIEW_TOPBAR" => "true"))
+      get "/for_bike_shops"
+      expect(response.body).not_to include("review-app-banner")
+    end
+  end
+
   describe "organization show" do
     let(:title) { response.body[/<title[^>]*>([^<]*)/, 1] }
-    let!(:organization) { FactoryBot.create(:organization, short_name: "University") }
+    let!(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+    let!(:organization_landing_page) do
+      FactoryBot.create(:organization_landing_page, organization:, body: "<p>Brakebills welcomes you</p>")
+    end
 
     it "renders" do
-      expect(LandingPages::ORGANIZATIONS).to include(organization.slug)
-      get "/university"
+      expect(LandingPageOrganizations::SLUGS).to include(organization.slug)
+      get "/#{organization.slug}"
       expect(response.status).to eq(200)
       expect(response).to render_template("show")
-      expect(title).to eq "University Bike Registration"
+      expect(title).to eq "Brakebills Bike Registration"
       expect(assigns(:page_id)).to eq "landing_pages_show"
+      expect(response.body).to include "<p>Brakebills welcomes you</p>"
+    end
+
+    context "without a landing page" do
+      let(:organization_landing_page) { nil }
+
+      it "renders empty" do
+        get "/#{organization.slug}"
+        expect(response.status).to eq(200)
+      end
     end
 
     context "xml request format" do
@@ -65,7 +88,7 @@ RSpec.describe LandingPagesController, type: :request do
         get "/#{organization.slug}.xml"
         expect(response.status).to eq(200)
         expect(response).to render_template("show")
-        expect(title).to eq "University Bike Registration"
+        expect(title).to eq "Brakebills Bike Registration"
       end
     end
   end

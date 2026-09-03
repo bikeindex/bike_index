@@ -1,0 +1,5 @@
+<%# Pre-built option tags: the selection is baked into them, so `options:` carries no selected: %>
+<%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :frame_material,
+    option_tags: options_for_select([["Aluminum", "aluminum"], ["Steel", "steel"], ["Carbon", "carbon"]], "carbon"))) %>
+<% end %>

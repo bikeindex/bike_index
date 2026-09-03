@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: model_audits
+# Database name: primary
 #
 #  id                   :bigint           not null, primary key
 #  bikes_count          :integer
@@ -52,6 +53,7 @@ class ModelAudit < ApplicationRecord
 
     def manufacturer_id_corrected(manufacturer_id, mnfg_name)
       return manufacturer_id if manufacturer_id != Manufacturer.other.id
+
       Manufacturer.friendly_find_id(mnfg_name) || manufacturer_id
     end
 
@@ -59,6 +61,7 @@ class ModelAudit < ApplicationRecord
       model_audits = where("mnfg_name ILIKE ?", mnfg_name)
       manufacturer_id = manufacturer_id_corrected(manufacturer_id, mnfg_name)
       return model_audits if manufacturer_id == Manufacturer.other.id
+
       model_audits.or(where(manufacturer_id: manufacturer_id))
     end
 
@@ -69,6 +72,7 @@ class ModelAudit < ApplicationRecord
       matching_audits = matching_manufacturer(manufacturer_id, mnfg_name)
         .matching_frame_model(frame_model, manufacturer_id: manufacturer_id).reorder(:id)
       return matching_audits.first if matching_audits.count < 2
+
       not_other = matching_audits.where.not(manufacturer_id: Manufacturer.other.id)
       not_other.present? ? not_other.first : matching_audits.first
     end
@@ -85,6 +89,7 @@ class ModelAudit < ApplicationRecord
 
     def audit?(bike)
       return true if bike.motorized? || bike.manufacturer&.motorized_only?
+
       if bike.manufacturer&.other?
         manufacturer_id = manufacturer_id_corrected(bike.manufacturer_id, bike.mnfg_name)
         if manufacturer_id != Manufacturer.other.id
@@ -92,15 +97,16 @@ class ModelAudit < ApplicationRecord
         end
       end
       return false if unknown_model?(bike.frame_model, manufacturer_id: bike.manufacturer_id)
+
       # Also enqueue if any matching bikes have a model_audit
       ModelAudit.matching_bikes_for(bike).where.not(model_audit_id: nil).limit(1).any?
     end
 
     def matching_bikes_for(bike = nil, manufacturer_id: nil, mnfg_name: nil, frame_model: nil)
       manufacturer_id ||= bike&.manufacturer_id
-      mnfg_name ||= bike&.mnfg_name || Manufacturer.find_by_id(manufacturer_id)&.simple_name
+      mnfg_name ||= bike&.mnfg_name || Manufacturer.find_by_id(manufacturer_id)&.short_name
       # Always match by mnfg_name, to fix things if it previously was manufacturer_other
-      bikes = Bike.unscoped.where("mnfg_name ILIKE ?", mnfg_name)
+      bikes = Bike.unscoped.where("LOWER(mnfg_name) = LOWER(?)", mnfg_name)
       if manufacturer_id != Manufacturer.other.id
         bikes = bikes.or(Bike.unscoped.where(manufacturer_id: manufacturer_id))
       end
@@ -132,9 +138,9 @@ class ModelAudit < ApplicationRecord
     def matching_bikes_for_frame_model(bikes, manufacturer_id:, frame_model:)
       if unknown_model?(frame_model, manufacturer_id: manufacturer_id)
         bikes = bikes.motorized unless Manufacturer.find_by_id(manufacturer_id)&.motorized_only
-        bikes.where(frame_model: nil).or(bikes.where("frame_model ILIKE ANY (array[?])", UNKNOWN_STRINGS))
+        bikes.where(frame_model: nil).or(bikes.where("LEFT(LOWER(frame_model), 255) = ANY (array[?])", UNKNOWN_STRINGS.map(&:downcase)))
       else
-        bikes.where("frame_model ILIKE ?", frame_model)
+        bikes.where("LEFT(LOWER(frame_model), 255) = LEFT(LOWER(?), 255)", frame_model)
       end
     end
 
@@ -180,6 +186,7 @@ class ModelAudit < ApplicationRecord
       frame_model&.downcase == bike.frame_model&.downcase
     end
     return false unless same_frame_model
+
     mnfg_name.downcase == bike.mnfg_name.downcase
   end
 

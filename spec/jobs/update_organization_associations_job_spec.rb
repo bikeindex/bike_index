@@ -80,6 +80,25 @@ RSpec.describe UpdateOrganizationAssociationsJob, type: :job do
     end
   end
 
+  describe "touching member users" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:user1) { FactoryBot.create(:organization_user, organization:) }
+    let!(:user2) { FactoryBot.create(:organization_user, organization:) }
+    let!(:other_user) { FactoryBot.create(:user_confirmed) }
+
+    it "touches every member user (so caches keyed on user.cache_key_with_version pick up org changes)" do
+      [user1, user2, other_user].each { |u| u.update_columns(updated_at: Time.current - 1.hour) }
+
+      expect { instance.perform(organization.id) }
+        .to change { user1.reload.updated_at }
+        .and change { user2.reload.updated_at }
+
+      expect(user1.reload.updated_at).to be_within(2).of(Time.current)
+      expect(user2.reload.updated_at).to be_within(2).of(Time.current)
+      expect(other_user.reload.updated_at).to be < Time.current - 30.minutes
+    end
+  end
+
   describe "organization_manufacturers" do
     let(:manufacturer) { FactoryBot.create(:manufacturer) }
     let!(:manufacturer_organization) { FactoryBot.create(:organization_with_organization_features, manufacturer: manufacturer, enabled_feature_slugs: ["official_manufacturer"]) }
@@ -141,6 +160,55 @@ RSpec.describe UpdateOrganizationAssociationsJob, type: :job do
       instance.perform(organization.id)
       expect(organization.reload.enabled_feature_slugs).to eq([])
       expect(organization_stolen_message.reload.is_enabled).to be_falsey
+    end
+  end
+
+  describe "email_placeholder" do
+    let(:organization) { FactoryBot.create(:organization) }
+
+    def email_placeholder
+      organization.reload.registration_field_labels["email_placeholder"]
+    end
+
+    it "takes the user_email_domain, and doesn't overwrite an existing placeholder" do
+      instance.perform(organization.id)
+      expect(email_placeholder).to be_blank
+
+      organization.update(user_email_domain: "uiowa.edu", skip_update: true)
+      instance.perform(organization.id)
+      expect(email_placeholder).to eq "you@uiowa.edu"
+
+      organization.update(user_email_domain: "brakebills.edu", skip_update: true)
+      instance.perform(organization.id)
+      expect(email_placeholder).to eq "you@uiowa.edu"
+    end
+
+    context "with an auto_user" do
+      let(:user) { FactoryBot.create(:user_confirmed, email: "sarah@uiowa.edu") }
+      let(:organization) { FactoryBot.create(:organization_with_auto_user, user:) }
+
+      it "takes the auto_user's domain" do
+        instance.perform(organization.id)
+        expect(email_placeholder).to eq "you@uiowa.edu"
+      end
+
+      context "auto_user is the AUTO_ORG_MEMBER" do
+        let(:user) { FactoryBot.create(:user_confirmed, email: ENV["AUTO_ORG_MEMBER"]) }
+
+        it "doesn't set a placeholder" do
+          instance.perform(organization.id)
+          expect(email_placeholder).to be_blank
+        end
+      end
+
+      context "auto_user is a bikeindex.org address" do
+        let(:user) { FactoryBot.create(:user_confirmed, email: "seth@bikeindex.org") }
+
+        it "doesn't set a placeholder" do
+          instance.perform(organization.id)
+          expect(email_placeholder).to be_blank
+        end
+      end
     end
   end
 end

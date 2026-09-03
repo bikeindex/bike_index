@@ -1,0 +1,14 @@
+<% nav_header_list_items = capture do %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "New Account", href: "/auth/twitter", color: :primary, size: :sm)) %>
+  </li>
+<% end %>
+
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  viewing: controller_name.humanize,
+  collection: @social_accounts,
+  index_title: "Social Accounts",
+  nav_header_list_items:,
+  skip_charting: true,
+)) %>

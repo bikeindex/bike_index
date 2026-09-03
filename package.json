@@ -1,13 +1,25 @@
 {
   "name": "bike_index-webapp",
   "devDependencies": {
+    "@herb-tools/formatter": "^0.10.3",
+    "@herb-tools/linter": "^0.10.3",
+    "axe-core": "4.12.1",
+    "playwright": "1.60.0",
     "standard": "*"
   },
   "scripts": {
-    "lint": "standard --fix"
+    "html:format": "herb-format .",
+    "html:format_check": "herb-format --check .",
+    "html:lint": "herb-lint --fix --format=simple",
+    "html:lint_check": "herb-lint --format=simple --github",
+    "js:lint": "standard --fix",
+    "js:lint_check": "standard",
+    "lint": "npm run js:lint && npm run html:lint && npm run html:format",
+    "lint_check": "npm run js:lint_check & npm run html:lint_check & npm run html:format_check & wait"
   },
   "standard": {
     "ignore": [
+      "/kelsey_redesign/",
       "/app/assets/",
       "/public/"
     ]

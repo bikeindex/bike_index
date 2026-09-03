@@ -2,21 +2,23 @@ module Organized
   class DashboardController < Organized::BaseController
     before_action :set_fallback_period
     before_action :set_period, only: [:index]
-    helper_method :bikes_for_graph
+
     skip_before_action :ensure_not_ambassador_organization!, only: [:root]
+
+    helper_method :bikes_for_graph
 
     def root
       if current_organization.ambassador?
         redirect_to organization_ambassador_dashboard_path
       else
-        redirect_to organization_bikes_path
+        redirect_to organization_registrations_path
       end
     end
 
     def index
       # Only render this page if the organization has overview_dashboard (or it's a superuser)
       if !current_organization.overview_dashboard? && !current_user.superuser?
-        redirect_to organization_bikes_path
+        redirect_to organization_registrations_path
         return
       end
 

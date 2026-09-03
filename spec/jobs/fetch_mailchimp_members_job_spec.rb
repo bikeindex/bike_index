@@ -13,7 +13,7 @@ RSpec.describe FetchMailchimpMembersJob, type: :job do
           merge_fields: {bikes: 0, number_of_donations: 0}
         }
       end
-      let(:mailchimp_updated_at) { TimeParser.parse("2021-06-11T19:06:19+00:00") }
+      let(:mailchimp_updated_at) { Binxtils::TimeParser.parse("2021-06-11T19:06:19+00:00") }
       it "creates the given number of mailchimp_datums" do
         expect(MailchimpDatum.count).to eq 0
         VCR.use_cassette("fetch_mailchimp_members_worker-success", match_requests_on: [:path]) do
@@ -41,7 +41,7 @@ RSpec.describe FetchMailchimpMembersJob, type: :job do
       end
       let(:user) { FactoryBot.create(:user, email: "seth@bikeindex.org") }
       let!(:mailchimp_datum) { MailchimpDatum.create(user: user, mailchimp_updated_at: Time.current - 1.year, data: {lists: ["organization"]}) }
-      let(:mailchimp_updated_at) { TimeParser.parse("2021-06-11T20:11:41+00:00") }
+      let(:mailchimp_updated_at) { Binxtils::TimeParser.parse("2021-06-11T20:11:41+00:00") }
       it "does not duplicate user" do
         expect(MailchimpDatum.count).to eq 1
         expect(mailchimp_datum.reload.lists).to eq([])

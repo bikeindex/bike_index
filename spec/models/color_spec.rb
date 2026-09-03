@@ -29,6 +29,23 @@ RSpec.describe Color, type: :model do
     end
   end
 
+  describe "#swatch_style" do
+    it "uses the display color" do
+      color = FactoryBot.create(:color, name: "Blue", display: "#386ed2")
+      expect(color.cover_up?).to be_falsey
+      expect(color.swatch_style).to eq("background: #386ed2")
+    end
+
+    context "cover-up color" do
+      let(:color) { FactoryBot.create(:color, name: Color::COVER_UP_NAME, display: "#fff") }
+
+      it "renders a multicolor swatch instead of the white display" do
+        expect(color.cover_up?).to be_truthy
+        expect(color.swatch_style).to eq("background: #{Color::COVER_UP_SWATCH}")
+      end
+    end
+  end
+
   describe "black" do
     context "not-existing" do
       it "creates it on first pass" do

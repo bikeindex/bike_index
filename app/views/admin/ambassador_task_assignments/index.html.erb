@@ -1,0 +1,26 @@
+<% ambassador_organizations = Organization.ambassador.to_a %>
+
+<% nav_header_list_items = capture do %>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: ambassador_organizations.detect { |org| org.id.to_s == params[:search_organization_id].to_s }&.name || "Filter by organization", button_size: :sm,
+          active: params[:search_organization_id].present?)) do |dropdown| %>
+      <% if params[:search_organization_id].present? %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All organizations", path: admin_ambassador_task_assignments_path(sortable_search_params.except(:search_organization_id)), match_params: {search_organization_id: nil}) } %>
+        <% dropdown.with_entry_divider %>
+      <% end %>
+
+      <% ambassador_organizations.each do |org| %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: org.name, path: admin_ambassador_task_assignments_path(sortable_search_params.merge(search_organization_id: org.id)), match_params: {search_organization_id: org.id}) } %>
+      <% end %>
+    <% end %>
+  </li>
+<% end %>
+
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  viewing: controller_name.humanize,
+  collection: @ambassador_task_assignments,
+  index_title: "Completed Ambassador Activities",
+  nav_header_list_items:,
+  skip_charting: true,
+)) %>

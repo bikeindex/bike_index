@@ -1,0 +1,4 @@
+<%= render(Pages::Admin::Organizations::Tabs::Component.new(organization: @organization, active: :custom_layouts,
+      display_dev_info: display_dev_info?)) %>
+
+<%= render(Pages::Admin::Organizations::CustomLayouts::Index::Component.new(organization: @organization)) %>

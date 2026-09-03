@@ -1,0 +1,36 @@
+<% content_for(:header) do %>
+  <% @strava_search_assets.each do |asset| %>
+    <% if asset[:type] == :react_refresh %>
+      <script type="module">
+        import RefreshRuntime from <%== asset[:src].to_json %>
+        RefreshRuntime.injectIntoGlobalHook(window)
+        window.$RefreshReg$ = () => {}
+        window.$RefreshSig$ = () => (type) => type
+        window.__vite_plugin_react_preamble_installed__ = true
+      </script>
+    <% elsif asset[:type] == :script %>
+      <script type="module" crossorigin src="<%= asset[:src] %>"></script>
+    <% elsif asset[:type] == :stylesheet %>
+      <link rel="stylesheet" crossorigin href="<%= asset[:href] %>">
+    <% end %>
+  <% end %>
+<% end %>
+
+<%#
+  The layout skips its own <main id="main-content"> here (the SPA renders its own <main>),
+  so provide the skip-link target around the React mount point
+%>
+
+<div id="main-content">
+  <div id="root"></div>
+</div>
+
+<script>
+  window.stravaSearchConfig = <%= @strava_search_config.to_json.html_safe %>;
+  document.addEventListener('DOMContentLoaded', function() {
+    <%# Update the body padding so that there isn't whitespace at top %>
+    document.querySelector('.primary-header-nav').style.marginBottom = '0';
+    <%# And remove the whitespace at the bottom of the page too %>
+    document.querySelector('.primary-footer').style.marginTop = '0';
+  });
+</script>

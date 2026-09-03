@@ -19,14 +19,16 @@
               = irecord.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
               = irecord.label :impounded_at_with_timezone, "When did you find this bike?", class: 'form-well-label'
               .form-well-input
-                - irecord.object.impounded_at = TimeParser.round(irecord.object.impounded_at || Time.current)
-                = irecord.datetime_local_field :impounded_at_with_timezone, value: irecord.object.impounded_at, max: TimeParser.round(Time.current + 1.day), step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(irecord.object.impounded_at, format: :convert_time)
+                - irecord.object.impounded_at = Binxtils::TimeParser.round(irecord.object.impounded_at || Time.current)
+                = irecord.datetime_local_field :impounded_at_with_timezone, max: Binxtils::TimeParser.round(Time.current + 1.day), step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(irecord.object.impounded_at, format: :convert_time)
 
             .form-group.row.unnested-field
               = irecord.label :impounded_description, "Description", class: 'form-well-label'
               .form-well-input
                 = irecord.text_area :impounded_description, rows: 3, class: 'form-control'
 
-            = render partial: '/bikes_edit/bike_fields/stolen_location', locals: { srecord: irecord }
+            - irecord.object.address_record = f.object.find_or_build_address_record(country_id: current_country_id)
+            = irecord.fields_for :address_record do |address_form|
+              = render(UI::Forms::LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, bike_status: @bike.status))
 
             = render "/shared/form_well_footer_save"

@@ -6,18 +6,33 @@ FactoryBot.define do
     password_confirmation { "testthisthing7$" }
     terms_of_service { true }
 
+    # Set latitude and longitude from address_record if it's present
+    latitude { address_record&.latitude }
+    longitude { address_record&.longitude }
+
     trait :confirmed do
       after(:create) { |u| u.confirm(u.confirmation_token) }
+    end
+
+    trait :with_address_record do
+      transient do
+        address_in { :new_york }
+        address_record_kind { :user }
+      end
+
+      address_record do
+        FactoryBot.build(:address_record, address_in, kind: address_record_kind, user: instance)
+      end
     end
 
     factory :user_confirmed, traits: [:confirmed] do
       factory :user_bikehub_signup do
         partner_data { {sign_up: "bikehub"} }
       end
-      factory :admin do
+      factory :superuser do
         accepted_vendor_terms_of_service { true }
-        superuser { true }
-        factory :admin_developer do
+        after(:create) { |user| FactoryBot.create(:superuser_ability, user:) }
+        factory :superuser_developer do
           developer { true }
         end
       end

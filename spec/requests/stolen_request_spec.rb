@@ -16,6 +16,15 @@ RSpec.describe StolenController, type: :request do
     end
   end
 
+  # The vendored multi_serial_search bundle hardcodes this webpacker path for the
+  # search button's icon, and renders a broken image without it
+  describe "the bundle's icon path" do
+    it "redirects to the asset" do
+      get "/packs/media/stolen/search-583a6c1f.svg"
+      expect(response).to redirect_to(%r{/assets/stolen/search-\w+\.svg})
+    end
+  end
+
   describe "current_tsv" do
     it "redirects to current_tsv" do
       get "/stolen/current_tsv"

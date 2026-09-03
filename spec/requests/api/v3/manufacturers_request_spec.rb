@@ -16,14 +16,12 @@ RSpec.describe "Manufacturers API V3", type: :request do
   end
 
   describe "find by id or name" do
-    before :all do
-      @manufacturer = FactoryBot.create(:manufacturer)
-    end
+    let!(:manufacturer) { FactoryBot.create(:manufacturer) }
     it "returns one with from an id" do
-      get "/api/v3/manufacturers/#{@manufacturer.id}"
+      get "/api/v3/manufacturers/#{manufacturer.id}"
       result = response.body
       expect(response.code).to eq("200")
-      expect(JSON.parse(result)["manufacturer"]["id"]).to eq(@manufacturer.id)
+      expect(JSON.parse(result)["manufacturer"]["id"]).to eq(manufacturer.id)
     end
     it "responds with missing and cors headers" do
       get "/api/v3/manufacturers/10000"

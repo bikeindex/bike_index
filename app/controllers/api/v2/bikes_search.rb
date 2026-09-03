@@ -2,6 +2,7 @@ module API
   module V2
     class BikesSearch < API::Base
       include API::V2::Defaults
+
       helpers do
         params :search_bikes do
           optional :colors, type: String, desc: "Comma separated list. Results will match **all** colors"
@@ -20,7 +21,7 @@ module API
         end
 
         def find_bikes
-          BikeSearcher.new(params.merge(api_search: true)).find_bikes
+          BikeServices::Searcher.new(params.merge(api_search: true)).find_bikes
         end
 
         def bikes_serialized(bikes)
@@ -33,6 +34,7 @@ module API
           params[:proximity_radius] ||= params[:proximity_square] if params[:proximity_square].present?
           params[:proximity_radius] ||= 100
           return nil unless params[:proximity] == "ip"
+
           if Rails.env == "production"
             params[:proximity] = request.env["HTTP_X_FORWARDED_FOR"].split(",")[0]
           end
@@ -107,7 +109,7 @@ module API
         get "/count" do
           params[:proximity] = params[:proximity] || "ip"
           set_proximity
-          BikeSearcher.new(params.except("format")).find_bike_counts
+          BikeServices::Searcher.new(params.except("format")).find_bike_counts
         end
 
         desc "Close serials", {
@@ -122,7 +124,7 @@ module API
           requires :serial, type: String, desc: "Serial to search for"
         end
         get "/close_serials" do
-          close_bikes = BikeSearcher.new(params.merge(api_search: true)).close_serials
+          close_bikes = BikeServices::Searcher.new(params.merge(api_search: true)).close_serials
           bikes_serialized(paginate(close_bikes))
         end
 

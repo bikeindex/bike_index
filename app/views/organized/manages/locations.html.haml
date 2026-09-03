@@ -1,19 +1,19 @@
 .mb-4
-  %h1.uncap= t(".location_settings_html", org_name: @organization.name)
+  = render(UI::Header::Component.new(text: t(".location_settings_html", org_name: @organization.name), html_class: "uncap"))
 
 = form_for @organization, { url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
   = hidden_field_tag :locations_page, true
 
   .form-group.row.locations-where-and-add{ style: "margin-top: 40px;" }
     - unless @organization.lock_show_on_map
-      .col-sm-6.mt-2
+      .col-sm-8.mt-2
         .checkbox
           = f.check_box :show_on_map # Note: This ID is called by the JS
           = f.label :show_on_map do
             - map_link = link_to(t(".bike_index_partner_map"), where_path, target: "_blank" )
             = t(".display_org_on_map_html", org_name: @organization.name, map_link: map_link)
 
-    .col-sm-6.text-right.mt-2
+    .col-sm-4.text-right.mt-2
       = link_to_add_fields t(".add_location"), f, :locations, class_name: 'btn btn-secondary btn-lg'
 
   - @organization.locations.build unless @organization.locations.first.present?

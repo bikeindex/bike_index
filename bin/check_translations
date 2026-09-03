@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+if [ -n "$1" ]; then
+  export TRANSLATION_IO_API_KEY="$1"
+fi
+
 set -e
 
 CYAN="\033[0;36m"
@@ -12,13 +16,25 @@ output() {
   printf "\n${1}${2}${NONE}\n\n"
 }
 
-alias git=/usr/local/bin/git
+# Only alias git on macOS (local dev); CI has git on a different path
+if [ -z "$CI" ] && [ -f /usr/local/bin/git ]; then
+  alias git=/usr/local/bin/git
+fi
 
 output "${CYAN}" "Checking Translations"
 
-# Quit as success if not on the branch to be synced
-if ! git branch --list | grep --silent "^* ${TRANSLATION_BRANCH}$"; then
-  output "${GREEN}" "Skipping: Not on TRANSLATION_BRANCH: ${TRANSLATION_BRANCH}"
+# The job runs as root over a workspace the runner owns, so git refuses to read the
+# repo at all without this. Only under $CI — locally it would write ~/.gitconfig.
+if [ -n "$CI" ]; then
+  git config --global --add safe.directory "$PWD"
+fi
+
+# Assigned rather than tested inline, so a git that can't answer aborts under `set -e`
+# instead of reading as "some other branch" and skipping green
+current_branch="$(git rev-parse --abbrev-ref HEAD)"
+
+if [ "$current_branch" != "$TRANSLATION_BRANCH" ]; then
+  output "${GREEN}" "Skipping: on ${current_branch}, not TRANSLATION_BRANCH: ${TRANSLATION_BRANCH}"
   exit 0
 fi
 
@@ -29,6 +45,8 @@ output "${YELLOW}" "Stashing translation.io timestamp file"
 set -x
 git stash -- config/locales/.translation_io
 git status --short
+# Reset the migrations, in case of postgres artifacts changing things
+git checkout HEAD db/
 set +x
 
 if [[ -z "$(git --no-pager diff)" ]]; then
@@ -38,39 +56,43 @@ else
   output "${RED}" "Uncommitted Translations"
   git --no-pager diff
 
-  git config user.email "ci@bikeindex.org"
-  git config user.name "CircleCI"
+  if [ -n "$CI" ]; then
+    output "${YELLOW}" "On CI — creating translation sync PR"
 
-  output "${YELLOW}" "Committing and pushing translation update"
-  BRANCH="translation-update-${CIRCLE_BUILD_NUM}"
-  set -x
-  git clean --quiet --force -d -x
-  git stash
-  git checkout -b ${BRANCH}
-  git reset --hard origin/main
+    # Branches are named translations-sync-<timestamp>, so `gh pr list --head`
+    # can't be used — it wants an exact branch name.
+    # Deliberately not failure-tolerant: a swallowed error reads as "no open sync
+    # PR" and opens a duplicate.
+    existing_pr=$(gh pr list --state open --limit 100 --json number,headRefName \
+      --jq 'map(select(.headRefName | startswith("translations-sync")))[0].number')
+    if [ -n "$existing_pr" ]; then
+      output "${YELLOW}" "Translation sync PR already exists: #${existing_pr} — skipping PR creation"
+      exit 1
+    fi
 
-  # Commit translation changes
-  git stash pop
-  git add .
-  git commit -m "Translation update: diff [ci skip]"
+    branch_name="translations-sync-$(date +%Y%m%d%H%M%S)"
 
-  # Commit timestamp update
-  git stash pop
-  git add .
-  git commit -m "Translation update: timestamp [ci skip]"
-  set +x
+    git config user.name "github-actions[bot]"
+    git config user.email "github-actions[bot]@users.noreply.github.com"
 
+    git checkout -b "$branch_name"
+    git stash pop || true
+    git add config/locales/
+    git commit -m "translations sync"
 
-  output "${YELLOW}" "Checking for existing Pull Request"
+    # In CI the checkout persists the App token as git creds, so this pushes as
+    # the App — a non-default-token push is what fires `on: push` and gives the
+    # PR its required checks. A default-token push triggers no workflows at all.
+    git push origin "$branch_name"
 
-  git fetch
-  if git ls-remote --exit-code --heads origin "${BRANCH}" >/dev/null; then
-    output "${GREEN}" "Translation update PR already created."
-    exit 1
+    gh pr create \
+      --title "Automated translations sync from CI" \
+      --body "" \
+      --base main \
+      --head "$branch_name"
+
+    output "${YELLOW}" "PR created with CI running. Build will fail until the PR is merged."
   fi
-
-
-  output "${YELLOW}" "Create a new Pull Request"
 
   exit 1
 fi

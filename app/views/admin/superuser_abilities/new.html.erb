@@ -1,0 +1,45 @@
+<h1 class="mt-4">New Superuser Ability</h1>
+
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="card bg-light">
+      <div class="card-body">
+        <%= form_for [:admin, @superuser_ability] do |f| %>
+          <%= render(UI::Alerts::ObjectError::Component.new(object: @superuser_ability)) %>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :user_identifier,
+              label_text: "User", required: true, html_options: {autocomplete: "off"})) do |group| %>
+            <% group.with_helper_text { "email, username or id" } %>
+          <% end %>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :controller_name,
+              html_options: {autocomplete: "off"})) do |group| %>
+            <% group.with_helper_text do %>
+              <em>leave blank</em> for a universal ability - access to all of
+              admin
+            <% end %>
+          <% end %>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :action_name,
+              html_options: {autocomplete: "off"})) do |group| %>
+            <% group.with_helper_text { "only applies with a controller name" } %>
+          <% end %>
+
+          <div class="tw:mb-4">
+            <% SuperuserAbility::SU_OPTIONS.each do |ability| %>
+              <%= render UI::Forms::Checkbox::Component.new(
+                name: ability,
+                label: ability.to_s.humanize,
+                checked: @superuser_ability.su_option?(ability)
+              ) %>
+            <% end %>
+          </div>
+
+          <div class="tw:flex tw:justify-end">
+            <%= render UI::Button::Component.new(text: "Create", color: :primary, type: "submit") %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -3,12 +3,11 @@
 # == Schema Information
 #
 # Table name: parking_notifications
+# Database name: primary
 #
 #  id                    :integer          not null, primary key
 #  accuracy              :float
 #  city                  :string
-#  delivery_status       :string
-#  hide_address          :boolean          default(FALSE)
 #  image                 :text
 #  image_processing      :boolean          default(FALSE), not null
 #  internal_notes        :text
@@ -18,6 +17,8 @@
 #  longitude             :float
 #  message               :text
 #  neighborhood          :string
+#  postal_code           :string
+#  region_string         :string
 #  repeat_number         :integer
 #  resolved_at           :datetime
 #  retrieval_link_token  :text
@@ -25,7 +26,6 @@
 #  status                :integer          default("current")
 #  street                :string
 #  unregistered_bike     :boolean          default(FALSE)
-#  zipcode               :string
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
 #  bike_id               :integer
@@ -33,63 +33,65 @@
 #  impound_record_id     :integer
 #  initial_record_id     :integer
 #  organization_id       :integer
+#  region_record_id      :bigint
 #  retrieved_by_id       :bigint
-#  state_id              :bigint
 #  user_id               :integer
 #
 # Indexes
 #
 #  index_parking_notifications_on_bike_id            (bike_id)
-#  index_parking_notifications_on_country_id         (country_id)
 #  index_parking_notifications_on_impound_record_id  (impound_record_id)
 #  index_parking_notifications_on_initial_record_id  (initial_record_id)
 #  index_parking_notifications_on_organization_id    (organization_id)
-#  index_parking_notifications_on_retrieved_by_id    (retrieved_by_id)
-#  index_parking_notifications_on_state_id           (state_id)
 #  index_parking_notifications_on_user_id            (user_id)
 #
 class ParkingNotification < ActiveRecord::Base
+  include AddressRecordedWithinBoundingBox
   include Geocodeable
-  KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2}.freeze
+
+  KIND_ENUM = {appears_abandoned_notification: 0, parked_incorrectly_notification: 1, impound_notification: 2, other_parking_notification: 3}.freeze
   STATUS_ENUM = {current: 0, replaced: 1, impounded: 2, retrieved: 3, impounded_retrieved: 5, resolved_otherwise: 4}.freeze
-  RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2}.freeze
+  RETRIEVED_KIND_ENUM = {organization_recovery: 0, link_token_recovery: 1, user_recovery: 2, ownership_transfer: 3}.freeze
   MAX_PER_PAGE = 250
-
-  mount_uploader :image, ImageUploaderBackgrounded
-  process_in_background :image
-
+  # Marker delivery_error for notifications backfilled from the legacy delivery_status column
+  PRE_TRACKING_ERROR = "Failed pre-notification tracking"
+  enum :kind, KIND_ENUM
+  enum :status, STATUS_ENUM
+  enum :retrieved_kind, RETRIEVED_KIND_ENUM
   belongs_to :bike
   belongs_to :user
   belongs_to :organization
   belongs_to :impound_record
   belongs_to :initial_record, class_name: "ParkingNotification"
   belongs_to :retrieved_by, class_name: "User"
-
+  has_many :notifications, as: :notifiable
   has_many :repeat_records, class_name: "ParkingNotification", foreign_key: :initial_record_id
-
   validates_presence_of :bike_id, :user_id
   validate :location_present, on: :create
+  validate :bike_not_impounded, on: :create
+  attr_accessor :skip_geocoding, :is_repeat, :use_entered_address, :image_cache, :skip_update
+
+  mount_uploader :image, ImageUploaderBackgrounded
+  process_in_background :image
 
   before_validation :set_calculated_attributes
   after_commit :process_notification
 
-  enum :kind, KIND_ENUM
-  enum :status, STATUS_ENUM
-  enum :retrieved_kind, RETRIEVED_KIND_ENUM
-
-  attr_accessor :is_repeat, :use_entered_address, :image_cache, :skip_update
+  scope :with_location, -> { where.not(latitude: nil) }
+  scope :with_street, -> { with_location.where.not(street: nil) }
+  scope :without_street, -> { where(street: ["", nil]) }
 
   scope :active, -> { where(resolved_at: nil) }
   scope :resolved, -> { where.not(resolved_at: nil) }
   scope :initial_records, -> { where(initial_record_id: nil) }
   scope :repeat_records, -> { where.not(initial_record_id: nil) }
   scope :with_impound_record, -> { where.not(impound_record_id: nil) }
-  scope :email_success, -> { where(delivery_status: "email_success") }
   scope :send_email, -> { where.not(unregistered_bike: true) }
   scope :unregistered_bike, -> { where(unregistered_bike: true) }
   scope :not_unregistered_bike, -> { where(unregistered_bike: false) }
   scope :first_notification, -> { where(repeat_number: 0) }
   scope :not_replaced, -> { where.not(status: "replaced") }
+  scope :email_success, -> { joins(:notifications).merge(Notification.delivery_success).distinct }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -103,8 +105,19 @@ class ParkingNotification < ActiveRecord::Base
     {
       appears_abandoned_notification: "Appears abandoned",
       parked_incorrectly_notification: "Parked incorrectly",
-      impound_notification: "Impounded"
+      impound_notification: "Impounded",
+      other_parking_notification: "Other"
     }
+  end
+
+  # The org form panels only ever offer a new notification, so the repeat flag, location
+  # and kind are defaulted here rather than read off an existing record
+  def self.build_for(bike:, organization:)
+    new(bike_id: bike.id, organization:, use_entered_address: false).tap do |notification|
+      notification.is_repeat = notification.likely_repeat?
+      notification.set_location_from_organization
+      notification.kind ||= notification.potential_initial_record&.kind || kinds.first
+    end
   end
 
   def self.associated_notifications_including_self(id, initial_record_id)
@@ -128,9 +141,29 @@ class ParkingNotification < ActiveRecord::Base
     within_bounding_box(sw_lat, sw_lng, ne_lat, ne_lng)
   end
 
+  def self.permitted_visible_attribute(_, default: nil)
+    :street
+  end
+
   # geocoding is managed by set_calculated_attributes
   def should_be_geocoded?
     false
+  end
+
+  def skip_geocoding?
+    skip_geocoding.present?
+  end
+
+  def latitude_public
+    return nil if latitude.blank?
+
+    show_address ? latitude : latitude.round(Bike::PUBLIC_COORD_LENGTH)
+  end
+
+  def longitude_public
+    return nil if longitude.blank?
+
+    show_address ? longitude : longitude.round(Bike::PUBLIC_COORD_LENGTH)
   end
 
   def sent_at
@@ -142,6 +175,9 @@ class ParkingNotification < ActiveRecord::Base
     @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
   end
 
+  def street_2
+  end
+
   def active?
     resolved_at.blank?
   end
@@ -151,7 +187,7 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def email_success?
-    delivery_status == "email_success"
+    notifications.delivery_success.exists?
   end
 
   def initial_record?
@@ -170,9 +206,9 @@ class ParkingNotification < ActiveRecord::Base
     owner_known?
   end
 
-  def show_address
-    !hide_address
-  end
+  def publicly_visible_attribute = :street
+
+  def show_address = true
 
   def kind_humanized
     self.class.kinds_humanized[kind.to_sym]
@@ -217,6 +253,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def associated_retrieved_notification
     return nil unless resolved_at.present? # Used by calculated_state, so we can't use the status
+
     retrieved_kind.present? ? self : associated_notifications_including_self.where.not(retrieved_kind: nil).first
   end
 
@@ -236,12 +273,14 @@ class ParkingNotification < ActiveRecord::Base
 
   def potential_initial_record
     return earlier_bike_notifications.initial_records.order(:id).last unless id.blank?
+
     # If this is a new record, we the record needs to be current
     earlier_bike_notifications.current.initial_records.order(:id).last
   end
 
   def likely_repeat?
     return false unless can_be_repeat?
+
     # We know there has to be a potential initial record if can_be_repeat,
     # so it doesn't matter if we scope to current on new records or not
     earlier_bike_notifications.maximum(:created_at) > (created_at || Time.current) - 1.month
@@ -259,6 +298,7 @@ class ParkingNotification < ActiveRecord::Base
     if replaced? && calculated_later_notifications.current.last.present?
       return calculated_later_notifications.current.last.mark_retrieved!(passed_args)
     end
+
     self.retrieved_kind = passed_args[:retrieved_kind]
     # Assign status here because of calculated_status
     update!(status: "retrieved",
@@ -267,20 +307,12 @@ class ParkingNotification < ActiveRecord::Base
     self
   end
 
-  # force_show_address, just like stolen_record - but this has a hide_address attr, so by default we show addresses
-  def address(force_show_address: false, country: [:iso, :optional, :skip_default])
-    Geocodeable.address(
-      self,
-      street: force_show_address || show_address,
-      country: country
-    ).presence
-  end
-
   def set_location_from_organization
-    self.country_id = organization&.country&.id
-    self.city = organization&.city
-    self.zipcode = organization&.zipcode
-    self.state_id = organization&.state&.id
+    org_address = organization&.default_address_record
+    self.country_id = org_address&.country_id
+    self.city = org_address&.city
+    self.postal_code = org_address&.postal_code
+    self.region_record_id = org_address&.region_record_id
   end
 
   def set_calculated_attributes
@@ -293,24 +325,22 @@ class ParkingNotification < ActiveRecord::Base
     # generate retrieval token after checking if unregistered_bike
     self.retrieval_link_token ||= SecurityTokenizer.new_token if current? && send_email?
     # We need to geocode on creation, unless all the attributes are present
+    return true if skip_geocoding?
     return true if id.present? && street.present? && latitude.present? && longitude.present?
+
     if !use_entered_address && latitude.present? && longitude.present?
-      self.attributes = GeocodeHelper.assignable_address_hash_for(latitude: latitude, longitude: longitude)
+      self.attributes = GeocodeHelper.assignable_address_hash_for(latitude: latitude, longitude: longitude, new_attrs: true)
     else
-      coordinates = GeocodeHelper.coordinates_for(address)
+      coordinates = GeocodeHelper.coordinates_for(formatted_address_string)
       self.attributes = coordinates if coordinates.present?
       self.location_from_address = true
     end
-  end
-
-  def location_present
-    # in case geocoder is failing (which happens sometimes), permit if either is present
-    return true if latitude.present? && longitude.present? || address.present?
-    errors.add(:address, :address_required)
+    assign_region_record
   end
 
   def subject
     return mail_snippet.subject if mail_snippet&.subject.present?
+
     if appears_abandoned_notification?
       "Your #{bike&.type || "Bike"} appears to be abandoned"
     elsif parked_incorrectly_notification?
@@ -320,13 +350,6 @@ class ParkingNotification < ActiveRecord::Base
     end
   end
 
-  def process_notification
-    return true if skip_update
-    # Update the bike immediately, inline
-    bike&.update(updated_at: Time.current)
-    ProcessParkingNotificationJob.perform_async(id)
-  end
-
   # new_attrs needs to include kind and user_id. It can include additional attrs if they matter
   def retrieve_or_repeat_notification!(new_attrs)
     new_attrs = new_attrs.with_indifferent_access
@@ -334,8 +357,9 @@ class ParkingNotification < ActiveRecord::Base
       mark_retrieved!(retrieved_by_id: new_attrs[:user_id], retrieved_kind: "organization_recovery")
     else
       return self unless active?
+
       attrs = attributes.except("id", "internal_notes", "created_at", "updated_at", "message",
-        "location_from_address", "retrieval_link_token", "delivery_status")
+        "location_from_address", "retrieval_link_token")
         .merge(new_attrs)
       attrs["initial_record_id"] ||= id
       ParkingNotification.create!(attrs)
@@ -344,8 +368,39 @@ class ParkingNotification < ActiveRecord::Base
 
   private
 
+  def location_present
+    # in case geocoder is failing (which happens sometimes), permit if either is present
+    return true if latitude.present? && longitude.present? || formatted_address_string.present?
+
+    errors.add(:base, "address is required")
+  end
+
+  # Organizations re-submit the impound form when the bike page hasn't caught up yet - tell them
+  # it worked rather than duplicating the record and re-emailing the owner
+  def bike_not_impounded
+    return unless impound_notification?
+
+    impound_record = ImpoundRecord.current.find_by(bike_id:)
+    return if impound_record.blank?
+
+    errors.add(:base, if impound_record.organization_id == organization_id
+      "This #{bike&.type} is already impounded (impound record ##{impound_record.display_id})"
+    else
+      "This #{bike&.type} is already impounded by another organization"
+    end)
+  end
+
+  def process_notification
+    return true if skip_update
+
+    # Update the bike immediately, inline, if current or if status changed
+    bike&.update(updated_at: Time.current) if current? || saved_change_to_status?
+    ProcessParkingNotificationJob.perform_async(id)
+  end
+
   def calculated_repeat_number
     return 0 unless repeat_record?
+
     other_records = ParkingNotification.where(initial_record_id: initial_record_id)
     # Generally this will be called on create, so id won't be present
     other_records = other_records.where("id < ?", id) if id.present?
@@ -358,6 +413,7 @@ class ParkingNotification < ActiveRecord::Base
 
   def calculated_later_notifications
     return ParkingNotification.none if id.blank?
+
     associated_notifications.where("id > ?", id)
   end
 
@@ -366,15 +422,18 @@ class ParkingNotification < ActiveRecord::Base
     resolved_notification = associated_notifications_including_self.resolved.first
     # Also set the resolved_at if this is an impound_notification
     return nil unless impound_notification? || resolved_notification.present?
+
     resolved_notification&.resolved_at || Time.current
   end
 
   def calculated_status
     return "replaced" if calculated_later_notifications.any?
+
     if impound_notification? || impound_record_id.present?
       impound_record&.resolved? ? "impounded_retrieved" : "impounded"
     elsif resolved_at.present?
       return "retrieved" if associated_retrieved_notification.present?
+
       associated_notifications.resolved.last&.status || "resolved_otherwise"
     else
       "current"

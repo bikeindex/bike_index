@@ -1,9 +1,9 @@
 # == Schema Information
 #
 # Table name: locations
+# Database name: primary
 #
 #  id                       :integer          not null, primary key
-#  city                     :string(255)
 #  default_impound_location :boolean          default(FALSE)
 #  deleted_at               :datetime
 #  email                    :string(255)
@@ -11,20 +11,21 @@
 #  latitude                 :float
 #  longitude                :float
 #  name                     :string(255)
-#  neighborhood             :string
 #  not_publicly_visible     :boolean          default(FALSE)
 #  phone                    :string(255)
 #  shown                    :boolean          default(FALSE)
-#  street                   :string(255)
-#  zipcode                  :string(255)
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
-#  country_id               :integer
+#  address_record_id        :bigint
 #  organization_id          :integer
-#  state_id                 :integer
+#
+# Indexes
+#
+#  index_locations_on_address_record_id  (address_record_id)
 #
 class Location < ApplicationRecord
-  include Geocodeable
+  include AddressRecorded
+  include AddressRecordedWithinBoundingBox
 
   acts_as_paranoid
 
@@ -33,20 +34,21 @@ class Location < ApplicationRecord
   has_many :bikes
   has_many :impound_records
 
-  validates :name, :city, :country, :organization, presence: true
+  validates :name, presence: true
+  validate :organization_present
 
-  scope :by_state, -> { order(:state_id) }
+  attr_accessor :skip_update
+
+  before_validation :set_calculated_attributes
+  before_save :set_address_record_coordinates
+  after_commit :update_associations
+  before_destroy :ensure_destroy_permitted!
+
   scope :shown, -> { where(shown: true) }
   scope :publicly_visible, -> { shown.where(not_publicly_visible: false) }
   scope :impound_locations, -> { where(impound_location: true) }
   scope :default_impound_locations, -> { impound_locations.where(default_impound_location: true) }
-  # scope :international, where("country_id IS NOT #{Country.united_states.id}")
-
-  before_validation :set_calculated_attributes
-  after_commit :update_associations
-  before_destroy :ensure_destroy_permitted!
-
-  attr_accessor :skip_update
+  # scope :international, where("country_id IS NOT #{Country.united_states_id}")
 
   # For now, doesn't do anything - but eventually we may switch to slugged locations, so prep for it
   def self.friendly_find(str)
@@ -57,8 +59,23 @@ class Location < ApplicationRecord
     Location.where(organization_id: organization_id).where.not(id: id)
   end
 
-  def address
-    Geocodeable.address(self, country: %i[name])
+  # Override AddressRecorded delegation to fall back to legacy fields
+  def address_present?
+    return address_record.address_present? if address_record?
+
+    [street, city, zipcode].any?(&:present?)
+  end
+
+  def find_or_build_address_record(current_country_id: nil)
+    return address_record if address_record?
+
+    current_country_id ||= Country.united_states_id
+    d_address_record = AddressRecord.where(organization_id:).order(:id).first
+    return AddressRecord.new(country_id: current_country_id) if d_address_record.blank?
+
+    AddressRecord.new(country_id: d_address_record.country_id || current_country_id,
+      region_record_id: d_address_record.region_record_id,
+      region_string: d_address_record.region_string)
   end
 
   def org_location_id
@@ -75,7 +92,7 @@ class Location < ApplicationRecord
   end
 
   def publicly_visible=(val)
-    self.not_publicly_visible = !InputNormalizer.boolean(val)
+    self.not_publicly_visible = !Binxtils::InputNormalizer.boolean(val)
   end
 
   def set_calculated_attributes
@@ -84,10 +101,15 @@ class Location < ApplicationRecord
     end
     self.phone = Phonifyer.phonify(phone)
     self.shown = calculated_shown
+    if address_record.present?
+      address_record.organization_id = organization_id
+      address_record.kind = :organization
+    end
   end
 
   def update_associations
     return true if skip_update
+
     # If this wasn't set by the organization callback (which uses skip_update: true)
     # And this location was updated with default_impound_location, ensure there aren't any others
     if default_impound_location
@@ -101,19 +123,36 @@ class Location < ApplicationRecord
 
   def display_name
     return "" if organization.blank?
+
     (name == organization.name) ? name : "#{organization.name} - #{name}"
   end
 
   # Quick and dirty hack to ensure it's blocked - frontend should prevent doing this normally
   def ensure_destroy_permitted!
     return true unless destroy_forbidden?
+
     raise StandardError, "Can't destroy a location with impounded bikes"
   end
 
   private
 
+  # AddressRecord geocodes in its own after_validation, which for a nested address record is
+  # after set_calculated_attributes has run -- so a new location would copy coordinates that
+  # aren't there yet, and the organization reads its own off the location
+  def set_address_record_coordinates
+    self.latitude = address_record&.latitude
+    self.longitude = address_record&.longitude
+  end
+
+  def organization_present
+    return if organization.present? || organization_id.present?
+
+    errors.add(:organization, :blank)
+  end
+
   def calculated_shown
     return false if not_publicly_visible
+
     organization.present? && organization.allowed_show?
   end
 end

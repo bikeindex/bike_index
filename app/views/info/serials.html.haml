@@ -59,7 +59,7 @@
 %p.mt-2{ style: "margin-bottom: 0;" }
   = t(".weve_done_a_few_things_to_make_it_more_li")
 
-%ul
+%ul{class: "tw:list-disc tw:ml-4"}
   %li= t(".certain_numbers_and_letters_html")
   %li= t(".we_split_bike_serials_up_by_html")
   %li= t(".we_do_close_serial_matching_html")
@@ -68,7 +68,7 @@
 
 
 .footnotes
-  %ol
+  %ol{class: "tw:list-decimal tw:ml-4"}
     %li#fn-all-bikes-serials
       = t(".okay_fine_so_maybe_html")
       %a.footnote-back-link{ href: "#fnref-all-bikes-serials", title: t(".jump_back_to_footnote", num: 1) }

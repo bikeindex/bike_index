@@ -1,0 +1,100 @@
+<%# locals: (collection:, render_sortable: false, render_size: false) %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <th><%= sortable "created_at", render_sortable: %></th>
+      <th class="small"><%= sortable "updated_at", render_sortable: %></th>
+      <th>Image</th>
+
+      <% if render_size %>
+        <th>Size</th>
+      <% end %>
+
+      <th>
+        AS
+        <%= render UI::Tooltip::Component.new(text: "ActiveStorage (instead of legacy carrierwave)") %>
+      </th>
+
+      <th>Private</th>
+      <th><%= sortable "kind", render_sortable: %></th>
+      <th><%= sortable "imageable_type", render_sortable: %></th>
+      <th>Imageable</th>
+    </thead>
+
+    <tbody
+      data-controller="update-cached-sortable-links"
+      data-update-cached-sortable-links-base-url-value="<%= url_for(sortable_search_params) %>"
+    >
+      <% collection.each do |public_image| %>
+        <% cache(["admin_public_image", public_image, render_sortable, render_size]) do %>
+          <tr>
+            <td>
+              <div class="less-strong-hold">
+                <%= render UI::Time::Component.new(time: public_image.created_at) %>
+
+                <span class="less-strong-right d-none d-md-block only-dev-visible">
+                  <%= public_image.id %>
+                </span>
+              </div>
+            </td>
+
+            <td>
+              <small>
+                <%= render UI::Time::Component.new(time: public_image.updated_at, format: :localize_time_precise) %>
+              </small>
+            </td>
+
+            <td>
+              <% image_url = public_image.image_url %>
+
+              <% if image_url.present? %>
+                <%= link_to image_url do %>
+                  <%= image_tag(public_image.image_url(:small), class: "tw:max-h-12", loading: "lazy", alt: public_image.image_alt,
+                    data: {controller: "image-fallback", action: "error->image-fallback#useOriginal", "image-fallback-url-value": image_url}) %>
+                <% end %>
+              <% end %>
+            </td>
+
+            <% if render_size %>
+              <td>
+                <% image_size = public_image.image_size %>
+
+                <small>
+                  <%= number_to_human_size(image_size) if image_size %>
+                </small>
+              </td>
+            <% end %>
+
+            <td><%= check_mark if public_image.activestorage? %></td>
+
+            <td><%= check_mark if public_image.is_private? %></td>
+
+            <td>
+              <%= public_image.kind&.titleize %>
+
+              <% if render_sortable %>
+                <%= link_to search_emoji, url_for(sortable_search_params.merge(search_kind: public_image.kind)), class: "display-sortable-link small" %>
+              <% end %>
+            </td>
+
+            <td>
+              <%= public_image.imageable_type %>
+
+              <% if render_sortable %>
+                <%= link_to search_emoji, url_for(sortable_search_params.merge(search_imageable_type: public_image.imageable_type)), class: "display-sortable-link small" %>
+              <% end %>
+            </td>
+
+            <td>
+              <% imageable_name = public_image.imageable_name.presence || "##{public_image.imageable_id}" %>
+              <% imageable_path = admin_path_for_object(public_image.imageable) %>
+
+              <%= imageable_path.present? ? link_to(imageable_name, imageable_path) : imageable_name %>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

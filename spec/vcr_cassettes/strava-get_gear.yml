@@ -1,0 +1,41 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://www.strava.com/api/v3/gear/b12345
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 09 Feb 2026 18:00:00 GMT
+      X-RateLimit-Limit:
+      - 200,2000
+      X-RateLimit-Usage:
+      - '5,50'
+      X-ReadRateLimit-Limit:
+      - 200,2000
+      X-ReadRateLimit-Usage:
+      - '5,50'
+    body:
+      encoding: UTF-8
+      string: '{"id":"b12345","primary":true,"name":"Yuba longtail","nickname":"Yuba","resource_state":3,"retired":false,"distance":75000.0,"converted_distance":75.0,"brand_name":"Yuba","model_name":"Spicy Curry","frame_type":3,"description":"Electric cargo bike","notification_distance":0,"weight":0.0}'
+  recorded_at: Sun, 09 Feb 2026 18:00:00 GMT
+recorded_with: VCR 6.3.1

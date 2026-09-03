@@ -1,0 +1,165 @@
+<div class="row">
+  <div class="col-md-6">
+    <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".created"), value: @parking_notification.created_at, render_with_no_value: true)) %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".by"), value: @parking_notification.user&.display_name, render_with_no_value: true)) %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: "Type", render_with_no_value: true)) do %>
+        <strong><%= @parking_notification.kind_humanized %></strong>
+        notification
+      <% end %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: "Status", render_with_no_value: true)) do %>
+        <% if @parking_notification.current? %>
+          <em class="less-strong">
+            This is the current parking notification for this
+            <%= passed_bike.type %>
+          </em>
+        <% elsif @parking_notification.replaced? %>
+          <% current_notification = @parking_notification.current_associated_notification %>
+          <em class="less-strong"> This parking notification replaced by: </em>
+          <% if current_notification.present? %>
+            <span class="less-strong d-block">
+              <%= link_to organization_parking_notification_path(current_notification, organization_id: @organization.to_param) do %>
+                notification #<%= current_notification.notification_number %>
+              <% end %>
+              - status:
+              <%= helpers.status_display(current_notification.status) %>
+            </span>
+          <% end %>
+        <% elsif @parking_notification.impounded? %>
+          <span class="text-danger">
+            This <%= passed_bike&.type || CycleType::DEFAULT %> was impounded
+          </span>
+          <% unless @viewing_impound_record %>
+            <br>
+            <strong>
+              <% unless @parking_notification.impound_notification? %>
+                <% impound_notification = @parking_notification.associated_notifications.impound_notification.last %>
+                View the
+                <%= link_to "Impound notification", organization_parking_notification_path(impound_notification, organization_id: @organization.to_param) %>
+
+
+                <small><em>created <%= render(UI::Time::Component.new(time: impound_notification.created_at, format: :localize_time_precise)) %></em> by <%= impound_notification.user.display_name %></small>
+              <% end %>
+
+              <% if @parking_notification.impound_record_id.present? %>
+                <br>
+                View the
+                <%= link_to "Impound record", organization_impound_record_path(@parking_notification.impound_record&.display_id, organization_id: @organization.to_param) %>
+              <% else %>
+                <small class="less-strong">
+                  Impound record not found. Try reloading the page?
+                </small>
+              <% end %>
+            </strong>
+          <% end %>
+        <% elsif @parking_notification.retrieved? %>
+          <span class="text-warning">
+            This <%= passed_bike.type %> has been retrieved!
+          </span>
+          <br>
+          <% retrieved_notification = @parking_notification.associated_retrieved_notification %>
+          <% if retrieved_notification.present? %>
+            Marked retrieved
+            <%= render(UI::Time::Component.new(time: retrieved_notification.created_at, format: :localize_time_precise)) %>
+            by
+            <% if retrieved_notification.organization_recovery? %>
+              <%= @organization.short_name %> (
+              <em><%= retrieved_notification.retrieved_by.display_name %></em> )
+            <% else %>
+              the user
+            <% end %>
+            <% if @display_dev_info %>
+              <br>
+              <small class="only-dev-visible">
+                <span class="less-strong">developer info:</span>
+                <code><%= retrieved_notification.retrieved_kind %></code>
+
+                <em class="less-strong">
+                  notification:
+                  <%= link_to "##{retrieved_notification.id}", organization_parking_notification_path(retrieved_notification, organization_id: @organization.to_param) %>
+                </em>
+              </small>
+            <% end %>
+          <% else %>
+            <em class="text-danger">Unable to find retrieved information!</em>
+          <% end %>
+        <% else %>
+          <%= helpers.status_display(@parking_notification.status) %>
+        <% end %>
+      <% end %>
+
+      <% unless @skip_bike %>
+        <%= render(UI::DefinitionList::Row::Component.new(label: translation(".bike"), render_with_no_value: true)) do %>
+          <% if passed_bike.present? %>
+            <%= link_to helpers.organized_bike_text(passed_bike), bike_path(passed_bike, organization_id: @organization.to_param) %>
+            <br>
+            <small>
+              <%= link_to organization_parking_notifications_path(organization_id: @organization.to_param, search_bike_id: passed_bike.id, search_status: "all"), class: "gray-link" do %>
+                view all notifications for <em><%= passed_bike.type %></em>
+              <% end %>
+            </small>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="col-md-6">
+    <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".address"), value: @parking_notification.formatted_address_string, render_with_no_value: true)) %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: "Location", render_with_no_value: true)) do %>
+        <% if @parking_notification.location_from_address %>
+          Address entered
+        <% else %>
+          From GPS
+        <% end %>
+
+        <% if @display_dev_info %>
+          <small class="only-dev-visible ml-2">
+            <span class="less-strong">developer info:</span>
+            <%= @parking_notification.to_coordinates %>
+
+            <% if @parking_notification.accuracy.present? %>
+              <code><%= @parking_notification.accuracy %> accuracy</code>
+            <% end %>
+          </small>
+        <% end %>
+      <% end %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".notification_number"), render_with_no_value: true)) do %>
+        <% if @parking_notification.initial_record? %>
+          <span class="less-strong">First notification</span>
+        <% else %>
+          <strong><%= @parking_notification.notification_number %></strong>
+          <em class="small less-strong ml-1">
+            first notification sent
+            <a class="localizeTime preciseTime" href="<%= organization_parking_notification_path(@parking_notification.initial_record_id, organization_id: @organization.to_param) %>"><% if @parking_notification.initial_record.present? %><%= l(@parking_notification.initial_record.created_at, format: :convert_time) %><% else %><%= @parking_notification.initial_record_id %><% end %></a>
+          </em>
+        <% end %>
+      <% end %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".resolved"), render_with_no_value: true)) do %>
+        <% if @parking_notification.resolved? %>
+          <span class="less-strong">
+            <% if @parking_notification.impounded? %>
+              Impounded
+            <% elsif @parking_notification.retrieved? %>
+              Retrieved
+            <% else %>
+              Resolved
+            <% end %>
+          </span>
+          <%= render(UI::Time::Component.new(time: @parking_notification.resolved_at, format: :localize_time)) %>
+        <% end %>
+      <% end %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".message"), value: @parking_notification.message, render_with_no_value: true)) %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".internal_notes"), value: @parking_notification.internal_notes, render_with_no_value: true)) %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,11 @@
+<div class="doorkeeper-container">
+  <% if @current_user&.superuser? && @oauth_application&.owner.present? %>
+    Application by <strong><%= @oauth_application.owner.display_name %></strong>
+  <% end %>
+
+  <% if @action_name != "index" %>
+    <%= link_to "Your applications", oauth_applications_url, class: "pull-right" %>
+  <% end %>
+
+  <%= content %>
+</div>

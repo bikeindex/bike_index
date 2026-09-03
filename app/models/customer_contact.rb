@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: customer_contacts
+# Database name: primary
 #
 #  id            :integer          not null, primary key
 #  body          :text
@@ -15,12 +16,11 @@
 #  creator_id    :integer
 #  user_id       :integer
 #
+# Indexes
+#
+#  index_customer_contacts_on_bike_id  (bike_id)
+#
 class CustomerContact < ApplicationRecord
-  belongs_to :bike
-  belongs_to :user
-  belongs_to :creator, class_name: "User"
-  has_one :notification, as: :notifiable
-
   KIND_ENUM = {
     stolen_contact: 0,
     stolen_twitter_alerter: 1,
@@ -28,6 +28,11 @@ class CustomerContact < ApplicationRecord
   }.freeze
 
   enum :kind, KIND_ENUM
+
+  belongs_to :bike
+  belongs_to :user
+  belongs_to :creator, class_name: "User"
+  has_one :notification, as: :notifiable
 
   validates \
     :bike,

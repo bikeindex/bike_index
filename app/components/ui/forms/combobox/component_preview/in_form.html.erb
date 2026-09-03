@@ -1,0 +1,7 @@
+<%= form_with(url: "/rails/view_components/ui/forms/combobox/component/in_form", method: :get) do %>
+  <%= render(UI::Forms::Group::Component.new(attribute: :cycle_type)) do %>
+    <%= render(UI::Forms::Combobox::Component.new(name: :cycle_type, options: CycleType.select_options.map(&:first))) %>
+  <% end %>
+
+  <%= render(UI::Button::Component.new(text: "Search", type: "submit", color: :primary)) %>
+<% end %>

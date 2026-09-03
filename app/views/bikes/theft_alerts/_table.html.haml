@@ -23,16 +23,16 @@
             - theft_alerts.each do |theft_alert|
               %tr
                 %td
-                  %span.convertTime
+                  %span.localizeTime
                     = l(theft_alert.created_at, format: :convert_time)
                 %td= theft_alert.theft_alert_plan.name
                 %td= theft_alert.status
                 %td
                   - if theft_alert.start_at.present?
-                    %span.convertTime= l(theft_alert.start_at, format: :convert_time)
+                    %span.localizeTime= l(theft_alert.start_at, format: :convert_time)
                 %td
                   - if theft_alert.end_at.present?
-                    .convertTime= l(theft_alert.end_at, format: :convert_time)
+                    .localizeTime= l(theft_alert.end_at, format: :convert_time)
                 - if show_creator
                   %td
                     %small= theft_alert.user&.display_name

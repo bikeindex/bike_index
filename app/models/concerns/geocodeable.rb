@@ -1,217 +1,224 @@
-# Add to a model that can be geolocated
-# Expects `latitude` and `longitude` columns to be defined.
+# frozen_string_literal: true
+
 module Geocodeable
   extend ActiveSupport::Concern
 
-  included do
-    belongs_to :state
-    belongs_to :country
+  RENDER_COUNTRY_OPTIONS = [:if_different, true, false].freeze
+  ADDRESS_ATTRS = %i[city country_id postal_code region_record_id region_string street street_2].freeze
+  GEO_ATTRS = (ADDRESS_ATTRS + %i[latitude longitude]).freeze
 
-    geocoded_by :address
-    before_validation :clean_state_and_street_data
-    after_validation :bike_index_geocode, if: :should_be_geocoded? # Geocode using our own geocode process
+  class << self
+    def attrs_to_duplicate(obj)
+      if obj.class.ancestors.include?(Geocodeable)
+        obj.internal_address_attrs.merge(skip_geocoding: obj.latitude.present?, skip_callback_job: true)
+      elsif defined?(obj.address_record) && obj.address_record.present?
+        attrs_to_duplicate(obj.address_record)
+      elsif defined?(obj.street)
+        attrs_from_legacy(obj)
+      else
+        {}
+      end
+    end
 
-    # TODO: Make without_location be without_street everywhere (removing with_location, etc)
-    scope :with_location, -> { where.not(latitude: nil) }
-    scope :with_street, -> { with_location.where.not(street: nil) }
-    scope :without_street, -> { where(street: ["", nil]) }
-    # NOTE: without_location not included because it's overridden in stolen_record, which warns everytime it's loaded
-    # ... this is part of the without_location reconcilliation above
+    def format_postal_code(str, country_id = nil)
+      str = str.strip.upcase.gsub(/\s*,\z/, "")
+      return str unless country_id == Country.canada_id && str.gsub(/\s+/, "").length == 6
 
-    # Skip geocoding if this flag is truthy
-    attr_accessor :skip_geocoding
+      str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
+    end
 
-    def skip_geocoding?
-      skip_geocoding.present?
+    private
+
+    def attrs_from_legacy(obj)
+      {
+        skip_geocoding: obj.latitude.present?, # Skip geocoding if already geocoded
+        skip_callback_job: true, # they're already in sync
+        street: obj.street,
+        city: obj.city,
+        region_record_id: obj.state_id,
+        postal_code: obj.zipcode,
+        country_id: obj.country_id,
+        latitude: obj.latitude,
+        longitude: obj.longitude
+      }
     end
   end
 
-  def self.location_attrs
-    %w[country_id state_id street city zipcode latitude longitude neighborhood].freeze
+  included do
+    before_validation :clean_location_attributes
+
+    belongs_to :country
+    belongs_to :region_record, class_name: "State"
   end
 
-  # Build an address string from the given object's location data.
-  #
-  # The following keyword args accept booleans for inclusion / omission in the
-  # string: `street` `city` `state` `zipcode`, `country`.
-  #
-  # By default, the country is included as an ISO abbreviation and is required
-  # (an empty string is returned if no country is available.)
-  #
-  # The `country` keyword arg also accepts a list of options to customize
-  # output:
-  #
-  # - :iso or :name for the format
-  # - :optional to make the country optional
-  # - :skip_default to omit the country name if it's the default country (US)
-  #
-  # Returns a String.
-  def self.address(obj, street: true, city: true, state: true, zipcode: true, country: [:iso])
-    return "" if obj.blank?
-
-    include_country =
-      country && !(obj.country&.default? && country.include?(:skip_default))
-
-    country_name =
-      if include_country
-        country_format = country.find { |e| e.in? %i[iso name] } || :iso
-        country_name = obj.country&.public_send(country_format)
-
-        country_is_required = !country.include?(:optional)
-        not_enough_info = country_is_required && country_name.blank?
-        return "" if not_enough_info
-
-        country_name
-      end
-
-    [
-      street && obj.street,
-      city && obj.city,
-      [
-        state && obj.state&.abbreviation,
-        zipcode && obj.zipcode
-      ].reject(&:blank?).join(" "),
-      country_name
-    ].reject(&:blank?).join(", ")
+  def metric_units?
+    Country.metric_units?(country_id)
   end
 
-  # For testing, look it up, otherwise use static
-  def self.canada_id
-    Rails.env.test? ? Country.canada.id : 38
+  def to_coordinates
+    [latitude, longitude]
   end
 
-  def self.format_postal_code(str, country_id = nil)
-    str = str.strip.upcase.gsub(/\s*,\z/, "")
-    return str unless country_id == canada_id && str.gsub(/\s+/, "").length == 6
-    str.gsub(/\s+/, "").scan(/.{1,3}/).join(" ")
-  end
-
-  def address(**kwargs)
-    Geocodeable.address(self, **kwargs)
+  def with_location?
+    latitude.present?
   end
 
   def without_location?
     latitude.blank?
   end
 
-  def with_location?
-    !without_location?
-  end
-
-  # stolen_record and impound_record
-  def latitude_public
-    return nil if latitude.blank?
-    return latitude unless defined?(show_address)
-    show_address ? latitude : latitude.round(Bike::PUBLIC_COORD_LENGTH)
-  end
-
-  def longitude_public
-    return nil if longitude.blank?
-    return longitude unless defined?(show_address)
-    show_address ? longitude : longitude.round(Bike::PUBLIC_COORD_LENGTH)
-  end
-
-  # Should the receiving object be geocoded?
-  #
-  # By default:
-  #  - skip geocoding if the `skip_geocoding` flag is set.
-  #  - geocode if address is changed
-  #
-  # Overwrite this method in inheriting models to customize skip-geocoding
-  # logic.
-  def should_be_geocoded?
-    return false if skip_geocoding?
-    address_changed?
-  end
-
-  def address_changed?
-    %i[street city state_id zipcode country_id]
-      .any? { |col| public_send(:"#{col}_changed?") }
-  end
-
   def address_present?
-    [street, city, zipcode].any?(&:present?)
+    [street, postal_code, city].any?(&:present?)
   end
 
-  # Separate from bike_index_geocode because some models handle geocoding independently
-  def clean_state_and_street_data
-    # remove state if it's not for the same country - we currently only handle us states
-    if country_id.present? && state_id.present?
-      self.state_id = nil unless state&.country_id == country_id
-    end
-    self.street = street.blank? ? nil : street.strip.gsub(/\s*,\z/, "")
-    self.city = city.blank? ? nil : clean_city(city)
-    self.zipcode = zipcode.blank? ? nil : Geocodeable.format_postal_code(zipcode, country_id)
-  end
-
-  def bike_index_geocode
-    # Only geocode if there is specific location information
-    self.attributes = if address_present?
-      GeocodeHelper.coordinates_for(address)
-    else
-      {latitude: nil, longitude: nil}
-    end
-  end
-
-  # default address hash. Probably could be used more often/better
-  def address_hash
-    address_attrs = Geocodeable.location_attrs - %w[country_id country state_id state neighborhood]
-    attributes.slice(*address_attrs)
-      .merge(state: state_abbr, country: country_abbr)
-      .to_a.map { |k, v| [k, v.blank? ? nil : v] }.to_h # Return blank attrs as nil
-      .with_indifferent_access
-  end
-
-  # Override assignment to enable friendly finding state and country
-  def state=(val)
-    if val.is_a?(String)
-      self.state = State.friendly_find(val)
-    else
-      super
-    end
-  end
-
-  def state_abbr
-    state&.abbreviation
-  end
-
-  def country=(val)
-    if val.is_a?(String)
-      self.country = Country.friendly_find(val)
-    else
-      super
-    end
-  end
-
-  def country_abbr
+  def country_iso
     country&.iso
   end
 
-  def metric_units?
-    country.blank? || !country.united_states?
+  def country_name
+    country&.name
+  end
+
+  # Enable assigning string countries
+  def country=(val)
+    self.country_id = if val.is_a?(String) || val.is_a?(Numeric)
+      Country.friendly_find_id(val)
+    elsif val.respond_to?(:id)
+      val.id
+    end
+  end
+
+  def region(full_region: false)
+    return region_string unless region_record.present?
+
+    full_region ? region_record.name : region_record.abbreviation
+  end
+
+  def address_hash(visible_attribute: nil, render_country: nil, current_country_id: nil, current_country_iso: nil)
+    include_country = include_country?(render_country:, current_country_id:, current_country_iso:)
+    country_hash = (include_country && country&.name.present?) ? {country: country.name} : {}
+    visible_attr = self.class.permitted_visible_attribute(visible_attribute, default: publicly_visible_attribute)
+    {
+      street: %i[street].include?(visible_attr) ? street : nil,
+      street_2: %i[street].include?(visible_attr) ? street_2 : nil,
+      city:,
+      region:,
+      postal_code: %i[street postal_code].include?(visible_attr) ? postal_code : nil,
+      latitude:, longitude:
+    }.merge(country_hash)
+  end
+
+  def address_hash_legacy(address_record_id: false)
+    l_hash = address_hash(visible_attribute: :street, render_country: true).dup
+    l_hash[:zipcode] = l_hash.delete(:postal_code)
+    l_hash[:state] = l_hash.delete(:region)
+    l_hash[:address_record_id] = id if address_record_id
+    l_hash.with_indifferent_access
+  end
+
+  def formatted_address_string(visible_attribute: nil, render_country: nil, current_country_id: nil, current_country_iso: nil)
+    f_hash = address_hash(visible_attribute:, render_country:, current_country_id:, current_country_iso:)
+    arr = f_hash.values_at(:street, :street_2, :city)
+    arr << f_hash.values_at(:region, :postal_code).reject(&:blank?).join(" ") # region and postal code don't have a comma
+    (arr << f_hash[:country]).reject(&:blank?).join(", ")
+  end
+
+  def internal_address_attrs
+    slice(*GEO_ATTRS)
   end
 
   private
 
-  # remove ", CA" for things like "Sacramento, CA"
-  # Assign state if not assigned.
-  # Only works for USA because states only work in US :(
+  def clean_location_attributes
+    self.street = Binxtils::InputNormalizer.string(street)&.gsub(/\s*,\z/, "")
+    self.street_2 = Binxtils::InputNormalizer.string(street_2) if has_attribute?(:street_2)
+    self.postal_code = Binxtils::InputNormalizer.string(postal_code)
+    self.city = clean_city(city)
+    self.neighborhood = Binxtils::InputNormalizer.string(neighborhood)
+    self.postal_code = Geocodeable.format_postal_code(postal_code, country_id) if postal_code.present?
+
+    assign_region_record
+  end
+
+  def include_country?(render_country: nil, current_country_id: nil, current_country_iso: nil)
+    render_country = render_country&.to_s
+    return render_country == "true" if %w[true false].include?(render_country)
+
+    render_sym = render_country&.to_sym
+    RENDER_COUNTRY_OPTIONS.first unless RENDER_COUNTRY_OPTIONS.include?(render_sym)
+
+    if current_country_iso.present?
+      country_iso != current_country_iso.strip.upcase
+    elsif current_country_id.present?
+      country_id != current_country_id
+    else
+      # Default to US if no current country is passed. Compare iso rather than
+      # Country.united_states_id - which lazily creates and errors on the read replica
+      country_iso != "US"
+    end
+  end
+
+  # Clean "INDIANAPOLIS, IN USA" type cities: strip "USA" and trailing state abbreviations
+  # (assigning region if not assigned), then titleize. US-only - regions only work in the US,
+  # and non-US cities are left alone
   def clean_city(str)
-    if str.match?(/(,|\.)\s*\w\w\s*\z/) && country_id == Country.united_states.id
-      str_state_abbr = str[/(,|\.)\s*\w\w\s*\z/].gsub(/,|\./, "").strip.downcase
-      str_no_state = str.gsub(/(,|\.)\s*\w\w\s*\z/, "")
-      if state_id.present?
-        if state.abbreviation.downcase == str_state_abbr
-          str = str_no_state
-        end
+    str = Binxtils::InputNormalizer.string(str&.gsub("USA", ""))&.gsub(/\s*,\z/, "")
+    return str if str.blank?
+    return str if country_id.present? && country_id != Country.united_states_id
+
+    if str.match?(/(,|\.)\s*\w\w\s*\z/) && country_id.present?
+      state_abbr = str[/(,|\.)\s*\w\w\s*\z/].gsub(/,|\./, "").strip.downcase
+      if region_record_id.present?
+        # Keep an abbreviation that disagrees with the assigned region
+        return str unless region_record.abbreviation.downcase == state_abbr
       else
-        citys_state = State.fuzzy_abbr_find(str_state_abbr)
-        if citys_state.present?
-          self.state_id = citys_state.id
-          str = str_no_state
-        end
+        matched_state = State.fuzzy_abbr_find(state_abbr)
+        return str if matched_state.blank?
+
+        self.region_record_id = matched_state.id
+      end
+      str = str.gsub(/(,|\.)\s*\w\w\s*\z/, "")
+    end
+    str.gsub(/,?(,|\s)[A-Z]+\s?++\z/, "").strip.gsub(/\s*,\z/, "").titleize
+  end
+
+  def assign_region_record
+    self.region_string = nil if region_string.blank?
+
+    # Remove region_record if it doesn't match the country
+    if country_id.present? && region_record_id.present?
+      self.region_record_id = nil unless region_record&.country_id == country_id
+    end
+
+    # Only remove region_string if region_record.present
+    self.region_string = nil if region_record.present?
+
+    if region_string.present?
+      self.region_record_id = State.friendly_find(region_string, country_id:)&.id
+      self.region_string = nil if region_record_id.present?
+    end
+  end
+
+  def address_changed?
+    (ADDRESS_ATTRS - %i[street_2]).any? { |col| public_send(:"#{col}_changed?") }
+  end
+
+  def address_record_geocode
+    # Only geocode if there is specific location information
+    unless address_present?
+      self.attributes = {latitude: nil, longitude: nil}
+      return
+    end
+
+    GeocodeHelper.assignable_address_hash_for(
+      formatted_address_string(render_country: :always), new_attrs: true
+    ).each do |key, value|
+      # Don't overwrite any values except latitude and longitude
+      if self[key].blank? || %i[latitude longitude].include?(key)
+        self[key] = value
       end
     end
-    str.strip.gsub(/\s*,\z/, "")
+
+    assign_region_record if region_string_changed?
   end
 end

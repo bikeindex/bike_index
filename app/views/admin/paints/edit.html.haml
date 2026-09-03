@@ -11,13 +11,13 @@
             %td
               Created
             %td
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l @paint.created_at, format: :convert_time
           %tr
             %td
               Updated
             %td
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l @paint.updated_at, format: :convert_time
           %tr
             %td
@@ -32,8 +32,8 @@
 
 
 = form_for [:admin, @paint] do |f|
-  - if @paint.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Paint", obj: @paint }
+  = render(UI::Alerts::ObjectError::Component.new(object: @paint))
+
   .row
     .col-lg-3.col-md-6.col-sm-12
       .form-group
@@ -65,9 +65,9 @@
     = number_with_delimiter(@bikes_count)
     Bikes with this paint
 
-  = render partial: "/shared/pagination", locals: {collection: @bikes}
+  = render(Atoms::Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state))
 
-  = render partial: "/admin/bikes/table"
+  = render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:, display_dev_info: display_dev_info?)
 
 - else
   = link_to "Delete!", admin_paint_url(@paint), method: :delete, class: "btn btn-danger"

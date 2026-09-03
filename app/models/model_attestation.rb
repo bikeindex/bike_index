@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: model_attestations
+# Database name: primary
 #
 #  id                 :bigint           not null, primary key
 #  certification_type :string
@@ -17,9 +18,7 @@
 #
 # Indexes
 #
-#  index_model_attestations_on_model_audit_id   (model_audit_id)
 #  index_model_attestations_on_organization_id  (organization_id)
-#  index_model_attestations_on_user_id          (user_id)
 #
 class ModelAttestation < ApplicationRecord
   # NOTE: This hash is ordered by the importance of the kind
@@ -45,14 +44,15 @@ class ModelAttestation < ApplicationRecord
 
   mount_uploader :file, PdfUploader
 
-  scope :current, -> { where(replaced: false) }
-  scope :certification_updating, -> { where(kind: certification_update_kinds) }
-
   before_validation :set_calculated_attributes
   after_commit :update_model_audit
 
+  scope :current, -> { where(replaced: false) }
+  scope :certification_updating, -> { where(kind: certification_update_kinds) }
+
   def self.kind_humanized(str)
     return nil if str.blank?
+
     str.to_s.gsub("_org", " organization").tr("_", " ")
   end
 
@@ -73,8 +73,8 @@ class ModelAttestation < ApplicationRecord
 
   def set_calculated_attributes
     self.url = Urlifyer.urlify(url)
-    self.info = InputNormalizer.string(info)
-    self.certification_type = InputNormalizer.string(certification_type)
+    self.info = Binxtils::InputNormalizer.string(info)
+    self.certification_type = Binxtils::InputNormalizer.string(certification_type)
   end
 
   private

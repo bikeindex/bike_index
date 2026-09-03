@@ -46,6 +46,20 @@ RSpec.describe Organized::HotSheetsController, type: :request do
           expect(assigns(:day)).to eq Time.current.to_date
         end
       end
+      context "with a bike recovered since the sheet was built" do
+        let(:stolen_record) { FactoryBot.create(:stolen_record_recovered) }
+        let!(:hot_sheet) do
+          FactoryBot.create(:hot_sheet, organization: current_organization,
+            stolen_record_ids: [stolen_record.id])
+        end
+        it "badges the recovery" do
+          get "#{base_url}?day=#{Time.current.to_date}"
+          expect(response.status).to eq(200)
+          expect(assigns(:hot_sheet)).to eq hot_sheet
+          expect(stolen_record.reload.recovered?).to be_truthy
+          expect(response.body).to include("Bike was recovered!")
+        end
+      end
       context "organization doesn't have location" do
         let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["hot_sheet"]) }
         it "redirects with error" do
@@ -78,9 +92,9 @@ RSpec.describe Organized::HotSheetsController, type: :request do
       end
       context "organization doesn't have location" do
         let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["hot_sheet"]) }
-        it "redirects with error" do
+        it "redirects to edit, which renders the missing location alert rather than a flash" do
           get base_url
-          expect(flash[:error]).to match(/location/i)
+          expect(flash[:error]).to be_blank
           expect(response).to redirect_to edit_organization_hot_sheet_path(current_organization)
           expect(current_organization.reload.hot_sheet_configuration).to be_valid
         end
@@ -99,6 +113,15 @@ RSpec.describe Organized::HotSheetsController, type: :request do
           get "#{base_url}/edit"
           expect(response.status).to eq(200)
           expect(response).to render_template("edit")
+        end
+      end
+      context "organization doesn't have location" do
+        let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["hot_sheet"]) }
+        it "renders with the missing location alert" do
+          get "#{base_url}/edit"
+          expect(response.status).to eq(200)
+          expect(response).to render_template("edit")
+          expect(response.body).to match("Organization does not have a base location")
         end
       end
     end

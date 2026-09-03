@@ -1,0 +1,100 @@
+# frozen_string_literal: true
+
+module API
+  class StravaProxyController < ApplicationController
+    include API::TokenAuthenticatable
+
+    respond_to :json
+    wrap_parameters false
+    skip_before_action :verify_authenticity_token
+    before_action :cors_preflight_check
+    after_action :cors_set_access_control_headers
+    rescue_from ArgumentError, with: :render_bad_request
+
+    def create
+      auth_response = authorize_user_and_strava_integration
+      if auth_response[:error].present?
+        render json: {error: auth_response[:error]}, status: auth_response[:status]
+        return
+      end
+
+      if !auth_response[:strava_integration].synced? || Binxtils::InputNormalizer.boolean(params[:sync_status])
+        render json: Integrations::Strava::ProxyRequester.sync_status(auth_response[:strava_integration])
+        return
+      end
+
+      enriched_since = enriched_since_from_url(permitted_params[:url])
+      if enriched_since
+        activities = auth_response[:strava_integration].strava_activities
+          .where("enriched_at > ?", Time.at(enriched_since))
+          .map(&:proxy_serialized)
+        render json: activities.to_json
+        return
+      end
+
+      result = Integrations::Strava::ProxyRequester.create_and_execute(
+        strava_integration: auth_response[:strava_integration], user: auth_response[:user],
+        url: permitted_params[:url], method: permitted_params[:method], body: permitted_params[:body]&.to_h
+      )
+
+      render json: result[:json].to_json, status: result[:status]
+    end
+
+    private
+
+    # returns {user:, strava_integration:} if valid, otherwise {error:, status:}
+    def authorize_user_and_strava_integration
+      auth = authorize_user
+      return auth if auth[:error]
+
+      strava_integration = auth[:user].strava_integration
+      return {error: "No Strava integration", status: 404} unless strava_integration
+      return {error: "Strava authorization failed. Please re-authenticate with Strava.", status: 401} if strava_integration.error?
+
+      {user: auth[:user], strava_integration:}
+    end
+
+    def authorized_app?(access_token)
+      access_token.application_id == Integrations::Strava::ProxyRequester::STRAVA_DOORKEEPER_APP_ID
+    end
+
+    def enriched_since_from_url(url)
+      return nil unless url&.match?(/enriched_since=/)
+      match = url.match(/enriched_since=(\d+)/)
+      match ? match[1].to_i : nil
+    end
+
+    def permitted_params
+      params.permit(:url, :method, :sync_status, body: {})
+    end
+
+    def render_bad_request(exception)
+      render json: {error: exception.message}, status: 400
+    end
+
+    def cors_set_access_control_headers
+      set_cors_headers
+    end
+
+    def cors_preflight_check
+      return unless request.method == "OPTIONS"
+      set_cors_headers
+      render plain: ""
+    end
+
+    def set_cors_headers
+      headers["Access-Control-Allow-Origin"] = cors_allowed_origin
+      headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+      headers["Access-Control-Request-Method"] = "*"
+      headers["Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+      headers["Access-Control-Max-Age"] = "1728000"
+    end
+
+    def cors_allowed_origin
+      origin = request.headers["Origin"]
+      allowed = ["https://bikeindex.org", "https://www.bikeindex.org"]
+      allowed << origin if Rails.env.development?
+      allowed.include?(origin) ? origin : allowed.first
+    end
+  end
+end

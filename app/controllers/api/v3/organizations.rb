@@ -25,6 +25,7 @@ module API
         }
         params do
           requires :name, type: String, desc: "The organization name"
+          optional :short_name, type: String, desc: "The organization's short name (used for the slug). Defaults to a shortened `name`."
           requires :website, type: String, desc: "The organization website", regexp: URI::DEFAULT_PARSER.make_regexp(%w[http https])
           requires :kind, type: String, desc: "The kind of organization", values: Organization.user_creatable_kinds
 
@@ -52,13 +53,38 @@ module API
             relations = permitted[:locations].map { |loc|
               state = State.where(name: loc[:state]).first
               country = Country.where(name: loc[:country]).first
-              loc.merge(state: state, country: country).to_h
+              {
+                name: loc[:name],
+                phone: loc[:phone],
+                address_record_attributes: {
+                  street: loc[:street],
+                  city: loc[:city],
+                  postal_code: loc[:zipcode],
+                  region_record_id: state&.id,
+                  country_id: country&.id
+                }
+              }
             }
             organization.locations.build(relations)
           end
 
           organization.save || error!(organization.errors.full_messages, 422)
           OrganizationSerializer.new(organization, root: "organization")
+        end
+
+        desc "List the current user's Organizations<span class='accstr'>*</span>", {
+          authorizations: {oauth2: {scope: :read_organization_membership}},
+          notes: <<-NOTES
+          **Requires** `read_organization_membership` **in the access token** you use to make the request.
+          <hr>
+          Returns every organization the access token's user is a member of.
+          NOTES
+        }
+        # GET /api/v3/organizations
+        get "/" do
+          ActiveModel::ArraySerializer.new(current_user.organizations,
+            each_serializer: OrganizationSerializer,
+            root: "organizations")
         end
       end
     end

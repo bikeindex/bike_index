@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: bike_versions
+# Database name: primary
 #
 #  id                        :bigint           not null, primary key
 #  belt_drive                :boolean
@@ -39,6 +40,7 @@
 #  manufacturer_id           :bigint
 #  owner_id                  :bigint
 #  paint_id                  :bigint
+#  primary_activity_id       :bigint
 #  primary_frame_color_id    :bigint
 #  rear_gear_type_id         :bigint
 #  rear_wheel_size_id        :bigint
@@ -47,22 +49,16 @@
 #
 # Indexes
 #
-#  index_bike_versions_on_bike_id                   (bike_id)
-#  index_bike_versions_on_front_gear_type_id        (front_gear_type_id)
-#  index_bike_versions_on_front_wheel_size_id       (front_wheel_size_id)
-#  index_bike_versions_on_manufacturer_id           (manufacturer_id)
-#  index_bike_versions_on_owner_id                  (owner_id)
-#  index_bike_versions_on_paint_id                  (paint_id)
-#  index_bike_versions_on_primary_frame_color_id    (primary_frame_color_id)
-#  index_bike_versions_on_rear_gear_type_id         (rear_gear_type_id)
-#  index_bike_versions_on_rear_wheel_size_id        (rear_wheel_size_id)
-#  index_bike_versions_on_secondary_frame_color_id  (secondary_frame_color_id)
-#  index_bike_versions_on_tertiary_frame_color_id   (tertiary_frame_color_id)
+#  index_bike_versions_on_bike_id              (bike_id)
+#  index_bike_versions_on_manufacturer_id      (manufacturer_id)
+#  index_bike_versions_on_owner_id             (owner_id)
+#  index_bike_versions_on_primary_activity_id  (primary_activity_id)
 #
 class BikeVersion < ApplicationRecord
   include BikeSearchable
   include BikeAttributable
   include PgSearch::Model
+  include ShortIdable
 
   acts_as_paranoid without_default_scope: true
 
@@ -72,29 +68,30 @@ class BikeVersion < ApplicationRecord
     user_hidden: 2
   }.freeze
 
+  enum :visibility, VISIBILITY_ENUM
+  enum :status, Bike::STATUS_ENUM # Only included to match bike, always should be with_owner
+
   belongs_to :bike
 
   belongs_to :paint # Not in BikeAttributable because of counter cache
 
   belongs_to :owner, class_name: "User" # Direct association, unlike bike
 
-  enum :visibility, VISIBILITY_ENUM
-  enum :status, Bike::STATUS_ENUM # Only included to match bike, always should be with_owner
+  validates :name, presence: true, uniqueness: {scope: [:bike_id, :owner_id]}
 
   attr_accessor :timezone
   attr_writer :end_at_shown, :start_at_shown
 
-  scope :user_hidden, -> { unscoped.user_hidden }
-
-  default_scope { where.not(visibility: "user_hidden").where(deleted_at: nil).order(listing_order: :desc) }
-
-  validates :name, presence: true, uniqueness: {scope: [:bike_id, :owner_id]}
+  delegate :bike_versions,
+    :no_serial?, :serial_display, :serial_hidden?, :serial_number, :serial_unknown, :made_without_serial?,
+    to: :bike, allow_nil: true
 
   before_validation :set_calculated_attributes
 
-  delegate :bike_versions,
-    :no_serial?, :serial_number, :serial_unknown, :made_without_serial?,
-    to: :bike, allow_nil: true
+  scope :user_hidden, -> { unscoped.user_hidden }
+  scope :visible, -> { where.not(visibility: "user_hidden").where(deleted_at: nil) }
+
+  default_scope { visible.order(listing_order: :desc) }
 
   pg_search_scope :pg_search, against: {
     cached_data: "B",
@@ -117,6 +114,11 @@ class BikeVersion < ApplicationRecord
 
   # Necessary to duplicate bike
   def status_found?
+    false
+  end
+
+  # Necessary to duplicate bike
+  def is_for_sale?
     false
   end
 
@@ -160,6 +162,19 @@ class BikeVersion < ApplicationRecord
     nil
   end
 
+  # Necessary to duplicate bike
+  def current?
+    !deleted? && !user_hidden?
+  end
+
+  def current_impound_record
+    nil
+  end
+
+  def current_stolen_record
+    nil
+  end
+
   def end_at_shown
     end_at.present?
   end
@@ -176,21 +191,24 @@ class BikeVersion < ApplicationRecord
   def authorized?(passed_user, no_superuser_override: false)
     return false if passed_user.blank?
     return true if !no_superuser_override && passed_user.superuser?
+    return false if deleted?
+
     passed_user == owner
   end
 
   def visible_by?(passed_user = nil)
+    return true if passed_user&.superuser?
+    return false if deleted?
     return true unless user_hidden?
-    if passed_user.present?
-      return true if passed_user.superuser?
-      return true if user_hidden? && authorized?(passed_user)
-    end
-    false
+
+    passed_user.present? && authorized?(passed_user)
   end
 
   def calculated_listing_order
-    t = (updated_at || Time.current).to_i / 10000
-    public_images.present? ? t : t / 100
+    t = Time.current.to_i / 10000
+
+    # Use ID so that more recent versions have a little bit of precedence
+    id_with_fallback + (public_images.present? ? t : (t / 100))
   end
 
   def set_calculated_attributes
@@ -201,7 +219,7 @@ class BikeVersion < ApplicationRecord
     self.listing_order = calculated_listing_order
     self.thumb_path = public_images&.limit(1)&.first&.image_url(:small)
     self.cached_data = cached_data_array.join(" ")
-    self.name = name.present? ? name.strip : nil
+    self.name = Binxtils::InputNormalizer.string(name)
   end
 
   # Method from bike that is static in bike_version
@@ -214,5 +232,11 @@ class BikeVersion < ApplicationRecord
   def bike_overridden_attributes
     self.class.bike_override_attributes.map { |k| [k, bike.send(k)] }
       .reject { |_k, v| v.blank? }.to_h
+  end
+
+  def id_with_fallback
+    return id if id.present?
+
+    (BikeVersion.maximum(:id) || 0) + 1
   end
 end

@@ -1,21 +1,37 @@
-# Warning: BikeCreator forces every bike to have an ownership
+# Warning: BikeServices::Creator forces every bike to have an ownership
 # ... But this factory allows creating bikes without ownerships
 FactoryBot.define do
   factory :bike do
     creator { FactoryBot.create(:user) }
     serial_number
     manufacturer { FactoryBot.create(:manufacturer) }
-    sequence(:owner_email) { |n| "bike_owner#{n}@example.com" }
+    sequence(:owner_email) { |n| "bike_owner#{n}@bikeindex.org" }
     primary_frame_color { Color.black }
     cycle_type { CycleType.slugs.first }
     propulsion_type { "foot-pedal" }
-    skip_geocoding { true }
+
+    trait :with_primary_activity do
+      primary_activity { FactoryBot.create(:primary_activity) }
+    end
 
     trait :with_image do
       after(:create) do |bike|
         FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike)
         bike.reload
         bike.save
+      end
+    end
+
+    trait :with_address_record do
+      transient do
+        address_in { :new_york }
+        address_record_kind { :bike }
+      end
+
+      address_set_manually { true } # Required to set the address_record coordinates
+
+      address_record do
+        FactoryBot.build(:address_record, address_in, kind: address_record_kind, bike: instance, user:)
       end
     end
 
@@ -26,12 +42,14 @@ FactoryBot.define do
         claimed_at { nil }
         can_edit_claimed { true }
         creation_pos_kind { "" }
+        marked_user_hidden { false }
         # Previous Creation State attributes
         # TODO: part of #2110 - remove prefix
         creation_state_origin { "" }
         creation_state_bulk_import { nil }
         creation_registration_info { nil }
       end
+      user_hidden { marked_user_hidden }
 
       after(:create) do |bike, evaluator|
         # Sometimes multiple things include with_ownership, this can get called multiple times
@@ -45,6 +63,7 @@ FactoryBot.define do
           end
 
           FactoryBot.create(:ownership,
+            user_hidden: bike.user_hidden,
             bike: bike,
             creator: bike.creator,
             owner_email: bike.owner_email,
@@ -67,12 +86,12 @@ FactoryBot.define do
     trait :with_ownership_claimed do
       with_ownership
       transient do
-        user { FactoryBot.create(:user) }
+        user { FactoryBot.create(:user_confirmed) }
         claimed_at { Time.current - 1.day }
         claimed { true }
       end
       creator { user }
-      owner_email { user.email }
+      owner_email { user&.email }
       created_at { claimed_at }
     end
 

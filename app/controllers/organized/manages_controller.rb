@@ -24,12 +24,12 @@ module Organized
     def destroy
       organization_name = current_organization.name
       if current_organization.paid?
-        flash[:info] = translation(:contact_support_to_delete, org_name: organization_name)
+        flash[:notice] = translation(:contact_support_to_delete, org_name: organization_name)
         redirect_to(current_root_path) && return
       end
       notify_admins("organization_destroyed")
       current_organization.destroy
-      flash[:info] = translation(:deleted_org, org_name: organization_name)
+      flash[:notice] = translation(:deleted_org, org_name: organization_name)
       redirect_to user_root_url
     end
 
@@ -50,11 +50,12 @@ module Organized
     def permitted_parameters
       params.require(:organization).permit(:name, :website, :embedable_user_email, :short_name,
         :avatar, :lightspeed_register_with_phone, :direct_unclaimed_notifications, permitted_kind,
-        show_on_map_if_permitted, locations_attributes: permitted_locations_params)
+        show_on_map_if_permitted, locations_attributes:)
     end
 
     def permitted_kind
       return "ambassador" if @organization.ambassador?
+
       new_kind = params.dig(:organization, :kind)
       Organization.user_creatable_kinds.include?(new_kind) ? new_kind : @organization.kind
     end
@@ -63,9 +64,9 @@ module Organized
       current_organization.lock_show_on_map ? [] : [:show_on_map]
     end
 
-    def permitted_locations_params
-      %i[name zipcode city state_id country_id street phone email id _destroy publicly_visible
-        impound_location default_impound_location]
+    def locations_attributes
+      %i[name phone email id _destroy publicly_visible impound_location default_impound_location] +
+        [address_record_attributes: AddressRecord.permitted_params + [:id]]
     end
 
     def notify_admins(type)

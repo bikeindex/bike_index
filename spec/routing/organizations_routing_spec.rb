@@ -3,10 +3,10 @@ require "rails_helper"
 RSpec.describe "organizations routing", type: :routing do
   describe "landing_pages" do
     it "routes root to " do
-      expect(LandingPages::ORGANIZATIONS).to include("university")
-      expect(get: "/university").to route_to(
+      expect(LandingPageOrganizations::SLUGS).to include("brakebills")
+      expect(get: "/brakebills").to route_to(
         controller: "landing_pages",
-        organization_id: "university",
+        organization_id: "brakebills",
         action: "show"
       )
     end
@@ -90,10 +90,10 @@ RSpec.describe "organizations routing", type: :routing do
 
   describe "org_public module" do # At least for now...
     it "routes to impounded_bikes" do
-      expect(get: "/hogwarts/impounded_bikes").to route_to(
+      expect(get: "/brakebills/impounded_bikes").to route_to(
         controller: "org_public/impounded_bikes",
         action: "index",
-        organization_id: "hogwarts"
+        organization_id: "brakebills"
       )
     end
   end

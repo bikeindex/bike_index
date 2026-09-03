@@ -116,10 +116,6 @@ table {
     font-weight: bold;
   }
 
-  .table-checkbox-select {
-    @extend .table-cell-check;
-  }
-
   code {
     word-break: break-all;
   }

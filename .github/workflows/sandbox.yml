@@ -1,0 +1,67 @@
+name: Sandbox Deploy
+
+# Deploys `main` to the persistent sandbox app (sandbox.review.bikeindex.org) via
+# the shared kamal-deploy.yml reusable workflow — same host + shared accessories as
+# the per-PR review apps. It shares config/deploy.review.yml (the `sandbox` slug,
+# with no accessories block) — see that file and docs/review-apps.md.
+#
+# Trigger: workflow_dispatch only. CI's `dispatch` job fires this on every push to
+# main (see .github/workflows/ci.yml), and it's also a manual redeploy button.
+# NOTE: CI dispatches this in parallel with its own test job, so a sandbox deploy
+# does NOT wait for the test suite to pass.
+#
+# There is no destroy path — sandbox is long-lived. Its Postgres role/databases and
+# Redis DB 0 persist across deploys (first boot seeds, later boots migrate).
+
+on:
+  workflow_dispatch:
+
+# Capped scope handed to the reusable workflow's jobs (GHCR push + deployment).
+permissions:
+  contents: read
+  packages: write
+  deployments: write
+
+jobs:
+  deploy:
+    name: Build & deploy sandbox
+    uses: ./.github/workflows/kamal-deploy.yml
+    secrets: inherit
+    with:
+      ref: ${{ github.sha }}
+      image_tag: sandbox-${{ github.sha }}
+      service_label: bike-index-sandbox
+      sprockets_cache_prefix: sandbox-sprockets
+      # Shared config resolves the `sandbox` slug because no REVIEW_APP_PR_NUMBER
+      # is set; REVIEW_APP_REDIS_DB=0 is the DB reserved out of the per-PR 1..1023
+      # range. --skip-push: CI built + pushed the image. KAMAL_CONFIG lets the
+      # post-deploy Honeybadger hook target the same config.
+      kamal_config: config/deploy.review.yml
+      command: REVIEW_APP_REDIS_DB=0 kamal deploy --version "$IMAGE_TAG" --skip-push --config-file config/deploy.review.yml
+      # review-app.yml's sandbox reload_database joins this group to stay off a
+      # deploy that's mid-boot, so renaming it here un-serializes the two.
+      concurrency_prefix: sandbox-deploy
+      environment_name: review-app
+      environment_url: https://sandbox.review.bikeindex.org
+
+  # Kick off the iOS E2E suite against the sandbox we just deployed. Dispatched
+  # here rather than via a workflow_run trigger in ios-e2e.yml because this
+  # deploy is started by CI's GITHUB_TOKEN, and GITHUB_TOKEN-initiated runs don't
+  # emit downstream events like workflow_run. workflow_dispatch is the exception
+  # GITHUB_TOKEN is allowed to fire, so we dispatch explicitly.
+  dispatch-ios-e2e:
+    name: Dispatch iOS E2E
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      STATUS_SHA: ${{ github.sha }}
+    steps:
+      # Pass the deployed commit so ios-e2e.yml can report a failure status back
+      # onto it. No status is written here — see report-failure in ios-e2e.yml.
+      - name: Dispatch iOS E2E against the freshly deployed sandbox
+        run: |
+          retry() { local n=1; until "$@"; do [ $n -ge 3 ] && return 1; echo "attempt $n failed; retrying in 15s..." >&2; n=$((n+1)); sleep 15; done; }
+          retry gh workflow run ios-e2e.yml --repo "$GITHUB_REPOSITORY" --ref main -f status_sha="$STATUS_SHA"

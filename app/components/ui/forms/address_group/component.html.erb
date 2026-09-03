@@ -1,0 +1,44 @@
+<div
+  data-controller="ui--forms--address-group"
+  data-ui--forms--address-group-us-id-value="<%= us_country_id %>"
+>
+  <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :street, kind: :text_field, label_text: street_label, required: @required)) %>
+
+  <% if @street_2 %>
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :street_2, kind: :text_field, label_text: translation(".street_2"))) %>
+  <% end %>
+
+  <div class="twfieldrow">
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :city, kind: :text_field, label_text: translation(".city"), required: @required)) %>
+
+    <div
+      data-ui--forms--address-group-target="state"
+      class="<%= state_hidden_class %>"
+    >
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :region_record_id, label_text: translation(".state"), required: @required)) do %>
+        <%= @form.collection_select(:region_record_id, State.united_states, :id, :name, {include_blank: true}, {class: "twinput tw:w-full", required: state_required?}) %>
+      <% end %>
+    </div>
+
+    <div
+      data-ui--forms--address-group-target="region"
+      class="<%= region_hidden_class %>"
+    >
+      <%# Input rather than kind:, so the label can be starred while the hidden field isn't required %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :region_string, label_text: translation(".region"), required: @required)) do %>
+        <%= render(UI::Forms::Input::Component.new(form_builder: @form, attribute: :region_string, required: region_required?)) %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="twfieldrow">
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :postal_code, kind: :text_field, label_text: translation(".postal_code"), required: @required)) %>
+
+    <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :country_id, label_text: translation(".country"), required: @required)) do %>
+      <%= render(UI::Forms::Select::Component.new(form_builder: @form, attribute: :country_id, required: @required,
+          option_tags: Country.select_options,
+          options: {prompt: translation(".choose_country"), selected: selected_country_id},
+          html_options: {class: "tw:w-full", data: {action: "change->ui--forms--address-group#toggleCountry", "ui--forms--address-group-target": "country"}})) %>
+    <% end %>
+  </div>
+</div>

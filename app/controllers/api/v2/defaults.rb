@@ -2,6 +2,7 @@ module API
   module V2
     module Defaults
       extend ActiveSupport::Concern
+
       included do
         before do
           header["Access-Control-Allow-Origin"] = "*"
@@ -15,6 +16,7 @@ module API
 
           def current_organization
             return @current_organization if defined?(@current_organization)
+
             organization = Organization.friendly_find(params[:organization_slug])
             if organization.present? && current_user.authorized?(organization)
               @current_organization = organization
@@ -24,6 +26,7 @@ module API
           def current_user
             return nil unless resource_owner.present?
             return resource_owner if resource_owner.confirmed? || permit_unconfirmed_user?
+
             # If user isn't confirmed, raise error for us to manage
             error!("User is unconfirmed", 403)
           end
@@ -39,6 +42,10 @@ module API
           # client_credentials flow. See #2282
           def doorkeeper_authorized_no_user?
             env["doorkeeper_authorized_no_user"]
+          end
+
+          def doorkeeper_application
+            current_token&.application
           end
 
           private

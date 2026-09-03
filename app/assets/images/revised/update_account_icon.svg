@@ -1,0 +1,21 @@
+<svg viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main speech bubble shape -->
+  <path d="M20 20 L180 20 Q190 20 190 30 L190 120 Q190 130 180 130 L70 130 L40 160 L40 130 L20 130 Q10 130 10 120 L10 30 Q10 20 20 20 Z"
+        fill="none"
+        stroke="#3498db"
+        stroke-width="20"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+  <!-- Settings icon (gear) in the middle -->
+  <g transform="translate(100, 75) scale(0.5)">
+    <!-- Outer circle -->
+    <circle cx="0" cy="0" r="40" fill="none" stroke="#3498db" stroke-width="10" />
+
+    <!-- Inner details (gear teeth) -->
+    <path d="M0,-60 L0,-45 M0,45 L0,60 M-42,-42 L-32,-32 M42,42 L32,32 M-60,0 L-45,0 M45,0 L60,0 M-42,42 L-32,32 M42,-42 L32,-32"
+          stroke="#3498db"
+          stroke-width="16"
+          stroke-linecap="round" />
+  </g>
+</svg>

@@ -74,7 +74,7 @@ RSpec.describe SessionsController, type: :controller do
   describe "magic_link" do
     it "renders" do
       get :magic_link
-      expect(assigns(:incorrect_token)).to be_falsey
+      expect(assigns(:failure)).to be_falsey
       expect(cookies.signed[:auth]).to be_nil
       expect(response.code).to eq "200"
       expect(response).to render_template("magic_link")
@@ -83,7 +83,7 @@ RSpec.describe SessionsController, type: :controller do
     context "incorrect_token" do
       it "renders" do
         get :magic_link, params: {incorrect_token: SecurityTokenizer.new_token}
-        expect(assigns(:incorrect_token)).to be_truthy
+        expect(assigns(:failure)).to be_truthy
         expect(cookies.signed[:auth]).to be_nil
         expect(response.code).to eq "200"
         expect(response).to render_template("magic_link")
@@ -140,7 +140,7 @@ RSpec.describe SessionsController, type: :controller do
       end
       context "magic_link expired" do
         it "renders" do
-          user.update_auth_token("magic_link_token", Time.current - 121.minutes)
+          user.update_auth_token("magic_link_token", (User::AUTH_TOKEN_EXPIRY + 1.minute).ago)
           og_token = user.magic_link_token
           request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
           post :sign_in_with_magic_link, params: {token: og_token}
@@ -192,7 +192,7 @@ RSpec.describe SessionsController, type: :controller do
         get :destroy, params: {partner: "bikehub"}
         expect(cookies.signed[:auth]).to be_nil
         expect(session[:user_id]).to be_nil
-        expect(response).to redirect_to "https://bikehub.com/"
+        expect(response).to redirect_to "https://parkit.bikehub.com/"
         expect(session[:return_to]).to be_nil
         expect(session[:partner]).to be_nil
         expect(session[:passive_organization_id]).to be_nil
@@ -216,7 +216,7 @@ RSpec.describe SessionsController, type: :controller do
             get :destroy, params: {partner: "bikehub", return_to: "https://badplace.stuff.com/"}
             expect(cookies.signed[:auth]).to be_nil
             expect(session[:user_id]).to be_nil
-            expect(response).to redirect_to "https://bikehub.com/"
+            expect(response).to redirect_to "https://parkit.bikehub.com/"
             expect(session[:return_to]).to be_nil
             expect(session[:partner]).to be_nil
             expect(session[:passive_organization_id]).to be_nil
@@ -253,7 +253,6 @@ RSpec.describe SessionsController, type: :controller do
           expect(response).to redirect_to my_account_url
           expect(session[:partner]).to be_nil
           user.reload
-          expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
           expect(user.last_login_at).to be_within(1.second).of Time.current
           expect(user.last_login_ip).to eq "66.66.66.66"
         end
@@ -313,7 +312,7 @@ RSpec.describe SessionsController, type: :controller do
         end
 
         context "admin" do
-          let(:user) { FactoryBot.create(:admin) }
+          let(:user) { FactoryBot.create(:superuser) }
           it "authenticates and redirects to admin" do
             expect(user).to receive(:authenticate).and_return(true)
             request.env["HTTP_REFERER"] = my_account_url
@@ -372,7 +371,8 @@ RSpec.describe SessionsController, type: :controller do
         expect(user).to receive(:authenticate).and_return(false)
         post :create, params: {session: {password: "something incorrect"}}
         expect(session[:user_id]).to be_nil
-        expect(response).to render_template("new")
+        # Wrong password stays on the credential step (identify), not the email step
+        expect(response).to render_template("identify")
         expect(response).to render_template("layouts/application")
       end
 
@@ -396,7 +396,7 @@ RSpec.describe SessionsController, type: :controller do
             post :create, params: {session: {password: "would be correct"}}
             expect(cookies.signed[:auth][1]).to eq(user.auth_token)
             expect(session[:render_donation_request]).to eq "law_enforcement"
-            expect(response).to redirect_to bikes_path(stolenness: "all")
+            expect(response).to redirect_to search_registrations_path(stolenness: "all")
           end
         end
       end

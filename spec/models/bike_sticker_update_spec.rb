@@ -10,6 +10,29 @@ RSpec.describe BikeStickerUpdate, type: :model do
     end
   end
 
+  describe "following_updates" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization:) }
+    let(:earlier_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+    let(:later_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+
+    it "is empty for the sticker's only update" do
+      bike_sticker.claim(user:, bike: earlier_bike, organization:)
+      expect(bike_sticker.bike_sticker_updates.last.following_updates.count).to eq 0
+    end
+
+    context "sticker was claimed again" do
+      it "is the later update" do
+        bike_sticker.claim(user:, bike: earlier_bike, organization:)
+        bike_sticker.claim(user:, bike: later_bike, organization:)
+        first_update, second_update = bike_sticker.bike_sticker_updates.reorder(:id)
+        expect(first_update.following_updates.pluck(:id)).to eq([second_update.id])
+        expect(second_update.following_updates.count).to eq 0
+      end
+    end
+  end
+
   describe "user association" do
     let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed) }
     let(:user) { bike_sticker.user }

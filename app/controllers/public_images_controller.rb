@@ -10,6 +10,10 @@ class PublicImagesController < ApplicationController
   end
 
   def create
+    if request.content_length.to_i > PublicImageUploader::MAX_FILE_SIZE
+      max_size = ActiveSupport::NumberHelper.number_to_human_size(PublicImageUploader::MAX_FILE_SIZE)
+      render(json: {error: translation(:image_too_large, size: max_size)}, status: 413) && return
+    end
     @public_image = PublicImage.new(permitted_parameters)
     if params[:bike_id].present?
       @public_image.imageable = @bike
@@ -92,13 +96,14 @@ class PublicImagesController < ApplicationController
       @bike = if params[:imageable_type] == "BikeVersion"
         BikeVersion.unscoped.find(params[:bike_id])
       else
-        Bike.unscoped.find(params[:bike_id])
+        Bike.unscoped.find_id(params[:bike_id])
       end
       return true if @bike.authorized?(current_user)
     end
     # Otherwise, it's a blog image or an organization image (or someone messing about),
     # so ensure the current user is admin authorized
     return true if current_user&.superuser?
+
     render(json: {error: "Access denied"}, status: 401) && return
   end
 

@@ -1,60 +1,13 @@
 - if @bike.present?
-  = render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, active_tab: "recovery_displays", display_recovery: true}
+  = render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :recovery_displays, display_recovery: true, user: current_user, display_dev_info: display_dev_info?)
   %h1.mt-5.mb-4 Recovery displays
 
 - else
-  .admin-subnav
-    .col-md-6
-      %h1
-        Recovery displays
-    .col-md-6
-      %ul
-        %li.nav-item
-          = link_to "New recovery display", new_admin_recovery_display_url, class: "nav-link btn btn-outline-success"
-        %li.nav-item
-          = link_to "bust cache", admin_recovery_display_path("bust_cache"), class: "nav-link less-strong"
-        %li.nav-item
-          = link_to "graph", url_for(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+  - nav_header_list_items = capture_haml do
+    %li
+      = render(UI::ButtonLink::Component.new(text: "New recovery display", href: new_admin_recovery_display_url, color: :primary, size: :sm))
+    %li
+      = render(UI::ButtonLink::Component.new(text: "bust cache", href: admin_recovery_display_path("bust_cache"), color: :link, html_class: "twless-strong"))
 
-  - if @render_chart
-    .col-12.mt-2
-      = column_chart time_range_counts(collection: matching_recovery_displays, column: "recovery_displays.#{@time_range_column}"), stacked: true, thousands: ","
+  = render(Pages::Admin::IndexSkeleton::Component.new(index: admin_index_state, viewing: controller_name.humanize, chart_collection: @render_chart && matching_recovery_displays, nav_header_list_items:, time_range_column: "recovery_displays.#{@time_range_column}", collection: @recovery_displays))
 
-  = render partial: "/shared/period_select"
-
-  = render partial: "/shared/pagination", locals: {collection: @recovery_displays}
-
-.full-screen-table
-  %table.table.table-striped.table-bordered.padded.table-sm
-    %thead.thead-light
-      %th= sortable "recovered_at"
-      %th.small.less-strong= sortable "created_at"
-      %th.small= sortable "updated_at"
-      %th Quote
-      %th Quoter
-      %th.small image?
-      %th.large-screens.small Association?
-    %tbody
-      - @recovery_displays.each do |recovery_display|
-        %tr
-          %td
-            .less-strong-hold
-              %a.convertTime.mr-2{href: edit_admin_recovery_display_url(recovery_display)}
-                = l recovery_display.recovered_at, format: :convert_time
-              %code.small.less-strong-right= recovery_display.id
-          %td
-            %small.convertTime
-              = l recovery_display.created_at, format: :convert_time
-          %td
-            %small.convertTime.less-strong
-              = l recovery_display.updated_at, format: :convert_time
-          %td
-            = truncate(recovery_display.quote, length: 140)
-          %td
-            = recovery_display.quote_by
-          %td.table-cell-check
-            = check_mark if recovery_display.image?
-          %td.large-screens.table-cell-check
-            = check_mark if recovery_display.stolen_record_id.present?
-
-= render partial: "/shared/pagination", locals: {collection: @recovery_displays}

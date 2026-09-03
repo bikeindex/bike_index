@@ -38,11 +38,11 @@ RSpec.describe "bikes routing", type: :routing do
         )
       end
       it "directs UI to scanned" do
-        expect(get: "bikes/scannedUI0001?organization_id=university-of-hogwarts").to route_to(
+        expect(get: "bikes/scannedUI0001?organization_id=university-of-brakebills").to route_to(
           controller: "bikes",
           action: "show",
           id: "scannedUI0001",
-          organization_id: "university-of-hogwarts"
+          organization_id: "university-of-brakebills"
         )
       end
     end

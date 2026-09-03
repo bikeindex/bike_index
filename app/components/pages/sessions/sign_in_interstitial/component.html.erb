@@ -1,0 +1,13 @@
+<div class="tw:text-center">
+  <h3><%= @heading %></h3>
+
+  <p class="tw:mt-2 tw:mb-6"><%= translation("click_button_to_continue") %></p>
+
+  <%= form_tag @url, method: "post" do %>
+    <% @fields.each do |name, value| %>
+      <%= hidden_field_tag name, value %>
+    <% end %>
+
+    <%= render UI::Button::Component.new(text: @submit_text, type: "submit", color: :primary, size: :lg) %>
+  <% end %>
+</div>

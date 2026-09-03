@@ -3,6 +3,113 @@ require "rails_helper"
 RSpec.describe UsersController, type: :request do
   base_url = "/users"
 
+  describe "new" do
+    it "renders an email field that offers a correction for a mistyped domain" do
+      get "#{base_url}/new"
+      expect(response).to have_http_status(:ok)
+      expect(response).to render_template(:new)
+      expect(Capybara.string(response.body)).to have_css("[data-controller='ui--forms--email'] input#user_email")
+    end
+
+    context "sso organization domain" do
+      let!(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
+      end
+      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :active, organization:) }
+
+      it "hands a claimed email off to the IdP, and renders the form for one it doesn't claim" do
+        get "#{base_url}/new", params: {email: "student@sso.edu"}
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+
+        get "#{base_url}/new", params: {email: "student@example.edu"}
+        expect(response).to render_template(:new)
+      end
+    end
+  end
+
+  describe "create" do
+    let(:email) { "ruther99@msu.edu" }
+
+    it "signs up passwordless, links to setting a password once confirmed" do
+      expect {
+        post base_url, params: {user: {email:, name: "Test name", terms_of_service: "1"}}
+      }.to change(User, :count).by(1)
+      user = User.order(:created_at).last
+      expect(user.passwordless_user?).to be_truthy
+
+      # The emailed link is a GET, so it only renders the form that confirms
+      get "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token}
+      expect(response).to render_template(:confirm_interstitial)
+      expect(user.reload.confirmed?).to be_falsey
+      expect(Capybara.string(response.body))
+        .to have_css("form[action='#{base_url}/confirm'] input[name='code'][value='#{user.confirmation_token}']", visible: :hidden)
+
+      post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token}
+      expect(response).to redirect_to my_account_url
+      follow_redirect!
+      expect(Capybara.string(response.body))
+        .to have_link("set a password to sign in", href: update_password_form_with_reset_token_users_path)
+    end
+
+    context "with partner" do
+      it "carries the partner through the interstitial" do
+        post base_url, params: {user: {email:, name: "Test name", terms_of_service: "1"}, partner: "bikehub"}
+        user = User.order(:created_at).last
+
+        get "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
+        expect(Capybara.string(response.body))
+          .to have_css("input[name='partner'][value='bikehub']", visible: :hidden)
+
+        post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
+        expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
+      end
+    end
+
+    context "sso organization domain" do
+      let(:email) { "student@sso.edu" }
+      let!(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
+      end
+      let!(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :active, organization:) }
+
+      it "forces SSO instead of creating an account the IdP doesn't know about" do
+        expect {
+          post base_url, params: {user: {email:, name: "Test name", terms_of_service: "1"}}
+        }.to_not change(User, :count)
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+      end
+
+      context "SAML config not yet live" do
+        let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, organization:) }
+
+        it "signs up normally rather than redirecting into an unconfigured IdP" do
+          expect {
+            post base_url, params: {user: {email:, name: "Test name", terms_of_service: "1"}}
+          }.to change(User, :count).by(1)
+        end
+      end
+    end
+  end
+
+  describe "create with a null origin" do
+    include_context :test_csrf_token
+    let(:email) { "ruther99@msu.edu" }
+
+    # Privacy extensions and VPNs strip the Origin header, which Rails rejects outright
+    it "re-renders the signup form with the email and an explanation" do
+      expect {
+        post base_url, params: {user: {email:, password: "somethinggreat", terms_of_service: "1"}},
+          headers: {"HTTP_ORIGIN" => "null"}
+      }.to_not change(User, :count)
+      expect(response).to render_template(:new)
+      expect(response.body).to match(email)
+      expect(flash[:error]).to match(/try again.*a VPN/i)
+      expect(response.body).to match(/try again.*a VPN/i)
+    end
+  end
+
   describe "update" do
     include_context :request_spec_logged_in_as_user
 
@@ -21,7 +128,7 @@ RSpec.describe UsersController, type: :request do
         organization = FactoryBot.create(:organization)
         FactoryBot.create(:organization_role_claimed, organization: organization, user: current_user)
         current_user.reload
-        expect(current_user.default_organization).to eq organization
+        expect(OrganizationRole.default_organization(current_user)).to eq organization
         patch "#{base_url}/#{current_user.username}", params: {id: current_user.username, user: {vendor_terms_of_service: "1", notification_newsletters: true}}
         expect(response.code).to eq("302")
         expect(response).to redirect_to organization_root_url(organization_id: organization.to_param)
@@ -59,6 +166,25 @@ RSpec.describe UsersController, type: :request do
       get "/accept_terms"
       expect(response).to render_template(:accept_terms)
     end
+
+    # Submitting with the box unchecked lands back on the same form, which reads as
+    # nothing having happened unless it says what's missing
+    it "errors when the terms aren't agreed to" do
+      patch "/users/#{current_user.to_param}", params: {user: {terms_of_service: "0"}}
+
+      expect(response).to redirect_to accept_terms_url
+      expect(flash[:error]).to eq "You must agree to the terms to use Bike Index"
+      expect(flash[:notice]).to be_blank
+      expect(current_user.reload.terms_of_service).to be_falsey
+    end
+
+    it "accepts them when it is" do
+      patch "/users/#{current_user.to_param}", params: {user: {terms_of_service: "1"}}
+
+      expect(response).to redirect_to my_account_url
+      expect(flash[:error]).to be_blank
+      expect(current_user.reload.terms_of_service).to be_truthy
+    end
   end
 
   describe "accept_vendor_terms" do
@@ -71,6 +197,20 @@ RSpec.describe UsersController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:accept_vendor_terms)
       expect(response).to render_template("layouts/application")
+    end
+  end
+
+  describe "confirm" do
+    context "sso organization domain", :sso_organization do
+      let(:user) { FactoryBot.create(:user, email: "student@sso.edu") }
+
+      # The account predates the organization going SSO - create blocks new ones
+      it "confirms the account but sends the sign in to the IdP" do
+        post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token}
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+        expect(user.reload.confirmed?).to be_truthy
+        expect(response.cookies["auth"]).to be_blank
+      end
     end
   end
 
@@ -87,7 +227,7 @@ RSpec.describe UsersController, type: :request do
       ActionMailer::Base.deliveries = []
       expect {
         post "#{base_url}/resend_confirmation_email", params: {email: "stuff@stuff.com"}
-      }.to_not change(EmailConfirmationJob, :jobs) # Because it's done inline
+      }.to_not change(Email::ConfirmationJob, :jobs) # Because it's done inline
       expect(response).to redirect_to please_confirm_email_users_path
       expect(flash[:error]).to be_present
       expect(ActionMailer::Base.deliveries.count).to eq 0
@@ -103,7 +243,7 @@ RSpec.describe UsersController, type: :request do
         ActionMailer::Base.deliveries = []
         expect {
           post "#{base_url}/resend_confirmation_email", params: {email: "blah blah blah"}
-        }.to_not change(EmailConfirmationJob, :jobs) # Because it's done inline
+        }.to_not change(Email::ConfirmationJob, :jobs) # Because it's done inline
         expect(response).to redirect_to please_confirm_email_users_path
         expect(flash[:success]).to be_present
         expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -126,7 +266,7 @@ RSpec.describe UsersController, type: :request do
         ActionMailer::Base.deliveries = []
         expect {
           post "#{base_url}/resend_confirmation_email", params: {email: "test@stuff.com"}
-        }.to_not change(EmailConfirmationJob, :jobs) # Because it's done inline
+        }.to_not change(Email::ConfirmationJob, :jobs) # Because it's done inline
         expect(response).to redirect_to please_confirm_email_users_path
         expect(flash[:success]).to be_present
         expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -146,13 +286,37 @@ RSpec.describe UsersController, type: :request do
           ActionMailer::Base.deliveries = []
           expect {
             post "#{base_url}/resend_confirmation_email", params: {email: "test@stuff.com"}
-          }.to_not change(EmailConfirmationJob, :jobs) # Because it's done inline
+          }.to_not change(Email::ConfirmationJob, :jobs) # Because it's done inline
           expect(response).to redirect_to please_confirm_email_users_path
           expect(flash[:error]).to be_present
           expect(ActionMailer::Base.deliveries.count).to eq 0
           expect(Notification.count).to eq 0
         end
       end
+    end
+  end
+
+  describe "resend_confirmation_email with rack_attack" do
+    include_context :rack_attack
+
+    it "returns 429 after exceeding the limit" do
+      throttled = rack_attack_throttled_response(limit: 5) do
+        post "#{base_url}/resend_confirmation_email", params: {email: "a@b.com"}
+        response
+      end
+      expect(throttled).to have_http_status(:too_many_requests)
+    end
+  end
+
+  describe "send_password_reset_email with rack_attack" do
+    include_context :rack_attack
+
+    it "returns 429 after exceeding the limit" do
+      throttled = rack_attack_throttled_response(limit: 5) do
+        post "#{base_url}/send_password_reset_email", params: {email: "a@b.com"}
+        response
+      end
+      expect(throttled).to have_http_status(:too_many_requests)
     end
   end
 
@@ -183,11 +347,22 @@ RSpec.describe UsersController, type: :request do
       user.reload
       expect(user.token_for_password_reset).to be_present
     end
+    context "sso organization domain", :sso_organization do
+      let(:user) { FactoryBot.create(:user_confirmed, email: "student@sso.edu") }
+
+      it "hands the reset off to the IdP rather than minting a token" do
+        expect {
+          post "#{base_url}/send_password_reset_email", params: {email: user.email}
+        }.to_not change(Email::ResetPasswordJob.jobs, :size)
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+        expect(user.reload.token_for_password_reset).to be_blank
+      end
+    end
     context "unknown user" do
       it "redirects back and flash errors if unable to find user" do
         expect {
           post "#{base_url}/send_password_reset_email", params: {email: "some-crazy-email@stuff.com"}
-        }.to_not change(EmailResetPasswordJob.jobs, :size)
+        }.to_not change(Email::ResetPasswordJob.jobs, :size)
         expect(flash[:error]).to match(/email/)
         expect(response).to redirect_to request_password_reset_form_users_path
       end
@@ -200,8 +375,8 @@ RSpec.describe UsersController, type: :request do
           expect(response.code).to eq("200")
           expect(response).to render_template(:send_password_reset_email)
           expect(flash).to be_blank
-        }.to change(EmailResetPasswordJob.jobs, :size).by(1)
-        expect(EmailResetPasswordJob).to have_enqueued_sidekiq_job(user.id)
+        }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
+        expect(Email::ResetPasswordJob).to have_enqueued_sidekiq_job(user.id, nil)
         user.reload
         expect(user.token_for_password_reset).to be_present
       end
@@ -215,10 +390,25 @@ RSpec.describe UsersController, type: :request do
           expect(response.code).to eq("200")
           expect(response).to render_template(:send_password_reset_email)
           expect(flash).to be_blank
-        }.to change(EmailResetPasswordJob.jobs, :size).by(1)
+        }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
         user.reload
         expect(user.token_for_password_reset).to be_present
         expect(user.confirmed?).to be_falsey
+      end
+    end
+    context "banned user" do
+      let(:user) { FactoryBot.create(:user_confirmed, banned: true) }
+
+      it "enqueues a password reset email job" do
+        expect(user.reload.banned?).to be_truthy
+        expect {
+          post "#{base_url}/send_password_reset_email", params: {email: user.email}
+          expect(response.code).to eq("200")
+          expect(response).to render_template(:send_password_reset_email)
+          expect(flash).to be_blank
+        }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
+        user.reload
+        expect(user.token_for_password_reset).to be_present
       end
     end
     context "existing password reset token" do
@@ -230,7 +420,7 @@ RSpec.describe UsersController, type: :request do
           expect(response.code).to eq("200")
           expect(response).to render_template(:send_password_reset_email)
           expect(flash).to be_present
-        }.to_not change(EmailResetPasswordJob.jobs, :size)
+        }.to_not change(Email::ResetPasswordJob.jobs, :size)
         user.reload
         expect(user.token_for_password_reset).to eq og_token
       end
@@ -244,7 +434,7 @@ RSpec.describe UsersController, type: :request do
             expect(response.code).to eq("200")
             expect(response).to render_template(:send_password_reset_email)
             expect(flash).to be_blank
-          }.to change(EmailResetPasswordJob.jobs, :size).by(1)
+          }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
           user.reload
           expect(user.token_for_password_reset).to_not eq og_token
         end
@@ -271,6 +461,17 @@ RSpec.describe UsersController, type: :request do
         expect(response).to redirect_to request_password_reset_form_users_path
         expect(flash[:error]).to be_present
       end
+      context "signed in" do
+        include_context :request_spec_logged_in_as_user
+        let(:current_user) { FactoryBot.create(:user_confirmed, passwordless_user: true) }
+        it "renders without emailing a reset token" do
+          get "#{base_url}/update_password_form_with_reset_token"
+          expect(response.code).to eq("200")
+          expect(response).to render_template(:update_password_form_with_reset_token)
+          expect(flash).to be_blank
+          expect(current_user.reload.token_for_password_reset).to be_blank
+        end
+      end
     end
     context "token not found" do
       it "redirects" do
@@ -281,7 +482,7 @@ RSpec.describe UsersController, type: :request do
     end
     context "auth token expired" do
       it "redirects" do
-        user.update_auth_token("token_for_password_reset", Time.current - 121.minutes)
+        user.update_auth_token("token_for_password_reset", (User::AUTH_TOKEN_EXPIRY + 1.minute).ago)
         og_token = user.token_for_password_reset
         get "#{base_url}/update_password_form_with_reset_token", params: {token: user.token_for_password_reset}
         expect(response).to redirect_to request_password_reset_form_users_path
@@ -306,12 +507,32 @@ RSpec.describe UsersController, type: :request do
       og_token = user.token_for_password_reset
       post "#{base_url}/update_password_with_reset_token", params: valid_params
       expect(response).to redirect_to my_account_url
+      # Signing in doesn't replace it with the generic "Logged in!"
+      expect(flash[:success]).to match(/password reset successfully/i)
       user.reload
       expect(user.token_for_password_reset).to_not eq og_token
       expect(user.auth_token).to_not eq og_auth
       expect(user.authenticate(valid_params.dig(:user, :password))).to be_truthy
       jar = ActionDispatch::Cookies::CookieJar.build(request, cookies.to_hash)
       expect(jar.signed["auth"]).to eq([user.id, user.auth_token])
+    end
+    context "sso organization domain", :sso_organization do
+      let(:user) do
+        FactoryBot.create(:user_confirmed, email: "student@sso.edu",
+          password: og_password, password_confirmation: og_password)
+      end
+      let(:og_password) { "old-password-4bf03ab1" }
+
+      # The token predates the organization going SSO - issuance is blocked, redemption catches the rest
+      it "neither changes the password nor signs in" do
+        user.send_password_reset_email
+        user.reload
+        post "#{base_url}/update_password_with_reset_token", params: valid_params
+        expect(response).to redirect_to(saml_init_path(org_slug: organization.to_param))
+        expect(user.reload.authenticate(og_password)).to be_truthy
+        jar = ActionDispatch::Cookies::CookieJar.build(request, cookies.to_hash)
+        expect(jar.signed["auth"]).to be_blank
+      end
     end
     context "unconfirmed user" do
       let(:user) { FactoryBot.create(:user) }
@@ -384,6 +605,17 @@ RSpec.describe UsersController, type: :request do
         expect(response.cookies[:auth]).to be_blank
       end
     end
+    context "signed in passwordless user" do
+      include_context :request_spec_logged_in_as_user
+      let(:current_user) { FactoryBot.create(:user_confirmed, passwordless_user: true) }
+      it "sets the password without a token" do
+        post "#{base_url}/update_password_with_reset_token", params: valid_params.merge(token: "")
+        expect(response).to redirect_to my_account_url
+        current_user.reload
+        expect(current_user.passwordless_user?).to be_falsey
+        expect(current_user.authenticate(valid_params.dig(:user, :password))).to be_truthy
+      end
+    end
     context "nil token" do
       it "redirects" do
         user.reload
@@ -406,7 +638,7 @@ RSpec.describe UsersController, type: :request do
     end
     context "auth token expired" do
       it "redirects" do
-        user.update_auth_token("token_for_password_reset", Time.current - 3.hours)
+        user.update_auth_token("token_for_password_reset", (User::AUTH_TOKEN_EXPIRY + 1.minute).ago)
         user.reload
         og_token = user.token_for_password_reset
         post "#{base_url}/update_password_with_reset_token", params: valid_params
@@ -421,48 +653,111 @@ RSpec.describe UsersController, type: :request do
   end
 
   describe "show" do
-    let(:user) { FactoryBot.create(:user_confirmed) }
+    let(:user) { FactoryBot.create(:user_confirmed, show_bikes:) }
+    let(:show_bikes) { false }
+
     it "404s if the user doesn't exist" do
       get "#{base_url}/fake_user-extra-stuff"
       expect(response.status).to eq 404
     end
 
-    it "redirects to user home url if the user exists but doesn't want to show their page" do
-      user.show_bikes = false
-      user.save
-      get "#{base_url}/#{user.username}"
-      expect(response).to redirect_to my_account_url
+    context "user doesn't show their page" do
+      it "redirects to user home url" do
+        get "#{base_url}/#{user.username}"
+        expect(response).to redirect_to my_account_url
+      end
     end
 
-    it "shows the page if the user exists and wants to show their page" do
-      user.show_bikes = true
-      user.save
-      get "#{base_url}/#{user.username}?page=1&per_page=1"
-      expect(response).to render_template :show
-      expect(assigns(:per_page)).to eq "1"
+    context "owner viewing their own hidden page" do
+      include_context :request_spec_logged_in_as_user
+      let(:current_user) { FactoryBot.create(:user_confirmed, show_bikes: false) }
+
+      it "renders with a notice that only they can see it" do
+        get "#{base_url}/#{current_user.username}"
+        expect(response.status).to eq 200
+        expect(response).to render_template :show
+        expect(assigns(:profile_hidden_reason)).to eq :owner
+        expect(response.body).to match(/only visible to you/i)
+      end
+    end
+
+    context "user shows their page" do
+      let(:show_bikes) { true }
+
+      it "renders" do
+        get "#{base_url}/#{user.username}?page=1&per_page=1"
+        expect(response).to render_template :show
+        expect(assigns(:per_page)).to eq 1
+        # Test some header tag properties
+        expect(response.body).to match(/<title>#{user.name}</)
+      end
+
+      context "banned user" do
+        let(:user) { FactoryBot.create(:user_confirmed, show_bikes:, banned: true) }
+        it "404s" do
+          get "#{base_url}/#{user.username}"
+          expect(response.status).to eq 404
+        end
+      end
+
+      context "email banned user" do
+        let!(:email_ban) { FactoryBot.create(:email_ban, user:) }
+        it "404s" do
+          expect(user.reload.email_banned?).to be_truthy
+          get "#{base_url}/#{user.username}"
+          expect(response.status).to eq 404
+        end
+      end
+    end
+
+    context "superuser viewing a banned user" do
+      include_context :request_spec_logged_in_as_superuser
+      let(:user) { FactoryBot.create(:user_confirmed, show_bikes:, banned: true) }
+
+      it "renders the profile with a banned alert" do
+        get "#{base_url}/#{user.username}"
+        expect(response.status).to eq 200
+        expect(response).to render_template :show
+        expect(assigns(:user_banned)).to be_truthy
+        expect(response.body).to match(/is banned/)
+      end
+    end
+
+    context "superuser viewing a hidden unbanned user" do
+      include_context :request_spec_logged_in_as_superuser
+
+      it "renders with a notice that only a superuser can see it" do
+        get "#{base_url}/#{user.username}"
+        expect(response.status).to eq 200
+        expect(assigns(:profile_hidden_reason)).to eq :superuser
+        expect(response.body).to match(/only visible because you/i)
+      end
     end
   end
 
   describe "unsubscribe" do
     let!(:user) { FactoryBot.create(:user_confirmed, notification_newsletters: true) }
+    let(:signed_id) { user.unsubscribe_signed_id }
+
     it "renders" do
       expect(user.notification_newsletters).to be_truthy
-      expect(user.confirmed?).to be_truthy
-      get "#{base_url}/#{user.username}/unsubscribe"
+      get "#{base_url}/#{signed_id}/unsubscribe"
       expect(assigns(:user)&.id).to eq user.id
       expect(response.code).to eq("200")
       expect(response).to render_template("users/unsubscribe")
+      # The rendered interstitial posts to unsubscribe_update, it doesn't unsubscribe here
+      expect(Capybara.string(response.body))
+        .to have_css("form[action^='#{base_url}/'][action$='/unsubscribe_update']")
       expect(flash).to be_blank
       expect(user.reload.notification_newsletters).to be_truthy
     end
+
     context "current_user" do
       include_context :request_spec_logged_in_as_user
       let(:current_user) { FactoryBot.create(:user_confirmed, notification_newsletters: true) }
       it "renders current user instead" do
-        expect(user.notification_newsletters).to be_truthy
-        expect(user.confirmed?).to be_truthy
         expect(current_user.notification_newsletters).to be_truthy
-        get "#{base_url}/#{user.username}/unsubscribe"
+        get "#{base_url}/#{signed_id}/unsubscribe"
         expect(assigns(:user)&.id).to eq current_user.id
         expect(response.code).to eq("200")
         expect(response).to render_template("users/unsubscribe")
@@ -471,31 +766,28 @@ RSpec.describe UsersController, type: :request do
         expect(current_user.reload.notification_newsletters).to be_truthy
       end
     end
-    context "subscribed unconfirmed user" do
-      let(:user) { FactoryBot.create(:user, notification_newsletters: true) }
-      it "renders" do
-        expect(user.notification_newsletters).to be_truthy
-        expect(user.confirmed?).to be_falsey
+
+    context "with plain username" do
+      it "redirects (does not find user, prevents enumeration)" do
         get "#{base_url}/#{user.username}/unsubscribe"
-        expect(assigns(:user)&.id).to eq user.id
-        expect(response.code).to eq("200")
-        expect(response).to render_template("users/unsubscribe")
-        expect(flash).to be_blank
-        expect(user.reload.notification_newsletters).to be_truthy
+        expect(response.code).to eq("302")
+        expect(flash[:success]).to be_present
       end
     end
-    context "user not present" do
-      it "does not error, shows same flash success (to prevent email enumeration)" do
+
+    context "with invalid token" do
+      it "redirects (does not find user, prevents enumeration)" do
         get "#{base_url}/cvxvxxxxx/unsubscribe"
         expect(response.code).to eq("302")
         expect(flash[:success]).to be_present
       end
     end
+
     context "user already unsubscribed" do
       let(:user) { FactoryBot.create(:user_confirmed, notification_newsletters: false) }
       it "renders" do
         expect(user.notification_newsletters).to be_falsey
-        get "#{base_url}/#{user.username}/unsubscribe"
+        get "#{base_url}/#{signed_id}/unsubscribe"
         expect(assigns(:user)&.id).to eq user.id
         expect(response.code).to eq("200")
         expect(response).to render_template("users/unsubscribe")
@@ -505,60 +797,75 @@ RSpec.describe UsersController, type: :request do
     end
   end
 
-  describe "unsubscribe" do
+  describe "unsubscribe_update" do
     let!(:user) { FactoryBot.create(:user_confirmed, notification_newsletters: true) }
+    let(:signed_id) { user.unsubscribe_signed_id }
+
     it "unsubscribes" do
       expect(user.notification_newsletters).to be_truthy
-      expect(user.confirmed?).to be_truthy
-      post "#{base_url}/#{user.username}/unsubscribe_update"
+      post "#{base_url}/#{signed_id}/unsubscribe_update"
       expect(response.code).to eq("302")
       expect(flash[:success]).to be_present
-      user.reload
-      expect(user.notification_newsletters).to be_falsey
+      expect(user.reload.notification_newsletters).to be_falsey
     end
+
     context "current_user" do
       include_context :request_spec_logged_in_as_user
       let(:current_user) { FactoryBot.create(:user_confirmed, notification_newsletters: true) }
-      it "unsubscribes current user instead" do
-        expect(user.notification_newsletters).to be_truthy
-        expect(user.confirmed?).to be_truthy
+      it "unsubscribes the signed id's user, not the session's" do
         expect(current_user.notification_newsletters).to be_truthy
+        post "#{base_url}/#{signed_id}/unsubscribe_update"
+        expect(response.code).to eq("302")
+        expect(flash[:success]).to be_present
+        expect(user.reload.notification_newsletters).to be_falsey
+        expect(current_user.reload.notification_newsletters).to be_truthy
+      end
+    end
+
+    # RFC 8058 - the mail client's own unsubscribe button
+    context "one-click" do
+      include_context :test_csrf_token
+      it "unsubscribes without a session or a CSRF token" do
+        post "#{base_url}/#{signed_id}/unsubscribe_update", params: {"List-Unsubscribe" => "One-Click"}
+        expect(response.code).to eq("200")
+        expect(response.body).to be_blank
+        expect(user.reload.notification_newsletters).to be_falsey
+      end
+    end
+
+    # A mail client that doesn't do one-click opens the POST target in a browser
+    it "GET renders the interstitial rather than unsubscribing" do
+      get "#{base_url}/#{signed_id}/unsubscribe_update"
+      expect(response.code).to eq("200")
+      expect(response).to render_template("users/unsubscribe")
+      expect(user.reload.notification_newsletters).to be_truthy
+    end
+
+    context "with plain username" do
+      it "does not unsubscribe (token required)" do
         post "#{base_url}/#{user.username}/unsubscribe_update"
         expect(response.code).to eq("302")
         expect(flash[:success]).to be_present
         expect(user.reload.notification_newsletters).to be_truthy
-        expect(current_user.reload.notification_newsletters).to be_falsey
       end
     end
-    context "subscribed unconfirmed user" do
-      let(:user) { FactoryBot.create(:user, notification_newsletters: true) }
-      it "updates notification_newsletters" do
-        expect(user.notification_newsletters).to be_truthy
-        expect(user.confirmed?).to be_falsey
-        post "#{base_url}/#{user.username}/unsubscribe_update"
-        expect(response.code).to eq("302")
-        expect(flash[:success]).to be_present
-        user.reload
-        expect(user.notification_newsletters).to be_falsey
-        expect(user.confirmed).to be_falsey
-      end
-    end
-    context "user not present" do
+
+    context "with invalid token" do
       it "does not error, shows same flash success (to prevent email enumeration)" do
         post "#{base_url}/cvxvxxxxx/unsubscribe_update"
         expect(response.code).to eq("302")
         expect(flash[:success]).to be_present
       end
     end
+
     context "user already unsubscribed" do
       let(:user) { FactoryBot.create(:user_confirmed, notification_newsletters: false) }
       it "does nothing" do
         expect(user.notification_newsletters).to be_falsey
-        post "#{base_url}/#{user.username}/unsubscribe_update"
+        post "#{base_url}/#{signed_id}/unsubscribe_update"
         expect(response.code).to eq("302")
         expect(flash[:success]).to be_present
-        user.reload
-        expect(user.notification_newsletters).to be_falsey
+        expect(user.reload.notification_newsletters).to be_falsey
       end
     end
   end

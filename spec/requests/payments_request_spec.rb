@@ -2,7 +2,7 @@ require "rails_helper"
 
 base_url = "/payments"
 RSpec.describe PaymentsController, type: :request do
-  let(:re_record_interval) { 30.days }
+  let(:re_record_interval) { 60.days }
 
   describe "new" do
     context "with user" do
@@ -45,14 +45,14 @@ RSpec.describe PaymentsController, type: :request do
     context "with stripe_id" do
       let(:stripe_id) { "cs_test_a17wYrWqVcrfgLkOnthsa6r4STYqidDh3gTU8pkUqgGepDZSprYeoT8VxV" }
       let(:kind) { "donation" }
-      let(:payment) { Payment.create(stripe_id: stripe_id, payment_method: "stripe", amount: nil, kind: kind) }
+      let(:payment) { Payment.create(stripe_id:, payment_method: "stripe", amount: nil, kind:) }
       it "renders" do
         expect(payment).to be_valid
         expect(payment.reload.email).to be_blank
         expect(payment.paid?).to be_falsey
         expect(payment.kind).to eq "donation"
         expect(payment.amount_cents).to eq 0
-        VCR.use_cassette("payments_controller-success", match_requests_on: [:method], re_record_interval: re_record_interval) do
+        VCR.use_cassette("payments_controller-success", match_requests_on: [:method], re_record_interval:) do
           Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
           expect(Notification.count).to eq 0
@@ -85,7 +85,7 @@ RSpec.describe PaymentsController, type: :request do
           expect(payment.reload.email).to be_blank
           expect(payment.paid?).to be_falsey
           expect(payment.amount_cents).to eq 0
-          VCR.use_cassette("payments_controller-success-customer", match_requests_on: [:method], re_record_interval: re_record_interval) do
+          VCR.use_cassette("payments_controller-success-customer", match_requests_on: [:method], re_record_interval:) do
             Sidekiq::Job.clear_all
             ActionMailer::Base.deliveries = []
             expect(Notification.count).to eq 0
@@ -97,7 +97,7 @@ RSpec.describe PaymentsController, type: :request do
             expect(flash).to_not be_present
             expect(assigns(:payment)&.id).to eq payment.id
             payment.reload
-            expect(payment.reload.email).to eq "testly@bikeindex.org"
+            expect(payment.reload.email).to eq current_user.email
             expect(payment.paid?).to be_truthy
             expect(payment.amount_cents).to eq 500000
           end
@@ -113,7 +113,7 @@ RSpec.describe PaymentsController, type: :request do
 
   describe "create" do
     it "makes a onetime payment" do
-      VCR.use_cassette("payments_controller-onetime-nouser", match_requests_on: [:method], re_record_interval: re_record_interval) do
+      VCR.use_cassette("payments_controller-onetime-nouser", match_requests_on: [:method], re_record_interval:) do
         Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         expect(Notification.count).to eq 0
@@ -134,7 +134,7 @@ RSpec.describe PaymentsController, type: :request do
         expect(payment.user_id).to be_blank
         expect(payment.stripe_id).to be_present
         expect(payment.kind).to eq "payment"
-        expect(payment.currency).to eq "USD"
+        expect(payment.currency_name).to eq "USD"
         expect(payment.amount_cents).to eq 4000
         expect(payment.paid_at).to be_blank # Ensure this gets set
         expect(payment.paid?).to be_falsey
@@ -179,17 +179,30 @@ RSpec.describe PaymentsController, type: :request do
       end
     end
 
+    context "with amount below stripe minimum" do
+      it "redirects back with the stripe error message" do
+        VCR.use_cassette("payments_controller-below-stripe-minimum", match_requests_on: [:method], re_record_interval:) do
+          post base_url, params: {
+            is_arbitrary: false,
+            payment: {amount_cents: 1, currency: "USD", kind: "donation"}
+          }
+        end
+        expect(response).to redirect_to(new_payment_path)
+        expect(flash[:notice]).to match(/unable to process payment/i)
+      end
+    end
+
     context "with user" do
       include_context :request_spec_logged_in_as_user
       it "makes a onetime payment with current user" do
         expect(current_user.reload.stripe_id).to be_blank
-        VCR.use_cassette("payments_controller-donation", match_requests_on: [:method], re_record_interval: re_record_interval) do
+        VCR.use_cassette("payments_controller-donation", match_requests_on: [:method], re_record_interval:) do
           expect {
             post base_url, params: {
               is_arbitrary: false,
               payment: {
                 amount_cents: "4000",
-                currency: "USD",
+                currency: "MXN",
                 kind: "donation"
               }
             }
@@ -198,11 +211,11 @@ RSpec.describe PaymentsController, type: :request do
           expect(payment.user_id).to eq current_user.id
           expect(payment.stripe_id).to be_present
           expect(payment.kind).to eq "donation"
-          expect(payment.currency).to eq "USD"
+          expect(payment.currency_name).to eq "MXN"
           expect(payment.amount_cents).to eq 4000
           expect(payment.paid_at).to be_blank # Ensure this gets set
           expect(payment.paid?).to be_falsey
-          expect(payment.stripe_customer).to be_blank
+          expect(payment.user.stripe_id).to be_blank
         end
       end
       context "user is a stripe customer" do
@@ -210,7 +223,7 @@ RSpec.describe PaymentsController, type: :request do
         let(:current_user) { FactoryBot.create(:user_confirmed, email: "stripetest@bikeindex.org", stripe_id: customer_stripe_id) }
 
         it "adds the customer" do
-          VCR.use_cassette("payments_controller-donation-customer", match_requests_on: [:method], re_record_interval: re_record_interval) do
+          VCR.use_cassette("payments_controller-donation-customer", match_requests_on: [:method], re_record_interval:) do
             expect {
               post base_url, params: {
                 is_arbitrary: false,
@@ -225,12 +238,11 @@ RSpec.describe PaymentsController, type: :request do
             expect(payment.user_id).to eq current_user.id
             expect(payment.stripe_id).to be_present
             expect(payment.kind).to eq "donation"
-            expect(payment.currency).to eq "USD"
+            expect(payment.currency_name).to eq "USD"
             expect(payment.amount_cents).to eq 7500
             expect(payment.paid_at).to be_blank # Ensure this gets set
             expect(payment.paid?).to be_falsey
-            expect(payment.stripe_customer).to be_present
-            expect(payment.stripe_customer.id).to eq customer_stripe_id
+            expect(payment.user.stripe_id).to be_present
           end
         end
       end

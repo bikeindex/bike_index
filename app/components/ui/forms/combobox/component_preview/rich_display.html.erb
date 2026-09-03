@@ -1,0 +1,8 @@
+<%= render(UI::Forms::Group::Component.new(attribute: :cycle_type)) do %>
+  <%= render(UI::Forms::Combobox::Component.new(name: :cycle_type, rich_display: :inline,
+    options: CycleType.select_options.map { |label, slug|
+      base, parenthetical = label.split(" (", 2)
+      content = parenthetical ? safe_join([base, tag.span(" (#{parenthetical}", class: "tw:text-gray-500")]) : label
+      {display: label, value: slug, content:}
+    })) %>
+<% end %>

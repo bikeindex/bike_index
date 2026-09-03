@@ -5,7 +5,7 @@
       %small.less-strong
         %small simple:
 
-        = @manufacturer.simple_name
+        = @manufacturer.short_name
 
 .row
   .col-6
@@ -20,14 +20,14 @@
           %td
             Created
           %td
-            %span.convertTime.preciseTime
+            %span.localizeTime.preciseTime
               = l @manufacturer.created_at, format: :convert_time
         - if display_dev_info?
           %tr
             %td.only-dev-visible
               Updated
             %td
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l @manufacturer.updated_at, format: :convert_time
         %tr
           %td
@@ -51,7 +51,7 @@
           %td
             Bikes
           %td
-            = admin_number_display(@manufacturer.bikes.count)
+            = number_display(@manufacturer.bikes.count)
             %a{ href: admin_bikes_path(search_manufacturer: @manufacturer.slug) }
               view
         %tr

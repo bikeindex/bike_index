@@ -1,6 +1,7 @@
 class StolenBikeListingsController < ApplicationController
-  include SortableTable
-  before_action :set_period, only: [:index]
+  include Binxtils::SortableTable
+
+  around_action :set_reading_role
 
   def index
     @render_info = calculated_render_info
@@ -9,10 +10,10 @@ class StolenBikeListingsController < ApplicationController
       per_page = 10
     end
     per_page ||= params[:per_page] || 25
-    @pagy, @stolen_bike_listings = pagy(matching_stolen_bike_listings
-      .reorder("stolen_bike_listings.#{sort_column} #{sort_direction}"), limit: per_page)
+    @pagy, @stolen_bike_listings = pagy(:countish, matching_stolen_bike_listings
+      .reorder("stolen_bike_listings.#{sort_column} #{sort_direction}"), limit: per_page, page: permitted_page)
 
-    @selected_query_items_options = StolenBikeListing.selected_query_items_options(@interpreted_params)
+    @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
   end
 
   helper_method :matching_stolen_bike_listings
@@ -44,7 +45,7 @@ class StolenBikeListingsController < ApplicationController
   end
 
   def matching_stolen_bike_listings
-    @interpreted_params = StolenBikeListing.searchable_interpreted_params(permitted_search_params)
+    @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_search_params)
     # This might become more sophisticated someday...
     matching_stolen_bike_listings = StolenBikeListing.search(@interpreted_params)
 

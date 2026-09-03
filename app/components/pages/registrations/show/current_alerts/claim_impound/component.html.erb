@@ -1,0 +1,78 @@
+<%= render(UI::Alerts::Base::Component.new(kind: alert_kind, header: heading, margin_classes: "")) do %>
+  <% if impound_claim.present? %>
+    <% if impound_claim.unsubmitted? %>
+      <%= form_with(model: impound_claim, url: impound_claim_path(impound_claim), builder: BikeIndexFormBuilder, data: {controller: "csrf-refresh"}) do |form| %>
+        <%# Required in the browser only - nothing server-side turns an empty claim away %>
+        <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :message, kind: :text_area,
+          label_text: translation(".prove_its_yours", bike_type: impound_claim.bike_type), required: true,
+          html_options: {rows: 4})) %>
+
+        <%= render(UI::Button::Component.new(text: translation(".save_message"), color: :secondary, type: "submit")) %>
+
+        <%# The same form, so submitting sends the message rather than dropping an unsaved one %>
+        <div class="tw:mt-4">
+          <%= render(UI::Button::Component.new(text: translation(".submit_claim"), color: :primary, type: "submit",
+            name: form.field_name(:status), value: "submitting")) %>
+        </div>
+
+        <p class="tw:mt-1 tw:text-sm tw:opacity-65">
+          <%= translation(".no_editing_after_submitting") %>
+        </p>
+      <% end %>
+    <% else %>
+      <p>
+        <%= translation(".claim_submitted") %>
+        <%= render(UI::Time::Component.new(time: impound_claim.submitted_at)) %>
+      </p>
+      <% if impound_claim.successful? %>
+        <p class="tw:mt-2">
+          <%= translation(".claim_was_status", status: impound_claim.status_humanized) %>
+        </p>
+      <% end %>
+    <% end %>
+  <% elsif submitting_impound_claim.present? %>
+    <p>
+      <%= translation(".claim_with_this_bike_type", status: submitting_impound_claim.status_humanized, bike_type: @bike.type) %>
+    </p>
+    <% if submitting_impound_claim.bike_claimed.present? %>
+      <p class="tw:mt-2">
+        <%= link_to translation(".view_claimed_bike_type", kind: submitting_impound_claim.kind, bike_type: submitting_impound_claim.bike_claimed.type),
+            registration_path(submitting_impound_claim.bike_claimed), class: "twlink-underlined" %>
+      </p>
+    <% end %>
+  <% elsif sign_in_redirect %>
+    <%= render(UI::ButtonLink::Component.new(href: sign_in_redirect, text: claim_button_text, color: :purple)) %>
+  <% elsif stolen_record_options.any? %>
+    <div
+      data-controller="ui--collapse"
+      data-ui--collapse-param-value="contact_owner"
+    >
+      <%= render(UI::Button::Component.new(
+          text: claim_button_text,
+          color: :purple,
+          aria: {expanded: false},
+          data: {"ui--collapse-target": "trigger", action: "ui--collapse#toggle"}
+        )) %>
+
+      <div data-ui--collapse-target="content" class="tw:hidden">
+        <%= form_with(model: new_impound_claim, url: impound_claims_path, builder: BikeIndexFormBuilder, class: "tw:mt-3", data: {controller: "csrf-refresh"}) do |form| %>
+          <%= form.hidden_field :impound_record_id, value: impound_record.id %>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :stolen_record_id,
+            label_text: translation(".select_your_stolen_bike", bike_type: @bike.type), required: true)) do %>
+            <%= render(UI::Forms::Select::Component.new(form_builder: form, attribute: :stolen_record_id,
+              option_tags: stolen_record_options,
+              options: {prompt: translation(".choose_stolen_bike", bike_type: @bike.type)},
+              required: true)) %>
+          <% end %>
+
+          <%= render(UI::Button::Component.new(text: translation(".open_claim"), color: :primary, type: "submit")) %>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <p class="tw:text-sm tw:opacity-65">
+      <%= translation(".need_stolen_bike_html", bike_type: @bike.type, add_link: link_to(translation(".add_a_stolen_bike", bike_type: @bike.type), new_register_path(status: "status_stolen"), class: "twlink-underlined", target: "_blank", rel: "noopener")) %>
+    </p>
+  <% end %>
+<% end %>

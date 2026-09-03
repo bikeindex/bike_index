@@ -1,0 +1,81 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Clean up workspace-specific resources for this checkout: stops bin/dev,
+# drops postgres databases whose names end in `_<workspace_id>` (optionally
+# followed by `_replica` and/or a single digit 1-8 for parallel test DBs),
+# soft-deletes the row in dev_workspaces.workspace_ids (so the ID can be
+# reused after DELETED_REUSE_DELAY in bin/workspace_setup), and deletes
+# .workspace_id.
+#
+# All output is teed to ~/.workspace_teardown.log so it survives the terminal
+# closing or the workspace folder being removed.
+
+require "fileutils"
+require "time"
+
+APP_ROOT = Dir.pwd
+WORKSPACE_FILE = File.join(APP_ROOT, ".workspace_id")
+WORKSPACE_DB = "dev_workspaces"
+LOG_FILE = File.expand_path("~/.workspace_teardown.log")
+
+def log_line(msg)
+  puts msg
+  File.open(LOG_FILE, "a") { |f| f.puts(msg) }
+end
+
+def psql(database, query)
+  output = IO.popen(["psql", "-d", database, "-tAX", "-c", query], &:read)
+  abort "psql failed for #{database}: #{query}" unless $?.success?
+  output.strip
+end
+
+workspace_id = ENV["WORKSPACE_ID"]
+if (workspace_id.nil? || workspace_id.empty?) && File.exist?(WORKSPACE_FILE)
+  workspace_id = File.read(WORKSPACE_FILE).strip
+end
+
+if workspace_id.nil? || workspace_id.empty?
+  log_line("WORKSPACE_ID not set and .workspace_id missing, skipping teardown.")
+  exit 0
+end
+
+# Constrain workspace_id so it's safe to interpolate into SQL/regex below.
+abort "workspace_id must be a positive integer, got: #{workspace_id.inspect}" unless workspace_id.match?(/\A\d+\z/)
+
+log_line("")
+log_line("=== #{Time.now.iso8601} workspace #{workspace_id} @ #{APP_ROOT} ===")
+
+# Stop bin/dev for this workspace (kill the foreman process group on DEV_PORT)
+listener_pid = IO.popen(["lsof", "-ti", "tcp:#{workspace_id}", "-sTCP:LISTEN"], err: File::NULL, &:read).split.first
+if listener_pid
+  pgid = IO.popen(["ps", "-o", "pgid=", "-p", listener_pid], err: File::NULL, &:read).strip
+  unless pgid.empty?
+    log_line("Stopping bin/dev (port #{workspace_id}, pgid #{pgid})")
+    begin
+      Process.kill("TERM", -pgid.to_i)
+    rescue Errno::ESRCH, Errno::EPERM
+      # process already gone or not ours — fine
+    end
+  end
+end
+
+# Discover postgres databases tied to this workspace_id.
+databases = psql("postgres", "SELECT datname FROM pg_database WHERE datname ~ '_#{workspace_id}(_replica)?[1-8]?$' ORDER BY datname")
+  .split("\n").map(&:strip).reject(&:empty?)
+
+if databases.empty?
+  log_line("No databases found matching workspace_id #{workspace_id}")
+else
+  databases.each do |db|
+    log_line("Dropping database: #{db}")
+    system("dropdb", "--if-exists", db, out: File::NULL, err: File::NULL)
+  end
+end
+
+log_line("Soft-deleting workspace_ids row: #{workspace_id}")
+psql(WORKSPACE_DB, "UPDATE workspace_ids SET deleted_at = NOW() WHERE id = #{workspace_id}")
+
+FileUtils.rm_f(WORKSPACE_FILE)
+
+log_line("Workspace teardown complete!")

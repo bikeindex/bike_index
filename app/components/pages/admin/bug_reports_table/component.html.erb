@@ -1,0 +1,97 @@
+<%# require inline CSS setting because of caching %>
+<% unless @display_dev_info %>
+  <style>.only-dev-visible {display: none !important;}</style>
+<% end %>
+
+<%= form_tag assign_tags_admin_bug_reports_path, method: :post, data: {controller: "table-multi-checkbox"} do %>
+  <div class="row align-items-end">
+    <div class="col-md-4">
+      <%= render(UI::Forms::Group::Component.new(attribute: :tags, label_text: "Tag to assign", wrapper_class: "tw:mb-0")) do %>
+        <%= render UI::Forms::Combobox::Component.new(name: :tags, free_text: true, options: @searchable_tags, placeholder: "Select or create a tag") %>
+      <% end %>
+    </div>
+
+    <div class="col-md-2">
+      <%= submit_tag "Add tag to selected", class: "btn btn-primary" %>
+    </div>
+  </div>
+
+  <div
+    class="mt-4"
+    data-controller="update-cached-sortable-links"
+    data-update-cached-sortable-links-base-url-value="<%= url_for(@sort_state.search_params) %>"
+  >
+    <%= render(UI::Table::Component.new(records: @collection, cache_key:, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
+      <% table.column(label: button_tag(check_mark, type: "button", class: "twlink tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0", title: "Toggle all checked", aria: {label: "Toggle all checked"}, data: {action: "click->table-multi-checkbox#toggleAll"}), classes: "display-multi-check tw:w-8", header_classes: "display-multi-check tw:w-8") do |bug_report| %>
+        <%= check_box_tag "bug_reports_selected[#{bug_report.id}]", bug_report.id, false, data: {"table-multi-checkbox-target" => "checkbox"} %>
+      <% end %>
+
+      <% table.column(sortable: "received_at", label: "Received", lower_right: ->(bug_report) { content_tag(:span, bug_report.id, class: "only-dev-visible") }) do |bug_report| %>
+        <%= link_to render(UI::Time::Component.new(time: bug_report.received_at || bug_report.created_at)),
+          admin_bug_report_path(bug_report), class: "tw:text-xs" %>
+      <% end %>
+
+      <% table.column(sortable: "email", label: "Sender") do |bug_report| %>
+        <% if bug_report.user_id.present? %>
+          <%= render Pages::Admin::Users::Cell::Component.new(user: bug_report.user, user_id: bug_report.user_id) %>
+        <% else %>
+          <span class="tw:block tw:xl:inline"><%= bug_report.from_name %></span>
+          <%= content_tag(:code, bug_report.email, class: "small") %>
+        <% end %>
+
+        <%# a fixed path rather than sortable_search_params, which caching would bake in %>
+        <%= link_to search_emoji, admin_bug_reports_path(search_email: bug_report.email), class: "display-sortable-link small" %>
+      <% end %>
+
+      <% table.column(sortable: "receiver", label: "Receiver") do |bug_report| %>
+        <% if bug_report.receiver.present? %>
+          <small><%= BugReport.display_receiver(bug_report.receiver) %></small>
+          <%= link_to search_emoji, admin_bug_reports_path(search_receiver: bug_report.receiver), class: "display-sortable-link small" %>
+        <% end %>
+      <% end %>
+
+      <% table.column(label: "Subject") do |bug_report| %>
+        <%= bug_report.display_subject %>
+
+        <%= render(UI::Tooltip::Component.new) do |tooltip| %>
+          <% tooltip.with_body do %>
+            <div class="tw:w-96 tw:text-left">
+              <%= content_tag(:strong, bug_report.display_subject) %>
+
+              <%# truncated because the tooltip has no scroll container %>
+              <%= content_tag(:div, bug_report.body_stripped.truncate(1000), class: "tw:mt-1 tw:whitespace-pre-wrap") %>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <% table.column(sortable: "status", label: "Status") do |bug_report| %>
+        <%= BugReport.status_display(bug_report.status) %>
+      <% end %>
+
+      <% table.column(label: "Tags") do |bug_report| %>
+        <% bug_report.tags.each do |tag| %>
+          <code class="tw:text-xs tw:text-black"><%= tag %></code>
+        <% end %>
+      <% end %>
+
+      <% table.column(label: "Member") do |bug_report| %>
+        <%= check_mark if bug_report.is_member %>
+      <% end %>
+
+      <% table.column(label: "Paid org") do |bug_report| %>
+        <%= check_mark if bug_report.is_paid_organization %>
+
+        <% if bug_report.is_paid_organization_staff %>
+          <small>staff</small>
+        <% end %>
+      <% end %>
+
+      <% table.column(sortable: "github_pull_request", label: "PR") do |bug_report| %>
+        <% if bug_report.github_pull_request.present? %>
+          <%= link_to "##{bug_report.github_pull_request}", bug_report.github_pull_request_url %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

@@ -19,11 +19,11 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 02 Jan 2025 19:33:48 GMT
+      - Fri, 05 Jun 2026 17:59:29 GMT
       Content-Type:
       - text/plain; charset=ISO-8859-1
       Content-Length:
-      - '41'
+      - '37'
       Connection:
       - keep-alive
       Access-Control-Allow-Origin:
@@ -39,12 +39,11 @@ http_interactions:
       Server:
       - cloudflare
       Cf-Ray:
-      - 8fbd2ed0ef35dbe9-LAX
+      - a0711249fe36327e-SJC
       Alt-Svc:
       - h3=":443"; ma=86400
     body:
       encoding: UTF-8
-      string: US,CA,San Francisco,37.750600,-122.412100
-    http_version:
-  recorded_at: Thu, 02 Jan 2025 19:33:48 GMT
-recorded_with: VCR 5.0.0
+      string: US,CA,Brentwood,37.928500,-121.688100
+  recorded_at: Fri, 05 Jun 2026 17:59:29 GMT
+recorded_with: VCR 6.4.0

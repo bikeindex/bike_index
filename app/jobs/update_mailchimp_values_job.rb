@@ -5,6 +5,7 @@ class UpdateMailchimpValuesJob < ApplicationJob
 
   def perform(list = nil, kind = nil)
     return enqueue_all if list.blank?
+
     if kind == "interest_category"
       update_interest_categories(list)
     elsif kind == "interest"

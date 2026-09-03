@@ -1,5 +1,4 @@
-%h1.mb-4.uncap
-  = t(".org_settings", org_name: @organization.short_name)
+= render(UI::Header::Component.new(text: t(".org_settings", org_name: @organization.short_name), html_class: "uncap"))
 
 = form_for @organization, {url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: "update", html: {class: "organized-form"}} do |f|
 
@@ -63,14 +62,8 @@
     %label.org-form-label
       = t(".organization_logo")
     .col-sm-4
-      - if @organization.avatar?
-        = link_to image_tag(@organization.avatar_url(:thumb)), @organization.avatar_url
-
-      %label.file
-        = f.file_field :avatar, class: "avatar-upload-field", accept: ImageUploader.permitted_extensions.join(",")
-        %span.file-custom
-          %span.file-upload-text= t(".choose_file")
-        = f.hidden_field :avatar_cache
+      = render(UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :avatar, accept: ImageUploader.permitted_extensions))
+      = f.hidden_field :avatar_cache
       %span.below-input-help
         = t(".square_image")
 

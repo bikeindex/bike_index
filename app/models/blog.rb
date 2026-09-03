@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: blogs
+# Database name: primary
 #
 #  id               :integer          not null, primary key
 #  body             :text
@@ -31,6 +32,8 @@ class Blog < ApplicationRecord
 
   KIND_ENUM = {blog: 0, info: 1, listicle: 2}.freeze
 
+  enum :kind, KIND_ENUM
+
   belongs_to :user
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :listicles, dependent: :destroy
@@ -43,71 +46,86 @@ class Blog < ApplicationRecord
   validates_uniqueness_of :title, message: "has already been taken. If you believe that this message is an error, contact us!"
   validates_uniqueness_of :title_slug, message: "somehow that overlaps with another title! Sorrys."
 
+  attr_accessor :post_date, :post_now, :update_title, :user_email, :timezone, :info_kind
+
   before_save :set_calculated_attributes
   before_create :set_title_slug
-
-  enum :kind, KIND_ENUM
-
-  attr_accessor :post_date, :post_now, :update_title, :user_email, :timezone, :info_kind
 
   scope :published, -> { where(published: true) }
   default_scope { order("published_at desc") }
 
   pg_search_scope :text_search, against: {title: "A", body: "B"}
 
-  def self.kinds
-    KIND_ENUM.keys.map(&:to_s)
-  end
+  class << self
+    def kinds
+      KIND_ENUM.keys.map(&:to_s)
+    end
 
-  def self.slugify_title(str)
-    # Truncate, slugify, also - remove last char if a dash (slugify should take care of removing the dash now, but whatever)
-    return nil unless str.present?
-    Slugifyer.slugify(str)[0, 70].gsub(/-$/, "")
-  end
+    def slugify_title(str)
+      # Truncate, slugify, also - remove last char if a dash (slugify should take care of removing the dash now, but whatever)
+      return nil unless str.present?
 
-  def self.integer_slug?(n)
-    n.is_a?(Integer) || n.match(/\A\d+\z/).present?
-  end
+      Slugifyer.slugify(str)[0, 70].gsub(/-$/, "")
+    end
 
-  def self.friendly_find(str)
-    return nil unless str.present?
-    return find_by_id(str) if integer_slug?(str)
-    slug = slugify_title(str)
-    find_by_title_slug(slug) || find_by_old_title_slug(slug) ||
-      find_by_title_slug(str) || find_by_title(str) || find_by_secondary_title(str)
-  end
+    def integer_slug?(n)
+      n.is_a?(Integer) || n.match(/\A\d+\z/).present?
+    end
 
-  def self.theft_rings_id
-    324
-  end
+    def friendly_find(str)
+      str = Binxtils::InputNormalizer.string(str) if str.is_a?(String)
+      return nil if str.blank?
+      return find_by_id(str) if integer_slug?(str)
 
-  def self.why_donate_slug
-    "end-2020-with-a-donation-to-bike-index"
-  end
+      slug = slugify_title(str)
+      find_by_title_slug(slug) || find_by_old_title_slug(slug) ||
+        find_by_title_slug(str) || find_by_title(str) || find_by_secondary_title(str)
+    end
 
-  def self.get_your_stolen_bike_back_slug
-    "how-to-get-your-stolen-bike-back" # Also hard coded in routes
-  end
+    def theft_rings_id
+      324
+    end
 
-  # matches ALL content tag ids
-  def self.with_tag_ids(content_tag_ids)
-    content_tag_ids = Array(content_tag_ids)
-    joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
-      .group("blogs.id").having("count(distinct blog_content_tags.id) = ?", content_tag_ids.count)
-  end
+    def why_donate_slug
+      "end-2020-with-a-donation-to-bike-index"
+    end
 
-  def self.with_any_of_tag_ids(content_tag_ids)
-    content_tag_ids = Array(content_tag_ids)
-    joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
-  end
+    def get_your_stolen_bike_back_slug
+      "how-to-get-your-stolen-bike-back" # Also hard coded in routes
+    end
 
-  # TODO: This is bad, but it's better than nothing so I'm going with it
-  # NOTE: this is unscoped (so it removes the default scope)
-  def self.ids_sorted_by_matching_tag_ids_count(content_tag_ids)
-    grouped_ids = unscoped.joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
-      .group("blog_content_tags.blog_id").count
-    sorted_counted_ids = grouped_ids.to_a.sort { |a, b| b[1] <=> a[1] }
-    sorted_counted_ids.map { |id, count| id }
+    def membership_slug
+      "bike-index-membership"
+    end
+
+    def e_vehicle_acknowledgment_faq
+      "e-vehicle-acknowledgment-faq"
+    end
+
+    def top_level_routed
+      [membership_slug, why_donate_slug].freeze
+    end
+
+    # matches ALL content tag ids
+    def with_tag_ids(content_tag_ids)
+      content_tag_ids = Array(content_tag_ids)
+      joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
+        .group("blogs.id").having("count(distinct blog_content_tags.id) = ?", content_tag_ids.count)
+    end
+
+    def with_any_of_tag_ids(content_tag_ids)
+      content_tag_ids = Array(content_tag_ids)
+      joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
+    end
+
+    # TODO: This is bad, but it's better than nothing so I'm going with it
+    # NOTE: this is unscoped (so it removes the default scope)
+    def ids_sorted_by_matching_tag_ids_count(content_tag_ids)
+      grouped_ids = unscoped.joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
+        .group("blog_content_tags.blog_id").count
+      sorted_counted_ids = grouped_ids.to_a.sort { |a, b| b[1] <=> a[1] }
+      sorted_counted_ids.map { |id, count| id }
+    end
   end
 
   def content_tag_names=(val)
@@ -144,6 +162,7 @@ class Blog < ApplicationRecord
 
   def pretty_canonical
     return nil unless canonical_url?
+
     canonical_url.gsub(/https?:\/\//i, "").truncate(90)
   end
 
@@ -152,7 +171,7 @@ class Blog < ApplicationRecord
     self.canonical_url = Urlifyer.urlify(canonical_url)
     set_published_at_and_published
     unless listicle?
-      self.kind = (!InputNormalizer.boolean(info_kind)) ? "blog" : "info"
+      self.kind = (!Binxtils::InputNormalizer.boolean(info_kind)) ? "blog" : "info"
     end
     self.published_at = Time.current if info?
     update_title_save
@@ -162,7 +181,7 @@ class Blog < ApplicationRecord
 
   def set_published_at_and_published
     if post_date.present?
-      self.published_at = TimeParser.parse(post_date, timezone)
+      self.published_at = Binxtils::TimeParser.parse(post_date, timezone)
     end
     self.published_at = Time.current if post_now == "1"
     if user_email.present?
@@ -173,6 +192,7 @@ class Blog < ApplicationRecord
 
   def description
     return description_abbr if description_abbr.present?
+
     body_abbr
   end
 
@@ -187,7 +207,8 @@ class Blog < ApplicationRecord
   end
 
   def update_title_save
-    return true unless InputNormalizer.boolean(update_title)
+    return true unless Binxtils::InputNormalizer.boolean(update_title)
+
     self.old_title_slug = title_slug
     set_title_slug
   end
@@ -208,7 +229,7 @@ class Blog < ApplicationRecord
         markdown = Kramdown::Document.new(body)
         body_html = markdown.to_html
       end
-      abbr = InputNormalizer.sanitize(body_html)
+      abbr = Binxtils::InputNormalizer.sanitize(body_html)
       # strip tags, then remove extra spaces
       abbr = abbr.tr("\n", " ").gsub(/\s+/, " ").strip if abbr.present?
       self.body_abbr = truncate(abbr, length: 200)

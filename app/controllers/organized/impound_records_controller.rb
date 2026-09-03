@@ -1,16 +1,31 @@
 module Organized
   class ImpoundRecordsController < Organized::BaseController
-    include SortableTable
-    before_action :set_period, only: [:index]
+    include Binxtils::SortableTable
+
+    MIN_DISTANCE = 0.01
+    DEFAULT_DISTANCE = 1
+
     before_action :find_impound_record, except: [:index]
 
     def index
-      @per_page = params[:per_page] || 25
-      @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
-      @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
+      @per_page = permitted_per_page
+      @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
+      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
+      @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
+      @multi_update_open = Binxtils::InputNormalizer.boolean(params[:multi_update])
+      @search_proximity = GeocodeHelper.permitted_distance(params[:search_proximity],
+        min_distance: MIN_DISTANCE, default_distance: DEFAULT_DISTANCE)
 
-      @pagy, @impound_records = pagy(available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
-        .includes(:user, :bike, :location), limit: @per_page)
+      if chart_only?
+        render UI::ChartAsyncFrame::Component.new(id: :impound_records_chart_frame, chart: impound_records_chart), layout: false
+      elsif @render_results
+        @pagy, @impound_records = pagy(:countish, available_impound_records.reorder("impound_records.#{sort_column} #{sort_direction}")
+          .includes(:user, :bike, :location), limit: @per_page, page: permitted_page)
+        respond_to do |format|
+          format.html
+          format.turbo_stream
+        end
+      end
     end
 
     def show
@@ -19,6 +34,7 @@ module Organized
 
     def update
       return multi_update_response(params[:ids].as_json) if params[:id] == "multi_update"
+
       @impound_record_update = @impound_record.impound_record_updates.new(permitted_parameters)
       is_valid_kind = @impound_record.update_kinds.include?(@impound_record_update.kind)
       if @impound_record.update_kinds.include?(@impound_record_update.kind) && @impound_record_update.save
@@ -26,7 +42,7 @@ module Organized
         redirect_to organization_impound_record_path(@impound_record.display_id, organization_id: current_organization.to_param)
       else
         flash[:error] = if is_valid_kind
-          @impound_record_update.errors.full_messages
+          @impound_record_update.errors.full_messages.to_sentence
         else
           "Sorry, you can't update this impound record with #{@impound_record_update.kind_humanized}"
         end
@@ -46,9 +62,20 @@ module Organized
       %w[created_at display_id_integer updated_at user_id resolved_at location_id]
     end
 
+    def impound_records_chart
+      return nil if available_impound_records.blank?
+
+      UI::Chart::Component.new(
+        series: UI::Chart::Component.time_range_counts(collection: available_impound_records, time_range: @time_range),
+        time_range: @time_range,
+        stacked: true
+      )
+    end
+
     def available_statuses
       # current ordered the way we want to display
       return @available_statuses if defined?(@available_statuses)
+
       available_statuses = %w[current resolved all] + (ImpoundRecord.statuses - ["current"])
       available_statuses -= ["expired"] unless current_organization.fetch_impound_configuration.expiration?
       @available_statuses = available_statuses
@@ -60,6 +87,7 @@ module Organized
 
     def available_impound_records
       return @available_impound_records if defined?(@available_impound_records)
+
       if params[:search_status] == "all"
         @search_status = "all"
         a_impound_records = impound_records
@@ -84,10 +112,19 @@ module Organized
 
       if bike_search_params_present?
         bikes = a_impound_records.bikes.search(@interpreted_params)
-        bikes = bikes.organized_email_and_name_search(params[:search_email]) if params[:search_email].present?
+        bikes = BikeServices::OrganizedSearch.email_and_name(bikes, params[:search_email])
         a_impound_records = a_impound_records.where(bike_id: bikes.pluck(:id))
       elsif params[:search_bike_id].present?
         a_impound_records = a_impound_records.where(bike_id: params[:search_bike_id])
+      end
+
+      if params[:search_location].present?
+        bounding_box = GeocodeHelper.bounding_box(params[:search_location], @search_proximity)
+        if bounding_box.present?
+          a_impound_records = a_impound_records.within_bounding_box(bounding_box)
+        else
+          flash.now[:notice] = translation(:we_dont_know_location, location: params[:search_location])
+        end
       end
 
       @available_impound_records = a_impound_records.where(created_at: @time_range)
@@ -95,6 +132,7 @@ module Organized
 
     def find_impound_record
       return if params[:id] == "multi_update" # Can't find a single impound_record!
+
       # NOTE: Uses display_id, not normal id, unless id starts with pkey-
       @impound_record = impound_records.friendly_find!(params[:id])
     end
@@ -118,6 +156,7 @@ module Organized
       else
         successful = selected_records.select { |impound_record|
           next unless impound_record.update_multi_kinds.include?(permitted_parameters[:kind])
+
           impound_record.impound_record_updates.create(permitted_parameters)
         }
         flash[:success] = "Updated #{successful.count} impound record"

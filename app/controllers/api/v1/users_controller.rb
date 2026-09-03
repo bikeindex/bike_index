@@ -22,7 +22,7 @@ module API
         reason = params[:request_reason]
         feedback_type = params[:request_type]
         if current_user.present? && reason.present? && bike_id.present? && feedback_type.present?
-          bike = Bike.find(bike_id)
+          bike = Bike.find_id(bike_id)
           if bike.authorized?(current_user)
             feedback = Feedback.new(email: current_user.email, body: reason, title: feedback_type.titleize.to_s, feedback_type: feedback_type)
             feedback.name = (current_user.name.present? && current_user.name) || "no name"
@@ -38,12 +38,12 @@ module API
               feedback.feedback_hash[:old_manufacturer] = bike.mnfg_name
               if bike.manufacturer_other.present?
                 feedback.feedback_hash[:old_manufacturer] += " (#{bike.manufacturer_other})"
-                bike.manufacturer_other = nil
               end
               bike.manufacturer_id = Manufacturer.friendly_find_id(params[:manufacturer_update_manufacturer])
+              bike.manufacturer_other = bike.manufacturer&.other? ? params[:manufacturer_update_manufacturer_other] : nil
               if bike.manufacturer_id.present?
                 bike.save
-                feedback.feedback_hash[:new_manufacturer] = bike.manufacturer.name
+                feedback.feedback_hash[:new_manufacturer] = bike.mnfg_name
               end
             elsif feedback_type.match?("bike_recovery")
               recover_bike(bike, feedback)
@@ -68,6 +68,7 @@ module API
 
       def recover_bike(bike, feedback)
         return true unless bike.current_stolen_record.present?
+
         feedback.feedback_hash.merge!(index_helped_recovery: params[:index_helped_recovery],
           can_share_recovery: params[:can_share_recovery])
 

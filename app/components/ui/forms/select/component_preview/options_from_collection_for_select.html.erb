@@ -1,0 +1,6 @@
+<%# Option tags from a collection, addressing value and text by method name %>
+<%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :cycle_type,
+    option_tags: options_from_collection_for_select(CycleType.all, :slug, :name, :tandem),
+    options: {include_blank: "Choose a cycle type"})) %>
+<% end %>

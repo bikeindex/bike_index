@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: countries
+# Database name: primary
 #
 #  id         :integer          not null, primary key
 #  iso        :string(255)
@@ -9,40 +10,73 @@
 #  updated_at :datetime         not null
 #
 class Country < ApplicationRecord
+  include FriendlyNameFindable
+
+  UNITED_STATES_ID = Rails.env.test? ? nil : 230
+  CANADA_ID = Rails.env.test? ? nil : 38
+
+  has_many :stolen_records
+
   validates_presence_of :name
   validates_uniqueness_of :name, :iso
 
-  has_many :stolen_records
-  has_many :locations
-
-  def self.select_options
-    pluck(:id, :iso).map do |id, iso|
-      [I18n.t(iso, scope: :countries), id]
+  class << self
+    def select_options
+      pluck(:id, :iso, :name).map do |id, iso, name|
+        [I18n.t(iso, scope: :countries, default: name), id]
+      end
     end
-  end
 
-  def self.friendly_find(name_or_iso)
-    name_or_iso = name_or_iso.to_s.strip.downcase
-    return if name_or_iso.blank?
-    return united_states if name_or_iso.in? %w[us usa]
+    def friendly_find(name_or_iso)
+      return name_or_iso if name_or_iso.is_a?(Country)
+      name_or_iso = normalize_friendly_str(name_or_iso)&.downcase
+      return if name_or_iso.blank?
+      return where(id: name_or_iso).first if integer_string?(name_or_iso)
+      return united_states if %w[us usa].include?(name_or_iso)
+      return canada if name_or_iso == "ca"
 
-    find_by("lower(name) = ? or lower(iso) = ?", name_or_iso, name_or_iso)
-  end
+      find_by("lower(name) = ? or lower(iso) = ?", name_or_iso, name_or_iso)
+    end
 
-  def self.united_states
-    where(name: "United States", iso: "US").first_or_create
-  end
+    def friendly_find_id(name_or_iso)
+      name_or_iso = name_or_iso&.to_s&.strip&.downcase
+      return united_states_id if %w[us usa].include?(name_or_iso)
+      return canada_id if name_or_iso == "ca"
 
-  def self.canada
-    where(name: "Canada", iso: "CA").first_or_create
-  end
+      friendly_find(name_or_iso)
+    end
 
-  def self.netherlands
-    where(name: "Netherlands", iso: "NL").first_or_create
-  end
+    def united_states
+      where(name: "United States", iso: "US").first_or_create
+    end
 
-  def self.valid_names
-    StatesAndCountries.countries.map { |c| c[:name] }
+    def canada
+      where(name: "Canada", iso: "CA").first_or_create
+    end
+
+    # For testing, look it up, otherwise use static
+    def united_states_id
+      UNITED_STATES_ID || Country.united_states.id
+    end
+
+    # For testing, look it up, otherwise use static
+    def canada_id
+      CANADA_ID || Country.canada.id
+    end
+
+    def netherlands
+      where(name: "Netherlands", iso: "NL").first_or_create
+    end
+
+    def valid_names
+      StatesAndCountries.countries.map { |c| c[:name] }
+    end
+
+    def metric_units?(country_id)
+      return false if country_id.blank?
+
+      country_id != Country.united_states_id
+    end
   end
 
   def united_states?

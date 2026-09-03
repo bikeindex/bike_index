@@ -1,18 +1,23 @@
-= render partial: "/admin/bikes/bike_tabs", locals: {bike: @bike, target: "ownerships" }
+= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :ownerships, user: current_user, display_dev_info: display_dev_info?)
 
-.admin-subnav.midpage-subnav
+%h1.mt-5.mb-4
+  Ownerships
+= render partial: "/admin/ownerships/table", locals: {ownerships: @bike.ownerships.reorder(created_at: :desc), skip_bike: true}
+
+%div{class: "admin-subnav midpage-subnav"}
   .col-12
-    %h1 Edit ownership
-.row
-  .col-auto
+    %h1
+      Edit ownership
+      %code= @ownership.id
     %h2
       %span.text-danger
         BE CAREFUL. YOU CAN BREAK STUFF HERE
+
 .row
   .col-md-6
     = form_for [:admin, @ownership], html: { class: "form form-horizontal" } do |f|
-      - if @ownership.errors.any?
-        = render partial: "/shared/errors", locals: { name: "Ownership", obj: @ownership }
+      = render(UI::Alerts::ObjectError::Component.new(object: @ownership))
+
       .form-group
         = f.label :creator_id
         = f.email_field :creator_email, value: @ownership.creator&.email, required: true, prompt: "Creator's email", class: "form-control"
@@ -40,7 +45,7 @@
     %table.table-list
       %tr
         %td Created At
-        %td.convertTime
+        %td.localizeTime
           = l @bike.created_at, format: :convert_time
       %tr
         %td Owner Email

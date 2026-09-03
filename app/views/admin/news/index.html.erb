@@ -1,0 +1,37 @@
+<% nav_header_list_items = capture do %>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: @search_kind == "all" ? "All kinds" : "#{@search_kind.humanize} only", button_size: :sm,
+          active: @search_kind != "all")) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All kinds", path: admin_news_index_path(sortable_search_params.merge(search_kind: nil)), match_params: {search_kind: nil}) } %>
+      <% dropdown.with_entry_divider %>
+
+      <% Blog.kinds.each do |kind| %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.humanize} only", path: admin_news_index_path(sortable_search_params.merge(search_kind: kind)), match_params: {search_kind: kind}) } %>
+      <% end %>
+    <% end %>
+  </li>
+
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "New Post", href: new_admin_news_url, color: :primary, size: :sm)) %>
+  </li>
+<% end %>
+
+<% count_detail = capture do %>
+  <% if @tags.present? %>
+    &mdash; with tags: <%= @tags.pluck(:name).join(", ") %>
+  <% end %>
+<% end %>
+
+<% table_view = capture do %>
+  <%= render partial: "/admin/news/table", locals: {blogs: @blogs, skip_kind: @search_kind != "all"} %>
+<% end %>
+
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @blogs,
+  viewing: "News/Blogs/Info",
+  nav_header_list_items:,
+  table_view:,
+  count_detail:,
+  chart_collection: @render_chart && available_blogs,
+)) %>

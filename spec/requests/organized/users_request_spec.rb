@@ -71,6 +71,18 @@ RSpec.describe Organized::UsersController, type: :request do
         expect(response.code).to eq("200")
         expect(response).to render_template :new
       end
+      context "passwordless_users with a permitted domain" do
+        let(:current_organization) do
+          FactoryBot.create(:organization_with_organization_features,
+            enabled_feature_slugs: ["passwordless_users"], user_email_domain: "example.gov")
+        end
+        it "renders the permitted-domain alert" do
+          get "#{base_url}/new", params: {organization_id: current_organization.to_param}
+          expect(response.code).to eq("200")
+          expect(response.body).to include("role=\"alert\"")
+          expect(response.body).to include("@example.gov")
+        end
+      end
     end
 
     describe "edit" do
@@ -212,7 +224,7 @@ RSpec.describe Organized::UsersController, type: :request do
         end
       end
       context "restrict_invitations? is false" do
-        let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov", available_invitation_count: 1) }
+        let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "example.gov", available_invitation_count: 1) }
         it "just creates the user" do
           Sidekiq::Testing.inline! do
             ActionMailer::Base.deliveries = []
@@ -260,7 +272,7 @@ RSpec.describe Organized::UsersController, type: :request do
             end
           end
           context "restrict_invitations? is false" do
-            let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov", available_invitation_count: 1) }
+            let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "example.gov", available_invitation_count: 1) }
             it "creates organization_roles" do
               Sidekiq::Testing.inline! do
                 ActionMailer::Base.deliveries = []

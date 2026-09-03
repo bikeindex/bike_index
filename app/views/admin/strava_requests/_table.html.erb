@@ -1,0 +1,70 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |strava_request| %>
+    <%= render UI::Time::Component.new(time: strava_request.created_at) %>
+  <% end %>
+
+  <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |strava_request| %>
+    <small>
+      <%= render UI::Time::Component.new(time: strava_request.updated_at) %>
+    </small>
+  <% end %>
+
+  <% if display_dev_info? %>
+    <% table.column(sortable: "priority", classes: "only-dev-visible tw:text-xs") do |strava_request| %>
+      <small title="<%= number_with_delimiter(strava_request.priority) %>">
+        <%= (strava_request.priority / 100_000_000.0).round(1) %>
+      </small>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "request_type", label: "Type") do |strava_request| %>
+    <span class="tw:inline-flex tw:items-center tw:gap-1 tw:whitespace-nowrap">
+      <small><%= strava_request.request_type&.humanize %></small>
+
+      <% if strava_request.proxy_request? %>
+        <%= render UI::Badge::Component.new(
+          text: "p",
+          title: "Proxy request",
+          color: :gray,
+          size: :sm) %>
+      <% end %>
+    </span>
+  <% end %>
+
+  <% table.column(sortable: "response_status", label: "Status") do |strava_request| %>
+    <% status_text = if strava_request.response_status.start_with?("binx_response")
+      strava_request.response_status == "binx_response" ? "binx" : "binx limited"
+    else
+      strava_request.response_status.humanize
+    end %>
+
+    <%= render UI::Badge::Component.new(
+      text: status_text,
+      title: strava_request.response_status.humanize,
+      color: Pages::Admin::Strava::RequestsChart::Component::RESPONSE_STATUS_BADGE_COLORS[strava_request.response_status.to_sym],
+      size: :sm
+    ) %>
+  <% end %>
+
+  <% table.column(label: "Params", header_classes: "tw:font-normal") do |strava_request| %>
+    <small>
+      <%= strava_request.parameters&.to_json if strava_request.parameters.present? %>
+    </small>
+  <% end %>
+
+  <% table.column(label: "Rate limit", header_classes: "tw:font-normal") do |strava_request| %>
+    <%= render Pages::Admin::Strava::RateLimit::Component.new(rate_limit_json: strava_request.rate_limit) %>
+  <% end %>
+
+  <% table.column(sortable: "requested_at") do |strava_request| %>
+    <small>
+      <%= render UI::Time::Component.new(time: strava_request.requested_at) %>
+    </small>
+  <% end %>
+
+  <% table.column(label: "User", header_classes: "tw:font-normal") do |strava_request| %>
+    <%= render Pages::Admin::Users::Cell::Component.new(user: strava_request.user, user_id: strava_request.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_request.strava_integration_id), search_url: url_for(sort_state.search_params.merge(search_strava_integration_id: strava_request.strava_integration_id))) %>
+  <% end %>
+<% end %>

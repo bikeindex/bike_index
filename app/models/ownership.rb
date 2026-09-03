@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: ownerships
+# Database name: primary
 #
 #  id                            :integer          not null, primary key
 #  claimed                       :boolean          default(FALSE)
@@ -21,25 +22,33 @@
 #  user_hidden                   :boolean          default(FALSE), not null
 #  created_at                    :datetime         not null
 #  updated_at                    :datetime         not null
+#  address_record_id             :bigint
 #  bike_id                       :integer
 #  bulk_import_id                :bigint
 #  creator_id                    :integer
+#  doorkeeper_app_id             :bigint
 #  impound_record_id             :bigint
 #  organization_id               :bigint
 #  previous_ownership_id         :bigint
+#  sale_id                       :bigint
 #  user_id                       :integer
 #
 # Indexes
 #
+#  index_ownerships_on_address_record_id  (address_record_id)
 #  index_ownerships_on_bike_id            (bike_id)
 #  index_ownerships_on_bulk_import_id     (bulk_import_id)
 #  index_ownerships_on_creator_id         (creator_id)
-#  index_ownerships_on_impound_record_id  (impound_record_id)
+#  index_ownerships_on_doorkeeper_app_id  (doorkeeper_app_id)
 #  index_ownerships_on_organization_id    (organization_id)
+#  index_ownerships_on_owner_email_trgm   (owner_email) USING gin
+#  index_ownerships_on_sale_id            (sale_id)
 #  index_ownerships_on_user_id            (user_id)
 #
 class Ownership < ApplicationRecord
   include RegistrationInfoable
+  include AddressRecorded
+
   ORIGIN_ENUM = {
     web: 0,
     embed: 1,
@@ -54,8 +63,31 @@ class Ownership < ApplicationRecord
     impound_import: 9,
     impound_process: 11,
     transferred_ownership: 10,
-    sticker: 13
+    sticker: 13,
+    register_flow: 14,
+    register_flow_organized: 15,
+    register_flow_landing_page: 16
   }.freeze
+  # BParam#origin takes the same strings
+  ORIGIN_REG_FLOW = %w[register_flow register_flow_organized register_flow_landing_page].freeze
+  # Registered on bikeindex.org - not an embed form, the API, an import or a transfer
+  ORIGIN_WEBSITE_REG = (ORIGIN_REG_FLOW + %w[web organization_form sticker]).freeze
+
+  enum :status, Bike::STATUS_ENUM
+  enum :pos_kind, Organization::POS_KIND_ENUM
+  enum :origin, ORIGIN_ENUM
+
+  belongs_to :bike, touch: true
+  belongs_to :user
+  belongs_to :creator, class_name: "User"
+  belongs_to :impound_record
+  belongs_to :organization
+  belongs_to :bulk_import
+  belongs_to :previous_ownership, class_name: "Ownership" # Not indexed, added to make queries easier
+  belongs_to :doorkeeper_app, class_name: "Doorkeeper::Application", counter_cache: true, touch: true
+  belongs_to :sale
+  has_one :sale_sold_in, class_name: "Sale" # Mainly to distinguish from the belongs_to :sale
+  has_many :notifications, as: :notifiable
 
   validates_presence_of :owner_email
   validates_presence_of :creator_id
@@ -64,19 +96,10 @@ class Ownership < ApplicationRecord
     format: {with: /\A.+@.+\..+\z/, message: "invalid format"},
     unless: :phone_registration?
 
-  belongs_to :bike
-  belongs_to :user
-  belongs_to :creator, class_name: "User"
-  belongs_to :impound_record
-  belongs_to :organization
-  belongs_to :bulk_import
-  belongs_to :previous_ownership, class_name: "Ownership" # Not indexed, added to make queries easier
+  attr_accessor :creator_email, :user_email, :can_edit_claimed
 
-  has_many :notifications, as: :notifiable
-
-  enum :status, Bike::STATUS_ENUM
-  enum :pos_kind, Organization::POS_KIND_ENUM
-  enum :origin, ORIGIN_ENUM
+  before_validation :set_calculated_attributes
+  after_commit :send_notification_and_update_associations, on: :create
 
   default_scope { order(:id) }
   scope :current, -> { where(current: true) }
@@ -88,19 +111,26 @@ class Ownership < ApplicationRecord
   scope :transferred_pre_registration, -> { left_joins(:previous_ownership).where(previous_ownerships: {organization_pre_registration: true}) }
   scope :self_made, -> { where("user_id = creator_id") }
   scope :not_self_made, -> { where("user_id != creator_id").or(where(user_id: nil)) }
+  scope :with_reg_info_location, -> { where("(registration_info -> 'city') IS NOT NULL") }
 
-  before_validation :set_calculated_attributes
-  after_commit :send_notification_and_update_other_ownerships, on: :create
+  class << self
+    def origins
+      ORIGIN_ENUM.keys.map(&:to_s)
+    end
 
-  attr_accessor :creator_email, :user_email, :can_edit_claimed
+    def origin_humanized(str)
+      return nil unless str.present?
 
-  def self.origins
-    ORIGIN_ENUM.keys.map(&:to_s)
-  end
+      str.titleize.downcase
+    end
 
-  def self.origin_humanized(str)
-    return nil unless str.present?
-    str.titleize.downcase
+    def current_at(time)
+      where("created_at < ?", time).order(created_at: :desc).first
+    end
+
+    def claimed_at(time)
+      where("claimed_at < ?", time).order(created_at: :desc).first
+    end
   end
 
   def bike
@@ -112,9 +142,15 @@ class Ownership < ApplicationRecord
     Bike.find_by_id(bike_id)
   end
 
-  def first?
-    # If the ownership is created, use the id created in set_calculated_attributes
-    id.present? ? previous_ownership_id.blank? : prior_ownerships.none?
+  def bike_type
+    bike&.type || CycleType::DEFAULT.downcase # match BikeAttributable#type case
+  end
+
+  def initial?
+    return previous_ownership_id.blank? if id.present?
+
+    # If the ownership isn't finished being created, use the id created in set_calculated_attributes
+    prior_ownerships.none?
   end
 
   def second?
@@ -130,7 +166,10 @@ class Ownership < ApplicationRecord
   end
 
   def new_registration?
-    return true if first? || impound_record_id.present?
+    return true if initial?
+
+    return impound_record.unregistered_bike? if impound_record.present?
+
     previous_ownership.present? && previous_ownership.organization_pre_registration?
   end
 
@@ -158,7 +197,8 @@ class Ownership < ApplicationRecord
     elsif origin.present?
       return "org reg" if %w[embed_extended organization_form].include?(origin)
       return "landing page" if origin == "embed_partial"
-      return "parking notification" if origin == "unregistered_parking_notification"
+      return "parking notification" if origin == "creator_unregistered_parking_notification"
+
       self.class.origin_humanized(origin)
     end
   end
@@ -194,17 +234,20 @@ class Ownership < ApplicationRecord
 
   def overridden_by_user_registration?
     return false if user.blank?
+
     user.user_registration_organizations.where.not(registration_info: {}).any?
   end
 
   def claim_message
     return nil if claimed? || !current? || user.present?
+
     new_registration? ? "new_registration" : "transferred_registration"
   end
 
   def calculated_send_email
     return false if skip_email || bike.blank? || phone_registration? || bike.example? || bike.likely_spam?
     return false if spam_risky_email? || user&.no_non_theft_notification
+
     # Unless this is the first ownership for a bike with a creation organization, it's good to send!
     true unless organization.present? && organization.enabled?("skip_ownership_email")
   end
@@ -222,7 +265,7 @@ class Ownership < ApplicationRecord
         self.creator_id ||= bike.creator_id
         self.example = bike.example
         # Calculate current_impound_record, if it isn't assigned
-        self.impound_record_id ||= bike.impound_records.current.last&.id
+        self.impound_record_id ||= calculated_impound_record_id
       end
       # Previous attrs to #2110
       self.user_id ||= User.fuzzy_email_find(owner_email)&.id
@@ -231,10 +274,10 @@ class Ownership < ApplicationRecord
       self.previous_ownership_id = prior_ownerships.pluck(:id).last
       self.organization_id ||= impound_record&.organization_id
       self.organization_pre_registration ||= calculated_organization_pre_registration?
-      # Would this be better in BikeCreator? Maybe, but specs depend on this always being set
+      # Would this be better in BikeServices::Creator? Maybe, but specs depend on this always being set
       self.origin ||= if impound_record_id.present?
         "impound_process"
-      elsif first?
+      elsif initial?
         "web"
       else
         "transferred_ownership"
@@ -247,6 +290,7 @@ class Ownership < ApplicationRecord
       # Update owner name always! Keep it in track
       self.owner_name = user.name if user.present?
     end
+    self.address_record ||= address_record_from_registration_info
   end
 
   def prior_ownerships
@@ -254,19 +298,20 @@ class Ownership < ApplicationRecord
     id.present? ? ownerships.where("id < ?", id) : ownerships
   end
 
-  def send_notification_and_update_other_ownerships
+  def send_notification_and_update_associations
     # TODO: post #2110 doing this - I'm not sure if it's a good idea...
     if current && id.present?
       bike&.update_column :current_ownership_id, id
       prior_ownerships.current.each { |o| o.update(current: false) }
     end
-    # Note: this has to be performed later; we create ownerships and then delete them, in BikeCreator
+    # Note: this has to be performed later; we create ownerships and then delete them, in BikeServices::Creator
     # We need to be sure we don't accidentally send email for ownerships that will be deleted
-    EmailOwnershipInvitationJob.perform_in(2.seconds, id)
+    Email::OwnershipInvitationJob.perform_in(2.seconds, id)
   end
 
   def create_user_registration_for_phone_registration!(user)
     return true unless phone_registration? && current
+
     update(claimed: true, user_id: user.id)
     bike.update(owner_email: user.email, is_phone: false)
     bike.ownerships.create(skip_email: true, owner_email: user.email, creator_id: user.id)
@@ -277,7 +322,7 @@ class Ownership < ApplicationRecord
     if overridden_by_user_registration?
       UserRegistrationOrganization.universal_registration_info_for(user, registration_info)
     else
-      # Only assign info with organization_uniq if
+      # Only assign info with organization_uniq if org_id is present
       r_info = info_with_organization_uniq(registration_info, organization_id)
       clean_registration_info(r_info)
     end
@@ -287,6 +332,7 @@ class Ownership < ApplicationRecord
 
   def info_with_organization_uniq(r_info, org_id = nil)
     return r_info if org_id.blank? || r_info.blank?
+
     # NOTE: This is deleted when the user_registration_organization processes (or will be)
     if r_info["student_id"].present?
       r_info["student_id_#{org_id}"] ||= r_info["student_id"]
@@ -301,36 +347,67 @@ class Ownership < ApplicationRecord
     r_info ||= {}
     # skip cleaning if it's blank
     return {} if r_info.blank?
-    # The only place user_name comes from, other than a user setting it themselves, is bulk_import
+
+    # user_name comes from bulk_import and the register flow, or a user setting it themselves
     r_info["phone"] = Phonifyer.phonify(r_info["phone"])
     # bike_code should be renamed bike_sticker. Legacy ownership issue
     if r_info["bike_code"].present?
       r_info["bike_sticker"] = r_info.delete("bike_code")
     end
-    r_info.reject { |_k, v| v.blank? }
+    r_info.reject { |_k, v| v.blank? }.except("kind") # ignore 'kind' from the address_record
   end
 
   def spam_risky_email?
     risky_domains = ["@yahoo.co", "@hotmail.co"]
     return false unless owner_email.present? && risky_domains.any? { |d| owner_email.match?(d) }
     return true if pos?
+
     embed? && organization&.spam_registrations?
+  end
+
+  def calculated_impound_record_id
+    # if the previous ownership is :status_with_owner, the new ownership should be too (not registered impounded)
+    return if bike.ownerships.where.not(id: nil).last&.status == "status_with_owner"
+
+    bike.impound_records.current.last&.id
   end
 
   # Some organizations pre-register bikes and then transfer them.
   # This may be more complicated in the future! For now, calling this good enough.
   def calculated_organization_pre_registration?
     return false if organization_id.blank?
+
     self.origin = "creator_unregistered_parking_notification" if status == "unregistered_parking_notification"
     return true if creator_unregistered_parking_notification?
+
     self_made? && creator_id == organization&.auto_user_id
   end
 
   def fallback_owner_name
     return registration_info["user_name"] if registration_info["user_name"].present?
+
     # If it's made by PSU and not from a member of PSU, use the creator name
-    if new_registration? && organization_id == 553 && !creator.member_of?(organization)
+    if new_registration? && organization_id == 553 && creator.present? && !creator.member_of?(organization)
       creator.name
     end
+  end
+
+  def address_record_from_registration_info
+    address_attrs = reg_info_location_hash
+    if address_attrs.blank? && registration_info["ip_address"].present?
+      address_attrs = GeocodeHelper.assignable_address_hash_for(registration_info["ip_address"], new_attrs: true)
+    end
+    return if address_attrs.blank?
+
+    AddressRecord.new(bike_id: bike_id, kind: :ownership, user_id:,
+      skip_geocoding: address_attrs[:latitude].present?, **address_attrs)
+  end
+
+  def reg_info_location_hash
+    reg_info_location = registration_info.slice(*LOCATION_KEYS).reject { |_k, v| v.blank? }
+    return unless reg_info_location.present?
+
+    reg_info_location["country"] ||= "US"
+    reg_info_location.with_indifferent_access
   end
 end

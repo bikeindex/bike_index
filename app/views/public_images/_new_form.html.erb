@@ -1,14 +1,14 @@
 <%= form_for PublicImage.new do |f| %>
   <div class="photo-upload-fields">
     <%= hidden_field_tag :bike_id, @bike.id %>
+
     <div class="upload-buttons">
       <div class="multifilefield-button">
         <%= t(".upload_photos") %>
         <%= f.file_field :image, multiple: true, name: "public_image[image]" %>
       </div>
     </div>
-    <p class="extra-info">
-      <%= t(".drag_and_drop_html") %>
-    </p>
+
+    <p class="extra-info"><%= t(".drag_and_drop_html") %></p>
   </div>
 <% end %>

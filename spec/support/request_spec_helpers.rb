@@ -4,11 +4,22 @@ module RequestSpecHelpers
   # Lame copy of user_root_url - required because of subdomain: false
   def user_root_url
     return my_account_url if current_user&.confirmed?
+
     root_url
+  end
+
+  # Captures the ViewComponent classes rendered during the given block,
+  # via the !render.view_component ActiveSupport notification.
+  def rendered_view_component_names(&block)
+    names = []
+    callback = ->(_, _, _, _, payload) { names << payload[:name] if payload[:name] }
+    ActiveSupport::Notifications.subscribed(callback, "render.view_component", &block)
+    names
   end
 
   def log_in(current_user = nil)
     return if current_user == false # Allow skipping log in by setting current_user: false
+
     current_user ||= FactoryBot.create(:user_confirmed)
     allow(User).to receive(:from_auth) { current_user }
   end
@@ -24,7 +35,12 @@ module RequestSpecHelpers
   end
 
   RSpec.shared_context :request_spec_logged_in_as_superuser do
-    let(:current_user) { FactoryBot.create(:admin) }
+    let(:current_user) { FactoryBot.create(:superuser) }
+    before { log_in(current_user) }
+  end
+
+  RSpec.shared_context :request_spec_logged_in_as_developer do
+    let(:current_user) { FactoryBot.create(:developer) }
     before { log_in(current_user) }
   end
 

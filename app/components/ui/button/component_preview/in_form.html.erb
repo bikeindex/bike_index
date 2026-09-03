@@ -1,0 +1,19 @@
+<%#
+  Submitting into a hidden iframe leaves the page put, so the state the
+  controller reveals stays on screen instead of flashing past a navigation
+%>
+
+<%= form_with(url: "/rails/view_components/ui/button/component/in_form", method: :get,
+  html: {target: "submit_spinner_preview"}) do |form| %>
+  <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :email, required: true)) do %>
+    <%= render(UI::Forms::Email::Component.new(form_builder: form, required: true)) %>
+  <% end %>
+
+  <%= render(UI::Button::Component.new(text: "Next", color: :primary, type: "submit", spinner: true)) %>
+<% end %>
+
+<iframe
+  name="submit_spinner_preview"
+  title="Submission target"
+  class="tw:hidden"
+></iframe>

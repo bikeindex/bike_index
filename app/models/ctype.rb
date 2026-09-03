@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: ctypes
+# Database name: primary
 #
 #  id             :integer          not null, primary key
 #  has_multiple   :boolean          default(FALSE), not null
@@ -17,13 +18,17 @@ class Ctype < ApplicationRecord
   # The name had to be shortened because of join table key length
   include FriendlySlugFindable
 
-  attr_accessor :cgroup_name, :image_cache
+  MEMOIZE_OTHER = ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"].blank? # enable skipping for testing
 
   belongs_to :cgroup
 
+  has_many :components
+
   mount_uploader :image, AvatarUploader
 
-  has_many :components
+  attr_accessor :cgroup_name, :image_cache
+
+  before_create :set_calculated_attributes
 
   def self.select_options
     normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
@@ -36,13 +41,14 @@ class Ctype < ApplicationRecord
   end
 
   def self.other
-    where(name: "unknown", has_multiple: false, cgroup_id: Cgroup.additional_parts.id).first_or_create
-  end
+    return @other if MEMOIZE_OTHER && defined?(@other)
 
-  before_create :set_calculated_attributes
+    @other = where(name: "unknown", has_multiple: false, cgroup_id: Cgroup.additional_parts.id).first_or_create
+  end
 
   def set_calculated_attributes
     return true unless cgroup_name.present?
+
     self.cgroup_id = Cgroup.friendly_find(cgroup_name)&.id
   end
 end

@@ -1,0 +1,23 @@
+<% admin_search_form = capture do %>
+  <%= form_tag oauth_applications_path, method: :get do %>
+    <%= hidden_field_tag :search_all, true %>
+    <%= render partial: "/shared/hidden_search_fields" %>
+
+    <div class="mt-4 mb-4 d-flex justify-content-md-end flex-wrap">
+      <div class="align-self-end mt-2 mr-2">
+        <%= text_field_tag :search_query, params[:search_query], placeholder: "Name/Client ID", class: "form-control" %>
+      </div>
+
+      <div class="mt-2 mr-2">
+        <%= submit_tag "Search", name: "search", class: "btn btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @collection,
+  viewing: controller_name.humanize,
+  admin_search_form:, chart_collection: @render_chart && @matching_applications,
+)) %>

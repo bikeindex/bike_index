@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: superuser_abilities
+# Database name: primary
 #
 #  id              :bigint           not null, primary key
 #  action_name     :string
@@ -17,8 +18,6 @@
 #  index_superuser_abilities_on_user_id  (user_id)
 #
 
-# TODO: make this the way that superuser is defined for everyone
-# e.g. if universal, update user to be superuser: true, remove superuser: true if deleted, etc
 class SuperuserAbility < ApplicationRecord
   KIND_ENUM = {
     universal: 0,
@@ -39,11 +38,17 @@ class SuperuserAbility < ApplicationRecord
 
   acts_as_paranoid
 
-  belongs_to :user
+  enum :kind, KIND_ENUM
+
+  belongs_to :user, touch: true
+
+  # user_id rather than user, so an ability outliving its soft-deleted user stays editable
+  validates :user_id, presence: true
+
+  # Admin creation looks the user up by email, username or id
+  attr_accessor :user_identifier
 
   before_validation :set_calculated_attributes
-
-  enum :kind, KIND_ENUM
 
   scope :non_universal, -> { where.not(kind: "universal") }
 
@@ -54,6 +59,7 @@ class SuperuserAbility < ApplicationRecord
   def self.can_access?(controller_name: nil, action_name: nil)
     return true if universal.any? || controller.where(controller_name: controller_name).any?
     return false if action_name.blank?
+
     # if permitted to view edit, also permitted to view show (lazy hack because there aren't RBAC roles)
     action_name = %w[show edit] if action_name == "show"
     action.where(controller_name: controller_name).where(action_name: action_name).any?
@@ -86,6 +92,9 @@ class SuperuserAbility < ApplicationRecord
   end
 
   def set_calculated_attributes
+    self.controller_name = controller_name.presence
+    self.action_name = action_name.presence
+    self.user ||= User.friendly_find(user_identifier) if user_identifier.present?
     self.kind = calculated_kind
     self.su_options ||= []
     self.su_options = su_options.sort
@@ -95,6 +104,7 @@ class SuperuserAbility < ApplicationRecord
 
   def calculated_kind
     return "universal" if controller_name.blank?
+
     action_name.blank? ? "controller" : "action"
   end
 end

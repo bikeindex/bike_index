@@ -51,13 +51,12 @@
 
 
 = form_for [:admin, @bike_sticker_batch], url: {action: "create", controller: "bike_stickers"} do |f|
-  - if @bike_sticker_batch.errors.any?
-    = render partial: "shared/errors", locals: { name: "Sticker Batch", obj: @bike_sticker_batch }
+  = render(UI::Alerts::ObjectError::Component.new(name: "Sticker Batch", object: @bike_sticker_batch))
+
   .row.mt-4
     .col-md-6.col-lg-3
-      .form-group.fancy-select.unfancy
-        = f.label :organization_id
-        = f.collection_select(:organization_id, @organizations, :id, :name, {prompt: "Choose organization"}, {class: "form-control", required: true})
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, label_text: BikeStickerBatch.human_attribute_name(:organization_id), required: true)) do
+        = render UI::Forms::Combobox::Component.new(name: :organization_id, form: f, placeholder: "Choose organization", required: true, include_blank: true, options: @organizations.pluck(:name, :id))
     .col-md-6.col-lg-9
       .form-group
         = f.label :notes, "Notes"

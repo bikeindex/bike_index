@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: users
+# Database name: primary
 #
 #  id                                 :integer          not null, primary key
 #  address_set_manually               :boolean          default(FALSE)
@@ -9,14 +10,15 @@
 #  auth_token                         :string(255)
 #  avatar                             :string(255)
 #  banned                             :boolean          default(FALSE), not null
+#  can_send_many_marketplace_messages :boolean          default(FALSE), not null
 #  can_send_many_stolen_notifications :boolean          default(FALSE), not null
-#  city                               :string
 #  confirmation_token                 :string(255)
 #  confirmed                          :boolean          default(FALSE), not null
 #  deleted_at                         :datetime
 #  description                        :text
 #  developer                          :boolean          default(FALSE), not null
 #  email                              :string(255)
+#  feature_registration_show_legacy   :boolean          default(FALSE), not null
 #  instagram                          :string
 #  last_login_at                      :datetime
 #  last_login_ip                      :string
@@ -25,7 +27,6 @@
 #  magic_link_token                   :text
 #  my_bikes_hash                      :jsonb
 #  name                               :string(255)
-#  neighborhood                       :string
 #  no_address                         :boolean          default(FALSE)
 #  no_non_theft_notification          :boolean          default(FALSE)
 #  notification_newsletters           :boolean          default(FALSE), not null
@@ -33,6 +34,7 @@
 #  partner_data                       :jsonb
 #  password                           :text
 #  password_digest                    :string(255)
+#  passwordless_user                  :boolean          default(FALSE), not null
 #  phone                              :string(255)
 #  preferred_language                 :string
 #  show_bikes                         :boolean          default(FALSE), not null
@@ -40,8 +42,6 @@
 #  show_phone                         :boolean          default(TRUE)
 #  show_twitter                       :boolean          default(FALSE), not null
 #  show_website                       :boolean          default(FALSE), not null
-#  street                             :string
-#  superuser                          :boolean          default(FALSE), not null
 #  terms_of_service                   :boolean          default(FALSE), not null
 #  time_single_format                 :boolean          default(FALSE)
 #  title                              :text
@@ -50,106 +50,128 @@
 #  username                           :string(255)
 #  vendor_terms_of_service            :boolean
 #  when_vendor_terms_of_service       :datetime
-#  zipcode                            :string(255)
 #  created_at                         :datetime         not null
 #  updated_at                         :datetime         not null
-#  country_id                         :integer
-#  state_id                           :integer
+#  address_record_id                  :bigint
 #  stripe_id                          :string(255)
 #
 # Indexes
 #
-#  index_users_on_auth_token                (auth_token)
-#  index_users_on_token_for_password_reset  (token_for_password_reset)
+#  index_users_on_address_record_id             (address_record_id)
+#  index_users_on_email                         (email) WHERE (deleted_at IS NULL)
+#  index_users_on_email_trgm                    (email) WHERE (deleted_at IS NULL) USING gin
+#  index_users_on_magic_link_token_outstanding  (magic_link_token) WHERE (magic_link_token IS NOT NULL)
+#  index_users_on_token_for_password_reset      (token_for_password_reset)
+#  index_users_on_username                      (username) WHERE (deleted_at IS NULL)
 #
 class User < ApplicationRecord
-  include ActionView::Helpers::SanitizeHelper
   include FeatureFlaggable
-  include Geocodeable
+  include AddressRecorded
+  include AddressRecordedWithinBoundingBox
+
+  EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/
+  # How long an emailed token stays good for - magic link sign in and password reset alike
+  AUTH_TOKEN_EXPIRY = 10.minutes
 
   cattr_accessor :current_user
 
   acts_as_paranoid
   has_secure_password
 
-  attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password
-  # stripe_id, is_paid_member, paid_organization_role_info
-
-  mount_uploader :avatar, AvatarUploader
-
   has_many :ambassador_task_assignments
-  has_many :ambassador_tasks, through: :ambassador_task_assignments
-  has_many :payments
-  has_many :notifications
-  has_many :organization_roles
-  has_many :sent_organization_roles, class_name: "OrganizationRole", foreign_key: :sender_id
-  has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id
-  has_many :organizations, through: :organization_roles
-  has_many :ownerships
+  has_many :b_params, foreign_key: :creator_id
   has_many :bike_sticker_updates
-  has_many :updated_bike_stickers, -> { distinct }, through: :bike_sticker_updates, class_name: "BikeSticker", source: :bike_sticker
+  has_many :created_bikes, class_name: "Bike", inverse_of: :creator, foreign_key: :creator_id
+  has_many :created_ownerships, class_name: "Ownership", inverse_of: :creator, foreign_key: :creator_id
   has_many :current_ownerships, -> { current }, class_name: "Ownership"
-  has_many :owned_bikes, through: :ownerships, source: :bike
-  has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner
-  has_many :user_registration_organizations
-  has_many :uro_organizations, through: :user_registration_organizations, class_name: "Organization", source: :organization
-
-  has_many :integrations, dependent: :destroy
+  has_many :email_bans, dependent: :destroy
+  has_many :email_bans_active, -> { period_active }, class_name: "EmailBan"
+  has_many :feedbacks
   has_many :impound_claims
   has_many :impound_records
-  has_many :created_ownerships, class_name: "Ownership", inverse_of: :creator, foreign_key: :creator_id
-  has_many :created_bikes, class_name: "Bike", inverse_of: :creator, foreign_key: :creator_id
   has_many :locks, dependent: :destroy
+  has_many :marketplace_listings, foreign_key: :seller_id
+  has_many :marketplace_messages_received, class_name: "MarketplaceMessage", foreign_key: :receiver_id
+  has_many :marketplace_messages_sent, class_name: "MarketplaceMessage", foreign_key: :sender_id
+  has_many :memberships
+  has_many :notifications
+  has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner
+  has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id
+  has_many :organization_roles
+  has_many :ownerships
+  has_many :payments
+  has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
+  has_many :sent_organization_roles, class_name: "OrganizationRole", foreign_key: :sender_id
+  has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
+  has_many :strava_activities, through: :strava_integration
+  has_many :stripe_subscriptions
+  has_many :superuser_abilities
+  has_many :theft_alerts
+  has_many :user_alerts
   has_many :user_emails, dependent: :destroy
   has_many :user_phones
-  has_many :user_alerts
-  has_many :superuser_abilities
-
-  has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
-  has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
-  has_many :theft_alerts
-  has_many :feedbacks
-
+  has_many :user_registration_organizations
+  has_many :ambassador_tasks, through: :ambassador_task_assignments
+  has_many :organizations, through: :organization_roles
+  has_many :owned_bikes, through: :ownerships, source: :bike
+  has_many :updated_bike_stickers, -> { distinct }, through: :bike_sticker_updates, class_name: "BikeSticker", source: :bike_sticker
+  has_many :uro_organizations, through: :user_registration_organizations, class_name: "Organization", source: :organization
+  has_one :membership_active, -> { active }, class_name: "Membership"
   has_one :mailchimp_datum
+  has_one :strava_integration, dependent: :destroy
   has_one :user_ban
-  accepts_nested_attributes_for :user_ban
+  has_many :sso_identities, dependent: :destroy
 
-  scope :banned, -> { where(banned: true) }
-  scope :confirmed, -> { where(confirmed: true) }
-  scope :unconfirmed, -> { where(confirmed: false) }
-  scope :superuser_abilities, -> { left_joins(:superuser_abilities).where.not(superuser_abilities: {id: nil}) }
-  scope :ambassadors, -> { where(id: OrganizationRole.ambassador_organizations.select(:user_id)) }
-  scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
-
-  validates_uniqueness_of :username, case_sensitive: false
-
+  validates_uniqueness_of :username
+  validates_with UserNameValidator
   validates :password,
     presence: true,
     length: {within: 12..100},
     on: :create
-  validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :create
-
   validates :password,
     confirmation: true,
     length: {within: 12..100},
     allow_blank: true,
     on: :update
+  validate :preferred_language_is_an_available_locale
+  validates_presence_of :email
+  validates_uniqueness_of :email
+  validate :ensure_unique_email
+  validates :email, format: {with: EMAIL_REGEX, message: "Email invalid"}
+  validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :create
   validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :update, allow_blank: true
 
-  validate :preferred_language_is_an_available_locale
+  mount_uploader :avatar, AvatarUploader
 
-  validates_presence_of :email
-  validates_uniqueness_of :email, case_sensitive: false
+  accepts_nested_attributes_for :user_ban
+
+  attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password, :skip_update, :additional
+  # stripe_id, is_paid_member, paid_organization_role_info
 
   before_validation :set_calculated_attributes
-  validate :ensure_unique_email
   before_create :generate_username_confirmation_and_auth
   after_commit :perform_create_jobs, on: :create, unless: lambda { skip_update }
   after_commit :perform_user_update_jobs
 
-  attr_accessor :skip_update
+  scope :email_banned, -> { left_joins(:email_bans_active).where.not(email_bans: {id: nil}) }
+  scope :no_email_bans, -> { left_joins(:email_bans_active).where(email_bans: {id: nil}) }
+  scope :banned, -> { where(banned: true) }
+  scope :valid_only, -> { no_email_bans.where(banned: false) }
+  scope :confirmed, -> { where(confirmed: true) }
+  scope :unconfirmed, -> { where(confirmed: false) }
+  scope :admins, -> { left_joins(:superuser_abilities).where.not(superuser_abilities: {id: nil}) }
+  scope :with_organization_roles, -> { joins(:organization_roles).merge(OrganizationRole.approved_organizations) }
+  scope :ambassadors, -> { joins(:organization_roles).merge(OrganizationRole.ambassador_organizations) }
+  scope :partner_sign_up, -> { where("partner_data -> 'sign_up' IS NOT NULL") }
+  scope :donated, -> { joins(:payments).merge(Payment.paid) }
+  scope :member, -> { includes(:memberships).merge(Membership.active) }
 
   class << self
+    # Never find_by_<column> for these - a blank token matches IS NULL, which is nearly every row
+    def find_for_auth_token(auth_token_type, token)
+      where(auth_token_type => token).first if token.present?
+    end
+
     def fuzzy_email_find(email)
       UserEmail.confirmed.fuzzy_user_find(email)
     end
@@ -163,6 +185,9 @@ class User < ApplicationRecord
     end
 
     def username_friendly_find(str)
+      str = Binxtils::InputNormalizer.string(str) if str.is_a?(String)
+      return if str.blank?
+
       if str.is_a?(Integer) || str.match(/\A\d+\z/).present?
         where(id: str).first
       else
@@ -171,22 +196,33 @@ class User < ApplicationRecord
     end
 
     def friendly_find(str)
-      fuzzy_email_find(str) || username_friendly_find(str)
+      str = Binxtils::InputNormalizer.string(str) if str.is_a?(String)
+      username_friendly_find(str) || fuzzy_email_find(str)
     end
 
     def friendly_find_id(str)
       friendly_find(str)&.id
     end
 
+    # BadWordCleaner matches substrings, so roughly 1 in 500 random usernames
+    # contains one -- and CredibilityScorer then scores the user down for a
+    # handle we generated for them. Draw again rather than hand them that.
+    def generate_username
+      loop do
+        username = Slugifyer.slugify(SecureRandom.urlsafe_base64)
+        return username unless CredibilityScorer.suspiscious_handle?(username)
+      end
+    end
+
     def admin_text_search(str)
-      q = "%#{str.to_s.strip}%"
+      q = "%#{str.to_s.strip.downcase}%"
       unscoped.includes(:user_emails)
-        .where("users.name ILIKE ? OR users.email ILIKE ? OR user_emails.email ILIKE ?", q, q, q)
+        .where("users.name ILIKE ? OR users.email LIKE ? OR user_emails.email LIKE ?", q, q, q)
         .distinct.references(:user_emails)
     end
 
     def matching_domain(str)
-      where("email ILIKE ?", "%#{str.to_s.strip}")
+      where("users.email LIKE ?", "%#{str.to_s.strip.downcase}")
     end
 
     def search_phone(str)
@@ -198,7 +234,20 @@ class User < ApplicationRecord
 
     def from_auth(auth)
       return nil unless auth&.is_a?(Array)
+
       where(id: auth[0], auth_token: auth[1]).first
+    end
+  end
+
+  def find_or_build_address_record(country_id: nil)
+    return address_record if address_record?
+
+    orphaned_address_record = AddressRecord.user.where(user_id: id).first
+    if orphaned_address_record.present?
+      update(address_record_id: orphaned_address_record.id)
+      orphaned_address_record
+    else
+      self.address_record = AddressRecord.new(user_id: id, kind: :user, country_id:)
     end
   end
 
@@ -217,7 +266,12 @@ class User < ApplicationRecord
   def ensure_unique_email
     return true unless self.class.fuzzy_confirmed_or_unconfirmed_email_find(email)
     return true if id.present? # Because existing users shouldn't see this error
+
     errors.add(:email, :email_already_exists)
+  end
+
+  def member?
+    membership_active.present?
   end
 
   def confirmed?
@@ -228,18 +282,22 @@ class User < ApplicationRecord
     !confirmed?
   end
 
+  # Their organization requires passwordless users (magic link or IdP)
+  def organization_passwordless_user?
+    passwordless_user? && organizations.any?(&:passwordless_user_creation?)
+  end
+
   # Performed inline
   def perform_create_jobs
-    AfterUserCreateJob.new.perform(id, "new", user: self)
+    CallbackJobs::AfterUserCreateJob.new.perform(id, "new", user: self)
   end
 
   def perform_user_update_jobs
-    AfterUserChangeJob.perform_async(id) if id.present? && !skip_update
+    CallbackJobs::AfterUserChangeJob.perform_async(id) if id.present? && !skip_update
   end
 
   def superuser?(controller_name: nil, action_name: nil)
-    superuser ||
-      superuser_abilities.can_access?(controller_name: controller_name, action_name: action_name)
+    superuser_abilities.can_access?(controller_name:, action_name:)
   end
 
   def developer?
@@ -254,12 +312,35 @@ class User < ApplicationRecord
     banned
   end
 
+  # `additional` is a honeypot field on the sign up form - only bots fill it in
+  def looks_like_spam?
+    additional.present?
+  end
+
   def ambassador?
     organization_roles.ambassador_organizations.limit(1).any?
   end
 
+  # In the bike show redesign rollout, so sees the controls for switching views
+  def registration_show_toggleable?
+    Flipper.enabled?(:bike_show_redesign_toggle, self)
+  end
+
+  # Defaults to the redesigned registration page, rather than the legacy bike show
+  def registration_show_redesign?
+    registration_show_toggleable? && !feature_registration_show_legacy?
+  end
+
+  def can_create_listing?
+    true # Currently, marketplace is free
+  end
+
   def to_param
     username
+  end
+
+  def marketplace_message_name
+    Binxtils::InputNormalizer.sanitize(name.present? ? name : short_username)
   end
 
   def display_name
@@ -271,7 +352,7 @@ class User < ApplicationRecord
   end
 
   def donations
-    payments.donation.sum(:amount_cents)
+    payments.donation.paid.sum(:amount_cents)
   end
 
   def donor?
@@ -284,6 +365,7 @@ class User < ApplicationRecord
 
   def organization_prioritized
     return nil if organization_roles.limit(1).none?
+
     orgs = organizations.reorder(:created_at)
     # Prioritization of organizations
     orgs.ambassador.limit(1).first ||
@@ -300,6 +382,7 @@ class User < ApplicationRecord
 
   def authorized?(obj, no_superuser_override: false)
     return true if !no_superuser_override && superuser?
+
     case obj.class.name
     when "Bike", "BikeVersion"
       obj.authorized?(self, no_superuser_override: no_superuser_override)
@@ -314,6 +397,7 @@ class User < ApplicationRecord
     features = OrganizationFeature.matching_slugs(slugs)
     return false if features.blank?
     return true if !no_superuser_override && superuser?
+
     organizations.with_enabled_feature_slugs(features).limit(1).any?
   end
 
@@ -322,7 +406,7 @@ class User < ApplicationRecord
   end
 
   def auth_token_expired?(auth_token_type)
-    auth_token_time(auth_token_type) < (Time.current - 2.hours)
+    auth_token_time(auth_token_type) < (Time.current - AUTH_TOKEN_EXPIRY)
   end
 
   def accepted_vendor_terms_of_service?
@@ -330,26 +414,45 @@ class User < ApplicationRecord
   end
 
   def accepted_vendor_terms_of_service=(val)
-    return unless InputNormalizer.boolean(val)
+    return unless Binxtils::InputNormalizer.boolean(val)
+
     self.vendor_terms_of_service = true
     self.when_vendor_terms_of_service = Time.current
   end
 
-  def send_password_reset_email
+  # return_to rides in the link for the same reason it does on send_magic_link_email
+  def send_password_reset_email(return_to: nil)
     # If the auth token was just created, don't create a new one, it's too error prone
-    return false if auth_token_time("token_for_password_reset").to_i > (Time.current - 2.minutes).to_i
+    return false if password_reset_just_sent?
+
     update_auth_token("token_for_password_reset")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    EmailResetPasswordJob.perform_async(id)
+    Email::ResetPasswordJob.perform_async(id, return_to)
     true
   end
 
-  def send_magic_link_email
+  # The emailed link is often opened in another browser, which has no session
+  # holding where the user was headed - so return_to rides along in the link
+  def send_magic_link_email(return_to: nil)
     # If the auth token was just created, don't create a new one, it's too error prone
     return true if auth_token_time("magic_link_token") > Time.current - 1.minutes
+
     update_auth_token("magic_link_token")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    EmailMagicLoginLinkJob.perform_async(id)
+    Email::MagicLoginLinkJob.perform_async(id, return_to)
+  end
+
+  # Unlike send_magic_link_email, reuses an unexpired token and sends no email
+  def refreshed_magic_link_token
+    if magic_link_token.blank? || auth_token_expired?("magic_link_token")
+      update_auth_token("magic_link_token")
+    end
+    magic_link_token
+  end
+
+  # Newsletters are infrequent, so this outlives any reasonable "unsubscribe me" click
+  def unsubscribe_signed_id
+    signed_id(purpose: :unsubscribe, expires_in: 365.days)
   end
 
   def update_last_login(ip_address)
@@ -359,34 +462,38 @@ class User < ApplicationRecord
 
   def confirm(token)
     return false if token != confirmation_token
+
     self.confirmation_token = nil
     self.confirmed = true
     save
     reload
-    AfterUserCreateJob.new.perform(id, "confirmed", user: self)
+    CallbackJobs::AfterUserCreateJob.new.perform(id, "confirmed", user: self)
     true
   end
 
-  def role(organization)
-    m = OrganizationRole.where(user_id: id, organization_id: organization.id).first
+  def role(org_or_id)
+    m = OrganizationRole.where(user_id: id, organization_id: org_id(org_or_id)).first
     m&.role
   end
 
-  def member_of?(organization, no_superuser_override: false)
-    return false unless organization.present?
-    return true if claimed_organization_roles_for(organization.id).limit(1).any?
+  def member_of?(org_or_id, no_superuser_override: false)
+    return false unless org_or_id.present?
+    return true if claimed_organization_roles_for(org_or_id).limit(1).any?
+
     superuser? && !no_superuser_override
   end
 
-  def member_bike_edit_of?(organization, no_superuser_override: false)
-    return false unless organization.present?
-    return true if claimed_organization_roles_for(organization.id).not_member_no_bike_edit.limit(1).any?
+  def member_bike_edit_of?(org_or_id, no_superuser_override: false)
+    return false unless org_or_id.present?
+    return true if claimed_organization_roles_for(org_or_id).not_member_no_bike_edit.limit(1).any?
+
     superuser? && !no_superuser_override
   end
 
-  def admin_of?(organization, no_superuser_override: false)
-    return false unless organization.present?
-    return true if claimed_organization_roles_for(organization.id).admin.limit(1).any?
+  def admin_of?(org_or_id, no_superuser_override: false)
+    return false unless org_or_id.present?
+    return true if claimed_organization_roles_for(org_or_id).admin.limit(1).any?
+
     superuser? && !no_superuser_override
   end
 
@@ -406,13 +513,13 @@ class User < ApplicationRecord
     !superuser? && organization_roles.admin.limit(1).none?
   end
 
-  def default_organization
-    return @default_organization if defined?(@default_organization) # Memoize, permit nil
-    @default_organization = organizations&.first # Maybe at some point use organization_roles to get the most recent, for now, speed
-  end
-
   def partner_sign_up
     (partner_data && partner_data["sign_up"].present?) ? partner_data["sign_up"] : nil
+  end
+
+  # Read by the confirmation email, which is built from the user record alone
+  def signup_return_to
+    partner_data && partner_data["return_to"].presence
   end
 
   def bikes(user_hidden = true)
@@ -446,6 +553,7 @@ class User < ApplicationRecord
 
   def render_donation_request
     return nil unless has_police_organization_role? && !organizations.law_enforcement.paid.limit(1).any?
+
     "law_enforcement"
   end
 
@@ -462,7 +570,13 @@ class User < ApplicationRecord
     user_phones.confirmed.limit(1).any?
   end
 
+  def email_banned?
+    email_bans_active.any?
+  end
+
   def set_calculated_attributes
+    # Passwordless users sign in by emailed link, but has_secure_password still requires a digest
+    self.password = SecurityTokenizer.new_password_token if passwordless_user? && password_digest.blank?
     self.preferred_language = nil if preferred_language.blank?
     self.phone = Phonifyer.phonify(phone)
     self.alert_slugs = (alert_slugs || [])
@@ -470,7 +584,7 @@ class User < ApplicationRecord
     self.alert_slugs += ["phone_waiting_confirmation"] if phone_changed?
     self.username = Slugifyer.slugify(username) if username
     self.email = EmailNormalizer.normalize(email)
-    self.title = InputNormalizer.sanitize(title) if title.present?
+    self.title = Binxtils::InputNormalizer.sanitize(title) if title.present?
     if no_non_theft_notification
       self.notification_newsletters = false
       organization_roles.notification_daily.each { |m| m.update(hot_sheet_notification: :notification_never) }
@@ -516,9 +630,9 @@ class User < ApplicationRecord
   protected
 
   def generate_username_confirmation_and_auth
-    usrname = username || SecureRandom.urlsafe_base64
+    usrname = username ? Slugifyer.slugify(username) : User.generate_username
     while User.where(username: usrname).where.not(id: id).exists?
-      usrname = SecureRandom.urlsafe_base64
+      usrname = User.generate_username
     end
     self.username = usrname
     generate_auth_token("confirmation_token") unless confirmed
@@ -528,13 +642,26 @@ class User < ApplicationRecord
 
   private
 
-  def claimed_organization_roles_for(organization_id)
-    OrganizationRole.claimed.where(user_id: id, organization_id: organization_id)
+  def org_id(org_or_id)
+    org_or_id.is_a?(Organization) ? org_or_id.id : org_or_id
+  end
+
+  def short_username
+    username&.truncate(11)
+  end
+
+  def password_reset_just_sent?
+    auth_token_time("token_for_password_reset").to_i > (Time.current - 2.minutes).to_i
+  end
+
+  def claimed_organization_roles_for(org_or_id)
+    OrganizationRole.claimed.where(user_id: id, organization_id: org_id(org_or_id))
   end
 
   def preferred_language_is_an_available_locale
     return if preferred_language.blank?
     return if I18n.available_locales.include?(preferred_language.to_sym)
+
     errors.add(:preferred_language, :not_an_available_language)
   end
 end

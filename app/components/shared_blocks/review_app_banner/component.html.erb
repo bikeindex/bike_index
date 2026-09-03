@@ -1,0 +1,60 @@
+<%#
+  z-index sits above the navbar ($zindex-navbar-fixed: 1030) so the
+  letter_opener tooltip renders over it instead of behind when it flips down.
+%>
+
+<div
+  id="review-app-banner"
+  class="tw:relative tw:z-[1040] tw:border-b tw:px-4 tw:py-2 tw:text-center tw:font-semibold tw:text-black <%= banner_accent_class %>"
+>
+  <%# Hide the "Review app" label on small screens — the PR title carries the context there; "Sandbox" has no title, so it stays %>
+  <span class="<%= "tw:hidden tw:sm:inline" if @pr_number %>">
+    <%= banner_label %>
+  </span>
+
+  <% if @pr_number %>
+    <span class="tw:hidden tw:sm:inline">&middot;</span>
+    <a class="twlink-underlined" href="<%= pr_url %>"><%= pr_link_text %></a>
+  <% end %>
+
+  <% if @commit.present? %>
+    <%= render(UI::Tooltip::Component.new(text: "#{translation(".commit_tooltip")} #{@commit}")) do |tooltip| %>
+      <% tooltip.with_body do %>
+        <%= translation(".commit_tooltip") %> <%= link_to @commit, commit_url, class: "twlink-underlined" %>
+      <% end %>
+
+      <% tooltip.with_tooltip_button(class: pill_button_class) { "?" } %>
+    <% end %>
+  <% end %>
+
+  <%# No ephemeral-data disclaimer in dev — the local database persists %>
+  <% unless development? %>
+    <span class="tw:hidden tw:sm:inline">
+      &middot; <%= translation(".disclaimer") %>
+    </span>
+  <% end %>
+
+  <span>&middot;</span>
+
+  <%= link_to translation(".letter_opener_link"), "/letter_opener",
+    class: "tw:font-normal twlink-underlined" %>
+
+  <%= render(UI::Tooltip::Component.new(text: translation(".letter_opener_tooltip"))) do |tooltip| %>
+    <% tooltip.with_tooltip_button(class: pill_button_class) { "?" } %>
+  <% end %>
+
+  <% if signed_in_as_superadmin? %>
+    &middot;
+    <span class="tw:font-normal tw:text-black/60 tw:italic"><%= translation(".superadmin_signed_in") %></span>
+  <% elsif superadmin %>
+    &middot;
+    <%= form_with url: sign_in_with_magic_link_session_path, class: "tw:inline-block tw:align-middle" do %>
+      <%= hidden_field_tag :token, superadmin_magic_link_token %>
+      <%= hidden_field_tag :return_to, @return_to if @return_to.present? %>
+      <%= render UI::Button::Component.new(text: translation(".superadmin_button"), type: "submit", size: :sm) %>
+    <% end %>
+  <% else %>
+    &middot;
+    <span class="tw:font-normal tw:text-black/60 tw:italic"><%= translation(".no_superadmin") %></span>
+  <% end %>
+</div>

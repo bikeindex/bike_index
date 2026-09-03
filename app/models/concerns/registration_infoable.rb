@@ -3,24 +3,29 @@
 module RegistrationInfoable
   extend ActiveSupport::Concern
 
+  LOCATION_KEYS = %w[
+    city
+    country
+    postal_code
+    region_string
+    street
+    street_2
+    latitude
+    longitude
+  ].freeze
+
   # Currently not used, keeping it around for reference
   # REGISTRATION_INFO_KEYS = %w[
   #   organization_affiliation
   #   student_id
   #   phone
   #   bike_sticker
-  #   city
-  #   country
-  #   state
-  #   street
-  #   zipcode
-  #   latitude
-  #   longitude
   # ].freeze
 
   class_methods do
     def org_id_for_org(org = nil)
       return nil if org.blank?
+
       is_a?(Organization) ? org.id : Organization.friendly_find_id(org)
     end
 
@@ -47,6 +52,7 @@ module RegistrationInfoable
     end
     return "student_id" if reg_info.key?("student_id")
     return nil if org.present?
+
     reg_info.keys.find { |k| k.start_with?("student_id") } || "student_id"
   end
 
@@ -64,17 +70,17 @@ module RegistrationInfoable
     end
     return "organization_affiliation" if reg_info.key?("organization_affiliation")
     return nil if org.present?
+
     reg_info.keys.find { |k| k.start_with?("organization_affiliation") } || "organization_affiliation"
+  end
+
+  def ios_version
+    reg_info["ios_version"]
   end
 
   # Accepts organization or organization.id
   def organization_affiliation(org = nil)
     reg_info[organization_affiliation_key(org)]
-  end
-
-  def update_registration_information(key, value)
-    update(registration_info: registration_info.merge(key => value))
-    value
   end
 
   def organization_affiliation=(val, org = nil)
@@ -85,12 +91,12 @@ module RegistrationInfoable
     update_registration_information(student_id_key(org), val)
   end
 
-  def address_hash
-    reg_info.slice("street", "city", "state", "zipcode", "state", "country")
-      .with_indifferent_access
-  end
-
   private
+
+  def update_registration_information(key, value)
+    update(registration_info: registration_info.merge(key => value))
+    value
+  end
 
   # Only internal, nil protection. Only should be nil when unsaved
   def reg_info

@@ -1,13 +1,15 @@
-class Autocomplete::Matcher
-  DEFAULT_PARAMS = {
-    page: 1,
-    per_page: 5,
-    categories: [],
-    q: "", # Query
-    cache: true
-  }.freeze
+module Autocomplete
+  module Matcher
+    extend Functionable
 
-  class << self
+    DEFAULT_PARAMS = {
+      page: 1,
+      per_page: 5,
+      categories: [],
+      q: "", # Query
+      cache: true
+    }.freeze
+
     def search(pparms = {}, opts = nil)
       opts ||= params_to_opts(pparms)
       # It always responds with the cache - if cache: false, store the cache - or, if there isn't a cached
@@ -31,7 +33,7 @@ class Autocomplete::Matcher
         category_cache_key: category_key_from_opts(categories)
       }
       opts.merge(
-        cache: pparms[:cache].present? ? InputNormalizer.boolean(pparms[:cache]) : DEFAULT_PARAMS[:cache],
+        cache: pparms[:cache].present? ? Binxtils::InputNormalizer.boolean(pparms[:cache]) : DEFAULT_PARAMS[:cache],
         cache_key: cache_key_from_opts(categories, opts[:q_array]),
         interkeys: interkeys_from_opts(opts[:category_cache_key], opts[:q_array]),
         offset: offset,
@@ -39,7 +41,9 @@ class Autocomplete::Matcher
       )
     end
 
-    private
+    #
+    # private below here
+    #
 
     def not_in_cache?(cache_key)
       cached_result = RedisPool.conn { |r| r.exists(cache_key) }
@@ -56,10 +60,12 @@ class Autocomplete::Matcher
 
     def categories_array(categories = [])
       return [] if categories.blank?
+
       categories = categories.split(/,|\+/) if !categories.is_a?(Array)
       permitted_categories = Autocomplete.sorted_category_array
       categories = permitted_categories & categories.map { |s| Autocomplete.normalize(s) }
       return [] if categories.length == permitted_categories.length
+
       categories
     end
 
@@ -101,8 +107,13 @@ class Autocomplete::Matcher
 
     def matching_hashes(terms)
       return [] unless terms.size > 0
+
       RedisPool.conn { |r| r.hmget(Autocomplete.items_data_key, *terms) }
         .reject(&:blank?).map { |r| JSON.parse(r) }
     end
+
+    conceal :not_in_cache?, :query_array, :categories_array, :total_categories_count,
+      :categories_string, :category_key_from_opts, :cache_key_from_opts, :interkeys_from_opts,
+      :store_search_in_cache, :matching_hashes
   end
 end

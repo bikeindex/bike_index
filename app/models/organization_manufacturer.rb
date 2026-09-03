@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: organization_manufacturers
+# Database name: primary
 #
 #  id              :bigint           not null, primary key
 #  can_view_counts :boolean          default(FALSE)
@@ -11,7 +12,6 @@
 #
 # Indexes
 #
-#  index_organization_manufacturers_on_manufacturer_id  (manufacturer_id)
 #  index_organization_manufacturers_on_organization_id  (organization_id)
 #
 class OrganizationManufacturer < ApplicationRecord

@@ -5,13 +5,19 @@ class UpdateOrganizationAssociationsJob < ApplicationJob
     organization_ids_for_update = associated_organization_ids(org_ids)
 
     organization_ids_for_update.each do |id|
-      organization = Organization.find(id)
+      organization = Organization.find_by(id: id)
+      next if organization.blank?
+
       # Critical that locations skip_update, so we don't loop
       organization.locations.each { |l| l.update(updated_at: Time.current, skip_update: true) }
+      # Touch member users so caches keyed on user.cache_key_with_version (e.g. the
+      # organized menu) pick up org-feature changes
+      organization.users.update_all(updated_at: Time.current)
       organization.reload # Just in case default location has changed
       organization.update(skip_update: true, updated_at: Time.current)
       add_organization_manufacturers(organization)
       update_organization_stolen_message(organization)
+      update_email_placeholder(organization)
 
       if organization.enabled?("impound_bikes_locations")
         # If there is isn't a default impound bikes location and there should be, set one
@@ -61,14 +67,38 @@ class UpdateOrganizationAssociationsJob < ApplicationJob
 
   def add_organization_manufacturers(organization)
     return unless organization.bike_shop?
+
     manufacturer_ids = Organization.with_enabled_feature_slugs("official_manufacturer")
       .where.not(manufacturer_id: nil).pluck(:manufacturer_id)
     new_manufacturer_ids = manufacturer_ids - organization.organization_manufacturers.pluck(:manufacturer_id)
     new_manufacturer_ids.each do |manufacturer_id|
       next unless organization.bikes.where(manufacturer_id: manufacturer_id).any?
+
       OrganizationManufacturer.create(manufacturer_id: manufacturer_id,
         organization_id: organization.id)
     end
+  end
+
+  # Whatever domain the organization's own people sign in with is the one its
+  # registrations ask for
+  def update_email_placeholder(organization)
+    return if organization.registration_field_labels["email_placeholder"].present?
+
+    domain = organization.user_email_domain.presence || auto_user_email_domain(organization)
+    return if domain.blank?
+
+    organization.update(skip_update: true, registration_field_labels:
+      organization.registration_field_labels.merge("email_placeholder" => "you@#{domain}"))
+  end
+
+  # The auto user is Bike Index's own account when an organization has no members of
+  # its own, which says nothing about the organization's domain
+  def auto_user_email_domain(organization)
+    email = organization.auto_user&.email
+    return if email.blank? || email == ENV["AUTO_ORG_MEMBER"]
+
+    domain = email.split("@").last
+    domain unless domain == "bikeindex.org"
   end
 
   def update_organization_stolen_message(organization)

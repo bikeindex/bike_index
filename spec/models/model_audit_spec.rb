@@ -128,7 +128,7 @@ RSpec.describe ModelAudit, type: :model do
   describe "find_for" do
     let!(:model_audit) { FactoryBot.create(:model_audit, manufacturer: manufacturer) }
     let(:manufacturer) { FactoryBot.create(:manufacturer) }
-    let(:bike) { Bike.new(manufacturer: manufacturer, frame_model: model_audit.frame_model.upcase, mnfg_name: manufacturer.simple_name) }
+    let(:bike) { Bike.new(manufacturer: manufacturer, frame_model: model_audit.frame_model.upcase, mnfg_name: manufacturer.short_name) }
     it "finds the matching model_audit" do
       expect(ModelAudit.find_for(bike)&.id).to eq model_audit.id
     end

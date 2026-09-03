@@ -1,0 +1,18 @@
+.admin-subnav
+  .col-12
+    %h1
+      IP Location
+
+%p
+  Compare cloudflare headers vs geocoder results
+
+.row
+  .col-md-6
+    %h4 Cloudflare
+    = pretty_print_json(@cloudflare_hash)
+  .col-md-6
+    %h4 Geocoder
+    = pretty_print_json(@geocoder_hash)
+  .col-md-6
+    %h4 Raw Headers
+    = pretty_print_json(@headers)

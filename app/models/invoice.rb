@@ -3,12 +3,13 @@
 # == Schema Information
 #
 # Table name: invoices
+# Database name: primary
 #
 #  id                          :integer          not null, primary key
 #  amount_due_cents            :integer
 #  amount_paid_cents           :integer
 #  child_enabled_feature_slugs :jsonb
-#  currency                    :string           default("USD"), not null
+#  currency_enum               :integer
 #  force_active                :boolean          default(FALSE), not null
 #  is_active                   :boolean          default(FALSE), not null
 #  is_endless                  :boolean          default(FALSE)
@@ -28,7 +29,9 @@
 
 # daily_maintenance_tasks updates all invoices that have expiring subscriptions every day
 class Invoice < ApplicationRecord
+  include Currencyable
   include Amountable # included for formatting stuff
+
   belongs_to :organization
   belongs_to :first_invoice, class_name: "Invoice" # Use subscription_first_invoice_id + subscription_first_invoice, NOT THIS
 
@@ -36,7 +39,9 @@ class Invoice < ApplicationRecord
   has_many :organization_features, through: :invoice_organization_features
   has_many :payments
 
-  validates :organization, :currency, presence: true
+  validates :organization, presence: true
+
+  attr_accessor :timezone
 
   before_save :set_calculated_attributes
   after_commit :update_organization
@@ -48,14 +53,12 @@ class Invoice < ApplicationRecord
   scope :paid, -> { where.not(amount_due_cents: 0) }
   scope :free, -> { where(amount_due_cents: 0) }
   scope :current, -> { active.where("subscription_end_at > ? AND subscription_start_at < ?", Time.current, Time.current) }
-  scope :expired, -> { where.not(subscription_start_at: nil).where("subscription_end_at < ?", Time.current) }
+  scope :expired, -> { not_endless.where.not(subscription_start_at: nil).where("subscription_end_at < ?", Time.current) }
   scope :future, -> { where("subscription_start_at > ?", Time.current) }
   scope :endless, -> { where(is_endless: true) }
   scope :not_endless, -> { where.not(is_endless: true) }
   scope :should_expire, -> { not_endless.where(is_active: true).where("subscription_end_at < ?", Time.current) }
   scope :should_activate, -> { where(is_active: false).where("subscription_start_at < ? AND subscription_end_at > ?", Time.current, Time.current) }
-
-  attr_accessor :timezone
 
   def self.friendly_find(str)
     str = str[/\d+/] if str.is_a?(String)
@@ -118,11 +121,8 @@ class Invoice < ApplicationRecord
   end
 
   def paid_in_full?
-    amount_paid_cents.present? && amount_due_cents.present? && amount_paid_cents >= amount_due_cents
-  end
-
-  def costs_money?
-    amount_due_cents > 0
+    return false unless amount_paid_cents.present?
+    amount_paid_cents >= (amount_due_cents || 0)
   end
 
   def no_cost?
@@ -133,16 +133,10 @@ class Invoice < ApplicationRecord
     paid_in_full? && costs_money?
   end
 
-  def subscription_first_invoice_id
-    first_invoice_id || id
-  end
+  def paid_money_but_no_cost?
+    return false if costs_money? || paid_money_in_full?
 
-  def subscription_first_invoice
-    first_invoice || self
-  end
-
-  def subscription_invoices
-    self.class.where(first_invoice_id: subscription_first_invoice_id).where.not(id: id)
+    amount_paid_cents.present? && amount_paid_cents > 0
   end
 
   def display_name
@@ -184,6 +178,7 @@ class Invoice < ApplicationRecord
 
   def child_enabled_feature_slugs_string=(val)
     return if val.blank?
+
     unless val.is_a?(Array)
       val = val.strip.split(",").map(&:strip)
     end
@@ -201,11 +196,11 @@ class Invoice < ApplicationRecord
   end
 
   def start_at=(val)
-    self.subscription_start_at = TimeParser.parse(val, timezone)
+    self.subscription_start_at = Binxtils::TimeParser.parse(val, timezone)
   end
 
   def end_at=(val)
-    self.subscription_end_at = TimeParser.parse(val, timezone)
+    self.subscription_end_at = Binxtils::TimeParser.parse(val, timezone)
   end
 
   def amount_due
@@ -218,19 +213,20 @@ class Invoice < ApplicationRecord
   end
 
   def amount_due_formatted
-    MoneyFormater.money_format(amount_due_cents, currency)
+    MoneyFormatter.money_format(amount_due_cents, currency_name)
   end
 
   def amount_paid_formatted
-    MoneyFormater.money_format(amount_paid_cents, currency)
+    MoneyFormatter.money_format(amount_paid_cents, currency_name)
   end
 
   def discount_formatted
-    MoneyFormater.money_format(-(discount_cents || 0), currency)
+    MoneyFormatter.money_format(-(discount_cents || 0), currency_name)
   end
 
   def previous_invoice
     return nil unless renewal_invoice?
+
     subscription_invoices.where("id < ?", id).reorder(:id).last || subscription_first_invoice
   end
 
@@ -249,6 +245,7 @@ class Invoice < ApplicationRecord
   def create_following_invoice
     return nil unless active? || was_active? || future?
     return following_invoice if following_invoice.present?
+
     new_invoice = organization.invoices.create(start_at: subscription_end_at,
       first_invoice_id: subscription_first_invoice_id)
     new_invoice.organization_feature_ids = organization_features.recurring.pluck(:id)
@@ -268,5 +265,23 @@ class Invoice < ApplicationRecord
 
   def update_organization
     UpdateOrganizationAssociationsJob.perform_async(organization_id)
+  end
+
+  private
+
+  def subscription_first_invoice
+    first_invoice || self
+  end
+
+  def subscription_first_invoice_id
+    first_invoice_id || id
+  end
+
+  def subscription_invoices
+    self.class.where(first_invoice_id: subscription_first_invoice_id).where.not(id: id)
+  end
+
+  def costs_money?
+    amount_due_cents.present? && amount_due_cents > 0
   end
 end

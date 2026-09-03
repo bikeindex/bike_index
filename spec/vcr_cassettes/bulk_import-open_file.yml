@@ -1,0 +1,76 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://raw.githubusercontent.com/bikeindex/bike_index/main/public/import_all_optional_fields.csv
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Down/5.4.2
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '475'
+      Cache-Control:
+      - max-age=300
+      Content-Security-Policy:
+      - default-src 'none'; style-src 'unsafe-inline'; sandbox
+      Content-Type:
+      - text/plain; charset=utf-8
+      Etag:
+      - W/"04f0b606c73a5fce0a1b65b2323c5ef25de0081fa84c9f991bcd5e89129518b1"
+      Strict-Transport-Security:
+      - max-age=31536000
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - deny
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Github-Request-Id:
+      - 9D80:BD8B9:CC06E:1108ED:689B6429
+      Accept-Ranges:
+      - bytes
+      Date:
+      - Tue, 12 Aug 2025 15:56:33 GMT
+      Via:
+      - 1.1 varnish
+      X-Served-By:
+      - cache-sjc1000124-SJC
+      X-Cache:
+      - MISS
+      X-Cache-Hits:
+      - '0'
+      X-Timer:
+      - S1755014193.421027,VS0,VE131
+      Vary:
+      - Authorization,Accept-Encoding
+      Access-Control-Allow-Origin:
+      - "*"
+      Cross-Origin-Resource-Policy:
+      - cross-origin
+      X-Fastly-Request-Id:
+      - 5c607ee11e0486a40bfcc51d7bb01ba762439b7a
+      Expires:
+      - Tue, 12 Aug 2025 16:01:33 GMT
+      Source-Age:
+      - '0'
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        manufacturer,model,color,email,serial,year,description,address,phone,secondary_serial,owner_name,frame_size,bike_sticker,photo
+        "Trek","Roscoe 8","Green","test@bikeindex.org","xyz_test","2019","I love this, it's my favorite","New York, NY, USA","(888) 777-6666"," ",,29,"XXX123",
+        "Surly","Midnight Special","White","test2@bikeindex.org","example",,,,,"extra serial number","Sally",M,,"https://upload.wikimedia.org/wikipedia/commons/6/68/Bike_Index_registration_spokecard.jpg"
+  recorded_at: Tue, 12 Aug 2025 15:56:33 GMT
+recorded_with: VCR 6.3.1

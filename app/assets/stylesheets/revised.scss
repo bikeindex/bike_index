@@ -1,9 +1,9 @@
-/*
- * Revised manifest file
- * things from rails-assets
- *= require select2
- *= require selectize/selectize.bootstrap3
- */
+@import "legacy_includes/css_layers";
+
+@layer legacy {
+
+@import 'legacy_includes/select2';
+@import 'legacy_includes/selectize.bootstrap3';
 
 /*!
  * Bootstrap v4.0.0-alpha.2 (http://getbootstrap.com)
@@ -174,7 +174,6 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 @import 'revised/sections/side_boxes';
 @import 'revised/new_table_extensions'; // Import from new scss files!
 @import 'revised/sections/embeded_tweet';
-@import 'revised/sections/general_alerts';
 
 // Shared organized styles
 @import 'revised/pages/organized/forms';
@@ -184,7 +183,6 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 @import 'revised/pages/organized/bikes';
 @import 'revised/pages/organized/dashboard';
 @import 'revised/pages/organized/hot_sheet';
-@import 'revised/sections/organized_menu'; // left hand organized menu
 @import 'revised/sections/period_selection'; // mostly copies pack styles
 
 // Organization public
@@ -267,9 +265,6 @@ html {
   background: $black-off;
 }
 
-.currently-hidden {
-  display: none;
-}
 
 img {
   max-width: 100%;
@@ -377,25 +372,26 @@ body {
   text-decoration: underline;
 }
 
-$dev-color: #9400d3;
-.only-dev-visible {
-  border: 1px solid $dev-color;
-  background: rgba($dev-color, 0.1);
-}
-// This is frequently used in display-tables, make it work
-.table-list {
-  tr.only-dev-visible {
-    background: rgba($dev-color, 0.1) !important;
-  }
-  td .only-dev-visible {
-    padding: 2px 0.25rem;
-  }
-}
-
-.cursor-pointer {
+.cursor-pointer, label.checkbox {
   cursor: pointer;
 }
 
 .cursor-not-allowed {
   cursor: not-allowed;
 }
+
+// Fix collapse post tailwind
+.container {
+  .currently-hidden {
+    display: none;
+  }
+
+  .collapse {
+    display: none;
+    &.in {
+      display: block;
+    }
+  }
+}
+
+} // end @layer legacy

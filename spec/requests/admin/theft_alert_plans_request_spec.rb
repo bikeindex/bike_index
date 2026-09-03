@@ -49,14 +49,14 @@ RSpec.describe Admin::TheftAlertPlansController, type: :request do
         expect(TheftAlertPlan.count).to eq(1)
         theft_alert_plan = TheftAlertPlan.first
         expect(response).to redirect_to(edit_admin_theft_alert_plan_path(theft_alert_plan))
-        expect(flash[:errors]).to be_blank
-        expect(theft_alert_plan).to match_hash_indifferently valid_params
+        expect(theft_alert_plan).to have_attributes valid_params
       end
 
-      it "re-renders the edit template with a flash on update failure" do
+      it "re-renders the new template with the errors on create failure" do
         post "/admin/theft_alert_plans", params: {theft_alert_plan: {amount_cents: 22_00}}
         expect(response).to render_template(:new)
-        expect(flash[:errors]).to include("Name can't be blank")
+        expect(response.body).to match(/errors? prevented this Theft Alert Plan from being saved/)
+        expect(response.body).to include("Name can&#39;t be blank")
       end
     end
 
@@ -76,18 +76,18 @@ RSpec.describe Admin::TheftAlertPlansController, type: :request do
           params: {theft_alert_plan: valid_params}
 
         expect(response).to redirect_to(admin_theft_alert_plans_path)
-        expect(flash[:errors]).to be_blank
         theft_alert_plan.reload
-        expect(theft_alert_plan).to match_hash_indifferently valid_params
+        expect(theft_alert_plan).to have_attributes valid_params
       end
 
-      it "re-renders the edit template with a flash on update failure" do
+      it "re-renders the edit template with the errors on update failure" do
         patch "/admin/theft_alert_plans/#{theft_alert_plan.id}",
           params: {theft_alert_plan: {name: ""}}
 
         expect(response).to be_ok
         expect(response).to render_template(:edit)
-        expect(flash[:errors]).to include("Name can't be blank")
+        expect(response.body).to match(/errors? prevented this Theft Alert Plan from being saved/)
+        expect(response.body).to include("Name can&#39;t be blank")
       end
     end
   end

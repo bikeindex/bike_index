@@ -1,0 +1,96 @@
+<div data-controller="<%= turbo? ? "search--form" : "" %>">
+  <%= form_with(url: @target_search_path,
+    builder: BikeIndexFormBuilder,
+    method: :get,
+    id: "Search_Form",
+    data: form_data) do |f| %>
+    <% if turbo? %>
+      <%= hidden_field_tag :search_no_js, true %>
+    <% end %>
+
+    <div class="tw:flex tw:flex-nowrap tw:gap-4">
+      <div class="search-fields tw:flex-grow">
+        <%= render(
+        Pages::Search::EverythingCombobox::Component.new(
+          selected_query_items_options: @selected_query_items_options,
+          query: @interpreted_params[:query],
+        ),
+      ) %>
+
+        <div class="tw:mt-2 tw:flex tw:flex-col tw:gap-2 tw:lg:flex-row">
+          <%= label_tag :search_email,
+          translation(".search_owner_email_or_name"),
+          class: "twlabel tw:sr-only" %>
+
+          <%= text_field_tag :search_email,
+          @interpreted_params[:search_email],
+          placeholder: translation(".search_owner_email_or_name"),
+          class: "twinput tw:flex-1 fieldResetsCounts" %>
+
+          <% if render_serial_field? %>
+            <%= label_tag :serial,
+            translation(".search_for_serial_number"),
+            class: "twlabel tw:sr-only" %>
+            <%= text_field_tag :serial,
+            @interpreted_params[:raw_serial],
+            placeholder: translation(".search_for_serial_number"),
+            class: "twinput tw:flex-1 fieldResetsCounts" %>
+          <% end %>
+
+          <% if render_notes_field? %>
+            <div
+              class="tw:hidden tw:flex-1"
+              data-org--search-target="notesField"
+            >
+              <%= label_tag :search_notes,
+                translation(".search_notes"),
+                class: "twlabel tw:sr-only" %>
+
+              <%= text_field_tag :search_notes,
+                @interpreted_params[:search_notes],
+                placeholder: translation(".search_notes"),
+                class: "twinput tw:w-full fieldResetsCounts" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <%# shrink-0: the fields column would otherwise squeeze this to a sliver on phones %>
+      <div class="tw:w-20 tw:shrink-0">
+        <%= render UI::Button::Component.new(color: :primary, type: "submit", html_class: "tw:w-full tw:h-full#{" tw:disabled:cursor-wait" if turbo?}") do %>
+          <%= helpers.inline_svg_tag "icons/searcher.svg",
+          id: "search-button",
+          class: "tw:text-white tw:w-full tw:h-auto",
+          title: "searcher" %>
+        <% end %>
+      </div>
+    </div>
+
+    <% if render_serial_field? && serial_looks_like_not_a_serial? %>
+      <%= render(
+      UI::Alerts::Base::Component.new(
+        text: translation(".doesnt_look_like_serial"),
+        kind: :warning,
+        margin_classes: "tw:my-2",
+      ),
+    ) %>
+    <% end %>
+
+    <%= content %>
+
+    <%= render partial: "/shared/hidden_search_fields", locals: {kind: "organized_bike_search", skip_organization: true} %>
+
+    <% unless @settings_component %>
+      <%= hidden_field_tag :search_stickers, @interpreted_params[:search_stickers] %>
+      <%= hidden_field_tag :search_address, @interpreted_params[:search_address] %>
+      <%= hidden_field_tag :search_status, @interpreted_params[:search_status] %>
+    <% end %>
+
+    <%= hidden_field_tag :search_secondary, @interpreted_params[:search_secondary] %>
+    <%= hidden_field_tag :search_model_audit_id, @interpreted_params[:search_model_audit_id] %>
+  <% end %>
+</div>
+
+<% if @settings_component %>
+  <%= render(@settings_component) %>
+<% end %>

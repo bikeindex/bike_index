@@ -1,11 +1,14 @@
 class BikeIndex.BikesEditBikeDetails extends BikeIndex
   constructor: ->
-    @initializeEventListeners()
     new window.ManufacturersSelect('#manufacturer_update_manufacturer')
+    @initializeEventListeners()
+    @otherManufacturerDisplay($('#manufacturer_update_manufacturer').val())
     @setFrameSize()
     @updateYear()
 
   initializeEventListeners: ->
+    $('#manufacturer_update_manufacturer').change (e) =>
+      @otherManufacturerDisplay(e.target.value)
     $('#bike_unknown_year').change (e) =>
       @toggleUnknownYear()
     $('#bike_year').change (e) =>
@@ -70,6 +73,14 @@ class BikeIndex.BikesEditBikeDetails extends BikeIndex
         $('.frame-size-units').removeClass('ex-size')
         $('.frame-size-units .btn').removeClass('active')
 
+  otherManufacturerDisplay: (slug) ->
+    hidden_other = $('#manufacturer_update_manufacturer').parents('.related-fields').find('.hidden-other')
+    if slug == 'other' or slug == 'Other' # show the bugger!
+      hidden_other.slideDown().addClass('unhidden')
+    else if hidden_other.hasClass('unhidden') # Hide it!
+      hidden_other.find('input').val('')
+      hidden_other.removeClass('unhidden').slideUp()
+
   requestSerialUpdateRequestCallback: (data, success) ->
     if success
       msg = "We've updated your serial!"
@@ -101,14 +112,18 @@ class BikeIndex.BikesEditBikeDetails extends BikeIndex
 
   requestManufacturerUpdate: ->
     manufacturer = $('#manufacturer_update_manufacturer').val()
+    manufacturer_other = $('#manufacturer_update_manufacturer_other').val()
     reason = $('#manufacturer_update_reason').val()
     bike_id = $('#manufacturer_update_bike_id').val()
-    if manufacturer.length > 0 && reason.length > 0 && bike_id.length > 0
+    other_selected = manufacturer == 'other' or manufacturer == 'Other'
+    other_missing = other_selected && manufacturer_other.length == 0
+    if manufacturer.length > 0 && reason.length > 0 && bike_id.length > 0 && !other_missing
       data =
         request_type: 'manufacturer_update_request'
         request_bike_id: bike_id
         request_reason: reason
         manufacturer_update_manufacturer: manufacturer
+        manufacturer_update_manufacturer_other: manufacturer_other
       response_callback = @requestManufacturerUpdateRequestCallback
       new BikeIndex.SubmitUserRequest(data, response_callback)
     else

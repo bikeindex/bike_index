@@ -1,0 +1,80 @@
+name: Copilot Coding Agent Setup
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+
+    # Read permission required to be able to clone the repository in setup
+    permissions:
+      contents: read
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: rails
+          POSTGRES_PASSWORD: password
+        # needed because the postgres container does not provide a healthcheck
+        # tmpfs makes DB faster by using RAM
+        options: >-
+          --mount type=tmpfs,destination=/var/lib/postgresql/data
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-retries 5
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+
+    steps:
+      - name: Get CPU cores
+        id: cpu-info
+        run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
+      # Plain apt, not cache-apt-pkgs-action: its restore skips package
+      # postinst scripts (losing update-alternatives binaries like imagemagick's
+      # `identify`), and on cache miss it pins versions from the runner's stale
+      # apt lists, 404s, silently installs nothing, and caches the empty result.
+      # No google-chrome-stable: :js specs run Playwright's bundled Chromium (below).
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends curl gettext imagemagick libvips libcurl4-gnutls-dev libexpat1-dev libssl-dev libz-dev postgresql-client ripgrep
+          identify --version
+      - name: Checkout code
+        uses: actions/checkout@v7
+      # Install Ruby dependencies
+      - name: Install Ruby and gems
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - run: bundle install
+      # :js system specs run through capybara-playwright-driver, which drives the
+      # `playwright` npm package and its bundled Chromium.
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          cache: 'npm'
+      - run: npm install
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      # db:seed renders mailers (e.g. parking notifications) whose layout calls
+      # stylesheet_link_tag "email"; without compiled builds/*.css, Sprockets falls
+      # back to compiling the raw .scss with sassc, which isn't bundled (we use
+      # dartsass-rails). Precompile first so the built CSS exists.
+      - name: Precompile assets
+        run: bin/rails assets:precompile
+      - name: Set up database
+        run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate db:seed

@@ -1,0 +1,156 @@
+<div class="admin-subnav">
+  <div class="col-md-12">
+    <h1>Bug Report</h1>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-6">
+    <table class="table-list">
+      <tbody>
+        <% if display_dev_info? %>
+          <tr>
+            <td class="only-dev-visible">ID</td>
+            <td><code><%= @bug_report.id %></code></td>
+          </tr>
+          <tr>
+            <td class="only-dev-visible">Inbound email</td>
+            <td><code><%= @bug_report.inbound_email_id %></code></td>
+          </tr>
+        <% end %>
+
+        <tr>
+          <td>Sender</td>
+
+          <td>
+            <div><%= @bug_report.from_name %></div>
+
+            <div>
+              <%= content_tag(:code, @bug_report.email, class: "small") %>
+
+              <%= mail_to @bug_report.email, inline_svg_tag("icons/envelope.svg", class: "tw:inline-block tw:h-4 tw:w-4"), class: "twlink tw:ml-1", title: "Email #{@bug_report.email}" %>
+
+              <%= bug_report_search_link(@bug_report.user_id.present? ? {user_id: @bug_report.user_id} : {search_email: @bug_report.email}) %>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Sender user</td>
+
+          <td>
+            <% if @bug_report.user_id.present? %>
+              <%= render Pages::Admin::Users::Cell::Component.new(user: @bug_report.user, user_id: @bug_report.user_id) %>
+            <% else %>
+              <span class="less-strong">no user</span>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Member</td>
+          <td><%= check_mark if @bug_report.is_member %></td>
+        </tr>
+
+        <tr>
+          <td>Paid organization</td>
+          <td><%= check_mark if @bug_report.is_paid_organization %></td>
+        </tr>
+
+        <tr>
+          <td>Paid organization staff</td>
+          <td><%= check_mark if @bug_report.is_paid_organization_staff %></td>
+        </tr>
+
+        <tr>
+          <td>Receiver</td>
+
+          <td>
+            <% if @bug_report.receiver.present? %>
+              <%= BugReport.display_receiver(@bug_report.receiver) %>
+              <%= bug_report_search_link(search_receiver: @bug_report.receiver) %>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Received</td>
+
+          <td>
+            <%= render UI::Time::Component.new(time: @bug_report.received_at || @bug_report.created_at,
+              format: :localize_time_precise) %>
+          </td>
+        </tr>
+
+        <% if @bug_report.github_pull_request.present? %>
+          <tr>
+            <td>Pull request</td>
+
+            <td>
+              <%= link_to @bug_report.github_pull_request_url, class: "twlink" do %>
+                #<%= @bug_report.github_pull_request %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-6">
+    <%= form_with(model: [:admin, @bug_report]) do |f| %>
+      <%= render(UI::Forms::Group::Component.new(attribute: :status, form_builder: f, label_text: "Priority")) do %>
+        <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :status,
+          option_tags: BugReport.statuses.keys.map { [BugReport.status_display(it), it] })) %>
+      <% end %>
+
+      <%= render(UI::Forms::Group::Component.new(attribute: :tags, form_builder: f)) do %>
+        <%= render UI::Forms::Combobox::Component.new(name: :tags, form: f, free_text: true,
+          options: searchable_tags, multiselect_chip_src: tag_chips_admin_bug_reports_path,
+          placeholder: "Select or create tags") %>
+      <% end %>
+
+      <%= render(UI::Forms::Group::Component.new(attribute: :github_pull_request, form_builder: f, kind: :number_field)) %>
+
+      <%= f.submit "Update", class: "btn btn-outline-primary" %>
+    <% end %>
+  </div>
+</div>
+
+<%= render(UI::Card::Component.new(shadow: true, additional_classes: "tw:max-w-3xl")) do %>
+  <p><strong>Subject:</strong> <%= @bug_report.display_subject %></p>
+  <%= render(UI::UserTextBlockDisplay::Component.new(text: @bug_report.body_stripped, max_height_class: "")) %>
+<% end %>
+
+<% if @bug_report.body_significant_tags? %>
+  <div data-controller="ui--collapse" class="tw:max-w-3xl">
+    <div class="tw:flex tw:justify-end">
+      <%= render UI::Button::Component.new(text: "show with tags", color: :link,
+        data: {action: "ui--collapse#toggle", "ui--collapse-target": "trigger"}, aria: {expanded: false}) %>
+    </div>
+
+    <div data-ui--collapse-target="content" class="tw:hidden">
+      <%= render(UI::Card::Component.new) do %>
+        <pre class="tw:overflow-x-auto"><code><%= @bug_report.body %></code></pre>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<% if @bug_report.images.attached? %>
+  <h2 class="mt-5">Images</h2>
+  <div class="tw:flex tw:flex-wrap tw:gap-4">
+    <% @bug_report.images.each do |image| %>
+      <div>
+        <%= link_to BlobUrl.for(image.blob), target: "_blank", rel: "noopener" do %>
+          <%= image_tag BlobUrl.for(image.blob), alt: image.filename, class: "img-thumbnail tw:max-h-72" %>
+        <% end %>
+
+        <div class="small less-strong">
+          <%= image.filename %>
+          <%= number_to_human_size(image.byte_size) %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>

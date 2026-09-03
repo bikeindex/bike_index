@@ -1,0 +1,18 @@
+<% if @term == :left_align %>
+  <% if @multi_columns %>
+    <div class="tw:@container tw:w-full">
+      <dl
+        class="
+          tw:@container tw:gap-x-4 tw:break-words tw:@md:grid
+          tw:@md:grid-cols-2
+        "
+      >
+        <%= content %>
+      </dl>
+    </div>
+  <% else %>
+    <dl class="tw:@container tw:break-words"><%= content %></dl>
+  <% end %>
+<% else %>
+  <dl class="<%= dl_classes %>"><%= content %></dl>
+<% end %>

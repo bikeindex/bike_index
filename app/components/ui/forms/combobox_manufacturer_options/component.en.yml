@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    ui:
+      forms:
+        combobox_manufacturer_options:
+          unknown_manufacturer: Unknown manufacturer

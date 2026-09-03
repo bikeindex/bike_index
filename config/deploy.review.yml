@@ -1,0 +1,231 @@
+# Kamal config for both non-production targets on the shared review host:
+#   - per-PR review apps      (REVIEW_APP_PR_NUMBER set → slug `pr-<N>`)
+#   - the persistent `sandbox` app (no PR number → slug `sandbox`)
+# Everything below derives from `slug`; the only real fork is the `accessories:`
+# block, emitted for review apps only (see the WARNING there).
+#
+# Usage:
+#   # review app (via .github/workflows/review-app.yml and bin/kamal_review):
+#   export REVIEW_APP_PR_NUMBER=123 REVIEW_APP_HOST=host.review.bikeindex.org
+#   kamal deploy --version pr-123-<sha> --config-file config/deploy.review.yml
+#   # sandbox (via .github/workflows/sandbox.yml): no PR number, Redis DB 0:
+#   REVIEW_APP_REDIS_DB=0 REVIEW_APP_HOST=host.review.bikeindex.org \
+#     kamal deploy --version sandbox-<sha> --skip-push --config-file config/deploy.review.yml
+#
+# Secrets: kamal always reads .kamal/secrets. Locally that pulls from 1Password;
+# CI copies .kamal/secrets-ci over it first (see the workflows).
+#
+# Multi-tenancy: each target gets a unique service name (`bike-index-<slug>`) so
+# containers coexist on the host. Postgres + Redis are *shared* accessories
+# (`service: shared-db`, `service: shared-redis`) — booted once during host
+# setup; every app connects using its own role + database.
+#
+# bin/docker-entrypoint creates the Postgres role on first boot and runs
+# `db:prepare`, which creates both the primary and analytics databases.
+#
+# TLS: each app declares `ssl: true`, so kamal-proxy obtains a per-host Let's
+# Encrypt cert (HTTP-01 over port 80) on first deploy and renews it itself.
+# No wildcard cert / certbot / DNS-01 — see docs/review-apps.md.
+#
+# This file is NOT used by production (Cloud66).
+
+<%# The role/database naming must stay in lockstep with bin/kamal_review, which
+    re-derives it to DROP review-app databases on destroy (sandbox is never
+    destroyed). The names reproduce both pre-existing schemes verbatim. %>
+<% require "json" %>
+<% pr      = ENV["REVIEW_APP_PR_NUMBER"].to_s %>
+<% pr      = nil if pr.empty? %>
+<% host    = ENV.fetch("REVIEW_APP_HOST") %>
+<% slug    = pr ? "pr-#{pr}" : "sandbox" %>
+<% appname = "bike-index-#{slug}" %>
+<% role    = "bike_index_#{slug.tr("-", "_")}" %>
+<%# Review-app databases carry a `review_pr_<N>` infix; sandbox's are just `sandbox`. %>
+<% db_prefix = pr ? "bike_index_review_pr_#{pr}" : "bike_index_sandbox" %>
+<%# Per-PR logical Redis DB (bin/kamal_review sets 1..1023); sandbox exports 0. %>
+<% redis_url = "redis://shared-redis:6379/#{ENV.fetch("REVIEW_APP_REDIS_DB", "1")}" %>
+<%# .to_json quotes/escapes the title into a valid (double-quoted) YAML scalar. %>
+<% pr_title_json = ENV.fetch("REVIEW_APP_PR_TITLE", "").to_json %>
+<%# The deploy runs from a checkout at the deployed commit, so git resolves the
+    short SHA the banner shows. Empty if git isn't available. %>
+<% commit = `git rev-parse --short HEAD 2>/dev/null`.strip %>
+
+service: <%= appname %>
+# NOTE: no registry host here — kamal prepends `registry.server` (configuration.rb
+# `repository = [registry.server, image].join("/")`). Including ghcr.io would
+# double it to ghcr.io/ghcr.io/...
+image: bikeindex/bike_index
+
+# A fresh PR's first boot runs the full db:prepare (schema + seed: manufacturer
+# CSV import, 25 bikes, components, …) in bin/docker-entrypoint before Puma
+# starts, so the container needs longer than kamal's 30s default to pass the
+# /up health check. Redeploys (databases already exist) skip seeding and become
+# healthy quickly, so this only matters on first boot.
+deploy_timeout: 240
+
+servers:
+  web:
+    - <%= host %>
+  worker:
+    hosts:
+      - <%= host %>
+    cmd: bundle exec sidekiq -c 2
+  # Native Kamal cron (https://kamal-deploy.org/docs/configuration/cron/): a
+  # per-PR container that loads config/crontab and runs the cron daemon. The
+  # `env` prefix copies the container env into the crontab so jobs inherit the
+  # DB/Redis/secret vars. Runs as root because the cron daemon needs it — the
+  # image's default `rails` user can't run cron. The entrypoint's db:prepare is
+  # keyed to `./bin/rails server`, so this role skips it.
+  cron:
+    hosts:
+      - <%= host %>
+    cmd: bash -c "(env && cat config/crontab) | crontab - && cron -f"
+    options:
+      user: root
+
+proxy:
+  ssl: true
+  host: <%= slug %>.review.bikeindex.org
+  app_port: 80
+  healthcheck:
+    path: /up
+    interval: 5
+    timeout: 60
+
+registry:
+  server: ghcr.io
+  username: bikeindex
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+env:
+  clear:
+    # Review apps run the dedicated sandbox Rails environment, which mirrors
+    # production except ActionMailer routes through letter_opener_web. See
+    # config/environments/sandbox.rb and config/routes.rb.
+    RAILS_ENV: sandbox
+    REVIEW_APP: "1"
+    REVIEW_APP_PR_NUMBER: "<%= pr %>"
+    # Empty unless the deployer exports REVIEW_APP_PR_TITLE (the workflow does);
+    # the banner then falls back to "PR #<number>".
+    REVIEW_APP_PR_TITLE: <%= pr_title_json %>
+    REVIEW_APP_COMMIT: "<%= commit %>"
+    BASE_URL: "https://<%= slug %>.review.bikeindex.org"
+
+    # Postgres (shared-db accessory; per-app role + databases). The sandbox
+    # primary_replica points at the same database as the primary, so no
+    # separate replica address is needed (see config/database.yml).
+    POSTGRESQL_ADDRESS: shared-db
+    POSTGRESQL_USERNAME: <%= role %>
+    POSTGRESQL_DATABASE: <%= db_prefix %>_primary
+    # Analytics lives on the same shared-db accessory (dropped alongside the
+    # primary in bin/kamal_review destroy — review apps only; sandbox persists).
+    POSTGRESQL_ANALYTICS_ADDRESS: shared-db
+    ANALYTICS_DB_USERNAME: <%= role %>
+    ANALYTICS_DB_DATABASE: <%= db_prefix %>_analytics
+    ANALYTICS_DB_PORT: "5432"
+
+    # Redis (shared-redis accessory; logical DB per PR). config/application.rb
+    # chains REDIS_RACK_ATTACK_URL → REDIS_CACHE_URL → REDIS_URL, so cache,
+    # Sidekiq and rack-attack all land in this PR's one logical DB.
+    REDIS_URL: "<%= redis_url %>"
+    REDIS_RACK_ATTACK_URL: "<%= redis_url %>"
+
+    # Scheduled jobs that can't work in review apps (run by config/crontab's
+    # bin/run_scheduled_job_runner), skipped via ApplicationJob's SIDEKIQ_SKIP_<job> mechanism.
+    # - exchange-rate API uses placeholder review-app secrets, so its response
+    #   has no `rates` key (KeyError).
+    # - manufacturer-logo job reaches the external img.logo.dev, which the
+    #   review-app host can't connect to (Net::OpenTimeout).
+    SIDEKIQ_SKIP_UPDATE_EXCHANGE_RATES_JOB: "1"
+    SIDEKIQ_SKIP_UPDATE_MANUFACTURER_LOGO_AND_PRIORITY_JOB: "1"
+
+    # Runtime
+    RAILS_LOG_TO_STDOUT: "1"
+    RAILS_SERVE_STATIC_FILES: "1"
+    WEB_CONCURRENCY: "1"
+    RAILS_MAX_THREADS: "3"
+    DB_POOL: "5"
+
+  secret:
+    - POSTGRES_PASSWORD
+    - POSTGRESQL_PASSWORD
+    - ANALYTICS_DB_PASSWORD
+    - SECRET_KEY_BASE
+    - SESSION_SECRET
+    - VERIFICATION_SECRET
+    # Stripe (test-mode) is NOT here — it comes from the committed .env via
+    # dotenv in sandbox (see config/environments/sandbox.rb + Gemfile).
+    - GOOGLE_MAPS
+    - GOOGLE_MAPS_STATIC
+    - GOOGLE_GEOCODER
+    - MAPBOX_GEOCODER
+    - MAPBOX_MAPPING
+    - R2_DEV_ENDPOINT
+    - R2_DEV_ACCESS_KEY
+    - R2_DEV_ACCESS_KEY_SECRET
+    - HONEYBADGER_API_KEY
+    - HONEYBADGER_FRONTEND_API_KEY
+    # Base64-encoded (Saml::SettingsBuilder decodes). Throwaway per-environment keypair
+    # from `rake saml:generate_sp_keypair`, never production's.
+    - SAML_SP_CERTIFICATE
+    - SAML_SP_PRIVATE_KEY
+
+aliases:
+  console: app exec --interactive --reuse "bin/rails console"
+  shell:   app exec --interactive --reuse "bash"
+  logs:    app logs -f
+  dbc:     app exec --interactive --reuse "bin/rails dbconsole --include-password"
+
+# Per-PR named volumes, mounted on every role so the worker sees the same files
+# the web container wrote. Named volumes survive redeploys; bin/kamal_review's
+# destroy removes them (kamal app remove leaves them behind).
+# - _storage: ActiveStorage local service — review apps mostly use R2, but this
+#   catches anything that falls through.
+# - _uploads: user uploads under public/uploads — web writes the original, the
+#   worker reads it back to generate versions.
+volumes:
+  - "<%= appname %>_storage:/rails/storage"
+  - "<%= appname %>_uploads:/rails/public/uploads"
+
+asset_path: /rails/public/assets
+
+builder:
+  arch: amd64
+  # CI builds + pushes the image; Kamal just pulls. No remote builder needed.
+
+<%# Shared accessories — booted once during host setup, reused by every app.
+    Emitted for review-app deploys ONLY (pr present): sandbox must never carry
+    this block, or a sandbox deploy could reboot/remove the shared infra that
+    every PR app depends on. This is the one real fork between the two targets.
+    A sandbox reload_database does need them, so bin/kamal_review's
+    kamal_accessory re-renders with pr=0 for those two commands alone.
+    WARNING: do not run `kamal accessory stop/remove` from a review-app deploy —
+    it would tear down the shared infra and all in-flight PRs. %>
+<% if pr %>
+accessories:
+  db:
+    service: shared-db
+    image: postgres:17
+    host: <%= host %>
+    # pg_stat_statements must be preloaded at server start for pghero's
+    # query-stats capture (the extension itself is created per-database by
+    # structure.sql). Changing this requires `kamal accessory reboot db`.
+    cmd: "postgres -c shared_preload_libraries=pg_stat_statements"
+    env:
+      secret:
+        - POSTGRES_PASSWORD
+    directories:
+      - shared_db_data:/var/lib/postgresql/data
+  redis:
+    service: shared-redis
+    image: redis:7
+    host: <%= host %>
+    # --databases sets the count, so indices are 0..1023; bin/kamal_review's
+    # REDIS_DATABASES (1023) is the modulus and hands PRs 1..1023, reserving 0 for
+    # sandbox. Raising it costs ~3.5MB of baseline RSS and slows active expiry of
+    # TTL'd keys (redis's cron round-robins a fixed number of databases per call).
+    # Changing this requires `kamal accessory reboot redis`.
+    cmd: "redis-server --databases 1024 --maxmemory 512mb --maxmemory-policy allkeys-lru"
+    directories:
+      - shared_redis_data:/data
+<% end %>

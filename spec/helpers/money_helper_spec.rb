@@ -19,9 +19,9 @@ RSpec.describe MoneyHelper, type: :helper do
           expect(default_currency).to eq("EUR")
         end
       end
-      it "returns USD" do
+      it "returns EUR" do
         I18n.with_locale(:es) do
-          expect(default_currency).to eq("USD")
+          expect(default_currency).to eq("EUR")
         end
       end
       it "returns EUR" do
@@ -126,14 +126,6 @@ RSpec.describe MoneyHelper, type: :helper do
       it "returns a Money object converting to the default currency" do
         expect(as_currency(100)).to eq("$100")
       end
-    end
-  end
-
-  describe "#currency_symbols" do
-    let(:target) { ["$ (USD)", "€ (EUR)"] }
-
-    it "returns the available currencies" do
-      expect(currency_symbols).to eq target
     end
   end
 end

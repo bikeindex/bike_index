@@ -1,0 +1,386 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe StravaActivity, type: :model do
+  describe "validations" do
+    it "requires strava_id" do
+      sa = FactoryBot.build(:strava_activity, strava_id: nil)
+      expect(sa).not_to be_valid
+      expect(sa.errors[:strava_id]).to be_present
+    end
+
+    it "requires unique strava_id per integration" do
+      strava_integration = FactoryBot.create(:strava_integration)
+      FactoryBot.create(:strava_activity, strava_integration:, strava_id: "123")
+      sa = FactoryBot.build(:strava_activity, strava_integration:, strava_id: "123")
+      expect(sa).not_to be_valid
+      expect(sa.errors[:strava_id]).to be_present
+    end
+
+    it "allows same strava_id for different integrations" do
+      strava_integration1 = FactoryBot.create(:strava_integration)
+      strava_integration2 = FactoryBot.create(:strava_integration)
+      FactoryBot.create(:strava_activity, strava_integration: strava_integration1, strava_id: "123")
+      sa = FactoryBot.build(:strava_activity, strava_integration: strava_integration2, strava_id: "123")
+      expect(sa).to be_valid
+    end
+  end
+
+  describe "associations" do
+    it "belongs to strava_integration" do
+      sa = FactoryBot.create(:strava_activity)
+      expect(sa.strava_integration).to be_present
+      expect(sa.strava_integration).to be_a(StravaIntegration)
+    end
+  end
+
+  describe "scopes" do
+    let(:strava_integration) { FactoryBot.create(:strava_integration) }
+    let!(:ride) { FactoryBot.create(:strava_activity, strava_integration:, activity_type: "Ride", strava_id: "22") }
+    let!(:mtb) { FactoryBot.create(:strava_activity, strava_integration:, activity_type: "MountainBikeRide", strava_id: "221") }
+    let!(:gravel) { FactoryBot.create(:strava_activity, strava_integration:, activity_type: "GravelRide", strava_id: "17323701543") }
+    let!(:virtual) { FactoryBot.create(:strava_activity, strava_integration:, activity_type: "VirtualRide", strava_id: "22123") }
+    let!(:ebike) { FactoryBot.create(:strava_activity, strava_integration:, activity_type: "EBikeRide", strava_id: "9999") }
+    let!(:emtb) { FactoryBot.create(:strava_activity, strava_integration:, activity_type: "EMountainBikeRide", strava_id: "222") }
+    let!(:run) { FactoryBot.create(:strava_activity, :run, strava_integration:, strava_id: "999") }
+
+    it "cycling scope returns cycling activities" do
+      expect(StravaActivity.cycling.pluck(:id).sort).to eq([ride.id, mtb.id, gravel.id, virtual.id, ebike.id, emtb.id].sort)
+      expect(StravaActivity.strava_ordered.pluck(:id)).to eq([gravel.id, virtual.id, ebike.id, run.id, emtb.id, mtb.id, ride.id])
+    end
+  end
+
+  describe "cycling?" do
+    it "returns true for all cycling sport types" do
+      %w[Ride MountainBikeRide GravelRide EBikeRide EMountainBikeRide VirtualRide Handcycle Velomobile].each do |type|
+        sa = FactoryBot.build(:strava_activity, activity_type: type)
+        expect(sa.cycling?).to be_truthy
+      end
+    end
+
+    it "returns false for non-cycling types" do
+      %w[Run Swim Walk Hike TrailRun].each do |type|
+        sa = FactoryBot.build(:strava_activity, activity_type: type)
+        expect(sa.cycling?).to be_falsey
+      end
+    end
+  end
+
+  describe "distance_miles" do
+    it "returns nil if distance_meters is nil" do
+      sa = FactoryBot.build(:strava_activity, distance_meters: nil)
+      expect(sa.distance_miles).to be_nil
+    end
+
+    it "converts meters to miles" do
+      sa = FactoryBot.build(:strava_activity, distance_meters: 1609.344)
+      expect(sa.distance_miles).to eq(1.0)
+    end
+  end
+
+  describe "distance_km" do
+    it "returns nil if distance_meters is nil" do
+      sa = FactoryBot.build(:strava_activity, distance_meters: nil)
+      expect(sa.distance_km).to be_nil
+    end
+
+    it "converts meters to kilometers" do
+      sa = FactoryBot.build(:strava_activity, distance_meters: 5000.0)
+      expect(sa.distance_km).to eq(5.0)
+    end
+  end
+
+  describe "create_or_update_from_strava_response" do
+    let(:strava_integration) { FactoryBot.create(:strava_integration) }
+    let(:summary) do
+      {id: 9876543, name: "Morning Ride", distance: 25000.0,
+       moving_time: 3600, total_elevation_gain: 200.0,
+       sport_type: "Ride", type: "Ride",
+       start_date: "2025-06-15T08:00:00Z",
+       timezone: "(GMT-07:00) America/Denver",
+       gear_id: "b1234", private: false, kudos_count: 10,
+       average_speed: 6.944, suffer_score: 42.0,
+       average_heartrate: 145.0, max_heartrate: 180.0,
+       device_name: "Garmin Edge 530", commute: false, trainer: false,
+       pr_count: 3, average_watts: 200.0, device_watts: true}.as_json
+    end
+
+    it "creates a new activity from summary" do
+      strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration, summary)
+      expect(strava_activity).to be_persisted
+      expect(strava_activity).to have_attributes({
+        strava_id: "9876543",
+        title: "Morning Ride",
+        distance_meters: 25000.0,
+        moving_time_seconds: 3600,
+        total_elevation_gain_meters: 200.0,
+        sport_type: "Ride",
+        activity_type: "Ride",
+        kudos_count: 10,
+        average_speed: 6.944,
+        suffer_score: 42.0,
+        timezone: "America/Denver",
+        gear_id: "b1234",
+        private: false,
+        strava_data: {
+          average_heartrate: 145.0, max_heartrate: 180.0,
+          device_name: "Garmin Edge 530", commute: false, trainer: false,
+          average_speed: 6.944, pr_count: 3,
+          average_watts: 200.0, device_watts: true
+        }.as_json
+      })
+      expect(strava_activity.start_date).to be_within(1).of Time.at(1749974400)
+    end
+
+    it "updates an existing activity" do
+      FactoryBot.create(:strava_activity, strava_integration:, strava_id: "9876543", title: "Old Title")
+      strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration, summary)
+      expect(strava_activity.title).to eq("Morning Ride")
+      expect(strava_integration.strava_activities.count).to eq(1)
+    end
+
+    context "when a concurrent import races the insert" do
+      it "rescues RecordNotUnique and updates the existing row" do
+        existing = FactoryBot.create(:strava_activity, strava_integration:, strava_id: "9876543", title: "Old Title")
+        # Simulate the TOCTOU race: the first find_or_initialize_by misses (its insert hits the
+        # unique index), then the retry finds the row a concurrent import committed
+        activities = strava_integration.strava_activities
+        allow(strava_integration).to receive(:strava_activities).and_return(activities)
+        fresh = activities.build(strava_id: "9876543")
+        allow(activities).to receive(:find_or_initialize_by).and_return(fresh, existing)
+        allow(fresh).to receive(:update).and_raise(ActiveRecord::RecordNotUnique)
+
+        strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration, summary)
+        expect(strava_activity.id).to eq(existing.id)
+        expect(strava_activity.title).to eq("Morning Ride")
+        expect(strava_integration.strava_activities.count).to eq(1)
+      end
+    end
+
+    context "with id-only response" do
+      let(:existing) do
+        FactoryBot.create(:strava_activity, strava_integration:, strava_id: "9876543",
+          title: "Morning Ride", distance_meters: 25000.0, sport_type: "Ride")
+      end
+
+      it "does not overwrite existing attributes" do
+        StravaActivity.create_or_update_from_strava_response(strava_integration, {"id" => existing.strava_id})
+        existing.reload
+        expect(existing.title).to eq("Morning Ride")
+        expect(existing.distance_meters).to eq(25000.0)
+        expect(existing.sport_type).to eq("Ride")
+      end
+    end
+
+    context "with segment_efforts" do
+      let(:segment_efforts) do
+        [{"kom_rank" => 10}, {"kom_rank" => 1}, {"kom_rank" => nil}, {"pr_rank" => 1}, {"kom_rank" => 2}]
+      end
+      let(:detail) { summary.merge("segment_efforts" => segment_efforts) }
+
+      it "collects the all-time leaderboard ranks, best first" do
+        strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration, detail)
+        expect(strava_activity.top_10_ranks).to eq [1, 2, 10]
+      end
+
+      context "without any ranked efforts" do
+        let(:segment_efforts) { [{"kom_rank" => nil}] }
+
+        it "is empty" do
+          strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration, detail)
+          expect(strava_activity.top_10_ranks).to eq([])
+        end
+      end
+
+      # Summaries carry no segment_efforts, so a re-list must leave the enriched ranks alone
+      it "survives a later summary response" do
+        StravaActivity.create_or_update_from_strava_response(strava_integration, detail)
+        strava_activity = StravaActivity.create_or_update_from_strava_response(strava_integration, summary)
+        expect(strava_activity.top_10_ranks).to eq [1, 2, 10]
+      end
+    end
+
+    context "with explicit nil in response" do
+      let(:existing) do
+        FactoryBot.create(:strava_activity, strava_integration:, strava_id: "9876543",
+          title: "Morning Ride", distance_meters: 25000.0)
+      end
+
+      it "blanks fields present in the response with nil values" do
+        StravaActivity.create_or_update_from_strava_response(strava_integration,
+          {"id" => existing.strava_id, "name" => nil, "distance" => nil})
+        existing.reload
+        expect(existing.title).to be_nil
+        expect(existing.distance_meters).to be_nil
+      end
+    end
+  end
+
+  describe "proxy_serialized" do
+    let(:target) do
+      {
+        activity_type: "Ride",
+        average_speed: 6.944,
+        description: "Great ride",
+        distance_meters: 25000.0,
+        enriched_at: nil,
+        kudos_count: 10,
+        moving_time_seconds: 3600,
+        photos: {photo_url: "https://example.com/photo.jpg", photo_count: 3},
+        private: false,
+        segment_locations: {locations: [{city: "Denver", region: "Colorado", country: "United States"}]},
+        sport_type: "Ride",
+        suffer_score: 42.0,
+        timezone: "America/Denver",
+        title: "Morning Ride",
+        top_10_ranks: [1, 2, 5, 9],
+        total_elevation_gain_meters: 200.0,
+        gear_id: "b1234",
+        strava_id: "123",
+        average_heartrate: 145.0,
+        max_heartrate: 180.0,
+        device_name: "Garmin Edge 530",
+        commute: false,
+        trainer: false,
+        pr_count: 3,
+        average_watts: 200.0,
+        device_watts: true
+      }
+    end
+    it "returns PROXY_ATTRS merged with strava_data" do
+      strava_activity = FactoryBot.build(:strava_activity,
+        strava_id: "123",
+        title: "Morning Ride",
+        activity_type: "Ride",
+        sport_type: "Ride",
+        description: "Great ride",
+        distance_meters: 25000.0,
+        moving_time_seconds: 3600,
+        total_elevation_gain_meters: 200.0,
+        average_speed: 6.944,
+        suffer_score: 42.0,
+        kudos_count: 10,
+        top_10_ranks: [1, 2, 5, 9],
+        gear_id: "b1234",
+        private: false,
+        timezone: "America/Denver",
+        start_date: Time.current,
+        photos: {photo_url: "https://example.com/photo.jpg", photo_count: 3},
+        segment_locations: {locations: [{city: "Denver", region: "Colorado", country: "United States"}]},
+        strava_data: {average_heartrate: 145.0, max_heartrate: 180.0, device_name: "Garmin Edge 530",
+                      commute: false, trainer: false, average_speed: 6.944, pr_count: 3, average_watts: 200.0, device_watts: true})
+
+      expect(strava_activity.proxy_serialized.except("start_date", "start_date_in_zone")).to eq target.as_json
+      expect(strava_activity.proxy_serialized["start_date"]).to be_within(1).of Time.current
+      expect(strava_activity.proxy_serialized["start_date_in_zone"].time_zone.name).to eq strava_activity.timezone
+    end
+  end
+
+  describe "update_from_strava!" do
+    before do
+      FactoryBot.create(:state_california)
+      FactoryBot.create(:state_indiana)
+      FactoryBot.create(:state_illinois)
+    end
+    let(:strava_integration) { FactoryBot.create(:strava_integration, :synced, :env_tokens) }
+    let(:strava_activity) { StravaActivity.create(strava_integration:, strava_id: "17419209324") }
+    let(:target_attributes) do
+      {
+        gear_id: "b11099574",
+        title: "Extra 10: HIIT Ride with Cody Rigsby",
+        description: "Total Output: 94 kJ\n" + "Leaderboard Rank: 6,555 / 32,313",
+        photos: {
+          photo_url: "https://dgtzuqphqg23d.cloudfront.net/lDHfSHn0XR7kn5dltGzfOIgJlAdwjgqM4_6HbGt95l4-768x432.jpg",
+          photo_count: 1
+        },
+        strava_data: {
+          commute: false,
+          trainer: true,
+          pr_count: 0,
+          device_name: "Peloton Bike",
+          device_watts: true,
+          average_speed: 8.466,
+          average_watts: 156.0,
+          max_heartrate: 149.0,
+          average_heartrate: 136.2,
+          muted: true
+        }
+      }
+    end
+    it "updates from strava" do
+      expect(strava_activity).to be_valid
+      VCR.use_cassette("strava-update_from_strava") do
+        strava_activity.update_from_strava!(run_inline: true)
+      end
+      strava_activity.reload
+      expect(strava_activity).to have_attributes target_attributes.as_json
+      expect(strava_activity.enriched_at).to be_within(2.seconds).of(Time.current)
+    end
+
+    context "dunes trip with multi-state segments" do
+      let(:strava_activity) { StravaActivity.create(strava_integration:, strava_id: "630203151") }
+      let(:target_attributes) do
+        {
+          title: "Dunes trip '16",
+          activity_type: "Ride",
+          sport_type: "Ride",
+          distance_meters: 95650.5,
+          moving_time_seconds: 15543,
+          total_elevation_gain_meters: 28.9,
+          average_speed: 6.154,
+          suffer_score: 113.0,
+          kudos_count: 4,
+          top_10_ranks: [],
+          gear_id: nil,
+          private: false,
+          description: "",
+          photos: {
+            photo_url: "https://dgtzuqphqg23d.cloudfront.net/3xxlmNZNWWBLPBEdUPxXaZ0X6acdl6c5D5R6StX5egc-768x576.jpg",
+            photo_count: 2
+          },
+          segment_locations: {
+            locations: [
+              {city: "Hobart", region: "IN", country: "US"},
+              {city: "Merrillville", region: "IN", country: "US"},
+              {city: "Gary", region: "IN", country: "US"},
+              {city: "Griffith", region: "IN", country: "US"},
+              {city: "Highland", region: "IN", country: "US"},
+              {city: "Hammond", region: "IN", country: "US"},
+              {city: "Chicago", region: "IL", country: "US"}
+            ],
+            regions: {"Illinois" => "IL", "Indiana" => "IN"},
+            countries: {"United States" => "US"}
+          },
+          strava_data: {
+            commute: false,
+            trainer: false,
+            muted: false,
+            pr_count: 6,
+            device_watts: true,
+            average_speed: 6.154,
+            average_watts: 108.7,
+            max_heartrate: 167.0,
+            average_heartrate: 131.2
+          }
+        }
+      end
+
+      it "updates from strava and returns correct proxy_serialized" do
+        expect(strava_activity).to be_valid
+        VCR.use_cassette("strava-update_from_strava-dunes_trip") do
+          strava_activity.update_from_strava!(run_inline: true)
+        end
+        strava_activity.reload
+        expect(strava_activity).to have_attributes target_attributes.as_json
+        expect(strava_activity.enriched_at).to be_within(2.seconds).of(Time.current)
+
+        proxy = strava_activity.proxy_serialized
+        expect(proxy["segment_locations"]).to eq target_attributes[:segment_locations].as_json
+        expect(proxy["strava_id"]).to eq "630203151"
+        expect(proxy["title"]).to eq "Dunes trip '16"
+        expect(proxy["start_date_in_zone"]).to be_present
+      end
+    end
+  end
+end

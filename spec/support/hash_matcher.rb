@@ -105,9 +105,10 @@ class RspecHashMatcher
       elsif options[:coerce_values_to_json]
         value.to_s == match_value.to_s
       elsif BOOLEANS.include?(value) || BOOLEANS.include?(match_value)
-        InputNormalizer.boolean(value) == InputNormalizer.boolean(match_value)
+        Binxtils::InputNormalizer.boolean(value) == Binxtils::InputNormalizer.boolean(match_value)
       else
         return true if !options[:match_blanks] && value.blank? && match_value.blank?
+
         value == match_value
       end
     end
@@ -115,8 +116,9 @@ class RspecHashMatcher
     # By default, match within 1 second
     def times_match?(time_1, time_2, match_time_within: nil)
       return false if time_1.blank? || time_2.blank?
-      time_1 = TimeParser.parse(time_1) unless time_1.is_a?(Time)
-      time_2 = TimeParser.parse(time_2) unless time_2.is_a?(Time)
+
+      time_1 = Binxtils::TimeParser.parse(time_1) unless time_1.is_a?(Time)
+      time_2 = Binxtils::TimeParser.parse(time_2) unless time_2.is_a?(Time)
       match_time_within ||= 1.5
       time_2.utc.between?(time_1.utc - match_time_within, time_1.utc + match_time_within)
     end
@@ -176,4 +178,17 @@ RSpec::Matchers.define :match_hash_indifferently do |expected|
   end
 
   diffable
+end
+
+# Instead of doing our own thing, use have_attributes instead
+RSpec::Matchers.define :have_attributes_with_time_within do |expected, time_within = 1|
+  match do |actual|
+    attrs = expected.transform_values do |value|
+      value.is_a?(Time) ? be_within(time_within).of(value) : value
+    end
+    @have_attrs_matcher = have_attributes(attrs)
+    @have_attrs_matcher.matches?(actual)
+  end
+
+  failure_message { @have_attrs_matcher.failure_message }
 end

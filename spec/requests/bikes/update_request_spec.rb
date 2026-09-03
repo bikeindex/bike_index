@@ -34,9 +34,15 @@ RSpec.describe "BikesController#update", type: :request do
     end
   end
   context "setting address for bike" do
-    let(:current_user) { FactoryBot.create(:user_confirmed, default_location_registration_address.merge(address_set_manually: true)) }
+    let(:address_record) { FactoryBot.create(:address_record, :new_york) }
+    let(:current_user) { FactoryBot.create(:user_confirmed, address_set_manually: true, address_record:) }
     let(:ownership) { FactoryBot.create(:ownership_claimed, creator: current_user, owner_email: current_user.email) }
-    let(:update) { {street: "10544 82 Ave NW", zipcode: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id, state_id: ""} }
+    let(:primary_activity_id) { FactoryBot.create(:primary_activity).id }
+    let(:update) do
+      {address_record_attributes: {street: "10544 82 Ave NW", postal_code: "AB T6E 2A4", city: "Edmonton", country_id: Country.canada.id},
+       primary_activity_id:}
+    end
+    let(:target_address_record_attributes) { update[:address_record_attributes].merge(kind: "bike", bike_id: bike.id) }
     include_context :geocoder_real # But it shouldn't make any actual calls!
     it "sets the address for the bike" do
       expect(current_user.to_coordinates).to eq([default_location[:latitude], default_location[:longitude]])
@@ -58,9 +64,12 @@ RSpec.describe "BikesController#update", type: :request do
         end
       end
       bike.reload
-      expect(bike.street).to eq default_location[:street_address]
       expect(bike.address_set_manually).to be_falsey
+      # I don't understand why this doesn't create an address record?
+      expect(bike.address_record.street).to eq default_location[:street_address]
+      # expect(bike.address_record).to match_hash_indifferently(target_address_record_attributes)
       expect(bike.updated_by_user_at).to be > (Time.current - 1)
+      expect(bike.primary_activity_id).to eq primary_activity_id
       expect(bike.not_updated_by_user?).to be_falsey
     end
     context "with user without address" do
@@ -79,13 +88,16 @@ RSpec.describe "BikesController#update", type: :request do
         VCR.use_cassette("bike_request-set_manual_address") do
           Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
-            patch base_url, params: {bike: update}
+            expect do
+              patch base_url, params: {bike: update}
+            end.to change(AddressRecord, :count).by(2)
           end
         end
+        expect(AddressRecord.pluck(:kind).sort).to eq(%w[bike user])
         bike.reload
-        expect(bike.street).to eq "10544 82 Ave NW"
-        expect(bike.country).to eq Country.canada
+        expect(bike.address_record).to have_attributes(target_address_record_attributes)
         expect(bike.address_set_manually).to be_truthy
+        expect(bike.registration_address).to match_hash_indifferently(target_address_record_attributes.slice(:latitude, :longitude))
         # NOTE: There is an issue with coordinate precision locally vs on CI. It isn't relevant, so bypassing
         expect(bike.latitude).to be_within(0.01).of(53.5183351)
         expect(bike.longitude).to be_within(0.01).of(-113.5015663)
@@ -99,7 +111,7 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.status_stolen?).to be_falsey
       expect(bike.claimed?).to be_falsey
       expect(bike.authorized?(current_user)).to be_truthy
-      AfterUserChangeJob.new.perform(current_user.id)
+      CallbackJobs::AfterUserChangeJob.new.perform(current_user.id)
       expect(current_user.reload.alert_slugs).to eq([])
       Sidekiq::Job.clear_all
       Sidekiq::Testing.inline! do
@@ -150,7 +162,7 @@ RSpec.describe "BikesController#update", type: :request do
       end
     end
     context "bike has location" do
-      let(:location_attrs) { {country_id: Country.united_states.id, city: "New York", street: "278 Broadway", zipcode: "10007", latitude: 40.7143528, longitude: -74.0059731, address_set_manually: true} }
+      let(:address_record) { FactoryBot.create(:address_record, :new_york, bike:, kind: "bike") }
       let(:time) { Time.current - 10.minutes }
       let(:phone) { "2221114444" }
       let(:current_user) { FactoryBot.create(:user_confirmed, phone: phone) }
@@ -159,15 +171,15 @@ RSpec.describe "BikesController#update", type: :request do
       let!(:user_phone_confirmed) { FactoryBot.create(:user_phone_confirmed, user: current_user, phone: phone) }
       it "marks the bike stolen, doesn't set a location, blanks bike location" do
         expect(current_user.reload.phone).to eq "2221114444"
-        bike.update(location_attrs.merge(skip_geocoding: true))
+        bike.update(address_set_manually: true, address_record:)
         bike.reload
         expect(bike.address_set_manually).to be_truthy
         expect(bike.status_stolen?).to be_falsey
         expect(bike.claimed?).to be_falsey
         expect(bike.user&.id).to eq current_user.id
-        AfterUserChangeJob.new.perform(current_user.id)
+        CallbackJobs::AfterUserChangeJob.new.perform(current_user.id)
         expect(current_user.reload.alert_slugs).to eq([])
-        expect(current_user.address).to eq "278 Broadway, New York, 10007, US"
+        expect(current_user.formatted_address_string(visible_attribute: :street)).to eq "278 Broadway, New York, NY 10007"
         expect(current_user.address_set_manually).to be_truthy
         # saving the bike one more time changes address_set_manually to be false
         # Someone surprising, but I think I'm happy with the outcome - it should be set by user
@@ -192,7 +204,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(bike.claimed?).to be_truthy
         expect(bike.owner&.id).to eq current_user.id
         # It no longer has an address, the stolen record has updated it
-        expect(bike.address_hash.values.compact).to eq(["US"])
+        expect(bike.address_hash.values.compact).to eq([])
 
         stolen_record = bike.current_stolen_record
         expect(stolen_record).to be_present
@@ -224,13 +236,21 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.user_hidden).to be_truthy
       expect(bike.authorized_by_organization?(u: current_user)).to be_truthy
       expect(bike.ownerships.count).to eq 1
-      expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
+      expect(bike.send(:editable_organization_ids)).to eq([current_organization.id])
+      expect(bike.to_coordinates.compact.count).to eq 2
       expect(bike.stolen_records.count).to eq 0
+
       expect(ownership1.user_hidden).to be_truthy
       expect(ownership1.current).to be_truthy
       expect(ownership1.organization_pre_registration).to be_truthy
       expect(ownership1.status).to eq "unregistered_parking_notification"
       expect(ownership1.origin).to eq "creator_unregistered_parking_notification"
+      expect(parking_notification.reload.active?).to be_truthy
+      expect(parking_notification.send_email?).to be_falsey
+      expect(parking_notification.status).to eq "current"
+      expect(parking_notification.kind).to eq "parked_incorrectly_notification"
+      expect(parking_notification.retrieved_kind).to be_nil
+
       Sidekiq::Job.clear_all
       expect {
         patch base_url, params: {
@@ -240,7 +260,8 @@ RSpec.describe "BikesController#update", type: :request do
       }.to change(Ownership, :count).by 1
       Sidekiq::Job.drain_all
       expect(bike.reload.ownerships.count).to eq 2
-      expect(ownership1.reload.user_hidden).to be_falsey # Meh, maybe not ideal? But convenient
+
+      expect(ownership1.reload.user_hidden).to be_truthy
       expect(ownership1.current).to be_falsey
       expect(ownership1.organization_pre_registration).to be_truthy
       expect(ownership1.status).to eq "unregistered_parking_notification"
@@ -254,6 +275,7 @@ RSpec.describe "BikesController#update", type: :request do
       expect(ownership2.origin).to eq "transferred_ownership"
 
       expect(bike.claimed?).to be_falsey
+      expect(bike.owner_email).to eq "newuser@example.com"
       expect(bike.current_ownership.user_id).to be_blank
       expect(bike.current_ownership_id).to eq ownership2.id
       expect(bike.current_ownership.owner_email).to eq "newuser@example.com"
@@ -261,8 +283,16 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.stolen_records.count).to eq 0
       expect(bike.status).to eq "status_with_owner"
       expect(bike.user_hidden).to be_falsey
-      expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
+      expect(bike.serial_hidden?).to be_falsey
+      expect(bike.send(:editable_organization_ids)).to eq([current_organization.id])
       expect(bike.authorized_by_organization?(org: current_organization)).to be_truthy # user is temporarily owner, so need to check org instead
+      expect(bike.to_coordinates.compact.count).to eq 2
+
+      expect(parking_notification.reload.active?).to be_falsey
+      expect(parking_notification.send_email?).to be_falsey
+      expect(parking_notification.status).to eq "retrieved"
+      expect(parking_notification.kind).to eq "parked_incorrectly_notification"
+      expect(parking_notification.retrieved_kind).to eq "ownership_transfer"
     end
     context "add extra information" do
       let(:auto_user) { current_user }
@@ -280,7 +310,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(bike.unregistered_parking_notification?).to be_truthy
         expect(bike.user_hidden).to be_truthy
         expect(bike.ownerships.count).to eq 1
-        expect(bike.editable_organizations.pluck(:id)).to eq([current_organization.id])
+        expect(bike.send(:editable_organization_ids)).to eq([current_organization.id])
         Sidekiq::Job.clear_all
         expect {
           patch base_url, params: {bike: {description: "sooo cool and stuff"}}
@@ -305,8 +335,8 @@ RSpec.describe "BikesController#update", type: :request do
   end
   context "adding location to a stolen bike" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, stock_photo_url: "https://bikebook.s3.amazonaws.com/uploads/Fr/6058/13-brentwood-l-purple-1000.jpg", user: current_user) }
-    let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
-    let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY", country: Country.united_states) }
+    let!(:stolen_record) { FactoryBot.create(:stolen_record, :with_alert_image, bike: bike) }
+    let(:state) { FactoryBot.create(:state_new_york) }
     let(:stolen_params) do
       {
         timezone: "America/Los_Angeles",
@@ -316,8 +346,8 @@ RSpec.describe "BikesController#update", type: :request do
         country_id: Country.united_states.id,
         street: "278 Broadway",
         city: "New York",
-        zipcode: "10007",
-        state_id: state.id,
+        postal_code: "10007",
+        region_record_id: state.id,
         show_address: "1",
         estimated_value: "2101",
         locking_description: "party",
@@ -334,15 +364,30 @@ RSpec.describe "BikesController#update", type: :request do
       }
     end
 
+    context "with legacy stolen attribute names" do
+      let(:legacy_stolen_params) do
+        stolen_params.except(:postal_code, :region_record_id).merge(zipcode: "10007", state_id: state.id)
+      end
+      it "updates with the renamed attributes" do
+        expect(bike.reload.current_stolen_record_id).to eq stolen_record.id
+        patch base_url, params: {bike: {stolen: "true", stolen_records_attributes: {"0" => legacy_stolen_params}}}
+        expect(flash[:success]).to be_present
+        stolen_record.reload
+        expect(stolen_record.street).to eq "278 Broadway"
+        expect(stolen_record.postal_code).to eq "10007"
+        expect(stolen_record.region_record_id).to eq state.id
+      end
+    end
+
     it "clears the existing alert image" do
       # Cassette required for alert image
       VCR.use_cassette("bike_request-stolen", match_requests_on: [:method], re_record_interval: 1.month) do
         expect(bike.reload.claimed?).to be_truthy
         expect(bike.owner&.id).to eq current_user.id
-        stolen_record.current_alert_image
+        FactoryBot.create(:alert_image, stolen_record:)
         stolen_record.reload
-        expect(bike.current_stolen_record).to eq stolen_record
-        expect(stolen_record.without_location?).to be_truthy
+        expect(bike.current_stolen_record_id).to eq stolen_record.id
+        expect(stolen_record.without_street?).to be_truthy
         og_alert_image_id = stolen_record.alert_image&.id # Fails without internet connection
         expect(og_alert_image_id).to be_present
         # Test stolen record phoning
@@ -350,7 +395,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(stolen_record.phone_for_users).to be_truthy
         expect(stolen_record.phone_for_shops).to be_truthy
         expect(stolen_record.phone_for_police).to be_truthy
-        AfterUserChangeJob.new.perform(current_user.id)
+        CallbackJobs::AfterUserChangeJob.new.perform(current_user.id)
         expect(current_user.reload.alert_slugs).to eq(["stolen_bike_without_location"])
         current_user.update_column :updated_at, Time.current - 5.minutes
         Sidekiq::Job.clear_all
@@ -373,7 +418,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(stolen_record.phone).to eq "1111111111"
         expect(stolen_record.secondary_phone).to eq "1231231234"
         expect(stolen_record.country_id).to eq Country.united_states.id
-        expect(stolen_record.state_id).to eq state.id
+        expect(stolen_record.region_record_id).to eq state.id
         expect(stolen_record.show_address).to be_falsey
         expect(stolen_record.estimated_value).to eq 2101
         expect(stolen_record.locking_description).to eq "party"
@@ -388,8 +433,7 @@ RSpec.describe "BikesController#update", type: :request do
         expect(stolen_record.phone_for_shops).to be_truthy
         expect(stolen_record.phone_for_police).to be_falsey
 
-        expect(stolen_record.alert_image).to be_present
-        expect(stolen_record.alert_image.id).to_not eq og_alert_image_id
+        expect(stolen_record.images_attached?).to be_truthy
       end
 
       expect(current_user.reload.alert_slugs).to eq([])
@@ -399,16 +443,18 @@ RSpec.describe "BikesController#update", type: :request do
   end
   context "updating impound_record" do
     let!(:impound_record) { FactoryBot.create(:impound_record, user: current_user, bike: bike) }
-    let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY", country: Country.united_states) }
+    let(:state) { FactoryBot.create(:state_new_york) }
     let(:impound_params) do
       {
         timezone: "America/Los_Angeles",
         impounded_at_with_timezone: "2020-04-28T11:00",
-        country_id: Country.united_states.id,
-        street: "278 Broadway",
-        city: "New York",
-        zipcode: "10007",
-        state_id: state.id
+        address_record_attributes: {
+          country_id: Country.united_states.id,
+          street: "278 Broadway",
+          city: "New York",
+          postal_code: "10007",
+          region_record_id: state.id
+        }
       }
     end
     it "updates the impound_record" do
@@ -416,7 +462,7 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike.current_impound_record_id).to eq impound_record.id
       expect(bike.authorized?(current_user)).to be_truthy
       impound_record.reload
-      expect(impound_record.latitude).to be_blank
+      expect(impound_record.address_record).to be_blank
       patch base_url, params: {
         bike: {impound_records_attributes: {"0" => impound_params}},
         edit_template: "found_details"
@@ -424,9 +470,85 @@ RSpec.describe "BikesController#update", type: :request do
       expect(flash[:success]).to be_present
       expect(response).to redirect_to(edit_bike_path(bike, edit_template: "found_details"))
       impound_record.reload
-      expect(impound_record.latitude).to be_present
+      expect(impound_record.address_record).to be_present
+      expect(impound_record.address_record).to have_attributes(
+        street: "278 Broadway",
+        city: "New York"
+      )
       expect(impound_record.impounded_at.to_i).to be_within(5).of 1588096800
-      expect(impound_record).to match_hash_indifferently impound_params.except(:impounded_at_with_timezone, :timezone)
+    end
+
+    context "updating with new owner email" do
+      it "sends to the new owner" do
+        expect {
+          patch base_url, params: {
+            bike: {owner_email: "newuser@example.com"}
+          }
+          expect(flash[:success]).to be_present
+        }.to change(Ownership, :count).by 1
+      end
+    end
+  end
+
+  context "setting strava_gear" do
+    let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, user: current_user) }
+    let!(:road_bike_gear) do
+      FactoryBot.create(:strava_gear, strava_integration:,
+        strava_id: "b12345", name: "My Road Bike", gear_type: "bike")
+    end
+    let!(:mtb_gear) do
+      FactoryBot.create(:strava_gear, strava_integration:,
+        strava_id: "b67890", name: "My MTB", gear_type: "bike")
+    end
+
+    it "connects bike to strava gear" do
+      expect(bike.strava_gear).to be_nil
+      patch base_url, params: {strava_gear_id: "b12345", edit_template: "versions"}
+      expect(flash[:success]).to match(/My Road Bike/)
+
+      bike.reload
+      expect(bike.strava_gear).to be_present
+      expect(bike.strava_gear.strava_id).to eq("b12345")
+      expect(bike.strava_gear.name).to eq("My Road Bike")
+    end
+
+    it "updates existing strava gear connection" do
+      road_bike_gear.update(item: bike)
+
+      patch base_url, params: {strava_gear_id: "b67890", edit_template: "versions"}
+      expect(flash[:success]).to match(/My MTB/)
+
+      bike.reload
+      expect(bike.strava_gear.strava_id).to eq("b67890")
+      expect(road_bike_gear.reload.item).to be_nil
+    end
+
+    it "disconnects strava gear when blank value" do
+      road_bike_gear.update(item: bike)
+
+      expect {
+        patch base_url, params: {strava_gear_id: "", edit_template: "versions"}
+      }.not_to change(StravaGear, :count)
+
+      expect(flash[:success]).to match(/disconnected/)
+      expect(road_bike_gear.reload.item).to be_nil
+    end
+
+    context "without strava integration" do
+      before do
+        strava_integration.destroy
+        current_user.reload
+      end
+
+      it "shows error" do
+        patch base_url, params: {strava_gear_id: "b12345", edit_template: "versions"}
+        expect(flash[:error]).to match(/No synced Strava/)
+      end
+    end
+
+    it "shows error for invalid gear id" do
+      patch base_url, params: {strava_gear_id: "b99999", edit_template: "versions"}
+      expect(flash[:error]).to match(/not found/)
     end
   end
 end

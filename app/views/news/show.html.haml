@@ -16,7 +16,7 @@
         - else
           %em= blogger.name
     %h4.pub-date
-      %span.convertTime= l @blog.published_at, format: :convert_time
+      %span.localizeTime= l @blog.published_at, format: :convert_time
 
     %p.blog-topics-list.mb-3
       Topics:
@@ -39,7 +39,7 @@
       = link_to @blog.pretty_canonical, @blog.canonical_url
 
 
-- if Rails.env.production? && @blog.published
+- if @blog.published && @show_discuss
   -# Clear the ad overhang with a padded block
   .padded
   %article#discourse-comments

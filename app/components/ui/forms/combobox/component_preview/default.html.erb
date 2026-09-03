@@ -1,0 +1,3 @@
+<%= render(UI::Forms::Group::Component.new(attribute: :cycle_type)) do %>
+  <%= render(UI::Forms::Combobox::Component.new(name: :cycle_type, options: CycleType.select_options.map(&:first))) %>
+<% end %>

@@ -1,8 +1,10 @@
 # == Schema Information
 #
 # Table name: exports
+# Database name: primary
 #
 #  id              :integer          not null, primary key
+#  deleted_at      :datetime
 #  file            :text
 #  file_format     :integer          default("csv")
 #  kind            :integer          default("organization")
@@ -17,7 +19,6 @@
 # Indexes
 #
 #  index_exports_on_organization_id  (organization_id)
-#  index_exports_on_user_id          (user_id)
 #
 class Export < ApplicationRecord
   PROGRESS_ENUM = {
@@ -51,65 +52,96 @@ class Export < ApplicationRecord
     thumbnail
     vehicle_type
   ].freeze
-  AVERY_HEADERS = %w[address owner_name].freeze
   PERMITTED_HEADERS = (DEFAULT_HEADERS + EXTRA_HEADERS).sort.freeze
+  FEATURE_HEADERS = %w[partial_registration is_impounded impounded_at organization_notes].freeze
+  HEADERS_FOR_AVERY_EXPORT = %w[address owner_name].freeze
+
+  acts_as_paranoid
 
   mount_uploader :file, ExportUploader
 
-  belongs_to :organization
-  belongs_to :user # Creator of export
   enum :progress, PROGRESS_ENUM
   enum :kind, VALID_KINDS
   enum :file_format, VALID_FILE_FORMATS
 
-  before_validation :set_calculated_attributes
-
-  scope :avery, -> { where("(options -> 'avery_export') IS NOT NULL") }
+  belongs_to :organization
+  belongs_to :user # Creator of export
 
   attr_accessor :timezone # permit assignment
   attr_reader :avery_export
 
-  def self.default_headers
-    DEFAULT_HEADERS
-  end
+  before_validation :set_calculated_attributes, on: :create
+  before_validation :set_progress
 
-  def self.default_options(kind)
-    {"headers" => default_headers}.merge(default_kind_options[kind.to_s])
-  end
+  scope :avery, -> { where("(options -> 'avery_export') IS NOT NULL") }
+  scope :with_stickers, -> { where("(options -> 'bike_code_start') IS NOT NULL OR (options -> 'assign_bike_codes') IS NOT NULL") }
+  scope :specific, -> { where("(options -> 'only_custom_bike_ids')::text = 'true'") }
+  scope :not_specific, -> { where("(options -> 'only_custom_bike_ids') IS NULL OR (options -> 'only_custom_bike_ids')::text != 'true'") }
+  scope :incompletes, -> { where("(options -> 'partial_registrations')::text = '\"only\"'") }
+  scope :registrations, -> {
+    not_specific.where("(options -> 'partial_registrations') IS NULL OR (options -> 'partial_registrations')::text = 'false' OR ((options -> 'partial_registrations') IS NOT NULL AND (options -> 'partial_registrations')::text != '\"only\"')")
+  }
+  scope :with_dates, -> {
+    where("((options -> 'start_at') IS NOT NULL AND (options -> 'start_at')::text != 'null') OR ((options -> 'end_at') IS NOT NULL AND (options -> 'end_at')::text != 'null')")
+  }
+  scope :incompletes_and_registrations, -> {
+    not_specific.where("(options -> 'partial_registrations') IS NOT NULL")
+      .where.not("(options -> 'partial_registrations')::text IN ('false', '\"only\"')")
+  }
+  scope :impounded, -> { where("(options -> 'impounded_bikes')::text = 'true'") }
 
-  def self.default_kind_options
-    {
-      stolen: {
-        with_blocklist: false,
-        only_serials_and_police_reports: false
-      },
-      organization: {
-        partial_registrations: false,
-        start_at: nil,
-        end_at: nil
-      },
-      manufacturer: {
-        frame_only: false
-      }
-    }.as_json.freeze
-  end
-
-  def self.permitted_headers(organization_or_overide = nil)
-    return PERMITTED_HEADERS unless organization_or_overide.present?
-    if organization_or_overide == "include_paid" # passing include_paid overrides
-      additional_headers = OrganizationFeature::REG_FIELDS
-    elsif organization_or_overide.is_a?(Organization)
-      additional_headers = organization_or_overide.additional_registration_fields
-      additional_headers += ["partial_registration"] if organization_or_overide.enabled?("show_partial_registrations")
-      additional_headers += ["is_impounded"] if organization_or_overide.enabled?("impound_bikes")
+  class << self
+    def default_headers
+      DEFAULT_HEADERS
     end
-    additional_headers = additional_headers.map { |h| h.gsub("reg_", "") } # skip the reg_ prefix, we don't want to display it
-    # We always give the option to export extra_registration_number, don't double up if org can add too
-    (PERMITTED_HEADERS + additional_headers).uniq
-  end
 
-  def self.with_bike_sticker_code(bike_sticker_code)
-    where("options->'bike_codes_assigned' @> ?", [bike_sticker_code].to_json)
+    def default_options(kind)
+      {"headers" => default_headers}.merge(default_kind_options[kind.to_s])
+    end
+
+    def default_kind_options
+      {
+        stolen: {
+          with_blocklist: false,
+          only_serials_and_police_reports: false
+        },
+        organization: {
+          partial_registrations: false,
+          start_at: nil,
+          end_at: nil
+        },
+        manufacturer: {
+          frame_only: false
+        }
+      }.as_json.freeze
+    end
+
+    def permitted_headers(organization_or_overide = nil)
+      return PERMITTED_HEADERS unless organization_or_overide.present?
+
+      if organization_or_overide == :include_all # passing include_all overrides
+        additional_headers = reg_field_headers(OrganizationFeature::REG_FIELDS) + FEATURE_HEADERS
+      elsif organization_or_overide.is_a?(Organization)
+        additional_headers = reg_field_headers(organization_or_overide.additional_registration_fields)
+        additional_headers += %w[partial_registration] if organization_or_overide.enabled?("show_partial_registrations")
+        additional_headers += %w[is_impounded impounded_at] if organization_or_overide.enabled?("impound_bikes")
+        additional_headers += %w[organization_notes] if organization_or_overide.enabled?("registration_notes")
+      end
+      additional_headers ||= []
+      # We always give the option to export extra_registration_number, don't double up if org can add too
+      (PERMITTED_HEADERS + additional_headers).uniq
+    end
+
+    def with_bike_sticker_code(bike_sticker_code)
+      where("options->'bike_codes_assigned' @> ?", [bike_sticker_code].to_json)
+    end
+
+    private
+
+    def reg_field_headers(arr)
+      # skip the reg_ prefix, we don't want to display it
+      arr.map { |h| h.gsub("reg_", "") }
+    end
   end
 
   def finished_processing?
@@ -140,6 +172,15 @@ class Export < ApplicationRecord
     option?("bike_codes_removed")
   end
 
+  def bike_codes_undone?
+    option?("bike_codes_undone")
+  end
+
+  # Codes that were claimed again after this export, so reverting would erase that later claim
+  def bike_stickers_not_undone
+    options["bike_codes_not_undone"] || []
+  end
+
   def custom_bike_ids
     options["custom_bike_ids"]
   end
@@ -149,11 +190,23 @@ class Export < ApplicationRecord
   end
 
   def only_custom_bike_ids=(val)
-    options["only_custom_bike_ids"] = InputNormalizer.boolean(val)
+    options["only_custom_bike_ids"] = Binxtils::InputNormalizer.boolean(val)
   end
 
   def partial_registrations
     options["partial_registrations"].blank? ? false : options["partial_registrations"]
+  end
+
+  def impounded_bikes
+    Binxtils::InputNormalizer.boolean(options["impounded_bikes"])
+  end
+
+  def matching_kinds
+    kinds = []
+    kinds << :impounded if impounded_bikes
+    kinds << :incomplete if partial_registrations.present? && !partial_registrations.in?([false, "none"])
+    kinds << :registered unless partial_registrations == "only" || partial_registrations == "none"
+    kinds
   end
 
   # NOTE: Only does the first 100 bikes, in case there is a huge export
@@ -166,16 +219,17 @@ class Export < ApplicationRecord
     options["bike_codes_assigned"] || []
   end
 
-  def remove_bike_stickers_and_record!(passed_user = nil)
-    return true unless assign_bike_codes? && !bike_codes_removed?
-    remove_bike_stickers(passed_user)
-    update_attribute :options, options.merge(bike_codes_removed: true)
+  def undo_bike_stickers_and_record!
+    return true unless assign_bike_codes? && !bike_codes_undone?
+
+    update_attribute :options, options.merge(bike_codes_undone: true,
+      bike_codes_not_undone: undo_bike_stickers)
   end
 
   def remove_bike_stickers(passed_user = nil)
-    (bike_stickers_assigned || []).each do |code|
-      BikeSticker.lookup(code, organization_id: organization_id)
-        &.claim(user: passed_user, bike_string: nil, organization: organization, creator_kind: "creator_export")
+    bike_stickers_assigned.each do |code|
+      BikeSticker.lookup(code, organization_id:)
+        &.claim(user: passed_user, bike_string: nil, organization:, creator_kind: "creator_export")
     end
   end
 
@@ -197,12 +251,13 @@ class Export < ApplicationRecord
   def avery_export=(val)
     if val
       self.options = options.merge(avery_export: true)
-      self.attributes = {file_format: "xlsx", headers: AVERY_HEADERS}
+      self.attributes = {file_format: "xlsx", headers: HEADERS_FOR_AVERY_EXPORT}
     end
   end
 
   def bike_code_start=(val)
     return unless val.present?
+
     self.options = options.merge(bike_code_start: BikeSticker.normalize_code(val, leading_zeros: true))
   end
 
@@ -225,15 +280,16 @@ class Export < ApplicationRecord
 
   def avery_export_url
     return nil unless avery_export? && finished?
+
     (ENV["AVERY_EXPORT_URL"] || "") + CGI.escape(file_url)
   end
 
   def start_at=(val)
-    self.options = options.merge("start_at" => TimeParser.parse(val, timezone))
+    self.options = options.merge("start_at" => Binxtils::TimeParser.parse(val, timezone))
   end
 
   def end_at=(val)
-    self.options = options.merge("end_at" => TimeParser.parse(val, timezone))
+    self.options = options.merge("end_at" => Binxtils::TimeParser.parse(val, timezone))
   end
 
   def headers=(val)
@@ -271,16 +327,19 @@ class Export < ApplicationRecord
 
   def bikes_scoped
     raise "#{kind} scoping not set up" unless kind == "organization"
-    return Bike.none if partial_registrations == "only"
+    return Bike.none if partial_registrations.in?(["only", "none"])
     return organization.bikes.where(id: custom_bike_ids) if only_custom_bike_ids
     return bikes_within_time(organization.bikes) unless custom_bike_ids.present?
+
     bikes_within_time(organization.bikes).or(organization.bikes.where(id: custom_bike_ids))
   end
 
   def incompletes_scoped
     return BParam.none unless partial_registrations.present?
+
     incompletes = organization.incomplete_b_params
     return incompletes unless option?("start_at") || option?("end_at")
+
     if option?("start_at")
       option?("end_at") ? incompletes.where(created_at: start_at..end_at) : incompletes.where("b_params.created_at > ?", start_at)
     elsif option?("end_at") # If only end_at is present
@@ -291,27 +350,45 @@ class Export < ApplicationRecord
   def set_calculated_attributes
     self.options = validated_options(options)
     errors.add :organization_id, :required if kind == "organization" && organization_id.blank?
+  end
+
+  def set_progress
     self.progress = calculated_progress
   end
 
   # Generally, use calculated_progress rather than progress directly for display
   def calculated_progress
     return progress unless pending? || ongoing?
+
     ((created_at || Time.current) < Time.current - 10.minutes) ? "errored" : progress
+  end
+
+  private
+
+  # Deletes this export's sticker updates, restoring each sticker to its pre-export state.
+  # Returns the codes it skipped - a sticker claimed again since can't be reverted without
+  # erasing that later claim
+  def undo_bike_stickers
+    revertable, skipped = bike_sticker_updates.partition { |update| update.following_updates.none? }
+    revertable.each { |update| RevertBikeStickerUpdateJob.perform_async(update.id) }
+    skipped.map { |update| update.bike_sticker&.code }.compact
+  end
+
+  def bike_sticker_updates
+    BikeStickerUpdate.where(export_id: id).successful.includes(:bike_sticker).reorder(:id)
   end
 
   def validated_options(opts)
     opts = self.class.default_options(kind).merge(opts)
     # Permit setting any header - we'll block organizations setting those headers via show and also via controller
     # but if we want to manually create an export, we should be able to do so
-    opts["headers"] = opts["headers"] & self.class.permitted_headers("include_paid")
+    opts["headers"] = opts["headers"] & self.class.permitted_headers(:include_all)
     opts
   end
 
-  private
-
   def bikes_within_time(bikes)
     return bikes unless option?("start_at") || option?("end_at")
+
     if option?("start_at")
       option?("end_at") ? bikes.where(created_at: start_at..end_at) : bikes.where("bikes.created_at > ?", start_at)
     elsif option?("end_at") # If only end_at is present
@@ -322,6 +399,7 @@ class Export < ApplicationRecord
   def bike_id_from_url(bike_url)
     return nil unless bike_url.present?
     return bike_url if bike_url.is_a?(Integer) # integers passed directly in organized bikes_controller
+
     id_str = bike_url.strip
     if id_str.match?(/\A\d+\z/)
       id_str.to_i

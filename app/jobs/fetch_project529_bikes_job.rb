@@ -5,6 +5,10 @@ class FetchProject529BikesJob < ScheduledJob
     23.5.hours
   end
 
+  def skip_scheduling?
+    super || ExternalRegistryCredential::Project529Credential.none?
+  end
+
   def perform(updated_since = nil, page = 1)
     updated_since ||= ExternalRegistryBike::Project529Bike.updated_since_date
 

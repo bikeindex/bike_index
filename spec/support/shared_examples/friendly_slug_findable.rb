@@ -4,29 +4,19 @@ RSpec.shared_examples "friendly_slug_findable" do
   let(:model_sym) { subject.class.name.underscore.to_sym }
   let(:instance) { FactoryBot.create model_sym }
 
-  describe "callbacks" do
-    it "calls set slug before create" do
-      obj = FactoryBot.build(model_sym, name: "something cool and things&")
-      expect(obj).to receive :set_slug
-      obj.save
+  describe "sets slug" do
+    let(:instance) { FactoryBot.create(model_sym, name:) }
+    let(:name) { "Some Cool NAMe " }
+    it "assigns slug on create" do
+      expect(instance.reload.name).to eq "Some Cool NAMe"
+      expect(instance.slug).to eq "some-cool-name"
     end
-  end
 
-  describe "set_slug" do
-    context "name" do
-      it "slugs it" do
-        obj = FactoryBot.build(model_sym, name: "something cool and things&")
-        obj.slug = nil
-        obj.set_slug
-        expect(obj.slug).to eq Slugifyer.slugify("something cool and things&")
-      end
-    end
-    context "existing" do
-      it "doesn't overwrite" do
-        obj = FactoryBot.build model_sym
-        obj.slug = "something cool"
-        obj.set_slug
-        expect(obj.slug).to eq "something cool"
+    context "with parens" do
+      let(:name) { "Some Cool NAMe (additional info)" }
+      it "assigns slug without parens" do
+        expect(instance.reload.name).to eq name
+        expect(instance.slug).to eq "some-cool-name"
       end
     end
   end

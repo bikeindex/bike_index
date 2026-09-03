@@ -1,6 +1,6 @@
 class OrganizationsController < ApplicationController
-  before_action :set_bparam, only: [:embed, :embed_extended]
-  skip_before_action :set_x_frame_options_header, only: [:embed, :embed_extended, :embed_create_success]
+  before_action :set_bparam, only: %i[embed embed_extended]
+  before_action :allow_x_frame, only: %i[embed embed_extended embed_create_success]
 
   def new
     session[:return_to] ||= new_organization_url unless current_user.present?
@@ -15,10 +15,10 @@ class OrganizationsController < ApplicationController
 
     session[:return_to] = lightspeed_interface_path
     if current_user.present?
-      flash[:info] = translation(:must_create_an_organization_first)
+      flash[:notice] = translation(:must_create_an_organization_first)
       redirect_to new_organization_path
     else
-      flash[:info] = translation(:must_create_an_account_first)
+      flash[:notice] = translation(:must_create_an_account_first)
       redirect_to(new_user_path) && return
     end
   end
@@ -41,18 +41,19 @@ class OrganizationsController < ApplicationController
     end
   end
 
-  # previously accepted stolen_first=true as a parameter.
-  # Stopped accepting in PR#1875, because consistency, use stolen=true instead
+  # Additional parameter included in shop printouts: shop_display=true
+  # currently not used, but may use it someday!
   def embed
-    @bike = BikeCreator.new.build_bike(@b_param)
+    @bike = BikeServices::Builder.build(@b_param)
     @bike.owner_email = params[:email] if params[:email].present?
     @stolen_record = built_stolen_record
     @stolen = @bike.status_stolen?
+    @non_stolen = Binxtils::InputNormalizer.boolean(params[:non_stolen]) if !@stolen
     render layout: "embed_layout"
   end
 
   def embed_extended
-    @bike = BikeCreator.new.build_bike(@b_param)
+    @bike = BikeServices::Builder.build(@b_param)
     if params[:email].present?
       @bike.owner_email = params[:email]
       @persist_email = true unless defined?(@persist_email)
@@ -62,14 +63,27 @@ class OrganizationsController < ApplicationController
 
   def embed_create_success
     find_organization
-    @bike = Bike.find(params[:bike_id])
+    @bike = Bike.find_id(params[:bike_id])
     render layout: "embed_layout"
+  end
+
+  def qr
+    return unless find_organization.present?
+    @qr_url = case params[:target]
+    when "shop_display" then embed_organization_url(@organization, non_stolen: true, shop_display: true)
+    when "landing" then "#{root_url}#{@organization.to_param}" # not routed unless in LandingPageOrganizations::SLUGS
+    else new_register_url(organization_id: @organization.to_param)
+    end
+
+    qrcode = RQRCode::QRCode.new(@qr_url)
+    send_data qrcode.as_png(size: 1200, border_modules: 0).to_s, type: "image/png", disposition: "inline"
   end
 
   protected
 
   def set_bparam
     return true unless find_organization.present?
+
     unless find_organization.auto_user.present?
       flash[:error] = translation(:no_user)
       redirect_to(root_url) && return
@@ -80,7 +94,7 @@ class OrganizationsController < ApplicationController
       BParam.create(creator_id: @organization.auto_user.id, params: {
         creation_organization_id: @organization.id,
         embeded: true,
-        bike: BParam.bike_attrs_from_url_params(params.permit(:status, :stolen).to_h)
+        bike: BParam.status_hash_from_params(params)
       })
     end
   end
@@ -99,17 +113,18 @@ class OrganizationsController < ApplicationController
     approved_kind = params.dig(:organization, :kind)
     approved_kind = "other" unless Organization.user_creatable_kinds.include?(approved_kind)
     params.require(:organization)
-      .permit(:name, :website, locations_attributes: permitted_locations_params)
+      .permit(:name, :website, locations_attributes:)
       .merge(auto_user_id: current_user.id, kind: approved_kind)
   end
 
-  def permitted_locations_params
-    %i[name zipcode city state_id country_id street phone publicly_visible]
+  def locations_attributes
+    %i[name phone publicly_visible] + [address_record_attributes: AddressRecord.permitted_params + [:id]]
   end
 
   def find_organization
     @organization = Organization.friendly_find(params[:id])
     return @organization if @organization.present?
+
     flash[:error] = translation(:not_found)
     redirect_to(root_url) && return
   end

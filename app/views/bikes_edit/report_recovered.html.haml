@@ -14,9 +14,13 @@
             .form-well-form-header
               -# Mark This Bike Recovered
               %h3= @edit_templates[@edit_template]
-            .no-divider-row.full-width-button
+            .no-divider-row.full-width-button#mark_recovered_action
               %a.btn.btn-success.btn-lg{data: { toggle: "modal", target: "#toggle-stolen" } }
                 = t(".this_bike_has_been_returned", bike_type: @bike.type)
+            -# Shown by edit_stolen.coffee after the recovery request is sent (the modal is
+            -# already hidden by then), until the redirect to the recovered bike happens
+            .no-divider-row#mark_recovered_spinner{ style: "display: none;" }
+              = render(UI::LoadingSpinner::Component.new(text: t(".marking_recovered")))
 
 
 - modal_title = t(".were_so_glad", bike_type: @bike.type)

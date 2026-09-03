@@ -1,0 +1,227 @@
+---
+http_interactions:
+- request:
+    method: head
+    uri: http://msn.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 301
+      message: Moved Permanently
+    headers:
+      Content-Length:
+      - '0'
+      Location:
+      - https://msn.com/
+      X-Msedge-Ref:
+      - 'Ref A: C5E247F1A789493FB508D490C21235AF Ref B: BY3EDGE0510 Ref C: 2025-03-19T02:21:21Z'
+      Date:
+      - Wed, 19 Mar 2025 02:21:20 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Wed, 19 Mar 2025 02:21:21 GMT
+- request:
+    method: head
+    uri: https://msn.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 301
+      message: Moved Permanently
+    headers:
+      Content-Length:
+      - '0'
+      Location:
+      - https://www.msn.com/
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Accept-Ch:
+      - Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-Full-Version-List,
+        Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform, Sec-CH-UA-Platform-Version
+      X-Msedge-Ref:
+      - 'Ref A: 18107796D0564EFF8D70357713FD22D6 Ref B: BY3EDGE0308 Ref C: 2025-03-19T02:21:21Z'
+      Date:
+      - Wed, 19 Mar 2025 02:21:21 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Wed, 19 Mar 2025 02:21:21 GMT
+- request:
+    method: head
+    uri: https://www.msn.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Cache-Control:
+      - no-store, no-cache
+      Pragma:
+      - no-cache
+      Content-Length:
+      - '0'
+      X-Fabric-Cluster:
+      - pmeprodwus
+      Nel:
+      - '{"report_to":"network-errors","max_age":604800,"success_fraction":0.001,"failure_fraction":0.5}'
+      Report-To:
+      - '{"group":"network-errors","max_age":604800,"endpoints":[{"url":"https://deff.nelreports.net/api/report?cat=msn"}]},{"group":"csp-endpoint","max_age":86400,"endpoints":[{"url":"https://deff.nelreports.net/api/report"}]}'
+      Strict-Transport-Security:
+      - max-age=1209600; includeSubDomains; preload
+      X-Ceto-Ref:
+      - 67da2a2194b24ec597b3db376669b1fd|AFD:2025383B8B014FF6B30AD8AC382973CD|2025-03-19T02:21:21.642Z
+      X-Cache:
+      - CONFIG_NOCACHE
+      Accept-Ch:
+      - Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-Full-Version-List,
+        Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform, Sec-CH-UA-Platform-Version
+      X-Msedge-Ref:
+      - 'Ref A: 2025383B8B014FF6B30AD8AC382973CD Ref B: BY3EDGE0320 Ref C: 2025-03-19T02:21:21Z'
+      Date:
+      - Wed, 19 Mar 2025 02:21:20 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Wed, 19 Mar 2025 02:21:21 GMT
+- request:
+    method: head
+    uri: http://msn.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 301
+      message: Moved Permanently
+    headers:
+      Content-Length:
+      - '0'
+      Location:
+      - https://msn.com/
+      X-Msedge-Ref:
+      - 'Ref A: CB37D83C090B422FA00F5C3546CED599 Ref B: BY3EDGE0115 Ref C: 2025-03-19T02:21:21Z'
+      Date:
+      - Wed, 19 Mar 2025 02:21:20 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Wed, 19 Mar 2025 02:21:21 GMT
+- request:
+    method: head
+    uri: https://msn.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 301
+      message: Moved Permanently
+    headers:
+      Content-Length:
+      - '0'
+      Location:
+      - https://www.msn.com/
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Accept-Ch:
+      - Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-Full-Version-List,
+        Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform, Sec-CH-UA-Platform-Version
+      X-Msedge-Ref:
+      - 'Ref A: 2EB60B91DAEC4D73838C0159AA6363FE Ref B: PAOEDGE0620 Ref C: 2025-03-19T02:21:21Z'
+      Date:
+      - Wed, 19 Mar 2025 02:21:20 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Wed, 19 Mar 2025 02:21:21 GMT
+- request:
+    method: head
+    uri: https://www.msn.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Cache-Control:
+      - no-store, no-cache
+      Pragma:
+      - no-cache
+      Content-Length:
+      - '0'
+      X-Fabric-Cluster:
+      - pmeprodwus
+      Nel:
+      - '{"report_to":"network-errors","max_age":604800,"success_fraction":0.001,"failure_fraction":0.5}'
+      Report-To:
+      - '{"group":"network-errors","max_age":604800,"endpoints":[{"url":"https://deff.nelreports.net/api/report?cat=msn"}]},{"group":"csp-endpoint","max_age":86400,"endpoints":[{"url":"https://deff.nelreports.net/api/report"}]}'
+      Strict-Transport-Security:
+      - max-age=1209600; includeSubDomains; preload
+      X-Ceto-Ref:
+      - 67da2a215e12499381a9ceb349feabef|AFD:6D758C850CBE42D69B39D485A448220B|2025-03-19T02:21:21.811Z
+      X-Cache:
+      - CONFIG_NOCACHE
+      Accept-Ch:
+      - Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Full-Version, Sec-CH-UA-Full-Version-List,
+        Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform, Sec-CH-UA-Platform-Version
+      X-Msedge-Ref:
+      - 'Ref A: 6D758C850CBE42D69B39D485A448220B Ref B: BY3EDGE0408 Ref C: 2025-03-19T02:21:21Z'
+      Date:
+      - Wed, 19 Mar 2025 02:21:21 GMT
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Wed, 19 Mar 2025 02:21:21 GMT
+recorded_with: VCR 6.3.1

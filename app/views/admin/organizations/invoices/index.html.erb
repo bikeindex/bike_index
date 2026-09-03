@@ -1,0 +1,16 @@
+<%= render(Pages::Admin::Organizations::Tabs::Component.new(organization: @organization, active: :invoices, display_dev_info: display_dev_info?)) %>
+
+<%= render(Pages::Admin::Invoices::Table::Component.new(invoices: @invoices)) %>
+
+<h2 class="mt-5">
+  <%= @organization.name %> has
+  <%= pluralize(@organization.payments.count, "payment") %>
+</h2>
+
+<p class="less-strong">
+  You can add invoices to payments by editing them. If you don't see a payment
+  in this list, <%= link_to "search the payments", admin_payments_path %> and
+  add it by editing it.
+</p>
+
+<%= render(Pages::Admin::Organizations::PaymentsTable::Component.new(organization: @organization)) %>

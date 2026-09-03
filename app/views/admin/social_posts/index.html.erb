@@ -1,0 +1,69 @@
+<% nav_header_list_items = capture do %>
+  <li>
+    <% reposts_hidden = Binxtils::InputNormalizer.boolean(params[:search_repost]) %>
+
+    <%# the component escapes the label, so writing &amp; here would double-escape %>
+    <%= render(UI::ButtonLink::Component.new(size: :sm, active: reposts_hidden,
+          text: reposts_hidden ? "OG & Reposts" : "OG posts only",
+          href: reposts_hidden ? admin_social_posts_path(sortable_search_params.except(:search_repost)) : admin_social_posts_path(sortable_search_params.merge(search_repost: true)))) %>
+  </li>
+
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: @search_kind == "all" ? "All kinds" : "#{@search_kind.gsub(/_?post/, "").humanize} posts", button_size: :sm,
+          active: @search_kind != "all")) do |dropdown| %>
+      <% permitted_search_kinds.each do |kind| %>
+        <% kind_active = @search_kind == kind %>
+        <% kind_display = kind == "all" ? "All kinds" : "#{kind.gsub(/_?post/, "").humanize} posts" %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind_display, path: admin_social_posts_path(sortable_search_params.merge(search_kind: (kind_active ? nil : kind))), match_params: {search_kind: kind}) } %>
+
+        <% if kind == "not_stolen" %>
+          <% dropdown.with_entry_divider %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </li>
+
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "New Post", href: new_admin_social_post_path, color: :primary, size: :sm)) %>
+  </li>
+<% end %>
+
+<% admin_search_form = capture do %>
+  <div class="row mt-4 mb-4">
+    <div class="col-sm-5">
+      <% if @social_account.present? %>
+        <strong>
+          from
+          <%= link_to @social_account.screen_name, admin_social_account_path(@social_account) %>
+        </strong>
+      <% end %>
+    </div>
+
+    <div class="col-md-7">
+      <%= form_tag admin_social_posts_path, method: :get, class: "form-inline" do %>
+        <%= render partial: "/shared/hidden_search_fields" %>
+        <%= hidden_field_tag :search_social_account_id, params[:search_social_account_id] %>
+
+        <div class="form-group ml-auto mr-2 mb-2">
+          <%= text_field_tag :query, params[:query], placeholder: "Search posts", class: "form-control" %>
+        </div>
+
+        <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<% table_view = capture do %>
+  <%= render partial: "/admin/social_posts/table", locals: {social_posts: @social_posts, render_sortable: true, skip_total: true} %>
+<% end %>
+
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @social_posts,
+  viewing: "Posts",
+  nav_header_list_items:,
+  chart_collection: @render_chart && matching_social_posts,
+  admin_search_form:,
+  table_view:,
+)) %>

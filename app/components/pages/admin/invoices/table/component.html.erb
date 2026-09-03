@@ -1,0 +1,100 @@
+<% organization_for = method(:organization_for) %>
+<% invoice_link = method(:invoice_link) %>
+<% end_at_class = method(:end_at_class) %>
+
+<%= render(UI::Table::Component.new(records:, render_sortable: @render_sortable)) do |table| %>
+  <% table.column(sortable: "id", label: "#") do |invoice| %>
+    <%= invoice_link.call(invoice) %>
+  <% end %>
+
+  <% table.column(label: "Active") do |invoice| %>
+    <% if invoice.active? %>
+      <small class="text-success tw:block">Active</small>
+    <% end %>
+
+    <% previous_invoice = invoice.previous_invoice %>
+
+    <% if previous_invoice.present? %>
+      <small class="twless-strong tw:mt-1 tw:block">Follows #<%= previous_invoice.id %></small>
+    <% end %>
+  <% end %>
+
+  <% if @display_organization %>
+    <% table.column(sortable: "organization_id", label: "Organization") do |invoice| %>
+      <% organization = organization_for.call(invoice) %>
+
+      <%= link_to organization.short_name, admin_organization_path(organization.to_param) %>
+      <%= link_to search_emoji, admin_invoices_path(organization_id: organization.to_param) %>
+
+      <% if organization.deleted? %>
+        <small class="text-danger">organization is deleted!</small>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "subscription_start_at", label: "Start") do |invoice| %>
+    <%= render(UI::Time::Component.new(time: invoice.subscription_start_at)) %>
+  <% end %>
+
+  <% table.column(sortable: "subscription_end_at", label: "End") do |invoice| %>
+    <% if invoice.endless? %>
+      <small class="twless-strong">endless</small>
+    <% elsif invoice.subscription_end_at.present? %>
+      <span class="<%= end_at_class.call(invoice) %>">
+        <%= render(UI::Time::Component.new(time: invoice.subscription_end_at)) %>
+      </span>
+    <% end %>
+  <% end %>
+
+  <% unless @skip_discount_due %>
+    <% table.column(sortable: "amount_due_cents", label: "$ Due") do |invoice| %>
+      <%= invoice.amount_due_formatted %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "amount_paid_cents", label: "$ Paid") do |invoice| %>
+    <span class="<%= "text-success" if invoice.paid_in_full? %>">
+      <%= invoice.amount_paid_formatted %>
+    </span>
+
+    <% if invoice.payments.any? %>
+      <ul class="tw:list-disc tw:pl-2 tw:text-xs">
+        <% invoice.payments.each do |payment| %>
+          <li>
+            <%= link_to "#{payment.amount_formatted} #{payment.payment_method}", admin_payment_path(payment) %>,
+            <%= render(UI::Time::Component.new(time: payment.created_at)) %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <% if invoice.current? && invoice.paid_money_but_no_cost? %>
+      <em class="tw:block tw:text-sm/4">
+        <strong class="text-danger">doesn't make organization "paid"</strong>
+        even though it is paid - because amount due is $0
+      </em>
+    <% end %>
+  <% end %>
+
+  <% unless @skip_discount_due %>
+    <% table.column(label: "Discount") do |invoice| %>
+      <span class="<%= "text-danger" if invoice.discount_cents > 0 %>">
+        <%= invoice.discount_formatted %>
+      </span>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Features") do |invoice| %>
+    <ul class="tw:mt-1 tw:mb-1 tw:pl-3 tw:text-xs">
+      <% invoice.organization_features.each do |organization_feature| %>
+        <li>
+          <%= link_to organization_feature.name, edit_admin_organization_feature_path(organization_feature) %>
+        </li>
+      <% end %>
+    </ul>
+
+    <small>
+      <%= safe_join(invoice.feature_slugs.map { |slug| content_tag(:code, slug) }, ", ") %>
+    </small>
+  <% end %>
+<% end %>

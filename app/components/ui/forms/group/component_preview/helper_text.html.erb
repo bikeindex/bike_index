@@ -1,0 +1,13 @@
+<%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :username, required: true)) do |group| %>
+    <% group.with_helper_text { "letters, numbers and dashes only" } %>
+  <% end %>
+
+  <%# A content block renders its own field, so it passes helper_text_id along %>
+  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :avatar)) do |group| %>
+    <% group.with_helper_text { "square images look best" } %>
+
+    <%= render(UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :avatar, accept: "image/*",
+        html_options: {"aria-describedby" => group.helper_text_id})) %>
+  <% end %>
+<% end %>

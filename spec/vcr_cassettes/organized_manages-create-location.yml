@@ -123,6 +123,97 @@ http_interactions:
            ],
            "status" : "OK"
         }
-    http_version:
   recorded_at: Wed, 17 Jun 2020 16:44:25 GMT
-recorded_with: VCR 5.0.0
+- request:
+    method: get
+    uri: https://maps.googleapis.com/maps/api/geocode/json?address=1300%20W%2014th%20Pl,%20Chicago,%20IL%2060608,%20United%20States&key=<GOOGLE_GEOCODER>&language=en&sensor=false
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Fri, 30 Jan 2026 04:02:01 GMT
+      Pragma:
+      - no-cache
+      Expires:
+      - Fri, 01 Jan 1990 00:00:00 GMT
+      Cache-Control:
+      - no-cache, must-revalidate
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Goog-Maps-Metro-Area:
+      - Chicago, IL
+      Content-Security-Policy-Report-Only:
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:213:0
+      Cross-Origin-Opener-Policy-Report-Only:
+      - same-origin; report-to=msaifdggmnwc:213:0
+      Report-To:
+      - '{"group":"msaifdggmnwc:213:0","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:213:0"}],}'
+      Server:
+      - mafe
+      Content-Length:
+      - '2971'
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      Server-Timing:
+      - gfet4t7; dur=109
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+    body:
+      encoding: UTF-8
+      string: "{\n   \"results\" : \n   [\n      {\n         \"address_components\"
+        : \n         [\n            {\n               \"long_name\" : \"1300\",\n
+        \              \"short_name\" : \"1300\",\n               \"types\" : \n               [\n
+        \                 \"street_number\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"West 14th Place\",\n               \"short_name\"
+        : \"W 14th Pl\",\n               \"types\" : \n               [\n                  \"route\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Little Italy\",\n               \"short_name\" : \"Little Italy\",\n               \"types\"
+        : \n               [\n                  \"neighborhood\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Chicago\",\n               \"short_name\" : \"Chicago\",\n               \"types\"
+        : \n               [\n                  \"locality\",\n                  \"political\"\n
+        \              ]\n            },\n            {\n               \"long_name\"
+        : \"Cook County\",\n               \"short_name\" : \"Cook County\",\n               \"types\"
+        : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Illinois\",\n               \"short_name\"
+        : \"IL\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"United States\",\n               \"short_name\"
+        : \"US\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"60608\",\n               \"short_name\" :
+        \"60608\",\n               \"types\" : \n               [\n                  \"postal_code\"\n
+        \              ]\n            }\n         ],\n         \"formatted_address\"
+        : \"1300 W 14th Pl, Chicago, IL 60608, USA\",\n         \"geometry\" : \n
+        \        {\n            \"location\" : \n            {\n               \"lat\"
+        : 41.8627292,\n               \"lng\" : -87.65921139999999\n            },\n
+        \           \"location_type\" : \"ROOFTOP\",\n            \"viewport\" : \n
+        \           {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 41.8639556802915,\n                  \"lng\" : -87.65785836970849\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 41.8612577197085,\n                  \"lng\" : -87.66055633029151\n               }\n
+        \           }\n         },\n         \"navigation_points\" : \n         [\n
+        \           {\n               \"location\" : \n               {\n                  \"latitude\"
+        : 41.8625472,\n                  \"longitude\" : -87.65920539999999\n               }\n
+        \           }\n         ],\n         \"place_id\" : \"ChIJz3ybaQItDogRNfoaM3L_C90\",\n
+        \        \"types\" : \n         [\n            \"street_address\",\n            \"subpremise\"\n
+        \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
+  recorded_at: Fri, 30 Jan 2026 04:02:01 GMT
+recorded_with: VCR 6.3.1

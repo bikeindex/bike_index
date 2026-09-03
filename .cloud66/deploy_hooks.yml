@@ -1,7 +1,7 @@
 production:
   # Install postgres (to enable db:structure:load) and ripgrep
   first_thing:
-    - command: sudo apt-get -y install postgresql-client-common ripgrep
+    - command: sudo apt-get -y install postgresql-client-common ripgrep libvips
       target: rails
       sudo: true
       apply_during: build_only
@@ -26,9 +26,9 @@ production:
       target: rails
       apply_during: build_only
 
-    - source: /.cloud66/papertrail.sh
-      destination: /tmp/papertrail.sh
+  last_thing:
+    # Trigger honeybadger deploy hook
+    - command: cd $RAILS_STACK_PATH && bundle exec rake trigger_honeybadger_deploy
       target: rails
-      sudo: true
       execute: true
-      apply_during: build_only
+      run_on: single_server

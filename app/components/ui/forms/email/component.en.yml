@@ -1,0 +1,11 @@
+---
+en:
+  components:
+    ui:
+      forms:
+        email:
+          did_you_mean_html: Did you mean %{email}?
+          not_real: >-
+            That doesn't look like your real email address. Please enter an email
+            address where you receive email
+          submit_anyway: Submit form anyway

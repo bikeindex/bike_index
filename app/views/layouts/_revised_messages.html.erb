@@ -1,0 +1,28 @@
+<%# Flash messages render via UI::Alerts::FlashMessage; this block holds page errors %>
+<%# and the alerts BikeIndexAlerts adds client side (revised/components/alerts.coffee) %>
+
+<div class="bootstrapstyle primary-alert-block">
+  <% if @page_errors.present? %>
+    <%# Primarily used for form object errors %>
+    <% title = t(".please_fix_the_following", errors: pluralize(@page_errors.count, t(".error"))) %>
+    <% error_body = capture do %>
+      <ul>
+        <% @page_errors = @page_errors.full_messages if @page_errors.is_a?(ActiveModel::Errors) %>
+
+        <% @page_errors.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    <% end %>
+    <%= render partial: '/shared/alert', locals: { body: error_body, title: title } %>
+  <% end %>
+</div>
+
+<script id="alert-template" type="x-tmpl-mustache"> <%# herb:disable html-allowed-script-type %>
+  <div class="alert alert-{{alert_type}} in" data-seconds="{{seconds}}">
+    <button aria-label="Close" class="close" data-dismiss="alert" type="button">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    {{alert_body}}
+  </div>
+</script>

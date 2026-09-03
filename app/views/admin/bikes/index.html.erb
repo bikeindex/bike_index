@@ -1,0 +1,181 @@
+<% show_search_statuses = !@ignored_only %>
+
+<% nav_header_list_items = capture do %>
+  <%= render(Pages::Admin::Bikes::Index::Filters::Component.new(index: admin_index_state, motorized: @motorized,
+        multi_delete: @multi_delete, origin_search_type: @origin_search_type,
+        pos_search_type: @pos_search_type, period: @period)) %>
+<% end %>
+
+<% rendered_chart = nil %>
+
+<% if @render_chart %>
+  <% rendered_chart = capture do %>
+    <% series = [{name: "Bikes", data: UI::Chart::Component.time_range_counts(collection: available_bikes.reorder(nil), time_range: @time_range, column: "bikes.created_at")}] %>
+    <%= render(UI::Chart::Component.new(series:, time_range: @time_range)) %>
+  <% end %>
+<% end %>
+
+<% admin_search_form = capture do %>
+  <div class="twwiderow tw:mt-4">
+    <div>
+      <% if current_organization.present? %>
+        <p>
+          <% if params[:search_only_creation_organization].present? %>
+            Viewing only bikes created by
+            <em><%= current_organization.name %></em>
+            <%= link_to "view all associated bikes", url_for(sortable_search_params.merge(search_only_creation_organization: nil)) %>
+          <% else %>
+            Viewing all associated <em><%= current_organization.name %></em>
+            bikes -
+            <%= link_to "view only bikes created by", url_for(sortable_search_params.merge(search_only_creation_organization: true)) %>
+          <% end %>
+          |
+          <%= link_to "org bikes view", organization_registrations_path(organization_id: current_organization.to_param) %>
+        </p>
+      <% end %>
+
+      <% if @ignored_only %>
+        <p>
+          Viewing only <strong>ignored</strong> bikes
+          <em>(deleted, test, spam)</em>
+          <%= link_to "view not ignored bikes", url_for(sortable_search_params.merge(search_ignored: false)), class: "twlink tw:text-sm" %>
+        </p>
+      <% end %>
+
+      <% if @search_email.present? %>
+        <p>
+          Viewing only bikes <strong>sent to</strong>
+          <code><%= @search_email %></code>
+          <%= link_to "view sent to any emails", url_for(sortable_search_params.merge(search_email: nil)), class: "twlink tw:text-sm" %>
+        </p>
+      <% end %>
+
+      <% if @search_domain.present? %>
+        <p>
+          Viewing only bikes <strong>from the domain</strong>
+          <code><%= @search_domain %></code>
+          <%= link_to "view sent to any domain", url_for(sortable_search_params.merge(search_domain: nil)), class: "twlink tw:text-sm" %>
+        </p>
+      <% end %>
+
+      <% if params[:search_model_audit_id].present? %>
+        <p>
+          Viewing only for model audit
+          <% if @model_audit.present? %>
+            <%= model_audit_display(@model_audit, truncate: true) %>
+          <% else %>
+            <code>ID: <%= params[:search_model_audit_id] %></code>
+          <% end %>
+          <%= link_to "view for any model audit", url_for(sortable_search_params.merge(search_model_audit_id: nil)), class: "twlink tw:text-sm" %>
+        </p>
+      <% end %>
+
+      <% if params[:search_doorkeeper_app_id].present? %>
+        <p>
+          Viewing only for API Application
+          <% if @doorkeeper_app.present? %>
+            <%= link_to @doorkeeper_app.name, oauth_application_path(@doorkeeper_app) %>
+          <% else %>
+            <code>ID: <%= params[:search_doorkeeper_app_id] %></code>
+            <span class="twless-strong">(no app with that ID)</span>
+          <% end %>
+          <%= link_to "view for any API Application", url_for(sortable_search_params.merge(search_doorkeeper_app_id: nil)), class: "twlink tw:text-sm" %>
+          <em class="twless-strong tw:text-xs">
+            NOTE: only tracked since
+            <span class="localizeTime"><%= START_TRACKING_REGISTRATION_APP_ID_AT %></span>
+          </em>
+        </p>
+      <% end %>
+
+      <% if params[:serial].present? %>
+        <p>
+          Viewing only bikes <strong>with normalized serials matching</strong>
+          <code><%= @serial_normalized %></code>
+          <%= link_to "view with any serial", url_for(sortable_search_params.merge(serial: nil)), class: "twlink tw:text-sm" %>
+        </p>
+      <% end %>
+
+      <% if params[:search_manufacturer].present? %>
+        <p>
+          <% if @manufacturer.present? %>
+            Made by
+            <%= link_to @manufacturer.name, admin_manufacturer_path(@manufacturer) %>
+            <% if @manufacturer.official_organization.present? %>
+              <small class="twless-strong">
+                (view
+                <%= link_to "official org", admin_organization_path(@manufacturer.official_organization.to_param) %>)
+              </small>
+            <% end %>
+          <% else %>
+            No manufacturer found for
+            <code><%= params[:search_manufacturer] %></code>
+          <% end %>
+
+          <%= link_to "view all manufacturer bikes", url_for(sortable_search_params.merge(search_manufacturer: nil)), class: "twlink tw:text-sm" %>
+        </p>
+      <% end %>
+    </div>
+
+    <div>
+      <%= form_tag admin_bikes_path, method: :get, data: {controller: "ui--collapse"} do %>
+        <%= render partial: "/shared/hidden_search_fields", locals: {include_primary_activity: true} %>
+
+        <%= hidden_field_tag :search_pos, params[:search_pos] %>
+        <%= hidden_field_tag :search_origin, params[:search_origin] %>
+        <%= hidden_field_tag :search_only_creation_organization, params[:search_only_creation_organization] %>
+
+        <% if show_search_statuses %>
+          <%= render(Pages::Admin::Bikes::Index::SearchStatuses::Component.new(index: admin_index_state,
+                searched_statuses: @searched_statuses, default_statuses: @default_statuses,
+                not_default_statuses: @not_default_statuses, display_dev_info: display_dev_info?)) %>
+        <% end %>
+
+        <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-2">
+          <% if show_search_statuses %>
+            <%= render(UI::Button::Component.new(size: :sm, active: @not_default_statuses,
+                  html_class: "tw:inline-flex tw:items-center tw:gap-1.5",
+                  data: {action: "click->ui--collapse#toggle", "ui--collapse-target": "trigger"})) do %>
+              <span class="tw:inline-block tw:transition-transform tw:duration-200" data-ui--collapse-target="chevron"><span class="tw:flex"><%= render UI::IconChevron::Component.new %></span></span>
+              Search statuses
+            <% end %>
+          <% end %>
+
+          <%= text_field_tag :serial, params[:serial], placeholder: "Find by serial", class: "twinput tw:w-auto" %>
+
+          <%= text_field_tag :search_phone, params[:search_phone], placeholder: "Find by phone", class: "twinput tw:w-auto" %>
+
+          <% if @search_domain.present? %>
+            <%= text_field_tag :search_domain, @search_domain, placeholder: "Search bikes by domain", class: "twinput tw:w-auto" %>
+          <% else %>
+            <%= text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by email", class: "twinput tw:w-auto" %>
+          <% end %>
+
+          <%= render(UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search")) %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<% count_detail = capture do %>
+  &mdash; <%= number_display(Bike.count) %> publicly registered
+  <em>(<%= number_display(Bike.where("created_at >= ?", Time.current.beginning_of_day).count) %> today)</em>,
+  <%= number_display(Ownership.where(current: true, claimed: true).count) %>
+  claimed, <%= number_display(PublicImage.count) %> bike images
+  <em>(<%= number_display(PublicImage.where("created_at >= ?", Time.current.beginning_of_day).count) %> today)</em>
+<% end unless admin_search_filtered? %>
+
+<% table_view = capture do %>
+  <%= render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:, display_dev_info: display_dev_info?, show_serial: params[:show_serial].present?, skip_manufacturer_link: params[:search_manufacturer].present?, render_sortable: true, render_multi_check: @multi_delete) %>
+<% end %>
+
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @bikes,
+  viewing: "Bikes",
+  nav_header_list_items:,
+  rendered_chart:,
+  admin_search_form:,
+  table_view:,
+  count_detail:,
+)) %>

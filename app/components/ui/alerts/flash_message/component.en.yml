@@ -1,0 +1,14 @@
+---
+en:
+  components:
+    ui:
+      alerts:
+        flash_message:
+          signed_in_html: >-
+            You're signed in! You can %{link} if you prefer not to sign in via an
+            emailed link.
+          signed_in_link: set a password to sign in
+          signed_up_html: >-
+            You've signed up for Bike Index! You can %{link} if you prefer not to
+            sign in via an emailed link.
+          signed_up_link: set a password to sign in

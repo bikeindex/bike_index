@@ -1,0 +1,16 @@
+- if SocialAccount.active.errored.any?
+  .row.mt-4.mb-4
+    .alert.alert-danger.col-md-6.ml-auto.mr-auto
+      %h4
+        %strong.text-danger
+          = pluralize(SocialAccount.active.errored.count, "Social account")
+        with errors
+        %em.text-success
+          = link_to "review errors", admin_social_accounts_path(sort: "last_error_at")
+      %p
+        This will prevent posting for areas served by:
+        %br
+        %em
+          = SocialAccount.active.errored.pluck(:screen_name).sort.join(", ")
+
+      = link_to "Log in with any of these accounts to refresh their credentials", "/auth/twitter", class: "btn btn-success"

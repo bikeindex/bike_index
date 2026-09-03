@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: hot_sheet_configurations
+# Database name: primary
 #
 #  id                         :bigint           not null, primary key
 #  is_on                      :boolean          default(FALSE)
@@ -27,9 +28,9 @@ class HotSheetConfiguration < ApplicationRecord
   validates_presence_of :organization_id, :send_seconds_past_midnight, :search_radius_miles
   validate :ensure_location_if_on
 
-  before_validation :set_calculated_attributes
-
   delegate :search_coordinates, :metric_units?, to: :organization, allow_nil: true
+
+  before_validation :set_calculated_attributes
 
   scope :on, -> { where(is_on: true) }
 
@@ -50,7 +51,7 @@ class HotSheetConfiguration < ApplicationRecord
   end
 
   def timezone
-    TimeZoneParser.parse(timezone_str)
+    Binxtils::TimeZoneParser.parse(timezone_str)
   end
 
   def time_in_zone
@@ -83,13 +84,14 @@ class HotSheetConfiguration < ApplicationRecord
 
   def set_calculated_attributes
     # Store a parsed value - needs to store name, because timeparser can't parse timezone.to_s
-    self.timezone_str = TimeZoneParser.parse(timezone_str)&.name
+    self.timezone_str = Binxtils::TimeZoneParser.parse(timezone_str)&.name
     self.send_seconds_past_midnight ||= 21_600 # 6am
   end
 
   def ensure_location_if_on
     return true unless on?
     return true if search_coordinates.count(&:present?) == 2
+
     self.is_on = false
     errors.add(:base, MISSING_LOCATION_ERROR)
   end

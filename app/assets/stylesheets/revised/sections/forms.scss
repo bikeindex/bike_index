@@ -4,11 +4,6 @@ input[type="checkbox"], input[type="radio"] {
 //
 // Input helpers
 //
-.hide-selectize-dropdown-arrow {
-  .selectize-control.single .selectize-input:after {
-    display: none;
-  }
-}
 
 .form-circle-item {
   // Mixin for help blocks
@@ -34,13 +29,19 @@ a.optional-form-block {
   cursor: pointer;
   color: $gray;
 
-  &:hover {
+  // Keyboard focus matches hover (blue link + circle) instead of a native ring
+  &:hover,
+  &:focus-visible {
     color: $link-color;
     text-decoration: none;
 
     .context-display-help {
       color: $link-color;
     }
+  }
+
+  &:focus {
+    outline: none;
   }
 }
 
@@ -60,6 +61,14 @@ a.optional-form-block {
     margin-bottom: 1.5rem;
     display: flex !important;
     flex-wrap: wrap;
+  }
+}
+
+.shown-other {
+  display: none;
+
+  &.unhidden {
+    display: block;
   }
 }
 

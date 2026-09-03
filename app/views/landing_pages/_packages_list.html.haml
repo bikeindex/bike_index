@@ -26,10 +26,10 @@
         %a.showPlanFeatures.collapsed{ href: "##{plan}_features", "aria-controls" => "#{plan}_features", "data-toggle" => "collapse" }
           %span.uncollapsed
             = t(".see_features")
-            %i.fas.fa-chevron-down
+            = render UI::IconChevron::Component.new(direction: :down, html_class: "tw:ml-1")
           %span.incollapsed
             = t(".hide_features")
-            %i.fas.fa-chevron-up
+            = render UI::IconChevron::Component.new(direction: :up, html_class: "tw:ml-1")
         %ul.collapse{ id: "#{plan}_features" }
           - plan_features.select { |f| f[plan].present? }.each do |feature|
             %li

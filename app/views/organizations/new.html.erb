@@ -1,0 +1,10 @@
+<%= stylesheet_link_tag "kelsey_styles", "data-turbo-track" => "reload" %>
+
+<div class="container">
+  <h1><%= t(".bike_index_for_organizations") %></h1>
+  <%= render(Pages::Homepage::ForButtons::Component.new(skip_theft: true)) %>
+
+  <div class="mt-4"></div>
+
+  <%= render "new_form" %>
+</div>

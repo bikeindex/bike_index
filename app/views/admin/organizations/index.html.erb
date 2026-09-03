@@ -1,0 +1,11 @@
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  viewing: controller_name.humanize,
+  collection: @organizations,
+  nav_header_list_items: render(Pages::Admin::Organizations::Index::Filters::Component.new(search_paid: @search_paid, index: admin_index_state)),
+  chart_collection: @render_chart && matching_organizations,
+  admin_search_form: render(Pages::Admin::Organizations::Index::SearchForm::Component.new(search_paid: @search_paid,
+    features_and_settings_ids: @features_and_settings_ids, index: admin_index_state)),
+  table_view: render(Pages::Admin::Organizations::Table::Component.new(organizations: @organizations, sort_state:,
+    render_sortable: true, render_deleted: @render_deleted))
+)) %>

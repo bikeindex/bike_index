@@ -1,19 +1,20 @@
 class SingleSignOn
   ACCESSORS = [:nonce, :name, :username, :email, :avatar_url, :avatar_force_update, :require_activation,
-               :about_me, :external_id, :return_sso_url, :admin, :moderator, :suppress_welcome_message]
+    :about_me, :external_id, :return_sso_url, :admin, :moderator, :suppress_welcome_message]
   FIXNUMS = []
   BOOLS = [:avatar_force_update, :admin, :moderator, :require_activation, :suppress_welcome_message]
   NONCE_EXPIRY_TIME = 10.minutes
 
   attr_accessor(*ACCESSORS)
+
   attr_accessor :sso_secret, :sso_url
 
   def self.sso_secret
-    raise RuntimeError, "sso_secret not implemented on class, be sure to set it on instance"
+    raise "sso_secret not implemented on class, be sure to set it on instance"
   end
 
   def self.sso_url
-    raise RuntimeError, "sso_url not implemented on class, be sure to set it on instance"
+    raise "sso_url not implemented on class, be sure to set it on instance"
   end
 
   def self.parse(payload, sso_secret = nil)
@@ -23,10 +24,10 @@ class SingleSignOn
     parsed = Rack::Utils.parse_query(payload)
     if sso.sign(parsed["sso"]) != parsed["sig"]
       diags = "\n\nsso: #{parsed["sso"]}\n\nsig: #{parsed["sig"]}\n\nexpected sig: #{sso.sign(parsed["sso"])}"
-      if parsed["sso"] =~ /[^a-zA-Z0-9=\r\n\/+]/m
-        raise RuntimeError, "The SSO field should be Base64 encoded, using only A-Z, a-z, 0-9, +, /, and = characters. Your input contains characters we don't understand as Base64, see http://en.wikipedia.org/wiki/Base64 #{diags}"
+      if /[^a-zA-Z0-9=\r\n\/+]/m.match?(parsed["sso"])
+        raise "The SSO field should be Base64 encoded, using only A-Z, a-z, 0-9, +, /, and = characters. Your input contains characters we don't understand as Base64, see http://en.wikipedia.org/wiki/Base64 #{diags}"
       else
-        raise RuntimeError, "Bad signature for payload #{diags}"
+        raise "Bad signature for payload #{diags}"
       end
     end
 
@@ -78,13 +79,13 @@ class SingleSignOn
 
   def payload
     payload = Base64.encode64(unsigned_payload)
-    "sso=#{CGI::escape(payload)}&sig=#{sign(payload)}"
+    "sso=#{CGI.escape(payload)}&sig=#{sign(payload)}"
   end
 
   def unsigned_payload
     payload = {}
     ACCESSORS.each do |k|
-      next if (val = send k) == nil
+      next if (val = send k).nil?
 
       payload[k] = val
     end

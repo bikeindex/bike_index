@@ -1,0 +1,80 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative "../config/environment"
+require "benchmark"
+
+VERBOSE = ARGV.include?("-v") || ARGV.include?("--verbose")
+
+# Coordinates for common cities
+COORDS = {
+  chicago: [41.8781, -87.6298],
+  nyc: [40.7128, -74.0060],
+  la: [34.0522, -118.2437]
+}.freeze
+
+def bounding_box(lat, lng, distance_miles)
+  # Approximate degrees per mile
+  lat_delta = distance_miles / 69.0
+  lng_delta = distance_miles / (69.0 * Math.cos(lat * Math::PI / 180))
+  [lat - lat_delta, lng - lng_delta, lat + lat_delta, lng + lng_delta]
+end
+
+def bench(name, query_params, results, iterations: 5)
+  interpreted = BikeSearchable.searchable_interpreted_params(query_params)
+  times = iterations.times.map { Benchmark.realtime { Bike.search(interpreted).count } }
+  avg = (times.sum / times.size * 1000).round(1)
+  puts "#{avg.to_s.rjust(8)}ms  #{name}" if VERBOSE
+  results << avg
+end
+
+def bench_proximity(name, coords, distance, results, iterations: 5)
+  interpreted = {
+    stolenness: "proximity",
+    bounding_box: bounding_box(coords[0], coords[1], distance)
+  }
+  times = iterations.times.map { Benchmark.realtime { Bike.search(interpreted).count } }
+  avg = (times.sum / times.size * 1000).round(1)
+  puts "#{avg.to_s.rjust(8)}ms  #{name}" if VERBOSE
+  results << avg
+end
+
+def delimit(n) = n.to_s.gsub(/(\d)(?=(\d{3})+$)/, '\1,')
+
+puts "Bikes: #{delimit(Bike.count)} total, #{delimit(Bike.stolen_or_impounded.count)} stolen"
+puts if VERBOSE
+
+results = []
+manufacturer = Manufacturer.find_by(name: "Trek") || Manufacturer.first
+color = Color.find_by(name: "Black") || Color.first
+color2 = Color.find_by(name: "Red") || Color.second
+
+bench "Stolen (default)", {}, results
+bench "All bikes", {stolenness: "all"}, results
+bench "Non-stolen", {stolenness: "non"}, results
+bench "Serial exact", {serial: "WTU123456"}, results
+bench "Serial partial", {serial: "WTU"}, results
+bench "Manufacturer (#{manufacturer&.name})", {manufacturer: manufacturer&.id}, results
+bench "Color (#{color&.name})", {colors: [color&.id].compact}, results
+bench "Two colors", {colors: [color&.id, color2&.id].compact}, results
+bench "Text query 'trek'", {query: "trek"}, results
+bench "Text query 'blue mountain'", {query: "blue mountain"}, results
+bench "Manufacturer + color", {manufacturer: manufacturer&.id, colors: [color&.id].compact}, results
+bench "Manufacturer + query", {manufacturer: manufacturer&.id, query: "mountain"}, results
+bench "Serial + manufacturer", {serial: "WTU", manufacturer: manufacturer&.id}, results
+bench_proximity "Proximity Chicago 100mi", COORDS[:chicago], 100, results
+bench_proximity "Proximity Chicago 10mi", COORDS[:chicago], 10, results
+bench_proximity "Proximity NYC 50mi", COORDS[:nyc], 50, results
+bench_proximity "Proximity LA 25mi", COORDS[:la], 25, results
+
+# Complex search with proximity
+interpreted = BikeSearchable.searchable_interpreted_params({serial: "WTU", manufacturer: manufacturer&.id, colors: [color&.id].compact})
+interpreted[:stolenness] = "proximity"
+interpreted[:bounding_box] = bounding_box(COORDS[:chicago][0], COORDS[:chicago][1], 100)
+times = 5.times.map { Benchmark.realtime { Bike.search(interpreted).count } }
+avg = (times.sum / times.size * 1000).round(1)
+puts "#{avg.to_s.rjust(8)}ms  Complex: serial+mfg+color+prox" if VERBOSE
+results << avg
+
+puts if VERBOSE
+puts "#{results.sum.round(1).to_s.rjust(8)}ms  TOTAL (#{results.size} searches)"

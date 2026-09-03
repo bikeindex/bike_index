@@ -1,5 +1,5 @@
 .mb-4
-  %h1
+  = render(UI::Header::Component.new) do
     = t(".edit_sticker")
     %strong= @bike_sticker.pretty_code
   - if @bike_sticker.bike_id.present?
@@ -18,7 +18,7 @@
       %td= t(".claimed")
       %td
         - if @bike_sticker.claimed_at.present?
-          %span.convertTime
+          %span.localizeTime
             = l(@bike_sticker.created_at, format: :convert_time)
     %tr
       %td= t(".bike")
@@ -64,7 +64,7 @@
 %div{style: "opacity: 0.7;"}
   %hr.mt-5
 
-  %h3.mt-4 Sticker assignments
+  = render(UI::Header::Component.new(text: "Sticker assignments", tag: :h3, html_class: "mt-4"))
 
   - if bike_sticker_updates.none?
     %p No updates
@@ -80,8 +80,10 @@
         - bike_sticker_updates.reorder(created_at: :desc).each do |bike_sticker_update|
           %tr
             %td
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(bike_sticker_update.created_at, format: :convert_time)
+              - if display_dev_info?
+                %small.code.only-dev-visible= bike_sticker_update.id
             %td
               = bike_sticker_update.creator_kind_humanized
             %td

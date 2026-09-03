@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Rewrites every component's committed MARKUP_DIGEST to the digest of its current markup.
+# Run it after editing markup that renders inside a fragment cache.
+
+require_relative "../config/environment"
+
+Rails.application.eager_load!
+
+updated = ApplicationComponent.descendants
+  .select { |component| component.const_defined?(:MARKUP_DIGEST, false) }
+  .sort_by(&:name)
+  .filter_map do |component|
+    digest = component.calculated_markup_digest
+    next if digest == component::MARKUP_DIGEST
+
+    path = Pathname.new(component.identifier)
+    path.write(path.read.sub(ApplicationComponent::DIGEST_ASSIGNMENT, "\\1#{digest.inspect}"))
+    "#{component}: #{digest}"
+  end
+
+puts updated.any? ? updated.join("\n") : "All component digests are current"

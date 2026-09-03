@@ -5,12 +5,10 @@
 .row
   .col-sm-6
     = form_for [:admin, @bulk_import] do |f|
-      - if @bulk_import.errors.any?
-        = render partial: "/shared/errors", locals: { name: "Bulk Import", obj: @bulk_import }
+      = render(UI::Alerts::ObjectError::Component.new(object: @bulk_import))
 
-      .form-group.fancy-select.unfancy
-        = f.label :organization_id
-        = f.collection_select(:organization_id, Organization.all, :id, :name, { prompt: "Choose organization", required: true }, class: "form-control")
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, label_text: BulkImport.human_attribute_name(:organization_id), required: true)) do
+        = render UI::Forms::Combobox::Component.new(name: :organization_id, form: f, placeholder: "Choose organization", required: true, include_blank: true, options: Organization.all.pluck(:name, :id))
       .form-group
         .input-group
           .custom-file

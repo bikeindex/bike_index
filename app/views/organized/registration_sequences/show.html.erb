@@ -1,0 +1,21 @@
+<%= render(UI::Header::Component.new(html_class: "uncap")) do %>
+  Previewing <strong><%= @registration_sequence.status_display %></strong>
+  registration sequence
+<% end %>
+
+<%#
+  Full-bleed on mobile so the gray runs edge to edge, past the org page's padding. pt
+  cancels the shell's negative top margin (padding doesn't collapse) so the title clears it.
+%>
+
+<div class="tw:mx-[calc(50%_-_50vw)] tw:pt-(--nav-gap) tw:sm:mx-0">
+  <%= render Pages::Org::RegistrationSequence::Preview::Component.new(registration_sequence: @registration_sequence, index: @preview_pagy.page - 1) %>
+</div>
+
+<%# Below the gray. mt-24 clears the flow shell's -mb-18 pull-up. %>
+<div class="tw:mt-24 tw:flex tw:items-baseline tw:gap-4">
+  <%= link_to "← Registration Sequences", organization_registration_sequences_path(organization_id: current_organization.to_param), class: "twlink tw:shrink-0 tw:text-sm" %>
+
+  <%= render UI::Pagination::Component.new(pagy: @preview_pagy,
+    page_params: {organization_id: current_organization.to_param, id: @registration_sequence.id}) %>
+</div>

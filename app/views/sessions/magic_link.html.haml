@@ -1,20 +1,21 @@
 .container
   - if @token.present?
-    .text-center
-      %h3
-        = t(".you_should_be_signed_in_automatically")
-      %p= t(".if_not_click_button")
-      = form_tag sign_in_with_magic_link_session_path, id: "sign_in_with_magic_link", method: "post" do
-        = hidden_field_tag :token, params[:token]
-        %input{ type: "submit", value: t(".sign_in"), class: 'btn btn-success btn-lg' }
-      :javascript
-        document.forms["sign_in_with_magic_link"].submit()
+    = render Pages::Sessions::SignInInterstitial::Component.new(url: sign_in_with_magic_link_session_path, fields: { token: @token, return_to: @return_to })
   - else
     %h3= t(".sign_in_with_magic_link")
-    - if @incorrect_token
-      .alert.alert-warning.mt-2.mb-4
-        %h3.header-font-alt.mb-2=t(".unable_to_auth")
-        %p=t(".reenter_email")
+    - if @failure
+      - header = t(".unable_to_auth")
+      - detail = nil
+      - if @failure == :expired
+        - header = t(".link_expired")
+        - detail = t(".links_work_for", duration: distance_of_time_in_words(User::AUTH_TOKEN_EXPIRY))
+      - elsif @failure == :already_used
+        - header = t(".link_already_used")
+        - detail = t(".only_the_newest_link_works")
+      = render UI::Alerts::Base::Component.new(kind: :warning, header:, margin_classes: "tw:mt-2 tw:mb-4") do
+        - if detail
+          %p= detail
+        %p= t(".reenter_email")
 
     %p= t(".enter_email_address")
 

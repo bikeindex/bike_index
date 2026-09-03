@@ -37,6 +37,27 @@ RSpec.describe BParam, type: :model do
     end
   end
 
+  describe "stolen_attrs" do
+    context "legacy attribute names" do
+      let(:b_param) { BParam.new(params: {stolen_record: {address: "100 Main St", zipcode: "60622", state_id: 12}}) }
+      it "renames to the current attributes" do
+        expect(b_param.stolen_attrs).to eq({"street" => "100 Main St", "postal_code" => "60622", "region_record_id" => 12})
+      end
+      context "nested in stolen_records_attributes" do
+        let(:b_param) { BParam.new(params: {bike: {stolen_records_attributes: {"0" => {zipcode: "60622", street: "100 Main St"}}}}) }
+        it "renames to the current attributes" do
+          expect(b_param.stolen_attrs).to eq({"street" => "100 Main St", "postal_code" => "60622"})
+        end
+      end
+      context "with both legacy and current names" do
+        let(:b_param) { BParam.new(params: {stolen_record: {zipcode: "60622", postal_code: "10007"}}) }
+        it "prefers the current name" do
+          expect(b_param.stolen_attrs).to eq({"postal_code" => "10007"})
+        end
+      end
+    end
+  end
+
   describe "clean_params" do
     context "passed params" do
       it "calls the things we want it to call" do
@@ -262,10 +283,32 @@ RSpec.describe BParam, type: :model do
     end
   end
 
+  describe "image processing" do
+    let(:image_file) { File.open(Rails.root.join("spec", "fixtures", "bike.jpg")) }
+    let(:b_param) { FactoryBot.build(:b_param) }
+
+    # Regression: process_in_background with a non-Delay uploader resized inline in the
+    # request, hitting the 30s Rack::Timeout on bikes#create (Honeybadger 132565677)
+    it "defers version generation to the background job instead of resizing inline" do
+      ImageUploaderBackgrounded.enable_processing = true
+      b_param.image = image_file
+      expect { b_param.save! }.to change(CarrierWaveProcessJob.jobs, :size).by(1)
+      expect(b_param.process_image_upload).to be_nil
+      expect(b_param.image.file).to be_present # original stored synchronously
+      expect(b_param.image.large.file).to be_blank # resized versions deferred to the job
+    ensure
+      ImageUploaderBackgrounded.enable_processing = false
+      b_param.image&.remove!
+      image_file.close
+    end
+  end
+
   describe "additional_registration_fields" do
     let(:params_hash) { {bike: bike_params}.as_json }
     let(:b_param) { BParam.new(params: params_hash) }
-    let(:target_address) { {street: "123 Main St", city: "Nevernever Land", zipcode: "11111", state: "CA"}.as_json }
+    let(:target_address) do
+      {street: "123 Main St", city: "Nevernever Land", postal_code: "11111", region_string: "CA", kind: "ownership"}
+    end
     let(:bike) { Bike.new }
     let(:bike_params) do
       {
@@ -274,21 +317,17 @@ RSpec.describe BParam, type: :model do
         external_image_urls: ["xxxxx"],
         bike_sticker: "xxxx",
         phone: "919929333",
-        street: "123 Main St",
-        city: "Nevernever Land",
-        zipcode: "11111",
-        state: "CA"
+        address_record_attributes: {
+          street: "123 Main St",
+          city: "Nevernever Land",
+          postal_code: "11111",
+          region_string: "CA"
+        }
       }
     end
     before { allow(bike).to receive(:b_params) { [b_param] } }
     it "has the expected fields" do
-      expect(b_param.address("street")).to eq "123 Main St"
-      expect(b_param.address("address")).to eq "123 Main St"
-      expect(b_param.address("city")).to eq "Nevernever Land"
-      expect(b_param.address("address_zipcode")).to eq "11111"
-      expect(b_param.address("state")).to eq "CA"
-
-      expect(b_param.address_hash.except("country")).to eq target_address
+      expect(described_class.address_record_attributes(b_param.bike)).to match_hash_indifferently target_address
       expect(b_param.bike_sticker_code).to eq "xxxx"
       expect(b_param.organization_affiliation).to eq "employee"
       expect(b_param.phone).to eq "919929333"
@@ -513,6 +552,34 @@ RSpec.describe BParam, type: :model do
         expect(result.id).to be_nil
         expect(result.creator_id).to eq user.id
       end
+      context "with no creator" do
+        it "does not return that BParam" do
+          b_param_nil.update_columns(id_token: nil, creator_id: nil)
+          result = BParam.find_or_new_from_token(nil, user_id: user.id)
+          expect(result.is_a?(BParam)).to be_truthy
+          expect(result.id).to be_nil
+          expect(result.creator_id).to eq user.id
+        end
+      end
+    end
+  end
+
+  describe "with_organization_or_no_creator" do
+    it "returns nil for a blank token" do
+      FactoryBot.create(:b_param) # a creator-less b_param that a blank token must not match
+      expect(BParam.with_organization_or_no_creator(nil)).to be_nil
+      expect(BParam.with_organization_or_no_creator("")).to be_nil
+    end
+  end
+
+  describe "string assignments scrub null bytes" do
+    it "saves without raising when input contains a null byte" do
+      b_param = BParam.new
+      b_param.owner_email = "1\u0000foo@example.com"
+      b_param.cycle_type = "tall\u0000-bike"
+      expect(b_param.bike["owner_email"]).to eq "1foo@example.com"
+      expect(b_param.bike["cycle_type"]).to eq "tall-bike"
+      expect { b_param.save! }.not_to raise_error
     end
   end
 
@@ -539,64 +606,80 @@ RSpec.describe BParam, type: :model do
     end
   end
 
-  describe "bike_attrs_from_url_params" do
-    it "returns empty" do
-      expect(BParam.bike_attrs_from_url_params).to eq({})
-      expect(BParam.bike_attrs_from_url_params(status: "asdfasdfasdfasdf")).to eq({})
-      expect(BParam.bike_attrs_from_url_params(status: "status_party")).to eq({})
+  describe "self_made?" do
+    let(:b_param) { BParam.new(params: {bike: {owner_email: "owner@example.com"}}.as_json) }
+    let(:user) { FactoryBot.create(:user_confirmed, email: "owner@example.com") }
+
+    it "is only the registrant's own addresses" do
+      expect(b_param.self_made?(nil)).to be_falsey
+      expect(b_param.self_made?(user)).to be_truthy
+
+      # An additional address is theirs once it's confirmed, and not before
+      user.additional_emails = "second@example.com"
+      b_param.owner_email = " SECOND@example.com"
+      expect(b_param.self_made?(user)).to be_falsey
+      user_email = user.user_emails.find_by(email: "second@example.com")
+      user_email.confirm(user_email.confirmation_token)
+      expect(b_param.self_made?(user)).to be_truthy
+
+      b_param.owner_email = "someone@example.com"
+      expect(b_param.self_made?(user)).to be_falsey
     end
-    context "url_params" do
-      let(:url_params) { ActionController::Parameters.new({status: nil}) }
-      it "returns status_stolen" do
-        expect(BParam.bike_attrs_from_url_params(url_params.permit(:status, :stolen).to_h)).to eq({})
-        expect(BParam.bike_attrs_from_url_params(url_params.permit(:stolen).to_h)).to eq({})
+
+    context "without a user passed" do
+      it "answers for the creator" do
+        expect(b_param.self_made?).to be_falsey
+        b_param.creator = user
+        expect(b_param.self_made?).to be_truthy
       end
     end
-    context "stolen falsey" do
+  end
+
+  describe "status_hash_from_params" do
+    let(:params) { ActionController::Parameters.new(params_hash) }
+    def acparams(hash)
+      ActionController::Parameters.new(hash)
+    end
+    it "returns empty" do
+      expect(BParam.status_hash_from_params).to eq({})
+      expect(BParam.status_hash_from_params(acparams(status: "asdfasdfasdfasdf"))).to eq({})
+      expect(BParam.status_hash_from_params(acparams(status: "status_party"))).to eq({})
+      expect(BParam.status_hash_from_params(acparams(status: nil))).to eq({})
+      expect(BParam.status_hash_from_params(acparams(stolen: nil))).to eq({})
+      expect(BParam.status_hash_from_params(acparams(status: nil, stolen: nil))).to eq({})
+    end
+    context "with stolen value" do
       it "returns empty" do
-        expect(BParam.bike_attrs_from_url_params(stolen: nil)).to eq({})
-        expect(BParam.bike_attrs_from_url_params(stolen: "false")).to eq({})
-        expect(BParam.bike_attrs_from_url_params(stolen: 0)).to eq({})
+        expect(BParam.status_hash_from_params(acparams(stolen: nil))).to eq({})
+        expect(BParam.status_hash_from_params(acparams(stolen: "false"))).to eq({})
+        expect(BParam.status_hash_from_params(acparams(stolen: 0))).to eq({})
       end
     end
     context "stolen truthy" do
       it "returns stolen" do
-        expect(BParam.bike_attrs_from_url_params(stolen: true)).to eq({status: "status_stolen"})
-        expect(BParam.bike_attrs_from_url_params(stolen: "true")).to eq({status: "status_stolen"})
-        expect(BParam.bike_attrs_from_url_params(stolen: 1)).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(stolen: true))).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(stolen: "true"))).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(stolen: 1))).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(stolen: 1, status: nil))).to eq({status: "status_stolen"})
       end
     end
     context "status_stolen" do
       it "returns stolen" do
-        expect(BParam.bike_attrs_from_url_params(status: "status_stolen")).to eq({status: "status_stolen"})
-        expect(BParam.bike_attrs_from_url_params(status: "stolen")).to eq({status: "status_stolen"})
-        expect(BParam.bike_attrs_from_url_params(status: "stolen", stolen: nil)).to eq({status: "status_stolen"})
-      end
-      context "url_params" do
-        let(:url_params) { ActionController::Parameters.new({status: nil, stolen: true}) }
-        it "returns status_stolen" do
-          expect(BParam.bike_attrs_from_url_params(url_params.permit(:status, :stolen).to_h)).to eq({status: "status_stolen"})
-        end
+        expect(BParam.status_hash_from_params(acparams(status: "status_stolen"))).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(status: "stolen"))).to eq({status: "status_stolen"})
+        expect(BParam.status_hash_from_params(acparams(status: "stolen", stolen: nil))).to eq({status: "status_stolen"})
       end
     end
     context "status_impounded" do
       it "returns impounded" do
-        expect(BParam.bike_attrs_from_url_params(status: "status_impounded")).to eq({status: "status_impounded"})
-        expect(BParam.bike_attrs_from_url_params(status: "impounded")).to eq({status: "status_impounded"})
-        expect(BParam.bike_attrs_from_url_params(status: "impounded", stolen: "1")).to eq({status: "status_impounded"})
-      end
-      context "url_params" do
-        let(:url_params) { ActionController::Parameters.new({status: "impounded", stolen: "1"}) }
-        it "returns impounded" do
-          # Make sure slice works
-          expect(BParam.bike_attrs_from_url_params(url_params.permit(:status, :stolen).to_h)).to eq({status: "status_impounded"})
-        end
+        expect(BParam.status_hash_from_params(acparams(status: "status_impounded"))).to eq({status: "status_impounded"})
+        expect(BParam.status_hash_from_params(acparams(status: "impounded"))).to eq({status: "status_impounded"})
+        expect(BParam.status_hash_from_params(acparams(status: "impounded", stolen: "1"))).to eq({status: "status_impounded"})
       end
       context "found" do
-        let(:url_params) { ActionController::Parameters.new({status: "found"}) }
         it "returns impounded" do
-          expect(BParam.bike_attrs_from_url_params(status: "found")).to eq({status: "status_impounded"})
-          expect(BParam.bike_attrs_from_url_params(url_params.permit(:status, :stolen).to_h)).to eq({status: "status_impounded"})
+          expect(BParam.status_hash_from_params(acparams(status: "found"))).to eq({status: "status_impounded"})
+          expect(BParam.status_hash_from_params(acparams(status: "found", stolen: true))).to eq({status: "status_impounded"})
         end
       end
     end
@@ -605,12 +688,12 @@ RSpec.describe BParam, type: :model do
   describe "partial_resent_notifications" do
     let(:b_param) { FactoryBot.create(:b_param_partial_registration, created_at: created_at) }
     let(:created_at) { Time.current }
-    before { EmailPartialRegistrationJob.new.perform(b_param.id) }
+    before { Email::PartialRegistrationJob.new.perform(b_param.id) }
     it "doesn't include initial notification" do
       expect(b_param.partial_notification_pre_tracking?).to be_falsey
       expect(b_param.partial_notifications.count).to eq 1
       expect(b_param.partial_notification_resends.count).to eq 0
-      EmailPartialRegistrationJob.new.perform(b_param.id)
+      Email::PartialRegistrationJob.new.perform(b_param.id)
       b_param.reload
       expect(b_param.partial_notifications.count).to eq 2
       expect(b_param.partial_notification_resends.count).to eq 1
@@ -686,23 +769,67 @@ RSpec.describe BParam, type: :model do
         owner_email: "stuff@something.com",
         b_param_id: nil,
         b_param_id_token: nil,
-        city: nil,
-        country: nil,
         creator_id: nil,
-        state: nil,
-        street: nil,
         updator_id: nil,
-        zipcode: nil,
         status: "status_with_owner",
         propulsion_type_slug: "foot-pedal"
       }
     end
     it "responds with bike_attrs" do
       expect(b_param.safe_bike_attrs({})).to match_hash_indifferently target
+      expect(b_param.safe_bike_attrs({})).to_not have_key(:address_record_attributes)
     end
     context "with new_attrs" do
       it "uses the new_attrs" do
         expect(b_param.safe_bike_attrs({"owner_email" => "e@f.g"})).to match_hash_indifferently target.merge(owner_email: "e@f.g")
+      end
+    end
+    context "with location attrs" do
+      let!(:organization) { FactoryBot.create(:organization) }
+      let!(:state) { FactoryBot.create(:state, :find_or_create, abbreviation: "CO", name: "Colorado") }
+      let(:target) do
+        {
+          email: "stuff@example.com",
+          embeded: "true",
+          b_param_id: nil,
+          b_param_id_token: nil,
+          status: "status_with_owner",
+          propulsion_type_slug: nil,
+          creator_id: nil,
+          updator_id: nil,
+          phone: "1112223333",
+          student_id: "99999999",
+          address_record_attributes: {
+            city: "Golden",
+            country_id: Country.united_states_id,
+            region_string: "CO",
+            street: "1812 Miners Spur, Building 2015 Unit 99999-69",
+            postal_code: "80401",
+            kind: "ownership"
+          }
+        }
+      end
+      context "with address_record" do
+        let(:bike_params) do
+          {
+            phone: "1112223333",
+            student_id: "99999999",
+            email: "stuff@example.com",
+            embeded: "true",
+            address_record_attributes: {
+              city: "Golden",
+              region_string: "CO",
+              street: "1812 Miners Spur, Building 2015 Unit 99999-69",
+              postal_code: "80401",
+              country_id: Country.united_states_id
+            }
+          }
+        end
+        it "returns target attributes" do
+          expect(described_class.address_record_attributes(b_param.bike).except(:region_record_id))
+            .to match_hash_indifferently target[:address_record_attributes].except(:region_record_id)
+          expect(b_param.safe_bike_attrs({})).to match_hash_indifferently target
+        end
       end
     end
     context "top_level_propulsion_type" do
@@ -737,6 +864,171 @@ RSpec.describe BParam, type: :model do
         result = b_param.safe_bike_attrs({})
         expect(result).to match_hash_indifferently target.merge(cycle_type: "tandem", propulsion_type_slug: "foot-pedal")
         expect(result.keys).to include "propulsion_type_slug"
+      end
+    end
+  end
+
+  describe "unfinished_registration?" do
+    let(:b_param) { FactoryBot.create(:b_param, creator:, origin: "register_flow", params: {bike: bike_params}) }
+    let(:creator) { FactoryBot.create(:user_confirmed) }
+    let(:bike_params) { {manufacturer_id: 1, owner_email: creator&.email} }
+
+    it "is unfinished, and alerts the creator" do
+      expect(b_param.unfinished_registration?).to be_truthy
+      expect(creator.reload.alert_slugs).to eq ["unfinished_registration"]
+      expect(creator.user_alerts.active.unfinished_registration.map(&:alertable)).to eq [b_param]
+    end
+
+    context "once the bike is created" do
+      it "resolves the alert" do
+        expect(b_param.unfinished_registration?).to be_truthy
+        expect(creator.reload.alert_slugs).to eq ["unfinished_registration"]
+
+        b_param.update(created_bike_id: FactoryBot.create(:bike).id)
+
+        expect(b_param.unfinished_registration?).to be_falsey
+        expect(creator.reload.alert_slugs).to eq []
+      end
+    end
+
+    # Email::PartialRegistrationJob destroys them for banned email domains
+    context "destroyed" do
+      it "doesn't alert about a registration that's gone" do
+        expect(b_param.unfinished_registration?).to be_truthy
+        expect(creator.reload.alert_slugs).to eq ["unfinished_registration"]
+
+        b_param.destroy
+
+        expect(creator.reload.user_alerts.active.pluck(:kind)).to eq []
+        expect(creator.reload.alert_slugs).to eq []
+      end
+    end
+
+    context "without a manufacturer" do
+      let(:bike_params) { {owner_email: creator.email} }
+
+      it "is not unfinished, and doesn't alert" do
+        expect(b_param.unfinished_registration?).to be_falsey
+        expect(creator.reload.alert_slugs).to eq []
+      end
+    end
+
+    # An organization user registering a customer's bike, or anyone registering a friend's
+    context "owned by someone else" do
+      let(:bike_params) { {manufacturer_id: 1, owner_email: "someone-else@example.com"} }
+
+      it "is unfinished, but isn't the creator's to be alerted about" do
+        expect(b_param.unfinished_registration?).to be_falsey
+        expect(creator.reload.alert_slugs).to eq []
+      end
+    end
+
+    context "owned by a confirmed secondary email of the creator's" do
+      let!(:user_email) { FactoryBot.create(:user_email, user: creator) }
+      let(:bike_params) { {manufacturer_id: 1, owner_email: user_email.email} }
+
+      it "is the creator's own, and alerts" do
+        expect(creator.reload.confirmed_emails).to include user_email.email
+        expect(b_param.unfinished_registration?).to be_truthy
+        expect(creator.reload.alert_slugs).to eq ["unfinished_registration"]
+      end
+    end
+
+    context "with another origin" do
+      let(:b_param) { FactoryBot.create(:b_param, creator:, origin: "api_v2", params: {bike: bike_params}) }
+
+      it "is not unfinished, and doesn't alert" do
+        expect(b_param.unfinished_registration?).to be_falsey
+        expect(creator.reload.alert_slugs).to eq []
+      end
+    end
+
+    context "without a creator" do
+      let(:creator) { nil }
+
+      it "can't be self made, and has nobody to alert" do
+        expect(b_param.unfinished_registration?).to be_falsey
+        expect(UserAlert.count).to eq 0
+      end
+    end
+
+    # Past the window the token stops resuming it, so the alert's own link is dead
+    context "older than the token expiration" do
+      let(:b_param) do
+        FactoryBot.create(:b_param, creator:, origin: "register_flow", params: {bike: bike_params},
+          created_at: Time.current - BParam::TOKEN_EXPIRATION - 1.day)
+      end
+
+      it "is not unfinished, and isn't in the scope" do
+        expect(b_param.unfinished_registration?).to be_falsey
+        expect(BParam.unfinished_registrations.pluck(:id)).to eq []
+        expect(creator.reload.alert_slugs).to eq []
+      end
+    end
+  end
+
+  describe "email confirmation token" do
+    let(:b_param) { BParam.create(params: {bike: {owner_email: "owner@example.com"}}) }
+
+    let(:user) { FactoryBot.create(:user_confirmed) }
+
+    it "mints a token, reuses it and spends it on confirmation" do
+      token = b_param.generate_email_confirmation_token!
+      expect(token).to be_present
+      expect(b_param.email_confirmation_sent_at).to be_within(2.seconds).of Time.current
+
+      # Resending reuses the token, but re-stamps - the stamp is what rate limits it
+      b_param.update(params: b_param.params.merge("email_confirmation_sent_at" => Time.current - 1.hour))
+      expect(b_param.generate_email_confirmation_token!).to eq token
+      expect(b_param.email_confirmation_sent_at).to be_within(2.seconds).of Time.current
+
+      expect(b_param.confirm_email!(creator_id: user.id)).to be_truthy
+      # Single use - confirming spends the token, so there's nothing left to compare against
+      expect(b_param.reload).to have_attributes(email_confirmed?: true,
+        email_confirmation_token: nil, creator_id: user.id)
+    end
+
+    context "with a creator" do
+      let(:creator) { FactoryBot.create(:user_confirmed) }
+      before { b_param.update(creator_id: creator.id) }
+
+      it "keeps the creator it has" do
+        b_param.confirm_email!(creator_id: user.id)
+        expect(b_param.reload.creator_id).to eq creator.id
+      end
+    end
+
+    context "expired token" do
+      let(:expired_token) { SecurityTokenizer.new_token(Time.current - BParam::TOKEN_EXPIRATION - 1.day) }
+      before do
+        b_param.update(params: b_param.params.merge("email_confirmation_token" => expired_token,
+          "email_confirmation_email" => b_param.owner_email))
+      end
+
+      it "reads as expired, and mints a new token" do
+        expect(b_param.email_confirmation_token_expired?).to be_truthy
+
+        expect(b_param.generate_email_confirmation_token!).to_not eq expired_token
+        expect(b_param.email_confirmation_token_expired?).to be_falsey
+      end
+    end
+
+    context "owner_email edited after the link went out" do
+      let!(:token) { b_param.generate_email_confirmation_token! }
+
+      it "drops the token - it only proves the address it was mailed to" do
+        b_param.clean_params({bike: {owner_email: "someone-else@example.com"}}.as_json)
+        b_param.save!
+        expect(b_param.reload.email_confirmation_token).to be_nil
+
+        # A link for the new address is a new token
+        expect(b_param.generate_email_confirmation_token!).to_not eq token
+      end
+
+      it "keeps the token when only the address's casing changes" do
+        b_param.clean_params({bike: {owner_email: "Owner@Example.com"}}.as_json)
+        b_param.save!
+        expect(b_param.reload.email_confirmation_token).to eq token
       end
     end
   end

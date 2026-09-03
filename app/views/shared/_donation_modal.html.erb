@@ -1,0 +1,23 @@
+<%# NOTE: rendered from inside a cached wrapper. Make sure to break that if changing %>
+<div id="donationModal" class="modal fade">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate-block">
+      <div class="modal-body select-amount" style="padding: 12px 15px 24px;">
+        <button
+          class="close"
+          aria-label="Close"
+          data-dismiss="modal"
+          type="button"
+        >
+          <span aria-hidden="true"> &times; </span>
+        </button>
+
+        <%= image_tag "revised/logo_blue_black.svg", class: "modal-title-logo", alt: "Bike Index home" %>
+
+        <h2 class="modal-title uncap"><%= t(".donation_header") %></h2>
+        <hr>
+        <%= render partial: "/shared/donation_form", locals: {kind: "modal", is_cached: true} %>
+      </div>
+    </div>
+  </div>
+</div>

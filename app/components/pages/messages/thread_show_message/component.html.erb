@@ -1,0 +1,56 @@
+<div
+  id="message-<%= @marketplace_message.id %>"
+  class="tw:mt-4 tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:p-4 tw:dark:border-gray-700 tw:dark:bg-gray-800 <%= margin_class %>"
+>
+  <div class="tw:mb-2 tw:flex tw:w-full tw:flex-wrap tw:gap-x-6 tw:md:flex-nowrap">
+    <span class="tw:block tw:grow">
+      <% if initial_message? %>
+        <% if currently_buyer? %>
+          <%= translation(".me") %>
+          <%= user_display(@marketplace_message.sender_id, parens: true) %>
+          <span class="less-strong tw:text-sm">
+            <%= translation(".to") %>
+            <%= user_display(@marketplace_message.receiver_id) %>
+          </span>
+        <% else %>
+          <%= user_display(@marketplace_message.sender_id) %>
+          <span class="less-strong tw:text-sm">
+            <%= translation(".to_me") %>
+            <%= user_display(@marketplace_message.receiver_id, parens: true) %>
+          </span>
+        <% end %>
+      <% else %>
+        <%= user_display(@marketplace_message.sender_id) %>
+        <% if @marketplace_message.receiver_id == @current_user.id %>
+          <span class="less-strong tw:text-sm">
+            <%= translation(".to_me") %>
+          </span>
+        <% end %>
+      <% end %>
+    </span>
+
+    <span
+      class="
+        localizeTime tw:block tw:flex-grow tw:text-right tw:text-sm
+        tw:md:flex-none tw:md:text-base
+      "
+    >
+      <%= l @marketplace_message.created_at, format: :convert_time %>
+    </span>
+  </div>
+
+  <% if initial_message? %>
+    <h2 class="tw:w-full tw:text-lg">
+      <strong><%= translation(".subject") %>:</strong>
+      <%= @marketplace_message.subject %>
+    </h2>
+  <% end %>
+
+  <%= render(
+    UI::UserTextBlockDisplay::Component.new(
+      text: @marketplace_message.body,
+      max_height_class: "",
+      additional_classes: "tw:mt-4 tw:border-t tw:border-t-slate-100 tw:dark:border-t-slate-900"
+    )
+  ) %>
+</div>

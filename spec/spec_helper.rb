@@ -1,6 +1,9 @@
 RSpec.configure do |config|
-  # Use color in STDOUT
-  config.color = true
+  # Use the GitHub Annotations formatter for CI
+  if ENV["GITHUB_ACTIONS"] == "true"
+    require "rspec/github"
+    config.add_formatter RSpec::Github::Formatter
+  end
 
   # Use color not only in STDOUT but also in pagers and files
   config.tty = true
@@ -45,7 +48,7 @@ RSpec.configure do |config|
   # Print the 10 slowest examples and example groups at the
   # end of the spec run, to help surface which specs are running
   # particularly slow.
-  config.profile_examples = 10
+  # config.profile_examples = 10
 
   # Run specs in random order to surface order dependencies. If you find an
   # order dependency and want to debug it, you can fix the order by providing

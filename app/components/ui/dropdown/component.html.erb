@@ -1,0 +1,36 @@
+<div class="tw:relative tw:inline-block" data-controller="ui--dropdown">
+  <%= tag.button(**button_attributes) do %>
+    <span class="tw:sr-only">Open <%= @name %> menu</span>
+    <%= button_content %>
+
+    <span
+      class="
+        twdropdown-chevron tw:inline-block tw:transition-transform
+        tw:duration-200
+      "
+    >
+      <%= render UI::IconChevron::Component.new(direction: :down) %>
+    </span>
+  <% end %>
+
+  <%#
+    The menu is absolute inside a wrapper only as wide as the button, so without
+    w-max it shrink-to-fits to that and long entries wrap. 75vw so a long one
+    can't run off the screen instead.
+  %>
+
+  <div
+    class="
+      tw:absolute tw:top-0 tw:left-0 tw:hidden tw:w-max tw:max-w-[75vw]
+      tw:min-w-44 tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white
+      tw:shadow-lg tw:dark:border-gray-700 tw:dark:bg-gray-800
+    "
+    data-ui--dropdown-target="menu"
+  >
+    <ul role="menu" class="twdropdown" aria-labelledby="<%= button_id %>">
+      <% entries.each do |entry| %>
+        <%= entry %>
+      <% end %>
+    </ul>
+  </div>
+</div>

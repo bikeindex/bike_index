@@ -21,7 +21,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(json_result).to eq("parking_notifications" => [])
         expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
         expect(response.headers["Access-Control-Request-Method"]).not_to be_present
-        expect(response.headers["Vary"]).to eq "Accept"
+        expect(response.headers["Vary"]).to eq "Accept,Accept-Encoding"
       end
       context "with an impound_record" do
         let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization) }
@@ -93,7 +93,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(response.status).to eq(200)
         expect(json_result["parking_notifications"].count).to eq 1
         expect(json_result["parking_notifications"].first.dig("bike", "id")).to eq bike.id
-        expect(response.header["Per-Page"]).to eq "200" # Because it's over the max permitted
+        expect(response.header["Per-Page"]).to eq "250" # Because it's over the max permitted
 
         # Pagination tests
         get "#{base_url}?per_page=1&page=2", headers: json_headers
@@ -127,7 +127,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       {
         kind: "appears_abandoned_notification",
         internal_notes: "some details about the abandoned thing",
-        bike_id: bike.to_param,
+        bike_id: bike.id,
         use_entered_address: "false",
         latitude: default_location[:latitude],
         longitude: default_location[:longitude],
@@ -198,10 +198,10 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         }.to change(ParkingNotification, :count).by(1)
         parking_notification = ParkingNotification.last
 
-        expect(parking_notification).to match_hash_indifferently parking_notification_params.except(:use_entered_address)
+        expect(parking_notification).to have_attributes parking_notification_params.except(:use_entered_address)
         expect(parking_notification.user).to eq current_user
         expect(parking_notification.organization).to eq current_organization
-        expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
+        expect(parking_notification.formatted_address_string).to eq default_location[:formatted_address_no_country]
         expect(parking_notification.location_from_address).to be_falsey
         expect(ProcessParkingNotificationJob.jobs.count).to eq 1
 
@@ -239,10 +239,10 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(parking_notification.image).to be_present
           expect(parking_notification.image_processing).to be_falsey
 
-          expect(parking_notification).to match_hash_indifferently parking_notification_params.except(:use_entered_address)
+          expect(parking_notification).to have_attributes parking_notification_params.except(:use_entered_address)
           expect(parking_notification.user).to eq current_user
           expect(parking_notification.organization).to eq current_organization
-          expect(parking_notification.address).to eq default_location[:formatted_address_no_country]
+          expect(parking_notification.formatted_address_string).to eq default_location[:formatted_address_no_country]
           expect(parking_notification.location_from_address).to be_falsey
 
           bike.reload
@@ -254,13 +254,13 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       end
 
       context "manual address and repeat" do
-        let(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA") }
-        let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: current_organization, created_at: Time.current - 1.year, state: state, kind: "parked_incorrectly_notification") }
+        let(:state) { FactoryBot.create(:state_california) }
+        let!(:parking_notification_initial) { FactoryBot.create(:parking_notification, bike: bike, organization: current_organization, created_at: Time.current - 1.year, region_record: state, kind: "parked_incorrectly_notification") }
         let(:parking_notification_params) do
           {
             kind: "impound_notification",
             internal_notes: "",
-            bike_id: bike.to_param,
+            bike_id: bike.id,
             use_entered_address: "true",
             latitude: default_location[:latitude],
             longitude: default_location[:longitude],
@@ -269,8 +269,8 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             is_repeat: "true",
             street: "300 Lakeside Dr",
             city: "Oakland",
-            zipcode: "94612",
-            state_id: state.id.to_s,
+            postal_code: "94612",
+            region_record_id: state.id,
             country_id: Country.united_states.id
           }
         end
@@ -293,14 +293,14 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           parking_notification = ParkingNotification.last
 
-          expect(parking_notification).to match_hash_indifferently parking_notification_params.except(:use_entered_address, :is_repeat, :latitude, :longitude)
+          expect(parking_notification).to have_attributes parking_notification_params.except(:use_entered_address, :is_repeat, :latitude, :longitude)
           expect(parking_notification.user).to eq current_user
           expect(parking_notification.organization).to eq current_organization
           expect(parking_notification.initial_record).to eq parking_notification_initial
           expect(parking_notification.latitude).to eq(37.8087498)
           expect(parking_notification.longitude).to eq(-122.263705)
           expect(parking_notification.location_from_address).to be_truthy
-          expect(parking_notification.delivery_status).to eq("email_success")
+          expect(parking_notification.email_success?).to be_truthy
           expect(parking_notification.impound_record).to be_present
           expect(parking_notification.impound_record.unregistered_bike).to be_falsey
           expect(parking_notification.status).to eq "impounded"
@@ -324,13 +324,14 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
 
   describe "send_additional" do
     let!(:parking_notification_initial) do
-      FactoryBot.create(:parking_notification,
+      pn = FactoryBot.create(:parking_notification,
         :in_los_angeles,
         bike: bike,
         organization: current_organization,
         message: "some message to the user",
-        delivery_status: "failed for unknown reason",
         kind: "parked_incorrectly_notification")
+      FactoryBot.create(:notification, kind: "parking_notification", notifiable: pn, delivery_status: "delivery_success", bike: pn.bike, message_channel_target: pn.email)
+      pn
     end
     it "sends another notification" do
       bike.reload
@@ -350,7 +351,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(ParkingNotification.count).to eq 2
         parking_notification_initial.reload
         expect(parking_notification_initial.current?).to be_falsey
-        expect(parking_notification_initial.delivery_status).to eq "failed for unknown reason"
+        expect(parking_notification_initial.email_success?).to be_truthy
         parking_notification = ParkingNotification.reorder(:id).last
         expect(ActionMailer::Base.deliveries.count).to eq 1
 
@@ -366,7 +367,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(parking_notification.message).to be_blank
         expect(parking_notification.retrieval_link_token).to be_present
         expect(parking_notification.retrieval_link_token).to_not eq parking_notification_initial.retrieval_link_token
-        expect(parking_notification.delivery_status).to eq "email_success"
+        expect(parking_notification.email_success?).to be_truthy
       end
 
       bike.reload
@@ -393,7 +394,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(ActionMailer::Base.deliveries.count).to eq 0
         parking_notification_initial.reload
         expect(parking_notification_initial.current?).to be_falsey
-        expect(parking_notification_initial.delivery_status).to eq "failed for unknown reason" # This should not have been bumped
+        expect(parking_notification_initial.email_success?).to be_truthy # Pre-existing send was preserved
         expect(parking_notification_initial.retrieved_kind).to eq "organization_recovery"
         expect(parking_notification_initial.retrieved_by).to eq current_user
 
@@ -405,7 +406,11 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(bike.status).to eq "status_with_owner"
       end
       context "multiple parking notifications" do
-        let!(:parking_notification2) { FactoryBot.create(:parking_notification_organized, :in_los_angeles, organization: current_organization, delivery_status: "email_success") }
+        let!(:parking_notification2) do
+          pn = FactoryBot.create(:parking_notification_organized, :in_los_angeles, organization: current_organization)
+          FactoryBot.create(:notification, kind: "parking_notification", notifiable: pn, delivery_status: "delivery_success", bike: pn.bike, message_channel_target: pn.email)
+          pn
+        end
         it "marks both retrieved" do
           Sidekiq::Job.clear_all
           ActionMailer::Base.deliveries = []
@@ -449,6 +454,10 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(assigns(:notifications_failed_resolved).pluck(:id)).to eq([parking_notification_initial.id])
           expect(assigns(:notifications_repeated)).to eq([])
         end
+        # The failed ids round-trip through the session to the redirected page
+        follow_redirect!
+        expect(response.body).to include("Unable to send 1 notification")
+        expect(response.body).to include("role=\"alert\"")
       end
     end
     context "replaced" do
@@ -483,7 +492,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(parking_notification.message).to be_blank
         expect(parking_notification.retrieval_link_token).to be_present
         expect(parking_notification.retrieval_link_token).to_not eq parking_notification_initial.retrieval_link_token
-        expect(parking_notification.delivery_status).to eq "email_success"
+        expect(parking_notification.email_success?).to be_truthy
       end
 
       it "sends to the current one" do
@@ -563,7 +572,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(parking_notification_initial.repeat_records.count).to eq 1
         expect(parking_notification_initial.resolved_at).to be_present
         initial_impound_notification = parking_notification_initial.repeat_records.impound_notification.first
-        expect(initial_impound_notification.delivery_status).to eq "email_success"
+        expect(initial_impound_notification.email_success?).to be_truthy
         expect(initial_impound_notification.retrieval_link_token).to be_blank
         expect(initial_impound_notification.user).to eq current_user
         expect(parking_notification_initial.to_coordinates).to eq(initial_impound_notification.to_coordinates)
@@ -573,7 +582,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
         expect(parking_notification2.repeat_records.count).to eq 1
         expect(parking_notification2.resolved_at).to be_present
         impound_notification2 = parking_notification2.repeat_records.impound_notification.first
-        expect(impound_notification2.delivery_status).to eq "email_success"
+        expect(impound_notification2.email_success?).to be_truthy
         expect(impound_notification2.retrieval_link_token).to be_blank
         expect(impound_notification2.user).to eq current_user
         expect(parking_notification2.to_coordinates).to eq(impound_notification2.to_coordinates)

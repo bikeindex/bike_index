@@ -1,2 +1,4 @@
-nodejs 20.18.2
-ruby 3.3.7
+# NOTE: If updating ruby or node version, also update .cloud66/manifest.yml
+ruby 4.0.6
+nodejs 24.15.0
+

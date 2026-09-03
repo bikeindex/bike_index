@@ -33,7 +33,7 @@ RSpec.describe StolenNotificationsController, type: :request do
             post base_url, params: {stolen_notification: stolen_notification_attributes}
             expect(flash[:success]).to be_present
           }.to change(StolenNotification, :count).by(1)
-        }.to change(EmailStolenNotificationJob.jobs, :count).by(1)
+        }.to change(Email::StolenNotificationJob.jobs, :count).by(1)
         stolen_notification = StolenNotification.last
         expect(stolen_notification.bike).to eq bike
         expect(stolen_notification.sender_id).to eq current_user.id
@@ -42,7 +42,7 @@ RSpec.describe StolenNotificationsController, type: :request do
         expect(stolen_notification.reference_url).to eq stolen_notification_attributes[:reference_url]
         expect(stolen_notification.kind).to eq "stolen_permitted"
 
-        EmailStolenNotificationJob.drain
+        Email::StolenNotificationJob.drain
         expect(ActionMailer::Base.deliveries.count).to eq 1
         mail = ActionMailer::Base.deliveries.last
         expect(mail.subject).to eq("Stolen bike contact")
@@ -67,7 +67,7 @@ RSpec.describe StolenNotificationsController, type: :request do
               post base_url, params: {stolen_notification: stolen_notification_attributes}
               expect(flash[:success]).to be_present
             }.to change(StolenNotification, :count).by(1)
-          }.to change(EmailStolenNotificationJob.jobs, :count).by(1)
+          }.to change(Email::StolenNotificationJob.jobs, :count).by(1)
           stolen_notification = StolenNotification.last
           expect(stolen_notification.bike).to eq bike
           expect(stolen_notification.sender_id).to eq current_user.id
@@ -76,7 +76,7 @@ RSpec.describe StolenNotificationsController, type: :request do
           expect(stolen_notification.reference_url).to eq stolen_notification_attributes[:reference_url]
           expect(stolen_notification.kind).to eq "unstolen_unclaimed_permitted_direct"
 
-          EmailStolenNotificationJob.drain
+          Email::StolenNotificationJob.drain
           expect(ActionMailer::Base.deliveries.count).to eq 1
           mail = ActionMailer::Base.deliveries.last
           expect(mail.subject).to eq("Stolen bike contact")

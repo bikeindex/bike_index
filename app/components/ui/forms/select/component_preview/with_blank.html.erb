@@ -1,0 +1,5 @@
+<%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :frame_material,
+    option_tags: [["Aluminum", "aluminum"], ["Steel", "steel"], ["Carbon", "carbon"]],
+    options: {include_blank: "Choose a material"}, required: true)) %>
+<% end %>

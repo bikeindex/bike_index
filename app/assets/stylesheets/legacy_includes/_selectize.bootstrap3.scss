@@ -1,0 +1,560 @@
+@charset "UTF-8";
+/**
+ * selectize.bootstrap3.css (v0.12.6) - Bootstrap 3 Theme
+ * Copyright (c) 2013–2015 Brian Reavis & contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
+ * file except in compliance with the License. You may obtain a copy of the License at:
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+ * ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ *
+ * @author Brian Reavis <brian@thirdroute.com>
+ */
+/* line 16, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-drag_drop.multi > .selectize-input > div.ui-sortable-placeholder {
+  visibility: visible !important;
+  background: #f2f2f2 !important;
+  background: rgba(0, 0, 0, 0.06) !important;
+  border: 0 none !important;
+  -webkit-box-shadow: inset 0 0 12px 4px #fff;
+  box-shadow: inset 0 0 12px 4px #fff;
+}
+
+/* line 24, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-drag_drop .ui-sortable-placeholder::after {
+  content: '!';
+  visibility: hidden;
+}
+
+/* line 28, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-drag_drop .ui-sortable-helper {
+  -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* line 32, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown-header {
+  position: relative;
+  padding: 3px 12px;
+  border-bottom: 1px solid #d0d0d0;
+  background: #f8f8f8;
+  -webkit-border-radius: 4px 4px 0 0;
+  -moz-border-radius: 4px 4px 0 0;
+  border-radius: 4px 4px 0 0;
+}
+
+/* line 41, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown-header-close {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  color: #333333;
+  opacity: 0.4;
+  margin-top: -12px;
+  line-height: 20px;
+  font-size: 20px !important;
+}
+
+/* line 51, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown-header-close:hover {
+  color: #000000;
+}
+
+/* line 54, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown.plugin-optgroup_columns .optgroup {
+  border-right: 1px solid #f2f2f2;
+  border-top: 0 none;
+  float: left;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* line 62, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown.plugin-optgroup_columns .optgroup:last-child {
+  border-right: 0 none;
+}
+
+/* line 65, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown.plugin-optgroup_columns .optgroup:before {
+  display: none;
+}
+
+/* line 68, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown.plugin-optgroup_columns .optgroup-header {
+  border-top: 0 none;
+}
+
+/* line 71, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-remove_button [data-value] {
+  position: relative;
+  padding-right: 24px !important;
+}
+
+/* line 75, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-remove_button [data-value] .remove {
+  z-index: 1;
+  /* fixes ie bug (see #392) */
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 17px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 12px;
+  color: inherit;
+  text-decoration: none;
+  vertical-align: middle;
+  display: inline-block;
+  padding: 1px 0 0 0;
+  border-left: 1px solid rgba(0, 0, 0, 0);
+  -webkit-border-radius: 0 2px 2px 0;
+  -moz-border-radius: 0 2px 2px 0;
+  border-radius: 0 2px 2px 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* line 99, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-remove_button [data-value] .remove:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* line 102, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-remove_button .active[data-value] .remove {
+  border-left-color: rgba(0, 0, 0, 0);
+}
+
+/* line 105, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-remove_button .disabled [data-value] .remove:hover {
+  background: none;
+}
+
+/* line 108, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-remove_button .disabled [data-value] .remove {
+  border-left-color: rgba(77, 77, 77, 0);
+}
+
+/* line 111, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.plugin-remove_button .remove-single {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 23px;
+}
+
+/* line 117, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control {
+  position: relative;
+}
+
+/* line 120, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown,
+.selectize-input,
+.selectize-input input {
+  color: #333333;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 20px;
+  -webkit-font-smoothing: inherit;
+}
+
+/* line 129, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input,
+.selectize-control.single .selectize-input.input-active {
+  background: #fff;
+  cursor: text;
+  display: inline-block;
+}
+
+/* line 135, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input {
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+  display: inline-block;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+/* line 152, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.multi .selectize-input.has-items {
+  padding: 5px 12px 2px;
+}
+
+/* line 155, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input.full {
+  background-color: #fff;
+}
+
+/* line 158, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input.disabled,
+.selectize-input.disabled * {
+  cursor: default !important;
+}
+
+/* line 162, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input.focus {
+  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* line 166, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input.dropdown-active {
+  -webkit-border-radius: 4px 4px 0 0;
+  -moz-border-radius: 4px 4px 0 0;
+  border-radius: 4px 4px 0 0;
+}
+
+/* line 171, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input > * {
+  vertical-align: baseline;
+  display: -moz-inline-stack;
+  display: inline-block;
+  zoom: 1;
+  *display: inline;
+}
+
+/* line 178, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.multi .selectize-input > div {
+  cursor: pointer;
+  margin: 0 3px 3px 0;
+  padding: 1px 3px;
+  background: #efefef;
+  color: #333333;
+  border: 0 solid rgba(0, 0, 0, 0);
+}
+
+/* line 186, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.multi .selectize-input > div.active {
+  background: #428bca;
+  color: #fff;
+  border: 0 solid rgba(0, 0, 0, 0);
+}
+
+/* line 191, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.multi .selectize-input.disabled > div,
+.selectize-control.multi .selectize-input.disabled > div.active {
+  color: #808080;
+  background: #ffffff;
+  border: 0 solid rgba(77, 77, 77, 0);
+}
+
+/* line 197, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input > input {
+  display: inline-block !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  text-indent: 0 !important;
+  border: 0 none !important;
+  background: none !important;
+  line-height: inherit !important;
+  -webkit-user-select: auto !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+}
+
+/* line 212, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input > input::-ms-clear {
+  display: none;
+}
+
+/* line 215, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input > input:focus {
+  outline: none !important;
+}
+
+/* line 218, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input::after {
+  content: ' ';
+  display: block;
+  clear: left;
+}
+
+/* line 223, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input.dropdown-active::before {
+  content: ' ';
+  display: block;
+  position: absolute;
+  background: #ffffff;
+  height: 1px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+/* line 233, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown {
+  position: absolute;
+  z-index: 10;
+  border: 1px solid #d0d0d0;
+  background: #fff;
+  margin: -1px 0 0 0;
+  border-top: 0 none;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  -webkit-border-radius: 0 0 4px 4px;
+  -moz-border-radius: 0 0 4px 4px;
+  border-radius: 0 0 4px 4px;
+}
+
+/* line 249, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown [data-selectable] {
+  cursor: pointer;
+  overflow: hidden;
+}
+
+/* line 253, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown [data-selectable] .highlight {
+  background: rgba(255, 237, 40, 0.4);
+  -webkit-border-radius: 1px;
+  -moz-border-radius: 1px;
+  border-radius: 1px;
+}
+
+/* line 259, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .option,
+.selectize-dropdown .optgroup-header {
+  padding: 3px 12px;
+}
+
+/* line 263, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .option,
+.selectize-dropdown [data-disabled],
+.selectize-dropdown [data-disabled] .option[data-selectable] {
+  cursor: inherit;
+  opacity: 0.5;
+}
+
+/* line 269, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .option[data-selectable] {
+  opacity: 1;
+}
+
+/* line 272, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .optgroup:first-child .optgroup-header {
+  border-top: 0 none;
+}
+
+/* line 275, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .optgroup-header {
+  color: #777777;
+  background: #fff;
+  cursor: default;
+}
+
+/* line 280, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .active {
+  background-color: #f5f5f5;
+  color: #262626;
+}
+
+/* line 284, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .active.create {
+  color: #262626;
+}
+
+/* line 287, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .create {
+  color: rgba(51, 51, 51, 0.5);
+}
+
+/* line 290, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown-content {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 200px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* line 296, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.single .selectize-input,
+.selectize-control.single .selectize-input input {
+  cursor: pointer;
+}
+
+/* line 300, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.single .selectize-input.input-active,
+.selectize-control.single .selectize-input.input-active input {
+  cursor: text;
+}
+
+/* line 304, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.single .selectize-input:after {
+  content: ' ';
+  display: block;
+  position: absolute;
+  top: 50%;
+  right: 17px;
+  margin-top: -3px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 5px 0 5px;
+  border-color: #333333 transparent transparent transparent;
+}
+
+/* line 317, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.single .selectize-input.dropdown-active:after {
+  margin-top: -4px;
+  border-width: 0 5px 5px 5px;
+  border-color: transparent transparent #333333 transparent;
+}
+
+/* line 322, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.rtl.single .selectize-input:after {
+  left: 17px;
+  right: auto;
+}
+
+/* line 326, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.rtl .selectize-input > input {
+  margin: 0 4px 0 -2px !important;
+}
+
+/* line 329, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control .selectize-input.disabled {
+  opacity: 0.5;
+  background-color: #fff;
+}
+
+/* line 333, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown,
+.selectize-dropdown.form-control {
+  height: auto;
+  padding: 0;
+  margin: 2px 0 0 0;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+}
+
+/* line 348, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .optgroup-header {
+  font-size: 12px;
+  line-height: 1.42857143;
+}
+
+/* line 352, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .optgroup:first-child:before {
+  display: none;
+}
+
+/* line 355, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown .optgroup:before {
+  content: ' ';
+  display: block;
+  height: 1px;
+  margin: 9px 0;
+  overflow: hidden;
+  background-color: #e5e5e5;
+  margin-left: -12px;
+  margin-right: -12px;
+}
+
+/* line 365, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown-content {
+  padding: 5px 0;
+}
+
+/* line 368, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-dropdown-header {
+  padding: 6px 12px;
+}
+
+/* line 371, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input {
+  min-height: 34px;
+}
+
+/* line 374, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input.dropdown-active {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+/* line 379, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input.dropdown-active::before {
+  display: none;
+}
+
+/* line 382, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-input.focus {
+  border-color: #66afe9;
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+
+/* line 388, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.has-error .selectize-input {
+  border-color: #a94442;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+/* line 393, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.has-error .selectize-input:focus {
+  border-color: #843534;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #ce8483;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #ce8483;
+}
+
+/* line 398, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.multi .selectize-input.has-items {
+  padding-left: 9px;
+  padding-right: 9px;
+}
+
+/* line 402, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.selectize-control.multi .selectize-input > div {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+
+/* line 407, /rails-assets-selectize-0.12.6/app/assets/stylesheets/selectize/selectize.bootstrap3.scss */
+.form-control.selectize-control {
+  padding: 0;
+  height: auto;
+  border: none;
+  background: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+}
+/*
+ * Revised manifest file
+ * things from rails-assets
+
+ */

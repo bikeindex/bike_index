@@ -231,6 +231,10 @@ RSpec.describe BikeSticker, type: :model do
         # Things that don't match
         expect(BikeSticker.sticker_code_search("ca12").pluck(:id)).to eq([])
         expect(BikeSticker.sticker_code_search("ca0009").pluck(:id)).to eq([])
+        # More leading zeros than code_number_length should not raise
+        expect(BikeSticker.sticker_code_search("ca00000000112").pluck(:id)).to match_array([sticker2.id, sticker3.id])
+        # But should match if it matches
+        expect(BikeSticker.sticker_code_search("ca000000001120").pluck(:id)).to eq([sticker3.id])
       end
     end
   end
@@ -238,6 +242,13 @@ RSpec.describe BikeSticker, type: :model do
   describe "claimed?" do
     it "is not claimed if bike doesn't exist" do
       expect(BikeSticker.new(bike_id: 12123123).claimed?).to be_falsey
+    end
+  end
+
+  describe "short_id" do
+    it "is the code prefixed with s/" do
+      bike_sticker = FactoryBot.create(:bike_sticker, code: "UC1101")
+      expect(bike_sticker.short_id).to eq "s/UC1101"
     end
   end
 
@@ -486,7 +497,7 @@ RSpec.describe BikeSticker, type: :model do
         expect(bike_sticker2.claimable_by?(user, organization)).to be_truthy # Not authorized by organization tho
         expect(bike_sticker3.claimable_by?(user)).to be_falsey
         # If user is superuser, it's claimable
-        user.update(superuser: true)
+        FactoryBot.create(:superuser_ability, user:)
         expect(bike_sticker3.claimable_by?(user)).to be_truthy
         expect(bike_sticker3.claimable_by?(user, organization)).to be_truthy
       end
@@ -770,16 +781,16 @@ RSpec.describe BikeSticker, type: :model do
           expect(bike_sticker1.user_id).to eq user.id
           expect(bike_sticker1.organization_id).to eq organization.id
           expect(bike_sticker1.secondary_organization_id).to be_blank
-          expect(bike.editable_organizations.map(&:id)).to eq([])
+          expect(bike.send(:editable_organization_ids)).to eq([])
           bike_organization = bike.bike_organizations.first
           expect(bike_organization.can_not_edit_claimed).to be_truthy
           bike_organization.update(can_not_edit_claimed: false)
           og_id = bike_organization.id
           bike.reload
-          expect(bike.editable_organizations.map(&:id)).to eq([organization.id])
+          expect(bike.send(:editable_organization_ids)).to eq([organization.id])
           expect { bike_sticker2.claim_if_permitted(user: user, bike: bike) }.to change(BikeStickerUpdate, :count).by 1
           bike.reload
-          expect(bike.editable_organizations.map(&:id)).to eq([organization.id])
+          expect(bike.send(:editable_organization_ids)).to eq([organization.id])
           bike_organization.reload
           expect(bike_organization.id).to eq og_id
           expect(bike_organization.can_not_edit_claimed).to be_falsey
@@ -795,7 +806,7 @@ RSpec.describe BikeSticker, type: :model do
         let(:bike) { FactoryBot.create(:bike, :with_ownership, creator: user) }
         it "adds only the organization_regional" do
           expect(bike.bike_organizations.pluck(:organization_id)).to eq([])
-          expect(bike.editable_organizations.map(&:id)).to eq([])
+          expect(bike.send(:editable_organization_ids)).to eq([])
           expect(user.authorized?(bike)).to be_truthy
           expect(user.authorized?(organization_regional)).to be_truthy
           expect(user.authorized?(organization)).to be_falsey

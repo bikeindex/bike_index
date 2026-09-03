@@ -16,25 +16,26 @@ class CustomerMailer < ApplicationMailer
 
   def confirmation_email(user)
     @user = user
-    @partner = @user.partner_sign_up
+    @partner = @user.partner_sign_up # read by the email layout
+    component = Emails::ConfirmationEmail::Component.new(user:)
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(to: @user.email, tag: __callee__) { |format| format.html { render component } }
+    end
+  end
+
+  def password_reset_email(user, return_to: nil)
+    @user = user
+    @url = update_password_form_with_reset_token_users_url(token: @user.token_for_password_reset, return_to:)
 
     I18n.with_locale(@user&.preferred_language) do
       mail(to: @user.email, tag: __callee__)
     end
   end
 
-  def password_reset_email(user)
+  def magic_login_link_email(user, return_to: nil)
     @user = user
-    @url = update_password_form_with_reset_token_users_url(token: @user.token_for_password_reset)
-
-    I18n.with_locale(@user&.preferred_language) do
-      mail(to: @user.email, tag: __callee__)
-    end
-  end
-
-  def magic_login_link_email(user)
-    @user = user
-    @url = magic_link_session_url(token: @user.magic_link_token)
+    @url = magic_link_session_url(token: @user.magic_link_token, return_to:)
 
     I18n.with_locale(@user&.preferred_language) do
       mail(to: @user.email, tag: __callee__)
@@ -59,9 +60,24 @@ class CustomerMailer < ApplicationMailer
     end
   end
 
+  def newsletter(user:, mail_snippet:)
+    @user = user
+    @_action_has_layout = false # layout is manually included here
+    @mail_snippet_body = mail_snippet.body
+    @title = mail_snippet.subject
+    @unsubscribe_signed_id = @user.unsubscribe_signed_id
+
+    # RFC 8058 one-click, required by Gmail and Yahoo for bulk senders
+    headers["List-Unsubscribe"] = "<#{unsubscribe_update_user_url(@unsubscribe_signed_id)}>"
+    headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
+
+    mail(to: @user.email, subject: @title, tag: __callee__)
+  end
+
   def theft_survey(notification)
     mail_snippet = MailSnippet.theft_survey_2023.first
     raise "Missing theft survey mail snippet" if mail_snippet.blank?
+
     mail_body = mail_snippet.body.gsub("SURVEY_LINK_ID", notification.survey_id.to_s)
     if notification.user.present?
       mail_body = mail_body.gsub(/Bike Index Registrant/i, notification.user.name)
@@ -79,7 +95,7 @@ class CustomerMailer < ApplicationMailer
     @customer_contact = customer_contact
     @info = customer_contact.info_hash
     @bike = customer_contact.bike
-    @bike_type = @bike.cycle_type_name&.downcase
+    @bike_type = @bike.type
     @user = @customer_contact.user
 
     @location = @info["location"]
@@ -132,6 +148,7 @@ class CustomerMailer < ApplicationMailer
   def stolen_notification_email(stolen_notification)
     @stolen_notification = stolen_notification
     @user = stolen_notification.receiver
+    @mail_snippet = stolen_notification.mail_snippet
 
     I18n.with_locale(@user&.preferred_language) do
       mail(
@@ -198,6 +215,25 @@ class CustomerMailer < ApplicationMailer
       mail(to: @user.email,
         from: '"Gavin Hoover" <gavin@bikeindex.org>',
         tag: __callee__)
+    end
+  end
+
+  def marketplace_message_notification(marketplace_message)
+    @marketplace_message = marketplace_message
+    @user = @marketplace_message.receiver
+    @marketplace_listing = @marketplace_message.marketplace_listing
+    # TODO: Specific layout for these, rather than just skipping header
+    @skip_header = true
+
+    @message_url = my_account_message_url(id: @marketplace_message.id, anchor: "message-#{@marketplace_message.id}")
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(
+        to: @user.email,
+        subject: @marketplace_message.subject,
+        references: @marketplace_message.email_references_id,
+        tag: __callee__
+      )
     end
   end
 end

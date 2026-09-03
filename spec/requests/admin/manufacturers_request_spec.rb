@@ -20,10 +20,18 @@ RSpec.describe Admin::ManufacturersController, type: :request do
   end
 
   describe "index" do
-    it "renders" do
+    let!(:with_website) { FactoryBot.create(:manufacturer, website: "http://stuff.com") }
+    let!(:without_website) { FactoryBot.create(:manufacturer, website: nil) }
+
+    it "renders, and filters by search_with_websites" do
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
+      expect(assigns(:manufacturers).pluck(:id)).to match_array([with_website.id, without_website.id])
+
+      get base_url, params: {search_with_websites: true}
+      expect(response.status).to eq(200)
+      expect(assigns(:manufacturers).pluck(:id)).to eq([with_website.id])
     end
   end
 
@@ -56,7 +64,7 @@ RSpec.describe Admin::ManufacturersController, type: :request do
     it "updates available attributes" do
       put "#{base_url}/#{subject.to_param}", params: {manufacturer: permitted_attributes}
       expect(flash[:success]).to be_present
-      expect(subject.reload).to match_hash_indifferently permitted_attributes
+      expect(subject.reload).to have_attributes permitted_attributes
     end
   end
 
@@ -68,7 +76,7 @@ RSpec.describe Admin::ManufacturersController, type: :request do
       }.to change(Manufacturer, :count).by 1
       new_manufacturer = Manufacturer.where(name: "new name and things").first
       expect(flash[:success]).to be_present
-      expect(new_manufacturer).to match_hash_indifferently permitted_attributes
+      expect(new_manufacturer).to have_attributes permitted_attributes
       # permitted_attributes.each { |attribute, val| expect(target.send(attribute)).to eq val }
     end
   end

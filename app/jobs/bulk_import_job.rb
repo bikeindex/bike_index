@@ -1,21 +1,93 @@
 require "csv"
 
 class BulkImportJob < ApplicationJob
+  MAX_LINES = 25_100
   sidekiq_options retry: false
+
+  class << self
+    # This is a little gross. It was added in PR #2911 when adding address records to bikes
+    def address_record_attributes(address_string, country_id: nil)
+      return {} if address_string.blank?
+
+      address_record_attributes = country_id.present? ? {country: country_id} : {}
+
+      address_parts = address_string.split(",").map(&:strip)
+      street, city, region_postal, country = if address_parts.count < 3
+        region_postal = (address_parts.count == 2) ? address_parts.last : nil
+        [nil, address_parts.first, region_postal, nil]
+      else
+        address_array_from_parts(address_parts)
+      end
+      address_record_attributes[:street] = street
+      address_record_attributes[:city] = city
+      address_record_attributes[:country] = country if country.present?
+      address_record_attributes.merge!(region_and_postal(region_postal)) if region_postal.present?
+
+      {address_record_attributes:}
+    end
+
+    private
+
+    def address_array_from_parts(address_parts)
+      country = if address_parts.last.downcase == "usa"
+        address_parts.pop # remove and ignore the country
+        Country.united_states_id
+      elsif !address_parts.last.match?(/\d/)
+        address_parts.pop
+      end
+      region_postal = address_parts.pop
+      region_postal = "#{address_parts.pop}, #{region_postal}" if should_pop_for_region?(region_postal, address_parts)
+      city = address_parts.pop
+
+      [address_parts.any? ? address_parts.join(", ") : nil, city, region_postal, country]
+    end
+
+    def should_pop_for_region?(region_postal, address_parts)
+      return false if address_parts.count < 3
+
+      # if all substrings in region_postal have numbers, they're all (probably) postal_codes
+      region_postal.split(" ").all? { it.match(/\d/) }
+    end
+
+    def region_and_postal(region_postal)
+      return {region_string: region_postal} unless region_postal.match?(/\d/)
+
+      parts = region_postal.match?(",") ? region_postal.split(",") : region_postal.split(" ")
+      postal_code = parts.pop&.strip
+      postal_code = "#{parts.pop&.strip} #{postal_code}" if parts.last&.match?(/\d/)
+
+      {region_string: parts.join(" "), postal_code:}
+    end
+  end
 
   attr_accessor :bulk_import, :line_errors # Only necessary for testing
 
   def perform(bulk_import_id)
     @bulk_import = BulkImport.find(bulk_import_id)
     return true if @bulk_import.ascend? && !@bulk_import.check_ascend_import_processable!
-    process_csv(@bulk_import.open_file)
+    return true if @bulk_import.finished? # Exit early if already finished
 
+    # Check file size before processing
+    open_file = @bulk_import.open_file
+
+    line_count = count_file_lines(open_file)
+    if line_count > MAX_LINES
+      return @bulk_import.add_file_error("CSV is too big! Max allowed size is #{MAX_LINES - 100} lines")
+    end
+
+    # Used in address_record_attributes
+    @country_id = @bulk_import.organization&.default_address_record&.country_id
+    process_csv(open_file)
+
+    @bulk_import.unlink_tempfile
     @bulk_import.progress = "finished"
     return @bulk_import.save unless @line_errors.any?
 
     # Using update_attribute here to avoid validation checks that sometimes block updating postgres json in rails
     @bulk_import.update_attribute :import_errors, (@bulk_import.import_errors || {}).merge("line" => @line_errors.compact)
   end
+
+  private
 
   def process_csv(open_file)
     @line_errors = @bulk_import.line_errors || [] # We always need line_errors
@@ -48,10 +120,11 @@ class BulkImportJob < ApplicationJob
 
   def register_bike(b_param_hash)
     return nil if b_param_hash.blank?
+
     b_param = BParam.create(creator_id: creator_id,
       params: b_param_hash,
       origin: "bulk_import_worker")
-    BikeCreator.new.create_bike(b_param)
+    BikeServices::Creator.new.create_bike(b_param)
   end
 
   def row_to_b_param_hash(row_with_whitespaces)
@@ -68,15 +141,10 @@ class BulkImportJob < ApplicationJob
       impound_attrs = {
         # impounded_at_with_timezone parses with timeparser, and doesn't need timezone
         impounded_at_with_timezone: row[:impounded_at],
-        street: row[:impounded_street],
-        city: row[:impounded_city],
-        state: row[:impounded_state],
-        zipcode: row[:impounded_zipcode],
-        country: row[:impounded_country],
         impounded_description: row[:impounded_description],
         display_id: row[:impounded_id],
         organization_id: @bulk_import.organization_id
-      }
+      }.merge(impound_address_record_attributes(row))
     end
 
     {
@@ -95,14 +163,13 @@ class BulkImportJob < ApplicationJob
         description: row[:description],
         frame_size: row[:frame_size],
         phone: row[:phone],
-        address: row[:address],
         bike_sticker: row[:bike_sticker],
         user_name: row[:owner_name],
         extra_registration_number: row[:secondary_serial],
         send_email: @bulk_import.send_email,
         creation_organization_id: @bulk_import.organization_id,
         no_duplicate: @bulk_import.no_duplicate
-      },
+      }.merge(self.class.address_record_attributes(row[:address], country_id: @country_id)),
       impound_record: impound_attrs || {},
       stolen_record: @bulk_import.stolen_record_attrs,
       # Photo need to be an array - only include if photo has a value
@@ -112,6 +179,19 @@ class BulkImportJob < ApplicationJob
 
   def rescue_blank_serial(serial)
     SerialNormalizer.unknown_and_absent_corrected(serial)
+  end
+
+  def impound_address_record_attributes(row)
+    street = row[:impounded_street]
+    city = row[:impounded_city]
+    region_string = row[:impounded_state]
+    postal_code = row[:impounded_zipcode]
+    country = row[:impounded_country]
+    return {} if [street, city, region_string, postal_code, country].all?(&:blank?)
+
+    address_attrs = {kind: :impounded_from, street:, city:, region_string:, postal_code:}.compact
+    address_attrs[:country] = country if country.present?
+    {address_record_attributes: address_attrs}
   end
 
   def creator_id
@@ -137,7 +217,12 @@ class BulkImportJob < ApplicationJob
     headers
   end
 
-  private
+  def count_file_lines(file)
+    line_count = 0
+    file.each_line { line_count += 1 }
+    file.rewind # Reset file position for subsequent reading
+    line_count
+  end
 
   def validate_headers(attrs)
     required_headers = if @bulk_import.impounded?
@@ -148,6 +233,7 @@ class BulkImportJob < ApplicationJob
     valid_headers = (attrs & required_headers).count == 3
     # Update progress here, since we're successfully processing the file now - and we update here if invalid headers
     return @bulk_import.update_attribute :progress, "ongoing" if valid_headers
+
     missing_headers = required_headers - (attrs & required_headers)
     @bulk_import.add_file_error("Invalid CSV Headers: #{attrs.join(", ")} - missing #{missing_headers.join(", ")}")
   end

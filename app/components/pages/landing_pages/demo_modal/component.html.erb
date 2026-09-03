@@ -1,0 +1,25 @@
+<%= render(UI::Modal::Component.new(title: "Contact us for a free trial", id: @modal_id)) do |modal| %>
+  <% modal.with_body do %>
+    <%= form_for @feedback, html: {data: {controller: "form-persist", action: "input->form-persist#save submit->form-persist#clear"}} do |f| %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name, label_text: @name_label, html_options: {required: true})) %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :contact_name, label_text: "Name")) %>
+
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
+        <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true, html_options: {value: @current_user&.email})) %>
+      <% end %>
+
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone_number)) %>
+
+      <div class="tw:hidden">
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :additional, kind: :text_area, label_text: "Additional information")) %>
+      </div>
+
+      <%= f.hidden_field :feedback_type, value: @feedback_type %>
+      <%= f.hidden_field :body, value: "lead" %>
+
+      <div class="tw:pt-2">
+        <%= f.submit "Let's chat", class: "le-btn-primary tw:w-full tw:cursor-pointer" %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

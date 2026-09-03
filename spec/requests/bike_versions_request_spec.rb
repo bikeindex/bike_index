@@ -16,6 +16,7 @@ RSpec.describe BikeVersionsController, type: :request do
       get "#{base_url}?query_items%5B%5D=boo"
       expect(response.code).to eq("200")
       expect(response).to render_template(:index)
+      expect(assigns(:interpreted_params)).to eq({query: "boo", stolenness: "non"})
       expect(assigns(:bike_versions).pluck(:id)).to eq([bike_version.id])
 
       get "#{base_url}?query_items%5B%5D=booboo"
@@ -26,35 +27,80 @@ RSpec.describe BikeVersionsController, type: :request do
   end
 
   describe "show" do
+    context "short_id" do
+      let(:bike_version) { FactoryBot.create(:bike_version, owner: current_user, id: 35) }
+      it "finds the version via short_id and the /v/ short URL" do
+        expect(bike_version.short_id).to eq "v/35"
+        ["#{base_url}/35", "#{base_url}/z", "/v/z", "/V/Z", "/v/Z"].each do |path|
+          get path
+          expect(response).to render_template(:show)
+          expect(assigns(:bike_version)).to eq bike_version
+        end
+      end
+    end
     it "renders" do
       get "#{base_url}/#{bike_version.to_param}"
       expect(response.code).to eq "200"
       expect(response).to render_template(:show)
+      expect(response.body).to_not match(/is hidden/i)
+
+      # Hidden
       bike_version.update(visibility: "user_hidden")
+      expect(bike_version.authorized?(current_user)).to be_truthy
       get "#{base_url}/#{bike_version.to_param}"
       expect(response.code).to eq "200"
       expect(response).to render_template(:show)
+      expect(response.body).to match(/is hidden/i)
+
+      # And deleted
+      bike_version.update(visibility: "visible_not_related", deleted_at: Time.current)
+      expect(bike_version.authorized?(current_user)).to be_falsey
+      get "#{base_url}/#{bike_version.to_param}"
+      expect(response.status).to eq 404
     end
     context "superadmin" do
-      let(:current_user) { FactoryBot.create(:admin) }
-      it "renders" do
+      let(:current_user) { FactoryBot.create(:superuser) }
+      it "renders, when hidden or deleted" do
         get "#{base_url}/#{bike_version.to_param}"
         expect(response.code).to eq "200"
         expect(response).to render_template(:show)
+        expect(response.body).to_not match(/deleted/i)
+        expect(response.body).to_not match(/HIDDEN by owner/i)
+
+        # User hidden
         bike_version.update(visibility: "user_hidden")
+        expect(bike_version.authorized?(current_user)).to be_truthy
         get "#{base_url}/#{bike_version.to_param}"
         expect(response.code).to eq "200"
         expect(response).to render_template(:show)
+        expect(response.body).to match(/HIDDEN by owner/i)
+
+        # Deleted
+        bike_version.update(visibility: "visible_not_related", deleted_at: Time.current)
+        expect(bike_version.authorized?(current_user)).to be_truthy
+        get "#{base_url}/#{bike_version.to_param}"
+        expect(response).to render_template(:show)
+        expect(response.body).to match(/deleted/i)
       end
     end
     context "no current_user" do
       let(:current_user) { nil }
       let(:bike_version) { FactoryBot.create(:bike_version) }
       it "renders" do
+        expect(bike_version.reload.visibility).to eq "visible_not_related"
         get "#{base_url}/#{bike_version.to_param}"
         expect(response.code).to eq "200"
         expect(response).to render_template(:show)
+
+        # User hidden
         bike_version.update(visibility: "user_hidden")
+        expect(bike_version.authorized?(current_user)).to be_falsey
+        get "#{base_url}/#{bike_version.to_param}"
+        expect(response.status).to eq 404
+
+        # And deleted
+        bike_version.update(visibility: "visible_not_related", deleted_at: Time.current)
+        expect(bike_version.authorized?(current_user)).to be_falsey
         get "#{base_url}/#{bike_version.to_param}"
         expect(response.status).to eq 404
       end
@@ -112,7 +158,7 @@ RSpec.describe BikeVersionsController, type: :request do
           end_at: nil)
       }
       expect(flash[:success]).to be_present
-      expect(bike_version.reload).to match_hash_indifferently valid_update_params
+      expect(bike_version.reload).to have_attributes valid_update_params
       expect(bike_version.owner_id).to eq current_user.id
       expect(bike_version.bike_id).to eq og_bike_id
       expect(bike_version.start_at).to be_blank
@@ -132,9 +178,20 @@ RSpec.describe BikeVersionsController, type: :request do
       }
       expect(flash[:success]).to be_present
       expect(response).to redirect_to("/bike_versions/#{bike_version.id}/edit/accessories")
-      expect(bike_version.reload).to match_hash_indifferently valid_update_params
+      expect(bike_version.reload).to have_attributes valid_update_params
       expect(bike_version.start_at.to_i).to be_within(1).of 1524938400
       expect(bike_version.end_at.to_i).to be_within(1).of 1632852000
+    end
+    context "invalid params" do
+      it "redirects to edit with the error" do
+        patch "#{base_url}/#{bike_version.id}", params: {
+          edit_template: "bike_details",
+          bike_version: valid_update_params.merge(name: "")
+        }
+        expect(flash[:error]).to match("Unable to update")
+        expect(response).to redirect_to("/bike_versions/#{bike_version.id}/edit/bike_details")
+        expect(bike_version.reload.name).to_not eq ""
+      end
     end
     context "update visibility" do
       it "updates visibility" do

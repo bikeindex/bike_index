@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: bike_organizations
+# Database name: primary
 #
 #  id                   :integer          not null, primary key
 #  can_not_edit_claimed :boolean          default(FALSE), not null
@@ -12,9 +13,9 @@
 #
 # Indexes
 #
-#  index_bike_organizations_on_bike_id          (bike_id)
-#  index_bike_organizations_on_deleted_at       (deleted_at)
-#  index_bike_organizations_on_organization_id  (organization_id)
+#  index_bike_organizations_on_bike_id                             (bike_id)
+#  index_bike_organizations_on_bike_id_and_organization_id_unique  (bike_id,organization_id) UNIQUE WHERE (deleted_at IS NULL)
+#  index_bike_organizations_on_organization_id                     (organization_id)
 #
 class BikeOrganization < ApplicationRecord
   acts_as_paranoid
@@ -23,7 +24,9 @@ class BikeOrganization < ApplicationRecord
   belongs_to :organization
 
   validates_presence_of :bike_id, :organization_id
+
   validates_uniqueness_of :organization_id, scope: [:bike_id], allow_nil: false
+  after_commit :delete_bike_organization_note, on: :destroy
 
   scope :can_edit_claimed, -> { where(can_not_edit_claimed: false) }
 
@@ -43,5 +46,11 @@ class BikeOrganization < ApplicationRecord
 
   def can_edit_claimed=(val)
     self.can_not_edit_claimed = !val
+  end
+
+  private
+
+  def delete_bike_organization_note
+    BikeOrganizationNote.where(bike_id:, organization_id:).destroy_all
   end
 end

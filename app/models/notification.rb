@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: notifications
+# Database name: primary
 #
 #  id                     :bigint           not null, primary key
 #  delivery_error         :string
@@ -13,12 +16,14 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  bike_id                :bigint
+#  message_id             :string
 #  notifiable_id          :bigint
 #  user_id                :bigint
 #
 # Indexes
 #
 #  index_notifications_on_bike_id                            (bike_id)
+#  index_notifications_on_message_channel_target_trgm        (message_channel_target) USING gin
 #  index_notifications_on_notifiable_type_and_notifiable_id  (notifiable_type,notifiable_id)
 #  index_notifications_on_user_id                            (user_id)
 #
@@ -33,17 +38,17 @@ class Notification < ApplicationRecord
   MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
   DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2}.freeze
 
-  UNDELIVERABLE_ERRORS = %w[Postmark::InactiveRecipientError Postmark::InvalidEmailAddressError].freeze
+  UNDELIVERABLE_ERRORS = [Postmark::InactiveRecipientError, Postmark::InvalidEmailRequestError].freeze
+
+  enum :kind, KIND_ENUM
+  enum :message_channel, MESSAGE_CHANNEL_ENUM
+  enum :delivery_status, DELIVERY_STATUS_ENUM
 
   belongs_to :user # RECEIVER of the notification - unless it's a stolen_notification_blocked, which is sent to admin instead
   belongs_to :bike
   belongs_to :notifiable, polymorphic: true
 
   before_validation :set_calculated_attributes
-
-  enum :kind, KIND_ENUM
-  enum :message_channel, MESSAGE_CHANNEL_ENUM
-  enum :delivery_status, DELIVERY_STATUS_ENUM
 
   scope :with_bike, -> { where.not(bike_id: nil) }
   scope :without_bike, -> { where(bike_id: nil) }
@@ -53,6 +58,7 @@ class Notification < ApplicationRecord
   scope :customer_contact, -> { where(kind: customer_contact_kinds) }
   scope :theft_survey, -> { where(kind: theft_survey_kinds) }
   scope :admin, -> { where(kind: admin_kinds) }
+  scope :with_message_id, -> { where.not(message_id: nil) }
 
   class << self
     def kinds
@@ -61,6 +67,7 @@ class Notification < ApplicationRecord
 
     def kind_humanized(str)
       return "" unless str.present?
+
       str.tr("_", " ")
     end
 
@@ -89,7 +96,7 @@ class Notification < ApplicationRecord
     end
 
     def b_param_kinds
-      %w[partial_registration].freeze
+      %w[partial_registration partial_register_confirmation].freeze
     end
 
     def customer_contact_kinds
@@ -102,17 +109,18 @@ class Notification < ApplicationRecord
     end
 
     def admin_kinds
-      %w[stolen_notification_blocked unknown_organization_for_ascend].freeze +
+      %w[stolen_notification_blocked marketplace_message_blocked unknown_organization_for_ascend].freeze +
         pos_integration_broken_kinds
     end
 
     def sender_auto_kinds
       donation_kinds + theft_alert_kinds + user_alert_kinds + pos_integration_broken_kinds +
-        %w[bike_possibly_found stolen_twitter_alerter unknown_organization_for_ascend]
+        %w[bike_possibly_found stolen_twitter_alerter unknown_organization_for_ascend graduated_notification parking_notification]
     end
 
     def search_message_channel_target(str)
       return none unless str.present?
+
       where("message_channel_target ILIKE ?", "%#{str.strip.downcase}%")
     end
 
@@ -162,6 +170,7 @@ class Notification < ApplicationRecord
 
   def twilio_response
     return nil unless twilio_sid.present?
+
     Integrations::Twilio.new.get_message(twilio_sid)
   end
 
@@ -173,12 +182,14 @@ class Notification < ApplicationRecord
 
   def notifiable_display_name
     return nil if notifiable.blank?
+
     "#{notifiable.class.to_s.titleize} ##{notifiable_id}"
   end
 
   # Update notifications_sent_or_received_by if changing
   def sender
     return nil if self.class.sender_auto_kinds.include?(kind)
+
     if notifiable_type == "CustomerContact"
       notifiable&.creator
     elsif notifiable_type == "StolenNotification"
@@ -190,29 +201,34 @@ class Notification < ApplicationRecord
 
   def sender_display_name
     return "auto" if self.class.sender_auto_kinds.include?(kind)
+
     sender&.display_name
   end
 
   def set_calculated_attributes
     self.user_id ||= calculated_user_id
     self.bike_id ||= notifiable.bike_id if defined?(notifiable.bike_id)
+    self.bike_id ||= notifiable.item_id if defined?(notifiable.item_id)
     self.delivery_status ||= "delivery_pending"
     self.message_channel_target ||= calculated_message_channel_target
   end
 
   def survey_id
     raise "Not a theft survey!" unless theft_survey?
+
     id_searched = id || self.class.where(kind: kind).maximum(:id)
     self.class.where(kind: kind).where("id < ?", id_searched).count + 1
   end
 
   def bike_with_fallback
     return nil if bike_id.blank?
+
     bike || Bike.unscoped.find_by_id(bike_id)
   end
 
   def calculated_message_channel_target
     return calculated_phone if message_channel == "text" || phone_verification?
+
     calculated_email
   end
 
@@ -220,25 +236,38 @@ class Notification < ApplicationRecord
   def track_email_delivery
     return if delivery_success?
 
-    yield
+    delivery = yield
 
+    self.message_id ||= message_id_from_delivery(delivery)
     update(delivery_status: "delivery_success")
     user_email&.update_last_email_errored!(email_errored: false)
   rescue => e
     update(delivery_status: "delivery_failure", delivery_error: e.class)
     user_email&.update_last_email_errored!(email_errored: true)
 
-    raise e unless UNDELIVERABLE_ERRORS.include?(delivery_error)
+    raise e unless UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
+  end
+
+  def delivery_error_spam?
+    delivery_error == "Postmark::InactiveRecipientError"
+  end
+
+  def delivery_error_invalid?
+    delivery_error == "Postmark::InvalidEmailRequestError"
   end
 
   private
+
+  def message_id_from_delivery(delivery)
+    defined?(delivery.message_id) ? delivery.message_id : nil
+  end
 
   def calculated_phone
     notifiable&.phone
   end
 
   def calculated_email
-    c_email = notifiable&.email if b_param? || notifiable_type == "Payment"
+    c_email = notifiable&.email if b_param? || %w[Payment UserEmail].include?(notifiable_type)
     c_email ||= notifiable&.receiver_email if stolen_notification?
     c_email ||= user&.email if user_id.present?
     c_email ||= notifiable&.user_email if customer_contact?
@@ -248,6 +277,7 @@ class Notification < ApplicationRecord
 
   def calculated_user_id
     return notifiable&.receiver_id if notifiable_type == "StolenNotification"
+
     notifiable&.user_id if defined?(notifiable.user_id)
   end
 end

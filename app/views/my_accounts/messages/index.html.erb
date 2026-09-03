@@ -1,0 +1,13 @@
+<div class="twbootcontainer">
+  <h1 class="tw:mb-4 tw:text-xl tw:font-bold">
+    <%= t(".marketplace_messages") %>
+  </h1>
+
+  <% @marketplace_messages.each do |marketplace_message| %>
+    <% cache(marketplace_message) do %>
+      <%= render(Pages::Messages::ThreadsIndex::Component.new(marketplace_message:, current_user:)) %>
+    <% end %>
+  <% end %>
+
+  <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg)) %>
+</div>

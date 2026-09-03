@@ -12,7 +12,11 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
     let(:organization) { initial.organization }
     let(:initial_record_id) { initial.id }
     let(:kind2) { "appears_abandoned_notification" }
-    let!(:parking_notification2) { FactoryBot.create(:parking_notification, user: user, bike: bike, organization: organization, created_at: Time.current - 2.days, kind: kind2, initial_record_id: initial_record_id, delivery_status: "email_success") }
+    let!(:parking_notification2) do
+      pn = FactoryBot.create(:parking_notification, user: user, bike: bike, organization: organization, created_at: Time.current - 2.days, kind: kind2, initial_record_id: initial_record_id)
+      FactoryBot.create(:notification, kind: "parking_notification", notifiable: pn, delivery_status: "delivery_success", bike: pn.bike, message_channel_target: pn.email)
+      pn
+    end
     context "impound record" do
       let(:parking_notification3) { FactoryBot.build(:parking_notification, user: user, bike: bike, organization: organization, kind: "impound_notification", initial_record: initial) }
       it "updates the other parking_notifications, creates the impound record" do
@@ -24,7 +28,7 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
         expect(bike.status).to eq "status_abandoned"
         expect(initial.status).to eq "replaced"
         expect(parking_notification2.status).to eq "current"
-        expect(parking_notification2.delivery_status).to eq "email_success"
+        expect(parking_notification2.email_success?).to be_truthy
         expect(parking_notification2.organization_id).to be_present
         Sidekiq::Job.clear_all
         expect {
@@ -32,7 +36,7 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
           parking_notification3.reload
           expect(parking_notification3.associated_notifications.pluck(:id)).to match_array([initial.id, parking_notification2.id])
         }.to change(ProcessParkingNotificationJob.jobs, :size).by(1)
-        expect(parking_notification3.delivery_status).to be_blank
+        expect(parking_notification3.email_success?).to be_falsey
         # Ensure we don't accidentally reloop things
         expect {
           subject.drain
@@ -59,11 +63,33 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
         expect(initial.kind).to eq "appears_abandoned_notification"
         expect(initial.status).to eq "replaced"
         expect(initial.resolved_at).to be_present
-        expect(parking_notification2.delivery_status).to eq "email_success"
+        expect(parking_notification2.email_success?).to be_truthy
         expect(parking_notification2.status).to eq "replaced"
         expect(parking_notification2.resolved_at).to be_present
         expect(parking_notification2.impound_record).to eq impound_record
         expect(parking_notification2.kind).to eq "appears_abandoned_notification"
+      end
+    end
+    context "impound record sets impounded_from_address_record" do
+      let(:parking_notification3) do
+        FactoryBot.build(:parking_notification,
+          user: user, bike: bike, organization: organization,
+          kind: "impound_notification", initial_record: initial,
+          latitude: 37.7749, longitude: -122.4194,
+          street: "1 Market St", city: "San Francisco", postal_code: "94105",
+          use_entered_address: "1",
+          region_record_id: State.find_or_create_by(name: "California", abbreviation: "CA", country: Country.united_states).id,
+          country_id: Country.united_states.id)
+      end
+      it "creates impound_record with impounded_from_address_record from parking notification location" do
+        parking_notification3.save
+        Sidekiq::Testing.inline! { subject.drain }
+        parking_notification3.reload
+        impound_record = parking_notification3.impound_record
+        expect(impound_record).to be_present
+        expect(impound_record.impounded_from_address_record).to be_present
+        expect(impound_record.impounded_from_address_record.city).to eq "San Francisco"
+        expect(impound_record.impounded_from_address_record.street).to eq "1 Market St"
       end
     end
     context "retrieved" do
@@ -154,33 +180,132 @@ RSpec.describe ProcessParkingNotificationJob, type: :job do
     end
   end
 
-  describe "sending email" do
+  describe "second impound notification for an already impounded bike" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
     let(:bike) { FactoryBot.create(:ownership).bike }
-    let(:parking_notification) { FactoryBot.create(:parking_notification_organized, delivery_status: delivery_status, bike: bike) }
-    let(:delivery_status) { nil }
+    let(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: organization, bike: bike, kind: "impound_notification") }
+    let!(:parking_notification_duplicate) do
+      FactoryBot.create(:parking_notification_organized, organization: organization, bike: bike,
+        user: parking_notification.user, kind: "impound_notification")
+    end
+    before { instance.perform(parking_notification.id) }
 
-    it "sends an email" do
-      expect(parking_notification.send_email?).to be_truthy
-      instance.perform(parking_notification.id)
-      expect(ActionMailer::Base.deliveries.empty?).to be_falsey
-      parking_notification.reload
-      expect(parking_notification.delivery_status).to be_present
+    it "links to the existing impound record without emailing the owner again" do
+      impound_record = parking_notification.reload.impound_record
+      expect(impound_record).to be_present
+      expect(bike.reload.current_impound_record).to eq impound_record
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+
+      expect { instance.perform(parking_notification_duplicate.id) }.to_not change(ImpoundRecord, :count)
+      expect(parking_notification_duplicate.reload.impound_record).to eq impound_record
+      expect(parking_notification_duplicate.status).to eq "impounded"
+      expect(parking_notification_duplicate.notifications.count).to eq 0
+
+      instance.perform(parking_notification_duplicate.id)
+      expect(ActionMailer::Base.deliveries.count).to eq 1
     end
 
-    context "delivery failed" do
-      let(:delivery_status) { "email_failure" }
+    context "impounded by a different organization" do
+      let(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+      let!(:parking_notification_duplicate) do
+        FactoryBot.create(:parking_notification_organized, organization: organization2, bike: bike, kind: "impound_notification")
+      end
+
+      it "doesn't link to the other organization's impound record, or email" do
+        expect { instance.perform(parking_notification_duplicate.id) }.to_not change(ImpoundRecord, :count)
+        expect(parking_notification_duplicate.reload.impound_record_id).to be_blank
+        expect(bike.reload.current_impound_record).to eq parking_notification.reload.impound_record
+        expect(parking_notification_duplicate.notifications.count).to eq 0
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+      end
+    end
+  end
+
+  describe "sending email" do
+    let(:bike) { FactoryBot.create(:ownership).bike }
+    let(:parking_notification) { FactoryBot.create(:parking_notification_organized, bike: bike) }
+
+    it "delivers, records a delivery_success Notification, and is idempotent" do
+      expect(parking_notification.send_email?).to be_truthy
+      expect {
+        instance.perform(parking_notification.id)
+      }.to change { parking_notification.notifications.count }.by(1)
+        .and change { ActionMailer::Base.deliveries.count }.by(1)
+
+      notification = parking_notification.notifications.first
+      expect(notification.kind).to eq "parking_notification"
+      expect(notification.delivery_status).to eq "delivery_success"
+      expect(notification.message_channel_target).to eq parking_notification.email
+      expect(notification.bike_id).to eq parking_notification.bike_id
+
+      parking_notification.reload
+      expect(parking_notification.email_success?).to be_truthy
+
+      expect { instance.perform(parking_notification.id) }
+        .not_to change { Notification.count }
+      expect(ActionMailer::Base.deliveries.count).to eq 1
+    end
+
+    context "with InactiveRecipientError" do
+      let(:inactive_recipient_error) do
+        Postmark::ApiInputError.build("error", {"ErrorCode" => 406, "Message" => "inactive"})
+      end
+      it "records delivery_failure on the Notification and does not raise" do
+        allow(OrganizedMailer).to receive(:parking_notification).and_raise(inactive_recipient_error)
+        expect { instance.perform(parking_notification.id) }.not_to raise_error
+        notification = parking_notification.notifications.first
+        expect(notification.delivery_status).to eq "delivery_failure"
+        expect(notification.delivery_error).to eq "Postmark::InactiveRecipientError"
+        expect(parking_notification.reload.email_success?).to be_falsey
+      end
+    end
+
+    context "delivery succeeded" do
+      before do
+        FactoryBot.create(:notification, kind: "parking_notification", notifiable: parking_notification, delivery_status: "delivery_success", bike: parking_notification.bike, message_channel_target: parking_notification.email)
+      end
       it "does not send" do
-        expect(parking_notification.send_email?).to be_truthy
         instance.perform(parking_notification.id)
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
       end
     end
 
-    context "delivery succeeded" do
-      let(:delivery_status) { "email_success" }
+    context "redlock held by another worker" do
+      before do
+        @lock_manager = described_class.new_lock_manager
+        @redlock = @lock_manager.lock(described_class.redlock_key(parking_notification.id), 5000)
+      end
+      after { @lock_manager.unlock(@redlock) }
       it "does not send" do
+        expect(parking_notification.send_email?).to be_truthy
+        expect(described_class.locked_for?(parking_notification.id)).to be_truthy
         instance.perform(parking_notification.id)
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+        expect(parking_notification.notifications.count).to eq 0
+      end
+    end
+
+    context "impound_notification with location" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+      let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization: organization, name: "Impound Facility") }
+      let(:impound_record) { FactoryBot.create(:impound_record, organization: organization, location: location) }
+      let(:parking_notification) do
+        FactoryBot.create(:parking_notification_organized,
+          organization: organization,
+          kind: "impound_notification",
+          impound_record: impound_record)
+      end
+      it "sends email with location address" do
+        expect(location.address_record).to be_present
+        expect(parking_notification.impound_record.location).to eq location
+        instance.perform(parking_notification.id)
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        mail = ActionMailer::Base.deliveries.last
+        expect(mail.body.encoded).to match "Impound Facility"
+        # AddressDisplay component renders with HTML spans, so check for address parts
+        expect(mail.body.encoded).to match "1300 W 14th Pl"
+        expect(mail.body.encoded).to match "Chicago"
+        expect(mail.body.encoded).to match "IL 60608"
       end
     end
   end

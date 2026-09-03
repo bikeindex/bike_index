@@ -1,0 +1,8 @@
+<%#
+  The consumer page pulls itself up under the layout's header band, and Lookbook renders
+  it alone — without this the top of the page is dragged off the frame
+%>
+
+<div class="<%= "tw:pt-(--nav-gap)" if offset_header %>">
+  <%= render(component) %>
+</div>

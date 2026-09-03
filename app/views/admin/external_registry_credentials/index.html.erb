@@ -1,0 +1,14 @@
+<% nav_header_list_items = capture do %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "New Credential", href: new_admin_external_registry_credential_path, color: :primary, size: :sm)) %>
+  </li>
+<% end %>
+
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  viewing: controller_name.humanize,
+  collection: @external_registry_credentials,
+  index_title: "External Registry Credentials",
+  nav_header_list_items:,
+  skip_charting: true,
+)) %>

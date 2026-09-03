@@ -1,13 +1,43 @@
 <!DOCTYPE html>
+
 <html>
   <head>
     <title>Bike Index Component Preview</title>
-    <%= stylesheet_link_tag 'tailwind' %>
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700"
+      rel="stylesheet"
+      type="text/css"
+    >
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:400,700"
+      rel="stylesheet"
+      type="text/css"
+    >
+
+    <%= stylesheet_link_tag "tailwind" %>
+    <%= hw_combobox_style_tag %>
     <%= javascript_importmap_tags %>
+
+    <script>window.inComponentPreview = true</script>
+
+    <%#
+      Use Lookbook's display options to include additional stylesheets
+      add '# @display legacy_stylesheet true' above your preview method to render it
+      add '# @display kelsey_stylesheet true' above your preview method to render it
+    %>
+
+    <% if Binxtils::InputNormalizer.boolean(params.dig(:lookbook, :display, :legacy_stylesheet)) %>
+      <%= stylesheet_link_tag "revised", "data-turbo-track" => "reload" %>
+    <% elsif Binxtils::InputNormalizer.boolean(params.dig(:lookbook, :display, :kelsey_stylesheet)) %>
+      <%= stylesheet_link_tag "kelsey_styles", "data-turbo-track" => "reload" %>
+    <% end %>
   </head>
-  <body class="<%= params.dig(:lookbook, :display, :theme) %>">
-    <div class="tw-w-full tw-h-full">
-      <%= yield %>
-    </div>
-  </body>
+
+  <%# NOTE: This sets the theme. Padding set to 0 because revised stylesheet in bike box %>
+  <%= body_tag(html_class: params.dig(:lookbook, :display, :theme), style: "padding: 0;") do %>
+    <%# NOTE: at some point, make the padding optional %>
+    <div class="tw:p-4"><%= yield %></div>
+  <% end %>
 </html>

@@ -1,0 +1,13 @@
+<% nav_header_list_items = capture do %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "New Feature", href: new_admin_organization_feature_url, color: :primary, size: :sm)) %>
+  </li>
+<% end %>
+
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @organization_features,
+  viewing: "Organization Features",
+  skip_charting: true,
+  nav_header_list_items:,
+)) %>

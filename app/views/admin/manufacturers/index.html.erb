@@ -1,0 +1,35 @@
+<% nav_header_list_items = capture do %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "New Manufacturer", href: new_admin_manufacturer_url, color: :primary, size: :sm)) %>
+  </li>
+<% end %>
+
+<% count_detail = capture do %>
+  &mdash; <%= number_display(Manufacturer.with_websites.count) %> with
+  <%= link_to "websites", url_for(sortable_search_params.merge(search_with_websites: !@with_websites)), class: ("active" if @with_websites) %>,
+  <%= number_display(Manufacturer.with_logos.count) %> with
+  <%= link_to "logos", url_for(sortable_search_params.merge(search_with_logos: !@with_logos)), class: ("active" if @with_logos) %>.
+<% end if request.query_parameters.blank? %>
+
+<% table_view = capture do %>
+  <%= render partial: "/admin/manufacturers/table", locals: {collection: @manufacturers, render_sortable: true} %>
+
+  <%= form_tag import_admin_manufacturers_path, multipart: true do %>
+    <div class="form-group">
+      <%= label :csv, "Upload CSV of Manufacturers list" %>
+      <%= file_field_tag :file %>
+    </div>
+
+    <%= submit_tag "Import CSV of Manufacturers", class: "btn btn-warning float-right mb-4" %>
+  <% end %>
+<% end %>
+
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @manufacturers,
+  viewing: "Manufacturers",
+  nav_header_list_items:,
+  table_view:,
+  count_detail:,
+  skip_charting: true,
+)) %>

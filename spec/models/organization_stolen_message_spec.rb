@@ -68,12 +68,12 @@ RSpec.describe OrganizationStolenMessage, type: :model do
 
   describe "for stolen_record" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, kind: "bike_shop", enabled_feature_slugs: ["organization_stolen_message"]) }
-    let!(:organization_default_location) { FactoryBot.create(:location_nyc, organization: organization) }
+    let!(:organization_default_location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization: organization) }
     let!(:organization_stolen_message) { OrganizationStolenMessage.where(organization_id: organization.id).first_or_create }
     let(:attrs) { {kind: "association", is_enabled: true, body: "Something cool"} }
     before { organization_stolen_message.update(attrs) }
     let(:organization2) { FactoryBot.create(:organization) }
-    let(:bike) { FactoryBot.create(:bike_organized, :with_stolen_record, :in_nyc, creation_organization: organization) }
+    let(:bike) { FactoryBot.create(:bike_organized, :with_stolen_record, :with_address_record, address_in: :new_york, creation_organization: organization) }
     let(:stolen_record) { bike.reload.current_stolen_record }
     let(:bike2) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: organization2) }
     let(:stolen_record2) { bike2.current_stolen_record }
@@ -105,13 +105,13 @@ RSpec.describe OrganizationStolenMessage, type: :model do
       let(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["organization_stolen_message"]) }
       let!(:organization_stolen_message2) { OrganizationStolenMessage.where(organization_id: organization2.id).first_or_create }
       before { organization_stolen_message2.update(attrs) }
-      it "returns first", :flaky do
+      it "returns first" do
         expect(organization_stolen_message.id).to be_present
         expect(organization_stolen_message2).to be_valid
         expect(OrganizationStolenMessage.count).to eq 2
         bike.bike_organizations.create(organization: organization2)
         expect(stolen_record).to be_valid
-        expect(bike.reload.bike_organizations.pluck(:organization_id)).to eq([organization.id, organization2.id])
+        expect(bike.reload.bike_organizations.order(:id).pluck(:organization_id)).to eq([organization.id, organization2.id])
         expect(stolen_record.organization_stolen_message_id).to eq nil
         expect(OrganizationStolenMessage.for_stolen_record(stolen_record)&.id).to eq organization_stolen_message.id
         expect(stolen_record.reload.organization_stolen_message_id).to eq nil
@@ -119,7 +119,7 @@ RSpec.describe OrganizationStolenMessage, type: :model do
         expect(stolen_record2).to be_valid
         expect(OrganizationStolenMessage.for_stolen_record(stolen_record2)&.id).to eq organization_stolen_message2.id
         bike2.bike_organizations.create(organization: organization)
-        expect(bike2.reload.bike_organizations.pluck(:organization_id)).to eq([organization2.id, organization.id])
+        expect(bike2.reload.bike_organizations.order(:id).pluck(:organization_id)).to eq([organization2.id, organization.id])
         expect(OrganizationStolenMessage.for_stolen_record(stolen_record2)&.id).to eq organization_stolen_message2.id
       end
     end
@@ -153,9 +153,10 @@ RSpec.describe OrganizationStolenMessage, type: :model do
         let(:prospect_park) { {latitude: 40.655135, longitude: -73.9648107} }
         let(:williamsburg) { {latitude: 40.7031836, longitude: -73.9639495} }
         let(:attrs) { area_attrs } # Assigns it to be first
-        let!(:organization_default_location) { FactoryBot.create(:location_nyc, {organization: organization, skip_geocoding: true}.merge(williamsburg)) }
+        let(:williamsburg_address) { FactoryBot.create(:address_record, :new_york, williamsburg.merge(skip_geocoding: true)) }
+        let!(:organization_default_location) { FactoryBot.create(:location, organization:, address_record: williamsburg_address) }
         it "returns the closer area" do
-          expect(organization.reload.default_location.to_coordinates).to eq(williamsburg.values)
+          expect([organization.reload.default_location.latitude, organization.reload.default_location.longitude]).to eq(williamsburg.values)
           stolen_record.update(prospect_park.merge(skip_geocoding: true))
           expect(stolen_record.reload.to_coordinates).to eq(prospect_park.values)
           expect(organization_stolen_message.id).to be_present

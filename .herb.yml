@@ -1,0 +1,132 @@
+# This file configures Herb for your project and team.
+# Settings here take precedence over individual editor preferences.
+#
+# Herb is a suite of tools for HTML+ERB templates including:
+# - Linter: Validates templates and enforces best practices
+# - Formatter: Auto-formats templates with intelligent indentation
+# - Language Server: Provides IDE support (VS Code, Zed, Neovim, etc.)
+#
+# Website: https://herb-tools.dev
+# Configuration: https://herb-tools.dev/configuration
+# GitHub Repo: https://github.com/marcoroth/herb
+#
+
+version: 0.10.3
+
+files:
+#   # Additional patterns beyond the defaults (**.html, **.rhtml, **.html.erb, etc.)
+#   include:
+#     - '**/*.xml.erb'
+#     - 'custom/**/*.html'
+#
+#   # Patterns to exclude (can exclude defaults too)
+  exclude:
+    - 'kelsey_redesign/**/*'
+    - 'public/**/*'
+    - 'tmp/**/*'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
+    # ERB that renders something other than HTML. The formatter indents it as though it
+    # were markup, which loses whitespace that matters: a mail template's line breaks (and
+    # the space before an <%= %>), CoffeeScript's indentation. .turbo_stream.erb is HTML,
+    # so it stays in.
+    - '**/*.text.erb'
+    - '**/*.js.erb'
+    - '**/*.coffee.erb'
+
+linter:
+  enabled: true
+  # # Additional patterns beyond the defaults for linting
+  # include:
+  #   - '**/*.xml.erb'
+  #
+  # # Patterns to exclude from linting
+  # exclude:
+  #   - 'app/views/admin/**/*'
+
+  rules:
+    #
+    # Rules I don't want to enable ever:
+    #
+    html-head-only-elements:
+      enabled: false
+    # .html_safe and .raw are always hacks and I know they're hacks and are avoided
+    erb-no-unsafe-raw:
+      enabled: false
+    # Commented-out output tags are kept on purpose - a TODO, or what a thing replaced
+    erb-no-commented-out-output-tags:
+      enabled: false
+
+    #
+    # Rules I'd like to enable but we have legacy things that make it hard
+    #
+    erb-no-instance-variables-in-partials:
+      enabled: false
+    # Disabled: herb-format adds indentation to blank lines, conflicting with this rule
+    erb-no-trailing-whitespace:
+      enabled: false
+    # Disabled: branches often have structurally different content, making extraction impractical
+    erb-no-duplicate-branch-elements:
+      enabled: false
+    # Disabled: UI::Table column blocks run via instance_exec, so helpers need helpers. prefix
+    actionview-no-silent-helper:
+      enabled: false
+    # Every inline <script> would need a nonce, and CSP ignores unsafe_inline once one is
+    # present - so turning this on means moving the whole policy to nonces at the same time
+    html-require-script-nonce:
+      enabled: false
+
+    #
+    # Rules that don't apply everywhere
+    #
+    # db/seeds templates render through ERB.new, which has no view helpers
+    erb-prefer-image-tag-helper:
+      exclude:
+        - 'db/seeds/**/*'
+
+    # The legacy views are full of these; components are clean, so hold the line there
+    html-anchor-require-href:
+      only:
+        - 'app/components/**/*'
+      # org--assign-bike-sticker supplies that table's hrefs, because the sticker is a
+      # query param and the rows are cached without it. Excluded by file rather than
+      # herb:disable, which the formatter relocates onto an unrelated <a>
+      exclude:
+        - 'app/components/pages/org/search_results/bikes_table/component.html.erb'
+  #
+  #   # Rules can have 'include', 'only', and 'exclude' patterns
+  #   some-rule:
+  #     # Additional patterns to check (additive, ignored when 'only' is present)
+  #     include:
+  #       - 'app/components/**/*'
+  #     # Don't apply this rule to files matching these patterns
+  #     exclude:
+  #       - 'app/views/admin/**/*'
+  #
+  #   another-rule:
+  #     # Only apply this rule to files matching these patterns (overrides all 'include')
+  #     only:
+  #       - 'app/views/**/*'
+  #     # Exclude still applies even with 'only'
+  #     exclude:
+  #       - 'app/views/admin/**/*'
+
+formatter:
+  enabled: true
+  indentWidth: 2
+  maxLineLength: 80
+  # # Additional patterns beyond the defaults for formatting
+  # include:
+  #   - '**/*.xml.erb'
+  #
+  # # Patterns to exclude from formatting
+  # exclude:
+  #   - 'app/views/admin/**/*'
+
+  # Rewriters modify templates during formatting
+  rewriter:
+    # Pre-format rewriters (modify AST before formatting)
+    pre:
+      - tailwind-class-sorter
+  #   # Post-format rewriters (modify formatted output string)
+  #   post: []

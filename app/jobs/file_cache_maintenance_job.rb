@@ -21,7 +21,8 @@ class FileCacheMaintenanceJob < ScheduledJob
   end
 
   def file_prefix
-    Rails.env.test? ? "/spec/fixtures/tsv_creation/" : ""
+    # tmp/ is writable by the container's rails user; the app root (Rails.root) is not
+    Rails.env.test? ? "/spec/fixtures/tsv_creation/" : "tmp/"
   end
 
   def filename
@@ -36,7 +37,7 @@ class FileCacheMaintenanceJob < ScheduledJob
     File.open(tmp_path, "w") {}
     File.open(tmp_path, "a+") do |file|
       file << '{"bikes": ['
-      Bike.status_stolen.find_each { |bike| file << BikeV2Serializer.new(bike, root: false).to_json + "," }
+      Bike.status_stolen.find_each { |bike| file << BikeV2Serializer.new(bike, root: false).as_json.except(:for_sale).to_json + "," }
     end
     File.truncate(tmp_path, File.size(tmp_path) - 1) # remove final comma
     File.open(tmp_path, "a+") { |file| file << "]}" }

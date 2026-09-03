@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 class CycleType
   include Enumable
   include AutocompleteHashable
+  include ShortNameable
 
   SLUGS = {
     bike: 0,
@@ -23,11 +26,14 @@ class CycleType
     "personal-mobility": 18,
     "non-e-scooter": 19,
     "non-e-skateboard": 20,
-    "e-motorcycle": 21
+    "e-motorcycle": 21,
+    elliptical: 22,
+    "balance-bike": 23
   }.freeze
 
+  DEFAULT = "Bike"
   NAMES = {
-    bike: "Bike",
+    bike: DEFAULT,
     tandem: "Tandem",
     unicycle: "Unicycle",
     tricycle: "Tricycle",
@@ -36,18 +42,20 @@ class CycleType
     trailer: "Bike Trailer",
     wheelchair: "Wheelchair",
     cargo: "Cargo Bike (front storage)",
-    "tall-bike": "Tall Bike",
+    "tall-bike": "Tall Bike (multiple frames fused together)",
     "penny-farthing": "Penny Farthing",
     "cargo-rear": "Cargo Bike Rear (e.g. longtail)",
-    "cargo-trike": "Cargo Tricycle (front storage)",
-    "cargo-trike-rear": "Cargo Tricycle (rear storage)",
+    "cargo-trike": "Cargo Tricycle (trike with front storage, e.g. Christiania bike)",
+    "cargo-trike-rear": "Cargo Tricycle (trike with rear storage)",
     "trail-behind": "Trail behind (half bike)",
     "pedi-cab": "Pedi Cab (rickshaw)",
     "e-scooter": "e-Scooter",
-    "personal-mobility": "e-Skateboard (e-Unicycle, Personal mobility device, etc)",
+    "personal-mobility": "e-Personal Mobility (EPAMD, e-Skateboard, Segway, e-Unicycle, etc)",
     "non-e-scooter": "Scooter (not electric)",
     "non-e-skateboard": "Skateboard (not electric)",
-    "e-motorcycle": "e-Motorcycle/e-Dirtbike (no pedals)"
+    "e-motorcycle": "e-Motorcycle (e-Dirt bike, e-bike with no pedals)",
+    elliptical: "Elliptical bike",
+    "balance-bike": "Balance Bike"
   }.freeze
 
   MODEST_PRIORITY = %i[personal-mobility recumbent tandem tricycle].freeze
@@ -55,58 +63,70 @@ class CycleType
   PEDAL = %i[bike cargo cargo-rear cargo-trike cargo-trike-rear pedi-cab penny-farthing
     recumbent tall-bike tandem trail-behind tricycle unicycle].freeze
   ALWAYS_MOTORIZED = %i[e-scooter personal-mobility e-motorcycle].freeze
-  NEVER_MOTORIZED = %i[non-e-scooter non-e-skateboard trail-behind].freeze
+  NEVER_MOTORIZED = %i[non-e-scooter non-e-skateboard trail-behind balance-bike].freeze
   NOT_CYCLE_TYPE = %i[e-scooter non-e-skateboard personal-mobility stroller wheelchair e-motorcycle].freeze
 
-  def self.searchable_names
-    slugs
-  end
-
-  def self.pedal_type?(slug)
-    PEDAL.include?(slug&.to_sym)
-  end
-
-  def self.strict_motorized(slug)
-    if ALWAYS_MOTORIZED.include?(slug&.to_sym)
-      :always
-    elsif NEVER_MOTORIZED.include?(slug&.to_sym)
-      :never
+  class << self
+    def slug_translation_short(slug)
+      slug_translation(slug)&.gsub(/\s?\([^)]*\)/i, "")
     end
-  end
 
-  def self.not_cycle?(slug)
-    NOT_CYCLE_TYPE.include?(slug&.to_sym)
-  end
+    def searchable_names
+      slugs
+    end
 
-  def self.front_and_rear_wheels?(slug)
-    (PEDAL - %i[unicycle trail-behind trailer] + %i[e-scooter non-e-scooter e-motorcycle])
-      .include?(slug&.to_sym)
-  end
+    def pedal_type?(slug)
+      PEDAL.include?(slug&.to_sym)
+    end
 
-  def self.not_cycle_drivetrain?(slug)
-    (NOT_CYCLE_TYPE + %i[trail-behind trailer unicycle]).include?(slug&.to_sym)
-  end
-
-  def self.select_options(traditional_bike: false)
-    slugs.map do |slug|
-      if slug == "bike" && traditional_bike
-        [slug_translation("traditional_bike"), slug]
-      else
-        [slug_translation(slug), slug]
+    def strict_motorized(slug)
+      if ALWAYS_MOTORIZED.include?(slug&.to_sym)
+        :always
+      elsif NEVER_MOTORIZED.include?(slug&.to_sym)
+        :never
       end
     end
+
+    def not_cycle?(slug)
+      NOT_CYCLE_TYPE.include?(slug&.to_sym)
+    end
+
+    def front_and_rear_wheels?(slug)
+      (PEDAL - %i[unicycle trail-behind trailer] + %i[e-scooter non-e-scooter e-motorcycle])
+        .include?(slug&.to_sym)
+    end
+
+    def not_cycle_drivetrain?(slug)
+      (NOT_CYCLE_TYPE + %i[trail-behind trailer unicycle balance-bike]).include?(slug&.to_sym)
+    end
+
+    def select_options(traditional_bike: false)
+      slugs.map do |slug|
+        if slug == "bike" && traditional_bike
+          [slug_translation("traditional_bike"), slug]
+        else
+          [slug_translation(slug), slug]
+        end
+      end
+    end
+
+    def default_slug
+      "bike"
+    end
+
+    private
+
+    def ignored_secondaries
+      ["etc", "not electric"].freeze
+    end
   end
 
-  def self.default_slug
-    "bike"
-  end
+  attr_reader :slug, :id
 
   def initialize(slug)
     @slug = slug&.to_sym
     @id = SLUGS[@slug]
   end
-
-  attr_reader :slug, :id
 
   def priority
     if slug == :bike
@@ -120,6 +140,10 @@ class CycleType
     else
       900
     end
+  end
+
+  def short_name_translation
+    self.class.slug_translation_short(slug)
   end
 
   def search_id

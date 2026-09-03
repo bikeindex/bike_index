@@ -3,10 +3,12 @@ module FriendlySlugFindable
   include FriendlyNameFindable
 
   module ClassMethods
-    def friendly_find(n)
-      return nil if n.blank?
-      return where(id: n).first if n.is_a?(Integer) || n.strip.match(/\A\d+\z/).present?
-      find_by_slug(Slugifyer.slugify(n)) || where("lower(name) = ?", n.downcase.strip).first
+    def friendly_find(str)
+      str = normalize_friendly_str(str)
+      return nil if str.blank?
+      return where(id: str).first if integer_string?(str)
+
+      find_by_slug(Slugifyer.slugify(str)) || where("lower(name) = ?", str.downcase).first
     end
 
     def friendly_find_id(str)
@@ -27,6 +29,7 @@ module FriendlySlugFindable
   end
 
   def set_slug
+    self.name = name&.strip
     self.slug ||= Slugifyer.slugify(name)
   end
 end

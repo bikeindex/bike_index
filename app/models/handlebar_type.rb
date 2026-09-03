@@ -11,7 +11,7 @@ class HandlebarType
   }.freeze
 
   NAMES = {
-    drop_bar: "Drop",
+    drop_bar: "Drop bars",
     forward: "Forward facing",
     rearward: "Rear facing",
     other: "Not handlebars",
@@ -19,10 +19,10 @@ class HandlebarType
     flat: "Flat or riser"
   }.freeze
 
+  attr_reader :slug, :id
+
   def initialize(slug)
     @slug = slug&.to_sym
     @id = SLUGS[@slug]
   end
-
-  attr_reader :slug, :id
 end

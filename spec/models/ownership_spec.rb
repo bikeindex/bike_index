@@ -2,6 +2,8 @@ require "rails_helper"
 
 RSpec.describe Ownership, type: :model do
   it_behaves_like "registration_infoable"
+  # TODO: update so that this works! Probably
+  # it_behaves_like "address_recorded"
 
   describe "factories" do
     let(:ownership) { FactoryBot.create(:ownership) }
@@ -61,7 +63,7 @@ RSpec.describe Ownership, type: :model do
       expect {
         bike.ownerships.create(creator: ownership2.creator,
           owner_email: "s@s.com")
-      }.to change(EmailOwnershipInvitationJob.jobs, :size).by(1)
+      }.to change(Email::OwnershipInvitationJob.jobs, :size).by(1)
       expect(bike.ownerships.count).to eq 3
       expect(bike.reload.send(:calculated_current_ownership)&.id).to be > ownership2.id
       expect(ownership1.reload.current).to be_falsey
@@ -99,10 +101,10 @@ RSpec.describe Ownership, type: :model do
         expect(ownership1.current?).to be_falsey
         expect(ownership1.claim_message).to be_blank
         expect(ownership1.organization&.id).to eq bike.organizations.first.id
-        expect(ownership1.first?).to be_truthy
+        expect(ownership1.initial?).to be_truthy
         expect(ownership1.previous_ownership_id).to be_blank
         expect(ownership2.current?).to be_truthy
-        expect(ownership2.first?).to be_falsey
+        expect(ownership2.initial?).to be_falsey
         expect(ownership2.second?).to be_truthy
         expect(ownership2.organization&.id).to be_blank
         expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership1.id])
@@ -135,23 +137,23 @@ RSpec.describe Ownership, type: :model do
           expect(ownership.claimed?).to be_truthy
           expect(ownership.current?).to be_truthy
           expect(ownership.organization&.id).to eq organization.id
-          expect(ownership.first?).to be_truthy
+          expect(ownership.initial?).to be_truthy
           expect(ownership.previous_ownership_id).to be_blank
           expect(ownership.organization_pre_registration?).to be_truthy
           expect(ownership.send_email).to be_truthy # still defaults to true
           # Before save, still works
           expect(ownership2.current).to be_truthy
           expect(ownership2.prior_ownerships.pluck(:id)).to eq([ownership.id])
-          expect(ownership2.first?).to be_falsey
+          expect(ownership2.initial?).to be_falsey
           expect(ownership2.second?).to be_truthy
           ownership2.save
           ownership2.reload
           ownership.reload
           expect(ownership.current?).to be_falsey
-          expect(ownership.first?).to be_truthy
+          expect(ownership.initial?).to be_truthy
           expect(ownership2.current?).to be_truthy
           expect(ownership2.self_made?).to be_falsey
-          expect(ownership2.first?).to be_falsey
+          expect(ownership2.initial?).to be_falsey
           expect(ownership2.second?).to be_truthy
           expect(ownership2.organization_pre_registration?).to be_falsey
           expect(ownership2.previous_ownership_id).to eq ownership.id
@@ -169,7 +171,7 @@ RSpec.describe Ownership, type: :model do
           expect(ownership3.organization_pre_registration?).to be_falsey
           expect(ownership3.previous_ownership.organization_pre_registration?).to be_falsey
           expect(ownership3.prior_ownerships.pluck(:id)).to match_array([ownership.id, ownership2.id])
-          expect(ownership3.first?).to be_falsey
+          expect(ownership3.initial?).to be_falsey
           expect(ownership3.second?).to be_falsey
           expect(ownership3.new_registration?).to be_falsey
           expect(ownership3.self_made?).to be_falsey
@@ -197,7 +199,7 @@ RSpec.describe Ownership, type: :model do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, owner_email: email) }
       let!(:ownership1) { bike.ownerships.first }
       let(:ownership2) { FactoryBot.create(:ownership, bike: bike, creator: bike.creator, owner_email: email) }
-      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
+      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike, unregistered_bike: true) }
       let(:new_email) { "impound_user@stuff.com" }
       it "is new_registration" do
         expect(bike.reload.claimed?).to be_truthy
@@ -356,7 +358,7 @@ RSpec.describe Ownership, type: :model do
         # There was some trouble with CI on this, so now we're just updating a bunch
         ownership.update(updated_at: Time.current)
         expect(organization.enabled?("skip_ownership_email")).to be_truthy
-        expect(ownership.first?).to be_truthy
+        expect(ownership.initial?).to be_truthy
         expect(ownership.calculated_send_email).to be_falsey
         ownership2 = FactoryBot.create(:ownership, bike: bike, created_at: Time.current)
         ownership2.update(updated_at: Time.current)
@@ -557,6 +559,12 @@ RSpec.describe Ownership, type: :model do
         expect(ownership.creation_description).to eq "landing page"
       end
     end
+    context "creator_unregistered_parking_notification" do
+      let(:ownership) { Ownership.new(origin: "creator_unregistered_parking_notification") }
+      it "returns parking notification" do
+        expect(ownership.creation_description).to eq "parking notification"
+      end
+    end
   end
 
   describe "owner_name" do
@@ -669,6 +677,91 @@ RSpec.describe Ownership, type: :model do
         expect(bike.current_ownership.user_id).to be_blank
         expect(bike.current_ownership.owner_name).to eq "Jill Example"
       end
+    end
+  end
+
+  describe "address_record" do
+    let!(:state) { FactoryBot.create(:state, name: "Pennsylvania", abbreviation: "PA") }
+    let(:ownership) { FactoryBot.build(:ownership, registration_info:) }
+    let(:pa_info) { {city: "State College", region_string: "PA", street: "100 W College Ave", postal_code: "16801", organization_affiliation: "student"} }
+    let(:registration_info) { pa_info }
+    let(:target_attrs) do
+      {city: "State College", region_string: nil, street: "100 W College Ave", postal_code: "16801",
+       region_record_id: state.id, country_id: Country.united_states_id, bike_id: ownership.bike_id}
+    end
+    include_context :geocoder_real
+
+    it "creates an address_record" do
+      VCR.use_cassette("Ownership-address_record_from_registration_info") do
+        expect do
+          ownership.save!
+          ownership.reload.update(updated_at: Time.current)
+        end.to change(AddressRecord, :count).by 1
+
+        expect(ownership.address_record_id).to be_present
+        expect(ownership.address_record).to have_attributes target_attrs
+        expect(ownership.address_record.to_coordinates.map(&:round)).to eq([41, -78])
+        expect(ownership.bike.valid_mailing_address?).to be_truthy
+        ownership.bike.update(address_record_id: ownership.address_record_id)
+        expect(AddressRecord.count).to eq 1
+
+        expect { ownership.bike.update(delete_address_record: true) }.to_not change(AddressRecord, :count)
+        expect(ownership.bike.reload.address_record_id).to be_nil
+        expect(ownership.reload.address_record).to have_attributes target_attrs
+      end
+    end
+
+    context "without street" do
+      let(:registration_info) { pa_info.except(:street) }
+
+      it "creates an address_record, without street" do
+        VCR.use_cassette("Ownership-address_record_from_registration_info-streetless") do
+          expect do
+            ownership.save!
+            ownership.reload.update(updated_at: Time.current)
+          end.to change(AddressRecord, :count).by 1
+
+          expect(ownership.address_record_id).to be_present
+          expect(ownership.address_record).to have_attributes target_attrs.merge(street: nil)
+          expect(ownership.address_record.to_coordinates.map(&:round)).to eq([41, -78])
+          expect(ownership.bike.valid_mailing_address?).to be_falsey
+        end
+      end
+    end
+
+    context "edmonton" do
+      let(:registration_info) { {city: "Edmonton", region_string: "AB", street: "2 Sir Winston Churchill Sq", postal_code: "T5J 2C1", organization_affiliation: "student", country: "canada"} }
+      let(:target_attrs) do
+        {city: "Edmonton", region_string: "AB", street: "2 Sir Winston Churchill Sq", postal_code: "T5J 2C1",
+         region_record_id: nil, country_id: Country.canada_id}
+      end
+      it "creates an address_record" do
+        VCR.use_cassette("Ownership-address_record_from_registration_info-edmonton") do
+          expect do
+            ownership.save!
+            ownership.reload.update(updated_at: Time.current)
+          end.to change(AddressRecord, :count).by 1
+
+          expect(ownership.address_record_id).to be_present
+          expect(ownership.address_record).to have_attributes target_attrs
+          expect(ownership.address_record.to_coordinates.map(&:round)).to eq([54, -113])
+        end
+      end
+    end
+  end
+
+  describe "doorkeeper_app counter_cache" do
+    let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app) }
+    let(:ownership) { FactoryBot.create(:ownership, doorkeeper_app:) }
+    it "updates the counter_cache on create" do
+      expect(Doorkeeper::Application.count).to eq 0
+      expect(doorkeeper_app).to be_valid
+      doorkeeper_app.update_column :updated_at, Time.current - 1.day
+      expect(doorkeeper_app.ownerships_count).to eq 0
+      expect(ownership.reload.doorkeeper_app_id).to eq doorkeeper_app.id
+      expect(doorkeeper_app.reload.ownerships_count).to eq 1
+      expect(doorkeeper_app.updated_at).to be_within(1).of Time.current
+      expect(Doorkeeper::Application.count).to eq 1
     end
   end
 end

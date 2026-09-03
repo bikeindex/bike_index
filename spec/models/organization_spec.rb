@@ -3,10 +3,27 @@ require "rails_helper"
 RSpec.describe Organization, type: :model do
   it_behaves_like "search_radius_metricable"
 
+  describe "factory" do
+    let(:organization) { FactoryBot.create(:organization, :paid) }
+    it "is paid and valid" do
+      expect(organization.reload.is_paid).to be_truthy
+      expect(organization.enabled_feature_slugs).to eq([])
+      expect(organization.invoices.last.invoice_organization_features.pluck(:id)).to eq([])
+    end
+    context "organization_features" do
+      let(:organization) { FactoryBot.create(:organization, :organization_features) }
+      it "is valid" do
+        expect(organization.reload.is_paid).to be_truthy
+        expect(organization.enabled_feature_slugs).to eq(["csv_export"])
+        expect(organization.invoices.last.invoice_organization_features.pluck(:id).count).to eq 1
+      end
+    end
+  end
+
   describe "#nearby_bikes" do
     it "returns bikes within the search radius" do
-      FactoryBot.create(:bike, :in_los_angeles)
-      nyc_bike_ids = FactoryBot.create_list(:bike, 2, :in_nyc).map(&:id)
+      FactoryBot.create(:bike, :with_address_record, address_in: :los_angeles)
+      nyc_bike_ids = FactoryBot.create_list(:bike, 2, :with_address_record, address_in: :new_york).map(&:id)
       stolen_nyc_bike = FactoryBot.create(:stolen_bike_in_nyc)
 
       chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
@@ -21,21 +38,21 @@ RSpec.describe Organization, type: :model do
     it "returns bikes associated with nearby organizations" do
       # an nyc-org bike in chicago
       nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
-      chi_bike1 = FactoryBot.create(:bike_organized, :in_chicago, creation_organization: nyc_org1, skip_geocoding: true, address_set_manually: true)
+      chi_bike1 = FactoryBot.create(:bike_organized, :with_address_record, address_in: :chicago, creation_organization: nyc_org1)
 
       # a chicago-org bike in nyc
       chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
-      nyc_bike1 = FactoryBot.create(:bike_organized, :in_nyc, creation_organization: chi_org, skip_geocoding: true, address_set_manually: true)
+      nyc_bike1 = FactoryBot.create(:bike_organized, :with_address_record, creation_organization: chi_org)
 
       nyc_org2 = FactoryBot.create(:organization, :in_nyc)
-      nyc_bike2 = FactoryBot.create(:bike_organized, :in_nyc, creation_organization: nyc_org2, skip_geocoding: true, address_set_manually: true)
+      nyc_bike2 = FactoryBot.create(:bike_organized, :with_address_record, creation_organization: nyc_org2)
 
       nyc_org3 = FactoryBot.create(:organization, :in_nyc)
-      nyc_bike3 = FactoryBot.create(:bike_organized, :in_nyc, creation_organization: nyc_org3, skip_geocoding: true, address_set_manually: true)
+      nyc_bike3 = FactoryBot.create(:bike_organized, :with_address_record, creation_organization: nyc_org3)
 
-      nonorg_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
+      nonorg_bikes = FactoryBot.create_list(:bike, 2, :with_address_record, address_in: :new_york)
 
-      chi_bike1.reload
+      expect(chi_bike1.reload.address_set_manually).to be_truthy
       expect(chi_bike1.to_coordinates).to eq([41.8624488, -87.6591502])
 
       # stolen record doesn't automatically set latitude on bike,
@@ -95,11 +112,11 @@ RSpec.describe Organization, type: :model do
     let(:organization_child2) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius_miles: 3, parent_organization: organization_parent) }
     let(:organization_child3) { FactoryBot.create(:organization, kind: "law_enforcement", search_radius_miles: 3, parent_organization: organization_parent) }
     let(:organization_shop) { FactoryBot.create(:organization, kind: "bike_shop") }
-    let(:location_parent) { organization_parent.locations.create(state: state, country: country, city: "Los Angeles", street: "100 West 1st Street", zipcode: "90012", name: organization_parent.name) }
-    let(:location_child1) { organization_child1.locations.create(state: state, country: country, city: "Los Angeles", zipcode: "90014", name: organization_child1.name) }
-    let(:location_child2) { organization_child2.locations.create(state: state, country: country, city: "Los Angeles", zipcode: "90017", name: organization_child2.name) }
-    let(:location_child3) { organization_child3.locations.create(state: state, country: country, city: "Los Angeles", zipcode: "91325", name: organization_child3.name) }
-    let(:location_shop) { organization_shop.locations.create(state: state, country: country, city: "Los Angeles", street: "1626 S Hill St", zipcode: "90015", name: organization_shop.name) }
+    let(:location_parent) { organization_parent.locations.create(address_record: AddressRecord.new(region_record: state, country:, city: "Los Angeles", street: "100 West 1st Street", postal_code: "90012"), name: organization_parent.name) }
+    let(:location_child1) { organization_child1.locations.create(address_record: AddressRecord.new(region_record: state, country:, city: "Los Angeles", postal_code: "90014"), name: organization_child1.name) }
+    let(:location_child2) { organization_child2.locations.create(address_record: AddressRecord.new(region_record: state, country:, city: "Los Angeles", postal_code: "90017"), name: organization_child2.name) }
+    let(:location_child3) { organization_child3.locations.create(address_record: AddressRecord.new(region_record: state, country:, city: "Los Angeles", postal_code: "91325"), name: organization_child3.name) }
+    let(:location_shop) { organization_shop.locations.create(address_record: AddressRecord.new(region_record: state, country:, city: "Los Angeles", street: "1626 S Hill St", postal_code: "90015"), name: organization_shop.name) }
     let(:organization_ids) { [organization_parent.id, organization_child1.id, organization_child2.id, organization_child3.id, organization_shop.id] }
     it "matches organizations as expected" do
       VCR.use_cassette("organizations-nearby_organizations", match_requests_on: [:path]) do
@@ -207,8 +224,8 @@ RSpec.describe Organization, type: :model do
         end
       end
       context "by location city" do
-        let(:location) { FactoryBot.create(:location, city: "Chicago") }
-        let!(:location2) { FactoryBot.create(:location, city: "Chicago", organization: organization) }
+        let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago) }
+        let!(:location2) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization:) }
         it "finds the organization" do
           expect(Organization.admin_text_search("chi")).to eq([organization])
         end
@@ -245,6 +262,10 @@ RSpec.describe Organization, type: :model do
       expect(Organization.friendly_find("trek store of SANTA CRUZ")).to eq organization2
       expect(Organization.friendly_find("bikeeastbay")).to eq organization3
       expect(Organization.friendly_find(organization)).to eq organization
+    end
+    it "scrubs null bytes rather than raising" do
+      expect(Organization.friendly_find("1\u0000xxx")).to be_nil
+      expect(Organization.friendly_find("#{organization.id}\u0000")).to eq organization
     end
   end
 
@@ -284,20 +305,21 @@ RSpec.describe Organization, type: :model do
     end
     context "organization with a location" do
       let(:organization) { FactoryBot.create(:organization, approved: true, show_on_map: true) }
-      let!(:location) { FactoryBot.create(:location, organization: organization) }
-      let!(:location2) { FactoryBot.create(:location, organization: organization, latitude: 12, longitude: -111, skip_geocoding: true) }
+      let!(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization:) }
+      let(:address_record2) { FactoryBot.create(:address_record, latitude: 12, longitude: -111, skip_geocoding: true) }
+      let!(:location2) { FactoryBot.create(:location, organization:, address_record: address_record2) }
       it "is the locations coordinates for the first publicly_visible location, falls back to the first location if neither publicly_visible" do
         expect(organization.default_location).to eq location
-        expect(organization.map_focus_coordinates).to eq(latitude: 41.9282162, longitude: -87.6327552)
+        expect(organization.map_focus_coordinates).to eq(latitude: 41.8624488, longitude: -87.6591502)
         location.update(publicly_visible: false, skip_update: false)
         organization.reload
         expect(organization.default_location.id).to eq location2.id
         expect(organization.map_focus_coordinates).to eq(latitude: 12, longitude: -111)
-        location2.update(not_publicly_visible: true, skip_geocoding: true, skip_update: false)
+        location2.update(not_publicly_visible: true, skip_update: false)
         organization.reload
         # Now get the first location
         expect(organization.default_location).to eq location
-        expect(organization.map_focus_coordinates).to eq(latitude: 41.9282162, longitude: -87.6327552)
+        expect(organization.map_focus_coordinates).to eq(latitude: 41.8624488, longitude: -87.6591502)
       end
     end
   end
@@ -316,7 +338,7 @@ RSpec.describe Organization, type: :model do
         expect(user.enabled?("unstolen_notifications")).to be_truthy
         expect(user.enabled?("bike_stickers")).to be_falsey
         expect(user.enabled?("invalid feature name")).to be_falsey
-        user.superuser = true
+        FactoryBot.create(:superuser_ability, user:)
         expect(user.enabled?("unstolen_notifications")).to be_truthy
         expect(user.enabled?("unstolen_notifications", no_superuser_override: true)).to be_truthy
         expect(user.enabled?(["bike_stickers"])).to be_truthy
@@ -332,7 +354,9 @@ RSpec.describe Organization, type: :model do
     context "paid" do
       let(:enabled_feature_slugs) { ["regional_bike_counts"] }
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
-      it "is truthy", :flaky do
+      # Excluded IDs are real prod orgs (SBR/BikeIndex); stub them so the test org's auto-increment id can't collide
+      before { stub_const("Organization::USER_REGISTRATION_ALL_BIKES_EXCLUDED_IDS", []) }
+      it "is truthy" do
         expect(organization.user_registration_all_bikes?).to be_truthy
       end
       context "official_manufacturer?" do
@@ -373,6 +397,13 @@ RSpec.describe Organization, type: :model do
       expect(organization.child_ids).to eq([organization_child.id])
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
     end
+    context "registration_sequences_edit" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["registration_sequences_edit"]) }
+
+      it "adds registration_sequences, since editing without viewing locks the organization out" do
+        expect(organization.reload.enabled_feature_slugs).to match_array(%w[registration_sequences registration_sequences_edit])
+      end
+    end
     context "regional bike_stickers" do
       let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }
       let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, enabled_feature_slugs: %w[regional_bike_counts bike_stickers]) }
@@ -380,7 +411,7 @@ RSpec.describe Organization, type: :model do
       it "sets on the regional organization, applies to bikes" do
         regional_child.reload
         regional_parent.update(updated_at: Time.current)
-        expect(regional_parent.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker regional_bike_counts])
+        expect(regional_parent.reload.enabled_feature_slugs).to eq(%w[bike_stickers reg_bike_sticker regional_bike_counts])
         expect(regional_parent.regional_ids).to eq([regional_child.id])
         expect(Organization.regional.pluck(:id)).to eq([regional_parent.id])
         expect(regional_child.regional_parents.pluck(:id)).to eq([regional_parent.id])
@@ -398,35 +429,110 @@ RSpec.describe Organization, type: :model do
 
   describe "show_bulk_import?" do
     # Note: the show_bulk_import? for ascend shops is tested by the ascend_pos test
-    let(:organization) { Organization.new }
+    let(:organization) { FactoryBot.build(:organization, pos_kind:) }
+    let(:pos_kind) { "no_pos" }
+
     it "is falsey" do
       expect(organization.show_bulk_import?).to be_falsey
     end
-    context "enabled" do
-      %w[show_bulk_import show_bulk_import_impound show_bulk_import_stolen].each do |slug|
-        let(:organization) { Organization.new(enabled_feature_slugs: [slug]) }
-        it "is truthy" do
-          expect(organization.show_bulk_import?).to be_truthy
-        end
+
+    context "when ascend" do
+      let(:pos_kind) { "ascend_pos" }
+
+      it "is truthy" do
+        expect(organization.show_bulk_import?).to be_truthy
+      end
+    end
+
+    context "when broken_ascend_pos" do
+      let(:pos_kind) { "broken_ascend_pos" }
+      it "is truthy" do
+        expect(organization.show_bulk_import?).to be_truthy
+      end
+    end
+
+    context "when lightspeed_pos" do
+      let(:pos_kind) { "lightspeed_pos" }
+      it "is truthy" do
+        expect(organization.show_bulk_import?).to be_falsey
+      end
+    end
+
+    context "when feature show_bulk_import_impound" do
+      let(:organization) { FactoryBot.build(:organization_with_organization_features, enabled_feature_slugs: ["show_bulk_import_impound"]) }
+      it "is truthy" do
+        expect(organization.show_bulk_import?).to be_falsey
       end
     end
   end
 
-  describe "restrict_invitations?, permitted_domain_passwordless_signin, matching_domain" do
+  describe "restrict_invitations?, passwordless_email_matching" do
     it "is truthy" do
       expect(Organization.new.restrict_invitations?).to be_truthy
     end
-    context "passwordless_users with passwordless_user_domain" do
-      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], passwordless_user_domain: "example.gov") }
+    context "passwordless_users with user_email_domain" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"], user_email_domain: "example.gov") }
       it "is falsey" do
         expect(organization.restrict_invitations?).to be_falsey
-        expect(Organization.permitted_domain_passwordless_signin.pluck(:id)).to eq([organization.id])
         expect(Organization.passwordless_email_matching("fakeexample.gov")).to be_blank
         expect(Organization.passwordless_email_matching("f@example.gov@party.gov")).to be_blank
         expect(Organization.passwordless_email_matching("f@éxample.gov")).to be_blank # accent
         expect(Organization.passwordless_email_matching("party@@example.gov")).to be_blank
         expect(Organization.passwordless_email_matching("seth@EXample.gov")).to eq organization
         expect(Organization.passwordless_email_matching("seth@EXample.gov ")).to eq organization
+      end
+    end
+  end
+
+  describe "passwordless_user_creation?" do
+    it "is falsey" do
+      expect(Organization.new.passwordless_user_creation?).to be_falsey
+    end
+    context "saml_sso" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
+      it "is truthy without granting the passwordless feature" do
+        expect(organization.passwordless_user_creation?).to be_truthy
+        expect(organization.enabled_feature_slugs).to eq(["saml_sso"])
+      end
+    end
+    context "passwordless_users" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "passwordless_users") }
+      it "is truthy" do
+        expect(organization.passwordless_user_creation?).to be_truthy
+      end
+    end
+  end
+
+  describe "user_email_domain uniqueness" do
+    let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :active) }
+    let!(:sso_organization) { saml_configuration.organization }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
+    before { sso_organization.update!(user_email_domain: "example.edu") }
+
+    it "blocks a second SSO organization from claiming the domain" do
+      organization.user_email_domain = "example.edu"
+      expect(organization).to_not be_valid
+      expect(organization.errors.attribute_names).to include(:user_email_domain)
+      expect(Organization.saml_email_matching("someone@example.edu")).to eq sso_organization
+    end
+
+    context "when the SAML configuration is inactive" do
+      before { saml_configuration.update!(active: false) }
+
+      it "does not match the organization's domain" do
+        expect(Organization.saml_email_matching("someone@example.edu")).to be_nil
+      end
+    end
+
+    it "permits the claiming organization to keep its own domain" do
+      expect(sso_organization.update(name: "Renamed")).to be_truthy
+    end
+
+    context "organization without saml_sso" do
+      let(:organization) { FactoryBot.create(:organization) }
+      it "permits the shared domain, since it doesn't affect SSO routing" do
+        expect(organization.update(user_email_domain: "example.edu")).to be_truthy
+        expect(Organization.saml_email_matching("someone@example.edu")).to eq sso_organization
       end
     end
   end
@@ -481,6 +587,17 @@ RSpec.describe Organization, type: :model do
       expect(organization.slug).to eq(slug)
     end
 
+    # A blank short_name slugs to "", which OrganizationNameValidator rejects
+    context "blank short_name" do
+      let(:organization) { Organization.new(name:, short_name: " ") }
+
+      it "falls back to the name" do
+        expect(organization).to be_valid
+        expect(organization.short_name).to eq "something"
+        expect(organization.slug).to eq "something"
+      end
+    end
+
     context "tags" do
       let(:name) { "<script>alert(document.cookie)</script>" }
       it "doesn't xss" do
@@ -509,7 +626,7 @@ RSpec.describe Organization, type: :model do
         expect(organization.name).to eq "Bikes (& Trikes)"
         expect(organization.short_name).to eq "Bikes (& Trikes)"
         # only ampersands surrounded by spaces are kept
-        expect(organization.slug).to eq "bikes--trikes"
+        expect(organization.slug).to eq "bikes"
       end
     end
 
@@ -571,9 +688,8 @@ RSpec.describe Organization, type: :model do
     end
 
     describe "set_locations_shown" do
-      let(:country) { FactoryBot.create(:country) }
       let(:organization) { FactoryBot.create(:organization, show_on_map: true, approved: true) }
-      let(:location) { Location.create(country_id: country.id, city: "Chicago", name: "stuff", organization_id: organization.id, shown: true) }
+      let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization:, shown: true) }
       context "organization approved" do
         it "sets the locations shown to be org shown on save" do
           expect(organization.allowed_show?).to be_truthy
@@ -698,7 +814,7 @@ RSpec.describe Organization, type: :model do
         expect(organization.additional_registration_fields.include?("reg_student_id")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_bike_sticker")).to be_truthy
 
-        expect(organization.organization_affiliation_options).to eq([["Undergraduate Student", "student"], ["Graduate Student", "graduate_student"], ["Employee", "employee"], ["Community Member", "community_member"]])
+        expect(organization.organization_affiliation_options).to eq([["Undergraduate Student", "student"], ["Graduate Student", "graduate_student"], ["Postdoc", "postdoc"], ["Employee", "employee"], ["Community Member", "community_member"]])
       end
     end
   end

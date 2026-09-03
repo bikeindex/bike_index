@@ -5,7 +5,10 @@ RSpec.describe BikeV2Serializer do
   describe "standard validations" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership, year: 2011) }
     let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
-    before { bike.update(updated_at: Time.current) } # set thumb_path
+    before do
+      bike.update(updated_at: Time.current) # set thumb_path
+      public_image.reload # version URLs reconstruct from the stored identifier (generation is backgrounded)
+    end
 
     let(:target) do
       {
@@ -30,6 +33,7 @@ RSpec.describe BikeV2Serializer do
         description: nil,
         external_id: nil,
         status: "with owner",
+        for_sale: false,
         propulsion_type_slug: "foot-pedal",
         cycle_type_slug: "bike"
       }
@@ -38,6 +42,15 @@ RSpec.describe BikeV2Serializer do
     it "returns the expected thing" do
       expect(bike.reload.status).to eq "status_with_owner"
       expect(serializer.as_json(root: false)).to eq target
+    end
+
+    # Regression: each Bike#image_url issues a public_images SQL query, and
+    # the serializer used to invoke it twice per bike — at per_page=100 on
+    # /api/v3/search that blew Rack::Timeout.
+    it "calls Bike#image_url once per serialization" do
+      bike.reload
+      expect(bike).to receive(:image_url).once.and_call_original
+      serializer.as_json(root: false)
     end
 
     context "stolen bike" do
@@ -52,21 +65,22 @@ RSpec.describe BikeV2Serializer do
       end
       it "returns the expected thing" do
         expect(bike.reload.status).to eq "status_stolen"
-        expect(bike.address).to eq "278 Broadway, New York, NY 10007, US"
+        # expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "stolen_record"
+        # expect(bike.registration_address(true)["latitude"]).to eq 40.7143528
         expect(serializer.as_json(root: false)).to eq target_stolen
       end
     end
     context "found bike" do
-      let!(:impound_record) { FactoryBot.create(:impound_record, :in_nyc, bike: bike) }
+      let!(:impound_record) { FactoryBot.create(:impound_record, :with_address_record, address_in: :new_york, bike: bike) }
       let(:target_found) do
-        target.merge(location_found: "278 Broadway, New York, NY 10007, US",
+        target.merge(location_found: "New York, NY 10007, United States",
           status: "found",
           serial: "Hidden")
       end
       it "returns the expected thing" do
         expect(bike.reload.status).to eq "status_impounded"
-        expect(impound_record.reload.address).to eq "New York, NY 10007"
-        expect(impound_record.to_coordinates).to eq([40.7143528, -74.0059731])
+        expect(impound_record.reload.address_record.to_coordinates).to eq([40.7143528, -74.0059731])
+        expect(impound_record.address_record.publicly_visible_attribute).to eq "postal_code"
         expect(bike.to_coordinates).to eq([40.7143528, -74.0059731])
         expect(serializer.as_json(root: false)).to eq target_found
       end

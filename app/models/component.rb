@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: components
+# Database name: primary
 #
 #  id                 :integer          not null, primary key
 #  component_model    :string(255)
@@ -29,7 +30,14 @@
 class Component < ApplicationRecord
   include ActiveModel::Dirty
 
+  belongs_to :manufacturer
+  belongs_to :ctype
+  belongs_to :bike
+  belongs_to :bike_version
+
   attr_accessor :front_or_rear, :setting_is_stock
+
+  before_save :set_calculated_attributes
 
   def self.permitted_attributes
     %i[id component_model year ctype ctype_id ctype_other manufacturer manufacturer_id mnfg_name
@@ -39,13 +47,6 @@ class Component < ApplicationRecord
   def model_name=(val)
     self.component_model = val
   end
-
-  belongs_to :manufacturer
-  belongs_to :ctype
-  belongs_to :bike
-  belongs_to :bike_version
-
-  before_save :set_calculated_attributes
 
   def version_duplicated_attrs
     {component_model: component_model,
@@ -63,6 +64,7 @@ class Component < ApplicationRecord
 
   def set_front_or_rear
     return true unless front_or_rear.present?
+
     position = front_or_rear.downcase.strip
     self.front_or_rear = ""
     if position == "both"
@@ -79,7 +81,8 @@ class Component < ApplicationRecord
 
   def component_type
     return nil unless ctype.present?
-    if ctype.name && ctype.name == "Other" && ctype_other.present?
+
+    if ctype_id == Ctype.other.id && ctype_other.present?
       ctype_other
     else
       ctype.name
@@ -91,12 +94,14 @@ class Component < ApplicationRecord
   end
 
   def component_group
-    return "Additional parts" unless ctype.present?
+    return "Additional Parts" unless ctype.present?
+
     ctype.cgroup.name
   end
 
   def set_is_stock
     return true if setting_is_stock
+
     if id.present? && is_stock && description_changed? || component_model_changed?
       self.is_stock = false
     end
@@ -105,6 +110,9 @@ class Component < ApplicationRecord
   def set_calculated_attributes
     set_front_or_rear
     set_is_stock
+    self.manufacturer_other = Binxtils::InputNormalizer.string(manufacturer_other)
     self.mnfg_name = Manufacturer.calculated_mnfg_name(manufacturer, manufacturer_other)
+    self.ctype_other = Binxtils::InputNormalizer.string(ctype_other)
+    self.ctype_other = nil if ctype_other&.downcase == "other"
   end
 end

@@ -42,6 +42,20 @@ RSpec.describe OwnershipsController, type: :request do
         end
       end
 
+      context "owner_email matches" do
+        before { ownership.update(owner_email: current_user.email) }
+
+        # Claiming writes the ownership rather than the bike, so without the touch nothing
+        # keyed on the bike's cache version notices that the registration is now claimed
+        it "claims it and touches the bike" do
+          expect { get "#{base_url}/#{ownership.id}" }
+            .to change { ownership.bike.reload.updated_at }
+
+          expect(response).to redirect_to edit_bike_url(ownership.bike)
+          expect(ownership.reload.claimed).to be_truthy
+        end
+      end
+
       context "owner_email upcase" do
         before { ownership.update(owner_email: current_user.email.upcase) }
 
@@ -51,6 +65,57 @@ RSpec.describe OwnershipsController, type: :request do
           expect(response).to redirect_to edit_bike_url(ownership.bike)
           expect(flash).to be_present
           expect(ownership.reload.claimed).to be_truthy
+        end
+      end
+    end
+
+    describe "unconfirmed user following claim email link" do
+      let(:current_user) { FactoryBot.create(:user) }
+      let(:ownership) { FactoryBot.create(:ownership, owner_email: current_user.email) }
+      # RearGearType.fixed is required by bike show, otherwise it raises ReadOnlyError
+      before do
+        RearGearType.fixed
+        log_in(current_user)
+      end
+
+      it "auto-confirms and claims after visiting the bike page with a valid token" do
+        expect(current_user.reload.unconfirmed?).to be_truthy
+        get "/bikes/#{ownership.bike.id}", params: {t: ownership.token, email: ownership.owner_email}
+        expect(response.code).to eq("200")
+
+        get "#{base_url}/#{ownership.id}"
+        expect(response).to redirect_to edit_bike_url(ownership.bike)
+        expect(current_user.reload.confirmed?).to be_truthy
+        expect(ownership.reload.claimed).to be_truthy
+      end
+
+      it "does not confirm when the bike page was not visited with a valid token" do
+        get "#{base_url}/#{ownership.id}"
+        expect(response).to redirect_to(please_confirm_email_users_path)
+        expect(current_user.reload.unconfirmed?).to be_truthy
+        expect(ownership.reload.claimed).to be_falsey
+      end
+
+      it "does not confirm when the token in the URL does not match" do
+        get "/bikes/#{ownership.bike.id}", params: {t: "wrong-token", email: ownership.owner_email}
+        expect(response.code).to eq("200")
+
+        get "#{base_url}/#{ownership.id}"
+        expect(response).to redirect_to(please_confirm_email_users_path)
+        expect(current_user.reload.unconfirmed?).to be_truthy
+        expect(ownership.reload.claimed).to be_falsey
+      end
+
+      context "current_user email does not match owner_email" do
+        let(:ownership) { FactoryBot.create(:ownership, owner_email: "someone-else@example.com") }
+
+        it "does not confirm even if the bike was visited with a valid token" do
+          get "/bikes/#{ownership.bike.id}", params: {t: ownership.token, email: ownership.owner_email}
+          expect(response.code).to eq("200")
+
+          get "#{base_url}/#{ownership.id}"
+          expect(current_user.reload.unconfirmed?).to be_truthy
+          expect(ownership.reload.claimed).to be_falsey
         end
       end
     end

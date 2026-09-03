@@ -1,18 +1,19 @@
 module Organized
   class UsersController < Organized::AdminController
-    include SortableTable
+    include Binxtils::SortableTable
+
     before_action :find_organization_role, only: [:edit, :update, :destroy]
     before_action :reject_self_updates, only: [:update, :destroy]
 
     def index
       params[:page] || 1
-      per_page = params[:per_page] || 25
+      per_page = (params[:per_page] || 25).to_i
       @show_user_search = params[:query].present? || current_organization.organization_roles.count > per_page
       @show_matching_count = @show_user_search && params[:query].present?
-      @pagy, @organization_roles = pagy(
+      @pagy, @organization_roles = pagy(:countish,
         matching_organization_roles.reorder("organization_roles.#{sort_column} #{sort_direction}"),
-        limit: @per_page
-      )
+        limit: per_page,
+        page: permitted_page)
     end
 
     def edit
@@ -76,6 +77,7 @@ module Organized
     def matching_organization_roles
       m_organization_roles = current_organization.organization_roles.includes(:user, :sender)
       return m_organization_roles unless params[:query].present?
+
       m_organization_roles.admin_text_search(params[:query])
     end
 

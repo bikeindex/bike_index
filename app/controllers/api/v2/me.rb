@@ -2,10 +2,12 @@ module API
   module V2
     class Me < API::Base
       include API::V2::Defaults
+
       resource :me, desc: "Operations about the current user" do
         helpers do
           def user_info
             return {} unless current_scopes.include?("read_user")
+
             {
               user: {
                 username: current_user.username,
@@ -26,14 +28,15 @@ module API
             {
               organization_name: membership.organization.name,
               organization_slug: membership.organization.slug,
-              organization_access_token: membership.organization.access_token,
-              user_is_organization_admin: membership.role == "admin"
+              organization_access_token: membership.organization_access_token,
+              user_is_organization_admin: membership.admin?
             }
           end
 
           def organization_memberships
             return {} unless current_scopes.include?("read_organization_membership")
-            {memberships: current_user.organization_roles.map { |m| serialized_membership(m) }}
+
+            {memberships: OrganizationRole.ordered_for(current_user).includes(:organization).map { |m| serialized_membership(m) }}
           end
         end
 

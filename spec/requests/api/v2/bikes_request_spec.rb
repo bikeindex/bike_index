@@ -16,6 +16,15 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
     end
 
+    context "for sale bike" do
+      it "returns status 'with owner' and for_sale: true" do
+        bike = FactoryBot.create(:bike, :with_ownership, is_for_sale: true)
+        get "/api/v2/bikes/#{bike.id}", params: {format: :json}
+        expect(response.code).to eq("200")
+        expect(json_result["bike"]).to include("status" => "with owner", "for_sale" => true)
+      end
+    end
+
     it "responds with missing" do
       get "/api/v2/bikes/10", params: {format: :json}
       expect(response.code).to eq("404")
@@ -75,7 +84,7 @@ RSpec.describe "Bikes API V2", type: :request do
           no_notify: true
         }
       end
-      it "creates" do
+      it "creates", :flaky do
         VCR.use_cassette("bikes_v2-create-matching-bike-book", match_requests_on: [:path]) do
           expect(manufacturer.reload.name).to eq "Trek"
           expect(Bike.count).to eq 0
@@ -134,7 +143,7 @@ RSpec.describe "Bikes API V2", type: :request do
       post "/api/v2/bikes?access_token=#{token.token}",
         params: bike_attrs.to_json,
         headers: json_headers
-      EmailOwnershipInvitationJob.drain
+      Email::OwnershipInvitationJob.drain
       expect(ActionMailer::Base.deliveries.count).to eq 1
       expect(response.code).to eq("201")
       result = json_result["bike"]
@@ -149,13 +158,14 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.components.count).to eq(3)
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.pluck(:ctype_id).uniq.count).to eq(2)
-      expect(bike.components.map(&:component_model).compact).to eq(["Richie rich"])
+      expect(bike.components.filter_map(&:component_model)).to eq(["Richie rich"])
       expect(bike.front_gear_type).to eq(front_gear_type)
       expect(bike.handlebar_type).to eq(handlebar_type_slug)
       ownership = bike.current_ownership
       expect([ownership.pos?, ownership.is_new, ownership.bulk?]).to eq([true, true, false])
       expect(ownership.origin).to eq "api_v2"
       expect(ownership.creator).to eq bike.creator
+      expect(ownership.doorkeeper_app_id).to eq doorkeeper_app.id
     end
 
     it "doesn't send an email" do
@@ -163,7 +173,7 @@ RSpec.describe "Bikes API V2", type: :request do
       post "/api/v2/bikes?access_token=#{token.token}",
         params: bike_attrs.merge(no_notify: true).to_json,
         headers: json_headers
-      EmailOwnershipInvitationJob.drain
+      Email::OwnershipInvitationJob.drain
       expect(ActionMailer::Base.deliveries).to eq([])
       expect(response.code).to eq("201")
     end
@@ -173,7 +183,7 @@ RSpec.describe "Bikes API V2", type: :request do
       post "/api/v2/bikes?access_token=#{token.token}",
         params: bike_attrs.merge(test: true).to_json,
         headers: json_headers
-      EmailOwnershipInvitationJob.drain
+      Email::OwnershipInvitationJob.drain
       expect(ActionMailer::Base.deliveries.count).to eq 0
       expect(response.code).to eq("201")
       result = json_result["bike"]
@@ -190,43 +200,43 @@ RSpec.describe "Bikes API V2", type: :request do
       organization = FactoryBot.create(:organization)
       user.update_attribute :phone, "0987654321"
       FactoryBot.create(:organization_role_claimed, user: user, organization: organization)
-      FactoryBot.create(:country, iso: "US")
-      FactoryBot.create(:state, abbreviation: "NY")
+      Country.united_states
+      FactoryBot.create(:state_new_york)
       organization.save
-      bike_attrs[:organization_slug] = organization.slug
-      date_stolen = 1357192800
-      bike_attrs[:stolen_record] = {
-        phone: "1234567890",
-        date_stolen: date_stolen,
-        theft_description: "This bike was stolen and that's no fair.",
-        country: "US",
-        city: "New York",
-        address: "278 Broadway",
-        zipcode: "10007",
-        state: "NY",
-        police_report_number: "99999999",
-        police_report_department: "New York"
-        # locking_description: "some locking description",
-        # lock_defeat_description: "broken in some crazy way"
-      }
+      bike_attrs.merge!(organization_slug: organization.slug,
+        cycle_type_name: "e-dirt bike",
+        stolen_record: {
+          phone: "1", # phone number isn't validated in any way
+          date_stolen: 1357192800,
+          theft_description: "This bike was stolen and that's no fair.",
+          country: "US",
+          city: "New York",
+          address: "278 Broadway",
+          zipcode: "10007",
+          state: "NY",
+          police_report_number: "99999999",
+          police_report_department: "New York"
+          # locking_description: "some locking description",
+          # lock_defeat_description: "broken in some crazy way"
+        })
       expect {
         post "/api/v2/bikes?access_token=#{token.token}",
           params: bike_attrs.to_json,
           headers: json_headers
-      }.to change(EmailOwnershipInvitationJob.jobs, :size).by(1)
-      result = json_result
-      expect(result).to include("bike")
-      expect(result["bike"]["serial"]).to eq(bike_attrs[:serial].upcase)
-      expect(result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
-      expect(result["bike"]["stolen_record"]["date_stolen"]).to eq(date_stolen)
-      bike = Bike.find(result["bike"]["id"])
+      }.to change(Email::OwnershipInvitationJob.jobs, :size).by(1)
+      expect(json_result).to include("bike")
+      expect(json_result["bike"]["serial"]).to eq(bike_attrs[:serial].upcase)
+      expect(json_result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
+      expect(json_result["bike"]["stolen_record"]["date_stolen"]).to eq(bike_attrs[:stolen_record][:date_stolen])
+      expect(json_result["bike"]["type_of_cycle"]).to eq "e-Motorcycle (e-Dirt bike, e-bike with no pedals)"
+      bike = Bike.unscoped.find(json_result["bike"]["id"])
       expect(bike.creation_organization).to eq(organization)
       expect(bike.current_ownership.origin).to eq "api_v2"
       expect(bike.current_ownership.organization).to eq organization
       expect(bike.current_ownership.creator).to eq bike.creator
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
-      expect(bike.current_stolen_record.phone).to eq("1234567890")
+      expect(bike.current_stolen_record.phone).to eq("1")
     end
   end
 
@@ -269,7 +279,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
   end
 
-  describe "create v2_accessor" do
+  describe "create v2_accessor", :flaky do
     let(:organization) { FactoryBot.create(:organization) }
     let(:bike_attrs) do
       {
@@ -365,7 +375,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "updates bike even if stolen record doesn't have important things" do
-      FactoryBot.create(:country, iso: "US")
+      Country.united_states
       expect(bike.year).to be_nil
       params[:stolen_record] = {
         phone: "",
@@ -378,7 +388,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "updates a bike, adds a stolen record, doesn't update locked attrs" do
-      FactoryBot.create(:country, iso: "US")
+      Country.united_states
       expect(bike.year).to be_nil
       serial = bike.serial_number
       params[:stolen_record] = {
@@ -437,7 +447,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.year).to eq(params[:year])
       expect(comp2.reload.year).to eq(1999)
       expect(bike.components.pluck(:component_model)).to match_array([nil, nil, "Richie rich"])
-      expect(bike.components.map(&:mnfg_name).compact).to match_array(["BLUE TEETH", manufacturer.name])
+      expect(bike.components.filter_map(&:mnfg_name)).to match_array(["BLUE TEETH", manufacturer.name])
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.count).to eq(3)
     end
@@ -534,7 +544,7 @@ RSpec.describe "Bikes API V2", type: :request do
         expect(bike.reload.status).to eq "status_with_owner"
         post url, params: params.to_json, headers: json_headers
         expect(response.code).to eq("400")
-        expect(response.body.match("is not stolen")).to be_present
+        expect(response.body.match("Unable to find matching stolen bike")).to be_present
       end
     end
 
@@ -549,7 +559,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.reload.status).to eq "status_stolen"
       expect {
         post url, params: params.to_json, headers: json_headers
-      }.to change(EmailStolenNotificationJob.jobs, :size).by(1)
+      }.to change(Email::StolenNotificationJob.jobs, :size).by(1)
       expect(response.code).to eq("201")
     end
   end

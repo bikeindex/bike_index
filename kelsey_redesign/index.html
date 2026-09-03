@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Bike Index</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo-section">
+                <img src="assets/bike index logo_white-blue.png" alt="Bike Index Logo" class="logo">
+                <span class="logo-divider">|</span>
+                <a href="https://bikeindex.org/news/bike-index--now-a-nonprofit" class="tagline" target="_blank">
+                    <span>the non-profit</span>
+                    <span>bike registry</span>
+                </a>
+            </div>
+            <ul class="nav-menu">
+                <li class="dropdown">
+                    <a href="about.html">About</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#who-we-are">Who We Are</a></li>
+                        <li><a href="#who-were-for">Who We're For</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="database.html">Search</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="stolen-bike.html">Stolen Bikes</a></li>
+                        <li><a href="#marketplace">Marketplace</a></li>
+                    </ul>
+                </li>
+                <li><a href="#news">News</a></li>
+                <li><a href="stolen-bike.html">Stolen bike?</a></li>
+                <li><a href="faq.html">FAQ</a></li>
+                <li class="menu-divider">|</li>
+                <li><a href="#login" class="login-btn">Login</a></li>
+                <li><a href="#signup" class="signup-btn">Sign up</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Section 1: Hero Section -->
+        <section class="hero-section">
+            <div class="bike-tiles-grid" id="bikeTilesGrid"></div>
+            <div class="hero-content">
+                <div class="hero-stats">
+                    <div class="stat-box">
+                        <div class="stat-number" data-target="32">$0M+</div>
+                        <div class="stat-label">Total recovery value</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Since</div>
+                        <div class="stat-number">2013</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" data-target="1795">0+</div>
+                        <div class="stat-label">Trusted organizations</div>
+                    </div>
+                </div>
+                <h1>The bike registry that works.</h1>
+            </div>
+        </section>
+
+        <!-- Section 2: Bike Index is for -->
+        <section class="for-section">
+            <div class="container">
+                <h2>Bike Index is for:</h2>
+                <div class="buttons-grid">
+                    <div class="category-button">
+                        <div class="img-wrapper">
+                            <img src="assets/bikeshop.gif" alt="Bike Shops">
+                        </div>
+                        <span>Bike Shops</span>
+                    </div>
+                    <div class="category-button">
+                        <div class="img-wrapper">
+                            <img src="assets/cities.gif" alt="Cities">
+                        </div>
+                        <span>Cities</span>
+                    </div>
+                    <div class="category-button">
+                        <div class="img-wrapper">
+                            <img src="assets/unis.gif" alt="Universities">
+                        </div>
+                        <span>Universities</span>
+                    </div>
+                    <div class="category-button">
+                        <div class="img-wrapper">
+                            <img src="assets/community.gif" alt="Community Groups">
+                        </div>
+                        <span>Community Groups</span>
+                    </div>
+                    <div class="category-button">
+                        <div class="img-wrapper">
+                            <img src="assets/theft-victims.gif" alt="Theft Victims">
+                        </div>
+                        <span>Theft Victims</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Stolen Bikes -->
+        <section class="stolen-bikes-section">
+            <div class="container">
+                <h2>Stolen Bikes</h2>
+                <h3>WE'VE HELPED RECOVER:</h3>
+                
+                <div class="recovery-showcase">
+                    <div class="bike-container">
+                        <img src="assets/black-box.png" alt="Bike recovery showcase" class="black-box">
+                        <div class="bike-image-placeholder">
+                            <div class="bike-photo" id="bikePhoto">
+                                <!-- Placeholder for bike and owner images -->
+                                <div class="placeholder-content">Bike & Owner Photo</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="testimonial-container">
+                        <div class="testimonial-box">
+                            <img src="assets/location-pin_purple.png" alt="Location pin" class="location-pin">
+                            <div class="testimonial-content" id="testimonialContent">
+                                <div class="user-info">
+                                    <span class="user-name" id="userName">Sarah Johnson, Seattle</span>
+                                </div>
+                                <div class="recovery-date" id="recoveryDate">
+                                    Bike recovered on 03.15.2024
+                                </div>
+                                <div class="testimonial-text" id="testimonialText">
+                                    "I couldn't believe it when I got the call that my bike was found! The Bike Index made it so easy to report and helped connect me with the person who found it."
+                                </div>
+                            </div>
+                            <div class="testimonial-nav">
+                                <button class="nav-arrow prev" id="prevTestimonial">‹</button>
+                                <button class="nav-arrow next" id="nextTestimonial">›</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: What happens if my bike gets stolen -->
+        <section class="stolen-question-section">
+            <div class="container">
+                <div class="stolen-question-content">
+                    <div class="bike-animation-container">
+                        <div class="bike-transition">
+                            <img src="assets/bike-index-registered-single-loop.gif" alt="Registered bike animation" class="bike-registered" id="bikeRegistered">
+                            <img src="assets/bike-index-stolen.png" alt="Stolen bike" class="bike-stolen" id="bikeStolen">
+                        </div>
+                    </div>
+                    <div class="question-text">
+                        <h2>What happens if my bike gets stolen?</h2>
+                    </div>
+                </div>
+
+                <!-- Recovery Process Steps -->
+                <div class="recovery-process">
+                    <div class="crank-animation-container">
+                        <div class="crank-wrapper">
+                            <img src="assets/Step1.gif" alt="Step background" class="step-background" id="stepBackground">
+                            <img src="assets/bike-crank.png" alt="Bike crank" class="bike-crank" id="bikeCrank">
+                        </div>
+                    </div>
+                    <div class="steps-content">
+                        <div class="step-text" id="stepText">
+                            <h3>Step 1: REGISTER YOUR BIKE</h3>
+                            <p>It's simple. Submit your name, bike manufacturer, serial number, and component information to enter your bike into the most widely used bike registry on the planet.</p>
+                        </div>
+                        <div class="step-navigation">
+                            <button class="step-arrow prev" id="prevStep">‹</button>
+                            <span class="step-indicator" id="stepIndicator">1 / 4</span>
+                            <button class="step-arrow next" id="nextStep">›</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

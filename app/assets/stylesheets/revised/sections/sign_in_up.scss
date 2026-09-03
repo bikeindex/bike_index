@@ -294,8 +294,6 @@ $sign-in-up-form-bg: $gray-lighter;
   .sign-in-up.not-partner {
     .main-form {
       @include make-col(6);
-
-      @include make-col-pull(6);
     }
   }
 }
@@ -314,8 +312,6 @@ $sign-in-up-form-bg: $gray-lighter;
 
     .main-form {
       @include make-col(5);
-
-      @include make-col-pull(4);
     }
   }
 }

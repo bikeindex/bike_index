@@ -1,0 +1,14 @@
+- nav_header_list_items = capture_haml do
+  %li
+    = render(UI::Dropdown::Component.new(name: @scope.blank? ? "All scopes" : "#{@scope.titleize} only", button_size: :sm, active: @scope.present?)) do |dropdown|
+      - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All scopes", path: url_for(sortable_search_params.merge(search_scope: nil)), match_params: {search_scope: nil}) }
+      - dropdown.with_entry_divider
+      - searchable_scopes.each do |kind|
+        - dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.titleize} only", path: url_for(sortable_search_params.merge(search_scope: kind)), match_params: {search_scope: kind}) }
+  %li
+    = render(UI::ButtonLink::Component.new(text: "Show bike count", href: url_for(sortable_search_params.merge(search_show_count: !@search_show_count)), size: :sm, active: @search_show_count))
+
+- table_view = render partial: "table", locals: {collection: @collection, render_sortable: true, show_count: @search_show_count}
+
+= render(Pages::Admin::IndexSkeleton::Component.new(index: admin_index_state, collection: @collection, viewing: controller_name.humanize, chart_collection: @render_chart && matching_primary_activities, nav_header_list_items:, table_view:))
+

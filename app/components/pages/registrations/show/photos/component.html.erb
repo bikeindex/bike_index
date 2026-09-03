@@ -1,0 +1,87 @@
+<div class="tw:flex tw:flex-col tw:gap-3">
+  <% if has_photos? %>
+    <div
+      data-controller="registrations--show--photos"
+      data-registrations--show--photos-active-class="tw:border-blue-500"
+      class="tw:flex tw:flex-col tw:gap-3"
+    >
+      <a
+        href="<%= bike_image_original_url %>"
+        data-registrations--show--photos-target="link"
+        class="
+          tw:relative tw:-mx-2 tw:block tw:overflow-hidden tw:rounded-none
+          tw:bg-gray-100 tw:lg:mx-0 tw:lg:rounded-2xl tw:dark:bg-gray-900
+        "
+      >
+        <%= image_tag(
+          bike_image_url,
+          alt: translation(".bike_photo", bike_type: @bike.type_titleize),
+          data: {"registrations--show--photos-target": "main", action: "error->registrations--show--photos#disableLink"},
+          class: "tw:aspect-4/3 tw:w-full tw:object-contain",
+        ) %>
+
+        <%= hero_overlay %>
+      </a>
+
+      <% if @bike.public_images.count > 1 %>
+        <ul class="tw:flex tw:flex-wrap tw:gap-2">
+          <% @bike.public_images.select(&:image_url).each_with_index do |public_image, index| %>
+            <li>
+              <button
+                type="button"
+                data-registrations--show--photos-target="thumbnail"
+                data-action="click->registrations--show--photos#select"
+                data-large-url="<%= public_image.image_url(:large) %>"
+                data-original-url="<%= public_image.image_url %>"
+                data-photo-alt="<%= public_image.image_alt %>"
+                class="
+                  tw:cursor-pointer tw:overflow-hidden tw:rounded-sm tw:border-2
+                  <%= (index == 0) ? "tw:border-blue-500" : "tw:border-transparent" %>
+                "
+              >
+                <%= image_tag public_image.image_url(:small), alt: public_image.image_alt, class: "tw:h-16 tw:w-16 tw:object-cover" %>
+              </button>
+            </li>
+          <% end %>
+
+          <% if @owner %>
+            <li><%= add_photo_box %></li>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
+  <% elsif @bike.stock_photo_url.present? %>
+    <div
+      class="
+        tw:relative tw:-mx-2 tw:overflow-hidden tw:rounded-none
+        tw:bg-gray-100 tw:lg:mx-0 tw:lg:rounded-2xl tw:dark:bg-gray-900
+      "
+    >
+      <h3 class="tw:p-2 tw:text-sm tw:opacity-65">
+        <%= translation(".stock_photo", year: @bike.year, model: @bike.frame_model) %>
+        <em><%= translation(".color_may_not_match") %></em>
+      </h3>
+
+      <%= image_tag(@bike.stock_photo_url, alt: translation(".bike_photo", bike_type: @bike.type_titleize), class: "tw:aspect-4/3 tw:w-full tw:object-contain") %>
+
+      <%= hero_overlay %>
+    </div>
+    <% if @owner %>
+      <%= add_photo_box %>
+    <% end %>
+  <% else %>
+    <div
+      class="
+        tw:relative tw:-mx-2 tw:overflow-hidden tw:rounded-none
+        tw:bg-gray-100 tw:lg:mx-0 tw:lg:rounded-2xl tw:dark:bg-gray-900
+      "
+    >
+      <%= image_tag(helpers.bike_placeholder_image_path, alt: translation(".bike_photo", bike_type: @bike.type_titleize), class: "tw:aspect-4/3 tw:w-full tw:object-contain") %>
+
+      <%= hero_overlay %>
+    </div>
+    <% if @owner %>
+      <%= add_photo_box %>
+    <% end %>
+  <% end %>
+</div>

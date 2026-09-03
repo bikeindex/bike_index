@@ -1,0 +1,80 @@
+<div class="tw:space-y-8">
+  <%= render(UI::Button::Component.new(text: "Open Settings", commandfor: "settings-modal", command: "show-modal")) %>
+
+  <%= render(UI::Button::Component.new(text: "Open Confirmation", commandfor: "confirm-modal", command: "show-modal")) %>
+
+  <%= render(UI::Button::Component.new(text: "Open Long", commandfor: "long-modal", command: "show-modal")) %>
+</div>
+
+<%= render(UI::Modal::Component.new(title: "Settings", id: "settings-modal")) do |modal| %>
+  <% modal.with_body do %>
+    Modal body content
+  <% end %>
+<% end %>
+
+<%= render(UI::Modal::Component.new(title: "Confirmation", id: "confirm-modal")) do |modal| %>
+  <% modal.with_body do %>
+    <p class="tw:mb-4">
+      Are you sure you want to proceed?
+    </p>
+
+    <%= render(UI::Button::Component.new(text: "Confirm", color: :primary, data: { action: "click->ui--modal#close" })) %>
+  <% end %>
+<% end %>
+
+<%= render(UI::Modal::Component.new(title: "Long content", id: "long-modal")) do |modal| %>
+  <% modal.with_body do %>
+    <p class="tw:mb-4">
+      I'm baby hipster runoff herman miller somatic, lacto-ferment YOLO burrata
+      birth chart tbh cornhole praxis meh vinyl ice bath. Pickled cahiers yr
+      orange wine. Succulents monstera kale chips, normcore next level paleo
+      reading series before they sold out pork belly. Yr normcore new balance
+      moon phase edison bulb tarot pull live-edge omakase. Reading series
+      fingerstache thrifted manifesting, bruh tinned fish church-key hot
+      chicken. Fingerstache koji mumblecore sambas enamel pin neutra moka pot,
+      YOLO praxis.
+    </p>
+
+    <p class="tw:mb-4">
+      Vaporware van life pét-nat baffler, kombucha nepo baby shakshuka knoll
+      squid occupy slugging wolf cut oat milk cardigan. Bedroom pop abolition
+      gorpcore semiotics. Hyperpop moss wall chronically online, black garlic
+      normcore flexitarian conservas forage polycule pothos YIMBY. Banh mi
+      ottessa moshfegh girl dinner adaptogen bolaño monstera. Sound bath
+      furikake beard before they sold out dad shoes needle felting, mustache
+      babitz man braid affogato.
+    </p>
+
+    <p class="tw:mb-4">
+      Meggings same gibraltar brainrot freegan nepo baby. Keffiyeh manifesting
+      wabi-sabi pickled cupping fiddle leaf lambrusco braun. Edison bulb chia
+      polaroid, indigo dye shoegaze swag pandan cacio e pepe artisan sambas
+      doomer omakase vagus nerve. Sambas black trumpet PBR&amp;B tonx vaporware
+      williamsburg asymmetrical cacio e pepe natural wine y2k. Slugging
+      cold-pressed schlitz signet, koji paleo knoll iPhone enneagram austin
+      listicle. Etsy mid-century bespoke crucifix.
+    </p>
+
+    <p class="tw:mb-4">
+      Cassette literally skateboard cornhole leggings. Late capitalism lynch
+      copper mug, pug pop-up orange wine viral. Signet craft beer burrata
+      lumbersexual dreamcatcher vibe check yes plz meggings sound bath.
+      Breadcrumbing gochujang vagus nerve waistcoat live-edge gravel bike
+      biohack jawn blue bottle supper club truffaut. Ottessa moshfegh delulu
+      JOMO bolaño. Abolition tbh drinking vinegar visible mending dog dad.
+    </p>
+
+    <p class="tw:mb-4">
+      Normcore pour-over yo la tengo, street art amaro gut health poutine
+      cupping sound bath pop-up ego death you probably haven't heard of them raw
+      denim art party gastropub. Knoll art party small batch, oyster hour
+      slow-carb jawn marxism sally rooney shoreditch granny square adaptogen
+      literally n+1. Feeld manifesting matcha lo-fi nootropic. Organic tarkovsky
+      birria four tet matcha single-origin coffee hammock lomo farm-to-table.
+      Salvia bluesky messenger bag in this economy air plant Brooklyn etsy koji
+      breathwork stereolab jawn.
+    </p>
+
+    <%= render(UI::Button::Component.new(text: "Done", color: :primary, data: { action: "click->ui--modal#close" })) %>
+  <% end %>
+<% end %>

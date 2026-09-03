@@ -3,6 +3,7 @@ require "rails_helper"
 RSpec.describe UpdateManufacturerLogoAndPriorityJob, type: :job do
   include_context :scheduled_job
   include_examples :scheduled_job_tests
+  let(:vcr_config) { {re_record_interval: 6.months, match_requests_on: [:method, :path]} }
 
   it "is the correct queue and frequency" do
     expect(described_class.sidekiq_options["queue"]).to eq "low_priority"
@@ -10,17 +11,17 @@ RSpec.describe UpdateManufacturerLogoAndPriorityJob, type: :job do
   end
 
   it "Adds a logo, sets source" do
-    VCR.use_cassette("get_manufacturer_logo_worker", re_record_interval: 1.month) do
+    VCR.use_cassette("get_manufacturer_logo_worker", vcr_config) do
       manufacturer = FactoryBot.create(:manufacturer, website: "https://trekbikes.com")
       described_class.new.perform(manufacturer.id)
       manufacturer.reload
       expect(manufacturer.logo).to be_present
-      expect(manufacturer.logo_source).to eq("Clearbit")
+      expect(manufacturer.logo_source).to eq("Logo.dev")
     end
   end
 
   it "Doesn't break if no logo present" do
-    VCR.use_cassette("get_manufacturer_logo_worker-nologo", re_record_interval: 1.month) do
+    VCR.use_cassette("get_manufacturer_logo_worker-nologo", vcr_config) do
       manufacturer = FactoryBot.create(:manufacturer, website: "bbbbbbbbbbbbbbsafasds.net")
       described_class.new.perform(manufacturer.id)
       manufacturer.reload
@@ -29,11 +30,45 @@ RSpec.describe UpdateManufacturerLogoAndPriorityJob, type: :job do
     end
   end
 
+  it "Doesn't break when logo.dev returns 200 with a non-image body" do
+    VCR.use_cassette("get_manufacturer_logo_worker-non-image", vcr_config) do
+      manufacturer = FactoryBot.create(:manufacturer, name: "Ibera", website: "http://www.ibera.info/")
+      described_class.new.perform(manufacturer.id)
+      manufacturer.reload
+      expect(manufacturer.logo).to_not be_present
+      expect(manufacturer.logo_source).to be_nil
+    end
+  end
+
+  it "Doesn't break when website has a path" do
+    VCR.use_cassette("get_manufacturer_logo_worker-website-with-path", vcr_config) do
+      manufacturer = FactoryBot.create(:manufacturer, website: "http://www.ternbicycles.com/us/")
+      described_class.new.perform(manufacturer.id)
+      manufacturer.reload
+      expect(manufacturer.logo).to be_present
+      expect(manufacturer.logo_source).to eq("Logo.dev")
+    end
+  end
+
   it "updates manufacturer priority" do
     manufacturer = FactoryBot.create(:manufacturer)
     manufacturer.update_column :priority, 14
     described_class.new.perform(manufacturer.id)
     expect(manufacturer.reload.priority).to eq 0
+  end
+
+  context "when API_KEY is blank" do
+    before { stub_const("UpdateManufacturerLogoAndPriorityJob::API_KEY", "") }
+
+    it "still updates priority but does not fetch a logo" do
+      manufacturer = FactoryBot.create(:manufacturer, website: "https://trekbikes.com")
+      manufacturer.update_column :priority, 14
+      described_class.new.perform(manufacturer.id)
+      manufacturer.reload
+      expect(manufacturer.logo).to_not be_present
+      expect(manufacturer.logo_source).to be_nil
+      expect(manufacturer.priority).to eq 0
+    end
   end
 
   context "manufacturer has logo" do

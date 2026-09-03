@@ -1,0 +1,197 @@
+export interface StravaAthlete {
+  id: number;
+  username: string;
+  firstname: string;
+  lastname: string;
+  city: string;
+  state: string;
+  country: string;
+  profile: string;
+  profile_medium: string;
+  measurement_preference?: string;
+  bikes?: StravaGear[];
+  shoes?: StravaGear[];
+}
+
+export interface StravaGear {
+  id: string;
+  primary: boolean;
+  name: string;
+  distance: number;
+  brand_name?: string;
+  model_name?: string;
+  description?: string;
+  resource_state: number;
+}
+
+export interface StravaActivity {
+  strava_id: string;
+  title: string;
+  description?: string;
+  activity_type: string;
+  sport_type: string;
+  distance_meters: number;
+  moving_time_seconds: number;
+  total_elevation_gain_meters: number;
+  average_speed: number;
+  start_date: string;
+  start_date_in_zone: string;
+  timezone: string;
+  kudos_count: number;
+  suffer_score?: number;
+  gear_id?: string | null;
+  private: boolean;
+  trainer: boolean;
+  commute: boolean;
+  muted: boolean;
+  enriched_at?: string | null;
+  pr_count: number;
+  top_10_ranks?: number[] | null;
+  device_name?: string;
+  device_watts?: boolean;
+  average_watts?: number;
+  max_heartrate?: number;
+  average_heartrate?: number;
+  photos?: {
+    photo_url: string | null;
+    photo_count: number;
+  };
+  segment_locations?: {
+    locations?: Array<{ city?: string; region?: string; country?: string }>;
+    regions?: Record<string, string>;
+    countries?: Record<string, string>;
+  };
+}
+
+export interface StoredAuth {
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: number;
+  athlete: StravaAthlete;
+}
+
+export type ActivityType =
+  | 'AlpineSki'
+  | 'BackcountrySki'
+  | 'Canoeing'
+  | 'Crossfit'
+  | 'EBikeRide'
+  | 'Elliptical'
+  | 'Golf'
+  | 'Handcycle'
+  | 'Hike'
+  | 'IceSkate'
+  | 'InlineSkate'
+  | 'Kayaking'
+  | 'Kitesurf'
+  | 'NordicSki'
+  | 'Ride'
+  | 'RockClimbing'
+  | 'RollerSki'
+  | 'Rowing'
+  | 'Run'
+  | 'Sail'
+  | 'Skateboard'
+  | 'Snowboard'
+  | 'Snowshoe'
+  | 'Soccer'
+  | 'StairStepper'
+  | 'StandUpPaddling'
+  | 'Surfing'
+  | 'Swim'
+  | 'Velomobile'
+  | 'VirtualRide'
+  | 'VirtualRun'
+  | 'Walk'
+  | 'WeightTraining'
+  | 'Wheelchair'
+  | 'Windsurf'
+  | 'Workout'
+  | 'Yoga';
+
+export const ACTIVITY_TYPES: ActivityType[] = [
+  'AlpineSki',
+  'BackcountrySki',
+  'Canoeing',
+  'Crossfit',
+  'EBikeRide',
+  'Elliptical',
+  'Golf',
+  'Handcycle',
+  'Hike',
+  'IceSkate',
+  'InlineSkate',
+  'Kayaking',
+  'Kitesurf',
+  'NordicSki',
+  'Ride',
+  'RockClimbing',
+  'RollerSki',
+  'Rowing',
+  'Run',
+  'Sail',
+  'Skateboard',
+  'Snowboard',
+  'Snowshoe',
+  'Soccer',
+  'StairStepper',
+  'StandUpPaddling',
+  'Surfing',
+  'Swim',
+  'Velomobile',
+  'VirtualRide',
+  'VirtualRun',
+  'Walk',
+  'WeightTraining',
+  'Wheelchair',
+  'Windsurf',
+  'Workout',
+  'Yoga',
+];
+
+export type MutedFilter = 'all' | 'muted' | 'not_muted';
+export type PhotoFilter = 'all' | 'with_photo' | 'without_photo';
+export type PrivateFilter = 'all' | 'private' | 'not_private';
+export type CommuteFilter = 'all' | 'commute' | 'not_commute';
+export type TrainerFilter = 'all' | 'trainer' | 'not_trainer';
+
+export interface SearchFilters {
+  query: string;
+  activityTypes: string[];
+  gearIds: string[];
+  noEquipment: boolean;
+  dateFrom: string | null;
+  dateTo: string | null;
+  distanceFrom: number | null;
+  distanceTo: number | null;
+  elevationFrom: number | null;
+  elevationTo: number | null;
+  filtersExpanded: boolean;
+  activityTypesExpanded: boolean;
+  equipmentExpanded: boolean;
+  updatePanelExpanded: boolean;
+  mutedFilter: MutedFilter;
+  photoFilter: PhotoFilter;
+  privateFilter: PrivateFilter;
+  commuteFilter: CommuteFilter;
+  trainerFilter: TrainerFilter;
+  sufferScoreFrom: number | null;
+  sufferScoreTo: number | null;
+  kudosFrom: number | null;
+  kudosTo: number | null;
+  hasTop10: boolean;
+  country: string | null;
+  region: string | null;
+  city: string | null;
+  page: number;
+}
+
+export interface UpdatableActivity {
+  name?: string;
+  type?: ActivityType;
+  sport_type?: string;
+  gear_id?: string;
+  description?: string;
+  trainer?: boolean;
+  commute?: boolean;
+}

@@ -1,0 +1,7 @@
+-# the default wrapper class works for form-wells, it's overridden for admin bike edit
+- wrapper_class ||= "form-group row fancy-select-placeholder unfancy"
+
+%div{class: wrapper_class}
+  = f.label :primary_activity_id, t(".primary_activity"), class: "form-well-label"
+  .form-well-input
+    = f.collection_select(:primary_activity_id, PrimaryActivity.by_priority, :id, :display_name, {include_blank: true, prompt: t(".choose_activity")}, {class: "form-control"})

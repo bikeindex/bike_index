@@ -1,0 +1,11 @@
+<h1><%= translation("confirm_your_email") %></h1>
+
+<p>
+  <%= translation("we_saved_your_registration_html", color_and_brand: @b_param.color_and_brand) %>
+</p>
+
+<p><%= translation("click_below_to_pick_up_where_you_left_off") %></p>
+
+<%= link_to translation("confirm_and_continue"), tokenized_url, "data-pm-no-track" => true, class: "binx-button" %>
+
+<p><%= translation("link_signs_you_in", days: expiration_days) %></p>

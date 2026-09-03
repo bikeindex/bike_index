@@ -1,18 +1,34 @@
 #!/bin/bash
-touch log/development.log
-> log/development.log # Clear out development log, otherwise it balloons
-> log/test.log # Clear out test log too
-touch log/bullet.log
-> log/test.log # Clear out bullet log
+# Clear out logs (they balloon) and tmp (mainly used by tests)
+bin/rails log:clear tmp:clear
 
 # Start Redis in the background, if it isn't started already
 touch log/redis.log
 > log/redis.log
 redis-server > log/redis.log &
 
+eval "$(ruby bin/env --export)"
+echo "Starting server on http://localhost:$DEV_PORT"
+echo
+
+# Point the review banner at this branch's PR
+if [ -f .workspace_id ] && [ "$NO_REVIEW_TOPBAR" != "true" ] &&
+  ! grep -qs "^NO_REVIEW_TOPBAR=true" .env.development; then
+  eval "$(gh pr view --json number,title --jq '@sh "export REVIEW_APP_PR_NUMBER=\(.number) REVIEW_APP_PR_TITLE=\(.title)"' 2>/dev/null)"
+fi
+
+# Pass --strava to start the strava_search Vite dev server
+FOREMAN_ARGS="-f Procfile.dev"
+if [[ " $* " == *" --strava "* ]]; then
+  export BUILD_STRAVA_SEARCH=true
+else
+  FOREMAN_ARGS="$FOREMAN_ARGS -m all=1,strava_search=0"
+fi
+
 # If there is a development specific environment file
 if test -f .env.development; then
-  bundle exec foreman start -f Procfile_development --env .env.development
+  bundle exec foreman start $FOREMAN_ARGS --env .env.development
 else
-  bundle exec foreman start -f Procfile_development
+  bundle exec foreman start $FOREMAN_ARGS
 fi
+

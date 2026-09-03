@@ -8,22 +8,23 @@
         %tr
           %td Created
           %td
-            %span.convertTime
+            %span.localizeTime
               = l(@superuser_ability.created_at, format: :convert_time)
         %tr
           %td Updated
-          %td.small.convertTime
+          %td.small.localizeTime
             = l(@superuser_ability.updated_at, format: :convert_time)
         %tr
           %td Deleted
           %td
             - if @superuser_ability.deleted_at.present?
-              %strong.convertTime.text-danger
+              %strong.localizeTime.text-danger
                 = l(@superuser_ability.deleted_at, format: :convert_time)
         %tr
           %td User
           %td
-            = render partial: "/shared/admin_user_cell", locals: {user_id: @superuser_ability.user_id, user: @superuser_ability.user, render_search: false, cache: true}
+            = cache(@superuser_ability.user) do
+              = render Pages::Admin::Users::Cell::Component.new(user_id: @superuser_ability.user_id, user: @superuser_ability.user, render_search: false)
   .col-md-6
     %table.table-list
       %tbody
@@ -44,8 +45,7 @@
     .card.bg-light
       .card-body
         = form_for [:admin, @superuser_ability] do |f|
-          - if @superuser_ability.errors.any?
-            = render partial: "/shared/errors", locals: {obj: @superuser_ability}
+          = render(UI::Alerts::ObjectError::Component.new(object: @superuser_ability))
 
           - SuperuserAbility::SU_OPTIONS.each do |ability|
             .form-group

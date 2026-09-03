@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: organizations
+# Database name: primary
 #
 #  id                              :integer          not null, primary key
 #  access_token                    :string(255)
@@ -16,7 +17,6 @@
 #  graduated_notification_interval :bigint
 #  is_paid                         :boolean          default(FALSE), not null
 #  kind                            :integer
-#  landing_html                    :text
 #  lightspeed_register_with_phone  :boolean          default(FALSE)
 #  location_latitude               :float
 #  location_longitude              :float
@@ -24,7 +24,6 @@
 #  manual_pos_kind                 :integer
 #  name                            :string(255)
 #  opted_into_theft_survey_2023    :boolean          default(FALSE)
-#  passwordless_user_domain        :string
 #  pos_kind                        :integer          default("no_pos")
 #  previous_slug                   :string
 #  regional_ids                    :jsonb
@@ -34,6 +33,7 @@
 #  show_on_map                     :boolean
 #  slug                            :string(255)      not null
 #  spam_registrations              :boolean          default(FALSE)
+#  user_email_domain               :string
 #  website                         :string(255)
 #  created_at                      :datetime         not null
 #  updated_at                      :datetime         not null
@@ -47,9 +47,11 @@
 #  index_organizations_on_manufacturer_id                           (manufacturer_id)
 #  index_organizations_on_parent_organization_id                    (parent_organization_id)
 #  index_organizations_on_slug                                      (slug) UNIQUE
+#  index_organizations_on_user_email_domain                         (user_email_domain)
 #
 class Organization < ApplicationRecord
   include ActionView::Helpers::SanitizeHelper
+  include FriendlyNameFindable
   include SearchRadiusMetricable
 
   KIND_ENUM = {
@@ -65,19 +67,25 @@ class Organization < ApplicationRecord
     bike_depot: 9
   }.freeze
 
+  USER_REGISTRATION_ALL_BIKES_EXCLUDED_IDS = [36, 1].freeze # SBR and BikeIndex
+
   POS_KIND_ENUM = {
     no_pos: 0,
     other_pos: 1,
     lightspeed_pos: 2,
     ascend_pos: 3,
-    broken_lightspeed_pos: 4,
     does_not_need_pos: 5,
+    broken_lightspeed_pos: 4,
     broken_ascend_pos: 6
   }.freeze
 
   acts_as_paranoid
 
   mount_uploader :avatar, AvatarUploader
+
+  enum :kind, KIND_ENUM
+  enum :pos_kind, POS_KIND_ENUM
+  enum :manual_pos_kind, POS_KIND_ENUM, prefix: :manual
 
   belongs_to :parent_organization, class_name: "Organization"
   belongs_to :auto_user, class_name: "User"
@@ -100,7 +108,9 @@ class Organization < ApplicationRecord
 
   has_many :organization_manufacturers
   has_many :locations, inverse_of: :organization, dependent: :destroy
+  has_many :location_address_records, -> { where(kind: :organization) }, class_name: "AddressRecord", foreign_key: :organization_id
   has_many :mail_snippets
+  has_many :registration_sequences, dependent: :destroy
   has_many :parking_notifications
   has_many :impound_records
   has_many :impound_claims
@@ -113,22 +123,33 @@ class Organization < ApplicationRecord
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other organization features
   has_one :hot_sheet_configuration
   has_one :organization_stolen_message
+  has_one :organization_landing_page
   has_one :impound_configuration
+  has_one :organization_saml_configuration
   has_many :hot_sheets
   has_many :organization_model_audits
   accepts_nested_attributes_for :mail_snippets
   accepts_nested_attributes_for :organization_stolen_message
+  accepts_nested_attributes_for :organization_saml_configuration
   accepts_nested_attributes_for :locations, allow_destroy: true
-
-  enum :kind, KIND_ENUM
-  enum :pos_kind, POS_KIND_ENUM
-  enum :manual_pos_kind, POS_KIND_ENUM, prefix: :manual
 
   validates_presence_of :name
   validates_uniqueness_of :short_name, case_sensitive: false, message: I18n.t(:duplicate_short_name, scope: [:activerecord, :errors, :organization])
   validates_with OrganizationNameValidator
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_uniqueness_of :manufacturer_id, allow_blank: true
+  validate :user_email_domain_format
+  # Two SSO orgs on one domain would make saml_email_matching's pick arbitrary (name order),
+  # silently sending logins to the wrong org's IdP. Non-SSO orgs may still share a domain.
+  validates_uniqueness_of :user_email_domain, allow_blank: true,
+    conditions: -> { with_enabled_feature_slugs("saml_sso") },
+    if: -> { enabled?("saml_sso") },
+    message: "is already used for SSO by another organization"
+
+  attr_accessor :embedable_user_email, :skip_update
+
+  before_validation :set_calculated_attributes
+  after_commit :update_associations
 
   default_scope { order(:name) }
   scope :name_ordered, -> { order(arel_table["name"].lower) }
@@ -145,125 +166,130 @@ class Organization < ApplicationRecord
   # Regional orgs have to have the organization feature slug AND the search location set
   scope :regional, -> { where.not(location_latitude: nil).where.not(location_longitude: nil).where("enabled_feature_slugs ?| array[:keys]", keys: ["regional_bike_counts"]) }
 
-  before_validation :set_calculated_attributes
-  after_commit :update_associations
-
-  delegate \
-    :address,
-    :city,
-    :country,
-    :country_id,
-    :latitude,
-    :longitude,
-    :state,
-    :state_id,
-    :street,
-    :zipcode,
-    :metric_units?,
-    to: :default_location,
-    allow_nil: true
-
   geocoded_by nil, latitude: :location_latitude, longitude: :location_longitude
 
-  attr_accessor :embedable_user_email, :skip_update
+  class << self
+    def kinds
+      KIND_ENUM.keys.map(&:to_s)
+    end
 
-  def self.kinds
-    KIND_ENUM.keys.map(&:to_s)
+    def pos_kinds
+      POS_KIND_ENUM.keys.map(&:to_s)
+    end
+
+    def broken_pos_kinds
+      %w[broken_ascend_pos broken_lightspeed_pos].freeze
+    end
+
+    def without_pos_kinds
+      %w[no_pos does_not_need_pos].freeze
+    end
+
+    def ascend_or_broken_ascend_kinds
+      %w[ascend_pos broken_ascend_pos].freeze
+    end
+
+    def lightspeed_or_broken_lightspeed_kinds
+      %w[lightspeed_pos broken_lightspeed_pos].freeze
+    end
+
+    def with_pos_kinds
+      pos_kinds - broken_pos_kinds - without_pos_kinds
+    end
+
+    def pos?(kind = nil)
+      kind.present? && !without_pos_kinds.include?(kind)
+    end
+
+    def admin_required_kinds
+      %w[ambassador bike_depot].freeze
+    end
+
+    def user_creatable_kinds
+      kinds - admin_required_kinds
+    end
+
+    def kind_humanized(str)
+      str.blank? ? nil : str.to_s.titleize
+    end
+
+    def friendly_find(n)
+      return n if n.is_a?(Organization)
+      n = normalize_friendly_str(n)
+      return nil if n.blank?
+      return find_by_id(n) if integer_string?(n)
+
+      slug = Slugifyer.slugify(n)
+      # First try slug, then previous slug, and finally, just give finding by name a shot
+      find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first
+    end
+
+    def admin_text_search(n)
+      n = normalize_friendly_str(n)
+      return nil if n.blank?
+
+      str = "%#{n}%"
+      match_cols = %w[organizations.name organizations.short_name organizations.ascend_name locations.name address_records.city]
+      left_outer_joins(:locations, :location_address_records)
+        .distinct
+        .where(match_cols.map { |col| "#{col} ILIKE :str" }.join(" OR "), {str: str})
+    end
+
+    def with_enabled_feature_slugs(slugs)
+      matching_slugs = OrganizationFeature.matching_slugs(slugs)
+      return none unless matching_slugs.present?
+
+      where("enabled_feature_slugs ?& array[:keys]", keys: matching_slugs)
+    end
+
+    def with_any_enabled_feature_slugs(slugs)
+      matching_slugs = OrganizationFeature.matching_slugs(slugs)
+      return none unless matching_slugs.present?
+
+      where("enabled_feature_slugs ?| array[:keys]", keys: matching_slugs)
+    end
+
+    def passwordless_email_matching(str)
+      domain = email_domain(str)
+      return nil if domain.blank?
+
+      permitted_domain_signin("passwordless_users").find_by(user_email_domain: domain)
+    end
+
+    # The org that forces SSO for an email's domain: feature enabled + a live IdP config.
+    # SSO shares the passwordless domain field for routing (no separate saml domain column).
+    # Filter the domain in SQL and eager-load the config so a login never scans every SSO org.
+    def saml_email_matching(str)
+      domain = email_domain(str)
+      return nil if domain.blank?
+
+      permitted_domain_signin("saml_sso").where(user_email_domain: domain)
+        .includes(:organization_saml_configuration)
+        .detect do |org|
+          configuration = org.organization_saml_configuration
+          configuration&.active? && configuration.configured?
+        end
+    end
+
+    def email_domain(str)
+      normalized = EmailNormalizer.normalize(str)
+      return nil unless normalized.present? && normalized.count("@") == 1 && normalized.match?(/.@.*\../)
+
+      normalized.split("@").last
+    end
+
+    def example
+      # In test, ids climb across examples so a factory org can land on 92 - look up by name instead
+      found = Rails.env.test? ? Organization.find_by(name: "Example Bike Shop") : Organization.find_by_id(92)
+      found || Organization.create(name: "Example Bike Shop")
+    end
+
+    private
+
+    def permitted_domain_signin(feature_slug)
+      where.not(user_email_domain: nil).with_enabled_feature_slugs(feature_slug)
+    end
   end
-
-  def self.pos_kinds
-    POS_KIND_ENUM.keys.map(&:to_s)
-  end
-
-  def self.broken_pos_kinds
-    %w[broken_ascend_pos broken_lightspeed_pos].freeze
-  end
-
-  def self.without_pos_kinds
-    %w[no_pos does_not_need_pos].freeze
-  end
-
-  def self.ascend_or_broken_ascend_kinds
-    %w[ascend_pos broken_ascend_pos].freeze
-  end
-
-  def self.lightspeed_or_broken_lightspeed_kinds
-    %w[lightspeed_pos broken_lightspeed_pos].freeze
-  end
-
-  def self.with_pos_kinds
-    pos_kinds - broken_pos_kinds - without_pos_kinds
-  end
-
-  def self.pos?(kind = nil)
-    kind.present? && !without_pos_kinds.include?(kind)
-  end
-
-  def self.admin_required_kinds
-    %w[ambassador bike_depot].freeze
-  end
-
-  def self.user_creatable_kinds
-    kinds - admin_required_kinds
-  end
-
-  def self.kind_humanized(str)
-    str.blank? ? nil : str.to_s.titleize
-  end
-
-  def self.friendly_find(n)
-    return nil unless n.present?
-    return n if n.is_a?(Organization)
-    return find_by_id(n) if integer_slug?(n)
-    slug = Slugifyer.slugify(n)
-    # First try slug, then previous slug, and finally, just give finding by name a shot
-    find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first
-  end
-
-  def self.friendly_find_id(n)
-    friendly_find(n)&.id
-  end
-
-  def self.integer_slug?(n)
-    n.is_a?(Integer) || n.match(/\A\d+\z/).present?
-  end
-
-  def self.admin_text_search(n)
-    return nil unless n.present?
-    str = "%#{n.strip}%"
-    match_cols = %w[organizations.name organizations.short_name organizations.ascend_name locations.name locations.city]
-    joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")
-      .distinct
-      .where(match_cols.map { |col| "#{col} ILIKE :str" }.join(" OR "), {str: str})
-  end
-
-  def self.with_enabled_feature_slugs(slugs)
-    matching_slugs = OrganizationFeature.matching_slugs(slugs)
-    return none unless matching_slugs.present?
-    where("enabled_feature_slugs ?& array[:keys]", keys: matching_slugs)
-  end
-
-  def self.with_any_enabled_feature_slugs(slugs)
-    matching_slugs = OrganizationFeature.matching_slugs(slugs)
-    return none unless matching_slugs.present?
-    where("enabled_feature_slugs ?| array[:keys]", keys: matching_slugs)
-  end
-
-  def self.permitted_domain_passwordless_signin
-    where.not(passwordless_user_domain: nil).with_enabled_feature_slugs("passwordless_users")
-  end
-
-  def self.passwordless_email_matching(str)
-    str = EmailNormalizer.normalize(str)
-    return nil unless str.present? && str.count("@") == 1 && str.match?(/.@.*\../)
-    domain = str.split("@").last
-    permitted_domain_passwordless_signin.detect { |o| o.passwordless_user_domain == domain }
-  end
-
-  def self.example
-    Organization.find_by_id(92) || Organization.create(name: "Example organization")
-  end
-
   # never geocode, use default_location lat/long
   def should_be_geocoded?
     false
@@ -273,12 +299,13 @@ class Organization < ApplicationRecord
     slug
   end
 
-  def landing_html?
-    landing_html.present?
+  def restrict_invitations?
+    !enabled?("passwordless_users") && !user_email_domain.present?
   end
 
-  def restrict_invitations?
-    !enabled?("passwordless_users") && !passwordless_user_domain.present?
+  # Members of these organizations authenticate via a magic link or the organization's IdP
+  def passwordless_user_creation?
+    any_enabled?(%w[passwordless_users saml_sso])
   end
 
   def sent_invitation_count
@@ -304,10 +331,6 @@ class Organization < ApplicationRecord
   # Enable this if they have paid for showing it, or if they use ascend
   def show_bulk_import?
     ascend_or_broken_ascend? || any_enabled?(%w[show_bulk_import show_bulk_import_impound show_bulk_import_stolen])
-  end
-
-  def show_multi_serial?
-    enabled?("show_multi_serial") || %w[law_enforcement].include?(kind)
   end
 
   def public_impound_bikes?
@@ -344,7 +367,7 @@ class Organization < ApplicationRecord
   # For now - just using paid
   def user_registration_all_bikes?
     paid? && !official_manufacturer? &&
-      [36, 1].exclude?(id) # Exclude SBR and BikeIndex
+      USER_REGISTRATION_ALL_BIKES_EXCLUDED_IDS.exclude?(id)
   end
 
   def paid_money?
@@ -392,6 +415,17 @@ class Organization < ApplicationRecord
     locations.publicly_visible.order(id: :asc).first || locations.order(id: :asc).first
   end
 
+  def default_address_record
+    default_location&.address_record
+  end
+
+  # TODO: when default_location is configurable, use default location
+  def metric_units?
+    return @metric_units if defined?(@metric_units)
+
+    @metric_units = Country.metric_units?(location_address_records.order(:id).pick(:country_id))
+  end
+
   def search_coordinates
     [location_latitude, location_longitude]
   end
@@ -429,14 +463,15 @@ class Organization < ApplicationRecord
 
   def organization_view_counts
     return Organization.none unless manufacturer_id.present?
+
     Organization.left_joins(:organization_manufacturers)
       .where(organization_manufacturers: {can_view_counts: true, manufacturer_id: manufacturer_id})
   end
 
-  def mail_snippet_body(snippet_kind)
+  def mail_snippet_body(snippet_kind, time: nil)
     return nil unless MailSnippet.organization_snippet_kinds.include?(snippet_kind)
-    snippet = mail_snippets.enabled.where(kind: snippet_kind).first
-    snippet&.body
+
+    MailSnippet.for_organization(organization_id: id, kind: snippet_kind, time:)&.body
   end
 
   def current_organization_status
@@ -451,7 +486,7 @@ class Organization < ApplicationRecord
     translation_scope =
       [:activerecord, :select_options, self.class.name.underscore, __method__]
 
-    %w[student graduate_student employee community_member]
+    %w[student graduate_student postdoc employee community_member]
       .map { |e| [I18n.t(e, scope: translation_scope), e] }
   end
 
@@ -478,12 +513,14 @@ class Organization < ApplicationRecord
   # Bikes geolocated within `search_radius` miles.
   def nearby_bikes
     return Bike.none unless regional? && search_coordinates_set?
+
     # Need to unscope it so that we can call group-by on it
     Bike.unscoped.current.within_bounding_box(bounding_box)
   end
 
   def nearby_recovered_records
     return StolenRecord.none unless regional? && search_coordinates_set?
+
     # Don't use recovered scope because it orders them
     StolenRecord.recovered.within_bounding_box(bounding_box)
   end
@@ -494,6 +531,7 @@ class Organization < ApplicationRecord
 
   def graduated_notification_interval_days
     return nil unless graduated_notification_interval.present?
+
     graduated_notification_interval / ActiveSupport::Duration::SECONDS_PER_DAY
   end
 
@@ -506,6 +544,7 @@ class Organization < ApplicationRecord
   def enabled?(feature_name)
     features = OrganizationFeature.matching_slugs(feature_name)
     return false unless features.present? && enabled_feature_slugs.is_a?(Array)
+
     features.all? { |feature| enabled_feature_slugs.include?(feature) }
   end
 
@@ -516,14 +555,15 @@ class Organization < ApplicationRecord
 
   def set_calculated_attributes
     return true unless name.present?
+
     self.name = strip_name_tags(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
-    self.short_name = name_shortener(short_name || name)
+    self.short_name = name_shortener(short_name.presence || name)
     self.ascend_name = nil if ascend_name.blank?
     self.is_paid = current_invoices.any? || current_parent_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
-    self.passwordless_user_domain = EmailNormalizer.normalize(passwordless_user_domain)
+    self.user_email_domain = EmailNormalizer.normalize(user_email_domain)
     self.graduated_notification_interval = nil unless graduated_notification_interval.to_i > 0
     # For now, just use them. However - nesting organizations probably need slightly modified organization_feature slugs
     self.enabled_feature_slugs = calculated_enabled_feature_slugs.compact.sort
@@ -552,6 +592,7 @@ class Organization < ApplicationRecord
 
   def ensure_auto_user
     return true if auto_user.present?
+
     self.embedable_user_email = users.first && users.first.email || ENV["AUTO_ORG_MEMBER"]
     save
   end
@@ -578,25 +619,34 @@ class Organization < ApplicationRecord
       end
     elsif auto_user_id.blank?
       return nil unless users.any?
+
       self.auto_user_id = users.first.id
     end
   end
 
   def update_associations
     return true if skip_update
+
     UpdateOrganizationAssociationsJob.perform_async(id)
   end
 
   private
 
+  def user_email_domain_format
+    return if user_email_domain.blank?
+    errors.add(:user_email_domain, "must include a .") unless user_email_domain.include?(".")
+    errors.add(:user_email_domain, "must not include @") if user_email_domain.include?("@")
+  end
+
   def nearby_organizations_including_siblings
     return self.class.none unless regional? && search_coordinates_set?
+
     self.class.within_bounding_box(bounding_box).where.not(id: child_ids + [id, parent_organization_id])
       .reorder(id: :asc)
   end
 
   def strip_name_tags(str)
-    InputNormalizer.sanitize(name&.strip).gsub("&amp;", "&")
+    Binxtils::InputNormalizer.sanitize(name&.strip).gsub("&amp;", "&")
   end
 
   def name_shortener(str)
@@ -606,6 +656,7 @@ class Organization < ApplicationRecord
     end
     str = str.gsub(/\s+/, " ").strip.truncate(30, omission: "", separator: " ").strip
     return str unless deleted_at.present?
+
     str.match?("-deleted") ? str : "#{str}-deleted"
   end
 
@@ -626,6 +677,8 @@ class Organization < ApplicationRecord
     end
     # If it has stickers, add reg_bike_sticker field
     fslugs += ["reg_bike_sticker"] if fslugs.include?("bike_stickers")
+    # Alone, the edit feature would lock the organization out - viewing is gated separately
+    fslugs += ["registration_sequences"] if fslugs.include?("registration_sequences_edit")
 
     if fslugs.include?("impound_bikes")
       # If impound_bikes enabled and there is a default location for impounding bikes, add impound_bikes_locations

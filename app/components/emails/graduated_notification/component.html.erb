@@ -1,0 +1,24 @@
+<h1>
+  <%= @graduated_notification.subject %>
+</h1>
+
+<% if organization_snippet_body.present? %>
+  <%= organization_snippet_body.html_safe %>
+<% end %>
+
+<% if tokenized_url.present? %>
+  <div class="mark-retrieved-box">
+    <%= link_to tokenized_url, "data-pm-no-track" => true, class: "binx-button" do %>
+      Click to renew
+    <% end %>
+
+    <p>
+      <em>
+        Your <%= bike.type %> registration is set to expire soon.
+        <br>
+        If you're remaining on campus or returning in the fall, please click the
+        link above to keep your registration up to date.
+      </em>
+    </p>
+  </div>
+<% end %>

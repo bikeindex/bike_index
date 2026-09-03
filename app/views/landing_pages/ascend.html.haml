@@ -17,7 +17,7 @@
         %p
           %strong
 
-        %ol
+        %ol{class: "tw:list-decimal tw:ml-4"}
           %li
             - new_org_link = link_to t(".new_bike_shop_org"), new_organization_path
             = t(".sign_up_as_a_new_org_html", new_org_link: new_org_link)

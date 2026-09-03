@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: blog_content_tags
+# Database name: primary
 #
 #  id             :bigint           not null, primary key
 #  created_at     :datetime         not null

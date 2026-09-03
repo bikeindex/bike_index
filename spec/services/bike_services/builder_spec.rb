@@ -1,0 +1,244 @@
+require "rails_helper"
+
+RSpec.describe BikeServices::Builder do
+  let(:b_param_params) { {} }
+  let(:b_param) { BParam.new(params: b_param_params) }
+  let(:organization) { FactoryBot.create(:organization) }
+
+  describe "build" do
+    let(:bike) { described_class.build(b_param, new_attrs) }
+    let(:new_attrs) { nil }
+    it "builds it" do
+      expect(bike.status).to eq "status_with_owner"
+      expect(bike.id).to be_blank
+      # No address_record
+      expect(bike.creation_organization_id).to be_blank
+      expect(BParam.address_record_attributes(b_param.bike)).to be_blank
+      expect(bike.address_record).to be_blank
+    end
+    context "status impounded" do
+      let(:b_param_params) { {bike: {status: "status_impounded"}} }
+      it "is abandoned" do
+        expect(b_param.status).to eq "status_impounded"
+        expect(b_param.impound_attrs).to be_blank
+        expect(bike.id).to be_blank
+        impound_record = bike.impound_records.last
+        expect(impound_record).to be_present
+        expect(impound_record.kind).to eq "found"
+        expect(bike.status_humanized).to eq "found"
+      end
+      context "with impound attrs" do
+        let(:time) { Time.current - 12.hours }
+        let(:b_param_params) do
+          {
+            bike: {status: "status_with_owner"},
+            impound_record: {
+              impounded_at: time,
+              impounded_description: "Some description or whatever",
+              resolved_at: time, # Not a permitted attribute, so ignored
+              address_record_attributes: {
+                country_id: Country.united_states_id,
+                street: "1233 Howard St",
+                city: "san Francisco",
+                region_record_id: FactoryBot.create(:state_california).id,
+                region_string: "california",
+                postal_code: "94103"
+              }
+            }
+          }
+        end
+        it "is abandoned" do
+          expect(b_param.status).to eq "status_impounded"
+          expect(b_param.impound_attrs).to be_present
+          expect(bike.id).to be_blank
+          impound_record = bike.impound_records.last
+          expect(bike.current_impound_record).to eq impound_record
+          expect(impound_record).to be_present
+          expect(impound_record.formatted_address_string(visible_attribute: :street))
+            .to eq "1233 Howard St, san Francisco, CA 94103"
+          expect(impound_record.address_record).to have_attributes(kind: "impounded_from", id: nil)
+          expect(impound_record.resolved_at).to be_blank
+          expect(impound_record.impounded_at).to be_within(1).of time
+          expect(impound_record).to have_attributes(kind: "found", impounded_description: "Some description or whatever")
+          expect(bike.status_humanized).to eq "found"
+        end
+      end
+    end
+    context "status stolen" do
+      let(:b_param_params) { {bike: {status: "status_stolen"}} }
+      it "is stolen" do
+        expect(b_param).to be_valid
+        expect(b_param.status).to eq "status_stolen"
+        expect(b_param.stolen_attrs).to be_blank
+        expect(bike.status).to eq "status_stolen"
+        expect(bike.id).to be_blank
+        expect(bike.stolen_records.last).to be_present
+      end
+      context "legacy_stolen" do
+        let(:b_param_params) { {bike: {stolen: true}} }
+        it "is stolen" do
+          expect(b_param).to be_valid
+          expect(b_param.status).to eq "status_stolen"
+          expect(b_param.stolen_attrs).to be_blank
+          expect(bike.status).to eq "status_stolen"
+          expect(bike.id).to be_blank
+          expect(bike.stolen_records.last).to be_present
+        end
+      end
+    end
+    context "with id" do
+      let(:b_param) { FactoryBot.create(:b_param, params: b_param_params) }
+      it "includes ID" do
+        expect(b_param).to be_valid
+        expect(bike.status).to eq "status_with_owner"
+        expect(bike.id).to be_blank
+        expect(bike.b_param_id).to eq b_param.id
+        expect(bike.b_param_id_token).to eq b_param.id_token
+        expect(bike.creator).to eq b_param.creator
+      end
+      context "stolen" do
+        # Even though status_with_owner passed - since it has stolen attrs
+        let(:b_param_params) { {bike: {status: "status_with_owner"}, stolen_record: {phone: "7183839292"}} }
+        it "is stolen" do
+          expect(b_param).to be_valid
+          expect(b_param.status).to eq "status_stolen"
+          expect(b_param.stolen_attrs).to eq b_param_params[:stolen_record].as_json
+          expect(bike.status).to eq "status_stolen"
+          expect(bike.id).to be_blank
+          expect(bike.b_param_id).to eq b_param.id
+          expect(bike.b_param_id_token).to eq b_param.id_token
+          expect(bike.creator).to eq b_param.creator
+          stolen_record = bike.stolen_records.last
+          expect(stolen_record).to be_present
+          expect(stolen_record.phone).to eq b_param_params.dig(:stolen_record, :phone)
+        end
+      end
+    end
+
+    context "status overrides" do
+      it "is stolen if it is stolen" do
+        bike = described_class.build(BParam.new, status: "status_stolen")
+        expect(bike.status).to eq "status_stolen"
+      end
+      it "impounded if status_impounded" do
+        bike = described_class.build(BParam.new, status: "status_impounded")
+        expect(bike.status).to eq "status_impounded"
+        expect(bike.address_record).to be_blank
+      end
+    end
+
+    context "with an invalid enum value" do
+      let(:b_param_params) { {bike: {frame_material: "1", handlebar_type: "9", frame_model: "Cool model"}} }
+      it "adds an error rather than raising" do
+        expect(bike.errors.full_messages).to eq(["Frame material is not valid", "Handlebar type is not valid"])
+        expect(bike.frame_material).to be_blank
+        expect(bike.handlebar_type).to be_blank
+        expect(bike.frame_model).to eq "Cool model"
+      end
+    end
+
+    context "with organization" do
+      let(:new_attrs) { {organization:} }
+
+      it "assigns from organization keywarg" do
+        expect(bike.creation_organization_id).to eq organization.id
+      end
+      context "with organization in b_param_params" do
+        let(:organization2) { FactoryBot.create(:organization) }
+        let(:b_param_params) { {bike: {creation_organization_id: organization2.id}} }
+        it "assigns from b_param_params" do
+          expect(bike.creation_organization_id).to eq organization2.id
+        end
+      end
+    end
+
+    describe "address_record" do
+      let(:new_attrs) { {organization:} }
+
+      it "doesn't create an address_record" do
+        expect(organization.additional_registration_fields.include?("reg_address")).to be_falsey
+        expect(BParam.address_record_attributes(b_param.bike)).to be_blank
+        expect(bike.creation_organization_id).to eq organization.id
+        expect(bike.address_record).to be_blank
+      end
+
+      context "with address_record_attributes: street" do
+        let(:b_param_params) do
+          {
+            bike: {
+              address_record_attributes: {
+                street: "123 Main St",
+                city: "Oakland",
+                region_string: "CA",
+                postal_code: "94612",
+                country_id: Country.united_states_id
+              }
+            }
+          }
+        end
+        it "creates" do
+          expect(organization.additional_registration_fields.include?("reg_address")).to be_falsey
+          expect(BParam.address_record_attributes(b_param.bike)).to be_present
+          expect(bike.address_record).to be_present
+          expect(bike.address_record).to have_attributes(
+            street: "123 Main St",
+            city: "Oakland",
+            kind: "ownership"
+          )
+        end
+      end
+
+      context "with organization with reg_address" do
+        let!(:organization) { FactoryBot.create(:organization_with_organization_features, :in_chicago, enabled_feature_slugs: ["reg_address"]) }
+        let(:org_address) { organization.default_address_record }
+        let(:target_attributes) do
+          {id: nil, kind: "ownership", city: "Chicago", region_record_id: org_address.region_record_id,
+           country_id: Country.united_states_id, street: nil, postal_code: nil}
+        end
+        it "returns address with organization's country, region_string and city" do
+          expect(org_address.city).to eq "Chicago"
+          expect(org_address.street).to be_present
+          expect(organization.additional_registration_fields.include?("reg_address")).to be_truthy
+          expect(BParam.address_record_attributes(b_param.bike)).to be_blank
+          expect(BikeServices::Displayer.include_reg_field?(:address, bike.creation_organization)).to be_truthy
+          expect(bike.address_record).to have_attributes target_attributes
+        end
+        context "with b_param with address_record_attributes" do
+          let(:b_param_organization) { Organization.new } # this is ignored, because it's in b_param
+          let(:b_param_params) do
+            {
+              bike: {
+                creation_organization_id: organization.id,
+                address_record_attributes: {
+                  city: "San Francisco",
+                  country_id: Country.united_states_id,
+                  region_string: "CA",
+                  street: "3333 nowhere",
+                  postal_code: "94110"
+                }
+              }
+            }
+          end
+          it "returns the b_param address_record_attributes" do
+            expect(org_address.city).to eq "Chicago"
+            expect(org_address.street).to be_present
+            expect(organization.additional_registration_fields.include?("reg_address")).to be_truthy
+            expect(BParam.address_record_attributes(b_param.bike)).to be_present
+            expect(BikeServices::Displayer.include_reg_field?(:address, bike.creation_organization)).to be_truthy
+            expect(bike.address_record).to have_attributes b_param_params[:bike][:address_record_attributes]
+          end
+        end
+
+        context "with organization without a location" do
+          # NOTE: This would be an error situation, just want to make sure things don't explode
+          let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["reg_address"]) }
+          it "returns an address_record" do
+            expect(organization.default_address_record).to be_blank
+            expect(BikeServices::Displayer.include_reg_field?(:address, bike.creation_organization)).to be_truthy
+            expect(bike.address_record).to be_blank
+          end
+        end
+      end
+    end
+  end
+end

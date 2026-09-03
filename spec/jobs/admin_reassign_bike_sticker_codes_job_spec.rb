@@ -6,7 +6,7 @@ RSpec.describe AdminReassignBikeStickerCodesJob, type: :job do
   describe "perform" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:organization2) { FactoryBot.create(:organization) }
-    let!(:user) { FactoryBot.create(:admin) }
+    let!(:user) { FactoryBot.create(:superuser) }
     let(:user2) { FactoryBot.create(:user) }
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
     let(:bike_sticker_batch) { FactoryBot.create(:bike_sticker_batch, prefix: "A", code_number_length: nil, organization: organization) }

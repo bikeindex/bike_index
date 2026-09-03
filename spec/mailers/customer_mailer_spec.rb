@@ -10,7 +10,8 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.to).to eq([user.email])
       expect(mail.tag).to eq "welcome_email"
-      expect(mail.body.encoded).to match(/supported by/i)
+      expect(mail.body.encoded).to_not match(/supported by/i)
+      expect(mail.deliver_now.text_part.body.to_s).to include("Welcome to Bike Index")
     end
   end
 
@@ -21,6 +22,8 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.to).to eq([user.email])
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.tag).to eq "confirmation_email"
+      expect(mail.body.encoded).to include(CGI.escapeHTML(confirm_users_url(id: user.id, code: user.confirmation_token)))
+      expect(mail.deliver_now.text_part.body.to_s).to include("Follow this link to sign in").and include("Sign in")
     end
     context "partner signup" do
       let(:user) { FactoryBot.create(:user_bikehub_signup) }
@@ -31,6 +34,8 @@ RSpec.describe CustomerMailer, type: :mailer do
         expect(mail.to).to eq([user.email])
         expect(mail.from).to eq(["contact@bikeindex.org"])
         expect(mail.tag).to eq "confirmation_email"
+        expect(mail.body.encoded).to include(CGI.escapeHTML(confirm_users_url(id: user.id, code: user.confirmation_token, partner: "bikehub")))
+        expect(mail.deliver_now.text_part.body.to_s).to include("Follow this link to sign in").and include("Sign in")
       end
     end
   end
@@ -45,6 +50,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       # And just to be sure, test the route a little more
       expect(mail.body.encoded).to match(/users\/update_password_form_with_reset_token\?token=#{user.token_for_password_reset}/)
       expect(mail.tag).to eq "password_reset_email"
+      expect(mail.deliver_now.text_part.body.to_s).to include(user.token_for_password_reset).and include("Reset password")
     end
   end
 
@@ -56,6 +62,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.body.encoded).to match(user.magic_link_token)
       expect(mail.tag).to eq "magic_login_link_email"
+      expect(mail.deliver_now.text_part.body.to_s).to include(user.magic_link_token).and include("Sign in")
     end
   end
 
@@ -66,6 +73,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.subject).to match(/confirm/i)
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.tag).to eq "additional_email_confirmation"
+      expect(mail.deliver_now.text_part.body.to_s).to include(user_email.email).and include("Verify email")
     end
   end
 
@@ -79,6 +87,7 @@ RSpec.describe CustomerMailer, type: :mailer do
         expect(mail.from).to eq(["contact@bikeindex.org"])
         expect(mail.body.encoded).to match "donation of"
         expect(mail.tag).to eq "invoice_email"
+        expect(mail.deliver_now.text_part.body.to_s).to include("donation of")
       end
     end
     context "payment" do
@@ -90,6 +99,7 @@ RSpec.describe CustomerMailer, type: :mailer do
         expect(mail.from).to eq(["contact@bikeindex.org"])
         expect(mail.body.encoded).to_not match "donation of"
         expect(mail.tag).to eq "invoice_email"
+        expect(mail.deliver_now.text_part.body.to_s).to include("payment of").and include("Thank you so much")
       end
     end
   end
@@ -116,6 +126,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.to).to eq([customer_contact.user_email])
       expect(mail.subject).to eq "CUSTOM CUSTOMER contact Title"
       expect(mail.from).to eq(["contact@bikeindex.org"])
+      expect(mail.deliver_now.text_part.body.to_s).to include("spreading the word about").and include("bikeindex")
     end
   end
 
@@ -128,16 +139,17 @@ RSpec.describe CustomerMailer, type: :mailer do
     it "renders email" do
       mail = CustomerMailer.recovered_from_link(stolen_record)
       expect(mail.to).to eq([bike.owner_email])
-      expect(mail.subject).to eq "Your tall bike has been marked recovered!"
+      expect(mail.subject).to eq "Your tall bike (multiple frames fused together) has been marked recovered!"
       expect(mail.from).to eq(["bryan@bikeindex.org"])
       expect(mail.body.encoded).to match recovered_description
+      expect(mail.deliver_now.text_part.body.to_s).to include(recovered_description).and include("was marked")
     end
   end
 
   describe "admin_contact_stolen_email" do
     let!(:ownership) { FactoryBot.create(:ownership, bike: bike) }
     let(:bike) { FactoryBot.create(:stolen_bike) }
-    let(:user) { FactoryBot.create(:admin, email: "something@stuff.com") }
+    let(:user) { FactoryBot.create(:superuser, email: "something@stuff.com") }
     let(:customer_contact) do
       CustomerContact.create(user_email: bike.owner_email,
         creator_email: user.email,
@@ -152,6 +164,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.body.encoded).to match("some message")
       expect(mail.reply_to).to eq(["something@stuff.com"])
       expect(mail.from).to eq(["contact@bikeindex.org"])
+      expect(mail.deliver_now.text_part.body.to_s).to include("some message")
     end
   end
 
@@ -166,6 +179,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.from.first).to eq("bryan@bikeindex.org")
       expect(mail.body.encoded).to match(stolen_notification.message)
       expect(mail.body.encoded).to match(stolen_notification.reference_url)
+      expect(mail.deliver_now.text_part.body.to_s).to include(stolen_notification.message).and include(stolen_notification.reference_url)
       expect(mail.reply_to).to eq(["party@example.com"])
       expect(mail.cc).to eq(["bryan@bikeindex.org", "gavin@bikeindex.org"])
       stolen_notification.reload
@@ -187,6 +201,9 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.from.count).to eq(1)
       expect(mail.from.first).to eq("gavin@bikeindex.org")
       expect(mail.body.encoded).to_not match "vendor terms"
+      expect(mail.body.encoded).to match "binx-header-banner" # shared blue banner header, not the old logo
+      expect(mail.body.encoded).to_not match "email_assets/logo.png"
+      expect(mail.deliver_now.text_part.body.to_s).to include("Gavin Hoover and the Bike Index Team").and include("updated our privacy policy")
     end
   end
 
@@ -233,6 +250,39 @@ RSpec.describe CustomerMailer, type: :mailer do
         expect(mail.body.encoded.strip).to eq "Dear #{user.name}, a bike from Wheelageddon, view survey: https://example.com?respid=2"
         expect(mail.message_stream).to eq "outbound"
       end
+    end
+  end
+
+  describe "newsletter" do
+    let(:mail_snippet) { FactoryBot.build(:mail_snippet, kind: :newsletter) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:mail) { CustomerMailer.newsletter(user:, mail_snippet:) }
+
+    it "renders, includes unsubscribe" do
+      expect(mail.from).to eq(["contact@bikeindex.org"])
+      expect(mail.to).to eq([user.email])
+      expect(mail.tag).to eq "newsletter"
+      expect(mail.body.encoded).to match "unsubscribe"
+      expect(mail.body.encoded).to match "binx-header-banner" # shared blue banner header, not the old logo
+      expect(mail.body.encoded).to_not match "email_assets/logo.png"
+    end
+
+    it "includes one-click unsubscribe headers, pointing at the POST endpoint" do
+      expect(mail["List-Unsubscribe-Post"].value).to eq "List-Unsubscribe=One-Click"
+      signed_id = mail["List-Unsubscribe"].value[%r{/users/(.+)/unsubscribe_update>\z}, 1]
+      expect(User.find_signed(signed_id, purpose: :unsubscribe)).to eq user
+    end
+  end
+
+  # TODO: Move to its own mailer?
+  describe "marketplace_message_notification" do
+    let(:marketplace_message) { FactoryBot.create(:marketplace_message) }
+    it "delivers" do
+      mail = CustomerMailer.marketplace_message_notification(marketplace_message)
+      expect(mail.from).to eq(["contact@bikeindex.org"])
+      expect(mail.to).to eq([marketplace_message.receiver.email])
+      expect(mail.body.encoded.strip).to match marketplace_message.body
+      expect(mail.message_stream).to eq "outbound"
     end
   end
 end

@@ -1,0 +1,4 @@
+<%= render(UI::Forms::Group::Component.new(attribute: :manufacturer_id,
+  label_text: Manufacturer.model_name.human)) do %>
+  <%= render(UI::Forms::ComboboxManufacturer::Component.new) %>
+<% end %>

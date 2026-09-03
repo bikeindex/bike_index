@@ -1,0 +1,34 @@
+<%= render(Pages::Registrations::Show::CurrentAlerts::PromptChrome::Component.new(variant: @variant, id: MODAL_ID, title: translation(".claim_your_bike_type", bike_type: @bike.type))) do %>
+  <%# The avatar sits alongside the opening line only — the rest runs full width %>
+
+  <div class="tw:flex tw:items-start tw:gap-3">
+    <% if organization_avatar %>
+      <div class="tw:flex-none"><%= organization_avatar %></div>
+    <% end %>
+
+    <p class="tw:min-w-0">
+      <% if claimable? %>
+        <%= translation(".were_honored_to_have_your_bike", bike_type: @bike.type) %>
+      <% else %>
+        <strong><%= registered_by %></strong>
+        <%= translation(".registered_your_bike_on_index_html", bike_type: @bike.type, read_more_link: read_more_link) %>
+      <% end %>
+    </p>
+  </div>
+
+  <%# Signed in, the button is the whole instruction — there's no account to make %>
+
+  <% if claimable? %>
+    <p class="tw:mt-2">
+      <%= translation(".claim_it_so_you_can_update_your_listing") %>
+    </p>
+  <% elsif !signed_in? %>
+    <p class="tw:mt-2">
+      <%= translation(".to_see_your_bike_sign_up_html", bike_type: @bike.type, sign_up_link: link_to(translation(".sign_up"), claim_path, class: "twlink-underlined")) %>
+    </p>
+  <% end %>
+
+  <div class="tw:mt-4">
+    <%= render(UI::ButtonLink::Component.new(href: claim_path, text: claim_button_text, color: :purple)) %>
+  </div>
+<% end %>

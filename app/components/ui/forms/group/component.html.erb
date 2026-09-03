@@ -1,0 +1,18 @@
+<div class="<%= @wrapper_class %>">
+  <%= label_markup %>
+
+  <% if content_field? %>
+    <%= content %>
+  <% else %>
+    <%= render(UI::Forms::Input::Component.new(form_builder: @form_builder, attribute: @attribute, kind: @kind, required: required?, html_options: input_html_options)) %>
+  <% end %>
+
+  <% if helper_text? %>
+    <p
+      id="<%= helper_text_id %>"
+      class="tw:mt-1 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"
+    >
+      <%= helper_text %>
+    </p>
+  <% end %>
+</div>

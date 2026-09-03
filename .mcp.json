@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest",
+        "--isolated",
+        "--storage-state=${HOME}/.cache/ms-playwright/mcp-auth.json",
+        "--headless"
+      ]
+    }
+  }
+}

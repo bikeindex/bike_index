@@ -1,0 +1,15 @@
+<div class="tw:mt-2 tw:text-center">
+  <%= render(UI::Alerts::Base::Component.new(kind: :purple)) do %>
+    <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3">
+      <span class="tw:font-semibold">
+        <%= translation(".using_new_view", bike_type: @bike.type) %>
+      </span>
+
+      <% if redesign_enabled? %>
+        <%= render(UI::ButtonLink::Component.new(text: translation(".switch_to_classic"), href: toggle_show_redesign_my_account_path, method: :post, params: {bike_id: @bike.id}, form: {data: {controller: "csrf-refresh"}}, color: :secondary, size: :sm)) %>
+      <% else %>
+        <%= link_to translation(".view_in_legacy", bike_type: @bike.type), bike_path(@bike), class: "twlink-underlined tw:text-sm" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

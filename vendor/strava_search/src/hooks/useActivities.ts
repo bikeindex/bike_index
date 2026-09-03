@@ -1,0 +1,391 @@
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { usePreferences } from '../contexts/PreferencesContext';
+import {
+  getActivitiesForAthlete,
+  getGearForAthlete,
+  updateActivityInDb,
+  type StoredActivity,
+  type StoredGear,
+} from '../services/database';
+import { updateActivity as updateActivityApi } from '../services/strava';
+import { useUrlFilters } from './useUrlFilters';
+import type { SearchFilters, UpdatableActivity } from '../types/strava';
+
+interface UpdateProgress {
+  current: number;
+  total: number;
+}
+
+interface UseActivitiesResult {
+  activities: StoredActivity[];
+  filteredActivities: StoredActivity[];
+  gear: StoredGear[];
+  isLoading: boolean;
+  error: string | null;
+  clearError: () => void;
+  filters: SearchFilters;
+  setFilters: React.Dispatch<React.SetStateAction<SearchFilters>>;
+  selectedIds: Set<number>;
+  setSelectedIds: React.Dispatch<React.SetStateAction<Set<number>>>;
+  selectAll: () => void;
+  deselectAll: () => void;
+  updateSelectedActivities: (updates: UpdatableActivity) => Promise<void>;
+  isUpdating: boolean;
+  updateProgress: UpdateProgress | null;
+  refreshActivities: (silent?: boolean) => Promise<void>;
+  activityTypes: string[];
+}
+
+const MILES_TO_KM = 1.60934;
+const FEET_TO_METERS = 0.3048;
+
+export function useActivities(): UseActivitiesResult {
+  const { athlete, isAuthenticated } = useAuth();
+  const { units } = usePreferences();
+  const [activities, setActivities] = useState<StoredActivity[]>([]);
+  const [gear, setGear] = useState<StoredGear[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useUrlFilters();
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateProgress, setUpdateProgress] = useState<UpdateProgress | null>(null);
+
+  const loadActivities = useCallback(async (silent = false) => {
+    if (!athlete) {
+      setIsLoading(false);
+      return;
+    }
+
+    if (!silent) {
+      setIsLoading(true);
+      setError(null);
+    }
+
+    try {
+      const [loadedActivities, loadedGear] = await Promise.all([
+        getActivitiesForAthlete(athlete.id),
+        getGearForAthlete(athlete.id),
+      ]);
+
+      // Sort by date descending
+      loadedActivities.sort(
+        (a, b) => new Date(b.start_date_in_zone).getTime() - new Date(a.start_date_in_zone).getTime()
+      );
+
+      setActivities(loadedActivities);
+      setGear(loadedGear);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load activities');
+    } finally {
+      if (!silent) {
+        setIsLoading(false);
+      }
+    }
+  }, [athlete]);
+
+  useEffect(() => {
+    if (isAuthenticated && athlete) {
+      loadActivities();
+    } else {
+      setActivities([]);
+      setGear([]);
+      setIsLoading(false);
+    }
+  }, [isAuthenticated, athlete, loadActivities]);
+
+  // Retry once if initial load returned empty (handles IndexedDB timing issues)
+  const initialLoadRetried = useRef(false);
+  useEffect(() => {
+    if (!initialLoadRetried.current && !isLoading && activities.length === 0 && isAuthenticated && athlete) {
+      initialLoadRetried.current = true;
+      const timer = setTimeout(() => loadActivities(), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, activities.length, isAuthenticated, athlete, loadActivities]);
+
+  // Get unique activity types from the data (using sport_type for more specific types)
+  const activityTypes = useMemo(() => {
+    const types = new Set(activities.map((a) => a.sport_type));
+    return Array.from(types).sort();
+  }, [activities]);
+
+  // Filter activities based on search criteria
+  const filteredActivities = useMemo(() => {
+    return activities.filter((activity) => {
+      // Text search
+      if (filters.query) {
+        const query = filters.query.toLowerCase();
+        const searchableText = [
+          activity.title,
+          activity.description,
+          activity.device_name,
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+
+        if (!searchableText.includes(query)) {
+          return false;
+        }
+      }
+
+      // Activity type filter (using sport_type for more specific types)
+      if (filters.activityTypes.length > 0) {
+        if (!filters.activityTypes.includes(activity.sport_type)) {
+          return false;
+        }
+      }
+
+      // Gear filter
+      if (filters.gearIds.length > 0) {
+        if (!activity.gear_id || !filters.gearIds.includes(activity.gear_id)) {
+          return false;
+        }
+      }
+
+      // No equipment filter
+      if (filters.noEquipment) {
+        if (activity.gear_id) {
+          return false;
+        }
+      }
+
+      // Date range filter
+      if (filters.dateFrom) {
+        const activityDate = new Date(activity.start_date_in_zone);
+        const fromDate = new Date(filters.dateFrom);
+        fromDate.setHours(0, 0, 0, 0);
+        if (activityDate < fromDate) {
+          return false;
+        }
+      }
+
+      if (filters.dateTo) {
+        const activityDate = new Date(activity.start_date_in_zone);
+        const toDate = new Date(filters.dateTo);
+        toDate.setHours(23, 59, 59, 999);
+        if (activityDate > toDate) {
+          return false;
+        }
+      }
+
+      // Distance range filter
+      if (filters.distanceFrom !== null) {
+        const distanceInKm = activity.distance_meters / 1000;
+        const filterValueInKm = units === 'imperial' ? filters.distanceFrom * MILES_TO_KM : filters.distanceFrom;
+        if (distanceInKm < filterValueInKm) {
+          return false;
+        }
+      }
+
+      if (filters.distanceTo !== null) {
+        const distanceInKm = activity.distance_meters / 1000;
+        const filterValueInKm = units === 'imperial' ? filters.distanceTo * MILES_TO_KM : filters.distanceTo;
+        if (distanceInKm > filterValueInKm) {
+          return false;
+        }
+      }
+
+      // Elevation range filter
+      if (filters.elevationFrom !== null) {
+        const filterValueInMeters = units === 'imperial' ? filters.elevationFrom * FEET_TO_METERS : filters.elevationFrom;
+        if (activity.total_elevation_gain_meters < filterValueInMeters) {
+          return false;
+        }
+      }
+
+      if (filters.elevationTo !== null) {
+        const filterValueInMeters = units === 'imperial' ? filters.elevationTo * FEET_TO_METERS : filters.elevationTo;
+        if (activity.total_elevation_gain_meters > filterValueInMeters) {
+          return false;
+        }
+      }
+
+      // Muted filter
+      if (filters.mutedFilter === 'muted') {
+        if (!activity.muted) {
+          return false;
+        }
+      } else if (filters.mutedFilter === 'not_muted') {
+        if (activity.muted) {
+          return false;
+        }
+      }
+
+      // Private filter
+      if (filters.privateFilter === 'private') {
+        if (!activity.private) {
+          return false;
+        }
+      } else if (filters.privateFilter === 'not_private') {
+        if (activity.private) {
+          return false;
+        }
+      }
+
+      // Photo filter
+      if (filters.photoFilter === 'with_photo') {
+        if ((activity.photos?.photo_count || 0) === 0) {
+          return false;
+        }
+      } else if (filters.photoFilter === 'without_photo') {
+        if ((activity.photos?.photo_count || 0) > 0) {
+          return false;
+        }
+      }
+
+      // Commute filter
+      if (filters.commuteFilter === 'commute') {
+        if (!activity.commute) {
+          return false;
+        }
+      } else if (filters.commuteFilter === 'not_commute') {
+        if (activity.commute) {
+          return false;
+        }
+      }
+
+      // Trainer filter
+      if (filters.trainerFilter === 'trainer') {
+        if (!activity.trainer) {
+          return false;
+        }
+      } else if (filters.trainerFilter === 'not_trainer') {
+        if (activity.trainer) {
+          return false;
+        }
+      }
+
+      // Suffer score range filter
+      if (filters.sufferScoreFrom !== null) {
+        if (!activity.suffer_score || activity.suffer_score < filters.sufferScoreFrom) {
+          return false;
+        }
+      }
+      if (filters.sufferScoreTo !== null) {
+        if (!activity.suffer_score || activity.suffer_score > filters.sufferScoreTo) {
+          return false;
+        }
+      }
+
+      // Location filters
+      if (filters.country || filters.region || filters.city) {
+        const locations = activity.segment_locations?.locations;
+        if (!locations?.length) return false;
+        const match = locations.some((loc) =>
+          (!filters.country || loc.country === filters.country) &&
+          (!filters.region || loc.region === filters.region) &&
+          (!filters.city || loc.city === filters.city)
+        );
+        if (!match) return false;
+      }
+
+      // Kudos count range filter
+      if (filters.kudosFrom !== null) {
+        if (activity.kudos_count < filters.kudosFrom) {
+          return false;
+        }
+      }
+      if (filters.kudosTo !== null) {
+        if (activity.kudos_count > filters.kudosTo) {
+          return false;
+        }
+      }
+
+      // Top 10 filter
+      if (filters.hasTop10 && !activity.top_10_ranks?.length) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [activities, filters, units]);
+
+  // Deselect activities that are no longer visible
+  useEffect(() => {
+    const filteredIdSet = new Set(filteredActivities.map((a) => a.id));
+    setSelectedIds((prev) => {
+      if (prev.size === 0) return prev;
+      const pruned = new Set([...prev].filter((id) => filteredIdSet.has(id)));
+      return pruned.size === prev.size ? prev : pruned;
+    });
+  }, [filteredActivities]);
+
+  const selectAll = useCallback(() => {
+    setSelectedIds(new Set(filteredActivities.map((a) => a.id)));
+  }, [filteredActivities]);
+
+  const deselectAll = useCallback(() => {
+    setSelectedIds(new Set());
+  }, []);
+
+  const updateSelectedActivities = useCallback(
+    async (updates: UpdatableActivity) => {
+      if (selectedIds.size === 0 || isUpdating) return;
+
+      setIsUpdating(true);
+      setError(null);
+      const total = selectedIds.size;
+      setUpdateProgress({ current: 0, total });
+
+      const errors: string[] = [];
+      let successCount = 0;
+      let current = 0;
+
+      for (const id of selectedIds) {
+        try {
+          // Update on Strava
+          const updatedActivity = await updateActivityApi(id, updates);
+
+          // Update in local database
+          await updateActivityInDb(id, updatedActivity);
+
+          successCount++;
+        } catch (err) {
+          errors.push(`Activity ${id}: ${err instanceof Error ? err.message : 'Failed'}`);
+        }
+
+        current++;
+        setUpdateProgress({ current, total });
+
+        // Small delay to avoid rate limiting
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+
+      // Reload activities
+      setUpdateProgress({ current: total, total });
+      await loadActivities();
+
+      if (errors.length > 0) {
+        setError(`Updated ${successCount}/${selectedIds.size} activities.\n${errors.join('\n')}`);
+      }
+
+      setSelectedIds(new Set());
+      setIsUpdating(false);
+      setUpdateProgress(null);
+    },
+    [selectedIds, isUpdating, loadActivities]
+  );
+
+  return {
+    activities,
+    filteredActivities,
+    gear,
+    isLoading,
+    error,
+    clearError: () => setError(null),
+    filters,
+    setFilters,
+    selectedIds,
+    setSelectedIds,
+    selectAll,
+    deselectAll,
+    updateSelectedActivities,
+    isUpdating,
+    updateProgress,
+    refreshActivities: loadActivities,
+    activityTypes,
+  };
+}

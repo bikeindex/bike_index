@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: impound_record_updates
+# Database name: primary
 #
 #  id                :bigint           not null, primary key
 #  kind              :integer
@@ -18,8 +19,6 @@
 #
 #  index_impound_record_updates_on_impound_claim_id   (impound_claim_id)
 #  index_impound_record_updates_on_impound_record_id  (impound_record_id)
-#  index_impound_record_updates_on_location_id        (location_id)
-#  index_impound_record_updates_on_user_id            (user_id)
 #
 class ImpoundRecordUpdate < ApplicationRecord
   # These statuses are used by impound_records!
@@ -35,6 +34,8 @@ class ImpoundRecordUpdate < ApplicationRecord
     expired: 8
   }.freeze
 
+  enum :kind, KIND_ENUM
+
   belongs_to :impound_record
   belongs_to :impound_claim
   belongs_to :user
@@ -45,16 +46,14 @@ class ImpoundRecordUpdate < ApplicationRecord
   validates_presence_of :transfer_email, if: :transferred_to_new_owner?
   validates_presence_of :location_id, if: :move_location?
 
-  after_commit :update_associations
+  attr_accessor :skip_update
 
-  enum :kind, KIND_ENUM
+  after_commit :update_associations
 
   scope :active, -> { where(kind: active_kinds) }
   scope :resolved, -> { where(kind: resolved_kinds) }
   scope :with_location, -> { where.not(location_id: nil) }
   scope :unprocessed, -> { where(processed: false) } # Means the update worker hasn't taken care of them
-
-  attr_accessor :skip_update
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -83,7 +82,7 @@ class ImpoundRecordUpdate < ApplicationRecord
       move_location: "Update location",
       retrieved_by_owner: "Owner retrieved bike",
       removed_from_bike_index: "Removed from Bike Index",
-      transferred_to_new_owner: "Transferred to new owner",
+      transferred_to_new_owner: "Transferred to owner",
       claim_approved: "Claim approved",
       claim_denied: "Claim denied",
       expired: "Removed after expiration period"
@@ -126,6 +125,7 @@ class ImpoundRecordUpdate < ApplicationRecord
 
   def update_associations
     return true if skip_update
+
     impound_record&.update(updated_at: Time.current)
     impound_claim&.update(updated_at: Time.current)
   end

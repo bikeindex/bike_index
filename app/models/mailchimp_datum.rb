@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: mailchimp_data
+# Database name: primary
 #
 #  id                   :bigint           not null, primary key
 #  data                 :jsonb
@@ -26,7 +27,10 @@ class MailchimpDatum < ApplicationRecord
     archived: 5 # Not a mailchimp status, but tracking it as well
   }.freeze
 
-  MANAGED_TAGS = %w[in_bike_index not_org_creator paid paid_previously pos_approved lightspeed ascend].freeze
+  MANAGED_TAGS = %w[ascend in_bike_index lightspeed member not_org_creator paid paid_previously
+    pos_approved].freeze
+
+  enum :status, STATUS_ENUM
 
   belongs_to :user
   has_many :feedbacks
@@ -35,12 +39,10 @@ class MailchimpDatum < ApplicationRecord
   validates :user_id, uniqueness: true, allow_blank: true
   validate :ensure_subscription_required, on: :create
 
+  attr_accessor :creator_feedback, :skip_update
+
   before_validation :set_calculated_attributes
   after_commit :update_association_and_mailchimp, if: :persisted?
-
-  enum :status, STATUS_ENUM
-
-  attr_accessor :creator_feedback, :skip_update
 
   scope :no_user, -> { where(user_id: nil) }
   scope :with_user, -> { where.not(user_id: nil).where(user_deleted_at: nil) }
@@ -68,6 +70,7 @@ class MailchimpDatum < ApplicationRecord
   def self.find_and_update_or_create_for(obj)
     mailchimp_datum = find_or_create_for(obj)
     return mailchimp_datum unless mailchimp_datum.should_update?
+
     mailchimp_datum.update(updated_at: Time.current)
     mailchimp_datum
   end
@@ -79,8 +82,12 @@ class MailchimpDatum < ApplicationRecord
   # This finds the organization from the existing merge field, or uses the most recent organization
   def mailchimp_organization_role
     return @mailchimp_organization_role if defined?(@mailchimp_organization_role)
-    organization_roles = user&.organization_roles&.admin&.reorder(created_at: :desc)&.reject { |m| m.organization.ambassador? }
-    return nil unless organization_roles.present? && organization_roles.any?
+    return nil if user.blank?
+
+    organization_roles = OrganizationRole.ordered_for(user).admin.includes(:organization)
+      .reject { |m| m.organization.ambassador? }
+    return nil unless organization_roles.any?
+
     existing_name = data&.dig("merge_fields", "organization_name")
     existing_org = Organization.friendly_find(existing_name) if existing_name.present?
     if existing_org.present?
@@ -95,12 +102,14 @@ class MailchimpDatum < ApplicationRecord
 
   def stolen_records_recovered
     return StolenRecord.none if user.blank?
+
     StolenRecord.recovered.where(index_helped_recovery: true, bike_id: user.ownerships.pluck(:bike_id))
   end
 
   def should_update?(prev_status = nil)
     return false if id.blank? || mailchimp_archived_at.present?
     return true unless mailchimp_updated_at.present? && mailchimp_updated_at > Time.current - 2.minutes
+
     prev_status ||= status # Enable passing previous_status in after_commit
     prev_status != calculated_status # If status doesn't match, we should update!
   end
@@ -115,7 +124,7 @@ class MailchimpDatum < ApplicationRecord
 
   def mailchimp_archived_at
     t = data&.dig("mailchimp_archived_at")
-    t.present? ? TimeParser.parse(t) : nil
+    t.present? ? Binxtils::TimeParser.parse(t) : nil
   end
 
   def on_mailchimp?
@@ -154,18 +163,21 @@ class MailchimpDatum < ApplicationRecord
     end.compact
 
     new_interests = val.map do |key, value|
-      next unless InputNormalizer.boolean(value)
+      next unless Binxtils::InputNormalizer.boolean(value)
+
       MailchimpValue.interest.friendly_find(key, list: list)&.slug || key
     end.compact
     self.data ||= {}
-    self.data["interests"] = (kept_interests + new_interests).compact.uniq.sort
+    data["interests"] = (kept_interests + new_interests).compact.uniq.sort
   end
 
   def mailchimp_merge_fields(list)
     managed_merge_fields.dup.map do |k, v|
       next unless v.present?
+
       m_key = MailchimpValue.merge_field.friendly_find(k, list: list)&.mailchimp_id
       next unless m_key.present?
+
       [m_key, v]
     end.compact.to_h.merge(address_merge(list))
   end
@@ -173,20 +185,23 @@ class MailchimpDatum < ApplicationRecord
   def add_mailchimp_merge_fields(list, val)
     kept_merge_fields = merge_fields.dup.map do |k, v|
       next if MailchimpValue.merge_field.friendly_find(k, list: list)&.present?
+
       [k, v]
     end.compact.to_h
     new_merge_fields = val.map do |key, value|
       next unless value.present?
+
       [MailchimpValue.merge_field.friendly_find(key, list: list)&.slug || key, value]
     end.compact.to_h
     self.data ||= {}
-    self.data["merge_fields"] = kept_merge_fields.merge(new_merge_fields)
+    data["merge_fields"] = kept_merge_fields.merge(new_merge_fields)
   end
 
   def mailchimp_tags(list)
     tag_slugs = tags.dup.map { |t| MailchimpValue.tag.friendly_find(t, list: list)&.slug }.compact
     MailchimpValue.tag.where(list: list).order(:name).map do |mailchimp_value|
       next unless MANAGED_TAGS.include?(mailchimp_value.slug)
+
       present = tag_slugs.include?(mailchimp_value.slug)
       {name: mailchimp_value.name, status: present ? "active" : "inactive"}
     end.compact
@@ -200,7 +215,7 @@ class MailchimpDatum < ApplicationRecord
       MailchimpValue.tag.friendly_find(hash["name"], list: list)&.slug || hash["name"]
     end
     self.data ||= {}
-    self.data["tags"] = (new_tags + kept_tags).uniq.sort
+    data["tags"] = (new_tags + kept_tags).uniq.sort
   end
 
   def full_name
@@ -233,17 +248,21 @@ class MailchimpDatum < ApplicationRecord
 
   def update_association_and_mailchimp
     return true if skip_update
+
     calculated_feedbacks.each do |f|
       next if f.mailchimp_datum_id.present?
+
       f.update(mailchimp_datum_id: id)
     end
     return true unless should_update?(@previous_status)
     return true if data == @previous_data && status == @previous_status
+
     UpdateMailchimpDatumJob.perform_async(id)
   end
 
   def ensure_subscription_required
     return true if !no_subscription_required? || on_mailchimp?
+
     errors.add(:base, "No mailchimp subscription required, so not creating")
   end
 
@@ -276,10 +295,12 @@ class MailchimpDatum < ApplicationRecord
 
   def address_merge(list)
     if list == "organization"
-      return {} unless mailchimp_organization&.default_location.present? && mailchimp_organization&.city.present?
-      {"O_CITY" => mailchimp_organization.city,
-       "O_STATE" => mailchimp_organization.state&.abbreviation || "",
-       "O_COUNTRY" => mailchimp_organization.country&.iso || ""}
+      org_address = mailchimp_organization&.default_address_record
+      return {} unless org_address&.city.present?
+
+      {"O_CITY" => org_address.city,
+       "O_STATE" => org_address.region_record&.abbreviation || "",
+       "O_COUNTRY" => org_address.country&.iso || ""}
     else
       {} # For now, not handling
     end
@@ -293,6 +314,7 @@ class MailchimpDatum < ApplicationRecord
 
   def most_recent_donation_at
     return nil unless user.present?
+
     mailchimp_date(user.payments.donation.maximum(:created_at))
   end
 
@@ -304,7 +326,10 @@ class MailchimpDatum < ApplicationRecord
   # or else it won't update mailchimp
   def calculated_tags
     updated_tags = tags.dup
-    updated_tags << "in_bike_index" if user.present?
+    if user.present?
+      updated_tags << "in_bike_index"
+      updated_tags << "member" if user.member?
+    end
     if mailchimp_organization.present?
       unless mailchimp_organization_role.organization_creator?
         updated_tags << "not_org_creator"
@@ -330,6 +355,7 @@ class MailchimpDatum < ApplicationRecord
       # If the mailchimp_datum is created, we need to persist it, otherwise - don't save
       return id.present? ? "archived" : "no_subscription_required"
     end
+
     "subscribed"
   end
 
@@ -350,8 +376,8 @@ class MailchimpDatum < ApplicationRecord
     # users aren't added to the individual list if they're on the organization list
     unless c_list.include?("organization")
       if user&.present?
-        c_list << "individual" if user.payments.donation.any?
-        c_list << "individual" if stolen_records_recovered.any?
+        c_list << "individual" if user.member? || user.payments.donation.any? ||
+          stolen_records_recovered.any?
       end
     end
     c_list.uniq.sort

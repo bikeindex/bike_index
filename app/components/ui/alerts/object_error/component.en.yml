@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    ui:
+      alerts:
+        object_error:
+          error_prevented_this_from_being_saved:
+            one: "%{count} error prevented this %{object_name} from being saved:"
+            other: "%{count} errors prevented this %{object_name} from being saved:"

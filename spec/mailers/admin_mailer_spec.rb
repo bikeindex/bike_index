@@ -9,7 +9,8 @@ RSpec.describe AdminMailer, type: :mailer do
       expect(mail.to).to eq(["contact@bikeindex.org"])
       expect(mail.reply_to).to eq([feedback.email])
       expect(mail.tag).to eq("admin")
-      expect(mail.body.encoded).to match "supported by"
+      expect(mail.body.encoded).to_not match "supported by"
+      expect(mail.deliver_now.text_part.body.to_s).to include(feedback.body)
     end
   end
 
@@ -93,6 +94,7 @@ RSpec.describe AdminMailer, type: :mailer do
       expect(@mail.to).to eq(["contact@bikeindex.org"])
       expect(@mail.subject).to match("doesn't have any admins")
       expect(@mail.tag).to eq("admin")
+      expect(@mail.deliver_now.text_part.body.to_s).to include("There are no admins in").and include(@organization.name)
     end
   end
 
@@ -106,6 +108,19 @@ RSpec.describe AdminMailer, type: :mailer do
       expect(@mail.subject[/blocked/i].present?).to be_truthy
       expect(@mail.body.encoded).to match(@stolen_notification.message)
       expect(@mail.tag).to eq("admin")
+      expect(@mail.deliver_now.text_part.body.to_s).to include(@stolen_notification.message)
+    end
+  end
+
+  describe "blocked_marketplace_message_email" do
+    let(:marketplace_message) { FactoryBot.create(:marketplace_message, body: "Test Message", subject: "Test subject") }
+    let(:mail) { AdminMailer.blocked_marketplace_message_email(marketplace_message) }
+
+    it "renders email" do
+      expect(mail.subject[/blocked/i].present?).to be_truthy
+      expect(mail.body.encoded).to match(marketplace_message.body)
+      expect(mail.tag).to eq("admin")
+      expect(mail.deliver_now.text_part.body.to_s).to include(marketplace_message.body)
     end
   end
 
@@ -119,6 +134,7 @@ RSpec.describe AdminMailer, type: :mailer do
         expect(mail.subject).to match("RECOVERED Promoted Alert: #{theft_alert.id}")
         expect(mail.body.encoded).to include("RECOVERED")
         expect(mail.tag).to eq("admin")
+        expect(mail.deliver_now.text_part.body.to_s).to include("RECOVERED").and include("Promoted Alert")
       end
     end
   end

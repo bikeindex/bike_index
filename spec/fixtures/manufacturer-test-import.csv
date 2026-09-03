@@ -1,3 +1,3 @@
-name,website,frame_maker,open_year,close_year
-WeThePeople,http://wethepeople.com,,,
-Surly Bikes,surlybikes.com,true,1900,3000
+name,alternate_name,website,makes_frames,ebike_only,open_year,close_year,logo_url
+Riese & Müller,Riese and Muller,https://www.r-m.de/,true,true,1993,,
+"b'Twin","Btwin",,true,false,1976,,

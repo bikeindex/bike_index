@@ -1,0 +1,32 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered table-sm">
+    <thead class="thead-light">
+      <th>Name</th>
+      <th>Price</th>
+      <th>Views Provided</th>
+      <th>Duration (days)</th>
+      <th>Description</th>
+      <th>Language</th>
+      <th>Active?</th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |plan| %>
+        <tr>
+          <td>
+            <%= link_to plan.name, edit_admin_theft_alert_plan_path(plan) %>
+          </td>
+
+          <td><%= plan.amount_formatted %></td>
+          <td><%= number_with_delimiter(plan.views) %></td>
+          <td><%= plan.duration_days %></td>
+          <td><%= plan.description_html.html_safe %></td>
+          <td><%= t(plan.language, scope: [:locales]) %></td>
+          <td><%= check_mark if plan.active? %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

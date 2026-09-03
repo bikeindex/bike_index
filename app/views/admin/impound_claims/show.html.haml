@@ -21,12 +21,12 @@
         %tr
           %td Created
           %td
-            %span.convertTime.preciseTime
+            %span.localizeTime.preciseTime
               = l(@impound_claim.created_at, format: :convert_time)
         %tr
           %td Updated
           %td
-            %span.convertTime.preciseTime
+            %span.localizeTime.preciseTime
               = l(@impound_claim.updated_at, format: :convert_time)
         %tr
           %td Status
@@ -68,5 +68,5 @@
           %td Resolved
           %td
             - if @impound_claim.resolved_at.present?
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(@impound_claim.resolved_at, format: :convert_time)

@@ -1,0 +1,6 @@
+<%# A content block renders in place of the input -- here a file upload input. %>
+<%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :avatar)) do %>
+    <%= render(UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :avatar, accept: "image/*")) %>
+  <% end %>
+<% end %>

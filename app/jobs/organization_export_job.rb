@@ -1,15 +1,19 @@
 class OrganizationExportJob < ApplicationJob
   LINK_BASE = "#{ENV["BASE_URL"]}/bikes/".freeze
+  MATCHING_KEYS = %w[owner_email owner_name year phone extra_registration_number organization_affiliation student_id].freeze
 
   sidekiq_options retry: false, queue: "med_priority"
+
   attr_accessor :export # Only necessary for testing
 
   def perform(export_id)
     @export = Export.find(export_id)
     return true if @export.finished_processing?
+
     @export.update_attribute :progress, "ongoing"
     write_spreadsheet(@export.file_format, @export.tmp_file)
     return if @export_ebraked
+
     @export.file = @export.tmp_file
     @export.progress = "finished"
     @export.options = @export.options.merge(bike_codes_assigned: @bike_stickers) if @export.assign_bike_codes?
@@ -39,18 +43,21 @@ class OrganizationExportJob < ApplicationJob
       @export.bikes_scoped.find_each(batch_size: 100) do |bike|
         check_export_ebrake(row_index) # Run first thing in case it's already broken
         next unless export_bike?(bike)
+
         row_index += 1
         sheet.add_row(bike_to_row(bike))
       end
       @export.incompletes_scoped.find_each(batch_size: 100) do |b_param|
         check_export_ebrake(row_index) # Run first thing in case it's already broken
         next unless export_bike?(b_param)
+
         row_index += 1
         sheet.add_row(b_param_to_row(b_param))
       end
       @export.rows = row_index
     end
     return if @export_ebraked
+
     file.write(axlsx_package.to_stream.read)
     @export.tmp_file.close
     true
@@ -63,12 +70,14 @@ class OrganizationExportJob < ApplicationJob
     @export.bikes_scoped.find_each(batch_size: 100) do |bike|
       check_export_ebrake(row_index) # Run first thing in case it's already broken
       next unless export_bike?(bike)
+
       row_index += 1
       file.write(comma_wrapped_string(bike_to_row(bike)))
     end
     @export.incompletes_scoped.find_each(batch_size: 100) do |b_param|
       check_export_ebrake(row_index) # Run first thing in case it's already broken
       next unless export_bike?(b_param)
+
       row_index += 1
       file.write(comma_wrapped_string(b_param_to_row(b_param)))
     end
@@ -85,10 +94,12 @@ class OrganizationExportJob < ApplicationJob
   # Currently avery_exports are the only ones that need to do this
   def export_bike?(bike_or_b_param)
     return false if @export_ebraked
+
     @avery_export ||= @export.avery_export?
     return true unless @avery_export
     # The address must include a street for it to be valid
     return false unless bike_or_b_param.is_a?(Bike)
+
     bike_or_b_param.avery_exportable?
   end
 
@@ -107,7 +118,7 @@ class OrganizationExportJob < ApplicationJob
           color_id.present? ? Color.find(color_id).name : nil
         }.compact.join(", ")
       when "owner_email" then b_param.owner_email
-      when "vehicle_type" then CycleType.slug_translation(b_param.cycle_type)
+      when "vehicle_type" then CycleType.slug_translation_short(b_param.cycle_type)
       when "motorized" then b_param.motorized?
       when "partial_registration" then true
       end
@@ -116,12 +127,16 @@ class OrganizationExportJob < ApplicationJob
 
   def export_headers
     return @export_headers if defined?(@export_headers)
+
     @export_headers = @export.headers
     if @export_headers.include?("address")
       # Remove address and re-add, because we want to keep them in line
-      @export_headers = (@export_headers - ["address"]) + %w[address city state zipcode]
+      @export_headers = (@export_headers - ["address"]) + %w[address address_2 city state zipcode]
     end
-    @export_headers += ["partial_registration"] if @export.partial_registrations.present?
+    # If there are partial registrations, always include partial_registration
+    if @export.partial_registrations.present? && @export_headers.exclude?("partial_registration")
+      @export_headers += ["partial_registration"]
+    end
     if @export.assign_bike_codes?
       @export_headers << "assigned_sticker"
       @bike_stickers = []
@@ -131,10 +146,9 @@ class OrganizationExportJob < ApplicationJob
     @export_headers
   end
 
-  MATCHING_KEYS = %w[owner_email owner_name year phone extra_registration_number organization_affiliation student_id].freeze
-
   def value_for_header(header, bike)
     return bike.send(header) if MATCHING_KEYS.include?(header)
+
     case header
     when "link" then LINK_BASE + bike.id.to_s
     when "registration_method" then bike.creation_description
@@ -146,7 +160,9 @@ class OrganizationExportJob < ApplicationJob
     when "serial" then bike.serial_number
     when "is_stolen" then bike.status_stolen? ? "true" : nil
     when "is_impounded" then bike.status_impounded? ? "true" : nil
+    when "impounded_at" then bike.current_impound_record&.impounded_at&.utc
     when "address" then bike.registration_address["street"] # These are the expanded values for bike registration address
+    when "address_2" then bike.registration_address["street_2"]
     when "city" then bike.registration_address["city"]
     when "state" then bike.registration_address["state"]
     when "zipcode" then bike.registration_address["zipcode"]
@@ -155,11 +171,19 @@ class OrganizationExportJob < ApplicationJob
     when "vehicle_type" then bike.type_titleize
     when "motorized" then bike.motorized?
     when "status" then bike.status_humanized_no_with_owner
+    when "organization_notes" then organization_note_bodies[bike.id]
     end
+  end
+
+  # to_h can't collide: unique index on (bike_id, organization_id)
+  def organization_note_bodies
+    @organization_note_bodies ||= BikeOrganizationNote.where(organization_id: @export.organization_id)
+      .pluck(:bike_id, :body).to_h
   end
 
   def assign_bike_code_and_increment(bike)
     return "" unless @bike_sticker.present?
+
     code = @bike_sticker.code
     pretty_code = @bike_sticker.pretty_code
     @bike_sticker.claim(user: @export.user,
@@ -177,12 +201,15 @@ class OrganizationExportJob < ApplicationJob
     return true if @export_ebraked # If it's already braked, don't check again
     # only check every so often, so we can halt processing via an external trip switch
     return true unless (row % 50).zero?
+
     reloaded_export = Export.where(id: @export.id).first
     # Specifically - if this export has been deleted, errored or somehow finished, halt processing
     return true unless reloaded_export.blank? || reloaded_export.finished_processing?
+
     @export_ebraked = true
     # And because this might have processed some bike_stickers after the export was deleted, remove them here
     return true unless @export.assign_bike_codes?
+
     @export.options = @export.options.merge(bike_codes_assigned: @bike_stickers)
     @export.remove_bike_stickers
   end

@@ -2,12 +2,13 @@ class BikeVersionsController < ApplicationController
   before_action :render_ad, only: %i[index show]
   before_action :find_bike_version, except: %i[index create]
   before_action :ensure_user_allowed_to_edit_version, except: %i[index show create]
+  around_action :set_reading_role, only: :index
 
   def index
-    @interpreted_params = BikeVersion.searchable_interpreted_params(permitted_search_params)
+    @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_search_params)
     per_page = params[:per_page] || 10
-    @pagy, @bike_versions = pagy(BikeVersion.search(@interpreted_params), limit: per_page)
-    @selected_query_items_options = BikeVersion.selected_query_items_options(@interpreted_params)
+    @pagy, @bike_versions = pagy(:countish, BikeVersion.search(@interpreted_params), limit: per_page, page: permitted_page)
+    @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
   end
 
   def show
@@ -15,10 +16,10 @@ class BikeVersionsController < ApplicationController
   end
 
   def create
-    bike = Bike.unscoped.find(params[:bike_id])
+    bike = Bike.unscoped.find_id(params[:bike_id])
     if bike&.authorized?(current_user)
       # Do it inline because it's blocking
-      bike_version = BikeVersionCreatorJob.new.perform(bike.id)
+      bike_version = BikeJobs::BikeVersionCreatorJob.new.perform(bike.id)
       flash[:success] = "Bike Version created!"
       redirect_to edit_bike_version_path(bike_version.id)
     else
@@ -30,21 +31,19 @@ class BikeVersionsController < ApplicationController
   def update
     # Set the start and end at with timezone
     if permitted_params.key?(:start_at)
-      @bike_version.start_at = if InputNormalizer.boolean(permitted_params[:start_at_shown])
-        TimeParser.parse(permitted_params[:start_at], permitted_params[:timezone])
+      @bike_version.start_at = if Binxtils::InputNormalizer.boolean(permitted_params[:start_at_shown])
+        Binxtils::TimeParser.parse(permitted_params[:start_at], permitted_params[:timezone])
       end
-      @bike_version.end_at = if InputNormalizer.boolean(permitted_params[:end_at_shown])
-        TimeParser.parse(permitted_params[:end_at], permitted_params[:timezone])
+      @bike_version.end_at = if Binxtils::InputNormalizer.boolean(permitted_params[:end_at_shown])
+        Binxtils::TimeParser.parse(permitted_params[:end_at], permitted_params[:timezone])
       end
     end
     if @bike_version.update(permitted_params.except(:start_at, :end_at))
       flash[:success] = "#{@bike.type.titleize} version updated"
-      redirect_to(edit_bike_version_path(@bike_version, edit_template: params[:edit_template])) && return
     else
-      @edit_template = nil
-      flash[:error] = "Unable to update"
-      render :edit_template
+      flash[:error] = "Unable to update: #{@bike_version.errors.full_messages.to_sentence}"
     end
+    redirect_to(edit_bike_version_path(@bike_version, edit_template: params[:edit_template]))
   end
 
   def destroy
@@ -61,18 +60,20 @@ class BikeVersionsController < ApplicationController
 
   def find_bike_version
     begin
-      @bike_version = BikeVersion.unscoped.find(params[:id])
+      @bike_version = BikeVersion.unscoped.find_id(params[:id])
     rescue ActiveRecord::StatementInvalid => e
       raise e.to_s.match?(/PG..NumericValueOutOfRange/) ? ActiveRecord::RecordNotFound : e
     end
     @bike = @bike_version
     @bike_og = @bike_version.bike
     return @bike_version if @bike_version.visible_by?(current_user)
+
     fail ActiveRecord::RecordNotFound
   end
 
   def ensure_user_allowed_to_edit_version
     return if @bike_version.authorized?(current_user)
+
     flash[:error] = "You don't appear to own that bike version"
     redirect_to(bike_version_path(@bike_version)) && return
   end

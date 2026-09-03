@@ -16,8 +16,8 @@ RSpec.describe Notification, type: :model do
     let!(:notification1) { FactoryBot.create(:notification, user: user) }
     it "gets from and by" do
       expect {
-        EmailStolenNotificationJob.new.perform(stolen_notification.id)
-        EmailStolenNotificationJob.new.perform(stolen_notification.id, true)
+        Email::StolenNotificationJob.new.perform(stolen_notification.id)
+        Email::StolenNotificationJob.new.perform(stolen_notification.id, true)
       }.to change(Notification, :count).by 2
 
       expect(Notification.pluck(:kind)).to match_array(%w[confirmation_email stolen_notification_sent stolen_notification_blocked])
@@ -255,6 +255,18 @@ RSpec.describe Notification, type: :model do
 
           expect(user_email.reload.last_email_errored).to be_truthy
         end
+      end
+    end
+
+    context "with InvalidEmailRequestError" do
+      let(:invalid_email_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 300}) }
+      it "adds the error to the notification without raising" do
+        expect(notification.reload.delivery_status).to eq "delivery_pending"
+        notification.track_email_delivery { raise invalid_email_error }
+
+        expect(notification.reload.delivery_status).to eq "delivery_failure"
+        expect(notification.delivery_error).to eq "Postmark::InvalidEmailRequestError"
+        expect(notification.delivery_error_invalid?).to be_truthy
       end
     end
   end

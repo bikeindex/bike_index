@@ -110,6 +110,8 @@
 
     label.file {
       float: right;
+      // Added fixed width to fix text breaking after wrapping bootstrap (#2707)
+      width: 300px;
     }
 
     .file-custom {

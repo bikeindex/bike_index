@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: ambassador_task_assignments
+# Database name: primary
 #
 #  id                 :integer          not null, primary key
 #  completed_at       :datetime
@@ -11,8 +12,7 @@
 #
 # Indexes
 #
-#  index_ambassador_task_assignments_on_ambassador_task_id  (ambassador_task_id)
-#  unique_assignment_to_ambassador                          (user_id,ambassador_task_id) UNIQUE
+#  unique_assignment_to_ambassador  (user_id,ambassador_task_id) UNIQUE
 #
 # Foreign Keys
 #
@@ -31,17 +31,17 @@ class AmbassadorTaskAssignment < ApplicationRecord
 
   validates :ambassador_task, uniqueness: {scope: :ambassador}
 
+  delegate :description, :description_html, :title, to: :ambassador_task
+  delegate :name, to: :ambassador, prefix: true, allow_nil: true
+  delegate :name, to: :organization, prefix: true, allow_nil: true
+
+  after_commit :update_associated_user
+
   scope :completed, -> { where.not(completed_at: nil) }
   scope :incomplete, -> { where(completed_at: nil) }
   scope :pending_completion, -> { incomplete.or(where("completed_at > ?", Time.current - 2.hours)) }
   scope :locked_completed, -> { completed.where("completed_at < ?", Time.current - 2.hours) }
   scope :task_ordered, -> { order(ambassador_task_id: :asc) }
-
-  after_commit :update_associated_user
-
-  delegate :description, :description_html, :title, to: :ambassador_task
-  delegate :name, to: :ambassador, prefix: true, allow_nil: true
-  delegate :name, to: :organization, prefix: true, allow_nil: true
 
   # Find completed assignments, filtering and sorting by columns on associated
   # models. The inner join is necessary because our data model permits multiple
@@ -91,9 +91,9 @@ class AmbassadorTaskAssignment < ApplicationRecord
       SQL
 
       filter_to_sql_clause = {
-        organization_id: ->(filter_val) { "AND organizations.id = #{filter_val} " },
-        ambassador_task_id: ->(filter_val) { "AND ambassador_tasks.id = #{filter_val} " },
-        ambassador_id: ->(filter_val) { "AND users.id = #{filter_val} " }
+        organization_id: ->(filter_val) { "AND organizations.id = #{filter_val.to_i} " },
+        ambassador_task_id: ->(filter_val) { "AND ambassador_tasks.id = #{filter_val.to_i} " },
+        ambassador_id: ->(filter_val) { "AND users.id = #{filter_val.to_i} " }
       }
       sql << filters
         .map { |col, val| filter_to_sql_clause[col]&.call(val) }

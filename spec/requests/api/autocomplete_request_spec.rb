@@ -15,6 +15,9 @@ RSpec.describe "API::Autocomplete", type: :request do
       expect(json_result.keys).to eq(["matches"])
       expect(json_result["matches"].count).to eq 1
       expect(json_result["matches"].first).to match_hash_indifferently target
+      # Verify that Cors is present
+      expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+      expect(response.headers["Access-Control-Request-Method"]).to eq("*")
     end
   end
 end

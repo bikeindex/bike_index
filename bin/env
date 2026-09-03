@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Default environment variables for development and test.
+# Required from config/boot.rb so all Rails entry points get these defaults.
+# Can also be run standalone: `eval "$(ruby bin/env --export)"` from bash.
+
+require "etc"
+
+workspace_file = File.expand_path("../.workspace_id", __dir__)
+if File.exist?(workspace_file)
+  workspace_int = File.read(workspace_file).strip
+  ENV["WORKSPACE_ID"] ||= workspace_int
+  ENV["DEV_PORT"] ||= workspace_int
+end
+
+ENV["DEV_PORT"] ||= "3042"
+ENV["BASE_URL"] ||= "http://localhost:#{ENV["DEV_PORT"]}"
+ENV["WEB_CONCURRENCY"] ||= "0" # Run Puma in single mode (0 workers, no fork)
+
+# turbo_tests numbers workers from 1, but parallel_tests leaves the first database
+# unsuffixed - worker 1 would connect to one nothing prepared.
+ENV["PARALLEL_TEST_FIRST_IS_1"] ||= "true"
+
+# Capped at the 8 test Redis databases below - a 9th worker would share one and see
+# another's Sidekiq jobs. Here rather than in bin/turbo_tests so parallel:prepare
+# builds databases for the same worker count it will launch.
+ENV["PARALLEL_TEST_PROCESSORS"] ||= [Etc.nprocessors, 8].min.to_s
+
+# Redis has 16 databases. Dev takes 0-7 - database 0 belongs to the main checkout
+# (no WORKSPACE_ID) so workspaces can't clobber its autocomplete cache, workspaces
+# share 1-7. Test takes 8-15, one per parallel worker: specs enqueue into real
+# Sidekiq queues, which a dev server on the same database would run and consume.
+unless ENV["REDIS_URL"]
+  redis_database = if ENV["RAILS_ENV"] == "test"
+    8 + (ENV["WORKSPACE_ID"].to_i + ENV["TEST_ENV_NUMBER"].to_i) % 8
+  else
+    ENV["WORKSPACE_ID"] ? ENV["WORKSPACE_ID"].to_i % 7 + 1 : 0
+  end
+  ENV["REDIS_URL"] = "redis://localhost:6379/#{redis_database}"
+end
+
+# When called with --export, print shell export statements for bash scripts
+if ARGV.include?("--export")
+  %w[WORKSPACE_ID DEV_PORT BASE_URL REDIS_URL WEB_CONCURRENCY
+    PARALLEL_TEST_FIRST_IS_1 PARALLEL_TEST_PROCESSORS].each do |key|
+    puts "export #{key}=#{ENV[key]}" if ENV[key]
+  end
+end

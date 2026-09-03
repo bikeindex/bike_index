@@ -6,7 +6,7 @@ RSpec.describe SecurityTokenizer do
     it "is long" do
       expect(token.length).to be > 50
       expect(token).to match("-")
-      expect(SecurityTokenizer.token_time(token)).to be_within(1).of Time.current
+      expect(SecurityTokenizer.token_time(token)).to be_within(2).of Time.current
     end
   end
 

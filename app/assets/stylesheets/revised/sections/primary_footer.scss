@@ -2,6 +2,7 @@ $primary-footer-top-margin: 6 * $vertical-height;
 
 // Because sometimes we cover this up other places
 .primary-footer {
+  position: relative;
   margin-top: $primary-footer-top-margin;
 
   .primary-footer-nav,
@@ -14,7 +15,7 @@ $primary-footer-top-margin: 6 * $vertical-height;
 
     &:hover,
     &:active,
-    &.active {
+    &[aria-current] {
       text-decoration: underline;
     }
   }
@@ -59,6 +60,11 @@ $primary-footer-top-margin: 6 * $vertical-height;
       margin: 0;
     }
 
+    li {
+      padding: 0.5em 0;
+      line-height: 1.25em;
+    }
+
     .social-nav {
       text-align: center;
 
@@ -66,7 +72,7 @@ $primary-footer-top-margin: 6 * $vertical-height;
         display: block;
         float: left;
         width: 25%;
-        padding: 0 6px;
+        padding: 0 6px 6px;
       }
 
       a {
@@ -79,9 +85,6 @@ $primary-footer-top-margin: 6 * $vertical-height;
             color: lighten($gray-light, 15%);
           }
         }
-      }
-      .fa-3x {
-        font-size: 2.5em; // Adjust font size to space out mastodon
       }
     }
   }

@@ -1,0 +1,35 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<div class="full-screen-table mt-4">
+  <table class="table table-striped table-bordered table-sm without-exterior-border">
+    <thead class="small-header">
+      <th>
+        <%= sortable "from", "Source currency", render_sortable: render_sortable %>
+      </th>
+
+      <th>
+        <%= sortable "to", "Target currency", render_sortable: render_sortable %>
+      </th>
+
+      <th><%= sortable "rate", render_sortable: render_sortable %></th>
+      <th><%= sortable "updated_at", render_sortable: render_sortable %></th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |xrate| %>
+        <tr>
+          <td><%= xrate.from %></td>
+          <td><%= xrate.to %></td>
+
+          <td>
+            <%= link_to xrate.rate.truncate(2), edit_admin_exchange_rate_path(xrate) %>
+          </td>
+
+          <td class="localizeTime">
+            <%= l(xrate.updated_at, format: :convert_time) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

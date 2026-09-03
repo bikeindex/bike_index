@@ -61,6 +61,19 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
         expect(email.to).to eq([organization_role.user.email])
         expect(email.bcc).to eq([])
       end
+
+      context "with a bike whose thumb_path has gone stale" do
+        let!(:stolen_record) { FactoryBot.create(:stolen_record, :in_nyc, :with_bike_image) }
+        let(:bike) { stolen_record.bike }
+        before { bike.update_column(:thumb_path, nil) }
+
+        it "refreshes it before the email renders" do
+          ProcessHotSheetJob.drain
+          expect(HotSheet.last.stolen_record_ids).to eq([stolen_record.id])
+          expect(bike.reload.thumb_path).to be_present
+          expect(ActionMailer::Base.deliveries.count).to eq 1
+        end
+      end
       context "with more than 50 recipients" do
         let(:emails) { Array(1..102).map { |i| "email#{i}@bikeindex.org" } }
         it "delivers multiple emails" do

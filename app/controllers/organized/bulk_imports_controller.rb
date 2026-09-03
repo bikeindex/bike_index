@@ -1,16 +1,17 @@
 module Organized
   class BulkImportsController < Organized::BaseController
-    include SortableTable
+    include Binxtils::SortableTable
+
     skip_before_action :ensure_member!
-    before_action :set_period, only: [:index]
+
     skip_before_action :ensure_current_organization!, only: [:create]
     skip_before_action :verify_authenticity_token, only: [:create]
     before_action :ensure_access_to_bulk_import!, except: [:create] # Because this checks ensure_admin
 
     def index
-      params[:per_page] || 25
-      @pagy, @bulk_imports = pagy(available_bulk_imports.includes(:ownerships)
-        .reorder("bulk_imports.#{sort_column} #{sort_direction}"), limit: @per_page)
+      @per_page = permitted_per_page
+      @pagy, @bulk_imports = pagy(:countish, available_bulk_imports.includes(:ownerships)
+        .reorder("bulk_imports.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
       @show_kind = bulk_imports.distinct.pluck(:kind).count > 1
     end
 
@@ -20,8 +21,8 @@ module Organized
         flash[:error] = translation(:unable_to_find_import)
         redirect_to(organization_bulk_imports_path(organization_id: current_organization.to_param)) && return
       end
-      @per_page = params[:per_page] || 25
-      @pagy, @bikes = pagy(@bulk_import.bikes.order(created_at: :desc), limit: @per_page)
+      @per_page = permitted_per_page
+      @pagy, @bikes = pagy(:countish, @bulk_import.bikes.order(created_at: :desc), limit: @per_page, page: permitted_page)
     end
 
     def new
@@ -32,9 +33,9 @@ module Organized
 
     def create
       return unless ensure_can_create_import!
+
       @bulk_import = BulkImport.new(permitted_parameters)
       if @bulk_import.save
-        BulkImportJob.perform_async(@bulk_import.id)
         if @is_api
           render json: {success: translation(:file_imported)}, status: 201
         else
@@ -62,10 +63,20 @@ module Organized
     end
 
     def available_bulk_imports
+      @search_filter = %w[all without_errors without_empty only_empty with_errors].include?(params[:search_filter]) ? params[:search_filter] : "all"
       a_bulk_imports = bulk_imports.where(created_at: @time_range, kind: permitted_kinds)
-      @show_empty = !InputNormalizer.boolean(params[:without_empty])
-      a_bulk_imports = a_bulk_imports.with_bikes unless @show_empty
-      a_bulk_imports
+      case @search_filter
+      when "without_errors"
+        a_bulk_imports.no_import_errors
+      when "without_empty"
+        a_bulk_imports.with_bikes
+      when "only_empty"
+        a_bulk_imports.no_bikes.no_import_errors
+      when "with_errors"
+        a_bulk_imports.import_errors
+      else
+        a_bulk_imports
+      end
     end
 
     def ensure_can_create_import!
@@ -77,11 +88,11 @@ module Organized
 
       if params[:organization_id] == "ascend"
         @ascend_import = true
-        return true if request.headers["Authorization"] == BulkImport.ascend_api_token
+        return true if Binxtils::Secure.compare?(request.headers["Authorization"], BulkImport.ascend_api_token)
       else
         ensure_current_organization!
         @current_user = current_organization.auto_user # Crazy override to make current user work
-        return true if request.headers["Authorization"] == current_organization.access_token
+        return true if Binxtils::Secure.compare?(request.headers["Authorization"], current_organization.access_token)
       end
       render(json: {error: "Not permitted"}, status: 401) && return
     end
@@ -93,11 +104,13 @@ module Organized
       return false unless ensure_admin!
 
       return true if current_user.superuser? || current_organization.show_bulk_import?
+
       raise_do_not_have_access!
     end
 
     def permitted_kinds
       return @permitted_kinds if defined?(@permitted_kinds)
+
       permitted_kinds = []
       permitted_kinds += ["ascend"] if current_organization.ascend_or_broken_ascend?
       permitted_kinds += ["organization_import"] if current_organization.enabled?("show_bulk_import")
@@ -135,7 +148,7 @@ module Organized
 
     def stolen_attributes
       {data: {stolen_record:
-        params.require(:stolen_record).permit(*StolenRecordUpdator.old_attr_accessible)}}
+        params.require(:stolen_record).permit(*BikeServices::StolenRecordUpdator.old_attr_accessible)}}
     end
   end
 end

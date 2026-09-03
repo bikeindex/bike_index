@@ -7,7 +7,7 @@ RSpec.describe Organized::BaseController, type: :request do
 
       it "redirects to the bikes page" do
         get "/o/#{current_organization.to_param}"
-        expect(response).to redirect_to(organization_bikes_path(organization_id: current_organization.to_param))
+        expect(response).to redirect_to(organization_registrations_path(organization_id: current_organization.to_param))
         get "/user_root_url_redirect"
         expect(response).to redirect_to(organization_root_path(organization_id: current_organization.to_param))
       end
@@ -29,12 +29,12 @@ RSpec.describe Organized::BaseController, type: :request do
       let(:current_organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
 
       it "redirects to the ambassador dashboard" do
-        expect(current_user.default_organization.law_enforcement?).to be_truthy
+        expect(OrganizationRole.default_organization(current_user).law_enforcement?).to be_truthy
         get "/o/#{current_organization.to_param}"
-        expect(response).to redirect_to(organization_bikes_path(organization_id: current_organization.to_param))
+        expect(response).to redirect_to(organization_registrations_path(organization_id: current_organization.to_param))
         get "/user_root_url_redirect"
-        # default_bike_search_path
-        expect(response).to redirect_to(bikes_path(stolenness: "all"))
+        # every_bike_search_path, not the organization's own registrations
+        expect(response).to redirect_to(search_registrations_path(stolenness: "all"))
       end
     end
   end
@@ -62,9 +62,9 @@ RSpec.describe Organized::BaseController, type: :request do
         expect(current_organization.parent?).to be_truthy
         expect(current_organization.overview_dashboard?).to be_falsey
         get "/o/#{current_organization.to_param}/dashboard"
-        expect(response).to redirect_to(organization_bikes_path)
+        expect(response).to redirect_to(organization_registrations_path)
         # ... but it renders if the current_user is superuser
-        current_user.update(superuser: true)
+        FactoryBot.create(:superuser_ability, user: current_user)
         get "/o/#{current_organization.to_param}/dashboard"
         expect(response).to render_template(:child_and_regional)
       end
@@ -107,7 +107,7 @@ RSpec.describe Organized::BaseController, type: :request do
         expect(current_organization.reload.official_manufacturer?).to be_falsey
         expect(current_organization.overview_dashboard?).to be_falsey
         get "/o/#{current_organization.to_param}/dashboard"
-        expect(response).to redirect_to(organization_bikes_path)
+        expect(response).to redirect_to(organization_registrations_path)
       end
       context "with official_manufacturer" do
         let(:current_organization) { FactoryBot.create(:organization_with_organization_features, manufacturer_id: manufacturer.id, enabled_feature_slugs: ["official_manufacturer"]) }
@@ -116,7 +116,7 @@ RSpec.describe Organized::BaseController, type: :request do
           expect(current_organization.reload.invoices.active.count).to eq 1
           expect(current_organization.official_manufacturer?).to be_truthy
           expect(current_organization.overview_dashboard?).to be_truthy
-          expect(OrganizationDisplayer.bike_shop_display_integration_alert?(current_organization)).to be_falsey
+          expect(OrgServices::Displayer.bike_shop_display_integration_alert?(current_organization)).to be_falsey
           get "/o/#{current_organization.to_param}/dashboard"
           expect(response).to render_template(:manufacturer)
           expect(assigns(:period)).to eq "year"
@@ -125,6 +125,21 @@ RSpec.describe Organized::BaseController, type: :request do
           expect(assigns(:start_time)).to be_within(1.day).of Time.parse("2017-1-1")
         end
       end
+    end
+  end
+
+  describe "general alert" do
+    include_context :request_spec_logged_in_as_organization_user
+    let!(:b_param) { FactoryBot.create(:b_param_unfinished_registration, creator: current_user) }
+
+    # The organization menu is positioned over the layout's usual spot for the alert
+    it "renders once, inside the organization's content column" do
+      get "/o/#{current_organization.to_param}/registrations"
+      alerts = Nokogiri::HTML(response.body).css("[role=alert]")
+        .select { |alert| alert.text.include?("isn't registered yet!") }
+
+      expect(alerts.count).to eq 1
+      expect(alerts.first.ancestors(".organized-wrap")).to be_present
     end
   end
 end

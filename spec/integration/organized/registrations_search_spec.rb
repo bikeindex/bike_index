@@ -1,0 +1,581 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe "Organized registrations search", :js, type: :system do
+  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:, created_at: 5.years.ago) }
+  let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes registration_notes show_bulk_import] }
+  let(:user) { FactoryBot.create(:organization_admin, organization:) }
+  let(:bikes_path) { "/o/#{organization.to_param}/registrations" }
+
+  let!(:bike1) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "alice@example.com", created_at: 2.years.ago) }
+  let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "bob@example.com", created_at: 3.days.ago) }
+
+  before do
+    # Ensure gear types exist so bike show page doesn't write during readonly mode
+    RearGearType.fixed
+    FrontGearType.fixed
+    # Below the sidebar's 760px breakpoint, where it's an overlay behind the top
+    # bar's hamburgler. Chrome's --window-size flag is unreliable in headless
+    # mode, so resize explicitly.
+    page.current_window.resize_to(720, 2000)
+    # The two-step login, the flash and the org submenu all animate, and a click
+    # waits for its target to settle before it lands. That wait is Capybara's,
+    # so the 2s default is what times out here on a loaded machine.
+    using_wait_time(10) do
+      visit new_session_path
+      fill_in "Email", with: user.email
+      click_button "Continue"
+      fill_in "Password", with: "testthisthing7$"
+      click_button "Log in"
+      dismiss_flash_messages
+      # 720px wide, so the sidebar is an overlay behind the top bar's hamburgler.
+      # Its registrations group is the one open on a page no group matches.
+      find("#org_sidebar_hamburgler").click
+      within("#org_sidebar_nav") { click_link "Search Registrations" }
+      expect(page).to have_current_path(/\A#{Regexp.escape(bikes_path)}(\?|\z)/)
+    end
+  end
+
+  def settings_selector
+    "[data-org--search-target='settings']"
+  end
+
+  # multi_search paints the chips from UI::Badge's palette via JS, so take the
+  # background off the component rather than restating it here
+  def badge_background(color)
+    UI::Badge::Component::COLORS.fetch(color).split.first
+  end
+
+  def expect_settings_open
+    expect(find(settings_selector, visible: :all)["class"]).not_to include("tw:hidden!")
+    expect(page).to have_css("[data-org--search-target='settingsButton'][data-active='true']")
+  end
+
+  def open_settings_if_not
+    if find(settings_selector, visible: :all)["class"].include?("tw:hidden!")
+      click_button "settings"
+    end
+  end
+
+  def rendered_bike_ids
+    page.all("tbody tr a[href^='/bikes/']").map { |a| Integer(a[:href][%r{/bikes/(\d+)}, 1]) }.sort
+  end
+
+  # flaky: the in-frame "Render chart" advance-link toggle intermittently leaves
+  # the results frame showing a stale snapshot under Playwright (its history/frame
+  # nav settles differently than Selenium's), so the toggle reads the wrong state.
+  # Retry like the back/forward sync spec; a real browser renders it reliably.
+  it "searches by email and serial", flaky: 4 do
+    # Create enough bikes to trigger pagination (default per_page is 10)
+    FactoryBot.create_list(:bike_organized, 10, creation_organization: organization)
+
+    # Visit a different page first to establish history, then navigate to bikes
+    visit "/"
+    visit bikes_path
+    # Results load via the eager turbo-frame (src fetched once the frame connects)
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
+    expect(page).to have_css("tbody tr", minimum: 2)
+    expect_axe_clean("select-name")
+
+    # search_no_js should NOT be in the URL (removed by JS controller)
+    expect(page).not_to have_current_path(/search_no_js/)
+
+    # Initial load uses replaceState, so back button returns to the previous page (not a duplicate search entry)
+    page.go_back
+    expect(page).to have_current_path("/", wait: 5)
+    page.go_forward
+    expect(page).to have_css("table", wait: 10)
+    expect(page).to have_css("tbody tr", minimum: 2)
+
+    # Search by serial number
+    fill_in "serial", with: bike1.serial_number
+    find("#search-button").click
+
+    expect(page).to have_current_path(/serial=/, wait: 10)
+    expect(page).to have_css("tbody tr", count: 1)
+
+    # Clear serial and search by email
+    fill_in "serial", with: ""
+    fill_in "search_email", with: "alice@example.com"
+    find("#search-button").click
+
+    expect(page).to have_current_path(/search_email=alice/, wait: 10)
+    expect(page).to have_css("tbody tr", count: 1)
+    expect(page).to have_content("alice@example.com")
+    expect(page).not_to have_content("bob@example.com")
+
+    # submits when enter is pressed twice
+    visit bikes_path
+    expect(page).to have_css("table", wait: 10)
+
+    fill_in "search_email", with: "alice@example.com"
+    find_field("search_email").send_keys(:return)
+
+    expect(page).to have_current_path(/search_email=alice/, wait: 10)
+    expect(page).to have_css("tbody tr", count: 1)
+
+    visit bikes_path
+    expect(page).to have_css("table", wait: 10)
+    expect(page).to have_css("tbody tr", minimum: 10)
+
+    # Pagination should be visible with multiple pages
+    expect(page).to have_css(".paginate-container a", minimum: 1)
+
+    # Click page 2 — turbo frame updates without full reload
+    click_link "2"
+    expect(page).to have_current_path(/page=2/, wait: 10)
+    expect(page).to have_css("table", wait: 10)
+    expect(page).to have_css("tbody tr", minimum: 1)
+
+    # Verify that it preserves turbo-frame after search submissions
+    # Results load via the eager turbo-frame
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
+    # turbo-frame element must still exist after turbo_stream.update
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame")
+
+    # Search again — this fails if the frame was removed by turbo_stream.replace
+    fill_in "search_email", with: "alice@example.com"
+    find("#search-button").click
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame", wait: 10)
+    expect(page).to have_css("tbody tr", count: 1)
+
+    # Third submission to confirm frame is still intact
+    fill_in "search_email", with: ""
+    find("#search-button").click
+    expect(page).to have_css("tbody tr", count: 10, wait: 10)
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame")
+
+    # clicking a bike navigates to the bike show page with organized panel
+    first("a[aria-label='View bike']").click
+
+    expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
+
+    expect(page).to have_css(".organized-access-panel", text: /Access Panel/i)
+    # Scoped to the panel: unscoped, this matched the navbar's organization name against
+    # the panel's heading, whose own organization is hidden below md
+    expect(page).to have_css(".organized-access-panel", text: organization.name)
+
+    # Go back
+    page.go_back
+    expect(page).to have_css("tbody tr", count: 10, wait: 10)
+    # Open settings to reveal the export link
+    open_settings_if_not
+    # go_back re-renders the results frame, and while it's busy the wrapper grows
+    # a min-height -- the table lands over the link and swallows the click. The
+    # click then waits out a full page navigation, which also outruns the 2s default.
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
+    using_wait_time(10) { click_link "Create export of searched registrations" }
+
+    expect(page).to have_current_path(%r{/o/\S+/exports/new}, wait: 10)
+    all_bike_ids = organization.bikes.pluck(:id).sort
+    export_ids = find("#export_custom_bike_ids", visible: :all).value.split(", ").map(&:to_i).sort
+    expect(export_ids).to eq(all_bike_ids)
+
+    # Search by notes
+    FactoryBot.create(:bike_organization_note, bike: bike1, body: "red lock on rack")
+    page.go_back
+    expect(page).to have_css("table", wait: 10)
+
+    open_settings_if_not
+    click_button "show notes search"
+    fill_in "search_notes", with: "red lock"
+    find("#search-button").click
+
+    expect(page).to have_current_path(/search_notes=red/, wait: 10)
+    expect(page).to have_css("tbody tr", count: 1)
+    expect(page).to have_content("alice@example.com")
+
+    # filters by period and custom time range — 12 bikes total: bike1 (2.years.ago), bike2 (3.days.ago), 10 create_list (now)
+    # "past year" excludes bike1 (2 years ago)
+    click_link "past year"
+    expect(page).to have_current_path(/period=year/, wait: 10)
+    expect(page).to have_text("0 registrations matching")
+
+    fill_in "search_notes", with: ""
+    find("#search-button").click
+    expect(page).to have_current_path(/period=year/, wait: 10)
+    expect(page).to have_text("11 registrations matching", wait: 10)
+
+    # "past day" additionally excludes bike2 (3 days ago)
+    click_link "past day"
+    expect(page).to have_current_path(/period=day/, wait: 10)
+    expect(page).to have_text("10 registrations matching")
+
+    # Combined email + period: bob is within "past year" (3 days ago), alice is not (2 years ago).
+    # Search on the page (no URL navigation): switch to past year, then submit the email filter.
+    click_link "past year"
+    expect(page).to have_current_path(/period=year/, wait: 10)
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame table", wait: 10)
+    fill_in "search_email", with: "bob@example.com"
+    find("#search-button").click
+    expect(page).to have_current_path(/search_email=bob/, wait: 10)
+    expect(page).to have_current_path(/period=year/, wait: 10)
+    expect(page).to have_field("search_email", with: "bob@example.com")
+    # Wait for the results frame to settle before reading hrefs, otherwise
+    # rendered_bike_ids can read a row that's being replaced mid-render
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
+    expect(rendered_bike_ids).to eq([bike2.id])
+
+    # Chart test must run before the custom-range click below: that submission
+    # writes session[:timezone] from Intl.DateTimeFormat (varies between local
+    # Chrome and CI's headless Chrome), and set_timezone prefers session over
+    # cookie — so the cookie override only takes effect while session is empty.
+    expect(browser_cookie_value("timezone")).to be_present
+
+    # 5 AM UTC = 9 PM PDT (or 12 AM CDT) the previous day, so PDT and CDT fall on different days.
+    chart_bike_created_at = 14.days.ago.utc.beginning_of_day + 5.hours
+    bike2.update_columns(created_at: chart_bike_created_at)
+    la_date_key = chart_bike_created_at.in_time_zone("America/Los_Angeles").strftime("%Y-%-m-%-d")
+    cdt_date_key = chart_bike_created_at.in_time_zone("America/Chicago").strftime("%Y-%-m-%-d")
+    expect(la_date_key).not_to eq(cdt_date_key)
+
+    # Replace the cookie via JS the same way the app does, so attributes (SameSite, path)
+    # match and Chrome reliably overwrites the existing cookie set on previous loads.
+    page.execute_script("document.cookie = 'timezone=America/Los_Angeles;path=/;max-age=31536000;SameSite=Lax'")
+    expect(browser_cookie_value("timezone")).to eq("America/Los_Angeles")
+
+    # Switch to past 30 days for daily chart bucketing, then enable the chart on the search page
+    click_link "past 30 days"
+    expect(page).to have_current_path(/period=month/, wait: 10)
+    # "Render chart" lives inside the results frame the period change above
+    # replaces. Fully settle that frame navigation before clicking, so the
+    # advance nav isn't superseded mid-swap: rows in (bob is the only past-30-day
+    # match), Turbo's `busy` flag cleared, and the freshly-rendered link (its href
+    # now toggles to render_chart=true) present -- then click that exact link.
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
+    expect(page).to have_link("Render chart", href: /render_chart=true/, wait: 10)
+
+    click_link "Render chart", href: /render_chart=true/
+    expect(page).to have_current_path(/render_chart=true/, wait: 10)
+    expect(page).to have_css("table", wait: 10)
+    # Chart loads async via a lazy turbo-frame; wait for the chartkick element
+    # before checking the inline init data.
+    expect(page).to have_css("turbo-frame#registrations_chart_frame [id^='chart-']", wait: 10)
+    # Chartkick init renders inline as array tuples; LA bucket has count 1, CDT bucket is empty (null)
+    expect(page.html).to include(%(["#{la_date_key}",1]))
+    expect(page.html).to include(%(["#{cdt_date_key}",null]))
+
+    # Custom time range narrowed to a ±1 day window around bike2.created_at — matches bike2 only.
+    # Runs after the chart test because the Stimulus submit posts a timezone param that pins
+    # session[:timezone], which would otherwise override the cookie set above.
+    click_link "past year"
+    expect(page).to have_current_path(/period=year/, wait: 10)
+    # Let the period navigation land before submitting. The search posts the
+    # period the frame currently holds, so submitting mid-swap searches the past
+    # 30 days again -- and the URL already says year, so only the count shows it.
+    expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
+    fill_in "search_email", with: ""
+    find("#search-button").click
+    expect(page).to have_current_path(/period=year/, wait: 10)
+    # The "custom" button lives inside the results frame, which this search
+    # replaces. Wait for the swap to finish (count reflects the cleared email)
+    # before toggling it -- otherwise Playwright grabs the old button and it
+    # detaches mid-click ("Element is not attached to the DOM").
+    expect(page).to have_text("11 registrations matching", wait: 10)
+
+    click_button "custom"
+    start_str = (bike2.created_at - 1.day).strftime("%Y-%m-%dT%H:%M")
+    end_str = (bike2.created_at + 1.day).strftime("%Y-%m-%dT%H:%M")
+    page.execute_script("document.getElementById('start_time_selector').value = '#{start_str}'")
+    page.execute_script("document.getElementById('end_time_selector').value = '#{end_str}'")
+    page.execute_script("document.querySelector(\"[data-controller~='ui--period-select'] button[type='submit']\").click()")
+    expect(page).to have_current_path(/period=custom/, wait: 10)
+    # Wait for the results frame to settle before reading hrefs, otherwise
+    # rendered_bike_ids can read a row that's being replaced mid-render
+    expect(page).to have_css("tbody tr", count: 1, wait: 10)
+    expect(rendered_bike_ids).to eq([bike2.id])
+  end
+
+  context "with stolen and impounded bikes" do
+    let(:enabled_feature_slugs) { %w[bike_search impound_bikes] }
+    let!(:stolen_bike) { FactoryBot.create(:bike_organized, :with_stolen_record, creation_organization: organization) }
+    let!(:impounded_bike) { FactoryBot.create(:bike_organized, :impounded, creation_organization: organization) }
+
+    it "filters by status radios" do
+      visit "#{bikes_path}?search_status=all"
+      expect(page).to have_css("table", wait: 10)
+      expect(page).to have_css("tbody tr", minimum: 4, wait: 10)
+
+      # Default columns are visible
+      expect(page).to have_css("th.manufacturer_cell", visible: :visible)
+      expect(page).to have_css("th.owner_email_cell", visible: :visible)
+      expect(page).to have_css("th.stolen_cell", visible: :visible)
+      # Non-default columns are hidden
+      expect(page).to have_css("th.serial_number_cell", visible: :hidden)
+      expect(page).to have_css("th.url_cell", visible: :hidden)
+      expect(page).to have_css("th.impounded_cell", visible: :hidden)
+      # Uncheck a default column — it hides
+      open_settings_if_not
+      uncheck "manufacturer_cell"
+      expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
+      expect(page).to have_css("td.manufacturer_cell", visible: :hidden, minimum: 1)
+      # Check a non-default column — it shows
+      check "serial_number_cell"
+      expect(page).to have_css("th.serial_number_cell", visible: :visible)
+      expect(page).to have_css("td.serial_number_cell", visible: :visible, minimum: 1)
+      # Show impounded column
+      check "impounded_cell"
+      expect(page).to have_css("th.impounded_cell", visible: :visible)
+
+      # Choose "only stolen"
+      choose("search_status_stolen", allow_label_click: true, visible: :all)
+      expect(page).to have_current_path(/search_status=stolen/, wait: 10)
+      expect(page).to have_css("table", wait: 10)
+      expect(page).to have_css("tbody tr", count: 1)
+      expect(page).to have_text("1 registration matching")
+      expect(page).to have_text("only stolen")
+      # Column choices persist after the search
+      expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
+      expect(page).to have_css("th.serial_number_cell", visible: :visible)
+      expect(page).to have_css("th.impounded_cell", visible: :visible)
+
+      # Settings persisted open via localStorage; choose "only impounded"
+      expect_settings_open
+      choose("search_status_impounded", allow_label_click: true, visible: :all)
+      expect(page).to have_current_path(/search_status=impounded/, wait: 10)
+      expect(page).to have_css("table", wait: 10)
+      expect(page).to have_css("tbody tr", count: 1)
+
+      # Doesn't have export, because no csv_export feature
+      expect_settings_open
+      expect(page).to_not have_text "Create export of searched registrations"
+
+      # Choose "not stolen or impounded"
+      choose("search_status_with_owner", allow_label_click: true, visible: :all)
+      expect(page).to have_current_path(/search_status=with_owner/, wait: 10)
+      expect(page).to have_css("table", wait: 10)
+      expect(page).to have_css("tbody tr", count: 2)
+      expect(page).to have_text("not stolen or impounded")
+
+      # Choose "All" to show everything
+      choose("search_status_all", allow_label_click: true, visible: :all)
+      expect(page).to have_current_path(/search_status=all/, wait: 10)
+      expect(page).to have_css("table", wait: 10)
+      expect(page).to have_css("tbody tr", minimum: 4, wait: 10)
+      # Column choices still persist
+      expect(page).to have_css("th.manufacturer_cell", visible: :hidden)
+      expect(page).to have_css("th.serial_number_cell", visible: :visible)
+      expect(page).to have_css("th.impounded_cell", visible: :visible)
+    end
+  end
+
+  context "multi serial search" do
+    let(:multi_serial_path) { "/o/#{organization.to_param}/registrations/multi_search" }
+
+    let!(:bike_a) { FactoryBot.create(:bike_organized, serial_number: "SERIAL111", owner_email: "owner-alpha@example.com", creation_organization: organization) }
+    let!(:bike_b) { FactoryBot.create(:bike_organized, serial_number: "SERIAL222", creation_organization: organization) }
+    let!(:other_org_bike) { FactoryBot.create(:bike, serial_number: "SERIAL333") }
+
+    around do |example|
+      ActionController::Base.perform_caching = true
+      ActionController::Base.cache_store = ActiveSupport::Cache::MemoryStore.new
+      example.run
+    ensure
+      ActionController::Base.perform_caching = false
+      ActionController::Base.cache_store = :null_store
+    end
+
+    # Clicking before org--multi-search connects submits the form and reloads the
+    # page, so wait for the controller to enable the (initially disabled) button
+    def wait_for_multi_search_controller
+      expect(page).to have_button("Search serials", disabled: false, wait: 15)
+    end
+
+    it "searches multiple serials, shows results, and caches rows by updated_at" do
+      find("#org_sidebar_hamburgler").click
+      within("#org_sidebar_nav") { click_link "Multi search" }
+      expect(page).to have_current_path(/\A#{Regexp.escape(multi_serial_path)}(\?|\z)/, wait: 10)
+
+      expect(page).to have_content(/multi search/i)
+      wait_for_multi_search_controller
+
+      # Kind toggle radios should not be present without bike_stickers feature
+      expect(page).not_to have_field("Serials", visible: :all)
+      expect(page).not_to have_field("Registration Stickers", visible: :all)
+
+      find("textarea#serials").set("SERIAL111, SERIAL222, NONEXISTENT")
+      click_button "Search serials"
+
+      # Chips update with results
+      expect(page).to have_css("#chip_2", class: badge_background(:gray), wait: 15)
+
+      # Results sorted by chip order, empty results removed
+      expect(page).to have_css(".multi-search-serial-result", count: 2)
+      expect(page).not_to have_content("No matches found")
+      expect(page).not_to have_content("SERIAL333")
+      expect(page).to have_content("owner-alpha@example.com")
+
+      # Mutate without bumping updated_at — reload should serve the cached row
+      bike_a.update_columns(owner_email: "owner-beta@example.com")
+      visit page.current_url
+
+      expect(page).to have_content("owner-alpha@example.com", wait: 10)
+      expect(page).not_to have_content("owner-beta@example.com")
+
+      # Bump updated_at to bust the per-row cache
+      bike_a.update_column(:updated_at, 1.second.from_now)
+      visit page.current_url
+
+      expect(page).to have_content("owner-beta@example.com", wait: 10)
+      expect(page).not_to have_content("owner-alpha@example.com")
+
+      # Close serials: a serial with no exact match but a bike within Levenshtein
+      # distance renders in the results table. Regression: sortAndFilterResults
+      # dropped the whole result a frame after it rendered because the exact-match
+      # count was 0, so the close serials flashed then disappeared.
+      find("textarea#serials").set("SERIAL119")
+      click_button "Search serials"
+
+      expect(page).to have_content("No exact matches. Close serials:", wait: 15)
+      expect(page).to have_css(".multi-search-serial-result", count: 1)
+      within(".multi-search-serial-result") do
+        expect(page).to have_css("table")
+        expect(page).to have_link(href: %r{/bikes/#{bike_a.id}})
+      end
+
+      # Back/forward re-syncs the search box and results to the URL
+      find("textarea#serials").set("SERIAL111")
+      click_button "Search serials"
+      expect(page).to have_css(".multi-search-serial-result", count: 1)
+      expect(page).to have_current_path(/serials=SERIAL111(&|\z)/, wait: 10)
+
+      find("textarea#serials").set("SERIAL111, SERIAL222")
+      click_button "Search serials"
+      expect(page).to have_css(".multi-search-serial-result", count: 2)
+
+      page.go_back
+      expect(page).to have_current_path(/serials=SERIAL111(&|\z)/, wait: 10)
+      expect(page).to have_field("serials", with: "SERIAL111")
+      expect(page).to have_css(".multi-search-serial-result", count: 1)
+    end
+
+    context "with bike_stickers enabled" do
+      let(:enabled_feature_slugs) { %w[bike_search csv_exports impound_bikes registration_notes bike_stickers] }
+      let(:claimed_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+      let!(:sticker_a) { FactoryBot.create(:bike_sticker, code: "STKR100", organization:) }
+      let!(:sticker_b) { FactoryBot.create(:bike_sticker_claimed, code: "STKR200", organization:, bike: claimed_bike) }
+      let!(:other_org_sticker) { FactoryBot.create(:bike_sticker, code: "STKR300") }
+
+      it "toggles to sticker search and shows results" do
+        visit multi_serial_path
+        wait_for_multi_search_controller
+
+        # Kind toggle radios are present
+        expect(page).to have_field("Serials", visible: :all)
+        expect(page).to have_field("Registration Stickers", visible: :all)
+
+        # "Search all" starts interactive (serial search can scope to just the org)
+        expect(page).to have_field("search_all", checked: false, disabled: false)
+
+        # Switch to sticker search
+        choose "Registration Stickers", allow_label_click: true, visible: :all
+
+        expect(page).to have_current_path(/search_kind=stickers/, wait: 5)
+        expect(page).to have_field("serials", placeholder: /sticker codes/i)
+
+        # Sticker search always spans every org, so "search all" is forced on and locked
+        expect(page).to have_field("search_all", checked: true, disabled: true)
+
+        # The locked checkbox gets an info tooltip explaining why; it appears on hover
+        expect(page).to have_css("button[aria-label='Sticker search always searches all bikes']")
+        find("button[aria-label='Sticker search always searches all bikes']").hover
+        expect(page).to have_css("[role=tooltip]", text: "Sticker search always searches all bikes")
+
+        find("textarea#serials").set("STKR200, STKR100, STKR300")
+        click_button "Search stickers"
+
+        # Chips for unclaimed and non-org stickers show gray (no bikes)
+        expect(page).to have_css("#chip_1", class: badge_background(:gray), wait: 15)
+        expect(page).to have_css("#chip_2", class: badge_background(:gray))
+
+        # Only claimed org sticker has a bike result
+        expect(page).to have_css("#chip_0", class: badge_background(:success))
+
+        # Switch back to serials
+        choose "Serials", allow_label_click: true, visible: :all
+        expect(page).not_to have_current_path(/search_kind=stickers/)
+
+        # "Search all" is interactive again on serial search, with the sticker tooltip hidden
+        expect(page).to have_field("search_all", checked: false, disabled: false)
+        expect(page).not_to have_css("button[aria-label='Sticker search always searches all bikes']")
+
+        # Previous results cleared
+        expect(page).not_to have_css(".multi-search-serial-result")
+      end
+    end
+  end
+
+  context "with avery_export enabled" do
+    let(:enabled_feature_slugs) { %w[bike_search avery_export reg_address bike_stickers csv_exports] }
+    let!(:avery_bike) do
+      bike = FactoryBot.create(:bike_organized, :with_address_record, creation_organization: organization)
+      bike.current_ownership.update!(owner_name: "Test Owner")
+      bike
+    end
+    let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization:, bike: bike1) }
+    let!(:unlinked_sticker) { FactoryBot.create(:bike_sticker, organization:) }
+
+    it "toggles avery export column via checkbox" do
+      visit bikes_path
+      expect(page).to have_css("table", wait: 10)
+      expect(page).not_to have_css("th.avery_cell", visible: :visible)
+      expect(page).not_to have_css("th.assign_bike_sticker_cell")
+
+      # Open settings and check avery — toggles column visibility client-side
+      open_settings_if_not
+      check "avery_cell"
+      # Avery column should be visible with check mark for exportable bike
+      expect(page).to have_css("th.avery_cell", visible: :visible)
+      expect(page).to have_css("td.avery_cell", text: "✓")
+
+      # Uncheck avery — hides column client-side
+      uncheck "avery_cell"
+      expect(page).not_to have_css("th.avery_cell", visible: :visible)
+
+      # Open settings and choose "only with address"
+      choose("search_address_with_street", allow_label_click: true, visible: :all)
+      expect(page).to have_current_path(/search_address=with_street/, wait: 10)
+      expect(page).to have_css("table", wait: 10)
+      expect(page).to have_css("tbody tr", count: 1)
+      expect(page).to have_text("1 registration matching")
+      expect(page).to have_text("only with address")
+
+      expect_settings_open
+      expect(page).to have_css("turbo-frame#organized_bikes_results_frame:not([busy])", wait: 10)
+      using_wait_time(10) { click_link "Create export of searched registrations" }
+      expect(page).to have_current_path(%r{/o/\S+/exports/new}, wait: 10)
+      export_ids = find("#export_custom_bike_ids", visible: :all).value.split(", ").map(&:to_i).sort
+      expect(export_ids).to eq([avery_bike.id])
+      page.go_back
+      expect(page).to have_css("tbody tr", count: 1, wait: 10)
+
+      expect_settings_open
+      choose("search_stickers_with", allow_label_click: true, visible: :all)
+      expect(page).to have_current_path(/search_stickers=with/, wait: 10)
+      expect(page).to have_css("table", wait: 10)
+      expect(page).to have_css("tbody tr", count: 0)
+      expect(page).to have_text("0 registrations matching")
+      expect(page).to have_text("only with address")
+      expect(page).to have_text("only with stickers")
+
+      choose("search_address_", allow_label_click: true, visible: :all)
+      expect(page).to have_current_path(/search_stickers=with/, wait: 10)
+      expect(page).to have_css("table", wait: 10)
+      expect(page).to have_css("tbody tr", count: 1)
+
+      # Visit with bike_sticker param to test assign_bike_sticker column
+      visit "#{bikes_path}?bike_sticker=#{unlinked_sticker.code}"
+      expect(page).to have_css("table", wait: 10)
+      expect(page).to have_css("th.assign_bike_sticker_cell")
+      expect(page).to have_css("td.assign_bike_sticker_cell a", text: "link sticker", minimum: 1)
+
+      # Click the first "Link" to assign the sticker to a bike
+      first("td.assign_bike_sticker_cell a").click
+      expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
+      expect(page).to have_content("claimed")
+      expect(unlinked_sticker.reload.bike).to be_present
+    end
+  end
+end

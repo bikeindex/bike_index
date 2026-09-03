@@ -1,0 +1,200 @@
+require "rails_helper"
+
+base_url = "/oauth/applications"
+RSpec.describe Oauth::ApplicationsController, type: :request do
+  include_context :existing_doorkeeper_app
+  include_context :request_spec_logged_in_as_user
+
+  describe "index" do
+    let!(:doorkeeper_app2) do
+      application = Doorkeeper::Application.new(name: "MyApp", redirect_uri: "https://app.com")
+      application.owner = FactoryBot.create(:user_confirmed)
+      application.save
+      application
+    end
+    context "with current_user" do
+      let(:current_user) { application_owner }
+      before { expect(doorkeeper_app.owner_id).to eq current_user.id }
+      it "renders" do
+        get base_url
+        expect(response.status).to eq 200
+        expect(response).to render_template(:index)
+        expect(assigns(:applications).pluck(:id)).to eq([doorkeeper_app.id])
+        get "#{base_url}?search_all=true"
+        expect(response.status).to eq 200
+        expect(response).to render_template(:index)
+        expect(assigns(:applications).pluck(:id)).to eq([doorkeeper_app.id])
+        expect(assigns(:collection)).to be_nil
+      end
+      context "superuser" do
+        let(:application_owner) { FactoryBot.create(:superuser) }
+        it "renders, with admin" do
+          get base_url
+          expect(response.status).to eq 200
+          expect(response).to render_template(:index)
+          expect(assigns(:applications).pluck(:id)).to eq([doorkeeper_app.id])
+          get "#{base_url}?search_all=true"
+          expect(response.status).to eq 200
+          expect(response).to render_template(:admin_index)
+          expect(assigns(:applications)).to be_nil
+          expect(assigns(:collection).pluck(:id)).to match_array([doorkeeper_app.id, doorkeeper_app2.id])
+
+          get "#{base_url}?search_all=true&user_id=#{doorkeeper_app2.owner.email}"
+          expect(response.status).to eq 200
+          expect(response).to render_template(:admin_index)
+          expect(assigns(:applications)).to be_nil
+          expect(assigns(:collection).pluck(:id)).to match_array([doorkeeper_app2.id])
+
+          get "#{base_url}?search_all=true&search_query=MyApp"
+          expect(assigns(:collection).pluck(:id)).to match_array([doorkeeper_app2.id])
+
+          get "#{base_url}?search_all=true&search_query=#{doorkeeper_app.uid}"
+          expect(assigns(:collection).pluck(:id)).to match_array([doorkeeper_app.id])
+        end
+      end
+    end
+    context "no current user" do
+      let(:current_user) { false }
+      it "redirects" do
+        get base_url
+        expect(response).to redirect_to new_session_url
+        expect(flash[:error]).to be_present
+      end
+    end
+    context "unconfirmed" do
+      let!(:current_user) { FactoryBot.create(:user) }
+      it "redirects to please_confirm_users_path" do
+        expect(current_user.confirmed?).to be_falsey
+        get base_url
+        expect(response).to redirect_to please_confirm_email_users_path
+      end
+    end
+  end
+
+  describe "create" do
+    it "creates an application and adds the v2 accessor to it" do
+      v2_access_id
+      app_attrs = {
+        name: "Some app",
+        redirect_uri: "urn:ietf:wg:oauth:2.0:oob"
+      }
+      post base_url, params: {doorkeeper_application: app_attrs}
+      app = current_user.oauth_applications.first
+      expect(app.name).to eq(app_attrs[:name])
+      expect(app.access_tokens.count).to eq(1)
+      v2_accessor = app.access_tokens.last
+      expect(v2_accessor.resource_owner_id).to eq(ENV["V2_ACCESSOR_ID"].to_i)
+      expect(v2_accessor.scopes).to eq(["write_bikes"])
+    end
+  end
+
+  context "existing_doorkeeper_app" do
+    before { expect(doorkeeper_app).to be_present }
+
+    describe "edit" do
+      context "user's app" do
+        let(:current_user) { application_owner }
+        it "renders if owned by user" do
+          expect(doorkeeper_app.owner_id).to eq current_user.id
+          get "#{base_url}/#{doorkeeper_app.id}/edit"
+          expect(response.code).to eq("200")
+          expect(flash).not_to be_present
+        end
+      end
+
+      context "confidential app" do
+        let(:current_user) { application_owner }
+        before { doorkeeper_app.update(confidential: true) }
+        it "renders the toggle checked" do
+          get "#{base_url}/#{doorkeeper_app.id}/edit"
+          expect(Capybara.string(response.body))
+            .to have_css("input#doorkeeper_application_confidential[checked]")
+        end
+      end
+
+      context "no current user" do
+        let(:current_user) { false }
+        it "redirects if no user present" do
+          get "#{base_url}/#{doorkeeper_app.id}/edit"
+          expect(response).to redirect_to new_session_url
+          expect(flash).to be_present
+        end
+      end
+
+      context "other users app" do
+        let(:user) { FactoryBot.create(:user_confirmed) }
+        it "redirects if not owned by user" do
+          expect(doorkeeper_app.owner_id).to_not eq current_user.id
+          get "#{base_url}/#{doorkeeper_app.id}/edit"
+          expect(response).to redirect_to oauth_applications_url
+          expect(flash).to be_present
+        end
+      end
+
+      context "admin" do
+        let(:current_user) { FactoryBot.create(:superuser) }
+        it "renders if superuser" do
+          expect(doorkeeper_app.owner_id).to_not eq current_user.id
+          get "#{base_url}/#{doorkeeper_app.id}/edit"
+          expect(response.code).to eq("200")
+          expect(flash).not_to be_present
+        end
+      end
+    end
+
+    describe "show" do
+      let(:current_user) { application_owner }
+      let(:body) { Capybara.string(response.body) }
+
+      it "renders confidential false, with the tooltip explaining it" do
+        get "#{base_url}/#{doorkeeper_app.id}"
+        expect(body).to have_css("code", text: "false")
+        expect(body).to have_css("[role=tooltip]", text: /require the client secret/i, visible: :all)
+        expect(body).to_not have_css("[role=alert]")
+      end
+
+      context "confidential app" do
+        before { doorkeeper_app.update(confidential: true) }
+        it "renders confidential true, with the alert instead of the tooltip" do
+          get "#{base_url}/#{doorkeeper_app.id}"
+          expect(body).to have_css("code", text: "true")
+          expect(body).to have_css("[role=alert]", text: /all requests fail/i)
+          expect(body).to_not have_css("[role=tooltip]", visible: :all)
+        end
+      end
+    end
+
+    describe "update" do
+      context "user's app" do
+        let(:current_user) { application_owner }
+
+        it "renders if owned by user" do
+          expect(doorkeeper_app.owner_id).to eq current_user.id
+          put "#{base_url}/#{doorkeeper_app.id}", params: {doorkeeper_application: {name: "new thing"}}
+          doorkeeper_app.reload
+          expect(doorkeeper_app.name).to eq("new thing")
+        end
+
+        it "toggles confidential" do
+          expect(doorkeeper_app.confidential).to be_falsey
+          put "#{base_url}/#{doorkeeper_app.id}", params: {doorkeeper_application: {confidential: "1"}}
+          expect(doorkeeper_app.reload.confidential).to be_truthy
+          # The checkbox submits "0" when unchecked, so it can be turned back off
+          put "#{base_url}/#{doorkeeper_app.id}", params: {doorkeeper_application: {confidential: "0"}}
+          expect(doorkeeper_app.reload.confidential).to be_falsey
+        end
+      end
+
+      context "other user" do
+        it "doesn't update" do
+          og_name = doorkeeper_app.name
+          expect(doorkeeper_app.owner_id).to_not eq current_user.id
+          put "#{base_url}/#{doorkeeper_app.id}", params: {doorkeeper_application: {name: "new thing"}}
+          doorkeeper_app.reload
+          expect(doorkeeper_app.name).to eq(og_name)
+          expect(response).to redirect_to oauth_applications_url
+        end
+      end
+    end
+  end
+end

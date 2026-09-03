@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe OrganizationFeature, type: :model do
   it_behaves_like "amountable"
+  it_behaves_like "currencyable"
 
   describe "constant ordering" do
     it "is ordered" do
@@ -68,6 +69,8 @@ RSpec.describe OrganizationFeature, type: :model do
         bike_attr = OrganizationFeature.reg_field_to_bike_attrs(reg_field.to_sym)
         if bike_attr == "bike_sticker" # Because it accepts arguments, I guess? it fails
           expect(bike.bike_sticker).to be_blank
+        elsif bike_attr == "address"
+          expect(bike.address_record).to be_blank
         else
           expect(bike.send(bike_attr)).to be_blank
         end
@@ -79,8 +82,8 @@ RSpec.describe OrganizationFeature, type: :model do
     let(:organization) { FactoryBot.build(:organization) }
     it "includes expected" do
       labeled_fields = OrganizationFeature.reg_fields_with_customizable_labels
-      expect(labeled_fields.count).to eq OrganizationFeature::REG_FIELDS.count
       expect(labeled_fields).to include("owner_email")
+      expect(labeled_fields).to include("email_placeholder")
       expect(labeled_fields).to_not include("reg_bike_sticker")
     end
   end
@@ -88,8 +91,9 @@ RSpec.describe OrganizationFeature, type: :model do
   describe "with_admin_organization_attributes" do
     let(:target_kinds) do
       %w[regional_bike_counts passwordless_users graduated_notifications
-        organization_stolen_message reg_extra_registration_number
-        reg_organization_affiliation reg_address reg_phone reg_student_id owner_email]
+        organization_stolen_message saml_sso reg_extra_registration_number
+        reg_organization_affiliation reg_address reg_phone reg_student_id owner_email
+        email_placeholder]
     end
     it "is expected" do
       expect(OrganizationFeature.with_admin_organization_attributes).to match_array target_kinds

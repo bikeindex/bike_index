@@ -1,6 +1,6 @@
 # Seed the lock types
 
-lock_types = ["U-lock", "Chain with lock", "Cable", "Locking skewer", "Other style"]
+lock_types = ["U-lock", "Chain with lock", "Cable", "Locking skewers", "Other style", "Battery or e-bike key"]
 lock_types.each do |type_name|
   lock_type = LockType.create(name: type_name)
   lock_type.save
@@ -16,7 +16,7 @@ colors = [
   {name: "Pink", priority: 1, display: "#ff7dfd"},
   {name: "Purple", priority: 1, display: "#a745c0"},
   {name: "Red", priority: 1, display: "#ec1313"},
-  {name: "Silver, Gray or Bare Metal", priority: 1, display: "#b0b0b0"},
+  {name: "Silver, gray or bare metal", priority: 1, display: "#b0b0b0"},
   {name: "Stickers tape or other cover-up", priority: 3, display: "#fff"},
   {name: "Teal", priority: 1, display: "#3bede7"},
   {name: "White", priority: 1, display: "#fff"},
@@ -34,7 +34,11 @@ f_gear_types = [
   {name: "2", count: 2, internal: false, standard: true},
   {name: "3", count: 3, internal: false, standard: true},
   {name: "2 internal", count: 2, internal: true},
-  {name: "3 internal", count: 3, internal: true}
+  {name: "3 internal", count: 3, internal: true},
+  {name: "6 Speed Pinion Gearbox", count: 6, internal: true},
+  {name: "9 Speed Pinion Gearbox", count: 9, internal: true},
+  {name: "12 Speed Pinion Gearbox", count: 12, internal: true},
+  {name: "18 Speed Pinion Gearbox", count: 18, internal: true}
 ]
 f_gear_types.each do |gear|
   f_gear_type = FrontGearType.create(name: gear[:name], count: gear[:count], internal: gear[:internal], standard: gear[:standard])

@@ -15,8 +15,8 @@ RSpec.describe UpdateMailchimpDatumJob, type: :job do
       let(:email_address) { "seth@bikeindex.org" }
       let(:user) { FactoryBot.create(:user, email: email_address, name: "Seth Herr") }
       let(:organization_created_at) { Time.at(1552072143) }
-      let(:target_merge_fields) { {"NAME" => "Seth Herr", "O_NAME" => "Hogwarts", "O_AT" => organization_created_at.to_date.to_s} }
-      let(:organization) { FactoryBot.create(:organization, kind: "school", name: "Hogwarts", created_at: organization_created_at) }
+      let(:target_merge_fields) { {"NAME" => "Seth Herr", "O_NAME" => "Brakebills", "O_AT" => organization_created_at.to_date.to_s} }
+      let(:organization) { FactoryBot.create(:organization, kind: "school", name: "Brakebills", created_at: organization_created_at) }
       let(:organization_role) { FactoryBot.create(:organization_role_claimed, organization: organization, user: user, role: "admin") }
       let(:mailchimp_datum) { MailchimpDatum.find_or_create_for(user) }
 
@@ -70,7 +70,7 @@ RSpec.describe UpdateMailchimpDatumJob, type: :job do
           MailchimpValue.create(kind: "tag", slug: "Not org creator", mailchimp_id: "1882022", list: "organization")
           MailchimpValue.create(kind: "tag", slug: "Weird new tag", mailchimp_id: "1892850", list: "individual")
         end
-        let!(:location) { FactoryBot.create(:location_los_angeles, organization: organization) }
+        let!(:location) { FactoryBot.create(:location, :with_address_record, address_in: :los_angeles, organization: organization) }
         let(:merge_address_fields) { {"O_CITY" => "Los Angeles", "O_STATE" => "CA", "O_COUNTRY" => "US"} }
         let(:target_tags) { ["In Bike Index", "in_bike_index", "weird other tag"] }
         let!(:payment) { FactoryBot.create(:payment, user: user, kind: "donation") }
@@ -83,7 +83,7 @@ RSpec.describe UpdateMailchimpDatumJob, type: :job do
            "RECOVE_AT" => "2015-08-05",
            "SIGN_UP_AT" => "2013-07-14",
            "signed_up_at" => "2021-06-22",
-           "organization_name" => "Hogwarts",
+           "organization_name" => "Brakebills",
            "number_of_donations" => 1,
            "most_recent_donation_at" => "2021-06-22",
            "organization_signed_up_at" => "2019-03-08"}

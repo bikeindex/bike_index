@@ -1,0 +1,7 @@
+<p>The modal below opens itself on load, without a trigger or a URL param.</p>
+
+<%= render(UI::Modal::Component.new(title: "Opened on connect", id: "open-on-connect-modal", open: true)) do |modal| %>
+  <% modal.with_body do %>
+    Server-opened modal body
+  <% end %>
+<% end %>

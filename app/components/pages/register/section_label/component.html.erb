@@ -1,0 +1,12 @@
+<% if @divider %>
+  <div class="tw:my-6 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700"></div>
+<% end %>
+
+<%# A block renders alongside the label, e.g. the acknowledgment pages' FAQ tooltip %>
+<div class="tw:mb-4 tw:flex tw:items-center tw:gap-1.5">
+  <span class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-gray-400 tw:uppercase">
+    <%= @text %>
+  </span>
+
+  <%= content %>
+</div>

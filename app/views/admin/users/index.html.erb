@@ -1,0 +1,116 @@
+<% nav_header_list_items = capture do %>
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: @invalid.titleize, button_size: :sm,
+          active: @invalid != invalid_user_options.first)) do |dropdown| %>
+      <% invalid_user_options.each do |kind| %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind.titleize, path: url_for(sortable_search_params.merge(search_invalid: kind)), match_params: {search_invalid: kind}) } %>
+      <% end %>
+    <% end %>
+  </li>
+
+  <li>
+    <% access_active = @search_ambassadors || @search_superusers || @search_developers || @search_with_organization %>
+    <% clear_access_params = {search_ambassadors: nil, search_superusers: nil, search_developers: nil, search_with_organization: nil} %>
+
+    <% access_filter_name = [[@search_ambassadors, "Ambassadors"], [@search_superusers, "Superusers"],
+         [@search_developers, "Developers"], [@search_with_organization, "With Organization Role"]]
+       .detect(&:first)&.last || "Any Access" %>
+
+    <%= render(UI::Dropdown::Component.new(name: access_filter_name, button_size: :sm,
+          active: access_active)) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Any Access", path: url_for(sortable_search_params.merge(clear_access_params)), match_params: clear_access_params) } %>
+      <% dropdown.with_entry_divider %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "With Organization Role", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_with_organization: true))), match_params: {search_with_organization: true}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Ambassadors", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_ambassadors: true))), match_params: {search_ambassadors: true}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Superusers", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_superusers: true))), match_params: {search_superusers: true}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Developers", path: url_for(sortable_search_params.merge(clear_access_params.merge(search_developers: true))), match_params: {search_developers: true}) } %>
+    <% end %>
+  </li>
+
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Un", href: url_for(sortable_search_params.merge(search_unconfirmed: !@search_unconfirmed, search_confirmed: false)), size: :sm)) %>
+    /
+    <%= render(UI::ButtonLink::Component.new(text: "confirmed", href: url_for(sortable_search_params.merge(search_confirmed: !@search_confirmed, search_unconfirmed: false)), size: :sm)) %>
+  </li>
+<% end %>
+
+<% index_title = capture do %>
+  Manage
+  <% if display_dev_info? %>
+    <small class="less-strong only-dev-visible" style="font-size: 50%;">
+      current_user id:
+      <%= link_to current_user.id, admin_user_path(current_user) %>
+    </small>
+  <% end %>
+<% end %>
+
+<% admin_search_form = capture do %>
+  <%= form_tag admin_users_path, method: :get do %>
+    <%= render partial: "/shared/hidden_search_fields" %>
+    <%= hidden_field_tag :search_ambassadors, params[:search_ambassadors] %>
+    <%= hidden_field_tag :search_superusers, params[:search_superusers] %>
+    <%= hidden_field_tag :search_invalid, params[:search_invalid] %>
+    <%= hidden_field_tag :search_confirmed, params[:search_confirmed] %>
+    <%= hidden_field_tag :search_unconfirmed, params[:search_unconfirmed] %>
+
+    <div class="mt-4 mb-4 d-flex justify-content-md-end flex-wrap">
+      <% if display_dev_info? %>
+        <div class="mt-2 mr-2 only-dev-visible">
+          <%= text_field_tag :search_domain, params[:search_domain], placeholder: "search email domain", class: "form-control" %>
+        </div>
+      <% end %>
+
+      <div class="mt-2 mr-2">
+        <%= text_field_tag :search_phone, params[:search_phone], placeholder: "Find by phone", class: "form-control" %>
+      </div>
+
+      <div class="mt-2 mr-2">
+        <%= text_field_tag :query, params[:query], placeholder: "Find by name or email", class: "form-control" %>
+      </div>
+
+      <div class="mt-2 mr-2">
+        <%= submit_tag "Search", name: "search", class: "btn btn-primary" %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @deleted %>
+    <div class="row">
+      <div class="col-sm-10 offset-sm-1 col-md-6 offset-md-3">
+        <div class="alert alert-info mt-1 mb-1">
+          <p>
+            Account deletion was added because it's a requirement for the iOS
+            app store. Right now, admins can't delete users, they must delete
+            themselves.
+          </p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<% table_view = capture do %>
+  <% show_unconfirmed_count = params[:search_domain].present? && !@search_unconfirmed && !@search_confirmed %>
+
+  <% if show_unconfirmed_count %>
+    <strong><%= number_with_delimiter(matching_users.unconfirmed.size) %></strong>
+    unconfirmed users
+  <% end %>
+
+  <%= render Pages::Admin::Users::Table::Component.new(users: @collection, sort_state:, display_dev_info: display_dev_info?, render_sortable: true, render_deleted: @deleted) %>
+
+  <% unless @collection.present? %>
+    <h1 class="mt-4">No users found!</h1>
+  <% end %>
+<% end %>
+
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @collection,
+  index_title: index_title,
+  viewing: "Users",
+  chart_collection: @render_chart && matching_users,
+  nav_header_list_items:,
+  admin_search_form:,
+  table_view:,
+)) %>

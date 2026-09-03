@@ -18,7 +18,7 @@
       - blogs.each do |blog|
         %tr
           %td
-            %small.convertTime
+            %small.localizeTime
               = l blog.created_at, format: :convert_time
             - if display_dev_info?
               %small.less-strong-right.only-dev-visible
@@ -26,7 +26,7 @@
           %td.d-none.d-lg-table-cell
             = blog.user&.name || blog.user&.email
           %td
-            %small.convertTime= l blog.updated_at, format: :convert_time
+            %small.localizeTime= l blog.updated_at, format: :convert_time
           %td
             = link_to blog.title, edit_admin_news_url(blog)
             %br
@@ -48,4 +48,4 @@
             = t(blog.language, scope: [:locales])
           %td
             - if blog.published? && blog.published_at.present?
-              %small.convertTime= l blog.published_at, format: :convert_time
+              %small.localizeTime= l blog.published_at, format: :convert_time

@@ -1,0 +1,100 @@
+<% nav_header_list_items = capture do %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "org count", href: url_for(sortable_search_params.merge(search_org_count: !@org_count)), size: :sm, active: @org_count)) %>
+  </li>
+
+  <li>
+    <% search_errors_text = @search_errors || "With and without errors" %>
+
+    <%= render(UI::Dropdown::Component.new(name: search_errors_text.titleize, button_size: :sm,
+          active: @search_errors.present?)) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "With and without errors", path: url_for(sortable_search_params.merge(search_errors: nil)), match_params: {search_errors: nil}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Without errors", path: url_for(sortable_search_params.merge(search_errors: "no_error")), match_params: {search_errors: "no_error"}) } %>
+      <% dropdown.with_entry_divider %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "File Error (fully blocks import)", path: url_for(sortable_search_params.merge(search_errors: "file_error")), match_params: {search_errors: "file_error"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Line Error", path: url_for(sortable_search_params.merge(search_errors: "line_error")), match_params: {search_errors: "line_error"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Ascend error", path: url_for(sortable_search_params.merge(search_errors: "ascend_error")), match_params: {search_errors: "ascend_error"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Any Error", path: url_for(sortable_search_params.merge(search_errors: "any_error")), match_params: {search_errors: "any_error"}) } %>
+    <% end %>
+  </li>
+
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: "#{@progress.titleize} #{"progresses" if @progress == "all"}", button_size: :sm,
+          active: @progress != "all")) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All progresses", path: url_for(sortable_search_params.merge(search_progress: nil)), match_params: {search_progress: nil}) } %>
+      <% dropdown.with_entry_divider %>
+
+      <% BulkImport.progresses.each do |progress| %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: progress.humanize, path: url_for(sortable_search_params.merge(search_progress: progress)), match_params: {search_progress: progress}) } %>
+      <% end %>
+    <% end %>
+  </li>
+
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Only Ascend", href: admin_bulk_imports_path(sortable_search_params.merge(search_ascend: @only_ascend ? nil : "only_ascend")), size: :sm, active: @only_ascend)) %>
+  </li>
+
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Not Ascend", href: admin_bulk_imports_path(sortable_search_params.merge(search_ascend: @not_ascend ? nil : "not_ascend")), size: :sm, active: @not_ascend)) %>
+  </li>
+
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "New bulk import", href: new_admin_bulk_import_url, color: :primary, size: :sm)) %>
+  </li>
+<% end %>
+
+<% rendered_chart = capture do %>
+  <% chart_data = UI::Chart::Component.time_range_counts(collection: matching_bulk_imports, time_range: @time_range) %>
+  <%= render(UI::Chart::Component.new(series: [{name: "Bulk imports", data: chart_data}], time_range: @time_range)) %>
+<% end %>
+
+<% table_view = capture do %>
+  <% if @org_count %>
+    <div class="col-sm-6 offset-sm-3 mt-4">
+      <div class="full-screen-table">
+        <table class="table table-striped table-bordered table-sm">
+          <thead>
+            <th class="text-left">Organization</th>
+            <th class="text-right">Imports</th>
+          </thead>
+
+          <tbody>
+            <% matching_bulk_imports.distinct.pluck(:organization_id).each do |id| %>
+              <tr>
+                <td>
+                  <% if id.present? %>
+                    <% organization = Organization.find_by_id(id) %>
+                    <%= link_to organization&.name || id, url_for(sortable_search_params.merge(organization_id: id)) %>
+                    <%= link_to link_emoji, admin_organization_path(id) %>
+                  <% else %>
+                    <%= link_to "No organization", url_for(sortable_search_params.merge(organization_id: "none")) %>
+                    <span class="text-danger">missing org!</span>
+                  <% end %>
+                </td>
+
+                <td>
+                  <%= number_display(matching_bulk_imports.where(organization_id: id).count) %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+
+  <% unless display_dev_info? %>
+    <style>.only-dev-visible {display: none !important;} </style>
+  <% end %>
+
+  <%= render partial: "/admin/bulk_imports/table", locals: {collection: @bulk_imports, render_sortable: true} %>
+<% end %>
+
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @bulk_imports,
+  viewing: "Bulk imports",
+  rendered_chart:,
+  nav_header_list_items:,
+  table_view:,
+)) %>

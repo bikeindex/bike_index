@@ -10,9 +10,12 @@ module BikeAttributable
     belongs_to :front_wheel_size, class_name: "WheelSize"
     belongs_to :rear_gear_type
     belongs_to :front_gear_type
+    belongs_to :primary_activity
 
-    has_many :public_images, as: :imageable, dependent: :destroy
+    has_many :public_images, as: :imageable
     has_many :components
+    has_many :ctypes, -> { distinct }, through: :components
+    has_many :cgroups, -> { distinct }, through: :ctypes
 
     accepts_nested_attributes_for :components, allow_destroy: true
 
@@ -34,11 +37,14 @@ module BikeAttributable
 
   def status_found?
     return false unless status_impounded?
+
     (id.present? ? current_impound_record&.kind : impound_records.last&.kind) == "found"
   end
 
   def status_humanized
     return "found" if status_found?
+    return "for sale" if status == "status_with_owner" && is_for_sale?
+
     Bike.status_humanized(status)
   end
 
@@ -48,6 +54,7 @@ module BikeAttributable
 
   def status_humanized_no_with_owner
     return "" if status == "status_with_owner"
+
     status_humanized
   end
 
@@ -76,25 +83,19 @@ module BikeAttributable
     ].compact
   end
 
-  # list of cgroups so that we can arrange them
-  def cgroup_array
-    components.map(&:cgroup_id).uniq
-  end
-
-  # Small helper because we call this a lot
+  # When displaying the cycle_type, generally this is what you want
   def type
-    cycle_type && cycle_type_name&.downcase
+    type_titleize&.downcase
   end
 
   def type_titleize
-    return "" unless type.present?
-    CycleType.slug_translation(cycle_type)
+    cycle_type_obj&.short_name_translation
   end
 
   def propulsion_titleize
     return "" unless propulsion_type.present?
-    return "Pedal" if propulsion_type == "foot-pedal"
-    propulsion_type.split(/(\s|-)/).map(&:capitalize).join("")
+
+    propulsion_type_name
   end
 
   def frame_model_truncated
@@ -104,17 +105,19 @@ module BikeAttributable
   def title_string
     t = [year, mnfg_name, frame_model_truncated].join(" ")
     t += " #{type}" if type != "bike"
-    InputNormalizer.sanitize(t.gsub(/\s+/, " "))
+    Binxtils::InputNormalizer.sanitize(t.gsub(/\s+/, " "))
   end
 
   def video_embed_src
     return nil unless video_embed.present?
+
     code = Nokogiri::HTML(video_embed)
     code.xpath("//iframe/@src")[0]&.value
   end
 
   def render_paint_description?
     return false unless pos? && primary_frame_color == Color.black
+
     secondary_frame_color_id.blank? && paint.present?
   end
 
@@ -131,15 +134,35 @@ module BikeAttributable
   end
 
   def cycle_type_name
-    CycleType.new(cycle_type)&.name
+    return nil if cycle_type.blank?
+
+    CycleType.slug_translation(cycle_type)
+  end
+
+  def cycle_type_obj
+    CycleType.new(cycle_type)
   end
 
   def not_cycle?
     CycleType.not_cycle?(cycle_type)
   end
 
+  def fixed_gear?
+    rear_gear_type_id == RearGearType.fixed.id
+  end
+
   def propulsion_type_name
-    PropulsionType.new(propulsion_type).name
+    PropulsionType.new(propulsion_type)&.name
+  end
+
+  def drivetrain_attributes
+    d_slugs = []
+    d_slugs << "coaster_brake" if coaster_brake
+    d_slugs << "belt_drive" if belt_drive
+
+    d_slugs.map do |d_slug|
+      I18n.t(d_slug, scope: %i[activerecord bike_attributable drivetrain_attributes])
+    end.join(", ")
   end
 
   # NB: val can be a propulsion_type OR [nil, :motorized] (see spec)
@@ -161,6 +184,7 @@ module BikeAttributable
       ((propulsion_type_name == "Foot pedal") ? nil : propulsion_type_name),
       year,
       frame_colors,
+      paint&.name,
       frame_material && frame_material_name,
       frame_size,
       frame_model,
@@ -179,8 +203,15 @@ module BikeAttributable
     if thumb_path.blank?
       return stock_photo_url.present? ? stock_photo_url : nil
     end
-    image_col = public_images.limit(1).first&.image
-    return nil if image_col.blank? && !REMOTE_IMAGE_FALLBACK_URLS
+
+    public_image = public_images.limit(1).first
+    # PublicImage owns which backend a row is on
+    return public_image.image_url(size) if public_image&.activestorage?
+
+    image_col = public_image&.image
+    # NOTE: avoid image_col.blank? — on Fog storage it issues an S3 HEAD per call (timed out the API search).
+    return nil if image_col&.path.blank? && !REMOTE_IMAGE_FALLBACK_URLS
+
     image_url = image_col&.send(:url, size)
     # image_col.blank? and image_url.present? indicates it's a remote file in local development
     if REMOTE_IMAGE_FALLBACK_URLS && image_col.blank? && image_url.present?
@@ -196,6 +227,7 @@ module BikeAttributable
   def components_cache_array
     components.includes(:manufacturer, :ctype).map do |c|
       next unless c.ctype.present? || c.component_model.present?
+
       [c.year, c.mnfg_name, c.component_model].compact
     end
   end

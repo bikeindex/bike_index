@@ -1,0 +1,103 @@
+<%# Shared by the pages and the acknowledgment below them %>
+<% collapse_toggle = capture do %>
+  <button
+    type="button"
+    data-action="ui--collapse#toggle"
+    data-ui--collapse-target="trigger"
+    aria-expanded="true"
+    class="tw:cursor-pointer tw:text-gray-400 tw:hover:text-gray-600"
+  >
+    <span class="tw:sr-only">Toggle details</span>
+
+    <span
+      data-ui--collapse-target="chevron"
+      class="tw:inline-block tw:rotate-90 tw:transition-transform tw:duration-200"
+    >
+      <span class="tw:flex"><%= render UI::IconChevron::Component.new %></span>
+    </span>
+  </button>
+<% end %>
+
+<%= render UI::Card::Component.new do %>
+  <%= tag.div(class: "tw:-my-1.5 tw:divide-y tw:divide-gray-200", data: list_data) do %>
+    <% pages.each do |page| %>
+      <%= tag.div(class: "tw:py-1.5", data: page_data(page)) do %>
+        <div class="tw:flex tw:items-baseline">
+          <% if @editable %>
+            <%= render UI::DragHandle::Component.new(controller: "sortable", html_class: "tw:pr-4") %>
+          <% end %>
+
+          <div class="tw:min-w-0 tw:flex-1">
+            <div class="tw:flex tw:items-center tw:gap-2">
+              <%= collapse_toggle %>
+
+              <h3 class="uncap tw:mb-0 tw:text-base tw:font-semibold">
+                <%= page.title %>
+              </h3>
+
+              <% if page.organization_specific %>
+                <%= render UI::Badge::Component.new(text: @registration_sequence.badge_name, color: :notice, size: :xs) %>
+              <% end %>
+            </div>
+
+            <% if page.subtitle.present? %>
+              <p
+                data-ui--collapse-target="content"
+                class="tw:mt-1 tw:mb-0 tw:pl-5 tw:text-sm tw:text-gray-600"
+              >
+                <%= page.subtitle %>
+              </p>
+            <% end %>
+          </div>
+
+          <% if @editable %>
+            <%= link_to "Edit", edit_page_path(page), class: "twlink" %>
+          <% end %>
+        </div>
+
+        <div
+          data-ui--collapse-target="content"
+          class="
+            tw:prose tw:mt-1 tw:max-w-none tw:py-2 tw:text-sm tw:[&_ul]:my-0
+            tw:[&_ul]:list-disc tw:[&_ul]:pl-5
+          "
+        >
+          <%= page.body&.html_safe %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <%# The editor has its own field for this %>
+    <% unless @editable %>
+      <%= tag.div(class: "tw:py-1.5", data: {controller: "ui--collapse"}) do %>
+        <div class="tw:flex tw:items-baseline">
+          <div class="tw:min-w-0 tw:flex-1">
+            <div class="tw:flex tw:items-center tw:gap-2">
+              <%= collapse_toggle %>
+
+              <h3 class="uncap tw:mb-0 tw:text-base tw:font-semibold">
+                Final acknowledgment
+              </h3>
+            </div>
+
+            <% if @registration_sequence.faq_url.present? %>
+              <p
+                data-ui--collapse-target="content"
+                class="tw:mt-1 tw:mb-0 tw:pl-5 tw:text-sm tw:text-gray-600"
+              >
+                <%= link_to "FAQ link", @registration_sequence.faq_url, class: "twlink" %>
+              </p>
+            <% end %>
+          </div>
+        </div>
+
+        <div
+          data-ui--collapse-target="content"
+          class="tw:mt-1 tw:py-2 tw:text-sm"
+        >
+          <%= @registration_sequence.acknowledgment %>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

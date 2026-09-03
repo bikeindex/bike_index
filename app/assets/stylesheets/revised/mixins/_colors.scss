@@ -44,9 +44,15 @@ $stolen-color: $red;
   color: $stolen-color;
 }
 
-$found-color: $green;
+// tailwind fuchsia-600
+$found-color: oklch(59.1% 0.293 322.896);
 .found-color {
   color: $found-color;
+}
+
+$for-sale-color: $green;
+.for-sale-color {
+  color: $for-sale-color;
 }
 
 $impounded-color: $stolen-color;

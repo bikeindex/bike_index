@@ -14,13 +14,25 @@ RSpec.describe Admin::DashboardController, type: :request do
       it "redirects" do
         get "/admin"
         expect(response.code).to eq("302")
-        expect(response).to redirect_to organization_root_path(organization_id: current_user.default_organization.to_param)
+        expect(response).to redirect_to organization_root_path(organization_id: OrganizationRole.default_organization(current_user).to_param)
       end
     end
   end
 
   context "logged in as admin" do
     include_context :request_spec_logged_in_as_superuser
+
+    describe "review app banner" do
+      it "renders the banner, and suppresses it with NO_REVIEW_TOPBAR" do
+        stub_const("ENV", ENV.to_hash.merge("REVIEW_APP" => "1"))
+        get "/admin/maintenance"
+        expect(response.body).to include("review-app-banner")
+
+        stub_const("ENV", ENV.to_hash.merge("REVIEW_APP" => "1", "NO_REVIEW_TOPBAR" => "true"))
+        get "/admin/maintenance"
+        expect(response.body).not_to include("review-app-banner")
+      end
+    end
 
     describe "index (also timezone setting tests)" do
       let!(:bike) { FactoryBot.create(:bike, :with_ownership) }
@@ -40,7 +52,7 @@ RSpec.describe Admin::DashboardController, type: :request do
         expect(session[:timezone]).to eq timezone
         expect(assigns(:time_range).first).to be_within(2.seconds).of time_range_start
         expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
-        expect(Time.zone).to eq TimeParser::DEFAULT_TIME_ZONE
+        expect(Time.zone).to eq Binxtils::TimeParser.default_time_zone
         # If current user has no_hide_spam, it shows likely_spam though
         SuperuserAbility.create(user: current_user, su_options: [:no_hide_spam])
         get "/admin", params: {timezone: timezone}
@@ -55,7 +67,7 @@ RSpec.describe Admin::DashboardController, type: :request do
           expect(response.code).to eq "200"
           expect(response).to render_template(:index)
           expect(session[:timezone]).to be_blank
-          expect(Time.zone).to eq TimeParser::DEFAULT_TIME_ZONE
+          expect(Time.zone).to eq Binxtils::TimeParser.default_time_zone
         end
       end
     end
@@ -73,6 +85,18 @@ RSpec.describe Admin::DashboardController, type: :request do
         get "/admin/scheduled_jobs"
         expect(response.code).to eq "200"
         expect(response).to render_template(:scheduled_jobs)
+        expect(response.body).to_not include("Skipped via ENV SIDEKIQ_SKIP")
+      end
+
+      context "with a SIDEKIQ_SKIP_* env var set" do
+        before { stub_const("ENV", ENV.to_hash.merge("SIDEKIQ_SKIP_FETCH_PROJECT529_BIKES_JOB" => "true")) }
+
+        it "lists the skipped job in a warning alert" do
+          get "/admin/scheduled_jobs"
+          expect(response.code).to eq "200"
+          expect(response.body).to include("Skipped via ENV SIDEKIQ_SKIP")
+          expect(response.body).to match(%r{<code>\s*FetchProject529BikesJob\s*</code>})
+        end
       end
     end
 
@@ -114,6 +138,14 @@ RSpec.describe Admin::DashboardController, type: :request do
         ids = "\n1\n2\n69\n200\n22222\n\n\n"
         put "/admin/update_tsv_blocklist", params: {blocklist: ids}
         expect(FileCacheMaintainer.blocklist).to eq([1, 2, 69, 200, 22222].map(&:to_s))
+      end
+    end
+
+    describe "ip_location" do
+      it "renders" do
+        get "/admin/ip_location"
+        expect(response.code).to eq "200"
+        expect(response).to render_template(:ip_location)
       end
     end
   end

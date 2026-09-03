@@ -30,6 +30,18 @@ RSpec.shared_context :geocoder_default_location do
     }.as_json
   end
 
+  let(:default_location_address_record_attrs) do
+    {street: "278 Broadway",
+     city: "New York",
+     region: "NY",
+     postal_code: "10007",
+     country_id: Country.united_states_id,
+     latitude: 40.7143528,
+     longitude: -74.0059731}
+  end
+
+  let(:default_location_coordinates) { default_location.slice(:latitude, :longitude).values }
+
   let(:geo_hash) do
     {
       data: ["US", "NY", "New York", default_location[:latitude].to_s, default_location[:longitude].to_s],

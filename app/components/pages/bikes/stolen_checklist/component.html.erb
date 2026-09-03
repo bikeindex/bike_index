@@ -1,0 +1,157 @@
+<% if organization_stolen_message.present? %>
+  <div class="also-give-me-padding-x">
+    <%= render partial: "/bikes/organization_stolen_message", locals: {stolen_record: @stolen_record} %>
+  </div>
+<% end %>
+
+<ul class="stolen-checklist tw:m-0 tw:list-none tw:p-1.5">
+  <li class="<%= item_classes(true) %>">
+    <%= box(true) %>
+
+    <span class="<%= text_classes(true) %>">
+      <%= translation(:list_bike_type_on_bike_index, bike_type: @bike.type) %>
+    </span>
+  </li>
+
+  <% if serial_unknown? %>
+    <li class="<%= item_classes(false) %>">
+      <%= box(false) %>
+
+      <span class="<%= text_classes(false) %>">
+        <%= translation(:add_serial_number) %>
+        <em><%= translation(:contact_seller) %></em>
+      </span>
+    </li>
+  <% end %>
+
+  <li class="<%= item_classes(street?) %>">
+    <%= box(street?) %>
+
+    <span class="<%= text_classes(street?) %>">
+      <%= translation(:report_theft_html,
+            edit_bike_link: link_to(translation(:location_where_the_theft_occurred), edit_path("theft_details"), class: "twlink-underlined")) %>
+    </span>
+  </li>
+
+  <li class="<%= item_classes(images?) %>">
+    <%= box(images?) %>
+
+    <span class="<%= text_classes(images?) %>">
+      <%= translation(:add) %>
+      <%= link_to translation(:a_photo_of_your_bike_type, bike_type: @bike.type), edit_path("photos"), class: "twlink-underlined" %>
+    </span>
+  </li>
+
+  <%# Only the Netherlands has reporting instructions we can give %>
+  <% if netherlands? %>
+    <li class="<%= item_classes(police_report?) %>">
+      <%= box(police_report?) %>
+
+      <span class="<%= text_classes(police_report?) %>">
+        <%= translation(:nl_file_police_report) %>
+      </span>
+
+      <% unless police_report? %>
+        <ul class="tw:m-0 tw:list-none tw:p-0">
+          <li class="<%= item_classes(false) %>">
+            <%= dash %>
+
+            <span class="checklist-text">
+              <strong><%= translation(:nl_online) %></strong>
+
+              <%= link_to translation(:nl_website_link_text),
+                    "https://www.politie.nl/aangifte-of-melding-doen/voorbereiding-aangifte/diefstal-fiets.html",
+                    target: "_blank", rel: "noopener", class: "twlink-underlined" %>
+
+              <em><%= translation(:nl_digid_required) %></em>
+            </span>
+          </li>
+
+          <li class="<%= item_classes(false) %>">
+            <%= dash %>
+
+            <span class="checklist-text">
+              <strong><%= translation(:nl_phone) %></strong>
+              <%= translation(:nl_phone_report) %>
+            </span>
+          </li>
+
+          <li class="<%= item_classes(false) %>">
+            <%= dash %>
+
+            <span class="checklist-text">
+              <strong><%= translation(:nl_person) %></strong>
+              <%= translation(:nl_person_report) %>
+              <%= link_to "www.politie.nl/mijn-buurt/politiebureaus", "https://www.politie.nl/mijn-buurt/politiebureaus", class: "twlink-underlined" %>
+            </span>
+          </li>
+        </ul>
+      <% end %>
+    </li>
+  <% end %>
+
+  <li class="<%= item_classes(police_report?) %>">
+    <%= box(police_report?) %>
+
+    <span class="<%= text_classes(police_report?) %>">
+      <%= translation(:add_bike_link_to_your_theft_report_html,
+            bike_link: link_to(translation(:your_police_report), edit_path("theft_details", anchor: "policeReportNumber"), class: "twlink-underlined")) %>
+    </span>
+
+    <ul class="tw:m-0 tw:list-none tw:p-0">
+      <li class="<%= item_classes(submitted_to_police_services?) %>">
+        <%= box(submitted_to_police_services?) %>
+
+        <span class="<%= text_classes(submitted_to_police_services?) %>">
+          <%= translation(:push_bike_info_to) %>
+          <%= link_to translation(:leads_online), translation(:leads_online_url), class: "twlink-underlined" %>
+          <%= translation(:bike_index_does_this) %>
+        </span>
+
+        <% if serial_unknown? %>
+          <span class="tw:text-red-600">
+            <%= translation(:requires_a_serial_number) %>
+          </span>
+        <% end %>
+      </li>
+
+      <li class="<%= item_classes(submitted_to_police_services?) %>">
+        <%= box(submitted_to_police_services?) %>
+
+        <span class="<%= text_classes(submitted_to_police_services?) %>">
+          <%= translation(:push_bike_info_to_law_enforcement) %>
+
+          <% if serial_unknown? %>
+            <span class="tw:text-red-600">
+              <%= translation(:requires_a_serial_number) %>
+            </span>
+          <% end %>
+        </span>
+      </li>
+    </ul>
+  </li>
+
+  <%#
+    Share on Twitter is commented out for now. Left as a note rather than commented in
+    place, since an ERB comment ends at the first closing delimiter inside it - restore
+    it as an item reading translation(:share_on_twitter), ticked by approved?
+  %>
+
+  <li class="<%= item_classes(false) %>">
+    <%= box(false) %>
+
+    <span class="<%= text_classes(false) %>">
+      <%= link_to translation(:share_widely_on_your_personal_social), edit_path("publicize"), class: "twlink-underlined" %>
+      <%= translation(:facebook_instagram_etc) %>
+    </span>
+  </li>
+
+  <li class="<%= item_classes(theft_alert?) %>">
+    <%= box(theft_alert?) %>
+
+    <span class="<%= text_classes(theft_alert?) %>">
+      <%= translation(:supercharge_sharing_on_facebook) %>
+      <%= link_to translation(:promoted_stolen_bike_alerts), edit_path("alert"), class: "twlink-underlined" %>
+    </span>
+  </li>
+</ul>

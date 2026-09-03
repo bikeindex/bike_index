@@ -1,6 +1,9 @@
 require "rails_helper"
 
 RSpec.describe StolenBikeListing, type: :model do
+  it_behaves_like "amountable"
+  it_behaves_like "currencyable"
+
   let(:manufacturer) { FactoryBot.create(:manufacturer) }
   let(:color) { FactoryBot.create(:color) }
 
@@ -15,7 +18,7 @@ RSpec.describe StolenBikeListing, type: :model do
   end
 
   describe "searchable" do
-    let(:interpreted_params) { StolenBikeListing.searchable_interpreted_params(query_params) }
+    let(:interpreted_params) { BikeSearchable.searchable_interpreted_params(query_params) }
     context "color_ids of primary, secondary and tertiary" do
       let(:color2) { FactoryBot.create(:color) }
       let(:stolen_bike_listing1) { FactoryBot.create(:stolen_bike_listing, primary_frame_color: color, listed_at: Time.current - 3.months) }

@@ -19,6 +19,7 @@ RSpec.describe NewsController, type: :request do
           get "#{base_url}/#{blog.title_slug}"
           expect(response.status).to eq(200)
           expect(response).to render_template("show")
+          expect(assigns(:show_discuss)).to be_falsey
         end
       end
       context "old title slug" do
@@ -63,6 +64,7 @@ RSpec.describe NewsController, type: :request do
         get base_url
         expect(response.status).to eq(200)
         expect(response).to render_template("index")
+        expect(response.body).to match(/type=.application.atom.xml/)
       end
     end
     context "given a tag" do

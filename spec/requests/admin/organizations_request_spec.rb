@@ -43,6 +43,102 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template("admin/organizations/edit")
     end
+
+    # tab names the template to render, so anything but one of FORM_TABS has to fall back
+    # rather than reach a template of the request's choosing
+    it "falls back to the edit tab for a tab it doesn't have" do
+      Country.united_states # Read replica
+      get "#{base_url}/#{organization.to_param}/edit", params: {tab: "../show"}
+      expect(response.status).to eq(200)
+      expect(response).to render_template("admin/organizations/edit")
+    end
+  end
+
+  describe "new" do
+    it "renders" do
+      Country.united_states # Read replica
+      get "#{base_url}/new"
+      expect(response.status).to eq(200)
+      expect(response).to render_template("admin/organizations/new")
+    end
+  end
+
+  describe "locations" do
+    let!(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization:, name: "Main Office") }
+
+    it "renders the locations, which show and edit no longer do" do
+      Country.united_states # Read replica
+      get "#{base_url}/#{organization.to_param}/edit", params: {tab: "locations"}
+      expect(response.status).to eq(200)
+      expect(response).to render_template("admin/organizations/locations")
+      expect(response.body).to include("Main Office")
+      expect(response.body).to include("1300 W 14th Pl")
+
+      get "#{base_url}/#{organization.to_param}"
+      expect(response.body).to_not include("Main Office")
+      get "#{base_url}/#{organization.to_param}/edit"
+      expect(response.body).to_not include("Main Office")
+    end
+  end
+
+  describe "paid_functionality" do
+    it "renders nothing to configure" do
+      get "#{base_url}/#{organization.to_param}/edit", params: {tab: "paid_functionality"}
+      expect(response.status).to eq(200)
+      expect(response.body).to include("no paid functionality to configure")
+    end
+    context "paid" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "reg_address") }
+      it "renders the email label and placeholder fields" do
+        get "#{base_url}/#{organization.to_param}/edit", params: {tab: "paid_functionality"}
+        expect(response.status).to eq(200)
+        expect(response.body).to include('name="reg_label-owner_email"')
+        expect(response.body).to include('name="reg_label-email_placeholder"')
+      end
+    end
+    context "saml_sso enabled" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
+      it "renders the permitted domain, which the SSO tab doesn't own" do
+        get "#{base_url}/#{organization.to_param}/edit", params: {tab: "paid_functionality"}
+        expect(response.status).to eq(200)
+        expect(response.body).to include("permitted domain for SAML SSO")
+        expect(response.body).to include('name="organization[user_email_domain]"')
+      end
+    end
+  end
+
+  describe "sso" do
+    it "renders that the feature isn't enabled" do
+      get "#{base_url}/#{organization.to_param}/edit", params: {tab: "sso"}
+      expect(response.status).to eq(200)
+      expect(response.body).to include("SAML SSO is not enabled")
+    end
+    context "saml_sso enabled" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
+      it "renders the SAML configuration section" do
+        get "#{base_url}/#{organization.to_param}/edit", params: {tab: "sso"}
+        expect(response.status).to eq(200)
+        expect(response).to render_template("admin/organizations/sso")
+        expect(response.body).to include("/sso/#{organization.to_param}/metadata")
+        expect(response.body).to include('name="organization[organization_saml_configuration_attributes][name_id_format]"')
+      end
+    end
+  end
+
+  describe "feature_chips" do
+    let!(:organization_feature) { FactoryBot.create(:organization_feature, name: "Bike Stickers") }
+
+    # The values are ids and setting keys; the chip has to carry the name back, and a value
+    # that matches neither has no name to show
+    it "names each selected filter, and drops one it doesn't recognise" do
+      post "#{base_url}/feature_chips", as: :turbo_stream,
+        params: {combobox_values: "#{organization_feature.id},with_stolen_message,nonsense",
+                 for_id: "search_features_and_settings"}
+
+      expect(response.status).to eq(200)
+      expect(response.body.scan(/<span>([^<]+)<\/span>/).flatten)
+        .to eq(["Bike Stickers", "With Stolen Message"])
+    end
   end
 
   describe "create" do
@@ -59,6 +155,15 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         approved: true
       }
     end
+    context "without a short_name" do
+      it "creates, shortening the name" do
+        post base_url, params: {organization: create_attributes.merge(short_name: "")}
+        expect(Organization.count).to eq 1
+        expect(Organization.last).to have_attributes(name: "Organization name", short_name: "Organization name",
+          slug: "organization-name")
+      end
+    end
+
     context "privileged kinds" do
       Organization.admin_required_kinds.each do |kind|
         it "prevents creating privileged #{kind}" do
@@ -67,7 +172,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
           organization = Organization.last
           expect(organization.kind).to eq(kind)
           unless organization.ambassador? # Ambassadors have special attrs set
-            expect(organization).to match_hash_indifferently create_attributes.except(:kind)
+            expect(organization).to have_attributes create_attributes.except(:kind)
           end
           expect(current_user.organizations.count).to eq 0 # it doesn't assign the user
         end
@@ -79,7 +184,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
     let(:state) { FactoryBot.create(:state) }
     let(:country) { state.country }
     let(:parent_organization) { FactoryBot.create(:organization) }
-    let(:location1) { FactoryBot.create(:location, organization: organization, street: "old street", name: "cool name") }
+    let(:location1) { FactoryBot.create(:location, organization:, name: "cool name") }
     let(:update) do
       {
         name: "new name thing stuff",
@@ -97,38 +202,34 @@ RSpec.describe Admin::OrganizationsController, type: :request do
           "0" => {
             id: location1.id,
             name: "First shop",
-            zipcode: "2222222",
-            city: "First city",
-            state_id: state.id,
-            country_id: country.id,
-            street: "some street 2",
             phone: "7272772727272",
             email: "stuff@goooo.com",
-            latitude: 22_222,
-            longitude: 11_111,
-            organization_id: 844,
             publicly_visible: false,
             impound_location: true,
             default_impound_location: false,
-            _destroy: 0
+            _destroy: 0,
+            address_record_attributes: {
+              postal_code: "2222222",
+              city: "First city",
+              region_record_id: state.id,
+              country_id: country.id,
+              street: "some street 2"
+            }
           },
           Time.current.to_i.to_s => {
-            created_at: Time.current.to_f.to_s,
             name: "Second shop",
-            zipcode: "12243444",
-            city: "cool city",
-            state_id: state.id,
-            country_id: country.id,
-            street: "some street 2",
             phone: "7272772727272",
             email: "stuff@goooo.com",
-            latitude: 22_222,
-            longitude: 11_111,
-            organization_id: 844,
-            shown: false,
             publicly_visible: true,
             impound_location: true,
-            default_impound_location: true
+            default_impound_location: true,
+            address_record_attributes: {
+              postal_code: "12243444",
+              city: "cool city",
+              region_record_id: state.id,
+              country_id: country.id,
+              street: "some street 2"
+            }
           }
         }
       }
@@ -155,13 +256,103 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       # Existing location is updated
       location1.reload
       expect(location1.organization).to eq organization
-      location1_update = update[:locations_attributes]["0"]
-      expect(location1).to match_hash_indifferently location1_update.except(:latitude, :longitude, :organization_id, :created_at, :_destroy)
+      expect(location1.name).to eq "First shop"
+      expect(location1.phone).to eq "7272772727272"
+      expect(location1.email).to eq "stuff@goooo.com"
+      expect(location1.publicly_visible).to be_falsey
+      expect(location1.impound_location).to be_truthy
+      expect(location1.address_record).to have_attributes(street: "some street 2", city: "First City",
+        postal_code: "2222222", region_record_id: state.id, country_id: country.id)
 
-      # still existing location
+      # second location
       location2 = organization.locations.last
-      location2_update = update[:locations_attributes][update[:locations_attributes].keys.last]
-      expect(location2).to match_hash_indifferently location2_update.except(:latitude, :longitude, :organization_id, :created_at)
+      expect(location2.name).to eq "Second shop"
+      expect(location2.publicly_visible).to be_truthy
+      expect(location2.impound_location).to be_truthy
+      expect(location2.default_impound_location).to be_truthy
+      expect(location2.address_record).to have_attributes(street: "some street 2", city: "Cool City",
+        postal_code: "12243444", region_record_id: state.id, country_id: country.id)
+    end
+    context "with address_record_attributes" do
+      let(:location1) { FactoryBot.create(:location, :with_address_record, organization:, name: "Original") }
+      it "updates address_record via nested attributes" do
+        expect(location1.address_record).to be_present
+        original_address_record_id = location1.address_record.id
+
+        put "#{base_url}/#{organization.to_param}", params: {
+          organization: {
+            locations_attributes: {
+              "0" => {
+                id: location1.id,
+                address_record_attributes: {id: location1.address_record.id, street: "999 New St", city: "New City", postal_code: "99999"}
+              }
+            }
+          }
+        }
+
+        location1.reload
+        expect(location1.address_record.id).to eq original_address_record_id
+        expect(location1.address_record).to have_attributes(street: "999 New St", city: "New City", postal_code: "99999")
+      end
+    end
+    context "with a _destroy from the nested-fields remove" do
+      let!(:location1) { FactoryBot.create(:location, organization:, name: "Original") }
+
+      # The hidden field renders `false` (Rails reads `_destroy` off the record), so it takes
+      # the controller setting 1 to destroy
+      it "keeps the location for the untouched hidden field, and destroys it for 1" do
+        put_destroy = lambda { |destroy_value|
+          put "#{base_url}/#{organization.to_param}", params: {
+            organization: {locations_attributes: {"0" => {id: location1.id, _destroy: destroy_value}}}
+          }
+        }
+
+        expect { put_destroy.call("false") }.not_to change(Location, :count)
+        expect { put_destroy.call("1") }.to change(Location, :count).by(-1)
+      end
+    end
+
+    # A tab that renders no organization[...] field still has to save - the reg labels are
+    # top-level params, and a location-less locations tab posts nothing but the template
+    context "submitted from a tab with nothing under organization" do
+      context "paid_functionality, whose only fields are the reg labels" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "reg_address") }
+
+        it "saves the labels" do
+          put "#{base_url}/#{organization.to_param}", params: {:tab => "paid_functionality",
+                                                               "reg_label-owner_email" => "Your email"}
+          expect(response).to redirect_to(edit_admin_organization_url(organization, tab: "paid_functionality"))
+          expect(organization.reload.registration_field_labels).to eq({"owner_email" => "Your email"})
+        end
+      end
+
+      context "locations, for an organization with none" do
+        it "redirects rather than raising" do
+          expect(organization.locations.count).to eq 0
+          put "#{base_url}/#{organization.to_param}", params: {tab: "locations"}
+          expect(response).to redirect_to(edit_admin_organization_url(organization, tab: "locations"))
+        end
+      end
+    end
+
+    context "submitted from a tab" do
+      it "returns to the tab, and to show without one" do
+        put "#{base_url}/#{organization.to_param}", params: {tab: "sso", organization: {name: "new name"}}
+        expect(response).to redirect_to(edit_admin_organization_url(organization, tab: "sso"))
+        put "#{base_url}/#{organization.to_param}", params: {tab: "not-a-tab", organization: {name: "newer name"}}
+        expect(response).to redirect_to(admin_organization_url(organization))
+      end
+
+      # Each tab submits the whole organization, so one that doesn't render a field would
+      # otherwise blank it
+      it "leaves the fields its tab doesn't render alone" do
+        organization.update(kind: "bike_shop", registration_field_labels: {reg_student_id: "Cool label"})
+        put "#{base_url}/#{organization.to_param}", params: {tab: "sso", organization: {name: "new name"}}
+        organization.reload
+        expect(organization.name).to eq "new name"
+        expect(organization.kind).to eq "bike_shop"
+        expect(organization.registration_field_labels).to eq({"reg_student_id" => "Cool label"})
+      end
     end
     context "setting to not_set" do
       let(:organization) { FactoryBot.create(:organization, manual_pos_kind: "lightspeed_pos", lightspeed_register_with_phone: true) }
@@ -183,11 +374,36 @@ RSpec.describe Admin::OrganizationsController, type: :request do
         expect(organization.reload.manufacturer_id).to be_blank
       end
     end
-    context "update passwordless_user_domain" do
-      it "updates (only blocking non-developers in frontend because whateves)" do
-        put "#{base_url}/#{organization.to_param}", params: {organization: {passwordless_user_domain: "@bikeindex.org"}}
-        organization.reload
-        expect(organization.passwordless_user_domain).to eq "@bikeindex.org"
+    context "update user_email_domain" do
+      it "updates a valid domain and rejects values with an @ or without a ." do
+        put "#{base_url}/#{organization.to_param}", params: {organization: {user_email_domain: "bikeindex.org"}}
+        expect(organization.reload.user_email_domain).to eq "bikeindex.org"
+        put "#{base_url}/#{organization.to_param}", params: {organization: {user_email_domain: "@bikeindex.org"}}
+        expect(organization.reload.user_email_domain).to eq "bikeindex.org" # unchanged - invalid
+        put "#{base_url}/#{organization.to_param}", params: {organization: {user_email_domain: "bikeindexorg"}}
+        expect(organization.reload.user_email_domain).to eq "bikeindex.org" # unchanged - invalid
+      end
+    end
+    context "update organization_saml_configuration" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: "saml_sso", user_email_domain: "example.edu")
+      end
+      let(:saml_attributes) do
+        {active: "1", idp_entity_id: "https://idp.example.edu/",
+         idp_sso_target_url: "https://idp.example.edu/idp/profile/SAML2/POST/SSO",
+         idp_cert: File.read(Rails.root.join("spec/fixtures/saml/idp_cert.pem")),
+         name_id_format: OrganizationSamlConfiguration::NAME_ID_FORMATS["persistent"]}
+      end
+      it "creates the nested configuration" do
+        expect do
+          put "#{base_url}/#{organization.to_param}", params: {organization: {organization_saml_configuration_attributes: saml_attributes}}
+        end.to change(OrganizationSamlConfiguration, :count).by(1)
+        saml_configuration = organization.reload.organization_saml_configuration
+        expect(saml_configuration.active?).to be_truthy
+        expect(saml_configuration.idp_entity_id).to eq "https://idp.example.edu/"
+        expect(saml_configuration.name_id_format).to eq OrganizationSamlConfiguration::NAME_ID_FORMATS["persistent"]
+        expect(saml_configuration.configured?).to be_truthy
       end
     end
     context "updating graduated notifications" do
@@ -216,7 +432,10 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       end
     end
     context "updating registration labels" do
-      let(:target) { {reg_student_id: "party label", reg_address: "useful label", owner_email: "<p>stuff</p> again", unknown_attr: "Whoop"} }
+      let(:target) do
+        {reg_student_id: "party label", reg_address: "useful label", owner_email: "<p>stuff</p> again",
+         email_placeholder: "you@party.edu", unknown_attr: "Whoop"}
+      end
       let(:update_params) do
         {
           :organization => {name: "new name"},
@@ -224,6 +443,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
           "reg_label-reg_address" => "useful label",
           "reg_label-reg_organization_affiliation" => "  ",
           "reg_label-owner_email" => "<p>stuff</p> again ",
+          "reg_label-email_placeholder" => "you@party.edu",
           "reg_label-unknown_attr" => "Whoop"
 
         }
@@ -248,9 +468,9 @@ RSpec.describe Admin::OrganizationsController, type: :request do
       let(:update_params) do
         {
           name: "other namE",
-          search_radius_miles: "1222.2",
+          search_radius_miles: 1222.2,
           graduated_notification_interval_days: 4444,
-          passwordless_user_domain: "stuff.com"
+          user_email_domain: "stuff.com"
         }
       end
       it "updates the organization attributes" do
@@ -262,7 +482,7 @@ RSpec.describe Admin::OrganizationsController, type: :request do
           organization_stolen_message_search_radius_miles: 44,
           organization_stolen_message_kind: "association"
         }
-        expect(organization.reload).to match_hash_indifferently update_params
+        expect(organization.reload).to have_attributes update_params
         expect(organization_stolen_message.reload.kind).to eq "association"
         expect(organization_stolen_message.search_radius_miles).to eq 44
         # And it works with kilometers too

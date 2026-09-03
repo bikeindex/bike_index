@@ -47,10 +47,10 @@
       - impound_record = impound_claim.impound_record
       %tr
         %td
-          %a.convertTime.preciseTime{ href: organization_impound_claim_path(impound_claim.id, organization_id: impound_claim.organization_id) }
+          %a.localizeTime.preciseTime{ href: organization_impound_claim_path(impound_claim.id, organization_id: impound_claim.organization_id) }
             = l(impound_claim.created_at, format: :convert_time)
         %td
-          %span.convertTime.preciseTime
+          %span.localizeTime.preciseTime
             = l(impound_claim.updated_at, format: :convert_time)
         - unless skip_bike
           %td
@@ -71,5 +71,5 @@
         - if render_resolved_at
           %td
             - if impound_claim.resolved_at.present?
-              %span.convertTime.preciseTime
+              %span.localizeTime.preciseTime
                 = l(impound_claim.resolved_at, format: :convert_time)

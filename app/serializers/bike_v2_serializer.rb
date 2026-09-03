@@ -14,6 +14,7 @@ class BikeV2Serializer < ApplicationSerializer
     :registry_url,
     :serial,
     :status,
+    :for_sale,
     :stolen,
     :stolen_coordinates,
     :stolen_location,
@@ -46,13 +47,19 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   def status
-    object.status_humanized
+    return "found" if object.status_found?
+
+    Bike.status_humanized(object.status)
+  end
+
+  def for_sale
+    object.is_for_sale?
   end
 
   def location_found
-    return object.location_found if defined?(object.location)
     return nil unless object.status_impounded?
-    object.address
+
+    object.current_impound_record&.address_record&.formatted_address_string(render_country: true)
   end
 
   def date_stolen
@@ -60,11 +67,11 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   def thumb
-    @thumb ||= BikeDisplayer.thumb_image_url(object)
+    @thumb ||= BikeServices::Displayer.thumb_image_url(object)
   end
 
   def large_img
-    object.image_url(:large).presence || object.stock_photo_url
+    image_url.presence || object.stock_photo_url
   end
 
   def url
@@ -72,15 +79,16 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   def is_stock_img
-    object.image_url.blank? && object.stock_photo_url.present?
+    image_url.blank? && object.stock_photo_url.present?
   end
 
   def stolen_location
-    current_stolen_record&.address
+    StolenRecordV2Serializer.formatted_address_string_with_iso(current_stolen_record)
   end
 
   def stolen_coordinates
     return nil unless current_stolen_record&.latitude_public&.present?
+
     [current_stolen_record.latitude_public, current_stolen_record.longitude_public]
   end
 
@@ -93,6 +101,12 @@ class BikeV2Serializer < ApplicationSerializer
   end
 
   private
+
+  # Memoized — Bike#image_url issues a public_images SQL query per call.
+  def image_url
+    return @image_url if defined?(@image_url)
+    @image_url = object.image_url(:large)
+  end
 
   def current_stolen_record
     object.current_stolen_record

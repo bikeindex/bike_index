@@ -1,0 +1,45 @@
+<nav class="navbar navbar-expand-md navbar-light bg-light admin-navbar">
+  <span class="navbar-brand">
+    <%= link_to image_tag("logo.svg"), @user_root_url %>
+  </span>
+
+  <% if @current_user.superuser? %>
+    <ul class="navbar-nav d-none d-lg-flex">
+      <% shortcut_links.each do |link| %>
+        <li>
+          <%= render UI::ActiveLink::Component.from_item(link, html_class: NAV_LINK_CLASS,
+                text: link[:title]) %>
+        </li>
+      <% end %>
+
+      <% if mailer_links.any? %>
+        <li>
+          <%= render(UI::Dropdown::Component.new(name: "Mailers",
+                button_class: "#{NAV_LINK_CLASS} tw:mr-1 tw:cursor-pointer")) do |dropdown| %>
+            <% mailer_links.each do |title, path| %>
+              <% dropdown.with_entry_item { link_to title, path } %>
+            <% end %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+    <% if display_view_all? %>
+      <%# The same .nav-link outside the list, so it keeps the padding .navbar-nav overrode %>
+      <%= link_to current_nav_link[:path], class: "tw:block tw:py-2 tw:px-4 tw:no-underline text-muted em" do %>
+        All
+        <div class="d-none d-sm-inline-block d-lg-none d-xl-inline-block">
+          <%= view_all_title %>
+        </div>
+      <% end %>
+    <% end %>
+    <div
+      class="tw:mt-1 tw:min-w-75 tw:max-sm:min-w-60"
+      data-controller="admin--navbar"
+      data-action="hw-combobox:selection->admin--navbar#navigate"
+    >
+      <%= render(UI::Forms::Combobox::Component.new(name: :admin_navigation, options: combobox_options, placeholder:)) %>
+    </div>
+  <% end %>
+
+  <%= link_to "Exit Admin", root_path, class: "btn btn-outline-secondary ml-auto less-strong d-none d-lg-inline-block" %>
+</nav>

@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: lock_types
+# Database name: primary
 #
 #  id         :integer          not null, primary key
 #  name       :string(255)

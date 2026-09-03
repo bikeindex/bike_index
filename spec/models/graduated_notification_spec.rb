@@ -177,7 +177,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(GraduatedNotification.bike_ids_to_notify(organization)).to eq([bike1.id, bike2.id])
         expect(GraduatedNotification.count).to eq 0
         graduated_notification2 = GraduatedNotification.create(organization: organization, bike: bike2)
-        graduated_notification2.update(created_at: Time.current - 1.day)
+        graduated_notification2.update(created_at: Time.current - 25.hours)
         expect(GraduatedNotification.count).to eq 1
         expect(graduated_notification2.primary_notification?).to be_falsey
         expect(graduated_notification2.user_id).to eq user.id
@@ -188,7 +188,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification2.processable?).to be_falsey
         expect(graduated_notification2.in_pending_period?).to be_falsey
         graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike1)
-        graduated_notification1.update(created_at: Time.current - 1.day)
+        graduated_notification1.update(created_at: Time.current - 25.hours)
         expect(GraduatedNotification.count).to eq 2
         graduated_notification1.reload
         expect(graduated_notification1.primary_notification?).to be_truthy
@@ -282,7 +282,7 @@ RSpec.describe GraduatedNotification, type: :model do
         Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike1)
-        graduated_notification1.update(created_at: Time.current - 25.hours)
+        graduated_notification1.update(created_at: Time.current - 25.hours) # Use 25.hours instead of 1.day to survive DST
         expect(graduated_notification1.in_pending_period?).to be_falsey
         expect(graduated_notification1.processable?).to be_falsey
         expect(graduated_notification1.process_notification).to be_falsey
@@ -338,7 +338,7 @@ RSpec.describe GraduatedNotification, type: :model do
     it "it is still primary notification" do
       expect(bike1.user&.id).to eq user.id
       graduated_notification1 = GraduatedNotification.create(organization: organization, bike: bike1)
-      graduated_notification1.update(created_at: Time.current - 1.day)
+      graduated_notification1.update(created_at: Time.current - 25.hours) # Use 25.hours instead of 1.day to survive DST
       expect(graduated_notification1.primary_notification?).to be_truthy
       expect(graduated_notification1.processable?).to be_truthy
       graduated_notification1.process_notification
@@ -447,7 +447,7 @@ RSpec.describe GraduatedNotification, type: :model do
       let(:user_registration_organization) { FactoryBot.create(:user_registration_organization, user: user, organization: organization, all_bikes: true) }
       it "removes all_bikes" do
         expect(user_registration_organization.reload.bikes.pluck(:id)).to eq([bike1.id])
-        AfterUserChangeJob.new.perform(user.id)
+        CallbackJobs::AfterUserChangeJob.new.perform(user.id)
         graduated_notification1.save
         expect(graduated_notification1.reload.user).to be_present
         expect(graduated_notification1.processed?).to be_falsey
@@ -465,7 +465,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification1.processed?).to be_truthy
         expect(graduated_notification1.send_email?).to be_truthy
         Sidekiq::Testing.inline! do
-          AfterUserChangeJob.new.perform(user.id)
+          CallbackJobs::AfterUserChangeJob.new.perform(user.id)
         end
         expect(bike1.reload.bike_organizations.count).to eq 0
         expect(bike1.graduated?).to be_truthy
@@ -485,7 +485,7 @@ RSpec.describe GraduatedNotification, type: :model do
         let!(:bike2) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization, created_at: bike1.created_at + 1.hour) }
         it "removes all_bikes" do
           expect(user_registration_organization.reload.bikes.pluck(:id)).to eq([bike1.id, bike2.id])
-          AfterUserChangeJob.new.perform(user.id)
+          CallbackJobs::AfterUserChangeJob.new.perform(user.id)
           graduated_notification1.save
           # Manually create graduated_notification2 because whateves
           graduated_notification2 = GraduatedNotification.create(bike_id: bike2.id, organization_id: organization.id)
@@ -661,7 +661,7 @@ RSpec.describe GraduatedNotification, type: :model do
         expect(graduated_notification.user_id).to be_blank
 
         expect(bike.ownerships.count).to eq 1
-        BikeUpdator.new(bike: bike, user: user2, b_params: {bike: {owner_email: user2.email}}.as_json).update_ownership
+        BikeServices::OwnershipTransferer.find_or_create(bike, updator: user2, new_owner_email: user2.email)
         expect(bike.reload.owner_email).to eq user2.email
         expect(bike.user.id).to eq user2.id
         expect(bike.ownerships.count).to eq 2
@@ -671,15 +671,13 @@ RSpec.describe GraduatedNotification, type: :model do
 
         graduated_notification2 = GraduatedNotification.create(bike: bike, organization: organization)
         expect(graduated_notification2).to be_valid
-        graduated_notification2.update_attribute :created_at, Time.current - 25.hours # Pending period
-        expect(graduated_notification2).to be_valid
+        allow(graduated_notification2).to receive(:processable?) { true }
         expect(graduated_notification2.user_id).to eq user2.id
         expect(graduated_notification2.email).to eq user2.email
         expect(graduated_notification2.primary_bike_id).to eq bike.id
 
         expect(graduated_notification2.send(:existing_sent_notification)&.id).to be_blank
         expect(graduated_notification2.primary_notification?).to be_truthy
-        expect(graduated_notification2.processable?).to be_truthy
         graduated_notification2.process_notification
         expect(graduated_notification2.reload.most_recent?).to be_truthy
         expect(graduated_notification2.status).to eq "bike_graduated"

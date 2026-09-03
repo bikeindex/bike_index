@@ -13,8 +13,12 @@
 
     .processing
       = t(".processing")
-    - if image.image?
-      %img{ src: image.image_url(:small) }
+    - if image.image_present?
+      -# Versions are generated in a background job; the versioned src can 404 until the
+      -# worker finishes, so image_fallback swaps to the synchronously-stored original
+      - original_url = image.image_url
+      %img{ src: image.image_url(:small) || original_url,
+        data: { controller: "image-fallback", action: "error->image-fallback#useOriginal", "image-fallback-url-value": original_url } }
     - else
       %em.missing-image
         = t(".missing_image")
@@ -23,6 +27,6 @@
         %input.is_private_check{type: 'checkbox', checked: image.is_private}
         = t(".keep_image_private")
       .remove-wrapper
-        %a.photo-remove{href: public_image_url(image, imageable_type: @bike.class.name, edit_template: 'photos', return_url: edit_bike_url(@bike, edit_template: 'photos')), rel: 'nofollow', 'data-method' => 'delete'}
+        %a.photo-remove{href: public_image_url(image, imageable_type: @bike.class.name, edit_template: 'photos', return_url: edit_bike_url(@bike, edit_template: 'photos')), rel: 'nofollow', 'data-method' => 'delete', 'aria-label' => t(".remove_image")}
           = render 'shared/trash_icon'
 

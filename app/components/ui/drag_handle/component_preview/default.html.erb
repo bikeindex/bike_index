@@ -1,0 +1,17 @@
+<div
+  data-controller="sortable"
+  class="
+    tw:max-w-md tw:divide-y tw:divide-gray-200 tw:rounded tw:border
+    tw:border-gray-200
+  "
+>
+  <% ["First item", "Second item", "Third item"].each do |label| %>
+    <div
+      data-sortable-target="item"
+      class="tw:flex tw:items-center tw:gap-3 tw:p-3"
+    >
+      <%= render UI::DragHandle::Component.new(controller: "sortable") %>
+      <span><%= label %></span>
+    </div>
+  <% end %>
+</div>

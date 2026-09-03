@@ -18,7 +18,6 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
         location.reload(true)
 
   initializeImageUploads: ->
-    initializeSortablePhotos = @initializeSortablePhotos
     finished_upload_template = $('#image-upload-finished-template').html()
     Mustache.parse(finished_upload_template)
     $('#new_public_image').fileupload
@@ -37,22 +36,21 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
         if data.context
           progress = parseInt(data.loaded / data.total * 95, 10) # Multiply by 95, so that it doesn't look done, since progress doesn't work.
           data.context.find('.progress').text(progress + '%')
-      done: (e, data) ->
-        initializeSortablePhotos()
+      done: (e, data) =>
+        @initializeSortablePhotos()
         file = data.files[0]
         $.each(data.files, (index, file) ->
           data.context.addClass('finished_upload')
             .html(Mustache.render(finished_upload_template, file)).fadeOut()
           )
 
-  initializeSortablePhotos: ->
+  initializeSortablePhotos: =>
     $sortable_container = $('#public_images')
     $sortable_container.sortable('destroy') # In case we're reinitializing it
-    pushImageOrder = @pushImageOrder
     $sortable_container.sortable
-      onDrop: ($item, container, _super) ->
+      onDrop: ($item, container, _super) =>
         # Push image order
-        pushImageOrder($sortable_container)
+        @pushImageOrder($sortable_container)
         # Run the things we're expected to run
         _super($item, container)
 

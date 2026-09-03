@@ -1,0 +1,53 @@
+<div
+  class="tw:flow-root tw:rounded-sm tw:border tw:p-4 tw:transition-all tw:duration-300 <%= @margin_classes %> <%= color_classes %>"
+  role="alert"
+  data-controller="ui--alert"
+>
+  <div class="tw:float-left tw:mr-2 tw:flex tw:w-4 tw:items-center <%= icon_classes %>">
+    <% if @icon.present? %>
+      <%= @icon %>
+    <% else %>
+      <%= helpers.inline_svg_tag(default_icon, class: "tw:h-4 tw:w-4", aria_hidden: true) %>
+    <% end %>
+
+    <span class="tw:sr-only"><%= announcement %></span>
+  </div>
+
+  <% if @dismissable %>
+    <button
+      type="button"
+      class="tw:float-right tw:-my-1.5 tw:-mr-1.5 tw:ml-4 tw:inline-flex tw:h-8 tw:w-8 tw:items-center tw:justify-center tw:rounded-sm tw:p-1.5 tw:focus:ring-2 <%= dismissable_color_classes %>"
+      aria-label="Close"
+      data-action="click->ui--alert#close"
+    >
+      <span class="tw:sr-only">Close</span>
+
+      <svg
+        class="tw:h-3 tw:w-3"
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 14 14"
+      >
+        <path
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+        />
+      </svg>
+    </button>
+  <% end %>
+
+  <% if @header.present? %>
+    <h4 class="tw:mb-2 tw:font-sans tw:text-lg tw:normal-case <%= header_color_classes %>">
+      <%= @header %>
+    </h4>
+  <% end %>
+
+  <div class="twalert-body">
+    <%= @text %>
+    <%= content %>
+  </div>
+</div>

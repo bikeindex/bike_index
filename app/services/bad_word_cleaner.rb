@@ -1,8 +1,11 @@
-class BadWordCleaner
+module BadWordCleaner
+  extend Functionable
+
   BAD_WORDS = %w[ass bastard bitch chink cock cum cunt damn fuck nigger shit spic]
 
-  def self.clean(str)
+  def clean(str)
     return nil unless str.present?
+
     duped_str = str.dup
     BAD_WORDS.each { |w| duped_str.gsub!(/#{w}/i, "*" * w.length) }
     duped_str

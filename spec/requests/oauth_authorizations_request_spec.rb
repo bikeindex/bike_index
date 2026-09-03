@@ -6,6 +6,16 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
   let(:scope_param) { "scope=read_bikes+read_user" }
   let(:authorization_url) { "/oauth/authorize?redirect_uri=#{CGI.escape(doorkeeper_app.redirect_uri)}&client_id=#{doorkeeper_app.uid}&response_type=code&#{scope_param}" }
 
+  def delivered_url(matcher)
+    ActionMailer::Base.deliveries.last.body.parts.first.decoded[matcher]
+  end
+
+  # What the emailed link's page posts onward - the destination rides in one of these
+  def hidden_fields
+    Capybara.string(response.body).all("form input[type=hidden]", visible: :all)
+      .to_h { |input| [input[:name], input[:value]] }
+  end
+
   context "no current user present" do
     it "redirects to sign in" do
       get authorization_url
@@ -13,6 +23,67 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
       expect(session[:return_to]).to match(/#{doorkeeper_app.uid}/)
       expect(session[:partner]).to be_nil
       expect(flash).to be_blank
+    end
+    # A native app hands OAuth to a webview; the magic link then opens in the phone's browser,
+    # which has none of that session
+    context "signing in with a magic link opened in another browser" do
+      let(:user) { FactoryBot.create(:user_confirmed, passwordless_user: true) }
+
+      it "resumes the authorization" do
+        get authorization_url
+        Sidekiq::Testing.inline! do
+          post "/session/identify", params: {session: {email: user.email}}
+        end
+        emailed_url = delivered_url(%r{https?://\S+/session/magic_link\S*})
+        expect(emailed_url).to include CGI.escape("client_id=#{doorkeeper_app.uid}")
+
+        reset! # Wipe the session, as opening the link in a different browser does
+        get emailed_url
+        post "/session/sign_in_with_magic_link", params: hidden_fields
+        expect(response).to redirect_to(/#{doorkeeper_app.uid}/)
+      end
+    end
+
+    # Reached from this sign-in page's "forgot your password" link
+    context "resetting a password in another browser" do
+      let(:user) { FactoryBot.create(:user_confirmed) }
+      let(:password) { "reasonable_password" }
+
+      it "resumes the authorization" do
+        get authorization_url
+        Sidekiq::Testing.inline! do
+          post "/users/send_password_reset_email", params: {email: user.email}
+        end
+        emailed_url = delivered_url(%r{https?://\S+/users/update_password_form_with_reset_token\S*})
+        expect(emailed_url).to include CGI.escape("client_id=#{doorkeeper_app.uid}")
+
+        reset!
+        get emailed_url
+        post "/users/update_password_with_reset_token",
+          params: hidden_fields.merge(user: {password:, password_confirmation: password})
+        expect(response).to redirect_to(/#{doorkeeper_app.uid}/)
+      end
+    end
+
+    # Reached because identify sends an email with no account to the signup form
+    context "signing up and confirming in another browser" do
+      let(:email) { "newperson@example.com" }
+
+      it "resumes the authorization" do
+        get authorization_url
+        Sidekiq::Testing.inline! do
+          post "/users", params: {user: {email:, name: "New Person", terms_of_service: "1"}}
+        end
+        user = User.find_by(email:)
+        emailed_url = delivered_url(%r{https?://\S+/users/confirm\S*})
+        expect(emailed_url).to include CGI.escape("client_id=#{doorkeeper_app.uid}")
+
+        reset!
+        get emailed_url
+        post "/users/confirm", params: hidden_fields
+        expect(user.reload.confirmed?).to be_truthy
+        expect(response).to redirect_to(/#{doorkeeper_app.uid}/)
+      end
     end
     context "partner parameter" do
       it "redirects to sign in with the partners parameter included" do
@@ -53,6 +124,33 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
         expect(response).to render_template(:new)
         expect(response.body).to match(/authorize/i)
         expect(response.body).to match(/form action=.\/oauth\/authorize/)
+        expect(response.body).to_not include("fbevents.js")
+        expect(response.body).to match(/nav class="primary-header-nav"/)
+        expect(response.body).to_not include("primary-main-menu")
+      end
+      context "non-https redirect_uri" do
+        before { doorkeeper_app.update(redirect_uri:) }
+
+        context "custom scheme, like a native app" do
+          let(:redirect_uri) { "bikeindex://oauth-callback" }
+          it "renders without the insecure authorization modal" do
+            get authorization_url
+            expect(response.code).to eq("200")
+            expect(response.body).to_not match("insecure-authorization-modal")
+          end
+        end
+
+        context "cleartext http" do
+          let(:redirect_uri) { "http://app.com" }
+          it "renders the insecure authorization modal, its cancel button denying" do
+            get authorization_url
+            expect(response.code).to eq("200")
+            expect(response.body).to match("insecure-authorization-modal")
+            # Cancelling has to deny - closing the modal is the documented way to continue anyway
+            expect(response.body).to match(/<form[^>]*id="deny-authorization"/)
+            expect(response.body).to match(/<button[^>]*form="deny-authorization"/)
+          end
+        end
       end
       context "no scope" do
         let(:scope_param) { "" }
@@ -150,6 +248,65 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
           expect(access_token.resource_owner_id).to eq current_user.id
           expect(access_token.scopes).to match_array(%w[write_bikes read_bikes])
         end
+      end
+    end
+
+    describe "authorization_code flow with PKCE" do
+      let(:code_verifier) { "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk" }
+      let(:code_challenge) { Base64.urlsafe_encode64(Digest::SHA256.digest(code_verifier), padding: false) }
+      let(:code_challenge_method) { "S256" }
+      let(:authorize_params) { "response_type=code&redirect_uri=#{doorkeeper_app.redirect_uri}&client_id=#{doorkeeper_app.uid}&scope=read_bikes&code_challenge=#{code_challenge}&code_challenge_method=#{code_challenge_method}" }
+      # No client_secret - the point of PKCE is securing public clients, which can't keep one
+      let(:token_params) { "grant_type=authorization_code&redirect_uri=#{doorkeeper_app.redirect_uri}&client_id=#{doorkeeper_app.uid}" }
+      let(:auth_code) do
+        post "/oauth/authorize?#{authorize_params}"
+        response.redirect_url[/code=[^&]*/i].gsub(/code=/i, "")
+      end
+
+      it "stores the challenge and exchanges the code for a token" do
+        expect(Doorkeeper::AccessGrant.find_by(token: auth_code).code_challenge).to eq code_challenge
+        post "/oauth/token?#{token_params}&code=#{auth_code}&code_verifier=#{code_verifier}"
+        expect(Doorkeeper::AccessToken.count).to eq 1
+        expect(json_result["access_token"]).to eq Doorkeeper::AccessToken.last.token
+      end
+
+      context "mismatched code_verifier" do
+        it "refuses the token" do
+          post "/oauth/token?#{token_params}&code=#{auth_code}&code_verifier=#{code_verifier.reverse}"
+          expect(response.code).to eq("400")
+          expect(json_result["error"]).to eq "invalid_grant"
+          expect(Doorkeeper::AccessToken.count).to eq 0
+        end
+      end
+
+      context "missing code_verifier" do
+        it "refuses the token" do
+          post "/oauth/token?#{token_params}&code=#{auth_code}"
+          expect(response.code).to eq("400")
+          expect(json_result["error"]).to eq "invalid_request"
+          expect(Doorkeeper::AccessToken.count).to eq 0
+        end
+      end
+
+      context "code_challenge_method=plain" do
+        let(:code_challenge_method) { "plain" }
+        let(:code_challenge) { code_verifier }
+        it "refuses to authorize" do
+          get "/oauth/authorize?#{authorize_params}"
+          expect(response.code).to eq("400")
+          expect(response).to render_template(:error)
+          expect(response.body).to match("code_challenge_method must be S256")
+          expect(Doorkeeper::AccessGrant.count).to eq 0
+        end
+      end
+    end
+
+    describe "password flow" do
+      it "isn't supported, even with valid credentials" do
+        post "/oauth/token?grant_type=password&client_id=#{doorkeeper_app.uid}&client_secret=#{doorkeeper_app.secret}&username=#{CGI.escape(current_user.email)}&password=testthisthing7$&scope=read_bikes"
+        expect(response.code).to eq("400")
+        expect(json_result["error"]).to eq "unsupported_grant_type"
+        expect(Doorkeeper::AccessToken.count).to eq 0
       end
     end
 

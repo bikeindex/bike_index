@@ -1,0 +1,7 @@
+<div class="tw:mx-auto tw:max-w-3xl tw:py-4">
+  <%= render Pages::Admin::RegistrationSequence::Header::Component.new(registration_sequence: @registration_sequence, mode: :edit) %>
+
+  <%= render Pages::Org::RegistrationSequence::Edit::Component.new(registration_sequence: @registration_sequence, admin: true) %>
+
+  <%= render Pages::Admin::RegistrationSequence::DiscardDraft::Component.new(registration_sequence: @registration_sequence) %>
+</div>

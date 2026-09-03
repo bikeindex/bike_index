@@ -1,17 +1,18 @@
-# See PR#2483 - frequency can definitely be dropped a month or 2 after 2023-11
 class ScheduledAutocompleteCheckJob < ScheduledJob
   prepend ScheduledJobRecorder
 
   def self.frequency
-    4.minutes
+    1.day
   end
 
   def perform
-    if too_few_autocomplete_manufacturers?
-      AutocompleteLoaderJob.perform_async
-      raise "Missing Manufacturers!"
-    end
+    return unless too_few_autocomplete_manufacturers?
+
+    AutocompleteLoaderJob.new.perform
+    raise "Missing Manufacturers!" if too_few_autocomplete_manufacturers?
   end
+
+  private
 
   def too_few_autocomplete_manufacturers?
     Autocomplete::Loader.frame_mnfg_count < Manufacturer.frame_makers.count

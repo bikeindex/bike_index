@@ -5,7 +5,7 @@ RSpec.describe Integrations::BikeBook do
 
   describe "get_model" do
     it "returns a hash with the model for Co-motion" do
-      VCR.use_cassette("bike_book_integration-comotion", re_record_interval: re_record_interval) do
+      VCR.use_cassette("bike_book_integration-comotion", re_record_interval:) do
         manufacturer = FactoryBot.create(:manufacturer, name: "Co-Motion")
         bike = {manufacturer: manufacturer.name, frame_model: "Americano Rohloff", year: 2014}
         response = Integrations::BikeBook.new.get_model(bike)
@@ -16,7 +16,7 @@ RSpec.describe Integrations::BikeBook do
     end
 
     it "returns a hash of the model for Surly" do
-      VCR.use_cassette("bike_book_integration-surly", re_record_interval: re_record_interval) do
+      VCR.use_cassette("bike_book_integration-surly", re_record_interval:) do
         manufacturer = FactoryBot.create(:manufacturer, name: "Surly")
         bike = {manufacturer: manufacturer.name, frame_model: "Pugsley", year: 2013}
         response = Integrations::BikeBook.new.get_model(bike)
@@ -26,7 +26,7 @@ RSpec.describe Integrations::BikeBook do
     end
 
     it "returns nothing if it fails" do
-      VCR.use_cassette("bike_book_integration-fail", re_record_interval: re_record_interval) do
+      VCR.use_cassette("bike_book_integration-fail", re_record_interval:) do
         manufacturer = FactoryBot.create(:manufacturer, name: "Some crazy manufacturer we have nothing on")
         bike = {manufacturer: manufacturer.name, frame_model: "Pugsley", year: 2014}
         response = Integrations::BikeBook.new.get_model(bike)
@@ -37,7 +37,7 @@ RSpec.describe Integrations::BikeBook do
 
   describe "get_model_list" do
     it "doesn't fail if bikebook is down" do
-      VCR.use_cassette("bike_book_integration-models", re_record_interval: re_record_interval) do
+      VCR.use_cassette("bike_book_integration-models", re_record_interval:) do
         manufacturer = FactoryBot.create(:manufacturer, name: "Giant")
         all_giants = Integrations::BikeBook.new.get_model_list(manufacturer: manufacturer.name)
         expect(all_giants.is_a?(Array)).to be_truthy
@@ -48,7 +48,7 @@ RSpec.describe Integrations::BikeBook do
     end
 
     it "returns an array with the models for Giant, and a smaller array for a specific year of giant" do
-      VCR.use_cassette("bike_book_integration-models-more", re_record_interval: re_record_interval) do
+      VCR.use_cassette("bike_book_integration-models-more", re_record_interval:) do
         manufacturer = FactoryBot.create(:manufacturer, name: "Giant")
         all_giants = Integrations::BikeBook.new.get_model_list(manufacturer: manufacturer.name)
         expect(all_giants.is_a?(Array)).to be_truthy
@@ -59,11 +59,21 @@ RSpec.describe Integrations::BikeBook do
     end
 
     it "returns nothing if it fails" do
-      VCR.use_cassette("bike_book_integration-models-fail", re_record_interval: re_record_interval) do
+      VCR.use_cassette("bike_book_integration-models-fail", re_record_interval:) do
         manufacturer = FactoryBot.create(:manufacturer, name: "Some weird manufacturer")
         response = Integrations::BikeBook.new.get_model_list(manufacturer: manufacturer.name)
         expect(response).to be_nil
       end
+    end
+  end
+
+  # Registration renders inline, so an unreachable bikebook has to drop rather than block
+  describe "make_request timing out" do
+    after { WebMock.reset! } # this stub is registered outside a VCR cassette
+
+    it "returns nil" do
+      WebMock.stub_request(:get, /bikebook\.io/).to_timeout
+      expect(Integrations::BikeBook.new.get_model_list(manufacturer: "Giant")).to be_nil
     end
   end
 end

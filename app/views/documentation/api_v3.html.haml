@@ -1,7 +1,8 @@
 !!!
 %html
   %head
-    = header_tags
+    = render(SharedBlocks::HeaderTags::Component.new(**header_tags_component_options))
+    = csrf_meta_tags
     = stylesheet_link_tag 'documentation_v2', media: "all"
     = stylesheet_link_tag 'og_application', media: 'all'
     - api_version = 'v3'
@@ -87,6 +88,9 @@
         %li
           %a#m_ref_oauth_flows{ href: "#ref_oauth_flows" }
             OAuth flows
+        %li
+          %a#m_ref_pkce{ href: "#ref_pkce" }
+            PKCE
         %li
           %a#m_ref_applications_authorized{ href: "#ref_applications_authorized" }
             Applications authorized

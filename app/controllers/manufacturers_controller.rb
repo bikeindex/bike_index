@@ -1,13 +1,10 @@
 class ManufacturersController < ApplicationController
   def index
-    @manufacturers = Manufacturer.all
+    @manufacturers = Manufacturer.except_other
+
     respond_to do |format|
       format.html
-      format.csv { render plain: @manufacturers.to_csv }
+      format.csv { render plain: Spreadsheets::Manufacturers.to_csv(@manufacturers) }
     end
-  end
-
-  def tsv
-    redirect_to "https://files.bikeindex.org/uploads/tsvs/manufacturers.tsv", allow_other_host: true
   end
 end

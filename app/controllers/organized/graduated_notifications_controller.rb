@@ -1,17 +1,28 @@
 module Organized
   class GraduatedNotificationsController < Organized::BaseController
-    include SortableTable
+    include Binxtils::SortableTable
+
     before_action :ensure_access_to_graduated_notifications!
-    before_action :set_period, only: [:index]
+
     before_action :find_graduated_notification, except: [:index]
+    around_action :set_reading_role, only: :index
 
     def index
-      @per_page = params[:per_page] || 25
-      @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
-      @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
+      @per_page = permitted_per_page
+      @render_results = Binxtils::InputNormalizer.boolean(params[:search_no_js]) || turbo_request?
+      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
+      @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
-      @pagy, @graduated_notifications = pagy(available_graduated_notifications.reorder("graduated_notifications.#{sort_column} #{sort_direction}")
-        .includes(:user, :bike, :secondary_notifications), limit: @per_page)
+      if chart_only?
+        render UI::ChartAsyncFrame::Component.new(id: :graduated_notifications_chart_frame, chart: graduated_notifications_chart), layout: false
+      elsif @render_results
+        @pagy, @graduated_notifications = pagy(:countish, available_graduated_notifications.reorder("graduated_notifications.#{sort_column} #{sort_direction}")
+          .includes(:user, :bike, :secondary_notifications), limit: @per_page, page: permitted_page)
+        respond_to do |format|
+          format.html
+          format.turbo_stream
+        end
+      end
     end
 
     def show
@@ -29,12 +40,26 @@ module Organized
       %w[created_at processed_at email marked_remaining_at]
     end
 
+    def graduated_notifications_chart
+      return nil if available_graduated_notifications.blank?
+
+      UI::Chart::Component.new(
+        series: UI::Chart::Component.time_range_counts(
+          collection: available_graduated_notifications.unscope(:order),
+          time_range: @time_range,
+          column: "graduated_notifications.created_at"
+        ),
+        time_range: @time_range,
+        stacked: true
+      )
+    end
+
     def user_search_params_present?
       %i[search_email user_id].any? { |k| params[k].present? }
     end
 
     def separate_secondary_notifications?
-      @separate_secondary_notifications ||= InputNormalizer.boolean(params[:search_secondary])
+      @separate_secondary_notifications ||= Binxtils::InputNormalizer.boolean(params[:search_secondary])
     end
 
     def search_params_present?
@@ -44,6 +69,7 @@ module Organized
 
     def available_graduated_notifications
       return @available_graduated_notifications if defined?(@available_graduated_notifications)
+
       if params[:search_status] == "all"
         @search_status = "all"
         a_graduated_notifications = graduated_notifications
@@ -63,9 +89,7 @@ module Organized
         a_graduated_notifications = a_graduated_notifications.where(bike_id: bikes.pluck(:id))
       end
       if params[:user_id].present?
-        @user = User.find_by_id(params[:user_id])
-        # Don't use @user to lookup, so even if user isn't found, we still search the id
-        a_graduated_notifications = a_graduated_notifications.where(user_id: params[:user_id])
+        a_graduated_notifications = a_graduated_notifications.where(user_id: user_subject&.id || params[:user_id])
       elsif params[:search_email].present?
         email = EmailNormalizer.normalize(params[:search_email])
         a_graduated_notifications = a_graduated_notifications.where("email ILIKE ?", "%#{email}%")
@@ -83,6 +107,7 @@ module Organized
 
     def ensure_access_to_graduated_notifications!
       return true if current_organization.enabled?("graduated_notifications") || current_user.superuser?
+
       raise_do_not_have_access!
     end
   end

@@ -13,7 +13,9 @@ class CleanBParamsJob < ScheduledJob
     b_params.delete_all
   end
 
+  # Registrations that made their bike, plus never-submitted blank shells
   def b_params
-    BParam.with_bike.where("updated_at < ?", self.class.clean_before)
+    stale = BParam.where("updated_at < ?", self.class.clean_before)
+    stale.with_bike.or(stale.without_bike_values)
   end
 end

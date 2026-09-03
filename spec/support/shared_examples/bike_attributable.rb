@@ -53,12 +53,27 @@ RSpec.shared_examples "bike_attributable" do
         expect(obj.propulsion_titleize).to eq "Throttle"
       end
     end
+    context "pedal-assist" do
+      let(:type) { "bike" }
+      let(:propulsion_type) { "pedal-assist" }
+      it "returns expected" do
+        expect(obj.propulsion_titleize).to eq "Pedal Assist"
+      end
+    end
+    context "pedal-assist-and-throttle" do
+      let(:type) { "bike" }
+      let(:propulsion_type) { "pedal-assist-and-throttle" }
+      it "returns expected" do
+        expect(obj.propulsion_titleize).to eq "Pedal Assist and Throttle"
+      end
+    end
     context "personal-mobility" do
       let(:type) { "personal-mobility" }
       let(:propulsion_type) { "throttle" }
       it "returns expected" do
-        expect(obj.type).to eq "e-skateboard (e-unicycle, personal mobility device, etc)"
-        expect(obj.type_titleize).to eq "e-Skateboard (e-Unicycle, Personal mobility device, etc)"
+        expect(obj.cycle_type_name).to eq "e-Personal Mobility (EPAMD, e-Skateboard, Segway, e-Unicycle, etc)"
+        expect(obj.type).to eq "e-personal mobility"
+        expect(obj.type_titleize).to eq "e-Personal Mobility"
         expect(obj.propulsion_titleize).to eq "Throttle"
       end
     end
@@ -85,6 +100,22 @@ RSpec.shared_examples "bike_attributable" do
     it "returns the normalized name" do
       normalized_name = PropulsionType.new(obj.propulsion_type).name
       expect(obj.propulsion_type_name).to eq(normalized_name)
+    end
+  end
+
+  describe "drivetrain_attributes" do
+    let(:obj) { FactoryBot.build(model_sym, coaster_brake:, belt_drive:) }
+    let(:coaster_brake) { false }
+    let(:belt_drive) { false }
+    it "returns empty" do
+      expect(obj.drivetrain_attributes).to eq ""
+    end
+    context "with belt_drive and coaster_brake" do
+      let(:coaster_brake) { true }
+      let(:belt_drive) { true }
+      it "returns empty" do
+        expect(obj.drivetrain_attributes).to eq "Coaster brake, Belt drive"
+      end
     end
   end
 
@@ -142,6 +173,51 @@ RSpec.shared_examples "bike_attributable" do
           expect(obj.propulsion_type).to eq "throttle"
         end
       end
+    end
+  end
+
+  describe "cached_data_array" do
+    let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
+    let(:primary_frame_color) { Color.friendly_find("Purple") || FactoryBot.create(:color, name: "Purple") }
+    let(:secondary_frame_color) { Color.friendly_find("Red") || FactoryBot.create(:color, name: "Red") }
+    let(:tertiary_frame_color) { Color.friendly_find("Silver, gray or bare metal") || FactoryBot.create(:color, name: "Silver, gray or bare metal") }
+    let(:rear_wheel_size) { FactoryBot.create(:wheel_size, name: "26") }
+    let(:front_wheel_size) { FactoryBot.create(:wheel_size, name: "20") }
+    let(:paint) { FactoryBot.create(:paint, name: "fluorescent green") }
+    let(:obj) do
+      FactoryBot.create(model_sym,
+        manufacturer:,
+        cycle_type: "cargo",
+        propulsion_type: "pedal-assist",
+        frame_material: "steel",
+        year: 2020,
+        frame_model: "Cross-Check",
+        frame_size: "m",
+        primary_frame_color:,
+        secondary_frame_color:,
+        tertiary_frame_color:,
+        rear_wheel_size:,
+        front_wheel_size:,
+        extra_registration_number: "EXTRA-123",
+        paint:)
+    end
+    it "includes all cached attributes" do
+      expect(obj.cached_data_array).to match_array([
+        obj.mnfg_name,
+        obj.propulsion_type_name,
+        obj.year,
+        obj.primary_frame_color.name,
+        obj.secondary_frame_color.name,
+        obj.tertiary_frame_color.name,
+        "fluorescent green",
+        obj.frame_material_name,
+        obj.frame_size,
+        obj.frame_model,
+        "#{obj.rear_wheel_size.name} wheel",
+        "#{obj.front_wheel_size.name} wheel",
+        obj.extra_registration_number,
+        obj.type
+      ])
     end
   end
 

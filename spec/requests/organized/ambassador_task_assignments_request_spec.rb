@@ -8,7 +8,7 @@ RSpec.describe Organized::AmbassadorTaskAssignmentsController, type: :request do
 
     context "given completed: false" do
       it "unsets the task's completed_at value" do
-        assignment = FactoryBot.create(:ambassador_task_assignment, :completed)
+        assignment = FactoryBot.create(:ambassador_task_assignment, :completed, ambassador: current_user)
 
         patch "#{base_url}/#{assignment.to_param}",
           params: {
@@ -17,14 +17,14 @@ RSpec.describe Organized::AmbassadorTaskAssignmentsController, type: :request do
 
         expect(response).to redirect_to(organization_ambassador_dashboard_url)
         expect(assignment.reload.completed_at).to be_nil
-        expect(flash[:info]).to match("status updated")
+        expect(flash[:notice]).to match("status updated")
         expect(flash[:error]).to be_blank
       end
     end
 
     context "given completed: true" do
       it "sets the task's completed_at value" do
-        assignment = FactoryBot.create(:ambassador_task_assignment)
+        assignment = FactoryBot.create(:ambassador_task_assignment, ambassador: current_user)
         expect(assignment.reload.completed_at).to be_nil
 
         patch "#{base_url}/#{assignment.to_param}",
@@ -34,16 +34,15 @@ RSpec.describe Organized::AmbassadorTaskAssignmentsController, type: :request do
 
         expect(response).to redirect_to(organization_ambassador_dashboard_url)
         expect(assignment.reload.completed_at).to_not be_nil
-        expect(flash[:info]).to match("status updated")
+        expect(flash[:notice]).to match("status updated")
         expect(flash[:error]).to be_blank
       end
     end
 
     context "given a failed update" do
       it "sets the flash error message" do
-        assignment = FactoryBot.create(:ambassador_task_assignment)
-        allow(assignment).to receive(:update).and_return(false)
-        allow(AmbassadorTaskAssignment).to receive(:find).and_return(assignment)
+        assignment = FactoryBot.create(:ambassador_task_assignment, ambassador: current_user)
+        allow_any_instance_of(AmbassadorTaskAssignment).to receive(:update).and_return(false)
 
         patch "#{base_url}/#{assignment.to_param}",
           params: {
@@ -52,8 +51,19 @@ RSpec.describe Organized::AmbassadorTaskAssignmentsController, type: :request do
 
         expect(response).to redirect_to(organization_ambassador_dashboard_url)
         expect(assignment.reload.completed_at).to_not be_present
-        expect(flash[:info]).to be_blank
+        expect(flash[:notice]).to be_blank
         expect(flash[:error]).to match("Could not update")
+      end
+    end
+
+    context "given another ambassador's assignment" do
+      it "does not update it" do
+        assignment = FactoryBot.create(:ambassador_task_assignment, :completed)
+
+        patch "#{base_url}/#{assignment.to_param}", params: {completed: "false"}
+
+        expect(response.status).to eq(404)
+        expect(assignment.reload.completed_at).to be_present
       end
     end
   end

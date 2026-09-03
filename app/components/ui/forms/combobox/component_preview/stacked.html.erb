@@ -1,0 +1,11 @@
+<% status_options = {"status_with_owner" => ["I own it", "Register a bike you own, so you can prove it's yours"],
+  "status_stolen" => ["It was stolen", "Report a bike stolen so others can help find it"],
+  "status_impounded" => ["I found it", "Log a bike you found, to reunite it with its owner"]}.map do |status, (title, description)|
+  content = safe_join([tag.span(title, class: "tw:block tw:font-semibold"),
+    tag.span(description, class: "tw:block tw:text-xs tw:text-gray-500")])
+  {display: title, value: status, content:}
+end %>
+
+<%= render(UI::Forms::Group::Component.new(attribute: :status, label_text: "Registration type")) do %>
+  <%= render(UI::Forms::Combobox::Component.new(name: :status, options: status_options, rich_display: :stacked)) %>
+<% end %>

@@ -3,16 +3,23 @@ require "rails_helper"
 RSpec.describe ProcessImpoundUpdatesJob, type: :job do
   let(:instance) { described_class.new }
 
-  let(:bike) { FactoryBot.create(:bike, updated_at: Time.current - 2.hours) }
+  let(:bike) { FactoryBot.create(:bike, :with_ownership, updated_at: Time.current - 2.hours) }
   let(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
   let(:impound_record_update) { FactoryBot.build(:impound_record_update, impound_record: impound_record, processed: false, kind: kind) }
   let(:kind) { "note" }
+
+  context "when impound_record not found" do
+    it "returns without error" do
+      expect { instance.perform(999999) }.not_to raise_error
+    end
+  end
 
   it "resolves the impound_record_update" do
     impound_record.reload
     # The factory force updates bike, so force un-update
     bike.update_columns(status: "status_with_owner", current_impound_record_id: nil)
     expect(bike.reload.status).to eq "status_with_owner"
+    expect(bike.current_ownership.status).to eq "status_with_owner"
 
     impound_record_update.save
     Sidekiq::Job.clear_all
@@ -24,6 +31,7 @@ RSpec.describe ProcessImpoundUpdatesJob, type: :job do
 
     expect(bike.reload.status).to eq "status_impounded"
     expect(bike.updated_at).to be_within(1).of Time.current
+    expect(bike.current_ownership.reload.status).to eq "status_with_owner"
   end
 
   context "unregistered_parking_notification" do
@@ -77,6 +85,18 @@ RSpec.describe ProcessImpoundUpdatesJob, type: :job do
         expect(impound_record2.display_id).to eq (og_id_integer + 2).to_s
         expect(impound_record3.display_id).to eq (og_id_integer + 1).to_s
       end
+    end
+  end
+
+  context "organization deleted" do
+    let(:organization) { impound_record.organization }
+    it "doesn't error" do
+      expect(impound_record.organized?).to be_truthy
+      organization.destroy
+      impound_record.reload
+      expect(impound_record.organization_id).to be_present
+      expect(impound_record.organization).to be_nil
+      described_class.new.perform(impound_record.id)
     end
   end
 
@@ -142,11 +162,21 @@ RSpec.describe ProcessImpoundUpdatesJob, type: :job do
 
       expect(Bike.unscoped.find(bike.id).deleted?).to be_truthy
     end
+
+    context "bike already deleted" do
+      it "doesn't error" do
+        impound_record_update.save
+        bike.destroy
+        Sidekiq::Job.clear_all
+        described_class.new.perform(impound_record.id)
+        expect(impound_record_update.reload.processed?).to be_truthy
+      end
+    end
   end
 
   context "transferred_to_new_owner" do
     let(:kind) { "transferred_to_new_owner" }
-    let!(:ownership) { FactoryBot.create(:ownership, bike: bike, claimed: false) }
+    let!(:ownership) { bike.reload.current_ownership }
     let!(:impound_record_update) do
       impound_record.impound_record_updates.create(processed: false,
         kind: kind,

@@ -16,7 +16,8 @@
   }
 }
 
-// Duplicated from period_selection in packs
+// Duplicated from period_selection in packs (used by legacy haml usages
+// of #timeSelectionBtnGroup; UI::PeriodSelect handles its own fade via Tailwind)
 #timeSelectionBtnGroup {
   .period-select-standard {
     transition: opacity 0.5s ease-in-out;

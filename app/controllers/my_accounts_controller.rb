@@ -1,20 +1,27 @@
 class MyAccountsController < ApplicationController
   include Sessionable
+
   before_action :assign_edit_template, only: %i[edit update destroy]
   before_action :authenticate_user_for_my_accounts_controller
   around_action :set_reading_role, only: %i[show]
 
   def show
     @locks_active_tab = params[:active_tab] == "locks"
-    @per_page = params[:per_page] || 20
-    @pagy, @bikes = pagy(current_user.bikes.reorder(updated_at: :desc), limit: @per_page)
-    @locks = current_user.locks
+    @per_page = permitted_per_page
+    @pagy, @bikes = pagy(:countish, current_user.bikes.reorder(updated_at: :desc), limit: @per_page, page: permitted_page)
+    @locks = current_user.locks.reorder(created_at: :desc)
   end
 
   def edit
     @user = current_user
     @page_errors = @user.errors
     @page_title = @edit_templates[@edit_template]
+
+    if @edit_template&.to_sym == :root
+      @user.find_or_build_address_record(country_id: current_country_id)
+    elsif @edit_template&.to_sym == :organization_roles
+      @organization_roles = OrganizationRole.ordered_for(@user).includes(:organization).load
+    end
   end
 
   def update
@@ -25,10 +32,11 @@ class MyAccountsController < ApplicationController
       end
     end
     unless @user.errors.any?
-      successfully_updated = update_hot_sheet_notifications || update_user_registration_organizations
-      @user.address_set_manually = true if params&.dig(:user, :street).present?
-      if params[:user].present? && @user.update(permitted_parameters)
-        successfully_updated = true
+      successfully_updated = update_hot_sheet_notifications || update_user_registration_organizations ||
+        update_organization_role_on_by_default
+
+      if params[:user].present?
+        successfully_updated = update_user_from_params(@user, permitted_parameters)
         if params.dig(:user, :password).present?
           update_user_authentication_for_new_password
           default_session_set(@user)
@@ -46,7 +54,7 @@ class MyAccountsController < ApplicationController
 
   def destroy
     if current_user.deletable?
-      UserDeleteJob.new.perform(current_user.id, user: current_user)
+      current_user.destroy
       remove_session
       redirect_to goodbye_url, notice: "Account deleted!"
     else
@@ -60,23 +68,42 @@ class MyAccountsController < ApplicationController
     end
   end
 
-  private
-
-  def authenticate_user_for_my_accounts_controller
-    authenticate_user(translation_key: :create_account, flash_type: :info)
+  # Returns to the bike in whichever view is now active. skip_update because a view
+  # preference doesn't warrant the mailchimp/address recalculation of AfterUserChangeJob
+  def toggle_show_redesign
+    bike = Bike.unscoped.find_id(params[:bike_id])
+    show_legacy = !current_user.feature_registration_show_legacy?
+    if current_user.update(feature_registration_show_legacy: show_legacy, skip_update: true)
+      redirect_to(show_legacy ? bike_path(bike) : registration_path(bike))
+    else
+      # Unrelated validations (e.g. a preferred_language no longer available) can block
+      # the update, so return to the view they came from rather than bouncing them
+      flash[:error] = "Sorry, unable to update. Email contact@bikeindex.org for help fixing this!"
+      redirect_to(show_legacy ? registration_path(bike) : bike_path(bike))
+    end
   end
+
+  private
 
   def edit_templates
     @edit_templates ||= {
       root: translation(:user_settings, scope: [:controllers, :my_accounts, :edit]),
       password: translation(:password, scope: [:controllers, :my_accounts, :edit]),
       sharing: translation(:sharing, scope: [:controllers, :my_accounts, :edit]),
-      delete_account: translation(:delete_account, scope: [:controllers, :my_accounts, :edit])
-    }.merge(registration_organization_template).as_json
+      delete_account: translation(:delete_account, scope: [:controllers, :my_accounts, :edit]),
+      membership: translation(:membership, scope: [:controllers, :my_accounts, :edit])
+    }.merge(organization_role_template).merge(registration_organization_template).as_json
+  end
+
+  def organization_role_template
+    return {} unless current_user&.organization_roles&.exists?
+
+    {organization_roles: translation(:organization_roles, scope: [:controllers, :my_accounts, :edit])}
   end
 
   def registration_organization_template
     return {} unless current_user&.user_registration_organizations.present?
+
     {registration_organizations: translation(:registration_organizations, scope: [:controllers, :my_accounts, :edit])}
   end
 
@@ -86,18 +113,32 @@ class MyAccountsController < ApplicationController
 
   def update_hot_sheet_notifications
     return false unless params[:hot_sheet_organization_ids].present?
+
     params[:hot_sheet_organization_ids].split(",").each do |org_id|
       notify = params.dig(:hot_sheet_notifications, org_id).present?
       organization_role = @user.organization_roles.where(organization_id: org_id).first
       next unless organization_role.present?
+
       organization_role.update(hot_sheet_notification: notify ? "notification_daily" : "notification_never")
       flash[:success] ||= "Notification setting updated"
     end
     true
   end
 
+  # Viewing as an organization is the first one holding priority 0, so the whole list renumbers
+  def update_organization_role_on_by_default
+    return false unless params.key?(:on_by_default)
+
+    organization_role = OrganizationRole.ordered_for(@user).first
+    return false if organization_role.blank?
+
+    organization_role.update_on_by_default!(Binxtils::InputNormalizer.boolean(params[:on_by_default]))
+    true
+  end
+
   def update_user_registration_organizations
     return false unless params.key?(:user_registration_organization_all_bikes)
+
     uro_all_bikes = (params[:user_registration_organization_all_bikes] || []).reject(&:blank?).map(&:to_i)
     uro_can_edit_claimed = (params[:user_registration_organization_can_edit_claimed] || []).reject(&:blank?).map(&:to_i)
     new_registration_info = calculated_new_registration_info
@@ -107,14 +148,32 @@ class MyAccountsController < ApplicationController
         can_edit_claimed: uro_can_edit_claimed.include?(user_registration_organization.id),
         registration_info: user_registration_organization.registration_info.merge(new_registration_info))
     end
-    @user.update(updated_at: Time.current) # Bump user to enqueue AfterUserChangeJob
+    @user.update(updated_at: Time.current) # Bump user to enqueue CallbackJobs::AfterUserChangeJob
     @user
+  end
+
+  def update_user_from_params(user, pparams)
+    address_params = pparams.delete(:address_record_attributes)
+    if address_params&.values.presence&.any?
+      address_record = AddressRecord.where(user_id: user.id).find_by(id: address_params[:id]) ||
+        AddressRecord.new(kind: :user, user_id: user.id)
+      address_record.update(address_params.except(:id).merge(skip_callback_job: true))
+
+      if address_record.valid?
+        user.address_set_manually = true
+        user.address_record = address_record.reload
+        # Updates the user association, user needs to be assigned
+        CallbackJobs::AddressRecordUpdateAssociationsJob.perform_in(5, address_record.id)
+      end
+    end
+    user.update(pparams)
   end
 
   def calculated_new_registration_info
     # Select the matching key value pairs, and rename them
     new_info = params.as_json.map do |k, v|
       next unless k.match?(/reg_field-/)
+
       [k.gsub("reg_field-", ""), v]
     end.compact.to_h
     # merge in existing registration_info
@@ -129,7 +188,9 @@ class MyAccountsController < ApplicationController
         :state_id, :avatar, :avatar_cache, :twitter, :show_twitter, :instagram, :show_instagram,
         :show_website, :show_bikes, :show_phone, :my_bikes_link_target, :time_single_format,
         :my_bikes_link_title, :password, :password_confirmation, :preferred_language,
-        user_registration_organization_attributes: [:all_bikes, :can_edit_claimed])
+        user_registration_organization_attributes: [:all_bikes, :can_edit_claimed],
+        # include address_record id so we don't create new address records
+        address_record_attributes: (AddressRecord.permitted_params + [:id]))
     if pparams.key?("username")
       pparams.delete("username") unless pparams["username"].present?
     end

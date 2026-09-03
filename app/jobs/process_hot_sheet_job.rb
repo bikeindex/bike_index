@@ -1,5 +1,6 @@
 class ProcessHotSheetJob < ScheduledJob
   prepend ScheduledJobRecorder
+
   sidekiq_options queue: "low_priority", retry: false
 
   def self.frequency
@@ -8,10 +9,14 @@ class ProcessHotSheetJob < ScheduledJob
 
   def perform(org_id = nil)
     return enqueue_workers unless org_id.present?
+
     hot_sheet = HotSheet.for(org_id, Time.current.to_date)
     return hot_sheet if hot_sheet&.email_success?
+
     hot_sheet ||= HotSheet.create!(organization_id: org_id, sheet_date: Time.current.to_date)
-    hot_sheet.fetch_stolen_records
+    # Bump bike cached attributes, to be sure the email has all the info. Once per sheet -
+    # a separate email is sent per 48 recipients, all rendering the same bikes
+    hot_sheet.fetch_stolen_records.each { it.bike.update(updated_at: Time.current) }
     recipient_emails = hot_sheet.fetch_recipients
     return if recipient_emails.none?
 

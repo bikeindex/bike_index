@@ -60,7 +60,7 @@
 - else
   %h3.header-font-alt
     = t(".add_your_organization_to_bike_index")
-  %ol
+  %ol{class: "tw:list-decimal tw:ml-4"}
     %li
       - new_account_link = link_to t(".bike_index_account"), new_user_url(return_to: "/organizations/new")
       = t(".sign_up_for_a_new_account_html", new_account_link: new_account_link)

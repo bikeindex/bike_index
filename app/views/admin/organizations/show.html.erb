@@ -1,0 +1,43 @@
+<%= render(Pages::Admin::Organizations::Tabs::Component.new(organization: @organization, active: :show, display_dev_info: display_dev_info?)) %>
+
+<% if OrgServices::Displayer.law_enforcement_missing_verified_features?(@organization) %>
+  <div class="alert alert-info">
+    This is a law enforcement organization without unstolen notifications. To
+    enable unstolen notifications,
+    <%= link_to "add an invoice for this organization", new_admin_organization_invoice_path(organization_id: @organization.to_param, end_at: (Time.current + 10.years).to_i) %>
+    and enable "Law Enforcement functionality" in it
+  </div>
+<% end %>
+
+<%#
+  items-start because a bare <table> grid item stretches to the row and spreads the extra
+  height across its own rows
+%>
+
+<div class="twwiderow tw:items-start tw:gap-y-6">
+  <%= render(Pages::Admin::Organizations::Show::Details::Component.new(organization: @organization, display_dev_info: display_dev_info?)) %>
+  <%= render(Pages::Admin::Organizations::Show::Account::Component.new(organization: @organization, display_dev_info: display_dev_info?)) %>
+
+  <%# Invoices is the one with more than one root element, so it needs the cell wrapper %>
+  <div>
+    <%= render(Pages::Admin::Organizations::Show::Invoices::Component.new(organization: @organization)) %>
+  </div>
+
+  <%= render(Pages::Admin::Organizations::Show::Features::Component.new(organization: @organization)) %>
+</div>
+
+<%= render(Pages::Admin::Organizations::Show::Bikes::Component.new(organization: @organization, bikes: @bikes, bikes_count: @bikes_count,
+      sort_state:, display_dev_info: display_dev_info?)) %>
+
+<%= render(Pages::Admin::Organizations::Show::Roles::Component.new(organization: @organization, deleted: @deleted_organization_roles)) %>
+
+<%# forced: admin_unvendored's `hr` rule is unlayered, so plain utilities are inert here %>
+<hr class="tw:mt-8! tw:mb-4!">
+
+<div class="text-right">
+  <% if @organization.deleted? %>
+    <%= link_to "Un-Delete organization", admin_recover_organization_path(id: @organization.id), data: {confirm: "Are you sure?"}, class: "btn btn-outline-warning" %>
+  <% else %>
+    <%= link_to "Delete", admin_organization_url(@organization), method: :delete, data: {confirm: "Are you sure?"}, class: "btn btn-danger" %>
+  <% end %>
+</div>

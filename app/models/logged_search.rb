@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: logged_searches
+# Database name: analytics
 #
 #  id                :bigint           not null, primary key
 #  city              :string
@@ -37,7 +38,7 @@
 #  index_logged_searches_on_user_id          (user_id)
 #
 class LoggedSearch < AnalyticsRecord
-  include Geocodeable
+  include GeocodeableLegacy
 
   ENDPOINT_ENUM = {
     web_bikes: 0,
@@ -58,17 +59,20 @@ class LoggedSearch < AnalyticsRecord
     org_bikes: 12,
     org_parking_notifications: 13,
     org_impounded: 14,
-    org_public_impounded: 15
+    org_public_impounded: 15,
+    web_serials_containing: 19,
+    web_close_serials: 20,
+    web_marketplace: 21,
+    web_marketplace_count: 22
   }.freeze
 
-  STOLENNESS_ENUM = {all: 0, non: 1, stolen: 2, impounded: 3}.freeze
-
-  # TODO: make the belongs to work across tables
-  belongs_to :user
-  belongs_to :organization
+  STOLENNESS_ENUM = {all: 0, non: 1, stolen: 2, impounded: 3, for_sale: 4}.freeze
 
   enum :endpoint, ENDPOINT_ENUM
   enum :stolenness, STOLENNESS_ENUM, prefix: :stolenness
+
+  belongs_to :user
+  belongs_to :organization
 
   validates_presence_of :log_line, :request_at
   validates_uniqueness_of :request_id, allow_nil: false

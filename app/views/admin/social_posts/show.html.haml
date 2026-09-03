@@ -1,0 +1,5 @@
+.admin-subnav
+  .col-12.text-right
+    = link_to @social_post.post_link.gsub(/https?..\//, ''), @social_post.post_link, target: '_blank'
+
+= render partial: "display"

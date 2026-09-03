@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: front_gear_types
+# Database name: primary
 #
 #  id         :integer          not null, primary key
 #  count      :integer
@@ -13,12 +14,15 @@
 #
 class FrontGearType < ApplicationRecord
   include FriendlySlugFindable
+
+  has_many :bikes
+
   validates_presence_of :name, :count
   validates_uniqueness_of :name
-  has_many :bikes
 
   scope :standard, -> { where(standard: true) }
   scope :internal, -> { where(internal: true) }
+  scope :pinion, -> { where("name ILIKE ?", "%pinion%") }
 
   def self.fixed
     where(name: "1", count: 1, internal: false, standard: true).first_or_create

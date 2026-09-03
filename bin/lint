@@ -1,16 +1,94 @@
 #!/usr/bin/env ruby
 
+# To test linting, rather than automatically fix it, set LINT_TEST
+# NOTE: CI doesn't actually use bin/lint, it manually calls each of the commands for better output
+#
+cli_args = ARGV
+lint_test = ENV["LINT_TEST"] == "true" || cli_args.include?("--no-fix")
+
+# You can pass file names or directories to lint just those. Prefer it to a whole-repo
+# run: it's much faster, and it won't reformat files you aren't working on.
+file_args = cli_args.reject { |arg| arg.start_with?("-") }
+
 require "fileutils"
-include FileUtils
 
 # path to your application root.
 APP_ROOT = File.expand_path("..", __dir__)
+
+EXTENSIONS_BY_KIND = {ruby: %w[rb rake], js: %w[js ts jsx tsx], erb: %w[erb html]}.freeze
+# Vendored or generated - every underlying linter excludes these in its own config
+SKIPPED_DIRECTORIES = %w[node_modules public tmp vendor].freeze
 
 def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
 end
 
-chdir APP_ROOT do
-  system!("bundle exec standardrb --fix")
-  system!("npm run lint")
+# Directories expand to every file below them that lint_kind can place - by extension,
+# or by shebang for the extensionless scripts in bin/
+def lintable_files(path)
+  return [path] unless File.directory?(path)
+
+  extensions = EXTENSIONS_BY_KIND.values.flatten.join(",")
+  globs = [File.join(path, "**", "*.{#{extensions}}"), File.join(path, "**", "*[^.]")]
+  files = Dir.glob(globs).uniq
+    .reject { |file| file.split(File::SEPARATOR).intersect?(SKIPPED_DIRECTORIES) }
+    .select { |file| File.file?(file) && lint_kind(file) }
+  warn "No lintable files in: #{path}" if files.none?
+
+  files
+end
+
+def ruby_shebang?(file)
+  File.open(file, &:gets).to_s.match?(/\A#!.*ruby/)
+rescue ArgumentError, SystemCallError
+  false
+end
+
+def lint_kind(file)
+  extension = File.extname(file).delete_prefix(".")
+  kind = EXTENSIONS_BY_KIND.find { |_kind, extensions| extensions.include?(extension) }&.first
+  # bin/ scripts have no extension to go by, and a handful of them are bash
+  kind || (:ruby if extension.empty? && ruby_shebang?(file))
+end
+
+FileUtils.chdir APP_ROOT do
+  # lint_test checking doesn't accept file name
+  if lint_test
+    puts "Testing lint (will not autofix)"
+
+    system!("bundle exec standardrb --no-fix")
+    system!("bundle exec rubocop -c .rubocop_custom.yml")
+    return system!("npm run lint_check")
+  end
+
+  if file_args.any?
+    present, missing = file_args.partition { |arg| File.exist?(arg) }
+    warn "Not found: #{missing.join(", ")}" if missing.any?
+
+    # Unlintable paths are skipped rather than raised on, so that passing a branch's
+    # changed files works - they'll include .haml, .scss and friends
+    files_by_kind = present.flat_map { |arg| lintable_files(arg) }.group_by { |file| lint_kind(file) }
+    skipped = files_by_kind[nil]
+    warn "Skipping (no linter): #{skipped.join(", ")}" if skipped
+
+    if (ruby_files = files_by_kind[:ruby])
+      system!("bundle exec standardrb --fix #{ruby_files.join(" ")}")
+      system!("bundle exec rubocop -c .rubocop_custom.yml -A --format quiet #{ruby_files.join(" ")}")
+    end
+
+    if (js_files = files_by_kind[:js])
+      system!("npm run js:lint -- #{js_files.join(" ")}")
+    end
+
+    # herb-lint is what CI checks, herb-format is what rewrites the file.
+    # Only the lint script can be delegated to - html:format hardcodes "."
+    if (erb_files = files_by_kind[:erb])
+      system!("npm run html:lint -- #{erb_files.join(" ")}")
+      system!("npx herb-format #{erb_files.join(" ")}")
+    end
+  else
+    system!("bundle exec standardrb --fix")
+    system!("bundle exec rubocop -c .rubocop_custom.yml -A --format quiet")
+    system!("npm run lint")
+  end
 end

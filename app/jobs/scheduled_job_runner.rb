@@ -1,6 +1,6 @@
 # This worker runs all the scheduled workers
 # It needs to have a frequency <= the most frequent scheduled worker interval
-# It's enqueued by a rake task that runs every minute, and enqueues this job if it .should_enqueue?
+# It's enqueued every minute by bin/run_scheduled_job_runner (via cron) when it .should_enqueue?
 # This worker, in turn, runs every scheduled worker that hasn't run for at least as long as its frequency, unless the queue is backed up
 
 class ScheduledJobRunner < ScheduledJob
@@ -8,7 +8,7 @@ class ScheduledJobRunner < ScheduledJob
   HISTORY_KEY = "scheduler_history_#{Rails.env}".freeze
 
   def self.frequency
-    5.minutes
+    59
   end
 
   def self.worker_from_string(worker_string)
@@ -21,6 +21,7 @@ class ScheduledJobRunner < ScheduledJob
 
   def self.record_key(worker_string, record)
     raise ArgumentError, "Unknown history record type: #{record}" unless valid_history_records[record]
+
     "#{worker_string}-#{valid_history_records[record]}"
   end
 
@@ -34,31 +35,36 @@ class ScheduledJobRunner < ScheduledJob
 
   def self.scheduled_jobs
     [
+      BikeJobs::DeactivateExpiredTheftAlertJob,
+      BikeJobs::RemoveOrphanedImagesJob,
+      BikeJobs::ScheduledBikePossiblyFoundNotificationJob,
+      BikeJobs::UpdateTheftAlertFacebookJob,
       CleanBParamsJob,
       CleanBulkImportJob,
       CreateGraduatedNotificationJob,
       CreateStolenGeojsonJob,
       CreateUserAlertNotificationJob,
-      DeactivateExpiredTheftAlertJob,
+      Email::ScheduledSurveyJob,
       FetchProject529BikesJob,
       FileCacheMaintenanceJob,
+      ImageJobs::CleanUnattachedBlobsJob,
       ImpoundExpirationJob,
       ProcessGraduatedNotificationJob,
       ProcessHotSheetJob,
-      RemoveUnconfirmedUsersJob,
       ScheduledAutocompleteCheckJob,
-      ScheduledBikePossiblyFoundNotificationJob,
-      ScheduledEmailSurveyJob,
       ScheduledSearchForExternalRegistryBikesJob,
       ScheduledStoreLogSearchesJob,
-      TsvCreatorJob,
+      Spreadsheets::TsvCreatorJob,
+      StravaJobs::ScheduledRequestEnqueuer,
+      StravaJobs::ScheduledRequestPriorityUpdator,
       # UnusedOwnershipRemovalJob,
       UpdateCountsJob,
+      UpdateEmailDomainJob,
       UpdateExchangeRatesJob,
       UpdateInvoiceJob,
       UpdateManufacturerLogoAndPriorityJob,
       UpdateOrganizationPosKindJob,
-      UpdateTheftAlertFacebookJob,
+      UserJobs::RemoveUnconfirmedJob,
       self
     ].freeze
   end
@@ -68,6 +74,8 @@ class ScheduledJobRunner < ScheduledJob
   end
 
   def perform
+    return if skip_scheduling?
+
     record_scheduler_started
     self.class.scheduled_non_scheduler_workers.each do |worker|
       worker.perform_async if worker.should_enqueue?

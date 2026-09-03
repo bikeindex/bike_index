@@ -14,6 +14,7 @@ class AdminReassignBikeStickerCodesJob < ApplicationJob
       last_update = bike_sticker.bike_sticker_updates.order(:id).last
       next if last_update.present? && last_update.kind == "admin_reassign" &&
         last_update.organization_id == organization_id
+
       BikeStickerUpdate.create(bike_sticker_id: bike_sticker.id,
         user_id: user_id,
         organization_id: organization_id,

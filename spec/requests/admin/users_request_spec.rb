@@ -6,9 +6,49 @@ RSpec.describe Admin::UsersController, type: :request do
   let(:user_subject) { FactoryBot.create(:user) }
 
   describe "index" do
-    it "renders" do
-      expect(user_subject).to be_present
-      get "#{base_url}?query=something" # Test to make sure we're dealing with admin_text_search correctly
+    let!(:ambassador) { FactoryBot.create(:ambassador) }
+    let!(:organization_user) { FactoryBot.create(:organization_user) }
+    let!(:developer) { FactoryBot.create(:developer) }
+    let!(:superuser_ability) { SuperuserAbility.create(user: user_subject) }
+
+    it "renders with all search options" do
+      get "#{base_url}?query=something"
+      expect(response).to render_template :index
+
+      get base_url, params: {search_with_organization: true}
+      expect(assigns(:collection).pluck(:id)).to include(organization_user.id)
+
+      get base_url, params: {search_ambassadors: true}
+      expect(assigns(:collection).pluck(:id)).to eq([ambassador.id])
+
+      get base_url, params: {search_superusers: true}
+      expect(assigns(:collection).pluck(:id)).to include(user_subject.id)
+
+      get base_url, params: {search_developers: true}
+      expect(assigns(:collection).pluck(:id)).to eq([developer.id])
+
+      get base_url, params: {search_unconfirmed: true}
+      expect(assigns(:collection).pluck(:id)).to include(user_subject.id)
+
+      get base_url, params: {search_confirmed: true}
+      expect(assigns(:collection).pluck(:id)).to include(current_user.id)
+
+      get base_url, params: {search_invalid: "banned_only"}
+      expect(response).to render_template :index
+
+      get base_url, params: {search_invalid: "deleted_only"}
+      expect(response).to render_template :index
+
+      get base_url, params: {search_invalid: "all"}
+      expect(response).to render_template :index
+
+      get base_url, params: {search_phone: "2063339999"}
+      expect(response).to render_template :index
+
+      get base_url, params: {search_domain: "example.com"}
+      expect(response).to render_template :index
+
+      get base_url, params: {render_chart: true}
       expect(response).to render_template :index
     end
   end
@@ -16,7 +56,7 @@ RSpec.describe Admin::UsersController, type: :request do
   describe "show" do
     it "links to edit" do
       get "#{base_url}/#{user_subject.username}"
-      expect(response).to redirect_to(edit_admin_user_path(user_subject.id))
+      expect(response).to redirect_to(edit_admin_user_path(user_subject.username))
     end
   end
 
@@ -37,25 +77,50 @@ RSpec.describe Admin::UsersController, type: :request do
       get "#{base_url}/#{user_subject.id}/edit"
       expect(response).to render_template :edit
     end
+
+    # It rendered a link with ?method=delete, so deleting quietly did nothing but show the user again
+    it "deletes through a form, rather than a GET" do
+      get "#{base_url}/#{user_subject.id}/edit"
+      expect(response.body).to match(%r{<form[^>]*action="/admin/users/#{user_subject.id}"[^>]*>\s*<input type="hidden" name="_method" value="delete"})
+      expect(response.body).to_not include("method=delete")
+    end
+  end
+
+  describe "destroy" do
+    it "deletes the user" do
+      expect(user_subject).to be_present
+      delete "#{base_url}/#{user_subject.id}"
+      expect(flash[:notice]).to be_present
+      expect(User.unscoped.find(user_subject.id).deleted_at).to be_present
+      expect(User.where(id: user_subject.id)).to be_empty
+    end
   end
 
   describe "update" do
     let(:user_subject) { FactoryBot.create(:user, confirmed: false) }
+    let(:ban_user_params) do
+      {email: user_subject.email, banned: true,
+       can_send_many_stolen_notifications: false, can_send_many_marketplace_messages: false}
+    end
     context "non developer" do
       it "updates all the things that can be edited (finding via user id)" do
         user_subject.reload
         og_auth_token = user_subject.auth_token
         expect(user_subject.banned?).to be_falsey
         current_user.reload
+        bike = FactoryBot.create(:bike, :with_primary_activity, :with_ownership_claimed, user: user_subject)
+        marketplace_listing = FactoryBot.create(:marketplace_listing, :for_sale, item: bike)
+        expect(marketplace_listing).to be_valid
         Sidekiq::Job.clear_all
-        put "#{base_url}/#{user_subject.id}", params: {
+        patch "#{base_url}/#{user_subject.id}", params: {
           user: {
             name: "New Name",
-            email: "newemailexample.com",
+            email: "newemail@example.com",
             confirmed: true,
             superuser: true,
             developer: "1",
             can_send_many_stolen_notifications: true,
+            can_send_many_marketplace_messages: true,
             banned: true,
             phone: "9876543210",
             user_ban_attributes: {
@@ -64,11 +129,12 @@ RSpec.describe Admin::UsersController, type: :request do
           }
         }
         expect(user_subject.reload.name).to eq("New Name")
-        expect(user_subject.email).to eq("newemailexample.com")
+        expect(user_subject.email).to eq("newemail@example.com")
         expect(user_subject.confirmed).to be_truthy
-        expect(user_subject.superuser).to be_truthy
+        expect(user_subject.superuser?).to be_truthy
         expect(user_subject.developer).to be_falsey
         expect(user_subject.can_send_many_stolen_notifications).to be_truthy
+        expect(user_subject.can_send_many_marketplace_messages).to be_truthy
         expect(user_subject.banned?).to be_truthy
         expect(user_subject.phone).to eq "9876543210"
         user_ban = user_subject.user_ban
@@ -78,14 +144,59 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_ban.description).to eq "something here"
         # Bump the auth token, because we want to sign out the user
         expect(user_subject.auth_token).to_not eq og_auth_token
-        expect(AfterUserChangeJob.jobs.count).to be > 0
-        AfterUserChangeJob.new.perform(user_subject.id)
+        expect(CallbackJobs::AfterUserChangeJob.jobs.count).to be > 0
+        CallbackJobs::AfterUserChangeJob.new.perform(user_subject.id)
+        expect(bike.reload.likely_spam).to be_truthy
+        expect(bike.deleted_at).to be_blank
         expect(user_subject.superuser_abilities.count).to eq 1
-        expect(User.superuser_abilities.pluck(:id)).to eq([user_subject.id])
+        expect(User.admins.pluck(:id)).to include(user_subject.id)
+        expect(marketplace_listing.reload.status).to eq "removed"
+      end
+    end
+    context "banning, draining jobs" do
+      # UserBan.create! marks the user banned; the ban must survive once the enqueued
+      # AfterUserChangeJob (which deletes bans for un-banned users) drains
+      it "keeps the ban" do
+        expect(user_subject.reload.banned?).to be_falsey
+        Sidekiq::Job.clear_all
+        patch "#{base_url}/#{user_subject.id}", params: {
+          user: ban_user_params.merge(user_ban_attributes: {reason: "known_criminal", description: "something here"})
+        }
+        Sidekiq::Job.drain_all
+        expect(user_subject.reload.banned?).to be_truthy
+        user_ban = user_subject.user_ban
+        expect(user_ban).to be_present
+        expect(user_ban.deleted_at).to be_blank
+        expect(user_ban.creator_id).to eq current_user.id
+        expect(user_ban.reason).to eq "known_criminal"
+      end
+    end
+    context "banning without a reason" do
+      it "still bans the user, without a UserBan" do
+        expect(user_subject.reload.banned?).to be_falsey
+        Sidekiq::Job.clear_all
+        patch "#{base_url}/#{user_subject.id}", params: {user: ban_user_params}
+        Sidekiq::Job.drain_all
+        expect(user_subject.reload.banned?).to be_truthy
+        expect(user_subject.user_ban).to be_blank
+      end
+    end
+    context "updating an existing ban" do
+      let(:original_creator) { FactoryBot.create(:superuser) }
+      let!(:user_ban) { UserBan.create!(user: user_subject, creator: original_creator, reason: :abuse, description: "old") }
+      it "updates the existing ban, keeping the original creator" do
+        expect(user_subject.reload.banned?).to be_truthy
+        Sidekiq::Job.clear_all
+        patch "#{base_url}/#{user_subject.id}", params: {
+          user: ban_user_params.merge(user_ban_attributes: {reason: "seo_spam", description: "new"})
+        }
+        Sidekiq::Job.drain_all
+        expect(UserBan.where(user_id: user_subject.id).count).to eq 1
+        expect(user_ban.reload).to have_attributes(reason: "seo_spam", description: "new", creator_id: original_creator.id)
       end
     end
     context "developer" do
-      let(:current_user) { FactoryBot.create(:admin_developer) }
+      let(:current_user) { FactoryBot.create(:superuser_developer) }
       it "updates developer" do
         user_subject.reload
         og_auth_token = user_subject.auth_token
@@ -95,6 +206,7 @@ RSpec.describe Admin::UsersController, type: :request do
             email: user_subject.email,
             superuser: false,
             can_send_many_stolen_notifications: true,
+            can_send_many_marketplace_messages: true,
             banned: false
           }
         }

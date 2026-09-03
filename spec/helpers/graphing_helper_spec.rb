@@ -13,8 +13,12 @@ RSpec.describe GraphingHelper, type: :helper do
     end
     describe "time_range_counts" do
       let(:target_counts) { {" 1:16 PM" => 0, " 1:17 PM" => 1, " 1:18 PM" => 0, " 1:19 PM" => 0} }
-      it "returns the thing with want" do
+      it "buckets in the current Time.zone" do
         expect(time_range_counts(collection: Payment.all)).to eq target_counts
+
+        Time.zone = "America/Los_Angeles"
+        expect(time_range_counts(collection: Payment.all))
+          .to eq({"11:16 AM" => 0, "11:17 AM" => 1, "11:18 AM" => 0, "11:19 AM" => 0})
       end
     end
     describe "time_range_counts" do
@@ -62,6 +66,12 @@ RSpec.describe GraphingHelper, type: :helper do
         expect(end_time.in_time_zone("America/New_York").strftime(group_by_format(time_range))).to eq " 7:01 PM"
       end
     end
+    context "2 days" do
+      let(:start_time) { end_time - 47.hours }
+      it "is weekday hour pm" do
+        expect(end_time.in_time_zone("America/New_York").strftime(group_by_format(time_range))).to eq "Sun 7 PM"
+      end
+    end
     context "3 days" do
       let(:start_time) { end_time - 3.days }
       it "is weekday hour pm" do
@@ -69,14 +79,20 @@ RSpec.describe GraphingHelper, type: :helper do
       end
     end
     context "6 days" do
+      let(:start_time) { end_time - 6.days }
+      it "is weekday date" do
+        expect(end_time.in_time_zone("America/New_York").strftime(group_by_format(time_range))).to eq "Sun 1-5"
+      end
+    end
+    context "10 days" do
       let(:start_time) { end_time - 10.days }
-      it "is weekday month-date" do
-        expect(end_time.in_time_zone("America/New_York").strftime(group_by_format(time_range))).to eq "Sun 2020-1-5"
+      it "is date" do
+        expect(end_time.in_time_zone("America/New_York").strftime(group_by_format(time_range))).to eq "2020-1-5"
       end
     end
     context "6 months" do
       let(:start_time) { end_time - 6.months }
-      it "is weekday month-date" do
+      it "is date" do
         expect(end_time.in_time_zone("America/New_York").strftime(group_by_format(time_range))).to eq "2020-1-5"
       end
     end
@@ -144,9 +160,9 @@ RSpec.describe GraphingHelper, type: :helper do
         let(:start_time) { end_time - 45.minutes }
         let(:target_html) do
           [
-            'from <em class="convertTime preciseTimeSeconds">',
+            'from <em class="localizeTime preciseTimeSeconds">',
             start_time.strftime("%FT%T%z"),
-            '</em> to <em class="convertTime preciseTimeSeconds">',
+            '</em> to <em class="localizeTime preciseTimeSeconds">',
             end_time.strftime("%FT%T%z") + "</em>"
           ]
         end
@@ -159,9 +175,9 @@ RSpec.describe GraphingHelper, type: :helper do
         let(:start_time) { end_time - 2.hours }
         let(:target_html) do
           [
-            'from <em class="convertTime preciseTime">',
+            'from <em class="localizeTime preciseTime">',
             start_time.strftime("%FT%T%z"),
-            '</em> to <em class="convertTime preciseTime">',
+            '</em> to <em class="localizeTime preciseTime">',
             end_time.strftime("%FT%T%z") + "</em>"
           ]
         end
@@ -181,9 +197,9 @@ RSpec.describe GraphingHelper, type: :helper do
         let(:start_time) { end_time - 7.days }
         let(:target_html) do
           [
-            'from <em class="convertTime ">',
+            'from <em class="localizeTime ">',
             start_time.strftime("%FT%T%z"),
-            '</em> to <em class="convertTime ">',
+            '</em> to <em class="localizeTime ">',
             end_time.strftime("%FT%T%z") + "</em>"
           ]
         end

@@ -1,4 +1,4 @@
-hr {
+hr:not(.twhr) {
   display: block;
   border: none;
   border-top: $gray-light 1px solid;

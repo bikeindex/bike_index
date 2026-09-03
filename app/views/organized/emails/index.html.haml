@@ -1,8 +1,12 @@
 -# TODO: add translations
 
 .organized-page-header
-  %h1
-    Custom Emails
+  = render(UI::Header::Component.new(text: "Custom Emails"))
+
+- all_snippet_kinds = current_organization.mail_snippets.where(kind: MailSnippet.organization_snippets_in_all).pluck(:kind)
+- if all_snippet_kinds.any?
+  = render(UI::Alerts::Base::Component.new(kind: :notice, margin_classes: 'tw:mt-4 mb-4')) do
+    All of your emails include your custom #{all_snippet_kinds.map { MailSnippet.kind_humanized(_1)&.downcase }.to_sentence}.
 
 %table.table.table-striped.table-bordered.table-sm.without-exterior-border
   %thead.small-header.hidden-md-down
@@ -14,9 +18,9 @@
   %tbody
     - (viewable_email_kinds - ["organization_stolen_message"]).each do |kind|
       - if kind == "finished_registration"
-        - mail_snippets = current_organization.mail_snippets.select { |mail_snippet| mail_snippet.in_email?("finished_registration") }
+        - mail_snippets = current_organization.mail_snippets.select { |mail_snippet| mail_snippet.in_email?("finished_registration", exclude_all: true) }
       - elsif kind == "partial_registration"
-        - mail_snippets = current_organization.mail_snippets.select { |mail_snippet| mail_snippet.in_email?("partial_registration") }
+        - mail_snippets = current_organization.mail_snippets.select { |mail_snippet| mail_snippet.in_email?("partial_registration", exclude_all: true) }
       - else
         - mail_snippets = current_organization.mail_snippets.where(kind: kind)
       %tr
@@ -26,11 +30,11 @@
           = check_mark if mail_snippets.any? { |mail_snippet| mail_snippet.is_enabled }
         %td
           - if mail_snippets.any?
-            %span.convertTime
+            %span.localizeTime
               = l(mail_snippets.first.created_at, format: :convert_time)
         %td
           - if mail_snippets.any?
-            %span.convertTime
+            %span.localizeTime
               = l(mail_snippets.last.updated_at, format: :convert_time)
         %td
           - if mail_snippets.any?
@@ -44,11 +48,11 @@
         %td= check_mark if organization_stolen_message.is_enabled
         %td
           - if organization_stolen_message.content_added_at.present?
-            %span.convertTime
+            %span.localizeTime
               = l(organization_stolen_message.content_added_at, format: :convert_time)
         %td
           - if organization_stolen_message.content_added_at.present?
-            %span.convertTime
+            %span.localizeTime
               = l(organization_stolen_message.updated_at, format: :convert_time)
         %td
           %small

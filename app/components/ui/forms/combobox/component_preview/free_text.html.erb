@@ -1,0 +1,5 @@
+<%= render(UI::Forms::Group::Component.new(attribute: :primary_activity,
+  label_text: "Primary activity (or type your own)")) do %>
+  <%= render(UI::Forms::Combobox::Component.new(name: :primary_activity, free_text: true,
+    options: PrimaryActivity.family.alphabetized.pluck(:name))) %>
+<% end %>

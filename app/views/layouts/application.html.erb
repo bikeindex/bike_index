@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+
+<html lang="<%= I18n.locale %>">
+  <head>
+    <%= capybara_lockstep if defined?(Capybara::Lockstep) %>
+    <%= render(SharedBlocks::HeaderTags::Component.new(**header_tags_component_options)) %>
+
+    <%# TODO: Cache this ^ %>
+    <%= csrf_meta_tags %>
+
+    <%= tag.meta name: "honeybadger-api-key", content: ENV["HONEYBADGER_FRONTEND_API_KEY"] %>
+    <%= tag.meta name: "honeybadger-environment", content: Rails.env %>
+    <%= stylesheet_link_tag 'tailwind', 'revised', "data-turbo-track": "reload" %>
+    <%= hw_combobox_style_tag %>
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700"
+      rel="stylesheet"
+      type="text/css"
+    >
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:400,700"
+      rel="stylesheet"
+      type="text/css"
+    >
+
+    <%= javascript_include_tag 'application_revised' %>
+    <%= javascript_importmap_tags %>
+    <%= hotwire_livereload_tags if Rails.env.development? %>
+
+    <script>
+      window.BikeIndex.translator = (keyspace) => {
+        return (key, args={}) => I18n.t(`javascript.${keyspace}.${key}`, args);
+      }
+    </script>
+
+    <% if current_user&.time_single_format %>
+      <script>window.timeParserSingleFormat = true</script>
+    <% end %>
+
+    <%= render partial: "/shared/analytics" %>
+
+    <%# Use with content_for(:header) -- see news/show for an example of content yielded to a named `yield`. %>
+    <%# https://guides.rubyonrails.org/layouts_and_rendering.html#using-the-content-for-method %>
+    <%= yield :header %>
+
+    <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
+  </head>
+
+  <%# The navbar picks between the bar and the sidebar; the body is laid out around whichever %>
+  <% navbar = SharedBlocks::Navbar::Wrapper::Component.new(current_user:, current_user_or_unconfirmed_user:,
+    passive_organization:, old_register_view: old_register_view?) %>
+
+  <%= body_tag(html_class: class_names(body_class, "with-org-sidebar" => navbar.org_sidebar?)) do %>
+    <a
+      href="#main-content"
+      class="
+        tw:sr-only tw:focus:not-sr-only tw:focus:absolute tw:focus:top-2
+        tw:focus:left-2 tw:focus:z-50 tw:focus:rounded tw:focus:bg-white
+        tw:focus:px-4 tw:focus:py-2 tw:focus:text-blue-800
+        tw:focus:shadow-lg
+      "
+    >
+      <%= t(".skip_to_main_content") %>
+    </a>
+
+    <%= render(SharedBlocks::ReviewAppBanner::Component.from_env(current_user:, return_to: request.fullpath)) %>
+
+    <%= render navbar %>
+
+    <% if render_donation_request? %>
+      <%= render SharedBlocks::LawEnforcementDonation::Component.new(current_user:) %>
+    <% end %>
+
+    <%# organized renders its own, inside the content column the menu doesn't cover %>
+    <% general_alert = SharedBlocks::UserAlerts::Wrapper::Component.new(current_user:) if
+      show_general_alert && !main_content_organized? %>
+
+    <% show_general_alert_here = general_alert&.render? %>
+
+    <%= render general_alert if show_general_alert_here %>
+
+    <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
+    <%= render partial: "/layouts/revised_messages" %>
+
+    <%# The strava_search SPA (where @strava_search_config is set) renders its own <main>, so skip this landmark to avoid nesting %>
+    <% if @strava_search_config %>
+      <%= yield %>
+    <% else %>
+      <%#
+        the alert sits in the navbar's gap, so the full-bleed pages that pull up
+        by --nav-gap would slide under it
+      %>
+
+      <main
+        id="main-content"
+        class="<%= "tw:[--nav-gap:0px]" if show_general_alert_here %>"
+      >
+        <%= render(SharedBlocks::MainContent::Wrapper::Component.new(
+          controller_namespace:,
+          controller_name:,
+          action_name:,
+          current_user:,
+          current_organization:,
+          passive_organization:,
+          show_general_alert:,
+          source: params[:source],
+          force_landing_page_render: @force_landing_page_render,
+          blog: @blog,
+          related_blogs: @related_blogs,
+          bike: @bike,
+          bike_og: @bike_og,
+          og_email: @og_email,
+          edit_template: @edit_template,
+          edit_templates: @edit_templates,
+          oauth_application: @application
+        )) do %>
+          <%= yield %>
+        <% end %>
+      </main>
+    <% end %>
+
+    <%# Skip the Meta pixel on org/oauth pages and when blocked params are present (search_email is PII, and the pixel %>
+    <%# auto-sends the URL query string) %>
+    <% skip_facebook = controller_namespace.in?(%w[organized org_public oauth]) || controller_name == "organizations" || params.key?(:search_email) || params.key?(:proximity) %>
+
+    <%= render SharedBlocks::Footer::Component.new(current_user:, skip_facebook:, passive_organization:) %>
+
+    <script>
+  I18n.defaultLocale = <%== I18n.default_locale.to_json %>
+  I18n.locale = <%== I18n.locale.to_json %>
+</script>
+  <% end %>
+</html>

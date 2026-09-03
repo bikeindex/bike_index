@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html class="doorkeeper" lang="<%= I18n.locale %>">
+  <head>
+    <%= render(SharedBlocks::HeaderTags::Component.new(**header_tags_component_options)) %>
+    <%= csrf_meta_tags %>
+    <%= stylesheet_link_tag 'tailwind', 'revised', "data-turbo-track": "reload" %>
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700"
+      rel="stylesheet"
+      type="text/css"
+    >
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:400,700"
+      rel="stylesheet"
+      type="text/css"
+    >
+
+    <script src="/vendored_assets/application_standalone.js"></script>
+
+    <%= javascript_include_tag 'application_revised' %>
+    <%= javascript_importmap_tags %>
+
+    <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
+  </head>
+
+  <%= body_tag do %>
+    <%= render SharedBlocks::Navbar::Wrapper::Component.new(logo_only: true) %>
+
+    <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
+    <%= render 'layouts/revised_messages' %>
+
+    <div class="doorkeeper-container">
+      <% if controller_name.match('application') && action_name != 'index' %>
+        <%= link_to 'Your applications', oauth_applications_url, class: 'pull-right' %>
+      <% end %>
+
+      <%= yield %>
+    </div>
+
+    <%# OAuth pages never load the marketing pixel %>
+    <%= render SharedBlocks::Footer::Component.new(current_user:, skip_facebook: true, passive_organization:) %>
+    <%= render "/shared/analytics" %>
+  <% end %>
+</html>

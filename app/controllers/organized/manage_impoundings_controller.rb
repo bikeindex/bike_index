@@ -29,6 +29,7 @@ module Organized
       @organization = current_organization
       @impound_configuration = @organization&.fetch_impound_configuration
       return true if @organization.enabled?("impound_bikes") || current_user.superuser?
+
       raise_do_not_have_access!
     end
 

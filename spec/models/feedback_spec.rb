@@ -15,25 +15,25 @@ RSpec.describe Feedback, type: :model do
     it "enqueues an email job" do
       expect {
         FactoryBot.create(:feedback)
-      }.to change(EmailFeedbackNotificationJob.jobs, :size).by(1)
+      }.to change(Email::FeedbackNotificationJob.jobs, :size).by(1)
     end
 
     it "doesn't send email" do
       expect {
         FactoryBot.create(:feedback, feedback_type: "bike_delete_request")
-      }.to_not change(EmailFeedbackNotificationJob.jobs, :size)
+      }.to_not change(Email::FeedbackNotificationJob.jobs, :size)
     end
 
     it "doesn't enqueue an email job for serial updates" do
       expect {
         FactoryBot.create(:feedback, feedback_type: "serial_update_request")
-      }.to change(EmailFeedbackNotificationJob.jobs, :size).by(0)
+      }.to change(Email::FeedbackNotificationJob.jobs, :size).by(0)
     end
 
     it "doesn't enqueue an email job for manufacturer updates" do
       expect {
         FactoryBot.create(:feedback, feedback_type: "manufacturer_update_request")
-      }.to change(EmailFeedbackNotificationJob.jobs, :size).by(0)
+      }.to change(Email::FeedbackNotificationJob.jobs, :size).by(0)
     end
 
     it "auto sets the body for a lead_type" do

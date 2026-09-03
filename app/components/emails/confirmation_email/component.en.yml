@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    emails:
+      confirmation_email:
+        click_to_sign_in_html: Click the <em>Sign in</em> button to finish signing
+          up!
+        follow_this_link_to_sign_in: Follow this link to sign in
+        sign_in: Sign in
+        youre_almost_there: You're almost there!

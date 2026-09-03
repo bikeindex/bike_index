@@ -1,0 +1,1 @@
+<%= render UI::ButtonLink::Component.new(text: "Revoke", color: :error, href: oauth_authorized_application_path(application), method: :delete, form: {onsubmit: "return confirm('Are you sure?')"}) %>

@@ -12,13 +12,13 @@
         %tr
           %td Category Keys
           %td
-            = admin_number_display(@autocomplete_info[:category_keys])
+            = number_display(@autocomplete_info[:category_keys])
             %small.less-strong.ml-1
               should be > 100k
         %tr
           %td Cache Keys
           %td
-            = admin_number_display(@autocomplete_info[:cache_keys])
+            = number_display(@autocomplete_info[:cache_keys])
             %small.less-strong.ml-1
               they should expire every 10 minutes...
 
@@ -27,6 +27,6 @@
             %td= key.to_s.humanize
             %td
               - if value.is_a?(Integer)
-                = admin_number_display(value)
+                = number_display(value)
               - else
                 = value

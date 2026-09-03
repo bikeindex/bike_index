@@ -1,0 +1,43 @@
+<% if switchable? %>
+  <%= render(UI::Dropdown::Component.new(name: @label, button_class: button_class)) do |dropdown| %>
+    <% dropdown.with_button do %>
+      <%= display_label %>
+    <% end %>
+
+    <% if superuser? %>
+      <% dropdown.with_entry_item do %>
+        <%= super_admin_link %>
+      <% end %>
+      <% dropdown.with_entry_divider %>
+    <% end %>
+
+    <% org_view_groups.each_with_index do |group, index| %>
+      <% dropdown.with_entry_divider if index.positive? %>
+
+      <% group.each do |view| %>
+        <% dropdown.with_entry_item do %>
+          <%= entry_link(view) %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% if org_views.any? && other_views.any? %>
+      <% dropdown.with_entry_divider %>
+    <% end %>
+
+    <% other_views.each do |view| %>
+      <% dropdown.with_entry_item do %>
+        <%= entry_link(view) %>
+      <% end %>
+    <% end %>
+
+    <% if show_legacy_link? %>
+      <% dropdown.with_entry_divider %>
+      <% dropdown.with_entry_item do %>
+        <%= legacy_view_link %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% else %>
+  <%= render(UI::Badge::Component.new(text: display_label, color: @color, size: :sm, solid: @solid)) %>
+<% end %>

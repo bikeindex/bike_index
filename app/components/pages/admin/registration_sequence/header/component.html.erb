@@ -1,0 +1,44 @@
+<div class="tw:mb-6">
+  <h1 class="uncap tw:mb-2 tw:text-2xl tw:font-semibold">
+    <%= action_word %>
+    <strong><%= @registration_sequence.display_name %></strong> registration
+    sequence
+  </h1>
+
+  <%# ml-auto on the group below, not justify-between: it holds it right when the row wraps %>
+  <div class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-4 tw:gap-y-1">
+    <%#
+      Beside the chip, not in it: a disabled button is pointer-events-none, so
+      nothing inside it can be hovered
+    %>
+
+    <div class="tw:flex tw:items-center tw:gap-2">
+      <%= render UI::ButtonGroup::Component.new(entries:) %>
+
+      <% if uneditable_title.present? %>
+        <span class="tw:relative tw:z-10 tw:-mt-4 tw:-ml-4">
+          <%= render UI::Tooltip::Component.new(text: uneditable_title) %>
+        </span>
+      <% end %>
+    </div>
+
+    <%# onsubmit, not turbo_confirm: Turbo Drive is off app-wide, so it never fires %>
+    <div
+      class="
+        tw:ml-auto tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-4
+        tw:gap-y-1
+      "
+    >
+      <% if organization_sequence_path.present? %>
+        <%= link_to "View in organization", organization_sequence_path, class: "twlink tw:text-sm" %>
+      <% end %>
+
+      <% if @registration_sequence.draft? %>
+        <%= render UI::ButtonLink::Component.new(text: "Activate", href: activate_path, method: :patch, color: :primary, size: :sm,
+          form: {onsubmit: "return confirm('#{j activate_confirm}')"}) %>
+      <% else %>
+        <%= render UI::ButtonLink::Component.new(text: create_draft_text, href: create_draft_path, method: :post, color: :primary, size: :sm) %>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+<h1>
+  <%= translation("hello", name: @organization_role.invited_display_name) %>
+</h1>
+
+<% if @is_new_user %>
+  <h2><%= translation("welcome_to_bike_index") %></h2>
+<% end %>
+
+<% if sender.present? %>
+  <p>
+    <%= translation("you_are_a_member", sender_name: sender.display_name, org_name: organization.name) %>
+  </p>
+<% end %>
+
+<%= link_to translation("join_org", org_name: organization.short_name), tokenized_url, "data-pm-no-track" => true, class: "binx-button" %>

@@ -1,0 +1,54 @@
+# frozen_string_literal: true
+
+# General helper methods shared with View Components
+module ApplicationComponentHelper
+  # Override ActionView `cache` helper, adding the current locale to the cache
+  # key. Lives here (rather than ApplicationHelper) so both views and view
+  # components get it; otherwise a component's `cache` would skip the locale.
+  def cache(key = {}, options = {}, &block)
+    super([key, locale: I18n.locale], options, &block)
+  end
+
+  def number_display(number)
+    content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "less-less-strong" : ""))
+  end
+
+  # currency_name_suffix options: [false, true, :if_not_default]
+  def amount_display(obj, currency_name_suffix: false)
+    return if obj.amount_cents.nil?
+
+    content_tag(:span) do
+      concat(content_tag(:span, obj.currency_symbol, title: obj.currency_name))
+      concat(number_display(obj.amount))
+      if render_currency_name?(currency_name_suffix, obj.currency_name)
+        # Uses 66% so that it works for different size text
+        concat(content_tag(:span, " #{obj.currency_name}", class: "tw:text-[66%]"))
+      end
+    end
+  end
+
+  def check_mark
+    "&#x2713;".html_safe
+  end
+
+  def cross_mark
+    "&#x274C;".html_safe
+  end
+
+  def search_emoji
+    "🔎"
+  end
+
+  def link_emoji
+    image_tag("link.svg", class: "link-emoji")
+  end
+
+  private
+
+  def render_currency_name?(currency_name_suffix, currency_name)
+    return true if currency_name_suffix == true
+    return false if currency_name_suffix != :if_not_default
+
+    (current_currency || Currency.default).name != currency_name
+  end
+end

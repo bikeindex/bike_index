@@ -1,0 +1,93 @@
+<% nav_header_list_items = capture do %>
+  <li>
+    <%= render(UI::Dropdown::Component.new(
+      name: @searched_tag.present? ? "Tagged: #{@searched_tag}" : "All tags",
+      button_size: :sm,
+      active: @searched_tag.present?
+    )) do |dropdown|
+      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All tags", path: url_for(sortable_search_params.merge(search_tag: nil)), match_params: {search_tag: nil}) }
+      dropdown.with_entry_divider
+      searchable_tags.each do |tag|
+        dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: tag, path: url_for(sortable_search_params.merge(search_tag: tag)), match_params: {search_tag: tag}) }
+      end
+    end %>
+  </li>
+
+  <li>
+    <%= render(UI::Dropdown::Component.new(
+      name: @searched_receiver.present? ? "To: #{BugReport.display_receiver(@searched_receiver)}" : "All receivers",
+      button_size: :sm,
+      active: @searched_receiver.present?
+    )) do |dropdown|
+      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All receivers", path: url_for(sortable_search_params.merge(search_receiver: nil)), match_params: {search_receiver: nil}) }
+      dropdown.with_entry_divider
+      searchable_receivers.each do |receiver|
+        dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: BugReport.display_receiver(receiver), path: url_for(sortable_search_params.merge(search_receiver: receiver)), match_params: {search_receiver: receiver}) }
+      end
+    end %>
+  </li>
+
+  <li>
+    <%= render(UI::Dropdown::Component.new(
+      name: @searched_membership.present? ? membership_filters[@searched_membership] : "All membership status",
+      button_size: :sm,
+      active: @searched_membership.present?
+    )) do |dropdown|
+      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All membership status", path: url_for(sortable_search_params.merge(search_membership: nil)), match_params: {search_membership: nil}) }
+      dropdown.with_entry_divider
+      membership_filters.each do |value, label|
+        dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: label, path: url_for(sortable_search_params.merge(search_membership: value)), match_params: {search_membership: value}) }
+      end
+    end %>
+  </li>
+
+  <li>
+    <%= render(UI::Dropdown::Component.new(
+      name: status_filters[@searched_status],
+      button_size: :sm,
+      active: @searched_status != "investigate"
+    )) do |dropdown|
+      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: status_filters["investigate"], path: url_for(sortable_search_params.merge(search_status: "investigate")), match_params: {search_status: ["investigate", nil]}) }
+      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: status_filters["all"], path: url_for(sortable_search_params.merge(search_status: "all")), match_params: {search_status: "all"}) }
+      dropdown.with_entry_divider
+      status_only_filters.each do |value, label|
+        dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: label, path: url_for(sortable_search_params.merge(search_status: value)), match_params: {search_status: value}) }
+      end
+    end %>
+  </li>
+<% end %>
+
+<% admin_search_form = capture do %>
+  <%= form_with(url: admin_bug_reports_path, method: :get,
+    html: {class: "twsearchrow"}) do |f| %>
+    <%= hidden_field_tag :search_tag, params[:search_tag] %>
+    <%= hidden_field_tag :search_receiver, params[:search_receiver] %>
+    <%= hidden_field_tag :search_membership, params[:search_membership] %>
+    <%= hidden_field_tag :search_status, params[:search_status] %>
+
+    <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :search_email,
+      html_options: {value: params[:search_email], placeholder: "Sender email", class: "tw:w-full tw:sm:w-72"}) %>
+
+    <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :query,
+      html_options: {value: params[:query], placeholder: "Search subject and body", class: "tw:w-full tw:sm:w-[32rem]"}) %>
+
+    <%= render UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search") %>
+  <% end %>
+<% end %>
+
+<% searched_terms = {"receiver" => @searched_receiver, "tag" => @searched_tag, "sender email" => params[:search_email],
+  "user" => params[:user_id], "text" => params[:query]}
+  .filter_map { |label, value| safe_join(["#{label}: ", content_tag(:code, value)]) if value.present? } %>
+
+<% count_detail = capture do %>
+  &mdash; with <%= safe_join(searched_terms, ", ") %>
+<% end if searched_terms.any? %>
+
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @collection,
+  viewing: controller_name.humanize,
+  nav_header_list_items:, admin_search_form:, count_detail:,
+  table_view: render(Pages::Admin::BugReportsTable::Component.new(collection: @collection, searchable_tags:, sort_state:, display_dev_info: display_dev_info?, render_sortable: true)),
+  chart_collection: @render_chart && matching_bug_reports,
+)) %>

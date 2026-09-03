@@ -30,6 +30,7 @@ class BikeStickersController < ApplicationController
     # use the loosest lookup
     @bike_sticker = bike_sticker if bike_sticker.present?
     return @bike_sticker if @bike_sticker.present?
+
     flash[:error] = translation(:unable_to_find_sticker, code: bike_sticker_code)
     redirect_back(fallback_location: root_url) && return
   end

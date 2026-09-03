@@ -1,0 +1,85 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://maps.googleapis.com/maps/api/geocode/json?address=T4N%204E4,%20Canada&key=<GOOGLE_GEOCODER>&language=en&sensor=false
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Wed, 11 Jun 2025 18:28:40 GMT
+      Pragma:
+      - no-cache
+      Expires:
+      - Fri, 01 Jan 1990 00:00:00 GMT
+      Cache-Control:
+      - no-cache, must-revalidate
+      Access-Control-Allow-Origin:
+      - "*"
+      Content-Security-Policy-Report-Only:
+      - script-src 'none'; form-action 'none'; frame-src 'none'; report-uri https://csp.withgoogle.com/csp/scaffolding/msaifdggmnwc:228:0
+      Cross-Origin-Opener-Policy-Report-Only:
+      - same-origin; report-to=msaifdggmnwc:228:0
+      Report-To:
+      - '{"group":"msaifdggmnwc:228:0","max_age":2592000,"endpoints":[{"url":"https://csp.withgoogle.com/csp/report-to/scaffolding/msaifdggmnwc:228:0"}],}'
+      Server:
+      - mafe
+      Content-Length:
+      - '2368'
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      Server-Timing:
+      - gfet4t7; dur=98
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+    body:
+      encoding: UTF-8
+      string: "{\n   \"results\" : \n   [\n      {\n         \"address_components\"
+        : \n         [\n            {\n               \"long_name\" : \"T4N 4E4\",\n
+        \              \"short_name\" : \"T4N 4E4\",\n               \"types\" : \n
+        \              [\n                  \"postal_code\"\n               ]\n            },\n
+        \           {\n               \"long_name\" : \"Red Deer\",\n               \"short_name\"
+        : \"Red Deer\",\n               \"types\" : \n               [\n                  \"locality\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Red Deer County\",\n               \"short_name\"
+        : \"Red Deer County\",\n               \"types\" : \n               [\n                  \"administrative_area_level_2\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Alberta\",\n               \"short_name\"
+        : \"AB\",\n               \"types\" : \n               [\n                  \"administrative_area_level_1\",\n
+        \                 \"political\"\n               ]\n            },\n            {\n
+        \              \"long_name\" : \"Canada\",\n               \"short_name\"
+        : \"CA\",\n               \"types\" : \n               [\n                  \"country\",\n
+        \                 \"political\"\n               ]\n            }\n         ],\n
+        \        \"formatted_address\" : \"Red Deer, AB T4N 4E4, Canada\",\n         \"geometry\"
+        : \n         {\n            \"bounds\" : \n            {\n               \"northeast\"
+        : \n               {\n                  \"lat\" : 52.2995248,\n                  \"lng\"
+        : -113.811914\n               },\n               \"southwest\" : \n               {\n
+        \                 \"lat\" : 52.295942,\n                  \"lng\" : -113.8143829\n
+        \              }\n            },\n            \"location\" : \n            {\n
+        \              \"lat\" : 52.2977406,\n               \"lng\" : -113.812812\n
+        \           },\n            \"location_type\" : \"APPROXIMATE\",\n            \"viewport\"
+        : \n            {\n               \"northeast\" : \n               {\n                  \"lat\"
+        : 52.2995248,\n                  \"lng\" : -113.8117994697085\n               },\n
+        \              \"southwest\" : \n               {\n                  \"lat\"
+        : 52.295942,\n                  \"lng\" : -113.8144974302915\n               }\n
+        \           }\n         },\n         \"place_id\" : \"ChIJlT7Osq5VdFMRxTPqe5pJufs\",\n
+        \        \"types\" : \n         [\n            \"postal_code\"\n         ]\n
+        \     }\n   ],\n   \"status\" : \"OK\"\n}"
+  recorded_at: Wed, 11 Jun 2025 18:28:40 GMT
+recorded_with: VCR 6.3.1

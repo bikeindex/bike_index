@@ -5,7 +5,7 @@
   %article.blogger-info
     %h4.pub-date
       = t(".updated")
-      %span.convertTime.withPreposition= l @blog.published_at, format: :convert_time
+      %span.localizeTime.withPreposition= l @blog.published_at, format: :convert_time
   %hr.mb-5.less-strong
 
 - if @blog.is_listicle

@@ -36,9 +36,20 @@ RSpec.describe InfoController, type: :request do
     end
   end
 
+  describe "membership" do
+    let!(:blog) { FactoryBot.create(:blog, title: "Bike Index Membership", info_kind: true) }
+    it "renders" do
+      get "/membership"
+      expect(assigns(:blog)&.id).to eq blog.id
+      expect(response.status).to eq(200)
+      get "/info/bike-index-membership"
+      expect(response).to redirect_to "/membership"
+    end
+  end
+
   describe "static pages" do
-    pages = %w[about protect_your_bike where serials image_resources resources security
-      dev_and_design donate terms vendor_terms privacy lightspeed]
+    pages = %w[about protect_your_bike serials resources security
+      donate terms vendor_terms privacy lightspeed]
     context "no user" do
       pages.each do |page|
         context "#{page} with revised_layout enabled" do
@@ -73,6 +84,26 @@ RSpec.describe InfoController, type: :request do
           end
         end
       end
+    end
+    %w[image_resources dev_and_design].each do |page|
+      context page do
+        it "redirects to resources" do
+          get "/#{page}"
+          expect(response).to redirect_to "/resources"
+        end
+      end
+    end
+  end
+
+  describe "where" do
+    let!(:organization1) { FactoryBot.create(:organization, :in_nyc, show_on_map: true) }
+    let!(:organization2) { FactoryBot.create(:organization, :in_chicago, show_on_map: false) }
+    let!(:organization3) { FactoryBot.create(:organization, :in_edmonton, show_on_map: true) }
+    it "renders" do
+      get "/where"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:where)
+      expect(assigns(:organizations).pluck(:id)).to match_array([organization1.id, organization3.id])
     end
   end
 
@@ -135,9 +166,17 @@ RSpec.describe InfoController, type: :request do
   end
 
   describe "current_tsv" do
-    it "redirects to current_tsv" do
+    it "redirects to how_not_to_buy_stolen PDF" do
       get "/how_not_to_buy_stolen"
       expect(response).to redirect_to InfoController::DONT_BUY_STOLEN_URL
+    end
+  end
+
+  context "primary_activities" do
+    it "gets a csv" do
+      get "/primary_activities.csv"
+      expect(response.status).to eq(200)
+      expect(response.content_type).to match("text/csv")
     end
   end
 end

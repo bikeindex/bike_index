@@ -1,44 +1,51 @@
-# This class parses bike search log lines
-class LogSearcher::Parser
-  CONTROLLER_ENDPOINTS = {
-    "API::V1::BikesController#index" => :api_v1_bikes,
-    "API::V1::BikesController#stolen_ids" => :api_v1_stolen_ids,
-    "API::V1::BikesController#close_serials" => :api_v1_close_serials,
-    "BikesController#index" => :web_bikes,
-    "Organized::BikesController#index" => :org_bikes,
-    "Admin::BikesController#index" => :admin_bikes,
-    "OrgPublic::ImpoundedBikesController#index" => :org_public_impounded,
-    "Organized::ImpoundRecordsController#index" => :org_impounded,
-    "Organized::ParkingNotificationsController#index" => :org_parking_notifications
-  }.freeze
+# This module parses bike search log lines
+module LogSearcher
+  module Parser
+    extend Functionable
 
-  ROUTE_ENDPOINTS = {
-    "/api/v2/bikes_search/count" => :api_v2_count,
-    "/api/v2/bikes_search/close_serials" => :api_v2_close_serials,
-    "/api/v2/bikes/check_if_registered" => :api_v2_check_if_registered,
-    "/api/v3/search" => :api_v3_bikes,
-    "/api/v3/search/count" => :api_v3_count,
-    "/api/v3/search/close_serials" => :api_v3_close_serials,
-    "/api/v3/search/serials_containing" => :api_v3_serials_containing,
-    "/api/v3/search/external_registries" => :api_v3_external_registries,
-    "/api/v3/bikes/check_if_registered" => :api_v3_check_if_registered
-  }.freeze
+    CONTROLLER_ENDPOINTS = {
+      "API::V1::BikesController#index" => :api_v1_bikes,
+      "API::V1::BikesController#stolen_ids" => :api_v1_stolen_ids,
+      "API::V1::BikesController#close_serials" => :api_v1_close_serials,
+      "Organized::BikesController#index" => :org_bikes,
+      "Admin::BikesController#index" => :admin_bikes,
+      "OrgPublic::ImpoundedBikesController#index" => :org_public_impounded,
+      "Organized::ImpoundRecordsController#index" => :org_impounded,
+      "Organized::ParkingNotificationsController#index" => :org_parking_notifications,
+      "Search::RegistrationsController#index" => :web_bikes,
+      "Search::RegistrationsController#serials_containing" => :web_serials_containing,
+      "Search::RegistrationsController#similar_serials" => :web_close_serials,
+      "Search::MarketplaceController#index" => :web_marketplace,
+      "Search::MarketplaceController#counts" => :web_marketplace_count
+    }.freeze
 
-  FILTERED_PARAMS = %w[access_token page].freeze
-  NON_QUERY_ITEMS = (
-    FILTERED_PARAMS +
-    %w[stolenness location distance locale organization_id organization_slug sort sort_direction render_chart utf8]
-  ).freeze
+    ROUTE_ENDPOINTS = {
+      "/api/v2/bikes_search/count" => :api_v2_count,
+      "/api/v2/bikes_search/close_serials" => :api_v2_close_serials,
+      "/api/v2/bikes/check_if_registered" => :api_v2_check_if_registered,
+      "/api/v3/search" => :api_v3_bikes,
+      "/api/v3/search/count" => :api_v3_count,
+      "/api/v3/search/close_serials" => :api_v3_close_serials,
+      "/api/v3/search/serials_containing" => :api_v3_serials_containing,
+      "/api/v3/search/external_registries" => :api_v3_external_registries,
+      "/api/v3/bikes/check_if_registered" => :api_v3_check_if_registered
+    }.freeze
 
-  class << self
+    FILTERED_PARAMS = %w[access_token page].freeze
+    NON_QUERY_ITEMS = (
+      FILTERED_PARAMS +
+      %w[stolenness location distance locale organization_id organization_slug sort sort_direction render_chart utf8]
+    ).freeze
+
     def parse_log_line(log_line)
       raise "Multiple line_data matches for log line #{log_line}" if log_line.match?(/\] \{.*\] \{/)
+
       line_data, opts = log_line.split("] {")
       opts = JSON.parse("{#{opts}")
       endpoint = parse_endpoint(opts)
       return nil unless LoggedSearch.endpoints_sym.include?(endpoint)
 
-      query_items = (opts["params"] || {}).select { |_, value| value.present? }
+      query_items = scrub_null_bytes(opts["params"] || {}).select { |_, value| value.present? }
       if query_items["search_secondary"].present? && query_items["search_secondary"].is_a?(Array) &&
           query_items["search_secondary"].reject(&:blank?).none?
 
@@ -57,11 +64,19 @@ class LogSearcher::Parser
         stolenness: stolenness_for(endpoint, opts),
         serial_normalized: SerialNormalizer.normalized_and_corrected(query_items["serial"]),
         includes_query: includes_query?(query_items),
-        page: [nil, "1", "undefined"].include?(query_items["page"]) ? nil : query_items["page"].to_i
+        page: page_for(query_items["page"])
       }
     end
 
-    private
+    #
+    # private below here
+    #
+
+    def page_for(value)
+      return nil if [nil, "1", "undefined"].include?(value)
+      return nil unless value.is_a?(String) || value.is_a?(Numeric)
+      value.to_i
+    end
 
     def includes_query?(query_items)
       query_items.except(*NON_QUERY_ITEMS).present?
@@ -81,12 +96,22 @@ class LogSearcher::Parser
 
     def organization_from_params(params)
       return nil if params.blank?
+
       Organization.friendly_find_id(params["organization_id"] || params["organization_slug"])
     end
 
     def parse_request_time(line_data)
       time_str = line_data.gsub("I, [", "").split(" #").first
       Time.parse("#{time_str} UTC")
+    end
+
+    def scrub_null_bytes(value)
+      case value
+      when String then value.delete("\u0000")
+      when Array then value.map { |v| scrub_null_bytes(v) }
+      when Hash then value.transform_values { |v| scrub_null_bytes(v) }
+      else value
+      end
     end
 
     def stolenness_for(endpoint, opts)
@@ -100,13 +125,15 @@ class LogSearcher::Parser
         :impounded
       elsif endpoint == :api_v1_stolen_ids
         :stolen
+      elsif endpoint.match?(/marketplace/)
+        :for_sale
       else
         case opts.dig("params", "stolenness")
         when "stolen", "proximity" then :stolen
         when "non" then :non
         when "found", "impounded" then :impounded
         else
-          if opts.dig("params", "stolen").present? && InputNormalizer.boolean(opts.dig("params", "stolen"))
+          if opts.dig("params", "stolen").present? && Binxtils::InputNormalizer.boolean(opts.dig("params", "stolen"))
             :stolen
           else
             :all
@@ -114,5 +141,7 @@ class LogSearcher::Parser
         end
       end
     end
+
+    conceal :includes_query?, :parse_endpoint, :organization_from_params, :page_for, :parse_request_time, :scrub_null_bytes, :stolenness_for
   end
 end

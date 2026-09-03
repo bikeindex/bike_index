@@ -1,0 +1,323 @@
+/* Declare CSS layers so that legacy is overridden by tailwind utility classes */
+@layer theme, base, legacy, components, utilities;
+/* source(none) + explicit @source: without it, tailwind v4 auto-scans the
+ * entire repo (~3k files — vendor/, public/, spec/, …) for class candidates,
+ * which was ~45s of every CI assets:precompile. Paths are relative to THIS
+ * file. */
+@import "tailwindcss" prefix(tw) source(none);
+@source "../../views";
+@source "../../components";
+@source "../../helpers";
+@source "../../javascript";
+@source "../../../public/*.html";
+@import "./combobox.css";
+@import "./lexxy_overrides.css";
+
+/* Class-based dark mode (the legacy config's darkMode: 'selector'); a `.dark`
+ * ancestor activates tw:dark:* utilities. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* The selected/pressed state of a button, link or menu item, however it's flagged.
+ * Keep it the last @custom-variant: tailwind sorts custom variants in declaration
+ * order, and sorting after `dark` is what lets tw:is-active:* beat the resting,
+ * hover and dark colors it overrides without `!important`.
+ *
+ * The :not()s keep a disabled element from looking active, and tie the specificity of
+ * the hovers they beat (guarded not-disabled:not-aria-disabled:) — sorting last only
+ * settles ties, so without them a pressed button renders its hover color. */
+@custom-variant is-active (&:is([data-active="true"], [aria-pressed="true"], [aria-current], :active):not(:disabled):not([aria-disabled="true"]));
+
+@theme {
+  --font-sans: "Open Sans", sans-serif;
+  --font-header: "Montserrat", sans-serif;
+  --breakpoint-xs: 23rem; /* 368px (iphone mini is 375px) */
+  --breakpoint-navbar: 62rem; /* 992px, the $grid-breakpoint-lg the navbar switches at */
+
+  /* OG Bike Index brand palettes (formerly config/tailwind.config.js) */
+  /* Blue 500 and up carry the redesign's saturation (kelsey_styles.css's
+   * --redesign-blue-500/-800 are 500 and 600 here). Same hue and lightness as
+   * the OG ramp, just fully saturated; 800-950 continue it so the dark end
+   * doesn't fall back to the duller mix. */
+  --color-blue-50: #f2f8fd;
+  --color-blue-100: #e3effb;
+  --color-blue-200: #c1dff6;
+  --color-blue-300: #8ac5ef;
+  --color-blue-400: #4ca7e4;
+  --color-blue-500: #3397dc; /* OG Bike Index blue */
+  --color-blue-600: #016ec2;
+  --color-blue-700: #015a9e;
+  --color-blue-800: #014e89;
+  --color-blue-900: #01457a;
+  --color-blue-950: #002e51;
+
+  --color-green-50: #f1fcf5;
+  --color-green-100: #defaea;
+  --color-green-200: #bef4d4;
+  --color-green-300: #8beab3;
+  --color-green-400: #52d689;
+  --color-green-500: #2ecc71; /* OG Bike Index green */
+  --color-green-600: #1d9c53;
+  --color-green-700: #1b7a43;
+  --color-green-800: #1a6139;
+  --color-green-900: #175031;
+  --color-green-950: #072c18;
+
+  --color-red-50: #fef3f2;
+  --color-red-100: #fde5e3;
+  --color-red-200: #fcd0cc;
+  --color-red-300: #f9b0a8;
+  --color-red-400: #f38276;
+  --color-red-500: #e74c3c; /* OG Bike Index red */
+  --color-red-600: #d53d2d;
+  --color-red-700: #b33022;
+  --color-red-800: #942b20;
+  --color-red-900: #7b2921;
+  --color-red-950: #43110c;
+
+  --color-slate-50: #f5f7fa; /* slate is pretty close to blue, but -- I still like it! */
+  --color-slate-100: #eaeff4;
+  --color-slate-200: #cfdce8;
+  --color-slate-300: #a6bfd3;
+  --color-slate-400: #759cbb;
+  --color-slate-500: #5480a3;
+  --color-slate-600: #416788;
+  --color-slate-700: #35526f;
+  --color-slate-800: #2f475d;
+  --color-slate-900: #2c3e50; /* OG Bike Index blue-dark */
+  --color-slate-950: #1d2834;
+
+  /* OG Bike Index purple — replaces Tailwind's default `purple`. 50–600 are the
+     existing design values; 400 and 700–950 are derived to complete the ramp. */
+  --color-purple-50: #f7f5fc;
+  --color-purple-100: #f0edfa;
+  --color-purple-200: #d6d4e0;
+  --color-purple-300: #9a8fc4;
+  --color-purple-400: #8574bb;
+  --color-purple-500: #715eb2;
+  --color-purple-600: #5d4b9c;
+  --color-purple-700: #4a3c7d;
+  --color-purple-800: #3a2f62;
+  --color-purple-900: #2c244b;
+  --color-purple-950: #1c162f;
+
+  /* The dev-info marking, the legacy stylesheets' $dev-color */
+  --color-dev: #9400d3;
+}
+
+@import "./bike_index_components.css";
+
+@layer components {
+  /* Style tables with CSS selectors to prevent caching issues */
+  .ui-table tbody tr:nth-child(odd) {
+    @apply tw:bg-white tw:dark:bg-gray-900;
+  }
+  .ui-table tbody tr:nth-child(even) {
+    @apply tw:bg-gray-100 tw:dark:bg-gray-800;
+  }
+  /* Default first/last column rounding/borders. ui_table_controller.js
+     reapplies these to the first/last *visible* column when columns are hidden. */
+  .ui-table thead tr th:first-child {
+    @apply tw:rounded-tl-sm;
+  }
+  .ui-table thead tr th:last-child {
+    @apply tw:rounded-tr-sm;
+  }
+  .ui-table tbody tr:last-child td:first-child {
+    @apply tw:rounded-bl-sm;
+  }
+  .ui-table tbody tr:last-child td:last-child {
+    @apply tw:rounded-br-sm;
+  }
+  .ui-table-bordered tbody tr td:first-child {
+    @apply tw:ui-table-bordered-td-first;
+  }
+  .ui-table-bordered tbody tr td:last-child {
+    @apply tw:ui-table-bordered-td-last;
+  }
+  .ui-table-bordered thead tr th:first-child {
+    @apply tw:ui-table-bordered-th-first;
+  }
+  .ui-table-bordered thead tr th:last-child {
+    @apply tw:ui-table-bordered-th-last;
+  }
+
+  /* Turbo sets [busy] on the results frame during requests. Hide the existing
+     results and overlay a spinner; min-height gives the spinner a place to
+     land on the initial auto-submit when the frame is still empty. */
+  .search-results-frame-wrapper {
+    @apply tw:relative;
+  }
+  .search-results-frame-wrapper > turbo-frame[busy] {
+    @apply tw:opacity-0 tw:pointer-events-none;
+  }
+  .search-results-frame-wrapper > .search-loading-overlay {
+    @apply tw:hidden tw:absolute tw:top-0 tw:left-0 tw:right-0 tw:pointer-events-none tw:z-1;
+  }
+  .search-results-frame-wrapper:has(> turbo-frame[busy]) {
+    @apply tw:min-h-48;
+  }
+  .search-results-frame-wrapper:has(> turbo-frame[busy]) > .search-loading-overlay {
+    @apply tw:block;
+  }
+}
+
+/* Create utility classes for the sides of the table so that it can be applied in JS when columns are hidden */
+@utility ui-table-bordered-td-first {
+  @apply tw:border-l tw:border-gray-200 tw:dark:border-gray-700;
+}
+@utility ui-table-bordered-td-last {
+  @apply tw:border-r tw:border-gray-200 tw:dark:border-gray-700;
+}
+@utility ui-table-bordered-th-first {
+  @apply tw:border-l tw:border-gray-200 tw:dark:border-gray-600 tw:rounded-tl-sm;
+}
+@utility ui-table-bordered-th-last {
+  @apply tw:border-r tw:border-gray-200 tw:dark:border-gray-600 tw:rounded-tr-sm;
+}
+
+@utility base-font {
+  @apply tw:antialiased tw:font-sans tw:twtext-color;
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  input:where([type="button"], [type="reset"], [type="submit"]):not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+body {
+  @apply tw:base-font tw:dark:bg-gray-900;
+
+  /* .primary-header-nav's margin-bottom, which the full-bleed pages pull up by to sit
+     flush under the navbar. Defined here rather than beside the nav in revised.scss,
+     which the admin and component-preview layouts don't load; the layout zeroes it on
+     <main> when the general alert stands in the gap instead */
+  --nav-gap: 36px;
+}
+@media (min-width: 992px) {
+  body {
+    --nav-gap: 60px;
+  }
+}
+/* The org sidebar is fixed, so the page it covers is pushed over instead. The
+   controller narrows --org-sidebar-width as it collapses; defaulting to the
+   expanded width keeps the content still until stimulus connects. There's no
+   navbar here, so main's inset stands in for its gap -- named the same so a
+   full-bleed page pulls up under it with the same -mt-(--nav-gap) */
+body.with-org-sidebar {
+  --nav-gap: 28px;
+
+  margin-left: var(--org-sidebar-width, 266px);
+  transition: margin-left 0.18s ease;
+}
+
+/* The sidebar runs the height of the window, so the content does too -- a short page
+   would otherwise end partway down it, with the footer riding up beside the rows */
+body.with-org-sidebar main {
+  @apply tw:pt-(--nav-gap);
+
+  min-height: 100vh;
+}
+
+/* A page that is one shell stretches to fill that height, so a full-bleed background
+   reaches the bottom rather than stopping at its content. Guarded on :only-child so
+   a multi-element page keeps block layout, where its margins still collapse */
+body.with-org-sidebar main:has(> :only-child) {
+  @apply tw:flex tw:flex-col;
+}
+
+/* Bootstrap's .container has auto side margins, which opt it out of the cross-axis
+   stretch -- unstretched it goes max-content wide, so the width is asked for */
+body.with-org-sidebar main > :only-child {
+  flex-grow: 1;
+  width: 100%;
+}
+
+/* SharedBlocks::Navbar::OrgSidebar::Component::MOBILE_BREAKPOINT, below which the sidebar is
+   a top bar in the flow -- which takes its own space, so there's nothing to hold
+   open for it. `width <` rather than a max-width of 759px, so a fractional viewport
+   between the two doesn't land outside both this and the template's min-[760px] */
+@media (width < 760px) {
+  body.with-org-sidebar {
+    --nav-gap: 16px;
+
+    margin-left: 0;
+  }
+
+  body.with-org-sidebar main {
+    min-height: 0;
+  }
+}
+
+/* select2 is used by everythingcombox. Here are styles to make it look like the other inputs */
+.select2 .select2-selection--multiple {
+  /* There is some funky padding stuff that goes on in select2. This makes it mostly match */
+  @apply tw:pt-1.5 tw:px-2.5 tw:pb-0;
+}
+
+.select2-container.select2-container--default .select2-selection--multiple {
+  @apply tw:border tw:border-gray-300 tw:dark:border-gray-600;
+}
+
+.select2-container .select2-dropdown,
+.select2-container.select2-container--default .select2-selection--multiple {
+  @apply tw:bg-white tw:dark:bg-gray-700 tw:rounded-sm
+    tw:placeholder-gray-500 tw:text-gray-900 tw:text-base tw:dark:placeholder-gray-400 tw:dark:text-gray-200;
+}
+
+.select2-search__field {
+  @apply tw:placeholder-gray-500 tw:dark:placeholder-gray-400;
+}
+
+.select2-container .select2-dropdown,
+.select2.select2-container--default.select2-container--focus
+  .select2-selection--multiple {
+  @apply tw:outline-0 tw:ring tw:ring-blue-400 tw:border-blue-400 tw:dark:ring-blue-500 tw:dark:focus:border-blue-500;
+}
+
+.select2-container--default
+  .select2-selection--multiple
+  .select2-selection__choice,
+.select2-container .select2-search--inline .select2-search__field {
+  margin-top: 0 !important;
+}
+
+.select2-container--default
+  .select2-selection--multiple
+  .select2-selection__rendered {
+  padding: 0 !important;
+}
+
+/* This is a container that matches the width of the bootstrap container */
+.twbootcontainer {
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+@media (min-width: 544px) {
+  .twbootcontainer {
+    max-width: 576px;
+  }
+}
+@media (min-width: 768px) {
+  .twbootcontainer {
+    max-width: 720px;
+  }
+}
+@media (min-width: 992px) {
+  .twbootcontainer {
+    max-width: 940px;
+  }
+}
+@media (min-width: 1200px) {
+  .twbootcontainer {
+    max-width: 1140px;
+  }
+}
+
+.serial-span {
+  @apply tw:text-sm tw:font-mono tw:font-light tw:text-gray-900 tw:dark:text-gray-100;
+}

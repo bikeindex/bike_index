@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: paints
+# Database name: primary
 #
 #  id                 :integer          not null, primary key
 #  bikes_count        :integer          default(0), not null
@@ -15,22 +16,21 @@
 class Paint < ApplicationRecord
   include FriendlyNameFindable
 
-  validates_presence_of :name
-  validates_uniqueness_of :name
   belongs_to :color
   belongs_to :manufacturer
   has_many :bikes
-
   belongs_to :secondary_color, class_name: "Color"
   belongs_to :tertiary_color, class_name: "Color"
+
+  validates_presence_of :name
+  validates_uniqueness_of :name
+
+  before_save :set_calculated_attributes
+  before_create :associate_colors
 
   scope :official, -> { where("manufacturer_id IS NOT NULL") }
   scope :linked, -> { where("color_id IS NOT NULL") }
   scope :unlinked, -> { where("color_id IS NULL") }
-
-  before_save :set_calculated_attributes
-
-  before_create :associate_colors
 
   # TODO: Refactor this to be better
   def self.paint_name_parser(str)
@@ -98,7 +98,7 @@ class Paint < ApplicationRecord
     paint_str.gsub!(/golde?n?/, " yellow ")
     paint_str.gsub!(/(\A|\s)crcl(\s|\Z)/, " silver ") # bad abbreviation of charcoal
     paint_str.gsub!("gunmetal", " silver ")
-    paint_str.gsub!(/char(coa?l)?/, " silver ")
+    paint_str.gsub!(/\bchar(coa?l)?\b/, " silver ") # use word boundaries to ensure it doesn't match chartreuse
     paint_str.gsub!("graphite", " silver ")
     paint_str.gsub!("platinum", " silver ")
     paint_str.gsub!("nickel", " silver ")

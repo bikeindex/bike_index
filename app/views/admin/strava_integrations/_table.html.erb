@@ -1,0 +1,77 @@
+<%# locals: (collection:, render_sortable: false, render_deleted: false) %>
+
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+  <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |strava_integration| %>
+    <%= link_to admin_strava_integration_path(strava_integration) do %>
+      <%= render UI::Time::Component.new(time: strava_integration.created_at) %>
+    <% end %>
+  <% end %>
+
+  <% if render_deleted %>
+    <% table.column(sortable: "deleted_at") do |strava_integration| %>
+      <% if strava_integration.deleted_at.present? %>
+        <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">
+          <%= render UI::Time::Component.new(time: strava_integration.deleted_at) %>
+        </small>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |strava_integration| %>
+    <small>
+      <%= render UI::Time::Component.new(time: strava_integration.updated_at) %>
+    </small>
+  <% end %>
+
+  <% table.column(sortable: "user_id") do |strava_integration| %>
+    <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: strava_integration.user, user_id: strava_integration.user_id, render_search: render_sortable) %>
+  <% end %>
+
+  <% table.column(sortable: "status") do |strava_integration| %>
+    <% if strava_integration.synced? %>
+      <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">
+        <%= strava_integration.status %>
+      </span>
+    <% elsif strava_integration.error? %>
+      <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">
+        <%= strava_integration.status %>
+      </span>
+    <% else %>
+      <small><%= strava_integration.status %></small>
+    <% end %>
+
+    <% if strava_integration.permissions_less? %>
+      <%= render UI::Badge::Component.new(text: "p-", title: "less than default permissions", color: :error, size: :sm) %>
+    <% elsif strava_integration.permissions_strava_search_default? %>
+      <%= render UI::Badge::Component.new(text: "s", title: "Strava Search default permissions", color: :success, size: :sm) %>
+    <% elsif strava_integration.permissions_more? %>
+      <%= render UI::Badge::Component.new(text: "p+", title: "more than default permissions", color: :notice, size: :sm) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Athlete ID", header_classes: "tw:font-normal") do |strava_integration| %>
+    <small><%= number_display(strava_integration.strava_id) %></small>
+  <% end %>
+
+  <% table.column(sortable: "activities_downloaded_count", label: "Activities") do |strava_integration| %>
+    <%= link_to number_display(strava_integration.activities_downloaded_count), admin_strava_activities_path(search_strava_integration_id: strava_integration.id) %>
+
+    <% if !strava_integration.synced? && strava_integration.athlete_activity_count.present? %>
+      <small class="less-strong">
+        / <%= number_display(strava_integration.athlete_activity_count) %>
+      </small>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: "Gear", header_classes: "tw:font-normal") do |strava_integration| %>
+    <small>
+      <%= strava_integration.strava_gears.pluck(:name).compact.join(", ").truncate(40) %>
+    </small>
+  <% end %>
+
+  <% table.column(sortable: "last_updated_activities_at", label: "Activities updated") do |strava_integration| %>
+    <small>
+      <%= render UI::Time::Component.new(time: strava_integration.last_updated_activities_at) %>
+    </small>
+  <% end %>
+<% end %>

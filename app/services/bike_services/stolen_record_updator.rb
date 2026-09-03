@@ -1,0 +1,70 @@
+module BikeServices
+  class StolenRecordUpdator
+    # Used to be in StolenRecord - but now it's here. Eventually, I'd like to actually do permitted params handling in here
+    # recovery_tweet, recovery_share # We edit this in the admin panel
+    OLD_ATTR_ACCESSIBLE = (%i[police_report_number police_report_department locking_description lock_defeat_description
+      timezone date_stolen bike creation_organization_id country_id region_record_id region_string street postal_code city latitude
+      longitude theft_description current phone secondary_phone phone_for_everyone
+      phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
+      approved recovered_at recovered_description index_helped_recovery can_share_recovery
+      recovery_posted tsved_at estimated_value] +
+      BParam::LEGACY_STOLEN_ATTRS.keys.map(&:to_sym)).freeze # TODO: #3952 - stolen record legacy attrs
+
+    attr_reader :stolen_params
+
+    def self.old_attr_accessible = OLD_ATTR_ACCESSIBLE
+
+    def initialize(bike: nil, b_param: nil, params: nil)
+      @bike = bike
+      b_param ||= BParam.new(params:)
+      @stolen_params = b_param&.stolen_attrs
+    end
+
+    def update_records
+      return if @stolen_params.blank? || @bike.id.blank? # If no bike ID, bike has errored
+
+      @bike.reload
+      stolen_record = @bike.fetch_current_stolen_record
+      stolen_record ||= @bike.build_new_stolen_record
+      stolen_record = update_with_params(stolen_record)
+      stolen_record.save
+      @bike.reload
+      stolen_record
+    end
+
+    private
+
+    def update_with_params(stolen_record)
+      return stolen_record unless @stolen_params.present?
+
+      stolen_record.attributes = permitted_attributes(@stolen_params)
+
+      if @stolen_params["date_stolen"].present?
+        stolen_record.date_stolen = Binxtils::TimeParser.parse(@stolen_params["date_stolen"], @stolen_params["timezone"])
+      end
+
+      if @stolen_params["country"].present?
+        stolen_record.country = Country.friendly_find(@stolen_params["country"])
+      end
+
+      stolen_record.region_record_id = State.fuzzy_abbr_find(@stolen_params["state"])&.id if @stolen_params["state"].present?
+      if @stolen_params["phone_no_show"]
+        stolen_record.attributes = {
+          phone_for_everyone: false,
+          phone_for_users: false,
+          phone_for_shops: false,
+          phone_for_police: false
+        }
+      end
+      stolen_record
+    end
+
+    def permitted_attributes(params)
+      ActionController::Parameters.new(params).permit(:phone, :secondary_phone, :street, :city, :postal_code,
+        :country_id, :region_record_id, :region_string, :police_report_number, :police_report_department, :estimated_value,
+        :theft_description, :locking_description, :lock_defeat_description, :proof_of_ownership,
+        :receive_notifications, :phone_for_everyone, :phone_for_users,
+        :phone_for_shops, :phone_for_police, :skip_geocoding)
+    end
+  end
+end

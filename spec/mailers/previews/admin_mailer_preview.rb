@@ -15,6 +15,11 @@ class AdminMailerPreview < ActionMailer::Preview
     AdminMailer.blocked_stolen_notification_email(stolen_notification)
   end
 
+  def blocked_marketplace_message_email
+    marketplace_message = MarketplaceMessage.blocked.last || MarketplaceMessage.last
+    AdminMailer.blocked_marketplace_message_email(marketplace_message)
+  end
+
   def lightspeed_notification_email
     organization = Organization.last
     AdminMailer.lightspeed_notification_email(organization, "asdfasdf")

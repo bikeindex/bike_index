@@ -10,25 +10,25 @@ FactoryBot.define do
 
     trait :in_nyc do
       after(:create) do |org|
-        FactoryBot.create(:location_nyc, organization: org)
+        FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization: org)
       end
     end
 
     trait :in_chicago do
       after(:create) do |org|
-        FactoryBot.create(:location_chicago, organization: org)
+        FactoryBot.create(:location, :with_address_record, address_in: :chicago, organization: org)
       end
     end
 
     trait :in_los_angeles do
       after(:create) do |org|
-        FactoryBot.create(:location_los_angeles, organization: org)
+        FactoryBot.create(:location, :with_address_record, address_in: :los_angeles, organization: org)
       end
     end
 
     trait :in_edmonton do
       after(:create) do |org|
-        FactoryBot.create(:location_edmonton, organization: org)
+        FactoryBot.create(:location, :with_address_record, address_in: :edmonton, organization: org)
       end
     end
 
@@ -42,6 +42,22 @@ FactoryBot.define do
       end
     end
 
+    trait :paid do
+      transient do
+        enabled_feature_slugs { nil }
+        organization_feature { nil }
+      end
+
+      after(:create) do |organization, evaluator|
+        Sidekiq::Testing.inline! do
+          invoice = FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization)
+          invoice.update(organization_feature_ids: [evaluator.organization_feature&.id])
+          organization.reload
+        end
+      end
+    end
+
+    # TODO: Figure out how to use the :paid trait rather than duplicating the logic
     trait :organization_features do
       transient do
         enabled_feature_slugs { ["csv_export"] }
@@ -51,7 +67,7 @@ FactoryBot.define do
       after(:create) do |organization, evaluator|
         Sidekiq::Testing.inline! do
           invoice = FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization)
-          invoice.update(organization_feature_ids: [evaluator.organization_feature.id])
+          invoice.update(organization_feature_ids: [evaluator.organization_feature&.id])
           organization.reload
         end
       end
@@ -60,6 +76,12 @@ FactoryBot.define do
     factory :organization_with_organization_features, traits: [:organization_features] do
       factory :organization_with_regional_bike_counts do
         enabled_feature_slugs { ["regional_bike_counts"] }
+      end
+
+      factory :organization_brakebills do
+        name { "Brakebills" }
+        short_name { "Brakebills" }
+        enabled_feature_slugs { OrganizationFeature::EXPECTED_SLUGS }
       end
     end
 

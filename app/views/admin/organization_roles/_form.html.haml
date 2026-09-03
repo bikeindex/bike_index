@@ -7,11 +7,10 @@
           %br
           It would be better to delete and re-add
     = form_for [:admin, @organization_role] do |f|
-      - if @organization_role.errors.any?
-        = render partial: "/shared/errors", locals: { name: "OrganizationRole", obj: @organization_role }
-      .form-group.fancy-select.unfancy
-        = f.label :organization
-        = collection_select :organization_role, :organization_id, @organizations, :id, :name, { include_blank: "Please select an organization" }, required: true,  class: "form-control"
+      = render(UI::Alerts::ObjectError::Component.new(object: @organization_role))
+
+      = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id, label_text: OrganizationRole.human_attribute_name(:organization), required: true)) do
+        = render UI::Forms::Combobox::Component.new(name: :organization_id, form: f, placeholder: "Please select an organization", required: true, include_blank: true, options: @organizations.pluck(:name, :id))
 
       .form-group
         = f.label :invited_email

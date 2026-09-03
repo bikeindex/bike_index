@@ -1,0 +1,19 @@
+<%= render(UI::Card::Component.new) do %>
+  <h2 class="tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2] tw:uppercase">
+    <%= heading %>
+  </h2>
+
+  <%= render(Pages::Registrations::Show::Map::Component.new(latitude: map_latitude, longitude: map_longitude, precise: map_precise?, point: org_record?)) %>
+
+  <% if org_record? %>
+    <%= render(Pages::Registrations::Show::ImpoundRecordFields::Component.new(impound_record:)) %>
+  <% else %>
+    <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+      <% if impound_record.formatted_address_string.present? %>
+        <%= render(UI::DefinitionList::Row::Component.new(label: translation(".location"), value: impound_record.formatted_address_string)) %>
+      <% end %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(found? ? ".found_at" : ".impounded_at"), value: impound_record.impounded_at, time_localizer_settings: %i[preciseTime originalTimeZone])) %>
+    <% end %>
+  <% end %>
+<% end %>

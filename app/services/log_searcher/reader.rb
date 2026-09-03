@@ -1,21 +1,23 @@
-class LogSearcher::Reader
-  KEY = "logSrch#{Rails.env.test? ? ":test" : ""}:".freeze
-  DEFAULT_LOG_PATH = (ENV["LOG_SEARCH_PATH"] || "#{Rails.root}/log/#{Rails.env}.log").freeze
-  SEARCHES_MATCHES = %w[api/v2/bikes_search
-    api/v2/bikes/check_if_registered
-    api/v3/search
-    api/v3/bikes/check_if_registered
-    API::V1::BikesController#index
-    API::V1::BikesController#stolen_ids
-    API::V1::BikesController#close_serial
-    BikesController#index
-    Organized::BikesController#index
-    Admin::BikesController#index
-    OrgPublic::ImpoundedBikesController#index
-    Organized::ImpoundRecordsController#index
-    ParkingNotificationsController#index].freeze
+module LogSearcher
+  module Reader
+    extend Functionable
 
-  class << self
+    KEY = "logSrch#{":test" if Rails.env.test?}:".freeze
+    DEFAULT_LOG_PATH = (ENV["LOG_SEARCH_PATH"] || "#{Rails.root}/log/#{Rails.env}.log").freeze
+    SEARCHES_MATCHES = %w[api/v2/bikes_search
+      api/v2/bikes/check_if_registered
+      api/v3/search
+      api/v3/bikes/check_if_registered
+      API::V1::BikesController#index
+      API::V1::BikesController#stolen_ids
+      API::V1::BikesController#close_serial
+      Organized::BikesController#index
+      Admin::BikesController#index
+      OrgPublic::ImpoundedBikesController#index
+      Organized::ImpoundRecordsController#index
+      ParkingNotificationsController#index
+      Search::].freeze
+
     # Remove search matches that contain bikesController index (which are already matched)
     # Including them for clarity/documentation
     def searches_regex
@@ -26,7 +28,7 @@ class LogSearcher::Reader
     # If no time is included, it returns all the lines from the file
     def rgrep_command_str(time = nil, log_path: nil)
       log_path ||= DEFAULT_LOG_PATH
-      "rg '#{searches_regex}' '#{log_path}'" + time_rgrep(time)
+      "rg '#{searches_regex}' '#{log_path}'" + time_rgrep(time) + " | sort -u"
     end
 
     # This is for diagnostics, to count how many are returned
@@ -52,11 +54,16 @@ class LogSearcher::Reader
       RedisPool.conn { |r| r.llen(KEY) }
     end
 
-    private
+    #
+    # private below here
+    #
 
     def time_rgrep(time)
       return "" if time.blank?
+
       " | rg '\\AI,\\s\\[#{time.utc.strftime("%Y-%m-%dT%H")}'"
     end
+
+    conceal :time_rgrep
   end
 end

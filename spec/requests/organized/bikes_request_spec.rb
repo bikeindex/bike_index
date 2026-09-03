@@ -6,144 +6,36 @@ RSpec.describe Organized::BikesController, type: :request do
   let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
 
-  describe "index" do
-    # NOTE: Additional index tests in controller spec because of session
-    let(:query_params) do
-      {
-        query: "1",
-        manufacturer: "2",
-        colors: %w[3 4],
-        location: "5",
-        distance: "6",
-        serial: "9",
-        query_items: %w[7 8],
-        stolenness: "stolen"
-      }.as_json
-    end
-    let!(:non_organization_bike) { FactoryBot.create(:bike) }
-    let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
-    it "sends all the params and renders search template to organization_bikes" do
-      get base_url, params: query_params
-      expect(response.status).to eq(200)
-      expect(assigns(:current_organization)).to eq current_organization
-      expect(assigns(:search_query_present)).to be_truthy
-      expect(assigns(:bikes).pluck(:id)).to eq([])
-      expect(assigns(:search_stickers)).to eq false
-      # create_export fails if the org doesn't have have csv_exports
-      expect {
-        get base_url, params: query_params.merge(create_export: true)
-      }.to_not change(Export, :count)
-    end
-    context "member_no_bike_edit" do
-      let(:current_user) { FactoryBot.create(:organization_user, organization: current_organization, role: "member_no_bike_edit") }
-      it "allows viewing" do
-        expect(current_user.reload.organization_roles.first.role).to eq "member_no_bike_edit"
-        get base_url, params: query_params
-        expect(response.status).to eq(200)
-        expect(assigns(:current_organization)).to eq current_organization
-        expect(assigns(:search_query_present)).to be_truthy
-        expect(assigns(:bikes).pluck(:id)).to eq([])
-      end
-    end
-    describe "create_export" do
-      let(:enabled_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes csv_exports] }
-      let(:target_params) do
-        {
-          organization_id: current_organization.id,
-          custom_bike_ids: "#{bike.id}_#{bike2.id}",
-          only_custom_bike_ids: true
-        }
-      end
-      let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: current_organization, manufacturer: bike.manufacturer) }
-      it "creates export", :flaky do
-        expect {
-          get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true}
-        }.to change(Export, :count).by 0
-        expect(flash).to be_blank
-        redirected_to = response.redirect_url
-        expect(redirected_to.gsub(/custom_bike_ids=\d+_\d+&/, "")).to eq new_organization_export_url(target_params.except(:custom_bike_ids))
-        custom_bike_ids = redirected_to.match(/custom_bike_ids=(\d+)_(\d+)&/)[1, 2]
-        expect(custom_bike_ids).to match_array([bike.id, bike2.id].map(&:to_s))
-      end
-      context "directly create export", :flaky do
-        it "directly creates" do
-          Sidekiq::Job.clear_all
-          expect {
-            get base_url, params: {manufacturer: bike.manufacturer.id, create_export: true, directly_create_export: 1}
-          }.to change(Export, :count).by 1
-          expect(flash[:info]).to be_present
-          export = Export.last
-          expect(export.organization_id).to eq current_organization.id
-          expect(export.kind).to eq "organization"
-          expect(export.custom_bike_ids).to match_array([bike.id, bike2.id])
-          expect(export.user_id).to eq current_user.id
-          expect(response).to redirect_to(organization_export_path(export, organization_id: current_organization.id))
-          expect(OrganizationExportJob.jobs.count).to eq 1
-        end
-      end
-    end
-    context "with search_stickers" do
-      let!(:bike_with_sticker) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
-      let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: current_organization, bike: bike_with_sticker) }
-      let!(:non_organization_bike) { FactoryBot.create(:bike) }
-      let!(:bike_sticker_2) { FactoryBot.create(:bike_sticker_claimed, organization: current_organization, bike: non_organization_bike) }
-      it "searches for bikes with stickers" do
-        expect(bike_with_sticker.reload.bike_sticker?).to be_truthy
-        expect(current_organization.reload.paid?).to be_truthy
-        get base_url, params: {search_stickers: "none"}
-        expect(response.status).to eq(200)
-        expect(assigns(:current_organization)).to eq current_organization
-        expect(assigns(:search_stickers)).to eq "none"
-        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
-        expect(session[:passive_organization_id]).to eq current_organization.id
-
-        # And searching without params returns expected result
-        get base_url
-        expect(response.status).to eq(200)
-        expect(assigns(:bikes).pluck(:id)).to match_array([bike.id, bike_with_sticker.id])
-        expect(assigns(:search_query_present)).to be_falsey
-        expect(assigns(:search_stickers)).to eq false
-        expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
-        expect(assigns(:interpreted_params)).to match_hash_indifferently({stolenness: "all"})
-      end
-    end
-
-    context "unpaid organization" do
-      let(:current_organization) { FactoryBot.create(:organization) }
-
-      it "renders without search" do
-        expect(current_organization.reload.paid?).to be_falsey
-        expect(Bike).to_not receive(:search)
-        get base_url
-        expect(response.status).to eq(200)
-        expect(response).to render_template :index
-        expect(assigns(:current_organization)).to eq current_organization
-        expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
-      end
-    end
-  end
-
   describe "new" do
-    it "renders" do
+    it "redirects" do
       get "#{base_url}/new"
-      expect(response.status).to eq(200)
-      expect(assigns(:unregistered_parking_notification)).to be_falsey
-      expect(response).to render_template(:new)
+      expect(response).to redirect_to organization_manage_path(current_organization)
+      expect(flash[:error]).to match(/email/i)
     end
-    context "parking_notification" do
-      it "renders with unregistered_parking_notification" do
-        get "#{base_url}/new", params: {parking_notification: 1}
+    context "with auto_user present" do
+      let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :with_auto_user, enabled_feature_slugs: enabled_feature_slugs) }
+      it "renders" do
+        get "#{base_url}/new"
         expect(response.status).to eq(200)
         expect(assigns(:unregistered_parking_notification)).to be_falsey
         expect(response).to render_template(:new)
+        expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
       end
-      context "with feature" do
-        let(:enabled_feature_slugs) { ["parking_notifications"] }
+      context "parking_notification" do
         it "renders with unregistered_parking_notification" do
           get "#{base_url}/new", params: {parking_notification: 1}
           expect(response.status).to eq(200)
-          expect(assigns(:unregistered_parking_notification)).to be_truthy
+          expect(assigns(:unregistered_parking_notification)).to be_falsey
           expect(response).to render_template(:new)
+        end
+        context "with feature" do
+          let(:enabled_feature_slugs) { ["parking_notifications"] }
+          it "renders with unregistered_parking_notification" do
+            get "#{base_url}/new", params: {parking_notification: 1}
+            expect(response.status).to eq(200)
+            expect(assigns(:unregistered_parking_notification)).to be_truthy
+            expect(response).to render_template(:new)
+          end
         end
       end
     end
@@ -154,6 +46,7 @@ RSpec.describe Organized::BikesController, type: :request do
       get "#{base_url}/new_iframe", params: {parking_notification: 1}
       expect(response.status).to eq(200)
       expect(response).to render_template(:new_iframe)
+      expect(response.headers["X-Frame-Options"]).to be_blank
     end
     context "without current_organization" do
       include_context :request_spec_logged_in_as_user
@@ -176,7 +69,7 @@ RSpec.describe Organized::BikesController, type: :request do
     let(:testable_bike_params) { bike_params.except(:serial_unknown, :b_param_id_token, :cycle_type_slug, :accuracy, :origin) }
     context "with parking_notification" do
       let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
-      let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
+      let(:state) { FactoryBot.create(:state_new_york) }
 
       let(:parking_notification) do
         {
@@ -189,8 +82,8 @@ RSpec.describe Organized::BikesController, type: :request do
           street: "",
           city: "",
           accuracy: "14.2",
-          zipcode: "10007",
-          state_id: state.id.to_s,
+          postal_code: "10007",
+          region_record_id: state.id.to_s,
           country_id: Country.united_states.id
         }
       end
@@ -217,11 +110,12 @@ RSpec.describe Organized::BikesController, type: :request do
             post base_url, params: {bike: bike_params.merge(image: test_photo), parking_notification: parking_notification}
             expect(flash[:success]).to match(/tricycle/i)
             expect(response).to redirect_to new_iframe_organization_bikes_path(organization_id: current_organization.to_param)
+            expect(response.headers["X-Frame-Options"]).to be_blank
           }.to change(Ownership, :count).by 1
           expect(ActionMailer::Base.deliveries.count).to eq 0
         end
         # Have to do after, because inline sidekiq ignores delays and created_bike isn't present when it's run
-        ImageAssociatorJob.new.perform
+        ImageJobs::AssociatorJob.new.perform
 
         b_param.reload
         expect(b_param.creation_organization).to eq current_organization
@@ -242,7 +136,7 @@ RSpec.describe Organized::BikesController, type: :request do
         expect(bike.creator_unregistered_parking_notification?).to be_truthy
         expect(bike.public_images.count).to eq 1
         expect(bike.bike_organizations.first.can_not_edit_claimed).to be_falsey
-        expect(bike).to match_hash_indifferently testable_bike_params.except(:serial_number)
+        expect(bike).to have_attributes testable_bike_params.except(:serial_number)
 
         ownership = bike.ownerships.first
         expect(ownership.send_email).to be_falsey
@@ -276,7 +170,7 @@ RSpec.describe Organized::BikesController, type: :request do
           }.to change(Bike, :count).by 0
           expect(flash[:error]).to match(/manufacturer/i)
           expect(b_param.reload.bike_errors.to_s).to match(/manufacturer/i)
-          expect(assigns(:bike)).to match_hash_indifferently testable_bike_params.except(:manufacturer_id, :serial_number)
+          expect(assigns(:bike)).to have_attributes testable_bike_params.except(:manufacturer_id, :serial_number)
           expect(ParkingNotification.count).to eq 0
         end
       end
@@ -290,7 +184,7 @@ RSpec.describe Organized::BikesController, type: :request do
             street: "10544 82 Ave NW",
             city: "Edmonton",
             country_id: Country.canada.id,
-            zipcode: "T6E 2A4",
+            postal_code: "T6E 2A4",
             internal_notes: "Impounded it!")
         end
         include_context :geocoder_real
@@ -298,7 +192,7 @@ RSpec.describe Organized::BikesController, type: :request do
           current_organization.reload
           expect(current_organization.auto_user).to eq auto_user
           expect(current_organization.public_impound_bikes?).to be_truthy
-          expect(parking_notification_abandoned[:state_id]).to be_present # Test that we're blanking the state
+          expect(parking_notification_abandoned[:region_record_id]).to be_present # Test that we're blanking the region
           VCR.use_cassette("organized_bikes_controller-create-impound-record-edmonton", match_requests_on: [:path]) do
             Sidekiq::Testing.inline! do
               ActionMailer::Base.deliveries = []
@@ -326,7 +220,7 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(bike.user_hidden).to be_falsey
           expect(bike.status).to eq "status_impounded"
           expect(bike.creator_unregistered_parking_notification?).to be_truthy
-          expect(bike).to match_hash_indifferently testable_bike_params.except(:serial_number, :latitude, :longitude)
+          expect(bike).to have_attributes testable_bike_params.except(:serial_number, :latitude, :longitude)
 
           ownership = bike.ownerships.first
           expect(ownership.send_email).to be_falsey
@@ -353,8 +247,8 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(parking_notification.location_from_address).to be_truthy
           expect(parking_notification.street).to eq "10544 82 Ave NW"
           expect(parking_notification.city).to eq "Edmonton"
-          expect(parking_notification.state_id).to be_blank
-          expect(parking_notification.zipcode).to eq "T6E 2A4"
+          expect(parking_notification.region_record_id).to be_blank
+          expect(parking_notification.postal_code).to eq "T6E 2A4"
           expect(parking_notification.latitude).to eq 53.5183943
           expect(parking_notification.longitude).to eq(-113.5023587)
 
@@ -403,7 +297,7 @@ RSpec.describe Organized::BikesController, type: :request do
       it "redirects" do
         expect(current_organization.reload.paid?).to be_falsey
         get "#{base_url}/recoveries"
-        expect(response.location).to match(organization_bikes_path(organization_id: current_organization.to_param))
+        expect(response.location).to match(organization_registrations_path(organization_id: current_organization.to_param))
       end
     end
   end
@@ -471,16 +365,80 @@ RSpec.describe Organized::BikesController, type: :request do
       it "redirects" do
         expect(current_organization.reload.paid?).to be_falsey
         get "#{base_url}/incompletes"
-        expect(response.location).to match(organization_bikes_path(organization_id: current_organization.to_param))
+        expect(response.location).to match(organization_registrations_path(organization_id: current_organization.to_param))
       end
     end
   end
 
-  describe "multi_serial_search" do
-    it "renders" do
-      get "#{base_url}/multi_serial_search"
-      expect(response.status).to eq(200)
-      expect(response).to render_template :multi_serial_search
+  describe "update" do
+    let(:bike_user) { FactoryBot.create(:user_confirmed) }
+    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: bike_user, creation_organization: current_organization) }
+
+    context "without registration_notes feature" do
+      it "redirects with flash error" do
+        patch "#{base_url}/#{bike.id}", params: {notes: "test notes"}
+        expect(response).to redirect_to(bike_path(bike))
+        expect(flash[:error]).to be_present
+        expect(BikeOrganizationNote.find_by(bike_id: bike.id, organization_id: current_organization.id)).to be_nil
+      end
+    end
+
+    context "with registration_notes feature" do
+      let(:enabled_feature_slugs) { %w[bike_search registration_notes] }
+
+      context "with paper_trail" do
+        include_context :with_paper_trail
+
+        it "updates notes and creates audit trail" do
+          patch "#{base_url}/#{bike.id}", params: {notes: "test notes"}
+          expect(response).to redirect_to(bike_path(bike))
+          expect(flash[:success]).to be_present
+          bike_organization_note = BikeOrganizationNote.find_by(bike_id: bike.id, organization_id: current_organization.id)
+          expect(bike_organization_note.body).to eq "test notes"
+          expect(bike_organization_note.user).to eq current_user
+          version = bike_organization_note.versions.last
+          expect(version.event).to eq "create"
+          expect(version.whodunnit).to eq current_user.id.to_s
+        end
+      end
+
+      context "turbo_stream request" do
+        it "updates notes" do
+          patch "#{base_url}/#{bike.id}", params: {notes: "test notes"},
+            headers: {"Accept" => "text/vnd.turbo-stream.html"}
+          expect(response).to redirect_to(bike_path(bike))
+          expect(flash[:success]).to be_present
+          expect(BikeOrganizationNote.find_by(bike_id: bike.id, organization_id: current_organization.id).body).to eq "test notes"
+        end
+      end
+
+      context "with blank notes" do
+        include_context :with_paper_trail
+        let!(:bike_organization_note) { FactoryBot.create(:bike_organization_note, bike:, organization: current_organization, body: "old note") }
+
+        it "updates note body to nil" do
+          expect(bike_organization_note.body).to eq "old note"
+          patch "#{base_url}/#{bike.id}", params: {notes: "  "}
+          expect(response).to redirect_to(bike_path(bike))
+          expect(flash[:success]).to be_present
+          bike_organization_note.reload
+          expect(bike_organization_note.body).to be_nil
+          expect(bike_organization_note.user).to eq current_user
+          version = bike_organization_note.versions.last
+          expect(version.event).to eq "update"
+          expect(version.whodunnit).to eq current_user.id.to_s
+        end
+      end
+
+      context "bike not in organization" do
+        let(:other_bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: bike_user) }
+        it "redirects with flash error" do
+          patch "#{base_url}/#{other_bike.id}", params: {notes: "test notes"}
+          expect(response).to redirect_to(bike_path(other_bike))
+          expect(flash[:error]).to be_present
+          expect(BikeOrganizationNote.find_by(bike_id: other_bike.id, organization_id: current_organization.id)).to be_nil
+        end
+      end
     end
   end
 end

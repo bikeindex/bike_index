@@ -16,6 +16,51 @@ RSpec.describe SuperuserAbility, type: :model do
       expect(user.reload.superuser_abilities.can_access?(controller_name: "graphs")).to be_falsey
       expect(user.superuser_abilities.can_access?(controller_name: "graphs", action_name: "tables")).to be_truthy
     end
+
+    context "with blank names" do
+      let(:superuser_ability) { SuperuserAbility.create(user: user, controller_name: " ", action_name: "") }
+      it "stores nil, so universal abilities stay findable" do
+        expect(superuser_ability.reload.controller_name).to be_nil
+        expect(superuser_ability.action_name).to be_nil
+        expect(superuser_ability.kind).to eq "universal"
+      end
+    end
+
+    context "with user_identifier" do
+      it "finds by email, username or id" do
+        expect(SuperuserAbility.create(user_identifier: user.email).user_id).to eq user.id
+        expect(SuperuserAbility.create(user_identifier: user.username).user_id).to eq user.id
+        expect(SuperuserAbility.create(user_identifier: user.id.to_s).user_id).to eq user.id
+      end
+
+      it "is invalid without a matching user" do
+        superuser_ability = SuperuserAbility.create(user_identifier: "nobody@example.com")
+        expect(superuser_ability).to_not be_valid
+        expect(superuser_ability.errors.full_messages.join).to match(/user/i)
+      end
+    end
+  end
+
+  describe "user touch" do
+    before { user.update_columns(updated_at: Time.current - 1.hour) }
+
+    it "touches the user on create so caches keyed on user.cache_key_with_version bust" do
+      expect { SuperuserAbility.create!(user: user) }
+        .to change { user.reload.updated_at }
+      expect(user.reload.updated_at).to be_within(2).of(Time.current)
+    end
+
+    it "touches the user on update and destroy" do
+      ability = SuperuserAbility.create!(user: user)
+      user.update_columns(updated_at: Time.current - 1.hour)
+
+      expect { ability.update!(controller_name: "graphs") }
+        .to change { user.reload.updated_at }
+
+      user.update_columns(updated_at: Time.current - 1.hour)
+      expect { ability.destroy }
+        .to change { user.reload.updated_at }
+    end
   end
 
   describe "su_options" do

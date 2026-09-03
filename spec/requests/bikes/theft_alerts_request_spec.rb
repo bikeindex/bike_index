@@ -52,7 +52,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
           expect(assigns(:theft_alerts).pluck(:id)).to eq([])
         end
         context "superadmin" do
-          let(:current_user) { FactoryBot.create(:admin) }
+          let(:current_user) { FactoryBot.create(:superuser) }
           it "renders" do
             get "#{base_url}/new"
             expect(response.code).to eq("200")
@@ -98,7 +98,7 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
       expect(payment.user_id).to eq current_user.id
       expect(payment.stripe_id).to be_present
       expect(payment.kind).to eq "theft_alert"
-      expect(payment.currency).to eq "USD"
+      expect(payment.currency_name).to eq "USD"
       expect(payment.amount_cents).to eq theft_alert_plan.amount_cents
       expect(payment.paid_at).to be_blank # Ensure this gets set
       expect(payment.paid?).to be_falsey
@@ -126,12 +126,12 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
       expect(ActionMailer::Base.deliveries.count).to eq 0
     end
     context "passing alert_image" do
-      let!(:image1) { FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike) }
-      let!(:image2) { FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike) }
-      it "updates the alert image" do
-        stolen_record.reload.current_alert_image
-        expect(stolen_record.reload.alert_image).to be_present
-        og_alert_image_id = stolen_record.alert_image&.id # Fails without internet connection
+      let!(:image1) { FactoryBot.create(:public_image, :with_image_file, imageable: bike) }
+      let!(:image2) { FactoryBot.create(:public_image, :with_image_file, imageable: bike) }
+      it "updates the alert image", :flaky do
+        ImageServices::StolenProcessor.update_alert_images(stolen_record)
+        expect(stolen_record.reload.images_attached_id).to eq image1.id
+
         expect(Payment.count).to eq 0
         expect(TheftAlert.count).to eq 0
         Sidekiq::Job.clear_all
@@ -149,8 +149,8 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
         end
         expect_theft_alert_to_be_created
 
-        expect(stolen_record.reload.alert_image).to be_present
-        expect(stolen_record.alert_image.id).to_not eq og_alert_image_id
+        expect(stolen_record.reload.images_attached?).to be_truthy
+        expect(stolen_record.images_attached_id).to eq image2.id
 
         # No deliveries, because the payment hasn't been completed
         expect(Notification.count).to eq 0
@@ -166,6 +166,8 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
     it "marks as paid" do
       expect(payment.reload.paid?).to be_falsey
       expect(payment.amount_cents).to eq 0
+      expect(theft_alert.activateable?).to be_falsey
+      Sidekiq::Job.clear_all
       get "#{base_url}?session_id=#{stripe_id}"
       expect(response.code).to eq("200")
       expect(response).to render_template("show")
@@ -174,6 +176,38 @@ RSpec.describe Bikes::TheftAlertsController, type: :request, vcr: true, match_re
 
       expect(payment.reload.paid?).to be_truthy
       expect(payment.amount_cents).to eq 3999
+
+      expect(theft_alert.reload.paid?).to be_truthy
+      expect(theft_alert.activateable?).to be_falsey
+      expect(BikeJobs::ActivateTheftAlertJob.jobs.count).to eq 0
+    end
+    context "with an activateable theft_alert" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
+      let!(:stolen_record) { FactoryBot.create(:stolen_record, :in_chicago, :with_images, bike:) }
+      it "marks as paid and enqueues activation" do
+        bike.update(current_stolen_record: stolen_record)
+        expect(stolen_record.reload.images_attached?).to be_truthy
+        expect(payment.reload.paid?).to be_falsey
+        expect(payment.amount_cents).to eq 0
+        expect(theft_alert.reload.activateable?).to be_falsey
+        expect(theft_alert.missing_photo?).to be_falsey
+        expect(theft_alert.bike_not_current?).to be_falsey
+        expect(theft_alert.missing_location?).to be_falsey
+        Sidekiq::Job.clear_all
+        get "#{base_url}?session_id=#{stripe_id}"
+        expect(response.code).to eq("200")
+        expect(response).to render_template("show")
+        expect(flash).to_not be_present
+        expect(assigns(:show_general_alert)).to be_falsey
+
+        expect(payment.reload.paid?).to be_truthy
+        expect(payment.amount_cents).to eq 3999
+
+        expect(theft_alert.reload.paid?).to be_truthy
+        expect(theft_alert.activateable_except_approval?).to be_truthy
+        expect(theft_alert.activateable?).to be_truthy
+        expect(BikeJobs::ActivateTheftAlertJob.jobs.count).to eq 1
+      end
     end
   end
 end

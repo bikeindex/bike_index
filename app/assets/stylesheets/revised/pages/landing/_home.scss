@@ -89,7 +89,8 @@
   }
 }
 
-@media screen and (min-width: 991px) {
+// Below $grid-breakpoint-lg the menu's own signup link is still behind the hamburgler
+@media screen and (min-width: $grid-breakpoint-lg) {
   .center-navbar-signup-link-container {
     display: none;
   }
@@ -121,35 +122,35 @@
 }
 
 .bg-image-bike-hero {
-  background-image: image-url("landing_pages/header_bg_root-full.jpg");
+  background-image: url("landing_pages/header_bg_root-full.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .bg-image-bike-shops {
-  background-image: image-url("landing_pages/bike-shop.jpg");
+  background-image: url("landing_pages/bike-shop.jpg");
   background-size: cover;
   background-position: top;
   background-repeat: no-repeat;
 }
 
 .bg-image-bike-cities {
-  background-image: image-url("landing_pages/cities.jpg");
+  background-image: url("landing_pages/cities.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .bg-image-bike-schools {
-  background-image: image-url("landing_pages/schools.jpg");
+  background-image: url("landing_pages/schools.jpg");
   background-size: cover;
   background-position: top;
   background-repeat: no-repeat;
 }
 
 .bg-image-bike-groups {
-  background-image: image-url("landing_pages/groups.jpg");
+  background-image: url("landing_pages/groups.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -180,13 +181,13 @@
 // TODO: Optimize images
 @media screen and (min-device-width: 1000px) {
   .root-landing-banner-header {
-    background-image: image-url("landing_pages/header_bg_root-full.jpg");
+    background-image: url("landing_pages/header_bg_root-full.jpg");
   }
 }
 
 @media screen and (min-device-width: 1000px) and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi) {
   .root-landing-banner-header {
-    background-image: image-url("landing_pages/header_bg_root-full.jpg");
+    background-image: url("landing_pages/header_bg_root-full.jpg");
   }
 }
 
@@ -472,13 +473,16 @@
 
 .root-landing-who {
   padding-bottom: 6 * $vertical-height;
+  position: relative;
+  background: white;
 
   h3.landing-container-label {
     color: $gray-darker;
-    margin: (2 * $vertical-height) 0;
+    padding: (2 * $vertical-height) 0;
+    margin: 0;
 
     @include media-breakpoint-up(lg) {
-      margin: (4 * $vertical-height) 0;
+      padding: (4 * $vertical-height) 0;
     }
   }
 
@@ -533,10 +537,11 @@
 }
 
 .root-by-the-numbers {
-  background-image: image-url("landing_pages/bike_pattern_bg.png");
+  background-image: url("landing_pages/bike_pattern_bg.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  position: relative;
 
   color: rgb(172, 172, 172);
   text-align: center;

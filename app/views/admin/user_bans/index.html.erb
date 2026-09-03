@@ -1,0 +1,6 @@
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @collection,
+  viewing: controller_name.humanize,
+  chart_collection: @render_chart && matching_user_bans,
+)) %>

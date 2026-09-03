@@ -1,0 +1,18 @@
+<div
+  id="flash-messages"
+  class="
+    tw:pointer-events-none tw:fixed tw:right-0 tw:bottom-8 tw:left-0 tw:z-50
+    tw:mx-auto tw:max-w-screen-xl tw:px-[5px] tw:md:bottom-12 tw:md:px-4
+  "
+>
+  <div
+    class="
+      tw:pointer-events-auto tw:flex tw:w-full tw:flex-col tw:gap-2
+      tw:md:w-auto tw:md:max-w-xs tw:md:min-w-140
+    "
+  >
+    <% messages.each do |msg| %>
+      <%= render UI::Alerts::Base::Component.new(text: msg[:text], kind: msg[:kind], dismissable: true, margin_classes: "tw:mb-0") %>
+    <% end %>
+  </div>
+</div>

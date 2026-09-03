@@ -1,0 +1,37 @@
+<div class="row tw:mt-8 tw:mb-4">
+  <% unless @skip_total %>
+    <div class="col-md-5">
+      <p class="pagination-number mb-2 mb-md-0">
+        <strong><%= number_with_delimiter(count) %></strong> Matching
+        <%= viewing.pluralize(count) %>
+
+
+        <% if show_time_range? %>
+          <em>
+            <% if @time_range_column.present? %>
+              <strong><%= humanized_time_range_column_display %></strong>
+            <% end %>
+
+            <%= humanized_time_range(@index.time_range, period: @index.period) %>
+          </em>
+        <% elsif show_today_count? %>
+          <em class="less-strong">
+            (<%= number_with_delimiter(today_count) %> today)
+          </em>
+        <% end %>
+
+        <% if @count_detail.present? %>
+          <span class="less-strong"><%= @count_detail %></span>
+        <% end %>
+      </p>
+    </div>
+  <% end %>
+
+  <% if @index.pagy.present? %>
+    <div class="tw:flex tw:flex-wrap tw:justify-end tw:gap-4 tw:md:text-right tw:lg:flex-nowrap <%= (@skip_total ? "col-12" : "col-md-7") %>">
+      <%= render(UI::Pagination::Component.new(pagy: @index.pagy, page_params: @index.params)) %>
+
+      <%= select_tag :per_page_select, options_for_select(per_pages.map { |i| ["#{i} / page", i] }, selected: @index.per_page), {id: per_page_select_id, class: "form-control d-inline-block", style: "margin-top: -6px; max-width: 8rem;"} %>
+    </div>
+  <% end %>
+</div>

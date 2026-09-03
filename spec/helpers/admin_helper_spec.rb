@@ -3,39 +3,30 @@
 require "rails_helper"
 
 RSpec.describe AdminHelper, type: :helper do
-  # This is sort of gross, because of all the stubbing, but it's still useful, so...
-  describe "admin_nav_display_view_all" do
-    before do
-      allow(helper).to receive(:request) { double("request", url: bikes_path) }
-      allow(helper).to receive(:dev_nav_select_links) { [] } # Can't get current_user to stub :(
-      controller.params = ActionController::Parameters.new(passed_params)
-      admin_nav_active = helper.admin_nav_select_links.find { |v| v[:title] == "Bikes" }
-      allow(helper).to receive(:admin_nav_select_link_active) { admin_nav_active }
-      allow(view).to receive(:current_page?) { true }
-    end
+  describe "admin_search_filtered?" do
+    before { controller.params = ActionController::Parameters.new(passed_params) }
 
     context "period all" do
       let(:passed_params) { {period: "all", timezone: "Party"} }
       it "is false" do
-        expect(helper.admin_nav_select_link_active[:match_controller]).to be_truthy
-        expect(helper.admin_nav_display_view_all).to be_falsey
+        expect(helper.admin_search_filtered?).to be_falsey
       end
       context "with sort" do
         let(:passed_params) { {direction: "desc", render_chart: "true", sort: "manufacturer_id"} }
         it "is false" do
-          expect(helper.admin_nav_display_view_all).to be_falsey
+          expect(helper.admin_search_filtered?).to be_falsey
         end
       end
       context "with period != all" do
         let(:passed_params) { {period: "week", timezone: "Party"} }
         it "is true" do
-          expect(helper.admin_nav_display_view_all).to be_truthy
+          expect(helper.admin_search_filtered?).to be_truthy
         end
       end
-      context "not actual current_page" do
+      context "with a search param" do
+        let(:passed_params) { {period: "all", search_email: "party@example.com"} }
         it "is true" do
-          allow(helper).to receive(:current_page_active?) { false }
-          expect(helper.admin_nav_display_view_all).to be_truthy
+          expect(helper.admin_search_filtered?).to be_truthy
         end
       end
     end
@@ -63,71 +54,6 @@ RSpec.describe AdminHelper, type: :helper do
     end
     it "returns green for 80" do
       expect(credibility_scorer_color(80)).to eq "#28a745"
-    end
-  end
-
-  describe "user_icon" do
-    it "returns empty" do
-      expect(user_icon_hash(User.new)).to eq({tags: []})
-      expect(user_icon(User.new)).to be_blank
-    end
-    context "donor" do
-      let(:payment) { FactoryBot.create(:payment, kind: "donation") }
-      let(:user) { payment.user }
-      let(:target) { "<span><span class=\"donor-icon user-icon ml-1\" title=\"Donor\">D</span></span>" }
-      let(:target_full_text) { "<span><span class=\"donor-icon user-icon ml-1\" title=\"Donor\">D</span><span class=\"less-strong\">onor</span></span>" }
-      it "returns donor" do
-        expect(user.donor?).to be_truthy
-        expect(user_icon_hash(user)).to eq({tags: %i[donor]})
-        expect(user_icon(user)).to eq target
-        expect(user_icon(user, full_text: true)).to eq target_full_text
-      end
-      context "theft alert" do
-        let!(:theft_alert) { FactoryBot.create(:theft_alert_paid, user: user) }
-        let(:target) { "<span><span class=\"donor-icon user-icon ml-1\" title=\"Donor\">D</span><span class=\"theft-alert-icon user-icon ml-1\" title=\"Promoted alert purchaser\">P</span></span>" }
-        let(:target_full_text) do
-          "<span><span class=\"donor-icon user-icon ml-1\" title=\"Donor\">D</span><span class=\"less-strong\">onor</span>" \
-            "<span class=\"theft-alert-icon user-icon ml-1\" title=\"Promoted alert purchaser\">P</span><span class=\"less-strong\">romoted alert</span>" \
-            "</span>"
-        end
-        it "returns donor and theft alert" do
-          expect(user.donor?).to be_truthy
-          expect(user.theft_alert_purchaser?).to be_truthy
-          expect(user_icon_hash(user)).to eq({tags: %i[donor theft_alert]})
-          expect(user_icon(user)).to eq target
-          expect(user_icon(user, full_text: true)).to eq target_full_text
-          user.superuser = true
-          expect(user_icon_hash(user)).to eq({tags: %i[superuser]}) # It's just superuser
-        end
-      end
-    end
-    context "recovery" do
-      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
-      let!(:stolen_record_recovered) { FactoryBot.create(:stolen_record_recovered, bike: bike) }
-      let(:user) { bike.user }
-      it "returns recovery" do
-        expect(user.reload).to be_present
-        expect(user_icon_hash(user)).to eq({tags: %i[recovery]})
-      end
-    end
-    context "organization" do
-      let(:organization) { FactoryBot.create(:organization, kind: "bike_shop") }
-      let(:user) { FactoryBot.create(:organization_user, organization: organization) }
-      it "returns paid_org" do
-        expect(user.paid_org?).to be_falsey
-        expect(user_icon_hash(user)).to eq({tags: %i[organization_role], organization: {kind: :bike_shop, paid: false}})
-      end
-      context "paid_org" do
-        let(:organization) { FactoryBot.create(:organization, :organization_features, kind: "law_enforcement") }
-        let(:target) { "<span><span class=\"org-member-icon user-icon ml-1\" title=\"Paid organization member - Law Enforcement\">$O P</span></span>" }
-        let(:target_full_text) { "<span><span class=\"org-member-icon user-icon ml-1\" title=\"Paid organization member - Law Enforcement\">$O P</span><span class=\"ml-1 less-strong\">Paid organization member - Law Enforcement</span></span>" }
-        it "returns paid_org" do
-          expect(user.paid_org?).to be_truthy
-          expect(user_icon_hash(user)).to eq({tags: %i[organization_role], organization: {kind: :law_enforcement, paid: true}})
-          expect(user_icon(user)).to eq target
-          expect(user_icon(user, full_text: true)).to eq target_full_text
-        end
-      end
     end
   end
 
@@ -163,6 +89,23 @@ RSpec.describe AdminHelper, type: :helper do
     context "impound_record" do
       it "returns" do
         expect(admin_path_for_object(ImpoundRecord.new(id: 11))).to eq admin_impound_record_path("pkey-11")
+      end
+    end
+    context "bike_organization_note" do
+      let(:bike_organization_note) { FactoryBot.create(:bike_organization_note) }
+
+      it "returns" do
+        expect(admin_path_for_object(BikeOrganizationNote.new(id: 5))).to eq admin_bike_organization_note_path(5)
+        # with item_type and item_id
+        expect(admin_path_for_object(item_type: "BikeOrganizationNote", item_id: bike_organization_note.id)).to eq admin_bike_organization_note_path(bike_organization_note.id)
+      end
+    end
+    context "paper_trail_version" do
+      let(:bike_organization_note) { FactoryBot.create(:bike_organization_note) }
+
+      it "returns path from item_type and item_id" do
+        version = PaperTrail::Version.new(id: 1, item_type: "BikeOrganizationNote", item_id: bike_organization_note.id)
+        expect(admin_path_for_object(version)).to eq admin_bike_organization_note_path(bike_organization_note.id)
       end
     end
   end

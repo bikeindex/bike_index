@@ -1,0 +1,243 @@
+/* Bike Index's own tw* classes. Rules that style one component's markup — .ui-table,
+ * .search-results-frame-wrapper — stay in application.css */
+
+/* A plain custom property rather than @theme: a theme variable takes the tw prefix, and
+ * is dropped unless a generated utility references it */
+:root {
+  --gutter: calc(var(--tw-spacing) * 4);
+}
+
+/* A utility rather than a class in the layer below: `@apply` only takes utilities */
+@utility twtext-color {
+  @apply tw:text-gray-900 tw:dark:text-gray-400;
+}
+
+/* A card that meets the page's own gutter rather than sitting inset inside it twice over,
+ * once the .twwiderow holding it has dropped to one column. Keyed to the row rather than the
+ * viewport so it can't disagree with the column count - 672px is where .twwiderow's second
+ * 320px column stops fitting, and a container query can't read that from a var(). A utility,
+ * not a class in the layer below, so it outranks the card's own tw:border. */
+@utility twfullbleed {
+  @container twwiderow (width < 672px) {
+    /* px-0 forced: the card's own tw:p-4 is the padding shorthand, which wins outright */
+    @apply tw:border-x-0 tw:border-t-0 tw:px-0!;
+  }
+}
+
+/* The dev-info marking, formerly admin_unvendored's unlayered copy. A hand-written block
+ * rather than @utility, which would take the tw: prefix and so match none of the ~95
+ * existing .only-dev-visible sites - nor the `<style>.only-dev-visible {display: none}`
+ * hooks several admin tables hide it with. Emitted after tailwind's own utilities, so it
+ * takes ties against a resting background like an active UI::Tabs tab's tw:bg-white.
+ * The legacy rule's border is dropped: it fought the shape it marked, and the tab's white
+ * lower edge is what breaks the row's underline */
+@layer utilities {
+  .only-dev-visible {
+    @apply tw:bg-dev/10;
+  }
+
+  /* Frequently marks one value inside a display-table cell, which has no padding of its own */
+  .table-list td .only-dev-visible {
+    @apply tw:px-1 tw:py-0.5;
+  }
+}
+
+@layer components {
+  .twlink {
+    @apply tw:text-blue-600 tw:dark:text-blue-400 tw:transition-colors;
+
+    /* Outranks the hover below on specificity, so a selected link doesn't take the
+     * hover color when the pointer is over it */
+    @variant is-active {
+      @apply tw:text-blue-700 tw:underline tw:font-bold tw:dark:text-blue-300;
+    }
+  }
+
+  /* Guarded so a disabled UI::Button/UI::ButtonLink in link color holds its color.
+   * Every other color guards its hover in the utilities; link color's lives here. */
+  .twlink:not(:disabled, [aria-disabled="true"]):hover {
+    @apply tw:text-blue-700 tw:underline tw:dark:text-blue-300;
+  }
+
+  /* For links that should inherit the color of the text they sit in. text-inherit rather
+   * than nothing: this layer beats legacy only where it declares the property, so legacy's
+   * `a { color: #3498db }` would otherwise supply the color */
+  .twlink-underlined {
+    @apply tw:text-inherit tw:underline tw:transition-colors;
+
+    /* Substituted into `color` rather than resolved here: currentColor in a `color`
+     * declaration is the inherited color, so hover and is-active below shift whatever the
+     * link sits in — lightening in dark mode, where deepening would sink it into the
+     * background. Clamped, so text already at the floor lifts rather than shifting to
+     * itself; a browser too old for relative color syntax still gets the thicker underline */
+    --twlink-underlined-shifted: oklch(from currentColor max(calc(l - 0.12), 0.2) c h);
+
+    @variant dark {
+      --twlink-underlined-shifted: oklch(from currentColor min(calc(l + 0.12), 0.8) c h);
+    }
+
+    @variant is-active {
+      @apply tw:decoration-2 tw:font-bold;
+
+      color: var(--twlink-underlined-shifted);
+    }
+  }
+
+  .twlink-underlined:not(:disabled, [aria-disabled="true"]):hover {
+    @apply tw:decoration-2;
+
+    color: var(--twlink-underlined-shifted);
+  }
+
+  /* Legacy's `.container` reaches into an alert two ways tailwind can't answer on
+   * its own: `font-size: 15px; line-height: 2em` by inheritance, and `p, ul, ol,
+   * dl` margins from a layer that beats preflight. Own both here. */
+  .twalert-body {
+    @apply tw:text-base;
+  }
+
+  .twalert-body :is(p, ul, ol, dl) {
+    @apply tw:m-0;
+  }
+
+  .twless-strong {
+    @apply tw:opacity-65 tw:decoration-gray-900/65 tw:dark:decoration-gray-400/65;
+  }
+
+  .twinput {
+    @apply tw:bg-white tw:border tw:border-gray-200 tw:dark:bg-gray-700 tw:dark:border-gray-700 tw:rounded-sm
+      tw:placeholder-gray-500 tw:text-gray-900 tw:text-base tw:dark:placeholder-gray-400 tw:dark:text-gray-200
+      tw:focus-visible:outline-0 tw:focus-visible:ring tw:focus-visible:ring-blue-400 tw:focus-visible:border-blue-400 tw:dark:focus-visible:ring-blue-500 tw:dark:focus-visible:border-blue-500
+      tw:w-full tw:py-1.5 tw:px-2.5 tw:block;
+  }
+  /* block + the gap to its field, so a label spaces the same whatever renders
+   * below it. Bootstrap's `.container label` is inline-block with a .5rem
+   * margin, and it only applies inside a container -- owning both here is what
+   * stops the spacing depending on where the field sits. Utilities still win,
+   * so `twlabel tw:m-0` and the checkbox's `tw:flex` override as before. */
+  .twlabel {
+    @apply tw:block tw:mb-1 tw:text-sm tw:font-medium tw:text-gray-800 tw:dark:text-gray-500 tw:cursor-pointer;
+  }
+
+  /* Fields that read as one control -- a city and its state, a name and its phone. The
+   * gutter is tighter than a page-level grid's, and auto-fit means the break to full width
+   * comes from the row running out of room rather than from a viewport breakpoint, so a row
+   * inside a narrow card breaks at the same width it would anywhere else. */
+  /* CodeRay renders the admin JSON dumps as a .code div inside its own wrapper, so the
+   * box belongs to the container rather than to what it holds */
+  .twjson-box .code {
+    @apply tw:max-h-72 tw:overflow-auto tw:border tw:border-gray-300 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-900;
+  }
+
+  .twjson-box pre {
+    @apply tw:m-0;
+  }
+
+  .twfieldrow {
+    @apply tw:grid tw:gap-x-2 tw:grid-cols-[repeat(auto-fit,minmax(140px,1fr))];
+  }
+
+  /* An admin index's search form. Baseline rather than centre: the rows mix a combobox
+   * with shorter inputs and buttons, so they line up on their text or on nothing. */
+  .twsearchrow {
+    @apply tw:my-4 tw:flex tw:flex-wrap tw:items-baseline tw:justify-end tw:gap-2;
+  }
+
+  /* Two columns of cards or sections, breaking on the row's own width like .twfieldrow
+   * rather than at a viewport breakpoint. The max() caps it at two, which repeat() alone
+   * would not do - a wide row fits four 320px tracks. auto-fill rather than auto-fit so a
+   * column whose only child is hidden holds its place instead of handing the whole row to
+   * its neighbour. The min(100%) is what keeps that 320px floor from overflowing a row
+   * nested in something narrower than it. */
+  .twwiderow {
+    @apply tw:grid tw:gap-x-8;
+    container: twwiderow / inline-size;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, max(320px, calc((100% - var(--tw-spacing) * 8) / 2))), 1fr));
+  }
+
+  [aria-expanded="true"] .twdropdown-chevron {
+    @apply tw:rotate-180;
+  }
+
+  .twdropdown {
+    @apply tw:flex-col tw:list-none tw:py-0 tw:mb-0;
+  }
+
+  /* An entry is a link, or -- for what's already being viewed, which is nowhere to go -- a
+   * label. The rules below that lay entries out take both; only the colors tell them apart */
+  .twdropdown li[role="menuitem"]:first-child > :is(a, span[data-active="true"]) {
+    @apply tw:pt-2 tw:rounded-t-lg;
+  }
+
+  .twdropdown li[role="menuitem"]:last-child > :is(a, span[data-active="true"]) {
+    @apply tw:pb-2 tw:rounded-b-lg;
+  }
+
+  .twdropdown li[role="menuitem"] > :is(a, span[data-active="true"]) {
+    @apply tw:block tw:px-4 tw:py-1 tw:text-left tw:text-base tw:text-gray-700
+      tw:dark:text-gray-200;
+  }
+
+  .twdropdown li[role="menuitem"] > a {
+    @apply tw:no-underline tw:hover:bg-gray-100 tw:hover:text-gray-900
+      tw:dark:hover:bg-gray-700 tw:dark:hover:text-gray-100;
+
+    /* ui--active-link marks the link itself, so the entry reads its own state rather than
+     * the li's. The fill is UI::Button's secondary active, minus the border and ring a
+     * menu item has no room for */
+    @variant is-active {
+      @apply tw:bg-purple-500 tw:text-white;
+    }
+  }
+
+  /* Where-you-are, without the pull of somewhere to go -- under the fill hovering an entry
+   * takes, so the row a pointer is on still reads as the live one */
+  .twdropdown li[role="menuitem"] > span[data-active="true"] {
+    @apply tw:italic tw:bg-gray-50 tw:dark:bg-gray-700/50;
+  }
+
+  .twdropdown li[role="menuitem"]:has(+ li[role="separator"]) > :is(a, span[data-active="true"]) {
+    @apply tw:pb-2;
+  }
+
+  .twdropdown li[role="separator"] + li[role="menuitem"] > :is(a, span[data-active="true"]) {
+    @apply tw:pt-2;
+  }
+
+  .twdropdown li[role="separator"] {
+    @apply tw:border-t tw:border-gray-200 tw:dark:border-gray-700;
+  }
+
+  /* The band the admin bike screens open with: what the registration is, set apart from
+   * whichever tab's body follows it. Full bleed and borderless, the way the legacy
+   * .admin-bike-tabs read - its .table-list tables sit on white against it. The negative top
+   * margin cancels the tab row's mb-3, so the band meets the row it sits under. */
+  .admin-bike-summary {
+    @apply tw:-mt-3 tw:bg-[#212529] tw:pt-6 tw:pb-1 tw:text-white;
+  }
+
+  .admin-bike-summary h1,
+  .admin-bike-summary h2,
+  .admin-bike-summary h3,
+  .admin-bike-summary h4 {
+    @apply tw:text-white;
+  }
+
+  .admin-bike-summary table {
+    @apply tw:bg-white;
+  }
+
+  .twhr {
+    @apply tw:border-0 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700 tw:my-8;
+  }
+
+  .twgutter {
+    padding-inline: var(--gutter);
+  }
+
+  /* Edge to edge, then the gutter back inside it - what a wide table scrolls in */
+  .twgutter-bleed {
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+  }
+}

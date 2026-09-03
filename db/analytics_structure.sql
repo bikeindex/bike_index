@@ -1,7 +1,6 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -9,20 +8,6 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
---
--- Name: pg_stat_statements; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS pg_stat_statements WITH SCHEMA public;
-
-
---
--- Name: EXTENSION pg_stat_statements; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION pg_stat_statements IS 'track planning and execution statistics of all SQL statements executed';
-
 
 SET default_tablespace = '';
 
@@ -138,6 +123,80 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: strava_requests; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.strava_requests (
+    id bigint NOT NULL,
+    user_id bigint,
+    strava_integration_id bigint NOT NULL,
+    request_type integer NOT NULL,
+    parameters jsonb DEFAULT '{}'::jsonb,
+    requested_at timestamp without time zone,
+    response_status integer DEFAULT 0 NOT NULL,
+    rate_limit jsonb,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    priority bigint NOT NULL,
+    proxy_request boolean DEFAULT false NOT NULL
+);
+
+
+--
+-- Name: strava_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.strava_requests_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: strava_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.strava_requests_id_seq OWNED BY public.strava_requests.id;
+
+
+--
+-- Name: versions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.versions (
+    id bigint NOT NULL,
+    item_type character varying NOT NULL,
+    item_id bigint NOT NULL,
+    event character varying NOT NULL,
+    whodunnit character varying,
+    object jsonb,
+    object_changes jsonb,
+    created_at timestamp without time zone
+);
+
+
+--
+-- Name: versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.versions_id_seq OWNED BY public.versions.id;
+
+
+--
 -- Name: logged_searches id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -149,6 +208,20 @@ ALTER TABLE ONLY public.logged_searches ALTER COLUMN id SET DEFAULT nextval('pub
 --
 
 ALTER TABLE ONLY public.organization_statuses ALTER COLUMN id SET DEFAULT nextval('public.organization_statuses_id_seq'::regclass);
+
+
+--
+-- Name: strava_requests id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.strava_requests ALTER COLUMN id SET DEFAULT nextval('public.strava_requests_id_seq'::regclass);
+
+
+--
+-- Name: versions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.versions ALTER COLUMN id SET DEFAULT nextval('public.versions_id_seq'::regclass);
 
 
 --
@@ -181,6 +254,22 @@ ALTER TABLE ONLY public.organization_statuses
 
 ALTER TABLE ONLY public.schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
+
+
+--
+-- Name: strava_requests strava_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.strava_requests
+    ADD CONSTRAINT strava_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: versions versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.versions
+    ADD CONSTRAINT versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -226,12 +315,53 @@ CREATE INDEX index_organization_statuses_on_organization_id ON public.organizati
 
 
 --
+-- Name: index_strava_requests_on_requested_at_with_rate_limit; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_strava_requests_on_requested_at_with_rate_limit ON public.strava_requests USING btree (requested_at DESC) WHERE (rate_limit IS NOT NULL);
+
+
+--
+-- Name: index_strava_requests_on_strava_integration_id_and_requested_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_strava_requests_on_strava_integration_id_and_requested_at ON public.strava_requests USING btree (strava_integration_id, requested_at);
+
+
+--
+-- Name: index_strava_requests_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_strava_requests_on_user_id ON public.strava_requests USING btree (user_id);
+
+
+--
+-- Name: index_strava_requests_pending_on_integration_id_request_type; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_strava_requests_pending_on_integration_id_request_type ON public.strava_requests USING btree (strava_integration_id, request_type) WHERE (response_status = 0);
+
+
+--
+-- Name: index_versions_on_item_type_and_item_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_versions_on_item_type_and_item_id ON public.versions USING btree (item_type, item_id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260425121709'),
+('20260318174948'),
+('20260306001002'),
+('20260303050228'),
+('20260227165150'),
+('20260208234737'),
 ('20240702144929'),
 ('20231209193453'),
 ('20231027173606'),

@@ -1,0 +1,11 @@
+<div class="tw:flex tw:flex-col tw:gap-8">
+  <% scenarios.each do |label, component| %>
+    <section>
+      <h2 class="tw:mb-3 tw:text-sm tw:font-bold tw:opacity-65">
+        <%= label %>
+      </h2>
+
+      <%= render(component) %>
+    </section>
+  <% end %>
+</div>

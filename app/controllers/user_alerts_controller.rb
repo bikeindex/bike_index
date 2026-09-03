@@ -10,7 +10,7 @@ class UserAlertsController < ApplicationController
         else
           flash[:error] = "We're sorry, you can't hide that alert"
         end
-      elsif InputNormalizer.boolean(params[:add_bike_organization])
+      elsif Binxtils::InputNormalizer.boolean(params[:add_bike_organization])
         add_bike_organization
       else
         flash[:error] = "Unknown alert action!"
@@ -24,7 +24,7 @@ class UserAlertsController < ApplicationController
   private
 
   def authenticate_user_for_user_alerts_controller
-    authenticate_user(translation_key: :you_have_to_log_in, flash_type: :info)
+    authenticate_user(translation_key: :you_have_to_log_in, flash_type: :notice)
   end
 
   # Probably only should be called for "unassigned_bike_org"
@@ -33,7 +33,7 @@ class UserAlertsController < ApplicationController
       bike_organization = BikeOrganization.find_or_create_by(bike_id: @user_alert.bike_id,
         organization_id: @user_alert.organization_id)
       @user_alert.resolve! if bike_organization.valid?
-      AfterUserChangeJob.perform_async(@user_alert.user_id)
+      CallbackJobs::AfterUserChangeJob.perform_async(@user_alert.user_id)
     else
       flash[:error] = "You don't have permission to edit that bike"
     end

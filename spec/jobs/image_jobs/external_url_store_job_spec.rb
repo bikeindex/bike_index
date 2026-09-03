@@ -1,0 +1,58 @@
+require "rails_helper"
+
+RSpec.describe ImageJobs::ExternalUrlStoreJob, type: :job do
+  let(:instance) { described_class.new }
+
+  context "valid performance" do
+    # Version generation only defers to CarrierWaveProcessJob with remote (fog)
+    # storage; simulate production since test uses local file storage (inline)
+    before { allow_any_instance_of(PublicImage).to receive(:remote_storage?).and_return(true) }
+
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:is_private) { false }
+    let(:public_image) do
+      # Use the email logo url - since that file it should never be removed
+      PublicImage.create(imageable: bike, is_private:,
+        external_image_url: "https://files.bikeindex.org/email_assets/logo.png")
+    end
+    it "downloads and processes the image" do
+      expect(public_image.id).to be_present
+      Sidekiq::Job.clear_all
+      expect(public_image.image).to_not be_present
+      VCR.use_cassette("external_image_url_store_worker") do
+        instance.perform(public_image.id)
+        public_image.reload
+        expect(public_image.image).to be_present
+      end
+      # AfterBikeSaveJob + backgrounded version generation (process_in_background :image)
+      expect(Sidekiq::Job.jobs.count).to eq 2
+      expect(CallbackJobs::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
+      expect(CarrierWaveProcessJob).to have_enqueued_sidekiq_job("PublicImage", public_image.id.to_s, "image")
+    end
+    context "is_private true" do
+      let(:is_private) { true }
+      it "downloads and processes" do
+        expect(public_image.id).to be_present
+        Sidekiq::Job.clear_all
+        expect(public_image.image).to_not be_present
+        VCR.use_cassette("external_image_url_store_worker") do
+          instance.perform(public_image.id)
+          public_image.reload
+          expect(public_image.image).to be_present
+        end
+        # AfterBikeSaveJob + backgrounded version generation (process_in_background :image)
+        expect(Sidekiq::Job.jobs.count).to eq 2
+        expect(CallbackJobs::AfterBikeSaveJob).to have_enqueued_sidekiq_job(bike.id, false, true)
+        expect(CarrierWaveProcessJob).to have_enqueued_sidekiq_job("PublicImage", public_image.id.to_s, "image")
+      end
+    end
+  end
+  context "already has an image" do
+    let(:public_image) { FactoryBot.create(:public_image, external_image_url: "https://files.bikeindex.org/email_assets/logo.png") }
+    it "doesn't do anything" do
+      expect(public_image.image).to be_present
+      expect_any_instance_of(PublicImage).to_not receive(:save)
+      instance.perform(public_image.id)
+    end
+  end
+end

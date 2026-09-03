@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: external_registry_credentials
+# Database name: primary
 #
 #  id                      :integer          not null, primary key
 #  access_token            :string
@@ -11,10 +12,6 @@
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  app_id                  :string
-#
-# Indexes
-#
-#  index_external_registry_credentials_on_type  (type)
 #
 class ExternalRegistryCredential < ApplicationRecord
   validates :type, uniqueness: true
@@ -47,12 +44,14 @@ class ExternalRegistryCredential < ApplicationRecord
   # not yet expired.
   def access_token_valid?
     return false if access_token_expires_at.blank?
+
     Time.current < access_token_expires_at
   end
 
   # Set an error and return false if access_token is not yet expired.
   def access_token_can_be_reset?
     return true unless access_token_expires_at.present? && access_token_valid?
+
     errors.add(:access_token, "not expired")
     false
   end

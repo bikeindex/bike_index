@@ -1,0 +1,20 @@
+<details data-controller="ui--details" class="tw:max-w-md">
+  <summary
+    data-action="click->ui--details#toggle"
+    class="
+      tw:flex tw:cursor-pointer tw:list-none tw:items-center
+      tw:justify-between tw:gap-3 tw:rounded-sm tw:border tw:border-gray-200
+      tw:p-3 tw:[&::-webkit-details-marker]:hidden
+    "
+  >
+    <span class="tw:font-semibold">Full spec sheet</span>
+    <%= render UI::IconChevron::Component.new(html_class: "tw:transition-transform tw:[details[open]_&]:rotate-90") %>
+  </summary>
+
+  <div data-ui--details-target="content" class="tw:hidden! tw:pt-3">
+    <p class="tw:mb-0">
+      Native &lt;details&gt; body, animated open/closed by the details
+      controller.
+    </p>
+  </div>
+</details>

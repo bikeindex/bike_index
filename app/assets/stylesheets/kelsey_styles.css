@@ -1,0 +1,37 @@
+/*
+ *= require_self
+ *= require kelsey/homepage
+ *= require kelsey/landing_pages
+ */
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Every page loading this also loads tailwind.css (via the application layout, and
+ * the Lookbook preview layout), so the theme's --tw-color-* resolve here. The blue
+ * and purple are the same values as the Tailwind ramp — the redesign's 800 is the
+ * ramp's 600 — so they track it instead of restating it. The red and the grays stay
+ * literal: these grays are neutral where Tailwind's are blue-tinted (dE ~11-13), and
+ * its red-500 is the OG #e74c3c. */
+:root {
+  --redesign-blue-500: var(--tw-color-blue-500);
+  --redesign-blue-800: var(--tw-color-blue-600);
+  --redesign-purple-500: var(--tw-color-purple-500);
+  --redesign-red-500: #cc0000;
+  --redesign-gray-100: #f5f5f5;
+  --redesign-gray-500: #666;
+  --redesign-gray-800: #333;
+}
+
+.kelsey_styles .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.kelsey_styles h2 {
+  font-weight: bold;
+}

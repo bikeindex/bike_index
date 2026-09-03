@@ -1,0 +1,4 @@
+<%= render(UI::Forms::Group::Component.new(attribute: :wheel_size_id)) do %>
+  <%= render(UI::Forms::Combobox::Component.new(name: :wheel_size_id,
+    options: WheelSize.commonness.first(6).map { |wheel_size| {display: wheel_size.select_value, value: wheel_size.id} })) %>
+<% end %>

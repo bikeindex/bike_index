@@ -12,9 +12,9 @@ class PropulsionType
   }.freeze # NOTE: 10 is reserved for "motorized"
 
   NAMES = {
-    "foot-pedal": "Foot Pedal",
+    "foot-pedal": "Pedal",
     "pedal-assist": "Pedal Assist",
-    throttle: "Electric Throttle",
+    throttle: "Throttle",
     "pedal-assist-and-throttle": "Pedal Assist and Throttle",
     "hand-pedal": "Hand Cycle (hand pedal)",
     "human-not-pedal": "Human powered (not by pedals)"
@@ -101,18 +101,20 @@ class PropulsionType
 
     def default_non_motorized_type(cycle_type)
       return nil if CycleType.strict_motorized(cycle_type) == :always
+
       CycleType.pedal_type?(cycle_type) ? :"foot-pedal" : :"human-not-pedal"
     end
 
     def default_motorized_type(cycle_type)
       return nil if CycleType.strict_motorized(cycle_type) == :never
+
       CycleType.pedal_type?(cycle_type) ? :"pedal-assist" : :throttle
     end
 
     def motorized_autocomplete_hash
       {
         id: 10,
-        text: "E-Vehicles",
+        text: "E-Vehicles (electric vehicles)",
         priority: 980,
         category: "propulsion",
         data: {priority: 980, slug: :motorized, search_id: "p_10"}
@@ -120,12 +122,12 @@ class PropulsionType
     end
   end
 
+  attr_reader :slug, :id
+
   def initialize(slug)
     @slug = slug&.to_sym
     @id = SLUGS[@slug]
   end
-
-  attr_reader :slug, :id
 
   def motorized?
     self.class.motorized?(slug)

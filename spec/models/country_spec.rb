@@ -1,6 +1,39 @@
 require "rails_helper"
 
 RSpec.describe Country, type: :model do
+  it_behaves_like "friendly_name_findable"
+
+  describe "factory" do
+    let(:country) { FactoryBot.create(:country_australia) }
+    it "is valid and only creates once" do
+      expect(country).to be_valid
+      expect(FactoryBot.create(:country_australia).id).to eq country.id
+    end
+
+    context "united_states" do
+      let(:country) { Country.united_states }
+
+      it "matches class methods" do
+        expect(country.id).to eq Country.united_states_id
+      end
+    end
+  end
+
+  describe "select_options" do
+    let!(:country) { Country.create!(name: "Svenborgia", iso: "SVE") }
+
+    it "falls back to name when the iso has no translation" do
+      expect(Country.select_options).to include(["Svenborgia", country.id])
+    end
+
+    context "with a translation for the iso" do
+      it "uses the translation" do
+        I18n.backend.store_translations(:en, countries: {SVE: "Svenborgia (translated)"})
+        expect(Country.select_options).to include(["Svenborgia (translated)", country.id])
+      end
+    end
+  end
+
   describe "friendly_find" do
     it "finds the country by name or iso" do
       country = Country.create(name: "Svenborgia", iso: "SVE")

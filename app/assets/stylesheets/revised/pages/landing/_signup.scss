@@ -15,12 +15,12 @@
 
 $landing-page-targets: "bike_shops", "school", "community_groups",
   "law_enforcement", "cities", "ambassadors-how-to", "ambassadors-current",
-  "campus-packages", "shop-packages", "cities-packages";
+  "shop-packages";
 
 @each $target in $landing-page-targets {
   .signup-landing-page-#{$target} {
     .banner-header {
-      background-image: image-url("landing_pages/header_bg_#{$target}.jpg");
+      background-image: url("landing_pages/header_bg_#{$target}.jpg");
     }
   }
 }

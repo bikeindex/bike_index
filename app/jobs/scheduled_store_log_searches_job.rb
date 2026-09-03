@@ -1,5 +1,6 @@
 class ScheduledStoreLogSearchesJob < ScheduledJob
   prepend ScheduledJobRecorder
+
   MAX_W = 2_000
 
   def self.frequency
@@ -11,8 +12,10 @@ class ScheduledStoreLogSearchesJob < ScheduledJob
 
     log_line = get_log_line
     return if log_line.blank?
+
     log_line_attrs = LogSearcher::Parser.parse_log_line(log_line)
     return if log_line_attrs.blank?
+
     logged_search = LoggedSearch.create(log_line_attrs.merge(log_line: log_line))
     ProcessLoggedSearchJob.perform_async(logged_search.id) if logged_search.id.present?
     logged_search

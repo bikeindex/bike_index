@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: ambassador_tasks
+# Database name: primary
 #
 #  id          :integer          not null, primary key
 #  description :string           default(""), not null
@@ -18,9 +19,9 @@ class AmbassadorTask < ApplicationRecord
 
   validates :title, presence: true, uniqueness: true
 
-  scope :task_ordered, -> { order(id: :asc) }
-
   after_create :ensure_assigned_to_all_ambassadors!
+
+  scope :task_ordered, -> { order(id: :asc) }
 
   def description_html
     Kramdown::Document.new(description).to_html
@@ -34,6 +35,6 @@ class AmbassadorTask < ApplicationRecord
 
   # Assigns the task to all ambassadors, if not already assigned
   def ensure_assigned_to_all_ambassadors!
-    AmbassadorTaskAfterCreateJob.perform_async(id)
+    CallbackJobs::AmbassadorTaskAfterCreateJob.perform_async(id)
   end
 end

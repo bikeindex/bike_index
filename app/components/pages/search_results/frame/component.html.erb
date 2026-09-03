@@ -1,0 +1,32 @@
+<% helpers.content_for(:header) { tag.meta(name: "turbo-cache-control", content: "no-cache") } %>
+
+<div class="search-results-frame-wrapper">
+  <%# Revealed by search--form when a search request comes back 429-throttled %>
+  <div hidden data-search-notice="rate-limited">
+    <%= render UI::Alerts::Base::Component.new(text: translation(".rate_limited"), kind: :warning) %>
+  </div>
+
+  <%# Revealed by search--form when the frame's fetch fails outright, rather than answering with a status %>
+  <div hidden data-search-notice="fetch-failed">
+    <%= render UI::Alerts::Base::Component.new(text: translation(".fetch_failed"), kind: :error) do %>
+      <div class="tw:mt-2">
+        <%= render UI::Button::Component.new(text: translation(".retry"), size: :sm,
+          data: {search_retry: ""}) %>
+      </div>
+    <% end %>
+  </div>
+
+  <%= helpers.turbo_frame_tag @frame_id, src: @src do %>
+    <% if @render_results %>
+      <%= content %>
+    <% else %>
+      <div hidden data-search-loading>
+        <%= render UI::LoadingSpinner::Component.new(text: @loading_text) %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div class="search-loading-overlay">
+    <%= render UI::LoadingSpinner::Component.new(text: @loading_text) %>
+  </div>
+</div>

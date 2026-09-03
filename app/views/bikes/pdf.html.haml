@@ -6,7 +6,7 @@
   %head
     %meta{charset: "utf-8"}
     %meta{"http-equiv" => "X-UA-Compatible", content: "text/html; charset=UTF-8"}
-    = wicked_pdf_stylesheet_link_tag "registration_pdf"
+    =# wicked_pdf_stylesheet_link_tag "registration_pdf"
     <link href='https://fonts.googleapis.com/css?family=Rambla:400' rel='stylesheet' type='text/css'>
 
     %title
@@ -52,7 +52,7 @@
               %td.td-title
                 = t(".location")
               %td
-                = @stolen_record.address
+                = @stolen_record.formatted_address_string
 
       .bike-details
         %table.table.table-striped
@@ -62,7 +62,7 @@
                 %td.td-title
                   = t(".owner_phone")
                 %td
-                  = phone_link(@stolen_record.phone, class: "phone-number-link")
+                  = render Atoms::Phone::Component.new(phone: @stolen_record.phone)
             - if @stolen_record.police_report_number.present?
               %tr
                 %td.td-title
@@ -91,7 +91,7 @@
           %tr
             %td.td-title
               = t(".registered")
-            %td.convertTime
+            %td.localizeTime
               = @bike.created_at.strftime("time.format.convert_time")
               = t(".to")
               - if @bike.owner.present? && @bike.owner.name.present?

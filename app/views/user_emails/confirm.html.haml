@@ -1,0 +1,5 @@
+.container
+  = render Pages::Sessions::SignInInterstitial::Component.new(url: confirm_user_email_path(@user_email),
+    fields: { confirmation_token: params[:confirmation_token] },
+    heading: t(".confirm_this_email", user_email: @user_email.email),
+    submit_text: t(".confirm_email"))

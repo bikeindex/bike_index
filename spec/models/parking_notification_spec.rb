@@ -1,8 +1,6 @@
 require "rails_helper"
 
 RSpec.describe ParkingNotification, type: :model do
-  it_behaves_like "geocodeable"
-
   describe "factory" do
     let(:parking_notification) { FactoryBot.create(:parking_notification, kind: "appears_abandoned_notification") }
     let(:bike) { parking_notification.bike }
@@ -41,6 +39,39 @@ RSpec.describe ParkingNotification, type: :model do
     end
   end
 
+  describe "email_success?" do
+    let(:parking_notification) { FactoryBot.create(:parking_notification) }
+    it "is false without a notification" do
+      expect(parking_notification.email_success?).to be_falsey
+    end
+    context "with a delivery_success notification" do
+      before do
+        FactoryBot.create(:notification, kind: "parking_notification", notifiable: parking_notification, delivery_status: "delivery_success", bike: parking_notification.bike, message_channel_target: parking_notification.email)
+      end
+      it "is true" do
+        expect(parking_notification.email_success?).to be_truthy
+      end
+    end
+  end
+
+  describe ".email_success" do
+    let!(:via_notification) do
+      pn = FactoryBot.create(:parking_notification)
+      FactoryBot.create(:notification, kind: "parking_notification", notifiable: pn, delivery_status: "delivery_success", bike: pn.bike, message_channel_target: pn.email)
+      pn
+    end
+    let!(:failed) do
+      pn = FactoryBot.create(:parking_notification)
+      FactoryBot.create(:notification, kind: "parking_notification", notifiable: pn, delivery_status: "delivery_failure", bike: pn.bike, message_channel_target: pn.email)
+      pn
+    end
+    let!(:unsent) { FactoryBot.create(:parking_notification) }
+
+    it "matches only parking_notifications with a delivery_success notification" do
+      expect(ParkingNotification.email_success.pluck(:id)).to eq([via_notification.id])
+    end
+  end
+
   describe "reply_to_email" do
     let(:organization) { FactoryBot.create(:organization_with_auto_user) }
     let(:parking_notification) { FactoryBot.build(:parking_notification_organized, organization: organization) }
@@ -69,6 +100,42 @@ RSpec.describe ParkingNotification, type: :model do
     end
   end
 
+  describe "bike_not_impounded" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+    let(:bike) { FactoryBot.create(:bike) }
+    let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: organization, bike: bike) }
+    let(:parking_notification) { FactoryBot.build(:parking_notification_organized, organization: organization, bike: bike, kind: "impound_notification") }
+    it "is invalid, naming the impound record" do
+      expect(parking_notification).to_not be_valid
+      expect(parking_notification.errors.full_messages.to_sentence)
+        .to eq "This bike is already impounded (impound record ##{impound_record.display_id})"
+    end
+
+    context "notification of another kind" do
+      let(:parking_notification) { FactoryBot.build(:parking_notification_organized, organization: organization, bike: bike, kind: "appears_abandoned_notification") }
+      it "is valid" do
+        expect(parking_notification).to be_valid
+      end
+    end
+
+    context "impound record resolved" do
+      let!(:impound_record) { FactoryBot.create(:impound_record_resolved, organization: organization, bike: bike) }
+      it "is valid" do
+        expect(impound_record.reload.resolved?).to be_truthy
+        expect(parking_notification).to be_valid
+      end
+    end
+
+    context "impounded by another organization" do
+      let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
+      it "is invalid" do
+        expect(parking_notification).to_not be_valid
+        expect(parking_notification.errors.full_messages.to_sentence)
+          .to eq "This bike is already impounded by another organization"
+      end
+    end
+  end
+
   describe "unregistered" do
     let(:parking_notification) { FactoryBot.create(:parking_notification_unregistered) }
     let(:organization) { parking_notification.organization }
@@ -85,6 +152,27 @@ RSpec.describe ParkingNotification, type: :model do
       expect(parking_notification.retrieval_link_token).to be_blank
       expect(parking_notification.bike.unregistered_parking_notification?).to be_truthy
       expect(organization.parking_notifications.bikes.pluck(:id)).to eq([bike.id])
+    end
+  end
+
+  describe ".build_for" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications], approved: true) }
+
+    it "defaults the kind and the location, without a repeat to point at" do
+      built = ParkingNotification.build_for(bike:, organization:)
+      expect(built).to be_new_record
+      expect(built.bike_id).to eq bike.id
+      expect(built.organization_id).to eq organization.id
+      expect(built.is_repeat).to be_falsey
+      expect(built.kind).to eq ParkingNotification.kinds.first
+    end
+
+    it "takes the kind of the notification it would repeat" do
+      FactoryBot.create(:parking_notification, bike:, organization:, kind: "appears_abandoned_notification")
+      built = ParkingNotification.build_for(bike:, organization:)
+      expect(built.is_repeat).to be_truthy
+      expect(built.kind).to eq "appears_abandoned_notification"
     end
   end
 
@@ -170,30 +258,102 @@ RSpec.describe ParkingNotification, type: :model do
   describe "calculated_unregistered_parking_notification" do
     let(:parking_notification1) { FactoryBot.create(:parking_notification_unregistered, kind: "parked_incorrectly_notification") }
     let(:organization) { parking_notification1.organization }
-    let!(:bike) { parking_notification1.bike }
-    it "sets the impound record" do
-      bike.reload
+    let!(:bike) { Bike.unscoped.find(parking_notification1.bike_id) }
+    let(:user) { parking_notification1.user }
+
+    it "user_hidden: false if transferred" do
       expect(bike.status).to eq "unregistered_parking_notification"
       expect(bike.user_hidden).to be_truthy
+      expect(bike.current_ownership).to be_present
+      expect(bike.current_impound_record&.id).to be_nil
+      expect(bike.current_parking_notification&.id).to eq parking_notification1.id
+
       expect(parking_notification1.unregistered_bike?).to be_truthy
       expect(parking_notification1.resolved_at).to be_blank
-      Sidekiq::Job.clear_all
-      parking_notification2 = parking_notification1.retrieve_or_repeat_notification!(kind: "impound_notification")
-      expect(parking_notification2.unregistered_bike?).to be_truthy
-      expect(parking_notification2.resolved_at).to be_within(1).of Time.current
-      Sidekiq::Testing.inline! do
-        parking_notification2.process_notification
-      end
-      bike.reload
-      parking_notification2.reload
-      expect(parking_notification2.impound_record).to be_present
-      expect(parking_notification2.resolved_at).to be_present # The job sets the resolved at
-      expect(bike.status).to eq "status_impounded"
-      expect(parking_notification2.unregistered_bike?).to be_truthy
-      expect(bike.user_hidden).to be_falsey
-
-      expect(parking_notification1.reload.resolved_at).to be_present
       expect(parking_notification1.retrieved_kind).to be_blank
+
+      # Transfer ownership:
+      expect do
+        BikeServices::Updator.new(user:, bike:, permitted_params: {bike: {owner_email: "new@bikes.com"}}.as_json)
+          .update_available_attributes
+      end.to change(ImpoundRecordUpdate, :count).by(0)
+        .and change(ParkingNotification, :count).by(0)
+
+      expect(bike.reload.status).to eq "status_with_owner"
+      expect(bike.user_hidden).to be_falsey
+      expect(bike.current_impound_record&.id).to be_nil
+      expect(bike.current_parking_notification&.id).to be_nil
+
+      expect(parking_notification1.reload.unregistered_bike?).to be_truthy
+      expect(parking_notification1.resolved_at).to be_within(2).of Time.current
+      expect(parking_notification1.retrieved_kind).to eq "ownership_transfer"
+      expect(parking_notification1.retrieved_by_id).to eq user.id
+      expect(parking_notification1.status).to eq "retrieved"
+
+      # verify that processing doesn't update the bike again
+      updated_at = Time.current - 101
+      bike.update_column :updated_at, updated_at
+      parking_notification1.update(updated_at: Time.current)
+      expect(bike.reload.updated_at).to be_within(1).of updated_at
+    end
+
+    context "when a repeat notification impounds" do
+      it "creates an impound record" do
+        bike.reload
+        expect(bike.status).to eq "unregistered_parking_notification"
+        expect(bike.user_hidden).to be_truthy
+        expect(parking_notification1.unregistered_bike?).to be_truthy
+        expect(parking_notification1.resolved_at).to be_blank
+
+        Sidekiq::Job.clear_all
+        parking_notification2 = parking_notification1.retrieve_or_repeat_notification!(kind: "impound_notification")
+        expect(parking_notification2.unregistered_bike?).to be_truthy
+        expect(parking_notification2.resolved_at).to be_within(1).of Time.current
+        Sidekiq::Testing.inline! do
+          parking_notification2.send(:process_notification)
+        end
+        bike.reload
+        parking_notification2.reload
+        expect(parking_notification2.impound_record).to be_present
+        expect(parking_notification2.resolved_at).to be_present # The job sets the resolved at
+        expect(bike.status).to eq "status_impounded"
+        expect(parking_notification2.unregistered_bike?).to be_truthy
+        expect(parking_notification2.status).to eq "impounded"
+        expect(parking_notification2.retrieved_kind).to be_nil
+        expect(bike.user_hidden).to be_falsey
+        expect(bike.current_impound_record&.id).to eq parking_notification2.impound_record_id
+        expect(bike.current_parking_notification&.id).to be_nil
+
+        expect(parking_notification1.reload.resolved_at).to be_within(2).of Time.current
+        expect(parking_notification1.retrieved_kind).to be_blank
+
+        Sidekiq::Job.clear_all
+        # Transfer ownership:
+        expect do
+          BikeServices::Updator.new(user:, bike:, permitted_params: {bike: {owner_email: "new@bikes.com"}}.as_json)
+            .update_available_attributes
+        end.to change(ImpoundRecordUpdate, :count).by(1)
+          .and change(ParkingNotification, :count).by(0)
+          .and change(ProcessImpoundUpdatesJob.jobs, :count).by(1)
+        ProcessImpoundUpdatesJob.drain
+        expect(ProcessImpoundUpdatesJob.jobs.count).to eq 0 # verify that we aren't endlessly looping
+
+        expect(bike.reload.status).to eq "status_with_owner"
+        expect(bike.user_hidden).to be_falsey
+        expect(bike.current_impound_record&.id).to be_nil
+        expect(bike.current_parking_notification&.id).to be_nil
+
+        expect(parking_notification1.reload.unregistered_bike?).to be_truthy
+        expect(parking_notification1.resolved_at).to be_within(5).of Time.current
+        expect(parking_notification1.status).to eq "replaced"
+        expect(parking_notification1.retrieved_kind).to be_nil
+        expect(parking_notification1.retrieved_by_id).to be_nil
+
+        expect(parking_notification2.reload.status).to eq "impounded_retrieved"
+        # Decided to leave it nil because it isn't directly retrieved
+        expect(parking_notification2.retrieved_kind).to be_nil
+        expect(parking_notification2.retrieved_by_id).to be_nil
+      end
     end
   end
 
@@ -202,8 +362,8 @@ RSpec.describe ParkingNotification, type: :model do
     let(:parking_notification) { FactoryBot.create(:parking_notification_organized, kind: "parked_incorrectly_notification", bike: bike) }
     let(:organization) { parking_notification.organization }
     it "is default with snippet" do
-      expect(parking_notification.mail_snippet).to be_blank
-      expect(parking_notification.subject).to eq "Your pedi cab (rickshaw) is parked incorrectly"
+      expect(parking_notification.reload.mail_snippet).to be_blank
+      expect(parking_notification.subject).to eq "Your pedi cab is parked incorrectly"
     end
     context "with mail_snippet" do
       let!(:mail_snippet) do
@@ -220,34 +380,27 @@ RSpec.describe ParkingNotification, type: :model do
     end
   end
 
-  describe "address" do
-    # Copies StolenRecord, needs to be moved to a concern
+  describe "formatted_address_string" do
     let(:country) { Country.create(name: "Neverland", iso: "NEVVVV") }
     let(:state) { State.create(country_id: country.id, name: "BullShit", abbreviation: "XXX") }
     it "creates an address" do
       parking_notification = ParkingNotification.new(street: "2200 N Milwaukee Ave",
         city: "Chicago",
-        hide_address: true,
-        state_id: state.id,
-        zipcode: "60647",
+        region_record_id: state.id,
+        postal_code: "60647",
         country_id: country.id)
-      expect(parking_notification.address).to eq("Chicago, XXX 60647, NEVVVV")
-      expect(parking_notification.address(force_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
-      parking_notification.hide_address = false
-      expect(parking_notification.address).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, NEVVVV")
+      expect(parking_notification.show_address).to be_truthy
+      expect(parking_notification.formatted_address_string).to eq("2200 N Milwaukee Ave, Chicago, XXX 60647, Neverland")
     end
     it "is ok with missing information" do
       parking_notification = ParkingNotification.new(street: "2200 N Milwaukee Ave",
-        zipcode: "60647",
-        hide_address: true,
+        postal_code: "60647",
         country_id: country.id)
-      expect(parking_notification.address).to eq("60647, NEVVVV")
-      parking_notification.hide_address = false
-      expect(parking_notification.address).to eq("2200 N Milwaukee Ave, 60647, NEVVVV")
+      expect(parking_notification.formatted_address_string).to eq("2200 N Milwaukee Ave, 60647, Neverland")
     end
     it "returns even if no country" do
       parking_notification = ParkingNotification.new(street: "302666 Richmond Blvd")
-      expect(parking_notification.address).to eq parking_notification.street
+      expect(parking_notification.formatted_address_string).to eq parking_notification.street
     end
   end
 
@@ -270,9 +423,9 @@ RSpec.describe ParkingNotification, type: :model do
       let(:parking_notification) { FactoryBot.build(:parking_notification, latitude: default_location[:latitude], longitude: default_location[:longitude]) }
       it "sets address" do
         parking_notification.save
-        expect(parking_notification.state).to eq state
+        expect(parking_notification.region_record).to eq state
         expect(parking_notification.country).to eq country
-        expect(parking_notification.address).to be_present
+        expect(parking_notification.formatted_address_string).to be_present
         expect(parking_notification.valid?).to be_truthy
         expect(parking_notification.id).to be_present
         expect(parking_notification.location_from_address).to be_falsey
@@ -346,13 +499,14 @@ RSpec.describe ParkingNotification, type: :model do
     end
     context "mark_retrieved of replaced notification" do
       let(:parking_notification2) do
-        FactoryBot.create(:parking_notification,
+        pn = FactoryBot.create(:parking_notification,
           bike: parking_notification.bike,
           organization: parking_notification.organization,
           user: parking_notification.user,
           created_at: Time.current - 1.week,
-          initial_record: parking_notification,
-          delivery_status: "email_success")
+          initial_record: parking_notification)
+        FactoryBot.create(:notification, kind: "parking_notification", notifiable: pn, delivery_status: "delivery_success", bike: pn.bike, message_channel_target: pn.email)
+        pn
       end
       it "retrieves" do
         ProcessParkingNotificationJob.new.perform(parking_notification2.id)

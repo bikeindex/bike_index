@@ -1,0 +1,67 @@
+<dialog
+  id="<%= @id %>"
+  data-controller="ui--modal"
+  data-ui--modal-open-on-connect-value="<%= @open %>"
+  data-action="click->ui--modal#backdropClick close->ui--modal#closed command->ui--modal#invoked"
+  class="
+    tw:m-auto tw:max-h-dvh tw:w-full tw:max-w-lg tw:overflow-y-auto
+    tw:overscroll-contain tw:bg-transparent tw:px-4 tw:backdrop:bg-black/50
+    tw:backdrop:backdrop-blur-sm
+  "
+>
+  <%#
+    The dialog is the scroller, so the rounded ends stay off-screen until you
+    reach them. clip rather than hidden: hidden would make this the scrollport
+    and strand the sticky title bar
+  %>
+
+  <div
+    class="
+      tw:my-4 tw:w-full tw:overflow-clip tw:rounded-xl tw:bg-white
+      tw:shadow-xl tw:dark:bg-gray-800
+    "
+  >
+    <% if @title %>
+      <div
+        class="
+          tw:sticky tw:top-0 tw:flex tw:items-center tw:justify-between
+          tw:border-b tw:border-gray-200 tw:bg-white tw:px-5 tw:py-4
+          tw:dark:border-gray-700 tw:dark:bg-gray-800
+        "
+      >
+        <h3 class="tw:text-lg tw:font-semibold tw:text-gray-900 tw:dark:text-white">
+          <%= @title %>
+        </h3>
+
+        <button
+          type="button"
+          commandfor="<%= @id %>"
+          command="close"
+          aria-label="Close"
+          class="
+            tw:text-gray-400 tw:hover:text-gray-600
+            tw:dark:hover:text-gray-300
+          "
+        >
+          <svg
+            class="tw:h-5 tw:w-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+    <% end %>
+
+    <div class="tw:px-5 tw:py-4 tw:twtext-color">
+      <%= body %>
+    </div>
+  </div>
+</dialog>

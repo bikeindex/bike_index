@@ -19,10 +19,11 @@ RSpec.describe InvalidExtensionForAscendImportJob, type: :job do
     ActionMailer::Base.deliveries = []
     expect(OrganizationStatus.count).to eq 0
     expect(Notification.count).to eq 0
+
     instance.perform(bulk_import.id)
     instance.perform(bulk_import.id) # Do it again to verify it only notifies once
-    expect(OrganizationStatus.count).to eq 2
-    expect(OrganizationStatus.pluck(:pos_kind)).to match_array(%w[no_pos broken_ascend_pos])
+    expect(OrganizationStatus.count).to eq 1
+    expect(OrganizationStatus.pluck(:pos_kind)).to match_array(%w[broken_ascend_pos])
     organization_status = OrganizationStatus.current.last
     expect(organization_status.organization_id).to eq organization.id
     expect(organization_status.pos_kind).to eq "broken_ascend_pos"

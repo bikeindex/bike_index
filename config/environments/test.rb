@@ -4,6 +4,15 @@ Rails.application.configure do
   # While tests run files are not watched, reloading is not necessary.
   config.enable_reloading = false
 
+  # capybara-lockstep: let the browser-side helper know when the server is still
+  # processing a request, so :js specs wait for in-flight work before proceeding.
+  config.middleware.insert_before 0, Capybara::Lockstep::Middleware if defined?(Capybara::Lockstep::Middleware)
+
+  # Don't log things in test
+  config.active_record.verbose_query_logs = false
+  config.active_record.query_log_tags_enabled = false
+  config.log_level = :fatal
+
   # Eager loading loads your entire application. When running a single test locally,
   # this is usually not necessary, and can slow down your test suite. However, it's
   # recommended that you enable it in continuous integration systems to ensure eager
@@ -55,6 +64,14 @@ Rails.application.configure do
   config.i18n.exception_handler = proc { |exception| raise exception.to_exception }
 
   config.action_mailer.default_url_options = {host: ENV["BASE_URL"]}
+  routes.default_url_options = config.action_mailer.default_url_options
 
   config.cache_store = :file_store, Rails.root.join("tmp", "cache", "test#{ENV["TEST_ENV_NUMBER"]}")
+
+  # Configure Sidekiq to suppress INFO logs in test environment
+  if defined?(Sidekiq)
+    Sidekiq.configure_client { |config| config.logger.level = Logger::WARN }
+
+    Sidekiq.configure_server { |config| config.logger.level = Logger::WARN }
+  end
 end

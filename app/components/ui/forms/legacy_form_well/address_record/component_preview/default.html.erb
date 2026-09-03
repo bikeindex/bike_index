@@ -1,0 +1,21 @@
+<% bike ||= nil %>
+<% user ||= nil %>
+<% organization ||= nil %>
+
+<% if bike.present? %>
+  <%= form_for bike, url: bikes_path, method: :post, multipart: true do |f| %>
+    <%= fields_for(bike.impound_records.last) do |irecord| %>
+      <%= irecord.fields_for :address_record do |address_form| %>
+        <%= render(UI::Forms::LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, bike_status: bike.status)) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% else %>
+  <%= form_for user, url: my_account_path, method: :patch, multipart: true do |f| %>
+    <%= f.fields_for :address_record do |address_form| %>
+      <%= render(
+        UI::Forms::LegacyFormWell::AddressRecord::Component.new(form_builder: address_form, organization:)
+      ) %>
+    <% end %>
+  <% end %>
+<% end %>

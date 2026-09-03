@@ -8,12 +8,27 @@ RSpec.describe "Search API V3", type: :request do
     let!(:bike2) { FactoryBot.create(:stolen_bike, manufacturer: manufacturer) }
     let(:query_params) { {query_items: [manufacturer.search_id]} }
     context "with per_page" do
+      let(:link_headers) do
+        "<http://www.example.com/api/v3/search?page=1&per_page=50000&stolenness=all>; rel=\"first\", " \
+        "<http://www.example.com/api/v3/search?page=1&per_page=50000&stolenness=all>; rel=\"prev\", " \
+        "<http://www.example.com/api/v3/search?page=1&per_page=50000&stolenness=all>; rel=\"last\", " \
+        "<http://www.example.com/api/v3/search?page&per_page=50000&stolenness=all>; rel=\"next\""
+      end
       it "returns matching bikes, defaults to stolen" do
         expect(Bike.count).to eq 2
         get "/api/v3/search", params: query_params.merge(per_page: 1, format: :json)
         expect(response.header["Total"]).to eq("1")
         result = JSON.parse(response.body)
         expect(result["bikes"][0]["id"]).to eq bike2.id
+        expect(response.headers["Per-Page"]).to eq("1")
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+        expect(response.headers["Access-Control-Request-Method"]).to eq("*")
+
+        # Outside permitted page params
+        get "/api/v3/search", params: {stolenness: "all", page: 500, per_page: 50_000}, headers: json_headers
+        expect(response.headers["Total"]).to eq("2")
+        expect(response.headers["Per-Page"]).to eq("100")
+        expect(response.headers["Link"]).to eq link_headers
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
         expect(response.headers["Access-Control-Request-Method"]).to eq("*")
       end
@@ -62,12 +77,44 @@ RSpec.describe "Search API V3", type: :request do
         expect(json_result["bikes"][0]["id"]).to eq bike2.id
       end
     end
+    context "non-stolen for-sale bike" do
+      let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
+      let(:listed_bike) { marketplace_listing.item }
+
+      it "serializes status as 'with owner' with for_sale: true" do
+        expect(listed_bike.reload.is_for_sale).to be_truthy
+        get "/api/v3/search", params: {stolenness: "non", format: :json}
+        expect(response.status).to eq 200
+        result = json_result["bikes"].find { |b| b["id"] == listed_bike.id }
+        expect(result).to include("status" => "with owner", "for_sale" => true)
+      end
+    end
+
+    context "proximity" do
+      let(:ip_address) { "23.115.69.69" }
+      let(:headers) { {"HTTP_X_FORWARDED_FOR" => ip_address} }
+      include_context :geocoder_default_location
+
+      it "clamps below minimum distance, finds bike within clamped range" do
+        # Create a stolen bike ~0.5 miles north of the default NYC location
+        stolen_bike = FactoryBot.create(:stolen_bike_in_nyc)
+        nearby_lat = default_location[:latitude] + 0.00725
+        stolen_bike.update_columns(latitude: nearby_lat, longitude: default_location[:longitude])
+        stolen_bike.current_stolen_record.update_columns(latitude: nearby_lat, longitude: default_location[:longitude])
+
+        # distance=0.1 is clamped to 1 mile minimum — bike 0.5 miles away should be found
+        get "/api/v3/search", params: {stolenness: "proximity", location: "New York", distance: "0.1", format: :json}, headers: headers
+        expect(response.status).to eq 200
+        result_ids = json_result["bikes"].map { |b| b["id"] }
+        expect(result_ids).to include(stolen_bike.id)
+      end
+    end
   end
 
   describe "/close_serials" do
     let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer, serial_number: "something") }
     let(:query_params) { {serial: "somethind", stolenness: "non"} }
-    let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: nil) }
+    let(:target_interpreted_params) { BikeSearchable.searchable_interpreted_params(query_params, ip: nil) }
     context "with per_page" do
       it "returns matching bikes, defaults to stolen" do
         get "/api/v3/search/close_serials", params: query_params.merge(format: :json)
@@ -127,6 +174,7 @@ RSpec.describe "Search API V3", type: :request do
             registry_url
             serial
             status
+            for_sale
             stolen
             stolen_coordinates
             stolen_location
@@ -142,7 +190,24 @@ RSpec.describe "Search API V3", type: :request do
     end
   end
 
+  describe "rack_attack" do
+    include_context :rack_attack
+
+    it "throttles after exceeding the API limit, returns JSON" do
+      expect(Rack::Attack::API_MAX_REQUESTS).to eq 15
+      throttled = rack_attack_throttled_response(limit: Rack::Attack::API_MAX_REQUESTS) do
+        get "/api/v3/search", params: {stolenness: "non", format: :json}
+        response
+      end
+      expect(throttled).to have_http_status(:too_many_requests)
+      expect(throttled.content_type).to include("application/json")
+      expect(JSON.parse(throttled.body)).to eq("error" => "Too Many Requests")
+    end
+  end
+
   describe "/count" do
+    before { Rails.cache.clear }
+
     context "incorrect stolenness value" do
       it "returns an error message" do
         get "/api/v3/search/count", params: {stolenness: "something else", format: :json}
@@ -163,7 +228,7 @@ RSpec.describe "Search API V3", type: :request do
         }
       end
       let(:proximity_query_params) { request_query_params.merge(stolenness: "proximity") }
-      let(:proximity_interpreted_params) { Bike.searchable_interpreted_params(proximity_query_params, ip: "") }
+      let(:proximity_interpreted_params) { BikeSearchable.searchable_interpreted_params(proximity_query_params, ip: "") }
       # Use the interpreted params, because they come with proximity data - it"s what we do in the API
       let(:stolen_interpreted_params) { proximity_interpreted_params.merge(stolenness: "stolen") }
       let(:non_stolen_interpreted_params) { proximity_interpreted_params.merge(stolenness: "non") }
@@ -175,7 +240,7 @@ RSpec.describe "Search API V3", type: :request do
         VCR.use_cassette("v3_bike_search-count") do
           get "/api/v3/search/count", params: request_query_params.merge(format: :json)
           result = JSON.parse(response.body)
-          expect(result).to match({non: 1, stolen: 2, proximity: 1}.as_json)
+          expect(result).to match({non: 1, stolen: 2, proximity: 1, for_sale: 0}.as_json)
           expect(response.status).to eq(200)
           expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
           expect(response.headers["Access-Control-Request-Method"]).to eq("*")
@@ -185,28 +250,44 @@ RSpec.describe "Search API V3", type: :request do
     context "nil params" do
       it "succeeds" do
         get "/api/v3/search/count", params: {stolenness: "", query_items: [], serial: "", format: :json}
-        # JSON.parse(response.body)
         expect(response.status).to eq(200)
       end
     end
     context "with query items" do
       let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer) }
-      let!(:bike2) { FactoryBot.create(:bike) }
+      let!(:color) { FactoryBot.create(:color, name: "Purple") }
+      let!(:bike2) { FactoryBot.create(:bike, primary_frame_color: color) }
       let(:query_params) { {query_items: [manufacturer.search_id]} }
+      let(:target) { {non: 1, proximity: 0, stolen: 0, for_sale: 0} }
       it "succeeds" do
         get "/api/v3/search/count", params: query_params.merge(format: :json)
-        result = JSON.parse(response.body)
-        expect(result["non"]).to eq 1
+        JSON.parse(response.body)
         expect(response.status).to eq(200)
+        expect(json_result).to match_hash_indifferently target
+        # Search color
+        get "/api/v3/search/count?colors%5B%5D=#{color.id}&stolenness=non&location=edmonton"
+        expect(response.status).to eq(200)
+        expect(json_result).to match_hash_indifferently target
+
+        get "/api/v3/search/count", params: {
+          query_items: [manufacturer.search_id], colors: [color.id], format: :json
+        }
+        JSON.parse(response.body)
+        expect(response.status).to eq(200)
+        expect(json_result).to match_hash_indifferently target.merge(non: 0)
       end
-      context "with colors" do
-        let!(:color) { FactoryBot.create(:color, name: "Purple") }
-        let(:target) { {non: 0, proximity: 0, stolen: 0} }
-        it "succeeds" do
-          get "/api/v3/search/count?colors%5B%5D=#{color.id}&stolenness=non&location=edmonton"
-          expect(json_result).to eq target.as_json
-          expect(response.status).to eq(200)
-        end
+    end
+
+    context "for_sale" do
+      let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
+      let(:target) { {non: 1, proximity: 0, stolen: 0, for_sale: 1} }
+      it "returns successfully" do
+        get "/api/v3/search/count", params: {stolenness: "", query_items: [], serial: "", format: :json}
+        expect(response.status).to eq(200)
+        expect(json_result).to match_hash_indifferently target
+        get "/api/v3/search/count", params: {stolenness: "for_sale", format: :json}
+        expect(response.status).to eq(200)
+        expect(json_result).to match_hash_indifferently target
       end
     end
   end

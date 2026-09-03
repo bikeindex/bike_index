@@ -2,38 +2,13 @@
   - unless sign_in_partner.present?
     .sign-in-up-header.container
       .row
-        %h1= t(".get_on_bike_index")
+        %h1{ class: "tw:pl-4 tw:md:pl-0" }= t(".get_on_bike_index")
   .container
     .sign-in-up-wrap
       .row
-        .oauth-providers
-          -# %a.facebook-login{ href: '/auth/facebook' }
-          -#   %span.oauth-logo-block= image_tag 'revised/facebook_login.svg'
-          /   %span.oauth-text-block= t(".sign_in_using_facebook")
-          -# %a.strava-login{ href: '/auth/strava' }
-          -#   %span.oauth-logo-block= image_tag 'revised/strava_login.svg'
-          /    %span.oauth-text-block= t(".sign_in_using_strava")
-
-          -#- unless sign_in_partner.present?
-          -#  %a.globalid-login{ href: '/auth/globalid' }
-          -#    %span.oauth-logo-block= image_tag 'revised/globalid_logo.svg'
-          /     %span.oauth-text-block= t(".sign_in_using_globalid")
-
-          %a.magic_link-login{ href: magic_link_session_path }
-            %span.oauth-logo-block
-              %i.fas.fa-envelope-open-text
-            %span.oauth-text-block= t(".sign_in_using_magic_link")
-        .sign-in-up-or
-          %h3= t(".or")
         .main-form
           - company = session[:company] if sign_in_partner.present? && session[:company].present?
           %h3.sign-in-up-main-form-header{ class: (company.present? ? "mb-1" : "") }
-            %small
-              - if sign_in_partner.present?
-                = t(".no_bike_index_account")
-              - else
-                = t(".dont_have_an_account")
-              = link_to t(".sign_up"), new_user_path(partner: sign_in_partner, email: params[:email])
             - if company.present?
               - image_path = company.match?(/metro/i) ? "bikehub/metro_logo.png" : "bikehub/bikehub_logo_nosubtitle.png"
               = image_tag image_path, alt: "", class: "company-logo"
@@ -42,30 +17,20 @@
                 for
                 %em= company
             - else
-              = t(".log_in")
+              = t(".log_in_or_sign_up")
 
-          = form_for :session, url: session_url(params.permit(:return_to)) do |f|
+          = form_for :session, url: identify_session_path(params.permit(:return_to)) do |f|
             - if sign_in_partner
               = hidden_field_tag :partner, sign_in_partner
 
             .form-group
               = f.label :email, class: 'sr-only'
-              = f.email_field :email,
-              value: params[:email],
-              placeholder: t(".email"),
-              class: 'form-control'
+              = render(UI::Forms::Email::Component.new(form_builder: f, required: true,
+              html_options: {value: @email, placeholder: t(".email"), autocomplete: "username", autofocus: true}))
 
-            .form-group
-              = f.label :password, class: 'sr-only'
-              = f.password_field :password,
-              placeholder: t(".password"),
-              class: 'form-control'
-
-            .checkbox
+            .checkbox{ class: "tw:mt-4!" }
               %label
                 = f.check_box :remember_me, value: '1', checked: true
                 = t(".keep_me_logged_in")
 
-            = f.submit t(".log_in"), class: 'btn btn-primary btn-lg'
-
-          %p.forgot-password-link= link_to t(".forgot_your_password"), request_password_reset_form_users_path
+            = f.submit t(".continue"), class: 'btn btn-primary btn-lg tw:mx-0! tw:mt-4!'

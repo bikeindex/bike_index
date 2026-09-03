@@ -1,0 +1,29 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://www.strava.com/api/v3/push_subscriptions
+    body:
+      encoding: UTF-8
+      string: client_id=<STRAVA_KEY>&client_secret=<STRAVA_SECRET>&callback_url=http%3A%2F%2Flocalhost%3A3042%2Fwebhooks%2Fstrava&verify_token=<STRAVA_WEBHOOK_VERIFY_TOKEN>
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: '{"id":123456,"resource_state":2,"application_id":12345,"callback_url":"http://localhost:3042/webhooks/strava","created_at":"2026-02-08T22:46:00Z","updated_at":"2026-02-08T22:46:00Z"}'
+  recorded_at: Sun, 08 Feb 2026 22:46:00 GMT
+recorded_with: VCR 6.3.1

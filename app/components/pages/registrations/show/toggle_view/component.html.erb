@@ -1,0 +1,16 @@
+<%= render(UI::Alerts::Base::Component.new(kind: :purple)) do %>
+  <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3">
+    <% if redesign_enabled? %>
+      <div class="tw:font-semibold">
+        <%= translation(".viewing_in_legacy") %>
+        <%= render(UI::ButtonLink::Component.new(text: translation(".switch_to_legacy_default"), href: toggle_show_redesign_my_account_path, method: :post, params: {bike_id: @bike.id}, color: :link, form: {class: "tw:inline"}, html_class: "tw:font-semibold")) %>
+      </div>
+      <%= render(UI::ButtonLink::Component.new(text: translation(".view_in_new"), href: registration_path(@bike), color: :secondary, size: :sm)) %>
+    <% else %>
+      <span class="tw:font-semibold">
+        <%= translation(".try_new_view", bike_type: @bike.type) %>
+      </span>
+      <%= render(UI::ButtonLink::Component.new(text: translation(".switch_to_new"), href: toggle_show_redesign_my_account_path, method: :post, params: {bike_id: @bike.id}, color: :secondary, size: :sm)) %>
+    <% end %>
+  </div>
+<% end %>

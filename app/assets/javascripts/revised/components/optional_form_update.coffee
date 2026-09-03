@@ -18,6 +18,11 @@ class BikeIndex.OptionalFormUpdate extends BikeIndex
     if action == 'rm-block'
       $click_target.slideUp 'fast', ->
         $click_target.removeClass('unhidden').addClass('currently-hidden')
+        # FIX FIX FIX
+        # THIS IS A TERRIBLE HACK
+        setTimeout ->
+          $click_target.css('display', 'none')
+        , 50
 
     else if action == 'swap'
       $swap = $($target.attr('data-swap'))

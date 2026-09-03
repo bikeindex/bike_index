@@ -10,7 +10,8 @@ RSpec.describe BikeVersions::EditsController, type: :request do
       photos: "Photos",
       drivetrain: "Wheels and Drivetrain",
       accessories: "Accessories and Components",
-      remove: "Hide or Delete"
+      remove: "Hide or Delete",
+      versions: "Versions"
     }
   end
 
@@ -23,28 +24,29 @@ RSpec.describe BikeVersions::EditsController, type: :request do
     get base_url
     expect(response.code).to eq "200"
     expect(response).to render_template("bikes_edit/bike_details")
+    expect(response.body).to match(/<title>Details:/)
     expect(assigns(:edit_templates)).to eq edit_templates.as_json
-  end
-  context "superadmin" do
-    let!(:bike_version) { FactoryBot.create(:bike_version) }
-    let(:current_user) { FactoryBot.create(:admin) }
-    it "renders" do
-      expect(bike_version.authorized?(current_user)).to be_truthy
-      expect(bike_version.owner_id).to_not eq current_user.id
-      get base_url
+    edit_templates.keys.each do |edit_template|
+      get "#{base_url}/#{edit_template}"
       expect(response.code).to eq "200"
-      expect(response).to render_template("bikes_edit/bike_details")
-      bike_version.update(visibility: "user_hidden")
-      get base_url
-      expect(response.code).to eq "200"
-      expect(response).to render_template("bikes_edit/bike_details")
-      expect(assigns(:edit_templates)).to eq edit_templates.as_json
+      expect(response).to render_template("bikes_edit/#{edit_template}")
     end
   end
+
+  context "user with strava gear" do
+    let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, :with_gear, user: current_user) }
+    it "renders the versions template without the strava gear section" do
+      expect(strava_integration.show_gear_link?).to be_truthy
+      get "#{base_url}/versions"
+      expect(response.code).to eq "200"
+      expect(response).to render_template("bikes_edit/versions")
+      expect(response.body).to_not match(/strava_gear_id/)
+    end
+  end
+
   context "no current_user" do
     let!(:bike_version) { FactoryBot.create(:bike_version) }
-    it "renders" do
-      Flipper.enable :bike_versions
+    it "redirects" do
       expect(bike_version.authorized?(current_user)).to be_falsey
       get base_url
       expect(response).to redirect_to(bike_version_path(bike_version))

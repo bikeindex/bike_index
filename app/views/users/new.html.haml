@@ -40,17 +40,17 @@
             - if sign_in_partner
               = hidden_field_tag :partner, sign_in_partner
 
+            -# Honeypot spam trap - hidden from people, only bots fill it in
+            .form-group.additional-field{ class: "tw:hidden" }
+              = f.label :additional, "Additional", class: "sr-only"
+              = f.text_field :additional, tabindex: -1, autocomplete: "off", class: "form-control"
+
             .form-group
               = f.label :email, class: 'sr-only'
-              = f.email_field :email, placeholder: 'email', class: 'form-control'
+              = render(UI::Forms::Email::Component.new(form_builder: f, html_options: {placeholder: "email"}))
             .form-group
               = f.label :name, class: 'sr-only'
-              = f.text_field :name, placeholder: 'name', class: 'form-control'
-            .form-group
-              = f.label :password, class: 'sr-only'
-              = f.password_field :password, placeholder: 'password', class: 'form-control'
-              .password-help-text
-                = t(".password_helper_text_html", better_password_link: link_to(t(".better_password"), "https://xkcd.com/936/", tabindex: -1))
+              = f.text_field :name, placeholder: 'name', class: 'twinput'
 
             .checkbox.terms-and-conditions
               %label

@@ -6,6 +6,7 @@ class UnknownOrganizationForAscendImportJob < ApplicationJob
 
   def perform(id)
     return if SKIP_ASCEND_EMAIL
+
     bulk_import = BulkImport.find(id)
     notification = Notification.unknown_organization_for_ascend
       .where(notifiable: bulk_import).first

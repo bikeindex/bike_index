@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: colors
+# Database name: primary
 #
 #  id         :integer          not null, primary key
 #  display    :string(255)
@@ -18,14 +19,20 @@ class Color < ApplicationRecord
     "Silver, gray or bare metal", "Stickers tape or other cover-up", "Teal", "White",
     "Yellow or Gold"].freeze
 
+  COVER_UP_NAME = "Stickers tape or other cover-up"
+
+  # The cover-up "color" has no real display value, so its swatch is a rainbow arch drawn on white
+  COVER_UP_SWATCH = "radial-gradient(circle at 50% 100%, transparent 0 20%, #a745c0 20% 30%, " \
+    "#386ed2 30% 40%, #1ba100 40% 50%, #fff44b 50% 60%, #ff8d1d 60% 70%, #ec1313 70% 80%, transparent 80%), #fff"
+
   has_many :bikes
   has_many :paints
 
-  default_scope { order(:name) }
-  scope :commonness, -> { order("priority ASC, name ASC") }
-
   validates_presence_of :name, :priority
   validates_uniqueness_of :name
+
+  default_scope { order(:name) }
+  scope :commonness, -> { order("priority ASC, name ASC") }
 
   def self.black
     where(name: "Black", priority: 1, display: "#000").first_or_create
@@ -43,9 +50,11 @@ class Color < ApplicationRecord
 
   def self.friendly_find(n)
     # Use the FriendlyNameFindable version, then the first part of the string (for slug), then grasp at straws
+    n = normalize_friendly_str(n)
+    return nil if n.blank?
     super ||
-      where("lower(name) ILIKE ?", "#{n.to_s.downcase.strip}%").first ||
-      where("lower(name) ILIKE ?", "%#{n.to_s.downcase.strip}%").first
+      where("lower(name) ILIKE ?", "#{n.to_s.downcase}%").first ||
+      where("lower(name) ILIKE ?", "%#{n.to_s.downcase}%").first
   end
 
   def autocomplete_hash
@@ -64,6 +73,15 @@ class Color < ApplicationRecord
 
   def search_id
     "c_#{id}"
+  end
+
+  def cover_up?
+    name == COVER_UP_NAME
+  end
+
+  # CSS background for a color swatch
+  def swatch_style
+    "background: #{cover_up? ? COVER_UP_SWATCH : display}"
   end
 
   def slug

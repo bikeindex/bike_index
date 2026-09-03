@@ -1,0 +1,16 @@
+<nav
+  class="tw:flex tw:w-full tw:items-center tw:justify-center tw:-space-x-px <%= size_classes %>"
+  aria-label="<%= pagy_t('pagy.aria_label.nav', count: @pagy.pages) %>"
+>
+  <% if show_previous %>
+    <%= prev_html %>
+  <% end %>
+
+  <% pagy_series.each do |item| %>
+    <%= pagy_series_link(item) %>
+  <% end %>
+
+  <% if show_next %>
+    <%= next_html %>
+  <% end %>
+</nav>

@@ -1,0 +1,71 @@
+<%# locals: (collection:, render_sortable: true) %>
+
+<% if collection.present? %>
+  <div class="full-screen-table mt-4">
+    <table class="table table-striped table-bordered table-sm">
+      <thead class="thead-light">
+        <th><%= sortable "created_at", render_sortable: render_sortable %></th>
+
+        <th class="small">
+          <%= sortable "updated_at", render_sortable: render_sortable %>
+        </th>
+
+        <th>
+          <%= sortable "manufacturer", render_sortable: render_sortable %>
+        </th>
+
+        <th>
+          <%= sortable "bikes_count", "Bikes", render_sortable: render_sortable %>
+        </th>
+
+        <th>Description</th>
+        <th>Color</th>
+      </thead>
+
+      <tbody>
+        <% collection.each do |paint| %>
+          <tr>
+            <td>
+              <a class="localizeTime" href="<%= admin_paint_url(paint) %>">
+                <%= l paint.created_at, format: :convert_time %>
+              </a>
+            </td>
+
+            <td>
+              <small class="localizeTime">
+                <%= l paint.updated_at, format: :convert_time %>
+              </small>
+            </td>
+
+            <td>
+              <% if paint.manufacturer_id.present? %>
+                <%= paint.manufacturer.name %>
+              <% end %>
+            </td>
+
+            <td><%= paint.bikes_count %></td>
+            <td><%= paint.name %></td>
+
+            <td>
+              <ul class="small">
+                <% if paint.color_id.present? %>
+                  <li><%= paint.color.name %></li>
+                <% end %>
+
+                <% if paint.secondary_color_id.present? %>
+                  <li><%= paint.secondary_color.name %></li>
+                <% end %>
+
+                <% if paint.tertiary_color_id.present? %>
+                  <li><%= paint.tertiary_color.name %></li>
+                <% end %>
+              </ul>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <h1 class="mb-4">No paints found!</h1>
+<% end %>

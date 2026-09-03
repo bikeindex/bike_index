@@ -1,0 +1,51 @@
+<% if flash[:notice].present? && @pagy.page == 1 %>
+  <div class="tw:mx-auto tw:max-w-7xl tw:px-4">
+    <%= render(UI::Alerts::Base::Component.new(text: flash[:notice], kind: :warning, dismissable: true)) %>
+  </div>
+<% end %>
+
+<div class="tw:mx-auto tw:mt-8 tw:mb-6 tw:max-w-7xl tw:px-4 tw:lg:mt-12">
+  <% component_class = Pages::SearchResults::Container::Component.component_class_for_result_view(@result_view) %>
+
+  <%= render(Pages::SearchResults::Container::Component.new(result_view: @result_view, search_kind: @search_kind, no_results: t("search.registrations.results.no_matched", search_obj_name: @search_obj_name))) do %>
+    <% @bikes.each do |bike| %>
+      <% cache(["search_results", @search_kind, @result_view, bike]) do %>
+        <%= render(component_class.new(bike:, search_kind: @search_kind)) %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
+
+<%#
+  A turbo request proves JS, so it gets infinite scroll alone. A full page render
+  might be a browser that can never fetch the lazy frame, so it gets pagination links
+  too - search--pagination-fallback drops them if JS turns out to be running.
+%>
+<% javascript_confirmed = turbo_request? %>
+
+<% next_page_frame = capture do %>
+  <% if @pagy.next %>
+    <%= turbo_frame_tag "page_#{@pagy.next}", src: search_marketplace_path(page: @pagy.next, **params.except(:page, :controller, :action).permit!), loading: :lazy do %>
+      <%= tag.div(class: "tw:py-4 tw:text-center", hidden: !javascript_confirmed, data: {search_loading: ""}) do %>
+        <%= render UI::LoadingSpinner::Component.new(text: "Loading more...") %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% if javascript_confirmed %>
+  <%= next_page_frame %>
+<% else %>
+  <%# Registrations search leaves the frame implicit; these links sit a page_N frame deeper, which the response has no match for %>
+  <% pagination = UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg,
+    data: {turbo_action: "advance", turbo_frame: :marketplace_results_frame}) %>
+  <% if pagination.render? %>
+    <div data-controller="search--pagination-fallback">
+      <div data-search--pagination-fallback-target="links">
+        <%= render(pagination) %>
+      </div>
+
+      <%= next_page_frame %>
+    </div>
+  <% end %>
+<% end %>

@@ -15,7 +15,7 @@
       display: block;
       position: absolute;
       z-index: 0;
-      background-image: image-url("landing_pages/chainring_bg.svg");
+      background-image: url("landing_pages/chainring_bg.svg");
       background-size: cover;
 
       @include media-breakpoint-down(md) {

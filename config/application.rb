@@ -8,13 +8,15 @@ require "active_model/railtie"
 require "active_record/railtie"
 require "active_storage/engine"
 require "action_controller/railtie"
+require "action_mailbox/engine"
 require "action_mailer/railtie"
+require "action_text/engine"
 require "action_view/railtie"
 # require "action_cable/engine"
 require "sprockets/railtie"
 # require "rails/test_unit/railtie"
 
-require "rack/throttle"
+require_relative "../lib/ip_spoof_attack_filter"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -23,9 +25,22 @@ Bundler.require(*Rails.groups)
 module Bikeindex
   class Application < Rails::Application
     config.redis_default_url = ENV["REDIS_URL"]
-    config.redis_cache_url = ENV["REDIS_CACHE_URL"]
+    config.redis_cache_url = ENV.fetch("REDIS_CACHE_URL", config.redis_default_url)
+    config.redis_rack_attack_url = ENV.fetch("REDIS_RACK_ATTACK_URL", config.redis_cache_url)
 
-    config.load_defaults 8.0
+    config.load_defaults 8.1
+
+    # Clear Rails default security headers - secure_headers gem manages these instead
+    # (secure_headers has a bug where it tries to delete lowercase keys but Rails uses mixed case)
+    config.action_dispatch.default_headers.clear
+
+    # directly using Sidekiq is preferred, but some things (e.g. active_storage) use active job
+    config.active_job.queue_adapter = :sidekiq
+    config.active_job.default_queue_name = :low_priority
+
+    # Overrides load_defaults. Untracked variant keys are a digest of the blob key, so BlobUrl
+    # builds them without a query - at the cost of only being able to count them from the bucket.
+    config.active_storage.track_variants = false
 
     # Use our custom error pages
     config.exceptions_app = routes
@@ -45,16 +60,19 @@ module Bikeindex
 
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     config.i18n.load_path += Dir[Rails.root.join("config", "locales", "**", "*.{rb,yml}").to_s]
-    config.i18n.load_path += Dir[Rails.root.join("app", "components", "**", "*.{yml}").to_s]
+    # Component sidecar translations. A reloadable path (not a static glob) so dev reloads
+    # re-scan the tree — picking up renamed/added keys and files without a server restart.
+    config.i18n.railties_load_path << config.paths.add("app/components", glob: "**/*.yml")
     config.i18n.enforce_available_locales = false
     config.i18n.default_locale = :en
     config.i18n.available_locales = %i[en es it nl nb]
     config.i18n.fallbacks = {"en-US": :en, "en-GB": :en}
 
-    config.middleware.use Rack::Throttle::Minute,
-      max: ENV["MIN_MAX_RATE"].to_i,
-      cache: Redis.new(url: config.redis_cache_url),
-      key_prefix: :throttle
+    # Must sit below DebugExceptions/ShowExceptions: those rescue the raised IpSpoofAttackError
+    # and render it as a 500 before it can reach this filter. Above them it never fires.
+    config.middleware.insert_after ActionDispatch::DebugExceptions, IpSpoofAttackFilter
+    config.middleware.use Rack::Deflater
+    config.middleware.insert 0, Rack::UTF8Sanitizer
 
     # Add middleware to make i18n configuration thread-safe
     config.middleware.use I18n::Middleware
@@ -67,13 +85,16 @@ module Bikeindex
 
     # Enable instrumentation for ViewComponents (used by rack-mini-profiler)
     config.view_component.instrumentation_enabled = true
-    config.view_component.use_deprecated_instrumentation_name = false # Stop annoying deprecation message
-    # ^ remove after upgrading to ViewComponent 4
-    config.default_preview_layout = "component_preview"
-    config.view_component.preview_paths << "#{Rails.root}/app/components/"
+    config.view_component.previews.controller = "ComponentPreviewsController"
     # This is ugly but necessary, see github.com/ViewComponent/view_component/issues/1064
     initializer "app_assets", after: "importmap.assets" do
       Rails.application.config.assets.paths << Rails.root.join("app")
+    end
+    # Add app/components to view paths for component preview templates
+    initializer "append_component_views", after: :set_autoload_paths do
+      ActiveSupport.on_load(:action_controller) do
+        prepend_view_path Rails.root.join("app/components")
+      end
     end
     config.importmap.cache_sweepers << Rails.root.join("app/components") # Sweep importmap cache
     config.lookbook.preview_display_options = {theme: ["light", "dark"]} # Add dynamic 'theme' display option

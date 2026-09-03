@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+
+<html lang="<%= I18n.locale %>">
+  <head>
+    <%= render(SharedBlocks::HeaderTags::Component.new(**header_tags_component_options)) %>
+    <%= stylesheet_link_tag "tailwind", "embed_styles", media: "all" %>
+    <%= javascript_include_tag "embed" %>
+    <%= javascript_importmap_tags %>
+    <%= csrf_meta_tags %>
+  </head>
+
+  <body id="bi_embed">
+    <div id="alert-block">
+      <% flash.each do |name, msg| %>
+        <% alert_class = "alert-#{name}" %>
+
+        <div class="alert <%= alert_class %>">
+          <a class="close" data-dismiss="alert">×</a>
+          <%= content_tag :div, msg, id: "flash_#{name}" if msg.is_a?(String) %>
+        </div>
+      <% end %>
+
+      <% if @b_param && @b_param.bike_errors.present? %>
+        <div class="alert alert-error">
+          <a class="close" data-dismiss="alert">×</a>
+
+          <%# preflight drops heading sizing and list markers; embed_styles never restated them %>
+          <h4 class="tw:font-bold">
+            <%= t(".please_fix_the_following") %>
+            <%= pluralize(@b_param.bike_errors.count, t(".error")) %>
+          </h4>
+
+          <ul class="tw:list-disc tw:pl-10">
+            <% @b_param.bike_errors.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+    </div>
+
+    <%= yield %>
+
+    <%= render "/shared/analytics" %>
+  </body>
+</html>

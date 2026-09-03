@@ -77,6 +77,7 @@ RSpec.describe BikeV2ShowSerializer do
         registry_name: nil,
         registry_url: nil,
         status: "with owner",
+        for_sale: false,
         propulsion_type_slug: "pedal-assist",
         cycle_type_slug: "cargo"
       }
@@ -84,6 +85,7 @@ RSpec.describe BikeV2ShowSerializer do
 
     it "returns the expected thing" do
       bike.reload
+      public_image.reload # version URLs reconstruct from the stored identifier (generation is backgrounded)
       expect(subject.as_json(root: false)).to eq target
     end
   end

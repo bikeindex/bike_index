@@ -1,0 +1,5 @@
+<%= render(UI::Forms::Group::Component.new(attribute: :primary_activity_id, required: true)) do %>
+  <%= render(UI::Forms::Combobox::Component.new(name: :primary_activity_id, open: true, required: true,
+    value: PrimaryActivity.family.by_priority.first&.id,
+    options: PrimaryActivity.family.alphabetized.pluck(:name, :id))) %>
+<% end %>

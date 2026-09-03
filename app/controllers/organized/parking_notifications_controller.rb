@@ -1,16 +1,17 @@
 module Organized
   class ParkingNotificationsController < Organized::BaseController
     include Rails::Pagination
-    include SortableTable
+    include Binxtils::SortableTable
+
     DEFAULT_PER_PAGE = 200
     before_action :ensure_access_to_parking_notifications!, only: %i[index create]
-    before_action :set_period, only: [:index]
+    around_action :set_reading_role, only: :index
+
     before_action :set_failed_and_repeated_ivars
 
     def index
       @search_bounding_box = search_bounding_box
-      @per_page = params[:per_page]
-      @per_page = DEFAULT_PER_PAGE if @per_page.blank? || @per_page.to_i > ParkingNotification::MAX_PER_PAGE
+      @per_page = permitted_per_page(default: DEFAULT_PER_PAGE, max: ParkingNotification::MAX_PER_PAGE)
       @page_data = {
         google_maps_key: ENV["GOOGLE_MAPS"],
         per_page: @per_page,
@@ -19,8 +20,8 @@ module Organized
         map_center_lng: map_center(@search_bounding_box).last
       }
 
-      @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
-      @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
+      @interpreted_params = BikeSearchable.searchable_interpreted_params(permitted_org_registration_search_params, ip: forwarded_ip_address)
+      @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
       # These are set here because we render them in HTML
       @search_kind = if ParkingNotification.kinds.include?(params[:search_kind]).present?
@@ -40,8 +41,8 @@ module Organized
       respond_to do |format|
         format.html
         format.json do
-          pagy, records = pagy(matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
-            .includes(:user, :bike, :impound_record), limit: @per_page)
+          pagy, records = pagy(:countish, matching_parking_notifications.reorder("parking_notifications.#{sort_column} #{sort_direction}")
+            .includes(:user, :bike, :impound_record), limit: @per_page, page: permitted_page)
           # This was already set up, so I left it when upgrading to pagy
           set_pagination_headers(pagy, @per_page)
           render json: records,
@@ -88,6 +89,7 @@ module Organized
 
     def matching_parking_notifications
       return @matching_parking_notifications if defined?(@matching_parking_notifications)
+
       notifications = parking_notifications
       if params[:search_bike_id].present?
         notifications = notifications.where(bike_id: params[:search_bike_id])
@@ -105,14 +107,14 @@ module Organized
       end
       if bike_search_params_present?
         bikes = notifications.bikes.search(@interpreted_params)
-        bikes = bikes.organized_email_and_name_search(params[:search_email]) if params[:search_email].present?
+        bikes = BikeServices::OrganizedSearch.email_and_name(bikes, params[:search_email])
         notifications = notifications.where(bike_id: bikes.pluck(:id))
       end
       if @search_bounding_box.present?
         notifications = notifications.search_bounding_box(*@search_bounding_box)
       end
       if params[:user_id].present?
-        notifications = notifications.where(user_id: params[:user_id])
+        notifications = notifications.where(user_id: user_subject&.id || params[:user_id])
       end
       notifications = notifications.where(kind: @search_kind) unless @search_kind == "all"
       if @search_unregistered == "only_unregistered"
@@ -129,10 +131,10 @@ module Organized
     end
 
     def permitted_parameters
-      use_entered_address = InputNormalizer.boolean(params.dig(:parking_notification, :use_entered_address))
+      use_entered_address = Binxtils::InputNormalizer.boolean(params.dig(:parking_notification, :use_entered_address))
       params.require(:parking_notification)
         .permit(:message, :internal_notes, :bike_id, :kind, :is_repeat, :image, :image_cache,
-          :latitude, :longitude, :accuracy, :street, :city, :zipcode, :state_id, :country_id)
+          :latitude, :longitude, :accuracy, :street, :city, :postal_code, :region_record_id, :region_string, :country_id)
         .merge(user_id: current_user.id, organization_id: current_organization.id,
           use_entered_address: use_entered_address)
     end
@@ -157,6 +159,7 @@ module Organized
         target_notification = parking_notification.current_associated_notification
         # Don't repeat notifications already sent, or previous to ones already targeted
         next if (ids_repeated + success_ids).include?(target_notification.id)
+
         ids_repeated << target_notification.id
         new_notification = target_notification.retrieve_or_repeat_notification!(kind: kind, user_id: current_user.id)
         success_ids << new_notification.id
@@ -178,6 +181,7 @@ module Organized
 
     def set_failed_and_repeated_ivars
       return true unless session[:repeated_kind].present?
+
       @repeated_kind = session.delete(:repeated_kind)
       notifications_failed_resolved_ids = session.delete(:notifications_failed_resolved_ids)
       notifications_repeated_ids = session.delete(:notifications_repeated_ids)
@@ -193,6 +197,7 @@ module Organized
 
     def ensure_access_to_parking_notifications!
       return true if current_organization.enabled?("parking_notifications") || current_user.superuser?
+
       raise_do_not_have_access!
     end
 
@@ -209,11 +214,13 @@ module Organized
 
     def search_bounding_box
       return nil unless params[:search_southwest_coords].present? && params[:search_northeast_coords].present?
+
       [params[:search_southwest_coords].split(","), params[:search_northeast_coords].split(",")].flatten.map(&:to_f)
     end
 
     def map_center(bounding_box)
       return current_organization.map_focus_coordinates.values unless bounding_box.present?
+
       lat_dif = bounding_box[0] - bounding_box[2]
       lng_dif = bounding_box[1] - bounding_box[3]
       [bounding_box[0] + lat_dif, bounding_box[1] + lng_dif]

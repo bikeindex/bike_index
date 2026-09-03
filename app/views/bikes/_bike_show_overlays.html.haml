@@ -42,7 +42,7 @@
             .mt-2.small.less-strong
               = t(".organization_sent_this_message", org_name: @matching_notification.organization.name)
               - if @matching_notification.sent_at.present?
-                %span.convertTime.preciseTime.withPreposition
+                %span.localizeTime.preciseTime.withPreposition
                   = l @matching_notification.sent_at, format: :convert_time
 
             - organization_email = @matching_notification.organization.auto_user&.email
@@ -72,7 +72,7 @@
               = f.text_area :recovered_description, class: 'form-control'
             .form-group
               = f.label :recovered_at, t(".when_did_you_recover_it"), class: 'form-well-label'
-              - f.object.recovered_at = TimeParser.round(f.object.recovered_at || Time.current)
+              - f.object.recovered_at = Binxtils::TimeParser.round(f.object.recovered_at || Time.current)
               = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
               = f.datetime_local_field :recovered_at, max: Time.current.end_of_day, step: 3600, required: true, class: 'form-control'
             .checkbox
@@ -110,7 +110,7 @@
     = render partial: 'shared/modal', locals: { title: modal_title, id: 'initial-open-modal', modal_body: modal_body }
 
 - if bike_edit_overlay_possible && @bike.authorized?(current_user, no_superuser_override: true) && !@bike.authorized_by_organization?(u: current_user)
-  .bike-overlay-wrapper
+  .bike-overlay-wrapper.bootstrapstyle
     .bike-edit-overlay
       %p
         -# If the bike user is actually the current bike owner, do this
@@ -140,7 +140,7 @@
                 = t(".add_a_picture_of_it")
               - else
                 = t(".add_a_picture_so_people_know_what_to_look")
-        - else
+        - elsif !@bike.version?
           -# The bike has been sent to someone other than the current_user
           = t(".you_sent_this_bike_html", bike_type: @bike.type, owner_email: @bike.current_ownership.owner_email)
         - bike_or_version_link = @bike.version? ? edit_bike_version_path(@bike, edit_template: @bike.default_edit_template) : edit_bike_path(@bike, edit_template: @bike.default_edit_template)

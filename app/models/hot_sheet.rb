@@ -1,14 +1,16 @@
 # == Schema Information
 #
 # Table name: hot_sheets
+# Database name: primary
 #
-#  id                :bigint           not null, primary key
-#  recipient_ids     :jsonb
-#  sheet_date        :date
-#  stolen_record_ids :jsonb
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  organization_id   :bigint
+#  id                     :bigint           not null, primary key
+#  delivery_error_message :text
+#  recipient_ids          :jsonb
+#  sheet_date             :date
+#  stolen_record_ids      :jsonb
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  organization_id        :bigint
 #
 # Indexes
 #
@@ -22,6 +24,8 @@ class HotSheet < ApplicationRecord
 
   validates_presence_of :organization_id, :sheet_date
 
+  delegate :bounding_box, :timezone, to: :hot_sheet_configuration, allow_nil: true
+
   def self.for(organization_or_id, date = nil)
     org_id = organization_or_id.is_a?(Integer) ? organization_or_id : organization_or_id.id
     if date.present?
@@ -30,8 +34,6 @@ class HotSheet < ApplicationRecord
       new(organization_id: org_id)
     end
   end
-
-  delegate :bounding_box, :timezone, to: :hot_sheet_configuration, allow_nil: true
 
   def current?
     sheet_date.blank?
@@ -56,6 +58,7 @@ class HotSheet < ApplicationRecord
 
   def next_sheet
     return nil if current?
+
     HotSheet.where(organization_id: organization_id).where("sheet_date > ?", sheet_date)
       .reorder(:sheet_date).first
   end

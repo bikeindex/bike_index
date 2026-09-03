@@ -52,6 +52,29 @@ RSpec.describe Export, type: :model do
     end
   end
 
+  describe "scopes" do
+    let!(:basic) { FactoryBot.create(:export_organization) }
+    let!(:with_incompletes) { FactoryBot.create(:export_organization, options: Export.default_options("organization").merge("partial_registrations" => true)) }
+    let!(:incompletes_only) { FactoryBot.create(:export_organization, options: Export.default_options("organization").merge("partial_registrations" => "only")) }
+    let!(:specific) { FactoryBot.create(:export_organization, options: Export.default_options("organization").merge("only_custom_bike_ids" => true)) }
+    let!(:with_stickers) { FactoryBot.create(:export_organization, options: Export.default_options("organization").merge("assign_bike_codes" => true)) }
+    let!(:with_dates) { FactoryBot.create(:export_organization, options: Export.default_options("organization").merge("start_at" => Time.current.to_s)) }
+    let!(:avery) { FactoryBot.create(:export_avery) }
+    let!(:with_impounded) { FactoryBot.create(:export_organization, options: Export.default_options("organization").merge("impounded_bikes" => true)) }
+
+    it "returns correct records for each scope" do
+      expect(Export.specific.pluck(:id)).to match_array([specific.id])
+      expect(Export.not_specific.pluck(:id)).to match_array([basic.id, with_incompletes.id, incompletes_only.id, with_stickers.id, with_dates.id, avery.id, with_impounded.id])
+      expect(Export.incompletes.pluck(:id)).to match_array([incompletes_only.id])
+      expect(Export.incompletes_and_registrations.pluck(:id)).to match_array([with_incompletes.id])
+      expect(Export.registrations.pluck(:id)).to match_array([basic.id, with_incompletes.id, with_stickers.id, with_dates.id, avery.id, with_impounded.id])
+      expect(Export.with_stickers.pluck(:id)).to match_array([with_stickers.id])
+      expect(Export.with_dates.pluck(:id)).to match_array([with_dates.id])
+      expect(Export.avery.pluck(:id)).to match_array([avery.id])
+      expect(Export.impounded.pluck(:id)).to match_array([with_impounded.id])
+    end
+  end
+
   describe "calculated_progress" do
     let(:export) { Export.new(created_at: Time.current, progress: "pending") }
     it "returns the progress it is given" do
@@ -190,8 +213,66 @@ RSpec.describe Export, type: :model do
     end
   end
 
+  describe "undo_bike_stickers_and_record!" do
+    let(:export) { FactoryBot.create(:export_organization) }
+    let(:organization) { export.organization }
+    let(:user) { FactoryBot.create(:user) }
+    let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization:, code: "A11") }
+    let(:exported_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+    let(:later_bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+    before do
+      export.update(options: export.options.merge(assign_bike_codes: true, bike_codes_assigned: ["A11"]))
+    end
+
+    def export_claim(bike)
+      bike_sticker.claim(user:, bike:, organization:, export_id: export.id, creator_kind: "creator_export")
+    end
+
+    it "enqueues a revert for the export's sticker update" do
+      export_claim(exported_bike)
+      bike_sticker_update = bike_sticker.bike_sticker_updates.last
+      expect {
+        export.undo_bike_stickers_and_record!
+      }.to change(RevertBikeStickerUpdateJob.jobs, :count).by 1
+      expect(RevertBikeStickerUpdateJob.jobs.last["args"]).to eq([bike_sticker_update.id])
+      expect(export.reload.bike_codes_undone?).to be_truthy
+      expect(export.bike_stickers_not_undone).to eq([])
+    end
+
+    it "reverts the sticker when the job runs" do
+      export_claim(exported_bike)
+      expect(bike_sticker.reload.bike).to eq exported_bike
+      Sidekiq::Testing.inline! { export.undo_bike_stickers_and_record! }
+      expect(bike_sticker.reload.bike).to be_nil
+      expect(bike_sticker.bike_sticker_updates.count).to eq 0
+    end
+
+    context "sticker was claimed again after the export" do
+      it "skips it and records the code" do
+        export_claim(exported_bike)
+        bike_sticker.claim(user:, bike: later_bike, organization:)
+        expect {
+          export.undo_bike_stickers_and_record!
+        }.to_not change(RevertBikeStickerUpdateJob.jobs, :count)
+        expect(export.reload.bike_codes_undone?).to be_truthy
+        expect(export.bike_stickers_not_undone).to eq(["A11"])
+        expect(bike_sticker.reload.bike).to eq later_bike
+      end
+    end
+
+    context "already undone" do
+      it "does not re-run" do
+        export_claim(exported_bike)
+        export.undo_bike_stickers_and_record!
+        expect {
+          export.undo_bike_stickers_and_record!
+        }.to_not change(RevertBikeStickerUpdateJob.jobs, :count)
+      end
+    end
+  end
+
   describe "bikes_scoped" do
-    # Pending - we're getting the organization scopes up and running before migrating existing TsvCreator tasks
+    # Pending - we're getting the organization scopes up and running before migrating existing Spreadsheets::TsvCreator tasks
     # But we eventually want to add stolen tsv's into here
     # context "stolen" do
     #   it "matches existing tsv scopes"
@@ -216,24 +297,49 @@ RSpec.describe Export, type: :model do
     let(:organization_full) { Organization.new(enabled_feature_slugs: %w[reg_address reg_phone reg_organization_affiliation reg_student_id reg_bike_sticker]) }
     let(:permitted_headers) { Export::PERMITTED_HEADERS }
     let(:additional_headers) { %w[address bike_sticker organization_affiliation phone student_id] }
-    let(:all_headers) { permitted_headers + additional_headers }
+    let(:all_headers) do
+      %w[
+        address
+        bike_sticker
+        color
+        extra_registration_number
+        impounded_at
+        is_impounded
+        is_stolen
+        link
+        manufacturer
+        model
+        motorized
+        organization_affiliation
+        organization_notes
+        owner_email
+        owner_name
+        partial_registration
+        phone
+        registered_at
+        registered_by
+        serial
+        status
+        student_id
+        thumbnail
+        vehicle_type
+      ]
+    end
     it "returns the array we expect" do
       expect(permitted_headers.count).to eq 15
       expect(Export.permitted_headers).to eq permitted_headers
-      expect(Export.permitted_headers("include_paid")).to match_array all_headers
       expect(Export.permitted_headers(organization)).to eq permitted_headers
       expect(organization_reg_phone.additional_registration_fields).to eq(["reg_phone"])
       expect(Export.permitted_headers(organization_reg_phone)).to eq(permitted_headers + ["phone"])
       expect(organization_full.additional_registration_fields.map { |s| s.gsub("reg_", "") }).to eq additional_headers
-      expect(Export.permitted_headers(organization_full)).to eq all_headers
+      expect(Export.permitted_headers(organization_full).sort).to eq(all_headers - %w[is_impounded impounded_at organization_notes partial_registration])
     end
-    context "with impounded and partial" do
-      let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[impound_bikes show_partial_registrations]) }
+    context "with impounded, partial and notes" do
+      let!(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[impound_bikes registration_notes show_partial_registrations]) }
+      # All headers except the reg_field headers
+      let(:permitted_headers) { all_headers - %w[address bike_sticker organization_affiliation phone student_id] }
       it "returns the array we expect" do
-        expect(permitted_headers.count).to eq 15
-        expect(Export.permitted_headers).to eq permitted_headers
-        expect(Export.permitted_headers("include_paid")).to match_array all_headers
-        expect(Export.permitted_headers(organization)).to match_array(permitted_headers + %w[is_impounded partial_registration])
+        expect(Export.permitted_headers(organization).sort).to eq permitted_headers
       end
     end
     context "with bike_stickers from regional organization" do
@@ -259,6 +365,16 @@ RSpec.describe Export, type: :model do
         expect(organization_in_region.enabled?("reg_bike_sticker")).to be_truthy
         expect(organization_in_region.additional_registration_fields).to eq(["reg_bike_sticker"])
         expect(Export.permitted_headers(organization_in_region)).to eq(permitted_headers + ["bike_sticker"])
+      end
+    end
+    context "with superuser" do
+      let(:user) { FactoryBot.create(:superuser) }
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:export) { Export.new(user:, options: {headers: all_headers}, kind: :organization, organization:) }
+      it "returns all_headers" do
+        expect(Export.permitted_headers(:include_all).sort).to eq all_headers
+        expect(export).to be_valid
+        expect(export.headers.sort).to eq all_headers
       end
     end
   end

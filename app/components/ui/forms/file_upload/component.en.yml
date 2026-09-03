@@ -1,0 +1,11 @@
+---
+en:
+  components:
+    ui:
+      forms:
+        file_upload:
+          no_file_chosen: No file chosen
+          take_picture: Take picture
+          upload: Upload
+          upload_failed: upload failed
+          uploading: uploading

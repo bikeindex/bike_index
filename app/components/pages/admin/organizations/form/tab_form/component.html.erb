@@ -1,0 +1,11 @@
+<%= form_for [:admin, @organization], html: {data: {controller: "admin--organization-form"}} do |form_builder| %>
+  <%= render(UI::Container::Component.new(width: @width)) do %>
+    <%= hidden_field_tag :tab, @tab if @tab.present? %>
+
+    <%= render(@fields_component.new(form_builder:, **@fields_args)) %>
+
+    <div class="tw:mt-6 tw:flex tw:justify-end">
+      <%= render(UI::Button::Component.new(text: @submit_text, color: :primary, size: :lg, type: "submit")) %>
+    </div>
+  <% end %>
+<% end %>

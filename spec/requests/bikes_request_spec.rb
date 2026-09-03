@@ -5,7 +5,6 @@ require "rails_helper"
 #  - bikes/show_request_spec.rb
 #  - bikes/update_request_spec.rb
 #  - bikes/edit_request_spec.rb
-#  - bikes/index_request_spec.rb
 
 RSpec.describe BikesController, type: :request do
   include_context :request_spec_logged_in_as_user_if_present
@@ -24,8 +23,10 @@ RSpec.describe BikesController, type: :request do
       expect(bike.status).to eq "status_with_owner"
       expect(bike.stolen_records.last).to be_blank
       expect(response).to render_template(:new)
-      # This still wouldn't show address, because it doesn't have an organization with include_field_reg_address?
-      expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_truthy
+      expect(response.body).to match("<title>Register a bike!</title>")
+      expect(response.body).to match('<meta name="description" content="Register a bike on Bike Index quickly')
+      # This still wouldn't show address, because it doesn't have an organization with reg_address
+      expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_truthy
     end
     context "with bike_sticker" do
       let(:organization) { FactoryBot.create(:organization) }
@@ -46,6 +47,43 @@ RSpec.describe BikesController, type: :request do
         expect(response).to render_template(:new)
       end
     end
+    context "with organization" do
+      let!(:organization) { FactoryBot.create(:organization) }
+
+      it "renders with organization" do
+        get "#{base_url}/new?organization_id=#{organization.slug}"
+        expect(response.code).to eq("200")
+        expect(response).to render_template(:new)
+        expect(assigns(:bike).creation_organization_id).to eq organization.id
+        expect(assigns(:bike).primary_frame_color_id).to be_nil
+        expect(assigns(:bike).address_record).to be_blank
+      end
+
+      context "existing b_param with creation_organization_id" do
+        let(:organization2) { FactoryBot.create(:organization_with_organization_features, kind: :school, enabled_feature_slugs: "reg_address") }
+        let(:b_param) { FactoryBot.create(:b_param, params: {bike: bike_params}) }
+        let(:manufacturer_id) { FactoryBot.create(:manufacturer).id }
+        let(:bike_params) do
+          {owner_email: current_user.email, manufacturer_id:, creation_organization_id: organization2.id,
+           address_record_attributes: {street: "212 Main St", city: "Chicago", region_string: "IL", postal_code: "60647"}}
+        end
+        let(:target_address_attrs) { {street: "212 Main St", city: "Chicago", region_string: "IL", postal_code: "60647", kind: "ownership"} }
+
+        it "uses the existing organization" do
+          expect(b_param.reload.id_token).to be_present
+          get "#{base_url}/new?organization_id=#{organization.slug}&b_param_token=#{b_param.id_token}"
+          expect(response.code).to eq("200")
+          expect(response).to render_template(:new)
+          expect(assigns(:bike).creation_organization_id).to eq organization2.id
+          expect(assigns(:bike).manufacturer_id).to eq manufacturer_id
+          expect(assigns(:bike).primary_frame_color_id).to be_nil
+
+          expect(response.body).to match("Campus mailing address")
+          address_record = assigns(:bike).address_record
+          expect(address_record).to have_attributes target_address_attrs
+        end
+      end
+    end
     context "stolen from params" do
       it "renders a new stolen bike" do
         get "#{base_url}/new?stolen=true"
@@ -54,21 +92,26 @@ RSpec.describe BikesController, type: :request do
         bike = assigns(:bike)
         expect(bike.status).to eq "status_stolen"
         expect(bike.stolen_records.last).to be_present
-        expect(bike.stolen_records.last.country_id).to eq Country.united_states.id
+        expect(bike.stolen_records.last.country_id).to eq Country.united_states_id
         expect(response).to render_template(:new)
+        expect(response.body).to match("<title>Register a stolen bike</title>")
+        expect(response.body).to match('<meta name="description" content="Register a stolen bike on Bike Index quickly')
         # Make sure it renders without address fields for a stolen bikes
-        expect(BikeDisplayer.display_edit_address_fields?(bike, current_user)).to be_falsey
+        expect(BikeServices::Displayer.display_edit_address_fields?(bike, current_user)).to be_falsey
       end
-      it "renders a new stolen bike from status" do
-        country = FactoryBot.create(:country_canada)
-        current_user.update(country_id: country.id)
-        get "#{base_url}/new?status=stolen"
-        expect(response.code).to eq("200")
-        bike = assigns(:bike)
-        expect(bike.status_humanized).to eq "stolen"
-        expect(bike.stolen_records.last).to be_present
-        expect(bike.stolen_records.last.country_id).to eq country.id
-        expect(response).to render_template(:new)
+      context "with address in different country" do
+        let(:ownership) { FactoryBot.create(:ownership, creator: current_user) }
+        let(:current_user) { FactoryBot.create(:user, :with_address_record, address_in: :edmonton) }
+
+        it "renders a new stolen bike from status" do
+          get "#{base_url}/new?status=stolen"
+          expect(response.code).to eq("200")
+          bike = assigns(:bike)
+          expect(bike.status_humanized).to eq "stolen"
+          expect(bike.stolen_records.last).to be_present
+          expect(bike.stolen_records.last.country_id).to eq Country.canada_id
+          expect(response).to render_template(:new)
+        end
       end
     end
     context "impounded from params" do
@@ -79,6 +122,8 @@ RSpec.describe BikesController, type: :request do
         expect(bike.status).to eq "status_impounded"
         expect(bike.impound_records.last).to be_present
         expect(response).to render_template(:new)
+
+        expect(response.body).to match "Where was it found?"
       end
       it "found is impounded" do
         get "#{base_url}/new?status=found"
@@ -87,6 +132,7 @@ RSpec.describe BikesController, type: :request do
         expect(bike.status).to eq "status_impounded"
         expect(bike.impound_records.last).to be_present
         expect(response).to render_template(:new)
+        expect(response.body).to match "Where was it found?"
       end
     end
   end
@@ -304,7 +350,7 @@ RSpec.describe BikesController, type: :request do
           put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=parked_incorrectly_notification"
           expect(response).to redirect_to(bike_path(bike.id))
           expect(assigns(:bike)).to eq bike
-          expect(flash[:info]).to match(/retrieved/)
+          expect(flash[:notice]).to match(/retrieved/)
           parking_notification.reload
           expect(parking_notification.current?).to be_falsey
           expect(parking_notification.resolved_at).to be_within(1).of retrieval_time
@@ -391,6 +437,12 @@ RSpec.describe BikesController, type: :request do
       expect(response).to render_template("scanned")
       expect(assigns(:bike_sticker)&.id).to eq bike_sticker1.id
       expect(assigns(:organization))
+    end
+    it "redirects the /s/ short URL to scanned, preserving the query string" do
+      get "/s/UC1101"
+      expect(response).to redirect_to("/bikes/scanned/UC1101")
+      get "/s/UC1101?organization_id=UCLA"
+      expect(response).to redirect_to("/bikes/scanned/UC1101?organization_id=UCLA")
     end
     context "UI" do
       let!(:bike_sticker2) { FactoryBot.create(:bike_sticker, code: "UI1101", organization: organization) }

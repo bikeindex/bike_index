@@ -5,6 +5,8 @@ RSpec.describe CredibilityScorer do
   let(:instance) { subject.new(bike) }
   let(:created_at) { Time.current - 1.day }
   let(:bike) { FactoryBot.create(:bike, created_at: created_at) }
+  let(:check_suspiscious_numbers) { false }
+  before { stub_const("CredibilityScorer::CHECK_SUSPISCIOUS_NUMBERS", check_suspiscious_numbers) }
 
   describe "all_badges" do
     it "is a one dimensional hash" do
@@ -185,7 +187,7 @@ RSpec.describe CredibilityScorer do
     context "registered 2 years ago" do
       let(:created_at) { Time.current - 1.day - 2.years }
       let!(:ownership) { FactoryBot.create(:ownership, created_at: created_at, bike: bike) }
-      it "returns long_time_registration", :flaky do
+      it "returns long_time_registration" do
         bike.reload
         expect(subject.creation_age_badge(ownership)).to eq :long_time_registration
         expect(subject.creation_badges(ownership)).to eq([:long_time_registration])
@@ -234,7 +236,7 @@ RSpec.describe CredibilityScorer do
     let(:user) { FactoryBot.create(:user) }
     let(:banned_user) { FactoryBot.create(:user, banned: true) }
     before { bike.reload } # Because current_ownership
-    it "returns []", :flaky do
+    it "returns []" do
       expect(subject.bike_user_badges(bike)).to eq([])
     end
     context "creator banned" do
@@ -289,6 +291,7 @@ RSpec.describe CredibilityScorer do
       end
     end
     describe "user_name_suspicious" do
+      let(:check_suspiscious_numbers) { true }
       let(:user) { FactoryBot.create(:user, email: "something5150@yahoo.com") }
       it "returns user_name_suspicious" do
         expect(subject.bike_user_badges(bike)).to match_array([:user_handle_suspicious])
@@ -297,7 +300,7 @@ RSpec.describe CredibilityScorer do
         let(:organization) { FactoryBot.create(:organization_with_organization_features) }
         let!(:organization_user) { FactoryBot.create(:organization_role_claimed, user: user, organization: organization) }
         let!(:payment) { FactoryBot.create(:payment, user: user) }
-        it "returns just user_trusted_organization_role", :flaky do
+        it "returns just user_trusted_organization_role" do
           expect(user.organizations.pluck(:id)).to eq([organization.id])
           expect(subject.bike_user_badges(bike)).to match_array(%i[user_trusted_organization_role user_supporter])
         end
@@ -306,12 +309,10 @@ RSpec.describe CredibilityScorer do
         let(:user) { FactoryBot.create(:user, name: "shady", email: "bar@example.com") }
         let(:user2) { FactoryBot.create(:user, created_at: Time.current - 5.years) }
         let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, creator: user2, user: user) }
-        let(:strava_file) { File.read(Rails.root.join("spec", "fixtures", "integration_data_strava.json")) }
         let!(:user_phone) { FactoryBot.create(:user_phone_confirmed, user: user) }
-        let(:info) { JSON.parse(strava_file) }
-        let!(:integration) { FactoryBot.create(:integration, information: info) }
+        let!(:strava_integration) { FactoryBot.create(:strava_integration, user:) }
         it "returns all" do
-          expect(user.integrations.pluck(:id)).to eq([integration.id])
+          expect(user.strava_integration).to eq strava_integration
           expect(subject.bike_user_badges(bike)).to match_array([:user_handle_suspicious, :user_verified_phone, :long_time_user, :user_connected_to_strava])
         end
         context "ambassador" do
@@ -353,6 +354,7 @@ RSpec.describe CredibilityScorer do
   end
 
   describe "suspiscious_handle?" do
+    let(:check_suspiscious_numbers) { true }
     ["shady-p@yahoo.com", "bike thief", "hoogivzzafudge5150@hotmail.co", "mj", "fuckyou@stuff.com", "cunt-edu"].each do |str|
       it "is truthy for #{str}" do
         expect(subject.suspiscious_handle?(str)).to be_truthy

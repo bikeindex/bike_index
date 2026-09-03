@@ -5,9 +5,11 @@ class InvalidExtensionForAscendImportJob < ApplicationJob
 
   def perform(id)
     return if SKIP_ASCEND_EMAIL
+
     bulk_import = BulkImport.find(id)
     organization_id = bulk_import.organization_id
     return if bulk_import.organization_id.blank?
+
     UpdateOrganizationPosKindJob.new.perform(organization_id)
     organization_status = OrganizationStatus.where(organization_id: organization_id)
       .at_time(bulk_import.created_at).first

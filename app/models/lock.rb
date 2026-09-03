@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: locks
+# Database name: primary
 #
 #  id                 :integer          not null, primary key
 #  combination        :string(255)

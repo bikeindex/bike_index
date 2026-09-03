@@ -4,8 +4,8 @@ module Organized
     before_action :find_export, except: %i[index new create]
 
     def index
-      @per_page = params[:per_page] || 25
-      @pagy, @exports = pagy(exports.order(created_at: :desc), limit: @per_page)
+      @per_page = permitted_per_page
+      @pagy, @exports = pagy(:countish, exports.order(created_at: :desc), limit: @per_page, page: permitted_page)
     end
 
     def show
@@ -18,11 +18,15 @@ module Organized
     end
 
     def create
-      if InputNormalizer.boolean(params.dig(:export, :avery_export))
+      if Binxtils::InputNormalizer.boolean(params.dig(:export, :avery_export))
         create_avery_export
       else
         @export = Export.new(permitted_parameters)
         @export.options[:partial_registrations] = partial_registration_params
+        @export.options[:impounded_bikes] = Binxtils::InputNormalizer.boolean(params[:include_impounded_bikes])
+        if @export.options[:impounded_bikes] && !Binxtils::InputNormalizer.boolean(params[:include_full_registrations]) && @export.options[:partial_registrations] == false
+          @export.options[:partial_registrations] = "none"
+        end
       end
       if flash[:error].blank? && @export.update(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
         OrganizationExportJob.perform_async(@export.id)
@@ -40,9 +44,9 @@ module Organized
     end
 
     def update
-      if params[:remove_bike_stickers] && @export.assign_bike_codes?
-        @export.remove_bike_stickers_and_record!(current_user)
-        flash[:success] = translation(:bike_stickers_removed)
+      if params[:undo_bike_stickers] && @export.assign_bike_codes?
+        @export.undo_bike_stickers_and_record!
+        flash[:success] = translation(:bike_stickers_undone)
       else
         flash[:error] = translation(:unknown_update_action)
       end
@@ -82,7 +86,7 @@ module Organized
 
     def params_with_assigned_codes
       attrs = %i[timezone start_at end_at file_format custom_bike_ids only_custom_bike_ids]
-      attrs += [:bike_code_start] if InputNormalizer.boolean(params.dig(:export, :assign_bike_codes))
+      attrs += [:bike_code_start] if Binxtils::InputNormalizer.boolean(params.dig(:export, :assign_bike_codes))
       attrs + [headers: []]
     end
 
@@ -93,7 +97,8 @@ module Organized
     end
 
     def find_export
-      @export = exports.find(params[:id])
+      scope = current_user.superuser? ? Export.unscoped.where(organization_id: current_organization.id) : exports
+      @export = scope.find(params[:id])
     end
 
     def exports
@@ -102,15 +107,18 @@ module Organized
 
     def partial_registration_params
       return false unless current_organization.enabled?("show_partial_registrations")
-      include_full = InputNormalizer.boolean(params[:include_full_registrations])
-      include_partial = InputNormalizer.boolean(params[:include_partial_registrations])
+
+      include_full = Binxtils::InputNormalizer.boolean(params[:include_full_registrations])
+      include_partial = Binxtils::InputNormalizer.boolean(params[:include_partial_registrations])
       return false unless include_full || include_partial
       return "only" if !include_full && include_partial
+
       include_partial ? true : false
     end
 
     def ensure_access_to_exports!
       return true if current_organization.enabled?("csv_exports") || current_user.superuser?
+
       raise_do_not_have_access!
     end
   end

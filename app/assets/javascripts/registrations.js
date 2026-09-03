@@ -1,10 +1,6 @@
 // require self
-//= require jquery2
-//= require jquery_ujs
-//= require tether
-//= require bootstrap
-//= require mailcheck
-//= require selectize/standalone/selectize.js
+//= require external_scripts/registrations_dependencies.js
+//= require external_scripts/bootstrap
 //= require external_scripts/selectize_placeholder_plugin.js
 //= require revised/components/check_email.js
 //= require revised/components/manufacturers_select.js

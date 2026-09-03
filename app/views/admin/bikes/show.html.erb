@@ -1,0 +1,72 @@
+<%= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: @active_tab.to_sym,
+      display_recovery: @active_tab == "recoveries", user: current_user, display_dev_info: display_dev_info?) %>
+
+<% case @active_tab %>
+<% when "ownerships" %>
+  <%= render partial: "/admin/ownerships/table",
+        locals: {ownerships: @bike.ownerships.reorder(created_at: :desc), skip_bike: true} %>
+<% when "stickers" %>
+  <%= render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @bike.bike_stickers} %>
+<% when "duplicates" %>
+  <% duplicate_groups = @bike.duplicate_bike_groups %>
+
+  <% duplicate_groups.each do |duplicate_group| %>
+    <div
+      class="
+        tw:mt-4 tw:flex tw:flex-wrap tw:items-baseline tw:justify-between
+        tw:gap-2
+      "
+    >
+      <strong><%= duplicate_group.segment %></strong>
+
+      <%= link_to "ignore #{duplicate_group.segment}",
+            ignore_duplicate_toggle_admin_bikes_path(id: duplicate_group.id), method: :put,
+            class: "twlink tw:text-sm" %>
+    </div>
+
+    <%= render Pages::Admin::Bikes::Table::Component.new(bikes: duplicate_group.bikes, sort_state:,
+          display_dev_info: display_dev_info?, no_show_header: true, show_serial: true) %>
+  <% end %>
+
+  <% if duplicate_groups.none? %>
+    <h3 class="tw:mt-6">No duplicates</h3>
+  <% end %>
+<% when "messages" %>
+  <%= render(Pages::Admin::Bikes::Show::Messages::Component.new(bike: @bike)) %>
+<% when "recoveries" %>
+  <%= render partial: "/admin/recoveries/table", locals: {recoveries: @bike.recovered_records, skip_bike: true} %>
+
+  <h3 class="tw:mt-6">Other stolen records</h3>
+
+  <% if @bike.stolen_records.none? %>
+    No other stolen records
+  <% else %>
+    <ul>
+      <% @bike.stolen_records.each do |stolen_record| %>
+        <li>
+          Stolen on
+          <%= link_to edit_admin_stolen_bike_url(stolen_record, stolen_record_id: true), class: "twlink" do %>
+            <%= render(UI::Time::Component.new(time: stolen_record.date_stolen)) %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+<% when "impound" %>
+  <h3 class="tw:mt-6">
+    Impound records for this <%= @bike.type %>
+    <small class="twless-strong tw:ml-2"><%= link_to number_display(@bike.impound_records.count), admin_impound_records_path(search_bike_id: @bike.id), class: "twlink" %></small>
+  </h3>
+
+  <%= render partial: "/admin/impound_records/table",
+        locals: {impound_records: @bike.impound_records.reorder(created_at: :desc), skip_claims: true} %>
+
+  <% impound_claims = ImpoundClaim.involving_bike_id(@bike.id).reorder(created_at: :desc) %>
+
+  <h3 class="tw:mt-6">
+    Impound claims involving this <%= @bike.type %>
+    <small class="twless-strong tw:ml-2"><%= link_to number_display(impound_claims.count), admin_impound_claims_path(search_bike_id: @bike.id), class: "twlink" %></small>
+  </h3>
+
+  <%= render partial: "/admin/impound_claims/table", locals: {impound_claims:} %>
+<% end %>

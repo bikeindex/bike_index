@@ -1,0 +1,7 @@
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  viewing: controller_name.humanize,
+  collection: @stolen_notifications,
+  index_title: "Stolen Notifications",
+  chart_collection: @render_chart && searched_stolen_notifications,
+)) %>

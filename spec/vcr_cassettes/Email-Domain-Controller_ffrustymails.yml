@@ -1,0 +1,273 @@
+---
+http_interactions:
+- request:
+    method: head
+    uri: http://mails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 302
+      message: Moved Temporarily
+    headers:
+      Server:
+      - openresty
+      Date:
+      - Wed, 19 Mar 2025 02:32:58 GMT
+      Content-Type:
+      - text/html
+      Content-Length:
+      - '142'
+      Connection:
+      - keep-alive
+      Location:
+      - https://domains.atom.com/lpd/name/mails.com
+      Svr-Id:
+      - squadhelp-auto-ssl-1
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Wed, 19 Mar 2025 02:32:58 GMT
+- request:
+    method: head
+    uri: https://domains.atom.com/lpd/name/mails.com
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 19 Mar 2025 02:32:58 GMT
+      Content-Type:
+      - text/html; charset=UTF-8
+      Connection:
+      - keep-alive
+      Vary:
+      - Accept-Encoding
+      - Accept-Encoding
+      - Accept-Encoding
+      Expires:
+      - Thu, 19 Nov 1981 08:52:00 GMT
+      Cache-Control:
+      - max-age=86400, must-revalidate
+      Pragma:
+      - no-cache
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Last-Modified:
+      - Mon, 17 Mar 2025 01:53:03 GMT
+      Cf-Cache-Status:
+      - HIT
+      Age:
+      - '1'
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Speculation-Rules:
+      - '"/cdn-cgi/speculation"'
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 92298ff70e65270a-SJC
+      Content-Encoding:
+      - gzip
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Wed, 19 Mar 2025 02:32:58 GMT
+- request:
+    method: head
+    uri: http://mails.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 302
+      message: Moved Temporarily
+    headers:
+      Server:
+      - openresty
+      Date:
+      - Wed, 19 Mar 2025 02:32:58 GMT
+      Content-Type:
+      - text/html
+      Content-Length:
+      - '142'
+      Connection:
+      - keep-alive
+      Location:
+      - https://domains.atom.com/lpd/name/mails.com
+      Svr-Id:
+      - squadhelp-auto-ssl-2
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Wed, 19 Mar 2025 02:32:58 GMT
+- request:
+    method: head
+    uri: https://domains.atom.com/lpd/name/mails.com
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 19 Mar 2025 02:32:58 GMT
+      Content-Type:
+      - text/html; charset=UTF-8
+      Connection:
+      - keep-alive
+      Vary:
+      - Accept-Encoding
+      - Accept-Encoding
+      - Accept-Encoding
+      Expires:
+      - Thu, 19 Nov 1981 08:52:00 GMT
+      Cache-Control:
+      - max-age=86400, must-revalidate
+      Pragma:
+      - no-cache
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Last-Modified:
+      - Mon, 17 Mar 2025 01:53:03 GMT
+      Cf-Cache-Status:
+      - HIT
+      Age:
+      - '1'
+      Report-To:
+      - '{"endpoints":[{"url":"https:\/\/csp-reporting.cloudflare.com\/cdn-cgi\/script_monitor\/report?m=CU6UBG5RiJj_chgh0r5.WxZSahkmHCPNvy9a7KavkEk-1742351578-1.0.1.1-cGh_JG3fpUlQjwLtxAzdScYbodhgx2Lm2xiFqrWERAAJ6OsuGs2mJSz56LO52Vz.IJan6q0v_7oLbXbXqKN6WZLj.Q6rsagGKwlpr.01xWsjV0v7V0gFrLokOSg7J.gZ7Kma9yjFneLPWQrOFKDw2.UKSdQFwvBfILvUnKr8tbc"}],"group":"cf-csp-endpoint","max_age":86400}'
+      Content-Security-Policy-Report-Only:
+      - script-src 'none'; connect-src 'none'; report-uri https://csp-reporting.cloudflare.com/cdn-cgi/script_monitor/report?m=CU6UBG5RiJj_chgh0r5.WxZSahkmHCPNvy9a7KavkEk-1742351578-1.0.1.1-cGh_JG3fpUlQjwLtxAzdScYbodhgx2Lm2xiFqrWERAAJ6OsuGs2mJSz56LO52Vz.IJan6q0v_7oLbXbXqKN6WZLj.Q6rsagGKwlpr.01xWsjV0v7V0gFrLokOSg7J.gZ7Kma9yjFneLPWQrOFKDw2.UKSdQFwvBfILvUnKr8tbc;
+        report-to cf-csp-endpoint
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Speculation-Rules:
+      - '"/cdn-cgi/speculation"'
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 92298ff89bdacef9-SJC
+      Content-Encoding:
+      - gzip
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: UTF-8
+      string: ''
+  recorded_at: Wed, 19 Mar 2025 02:32:58 GMT
+- request:
+    method: post
+    uri: https://api.sendgrid.com/v3/validations/email
+    body:
+      encoding: UTF-8
+      string: '{"email":"fff@rusty.mails.com","source":"EmailDomain"}'
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 403
+      message: Forbidden
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Thu, 14 Aug 2025 17:07:10 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '56'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Methods:
+      - HEAD, GET, PUT, POST, DELETE, OPTIONS, PATCH
+      Access-Control-Max-Age:
+      - '21600'
+      Access-Control-Expose-Headers:
+      - Link, Location
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Headers:
+      - AUTHORIZATION, Content-Type, On-behalf-of, x-sg-elas-acl, X-Recaptcha, X-Request-Source,
+        Browser-Fingerprint
+      Content-Security-Policy:
+      - default-src https://api.sendgrid.com; frame-src 'none'; object-src 'none'
+      X-Content-Type-Options:
+      - nosniff
+      Strict-Transport-Security:
+      - max-age=31536000
+      X-Robots-Tag:
+      - noindex, nofollow
+      X-Client-Ff:
+      - '3010'
+      X-Ratelimit-Remaining:
+      - '6'
+      X-Ratelimit-Limit:
+      - '7'
+      X-Ratelimit-Reset:
+      - '1755191231'
+      Twilio-Request-Id:
+      - RQ31HqE24GGXGdzaaha9wO6RuqJbU
+      X-Envoy-Upstream-Service-Time:
+      - '189'
+      Cache-Control:
+      - no-cache
+      Referrer-Policy:
+      - strict-origin-when-cross-origin
+    body:
+      encoding: UTF-8
+      string: '{"errors":[{"field":null,"message":"access forbidden"}]}'
+  recorded_at: Thu, 14 Aug 2025 17:07:10 GMT
+recorded_with: VCR 6.3.1

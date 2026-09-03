@@ -81,7 +81,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
           submit: "Retrieved",
           impound_claim: {response_message: ""}
         }
-      }.to_not change(EmailImpoundClaimJob.jobs, :count)
+      }.to_not change(Email::ImpoundClaimJob.jobs, :count)
       expect(flash[:error]).to be_present
       expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
       impound_record.reload
@@ -102,7 +102,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
             submit: "Approve",
             impound_claim: {response_message: " "}
           }
-        }.to change(EmailImpoundClaimJob.jobs, :count).by(1)
+        }.to change(Email::ImpoundClaimJob.jobs, :count).by(1)
         expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
         expect(assigns(:impound_claim)).to eq impound_claim
         impound_record.reload
@@ -124,7 +124,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
         let(:response_message) { "RESponse=MESSAGE<alert>" }
         it "sends a message" do
           FactoryBot.create(:organization_mail_snippet, kind: "impound_claim_approved", organization: current_organization, body: snippet_body)
-          EmailImpoundClaimJob.new.perform(impound_claim.id)
+          Email::ImpoundClaimJob.new.perform(impound_claim.id)
           # ensure that the message includes the response_message
           expect(impound_claim.reload.status).to eq "submitting"
           # Verify we sent created a notification already (or else it gets created when sidekiq inlined)
@@ -181,7 +181,7 @@ RSpec.describe Organized::ImpoundClaimsController, type: :request do
             submit: "Deny",
             impound_claim: {response_message: "I recommend talking with us about all the things"}
           }
-        }.to change(EmailImpoundClaimJob.jobs, :count).by(1)
+        }.to change(Email::ImpoundClaimJob.jobs, :count).by(1)
         expect(response).to redirect_to organization_impound_claim_path(impound_claim.id, organization_id: current_organization.id)
         expect(assigns(:impound_claim)).to eq impound_claim
         impound_record.reload

@@ -8,6 +8,8 @@ class InfoController < ApplicationController
     if @blog.blank?
       flash[:error] = "unable to find that page"
       redirect_to(news_path) && return
+    elsif @blog.title_slug == Blog.membership_slug
+      redirect_to("/membership") && return
     elsif @blog.id == Blog.theft_rings_id
       redirect_to("/theft-rings") && return
     elsif @blog.blog?
@@ -49,7 +51,10 @@ class InfoController < ApplicationController
   def resources
   end
 
-  def image_resources
+  def membership
+    @blog = Blog.friendly_find(Blog.membership_slug)
+    @page_id = "news_show" # Override to make styles same as news
+    render "show"
   end
 
   def why_donate
@@ -74,11 +79,14 @@ class InfoController < ApplicationController
     redirect_to_donation_or_payment
   end
 
-  def dev_and_design
-  end
-
   def how_not_to_buy_stolen
     redirect_to(DONT_BUY_STOLEN_URL, allow_other_host: true)
+  end
+
+  def primary_activities
+    respond_to do |format|
+      format.csv { render plain: Spreadsheets::PrimaryActivities.to_csv }
+    end
   end
 
   private

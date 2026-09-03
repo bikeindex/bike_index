@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: theft_alerts
+# Database name: primary
 #
 #  id                          :integer          not null, primary key
 #  ad_radius_miles             :integer
@@ -41,11 +42,18 @@
 class TheftAlert < ApplicationRecord
   # NOTE: TheftAlert is called "Promoted alert" on the frontend
 
+  FAILED_DELAY = 5.minutes.to_i.freeze
   STATUS_ENUM = {pending: 0, active: 1, inactive: 2}.freeze
   # Timestamp 1s before first alert was automated
   AUTOMATION_START = 1625586988 # 2021-7-6
 
   enum :status, STATUS_ENUM
+
+  belongs_to :stolen_record
+  belongs_to :theft_alert_plan
+  belongs_to :payment
+  belongs_to :user
+  has_many :notifications, as: :notifiable
 
   validates :theft_alert_plan,
     :status,
@@ -54,70 +62,75 @@ class TheftAlert < ApplicationRecord
 
   validate :alert_cannot_begin_in_past_or_after_ends
 
-  belongs_to :stolen_record
-  belongs_to :theft_alert_plan
-  belongs_to :payment
-  belongs_to :user
-
-  has_many :notifications, as: :notifiable
+  delegate :duration_days, :duration_days_facebook, :amount_cents, to: :theft_alert_plan
+  delegate :country, :city, :region, :postal_code, :street, to: :stolen_record, allow_nil: true
 
   before_validation :set_calculated_attributes
 
   scope :should_expire, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
-  scope :paid, -> { joins(:payment).where.not(payments: {paid_at: nil}) }
+  scope :paid, -> { left_joins(:payment).merge(Payment.paid) }
   scope :admin, -> { where(admin: true) }
+  scope :not_admin, -> { where(admin: false) }
+  scope :unpaid, -> { not_admin.joins(:payment).merge(Payment.incomplete) }
   scope :paid_or_admin, -> { paid.or(admin) }
   scope :posted, -> { where.not(start_at: nil) }
+  scope :activating, -> { pending.where(start_at: nil).where("(facebook_data -> 'activating_at') IS NOT NULL") }
+  scope :failed_to_activate, -> { activating.where("(facebook_data -> 'activating_at')::integer < ?", Time.current.to_i - FAILED_DELAY) }
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
   scope :facebook_updateable, -> { where("(facebook_data -> 'campaign_id') IS NOT NULL") }
   scope :should_update_facebook, -> { facebook_updateable.where("theft_alerts.end_at > ?", update_end_buffer) }
 
-  delegate :duration_days, :duration_days_facebook, :amount_cents, to: :theft_alert_plan
-  delegate :country, :city, :state, :zipcode, :street, to: :stolen_record, allow_nil: true
-
   geocoded_by nil
 
-  def self.statuses
-    STATUS_ENUM.keys.map(&:to_s)
-  end
+  class << self
+    def statuses
+      STATUS_ENUM.keys.map(&:to_s)
+    end
 
-  def self.update_end_buffer
-    Time.current - 2.days
-  end
+    def update_end_buffer
+      Time.current - 2.days
+    end
 
-  def self.flatten_city(counted)
-    @countries ||= Country.pluck(:id, :name).to_h
-    @states ||= State.pluck(:id, :name).to_h
+    def flatten_city(counted)
+      @countries ||= Country.pluck(:id, :name).to_h
+      @states ||= State.pluck(:id, :name).to_h
 
-    [@countries[counted[0][0]], counted[0][1], @states[counted[0][2]], counted[1]]
-  end
+      [@countries[counted[0][0]], counted[0][1], @states[counted[0][2]], counted[1]]
+    end
 
-  def self.cities_count
-    joins(:stolen_record)
-      .group("stolen_records.country_id", "stolen_records.city", "stolen_records.state_id")
-      .count
-      .map { |c| flatten_city(c) }
-      .sort_by { |c| -c[3] }
-  end
+    def cities_count
+      joins(:stolen_record)
+        .group("stolen_records.country_id", "stolen_records.city", "stolen_records.region_record_id")
+        .count
+        .map { |c| flatten_city(c) }
+        .sort_by { |c| -c[3] }
+    end
 
-  def self.paid_cents
-    paid.sum("payments.amount_cents")
-  end
+    def paid_cents
+      paid.sum("payments.amount_cents")
+    end
 
-  def self.facebook_integration
-    "Facebook::AdsIntegration".constantize
-  rescue
-    nil
+    def facebook_integration
+      "Facebook::AdsIntegration".constantize
+    rescue
+      nil
+    end
+
+    def matching_adset_objective(objective)
+      where("(facebook_data ->> 'objective_adset') = ?", objective)
+        .or(where("(facebook_data ->> 'objective_campaign') = ?", objective))
+    end
   end
 
   # Override because of recovered bikes not being in default scope
   def stolen_record
     return nil unless stolen_record_id.present?
+
     StolenRecord.current_and_not.find_by_id(stolen_record_id)
   end
 
   def bike
-    stolen_record&.bike
+    stolen_record&.bike || Bike.unscoped.find_by(id: bike_id)
   end
 
   # never geocode, use calculated lat/long
@@ -131,6 +144,7 @@ class TheftAlert < ApplicationRecord
 
   def notify?
     return false if admin? || facebook_data.blank? || facebook_data&.dig("no_notify").present?
+
     stolen_record.present? && stolen_record.receive_notifications?
   end
 
@@ -155,18 +169,20 @@ class TheftAlert < ApplicationRecord
   def should_update_facebook?
     return false unless facebook_updateable?
     return false if end_at < self.class.update_end_buffer
-    facebook_updated_at.blank? || facebook_updated_at < Time.current - 6.hours
+
+    facebook_updated_at.blank? || facebook_updated_at < Time.current - 3.hours
   end
 
   # literally CAN NOT activate
   def activateable_except_approval?
-    return false if missing_photo? || missing_location?
+    return false if missing_photo? || missing_location? || bike_not_current?
+
     admin ? true : paid?
   end
 
-  # Probably don't want to activate
+  # Previously, required stolen_record_approved?
   def activateable?
-    activateable_except_approval? && stolen_record_approved?
+    activateable_except_approval?
   end
 
   def activating?
@@ -175,12 +191,22 @@ class TheftAlert < ApplicationRecord
 
   # Simplistic, can be improved
   def failed_to_activate?
-    return false unless activating?
-    activating_at < Time.current - 5.minutes
+    activating? && failed_to_activate_data?
+  end
+
+  # Some alerts have been manually overridden to be inactive - make it possible to show this state
+  def manual_override_inactive?
+    return false unless inactive? && end_at.blank?
+
+    facebook_data.blank? || (failed_to_activate_data? && start_at.blank?)
   end
 
   def recovered?
     stolen_record&.recovered?
+  end
+
+  def bike_not_current?
+    bike.blank? || !bike.current?
   end
 
   def missing_location?
@@ -192,7 +218,7 @@ class TheftAlert < ApplicationRecord
   end
 
   def address_string
-    stolen_record&.address(force_show_address: true, country: [:iso])
+    stolen_record&.formatted_address_string(visible_attribute: :street, render_country: :if_different).presence
   end
 
   def stolen_record_approved?
@@ -200,35 +226,38 @@ class TheftAlert < ApplicationRecord
   end
 
   def missing_photo?
-    !stolen_record&.current_alert_image.present?
+    stolen_record.present? && stolen_record.theft_alert_missing_photo?
   end
 
   def facebook_name(kind = "campaign")
     n = "Theft Alert #{id} - #{amount_facebook}"
     return n if kind == "campaign"
+
     "#{n} - #{kind}"
   end
 
   def amount_cents_facebook
     return facebook_data["amount_cents"] if facebook_data&.dig("amount_cents").present?
+
     theft_alert_plan&.amount_cents_facebook
   end
 
   def amount_facebook
-    MoneyFormater.money_format(amount_cents_facebook)
+    MoneyFormatter.money_format(amount_cents_facebook)
   end
 
   def amount_facebook_spent
-    MoneyFormater.money_format(amount_cents_facebook_spent)
+    MoneyFormatter.money_format(amount_cents_facebook_spent)
   end
 
   def activating_at
     t = facebook_data&.dig("activating_at")
-    t.present? ? TimeParser.parse(t) : nil
+    t.present? ? Binxtils::TimeParser.parse(t) : nil
   end
 
   def facebook_post_url
     return nil unless facebook_data&.dig("effective_object_story_id").present?
+
     "https://facebook.com/#{facebook_data&.dig("effective_object_story_id")}"
   end
 
@@ -250,25 +279,27 @@ class TheftAlert < ApplicationRecord
 
   def objective_campaign
     return nil if campaign_id.blank?
-    facebook_data&.dig("objective_campaign") || default_objective("campaign")
+
+    facebook_data&.dig("objective_campaign")
   end
 
   def objective_adset
     return nil if campaign_id.blank?
-    facebook_data&.dig("objective_campaign") || default_objective("adset")
+
+    facebook_data&.dig("objective_adset")
   end
 
   def message
     "#{stolen_record&.city}: Keep an eye out for this stolen #{bike.mnfg_name}. If you see it, let the owner know on Bike Index!"
   end
 
-  def calculated_start_at
+  def start_at_with_fallback
     start_at.present? ? start_at : Time.current
   end
 
   # Default to 3 days, because something
   def calculated_end_at
-    calculated_start_at + (duration_days_facebook || 3).days
+    start_at_with_fallback + (duration_days_facebook || 3).days
   end
 
   def set_calculated_attributes
@@ -282,6 +313,12 @@ class TheftAlert < ApplicationRecord
   end
 
   private
+
+  def failed_to_activate_data?
+    return false if activating_at.blank?
+
+    activating_at < Time.current - FAILED_DELAY
+  end
 
   def alert_cannot_begin_in_past_or_after_ends
     return if start_at.blank? && end_at.blank?
@@ -297,14 +334,5 @@ class TheftAlert < ApplicationRecord
 
   def calculated_cents_facebook_spent
     facebook_data&.dig("spend_cents")
-  end
-
-  def default_objective(target)
-    return nil if self.class.facebook_integration.blank?
-    if target == "campaign"
-      Facebook::AdsIntegration::OBJECTIVE_DEFAULT
-    else
-      Facebook::AdsIntegration::ADSET_OBJECTIVE_DEFAULT
-    end
   end
 end

@@ -26,22 +26,16 @@
         .row
           .col-xs-6
             = form_tag oauth_authorization_path, method: :post do
-              = hidden_field_tag :client_id, @pre_auth.client.uid
-              = hidden_field_tag :redirect_uri, @pre_auth.redirect_uri
-              = hidden_field_tag :state, @pre_auth.state
-              = hidden_field_tag :response_type, @pre_auth.response_type
-              = hidden_field_tag :scope, @pre_auth.scope
+              - pre_auth_hidden_fields.each do |field, value|
+                = hidden_field_tag field, value
               = submit_tag 'Authorize', class: 'btn btn-primary btn-lg'
           .col-xs-6
-            = form_tag oauth_authorization_path, method: :delete do
-              = hidden_field_tag :client_id, @pre_auth.client.uid
-              = hidden_field_tag :redirect_uri, @pre_auth.redirect_uri
-              = hidden_field_tag :state, @pre_auth.state
-              = hidden_field_tag :response_type, @pre_auth.response_type
-              = hidden_field_tag :scope, @pre_auth.scope
+            = form_tag oauth_authorization_path, method: :delete, id: 'deny-authorization' do
+              - pre_auth_hidden_fields.each do |field, value|
+                = hidden_field_tag field, value
               = submit_tag 'Deny', class: 'btn btn-secondary btn-lg'
-  
-- unless params[:redirect_uri][/\Ahttps:/]
+
+- if OauthRedirectUri.cleartext?(@pre_auth.redirect_uri)
   - modal_body = capture_haml do
     .modal-body
       %p
@@ -54,22 +48,18 @@
     .modal-btn-footer
       .row
         .col-xs-8.offset-sm-2
-          %button.btn.btn-primary{ type: 'button' }
+          %button.btn.btn-primary{ type: 'submit', form: 'deny-authorization' }
             Cancel authorization
       .insecure-continuing-explanation
-        %hr    
+        %hr
         %p.less-strong
           %small
             If you're aware of the risks and still want to authorize this application you can close this modal.
             %br
-            This 
+            This
             %em
               only makes sense
             if you're testing an application or something similar.
 
   / Heads up: The title for this modal is css styled by its id
-  = render partial: '/shared/modal', locals: { title: 'Insecure Authorization!', id: 'insecure-authorization-modal', modal_body: modal_body }
-
-  / Show the modal!
-  :javascript
-    $(document).ready(function() {$('#insecure-authorization-modal').modal('show') });
+  = render partial: '/shared/modal', locals: { title: 'Insecure Authorization!', id: 'insecure-authorization-modal', modal_body: modal_body, start_open: true }

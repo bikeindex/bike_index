@@ -1,0 +1,41 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://www.strava.com/api/v3/athlete/activities?page=13&per_page=200
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.4
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Date:
+      - Sun, 09 Feb 2026 18:00:00 GMT
+      X-RateLimit-Limit:
+      - 200,2000
+      X-RateLimit-Usage:
+      - '5,50'
+      X-ReadRateLimit-Limit:
+      - 200,2000
+      X-ReadRateLimit-Usage:
+      - '5,50'
+    body:
+      encoding: UTF-8
+      string: '[]'
+  recorded_at: Sun, 09 Feb 2026 18:00:00 GMT
+recorded_with: VCR 6.3.1

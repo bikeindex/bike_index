@@ -1,7 +1,28 @@
 require "rails_helper"
 
 RSpec.describe User, type: :model do
-  it_behaves_like "geocodeable"
+  it_behaves_like "address_recorded"
+  it_behaves_like "address_recorded_within_bounding_box"
+
+  describe "address factories" do
+    let(:user) { FactoryBot.create(:user, :with_address_record, address_in: :amsterdam) }
+    let(:address_record) { user.reload.address_record }
+    let(:target_attrs) do
+      {city: "Amsterdam", region_string: "North Holland", country_id: Country.netherlands.id,
+       user_id: user.id, kind: "user"}
+    end
+
+    it "is valid" do
+      expect(AddressRecord.count).to eq 0
+      expect(user.address_record_id).to be_present
+      expect(address_record.reload.user_id).to eq user.id
+      expect(address_record.kind).to eq "user"
+      expect(address_record.reload).to have_attributes target_attrs
+      expect(address_record.to_coordinates.map(&:round)).to eq([52, 5])
+      expect(user.to_coordinates).to eq(address_record.to_coordinates)
+      expect(AddressRecord.pluck(:id)).to eq([address_record.id])
+    end
+  end
 
   describe ".ambassadors" do
     context "given ambassadors and no org filter" do
@@ -43,6 +64,12 @@ RSpec.describe User, type: :model do
       subject { User.new(FactoryBot.attributes_for(:user)) }
       before :each do
         expect(subject.valid?).to be_truthy
+      end
+
+      it "is invalid if email is invalid" do
+        subject.email = "+response.write(9515797*9796573)+"
+        expect(subject.valid?).to be_falsey
+        expect(subject.errors.messages.to_s).to match(/email/i)
       end
 
       it "requires password on create" do
@@ -161,7 +188,7 @@ RSpec.describe User, type: :model do
     let(:organization) { FactoryBot.create(:organization) }
     let(:organization_user) { FactoryBot.create(:organization_user, organization: organization) }
     let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
-    let(:admin) { User.new(superuser: true) }
+    let(:admin) { FactoryBot.create(:superuser) }
     it "returns expected values" do
       expect(user.authorized?(bike)).to be_falsey
       expect(user.authorized?(organization)).to be_falsey
@@ -197,6 +224,33 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "registration_show_redesign?" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+
+    it "is falsey when not in the rollout" do
+      expect(user.registration_show_toggleable?).to be_falsey
+      expect(user.registration_show_redesign?).to be_falsey
+    end
+
+    context "in the rollout" do
+      before { Flipper.enable_actor(:bike_show_redesign_toggle, user) }
+
+      it "is truthy" do
+        expect(user.registration_show_toggleable?).to be_truthy
+        expect(user.registration_show_redesign?).to be_truthy
+      end
+
+      context "switched to the legacy view" do
+        let(:user) { FactoryBot.create(:user_confirmed, feature_registration_show_legacy: true) }
+
+        it "is toggleable, but not the redesign" do
+          expect(user.registration_show_toggleable?).to be_truthy
+          expect(user.registration_show_redesign?).to be_falsey
+        end
+      end
+    end
+  end
+
   describe "superuser?" do
     let(:user) { User.new }
     it "is true for superuser attribute" do
@@ -206,9 +260,9 @@ RSpec.describe User, type: :model do
     end
 
     context "with superuser" do
-      let(:user) { FactoryBot.build(:admin) }
+      let(:user) { FactoryBot.create(:superuser) }
 
-      it "is true for superuser attribute" do
+      it "is truthy" do
         expect(user.superuser?).to be_truthy
         expect(user.superuser?(controller_name: "bikes")).to be_truthy
         expect(user.superuser?(controller_name: "bikes", action_name: "edit")).to be_truthy
@@ -338,6 +392,15 @@ RSpec.describe User, type: :model do
       expect(user2.errors.full_messages.to_s).to match("Username has already been taken")
       expect(user2.reload.username).not_to eq(target)
       expect(user1.reload.username).to eq(target)
+    end
+
+    it "normalizes username to lowercase and validates uniqueness" do
+      user1 = FactoryBot.create(:user, username: "CoolName")
+      expect(user1.reload.username).to eq("coolname")
+
+      user2 = FactoryBot.build(:user, username: "COOLNAME")
+      expect(user2.valid?).to be_falsey
+      expect(user2.errors[:username]).to include("has already been taken")
     end
   end
 
@@ -470,6 +533,19 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "generate_username" do
+    it "returns a username CredibilityScorer doesn't penalize" do
+      expect(CredibilityScorer.suspiscious_handle?(User.generate_username)).to be_falsey
+    end
+    context "random username contains a bad word" do
+      # BadWordCleaner matches substrings, so a random username occasionally does
+      before { allow(SecureRandom).to receive(:urlsafe_base64).and_return("Xcumbersome7", "Zpolitely3") }
+      it "draws again" do
+        expect(User.generate_username).to eq "zpolitely3"
+      end
+    end
+  end
+
   describe "access_tokens_for_application" do
     it "returns [] if no application" do
       user = User.new
@@ -510,8 +586,8 @@ RSpec.describe User, type: :model do
       end
       it "input time" do
         user = FactoryBot.create(:user)
-        user.update_auth_token("token_for_password_reset", (Time.current - 121.minutes).to_i)
-        expect(user.reload.auth_token_time("token_for_password_reset")).to be < (Time.current - 1.hours)
+        user.update_auth_token("token_for_password_reset", (User::AUTH_TOKEN_EXPIRY + 1.minute).ago.to_i)
+        expect(user.reload.auth_token_time("token_for_password_reset")).to be < (Time.current - User::AUTH_TOKEN_EXPIRY)
         expect(user.auth_token_expired?("token_for_password_reset")).to be_truthy
       end
     end
@@ -527,12 +603,18 @@ RSpec.describe User, type: :model do
         expect(user.auth_token_time("magic_link_token")).to be > Time.current - 2.seconds
         expect(user.auth_token_expired?("magic_link_token")).to be_falsey
       end
-      it "uses input time, it returns the token" do
+      it "uses input time, and expires once past the window" do
         user = FactoryBot.create(:user)
-        user.update_auth_token("magic_link_token", (Time.current - 1.hour).to_i)
-        user.reload
-        expect(user.auth_token_time("magic_link_token")).to be < (Time.current - 1.hours)
+        # The token stores whole seconds, so compare against what was passed in rather
+        # than a second reading of the clock: that gap is the truncation plus however
+        # long the write took, which on a loaded runner overran the old 1 second window
+        token_time = 1.minute.ago.to_i
+        user.update_auth_token("magic_link_token", token_time)
+        expect(user.reload.auth_token_time("magic_link_token")).to eq Time.at(token_time)
         expect(user.auth_token_expired?("magic_link_token")).to be_falsey
+
+        user.update_auth_token("magic_link_token", (User::AUTH_TOKEN_EXPIRY + 1.minute).ago.to_i)
+        expect(user.reload.auth_token_expired?("magic_link_token")).to be_truthy
       end
     end
   end
@@ -542,7 +624,7 @@ RSpec.describe User, type: :model do
       user = FactoryBot.create(:user)
       expect {
         expect(user.send_password_reset_email).to be_truthy
-      }.to change(EmailResetPasswordJob.jobs, :size).by(1)
+      }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
       expect(user.reload.token_for_password_reset).not_to be_nil
     end
 
@@ -554,7 +636,7 @@ RSpec.describe User, type: :model do
       expect {
         expect(user.send_password_reset_email).to be_falsey
         expect(user.send_password_reset_email).to be_falsey
-      }.to change(EmailResetPasswordJob.jobs, :size).by(0)
+      }.to change(Email::ResetPasswordJob.jobs, :size).by(0)
       user.reload
       expect(user.token_for_password_reset).to eq current_token
     end
@@ -566,7 +648,7 @@ RSpec.describe User, type: :model do
       expect(user.magic_link_token).to be_nil
       expect {
         user.send_magic_link_email
-      }.to change(EmailMagicLoginLinkJob.jobs, :size).by(1)
+      }.to change(Email::MagicLoginLinkJob.jobs, :size).by(1)
       expect(user.reload.magic_link_token).not_to be_nil
     end
 
@@ -577,9 +659,21 @@ RSpec.describe User, type: :model do
       user.send_magic_link_email
       expect {
         user.send_magic_link_email
-      }.to change(EmailResetPasswordJob.jobs, :size).by(0)
+      }.to change(Email::ResetPasswordJob.jobs, :size).by(0)
       user.reload
       expect(user.magic_link_token).to eq token
+    end
+  end
+
+  describe "refreshed_magic_link_token" do
+    let(:user) { FactoryBot.create(:user) }
+
+    it "generates a token, reuses it while unexpired, replaces it once expired" do
+      token = user.refreshed_magic_link_token
+      expect(token).to be_present
+      expect(user.refreshed_magic_link_token).to eq token
+      user.update_auth_token("magic_link_token", (User::AUTH_TOKEN_EXPIRY + 1.minute).ago.to_i)
+      expect(user.refreshed_magic_link_token).to_not eq token
     end
   end
 
@@ -622,7 +716,7 @@ RSpec.describe User, type: :model do
 
   describe "enabled" do
     let(:user) { User.new }
-    let(:superuser) { User.new(superuser: true) }
+    let(:superuser) { FactoryBot.create(:superuser) }
     it "is falsey, truthy for superuser" do
       expect(user.enabled?("unstolen_notifications")).to be_falsey
       expect(superuser.enabled?("unstolen_notifications")).to be_truthy
@@ -633,10 +727,10 @@ RSpec.describe User, type: :model do
   end
 
   describe "unstolen_notifications enabled?" do
-    let(:user) { User.new }
+    let(:user) { FactoryBot.create(:user_confirmed) }
     it "is falsey, truthy for superuser" do
       expect(user.enabled?("unstolen_notifications")).to be_falsey
-      user.superuser = true
+      FactoryBot.create(:superuser_ability, user:)
       expect(user.enabled?("unstolen_notifications")).to be_truthy
     end
 
@@ -696,10 +790,12 @@ RSpec.describe User, type: :model do
   describe "donations" do
     let(:user) { FactoryBot.create(:user) }
     it "returns the payment amount" do
-      Payment.create(user: user, amount_cents: 200)
+      Payment.create(user: user, amount_cents: 200, paid_at: Time.current)
       expect(user.donations).to eq 200
       expect(user.donor?).to be_falsey
       Payment.create(user: user, amount_cents: 800)
+      expect(user.donor?).to be_falsey
+      Payment.create(user: user, amount_cents: 800, paid_at: Time.current)
       expect(user.donor?).to be_truthy
     end
   end
@@ -799,7 +895,7 @@ RSpec.describe User, type: :model do
       end
     end
     context "superadmin" do
-      let(:user) { FactoryBot.create(:admin) }
+      let(:user) { FactoryBot.create(:superuser) }
       it "returns true" do
         expect(user.member_of?(organization)).to be_truthy
         expect(user.member_of?(organization, no_superuser_override: true)).to be_falsey
@@ -839,6 +935,35 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "looks_like_spam?" do
+    let(:user) { User.new }
+    it "is false without the honeypot" do
+      expect(user.looks_like_spam?).to be_falsey
+    end
+    context "with the additional honeypot filled" do
+      let(:user) { User.new(additional: "http://spam.example.com") }
+      it "is true" do
+        expect(user.looks_like_spam?).to be_truthy
+      end
+    end
+  end
+
+  describe "can_create_listing?" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    context "superuser" do
+      let(:user) { FactoryBot.create(:superuser) }
+      it "returns true" do
+        expect(user.can_create_listing?).to be_truthy
+      end
+    end
+    context "member" do
+      let!(:membership) { FactoryBot.create(:membership, user:) }
+      it "returns true" do
+        expect(user.can_create_listing?).to be_truthy
+      end
+    end
+  end
+
   describe "admin_of?" do
     let(:organization) { FactoryBot.create(:organization) }
     context "admin of organization" do
@@ -854,7 +979,7 @@ RSpec.describe User, type: :model do
       end
     end
     context "superadmin" do
-      let(:user) { FactoryBot.create(:admin) }
+      let(:user) { FactoryBot.create(:superuser) }
       it "returns true" do
         expect(user.admin_of?(organization)).to be_truthy
       end
@@ -872,6 +997,67 @@ RSpec.describe User, type: :model do
         it "returns false" do
           expect(user.admin_of?(nil)).to be_falsey
         end
+      end
+    end
+  end
+
+  describe "find_or_build_address_record" do
+    let(:user) { FactoryBot.build(:user) }
+    let(:country) { Country.united_states }
+
+    context "when user has no address_record" do
+      it "creates a new AddressRecord" do
+        expect(user.address_record).to be_nil
+
+        address_record = user.find_or_build_address_record
+
+        expect(address_record).to be_a(AddressRecord)
+        expect(address_record.persisted?).to be_falsey
+        expect(address_record.user_id).to eq(user.id)
+        expect(address_record.kind).to eq("user")
+        expect(address_record.country_id).to be_nil
+      end
+
+      it "creates a new AddressRecord with country_id" do
+        address_record = user.find_or_build_address_record(country_id: country.id)
+
+        expect(address_record).to be_a(AddressRecord)
+        expect(address_record.persisted?).to be_falsey
+        expect(address_record.user_id).to eq(user.id)
+        expect(address_record.kind).to eq("user")
+        expect(address_record.country_id).to eq(country.id)
+      end
+    end
+
+    context "when user has an existing address_record" do
+      let(:user) { FactoryBot.create(:user, :with_address_record) }
+
+      it "returns the existing address_record" do
+        expect(user.reload.address_record_id).to be_present
+        expect(user.find_or_build_address_record.id).to eq user.address_record_id
+      end
+    end
+
+    context "when user has an orphaned address_record" do
+      let(:user) { FactoryBot.create(:user) }
+      let!(:address_record) { FactoryBot.create(:address_record, user_id: user.id, kind: :user) }
+
+      it "finds the existing orphaned address_record" do
+        expect(user.reload.address_record_id).to be_blank
+        expect(user.find_or_build_address_record.id).to eq address_record.id
+        expect(user.reload.address_record_id).to eq address_record.id
+      end
+    end
+
+    context "when user has an address_record not for themselves" do
+      let(:user) { FactoryBot.create(:user) }
+      let!(:address_record) { FactoryBot.create(:address_record, user_id: user.id, kind: :ownership) }
+
+      it "finds the existing orphaned address_record" do
+        expect(user.reload.address_record_id).to be_blank
+
+        expect(user.find_or_build_address_record.id).to be_blank
+        expect(user.reload.address_record_id).to be_blank
       end
     end
   end

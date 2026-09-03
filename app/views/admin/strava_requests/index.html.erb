@@ -1,0 +1,62 @@
+<% index_title = capture do %>
+  <%= render Pages::Admin::Strava::RequestsRateLimitDetails::Component.new %>
+<% end %>
+
+<% nav_header_list_items = capture do %>
+  <li>
+    <%= render(UI::ButtonLink::Component.new(text: "Proxy requests", href: url_for(sortable_search_params.merge(search_proxy_requests: !@proxy_request)), size: :sm, active: @proxy_request)) %>
+  </li>
+
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: params[:search_request_type].blank? ? "All types" : params[:search_request_type].humanize, button_size: :sm,
+          active: params[:search_request_type].present?)) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All types", path: url_for(sortable_search_params.merge(search_request_type: nil)), match_params: {search_request_type: nil}) } %>
+      <% dropdown.with_entry_divider %>
+
+      <% StravaRequest::REQUEST_TYPE_ENUM.each_key do |kind| %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind.to_s.humanize, path: url_for(sortable_search_params.merge(search_request_type: kind)), match_params: {search_request_type: kind}) } %>
+      <% end %>
+    <% end %>
+  </li>
+
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: params[:search_response_status].blank? ? "All statuses" : params[:search_response_status].humanize, button_size: :sm,
+          active: params[:search_response_status].present?)) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All statuses", path: url_for(sortable_search_params.merge(search_response_status: nil)), match_params: {search_response_status: nil}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Pending or successful", path: url_for(sortable_search_params.merge(search_response_status: "pending_or_success")), match_params: {search_response_status: "pending_or_success"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Not successful", path: url_for(sortable_search_params.merge(search_response_status: "not_successful")), match_params: {search_response_status: "not_successful"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Errors and failures", path: url_for(sortable_search_params.merge(search_response_status: "errors_and_failures")), match_params: {search_response_status: "errors_and_failures"}) } %>
+      <% dropdown.with_entry_divider %>
+
+      <% StravaRequest::RESPONSE_STATUS_ENUM.each_key do |kind| %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind.to_s.humanize, path: url_for(sortable_search_params.merge(search_response_status: kind)), match_params: {search_response_status: kind}) } %>
+      <% end %>
+    <% end %>
+  </li>
+
+  <li>
+    <%= render(UI::Dropdown::Component.new(name: params[:search_responder].blank? ? "Any responder" : params[:search_responder].humanize, button_size: :sm,
+          active: params[:search_responder].present?)) do |dropdown| %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Any responder", path: url_for(sortable_search_params.merge(search_responder: nil)), match_params: {search_responder: nil}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only Binx response", path: url_for(sortable_search_params.merge(search_responder: "only_binx_response")), match_params: {search_responder: "only_binx_response"}) } %>
+      <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "Only Strava Response", path: url_for(sortable_search_params.merge(search_responder: "only_strava_response")), match_params: {search_responder: "only_strava_response"}) } %>
+    <% end %>
+  </li>
+<% end %>
+
+<% rendered_chart = capture do %>
+  <% if @render_chart %>
+    <%= render(Pages::Admin::Strava::RequestsChart::Component.new(collection: matching_strava_requests, time_range: @time_range, time_range_column: @time_range_column, show_integration_chart: params[:search_strava_integration_id].blank?)) %>
+  <% end %>
+<% end %>
+
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @collection,
+  viewing: controller_name.humanize,
+  index_title:, nav_header_list_items:, rendered_chart:,
+)) %>
+
+<style>
+  .full-screen-table pre { margin-bottom: 0; }
+</style>

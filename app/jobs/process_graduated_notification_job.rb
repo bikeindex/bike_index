@@ -1,5 +1,6 @@
 class ProcessGraduatedNotificationJob < ScheduledJob
   prepend ScheduledJobRecorder
+
   sidekiq_options queue: "low_priority", retry: false
 
   def self.frequency

@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: user_phones
+# Database name: primary
 #
 #  id                :bigint           not null, primary key
 #  confirmation_code :string
@@ -37,6 +38,7 @@ class UserPhone < ApplicationRecord
 
   def self.code_display(str)
     return nil unless str.present?
+
     str[0..2] + " " + str[3..]
   end
 
@@ -73,11 +75,13 @@ class UserPhone < ApplicationRecord
   # Protect against overenthusiastic clicking
   def resend_confirmation?
     return true if legacy?
+
     unconfirmed? && updated_at < Time.current - 2.minutes
   end
 
   def resend_confirmation_if_reasonable!
     return false unless resend_confirmation?
+
     generate_confirmation
     send_confirmation_text
   end
@@ -92,8 +96,9 @@ class UserPhone < ApplicationRecord
 
   def confirm!
     return true if confirmed?
+
     result = update(confirmed_at: Time.current)
-    AfterPhoneConfirmedJob.perform_async(id)
+    CallbackJobs::AfterPhoneConfirmedJob.perform_async(id)
     result
   end
 

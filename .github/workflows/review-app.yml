@@ -1,0 +1,303 @@
+name: Review App
+
+# Deploys / destroys / reloads the database of per-PR review apps via the shared
+# kamal-deploy.yml reusable workflow (build + kamal command) to the shared review
+# host. This file owns only the PR lifecycle around it: resolving the trigger,
+# labelling, surfacing the deployment, and PR failure comments. See
+# docs/review-apps.md for host setup.
+#
+# Triggers:
+#   - workflow_dispatch   : operator clicks "Run workflow" in Actions UI, OR
+#                           ci.yml dispatches a deploy on push when the PR has
+#                           the 'review-app' label (ci.yml's `dispatch` job)
+#   - pull_request closed : auto-destroy, whether or not the label is set
+#
+# There is deliberately NO `pull_request: synchronize` trigger — label-gating it
+# leaves skipped check runs on every push to every unlabeled PR. ci.yml's
+# `dispatch` job gates on the label instead.
+#
+# Fork PRs never auto-deploy (their pushes don't run ci.yml in this repo); a
+# maintainer reviews the diff, then deploys via workflow_dispatch.
+#
+# `pr_number: sandbox` targets the persistent sandbox app instead of a PR, and is
+# accepted for reload_database only — sandbox deploys from sandbox.yml and is never
+# destroyed. With no PR, everything PR-side here (labels, deployment link, failure
+# comment) is skipped, so a sandbox failure surfaces only in the run itself.
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "Pull request number, or 'sandbox' (reload_database only)"
+        required: true
+        type: string
+      action:
+        description: "deploy, destroy, or reload_database (drop + create/migrate/seed)"
+        required: true
+        type: choice
+        default: deploy
+        options: [deploy, destroy, reload_database]
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+  packages: write       # push to GHCR (reusable build)
+  pull-requests: write  # add/remove labels and comment
+  deployments: write    # create the PR-head deployment that surfaces the link
+
+env:
+  REVIEW_LABEL: review-app
+  # Marks the `report` job's failure comment so it can be found again. Each comment
+  # also carries the failing commit's SHA (`<!-- sha:… -->`), so `report` edits in
+  # place only when the SAME commit fails again. The comment is hidden (minimized as
+  # OUTDATED), never deleted, once it's stale — either the op succeeds (`post`)
+  # or a newer commit is deployed (`report` hides the prior commit's comment).
+  FAILURE_COMMENT_MARKER: "<!-- review-app-failure -->"
+
+jobs:
+  resolve:
+    name: Resolve PR
+    # Every closed PR runs destroy, label or not — the deploy path's `--add-label`
+    # is best-effort, so an app can be live with no label on it (docs/review-apps.md).
+    runs-on: ubuntu-latest
+    outputs:
+      # Empty for sandbox.
+      pr_number: ${{ steps.set.outputs.pr_number }}
+      slug:      ${{ steps.set.outputs.slug }}
+      head_sha:  ${{ steps.set.outputs.head_sha }}
+      action:    ${{ steps.set.outputs.action }}
+      proceed:   ${{ steps.set.outputs.proceed }}
+      pr_title:  ${{ steps.set.outputs.pr_title }}
+    steps:
+      - name: Resolve PR + action from the trigger
+        id: set
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_PR: ${{ github.event.inputs.pr_number }}
+          INPUT_ACTION: ${{ github.event.inputs.action }}
+          PR_NUMBER_EVENT: ${{ github.event.pull_request.number }}
+          PR_HEAD_SHA_EVENT: ${{ github.event.pull_request.head.sha }}
+          PR_HEAD_REPO_EVENT: ${{ github.event.pull_request.head.repo.full_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            pr="$INPUT_PR"
+            action="$INPUT_ACTION"
+            proceed=true
+            if [[ "$pr" == "sandbox" ]]; then
+              if [[ "$action" != "reload_database" ]]; then
+                echo "::error::sandbox accepts reload_database only; deploy runs from sandbox.yml and it is never destroyed."
+                exit 1
+              fi
+              pr=""
+              head_sha=""
+              title=""
+            else
+              head_sha=$(gh pr view "$pr" --repo "$REPO" --json headRefOid -q .headRefOid)
+              title=$(gh pr view "$pr" --repo "$REPO" --json title -q .title)
+            fi
+          else
+            pr="$PR_NUMBER_EVENT"
+            head_sha="$PR_HEAD_SHA_EVENT"
+            title=""  # destroy doesn't render the banner, so no title needed
+            action="destroy"  # `closed` is the only pull_request trigger
+            if [[ "$PR_HEAD_REPO_EVENT" != "$REPO" ]]; then
+              echo "PR #$pr is from a fork ($PR_HEAD_REPO_EVENT); skipping auto-trigger."
+              proceed=false
+            else
+              proceed=true
+            fi
+          fi
+          if [[ -n "$pr" ]]; then slug="pr-$pr"; else slug="sandbox"; fi
+          echo "pr_number=$pr"   >> "$GITHUB_OUTPUT"
+          echo "slug=$slug"      >> "$GITHUB_OUTPUT"
+          echo "head_sha=$head_sha" >> "$GITHUB_OUTPUT"
+          echo "action=$action"  >> "$GITHUB_OUTPUT"
+          echo "proceed=$proceed" >> "$GITHUB_OUTPUT"
+          # Heredoc form — a PR title is arbitrary text (may contain `=`, `#`, …).
+          {
+            echo "pr_title<<__PR_TITLE_EOF__"
+            echo "$title"
+            echo "__PR_TITLE_EOF__"
+          } >> "$GITHUB_OUTPUT"
+      # Label on deploy *attempt*, not success: the label marks intent and arms
+      # auto-redeploy (ci.yml's dispatch job keys off it) — after a failed deploy,
+      # pushing a fix re-dispatches without another manual run. Create the label
+      # first (`gh pr edit --add-label` errors if it's missing); both are idempotent.
+      - name: Add review-app label
+        if: steps.set.outputs.proceed == 'true' && steps.set.outputs.action == 'deploy'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create "$REVIEW_LABEL" --repo "$GITHUB_REPOSITORY" \
+            --color 0E8A16 --description "Per-PR Kamal review app is deployed" 2>/dev/null || true
+          gh pr edit "${{ steps.set.outputs.pr_number }}" --repo "$GITHUB_REPOSITORY" --add-label "$REVIEW_LABEL" || true
+
+  # Build (deploy only) + run the kamal command, via the shared reusable workflow.
+  # Deploy checks out the PR head; the other actions check out the default branch —
+  # they act on the PR by number and need none of its code, and a PR predating a
+  # bin/kamal_review change would otherwise fail on its stale checkout.
+  op:
+    name: ${{ needs.resolve.outputs.action }} ${{ needs.resolve.outputs.slug }}
+    needs: resolve
+    if: needs.resolve.outputs.proceed == 'true'
+    uses: ./.github/workflows/kamal-deploy.yml
+    secrets: inherit
+    with:
+      build: ${{ needs.resolve.outputs.action == 'deploy' }}
+      ref: ${{ needs.resolve.outputs.action == 'deploy' && needs.resolve.outputs.head_sha || github.event.repository.default_branch }}
+      # Each action is also the bin/kamal_review subcommand of the same name.
+      command: ${{ format('bin/kamal_review {0} --app {1}', needs.resolve.outputs.action, needs.resolve.outputs.slug) }}
+      image_tag: ${{ needs.resolve.outputs.slug }}-${{ needs.resolve.outputs.head_sha }}
+      service_label: bike-index-${{ needs.resolve.outputs.slug }}
+      sprockets_cache_prefix: review-app-sprockets
+      pr_title: ${{ needs.resolve.outputs.pr_title }}
+      # A sandbox reload joins sandbox.yml's group, so it can't run mid-deploy.
+      concurrency_prefix: ${{ needs.resolve.outputs.pr_number && format('review-app-{0}', needs.resolve.outputs.pr_number) || 'sandbox-deploy' }}
+      environment_name: review-app
+      # Empty only for destroy — every other action leaves the app serving that URL.
+      environment_url: ${{ needs.resolve.outputs.action != 'destroy' && format('https://{0}.review.bikeindex.org', needs.resolve.outputs.slug) || '' }}
+
+  # PR-side follow-ups the generic reusable workflow can't own. Every step needs a
+  # PR, so the whole job sits out a sandbox run.
+  post:
+    name: Post-op PR updates
+    needs: [resolve, op]
+    if: ${{ !cancelled() && needs.resolve.outputs.proceed == 'true' && needs.resolve.outputs.pr_number }}
+    runs-on: ubuntu-latest
+    steps:
+      # The reusable `run` job's environment attaches the deployment to this run's
+      # commit, which surfaces the PR link only when that commit is the PR head —
+      # true for ci.yml auto-dispatches, but NOT a manual dispatch from another
+      # branch. Create a deployment on the PR head so the link appears regardless.
+      - name: Link deployment to PR head
+        if: needs.resolve.outputs.action == 'deploy' && needs.op.result == 'success' && github.sha != needs.resolve.outputs.head_sha
+        uses: actions/github-script@v9
+        env:
+          HEAD_SHA: ${{ needs.resolve.outputs.head_sha }}
+          DEPLOY_URL: https://${{ needs.resolve.outputs.slug }}.review.bikeindex.org
+        with:
+          script: |
+            const {data: deployment} = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: process.env.HEAD_SHA,
+              environment: "review-app",
+              auto_merge: false,
+              required_contexts: [],
+              transient_environment: true,
+              description: "Per-PR Kamal review app",
+            })
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: deployment.id,
+              state: "success",
+              environment_url: process.env.DEPLOY_URL,
+            })
+      # A successful op makes the `report` job's failure comment stale. Hide it
+      # (minimize as OUTDATED) rather than delete — the record stays on the PR.
+      - name: Hide stale failure comment
+        if: needs.resolve.outputs.action != 'destroy' && needs.op.result == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ needs.resolve.outputs.pr_number }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \
+            --jq ".[] | select(.body | startswith(\"$FAILURE_COMMENT_MARKER\")) | .node_id" \
+          | while read -r nid; do
+              [ -n "$nid" ] || continue
+              echo "Hiding stale failure comment $nid"
+              gh api graphql -f query='mutation($id: ID!) { minimizeComment(input: {classifier: OUTDATED, subjectId: $id}) { minimizedComment { isMinimized } } }' -f id="$nid" || true
+            done
+
+      # Gated on op success: a failed teardown leaves the app/db/volumes behind,
+      # so keep the label (the app still exists) and the images needed to retry.
+      - name: Remove review-app label
+        if: needs.resolve.outputs.action == 'destroy' && needs.op.result == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr edit "${{ needs.resolve.outputs.pr_number }}" --repo "$GITHUB_REPOSITORY" --remove-label "$REVIEW_LABEL" || true
+      # Each push built a `pr-<N>-<sha>` image; delete every version for this PR so
+      # closed PRs don't accumulate images in GHCR. Matches on the trailing dash so
+      # `pr-12-` never catches `pr-123-`. Best-effort.
+      # Skipped for an unlabeled close: the listing below paginates every version of
+      # the whole package, and only a PR that deployed — which is what labels it —
+      # has anything to delete. A deploy whose `--add-label` failed leaks its images,
+      # which is what the untagged-version prune in docs/review-apps.md is for.
+      - name: Delete PR images from GHCR
+        if: >-
+          needs.resolve.outputs.action == 'destroy' && needs.op.result == 'success' &&
+          (github.event_name == 'workflow_dispatch' ||
+           contains(github.event.pull_request.labels.*.name, 'review-app'))
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ needs.resolve.outputs.pr_number }}
+        run: |
+          set -euo pipefail
+          owner="${GITHUB_REPOSITORY%%/*}"
+          package="${GITHUB_REPOSITORY##*/}"
+          prefix="pr-${PR_NUMBER}-"
+          ids=$(gh api --paginate \
+            "/orgs/${owner}/packages/container/${package}/versions" \
+            --jq "[.[] | select(any(.metadata.container.tags[]; startswith(\"${prefix}\"))) | .id] | .[]")
+          if [[ -z "$ids" ]]; then
+            echo "No GHCR image versions tagged ${prefix}* to delete."
+            exit 0
+          fi
+          for id in $ids; do
+            echo "Deleting GHCR image version $id"
+            gh api --method DELETE \
+              "/orgs/${owner}/packages/container/${package}/versions/${id}" || true
+          done
+
+  # Failed builds/deploys are invisible on the PR otherwise: these runs are
+  # workflow_dispatch-triggered, so their check runs never appear in the PR's
+  # check rollup. Comment the failure instead — edited in place when the SAME commit
+  # fails again (matched via the marker + SHA), and hidden (never deleted) once stale:
+  # by `post` on the next successful deploy, or here when a newer commit fails.
+  report:
+    name: Report failure on PR
+    needs: [resolve, op, post]
+    if: >-
+      !cancelled() && needs.resolve.outputs.proceed == 'true' &&
+      needs.resolve.outputs.pr_number && contains(needs.*.result, 'failure')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment failure on PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ needs.resolve.outputs.pr_number }}
+          ACTION: ${{ needs.resolve.outputs.action }}
+          HEAD_SHA: ${{ needs.resolve.outputs.head_sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          sha_marker="<!-- sha:$HEAD_SHA -->"
+          body="$FAILURE_COMMENT_MARKER $sha_marker
+          🚨 **Review app ${ACTION//_/ } failed** for \`${HEAD_SHA:0:7}\` — [run logs](${RUN_URL})
+
+          Re-run the Review App workflow to retry (a push re-dispatches a deploy)."
+          # Edit in place only when THIS commit failed before; a comment for an older
+          # commit is left untouched here and hidden below.
+          cid=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \
+            --jq "[.[] | select(.body | startswith(\"$FAILURE_COMMENT_MARKER\")) | select(.body | contains(\"$sha_marker\")) | .id][0] // empty" | head -n1)
+          if [ -n "$cid" ]; then
+            echo "Updating existing failure comment $cid"
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$cid" -f body="$body"
+          else
+            gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body "$body"
+          fi
+          # A newer commit is being deployed, so hide (never delete) any failure
+          # comment left over from an earlier commit.
+          gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \
+            --jq ".[] | select(.body | startswith(\"$FAILURE_COMMENT_MARKER\")) | select(.body | contains(\"$sha_marker\") | not) | .node_id" \
+          | while read -r nid; do
+              [ -n "$nid" ] || continue
+              echo "Hiding stale failure comment $nid"
+              gh api graphql -f query='mutation($id: ID!) { minimizeComment(input: {classifier: OUTDATED, subjectId: $id}) { minimizedComment { isMinimized } } }' -f id="$nid" || true
+            done

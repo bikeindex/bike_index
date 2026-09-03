@@ -1,0 +1,64 @@
+<%# locals: (collection:, render_sortable: false) %>
+
+<div class="full-screen-table">
+  <table class="table table-striped table-bordered">
+    <thead class="thead-light">
+      <th class="small">
+        <%= sortable "created_at", "Added", render_sortable: render_sortable %>
+      </th>
+
+      <th><%= sortable "name", render_sortable: render_sortable %></th>
+      <th><%= sortable "kind", render_sortable: render_sortable %></th>
+
+      <th>
+        <%= sortable "amount_cents", "Amount", render_sortable: render_sortable %>
+      </th>
+    </thead>
+
+    <tbody>
+      <% collection.each do |organization_feature| %>
+        <tr>
+          <td>
+            <small class="localizeTime">
+              <%= l organization_feature.created_at, format: :convert_time %>
+            </small>
+          </td>
+
+          <td>
+            <%= link_to organization_feature.name, edit_admin_organization_feature_url(organization_feature) %>
+
+            <% if organization_feature.description.present? %>
+              <br>
+              <small><%= organization_feature.description %></small>
+            <% end %>
+
+            <% if organization_feature.details_link.present? %>
+              <br>
+              <small>
+                <%= link_to organization_feature.details_link, organization_feature.details_link %>
+              </small>
+            <% end %>
+
+            <% if organization_feature.feature_slugs_string.present? %>
+              <br>
+              <small class="less-strong">
+                <span>
+                  Feature slugs:
+                  <span style="color: purple;"><%= organization_feature.feature_slugs_string %></span>
+                </span>
+              </small>
+            <% end %>
+          </td>
+
+          <td>
+            <small><%= organization_feature.kind.humanize %></small>
+          </td>
+
+          <td>
+            <%= organization_feature.amount_formatted %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

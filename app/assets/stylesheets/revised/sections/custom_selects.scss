@@ -16,6 +16,12 @@
   padding: 0.475rem 0.75rem;
 }
 
+// indent lines after the first
+.selectize-input .item, .selectize-dropdown .option {
+  margin-left: 0.5em;
+  text-indent: -0.5em;
+}
+
 // Select2 styles
 // Right now, select2 is only used on bikes search, these styles
 // make the field on bikes search appear the same as other fields
@@ -42,4 +48,11 @@
   .select2-selection--multiple
   .select2-selection__rendered {
   padding: 0;
+}
+
+// .hide-selectize-dropdown-arrow is added via JS
+.hide-selectize-dropdown-arrow {
+  .selectize-control.single .selectize-input:after {
+    display: none;
+  }
 }

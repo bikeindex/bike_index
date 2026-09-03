@@ -24,20 +24,26 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
+      expect(assigns(:render_results)).to be_falsey
+
+      get "#{base_url}?search_no_js=true"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:index)
+      expect(assigns(:render_results)).to be_truthy
       expect(assigns(:search_status)).to eq "current"
       expect(assigns(:separate_secondary_notifications)).to be_falsey
       expect(assigns(:graduated_notifications).pluck(:id)).to match_array([graduated_notification_pending.id, graduated_notification_bike_graduated.id])
 
-      get "#{base_url}?search_status=all"
+      get "#{base_url}?search_no_js=true&search_status=all"
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
       expect(assigns(:graduated_notifications).pluck(:id)).to match_array([graduated_notification_pending.id, graduated_notification_bike_graduated.id, graduated_notification_remaining.id])
 
-      get "#{base_url}?search_email=testly%40univer"
+      get "#{base_url}?search_no_js=true&search_email=testly%40univer"
       expect(response.status).to eq(200)
       expect(assigns(:graduated_notifications).pluck(:id)).to match_array([graduated_notification_pending.id])
 
-      get "#{base_url}?search_email=testly%40univer&search_secondary=true"
+      get "#{base_url}?search_no_js=true&search_email=testly%40univer&search_secondary=true"
       expect(response.status).to eq(200)
       expect(assigns(:separate_secondary_notifications)).to be_truthy
       expect(assigns(:graduated_notifications).pluck(:id)).to match_array([graduated_notification_pending.id])
@@ -51,7 +57,9 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
-      expect(assigns(:search_status)).to eq "current"
+      expect(assigns(:render_results)).to be_falsey
+      expect(response.body).to include("Not delivering graduated notifications")
+      expect(response.body).to include("role=\"alert\"")
     end
   end
 
@@ -62,6 +70,28 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
       expect(assigns(:graduated_notification)).to eq graduated_notification
+    end
+    context "custom email content edited after the notification sent" do
+      let!(:mail_snippet) { FactoryBot.create(:mail_snippet, kind: "graduated_notification", organization: current_organization) }
+      it "renders the stale-content alert" do
+        graduated_notification.update(processed_at: Time.current - 1.week)
+        expect(graduated_notification.reload.send_email?).to be_truthy
+        get "#{base_url}/#{graduated_notification.id}"
+        expect(response.status).to eq(200)
+        expect(response.body).to include("has changed since this graduated notification was sent")
+        expect(response.body).to include("role=\"alert\"")
+      end
+    end
+    context "organization no longer delivering" do
+      it "renders the no-email-sent alert" do
+        current_organization.update(graduated_notification_interval: nil)
+        expect(graduated_notification.reload.send_email?).to be_falsey
+        expect(graduated_notification.primary_notification?).to be_truthy
+        get "#{base_url}/#{graduated_notification.id}"
+        expect(response.status).to eq(200)
+        expect(response.body).to include("No email will be sent for unknown reason")
+        expect(response.body).to include("role=\"alert\"")
+      end
     end
     context "different organization's" do
       let!(:graduated_notification) { FactoryBot.create(:graduated_notification_bike_graduated) }

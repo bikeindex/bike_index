@@ -10,6 +10,7 @@ OAUTH_SCOPES = %i[
   write_organizations
   unconfirmed
 ].freeze
+START_TRACKING_REGISTRATION_APP_ID_AT = 1765772107
 
 if Rails.env.development? && defined?(User) && defined?(User.first)
   ENV["V2_ACCESSOR_ID"] = (User.fuzzy_email_find("api@example.com") || User.first).id.to_s
@@ -21,7 +22,7 @@ Doorkeeper.configure do
 
   # This block is be called to check whether the resource owner is authenticated or not.
   resource_owner_authenticator do |request_envi|
-    user = User.from_auth(cookies.signed[:auth])
+    user = User.from_auth(cookies.signed[ControllerHelpers::AUTH_COOKIE_KEY])
     if user.present? && user.confirmed?
       user # Return user immediately, if user is confirmed
     else
@@ -97,12 +98,16 @@ Doorkeeper.configure do
   #
   # "authorization_code" => Authorization Code Grant Flow
   # "implicit"           => Implicit Grant Flow
-  # "password"           => Resource Owner Password Credentials Grant Flow
+  # "password"           => Resource Owner Password Credentials Grant Flow - needs a
+  #                         resource_owner_from_credentials block, which we've never defined
   # "client_credentials" => Client Credentials Grant Flow
   #
   # If not specified, Doorkeeper enables all the four grant flows.
   #
-  grant_flows %w[authorization_code implicit password client_credentials]
+  grant_flows %w[authorization_code implicit client_credentials]
+
+  # PKCE (RFC 7636) stays optional, so existing clients keep working
+  pkce_code_challenge_methods %w[S256]
 
   # Under some circumstances you might want to have applications auto-approved,
   # so that the user skips the authorization step.

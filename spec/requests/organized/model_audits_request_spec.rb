@@ -19,7 +19,7 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
     end
 
     context "logged in as super admin" do
-      let(:current_user) { FactoryBot.create(:admin) }
+      let(:current_user) { FactoryBot.create(:superuser) }
       describe "index" do
         it "renders" do
           expect(current_user.member_of?(current_organization, no_superuser_override: true)).to be_falsey
@@ -59,6 +59,15 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
         expect(response).to render_template(:show)
         expect(assigns(:model_attestations).pluck(:id)).to eq([model_attestation.id])
         # It renders with a model attestation too
+      end
+      context "without attestations" do
+        let!(:model_attestation) { nil }
+        it "renders the empty state" do
+          get "#{base_url}/#{model_audit.id}"
+          expect(response.code).to eq("200")
+          expect(assigns(:model_attestations)).to be_empty
+          expect(response.body).to include("No Attestations")
+        end
       end
     end
 

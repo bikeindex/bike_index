@@ -1,0 +1,244 @@
+#!/usr/bin/env ruby
+
+# binx_hb — Honeybadger v2 REST reads (read-only). Run from the repo root.
+#
+# Exists so fetching a fault is one literal command: an inline curl carrying
+# $HONEYBADGER_PERSONAL_AUTH_TOKEN is shell expansion, which the Claude Code
+# permission matcher always rejects. It also keeps payloads small — the
+# Honeybadger MCP returns whole notice objects, roughly half of them waste
+# (`backtrace` and `application_trace` come back byte-identical). This lands the
+# raw JSON in tmp/ and prints a projection, so follow-ups are a local jq.
+#
+# Needs HONEYBADGER_PERSONAL_AUTH_TOKEN in .env.development (see .env).
+#
+# Stdlib only, and kept parseable by system ruby 2.6 like the rest of bin/ that
+# doesn't boot Rails: Claude Code's shell doesn't always have the mise shim on
+# PATH, and a syntax error there reads as a broken script rather than the PATH
+# problem it is. So no endless defs and no 3.x-only methods.
+
+require "json"
+require "net/http"
+require "optparse"
+
+PROJECTS = {"backend" => 35931, "frontend" => 61305, "csp" => 138070}.freeze
+LOOKBACK_UNITS = {"H" => 3600, "h" => 3600, "M" => 60, "d" => 86400}.freeze
+ENV_FILE = ".env.development"
+PARAMS_LIMIT = 500
+ISO8601 = "%Y-%m-%dT%H:%M:%SZ"
+
+options = {all_frames: false, limit: 1}
+
+parser = OptionParser.new do |opts|
+  opts.banner = <<~BANNER
+    Usage: binx_hb MODE TARGET [WINDOW] [options]
+
+    Read Honeybadger without pulling whole notices into context.
+
+      MODE    fault | notice | faults | trend | counts
+      TARGET  a fault URL, PROJECT/FAULT_ID, or - for the project modes - a project alias
+      PROJECT backend | frontend | csp, or a numeric project id
+      WINDOW  faults/counts/trend only: lookback like 30M, 24H, 7d
+              (defaults: 24H, or 14d for `trend`)
+
+    Examples:
+      binx_hb fault https://app.honeybadger.io/projects/35931/faults/133010748
+      binx_hb notice backend/133010748
+      binx_hb notice backend/133010748 --all-frames
+      binx_hb faults frontend 7d
+      binx_hb trend csp 14d
+      binx_hb counts csp
+
+  BANNER
+
+  opts.on("--all-frames", "notice: include gem frames, not just app frames") { options[:all_frames] = true }
+  opts.on("--limit N", Integer, "notice: fetch N notices (default 1)") { |count| options[:limit] = count }
+  opts.on("-h", "--help") {
+    puts opts
+    exit
+  }
+end
+
+begin
+  parser.parse!
+rescue OptionParser::ParseError => e
+  abort "Error: #{e.message}\n\n#{parser}"
+end
+
+abort "Error: expected MODE and TARGET\n\n#{parser}" unless (2..3).cover?(ARGV.length)
+mode, target, window = ARGV
+
+def read_token
+  abort "Error: #{ENV_FILE} not found - run from the repo root" unless File.exist?(ENV_FILE)
+  line = File.foreach(ENV_FILE).find { |text| text.start_with?("HONEYBADGER_PERSONAL_AUTH_TOKEN=") }
+  # Blank as well as absent: .env ships the key with no value, so a copied
+  # template reads as unset here rather than coming back 401 from the API.
+  token = line.to_s.split("=", 2)[1].to_s.strip.gsub(/\A["']|["']\z/, "")
+  abort "Error: set HONEYBADGER_PERSONAL_AUTH_TOKEN in #{ENV_FILE} - get one at honeybadger.io/users/edit" if token.empty?
+  token
+end
+
+# Accepts a fault URL, PROJECT/FAULT_ID, or a bare project alias. Pulling both
+# ids out of a pasted URL is the common case when fixing a reported bug.
+def parse_target(target)
+  case target
+  when %r{\Ahttps?://} then [target[%r{/projects/(\d+)}, 1], target[%r{/faults/(\d+)}, 1]]
+  when %r{/} then target.split("/", 2)
+  else [target, nil]
+  end
+end
+
+# Named back as well as resolved, so a pasted numeric URL still says which
+# project it hit.
+def resolve_project(raw)
+  id = PROJECTS[raw] || raw.to_i
+  abort "Error: could not resolve a project from '#{raw}'" unless id.positive?
+  [id, PROJECTS.key(id) || "unknown"]
+end
+
+def lookback_seconds(window)
+  match = window.match(/\A(\d+)([HhMd])\z/)
+  abort "Error: bad window '#{window}' - use forms like 24H, 30M, 7d" if match.nil?
+  match[1].to_i * LOOKBACK_UNITS.fetch(match[2])
+end
+
+def window_start(window, default)
+  Time.now.utc - lookback_seconds(window || default)
+end
+
+def get(path, token)
+  uri = URI("https://app.honeybadger.io/v2#{path}")
+  request = Net::HTTP::Get.new(uri)
+  request.basic_auth(token, "")
+  response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(request) }
+
+  case response
+  when Net::HTTPOK then response.body
+  when Net::HTTPUnauthorized then abort "Error: 401 - HONEYBADGER_PERSONAL_AUTH_TOKEN rejected"
+  when Net::HTTPNotFound then abort "Error: 404 - no such project/fault (#{uri})"
+  else abort "Error: HTTP #{response.code} from #{uri}"
+  end
+end
+
+# Landing the body keeps a follow-up question a local jq rather than a refetch.
+def save(body, filename)
+  Dir.mkdir("tmp") unless Dir.exist?("tmp")
+  File.join("tmp", filename).tap { |path| File.write(path, body) }
+end
+
+def labelled(label, value, width)
+  format("%-#{width}s%s", "#{label}:", value)
+end
+
+# A Sidekiq notice puts the whole job hash in request.params, including an
+# error_backtrace of every gem frame - thousands of tokens the app-frame listing
+# already covers. Drop it, then cap whatever is left.
+def params_summary(notice)
+  params = notice.dig("request", "params") || {}
+  job = params["job"]
+  # Hash#except is ruby 3.0+, which the 2.6 note at the top rules out.
+  # standard:disable Style/HashExcept
+  compact = job.is_a?(Hash) ? params.merge("job" => job.reject { |key, _| key == "error_backtrace" }) : params
+  # standard:enable Style/HashExcept
+  json = JSON.generate(compact)
+  (json.length > PARAMS_LIMIT) ? "#{json[0, PARAMS_LIMIT]} …truncated, full JSON in the raw file" : json
+end
+
+def print_notice(notice, all_frames)
+  puts labelled("message", notice["message"] || "-", 12)
+  puts labelled("created", notice["created_at"], 12)
+  puts labelled("url", notice.dig("request", "url") || "-", 12)
+  puts labelled("referer", notice.dig("web_environment", "HTTP_REFERER") || "-", 12)
+  puts labelled("user_agent", notice.dig("web_environment", "HTTP_USER_AGENT") || "-", 12)
+  puts labelled("params", params_summary(notice), 12)
+  puts labelled("deploy", "#{notice.dig("deploy", "revision") || "-"} at #{notice.dig("deploy", "created_at") || "-"}", 12)
+
+  puts(all_frames ? "--- backtrace (all frames)" : "--- backtrace (app frames; --all-frames for the rest)")
+  frames = notice["backtrace"].select { |frame| all_frames || frame["context"] == "app" }
+  frames.each { |frame| puts "  #{frame["file"]}:#{frame["number"]}  #{frame["method"]}" }
+  puts
+end
+
+def fault_state(record)
+  "#{record["resolved"] ? "resolved" : "open"}, #{record["ignored"] ? "ignored" : "not ignored"}"
+end
+
+def print_summary(label, summary)
+  puts "--- #{label}"
+  puts "  total: #{summary["total"]}"
+  summary["environments"].each do |row|
+    puts "  #{row["environment"]} (#{fault_state(row)}): #{row["count"]}"
+  end
+end
+
+def print_fault(fault)
+  puts labelled("class", fault["klass"], 13)
+  puts labelled("message", fault["message"], 13)
+  puts labelled("component", "#{fault["component"] || "-"}##{fault["action"] || "-"}", 13)
+  puts labelled("created", fault["created_at"], 13)
+  puts labelled("last_notice", fault["last_notice_at"], 13)
+  puts labelled("counts", "#{fault["notices_count_in_range"] || "-"} in range, #{fault["notices_count"]} lifetime", 13)
+  puts labelled("state", fault_state(fault), 13)
+  puts labelled("url", fault["url"], 13)
+end
+
+token = read_token
+raw_project, fault_id = parse_target(target)
+project_id, project_name = resolve_project(raw_project)
+
+case mode
+when "faults"
+  # occurred_after is Unix epoch seconds; an ISO8601 value is silently ignored,
+  # which returns faults last seen years ago with a null notices_count_in_range.
+  since = window_start(window, "24H")
+  body = get("/projects/#{project_id}/faults?limit=25&order=frequent&occurred_after=#{since.to_i}", token)
+  path = save(body, "hb-faults-#{project_id}.json")
+
+  puts "PROJECT #{project_name} (#{project_id})   since #{since.strftime(ISO8601)}"
+  puts %w[in_window lifetime class component state last_notice url].join("\t")
+  JSON.parse(body)["results"].each do |fault|
+    puts [fault["notices_count_in_range"], fault["notices_count"], fault["klass"], fault["component"] || "-",
+      fault["resolved"] ? "resolved" : "open", fault["last_notice_at"], fault["url"]].join("\t")
+  end
+  puts "raw: #{path}"
+when "counts"
+  # One systemic problem mints a fault per distinct message, so a long tail of
+  # them crosses no per-fault threshold and never reaches the 25-row `faults`
+  # listing. Reconcile against it.
+  since = window_start(window, "24H")
+  created = JSON.parse(get("/projects/#{project_id}/faults/summary?created_after=#{since.to_i}", token))
+  occurred = JSON.parse(get("/projects/#{project_id}/faults/summary?occurred_after=#{since.to_i}", token))
+  path = save(JSON.generate({"created" => created, "occurred" => occurred}), "hb-counts-#{project_id}.json")
+
+  puts "PROJECT #{project_name} (#{project_id})   since #{since.strftime(ISO8601)}"
+  print_summary("faults created in window", created)
+  print_summary("faults firing in window", occurred)
+  puts "raw: #{path}"
+when "trend"
+  stop = Time.now.utc
+  start = window_start(window, "14d")
+  query = "start=#{start.strftime(ISO8601)}&stop=#{stop.strftime(ISO8601)}"
+  body = get("/projects/#{project_id}/reports/notices_per_day?#{query}", token)
+  path = save(body, "hb-trend-#{project_id}.json")
+
+  puts "PROJECT #{project_name} (#{project_id})   #{start.strftime("%Y-%m-%d")} -> #{stop.strftime("%Y-%m-%d")}"
+  JSON.parse(body).each { |day, count| puts [day[0, 10], count].join("\t") }
+  puts "raw: #{path}"
+when "fault"
+  abort "Error: #{mode} needs a fault id or URL\n\n#{parser}" if fault_id.nil?
+  body = get("/projects/#{project_id}/faults/#{fault_id}", token)
+  path = save(body, "hb-fault-#{fault_id}.json")
+
+  puts "PROJECT #{project_name} (#{project_id})"
+  print_fault(JSON.parse(body))
+  puts "raw: #{path}"
+when "notice"
+  abort "Error: #{mode} needs a fault id or URL\n\n#{parser}" if fault_id.nil?
+  body = get("/projects/#{project_id}/faults/#{fault_id}/notices?limit=#{options[:limit]}", token)
+  path = save(body, "hb-notice-#{fault_id}.json")
+
+  puts "PROJECT #{project_name} (#{project_id})"
+  JSON.parse(body)["results"].each { |notice| print_notice(notice, options[:all_frames]) }
+  puts "raw: #{path}"
+else
+  abort "Error: unknown mode '#{mode}'\n\n#{parser}"
+end

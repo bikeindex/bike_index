@@ -1,0 +1,21 @@
+<%# The same body twice - the modal on arrival, the banner for once it's dismissed %>
+
+<% body = capture do %>
+  <p class="tw:mb-3"><%= @intro %></p>
+
+  <%= content %>
+
+  <p class="tw:mb-0">
+    <em class="twless-strong"><%= @footer %></em>
+  </p>
+<% end %>
+
+<%= render UI::Alerts::Base::Component.new(header: @title) do %>
+  <%= body %>
+<% end %>
+
+<%= render UI::Modal::Component.new(id: @id, title: @title, open: true) do |modal| %>
+  <% modal.with_body do %>
+    <%= body %>
+  <% end %>
+<% end %>

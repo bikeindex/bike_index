@@ -2,7 +2,7 @@ class OrganizationNameValidator < ActiveModel::Validator
   # These were pulled from the top level of routes
   INVALID_NAMES = %w[400 401 404 422 500 about accept_terms accept_vendor_terms admin ambassadors ambassadors_current
     ambassadors_how_to api ascend auth bike_creation_graph bike_shop_packages bike_stickers bikes
-    blogs campus_packages choose_registration cities_packages dev_and_design discourse_authentication
+    blogs choose_registration dev_and_design discourse_authentication
     discuss documentation edit_my_account feedbacks for_bike_shops for_cities for_community_groups
     for_law_enforcement for_schools goodbye help how_not_to_buy_stolen ikes image_resources info
     integrations lightspeed lightspeed_interface locks logout manufacturers manufacturers_tsv
@@ -20,12 +20,14 @@ class OrganizationNameValidator < ActiveModel::Validator
     return false if INVALID_NAMES.include?(slugged.delete_suffix("s"))
     # If you add an s and it's an invalid name, reject it too
     return false if INVALID_NAMES.include?("#{slugged}s")
+
     true
   end
 
   def validate(record)
     # There's gotta be a way to put these attrs together, but too lazy to figure it out right now
     return true if [record[:name], record[:short_name], record[:slug]].all? { |str| self.class.valid?(str) }
+
     record.errors.add(:base, "Invalid name")
   end
 end

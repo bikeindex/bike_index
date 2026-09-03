@@ -1,0 +1,141 @@
+name: iOS E2E CI
+
+permissions:
+  contents: read
+
+# Runs the iOS suite against the persistent sandbox server
+# (sandbox.review.bikeindex.org) rather than a Rails dev server booted on the
+# runner. Sandbox tracks main, and its deploy job (see sandbox.yml) dispatches
+# this once the deploy finishes. A workflow_run trigger can't be used: CI starts
+# the sandbox deploy with GITHUB_TOKEN, and runs started by GITHUB_TOKEN don't
+# emit the downstream events (like workflow_run) that would fire this. Also
+# dispatchable manually (against whatever sandbox currently serves).
+#
+# status_sha (passed by sandbox.yml) is the bike_index commit under test.
+# report-pending publishes a pending "iOS E2E CI" commit status as soon as the
+# suite is dispatched, then report-result replaces it with success or failure once
+# the ~15-min suite finishes — so the check surfaces in the tested commit's list
+# for the whole run, not just on failure at the end. This is safe because Cloud 66
+# deploys from CI's own deploy_production job (needs: [test, lint_and_scan]), which
+# doesn't wait on commit statuses — a pending E2E status can't hold up the deploy.
+# Blank status_sha (manual runs) skips reporting.
+on:
+  workflow_dispatch:
+    inputs:
+      status_sha:
+        description: "bike_index commit SHA to report an 'iOS E2E CI' failure status against (blank to skip)"
+        required: false
+        default: ""
+
+jobs:
+  # Publish a pending "iOS E2E CI" commit status the moment the suite is
+  # dispatched, so the check appears in the tested commit's list while the
+  # ~15-min suite runs (report-result finalizes it). Skipped for manual runs.
+  report-pending:
+    name: Report iOS E2E pending
+    if: ${{ inputs.status_sha != '' }}
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      STATUS_SHA: ${{ inputs.status_sha }}
+    steps:
+      - name: Publish pending commit status
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$STATUS_SHA" \
+            -f state=pending \
+            -f context="iOS E2E CI" \
+            -f description="iOS E2E running" \
+            -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+
+  test-suite:
+    name: "${{ matrix.device }} ${{ matrix.only-testing }}"
+    runs-on: macos-26
+    strategy:
+      max-parallel: 1
+      matrix:
+        device: ["iPhone 17"] # "iPhone 17 Pro", "iPad (A16)"
+        only-testing: ["UnitTests"] # "UITests" (failing, temporarily disabled)
+
+    steps:
+      - name: Checkout bike_index_ios
+        uses: actions/checkout@v7
+        with:
+          repository: bikeindex/bike_index_ios
+          ref: main
+
+      - name: Set Xcode 26.4
+        run: sudo xcode-select -s /Applications/Xcode_26.4.app
+
+      - name: Install tools
+        run: brew bundle install
+
+      - name: Set up xcconfig (see README.md#quick-start)
+        env:
+          HONEYBADGER_API_KEY: ${{ secrets.IOS__HONEYBADGER_API_KEY }}
+          DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
+        run: |
+          echo '#include "Default"' >> BikeIndex-development.xcconfig
+          # Point at sandbox instead of Default.xcconfig's localhost:3042. The
+          # seeded iOS OAuth app (bike_index db/seeds/seed_oauth_app.rb) is
+          # is_internal, so its client_id/secret authorize without a consent step
+          # on any seeded server. Slashes are \/-escaped as Default.xcconfig does.
+          api_client_id=$(grep '^API_CLIENT_ID' Default.xcconfig | sed 's/API_CLIENT_ID = //' | xargs)
+          api_secret=$(grep '^API_SECRET' Default.xcconfig | sed 's/API_SECRET = //' | xargs)
+          echo 'API_HOST = https:\/\/sandbox.review.bikeindex.org' >> BikeIndex-development.xcconfig
+          echo 'API_PORT = 443' >> BikeIndex-development.xcconfig
+          echo "API_CLIENT_ID = ${api_client_id}" >> BikeIndex-development.xcconfig
+          echo "API_SECRET = ${api_secret}" >> BikeIndex-development.xcconfig
+          echo "DEVELOPMENT_TEAM = ${DEVELOPMENT_TEAM}" >> BikeIndex-development.xcconfig
+          echo "HONEYBADGER_API_KEY = ${HONEYBADGER_API_KEY}" >> BikeIndex-development.xcconfig
+      - name: Set up xcconfig test credentials (hardcoded for CI, see db/seeds/seed_test_users.rb)
+        run: |
+          echo "TEST_USERNAME = user@bikeindex.org" >> Test-credentials.xcconfig
+          echo "TEST_PASSWORD = pleaseplease12" >> Test-credentials.xcconfig
+
+      - name: Validate xcconfigs
+        run: ./scripts/validate-xcconfig.sh development && ./scripts/validate-xcconfig.sh test
+
+      - name: List available simulators
+        run: xcodebuild -scheme BikeIndex -project BikeIndex.xcodeproj -showdestinations
+
+      - name: Build
+        run: fastlane scan --build_for_testing=true
+
+      - name: "${{ matrix.only-testing }} on ${{ matrix.device }}"
+        run: fastlane scan --only-testing="${{ matrix.only-testing }}" --device="${{ matrix.device }}" \
+          --test_without_building=true
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: "test_output_${{ matrix.device }}_${{ matrix.only-testing }}"
+          path: "fastlane/test_output/*"
+          compression-level: 9 # maximum compression
+
+  # Once the suite completes, replace the pending status with the final
+  # "iOS E2E CI" result (success or failure) on the tested commit. Runs only
+  # after Cloud 66's post-CI redeploy, so it never touches the deploy path.
+  # Skipped for manual runs.
+  report-result:
+    name: Report iOS E2E result
+    needs: test-suite
+    if: ${{ always() && inputs.status_sha != '' }}
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      STATUS_SHA: ${{ inputs.status_sha }}
+      RESULT: ${{ needs.test-suite.result }}
+    steps:
+      - name: Publish final commit status
+        run: |
+          state=failure
+          [ "$RESULT" = "success" ] && state=success
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$STATUS_SHA" \
+            -f state="$state" \
+            -f context="iOS E2E CI" \
+            -f description="iOS E2E $RESULT" \
+            -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"

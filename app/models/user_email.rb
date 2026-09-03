@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: user_emails
+# Database name: primary
 #
 #  id                 :integer          not null, primary key
 #  confirmation_token :text
@@ -13,22 +14,26 @@
 #
 # Indexes
 #
-#  index_user_emails_on_user_id  (user_id)
+#  index_user_emails_on_email_confirmed  (email) WHERE (confirmation_token IS NULL)
+#  index_user_emails_on_user_id          (user_id)
 #
 class UserEmail < ActiveRecord::Base
   belongs_to :user, touch: true
   belongs_to :old_user, class_name: "User", touch: true
+  has_many :notifications, as: :notifiable
+
   validates_presence_of :user_id, :email
+
+  before_validation :normalize_email
 
   scope :confirmed, -> { where("confirmation_token IS NULL") }
   scope :unconfirmed, -> { where("confirmation_token IS NOT NULL") }
   scope :last_email_errored, -> { where(last_email_errored: true) }
 
-  before_validation :normalize_email
-
   class << self
     def create_confirmed_primary_email(user)
       return false unless user.confirmed
+
       where(user_id: user.id, email: user.email).first_or_create
     end
 
@@ -36,6 +41,7 @@ class UserEmail < ActiveRecord::Base
       email_list.to_s.split(",").reject(&:blank?).each do |str|
         email = EmailNormalizer.normalize(str)
         next if where(user_id: user_id, email: email).present?
+
         ue = new(user_id: user_id, email: email)
         ue.generate_confirmation
         ue.save
@@ -45,6 +51,7 @@ class UserEmail < ActiveRecord::Base
 
     def friendly_find(str)
       return nil if str.blank?
+
       find_by_email(EmailNormalizer.normalize(str))
     end
 
@@ -87,6 +94,7 @@ class UserEmail < ActiveRecord::Base
 
   def make_primary
     return false unless confirmed? && !primary?
+
     if user.user_emails.where(email: user.email).present?
       # Ensure we aren't somehow deleting an email
       # because it doesn't have a user_email associated with it
@@ -96,13 +104,14 @@ class UserEmail < ActiveRecord::Base
 
   def confirm(token)
     return false if token != confirmation_token
+
     update_attribute :confirmation_token, nil
-    MergeAdditionalEmailJob.perform_async(id)
+    UserJobs::MergeAdditionalEmailJob.perform_async(id)
     true
   end
 
   def send_confirmation_email
-    AdditionalEmailConfirmationJob.perform_async(id) unless confirmed?
+    Email::AdditionalEmailConfirmationJob.perform_async(id) unless confirmed?
   end
 
   def generate_confirmation

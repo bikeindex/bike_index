@@ -1,6 +1,7 @@
 # == Schema Information
 #
 # Table name: stolen_records
+# Database name: primary
 #
 #  id                             :integer          not null, primary key
 #  approved                       :boolean          default(FALSE), not null
@@ -24,6 +25,7 @@
 #  phone_for_users                :boolean          default(TRUE)
 #  police_report_department       :string(255)
 #  police_report_number           :string(255)
+#  postal_code                    :string(255)
 #  proof_of_ownership             :boolean
 #  receive_notifications          :boolean          default(TRUE)
 #  recovered_at                   :datetime
@@ -33,11 +35,11 @@
 #  recovery_posted                :boolean          default(FALSE)
 #  recovery_share                 :text
 #  recovery_tweet                 :text
+#  region_string                  :string
 #  secondary_phone                :string(255)
 #  street                         :string(255)
 #  theft_description              :text
 #  tsved_at                       :datetime
-#  zipcode                        :string(255)
 #  created_at                     :datetime         not null
 #  updated_at                     :datetime         not null
 #  bike_id                        :integer
@@ -45,18 +47,18 @@
 #  creation_organization_id       :integer
 #  organization_stolen_message_id :bigint
 #  recovering_user_id             :integer
-#  state_id                       :integer
+#  region_record_id               :integer
 #
 # Indexes
 #
-#  index_stolen_records_on_bike_id                         (bike_id)
-#  index_stolen_records_on_latitude_and_longitude          (latitude,longitude)
-#  index_stolen_records_on_organization_stolen_message_id  (organization_stolen_message_id)
-#  index_stolen_records_on_recovering_user_id              (recovering_user_id)
+#  index_stolen_records_on_bike_id                 (bike_id)
+#  index_stolen_records_on_latitude_and_longitude  (latitude,longitude)
 #
 class StolenRecord < ApplicationRecord
   include ActiveModel::Dirty
+  include AddressRecordedWithinBoundingBox
   include Geocodeable
+  include DefaultCurrencyable
 
   RECOVERY_DISPLAY_STATUS_ENUM = {
     not_eligible: 0,
@@ -86,13 +88,15 @@ class StolenRecord < ApplicationRecord
     "Bike was not locked"
   ].freeze
 
+  enum :recovery_display_status, RECOVERY_DISPLAY_STATUS_ENUM
+
   belongs_to :bike
   belongs_to :creation_organization, class_name: "Organization"
   belongs_to :recovering_user, class_name: "User"
   belongs_to :organization_stolen_message
 
   has_many :impound_claims
-  has_many :tweets
+  has_many :social_posts
   has_many :theft_alerts
   has_many :notifications, as: :notifiable
   has_many :theft_surveys, -> { theft_survey }, as: :notifiable, class_name: "Notification"
@@ -100,11 +104,16 @@ class StolenRecord < ApplicationRecord
   has_one :recovery_display
   has_one :current_bike, class_name: "Bike", foreign_key: :current_stolen_record_id
 
+  has_one_attached :image_four_by_five, dependent: false
+  has_one_attached :image_square, dependent: false
+  has_one_attached :image_opengraph, dependent: false
+
   validates_presence_of :date_stolen
 
-  enum :recovery_display_status, RECOVERY_DISPLAY_STATUS_ENUM
+  attr_accessor :timezone, :skip_update, :skip_geocoding # timezone provides a backup and permits assignment
 
   before_save :set_calculated_attributes
+  after_validation :bike_index_geocode, if: :should_be_geocoded?
   after_commit :update_associations
 
   default_scope { current }
@@ -119,21 +128,25 @@ class StolenRecord < ApplicationRecord
 
   scope :recovered, -> { unscoped.where(current: false) }
   scope :recovered_ordered, -> { recovered.order("recovered_at desc") }
-  scope :with_theft_alerts, -> { includes(:theft_alerts).where.not(theft_alerts: {id: nil}) }
+  scope :with_theft_alerts, -> { includes(:theft_alerts).where.not(theft_alerts: {id: nil}).distinct(true) }
+  scope :with_theft_alerts_paid_or_admin, -> { joins(:theft_alerts).merge(TheftAlert.paid_or_admin).distinct(true) }
   scope :can_share_recovery, -> { recovered_ordered.where(can_share_recovery: true) }
   scope :with_recovery_display, -> { joins(:recovery_display).where.not(recovery_displays: {id: nil}) }
   scope :without_recovery_display, -> { left_joins(:recovery_display).where(recovery_displays: {id: nil}) }
-  scope :without_location, -> { without_street } # References geocodeable without_street, we need to reconcile this
-
-  attr_accessor :timezone, :skip_update # timezone provides a backup and permits assignment
+  scope :without_street, -> { where(street: ["", nil]) }
 
   class << self
+    def permitted_visible_attribute(string_or_sym = nil, default: nil)
+      AddressRecord.permitted_visible_attribute(string_or_sym, default:)
+    end
+
     def recovery_display_statuses
       RECOVERY_DISPLAY_STATUS_ENUM.keys.map(&:to_s)
     end
 
     def find_matching_token(bike_id:, recovery_link_token:)
       return nil unless bike_id.present? && recovery_link_token.present?
+
       unscoped.where(bike_id: bike_id, recovery_link_token: recovery_link_token).first
     end
 
@@ -172,8 +185,9 @@ class StolenRecord < ApplicationRecord
       end
     end
 
+    # TODO: This should probably be handled on the frontend - so users can set weird values if they really want to
     def corrected_date_stolen(date = nil)
-      date = TimeParser.parse(date) || Time.current
+      date = Binxtils::TimeParser.parse(date) || Time.current
       year = date.year
       if year < (Time.current - 100.years).year
         decade = year.to_s[-2..].chars.join("")
@@ -181,32 +195,50 @@ class StolenRecord < ApplicationRecord
         date = corrected
       end
       if date > Time.current + 2.days
-        corrected = date.change(year: Time.current.year - 1)
+        updated_year = (date.month < Time.current.month) ? Time.current.year : Time.current.year - 1
+        corrected = date.change(year: updated_year)
         date = corrected
       end
       date
     end
   end
 
-  # override to enable reverse geocoding if applicable
-  def should_be_geocoded?
-    !skip_geocoding?
+  # ImageServices::StolenProcessor marks the blob removed when the image it rendered from is gone
+  def images_attached?
+    image_four_by_five&.attached? && alert_blob_data("removed") != true
   end
+
+  def images_attached_id
+    alert_blob_data("image_id")
+  end
+
+  def should_be_geocoded? = skip_geocoding.blank?
+
+  def street_2 = nil
+
+  def publicly_visible_attribute = :postal_code
+  def show_address = false
+
+  def latitude_public = latitude&.round(Bike::PUBLIC_COORD_LENGTH)
+
+  def longitude_public = longitude&.round(Bike::PUBLIC_COORD_LENGTH)
 
   # Override to add reverse geocoding functionality
   def bike_index_geocode
     if address_changed?
       self.attributes = if address_present?
-        GeocodeHelper.coordinates_for(address)
+        GeocodeHelper.coordinates_for(formatted_address_string(render_country: true))
       else
         {latitude: nil, longitude: nil}
       end
     end
     # Try to fill in missing attributes by reverse geocoding
     return if latitude.blank? || longitude.blank? || all_location_attributes_present?
-    geohelper_attrs = GeocodeHelper.assignable_address_hash_for(latitude: latitude, longitude: longitude)
+
+    geohelper_attrs = GeocodeHelper.assignable_address_hash_for(latitude:, longitude:, new_attrs: true)
     attrs_to_assign = geohelper_attrs.keys.reject { |gattr| self[gattr].present? }
     self.attributes = geohelper_attrs.slice(*attrs_to_assign)
+    assign_region_record if region_string_changed?
   end
 
   def recovered?
@@ -229,35 +261,17 @@ class StolenRecord < ApplicationRecord
 
   # Only display if they have put in an address - so that we don't show on initial creation
   def display_checklist?
-    address.present?
+    address_present?
   end
 
-  # Overrides geocodeable without_location, we need more specificity
-  def without_location?
+  def without_street?
     street.blank?
-  end
-
-  # Used to be an attribute, removed in
-  def show_address
-    false
-  end
-
-  def address(force_show_address: false, country: [:iso, :optional])
-    Geocodeable.address(
-      self,
-      street: force_show_address || show_address,
-      country: country
-    ).presence
   end
 
   def set_calculated_attributes
     self.phone = Phonifyer.phonify(phone)
     self.secondary_phone = Phonifyer.phonify(secondary_phone)
     self.date_stolen = self.class.corrected_date_stolen(date_stolen)
-    self.street = nil unless street.present? # Make it easier to find blank addresses
-    if city.present?
-      self.city = city.gsub("USA", "").gsub(/,?(,|\s)[A-Z]+\s?++\z/, "").strip.titleize
-    end
     update_tsved_at
     @alert_location_changed = city_changed? || country_id_changed? # Set ivar so it persists to after_commit
     self.current = false if recovered_at.present? # Make sure we set current to false if recovered
@@ -272,6 +286,7 @@ class StolenRecord < ApplicationRecord
 
   def tsv_col(i)
     return "" unless i.present?
+
     i.gsub(/\\?(\t|\\t)+/i, " ").gsub(/\\?(\r|\\r)+/i, " ")
       .gsub(/\\?(\n|\\n)+/i, " ").gsub(/\\?\\?('|")+/, " ")
   end
@@ -279,9 +294,10 @@ class StolenRecord < ApplicationRecord
   def tsv_row(with_article = true, with_stolen_locations: false)
     b = bike
     return "" unless b.present?
+
     row = ""
     if with_stolen_locations
-      row << "#{tsv_col(city)}\t#{tsv_col(state && state.abbreviation)}\t"
+      row << "#{tsv_col(city)}\t#{tsv_col(region)}\t"
     end
     row << tsv_col(b.mnfg_name)
     row << "\t"
@@ -292,7 +308,7 @@ class StolenRecord < ApplicationRecord
     row << tsv_col(b.frame_colors.to_sentence)
     row << tsv_col(b.description)
     row << " #{tsv_col(theft_description)}"
-    row << " Stolen from: #{tsv_col(address)}"
+    row << " Stolen from: #{tsv_col(formatted_address_string)}"
     row << "\t"
     row << "Article\t" if with_article
     row << date_stolen.strftime("%Y-%m-%d")
@@ -309,6 +325,7 @@ class StolenRecord < ApplicationRecord
     return "not_eligible" unless can_share_recovery
     return "not_displayed" if not_displayed?
     return "recovery_displayed" if recovery_display.present?
+
     if bike&.thumb_path&.present?
       "waiting_on_decision"
     else
@@ -318,14 +335,14 @@ class StolenRecord < ApplicationRecord
 
   def add_recovery_information(info = {})
     info = ActiveSupport::HashWithIndifferentAccess.new(info)
-    self.recovered_at = TimeParser.parse(info[:recovered_at], info[:timezone]) || Time.current
+    self.recovered_at = Binxtils::TimeParser.parse(info[:recovered_at], info[:timezone]) || Time.current
 
     update(
       current: false,
       recovered_description: info[:recovered_description],
       recovering_user_id: info[:recovering_user_id],
-      index_helped_recovery: InputNormalizer.boolean(info[:index_helped_recovery]),
-      can_share_recovery: InputNormalizer.boolean(info[:can_share_recovery])
+      index_helped_recovery: Binxtils::InputNormalizer.boolean(info[:index_helped_recovery]),
+      can_share_recovery: Binxtils::InputNormalizer.boolean(info[:can_share_recovery])
     )
     notify_of_promoted_alert_recovery
     true
@@ -348,82 +365,52 @@ class StolenRecord < ApplicationRecord
 
   # If there isn't any image and there is a theft alert, we want to tell the user to upload an image
   def theft_alert_missing_photo?
-    current_alert_image.blank? && theft_alerts.any?
+    missing_photo? && theft_alerts.any?
   end
 
   # The associated bike's first public image, if available. Else nil.
   def bike_main_image
-    bike&.public_images&.first
+    Bike.unscoped.find_by_id(bike_id)&.public_images&.first
+  end
+
+  def missing_photo?
+    !images_attached? && alert_image.blank?
   end
 
   def current_alert_image
-    return @current_alert_image if defined?(@current_alert_image)
-
-    @current_alert_image = if alert_image
-      alert_image
-    elsif ApplicationRecord.current_role != :reading
-      # Generate alert image, unless in read replica
-      generate_alert_image
-    else
-      enqueue_worker
-      nil
-    end
-  end
-
-  # Generate the "promoted alert image"
-  # (One of the stolen bike's public images, placed on a branded template)
-  #
-  # The URL is available immediately - processing is performed in the background.
-  # bike_image: [PublicImage]
-  def generate_alert_image(bike_image: bike_main_image)
-    alert_image&.destroy # Destroy before returning if the bike has no images - in case image was removed
-    return if bike_image&.image.blank? && bike&.stock_photo_url.blank?
-
-    new_image = AlertImage.new(stolen_record: self)
-
-    # Try to fallback to main image
-    bike_image = bike_main_image if bike_image&.image.blank?
-    if bike_image&.image.blank?
-      new_image.remote_image_url = bike.stock_photo_url
-    else
-      new_image.image = bike_image.image
-    end
-    new_image.save
-
-    if new_image.valid?
-      new_image
-    else
-      update(alert_image: nil) if alert_image.id.present?
-      nil
-    end
+    alert_image
   end
 
   def update_associations
     return true if skip_update
+
     # Bump bike only if it looks like this is bike's current_stolen_record
     if current || bike&.current_stolen_record_id == id
       bike&.update(manual_csr: true, current_stolen_record: (current ? self : nil))
     end
-    AfterStolenRecordSaveJob.perform_async(id, @alert_location_changed)
-    AfterUserChangeJob.perform_async(bike.user_id) if bike&.user_id.present?
+    enqueue_worker(@alert_location_changed)
+    CallbackJobs::AfterUserChangeJob.perform_async(bike.user_id) if bike&.user_id.present?
   end
 
   private
 
+  def alert_blob_data(key) = image_four_by_five&.blob&.binx_data&.dig(key)
+
   # The read replica can't make database changes, but can enqueue the worker - which will make the changes
-  def enqueue_worker
-    AfterStolenRecordSaveJob.perform_async(id)
+  def enqueue_worker(location_changed = false)
+    BikeJobs::AfterStolenRecordSaveJob.perform_async(id, location_changed)
   end
 
   def notify_of_promoted_alert_recovery
     return unless recovered? && theft_alerts.any?
 
-    EmailTheftAlertNotificationJob
+    Email::TheftAlertNotificationJob
       .perform_async(theft_alerts.last.id, "theft_alert_recovered")
   end
 
   def all_location_attributes_present?
-    return false if country_id.blank? || city.blank? || zipcode.blank?
-    (country_id == Country.united_states.id) ? state_id.present? : true
+    return false if country_id.blank? || city.blank? || postal_code.blank?
+
+    (country_id == Country.united_states_id) ? region_record_id.present? : true
   end
 end

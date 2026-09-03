@@ -1,5 +1,5 @@
 # simplecov must be required before anything else
-if ENV["COVERAGE"]
+if ENV["COVERAGE"] == "true"
   require "simplecov"
   require "simplecov_json_formatter"
   SimpleCov.start("rails") do
@@ -9,7 +9,6 @@ if ENV["COVERAGE"]
 
     add_group "Serializers", "app/serializers"
     add_group "Services", "app/services"
-    add_group "Uploaders", "app/uploaders"
   end
 
   Rails.application.eager_load! if defined?(Rails)
@@ -17,27 +16,21 @@ end
 
 # Assign here because only one .env file
 ENV["BASE_URL"] = "http://test.host"
+# Set before config/boot so bin/env picks the test Redis database
 ENV["RAILS_ENV"] ||= "test"
-ENV["SKIP_MEMOIZE_MANUFACTURER_OTHER"] = "true"
-
+ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"] = "true"
+ENV["RACK_ATTACK_MAX_LIMIT"] ||= "12"
+ENV["RACK_ATTACK_API_MAX_LIMIT"] ||= "15"
+# Production's hourly budget can't be driven to 429 under RACK_ATTACK_MAX_LIMIT above
+ENV["RACK_ATTACK_REGISTER_DIRECT_UPLOAD_LIMIT"] ||= "5"
 require "spec_helper"
+# Load functionable patch before Rails boot so all Functionable modules get permissive test hooks
+require File.expand_path("../../config/boot", __FILE__)
+require "functionable"
+require_relative "support/functionable"
 require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
-
-# Include capybara for view component system specs
-require "capybara/rails"
-require "capybara/rspec"
-Capybara.register_driver :chrome_headless do |app|
-  options = Selenium::WebDriver::Chrome::Options.new
-  options.add_argument("--headless")
-  options.add_argument("--window-size=1920,1080")
-  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
-end
-# Configure Capybara
-Capybara.configure do |config|
-  config.default_driver = :chrome_headless
-  config.javascript_driver = :chrome_headless
-end
+require "paper_trail/frameworks/rspec"
 
 require "view_component/test_helpers"
 require "view_component/system_test_helpers"
@@ -47,6 +40,13 @@ ActiveRecord::Migration.maintain_test_schema!
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
 Dir[Rails.root.join("spec", "support", "**", "*.rb")].sort.each { |f| require f }
+
+# If on GitHub actions, enable knapsack pro to optimize test splitting
+if ENV["GITHUB_ACTIONS"] == "true"
+  require "knapsack_pro"
+
+  KnapsackPro::Adapters::RSpecAdapter.bind
+end
 
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
@@ -60,6 +60,7 @@ RSpec.configure do |config|
   config.include ControllerSpecHelpers, type: :controller
   config.include JsonHelpers, type: :controller
   config.include JsonHelpers, type: :request
+  config.include HtmlContentHelpers, type: :request
   config.include StripeHelpers, type: :request
   config.include StripeHelpers, type: :controller
   config.include StripeHelpers, type: :service
@@ -71,7 +72,11 @@ RSpec.configure do |config|
   config.include ViewComponent::TestHelpers, type: :component
   config.include ViewComponent::SystemTestHelpers, type: :component
   config.include Capybara::RSpecMatchers, type: :component
-  config.before(:each, :js, type: :system) { driven_by(:selenium_chrome_headless) }
+  config.include HtmlContentHelpers, type: :component
+  # Whatever Capybara has settled on: the default :playwright, or the `driver:`
+  # metadata an example overrides it with. Without this, untagged `type: :system`
+  # specs fall back to Rails' default :selenium driver, which no longer loads.
+  config.before(:each, type: :system) { driven_by(Capybara.current_driver) }
 end
 
 require "vcr"
@@ -85,11 +90,18 @@ VCR.configure do |config|
     record: :new_episodes,
     match_requests_on: [:method, :host, :path]
   }
-  config.ignore_hosts("127.0.0.1", "0.0.0.0") # for capybara selenium
+  config.ignore_hosts("127.0.0.1", "0.0.0.0", "localhost") # for capybara's app server
 
-  %w[GOOGLE_GEOCODER MAILCHIMP_KEY FACEBOOK_AD_TOKEN CLOUDFLARE_TOKEN MAXMIND_KEY].each do |key|
+  %w[CLOUDFLARE_TOKEN EXCHANGE_RATE_API_KEY FACEBOOK_AD_TOKEN GOOGLE_GEOCODER MAILCHIMP_KEY
+    MAXMIND_KEY R2_TEST_ACCESS_KEY R2_TEST_ACCESS_KEY_SECRET R2_TEST_ENDPOINT SENDGRID_EMAIL_VALIDATION_KEY
+    LOGO_API_TOKEN STRAVA_KEY STRAVA_SECRET STRAVA_TEST_ACCESS_TOKEN
+    STRAVA_TEST_REFRESH_TOKEN].each do |key|
     config.filter_sensitive_data("<#{key}>") { ENV[key] }
   end
+
+  # aws-sdk addresses R2 virtual-host style (bucket.<account>.r2...), so the endpoint never appears
+  # verbatim - filtering the host keeps the account id out, and VCR swaps it back on playback
+  config.filter_sensitive_data("<R2_TEST_HOST>") { URI.parse(ENV["R2_TEST_ENDPOINT"]).host if ENV["R2_TEST_ENDPOINT"].present? }
 
   config.before_record do |i|
     i.response.headers.delete("Set-Cookie")
@@ -108,7 +120,10 @@ if ENV["RETRY_FLAKY"]
 
     config.around(:each) do |ex|
       if ex.metadata[:flaky]
-        ex.run_with_retry retry: 2
+        # `flaky: true` retries twice; `flaky: <n>` overrides for examples whose
+        # harness race (eg WebDriver back/forward) occasionally outlasts two tries.
+        retries = ex.metadata[:flaky].is_a?(Integer) ? ex.metadata[:flaky] : 2
+        ex.run_with_retry retry: retries
       else
         ex.run
       end
@@ -217,9 +232,45 @@ RSpec.configure do |config|
     FileUtils.rm_rf(ApplicationUploader.cache_dir)
     FileUtils.mkdir_p(ApplicationUploader.cache_dir)
   end
+
+  config.after(:suite) { FileUtils.rm_rf(ApplicationUploader.root) }
 end
 
 CarrierWave.configure do |config|
+  test_uploads = "test_uploads#{ENV["TEST_ENV_NUMBER"]}"
   config.cache_dir = Rails.root.join("tmp", "cache", "carrierwave#{ENV["TEST_ENV_NUMBER"]}")
+  # store_dir keys on the record id, and each parallel worker hands out the same ids from its
+  # own database — one shared root has a worker asserting against another's file, and leaves
+  # every run's files for the next one. The segment goes on asset_host rather than base_path,
+  # which CarrierWave only reads when asset_host is blank, so the url still resolves to the file.
+  config.root = Rails.root.join("public", test_uploads)
+  config.asset_host = "#{ENV["BASE_URL"]}/#{test_uploads}"
   config.enable_processing = false
+end
+
+# Override capybara methods to support tailwind selectors
+# Original methods defined in 'lib/capybara/rspec/matchers.rb'
+#
+# This is necessary because colons need to be escaped for these matchers (i.e. tw\:p-6)
+#
+module Capybara
+  module RSpecMatchers
+    def have_selector(*args, **, &)
+      args = args.map { |a| a.is_a?(String) ? escape_colon_classes(a) : a }
+      Matchers::HaveSelector.new(*args, **, &)
+    end
+
+    def have_css(expr, **, &)
+      Matchers::HaveSelector.new(:css, escape_colon_classes(expr), **, &)
+    end
+
+    private
+
+    # Automatically escape colons in tailwind class selectors (e.g. .tw\:p-6)
+    # Only escapes colons that appear within class selectors, preserving
+    # pseudo-selectors like :hover, :focus, :disabled, :not(), etc.
+    def escape_colon_classes(expr)
+      expr.gsub(/(\.\w+):/) { "#{$1}\\:" }
+    end
+  end
 end

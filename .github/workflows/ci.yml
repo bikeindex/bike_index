@@ -1,0 +1,360 @@
+name: CI
+
+on:
+  push:
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+
+# Not on main: cancelling would kill deploy_production, or leave a deploy this run
+# dispatched still going with no CI behind it
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  # Dispatches review-app deploys from CI's single `on: push` run — a
+  # `pull_request: synchronize` trigger + label gate in review-app.yml would
+  # leave skipped check runs on every push to every unlabeled PR.
+  # GITHUB_TOKEN can't fire event-driven triggers, but explicit
+  # workflow_dispatch API calls are allowed (`actions: write` above).
+  dispatch:
+    name: "Dispatch - review app conditional triggering"
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      # retry: gh has no built-in retry, and a sporadic API failure shouldn't
+      # fail the job. Progress goes to stderr — stdout would be captured by
+      # the $(command substitution) below.
+      - name: Dispatch review-app deploy (labeled PRs only)
+        run: |
+          retry() { local n=1; until "$@"; do [ $n -ge 3 ] && return 1; echo "attempt $n failed; retrying in 15s..." >&2; n=$((n+1)); sleep 15; done; }
+          pr=$(retry gh pr list --repo "$GITHUB_REPOSITORY" --head "$GITHUB_REF_NAME" \
+            --state open --label review-app --json number --jq '.[0].number')
+          if [ -n "$pr" ]; then
+            echo "PR #$pr is open with the 'review-app' label -> dispatching review-app deploy"
+            retry gh workflow run review-app.yml --repo "$GITHUB_REPOSITORY" \
+              --ref "$GITHUB_REF_NAME" -f pr_number="$pr" -f action=deploy
+          else
+            echo "No open PR with the 'review-app' label for branch '$GITHUB_REF_NAME' -> NOT dispatching review-app deploy"
+          fi
+
+      # Sandbox tracks main: redeploy the persistent sandbox app on every push to
+      # main. Dispatched here (rather than via a workflow_run trigger in
+      # sandbox.yml) so both deploys fire from CI's single push run.
+      # NOTE: this runs in parallel with the `test` job, so sandbox does not wait
+      # for the test suite to pass.
+      - name: Dispatch sandbox deploy (main only)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          retry() { local n=1; until "$@"; do [ $n -ge 3 ] && return 1; echo "attempt $n failed; retrying in 15s..." >&2; n=$((n+1)); sleep 15; done; }
+          echo "Push to main -> dispatching sandbox deploy"
+          retry gh workflow run sandbox.yml --repo "$GITHUB_REPOSITORY" --ref main
+
+  lint_and_scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - run: bundle install
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          cache: 'npm'
+      - run: npm install
+
+      - name: Lint Ruby code with standard
+        run: bundle exec standardrb --no-fix
+      - name: Lint Ruby code with rubocops
+        run: bundle exec rubocop -c .rubocop_custom.yml
+      - name: Lint JavaScript code
+        if: success() || failure()
+        run: npm run js:lint_check
+      - name: Lint HTML code
+        if: success() || failure()
+        run: npm run html:lint_check
+      - name: Check HTML formatting
+        if: success() || failure()
+        run: npm run html:format_check
+
+      - name: Scan for common Rails security vulnerabilities using static analysis
+        if: success() || failure()
+        run: bin/brakeman
+
+      # Eventually this should be added:
+      # - name: Scan for security vulnerabilities in JavaScript dependencies
+      #   run: bin/importmap audit
+
+  # Builds (or reuses, via GHA layer cache) the tooling image the `test` job
+  # runs in — see .github/ci/Dockerfile for what it bakes in and why.
+  build_ci_image:
+    name: "Build CI image"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.image.outputs.image }}
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}-ci
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+      # Tag + build-args are both derived from the same tracked files, so a
+      # version bump always produces a new tag AND a matching rebuild —
+      # nothing to manually keep in sync. Compression isn't one of those files,
+      # so it leads the tag: changing it has to reach a tag that doesn't exist
+      # yet, or the already-exists skip below serves the old compression back.
+      - name: Resolve build args and image tag
+        id: image
+        run: |
+          compression=zstd
+          ruby_version=$(awk '$1=="ruby"{print $2}' .tool-versions)
+          node_version=$(awk '$1=="nodejs"{print $2}' .tool-versions)
+          tag=$compression-${{ hashFiles('.github/ci/Dockerfile', '.tool-versions', 'package.json', 'Gemfile.lock', 'package-lock.json') }}
+          echo "compression=$compression" >> "$GITHUB_OUTPUT"
+          echo "ruby_version=$ruby_version" >> "$GITHUB_OUTPUT"
+          echo "node_version=$node_version" >> "$GITHUB_OUTPUT"
+          echo "image=$REGISTRY/$IMAGE_NAME:$tag" >> "$GITHUB_OUTPUT"
+      - name: Log in to GHCR
+        uses: docker/login-action@v4.6.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      # The tag is a content hash (see above) — if it already exists in GHCR
+      # it's byte-identical to what we'd build, so skip buildx/build/push
+      # entirely instead of paying their setup cost for a guaranteed no-op.
+      - name: Check whether this image tag already exists
+        id: existing
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
+        run: |
+          if docker manifest inspect ${{ steps.image.outputs.image }} > /dev/null 2>&1; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Set up Docker Buildx
+        if: steps.existing.outputs.found != 'true'
+        uses: docker/setup-buildx-action@v4
+      - name: Build and push CI image
+        if: steps.existing.outputs.found != 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: .github/ci/Dockerfile
+          push: true
+          tags: ${{ steps.image.outputs.image }}
+          build-args: |
+            RUBY_VERSION=${{ steps.image.outputs.ruby_version }}
+            NODE_VERSION=${{ steps.image.outputs.node_version }}
+          # Every test shard pulls this image, and zstd unpacks faster than gzip.
+          # force-compression is what converts the ruby base's own layers, which
+          # arrive gzip and stay that way without it — measured at 77MB of 746MB
+          # still gzip. It costs ~200s per rebuild, re-compressing and re-pushing
+          # every layer rather than reusing blobs the registry already has, but a
+          # rebuild only follows a lockfile change while the pull is every run.
+          outputs: type=image,compression=${{ steps.image.outputs.compression }},force-compression=true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  test:
+    name: "Run tests"
+    needs: build_ci_image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # translations-sync push fallback (see below)
+      pull-requests: write # translations-sync PR fallback (see below)
+      packages: read # pull the CI image built by build_ci_image
+    container:
+      image: ${{ needs.build_ci_image.outputs.image }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+      # Postgres and redis are baked into the image and started in-job (below)
+      # rather than run as service containers, whose two registry pulls cost
+      # ~10s on every shard. tmpfs for the data directory is what the postgres
+      # service container used it for — RAM beats the overlay filesystem, and
+      # nothing here outlives the job.
+      options: --mount type=tmpfs,destination=/pgdata
+    strategy:
+      fail-fast: false
+      matrix:
+        ci_node_total: [6]
+        ci_node_index: [0, 1, 2, 3, 4, 5]
+    env:
+      REDIS_URL: redis://127.0.0.1:6379
+      PGHOST: 127.0.0.1
+      RAILS_ENV: test
+      TZ: "America/Chicago"
+      COVERAGE: false # additional configuration is needed for parallelized tests
+      CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
+      TRANSLATION_BRANCH: main
+      TRANSLATIONS_SYNC_APP_ID: ${{ secrets.TRANSLATIONS_SYNC_APP_ID }}
+      RETRY_FLAKY: true
+      # The runs repo secrets don't reach - named, so a credential missing anywhere else fails
+      CI_WITHOUT_SECRETS: ${{ github.actor == 'dependabot[bot]' || github.event.pull_request.head.repo.fork == true }}
+      # spec/integration/register_spec.rb PUTs to the bikeindex-test bucket for real; absent, it
+      # skips. The placeholders are only so the R2 cassettes still sign.
+      R2_TEST_ACCESS_KEY: ${{ secrets.R2_TEST_ACCESS_KEY || 'test' }}
+      R2_TEST_ACCESS_KEY_SECRET: ${{ secrets.R2_TEST_ACCESS_KEY_SECRET || 'test' }}
+      R2_TEST_ENDPOINT: ${{ secrets.R2_TEST_ENDPOINT || 'https://r2-test.example.com' }}
+      KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC: ${{ secrets.KNAPSACK_PRO_TEST_SUITE_TOKEN_RSPEC }}
+      KNAPSACK_PRO_CI_NODE_TOTAL: ${{ matrix.ci_node_total }}
+      KNAPSACK_PRO_CI_NODE_INDEX: ${{ matrix.ci_node_index }}
+      KNAPSACK_PRO_LOG_LEVEL: warn
+    steps:
+      # Nothing reads steps.cpu-info.outputs.cpu-cores yet — kept for when the
+      # shards run rspec multi-process.
+      # - name: Get CPU cores
+      #   id: cpu-info
+      #   run: echo "cpu-cores=$(nproc)" >> $GITHUB_OUTPUT
+      # Checkout persists this App token (below) as the git creds so the sync
+      # branch is pushed as the App — only a non-default-token push fires
+      # `on: push`, which is what attaches the required checks to the PR.
+      # Falls back to default creds until the App secrets exist.
+      - name: Mint translations-sync token
+        id: translations_token
+        if: matrix.ci_node_index == 1 && github.ref == 'refs/heads/main' && env.TRANSLATIONS_SYNC_APP_ID != ''
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.TRANSLATIONS_SYNC_APP_ID }}
+          private-key: ${{ secrets.TRANSLATIONS_SYNC_APP_PRIVATE_KEY }}
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          token: ${{ steps.translations_token.outputs.token || github.token }}
+      # Ruby, the gems and node_modules are all baked into the CI image
+      # (.github/ci/Dockerfile), whose tag hashes both lockfiles — so a checkout
+      # can't disagree with what's installed, and `check` says so in one line
+      # rather than failing obscurely part-way through a native compile the
+      # final image no longer carries a toolchain for.
+      - run: bundle check
+      # node_modules lives at / in the image, because the runner mounts this
+      # workspace over the checkout path at job time. `npx playwright` and
+      # spec/support/axe.rb both ask for it by relative path.
+      - name: Link node_modules into the workspace
+        run: ln -sfn /node_modules node_modules
+      # `rails` as the initdb superuser and trust auth together satisfy the
+      # username/password config/database.yml hardcodes under CI. fsync off
+      # because a database on tmpfs has nothing to flush to.
+      - name: Start postgres and redis
+        run: |
+          redis-server --daemonize yes --save '' --appendonly no
+          chown postgres:postgres /pgdata && chmod 700 /pgdata
+          # Spelled out rather than left to PATH: su resets it for the target user
+          pgbin=$(echo /usr/lib/postgresql/*/bin)
+          su postgres -c "$pgbin/initdb -D /pgdata --username=rails --auth-local=trust --auth-host=trust --encoding=UTF8 --locale=C.UTF-8 --no-sync"
+          su postgres -c "$pgbin/pg_ctl -D /pgdata -l /tmp/postgres.log -w -o '-c listen_addresses=127.0.0.1 -c fsync=off -c full_page_writes=off -c synchronous_commit=off' start"
+      - name: Set up database
+        run: bin/rails db:create db:schema:load:primary db:schema:load:analytics db:migrate
+      - name: Sync translations (only on main by default)
+        if: matrix.ci_node_index == 1
+        env:
+          GH_TOKEN: ${{ steps.translations_token.outputs.token || github.token }}
+        run: bin/check_translations ${{ secrets.TRANSLATION_IO_API_KEY }}
+      # Cache compiled assets + sprockets' incremental cache.
+      # Key hashes every input the three asset tools read:
+      #   - sprockets: app/assets/images, javascripts, config/manifest.js, Gemfile.lock (gem versions)
+      #   - dartsass-rails: app/assets/stylesheets, config/initializers/dartsass.rb
+      #   - tailwindcss-rails: app/assets/tailwind (theme + @source globs live here),
+      #     and everything tailwind scans (views/components/helpers/javascript)
+      # On a partial-key restore, sprockets' tmp/cache makes the rebuild near-instant
+      # for unchanged inputs, so the loose restore-keys fallback is worth keeping.
+      #
+      # Split into restore/save: all matrix jobs restore, but only ci_node_index == 0
+      # writes the cache. With the combined actions/cache@v4 action, parallel jobs race
+      # on reserveCache and *all* of them lose ("another job may be creating this cache"),
+      # so the cache never gets populated.
+      - name: Restore precompiled assets cache
+        id: assets-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            tmp/cache/assets
+            app/assets/builds
+            public/assets
+          key: ${{ runner.os }}-assets-${{ hashFiles('app/assets/**', 'app/views/**', 'app/components/**', 'app/helpers/**/*.rb', 'app/javascript/**', 'config/initializers/dartsass.rb', 'config/initializers/assets.rb', 'Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-assets-
+      - name: build assets
+        if: steps.assets-cache.outputs.cache-hit != 'true'
+        run: bin/rails assets:precompile --trace
+      - name: Save precompiled assets cache
+        if: matrix.ci_node_index == 0 && steps.assets-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: |
+            tmp/cache/assets
+            app/assets/builds
+            public/assets
+          key: ${{ steps.assets-cache.outputs.cache-primary-key }}
+      # Test bin/setup (verifies e.g. seeds work) - only run on 1 node, knapsack should balance
+      # Done after asset compilation and caching to save time on that
+      - name: Test bin/setup
+        if: matrix.ci_node_index == 0
+        run: bin/setup
+      # Run tests
+      - name: Run tests
+        env:
+          SKIP_CSS_BUILD: true
+        run: bin/knapsack_pro_tests
+      # Until parallel reporting is set up, skip sending code coverage reports
+      # - name: publish code coverage
+      #   uses: paambaati/codeclimate-action@v9.0.0
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-${{ env.KNAPSACK_PRO_CI_NODE_INDEX }}
+          # tmp/capybara holds the failure screenshots system specs write, which
+          # are usually the only evidence of what a flaky :js spec actually saw
+          path: |
+            tmp/rspec-${{ env.KNAPSACK_PRO_CI_NODE_INDEX }}.xml
+            tmp/capybara/
+
+  deploy_production:
+    name: "Deploy to production"
+    runs-on: ubuntu-latest
+    needs: [test, lint_and_scan]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to Cloud66 production
+        run: |
+          curl --insecure -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${{ secrets.CLOUD66_REDEPLOYMENT_KEY }}
+
+  # Commenting out for now - it doesn't work for forked pull requests,
+  # Which means forked PRs always fail
+  # Also - I want to fix the thousands separator
+  # github.com/EnricoMi/publish-unit-test-result-action/issues/698
+  #
+  # aggregate_test_results:
+  #   name: "Test Report"
+  #   runs-on: ubuntu-latest
+  #   needs: test
+  #   if: always()
+  #   steps:
+  #     - name: Download all test results
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         pattern: test-results-*
+  #         path: test-results
+
+  #     - name: Publish combined test results
+  #       id: test-results
+  #       uses: EnricoMi/publish-unit-test-result-action@v2
+  #       with:
+  #         files: test-results/**/*.xml
+  #         json_thousands_separator: "," # Can't get this to work :/
+  #         comment_mode: off

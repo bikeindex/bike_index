@@ -1,0 +1,67 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Before bin/env: it picks the Redis database off RAILS_ENV. Unset, that's a *dev*
+# database - one a running bin/dev is also draining.
+ENV["RAILS_ENV"] ||= "test"
+redis_url_set = ENV.key?("REDIS_URL")
+load File.expand_path("env", __dir__)
+# Every worker inherits whatever this process lands on, and bin/env assigns per
+# TEST_ENV_NUMBER, which doesn't exist until the workers do.
+ENV.delete("REDIS_URL") unless redis_url_set
+
+require "bundler/setup"
+
+# For some reason (I believe because of dartsass) assets get recompiled every time tests run
+# So handle asset compilation ourselves. JS counts too: test serves it from the
+# sprockets manifest, so a stale bundle silently tests deleted code.
+CSS_SOURCES = [
+  "app/assets/stylesheets/**/*.{scss,css}",
+  "app/assets/tailwind/**/*.css",
+  "config/initializers/dartsass.rb"
+].freeze
+
+# Every JS tree app/assets/config/manifest.js links, plus Gemfile.lock for lexxy,
+# which a gem ships.
+JS_SOURCES = [
+  "app/assets/javascripts/**/*",
+  "app/javascript/**/*",
+  "vendor/javascript/**/*",
+  "app/components/**/*.js",
+  "Gemfile.lock"
+].freeze
+
+# Separate cutoffs: different tools build them, and SKIP_CSS_BUILD leaves
+# builds/tailwind.css behind, so one shared cutoff would read as permanently stale.
+def stale?(sources, output_pattern)
+  outputs = app_glob(output_pattern)
+  return true if outputs.empty?
+
+  oldest_asset_time = outputs.map { |file| File.mtime(file) }.min
+  sources.any? do |pattern|
+    app_glob(pattern).any? { |file| File.file?(file) && File.mtime(file) > oldest_asset_time }
+  end
+end
+
+def app_glob(pattern)
+  Dir.glob(File.expand_path("../#{pattern}", __dir__))
+end
+
+def assets_need_compilation?
+  stale?(CSS_SOURCES, "app/assets/builds/*.css") ||
+    # Filename pinned by config/initializers/assets.rb
+    stale?(JS_SOURCES, "public/assets/.sprockets-manifest.json")
+end
+
+if assets_need_compilation?
+  puts "Compiling assets before tests..."
+  # Hide the output, dartsass vomits a bunch of warnings
+  system("RAILS_ENV=test bundle exec rails assets:precompile 2>/dev/null")
+end
+
+# Make sure precompilation is off, because it's just been handled
+ENV["RAILS_ASSETS_PRECOMPILE"] = "false"
+# dartsass-rails hooks into test:prepare, skip since assets are already compiled
+ENV["SKIP_CSS_BUILD"] = "true"
+
+exec "bundle", "exec", "turbo_tests", *ARGV

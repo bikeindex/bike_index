@@ -1,0 +1,194 @@
+name: Kamal build & deploy
+
+# Reusable (workflow_call) build+deploy for a Kamal target on the shared review
+# host. Owns the boilerplate both review apps and sandbox share: build+push the
+# image to GHCR, then run a kamal command over SSH. Callers pass the bits that
+# differ (image tag, service label, the kamal command, concurrency, environment).
+#
+# Callers: review-app.yml (per-PR deploy/destroy/reload_database) and sandbox.yml
+# (main deploy). The `run` job just runs whatever `command` it's given; callers
+# with nothing to build (a teardown, a database reload) pass `build: false`.
+
+on:
+  workflow_call:
+    inputs:
+      build:
+        description: Build and push the image before running the command
+        type: boolean
+        default: true
+      ref:
+        description: Git ref to check out for the build and the kamal command
+        required: true
+        type: string
+      command:
+        description: The kamal command to run on the host
+        required: true
+        type: string
+      image_tag:
+        description: GHCR image tag to build/push and deploy (deploy only)
+        type: string
+        default: ""
+      service_label:
+        description: kamal `service` label baked onto the image (deploy only)
+        type: string
+        default: ""
+      sprockets_cache_prefix:
+        description: actions/cache key prefix for the sprockets incremental cache
+        type: string
+        default: ""
+      pr_title:
+        description: Baked into the review-app banner via config/deploy.review.yml
+        type: string
+        default: ""
+      kamal_config:
+        description: KAMAL_CONFIG for the post-deploy hook (empty = review default)
+        type: string
+        default: ""
+      concurrency_prefix:
+        description: "Serializes runs; build uses <prefix>-build, run uses <prefix>"
+        required: true
+        type: string
+      environment_name:
+        description: GitHub Environment for the run job (secrets + deployment)
+        type: string
+        default: review-app
+      environment_url:
+        description: Deployment URL surfaced on the environment (empty on destroy)
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+  packages: write      # push to GHCR
+  deployments: write   # surface the deployment + URL
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # A superseded build is wasted work and safe to cancel — the kamal run below is
+  # the part that must never be killed.
+  build:
+    if: inputs.build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ inputs.concurrency_prefix }}-build
+      cancel-in-progress: true
+    steps:
+      - name: Checkout the ref
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v4
+      # Sprockets' incremental cache (the Dockerfile's `--mount=type=cache`) doesn't
+      # survive ephemeral runners; cache-dance injects it into the buildx builder and
+      # extracts it after. A per-caller key prefix — review-app and sandbox bundles
+      # bake different BASE_URLs into ERB assets, so their caches can't be shared.
+      - name: Restore sprockets asset cache
+        id: sprockets-cache
+        uses: actions/cache@v6
+        with:
+          path: sprockets-cache
+          key: ${{ inputs.sprockets_cache_prefix }}-${{ hashFiles('app/assets/**', 'app/views/**', 'app/components/**', 'app/helpers/**/*.rb', 'app/javascript/**', 'config/initializers/dartsass.rb', 'config/initializers/assets.rb', 'Gemfile.lock') }}
+          restore-keys: |
+            ${{ inputs.sprockets_cache_prefix }}-
+      - name: Inject sprockets cache into the docker build
+        uses: reproducible-containers/buildkit-cache-dance@v3
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          cache-map: |
+            {
+              "sprockets-cache": "/rails/tmp/cache/assets"
+            }
+          skip-extraction: ${{ steps.sprockets-cache.outputs.cache-hit }}
+      - name: Log in to GHCR
+        uses: docker/login-action@v4.6.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ inputs.image_tag }}
+          # kamal verifies the deployed image carries a `service` label matching the
+          # config. CI builds here and deploys with --skip-push, so set it explicitly.
+          labels: service=${{ inputs.service_label }}
+          # Layer cache in GHCR (`:buildcache`), shared across callers — not type=gha,
+          # which CI's asset/gem caches keep evicting from the 10GB quota.
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+
+  run:
+    needs: build
+    # Runs after a successful build, and on its own when there's nothing to build
+    # (leaving needs.build.result == 'skipped'). A build cancelled by a newer push
+    # leaves 'cancelled', so the stale deploy is skipped here too.
+    if: >-
+      !cancelled() &&
+      (!inputs.build || needs.build.result == 'success')
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ inputs.concurrency_prefix }}
+      cancel-in-progress: false
+    environment:
+      name: ${{ inputs.environment_name }}
+      url: ${{ inputs.environment_url }}
+    # These feed .kamal/secrets-ci via Dotenv variable substitution when kamal runs.
+    # The non-deploy commands need the same bundle even though they use little of
+    # it — avoids silent empty-string substitutions causing odd failures.
+    env:
+      IMAGE_TAG: ${{ inputs.image_tag }}
+      KAMAL_CONFIG: ${{ inputs.kamal_config }}
+      REVIEW_APP_HOST: ${{ vars.REVIEW_APP_HOST }}
+      REVIEW_APP_PR_TITLE: ${{ inputs.pr_title }}
+      KAMAL_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      POSTGRES_PASSWORD: ${{ secrets.REVIEW_APP_POSTGRES_PASSWORD }}
+      SECRET_KEY_BASE: ${{ secrets.REVIEW_APP_SECRET_KEY_BASE }}
+      SESSION_SECRET: ${{ secrets.REVIEW_APP_SESSION_SECRET }}
+      VERIFICATION_SECRET: ${{ secrets.REVIEW_APP_VERIFICATION_SECRET }}
+      GOOGLE_MAPS: ${{ secrets.REVIEW_APP_GOOGLE_MAPS }}
+      GOOGLE_MAPS_STATIC: ${{ secrets.REVIEW_APP_GOOGLE_MAPS_STATIC }}
+      GOOGLE_GEOCODER: ${{ secrets.REVIEW_APP_GOOGLE_GEOCODER }}
+      MAPBOX_GEOCODER: ${{ secrets.REVIEW_APP_MAPBOX_GEOCODER }}
+      MAPBOX_MAPPING: ${{ secrets.REVIEW_APP_MAPBOX_MAPPING }}
+      R2_DEV_ENDPOINT: ${{ secrets.REVIEW_APP_R2_DEV_ENDPOINT }}
+      R2_DEV_ACCESS_KEY: ${{ secrets.REVIEW_APP_R2_DEV_ACCESS_KEY }}
+      R2_DEV_ACCESS_KEY_SECRET: ${{ secrets.REVIEW_APP_R2_DEV_ACCESS_KEY_SECRET }}
+      HONEYBADGER_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_API_KEY }}
+      HONEYBADGER_FRONTEND_API_KEY: ${{ secrets.REVIEW_APP_HONEYBADGER_FRONTEND_API_KEY }}
+      SAML_SP_CERTIFICATE: ${{ secrets.REVIEW_APP_SAML_SP_CERTIFICATE }}
+      SAML_SP_PRIVATE_KEY: ${{ secrets.REVIEW_APP_SAML_SP_PRIVATE_KEY }}
+    steps:
+      - name: Checkout the ref
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0.6"
+      - name: Install Kamal
+        run: gem install kamal -v "~> 2.0"
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.REVIEW_APP_SSH_KEY }}
+      - name: Trust review host
+        # Scan the hostname AND its resolved IP, un-hashed: kamal's net-ssh verifies
+        # the key against both (check_host_ip is on by default), so a hashed,
+        # hostname-only known_hosts entry triggers Net::SSH::HostKeyMismatch.
+        run: |
+          mkdir -p ~/.ssh
+          host='${{ vars.REVIEW_APP_HOST }}'
+          ip="$(getent hosts "$host" | awk 'NR==1 { print $1 }')"
+          ssh-keyscan "$host" $ip >> ~/.ssh/known_hosts
+      - name: Stage CI secrets file
+        run: cp .kamal/secrets-ci .kamal/secrets
+      - name: Run kamal command
+        run: ${{ inputs.command }}

@@ -1,0 +1,20 @@
+# frozen_string_literal: true
+
+FactoryBot.define do
+  factory :strava_gear do
+    strava_integration
+    strava_id { "b12345" }
+    name { "My Road Bike" }
+    gear_type { "bike" }
+
+    trait :with_bike do
+      association :item, factory: :bike
+    end
+
+    trait :shoe do
+      strava_id { "g12345" }
+      name { "Running Shoes" }
+      gear_type { "shoe" }
+    end
+  end
+end

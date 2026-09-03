@@ -10,6 +10,7 @@ class UpdateModelAuditJob < ApplicationJob
   def self.enqueue_for?(model_audit)
     return false if locked_for?(model_audit.id)
     return true if OrganizationModelAudit.missing_for?(model_audit)
+
     model_audit.bikes_count != model_audit.counted_matching_bikes_count
   end
 
@@ -24,6 +25,7 @@ class UpdateModelAuditJob < ApplicationJob
     return false unless model_audit.delete_if_no_bikes?
     return true if model_audit.should_be_unknown_model? || model_audit.counted_matching_bikes_count == 0
     return false if model_audit.manufacturer&.motorized_only?
+
     ModelAudit.counted_matching_bikes(model_audit.matching_bikes).motorized.limit(1).none?
   end
 
@@ -48,6 +50,7 @@ class UpdateModelAuditJob < ApplicationJob
 
   def perform(model_audit_id = nil)
     return if SKIP_PROCESSING
+
     lock_manager = self.class.new_lock_manager
     redlock = lock_manager.lock(self.class.redlock_key(model_audit_id), lock_duration_ms)
     return unless redlock
@@ -90,6 +93,7 @@ class UpdateModelAuditJob < ApplicationJob
     existing_manufacturer ||= Manufacturer.friendly_find(model_audit.mnfg_name)
     # Only can be fixed if there is a new matching manufacturer
     return if existing_manufacturer.blank? || existing_manufacturer.other?
+
     # If there is already a model_audit matching this, delete this model audit
     found_model_audit_id = self.class.find_model_audit_id(model_audit)
     if found_model_audit_id == model_audit.id

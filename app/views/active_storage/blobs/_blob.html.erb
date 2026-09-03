@@ -1,0 +1,20 @@
+<% kind_class = "attachment--#{blob.representable? ? "preview" : "file"}" %>
+<% extension_class = "attachment--#{blob.filename.extension}" %>
+
+<figure class="attachment <%= kind_class %> <%= extension_class %>">
+  <% if blob.representable? %>
+    <%# alt is empty because the figcaption below already names the image %>
+    <%= image_tag blob.representation(resize_to_limit: local_assigns[:in_gallery] ? [ 800, 600 ] : [ 1024, 768 ]), alt: "" %>
+  <% end %>
+
+  <figcaption class="attachment__caption">
+    <% if caption = blob.try(:caption) %>
+      <%= caption %>
+    <% else %>
+      <span class="attachment__name"><%= blob.filename %></span>
+      <span class="attachment__size">
+        <%= number_to_human_size blob.byte_size %>
+      </span>
+    <% end %>
+  </figcaption>
+</figure>

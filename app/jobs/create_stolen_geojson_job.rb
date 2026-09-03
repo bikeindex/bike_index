@@ -16,7 +16,8 @@ class CreateStolenGeojsonJob < ScheduledJob
   end
 
   def file_prefix
-    Rails.env.test? ? "/spec/fixtures/tsv_creation/" : ""
+    # tmp/ is writable by the container's rails user; the app root (Rails.root) is not
+    Rails.env.test? ? "/spec/fixtures/tsv_creation/" : "tmp/"
   end
 
   def perform
@@ -25,14 +26,14 @@ class CreateStolenGeojsonJob < ScheduledJob
     output = File.open(out_file, "w")
     output.puts Oj.dump({type: "FeatureCollection", features: geojson_bike_features})
     # Note: this file url uses Cloudflare's transform function to add CORS headers
-    TsvCreator.new.send_to_uploader(output)
+    Spreadsheets::TsvCreator.new.send_to_uploader(output)
     # Expire cache so we get the newest one!
-    Integrations::Cloudflare.new.expire_cache(self.class.file_url)
+    Integrations::Cloudflare.expire_cache(self.class.file_url)
   end
 
   def geojson_bike_features
     Bike.unscoped.status_stolen.current.where.not(latitude: nil).where.not(occurred_at: nil)
       .order(occurred_at: :desc).pluck(:id, :occurred_at, :latitude, :longitude)
-      .map { |id, oc, lat, lng| BikeGeojsoner.feature_from_plucked(id, oc, lat, lng) }
+      .map { |id, oc, lat, lng| BikeServices::Geojsoner.feature_from_plucked(id, oc, lat, lng) }
   end
 end

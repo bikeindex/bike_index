@@ -5,40 +5,21 @@ RSpec.shared_context :caching_enabled do
     config.around(:each, :caching) do |example|
       ActionController::Base.perform_caching = true
       ActionController::Base.cache_store = cache
+      original_rails_cache = Rails.cache
+      Rails.cache = cache
       example.run
+    ensure
       ActionController::Base.perform_caching = false
       ActionController::Base.cache_store = :null_store
+      Rails.cache = original_rails_cache if original_rails_cache
     end
-  end
-end
-
-class MemoryCacheStore
-  def fetch(key)
-    return store[key] if store[key]
-    store[key] = yield
-  end
-
-  def clear
-    store.clear
-  end
-
-  def store
-    @store ||= {}
-  end
-
-  def read(key)
-    store[key]
-  end
-
-  def as_json
-    store.as_json
   end
 end
 
 RSpec.shared_context :caching_basic do
   include_context :caching_enabled
 
-  let(:cache) { MemoryCacheStore.new }
+  let(:cache) { ActiveSupport::Cache::MemoryStore.new }
 end
 
 RSpec.shared_context :caching_full do
