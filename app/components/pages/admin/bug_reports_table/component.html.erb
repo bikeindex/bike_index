@@ -58,7 +58,7 @@
             <div class="tw:w-96 tw:text-left">
               <%= content_tag(:strong, bug_report.display_subject) %>
 
-              <%# truncated because the tooltip can't be scrolled - it has no pointer events %>
+              <%# truncated because the tooltip has no scroll container %>
               <%= content_tag(:div, bug_report.body_stripped.truncate(1000), class: "tw:mt-1 tw:whitespace-pre-wrap") %>
             </div>
           <% end %>
