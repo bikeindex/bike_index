@@ -27,7 +27,6 @@ class HotSheet < ApplicationRecord
   belongs_to :organization
 
   has_one :hot_sheet_configuration, through: :organization
-  has_many :notifications, as: :notifiable
 
   validates_presence_of :organization_id, :sheet_date
 
