@@ -104,6 +104,41 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
             expect(email.subject).to eq hot_sheet.subject
           end
         end
+
+        context "when one batch has an inactive recipient" do
+          let(:inactive_user) { organization_roles.first.user }
+          let(:error_message) do
+            "You tried to send to recipient(s) that have been marked as inactive. Found inactive " \
+            "addresses: #{inactive_user.email}. Inactive recipients are ones that have generated a " \
+            "hard bounce, a spam complaint, or a manual suppression."
+          end
+          let(:inactive_recipient_error) do
+            Postmark::ApiInputError.build("error", {"ErrorCode" => 406, "Message" => error_message})
+          end
+          before do
+            allow(OrganizedMailer).to receive(:hot_sheet).and_wrap_original do |method, sheet|
+              raise inactive_recipient_error if sheet.recipient_ids.include?(inactive_user.id)
+
+              method.call(sheet)
+            end
+          end
+
+          it "delivers the batches that don't include them" do
+            expect {
+              ProcessHotSheetJob.drain
+            }.to change(HotSheet, :count).by 3
+            hot_sheets = HotSheet.where(sheet_date: Time.current.to_date)
+            expect(hot_sheets.delivery_success.count).to eq 2
+            expect(hot_sheets.delivery_partial_success.count).to eq 1
+            expect(ActionMailer::Base.deliveries.count).to eq 2
+
+            rejected = hot_sheets.delivery_partial_success.first
+            expect(rejected.delivery_error).to eq "Postmark::InactiveRecipientError"
+            expect(rejected.recipient_ids).to include(inactive_user.id)
+            # Only the rejected address is flagged, not the rest of their batch
+            expect(UserEmail.last_email_errored.pluck(:email)).to eq([inactive_user.email])
+          end
+        end
       end
     end
   end

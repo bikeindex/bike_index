@@ -19,6 +19,8 @@
 #  index_hot_sheets_on_organization_id  (organization_id)
 #
 class HotSheet < ApplicationRecord
+  include EmailDeliveryTrackable
+
   DELIVERY_STATUS_ENUM = Notification::DELIVERY_STATUS_ENUM
 
   enum :delivery_status, DELIVERY_STATUS_ENUM
@@ -47,18 +49,6 @@ class HotSheet < ApplicationRecord
 
   def email_success?
     delivery_success?
-  end
-
-  # This method takes a block
-  def track_email_delivery
-    return if delivery_success?
-
-    yield
-    update(delivery_status: "delivery_success")
-  rescue => e
-    update(delivery_status: "delivery_failure", delivery_error: e.class)
-
-    raise e unless Notification::UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
   end
 
   def subject
@@ -106,6 +96,23 @@ class HotSheet < ApplicationRecord
   end
 
   private
+
+  def record_delivery_success(_delivery)
+    update(delivery_status: "delivery_success")
+  end
+
+  # A sheet emails a whole batch at once, so only the addresses Postmark rejected failed
+  def record_delivery_failure(error)
+    failed_emails = inactive_recipient_emails(error)
+    delivered_any = failed_emails.any? && (normalized_recipient_emails - failed_emails).any?
+    update(delivery_status: delivered_any ? "delivery_partial_success" : "delivery_failure",
+      delivery_error: error.class)
+    failed_emails.each { UserEmail.friendly_find(it)&.update_last_email_errored!(email_errored: true) }
+  end
+
+  def normalized_recipient_emails
+    recipient_emails.map { EmailNormalizer.normalize(it) }
+  end
 
   def calculated_stolen_records
     StolenRecord.current.within_bounding_box(bounding_box)

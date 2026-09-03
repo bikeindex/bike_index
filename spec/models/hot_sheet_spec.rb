@@ -49,6 +49,46 @@ RSpec.describe HotSheet, type: :model do
         hot_sheet.track_email_delivery { raise invalid_email_error }
         expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
         expect(hot_sheet.delivery_error).to eq "Postmark::InvalidEmailRequestError"
+        # There is no way to tell which of the batch failed, so nobody is flagged
+        expect(UserEmail.last_email_errored.count).to eq 0
+      end
+    end
+
+    context "with an inactive recipient" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:users) { Array.new(3) { FactoryBot.create(:organization_role_claimed, organization:).user } }
+      let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization:, recipient_ids: users.map(&:id)) }
+      let(:inactive_emails) { [users.first.email] }
+      let(:error_message) do
+        "You tried to send to recipient(s) that have been marked as inactive. Found inactive addresses: " \
+        "#{inactive_emails.join(", ")}. Inactive recipients are ones that have generated a hard bounce, " \
+        "a spam complaint, or a manual suppression."
+      end
+      let(:inactive_recipient_error) do
+        Postmark::ApiInputError.build("error", {"ErrorCode" => 406, "Message" => error_message})
+      end
+
+      it "records a partial success, and only flags the address that was rejected" do
+        expect(hot_sheet.recipient_emails).to match_array(users.map(&:email))
+        expect(UserEmail.last_email_errored.count).to eq 0
+        hot_sheet.track_email_delivery { raise inactive_recipient_error }
+
+        # Postmark delivered to the rest of the batch, so this isn't a total failure
+        expect(hot_sheet.reload.delivery_status).to eq "delivery_partial_success"
+        expect(hot_sheet.delivery_error).to eq "Postmark::InactiveRecipientError"
+        expect(hot_sheet.email_success?).to be_falsey
+        expect(UserEmail.last_email_errored.pluck(:email)).to eq(inactive_emails)
+      end
+
+      context "with every recipient inactive" do
+        let(:inactive_emails) { users.map(&:email) }
+        it "records a failure, and flags them all" do
+          hot_sheet.track_email_delivery { raise inactive_recipient_error }
+
+          expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
+          expect(hot_sheet.delivery_error).to eq "Postmark::InactiveRecipientError"
+          expect(UserEmail.last_email_errored.pluck(:email)).to match_array(inactive_emails)
+        end
       end
     end
   end

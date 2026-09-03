@@ -16,7 +16,7 @@ module Email
       raise e if user.nil?
 
       user_email_for(user)&.update_last_email_errored!(email_errored: true)
-      raise e unless Notification::UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
+      raise e unless EmailDeliveryTrackable::UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
     end
 
     private
