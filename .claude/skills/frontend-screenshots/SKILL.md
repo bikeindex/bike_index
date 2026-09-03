@@ -123,7 +123,7 @@ $BASE_URL/rails/view_components/<preview_path>/<scenario>
 
 `<preview_path>` is the preview class underscored with the `Preview` suffix dropped, and `<scenario>` is the preview method. `SharedBlocks::ReviewAppBanner::ComponentPreview#superadmin_signed_in` → `/rails/view_components/shared_blocks/review_app_banner/component/superadmin_signed_in`. If a scenario doesn't exist yet, add a method to the component's `*_preview.rb` first — a preview that renders the exact state (pass the args that trigger it) is often the fastest path to a clean shot.
 
-Use this bare route, not Lookbook's `/lookbook/...`, which wraps the component in its own browser chrome.
+Use this bare route, not Lookbook's `/lookbook/inspect/...`, which wraps the component in its own browser chrome. `/lookbook/preview/<preview_path>/<scenario>` renders bare as well, and it's the one route that puts a whole `@!group` on a single page — `/lookbook/preview/ui/tooltip/variants` for `UI::Tooltip::ComponentPreview`'s `# @!group Variants`. Reach for it when the shot needs several scenarios side by side; the component's system spec usually already visits it.
 
 The preview page loads Tailwind and renders the component standalone (no site chrome), so a preview that fits the viewport captures at `fullPage: false`; a small ViewComponent render-timing line at the bottom is harmless. **A preview taller than the viewport still captures `fullPage: true`** — page-sized components (a whole registration step, a long form) put the changed field below 900px, and cropping it out is the one thing the shot exists to show. Measure before choosing:
 
