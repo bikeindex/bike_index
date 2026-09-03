@@ -64,15 +64,36 @@ RSpec.describe HotSheetConfiguration, type: :model do
       end
       context "send_today_at before current time" do
         let(:send_seconds) { Time.current.in_time_zone(timezone).seconds_since_midnight - 60 }
-        it "is truthy - until it's been created" do
+        it "is truthy - until the day's sheets have delivered" do
           expect(hot_sheet_configuration.send_today_at.to_i).to be_within(within_time).of Time.current.to_i - 60
           expect(hot_sheet_configuration.hot_sheets.count).to eq 0
           # This fails when transitioning out of DST, so ignore it
           unless dst_transition?
             expect(hot_sheet_configuration.send_today_now?).to be_truthy
           end
-          # If there is a current hot_sheet, it shouldn't send_today_now
-          FactoryBot.create(:hot_sheet, organization: hot_sheet_configuration.organization, sheet_date: Time.current.in_time_zone(timezone).to_date)
+          sheet_date = Time.current.in_time_zone(timezone).to_date
+          hot_sheet = FactoryBot.create(:hot_sheet, organization: hot_sheet_configuration.organization, sheet_date:)
+          unless dst_transition?
+            # A sheet that hasn't delivered yet is worth another run
+            expect(hot_sheet.delivery_status).to eq "delivery_pending"
+            expect(hot_sheet_configuration.send_today_now?).to be_truthy
+            # So is one that failed for a reason resending could fix
+            hot_sheet.update(delivery_status: "delivery_failure", delivery_error: "Postmark::TimeoutError")
+            expect(hot_sheet_configuration.send_today_now?).to be_truthy
+          end
+          # A dead address won't deliver on a retry either
+          hot_sheet.update(delivery_status: "delivery_failure", delivery_error: "Postmark::InactiveRecipientError")
+          expect(hot_sheet_configuration.send_today_now?).to be_falsey
+          # ... but only if every batch is dead
+          hot_sheet2 = FactoryBot.create(:hot_sheet, organization: hot_sheet_configuration.organization, sheet_date:,
+            delivery_status: "delivery_failure", delivery_error: "Postmark::TimeoutError")
+          unless dst_transition?
+            expect(hot_sheet_configuration.send_today_now?).to be_truthy
+          end
+          # Anything that reached a recipient settles the day
+          hot_sheet2.update(delivery_status: "delivery_partial_success")
+          expect(hot_sheet_configuration.send_today_now?).to be_falsey
+          hot_sheet2.update(delivery_status: "delivery_success", delivery_error: nil)
           expect(hot_sheet_configuration.send_today_now?).to be_falsey
         end
       end

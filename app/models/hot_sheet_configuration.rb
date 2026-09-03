@@ -71,9 +71,18 @@ class HotSheetConfiguration < ApplicationRecord
   end
 
   def send_today_now?
-    return false if off? || hot_sheets.where(sheet_date: current_date).any?
+    return false if off? || sent_today?
 
     time_in_zone > send_today_at
+  end
+
+  # Resending only helps if nothing went out and something failed for a reason
+  # other than the addresses being dead
+  def sent_today?
+    sheets = hot_sheets.where(sheet_date: current_date)
+    return false if sheets.none?
+
+    sheets.delivered.any? || sheets.undeliverable.count == sheets.count
   end
 
   def send_hour=(val)

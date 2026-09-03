@@ -31,6 +31,9 @@ class HotSheet < ApplicationRecord
   validates_presence_of :organization_id, :sheet_date
 
   delegate :bounding_box, :timezone, to: :hot_sheet_configuration, allow_nil: true
+  scope :delivered, -> { where(delivery_status: %i[delivery_success delivery_partial_success]) }
+  # Resending a batch every address on it rejected just fails the same way
+  scope :undeliverable, -> { where(delivery_error: Notification::UNDELIVERABLE_ERRORS.map(&:name)) }
 
   def self.for(organization_or_id, date = nil)
     org_id = organization_or_id.is_a?(Integer) ? organization_or_id : organization_or_id.id
