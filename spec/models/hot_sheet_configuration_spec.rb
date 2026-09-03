@@ -72,7 +72,7 @@ RSpec.describe HotSheetConfiguration, type: :model do
             expect(hot_sheet_configuration.send_today_now?).to be_truthy
           end
           # If there is a current hot_sheet, it shouldn't send_today_now
-          FactoryBot.create(:hot_sheet, organization: hot_sheet_configuration.organization, sheet_date: Time.current.in_time_zone(timezone).to_date, delivery_status: "email_success")
+          FactoryBot.create(:hot_sheet, organization: hot_sheet_configuration.organization, sheet_date: Time.current.in_time_zone(timezone).to_date)
           expect(hot_sheet_configuration.send_today_now?).to be_falsey
         end
       end
