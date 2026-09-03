@@ -419,6 +419,30 @@ RSpec.describe "Register flow", :js, type: :system do
       expect(BParam.last.bike["serial_number"]).to eq "unknown"
     end
 
+    it "marks a registration spam when a bot fills the honeypot, without letting on" do
+      start_registration
+
+      # A rider can't see or reach the honeypot, so only a bot fills it in
+      honeypot = find_field("Additional", visible: :hidden)
+      expect(honeypot[:tabindex]).to eq "-1"
+      page.execute_script("arguments[0].value = 'http://spam.example.com'", honeypot)
+
+      type_into("#bike_primary_frame_color_id", "Red")
+      click_combobox_option("Red")
+      fill_in "bike[serial_number]", with: "XYZ 123"
+
+      # The bot gets the same finished page it would if it had gotten away with it
+      click_button "Complete Bike Registration"
+      expect(page).to have_content("Registration complete")
+
+      # Spam is outside Bike's default scope, so the registration is in no listing or search
+      expect(Bike.count).to eq 0
+      bike = Bike.spam.last
+      expect(bike).to have_attributes(owner_email:, serial_number: "XYZ 123")
+      # And the invitation to claim it, enqueued like any other, mails nothing
+      expect { Email::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
+    end
+
     # The one organization they're in, assigned without any link naming it
     context "a member of one organization" do
       let(:organization) do
