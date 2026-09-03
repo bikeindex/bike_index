@@ -6,6 +6,8 @@ Bike Index is a Rails webapp
 
 Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right WORKSPACE_ID fallback.
 
+**Renaming a `config/initializers/` file needs a `bin/dev` restart.** Initializers don't re-run on reload, so a running server still holds the old constant and none of the new one — and `config/routes.rb`, which does reload, then dies partway through its draw. Everything routed below that line 404s and the page reading the constant raises a bare `NameError` on a route helper, which reads as anything but a stale boot.
+
 ## Code style
 
 Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't use other formatters.
@@ -99,7 +101,7 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 ## Architecture notes
 
 - **`app/components` has five top-level folders, and a new component goes in exactly one of them**: `ui` (the design system — a component whose arguments are only about style), `atoms` (small renderers reused across pages — `Atoms::Serial`, `Atoms::Admin::Badges::User`), `pages` (one namespace per route, `Pages::Admin::Bikes::Table`), `shared_blocks` (the chrome around a page — navbar, footer, alerts), and `emails`. Nothing else belongs at the top level.
-- **Moving a file silently un-suppresses whatever was keyed to its old path.** `.herb.yml` excludes lint rules by path, and `brakeman.ignore` hashes the file path into each fingerprint — so a rename re-enables the rule and obsoletes the entry, and neither says so until CI fails. Grep the repo root and `config/` for the old path, not just `app/`; re-fingerprint brakeman from `brakeman -f json` rather than hand-editing the path.
+- **Moving a file silently un-suppresses whatever was keyed to its old path.** `.herb.yml` excludes lint rules by path, `brakeman.ignore` hashes the file path into each fingerprint, and `config/i18n-tasks.yml` routes deep component scopes by path — so a rename re-enables the rule, obsoletes the entry, and leaves a write rule pointing at nothing, and none of the three says so until CI fails or a key lands in the wrong sidecar. Grep the repo root and `config/` for the old path, not just `app/`; re-fingerprint brakeman from `brakeman -f json` rather than hand-editing the path.
 - **Changing a `PublicImage::VARIANTS` transformation re-keys every variant** — the key digests the transformations. Existing objects orphan and regenerate lazily, and the heic R2 cassette re-records: `rm` it and re-run rather than committing the appended interactions.
 - **Multi-database**: primary (`ApplicationRecord`) + analytics (`AnalyticsRecord`). Use `db:migrate:down:analytics` for analytics migrations
 - **Soft delete**: some models use `acts_as_paranoid` with `deleted_at` column; use `unscoped` in admin controllers when needed
