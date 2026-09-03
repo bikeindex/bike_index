@@ -140,16 +140,10 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
     visit bike_path(bike)
     click_link "contact the owner"
 
-    # Meant to ask for an account, but Sessionable's translation_key: :create_account is
-    # dropped by store_return_and_authenticate_user - dead since #2810 added both. So it
-    # asks for a login, and the email step carries an unknown address on to signing up
-    expect(page).to have_content("you have to log in")
-    expect(page).to have_current_path(new_session_path, ignore_query: true)
-    fill_in "Email", with: buyer_email
-    click_button "Continue"
-
+    # Messaging needs an account, so this asks for one rather than for a login
+    expect(page).to have_content("Please create an account")
     expect(page).to have_current_path(new_user_path, ignore_query: true)
-    expect(page).to have_field("Email", with: buyer_email)
+    fill_in "Email", with: buyer_email
     fill_in "Name", with: "Bianca Buyer"
     check "user_terms_of_service"
     expect { click_button "Sign up" }.to change(Email::ConfirmationJob.jobs, :count).by(1)

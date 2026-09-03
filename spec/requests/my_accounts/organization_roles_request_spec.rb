@@ -68,7 +68,7 @@ RSpec.describe MyAccounts::OrganizationRolesController, type: :request do
 
     it "redirects" do
       patch "#{base_url}/#{organization_role.id}", params: {position: 1}
-      expect(response).to redirect_to(/session\/new/)
+      expect(response).to redirect_to(/users\/new/)
       expect(organization_role.reload.priority).to eq 0
     end
   end

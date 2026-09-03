@@ -7,7 +7,7 @@ RSpec.describe MyAccountsController, type: :request do
     context "user not logged in" do
       it "redirects" do
         get base_url
-        expect(response).to redirect_to(/session\/new/) # weird subdomain issue matching url directly otherwise
+        expect(response).to redirect_to(/users\/new/) # weird subdomain issue matching url directly otherwise
       end
     end
 
@@ -850,7 +850,7 @@ RSpec.describe MyAccountsController, type: :request do
     context "user not logged in" do
       it "redirects to sign in without toggling" do
         post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-        expect(response).to redirect_to(/session\/new/)
+        expect(response).to redirect_to(/users\/new/)
       end
     end
     context "user logged in" do
