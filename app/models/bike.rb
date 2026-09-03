@@ -182,7 +182,7 @@ class Bike < ApplicationRecord
 
   attr_writer :phone, :user_name, :external_image_urls # reading is managed by a method
 
-  delegate :bulk_import, :claimed?, :creation_description,
+  delegate :bulk_import, :claimed?, :creation_description, :creation_kind,
     :creator_unregistered_parking_notification?, :owner, :owner_name, :pos?,
     :pos_kind, :registration_info, :user, :user_id,
     :student_id, :student_id=, :organization_affiliation, :organization_affiliation=,
