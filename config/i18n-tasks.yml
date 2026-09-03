@@ -26,7 +26,8 @@ data:
     # Deeply-namespaced components (namespace/sub-namespace/name) route to their
     # own sidecar. These must precede the generic rules below, which can't tell a
     # sub-namespace segment from a nested/plural key and would otherwise land
-    # these in the parent namespace's directory. Add a line here per sub-namespace.
+    # these in the parent namespace's directory. Add a line per sub-namespace that has
+    # keys - a rule for one that doesn't reads as coverage it isn't providing.
     - ['components.atoms.admin.badges.{:}.*', 'app/components/atoms/admin/badges/\1/component.%{locale}.yml']
     - ['components.emails.partials.{:}.*', 'app/components/emails/partials/\1/component.%{locale}.yml']
     - ['components.pages.bikes.org.{:}.*', 'app/components/pages/bikes/org/\1/component.%{locale}.yml']
