@@ -33,14 +33,14 @@ class ProcessHotSheetJob < ScheduledJob
     recipient_id_slices = hot_sheet.hot_sheet_configuration.current_recipient_ids
       .each_slice(RECIPIENTS_PER_EMAIL).to_a.presence || [[]]
 
-    # Build every sheet before delivering any, so the dups don't inherit a delivery_status
-    sheets = recipient_id_slices.map.with_index do |recipient_ids, index|
-      sheet = index.zero? ? hot_sheet : hot_sheet.dup
+    # Everything a batch's sheet shares with the others - notably not the delivery status
+    sheet_attributes = hot_sheet.slice(:organization_id, :sheet_date, :stolen_record_ids)
+    # Deliver every batch before raising, so one failure doesn't block the rest
+    errors = recipient_id_slices.filter_map.with_index do |recipient_ids, index|
+      sheet = index.zero? ? hot_sheet : HotSheet.new(sheet_attributes)
       sheet.update!(recipient_ids:)
-      sheet
+      deliver_email(sheet)
     end
-    # Deliver every sheet before raising, so one failing batch doesn't block the rest
-    errors = sheets.filter_map { deliver_email(it) }
     raise errors.first if errors.any?
   end
 
