@@ -445,15 +445,20 @@ RSpec.describe "Register flow", :js, type: :system do
     end
   end
 
-  # The Disk service answers instantly, so what happens between picking a file and the blob
-  # landing is only observable by holding the PUT open at the network layer.
-  describe "an upload still in flight" do
+  # These upload for real, to the bikeindex-test R2 bucket, so they need credentials and the
+  # network. A cross-origin PUT leaves a window before the blob lands, but not a dependable
+  # one - the routes below hold it open so every run gets the same window.
+  describe "uploading to R2" do
+    include_context :cloudflare_test_storage
+
     let(:image_path) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
+    # The PUT goes straight to the bucket, so what gets held is R2's host rather than ours
+    let(:upload_url_pattern) { /#{Regexp.escape(URI.parse(ENV["R2_TEST_ENDPOINT"]).host)}/ }
 
     # Nothing in the handler answers the request, so it hangs the way a dead connection does
     def hang_the_upload
       page.driver.with_playwright_page do |playwright_page|
-        playwright_page.route("**/rails/active_storage/disk/**", ->(_route, _request) {})
+        playwright_page.route(upload_url_pattern, ->(_route, _request) {})
       end
     end
 
@@ -469,7 +474,7 @@ RSpec.describe "Register flow", :js, type: :system do
       start_registration
       # Held just long enough to submit against it; the upload finishes on its own after
       page.driver.with_playwright_page do |playwright_page|
-        playwright_page.route("**/rails/active_storage/disk/**", ->(route, _request) {
+        playwright_page.route(upload_url_pattern, ->(route, _request) {
           sleep 3
           route.continue
         })
@@ -508,48 +513,43 @@ RSpec.describe "Register flow", :js, type: :system do
       expect(page).to have_css("h1", text: "Progress saved", wait: 15)
       expect(BParam.last.image_signed_id).to be_blank
     end
-  end
 
-  # The example above uploads to the Disk service, same-origin, which never exercises a presigned
-  # S3 PUT or a cross-origin request. This one goes to the bikeindex-test R2 bucket for real, so
-  # it needs credentials and the network. Kept separate so an R2 blip can't take the whole flow's
-  # coverage with it - and signed in, because a bike (and so a PublicImage) is what has a url.
-  describe "uploading to R2" do
-    include_context :cloudflare_test_storage
+    # A bike - and so the PublicImage that has a url - is what a signed in registrant's
+    # submit creates; an anonymous one gets no further than the b_param
+    context "signed in" do
+      let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
 
-    let(:image_path) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
-    let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
+      before { sign_in(current_user) }
 
-    before { sign_in(current_user) }
+      it "PUTs the photo to the bucket and serves it from the storage domain" do
+        start_registration
 
-    it "PUTs the photo to the bucket and serves it from the storage domain" do
-      start_registration
+        # The field ships with its name so a JS-less submit posts the bytes; the controller
+        # drops it on connect, which is what leaves the signed id as the only thing carrying
+        # the photo. Both would otherwise arrive, and the b_param would hold two of them.
+        expect(page).to have_no_css("input[name='bike[image]']", visible: :all)
+        expect(page).to have_css("input#bike_image[type='file']", visible: :all)
 
-      # The field ships with its name so a JS-less submit posts the bytes; the controller
-      # drops it on connect, which is what leaves the signed id as the only thing carrying
-      # the photo. Both would otherwise arrive, and the b_param would hold two of them.
-      expect(page).to have_no_css("input[name='bike[image]']", visible: :all)
-      expect(page).to have_css("input#bike_image[type='file']", visible: :all)
+        attach_file("bike_image", image_path, make_visible: true)
+        expect(page).to have_content("bike_photo-landscape.jpeg")
+        expect(page).to have_no_content("uploading", wait: 20) # A real cross-origin PUT
 
-      attach_file("bike_image", image_path, make_visible: true)
-      expect(page).to have_content("bike_photo-landscape.jpeg")
-      expect(page).to have_no_content("uploading", wait: 20) # A real cross-origin PUT
+        # A color is required for the bike to save, and signed in it saves on submit
+        type_into("#bike_primary_frame_color_id", "Red")
+        click_combobox_option("Red")
+        fill_in "bike[serial_number]", with: "R2UP1234"
+        click_button "Complete Bike Registration"
+        expect(page).to have_content("Registration complete")
 
-      # A color is required for the bike to save, and signed in it saves on submit
-      type_into("#bike_primary_frame_color_id", "Red")
-      click_combobox_option("Red")
-      fill_in "bike[serial_number]", with: "R2UP1234"
-      click_button "Complete Bike Registration"
-      expect(page).to have_content("Registration complete")
+        public_image = Bike.last.public_images.first
+        expect(public_image.file.attached?).to be_truthy
+        expect(public_image.image_url).to eq "https://test-uploads.bikeindex.org/#{public_image.file.blob.key}"
 
-      public_image = Bike.last.public_images.first
-      expect(public_image.file.attached?).to be_truthy
-      expect(public_image.image_url).to eq "https://test-uploads.bikeindex.org/#{public_image.file.blob.key}"
-
-      # Fetching it is the actual proof the browser's PUT landed - and that the bucket serves it
-      response = Faraday.get(public_image.image_url)
-      expect(response.status).to eq 200
-      expect(response.body.bytesize).to eq File.size(image_path)
+        # Fetching it is the actual proof the browser's PUT landed - and that the bucket serves it
+        response = Faraday.get(public_image.image_url)
+        expect(response.status).to eq 200
+        expect(response.body.bytesize).to eq File.size(image_path)
+      end
     end
   end
 
