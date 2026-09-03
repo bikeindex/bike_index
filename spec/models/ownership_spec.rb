@@ -572,14 +572,17 @@ RSpec.describe Ownership, type: :model do
     it "returns nil" do
       expect(ownership.creation_kind).to be_nil
     end
-    context "origin" do
-      let(:ownership) { Ownership.new(origin: "embed_partial") }
-      # creation_description humanizes this to "landing page", which register_flow_landing_page also answers to
-      it "distinguishes the origins creation_description flattens" do
-        expect(ownership.creation_kind).to eq :embed_partial
-        expect(Ownership.new(origin: "register_flow_landing_page").creation_kind).to eq :register_flow_landing_page
-        expect(Ownership.new(origin: "organization_form").creation_kind).to eq :organization_form
-      end
+    # creation_description humanizes both of the first two to "landing page"
+    it "distinguishes the origins creation_description flattens" do
+      expect(Ownership.new(origin: "embed_partial").creation_kind).to eq :embed_partial
+      expect(Ownership.new(origin: "register_flow_landing_page").creation_kind).to eq :register_flow_landing_page
+      expect(Ownership.new(origin: "organization_form").creation_kind).to eq :organization_form
+    end
+    # UpdateOrganizationPosKindJob sets broken_* on an organization, never on an ownership
+    it "reads every POS kind as the POS it is" do
+      expect(Ownership.new(pos_kind: "broken_lightspeed_pos").creation_kind).to eq :lightspeed_pos
+      expect(Ownership.new(pos_kind: "broken_ascend_pos").creation_kind).to eq :ascend_pos
+      expect(Ownership.new(pos_kind: "other_pos").creation_kind).to eq :other_pos
     end
     context "bulk" do
       let(:ownership) { Ownership.new(bulk_import_id: 12, origin: "api_v2") }
@@ -591,15 +594,6 @@ RSpec.describe Ownership, type: :model do
       let(:ownership) { Ownership.new(pos_kind: "lightspeed_pos", bulk_import_id: 12, origin: "embed_extended") }
       it "takes precedence over bulk and origin" do
         expect(ownership.creation_kind).to eq :lightspeed_pos
-      end
-      # broken_* is set on an organization by UpdateOrganizationPosKindJob, never on an ownership,
-      # but it would say nothing about how the registration was made if it were
-      context "broken" do
-        it "reads as the POS it is" do
-          expect(Ownership.new(pos_kind: "broken_lightspeed_pos").creation_kind).to eq :lightspeed_pos
-          expect(Ownership.new(pos_kind: "broken_ascend_pos").creation_kind).to eq :ascend_pos
-          expect(Ownership.new(pos_kind: "other_pos").creation_kind).to eq :other_pos
-        end
       end
       context "not a POS" do
         let(:ownership) { Ownership.new(pos_kind: "does_not_need_pos", origin: "web") }

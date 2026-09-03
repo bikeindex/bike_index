@@ -17,20 +17,12 @@ RSpec.describe Atoms::Org::OriginDisplay::Component, type: :component do
   # Nothing else catches a kind with no copy: raise_on_missing_translations only fires
   # for the kind that happens to render
   context "every creation_kind" do
-    let(:ownerships) do
-      Organization.pos_kinds.select { Organization.pos?(it) }.map { Ownership.new(pos_kind: it) } +
-        [Ownership.new(bulk_import_id: 1)] + Ownership.origins.map { Ownership.new(origin: it) }
-    end
+    let(:kinds) { Atoms::Org::OriginDisplay::ComponentPreview.new.every_kind.dig(:locals, :ownerships).map(&:creation_kind) }
+    let(:copy) { I18n.t("components.atoms.org.origin_display") }
 
-    it "renders a label and a tooltip for each" do
-      expect(ownerships.map(&:creation_kind).uniq.count).to eq 21
-
-      ownerships.each do |ownership|
-        rendered = render_inline(described_class.new(ownership:))
-        expect(rendered.css("[role=tooltip]").text).to be_present, "no tooltip for #{ownership.creation_kind}"
-        expect(rendered.text.sub(rendered.css("[role=tooltip]").text, "")).to match(/[a-z]/),
-          "no label for #{ownership.creation_kind}"
-      end
+    it "has a label and a description, and no copy for a kind that can't happen" do
+      expect(copy[:labels].keys).to match_array(kinds)
+      expect(copy[:descriptions].keys).to match_array(kinds)
     end
   end
 
@@ -81,11 +73,10 @@ RSpec.describe Atoms::Org::OriginDisplay::Component, type: :component do
     end
   end
 
-  # pos_kind wins over both, the way creation_kind orders them
   context "with a POS kind, a bulk_import and an origin" do
     let(:ownership) { Ownership.new(pos_kind: "ascend_pos", bulk_import_id: 1, origin: "web") }
 
-    it "renders the POS name" do
+    it "prefers the POS over the bulk import and the origin" do
       expect(component).to have_content("ascend")
     end
   end

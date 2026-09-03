@@ -190,9 +190,10 @@ class Ownership < ApplicationRecord
   end
 
   # creation_description humanizes distinct kinds down to a shared string, so anything
-  # that tells them apart has to key off this instead
+  # that tells them apart has to key off this instead. broken_* is an organization's
+  # integration health, not how a registration was made
   def creation_kind
-    return pos_creation_kind if pos?
+    return pos_kind.delete_prefix("broken_").to_sym if pos?
     return :bulk_import if bulk?
 
     origin&.to_sym
@@ -338,14 +339,6 @@ class Ownership < ApplicationRecord
   end
 
   private
-
-  # broken_* is an organization's integration health, not how a registration was made
-  def pos_creation_kind
-    return :lightspeed_pos if Organization.lightspeed_or_broken_lightspeed_kinds.include?(pos_kind)
-    return :ascend_pos if Organization.ascend_or_broken_ascend_kinds.include?(pos_kind)
-
-    :other_pos
-  end
 
   def info_with_organization_uniq(r_info, org_id = nil)
     return r_info if org_id.blank? || r_info.blank?
