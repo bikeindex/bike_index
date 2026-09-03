@@ -309,7 +309,7 @@
                 <% if show_contact? %>
                   <%= info_row(translation(".creator"), @bike.creator&.display_name) %>
                 <% end %>
-                <%= info_row(translation(".creation_source")) { render(Pages::Org::OriginDisplay::Component.new(creation_description: @bike.creation_description)) } %>
+                <%= info_row(translation(".creation_source")) { render(Atoms::Org::OriginDisplay::Component.new(creation_description: @bike.creation_description)) } %>
                 <% if show_contact? %>
                   <% org_registration_field_rows.each do |label, value| %>
                     <%= info_row(label, value) %>

@@ -81,7 +81,7 @@
                   %span.text-warning
                     not owner!
           %td
-            = render Pages::Admin::AddressRecordCell::Component.new(address_record: recovery)
+            = render Atoms::Admin::AddressRecordCell::Component.new(address_record: recovery)
           %td.table-cell-check
             / Posted
             / = check_mark if recovery.recovery_posted

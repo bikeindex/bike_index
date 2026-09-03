@@ -66,8 +66,8 @@ RSpec.describe Pages::Admin::Bikes::Cell::Component, type: :component do
 
       it "renders origin with tooltip" do
         expect(bike.creation_description).to eq "Lightspeed"
-        expect(component.css("small.less-strong").text).to include("Lightspeed")
-        expect(component.css("small.less-strong [role=tooltip]").text).to eq "Automatically registered by bike shop point of sale (Lightspeed POS)"
+        expect(component.css("small.less-strong").text).to include("lightspeed")
+        expect(component.css("small.less-strong [role=tooltip]").text).to eq "automatically registered by bike shop point of sale (Lightspeed POS)"
       end
     end
   end

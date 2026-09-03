@@ -26,7 +26,7 @@ class OrganizationLandingPage < ApplicationRecord
 
   # ORGANIZATIONS_WITH_LANDING_PAGES routes the page - enabled is only a copy of it
   def env_enabled?
-    LandingPages::ORGANIZATIONS.include?(organization&.slug)
+    LandingPageOrganizations::SLUGS.include?(organization&.slug)
   end
 
   def enabled_mismatch_error

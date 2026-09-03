@@ -79,7 +79,7 @@
 
       <% table.column(label: "Info", classes: "tw:hidden tw:lg:table-cell") do |bike| %>
         <div class="tw:relative">
-          <%= render Pages::Admin::Badges::BikeHiddenExplanation::Component.new(bike:) %>
+          <%= render Atoms::Admin::Badges::BikeHiddenExplanation::Component.new(bike:) %>
           <%= [bike.year, bike.frame_model_truncated].join(' ') %>
           <%= "(#{bike.type})" unless bike.type == 'bike' %>
 
@@ -124,7 +124,7 @@
 
           <% if bike.creation_description %>
             <span class="tw:absolute tw:right-0 tw:bottom-0 tw:text-xs tw:text-gray-400">
-              <%= render(Pages::Org::OriginDisplay::Component.new(creation_description: bike.creation_description)) %>
+              <%= render(Atoms::Org::OriginDisplay::Component.new(creation_description: bike.creation_description)) %>
 
               <% if bike.bulk_import.present? %>
                 <%= link_to "import", admin_bulk_import_path(bike.bulk_import), class: "tw:text-gray-400" %>

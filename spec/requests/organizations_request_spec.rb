@@ -280,7 +280,7 @@ RSpec.describe OrganizationsController, type: :request do
       let(:target_url) { "http://www.example.com/#{organization.slug}" }
 
       it "links to the landing page, even without a landing page route" do
-        expect(LandingPages::ORGANIZATIONS).to_not include(organization.slug)
+        expect(LandingPageOrganizations::SLUGS).to_not include(organization.slug)
 
         get "#{base_url}/#{organization.slug}/qr?target=landing"
         expect(response.status).to eq(200)

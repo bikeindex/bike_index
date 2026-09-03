@@ -60,7 +60,7 @@ module Pages
         end
 
         def pagination_component(skip_total: false)
-          Pages::Admin::PaginationWithCount::Component.new(
+          Atoms::Admin::PaginationWithCount::Component.new(
             index: @index, collection: @collection, viewing: @viewing, skip_total:,
             count_detail: skip_total ? nil : @count_detail, time_range_column: @time_range_column
           )

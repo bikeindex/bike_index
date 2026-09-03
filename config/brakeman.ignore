@@ -311,17 +311,17 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "b03a4c4d4282f543a01dd22237e2689272e328ce55828bbfdf27dc9fee56332d",
+      "fingerprint": "a1e21900190fc31bf19b9604ee80edc47134e61a18949fac37238f8aab7aecc3",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "app/components/pages/admin/pagination_with_count/component.rb",
+      "file": "app/components/atoms/admin/pagination_with_count/component.rb",
       "line": 52,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "collection.where(\"#{collection.table_name}.#{((time_range_column or index.time_range_column) or \"created_at\")} >= ?\", Time.current.beginning_of_day)",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "Pages::Admin::PaginationWithCount::Component",
+        "class": "Atoms::Admin::PaginationWithCount::Component",
         "method": "today_count"
       },
       "user_input": "time_range_column",

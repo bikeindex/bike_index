@@ -70,7 +70,7 @@
   </div>
 <% end %>
 
-<%= render(Pages::Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state)) %>
+<%= render(Atoms::Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state)) %>
 
 <%= form_tag update_manufacturers_admin_bikes_path, data: {controller: "table-multi-checkbox"} do %>
   <div class="tw:flex tw:flex-wrap tw:items-end tw:gap-4">
@@ -89,4 +89,4 @@
         searched_other_name: params[:search_other_name])) %>
 <% end %>
 
-<%= render(Pages::Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state)) %>
+<%= render(Atoms::Admin::PaginationWithCount::Component.new(collection: @bikes, index: admin_index_state)) %>

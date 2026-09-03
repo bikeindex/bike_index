@@ -73,7 +73,7 @@
 
             <% if @bike.creation_description.present? %>
               &ndash;
-              <em>Via <%= render(Pages::Org::OriginDisplay::Component.new(creation_description: @bike.creation_description)) %></em>
+              <em>Via <%= render(Atoms::Org::OriginDisplay::Component.new(creation_description: @bike.creation_description)) %></em>
 
 
               <% if current_ownership&.doorkeeper_app_id.present? %>
