@@ -684,8 +684,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
         # public is the superuser's default/current view
         expect(body).to match("Viewing as Public")
 
-        # Renders the owner view even though they don't own the bike, and switching
-        # to it drops the organization rather than leaving it in the session
+        # Renders the owner view even though they don't own the bike
         expect(response.body).to include("organization_id=false&amp;view_as=owner")
         get "#{base_url}/#{bike.id}", params: {view_as: "owner", organization_id: "false"}
         body = whitespace_normalized_body_text

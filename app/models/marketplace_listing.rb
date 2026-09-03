@@ -157,6 +157,14 @@ class MarketplaceListing < ApplicationRecord
     item&.updated_by_user_at
   end
 
+  # Only worth showing once it's a day past the listing going up
+  def notable_still_for_sale_at
+    return if still_for_sale_at.blank? || published_at.blank? ||
+      still_for_sale_at < (published_at + 1.day)
+
+    still_for_sale_at
+  end
+
   def just_published?
     @updated_for_sale && status == "for_sale" || false
   end

@@ -85,14 +85,11 @@ module Pages
             end
           end
 
-          # Switching to a view with no organization clears the passive one, so the
-          # next visit without a ?view_as doesn't snap back to the org admin view
+          # A view with no organization clears the passive one, so the next visit
+          # doesn't snap back to the org admin view
           def entry_path(view)
-            _kind, organization = view
-            view_as = BikeServices::ShowViews.view_param(view)
-            return registration_path(@bike, view_as:) if organization
-
-            registration_path(@bike, view_as:, organization_id: false)
+            registration_path(@bike, view_as: BikeServices::ShowViews.view_param(view),
+              organization_id: (false unless view.last))
           end
 
           def button_class

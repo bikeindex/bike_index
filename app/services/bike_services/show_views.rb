@@ -34,18 +34,18 @@ module BikeServices
       [:public, nil]
     end
 
-    #
-    # private below here
-    #
-
     # Once a listing is published the public view carries it, so only a draft is
-    # worth previewing — and only by whoever may see it before it's public
+    # worth previewing
     def marketplace_preview?(bike:, current_user:)
-      return false unless bike.status_with_owner?
+      return false if current_user.blank? || !bike.status_with_owner?
 
       marketplace_listing = bike.current_marketplace_listing
       marketplace_listing&.draft? && marketplace_listing.authorized?(current_user)
     end
+
+    #
+    # private below here
+    #
 
     # [role, organization] pairs. Superadmins may preview both staff and limited.
     def organization_views(bike:, current_user:, organization:, preview_organization: nil)
@@ -74,6 +74,6 @@ module BikeServices
       orgs.compact.uniq.select { |org| current_user.authorized?(org) }
     end
 
-    conceal :marketplace_preview?, :organization_views, :viewable_organizations, :role_for
+    conceal :organization_views, :viewable_organizations, :role_for
   end
 end

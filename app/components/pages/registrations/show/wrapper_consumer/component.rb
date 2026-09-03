@@ -21,10 +21,7 @@ module Pages
             @owner = owner.nil? ? (@current_user.present? && @bike.owner == @current_user) : owner
           end
 
-          # A listing edit doesn't touch the bike, so its cache version misses one
-          def cache_version
-            [@bike.current_marketplace_listing&.updated_at, *current_alerts_component.cache_version]
-          end
+          def cache_version = current_alerts_component.cache_version
 
           private
 
