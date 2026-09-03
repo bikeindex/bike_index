@@ -20,7 +20,7 @@
     <div class="tw:flex tw:flex-col tw:gap-4 tw:lg:pt-7">
       <div>
         <div class="tw:mb-1">
-          <%= render(Pages::Registrations::Show::ViewSwitcher::Component.new(bike: @bike, current_view: current_view, available_views: @available_views, label: audience_label, color: audience_color, current_user: @current_user)) %>
+          <%= render(Pages::Registrations::Show::ViewSwitcher::Component.new(bike: @bike, current_view:, available_views: @available_views, label: audience_label, color: audience_color, current_user: @current_user)) %>
         </div>
 
         <div class="tw:hidden tw:lg:block">
