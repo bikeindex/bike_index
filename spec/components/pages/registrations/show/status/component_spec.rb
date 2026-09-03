@@ -19,6 +19,25 @@ RSpec.describe Pages::Registrations::Show::Status::Component, type: :component d
     end
   end
 
+  context "for sale" do
+    let(:bike) { FactoryBot.create(:bike, is_for_sale: true) }
+    it "shows for sale in a purple badge" do
+      render_inline(component)
+      expect(page).to have_text("For Sale")
+      expect(page).to have_css("span.tw\\:text-purple-700")
+    end
+  end
+
+  context "override_to_for_sale" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:component) { described_class.new(bike:, override_to_for_sale: true) }
+    it "shows for sale for a bike that isn't listed yet" do
+      expect(bike.is_for_sale?).to be false
+      render_inline(component)
+      expect(page).to have_text("For Sale")
+    end
+  end
+
   context "unregistered" do
     let(:bike) { FactoryBot.create(:bike, status: "unregistered_parking_notification") }
     it "shows unregistered in a warning (yellow) badge" do

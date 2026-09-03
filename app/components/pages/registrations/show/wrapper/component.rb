@@ -9,7 +9,7 @@ module Pages
         class Component < ApplicationComponent
           # Digest of the markup inside the cache block — the cached_markup_digest spec
           # keeps it current, following what this tree renders out into UI:: and elsewhere
-          MARKUP_DIGEST = "6bd6a726d587"
+          MARKUP_DIGEST = "709a1c1be2d2"
 
           def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: {}, display_dev_info: false)
             @bike = bike
@@ -63,8 +63,8 @@ module Pages
                   current_alerts: @current_alerts, display_dev_info: @display_dev_info)
               else
                 WrapperConsumer::Component.new(bike: @bike, current_user: @current_user, owner: kind == :owner,
-                  show_for_sale: @bike.is_for_sale?, available_views: @available_views, bike_sticker: @bike_sticker,
-                  current_alerts: @current_alerts)
+                  show_for_sale: @bike.is_for_sale?, marketplace_preview: kind == :marketplace_preview,
+                  available_views: @available_views, bike_sticker: @bike_sticker, current_alerts: @current_alerts)
               end
             end
           end
