@@ -7,8 +7,17 @@ class ProcessHotSheetJob < ScheduledJob
     30.minutes
   end
 
+  def self.enqueue_workers
+    Organization.with_enabled_feature_slugs("hot_sheet").left_joins(:hot_sheet_configuration)
+      .where(hot_sheet_configurations: {is_on: true}).each do |organization|
+      next unless organization.hot_sheet_configuration&.send_today_now?
+
+      perform_async(organization.id)
+    end
+  end
+
   def perform(org_id = nil)
-    return enqueue_workers unless org_id.present?
+    return self.class.enqueue_workers unless org_id.present?
 
     hot_sheet = HotSheet.for(org_id, Time.current.to_date)
     return hot_sheet if hot_sheet&.email_success?
@@ -23,15 +32,6 @@ class ProcessHotSheetJob < ScheduledJob
     # Postmark only allows 50 emails per sent email, so abide by that
     recipient_emails.each_slice(48).map do |permitted_recipient_emails|
       send_emails(hot_sheet, permitted_recipient_emails)
-    end
-  end
-
-  def enqueue_workers
-    Organization.with_enabled_feature_slugs("hot_sheet").left_joins(:hot_sheet_configuration)
-      .where(hot_sheet_configurations: {is_on: true}).each do |organization|
-      next unless organization.hot_sheet_configuration&.send_today_now?
-
-      self.class.perform_async(organization.id)
     end
   end
 
