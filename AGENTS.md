@@ -103,6 +103,7 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 - **Changing a `PublicImage::VARIANTS` transformation re-keys every variant** — the key digests the transformations. Existing objects orphan and regenerate lazily, and the heic R2 cassette re-records: `rm` it and re-run rather than committing the appended interactions.
 - **Multi-database**: primary (`ApplicationRecord`) + analytics (`AnalyticsRecord`). Use `db:migrate:down:analytics` for analytics migrations
 - **Soft delete**: some models use `acts_as_paranoid` with `deleted_at` column; use `unscoped` in admin controllers when needed
+- **A bike is written on every user-facing edit path, so `cache_key_with_version` already moves.** `BikeServices::Updator` merges `updated_by_user_at: Time.current` into its `@bike.update`, and the records edited through the bike's nested attributes (marketplace listing, stolen record, address) all save that way — so "editing X doesn't touch the bike" is nearly always wrong, and a fragment cache keyed on the bike needs no extra term for X. Probing it with a bare `bike.update(...)` in `rails runner` bypasses the updator and shows no change, which is what makes the wrong answer look measured; go through the controller.
 - **Every user has a `password_digest`** — `User#set_calculated_attributes` gives passwordless accounts a random one so `has_secure_password` is satisfied. So it answers nothing about whether someone chose a password; `passwordless_user?` is that question.
 
 # Initial setup

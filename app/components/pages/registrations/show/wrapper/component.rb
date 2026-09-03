@@ -9,7 +9,7 @@ module Pages
         class Component < ApplicationComponent
           # Digest of the markup inside the cache block — the cached_markup_digest spec
           # keeps it current, following what this tree renders out into UI:: and elsewhere
-          MARKUP_DIGEST = "75c452336486"
+          MARKUP_DIGEST = "d9d9a716e50a"
 
           def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: {}, display_dev_info: false)
             @bike = bike
@@ -42,20 +42,10 @@ module Pages
               @current_user&.registration_show_toggleable?, @current_user&.feature_registration_show_legacy?,
               BikeServices::ShowViews.view_param(@view), @bike_sticker&.id,
               token_prompt && [@current_alerts.sort, *token_prompt.try(:cache_version)],
-              @bike.cache_key_with_version, marketplace_listing_version,
-              *inner_component.try(:cache_version)]
+              @bike.cache_key_with_version, *inner_component.try(:cache_version)]
           end
 
           private
-
-          # A listing edit doesn't touch the bike, so its cache version misses one.
-          # Only the preview renders a draft, so elsewhere a published listing is
-          # the whole story
-          def marketplace_listing_version
-            return @bike.current_marketplace_listing&.updated_at if @view.first == :marketplace_preview
-
-            @bike.current_for_sale_marketplace_listing&.updated_at
-          end
 
           def token_prompt
             return @token_prompt if defined?(@token_prompt)
