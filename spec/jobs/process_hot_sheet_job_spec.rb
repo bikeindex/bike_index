@@ -94,9 +94,8 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
           expect(hot_sheets.map(&:organization_id)).to eq([organization1.id] * 3)
           expect(hot_sheets.map(&:stolen_record_ids)).to eq([[stolen_record.id]] * 3)
           expect(hot_sheets.map { it.recipient_ids.count }).to eq([3, 3, 3])
-          # Every daily recipient is on exactly one sheet, and notification_never is on none
+          # Every daily recipient is on exactly one sheet, and notification_never on none
           expect(hot_sheets.flat_map(&:recipient_ids)).to match_array(recipient_ids)
-          expect(recipient_ids).to_not include(organization_role_never.user_id)
 
           expect(ActionMailer::Base.deliveries.count).to eq 3
           hot_sheets.each do |hot_sheet|

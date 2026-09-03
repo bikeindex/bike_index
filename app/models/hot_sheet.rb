@@ -50,13 +50,13 @@ class HotSheet < ApplicationRecord
     delivery_success?
   end
 
-  # This method takes a block. Unlike Notification's, it returns the error rather than
-  # raising it - the job delivers every sheet in the batch before blowing up
+  # Takes a block. Unlike Notification's, returns the error rather than raising it -
+  # the job delivers every batch before blowing up
   def track_email_delivery
     return if delivery_success?
 
     delivery = yield
-    self.message_id ||= message_id_from_delivery(delivery)
+    self.message_id ||= delivery.try(:message_id)
     update(delivery_status: "delivery_success")
     nil
   rescue => e
@@ -124,15 +124,14 @@ class HotSheet < ApplicationRecord
     delivered_any = failed_emails.any? && (normalized_recipient_emails - failed_emails).any?
     update(delivery_status: delivered_any ? "delivery_partial_success" : "delivery_failure",
       delivery_error: error.class)
-    failed_emails.each { UserEmail.friendly_find(it)&.update_last_email_errored!(email_errored: true) }
+    UserEmail.where(email: failed_emails).each { it.update_last_email_errored!(email_errored: true) }
   end
 
   def normalized_recipient_emails
     recipient_emails.map { EmailNormalizer.normalize(it) }
   end
 
-  # Postmark names the addresses it rejected as inactive, and delivers to the rest of
-  # the batch. Any other error leaves no way to tell who received the email
+  # Any other error leaves no way to tell who received the email
   def inactive_recipient_emails(error)
     return [] unless error.is_a?(Postmark::InactiveRecipientError)
 
@@ -141,10 +140,6 @@ class HotSheet < ApplicationRecord
 
   def undeliverable_error?(error)
     Notification::UNDELIVERABLE_ERRORS.any? { |error_class| error.is_a?(error_class) }
-  end
-
-  def message_id_from_delivery(delivery)
-    defined?(delivery.message_id) ? delivery.message_id : nil
   end
 
   def calculated_stolen_records
