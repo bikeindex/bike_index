@@ -6258,6 +6258,7 @@ nl:
             not_stolen: Niet gestolen
             stolen: Gestolen
             unregistered: Niet geregistreerd
+            for_sale: Te koop
           stolen_details:
             department_city: Afdeling & stad
             description_of_incident: Beschrijving van het incident
@@ -6284,6 +6285,7 @@ nl:
             sell_on_marketplace: Verkoop via de marktplaats
             share: Deel
             share_my_page: Deel mijn pagina
+            audience_marketplace_preview: Voorbeeldweergave van de advertentie
           wrapper_org_admin:
             about_this_bike: Over dit %{bike_type}
             assign_sticker: Sticker toewijzen
@@ -6337,6 +6339,18 @@ nl:
             unregistered_owner: Deze %{bike_type} is niet geregistreerd bij een gebruiker.
               Het is toegevoegd om parkeermeldingen te volgen.
             view_all_registrations: alles bekijken →
+          marketplace_listing_card:
+            condition: Voorwaarde
+            contact_seller: Neem contact op met de verkoper
+            description: Beschrijving
+            first_posted_at: Geplaatst
+            location: Plaats
+            member_listing: Lid van Bike Index
+            member_listing_tooltip: Deze verkoper is lid van Bike Index.
+            price_is_firm_false: prijs is onderhandelbaar
+            price_is_firm_true: prijs is vast
+            still_for_sale_at: Nog steeds te koop bij
+            this_bike_is_for_sale: Dit %{bike_type} is te koop
       search:
         everything_combobox:
           made_by: gemaakt door

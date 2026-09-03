@@ -6371,6 +6371,7 @@ it:
             not_stolen: Non rubato
             stolen: Rubata
             unregistered: Non registrato
+            for_sale: In vendita
           stolen_details:
             department_city: Dipartimento e città
             description_of_incident: Descrizione dell'incidente
@@ -6399,6 +6400,7 @@ it:
             sell_on_marketplace: Vendi sul Marketplace
             share: Condividere
             share_my_page: Condividi la mia pagina
+            audience_marketplace_preview: Anteprima dell'inserzione
           wrapper_org_admin:
             about_this_bike: Informazioni su questo %{bike_type}
             assign_sticker: Collegamento
@@ -6452,6 +6454,18 @@ it:
             unregistered_owner: Questo %{bike_type} non è registrato a un utente.
               È stato aggiunto per tenere traccia delle notifiche di parcheggio.
             view_all_registrations: visualizza tutto →
+          marketplace_listing_card:
+            condition: Condizione
+            contact_seller: Contatta il venditore
+            description: Descrizione
+            first_posted_at: Pubblicato
+            location: Luogo
+            member_listing: Membro di Bike Index
+            member_listing_tooltip: Questo venditore è un membro di Bike Index
+            price_is_firm_false: Il prezzo è negoziabile.
+            price_is_firm_true: il prezzo non è negoziabile
+            still_for_sale_at: Ancora in vendita a
+            this_bike_is_for_sale: Questo %{bike_type} è in vendita
       search:
         everything_combobox:
           made_by: realizzato da
