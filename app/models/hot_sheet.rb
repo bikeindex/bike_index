@@ -3,20 +3,26 @@
 # Table name: hot_sheets
 # Database name: primary
 #
-#  id                :bigint           not null, primary key
-#  delivery_response :jsonb
-#  recipient_ids     :jsonb
-#  sheet_date        :date
-#  stolen_record_ids :jsonb
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  organization_id   :bigint
+#  id                     :bigint           not null, primary key
+#  delivery_error         :string
+#  delivery_status        :integer          default(0)
+#  delivery_status_legacy :string
+#  recipient_ids          :jsonb
+#  sheet_date             :date
+#  stolen_record_ids      :jsonb
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  organization_id        :bigint
 #
 # Indexes
 #
 #  index_hot_sheets_on_organization_id  (organization_id)
 #
 class HotSheet < ApplicationRecord
+  DELIVERY_STATUS_ENUM = Notification::DELIVERY_STATUS_ENUM
+
+  enum :delivery_status, DELIVERY_STATUS_ENUM
+
   belongs_to :organization
 
   has_one :hot_sheet_configuration, through: :organization

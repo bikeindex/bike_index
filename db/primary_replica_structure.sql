@@ -1724,7 +1724,9 @@ CREATE TABLE public.hot_sheets (
     sheet_date date,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    delivery_response jsonb
+    delivery_status_legacy character varying,
+    delivery_status integer DEFAULT 0,
+    delivery_error character varying
 );
 
 
