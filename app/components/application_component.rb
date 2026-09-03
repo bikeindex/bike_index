@@ -29,7 +29,7 @@ class ApplicationComponent < ViewComponent::Base
 
     # This component's own files, plus the markup of every component they render, followed
     # transitively — an admin cell renders Pages::Admin::Users::Cell, which renders
-    # Pages::Admin::Badges::User, which renders UI::Badge, and any of the three going stale is
+    # Atoms::Admin::Badges::User, which renders UI::Badge, and any of the three going stale is
     # the same bug.
     def markup_files
       files = component_files(self)

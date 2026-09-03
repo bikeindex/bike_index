@@ -5241,38 +5241,6 @@ nb:
         still_for_sale_at: Selger fortsatt på
         member_listing: Medlem av sykkelindeksen
         member_listing_tooltip: Denne selgeren er medlem av Bike Index
-      homepage_for_buttons:
-        bike_shops: Sykkelbutikker
-        cities: Byer
-        community_groups: Fellesskapsgrupper
-        schools: Skoler
-        theft_victims: Tyveriofre
-      new_sale_form:
-        record_sale: Rekordsalg
-        sold_for: Beløp solgt for
-        transfer_to_html: Dette vil overføre registreringen til %{buyer_html} og lukke
-          markedsplassen.
-      strava_integration:
-        activities_synced:
-          one: "%{count} aktivitet synkronisert"
-          other: "%{count} aktiviteter synkronisert"
-        connect_with_strava: Koble til Strava
-        connected_to_strava: Koblet til Strava
-        disconnect_confirm: Er du sikker på at du vil koble fra Strava? Dette vil
-          fjerne alle synkroniserte aktiviteter.
-        disconnect_strava: Koble fra Strava
-        downloaded: nedlastet
-        integrate_your_bikes_with_strava: Integrer syklene dine med Strava og synkroniser
-          sykkelaktivitetene dine.
-        strava_bikes_connected: Strava-sykler koblet til Bike Index-sykler
-        strava_connected_pending: Koblet til Strava. Synkroniseringen starter snart.
-        strava_integration: Strava-integrasjon
-        sync_error: Synkroniseringsfeil
-        sync_error_description: Det oppsto en feil under synkronisering av Strava-aktivitetene
-          dine. Prøv å koble fra og koble til på nytt.
-        sync_running_in_background: Synkroniseringen kjører i bakgrunnen. Denne siden
-          oppdateres automatisk.
-        syncing_activities: Synkroniserer aktiviteter ...
       review_app_banner:
         disclaimer: ikke produksjon, data er flyktige
         label: Anmeld appen
@@ -5430,30 +5398,6 @@ nb:
           finish_the_required_steps: fullfør de nødvendige trinnene
           not_registered_yet_html: Din %{cycle_type} er ikke registrert ennå! Vennligst
             %{finish_link}
-      my_account:
-        organization_roles:
-          automatically_view_in_organization: Vis automatisk med navigasjonsfeltet
-            %{org_name} når du logger deg på Bike Index.
-          joined: Ble med
-          leave_confirm: Advarsel! Du må be en administrator fra %{org_name} om å
-            få tilbake denne organisasjonsrollen! Du kan ikke angre dette selv.
-          leave_organization: Forlat organisasjonen
-          organization_role_information: Organisasjoner du har en rolle i. Dra dem
-            til den rekkefølgen du vil prioritere dem i.
-          organization_roles:
-            one: Din organisasjonsrolle
-            other: Dine organisasjonsroller
-          role_html: 'Rolle: %{role}'
-          roles:
-            admin: Admin
-            member: Medlem
-            member_no_bike_edit: Medlem - ingen sykkelredigering
-          view_after_log_in: Etter innlogging
-          view_as_html: Vis som %{org_name}
-          view_without_an_organization: Vis uten en organisasjon
-          you_can_still_switch: Du kan fortsatt bytte til visning med eller uten organisasjonen
-            i innstillingene dine i navigasjonsfeltet.
-          your_first_organization: din første organisasjon
     emails:
       partials:
         bike_box:
@@ -5744,98 +5688,6 @@ nb:
           region: Region/provins
           state: Stat
           street: gate
-        impound_records_index:
-          matching_impound_record:
-            one: samsvarende beslagsregister
-            other: samsvarende beslaglagte poster
-          all_bikes: Alle sykler
-          all_statuses: Alle statuser
-          impound_records: Beslagleggelse av poster
-          interpreted_params: Interpreted_params
-          only_unregistered: Kun uregistrerte
-          only_user_registered: Kun bruker registrert
-          pagy: Pagy
-          per_page: Per_side
-          status_records: "%{status} poster"
-          update_multiple_records: Oppdater flere poster
-          cannot_update_with_kind: Denne oppføringen kan ikke oppdateres med «{kind}»
-          hide_update: Skjul oppdatering
-        bike_access_panel:
-          access_panel: Tilgangspanel
-          added_to_track_parking_notification: Denne %{bike_type} er ikke registrert
-            på en bruker. Den ble lagt til for å spore parkeringsvarsler.
-          additional_registrations_information: Registreringer etter bruker
-          additional_registrations_information_visible_because: synlig med %{org_name}
-            rettshåndhevelsestilgang
-          additional_registrations_potential_duplicates: 'Potensielle duplikatsykler
-            som matcher seriesegmenter:'
-          additional_registrations_registered_at: Registrert kl
-          additional_registrations_this_bike: Denne %{bike_type}
-          address: Registreringsadresse
-          address_or_intersection: Adresse eller veikryss
-          as_a_bikeindex_ambassador_html: <em><span class="hidden-md-down">Som Bike
-            Index-ambassadør</span> kan du merke den som gjenopprettet:</em>
-          assign_sticker: Tildel klistremerke
-          avery_exportable: Avery eksporterbar
-          believe_it_is_anyway: Tror du det er det uansett?
-          bike_is_not_registered_html: Denne %{bike_type} er <em>ikke</em> registrert
-            med %{org_name}
-          bike_is_registered: Denne %{bike_type} er registrert med %{org_name}
-          bike_not_marked_stolen: "%{bike_type} er ikke merket som stjålet."
-          choose_country: Velg land
-          city: By
-          claimed: Hevdet
-          contact_the_owner_it_is_stolen: til eieren av denne %{bike_type} som du tror
-            er stjålet.
-          creation_source: Kilde
-          creator: Skaper
-          edit: Endre
-          email_to_deal_with_this_html: Send e-post til %{support_link} for å håndtere
-            dette.
-          initial_registration: 'første registrering:'
-          is_false: falsk
-          is_not_registered_html: "<em>ikke</em> reged med %{org_name}"
-          is_registered: reged med %{org_name}
-          is_true: ekte
-          link_sticker: Link-klistremerke
-          link_url_for_online_sighting: Link url for online sighting (valgfritt)
-          mark_bike_recovered: Mark sykkelen gjenfunnet
-          missing_address: manglende adresse
-          missing_owner_name: mangler brukernavn
-          model_audit: E-kjøretøy revisjon
-          not_audited: Ikke revidert
-          or_call_owner_html: "<em>Eller ring</em> <strong>eierens telefonnummer:</strong>"
-          org_can_edit_bike: "%{org_name} kan redigere denne %{bike_type}"
-          org_cannot_edit: "%{org_name} kan ikke redigere"
-          organization_can_edit_after_claimed: og kan redigere etter %{bike_type} gjort
-            krav på
-          organization_child: Barneorganisasjon
-          organization_registered: Organisasjon
-          owner_email: E-post eier
-          owner_name: Eiers navn
-          parking_notification_notes_html: "%{org_name} interne notater <small>vises
-            ikke til brukeren</small>"
-          permission: Tillatelse
-          registered: Registrert
-          send_message: Sende melding
-          state: Stat
-          sticker: Klistremerke
-          sticker_code: Klistremerkekode
-          support_email: support@bikeindex.org
-          unable_to_display_additional_information: Kan ikke vise tilleggsinformasjon
-            fordi %{bike_type} ikke er registrert med %{org_name}
-          unregistered_parking_notification: opprettet for parkeringsvarsling
-          user_revoked_permission_html: Denne brukeren <strong>tilbakekalte</strong>
-            tillatelsen til å kontakte dem før sykkelen deres ble merket som stjålet.
-          waiting_on_device_location: Venter på enhetens plassering
-          where_did_you_see_this_bike: Hvor så du dette %{bike_type}? Hvis du kontakter
-            om en annonse du fant på nettet, inkluderer du en lenke i feltet nedenfor
-          write_a_message: Skrive en melding
-          zipcode: Postnummer
-          note_by: av %{user}
-          notes: Notater
-          save_notes: Lagre notat
-          region: Region
         bulk_import_error:
           ascend: Stige
           ascend_unprocessable_html: Masseimport <span class="text-danger">mislyktes</span>
@@ -5970,6 +5822,23 @@ nb:
             serial_label: 'Serie:'
             sticker_label: 'Klistremerke:'
             view_all: se alle
+        impound_records:
+          index:
+            matching_impound_record:
+              one: samsvarende beslagsregister
+              other: samsvarende beslaglagte poster
+            all_bikes: Alle sykler
+            all_statuses: Alle statuser
+            impound_records: Beslagleggelse av poster
+            interpreted_params: Interpreted_params
+            only_unregistered: Kun uregistrerte
+            only_user_registered: Kun bruker registrert
+            pagy: Pagy
+            per_page: Per_side
+            status_records: "%{status} poster"
+            update_multiple_records: Oppdater flere poster
+            cannot_update_with_kind: Denne oppføringen kan ikke oppdateres med «{kind}»
+            hide_update: Skjul oppdatering
       register:
         acknowledgment_check:
           i_name_html: Jeg, %{name},
@@ -6433,6 +6302,142 @@ nb:
           click_button_to_continue: Klikk på knappen nedenfor for å fortsette
           finish_signing_in: Fullfør påloggingen
           sign_in: Logg inn
+      my_account:
+        organization_roles:
+          automatically_view_in_organization: Vis automatisk med navigasjonsfeltet
+            %{org_name} når du logger deg på Bike Index.
+          joined: Ble med
+          leave_confirm: Advarsel! Du må be en administrator fra %{org_name} om å
+            få tilbake denne organisasjonsrollen! Du kan ikke angre dette selv.
+          leave_organization: Forlat organisasjonen
+          organization_role_information: Organisasjoner du har en rolle i. Dra dem
+            til den rekkefølgen du vil prioritere dem i.
+          organization_roles:
+            one: Din organisasjonsrolle
+            other: Dine organisasjonsroller
+          role_html: 'Rolle: %{role}'
+          roles:
+            admin: Admin
+            member: Medlem
+            member_no_bike_edit: Medlem - ingen sykkelredigering
+          view_after_log_in: Etter innlogging
+          view_as_html: Vis som %{org_name}
+          view_without_an_organization: Vis uten en organisasjon
+          you_can_still_switch: Du kan fortsatt bytte til visning med eller uten organisasjonen
+            i innstillingene dine i navigasjonsfeltet.
+          your_first_organization: din første organisasjon
+        strava_integration:
+          activities_synced:
+            one: "%{count} aktivitet synkronisert"
+            other: "%{count} aktiviteter synkronisert"
+          connect_with_strava: Koble til Strava
+          connected_to_strava: Koblet til Strava
+          disconnect_confirm: Er du sikker på at du vil koble fra Strava? Dette vil
+            fjerne alle synkroniserte aktiviteter.
+          disconnect_strava: Koble fra Strava
+          downloaded: nedlastet
+          integrate_your_bikes_with_strava: Integrer syklene dine med Strava og synkroniser
+            sykkelaktivitetene dine.
+          strava_bikes_connected: Strava-sykler koblet til Bike Index-sykler
+          strava_connected_pending: Koblet til Strava. Synkroniseringen starter snart.
+          strava_integration: Strava-integrasjon
+          sync_error: Synkroniseringsfeil
+          sync_error_description: Det oppsto en feil under synkronisering av Strava-aktivitetene
+            dine. Prøv å koble fra og koble til på nytt.
+          sync_running_in_background: Synkroniseringen kjører i bakgrunnen. Denne siden
+            oppdateres automatisk.
+          syncing_activities: Synkroniserer aktiviteter ...
+      sales:
+        new_form:
+          record_sale: Rekordsalg
+          sold_for: Beløp solgt for
+          transfer_to_html: Dette vil overføre registreringen til %{buyer_html} og lukke
+            markedsplassen.
+      homepage:
+        for_buttons:
+          bike_shops: Sykkelbutikker
+          cities: Byer
+          community_groups: Fellesskapsgrupper
+          schools: Skoler
+          theft_victims: Tyveriofre
+      bikes:
+        org:
+          bike_access_panel:
+            access_panel: Tilgangspanel
+            added_to_track_parking_notification: Denne %{bike_type} er ikke registrert
+              på en bruker. Den ble lagt til for å spore parkeringsvarsler.
+            additional_registrations_information: Registreringer etter bruker
+            additional_registrations_information_visible_because: synlig med %{org_name}
+              rettshåndhevelsestilgang
+            additional_registrations_potential_duplicates: 'Potensielle duplikatsykler
+              som matcher seriesegmenter:'
+            additional_registrations_registered_at: Registrert kl
+            additional_registrations_this_bike: Denne %{bike_type}
+            address: Registreringsadresse
+            address_or_intersection: Adresse eller veikryss
+            as_a_bikeindex_ambassador_html: <em><span class="hidden-md-down">Som Bike
+              Index-ambassadør</span> kan du merke den som gjenopprettet:</em>
+            assign_sticker: Tildel klistremerke
+            avery_exportable: Avery eksporterbar
+            believe_it_is_anyway: Tror du det er det uansett?
+            bike_is_not_registered_html: Denne %{bike_type} er <em>ikke</em> registrert
+              med %{org_name}
+            bike_is_registered: Denne %{bike_type} er registrert med %{org_name}
+            bike_not_marked_stolen: "%{bike_type} er ikke merket som stjålet."
+            choose_country: Velg land
+            city: By
+            claimed: Hevdet
+            contact_the_owner_it_is_stolen: til eieren av denne %{bike_type} som du tror
+              er stjålet.
+            creation_source: Kilde
+            creator: Skaper
+            edit: Endre
+            email_to_deal_with_this_html: Send e-post til %{support_link} for å håndtere
+              dette.
+            initial_registration: 'første registrering:'
+            is_false: falsk
+            is_not_registered_html: "<em>ikke</em> reged med %{org_name}"
+            is_registered: reged med %{org_name}
+            is_true: ekte
+            link_sticker: Link-klistremerke
+            link_url_for_online_sighting: Link url for online sighting (valgfritt)
+            mark_bike_recovered: Mark sykkelen gjenfunnet
+            missing_address: manglende adresse
+            missing_owner_name: mangler brukernavn
+            model_audit: E-kjøretøy revisjon
+            not_audited: Ikke revidert
+            or_call_owner_html: "<em>Eller ring</em> <strong>eierens telefonnummer:</strong>"
+            org_can_edit_bike: "%{org_name} kan redigere denne %{bike_type}"
+            org_cannot_edit: "%{org_name} kan ikke redigere"
+            organization_can_edit_after_claimed: og kan redigere etter %{bike_type} gjort
+              krav på
+            organization_child: Barneorganisasjon
+            organization_registered: Organisasjon
+            owner_email: E-post eier
+            owner_name: Eiers navn
+            parking_notification_notes_html: "%{org_name} interne notater <small>vises
+              ikke til brukeren</small>"
+            permission: Tillatelse
+            registered: Registrert
+            send_message: Sende melding
+            state: Stat
+            sticker: Klistremerke
+            sticker_code: Klistremerkekode
+            support_email: support@bikeindex.org
+            unable_to_display_additional_information: Kan ikke vise tilleggsinformasjon
+              fordi %{bike_type} ikke er registrert med %{org_name}
+            unregistered_parking_notification: opprettet for parkeringsvarsling
+            user_revoked_permission_html: Denne brukeren <strong>tilbakekalte</strong>
+              tillatelsen til å kontakte dem før sykkelen deres ble merket som stjålet.
+            waiting_on_device_location: Venter på enhetens plassering
+            where_did_you_see_this_bike: Hvor så du dette %{bike_type}? Hvis du kontakter
+              om en annonse du fant på nettet, inkluderer du en lenke i feltet nedenfor
+            write_a_message: Skrive en melding
+            zipcode: Postnummer
+            note_by: av %{user}
+            notes: Notater
+            save_notes: Lagre notat
+            region: Region
   user_emails:
     confirm:
       confirm_email: Bekreft e-post

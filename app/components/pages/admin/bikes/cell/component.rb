@@ -66,7 +66,7 @@ module Pages
                 concat(content_tag(:em, " unregistered", class: "small text-warning"))
               elsif @bike.creation_description.present?
                 concat(", ")
-                concat(content_tag(:small, render(Pages::Org::OriginDisplay::Component.new(creation_description: @bike.creation_description)), class: "less-strong"))
+                concat(content_tag(:small, render(Atoms::Org::OriginDisplay::Component.new(creation_description: @bike.creation_description)), class: "less-strong"))
               end
             end
           end

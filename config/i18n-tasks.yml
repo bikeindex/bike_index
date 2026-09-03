@@ -27,11 +27,14 @@ data:
     # own sidecar. These must precede the generic rules below, which can't tell a
     # sub-namespace segment from a nested/plural key and would otherwise land
     # these in the parent namespace's directory. Add a line here per sub-namespace.
-    - ['components.pages.admin.badges.{:}.*', 'app/components/pages/admin/badges/\1/component.%{locale}.yml']
+    - ['components.atoms.admin.badges.{:}.*', 'app/components/atoms/admin/badges/\1/component.%{locale}.yml']
+    - ['components.atoms.admin.{:}.*', 'app/components/atoms/admin/\1/component.%{locale}.yml']
+    - ['components.atoms.org.{:}.*', 'app/components/atoms/org/\1/component.%{locale}.yml']
     - ['components.emails.partials.{:}.*', 'app/components/emails/partials/\1/component.%{locale}.yml']
+    - ['components.pages.bikes.org.{:}.*', 'app/components/pages/bikes/org/\1/component.%{locale}.yml']
+    - ['components.pages.org.impound_records.{:}.*', 'app/components/pages/org/impound_records/\1/component.%{locale}.yml']
     - ['components.pages.org.registration_sequence.{:}.*', 'app/components/pages/org/registration_sequence/\1/component.%{locale}.yml']
     - ['components.shared_blocks.main_content.{:}.*', 'app/components/shared_blocks/main_content/\1/component.%{locale}.yml']
-    - ['components.shared_blocks.my_account.{:}.*', 'app/components/shared_blocks/my_account/\1/component.%{locale}.yml']
     - ['components.shared_blocks.navbar.{:}.*', 'app/components/shared_blocks/navbar/\1/component.%{locale}.yml']
     - ['components.shared_blocks.user_alerts.{:}.*', 'app/components/shared_blocks/user_alerts/\1/component.%{locale}.yml']
     - ['components.pages.registrations.show.current_alerts.{:}.*', 'app/components/pages/registrations/show/current_alerts/\1/component.%{locale}.yml']

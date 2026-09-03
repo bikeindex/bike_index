@@ -98,7 +98,7 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 
 ## Architecture notes
 
-- **`app/components` has five top-level folders, and a new component goes in exactly one of them**: `ui` (the design system — a component whose arguments are only about style), `atoms` (small value renderers — `Atoms::Serial`, `Atoms::Phone`), `pages` (one namespace per route, `Pages::Admin::Bikes::Table`), `shared_blocks` (the chrome around a page — navbar, footer, alerts), and `emails`. Nothing else belongs at the top level.
+- **`app/components` has five top-level folders, and a new component goes in exactly one of them**: `ui` (the design system — a component whose arguments are only about style), `atoms` (small renderers reused across pages — `Atoms::Serial`, `Atoms::Admin::Badges::User`), `pages` (one namespace per route, `Pages::Admin::Bikes::Table`), `shared_blocks` (the chrome around a page — navbar, footer, alerts), and `emails`. Nothing else belongs at the top level.
 - **Moving a file silently un-suppresses whatever was keyed to its old path.** `.herb.yml` excludes lint rules by path, and `brakeman.ignore` hashes the file path into each fingerprint — so a rename re-enables the rule and obsoletes the entry, and neither says so until CI fails. Grep the repo root and `config/` for the old path, not just `app/`; re-fingerprint brakeman from `brakeman -f json` rather than hand-editing the path.
 - **Multi-database**: primary (`ApplicationRecord`) + analytics (`AnalyticsRecord`). Use `db:migrate:down:analytics` for analytics migrations
 - **Soft delete**: some models use `acts_as_paranoid` with `deleted_at` column; use `unscoped` in admin controllers when needed

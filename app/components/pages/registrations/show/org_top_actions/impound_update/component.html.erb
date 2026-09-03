@@ -14,7 +14,7 @@
     </h2>
 
     <div class="tw:mt-4">
-      <%= render(Pages::Org::ImpoundRecordUpdateForm::Component.new(current_organization: @organization, impound_record:, card: false)) %>
+      <%= render(Pages::Org::ImpoundRecords::UpdateForm::Component.new(current_organization: @organization, impound_record:, card: false)) %>
     </div>
   <% end %>
 </div>

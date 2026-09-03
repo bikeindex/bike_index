@@ -58,7 +58,7 @@
             </td>
 
             <td>
-              <%= render Pages::Admin::Badges::MarketplaceListing::Component.new(status: marketplace_listing.status, status_humanized: marketplace_listing.status_humanized, kind: :marketplace_listing) %>
+              <%= render Atoms::Admin::Badges::MarketplaceListing::Component.new(status: marketplace_listing.status, status_humanized: marketplace_listing.status_humanized, kind: :marketplace_listing) %>
             </td>
 
             <td>
@@ -88,7 +88,7 @@
             <td><%= marketplace_listing.condition %></td>
 
             <td>
-              <%= render Pages::Admin::AddressRecordCell::Component.new(address_record: marketplace_listing.address_record) %>
+              <%= render Atoms::Admin::AddressRecordCell::Component.new(address_record: marketplace_listing.address_record) %>
             </td>
 
             <td>
