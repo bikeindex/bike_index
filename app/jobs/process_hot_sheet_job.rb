@@ -38,7 +38,7 @@ class ProcessHotSheetJob < ScheduledJob
     # Deliver every batch before raising, so one failure doesn't block the rest
     errors = recipient_id_slices.filter_map.with_index do |recipient_ids, index|
       sheet = index.zero? ? hot_sheet : HotSheet.new(sheet_attributes)
-      sheet.update!(recipient_ids:)
+      sheet.recipient_ids = recipient_ids
       deliver_email(sheet)
     end
     raise errors.first if errors.any?
