@@ -1726,7 +1726,8 @@ CREATE TABLE public.hot_sheets (
     updated_at timestamp without time zone NOT NULL,
     delivery_status_legacy character varying,
     delivery_status integer DEFAULT 0,
-    delivery_error character varying
+    delivery_error character varying,
+    message_id character varying
 );
 
 

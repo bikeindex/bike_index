@@ -5,13 +5,14 @@
 #
 #  id                     :bigint           not null, primary key
 #  delivery_error         :string
-#  delivery_status        :integer          default(0)
+#  delivery_status        :integer          default("delivery_pending")
 #  delivery_status_legacy :string
 #  recipient_ids          :jsonb
 #  sheet_date             :date
 #  stolen_record_ids      :jsonb
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
+#  message_id             :string
 #  organization_id        :bigint
 #
 # Indexes
@@ -19,8 +20,6 @@
 #  index_hot_sheets_on_organization_id  (organization_id)
 #
 class HotSheet < ApplicationRecord
-  include EmailDeliveryTrackable
-
   DELIVERY_STATUS_ENUM = Notification::DELIVERY_STATUS_ENUM
 
   enum :delivery_status, DELIVERY_STATUS_ENUM
@@ -49,6 +48,28 @@ class HotSheet < ApplicationRecord
 
   def email_success?
     delivery_success?
+  end
+
+  # This method takes a block. Unlike Notification's, it returns the error rather than
+  # raising it - the job delivers every sheet in the batch before blowing up
+  def track_email_delivery
+    return if delivery_success?
+
+    delivery = yield
+    self.message_id ||= message_id_from_delivery(delivery)
+    update(delivery_status: "delivery_success")
+    nil
+  rescue => e
+    record_delivery_failure(e)
+    undeliverable_error?(e) ? nil : e
+  end
+
+  def delivery_error_spam?
+    delivery_error == "Postmark::InactiveRecipientError"
+  end
+
+  def delivery_error_invalid?
+    delivery_error == "Postmark::InvalidEmailRequestError"
   end
 
   def subject
@@ -97,10 +118,6 @@ class HotSheet < ApplicationRecord
 
   private
 
-  def record_delivery_success(_delivery)
-    update(delivery_status: "delivery_success")
-  end
-
   # A sheet emails a whole batch at once, so only the addresses Postmark rejected failed
   def record_delivery_failure(error)
     failed_emails = inactive_recipient_emails(error)
@@ -112,6 +129,22 @@ class HotSheet < ApplicationRecord
 
   def normalized_recipient_emails
     recipient_emails.map { EmailNormalizer.normalize(it) }
+  end
+
+  # Postmark names the addresses it rejected as inactive, and delivers to the rest of
+  # the batch. Any other error leaves no way to tell who received the email
+  def inactive_recipient_emails(error)
+    return [] unless error.is_a?(Postmark::InactiveRecipientError)
+
+    error.recipients.map { EmailNormalizer.normalize(it) }
+  end
+
+  def undeliverable_error?(error)
+    Notification::UNDELIVERABLE_ERRORS.any? { |error_class| error.is_a?(error_class) }
+  end
+
+  def message_id_from_delivery(delivery)
+    defined?(delivery.message_id) ? delivery.message_id : nil
   end
 
   def calculated_stolen_records

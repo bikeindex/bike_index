@@ -57,6 +57,7 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
         expect(hot_sheet.recipient_ids).to eq([organization_role.user_id])
         expect(ActionMailer::Base.deliveries.count).to eq 1
         email = ActionMailer::Base.deliveries.last
+        expect(hot_sheet.message_id).to eq email.message_id
         expect(email.subject).to eq hot_sheet.subject
         expect(email.to).to eq([organization_role.user.email])
         expect(email.bcc).to eq([])
@@ -137,6 +138,22 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
             expect(rejected.recipient_ids).to include(inactive_user.id)
             # Only the rejected address is flagged, not the rest of their batch
             expect(UserEmail.last_email_errored.pluck(:email)).to eq([inactive_user.email])
+          end
+
+          context "with an error postmark can't attribute" do
+            let(:inactive_recipient_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 499}) }
+            it "delivers the other batches before raising" do
+              expect {
+                ProcessHotSheetJob.drain
+              }.to raise_error(Postmark::ApiInputError)
+              hot_sheets = HotSheet.where(sheet_date: Time.current.to_date)
+              expect(hot_sheets.count).to eq 3
+              expect(hot_sheets.delivery_success.count).to eq 2
+              expect(hot_sheets.delivery_failure.count).to eq 1
+              expect(ActionMailer::Base.deliveries.count).to eq 2
+              # Nobody is flagged - there is no telling which of the batch failed
+              expect(UserEmail.last_email_errored.count).to eq 0
+            end
           end
         end
       end

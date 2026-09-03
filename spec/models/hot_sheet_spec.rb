@@ -23,7 +23,7 @@ RSpec.describe HotSheet, type: :model do
       expect(hot_sheet.reload.delivery_status).to eq "delivery_pending"
       expect(hot_sheet.email_success?).to be_falsey
       deliveries = 0
-      hot_sheet.track_email_delivery { deliveries += 1 }
+      expect(hot_sheet.track_email_delivery { deliveries += 1 }).to be_nil
       expect(hot_sheet.reload.delivery_status).to eq "delivery_success"
       expect(hot_sheet.delivery_error).to be_nil
       expect(hot_sheet.email_success?).to be_truthy
@@ -34,9 +34,8 @@ RSpec.describe HotSheet, type: :model do
 
     context "with an unknown postmark error" do
       let(:api_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 499}) }
-      it "records the failure and raises" do
-        expect { hot_sheet.track_email_delivery { raise api_error } }
-          .to raise_error(Postmark::ApiInputError)
+      it "records the failure and returns the error for the job to raise" do
+        expect(hot_sheet.track_email_delivery { raise api_error }).to eq api_error
         expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
         expect(hot_sheet.delivery_error).to eq "Postmark::ApiInputError"
         expect(hot_sheet.email_success?).to be_falsey
@@ -45,8 +44,8 @@ RSpec.describe HotSheet, type: :model do
 
     context "with an undeliverable error" do
       let(:invalid_email_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 300}) }
-      it "records the failure without raising" do
-        hot_sheet.track_email_delivery { raise invalid_email_error }
+      it "records the failure without returning an error" do
+        expect(hot_sheet.track_email_delivery { raise invalid_email_error }).to be_nil
         expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
         expect(hot_sheet.delivery_error).to eq "Postmark::InvalidEmailRequestError"
         # There is no way to tell which of the batch failed, so nobody is flagged
@@ -71,7 +70,7 @@ RSpec.describe HotSheet, type: :model do
       it "records a partial success, and only flags the address that was rejected" do
         expect(hot_sheet.recipient_emails).to match_array(users.map(&:email))
         expect(UserEmail.last_email_errored.count).to eq 0
-        hot_sheet.track_email_delivery { raise inactive_recipient_error }
+        expect(hot_sheet.track_email_delivery { raise inactive_recipient_error }).to be_nil
 
         # Postmark delivered to the rest of the batch, so this isn't a total failure
         expect(hot_sheet.reload.delivery_status).to eq "delivery_partial_success"

@@ -29,8 +29,6 @@
 #
 
 class Notification < ApplicationRecord
-  include EmailDeliveryTrackable
-
   # TODO: create notifications for every email we send (including other models, e.g. Feedback)
   #
   # Every single notification that we send has a separate enum key - which is a lot!
@@ -40,6 +38,8 @@ class Notification < ApplicationRecord
   MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
   DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2,
                           delivery_partial_success: 3}.freeze
+
+  UNDELIVERABLE_ERRORS = [Postmark::InactiveRecipientError, Postmark::InvalidEmailRequestError].freeze
 
   enum :kind, KIND_ENUM
   enum :message_channel, MESSAGE_CHANNEL_ENUM
@@ -233,18 +233,31 @@ class Notification < ApplicationRecord
     calculated_email
   end
 
-  private
+  # This method takes a block
+  def track_email_delivery
+    return if delivery_success?
 
-  def record_delivery_success(delivery)
+    delivery = yield
+
     self.message_id ||= message_id_from_delivery(delivery)
     update(delivery_status: "delivery_success")
     user_email&.update_last_email_errored!(email_errored: false)
+  rescue => e
+    update(delivery_status: "delivery_failure", delivery_error: e.class)
+    user_email&.update_last_email_errored!(email_errored: true)
+
+    raise e unless UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
   end
 
-  def record_delivery_failure(error)
-    update(delivery_status: "delivery_failure", delivery_error: error.class)
-    user_email&.update_last_email_errored!(email_errored: true)
+  def delivery_error_spam?
+    delivery_error == "Postmark::InactiveRecipientError"
   end
+
+  def delivery_error_invalid?
+    delivery_error == "Postmark::InvalidEmailRequestError"
+  end
+
+  private
 
   def message_id_from_delivery(delivery)
     defined?(delivery.message_id) ? delivery.message_id : nil

@@ -29,10 +29,9 @@ class ProcessHotSheetJob < ScheduledJob
     hot_sheet ||= HotSheet.create!(organization_id: org_id, sheet_date: Time.current.to_date)
     # Bump bike cached attributes, to be sure the email has all the info. Once per sheet -
     hot_sheet.fetch_stolen_records.each { it.bike.update(updated_at: Time.current) }
-    hot_sheet.fetch_recipients
-    recipient_id_slices = hot_sheet.recipient_ids.each_slice(RECIPIENTS_PER_EMAIL).to_a
-    # With nobody to email, there is nothing left to deliver
-    return hot_sheet.update(delivery_status: "delivery_success") if recipient_id_slices.none?
+    # Always at least one slice, so a sheet with nobody to email is still marked delivered
+    recipient_id_slices = hot_sheet.hot_sheet_configuration.current_recipient_ids
+      .each_slice(RECIPIENTS_PER_EMAIL).to_a.presence || [[]]
 
     # Build every sheet before delivering any, so the dups don't inherit a delivery_status
     sheets = recipient_id_slices.map.with_index do |recipient_ids, index|
@@ -40,9 +39,17 @@ class ProcessHotSheetJob < ScheduledJob
       sheet.update!(recipient_ids:)
       sheet
     end
-    sheets.each do |sheet|
-      # This job delivers inline, rather than enqueuing a separate mailer job
-      sheet.track_email_delivery { OrganizedMailer.hot_sheet(sheet).deliver_now }
+    # Deliver every sheet before raising, so one failing batch doesn't block the rest
+    errors = sheets.filter_map { deliver_email(it) }
+    raise errors.first if errors.any?
+  end
+
+  private
+
+  # This job delivers inline, rather than enqueuing a separate mailer job
+  def deliver_email(hot_sheet)
+    hot_sheet.track_email_delivery do
+      OrganizedMailer.hot_sheet(hot_sheet).deliver_now if hot_sheet.recipient_ids.any?
     end
   end
 end
