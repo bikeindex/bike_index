@@ -4,8 +4,7 @@ module Atoms
   module Org
     module OriginDisplay
       class Component < ApplicationComponent
-        # The label is lowercase and the tooltip a lowercase sentence, so the only title case
-        # anywhere is a name inside one - the flow, the POS product
+        # These read as lowercase sentences - the title case in them is a proper name
         EXTENDED_DESCRIPTIONS = {
           "web" => "registered with self registration process",
           "org reg" => "registered by internal, organization member form",
