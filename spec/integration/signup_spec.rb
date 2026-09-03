@@ -72,6 +72,31 @@ RSpec.describe "Signup", :js, type: :system do
     expect(page).to have_content("Logged in!", wait: 10)
   end
 
+  it "email bans a bot that fills the honeypot, without letting on" do
+    visit new_user_path
+
+    # A rider can't see or reach the honeypot, so only a bot fills it in
+    honeypot = find_field("Additional", visible: :hidden)
+    expect(honeypot[:tabindex]).to eq "-1"
+    page.execute_script("arguments[0].value = 'http://spam.example.com'", honeypot)
+
+    fill_in "Email", with: email
+    fill_in "Name", with: "Spam Bot"
+    check "user_terms_of_service"
+
+    # The bot gets the same success it would if it had gotten away with it
+    expect { click_button "Sign up" }.to change(Email::ConfirmationJob.jobs, :count).by(1)
+    expect(page).to have_content("Follow the link in the email to finish signing up", wait: 10)
+
+    user = User.find_by(email:)
+    expect(user.email_banned?).to be_truthy
+    expect(user.email_bans.last.reason).to eq "honeypot"
+
+    # The ban empties the confirmation email, so the account can never be activated
+    expect { Email::ConfirmationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
+    expect(user.reload.confirmed?).to be_falsey
+  end
+
   it "signs in with a magic link, then confirms an additional email" do
     user = sign_up_and_confirm
     additional_email = "newrider@umich.edu"
