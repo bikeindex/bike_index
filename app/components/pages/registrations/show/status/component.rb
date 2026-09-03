@@ -13,7 +13,7 @@ module Pages
           end
 
           def call
-            render(UI::Badge::Component.new(text: label, color: color, indicator: true))
+            render(UI::Badge::Component.new(text: label, color:, indicator: true))
           end
 
           private
