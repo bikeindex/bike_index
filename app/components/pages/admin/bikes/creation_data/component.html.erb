@@ -48,9 +48,7 @@
           <% end %>
         </div>
 
-        <div class="twjson-box">
-          <%= helpers.pretty_print_json(ownership_attributes(ownership), true) %>
-        </div>
+        <%= render UI::JsonDisplay::Component.new(data: ownership_attributes(ownership), skip_blank: true) %>
       <% end %>
     </div>
 
@@ -77,9 +75,7 @@
             <% end %>
           </div>
 
-          <div class="twjson-box">
-            <%= helpers.pretty_print_json(b_param.params, true) %>
-          </div>
+          <%= render UI::JsonDisplay::Component.new(data: b_param.params, skip_blank: true) %>
         <% end %>
       </div>
     <% end %>

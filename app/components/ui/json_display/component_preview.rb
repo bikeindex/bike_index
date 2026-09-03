@@ -9,12 +9,13 @@ module UI
         render(UI::JsonDisplay::Component.new(data: sample_data))
       end
 
-      def small
-        render(UI::JsonDisplay::Component.new(data: sample_data, small: true))
+      def small_with_max_width
+        render(UI::JsonDisplay::Component.new(data: sample_data, max_width: 300, small: true))
       end
 
-      def max_width
-        render(UI::JsonDisplay::Component.new(data: sample_data, max_width: 300, small: true))
+      # Drops the nil and empty values, keeping false ones
+      def skip_blank
+        render(UI::JsonDisplay::Component.new(data: sample_data, skip_blank: true))
       end
 
       # @!endgroup
@@ -27,13 +28,12 @@ module UI
             manufacturer_id: 82,
             cycle_type: "cargo",
             serial_number: "GULLY-1987-XX",
-            primary_frame_color_id: 4,
-            owner_email: "mothman@bikeindex.org",
-            components: [{ctype: "headlight", description: "unusually bright"}]
+            owner_email: "mothman@bikeindex.org"
           },
           origin: "register_flow",
-          revised_new: true,
-          stolen_record: nil
+          revised_new: false,
+          stolen_record: nil,
+          bike_sticker: ""
         }
       end
     end

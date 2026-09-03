@@ -4,17 +4,16 @@ require "rails_helper"
 
 RSpec.describe UI::JsonDisplay::Component, type: :component do
   let(:component) { render_inline(described_class.new(data:, **options)) }
-  let(:data) { {bike: {owner_email: "mothman@bikeindex.org"}} }
+  let(:data) { {owner_email: "mothman@bikeindex.org", stolen: false, bike_sticker: nil} }
   let(:options) { {} }
 
-  it "renders the highlighted json, full width and full size" do
-    expect(component.text).to include "owner_email"
+  it "renders every value, full width and full size" do
     expect(component).to have_css("div.twjson-box pre")
+    expect(component.text).to include "bike_sticker"
     expect(component).to_not have_css("div.twjson-box[style]")
-    expect(component).to_not have_css("div.tw\\:text-xs")
   end
 
-  context "with small and a numeric max_width" do
+  context "with small and max_width" do
     let(:options) { {small: true, max_width: 450} }
 
     it "renders the pixel width and the smaller text" do
@@ -22,11 +21,12 @@ RSpec.describe UI::JsonDisplay::Component, type: :component do
     end
   end
 
-  context "with a css max_width" do
-    let(:options) { {max_width: "50%"} }
+  context "with skip_blank" do
+    let(:options) { {skip_blank: true} }
 
-    it "passes the value through" do
-      expect(component).to have_css("div[style='max-width: 50%;']")
+    it "drops the nil value but keeps the false one" do
+      expect(component.text).to_not include "bike_sticker"
+      expect(component.text).to include "stolen"
     end
   end
 
