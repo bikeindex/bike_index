@@ -45,9 +45,8 @@ export default class extends Controller {
     this.sync()
   }
 
-  // Only focus landing on another element in the page dismisses. A focusout with
-  // nowhere to go is the browser window losing focus (the rider switched program)
-  // or a click on the tooltip itself - neither means they're done with it.
+  // A focusout with a null relatedTarget is the window losing focus to another
+  // program - not a dismissal
   hideOnFocusout (event) {
     if (!event.relatedTarget || this.element.contains(event.relatedTarget)) return
     this.persistentActive = false
@@ -68,8 +67,8 @@ export default class extends Controller {
   }
 
   sync () {
-    // Only a held-open tooltip takes pointer events, so its text can be clicked
-    // and selected; a hover-only one stays transparent to the mouse.
+    // Pointer events only while held open - always-on would swallow clicks on
+    // whatever a hover-only tooltip overlaps
     this.tooltipTarget.classList.toggle('tw:pointer-events-none', !this.persistentActive)
     if (this.hoverActive || this.persistentActive) this.open()
     else this.close()

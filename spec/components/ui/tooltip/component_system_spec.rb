@@ -14,7 +14,6 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     JS
   end
 
-  # The id of the tooltip the current text selection sits inside, if any
   def selected_tooltip_id
     page.evaluate_script(<<~JS)
       (() => {
@@ -109,21 +108,19 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     find("body").click
     expect(tooltip).not_to be_visible
 
-    # Clicking the trigger persists the tooltip through mouseleave until a body click
+    # Clicking the trigger persists the tooltip through mouseleave until a body click,
+    # and only a held-open tooltip takes pointer events rather than being click-through
     trigger.hover
+    expect(tooltip[:class]).to include "tw:pointer-events-none"
     trigger.click
+    expect(tooltip[:class]).not_to include "tw:pointer-events-none"
     find("body").hover
     expect(tooltip).to be_visible
     find("body").click
     expect(tooltip).not_to be_visible
 
-    # A hovered tooltip is click-through; clicking the trigger open makes its text clickable
-    trigger.hover
-    expect(tooltip[:class]).to include "tw:pointer-events-none"
-    trigger.click
-    expect(tooltip[:class]).not_to include "tw:pointer-events-none"
-
     # Clicking the tooltip text leaves it open, so it can be selected
+    trigger.click
     tooltip.click
     find("body").hover
     expect(tooltip).to be_visible
