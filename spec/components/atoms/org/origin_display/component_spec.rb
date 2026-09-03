@@ -20,6 +20,16 @@ RSpec.describe Atoms::Org::OriginDisplay::Component, type: :component do
     let(:kinds) { Atoms::Org::OriginDisplay::ComponentPreview.new.every_kind.dig(:locals, :ownerships).map(&:creation_kind) }
     let(:copy) { I18n.t("components.atoms.org.origin_display") }
 
+    # Built off the enums rather than the preview, so an under-enumerating preview
+    # can't agree with a sidecar trimmed to match it
+    it "is every kind the enums can produce, and the preview renders each" do
+      possible = (Organization.pos_kinds.map { Ownership.new(pos_kind: it) } +
+        [Ownership.new(bulk_import_id: 1)] +
+        Ownership.origins.map { Ownership.new(origin: it) }).filter_map(&:creation_kind).uniq
+
+      expect(kinds).to match_array(possible)
+    end
+
     it "has a label and a description, and no copy for a kind that can't happen" do
       expect(copy[:labels].keys).to match_array(kinds)
       expect(copy[:descriptions].keys).to match_array(kinds)
