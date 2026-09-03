@@ -259,10 +259,13 @@ module BikeServices
       b_param.creator_id ||= user&.id
       b_param.image = image if image.present?
       bike_params = bike_params.to_h
+      # `additional` is a honeypot - merged rather than assigned, so a resubmission
+      # without it doesn't clear a flag already earned
+      bike_params = bike_params.merge("likely_spam" => true) if additional.present?
       completed = b_param.self_made?(user) || bike_params["user_name"].present?
       clear_stale_report(b_param, bike_params["status"])
       set_auto_organization(b_param, register_with_organization)
-      b_param.clean_params(step_2_params(bike_params, image_signed_id:, completed:, additional:).as_json)
+      b_param.clean_params(step_2_params(bike_params, image_signed_id:, completed:).as_json)
       b_param.save
       b_param.errors.add(:base, translation(:name_required)) unless completed
       completed
@@ -481,13 +484,10 @@ module BikeServices
 
     # Blank values keep what step 1 saved - except the additional colors, where
     # blank is the "remove color" button clearing one
-    def step_2_params(bike_params, image_signed_id:, completed:, additional:)
+    def step_2_params(bike_params, image_signed_id:, completed:)
       bike_params = bike_params.reject { |key, value| value.blank? && !key.in?(%w[secondary_frame_color_id tertiary_frame_color_id]) }
       # The unit only means something alongside a numeric size
       bike_params = bike_params.except("frame_size_unit") if bike_params["frame_size_number"].blank?
-      # `additional` is a honeypot on step 2 - only bots fill it in. Merged rather than
-      # always set, so a resubmission without it doesn't clear the flag it already earned
-      bike_params = bike_params.merge("likely_spam" => true) if additional.present?
       # The photo went browser -> bucket before submit, so only its signed id rides along.
       # Dropped when blank rather than merged, which would clobber an id already stored.
       {details_completed: completed, bike: bike_params, image_signed_id: image_signed_id.presence}.compact
