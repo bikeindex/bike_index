@@ -17,28 +17,11 @@ RSpec.describe "Register flow", :js, type: :system do
     Autocomplete::Loader.load_all(%w[Manufacturer])
   end
 
-  def sign_in(user)
-    visit new_session_path
-    fill_in "Email", with: user.email
-    click_button "Continue"
-    fill_in "Password", with: "testthisthing7$"
-    click_button "Log in"
-    expect(page).to have_current_path("/my_account", wait: 5)
-  end
-
   def submit_step_1
     type_into("#b_param_manufacturer_id", "Surly")
     click_combobox_option("Surly")
     fill_in "b_param[owner_email]", with: owner_email
     click_button "Next"
-  end
-
-  # fill_in focuses the field, then sends its text a round trip later - so a controller
-  # connecting in between lands the text in the field filled just before
-  def wait_for_details_step(wait: Capybara.default_max_wait_time)
-    expect(page).to have_content("Add your bike", wait:)
-    expect(page).to have_css("input[name='bike[frame_model]']:focus", wait:)
-    wait_for_stimulus(timeout: wait)
   end
 
   # Answers every submission in the browser, the way an edge that never reaches the app
@@ -379,7 +362,10 @@ RSpec.describe "Register flow", :js, type: :system do
     let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
     let(:friend_email) { "friend@bikeindex.org" }
 
-    before { sign_in(current_user) }
+    before do
+      sign_in(current_user)
+      expect(page).to have_current_path("/my_account")
+    end
 
     it "asks for a name once the registration is going to someone other than them" do
       # Step 1 prefills their own address, which their account is already the name for
@@ -545,7 +531,10 @@ RSpec.describe "Register flow", :js, type: :system do
     let(:image_path) { Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg") }
     let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
 
-    before { sign_in(current_user) }
+    before do
+      sign_in(current_user)
+      expect(page).to have_current_path("/my_account")
+    end
 
     it "PUTs the photo to the bucket and serves it from the storage domain" do
       start_registration

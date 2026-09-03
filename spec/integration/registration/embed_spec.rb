@@ -13,21 +13,11 @@ RSpec.describe "Organization embed registration", :js, type: :system do
     Autocomplete::Loader.load_all(%w[Manufacturer])
   end
 
-  def selectize_for(field_id)
-    find("##{field_id}", visible: :all).find(:xpath, "./following-sibling::div[contains(@class, 'selectize-control')][1]")
-  end
-
   def fill_in_the_registration
     # Manufacturer loads its options over AJAX, hence the longer wait than the colors,
     # which are in the page already
-    manufacturer_box = selectize_for("bike_manufacturer_id")
-    manufacturer_box.find(".selectize-input").click
-    type_into(manufacturer_box.find(".selectize-input input"), "Surly")
-    manufacturer_box.find(".selectize-dropdown-content .option", text: "Surly", wait: 10).click
-
-    color_box = selectize_for("bike_primary_frame_color_id")
-    color_box.find(".selectize-input").click
-    color_box.find(".selectize-dropdown-content .option", text: "Black", wait: 5).click
+    pick_remote_selectize(selectize_for("#bike_manufacturer_id"), "Surly")
+    pick_selectize("#bike_primary_frame_color_id", "Black")
 
     fill_in "bike[serial_number]", with: "EMBED1234"
     fill_in "bike[owner_email]", with: owner_email

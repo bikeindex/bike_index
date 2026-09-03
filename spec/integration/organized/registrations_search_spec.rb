@@ -23,11 +23,7 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # waits for its target to settle before it lands. That wait is Capybara's,
     # so the 2s default is what times out here on a loaded machine.
     using_wait_time(10) do
-      visit new_session_path
-      fill_in "Email", with: user.email
-      click_button "Continue"
-      fill_in "Password", with: "testthisthing7$"
-      click_button "Log in"
+      sign_in(user)
       dismiss_flash_messages
       # 720px wide, so the sidebar is an overlay behind the top bar's hamburgler.
       # Its registrations group is the one open on a page no group matches.

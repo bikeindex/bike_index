@@ -28,11 +28,7 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
 
   # Only the seller signs in - the buyer arrives signed in off their confirmation link
   def sign_in_as_seller
-    visit new_session_path
-    fill_in "Email", with: owner_email
-    click_button "Continue"
-    fill_in "Password", with: "testthisthing7$"
-    click_button "Log in"
+    sign_in(seller)
     expect(page).to have_current_path("/my_account")
     dismiss_donation_modal(wait: 10)
   end
@@ -92,11 +88,7 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
     expect(page).to have_content("Save the listing to be able to preview it")
     expect(page).to have_no_css("li.completed-item")
 
-    # revised/init.coffee selectizes this one select, so it has no <select> to pick from
-    within(".fancy-select-placeholder") do
-      find(".selectize-input").click
-      find(".selectize-dropdown-content .option", text: primary_activity.name).click
-    end
+    pick_selectize("#marketplace_listing_primary_activity_id", primary_activity.name)
     select "excellent - lightly ridden", from: "marketplace_listing[condition]"
     fill_in "Price", with: "450"
     check "marketplace_listing[price_negotiable]"

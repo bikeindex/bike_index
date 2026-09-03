@@ -29,28 +29,6 @@ RSpec.describe "Editing a registration", :js, type: :system do
     Autocomplete::Loader.load_all(%w[Manufacturer])
   end
 
-  def selectize_for(field_id)
-    find("##{field_id}", visible: :all).find(:xpath, "./following-sibling::div[contains(@class, 'selectize-control')][1]")
-  end
-
-  def pick_selectize(field_id, text)
-    pick_within_selectize(selectize_for(field_id), text)
-  end
-
-  # Picks an option from a selectize control found within the given scope element
-  def pick_within_selectize(control, text)
-    control.find(".selectize-input").click
-    control.find(".selectize-dropdown-content .option", text: text, wait: 5).click
-  end
-
-  # Types into a remote-autocomplete selectize (manufacturer fields) and picks the match.
-  # The option is loaded over AJAX, so allow a longer wait for it to appear.
-  def pick_remote_selectize(control, text)
-    control.find(".selectize-input").click
-    type_into(control.find(".selectize-input input"), text)
-    control.find(".selectize-dropdown-content .option", text:, wait: 10).click
-  end
-
   def save_bike
     find(".edit-form-well-submit-wrapper input[type=submit]").click
     expect(page).to have_content("Bike successfully updated!", wait: 10)
@@ -81,13 +59,8 @@ RSpec.describe "Editing a registration", :js, type: :system do
     # lg breakpoint; the Playwright driver defaults to desktop width, so narrow it.
     page.current_window.resize_to(720, 2000)
 
-    # Sign in
-    visit new_session_path
-    fill_in "Email", with: owner.email
-    click_button "Continue"
-    fill_in "Password", with: "testthisthing7$"
-    click_button "Log in"
-    expect(page).to have_content("Logged in", wait: 5)
+    sign_in(owner)
+    expect(page).to have_content("Logged in")
 
     dismiss_donation_modal
 
@@ -119,17 +92,17 @@ RSpec.describe "Editing a registration", :js, type: :system do
     click_link "Edit"
 
     # ---- Details: fill every available field ----
-    pick_selectize("bike_year", "2020")
+    pick_selectize("#bike_year", "2020")
     fill_in "Frame model", with: "Cross-Check"
     find("#add-secondary").click
     # Revealing the field slides it down and clears its selectize value, so wait for
     # that to settle before picking, otherwise the pick can be erased
     expect(page).to have_css("#secondary-color.unhidden", wait: 5)
-    pick_selectize("bike_secondary_frame_color_id", "Blue")
-    pick_selectize("bike_frame_material", "Steel")
+    pick_selectize("#bike_secondary_frame_color_id", "Blue")
+    pick_selectize("#bike_frame_material", "Steel")
     within(".ordinal-sizes") { find("label.btn", text: "M").click }
     fill_in "Bike Name", with: "My commuter"
-    pick_selectize("bike_primary_activity_id", "Road cycling")
+    pick_selectize("#bike_primary_activity_id", "Road cycling")
     fill_in "General description", with: "A trusty steel commuter"
     fill_in "Other serial or registration number", with: "EXTRA-REG-42"
     save_bike
@@ -161,7 +134,7 @@ RSpec.describe "Editing a registration", :js, type: :system do
     find('[data-target="#manufacturer-correction"]').click
     expect(page).to have_css("#manufacturer-correction.in", wait: 5)
     within("#manufacturer-correction") do
-      pick_remote_selectize(selectize_for("manufacturer_update_manufacturer"), "Trek")
+      pick_remote_selectize(selectize_for("#manufacturer_update_manufacturer"), "Trek")
       fill_in "manufacturer_update_reason", with: "It is actually a Trek"
       click_button "Submit update"
     end
@@ -180,15 +153,15 @@ RSpec.describe "Editing a registration", :js, type: :system do
     check("bike_coaster_brake")
     check("bike_belt_drive")
     # Pinion Gearboxes are internal-only: selecting one checks and disables "Internal front gears"
-    pick_selectize("front_gear_select", "12 Speed Pinion Gearbox")
+    pick_selectize("#front_gear_select", "12 Speed Pinion Gearbox")
     internal_front_check = find("#front_gear_select_internal")
     expect(internal_front_check).to be_checked
     expect(internal_front_check).to be_disabled
     # Switching to a standard front gear re-enables the checkbox
-    pick_selectize("front_gear_select", "Double")
+    pick_selectize("#front_gear_select", "Double")
     expect(internal_front_check).not_to be_disabled
     uncheck "Internal front gears"
-    pick_selectize("rear_gear_select", "Nine speed")
+    pick_selectize("#rear_gear_select", "Nine speed")
     save_bike
 
     bike.reload
@@ -203,7 +176,7 @@ RSpec.describe "Editing a registration", :js, type: :system do
 
     # ---- Accessories and Components (add 2 components) ----
     click_edit_nav "Accessories and Components"
-    pick_selectize("bike_handlebar_type", "Flat or riser")
+    pick_selectize("#bike_handlebar_type", "Flat or riser")
     click_link "Add a component"
     click_link "Add a component"
     component_fieldsets = all("fieldset.additional-component")

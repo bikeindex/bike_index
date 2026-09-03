@@ -108,6 +108,52 @@ module SystemSpecHelpers
     field
   end
 
+  # The two-step login, driven the way a rider does it. Both steps animate, and a click
+  # waits for its target to settle before it lands -- that wait is Capybara's 2s default.
+  # Callers assert their own landing: an organization member gets a different flash, and
+  # ends up somewhere other than my_account.
+  def sign_in(user)
+    using_wait_time(10) do
+      visit new_session_path
+      fill_in "Email", with: user.email
+      click_button "Continue"
+      fill_in "Password", with: "testthisthing7$"
+      click_button "Log in"
+      expect(page).to have_no_current_path(new_session_path)
+    end
+  end
+
+  # revised/init.coffee hands the legacy form-well's selects to selectize, which hides the
+  # <select> behind a control of its own -- so `select` can't reach them
+  def selectize_for(selector)
+    find(selector, visible: :all)
+      .find(:xpath, "./following-sibling::div[contains(@class, 'selectize-control')][1]")
+  end
+
+  def pick_selectize(selector, text) = pick_within_selectize(selectize_for(selector), text)
+
+  # Takes the control rather than a selector, for the ones reached by their wrapper
+  def pick_within_selectize(control, text)
+    control.find(".selectize-input").click
+    control.find(".selectize-dropdown-content .option", text:, wait: 5).click
+  end
+
+  # A remote-autocomplete selectize (the manufacturer fields) fetches its options, so the
+  # match is worth waiting longer for
+  def pick_remote_selectize(control, text)
+    control.find(".selectize-input").click
+    type_into(control.find(".selectize-input input"), text)
+    control.find(".selectize-dropdown-content .option", text:, wait: 10).click
+  end
+
+  # fill_in focuses the field, then sends its text a round trip later - so a controller
+  # connecting in between lands the text in the field filled just before
+  def wait_for_details_step(wait: Capybara.default_max_wait_time)
+    expect(page).to have_content("Add your bike", wait:)
+    expect(page).to have_css("input[name='bike[frame_model]']:focus", wait:)
+    wait_for_stimulus(timeout: wait)
+  end
+
   # Stimulus lazy loads controller modules, so a rendered page can have none of them
   # connected yet -- a combobox filters no options, a restored draft reaches no listener
   def wait_for_stimulus(timeout: Capybara.default_max_wait_time)
