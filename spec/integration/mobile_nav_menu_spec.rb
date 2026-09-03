@@ -28,6 +28,14 @@ RSpec.describe "Navbar", :js, type: :system do
     within("nav.primary-header-nav") { expect(page).to have_no_link("Search") }
     expect_axe_clean
 
+    # A double tap closes the menu mid-open, and the tail of that open must not raise the
+    # backdrop over a page the menu has left -- which locks body scroll too. `enabled` is
+    # what the close drops last, so waiting on it is waiting for the settled state
+    find("#primary_nav_hamburgler").double_click
+    expect(page).to have_css(".hamburgler button[aria-expanded='false']")
+    expect(page).to have_no_css("nav.primary-header-nav.enabled")
+    expect(page).to have_no_css("nav.primary-header-nav.menu-in")
+
     open_menu_and_search
 
     # The banner pushes the navbar down, further still when its title wraps

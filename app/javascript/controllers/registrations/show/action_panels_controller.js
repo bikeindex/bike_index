@@ -10,12 +10,16 @@ import { collapse } from 'utils/collapse_utils'
 // the parking form answers to both "parking" and "impound").
 export default class extends Controller {
   static targets = ['panel', 'trigger']
+  static values = { defaultPanel: String }
 
   connect () {
-    const name = new URLSearchParams(window.location.search).get('panel')
+    const param = new URLSearchParams(window.location.search).get('panel')
+    const name = param || this.defaultPanelValue
     // Defer so panel controllers finish connecting and their `shown` listeners
-    // are registered first (e.g. parking-notification's geolocation on open)
-    if (name) window.requestAnimationFrame(() => this.open(name, 0))
+    // are registered first (e.g. parking-notification's geolocation on open).
+    // A default-open panel doesn't persist — that would put the param in a URL
+    // nobody asked it of
+    if (name) window.requestAnimationFrame(() => this.open(name, 0, Boolean(param)))
   }
 
   toggle (event) {
@@ -24,12 +28,19 @@ export default class extends Controller {
     this.open(this.openName === panelName ? null : panelName)
   }
 
-  open (name, duration) {
+  open (name, duration, persist = true) {
     this.panelTargets.forEach((panel) => {
       const show = panel.dataset.panelName.split(' ').includes(name)
       collapse(show ? 'show' : 'hide', panel, duration)
-      // Let the panel react to which name opened it (e.g. impound vs notification)
-      if (show) this.dispatch('shown', { target: panel, detail: { name } })
+      // Let the panel react to which name opened it (e.g. impound vs notification).
+      // `shown` fires once, so a panel controller whose module lands later reads the
+      // name here instead — cleared on hide, or a reconnect would reapply it
+      if (show) {
+        panel.dataset.openedAs = name
+        this.dispatch('shown', { target: panel, detail: { name } })
+      } else {
+        delete panel.dataset.openedAs
+      }
     })
     this.triggerTargets.forEach((trigger) => {
       const active = String(trigger.dataset.panelName === name)
@@ -38,7 +49,7 @@ export default class extends Controller {
       trigger.dataset.active = active
     })
     this.openName = name
-    this.persist(name)
+    if (persist) this.persist(name)
   }
 
   // Reflect the open panel in the URL, preserving history state (Turbo) and

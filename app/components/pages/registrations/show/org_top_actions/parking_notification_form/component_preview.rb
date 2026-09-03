@@ -6,13 +6,15 @@ module Pages
       module OrgTopActions
         module ParkingNotificationForm
           class ComponentPreview < ApplicationComponentPreview
-            # Wrapped in a minimal action-panels accordion so the trigger opens the
-            # panel and geolocation runs, mirroring the org-admin page
-            def default
+            # Wrapped in a minimal action-panels accordion so geolocation runs on open,
+            # mirroring the org-admin page. An empty panel starts it closed, which is how
+            # the system spec drives the accordion
+            # @param panel text "Panel to open on load"
+            def default(panel: "parking")
               organization = lookbook_organization
               bike = organization.bikes.last || ::Bike.last
               render_with_template(template: "pages/registrations/show/org_top_actions/parking_notification_form/preview/default",
-                locals: {bike:, organization:})
+                locals: {bike:, organization:, panel:})
             end
           end
         end
