@@ -33,7 +33,7 @@
   .show-bike-details
     - if @show_for_sale
       %div{class: "tw:mt-10 tw:mb-5"}
-        = render(SharedBlocks::MarketplaceListingPanel::Component.new(marketplace_listing: @bike.current_marketplace_listing))
+        = render(Pages::Bikes::MarketplaceListingPanel::Component.new(marketplace_listing: @bike.current_marketplace_listing))
 
     -# Basic bike details
     = render(UI::DefinitionList::Container::Component.new(multi_columns: true)) do

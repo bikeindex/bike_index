@@ -5704,6 +5704,97 @@ it:
         made_without_serial: realizzato senza numero di serie
         unknown: sconosciuto
     pages:
+      bikes:
+        marketplace_listing_panel:
+          condition: Condizione
+          description: Descrizione
+          first_posted_at: Pubblicato
+          location: Luogo
+          member_listing: Membro di Bike Index
+          member_listing_tooltip: Questo venditore è un membro di Bike Index
+          price_is_firm_false: Il prezzo è negoziabile.
+          price_is_firm_true: il prezzo non è negoziabile
+          still_for_sale_at: Ancora in vendita a
+        org:
+          bike_access_panel:
+            access_panel: Pannello di accesso
+            added_to_track_parking_notification: Questo %{bike_type} non è registrato
+              a un utente. È stato aggiunto per tenere traccia delle notifiche di parcheggio.
+            additional_registrations_information: Registrazioni da parte dell'utente
+            additional_registrations_information_visible_because: visibile con accesso
+              alle forze dell'ordine %{org_name}
+            additional_registrations_potential_duplicates: 'Possibili duplicati di biciclette
+              corrispondenti ai segmenti seriali:'
+            additional_registrations_registered_at: Registrato a
+            additional_registrations_this_bike: Questo %{bike_type}
+            address: Indirizzo di registrazione
+            address_or_intersection: Indirizzo o incrocio
+            as_a_bikeindex_ambassador_html: <em><span class="hidden-md-down">In qualità
+              di ambasciatore di Bike Index,</span> puoi contrassegnarlo come recuperato:</em>
+            assign_sticker: Collegamento
+            avery_exportable: Avery Esportabile
+            believe_it_is_anyway: Credi che sia così, comunque?
+            bike_is_not_registered_html: Questo %{bike_type} <em>non</em> è registrato
+              con %{org_name}
+            bike_is_registered: Questo %{bike_type} è registrato con %{org_name}
+            bike_not_marked_stolen: "%{bike_type} non è contrassegnato come rubato."
+            choose_country: Seleziona il paese
+            city: Città
+            claimed: Rivendicato
+            contact_the_owner_it_is_stolen: al proprietario di questo %{bike_type} che
+              ritieni sia stato rubato.
+            creation_source: Fonte
+            creator: Creatore
+            edit: Modifica
+            email_to_deal_with_this_html: Invia un'e-mail a %{support_link} per risolvere
+              questo problema.
+            initial_registration: 'registrazione iniziale:'
+            is_false: falso
+            is_not_registered_html: "<em>non</em> registrato con %{org_name}"
+            is_registered: registrato con %{org_name}
+            is_true: VERO
+            link_sticker: Adesivo di collegamento
+            link_url_for_online_sighting: Link URL per l'avvistamento online (facoltativo)
+            mark_bike_recovered: La moto Mark è stata recuperata
+            missing_address: indirizzo mancante
+            missing_owner_name: nome utente mancante
+            model_audit: Audit dei veicoli elettrici
+            not_audited: Non sottoposto a revisione contabile
+            note_by: di %{user}
+            notes: Note
+            or_call_owner_html: "<em>Oppure chiama</em> <strong>il numero di telefono
+              del proprietario:</strong>"
+            org_can_edit_bike: "%{org_name} può modificare questo %{bike_type}"
+            org_cannot_edit: "%{org_name} non può essere modificato"
+            organization_can_edit_after_claimed: e può modificare dopo che %{bike_type}
+              ha rivendicato
+            organization_child: Organizzazione per l'infanzia
+            organization_registered: Organizzazione
+            owner_email: Email del proprietario
+            owner_name: Nome del proprietario
+            parking_notification_notes_html: "%{org_name} note interne <small>non mostrate
+              all'utente</small>"
+            permission: Autorizzazione
+            region: Regione
+            registered: Registrato
+            save_notes: Salva nota
+            send_message: Invia il messaggio
+            state: Stato
+            sticker: Adesivo
+            sticker_code: Codice adesivo
+            support_email: support@bikeindex.org
+            unable_to_display_additional_information: Impossibile visualizzare informazioni
+              aggiuntive perché %{bike_type} non è registrato con %{org_name}
+            unregistered_parking_notification: creato per la notifica di parcheggio
+            user_revoked_permission_html: Questo utente <strong>ha revocato</strong>
+              l'autorizzazione a contattarli prima che la sua bicicletta venisse segnalata
+              come rubata.
+            waiting_on_device_location: In attesa della posizione del dispositivo
+            where_did_you_see_this_bike: Dove hai visto questo %{bike_type}? Se ci contatti
+              in merito a un annuncio che hai trovato online, includi il link nel campo
+              sottostante.
+            write_a_message: Scrivi un messaggio
+            zipcode: Codice postale
       messages:
         thread_show:
           banned_message: Ci dispiace, ma quell'utente è stato bannato e non può ricevere
@@ -6482,87 +6573,6 @@ it:
           community_groups: Gruppi comunitari
           schools: Scuole
           theft_victims: Vittime di furto
-      bikes:
-        org:
-          bike_access_panel:
-            access_panel: Pannello di accesso
-            added_to_track_parking_notification: Questo %{bike_type} non è registrato
-              a un utente. È stato aggiunto per tenere traccia delle notifiche di parcheggio.
-            additional_registrations_information: Registrazioni da parte dell'utente
-            additional_registrations_information_visible_because: visibile con accesso
-              alle forze dell'ordine %{org_name}
-            additional_registrations_potential_duplicates: 'Possibili duplicati di biciclette
-              corrispondenti ai segmenti seriali:'
-            additional_registrations_registered_at: Registrato a
-            additional_registrations_this_bike: Questo %{bike_type}
-            address: Indirizzo di registrazione
-            address_or_intersection: Indirizzo o incrocio
-            as_a_bikeindex_ambassador_html: <em><span class="hidden-md-down">In qualità
-              di ambasciatore di Bike Index,</span> puoi contrassegnarlo come recuperato:</em>
-            assign_sticker: Collegamento
-            avery_exportable: Avery Esportabile
-            believe_it_is_anyway: Credi che sia così, comunque?
-            bike_is_not_registered_html: Questo %{bike_type} <em>non</em> è registrato
-              con %{org_name}
-            bike_is_registered: Questo %{bike_type} è registrato con %{org_name}
-            bike_not_marked_stolen: "%{bike_type} non è contrassegnato come rubato."
-            choose_country: Seleziona il paese
-            city: Città
-            claimed: Rivendicato
-            contact_the_owner_it_is_stolen: al proprietario di questo %{bike_type} che
-              ritieni sia stato rubato.
-            creation_source: Fonte
-            creator: Creatore
-            edit: Modifica
-            email_to_deal_with_this_html: Invia un'e-mail a %{support_link} per risolvere
-              questo problema.
-            initial_registration: 'registrazione iniziale:'
-            is_false: falso
-            is_not_registered_html: "<em>non</em> registrato con %{org_name}"
-            is_registered: registrato con %{org_name}
-            is_true: VERO
-            link_sticker: Adesivo di collegamento
-            link_url_for_online_sighting: Link URL per l'avvistamento online (facoltativo)
-            mark_bike_recovered: La moto Mark è stata recuperata
-            missing_address: indirizzo mancante
-            missing_owner_name: nome utente mancante
-            model_audit: Audit dei veicoli elettrici
-            not_audited: Non sottoposto a revisione contabile
-            note_by: di %{user}
-            notes: Note
-            or_call_owner_html: "<em>Oppure chiama</em> <strong>il numero di telefono
-              del proprietario:</strong>"
-            org_can_edit_bike: "%{org_name} può modificare questo %{bike_type}"
-            org_cannot_edit: "%{org_name} non può essere modificato"
-            organization_can_edit_after_claimed: e può modificare dopo che %{bike_type}
-              ha rivendicato
-            organization_child: Organizzazione per l'infanzia
-            organization_registered: Organizzazione
-            owner_email: Email del proprietario
-            owner_name: Nome del proprietario
-            parking_notification_notes_html: "%{org_name} note interne <small>non mostrate
-              all'utente</small>"
-            permission: Autorizzazione
-            region: Regione
-            registered: Registrato
-            save_notes: Salva nota
-            send_message: Invia il messaggio
-            state: Stato
-            sticker: Adesivo
-            sticker_code: Codice adesivo
-            support_email: support@bikeindex.org
-            unable_to_display_additional_information: Impossibile visualizzare informazioni
-              aggiuntive perché %{bike_type} non è registrato con %{org_name}
-            unregistered_parking_notification: creato per la notifica di parcheggio
-            user_revoked_permission_html: Questo utente <strong>ha revocato</strong>
-              l'autorizzazione a contattarli prima che la sua bicicletta venisse segnalata
-              come rubata.
-            waiting_on_device_location: In attesa della posizione del dispositivo
-            where_did_you_see_this_bike: Dove hai visto questo %{bike_type}? Se ci contatti
-              in merito a un annuncio che hai trovato online, includi il link nel campo
-              sottostante.
-            write_a_message: Scrivi un messaggio
-            zipcode: Codice postale
     shared_blocks:
       footer:
         about: Di
@@ -6665,16 +6675,6 @@ it:
           viewing_our_streamlined_page: Al momento stai visualizzando la nostra pagina
             di registrazione semplificata per i negozi di biciclette, che è quella
             che ti consigliamo di utilizzare
-      marketplace_listing_panel:
-        condition: Condizione
-        description: Descrizione
-        first_posted_at: Pubblicato
-        location: Luogo
-        member_listing: Membro di Bike Index
-        member_listing_tooltip: Questo venditore è un membro di Bike Index
-        price_is_firm_false: Il prezzo è negoziabile.
-        price_is_firm_true: il prezzo non è negoziabile
-        still_for_sale_at: Ancora in vendita a
       navbar:
         org_sidebar:
           admin_panel: PANNELLO DI AMMINISTRAZIONE

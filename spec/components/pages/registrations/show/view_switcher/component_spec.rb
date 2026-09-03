@@ -31,7 +31,9 @@ RSpec.describe Pages::Registrations::Show::ViewSwitcher::Component, type: :compo
     # The view already showing has nowhere to go, so .twdropdown renders it as the label
     it "links the other view and leaves the current one unclickable" do
       render_inline(component)
-      expect(page).to have_link("View as owner of bike", href: "/registrations/#{bike.id}?view_as=owner")
+      # organization_id=false so switching away from an org view drops it from the session
+      expect(page).to have_link("View as owner of bike",
+        href: "/registrations/#{bike.id}?organization_id=false&view_as=owner")
       expect(page).to have_css("li[role='menuitem'] span[data-active='true']", text: "Viewing as Public")
       expect(page).to have_no_css("a", text: "Viewing as")
     end

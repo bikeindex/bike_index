@@ -5,6 +5,7 @@ en:
       registrations:
         show:
           status:
+            for_sale: For Sale
             found: Found
             impounded: Impounded
             not_stolen: Not stolen

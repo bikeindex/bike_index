@@ -1,0 +1,47 @@
+<%= render(UI::Card::Component.new) do %>
+  <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
+    <h2
+      class="
+        tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+        tw:uppercase
+      "
+    >
+      <%= translation(".this_bike_is_for_sale", bike_type: @bike.type) %>
+    </h2>
+
+    <% if marketplace_listing.seller_member? %>
+      <%= render(UI::Badge::Component.new(text: translation(".member_listing"), title: translation(".member_listing_tooltip"), color: :purple, size: :sm)) %>
+    <% end %>
+  </div>
+
+  <p class="tw:mt-2 tw:text-3xl tw:leading-tight tw:font-bold">
+    <%= amount_display(marketplace_listing, currency_name_suffix: true) %>
+
+    <span class="uncap tw:text-sm tw:font-normal tw:opacity-65">
+      <%= translation(".price_is_firm_#{marketplace_listing.price_firm?}") %>
+    </span>
+  </p>
+
+  <div class="tw:mt-3">
+    <%= render(UI::DefinitionList::Container::Component.new(term: @term)) do %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".condition"))) do %>
+        <%= marketplace_listing.condition_humanized %>
+
+        <em class="less-strong tw:text-sm">
+          <%= marketplace_listing.condition_description_humanized %>
+        </em>
+      <% end %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".location"), value: marketplace_listing.formatted_address_string)) %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".first_posted_at"), value: marketplace_listing.published_at)) %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".still_for_sale_at"), value: marketplace_listing.notable_still_for_sale_at)) %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".description"), value: marketplace_listing.description, full_width: true)) %>
+    <% end %>
+  </div>
+
+  <% if show_contact? %>
+    <div class="tw:mt-4">
+      <%= render(UI::ButtonLink::Component.new(href: contact_path, text: translation(".contact_seller"), color: :purple)) %>
+    </div>
+  <% end %>
+<% end %>
