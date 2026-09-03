@@ -4,7 +4,7 @@ en:
     pages:
       registrations:
         show:
-          marketplace_listing:
+          marketplace_listing_card:
             condition: Condition
             contact_seller: Contact the seller
             description: Description

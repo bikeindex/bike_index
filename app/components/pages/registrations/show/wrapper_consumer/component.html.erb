@@ -44,7 +44,7 @@
 
       <%= render(current_alerts_component) %>
 
-      <%= render(Pages::Registrations::Show::MarketplaceListing::Component.new(bike: @bike, current_user: @current_user, owner: @owner, preview: @marketplace_preview, term: :right_align)) %>
+      <%= render(Pages::Registrations::Show::MarketplaceListingCard::Component.new(bike: @bike, current_user: @current_user, owner: @owner, preview: @marketplace_preview, term: :right_align)) %>
 
       <%= render(Pages::Registrations::Show::BikeIndexCard::Component.new(bike: @bike, term: :right_align)) %>
 

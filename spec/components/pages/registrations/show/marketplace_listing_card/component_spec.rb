@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Pages::Registrations::Show::MarketplaceListing::Component, type: :component do
+RSpec.describe Pages::Registrations::Show::MarketplaceListingCard::Component, type: :component do
   let(:bike) { marketplace_listing.item.reload }
   let(:current_user) { nil }
   let(:owner) { false }

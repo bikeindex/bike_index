@@ -3,7 +3,7 @@
 module Pages
   module Registrations
     module Show
-      module MarketplaceListing
+      module MarketplaceListingCard
         # The for-sale card, styled to match BikeIndexCard
         class Component < ApplicationComponent
           # preview: render the seller's draft listing as the public will see it
