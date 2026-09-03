@@ -5437,17 +5437,6 @@ nb:
         made_without_serial: laget uten serie
         unknown: ukjent
     pages:
-      bikes:
-        marketplace_listing_panel:
-          condition: Betingelse
-          description: Beskrivelse
-          first_posted_at: Postet
-          location: plassering
-          member_listing: Medlem av sykkelindeksen
-          member_listing_tooltip: Denne selgeren er medlem av Bike Index
-          price_is_firm_false: Prisen er omsettelig
-          price_is_firm_true: prisen er fast
-          still_for_sale_at: Selger fortsatt på
       messages:
         thread_show:
           banned_message: Beklager, men den brukeren er utestengt og kan ikke motta
@@ -6083,6 +6072,7 @@ nb:
             not_stolen: Ikke stjålet
             stolen: Stjålet
             unregistered: Uregistrert
+            for_sale: Til salgs
           stolen_details:
             department_city: Avdeling og by
             description_of_incident: Beskrivelse av hendelsen
@@ -6110,6 +6100,7 @@ nb:
             sell_on_marketplace: Selg på markedsplassen
             share: Dele
             share_my_page: Del siden min
+            audience_marketplace_preview: Forhåndsvisning av oppføring
           wrapper_org_admin:
             about_this_bike: Om dette %{bike_type}
             assign_sticker: Tildel klistremerke
@@ -6162,6 +6153,18 @@ nb:
             unregistered_owner: Denne %{bike_type} er ikke registrert på en bruker.
               Den ble lagt til for å spore parkeringsvarsler.
             view_all_registrations: se alle →
+          marketplace_listing_card:
+            condition: Betingelse
+            contact_seller: Kontakt selgeren
+            description: Beskrivelse
+            first_posted_at: Postet
+            location: plassering
+            member_listing: Medlem av sykkelindeksen
+            member_listing_tooltip: Denne selgeren er medlem av Bike Index
+            price_is_firm_false: Prisen er omsettelig
+            price_is_firm_true: prisen er fast
+            still_for_sale_at: Selger fortsatt på
+            this_bike_is_for_sale: Denne %{bike_type} er til salgs
       search:
         everything_combobox:
           made_by: laget av
@@ -6223,6 +6226,17 @@ nb:
           click_button_to_continue: Klikk på knappen nedenfor for å fortsette
           finish_signing_in: Fullfør påloggingen
           sign_in: Logg inn
+      bikes:
+        marketplace_listing_panel:
+          condition: Betingelse
+          description: Beskrivelse
+          first_posted_at: Postet
+          location: plassering
+          member_listing: Medlem av sykkelindeksen
+          member_listing_tooltip: Denne selgeren er medlem av Bike Index
+          price_is_firm_false: Prisen er omsettelig
+          price_is_firm_true: prisen er fast
+          still_for_sale_at: Selger fortsatt på
     shared_blocks:
       footer:
         about: Om

@@ -5689,17 +5689,6 @@ es:
         made_without_serial: hecho sin número de serie
         unknown: desconocido
     pages:
-      bikes:
-        marketplace_listing_panel:
-          condition: Condición
-          description: Descripción
-          first_posted_at: Al corriente
-          location: Ubicación
-          member_listing: Miembro de Bike Index
-          member_listing_tooltip: Este vendedor es miembro de Bike Index.
-          price_is_firm_false: El precio es negociable.
-          price_is_firm_true: El precio es fijo.
-          still_for_sale_at: Todavía se vende en
       messages:
         thread_show:
           banned_message: Lo sentimos, pero ese usuario ha sido bloqueado y no puede
@@ -6353,6 +6342,7 @@ es:
             not_stolen: No robado
             stolen: Robado
             unregistered: No registrado
+            for_sale: Se vende
           stolen_details:
             department_city: Departamento y ciudad
             description_of_incident: Descripción del incidente
@@ -6379,6 +6369,7 @@ es:
             sell_on_marketplace: Vender en el mercado
             share: Compartir
             share_my_page: Comparte mi página
+            audience_marketplace_preview: Vista previa del anuncio
           wrapper_org_admin:
             about_this_bike: Acerca de esto %{bike_type}
             assign_sticker: Asignar pegatina
@@ -6433,6 +6424,18 @@ es:
             unregistered_owner: Este %{bike_type} no está registrado a ningún usuario.
               Se agregó para realizar un seguimiento de las notificaciones de estacionamiento.
             view_all_registrations: ver todo →
+          marketplace_listing_card:
+            condition: Condición
+            contact_seller: Contacta con el vendedor
+            description: Descripción
+            first_posted_at: Al corriente
+            location: Ubicación
+            member_listing: Miembro de Bike Index
+            member_listing_tooltip: Este vendedor es miembro de Bike Index.
+            price_is_firm_false: El precio es negociable.
+            price_is_firm_true: El precio es fijo.
+            still_for_sale_at: Todavía se vende en
+            this_bike_is_for_sale: Este %{bike_type} está a la venta
       search:
         everything_combobox:
           made_by: hecho por
@@ -6495,6 +6498,17 @@ es:
           click_button_to_continue: Haz clic en el botón de abajo para continuar.
           finish_signing_in: Finalizar el registro
           sign_in: Iniciar sesión
+      bikes:
+        marketplace_listing_panel:
+          condition: Condición
+          description: Descripción
+          first_posted_at: Al corriente
+          location: Ubicación
+          member_listing: Miembro de Bike Index
+          member_listing_tooltip: Este vendedor es miembro de Bike Index.
+          price_is_firm_false: El precio es negociable.
+          price_is_firm_true: El precio es fijo.
+          still_for_sale_at: Todavía se vende en
     shared_blocks:
       footer:
         about: Acerca
