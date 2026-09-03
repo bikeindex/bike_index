@@ -13,6 +13,8 @@ updates:
     - dependency-name: twitter
     - dependency-name: coffee-rails # deprecated CoffeeScript
     - dependency-name: carrierwave
+    - dependency-name: redis # pinned < 6, see #4175
+      update-types: ["version-update:semver-major"]
 - package-ecosystem: github-actions
   directory: "/"
   schedule:
