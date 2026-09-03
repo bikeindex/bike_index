@@ -105,6 +105,21 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
           end
         end
 
+        context "re-run after the day's batches failed" do
+          it "reuses the day's sheets, rather than stacking up duplicates" do
+            expect {
+              ProcessHotSheetJob.drain
+            }.to change(HotSheet, :count).by 3
+            HotSheet.all.each { it.update(delivery_status: "delivery_failure", delivery_error: "Postmark::TimeoutError") }
+            ActionMailer::Base.deliveries = []
+
+            expect {
+              described_class.new.perform(organization1.id)
+            }.to_not change(HotSheet, :count)
+            expect(ActionMailer::Base.deliveries.count).to eq 3
+            expect(HotSheet.delivered.count).to eq 3
+          end
+        end
         context "when one batch has an inactive recipient" do
           let(:inactive_user) { organization_roles.first.user }
           let(:error_message) do

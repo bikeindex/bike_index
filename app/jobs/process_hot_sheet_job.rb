@@ -23,10 +23,12 @@ class ProcessHotSheetJob < ScheduledJob
   def perform(org_id = nil)
     return self.class.enqueue_workers unless org_id.present?
 
-    hot_sheet = HotSheet.for(org_id, Time.current.to_date)
-    return hot_sheet if hot_sheet&.email_success?
+    sheet_date = Time.current.to_date
+    day_sheets = HotSheet.where(organization_id: org_id, sheet_date:).order(:id).to_a
+    day_sheets = [HotSheet.create!(organization_id: org_id, sheet_date:)] if day_sheets.none?
+    hot_sheet = day_sheets.first
+    return hot_sheet if hot_sheet.email_success?
 
-    hot_sheet ||= HotSheet.create!(organization_id: org_id, sheet_date: Time.current.to_date)
     # Bump bike cached attributes, so the email has all the info
     hot_sheet.fetch_stolen_records.each { it.bike.update(updated_at: Time.current) }
     # Always at least one slice, so a sheet with nobody to email is still marked delivered
@@ -38,7 +40,8 @@ class ProcessHotSheetJob < ScheduledJob
                         stolen_record_ids: hot_sheet.stolen_record_ids}
     # Deliver every batch before raising, so one failure doesn't block the rest
     errors = recipient_id_slices.filter_map.with_index do |recipient_ids, index|
-      sheet = index.zero? ? hot_sheet : HotSheet.new(sheet_attributes)
+      # Re-running a day reuses its sheets, rather than stacking up duplicates
+      sheet = day_sheets[index] || HotSheet.new(sheet_attributes)
       sheet.recipient_ids = recipient_ids
       deliver_email(sheet)
     end
