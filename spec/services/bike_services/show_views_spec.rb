@@ -21,6 +21,33 @@ RSpec.describe BikeServices::ShowViews do
     end
   end
 
+  context "with a draft marketplace_listing" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity) }
+    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :with_address_record, item: bike) }
+
+    context "the seller" do
+      let(:current_user) { bike.reload.user }
+      it "includes the marketplace preview" do
+        expect(marketplace_listing.reload.status).to eq "draft"
+        expect(available_views).to eq([[:owner, nil], [:public, nil], [:marketplace_preview, nil]])
+      end
+
+      context "listing for_sale" do
+        let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: bike) }
+        it "is public only - the public view already shows the listing" do
+          expect(available_views).to eq([[:owner, nil], [:public, nil]])
+        end
+      end
+    end
+
+    context "someone else" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      it "doesn't include the marketplace preview" do
+        expect(available_views).to eq([[:public, nil]])
+      end
+    end
+  end
+
   context "org member with bike edit" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:current_user) { FactoryBot.create(:organization_admin, organization:) }

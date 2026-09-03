@@ -20,7 +20,7 @@
     <div class="tw:flex tw:flex-col tw:gap-4 tw:lg:pt-7">
       <div>
         <div class="tw:mb-1">
-          <%= render(Pages::Registrations::Show::ViewSwitcher::Component.new(bike: @bike, current_view: [@owner ? :owner : :public, nil], available_views: @available_views, label: audience_label, color: audience_color, current_user: @current_user)) %>
+          <%= render(Pages::Registrations::Show::ViewSwitcher::Component.new(bike: @bike, current_view:, available_views: @available_views, label: audience_label, color: audience_color, current_user: @current_user)) %>
         </div>
 
         <div class="tw:hidden tw:lg:block">
@@ -39,10 +39,12 @@
           <%= render(UI::Badge::Component.new(text: translation(".registered_protected"), color: :notice, icon: "kelsey/registration_show/shield")) %>
         <% end %>
 
-        <%= render(Pages::Registrations::Show::Status::Component.new(bike: @bike)) %>
+        <%= render(Pages::Registrations::Show::Status::Component.new(bike: @bike, override_to_for_sale: @marketplace_preview)) %>
       </div>
 
       <%= render(current_alerts_component) %>
+
+      <%= render(Pages::Registrations::Show::MarketplaceListingCard::Component.new(bike: @bike, current_user: @current_user, owner: @owner, preview: @marketplace_preview, term: :right_align)) %>
 
       <%= render(Pages::Registrations::Show::BikeIndexCard::Component.new(bike: @bike, term: :right_align)) %>
 

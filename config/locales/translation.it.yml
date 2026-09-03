@@ -5704,6 +5704,17 @@ it:
         made_without_serial: realizzato senza numero di serie
         unknown: sconosciuto
     pages:
+      bikes:
+        marketplace_listing_panel:
+          condition: Condizione
+          description: Descrizione
+          first_posted_at: Pubblicato
+          location: Luogo
+          member_listing: Membro di Bike Index
+          member_listing_tooltip: Questo venditore è un membro di Bike Index
+          price_is_firm_false: Il prezzo è negoziabile.
+          price_is_firm_true: il prezzo non è negoziabile
+          still_for_sale_at: Ancora in vendita a
       messages:
         thread_show:
           banned_message: Ci dispiace, ma quell'utente è stato bannato e non può ricevere
@@ -6608,16 +6619,6 @@ it:
           viewing_our_streamlined_page: Al momento stai visualizzando la nostra pagina
             di registrazione semplificata per i negozi di biciclette, che è quella
             che ti consigliamo di utilizzare
-      marketplace_listing_panel:
-        condition: Condizione
-        description: Descrizione
-        first_posted_at: Pubblicato
-        location: Luogo
-        member_listing: Membro di Bike Index
-        member_listing_tooltip: Questo venditore è un membro di Bike Index
-        price_is_firm_false: Il prezzo è negoziabile.
-        price_is_firm_true: il prezzo non è negoziabile
-        still_for_sale_at: Ancora in vendita a
       my_account:
         organization_roles:
           automatically_view_in_organization: Visualizzazione automatica con barra

@@ -617,7 +617,7 @@ RSpec.describe "BikesController#show", type: :request do
       expect(assigns(:bike)).to eq bike
       expect(assigns(:show_for_sale)).to be_falsey
       # passed preview
-      get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+      get "#{base_url}/#{bike.id}?view_as=marketplace_preview"
       expect(flash).to be_blank
       expect(assigns(:bike)).to eq bike
       expect(assigns(:show_for_sale)).to be_truthy
@@ -626,7 +626,7 @@ RSpec.describe "BikesController#show", type: :request do
     context "current_user superadmin" do
       let(:current_user) { FactoryBot.create(:superuser) }
       it "doesn't render" do
-        get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+        get "#{base_url}/#{bike.id}?view_as=marketplace_preview"
         expect(flash).to be_blank
         expect(assigns(:bike)).to eq bike
         expect(assigns(:show_for_sale)).to be_truthy
@@ -640,7 +640,7 @@ RSpec.describe "BikesController#show", type: :request do
         expect(marketplace_listing.reload.visible_by?(current_user)).to be_falsey
         expect(marketplace_listing.valid_publishable?).to be_truthy
 
-        get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+        get "#{base_url}/#{bike.id}?view_as=marketplace_preview"
         expect(flash).to be_blank
         expect(assigns(:bike)).to eq bike
         expect(assigns(:show_for_sale)).to be_falsey
@@ -651,7 +651,7 @@ RSpec.describe "BikesController#show", type: :request do
         it "renders" do
           expect(marketplace_listing.reload.visible_by?(current_user)).to be_truthy
           expect(marketplace_listing.visible_by?(nil)).to be_truthy
-          get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+          get "#{base_url}/#{bike.id}?view_as=marketplace_preview"
           expect(flash).to be_blank
           expect(assigns(:bike)).to eq bike
           expect(assigns(:show_for_sale)).to be_truthy
@@ -662,7 +662,7 @@ RSpec.describe "BikesController#show", type: :request do
 
           it "doesn't render" do
             expect(bike.reload.status).to eq "status_stolen"
-            get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+            get "#{base_url}/#{bike.id}?view_as=marketplace_preview"
             expect(flash).to be_blank
             expect(assigns(:bike)).to eq bike
             expect(assigns(:show_for_sale)).to be_falsey
@@ -675,7 +675,7 @@ RSpec.describe "BikesController#show", type: :request do
       let(:status) { :sold }
       it "doesn't render" do
         expect(marketplace_listing.reload.visible_by?(current_user)).to be_truthy
-        get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+        get "#{base_url}/#{bike.id}?view_as=marketplace_preview"
         expect(flash).to be_blank
         expect(assigns(:bike)).to eq bike
         expect(assigns(:show_for_sale)).to be_falsey
@@ -685,7 +685,7 @@ RSpec.describe "BikesController#show", type: :request do
     context "no marketplace_listing present" do
       let!(:marketplace_listing) { nil }
       it "doesn't render" do
-        get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+        get "#{base_url}/#{bike.id}?view_as=marketplace_preview"
         expect(flash).to be_blank
         expect(assigns(:bike)).to eq bike
         expect(assigns(:show_for_sale)).to be_falsey

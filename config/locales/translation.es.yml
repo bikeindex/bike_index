@@ -5689,6 +5689,17 @@ es:
         made_without_serial: hecho sin número de serie
         unknown: desconocido
     pages:
+      bikes:
+        marketplace_listing_panel:
+          condition: Condición
+          description: Descripción
+          first_posted_at: Al corriente
+          location: Ubicación
+          member_listing: Miembro de Bike Index
+          member_listing_tooltip: Este vendedor es miembro de Bike Index.
+          price_is_firm_false: El precio es negociable.
+          price_is_firm_true: El precio es fijo.
+          still_for_sale_at: Todavía se vende en
       messages:
         thread_show:
           banned_message: Lo sentimos, pero ese usuario ha sido bloqueado y no puede
@@ -6592,16 +6603,6 @@ es:
           viewing_our_streamlined_page: Actualmente estás viendo nuestra página de
             registro simplificada de la tienda de bicicletas, que es la que recomendamos
             usar.
-      marketplace_listing_panel:
-        condition: Condición
-        description: Descripción
-        first_posted_at: Al corriente
-        location: Ubicación
-        member_listing: Miembro de Bike Index
-        member_listing_tooltip: Este vendedor es miembro de Bike Index.
-        price_is_firm_false: El precio es negociable.
-        price_is_firm_true: El precio es fijo.
-        still_for_sale_at: Todavía se vende en
       my_account:
         organization_roles:
           automatically_view_in_organization: Visualización automática con la barra

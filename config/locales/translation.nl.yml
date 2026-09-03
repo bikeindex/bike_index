@@ -5592,6 +5592,17 @@ nl:
         made_without_serial: gemaakt zonder serie
         unknown: Onbekend
     pages:
+      bikes:
+        marketplace_listing_panel:
+          condition: Voorwaarde
+          description: Beschrijving
+          first_posted_at: Geplaatst
+          location: Plaats
+          member_listing: Lid van Bike Index
+          member_listing_tooltip: Deze verkoper is lid van Bike Index.
+          price_is_firm_false: prijs is onderhandelbaar
+          price_is_firm_true: prijs is vast
+          still_for_sale_at: Nog steeds te koop bij
       messages:
         thread_show:
           banned_message: Het spijt ons, maar die gebruiker is geblokkeerd en kan
@@ -6492,16 +6503,6 @@ nl:
           use_lightspeed_retail_pos: Lightspeed Retail POS gebruiken?
           viewing_our_streamlined_page: U bekijkt momenteel onze gestroomlijnde registratiepagina
             voor Bike Shop, die wij aanbevelen te gebruiken
-      marketplace_listing_panel:
-        condition: Voorwaarde
-        description: Beschrijving
-        first_posted_at: Geplaatst
-        location: Plaats
-        member_listing: Lid van Bike Index
-        member_listing_tooltip: Deze verkoper is lid van Bike Index.
-        price_is_firm_false: prijs is onderhandelbaar
-        price_is_firm_true: prijs is vast
-        still_for_sale_at: Nog steeds te koop bij
       my_account:
         organization_roles:
           automatically_view_in_organization: Automatisch weergeven met de %{org_name}-navigatiebalk
