@@ -92,6 +92,7 @@ class RegistrationsController < ApplicationController
     case param
     when "public" then [:public, nil]
     when "owner" then [:owner, nil]
+    when "marketplace_preview" then [:marketplace_preview, nil]
     when nil, "" then nil
     else
       slug, role = param.split(".", 2)

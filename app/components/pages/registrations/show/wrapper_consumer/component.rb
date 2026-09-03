@@ -8,18 +8,23 @@ module Pages
           include BikeHelper
 
           # owner: overrides the computed ownership, so the wrapper can force view_as
-          def initialize(bike:, current_user:, show_for_sale: false, owner: nil, available_views: [], bike_sticker: nil,
-            current_alerts: {})
+          # marketplace_preview: the public view of a listing that's still a draft
+          def initialize(bike:, current_user:, show_for_sale: false, marketplace_preview: false, owner: nil,
+            available_views: [], bike_sticker: nil, current_alerts: {})
             @bike = bike
             @current_user = current_user
             @show_for_sale = show_for_sale
+            @marketplace_preview = marketplace_preview
             @available_views = available_views
             @bike_sticker = bike_sticker
             @current_alerts = current_alerts
             @owner = owner.nil? ? (@current_user.present? && @bike.owner == @current_user) : owner
           end
 
-          def cache_version = current_alerts_component.cache_version
+          # A listing edit doesn't touch the bike, so its cache version misses one
+          def cache_version
+            [@bike.current_marketplace_listing&.updated_at, *current_alerts_component.cache_version]
+          end
 
           private
 
@@ -33,7 +38,14 @@ module Pages
             @bike.name.presence || bike_title_html(@bike)
           end
 
+          def current_view
+            return [:marketplace_preview, nil] if @marketplace_preview
+
+            [@owner ? :owner : :public, nil]
+          end
+
           def audience_label
+            return translation(".audience_marketplace_preview") if @marketplace_preview
             return translation(".audience_owner", bike_type: @bike.type) if @owner
             return translation(".audience_sent_away", bike_type: @bike.type) if previously_owned?
 
@@ -41,6 +53,7 @@ module Pages
           end
 
           def audience_color
+            return :purple if @marketplace_preview
             return :success if @owner
             return :warning if previously_owned?
 
@@ -54,8 +67,9 @@ module Pages
             @bike.ownerships.where(user_id: @current_user.id, current: false).exists?
           end
 
+          # A listed bike gets the marketplace card instead
           def show_marketplace_button?
-            @owner && @bike.status_with_owner? &&
+            !@show_for_sale && @owner && @bike.status_with_owner? &&
               (@bike.current_marketplace_listing&.current? || @current_user&.can_create_listing?)
           end
 

@@ -6,8 +6,10 @@ module Pages
       module Status
         # The stolen/found/impounded/registered status badge.
         class Component < ApplicationComponent
-          def initialize(bike:)
+          # override_to_for_sale: the marketplace preview, where the listing is still a draft
+          def initialize(bike:, override_to_for_sale: false)
             @bike = bike
+            @override_to_for_sale = override_to_for_sale
           end
 
           def call
@@ -25,6 +27,8 @@ module Pages
               translation(".impounded")
             elsif @bike.unregistered_parking_notification?
               translation(".unregistered")
+            elsif for_sale?
+              translation(".for_sale")
             else
               translation(".not_stolen")
             end
@@ -33,8 +37,13 @@ module Pages
           def color
             return :error if @bike.status_stolen?
             return :warning if @bike.status_impounded? || @bike.unregistered_parking_notification?
+            return :purple if for_sale?
 
             :success
+          end
+
+          def for_sale?
+            @bike.status_with_owner? && (@override_to_for_sale || @bike.is_for_sale?)
           end
         end
       end

@@ -5491,16 +5491,6 @@ it:
         loading_results: Caricamento dei risultati...
   components:
     shared_blocks:
-      marketplace_listing_panel:
-        condition: Condizione
-        description: Descrizione
-        first_posted_at: Pubblicato
-        location: Luogo
-        price_is_firm_false: Il prezzo è negoziabile.
-        price_is_firm_true: il prezzo non è negoziabile
-        still_for_sale_at: Ancora in vendita a
-        member_listing: Membro di Bike Index
-        member_listing_tooltip: Questo venditore è un membro di Bike Index
       homepage_for_buttons:
         bike_shops: Bicicletta
         cities: Città
@@ -5933,6 +5923,17 @@ it:
         made_without_serial: realizzato senza numero di serie
         unknown: sconosciuto
     pages:
+      bikes:
+        marketplace_listing_panel:
+          condition: Condizione
+          description: Descrizione
+          first_posted_at: Pubblicato
+          location: Luogo
+          price_is_firm_false: Il prezzo è negoziabile.
+          price_is_firm_true: il prezzo non è negoziabile
+          still_for_sale_at: Ancora in vendita a
+          member_listing: Membro di Bike Index
+          member_listing_tooltip: Questo venditore è un membro di Bike Index
       search:
         everything_combobox:
           query_items_description: Casella combinata delle descrizioni di ricerca

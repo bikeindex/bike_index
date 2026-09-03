@@ -42,6 +42,38 @@ RSpec.describe "RegistrationsController#show", type: :request do
       end
     end
 
+    context "with a draft marketplace_listing" do
+      let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :with_address_record, item: bike) }
+
+      it "offers the preview, which renders the listing publicly" do
+        get "#{base_url}/#{bike.id}"
+        body = whitespace_normalized_body_text
+        expect(body).to match("Your bike")
+        expect(body).to_not match("This bike is for sale")
+        expect(response.body).to include("view_as=marketplace_preview")
+
+        get "#{base_url}/#{bike.id}", params: {view_as: "marketplace_preview"}
+        body = whitespace_normalized_body_text
+        expect(body).to match("Listing preview")
+        expect(body).to match("This bike is for sale")
+        expect(body).to match("For Sale")
+        # It's the public view, so the owner actions and the seller's own contact link are gone
+        expect(body).to_not match("Mark stolen")
+        expect(body).to_not match("Contact the seller")
+      end
+
+      context "current_user not the seller" do
+        let(:current_user) { FactoryBot.create(:user_confirmed) }
+        it "flashes and falls back to the public view" do
+          get "#{base_url}/#{bike.id}", params: {view_as: "marketplace_preview"}
+          body = whitespace_normalized_body_text
+          expect(body).to match("not allowed to view this registration")
+          expect(body).to match("Public view")
+          expect(body).to_not match("This bike is for sale")
+        end
+      end
+    end
+
     context "current_user has a general alert" do
       let(:current_user) { FactoryBot.create(:user_confirmed) }
       let!(:b_param) { FactoryBot.create(:b_param_unfinished_registration, creator: current_user) }
@@ -601,6 +633,20 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("Staff")
         expect(body).to match("not allowed to view this registration")
       end
+
+      it "drops the passive organization when switching to public" do
+        get "#{base_url}/#{bike.id}"
+        expect(response.body).to include("organization_id=false")
+
+        get "#{base_url}/#{bike.id}", params: {view_as: "public", organization_id: "false"}
+        expect(whitespace_normalized_body_text).to match("Public view")
+
+        # Without the org sticking in the session, the next visit stays public
+        get "#{base_url}/#{bike.id}"
+        body = whitespace_normalized_body_text
+        expect(body).to match("Public view")
+        expect(body).to_not match("Staff")
+      end
     end
 
     context "view_as another organization" do
@@ -638,11 +684,14 @@ RSpec.describe "RegistrationsController#show", type: :request do
         # public is the superuser's default/current view
         expect(body).to match("Viewing as Public")
 
-        # Renders the owner view even though they don't own the bike
-        get "#{base_url}/#{bike.id}", params: {view_as: "owner"}
+        # Renders the owner view even though they don't own the bike, and switching
+        # to it drops the organization rather than leaving it in the session
+        expect(response.body).to include("organization_id=false&amp;view_as=owner")
+        get "#{base_url}/#{bike.id}", params: {view_as: "owner", organization_id: "false"}
         body = whitespace_normalized_body_text
         expect(body).to match("Your bike")
         expect(body).to match("Mark stolen")
+        expect(session[:passive_organization_id]).to eq "0"
 
         # Renders an org panel as limited
         get "#{base_url}/#{bike.id}", params: {view_as: "#{brakebills.to_param}.limited"}

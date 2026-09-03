@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe SharedBlocks::MarketplaceListingPanel::Component, type: :component do
+RSpec.describe Pages::Bikes::MarketplaceListingPanel::Component, type: :component do
   let(:options) { {marketplace_listing:} }
   let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
   let(:component) { render_inline(described_class.new(**options)) }

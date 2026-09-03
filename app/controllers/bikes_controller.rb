@@ -223,8 +223,7 @@ class BikesController < Bikes::BaseController
     return true if bike.is_for_sale?
 
     marketplace_listing = bike.current_marketplace_listing
-    return false if marketplace_listing.blank? ||
-      !Binxtils::InputNormalizer.boolean(params[:show_marketplace_preview])
+    return false if marketplace_listing.blank? || params[:view_as] != "marketplace_preview"
 
     return false unless marketplace_listing.visible_by?(current_user)
 

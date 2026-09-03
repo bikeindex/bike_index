@@ -6,6 +6,7 @@ en:
         show:
           wrapper_consumer:
             about_this_bike: About this %{bike_type}
+            audience_marketplace_preview: Listing preview
             audience_owner: Your %{bike_type}
             audience_public: Public view
             audience_sent_away: No longer your %{bike_type}

@@ -80,9 +80,19 @@ module Pages
               return content_tag(:span, safe_join(["Viewing as ", entry_label(view)]), data: {active: true})
             end
 
-            link_to(registration_path(@bike, view_as: BikeServices::ShowViews.view_param(view))) do
+            link_to(entry_path(view)) do
               safe_join(["View as ", entry_label(view)])
             end
+          end
+
+          # Switching to a view with no organization clears the passive one, so the
+          # next visit without a ?view_as doesn't snap back to the org admin view
+          def entry_path(view)
+            _kind, organization = view
+            view_as = BikeServices::ShowViews.view_param(view)
+            return registration_path(@bike, view_as:) if organization
+
+            registration_path(@bike, view_as:, organization_id: false)
           end
 
           def button_class
@@ -96,6 +106,7 @@ module Pages
             case kind
             when :owner then content_tag(:span, "owner of bike", class: "tw:font-bold")
             when :public then content_tag(:span, "Public", class: "tw:font-bold")
+            when :marketplace_preview then content_tag(:span, "Listing preview", class: "tw:font-bold")
             else
               safe_join([content_tag(:span, organization.short_name, class: "tw:font-bold"), " ", kind.to_s])
             end

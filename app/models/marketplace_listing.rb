@@ -142,6 +142,10 @@ class MarketplaceListing < ApplicationRecord
     self.class.condition_humanized(condition)
   end
 
+  def condition_description_humanized
+    self.class.condition_description_humanized(condition)
+  end
+
   def primary_activity_id=(val)
     item&.update(primary_activity_id: val)
   end

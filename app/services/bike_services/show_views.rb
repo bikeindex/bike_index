@@ -6,13 +6,15 @@ module BikeServices
 
     # The perspectives the given user may view this bike as, each a [kind, org]
     # pair: [:owner, nil] (owners and superadmins), [:staff|:limited, org] admin
-    # views, and always [:public, nil]. preview_organization is the ?view_as target
-    # org, so a superuser can preview any organization it names.
+    # views, [:marketplace_preview, nil] and always [:public, nil].
+    # preview_organization is the ?view_as target org, so a superuser can preview
+    # any organization it names.
     def available(bike:, current_user:, organization:, preview_organization: nil)
       [
         ([:owner, nil] if (current_user.present? && bike.owner == current_user) || current_user&.superuser?),
         *organization_views(bike:, current_user:, organization:, preview_organization:),
-        [:public, nil]
+        [:public, nil],
+        ([:marketplace_preview, nil] if marketplace_preview?(bike:, current_user:))
       ].compact
     end
 
@@ -35,6 +37,15 @@ module BikeServices
     #
     # private below here
     #
+
+    # Once a listing is published the public view carries it, so only a draft is
+    # worth previewing — and only by whoever may see it before it's public
+    def marketplace_preview?(bike:, current_user:)
+      return false unless bike.status_with_owner?
+
+      marketplace_listing = bike.current_marketplace_listing
+      marketplace_listing&.draft? && marketplace_listing.authorized?(current_user)
+    end
 
     # [role, organization] pairs. Superadmins may preview both staff and limited.
     def organization_views(bike:, current_user:, organization:, preview_organization: nil)
@@ -63,6 +74,6 @@ module BikeServices
       orgs.compact.uniq.select { |org| current_user.authorized?(org) }
     end
 
-    conceal :organization_views, :viewable_organizations, :role_for
+    conceal :marketplace_preview?, :organization_views, :viewable_organizations, :role_for
   end
 end

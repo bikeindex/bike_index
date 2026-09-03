@@ -71,6 +71,8 @@
       <%= render(Pages::Registrations::Show::StolenDetails::Component.new(bike: @bike, current_user: @current_user)) %>
       <%= render(Pages::Registrations::Show::ImpoundDetails::Component.new(bike: @bike, organization: @organization)) %>
 
+      <%= render(Pages::Registrations::Show::MarketplaceListing::Component.new(bike: @bike, current_user: @current_user, term: :below)) %>
+
       <%= render(Pages::Registrations::Show::BikeIndexCard::Component.new(bike: @bike, term: :below)) %>
 
       <div class="tw:order-5 tw:lg:order-none">
