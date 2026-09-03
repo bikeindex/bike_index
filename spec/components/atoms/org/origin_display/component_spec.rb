@@ -54,15 +54,15 @@ RSpec.describe Atoms::Org::OriginDisplay::Component, type: :component do
       expect(component).to have_content("old landing page")
       expect(component).to have_css("[role=tooltip]", text: "registration began with incomplete registration, via organization landing page", visible: :all)
     end
+  end
 
-    context "in the registration flow" do
-      let(:creation_description) { Ownership.new(origin: "register_flow_landing_page").creation_description }
+  context "with a registration flow landing page origin" do
+    let(:creation_description) { Ownership.new(origin: "register_flow_landing_page").creation_description }
 
-      it "renders the landing page label" do
-        expect(creation_description).to eq "register flow landing page"
-        expect(component).to have_content("landing page")
-        expect(component).to have_css("[role=tooltip]", text: "registration began via an organization landing page, in the multi-step registration flow", visible: :all)
-      end
+    it "renders the landing page label" do
+      expect(creation_description).to eq "register flow landing page"
+      expect(component).to have_content("landing page")
+      expect(component).to have_css("[role=tooltip]", text: "registration began via an organization landing page, in the multi-step registration flow", visible: :all)
     end
   end
 

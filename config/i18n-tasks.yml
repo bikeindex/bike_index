@@ -28,8 +28,6 @@ data:
     # sub-namespace segment from a nested/plural key and would otherwise land
     # these in the parent namespace's directory. Add a line here per sub-namespace.
     - ['components.atoms.admin.badges.{:}.*', 'app/components/atoms/admin/badges/\1/component.%{locale}.yml']
-    - ['components.atoms.admin.{:}.*', 'app/components/atoms/admin/\1/component.%{locale}.yml']
-    - ['components.atoms.org.{:}.*', 'app/components/atoms/org/\1/component.%{locale}.yml']
     - ['components.emails.partials.{:}.*', 'app/components/emails/partials/\1/component.%{locale}.yml']
     - ['components.pages.bikes.org.{:}.*', 'app/components/pages/bikes/org/\1/component.%{locale}.yml']
     - ['components.pages.org.impound_records.{:}.*', 'app/components/pages/org/impound_records/\1/component.%{locale}.yml']

@@ -13,8 +13,7 @@ module Atoms
         private
 
         def creation_descriptions
-          pos_ownerships = Organization::POS_KIND_ENUM.keys.map(&:to_s).select { |kind| Organization.pos?(kind) }
-            .map { |pos_kind| Ownership.new(pos_kind:) }
+          pos_ownerships = Organization.pos_kinds.map { |pos_kind| Ownership.new(pos_kind:) }.select(&:pos?)
 
           (pos_ownerships + [Ownership.new(bulk_import_id: 1)] + Ownership.origins.map { |origin| Ownership.new(origin:) })
             .map(&:creation_description).uniq

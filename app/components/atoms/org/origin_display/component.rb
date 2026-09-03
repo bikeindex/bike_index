@@ -4,8 +4,8 @@ module Atoms
   module Org
     module OriginDisplay
       class Component < ApplicationComponent
-        # Sentence case is lowercase throughout - only a name within it (the flow, the POS
-        # product) is title case
+        # The label is lowercase and the tooltip a lowercase sentence, so the only title case
+        # anywhere is a name inside one - the flow, the POS product
         EXTENDED_DESCRIPTIONS = {
           "web" => "registered with self registration process",
           "org reg" => "registered by internal, organization member form",
@@ -14,7 +14,9 @@ module Atoms
           "parking notification" => "registered via the Unregistered Parking Notification flow",
           "register flow" => "registered with the multi-step registration flow",
           "register flow organized" => "registered by an organization member, in the multi-step registration flow",
-          "register flow landing page" => "registration began via an organization landing page, in the multi-step registration flow"
+          "register flow landing page" => "registration began via an organization landing page, in the multi-step registration flow",
+          "Lightspeed" => "automatically registered by bike shop point of sale (Lightspeed POS)",
+          "Ascend" => "automatically registered by bike shop point of sale (Ascend POS)"
         }.freeze
         LABELS = {
           "parking notification" => "unregistered parking notification",
@@ -43,11 +45,7 @@ module Atoms
         end
 
         def origin_title
-          if %w[Lightspeed Ascend].include?(@creation_description)
-            "automatically registered by bike shop point of sale (#{@creation_description} POS)"
-          else
-            EXTENDED_DESCRIPTIONS[@creation_description] || "registered via #{@creation_description}"
-          end
+          EXTENDED_DESCRIPTIONS[@creation_description] || "registered via #{@creation_description}"
         end
       end
     end
