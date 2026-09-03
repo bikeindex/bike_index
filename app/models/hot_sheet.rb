@@ -3,14 +3,14 @@
 # Table name: hot_sheets
 # Database name: primary
 #
-#  id                     :bigint           not null, primary key
-#  delivery_error_message :text
-#  recipient_ids          :jsonb
-#  sheet_date             :date
-#  stolen_record_ids      :jsonb
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  organization_id        :bigint
+#  id                :bigint           not null, primary key
+#  delivery_response :jsonb
+#  recipient_ids     :jsonb
+#  sheet_date        :date
+#  stolen_record_ids :jsonb
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  organization_id   :bigint
 #
 # Indexes
 #

@@ -1724,7 +1724,7 @@ CREATE TABLE public.hot_sheets (
     sheet_date date,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    delivery_error_message text
+    delivery_response jsonb
 );
 
 
@@ -7804,6 +7804,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260903162214'),
 ('20260821100000'),
 ('20260819120000'),
 ('20260815152851'),
@@ -7915,7 +7916,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20250217173308'),
 ('20250216191639'),
 ('20250216183834'),
-('20250208040953'),
 ('20250207221053'),
 ('20250207193640'),
 ('20250205135704'),
