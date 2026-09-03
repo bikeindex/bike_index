@@ -25,10 +25,13 @@ module Pages
             @preview ? @bike.current_marketplace_listing : @bike.current_for_sale_marketplace_listing
           end
 
-          # MessagesController bounces the seller back off their own listing, and
-          # takes no message about a draft one
+          # The preview shows the page as the public gets it, button and all.
+          # Otherwise the seller loses it — MessagesController bounces them back
+          # off their own listing
           def show_contact?
-            !@owner && !@preview && marketplace_listing.seller_id != @current_user&.id
+            return true if @preview
+
+            !@owner && marketplace_listing.seller_id != @current_user&.id
           end
 
           def contact_path

@@ -57,9 +57,9 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("Listing preview")
         expect(body).to match("This bike is for sale")
         expect(body).to match("For Sale")
-        # It's the public view, so the owner actions and the seller's own contact link are gone
+        # It's the public view, down to the contact link the seller can't otherwise see
+        expect(body).to match("Contact the seller")
         expect(body).to_not match("Mark stolen")
-        expect(body).to_not match("Contact the seller")
       end
 
       context "current_user not the seller" do

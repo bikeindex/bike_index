@@ -20,10 +20,12 @@ RSpec.describe Pages::Registrations::Show::MarketplaceListingCard::Component, ty
     context "preview" do
       let(:preview) { true }
 
-      it "renders the draft, without the contact link" do
+      # The preview is the public page, so it keeps the contact link the seller
+      # would otherwise never be shown
+      it "renders the draft as the public sees it" do
         expect(component.text).to include("is for sale")
         expect(component.text).to include("excellent")
-        expect(component).to_not have_link("Contact the seller")
+        expect(component).to have_link("Contact the seller", href: "/my_account/messages/ml_#{marketplace_listing.id}")
       end
     end
   end
