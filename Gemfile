@@ -47,7 +47,7 @@ gem "rails-i18n"
 gem "translation"
 
 # Redis and Redis dependents
-gem "redis", "< 7" # actioncable's declares gem "redis", ">= 4", "< 6"
+gem "redis", "< 6" # actioncable's redis adapter declares gem "redis", ">= 4", "< 6"
 gem "sidekiq" # Background job processing
 gem "sidekiq-failures" # Sidekiq failure tracking and viewing
 gem "sidekiq-logstash" # Better sidekiq logging
