@@ -74,28 +74,35 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
           expect(ActionMailer::Base.deliveries.count).to eq 1
         end
       end
-      context "with more than 50 recipients" do
-        let(:emails) { Array(1..102).map { |i| "email#{i}@bikeindex.org" } }
-        it "delivers multiple emails" do
+      context "with more recipients than fit in one email" do
+        let!(:organization_roles) do
+          Array.new(8) { FactoryBot.create(:organization_role_claimed, organization: organization1, hot_sheet_notification: "notification_daily") }
+        end
+        let!(:organization_role_never) { FactoryBot.create(:organization_role_claimed, organization: organization1, hot_sheet_notification: "notification_never") }
+        let!(:stolen_record) { FactoryBot.create(:stolen_record, :in_nyc) }
+        let(:recipient_ids) { ([organization_role] + organization_roles).map(&:user_id) }
+        before { stub_const("ProcessHotSheetJob::RECIPIENTS_PER_EMAIL", 3) }
+
+        it "creates a hot sheet for each slice of recipients, and emails each one" do
           expect(ActionMailer::Base.deliveries.count).to eq 0
-          allow_any_instance_of(HotSheet).to receive(:recipient_emails) { emails }
           expect {
             ProcessHotSheetJob.drain
-          }.to change(HotSheet, :count).by 1
-          hot_sheet = HotSheet.last
-          expect(hot_sheet.sheet_date).to eq Time.current.to_date
-          expect(hot_sheet.organization_id).to eq organization1.id
-          # And it's delivered the email
-          expect(hot_sheet.email_success?).to be_truthy
-          expect(hot_sheet.recipient_ids).to eq([organization_role.user_id])
+          }.to change(HotSheet, :count).by 3
+          hot_sheets = HotSheet.where(sheet_date: Time.current.to_date).order(:id)
+          # The sheets are identical, other than which recipients they went to
+          expect(hot_sheets.map(&:organization_id)).to eq([organization1.id] * 3)
+          expect(hot_sheets.map(&:stolen_record_ids)).to eq([[stolen_record.id]] * 3)
+          expect(hot_sheets.map { it.recipient_ids.count }).to eq([3, 3, 3])
+          # Every daily recipient is on exactly one sheet, and notification_never is on none
+          expect(hot_sheets.flat_map(&:recipient_ids)).to match_array(recipient_ids)
+          expect(recipient_ids).to_not include(organization_role_never.user_id)
+
           expect(ActionMailer::Base.deliveries.count).to eq 3
-
-          ActionMailer::Base.deliveries.each do |email|
+          hot_sheets.each do |hot_sheet|
+            email = ActionMailer::Base.deliveries.find { (it.to + it.bcc).sort == hot_sheet.recipient_emails.sort }
+            expect(email).to be_present
             expect(email.subject).to eq hot_sheet.subject
-            expect(email.bcc.count).to be < 49
           end
-
-          expect(Notification.count).to eq 102
         end
       end
     end

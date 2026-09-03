@@ -1,6 +1,10 @@
 class ProcessHotSheetJob < ScheduledJob
   prepend ScheduledJobRecorder
 
+  # Postmark only allows 50 emails per sent email
+  # So split into separate hot sheets, all rendering the same bikes
+  RECIPIENTS_PER_EMAIL = 48
+
   sidekiq_options queue: "low_priority", retry: false
 
   def self.frequency
@@ -24,23 +28,23 @@ class ProcessHotSheetJob < ScheduledJob
 
     hot_sheet ||= HotSheet.create!(organization_id: org_id, sheet_date: Time.current.to_date)
     # Bump bike cached attributes, to be sure the email has all the info. Once per sheet -
-    # a separate email is sent per 48 recipients, all rendering the same bikes
     hot_sheet.fetch_stolen_records.each { it.bike.update(updated_at: Time.current) }
-    recipient_emails = hot_sheet.fetch_recipients
-    return if recipient_emails.none?
+    hot_sheet.fetch_recipients
+    recipient_id_slices = hot_sheet.recipient_ids.each_slice(RECIPIENTS_PER_EMAIL).to_a
+    return if recipient_id_slices.none?
 
-    # Postmark only allows 50 emails per sent email, so abide by that
-    recipient_emails.each_slice(48).map do |permitted_recipient_emails|
-      send_emails(hot_sheet, permitted_recipient_emails)
+    recipient_id_slices.each_with_index do |recipient_ids, index|
+      sheet = index.zero? ? hot_sheet : hot_sheet.dup
+      sheet.update!(recipient_ids:)
+      send_email(sheet)
     end
   end
 
   private
 
-  def send_emails(hot_sheet, emails)
-    pp emails
-    # This is called from process_hot_sheet_worker, so it can be delivered inline
-    OrganizedMailer.hot_sheet(hot_sheet, emails).deliver_now
+  def send_email(hot_sheet)
+    # This is called from process_hot_sheet_job, so it can be delivered inline
+    OrganizedMailer.hot_sheet(hot_sheet).deliver_now
   end
 
   # update(delivery_status: "delivery_success")
