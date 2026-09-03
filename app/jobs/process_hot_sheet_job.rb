@@ -31,27 +31,18 @@ class ProcessHotSheetJob < ScheduledJob
     hot_sheet.fetch_stolen_records.each { it.bike.update(updated_at: Time.current) }
     hot_sheet.fetch_recipients
     recipient_id_slices = hot_sheet.recipient_ids.each_slice(RECIPIENTS_PER_EMAIL).to_a
-    return if recipient_id_slices.none?
+    # With nobody to email, there is nothing left to deliver
+    return hot_sheet.update(delivery_status: "delivery_success") if recipient_id_slices.none?
 
-    recipient_id_slices.each_with_index do |recipient_ids, index|
+    # Build every sheet before delivering any, so the dups don't inherit a delivery_status
+    sheets = recipient_id_slices.map.with_index do |recipient_ids, index|
       sheet = index.zero? ? hot_sheet : hot_sheet.dup
       sheet.update!(recipient_ids:)
-      send_email(sheet)
+      sheet
+    end
+    sheets.each do |sheet|
+      # This job delivers inline, rather than enqueuing a separate mailer job
+      sheet.track_email_delivery { OrganizedMailer.hot_sheet(sheet).deliver_now }
     end
   end
-
-  private
-
-  def send_email(hot_sheet)
-    # This is called from process_hot_sheet_job, so it can be delivered inline
-    OrganizedMailer.hot_sheet(hot_sheet).deliver_now
-  end
-
-  # update(delivery_status: "delivery_success")
-  #   user_email&.update_last_email_errored!(email_errored: false)
-  # rescue => e
-  #   update(delivery_status: "delivery_failure", delivery_error: e.class)
-  #   user_email&.update_last_email_errored!(email_errored: true)
-
-  #   raise e unless UNDELIVERABLE_ERRORS.include?(delivery_error)
 end

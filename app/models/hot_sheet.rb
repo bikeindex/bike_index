@@ -46,7 +46,19 @@ class HotSheet < ApplicationRecord
   end
 
   def email_success?
-    notifications.delivery_success.any? && notifications.not_delivery_success.none?
+    delivery_success?
+  end
+
+  # This method takes a block
+  def track_email_delivery
+    return if delivery_success?
+
+    yield
+    update(delivery_status: "delivery_success")
+  rescue => e
+    update(delivery_status: "delivery_failure", delivery_error: e.class)
+
+    raise e unless Notification::UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
   end
 
   def subject

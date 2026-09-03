@@ -16,6 +16,43 @@ RSpec.describe HotSheet, type: :model do
     end
   end
 
+  describe "track_email_delivery" do
+    let(:hot_sheet) { FactoryBot.create(:hot_sheet) }
+
+    it "records the success, and doesn't deliver a second time" do
+      expect(hot_sheet.reload.delivery_status).to eq "delivery_pending"
+      expect(hot_sheet.email_success?).to be_falsey
+      deliveries = 0
+      hot_sheet.track_email_delivery { deliveries += 1 }
+      expect(hot_sheet.reload.delivery_status).to eq "delivery_success"
+      expect(hot_sheet.delivery_error).to be_nil
+      expect(hot_sheet.email_success?).to be_truthy
+
+      hot_sheet.track_email_delivery { deliveries += 1 }
+      expect(deliveries).to eq 1
+    end
+
+    context "with an unknown postmark error" do
+      let(:api_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 499}) }
+      it "records the failure and raises" do
+        expect { hot_sheet.track_email_delivery { raise api_error } }
+          .to raise_error(Postmark::ApiInputError)
+        expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
+        expect(hot_sheet.delivery_error).to eq "Postmark::ApiInputError"
+        expect(hot_sheet.email_success?).to be_falsey
+      end
+    end
+
+    context "with an undeliverable error" do
+      let(:invalid_email_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 300}) }
+      it "records the failure without raising" do
+        hot_sheet.track_email_delivery { raise invalid_email_error }
+        expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
+        expect(hot_sheet.delivery_error).to eq "Postmark::InvalidEmailRequestError"
+      end
+    end
+  end
+
   describe "fetch_stolen_records" do
     let!(:stolen_record) { FactoryBot.create(:stolen_record, :in_nyc) }
     let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
