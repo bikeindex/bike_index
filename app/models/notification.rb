@@ -233,14 +233,6 @@ class Notification < ApplicationRecord
     calculated_email
   end
 
-  def delivery_error_spam?
-    delivery_error == "Postmark::InactiveRecipientError"
-  end
-
-  def delivery_error_invalid?
-    delivery_error == "Postmark::InvalidEmailRequestError"
-  end
-
   private
 
   def record_delivery_success(delivery)

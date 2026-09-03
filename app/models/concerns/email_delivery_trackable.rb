@@ -20,6 +20,14 @@ module EmailDeliveryTrackable
     raise e unless UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
   end
 
+  def delivery_error_spam?
+    delivery_error == "Postmark::InactiveRecipientError"
+  end
+
+  def delivery_error_invalid?
+    delivery_error == "Postmark::InvalidEmailRequestError"
+  end
+
   private
 
   # Postmark names the addresses it rejected as inactive, and delivers to the rest of
