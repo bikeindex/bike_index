@@ -104,9 +104,20 @@ export default class extends Controller {
     Promise.resolve().then(() => {
       this.syncQueryItems()
       window.kindControllerUpdateAfterComboboxChange?.()
-      // Keep focus in the field after a mouse selection so enter still submits
-      this.inputElement?.focus()
+      // Keep focus in the field after a mouse selection so enter still submits. The defer
+      // is load-bearing here too: focusing during the event instead leaves the gem to move
+      // focus after us, and the next field the reader fills loses what they type
+      if (!this.focusMovedOn) this.inputElement?.focus()
     })
+  }
+
+  // A task late, the reader may have clicked into another field -- taking focus back there
+  // eats what they type. Nothing focused (body) is the clicked option having been removed,
+  // which is still ours to take
+  get focusMovedOn () {
+    const active = document.activeElement
+
+    return Boolean(active) && active !== document.body && !this.element.contains(active)
   }
 
   syncQueryItems () {

@@ -62,20 +62,14 @@ module UI
         body? ? body : @text
       end
 
-      # A link or button in the body means the tooltip is meant to be clicked
-      # into (it stays open on click), so the popup needs pointer events.
-      def interactive_body?
-        tooltip_body.to_s.match?(/<(a|button)[\s>]/)
-      end
-
+      # The controller drops pointer-events-none once the tooltip is held open
       def tooltip_span
-        pointer = interactive_body? ? "tw:pointer-events-auto" : "tw:pointer-events-none"
         tag.span(
           tooltip_body,
           role: "tooltip",
           id: tooltip_id,
           data: {"ui--tooltip-target": "tooltip"},
-          class: "tw:twtext-color tw:hidden #{pointer} tw:whitespace-nowrap tw:rounded " \
+          class: "tw:twtext-color tw:hidden tw:pointer-events-none tw:whitespace-nowrap tw:rounded " \
             "tw:bg-white tw:px-2 tw:py-1 tw:text-xs tw:font-normal tw:border tw:border-gray-200 tw:shadow-lg tw:z-50 " \
             "tw:dark:bg-gray-800 tw:dark:border-gray-700"
         )

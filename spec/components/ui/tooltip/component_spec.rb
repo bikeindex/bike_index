@@ -69,11 +69,10 @@ RSpec.describe UI::Tooltip::Component, type: :component do
       end
     end
 
-    it "keeps the trigger a button and makes the popup clickable, not nested in the button" do
+    it "keeps the trigger a button, with the link in the popup rather than nested in the button" do
       trigger = component.css("[aria-describedby]").first
       expect(trigger.name).to eq "button"
       tooltip = component.css("[role='tooltip']").first
-      expect(tooltip["class"]).to include "tw:pointer-events-auto"
       expect(tooltip.at_css("a")[:href]).to eq "/commit/abc"
       expect(component.css("button a")).to be_empty
     end
