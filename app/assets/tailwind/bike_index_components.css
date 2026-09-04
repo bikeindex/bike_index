@@ -133,6 +133,17 @@
     @apply tw:m-0;
   }
 
+  /* Filling a table cell: the row's own borders already draw the box, so the inner
+   * border and the cell's padding would only double it up. Important because the
+   * cell's own tw:px-1 is a utility, and that layer outranks this one */
+  .ui-table td:has(> .twjson-box-cell) {
+    @apply tw:p-0!;
+  }
+
+  .twjson-box-cell .code {
+    @apply tw:border-0;
+  }
+
   .twfieldrow {
     @apply tw:grid tw:gap-x-2 tw:grid-cols-[repeat(auto-fit,minmax(140px,1fr))];
   }

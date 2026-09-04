@@ -3,11 +3,12 @@
 module UI
   module JsonDisplay
     class Component < ApplicationComponent
-      def initialize(data:, max_width: nil, small: false, skip_blank: false)
+      def initialize(data:, max_width: nil, small: false, skip_blank: false, table_cell: false)
         @data = data
         @max_width = max_width
         @small = small
         @skip_blank = skip_blank
+        @table_cell = table_cell
       end
 
       def call
@@ -18,7 +19,7 @@ module UI
 
       def render? = @data.present?
 
-      def classes = ["twjson-box", ("tw:text-xs" if @small)].compact
+      def classes = ["twjson-box", ("twjson-box-cell" if @table_cell), ("tw:text-xs" if @small)].compact
 
       # Inline, because Tailwind can't generate a class for a width it only sees at runtime
       def box_style

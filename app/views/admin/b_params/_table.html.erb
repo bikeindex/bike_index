@@ -45,6 +45,6 @@
   <% end %>
 
   <% table.column(label: "Data") do |b_param| %>
-    <%= render UI::JsonDisplay::Component.new(data: b_param.params, max_width: 450, small: true) %>
+    <%= render UI::JsonDisplay::Component.new(data: b_param.params, max_width: 450, small: true, table_cell: true) %>
   <% end %>
 <% end %>

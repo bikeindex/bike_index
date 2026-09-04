@@ -21,6 +21,14 @@ RSpec.describe UI::JsonDisplay::Component, type: :component do
     end
   end
 
+  context "with table_cell" do
+    let(:options) { {table_cell: true} }
+
+    it "adds the class the cell-filling css keys off" do
+      expect(component).to have_css("div.twjson-box.twjson-box-cell")
+    end
+  end
+
   context "with skip_blank" do
     let(:options) { {skip_blank: true} }
 
