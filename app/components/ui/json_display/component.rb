@@ -27,7 +27,7 @@ module UI
         data.select { |_key, value| Binxtils::InputNormalizer.present_or_false?(value) }
       end
 
-      def classes = ["twjson-box", ("twjson-box-cell" if @table_cell), ("tw:text-xs" if @small)].compact
+      def classes = ["highlightjs-json", ("highlightjs-json-cell" if @table_cell), ("tw:text-xs" if @small)].compact
 
       # Inline, because Tailwind can't generate a class for a width it only sees at runtime
       def box_style

@@ -7,50 +7,50 @@
  */
 
 @layer components {
-  .twjson-box pre {
+  .highlightjs-json pre {
     @apply tw:m-0 tw:max-h-72 tw:overflow-auto tw:rounded-sm tw:border tw:border-gray-300 tw:bg-gray-50 tw:p-1 tw:dark:border-gray-700 tw:dark:bg-gray-900;
   }
 
   /* Only the json grammar is registered, so these six scopes are the whole theme */
-  .twjson-box .hljs-attr {
+  .highlightjs-json .hljs-attr {
     @apply tw:text-purple-800 tw:dark:text-purple-300;
   }
 
-  .twjson-box .hljs-string {
+  .highlightjs-json .hljs-string {
     @apply tw:text-red-700 tw:dark:text-red-300;
   }
 
-  .twjson-box .hljs-number {
+  .highlightjs-json .hljs-number {
     @apply tw:text-blue-700 tw:dark:text-blue-300;
   }
 
-  .twjson-box .hljs-literal {
+  .highlightjs-json .hljs-literal {
     @apply tw:text-teal-700 tw:dark:text-teal-300;
   }
 
-  .twjson-box .hljs-punctuation {
+  .highlightjs-json .hljs-punctuation {
     @apply tw:text-gray-500 tw:dark:text-gray-400;
   }
 
-  .twjson-box .hljs-comment {
+  .highlightjs-json .hljs-comment {
     @apply tw:text-gray-400 tw:italic tw:dark:text-gray-500;
   }
 
   /* Filling a table cell: the row's own borders already draw the box, so the inner
    * border and the cell's padding would only double it up. Important because the
    * cell's own tw:px-1 is a utility, and that layer outranks this one */
-  .ui-table td:has(> .twjson-box-cell) {
+  .ui-table td:has(> .highlightjs-json-cell) {
     @apply tw:p-0!;
   }
 
   /* Full width rather than a max-width: a table with slack hands the column more than
    * the box asked for, and capping the box leaves the difference as a gap. Capping the
    * cell instead doesn't work -- table-layout: auto ignores max-width on a td. */
-  .twjson-box-cell {
+  .highlightjs-json-cell {
     @apply tw:w-full;
   }
 
-  .twjson-box-cell pre {
+  .highlightjs-json-cell pre {
     @apply tw:rounded-none tw:border-0;
   }
 }

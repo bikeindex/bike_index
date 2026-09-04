@@ -8,16 +8,16 @@ RSpec.describe UI::JsonDisplay::Component, type: :component do
   let(:options) { {} }
 
   it "renders every value, full width and full size" do
-    expect(component).to have_css("div.twjson-box[data-controller='ui--json-display'] pre code.language-json")
+    expect(component).to have_css("div.highlightjs-json[data-controller='ui--json-display'] pre code.language-json")
     expect(component.text).to include "bike_sticker"
-    expect(component).to_not have_css("div.twjson-box[style]")
+    expect(component).to_not have_css("div.highlightjs-json[style]")
   end
 
   context "with small and max_width" do
     let(:options) { {small: true, max_width: 450} }
 
     it "renders the pixel width and the smaller text" do
-      expect(component).to have_css("div.twjson-box.tw\\:text-xs[style='max-width: 450px;']")
+      expect(component).to have_css("div.highlightjs-json.tw\\:text-xs[style='max-width: 450px;']")
     end
   end
 
@@ -25,7 +25,7 @@ RSpec.describe UI::JsonDisplay::Component, type: :component do
     let(:options) { {table_cell: true} }
 
     it "adds the class the cell-filling css keys off" do
-      expect(component).to have_css("div.twjson-box.twjson-box-cell")
+      expect(component).to have_css("div.highlightjs-json.highlightjs-json-cell")
     end
   end
 
