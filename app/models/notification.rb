@@ -36,7 +36,7 @@ class Notification < ApplicationRecord
   KIND_ENUM = YAML.load_file(Rails.root.join("config/notification_kinds_enums.yml")).freeze
 
   MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
-  DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2}.freeze
+  DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2, delivery_banned: 3}.freeze
 
   UNDELIVERABLE_ERRORS = [Postmark::InactiveRecipientError, Postmark::InvalidEmailRequestError].freeze
 
@@ -59,6 +59,8 @@ class Notification < ApplicationRecord
   scope :theft_survey, -> { where(kind: theft_survey_kinds) }
   scope :admin, -> { where(kind: admin_kinds) }
   scope :with_message_id, -> { where.not(message_id: nil) }
+  # A send we blocked is as undelivered as one postmark refused
+  scope :delivery_failed, -> { where(delivery_status: %w[delivery_failure delivery_banned]) }
 
   class << self
     def kinds
@@ -141,7 +143,7 @@ class Notification < ApplicationRecord
 
     user_email = self.user_email
 
-    return if EmailBan.ban?(user, user_email:, is_new_email_address:)
+    return update(delivery_status: "delivery_banned") if EmailBan.ban?(user, user_email:, is_new_email_address:)
 
     delivery = yield
 

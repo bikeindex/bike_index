@@ -159,7 +159,7 @@ RSpec.describe UserJobs::ProcessOrganizationRoleJob, type: :job do
             expect(organization_role.user).to eq user
             expect(organization_role.email_invitation_sent_at).to be_blank
             expect(ActionMailer::Base.deliveries.count).to eq 0
-            expect(organization_role.notifications.first.delivery_status).to eq "delivery_pending"
+            expect(organization_role.notifications.first.delivery_status).to eq "delivery_banned"
           end
         end
 

@@ -365,7 +365,7 @@ class GraduatedNotification < ApplicationRecord
   def calculated_status
     # Because prior to commit, the value for the current notification isn't set
     return "marked_remaining" if marked_remaining_at.present?
-    return "delivery_failure" if processed_at.present? && notifications.delivery_failure.exists?
+    return "delivery_failure" if processed_at.present? && notifications.delivery_failed.exists?
 
     # Similar - if this is the primary_notification, we want to make sure it's marked processed during save
     return "bike_graduated" if email_success? || primary_notification.present? && primary_notification.email_success?

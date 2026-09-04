@@ -206,6 +206,16 @@ RSpec.describe EmailBan, type: :model do
         expect(FactoryBot.build(:email_ban, user:, user_email:, reason: :email_domain)).to_not be_valid
       end
 
+      it "keeps the user_email when the user's other addresses go away" do
+        expect(email_ban.reload.user_email_id).to eq user_email.id
+        primary_email.destroy
+        expect(user.reload.user_emails.pluck(:id)).to eq([user_email.id])
+
+        email_ban.update(end_at: Time.current + 1.hour)
+
+        expect(email_ban.reload.user_email_id).to eq user_email.id
+      end
+
       context "ban without a user_email" do
         let(:email_ban) { FactoryBot.create(:email_ban, user:, reason: :email_domain) }
         it "bans every address" do

@@ -147,7 +147,9 @@ class EmailBan < ApplicationRecord
 
   def set_calculated_attributes
     self.start_at ||= Time.current
-    self.user_email_id = nil unless multiple_user_emails?
+    # With one address on file, a ban on it is a ban on the user - but only at create,
+    # since removing an address later shouldn't widen the ban that named it
+    self.user_email_id = nil if new_record? && !multiple_user_emails?
   end
 
   def is_not_duplicate_ban
@@ -159,7 +161,6 @@ class EmailBan < ApplicationRecord
     errors.add(:user_id, "there is already an active email_ban for the same reason for that user")
   end
 
-  # With one address on file, a ban on it is a ban on the user
   def multiple_user_emails?
     user.present? && user.user_emails.size > 1
   end

@@ -186,7 +186,8 @@ RSpec.describe Notification, type: :model do
 
         notification.track_email_delivery { raise "delivered to a banned email!" }
 
-        expect(notification.reload.delivery_status).to eq "delivery_pending"
+        expect(notification.reload.delivery_status).to eq "delivery_banned"
+        expect(Notification.delivery_failed.pluck(:id)).to eq([notification.id])
         expect(ActionMailer::Base.deliveries.count).to eq 0
       end
 
