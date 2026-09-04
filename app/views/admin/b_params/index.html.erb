@@ -53,6 +53,6 @@
   nav_header_list_items:,
   admin_search_form:,
   count_detail:,
-  table_view: render(Pages::Admin::BParams::Table::Component.new(b_params: @b_params, sort_state:,
-    render_sortable: true, render_search: params[:organization_id].blank?)),
+  table_view: render(partial: "table", locals: {collection: @b_params,
+    render_sortable: true, render_search: params[:organization_id].blank?}),
 )) %>

@@ -13,6 +13,29 @@ RSpec.describe base_url, type: :request do
       get "#{base_url}?query=something"
       expect(response).to render_template :index
     end
+
+    context "with an organization and a created bike" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:bike) { FactoryBot.create(:bike) }
+      let!(:subject) do
+        FactoryBot.create(:b_param_with_creation_organization, organization:, origin: "embed_partial")
+      end
+
+      before { subject.update(created_bike_id: bike.id, bike_errors: ["frame_material is not valid"]) }
+
+      it "renders the row's links, origin, errors and params" do
+        get "#{base_url}?period=all"
+
+        expect(response.code).to eq("200")
+        expect(response.body).to match(%r{/admin/b_params/#{subject.id}})
+        expect(response.body).to match(%r{/admin/users/#{subject.creator_id}})
+        expect(response.body).to match(%r{/admin/organizations/#{organization.id}})
+        expect(response.body).to match(%r{/admin/bikes/#{bike.id}})
+        expect(response.body).to match(/Embed partial/)
+        expect(response.body).to match(/Frame material is not valid/)
+        expect(response.body).to match(/owner_email/)
+      end
+    end
   end
 
   describe "show" do
