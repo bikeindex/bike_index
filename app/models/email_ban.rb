@@ -45,13 +45,6 @@ class EmailBan < ApplicationRecord
       matching_bans(user, user_email).any?
     end
 
-    # An email getting through says the address works - it says nothing about the other reasons
-    def resolve_delivery_failure!(user:, user_email: nil)
-      return if user.blank?
-
-      matching_bans(user, user_email).delivery_failure.each { it.update!(end_at: Time.current) }
-    end
-
     def reason_humanized(str)
       return nil unless str.present?
 
@@ -86,8 +79,6 @@ class EmailBan < ApplicationRecord
 
     # A ban with no user_email covers every address the user has
     def matching_bans(user, user_email)
-      user_email ||= user.user_emails.friendly_find(user.email)
-
       user.email_bans_active.where(user_email_id: [nil, user_email&.id])
     end
 

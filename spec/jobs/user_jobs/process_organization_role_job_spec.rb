@@ -151,7 +151,7 @@ RSpec.describe UserJobs::ProcessOrganizationRoleJob, type: :job do
         let(:organization_role) { FactoryBot.create(:organization_role, invited_email: "existing@example.com", user: nil) }
 
         context "user is email_banned" do
-          let!(:email_ban) { FactoryBot.create(:email_ban, user:, reason: :delivery_failure) }
+          let!(:email_ban) { FactoryBot.create(:email_ban, user:, reason: :honeypot) }
           it "doesn't send, and leaves the invitation unsent so it can go out later" do
             instance.perform(organization_role.id)
 
@@ -159,7 +159,7 @@ RSpec.describe UserJobs::ProcessOrganizationRoleJob, type: :job do
             expect(organization_role.user).to eq user
             expect(organization_role.email_invitation_sent_at).to be_blank
             expect(ActionMailer::Base.deliveries.count).to eq 0
-            expect(organization_role.notifications.first.delivery_status).to eq "delivery_banned"
+            expect(organization_role.notifications.first.delivery_status).to eq "delivery_pending"
           end
         end
 

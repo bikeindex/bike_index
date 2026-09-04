@@ -36,7 +36,7 @@ class Notification < ApplicationRecord
   KIND_ENUM = YAML.load_file(Rails.root.join("config/notification_kinds_enums.yml")).freeze
 
   MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
-  DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2, delivery_banned: 3}.freeze
+  DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2}.freeze
 
   UNDELIVERABLE_ERRORS = [Postmark::InactiveRecipientError, Postmark::InvalidEmailRequestError].freeze
 
@@ -141,7 +141,7 @@ class Notification < ApplicationRecord
 
     user_email = self.user_email
 
-    return update(delivery_status: "delivery_banned") if EmailBan.ban?(user, user_email:, is_new_email_address:)
+    return if EmailBan.ban?(user, user_email:, is_new_email_address:)
 
     delivery = yield
 
@@ -149,14 +149,11 @@ class Notification < ApplicationRecord
     user_email&.update_last_email_errored!(email_errored: false)
   rescue => e
     update(delivery_status: "delivery_failure", delivery_error: e.class)
+    # Postmark refuses the address itself once it's deactivated, so last_email_errored
+    # doesn't block anything - it's recorded to show why the emails stopped arriving
     user_email&.update_last_email_errored!(email_errored: true)
 
     raise e unless UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
-
-    EmailBan.create(reason: :delivery_failure, user:, user_email:)
-  else
-    # else runs unrescued - a failed resolve can't mark a delivered email failed
-    EmailBan.resolve_delivery_failure!(user:, user_email:)
   end
 
   def theft_alert?

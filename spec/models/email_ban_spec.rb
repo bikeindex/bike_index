@@ -171,7 +171,7 @@ RSpec.describe EmailBan, type: :model do
   describe "user_email" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let(:user_email) { nil }
-    let(:email_ban) { FactoryBot.create(:email_ban, user:, user_email:, reason: :delivery_failure) }
+    let(:email_ban) { FactoryBot.create(:email_ban, user:, user_email:, reason: :email_domain) }
 
     context "with the user's only email" do
       let(:user_email) { user.user_emails.first }
@@ -194,50 +194,18 @@ RSpec.describe EmailBan, type: :model do
         expect(EmailBan.ban?(user)).to be_falsey
         expect(EmailBan.ban?(user, user_email: primary_email)).to be_falsey
         # the same reason can ban a second address
-        expect(FactoryBot.build(:email_ban, user:, user_email: primary_email, reason: :delivery_failure))
+        expect(FactoryBot.build(:email_ban, user:, user_email: primary_email, reason: :email_domain))
           .to be_valid
-        expect(FactoryBot.build(:email_ban, user:, user_email:, reason: :delivery_failure)).to_not be_valid
+        expect(FactoryBot.build(:email_ban, user:, user_email:, reason: :email_domain)).to_not be_valid
       end
 
       context "ban without a user_email" do
-        let(:email_ban) { FactoryBot.create(:email_ban, user:, reason: :delivery_failure) }
+        let(:email_ban) { FactoryBot.create(:email_ban, user:, reason: :email_domain) }
         it "bans every address" do
           expect(email_ban.reload.user_email_id).to be_nil
           expect(EmailBan.ban?(user)).to be_truthy
           expect(EmailBan.ban?(user, user_email:)).to be_truthy
         end
-      end
-    end
-  end
-
-  describe "resolve_delivery_failure!" do
-    let(:user) { FactoryBot.create(:user_confirmed) }
-    let!(:email_ban) { FactoryBot.create(:email_ban, user:, reason: :delivery_failure) }
-    let!(:domain_ban) { FactoryBot.create(:email_ban, user:, reason: :email_domain) }
-
-    it "ends the delivery_failure ban, leaving the other reasons" do
-      expect(EmailBan.ban?(user)).to be_truthy
-
-      EmailBan.resolve_delivery_failure!(user:)
-
-      expect(email_ban.reload.end_at).to be_within(2).of Time.current
-      expect(email_ban.period_active?).to be_falsey
-      expect(domain_ban.reload.end_at).to be_nil
-      expect(EmailBan.ban?(user)).to be_truthy
-    end
-
-    context "ban for a different address" do
-      let!(:other_email) { FactoryBot.create(:user_email, user:) }
-      let!(:email_ban) { FactoryBot.create(:email_ban, user:, user_email: other_email, reason: :delivery_failure) }
-      let!(:domain_ban) { nil }
-
-      it "leaves it active" do
-        expect(email_ban.reload.user_email_id).to eq other_email.id
-
-        EmailBan.resolve_delivery_failure!(user:)
-
-        expect(email_ban.reload.end_at).to be_nil
-        expect(EmailBan.ban?(user, user_email: other_email)).to be_truthy
       end
     end
   end
