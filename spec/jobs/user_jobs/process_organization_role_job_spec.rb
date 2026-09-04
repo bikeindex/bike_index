@@ -149,6 +149,20 @@ RSpec.describe UserJobs::ProcessOrganizationRoleJob, type: :job do
       context "user with email exists but is not yet assigned" do
         let!(:user) { FactoryBot.create(:user_confirmed, email: "existing@example.com") }
         let(:organization_role) { FactoryBot.create(:organization_role, invited_email: "existing@example.com", user: nil) }
+
+        context "user is email_banned" do
+          let!(:email_ban) { FactoryBot.create(:email_ban, user:, reason: :delivery_failure) }
+          it "doesn't send, and leaves the invitation unsent so it can go out later" do
+            instance.perform(organization_role.id)
+
+            organization_role.reload
+            expect(organization_role.user).to eq user
+            expect(organization_role.email_invitation_sent_at).to be_blank
+            expect(ActionMailer::Base.deliveries.count).to eq 0
+            expect(organization_role.notifications.first.delivery_status).to eq "delivery_banned"
+          end
+        end
+
         it "sends one email and does not enqueue a duplicate processing job" do
           Sidekiq::Job.clear_all
           expect(organization_role.user).to be_blank
