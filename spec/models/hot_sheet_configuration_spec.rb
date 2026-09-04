@@ -90,11 +90,16 @@ RSpec.describe HotSheetConfiguration, type: :model do
           unless dst_transition?
             expect(hot_sheet_configuration.send_today_now?).to be_truthy
           end
-          # Anything that reached a recipient settles the day
+          # Anything that reached a recipient settles that batch
           hot_sheet2.update(delivery_status: "delivery_partial_success")
           expect(hot_sheet_configuration.send_today_now?).to be_falsey
           hot_sheet2.update(delivery_status: "delivery_success", delivery_error: nil)
           expect(hot_sheet_configuration.send_today_now?).to be_falsey
+          unless dst_transition?
+            # ... but a delivered batch doesn't settle the ones that are still worth retrying
+            hot_sheet.update(delivery_status: "delivery_failure", delivery_error: "Postmark::TimeoutError")
+            expect(hot_sheet_configuration.send_today_now?).to be_truthy
+          end
         end
       end
     end

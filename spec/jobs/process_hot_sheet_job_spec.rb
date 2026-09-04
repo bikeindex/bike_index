@@ -119,6 +119,25 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
             expect(ActionMailer::Base.deliveries.count).to eq 3
             expect(HotSheet.delivered.count).to eq 3
           end
+
+          it "only re-sends the batches that failed, to the recipients they held" do
+            expect {
+              ProcessHotSheetJob.drain
+            }.to change(HotSheet, :count).by 3
+            hot_sheets = HotSheet.order(:id).to_a
+            hot_sheets.last(2).each { it.update(delivery_status: "delivery_failure", delivery_error: "Postmark::TimeoutError") }
+            ActionMailer::Base.deliveries = []
+
+            expect {
+              described_class.new.perform(organization1.id)
+            }.to_not change(HotSheet, :count)
+            expect(ActionMailer::Base.deliveries.count).to eq 2
+            expect(HotSheet.delivered.count).to eq 3
+            # Each sheet still holds the recipients it was created with
+            expect(HotSheet.order(:id).map(&:recipient_ids)).to eq(hot_sheets.map(&:recipient_ids))
+            emailed = ActionMailer::Base.deliveries.flat_map { it.to + it.bcc }
+            expect(emailed).to match_array(hot_sheets.last(2).flat_map(&:recipient_emails))
+          end
         end
         context "when one batch has an inactive recipient" do
           let(:inactive_user) { organization_roles.first.user }

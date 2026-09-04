@@ -46,8 +46,9 @@ class HotSheetConfiguration < ApplicationRecord
     organization.users.where(id: current_recipient_ids)
   end
 
+  # Ordered, so re-running a day slices the same recipients onto the same sheets
   def current_recipient_ids
-    organization.organization_roles.claimed.notification_daily.pluck(:user_id)
+    organization.organization_roles.claimed.notification_daily.order(:user_id).pluck(:user_id)
   end
 
   def timezone
@@ -76,13 +77,12 @@ class HotSheetConfiguration < ApplicationRecord
     time_in_zone > send_today_at
   end
 
-  # Resending only helps if nothing went out and something failed for a reason
-  # other than the addresses being dead
+  # Resending only helps a batch that failed for a reason other than its addresses being dead
   def sent_today?
     sheets = hot_sheets.where(sheet_date: current_date)
     return false if sheets.none?
 
-    sheets.delivered.any? || sheets.undeliverable.count == sheets.count
+    sheets.delivered.or(sheets.undeliverable).count == sheets.count
   end
 
   def send_hour=(val)

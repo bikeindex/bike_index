@@ -26,8 +26,9 @@ class ProcessHotSheetJob < ScheduledJob
     sheet_date = Time.current.to_date
     day_sheets = HotSheet.where(organization_id: org_id, sheet_date:).order(:id).to_a
     day_sheets = [HotSheet.create!(organization_id: org_id, sheet_date:)] if day_sheets.none?
+    return day_sheets if day_sheets.all?(&:email_success?)
+
     hot_sheet = day_sheets.first
-    return hot_sheet if hot_sheet.email_success?
 
     # Bump bike cached attributes, so the email has all the info
     hot_sheet.fetch_stolen_records.each { it.bike.update(updated_at: Time.current) }
