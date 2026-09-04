@@ -17,10 +17,8 @@
     <%= b_param.email %>
   <% end %>
 
-  <% table.column(sortable: "creator_id", classes: "tw:text-xs") do |b_param| %>
-    <% if b_param.creator.present? %>
-      <%= link_to b_param.creator.display_name, admin_user_path(b_param.creator_id), class: "twlink" %>
-    <% end %>
+  <% table.column(sortable: "creator_id") do |b_param| %>
+    <%= render Pages::Admin::Users::Cell::Component.new(user: b_param.creator, user_id: b_param.creator_id, sort_state:) %>
   <% end %>
 
   <% table.column(sortable: "created_bike_id", label: "Bike") do |b_param| %>

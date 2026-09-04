@@ -24,7 +24,8 @@ RSpec.describe Admin::UserRegistrationOrganizationsController, type: :request do
           get "#{base_url}?period=all"
 
           expect(response).to be_ok
-          expect(response.body).to match(/#{user.display_name}/)
+          expect(response.body).to match(%r{/admin/users/#{user.id}})
+          expect(response.body).to match(/#{user.email}/)
           expect(response.body).to match(/Alice Ambassador/)
         end
 

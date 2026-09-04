@@ -1,6 +1,7 @@
 <%# locals: (collection:, render_sortable: true) %>
 
-<% render_search = params[:organization_id].blank? %>
+<% render_organization_search = params[:organization_id].blank? %>
+<% render_user_search = params[:user_id].blank? %>
 
 <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at") do |user_registration_organization| %>
@@ -12,17 +13,11 @@
   <% end %>
 
   <% table.column(sortable: "user_id") do |user_registration_organization| %>
-    <% if user_registration_organization.user.present? %>
-      <%= link_to user_registration_organization.user.display_name, admin_user_path(user_registration_organization.user_id), class: "twlink" %>
-    <% elsif user_registration_organization.user_id.present? %>
-      <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">
-        Missing user <code><%= user_registration_organization.user_id %></code>
-      </small>
-    <% end %>
+    <%= render Pages::Admin::Users::Cell::Component.new(user: user_registration_organization.user, user_id: user_registration_organization.user_id, sort_state:, render_search: render_user_search) %>
   <% end %>
 
   <% table.column(sortable: "organization_id", label: "Organization") do |user_registration_organization| %>
-    <%= render Pages::Admin::Organizations::Cell::Component.new(organization: user_registration_organization.organization, organization_id: user_registration_organization.organization_id, sort_state:, render_search:) %>
+    <%= render Pages::Admin::Organizations::Cell::Component.new(organization: user_registration_organization.organization, organization_id: user_registration_organization.organization_id, sort_state:, render_search: render_organization_search) %>
   <% end %>
 
   <% table.column(label: "Registration info", header_classes: "tw:font-normal") do |user_registration_organization| %>
