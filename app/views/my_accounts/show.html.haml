@@ -182,5 +182,6 @@
             = render(Pages::MyAccount::StravaIntegration::Component.new(user: current_user))
 
 -# Cache this render callout to avoid allocations
-- cache("donation_modal2") do
-  = render "/shared/donation_modal"
+- unless current_user.paid_organization_registration?
+  - cache("donation_modal2") do
+    = render "/shared/donation_modal"

@@ -138,6 +138,28 @@ RSpec.describe MyAccountsController, type: :request do
       end
     end
 
+    context "with a claimed registration" do
+      include_context :request_spec_logged_in_as_user
+      let(:organization) { FactoryBot.create(:organization) }
+      let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: current_user) }
+
+      it "renders the donation modal" do
+        expect(bike.current_ownership.organization).to eq organization
+        get base_url
+        expect(response.body).to match("donationModal")
+      end
+
+      context "registered by an organization that pays" do
+        before { organization.update_column :is_paid, true }
+
+        it "doesn't render the donation modal" do
+          expect(current_user.reload.paid_organization_registration?).to be_truthy
+          get base_url
+          expect(response.body).to_not match("donationModal")
+        end
+      end
+    end
+
     # Signing a law enforcement organization's user in is what raises the donation
     # request, and the general alert is what gives way to it
     context "with a donation request and a general alert" do

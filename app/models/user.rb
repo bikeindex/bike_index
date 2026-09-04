@@ -380,6 +380,11 @@ class User < ApplicationRecord
     organizations.paid.limit(1).any?
   end
 
+  # Their registration was paid for, so don't ask them for a donation on top of it
+  def paid_organization_registration?
+    Organization.paid_money.where(id: ownerships.select(:organization_id)).limit(1).any?
+  end
+
   def authorized?(obj, no_superuser_override: false)
     return true if !no_superuser_override && superuser?
 
