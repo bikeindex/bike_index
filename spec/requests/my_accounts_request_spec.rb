@@ -165,8 +165,8 @@ RSpec.describe MyAccountsController, type: :request do
     end
   end
 
-  # default_bike_search_path resolves off passive_organization, so a member's Search link
-  # follows them to their own registrations away from the organization's own pages
+  # every_bike_search_path rather than default_bike_search_path: the organized nav already
+  # links an organization's own registrations, so this is a member's only way to the whole registry
   describe "the footer's Search link" do
     def footer_search_href
       Nokogiri::HTML(response.body).css("footer.primary-footer a")
@@ -176,11 +176,10 @@ RSpec.describe MyAccountsController, type: :request do
     context "with an organization" do
       include_context :request_spec_logged_in_as_organization_user
 
-      it "points at the organization's registrations" do
+      it "points at every registration" do
         get base_url
         expect(assigns[:passive_organization]).to eq current_organization
-        expect(footer_search_href)
-          .to eq organization_registrations_path(organization_id: current_organization.to_param)
+        expect(footer_search_href).to eq search_registrations_path(stolenness: "all")
       end
     end
 
