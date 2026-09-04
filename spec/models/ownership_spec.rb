@@ -604,6 +604,18 @@ RSpec.describe Ownership, type: :model do
     end
   end
 
+  describe "creation_kinds" do
+    # creation_kinds restates creation_kind's branching rather than deriving from it, so
+    # this is what catches the two drifting - a new enum value, or a change in precedence
+    it "is what creation_kind returns for every enum value" do
+      from_records = (Organization.pos_kinds.map { Ownership.new(pos_kind: it) } +
+        [Ownership.new(bulk_import_id: 1)] +
+        Ownership.origins.map { Ownership.new(origin: it) }).filter_map(&:creation_kind)
+
+      expect(Ownership.creation_kinds).to match_array(from_records)
+    end
+  end
+
   describe "owner_name" do
     context "registration_info" do
       let(:registration_info) { {user_name: "Cool Name"} }

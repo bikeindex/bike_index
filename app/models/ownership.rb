@@ -118,6 +118,12 @@ class Ownership < ApplicationRecord
       ORIGIN_ENUM.keys.map(&:to_s)
     end
 
+    # Every value creation_kind can return. It restates that method's branching, so
+    # ownership_spec checks it against what instantiating each enum value produces
+    def creation_kinds
+      (Organization.pos_kinds.select { Organization.pos?(it) } + %w[bulk_import] + origins).map(&:to_sym)
+    end
+
     def origin_humanized(str)
       return nil unless str.present?
 

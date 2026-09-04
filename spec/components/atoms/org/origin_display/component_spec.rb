@@ -14,25 +14,22 @@ RSpec.describe Atoms::Org::OriginDisplay::Component, type: :component do
     end
   end
 
-  # Nothing else catches a kind with no copy: raise_on_missing_translations only fires
-  # for the kind that happens to render
   context "every creation_kind" do
-    let(:kinds) { Atoms::Org::OriginDisplay::ComponentPreview.new.every_kind.dig(:locals, :ownerships).map(&:creation_kind) }
     let(:copy) { I18n.t(described_class.component_translation_scope.join(".")) }
 
-    # Built off the enums rather than the preview, so an under-enumerating preview
-    # can't agree with a sidecar trimmed to match it
-    it "is every kind the enums can produce, and the preview renders each" do
-      possible = (Organization.pos_kinds.map { Ownership.new(pos_kind: it) } +
-        [Ownership.new(bulk_import_id: 1)] +
-        Ownership.origins.map { Ownership.new(origin: it) }).filter_map(&:creation_kind).uniq
-
-      expect(kinds).to match_array(possible)
+    # Nothing else catches a kind with no copy: raise_on_missing_translations only fires
+    # for the kind that happens to render
+    it "has a label and a description, and no copy for a kind that can't happen" do
+      expect(copy[:labels].keys).to match_array(Ownership.creation_kinds)
+      expect(copy[:descriptions].keys).to match_array(Ownership.creation_kinds)
     end
 
-    it "has a label and a description, and no copy for a kind that can't happen" do
-      expect(copy[:labels].keys).to match_array(kinds)
-      expect(copy[:descriptions].keys).to match_array(kinds)
+    # The preview builds a sample ownership per kind - this catches that inverse mapping
+    # setting an attribute creation_kind doesn't read back
+    it "renders one ownership per kind" do
+      ownerships = Atoms::Org::OriginDisplay::ComponentPreview.new.every_kind.dig(:locals, :ownerships)
+
+      expect(ownerships.map(&:creation_kind)).to eq Ownership.creation_kinds
     end
   end
 
