@@ -37,6 +37,8 @@ class EmailBan < ApplicationRecord
 
   class << self
     def ban?(user, user_email: nil, destroy_for_banned_domain: false)
+      return false if user.blank?
+
       if EmailDomain::VERIFICATION_ENABLED
         email_domain = EmailDomain.find_or_create_for(user.email, skip_processing: true)
 

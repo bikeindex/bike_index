@@ -142,9 +142,7 @@ class Notification < ApplicationRecord
       user = notification.user
       user_email = notification.user_email
 
-      if user.present? && EmailBan.ban?(user, user_email:)
-        return notification.update(delivery_status: "delivery_banned")
-      end
+      return notification.update(delivery_status: "delivery_banned") if EmailBan.ban?(user, user_email:)
 
       delivery = yield
 

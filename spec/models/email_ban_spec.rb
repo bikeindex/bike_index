@@ -38,6 +38,10 @@ RSpec.describe EmailBan, type: :model do
       Sidekiq::Job.clear_all
     end
 
+    it "is falsey without a user" do
+      expect(EmailBan.ban?(nil)).to be_falsey
+    end
+
     it "processes email domain inline" do
       VCR.use_cassette("email_ban_process_email_domain") do
         expect do
