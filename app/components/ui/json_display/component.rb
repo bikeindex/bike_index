@@ -12,12 +12,20 @@ module UI
       end
 
       def call
-        tag.div(helpers.pretty_print_json(@data, @skip_blank), class: classes, style: box_style)
+        tag.div(tag.pre(tag.code(pretty_json, class: "language-json")),
+          class: classes, style: box_style, data: {controller: "ui--json-display"})
       end
 
       private
 
       def render? = @data.present?
+
+      def pretty_json = JSON.pretty_generate(@skip_blank ? present_or_false(@data) : @data)
+
+      # Show false values, just not empty or nil things
+      def present_or_false(data)
+        data.select { |_key, value| Binxtils::InputNormalizer.present_or_false?(value) }
+      end
 
       def classes = ["twjson-box", ("twjson-box-cell" if @table_cell), ("tw:text-xs" if @small)].compact
 

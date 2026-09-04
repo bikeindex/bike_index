@@ -16,6 +16,12 @@ pin "@bikeindex/time-localizer", to: "@bikeindex--time-localizer.js", preload: t
 # root-absolute /npm/ imports that 404 against our origin; the vendored
 # file is esm.sh's self-contained bundle. See the file header to re-generate.
 pin "@floating-ui/dom", to: "@floating-ui--dom.js"
+# Vendored (not CDN-pinned): cdnjs isn't in content_security_policy.rb, and admin JSON
+# highlighting shouldn't depend on a third party at runtime. Only the json grammar is
+# registered, and the ui--json-display controller is lazy-loaded, so neither loads
+# until a page renders UI::JsonDisplay. See each file's header to re-generate.
+pin "highlight.js/lib/core", to: "highlight.js--core.js"
+pin "highlight.js/lib/languages/json", to: "highlight.js--json.js"
 
 # jQuery is required for select2, which is used by search. It should not be used!
 # ideally we transition off it soon!

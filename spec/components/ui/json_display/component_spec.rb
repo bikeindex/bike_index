@@ -8,7 +8,7 @@ RSpec.describe UI::JsonDisplay::Component, type: :component do
   let(:options) { {} }
 
   it "renders every value, full width and full size" do
-    expect(component).to have_css("div.twjson-box pre")
+    expect(component).to have_css("div.twjson-box[data-controller='ui--json-display'] pre code.language-json")
     expect(component.text).to include "bike_sticker"
     expect(component).to_not have_css("div.twjson-box[style]")
   end
