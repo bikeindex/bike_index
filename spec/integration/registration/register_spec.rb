@@ -4,7 +4,7 @@ require "rails_helper"
 
 # The flow's organization cases are in register_organized_spec.rb
 RSpec.describe "Register flow", :js, type: :system do
-  include_context :register_flow
+  include_context :register_flow_steps
 
   let!(:blue) { FactoryBot.create(:color, name: "Blue") }
   let!(:green) { FactoryBot.create(:color, name: "Green") }

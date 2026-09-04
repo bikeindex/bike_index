@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Register flow, with an organization", :js, type: :system do
-  include_context :register_flow
+  include_context :register_flow_steps
 
   let!(:state) { FactoryBot.create(:state_new_york) }
 

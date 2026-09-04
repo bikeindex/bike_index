@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.shared_context :register_flow do
+RSpec.shared_context :register_flow_steps do
   let(:owner_email) { "owner@bikeindex.org" }
   let(:user_name) { "Sally Rider" }
   let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
