@@ -1,7 +1,6 @@
-<%# a local, because the cell blocks below are instance_exec'd and can't see the component's ivars %>
-<% render_search = @render_search %>
+<%# locals: (collection:, render_sortable: true, render_search: true) %>
 
-<%= render(UI::Table::Component.new(records: @user_registration_organizations, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
+<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at") do |user_registration_organization| %>
     <%= render UI::Time::Component.new(time: user_registration_organization.created_at) %>
   <% end %>
