@@ -3,75 +3,91 @@
 require "rails_helper"
 
 RSpec.describe Atoms::Org::OriginDisplay::Component, type: :component do
-  let(:instance) { described_class.new(creation_description:) }
+  let(:instance) { described_class.new(ownership:) }
   let(:component) { render_inline(instance) }
 
-  context "blank creation_description" do
-    let(:creation_description) { nil }
+  context "blank ownership" do
+    let(:ownership) { nil }
 
     it "does not render" do
       expect(component.to_html).to be_blank
     end
   end
 
-  context "with a creation_description" do
-    let(:creation_description) { Ownership.new(origin: "sticker").creation_description }
+  context "every creation_kind" do
+    let(:copy) { I18n.t(described_class.component_translation_scope.join(".")) }
 
-    it "renders the description with the origin_title tooltip" do
-      expect(creation_description).to eq "sticker"
+    # Nothing else catches a kind with no copy: raise_on_missing_translations only fires
+    # for the kind that happens to render
+    it "has a label and a description, and no copy for a kind that can't happen" do
+      expect(copy[:labels].keys).to match_array(Ownership.creation_kinds)
+      expect(copy[:descriptions].keys).to match_array(Ownership.creation_kinds)
+    end
+  end
+
+  # render? guards the rendered path, so nothing else covers a blank kind reaching these
+  describe "creation_kind copy without an instance" do
+    it "reads a kind's label and description, and passes blank through" do
+      expect(described_class.creation_kind_humanized(:embed_partial)).to eq "old landing page"
+      expect(described_class.creation_kind_description(:embed_partial))
+        .to eq "registration began with incomplete registration, via organization landing page"
+      expect(described_class.creation_kind_humanized(nil)).to be_nil
+      expect(described_class.creation_kind_description(nil)).to be_nil
+    end
+  end
+
+  context "with a sticker origin" do
+    let(:ownership) { Ownership.new(origin: "sticker") }
+
+    it "renders the label with the description tooltip" do
       expect(component).to have_content("sticker")
-      expect(component).to have_css("[role=tooltip]", text: "registered via sticker", visible: :all)
-    end
-  end
-
-  context "with an unregistered parking notification" do
-    let(:creation_description) { Ownership.new(origin: "creator_unregistered_parking_notification").creation_description }
-
-    it "renders the humanized label with the flow tooltip" do
-      expect(creation_description).to eq "parking notification"
-      expect(component).to have_content("unregistered parking notification")
-      expect(component).to have_css("[role=tooltip]", text: "registered via the Unregistered Parking Notification flow", visible: :all)
-    end
-  end
-
-  context "with a registration flow origin" do
-    let(:creation_description) { Ownership.new(origin: "register_flow_organized").creation_description }
-
-    it "renders the new flow label and the extended description" do
-      expect(creation_description).to eq "register flow organized"
-      expect(component).to have_content("new flow organized")
-      expect(component).to have_css("[role=tooltip]", text: "registered by an organization member, in the multi-step registration flow", visible: :all)
+      expect(component).to have_css("[role=tooltip]", text: "registration began from a sticker", visible: :all)
     end
   end
 
   # embed_partial and register_flow_landing_page are both landing page registrations, and
-  # only the tooltip separates them
+  # creation_description flattens the first to the same string as the second's label
   context "with a landing page origin" do
-    let(:creation_description) { Ownership.new(origin: "embed_partial").creation_description }
+    let(:ownership) { Ownership.new(origin: "embed_partial") }
 
     it "renders the old landing page label" do
-      expect(creation_description).to eq "landing page"
       expect(component).to have_content("old landing page")
       expect(component).to have_css("[role=tooltip]", text: "registration began with incomplete registration, via organization landing page", visible: :all)
     end
-  end
 
-  context "with a registration flow landing page origin" do
-    let(:creation_description) { Ownership.new(origin: "register_flow_landing_page").creation_description }
+    context "register_flow_landing_page" do
+      let(:ownership) { Ownership.new(origin: "register_flow_landing_page") }
 
-    it "renders the landing page label" do
-      expect(creation_description).to eq "register flow landing page"
-      expect(component).to have_content("landing page")
-      expect(component).to have_css("[role=tooltip]", text: "registration began via an organization landing page, in the multi-step registration flow", visible: :all)
+      it "renders the landing page label" do
+        expect(component).to have_content("landing page")
+        expect(component).to have_css("[role=tooltip]", text: "registration began via an organization landing page, in the multi-step registration flow", visible: :all)
+      end
     end
   end
 
-  context "with a bulk import" do
-    let(:creation_description) { Ownership.new(bulk_import_id: 1).creation_description }
+  context "with a POS kind" do
+    let(:ownership) { Ownership.new(pos_kind: "lightspeed_pos") }
 
-    it "renders the extended description" do
-      expect(creation_description).to eq "bulk import"
-      expect(component).to have_css("[role=tooltip]", text: "registered by spreadsheet import", visible: :all)
+    it "renders the POS name" do
+      expect(component).to have_content("lightspeed")
+      expect(component).to have_css("[role=tooltip]", text: "automatically registered by bike shop point of sale (Lightspeed POS)", visible: :all)
+    end
+
+    context "broken_lightspeed_pos" do
+      let(:ownership) { Ownership.new(pos_kind: "broken_lightspeed_pos") }
+
+      it "names the POS and its broken integration" do
+        expect(component).to have_content("lightspeed (broken)")
+        expect(component).to have_css("[role=tooltip]", text: "automatically registered by bike shop point of sale (Lightspeed POS), whose integration is marked broken", visible: :all)
+      end
+    end
+  end
+
+  context "with a POS kind, a bulk_import and an origin" do
+    let(:ownership) { Ownership.new(pos_kind: "ascend_pos", bulk_import_id: 1, origin: "web") }
+
+    it "prefers the POS over the bulk import and the origin" do
+      expect(component).to have_content("ascend")
     end
   end
 end

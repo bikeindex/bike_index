@@ -118,6 +118,12 @@ class Ownership < ApplicationRecord
       ORIGIN_ENUM.keys.map(&:to_s)
     end
 
+    # Every value creation_kind can return. It restates that method's branching, so
+    # ownership_spec checks it against what instantiating each enum value produces
+    def creation_kinds
+      (Organization.pos_kinds.select { Organization.pos?(it) } + %w[bulk_import] + origins).map(&:to_sym)
+    end
+
     def origin_humanized(str)
       return nil unless str.present?
 
@@ -187,6 +193,15 @@ class Ownership < ApplicationRecord
 
   def organization_direct_unclaimed_notifications?
     organization.present? && organization.direct_unclaimed_notifications?
+  end
+
+  # creation_description humanizes distinct kinds down to a shared string, so anything
+  # that tells them apart has to key off this instead
+  def creation_kind
+    return pos_kind.to_sym if pos?
+    return :bulk_import if bulk?
+
+    origin&.to_sym
   end
 
   def creation_description

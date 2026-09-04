@@ -151,7 +151,7 @@ class OrganizationExportJob < ApplicationJob
 
     case header
     when "link" then LINK_BASE + bike.id.to_s
-    when "registration_method" then bike.creation_description
+    when "registration_method" then Atoms::Org::OriginDisplay::Component.creation_kind_humanized(bike.creation_kind)
     when "thumbnail" then bike.thumb_path
     when "registered_at" then bike.created_at.utc
     when "manufacturer" then bike.mnfg_name

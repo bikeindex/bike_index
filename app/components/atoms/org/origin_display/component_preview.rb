@@ -4,19 +4,24 @@ module Atoms
   module Org
     module OriginDisplay
       class ComponentPreview < ApplicationComponentPreview
-        # Every creation_description an Ownership produces - POS kinds, bulk imports and origins
-        def every_type
-          {template: "atoms/org/origin_display/component_preview/every_type",
-           locals: {creation_descriptions:}}
+        # Every creation_kind an Ownership produces - POS kinds, bulk imports and origins
+        def every_kind
+          {template: "atoms/org/origin_display/component_preview/every_kind",
+           locals: {ownerships:}}
         end
 
         private
 
-        def creation_descriptions
-          pos_ownerships = Organization.pos_kinds.map { |pos_kind| Ownership.new(pos_kind:) }.select(&:pos?)
+        def ownerships
+          Ownership.creation_kinds.map { ownership_for(it) }
+        end
 
-          (pos_ownerships + [Ownership.new(bulk_import_id: 1)] + Ownership.origins.map { |origin| Ownership.new(origin:) })
-            .map(&:creation_description).uniq
+        # The inverse of creation_kind - whichever of the three attributes it would read
+        def ownership_for(creation_kind)
+          return Ownership.new(bulk_import_id: 1) if creation_kind == :bulk_import
+          return Ownership.new(pos_kind: creation_kind) if Organization.pos_kinds.include?(creation_kind.to_s)
+
+          Ownership.new(origin: creation_kind)
         end
       end
     end

@@ -567,6 +567,55 @@ RSpec.describe Ownership, type: :model do
     end
   end
 
+  describe "creation_kind" do
+    let(:ownership) { Ownership.new(organization_id: 1, creator_id: 1) }
+    it "returns nil" do
+      expect(ownership.creation_kind).to be_nil
+    end
+    # creation_description humanizes both of the first two to "landing page"
+    it "distinguishes the origins creation_description flattens" do
+      expect(Ownership.new(origin: "embed_partial").creation_kind).to eq :embed_partial
+      expect(Ownership.new(origin: "register_flow_landing_page").creation_kind).to eq :register_flow_landing_page
+      expect(Ownership.new(origin: "organization_form").creation_kind).to eq :organization_form
+    end
+    # UpdateOrganizationPosKindJob sets broken_* on an organization, never on an ownership
+    it "keeps every POS kind, the broken ones included" do
+      expect(Ownership.new(pos_kind: "broken_lightspeed_pos").creation_kind).to eq :broken_lightspeed_pos
+      expect(Ownership.new(pos_kind: "broken_ascend_pos").creation_kind).to eq :broken_ascend_pos
+      expect(Ownership.new(pos_kind: "other_pos").creation_kind).to eq :other_pos
+    end
+    context "bulk" do
+      let(:ownership) { Ownership.new(bulk_import_id: 12, origin: "api_v2") }
+      it "returns bulk_import" do
+        expect(ownership.creation_kind).to eq :bulk_import
+      end
+    end
+    context "pos" do
+      let(:ownership) { Ownership.new(pos_kind: "lightspeed_pos", bulk_import_id: 12, origin: "embed_extended") }
+      it "takes precedence over bulk and origin" do
+        expect(ownership.creation_kind).to eq :lightspeed_pos
+      end
+      context "not a POS" do
+        let(:ownership) { Ownership.new(pos_kind: "does_not_need_pos", origin: "web") }
+        it "falls through to the origin" do
+          expect(ownership.creation_kind).to eq :web
+        end
+      end
+    end
+  end
+
+  describe "creation_kinds" do
+    # creation_kinds restates creation_kind's branching rather than deriving from it, so
+    # this is what catches the two drifting - a new enum value, or a change in precedence
+    it "is what creation_kind returns for every enum value" do
+      from_records = (Organization.pos_kinds.map { Ownership.new(pos_kind: it) } +
+        [Ownership.new(bulk_import_id: 1)] +
+        Ownership.origins.map { Ownership.new(origin: it) }).filter_map(&:creation_kind)
+
+      expect(Ownership.creation_kinds).to match_array(from_records)
+    end
+  end
+
   describe "owner_name" do
     context "registration_info" do
       let(:registration_info) { {user_name: "Cool Name"} }

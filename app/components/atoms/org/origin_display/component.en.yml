@@ -1,0 +1,65 @@
+---
+en:
+  components:
+    atoms:
+      org:
+        origin_display:
+          descriptions:
+            api_v1: registered through the API (v1)
+            api_v2: registered through the API (v2)
+            api_v3: registered through the API (v3)
+            ascend_pos: automatically registered by bike shop point of sale (Ascend
+              POS)
+            broken_ascend_pos: >-
+              automatically registered by bike shop point of sale (Ascend POS), whose
+              integration is marked broken
+            broken_lightspeed_pos: >-
+              automatically registered by bike shop point of sale (Lightspeed POS),
+              whose integration is marked broken
+            bulk_import: registered by spreadsheet import
+            bulk_import_worker: registered by spreadsheet import
+            creator_unregistered_parking_notification: registered via the Unregistered
+              Parking Notification flow
+            embed: registered on an organization's embedded registration form
+            embed_extended: registered by internal, organization member form
+            embed_partial: registration began with incomplete registration, via organization
+              landing page
+            impound_import: registered by impound spreadsheet import
+            impound_process: transferred as part of the impound process
+            lightspeed_pos: automatically registered by bike shop point of sale (Lightspeed
+              POS)
+            organization_form: registered by internal, organization member form
+            other_pos: automatically registered by bike shop point of sale
+            register_flow: registered with the multi-step registration flow
+            register_flow_landing_page: >-
+              registration began via an organization landing page, in the multi-step
+              registration flow
+            register_flow_organized: registered by an organization member, in the
+              multi-step registration flow
+            sticker: registration began from a sticker
+            transferred_ownership: transferred to a new owner
+            web: registered with self registration process
+          labels:
+            api_v1: api v1
+            api_v2: api v2
+            api_v3: api v3
+            ascend_pos: ascend
+            broken_ascend_pos: ascend (broken)
+            broken_lightspeed_pos: lightspeed (broken)
+            bulk_import: bulk import
+            bulk_import_worker: bulk import worker
+            creator_unregistered_parking_notification: unregistered parking notification
+            embed: embed
+            embed_extended: org reg
+            embed_partial: old landing page
+            impound_import: impound import
+            impound_process: impound process
+            lightspeed_pos: lightspeed
+            organization_form: org reg
+            other_pos: point of sale
+            register_flow: new flow
+            register_flow_landing_page: landing page
+            register_flow_organized: new flow organized
+            sticker: sticker
+            transferred_ownership: transferred ownership
+            web: web
