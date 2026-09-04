@@ -11,6 +11,8 @@ module ApplicationHelper
       check_mark
     elsif status == "delivery_pending"
       "..."
+    elsif status == "delivery_banned"
+      "banned"
     else
       "failure"
     end

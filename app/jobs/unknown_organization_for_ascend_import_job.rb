@@ -14,7 +14,7 @@ class UnknownOrganizationForAscendImportJob < ApplicationJob
       kind: :unknown_organization_for_ascend,
       user_id: InvalidExtensionForAscendImportJob::NOTIFICATION_USER_ID)
 
-    notification.track_email_delivery do
+    Notification.track_email_delivery(notification) do
       AdminMailer.unknown_organization_for_ascend_import(notification).deliver_now
     end
   end

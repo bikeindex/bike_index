@@ -9,7 +9,7 @@ module Email
       notification = user.notifications.welcome_email.last ||
         Notification.create(user_id: user.id, kind: :welcome_email)
 
-      notification.track_email_delivery do
+      Notification.track_email_delivery(notification) do
         CustomerMailer.welcome_email(user).deliver_now
       end
     end

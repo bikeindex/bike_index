@@ -26,7 +26,7 @@ module Email
       notification = Notification.find_or_create_by(notifiable: ownership,
         kind: "finished_registration")
 
-      notification.track_email_delivery do
+      Notification.track_email_delivery(notification) do
         OrganizedMailer.finished_registration(ownership).deliver_now
       end
     end

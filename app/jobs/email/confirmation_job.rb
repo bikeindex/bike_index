@@ -17,7 +17,7 @@ module Email
 
       notification = notifications.last || Notification.create(user_id: user.id, kind: "confirmation_email")
 
-      notification.track_email_delivery do
+      Notification.track_email_delivery(notification) do
         CustomerMailer.confirmation_email(user).deliver_now
       end
     end

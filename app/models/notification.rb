@@ -36,7 +36,7 @@ class Notification < ApplicationRecord
   KIND_ENUM = YAML.load_file(Rails.root.join("config/notification_kinds_enums.yml")).freeze
 
   MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
-  DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2}.freeze
+  DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2, delivery_banned: 3}.freeze
 
   UNDELIVERABLE_ERRORS = [Postmark::InactiveRecipientError, Postmark::InvalidEmailRequestError].freeze
 
@@ -133,6 +133,38 @@ class Notification < ApplicationRecord
       where(user_id: user_id)
         .or(where(notifiable_type: "CustomerContact", notifiable_id: customer_contact_ids))
         .or(where(notifiable_type: "StolenNotification", notifiable_id: stolen_notification_ids))
+    end
+
+    # This method takes a block
+    def track_email_delivery(notification)
+      return if notification.delivery_success?
+
+      user = notification.user
+      user_email = notification.user_email
+
+      if user.present? && EmailBan.ban?(user, user_email:)
+        return notification.update(delivery_status: "delivery_banned")
+      end
+
+      delivery = yield
+
+      notification.update(delivery_status: "delivery_success",
+        message_id: notification.message_id || message_id_from_delivery(delivery))
+      user_email&.update_last_email_errored!(email_errored: false)
+      EmailBan.resolve_delivery_failure(user:, user_email:)
+    rescue => e
+      notification.update(delivery_status: "delivery_failure", delivery_error: e.class)
+      user_email&.update_last_email_errored!(email_errored: true)
+
+      raise e unless UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
+
+      EmailBan.create_delivery_failure(user:, user_email:)
+    end
+
+    private
+
+    def message_id_from_delivery(delivery)
+      defined?(delivery.message_id) ? delivery.message_id : nil
     end
   end
 
@@ -232,28 +264,6 @@ class Notification < ApplicationRecord
     calculated_email
   end
 
-  # This method takes a block
-  def track_email_delivery
-    return if delivery_success?
-
-    target_user_email = user_email
-    return if user.present? && EmailBan.ban?(user, user_email: target_user_email)
-
-    delivery = yield
-
-    self.message_id ||= message_id_from_delivery(delivery)
-    update(delivery_status: "delivery_success")
-    target_user_email&.update_last_email_errored!(email_errored: false)
-    EmailBan.resolve_delivery_failure(user:, user_email: target_user_email)
-  rescue => e
-    update(delivery_status: "delivery_failure", delivery_error: e.class)
-    target_user_email&.update_last_email_errored!(email_errored: true)
-
-    raise e unless UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
-
-    EmailBan.create_delivery_failure(user:, user_email: target_user_email)
-  end
-
   def delivery_error_spam?
     delivery_error == "Postmark::InactiveRecipientError"
   end
@@ -263,10 +273,6 @@ class Notification < ApplicationRecord
   end
 
   private
-
-  def message_id_from_delivery(delivery)
-    defined?(delivery.message_id) ? delivery.message_id : nil
-  end
 
   def calculated_phone
     notifiable&.phone

@@ -19,7 +19,7 @@ class InvalidExtensionForAscendImportJob < ApplicationJob
     notification ||= Notification.create(notifiable: organization_status,
       kind: :invalid_extension_for_ascend_import, user_id: NOTIFICATION_USER_ID)
 
-    notification.track_email_delivery do
+    Notification.track_email_delivery(notification) do
       AdminMailer.invalid_extension_for_ascend_import(notification).deliver_now
     end
   end

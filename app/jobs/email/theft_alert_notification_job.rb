@@ -14,7 +14,7 @@ module Email
         notifiable: theft_alert,
         bike: theft_alert.bike)
 
-      notification.track_email_delivery do
+      Notification.track_email_delivery(notification) do
         if kind == "theft_alert_recovered"
           AdminMailer.theft_alert_notification(theft_alert, notification_type: kind)
             .deliver_now
