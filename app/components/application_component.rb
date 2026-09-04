@@ -77,6 +77,11 @@ class ApplicationComponent < ViewComponent::Base
     end
   end
 
+  # On the class, so a class method that reads the sidecar copy can reach it without an instance
+  def self.component_translation_scope
+    @component_translation_scope ||= [:components] + name.split("::")[0..-2].map { |i| i.underscore.downcase }
+  end
+
   private
 
   # Wrap `I18n.translate` for use in components, abstracting away
@@ -94,11 +99,6 @@ class ApplicationComponent < ViewComponent::Base
   def translation(key, scope: nil, **kwargs)
     ActiveSupport::HtmlSafeTranslation
       .translate(key, **kwargs, scope: (scope || component_translation_scope).compact)
-  end
-
-  # On the class, so a class method that reads the sidecar copy can reach it without an instance
-  def self.component_translation_scope
-    @component_translation_scope ||= [:components] + name.split("::")[0..-2].map { |i| i.underscore.downcase }
   end
 
   def component_translation_scope
