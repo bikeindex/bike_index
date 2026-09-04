@@ -108,6 +108,52 @@ module SystemSpecHelpers
     field
   end
 
+  # The two-step login, driven the way a rider does it. Both steps animate, and a click
+  # waits for its target to settle before it lands -- that wait is Capybara's 2s default.
+  # Callers assert their own landing: an organization member gets a different flash, and
+  # ends up somewhere other than my_account.
+  def sign_in(user)
+    using_wait_time(10) do
+      visit new_session_path
+      fill_in "Email", with: user.email
+      click_button "Continue"
+      fill_in "Password", with: "testthisthing7$"
+      click_button "Log in"
+      expect(page).to have_no_current_path(new_session_path)
+    end
+  end
+
+  # revised/init.coffee hands the legacy form-well's selects to selectize, which hides the
+  # <select> behind a control of its own -- so `select` can't reach them
+  def selectize_for(selector)
+    find(selector, visible: :all)
+      .find(:xpath, "./following-sibling::div[contains(@class, 'selectize-control')][1]")
+  end
+
+  def pick_selectize(selector, text) = pick_within_selectize(selectize_for(selector), text)
+
+  # Takes the control rather than a selector, for the ones reached by their wrapper
+  def pick_within_selectize(control, text)
+    control.find(".selectize-input").click
+    control.find(".selectize-dropdown-content .option", text:, wait: 5).click
+  end
+
+  # A remote-autocomplete selectize (the manufacturer fields) fetches its options, so the
+  # match is worth waiting longer for
+  def pick_remote_selectize(control, text)
+    control.find(".selectize-input").click
+    type_into(control.find(".selectize-input input"), text)
+    control.find(".selectize-dropdown-content .option", text:, wait: 10).click
+  end
+
+  # fill_in focuses the field, then sends its text a round trip later - so a controller
+  # connecting in between lands the text in the field filled just before
+  def wait_for_details_step(wait: Capybara.default_max_wait_time)
+    expect(page).to have_content("Add your bike", wait:)
+    expect(page).to have_css("input[name='bike[frame_model]']:focus", wait:)
+    wait_for_stimulus(timeout: wait)
+  end
+
   # Stimulus lazy loads controller modules, so a rendered page can have none of them
   # connected yet -- a combobox filters no options, a restored draft reaches no listener
   def wait_for_stimulus(timeout: Capybara.default_max_wait_time)
@@ -193,7 +239,15 @@ module SystemSpecHelpers
     JS
   end
 
-  # The registration's emailed link, minus the mailer's host - the app is on Capybara's
+  # The link out of the mail just delivered, minus the mailer's host - the app is on Capybara's
+  def emailed_path(path)
+    body = ActionMailer::Base.deliveries.last.html_part.body.decoded
+    link = Nokogiri::HTML(body).css("a").map { |a| a["href"] }.compact.find { |href| href.include?(path) }
+    expect(link).to be_present
+    URI(link).request_uri
+  end
+
+  # The registration's emailed link, once its job has run
   def confirmation_link
     Email::PartialRegistrationJob.drain
     url = ActionMailer::Base.deliveries.last.html_part.decoded[%r{https?://[^"]*/register/confirm[^"]*}]
@@ -230,8 +284,15 @@ module SystemSpecHelpers
   # intercepting every click until it's dismissed -- which sets the localStorage flag
   # that keeps it closed for the rest of the session. A page that doesn't render it, or
   # one reached after that flag is set, is a no-op rather than a failure.
-  def dismiss_donation_modal
-    return unless page.has_css?("#donationModal", visible: :all, wait: 0)
+  #
+  # `wait` is for a caller that knows the modal renders: my_accounts#show puts it at the
+  # foot of a long page, so the default check can outrun the load and leave the modal to
+  # open over whatever gets clicked next.
+  def dismiss_donation_modal(wait: 0)
+    return unless page.has_css?("#donationModal", visible: :all, wait:)
+    # The element renders whether or not the flag lets it open, so without this the second
+    # visit of a session waits out the whole budget below for a modal that can't appear
+    return if page.evaluate_script('localStorage.getItem("hideDonationModal")') == "true"
     return unless page.has_css?("#donationModal.in", wait: 5)
 
     click_button "No donation"

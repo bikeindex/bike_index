@@ -9,11 +9,7 @@ RSpec.describe "Organized manage", :js, type: :system do
   let!(:location) { FactoryBot.create(:location, organization:) }
 
   before do
-    visit new_session_path
-    fill_in "Email", with: user.email
-    click_button "Continue"
-    fill_in "Password", with: "testthisthing7$"
-    click_button "Log in"
+    sign_in(user)
   end
 
   it "updates organization fields and attaches the logo" do

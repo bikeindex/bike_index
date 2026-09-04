@@ -11,17 +11,9 @@ RSpec.describe "Viewing a registration", :js, type: :system do
   # these gear records lazily — pre-create them so its readonly render doesn't write
   before { RearGearType.fixed && FrontGearType.fixed }
 
-  def sign_in(user)
-    visit new_session_path
-    fill_in "Email", with: user.email
-    click_button "Continue"
-    fill_in "Password", with: "testthisthing7$"
-    click_button "Log in"
-    expect(page).to have_content("Logged in", wait: 5)
-  end
-
   it "sends a stolen notification to the owner through the contact form" do
     sign_in(viewer)
+    expect(page).to have_content("Logged in")
     visit registration_path(bike)
 
     # The message form is collapsed until the viewer opens it

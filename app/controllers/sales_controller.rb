@@ -32,11 +32,7 @@ class SalesController < ApplicationController
       redirect_back(fallback_location: user_root_url) && return
     end
 
-    if @ownership&.bike.blank?
-      store_return_and_authenticate_user(translation_key: :cannot_find_bike)
-    else
-      store_return_and_authenticate_user
-    end
+    store_return_and_authenticate_user
   end
 
   def marketplace_message_id

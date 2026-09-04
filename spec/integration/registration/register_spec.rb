@@ -336,7 +336,10 @@ RSpec.describe "Register flow", :js, type: :system do
     let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
     let(:friend_email) { "friend@bikeindex.org" }
 
-    before { sign_in(current_user) }
+    before do
+      sign_in(current_user)
+      expect(page).to have_current_path("/my_account")
+    end
 
     it "asks for a name once the registration is going to someone other than them" do
       # Step 1 prefills their own address, which their account is already the name for
@@ -475,7 +478,10 @@ RSpec.describe "Register flow", :js, type: :system do
     context "signed in" do
       let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
 
-      before { sign_in(current_user) }
+      before do
+        sign_in(current_user)
+        expect(page).to have_current_path("/my_account")
+      end
 
       it "PUTs the photo to the bucket and serves it from the storage domain" do
         start_registration

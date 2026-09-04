@@ -171,7 +171,7 @@ expect(page).to have_css('button[aria-pressed="true"]')
 page.execute_script("document.querySelector('.search-btn').click()")
 ```
 
-When repeated assertions get noisy, define small DSL-style helpers in the file (`def listing_for(item)`, `def thumbnail_selector(...)`) — they read better than scattered selectors and keep you out of `page.execute_script`.
+When repeated assertions get noisy, define small DSL-style helpers in the file (`def listing_for(item)`, `def thumbnail_selector(...)`) — they read better than scattered selectors and keep you out of `page.execute_script`. **Check `spec/support/system_spec_helpers.rb` before writing one, and move it there once a third spec wants the same one** — `sign_in`, the selectize pickers and `wait_for_details_step` are each duplicated across four or five files under `spec/integration/`.
 
 ## Component system specs must assert accessibility
 

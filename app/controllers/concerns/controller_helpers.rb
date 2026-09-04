@@ -99,7 +99,7 @@ module ControllerHelpers
     return if current_user&.confirmed? && current_user.terms_of_service
 
     store_return_to
-    authenticate_user(flash_type:) && return
+    authenticate_user(translation_key:, flash_type:) && return
   end
 
   # Auto-confirms an unconfirmed user whose email matches an ownership owner_email validated

@@ -5,9 +5,9 @@ require "rails_helper"
 RSpec.describe StravaIntegrationsController, type: :request do
   describe "new" do
     context "not logged in" do
-      it "redirects to sign in" do
+      it "redirects to sign up" do
         get "/strava_integration/new"
-        expect(response).to redirect_to(/session\/new/)
+        expect(response).to redirect_to(/users\/new/)
       end
     end
 
@@ -38,9 +38,9 @@ RSpec.describe StravaIntegrationsController, type: :request do
 
   describe "callback" do
     context "not logged in" do
-      it "redirects to sign in" do
+      it "redirects to sign up" do
         get "/strava_integration/callback", params: {code: "test_code"}
-        expect(response).to redirect_to(/session\/new/)
+        expect(response).to redirect_to(/users\/new/)
       end
     end
 
@@ -246,9 +246,9 @@ RSpec.describe StravaIntegrationsController, type: :request do
 
   describe "destroy" do
     context "not logged in" do
-      it "redirects to sign in" do
+      it "redirects to sign up" do
         delete "/strava_integration"
-        expect(response).to redirect_to(/session\/new/)
+        expect(response).to redirect_to(/users\/new/)
       end
     end
 
@@ -282,9 +282,9 @@ RSpec.describe StravaIntegrationsController, type: :request do
 
   describe "sync_status" do
     context "not logged in" do
-      it "redirects to sign in" do
+      it "redirects to sign up" do
         get "/strava_integration/sync_status"
-        expect(response).to redirect_to(/session\/new/)
+        expect(response).to redirect_to(/users\/new/)
       end
     end
 

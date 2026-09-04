@@ -478,7 +478,7 @@ RSpec.describe SessionsController, type: :request do
         expect(response).to render_template("my_accounts/show")
         user.destroy
         get "/my_account"
-        expect(response).to redirect_to new_session_path
+        expect(response).to redirect_to new_user_path
         post "/session", params: {session: {email: user.email, password:}}
         expect(response).to render_template(:new)
       end
