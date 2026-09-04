@@ -4,7 +4,8 @@ module Atoms
   module Org
     module OriginDisplay
       class Component < ApplicationComponent
-        # The sidecar copy reads lowercase - title case in a value is a proper name
+        # component.en.yml reads lowercase - title case in a value is a proper name
+
         def initialize(ownership:)
           @creation_kind = ownership&.creation_kind
         end

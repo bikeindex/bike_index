@@ -13,10 +13,8 @@ module Atoms
         private
 
         def ownerships
-          pos_kinds = Organization.pos_kinds.select { Organization.pos?(it) }
-
-          (pos_kinds.map { Ownership.new(pos_kind: it) } + [Ownership.new(bulk_import_id: 1)] +
-            Ownership.origins.map { Ownership.new(origin: it) })
+          (Organization.pos_kinds.map { Ownership.new(pos_kind: it) } + [Ownership.new(bulk_import_id: 1)] +
+            Ownership.origins.map { Ownership.new(origin: it) }).select(&:creation_kind)
         end
       end
     end
