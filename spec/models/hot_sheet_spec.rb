@@ -16,6 +16,82 @@ RSpec.describe HotSheet, type: :model do
     end
   end
 
+  describe "track_email_delivery" do
+    let(:hot_sheet) { FactoryBot.create(:hot_sheet) }
+
+    it "records the success, and doesn't deliver a second time" do
+      expect(hot_sheet.reload.delivery_status).to eq "delivery_pending"
+      expect(hot_sheet.email_success?).to be_falsey
+      deliveries = 0
+      expect(hot_sheet.track_email_delivery { deliveries += 1 }).to be_nil
+      expect(hot_sheet.reload.delivery_status).to eq "delivery_success"
+      expect(hot_sheet.delivery_error).to be_nil
+      expect(hot_sheet.email_success?).to be_truthy
+
+      hot_sheet.track_email_delivery { deliveries += 1 }
+      expect(deliveries).to eq 1
+    end
+
+    context "with an unknown postmark error" do
+      let(:api_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 499}) }
+      it "records the failure and returns the error for the job to raise" do
+        expect(hot_sheet.track_email_delivery { raise api_error }).to eq api_error
+        expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
+        expect(hot_sheet.delivery_error).to eq "Postmark::ApiInputError"
+        expect(hot_sheet.email_success?).to be_falsey
+      end
+    end
+
+    context "with an undeliverable error" do
+      let(:invalid_email_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 300}) }
+      it "records the failure without returning an error" do
+        expect(hot_sheet.track_email_delivery { raise invalid_email_error }).to be_nil
+        expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
+        expect(hot_sheet.delivery_error).to eq "Postmark::InvalidEmailRequestError"
+        # There is no way to tell which of the batch failed, so nobody is flagged
+        expect(UserEmail.last_email_errored.count).to eq 0
+      end
+    end
+
+    context "with an inactive recipient" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:users) { Array.new(3) { FactoryBot.create(:organization_role_claimed, organization:).user } }
+      let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization:, recipient_ids: users.map(&:id)) }
+      let(:inactive_emails) { [users.first.email] }
+      let(:error_message) do
+        "You tried to send to recipient(s) that have been marked as inactive. Found inactive addresses: " \
+        "#{inactive_emails.join(", ")}. Inactive recipients are ones that have generated a hard bounce, " \
+        "a spam complaint, or a manual suppression."
+      end
+      let(:inactive_recipient_error) do
+        Postmark::ApiInputError.build("error", {"ErrorCode" => 406, "Message" => error_message})
+      end
+
+      it "records a partial success, and only flags the address that was rejected" do
+        expect(hot_sheet.recipient_emails).to match_array(users.map(&:email))
+        expect(UserEmail.last_email_errored.count).to eq 0
+        expect(hot_sheet.track_email_delivery { raise inactive_recipient_error }).to be_nil
+
+        # Postmark delivered to the rest of the batch, so this isn't a total failure
+        expect(hot_sheet.reload.delivery_status).to eq "delivery_partial_success"
+        expect(hot_sheet.delivery_error).to eq "Postmark::InactiveRecipientError"
+        expect(hot_sheet.email_success?).to be_falsey
+        expect(UserEmail.last_email_errored.pluck(:email)).to eq(inactive_emails)
+      end
+
+      context "with every recipient inactive" do
+        let(:inactive_emails) { users.map(&:email) }
+        it "records a failure, and flags them all" do
+          hot_sheet.track_email_delivery { raise inactive_recipient_error }
+
+          expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
+          expect(hot_sheet.delivery_error).to eq "Postmark::InactiveRecipientError"
+          expect(UserEmail.last_email_errored.pluck(:email)).to match_array(inactive_emails)
+        end
+      end
+    end
+  end
+
   describe "fetch_stolen_records" do
     let!(:stolen_record) { FactoryBot.create(:stolen_record, :in_nyc) }
     let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }

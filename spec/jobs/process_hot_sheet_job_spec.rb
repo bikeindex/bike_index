@@ -18,7 +18,6 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
     before do
       Sidekiq::Job.clear_all
       ActionMailer::Base.deliveries = []
-      expect(instance.organizations.pluck(:id)).to eq([organization1.id])
       # Skip timezone concerns, it's always send time!
       allow_any_instance_of(HotSheetConfiguration).to receive(:send_today_at) { 0 }
       expect(organization1.hot_sheet_configuration.send_today_now?).to be_truthy
@@ -58,6 +57,7 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
         expect(hot_sheet.recipient_ids).to eq([organization_role.user_id])
         expect(ActionMailer::Base.deliveries.count).to eq 1
         email = ActionMailer::Base.deliveries.last
+        expect(hot_sheet.message_id).to eq email.message_id
         expect(email.subject).to eq hot_sheet.subject
         expect(email.to).to eq([organization_role.user.email])
         expect(email.bcc).to eq([])
@@ -75,25 +75,99 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
           expect(ActionMailer::Base.deliveries.count).to eq 1
         end
       end
-      context "with more than 50 recipients" do
-        let(:emails) { Array(1..102).map { |i| "email#{i}@bikeindex.org" } }
-        it "delivers multiple emails" do
+      context "with more recipients than fit in one email" do
+        let!(:organization_roles) do
+          Array.new(8) { FactoryBot.create(:organization_role_claimed, organization: organization1, hot_sheet_notification: "notification_daily") }
+        end
+        let!(:organization_role_never) { FactoryBot.create(:organization_role_claimed, organization: organization1, hot_sheet_notification: "notification_never") }
+        let!(:stolen_record) { FactoryBot.create(:stolen_record, :in_nyc) }
+        let(:recipient_ids) { ([organization_role] + organization_roles).map(&:user_id) }
+        before { stub_const("ProcessHotSheetJob::RECIPIENTS_PER_EMAIL", 3) }
+
+        it "creates a hot sheet for each slice of recipients, and emails each one" do
           expect(ActionMailer::Base.deliveries.count).to eq 0
-          allow_any_instance_of(HotSheet).to receive(:recipient_emails) { emails }
           expect {
             ProcessHotSheetJob.drain
-          }.to change(HotSheet, :count).by 1
-          hot_sheet = HotSheet.last
-          expect(hot_sheet.sheet_date).to eq Time.current.to_date
-          expect(hot_sheet.organization_id).to eq organization1.id
-          # And it's delivered the email
-          expect(hot_sheet.email_success?).to be_truthy
-          expect(hot_sheet.recipient_ids).to eq([organization_role.user_id])
-          expect(ActionMailer::Base.deliveries.count).to eq 3
+          }.to change(HotSheet, :count).by 3
+          hot_sheets = HotSheet.where(sheet_date: Time.current.to_date).order(:id)
+          # The sheets are identical, other than which recipients they went to
+          expect(hot_sheets.map(&:organization_id)).to eq([organization1.id] * 3)
+          expect(hot_sheets.map(&:stolen_record_ids)).to eq([[stolen_record.id]] * 3)
+          expect(hot_sheets.map { it.recipient_ids.count }).to eq([3, 3, 3])
+          # Every daily recipient is on exactly one sheet, and notification_never on none
+          expect(hot_sheets.flat_map(&:recipient_ids)).to match_array(recipient_ids)
 
-          ActionMailer::Base.deliveries.each do |email|
+          expect(ActionMailer::Base.deliveries.count).to eq 3
+          hot_sheets.each do |hot_sheet|
+            email = ActionMailer::Base.deliveries.find { (it.to + it.bcc).sort == hot_sheet.recipient_emails.sort }
+            expect(email).to be_present
             expect(email.subject).to eq hot_sheet.subject
-            expect(email.bcc.count).to be < 49
+          end
+        end
+
+        context "re-run after the day's batches failed" do
+          it "reuses the day's sheets, rather than stacking up duplicates" do
+            expect {
+              ProcessHotSheetJob.drain
+            }.to change(HotSheet, :count).by 3
+            HotSheet.all.each { it.update(delivery_status: "delivery_failure", delivery_error: "Postmark::TimeoutError") }
+            ActionMailer::Base.deliveries = []
+
+            expect {
+              described_class.new.perform(organization1.id)
+            }.to_not change(HotSheet, :count)
+            expect(ActionMailer::Base.deliveries.count).to eq 3
+            expect(HotSheet.delivered.count).to eq 3
+          end
+        end
+        context "when one batch has an inactive recipient" do
+          let(:inactive_user) { organization_roles.first.user }
+          let(:error_message) do
+            "You tried to send to recipient(s) that have been marked as inactive. Found inactive " \
+            "addresses: #{inactive_user.email}. Inactive recipients are ones that have generated a " \
+            "hard bounce, a spam complaint, or a manual suppression."
+          end
+          let(:inactive_recipient_error) do
+            Postmark::ApiInputError.build("error", {"ErrorCode" => 406, "Message" => error_message})
+          end
+          before do
+            allow(OrganizedMailer).to receive(:hot_sheet).and_wrap_original do |method, sheet|
+              raise inactive_recipient_error if sheet.recipient_ids.include?(inactive_user.id)
+
+              method.call(sheet)
+            end
+          end
+
+          it "delivers the batches that don't include them" do
+            expect {
+              ProcessHotSheetJob.drain
+            }.to change(HotSheet, :count).by 3
+            hot_sheets = HotSheet.where(sheet_date: Time.current.to_date)
+            expect(hot_sheets.delivery_success.count).to eq 2
+            expect(hot_sheets.delivery_partial_success.count).to eq 1
+            expect(ActionMailer::Base.deliveries.count).to eq 2
+
+            rejected = hot_sheets.delivery_partial_success.first
+            expect(rejected.delivery_error).to eq "Postmark::InactiveRecipientError"
+            expect(rejected.recipient_ids).to include(inactive_user.id)
+            # Only the rejected address is flagged, not the rest of their batch
+            expect(UserEmail.last_email_errored.pluck(:email)).to eq([inactive_user.email])
+          end
+
+          context "with an error postmark can't attribute" do
+            let(:inactive_recipient_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 499}) }
+            it "delivers the other batches before raising" do
+              expect {
+                ProcessHotSheetJob.drain
+              }.to raise_error(Postmark::ApiInputError)
+              hot_sheets = HotSheet.where(sheet_date: Time.current.to_date)
+              expect(hot_sheets.count).to eq 3
+              expect(hot_sheets.delivery_success.count).to eq 2
+              expect(hot_sheets.delivery_failure.count).to eq 1
+              expect(ActionMailer::Base.deliveries.count).to eq 2
+              # Nobody is flagged - there is no telling which of the batch failed
+              expect(UserEmail.last_email_errored.count).to eq 0
+            end
           end
         end
       end
