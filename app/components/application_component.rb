@@ -25,6 +25,11 @@ class ApplicationComponent < ViewComponent::Base
       Digest::MD5.hexdigest(contents.join("\n"))[0, 12]
     end
 
+    # On the class, so a class method that reads the sidecar copy can reach it without an instance
+    def component_translation_scope
+      @component_translation_scope ||= [:components] + name.split("::")[0..-2].map { |i| i.underscore.downcase }
+    end
+
     private
 
     # This component's own files, plus the markup of every component they render, followed
@@ -75,11 +80,6 @@ class ApplicationComponent < ViewComponent::Base
       content_tag(:strong, "#{title}: ", class: "") +
         content_tag(:span, desc)
     end
-  end
-
-  # On the class, so a class method that reads the sidecar copy can reach it without an instance
-  def self.component_translation_scope
-    @component_translation_scope ||= [:components] + name.split("::")[0..-2].map { |i| i.underscore.downcase }
   end
 
   private
