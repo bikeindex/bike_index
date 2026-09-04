@@ -140,6 +140,13 @@
     @apply tw:p-0!;
   }
 
+  /* Full width rather than a max-width: a table with slack hands the column more than
+   * the box asked for, and capping the box leaves the difference as a gap. Capping the
+   * cell instead doesn't work -- table-layout: auto ignores max-width on a td. */
+  .twjson-box-cell {
+    @apply tw:w-full;
+  }
+
   .twjson-box-cell .code {
     @apply tw:border-0;
   }
