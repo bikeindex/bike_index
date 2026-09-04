@@ -41,7 +41,9 @@
     </div>
   <% end %>
 
-  <%= render partial: "table", locals: {collection: @user_registration_organizations, render_sortable: true} %>
+  <%= render(Pages::Admin::UserRegistrationOrganizations::Table::Component.new(
+    user_registration_organizations: @user_registration_organizations, sort_state:,
+    render_sortable: true, render_search: params[:organization_id].blank?)) %>
 <% end %>
 
 <%= render(Pages::Admin::IndexSkeleton::Component.new(

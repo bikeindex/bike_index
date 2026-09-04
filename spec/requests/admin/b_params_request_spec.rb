@@ -21,6 +21,19 @@ RSpec.describe base_url, type: :request do
 
       expect(response.code).to eq("200")
       expect(response).to render_template(:show)
+      expect(response.body).to_not match(/bike errors/i)
+    end
+
+    context "with bike_errors" do
+      before { subject.update(bike_errors: ["Frame material is not valid"]) }
+
+      it "renders them" do
+        get "#{base_url}/#{subject.to_param}"
+
+        expect(response.code).to eq("200")
+        expect(response.body).to match(/bike errors/i)
+        expect(response.body).to match(/Frame material is not valid/)
+      end
     end
   end
 end

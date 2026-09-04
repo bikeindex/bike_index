@@ -615,8 +615,8 @@
       </div>
 
       <div class="col-md-6">
-        <div class="small tw:hidden" data-ui--collapse-target="content">
-          <%= helpers.pretty_print_json(mailchimp_datum.data) %>
+        <div class="tw:hidden" data-ui--collapse-target="content">
+          <%= render UI::JsonDisplay::Component.new(data: mailchimp_datum.data, small: true) %>
         </div>
       </div>
     </div>

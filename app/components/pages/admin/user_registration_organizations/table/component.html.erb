@@ -1,0 +1,46 @@
+<%# a local, because the cell blocks below are instance_exec'd and can't see the component's ivars %>
+<% render_search = @render_search %>
+
+<%= render(UI::Table::Component.new(records: @user_registration_organizations, render_sortable: @render_sortable, sort_state: @sort_state)) do |table| %>
+  <% table.column(sortable: "created_at") do |user_registration_organization| %>
+    <%= render UI::Time::Component.new(time: user_registration_organization.created_at) %>
+  <% end %>
+
+  <% table.column(sortable: "updated_at", classes: "tw:text-xs") do |user_registration_organization| %>
+    <%= render UI::Time::Component.new(time: user_registration_organization.updated_at) %>
+  <% end %>
+
+  <%# A plain link rather than Pages::Admin::Users::Cell, whose badge costs ~9 queries a row %>
+  <% table.column(sortable: "user_id") do |user_registration_organization| %>
+    <% if user_registration_organization.user.present? %>
+      <%= link_to user_registration_organization.user.display_name, admin_user_path(user_registration_organization.user_id), class: "twlink" %>
+    <% elsif user_registration_organization.user_id.present? %>
+      <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">
+        Missing user <code><%= user_registration_organization.user_id %></code>
+      </small>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "organization_id", label: "Organization") do |user_registration_organization| %>
+    <%= render Pages::Admin::Organizations::Cell::Component.new(organization: user_registration_organization.organization, organization_id: user_registration_organization.organization_id, sort_state:, render_search:) %>
+  <% end %>
+
+  <% table.column(label: "Registration info", header_classes: "tw:font-normal") do |user_registration_organization| %>
+    <%= render UI::JsonDisplay::Component.new(data: user_registration_organization.registration_info, max_width: 300, small: true) %>
+  <% end %>
+
+  <% table.column(label: "All bikes", classes: "tw:text-center") do |user_registration_organization| %>
+    <%= check_mark if user_registration_organization.all_bikes? %>
+  <% end %>
+
+  <% table.column(label: "Can edit claimed", classes: "tw:text-center") do |user_registration_organization| %>
+    <%= check_mark if user_registration_organization.can_edit_claimed %>
+  <% end %>
+
+  <%# UserRegistrationOrganization#bikes goes through the user, so a deleted one has none to count %>
+  <% table.column(label: "Bikes") do |user_registration_organization| %>
+    <% if user_registration_organization.user.present? %>
+      <%= number_display(user_registration_organization.bikes.count) %>
+    <% end %>
+  <% end %>
+<% end %>

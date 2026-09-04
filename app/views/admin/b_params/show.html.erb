@@ -1,0 +1,76 @@
+<div class="row">
+  <div class="col-sm-6">
+    <table class="table-list">
+      <tbody>
+        <tr>
+          <td>ID</td>
+          <td><%= @b_param.id %></td>
+        </tr>
+
+        <tr>
+          <td>Creator</td>
+
+          <td>
+            <% if @b_param.creator.present? %>
+              <%= @b_param.creator.email %>
+            <% else %>
+              No Creator
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>created_at</td>
+
+          <td>
+            <%= render UI::Time::Component.new(time: @b_param.created_at, format: :localize_time_precise) %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Modified at</td>
+
+          <td>
+            <%= render UI::Time::Component.new(time: @b_param.updated_at, format: :localize_time_precise) %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-sm-6">
+    <table class="table-list">
+      <tbody>
+        <tr>
+          <td>Organization</td>
+
+          <td>
+            <% if @b_param.creation_organization.present? %>
+              <%= @b_param.creation_organization.name %>
+            <% end %>
+          </td>
+        </tr>
+
+        <tr>
+          <td>Created bike</td>
+
+          <td>
+            <% if @b_param.created_bike_id.present? %>
+              <%= link_to @b_param.created_bike_id, admin_bike_path(@b_param.created_bike_id) %>
+            <% end %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<h3 class="mt-4">Bike</h3>
+
+<%= render UI::JsonDisplay::Component.new(data: @b_param.params) %>
+
+<% if @b_param.bike_errors.present? %>
+  <h3 class="mt-4">Bike Errors</h3>
+
+  <%= render UI::JsonDisplay::Component.new(data: @b_param.bike_errors) %>
+<% end %>
