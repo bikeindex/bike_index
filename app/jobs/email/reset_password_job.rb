@@ -14,7 +14,7 @@ module Email
       # We dnn't send email to banned users
       return if user.banned?
 
-      Notification.track_email_delivery(notification_for_password_reset_token(user)) do
+      notification_for_password_reset_token(user).track_email_delivery do
         CustomerMailer.password_reset_email(user, return_to:).deliver_now
       end
     end

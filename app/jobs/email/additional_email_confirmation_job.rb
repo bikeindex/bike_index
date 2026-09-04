@@ -13,7 +13,7 @@ module Email
       notification = notifications.last ||
         Notification.create(kind: "additional_email_confirmation", notifiable: user_email)
 
-      Notification.track_email_delivery(notification, is_new_email_address: true) do
+      notification.track_email_delivery(is_new_email_address: true) do
         CustomerMailer.additional_email_confirmation(user_email).deliver_now
       end
     end

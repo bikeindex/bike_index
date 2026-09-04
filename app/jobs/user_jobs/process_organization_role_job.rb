@@ -14,7 +14,7 @@ module UserJobs
         notification = organization_role.notifications.where(kind: "organization_invitation").first ||
           Notification.create(kind: "organization_invitation", notifiable: organization_role,
             user_id: organization_role.user_id, message_channel_target: organization_role.invited_email)
-        Notification.track_email_delivery(notification) do
+        notification.track_email_delivery do
           OrganizedMailer.organization_invitation(organization_role).deliver_now
         end
         if notification.delivery_success?

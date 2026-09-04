@@ -45,12 +45,9 @@ class EmailBan < ApplicationRecord
       matching_bans(user, user_email).any?
     end
 
-    # An email getting through means the address works again - but it says nothing
-    # about the bans for the other reasons
+    # An email getting through says the address works - it says nothing about the other reasons
     def resolve_delivery_failure!(user:, user_email: nil)
       return if user.blank?
-
-      user_email ||= user.user_emails.friendly_find(user.email)
 
       matching_bans(user, user_email).delivery_failure.each { it.update!(end_at: Time.current) }
     end
@@ -63,9 +60,8 @@ class EmailBan < ApplicationRecord
 
     private
 
-    # Evaluating the domain and hunting for duplicate accounts asks whether the address
-    # should exist, not whether it accepts mail - and REPLACE(email) has no index, so it
-    # can't run on every send
+    # Asks whether the address should exist, not whether it accepts mail - and
+    # REPLACE(email) has no index, so it can't run on every send
     def banned_new_email_address?(user, user_email)
       # Only the account's own address condemns the account - an additional one is just an address
       additional = user_email if user_email&.email != user.email
@@ -90,6 +86,8 @@ class EmailBan < ApplicationRecord
 
     # A ban with no user_email covers every address the user has
     def matching_bans(user, user_email)
+      user_email ||= user.user_emails.friendly_find(user.email)
+
       user.email_bans_active.where(user_email_id: [nil, user_email&.id])
     end
 

@@ -357,7 +357,7 @@ class GraduatedNotification < ApplicationRecord
     notification = notifications.first ||
       Notification.create(kind: "graduated_notification", notifiable: self,
         user_id:, message_channel_target: email, bike_id:)
-    Notification.track_email_delivery(notification) do
+    notification.track_email_delivery do
       OrganizedMailer.graduated_notification(self).deliver_now
     end
   end

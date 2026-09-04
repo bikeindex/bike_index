@@ -26,7 +26,7 @@ module Email
       end
 
       notification = Notification.create(kind:, message_channel: "email", notifiable: b_param)
-      Notification.track_email_delivery(notification) { OrganizedMailer.public_send(kind, b_param).deliver_now }
+      notification.track_email_delivery { OrganizedMailer.public_send(kind, b_param).deliver_now }
     end
   end
 end

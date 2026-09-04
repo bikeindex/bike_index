@@ -34,7 +34,7 @@ module Email
 
       notification ||= Notification.create(user_id: user.id, kind: :newsletter, notifiable: mail_snippet)
 
-      Notification.track_email_delivery(notification) do
+      notification.track_email_delivery do
         CustomerMailer.newsletter(user:, mail_snippet:).deliver_now
       end
     end

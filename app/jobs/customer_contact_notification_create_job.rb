@@ -10,7 +10,7 @@ class CustomerContactNotificationCreateJob < ApplicationJob
       bike_id: customer_contact.bike_id,
       kind: customer_contact.kind)
 
-    Notification.track_email_delivery(notification) do
+    notification.track_email_delivery do
       CustomerMailer.stolen_bike_alert_email(customer_contact).deliver_now
     end
     return unless notification.delivery_success?

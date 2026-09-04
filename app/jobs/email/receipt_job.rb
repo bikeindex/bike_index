@@ -8,7 +8,7 @@ module Email
       payment = Payment.find(id)
       notification = payment.notifications.receipt.first
       notification ||= Notification.create(kind: "receipt", notifiable: payment)
-      Notification.track_email_delivery(notification) do
+      notification.track_email_delivery do
         CustomerMailer.invoice_email(payment).deliver_now
       end
       return unless notification.delivery_success? && payment.donation?

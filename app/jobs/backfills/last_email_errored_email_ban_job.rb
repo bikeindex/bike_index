@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module Backfills
-  # EmailBan delivery_failure replaces user_emails.last_email_errored, which is being dropped -
-  # create the bans track_email_delivery would have created for the errors already recorded
+  # Creates the delivery_failure bans for the errors user_emails.last_email_errored
+  # already recorded, ahead of dropping that column
   class LastEmailErroredEmailBanJob < ApplicationJob
     include Sidekiq::IterableJob
 

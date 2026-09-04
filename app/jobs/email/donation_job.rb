@@ -14,7 +14,7 @@ module Email
       notification ||= Notification.create(kind: notification_kind, notifiable: payment,
         bike: bike_for_notification(payment, notification_kind))
 
-      Notification.track_email_delivery(notification) do
+      notification.track_email_delivery do
         DonationMailer.donation_email(notification_kind, payment).deliver_now
       end
     end

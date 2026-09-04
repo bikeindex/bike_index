@@ -105,7 +105,7 @@ class ProcessParkingNotificationJob < ApplicationJob
       Notification.create(kind: "parking_notification", notifiable: parking_notification,
         user_id: parking_notification.bike&.user_id, message_channel_target: parking_notification.email,
         bike_id: parking_notification.bike_id)
-    Notification.track_email_delivery(notification) do
+    notification.track_email_delivery do
       OrganizedMailer.parking_notification(parking_notification).deliver_now
     end
   end
