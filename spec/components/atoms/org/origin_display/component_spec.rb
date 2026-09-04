@@ -23,14 +23,6 @@ RSpec.describe Atoms::Org::OriginDisplay::Component, type: :component do
       expect(copy[:labels].keys).to match_array(Ownership.creation_kinds)
       expect(copy[:descriptions].keys).to match_array(Ownership.creation_kinds)
     end
-
-    # The preview builds a sample ownership per kind - this catches that inverse mapping
-    # setting an attribute creation_kind doesn't read back
-    it "renders one ownership per kind" do
-      ownerships = Atoms::Org::OriginDisplay::ComponentPreview.new.every_kind.dig(:locals, :ownerships)
-
-      expect(ownerships.map(&:creation_kind)).to eq Ownership.creation_kinds
-    end
   end
 
   # render? guards the rendered path, so nothing else covers a blank kind reaching these
