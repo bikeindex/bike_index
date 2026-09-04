@@ -1,4 +1,6 @@
-<%# locals: (collection:, render_sortable: true, render_search: true) %>
+<%# locals: (collection:, render_sortable: true) %>
+
+<% render_search = params[:organization_id].blank? %>
 
 <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at") do |user_registration_organization| %>
@@ -9,7 +11,6 @@
     <%= render UI::Time::Component.new(time: user_registration_organization.updated_at) %>
   <% end %>
 
-  <%# A plain link rather than Pages::Admin::Users::Cell, whose badge costs ~9 queries a row %>
   <% table.column(sortable: "user_id") do |user_registration_organization| %>
     <% if user_registration_organization.user.present? %>
       <%= link_to user_registration_organization.user.display_name, admin_user_path(user_registration_organization.user_id), class: "twlink" %>

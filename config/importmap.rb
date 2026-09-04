@@ -16,12 +16,9 @@ pin "@bikeindex/time-localizer", to: "@bikeindex--time-localizer.js", preload: t
 # root-absolute /npm/ imports that 404 against our origin; the vendored
 # file is esm.sh's self-contained bundle. See the file header to re-generate.
 pin "@floating-ui/dom", to: "@floating-ui--dom.js"
-# Vendored (not CDN-pinned): cdnjs isn't in content_security_policy.rb, and admin JSON
-# highlighting shouldn't depend on a third party at runtime. Only the json grammar is
-# registered. preload: false because importmap-rails preloads by default, which fetched
-# 10KB on every page for a component that renders on a handful of admin ones -- the
-# controller import()s these so they stay out of its preloaded dependency graph too.
-# See each file's header to re-generate.
+# Vendored because cdnjs isn't in content_security_policy.rb; see each file's header to
+# re-generate. preload: false so a component rendered on a handful of admin pages doesn't
+# fetch 10KB on every page -- the controller import()s them for the same reason.
 pin "highlight.js/lib/core", to: "highlight.js--core.js", preload: false
 pin "highlight.js/lib/languages/json", to: "highlight.js--json.js", preload: false
 

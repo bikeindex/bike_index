@@ -1,4 +1,6 @@
-<%# locals: (collection:, render_sortable: true, render_search: true) %>
+<%# locals: (collection:, render_sortable: true) %>
+
+<% render_search = params[:organization_id].blank? %>
 
 <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at") do |b_param| %>
@@ -15,7 +17,6 @@
     <%= b_param.email %>
   <% end %>
 
-  <%# A plain link rather than Pages::Admin::Users::Cell, whose badge costs ~9 queries a row %>
   <% table.column(sortable: "creator_id", classes: "tw:text-xs") do |b_param| %>
     <% if b_param.creator.present? %>
       <%= link_to b_param.creator.display_name, admin_user_path(b_param.creator_id), class: "twlink" %>
