@@ -8,8 +8,6 @@ module Email
       user = User.find_by(id: user_id)
       return if user.blank?
 
-      # Don't send an email if the email is blocked
-      return if EmailBan.ban?(user)
       # Clean up situations where there are two users created
       return user.really_destroy! if duplicate_user?(user)
 

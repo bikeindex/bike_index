@@ -52,13 +52,19 @@ RSpec.describe EmailBan, type: :model do
 
     context "invalid domain" do
       let(:email) { "dddd@ff=.com" }
-      it "deletes user" do
+      it "bans without deleting the user" do
         expect(EmailDomain.invalid_domain_record.banned?).to be_truthy
         expect do
           expect(EmailBan.ban?(user)).to be_truthy
         end.to change(EmailDomain, :count).by(0)
-          .and change(User, :count).by(-1)
+          .and change(User, :count).by(0)
         expect(UpdateEmailDomainJob.jobs.count).to eq 0
+      end
+
+      it "deletes user with destroy_for_banned_domain" do
+        expect do
+          expect(EmailBan.ban?(user, destroy_for_banned_domain: true)).to be_truthy
+        end.to change(User, :count).by(-1)
       end
     end
 
@@ -129,6 +135,80 @@ RSpec.describe EmailBan, type: :model do
           expect(email_domain.calculated_users.count).to_not eq email_domain.user_count # Verify it still hasn't been processed
           expect(UpdateEmailDomainJob.jobs.count).to eq 1
         end
+      end
+    end
+  end
+
+  describe "user_email" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let(:user_email) { nil }
+    let(:email_ban) { FactoryBot.create(:email_ban, user:, user_email:, reason: :delivery_failure) }
+
+    context "with the user's only email" do
+      let(:user_email) { user.user_emails.first }
+      it "doesn't assign the user_email, bans every address" do
+        expect(user.reload.user_emails.pluck(:id)).to eq([user_email.id])
+        expect(email_ban.reload.user_email_id).to be_nil
+        expect(email_ban.email).to eq user.email
+        expect(EmailBan.ban?(user)).to be_truthy
+        expect(EmailBan.ban?(user, user_email:)).to be_truthy
+      end
+    end
+
+    context "with an additional email" do
+      let!(:primary_email) { user.user_emails.first }
+      let(:user_email) { FactoryBot.create(:user_email, user:) }
+      it "assigns the user_email, only bans that address" do
+        expect(email_ban.reload.user_email_id).to eq user_email.id
+        expect(email_ban.email).to eq user_email.email
+        expect(EmailBan.ban?(user, user_email:)).to be_truthy
+        expect(EmailBan.ban?(user)).to be_falsey
+        expect(EmailBan.ban?(user, user_email: primary_email)).to be_falsey
+        # the same reason can ban a second address
+        expect(FactoryBot.build(:email_ban, user:, user_email: primary_email, reason: :delivery_failure))
+          .to be_valid
+        expect(FactoryBot.build(:email_ban, user:, user_email:, reason: :delivery_failure)).to_not be_valid
+      end
+
+      context "ban without a user_email" do
+        let(:email_ban) { FactoryBot.create(:email_ban, user:, reason: :delivery_failure) }
+        it "bans every address" do
+          expect(email_ban.reload.user_email_id).to be_nil
+          expect(EmailBan.ban?(user)).to be_truthy
+          expect(EmailBan.ban?(user, user_email:)).to be_truthy
+        end
+      end
+    end
+  end
+
+  describe "resolve_delivery_failure" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let!(:email_ban) { FactoryBot.create(:email_ban, user:, reason: :delivery_failure) }
+    let!(:domain_ban) { FactoryBot.create(:email_ban, user:, reason: :email_domain) }
+
+    it "ends the delivery_failure ban, leaving the other reasons" do
+      expect(EmailBan.ban?(user)).to be_truthy
+
+      EmailBan.resolve_delivery_failure(user:)
+
+      expect(email_ban.reload.end_at).to be_within(2).of Time.current
+      expect(email_ban.period_active?).to be_falsey
+      expect(domain_ban.reload.end_at).to be_nil
+      expect(EmailBan.ban?(user)).to be_truthy
+    end
+
+    context "ban for a different address" do
+      let!(:other_email) { FactoryBot.create(:user_email, user:) }
+      let!(:email_ban) { FactoryBot.create(:email_ban, user:, user_email: other_email, reason: :delivery_failure) }
+      let!(:domain_ban) { nil }
+
+      it "leaves it active" do
+        expect(email_ban.reload.user_email_id).to eq other_email.id
+
+        EmailBan.resolve_delivery_failure(user:)
+
+        expect(email_ban.reload.end_at).to be_nil
+        expect(EmailBan.ban?(user, user_email: other_email)).to be_truthy
       end
     end
   end

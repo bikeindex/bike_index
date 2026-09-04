@@ -3,17 +3,19 @@
 # Table name: email_bans
 # Database name: primary
 #
-#  id         :bigint           not null, primary key
-#  end_at     :datetime
-#  reason     :integer
-#  start_at   :datetime
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  user_id    :bigint
+#  id            :bigint           not null, primary key
+#  end_at        :datetime
+#  reason        :integer
+#  start_at      :datetime
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  user_email_id :bigint
+#  user_id       :bigint
 #
 # Indexes
 #
-#  index_email_bans_on_user_id  (user_id)
+#  index_email_bans_on_user_email_id  (user_email_id)
+#  index_email_bans_on_user_id        (user_id)
 #
 class EmailBan < ApplicationRecord
   include ActivePeriodable
@@ -26,6 +28,7 @@ class EmailBan < ApplicationRecord
   enum :reason, REASON_ENUM
 
   belongs_to :user
+  belongs_to :user_email
 
   validates_presence_of :reason
   validate :is_not_duplicate_ban
@@ -33,15 +36,15 @@ class EmailBan < ApplicationRecord
   before_validation :set_calculated_attributes
 
   class << self
-    def ban?(user)
-      # Don't suffer a witch to live
+    def ban?(user, user_email: nil, destroy_for_banned_domain: false)
       if EmailDomain::VERIFICATION_ENABLED
         email_domain = EmailDomain.find_or_create_for(user.email, skip_processing: true)
 
         process_email_domain_if_required(email_domain)
 
         if email_domain.banned?
-          user.really_destroy!
+          # Don't suffer a witch to live
+          user.really_destroy! if destroy_for_banned_domain
           return true
         end
       end
@@ -50,7 +53,21 @@ class EmailBan < ApplicationRecord
       create(reason: :email_domain, user:) if email_domain&.provisional_ban?
       create(reason: :email_duplicate, user:) if email_duplicate?(user.email)
       # match existing bans
-      period_started.where(user:).any?
+      matching_bans(user, user_email).any?
+    end
+
+    def create_delivery_failure(user:, user_email: nil)
+      return if user.blank?
+
+      create(reason: :delivery_failure, user:, user_email:)
+    end
+
+    # An email getting through means the address works again - but it says nothing
+    # about the bans for the other reasons
+    def resolve_delivery_failure(user:, user_email: nil)
+      return if user.blank?
+
+      matching_bans(user, user_email).delivery_failure.each { it.update(end_at: Time.current) }
     end
 
     def reason_humanized(str)
@@ -60,6 +77,16 @@ class EmailBan < ApplicationRecord
     end
 
     private
+
+    def matching_bans(user, user_email)
+      period_active.where(user:, user_email_id: [nil, matching_user_email_id(user, user_email)])
+    end
+
+    # A ban without a user_email covers every address the user has; without an
+    # explicit address, the question being asked is about their primary one
+    def matching_user_email_id(user, user_email)
+      (user_email || user.user_emails.friendly_find(user.email))&.id
+    end
 
     def email_duplicate?(email)
       return false if PERMITTED_DUPLICATE_DOMAINS.include?(email.split("@").last)
@@ -103,7 +130,7 @@ class EmailBan < ApplicationRecord
   end
 
   def email
-    user&.email
+    user_email&.email || user&.email
   end
 
   def email_domain
@@ -118,14 +145,22 @@ class EmailBan < ApplicationRecord
 
   def set_calculated_attributes
     self.start_at ||= Time.current
+    self.user_email_id = nil unless multiple_user_emails?
   end
 
   def is_not_duplicate_ban
-    matching_previous_ban = self.class.where(user_id:, reason:).period_active_at(start_at)
+    matching_previous_ban = self.class.where(user_id:, reason:, user_email_id:).period_active_at(start_at)
       .where.not(id:)
     matching_previous_ban = matching_previous_ban.where("id < ?", id) if id.present?
     return if matching_previous_ban.none?
 
     errors.add(:user_id, "there is already an active email_ban for the same reason for that user")
+  end
+
+  private
+
+  # With one address on file, a ban on it is a ban on the user
+  def multiple_user_emails?
+    user.present? && user.user_emails.count > 1
   end
 end

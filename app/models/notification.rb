@@ -236,16 +236,22 @@ class Notification < ApplicationRecord
   def track_email_delivery
     return if delivery_success?
 
+    target_user_email = user_email
+    return if user.present? && EmailBan.ban?(user, user_email: target_user_email)
+
     delivery = yield
 
     self.message_id ||= message_id_from_delivery(delivery)
     update(delivery_status: "delivery_success")
-    user_email&.update_last_email_errored!(email_errored: false)
+    target_user_email&.update_last_email_errored!(email_errored: false)
+    EmailBan.resolve_delivery_failure(user:, user_email: target_user_email)
   rescue => e
     update(delivery_status: "delivery_failure", delivery_error: e.class)
-    user_email&.update_last_email_errored!(email_errored: true)
+    target_user_email&.update_last_email_errored!(email_errored: true)
 
     raise e unless UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
+
+    EmailBan.create_delivery_failure(user:, user_email: target_user_email)
   end
 
   def delivery_error_spam?

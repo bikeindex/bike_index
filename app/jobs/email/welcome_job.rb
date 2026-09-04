@@ -6,10 +6,12 @@ module Email
 
     def perform(user_id)
       user = User.find(user_id)
-      # Don't send an email if the email is blocked
-      return if EmailBan.ban?(user)
+      notification = user.notifications.welcome_email.last ||
+        Notification.create(user_id: user.id, kind: :welcome_email)
 
-      CustomerMailer.welcome_email(user).deliver_now
+      notification.track_email_delivery do
+        CustomerMailer.welcome_email(user).deliver_now
+      end
     end
   end
 end
