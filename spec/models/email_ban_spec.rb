@@ -181,6 +181,9 @@ RSpec.describe EmailBan, type: :model do
         expect(email_ban.email).to eq user.email
         expect(EmailBan.ban?(user)).to be_truthy
         expect(EmailBan.ban?(user, user_email:)).to be_truthy
+        expect(user.email_banned?).to be_truthy
+        expect(User.email_banned.pluck(:id)).to eq([user.id])
+        expect(User.valid_only.pluck(:id)).to eq([])
       end
     end
 
@@ -193,6 +196,10 @@ RSpec.describe EmailBan, type: :model do
         expect(EmailBan.ban?(user, user_email:)).to be_truthy
         expect(EmailBan.ban?(user)).to be_falsey
         expect(EmailBan.ban?(user, user_email: primary_email)).to be_falsey
+        # The account itself isn't banned, so the user keeps their profile and their newsletter
+        expect(user.email_banned?).to be_falsey
+        expect(User.email_banned.pluck(:id)).to eq([])
+        expect(User.valid_only.pluck(:id)).to eq([user.id])
         # the same reason can ban a second address
         expect(FactoryBot.build(:email_ban, user:, user_email: primary_email, reason: :email_domain))
           .to be_valid
@@ -205,6 +212,8 @@ RSpec.describe EmailBan, type: :model do
           expect(email_ban.reload.user_email_id).to be_nil
           expect(EmailBan.ban?(user)).to be_truthy
           expect(EmailBan.ban?(user, user_email:)).to be_truthy
+          expect(user.email_banned?).to be_truthy
+          expect(User.valid_only.pluck(:id)).to eq([])
         end
       end
     end

@@ -35,6 +35,12 @@ class EmailBan < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
+  # A ban on an additional address leaves the account's own address deliverable
+  scope :banning_account_email, lambda {
+    left_joins(:user_email).joins(:user)
+      .where("email_bans.user_email_id IS NULL OR user_emails.email = users.email")
+  }
+
   class << self
     def ban?(user, user_email: nil, is_new_email_address: false)
       return false if user.blank?

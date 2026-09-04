@@ -153,8 +153,8 @@ class User < ApplicationRecord
   after_commit :perform_create_jobs, on: :create, unless: lambda { skip_update }
   after_commit :perform_user_update_jobs
 
-  scope :email_banned, -> { left_joins(:email_bans_active).where.not(email_bans: {id: nil}) }
-  scope :no_email_bans, -> { left_joins(:email_bans_active).where(email_bans: {id: nil}) }
+  scope :email_banned, -> { where(id: EmailBan.period_active.banning_account_email.select(:user_id)) }
+  scope :no_email_bans, -> { where.not(id: EmailBan.period_active.banning_account_email.select(:user_id)) }
   scope :banned, -> { where(banned: true) }
   scope :valid_only, -> { no_email_bans.where(banned: false) }
   scope :confirmed, -> { where(confirmed: true) }
@@ -571,7 +571,7 @@ class User < ApplicationRecord
   end
 
   def email_banned?
-    email_bans_active.any?
+    EmailBan.ban?(self)
   end
 
   def set_calculated_attributes
