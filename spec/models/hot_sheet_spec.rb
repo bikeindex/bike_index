@@ -89,6 +89,18 @@ RSpec.describe HotSheet, type: :model do
           expect(UserEmail.last_email_errored.pluck(:email)).to match_array(inactive_emails)
         end
       end
+
+      context "with an error postmark didn't attribute" do
+        let(:error_message) { "You tried to send to recipient(s) that have been marked as inactive." }
+        it "records a partial success, without flagging anyone" do
+          expect(inactive_recipient_error.recipients).to eq([])
+          expect(hot_sheet.track_email_delivery { raise inactive_recipient_error }).to be_nil
+
+          expect(hot_sheet.reload.delivery_status).to eq "delivery_partial_success"
+          expect(hot_sheet.delivery_error).to eq "Postmark::InactiveRecipientError"
+          expect(UserEmail.last_email_errored.count).to eq 0
+        end
+      end
     end
   end
 

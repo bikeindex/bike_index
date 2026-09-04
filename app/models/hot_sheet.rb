@@ -123,7 +123,9 @@ class HotSheet < ApplicationRecord
   # A sheet emails a whole batch at once, so only the addresses Postmark rejected failed
   def record_delivery_failure(error)
     failed_emails = inactive_recipient_emails(error)
-    delivered_any = failed_emails.any? && (normalized_recipient_emails - failed_emails).any?
+    # Postmark delivers to the rest of the batch, whether or not it names who it rejected
+    delivered_any = error.is_a?(Postmark::InactiveRecipientError) &&
+      (normalized_recipient_emails - failed_emails).any?
     update(delivery_status: delivered_any ? "delivery_partial_success" : "delivery_failure",
       delivery_error: error.class)
     UserEmail.where(email: failed_emails).each { it.update_last_email_errored!(email_errored: true) }
