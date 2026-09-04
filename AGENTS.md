@@ -85,6 +85,8 @@ Uses RSpec. All business logic should be tested. The `rspec-testing` skill cover
 
 **Verify with `bundle exec rspec` over the spec files covering what you changed — usually one to three.** Not `bin/turbo_tests` or `bin/ci`. CI runs the whole suite on push; yours is a smoke test, and every extra minute of it delays the next fix. A whole directory — `spec/integration`, `spec/components` — is a suite run by another name, whichever runner you use. "It renders on every page, so anything could break" is the rationalization to watch for: run the specs that assert the behaviour you changed and let CI find the rest. A red example is not a reason to re-run its directory — re-run that example. Say which specs you ran and why those. A `:js` spec failing on a missing Tailwind build is the `sandbox-test-setup` skill, not a reason to switch runners.
 
+**Assert on what a drain produces, not on the flag that precedes it.** A column a job reconciles when it runs records what was true at write time — `Ownership#skip_email` is one — so it answers a different question than the one you're asking.
+
 **Never hand-edit a VCR cassette**, and never `git checkout` away one a spec run re-recorded — cassettes only change by being recorded, and a re-recording gets committed on whatever branch you're on. To clear stale contents, `rm` the file and re-run the spec.
 
 ## Frontend Development
