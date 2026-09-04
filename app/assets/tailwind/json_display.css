@@ -38,14 +38,21 @@
 
   /* Filling a table cell: the row's own borders already draw the box, so the inner
    * border and the cell's padding would only double it up. Important because the
-   * cell's own tw:px-1 is a utility, and that layer outranks this one */
+   * cell's own tw:px-1 is a utility, and that layer outranks this one.
+   *
+   * w-px is the shrink-to-content hint -- a table with slack would otherwise hand this
+   * column more than the capped box can use and leave the difference as a gap on the
+   * right. The box's own w-full plus its max-width is what gives the cell a width to
+   * shrink to, so the column lands on the cap rather than collapsing. */
   .ui-table td:has(> .highlightjs-json-cell) {
-    @apply tw:p-0!;
+    @apply tw:w-px tw:p-0!;
   }
 
-  /* Full width rather than a max-width: a table with slack hands the column more than
-   * the box asked for, and capping the box leaves the difference as a gap. Capping the
-   * cell instead doesn't work -- table-layout: auto ignores max-width on a td. */
+  /* w-full so the box takes whatever width the column settles on: a table with slack
+   * hands the column more than the content asked for, and a box sized to its content
+   * would leave the difference as a gap. The inline max-width caps the column instead,
+   * by capping what the cell's content asks for -- max-width on the td itself doesn't
+   * work, table-layout: auto ignores it. */
   .highlightjs-json-cell {
     @apply tw:w-full;
   }

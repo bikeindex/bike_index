@@ -24,8 +24,16 @@ RSpec.describe UI::JsonDisplay::Component, type: :component do
   context "with table_cell" do
     let(:options) { {table_cell: true} }
 
-    it "adds the class the cell-filling css keys off" do
-      expect(component).to have_css("div.highlightjs-json.highlightjs-json-cell")
+    it "adds the cell-filling class and defaults the cap" do
+      expect(component).to have_css("div.highlightjs-json.highlightjs-json-cell[style='max-width: 500px;']")
+    end
+
+    context "with max_width passed" do
+      let(:options) { {table_cell: true, max_width: 300} }
+
+      it "takes the given width over the default" do
+        expect(component).to have_css("div.highlightjs-json-cell[style='max-width: 300px;']")
+      end
     end
   end
 
