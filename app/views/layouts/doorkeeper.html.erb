@@ -41,7 +41,7 @@
     </div>
 
     <%# OAuth pages never load the marketing pixel %>
-    <%= render SharedBlocks::Footer::Component.new(current_user:, skip_facebook: true, passive_organization:) %>
+    <%= render SharedBlocks::Footer::Component.new(current_user:, skip_facebook: true) %>
     <%= render "/shared/analytics" %>
   <% end %>
 </html>
