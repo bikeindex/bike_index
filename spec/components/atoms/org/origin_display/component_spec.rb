@@ -18,7 +18,7 @@ RSpec.describe Atoms::Org::OriginDisplay::Component, type: :component do
   # for the kind that happens to render
   context "every creation_kind" do
     let(:kinds) { Atoms::Org::OriginDisplay::ComponentPreview.new.every_kind.dig(:locals, :ownerships).map(&:creation_kind) }
-    let(:copy) { I18n.t("components.atoms.org.origin_display") }
+    let(:copy) { I18n.t(described_class.component_translation_scope.join(".")) }
 
     # Built off the enums rather than the preview, so an under-enumerating preview
     # can't agree with a sidecar trimmed to match it
@@ -33,6 +33,17 @@ RSpec.describe Atoms::Org::OriginDisplay::Component, type: :component do
     it "has a label and a description, and no copy for a kind that can't happen" do
       expect(copy[:labels].keys).to match_array(kinds)
       expect(copy[:descriptions].keys).to match_array(kinds)
+    end
+  end
+
+  # render? guards the rendered path, so nothing else covers a blank kind reaching these
+  describe "creation_kind copy without an instance" do
+    it "reads a kind's label and description, and passes blank through" do
+      expect(described_class.creation_kind_humanized(:embed_partial)).to eq "old landing page"
+      expect(described_class.creation_kind_description(:embed_partial))
+        .to eq "registration began with incomplete registration, via organization landing page"
+      expect(described_class.creation_kind_humanized(nil)).to be_nil
+      expect(described_class.creation_kind_description(nil)).to be_nil
     end
   end
 

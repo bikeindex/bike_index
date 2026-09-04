@@ -96,8 +96,13 @@ class ApplicationComponent < ViewComponent::Base
       .translate(key, **kwargs, scope: (scope || component_translation_scope).compact)
   end
 
+  # On the class, so a class method that reads the sidecar copy can reach it without an instance
+  def self.component_translation_scope
+    @component_translation_scope ||= [:components] + name.split("::")[0..-2].map { |i| i.underscore.downcase }
+  end
+
   def component_translation_scope
-    @component_translation_scope ||= [:components] + component_namespace + [component_name]
+    self.class.component_translation_scope
   end
 
   # The component name. For example, Pages::SearchResults::BikeBox::Component => BikeBox
