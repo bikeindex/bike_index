@@ -963,7 +963,7 @@ DEPENDENCIES
   knapsack_pro
   kramdown
   letter_opener_web (~> 3.0)
-  lexxy (~> 0.9.31)
+  lexxy (~> 0.9)
   lograge
   logstash-event
   lookbook
