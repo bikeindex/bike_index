@@ -14,7 +14,7 @@ module Backfills
     end
 
     def each_iteration(batch)
-      batch.each { EmailBan.create_delivery_failure(user: it.user, user_email: it) }
+      batch.each { EmailBan.create(reason: :delivery_failure, user: it.user, user_email: it) }
     end
 
     private

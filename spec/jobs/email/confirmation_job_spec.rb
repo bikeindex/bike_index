@@ -57,8 +57,8 @@ RSpec.describe Email::ConfirmationJob, type: :job do
         end.to change(Notification, :count).by 1
         expect(Notification.last.delivery_status).to eq "delivery_banned"
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
-        expect(User.unscoped.count).to eq 2 # ban? doesn't destroy without destroy_for_banned_domain
-        expect(EmailBan.count).to eq 1
+        expect(User.unscoped.count).to eq 1
+        expect(EmailBan.count).to eq 0 # It deletes the user
       end
     end
   end

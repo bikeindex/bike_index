@@ -136,13 +136,13 @@ class Notification < ApplicationRecord
     end
 
     # This method takes a block
-    def track_email_delivery(notification)
+    def track_email_delivery(notification, destroy_for_banned_domain: false)
       return if notification.delivery_success?
 
       user = notification.user
       user_email = notification.user_email
 
-      return notification.update(delivery_status: "delivery_banned") if EmailBan.ban?(user, user_email:)
+      return notification.update(delivery_status: "delivery_banned") if EmailBan.ban?(user, user_email:, destroy_for_banned_domain:)
 
       delivery = yield
 
@@ -156,7 +156,7 @@ class Notification < ApplicationRecord
 
       raise e unless UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
 
-      EmailBan.create_delivery_failure(user:, user_email:)
+      EmailBan.create(reason: :delivery_failure, user:, user_email:)
     end
 
     private

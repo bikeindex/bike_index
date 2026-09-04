@@ -30,7 +30,7 @@ class EmailBan < ApplicationRecord
   belongs_to :user
   belongs_to :user_email
 
-  validates_presence_of :reason
+  validates_presence_of :reason, :user
   validate :is_not_duplicate_ban
 
   before_validation :set_calculated_attributes
@@ -56,12 +56,6 @@ class EmailBan < ApplicationRecord
       create(reason: :email_duplicate, user:) if email_duplicate?(user.email)
       # match existing bans
       matching_bans(user, user_email).any?
-    end
-
-    def create_delivery_failure(user:, user_email: nil)
-      return if user.blank?
-
-      create(reason: :delivery_failure, user:, user_email:)
     end
 
     # An email getting through means the address works again - but it says nothing
