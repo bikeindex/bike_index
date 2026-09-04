@@ -20,7 +20,7 @@ module Backfills
     private
 
     def user_emails
-      UserEmail.last_email_errored.includes(:user)
+      UserEmail.last_email_errored.includes(user: :user_emails)
     end
   end
 end

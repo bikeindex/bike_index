@@ -17,7 +17,7 @@ module Email
 
       notification = notifications.last || Notification.create(user_id: user.id, kind: "confirmation_email")
 
-      Notification.track_email_delivery(notification, destroy_for_banned_domain: true) do
+      Notification.track_email_delivery(notification, is_new_email_address: true) do
         CustomerMailer.confirmation_email(user).deliver_now
       end
     end

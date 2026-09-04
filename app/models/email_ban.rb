@@ -36,34 +36,23 @@ class EmailBan < ApplicationRecord
   before_validation :set_calculated_attributes
 
   class << self
-    def ban?(user, user_email: nil, destroy_for_banned_domain: false)
+    def ban?(user, user_email: nil, is_new_email_address: false)
       return false if user.blank?
 
-      if EmailDomain::VERIFICATION_ENABLED
-        email_domain = EmailDomain.find_or_create_for(user.email, skip_processing: true)
+      user_email ||= user.user_emails.friendly_find(user.email)
+      return true if is_new_email_address && banned_new_email_address?(user, user_email)
 
-        process_email_domain_if_required(email_domain)
-
-        if email_domain.banned?
-          # Don't suffer a witch to live
-          user.really_destroy! if destroy_for_banned_domain
-          return true
-        end
-      end
-
-      # Create a email ban if we should
-      create(reason: :email_domain, user:) if email_domain&.provisional_ban?
-      create(reason: :email_duplicate, user:) if email_duplicate?(user.email)
-      # match existing bans
       matching_bans(user, user_email).any?
     end
 
     # An email getting through means the address works again - but it says nothing
     # about the bans for the other reasons
-    def resolve_delivery_failure(user:, user_email: nil)
+    def resolve_delivery_failure!(user:, user_email: nil)
       return if user.blank?
 
-      matching_bans(user, user_email).delivery_failure.each { it.update(end_at: Time.current) }
+      user_email ||= user.user_emails.friendly_find(user.email)
+
+      matching_bans(user, user_email).delivery_failure.each { it.update!(end_at: Time.current) }
     end
 
     def reason_humanized(str)
@@ -74,14 +63,34 @@ class EmailBan < ApplicationRecord
 
     private
 
-    def matching_bans(user, user_email)
-      period_active.where(user:, user_email_id: [nil, matching_user_email_id(user, user_email)])
+    # Evaluating the domain and hunting for duplicate accounts asks whether the address
+    # should exist, not whether it accepts mail - and REPLACE(email) has no index, so it
+    # can't run on every send
+    def banned_new_email_address?(user, user_email)
+      # Only the account's own address condemns the account - an additional one is just an address
+      additional = user_email if user_email&.email != user.email
+      email = additional&.email || user.email
+
+      if EmailDomain::VERIFICATION_ENABLED
+        email_domain = EmailDomain.find_or_create_for(email, skip_processing: true)
+
+        process_email_domain_if_required(email_domain)
+
+        if email_domain.banned?
+          # Don't suffer a witch to live
+          additional.present? ? create(reason: :email_domain, user:, user_email: additional) : user.really_destroy!
+          return true
+        end
+      end
+
+      create(reason: :email_domain, user:, user_email: additional) if email_domain&.provisional_ban?
+      create(reason: :email_duplicate, user:, user_email: additional) if email_duplicate?(email)
+      false
     end
 
-    # A ban without a user_email covers every address the user has; without an
-    # explicit address, the question being asked is about their primary one
-    def matching_user_email_id(user, user_email)
-      (user_email || user.user_emails.friendly_find(user.email))&.id
+    # A ban with no user_email covers every address the user has
+    def matching_bans(user, user_email)
+      user.email_bans_active.where(user_email_id: [nil, user_email&.id])
     end
 
     def email_duplicate?(email)
@@ -139,6 +148,8 @@ class EmailBan < ApplicationRecord
     self.class.reason_humanized(reason)
   end
 
+  private
+
   def set_calculated_attributes
     self.start_at ||= Time.current
     self.user_email_id = nil unless multiple_user_emails?
@@ -153,10 +164,8 @@ class EmailBan < ApplicationRecord
     errors.add(:user_id, "there is already an active email_ban for the same reason for that user")
   end
 
-  private
-
   # With one address on file, a ban on it is a ban on the user
   def multiple_user_emails?
-    user.present? && user.user_emails.count > 1
+    user.present? && user.user_emails.size > 1
   end
 end

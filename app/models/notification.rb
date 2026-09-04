@@ -135,21 +135,19 @@ class Notification < ApplicationRecord
         .or(where(notifiable_type: "StolenNotification", notifiable_id: stolen_notification_ids))
     end
 
-    # This method takes a block
-    def track_email_delivery(notification, destroy_for_banned_domain: false)
+    def track_email_delivery(notification, is_new_email_address: false)
       return if notification.delivery_success?
 
       user = notification.user
       user_email = notification.user_email
 
-      return notification.update(delivery_status: "delivery_banned") if EmailBan.ban?(user, user_email:, destroy_for_banned_domain:)
+      return notification.update(delivery_status: "delivery_banned") if EmailBan.ban?(user, user_email:, is_new_email_address:)
 
       delivery = yield
 
       notification.update(delivery_status: "delivery_success",
-        message_id: notification.message_id || message_id_from_delivery(delivery))
+        message_id: notification.message_id || delivery.try(:message_id))
       user_email&.update_last_email_errored!(email_errored: false)
-      EmailBan.resolve_delivery_failure(user:, user_email:)
     rescue => e
       notification.update(delivery_status: "delivery_failure", delivery_error: e.class)
       user_email&.update_last_email_errored!(email_errored: true)
@@ -157,12 +155,9 @@ class Notification < ApplicationRecord
       raise e unless UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
 
       EmailBan.create(reason: :delivery_failure, user:, user_email:)
-    end
-
-    private
-
-    def message_id_from_delivery(delivery)
-      defined?(delivery.message_id) ? delivery.message_id : nil
+    else
+      # else runs unrescued - a failed resolve can't mark a delivered email failed
+      EmailBan.resolve_delivery_failure!(user:, user_email:)
     end
   end
 

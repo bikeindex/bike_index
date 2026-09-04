@@ -34,7 +34,7 @@ module Email
 
       notification ||= Notification.create(user_id: user.id, kind: :newsletter, notifiable: mail_snippet)
 
-      Notification.track_email_delivery(notification, destroy_for_banned_domain: true) do
+      Notification.track_email_delivery(notification) do
         CustomerMailer.newsletter(user:, mail_snippet:).deliver_now
       end
     end
