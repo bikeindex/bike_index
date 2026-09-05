@@ -8,8 +8,6 @@ module Email
       user = User.find_by(id: user_id)
       return if user.blank?
 
-      # Don't send an email if the email is blocked
-      return if EmailBan.ban?(user)
       # Clean up situations where there are two users created
       return user.really_destroy! if duplicate_user?(user)
 
@@ -19,7 +17,7 @@ module Email
 
       notification = notifications.last || Notification.create(user_id: user.id, kind: "confirmation_email")
 
-      notification.track_email_delivery do
+      notification.track_email_delivery(is_new_email_address: true) do
         CustomerMailer.confirmation_email(user).deliver_now
       end
     end

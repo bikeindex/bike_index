@@ -35,7 +35,8 @@ RSpec.describe Email::ConfirmationJob, type: :job do
         ActionMailer::Base.deliveries = []
         expect do
           Email::ConfirmationJob.new.perform(user.id)
-        end.to change(Notification, :count).by 0
+        end.to change(Notification, :count).by 1
+        expect(Notification.last.delivery_status).to eq "delivery_banned"
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
         expect(User.unscoped.count).to eq 2
         expect(EmailBan.count).to eq 1
@@ -53,7 +54,8 @@ RSpec.describe Email::ConfirmationJob, type: :job do
         ActionMailer::Base.deliveries = []
         expect do
           Email::ConfirmationJob.new.perform(user.id)
-        end.to change(Notification, :count).by 0
+        end.to change(Notification, :count).by 1
+        expect(Notification.last.delivery_status).to eq "delivery_banned"
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
         expect(User.unscoped.count).to eq 1
         expect(EmailBan.count).to eq 0 # It deletes the user
@@ -73,7 +75,8 @@ RSpec.describe Email::ConfirmationJob, type: :job do
         VCR.use_cassette("Email::ConfirmationJob-g.mail") do
           Email::ConfirmationJob.new.perform(user.id)
         end
-      end.to change(Notification, :count).by 0
+      end.to change(Notification, :count).by 1
+      expect(Notification.last.delivery_status).to eq "delivery_banned"
       expect(ActionMailer::Base.deliveries.empty?).to be_truthy
       expect(User.unscoped.count).to eq 2
       expect(EmailBan.count).to eq 1
@@ -104,7 +107,8 @@ RSpec.describe Email::ConfirmationJob, type: :job do
             VCR.use_cassette("Email::ConfirmationJob-g.mail") do
               Email::ConfirmationJob.new.perform(user.id)
             end
-          end.to change(Notification, :count).by 0
+          end.to change(Notification, :count).by 1
+          expect(Notification.last.delivery_status).to eq "delivery_banned"
           expect(ActionMailer::Base.deliveries.empty?).to be_truthy
           expect(User.unscoped.count).to eq 4
           expect(EmailDomain.count).to eq 1
@@ -132,7 +136,8 @@ RSpec.describe Email::ConfirmationJob, type: :job do
         VCR.use_cassette("Email::ConfirmationJob-g.mail") do
           Email::ConfirmationJob.new.perform(user.id)
         end
-      end.to change(Notification, :count).by 0
+      end.to change(Notification, :count).by 1
+      expect(Notification.last.delivery_status).to eq "delivery_banned"
       expect(ActionMailer::Base.deliveries.empty?).to be_truthy
       expect(User.unscoped.count).to eq 2
       expect(EmailBan.count).to eq 1
@@ -197,7 +202,8 @@ RSpec.describe Email::ConfirmationJob, type: :job do
             VCR.use_cassette("Email::ConfirmationJob-g.mail") do
               Email::ConfirmationJob.new.perform(user.id)
             end
-          end.to change(Notification, :count).by 0
+          end.to change(Notification, :count).by 1
+          expect(Notification.last.delivery_status).to eq "delivery_banned"
           expect(ActionMailer::Base.deliveries.empty?).to be_truthy
           expect(User.unscoped.count).to eq 5
           expect(EmailBan.count).to eq 1

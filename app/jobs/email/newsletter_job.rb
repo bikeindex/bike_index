@@ -22,8 +22,7 @@ module Email
       return if user.blank? || mail_snippet.blank?
 
       unless force_send
-        # Don't send an email if the email is blocked
-        return if EmailBan.ban?(user) || !user.notification_newsletters
+        return unless user.notification_newsletters
 
         notifications = user.notifications.newsletter.where(notifiable_id: mail_snippet_id)
 

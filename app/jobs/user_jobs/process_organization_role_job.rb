@@ -17,7 +17,9 @@ module UserJobs
         notification.track_email_delivery do
           OrganizedMailer.organization_invitation(organization_role).deliver_now
         end
-        organization_role.update(email_invitation_sent_at: Time.current, skip_processing: true)
+        if notification.delivery_success?
+          organization_role.update(email_invitation_sent_at: Time.current, skip_processing: true)
+        end
       end
 
       # Bust cache keys on user and organization
