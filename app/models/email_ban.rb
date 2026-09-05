@@ -35,10 +35,12 @@ class EmailBan < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  # A ban on an additional address leaves the account's own address deliverable
+  # A ban on an additional address leaves the account's own address deliverable.
+  # Correlating the address check against the outer users scan costs 2x over the
+  # whole table, so it resolves the primary addresses on their own instead
   scope :banning_account_email, lambda {
-    left_joins(:user_email).joins(:user)
-      .where("email_bans.user_email_id IS NULL OR user_emails.email = users.email")
+    where(user_email_id: nil)
+      .or(where(user_email_id: UserEmail.joins(:user).where("user_emails.email = users.email").select(:id)))
   }
 
   class << self
