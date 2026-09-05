@@ -69,9 +69,7 @@
         </ul>
       <% end %>
 
-      <% if other_errors.present? %>
-        <%= helpers.pretty_print_json(other_errors) %>
-      <% end %>
+      <%= render UI::JsonDisplay::Component.new(data: other_errors) %>
 
       <% if @display_dev_info %>
         <code class="small d-block only-dev-visible p-1">

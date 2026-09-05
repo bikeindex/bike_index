@@ -19,7 +19,7 @@ module Pages
           private
 
           def wrapper_classes
-            ["tw:mt-6 tw:flex tw:flex-row tw:flex-wrap tw:items-baseline tw:gap-x-4 tw:gap-y-2",
+            ["tw:flex tw:flex-row tw:flex-wrap tw:items-baseline tw:gap-x-4 tw:gap-y-2",
               (BORDER_CLASSES if @border)].compact.join(" ")
           end
         end

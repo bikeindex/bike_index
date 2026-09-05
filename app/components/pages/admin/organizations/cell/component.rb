@@ -24,9 +24,13 @@ module Pages
             @organization_id.present?
           end
 
+          # Memoized with defined?, since the template reads it five times and a soft-deleted
+          # organization isn't in the caller's preload
           def organization_subject
-            return @organization if @organization.present?
-            Organization.unscoped.find_by(id: @organization_id) if @organization_id.present?
+            return @organization_subject if defined?(@organization_subject)
+
+            @organization_subject = @organization.presence ||
+              (Organization.unscoped.find_by(id: @organization_id) if @organization_id.present?)
           end
 
           def error_text_class
