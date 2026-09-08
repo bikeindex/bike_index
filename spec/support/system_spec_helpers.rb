@@ -229,8 +229,7 @@ module SystemSpecHelpers
   # The donation modal greets a signed-in user on my_accounts#show, over the page and
   # intercepting every click until it's dismissed -- which sets the localStorage flag
   # that keeps it closed for the rest of the session. Callers are on my_accounts#show
-  # with it up, so a miss is the failure rather than a no-op -- who doesn't get it is
-  # register_organized_spec's
+  # with it up, so a miss is a failure rather than a no-op
   def dismiss_donation_modal
     expect(page).to have_css("#donationModal.in", wait: 5)
 

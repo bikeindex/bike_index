@@ -84,15 +84,11 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
           claimed: true, organization_id: organization.id)
 
         # A full load rather than a click through the account menu: the modal is only
-        # ever raised by the first init of a JS context, so arriving over Turbo would
-        # leave it down whether the gate held or not
+        # ever raised by a JS context's first init, so a Turbo arrival would leave it
+        # down whether the gate held or not
         visit "/my_account"
 
-        # Their registration, so the page has rendered -- have_no_css alone would pass
-        # on one that hasn't
         expect(page).to have_content("Surly")
-        # Absent from the DOM rather than merely hidden, which the dismissal above
-        # would explain just as well
         expect(page).to have_no_css("#donationModal", visible: :all)
       end
     end

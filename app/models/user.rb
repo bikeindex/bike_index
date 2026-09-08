@@ -114,6 +114,7 @@ class User < ApplicationRecord
   has_many :ambassador_tasks, through: :ambassador_task_assignments
   has_many :organizations, through: :organization_roles
   has_many :owned_bikes, through: :ownerships, source: :bike
+  has_many :ownership_organizations, through: :ownerships, source: :organization
   has_many :updated_bike_stickers, -> { distinct }, through: :bike_sticker_updates, class_name: "BikeSticker", source: :bike_sticker
   has_many :uro_organizations, through: :user_registration_organizations, class_name: "Organization", source: :organization
   has_one :membership_active, -> { active }, class_name: "Membership"
@@ -382,7 +383,7 @@ class User < ApplicationRecord
 
   # Their registration was paid for, so don't ask them for a donation on top of it
   def paid_organization_registration?
-    Organization.paid_money.where(id: ownerships.select(:organization_id)).limit(1).any?
+    ownership_organizations.paid_money.exists?
   end
 
   def authorized?(obj, no_superuser_override: false)

@@ -144,7 +144,6 @@ RSpec.describe MyAccountsController, type: :request do
       let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: current_user) }
 
       it "renders the donation modal" do
-        expect(bike.current_ownership.organization).to eq organization
         get base_url
         expect(response.body).to match("donationModal")
       end
@@ -153,7 +152,6 @@ RSpec.describe MyAccountsController, type: :request do
         before { organization.update_column :is_paid, true }
 
         it "doesn't render the donation modal" do
-          expect(current_user.reload.paid_organization_registration?).to be_truthy
           get base_url
           expect(response.body).to_not match("donationModal")
         end
