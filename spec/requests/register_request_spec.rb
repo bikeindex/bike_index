@@ -607,6 +607,19 @@ RSpec.describe RegisterController, type: :request do
       JSON.parse(status_field("phone")["data-statuses"])
     end
 
+    def phone_input
+      status_field("phone").at_css("input[name='bike[phone]']")
+    end
+
+    def phone_texts
+      JSON.parse(status_field("phone")["data-texts"])
+    end
+
+    let(:report_texts) do
+      {"status_stolen" => "Phone is required to register a stolen bike",
+       "status_impounded" => "Phone is required to register a found bike"}
+    end
+
     def user_name_field
       Nokogiri::HTML(response.body).at_css("input[name='bike[user_name]']")
     end
@@ -671,18 +684,16 @@ RSpec.describe RegisterController, type: :request do
     it "requires the phone for a theft or a find, saying which" do
       get register_path(b_param_token: b_param.id_token, step: 2)
       phone_field = status_field("phone")
-      expect(phone_field.at_css("input[name='bike[phone]']")["required"]).to be_blank
+      expect(phone_input["required"]).to be_blank
       expect(phone_field.at_css("[data-optional-marker]")["hidden"]).to be_blank
       expect(phone_field.at_css("[data-required-marker]")["hidden"]).to be_present
       expect(phone_field.at_css("[data-required-helper]")["hidden"]).to be_present
-      expect(JSON.parse(phone_field["data-texts"]))
-        .to eq("status_stolen" => "Phone is required to register a stolen bike",
-          "status_impounded" => "Phone is required to register a found bike")
+      expect(phone_texts).to eq report_texts
 
       b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_stolen"}))
       get register_path(b_param_token: b_param.id_token, step: 2)
       phone_field = status_field("phone")
-      expect(phone_field.at_css("input[name='bike[phone]']")["required"]).to be_present
+      expect(phone_input["required"]).to be_present
       expect(phone_field.at_css("[data-optional-marker]")["hidden"]).to be_present
       expect(phone_field.at_css("[data-required-marker]")["hidden"]).to be_blank
       helper = phone_field.at_css("[data-required-helper]")
@@ -765,19 +776,6 @@ RSpec.describe RegisterController, type: :request do
       end
 
       context "reg_phone" do
-        def phone_input
-          status_field("phone").at_css("input[name='bike[phone]']")
-        end
-
-        def phone_texts
-          JSON.parse(status_field("phone")["data-texts"])
-        end
-
-        let(:report_texts) do
-          {"status_stolen" => "Phone is required to register a stolen bike",
-           "status_impounded" => "Phone is required to register a found bike"}
-        end
-
         it "only requires the phone when the organization requires it" do
           organization.update_column :enabled_feature_slugs, ["reg_phone"]
           get register_path(b_param_token: b_param.id_token, step: 2)
