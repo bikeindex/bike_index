@@ -144,7 +144,7 @@ Bundle only what's cohesive — one subject, assembled in one place. `IndexState
 
 This project uses the ViewComponent gem to render components.
 
-- Prefer view components to partials.
+- Prefer view components to partials — **unless the `component.rb` would hold no Ruby beyond `initialize` assigning its arguments to ivars, and fewer than 3 callers render it.** Then it's a partial: the class buys nothing, and the arguments are locals the template already has. A `UI::Table` conversion lands here often, since the cell blocks are `instance_exec`'d — a partial's locals survive that, so it needs none of the local-aliasing preamble a component template does. Reach for the component once there's logic to name, a `MARKUP_DIGEST`, or a third caller.
 - **If a view file only renders a single component, consider rendering it from the controller instead** (`render Foo::Component.new(...)`) and deleting the view file — the layout still wraps it.
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`.
 - View components must initialize with keyword arguments. Everything the component needs must be passed in explicitly by the caller — never reach into controller state from inside a component (e.g. `controller.instance_variable_get(:@bike)`). If the component needs `@bike`, the caller renders `Component.new(bike: @bike)`.

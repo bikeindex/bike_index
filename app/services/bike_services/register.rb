@@ -255,10 +255,13 @@ module BikeServices
     # file field, or as the signed id of a blob the browser already uploaded.
     # Returns whether the step passed - a registration for someone else needs their name.
     # A failed step still saves, it just isn't marked complete, so nothing entered is lost
-    def save_step_2(b_param, user:, image:, image_signed_id:, bike_params:, register_with_organization: nil)
+    def save_step_2(b_param, user:, image:, image_signed_id:, bike_params:, register_with_organization: nil, additional: nil)
       b_param.creator_id ||= user&.id
       b_param.image = image if image.present?
       bike_params = bike_params.to_h
+      # `additional` is a honeypot - merged rather than assigned, so a resubmission
+      # without it doesn't clear a flag already earned
+      bike_params = bike_params.merge("likely_spam" => true) if additional.present?
       completed = b_param.self_made?(user) || bike_params["user_name"].present?
       clear_stale_report(b_param, bike_params["status"])
       set_auto_organization(b_param, register_with_organization)
