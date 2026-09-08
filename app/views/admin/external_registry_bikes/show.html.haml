@@ -26,9 +26,7 @@
           = bike_status_span(@bike)
       %tr
         %td Date Stolen
-        %td.localizeTime
-          - if @bike.date_stolen.present?
-            = l @bike.date_stolen, format: :convert_time
+        %td= render UI::Time::Component.new(time: @bike.date_stolen)
       %tr
         %td Location
         %td= @bike.location_found

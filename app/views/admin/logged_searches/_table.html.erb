@@ -61,7 +61,7 @@
           </td>
 
           <td>
-            <%= render UI::JsonDisplay::Component.new(data: logged_search.query_items, small: true, max_width: 500) %>
+            <%= render UI::JsonDisplay::Component.new(data: logged_search.query_items, small: true, max_width: UI::JsonDisplay::Component::TABLE_CELL_MAX_WIDTH) %>
 
             <% if logged_search.log_line.present? %>
               <div data-controller="ui--collapse">
