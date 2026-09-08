@@ -77,12 +77,11 @@ class HotSheetConfiguration < ApplicationRecord
     time_in_zone > send_today_at
   end
 
-  # Resending only helps a batch that failed for a reason other than its addresses being dead
   def sent_today?
     sheets = hot_sheets.where(sheet_date: current_date)
     return false if sheets.none?
 
-    sheets.delivered.or(sheets.undeliverable).count == sheets.count
+    sheets.settled.count == sheets.count
   end
 
   def send_hour=(val)

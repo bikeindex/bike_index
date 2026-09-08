@@ -50,6 +50,10 @@ RSpec.describe HotSheet, type: :model do
         expect(hot_sheet.delivery_error).to eq "Postmark::InvalidEmailRequestError"
         # There is no way to tell which of the batch failed, so nobody is flagged
         expect(UserEmail.last_email_errored.count).to eq 0
+        expect(hot_sheet.settled?).to be_truthy
+        deliveries = 0
+        hot_sheet.track_email_delivery { deliveries += 1 }
+        expect(deliveries).to eq 0
       end
     end
 
@@ -77,6 +81,11 @@ RSpec.describe HotSheet, type: :model do
         expect(hot_sheet.delivery_error).to eq "Postmark::InactiveRecipientError"
         expect(hot_sheet.email_success?).to be_falsey
         expect(UserEmail.last_email_errored.pluck(:email)).to eq(inactive_emails)
+        # ... so the batch isn't worth sending again
+        expect(hot_sheet.settled?).to be_truthy
+        deliveries = 0
+        hot_sheet.track_email_delivery { deliveries += 1 }
+        expect(deliveries).to eq 0
       end
 
       context "with every recipient inactive" do

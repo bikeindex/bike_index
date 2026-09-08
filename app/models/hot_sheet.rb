@@ -21,6 +21,9 @@
 #
 class HotSheet < ApplicationRecord
   DELIVERY_STATUS_ENUM = Notification::DELIVERY_STATUS_ENUM
+  DELIVERED_STATUSES = %w[delivery_success delivery_partial_success].freeze
+  # Resending a batch every address on it rejected just fails the same way
+  UNDELIVERABLE_ERROR_NAMES = Notification::UNDELIVERABLE_ERRORS.map(&:name).freeze
 
   enum :delivery_status, DELIVERY_STATUS_ENUM
 
@@ -31,9 +34,9 @@ class HotSheet < ApplicationRecord
   validates_presence_of :organization_id, :sheet_date
 
   delegate :bounding_box, :timezone, to: :hot_sheet_configuration, allow_nil: true
-  scope :delivered, -> { where(delivery_status: %i[delivery_success delivery_partial_success]) }
-  # Resending a batch every address on it rejected just fails the same way
-  scope :undeliverable, -> { where(delivery_error: Notification::UNDELIVERABLE_ERRORS.map(&:name)) }
+  scope :delivered, -> { where(delivery_status: DELIVERED_STATUSES) }
+  scope :undeliverable, -> { where(delivery_error: UNDELIVERABLE_ERROR_NAMES) }
+  scope :settled, -> { delivered.or(undeliverable) }
 
   def self.for(organization_or_id, date = nil)
     org_id = organization_or_id.is_a?(Integer) ? organization_or_id : organization_or_id.id
@@ -52,10 +55,15 @@ class HotSheet < ApplicationRecord
     delivery_success?
   end
 
+  # A settled batch isn't worth sending again - it delivered, or its addresses are dead
+  def settled?
+    DELIVERED_STATUSES.include?(delivery_status) || UNDELIVERABLE_ERROR_NAMES.include?(delivery_error)
+  end
+
   # Takes a block. Unlike Notification's, returns the error rather than raising it -
   # the job delivers every batch before blowing up
   def track_email_delivery
-    return if delivery_success?
+    return if settled?
 
     delivery = yield
     self.message_id ||= delivery.try(:message_id)
@@ -122,24 +130,22 @@ class HotSheet < ApplicationRecord
 
   # A sheet emails a whole batch at once, so only the addresses Postmark rejected failed
   def record_delivery_failure(error)
-    failed_emails = inactive_recipient_emails(error)
-    # Postmark delivers to the rest of the batch, whether or not it names who it rejected
-    delivered_any = error.is_a?(Postmark::InactiveRecipientError) &&
-      (normalized_recipient_emails - failed_emails).any?
+    # Postmark delivers to the rest of the batch, whether or not it names who it rejected;
+    # any other error leaves no way to tell who received the email
+    inactive_recipient_error = error.is_a?(Postmark::InactiveRecipientError)
+    failed_emails = inactive_recipient_error ? normalized_emails(error.recipients) : []
+    delivered_any = inactive_recipient_error && (normalized_recipient_emails - failed_emails).any?
     update(delivery_status: delivered_any ? "delivery_partial_success" : "delivery_failure",
       delivery_error: error.class)
     UserEmail.where(email: failed_emails).each { it.update_last_email_errored!(email_errored: true) }
   end
 
   def normalized_recipient_emails
-    recipient_emails.map { EmailNormalizer.normalize(it) }
+    normalized_emails(recipient_emails)
   end
 
-  # Any other error leaves no way to tell who received the email
-  def inactive_recipient_emails(error)
-    return [] unless error.is_a?(Postmark::InactiveRecipientError)
-
-    error.recipients.map { EmailNormalizer.normalize(it) }
+  def normalized_emails(emails)
+    emails.map { EmailNormalizer.normalize(it) }
   end
 
   def undeliverable_error?(error)

@@ -106,11 +106,13 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
         end
 
         context "re-run after the day's batches failed" do
-          it "reuses the day's sheets, rather than stacking up duplicates" do
+          let(:fail_batch) { {delivery_status: "delivery_failure", delivery_error: "Postmark::TimeoutError"} }
+          it "reuses the day's sheets, re-sending only the batches that haven't delivered" do
             expect {
               ProcessHotSheetJob.drain
             }.to change(HotSheet, :count).by 3
-            HotSheet.all.each { it.update(delivery_status: "delivery_failure", delivery_error: "Postmark::TimeoutError") }
+            hot_sheets = HotSheet.order(:id).to_a
+            hot_sheets.each { it.update(fail_batch) }
             ActionMailer::Base.deliveries = []
 
             expect {
@@ -118,19 +120,10 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
             }.to_not change(HotSheet, :count)
             expect(ActionMailer::Base.deliveries.count).to eq 3
             expect(HotSheet.delivered.count).to eq 3
-          end
 
-          it "only re-sends the batches that failed, to the recipients they held" do
-            expect {
-              ProcessHotSheetJob.drain
-            }.to change(HotSheet, :count).by 3
-            hot_sheets = HotSheet.order(:id).to_a
-            hot_sheets.last(2).each { it.update(delivery_status: "delivery_failure", delivery_error: "Postmark::TimeoutError") }
+            hot_sheets.last(2).each { it.reload.update(fail_batch) }
             ActionMailer::Base.deliveries = []
-
-            expect {
-              described_class.new.perform(organization1.id)
-            }.to_not change(HotSheet, :count)
+            described_class.new.perform(organization1.id)
             expect(ActionMailer::Base.deliveries.count).to eq 2
             expect(HotSheet.delivered.count).to eq 3
             # Each sheet still holds the recipients it was created with

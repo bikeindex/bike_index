@@ -26,7 +26,7 @@ class ProcessHotSheetJob < ScheduledJob
     sheet_date = Time.current.to_date
     day_sheets = HotSheet.where(organization_id: org_id, sheet_date:).order(:id).to_a
     day_sheets = [HotSheet.create!(organization_id: org_id, sheet_date:)] if day_sheets.none?
-    return day_sheets if day_sheets.all?(&:email_success?)
+    return day_sheets if day_sheets.all?(&:settled?)
 
     hot_sheet = day_sheets.first
 
