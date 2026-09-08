@@ -165,34 +165,17 @@ RSpec.describe MyAccountsController, type: :request do
     end
   end
 
-  # default_bike_search_path resolves off passive_organization, so a member's Search link
-  # follows them to their own registrations away from the organization's own pages
+  # The organized nav already links an organization's own registrations, so the footer
+  # is a member's only way to the whole registry
   describe "the footer's Search link" do
-    def footer_search_href
-      Nokogiri::HTML(response.body).css("footer.primary-footer a")
+    include_context :request_spec_logged_in_as_organization_user
+
+    it "points at every registration" do
+      get base_url
+      expect(assigns[:passive_organization]).to eq current_organization
+      footer_search_href = Nokogiri::HTML(response.body).css("footer.primary-footer a")
         .find { |link| link.text.strip == "Search" }&.attr("href")
-    end
-
-    context "with an organization" do
-      include_context :request_spec_logged_in_as_organization_user
-
-      it "points at the organization's registrations" do
-        get base_url
-        expect(assigns[:passive_organization]).to eq current_organization
-        expect(footer_search_href)
-          .to eq organization_registrations_path(organization_id: current_organization.to_param)
-      end
-    end
-
-    context "without an organization" do
-      include_context :request_spec_logged_in_as_user
-      let(:current_user) { FactoryBot.create(:user_confirmed) }
-
-      it "points at every registration" do
-        get base_url
-        expect(assigns[:passive_organization]).to be_nil
-        expect(footer_search_href).to eq search_registrations_path(stolenness: "all")
-      end
+      expect(footer_search_href).to eq search_registrations_path(stolenness: "all")
     end
   end
 
