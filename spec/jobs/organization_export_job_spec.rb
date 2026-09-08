@@ -234,14 +234,13 @@ RSpec.describe OrganizationExportJob, type: :job do
       end
     end
 
-    # creation_description flattens embed_partial to "landing page" - the label the newer
-    # register_flow_landing_page carries - so the two are only distinguishable by the kind
-    context "registration_method for a kind creation_description flattens" do
+    context "registration_method" do
       let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: {headers: %w[registration_method]}) }
       let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, creation_state_origin: "embed_partial") }
 
+      # The column is the component's copy, not the raw kind
       it "exports the kind's label" do
-        expect(bike.reload.creation_description).to eq "landing page"
+        expect(bike.reload.creation_kind).to eq :embed_partial
         instance.perform(export.id)
         expect(export.reload.file.read.split("\n").last).to eq instance.comma_wrapped_string(["old landing page"]).chomp
       end

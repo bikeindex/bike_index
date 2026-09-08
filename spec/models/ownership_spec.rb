@@ -509,71 +509,13 @@ RSpec.describe Ownership, type: :model do
     end
   end
 
-  describe "creation_description" do
-    let(:ownership) { Ownership.new(organization_id: 1, creator_id: 1) }
-    it "returns nil" do
-      expect(ownership.creation_description).to be_nil
-    end
-    context "bulk" do
-      let(:ownership) { Ownership.new(bulk_import_id: 12, origin: "api_v2") }
-      it "returns bulk reg" do
-        expect(ownership.creation_description).to eq "bulk import"
-        expect(ownership.pos?).to be_falsey
-      end
-    end
-    context "pos" do
-      let(:ownership) { Ownership.new(pos_kind: "lightspeed_pos", origin: "embed_extended") }
-      before { ownership.set_calculated_attributes }
-      it "returns pos reg" do
-        expect(ownership.creation_description).to eq "Lightspeed"
-      end
-      context "ascend" do
-        let(:bulk_import) { BulkImport.new(kind: "ascend") }
-        let(:ownership) { Ownership.new(pos_kind: "ascend_pos", bulk_import: bulk_import) }
-        it "returns pos reg" do
-          expect(ownership.creation_description).to eq "Ascend"
-        end
-      end
-    end
-    context "web" do
-      let(:ownership) { Ownership.new(origin: "web") }
-      it "returns web" do
-        expect(ownership.creation_description).to eq "web"
-      end
-    end
-    context "embed_extended" do
-      let(:ownership) { Ownership.new(origin: "embed_extended") }
-      it "returns org internal" do
-        expect(ownership.creation_description).to eq "org reg"
-      end
-    end
-    context "organization_form" do
-      let(:ownership) { Ownership.new(origin: "organization_form") }
-      it "returns org internal" do
-        expect(ownership.creation_description).to eq "org reg"
-      end
-    end
-    context "embed_partial" do
-      let(:ownership) { Ownership.new(origin: "embed_partial") }
-      it "returns landing page" do
-        expect(ownership.creation_description).to eq "landing page"
-      end
-    end
-    context "creator_unregistered_parking_notification" do
-      let(:ownership) { Ownership.new(origin: "creator_unregistered_parking_notification") }
-      it "returns parking notification" do
-        expect(ownership.creation_description).to eq "parking notification"
-      end
-    end
-  end
-
   describe "creation_kind" do
     let(:ownership) { Ownership.new(organization_id: 1, creator_id: 1) }
     it "returns nil" do
       expect(ownership.creation_kind).to be_nil
     end
-    # creation_description humanizes both of the first two to "landing page"
-    it "distinguishes the origins creation_description flattens" do
+    # These three are separate registration flows that used to share a humanized string
+    it "distinguishes the landing page and org form origins" do
       expect(Ownership.new(origin: "embed_partial").creation_kind).to eq :embed_partial
       expect(Ownership.new(origin: "register_flow_landing_page").creation_kind).to eq :register_flow_landing_page
       expect(Ownership.new(origin: "organization_form").creation_kind).to eq :organization_form

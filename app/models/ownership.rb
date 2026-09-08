@@ -195,27 +195,12 @@ class Ownership < ApplicationRecord
     organization.present? && organization.direct_unclaimed_notifications?
   end
 
-  # creation_description humanizes distinct kinds down to a shared string, so anything
-  # that tells them apart has to key off this instead
+  # Atoms::Org::OriginDisplay owns the copy for these - see Ownership.creation_kinds
   def creation_kind
     return pos_kind.to_sym if pos?
     return :bulk_import if bulk?
 
     origin&.to_sym
-  end
-
-  def creation_description
-    if pos?
-      pos_kind.to_s.gsub("_pos", "").humanize
-    elsif bulk?
-      "bulk import"
-    elsif origin.present?
-      return "org reg" if %w[embed_extended organization_form].include?(origin)
-      return "landing page" if origin == "embed_partial"
-      return "parking notification" if origin == "creator_unregistered_parking_notification"
-
-      self.class.origin_humanized(origin)
-    end
   end
 
   def owner

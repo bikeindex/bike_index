@@ -45,8 +45,8 @@ RSpec.describe Atoms::Org::OriginDisplay::Component, type: :component do
     end
   end
 
-  # embed_partial and register_flow_landing_page are both landing page registrations, and
-  # creation_description flattens the first to the same string as the second's label
+  # embed_partial and register_flow_landing_page are both landing page registrations, so
+  # only the tooltip separates "old landing page" from "landing page"
   context "with a landing page origin" do
     let(:ownership) { Ownership.new(origin: "embed_partial") }
 
