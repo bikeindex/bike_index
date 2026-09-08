@@ -765,12 +765,12 @@ en:
           bulk_import_worker: bulk import worker
           creator_unregistered_parking_notification: unregistered parking notification
           embed: embed
-          embed_extended: org reg
+          embed_extended: org embed
           embed_partial: old landing page
           impound_import: impound import
           impound_process: impound process
           lightspeed_pos: lightspeed
-          organization_form: org reg
+          organization_form: org form
           other_pos: point of sale
           register_flow: new flow
           register_flow_landing_page: landing page
@@ -795,14 +795,16 @@ en:
           creator_unregistered_parking_notification: registered via the Unregistered
             Parking Notification flow
           embed: registered on an organization's embedded registration form
-          embed_extended: registered by internal, organization member form
+          embed_extended: registered on the organization embed form, in its organization-member
+            version
           embed_partial: registration began with incomplete registration, via organization
             landing page
           impound_import: registered by impound spreadsheet import
           impound_process: transferred as part of the impound process
           lightspeed_pos: automatically registered by bike shop point of sale (Lightspeed
             POS)
-          organization_form: registered by internal, organization member form
+          organization_form: registered by an organization member, on the organization
+            form on Bike Index
           other_pos: automatically registered by bike shop point of sale
           register_flow: registered with the multi-step registration flow
           register_flow_landing_page: >-

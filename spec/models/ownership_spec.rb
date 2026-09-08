@@ -565,6 +565,15 @@ RSpec.describe Ownership, type: :model do
       expect(copy[:creation_kind].keys).to match_array(Ownership.creation_kinds)
       expect(copy[:creation_kind_description].keys).to match_array(Ownership.creation_kinds)
     end
+
+    # Two kinds sharing a label are indistinguishable in the CSV export, which has no
+    # tooltip to separate them
+    it "has a distinct label for every kind" do
+      duplicated = Ownership.creation_kinds.map { Ownership.creation_kind_humanized(it) }
+        .tally.select { |_label, count| count > 1 }
+
+      expect(duplicated).to eq({})
+    end
   end
 
   describe "creation_kind_humanized" do
