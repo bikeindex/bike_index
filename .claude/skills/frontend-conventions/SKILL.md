@@ -113,12 +113,6 @@ Any time you show, hide, or toggle an element in response to interaction, go thr
 
 The collapsible element starts hidden with the **`tw:hidden` class** (not the `hidden` attribute) — `collapse` toggles `tw:hidden`/`tw:hidden!` and runs the height/scale transition for you. Use **`tw:hidden!`** when the element also carries a display utility that sorts after `hidden` — any `inline-*`, which every `UI::Button` has — and on an admin page whenever the element carries a legacy class that sets `display` (`.row` and `.card` are the ones that come up), for the unlayered reason above. A plain `tw:hidden` renders that panel open, and no component spec can see it: the class is in the attribute, it just loses the cascade. Because the initial hidden state is a class, component specs assert it by class (`have_css("[…].tw\\:hidden")`), not Capybara visibility — the rack_test driver doesn't evaluate CSS, so it can't tell a class-hidden element is hidden.
 
-## Dismiss-on-outside listens on `pointerdown`
-
-**A popover that closes when you interact outside it registers `pointerdown` on `document`, never `click`** — a drag that starts inside and ends outside fires a click whose target is a common ancestor, so `this.element.contains(event.target)` reads it as outside and the popover closes mid-selection. `ui/tooltip_controller.js`'s `pointerdownOutside` is the pattern; `ui/dropdown_controller.js` and the navbar's `click@window->shared-blocks--navbar#closeDropdownsOutside` still listen on `click`.
-
-**Escape leaves focus where it was**, so a trigger dismissed with it fires no second `focusin` — bind `click` alongside `focusin` for anything that reopens on focus. That binding is also what makes click-to-open work in Safari and Firefox, which don't focus a `<button>` when it's clicked.
-
 ## No dead hooks in markup
 
 Only add an `id` or non-utility `class` when something concrete consumes it — a CSS rule, a JS/Stimulus selector, a test fixture, an accessibility attribute. Don't keep or invent "structural identifier" hooks "in case something needs them later," and don't replace a removed hook with a renamed one out of inertia.
