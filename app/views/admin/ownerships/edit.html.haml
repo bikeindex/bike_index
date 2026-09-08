@@ -82,4 +82,4 @@
   .row.mt-5
     .col-md-6
       %h5.only-dev-visible Registration info
-      = pretty_print_json(@ownership.registration_info, true)
+      = render UI::JsonDisplay::Component.new(data: @ownership.registration_info, skip_blank: true)

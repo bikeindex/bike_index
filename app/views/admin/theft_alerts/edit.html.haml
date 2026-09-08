@@ -233,4 +233,4 @@
 - if display_dev_info?
   .mt-5.mb-1.only-dev-visible
     %h2 Raw facebook data
-  = pretty_print_json(@theft_alert.facebook_data)
+  = render UI::JsonDisplay::Component.new(data: @theft_alert.facebook_data)
