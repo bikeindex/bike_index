@@ -228,11 +228,11 @@ module SystemSpecHelpers
 
   # The donation modal greets a signed-in user on my_accounts#show, over the page and
   # intercepting every click until it's dismissed -- which sets the localStorage flag
-  # that keeps it closed for the rest of the session. A page that doesn't render it, or
-  # one reached after that flag is set, is a no-op rather than a failure.
+  # that keeps it closed for the rest of the session. Callers are on my_accounts#show
+  # with it up, so a miss is the failure rather than a no-op -- who doesn't get it is
+  # register_organized_spec's
   def dismiss_donation_modal
-    return unless page.has_css?("#donationModal", visible: :all, wait: 0)
-    return unless page.has_css?("#donationModal.in", wait: 5)
+    expect(page).to have_css("#donationModal.in", wait: 5)
 
     click_button "No donation"
     # The backdrop outlives the modal's fade, and intercepts clicks while it does
