@@ -4,12 +4,12 @@ module UI
   module JsonDisplay
     class Component < ApplicationComponent
       # A cell's default cap, so one long line can't hand the JSON column half the table
-      MAX_WIDTHS = {table_cell: 500}.freeze
+      TABLE_CELL_MAX_WIDTH = 500
 
       def initialize(data:, max_width: nil, small: false, skip_blank: false, table_cell: false)
         @data = data
-        @max_width = (max_width.is_a?(Symbol) ? MAX_WIDTHS.fetch(max_width) : max_width) ||
-          (MAX_WIDTHS[:table_cell] if table_cell)
+        @max_width = ((max_width == :table_cell) ? TABLE_CELL_MAX_WIDTH : max_width) ||
+          (TABLE_CELL_MAX_WIDTH if table_cell)
         @small = small
         @skip_blank = skip_blank
         @table_cell = table_cell

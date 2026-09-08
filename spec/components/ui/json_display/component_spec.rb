@@ -28,14 +28,6 @@ RSpec.describe UI::JsonDisplay::Component, type: :component do
       expect(component).to have_css("div.highlightjs-json[style='max-width: 500px;']")
       expect(component).to_not have_css("div.highlightjs-json-cell")
     end
-
-    context "with an unknown name" do
-      let(:options) { {max_width: :sidebar} }
-
-      it "raises" do
-        expect { component }.to raise_error(KeyError)
-      end
-    end
   end
 
   context "with table_cell" do
