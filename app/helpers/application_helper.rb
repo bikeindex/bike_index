@@ -1,5 +1,4 @@
 module ApplicationHelper
-  include Binxtils::NavHelper
   include Binxtils::SortableHelper
 
   def body_tag(html_class: nil, **html_options, &block)

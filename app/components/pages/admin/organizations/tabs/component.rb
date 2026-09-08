@@ -65,7 +65,7 @@ module Pages
 
           def new_invoice_link
             path = new_admin_organization_invoice_path(organization_id: @organization)
-            return if helpers.current_page_active?(path)
+            return if helpers.current_page?(path)
 
             render(UI::ButtonLink::Component.new(text: "New Invoice", href: path, color: :primary, size: :sm))
           end
