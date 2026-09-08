@@ -6,13 +6,15 @@ module UI
       # A cell's default cap, so one long line can't hand the JSON column half the table
       TABLE_CELL_MAX_WIDTH = 500
 
-      def initialize(data:, max_width: nil, small: false, skip_blank: false, table_cell: false)
+      def initialize(data:, max_width: nil, small: false, skip_blank: false)
         @data = data
-        @max_width = ((max_width == :table_cell) ? TABLE_CELL_MAX_WIDTH : max_width) ||
-          (TABLE_CELL_MAX_WIDTH if table_cell)
+        @table_cell = max_width == :table_cell
+        @max_width = @table_cell ? TABLE_CELL_MAX_WIDTH : max_width
+        unless @max_width.nil? || @max_width.is_a?(Integer)
+          raise ArgumentError, "max_width must be an integer (for pixels) or :table_cell (to be the max width of a table cell)"
+        end
         @small = small
         @skip_blank = skip_blank
-        @table_cell = table_cell
       end
 
       def call

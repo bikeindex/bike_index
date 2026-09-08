@@ -21,7 +21,7 @@
   <% end %>
 
   <% table.column(label: "Registration info", header_classes: "tw:font-normal") do |user_registration_organization| %>
-    <%= render UI::JsonDisplay::Component.new(data: user_registration_organization.registration_info, small: true, table_cell: true) %>
+    <%= render UI::JsonDisplay::Component.new(data: user_registration_organization.registration_info, small: true, max_width: :table_cell) %>
   <% end %>
 
   <% table.column(label: "All bikes", classes: "tw:text-center") do |user_registration_organization| %>
