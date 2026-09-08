@@ -136,12 +136,6 @@ class Ownership < ApplicationRecord
       I18n.t(creation_kind, scope: %i[activerecord enums ownership creation_kind_description])
     end
 
-    def origin_humanized(str)
-      return nil unless str.present?
-
-      str.titleize.downcase
-    end
-
     def current_at(time)
       where("created_at < ?", time).order(created_at: :desc).first
     end
@@ -207,7 +201,6 @@ class Ownership < ApplicationRecord
     organization.present? && organization.direct_unclaimed_notifications?
   end
 
-  # Atoms::Org::OriginDisplay owns the copy for these
   def creation_kind
     return pos_kind.to_sym if pos?
     return :bulk_import if bulk?
