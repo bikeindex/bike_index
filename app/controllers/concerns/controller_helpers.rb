@@ -12,7 +12,7 @@ module ControllerHelpers
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
       :current_organization, :passive_organization, :current_location,
-      :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert,
+      :page_id, :default_bike_search_path, :every_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
       :render_donation_request?, :old_register_view?, :sort_state, :admin_index_state
     before_action :enable_rack_profiler

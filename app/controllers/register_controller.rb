@@ -95,7 +95,8 @@ class RegisterController < ApplicationController
     # Both read straight from params - update_params is stored as json, which an upload can't be
     saved = BikeServices::Register.save_step_2(@b_param, user: current_user,
       image: params.dig(:bike, :image), image_signed_id: params.dig(:bike, :image_signed_id),
-      bike_params: update_params, register_with_organization: params[:register_with_organization])
+      bike_params: update_params, register_with_organization: params[:register_with_organization],
+      additional: params[:additional])
     # Saved either way, so the re-render has everything they entered
     unless saved
       return render(Pages::Register::Step2::Component.new(b_param: @b_param, steps: flow_steps, current_user:),
