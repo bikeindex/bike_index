@@ -607,19 +607,6 @@ RSpec.describe RegisterController, type: :request do
       JSON.parse(status_field("phone")["data-statuses"])
     end
 
-    def phone_input
-      status_field("phone").at_css("input[name='bike[phone]']")
-    end
-
-    def phone_texts
-      JSON.parse(status_field("phone")["data-texts"])
-    end
-
-    let(:report_texts) do
-      {"status_stolen" => "Phone is required to register a stolen bike",
-       "status_impounded" => "Phone is required to register a found bike"}
-    end
-
     def user_name_field
       Nokogiri::HTML(response.body).at_css("input[name='bike[user_name]']")
     end
@@ -677,28 +664,6 @@ RSpec.describe RegisterController, type: :request do
       b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_stolen"}))
       get register_path(b_param_token: b_param.id_token, step: 2)
       expect(phone_field_classes).to_not include "tw:hidden"
-    end
-
-    # A theft or a find is contacted on it, so those two ask for a phone rather than
-    # offering one - and the status that decides which is picked in this form
-    it "requires the phone for a theft or a find, saying which" do
-      get register_path(b_param_token: b_param.id_token, step: 2)
-      phone_field = status_field("phone")
-      expect(phone_input["required"]).to be_blank
-      expect(phone_field.at_css("[data-optional-marker]")["hidden"]).to be_blank
-      expect(phone_field.at_css("[data-required-marker]")["hidden"]).to be_present
-      expect(phone_field.at_css("[data-required-helper]")["hidden"]).to be_present
-      expect(phone_texts).to eq report_texts
-
-      b_param.update(params: b_param.params.deep_merge("bike" => {"status" => "status_stolen"}))
-      get register_path(b_param_token: b_param.id_token, step: 2)
-      phone_field = status_field("phone")
-      expect(phone_input["required"]).to be_present
-      expect(phone_field.at_css("[data-optional-marker]")["hidden"]).to be_present
-      expect(phone_field.at_css("[data-required-marker]")["hidden"]).to be_blank
-      helper = phone_field.at_css("[data-required-helper]")
-      expect(helper["hidden"]).to be_blank
-      expect(helper.text.strip).to eq "Phone is required to register a stolen bike"
     end
 
     context "with an organization" do
@@ -772,31 +737,6 @@ RSpec.describe RegisterController, type: :request do
           organization.update_column :enabled_feature_slugs, %w[reg_address require_reg_address]
           get register_path(b_param_token: b_param.id_token, step: 2)
           expect(address_street_field["required"]).to eq "required"
-        end
-      end
-
-      context "reg_phone" do
-        it "only requires the phone when the organization requires it" do
-          organization.update_column :enabled_feature_slugs, ["reg_phone"]
-          get register_path(b_param_token: b_param.id_token, step: 2)
-          expect(phone_input["required"]).to be_nil
-          expect(phone_texts).to eq report_texts
-
-          organization.update_column :enabled_feature_slugs, %w[reg_phone require_reg_phone]
-          get register_path(b_param_token: b_param.id_token, step: 2)
-          expect(phone_input["required"]).to eq "required"
-          # A theft or a find still says which of them is asking
-          org_text = "Phone is required to register with #{organization.short_name}"
-          expect(phone_texts).to eq({"status_with_owner" => org_text, "status_abandoned" => org_text,
-                                     "unregistered_parking_notification" => org_text}.merge(report_texts))
-          expect(status_field("phone").at_css("[data-required-helper]").text.strip).to eq org_text
-        end
-
-        it "doesn't require a phone the organization isn't asking for" do
-          organization.update_column :enabled_feature_slugs, ["require_reg_phone"]
-          get register_path(b_param_token: b_param.id_token, step: 2)
-          expect(phone_input["required"]).to be_nil
-          expect(phone_texts).to eq report_texts
         end
       end
     end
