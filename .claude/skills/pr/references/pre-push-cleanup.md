@@ -127,4 +127,4 @@ For each stale migration, in this order (rollback must happen while the old vers
 1. Roll it back: `bin/rails db:migrate:down:primary VERSION=<old-timestamp>` (`db:migrate:down:analytics` for `db/analytics_migrate` files) — the un-namespaced `db:migrate:down` refuses in this multi-database app.
 2. `git mv` the file to the same name with a fresh `date +%Y%m%d%H%M%S` timestamp — when re-dating several, keep their relative order with incrementing timestamps.
 3. `bin/rails db:migrate` to re-apply and regenerate the structure files — never hand-edit `db/structure.sql`.
-4. Commit the renames together with the regenerated structure files.
+4. Commit the renames together with the regenerated structure files — but check what `db:migrate` re-dumped. It rewrites `db/analytics_structure.sql` too, and a local-only extension enabled on that database (`pg_stat_statements`, from PgHero) lands in it as a `CREATE EXTENSION` the branch never asked for. A re-dated primary migration should leave only `db/structure.sql` and `db/primary_replica_structure.sql` changed; `git checkout` the analytics one.
