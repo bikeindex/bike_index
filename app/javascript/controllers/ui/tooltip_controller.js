@@ -6,8 +6,8 @@ import { claimFloatingZIndex, releaseFloatingZIndex } from 'utils/floating_z_ind
 //
 // State model: two independent flags, OR'd together.
 //   hoverActive       toggled by mouseenter/mouseleave
-//   persistentActive  toggled by focus / cleared by a click outside or focus moving
-//                     to another element in the page
+//   persistentActive  set by focus or a click / cleared by a click outside or
+//                     focus moving to another element in the page
 // The tooltip is visible whenever either flag is true.
 export default class extends Controller {
   static targets = ['trigger', 'tooltip']
@@ -18,6 +18,7 @@ export default class extends Controller {
   initialize () {
     this.hoverActive = false
     this.persistentActive = false
+    this.pressedInside = false
   }
 
   connect () {
@@ -39,7 +40,9 @@ export default class extends Controller {
     this.sync()
   }
 
-  showOnFocus () {
+  // Also bound to click: Escape leaves focus on the trigger, so a second click
+  // on it fires no focusin to reopen with
+  showPersistent () {
     this.persistentActive = true
     document.addEventListener('click', this.clickOutside)
     this.sync()
@@ -53,14 +56,25 @@ export default class extends Controller {
     this.sync()
   }
 
+  trackPress () {
+    this.pressedInside = true
+  }
+
+  // A drag that selects the tooltip's text usually ends outside it, and the
+  // click that follows targets a common ancestor rather than the tooltip
   clickOutside (event) {
-    if (this.element.contains(event.target)) return
+    const pressedInside = this.pressedInside
+    this.pressedInside = false
+    if (pressedInside || this.element.contains(event.target)) return
     this.persistentActive = false
     this.sync()
   }
 
   keydownEscape (event) {
     if (event.key !== 'Escape') return
+    // Focus can sit on a link inside the tooltip we're about to hide - move it
+    // back to the trigger, whose focusin the lines below then undo
+    if (this.element.contains(document.activeElement)) this.triggerTarget.focus()
     this.hoverActive = false
     this.persistentActive = false
     this.sync()

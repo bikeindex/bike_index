@@ -23,6 +23,17 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     JS
   end
 
+  # Selects an element's text with the real mouse, releasing outside it
+  def drag_select_past(id)
+    page.driver.with_playwright_page do |playwright_page|
+      box = playwright_page.query_selector("##{id}").bounding_box
+      playwright_page.mouse.move(box["x"] + 2, box["y"] + box["height"] / 2)
+      playwright_page.mouse.down
+      playwright_page.mouse.move(box["x"] + box["width"] + 120, box["y"] + box["height"] / 2, steps: 12)
+      playwright_page.mouse.up
+    end
+  end
+
   def tooltip_z_index(id)
     page.evaluate_script("document.getElementById(#{id.to_json}).style.zIndex")
   end
@@ -73,6 +84,16 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     page.send_keys(:escape)
     expect(tooltip).not_to be_visible
     find("body").hover
+
+    # Esc leaves focus on the trigger, so clicking it again has to reopen
+    trigger.click
+    page.send_keys(:escape)
+    expect(tooltip).not_to be_visible
+    trigger.click
+    find("body").hover
+    expect(tooltip).to be_visible
+    find("body").click
+    expect(tooltip).not_to be_visible
 
     # Hover-then-focus stays visible until BOTH clear
     trigger.hover
@@ -127,6 +148,9 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     tooltip.double_click
     expect(tooltip).to be_visible
     expect(selected_tooltip_id).to eq tooltip_ids.first
+    # A selection dragged past the tooltip's edge ends in a click outside it
+    drag_select_past(tooltip_ids.first)
+    expect(tooltip).to be_visible
     find("body").click
     expect(tooltip).not_to be_visible
 
@@ -138,6 +162,10 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     commit_trigger.send_keys(:tab)
     expect(commit_tooltip).to be_visible
     expect(page.evaluate_script("document.activeElement.tagName")).to eq "A"
+    # Esc from a link inside the tooltip returns focus to the trigger
+    page.send_keys(:escape)
+    expect(commit_tooltip).not_to be_visible
+    expect(page.evaluate_script("document.activeElement.getAttribute('aria-describedby')")).to eq commit_tooltip[:id]
     find("body").click
     expect(commit_tooltip).not_to be_visible
 
