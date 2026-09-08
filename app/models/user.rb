@@ -571,7 +571,7 @@ class User < ApplicationRecord
   end
 
   def email_banned?
-    EmailBan.ban?(self)
+    email_bans_active.banning_account_email.any?
   end
 
   def set_calculated_attributes
