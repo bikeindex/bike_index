@@ -54,7 +54,7 @@
           </td>
 
           <td>
-            <%= render UI::JsonDisplay::Component.new(data: version.object_changes, small: true, max_width: UI::JsonDisplay::Component::TABLE_CELL_MAX_WIDTH) %>
+            <%= render UI::JsonDisplay::Component.new(data: version.object_changes, small: true, max_width: :table_cell) %>
           </td>
         </tr>
       <% end %>
