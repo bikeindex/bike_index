@@ -9,10 +9,10 @@
 .row
   .col-md-6
     %h4 Cloudflare
-    = render UI::JsonDisplay::Component.new(data: @cloudflare_hash, max_width: 500)
+    = render UI::JsonDisplay::Component.new(data: @cloudflare_hash)
   .col-md-6
     %h4 Geocoder
-    = render UI::JsonDisplay::Component.new(data: @geocoder_hash, max_width: 500)
+    = render UI::JsonDisplay::Component.new(data: @geocoder_hash)
   .col-md-6
     %h4 Raw Headers
-    = render UI::JsonDisplay::Component.new(data: @headers, max_width: 500)
+    = render UI::JsonDisplay::Component.new(data: @headers)
