@@ -6,7 +6,7 @@ import { claimFloatingZIndex, releaseFloatingZIndex } from 'utils/floating_z_ind
 //
 // State model: two independent flags, OR'd together.
 //   hoverActive       toggled by mouseenter/mouseleave
-//   persistentActive  set by focus or a click / cleared by a click outside or
+//   persistentActive  set by focus or a click / cleared by a press outside or
 //                     focus moving to another element in the page
 // The tooltip is visible whenever either flag is true.
 export default class extends Controller {
@@ -18,11 +18,10 @@ export default class extends Controller {
   initialize () {
     this.hoverActive = false
     this.persistentActive = false
-    this.pressedInside = false
   }
 
   connect () {
-    this.clickOutside = this.clickOutside.bind(this)
+    this.pointerdownOutside = this.pointerdownOutside.bind(this)
     this.keydownEscape = this.keydownEscape.bind(this)
   }
 
@@ -40,11 +39,11 @@ export default class extends Controller {
     this.sync()
   }
 
-  // Also bound to click: Escape leaves focus on the trigger, so a second click
-  // on it fires no focusin to reopen with
+  // Bound to click as well as focusin: Escape leaves focus on the trigger, so
+  // no focusin fires to reopen with
   showPersistent () {
     this.persistentActive = true
-    document.addEventListener('click', this.clickOutside)
+    document.addEventListener('pointerdown', this.pointerdownOutside)
     this.sync()
   }
 
@@ -56,24 +55,18 @@ export default class extends Controller {
     this.sync()
   }
 
-  trackPress () {
-    this.pressedInside = true
-  }
-
-  // A drag that selects the tooltip's text usually ends outside it, and the
-  // click that follows targets a common ancestor rather than the tooltip
-  clickOutside (event) {
-    const pressedInside = this.pressedInside
-    this.pressedInside = false
-    if (pressedInside || this.element.contains(event.target)) return
+  // The press rather than the click: a selection dragged out of the tooltip
+  // ends in a click whose target is a common ancestor, and reads as outside
+  pointerdownOutside (event) {
+    if (this.element.contains(event.target)) return
     this.persistentActive = false
     this.sync()
   }
 
   keydownEscape (event) {
     if (event.key !== 'Escape') return
-    // Focus can sit on a link inside the tooltip we're about to hide - move it
-    // back to the trigger, whose focusin the lines below then undo
+    // Focus can sit on a link inside the tooltip being hidden - the focusin
+    // this fires is undone by the lines below
     if (this.element.contains(document.activeElement)) this.triggerTarget.focus()
     this.hoverActive = false
     this.persistentActive = false
@@ -102,7 +95,7 @@ export default class extends Controller {
     this.isOpen = false
     releaseFloatingZIndex(this.tooltipTarget)
     this.tooltipTarget.classList.add('tw:hidden')
-    document.removeEventListener('click', this.clickOutside)
+    document.removeEventListener('pointerdown', this.pointerdownOutside)
     document.removeEventListener('keydown', this.keydownEscape)
     if (this.cleanup) {
       this.cleanup()

@@ -5,7 +5,6 @@ module UI
     class Component < ApplicationComponent
       TRIGGER_ACTIONS = "mouseenter->ui--tooltip#showOnHover mouseleave->ui--tooltip#hideOnHover " \
         "focusin->ui--tooltip#showPersistent click->ui--tooltip#showPersistent " \
-        "pointerdown->ui--tooltip#trackPress " \
         "focusout->ui--tooltip#hideOnFocusout"
 
       TRIGGER_CLASS = "tw:inline-block tw:rounded tw:cursor-help " \
