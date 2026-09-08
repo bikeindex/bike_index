@@ -242,9 +242,9 @@ class UserAlert < ApplicationRecord
   end
 
   def create_notification?
-    return false if user.blank? || inactive? || notification.present? ||
+    return false if inactive? || notification.present? ||
       !self.class.notify_period.cover?(updated_at) ||
-      self.class.notification_kinds.exclude?(kind)
+      self.class.notification_kinds.exclude?(kind) || user.blank?
 
     # Check if the relevant object is updated since
     if theft_alert_without_photo? || stolen_bike_without_location?

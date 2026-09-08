@@ -224,8 +224,7 @@ RSpec.describe UserAlert, type: :model do
       context "user deleted" do
         it "is false" do
           user_alert.user.destroy
-          expect(user_alert.reload.user).to be_blank
-          expect(user_alert.create_notification?).to be_falsey
+          expect(user_alert.reload.create_notification?).to be_falsey
           expect(UserAlert.create_notification.pluck(:id)).to eq([])
         end
       end
