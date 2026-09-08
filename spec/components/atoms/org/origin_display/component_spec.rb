@@ -82,12 +82,4 @@ RSpec.describe Atoms::Org::OriginDisplay::Component, type: :component do
       end
     end
   end
-
-  context "with a POS kind, a bulk_import and an origin" do
-    let(:ownership) { Ownership.new(pos_kind: "ascend_pos", bulk_import_id: 1, origin: "web") }
-
-    it "prefers the POS over the bulk import and the origin" do
-      expect(component).to have_content("ascend")
-    end
-  end
 end

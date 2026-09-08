@@ -13,8 +13,8 @@ module Atoms
 
           private
 
-          # Blank passes through, but an unknown kind raises - component_spec asserts a
-          # label and a description for every kind the enums produce
+          # An unknown kind raises rather than falling back; component_spec keeps the
+          # sidecar complete against Ownership.creation_kinds
           def copy(group, creation_kind)
             return if creation_kind.blank?
 

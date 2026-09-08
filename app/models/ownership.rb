@@ -195,7 +195,7 @@ class Ownership < ApplicationRecord
     organization.present? && organization.direct_unclaimed_notifications?
   end
 
-  # Atoms::Org::OriginDisplay owns the copy for these - see Ownership.creation_kinds
+  # Atoms::Org::OriginDisplay owns the copy for these
   def creation_kind
     return pos_kind.to_sym if pos?
     return :bulk_import if bulk?

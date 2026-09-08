@@ -10,7 +10,7 @@ module Pages
         # registrations on the show page). Pass render_sortable to enable sort links.
         class Component < ApplicationComponent
           # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-          MARKUP_DIGEST = "5a484420dd2c"
+          MARKUP_DIGEST = "7af53042bd7b"
 
           delegate :additional_registration_fields, :column_renames, to: :settings_component
 
@@ -20,8 +20,7 @@ module Pages
             @bikes = bikes
             @current_user = current_user
             @render_sortable = render_sortable
-            # Locale, because the rows carry translated copy and org pages switch locale
-            @cache_key = cache_key || "org-#{organization.id}-#{MARKUP_DIGEST}-#{I18n.locale}"
+            @cache_key = cache_key || "org-#{organization.id}-#{MARKUP_DIGEST}"
             @sort_state = sort_state
             @bike_sticker = bike_sticker
             @settings_component = settings_component
