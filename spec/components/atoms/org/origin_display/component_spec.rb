@@ -14,28 +14,6 @@ RSpec.describe Atoms::Org::OriginDisplay::Component, type: :component do
     end
   end
 
-  context "every creation_kind" do
-    let(:copy) { I18n.t(described_class.component_translation_scope.join(".")) }
-
-    # Nothing else catches a kind with no copy: raise_on_missing_translations only fires
-    # for the kind that happens to render
-    it "has a label and a description, and no copy for a kind that can't happen" do
-      expect(copy[:labels].keys).to match_array(Ownership.creation_kinds)
-      expect(copy[:descriptions].keys).to match_array(Ownership.creation_kinds)
-    end
-  end
-
-  # render? guards the rendered path, so nothing else covers a blank kind reaching these
-  describe "creation_kind copy without an instance" do
-    it "reads a kind's label and description, and passes blank through" do
-      expect(described_class.creation_kind_humanized(:embed_partial)).to eq "old landing page"
-      expect(described_class.creation_kind_description(:embed_partial))
-        .to eq "registration began with incomplete registration, via organization landing page"
-      expect(described_class.creation_kind_humanized(nil)).to be_nil
-      expect(described_class.creation_kind_description(nil)).to be_nil
-    end
-  end
-
   context "with a sticker origin" do
     let(:ownership) { Ownership.new(origin: "sticker") }
 

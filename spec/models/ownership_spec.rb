@@ -556,6 +556,25 @@ RSpec.describe Ownership, type: :model do
 
       expect(Ownership.creation_kinds).to match_array(from_records)
     end
+
+    # Nothing else catches a kind with no copy: raise_on_missing_translations only fires
+    # for the kind that happens to render
+    it "has a label and a description, and no copy for a kind that can't happen" do
+      copy = I18n.t("activerecord.enums.ownership")
+
+      expect(copy[:creation_kind].keys).to match_array(Ownership.creation_kinds)
+      expect(copy[:creation_kind_description].keys).to match_array(Ownership.creation_kinds)
+    end
+  end
+
+  describe "creation_kind_humanized" do
+    it "reads a kind's label and description, and passes an unknown kind through" do
+      expect(Ownership.creation_kind_humanized(:embed_partial)).to eq "old landing page"
+      expect(Ownership.creation_kind_description(:embed_partial))
+        .to eq "registration began with incomplete registration, via organization landing page"
+      expect(Ownership.creation_kind_humanized(nil)).to be_nil
+      expect(Ownership.creation_kind_humanized(:no_pos)).to be_nil
+    end
   end
 
   describe "owner_name" do

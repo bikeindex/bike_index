@@ -25,11 +25,6 @@ class ApplicationComponent < ViewComponent::Base
       Digest::MD5.hexdigest(contents.join("\n"))[0, 12]
     end
 
-    # On the class, so a class method that reads the sidecar copy can reach it without an instance
-    def component_translation_scope
-      @component_translation_scope ||= [:components] + name.split("::")[0..-2].map { |i| i.underscore.downcase }
-    end
-
     private
 
     # This component's own files, plus the markup of every component they render, followed
@@ -84,15 +79,41 @@ class ApplicationComponent < ViewComponent::Base
 
   private
 
-  # Wrap `I18n.translate` for use in components, abstracting away scope-setting -
-  # :components, then the component's own namespace and name. Either the key or the
-  # whole scope can be overridden, the latter taking precedence.
+  # Wrap `I18n.translate` for use in components, abstracting away
+  # scope-setting.
+  #
+  # :components
+  # > [component_namespace] (possibly none)
+  # > [component_name]
+  #
+  # Either the component method or the entire scope can be overridden via the
+  # corresponding keyword args, the latter taking precedence if both are
+  # provided.
+  #
+  # See specs for component_translation_scope in Pages::Search::Form::Component
   def translation(key, scope: nil, **kwargs)
     ActiveSupport::HtmlSafeTranslation
       .translate(key, **kwargs, scope: (scope || component_translation_scope).compact)
   end
 
   def component_translation_scope
-    self.class.component_translation_scope
+    @component_translation_scope ||= [:components] + component_namespace + [component_name]
+  end
+
+  # The component name. For example, Pages::SearchResults::BikeBox::Component => BikeBox
+  def component_name
+    set_name_and_namespace unless defined?(@component_name)
+    @component_name
+  end
+
+  def component_namespace
+    set_name_and_namespace unless defined?(@component_namespace)
+    @component_namespace
+  end
+
+  def set_name_and_namespace
+    arr = self.class.name.split("::")[0..-2].map { |i| i.underscore.downcase }
+    @component_name = arr.pop
+    @component_namespace = arr
   end
 end

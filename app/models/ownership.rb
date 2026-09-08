@@ -124,6 +124,18 @@ class Ownership < ApplicationRecord
       (Organization.pos_kinds.select { Organization.pos?(it) } + %w[bulk_import] + origins).map(&:to_sym)
     end
 
+    def creation_kind_humanized(creation_kind)
+      return nil unless creation_kinds.include?(creation_kind&.to_sym)
+
+      I18n.t(creation_kind, scope: %i[activerecord enums ownership creation_kind])
+    end
+
+    def creation_kind_description(creation_kind)
+      return nil unless creation_kinds.include?(creation_kind&.to_sym)
+
+      I18n.t(creation_kind, scope: %i[activerecord enums ownership creation_kind_description])
+    end
+
     def origin_humanized(str)
       return nil unless str.present?
 
