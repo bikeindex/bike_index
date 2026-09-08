@@ -804,6 +804,13 @@ RSpec.describe User, type: :model do
         expect(user.reload.paid_organization_registration?).to be_truthy
       end
 
+      # The transfer leaves their ownership behind, organization and all, with only current false
+      it "is false once they've transferred it away" do
+        BikeServices::OwnershipTransferer.find_or_create(bike, updator: user, new_owner_email: "newowner@example.com")
+
+        expect(user.reload.paid_organization_registration?).to be_falsey
+      end
+
       context "registration isn't the user's" do
         let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
 
