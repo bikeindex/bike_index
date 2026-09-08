@@ -35,12 +35,13 @@ class EmailBan < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  # A ban on an additional address leaves the account's own address deliverable.
   # Correlating the address check against the outer users scan costs 2x over the
   # whole table, so it resolves the primary addresses on their own instead
   scope :banning_account_email, lambda {
     where(user_email_id: nil)
       .or(where(user_email_id: UserEmail.joins(:user).where("user_emails.email = users.email").select(:id)))
+      # A NULL here makes the NOT IN in User.no_email_bans match no rows at all
+      .where.not(user_id: nil)
   }
 
   class << self
@@ -81,7 +82,7 @@ class EmailBan < ApplicationRecord
       end
 
       create(reason: :email_domain, user:, user_email: additional) if email_domain&.provisional_ban?
-      create(reason: :email_duplicate, user:, user_email: additional) if email_duplicate?(email)
+      create(reason: :email_duplicate, user:, user_email: additional) if email_duplicate?(email, (additional || user).created_at)
       false
     end
 
@@ -90,25 +91,27 @@ class EmailBan < ApplicationRecord
       user.email_bans_active.where(user_email_id: [nil, user_email&.id])
     end
 
-    def email_duplicate?(email)
+    # Duplicates match symmetrically, so only the addresses that showed up after
+    # created_at count - otherwise the original account is banned by its own imitators
+    def email_duplicate?(email, created_at)
       return false if PERMITTED_DUPLICATE_DOMAINS.include?(email.split("@").last)
 
-      email_period_duplicate?(email) || email_plus_duplicate?(email)
+      email_period_duplicate?(email, created_at) || email_plus_duplicate?(email, created_at)
     end
 
-    def email_period_duplicate?(email)
+    def email_period_duplicate?(email, created_at)
       matches = User.where("REPLACE(email, '.', '') = ?", email.tr(".", ""))
-        .where.not(email: email)
+        .where.not(email: email).where("users.created_at < ?", created_at)
 
       return true if matches.where("created_at > ?", Time.current - BLOCK_DUPLICATE_PERIOD).any?
 
       matches.count > PRE_PERIOD_DUPLICATE_LIMIT
     end
 
-    def email_plus_duplicate?(email)
+    def email_plus_duplicate?(email, created_at)
       return false unless email.match?(/\+.*@/)
 
-      matches = email_plus_duplicate_matches(email)
+      matches = email_plus_duplicate_matches(email).where("users.created_at < ?", created_at)
 
       return true if matches.where("created_at > ?", Time.current - BLOCK_DUPLICATE_PERIOD).any?
 
@@ -149,9 +152,9 @@ class EmailBan < ApplicationRecord
 
   def set_calculated_attributes
     self.start_at ||= Time.current
-    # With one address on file, a ban on it is a ban on the user - but only at create,
-    # since removing an address later shouldn't widen the ban that named it
-    self.user_email_id = nil if new_record? && !multiple_user_emails?
+    # A ban naming the account's own address is a ban on the account - but only at create,
+    # since changing the address later shouldn't widen the ban that named it
+    self.user_email_id = nil if new_record? && user_email&.email == user&.email
   end
 
   def is_not_duplicate_ban
@@ -161,9 +164,5 @@ class EmailBan < ApplicationRecord
     return if matching_previous_ban.none?
 
     errors.add(:user_id, "there is already an active email_ban for the same reason for that user")
-  end
-
-  def multiple_user_emails?
-    user.present? && user.user_emails.size > 1
   end
 end

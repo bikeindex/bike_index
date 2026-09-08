@@ -84,6 +84,21 @@ RSpec.describe Email::ConfirmationJob, type: :job do
       expect(user.email_bans.first).to have_attributes(reason: "email_duplicate")
     end
 
+    context "sending to the address that was registered first" do
+      it "sends the email and doesn't create a ban" do
+        ActionMailer::Base.deliveries = []
+        expect do
+          VCR.use_cassette("Email::ConfirmationJob-g.mail") do
+            Email::ConfirmationJob.new.perform(user_prior.id)
+          end
+        end.to change(Notification, :count).by 1
+        expect(Notification.last.delivery_status).to eq "delivery_success"
+        expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+        expect(EmailBan.count).to eq 0
+        expect(user_prior.reload.email_banned?).to be_falsey
+      end
+    end
+
     context "before period" do
       let(:created_at) { Time.current - 14.days }
       it "creates the user and sends the email" do
@@ -180,7 +195,7 @@ RSpec.describe Email::ConfirmationJob, type: :job do
       it "creates the user and sends the email" do
         expect(User.unscoped.count).to eq 2
         expect do
-          expect(EmailBan.send(:email_plus_duplicate?, user.email)).to be_falsey
+          expect(EmailBan.send(:email_plus_duplicate?, user.email, user.created_at)).to be_falsey
           VCR.use_cassette("Email::ConfirmationJob-g.mail") do
             Email::ConfirmationJob.new.perform(user.id)
           end
@@ -211,6 +226,24 @@ RSpec.describe Email::ConfirmationJob, type: :job do
           expect(user.email_bans.first).to have_attributes(reason: "email_duplicate")
         end
       end
+    end
+  end
+
+  context "with a + email registered before the duplicates" do
+    let!(:user) { FactoryBot.create(:user, email: "some+thing@g.mail.com", created_at: Time.current - 12.hours) }
+    let!(:user_later) { FactoryBot.create(:user, email: "some+other@g.mail.com") }
+
+    it "sends the email and doesn't create a ban" do
+      ActionMailer::Base.deliveries = []
+      expect do
+        VCR.use_cassette("Email::ConfirmationJob-g.mail") do
+          Email::ConfirmationJob.new.perform(user.id)
+        end
+      end.to change(Notification, :count).by 1
+      expect(Notification.last.delivery_status).to eq "delivery_success"
+      expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+      expect(EmailBan.count).to eq 0
+      expect(user.reload.email_banned?).to be_falsey
     end
   end
 

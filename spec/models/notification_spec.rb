@@ -204,6 +204,40 @@ RSpec.describe Notification, type: :model do
           expect(notification.reload.delivery_status).to eq "delivery_success"
         end
       end
+
+      context "admin notification about the banned user" do
+        let(:marketplace_message) { FactoryBot.create(:marketplace_message, sender: user) }
+        let(:notification) do
+          FactoryBot.create(:notification, kind: :marketplace_message_blocked, user:,
+            notifiable: marketplace_message)
+        end
+
+        it "delivers" do
+          expect(EmailBan.ban?(user)).to be_truthy
+          notification.track_email_delivery do
+            AdminMailer.blocked_marketplace_message_email(marketplace_message).deliver_now
+          end
+          expect(notification.reload.delivery_status).to eq "delivery_success"
+          expect(ActionMailer::Base.deliveries.count).to eq 1
+        end
+      end
+    end
+
+    context "with the ban evaluation erroring" do
+      let(:ban_error) { StandardError.new("email_domain lookup timed out") }
+      before { allow(EmailBan).to receive(:ban?).and_raise(ban_error) }
+
+      it "raises without recording a delivery failure" do
+        expect(user_email.reload.last_email_errored?).to be_falsey
+
+        expect {
+          notification.track_email_delivery { raise "should not be reached" }
+        }.to raise_error(/timed out/)
+
+        expect(notification.reload.delivery_status).to eq "delivery_pending"
+        expect(notification.delivery_error).to be_nil
+        expect(user_email.reload.last_email_errored?).to be_falsey
+      end
     end
 
     context "with a delivery_error" do

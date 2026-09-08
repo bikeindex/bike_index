@@ -206,6 +206,19 @@ RSpec.describe EmailBan, type: :model do
         expect(FactoryBot.build(:email_ban, user:, user_email:, reason: :email_domain)).to_not be_valid
       end
 
+      context "as the account's only user_email" do
+        before { user.user_emails.where.not(id: user_email.id).destroy_all }
+
+        it "only bans that address" do
+          expect(user.reload.user_emails.pluck(:id)).to eq([user_email.id])
+          expect(user_email.email).to_not eq user.email
+          expect(email_ban.reload.user_email_id).to eq user_email.id
+          expect(EmailBan.ban?(user, user_email:)).to be_truthy
+          expect(EmailBan.ban?(user)).to be_falsey
+          expect(user.email_banned?).to be_falsey
+        end
+      end
+
       it "keeps the user_email when the user's other addresses go away" do
         expect(email_ban.reload.user_email_id).to eq user_email.id
         primary_email.destroy
@@ -226,6 +239,20 @@ RSpec.describe EmailBan, type: :model do
           expect(User.valid_only.pluck(:id)).to eq([])
         end
       end
+    end
+  end
+
+  describe "banning_account_email with a null user_id" do
+    let!(:user) { FactoryBot.create(:user_confirmed) }
+    let!(:email_ban) { FactoryBot.create(:email_ban, user:, reason: :honeypot) }
+    # user_id is nullable with no FK - update_column is what gets past validates_presence_of
+    before { email_ban.update_column(:user_id, nil) }
+
+    it "doesn't ban every user" do
+      expect(EmailBan.period_active.banning_account_email.pluck(:id)).to eq([])
+      expect(User.email_banned.pluck(:id)).to eq([])
+      expect(User.no_email_bans.pluck(:id)).to eq([user.id])
+      expect(User.valid_only.pluck(:id)).to eq([user.id])
     end
   end
 
