@@ -35,6 +35,25 @@ RSpec.describe UserEmail, type: :model do
     end
   end
 
+  describe "make_primary" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let!(:user_email) { FactoryBot.create(:user_email, user:) }
+    let!(:email_ban) { FactoryBot.create(:email_ban, user:, user_email:, reason: :email_domain) }
+
+    it "widens a ban that named the address, now that it's the account's" do
+      expect(user_email.confirmed?).to be_truthy
+      expect(email_ban.reload.user_email_id).to eq user_email.id
+      expect(user.email_banned?).to be_falsey
+
+      expect(user_email.make_primary).to be_truthy
+
+      expect(user.reload.email).to eq user_email.email
+      expect(email_ban.reload.user_email_id).to be_nil
+      expect(user.email_banned?).to be_truthy
+      expect(User.valid_only.pluck(:id)).to eq([])
+    end
+  end
+
   describe "fuzzy_user_id_find" do
     let(:user) { FactoryBot.create(:user_confirmed, email: "mommy@stuff.com") }
     before do

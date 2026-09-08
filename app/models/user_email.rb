@@ -99,6 +99,8 @@ class UserEmail < ActiveRecord::Base
       # Ensure we aren't somehow deleting an email
       # because it doesn't have a user_email associated with it
       user.update_attribute :email, email
+      # This is the account's address now, so a ban naming it bans the account
+      user.email_bans_active.where(user_email_id: id).update_all(user_email_id: nil)
     end
   end
 

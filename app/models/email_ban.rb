@@ -35,14 +35,9 @@ class EmailBan < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  # Correlating the address check against the outer users scan costs 2x over the
-  # whole table, so it resolves the primary addresses on their own instead
-  scope :banning_account_email, lambda {
-    where(user_email_id: nil)
-      .or(where(user_email_id: UserEmail.joins(:user).where("user_emails.email = users.email").select(:id)))
-      # A NULL here makes the NOT IN in User.no_email_bans match no rows at all
-      .where.not(user_id: nil)
-  }
+  # user_email_id is nil'd at create when the ban names the account's own address, and
+  # a NULL user_id would make the NOT IN in User.no_email_bans match no rows at all
+  scope :banning_account_email, -> { where(user_email_id: nil).where.not(user_id: nil) }
 
   class << self
     def ban?(user, user_email: nil, is_new_email_address: false)
