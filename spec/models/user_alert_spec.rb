@@ -221,6 +221,14 @@ RSpec.describe UserAlert, type: :model do
           expect(UserAlert.create_notification.pluck(:id)).to eq([])
         end
       end
+      context "user deleted" do
+        it "is false" do
+          user_alert.user.destroy
+          expect(user_alert.reload.user).to be_blank
+          expect(user_alert.create_notification?).to be_falsey
+          expect(UserAlert.create_notification.pluck(:id)).to eq([])
+        end
+      end
       context "stolen bike no_notify" do
         it "is false" do
           user_alert.bike.current_stolen_record.update(receive_notifications: false)
