@@ -763,6 +763,44 @@ RSpec.describe RegisterController, type: :request do
           expect(address_street_field["required"]).to eq "required"
         end
       end
+
+      context "reg_phone" do
+        def phone_input
+          status_field("phone").at_css("input[name='bike[phone]']")
+        end
+
+        def phone_texts
+          JSON.parse(status_field("phone")["data-texts"])
+        end
+
+        let(:report_texts) do
+          {"status_stolen" => "Phone is required to register a stolen bike",
+           "status_impounded" => "Phone is required to register a found bike"}
+        end
+
+        it "only requires the phone when the organization requires it" do
+          organization.update_column :enabled_feature_slugs, ["reg_phone"]
+          get register_path(b_param_token: b_param.id_token, step: 2)
+          expect(phone_input["required"]).to be_nil
+          expect(phone_texts).to eq report_texts
+
+          organization.update_column :enabled_feature_slugs, %w[reg_phone require_reg_phone]
+          get register_path(b_param_token: b_param.id_token, step: 2)
+          expect(phone_input["required"]).to eq "required"
+          # A theft or a find still says which of them is asking
+          org_text = "Phone is required to register with #{organization.short_name}"
+          expect(phone_texts).to eq({"status_with_owner" => org_text, "status_abandoned" => org_text,
+                                     "unregistered_parking_notification" => org_text}.merge(report_texts))
+          expect(status_field("phone").at_css("[data-required-helper]").text.strip).to eq org_text
+        end
+
+        it "doesn't require a phone the organization isn't asking for" do
+          organization.update_column :enabled_feature_slugs, ["require_reg_phone"]
+          get register_path(b_param_token: b_param.id_token, step: 2)
+          expect(phone_input["required"]).to be_nil
+          expect(phone_texts).to eq report_texts
+        end
+      end
     end
 
     context "signed in" do

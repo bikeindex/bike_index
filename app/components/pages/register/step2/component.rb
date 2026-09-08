@@ -155,13 +155,27 @@ module Pages
           phone_statuses.include?(@b_param.status)
         end
 
-        # A phone number is how a theft or a find gets contacted, so those two ask for one
-        # rather than offering it. Which of them applies is picked in this form, so the copy
-        # for each renders and register--status-fields shows whichever the status names
+        # Having copy is what makes the field required, so which status has one decides -
+        # and the status is picked in this form, so every text renders and
+        # register--status-fields shows whichever the status names
         def phone_required_texts
-          @phone_required_texts ||= BikeServices::Register::REPORT_RECORDS.keys.index_with do |status|
+          @phone_required_texts ||= organization_phone_required_texts.merge(report_phone_required_texts)
+        end
+
+        # A phone number is how a theft or a find gets contacted, so those two ask for one
+        # rather than offering it
+        def report_phone_required_texts
+          BikeServices::Register::REPORT_RECORDS.keys.index_with do |status|
             translation((status == "status_stolen") ? ".phone_required_stolen" : ".phone_required_found", cycle_type:)
           end
+        end
+
+        # Requiring is on top of asking - without reg_phone, phone_statuses covers only a
+        # theft or a find, and the other statuses have no input to fill in
+        def organization_phone_required_texts
+          return {} unless show_reg_phone? && reg_organization.enabled?("require_reg_phone")
+
+          Bike.statuses.index_with { translation(".phone_required_org", org_name: reg_organization.short_name) }
         end
 
         def phone_required? = phone_required_texts.key?(@b_param.status)
