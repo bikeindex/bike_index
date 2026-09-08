@@ -10,6 +10,14 @@ The flow: decide what to capture → capture the branch → upload → capture t
 
 The Claude Code web sandbox is the case that has neither: no GitHub CLI, and an MCP browser that rejects the egress proxy's CA, so github.com won't even load (`ERR_CERT_AUTHORITY_INVALID`) and a logged-in session can't be established headlessly. Capture alone would work there, which is the trap — PNGs nothing can host, and no way to post them.
 
+**Check the browser's GitHub session here, not at upload time.** `gh auth status` says nothing about it — the MCP browser authenticates from its own `--storage-state` file, which expires on its own schedule, and a stale one first shows itself as a "Sign in" page at `github-pr-images`'s step 3. That's after both capture rounds and the base-branch checkout have been paid for. Navigate to the PR and look for the comment form, which is what the upload actually needs:
+
+```js
+() => !!document.querySelector('textarea[id*="comment"]') || !!document.querySelector('[aria-label="Add a comment"]')
+```
+
+False → skip the phase per the rule above. Regenerating that file needs the user to sign in to a headed browser (`github-pr-images`'s `references/headless-relogin.md`), so it's theirs to fix rather than something to drive yourself.
+
 **Skipping means posting nothing at all**, not posting something else. Substitute evidence — a rendered-HTML diff, a note about what couldn't be captured — reads as a fine idea in the moment and leaves a comment the next run can't find or replace, because it isn't the `## Screenshots` comment. That's how #4126 ended up with three comments telling one story. If the evidence is worth having, put it in your summary to the user and let them decide where it goes.
 
 ## Preflight: a CSS diff needs a fresh tailwind build
