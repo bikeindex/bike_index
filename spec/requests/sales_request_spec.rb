@@ -83,7 +83,7 @@ RSpec.describe SalesController, type: :request do
       context "without a found ownership" do
         it "redirects" do
           get "#{base_url}/new?ownership_id=3333333"
-          expect(flash[:error].match(/log in/i)).to be_present
+          expect(flash[:error].match(/cannot find that bike/i)).to be_present
         end
       end
     end
