@@ -1,7 +1,9 @@
 # Seed the blogs that top-level info pages render by slug. InfoController#why_donate
 # and #membership do `Blog.friendly_find(<slug>)` then render news/show, which
 # fails loudly (NoMethodError on @blog.user) when the blog is missing — so these
-# must exist for /why-donate and /membership to work (e.g. on review apps).
+# must exist for /why-donate and /membership to work (e.g. on review apps). The
+# stolen bike back page is linked from the navbar and the footer; missing, it
+# flashes "unable to find that page" and bounces to /news.
 author = User.find_by(email: "admin@bikeindex.org") || User.first
 
 why_donate_body = <<~HTML
@@ -15,17 +17,23 @@ why_donate_body = <<~HTML
   <img width="100%" class='post-image' src='https://files.bikeindex.org/uploads/Pu/365516/hi.png' alt='recovery 2'>
 HTML
 
+# The body as bikeindex.org serves it, so review apps show the real page
+stolen_bike_back_body = File.read(Rails.root.join("db/seeds/get_your_stolen_bike_back.md"))
+
 [
   {title: "Donate to Bike Index", slug: Blog.why_donate_slug, body: why_donate_body,
    secondary_title: "Thank you to everyone who has been part of Bike Index's journey! 10+ years and counting!"},
   {title: "Bike Index Membership", slug: Blog.membership_slug},
-  {title: "E-Vehicle Acknowledgment FAQ", slug: Blog.e_vehicle_acknowledgment_faq}
+  {title: "E-Vehicle Acknowledgment FAQ", slug: Blog.e_vehicle_acknowledgment_faq},
+  {title: "How to get your stolen bike back", slug: Blog.get_your_stolen_bike_back_slug,
+   body: stolen_bike_back_body, description_abbr: "Use our tools to get your stolen bike back"}
 ].each do |attrs|
   next if Blog.friendly_find(attrs[:slug]).present?
 
   blog = Blog.create!(
     title: attrs[:title],
     secondary_title: attrs[:secondary_title],
+    description_abbr: attrs[:description_abbr],
     body: attrs[:body] || "Seeded \"#{attrs[:title]}\" content for review apps.",
     user: author,
     info_kind: true, # kind: info — top-level info page, not a news post
