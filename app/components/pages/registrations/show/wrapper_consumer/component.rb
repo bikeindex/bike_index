@@ -10,8 +10,9 @@ module Pages
           # owner: overrides the computed ownership, so the wrapper can force view_as
           # marketplace_preview: the public view of a listing that's still a draft
           def initialize(bike:, current_user:, show_for_sale: false, marketplace_preview: false, owner: nil,
-            available_views: [], bike_sticker: nil, current_alerts: {})
+            available_views: [], bike_sticker: nil, current_alerts: {}, show_legacy: false)
             @bike = bike
+            @show_legacy = show_legacy
             @current_user = current_user
             @show_for_sale = show_for_sale
             @marketplace_preview = marketplace_preview

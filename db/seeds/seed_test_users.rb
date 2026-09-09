@@ -21,7 +21,4 @@ user_attrs.values_at(:admin, :dev).each do |attributes|
   SuperuserAbility.create!(user: User.find_by(email: attributes[:email]))
 end
 
-# Group gate rather than per-actor — opting out writes users.feature_registration_show_legacy
-Flipper.enable_group(:bike_show_redesign_toggle, :superusers)
-
 puts "Users added successfully\n"

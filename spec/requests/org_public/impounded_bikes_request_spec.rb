@@ -69,8 +69,9 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
 
       # Also test that we can view the bike!
       get "/bikes/#{bike.to_param}"
+      expect(response).to redirect_to(registration_path(bike))
+      follow_redirect!
       expect(response.status).to eq(200)
-      expect(response).to render_template :show
     end
   end
 end

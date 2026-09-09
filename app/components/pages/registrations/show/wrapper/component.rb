@@ -9,10 +9,12 @@ module Pages
         class Component < ApplicationComponent
           # Digest of the markup inside the cache block — the cached_markup_digest spec
           # keeps it current, following what this tree renders out into UI:: and elsewhere
-          MARKUP_DIGEST = "709a1c1be2d2"
+          MARKUP_DIGEST = "68d41006f61f"
 
-          def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: {}, display_dev_info: false)
+          def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: {},
+            show_legacy: false, display_dev_info: false)
             @bike = bike
+            @show_legacy = show_legacy
             @display_dev_info = display_dev_info
             @current_user = current_user
             @view = view
@@ -38,8 +40,7 @@ module Pages
           # session-scoped and can't be keyed here — the csrf-refresh controller reissues
           # them client-side from the meta tag
           def cache_key
-            [MARKUP_DIGEST, @current_user&.id,
-              @current_user&.registration_show_toggleable?, @current_user&.feature_registration_show_legacy?,
+            [MARKUP_DIGEST, @current_user&.id, @show_legacy,
               BikeServices::ShowViews.view_param(@view), @bike_sticker&.id,
               token_prompt && [@current_alerts.sort, *token_prompt.try(:cache_version)],
               @bike.cache_key_with_version, *inner_component.try(:cache_version)]
@@ -60,11 +61,12 @@ module Pages
               if organization
                 WrapperOrgAdmin::Component.new(bike: @bike, current_user: @current_user, organization:,
                   org_role: kind, available_views: @available_views, bike_sticker: @bike_sticker,
-                  current_alerts: @current_alerts, display_dev_info: @display_dev_info)
+                  current_alerts: @current_alerts, show_legacy: @show_legacy, display_dev_info: @display_dev_info)
               else
                 WrapperConsumer::Component.new(bike: @bike, current_user: @current_user, owner: kind == :owner,
                   show_for_sale: @bike.is_for_sale?, marketplace_preview: kind == :marketplace_preview,
-                  available_views: @available_views, bike_sticker: @bike_sticker, current_alerts: @current_alerts)
+                  available_views: @available_views, bike_sticker: @bike_sticker,
+                  current_alerts: @current_alerts, show_legacy: @show_legacy)
               end
             end
           end

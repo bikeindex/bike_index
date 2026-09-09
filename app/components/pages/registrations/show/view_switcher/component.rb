@@ -30,20 +30,11 @@ module Pages
             safe_join([@label, content_tag(:span, @role_label, class: "tw:font-normal tw:opacity-65")], " · ")
           end
 
-          def switchable?
-            @available_views.size > 1 || superuser? || show_legacy_link?
-          end
-
           def superuser?
             @current_user&.superuser?
           end
 
-          # The redesign rollout's escape hatch back to the classic bike show. Uses
-          # no_redesign so the viewer isn't redirected straight back to this page.
-          def show_legacy_link?
-            @current_user&.registration_show_toggleable?
-          end
-
+          # no_redesign so the viewer isn't redirected straight back to this page
           def legacy_view_link
             view_in_link(bike_path(@bike, no_redesign: true), "Legacy Viewer")
           end

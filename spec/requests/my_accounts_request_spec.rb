@@ -828,45 +828,6 @@ RSpec.describe MyAccountsController, type: :request do
     end
   end
 
-  describe "toggle_show_redesign" do
-    let(:bike) { FactoryBot.create(:bike) }
-    context "user not logged in" do
-      it "redirects to sign in without toggling" do
-        post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-        expect(response).to redirect_to(/session\/new/)
-      end
-    end
-    context "user logged in" do
-      include_context :request_spec_logged_in_as_user
-      let(:current_user) { FactoryBot.create(:user_confirmed) }
-
-      it "opts into the legacy view and redirects to the legacy page" do
-        post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-        expect(response).to redirect_to(bike_path(bike))
-        expect(current_user.reload.feature_registration_show_legacy).to be_truthy
-      end
-
-      context "user opted into the legacy view" do
-        let(:current_user) { FactoryBot.create(:user_confirmed, feature_registration_show_legacy: true) }
-        it "opts back out and redirects to the redesign" do
-          post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-          expect(response).to redirect_to(registration_path(bike))
-          expect(current_user.reload.feature_registration_show_legacy).to be_falsey
-        end
-      end
-
-      context "user invalid for an unrelated reason" do
-        before { current_user.update_column(:preferred_language, "xx") }
-        it "flashes an error and returns to the view they came from" do
-          post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-          expect(response).to redirect_to(registration_path(bike))
-          expect(flash[:error]).to match(/unable to update/i)
-          expect(current_user.reload.feature_registration_show_legacy).to be_falsey
-        end
-      end
-    end
-  end
-
   describe "update with rack_attack" do
     include_context :rack_attack
 

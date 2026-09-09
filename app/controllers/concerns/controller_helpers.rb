@@ -14,7 +14,8 @@ module ControllerHelpers
       :current_organization, :passive_organization, :current_location,
       :page_id, :default_bike_search_path, :every_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
-      :render_donation_request?, :old_register_view?, :sort_state, :admin_index_state
+      :render_donation_request?, :old_register_view?, :sort_state, :admin_index_state,
+      :registration_show_legacy?, :registration_view_toggleable?
     before_action :enable_rack_profiler
 
     before_action do
@@ -178,6 +179,17 @@ module ControllerHelpers
   # other way - the organized menu follows it
   def old_register_view?
     session[:old_register_view].present?
+  end
+
+  # The redesigned registration page is opt-out: everyone gets it unless they've switched
+  # to the classic bike page, which is stored on the user or - signed out - in the session
+  def registration_show_legacy?
+    current_user ? current_user.feature_registration_show_legacy? : session[:registration_show_legacy].present?
+  end
+
+  # Kill switch for the redesign rollout: forces the classic page and hides the view toggle
+  def registration_view_toggleable?
+    !Flipper.enabled?(:registration_redesign_disabled)
   end
 
   def show_general_alert

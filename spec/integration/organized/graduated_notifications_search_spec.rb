@@ -125,8 +125,8 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
 
     within("tbody tr") { find("a[href^='/bikes/']").click }
 
-    expect(page).to have_current_path(%r{/bikes/#{bike1.id}(\?|\z)}, wait: 10)
-    expect(page).to have_css(".organized-access-panel")
+    expect(page).to have_current_path(%r{/registrations/#{bike1.id}(\?|\z)}, wait: 10)
+    expect(page).to have_content(/owner & access/i)
 
     # Back from bike show: filtered search restored
     go_back_and_wait

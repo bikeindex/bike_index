@@ -77,11 +77,12 @@ RSpec.describe "Claim registration signup", :js, type: :system do
     visit "/logout"
     expect(page).to have_content("Logged out!", wait: 5)
 
-    # Follow the link from the claim email -- lands on the bike show page,
-    # which sets session[:claim_token_email] and renders a "sign up" CTA
+    # Follow the link from the claim email -- lands on the registration page,
+    # which sets session[:claim_token_email] and renders a "sign up" CTA. The alert
+    # renders both in the dialog and inline below it, so take the one on top
     visit claim_path
     expect(page).to have_link("sign up", wait: 5)
-    click_link "sign up"
+    first(:link, "sign up").click
 
     # Retrying matcher (not find_field(...).value, which reads once) so the
     # assertion waits for the signup page to finish loading after the click.
@@ -100,7 +101,7 @@ RSpec.describe "Claim registration signup", :js, type: :system do
     expect(new_user.name).to eq "New Claimer"
     expect(new_user.confirmed?).to be_truthy
 
-    click_link "Claim bike"
+    first(:link, "Claim bike").click
     expect(page).to have_content("you just claimed it", wait: 5)
     expect(ownership.reload.claimed?).to be_truthy
     expect(ownership.user_id).to eq new_user.id
