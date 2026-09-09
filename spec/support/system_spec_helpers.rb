@@ -119,7 +119,9 @@ module SystemSpecHelpers
       click_button "Continue"
       fill_in "Password", with: "testthisthing7$"
       click_button "Log in"
-      expect(page).to have_no_current_path(new_session_path)
+      # Step 1 posts to identify_session_path, so being off new_session_path is already
+      # true here - this button is what a failed sign-in re-renders
+      expect(page).to have_no_button("Log in")
     end
   end
 
