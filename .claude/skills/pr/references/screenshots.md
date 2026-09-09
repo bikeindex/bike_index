@@ -47,7 +47,7 @@ If it returns failures it couldn't diagnose, report them and leave the PR withou
 
 ## 3. Host the branch screenshots and get inline URLs
 
-Invoke `github-pr-images` with the PNGs from step 2 and **no body** — that's its host-only call, and it returns the `user-attachments/assets/` URLs without posting anything. The comment gets composed here in step 5 and posted by that same skill in one go at the end, so nothing lands on the PR until the before/after is complete. GitHub mints persistent URLs that render inline in the browser (release assets would force a download on click).
+Invoke `github-pr-images` with the PNGs from step 2 and **no body** — that's its host-only call, and it returns the `user-attachments/assets/` URLs without posting anything. This runs before step 4, not after it: the upload is the first thing to touch GitHub, so an expired browser session surfaces here, having cost one capture round rather than two and a base checkout. The comment gets composed here in step 5 and posted by that same skill in one go at the end, so nothing lands on the PR until the before/after is complete. GitHub mints persistent URLs that render inline in the browser (release assets would force a download on click).
 
 Collect the returned URLs, keyed by `(page-slug, viewport)`.
 
