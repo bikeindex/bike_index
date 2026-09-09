@@ -66,6 +66,37 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         expect(Bike.last.organizations.pluck(:id)).to eq([])
       end
     end
+
+    context "a member of an organization that pays" do
+      let(:organization) { FactoryBot.create(:organization, :paid, short_name: "Brakebills") }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
+
+      it "stops asking them for a donation once they have its registration" do
+        # Nothing of theirs is registered yet, so the ask is still there
+        expect(page).to have_current_path("/my_account")
+        dismiss_donation_modal
+
+        start_registration
+        expect(page).to have_checked_field("register_with_organization")
+
+        type_into("#bike_primary_frame_color_id", "Red")
+        click_combobox_option("Red")
+        fill_in "bike[serial_number]", with: "XYZ 123"
+        click_button "Complete Bike Registration"
+
+        expect(page).to have_content("Registration complete")
+        expect(Bike.last.current_ownership).to have_attributes(user_id: current_user.id,
+          claimed: true, organization_id: organization.id)
+
+        # A full load rather than a click through the account menu: the modal is only
+        # ever raised by a JS context's first init, so a Turbo arrival would leave it
+        # down whether the gate held or not
+        visit "/my_account"
+
+        expect(page).to have_content("Surly")
+        expect(page).to have_no_css("#donationModal", visible: :all)
+      end
+    end
   end
 
   context "e-vehicle with an organization's safety rules" do
