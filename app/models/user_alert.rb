@@ -58,7 +58,7 @@ class UserAlert < ApplicationRecord
   scope :dismissable, -> { where(kind: dismissable_kinds) }
   scope :with_notification, -> { joins(:notification).where.not(notifications: {id: nil}) }
   scope :create_notification, -> {
-    where(kind: notification_kinds, updated_at: notify_period)
+    joins(:user).where(kind: notification_kinds, updated_at: notify_period)
       .left_joins(:notification).where(notifications: {id: nil})
   }
 
@@ -244,7 +244,7 @@ class UserAlert < ApplicationRecord
   def create_notification?
     return false if inactive? || notification.present? ||
       !self.class.notify_period.cover?(updated_at) ||
-      self.class.notification_kinds.exclude?(kind)
+      self.class.notification_kinds.exclude?(kind) || user.blank?
 
     # Check if the relevant object is updated since
     if theft_alert_without_photo? || stolen_bike_without_location?
