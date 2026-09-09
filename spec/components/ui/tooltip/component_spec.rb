@@ -57,7 +57,7 @@ RSpec.describe UI::Tooltip::Component, type: :component do
       expect(component.css("button").attr("data-action").value).to include "click->custom#handler"
       wrapper = component.css("[data-controller='ui--tooltip']").first
       expect(wrapper["data-action"]).to include "mouseenter->ui--tooltip#showOnHover"
-      expect(wrapper["data-action"]).to include "focusin->ui--tooltip#showOnFocus"
+      expect(wrapper["data-action"]).to include "focusin->ui--tooltip#showPersistent"
     end
   end
 
