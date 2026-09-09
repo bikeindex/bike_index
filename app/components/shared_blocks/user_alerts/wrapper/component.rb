@@ -10,7 +10,7 @@ module SharedBlocks
         # landing page bike tile grids are positioned, so they'd otherwise paint over
         # this in-flow banner; general-alert is what the landing pages hang their own
         # spacing on
-        def initialize(current_user:, wrapper_class: "general-alert container tw:relative tw:z-20")
+        def initialize(current_user:, wrapper_class: "general-alert container tw:relative tw:z-20 tw:mt-8")
           @current_user = current_user
           @wrapper_class = wrapper_class
         end
