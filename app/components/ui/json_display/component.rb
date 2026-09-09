@@ -7,7 +7,7 @@ module UI
       TABLE_CELL_MAX_WIDTH = 500
       private_constant :TABLE_CELL_MAX_WIDTH
 
-      def initialize(data:, max_width: nil, small: false, skip_blank: false)
+      def initialize(data:, max_width: nil, small: false, skip_blank: false, no_max_height: false)
         unless max_width.nil? || max_width.is_a?(Integer) || max_width == :table_cell
           raise ArgumentError, "max_width must be an integer (for pixels) or :table_cell (to be the max width of a table cell)"
         end
@@ -16,6 +16,7 @@ module UI
         @max_width = @table_cell ? TABLE_CELL_MAX_WIDTH : max_width
         @small = small
         @skip_blank = skip_blank
+        @no_max_height = no_max_height
       end
 
       def call
@@ -34,7 +35,10 @@ module UI
         data.select { |_key, value| Binxtils::InputNormalizer.present_or_false?(value) }
       end
 
-      def classes = ["highlightjs-json", ("highlightjs-json-cell" if @table_cell), ("tw:text-xs" if @small)].compact
+      def classes
+        ["highlightjs-json", ("highlightjs-json-cell" if @table_cell),
+          ("highlightjs-json-no-max-height" if @no_max_height), ("tw:text-xs" if @small)].compact
+      end
 
       # Inline, because Tailwind can't generate a class for a width it only sees at runtime
       def box_style

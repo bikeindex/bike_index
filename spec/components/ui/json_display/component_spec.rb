@@ -11,6 +11,15 @@ RSpec.describe UI::JsonDisplay::Component, type: :component do
     expect(component).to have_css("div.highlightjs-json[data-controller='ui--json-display'] pre code.language-json")
     expect(component.text).to include "bike_sticker"
     expect(component).to_not have_css("div.highlightjs-json[style]")
+    expect(component).to_not have_css("div.highlightjs-json-no-max-height")
+  end
+
+  context "with no_max_height" do
+    let(:options) { {no_max_height: true} }
+
+    it "adds the class that drops the height cap" do
+      expect(component).to have_css("div.highlightjs-json.highlightjs-json-no-max-height")
+    end
   end
 
   context "with small and max_width" do

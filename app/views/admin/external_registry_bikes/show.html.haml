@@ -57,6 +57,6 @@
             %span.localizeTime.preciseTime= l @bike.updated_at, format: :convert_time
     .mt-2
       %p.mb-0 Info Hash
-      = render UI::JsonDisplay::Component.new(data: @bike.info_hash)
+      = render UI::JsonDisplay::Component.new(data: @bike.info_hash, no_max_height: true)
 
 
