@@ -6016,6 +6016,8 @@ it:
             serie
           without_serial_number: Questo %{cycle_type} è stato realizzato senza numero
             di serie
+          phone_required_org: Per registrarsi con %{org_name} è necessario un numero
+            di telefono.
         step_acknowledgment:
           continue: Continuare
         step_acknowledgment_review:

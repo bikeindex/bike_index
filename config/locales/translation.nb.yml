@@ -5737,6 +5737,7 @@ nb:
           wheres_my_serial: Hvor er serienummeret mitt?
           without_serial: Denne %{cycle_type} ble laget uten serienummer
           without_serial_number: Denne %{cycle_type} ble laget uten serienummer
+          phone_required_org: Telefonnummer kreves for å registrere seg hos %{org_name}
         step_acknowledgment:
           continue: Fortsette
         step_acknowledgment_review:

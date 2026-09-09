@@ -5902,6 +5902,8 @@ nl:
           wheres_my_serial: Waar is mijn serienummer?
           without_serial: Deze %{cycle_type} is gemaakt zonder serienummer.
           without_serial_number: Deze %{cycle_type} is gemaakt zonder serienummer.
+          phone_required_org: Een telefoonnummer is vereist om je te registreren bij
+            %{org_name}
         step_acknowledgment:
           continue: Doorgaan
         step_acknowledgment_review:
