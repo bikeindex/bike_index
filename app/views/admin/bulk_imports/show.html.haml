@@ -90,7 +90,7 @@
             - elsif data.except("headers").blank?
               No data (except <code>headers</code>)
             - else
-              .small= pretty_print_json(data.except("headers"))
+              = render UI::JsonDisplay::Component.new(data: data.except("headers"), small: true)
 
 .mt-4.mb-4
   %h3 Errors
