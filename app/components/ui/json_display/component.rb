@@ -20,7 +20,7 @@ module UI
       end
 
       def call
-        tag.div(tag.pre(tag.code(pretty_json, class: "language-json")),
+        tag.div(tag.pre(tag.code(pretty_json, class: "language-json"), class: pre_class),
           class: classes, style: box_style, data: {controller: "ui--json-display"})
       end
 
@@ -35,9 +35,11 @@ module UI
         data.select { |_key, value| Binxtils::InputNormalizer.present_or_false?(value) }
       end
 
-      def classes
-        ["highlightjs-json", ("highlightjs-json-cell" if @table_cell),
-          ("highlightjs-json-no-max-height" if @no_max_height), ("tw:text-xs" if @small)].compact
+      def classes = ["highlightjs-json", ("highlightjs-json-cell" if @table_cell), ("tw:text-xs" if @small)].compact
+
+      # Not an endless method: the condition would be read at definition time, where the ivar is nil
+      def pre_class
+        "tw:max-h-72" unless @no_max_height
       end
 
       # Inline, because Tailwind can't generate a class for a width it only sees at runtime

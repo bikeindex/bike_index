@@ -3,12 +3,7 @@
 
 @layer components {
   .highlightjs-json pre {
-    @apply tw:m-0 tw:max-h-72 tw:overflow-auto tw:rounded-sm tw:border tw:border-gray-300 tw:bg-gray-50 tw:p-1 tw:dark:border-gray-700 tw:dark:bg-gray-900;
-  }
-
-  /* Ties with the cap above, so it only wins by sitting after it */
-  .highlightjs-json-no-max-height pre {
-    @apply tw:max-h-none;
+    @apply tw:m-0 tw:overflow-auto tw:rounded-sm tw:border tw:border-gray-300 tw:bg-gray-50 tw:p-1 tw:dark:border-gray-700 tw:dark:bg-gray-900;
   }
 
   /* Only the json grammar is registered, so these six scopes are the whole theme */
