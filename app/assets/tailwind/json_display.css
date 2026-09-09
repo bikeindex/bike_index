@@ -37,6 +37,7 @@
     @apply tw:w-px tw:p-0!;
   }
 
+  /* Scoped, because a legacy table has no row borders to redraw the box this strips */
   .ui-table .highlightjs-json-cell {
     @apply tw:w-full;
   }
