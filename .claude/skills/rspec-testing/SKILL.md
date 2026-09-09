@@ -23,6 +23,7 @@ When something fails outside the files you changed, re-run that spec file on its
 
 - Tests should either: help make the code correct now, or prevent bugs in the future. Don't add tests that don't do one of those things.
 - Use **request specs**, not controller specs — request specs go through the full middleware/routing stack, so they catch breakage controller specs can't see. Everything making the same request should be in a single test. For markup a component owns, see [A component's own markup](#a-components-own-markup-is-tested-in-its-component-spec).
+  - Five legacy controller specs do still exist and still run: `spec/controllers/`, `bikes_controller_spec.rb` the largest. Don't add to them — but when you change what a controller action returns, sweep them too. They call `get :show`, so a grep for request-spec paths misses them.
 - Avoid testing private methods.
 - Avoid mocking objects.
   - If making external requests, use VCR. Never write or edit a cassette by hand — record them by running the tests (see [VCR cassettes](#vcr-cassettes-never-hand-edit-always-re-record)).
