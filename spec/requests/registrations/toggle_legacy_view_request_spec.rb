@@ -17,6 +17,25 @@ RSpec.describe "RegistrationsController#toggle_legacy_view", type: :request do
     expect(session[:registration_show_legacy]).to be_falsey
   end
 
+  context "signing in after opting out" do
+    let(:password) { "example_password2" }
+    let!(:user) { FactoryBot.create(:user_confirmed, password:, password_confirmation: password) }
+
+    it "carries the session opt-out onto the account" do
+      post toggle_legacy_view_registration_path(bike)
+      post "/session", params: {session: {email: user.email, password:}}
+
+      expect(user.reload.feature_registration_show_legacy).to be_truthy
+      expect(session[:registration_show_legacy]).to be_blank
+    end
+
+    it "leaves the account alone when they never opted out" do
+      post "/session", params: {session: {email: user.email, password:}}
+
+      expect(user.reload.feature_registration_show_legacy).to be_falsey
+    end
+  end
+
   context "user logged in" do
     let(:current_user) { FactoryBot.create(:user_confirmed) }
 

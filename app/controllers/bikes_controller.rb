@@ -215,7 +215,7 @@ class BikesController < Bikes::BaseController
   def show_redesign?
     return false if Binxtils::InputNormalizer.boolean(params[:no_redesign])
 
-    request.format.html? && registration_view_toggleable? && !registration_show_legacy?
+    request.format.html? && registration_redesign_enabled? && !registration_show_legacy?
   end
 
   def show_for_sale?(bike)

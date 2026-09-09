@@ -696,6 +696,19 @@ RSpec.describe "BikesController#show", type: :request do
       end
     end
   end
+  context "redesign disabled" do
+    it "renders the classic page without the invitation to the redesign" do
+      get "#{base_url}/#{bike.id}"
+      expect(response).to render_template(:show)
+      expect(response.body).to_not match("Try out the new")
+    end
+
+    it "sends the redesigned page back to the classic one, params and all" do
+      get "/registrations/#{bike.id}?scanned_id=XD8888"
+      expect(response).to redirect_to(bike_path(bike, scanned_id: "XD8888", no_redesign: true))
+    end
+  end
+
   context "redesign enabled" do
     before { Flipper.disable(:registration_redesign_disabled) }
 

@@ -24,12 +24,4 @@ RSpec.describe Pages::Registrations::Show::ToggleView::Component, type: :compone
       expect(form).to have_button("Switch to the new view")
     end
   end
-
-  context "not toggleable" do
-    let(:component) { described_class.new(bike:, show_legacy:, toggleable: false) }
-    it "does not render" do
-      render_inline(component)
-      expect(page.native.text).to be_blank
-    end
-  end
 end
