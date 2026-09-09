@@ -5999,6 +5999,7 @@ es:
           wheres_my_serial: "¿Dónde está mi número de serie?"
           without_serial: Este %{cycle_type} se hizo sin número de serie.
           without_serial_number: Este %{cycle_type} se fabricó sin número de serie.
+          phone_required_org: Se requiere un teléfono para registrarse en %{org_name}.
         step_acknowledgment:
           continue: Continuar
         step_acknowledgment_review:
