@@ -34,15 +34,9 @@
             <% end %>
 
             <div class="form-group avatar-upload">
-              <%= f.label :image, "Post photo", class: "control-label" %>
+              <label class="control-label">Post photo</label>
 
-              <div class="avatar-img">
-                <div class="input-group">
-                  <div class="custom-file"></div>
-                  <%= f.label :image, "Post Image", class: "custom-file-label" %>
-                  <%= f.file_field :image, class: "custom-file-input", accept: ImageUploader.permitted_extensions.join(",") %>
-                </div>
-              </div>
+              <%= render(UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions)) %>
             </div>
           </div>
 
