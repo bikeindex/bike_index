@@ -11,18 +11,8 @@
         - if @social_post.posted_image.present?
           = image_tag(@social_post.posted_image)
       - else
-        .form-group.avatar-upload
-          = f.label :image, 'Post photo', class: 'control-label'
-          .avatar-img
-            - if @social_post.image?
-              = image_tag(@social_post.image_url(:small))
-            - else
-              %p
-                No picture!
-              .input-group
-                .custom-file
-                = f.label :image, "Post Image", class: "custom-file-label"
-                = f.file_field :image, class: "custom-file-input", accept: ImageUploader.permitted_extensions.join(",")
+        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image, label_text: "Post photo", wrapper_class: "form-group")) do
+          = render(UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions))
           - if @social_post.image.present?
             .form-check
               = f.check_box :remove_image, class: "form-check-input"
