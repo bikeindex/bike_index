@@ -42,6 +42,7 @@ module Sessionable
   # a destination of their own
   def sign_in_user(user)
     confirm_user_from_claim_token(user)
+    carry_registration_show_legacy(user)
     session[:last_seen] = Time.current
     session[:render_donation_request] = user.render_donation_request if user&.render_donation_request
     set_passive_organization(OrganizationRole.default_organization(user)) # Set that organization!

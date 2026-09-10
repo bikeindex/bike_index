@@ -36,9 +36,9 @@ RSpec.describe "Bike search", :js, type: :system do
     retry_on_detach { first(".bike-box-item .title-link a").click }
     # Navigation and render assert separately because they fail differently: a nil
     # current_path is about:blank (Capybara returns nil for an `about:` scheme), not a
-    # lost click; current_path without the h1 is just a slow bike page.
-    expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
-    expect(page).to have_css("h1.bike-title", wait: 15)
+    # lost click; current_path without the audience badge is just a slow bike page.
+    expect(page).to have_current_path(%r{/registrations/\d+}, wait: 10)
+    expect(page).to have_content("Public view", wait: 15)
     page.go_back
     expect(page).to have_css(".bike-box-item", wait: 10)
   end

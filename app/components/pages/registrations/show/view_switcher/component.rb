@@ -31,21 +31,11 @@ module Pages
           end
 
           def switchable?
-            @available_views.size > 1 || superuser? || show_legacy_link?
+            @available_views.size > 1 || superuser?
           end
 
           def superuser?
             @current_user&.superuser?
-          end
-
-          # The redesign rollout's escape hatch back to the classic bike show. Uses
-          # no_redesign so the viewer isn't redirected straight back to this page.
-          def show_legacy_link?
-            @current_user&.registration_show_toggleable?
-          end
-
-          def legacy_view_link
-            view_in_link(bike_path(@bike, no_redesign: true), "Legacy Viewer")
           end
 
           # Superusers get a link to the admin bike page, ahead of the audience views

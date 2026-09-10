@@ -15,8 +15,12 @@ RSpec.describe BikesController, type: :controller do
     let(:bike) { FactoryBot.create(:bike, :with_ownership) }
     let(:user) { bike.creator }
     let(:organization) { FactoryBot.create(:organization) }
-    # This is required by show, if it isn't present it raises ReadOnlyError
-    before { RearGearType.fixed }
+    # RearGearType is required by show, if it isn't present it raises ReadOnlyError.
+    # The redesign is the default, so the kill switch is what keeps this page reachable
+    before do
+      RearGearType.fixed
+      Flipper.enable(:registration_redesign_disabled)
+    end
 
     it "shows the bike" do
       get :show, params: {id: bike.id}

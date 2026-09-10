@@ -5,10 +5,10 @@
         <%= translation(".using_new_view", bike_type: @bike.type) %>
       </span>
 
-      <% if redesign_enabled? %>
-        <%= render(UI::ButtonLink::Component.new(text: translation(".switch_to_classic"), href: toggle_show_redesign_my_account_path, method: :post, params: {bike_id: @bike.id}, form: {data: {controller: "csrf-refresh"}}, color: :secondary, size: :sm)) %>
-      <% else %>
+      <% if @show_legacy %>
         <%= link_to translation(".view_in_legacy", bike_type: @bike.type), bike_path(@bike), class: "twlink-underlined tw:text-sm" %>
+      <% else %>
+        <%= render(UI::ButtonLink::Component.new(text: translation(".switch_to_classic"), href: toggle_legacy_view_registration_path(@bike), method: :post, form: {data: {controller: "csrf-refresh"}}, color: :secondary, size: :sm)) %>
       <% end %>
     </div>
   <% end %>

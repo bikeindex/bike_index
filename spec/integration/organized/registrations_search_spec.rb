@@ -12,9 +12,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
   let!(:bike2) { FactoryBot.create(:bike_organized, creation_organization: organization, owner_email: "bob@example.com", created_at: 3.days.ago) }
 
   before do
-    # Ensure gear types exist so bike show page doesn't write during readonly mode
+    # Ensure these exist so the registration page doesn't write during readonly mode
     RearGearType.fixed
     FrontGearType.fixed
+    Country.united_states
     # Below the sidebar's 760px breakpoint, where it's an overlay behind the top
     # bar's hamburgler. Chrome's --window-size flag is unreliable in headless
     # mode, so resize explicitly.
@@ -145,12 +146,10 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     # clicking a bike navigates to the bike show page with organized panel
     first("a[aria-label='View bike']").click
 
-    expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
+    expect(page).to have_current_path(%r{/registrations/\d+}, wait: 10)
 
-    expect(page).to have_css(".organized-access-panel", text: /Access Panel/i)
-    # Scoped to the panel: unscoped, this matched the navbar's organization name against
-    # the panel's heading, whose own organization is hidden below md
-    expect(page).to have_css(".organized-access-panel", text: organization.name)
+    expect(page).to have_content(/owner & access/i)
+    expect(page).to have_content(organization.short_name)
 
     # Go back
     page.go_back
@@ -569,8 +568,8 @@ RSpec.describe "Organized registrations search", :js, type: :system do
 
       # Click the first "Link" to assign the sticker to a bike
       first("td.assign_bike_sticker_cell a").click
-      expect(page).to have_current_path(%r{/bikes/\d+}, wait: 10)
-      expect(page).to have_content("claimed")
+      expect(page).to have_current_path(%r{/registrations/\d+}, wait: 10)
+      expect(page).to have_content(/owner & access/i)
       expect(unlinked_sticker.reload.bike).to be_present
     end
   end

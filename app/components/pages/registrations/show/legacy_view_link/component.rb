@@ -4,23 +4,13 @@ module Pages
   module Registrations
     module Show
       module LegacyViewLink
-        # The redesign's view-preference control: a link back to the classic bike show,
-        # or — for viewers who switched to legacy but reached this page anyway — an
-        # offer to switch back. ToggleView is its counterpart on the legacy page.
+        # The redesign's view-preference control: an opt-out to the classic bike show,
+        # or — for viewers who already switched to legacy but reached this page anyway —
+        # a plain link there. ToggleView is its counterpart on the legacy page.
         class Component < ApplicationComponent
-          def initialize(bike:, current_user:)
+          def initialize(bike:, show_legacy:)
             @bike = bike
-            @current_user = current_user
-          end
-
-          def render?
-            @current_user&.registration_show_toggleable?
-          end
-
-          private
-
-          def redesign_enabled?
-            @current_user.registration_show_redesign?
+            @show_legacy = show_legacy
           end
         end
       end

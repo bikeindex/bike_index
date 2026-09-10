@@ -14,7 +14,8 @@ module ControllerHelpers
       :current_organization, :passive_organization, :current_location,
       :page_id, :default_bike_search_path, :every_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
-      :render_donation_request?, :old_register_view?, :sort_state, :admin_index_state
+      :render_donation_request?, :old_register_view?, :sort_state, :admin_index_state,
+      :registration_show_legacy?, :registration_redesign_enabled?
     before_action :enable_rack_profiler
 
     before_action do
@@ -180,6 +181,28 @@ module ControllerHelpers
   # other way - the organized menu follows it
   def old_register_view?
     session[:old_register_view].present?
+  end
+
+  # Carries a signed-out opt-out onto the account, since the redesign's own claim and
+  # sign-up CTAs are what push people through signing in. Only ever sets it - an absent
+  # session key means no preference was expressed, not that they want the redesign
+  def carry_registration_show_legacy(user)
+    return unless session.delete(:registration_show_legacy).present?
+
+    user.update(feature_registration_show_legacy: true, skip_update: true)
+  end
+
+  # The redesigned registration page is opt-out: everyone gets it unless they switched
+  def registration_show_legacy?
+    current_user ? current_user.feature_registration_show_legacy? : session[:registration_show_legacy].present?
+  end
+
+  # Kill switch for the redesign rollout - enabling the flag sends every viewer to the
+  # classic page. Memoized because it's a gate lookup asked more than once per request
+  def registration_redesign_enabled?
+    return @registration_redesign_enabled if defined?(@registration_redesign_enabled)
+
+    @registration_redesign_enabled = !Flipper.enabled?(:registration_redesign_disabled)
   end
 
   def show_general_alert
