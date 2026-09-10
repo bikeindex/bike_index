@@ -20,6 +20,8 @@ When a branch needs to catch up with its base, or a merge/cherry-pick/pull leave
 
 ## Determine the base branch first — don't assume `main`
 
+**Re-read `git branch --show-current` rather than trusting the branch from earlier in the session.** Conductor runs sessions concurrently, so another one can check this worktree out onto a different branch and commit to it while your conversation is open — and the base you resolved for the branch you *were* on is then the wrong base, merged into work you haven't read.
+
 "Update from base", "sync with main", "this branch is behind", "merge the base in" all need a base branch to merge *from*. **Don't default to `main`.** A branch is often stacked on another feature branch, and merging `main` instead silently pulls the wrong history — the diff looks "already up to date" against `main` while the real base has commits you're missing. Resolve the base in this order:
 
 1. **A branch the user names** — "update from X" / "base is X" wins outright.

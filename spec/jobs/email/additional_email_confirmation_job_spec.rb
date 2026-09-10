@@ -26,13 +26,17 @@ RSpec.describe Email::AdditionalEmailConfirmationJob, type: :job do
     end
     before { allow(CustomerMailer).to receive(:additional_email_confirmation).and_raise(inactive_recipient_error) }
 
-    it "swallows the error and marks user_email errored" do
-      expect { described_class.new.perform(user_email.id) }.to change(Notification, :count).by 1
+    it "swallows the error and records it on the additional email" do
+      expect(user_email.user.user_emails.count).to eq 2 # the primary and this one
+      expect { described_class.new.perform(user_email.id) }.to change(Notification, :count).by(1)
+        .and change(EmailBan, :count).by(0)
 
       notification = Notification.last
       expect(notification.delivery_status).to eq "delivery_failure"
       expect(notification.delivery_error).to eq "Postmark::InactiveRecipientError"
+      expect(notification.user_email&.id).to eq user_email.id
       expect(user_email.reload.last_email_errored).to be_truthy
+      expect(EmailBan.ban?(user_email.user, user_email:)).to be_falsey
     end
   end
 end
