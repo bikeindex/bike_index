@@ -16,11 +16,11 @@
   <div class="padded">
     <p class="padded"><%= t(".looks_like_this_is_your_image") %></p>
 
-    <p>
+    <div>
       <%= link_to t(".edit"), edit_public_image_path(@public_image) %> |
       <%= render(UI::ButtonLink::Component.new(text: t(".destroy"), href: @public_image, method: :delete, color: :link,
             form: {class: "tw:inline-block", onsubmit: "return confirm('#{j t(".are_you_sure")}')"})) %>
       | <%= link_to t(".back_to_images"), public_images_path %>
-    </p>
+    </div>
   </div>
 <% end %>
