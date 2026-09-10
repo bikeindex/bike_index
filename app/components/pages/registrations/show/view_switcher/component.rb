@@ -4,9 +4,10 @@ module Pages
   module Registrations
     module Show
       module ViewSwitcher
-        # The audience pill (Public view / Your bike / org admin), a dropdown linking to
-        # the viewer's other perspectives via ?view_as= and to the legacy page. The
-        # label/color are passed in so the caller keeps nuances like "No longer your bike".
+        # The audience pill (Public view / Your bike / org admin). When the viewer is
+        # allowed more than one perspective it becomes a dropdown linking to the
+        # others via ?view_as=; otherwise it's a plain badge. The label/color are
+        # passed in so the caller keeps nuances like "No longer your bike".
         class Component < ApplicationComponent
           def initialize(bike:, current_view:, available_views:, label:, color:, solid: true, role_label: nil, current_user: nil)
             @bike = bike
@@ -29,13 +30,12 @@ module Pages
             safe_join([@label, content_tag(:span, @role_label, class: "tw:font-normal tw:opacity-65")], " · ")
           end
 
-          def superuser?
-            @current_user&.superuser?
+          def switchable?
+            @available_views.size > 1 || superuser?
           end
 
-          # no_redesign so the viewer isn't redirected straight back to this page
-          def legacy_view_link
-            view_in_link(bike_path(@bike, no_redesign: true), "Legacy Viewer")
+          def superuser?
+            @current_user&.superuser?
           end
 
           # Superusers get a link to the admin bike page, ahead of the audience views

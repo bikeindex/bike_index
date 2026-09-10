@@ -9,7 +9,7 @@ module Pages
         class Component < ApplicationComponent
           # Digest of the markup inside the cache block — the cached_markup_digest spec
           # keeps it current, following what this tree renders out into UI:: and elsewhere
-          MARKUP_DIGEST = "e6c7dda6afa9"
+          MARKUP_DIGEST = "9ba623ece4af"
 
           def initialize(bike:, current_user:, view:, available_views:, bike_sticker: nil, current_alerts: {},
             show_legacy: false, display_dev_info: false)

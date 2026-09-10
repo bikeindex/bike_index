@@ -8,10 +8,11 @@ RSpec.describe Pages::Registrations::Show::ViewSwitcher::Component, type: :compo
     described_class.new(bike:, current_view: [:public, nil], available_views:, label: "Public", color: :gray, current_user:)
   end
 
-  it "renders the dropdown with a link to the legacy viewer" do
+  # LegacyViewLink owns the way back to the classic page, so this offers no second one
+  it "renders a plain badge when there's nowhere to switch to" do
     render_inline(component)
     expect(page).to have_text("Public")
-    expect(page).to have_link("View in Legacy Viewer", href: "/bikes/#{bike.id}?no_redesign=true")
+    expect(page).to have_no_css("a")
   end
 
   context "with another view available" do
