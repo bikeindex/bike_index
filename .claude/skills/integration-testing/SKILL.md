@@ -171,6 +171,8 @@ expect(page).to have_css('button[aria-pressed="true"]')
 page.execute_script("document.querySelector('.search-btn').click()")
 ```
 
+Clicking a top-nav link by its label is ambiguous — the footer repeats Marketplace, Blog, Donate and most of the rest, so scope it: `within("#primary-main-menu") { click_link "Marketplace" }`. The navbar renders each of those twice more, mobile and desktop, but only one is visible at a given width, so that isn't what the `Ambiguous` names.
+
 When repeated assertions get noisy, define small DSL-style helpers in the file (`def listing_for(item)`, `def thumbnail_selector(...)`) — they read better than scattered selectors and keep you out of `page.execute_script`. **Check `spec/support/system_spec_helpers.rb` before writing one, and move it there once a third spec wants the same one** — `sign_in`/`sign_out`, the selectize pickers, `wait_for_details_step` and `emailed_path` already live there.
 
 ## Component system specs must assert accessibility
