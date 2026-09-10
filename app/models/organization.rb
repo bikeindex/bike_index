@@ -155,7 +155,7 @@ class Organization < ApplicationRecord
   scope :name_ordered, -> { order(arel_table["name"].lower) }
   scope :show_on_map, -> { where(show_on_map: true, approved: true) }
   scope :with_invoice, -> { where(has_invoice: true) }
-  scope :paid_money, -> { where(has_invoice: true) } # TODO: make this actually show paid money, rather than just has_invoice
+  scope :paid_money, -> { where(has_invoice: true) } # TODO: make this actually show paid money, rather than just having an invoice
   scope :without_invoice, -> { where(has_invoice: false) }
   scope :approved, -> { where(approved: true) }
   scope :broken_pos, -> { where(pos_kind: broken_pos_kinds) }

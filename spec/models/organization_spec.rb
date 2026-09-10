@@ -5,7 +5,7 @@ RSpec.describe Organization, type: :model do
 
   describe "factory" do
     let(:organization) { FactoryBot.create(:organization, :with_invoice) }
-    it "is paid and valid" do
+    it "has_invoice and is valid" do
       expect(organization.reload.has_invoice).to be_truthy
       expect(organization.enabled_feature_slugs).to eq([])
       expect(organization.invoices.last.invoice_organization_features.pluck(:id)).to eq([])
@@ -351,7 +351,7 @@ RSpec.describe Organization, type: :model do
     it "is falsey" do
       expect(Organization.new.user_registration_all_bikes?).to be_falsey
     end
-    context "paid" do
+    context "with an invoice" do
       let(:enabled_feature_slugs) { ["regional_bike_counts"] }
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
       # Excluded IDs are real prod orgs (SBR/BikeIndex); stub them so the test org's auto-increment id can't collide
