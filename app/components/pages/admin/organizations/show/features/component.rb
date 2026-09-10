@@ -5,7 +5,7 @@ module Pages
     module Organizations
       module Show
         module Features
-          # What the organization's paid features give it, and the organizations it's associated with.
+          # What the organization's invoiced features give it, and the organizations it's associated with.
           class Component < ApplicationComponent
             def initialize(organization:)
               @organization = organization

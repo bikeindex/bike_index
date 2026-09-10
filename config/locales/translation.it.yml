@@ -643,7 +643,7 @@ it:
         deleted_at: Eliminato il
         enabled_feature_slugs: Slug delle funzionalità abilitate
         invoices: Fatture
-        is_paid: È pagato
+        is_invoiced: È fatturato
         kind: Tipo
         locations: Luoghi
         lock_show_on_map: Blocco visualizzato sulla mappa

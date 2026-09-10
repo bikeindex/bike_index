@@ -91,7 +91,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             approved: false,
             access_token: "stuff7",
             lock_show_on_map: true,
-            is_paid: false
+            is_invoiced: false
           }
         end
         let(:user2) { FactoryBot.create(:organization_user, organization: current_organization) }
@@ -109,7 +109,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             website: " www.drseuss.org",
             name: "some new name",
             kind: "bike_shop",
-            is_paid: true,
+            is_invoiced: true,
             lock_show_on_map: false,
             show_on_map: true,
             locations_attributes: []
@@ -449,9 +449,9 @@ RSpec.describe Organized::ManagesController, type: :request do
           expect(flash[:notice]).to be_present
         end
       end
-      context "paid organization" do
+      context "organization with an invoice" do
         it "does not destroy" do
-          current_organization.update_attribute :is_paid, true
+          current_organization.update_attribute :is_invoiced, true
           expect {
             delete base_url
           }.to change(Organization, :count).by(0)

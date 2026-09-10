@@ -638,7 +638,7 @@ nb:
         deleted_at: Slettet kl
         enabled_feature_slugs: Aktiverte funksjonssnegler
         invoices: Fakturaer
-        is_paid: Er betalt
+        is_invoiced: Er fakturert
         kind: Snill
         locations: Steder
         lock_show_on_map: Lås vis på kartet

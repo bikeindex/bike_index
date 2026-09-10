@@ -34,11 +34,11 @@ module Pages
               end
             end
 
-            # The email fields aren't features, so paid? is what gates them
+            # The email fields aren't features, so is_invoiced? is what gates them
             def customizable_reg_fields
               @customizable_reg_fields ||= OrganizationFeature.reg_fields_with_customizable_labels.select do |reg_field|
                 if OrganizationFeature.email_customizable_labels.include?(reg_field)
-                  @organization.paid?
+                  @organization.is_invoiced?
                 else
                   @organization.enabled?(reg_field)
                 end

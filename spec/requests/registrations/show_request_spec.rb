@@ -679,7 +679,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("View as owner of bike")
         expect(body).to match("View as #{brakebills.short_name} staff")
         expect(body).to match("View as #{brakebills.short_name} limited")
-        # ikes-bikes is the seeded unpaid default alongside the paid brakebills
+        # ikes-bikes is the seeded no-invoice default alongside the invoiced brakebills
         expect(body).to match("View as #{ikes.short_name} limited")
         # public is the superuser's default/current view
         expect(body).to match("Viewing as Public")

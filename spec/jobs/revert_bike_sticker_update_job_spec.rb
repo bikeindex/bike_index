@@ -4,10 +4,10 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
   let(:instance) { described_class.new }
 
   describe "perform" do
-    let!(:organization) { FactoryBot.create(:organization, :paid) }
+    let!(:organization) { FactoryBot.create(:organization, :with_invoice) }
     let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization:) }
     let!(:bike) { FactoryBot.create(:bike) }
-    let!(:new_organization) { FactoryBot.create(:organization, :paid) }
+    let!(:new_organization) { FactoryBot.create(:organization, :with_invoice) }
     let(:user) { FactoryBot.create(:user, :with_organization, organization: new_organization) }
 
     it "does nothing if the update doesn't exist" do
@@ -33,12 +33,12 @@ RSpec.describe RevertBikeStickerUpdateJob, type: :job do
         }
       end
       let(:initial_update) do
-        {kind: "initial_claim", organization_kind: "other_paid_organization", update_number: 1,
+        {kind: "initial_claim", organization_kind: "other_invoiced_organization", update_number: 1,
          user_id: user.id, organization_id: new_organization.id}
       end
       it "removes" do
-        expect(organization.reload.is_paid).to be_truthy
-        expect(new_organization.reload.is_paid).to be_truthy
+        expect(organization.reload.is_invoiced).to be_truthy
+        expect(new_organization.reload.is_invoiced).to be_truthy
 
         expect(bike_sticker_update.reload).to have_attributes initial_update
         expect(bike_sticker.reload.bike_sticker_updates.count).to eq 1

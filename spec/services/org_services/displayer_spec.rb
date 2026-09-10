@@ -16,10 +16,10 @@ RSpec.describe OrgServices::Displayer do
     it "displays" do
       expect(OrgServices::Displayer.avatar?(organization)).to be_truthy
     end
-    # someday, we might only want to show it for paid organizations
-    context "paid" do
+    # someday, we might only want to show it for organizations with an invoice
+    context "with an invoice" do
       it "displays" do
-        organization.is_paid = true
+        organization.is_invoiced = true
         expect(OrgServices::Displayer.avatar?(organization)).to be_truthy
       end
     end
@@ -67,7 +67,7 @@ RSpec.describe OrgServices::Displayer do
     let(:organization) { Organization.new }
     it "is falsey" do
       expect(OrgServices::Displayer.subscription_expired_alert?(organization)).to be_falsey
-      organization.is_paid = true
+      organization.is_invoiced = true
       expect(OrgServices::Displayer.subscription_expired_alert?(organization)).to be_falsey
     end
     context "with current invoice" do

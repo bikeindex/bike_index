@@ -4,16 +4,16 @@ RSpec.describe Organization, type: :model do
   it_behaves_like "search_radius_metricable"
 
   describe "factory" do
-    let(:organization) { FactoryBot.create(:organization, :paid) }
-    it "is paid and valid" do
-      expect(organization.reload.is_paid).to be_truthy
+    let(:organization) { FactoryBot.create(:organization, :with_invoice) }
+    it "is_invoiced and is valid" do
+      expect(organization.reload.is_invoiced).to be_truthy
       expect(organization.enabled_feature_slugs).to eq([])
       expect(organization.invoices.last.invoice_organization_features.pluck(:id)).to eq([])
     end
     context "organization_features" do
       let(:organization) { FactoryBot.create(:organization, :organization_features) }
       it "is valid" do
-        expect(organization.reload.is_paid).to be_truthy
+        expect(organization.reload.is_invoiced).to be_truthy
         expect(organization.enabled_feature_slugs).to eq(["csv_export"])
         expect(organization.invoices.last.invoice_organization_features.pluck(:id).count).to eq 1
       end
@@ -351,7 +351,7 @@ RSpec.describe Organization, type: :model do
     it "is falsey" do
       expect(Organization.new.user_registration_all_bikes?).to be_falsey
     end
-    context "paid" do
+    context "with an invoice" do
       let(:enabled_feature_slugs) { ["regional_bike_counts"] }
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
       # Excluded IDs are real prod orgs (SBR/BikeIndex); stub them so the test org's auto-increment id can't collide
@@ -368,12 +368,12 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "is_paid and enabled? calculations" do
+  describe "is_invoiced and enabled? calculations" do
     let(:organization_feature) { FactoryBot.create(:organization_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: %w[child_organizations csv_exports]) }
     let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0) }
     let(:organization) { invoice.organization }
     let(:organization_child) { FactoryBot.create(:organization) }
-    it "uses associations to determine is_paid" do
+    it "uses associations to determine is_invoiced" do
       expect(organization.enabled?("csv_exports")).to be_falsey
       invoice.update(organization_feature_ids: [organization_feature.id])
       invoice.update(child_enabled_feature_slugs_string: "csv_exports")
@@ -381,16 +381,16 @@ RSpec.describe Organization, type: :model do
 
       expect { organization.save }.to change { UpdateOrganizationAssociationsJob.jobs.count }.by(1)
 
-      expect(organization.is_paid).to be_truthy
+      expect(organization.is_invoiced).to be_truthy
       expect(organization.enabled_feature_slugs).to eq(["child_organizations", "csv_exports"])
       expect(organization.enabled?("csv_exports")).to be_truthy
-      expect(organization_child.is_paid).to be_falsey
+      expect(organization_child.is_invoiced).to be_falsey
 
       organization_child.update(parent_organization: organization)
       organization.save
 
       expect(organization.parent?).to be_truthy
-      expect(organization_child.is_paid).to be_truthy
+      expect(organization_child.is_invoiced).to be_truthy
       expect(organization_child.current_invoices.first).to be_blank
       expect(organization_child.enabled_feature_slugs).to eq(["csv_exports"])
       expect(organization_child.enabled?("csv_exports")).to be_truthy # It also checks for the full name version

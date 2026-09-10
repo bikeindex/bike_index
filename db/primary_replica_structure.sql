@@ -913,8 +913,8 @@ CREATE TABLE public.bug_reports (
     subject text,
     body text,
     is_member boolean DEFAULT false NOT NULL,
-    is_paid_organization boolean DEFAULT false NOT NULL,
-    is_paid_organization_staff boolean DEFAULT false NOT NULL,
+    is_invoiced_organization boolean DEFAULT false NOT NULL,
+    is_invoiced_organization_staff boolean DEFAULT false NOT NULL,
     github_pull_request integer,
     tags text[] DEFAULT '{}'::text[] NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
@@ -2958,7 +2958,7 @@ CREATE TABLE public.organizations (
     api_access_approved boolean DEFAULT false NOT NULL,
     approved boolean DEFAULT true,
     avatar character varying(255),
-    is_paid boolean DEFAULT false NOT NULL,
+    is_invoiced boolean DEFAULT false NOT NULL,
     lock_show_on_map boolean DEFAULT false NOT NULL,
     enabled_feature_slugs jsonb,
     parent_organization_id integer,
@@ -7812,6 +7812,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260909120000'),
 ('20260908163548'),
 ('20260821100000'),
 ('20260819120000'),

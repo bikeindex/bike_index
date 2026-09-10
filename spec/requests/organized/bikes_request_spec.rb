@@ -292,10 +292,10 @@ RSpec.describe Organized::BikesController, type: :request do
       expect(assigns(:recoveries).pluck(:id)).to eq([recovered_record.id, recovered_record2.id])
       expect(response).to render_template :recoveries
     end
-    context "unpaid organization" do
+    context "organization without an invoice" do
       let(:current_organization) { FactoryBot.create(:organization) }
       it "redirects" do
-        expect(current_organization.reload.paid?).to be_falsey
+        expect(current_organization.reload.is_invoiced?).to be_falsey
         get "#{base_url}/recoveries"
         expect(response.location).to match(organization_registrations_path(organization_id: current_organization.to_param))
       end
@@ -348,8 +348,8 @@ RSpec.describe Organized::BikesController, type: :request do
       let!(:partial_registration) { BParam.create(params: {bike: partial_reg_attrs.merge(creation_organization_id: organization_child.id)}, origin: "embed_partial") }
       it "renders" do
         current_organization.save # Have to resave organization because of child relationship, and re-stub
-        current_organization.update_columns(is_paid: true, enabled_feature_slugs: enabled_feature_slugs)
-        expect(organization_child.reload.paid?).to be_truthy
+        current_organization.update_columns(is_invoiced: true, enabled_feature_slugs: enabled_feature_slugs)
+        expect(organization_child.reload.is_invoiced?).to be_truthy
 
         expect(partial_registration.organization).to eq organization_child
         get "#{base_url}/incompletes"
@@ -359,11 +359,11 @@ RSpec.describe Organized::BikesController, type: :request do
       end
     end
 
-    context "unpaid organization" do
+    context "organization without an invoice" do
       let(:current_organization) { FactoryBot.create(:organization) }
 
       it "redirects" do
-        expect(current_organization.reload.paid?).to be_falsey
+        expect(current_organization.reload.is_invoiced?).to be_falsey
         get "#{base_url}/incompletes"
         expect(response.location).to match(organization_registrations_path(organization_id: current_organization.to_param))
       end
