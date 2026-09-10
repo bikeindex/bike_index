@@ -22,17 +22,15 @@
 class MarketplacePartnerShop < ApplicationRecord
   # A bike shop that boxes marketplace bikes for shipping, and takes a cut for doing it.
   #
-  # Deliberately thin: the shop is already an Organization with kind bike_shop, its address is
-  # already a Location, and who may act for it is already OrganizationRole. This holds only what
-  # organizations don't have - the fee, the capacity, and how the shipment gets booked.
+  # Deliberately thin: the shop is already an Organization with kind bike_shop, its address a
+  # Location, and who may act for it an OrganizationRole.
 
   include Currencyable
 
   FEATURE_SLUG = "marketplace_partner"
 
   STATUS_ENUM = {pending: 0, active: 1, paused: 2}.freeze
-  # Whether we buy the label or the shop does on their own BikeFlights account. Undecided until
-  # they answer, so it's per shop rather than global - shops that already ship may prefer their own.
+  # Per shop rather than global: a shop that already ships may prefer to buy the label itself
   BOOKED_BY_ENUM = {bike_index_account: 0, partner_shop_account: 1}.freeze
 
   enum :status, STATUS_ENUM
@@ -44,19 +42,27 @@ class MarketplacePartnerShop < ApplicationRecord
   has_many :marketplace_orders
 
   validates_presence_of :organization_id, :status
-  validates_uniqueness_of :organization_id
+  validates_uniqueness_of :organization_id, if: :organization_id_changed?
   validate :organization_is_a_bike_shop
   validate :location_belongs_to_organization
 
   before_validation :set_calculated_attributes
 
-  scope :accepting, -> { active.where.not(location_id: nil) }
+  # The organization feature is the kill switch, so it belongs in the scope rather than only in
+  # enabled? - otherwise a shop whose feature was revoked still comes back from near
+  scope :accepting, lambda {
+    active.where.not(location_id: nil).joins(:organization)
+      .merge(Organization.with_enabled_feature_slugs(FEATURE_SLUG))
+  }
 
   class << self
     def statuses = STATUS_ENUM.keys.map(&:to_s)
 
-    # Shops that could take a drop-off near where the seller is
-    def near(latitude_longitude, distance_miles = 50)
+    # Shops that could take a drop-off near where the seller is. Coordinates only - handing
+    # GeocodeHelper a string would put a blocking geocode request inside a finder.
+    def near(latitude_longitude, distance_miles = GeocodeHelper::DEFAULT_MARKETPLACE_DISTANCE)
+      return none unless latitude_longitude.is_a?(Array) && latitude_longitude.length == 2
+
       bounds = GeocodeHelper.bounding_box(latitude_longitude, distance_miles)
       return none if bounds.blank?
 
@@ -64,14 +70,20 @@ class MarketplacePartnerShop < ApplicationRecord
     end
   end
 
-  def boxing_fee = boxing_fee_cents.to_i / 100.0
+  # Matches Amountable#amount, which this can't include - that concern is hardwired to
+  # amount_cents and the shop's money column is boxing_fee_cents
+  def boxing_fee
+    fee = boxing_fee_cents.to_i / 100.00
+    (fee % 1 != 0) ? fee : fee.round
+  end
 
   def boxing_fee=(value)
     self.boxing_fee_cents = MoneyFormatter.convert_to_cents(value)
   end
 
-  # Being switched on in admin isn't enough - the organization has to have the feature too, so
-  # turning it off there takes the shop out of rotation without editing this record
+  def boxing_fee_formatted = MoneyFormatter.money_format(boxing_fee_cents, currency_name)
+
+  # Status is ours to set, the feature is the organization's - either one turns the shop off
   def enabled?
     active? && organization&.enabled?(FEATURE_SLUG)
   end

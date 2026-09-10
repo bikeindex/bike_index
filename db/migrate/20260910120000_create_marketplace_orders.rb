@@ -5,8 +5,9 @@ class CreateMarketplaceOrders < ActiveRecord::Migration[8.1]
       t.references :buyer
       t.references :seller
       t.references :sale
+      t.references :marketplace_partner_shop
 
-      t.integer :status
+      t.integer :status, index: true
       t.integer :fulfillment_kind
       t.integer :currency_enum
 
@@ -18,10 +19,7 @@ class CreateMarketplaceOrders < ActiveRecord::Migration[8.1]
       t.integer :platform_fee_cents
 
       t.string :stripe_payment_intent_id
-
       t.datetime :paid_at
-      t.datetime :completed_at
-      t.datetime :cancelled_at
 
       t.timestamps
     end

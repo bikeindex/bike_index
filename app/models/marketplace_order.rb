@@ -5,8 +5,6 @@
 #
 #  id                          :bigint           not null, primary key
 #  amount_cents                :integer
-#  cancelled_at                :datetime
-#  completed_at                :datetime
 #  currency_enum               :integer
 #  fulfillment_kind            :integer
 #  item_amount_cents           :integer
@@ -31,13 +29,12 @@
 #  index_marketplace_orders_on_marketplace_partner_shop_id  (marketplace_partner_shop_id)
 #  index_marketplace_orders_on_sale_id                      (sale_id)
 #  index_marketplace_orders_on_seller_id                    (seller_id)
+#  index_marketplace_orders_on_status                       (status)
 #
 class MarketplaceOrder < ApplicationRecord
   include Amountable
   include Currencyable
 
-  # One sequence covers both ways of getting the bike to the buyer; local pickup skips the four
-  # in the middle, which only mean anything once a shop is handling the bike.
   STATUS_ENUM = {pending_payment: 0, paid: 1, awaiting_drop_off: 2, dropped_off: 3,
                  in_transit: 4, delivered: 5, completed: 6, cancelled: 7, refunded: 8}.freeze
   FULFILLMENT_KIND_ENUM = {local_pickup: 0, shipped: 1}.freeze
@@ -72,10 +69,7 @@ class MarketplaceOrder < ApplicationRecord
 
   def ended? = ENDED_STATUSES.include?(status&.to_sym)
 
-  def paid? = paid_at.present?
-
-  # What the buyer pays on top of the bike itself - shown separately so they can see what the
-  # shop and the carrier are getting rather than one opaque total
+  # Shown to the buyer beside the bike's price rather than folded into one opaque total
   def fulfillment_amount_cents
     shipping_amount_cents.to_i + shop_fee_cents.to_i
   end
@@ -91,10 +85,9 @@ class MarketplaceOrder < ApplicationRecord
     self.status ||= :pending_payment
     self.seller_id ||= marketplace_listing&.seller_id
     self.item_amount_cents ||= marketplace_listing&.amount_cents
-    # Once charged, the total is a historical fact rather than a running sum - a later refund
-    # adjusts the components without rewriting what the buyer actually paid. Still calculate it
-    # when there's nothing there yet, or an order that arrives already paid never gets a total.
-    self.amount_cents = component_amount_cents unless paid? && amount_cents.present?
+    # Once paid, the total is what the buyer was charged - a refund adjusts the components
+    # without rewriting it
+    self.amount_cents = component_amount_cents unless paid_at.present? && amount_cents.present?
   end
 
   def buyer_is_not_seller
@@ -103,25 +96,26 @@ class MarketplaceOrder < ApplicationRecord
     errors.add(:buyer_id, "can't buy your own listing")
   end
 
+  # Only on the way in: re-deciding it on each status transition reloads the listing and its bike
   def fulfillment_is_available
+    return unless new_record? || fulfillment_kind_changed?
     return unless fulfillment_shipped?
     return if marketplace_listing&.shippable?
 
     errors.add(:fulfillment_kind, "isn't available for this listing")
   end
 
+  def shipping_status? = SHIPPING_STATUSES.include?(status&.to_sym)
+
   def status_matches_fulfillment_kind
-    return unless fulfillment_local_pickup?
-    return unless SHIPPING_STATUSES.include?(status&.to_sym)
+    return unless fulfillment_local_pickup? && shipping_status?
 
     errors.add(:status, "doesn't apply to a local pickup")
   end
 
-  # The buyer picks a shop at checkout, but an order can sit paid before one is assigned - what
-  # can't happen is a bike being expected at a shop nobody named
+  # A bike can't be expected at a shop nobody named
   def shop_present_once_shipping_starts
-    return unless fulfillment_shipped?
-    return unless SHIPPING_STATUSES.include?(status&.to_sym)
+    return unless fulfillment_shipped? && shipping_status?
     return if marketplace_partner_shop_id.present?
 
     errors.add(:marketplace_partner_shop, "is needed before a shipment starts")

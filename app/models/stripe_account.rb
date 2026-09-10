@@ -20,19 +20,14 @@
 #  index_stripe_accounts_on_stripe_id       (stripe_id) UNIQUE
 #
 class StripeAccount < ApplicationRecord
-  # A Stripe Connect account belonging to someone we pay out to - a seller, or a partner shop.
-  #
-  # Separate from the Checkout Sessions in Payment, which is us collecting for memberships.
-  # Connect is the other direction: Stripe holds the marketplace funds and carries the
-  # money-transmission licensing, so Bike Index never takes custody of a buyer's money.
-  #
-  # Nobody can be paid until Stripe says so, and they say so by webhook rather than at the end of
-  # the onboarding flow - somebody can finish the form and still not be payable.
+  # A Connect account for someone we pay out to - a seller, or a partner shop. Not the Checkout
+  # Sessions in Payment: Connect is Stripe holding the funds and carrying the money-transmission
+  # licensing, so Bike Index never takes custody of a buyer's money.
 
   belongs_to :account_holder, polymorphic: true
 
   validates_presence_of :account_holder_id, :account_holder_type
-  validates_uniqueness_of :stripe_id, allow_nil: true
+  validates_uniqueness_of :stripe_id, allow_nil: true, if: :stripe_id_changed?
 
   scope :payable, -> { where(payouts_enabled: true) }
 
@@ -42,12 +37,11 @@ class StripeAccount < ApplicationRecord
     end
   end
 
-  # The only question worth asking before releasing money
+  # Stripe's answer, not ours - somebody can finish onboarding and still not be payable
   def payable? = payouts_enabled?
 
   def onboarding_started? = stripe_id.present?
 
-  # Stripe's account object, whether from a webhook or a fetch
   def update_from_stripe!(stripe_account_obj)
     self.stripe_id ||= stripe_account_obj["id"]
     self.charges_enabled = stripe_account_obj["charges_enabled"] || false

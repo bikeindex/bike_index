@@ -71,15 +71,25 @@ RSpec.describe MarketplacePartnerShop, type: :model do
   end
 
   describe "near" do
-    let!(:marketplace_partner_shop) { FactoryBot.create(:marketplace_partner_shop, :active) }
+    let!(:marketplace_partner_shop) { FactoryBot.create(:marketplace_partner_shop, :accepting) }
     let(:location) { marketplace_partner_shop.location }
+    let(:coordinates) { [location.latitude, location.longitude] }
 
     it "finds the shop by its location, and excludes the ones not taking drop-offs" do
-      coordinates = [location.latitude, location.longitude]
       expect(described_class.near(coordinates).pluck(:id)).to eq([marketplace_partner_shop.id])
 
       marketplace_partner_shop.update(status: "paused")
       expect(described_class.near(coordinates).pluck(:id)).to eq([])
+    end
+
+    it "excludes an active shop whose organization doesn't have the feature" do
+      without_feature = FactoryBot.create(:marketplace_partner_shop, :active)
+      expect(without_feature.active?).to be_truthy
+      expect(described_class.near(coordinates).pluck(:id)).to_not include(without_feature.id)
+    end
+
+    it "won't geocode a place name - that would be a blocking request inside a finder" do
+      expect(described_class.near("New York, NY").pluck(:id)).to eq([])
     end
 
     it "doesn't find a shop across the country" do

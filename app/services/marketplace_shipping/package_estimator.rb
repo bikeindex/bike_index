@@ -2,19 +2,14 @@ module MarketplaceShipping
   module PackageEstimator
     extend Functionable
 
-    # BikeFlights' own assembled box sizes, from bikeflights.com/dimensionsandrates. They decline
-    # to map bike type to a box - "measure your bike as you will pack it" - so these are the two a
-    # partner shop realistically reaches for: both are the sizes they describe as packed with both
-    # wheels removed, which is how a shop packs. The medium also stays inside their best-rate
-    # thresholds (48in longest side, 30in second longest).
+    # BikeFlights' own box sizes. They decline to map bike type to a box ("measure your bike as
+    # you will pack it"), so these are their two both-wheels-removed sizes - how a shop packs.
     MEDIUM = {length: 45, width: 12, height: 30}.freeze
     EXTRA_LARGE = {length: 56, width: 21, height: 32}.freeze
 
-    # PROVISIONAL, and the least trustworthy part of this estimate: we store no bike weight, so
-    # this is a whole packed box - bike plus carton and padding - assumed rather than measured.
-    # Both sit under BikeFlights' 50lb preferential-rate threshold, which is what makes an
-    # under-estimate expensive: their carriers re-measure in transit and bill the difference plus
-    # a $27 penalty. The shop reweighs at drop-off and we re-quote before buying a label.
+    # PROVISIONAL - we store no bike weight, so a packed box is assumed rather than measured.
+    # Under-estimating costs the difference plus a $27 penalty when carriers re-measure in
+    # transit, which is why the shop reweighs at drop-off and we re-quote before buying a label.
     MEDIUM_WEIGHT_POUNDS = 45
     EXTRA_LARGE_WEIGHT_POUNDS = 55
 

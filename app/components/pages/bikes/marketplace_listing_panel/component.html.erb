@@ -40,9 +40,12 @@
     <%= render(UI::DefinitionList::Row::Component.new(label: translation(".shipping"))) do %>
       <%= translation(".shipping_#{@marketplace_listing.shippable?}") %>
 
-      <% if shipping_unavailable_reason_key.present? %>
+      <% if @marketplace_listing.shipping_unavailable_reason.present? %>
         <em class="less-strong tw:text-sm">
-          <%= translation(".#{shipping_unavailable_reason_key}", bike_type:) %>
+          <%= translation(
+            ".shipping_#{@marketplace_listing.shipping_unavailable_reason}",
+            bike_type: @marketplace_listing.item_type_sentence,
+          ) %>
         </em>
       <% end %>
     <% end %>

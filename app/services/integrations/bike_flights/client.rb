@@ -8,24 +8,28 @@ module Integrations
     # an API key, and every operation is named for a shop. Whoever holds the account is the payer
     # of record, because creating an order charges that account's saved payment method.
     #
-    # The request and response shapes below come from their published docs, NOT from a live
-    # account, so treat the field names as unconfirmed until we've run against the sandbox. The
-    # methods pass hashes straight through for that reason - a wrong guess here should be cheap.
-    class Client
+    # The wire format below comes from their published docs, NOT from a live account, so treat
+    # every field name as unconfirmed until we've run against the sandbox. It's all in this file
+    # so confirming it is one edit rather than a hunt.
+    module Client
+      extend Functionable
+
       BASE_URL = ENV.fetch("BIKEFLIGHTS_BASE_URL", "https://sandbox.bikeflights.com")
       EMAIL = ENV["BIKEFLIGHTS_EMAIL"]
       PASSWORD = ENV["BIKEFLIGHTS_PASSWORD"]
       STORE = ENV["BIKEFLIGHTS_STORE"]
+      SHOP_NAME = ENV["BIKEFLIGHTS_SHOP_NAME"]
 
       TOKEN_CACHE_KEY = "bike_flights_token"
-      # Their docs don't state a token lifetime - one of the questions for partners@. Re-authing
-      # every few hours is cheap, and an expired token surfaces as a 401 we can retry on.
+      # TODO: confirm the real lifetime with partners@ - an expired token surfaces as a 401
       TOKEN_EXPIRY = 4.hours
 
       class Error < StandardError; end
 
-      def shop_rate(params)
-        post("api/ShopRate", params)
+      # origin and destination take :postal_code, :city, :region and :country_iso
+      def shop_rate(origin:, destination:, packages:)
+        post("api/ShopRate", {shopName: SHOP_NAME, origin: address_params(origin),
+                              destination: address_params(destination), packages:})
       end
 
       # Charges the account's saved payment method. requestId and rateSignature come from the
@@ -53,6 +57,15 @@ module Integrations
         get("api/Data/countries")
       end
 
+      #
+      # private below here
+      #
+
+      def address_params(address)
+        {postalCode: address[:postal_code], city: address[:city], state: address[:region],
+         country: address[:country_iso].presence || "US"}.compact
+      end
+
       def token
         Rails.cache.fetch(TOKEN_CACHE_KEY, expires_in: TOKEN_EXPIRY) do
           response = connection.post("api/Authentication/login") do |req|
@@ -64,8 +77,6 @@ module Integrations
           body.is_a?(Hash) ? (body["token"] || body["accessToken"]) : body
         end
       end
-
-      private
 
       def get(path) = parsed(authorized_request(:get, path))
 
@@ -86,13 +97,15 @@ module Integrations
       end
 
       def connection
-        @connection ||= Faraday.new(url: BASE_URL) do |con|
+        Faraday.new(url: BASE_URL) do |con|
           con.request :json
           con.response :json, content_type: /\bjson$/
           con.adapter Faraday.default_adapter
           con.options.timeout = 10
         end
       end
+
+      conceal :address_params, :token, :get, :post, :authorized_request, :parsed, :connection
     end
   end
 end

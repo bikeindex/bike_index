@@ -2386,6 +2386,7 @@ CREATE TABLE public.marketplace_orders (
     buyer_id bigint,
     seller_id bigint,
     sale_id bigint,
+    marketplace_partner_shop_id bigint,
     status integer,
     fulfillment_kind integer,
     currency_enum integer,
@@ -2396,11 +2397,8 @@ CREATE TABLE public.marketplace_orders (
     platform_fee_cents integer,
     stripe_payment_intent_id character varying,
     paid_at timestamp(6) without time zone,
-    completed_at timestamp(6) without time zone,
-    cancelled_at timestamp(6) without time zone,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    marketplace_partner_shop_id bigint
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 
@@ -7220,6 +7218,13 @@ CREATE INDEX index_marketplace_orders_on_seller_id ON public.marketplace_orders 
 
 
 --
+-- Name: index_marketplace_orders_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_orders_on_status ON public.marketplace_orders USING btree (status);
+
+
+--
 -- Name: index_marketplace_partner_shops_on_location_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -8041,7 +8046,6 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20260910150000'),
 ('20260910140000'),
 ('20260910130000'),
 ('20260910120000'),
