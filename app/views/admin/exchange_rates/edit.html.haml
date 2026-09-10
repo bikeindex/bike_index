@@ -1,11 +1,7 @@
 .container
   %h1 Edit Exchange Rate
   .text-right
-    = link_to "Delete exchange rate",
-    admin_exchange_rate_path(@exchange_rate),
-    method: :delete,
-    data: { confirm: "Are you sure you want to delete this? This can't be undone" },
-    class: "text-warning"
+    = render(UI::ButtonLink::Component.new(text: "Delete exchange rate", href: admin_exchange_rate_path(@exchange_rate), method: :delete, color: :error, size: :sm, form: {onsubmit: "return confirm('#{j "Are you sure you want to delete this? This can't be undone"}')"}))
 
   = render "form",
     exchange_rate: @exchange_rate,

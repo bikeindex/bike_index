@@ -9,11 +9,7 @@
       = link_to "Log in to refresh credentials", "/auth/twitter"
 
   .col-sm-6.text-right
-    = link_to "Delete account",
-      admin_social_account_path(@social_account),
-      method: :delete,
-      data: { confirm: "Are you sure you want to delete this? This can't be undone" },
-      class: "btn btn-danger"
+    = render(UI::ButtonLink::Component.new(text: "Delete account", href: admin_social_account_path(@social_account), method: :delete, color: :error, form: {onsubmit: "return confirm('#{j "Are you sure you want to delete this? This can't be undone"}')"}))
 
 .container-fluid
   = render "form",
