@@ -1,7 +1,0 @@
----
-en:
-  components:
-    registrations:
-      show:
-        owner_phone:
-          or_call: Or call

@@ -31,19 +31,19 @@ export default class extends Controller {
   applyStatuses (duration) {
     const status = this.element.querySelector('input[name$="[status]"]')?.value
     this.fieldTargets.forEach((field) => {
-      // register--organization sets the flag on a field only its organization asks for
-      const shown = JSON.parse(field.dataset.statuses).includes(status) && !field.dataset.organizationOff
-      collapseField(field, shown, duration)
-      if (field.dataset.texts) this.applyRequired(field, this.textFor(field, status))
+      // register--organization sets the flag. A field it only adds to carries the answers
+      // for when it's dropped; one that only it asks for carries none, so dropping that
+      // leaves it no status to show on
+      const off = Boolean(field.dataset.organizationOff)
+      const statuses = off ? (field.dataset.organizationOffStatuses || '[]') : field.dataset.statuses
+      const texts = off ? field.dataset.organizationOffTexts : field.dataset.texts
+      collapseField(field, JSON.parse(statuses).includes(status), duration)
+      if (texts) this.applyRequired(field, JSON.parse(texts)[status])
     })
     // Backspacing the combobox empty deselects it, so keep the label it had rather
     // than writing an undefined status's missing text into the button
-    const submitText = this.hasSubmitLabelTarget && this.textFor(this.submitLabelTarget, status)
+    const submitText = this.hasSubmitLabelTarget && JSON.parse(this.submitLabelTarget.dataset.texts)[status]
     if (submitText) this.submitLabelTarget.textContent = submitText
-  }
-
-  textFor (element, status) {
-    return JSON.parse(element.dataset.texts)[status]
   }
 
   // The phone a theft or a find gets contacted on: required, starred rather than badged

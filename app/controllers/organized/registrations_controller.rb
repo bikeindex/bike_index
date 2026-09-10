@@ -69,7 +69,7 @@ module Organized
       response.set_header("Cache-Control", "no-store")
       sequence = BikeServices::Register.registration_sequence(@b_param)
       steps = BikeServices::Register.steps(@b_param, sequence:)
-      render Org::RegisterStep1::Component.new(b_param: @b_param, steps:,
+      render Pages::Org::RegisterStep1::Component.new(b_param: @b_param, steps:,
         organization: current_organization, current_user:)
     end
 

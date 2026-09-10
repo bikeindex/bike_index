@@ -24,7 +24,7 @@
           %td User
           %td
             = cache(@superuser_ability.user) do
-              = render Admin::Users::Cell::Component.new(user_id: @superuser_ability.user_id, user: @superuser_ability.user, render_search: false)
+              = render Pages::Admin::Users::Cell::Component.new(user_id: @superuser_ability.user_id, user: @superuser_ability.user, render_search: false)
   .col-md-6
     %table.table-list
       %tbody

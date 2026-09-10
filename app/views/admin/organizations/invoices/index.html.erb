@@ -1,6 +1,6 @@
-<%= render(Admin::Organizations::Tabs::Component.new(organization: @organization, active: :invoices, display_dev_info: display_dev_info?)) %>
+<%= render(Pages::Admin::Organizations::Tabs::Component.new(organization: @organization, active: :invoices, display_dev_info: display_dev_info?)) %>
 
-<%= render(Admin::Invoices::Table::Component.new(invoices: @invoices)) %>
+<%= render(Pages::Admin::Invoices::Table::Component.new(invoices: @invoices)) %>
 
 <h2 class="mt-5">
   <%= @organization.name %> has
@@ -13,4 +13,4 @@
   add it by editing it.
 </p>
 
-<%= render(Admin::Organizations::PaymentsTable::Component.new(organization: @organization)) %>
+<%= render(Pages::Admin::Organizations::PaymentsTable::Component.new(organization: @organization)) %>

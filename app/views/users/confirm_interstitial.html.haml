@@ -1,2 +1,2 @@
 .container
-  = render Sessions::SignInInterstitial::Component.new(url: confirm_users_path, fields: { id: params[:id], code: params[:code], partner: sign_in_partner, return_to: params[:return_to] })
+  = render Pages::Sessions::SignInInterstitial::Component.new(url: confirm_users_path, fields: { id: params[:id], code: params[:code], partner: sign_in_partner, return_to: params[:return_to] })

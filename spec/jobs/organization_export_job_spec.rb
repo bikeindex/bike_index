@@ -204,6 +204,7 @@ RSpec.describe OrganizationExportJob, type: :job do
           owner_name: "George Smith",
           registered_at: bike.created_at.utc.to_s,
           registered_by: nil, # Since user isn't part of organization. TODO: Currently not implemented
+          registration_method: "web",
           serial: bike.serial_number,
           status: nil, # no status
           thumbnail: nil,
@@ -230,6 +231,18 @@ RSpec.describe OrganizationExportJob, type: :job do
         # And matching the whole thing
         expect(generated_csv_string).to eq(csv_string)
         expect(export.rows).to eq 1
+      end
+    end
+
+    context "registration_method" do
+      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: {headers: %w[registration_method]}) }
+      let!(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization, creation_state_origin: "embed_partial") }
+
+      # The column is the component's copy, not the raw kind
+      it "exports the kind's label" do
+        expect(bike.reload.creation_kind).to eq :embed_partial
+        instance.perform(export.id)
+        expect(export.reload.file.read.split("\n").last).to eq instance.comma_wrapped_string(["old landing page"]).chomp
       end
     end
 
@@ -332,8 +345,9 @@ RSpec.describe OrganizationExportJob, type: :job do
           end
         end
         context "including every available field + stickers" do
-          let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[bike_stickers impound_bikes show_partial_registrations] }
+          let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[bike_stickers impound_bikes registration_notes show_partial_registrations] }
           let(:export_options) { {headers: Export.permitted_headers(organization)} }
+          let!(:bike_organization_note) { FactoryBot.create(:bike_organization_note, bike:, organization:, body: "Sold at the fall swap") }
           let(:bike_row_hash) do
             {
               color: "Black",
@@ -347,6 +361,7 @@ RSpec.describe OrganizationExportJob, type: :job do
               owner_name: nil,
               registered_at: bike.created_at.utc.to_s,
               registered_by: nil,
+              registration_method: "web",
               serial: bike.serial_number,
               status: nil,
               thumbnail: nil,
@@ -358,6 +373,7 @@ RSpec.describe OrganizationExportJob, type: :job do
               partial_registration: nil,
               is_impounded: nil,
               impounded_at: nil,
+              organization_notes: "Sold at the fall swap",
               address: "717 Market St",
               address_2: nil,
               city: "San Francisco",
@@ -404,6 +420,20 @@ RSpec.describe OrganizationExportJob, type: :job do
         end
       end
 
+      context "header only organization_notes" do
+        let(:target_headers) { %w[organization_notes] }
+        let(:export_options) { {headers: target_headers} }
+        let!(:bike_organization_note) { FactoryBot.create(:bike_organization_note, bike:, organization:, body: "Sold at the fall swap") }
+        let!(:other_organization_note) { FactoryBot.create(:bike_organization_note, bike:, organization: FactoryBot.create(:organization), body: "Not this org") }
+        it "returns the note from the export's organization" do
+          instance.perform(export.id)
+          export.reload
+          expect(instance.export_headers).to eq target_headers
+          expect(export.progress).to eq "finished"
+          expect(export.file.read.split("\n").last).to eq "\"Sold at the fall swap\""
+        end
+      end
+
       context "with partial registrations, every available field without sticker" do
         let(:enabled_feature_slugs) { OrganizationFeature::REG_FIELDS + %w[bike_stickers show_partial_registrations] }
         let(:export_options) { {headers: Export.permitted_headers(organization), partial_registrations: "only"} }
@@ -430,6 +460,7 @@ RSpec.describe OrganizationExportJob, type: :job do
             owner_name: nil,
             registered_at: partial_registration.created_at.utc.to_s,
             registered_by: nil,
+            registration_method: nil,
             serial: nil,
             status: nil,
             thumbnail: nil,
@@ -481,6 +512,7 @@ RSpec.describe OrganizationExportJob, type: :job do
               owner_name: nil,
               registered_at: bike.created_at.utc.to_s,
               registered_by: nil,
+              registration_method: "web",
               serial: bike.serial_number,
               status: nil,
               thumbnail: nil,
@@ -552,6 +584,7 @@ RSpec.describe OrganizationExportJob, type: :job do
             owner_name: nil,
             registered_at: bike.created_at.utc.to_s,
             registered_by: nil,
+            registration_method: "web",
             serial: bike.serial_number,
             status: "impounded",
             thumbnail: nil,

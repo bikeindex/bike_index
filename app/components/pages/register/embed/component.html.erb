@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+
+<html lang="<%= I18n.locale %>">
+  <head>
+    <%= render(SharedBlocks::HeaderTags::Component.new(**@header_tags_options)) %>
+
+    <%# The frame's src is crawlable from the embedding page, and it self-canonicalizes %>
+    <%= tag.meta name: "robots", content: "noindex" %>
+    <%= helpers.csrf_meta_tags %>
+    <%= helpers.stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= helpers.hw_combobox_style_tag %>
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700"
+      rel="stylesheet"
+      type="text/css"
+    >
+
+    <%= helpers.javascript_importmap_tags %>
+    <%= helpers.content_for(:header) %>
+  </head>
+
+  <%# The embedding page supplies the background %>
+  <body class="tw:bg-transparent"><%= @body %></body>
+</html>

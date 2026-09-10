@@ -1,0 +1,20 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe Pages::Memberships::ChooseMembership::Component, :js, type: :system do
+  let(:preview_path) { "/rails/view_components/pages/memberships/choose_membership/component/default" }
+
+  it "default preview" do
+    visit(preview_path)
+
+    expect(page).to have_content(/\$4.99\s+per\s+month/)
+    expect_axe_clean
+
+    # Click yearly toggle
+    choose "Yearly"
+
+    # Verify yearly price is displayed
+    expect(page).to have_content(/\$49.99\s+per\s+year/)
+  end
+end

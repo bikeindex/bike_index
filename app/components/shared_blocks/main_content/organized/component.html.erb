@@ -1,0 +1,107 @@
+<div class="organized-wrap">
+  <div class="<%= helpers.organized_container %>">
+    <%# the layout skips its own spot for this, so it lands inside the content column %>
+    <% if @show_general_alert %>
+      <%= render SharedBlocks::UserAlerts::Wrapper::Component.new(current_user: @current_user, wrapper_class: "tw:my-4") %>
+    <% end %>
+
+    <% if OrgServices::Displayer.law_enforcement_missing_verified_features?(@current_organization) %>
+      <div class="organization-wide-alert alert alert-info in">
+        <button
+          class="close"
+          aria-label="Close"
+          data-dismiss="alert"
+          type="button"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+
+        <p>
+          <%= translation(".additional_features_html", email_link: link_to("gavin@bikeindex.org", "mailto:gavin@bikeindex.org")) %>
+        </p>
+      </div>
+    <% end %>
+
+    <% if OrgServices::Displayer.subscription_expired_alert?(@current_organization) %>
+      <div class="organization-wide-alert alert alert-info in">
+        <button
+          class="close"
+          aria-label="Close"
+          data-dismiss="alert"
+          type="button"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+
+        <p>
+          <%= translation(".subscription_expired_html", email_link: link_to("gavin@bikeindex.org", "mailto:gavin@bikeindex.org")) %>
+        </p>
+      </div>
+    <% end %>
+
+    <% if OrgServices::Displayer.bike_shop_display_integration_alert?(@current_organization) %>
+      <div class="organization-wide-alert alert alert-info in">
+        <button
+          class="close"
+          aria-label="Close"
+          data-dismiss="alert"
+          type="button"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+
+        <div>
+          <p><%= translation(".use_lightspeed_retail_pos") %></p>
+
+          <ul>
+            <li>
+              <% link = link_to translation(".integrate_bike_index_with_lightspeed"), lightspeed_interface_path %>
+              <%= translation(".link_to_register_html", link:) %>
+            </li>
+
+            <li>
+              <% link = link_to translation(".how_integration_works"), lightspeed_path %>
+              <%= translation(".read_a_full_explanation_html", link:) %>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mt-2">
+          <p><%= translation(".use_ascend") %></p>
+
+          <ul>
+            <li>
+              <% link = link_to translation(".integrate_bike_index_with_ascend"), ascend_path %>
+              <%= translation(".link_to_register_html", link:) %>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mt-2">
+          <p><%= translation(".other_point_of_sale_system") %></p>
+
+          <ul>
+            <li>
+              <% if @controller_name == "bikes" && @action_name == "new" %>
+                <%= translation(".viewing_our_streamlined_page") %>
+              <% else %>
+                <% link = link_to translation(".streamlined_bike_shop_registration_page"), new_organization_bike_path(organization_id: @current_organization.to_param) %>
+                <%= translation(".register_bikes_with_link_html", link:) %>
+              <% end %>
+            </li>
+          </ul>
+        </div>
+      </div>
+    <% end %>
+
+    <%= content %>
+  </div>
+</div>
+
+<% if helpers.organized_include_javascript_pack? %>
+  <script>
+    window.passiveOrganizationId = <%== @passive_organization&.slug.to_json %>;
+  </script>
+  <%# Important that this is below the content, sometimes important page data is added to the dom in there %>
+  <script src="/vendored_assets/application.js"></script>
+<% end %>

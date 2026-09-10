@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe "organizations routing", type: :routing do
   describe "landing_pages" do
     it "routes root to " do
-      expect(LandingPages::ORGANIZATIONS).to include("brakebills")
+      expect(LandingPageOrganizations::SLUGS).to include("brakebills")
       expect(get: "/brakebills").to route_to(
         controller: "landing_pages",
         organization_id: "brakebills",

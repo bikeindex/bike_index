@@ -438,7 +438,7 @@ en:
         deleted_at: Deleted at
         enabled_feature_slugs: Enabled feature slugs
         invoices: Invoices
-        is_paid: Is paid
+        is_invoiced: Is invoiced
         kind: Kind
         locations: Locations
         lock_show_on_map: Lock show on map
@@ -753,6 +753,67 @@ en:
           new_in_box: unridden/with tags
           poor: needs service
           salvage: not working/unrideable
+      ownership:
+        creation_kind:
+          api_v1: api v1
+          api_v2: api v2
+          api_v3: api v3
+          ascend_pos: ascend
+          broken_ascend_pos: ascend (broken)
+          broken_lightspeed_pos: lightspeed (broken)
+          bulk_import: bulk import
+          bulk_import_worker: bulk import worker
+          creator_unregistered_parking_notification: unregistered parking notification
+          embed: embed
+          embed_extended: embed +
+          embed_partial: old landing page
+          impound_import: impound import
+          impound_process: impound process
+          lightspeed_pos: lightspeed
+          organization_form: org form
+          other_pos: point of sale
+          register_flow: new flow
+          register_flow_landing_page: landing page
+          register_flow_organized: new flow organized
+          sticker: sticker
+          transferred_ownership: transferred ownership
+          web: web
+        creation_kind_description:
+          api_v1: registered through the API (v1)
+          api_v2: registered through the API (v2)
+          api_v3: registered through the API (v3)
+          ascend_pos: automatically registered by bike shop point of sale (Ascend
+            POS)
+          broken_ascend_pos: >-
+            automatically registered by bike shop point of sale (Ascend POS), whose
+            integration is marked broken
+          broken_lightspeed_pos: >-
+            automatically registered by bike shop point of sale (Lightspeed POS),
+            whose integration is marked broken
+          bulk_import: registered by spreadsheet import
+          bulk_import_worker: registered by spreadsheet import
+          creator_unregistered_parking_notification: registered via the Unregistered
+            Parking Notification flow
+          embed: registered on an organization's embedded registration form
+          embed_extended: registered on the organization embed form, extended version
+          embed_partial: registration began with incomplete registration, via organization
+            landing page
+          impound_import: registered by impound spreadsheet import
+          impound_process: transferred as part of the impound process
+          lightspeed_pos: automatically registered by bike shop point of sale (Lightspeed
+            POS)
+          organization_form: registered by an organization member, on the organization
+            form on Bike Index
+          other_pos: automatically registered by bike shop point of sale
+          register_flow: registered with the multi-step registration flow
+          register_flow_landing_page: >-
+            registration began via an organization landing page, in the multi-step
+            registration flow
+          register_flow_organized: registered by an organization member, in the multi-step
+            registration flow
+          sticker: registration began from a sticker
+          transferred_ownership: transferred to a new owner
+          web: registered with self registration process
       propulsion_type:
         foot_pedal: Pedal
         hand_pedal: Hand Cycle (hand pedal)
@@ -5015,8 +5076,10 @@ en:
       recoveries: Recoveries
       registration_sequences: Registration sequences
       registration_stickers: Registration stickers
+      registrations_index: Organization Registrations
       reports: Reports
       resources: Resources
+      search_all_registrations: Search all registrations
       search_impounded_vehicles: Search Impounded Vehicles
       search_parking_notifications: Search Parking Notifications
       search_registrations: Search Registrations

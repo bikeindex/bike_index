@@ -89,7 +89,7 @@ RSpec.describe UserServices::MenuItemsAccount do
           .to eq([{type: :link, label: "View without any organization",
                    path: "http://test.host/?organization_id=false",
                    icon: nil, match_params: {organization_id: "false"},
-                   data: {controller: "page-block--navbar-switch-no-organization"}},
+                   data: {controller: "shared-blocks--navbar-switch-no-organization"}},
             {type: :disabled, label: "Viewing Brakebills"}])
       end
     end

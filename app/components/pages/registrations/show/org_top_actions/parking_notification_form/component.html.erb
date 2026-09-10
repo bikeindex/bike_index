@@ -1,0 +1,122 @@
+<div
+  data-registrations--show--action-panels-target="panel"
+  data-panel-name="parking impound"
+  data-controller="registrations--show--parking-notification-form"
+  data-registrations--show--parking-notification-form-notification-heading-value="<%= translation(".create_parking_notification") %>"
+  data-registrations--show--parking-notification-form-impound-heading-value="<%= translation(".impound_this_bike_type", bike_type: @bike.type) %>"
+  data-registrations--show--parking-notification-form-default-kind-value="<%= new_parking_notification.kind %>"
+  data-registrations--show--parking-notification-form-org-latitude-value="<%= org_map_coordinates[:latitude] %>"
+  data-registrations--show--parking-notification-form-org-longitude-value="<%= org_map_coordinates[:longitude] %>"
+  data-action="registrations--show--action-panels:shown->registrations--show--parking-notification-form#panelShown"
+  class="tw:hidden"
+>
+  <%= render(UI::Card::Component.new) do %>
+    <h2
+      data-registrations--show--parking-notification-form-target="heading"
+      class="
+        tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+        tw:uppercase
+      "
+    >
+      <%= translation(".create_parking_notification") %>
+    </h2>
+
+    <div class="tw:mt-3">
+      <%= form_with(model: new_parking_notification, url: create_parking_notifications_path, data: {controller: "csrf-refresh form-persist", "form-persist-key-value": "parking-notification-#{@bike.id}", action: "input->form-persist#save submit->form-persist#clear"}) do |form| %>
+        <%= form.hidden_field :bike_id %>
+        <%= form.hidden_field :latitude, data: {"registrations--show--parking-notification-form-target": "latitude"} %>
+        <%= form.hidden_field :longitude, data: {"registrations--show--parking-notification-form-target": "longitude"} %>
+        <%= form.hidden_field :accuracy, data: {"registrations--show--parking-notification-form-target": "accuracy"} %>
+
+        <% if new_parking_notification.can_be_repeat? %>
+          <div class="tw:mb-4">
+            <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "parking_notification[is_repeat]", selected: new_parking_notification.is_repeat, entries: [{value: true, label: "Repeat ##{new_parking_notification.earlier_bike_notifications.count} of earlier notification"}, {value: false, label: "First notice"}], data: {action: "registrations--show--parking-notification-form#selectRepeat"})) %>
+          </div>
+        <% end %>
+
+        <div
+          class="tw:mb-4"
+          data-registrations--show--parking-notification-form-target="locationSection"
+        >
+          <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "location_mode", selected: "current", entries: [{value: "current", label: "Set on map"}, {value: "entered", label: "Enter address manually"}], data: {action: "registrations--show--parking-notification-form#selectLocationMode", "registrations--show--parking-notification-form-target": "locationMode"})) %>
+
+          <div
+            data-registrations--show--parking-notification-form-target="mapSection"
+            class="tw:mt-3"
+          >
+            <%# The map and the hint for using it stand or fall together %>
+            <div
+              data-registrations--show--parking-notification-form-target="mapFrame"
+            >
+              <%#
+                Capped against the viewport so the map doesn't crowd out the rest
+                of the form on a short screen
+              %>
+
+              <div
+                class="
+                  tw:h-100 tw:max-h-[90vh] tw:w-full tw:overflow-hidden
+                  tw:rounded-sm tw:bg-gray-100 tw:dark:bg-gray-900
+                "
+              >
+                <%# The pin lives inside the map so it comes along into fullscreen %>
+                <div
+                  data-registrations--show--parking-notification-form-target="map"
+                  class="tw:relative tw:h-full tw:w-full"
+                >
+                  <%#
+                    A fixed pin marks the map center; moving the map places the pin.
+                    Its tip is at 21/24 of the viewBox, so shift by that much (not the
+                    full height) to land the tip — not the empty box below it — on centre
+                  %>
+                  <%= helpers.inline_svg_tag("kelsey/registration_show/map-pin.svg", class: "tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-1/2 tw:z-10 tw:h-9 tw:w-9 tw:-translate-x-1/2 tw:-translate-y-[87.5%] tw:text-red-600 tw:drop-shadow-md", aria_hidden: true) %>
+                </div>
+              </div>
+
+              <p class="tw:mt-1 tw:text-xs tw:opacity-65">
+                <%= translation(".map_hint") %>
+              </p>
+            </div>
+
+            <p
+              hidden
+              data-registrations--show--parking-notification-form-target="mapUnavailable"
+              class="tw:mt-2 tw:text-sm tw:opacity-65"
+            >
+              <%= translation(".map_unavailable") %>
+            </p>
+          </div>
+
+          <div
+            data-registrations--show--parking-notification-form-target="addressGroup"
+            class="tw:mt-3 tw:hidden"
+          >
+            <%= form.hidden_field :use_entered_address, value: false, data: {"registrations--show--parking-notification-form-target": "useEnteredAddress"} %>
+
+            <%= render(UI::Forms::AddressGroup::Component.new(form_builder: form, street_label: translation(".address_or_intersection"))) %>
+          </div>
+        </div>
+
+        <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :message, kind: :text_area, label_text: "Optional message to send to the owner", html_options: {rows: 3, placeholder: "Optional"})) %>
+
+        <div
+          class="tw:mb-4"
+          data-registrations--show--parking-notification-form-target="kindGroup"
+        >
+          <p class="twlabel">Notification because</p>
+          <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "parking_notification[kind]", selected: new_parking_notification.kind, entries: ::ParkingNotification.kinds.map { |kind| {value: kind, label: ::ParkingNotification.kinds_humanized[kind.to_sym]} })) %>
+        </div>
+
+        <div class="tw:mb-4">
+          <p class="twlabel">Photo</p>
+          <%= render(UI::Forms::FileUpload::Component.new(form_builder: form, attribute: :image, accept: ImageUploader.permitted_extensions)) %>
+          <%= form.hidden_field :image_cache %>
+        </div>
+
+        <%= render(UI::Forms::Group::Component.new(form_builder: form, attribute: :internal_notes, kind: :text_area, label_text: translation(".parking_notification_notes_html", org_name: @organization.short_name), html_options: {rows: 2})) %>
+
+        <%= render(UI::Button::Component.new(text: "Create parking notification", color: :primary, type: "submit", disabled: true, data: {"registrations--show--parking-notification-form-target": "submit"})) %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

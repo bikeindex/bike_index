@@ -3,22 +3,9 @@
 module UI
   module ButtonGroup
     # A row of chips that navigate or act — the link/button counterpart of
-    # UI::Forms::RadioButtonGroup, which chips off RESTING_CHIP_CLASSES too.
+    # UI::Forms::RadioButtonGroup, which chips off CHIP_CLASSES too.
     class Component < ApplicationComponent
-      # Mirrors UI::Button color: :secondary, so retuning it reaches the chips
-      RESTING_CHIP_CLASSES = [
-        "tw:cursor-pointer tw:select-none tw:inline-flex tw:items-center tw:justify-center tw:rounded tw:px-3 tw:py-1 tw:text-sm tw:leading-snug tw:transition-colors",
-        UI::Button::Component::COLORS[:secondary]
-      ].join(" ").freeze
-
-      # The radio group stops at the resting half, restating the rest off its checked input
-      CHIP_CLASSES = [
-        RESTING_CHIP_CLASSES,
-        "tw:no-underline",
-        UI::Button::Component::ACTIVE_COLORS[:secondary],
-        UI::Button::Component::FOCUS_CLASSES,
-        UI::Button::Component::DISABLED_CLASSES
-      ].join(" ").freeze
+      CHIP_CLASSES = UI::Button::Component.build_classes(color: :secondary, size: :md).freeze
 
       # full_width lays the chips out as equal columns that wrap, staying the same width
       # on every line — flex would size each line independently. auto-fit needs a

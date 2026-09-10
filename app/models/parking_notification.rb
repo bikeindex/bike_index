@@ -68,6 +68,7 @@ class ParkingNotification < ActiveRecord::Base
   has_many :repeat_records, class_name: "ParkingNotification", foreign_key: :initial_record_id
   validates_presence_of :bike_id, :user_id
   validate :location_present, on: :create
+  validate :bike_not_impounded, on: :create
   attr_accessor :skip_geocoding, :is_repeat, :use_entered_address, :image_cache, :skip_update
 
   mount_uploader :image, ImageUploaderBackgrounded
@@ -372,6 +373,21 @@ class ParkingNotification < ActiveRecord::Base
     return true if latitude.present? && longitude.present? || formatted_address_string.present?
 
     errors.add(:base, "address is required")
+  end
+
+  # Organizations re-submit the impound form when the bike page hasn't caught up yet - tell them
+  # it worked rather than duplicating the record and re-emailing the owner
+  def bike_not_impounded
+    return unless impound_notification?
+
+    impound_record = ImpoundRecord.current.find_by(bike_id:)
+    return if impound_record.blank?
+
+    errors.add(:base, if impound_record.organization_id == organization_id
+      "This #{bike&.type} is already impounded (impound record ##{impound_record.display_id})"
+    else
+      "This #{bike&.type} is already impounded by another organization"
+    end)
   end
 
   def process_notification

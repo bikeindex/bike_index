@@ -65,7 +65,7 @@ RSpec.describe LandingPagesController, type: :request do
     end
 
     it "renders" do
-      expect(LandingPages::ORGANIZATIONS).to include(organization.slug)
+      expect(LandingPageOrganizations::SLUGS).to include(organization.slug)
       get "/#{organization.slug}"
       expect(response.status).to eq(200)
       expect(response).to render_template("show")

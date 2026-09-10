@@ -40,12 +40,12 @@
           <td><small><%= bike_version.name&.truncate(30) %></small></td>
 
           <td>
-            <%= render Admin::Bikes::Cell::Component.new(bike: bike_version.bike, bike_id: bike_version.bike_id) %>
+            <%= render Pages::Admin::Bikes::Cell::Component.new(bike: bike_version.bike, bike_id: bike_version.bike_id) %>
           </td>
 
           <td>
             <% cache(bike_version.owner) do %>
-              <%= render Admin::Users::Cell::Component.new(sort_state:, user: bike_version.owner, render_search: render_sortable) %>
+              <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: bike_version.owner, render_search: render_sortable) %>
             <% end %>
           </td>
 

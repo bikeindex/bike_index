@@ -42,7 +42,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
 
       context "landing_page" do
         it "renders without creating a landing page, and links to the preview" do
-          expect(LandingPages::ORGANIZATIONS).to_not include(organization.slug)
+          expect(LandingPageOrganizations::SLUGS).to_not include(organization.slug)
           expect {
             get "#{base_url}/landing_page/edit"
           }.to_not change(OrganizationLandingPage, :count)
@@ -60,7 +60,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           let!(:landing_page) { FactoryBot.create(:organization_landing_page, organization:, enabled: true) }
 
           it "links to the landing page, and says nothing about enabled" do
-            expect(LandingPages::ORGANIZATIONS).to include(organization.slug)
+            expect(LandingPageOrganizations::SLUGS).to include(organization.slug)
             expect(landing_page.enabled_mismatch_error).to be_blank
             get "#{base_url}/landing_page/edit"
             expect(response.status).to eq(200)
@@ -157,7 +157,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
           let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
 
           it "creates the page enabled" do
-            expect(LandingPages::ORGANIZATIONS).to include(organization.slug)
+            expect(LandingPageOrganizations::SLUGS).to include(organization.slug)
             expect {
               put "#{base_url}/landing_page", params: {organization_landing_page: update.merge(enabled: "1")}
             }.to change(OrganizationLandingPage, :count).by 1

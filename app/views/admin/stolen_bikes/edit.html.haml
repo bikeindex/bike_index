@@ -1,8 +1,8 @@
-= render Admin::Bikes::Header::Component.new(bike: @bike, active: :stolen, stolen_record: @stolen_record, user: current_user, display_dev_info: display_dev_info?)
+= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :stolen, stolen_record: @stolen_record, user: current_user, display_dev_info: display_dev_info?)
 
 = render partial: "/admin/social_accounts/errored"
 
-= render Admin::Bikes::TheftAlertImages::Component.new(bike: @bike, stolen_record: @stolen_record, return_to: url_for)
+= render Pages::Admin::Bikes::TheftAlertImages::Component.new(bike: @bike, stolen_record: @stolen_record, return_to: url_for)
 
 %hr
 

@@ -1,4 +1,4 @@
-= render Admin::Bikes::Header::Component.new(bike: @bike, active: :ownerships, user: current_user, display_dev_info: display_dev_info?)
+= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :ownerships, user: current_user, display_dev_info: display_dev_info?)
 
 %h1.mt-5.mb-4
   Ownerships
@@ -82,4 +82,4 @@
   .row.mt-5
     .col-md-6
       %h5.only-dev-visible Registration info
-      = pretty_print_json(@ownership.registration_info, true)
+      = render UI::JsonDisplay::Component.new(data: @ownership.registration_info, skip_blank: true, no_max_height: true)

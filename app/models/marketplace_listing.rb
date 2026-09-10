@@ -148,6 +148,10 @@ class MarketplaceListing < ApplicationRecord
     self.class.condition_humanized(condition)
   end
 
+  def condition_description_humanized
+    self.class.condition_description_humanized(condition)
+  end
+
   def primary_activity_id=(val)
     item&.update(primary_activity_id: val)
   end
@@ -157,6 +161,14 @@ class MarketplaceListing < ApplicationRecord
     return nil unless for_sale?
 
     item&.updated_by_user_at
+  end
+
+  # Only worth showing once it's a day past the listing going up
+  def notable_still_for_sale_at
+    return if still_for_sale_at.blank? || published_at.blank? ||
+      still_for_sale_at < (published_at + 1.day)
+
+    still_for_sale_at
   end
 
   def just_published?

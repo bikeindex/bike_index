@@ -71,7 +71,7 @@
   <%= render partial: "table", locals: {logged_searches: @logged_searches} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @logged_searches,
   viewing: "Logged Searches",

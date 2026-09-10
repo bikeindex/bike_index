@@ -7,16 +7,6 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
   let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: owner) }
   let!(:united_states) { Country.united_states }
 
-  # Picks an option from a selectize-enhanced control found within the given scope
-  def pick_within_selectize(control, text)
-    control.find(".selectize-input").click
-    control.find(".selectize-dropdown-content .option", text:, wait: 5).click
-  end
-
-  def selectize_for(css)
-    find(css, visible: :all).find(:xpath, "./following-sibling::div[contains(@class, 'selectize-control')][1]")
-  end
-
   def save_bike
     find(".edit-form-well-submit-wrapper input[type=submit]").click
     expect(page).to have_content("Bike successfully updated!", wait: 10)
@@ -35,13 +25,8 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
   end
 
   it "reports the bike stolen with theft details, then marks it recovered" do
-    # Sign in
-    visit new_session_path
-    fill_in "Email", with: owner.email
-    click_button "Continue"
-    fill_in "Password", with: "testthisthing7$"
-    click_button "Log in"
-    expect(page).to have_content("Logged in", wait: 5)
+    sign_in(owner)
+    expect(page).to have_content("Logged in")
 
     dismiss_donation_modal
 
@@ -79,7 +64,7 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
 
     # ---- Send a message through the stolen bike's contact-owner form. The owner
     # doesn't see that card (they don't contact themselves), so view the public
-    # perspective. The form is fragment-cached (Registrations::Show::Wrapper), so its
+    # perspective. The form is fragment-cached (Pages::Registrations::Show::Wrapper), so its
     # session-scoped CSRF token is reissued client-side by the csrf-refresh controller.
     # The stale-token failure itself can't be reproduced here (it needs production
     # fragment caching + forgery protection, both off in test), so this exercises the

@@ -1,0 +1,15 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          org_top_actions:
+            wrapper:
+              impound: Impound
+              message_owner: Message Owner
+              new_parking_notice: New Parking Notification
+              update_impound_record: Update Impound Record
+              view_notifications: View Notifications
+              view_notifications_active_html: "<strong>%{count}</strong> Active"
+              view_notifications_resolved_html: "<strong>%{count}</strong> Resolved"

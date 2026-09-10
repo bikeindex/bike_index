@@ -1,0 +1,93 @@
+<div
+  class="
+    tw:mx-auto tw:-mt-(--nav-gap) tw:flex tw:w-full tw:max-w-[1440px]
+    tw:flex-col tw:gap-6 tw:px-2
+  "
+>
+  <div class="tw:grid tw:gap-6 tw:lg:grid-cols-3">
+    <div class="tw:lg:col-span-2">
+      <div
+        class="
+          tw:min-[992px]:rounded-t-none tw:lg:rounded-b-sm tw:lg:border
+          tw:lg:border-gray-200 tw:lg:bg-white tw:lg:p-4
+          tw:lg:dark:border-gray-700 tw:lg:dark:bg-gray-800
+        "
+      >
+        <%= render(Pages::Registrations::Show::Photos::Component.new(bike: @bike, owner: @owner, title: title, subtitle: render(Pages::Registrations::Show::Subtitle::Component.new(bike: @bike)))) %>
+      </div>
+    </div>
+
+    <div class="tw:flex tw:flex-col tw:gap-4 tw:lg:pt-7">
+      <div>
+        <div class="tw:mb-1">
+          <%= render(Pages::Registrations::Show::ViewSwitcher::Component.new(bike: @bike, current_view:, available_views: @available_views, label: audience_label, color: audience_color, current_user: @current_user)) %>
+        </div>
+
+        <div class="tw:hidden tw:lg:block">
+          <h1 class="tw:text-3xl tw:leading-tight tw:font-extrabold">
+            <%= title %>
+          </h1>
+
+          <p class="tw:mt-1 tw:text-sm tw:opacity-65">
+            <%= render(Pages::Registrations::Show::Subtitle::Component.new(bike: @bike)) %>
+          </p>
+        </div>
+      </div>
+
+      <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+        <% if @bike.status_with_owner? && !@bike.user_hidden %>
+          <%= render(UI::Badge::Component.new(text: translation(".registered_protected"), color: :notice, icon: "kelsey/registration_show/shield")) %>
+        <% end %>
+
+        <%= render(Pages::Registrations::Show::Status::Component.new(bike: @bike, override_to_for_sale: @marketplace_preview)) %>
+      </div>
+
+      <%= render(current_alerts_component) %>
+
+      <%= render(Pages::Registrations::Show::MarketplaceListingCard::Component.new(bike: @bike, current_user: @current_user, owner: @owner, preview: @marketplace_preview, term: :right_align)) %>
+
+      <%= render(Pages::Registrations::Show::BikeIndexCard::Component.new(bike: @bike, term: :right_align)) %>
+
+      <div class="tw:mt-auto tw:flex tw:flex-col tw:gap-2">
+        <% if @owner %>
+          <%= edit_bike_button %>
+          <% if show_marketplace_button? %>
+            <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "marketplace"), text: translation(".sell_on_marketplace"), color: :primary, size: :lg, html_class: "tw:text-center tw:py-2.5!")) %>
+          <% end %>
+          <%= render(Pages::Registrations::Show::Share::Component.new(text: translation(".share_my_page"), url: bike_url(@bike))) %>
+          <% if @bike.status_with_owner? %>
+            <%= render(UI::ButtonLink::Component.new(href: edit_bike_path(@bike, edit_template: "report_stolen"), text: translation(".mark_stolen"), color: :error, html_class: "tw:text-center tw:py-2.5!")) %>
+          <% end %>
+        <% else %>
+          <%= render(Pages::Registrations::Show::Share::Component.new(text: translation(".share"), url: bike_url(@bike))) %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%= render(Pages::Registrations::Show::ContactOwner::Component.new(bike: @bike, current_user: @current_user, owner: @owner)) %>
+
+  <%= render(Pages::Registrations::Show::StolenDetails::Component.new(bike: @bike, current_user: @current_user)) %>
+  <%= render(Pages::Registrations::Show::ImpoundDetails::Component.new(bike: @bike)) %>
+
+  <%= render(Pages::Registrations::Show::BikeDetails::Component.new(bike: @bike, serial_user: @owner ? @current_user : nil, skip_serial_explanation: !@owner)) %>
+
+  <% if @bike.description.present? %>
+    <%= render(UI::Card::Component.new) do %>
+      <h2
+        class="
+          tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
+          tw:uppercase
+        "
+      >
+        <%= translation(".about_this_bike", bike_type: @bike.type) %>
+      </h2>
+
+      <p class="tw:mt-2"><%= @bike.description %></p>
+    <% end %>
+  <% end %>
+
+  <%= render(Pages::Registrations::Show::ComponentList::Component.new(bike: @bike)) %>
+
+  <%= render(Pages::Registrations::Show::LegacyViewLink::Component.new(bike: @bike, current_user: @current_user)) %>
+</div>

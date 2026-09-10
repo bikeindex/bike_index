@@ -49,16 +49,12 @@
 
           <td>
             <% if version.whodunnit.present? %>
-              <%= render Admin::Users::Cell::Component.new(sort_state:, user: User.find_by(id: version.whodunnit), user_id: version.whodunnit.to_i, render_search: render_sortable) %>
+              <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: User.find_by(id: version.whodunnit), user_id: version.whodunnit.to_i, render_search: render_sortable) %>
             <% end %>
           </td>
 
           <td>
-            <small>
-              <% if version.object_changes.present? %>
-                <small><%= pretty_print_json(version.object_changes) %></small>
-              <% end %>
-            </small>
+            <%= render UI::JsonDisplay::Component.new(data: version.object_changes, small: true, max_width: :table_cell) %>
           </td>
         </tr>
       <% end %>

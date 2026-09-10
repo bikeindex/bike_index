@@ -182,7 +182,7 @@ class Bike < ApplicationRecord
 
   attr_writer :phone, :user_name, :external_image_urls # reading is managed by a method
 
-  delegate :bulk_import, :claimed?, :creation_description,
+  delegate :bulk_import, :claimed?, :creation_kind,
     :creator_unregistered_parking_notification?, :owner, :owner_name, :pos?,
     :pos_kind, :registration_info, :user, :user_id,
     :student_id, :student_id=, :organization_affiliation, :organization_affiliation=,
@@ -690,6 +690,13 @@ class Bike < ApplicationRecord
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
   end
 
+  def current_for_sale_marketplace_listing
+    return nil unless is_for_sale
+
+    cml = current_marketplace_listing
+    (cml.present? && cml.for_sale?) ? cml : nil
+  end
+
   def current_event_record
     current_impound_record || current_stolen_record || current_for_sale_marketplace_listing
   end
@@ -930,13 +937,6 @@ class Bike < ApplicationRecord
     return current_impound_record if current_impound_record.present? && current_impound_record.current?
 
     self.current_impound_record = impound_records.current.last
-  end
-
-  def current_for_sale_marketplace_listing
-    return nil unless is_for_sale
-
-    cml = current_marketplace_listing
-    (cml.present? && cml.for_sale?) ? cml : nil
   end
 
   def authorization_requires_impound_organization?

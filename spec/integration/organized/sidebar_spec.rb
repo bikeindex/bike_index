@@ -17,11 +17,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     # rather than the icon rail, which hides every row's label
     page.current_window.resize_to(1280, 1600)
     using_wait_time(10) do
-      visit new_session_path
-      fill_in "Email", with: user.email
-      click_button "Continue"
-      fill_in "Password", with: "testthisthing7$"
-      click_button "Log in"
+      sign_in(user)
       dismiss_flash_messages
     end
   end
@@ -35,7 +31,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(page).to have_css("#org_sidebar_nav button[data-active='true']", text: label, count: 1)
   end
 
-  let(:scroller) { "[data-page-block--org-sidebar-target='scroller']" }
+  let(:scroller) { "[data-shared-blocks--org-sidebar-target='scroller']" }
 
   def scroller_top
     page.evaluate_script("document.querySelector(\"#{scroller}\").scrollTop")
@@ -72,12 +68,12 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect_open("#{organization.short_name} Registrations")
     expect_current_group("Impounded Vehicles")
 
-    within("#org_sidebar_nav") { click_link "Search Registrations" }
+    within("#org_sidebar_nav") { click_link "Organization Registrations" }
 
     expect(page).to have_current_path("/o/#{slug}/registrations", ignore_query: true)
     expect_open("#{organization.short_name} Registrations")
     expect_current_group("#{organization.short_name} Registrations")
-    expect(page).to have_css "#org_sidebar_nav a[aria-current='page']", text: "Search Registrations"
+    expect(page).to have_css "#org_sidebar_nav a[aria-current='page']", text: "Organization Registrations"
     expect(page).to have_no_css "#org_sidebar_nav a[aria-current]", text: "Search Impounded Vehicles"
 
     # Short enough that the menu scrolls, with Manage users past its fold
@@ -117,10 +113,17 @@ RSpec.describe "Organization sidebar", :js, type: :system do
   it "opens the first group on a page no row matches, and leaves the organization from it" do
     visit "/my_account"
 
+    # Alone among these examples, everything asserted below is an absence -- and the row
+    # count `expect_open` waits for is the template's, not a controller's. So without this
+    # they'd all pass on a page that has connected nothing, then fail whenever the run
+    # lands between ui--collapse flagging the open group data-active and
+    # shared-blocks--org-sidebar clearing it
+    wait_for_stimulus
+
     expect_open("#{organization.short_name} Registrations")
     # The scroller holds the menu rows -- the account block below it points at /my_account,
     # so one of its own rows is current here
-    expect(page).to have_no_css "[data-page-block--org-sidebar-target='scroller'] a[aria-current]", visible: :all
+    expect(page).to have_no_css "[data-shared-blocks--org-sidebar-target='scroller'] a[aria-current]", visible: :all
     # Open, but no more the page than any other group
     expect(page).to have_no_css "#org_sidebar_nav button[data-active='true']"
 
@@ -138,7 +141,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(page).to have_no_css "#org_sidebar_nav"
 
     # Back in through the navbar's switcher, which lands on the organization's registrations
-    find("button[aria-label='Settings']").click
+    open_settings_menu
     click_link "Switch to #{organization.name}"
 
     expect(page).to have_current_path("/o/#{slug}/registrations", ignore_query: true)

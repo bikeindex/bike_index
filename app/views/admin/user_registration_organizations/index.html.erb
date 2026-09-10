@@ -44,7 +44,7 @@
   <%= render partial: "table", locals: {collection: @user_registration_organizations, render_sortable: true} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @user_registration_organizations,
   viewing: "User Registration Organizations",

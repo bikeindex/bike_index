@@ -24,7 +24,7 @@
   <% end %>
 
   <% table.column(sortable: "user_id") do |strava_integration| %>
-    <%= render Admin::Users::Cell::Component.new(sort_state:, user: strava_integration.user, user_id: strava_integration.user_id, render_search: render_sortable) %>
+    <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: strava_integration.user, user_id: strava_integration.user_id, render_search: render_sortable) %>
   <% end %>
 
   <% table.column(sortable: "status") do |strava_integration| %>

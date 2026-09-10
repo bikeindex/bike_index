@@ -1,0 +1,15 @@
+<%= render Pages::Register::Page::Component.new do %>
+  <div class="tw:px-1 tw:py-6 tw:text-center">
+    <%= render UI::Header::Component.new(text: translation(".confirming_your_email"),
+        subtitle: translation(".continue_where_you_left_off")) %>
+
+    <%= form_with(url: confirm_email_register_path, method: :post,
+        data: {turbo: true, controller: "register--retry"}) do %>
+      <%= hidden_field_tag :b_param_token, @b_param.id_token %>
+      <%= hidden_field_tag :confirmation_token, @token %>
+
+      <%= render UI::Button::Component.new(text: translation(".continue"), color: :primary, size: :lg,
+          type: "submit", spinner: true, html_class: "tw:w-full") %>
+    <% end %>
+  </div>
+<% end %>

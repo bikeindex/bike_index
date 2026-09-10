@@ -7,6 +7,6 @@
 
 - table_view = render partial: "/admin/organization_roles/table", locals: {organization_roles: @collection, render_sortable: true, render_deleted: @render_deleted}
 
-= render(Admin::IndexSkeleton::Component.new(index: admin_index_state, collection: @collection, viewing: controller_name.humanize, nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_organization_roles))
+= render(Pages::Admin::IndexSkeleton::Component.new(index: admin_index_state, collection: @collection, viewing: controller_name.humanize, nav_header_list_items:, table_view:, chart_collection: @render_chart && matching_organization_roles))
 
 

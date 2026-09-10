@@ -12,7 +12,7 @@
   <%= render partial: "table", locals: {collection: @ctypes, render_sortable: true} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @ctypes,
   viewing: "Component Types",

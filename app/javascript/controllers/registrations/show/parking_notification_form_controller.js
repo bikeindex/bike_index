@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { collapse } from 'utils/collapse_utils'
+import { collapse, COLLAPSE_DURATION_MS } from 'utils/collapse_utils'
 import { ExpandControl, groundRadiusStops, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION } from 'utils/maplibre'
 
 /* global navigator */
@@ -42,10 +42,18 @@ export default class extends Controller {
     orgLongitude: Number
   }
 
-  // Fired when the accordion reveals this panel; impound retitles and preselects
-  // that kind
-  applyMode (event) {
-    const impound = event.detail?.name === 'impound'
+  // The accordion opens a panel as soon as its own module lands, so `shown` can be
+  // spent before this lazily loaded one arrives — it records the name it opened as
+  connect () {
+    if (this.element.dataset.openedAs) this.applyMode(this.element.dataset.openedAs)
+  }
+
+  panelShown (event) {
+    this.applyMode(event.detail?.name)
+  }
+
+  applyMode (name) {
+    const impound = name === 'impound'
     if (this.hasHeadingTarget) {
       this.headingTarget.textContent = impound ? this.impoundHeadingValue : this.notificationHeadingValue
     }
@@ -57,8 +65,10 @@ export default class extends Controller {
     this.applyRepeat(this.repeatSelected, 0)
   }
 
+  // Not collapse()'s default by another name: applyRepeat forwards this to startLocation,
+  // which defaults to 0 and would resize the map before the reveal finished
   selectRepeat (event) {
-    this.applyRepeat(event.target.value === 'true', 200)
+    this.applyRepeat(event.target.value === 'true', COLLAPSE_DURATION_MS)
   }
 
   get repeatSelected () {

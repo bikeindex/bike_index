@@ -4,7 +4,7 @@
   </li>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @content_tags,
   viewing: "Content Tags",

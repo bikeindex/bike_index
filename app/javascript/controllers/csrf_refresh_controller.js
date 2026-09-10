@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='csrf-refresh'
 // The registration show page fragment-caches its forms (see
-// Registrations::Show::Wrapper), so a form's embedded authenticity_token can be a
+// Pages::Registrations::Show::Wrapper), so a form's embedded authenticity_token can be a
 // stale, session-scoped token captured when the cache was populated. Overwrite it
 // on connect with the fresh per-request token from the csrf-token meta tag (which
 // the layout renders outside the cache) so the submission validates for this

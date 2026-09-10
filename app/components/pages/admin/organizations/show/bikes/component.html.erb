@@ -1,0 +1,15 @@
+<div class="tw:mt-6 tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
+  <h2>
+    <%= number_with_delimiter(@bikes_count) %>
+    <%= "Bike".pluralize(@bikes_count) %>
+
+    <em class="small">
+      <%= link_to "view all bikes", admin_bikes_path(organization_id: @organization.to_param) %>
+    </em>
+  </h2>
+
+  <%# ml-auto rather than justify-between, which drops the link to the left once it wraps %>
+  <%= link_to "org bikes view", organization_registrations_path(organization_id: @organization.to_param), class: "gray-link tw:ml-auto" %>
+</div>
+
+<%= render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state: @sort_state, display_dev_info: @display_dev_info) %>

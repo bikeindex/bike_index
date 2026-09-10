@@ -121,6 +121,8 @@ git push -u origin HEAD
 
 Don't report the local branch name differing from the name in the invocation when the branch has no upstream — pushing `HEAD` creates a matching remote, so it's benign. Only flag a mismatch when the local branch already tracks a differently-named upstream. If the push is rejected as non-fast-forward, go back to **Prepare the branch**.
 
+**A branch already tracking a differently-named upstream** — a Conductor `-v1` local on `origin/<name>` — takes `git push origin HEAD:<upstream-branch>` instead. `git push -u origin HEAD` creates a second remote branch and leaves the existing PR behind on the first.
+
 - **Open PR found above**: `gh pr edit <number> --title "..." --body-file <tmp-body-file>`. Refresh the title to match the current diff (that's what "update pr" expects) unless the user gave it a deliberate custom title — if unsure, keep the title and update only the body.
 
   **Read the current body before you replace it.** A human may have edited it since your last run — added a caveat, a reviewer note, a deploy instruction. Anything you can't account for as your own writing gets carried into the new body, or asked about. Don't overwrite it silently.
@@ -152,7 +154,14 @@ Last, before reporting the PR URL. Look back over the whole run and ask whether 
 - **Did the branch establish a convention?** A new pattern, a rule you had to infer from existing code, or a guideline you found yourself explaining — that's `CLAUDE.md` (root, or the nested one nearest the code).
 - **Did `/simplify` or the CLAUDE.md pass flag the same thing more than once?** A repeated correction is a missing written rule.
 
-Most runs turn up nothing — say so and stop. When something does: if it's small and related to this PR, commit it onto the branch, push, and update the body if the change is worth a bullet. If it's larger or unrelated, tell the user what you'd change and where, and let them decide.
+Most runs turn up nothing — say so and stop.
+
+Two bars before you edit a skill, because a wrong edit here is permanent and costs every future run:
+
+- **Did the skill already say it?** Diff the steps you ran against the steps as written. Out of order or skipped is your deviation, so don't stack a new rule on the one you didn't follow. Revise the existing rule instead — reword it, or move it to where it gets read — since a rule you missed is a rule that was missable.
+- **Does it pay for itself?** Weigh how often the guidance fires against what it saves when it does, and state both. Guidance that runs every time to catch something rare is negative, however cheap each run looks.
+
+Then make the edit — commit it onto the branch, push, and update the body if it's worth a bullet. Prefer editing to reporting: a change you only describe is one the next run rediscovers.
 
 Then return the PR URL.
 

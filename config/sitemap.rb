@@ -18,7 +18,7 @@ SitemapGenerator::Sitemap.create do
 
     SitemapPages::ADDITIONAL.each { |i| add("/#{i}", priority: 0.8, changefreq: "daily") }
 
-    LandingPages::ORGANIZATIONS.each { |i| add("/o/#{i}", priority: 0.7, changefreq: "weekly") }
+    LandingPageOrganizations::SLUGS.each { |i| add("/o/#{i}", priority: 0.7, changefreq: "weekly") }
   end
 
   group(filename: :blog) do

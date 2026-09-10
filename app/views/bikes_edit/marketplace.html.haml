@@ -33,7 +33,7 @@
                   %span.checklist-checkbox
                   %span.checklist-text
                     - if marketplace_listing.id.present?
-                      = link_to t(".preview_it"), bike_path(@bike, show_marketplace_preview: true), target: "_blank"
+                      = link_to t(".preview_it"), bike_path(@bike, view_as: "marketplace_preview"), target: "_blank"
                     - else
                       %span{class: "tw:underline tw:cursor-not-allowed"}
                         = t(".preview_it")

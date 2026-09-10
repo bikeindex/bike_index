@@ -232,7 +232,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
   end
 
   # The link itself is matchesPath's, in ui/active_link_controller.js -- component_system_spec
-  # covers that copy, through the preview. This one answers for Admin::Navbar's prose.
+  # covers that copy, through the preview. This one answers for Pages::Admin::Navbar's prose.
   describe ".covers?" do
     def covers?(pattern, path) = described_class.covers?(pattern, path)
 
@@ -257,7 +257,7 @@ RSpec.describe UI::ActiveLink::Component, type: :component do
       expect(covers?("/admin/bikes/**", "/admin/bike_stickers")).to be false
     end
 
-    # The organizations-nested invoices in Admin::Navbar
+    # The organizations-nested invoices in Pages::Admin::Navbar
     it "takes one segment for a *, which can't span a slash" do
       expect(covers?("/admin/organizations/*/invoices", "/admin/organizations/bike-shop/invoices")).to be true
       expect(covers?("/admin/organizations/*/invoices", "/admin/organizations/invoices")).to be false

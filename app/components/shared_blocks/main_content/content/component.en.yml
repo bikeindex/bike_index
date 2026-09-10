@@ -1,0 +1,21 @@
+---
+en:
+  components:
+    shared_blocks:
+      main_content:
+        content:
+          about: About
+          bicycle_serials: Bicycle serials
+          bike_index_news: All Bike Index news
+          bike_index_store: Bike Index Store
+          design_and_developer_resources: Design and developer resources
+          donate: Donate
+          donate_today: Donate today
+          help: Help
+          how_to_get_your_stolen_bike_back: How to get your stolen bike back
+          make_a_difference: Make a difference in bike theft
+          other_pages: Other pages
+          protect_your_bike: Protect your bike
+          related: Related
+          sign_up_your_organization: Sign up your organization
+          where: Where

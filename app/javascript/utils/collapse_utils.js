@@ -1,6 +1,11 @@
 // collapse-utils.js
 // Utility class for handling element collapse animations
 
+// show/hide build `tw:duration-${duration}` at runtime, which tailwind's scanner can't see -
+// the build only carries 200/300/500, from ERB that writes them literally. Change this to
+// anything else and the transition silently stops applying while the timers still wait.
+export const COLLAPSE_DURATION_MS = 200
+
 /**
  * CollapseUtils class providing element collapse/expand functionality
  */
@@ -183,7 +188,7 @@ export class CollapseUtils {
  * @param {number} duration - Animation duration in milliseconds
  * @param {string} direction - 'vertical' (height) or 'horizontal' (width)
  */
-export function collapse (action, element, duration = 200, direction = 'vertical') {
+export function collapse (action, element, duration = COLLAPSE_DURATION_MS, direction = 'vertical') {
   return CollapseUtils.collapse(action, element, duration, direction)
 }
 

@@ -1,0 +1,28 @@
+<% if @bike.blank? %>
+  <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">
+    Missing bike
+    <% if @bike_id.present? %>
+      <code><%= @bike_id %></code>
+    <% end %>
+  </small>
+<% elsif @bike.present? %>
+  <% unless @bike.status_with_owner? %>
+    <% status_color_class = "#{@bike.status_humanized.tr(" ", "-")}-color" %>
+    <strong
+      class="uppercase <%= status_color_class %>"
+      title="<%= Bike.status_humanized_translated(@bike.status_humanized) %>"
+    >
+      <%= Bike.status_humanized_translated(@bike.status_humanized).first %>
+    </strong>
+  <% end %>
+  <%= render Atoms::Admin::Badges::BikeHiddenExplanation::Component.new(bike: @bike) %>
+  <% if bike_link_path.present? %>
+    <%= link_to bike_content, bike_link_path, class: "twlink" %>
+  <% else %>
+    <%= bike_content %>
+  <% end %>
+<% end %>
+
+<% if @render_search && computed_search_url.present? %>
+  <%= link_to search_emoji, computed_search_url, class: "display-sortable-link small ml-1" %>
+<% end %>

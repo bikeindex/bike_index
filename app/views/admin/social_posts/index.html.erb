@@ -58,7 +58,7 @@
   <%= render partial: "/admin/social_posts/table", locals: {social_posts: @social_posts, render_sortable: true, skip_total: true} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @social_posts,
   viewing: "Posts",

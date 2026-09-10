@@ -60,28 +60,20 @@
             </small>
           </td>
 
-          <td class="data-cell only-data small">
-            <div class="wrapper" style="position: relative">
-              <% if logged_search.query_items.present? %>
-                <%= pretty_print_json(logged_search.query_items) %>
-              <% end %>
+          <td>
+            <%= render UI::JsonDisplay::Component.new(data: logged_search.query_items, small: true, max_width: :table_cell) %>
 
-              <% if logged_search.log_line.present? %>
-                <% full_line_id = "fullLine-#{logged_search.id}" %>
-                <a
-                  class="less-strong"
-                  href="#"
-                  data-toggle="collapse"
-                  data-target="#<%= full_line_id %>"
-                  style="position: absolute;right: 0.5rem; top: 0.5rem;"
-                >
-                  &#x2194;&#xFE0F;
-                </a>
-                <code class="collapse" id="<%= full_line_id %>">
+            <% if logged_search.log_line.present? %>
+              <div data-controller="ui--collapse">
+                <%= render(UI::Button::Component.new(text: "↔️", color: :link,
+                      data: {action: "ui--collapse#toggle", "ui--collapse-target": "trigger"},
+                      aria: {expanded: false, label: "Toggle the full log line"})) %>
+
+                <code class="tw:hidden" data-ui--collapse-target="content">
                   <%= logged_search.log_line %>
                 </code>
-              <% end %>
-            </div>
+              </div>
+            <% end %>
           </td>
 
           <td>
@@ -94,7 +86,7 @@
           <td>
             <% if logged_search.user_id.present? %>
               <%= cache(logged_search.user) do %>
-                <%= render Admin::Users::Cell::Component.new(sort_state:, user: logged_search.user, render_search: true, user_id: logged_search.user_id) %>
+                <%= render Pages::Admin::Users::Cell::Component.new(sort_state:, user: logged_search.user, render_search: true, user_id: logged_search.user_id) %>
               <% end %>
             <% end %>
           </td>

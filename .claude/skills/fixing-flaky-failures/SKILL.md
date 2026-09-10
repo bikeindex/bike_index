@@ -171,6 +171,24 @@ example green on a page that held nothing back. Measured against `register--seri
 connect-time reconcile, throttling at 6, 12 and 25 left it green over 30+ runs; the
 route hold failed it every time.
 
+A `sleep` in the handler is still a race — it has to outlast whatever else the page is
+doing, and the duration that wins locally is not the one that wins on a loaded CI
+runner. When the spec can observe the state the module must arrive *after*, block the
+handler on a `Queue` and release it from the example instead:
+
+```ruby
+playwright_page.context.route(%r{parking_notification_form_controller}, proc { |route, request|
+  held << request.url
+  release.pop
+  route.continue
+})
+# ...only the accordion can reveal the panel, so this is it having already opened
+expect(page).to have_content("Set on map", wait: 10)
+release << :continue
+```
+
+Blocking the handler doesn't stall the driver, so Capybara still polls while it waits.
+
 Caveat when measuring locally: after a heavy record-creating run (seeding,
 probe scripts, a big suite), `:js` specs fail spuriously for a while. Re-measure
 in a quiet environment before concluding a spec is flaky.
@@ -194,6 +212,11 @@ Ruling ordering out is cheap and worth doing first: RSpec prints `Randomized wit
 seed N`, and `--seed N` replays that order. A failing seed that passes on replay
 leaves timing, not ordering or leaked state.
 
+Measure the "without the fix" arm against the base ref by name — `git checkout
+origin/main -- <paths>`. Once the fix is committed, `git checkout -- <paths>` restores
+*it*, so the arm you think is unpatched is the patched one, and a regression test that
+does fail without the fix reads as passing.
+
 ## Known causes in this repo
 
 Work through these before inventing a new theory — most flakes here are one of
@@ -210,7 +233,7 @@ in a Redis DB shared across `:js` examples and survives 600s, and `load_all`
 never invalidates it — so a stale entry from an earlier spec changes what a
 combobox returns. The fix is `Autocomplete::Loader.clear_redis` in `before`,
 not a retry. Browser history is the same shape: `reset_browser_history`
-(`spec/support/system_spec_helpers.rb`) drops entries earlier examples left, so
+(`spec/support/integration_spec_helpers.rb`) drops entries earlier examples left, so
 `go_back`/`go_forward` walk this example's own stack.
 
 **Interacting with a page whose controllers haven't connected.** `application.js`
@@ -218,7 +241,7 @@ lazy loads every Stimulus controller, so a freshly rendered page answers to none
 them until each module lands: a combobox filters nothing, a one-shot event (like
 form-persist's restore) reaches no listener, and a `fill_in`'s text can end up in
 whatever autofocus left focused. Waiting on any one controller proves nothing about
-the rest — `wait_for_stimulus` (`spec/support/system_spec_helpers.rb`) waits for
+the rest — `wait_for_stimulus` (`spec/support/integration_spec_helpers.rb`) waits for
 every identifier the page names.
 
 **Interacting before the legacy page script has bound.** The same shape, one era
@@ -226,7 +249,7 @@ back: `init.coffee`'s `loadPageScript` constructs the per-page class in
 `$(document).ready`, while `click_link` returns with the new document still
 parsing — so an interaction landing between the two is swallowed with nothing on
 the page to say so. `wait_for_page_script`
-(`spec/support/system_spec_helpers.rb`) waits on `window.pageScript`; reach for
+(`spec/support/integration_spec_helpers.rb`) waits on `window.pageScript`; reach for
 it after any navigation into a jQuery-driven control.
 
 **Clicking something that is being re-rendered.** The dominant `:js` flake.
@@ -240,7 +263,7 @@ expect(page).to have_css("turbo-frame#results_frame[complete]:not([busy])", wait
 retry_on_detach { first(".bike-box-item .title-link a").click }
 ```
 
-`retry_on_detach` (`spec/support/system_spec_helpers.rb`) rescues the raw
+`retry_on_detach` (`spec/support/integration_spec_helpers.rb`) rescues the raw
 `Playwright::Error` for a detached node, which Capybara's own retry does not.
 This is *not* a coverage reduction: the assertions are untouched, the click just
 happens on a DOM that has stopped moving.

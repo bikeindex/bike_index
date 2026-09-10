@@ -6,6 +6,8 @@ Bike Index is a Rails webapp
 
 Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right WORKSPACE_ID fallback.
 
+**Renaming a `config/initializers/` file needs a `bin/dev` restart.** Initializers don't re-run on reload, so a running server still holds the old constant and none of the new one — and `config/routes.rb`, which does reload, then dies partway through its draw. Everything routed below that line 404s and the page reading the constant raises a bare `NameError` on a route helper, which reads as anything but a stale boot.
+
 ## Code style
 
 Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't use other formatters.
@@ -24,7 +26,7 @@ Run `bin/lint` to automatically format the code. Always use `bin/lint`, don't us
 - Prefer less code, by character count (excluding whitespace and comments). Use `bin/char_count {FILE OR FOLDER}` to get the non-whitespace character count
 - prefer un-abbreviated variable names
 - Use full class/module names everywhere — `UI::Forms::Combobox::Component`, not the `Combobox::Component` that lexical scope also resolves from inside `UI::Forms`
-- **A namespace under `Admin::` shadows a top-level one of the same name** — admin controllers and components all nest in `module Admin`, so `Admin::Users` hides the `Users::` jobs from every one of them. Rename the collision away rather than prefixing call sites with `::`: job namespaces carry the `*_jobs` suffix (`app/jobs/user_jobs`, `bike_jobs`, `callback_jobs`, `image_jobs`, `strava_jobs`).
+- **A namespace under `Admin::` or `Pages::` shadows a top-level one of the same name** — `Pages::Search` hides the `Search::` controllers from every `.rb` nested in it. Nothing fails at boot; it raises only where something reads the shadowed constant, so check a new namespace against `Object.const_defined?("LandingPages", false)` after an eager load. Rename the collision away rather than prefixing call sites with `::` — job namespaces carry the `*_jobs` suffix, `LandingPageOrganizations` holds the landing-page slugs. Templates are exempt: a compiled template's `Module.nesting` is the component class alone, so a bare `Saml::` there still reaches the top level.
 - Default to no comment — see **Comments** below for when one earns its place
 - **Prefer composition over inheritance and `include`.** Share behavior by calling an object that owns it, not by mixing a module into several classes or adding a base class. A `module` extracted only to be `include`d in two classes is usually one of those classes with a parameter — pass the difference in as an argument instead. Rails' own extension points (`ApplicationRecord`, `ApplicationJob`, `ActiveSupport::Concern` for controller filters) are fine; new mixins of our own are what to avoid.
 - **Service objects** (`app/services/`): a stateless service is a `module` with `extend Functionable` (see the `functionable` gem) — inputs passed as args, no instance state, private methods via `conceal` + a `# private below here` block. Don't write a stateless service as a `class` with `def self.` methods.
@@ -59,13 +61,13 @@ None of this governs magic comments, `# rubocop:disable` (keep its justification
 
 ### Translations
 
-A registration is as often an e-scooter, a stroller or a wheelchair, so **never hardcode "bike" in a value that means the cycle type** — interpolate `%{bike_type}` and pass `bike_type: bike.type`. `Registrations::Show::CurrentAlerts::ClaimImpound` is the pattern. Key names (`about_this_bike:`), the product name, and copy that really is bike-only are fine.
+A registration is as often an e-scooter, a stroller or a wheelchair, so **never hardcode "bike" in a value that means the cycle type** — interpolate `%{bike_type}` and pass `bike_type: bike.type`. `Pages::Registrations::Show::CurrentAlerts::ClaimImpound` is the pattern. Key names (`about_this_bike:`), the product name, and copy that really is bike-only are fine.
 
-Run `bundle exec rails prepare_translations` after hand-editing a `component.en.yml`; `bin/lint` doesn't normalize YAML.
+Run `bundle exec rails prepare_translations` after hand-editing a `component.en.yml`; `bin/lint` doesn't normalize YAML. It strips comments, so a note about the copy — a casing convention, a term to leave untranslated — has to live in `component.rb`.
 
-A spec that renders in another locale — `spec/components/page_block/footer/component_spec.rb` does, in `:nl` — fails on a key the sync-generated `config/locales/translation.*.yml` don't carry yet, since `raise_on_missing_translations` is on in test. Add the key inline to all four; the next sync overwrites them.
+A spec that renders in another locale — `spec/components/shared_blocks/footer/component_spec.rb` does, in `:nl` — fails on a key the sync-generated `config/locales/translation.*.yml` don't carry yet, since `raise_on_missing_translations` is on in test. Add the key inline to all four; the next sync overwrites them.
 
-**Moving a key to another scope means moving its translations too.** Renaming a component or a service relocates its keys in `en.yml`, but the four `translation.*.yml` still hold the old scope — so every non-English reader silently drops back to English until the next sync re-translates. Nothing catches it: `prepare_translations` reports clean (`en.yml` is complete, and the orphans sit under the `ignore_unused` scopes), and no spec renders those rows in another locale. Carry the existing values across by hand, in all four, in the same commit as the rename.
+**Moving a key to another scope means moving its translations too.** Renaming a component or a service relocates its keys in `en.yml`, but the four `translation.*.yml` still hold the old scope — so every non-English reader silently drops back to English until the next sync re-translates. Nothing catches it: `prepare_translations` reports clean (`en.yml` is complete, and the orphans sit under the `ignore_unused` scopes), and no spec renders those rows in another locale. Carry the existing values across by hand, in all four, in the same commit as the rename — editing lines, not round-tripping the YAML, which re-wraps every folded string in these generated files and buries the move in a whole-file diff. A sync landing on the base conflicts with the re-nesting: apply the base's move onto your files rather than the reverse — its move is a few lines against your hundred. Then look for a scope both sides created; it auto-merges into two sibling keys of the same name, YAML keeps the last, and nothing reads these files to complain (i18n-tasks' `config/locales/%{locale}.yml` glob never matches `translation.*.yml`).
 
 ## Subagents
 
@@ -83,6 +85,8 @@ Uses RSpec. All business logic should be tested. The `rspec-testing` skill cover
 
 **Verify with `bundle exec rspec` over the spec files covering what you changed — usually one to three.** Not `bin/turbo_tests` or `bin/ci`. CI runs the whole suite on push; yours is a smoke test, and every extra minute of it delays the next fix. A whole directory — `spec/integration`, `spec/components` — is a suite run by another name, whichever runner you use. "It renders on every page, so anything could break" is the rationalization to watch for: run the specs that assert the behaviour you changed and let CI find the rest. A red example is not a reason to re-run its directory — re-run that example. Say which specs you ran and why those. A `:js` spec failing on a missing Tailwind build is the `sandbox-test-setup` skill, not a reason to switch runners.
 
+**Assert on what a drain produces, not on the flag that precedes it.** A column a job reconciles when it runs records what was true at write time — `Ownership#skip_email` is one — so it answers a different question than the one you're asking.
+
 **Never hand-edit a VCR cassette**, and never `git checkout` away one a spec run re-recorded — cassettes only change by being recorded, and a re-recording gets committed on whatever branch you're on. To clear stale contents, `rm` the file and re-run the spec.
 
 ## Frontend Development
@@ -98,11 +102,15 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 
 ## Architecture notes
 
+- **`app/components` has five top-level folders, and a new component goes in exactly one of them**: `ui` (the design system — a component whose arguments are only about style), `atoms` (small renderers reused across pages — `Atoms::Serial`, `Atoms::Admin::Badges::User`), `pages` (one namespace per route, `Pages::Admin::Bikes::Table`), `shared_blocks` (the chrome around a page — navbar, footer, alerts), and `emails`. Nothing else belongs at the top level.
+- **Moving a file silently un-suppresses whatever was keyed to its old path.** `.herb.yml` excludes lint rules by path, `brakeman.ignore` hashes the file path into each fingerprint, and `config/i18n-tasks.yml` routes deep component scopes by path — so a rename re-enables the rule, obsoletes the entry, and leaves a write rule pointing at nothing, and none of the three says so until CI fails or a key lands in the wrong sidecar. Grep the repo root and `config/` for the old path, not just `app/`; re-fingerprint brakeman from `brakeman -f json` rather than hand-editing the path.
+- **Changing a `PublicImage::VARIANTS` transformation re-keys every variant** — the key digests the transformations. Existing objects orphan and regenerate lazily, and the heic R2 cassette re-records: `rm` it and re-run rather than committing the appended interactions.
 - **Multi-database**: primary (`ApplicationRecord`) + analytics (`AnalyticsRecord`). Use `db:migrate:down:analytics` for analytics migrations
 - **Soft delete**: some models use `acts_as_paranoid` with `deleted_at` column; use `unscoped` in admin controllers when needed
-- **Admin search**: `sortable_search_params` auto-includes any param starting with `search_`
-- **Admin record screens are tabs**: a record with more than one super-admin page gets `Admin::Headers::Tabs::Component`, with the section's own tabs named in a component of its own (`Admin::Organizations::Tabs` is the pattern) rather than in each view.
+- **A bike is written on every user-facing edit path, so `cache_key_with_version` already moves.** `BikeServices::Updator` merges `updated_by_user_at: Time.current` into its `@bike.update`, and the records edited through the bike's nested attributes (marketplace listing, stolen record, address) all save that way — so "editing X doesn't touch the bike" is nearly always wrong, and a fragment cache keyed on the bike needs no extra term for X. Probing it with a bare `bike.update(...)` in `rails runner` bypasses the updator and shows no change, which is what makes the wrong answer look measured; go through the controller.
+- **A version constraint in the `Gemfile` needs a matching `.github/dependabot.yml` ignore.** Dependabot widens the constraint rather than skipping the update, so a pin with no ignore entry is silently reverted by a later bump PR — `redis` went that way in #4215, undoing #4175 and leaving its comment behind to explain a pin that was no longer there.
 - **Every user has a `password_digest`** — `User#set_calculated_attributes` gives passwordless accounts a random one so `has_secure_password` is satisfied. So it answers nothing about whether someone chose a password; `passwordless_user?` is that question.
+- **`Organization#is_invoiced?` is neither a money question nor a feature check.** It means an active invoice, the org's own or its `parent_organization`'s, and a $0 invoice sets it — which is how law enforcement gets features. `paid_money?` is the money question. It diverges from `enabled_feature_slugs` in both directions too: regional children and ambassadors get slugs with no invoice, and a child of an invoiced parent gets the flag with no slugs.
 
 # Initial setup
 

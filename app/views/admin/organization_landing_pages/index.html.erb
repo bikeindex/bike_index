@@ -1,8 +1,8 @@
-<% table_view = render(Admin::Organizations::LandingPagesTable::Component.new(collection: @collection,
+<% table_view = render(Pages::Admin::Organizations::LandingPagesTable::Component.new(collection: @collection,
   sort_state:,
   render_sortable: true, render_search: params[:organization_id].blank?)) %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @collection,
   viewing: controller_name.humanize,

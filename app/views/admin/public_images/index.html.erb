@@ -62,7 +62,7 @@
   <%= render partial: "table", locals: {collection: @collection, render_sortable: true, render_size: @render_size} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @collection,
   viewing: controller_name.humanize,

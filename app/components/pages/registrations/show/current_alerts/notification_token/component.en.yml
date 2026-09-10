@@ -1,0 +1,18 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          current_alerts:
+            notification_token:
+              mark_graduated_resolved: Mark %{bike_type} remaining
+              mark_parking_resolved: Mark %{bike_type} retrieved
+              no_futher_action_necessary: no further action necessary!
+              organization_sent_this_message: "%{org_name} sent this notification"
+              please_email_organization_with_questions_html: Please email %{email_link}
+                if you have any questions
+              you_have_already_marked_remaining: You have already marked this %{bike_type}
+                remaining
+              you_have_already_marked_resolved: You have marked this notification
+                resolved

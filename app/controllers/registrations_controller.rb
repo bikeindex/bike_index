@@ -20,7 +20,7 @@ class RegistrationsController < ApplicationController
     bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id],
       organization_id: params[:organization_id], user: current_user)
 
-    render(Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view:,
+    render(Pages::Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view:,
       available_views:, bike_sticker:, current_alerts:, display_dev_info: display_dev_info?), layout: "application")
   end
 
@@ -92,6 +92,7 @@ class RegistrationsController < ApplicationController
     case param
     when "public" then [:public, nil]
     when "owner" then [:owner, nil]
+    when "marketplace_preview" then [:marketplace_preview, nil]
     when nil, "" then nil
     else
       slug, role = param.split(".", 2)

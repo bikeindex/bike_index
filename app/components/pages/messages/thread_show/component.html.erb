@@ -1,0 +1,54 @@
+<div class="twbootcontainer">
+  <%= render(
+    Pages::Messages::ForSaleItem::Component.new(
+      vehicle: @marketplace_listing.item,
+      vehicle_id: @marketplace_listing.item_id,
+      current_user: @current_user,
+      marketplace_listing: @marketplace_listing
+    )
+  ) %>
+
+  <% if @marketplace_messages.any? %>
+    <% @marketplace_messages.each do |marketplace_message| %>
+      <% if @sale.present? && @sale.created_at < marketplace_message.created_at && !sold_alert_rendered? %>
+        <%= render_sold_alert %>
+      <% end %>
+
+      <%= render(Pages::Messages::ThreadShowMessage::Component.new(
+        marketplace_message:,
+        initial_message: @initial_message,
+        current_user: @current_user,
+        other_user_name: @other_user_name,
+        other_user_id: @other_user_id)) %>
+    <% end %>
+  <% end %>
+
+  <% if @sale.present? && !sold_alert_rendered? %>
+    <%= render_sold_alert %>
+  <% end %>
+
+  <% if user_banned? || user_deleted? %>
+    <%= render(UI::Alerts::Base::Component.new(kind: :warning, text: translation(user_banned? ? :banned_message : :removed_message), margin_classes: "tw:my-8")) %>
+  <% elsif @can_send_message %>
+    <%# matches Pages::Messages::ThreadShowMessage::Component#margin_class for sender %>
+    <div class="tw:mb-8 tw:ml-4 tw:lg:ml-8">
+      <%= render partial: "my_accounts/messages/form", locals: {marketplace_message: @new_marketplace_message} %>
+    </div>
+  <% else %>
+    <%= render(UI::Alerts::Base::Component.new(text: translation(".can_not_send_new_message"), kind: :error, margin_classes: "tw:my-10")) %>
+  <% end %>
+
+  <% if show_mark_sold? %>
+    <%# marketplace_message_email links to this anchor %>
+    <div class="tw:mt-15" id="markSoldSection">
+      <%= helpers.turbo_frame_tag "mark_sold_section" do %>
+        <div class="tw:text-center">
+          <%= render UI::ButtonLink::Component.new(href: new_sale_path(marketplace_message_id: @initial_message.id), color: :primary, html_class: "tw:px-8", data: {turbo_stream: true}) do %>
+            <%= translation(".sold_to", item_type: item_type_display) %>
+            <em><%= @other_user_name %></em>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

@@ -1,5 +1,4 @@
 module ApplicationHelper
-  include Binxtils::NavHelper
   include Binxtils::SortableHelper
 
   def body_tag(html_class: nil, **html_options, &block)
@@ -28,7 +27,7 @@ module ApplicationHelper
 
   # Organized lays out its own general alert, and takes over the body background
   def main_content_organized?
-    PageBlock::MainContent::Wrapper::Component.kind(
+    SharedBlocks::MainContent::Wrapper::Component.kind(
       controller_namespace:,
       controller_name:,
       action_name:,
@@ -106,21 +105,6 @@ module ApplicationHelper
 
   def show_sharing_links(user)
     [twitterable(user), instagramable(user), websiteable(user)].compact.to_sentence.html_safe
-  end
-
-  def pretty_print_json(data, no_blank = false)
-    require "coderay"
-    cleaned_data = if no_blank
-      # Show false values, just not empty or nil things
-      data.select do |k, v|
-        next unless Binxtils::InputNormalizer.present_or_false?(v)
-
-        [k, v]
-      end.compact.to_h
-    else
-      data
-    end
-    CodeRay.scan(JSON.pretty_generate(cleaned_data), :json).div.html_safe
   end
 
   private

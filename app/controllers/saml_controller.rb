@@ -106,7 +106,7 @@ class SamlController < ApplicationController
   def render_saml_test(saml_configuration, **component_options)
     @page_title = "SAML configuration test"
     response.headers["X-Robots-Tag"] = "noindex, nofollow"
-    render Saml::Test::Component.new(organization: saml_configuration.organization, **component_options)
+    render Pages::SamlTest::Component.new(organization: saml_configuration.organization, **component_options)
   end
 
   def saml_failure(message)

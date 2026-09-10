@@ -1,0 +1,136 @@
+<div
+  data-controller="admin--social-post-form"
+  data-admin--social-post-form-max-character-count-value="<%= Integrations::SocialPoster::TWEET_LENGTH %>"
+>
+  <%= render(UI::Alerts::ObjectError::Component.new(object: @social_post)) %>
+
+  <%= form_for [:admin, @social_post] do |f| %>
+    <div class="row">
+      <div class="col-md-6 offset-md-3">
+        <div class="form-group mb-4">
+          <%= f.label :kind, "Kind" %>
+
+          <%= f.select :kind, kind_options, {prompt: "Choose kind", required: true},
+                class: "form-control", data: {"admin--social-post-form-target": "kind", action: "change->admin--social-post-form#kindChanged"} %>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="card bg-light <%= kind_hidden_class("app_post") %>"
+      data-admin--social-post-form-target="kindFields"
+      data-kind="app_post"
+    >
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <% account_label = capture do %>
+              Account
+              <small class="less-strong">will send the original post</small>
+            <% end %>
+
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :social_account_id, label_text: account_label, wrapper_class: "form-group")) do %>
+              <%= render UI::Forms::Combobox::Component.new(name: :social_account_id, form: f, placeholder: "Choose  ", include_blank: true, options: account_options) %>
+            <% end %>
+
+            <div class="form-group avatar-upload">
+              <%= f.label :image, "Post photo", class: "control-label" %>
+
+              <div class="avatar-img">
+                <div class="input-group">
+                  <div class="custom-file"></div>
+                  <%= f.label :image, "Post Image", class: "custom-file-label" %>
+                  <%= f.file_field :image, class: "custom-file-input", accept: ImageUploader.permitted_extensions.join(",") %>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-group">
+              <%= f.label :body do %>
+                Post
+                <small class="less-strong">Make sure the text is under the character count</small>
+              <% end %>
+
+              <%= f.text_area :body, rows: 4, class: "form-control",
+                    data: {"admin--social-post-form-target": "characterCounter", action: "input->admin--social-post-form#setCharacterCount"} %>
+
+              <p
+                class="text-info text-right"
+                style="margin-top: -0.4rem; font-size: 150%;"
+              >
+                <span data-admin--social-post-form-target="characterTotal"></span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <%= f.submit "Send post!", class: "btn btn-success" %>
+        </div>
+
+        <div class="mt-4">
+          <strong>Repost:</strong>
+
+          <%= render(UI::Button::Component.new(text: "select all", size: :sm, html_class: "ml-4",
+                data: {action: "admin--social-post-form#checkAll"})) %>
+
+          <%= render(UI::Button::Component.new(text: "unselect", size: :sm, html_class: "ml-2",
+                data: {action: "admin--social-post-form#uncheckAll"})) %>
+        </div>
+
+        <div class="row mt-2">
+          <% SocialAccount.active.each do |social_account| %>
+            <div class="form-check">
+              <label>
+                <%= check_box_tag "social_account_ids[]", social_account.id, true, multiple: true,
+                      id: "social_account_ids_#{social_account.id}",
+                      data: {"admin--social-post-form-target": "accountCheckbox"} %>
+
+                <%= social_account.screen_name %>
+              </label>
+            </div>
+          <% end %>
+        </div>
+
+        <em class="small less-strong">
+          Even if checked, original account won't repost itself (so feel free to
+          leave it checked)
+        </em>
+      </div>
+    </div>
+
+    <div
+      class="card bg-light <%= kind_hidden_class("imported_post") %>"
+      data-admin--social-post-form-target="kindFields"
+      data-kind="imported_post"
+    >
+      <div class="card-body">
+        <p><strong>Import a post</strong></p>
+
+        <p><em>This is primarily for adding a post to a landing page.</em></p>
+
+        <p>
+          Get the post ID from the URL of the post. It's the final number at the
+          end of the url
+        </p>
+
+        <p>
+          e.g. for
+          <code>https://twitter.com/stolenbikereg/status/874644243737751553</code>
+          - 874644243737751553
+        </p>
+
+        <div class="form-group">
+          <%= f.label :platform_id, "Platform id" %>
+          <%= f.text_field :platform_id, class: "form-control" %>
+        </div>
+
+        <div class="mt-4">
+          <%= f.submit "Create post!", class: "btn btn-success" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

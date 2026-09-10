@@ -3,7 +3,7 @@
 - passed_bike ||= @bike || @parking_notification.bike
 
 = render(UI::Card::Component.new) do
-  = render(Org::ParkingNotificationDetails::Component.new(parking_notification: @parking_notification, organization: current_organization, bike: @bike, viewing_impound_record:, display_dev_info: display_dev_info?))
+  = render(Pages::Org::ParkingNotificationDetails::Component.new(parking_notification: @parking_notification, organization: current_organization, bike: @bike, viewing_impound_record:, display_dev_info: display_dev_info?))
 
 - if @parking_notification.image.present? || @parking_notification.image_processing
   .row

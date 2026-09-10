@@ -11,6 +11,11 @@ module Admin
       bikes = bikes.not_spam unless current_user.su_option?(:no_hide_spam)
       @bikes = bikes.order(id: :desc).limit(10)
       @users = User.valid_only.includes(organization_roles: [:organization]).limit(5).order(id: :desc)
+      @users_count = User.valid_only.count
+      beginning_of_day = Time.current.beginning_of_day
+      recent_user_dates = User.valid_only.where(created_at: beginning_of_day - 1.day..).pluck(:created_at)
+      @users_today = recent_user_dates.count { it >= beginning_of_day }
+      @users_yesterday = recent_user_dates.count - @users_today
     end
 
     def maintenance

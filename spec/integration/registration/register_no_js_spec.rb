@@ -7,10 +7,9 @@ require "rails_helper"
 # part no other driver reaches - HTML5 constraint validation runs against the stylesheet
 # that hides each combobox. Each one falls back to a UI::Forms::NoJsField control.
 RSpec.describe "Register flow without JavaScript", type: :system, driver: :playwright_no_js do
-  let(:owner_email) { "owner@bikeindex.org" }
-  let(:user_name) { "Sally Rider" }
-  let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
-  let!(:red) { FactoryBot.create(:color, name: "Red") }
+  # Only the fixtures are used here - scripting is off, so there are no comboboxes to
+  # type into and no controllers to wait for
+  include_context :register_flow_steps
 
   it "registers a bike through the plain controls the comboboxes fall back to" do
     visit "/register/new"

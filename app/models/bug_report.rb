@@ -3,23 +3,23 @@
 # Table name: bug_reports
 # Database name: primary
 #
-#  id                         :bigint           not null, primary key
-#  body                       :text
-#  email                      :text
-#  from_name                  :text
-#  github_pull_request        :integer
-#  is_member                  :boolean          default(FALSE), not null
-#  is_paid_organization       :boolean          default(FALSE), not null
-#  is_paid_organization_staff :boolean          default(FALSE), not null
-#  received_at                :datetime
-#  receiver                   :text
-#  status                     :integer          default("unprioritized"), not null
-#  subject                    :text
-#  tags                       :text             default([]), not null, is an Array
-#  created_at                 :datetime         not null
-#  updated_at                 :datetime         not null
-#  inbound_email_id           :bigint
-#  user_id                    :bigint
+#  id                             :bigint           not null, primary key
+#  body                           :text
+#  email                          :text
+#  from_name                      :text
+#  github_pull_request            :integer
+#  is_invoiced_organization       :boolean          default(FALSE), not null
+#  is_invoiced_organization_staff :boolean          default(FALSE), not null
+#  is_member                      :boolean          default(FALSE), not null
+#  received_at                    :datetime
+#  receiver                       :text
+#  status                         :integer          default("unprioritized"), not null
+#  subject                        :text
+#  tags                           :text             default([]), not null, is an Array
+#  created_at                     :datetime         not null
+#  updated_at                     :datetime         not null
+#  inbound_email_id               :bigint
+#  user_id                        :bigint
 #
 # Indexes
 #
@@ -56,7 +56,7 @@ class BugReport < ApplicationRecord
 
   has_many_attached :images
 
-  has_paper_trail only: %i[tags github_pull_request is_member is_paid_organization is_paid_organization_staff]
+  has_paper_trail only: %i[tags github_pull_request is_member is_invoiced_organization is_invoiced_organization_staff]
 
   pg_search_scope :text_search, against: {subject: "A", body: "B"}
 
@@ -67,8 +67,8 @@ class BugReport < ApplicationRecord
 
   scope :with_tag, ->(tag) { where("tags @> ARRAY[?]::text[]", tag) }
   scope :member, -> { where(is_member: true) }
-  scope :paid_organization, -> { where(is_paid_organization: true) }
-  scope :paid_organization_staff, -> { where(is_paid_organization_staff: true) }
+  scope :invoiced_organization, -> { where(is_invoiced_organization: true) }
+  scope :invoiced_organization_staff, -> { where(is_invoiced_organization_staff: true) }
   # Includes unprioritized so reports the auto-prioritize job hasn't reached yet stay visible
   scope :investigate, -> { where(status: %i[unprioritized investigate_priority_high investigate_priority_low]) }
 
@@ -170,9 +170,9 @@ class BugReport < ApplicationRecord
     return unless user_id_changed? && user.present?
 
     self.is_member = user.member?
-    self.is_paid_organization = user.paid_org?
-    self.is_paid_organization_staff = user.organization_roles.admin
-      .where(organization_id: Organization.paid).limit(1).any?
+    self.is_invoiced_organization = user.invoiced_org?
+    self.is_invoiced_organization_staff = user.organization_roles.admin
+      .where(organization_id: Organization.invoiced).limit(1).any?
   end
 
   def enqueue_prioritizing_job

@@ -88,7 +88,7 @@
   <%= render partial: "/admin/user_alerts/table", locals: {render_sortable: true, user_alerts: @collection, skip_user: @user_subject.present?} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @collection,
   viewing: controller_name.humanize,

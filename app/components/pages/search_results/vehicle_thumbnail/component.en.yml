@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    pages:
+      search_results:
+        vehicle_thumbnail:
+          member: Bike Index member
+          registered_not_stolen: registered, not stolen

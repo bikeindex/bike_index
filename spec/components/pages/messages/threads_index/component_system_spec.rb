@@ -1,0 +1,18 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+# As of now, this just verifies that the preview renders
+RSpec.describe Pages::Messages::ThreadsIndex::Component, :js, type: :system do
+  let(:preview_path) { "/rails/view_components/pages/messages/threads_index/component/default" }
+  let!(:user) { FactoryBot.create(:user_confirmed) }
+
+  before { ENV["LOOKBOOK_USER_ID"] = user.id.to_s }
+
+  it "default preview" do
+    visit(preview_path)
+
+    expect(page).to have_content "John Smith"
+    expect_axe_clean
+  end
+end

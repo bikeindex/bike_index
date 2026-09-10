@@ -1,0 +1,23 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          current_alerts:
+            claim_invitation:
+              claim_bike_type: Claim %{bike_type}
+              claim_it_so_you_can_update_your_listing: Claim it so you can update
+                your listing.
+              claim_your_bike_type: Claim your %{bike_type}
+              read_more: read more
+              registered_your_bike_on_index_html: >-
+                registered your %{bike_type} on Bike Index, a free, non-profit, bike
+                registry and stolen bike recovery platform %{read_more_link}.
+              sign_up: sign up
+              sign_up_to_claim: Sign up
+              to_see_your_bike_sign_up_html: >-
+                To see your %{bike_type} and claim it as your own, %{sign_up_link}
+                with the email address where you received your registration email.
+              were_honored_to_have_your_bike: We're honored to have your %{bike_type}
+                on the Index.

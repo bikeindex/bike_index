@@ -913,8 +913,8 @@ CREATE TABLE public.bug_reports (
     subject text,
     body text,
     is_member boolean DEFAULT false NOT NULL,
-    is_paid_organization boolean DEFAULT false NOT NULL,
-    is_paid_organization_staff boolean DEFAULT false NOT NULL,
+    is_invoiced_organization boolean DEFAULT false NOT NULL,
+    is_invoiced_organization_staff boolean DEFAULT false NOT NULL,
     github_pull_request integer,
     tags text[] DEFAULT '{}'::text[] NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
@@ -1281,7 +1281,8 @@ CREATE TABLE public.email_bans (
     end_at timestamp(6) without time zone,
     reason integer,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    user_email_id bigint
 );
 
 
@@ -3041,7 +3042,7 @@ CREATE TABLE public.organizations (
     api_access_approved boolean DEFAULT false NOT NULL,
     approved boolean DEFAULT true,
     avatar character varying(255),
-    is_paid boolean DEFAULT false NOT NULL,
+    is_invoiced boolean DEFAULT false NOT NULL,
     lock_show_on_map boolean DEFAULT false NOT NULL,
     enabled_feature_slugs jsonb,
     parent_organization_id integer,
@@ -6827,6 +6828,13 @@ CREATE INDEX index_customer_contacts_on_bike_id ON public.customer_contacts USIN
 
 
 --
+-- Name: index_email_bans_on_user_email_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_bans_on_user_email_id ON public.email_bans USING btree (user_email_id);
+
+
+--
 -- Name: index_email_bans_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -8033,10 +8041,12 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20260831150000'),
-('20260831140000'),
-('20260831130000'),
-('20260831120000'),
+('20260910150000'),
+('20260910140000'),
+('20260910130000'),
+('20260910120000'),
+('20260909120000'),
+('20260908163548'),
 ('20260821100000'),
 ('20260819120000'),
 ('20260815152851'),

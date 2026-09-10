@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # The account menu: the reader's account links, the organizations they can switch between,
-# and logout. PageBlock::Navbar::UserSettingsMenu renders it as the navbar's gear submenu,
-# PageBlock::Navbar::AccountMenu as the org sidebar's dropdown.
+# and logout. SharedBlocks::Navbar::UserSettingsMenu renders it as the navbar's gear submenu,
+# SharedBlocks::Navbar::AccountMenu as the org sidebar's dropdown.
 #
 # Its rows are ComponentStructs::Shapes'.
 module UserServices
@@ -80,7 +80,7 @@ module UserServices
     end
 
     # organization_id=false is what clears the one held in the session. The homepage is where
-    # that lands from inside the organization interface; page-block--navbar-switch-no-organization
+    # that lands from inside the organization interface; shared-blocks--navbar-switch-no-organization
     # points it at the current page anywhere else. The param is what the row matches on too --
     # the href's path alone is "/", which would go current on the homepage
     def without_organization(current_organization)
@@ -88,7 +88,7 @@ module UserServices
 
       ComponentStructs::Shapes.link(translation(:view_without_org), routes.root_url(organization_id: false),
         match_params: {organization_id: "false"},
-        data: {controller: "page-block--navbar-switch-no-organization"})
+        data: {controller: "shared-blocks--navbar-switch-no-organization"})
     end
 
     def translation(key, **interpolations)

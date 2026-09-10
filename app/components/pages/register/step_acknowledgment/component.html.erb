@@ -1,0 +1,26 @@
+<%= render Pages::Register::Page::Component.new do %>
+  <%= render Pages::Register::Progress::Component.new(steps: @steps, step: @step) %>
+
+  <%= render Pages::Register::AcknowledgmentProgress::Component.new(number: position + 1,
+      total: BikeServices::Register.acknowledgment_step_count(@sequence)) %>
+
+  <%= form_with(url: acknowledge_register_path, method: :patch,
+      data: {turbo: true, controller: "register--acknowledgment register--retry"}) do %>
+    <%= hidden_field_tag :b_param_token, @b_param.id_token %>
+    <%= hidden_field_tag :step, @step %>
+
+    <%= render Pages::Register::PageContent::Component.new(page:, first: first?,
+        checkbox_name: :acknowledged, checked: acknowledged?) %>
+
+    <%#
+      register--acknowledgment disables it on connect - one that ships disabled is one
+      nobody without JavaScript can press, and the server holds the gate either way
+    %>
+
+    <%= render UI::Button::Component.new(text: translation(".continue"), color: :primary, size: :lg,
+        type: "submit", spinner: true, html_class: "tw:mt-5 tw:w-full",
+        data: {"register--acknowledgment-target": "submit"}) %>
+
+    <%= render Pages::Register::BackLink::Component.new(href: previous_path) %>
+  <% end %>
+<% end %>

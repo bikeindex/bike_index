@@ -100,6 +100,42 @@ RSpec.describe ParkingNotification, type: :model do
     end
   end
 
+  describe "bike_not_impounded" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+    let(:bike) { FactoryBot.create(:bike) }
+    let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: organization, bike: bike) }
+    let(:parking_notification) { FactoryBot.build(:parking_notification_organized, organization: organization, bike: bike, kind: "impound_notification") }
+    it "is invalid, naming the impound record" do
+      expect(parking_notification).to_not be_valid
+      expect(parking_notification.errors.full_messages.to_sentence)
+        .to eq "This bike is already impounded (impound record ##{impound_record.display_id})"
+    end
+
+    context "notification of another kind" do
+      let(:parking_notification) { FactoryBot.build(:parking_notification_organized, organization: organization, bike: bike, kind: "appears_abandoned_notification") }
+      it "is valid" do
+        expect(parking_notification).to be_valid
+      end
+    end
+
+    context "impound record resolved" do
+      let!(:impound_record) { FactoryBot.create(:impound_record_resolved, organization: organization, bike: bike) }
+      it "is valid" do
+        expect(impound_record.reload.resolved?).to be_truthy
+        expect(parking_notification).to be_valid
+      end
+    end
+
+    context "impounded by another organization" do
+      let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike: bike) }
+      it "is invalid" do
+        expect(parking_notification).to_not be_valid
+        expect(parking_notification.errors.full_messages.to_sentence)
+          .to eq "This bike is already impounded by another organization"
+      end
+    end
+  end
+
   describe "unregistered" do
     let(:parking_notification) { FactoryBot.create(:parking_notification_unregistered) }
     let(:organization) { parking_notification.organization }

@@ -47,7 +47,7 @@ gem "rails-i18n"
 gem "translation"
 
 # Redis and Redis dependents
-gem "redis", "< 6" # actioncable's declares gem "redis", ">= 4", "< 6"
+gem "redis", "< 6" # actioncable's redis adapter declares gem "redis", ">= 4", "< 6"
 gem "sidekiq" # Background job processing
 gem "sidekiq-failures" # Sidekiq failure tracking and viewing
 gem "sidekiq-logstash" # Better sidekiq logging
@@ -61,7 +61,7 @@ gem "carrierwave", "~> 3.1" # File uploader
 # Using bikeindex fork to support rails 8
 gem "carrierwave_backgrounder", github: "bikeindex/carrierwave_backgrounder" # background processing of images
 gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
-gem "lexxy", "~> 0.9.29" # Rich text editor (Action Text) for registration sequences
+gem "lexxy", "~> 0.9" # Rich text editor (Action Text) for registration sequences. Minor bumps rewrite the toolbar DOM lexxy_overrides.css targets
 # gem "wicked_pdf" # TODO: PDFs are broken right now - commented out because they're unused
 # gem "wkhtmltopdf-binary" # TODO: PDFs are broken right now - commented out because they're unused
 gem "rqrcode", "3.2.0" # QR Code image generator
@@ -99,7 +99,6 @@ gem "grape_logging" # Grape logging. Also how we pass it to lograge. Always used
 
 # Frontend
 gem "chartkick" # Display charts
-gem "coderay" # Pretty print code
 gem "coffee-rails"
 gem "groupdate" # Required for charts
 gem "premailer-rails" # Inline styles for email, also auto-generates text versions of emails

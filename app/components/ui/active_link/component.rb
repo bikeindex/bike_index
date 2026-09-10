@@ -31,7 +31,7 @@ module UI
         end
 
         # matchesPath in ui/active_link_controller.js, which answers this for a link itself.
-        # The copy is for prose beside one — Admin::Navbar names the current page in the
+        # The copy is for prose beside one — Pages::Admin::Navbar names the current page in the
         # picker, which no link can go active on its behalf.
         def covers?(pattern, path)
           pattern_segments = segments_of(pattern)

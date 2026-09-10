@@ -1,0 +1,12 @@
+---
+en:
+  components:
+    pages:
+      search_results:
+        frame:
+          fetch_failed: Couldn't load these results — check your connection and try
+            again.
+          rate_limited: >-
+            Too many searches too fast — you're being rate limited. Wait a moment,
+            then try again.
+          retry: Try again

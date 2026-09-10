@@ -82,7 +82,7 @@
                       = link_to organized_bike_text(bike, skip_creation: true), bike_link
                   %tr
                     %td Serial
-                    %td= render(Atom::Serial::Component.new(bike:, user: current_user))
+                    %td= render(Atoms::Serial::Component.new(bike:, user: current_user))
                   - if stolen_record.recovered?
                     %tr
                       %td
@@ -120,7 +120,7 @@
                         %td
                           Phone
                         %td
-                          = render Atom::Phone::Component.new(phone: stolen_record.phone)
+                          = render Atoms::Phone::Component.new(phone: stolen_record.phone)
               .bike-image{ class: thumbclass }
                 %a{ href:  bike_link }
                   %img{ src: thumb_url }

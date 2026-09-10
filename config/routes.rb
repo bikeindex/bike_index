@@ -36,7 +36,7 @@ Rails.application.routes.draw do
 
   get "/user_root_url_redirect", to: "welcome#user_root_url_redirect", as: :user_root_url_redirect
 
-  LandingPages::ORGANIZATIONS.each do |slug|
+  LandingPageOrganizations::SLUGS.each do |slug|
     get slug, to: "landing_pages#show", organization_id: slug
   end
 

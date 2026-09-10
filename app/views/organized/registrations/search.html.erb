@@ -1,6 +1,6 @@
 <%= render "organized/bikes/sticker_header" if @bike_sticker.present? %>
 
-<% settings_component = Org::Search::Settings::Component.new(
+<% settings_component = Pages::Org::Search::Settings::Component.new(
   organization: current_organization,
   interpreted_params: @interpreted_params,
   sortable_search_params:,
@@ -28,7 +28,7 @@
   <%# Frame requests only need the results frame; skip the form (Turbo discards it) %>
   <% unless turbo_frame_request? %>
     <div class="mb-4">
-      <%= render(Org::Search::Form::Component.new(
+      <%= render(Pages::Org::Search::Form::Component.new(
         target_search_path: organization_registrations_path(organization_id: current_organization.to_param),
         target_frame: :organized_bikes_results_frame,
         interpreted_params: form_interpreted_params,
@@ -41,7 +41,7 @@
     </div>
   <% end %>
 
-  <%= render SearchResults::Frame::Component.new(frame_id: :organized_bikes_results_frame,
+  <%= render Pages::SearchResults::Frame::Component.new(frame_id: :organized_bikes_results_frame,
     render_results: @render_results, current_path: request.original_fullpath) do %>
     <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:) %>
 

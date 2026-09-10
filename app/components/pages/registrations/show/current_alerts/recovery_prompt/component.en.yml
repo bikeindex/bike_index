@@ -1,0 +1,19 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          current_alerts:
+            recovery_prompt:
+              can_we_share_your_story: Can we share your story?
+              did_we_help: Did we help?
+              how_did_you_get_it_back: How did you get it back?
+              its_also_how_we_get_better_at_recovering: It's also how we get better
+                at recovering %{bike_type}.
+              mark_recovered: Mark recovered
+              mark_your_bike_recovered: Mark your %{bike_type} recovered!
+              nevermind: Nevermind
+              please_tell_us_how_you_got_your_bike: Please tell us how you got your
+                %{bike_type} back, we really care!
+              when_did_you_recover_it: When did you recover it?

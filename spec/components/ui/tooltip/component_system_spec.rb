@@ -14,6 +14,25 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     JS
   end
 
+  def selected_tooltip_id
+    page.evaluate_script(<<~JS)
+      (() => {
+        const node = document.getSelection().anchorNode
+        return node && node.parentElement.closest("[role='tooltip']")?.id
+      })()
+    JS
+  end
+
+  def drag_select_past(element)
+    box = element.native.bounding_box
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.mouse.move(box["x"] + 2, box["y"] + box["height"] / 2)
+      playwright_page.mouse.down
+      playwright_page.mouse.move(box["x"] + box["width"] + 120, box["y"] + box["height"] / 2, steps: 12)
+      playwright_page.mouse.up
+    end
+  end
+
   def tooltip_z_index(id)
     page.evaluate_script("document.getElementById(#{id.to_json}).style.zIndex")
   end
@@ -65,20 +84,30 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     expect(tooltip).not_to be_visible
     find("body").hover
 
+    # Esc leaves focus on the trigger, so clicking it again has to reopen
+    trigger.click
+    page.send_keys(:escape)
+    expect(tooltip).not_to be_visible
+    trigger.click
+    find("body").hover
+    expect(tooltip).to be_visible
+    find("body").click
+    expect(tooltip).not_to be_visible
+
     # Hover-then-focus stays visible until BOTH clear
     trigger.hover
     page.execute_script("arguments[0].focus()", trigger)
     find("body").hover
     expect(tooltip).to be_visible
-    page.execute_script("arguments[0].blur()", trigger)
+    find("body").click
     expect(tooltip).not_to be_visible
 
-    # Focus-then-hover is symmetric: stays through mouseleave until blur
+    # Focus-then-hover is symmetric: stays through mouseleave until the click outside
     page.execute_script("arguments[0].focus()", trigger)
     trigger.hover
     find("body").hover
     expect(tooltip).to be_visible
-    page.execute_script("arguments[0].blur()", trigger)
+    find("body").click
     expect(tooltip).not_to be_visible
 
     # Focus moving to another trigger hides the first
@@ -87,15 +116,57 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     expect(tooltips.first).to be_visible
     page.execute_script("arguments[0].focus()", triggers.last)
     expect(tooltips.first).not_to be_visible
-    page.execute_script("arguments[0].blur()", triggers.last)
+    find("body").click
 
-    # Clicking the trigger persists the tooltip through mouseleave until a body click
+    # Focus leaving with nowhere else to land - the browser window losing focus to
+    # another program - is not a dismissal
+    page.execute_script("arguments[0].focus()", trigger)
+    find("body").hover
+    expect(tooltip).to be_visible
+    page.execute_script("arguments[0].blur()", trigger)
+    expect(tooltip).to be_visible
+    find("body").click
+    expect(tooltip).not_to be_visible
+
+    # Clicking the trigger persists the tooltip through mouseleave until a body click,
+    # and only a held-open tooltip takes pointer events rather than being click-through
     trigger.hover
+    expect(tooltip[:class]).to include "tw:pointer-events-none"
     trigger.click
+    expect(tooltip[:class]).not_to include "tw:pointer-events-none"
     find("body").hover
     expect(tooltip).to be_visible
     find("body").click
     expect(tooltip).not_to be_visible
+
+    # Clicking the tooltip text leaves it open, so it can be selected
+    trigger.click
+    tooltip.click
+    find("body").hover
+    expect(tooltip).to be_visible
+    tooltip.double_click
+    expect(tooltip).to be_visible
+    expect(selected_tooltip_id).to eq tooltip_ids.first
+    # A selection dragged past the tooltip's edge ends in a click outside it
+    drag_select_past(tooltip)
+    expect(tooltip).to be_visible
+    find("body").click
+    expect(tooltip).not_to be_visible
+
+    # Tabbing from the trigger into a link in the popup keeps the tooltip open
+    commit_tooltip = find("a[href*='commit']", visible: :all).find(:xpath, "ancestor::*[@role='tooltip']", visible: :all)
+    commit_trigger = find("[aria-describedby='#{commit_tooltip[:id]}']")
+    commit_trigger.click
+    expect(commit_tooltip).to be_visible
+    commit_trigger.send_keys(:tab)
+    expect(commit_tooltip).to be_visible
+    expect(page.evaluate_script("document.activeElement.tagName")).to eq "A"
+    # Esc from a link inside the tooltip returns focus to the trigger
+    page.send_keys(:escape)
+    expect(commit_tooltip).not_to be_visible
+    expect(page.evaluate_script("document.activeElement.getAttribute('aria-describedby')")).to eq commit_tooltip[:id]
+    find("body").click
+    expect(commit_tooltip).not_to be_visible
 
     # Click layering pushes each clicked tooltip's z-index higher
     tooltip_ids.each { |id| find("[aria-describedby='#{id}']").click }

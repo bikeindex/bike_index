@@ -131,7 +131,7 @@ module Emails
       end
 
       def donation_message?
-        bike.status_stolen? && !(organization && !organization.paid?)
+        bike.status_stolen? && !(organization && !organization.is_invoiced?)
       end
 
       def registered_by_owner?

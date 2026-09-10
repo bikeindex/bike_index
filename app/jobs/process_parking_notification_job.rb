@@ -36,11 +36,15 @@ class ProcessParkingNotificationJob < ApplicationJob
   def run(parking_notification_id)
     parking_notification = ParkingNotification.find(parking_notification_id)
 
-    if parking_notification.impound_notification? && parking_notification.impound_record_id.blank?
-      impound_record = ImpoundRecord.create!(bike_id: parking_notification.bike_id,
-        user_id: parking_notification.user_id,
-        organization_id: parking_notification.organization_id,
-        skip_update: true)
+    current_record = current_impound_record(parking_notification)
+    # Another organization's record isn't ours to link to, but it still blocks creating one
+    impound_record = if current_record.blank?
+      new_impound_record(parking_notification)
+    elsif current_record.organization_id == parking_notification.organization_id
+      current_record
+    end
+
+    if impound_record.present?
       parking_notification.resolved_at ||= Time.current
       parking_notification.update(impound_record_id: impound_record.id)
       ProcessImpoundUpdatesJob.new.perform(impound_record.id)
@@ -62,7 +66,36 @@ class ProcessParkingNotificationJob < ApplicationJob
       end
     end
 
-    send_notification_if_should(parking_notification)
+    # The owner was already emailed by the notification that impounded the bike
+    unless current_record.present? || earlier_impound_notification?(parking_notification)
+      send_notification_if_should(parking_notification)
+    end
+  end
+
+  # ParkingNotification validates that its bike isn't already impounded, so a current record here
+  # means both notifications were created before either of them was processed
+  def current_impound_record(parking_notification)
+    return nil unless parking_notification.impound_notification? && parking_notification.impound_record_id.blank?
+
+    ImpoundRecord.current.find_by(bike_id: parking_notification.bike_id)
+  end
+
+  # Once a duplicate has been linked to the record, this is what keeps a re-run from emailing
+  def earlier_impound_notification?(parking_notification)
+    return false if parking_notification.impound_record_id.blank?
+
+    ParkingNotification.impound_notification
+      .where(impound_record_id: parking_notification.impound_record_id)
+      .where("id < ?", parking_notification.id).exists?
+  end
+
+  def new_impound_record(parking_notification)
+    return nil unless parking_notification.impound_notification? && parking_notification.impound_record_id.blank?
+
+    ImpoundRecord.create!(bike_id: parking_notification.bike_id,
+      user_id: parking_notification.user_id,
+      organization_id: parking_notification.organization_id,
+      skip_update: true)
   end
 
   def send_notification_if_should(parking_notification)

@@ -28,6 +28,14 @@ RSpec.describe "Navbar", :js, type: :system do
     within("nav.primary-header-nav") { expect(page).to have_no_link("Search") }
     expect_axe_clean
 
+    # A double tap closes the menu mid-open, and the tail of that open must not raise the
+    # backdrop over a page the menu has left -- which locks body scroll too. `enabled` is
+    # what the close drops last, so waiting on it is waiting for the settled state
+    find("#primary_nav_hamburgler").double_click
+    expect(page).to have_css(".hamburgler button[aria-expanded='false']")
+    expect(page).to have_no_css("nav.primary-header-nav.enabled")
+    expect(page).to have_no_css("nav.primary-header-nav.menu-in")
+
     open_menu_and_search
 
     # The banner pushes the navbar down, further still when its title wraps
@@ -37,19 +45,6 @@ RSpec.describe "Navbar", :js, type: :system do
     visit root_path
     expect(page).to have_content(pr_title)
     open_menu_and_search
-  end
-
-  # The two-step login and the flash both animate, and a click waits for its target
-  # to settle before it lands -- that wait is Capybara's 2s default
-  def sign_in(user)
-    using_wait_time(10) do
-      visit new_session_path
-      fill_in "Email", with: user.email
-      click_button "Continue"
-      fill_in "Password", with: "testthisthing7$"
-      click_button "Log in"
-      expect(page).to have_no_current_path(new_session_path, wait: 10)
-    end
   end
 
   context "signed in without an organization" do
@@ -147,15 +142,15 @@ RSpec.describe "Navbar", :js, type: :system do
         registrations = find("button[aria-controls='org_sidebar_group_registrations']")
         expect(registrations["aria-expanded"]).to eq "true"
 
-        find("[data-page-block--org-sidebar-target='collapseToggle']").click
+        find("[data-shared-blocks--org-sidebar-target='collapseToggle']").click
 
         # Clicking the group that was already open has to leave it open, not toggle it shut
         registrations.click
 
-        expect(page).to have_link("Search Registrations")
+        expect(page).to have_link("Organization Registrations")
         expect(registrations["aria-expanded"]).to eq "true"
 
-        find("[data-page-block--org-sidebar-target='collapseToggle']").click
+        find("[data-shared-blocks--org-sidebar-target='collapseToggle']").click
         impounded = find("button[aria-controls='org_sidebar_group_impounded']")
         expect(impounded["aria-expanded"]).to eq "false"
 

@@ -776,12 +776,46 @@ RSpec.describe User, type: :model do
         user.reload
         expect(user.render_donation_request).to eq "law_enforcement"
       end
-      context "police department paid" do
-        before { organization.update_column :is_paid, true }
+      context "police department with an invoice" do
+        before { organization.update_column :is_invoiced, true }
         it "is 'law_enforcement'" do
           user.reload
-          expect(user.organizations.paid.count).to eq 1
+          expect(user.organizations.invoiced.count).to eq 1
           expect(user.render_donation_request).to be_nil
+        end
+      end
+    end
+  end
+
+  describe "paid_organization_registration?" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user:) }
+
+    it "is false" do
+      expect(User.new.paid_organization_registration?).to be_falsey
+      expect(user.reload.paid_organization_registration?).to be_falsey
+    end
+
+    context "organization has an invoice" do
+      before { organization.update_column :is_invoiced, true }
+
+      it "is true" do
+        expect(user.reload.paid_organization_registration?).to be_truthy
+      end
+
+      # The transfer leaves their ownership behind, organization and all, with only current false
+      it "is false once they've transferred it away" do
+        BikeServices::OwnershipTransferer.find_or_create(bike, updator: user, new_owner_email: "newowner@example.com")
+
+        expect(user.reload.paid_organization_registration?).to be_falsey
+      end
+
+      context "registration isn't the user's" do
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
+
+        it "is false" do
+          expect(user.reload.paid_organization_registration?).to be_falsey
         end
       end
     end

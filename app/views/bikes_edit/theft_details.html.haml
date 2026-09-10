@@ -12,7 +12,7 @@
             .form-well-form-header-always-visible
               %h3.header-font-alt
                 = t(".do_these_things_for_the_best_chance")
-            = render Bikes::StolenChecklist::Component.new(bike: @bike, stolen_record: @bike.current_stolen_record)
+            = render Pages::Bikes::StolenChecklist::Component.new(bike: @bike, stolen_record: @bike.current_stolen_record)
 
         .form-wrap{ class: @bike.current_stolen_record&.display_checklist? ? "secondary-form-wrap" : "" }
           .form-well-form-header

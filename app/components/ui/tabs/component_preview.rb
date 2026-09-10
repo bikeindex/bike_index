@@ -19,7 +19,7 @@ module UI
           ComponentStructs::Shapes.tab("Show", "#"),
           ComponentStructs::Shapes.tab("Edit", "#"),
           ComponentStructs::Shapes.tab("Locations", "#", count: 2),
-          ComponentStructs::Shapes.tab("Edit paid functionality", "#"),
+          ComponentStructs::Shapes.tab("Edit invoice functionality", "#"),
           ComponentStructs::Shapes.tab("SSO", "#"),
           ComponentStructs::Shapes.tab("Invoices", "#"),
           ComponentStructs::Shapes.tab("Custom layouts", "#", active: true)

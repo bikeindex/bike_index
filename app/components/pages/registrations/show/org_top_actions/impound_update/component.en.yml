@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          org_top_actions:
+            impound_update:
+              title: Update impound record

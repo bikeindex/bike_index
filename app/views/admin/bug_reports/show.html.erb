@@ -40,7 +40,7 @@
 
           <td>
             <% if @bug_report.user_id.present? %>
-              <%= render Admin::Users::Cell::Component.new(user: @bug_report.user, user_id: @bug_report.user_id) %>
+              <%= render Pages::Admin::Users::Cell::Component.new(user: @bug_report.user, user_id: @bug_report.user_id) %>
             <% else %>
               <span class="less-strong">no user</span>
             <% end %>
@@ -53,13 +53,16 @@
         </tr>
 
         <tr>
-          <td>Paid organization</td>
-          <td><%= check_mark if @bug_report.is_paid_organization %></td>
+          <td>Invoiced organization</td>
+          <td><%= check_mark if @bug_report.is_invoiced_organization %></td>
         </tr>
 
         <tr>
-          <td>Paid organization staff</td>
-          <td><%= check_mark if @bug_report.is_paid_organization_staff %></td>
+          <td>Invoiced organization staff</td>
+
+          <td>
+            <%= check_mark if @bug_report.is_invoiced_organization_staff %>
+          </td>
         </tr>
 
         <tr>

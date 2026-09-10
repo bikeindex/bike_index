@@ -66,7 +66,7 @@ That split — works in the browser, fails under `rspec` — is the tell. Confir
 before debugging the code:
 
 ```bash
-grep -o "controllers/page_block/[a-z_]*controller[^\"]*" public/assets/.sprockets-manifest.json | head
+grep -o "controllers/shared_blocks/[a-z_]*controller[^\"]*" public/assets/.sprockets-manifest.json | head
 ```
 
 Then delete `public/assets` — `rm -rf public/assets`, no need to ask. It's

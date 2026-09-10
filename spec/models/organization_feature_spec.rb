@@ -4,12 +4,19 @@ RSpec.describe OrganizationFeature, type: :model do
   it_behaves_like "amountable"
   it_behaves_like "currencyable"
 
-  describe "constant ordering" do
+  describe "constants" do
     it "is ordered" do
       expect(OrganizationFeature::REG_FIELDS.sort).to eq OrganizationFeature::REG_FIELDS
+      expect(OrganizationFeature::REG_FIELDS_REQUIRED.sort).to eq OrganizationFeature::REG_FIELDS_REQUIRED
       expect(OrganizationFeature::BIKE_ACTIONS.sort).to eq OrganizationFeature::BIKE_ACTIONS
-      expected_slugs = OrganizationFeature::EXPECTED_SLUGS - OrganizationFeature::REG_FIELDS - OrganizationFeature::BIKE_ACTIONS
+      expected_slugs = OrganizationFeature::EXPECTED_SLUGS - OrganizationFeature::REG_FIELDS -
+        OrganizationFeature::REG_FIELDS_REQUIRED - OrganizationFeature::BIKE_ACTIONS
       expect(expected_slugs.sort).to eq expected_slugs
+    end
+
+    it "requires only fields that are asked for" do
+      reg_fields = OrganizationFeature::REG_FIELDS_REQUIRED.map { it.delete_prefix("require_") }
+      expect(reg_fields - OrganizationFeature::REG_FIELDS).to eq([])
     end
   end
 

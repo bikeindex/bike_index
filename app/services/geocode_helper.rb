@@ -8,6 +8,8 @@ module GeocodeHelper
   MIN_DISTANCE = 1
   MAX_DISTANCE = 1_000
   DEFAULT_DISTANCE = 100
+  # Marketplace listings are searched over a tighter radius than registrations
+  DEFAULT_MARKETPLACE_DISTANCE = 50
 
   # Always returns latitude and longitude
   def coordinates_for(lookup_string)

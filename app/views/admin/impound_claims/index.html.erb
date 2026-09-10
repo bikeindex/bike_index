@@ -68,7 +68,7 @@
   <%= render partial: "table", locals: {impound_claims: @impound_claims, render_sortable: true, skip_organization: current_organization.present?} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
   index: admin_index_state,
   collection: @impound_claims,
   viewing: "Impound Claims",

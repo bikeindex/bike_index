@@ -3,7 +3,6 @@
 module Search
   class MarketplaceController < ApplicationController
     MAX_INDEX_PAGE = 100
-    DEFAULT_DISTANCE = 50
     before_action :render_ad
     before_action :set_interpreted_params
     around_action :set_reading_role
@@ -60,7 +59,8 @@ module Search
       location, coordinates = BikeSearchable.search_location(params[:location], forwarded_ip_address)
       return {} if location.blank?
 
-      distance = GeocodeHelper.permitted_distance(params[:distance], default_distance: DEFAULT_DISTANCE)
+      distance = GeocodeHelper.permitted_distance(params[:distance],
+        default_distance: GeocodeHelper::DEFAULT_MARKETPLACE_DISTANCE)
       bounding_box = if coordinates.present?
         GeocodeHelper.bounding_box(coordinates, distance)
       else
@@ -85,7 +85,7 @@ module Search
       @page = permitted_page(max: MAX_INDEX_PAGE)
       @search_kind = :marketplace
       @search_obj_name = "Listings"
-      @result_view = SearchResults::Container::Component
+      @result_view = Pages::SearchResults::Container::Component
         .permitted_result_view(params[:search_result_view], default: :thumbnail)
     end
 

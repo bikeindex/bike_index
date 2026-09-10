@@ -115,6 +115,7 @@ class User < ApplicationRecord
   has_many :ambassador_tasks, through: :ambassador_task_assignments
   has_many :organizations, through: :organization_roles
   has_many :owned_bikes, through: :ownerships, source: :bike
+  has_many :ownership_organizations, through: :current_ownerships, source: :organization
   has_many :updated_bike_stickers, -> { distinct }, through: :bike_sticker_updates, class_name: "BikeSticker", source: :bike_sticker
   has_many :uro_organizations, through: :user_registration_organizations, class_name: "Organization", source: :organization
   has_one :membership_active, -> { active }, class_name: "Membership"
@@ -154,8 +155,8 @@ class User < ApplicationRecord
   after_commit :perform_create_jobs, on: :create, unless: lambda { skip_update }
   after_commit :perform_user_update_jobs
 
-  scope :email_banned, -> { left_joins(:email_bans_active).where.not(email_bans: {id: nil}) }
-  scope :no_email_bans, -> { left_joins(:email_bans_active).where(email_bans: {id: nil}) }
+  scope :email_banned, -> { where(id: EmailBan.period_active.banning_account_email.select(:user_id)) }
+  scope :no_email_bans, -> { where.not(id: EmailBan.period_active.banning_account_email.select(:user_id)) }
   scope :banned, -> { where(banned: true) }
   scope :valid_only, -> { no_email_bans.where(banned: false) }
   scope :confirmed, -> { where(confirmed: true) }
@@ -371,14 +372,19 @@ class User < ApplicationRecord
     # Prioritization of organizations
     orgs.ambassador.limit(1).first ||
       orgs.paid_money.limit(1).first ||
-      orgs.paid.limit(1).first ||
+      orgs.invoiced.limit(1).first ||
       orgs.law_enforcement.limit(1).first ||
       orgs.bike_shop.limit(1).first ||
       orgs.limit(1).first
   end
 
-  def paid_org?
-    organizations.paid.limit(1).any?
+  def invoiced_org?
+    organizations.invoiced.limit(1).any?
+  end
+
+  # Their registration was paid for, so don't ask them for a donation on top of it
+  def paid_organization_registration?
+    ownership_organizations.paid_money.exists?
   end
 
   def authorized?(obj, no_superuser_override: false)
@@ -553,7 +559,7 @@ class User < ApplicationRecord
   end
 
   def render_donation_request
-    return nil unless has_police_organization_role? && !organizations.law_enforcement.paid.limit(1).any?
+    return nil unless has_police_organization_role? && !organizations.law_enforcement.invoiced.limit(1).any?
 
     "law_enforcement"
   end
@@ -572,7 +578,7 @@ class User < ApplicationRecord
   end
 
   def email_banned?
-    email_bans_active.any?
+    email_bans_active.banning_account_email.any?
   end
 
   def set_calculated_attributes

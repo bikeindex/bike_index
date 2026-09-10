@@ -45,9 +45,7 @@
     <%= claimed_ownerships ? bike.owner_email : first_owner_email %>
 
     <small class="less-strong">
-      <% if bike.creation_description %>
-        <%= render(Org::OriginDisplay::Component.new(creation_description: bike.creation_description)) %>
-      <% end %>
+      <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)) %>
 
       <%= "(#{sent_to_a_new_owner})" unless bike.owner_email == first_owner_email %>
     </small>
@@ -59,7 +57,7 @@
     <% table.column(label: t(".stickers")) do |bike| %>
       <% bike.bike_stickers.each do |sticker| %>
         <% url = edit_organization_sticker_path(id: sticker.code, organization_id: organization.to_param) if sticker.organization_id == organization.id %>
-        <%= render(Atom::Sticker::Component.new(bike_sticker: sticker, url:)) %>
+        <%= render(Atoms::Sticker::Component.new(bike_sticker: sticker, url:)) %>
       <% end %>
     <% end %>
   <% end %>
