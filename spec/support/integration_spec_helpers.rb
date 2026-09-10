@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-# Helpers for :js system specs that need browser behavior Capybara doesn't
-# abstract across drivers. Implemented for the Playwright driver via its raw
-# page (see spec/support/capybara.rb).
-module SystemSpecHelpers
+# Helpers shared across :js system specs - the steps more than one of them walks, and the
+# browser behavior Capybara doesn't abstract across drivers, which is implemented for the
+# Playwright driver via its raw page (see spec/support/capybara.rb).
+module IntegrationSpecHelpers
   # Clear the back/forward stack so go_back/go_forward operate on this example's
   # own short stack -- Capybara never resets history between examples, so it
   # accumulates across the suite.
@@ -108,6 +108,62 @@ module SystemSpecHelpers
     field
   end
 
+  # Both steps animate, and a click waits for its target to settle before it lands -- that
+  # wait is Capybara's 2s default. Callers assert their own landing, which differs for an
+  # organization member.
+  def sign_in(user)
+    using_wait_time(10) do
+      visit new_session_path
+      fill_in "Email", with: user.email
+      click_button "Continue"
+      fill_in "Password", with: "testthisthing7$"
+      click_button "Log in"
+      # Step 1 posts to identify_session_path, so being off new_session_path is already
+      # true here - this button is what a failed sign-in re-renders
+      expect(page).to have_no_button("Log in")
+    end
+  end
+
+  def open_settings_menu = find("button[aria-label='Settings']").click
+
+  def sign_out
+    open_settings_menu
+    click_link "Log out"
+    expect(page).to have_content("Logged out")
+  end
+
+  # revised/init.coffee hands the legacy form-well's selects to selectize, which hides the
+  # <select> behind a control of its own -- so `select` can't reach them
+  def selectize_for(selector)
+    find(selector, visible: :all)
+      .find(:xpath, "./following-sibling::div[contains(@class, 'selectize-control')][1]")
+  end
+
+  def pick_selectize(selector, text) = pick_within_selectize(selectize_for(selector), text)
+
+  # Takes the control rather than a selector, for the ones reached by their wrapper
+  def pick_within_selectize(control, text)
+    control.find(".selectize-input").click
+    control.find(".selectize-dropdown-content .option", text:, wait: 5).click
+  end
+
+  # A remote-autocomplete selectize (the manufacturer fields) fetches its options, so the
+  # match is worth waiting longer for
+  def pick_remote_selectize(selector, text)
+    control = selectize_for(selector)
+    control.find(".selectize-input").click
+    type_into(control.find(".selectize-input input"), text)
+    control.find(".selectize-dropdown-content .option", text:, wait: 10).click
+  end
+
+  # fill_in focuses the field, then sends its text a round trip later - so a controller
+  # connecting in between lands the text in the field filled just before
+  def wait_for_details_step(wait: Capybara.default_max_wait_time)
+    expect(page).to have_content("Add your bike", wait:)
+    expect(page).to have_css("input[name='bike[frame_model]']:focus", wait:)
+    wait_for_stimulus(timeout: wait)
+  end
+
   # Stimulus lazy loads controller modules, so a rendered page can have none of them
   # connected yet -- a combobox filters no options, a restored draft reaches no listener
   def wait_for_stimulus(timeout: Capybara.default_max_wait_time)
@@ -193,11 +249,18 @@ module SystemSpecHelpers
     JS
   end
 
-  # The registration's emailed link, minus the mailer's host - the app is on Capybara's
+  # The link out of the mail just delivered, minus the mailer's host - the app is on Capybara's
+  def emailed_path(path)
+    body = ActionMailer::Base.deliveries.last.html_part.body.decoded
+    link = Nokogiri::HTML(body).css("a").map { |a| a["href"] }.compact.find { |href| href.include?(path) }
+    expect(link).to be_present
+    URI(link).request_uri
+  end
+
+  # The registration's emailed link, once its job has run
   def confirmation_link
     Email::PartialRegistrationJob.drain
-    url = ActionMailer::Base.deliveries.last.html_part.decoded[%r{https?://[^"]*/register/confirm[^"]*}]
-    URI.parse(CGI.unescapeHTML(url)).request_uri
+    emailed_path("/register/confirm")
   end
 
   # Block until something no Capybara matcher can see is true - a route handler's record
@@ -227,10 +290,11 @@ module SystemSpecHelpers
   end
 
   # The donation modal greets a signed-in user on my_accounts#show, over the page and
-  # intercepting every click until it's dismissed -- which sets the localStorage flag
-  # that keeps it closed for the rest of the session. Callers are on my_accounts#show
-  # with it up, so a miss is a failure rather than a no-op
+  # intercepting every click until it's dismissed. Callers are on my_accounts#show with it
+  # up, so a miss is a failure rather than a no-op -- except once dismissing it has set the
+  # localStorage flag, after which the element still renders but can never open.
   def dismiss_donation_modal
+    return if page.evaluate_script('localStorage.getItem("hideDonationModal")') == "true"
     expect(page).to have_css("#donationModal.in", wait: 5)
 
     click_button "No donation"
@@ -262,5 +326,5 @@ module SystemSpecHelpers
 end
 
 RSpec.configure do |config|
-  config.include SystemSpecHelpers, type: :system
+  config.include IntegrationSpecHelpers, type: :system
 end

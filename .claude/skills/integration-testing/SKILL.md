@@ -97,7 +97,7 @@ most of the runtime, and merging examples doesn't touch it. Consolidating the tw
 settle saved the other ~32s.
 
 Wait on the condition instead, capped so a cancelled or infinite animation can't hang the
-example. `settle_animations` in `spec/support/system_spec_helpers.rb` is the one to reach for
+example. `settle_animations` in `spec/support/integration_spec_helpers.rb` is the one to reach for
 when a measurement follows a state change — it awaits the element's own transitions and races
 them against the cap as a ceiling. This is *stricter* than a sleep, not a trade: a state that
 transitions nothing returns in two frames, and one that runs longer than the sleep would have
@@ -171,7 +171,9 @@ expect(page).to have_css('button[aria-pressed="true"]')
 page.execute_script("document.querySelector('.search-btn').click()")
 ```
 
-When repeated assertions get noisy, define small DSL-style helpers in the file (`def listing_for(item)`, `def thumbnail_selector(...)`) — they read better than scattered selectors and keep you out of `page.execute_script`.
+Clicking a top-nav link by its label is ambiguous — the footer repeats Marketplace, Blog, Donate and most of the rest, so scope it: `within("#primary-main-menu") { click_link "Marketplace" }`. The navbar renders each of those twice more, mobile and desktop, but only one is visible at a given width, so that isn't what the `Ambiguous` names.
+
+When repeated assertions get noisy, define small DSL-style helpers in the file (`def listing_for(item)`, `def thumbnail_selector(...)`) — they read better than scattered selectors and keep you out of `page.execute_script`. **Check `spec/support/integration_spec_helpers.rb` before writing one, and move it there once a second spec wants the same one.**
 
 ## Component system specs must assert accessibility
 
@@ -252,7 +254,7 @@ things that cost real time when they go wrong:
   Without it a key collision quietly means half your interceptions never happened.
 - **A client-side timer you lengthen outruns Capybara's default wait.** `default_max_wait_time` is
   2 seconds here, so a retry/debounce stretched to 3s needs an explicit `wait:` on the next
-  assertion. Use `wait_for { ... }` (in `SystemSpecHelpers`) to block on something only the browser
+  assertion. Use `wait_for { ... }` (in `IntegrationSpecHelpers`) to block on something only the browser
   knows — a route handler's record of a request it answered — that no Capybara matcher can see.
 
 ## Drive it the way a user does, when checking what a click leaves behind
