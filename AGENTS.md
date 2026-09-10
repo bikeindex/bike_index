@@ -6,7 +6,7 @@ Bike Index is a Rails webapp
 
 Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right WORKSPACE_ID fallback.
 
-**Renaming a `config/initializers/` file needs a `bin/dev` restart.** Initializers don't re-run on reload, so a running server still holds the old constant and none of the new one — and `config/routes.rb`, which does reload, then dies partway through its draw. Everything routed below that line 404s and the page reading the constant raises a bare `NameError` on a route helper, which reads as anything but a stale boot.
+**Renaming a `config/initializers/` file needs a `bin/dev` restart.** Initializers don't re-run on reload, so a running server still holds the old constant and none of the new one — and `config/routes.rb`, which does reload, then dies partway through its draw. Everything routed below that line 404s and the page reading the constant raises a bare `NameError` on a route helper, which reads as anything but a stale boot. **Merging a branch that adds one does the same**, and the stale server then holds its port while serving nothing - `curl` reports it down and a fresh `bin/dev` dies on `Address already in use`, which reads as two unrelated problems. `lsof -ti tcp:$DEV_PORT | xargs kill -9`, then restart.
 
 ## Code style
 
