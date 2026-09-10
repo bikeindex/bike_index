@@ -11,8 +11,7 @@
         - if @social_post.posted_image.present?
           = image_tag(@social_post.posted_image)
       - else
-        .form-group.avatar-upload
-          %label.control-label Post photo
+        = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image, label_text: "Post photo", wrapper_class: "form-group")) do
           = render(UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions))
           - if @social_post.image.present?
             .form-check

@@ -141,10 +141,9 @@
         data-admin--recovery-display-form-target="notUsingBikeImage"
         class="form-group mt-4"
       >
-        <label>Recovery photo</label>
-
-        <%= render(UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :photo,
-              accept: "image/jpeg,image/jpg,image/png,image/gif")) %>
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :photo, label_text: "Recovery photo")) do %>
+          <%= render(UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :photo, accept: ImageUploader.permitted_extensions)) %>
+        <% end %>
       </div>
 
       <% if @bike.present? && !@recovery_display.photo_processed? %>

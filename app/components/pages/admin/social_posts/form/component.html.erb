@@ -33,11 +33,9 @@
               <%= render UI::Forms::Combobox::Component.new(name: :social_account_id, form: f, placeholder: "Choose  ", include_blank: true, options: account_options) %>
             <% end %>
 
-            <div class="form-group avatar-upload">
-              <label class="control-label">Post photo</label>
-
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image, label_text: "Post photo", wrapper_class: "form-group")) do %>
               <%= render(UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions)) %>
-            </div>
+            <% end %>
           </div>
 
           <div class="col-md-6">
