@@ -16,7 +16,7 @@ RSpec.describe "Organization embed registration", :js, type: :system do
   def fill_in_the_registration
     # Manufacturer loads its options over AJAX, hence the longer wait than the colors,
     # which are in the page already
-    pick_remote_selectize(selectize_for("#bike_manufacturer_id"), "Surly")
+    pick_remote_selectize("#bike_manufacturer_id", "Surly")
     pick_selectize("#bike_primary_frame_color_id", "Black")
 
     fill_in "bike[serial_number]", with: "EMBED1234"

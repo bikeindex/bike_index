@@ -108,10 +108,9 @@ module SystemSpecHelpers
     field
   end
 
-  # The two-step login, driven the way a rider does it. Both steps animate, and a click
-  # waits for its target to settle before it lands -- that wait is Capybara's 2s default.
-  # Callers assert their own landing: an organization member gets a different flash, and
-  # ends up somewhere other than my_account.
+  # Both steps animate, and a click waits for its target to settle before it lands -- that
+  # wait is Capybara's 2s default. Callers assert their own landing, which differs for an
+  # organization member.
   def sign_in(user)
     using_wait_time(10) do
       visit new_session_path
@@ -125,7 +124,6 @@ module SystemSpecHelpers
     end
   end
 
-  # The settings menu is where a signed-in rider's account links live, log out among them
   def open_settings_menu = find("button[aria-label='Settings']").click
 
   def sign_out
@@ -151,7 +149,8 @@ module SystemSpecHelpers
 
   # A remote-autocomplete selectize (the manufacturer fields) fetches its options, so the
   # match is worth waiting longer for
-  def pick_remote_selectize(control, text)
+  def pick_remote_selectize(selector, text)
+    control = selectize_for(selector)
     control.find(".selectize-input").click
     type_into(control.find(".selectize-input input"), text)
     control.find(".selectize-dropdown-content .option", text:, wait: 10).click
@@ -261,8 +260,7 @@ module SystemSpecHelpers
   # The registration's emailed link, once its job has run
   def confirmation_link
     Email::PartialRegistrationJob.drain
-    url = ActionMailer::Base.deliveries.last.html_part.decoded[%r{https?://[^"]*/register/confirm[^"]*}]
-    URI.parse(CGI.unescapeHTML(url)).request_uri
+    emailed_path("/register/confirm")
   end
 
   # Block until something no Capybara matcher can see is true - a route handler's record
@@ -292,10 +290,9 @@ module SystemSpecHelpers
   end
 
   # The donation modal greets a signed-in user on my_accounts#show, over the page and
-  # intercepting every click until it's dismissed -- which sets the localStorage flag
-  # that keeps it closed for the rest of the session. Callers are on my_accounts#show
-  # with it up, so a miss is a failure rather than a no-op -- until that flag is set, when
-  # the element renders on every later visit of the session but can never open.
+  # intercepting every click until it's dismissed. Callers are on my_accounts#show with it
+  # up, so a miss is a failure rather than a no-op -- except once dismissing it has set the
+  # localStorage flag, after which the element still renders but can never open.
   def dismiss_donation_modal
     return if page.evaluate_script('localStorage.getItem("hideDonationModal")') == "true"
     expect(page).to have_css("#donationModal.in", wait: 5)

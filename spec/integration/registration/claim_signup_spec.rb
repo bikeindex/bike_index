@@ -24,7 +24,7 @@ RSpec.describe "Claim registration signup", :js, type: :system do
     visit "/bikes/new"
     fill_in "Serial number", with: "ABC123XYZ"
 
-    pick_remote_selectize(selectize_for("#bike_manufacturer_id"), "Surly")
+    pick_remote_selectize("#bike_manufacturer_id", "Surly")
     pick_selectize("#bike_primary_frame_color_id", "Black")
     fill_in "Owner email", with: claimer_email
 

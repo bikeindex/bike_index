@@ -89,7 +89,7 @@ RSpec.describe SalesController, type: :request do
       # The mark-sold button is what actually links here, so this is the signed out link
       context "with a marketplace_message_id" do
         it "redirects" do
-          get "#{base_url}/new?marketplace_message_id=#{marketplace_message.id}"
+          get "#{base_url}/new?marketplace_message_id=12"
           expect(response).to redirect_to(:new_session)
           expect(flash[:error].match(/log in/i)).to be_present
         end

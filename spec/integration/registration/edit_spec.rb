@@ -134,7 +134,7 @@ RSpec.describe "Editing a registration", :js, type: :system do
     find('[data-target="#manufacturer-correction"]').click
     expect(page).to have_css("#manufacturer-correction.in", wait: 5)
     within("#manufacturer-correction") do
-      pick_remote_selectize(selectize_for("#manufacturer_update_manufacturer"), "Trek")
+      pick_remote_selectize("#manufacturer_update_manufacturer", "Trek")
       fill_in "manufacturer_update_reason", with: "It is actually a Trek"
       click_button "Submit update"
     end

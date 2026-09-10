@@ -141,7 +141,7 @@ RSpec.describe "Organization sidebar", :js, type: :system do
     expect(page).to have_no_css "#org_sidebar_nav"
 
     # Back in through the navbar's switcher, which lands on the organization's registrations
-    find("button[aria-label='Settings']").click
+    open_settings_menu
     click_link "Switch to #{organization.name}"
 
     expect(page).to have_current_path("/o/#{slug}/registrations", ignore_query: true)

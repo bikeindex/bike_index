@@ -3,22 +3,18 @@
 require "rails_helper"
 
 RSpec.describe "Listing a registration on the marketplace", :js, type: :system do
+  include_context :register_flow_steps
+
   let(:owner_email) { "seller@bikeindex.org" }
   let(:buyer_email) { "buyer@bikeindex.org" }
   let!(:seller) { FactoryBot.create(:user_confirmed, email: owner_email) }
-  let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
-  let!(:red) { FactoryBot.create(:color, name: "Red") }
   let!(:state) { FactoryBot.create(:state_new_york) }
   let!(:primary_activity) { FactoryBot.create(:primary_activity, name: "Commuting") }
 
-  # Every phase here opens on a navigation, and the two-step login alone outruns
-  # Capybara's 2s default
+  # Every phase here opens on a navigation, which the 2s default doesn't cover
   around { |example| Capybara.using_wait_time(10) { example.run } }
 
   before do
-    # The manufacturer combobox autocompletes against the redis index
-    Autocomplete::Loader.clear_redis
-    Autocomplete::Loader.load_all(%w[Manufacturer])
     # The legacy bike show builds these gear records lazily, and its render can't write
     RearGearType.fixed
     FrontGearType.fixed
@@ -33,26 +29,26 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
     dismiss_donation_modal
   end
 
-  # flaky: step 2 is typed into as soon as it hydrates, the same race register_spec carries
-  # retries for - seen twice locally in ~40 runs, once as the color combobox refusing to
-  # filter and once as both plain fills arriving empty. Neither CPU throttling nor holding
-  # form_persist_controller and autofocus_controller on the route reproduces it, so
-  # wait_for_stimulus above is not the gap; the retries stand in for a fix
+  # The listing reads the same to the seller previewing it and to the buyer who found it
+  def expect_listing_shown
+    expect(page).to have_css(".bike-status-html", text: /for sale/i)
+    expect(page).to have_content("$450")
+    expect(page).to have_content("price is negotiable")
+    expect(page).to have_content("lightly ridden")
+    expect(page).to have_content("New York, NY 10007")
+    expect(page).to have_content("Selling because I moved")
+  end
+
+  # flaky: step 2 is typed into as soon as it hydrates, the race register_organized_spec
+  # carries retries for - seen twice locally in ~40 runs, once as the color combobox
+  # refusing to filter and once as both plain fills arriving empty. Neither CPU throttling
+  # nor holding form_persist_controller and autofocus_controller on the route reproduces
+  # it, so wait_for_details_step is not the gap; the retries stand in for a fix
   it "publishes a registration for sale, sells it through a buyer's message, and transfers it", flaky: 4 do
     sign_in_as_seller
 
     # ---- Register the bike ----
-    visit "/register/new"
-    type_into("#b_param_manufacturer_id", "Surly")
-    click_combobox_option("Surly")
-    fill_in "b_param[owner_email]", with: owner_email
-    click_button "Next"
-
-    # fill_in sends its text a round trip later, so a controller connecting in between
-    # lands it in the field filled just before
-    expect(page).to have_content("Add your bike")
-    expect(page).to have_css("input[name='bike[frame_model]']:focus")
-    wait_for_stimulus
+    start_registration
 
     type_into("#bike_primary_frame_color_id", "Red")
     click_combobox_option("Red")
@@ -111,17 +107,17 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
 
     # ---- The listing as the registration now reads ----
     click_link "View your listing"
-
-    expect(page).to have_css(".bike-status-html", text: /for sale/i)
-    expect(page).to have_content("$450")
-    expect(page).to have_content("price is negotiable")
-    expect(page).to have_content("lightly ridden")
-    expect(page).to have_content("Selling because I moved")
+    expect_listing_shown
 
     sign_out
 
-    # ---- A buyer, signed out, tries to contact the seller ----
-    visit bike_path(bike)
+    # ---- A buyer, signed out, finds it in the marketplace and contacts the seller ----
+    # The footer links the marketplace too, so name the navbar's
+    within("#primary-main-menu") { click_link "Marketplace" }
+    click_link "Surly Cross Check"
+    expect(page).to have_current_path(bike_path(bike), ignore_query: true)
+    expect_listing_shown
+
     click_link "contact the owner"
 
     # Messaging needs an account, so this asks for one rather than for a login
