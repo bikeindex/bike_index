@@ -8,10 +8,11 @@ module Pages
           render(Pages::Bikes::MarketplaceListingPanel::Component.new(marketplace_listing:))
         end
 
-        # No motorized listing exists in seed data, so borrow one to show the shipping exclusion
+        # Seed data has no e-bike, so motorize one in memory - the battery exclusion is the
+        # one worth seeing, and a seeded cargo bike would show the cycle type reason instead
         def not_shippable
           listing = marketplace_listing
-          listing.item = Bike.motorized.first
+          listing.item = listing.item.tap { |bike| bike.propulsion_type = "throttle" }
           render(Pages::Bikes::MarketplaceListingPanel::Component.new(marketplace_listing: listing))
         end
 
