@@ -86,8 +86,10 @@ RSpec.describe MarketplaceOrder, type: :model do
   describe "status_matches_fulfillment_kind" do
     let(:marketplace_order) { FactoryBot.create(:marketplace_order) }
 
+    # Only the one error - a local pickup should never be told it's missing a shop
     it "can't put a local pickup into a shipping status" do
       expect(marketplace_order.update(status: "in_transit")).to be_falsey
+      expect(marketplace_order.errors.full_messages.count).to eq 1
       expect(marketplace_order.errors.full_messages.join).to match(/local pickup/)
     end
 

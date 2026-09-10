@@ -120,6 +120,7 @@ class MarketplaceOrder < ApplicationRecord
   # The buyer picks a shop at checkout, but an order can sit paid before one is assigned - what
   # can't happen is a bike being expected at a shop nobody named
   def shop_present_once_shipping_starts
+    return unless fulfillment_shipped?
     return unless SHIPPING_STATUSES.include?(status&.to_sym)
     return if marketplace_partner_shop_id.present?
 
