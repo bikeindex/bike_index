@@ -11,7 +11,7 @@ module Email
       notification.track_email_delivery do
         CustomerMailer.invoice_email(payment).deliver_now
       end
-      return unless payment.donation?
+      return unless notification.delivery_success? && payment.donation?
 
       Email::DonationJob.perform_in(1.2.hours + (rand(9..55) * 60), payment.id)
     end

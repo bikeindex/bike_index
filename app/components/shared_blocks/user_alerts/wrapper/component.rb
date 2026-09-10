@@ -8,9 +8,9 @@ module SharedBlocks
       class Component < ApplicationComponent
         # container lines it up with the navbar above; z-20 because the homepage and
         # landing page bike tile grids are positioned, so they'd otherwise paint over
-        # this in-flow banner; general-alert is what the landing pages hang their own
-        # spacing on
-        def initialize(current_user:, wrapper_class: "general-alert container tw:relative tw:z-20")
+        # this in-flow banner. The margin collapses into the navbar's matching
+        # margin-bottom, and is the whole gap where nothing above supplies one
+        def initialize(current_user:, wrapper_class: "container tw:relative tw:z-20 tw:mt-(--nav-gap)")
           @current_user = current_user
           @wrapper_class = wrapper_class
         end

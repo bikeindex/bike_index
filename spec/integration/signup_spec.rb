@@ -37,13 +37,6 @@ RSpec.describe "Signup", :js, type: :system do
     user
   end
 
-  def emailed_path(path)
-    body = ActionMailer::Base.deliveries.last.html_part.body.decoded
-    link = Nokogiri::HTML(body).css("a").map { |a| a["href"] }.compact.find { |href| href.include?(path) }
-    expect(link).to be_present
-    URI(link).request_uri
-  end
-
   it "sets a password from the nudge, then signs back in with it" do
     user = sign_up_and_confirm
 
