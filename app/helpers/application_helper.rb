@@ -107,21 +107,6 @@ module ApplicationHelper
     [twitterable(user), instagramable(user), websiteable(user)].compact.to_sentence.html_safe
   end
 
-  def pretty_print_json(data, no_blank = false)
-    require "coderay"
-    cleaned_data = if no_blank
-      # Show false values, just not empty or nil things
-      data.select do |k, v|
-        next unless Binxtils::InputNormalizer.present_or_false?(v)
-
-        [k, v]
-      end.compact.to_h
-    else
-      data
-    end
-    CodeRay.scan(JSON.pretty_generate(cleaned_data), :json).div.html_safe
-  end
-
   private
 
   def body_class
