@@ -22,12 +22,10 @@ module Admin
     # Always an array of named series, even for one: chartkick's single-series format
     # paints every bar a separate color out of the palette UI::Chart::Component passes
     def variable
-      chart_data = if @kind == "users"
-        [{name: "Users", data: helpers.time_range_counts(collection: matching_users)}]
-      elsif @kind == "bikes"
-        bike_chart_data
-      elsif @kind == "recoveries"
-        [{name: "Recoveries", data: helpers.time_range_counts(collection: matching_recoveries)}]
+      chart_data = case @kind
+      when "users" then [{name: "Users", data: helpers.time_range_counts(collection: matching_users)}]
+      when "bikes" then bike_chart_data
+      when "recoveries" then [{name: "Recoveries", data: helpers.time_range_counts(collection: matching_recoveries)}]
       end
       if chart_data.present?
         render json: chart_data.chart_json

@@ -21,10 +21,12 @@ RSpec.describe GraphingHelper, type: :helper do
           .to eq({"11:16 AM" => 0, "11:17 AM" => 1, "11:18 AM" => 0, "11:19 AM" => 0})
       end
     end
-    describe "time_range_counts" do
+    describe "time_range_amounts" do
       let(:target_counts) { {" 1:16 PM" => 0, " 1:17 PM" => 10.01, " 1:18 PM" => 0, " 1:19 PM" => 0} }
-      it "returns the thing with want" do
+      it "converts to dollars, or leaves the cents alone" do
         expect(time_range_amounts(collection: Payment.all, convert_to_dollars: true)).to eq target_counts
+        expect(time_range_amounts(collection: Payment.all))
+          .to eq({" 1:16 PM" => 0, " 1:17 PM" => 1001, " 1:18 PM" => 0, " 1:19 PM" => 0})
       end
     end
     describe "empty_time_range_counts" do

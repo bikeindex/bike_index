@@ -68,7 +68,7 @@
     <%= render(UI::Chart::Component.new(series: payments_counts_nozero.map { |c| {name: c[:name], data: c[:data]} }, time_range: @time_range, stacked: true)) %>
 
     <h4 class="mt-2">Amounts</h4>
-    <%= render(UI::Chart::Component.new(series: payments_counts_nozero.reject { |c| c[:count] < 1 }.map { |c| {name: c[:name], data: c[:data_money]} }, time_range: @time_range, stacked: true, prefix: "$", round: 2)) %>
+    <%= render(UI::Chart::Component.new(series: payments_counts_nozero.map { |c| {name: c[:name], data: c[:data_money]} }, time_range: @time_range, stacked: true, prefix: "$", round: 2)) %>
   <% end %>
 <% end %>
 

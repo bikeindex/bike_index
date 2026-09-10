@@ -3,16 +3,16 @@
 module UI
   module Chart
     class Component < ApplicationComponent
-      # time_range_counts, time_range_amounts and the bucketing behind them, so callers
-      # building a series outside a view have the same ones the views use
+      # time_range_counts and the bucketing behind it, so a series assembled outside a
+      # view buckets the way the views do
       extend GraphingHelper
 
       COLORS = %w[#3498db #DC2626 #D97706 #7C3AED #059669 #DB2777 #475569].freeze
       KINDS = %i[column line pie].freeze
+      private_constant :KINDS
 
       # series: a grouped hash, an array of {name:, data:} series, or a path the chart
-      # fetches its JSON from. prefix, round, height and library are chartkick's, named
-      # here so a typo raises rather than reaching the chart as an option it ignores.
+      # fetches its JSON from
       def initialize(series:, time_range: nil, kind: :column, colors: nil, stacked: false,
         prefix: nil, round: nil, height: nil, library: nil)
         raise ArgumentError, "kind must be one of #{KINDS.join(", ")}" unless KINDS.include?(kind)
@@ -36,9 +36,8 @@ module UI
 
       private
 
-      # Groupdate fills the range of the query it ran, so a series built any other way can
-      # stop short of the period asked for, and an empty one draws chartkick's "No data"
-      # rather than an empty chart
+      # time_range_counts fills its own range, so this is for a series assembled some
+      # other way -- and for an empty one, which chartkick draws as "No data"
       def chart_series
         return @series if @time_range.nil?
 
@@ -53,8 +52,6 @@ module UI
         @empty_buckets ||= self.class.empty_time_range_counts(@time_range)
       end
 
-      # compact, rather than handing chartkick a nil for each one unset - it reads its own
-      # defaults for the options it isn't given
       def chart_options
         {thousands: ",", colors: chart_colors, stacked: @stacked,
          prefix: @prefix, round: @round, height: @height, library: @library}.compact
