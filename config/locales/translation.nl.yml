@@ -625,7 +625,6 @@ nl:
         creation_states: Creatie staten
         deleted_at: Verwijderd om
         invoices: Facturen
-        is_invoiced: Is gefactureerd
         kind: Soort
         locations: Locaties
         lock_show_on_map: Show op kaart vergrendelen
@@ -645,6 +644,7 @@ nl:
         bike_stickers: Fietscodes
         enabled_feature_slugs: Ingeschakelde functie naaktslakken
         organization_roles: lidmaatschappen
+        is_invoiced: Wordt gefactureerd
       ownership:
         claimed: beweerde
         current: Stroom

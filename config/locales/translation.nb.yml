@@ -638,7 +638,6 @@ nb:
         deleted_at: Slettet kl
         enabled_feature_slugs: Aktiverte funksjonssnegler
         invoices: Fakturaer
-        is_invoiced: Er fakturert
         kind: Snill
         locations: Steder
         lock_show_on_map: Lås vis på kartet
@@ -656,6 +655,7 @@ nb:
         users: Brukere
         website: Nettsted
         organization_roles: Medlemskap
+        is_invoiced: Er fakturert
       organization_feature:
         amount_cents: Beløp cent
         description: Beskrivelse
