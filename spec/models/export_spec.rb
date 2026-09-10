@@ -318,6 +318,7 @@ RSpec.describe Export, type: :model do
         phone
         registered_at
         registered_by
+        registration_method
         serial
         status
         student_id
@@ -326,7 +327,7 @@ RSpec.describe Export, type: :model do
       ]
     end
     it "returns the array we expect" do
-      expect(permitted_headers.count).to eq 15
+      expect(permitted_headers.count).to eq 16
       expect(Export.permitted_headers).to eq permitted_headers
       expect(Export.permitted_headers(organization)).to eq permitted_headers
       expect(organization_reg_phone.additional_registration_fields).to eq(["reg_phone"])

@@ -1281,7 +1281,8 @@ CREATE TABLE public.email_bans (
     end_at timestamp(6) without time zone,
     reason integer,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    user_email_id bigint
 );
 
 
@@ -6661,6 +6662,13 @@ CREATE INDEX index_customer_contacts_on_bike_id ON public.customer_contacts USIN
 
 
 --
+-- Name: index_email_bans_on_user_email_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_bans_on_user_email_id ON public.email_bans USING btree (user_email_id);
+
+
+--
 -- Name: index_email_bans_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7805,6 +7813,7 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260909120000'),
+('20260908163548'),
 ('20260821100000'),
 ('20260819120000'),
 ('20260815152851'),

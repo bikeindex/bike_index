@@ -1,0 +1,8 @@
+<ul class="tw:flex tw:flex-col tw:gap-2">
+  <% ownerships.each do |ownership| %>
+    <li>
+      <code class="tw:mr-2 tw:text-xs tw:text-gray-400"><%= ownership.creation_kind %></code>
+      <%= render(Atoms::Org::OriginDisplay::Component.new(ownership:)) %>
+    </li>
+  <% end %>
+</ul>

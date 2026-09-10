@@ -23,11 +23,7 @@ RSpec.describe "Organized graduated notifications search", :js, type: :system do
     # Populate autocomplete so the combobox can match "Black"
     Color.black
     Autocomplete::Loader.load_all(%w[Color])
-    visit new_session_path
-    fill_in "Email", with: user.email
-    click_button "Continue"
-    fill_in "Password", with: "testthisthing7$"
-    click_button "Log in"
+    sign_in(user)
     dismiss_flash_messages
   end
 
