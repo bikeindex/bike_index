@@ -114,8 +114,8 @@ module ControllerHelpers
     user.confirm(user.confirmation_token)
   end
 
-  # Set by a partner linking in, not by us - BikeHub sends sign_up from its create-account
-  # button and log_in from the other, so anything but sign_up means sign-in
+  # Set by the partner linking in, not by us - BikeHub's create-account button sends sign_up
+  # and its log-in button sends log_in
   def force_sign_up?
     params[:unauthenticated_redirect] == "sign_up"
   end
