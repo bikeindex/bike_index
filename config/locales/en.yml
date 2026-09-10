@@ -5009,6 +5009,7 @@ en:
       org_locations: "%{org_name} locations"
       org_profile: "%{org_name} profile"
       org_registrations: "%{org_name} Registrations"
+      org_registrations_index: "%{org_name} registrations"
       org_settings: "%{org_name} Settings"
       parking_notification_unregistered: New unregistered notification
       parking_notifications_group: Parking Notifications
@@ -5017,6 +5018,7 @@ en:
       registration_stickers: Registration stickers
       reports: Reports
       resources: Resources
+      search_all_registrations: Search all registrations
       search_impounded_vehicles: Search Impounded Vehicles
       search_parking_notifications: Search Parking Notifications
       search_registrations: Search Registrations
