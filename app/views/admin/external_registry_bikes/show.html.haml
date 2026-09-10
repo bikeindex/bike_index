@@ -26,7 +26,7 @@
           = bike_status_span(@bike)
       %tr
         %td Date Stolen
-        %td.localizeTime= l @bike.date_stolen, format: :convert_time
+        %td= render UI::Time::Component.new(time: @bike.date_stolen)
       %tr
         %td Location
         %td= @bike.location_found
@@ -55,9 +55,8 @@
           %td Updated
           %td
             %span.localizeTime.preciseTime= l @bike.updated_at, format: :convert_time
-    .mt-2.p-2.pb-0{style: "border: 1px solid rgba(0,0,0,0.15);"}
+    .mt-2
       %p.mb-0 Info Hash
-      %code{style: "overflow: scroll; display: block; width: 100%;"}
-        = pretty_print_json(@bike.info_hash)
+      = render UI::JsonDisplay::Component.new(data: @bike.info_hash, no_max_height: true)
 
 
