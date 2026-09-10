@@ -85,6 +85,32 @@ RSpec.describe InfoController, type: :request do
         end
       end
     end
+
+    # serials is the one static page that links default_bike_search_path
+    describe "serials search links" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+      let(:search_hrefs) do
+        get "/serials"
+        Nokogiri::HTML(response.body).css("a.serial-search-screenshot").map { |link| link["href"] }
+      end
+      before { log_in(current_user) }
+
+      it "sends a member of an organization that can't search to every registration" do
+        expect(search_hrefs).to eq([search_registrations_path(stolenness: "all")])
+      end
+
+      context "with bike_search" do
+        let(:organization) do
+          FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["bike_search"])
+        end
+
+        it "sends them to their own registrations" do
+          expect(search_hrefs).to eq([organization_registrations_path(organization_id: organization.to_param)])
+        end
+      end
+    end
+
     %w[image_resources dev_and_design].each do |page|
       context page do
         it "redirects to resources" do

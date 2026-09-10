@@ -5076,8 +5076,10 @@ en:
       recoveries: Recoveries
       registration_sequences: Registration sequences
       registration_stickers: Registration stickers
+      registrations_index: Organization Registrations
       reports: Reports
       resources: Resources
+      search_all_registrations: Search all registrations
       search_impounded_vehicles: Search Impounded Vehicles
       search_parking_notifications: Search Parking Notifications
       search_registrations: Search Registrations
