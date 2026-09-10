@@ -30,7 +30,7 @@ class EmailBan < ApplicationRecord
   belongs_to :user
   belongs_to :user_email
 
-  validates_presence_of :reason, :user
+  validates_presence_of :reason, :user_id
   validate :is_not_duplicate_ban
 
   before_validation :set_calculated_attributes
