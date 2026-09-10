@@ -103,7 +103,7 @@ module UserServices
       path = routes.organization_registrations_path(organization_id: organization.to_param)
       return [ComponentStructs::Shapes.link(translation(:search_registrations), path)] if organization.enabled?("bike_search")
 
-      [ComponentStructs::Shapes.link(translation(:org_registrations_index, org_name: organization.short_name), path),
+      [ComponentStructs::Shapes.link(translation(:org_registrations_index), path),
         ComponentStructs::Shapes.link(translation(:search_all_registrations),
           routes.search_registrations_path(stolenness: "all"))]
     end
