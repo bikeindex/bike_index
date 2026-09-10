@@ -10,7 +10,10 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
   describe "signed in" do
     let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
 
-    before { sign_in(current_user) }
+    before do
+      sign_in(current_user)
+      expect(page).to have_current_path("/my_account")
+    end
 
     # The one organization they're in, assigned without any link naming it
     context "a member of one organization" do

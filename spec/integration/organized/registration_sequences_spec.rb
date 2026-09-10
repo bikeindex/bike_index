@@ -11,11 +11,7 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
   before do
     # Org drafts are cloned from the global template seeded here
     load Rails.root.join("db/seeds/seed_registration_sequence_template.rb").to_s
-    visit new_session_path
-    fill_in "Email", with: user.email
-    click_button "Continue"
-    fill_in "Password", with: "testthisthing7$"
-    click_button "Log in"
+    sign_in(user)
   end
 
   it "builds a draft from the template, then edits a page and the sequence" do

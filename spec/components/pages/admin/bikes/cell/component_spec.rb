@@ -61,11 +61,11 @@ RSpec.describe Pages::Admin::Bikes::Cell::Component, type: :component do
       end
     end
 
-    context "with creation_description" do
+    context "with a creation_kind" do
       let(:bike) { FactoryBot.create(:bike_lightspeed_pos) }
 
       it "renders origin with tooltip" do
-        expect(bike.creation_description).to eq "Lightspeed"
+        expect(bike.creation_kind).to eq :lightspeed_pos
         expect(component.css("small.less-strong").text).to include("lightspeed")
         expect(component.css("small.less-strong [role=tooltip]").text).to eq "automatically registered by bike shop point of sale (Lightspeed POS)"
       end

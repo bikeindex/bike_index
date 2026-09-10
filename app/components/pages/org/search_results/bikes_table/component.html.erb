@@ -77,9 +77,9 @@
     <% end %>
 
     <% table.column(label: translation(".source"), classes: "hideableColumn creation_description_cell tw:leading-none") do |bike| %>
-      <% if bike.creation_description %>
+      <% if bike.creation_kind %>
         <small class="tw:text-gray-400">
-          <%= render(Atoms::Org::OriginDisplay::Component.new(creation_description: bike.creation_description)) %>
+          <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: bike.current_ownership)) %>
         </small>
       <% end %>
     <% end %>
