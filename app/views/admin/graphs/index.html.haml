@@ -5,16 +5,16 @@
 - if @kind == "general"
 
   %h2.mt-4 Users past week
-  = column_chart variable_admin_graphs_path(search_kind: "users", period: "week"), stacked: true, thousands: ","
+  = render(UI::Chart::Component.new(series: variable_admin_graphs_path(search_kind: "users", period: "week"), time_range: @time_range, stacked: true))
 
   %h2.mt-4
     Users past year
-  = column_chart variable_admin_graphs_path(search_kind: "users", period: "year"), stacked: true, thousands: ","
+  = render(UI::Chart::Component.new(series: variable_admin_graphs_path(search_kind: "users", period: "year"), time_range: @time_range, stacked: true))
 
 
   %h2.mt-4
     Bikes past year
-  = column_chart variable_admin_graphs_path(search_kind: "bikes", period: "year"), stacked: true, thousands: ","
+  = render(UI::Chart::Component.new(series: variable_admin_graphs_path(search_kind: "bikes", period: "year"), time_range: @time_range, stacked: true))
 
 - elsif @kind == "bikes"
   = render partial: "bikes_graphs", locals: {sortable_params:}
@@ -26,4 +26,4 @@
       %em
         = humanized_time_range(@time_range)
   .mt-4
-  = column_chart variable_admin_graphs_path(sortable_params), thousands: ","
+  = render(UI::Chart::Component.new(series: variable_admin_graphs_path(sortable_params), time_range: @time_range))

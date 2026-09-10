@@ -24,6 +24,34 @@ RSpec.describe UI::Chart::Component, type: :component do
     end
   end
 
+  describe "time_range" do
+    let(:start_time) { Time.at(1568052985) }
+    let(:time_range) { start_time..(start_time + 3.minutes) }
+    let(:buckets) { %([[" 1:16 PM",0],[" 1:17 PM",0],[" 1:18 PM",0],[" 1:19 PM",0]]) }
+    before { Time.zone = "America/Chicago" }
+
+    it "fills the buckets a series is missing" do
+      expect(render_inline(instance).css("script").text).to include(buckets)
+      # a bare grouped hash, rather than named series, fills the same way
+      bare = described_class.new(series: {}, time_range:)
+      expect(render_inline(bare).css("script").text).to include(buckets)
+    end
+
+    context "without one" do
+      let(:instance) { described_class.new(series: [{name: "Test", data: {}}]) }
+      it "renders the series as passed" do
+        expect(render_inline(instance).css("script").text).to include(%("data":[]))
+      end
+    end
+
+    context "with a path to fetch" do
+      let(:instance) { described_class.new(series: "/admin/graphs/variable", time_range:) }
+      it "leaves the path for the browser" do
+        expect(render_inline(instance).css("script").text).to include(%("/admin/graphs/variable"))
+      end
+    end
+  end
+
   context "with payment" do
     let(:start_time) { Time.at(1568052985) }
     let(:payment_time) { start_time + 1.minute }

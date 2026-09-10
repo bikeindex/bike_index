@@ -58,7 +58,7 @@
     <% else %>
       <%# ALMOST ALWAYS we want to see fancy graphs for the start/end. %>
       <%# But, in case you want to see created_at (probably for bug hunting), graph that %>
-      <%= column_chart time_range_counts(collection: matching_organization_statuses, column: @time_range_column), stacked: true, thousands: "," %>
+      <%= render(UI::Chart::Component.new(series: time_range_counts(collection: matching_organization_statuses, column: @time_range_column), time_range: @time_range, stacked: true)) %>
     <% end %>
   <% end %>
 <% end %>

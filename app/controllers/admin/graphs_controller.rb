@@ -19,13 +19,15 @@ module Admin
       @page_title = "#{@kind.humanize} graphs"
     end
 
+    # Always an array of named series, even for one: chartkick's single-series format
+    # paints every bar a separate color out of the palette UI::Chart::Component passes
     def variable
       chart_data = if @kind == "users"
-        helpers.time_range_counts(collection: User.where(created_at: @time_range))
+        [{name: "Users", data: helpers.time_range_counts(collection: matching_users)}]
       elsif @kind == "bikes"
         bike_chart_data
       elsif @kind == "recoveries"
-        helpers.time_range_counts(collection: matching_recoveries)
+        [{name: "Recoveries", data: helpers.time_range_counts(collection: matching_recoveries)}]
       end
       if chart_data.present?
         render json: chart_data.chart_json
@@ -106,14 +108,13 @@ module Admin
     end
 
     # Grouped by origin as well as by time, so this is one query rather than one per
-    # origin. Groupdate's range only fills the origins it found rows for, so the rest
-    # take the empty series - which none builds without a query of its own.
-    # Distinct: a bike has an ownership per transfer
+    # origin. Groupdate's range only fills the origins it found rows for, so the rest take
+    # the empty series. Distinct: a bike has an ownership per transfer
     def origin_chart_series(bikes)
       counts = helpers.time_range_counts(column: "bikes.created_at",
         collection: bikes.joins(:ownerships).group("ownerships.origin").distinct)
       series = counts.each_with_object({}) { |((origin, at), count), h| (h[origin] ||= {})[at] = count }
-      empty = helpers.time_range_counts(collection: bikes.none, column: "bikes.created_at")
+      empty = helpers.empty_time_range_counts
       Ownership.origins.map do |origin|
         {name: origin.humanize, color: origin_colors[origin], data: empty.merge(series[origin] || {})}
       end

@@ -15,6 +15,13 @@ module GraphingHelper
       .to_h
   end
 
+  # What time_range_counts returns for a collection with no matching rows, without a
+  # relation to run a query through -- groupdate fills the series off the range alone
+  def empty_time_range_counts(time_range = @time_range)
+    [].send(group_by_method(time_range), range: time_range, format: group_by_format(time_range),
+      time_zone: Time.zone, series: true) { it }.transform_values { 0 }
+  end
+
   def time_range_length(time_range)
     time_range.last - time_range.first
   end

@@ -27,6 +27,12 @@ RSpec.describe GraphingHelper, type: :helper do
         expect(time_range_amounts(collection: Payment.all, convert_to_dollars: true)).to eq target_counts
       end
     end
+    describe "empty_time_range_counts" do
+      it "matches the buckets a collection with no rows counts into" do
+        expect(empty_time_range_counts).to eq({" 1:16 PM" => 0, " 1:17 PM" => 0, " 1:18 PM" => 0, " 1:19 PM" => 0})
+        expect(empty_time_range_counts).to eq time_range_counts(collection: Payment.none)
+      end
+    end
   end
 
   describe "group_by_method" do

@@ -22,6 +22,12 @@ pin "@floating-ui/dom", to: "@floating-ui--dom.js"
 pin "highlight.js/lib/core", to: "highlight.js--core.js", preload: false
 pin "highlight.js/lib/languages/json", to: "highlight.js--json.js", preload: false
 
+# Served from the chartkick gem's vendor/assets, which its engine already adds to
+# assets.precompile. preload: false and Chart.bundle first -- 180KB gzipped that only
+# a page with a UI::Chart::Component on it should pay for, so ui--chart import()s them.
+pin "chartkick", to: "chartkick.js", preload: false
+pin "Chart.bundle", to: "Chart.bundle.js", preload: false
+
 # jQuery is required for select2, which is used by search. It should not be used!
 # ideally we transition off it soon!
 pin "jquery", to: "https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.js", preload: true
