@@ -134,6 +134,8 @@ module ControllerHelpers
         )
       end
 
+      # The key doubles as the destination - asking for an account and then handing over the
+      # sign-in form is the wrong pairing, so a caller wanting sign-in passes no key
       if force_sign_up || translation_key.to_s.match?(/create.+account/)
         redirect_to(new_user_url(partner: sign_in_partner)) && return
       else

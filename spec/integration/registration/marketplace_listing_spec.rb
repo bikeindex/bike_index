@@ -120,8 +120,12 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
 
     click_link "contact the owner"
 
-    # Messaging needs an account, so this asks for one rather than for a login
-    expect(page).to have_content("Please create an account")
+    # Messaging asks them to log in, and this buyer has no account to log in to - so they
+    # cross to sign-up from the navbar, which carries no return_to of its own
+    expect(page).to have_content("you have to log in")
+    expect(page).to have_current_path(new_session_path, ignore_query: true)
+    click_link "Sign up"
+
     expect(page).to have_current_path(new_user_path, ignore_query: true)
     fill_in "Email", with: buyer_email
     fill_in "Name", with: "Bianca Buyer"

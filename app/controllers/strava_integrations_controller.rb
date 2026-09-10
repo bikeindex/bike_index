@@ -77,8 +77,6 @@ class StravaIntegrationsController < ApplicationController
   private
 
   def authenticate_user_for_strava
-    # No translation_key: authenticate_user reads its redirect target off one, and any key
-    # matching /create.+account/ would send these visitors to sign-up rather than sign-in
     store_return_and_authenticate_user(flash_type: :notice)
   end
 
