@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-# Helpers for :js system specs that need browser behavior Capybara doesn't
-# abstract across drivers. Implemented for the Playwright driver via its raw
-# page (see spec/support/capybara.rb).
-module SystemSpecHelpers
+# Helpers shared across :js system specs - the steps more than one of them walks, and the
+# browser behavior Capybara doesn't abstract across drivers, which is implemented for the
+# Playwright driver via its raw page (see spec/support/capybara.rb).
+module IntegrationSpecHelpers
   # Clear the back/forward stack so go_back/go_forward operate on this example's
   # own short stack -- Capybara never resets history between examples, so it
   # accumulates across the suite.
@@ -326,5 +326,5 @@ module SystemSpecHelpers
 end
 
 RSpec.configure do |config|
-  config.include SystemSpecHelpers, type: :system
+  config.include IntegrationSpecHelpers, type: :system
 end
