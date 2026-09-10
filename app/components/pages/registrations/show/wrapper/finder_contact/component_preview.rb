@@ -6,9 +6,8 @@ module Pages
       module Wrapper
         module FinderContact
           # The finder-contact card, rendered on the page it sits in — so this previews the
-          # same page as its parent, and inherits how that's built. Only an organization is
-          # offered it, so this pins the org view rather than whatever the lookbook user
-          # is entitled to
+          # same page as its parent. Only an organization is offered the card, so this pins
+          # the org view rather than whatever the lookbook user is entitled to
           class ComponentPreview < Wrapper::ComponentPreview
             # @param bike_id text "Bike to render — defaults to a found registration"
             def paid_organization(bike_id: nil)
