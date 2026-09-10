@@ -28,8 +28,9 @@ class PublicImagesController < ApplicationController
       else
         @public_image.imageable = current_organization
       end
-      @public_image.save
-      render(json: admin_image_json, status: @public_image.persisted? ? :ok : :unprocessable_entity) && return
+      render(json: {html: admin_image_html}) && return if @public_image.save
+
+      render(json: {error: @public_image.errors.full_messages.to_sentence}, status: :unprocessable_entity) && return
     end
     flash[:error] = translation(:cannot_create)
     redirect_to @public_image.present? ? @public_image.imageable : user_root_url
@@ -91,13 +92,10 @@ class PublicImagesController < ApplicationController
 
   protected
 
-  # What UI::Forms::FileUploadMulti appends to its list -- rendered here rather than built in
-  # JS, so the item an upload adds is the same markup as the ones the page loaded with
-  def admin_image_json
-    return {error: @public_image.errors.full_messages.to_sentence} unless @public_image.persisted?
-
-    {html: render_to_string(partial: "public_images/admin_public_image",
-      locals: {public_image: @public_image, skip_order: @public_image.imageable_type != "Blog"})}
+  # Rendered here rather than built in JS, so the item UI::Forms::FileUploadMulti appends is
+  # the same markup as the ones the page loaded with
+  def admin_image_html
+    render_to_string(partial: "public_images/admin_public_image", locals: {public_image: @public_image})
   end
 
   def ensure_authorized_to_create!

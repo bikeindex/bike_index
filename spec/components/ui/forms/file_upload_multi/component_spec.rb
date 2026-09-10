@@ -5,19 +5,17 @@ require "rails_helper"
 RSpec.describe UI::Forms::FileUploadMulti::Component, type: :component do
   let(:options) { {} }
   let(:component) do
-    render_inline(described_class.new(url: "/public_images", **options)) { "<li>already stored</li>".html_safe }
+    render_inline(described_class.new(url: "/public_images", file_param: "file", **options)) { "<li>already stored</li>".html_safe }
   end
 
   it "renders the picker, the drop frame and the list of what's already stored" do
     expect(component).to have_css("[data-controller='ui--forms--file-upload-multi']")
     expect(component).to have_css("[data-ui--forms--file-upload-multi-url-value='/public_images']")
     expect(component).to have_css("input[type='file'][multiple][data-ui--forms--file-upload-multi-target='input']")
-    expect(component).to have_css("label[for='file_upload_multi']", text: "Upload")
+    expect(component).to have_css("label", text: "Upload")
     # decorative -- the label text is what names it
     expect(component).to have_css("label svg[aria-hidden='true']")
     expect(component).to have_css("ul[data-ui--forms--file-upload-multi-target='list'] li", text: "already stored")
-    # the frame is always rendered -- only its outline reacts to a drag
-    expect(component).to have_css("[data-ui--forms--file-upload-multi-target='dropZone'].tw\\:outline-transparent")
     # each upload gets a row here, so it announces without the list moving focus
     expect(component).to have_css("ul[aria-live='polite'][data-ui--forms--file-upload-multi-target='status']")
     # nothing submits the input -- the controller reads its files and posts them itself
@@ -26,11 +24,11 @@ RSpec.describe UI::Forms::FileUploadMulti::Component, type: :component do
   end
 
   describe "params" do
-    let(:options) { {params: {blog_id: 12}, file_param: "public_image[image]"} }
+    let(:options) { {params: {blog_id: 12}} }
 
     it "posts them alongside the file" do
       expect(component).to have_css("[data-ui--forms--file-upload-multi-params-value='{\"blog_id\":12}']")
-      expect(component).to have_css("[data-ui--forms--file-upload-multi-file-param-value='public_image[image]']")
+      expect(component).to have_css("[data-ui--forms--file-upload-multi-file-param-value='file']")
     end
   end
 
@@ -44,17 +42,17 @@ RSpec.describe UI::Forms::FileUploadMulti::Component, type: :component do
   end
 
   it "accepts a string, an array, or nothing" do
-    expect(render_inline(described_class.new(url: "/x", accept: "image/png,image/jpeg")))
+    expect(render_inline(described_class.new(url: "/x", file_param: "f", accept: "image/png,image/jpeg")))
       .to have_css("input[type='file'][accept='image/png,image/jpeg']")
-    expect(render_inline(described_class.new(url: "/x", accept: %w[.png .jpg])))
+    expect(render_inline(described_class.new(url: "/x", file_param: "f", accept: %w[.png .jpg])))
       .to have_css("input[type='file'][accept='.png,.jpg']")
   end
 
-  describe "label" do
-    let(:options) { {label: "Upload photos"} }
+  # Two on a page would otherwise hand both labels the same input
+  it "gives the input an id of its own, which its label points at" do
+    ids = 2.times.map { render_inline(described_class.new(url: "/x", file_param: "f")).css("input[type=file]").first["id"] }
 
-    it "names the button" do
-      expect(component).to have_css("label", text: "Upload photos")
-    end
+    expect(ids.uniq.count).to eq 2
+    expect(component).to have_css("label[for='#{component.css("input[type=file]").first["id"]}']")
   end
 end

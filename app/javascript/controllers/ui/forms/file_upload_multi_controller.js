@@ -2,9 +2,9 @@ import { Controller } from '@hotwired/stimulus'
 import * as dropZone from 'utils/drop_zone'
 
 // Connects to data-controller='ui--forms--file-upload-multi'
-// Posts each picked or dropped file to the url, one request per file, and appends the markup
-// the endpoint answers with to the list. There is no form around this - the endpoint stores
-// the file on its own, so the page it sits on can be saved (or abandoned) independently.
+// Posts each picked or dropped file to the url and appends the markup the endpoint answers
+// with to the list. There is no form around this - the endpoint stores the file on its own,
+// so the page it sits on can be saved (or abandoned) independently.
 export default class extends Controller {
   static targets = ['input', 'dropZone', 'list', 'status']
   static values = {
@@ -15,8 +15,12 @@ export default class extends Controller {
     failed: String
   }
 
+  connect () {
+    this.requests = new Set()
+  }
+
   disconnect () {
-    this.requests?.forEach((request) => request.abort())
+    this.requests.forEach((request) => request.abort())
   }
 
   dragOver (event) { dropZone.dragOver(event, this.dropZoneTarget) }
@@ -45,7 +49,7 @@ export default class extends Controller {
     Object.entries(this.paramsValue).forEach(([key, value]) => body.append(key, value))
 
     const request = new window.XMLHttpRequest()
-    this.requests = [...(this.requests || []), request]
+    this.requests.add(request)
     request.open('POST', this.urlValue)
     request.responseType = 'json'
     request.setRequestHeader('X-CSRF-Token', document.querySelector('meta[name="csrf-token"]')?.content)
@@ -54,9 +58,8 @@ export default class extends Controller {
     request.send(body)
   }
 
-  // The endpoint answers with the item's markup, or with the reason it wouldn't store the file
   finish (request, row) {
-    this.requests = this.requests.filter((pending) => pending !== request)
+    this.requests.delete(request)
     if (request.response?.html) {
       this.listTarget.insertAdjacentHTML('beforeend', request.response.html)
       return row.remove()
@@ -73,7 +76,6 @@ export default class extends Controller {
     row.lastElementChild.textContent = `${this.uploadingValue} ${percent}%`
   }
 
-  // The row stands in for the image until the endpoint answers with its markup
   statusRow (file) {
     const row = document.createElement('li')
     row.className = 'tw:flex tw:gap-2 tw:text-sm tw:text-gray-500 tw:data-[failed=true]:text-red-600 tw:dark:text-gray-400 tw:dark:data-[failed=true]:text-red-400'

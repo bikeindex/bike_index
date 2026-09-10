@@ -12,13 +12,14 @@ module UI
         # otherwise center along with the text next to it.
         LABEL_CLASSES = "tw:mb-0 tw:whitespace-nowrap tw:peer-focus-visible:ring-3 tw:peer-focus-visible:ring-blue-500/40"
 
-        def initialize(url:, params: {}, file_param: "file", accept: nil, label: nil, list_html_options: {})
+        def initialize(url:, file_param:, params: {}, accept: nil, list_html_options: {})
           @url = url
-          @params = params
           @file_param = file_param
-          @accept = Array(accept).flat_map { it.to_s.split(",") }.filter_map { it.strip.presence }.join(",").presence
-          @label = label || translation(".upload")
+          @params = params
+          @accept = Array(accept).join(",").presence
           @list_html_options = list_html_options
+          # Random, so two uploaders on a page don't hand both labels the same input
+          @input_id = "file_upload_multi_#{SecureRandom.hex(4)}"
 
           # Style the label as a UI::Button; the focus ring is driven by the peer (sr-only) input.
           @label_classes = UI::Button::Component.build_classes(color: :secondary, size: :md, html_class: LABEL_CLASSES)
@@ -26,14 +27,11 @@ module UI
 
         private
 
-        # The label is the visible button, so it needs the input's id to activate it
-        def input_id = "file_upload_multi"
-
         # The button's gap-1.5 spaces these; the icon is decorative, the text names it.
         def label_content
           safe_join([
             helpers.inline_svg_tag("icons/upload.svg", class: "tw:h-4 tw:w-4", aria_hidden: true),
-            @label
+            translation(".upload")
           ])
         end
       end

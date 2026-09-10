@@ -24,7 +24,7 @@ RSpec.describe "Admin news images", :js, type: :system do
     expect(page).to have_css("#public_images li", text: "Already here")
 
     expect {
-      attach_file("file_upload_multi", Rails.root.join("spec/fixtures/bike.jpg").to_s, make_visible: true)
+      attach_file("Upload", Rails.root.join("spec/fixtures/bike.jpg").to_s, make_visible: true)
 
       expect(page).to have_css("#public_images li", count: 2)
     }.to change(blog.public_images, :count).by(1)

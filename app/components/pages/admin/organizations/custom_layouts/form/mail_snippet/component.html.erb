@@ -19,9 +19,4 @@
   <% end %>
 <% end %>
 
-<%= render(UI::Forms::FileUploadMulti::Component.new(url: public_images_path, file_param: "public_image[image]",
-      params: {mail_snippet_id: @mail_snippet.id}, accept: ImageUploader.permitted_extensions,
-      list_html_options: {id: "public_images", class: "list-unstyled mt-4 not-blog-public-images",
-        data: {order_url: order_public_images_url}})) do %>
-  <%= render partial: "public_images/admin_public_image", collection: @mail_snippet.public_images, as: :public_image, locals: {skip_order: true} %>
-<% end %>
+<%= render(Pages::Admin::PublicImages::Uploader::Component.new(imageable: @mail_snippet, list_class: "list-unstyled mt-4")) %>

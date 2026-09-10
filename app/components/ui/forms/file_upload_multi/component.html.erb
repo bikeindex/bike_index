@@ -11,10 +11,8 @@
   <%= tag.ul(content, **@list_html_options.deep_merge(data: {"ui--forms--file-upload-multi-target": "list"})) %>
 
   <%#
-    The drop target frames the controls. An outline rather than a border -- drawn outside the
-    box, so the button lines up with the list above instead of being indented by padding held
-    in reserve. data-over rather than is-active, which also matches :active and would flash
-    the frame whenever the button inside it is pressed.
+    data-over rather than is-active, which also matches :active and would flash the frame
+    whenever the button inside it is pressed.
   %>
 
   <div
@@ -30,18 +28,24 @@
     data-action="dragenter->ui--forms--file-upload-multi#highlightDropZone dragleave->ui--forms--file-upload-multi#unhighlightDropZone"
   >
     <div class="tw:inline-flex tw:flex-wrap tw:items-center tw:gap-3">
-      <%# sr-only keeps the input focusable and in the accessibility tree; the label is the visible button.
-          It carries no name -- nothing submits it, the controller reads its files and posts them itself. %>
-      <%= tag.input(type: "file", id: input_id, multiple: true, accept: @accept,
+      <%#
+        sr-only keeps the input focusable and in the accessibility tree; the label is the visible
+        button. It carries no name -- nothing submits it, the controller posts its files itself.
+      %>
+
+      <%= tag.input(type: "file", id: @input_id, multiple: true, accept: @accept,
             class: "tw:peer tw:sr-only",
             data: {"ui--forms--file-upload-multi-target": "input", action: "ui--forms--file-upload-multi#upload"}) %>
 
-      <%= label_tag(input_id, label_content, class: @label_classes) %>
+      <%= label_tag(@input_id, label_content, class: @label_classes) %>
 
       <span class="tw:text-gray-500 tw:dark:text-gray-400"><%= translation(".or_drag_and_drop") %></span>
     </div>
 
-    <%# Each file uploading gets a row here, which its markup in the list above replaces %>
-    <ul class="tw:mt-2" aria-live="polite" data-ui--forms--file-upload-multi-target="status"></ul>
+    <ul
+      class="tw:mt-2"
+      aria-live="polite"
+      data-ui--forms--file-upload-multi-target="status"
+    ></ul>
   </div>
 </div>

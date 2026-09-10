@@ -27,7 +27,7 @@ RSpec.describe UI::Forms::FileUploadMulti::Component, :js, type: :system do
     expect(page).to have_no_css("#{drop_frame}[data-dragging]")
     expect_axe_clean
 
-    attach_file("file_upload_multi", [fixture, Rails.root.join("spec/fixtures/exif_orientation.jpg").to_s],
+    attach_file("Upload", [fixture, Rails.root.join("spec/fixtures/exif_orientation.jpg").to_s],
       make_visible: true)
 
     expect(page).to have_css("#{status} li[data-failed='true']", text: "bike.jpg", wait: 10)
