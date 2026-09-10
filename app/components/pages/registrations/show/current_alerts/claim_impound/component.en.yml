@@ -14,14 +14,7 @@ en:
               claim_was_status: Your claim was %{status} — you should have received
                 an email with next steps.
               claim_with_this_bike_type: You have a %{status} claim with this %{bike_type}.
-              contact_the_finder: Contact the finder
-              contact_the_finder_to_arrange_return: >-
-                This %{bike_type} was registered as found — contact the finder to
-                arrange returning it.
               does_this_look_like_your_bike: Does this look like your %{bike_type}?
-              finder_email: Email
-              finder_name: Name
-              finder_phone: Phone
               need_stolen_bike_html: You need a stolen %{bike_type} registered to
                 file a claim — %{add_link}.
               no_editing_after_submitting: After submitting, you won't be able to

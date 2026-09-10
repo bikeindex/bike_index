@@ -1,0 +1,15 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          current_alerts:
+            finder_contact:
+              contact_the_finder: Contact the finder
+              contact_the_finder_to_arrange_return: >-
+                This %{bike_type} was registered as found — contact the finder to
+                arrange returning it.
+              email: Email
+              name: Name
+              phone: Phone

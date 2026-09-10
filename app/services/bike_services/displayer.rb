@@ -60,6 +60,12 @@ module BikeServices
         bike.impound_claims_claimed.active.where(user_id: user.id).any?
     end
 
+    # A found registration is somebody's find rather than an organization's impound, so
+    # its finder is the organization's only route to it
+    def display_found_contact?(bike, organization = nil)
+      organization.present? && organization.paid? && bike.status_found?
+    end
+
     def display_marketplace_message?(bike, _user = nil)
       bike.status_with_owner? && bike.is_for_sale? && bike.current_marketplace_listing.present?
     end

@@ -18,8 +18,7 @@ module Pages
 
             # An organization's staff panel isn't asking whether the bike is theirs
             def render?
-              return org_contact? if @organization.present?
-              return false if @owner
+              return false if hidden_from_viewer?
 
               BikeServices::Displayer.display_impound_claim?(@bike, @current_user)
             end
@@ -39,14 +38,7 @@ module Pages
               @owner || @organization.present?
             end
 
-            # Nobody at an organization claims a found registration with a stolen one of
-            # their own — a paid org gets the finder's contact information instead
-            def org_contact?
-              @organization.present? && @organization.paid? && @bike.status_found?
-            end
-
             def heading
-              return translation(".contact_the_finder") if org_contact?
               return translation(".your_claim") if shown_impound_claim
 
               translation(".does_this_look_like_your_bike", bike_type: @bike.type)
@@ -54,22 +46,7 @@ module Pages
 
             # An answered claim is good news; everything else is still waiting on somebody
             def alert_kind
-              return :notice if org_contact?
-
               shown_impound_claim&.successful? ? :success : :warning
-            end
-
-            # Whoever registered the find is the owner of record until it's claimed
-            def finder_name
-              @bike.owner_name.presence || impound_record&.user&.display_name
-            end
-
-            def finder_email
-              @bike.owner_email
-            end
-
-            def finder_phone
-              @bike.phone
             end
 
             # Whichever side of the claim this bike is - the impound being claimed, or the

@@ -1,0 +1,22 @@
+<%= render(UI::Alerts::Base::Component.new(kind: :notice, header: translation(".contact_the_finder"), margin_classes: "")) do %>
+  <p>
+    <%= translation(".contact_the_finder_to_arrange_return", bike_type: @bike.type) %>
+  </p>
+
+  <div class="tw:mt-3">
+    <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".name"), value: finder_name)) %>
+
+      <%# mail_to still emits an anchor for a blank address, which reads as a filled row %>
+      <% if finder_email.present? %>
+        <%= render(UI::DefinitionList::Row::Component.new(label: translation(".email"))) do %>
+          <%= mail_to(finder_email, class: "twlink") %>
+        <% end %>
+      <% end %>
+
+      <%= render(UI::DefinitionList::Row::Component.new(label: translation(".phone"))) do %>
+        <%= render(Atoms::Phone::Component.new(phone: finder_phone)) %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
