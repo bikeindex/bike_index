@@ -553,7 +553,7 @@ RSpec.describe BikeSticker, type: :model do
       let(:bike_sticker1) { FactoryBot.create(:bike_sticker) }
       let(:bike_sticker2) { FactoryBot.create(:bike_sticker, organization: organization) }
       let(:organization) { FactoryBot.create(:organization) }
-      let(:organization_paid) { FactoryBot.create(:organization_with_organization_features) }
+      let(:organization_invoiced) { FactoryBot.create(:organization_with_organization_features) }
       let(:user) { FactoryBot.create(:user) }
       let(:bike1) { FactoryBot.create(:bike, :with_ownership, creator: user) }
       let(:bike2) { FactoryBot.create(:bike, :with_ownership, creator: user) }
@@ -602,8 +602,8 @@ RSpec.describe BikeSticker, type: :model do
         # blank bike, manually passing in organization that is authorized
         expect(bike_sticker2.claimed?).to be_truthy
         expect(bike_sticker2.claimable_by?(user)).to be_truthy # This bike_sticker is already claimed by the user
-        expect(bike_sticker2.organization_authorized?(organization_paid)).to be_truthy
-        expect { bike_sticker2.claim(user: user, organization: organization_paid) }.to change(BikeStickerUpdate, :count).by 1
+        expect(bike_sticker2.organization_authorized?(organization_invoiced)).to be_truthy
+        expect { bike_sticker2.claim(user: user, organization: organization_invoiced) }.to change(BikeStickerUpdate, :count).by 1
         bike_sticker2.reload
         expect(bike_sticker2.claimed?).to be_falsey
         expect(bike_sticker2.user).to eq user
@@ -611,7 +611,7 @@ RSpec.describe BikeSticker, type: :model do
         expect(bike_sticker2.previous_bike_id).to eq bike1.id
         bike_sticker_update3 = bike_sticker2.bike_sticker_updates.last
         expect(bike_sticker_update3.user).to eq user
-        expect(bike_sticker_update3.organization).to eq organization_paid
+        expect(bike_sticker_update3.organization).to eq organization_invoiced
         expect(bike_sticker_update3.bike).to be_blank
         expect(bike_sticker_update3.organization_kind).to eq "other_paid_organization"
         expect(bike_sticker_update3.unauthorized_organization?).to be_falsey
@@ -619,29 +619,29 @@ RSpec.describe BikeSticker, type: :model do
         expect(bike_sticker_update3.creator_kind).to eq "creator_user" # Default
         bike1.reload
         expect(bike1.bike_organizations.pluck(:organization_id)).to eq([organization.id])
-        # claiming with organization_paid
-        expect { bike_sticker2.claim(user: user, bike: bike2, organization: organization_paid, creator_kind: "whatever69") }.to change(BikeStickerUpdate, :count).by 1
+        # claiming with organization_invoiced
+        expect { bike_sticker2.claim(user: user, bike: bike2, organization: organization_invoiced, creator_kind: "whatever69") }.to change(BikeStickerUpdate, :count).by 1
         bike_sticker2.reload
         expect(bike_sticker2.claimed?).to be_truthy
         expect(bike_sticker2.user).to eq user
-        expect(bike_sticker2.secondary_organization).to eq organization_paid
+        expect(bike_sticker2.secondary_organization).to eq organization_invoiced
         expect(bike_sticker2.previous_bike_id).to eq bike1.id
         bike_sticker_update4 = bike_sticker2.bike_sticker_updates.last
         expect(bike_sticker_update4.user).to eq user
-        expect(bike_sticker_update4.organization).to eq organization_paid
+        expect(bike_sticker_update4.organization).to eq organization_invoiced
         expect(bike_sticker_update4.bike).to eq bike2
         expect(bike_sticker_update4.organization_kind).to eq "other_paid_organization"
         expect(bike_sticker_update4.unauthorized_organization?).to be_falsey
         expect(bike_sticker_update4.kind).to eq "re_claim"
         expect(bike_sticker_update4.creator_kind).to eq "creator_user" # Because unknown value passed
         bike2.reload
-        expect(bike2.bike_organizations.pluck(:organization_id)).to match_array([organization_paid.id])
+        expect(bike2.bike_organizations.pluck(:organization_id)).to match_array([organization_invoiced.id])
         # claiming with primary organization
         expect { bike_sticker2.claim(user: user, bike: bike1, organization: organization, creator_kind: "creator_pos") }.to change(BikeStickerUpdate, :count).by 1
         bike_sticker2.reload
         expect(bike_sticker2.claimed?).to be_truthy
         expect(bike_sticker2.user).to eq user
-        expect(bike_sticker2.secondary_organization).to eq organization_paid
+        expect(bike_sticker2.secondary_organization).to eq organization_invoiced
         expect(bike_sticker2.previous_bike_id).to eq bike2.id
         bike_sticker_update5 = bike_sticker2.bike_sticker_updates.reorder(:id).last
         expect(bike_sticker_update5.user).to eq user

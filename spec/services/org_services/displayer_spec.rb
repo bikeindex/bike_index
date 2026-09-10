@@ -16,8 +16,8 @@ RSpec.describe OrgServices::Displayer do
     it "displays" do
       expect(OrgServices::Displayer.avatar?(organization)).to be_truthy
     end
-    # someday, we might only want to show it for paid organizations
-    context "paid" do
+    # someday, we might only want to show it for organizations with an invoice
+    context "with an invoice" do
       it "displays" do
         organization.has_invoice = true
         expect(OrgServices::Displayer.avatar?(organization)).to be_truthy

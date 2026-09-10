@@ -2,8 +2,8 @@
 
 module SharedBlocks
   module LawEnforcementDonation
-    # Shown once, on the sign-in after a police officer's organization is found to be
-    # unpaid - session[:render_donation_request] is what raises it (Sessionable)
+    # Shown once, on the sign-in after a police officer's organization is found to have
+    # no invoice - session[:render_donation_request] is what raises it (Sessionable)
     class Component < ApplicationComponent
       MODAL_ID = "donateMessageModal"
 

@@ -449,7 +449,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           expect(flash[:notice]).to be_present
         end
       end
-      context "paid organization" do
+      context "organization with an invoice" do
         it "does not destroy" do
           current_organization.update_attribute :has_invoice, true
           expect {

@@ -100,7 +100,7 @@ RSpec.describe Atoms::Admin::Badges::User::Component, type: :component do
     let(:organization) { FactoryBot.create(:organization, kind: "bike_shop") }
     let(:user) { FactoryBot.create(:organization_user, organization:) }
 
-    it "renders org icon for unpaid org" do
+    it "renders org icon for org without an invoice" do
       expect(user.invoiced_org?).to be_falsey
       result = render_component(user:)
       expect(result).to have_css("[role='tooltip']", text: "organization member - Bike Shop", visible: :all)

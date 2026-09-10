@@ -47,7 +47,7 @@ module Pages
           end
 
           def show_sticker_modal?
-            # display stickers if org has paid for them
+            # display stickers if the org has the stickers feature
             @organization.enabled?("bike_stickers")
           end
 

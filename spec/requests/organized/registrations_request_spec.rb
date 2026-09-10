@@ -208,7 +208,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       end
     end
 
-    context "unpaid organization" do
+    context "organization without an invoice" do
       let(:current_organization) { FactoryBot.create(:organization) }
 
       it "renders without search" do

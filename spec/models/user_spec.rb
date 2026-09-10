@@ -776,7 +776,7 @@ RSpec.describe User, type: :model do
         user.reload
         expect(user.render_donation_request).to eq "law_enforcement"
       end
-      context "police department paid" do
+      context "police department with an invoice" do
         before { organization.update_column :has_invoice, true }
         it "is 'law_enforcement'" do
           user.reload
@@ -797,7 +797,7 @@ RSpec.describe User, type: :model do
       expect(user.reload.paid_organization_registration?).to be_falsey
     end
 
-    context "organization is paid" do
+    context "organization has an invoice" do
       before { organization.update_column :has_invoice, true }
 
       it "is true" do

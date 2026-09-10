@@ -292,7 +292,7 @@ RSpec.describe Organized::BikesController, type: :request do
       expect(assigns(:recoveries).pluck(:id)).to eq([recovered_record.id, recovered_record2.id])
       expect(response).to render_template :recoveries
     end
-    context "unpaid organization" do
+    context "organization without an invoice" do
       let(:current_organization) { FactoryBot.create(:organization) }
       it "redirects" do
         expect(current_organization.reload.has_invoice?).to be_falsey
@@ -359,7 +359,7 @@ RSpec.describe Organized::BikesController, type: :request do
       end
     end
 
-    context "unpaid organization" do
+    context "organization without an invoice" do
       let(:current_organization) { FactoryBot.create(:organization) }
 
       it "redirects" do

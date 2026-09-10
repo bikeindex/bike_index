@@ -125,7 +125,7 @@ RSpec.describe CredibilityScorer do
           end
         end
       end
-      context "paid organization" do
+      context "organization with an invoice" do
         let(:organization) { FactoryBot.create(:organization_with_organization_features) }
         it "returns with trusted organization" do
           expect(organization.has_invoice).to be_truthy
