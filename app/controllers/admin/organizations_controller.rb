@@ -4,7 +4,7 @@ module Admin
 
     # Each has a template of its own rendering its slice of the organization form; #edit
     # picks between them, so only "edit" is an action
-    FORM_TABS = %w[edit locations paid_functionality sso].freeze
+    FORM_TABS = %w[edit locations invoice_functionality sso].freeze
 
     before_action :find_organization, only: %w[show edit update destroy]
     before_action :set_admin_form_page_id, only: %w[edit new]
@@ -161,7 +161,7 @@ module Admin
     end
 
     def registration_field_labels_param
-      return {} unless form_tab.nil? || form_tab == "paid_functionality"
+      return {} unless form_tab.nil? || form_tab == "invoice_functionality"
 
       {registration_field_labels: registration_field_labels_val}
     end
@@ -169,9 +169,9 @@ module Admin
     def matching_organizations
       return @matching_organizations if defined?(@matching_organizations)
 
-      @search_paid = Binxtils::InputNormalizer.boolean(params[:search_paid])
+      @search_invoiced = Binxtils::InputNormalizer.boolean(params[:search_invoiced])
       matching_organizations = search_deleted_scope(Organization.all)
-      matching_organizations = matching_organizations.paid if @search_paid
+      matching_organizations = matching_organizations.with_invoice if @search_invoiced
       matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
 
       @features_and_settings_ids = []

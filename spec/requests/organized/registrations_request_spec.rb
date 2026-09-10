@@ -160,7 +160,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
       it "searches for bikes with stickers" do
         expect(impounded_bike.reload.status).to eq "status_impounded"
         expect(bike_with_sticker.reload.bike_sticker?).to be_truthy
-        expect(current_organization.reload.paid?).to be_truthy
+        expect(current_organization.reload.has_invoice?).to be_truthy
         get base_url, params: {search_no_js: true, search_stickers: "none"}
         expect(response.status).to eq(200)
         expect(assigns(:current_organization)).to eq current_organization
@@ -213,7 +213,7 @@ RSpec.describe Organized::RegistrationsController, type: :request do
 
       it "renders without search" do
         expect(impounded_bike.reload.status).to eq "status_impounded"
-        expect(current_organization.reload.paid?).to be_falsey
+        expect(current_organization.reload.has_invoice?).to be_falsey
         expect(Bike).to_not receive(:search)
         get base_url
         expect(response.status).to eq(200)

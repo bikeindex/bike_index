@@ -406,10 +406,10 @@ RSpec.describe BikeSticker, type: :model do
       let(:bike_sticker_other) { FactoryBot.create(:bike_sticker, organization: organization_other) }
       let(:bike_sticker_no_organization) { FactoryBot.create(:bike_sticker, organization: nil) }
       it "returns true for regional organization" do
-        expect(organization.paid?).to be_truthy
-        expect(organization_child.paid?).to be_truthy
-        expect(organization_regional.paid?).to be_falsey
-        expect(organization_other.paid?).to be_falsey
+        expect(organization.has_invoice?).to be_truthy
+        expect(organization_child.has_invoice?).to be_truthy
+        expect(organization_regional.has_invoice?).to be_falsey
+        expect(organization_other.has_invoice?).to be_falsey
         # bike sticker for Main organization
         expect(bike_sticker.organization_authorized?(organization)).to be_truthy
         expect(bike_sticker.organization_authorized?(organization_child)).to be_truthy

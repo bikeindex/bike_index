@@ -151,7 +151,7 @@ class CredibilityScorer
   # This badge is displayed on the organization show page
   def self.organization_trusted?(organization)
     return false unless organization.present?
-    return true if organization.paid?
+    return true if organization.has_invoice?
 
     %w[other_pos lightspeed_pos ascend_pos does_not_need_pos].include?(organization.manual_pos_kind)
   end

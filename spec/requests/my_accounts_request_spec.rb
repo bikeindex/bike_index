@@ -149,7 +149,7 @@ RSpec.describe MyAccountsController, type: :request do
       end
 
       context "registered by an organization that pays" do
-        before { organization.update_column :is_paid, true }
+        before { organization.update_column :has_invoice, true }
 
         it "doesn't render the donation modal" do
           get base_url

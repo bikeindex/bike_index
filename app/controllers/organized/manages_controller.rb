@@ -23,7 +23,7 @@ module Organized
 
     def destroy
       organization_name = current_organization.name
-      if current_organization.paid?
+      if current_organization.has_invoice?
         flash[:notice] = translation(:contact_support_to_delete, org_name: organization_name)
         redirect_to(current_root_path) && return
       end

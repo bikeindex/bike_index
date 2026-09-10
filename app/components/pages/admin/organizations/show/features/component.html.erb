@@ -4,7 +4,7 @@
       <td>Paid</td>
 
       <td>
-        <% if @organization.paid? %>
+        <% if @organization.has_invoice? %>
           <strong>True</strong>
         <% else %>
           <% if LandingPageOrganizations::SLUGS.include?(@organization.slug) %>
@@ -25,7 +25,7 @@
       </td>
     </tr>
 
-    <% if @organization.paid? %>
+    <% if @organization.has_invoice? %>
       <tr>
         <td>Bike Search</td>
 

@@ -179,7 +179,7 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
     let!(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: user) }
     let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
     it "does not add alert" do
-      expect(organization.reload.paid?).to be_truthy
+      expect(organization.reload.has_invoice?).to be_truthy
       expect(organization.enabled?("no_address")).to be_truthy
       expect(organization.paid_money?).to be_falsey
       expect(organization.bikes.pluck(:id)).to match_array([bike1.id])
@@ -197,7 +197,7 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
       let(:feature_slugs) { ["regional_bike_counts"] }
       let!(:invoice) { FactoryBot.create(:invoice_with_payment, organization: organization) }
       it "adds alerts for unassigned bikes" do
-        expect(organization.reload.paid?).to be_truthy
+        expect(organization.reload.has_invoice?).to be_truthy
         expect(organization.paid_money?).to be_truthy
         expect(organization.bikes.pluck(:id)).to match_array([bike1.id])
         expect(user.user_alerts.pluck(:kind)).to eq([])

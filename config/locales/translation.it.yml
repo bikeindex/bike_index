@@ -642,8 +642,8 @@ it:
         creation_states: Stati di creazione
         deleted_at: Eliminato il
         enabled_feature_slugs: Slug delle funzionalità abilitate
+        has_invoice: Ha fattura
         invoices: Fatture
-        is_paid: È pagato
         kind: Tipo
         locations: Luoghi
         lock_show_on_map: Blocco visualizzato sulla mappa

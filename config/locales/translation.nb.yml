@@ -637,8 +637,8 @@ nb:
         creation_states: Skapelsen sier
         deleted_at: Slettet kl
         enabled_feature_slugs: Aktiverte funksjonssnegler
+        has_invoice: Har faktura
         invoices: Fakturaer
-        is_paid: Er betalt
         kind: Snill
         locations: Steder
         lock_show_on_map: Lås vis på kartet

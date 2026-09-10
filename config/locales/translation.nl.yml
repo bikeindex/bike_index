@@ -624,8 +624,8 @@ nl:
         created_bikes: Fietsen gemaakt
         creation_states: Creatie staten
         deleted_at: Verwijderd om
+        has_invoice: Heeft factuur
         invoices: Facturen
-        is_paid: Is betaald
         kind: Soort
         locations: Locaties
         lock_show_on_map: Show op kaart vergrendelen

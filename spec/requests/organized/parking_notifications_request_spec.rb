@@ -171,7 +171,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           current_organization.reload
           invoice = current_organization.current_invoices.first
           expect(invoice.paid_in_full?).to be_truthy
-          expect(current_organization.is_paid).to be_truthy
+          expect(current_organization.has_invoice).to be_truthy
           expect(current_organization.enabled?("parking_notifications")).to be_falsey
           expect {
             post base_url, params: {

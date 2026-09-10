@@ -237,8 +237,8 @@ class BikeSticker < ApplicationRecord
 
   def organization_authorized?(passed_organization = nil)
     return false if passed_organization.blank?
-    return true if passed_organization.is_paid || passed_organization.ambassador?
-    return false unless organization_id.present? # Non-paid organizations can't edit non-organized stickers
+    return true if passed_organization.has_invoice? || passed_organization.ambassador?
+    return false unless organization_id.present? # Organizations without an invoice can't edit non-organized stickers
     return true if passed_organization.regional_parents.pluck(:id).include?(organization_id)
 
     passed_organization.id == organization_id

@@ -163,7 +163,7 @@ class BikeStickerUpdate < ApplicationRecord
       "primary_organization"
     elsif bike_sticker.organization&.regional? && organization.regional_parents.pluck(:id).include?(bike_sticker.organization_id)
       "regional_organization"
-    elsif organization.paid?
+    elsif organization.has_invoice?
       "other_paid_organization"
     else
       "other_organization"

@@ -10,7 +10,7 @@ RSpec.describe MailerHelper, type: :helper do
     context "organization with invoice" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features) }
       it "is falsey" do
-        expect(organization.reload.paid?).to be_truthy
+        expect(organization.reload.has_invoice?).to be_truthy
         expect(organization.paid_money?).to be_falsey
         expect(render_donation?(organization)).to be_truthy
       end
@@ -19,7 +19,7 @@ RSpec.describe MailerHelper, type: :helper do
       let(:organization) { FactoryBot.create(:organization_with_organization_features) }
       let!(:invoice2) { FactoryBot.create(:invoice_with_payment, organization: organization) }
       it "is falsey" do
-        expect(organization.reload.paid?).to be_truthy
+        expect(organization.reload.has_invoice?).to be_truthy
         expect(organization.paid_money?).to be_truthy
         expect(render_donation?(organization)).to be_falsey
       end
@@ -41,7 +41,7 @@ RSpec.describe MailerHelper, type: :helper do
     context "organization with invoice" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features) }
       it "is falsey" do
-        expect(organization.reload.paid?).to be_truthy
+        expect(organization.reload.has_invoice?).to be_truthy
         expect(render_supporters?(organization)).to be_falsey
       end
     end
@@ -49,7 +49,7 @@ RSpec.describe MailerHelper, type: :helper do
       let(:organization) { FactoryBot.create(:organization_with_organization_features) }
       let!(:invoice2) { FactoryBot.create(:invoice_with_payment, organization: organization) }
       it "is falsey" do
-        expect(organization.reload.paid?).to be_truthy
+        expect(organization.reload.has_invoice?).to be_truthy
         expect(organization.paid_money?).to be_truthy
         expect(render_supporters?(organization)).to be_falsey
       end
