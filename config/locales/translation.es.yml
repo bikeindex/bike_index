@@ -922,6 +922,69 @@ es:
           new_in_box: sin montar/con etiquetas
           poor: necesita servicio
           salvage: no funciona/no se puede conducir
+      ownership:
+        creation_kind:
+          api_v1: API v1
+          api_v2: API v2
+          api_v3: API v3
+          ascend_pos: ascender
+          broken_ascend_pos: ascender (roto)
+          broken_lightspeed_pos: velocidad de la luz (rota)
+          bulk_import: importación a granel
+          bulk_import_worker: trabajador de importación masiva
+          creator_unregistered_parking_notification: Notificación de estacionamiento
+            no registrado
+          embed: empotrar
+          embed_extended: incrustar +
+          embed_partial: página de inicio antigua
+          impound_import: confiscar importación
+          impound_process: proceso de depósito
+          lightspeed_pos: velocidad de la luz
+          organization_form: formulario de organización
+          other_pos: punto de venta
+          register_flow: nuevo flujo
+          register_flow_landing_page: página de inicio
+          register_flow_organized: nuevo flujo organizado
+          sticker: etiqueta engomada
+          transferred_ownership: propiedad transferida
+          web: web
+        creation_kind_description:
+          api_v1: registrado a través de la API (v1)
+          api_v2: registrado a través de la API (v2)
+          api_v3: registrado a través de la API (v3)
+          ascend_pos: Registrado automáticamente por el sistema de punto de venta
+            de la tienda de bicicletas (Ascend POS).
+          broken_ascend_pos: Registrado automáticamente por el sistema de punto de
+            venta de la tienda de bicicletas (Ascend POS), cuya integración está marcada
+            como defectuosa.
+          broken_lightspeed_pos: Registrado automáticamente por el sistema de punto
+            de venta de la tienda de bicicletas (Lightspeed POS), cuya integración
+            está marcada como defectuosa.
+          bulk_import: registrado mediante importación de hoja de cálculo
+          bulk_import_worker: registrado mediante importación de hoja de cálculo
+          creator_unregistered_parking_notification: registrado a través del flujo
+            de notificación de estacionamiento no registrado
+          embed: registrado en el formulario de registro integrado de una organización
+          embed_extended: Registrado en el formulario de integración de la organización,
+            versión extendida
+          embed_partial: El registro comenzó con un registro incompleto, a través
+            de la página de inicio de la organización.
+          impound_import: registrado por importación de hoja de cálculo de retención
+          impound_process: transferido como parte del proceso de incautación
+          lightspeed_pos: Registrado automáticamente por el sistema de punto de venta
+            de la tienda de bicicletas (Lightspeed POS).
+          organization_form: Registrado por un miembro de la organización, en el formulario
+            de la organización en Bike Index.
+          other_pos: Registrado automáticamente por el punto de venta de la tienda
+            de bicicletas.
+          register_flow: registrado mediante el flujo de registro de varios pasos
+          register_flow_landing_page: El registro comenzó a través de una página de
+            inicio de la organización, en el proceso de registro de varios pasos.
+          register_flow_organized: registrado por un miembro de la organización, en
+            el flujo de registro de varios pasos
+          sticker: El registro comenzó con una pegatina.
+          transferred_ownership: transferido a un nuevo propietario
+          web: registrado mediante el proceso de autorregistro
     models:
       ad: Anuncio
       ambassador: Embajador
@@ -5999,6 +6062,7 @@ es:
           wheres_my_serial: "¿Dónde está mi número de serie?"
           without_serial: Este %{cycle_type} se hizo sin número de serie.
           without_serial_number: Este %{cycle_type} se fabricó sin número de serie.
+          phone_required_org: Se requiere un teléfono para registrarse en %{org_name}.
         step_acknowledgment:
           continue: Continuar
         step_acknowledgment_review:

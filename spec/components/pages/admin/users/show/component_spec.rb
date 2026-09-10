@@ -41,6 +41,17 @@ RSpec.describe Pages::Admin::Users::Show::Component, type: :component do
     end
   end
 
+  context "with an email_ban on an additional address" do
+    let(:user_email) { FactoryBot.create(:user_email, user:, email: "other@example.com") }
+    let!(:email_ban) { FactoryBot.create(:email_ban, user:, user_email:, reason: :email_duplicate) }
+
+    it "renders the ban and the address it names" do
+      expect(user.reload.email_banned?).to be_falsey
+      expect(component).to have_css("h4.text-danger", text: /email banned/)
+      expect(component).to have_content("other@example.com")
+    end
+  end
+
   context "with superuser" do
     let(:user) { FactoryBot.create(:superuser) }
     let!(:superuser_ability) { SuperuserAbility.create(user:) }

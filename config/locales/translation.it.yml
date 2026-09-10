@@ -916,6 +916,66 @@ it:
           new_in_box: non montato/con cartellino
           poor: necessita riparazione
           salvage: non funzionante/non utilizzabile
+      ownership:
+        creation_kind:
+          api_v1: API v1
+          api_v2: API v2
+          api_v3: API v3
+          ascend_pos: ascendere
+          broken_ascend_pos: salire (rotto)
+          broken_lightspeed_pos: velocità della luce (rotto)
+          bulk_import: importazione all'ingrosso
+          bulk_import_worker: lavoratore addetto all'importazione all'ingrosso
+          creator_unregistered_parking_notification: notifica di parcheggio non registrato
+          embed: incorporare
+          embed_extended: incorpora +
+          embed_partial: vecchia pagina di destinazione
+          impound_import: sequestro importazione
+          impound_process: processo di sequestro
+          lightspeed_pos: velocità della luce
+          organization_form: modulo org
+          other_pos: punto di vendita
+          register_flow: nuovo flusso
+          register_flow_landing_page: pagina di destinazione
+          register_flow_organized: nuovo flusso organizzato
+          sticker: adesivo
+          transferred_ownership: proprietà trasferita
+          web: web
+        creation_kind_description:
+          api_v1: registrato tramite API (v1)
+          api_v2: registrato tramite API (v2)
+          api_v3: registrato tramite API (v3)
+          ascend_pos: Registrazione automatica tramite il sistema POS del negozio
+            di biciclette (Ascend POS)
+          broken_ascend_pos: registrato automaticamente dal punto vendita del negozio
+            di biciclette (Ascend POS), la cui integrazione risulta interrotta
+          broken_lightspeed_pos: registrato automaticamente dal punto vendita del
+            negozio di biciclette (Lightspeed POS), la cui integrazione risulta interrotta
+          bulk_import: registrato tramite importazione da foglio di calcolo
+          bulk_import_worker: registrato tramite importazione da foglio di calcolo
+          creator_unregistered_parking_notification: registrato tramite il flusso
+            di notifica di parcheggio non registrato
+          embed: registrato tramite il modulo di registrazione incorporato di un'organizzazione
+          embed_extended: registrato sul modulo di incorporamento dell'organizzazione,
+            versione estesa
+          embed_partial: La registrazione è iniziata con una registrazione incompleta,
+            tramite la pagina di destinazione dell'organizzazione.
+          impound_import: registrato tramite importazione foglio di calcolo di deposito
+          impound_process: trasferito nell'ambito della procedura di sequestro
+          lightspeed_pos: Registrazione automatica tramite il sistema POS del negozio
+            di biciclette (Lightspeed POS)
+          organization_form: registrato da un membro dell'organizzazione, sul modulo
+            dell'organizzazione su Bike Index
+          other_pos: registrazione automatica da parte del punto vendita del negozio
+            di biciclette
+          register_flow: registrato con il flusso di registrazione a più fasi
+          register_flow_landing_page: la registrazione è iniziata tramite una landing
+            page dell'organizzazione, nel flusso di registrazione in più fasi
+          register_flow_organized: registrato da un membro dell'organizzazione, nel
+            flusso di registrazione a più fasi
+          sticker: la registrazione è iniziata da un adesivo
+          transferred_ownership: trasferito a un nuovo proprietario
+          web: registrazione tramite processo di autoregistrazione
     models:
       ad: Annuncio
       ambassador: Ambasciatore
@@ -6016,6 +6076,8 @@ it:
             serie
           without_serial_number: Questo %{cycle_type} è stato realizzato senza numero
             di serie
+          phone_required_org: Per registrarsi con %{org_name} è necessario un numero
+            di telefono.
         step_acknowledgment:
           continue: Continuare
         step_acknowledgment_review:

@@ -10,14 +10,17 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
   describe "signed in" do
     let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
 
-    before { sign_in(current_user) }
+    before do
+      sign_in(current_user)
+      expect(page).to have_current_path("/my_account")
+    end
 
     # The one organization they're in, assigned without any link naming it
     context "a member of one organization" do
       let(:organization) do
         FactoryBot.create(:organization, short_name: "Brakebills").tap do
           # set_calculated_attributes recomputes the slugs from the invoices, so assigning them won't hold
-          it.update_column :enabled_feature_slugs, %w[reg_student_id require_reg_student_id]
+          it.update_column :enabled_feature_slugs, %w[reg_phone reg_student_id require_reg_phone require_reg_student_id]
         end
       end
       let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
@@ -27,6 +30,9 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         expect(page).to have_checked_field("register_with_organization")
         expect(page).to have_content(/information for brakebills/i)
         expect(page).to have_field("bike[student_id]")
+        # A phone is only asked for a theft or a find, until the organization requires one
+        expect(page).to have_field("bike[phone]")
+        expect(page).to have_content(/phone is required to register with brakebills/i)
         # It heads the section whose contents it decides
         expect(page.text.index(/information for brakebills/i))
           .to be < page.text.index("Register with Brakebills")
@@ -44,12 +50,14 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         # heading, which can't go with them, the checkbox being under it
         uncheck "Register with Brakebills"
         expect(page).to have_no_field("bike[student_id]")
+        expect(page).to have_no_field("bike[phone]")
         expect(page).to have_content(/contact info/i)
         expect(page).to have_no_content(/information for brakebills/i)
 
         # Collapsed rather than dropped, so changing their mind brings all of it back
         check "Register with Brakebills"
         expect(page).to have_field("bike[student_id]")
+        expect(page).to have_field("bike[phone]")
         expect(page).to have_content(/information for brakebills/i)
 
         uncheck "Register with Brakebills"

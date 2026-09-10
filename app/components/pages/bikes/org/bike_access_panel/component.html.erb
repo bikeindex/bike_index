@@ -190,7 +190,7 @@
 
                   <td>
                     <em>
-                      <%= render(Atoms::Org::OriginDisplay::Component.new(creation_description: @bike.creation_description)) %>
+                      <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: current_ownership)) %>
 
                       <% unless current_ownership.initial? %>
                         <span class="localizeTime">
@@ -204,7 +204,7 @@
                         <%= translation(".initial_registration") %>
 
                         <em>
-                          <%= render(Atoms::Org::OriginDisplay::Component.new(creation_description: original_ownership.creation_description)) %>
+                          <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: original_ownership)) %>
                         </em>
                       </small>
                     <% end %>
@@ -466,7 +466,7 @@
 
                     <td>
                       <em class="less-strong">
-                        <%= render(Atoms::Org::OriginDisplay::Component.new(creation_description: @bike.creation_description)) %>
+                        <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: current_ownership)) %>
                       </em>
                     </td>
 

@@ -43,8 +43,8 @@
             %td
               - if @feedback.organization.present?
                 = link_to @feedback.organization.name, admin_organization_path(@feedback.organization.to_param)
-              .small.mt-2
-                = pretty_print_json(@feedback.feedback_hash)
+              .mt-2
+                = render UI::JsonDisplay::Component.new(data: @feedback.feedback_hash, small: true)
         %tr
           %td
             Bike

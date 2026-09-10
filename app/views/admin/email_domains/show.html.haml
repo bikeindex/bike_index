@@ -140,7 +140,7 @@
 
 .row.mt-4.mb-4.pb-4
   .col-md-4.pt-3
-    .only-dev-visible.small= pretty_print_json(@email_domain.data)
+    .only-dev-visible= render UI::JsonDisplay::Component.new(data: @email_domain.data, small: true)
   .col-md-68.pt-3
     = render "form",
       email_domain: @email_domain,

@@ -3,15 +3,6 @@
 require "rails_helper"
 
 RSpec.describe "Landing page demo modals", :js, type: :system do
-  def log_in_via_browser(user)
-    visit new_session_path
-    fill_in "Email", with: user.email
-    click_button "Continue"
-    fill_in "Password", with: "testthisthing7$"
-    click_button "Log in"
-    expect(page).to have_current_path("/my_account", wait: 5)
-  end
-
   def fill_in_and_submit_demo_form(name_label:, name_value:, contact_name: "Jane Doe", email: nil)
     expect(page).to have_content("Contact us for a free trial", wait: 5)
     fill_in "Name", with: contact_name
@@ -75,7 +66,8 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
     end
 
     it "submits a city lead via CTA button" do
-      log_in_via_browser(user)
+      sign_in(user)
+      expect(page).to have_current_path("/my_account")
       visit "/for_law_enforcement"
       expect(page).to have_content("bike theft recovery")
       open_modal(".le-cta-section button[commandfor]")

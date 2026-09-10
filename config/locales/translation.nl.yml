@@ -910,6 +910,66 @@ nl:
           new_in_box: onbereden/met tags
           poor: heeft service nodig
           salvage: niet werkend/onberijdbaar
+      ownership:
+        creation_kind:
+          api_v1: API versie 1
+          api_v2: API v2
+          api_v3: API-versie 3
+          ascend_pos: stijgen
+          broken_ascend_pos: opstijgen (onderbroken)
+          broken_lightspeed_pos: lichtsnelheid (kapot)
+          bulk_import: bulkimport
+          bulk_import_worker: bulkimportmedewerker
+          creator_unregistered_parking_notification: melding van niet-geregistreerd
+            parkeren
+          embed: insluiten
+          embed_extended: insluiten +
+          embed_partial: oude landingspagina
+          impound_import: inbeslagname import
+          impound_process: inbeslagnameproces
+          lightspeed_pos: lichtsnelheid
+          organization_form: org-formulier
+          other_pos: verkooppunt
+          register_flow: nieuwe stroom
+          register_flow_landing_page: landingspagina
+          register_flow_organized: nieuwe stroom georganiseerd
+          sticker: sticker
+          transferred_ownership: eigendom overgedragen
+          web: web
+        creation_kind_description:
+          api_v1: geregistreerd via de API (v1)
+          api_v2: geregistreerd via de API (v2)
+          api_v3: geregistreerd via de API (v3)
+          ascend_pos: automatisch geregistreerd door het kassasysteem van de fietsenwinkel
+            (Ascend POS)
+          broken_ascend_pos: automatisch geregistreerd door het kassasysteem van de
+            fietsenwinkel (Ascend POS), waarvan de integratie als defect is gemarkeerd
+          broken_lightspeed_pos: automatisch geregistreerd door het kassasysteem van
+            de fietsenwinkel (Lightspeed POS), waarvan de integratie als defect is
+            gemarkeerd
+          bulk_import: geregistreerd via spreadsheetimport
+          bulk_import_worker: geregistreerd via spreadsheetimport
+          creator_unregistered_parking_notification: geregistreerd via de procedure
+            voor meldingen van niet-geregistreerde parkeerplaatsen
+          embed: geregistreerd via het ingebouwde registratieformulier van een organisatie
+          embed_extended: geregistreerd op het insluitformulier van de organisatie,
+            uitgebreide versie
+          embed_partial: De registratie begon met een onvolledige registratie via
+            de landingspagina van de organisatie.
+          impound_import: geregistreerd via import van inbeslaggenomen spreadsheets
+          impound_process: overgedragen als onderdeel van het inbeslagnameproces
+          lightspeed_pos: automatisch geregistreerd door het kassasysteem van de fietsenwinkel
+            (Lightspeed POS)
+          organization_form: geregistreerd door een organisatielid, via het organisatieformulier
+            op Bike Index.
+          other_pos: automatisch geregistreerd door het kassasysteem van de fietsenwinkel
+          register_flow: geregistreerd via het registratieproces in meerdere stappen
+          register_flow_landing_page: De registratie begon via een landingspagina
+            van de organisatie, in het meerstappenregistratieproces.
+          register_flow_organized: geregistreerd door een organisatielid, in het meerstappenregistratieproces
+          sticker: De registratie begon met een sticker.
+          transferred_ownership: overgedragen aan een nieuwe eigenaar
+          web: geregistreerd via het zelfregistratieproces
     models:
       ad: Advertentie
       ambassador: Ambassadeur
@@ -5902,6 +5962,8 @@ nl:
           wheres_my_serial: Waar is mijn serienummer?
           without_serial: Deze %{cycle_type} is gemaakt zonder serienummer.
           without_serial_number: Deze %{cycle_type} is gemaakt zonder serienummer.
+          phone_required_org: Een telefoonnummer is vereist om je te registreren bij
+            %{org_name}
         step_acknowledgment:
           continue: Doorgaan
         step_acknowledgment_review:
