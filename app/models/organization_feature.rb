@@ -36,6 +36,13 @@ class OrganizationFeature < ApplicationRecord
     reg_student_id
   ].freeze
 
+  # Only some of the REG_FIELDS have a required counterpart
+  REG_FIELDS_REQUIRED = %w[
+    require_reg_address
+    require_reg_phone
+    require_reg_student_id
+  ].freeze
+
   BIKE_ACTIONS = %w[
     additional_registrations_information
     impound_bikes
@@ -67,8 +74,6 @@ class OrganizationFeature < ApplicationRecord
     registration_notes
     registration_sequences
     registration_sequences_edit
-    require_reg_address
-    require_reg_student_id
     saml_sso
     show_bulk_import
     show_bulk_import_impound
@@ -77,7 +82,7 @@ class OrganizationFeature < ApplicationRecord
     show_recoveries
     skip_ownership_email
     user_role_for_user_email_domain
-  ] + BIKE_ACTIONS + REG_FIELDS).freeze
+  ] + BIKE_ACTIONS + REG_FIELDS + REG_FIELDS_REQUIRED).freeze
 
   enum :kind, KIND_ENUM
 

@@ -94,11 +94,8 @@
           <% end %>
         </td>
 
-        <td
-          class="data-cell small tw:hidden"
-          data-ui--collapse-target="content"
-        >
-          <%= pretty_print_json(mailchimp_datum.data) %>
+        <td class="tw:hidden" data-ui--collapse-target="content">
+          <%= render UI::JsonDisplay::Component.new(data: mailchimp_datum.data, small: true, max_width: :table_cell) %>
         </td>
       </tr>
     <% end %>

@@ -44,6 +44,7 @@ feature_name_and_slugs = [
   {name: "Registration field: Address - REQUIRED", feature_slugs: ["reg_address", "require_reg_address"]},
   {name: "Registration field: Affiliation", feature_slugs: ["reg_organization_affiliation"]},
   {name: "Registration field: Phone number", feature_slugs: ["reg_phone"]},
+  {name: "Registration field: Phone number - REQUIRED", feature_slugs: ["reg_phone", "require_reg_phone"]},
   {name: "Registration field: Student ID", feature_slugs: ["reg_student_id"]},
   {name: "Registration field: Student ID - REQUIRED", feature_slugs: ["reg_student_id", "require_reg_student_id"]},
   {name: "Registration field: True/False question", feature_slugs: []},

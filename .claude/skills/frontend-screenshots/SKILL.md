@@ -91,7 +91,7 @@ browser_evaluate: () => {
 }
 ```
 
-The donation modal is why that starts with a dismiss: a seeded user who hasn't donated gets it over the page on `/my_account` and friends, and it covers the whole shot rather than sitting in a corner.
+The donation modal is why that starts with a dismiss: a seeded user who hasn't donated gets it over the page on `/my_account` and friends, and it covers the whole shot rather than sitting in a corner. **Drop the dismiss when a modal is what the diff changes** — the same rule as the footer, and it bites harder here, since the dismiss also sets `hideDonationModal` and the base-branch shot of a modal that was the whole point comes back without it.
 
 If the returned content height is **less than the viewport height**, `browser_resize` the height down to it before the shot (the `<html>` element's near-black background fills the gap otherwise), then resize back to the standard viewport before the next URL. Taller-than-viewport pages need no resize — `fullPage` scroll-stitches them.
 
@@ -125,7 +125,7 @@ $BASE_URL/rails/view_components/<preview_path>/<scenario>
 
 `<preview_path>` is the preview class underscored with the `Preview` suffix dropped, and `<scenario>` is the preview method. `SharedBlocks::ReviewAppBanner::ComponentPreview#superadmin_signed_in` → `/rails/view_components/shared_blocks/review_app_banner/component/superadmin_signed_in`. If a scenario doesn't exist yet, add a method to the component's `*_preview.rb` first — a preview that renders the exact state (pass the args that trigger it) is often the fastest path to a clean shot.
 
-Use this bare route, not Lookbook's `/lookbook/inspect/...`, which wraps the component in its own browser chrome. `/lookbook/preview/<preview_path>/<scenario>` renders bare as well, and it's the one route that puts a whole `@!group` on a single page — `/lookbook/preview/ui/tooltip/variants` for `UI::Tooltip::ComponentPreview`'s `# @!group Variants`. Reach for it when the shot needs several scenarios side by side; the component's system spec usually already visits it.
+Use this bare route, not Lookbook's `/lookbook/inspect/...`, which wraps the component in its own browser chrome. `/lookbook/preview/...` is the one route that puts a whole `@!group` on a single page — `/lookbook/preview/ui/tooltip/variants` for `UI::Tooltip::ComponentPreview`'s `# @!group Variants`. Reach for it when the shot needs several scenarios side by side; the component's system spec usually already visits it. **It takes a group, not a scenario** — `/lookbook/preview/<preview_path>/<scenario>` 404s, which reads as a wrong preview path rather than a wrong route.
 
 The preview page loads Tailwind and renders the component standalone (no site chrome), so a preview that fits the viewport captures at `fullPage: false`; a small ViewComponent render-timing line at the bottom is harmless. **A preview taller than the viewport still captures `fullPage: true`** — page-sized components (a whole registration step, a long form) put the changed field below 900px, and cropping it out is the one thing the shot exists to show. Measure before choosing:
 

@@ -787,6 +787,40 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "paid_organization_registration?" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user:) }
+
+    it "is false" do
+      expect(User.new.paid_organization_registration?).to be_falsey
+      expect(user.reload.paid_organization_registration?).to be_falsey
+    end
+
+    context "organization is paid" do
+      before { organization.update_column :is_paid, true }
+
+      it "is true" do
+        expect(user.reload.paid_organization_registration?).to be_truthy
+      end
+
+      # The transfer leaves their ownership behind, organization and all, with only current false
+      it "is false once they've transferred it away" do
+        BikeServices::OwnershipTransferer.find_or_create(bike, updator: user, new_owner_email: "newowner@example.com")
+
+        expect(user.reload.paid_organization_registration?).to be_falsey
+      end
+
+      context "registration isn't the user's" do
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
+
+        it "is false" do
+          expect(user.reload.paid_organization_registration?).to be_falsey
+        end
+      end
+    end
+  end
+
   describe "donations" do
     let(:user) { FactoryBot.create(:user) }
     it "returns the payment amount" do

@@ -171,7 +171,7 @@ class CustomerMailer < ApplicationMailer
 
     I18n.with_locale(@user&.preferred_language) do
       mail(
-        to: @user_alert.user.email,
+        to: @user.email,
         from: "bryan@bikeindex.org",
         subject: @user_alert.email_subject,
         tag: __callee__

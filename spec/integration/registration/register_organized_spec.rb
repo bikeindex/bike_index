@@ -20,7 +20,7 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
       let(:organization) do
         FactoryBot.create(:organization, short_name: "Brakebills").tap do
           # set_calculated_attributes recomputes the slugs from the invoices, so assigning them won't hold
-          it.update_column :enabled_feature_slugs, %w[reg_student_id require_reg_student_id]
+          it.update_column :enabled_feature_slugs, %w[reg_phone reg_student_id require_reg_phone require_reg_student_id]
         end
       end
       let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
@@ -30,6 +30,9 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         expect(page).to have_checked_field("register_with_organization")
         expect(page).to have_content(/information for brakebills/i)
         expect(page).to have_field("bike[student_id]")
+        # A phone is only asked for a theft or a find, until the organization requires one
+        expect(page).to have_field("bike[phone]")
+        expect(page).to have_content(/phone is required to register with brakebills/i)
         # It heads the section whose contents it decides
         expect(page.text.index(/information for brakebills/i))
           .to be < page.text.index("Register with Brakebills")
@@ -47,12 +50,14 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         # heading, which can't go with them, the checkbox being under it
         uncheck "Register with Brakebills"
         expect(page).to have_no_field("bike[student_id]")
+        expect(page).to have_no_field("bike[phone]")
         expect(page).to have_content(/contact info/i)
         expect(page).to have_no_content(/information for brakebills/i)
 
         # Collapsed rather than dropped, so changing their mind brings all of it back
         check "Register with Brakebills"
         expect(page).to have_field("bike[student_id]")
+        expect(page).to have_field("bike[phone]")
         expect(page).to have_content(/information for brakebills/i)
 
         uncheck "Register with Brakebills"
@@ -62,6 +67,37 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         expect(page).to have_content("Registration complete")
         expect(Bike.last.creation_organization_id).to be_blank
         expect(Bike.last.organizations.pluck(:id)).to eq([])
+      end
+    end
+
+    context "a member of an organization that pays" do
+      let(:organization) { FactoryBot.create(:organization, :paid, short_name: "Brakebills") }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
+
+      it "stops asking them for a donation once they have its registration" do
+        # Nothing of theirs is registered yet, so the ask is still there
+        expect(page).to have_current_path("/my_account")
+        dismiss_donation_modal
+
+        start_registration
+        expect(page).to have_checked_field("register_with_organization")
+
+        type_into("#bike_primary_frame_color_id", "Red")
+        click_combobox_option("Red")
+        fill_in "bike[serial_number]", with: "XYZ 123"
+        click_button "Complete Bike Registration"
+
+        expect(page).to have_content("Registration complete")
+        expect(Bike.last.current_ownership).to have_attributes(user_id: current_user.id,
+          claimed: true, organization_id: organization.id)
+
+        # A full load rather than a click through the account menu: the modal is only
+        # ever raised by a JS context's first init, so a Turbo arrival would leave it
+        # down whether the gate held or not
+        visit "/my_account"
+
+        expect(page).to have_content("Surly")
+        expect(page).to have_no_css("#donationModal", visible: :all)
       end
     end
   end

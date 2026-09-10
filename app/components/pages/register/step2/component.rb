@@ -100,13 +100,15 @@ module Pages
         end
 
         # Mirrors bikes/new: stolen needs a contact number, impounded needs one
-        # unless the finder has a confirmed phone, and an org can require it outright
+        # unless the finder has a confirmed phone
+        def report_phone_statuses
+          @report_phone_statuses ||= ["status_stolen"] + (@current_user&.phone_confirmed? ? [] : ["status_impounded"])
+        end
+
+        # An organization asking for a phone asks on every status - dropping it leaves
+        # the report's own answer, so both lists render for register--organization to pick
         def phone_statuses
-          @phone_statuses ||= if show_reg_phone?
-            Bike.statuses
-          else
-            ["status_stolen"] + (@current_user&.phone_confirmed? ? [] : ["status_impounded"])
-          end
+          @phone_statuses ||= show_reg_phone? ? Bike.statuses : report_phone_statuses
         end
 
         # The inverse of phone: stolen and impounded hang their address off their own
@@ -152,19 +154,35 @@ module Pages
         # bikes/new knows the status before rendering - here it's picked in this
         # form, so register--status-fields rechecks the list whenever it changes
         def show_phone?
-          phone_statuses.include?(@b_param.status)
+          (organization_dropped? ? report_phone_statuses : phone_statuses).include?(@b_param.status)
+        end
+
+        # Having copy is what makes the field required, and the status is picked in this
+        # form - so every text renders and register--status-fields shows the one it names
+        def phone_required_texts
+          @phone_required_texts ||= organization_phone_required_texts.merge(report_phone_required_texts)
         end
 
         # A phone number is how a theft or a find gets contacted, so those two ask for one
-        # rather than offering it. Which of them applies is picked in this form, so the copy
-        # for each renders and register--status-fields shows whichever the status names
-        def phone_required_texts
-          @phone_required_texts ||= BikeServices::Register::REPORT_RECORDS.keys.index_with do |status|
+        # rather than offering it
+        def report_phone_required_texts
+          BikeServices::Register::REPORT_RECORDS.keys.index_with do |status|
             translation((status == "status_stolen") ? ".phone_required_stolen" : ".phone_required_found", cycle_type:)
           end
         end
 
-        def phone_required? = phone_required_texts.key?(@b_param.status)
+        # Requiring is on top of asking: an organization needs reg_phone too
+        def organization_phone_required_texts
+          return {} unless show_reg_phone? && reg_organization.enabled?("require_reg_phone")
+
+          phone_statuses.index_with(translation(".phone_required_org", org_name: reg_organization.short_name))
+        end
+
+        def phone_required_text
+          (organization_dropped? ? report_phone_required_texts : phone_required_texts)[@b_param.status]
+        end
+
+        def phone_required? = phone_required_text.present?
       end
     end
   end

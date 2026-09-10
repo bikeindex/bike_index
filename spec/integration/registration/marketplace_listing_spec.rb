@@ -30,7 +30,7 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
   def sign_in_as_seller
     sign_in(seller)
     expect(page).to have_current_path("/my_account")
-    dismiss_donation_modal(wait: 10)
+    dismiss_donation_modal
   end
 
   def open_settings_menu = find("button[aria-label='Settings']").click

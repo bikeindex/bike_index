@@ -4,7 +4,8 @@ module UI
   module Tooltip
     class Component < ApplicationComponent
       TRIGGER_ACTIONS = "mouseenter->ui--tooltip#showOnHover mouseleave->ui--tooltip#hideOnHover " \
-        "focusin->ui--tooltip#showOnFocus focusout->ui--tooltip#hideOnFocusout"
+        "focusin->ui--tooltip#showPersistent click->ui--tooltip#showPersistent " \
+        "focusout->ui--tooltip#hideOnFocusout"
 
       TRIGGER_CLASS = "tw:inline-block tw:rounded tw:cursor-help " \
         "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
