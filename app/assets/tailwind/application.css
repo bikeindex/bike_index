@@ -212,6 +212,10 @@ body.with-org-sidebar {
 
   margin-left: var(--org-sidebar-width, 266px);
   transition: margin-left 0.18s ease;
+  /* The sidebar is fixed, so the general alert is the first in-flow child and its
+     margin-top would otherwise collapse out through body, over the canvas -- which
+     the browser paints near-black when it prefers dark */
+  display: flow-root;
 }
 
 /* The sidebar runs the height of the window, so the content does too -- a short page
