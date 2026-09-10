@@ -32,11 +32,8 @@ Doorkeeper.configure do
         user
       else
         session[:return_to] = request.fullpath
-        if request_envi&.params && request_envi.params[:unauthenticated_redirect] == "sign_up"
-          redirect_to(new_user_url)
-        else
-          redirect_to(new_session_url)
-        end
+        # This block runs as the controller, which includes ControllerHelpers
+        redirect_to(force_sign_up? ? new_user_url : new_session_url)
       end
     end
   end
