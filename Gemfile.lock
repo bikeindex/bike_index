@@ -922,7 +922,6 @@ DEPENDENCIES
   carrierwave_backgrounder!
   chartkick
   chunky_png
-  coderay
   coffee-rails
   csv
   dartsass-rails

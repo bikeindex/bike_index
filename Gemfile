@@ -99,7 +99,6 @@ gem "grape_logging" # Grape logging. Also how we pass it to lograge. Always used
 
 # Frontend
 gem "chartkick" # Display charts
-gem "coderay" # Pretty print code
 gem "coffee-rails"
 gem "groupdate" # Required for charts
 gem "premailer-rails" # Inline styles for email, also auto-generates text versions of emails

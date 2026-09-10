@@ -11,6 +11,15 @@ RSpec.describe UI::JsonDisplay::Component, type: :component do
     expect(component).to have_css("div.highlightjs-json[data-controller='ui--json-display'] pre code.language-json")
     expect(component.text).to include "bike_sticker"
     expect(component).to_not have_css("div.highlightjs-json[style]")
+    expect(component).to have_css("div.highlightjs-json pre.tw\\:max-h-72")
+  end
+
+  context "with no_max_height" do
+    let(:options) { {no_max_height: true} }
+
+    it "adds the class that drops the height cap" do
+      expect(component).to_not have_css("pre.tw\\:max-h-72")
+    end
   end
 
   context "with small and max_width" do
@@ -21,19 +30,28 @@ RSpec.describe UI::JsonDisplay::Component, type: :component do
     end
   end
 
-  context "with table_cell" do
-    let(:options) { {table_cell: true} }
+  context "with max_width: :table_cell" do
+    let(:options) { {max_width: :table_cell} }
 
-    it "adds the cell-filling class and defaults the cap" do
+    it "resolves the name to its pixel width and adds the cell-filling class" do
       expect(component).to have_css("div.highlightjs-json.highlightjs-json-cell[style='max-width: 500px;']")
     end
+  end
 
-    context "with max_width passed" do
-      let(:options) { {table_cell: true, max_width: 300} }
+  context "with a max_width that is neither" do
+    let(:options) { {max_width: :sidebar} }
 
-      it "takes the given width over the default" do
-        expect(component).to have_css("div.highlightjs-json-cell[style='max-width: 300px;']")
-      end
+    it "raises" do
+      expect { component }.to raise_error(ArgumentError, /must be an integer .* or :table_cell/)
+    end
+  end
+
+  context "with a pixel max_width" do
+    let(:options) { {max_width: 300} }
+
+    it "does not add the cell-filling class" do
+      expect(component).to have_css("div.highlightjs-json[style='max-width: 300px;']")
+      expect(component).to_not have_css("div.highlightjs-json-cell")
     end
   end
 
