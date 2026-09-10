@@ -5070,13 +5070,13 @@ en:
       org_locations: "%{org_name} locations"
       org_profile: "%{org_name} profile"
       org_registrations: "%{org_name} Registrations"
-      org_registrations_index: Organization Registrations
       org_settings: "%{org_name} Settings"
       parking_notification_unregistered: New unregistered notification
       parking_notifications_group: Parking Notifications
       recoveries: Recoveries
       registration_sequences: Registration sequences
       registration_stickers: Registration stickers
+      registrations_index: Organization Registrations
       reports: Reports
       resources: Resources
       search_all_registrations: Search all registrations
