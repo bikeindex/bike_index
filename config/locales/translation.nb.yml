@@ -5093,6 +5093,8 @@ nb:
       stolen_hot_sheet: Stjålet Bike Hot Sheet
       stolen_message: Stjålet melding
       in_super_admin: "%{org_name} i superadministrator"
+      registrations_index: Organisasjonsregistreringer
+      search_all_registrations: Søk i alle registreringer
   stolen:
     index:
       ambassador: ambassadør

@@ -5336,6 +5336,8 @@ es:
       stolen_hot_sheet: Lista de bicicletas robadas
       stolen_message: Mensaje robado
       in_super_admin: "%{org_name} en superadministrador"
+      registrations_index: Registro de organizaciones
+      search_all_registrations: Buscar en todos los registros
   stolen:
     index:
       ambassador: embajador

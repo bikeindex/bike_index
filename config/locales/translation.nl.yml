@@ -4528,6 +4528,8 @@ nl:
       stolen_hot_sheet: Stolen Bike Hot Sheet
       stolen_message: Gestolen bericht
       in_super_admin: "%{org_name} in superbeheerder"
+      registrations_index: Organisatieregistraties
+      search_all_registrations: Zoek alle registraties
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>

@@ -5350,6 +5350,8 @@ it:
       stolen_hot_sheet: Foglio informativo sui furti di biciclette
       stolen_message: Messaggio di furto
       in_super_admin: "%{org_name} in super amministratore"
+      registrations_index: Registrazioni delle organizzazioni
+      search_all_registrations: Cerca tutte le registrazioni
   stolen:
     index:
       ambassador: ambasciatore
