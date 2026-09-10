@@ -20,7 +20,9 @@
 #  index_hot_sheets_on_organization_id  (organization_id)
 #
 class HotSheet < ApplicationRecord
-  DELIVERY_STATUS_ENUM = Notification::DELIVERY_STATUS_ENUM
+  # A part-delivered batch has no equivalent on Notification, which is one address
+  DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2,
+                          delivery_partial_success: 3}.freeze
   DELIVERED_STATUSES = %w[delivery_success delivery_partial_success].freeze
   # Resending a batch every address on it rejected just fails the same way
   UNDELIVERABLE_ERROR_NAMES = Notification::UNDELIVERABLE_ERRORS.map(&:name).freeze
@@ -51,10 +53,6 @@ class HotSheet < ApplicationRecord
     sheet_date.blank?
   end
 
-  def email_success?
-    delivery_success?
-  end
-
   # A settled batch isn't worth sending again - it delivered, or its addresses are dead
   def settled?
     DELIVERED_STATUSES.include?(delivery_status) || UNDELIVERABLE_ERROR_NAMES.include?(delivery_error)
@@ -66,20 +64,11 @@ class HotSheet < ApplicationRecord
     return if settled?
 
     delivery = yield
-    self.message_id ||= delivery.try(:message_id)
-    update(delivery_status: "delivery_success")
+    update(delivery_status: "delivery_success", message_id: message_id || delivery.try(:message_id))
     nil
   rescue => e
     record_delivery_failure(e)
     undeliverable_error?(e) ? nil : e
-  end
-
-  def delivery_error_spam?
-    delivery_error == "Postmark::InactiveRecipientError"
-  end
-
-  def delivery_error_invalid?
-    delivery_error == "Postmark::InvalidEmailRequestError"
   end
 
   def subject
@@ -134,14 +123,10 @@ class HotSheet < ApplicationRecord
     # any other error leaves no way to tell who received the email
     inactive_recipient_error = error.is_a?(Postmark::InactiveRecipientError)
     failed_emails = inactive_recipient_error ? normalized_emails(error.recipients) : []
-    delivered_any = inactive_recipient_error && (normalized_recipient_emails - failed_emails).any?
+    delivered_any = inactive_recipient_error && (recipient_emails - failed_emails).any?
     update(delivery_status: delivered_any ? "delivery_partial_success" : "delivery_failure",
       delivery_error: error.class)
     UserEmail.where(email: failed_emails).each { it.update_last_email_errored!(email_errored: true) }
-  end
-
-  def normalized_recipient_emails
-    normalized_emails(recipient_emails)
   end
 
   def normalized_emails(emails)
@@ -149,7 +134,7 @@ class HotSheet < ApplicationRecord
   end
 
   def undeliverable_error?(error)
-    Notification::UNDELIVERABLE_ERRORS.any? { |error_class| error.is_a?(error_class) }
+    UNDELIVERABLE_ERROR_NAMES.include?(error.class.name)
   end
 
   def calculated_stolen_records

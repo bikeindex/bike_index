@@ -78,10 +78,9 @@ class HotSheetConfiguration < ApplicationRecord
   end
 
   def sent_today?
-    sheets = hot_sheets.where(sheet_date: current_date)
-    return false if sheets.none?
+    sheets = hot_sheets.where(sheet_date: current_date).to_a
 
-    sheets.settled.count == sheets.count
+    sheets.any? && sheets.all?(&:settled?)
   end
 
   def send_hour=(val)

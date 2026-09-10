@@ -8,7 +8,7 @@ RSpec.describe HotSheet, type: :model do
       hot_sheet.save
       expect(hot_sheet.valid?).to be_truthy
       expect(hot_sheet.id).to be_present
-      expect(hot_sheet.email_success?).to be_falsey
+      expect(hot_sheet.delivery_success?).to be_falsey
       expect(HotSheet.for(organization, Date.parse("2020-06-07"))).to eq hot_sheet
       expect(hot_sheet.subject).to eq "Stolen Bike Hot Sheet: Sunday, Jun 7"
       expect(hot_sheet.previous_sheet).to be_blank
@@ -21,12 +21,12 @@ RSpec.describe HotSheet, type: :model do
 
     it "records the success, and doesn't deliver a second time" do
       expect(hot_sheet.reload.delivery_status).to eq "delivery_pending"
-      expect(hot_sheet.email_success?).to be_falsey
+      expect(hot_sheet.delivery_success?).to be_falsey
       deliveries = 0
       expect(hot_sheet.track_email_delivery { deliveries += 1 }).to be_nil
       expect(hot_sheet.reload.delivery_status).to eq "delivery_success"
       expect(hot_sheet.delivery_error).to be_nil
-      expect(hot_sheet.email_success?).to be_truthy
+      expect(hot_sheet.delivery_success?).to be_truthy
 
       hot_sheet.track_email_delivery { deliveries += 1 }
       expect(deliveries).to eq 1
@@ -38,7 +38,7 @@ RSpec.describe HotSheet, type: :model do
         expect(hot_sheet.track_email_delivery { raise api_error }).to eq api_error
         expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
         expect(hot_sheet.delivery_error).to eq "Postmark::ApiInputError"
-        expect(hot_sheet.email_success?).to be_falsey
+        expect(hot_sheet.delivery_success?).to be_falsey
       end
     end
 
@@ -79,7 +79,7 @@ RSpec.describe HotSheet, type: :model do
         # Postmark delivered to the rest of the batch, so this isn't a total failure
         expect(hot_sheet.reload.delivery_status).to eq "delivery_partial_success"
         expect(hot_sheet.delivery_error).to eq "Postmark::InactiveRecipientError"
-        expect(hot_sheet.email_success?).to be_falsey
+        expect(hot_sheet.delivery_success?).to be_falsey
         expect(UserEmail.last_email_errored.pluck(:email)).to eq(inactive_emails)
         # ... so the batch isn't worth sending again
         expect(hot_sheet.settled?).to be_truthy

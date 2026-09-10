@@ -36,7 +36,7 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
       hot_sheet = HotSheet.last
       expect(hot_sheet.sheet_date).to eq Time.current.to_date
       expect(hot_sheet.organization_id).to eq organization1.id
-      expect(hot_sheet.email_success?).to be_truthy
+      expect(hot_sheet.delivery_success?).to be_truthy
       # And it hasn't delivered any email
       expect(hot_sheet.recipient_ids).to eq([])
       expect(ActionMailer::Base.deliveries).to eq([])
@@ -53,7 +53,7 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
         expect(hot_sheet.sheet_date).to eq Time.current.to_date
         expect(hot_sheet.organization_id).to eq organization1.id
         # And it's delivered the email
-        expect(hot_sheet.email_success?).to be_truthy
+        expect(hot_sheet.delivery_success?).to be_truthy
         expect(hot_sheet.recipient_ids).to eq([organization_role.user_id])
         expect(ActionMailer::Base.deliveries.count).to eq 1
         email = ActionMailer::Base.deliveries.last
