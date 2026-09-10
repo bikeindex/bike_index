@@ -9,8 +9,7 @@ module SharedBlocks
         # container lines it up with the navbar above; z-20 because the homepage and
         # landing page bike tile grids are positioned, so they'd otherwise paint over
         # this in-flow banner. The margin collapses into the navbar's matching
-        # margin-bottom where there is one, and is the whole gap where there isn't --
-        # the org sidebar is fixed, so its pages have nothing above to space it off
+        # margin-bottom, and is the whole gap where nothing above supplies one
         def initialize(current_user:, wrapper_class: "container tw:relative tw:z-20 tw:mt-(--nav-gap)")
           @current_user = current_user
           @wrapper_class = wrapper_class

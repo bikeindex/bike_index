@@ -9,8 +9,7 @@ module UI
       class Component < ApplicationComponent
         # mb-0 cancels legacy bootstrap's `label` margin, which items-center would
         # otherwise center along with the button next to it. The ring restates
-        # UI::Button's secondary focus color, which the label can't inherit -- the
-        # sr-only input is what takes focus, so the button's own :focus never fires.
+        # UI::Button's COLORS[:secondary] focus color under the peer variant.
         LABEL_CLASSES = "tw:mb-0 tw:whitespace-nowrap tw:peer-focus-visible:ring-3 tw:peer-focus-visible:ring-purple-500/40"
 
         def initialize(form_builder:, attribute:, accept: nil, camera: nil, direct_upload_url: nil, html_options: {})
