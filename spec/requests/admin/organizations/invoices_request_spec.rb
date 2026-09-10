@@ -62,7 +62,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
       }.to change(Invoice, :count).by 1
       invoice = organization.invoices.last
       expect(invoice.active?).to be_falsey
-      expect(organization.has_invoice).to be_falsey
+      expect(organization.is_invoiced).to be_falsey
       expect(organization.enabled_feature_slugs).to eq([])
       expect(invoice.organization_feature_ids).to match_array([organization_feature1.id, organization_feature2.id])
       expect(invoice.amount_due).to eq 1220
@@ -90,7 +90,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
           invoice = organization.invoices.last
           expect(invoice.paid_in_full?).to be_truthy
           expect(invoice.active?).to be_truthy
-          expect(organization.reload.has_invoice).to be_truthy
+          expect(organization.reload.is_invoiced).to be_truthy
           expect(organization.enabled_feature_slugs).to eq(%w[parking_notifications passwordless_users])
           expect(invoice.organization_feature_ids).to match_array([organization_feature1.id, organization_feature2.id])
           expect(invoice.amount_due).to eq 0

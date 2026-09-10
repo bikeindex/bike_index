@@ -11,8 +11,8 @@
   <% user_bike_ids = current_user.bike_ids.sort %>
 
   <%# get the organizations, so that we can sort alphabetically %>
-  <% uro_organizations = @user.uro_organizations.with_invoice.name_ordered %>
-  <% uro_organizations += @user.uro_organizations.without_invoice.name_ordered %>
+  <% uro_organizations = @user.uro_organizations.invoiced.name_ordered %>
+  <% uro_organizations += @user.uro_organizations.not_invoiced.name_ordered %>
 
   <% uro_organizations.each do |organization| %>
     <% user_registration_organization = @user.user_registration_organizations.find_by(organization_id: organization.id) %>

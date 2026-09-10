@@ -9,7 +9,7 @@
   <% table.column(sortable: "name") do |organization| %>
     <%= link_to organization.name, admin_organization_url(organization) %>
 
-    <small class="twless-strong"><%= "invoiced" if organization.has_invoice? %></small>
+    <small class="twless-strong"><%= "invoiced" if organization.is_invoiced? %></small>
 
     <% parent_names = organization.regional_parents.pluck(:short_name) %>
 

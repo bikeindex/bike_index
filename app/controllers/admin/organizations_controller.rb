@@ -171,7 +171,7 @@ module Admin
 
       @search_invoiced = Binxtils::InputNormalizer.boolean(params[:search_invoiced])
       matching_organizations = search_deleted_scope(Organization.all)
-      matching_organizations = matching_organizations.with_invoice if @search_invoiced
+      matching_organizations = matching_organizations.invoiced if @search_invoiced
       matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
 
       @features_and_settings_ids = []

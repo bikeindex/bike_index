@@ -1,6 +1,6 @@
 <%= render(Pages::Admin::Organizations::Tabs::Component.new(organization: @organization, active: :invoice_functionality, display_dev_info: display_dev_info?)) %>
 
-<% if @organization.has_invoice? %>
+<% if @organization.is_invoiced? %>
   <%= render(Pages::Admin::Organizations::Form::TabForm::Component.new(organization: @organization, tab: "invoice_functionality",
         fields_component: Pages::Admin::Organizations::Form::FeatureSettings::Component, fields_args: {current_user:})) %>
 <% else %>

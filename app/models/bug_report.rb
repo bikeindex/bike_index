@@ -172,7 +172,7 @@ class BugReport < ApplicationRecord
     self.is_member = user.member?
     self.is_invoiced_organization = user.invoiced_org?
     self.is_invoiced_organization_staff = user.organization_roles.admin
-      .where(organization_id: Organization.with_invoice).limit(1).any?
+      .where(organization_id: Organization.invoiced).limit(1).any?
   end
 
   def enqueue_prioritizing_job

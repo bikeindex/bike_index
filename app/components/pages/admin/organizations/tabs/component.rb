@@ -55,7 +55,7 @@ module Pages
             return true if @active == tab
 
             case tab
-            when :invoice_functionality then @organization.has_invoice?
+            when :invoice_functionality then @organization.is_invoiced?
             when :sso then @organization.enabled?("saml_sso")
             # Not "nothing behind it" - the page is developer-only, so its tab follows dev info
             when :custom_layouts then @display_dev_info

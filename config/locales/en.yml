@@ -437,8 +437,8 @@ en:
         creation_states: Creation states
         deleted_at: Deleted at
         enabled_feature_slugs: Enabled feature slugs
-        has_invoice: Has invoice
         invoices: Invoices
+        is_invoiced: Is invoiced
         kind: Kind
         locations: Locations
         lock_show_on_map: Lock show on map

@@ -14,7 +14,7 @@ module SharedBlocks
       private
 
       def org_name
-        @current_user&.organizations&.law_enforcement&.without_invoice&.first&.name || "your organization"
+        @current_user&.organizations&.law_enforcement&.not_invoiced&.first&.name || "your organization"
       end
     end
   end

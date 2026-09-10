@@ -406,10 +406,10 @@ RSpec.describe BikeSticker, type: :model do
       let(:bike_sticker_other) { FactoryBot.create(:bike_sticker, organization: organization_other) }
       let(:bike_sticker_no_organization) { FactoryBot.create(:bike_sticker, organization: nil) }
       it "returns true for regional organization" do
-        expect(organization.has_invoice?).to be_truthy
-        expect(organization_child.has_invoice?).to be_truthy
-        expect(organization_regional.has_invoice?).to be_falsey
-        expect(organization_other.has_invoice?).to be_falsey
+        expect(organization.is_invoiced?).to be_truthy
+        expect(organization_child.is_invoiced?).to be_truthy
+        expect(organization_regional.is_invoiced?).to be_falsey
+        expect(organization_other.is_invoiced?).to be_falsey
         # bike sticker for Main organization
         expect(bike_sticker.organization_authorized?(organization)).to be_truthy
         expect(bike_sticker.organization_authorized?(organization_child)).to be_truthy
@@ -613,7 +613,7 @@ RSpec.describe BikeSticker, type: :model do
         expect(bike_sticker_update3.user).to eq user
         expect(bike_sticker_update3.organization).to eq organization_invoiced
         expect(bike_sticker_update3.bike).to be_blank
-        expect(bike_sticker_update3.organization_kind).to eq "other_paid_organization"
+        expect(bike_sticker_update3.organization_kind).to eq "other_invoiced_organization"
         expect(bike_sticker_update3.unauthorized_organization?).to be_falsey
         expect(bike_sticker_update3.kind).to eq "un_claim"
         expect(bike_sticker_update3.creator_kind).to eq "creator_user" # Default
@@ -630,7 +630,7 @@ RSpec.describe BikeSticker, type: :model do
         expect(bike_sticker_update4.user).to eq user
         expect(bike_sticker_update4.organization).to eq organization_invoiced
         expect(bike_sticker_update4.bike).to eq bike2
-        expect(bike_sticker_update4.organization_kind).to eq "other_paid_organization"
+        expect(bike_sticker_update4.organization_kind).to eq "other_invoiced_organization"
         expect(bike_sticker_update4.unauthorized_organization?).to be_falsey
         expect(bike_sticker_update4.kind).to eq "re_claim"
         expect(bike_sticker_update4.creator_kind).to eq "creator_user" # Because unknown value passed

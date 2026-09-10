@@ -280,7 +280,7 @@ RSpec.describe MailchimpDatum, type: :model do
         it "responds with lightspeed" do
           expect(user).to be_present
           organization.update(pos_kind: "ascend_pos")
-          expect(organization.reload.has_invoice?).to be_falsey
+          expect(organization.reload.is_invoiced?).to be_falsey
           expect(organization.invoices.count).to eq 1
           expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[ascend in_bike_index pos_approved]).as_json
         end
@@ -297,7 +297,7 @@ RSpec.describe MailchimpDatum, type: :model do
         let!(:invoice) { FactoryBot.create(:invoice_paid, organization: organization) }
         it "returns paid" do
           organization.update(updated_at: Time.current)
-          expect(organization.reload.has_invoice?).to be_truthy
+          expect(organization.reload.is_invoiced?).to be_truthy
           expect(organization.paid_money?).to be_falsey
           expect(organization.paid_previously?).to be_falsey
           expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[in_bike_index]).as_json
@@ -307,7 +307,7 @@ RSpec.describe MailchimpDatum, type: :model do
         let!(:invoice) { FactoryBot.create(:invoice_with_payment, organization: organization) }
         it "returns paid" do
           organization.update(updated_at: Time.current)
-          expect(organization.reload.has_invoice?).to be_truthy
+          expect(organization.reload.is_invoiced?).to be_truthy
           expect(organization.paid_money?).to be_truthy
           expect(organization.paid_previously?).to be_falsey
           expect(mailchimp_datum.calculated_data.as_json).to eq target.merge(tags: %w[in_bike_index paid]).as_json
@@ -317,7 +317,7 @@ RSpec.describe MailchimpDatum, type: :model do
         let!(:invoice) { FactoryBot.create(:invoice_with_payment, organization: organization, start_at: Time.current - 2.years) }
         it "returns paid_previously" do
           organization.reload
-          expect(organization.has_invoice?).to be_falsey
+          expect(organization.is_invoiced?).to be_falsey
           expect(organization.paid_money?).to be_falsey
           expect(organization.paid_previously?).to be_truthy
           expect(invoice.reload.was_active?).to be_truthy

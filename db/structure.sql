@@ -2958,7 +2958,7 @@ CREATE TABLE public.organizations (
     api_access_approved boolean DEFAULT false NOT NULL,
     approved boolean DEFAULT true,
     avatar character varying(255),
-    has_invoice boolean DEFAULT false NOT NULL,
+    is_invoiced boolean DEFAULT false NOT NULL,
     lock_show_on_map boolean DEFAULT false NOT NULL,
     enabled_feature_slugs jsonb,
     parent_organization_id integer,

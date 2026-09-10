@@ -238,7 +238,7 @@ RSpec.describe Invoice, type: :model do
       organization.update(updated_at: Time.current)
       organization.reload
       expect(organization.enabled_feature_slugs).to eq(["bike_search"])
-      expect(organization.has_invoice?).to be_truthy
+      expect(organization.is_invoiced?).to be_truthy
       expect(organization.paid_money?).to be_falsey
 
       invoice2.update(organization_feature_ids: [organization_feature2.id])
@@ -253,7 +253,7 @@ RSpec.describe Invoice, type: :model do
       organization.update(updated_at: Time.current)
       organization.reload
       expect(organization.enabled_feature_slugs).to match_array %w[bike_search extra_registration_number]
-      expect(organization.has_invoice?).to be_truthy
+      expect(organization.is_invoiced?).to be_truthy
       expect(organization.paid_money?).to be_truthy
     end
   end

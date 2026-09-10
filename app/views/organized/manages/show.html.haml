@@ -85,7 +85,7 @@
           = t(".when_checked_go_direct")
           %em.less-strong= t(".why_no_direct_by_default")
 
-- unless current_organization.has_invoice?
+- unless current_organization.is_invoiced?
   %hr.delete-organization-section
   %p.text-md-center
     %a.collapsed{href: "#", data: {toggle: "collapse", target: "#delete-organization"}}

@@ -30,7 +30,7 @@
 class BikeStickerUpdate < ApplicationRecord
   KIND_ENUM = {initial_claim: 0, re_claim: 1, un_claim: 2, failed_claim: 3, admin_reassign: 4}.freeze
   CREATOR_KIND_ENUM = {creator_user: 0, creator_export: 1, creator_pos: 2, creator_bike_creation: 3, creator_import: 4}.freeze
-  ORGANIZATION_KIND_ENUM = {no_organization: 0, primary_organization: 1, regional_organization: 2, other_organization: 3, other_paid_organization: 4}.freeze
+  ORGANIZATION_KIND_ENUM = {no_organization: 0, primary_organization: 1, regional_organization: 2, other_organization: 3, other_invoiced_organization: 4}.freeze
 
   enum :kind, KIND_ENUM
   enum :creator_kind, CREATOR_KIND_ENUM
@@ -163,8 +163,8 @@ class BikeStickerUpdate < ApplicationRecord
       "primary_organization"
     elsif bike_sticker.organization&.regional? && organization.regional_parents.pluck(:id).include?(bike_sticker.organization_id)
       "regional_organization"
-    elsif organization.has_invoice?
-      "other_paid_organization"
+    elsif organization.is_invoiced?
+      "other_invoiced_organization"
     else
       "other_organization"
     end
