@@ -509,61 +509,80 @@ RSpec.describe Ownership, type: :model do
     end
   end
 
-  describe "creation_description" do
+  describe "creation_kind" do
     let(:ownership) { Ownership.new(organization_id: 1, creator_id: 1) }
     it "returns nil" do
-      expect(ownership.creation_description).to be_nil
+      expect(ownership.creation_kind).to be_nil
+    end
+    # These three are separate registration flows that used to share a humanized string
+    it "distinguishes the landing page and org form origins" do
+      expect(Ownership.new(origin: "embed_partial").creation_kind).to eq :embed_partial
+      expect(Ownership.new(origin: "register_flow_landing_page").creation_kind).to eq :register_flow_landing_page
+      expect(Ownership.new(origin: "organization_form").creation_kind).to eq :organization_form
+    end
+    # UpdateOrganizationPosKindJob sets broken_* on an organization, never on an ownership
+    it "keeps every POS kind, the broken ones included" do
+      expect(Ownership.new(pos_kind: "broken_lightspeed_pos").creation_kind).to eq :broken_lightspeed_pos
+      expect(Ownership.new(pos_kind: "broken_ascend_pos").creation_kind).to eq :broken_ascend_pos
+      expect(Ownership.new(pos_kind: "other_pos").creation_kind).to eq :other_pos
     end
     context "bulk" do
       let(:ownership) { Ownership.new(bulk_import_id: 12, origin: "api_v2") }
-      it "returns bulk reg" do
-        expect(ownership.creation_description).to eq "bulk import"
-        expect(ownership.pos?).to be_falsey
+      it "returns bulk_import" do
+        expect(ownership.creation_kind).to eq :bulk_import
       end
     end
     context "pos" do
-      let(:ownership) { Ownership.new(pos_kind: "lightspeed_pos", origin: "embed_extended") }
-      before { ownership.set_calculated_attributes }
-      it "returns pos reg" do
-        expect(ownership.creation_description).to eq "Lightspeed"
+      let(:ownership) { Ownership.new(pos_kind: "lightspeed_pos", bulk_import_id: 12, origin: "embed_extended") }
+      it "takes precedence over bulk and origin" do
+        expect(ownership.creation_kind).to eq :lightspeed_pos
       end
-      context "ascend" do
-        let(:bulk_import) { BulkImport.new(kind: "ascend") }
-        let(:ownership) { Ownership.new(pos_kind: "ascend_pos", bulk_import: bulk_import) }
-        it "returns pos reg" do
-          expect(ownership.creation_description).to eq "Ascend"
+      context "not a POS" do
+        let(:ownership) { Ownership.new(pos_kind: "does_not_need_pos", origin: "web") }
+        it "falls through to the origin" do
+          expect(ownership.creation_kind).to eq :web
         end
       end
     end
-    context "web" do
-      let(:ownership) { Ownership.new(origin: "web") }
-      it "returns web" do
-        expect(ownership.creation_description).to eq "web"
-      end
+  end
+
+  describe "creation_kinds" do
+    # creation_kinds restates creation_kind's branching rather than deriving from it, so
+    # this is what catches the two drifting - a new enum value, or a change in precedence
+    it "is what creation_kind returns for every enum value" do
+      from_records = (Organization.pos_kinds.map { Ownership.new(pos_kind: it) } +
+        [Ownership.new(bulk_import_id: 1)] +
+        Ownership.origins.map { Ownership.new(origin: it) }).filter_map(&:creation_kind)
+
+      expect(Ownership.creation_kinds).to match_array(from_records)
     end
-    context "embed_extended" do
-      let(:ownership) { Ownership.new(origin: "embed_extended") }
-      it "returns org internal" do
-        expect(ownership.creation_description).to eq "org reg"
-      end
+
+    # Nothing else catches a kind with no copy: raise_on_missing_translations only fires
+    # for the kind that happens to render
+    it "has a label and a description, and no copy for a kind that can't happen" do
+      copy = I18n.t("activerecord.enums.ownership")
+
+      expect(copy[:creation_kind].keys).to match_array(Ownership.creation_kinds)
+      expect(copy[:creation_kind_description].keys).to match_array(Ownership.creation_kinds)
     end
-    context "organization_form" do
-      let(:ownership) { Ownership.new(origin: "organization_form") }
-      it "returns org internal" do
-        expect(ownership.creation_description).to eq "org reg"
-      end
+
+    # Two kinds sharing a label are indistinguishable in the CSV export, which has no
+    # tooltip to separate them
+    it "has a distinct label for every kind" do
+      duplicated = Ownership.creation_kinds.map { Ownership.creation_kind_humanized(it) }
+        .tally.select { |_label, count| count > 1 }
+
+      expect(duplicated).to eq({})
     end
-    context "embed_partial" do
-      let(:ownership) { Ownership.new(origin: "embed_partial") }
-      it "returns landing page" do
-        expect(ownership.creation_description).to eq "landing page"
-      end
-    end
-    context "creator_unregistered_parking_notification" do
-      let(:ownership) { Ownership.new(origin: "creator_unregistered_parking_notification") }
-      it "returns parking notification" do
-        expect(ownership.creation_description).to eq "parking notification"
-      end
+  end
+
+  describe "creation_kind_humanized" do
+    it "reads a kind's label and description, and passes an unknown kind through" do
+      expect(Ownership.creation_kind_humanized(:embed_partial)).to eq "old landing page"
+      expect(Ownership.creation_kind_description(:embed_partial))
+        .to eq "registration began with incomplete registration, via organization landing page"
+      expect(Ownership.creation_kind_humanized(nil)).to be_nil
+      expect(Ownership.creation_kind_humanized(:no_pos)).to be_nil
     end
   end
 
