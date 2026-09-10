@@ -39,6 +39,16 @@
       ),
     ) %>
 
+    <%= render(UI::DefinitionList::Row::Component.new(label: translation(".shipping"))) do %>
+      <%= translation(".shipping_#{@marketplace_listing.shippable?}") %>
+
+      <% if shipping_unavailable_reason_key.present? %>
+        <em class="less-strong tw:text-sm">
+          <%= translation(".#{shipping_unavailable_reason_key}", bike_type:) %>
+        </em>
+      <% end %>
+    <% end %>
+
     <%= render(
       UI::DefinitionList::Row::Component.new(
         label: translation(".first_posted_at"),
