@@ -82,7 +82,8 @@ module UserServices
     end
 
     def registrations_group(organization)
-      children = registrations_links(organization) + [
+      children = [
+        *registrations_links(organization),
         enabled_link(organization, "show_partial_registrations", translation(:incomplete_registrations),
           routes.incompletes_organization_bikes_path(organization.to_param)),
         enabled_link(organization, "bike_search", translation(:multi_search),
@@ -97,14 +98,12 @@ module UserServices
         translation(:org_registrations, org_name: organization.short_name), "bike", children)
     end
 
-    # Without bike_search the index only lists the organization's own registrations, so
-    # searching means the whole registry
+    # Without bike_search the index lists the organization's own registrations rather than searching them
     def registrations_links(organization)
-      index = routes.organization_registrations_path(organization_id: organization.to_param)
-      return [ComponentStructs::Shapes.link(translation(:search_registrations), index)] if
-        organization.enabled?("bike_search")
+      path = routes.organization_registrations_path(organization_id: organization.to_param)
+      return [ComponentStructs::Shapes.link(translation(:search_registrations), path)] if organization.enabled?("bike_search")
 
-      [ComponentStructs::Shapes.link(translation(:org_registrations_index, org_name: organization.short_name), index),
+      [ComponentStructs::Shapes.link(translation(:org_registrations_index, org_name: organization.short_name), path),
         ComponentStructs::Shapes.link(translation(:search_all_registrations),
           routes.search_registrations_path(stolenness: "all"))]
     end
