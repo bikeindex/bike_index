@@ -125,6 +125,15 @@ module SystemSpecHelpers
     end
   end
 
+  # The settings menu is where a signed-in rider's account links live, log out among them
+  def open_settings_menu = find("button[aria-label='Settings']").click
+
+  def sign_out
+    open_settings_menu
+    click_link "Log out"
+    expect(page).to have_content("Logged out")
+  end
+
   # revised/init.coffee hands the legacy form-well's selects to selectize, which hides the
   # <select> behind a control of its own -- so `select` can't reach them
   def selectize_for(selector)

@@ -33,14 +33,6 @@ RSpec.describe "Listing a registration on the marketplace", :js, type: :system d
     dismiss_donation_modal
   end
 
-  def open_settings_menu = find("button[aria-label='Settings']").click
-
-  def sign_out
-    open_settings_menu
-    click_link "Log out"
-    expect(page).to have_content("Logged out")
-  end
-
   # flaky: step 2 is typed into as soon as it hydrates, the same race register_spec carries
   # retries for - seen twice locally in ~40 runs, once as the color combobox refusing to
   # filter and once as both plain fills arriving empty. Neither CPU throttling nor holding
