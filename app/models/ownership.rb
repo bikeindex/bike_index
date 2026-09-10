@@ -118,10 +118,22 @@ class Ownership < ApplicationRecord
       ORIGIN_ENUM.keys.map(&:to_s)
     end
 
-    def origin_humanized(str)
-      return nil unless str.present?
+    # Every value creation_kind can return. It restates that method's branching, so
+    # ownership_spec checks it against what instantiating each enum value produces
+    def creation_kinds
+      (Organization.pos_kinds.select { Organization.pos?(it) } + %w[bulk_import] + origins).map(&:to_sym)
+    end
 
-      str.titleize.downcase
+    def creation_kind_humanized(creation_kind)
+      return nil unless creation_kinds.include?(creation_kind&.to_sym)
+
+      I18n.t(creation_kind, scope: %i[activerecord enums ownership creation_kind])
+    end
+
+    def creation_kind_description(creation_kind)
+      return nil unless creation_kinds.include?(creation_kind&.to_sym)
+
+      I18n.t(creation_kind, scope: %i[activerecord enums ownership creation_kind_description])
     end
 
     def current_at(time)
@@ -189,18 +201,11 @@ class Ownership < ApplicationRecord
     organization.present? && organization.direct_unclaimed_notifications?
   end
 
-  def creation_description
-    if pos?
-      pos_kind.to_s.gsub("_pos", "").humanize
-    elsif bulk?
-      "bulk import"
-    elsif origin.present?
-      return "org reg" if %w[embed_extended organization_form].include?(origin)
-      return "landing page" if origin == "embed_partial"
-      return "parking notification" if origin == "creator_unregistered_parking_notification"
+  def creation_kind
+    return pos_kind.to_sym if pos?
+    return :bulk_import if bulk?
 
-      self.class.origin_humanized(origin)
-    end
+    origin&.to_sym
   end
 
   def owner

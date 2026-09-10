@@ -14,4 +14,13 @@ RSpec.describe Admin::ExternalRegistryBikesController, type: :request do
       expect(assigns(:bikes).pluck(:id)).to eq([external_registry_bike.id])
     end
   end
+
+  describe "show" do
+    let(:external_registry_bike) { FactoryBot.create(:external_registry_bike, info_hash: {"color" => "blue"}) }
+    it "renders" do
+      get "#{base_url}/#{external_registry_bike.id}"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:show)
+    end
+  end
 end

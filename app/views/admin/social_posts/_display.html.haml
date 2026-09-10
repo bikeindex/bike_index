@@ -57,4 +57,4 @@
 %hr.mt-4
 
 %h3 Platform Response Data
-= pretty_print_json(@social_post.platform_response)
+= render UI::JsonDisplay::Component.new(data: @social_post.platform_response, no_max_height: true)

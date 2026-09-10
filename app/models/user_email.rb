@@ -99,6 +99,11 @@ class UserEmail < ActiveRecord::Base
       # Ensure we aren't somehow deleting an email
       # because it doesn't have a user_email associated with it
       user.update_attribute :email, email
+      # This is the account's address now, so a ban naming it bans the account - except a reason
+      # already banned account-wide: is_not_duplicate_ban only counts older, already-active bans
+      account_ban_reasons = user.email_bans_active.banning_account_email.pluck(:reason)
+      user.email_bans_active.where(user_email_id: id).where.not(reason: account_ban_reasons)
+        .each { |email_ban| email_ban.update(user_email_id: nil) }
     end
   end
 

@@ -23,7 +23,7 @@ module UI
         data = sample_data
         render(UI::Table::Component.new(records: [1, 2])) do |table|
           table.column(label: "Registration") { |number| "b_param #{number}" }
-          table.column(label: "Data") { |_number| render(UI::JsonDisplay::Component.new(data:, small: true, table_cell: true)) }
+          table.column(label: "Data") { |_number| render(UI::JsonDisplay::Component.new(data:, small: true, max_width: :table_cell)) }
         end
       end
 

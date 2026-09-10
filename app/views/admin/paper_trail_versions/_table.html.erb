@@ -54,11 +54,7 @@
           </td>
 
           <td>
-            <small>
-              <% if version.object_changes.present? %>
-                <small><%= pretty_print_json(version.object_changes) %></small>
-              <% end %>
-            </small>
+            <%= render UI::JsonDisplay::Component.new(data: version.object_changes, small: true, max_width: :table_cell) %>
           </td>
         </tr>
       <% end %>
