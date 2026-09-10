@@ -1,5 +1,27 @@
 <%= render(UI::Alerts::Base::Component.new(kind: alert_kind, header: heading, margin_classes: "")) do %>
-  <% if impound_claim.present? %>
+  <% if org_contact? %>
+    <p>
+      <%= translation(".contact_the_finder_to_arrange_return", bike_type: @bike.type) %>
+    </p>
+
+    <div class="tw:mt-3">
+      <%= render(UI::DefinitionList::Container::Component.new(term: :below)) do %>
+        <%= render(UI::DefinitionList::Row::Component.new(label: translation(".finder_name"), value: finder_name)) %>
+
+        <% if finder_email.present? %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".finder_email"))) do %>
+            <%= link_to(finder_email, "mailto:#{finder_email}", class: "twlink") %>
+          <% end %>
+        <% end %>
+
+        <% if finder_phone.present? %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".finder_phone"))) do %>
+            <%= render(Atoms::Phone::Component.new(phone: finder_phone)) %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  <% elsif impound_claim.present? %>
     <% if impound_claim.unsubmitted? %>
       <%= form_with(model: impound_claim, url: impound_claim_path(impound_claim), builder: BikeIndexFormBuilder, data: {controller: "csrf-refresh"}) do |form| %>
         <%# Required in the browser only - nothing server-side turns an empty claim away %>

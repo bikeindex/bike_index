@@ -54,6 +54,15 @@ module Pages
               claim_page(bike_id: impound_claim.bike_submitting_id, current_user: impound_claim.user)
             end
 
+            # A paid organization gets the finder's contact information in place of the
+            # claim, so this is the one scenario pinned to the org view
+            def org_contact
+              bike_id = claimable_impound&.bike_id
+              return missing_notice("a found registration") if bike_id.blank?
+
+              page(bike_id:, as_view: [:staff, lookbook_organization])
+            end
+
             private
 
             # Defaults to the found registration the states without a claim of their own

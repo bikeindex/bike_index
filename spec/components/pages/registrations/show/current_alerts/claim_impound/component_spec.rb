@@ -145,6 +145,33 @@ RSpec.describe Pages::Registrations::Show::CurrentAlerts::ClaimImpound::Componen
       render_inline(component)
       expect(page.native.text).to be_blank
     end
+
+    context "found e-scooter" do
+      let(:finder) { FactoryBot.create(:user_confirmed, name: "Finder Person", phone: "2223334444") }
+      let(:found_e_scooter) { FactoryBot.create(:bike, :with_ownership_claimed, user: finder, cycle_type: "e-scooter") }
+      let(:bike) { FactoryBot.create(:impound_record, bike: found_e_scooter, user: finder).bike.reload }
+
+      it "does not render for an unpaid organization" do
+        expect(bike.status_found?).to be_truthy
+        render_inline(component)
+        expect(page.native.text).to be_blank
+      end
+
+      context "paid organization" do
+        let(:organization) { FactoryBot.create(:organization, :paid) }
+
+        it "shows the finder's contact information rather than a claim" do
+          render_inline(component)
+          expect(page).to have_text("Contact the finder")
+          expect(page).to have_text("This e-scooter was registered as found")
+          expect(page).to have_text("Finder Person")
+          expect(page).to have_link(finder.email, href: "mailto:#{finder.email}")
+          expect(page).to have_link("222-333-4444", href: "tel:222-333-4444")
+          expect(page).to_not have_button("Open claim")
+          expect(page).to_not have_text("Does this look like your e-scooter?")
+        end
+      end
+    end
   end
 
   # Each scenario resolves its own viewer, so one it can't find says so rather than
