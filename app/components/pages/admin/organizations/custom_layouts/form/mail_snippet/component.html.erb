@@ -19,16 +19,9 @@
   <% end %>
 <% end %>
 
-<ul
-  id="public_images"
-  class="list-unstyled mt-4 not-blog-public-images"
-  data-order-url="<%= order_public_images_url %>"
->
-  <% if @mail_snippet.public_images %>
-    <%= render partial: "public_images/admin_public_image", collection: @mail_snippet.public_images, as: :public_image, locals: {skip_order: true} %>
-  <% end %>
-</ul>
-
-<section class="custom-layouts">
-  <%= render partial: "public_images/admin_new_form", locals: {imageable_type: "MailSnippet"} %>
-</section>
+<%= render(UI::Forms::FileUploadMulti::Component.new(url: public_images_path, file_param: "public_image[image]",
+      params: {mail_snippet_id: @mail_snippet.id}, accept: ImageUploader.permitted_extensions,
+      list_html_options: {id: "public_images", class: "list-unstyled mt-4 not-blog-public-images",
+        data: {order_url: order_public_images_url}})) do %>
+  <%= render partial: "public_images/admin_public_image", collection: @mail_snippet.public_images, as: :public_image, locals: {skip_order: true} %>
+<% end %>

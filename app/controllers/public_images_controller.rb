@@ -29,7 +29,7 @@ class PublicImagesController < ApplicationController
         @public_image.imageable = current_organization
       end
       @public_image.save
-      render(json: {public_image: @public_image}) && return
+      render(json: admin_image_json, status: @public_image.persisted? ? :ok : :unprocessable_entity) && return
     end
     flash[:error] = translation(:cannot_create)
     redirect_to @public_image.present? ? @public_image.imageable : user_root_url
@@ -91,6 +91,15 @@ class PublicImagesController < ApplicationController
 
   protected
 
+  # What UI::Forms::FileUploadMulti appends to its list -- rendered here rather than built in
+  # JS, so the item an upload adds is the same markup as the ones the page loaded with
+  def admin_image_json
+    return {error: @public_image.errors.full_messages.to_sentence} unless @public_image.persisted?
+
+    {html: render_to_string(partial: "public_images/admin_public_image",
+      locals: {public_image: @public_image, skip_order: @public_image.imageable_type != "Blog"})}
+  end
+
   def ensure_authorized_to_create!
     if params[:bike_id].present?
       @bike = if params[:imageable_type] == "BikeVersion"
@@ -118,11 +127,7 @@ class PublicImagesController < ApplicationController
   end
 
   def permitted_parameters
-    if params[:upload_plugin] == "uppy"
-      {image: params[:file], name: params[:name]}
-    else
-      params.require(:public_image).permit(:image, :name, :imageable, :listing_order, :remote_image_url, :is_private)
-    end
+    params.require(:public_image).permit(:image, :name, :imageable, :listing_order, :remote_image_url, :is_private)
   end
 
   def ensure_authorized_to_update!

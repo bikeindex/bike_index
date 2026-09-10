@@ -41,8 +41,7 @@
 
 - unless @blog.is_listicle
   .mt-4#blog-image-form
-    %ul.row.list-unstyled#public_images{ :"data-order-url" => order_public_images_url }
-      - if @blog.public_images
-        = render partial: "public_images/admin_public_image", collection: @blog.public_images, as: :public_image
-  %section.mt-2
-    = render partial: "/public_images/admin_new_form", locals: { imageable_type: 'Blog', admin: true }
+    = render(UI::Forms::FileUploadMulti::Component.new(url: public_images_path, file_param: "public_image[image]",
+      params: { blog_id: @blog.id }, accept: ImageUploader.permitted_extensions,
+      list_html_options: { id: "public_images", class: "row list-unstyled", data: { order_url: order_public_images_url } })) do
+      = render partial: "public_images/admin_public_image", collection: @blog.public_images, as: :public_image

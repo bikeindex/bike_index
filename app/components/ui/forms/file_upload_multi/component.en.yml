@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    ui:
+      forms:
+        file_upload_multi:
+          or_drag_and_drop: or drag and drop
+          upload: Upload
+          upload_failed: upload failed
+          uploading: uploading
