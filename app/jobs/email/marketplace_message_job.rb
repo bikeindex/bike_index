@@ -24,7 +24,7 @@ module Email
       return if notification.delivery_success?
 
       delivery = nil
-      notification.track_email_delivery do
+      Notification.track_email_delivery(notification) do
         delivery = if likely_spam
           AdminMailer.blocked_marketplace_message_email(marketplace_message).deliver_now
         else

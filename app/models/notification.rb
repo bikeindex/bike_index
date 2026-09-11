@@ -142,28 +142,37 @@ class Notification < ApplicationRecord
         .or(where(notifiable_type: "CustomerContact", notifiable_id: customer_contact_ids))
         .or(where(notifiable_type: "StolenNotification", notifiable_id: stolen_notification_ids))
     end
-  end
 
-  def track_email_delivery(is_new_email_address: false)
-    return if delivery_success?
+    def track_email_delivery(notification, is_new_email_address: false)
+      return if notification.delivery_success?
 
-    user_email = self.user_email
+      user_email = notification.user_email
 
-    return update(delivery_status: "delivery_banned") if delivery_email_banned?(user_email, is_new_email_address)
+      return notification.update(delivery_status: "delivery_banned") if delivery_email_banned?(notification, user_email, is_new_email_address)
 
-    # Only the send is rescued - a ban evaluation that blows up hasn't failed to deliver anything
-    begin
-      delivery = yield
+      # Only the send is rescued - a ban evaluation that blows up hasn't failed to deliver anything
+      begin
+        delivery = yield
 
-      update(delivery_status: "delivery_success", message_id: message_id || delivery.try(:message_id))
-      user_email&.update_last_email_errored!(email_errored: false)
-    rescue => e
-      update(delivery_status: "delivery_failure", delivery_error: e.class)
-      # Postmark refuses the address itself once it's deactivated, so last_email_errored
-      # doesn't block anything - it's recorded to show why the emails stopped arriving
-      user_email&.update_last_email_errored!(email_errored: true)
+        notification.update(delivery_status: "delivery_success",
+          message_id: notification.message_id || delivery.try(:message_id))
+        user_email&.update_last_email_errored!(email_errored: false)
+      rescue => e
+        notification.update(delivery_status: "delivery_failure", delivery_error: e.class)
+        # Postmark refuses the address itself once it's deactivated, so last_email_errored
+        # doesn't block anything - it's recorded to show why the emails stopped arriving
+        user_email&.update_last_email_errored!(email_errored: true)
 
-      raise e unless UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
+        raise e unless UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
+      end
+    end
+
+    private
+
+    def delivery_email_banned?(notification, user_email, is_new_email_address)
+      return false if email_ban_exempt_kinds.include?(notification.kind)
+
+      EmailBan.ban?(notification.user, user_email:, is_new_email_address:)
     end
   end
 
@@ -272,12 +281,6 @@ class Notification < ApplicationRecord
   end
 
   private
-
-  def delivery_email_banned?(user_email, is_new_email_address)
-    return false if self.class.email_ban_exempt_kinds.include?(kind)
-
-    EmailBan.ban?(user, user_email:, is_new_email_address:)
-  end
 
   def calculated_phone
     notifiable&.phone
