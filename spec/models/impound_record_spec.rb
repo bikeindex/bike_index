@@ -436,6 +436,47 @@ RSpec.describe ImpoundRecord, type: :model do
     end
   end
 
+  describe "contactable_without_claiming?" do
+    let(:impound_record) { FactoryBot.create(:impound_record) }
+    let(:organization_role) { FactoryBot.create(:organization_role_claimed) }
+    let(:contactable_user) { organization_role.user }
+    let(:contactable_organization) { organization_role.organization }
+
+    it "is false without a user, and for a user whose organization qualifies on nothing" do
+      expect(impound_record.contactable_without_claiming?).to be_falsey
+      expect(impound_record.contactable_without_claiming?(FactoryBot.create(:user_confirmed))).to be_falsey
+      expect(contactable_organization.reload.paid?).to be_falsey
+      expect(impound_record.contactable_without_claiming?(contactable_user)).to be_falsey
+    end
+
+    context "organization has unstolen_notifications" do
+      before { contactable_organization.update_attribute :enabled_feature_slugs, ["unstolen_notifications"] }
+
+      it "is true" do
+        expect(impound_record.contactable_without_claiming?(contactable_user.reload)).to be_truthy
+      end
+    end
+
+    # paid_money is a wider allowance than the feature - an organization can be paid
+    # without having bought unstolen_notifications
+    context "organization is paid" do
+      before { contactable_organization.update_attribute :is_paid, true }
+
+      it "is true, without the unstolen_notifications feature" do
+        expect(contactable_organization.reload.enabled?("unstolen_notifications")).to be_falsey
+        expect(impound_record.contactable_without_claiming?(contactable_user.reload)).to be_truthy
+      end
+    end
+
+    context "organization is an ambassador organization" do
+      before { contactable_organization.update_attribute :kind, "ambassador" }
+
+      it "is true" do
+        expect(impound_record.contactable_without_claiming?(contactable_user.reload)).to be_truthy
+      end
+    end
+  end
+
   describe "notification_notes_and_messages" do
     # This method is relevant because PSU puts serials into the notes from the parking notifications
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }

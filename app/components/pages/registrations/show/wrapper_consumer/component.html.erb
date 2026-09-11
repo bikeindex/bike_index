@@ -66,6 +66,7 @@
   </div>
 
   <%= render(Pages::Registrations::Show::ContactOwner::Component.new(bike: @bike, current_user: @current_user, owner: @owner)) %>
+  <%= render(Pages::Registrations::Show::ContactImpound::Component.new(bike: @bike, current_user: @current_user, owner: @owner)) %>
 
   <%= render(Pages::Registrations::Show::StolenDetails::Component.new(bike: @bike, current_user: @current_user)) %>
   <%= render(Pages::Registrations::Show::ImpoundDetails::Component.new(bike: @bike)) %>

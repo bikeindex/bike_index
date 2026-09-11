@@ -566,6 +566,38 @@ RSpec.describe Bike, type: :model do
       end
     end
 
+    # A paid organization can reach whoever holds an impounded vehicle without having
+    # bought unstolen_notifications - which is the only thing that would let them
+    # message an ordinary registration
+    context "impounded bike, paid org without unstolen_notifications" do
+      let(:bike) { FactoryBot.create(:bike, :impounded, :with_ownership_claimed, user: owner) }
+      let(:owner) { FactoryBot.create(:user_confirmed, phone: "831289423") }
+      let(:organization_role) { FactoryBot.create(:organization_role_claimed) }
+      let(:user) { organization_role.user }
+      let(:organization) { organization_role.organization }
+
+      it "is contactable and phoneable once the org is paid" do
+        expect(bike.reload.status_found?).to be_truthy
+        expect(user.reload.enabled?("unstolen_notifications", no_superuser_override: true)).to be_falsey
+        expect(bike.contact_owner?(user)).to be_falsey
+        expect(bike.phoneable_by?(user)).to be_falsey
+
+        organization.update_attribute :is_paid, true
+
+        expect(bike.contact_owner?(user.reload)).to be_truthy
+        expect(bike.phoneable_by?(user)).to be_truthy
+      end
+
+      # The owner's opt-out still wins - the allowance is about which organizations may
+      # ask, not about overriding the answer
+      it "respects notification_unstolen" do
+        organization.update_attribute :is_paid, true
+        owner.update(notification_unstolen: false)
+
+        expect(bike.reload.contact_owner?(user.reload)).to be_falsey
+      end
+    end
+
     context "stolen" do
       let(:stolen_record) { StolenRecord.new(phone: "7883747392", phone_for_users: false, phone_for_shops: false, phone_for_police: false) }
       let(:bike) { Bike.new(current_stolen_record: stolen_record) }

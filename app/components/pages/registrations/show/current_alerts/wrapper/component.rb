@@ -38,8 +38,7 @@ module Pages
                 ScannedSticker::Component.new(bike: @bike, bike_sticker: @bike_sticker, current_user: @current_user),
                 SentToNewOwner::Component.new(bike: @bike, owner: @owner),
                 ClaimImpound::Component.new(bike: @bike, current_user: @current_user, owner: @owner,
-                  organization: @organization),
-                FinderContact::Component.new(bike: @bike, organization: @organization)
+                  organization: @organization)
               ]
             end
           end

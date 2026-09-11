@@ -611,6 +611,9 @@ class Bike < ApplicationRecord
     return false unless u.present?
     return true if status_stolen? && current_stolen_record.present?
     return false unless owner&.notification_unstolen
+    # Reaching whoever holds an impounded vehicle is a wider allowance than the
+    # unstolen_notifications feature, and applies whichever organization is passed
+    return true if current_impound_record&.contactable_without_claiming?(u)
     return u.enabled?("unstolen_notifications") unless organization.present? # Passed organization overrides user setting to speed stuff up
 
     organization.enabled?("unstolen_notifications") && u.member_of?(organization)

@@ -1,0 +1,15 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          contact_impound:
+            contact_the_finder: Contact the finder
+            contact_the_owner: Contact the owner
+            know_who_has_this_bike_type: Know who has this %{bike_type}?
+            link_url: Link url
+            send_message: Send message
+            what_do_you_need_to_ask: >-
+              What do you need to ask about this %{bike_type}? Include a link in the
+              field below if there's one that helps
