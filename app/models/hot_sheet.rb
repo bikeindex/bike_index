@@ -20,9 +20,9 @@
 #  index_hot_sheets_on_organization_id  (organization_id)
 #
 class HotSheet < ApplicationRecord
-  # A part-delivered batch has no equivalent on Notification, which is one address
-  DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2,
-                          delivery_partial_success: 3}.freeze
+  include EmailDeliveryTrackable
+
+  DELIVERY_STATUS_ENUM = Notification::DELIVERY_STATUS_ENUM
   DELIVERED_STATUSES = %w[delivery_success delivery_partial_success].freeze
   # Resending a batch every address on it rejected just fails the same way
   UNDELIVERABLE_ERROR_NAMES = Notification::UNDELIVERABLE_ERRORS.map(&:name).freeze
@@ -56,19 +56,6 @@ class HotSheet < ApplicationRecord
   # A settled batch isn't worth sending again - it delivered, or its addresses are dead
   def settled?
     DELIVERED_STATUSES.include?(delivery_status) || UNDELIVERABLE_ERROR_NAMES.include?(delivery_error)
-  end
-
-  # Takes a block. Unlike Notification's, returns the error rather than raising it -
-  # the job delivers every batch before blowing up
-  def track_email_delivery
-    return if settled?
-
-    delivery = yield
-    update(delivery_status: "delivery_success", message_id: message_id || delivery.try(:message_id))
-    nil
-  rescue => e
-    record_delivery_failure(e)
-    undeliverable_error?(e) ? nil : e
   end
 
   def subject
@@ -117,8 +104,18 @@ class HotSheet < ApplicationRecord
 
   private
 
-  # A sheet emails a whole batch at once, so only the addresses Postmark rejected failed
-  def record_delivery_failure(error)
+  def delivery_settled?
+    settled?
+  end
+
+  # A sheet emails a batch of addresses, and a ban covers one - so nothing is checked here
+  def delivery_email_banned?(_is_new_email_address)
+    false
+  end
+
+  # A sheet emails a whole batch at once, so only the addresses Postmark rejected failed.
+  # Returns the error rather than raising it - the job delivers every batch before blowing up
+  def handle_email_delivery_error(error)
     # Postmark delivers to the rest of the batch, whether or not it names who it rejected;
     # any other error leaves no way to tell who received the email
     inactive_recipient_error = error.is_a?(Postmark::InactiveRecipientError)
@@ -127,6 +124,8 @@ class HotSheet < ApplicationRecord
     update(delivery_status: delivered_any ? "delivery_partial_success" : "delivery_failure",
       delivery_error: error.class)
     UserEmail.where(email: failed_emails).each { it.update_last_email_errored!(email_errored: true) }
+
+    undeliverable_error?(error) ? nil : error
   end
 
   def normalized_emails(emails)

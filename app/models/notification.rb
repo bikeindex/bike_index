@@ -29,6 +29,8 @@
 #
 
 class Notification < ApplicationRecord
+  include EmailDeliveryTrackable
+
   # TODO: create notifications for every email we send (including other models, e.g. Feedback)
   #
   # Every single notification that we send has a separate enum key - which is a lot!
@@ -36,7 +38,8 @@ class Notification < ApplicationRecord
   KIND_ENUM = YAML.load_file(Rails.root.join("config/notification_kinds_enums.yml")).freeze
 
   MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
-  DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2, delivery_banned: 3}.freeze
+  DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2,
+                          delivery_banned: 3, delivery_partial_success: 4}.freeze
 
   UNDELIVERABLE_ERRORS = [Postmark::InactiveRecipientError, Postmark::InvalidEmailRequestError].freeze
 
@@ -144,29 +147,6 @@ class Notification < ApplicationRecord
     end
   end
 
-  def track_email_delivery(is_new_email_address: false)
-    return if delivery_success?
-
-    user_email = self.user_email
-
-    return update(delivery_status: "delivery_banned") if delivery_email_banned?(user_email, is_new_email_address)
-
-    # Only the send is rescued - a ban evaluation that blows up hasn't failed to deliver anything
-    begin
-      delivery = yield
-
-      update(delivery_status: "delivery_success", message_id: message_id || delivery.try(:message_id))
-      user_email&.update_last_email_errored!(email_errored: false)
-    rescue => e
-      update(delivery_status: "delivery_failure", delivery_error: e.class)
-      # Postmark refuses the address itself once it's deactivated, so last_email_errored
-      # doesn't block anything - it's recorded to show why the emails stopped arriving
-      user_email&.update_last_email_errored!(email_errored: true)
-
-      raise e unless UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
-    end
-  end
-
   def theft_alert?
     self.class.theft_alert_kinds.include?(kind)
   end
@@ -208,7 +188,7 @@ class Notification < ApplicationRecord
   def user_email
     return nil unless email?
 
-    user&.user_emails&.friendly_find(message_channel_target)
+    @user_email ||= user&.user_emails&.friendly_find(message_channel_target)
   end
 
   def notifiable_display_name
@@ -273,10 +253,28 @@ class Notification < ApplicationRecord
 
   private
 
-  def delivery_email_banned?(user_email, is_new_email_address)
+  def delivery_settled?
+    delivery_success?
+  end
+
+  def delivery_email_banned?(is_new_email_address)
     return false if self.class.email_ban_exempt_kinds.include?(kind)
 
     EmailBan.ban?(user, user_email:, is_new_email_address:)
+  end
+
+  def handle_email_delivery_success(delivery)
+    super
+    user_email&.update_last_email_errored!(email_errored: false)
+  end
+
+  def handle_email_delivery_error(error)
+    update(delivery_status: "delivery_failure", delivery_error: error.class)
+    # Postmark refuses the address itself once it's deactivated, so last_email_errored
+    # doesn't block anything - it's recorded to show why the emails stopped arriving
+    user_email&.update_last_email_errored!(email_errored: true)
+
+    raise error unless UNDELIVERABLE_ERRORS.any? { |error_class| error.is_a?(error_class) }
   end
 
   def calculated_phone
