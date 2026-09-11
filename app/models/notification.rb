@@ -148,7 +148,7 @@ class Notification < ApplicationRecord
 
       user_email = notification.user_email
 
-      return notification.update(delivery_status: "delivery_banned") if delivery_email_banned?(notification, user_email, is_new_email_address)
+      return notification.update(delivery_status: "delivery_banned") if delivery_email_banned?(notification, user_email:, is_new_email_address:)
 
       # Only the send is rescued - a ban evaluation that blows up hasn't failed to deliver anything
       begin
@@ -169,7 +169,7 @@ class Notification < ApplicationRecord
 
     private
 
-    def delivery_email_banned?(notification, user_email, is_new_email_address)
+    def delivery_email_banned?(notification, user_email:, is_new_email_address:)
       return false if email_ban_exempt_kinds.include?(notification.kind)
 
       EmailBan.ban?(notification.user, user_email:, is_new_email_address:)
