@@ -61,8 +61,9 @@ RSpec.describe SharedBlocks::Navbar::Wrapper::Component, type: :component do
     # The cached fragment must include the locale in its key, or a request in
     # one language serves the navbar cached in another. See ApplicationComponentHelper#cache.
     it "varies the cached fragment by locale" do
-      en = with_request_url("/") { render_inline(instance) }.to_html
-      nl = I18n.with_locale(:nl) { with_request_url("/") { render_inline(instance) } }.to_html
+      render_navbar = -> { with_request_url("/") { render_inline(described_class.new) }.to_html }
+      en = render_navbar.call
+      nl = I18n.with_locale(:nl) { render_navbar.call }
       expect(en).to include("Stolen bike?")
       expect(nl).to_not include("Stolen bike?")
     end
