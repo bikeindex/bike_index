@@ -26,7 +26,7 @@ class ProcessHotSheetJob < ScheduledJob
     sheet_date = Time.current.to_date
     day_sheets = HotSheet.where(organization_id: org_id, sheet_date:).order(:id).to_a
     day_sheets = [HotSheet.create!(organization_id: org_id, sheet_date:)] if day_sheets.none?
-    return day_sheets if day_sheets.all?(&:settled?)
+    return day_sheets if day_sheets.all?(&:delivery_settled?)
 
     hot_sheet = day_sheets.first
 
@@ -54,5 +54,8 @@ class ProcessHotSheetJob < ScheduledJob
     hot_sheet.track_email_delivery do
       OrganizedMailer.hot_sheet(hot_sheet).deliver_now if hot_sheet.recipient_ids.any?
     end
+    nil
+  rescue => e
+    e
   end
 end

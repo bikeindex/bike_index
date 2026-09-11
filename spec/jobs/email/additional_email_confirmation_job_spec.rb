@@ -34,7 +34,6 @@ RSpec.describe Email::AdditionalEmailConfirmationJob, type: :job do
       notification = Notification.last
       expect(notification.delivery_status).to eq "delivery_failure"
       expect(notification.delivery_error).to eq "Postmark::InactiveRecipientError"
-      expect(notification.user_email&.id).to eq user_email.id
       expect(user_email.reload.last_email_errored).to be_truthy
       expect(EmailBan.ban?(user_email.user, user_email:)).to be_falsey
     end

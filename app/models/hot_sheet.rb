@@ -22,12 +22,7 @@
 class HotSheet < ApplicationRecord
   include EmailDeliveryTrackable
 
-  DELIVERY_STATUS_ENUM = Notification::DELIVERY_STATUS_ENUM
-  DELIVERED_STATUSES = %w[delivery_success delivery_partial_success].freeze
-  # Resending a batch every address on it rejected just fails the same way
-  UNDELIVERABLE_ERROR_NAMES = Notification::UNDELIVERABLE_ERRORS.map(&:name).freeze
-
-  enum :delivery_status, DELIVERY_STATUS_ENUM
+  enum :delivery_status, Notification::DELIVERY_STATUS_ENUM
 
   belongs_to :organization
 
@@ -36,9 +31,6 @@ class HotSheet < ApplicationRecord
   validates_presence_of :organization_id, :sheet_date
 
   delegate :bounding_box, :timezone, to: :hot_sheet_configuration, allow_nil: true
-  scope :delivered, -> { where(delivery_status: DELIVERED_STATUSES) }
-  scope :undeliverable, -> { where(delivery_error: UNDELIVERABLE_ERROR_NAMES) }
-  scope :settled, -> { delivered.or(undeliverable) }
 
   def self.for(organization_or_id, date = nil)
     org_id = organization_or_id.is_a?(Integer) ? organization_or_id : organization_or_id.id
@@ -51,11 +43,6 @@ class HotSheet < ApplicationRecord
 
   def current?
     sheet_date.blank?
-  end
-
-  # A settled batch isn't worth sending again - it delivered, or its addresses are dead
-  def settled?
-    DELIVERED_STATUSES.include?(delivery_status) || UNDELIVERABLE_ERROR_NAMES.include?(delivery_error)
   end
 
   def subject
@@ -104,36 +91,8 @@ class HotSheet < ApplicationRecord
 
   private
 
-  def delivery_settled?
-    settled?
-  end
-
-  # A sheet emails a batch of addresses, and a ban covers one - so nothing is checked here
-  def delivery_email_banned?(_is_new_email_address)
-    false
-  end
-
-  # A sheet emails a whole batch at once, so only the addresses Postmark rejected failed.
-  # Returns the error rather than raising it - the job delivers every batch before blowing up
-  def handle_email_delivery_error(error)
-    # Postmark delivers to the rest of the batch, whether or not it names who it rejected;
-    # any other error leaves no way to tell who received the email
-    inactive_recipient_error = error.is_a?(Postmark::InactiveRecipientError)
-    failed_emails = inactive_recipient_error ? normalized_emails(error.recipients) : []
-    delivered_any = inactive_recipient_error && (recipient_emails - failed_emails).any?
-    update(delivery_status: delivered_any ? "delivery_partial_success" : "delivery_failure",
-      delivery_error: error.class)
-    UserEmail.where(email: failed_emails).each { it.update_last_email_errored!(email_errored: true) }
-
-    undeliverable_error?(error) ? nil : error
-  end
-
-  def normalized_emails(emails)
-    emails.map { EmailNormalizer.normalize(it) }
-  end
-
-  def undeliverable_error?(error)
-    UNDELIVERABLE_ERROR_NAMES.include?(error.class.name)
+  def recipient_users
+    fetch_recipients
   end
 
   def calculated_stolen_records

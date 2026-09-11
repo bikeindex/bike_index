@@ -17,7 +17,7 @@ RSpec.describe HotSheet, type: :model do
   end
 
   describe "track_email_delivery" do
-    let(:hot_sheet) { FactoryBot.create(:hot_sheet) }
+    let(:hot_sheet) { FactoryBot.create(:hot_sheet, recipient_ids: []) }
 
     it "records the success, and doesn't deliver a second time" do
       expect(hot_sheet.reload.delivery_status).to eq "delivery_pending"
@@ -34,8 +34,8 @@ RSpec.describe HotSheet, type: :model do
 
     context "with an unknown postmark error" do
       let(:api_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 499}) }
-      it "records the failure and returns the error for the job to raise" do
-        expect(hot_sheet.track_email_delivery { raise api_error }).to eq api_error
+      it "records the failure and raises" do
+        expect { hot_sheet.track_email_delivery { raise api_error } }.to raise_error(Postmark::ApiInputError)
         expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
         expect(hot_sheet.delivery_error).to eq "Postmark::ApiInputError"
         expect(hot_sheet.delivery_success?).to be_falsey
@@ -50,10 +50,35 @@ RSpec.describe HotSheet, type: :model do
         expect(hot_sheet.delivery_error).to eq "Postmark::InvalidEmailRequestError"
         # There is no way to tell which of the batch failed, so nobody is flagged
         expect(UserEmail.last_email_errored.count).to eq 0
-        expect(hot_sheet.settled?).to be_truthy
+        expect(hot_sheet.delivery_settled?).to be_truthy
         deliveries = 0
         hot_sheet.track_email_delivery { deliveries += 1 }
         expect(deliveries).to eq 0
+      end
+    end
+
+    context "with banned recipients" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:users) { Array.new(2) { FactoryBot.create(:organization_role_claimed, organization:).user } }
+      let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization:, recipient_ids: users.map(&:id)) }
+      let(:banned_users) { users }
+      before { banned_users.each { FactoryBot.create(:email_ban, user: it, reason: :honeypot) } }
+
+      it "doesn't deliver" do
+        deliveries = 0
+        hot_sheet.track_email_delivery { deliveries += 1 }
+        expect(deliveries).to eq 0
+        expect(hot_sheet.reload.delivery_status).to eq "delivery_banned"
+      end
+
+      context "with only some banned" do
+        let(:banned_users) { users.first(1) }
+        it "delivers" do
+          deliveries = 0
+          hot_sheet.track_email_delivery { deliveries += 1 }
+          expect(deliveries).to eq 1
+          expect(hot_sheet.reload.delivery_status).to eq "delivery_success"
+        end
       end
     end
 
@@ -82,7 +107,7 @@ RSpec.describe HotSheet, type: :model do
         expect(hot_sheet.delivery_success?).to be_falsey
         expect(UserEmail.last_email_errored.pluck(:email)).to eq(inactive_emails)
         # ... so the batch isn't worth sending again
-        expect(hot_sheet.settled?).to be_truthy
+        expect(hot_sheet.delivery_settled?).to be_truthy
         deliveries = 0
         hot_sheet.track_email_delivery { deliveries += 1 }
         expect(deliveries).to eq 0

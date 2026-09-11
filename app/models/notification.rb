@@ -40,6 +40,7 @@ class Notification < ApplicationRecord
   MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
   DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2,
                           delivery_banned: 3, delivery_partial_success: 4}.freeze
+  DELIVERED_STATUSES = %w[delivery_success delivery_partial_success].freeze
 
   UNDELIVERABLE_ERRORS = [Postmark::InactiveRecipientError, Postmark::InvalidEmailRequestError].freeze
 
@@ -62,8 +63,6 @@ class Notification < ApplicationRecord
   scope :theft_survey, -> { where(kind: theft_survey_kinds) }
   scope :admin, -> { where(kind: admin_kinds) }
   scope :with_message_id, -> { where.not(message_id: nil) }
-  # A send we blocked is as undelivered as one postmark refused
-  scope :delivery_failed, -> { where(delivery_status: %w[delivery_failure delivery_banned]) }
 
   class << self
     def kinds
@@ -185,12 +184,6 @@ class Notification < ApplicationRecord
     Integrations::Twilio.new.get_message(twilio_sid)
   end
 
-  def user_email
-    return nil unless email?
-
-    @user_email ||= user&.user_emails&.friendly_find(message_channel_target)
-  end
-
   def notifiable_display_name
     return nil if notifiable.blank?
 
@@ -253,28 +246,16 @@ class Notification < ApplicationRecord
 
   private
 
-  def delivery_settled?
-    delivery_success?
+  def email_ban_exempt?
+    self.class.email_ban_exempt_kinds.include?(kind)
   end
 
-  def delivery_email_banned?(is_new_email_address)
-    return false if self.class.email_ban_exempt_kinds.include?(kind)
-
-    EmailBan.ban?(user, user_email:, is_new_email_address:)
+  def recipient_users
+    [user].compact
   end
 
-  def handle_email_delivery_success(delivery)
-    super
-    user_email&.update_last_email_errored!(email_errored: false)
-  end
-
-  def handle_email_delivery_error(error)
-    update(delivery_status: "delivery_failure", delivery_error: error.class)
-    # Postmark refuses the address itself once it's deactivated, so last_email_errored
-    # doesn't block anything - it's recorded to show why the emails stopped arriving
-    user_email&.update_last_email_errored!(email_errored: true)
-
-    raise error unless UNDELIVERABLE_ERRORS.any? { |error_class| error.is_a?(error_class) }
+  def recipient_emails
+    [message_channel_target].compact
   end
 
   def calculated_phone
