@@ -12,6 +12,8 @@ FactoryBot.define do
 
       after(:create) do |invoice, _evaluator|
         FactoryBot.create(:payment, amount_cents: invoice.amount_due_cents, invoice: invoice)
+        # In production UpdateOrganizationAssociationsJob does this, so paid_money is set
+        invoice.organization.update(updated_at: Time.current)
       end
     end
   end
