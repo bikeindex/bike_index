@@ -5,11 +5,15 @@ RSpec.describe MarketplaceShipping::Quote do
     let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale) }
     let(:base_url) { Integrations::BikeFlights::Client::BASE_URL }
     let(:rate_requests) { [] }
+    let(:destination) do
+      {address1: "278 Broadway", city: "New York", region: "NY",
+       postal_code: "10007", country_iso: "US"}
+    end
 
     before do
       Rails.cache.clear
       WebMock.stub_request(:post, "#{base_url}/api/Authentication/login")
-        .to_return(status: 200, body: {token: "jwt"}.to_json,
+        .to_return(status: 200, body: {token: "jwt", expiration: 8.hours.from_now.iso8601(3)}.to_json,
           headers: {"Content-Type" => "application/json"})
       WebMock.stub_request(:post, "#{base_url}/api/ShopRate").to_return do |request|
         rate_requests << request
@@ -21,72 +25,75 @@ RSpec.describe MarketplaceShipping::Quote do
     after { WebMock.reset! }
 
     it "returns the rate, and asks for it once" do
-      result = described_class.for_listing(marketplace_listing, postal_code: "80302")
-      described_class.for_listing(marketplace_listing, postal_code: "80302")
+      result = described_class.for_listing(marketplace_listing, destination:)
+      described_class.for_listing(marketplace_listing, destination:)
 
       expect(result[:requestId]).to eq "req-1"
       expect(result[:rates].first[:total]).to eq 92.5
       expect(rate_requests.count).to eq 1
     end
 
+    # The bug this catches is a cache key that ignores the destination, quoting a New York
+    # price to a Portland buyer
     it "re-quotes for a different destination" do
-      described_class.for_listing(marketplace_listing, postal_code: "80302")
-      described_class.for_listing(marketplace_listing, postal_code: "97202")
+      described_class.for_listing(marketplace_listing, destination:)
+      described_class.for_listing(marketplace_listing,
+        destination: destination.merge(postal_code: "97202", city: "Portland", region: "OR"))
 
       expect(rate_requests.count).to eq 2
     end
 
-    it "sends the estimated package and the listing price" do
-      described_class.for_listing(marketplace_listing, postal_code: "80302")
+    it "sends the seller's address as the origin, and the estimated package" do
+      described_class.for_listing(marketplace_listing, destination:)
 
       body = JSON.parse(rate_requests.first.body)
-      expect(body.dig("destination", "postalCode")).to eq "80302"
-      expect(body["packages"].first).to include("length" => 45, "weight_pounds" => 45,
-        "value" => marketplace_listing.amount)
+      address_record = marketplace_listing.address_record
+      expect(body.dig("stage", "from")).to include(
+        "address1" => address_record.street,
+        "postalCode" => address_record.postal_code,
+        # region rather than region_string, which is nil for every US address
+        "stateCode" => address_record.region
+      )
+      expect(body.dig("stage", "to", "postalCode")).to eq "10007"
+      expect(body["packages"].first).to include("length" => 45, "weight" => 45,
+        "linearUnit" => "IN", "value" => marketplace_listing.amount)
     end
 
-    context "bikeflights errors" do
-      it "returns nil rather than raising, and doesn't cache the failure" do
-        WebMock.stub_request(:post, "#{base_url}/api/ShopRate").to_return(status: 500, body: "boom")
+    context "the destination has no street address" do
+      it "doesn't call out - BikeFlights won't rate without one" do
+        expect(described_class.for_listing(marketplace_listing,
+          destination: destination.merge(address1: nil))).to be_nil
+        expect(rate_requests.count).to eq 0
+      end
+    end
 
-        expect(described_class.for_listing(marketplace_listing, postal_code: "80302")).to be_nil
+    context "a listing that can't ship" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, propulsion_type: "throttle") }
+      let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :for_sale, item: bike) }
 
+      it "doesn't call out" do
+        expect(described_class.for_listing(marketplace_listing, destination:)).to be_nil
+        expect(rate_requests.count).to eq 0
+      end
+    end
+
+    context "BikeFlights is down" do
+      before do
         WebMock.stub_request(:post, "#{base_url}/api/ShopRate")
-          .to_return(status: 200, body: {requestId: "req-2"}.to_json,
-            headers: {"Content-Type" => "application/json"})
-        expect(described_class.for_listing(marketplace_listing, postal_code: "80302")[:requestId])
+          .to_return(status: 500, body: "nope")
+      end
+
+      # A listing page without a shipping estimate beats one that errors
+      it "returns nil rather than raising, and doesn't cache the failure" do
+        expect(described_class.for_listing(marketplace_listing, destination:)).to be_nil
+
+        WebMock.stub_request(:post, "#{base_url}/api/ShopRate").to_return do |request|
+          rate_requests << request
+          {status: 200, body: {requestId: "req-2"}.to_json,
+           headers: {"Content-Type" => "application/json"}}
+        end
+        expect(described_class.for_listing(marketplace_listing, destination:)[:requestId])
           .to eq "req-2"
-      end
-    end
-
-    context "bikeflights times out" do
-      it "returns nil" do
-        WebMock.stub_request(:post, "#{base_url}/api/ShopRate").to_timeout
-
-        expect(described_class.for_listing(marketplace_listing, postal_code: "80302")).to be_nil
-      end
-    end
-
-    context "not shippable" do
-      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, cycle_type: "cargo") }
-      let(:marketplace_listing) { FactoryBot.create(:marketplace_listing, item: bike) }
-
-      it "returns nil without asking for a rate" do
-        expect(described_class.for_listing(marketplace_listing, postal_code: "80302")).to be_nil
-        expect(rate_requests.count).to eq 0
-      end
-    end
-
-    context "no postal code" do
-      it "returns nil without asking for a rate" do
-        expect(described_class.for_listing(marketplace_listing, postal_code: nil)).to be_nil
-        expect(rate_requests.count).to eq 0
-      end
-    end
-
-    context "no listing" do
-      it "returns nil" do
-        expect(described_class.for_listing(nil, postal_code: "80302")).to be_nil
       end
     end
   end
