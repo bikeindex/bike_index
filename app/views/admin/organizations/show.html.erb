@@ -39,6 +39,6 @@
     <%= link_to "Un-Delete organization", admin_recover_organization_path(id: @organization.id), data: {confirm: "Are you sure?"}, class: "btn btn-outline-warning" %>
   <% else %>
     <%= render(UI::ButtonLink::Component.new(text: "Delete", href: admin_organization_url(@organization), method: :delete, color: :error,
-          form: {onsubmit: "return confirm('#{j "Are you sure?"}')"})) %>
+          confirm: "Are you sure?")) %>
   <% end %>
 </div>

@@ -84,6 +84,16 @@ module UI
         render(UI::ButtonLink::Component.new(text: "Delete", href: "#", color: :error, method: :delete))
       end
 
+      # @label button_to with confirm
+      def button_to_confirm
+        render(UI::ButtonLink::Component.new(text: "Delete", href: "#", color: :error, method: :delete, confirm: "Are you sure? It can't be undone"))
+      end
+
+      # A confirm on a plain link guards the navigation, so the href has to go somewhere
+      def link_confirm
+        render(UI::ButtonLink::Component.new(text: "Read the terms", href: "/terms", confirm: "Leave this page?"))
+      end
+
       # @label button_to disabled
       def button_to_disabled
         render(UI::ButtonLink::Component.new(text: "Follow", href: "#", color: :primary, method: :post, disabled: true))

@@ -200,7 +200,7 @@
 
     <% unless @bike.deleted? %>
       <%= render(UI::ButtonLink::Component.new(text: "Delete #{@bike.type}", href: admin_bike_url(@bike),
-            color: :error, method: :delete, form: {onsubmit: "return confirm('#{j "Are you sure?"}')"})) %>
+            color: :error, method: :delete, confirm: "Are you sure?")) %>
     <% end %>
   </div>
 <% end %>
