@@ -261,4 +261,32 @@ RSpec.describe StripeEvent, type: :model do
       end
     end
   end
+
+  describe "connect account.updated" do
+    let(:event_mock) do
+      OpenStruct.new(:type => "account.updated", "data" => {"object" => stripe_object})
+    end
+    let(:stripe_event) { StripeEvent.create_from(event_mock) }
+    let(:stripe_object) do
+      {"id" => "acct_1", "charges_enabled" => true, "payouts_enabled" => true,
+       "details_submitted" => true}
+    end
+
+    it "makes the seller payable" do
+      stripe_account = FactoryBot.create(:stripe_account, stripe_id: "acct_1")
+      expect(stripe_event.known_event?).to be_truthy
+
+      stripe_event.update_bike_index_record!
+
+      expect(stripe_account.reload).to be_payable
+    end
+
+    # the same webhook fires for every Connect account, including ones we didn't create
+    context "an account we don't know" do
+      it "does nothing" do
+        expect { stripe_event.update_bike_index_record! }.to_not raise_error
+        expect(StripeAccount.count).to eq 0
+      end
+    end
+  end
 end

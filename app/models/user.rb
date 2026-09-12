@@ -100,6 +100,7 @@ class User < ApplicationRecord
   has_many :organization_roles
   has_many :ownerships
   has_many :payments
+  has_one :stripe_account, as: :account_holder
   has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
   has_many :sent_organization_roles, class_name: "OrganizationRole", foreign_key: :sender_id
   has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id

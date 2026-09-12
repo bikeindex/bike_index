@@ -138,6 +138,18 @@ class MarketplaceListing < ApplicationRecord
     item&.type_titleize || "bike"
   end
 
+  def item_type_sentence = item_type_display.downcase
+
+  def shippable? = shipping_unavailable_reason.nil?
+
+  # Which half of the rule failed, so callers explain the no rather than re-deriving it.
+  # Lithium batteries are regulated dangerous goods, which is why motorized is excluded.
+  def shipping_unavailable_reason
+    return :cycle_type unless item&.cycle_type == "bike"
+
+    :motorized if item.motorized?
+  end
+
   def condition_humanized
     self.class.condition_humanized(condition)
   end

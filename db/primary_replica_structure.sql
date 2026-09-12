@@ -2377,6 +2377,88 @@ ALTER SEQUENCE public.marketplace_messages_id_seq OWNED BY public.marketplace_me
 
 
 --
+-- Name: marketplace_orders; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.marketplace_orders (
+    id bigint NOT NULL,
+    marketplace_listing_id bigint NOT NULL,
+    buyer_id bigint,
+    seller_id bigint,
+    sale_id bigint,
+    marketplace_partner_shop_id bigint,
+    status integer,
+    fulfillment_kind integer,
+    currency_enum integer,
+    amount_cents integer,
+    item_amount_cents integer,
+    shipping_amount_cents integer,
+    shop_fee_cents integer,
+    platform_fee_cents integer,
+    stripe_payment_intent_id character varying,
+    paid_at timestamp(6) without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: marketplace_orders_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.marketplace_orders_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: marketplace_orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.marketplace_orders_id_seq OWNED BY public.marketplace_orders.id;
+
+
+--
+-- Name: marketplace_partner_shops; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.marketplace_partner_shops (
+    id bigint NOT NULL,
+    organization_id bigint NOT NULL,
+    location_id bigint,
+    status integer,
+    booked_by integer,
+    boxing_fee_cents integer,
+    currency_enum integer,
+    weekly_capacity integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: marketplace_partner_shops_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.marketplace_partner_shops_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: marketplace_partner_shops_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.marketplace_partner_shops_id_seq OWNED BY public.marketplace_partner_shops.id;
+
+
+--
 -- Name: memberships; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3991,6 +4073,43 @@ ALTER SEQUENCE public.strava_integrations_id_seq OWNED BY public.strava_integrat
 
 
 --
+-- Name: stripe_accounts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.stripe_accounts (
+    id bigint NOT NULL,
+    account_holder_type character varying,
+    account_holder_id bigint,
+    stripe_id character varying,
+    charges_enabled boolean DEFAULT false NOT NULL,
+    payouts_enabled boolean DEFAULT false NOT NULL,
+    details_submitted boolean DEFAULT false NOT NULL,
+    onboarded_at timestamp(6) without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: stripe_accounts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.stripe_accounts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: stripe_accounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.stripe_accounts_id_seq OWNED BY public.stripe_accounts.id;
+
+
+--
 -- Name: stripe_events; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4926,6 +5045,20 @@ ALTER TABLE ONLY public.marketplace_messages ALTER COLUMN id SET DEFAULT nextval
 
 
 --
+-- Name: marketplace_orders id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_orders ALTER COLUMN id SET DEFAULT nextval('public.marketplace_orders_id_seq'::regclass);
+
+
+--
+-- Name: marketplace_partner_shops id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_partner_shops ALTER COLUMN id SET DEFAULT nextval('public.marketplace_partner_shops_id_seq'::regclass);
+
+
+--
 -- Name: memberships id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5196,6 +5329,13 @@ ALTER TABLE ONLY public.strava_gears ALTER COLUMN id SET DEFAULT nextval('public
 --
 
 ALTER TABLE ONLY public.strava_integrations ALTER COLUMN id SET DEFAULT nextval('public.strava_integrations_id_seq'::regclass);
+
+
+--
+-- Name: stripe_accounts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_accounts ALTER COLUMN id SET DEFAULT nextval('public.stripe_accounts_id_seq'::regclass);
 
 
 --
@@ -5770,6 +5910,22 @@ ALTER TABLE ONLY public.marketplace_messages
 
 
 --
+-- Name: marketplace_orders marketplace_orders_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_orders
+    ADD CONSTRAINT marketplace_orders_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: marketplace_partner_shops marketplace_partner_shops_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.marketplace_partner_shops
+    ADD CONSTRAINT marketplace_partner_shops_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: memberships memberships_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -6079,6 +6235,14 @@ ALTER TABLE ONLY public.strava_gears
 
 ALTER TABLE ONLY public.strava_integrations
     ADD CONSTRAINT strava_integrations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: stripe_accounts stripe_accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.stripe_accounts
+    ADD CONSTRAINT stripe_accounts_pkey PRIMARY KEY (id);
 
 
 --
@@ -7019,6 +7183,62 @@ CREATE INDEX index_marketplace_messages_on_sender_id ON public.marketplace_messa
 
 
 --
+-- Name: index_marketplace_orders_on_buyer_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_orders_on_buyer_id ON public.marketplace_orders USING btree (buyer_id);
+
+
+--
+-- Name: index_marketplace_orders_on_marketplace_listing_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_orders_on_marketplace_listing_id ON public.marketplace_orders USING btree (marketplace_listing_id);
+
+
+--
+-- Name: index_marketplace_orders_on_marketplace_partner_shop_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_orders_on_marketplace_partner_shop_id ON public.marketplace_orders USING btree (marketplace_partner_shop_id);
+
+
+--
+-- Name: index_marketplace_orders_on_sale_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_orders_on_sale_id ON public.marketplace_orders USING btree (sale_id);
+
+
+--
+-- Name: index_marketplace_orders_on_seller_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_orders_on_seller_id ON public.marketplace_orders USING btree (seller_id);
+
+
+--
+-- Name: index_marketplace_orders_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_orders_on_status ON public.marketplace_orders USING btree (status);
+
+
+--
+-- Name: index_marketplace_partner_shops_on_location_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_marketplace_partner_shops_on_location_id ON public.marketplace_partner_shops USING btree (location_id);
+
+
+--
+-- Name: index_marketplace_partner_shops_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_marketplace_partner_shops_on_organization_id ON public.marketplace_partner_shops USING btree (organization_id);
+
+
+--
 -- Name: index_memberships_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7544,6 +7764,20 @@ CREATE UNIQUE INDEX index_strava_integrations_on_user_id ON public.strava_integr
 
 
 --
+-- Name: index_stripe_accounts_on_account_holder; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stripe_accounts_on_account_holder ON public.stripe_accounts USING btree (account_holder_type, account_holder_id);
+
+
+--
+-- Name: index_stripe_accounts_on_stripe_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_stripe_accounts_on_stripe_id ON public.stripe_accounts USING btree (stripe_id);
+
+
+--
 -- Name: index_stripe_subscriptions_on_membership_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7812,6 +8046,9 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260910140000'),
+('20260910130000'),
+('20260910120000'),
 ('20260909120000'),
 ('20260908163548'),
 ('20260821100000'),
