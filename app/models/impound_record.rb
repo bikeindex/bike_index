@@ -71,50 +71,52 @@ class ImpoundRecord < ApplicationRecord
       .where(address_records: {latitude: sw_lat..ne_lat, longitude: sw_lng..ne_lng})
   }
 
-  def self.statuses
-    ImpoundRecordUpdate::KIND_ENUM.keys.map(&:to_s) - ImpoundRecordUpdate.update_only_kinds
-  end
-
-  def self.active_statuses
-    %w[current]
-  end
-
-  def self.resolved_statuses
-    statuses - active_statuses
-  end
-
-  def self.statuses_humanized
-    ImpoundRecordUpdate.kinds_humanized
-  end
-
-  def self.statuses_humanized_short
-    ImpoundRecordUpdate.kinds_humanized_short
-  end
-
-  # Using method here to make it easier to update/translate the specific word later
-  def self.impounded_kind
-    "impounded"
-  end
-
-  # Using method here to make it easier to update/translate the specific word later
-  def self.found_kind
-    "found"
-  end
-
-  def self.friendly_find(str)
-    if str.start_with?("pkey-")
-      find_by_id(str.gsub("pkey-", ""))
-    else
-      find_by_display_id(str)
+  class << self
+    def statuses
+      ImpoundRecordUpdate::KIND_ENUM.keys.map(&:to_s) - ImpoundRecordUpdate.update_only_kinds
     end
-  end
 
-  def self.friendly_find!(str)
-    friendly_find(str) || (raise ActiveRecord::RecordNotFound)
-  end
+    def active_statuses
+      %w[current]
+    end
 
-  def self.bikes
-    Bike.unscoped.where(id: pluck(:bike_id))
+    def resolved_statuses
+      statuses - active_statuses
+    end
+
+    def statuses_humanized
+      ImpoundRecordUpdate.kinds_humanized
+    end
+
+    def statuses_humanized_short
+      ImpoundRecordUpdate.kinds_humanized_short
+    end
+
+    # Using method here to make it easier to update/translate the specific word later
+    def impounded_kind
+      "impounded"
+    end
+
+    # Using method here to make it easier to update/translate the specific word later
+    def found_kind
+      "found"
+    end
+
+    def friendly_find(str)
+      if str.start_with?("pkey-")
+        find_by_id(str.gsub("pkey-", ""))
+      else
+        find_by_display_id(str)
+      end
+    end
+
+    def friendly_find!(str)
+      friendly_find(str) || (raise ActiveRecord::RecordNotFound)
+    end
+
+    def bikes
+      Bike.unscoped.where(id: pluck(:bike_id))
+    end
   end
 
   def impound_configuration
@@ -151,6 +153,15 @@ class ImpoundRecord < ApplicationRecord
     else
       passed_user.id == user_id
     end
+  end
+
+  # Messaging whoever holds the vehicle, rather than opening a claim against it, is for
+  # the organizations we already trust with unstolen registrations
+  def contactable_without_claiming?(passed_user = nil)
+    return false if passed_user.blank?
+
+    passed_user.organizations.where(id: Organization.with_enabled_feature_slugs("unstolen_notifications")
+      .or(Organization.paid_money).or(Organization.ambassador)).limit(1).any?
   end
 
   def find_or_build_address_record(country_id: nil)

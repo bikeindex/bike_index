@@ -33,6 +33,7 @@ get back local PNG paths.
 
 - `eval "$(ruby bin/env --export)"` so `$BASE_URL` is set.
 - `curl -fs "$BASE_URL/" >/dev/null` — if it isn't, **stop and ask the user to start it**. `bin/env` resolves `$DEV_PORT`/`$BASE_URL` from the workspace ID, so the bin/dev the user starts will bind to the same port and DB this skill expects.
+- **`-f` fails on a 500 as well as on a refused connection, so a non-zero exit doesn't mean nothing is listening.** Re-check with `curl -s -o /dev/null -w '%{http_code}'`: `000` is nothing there, anything else is a running server with a broken page — read `log/development.log` rather than asking for a restart of what's already up. Conflict markers left on disk by an in-progress merge do this.
 - A 200 there doesn't promise the next page renders. A merge from the base can leave the dev DB
   unmigrated, and `CheckPending` only re-raises once the evented file watcher notices `db/migrate`
   moved — so a passing curl can be followed by `ActiveRecord::PendingMigrationError` on every page.
