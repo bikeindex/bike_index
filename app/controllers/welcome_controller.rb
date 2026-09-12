@@ -41,7 +41,7 @@ class WelcomeController < ApplicationController
   private
 
   def authenticate_user_for_welcome_controller
-    authenticate_user(translation_key: :create_account, flash_type: :notice)
+    authenticate_user(translation_key: :create_account, flash_type: :notice, sign_up_not_in: true)
   end
 
   # Split the given array `list` into two halves

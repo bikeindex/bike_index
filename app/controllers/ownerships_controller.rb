@@ -29,7 +29,7 @@ class OwnershipsController < ApplicationController
       authenticate_user(translation_key: :owner_already_has_account,
         translation_args: {bike_type: @ownership.bike.type})
     else
-      authenticate_user(translation_key: :create_account_to_claim,
+      authenticate_user(translation_key: :create_account_to_claim, sign_up_not_in: true,
         translation_args: {bike_type: @ownership.bike.type})
     end
   end
