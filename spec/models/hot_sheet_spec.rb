@@ -23,19 +23,19 @@ RSpec.describe HotSheet, type: :model do
       expect(hot_sheet.reload.delivery_status).to eq "delivery_pending"
       expect(hot_sheet.delivery_success?).to be_falsey
       deliveries = 0
-      expect(hot_sheet.track_email_delivery { deliveries += 1 }).to be_nil
+      expect(HotSheet.track_email_delivery(hot_sheet) { deliveries += 1 }).to be_nil
       expect(hot_sheet.reload.delivery_status).to eq "delivery_success"
       expect(hot_sheet.delivery_error).to be_nil
       expect(hot_sheet.delivery_success?).to be_truthy
 
-      hot_sheet.track_email_delivery { deliveries += 1 }
+      HotSheet.track_email_delivery(hot_sheet) { deliveries += 1 }
       expect(deliveries).to eq 1
     end
 
     context "with an unknown postmark error" do
       let(:api_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 499}) }
       it "records the failure and raises" do
-        expect { hot_sheet.track_email_delivery { raise api_error } }.to raise_error(Postmark::ApiInputError)
+        expect { HotSheet.track_email_delivery(hot_sheet) { raise api_error } }.to raise_error(Postmark::ApiInputError)
         expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
         expect(hot_sheet.delivery_error).to eq "Postmark::ApiInputError"
         expect(hot_sheet.delivery_success?).to be_falsey
@@ -45,14 +45,14 @@ RSpec.describe HotSheet, type: :model do
     context "with an undeliverable error" do
       let(:invalid_email_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 300}) }
       it "records the failure without returning an error" do
-        expect(hot_sheet.track_email_delivery { raise invalid_email_error }).to be_nil
+        expect(HotSheet.track_email_delivery(hot_sheet) { raise invalid_email_error }).to be_nil
         expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
         expect(hot_sheet.delivery_error).to eq "Postmark::InvalidEmailRequestError"
         # There is no way to tell which of the batch failed, so nobody is flagged
         expect(UserEmail.last_email_errored.count).to eq 0
         expect(hot_sheet.delivery_settled?).to be_truthy
         deliveries = 0
-        hot_sheet.track_email_delivery { deliveries += 1 }
+        HotSheet.track_email_delivery(hot_sheet) { deliveries += 1 }
         expect(deliveries).to eq 0
       end
     end
@@ -66,7 +66,7 @@ RSpec.describe HotSheet, type: :model do
 
       it "doesn't deliver" do
         deliveries = 0
-        hot_sheet.track_email_delivery { deliveries += 1 }
+        HotSheet.track_email_delivery(hot_sheet) { deliveries += 1 }
         expect(deliveries).to eq 0
         expect(hot_sheet.reload.delivery_status).to eq "delivery_banned"
       end
@@ -75,7 +75,7 @@ RSpec.describe HotSheet, type: :model do
         let(:banned_users) { users.first(1) }
         it "delivers" do
           deliveries = 0
-          hot_sheet.track_email_delivery { deliveries += 1 }
+          HotSheet.track_email_delivery(hot_sheet) { deliveries += 1 }
           expect(deliveries).to eq 1
           expect(hot_sheet.reload.delivery_status).to eq "delivery_success"
         end
@@ -99,7 +99,7 @@ RSpec.describe HotSheet, type: :model do
       it "records a partial success, and only flags the address that was rejected" do
         expect(hot_sheet.recipient_emails).to match_array(users.map(&:email))
         expect(UserEmail.last_email_errored.count).to eq 0
-        expect(hot_sheet.track_email_delivery { raise inactive_recipient_error }).to be_nil
+        expect(HotSheet.track_email_delivery(hot_sheet) { raise inactive_recipient_error }).to be_nil
 
         # Postmark delivered to the rest of the batch, so this isn't a total failure
         expect(hot_sheet.reload.delivery_status).to eq "delivery_partial_success"
@@ -109,14 +109,14 @@ RSpec.describe HotSheet, type: :model do
         # ... so the batch isn't worth sending again
         expect(hot_sheet.delivery_settled?).to be_truthy
         deliveries = 0
-        hot_sheet.track_email_delivery { deliveries += 1 }
+        HotSheet.track_email_delivery(hot_sheet) { deliveries += 1 }
         expect(deliveries).to eq 0
       end
 
       context "with every recipient inactive" do
         let(:inactive_emails) { users.map(&:email) }
         it "records a failure, and flags them all" do
-          hot_sheet.track_email_delivery { raise inactive_recipient_error }
+          HotSheet.track_email_delivery(hot_sheet) { raise inactive_recipient_error }
 
           expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
           expect(hot_sheet.delivery_error).to eq "Postmark::InactiveRecipientError"
@@ -128,7 +128,7 @@ RSpec.describe HotSheet, type: :model do
         let(:error_message) { "You tried to send to recipient(s) that have been marked as inactive." }
         it "records a partial success, without flagging anyone" do
           expect(inactive_recipient_error.recipients).to eq([])
-          expect(hot_sheet.track_email_delivery { raise inactive_recipient_error }).to be_nil
+          expect(HotSheet.track_email_delivery(hot_sheet) { raise inactive_recipient_error }).to be_nil
 
           expect(hot_sheet.reload.delivery_status).to eq "delivery_partial_success"
           expect(hot_sheet.delivery_error).to eq "Postmark::InactiveRecipientError"

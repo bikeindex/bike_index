@@ -245,8 +245,6 @@ class Notification < ApplicationRecord
     delivery_error == "Postmark::InvalidEmailRequestError"
   end
 
-  private
-
   def email_ban_exempt?
     self.class.email_ban_exempt_kinds.include?(kind)
   end
@@ -258,6 +256,8 @@ class Notification < ApplicationRecord
   def recipient_emails
     [message_channel_target].compact
   end
+
+  private
 
   def calculated_phone
     notifiable&.phone

@@ -92,8 +92,6 @@ class HotSheet < ApplicationRecord
       .joins(:bike).where(bikes: {deleted_at: nil}).includes(:bike)
   end
 
-  private
-
   def recipient_users
     organization.users.where(id: recipient_ids)
   end

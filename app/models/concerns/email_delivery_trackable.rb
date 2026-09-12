@@ -11,80 +11,76 @@ module EmailDeliveryTrackable
     scope :delivery_failed, -> { where(delivery_status: %w[delivery_failure delivery_banned]) }
   end
 
-  # Raises the delivery's error, unless the addresses are undeliverable
-  def track_email_delivery(is_new_email_address: false)
-    return if delivery_settled?
+  class_methods do
+    # Takes the record and a block that delivers its email. Raises the delivery's error,
+    # unless the addresses are undeliverable
+    def track_email_delivery(record, is_new_email_address: false)
+      return if record.delivery_settled?
 
-    return update(delivery_status: "delivery_banned") if email_banned?(is_new_email_address)
+      recipients = record.recipient_users.to_a
+      addresses = normalized(record.recipient_emails)
+      # Addresses are held per user, so an address another account also holds is theirs alone
+      user_emails = UserEmail.where(user_id: recipients.map(&:id), email: addresses).to_a
 
-    # Only the send is rescued - a ban evaluation that blows up hasn't failed to deliver anything
-    begin
-      handle_email_delivery_success(yield)
-    rescue => e
-      handle_email_delivery_error(e)
+      if delivery_email_banned?(record, recipients:, user_emails:, is_new_email_address:)
+        return record.update(delivery_status: "delivery_banned")
+      end
+
+      # Only the send is rescued - a ban evaluation that blows up hasn't failed to deliver anything
+      begin
+        handle_delivery_success(record, yield, user_emails:)
+      rescue => e
+        handle_delivery_error(record, e, addresses:, user_emails:)
+      end
     end
+
+    private
+
+    # A ban covers one address, so only a batch that's entirely banned is blocked
+    def delivery_email_banned?(record, recipients:, user_emails:, is_new_email_address:)
+      return false if record.email_ban_exempt? || recipients.none?
+
+      recipients.all? do |user|
+        EmailBan.ban?(user, user_email: user_emails.find { it.user_id == user.id }, is_new_email_address:)
+      end
+    end
+
+    def handle_delivery_success(record, delivery, user_emails:)
+      record.update(delivery_status: "delivery_success",
+        message_id: record.message_id || delivery.try(:message_id))
+      user_emails.each { it.update_last_email_errored!(email_errored: false) }
+      nil
+    end
+
+    # Postmark delivers to the rest of a batch, whether or not it names who it rejected - and an
+    # error it doesn't attribute can only be pinned on a lone recipient
+    def handle_delivery_error(record, error, addresses:, user_emails:)
+      inactive_recipient_error = error.is_a?(Postmark::InactiveRecipientError)
+      named_emails = inactive_recipient_error ? normalized(error.recipients) : []
+      failed_emails = named_emails.presence || (addresses.one? ? addresses : [])
+      delivered_any = inactive_recipient_error && (addresses - failed_emails).any?
+      record.update(delivery_status: delivered_any ? "delivery_partial_success" : "delivery_failure",
+        delivery_error: error.class)
+      # Postmark refuses a deactivated address itself, so this doesn't block anything -
+      # it's recorded to show why the emails stopped arriving
+      user_emails.select { failed_emails.include?(it.email) }
+        .each { it.update_last_email_errored!(email_errored: true) }
+
+      raise error unless Notification::UNDELIVERABLE_ERROR_NAMES.include?(error.class.name)
+    end
+
+    def normalized(emails)
+      emails.map { EmailNormalizer.normalize(it) }
+    end
+  end
+
+  def email_ban_exempt?
+    false
   end
 
   # A settled delivery isn't worth sending again - it delivered, or its addresses are dead
   def delivery_settled?
     Notification::DELIVERED_STATUSES.include?(delivery_status) ||
       Notification::UNDELIVERABLE_ERROR_NAMES.include?(delivery_error)
-  end
-
-  private
-
-  def email_ban_exempt?
-    false
-  end
-
-  # A ban covers one address, so only a batch that's entirely banned is blocked
-  def email_banned?(is_new_email_address)
-    return false if email_ban_exempt? || recipients.none?
-
-    recipients.all? { EmailBan.ban?(it, user_email: user_email_for(it), is_new_email_address:) }
-  end
-
-  def handle_email_delivery_success(delivery)
-    update(delivery_status: "delivery_success", message_id: message_id || delivery.try(:message_id))
-    recipient_user_emails.each { it.update_last_email_errored!(email_errored: false) }
-    nil
-  end
-
-  # Postmark delivers to the rest of a batch, whether or not it names who it rejected - and an
-  # error it doesn't attribute can only be pinned on a lone recipient
-  def handle_email_delivery_error(error)
-    inactive_recipient_error = error.is_a?(Postmark::InactiveRecipientError)
-    named_emails = inactive_recipient_error ? normalized(error.recipients) : []
-    failed_emails = named_emails.presence || (recipient_addresses.one? ? recipient_addresses : [])
-    delivered_any = inactive_recipient_error && (recipient_addresses - failed_emails).any?
-    update(delivery_status: delivered_any ? "delivery_partial_success" : "delivery_failure",
-      delivery_error: error.class)
-    # Postmark refuses a deactivated address itself, so this doesn't block anything -
-    # it's recorded to show why the emails stopped arriving
-    recipient_user_emails.select { failed_emails.include?(it.email) }
-      .each { it.update_last_email_errored!(email_errored: true) }
-
-    raise error unless Notification::UNDELIVERABLE_ERROR_NAMES.include?(error.class.name)
-  end
-
-  def recipients
-    @recipients ||= recipient_users.to_a
-  end
-
-  def recipient_addresses
-    @recipient_addresses ||= normalized(recipient_emails)
-  end
-
-  # Addresses are held per user, so an address shared with another account is theirs alone
-  def recipient_user_emails
-    @recipient_user_emails ||= UserEmail.where(user_id: recipients.map(&:id), email: recipient_addresses).to_a
-  end
-
-  def user_email_for(user)
-    recipient_user_emails.find { it.user_id == user.id }
-  end
-
-  def normalized(emails)
-    emails.map { EmailNormalizer.normalize(it) }
   end
 end

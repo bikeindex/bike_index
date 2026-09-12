@@ -34,7 +34,7 @@ class ProcessHotSheetJob < ScheduledJob
   # Returns the batch's error rather than raising it, so the rest still go out - and nil
   # for a batch that delivered, which is what keeps it out of the errors
   def delivery_error(hot_sheet)
-    hot_sheet.track_email_delivery do
+    HotSheet.track_email_delivery(hot_sheet) do
       OrganizedMailer.hot_sheet(hot_sheet).deliver_now if hot_sheet.recipient_ids.any?
     end
     nil

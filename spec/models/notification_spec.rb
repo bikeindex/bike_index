@@ -148,7 +148,7 @@ RSpec.describe Notification, type: :model do
 
     it "adds email success" do
       expect(notification.reload.delivery_status).to eq "delivery_pending"
-      notification.track_email_delivery do
+      Notification.track_email_delivery(notification) do
         CustomerMailer.confirmation_email(notification.user).deliver_now
       end
       expect(notification.reload.delivery_status).to eq "delivery_success"
@@ -165,7 +165,7 @@ RSpec.describe Notification, type: :model do
         expect(notification.reload.message_channel_target).to eq user.email
         user.update_column :updated_at, Time.current - 1.hour
         expect(notification.reload.delivery_status).to eq "delivery_pending"
-        notification.track_email_delivery do
+        Notification.track_email_delivery(notification) do
           CustomerMailer.confirmation_email(notification.user).deliver_now
         end
         expect(notification.reload.delivery_status).to eq "delivery_success"
@@ -183,7 +183,7 @@ RSpec.describe Notification, type: :model do
         expect(EmailBan.ban?(user)).to be_truthy
         expect(notification.reload.delivery_status).to eq "delivery_pending"
 
-        notification.track_email_delivery { raise "delivered to a banned email!" }
+        Notification.track_email_delivery(notification) { raise "delivered to a banned email!" }
 
         expect(notification.reload.delivery_status).to eq "delivery_banned"
         expect(Notification.delivery_failed.pluck(:id)).to eq([notification.id])
@@ -197,7 +197,7 @@ RSpec.describe Notification, type: :model do
 
         it "delivers" do
           expect(EmailBan.ban?(user)).to be_falsey
-          notification.track_email_delivery do
+          Notification.track_email_delivery(notification) do
             CustomerMailer.confirmation_email(notification.user).deliver_now
           end
           expect(notification.reload.delivery_status).to eq "delivery_success"
@@ -213,7 +213,7 @@ RSpec.describe Notification, type: :model do
 
         it "delivers" do
           expect(EmailBan.ban?(user)).to be_truthy
-          notification.track_email_delivery do
+          Notification.track_email_delivery(notification) do
             AdminMailer.blocked_marketplace_message_email(marketplace_message).deliver_now
           end
           expect(notification.reload.delivery_status).to eq "delivery_success"
@@ -230,7 +230,7 @@ RSpec.describe Notification, type: :model do
         expect(user_email.reload.last_email_errored?).to be_falsey
 
         expect {
-          notification.track_email_delivery { raise "should not be reached" }
+          Notification.track_email_delivery(notification) { raise "should not be reached" }
         }.to raise_error(/timed out/)
 
         expect(notification.reload.delivery_status).to eq "delivery_pending"
@@ -243,7 +243,7 @@ RSpec.describe Notification, type: :model do
       before { notification.update(delivery_status: "delivery_failure", delivery_error: "SomeErrorThing") }
       it "updates_delivery_status, doesn't remove delivery_error" do
         notification.reload
-        notification.track_email_delivery do
+        Notification.track_email_delivery(notification) do
           CustomerMailer.confirmation_email(notification.user).deliver_now
         end
         expect(notification.reload.delivery_status).to eq "delivery_success"
@@ -254,13 +254,13 @@ RSpec.describe Notification, type: :model do
     context "sent a second time" do
       it "only delivers once" do
         expect(notification.reload.delivery_status).to eq "delivery_pending"
-        notification.track_email_delivery do
+        Notification.track_email_delivery(notification) do
           CustomerMailer.confirmation_email(notification.user).deliver_now
         end
         expect(notification.reload.delivery_status).to eq "delivery_success"
         expect(ActionMailer::Base.deliveries.count).to eq 1
 
-        notification.track_email_delivery do
+        Notification.track_email_delivery(notification) do
           CustomerMailer.confirmation_email(notification.user).deliver_now
         end
         expect(notification.reload.delivery_status).to eq "delivery_success"
@@ -273,7 +273,7 @@ RSpec.describe Notification, type: :model do
         expect(notification.reload.delivery_status).to eq "delivery_pending"
         expect do
           expect do
-            notification.track_email_delivery do
+            Notification.track_email_delivery(notification) do
               raise Postmark::ApiInputError.build("error", {"ErrorCode" => 499})
             end
           end.to raise_error(Postmark::ApiInputError)
@@ -296,14 +296,14 @@ RSpec.describe Notification, type: :model do
       it "adds the error to the notification without banning, and doesn't deliver again" do
         expect(notification.reload.delivery_status).to eq "delivery_pending"
         expect do
-          notification.track_email_delivery { raise inactive_recipient_error }
+          Notification.track_email_delivery(notification) { raise inactive_recipient_error }
         end.to change(EmailBan, :count).by 0
 
         expect(notification.reload.delivery_status).to eq "delivery_failure"
         expect(notification.delivery_error).to eq "Postmark::InactiveRecipientError"
         expect(EmailBan.ban?(user)).to be_falsey
         expect(notification.delivery_settled?).to be_truthy
-        notification.track_email_delivery { raise "should not be reached" }
+        Notification.track_email_delivery(notification) { raise "should not be reached" }
       end
 
       context "with an error postmark didn't attribute" do
@@ -312,7 +312,7 @@ RSpec.describe Notification, type: :model do
 
         it "records a failure, and flags the address" do
           expect(inactive_recipient_error.recipients).to eq([])
-          notification.track_email_delivery { raise inactive_recipient_error }
+          Notification.track_email_delivery(notification) { raise inactive_recipient_error }
 
           # One address can't be part-delivered
           expect(notification.reload.delivery_status).to eq "delivery_failure"
@@ -329,7 +329,7 @@ RSpec.describe Notification, type: :model do
           expect(notification.reload.delivery_status).to eq "delivery_pending"
 
           expect do
-            notification.track_email_delivery { raise inactive_recipient_error }
+            Notification.track_email_delivery(notification) { raise inactive_recipient_error }
           end.to change(EmailBan, :count).by 0
 
           expect(notification.reload.delivery_status).to eq "delivery_failure"
@@ -348,7 +348,7 @@ RSpec.describe Notification, type: :model do
           end
           it "only records the error on the errored email" do
             expect do
-              notification.track_email_delivery { raise inactive_recipient_error }
+              Notification.track_email_delivery(notification) { raise inactive_recipient_error }
             end.to change(EmailBan, :count).by 0
 
             expect(additional_email.reload.last_email_errored).to be_truthy
@@ -363,14 +363,14 @@ RSpec.describe Notification, type: :model do
       it "adds the error to the notification without raising, and doesn't deliver again" do
         expect(notification.reload.delivery_status).to eq "delivery_pending"
         expect do
-          notification.track_email_delivery { raise invalid_email_error }
+          Notification.track_email_delivery(notification) { raise invalid_email_error }
         end.to change(EmailBan, :count).by 0
 
         expect(notification.reload.delivery_status).to eq "delivery_failure"
         expect(notification.delivery_error).to eq "Postmark::InvalidEmailRequestError"
         expect(notification.delivery_error_invalid?).to be_truthy
         expect(notification.delivery_settled?).to be_truthy
-        notification.track_email_delivery { raise "should not be reached" }
+        Notification.track_email_delivery(notification) { raise "should not be reached" }
       end
     end
   end
