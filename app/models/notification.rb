@@ -43,6 +43,7 @@ class Notification < ApplicationRecord
   DELIVERED_STATUSES = %w[delivery_success delivery_partial_success].freeze
 
   UNDELIVERABLE_ERRORS = [Postmark::InactiveRecipientError, Postmark::InvalidEmailRequestError].freeze
+  UNDELIVERABLE_ERROR_NAMES = UNDELIVERABLE_ERRORS.map(&:name).freeze
 
   enum :kind, KIND_ENUM
   enum :message_channel, MESSAGE_CHANNEL_ENUM

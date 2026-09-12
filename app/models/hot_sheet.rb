@@ -25,7 +25,6 @@ class HotSheet < ApplicationRecord
   # Postmark only allows 50 recipients per email, so a day's recipients are split across
   # sheets - all rendering the same bikes
   RECIPIENTS_PER_EMAIL = 48
-  # This may become a configurable option
   MAX_BIKES = 10
 
   enum :delivery_status, Notification::DELIVERY_STATUS_ENUM
@@ -37,7 +36,7 @@ class HotSheet < ApplicationRecord
   validates_presence_of :organization_id, :sheet_date
 
   class << self
-    # The day's sheets - or, when there are none yet, one built for each batch of recipients
+    # The day's sheets, built (unsaved) one per batch of recipients when the day has none
     def for(organization_or_id, date)
       org_id = organization_or_id.is_a?(Integer) ? organization_or_id : organization_or_id.id
       hot_sheets = where(organization_id: org_id, sheet_date: date).order(:id).to_a
@@ -55,7 +54,7 @@ class HotSheet < ApplicationRecord
     private
 
     def calculated_stolen_records(hot_sheet_configuration)
-      StolenRecord.current.within_bounding_box(hot_sheet_configuration.bounding_box)
+      StolenRecord.within_bounding_box(hot_sheet_configuration.bounding_box)
         .reorder(date_stolen: :desc)
         .joins(:bike).where(bikes: {deleted_at: nil})
         .limit(MAX_BIKES)
@@ -90,7 +89,7 @@ class HotSheet < ApplicationRecord
   def fetch_stolen_records
     StolenRecord.current_and_not.where(id: stolen_record_ids)
       .reorder(date_stolen: :desc)
-      .joins(:bike).where(bikes: {deleted_at: nil})
+      .joins(:bike).where(bikes: {deleted_at: nil}).includes(:bike)
   end
 
   private
