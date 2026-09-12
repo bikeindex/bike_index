@@ -71,7 +71,8 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
     end
 
     context "a member of an organization that pays" do
-      let(:organization) { FactoryBot.create(:organization, :with_invoice, short_name: "Brakebills") }
+      let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+      let!(:invoice) { FactoryBot.create(:invoice_with_payment, organization:) }
       let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user, organization:) }
 
       it "stops asking them for a donation once they have its registration" do
