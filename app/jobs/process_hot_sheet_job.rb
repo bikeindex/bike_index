@@ -22,6 +22,9 @@ class ProcessHotSheetJob < ScheduledJob
     hot_sheets = HotSheet.for(org_id, Time.current.to_date)
     return hot_sheets if hot_sheets.all?(&:delivery_settled?)
 
+    # Saved before any delivery, so a run that dies leaves the rest of the day's batches
+    # to the next one - HotSheet.for builds them only for a day that has none
+    hot_sheets.each(&:save!)
     # Bump bike cached attributes, so the email has all the info
     hot_sheets.first.fetch_stolen_records.each { it.bike.update(updated_at: Time.current) }
     # Deliver every batch before raising, so one failure doesn't block the rest

@@ -52,8 +52,8 @@ module EmailDeliveryTrackable
       nil
     end
 
-    # Postmark delivers to the rest of a batch, whether or not it names who it rejected - and an
-    # error it doesn't attribute can only be pinned on a lone recipient
+    # Postmark's 406 is a partial delivery - the rest of the batch goes out, whether or not it
+    # names who it rejected, and an error it doesn't name can only be pinned on a lone recipient
     def handle_delivery_error(record, error, addresses:, user_emails:)
       inactive_recipient_error = error.is_a?(Postmark::InactiveRecipientError)
       named_emails = inactive_recipient_error ? normalized(error.recipients) : []
@@ -78,9 +78,10 @@ module EmailDeliveryTrackable
     false
   end
 
-  # A settled delivery isn't worth sending again - it delivered, or its addresses are dead
+  # A settled delivery isn't worth sending again - it delivered, we blocked it, or its
+  # addresses are dead
   def delivery_settled?
-    Notification::DELIVERED_STATUSES.include?(delivery_status) ||
+    Notification::SETTLED_STATUSES.include?(delivery_status) ||
       Notification::UNDELIVERABLE_ERROR_NAMES.include?(delivery_error)
   end
 end

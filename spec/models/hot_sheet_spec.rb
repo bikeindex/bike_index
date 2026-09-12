@@ -64,11 +64,15 @@ RSpec.describe HotSheet, type: :model do
       let(:banned_users) { users }
       before { banned_users.each { FactoryBot.create(:email_ban, user: it, reason: :honeypot) } }
 
-      it "doesn't deliver" do
+      it "doesn't deliver, and doesn't try again" do
         deliveries = 0
         HotSheet.track_email_delivery(hot_sheet) { deliveries += 1 }
         expect(deliveries).to eq 0
         expect(hot_sheet.reload.delivery_status).to eq "delivery_banned"
+        expect(hot_sheet.delivery_settled?).to be_truthy
+
+        HotSheet.track_email_delivery(hot_sheet) { deliveries += 1 }
+        expect(deliveries).to eq 0
       end
 
       context "with only some banned" do
@@ -205,6 +209,13 @@ RSpec.describe HotSheet, type: :model do
     context "for a past day" do
       it "builds nothing" do
         expect(HotSheet.for(organization, Time.current.to_date - 1.day)).to eq([])
+      end
+    end
+
+    context "without a configuration" do
+      let!(:hot_sheet_configuration) { nil }
+      it "builds nothing" do
+        expect(HotSheet.for(organization, Time.current.to_date)).to eq([])
       end
     end
 

@@ -45,6 +45,8 @@ class HotSheet < ApplicationRecord
       return [] if date.present? && date != Time.current.to_date
 
       configuration = HotSheetConfiguration.find_by(organization_id: org_id)
+      return [] if configuration.blank?
+
       stolen_record_ids = calculated_stolen_records(configuration).pluck(:id)
       # At least one sheet, so a day with nobody to email is still marked delivered
       (configuration.current_recipient_ids.each_slice(RECIPIENTS_PER_EMAIL).to_a.presence || [[]])
