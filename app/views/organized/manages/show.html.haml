@@ -92,8 +92,7 @@
       = t(".i_would_like_to_terminate_my_account")
   #delete-organization.collapse
     .text-md-center
-      = link_to t(".delete_organization"),
-        organization_manage_path(id: current_organization.to_param, organization_id: current_organization.to_param),
-        method: :delete,
-        data: {confirm: t(".removal_confirmation", org_name: current_organization.name)},
-        class: "btn btn-danger"
+      = render(UI::ButtonLink::Component.new(text: t(".delete_organization"),
+        href: organization_manage_path(id: current_organization.to_param, organization_id: current_organization.to_param),
+        method: :delete, color: :error,
+        confirm: t(".removal_confirmation", org_name: current_organization.name)))
