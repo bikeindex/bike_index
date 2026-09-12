@@ -3,82 +3,64 @@
 module UI
   module Chart
     class Component < ApplicationComponent
+      # time_range_counts and the bucketing behind it, so a series assembled outside a
+      # view buckets the way the views do
+      extend GraphingHelper
+
       COLORS = %w[#3498db #DC2626 #D97706 #7C3AED #059669 #DB2777 #475569].freeze
+      KINDS = %i[column line pie].freeze
+      private_constant :KINDS
 
-      class << self
-        def time_range_counts(collection:, time_range:, column: "created_at")
-          collection_grouped(collection:, column:, time_range:).count
-        end
+      # series: a grouped hash, an array of {name:, data:} series, or a path the chart
+      # fetches its JSON from
+      def initialize(series:, time_range: nil, kind: :column, colors: nil, stacked: false,
+        prefix: nil, round: nil, height: nil, library: nil)
+        raise ArgumentError, "kind must be one of #{KINDS.join(", ")}" unless KINDS.include?(kind)
 
-        def time_range_amounts(collection:, time_range:, column: "created_at", amount_column: "amount_cents", convert_to_dollars: false)
-          result = collection_grouped(collection:, column:, time_range:).sum(amount_column)
-          return result unless convert_to_dollars
-
-          result.transform_values { |v| (v.to_f / 100.00).round(2) }
-        end
-
-        private
-
-        def collection_grouped(collection:, time_range:, column: "created_at")
-          collection.send(
-            group_by_method(time_range),
-            column,
-            range: time_range,
-            format: group_by_format(time_range),
-            time_zone: ::Time.zone
-          )
-        end
-
-        def group_by_method(time_range)
-          period_s = time_range.last - time_range.first
-          if period_s < 3601 # 1.hour + 1 second
-            :group_by_minute
-          elsif period_s < 5.days
-            :group_by_hour
-          elsif period_s < 5_000_000 # around 60 days
-            :group_by_day
-          elsif period_s < 31449600 # 364 days (52 weeks)
-            :group_by_week
-          else
-            :group_by_month
-          end
-        end
-
-        def group_by_format(time_range, group_period = nil)
-          period_s = time_range.last - time_range.first
-          group_period ||= group_by_method(time_range)
-          if group_period == :group_by_minute
-            "%l:%M %p"
-          elsif group_period == :group_by_hour
-            "%a%l %p"
-          elsif group_period == :group_by_month
-            "%Y-%-m"
-          elsif group_period == :group_by_day && (period_s < 10.days)
-            "%a %-m-%-d"
-          else
-            "%Y-%-m-%-d"
-          end
-        end
-      end
-
-      def initialize(series:, time_range:, stacked: false, thousands: ",", colors: nil)
         @series = series
         @time_range = time_range
-        @stacked = stacked
-        @thousands = thousands
+        @kind = kind
         @colors = colors || COLORS
+        @stacked = stacked
+        @prefix = prefix
+        @round = round
+        @height = height
+        @library = library
       end
 
       def call
-        helpers.column_chart @series, stacked: @stacked, thousands: @thousands, colors: chart_colors
+        tag.div(data: {controller: "ui--chart"}) do
+          helpers.public_send(:"#{@kind}_chart", chart_series, **chart_options)
+        end
       end
 
       private
 
+      # time_range_counts fills its own range, so this is for a series assembled some
+      # other way -- and for an empty one, which chartkick draws as "No data"
+      def chart_series
+        return @series if @time_range.nil?
+
+        case @series
+        when Hash then empty_buckets.merge(@series)
+        when Array then @series.map { it.merge(data: empty_buckets.merge(it[:data].to_h)) }
+        else @series # a path, which the browser fetches the buckets for
+        end
+      end
+
+      def empty_buckets
+        @empty_buckets ||= self.class.empty_time_range_counts(@time_range)
+      end
+
+      def chart_options
+        {thousands: ",", colors: chart_colors, stacked: @stacked,
+         prefix: @prefix, round: @round, height: @height, library: @library}.compact
+      end
+
       # Chartkick paints single-series column bars per-color from a flat array;
       # collapse to one so bars are uniform.
       def chart_colors
-        @series.is_a?(Hash) ? [@colors.first] : @colors
+        (@kind == :column && @series.is_a?(Hash)) ? [@colors.first] : @colors
       end
     end
   end

@@ -14,7 +14,7 @@ module Email
         notifiable: impound_claim,
         bike_id: impound_claim.bike_claimed_id)
 
-      notification.track_email_delivery do
+      Notification.track_email_delivery(notification) do
         if email_to_send == "submitting"
           OrganizedMailer.impound_claim_submitted(impound_claim).deliver_now
         else
