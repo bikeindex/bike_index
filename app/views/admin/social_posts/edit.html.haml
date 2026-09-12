@@ -44,11 +44,9 @@
   .row.justify-content-end
     .col-auto
       = f.submit "Save", class: "btn btn-success"
-      = link_to "Delete",
-      { controller: "admin/social_posts", id: @social_post.id, action: :destroy},
-      data: { confirm: "Are you sure you want to delete this post?" },
-      method: :delete,
-      class: "btn btn-danger"
+
+.text-right.mt-2
+  = render(UI::ButtonLink::Component.new(text: "Delete", href: {controller: "admin/social_posts", id: @social_post.id, action: :destroy}, method: :delete, color: :error, form: {onsubmit: "return confirm('#{j "Are you sure you want to delete this post?"}')"}))
 
 %hr
 

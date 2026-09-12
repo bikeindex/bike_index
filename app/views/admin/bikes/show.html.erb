@@ -19,9 +19,8 @@
     >
       <strong><%= duplicate_group.segment %></strong>
 
-      <%= link_to "ignore #{duplicate_group.segment}",
-            ignore_duplicate_toggle_admin_bikes_path(id: duplicate_group.id), method: :put,
-            class: "twlink tw:text-sm" %>
+      <%= render(UI::ButtonLink::Component.new(text: "ignore #{duplicate_group.segment}", method: :put,
+            href: ignore_duplicate_toggle_admin_bikes_path(id: duplicate_group.id), color: :link, html_class: "tw:text-sm")) %>
     </div>
 
     <%= render Pages::Admin::Bikes::Table::Component.new(bikes: duplicate_group.bikes, sort_state:,

@@ -79,7 +79,7 @@
           %li
             It <strong class="em">can NOT</strong> be effectively reversed
         .mt-4.text-center
-          = link_to "Approve listing", approve_admin_stolen_bike_url(@bike), method: :post, class: "btn btn-lg btn-success"
+          = render(UI::ButtonLink::Component.new(text: "Approve listing", href: approve_admin_stolen_bike_url(@bike), method: :post, color: :primary, size: :lg))
 
 - social_posts = @stolen_record&.social_posts
 %h3.mt-4 Posts
@@ -116,7 +116,8 @@
           = f.text_area :body, placeholder: "You can write HTML in here. There will be a link to the #{@bike.type} included automatically.", rows: 7, class: "form-control"
       .col-auto.mt-auto
         = f.submit 'Send it!', class: 'btn btn-success mb-4'
-        = link_to "Delete", admin_bike_url(@bike), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger mb-4"
+
+  = render(UI::ButtonLink::Component.new(text: "Delete", href: admin_bike_url(@bike), method: :delete, color: :error, form: {class: "mb-4", onsubmit: "return confirm('#{j "Are you sure?"}')"}))
 
 - else
   %h1

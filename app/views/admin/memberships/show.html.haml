@@ -6,7 +6,7 @@
     - else
       stripe managed
   - if @membership.stripe_managed?
-    = link_to "Update from Stripe", admin_membership_path(id: @membership.id, update_from_stripe: true), method: :patch, action: :update, class: "btn btn-sm btn-success float-right"
+    = render(UI::ButtonLink::Component.new(text: "Update from Stripe", href: admin_membership_path(id: @membership.id, update_from_stripe: true), method: :patch, color: :primary, size: :sm, form: {class: "float-right"}))
 
 .row.mt-4
   .col-md-6

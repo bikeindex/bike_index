@@ -15,7 +15,7 @@
       %span.less-strong This happened either because something is broken with this alert, or because it was one of the original ~90 that Seth updated when he enabled automated fixing of failed activations on 2025-2-23.
 %h4
   - if @theft_alert.facebook_updateable?
-    = link_to "Update Facebook data", admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, action: "update", class: "btn btn-outline-success btn-sm"
+    = render(UI::ButtonLink::Component.new(text: "Update Facebook data", href: admin_theft_alert_path(@theft_alert.id, update_theft_alert: true), method: :patch, size: :sm))
   - else
     %em
       %span.text-warning Can't update Facebook:
@@ -58,7 +58,7 @@
                 unless activation started a while ago
 
             .text-center.mt-4
-              = link_to "Activate!", admin_theft_alert_path(@theft_alert.id, activate_theft_alert: true), method: :patch, action: "update", class: "btn btn-lg btn-success"
+              = render(UI::ButtonLink::Component.new(text: "Activate!", href: admin_theft_alert_path(@theft_alert.id, activate_theft_alert: true), method: :patch, color: :primary, size: :lg))
           - else
             %h4.text-center
               Theft alert

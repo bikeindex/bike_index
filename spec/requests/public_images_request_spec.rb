@@ -332,6 +332,14 @@ RSpec.describe PublicImagesController, type: :request do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
     let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
 
+    describe "show" do
+      it "renders the owner's view" do
+        get "#{base_url}/#{public_image.id}"
+        expect(response.code).to eq("200")
+        expect(response.body).to match(t("public_images.show.looks_like_this_is_your_image"))
+      end
+    end
+
     describe "edit" do
       it "renders" do
         expect(bike.authorized?(current_user)).to be_truthy

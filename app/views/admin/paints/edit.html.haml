@@ -70,4 +70,4 @@
   = render Pages::Admin::Bikes::Table::Component.new(bikes: @bikes, sort_state:, display_dev_info: display_dev_info?)
 
 - else
-  = link_to "Delete!", admin_paint_url(@paint), method: :delete, class: "btn btn-danger"
+  = render(UI::ButtonLink::Component.new(text: "Delete!", href: admin_paint_url(@paint), method: :delete, color: :error))

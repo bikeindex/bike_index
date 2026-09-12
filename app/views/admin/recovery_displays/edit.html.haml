@@ -6,4 +6,4 @@
 
 = render partial: "form"
 
-= link_to "Delete recovery display", admin_recovery_display_url(@recovery_display), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger"
+= render(UI::ButtonLink::Component.new(text: "Delete recovery display", href: admin_recovery_display_url(@recovery_display), method: :delete, color: :error, form: {onsubmit: "return confirm('#{j "Are you sure?"}')"}))
