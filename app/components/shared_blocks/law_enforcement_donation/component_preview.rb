@@ -7,7 +7,7 @@ module SharedBlocks
         render(Component.new(current_user: lookbook_user))
       end
 
-      # No unpaid law enforcement organization, so the nonprofit note falls back
+      # No law enforcement organization without an invoice, so the nonprofit note falls back
       def without_an_organization
         render(Component.new(current_user: ::User.new(name: "Officer Friendly")))
       end

@@ -22,7 +22,7 @@ Then run `bin/lint` to auto-format (it also picks up whatever `/simplify` just c
 
 `xargs` rather than `bin/lint $(…)`, because zsh doesn't word-split an unquoted command substitution — the interpolated form hands the whole list over as one argument and reports `Not found:` followed by every file. `rtk proxy` for the same reason the greps below need it: the hook rewrites these into a stat whose trailing `Changes:` line then arrives as a filename.
 
-**Both halves are load-bearing.** `origin/main...HEAD` sees only *committed* work, and `/simplify` ran immediately above — so its edits are uncommitted, and a file it touched that the branch hadn't committed yet (a shared controller it reached into, say) is invisible to that range and goes unlinted. The second `git diff HEAD` picks up the working tree. Same union applies to the spec scoping below.
+**Both halves are load-bearing.** `origin/main...HEAD` sees only *committed* work, and `/simplify` ran immediately above — so its edits are uncommitted, and a file it touched that the branch hadn't committed yet (a shared controller it reached into, say) is invisible to that range and goes unlinted. The second `git diff HEAD` picks up the working tree. Same union applies to the spec scoping and to both audits below — they run before the commit too, so the bare `origin/main...HEAD` greps as written read none of what `/simplify` and the CLAUDE.md pass just changed.
 
 **Check that substitution produced something first.** With no arguments `bin/lint` lints the whole repo (`bin/lint:64` falls through to a bare `standardrb --fix`), so an empty diff turns the scoped command into exactly the whole-repo run it's avoiding.
 

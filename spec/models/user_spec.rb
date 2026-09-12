@@ -776,11 +776,11 @@ RSpec.describe User, type: :model do
         user.reload
         expect(user.render_donation_request).to eq "law_enforcement"
       end
-      context "police department paid" do
-        before { organization.update_column :is_paid, true }
+      context "police department with an invoice" do
+        before { organization.update_column :is_invoiced, true }
         it "is 'law_enforcement'" do
           user.reload
-          expect(user.organizations.paid.count).to eq 1
+          expect(user.organizations.invoiced.count).to eq 1
           expect(user.render_donation_request).to be_nil
         end
       end
@@ -797,8 +797,8 @@ RSpec.describe User, type: :model do
       expect(user.reload.paid_organization_registration?).to be_falsey
     end
 
-    context "organization is paid" do
-      before { organization.update_column :is_paid, true }
+    context "organization has an invoice" do
+      before { organization.update_column :is_invoiced, true }
 
       it "is true" do
         expect(user.reload.paid_organization_registration?).to be_truthy

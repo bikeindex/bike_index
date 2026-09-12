@@ -233,7 +233,7 @@ in a Redis DB shared across `:js` examples and survives 600s, and `load_all`
 never invalidates it — so a stale entry from an earlier spec changes what a
 combobox returns. The fix is `Autocomplete::Loader.clear_redis` in `before`,
 not a retry. Browser history is the same shape: `reset_browser_history`
-(`spec/support/system_spec_helpers.rb`) drops entries earlier examples left, so
+(`spec/support/integration_spec_helpers.rb`) drops entries earlier examples left, so
 `go_back`/`go_forward` walk this example's own stack.
 
 **Interacting with a page whose controllers haven't connected.** `application.js`
@@ -241,7 +241,7 @@ lazy loads every Stimulus controller, so a freshly rendered page answers to none
 them until each module lands: a combobox filters nothing, a one-shot event (like
 form-persist's restore) reaches no listener, and a `fill_in`'s text can end up in
 whatever autofocus left focused. Waiting on any one controller proves nothing about
-the rest — `wait_for_stimulus` (`spec/support/system_spec_helpers.rb`) waits for
+the rest — `wait_for_stimulus` (`spec/support/integration_spec_helpers.rb`) waits for
 every identifier the page names.
 
 **Interacting before the legacy page script has bound.** The same shape, one era
@@ -249,7 +249,7 @@ back: `init.coffee`'s `loadPageScript` constructs the per-page class in
 `$(document).ready`, while `click_link` returns with the new document still
 parsing — so an interaction landing between the two is swallowed with nothing on
 the page to say so. `wait_for_page_script`
-(`spec/support/system_spec_helpers.rb`) waits on `window.pageScript`; reach for
+(`spec/support/integration_spec_helpers.rb`) waits on `window.pageScript`; reach for
 it after any navigation into a jQuery-driven control.
 
 **Clicking something that is being re-rendered.** The dominant `:js` flake.
@@ -263,7 +263,7 @@ expect(page).to have_css("turbo-frame#results_frame[complete]:not([busy])", wait
 retry_on_detach { first(".bike-box-item .title-link a").click }
 ```
 
-`retry_on_detach` (`spec/support/system_spec_helpers.rb`) rescues the raw
+`retry_on_detach` (`spec/support/integration_spec_helpers.rb`) rescues the raw
 `Playwright::Error` for a detached node, which Capybara's own retry does not.
 This is *not* a coverage reduction: the assertions are untouched, the click just
 happens on a DOM that has stopped moving.

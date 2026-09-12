@@ -15,7 +15,7 @@
 #  direct_unclaimed_notifications  :boolean          default(FALSE)
 #  enabled_feature_slugs           :jsonb
 #  graduated_notification_interval :bigint
-#  is_paid                         :boolean          default(FALSE), not null
+#  is_invoiced                     :boolean          default(FALSE), not null
 #  kind                            :integer
 #  lightspeed_register_with_phone  :boolean          default(FALSE)
 #  location_latitude               :float
@@ -154,9 +154,9 @@ class Organization < ApplicationRecord
   default_scope { order(:name) }
   scope :name_ordered, -> { order(arel_table["name"].lower) }
   scope :show_on_map, -> { where(show_on_map: true, approved: true) }
-  scope :paid, -> { where(is_paid: true) }
-  scope :paid_money, -> { where(is_paid: true) } # TODO: make this actually show paid money, rather than just paid
-  scope :unpaid, -> { where(is_paid: false) }
+  scope :invoiced, -> { where(is_invoiced: true) }
+  scope :paid_money, -> { where(is_invoiced: true) } # TODO: make this actually show paid money, rather than just having an invoice
+  scope :not_invoiced, -> { where(is_invoiced: false) }
   scope :approved, -> { where(approved: true) }
   scope :broken_pos, -> { where(pos_kind: broken_pos_kinds) }
   scope :with_pos, -> { where(pos_kind: with_pos_kinds) }
@@ -359,19 +359,13 @@ class Organization < ApplicationRecord
     show_on_map && approved
   end
 
-  # TODO: rename - actually should be "enabled_features?" - because many orgs haven't actually paid
-  def paid?
-    is_paid
-  end
-
-  # For now - just using paid
   def user_registration_all_bikes?
-    paid? && !official_manufacturer? &&
+    is_invoiced? && !official_manufacturer? &&
       USER_REGISTRATION_ALL_BIKES_EXCLUDED_IDS.exclude?(id)
   end
 
   def paid_money?
-    paid? && current_invoices.any? { |i| i.paid_money_in_full? }
+    is_invoiced? && current_invoices.any? { |i| i.paid_money_in_full? }
   end
 
   def paid_previously?
@@ -491,7 +485,7 @@ class Organization < ApplicationRecord
   end
 
   def block_short_name_edit?
-    paid? # Prevent url changes breaking landing pages, etc
+    is_invoiced? # Prevent url changes breaking landing pages, etc
   end
 
   def bike_actions?
@@ -561,7 +555,7 @@ class Organization < ApplicationRecord
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = name_shortener(short_name.presence || name)
     self.ascend_name = nil if ascend_name.blank?
-    self.is_paid = current_invoices.any? || current_parent_invoices.any?
+    self.is_invoiced = calculated_is_invoiced
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     self.user_email_domain = EmailNormalizer.normalize(user_email_domain)
     self.graduated_notification_interval = nil unless graduated_notification_interval.to_i > 0
@@ -658,6 +652,10 @@ class Organization < ApplicationRecord
     return str unless deleted_at.present?
 
     str.match?("-deleted") ? str : "#{str}-deleted"
+  end
+
+  def calculated_is_invoiced
+    current_invoices.any? || current_parent_invoices.any?
   end
 
   def calculated_enabled_feature_slugs

@@ -5,13 +5,13 @@ module Pages
     module Organizations
       module Tabs
         class Component < ApplicationComponent
-          TABS = %i[show edit locations paid_functionality sso invoices custom_layouts].freeze
+          TABS = %i[show edit locations invoice_functionality sso invoices custom_layouts].freeze
 
-          # paid_functionality and sso have no organized page of their own, so both land on the
+          # invoice_functionality and sso have no organized page of their own, so both land on the
           # profile the edit tab mirrors
           ORGANIZED_VIEWS = {show: :organization_root_path, edit: :organization_manage_path,
                              locations: :locations_organization_manage_path,
-                             paid_functionality: :organization_manage_path, sso: :organization_manage_path,
+                             invoice_functionality: :organization_manage_path, sso: :organization_manage_path,
                              custom_layouts: :organization_emails_path}.freeze
 
           # active: is passed rather than read off the route because a failed update renders the
@@ -35,8 +35,8 @@ module Pages
               ComponentStructs::Shapes.tab("Edit", edit_tab_path, tab: :edit),
               ComponentStructs::Shapes.tab("Locations", edit_tab_path(:locations),
                 count: @organization.locations.size, tab: :locations),
-              ComponentStructs::Shapes.tab("Edit paid functionality", edit_tab_path(:paid_functionality),
-                tab: :paid_functionality),
+              ComponentStructs::Shapes.tab("Edit invoice functionality", edit_tab_path(:invoice_functionality),
+                tab: :invoice_functionality),
               ComponentStructs::Shapes.tab("SSO", edit_tab_path(:sso), tab: :sso),
               ComponentStructs::Shapes.tab("Invoices", admin_organization_invoices_path(organization_id: @organization),
                 tab: :invoices),
@@ -55,7 +55,7 @@ module Pages
             return true if @active == tab
 
             case tab
-            when :paid_functionality then @organization.paid?
+            when :invoice_functionality then @organization.is_invoiced?
             when :sso then @organization.enabled?("saml_sso")
             # Not "nothing behind it" - the page is developer-only, so its tab follows dev info
             when :custom_layouts then @display_dev_info

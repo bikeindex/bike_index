@@ -11,7 +11,7 @@ RSpec.describe BugReport, type: :model do
       expect(bug_report).to have_attributes(email: "someone@example.com",
         receiver: "contact@bikeindex.org", tags: %w[broken search],
         user_id: nil, is_member: false,
-        is_paid_organization: false, is_paid_organization_staff: false)
+        is_invoiced_organization: false, is_invoiced_organization_staff: false)
     end
 
     context "with a user" do
@@ -20,7 +20,7 @@ RSpec.describe BugReport, type: :model do
 
       it "associates the user" do
         expect(bug_report).to have_attributes(user_id: user.id, is_member: false,
-          is_paid_organization: false, is_paid_organization_staff: false)
+          is_invoiced_organization: false, is_invoiced_organization_staff: false)
       end
 
       context "with an active membership" do
@@ -28,7 +28,7 @@ RSpec.describe BugReport, type: :model do
 
         it "is_member" do
           expect(bug_report).to have_attributes(user_id: user.id, is_member: true,
-            is_paid_organization: false, is_paid_organization_staff: false)
+            is_invoiced_organization: false, is_invoiced_organization_staff: false)
         end
       end
 
@@ -41,22 +41,22 @@ RSpec.describe BugReport, type: :model do
         end
       end
 
-      context "in a paid organization" do
-        let(:organization) { FactoryBot.create(:organization, :paid) }
+      context "in an invoiced organization" do
+        let(:organization) { FactoryBot.create(:organization, :with_invoice) }
         let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user:, organization:, role:) }
         let(:role) { "member" }
 
-        it "is_paid_organization" do
+        it "is_invoiced_organization" do
           expect(bug_report).to have_attributes(user_id: user.id, is_member: false,
-            is_paid_organization: true, is_paid_organization_staff: false)
+            is_invoiced_organization: true, is_invoiced_organization_staff: false)
         end
 
         context "with an admin role" do
           let(:role) { "admin" }
 
-          it "is_paid_organization_staff" do
+          it "is_invoiced_organization_staff" do
             expect(bug_report).to have_attributes(user_id: user.id, is_member: false,
-              is_paid_organization: true, is_paid_organization_staff: true)
+              is_invoiced_organization: true, is_invoiced_organization_staff: true)
           end
         end
       end
@@ -253,13 +253,13 @@ RSpec.describe BugReport, type: :model do
   end
 
   describe "scopes" do
-    let!(:paid_staff) { FactoryBot.create(:bug_report, is_paid_organization: true, is_paid_organization_staff: true, status: :resolved) }
+    let!(:invoiced_staff_report) { FactoryBot.create(:bug_report, is_invoiced_organization: true, is_invoiced_organization_staff: true, status: :resolved) }
     let!(:member) { FactoryBot.create(:bug_report, is_member: true, status: :investigate_priority_low) }
 
     it "filters by membership and investigate status" do
       expect(BugReport.member.pluck(:id)).to eq([member.id])
-      expect(BugReport.paid_organization.pluck(:id)).to eq([paid_staff.id])
-      expect(BugReport.paid_organization_staff.pluck(:id)).to eq([paid_staff.id])
+      expect(BugReport.invoiced_organization.pluck(:id)).to eq([invoiced_staff_report.id])
+      expect(BugReport.invoiced_organization_staff.pluck(:id)).to eq([invoiced_staff_report.id])
       # investigate includes unprioritized, excludes resolved/ignored
       expect(BugReport.investigate.pluck(:id)).to eq([member.id])
     end

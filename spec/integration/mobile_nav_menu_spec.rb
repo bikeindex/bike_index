@@ -47,19 +47,6 @@ RSpec.describe "Navbar", :js, type: :system do
     open_menu_and_search
   end
 
-  # The two-step login and the flash both animate, and a click waits for its target
-  # to settle before it lands -- that wait is Capybara's 2s default
-  def sign_in(user)
-    using_wait_time(10) do
-      visit new_session_path
-      fill_in "Email", with: user.email
-      click_button "Continue"
-      fill_in "Password", with: "testthisthing7$"
-      click_button "Log in"
-      expect(page).to have_no_current_path(new_session_path, wait: 10)
-    end
-  end
-
   context "signed in without an organization" do
     let!(:user) { FactoryBot.create(:user_confirmed) }
 
@@ -160,7 +147,7 @@ RSpec.describe "Navbar", :js, type: :system do
         # Clicking the group that was already open has to leave it open, not toggle it shut
         registrations.click
 
-        expect(page).to have_link("Search Registrations")
+        expect(page).to have_link("Organization Registrations")
         expect(registrations["aria-expanded"]).to eq "true"
 
         find("[data-shared-blocks--org-sidebar-target='collapseToggle']").click

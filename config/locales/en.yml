@@ -438,7 +438,7 @@ en:
         deleted_at: Deleted at
         enabled_feature_slugs: Enabled feature slugs
         invoices: Invoices
-        is_paid: Is paid
+        is_invoiced: Is invoiced
         kind: Kind
         locations: Locations
         lock_show_on_map: Lock show on map
@@ -5076,8 +5076,10 @@ en:
       recoveries: Recoveries
       registration_sequences: Registration sequences
       registration_stickers: Registration stickers
+      registrations_index: Organization Registrations
       reports: Reports
       resources: Resources
+      search_all_registrations: Search all registrations
       search_impounded_vehicles: Search Impounded Vehicles
       search_parking_notifications: Search Parking Notifications
       search_registrations: Search Registrations

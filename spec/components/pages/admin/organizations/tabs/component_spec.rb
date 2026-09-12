@@ -16,27 +16,27 @@ RSpec.describe Pages::Admin::Organizations::Tabs::Component, type: :component do
     expect(component).to have_link("Edit", href: "/admin/organizations/#{organization.to_param}/edit")
   end
 
-  describe "the paid functionality tab" do
-    it "is absent without paid features" do
-      expect(component).to_not have_link("Edit paid functionality")
+  describe "the invoice functionality tab" do
+    it "is absent without invoice features" do
+      expect(component).to_not have_link("Edit invoice functionality")
     end
 
-    context "with a paid organization" do
+    context "with an invoiced organization" do
       let(:organization) { FactoryBot.create(:organization_with_organization_features, name: "Cool Bikes") }
 
       it "renders" do
-        expect(component).to have_link("Edit paid functionality",
-          href: "/admin/organizations/#{organization.to_param}/edit?tab=paid_functionality")
+        expect(component).to have_link("Edit invoice functionality",
+          href: "/admin/organizations/#{organization.to_param}/edit?tab=invoice_functionality")
       end
     end
 
     # The page renders either way, saying there's nothing to configure
-    context "on the paid functionality tab unpaid" do
-      let(:active) { :paid_functionality }
+    context "on the invoice functionality tab without an invoice" do
+      let(:active) { :invoice_functionality }
 
       it "renders it, active" do
         expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish })
-          .to eq ["Edit paid functionality"]
+          .to eq ["Edit invoice functionality"]
       end
     end
   end

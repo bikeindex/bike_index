@@ -638,7 +638,6 @@ nb:
         deleted_at: Slettet kl
         enabled_feature_slugs: Aktiverte funksjonssnegler
         invoices: Fakturaer
-        is_paid: Er betalt
         kind: Snill
         locations: Steder
         lock_show_on_map: Lås vis på kartet
@@ -656,6 +655,7 @@ nb:
         users: Brukere
         website: Nettsted
         organization_roles: Medlemskap
+        is_invoiced: Er fakturert
       organization_feature:
         amount_cents: Beløp cent
         description: Beskrivelse
@@ -910,6 +910,63 @@ nb:
           new_in_box: uberørt/med merkelapper
           poor: trenger service
           salvage: fungerer ikke/kan ikke kjøres
+      ownership:
+        creation_kind:
+          api_v1: API v1
+          api_v2: API v2
+          api_v3: API v3
+          ascend_pos: stige
+          broken_ascend_pos: stige opp (brutt)
+          broken_lightspeed_pos: lyshastighet (ødelagt)
+          bulk_import: masseimport
+          bulk_import_worker: bulkimportarbeider
+          creator_unregistered_parking_notification: varsel om uregistrert parkering
+          embed: legge inn
+          embed_extended: legg inn +
+          embed_partial: gammel landingsside
+          impound_import: beslaglegge import
+          impound_process: beslagleggingsprosess
+          lightspeed_pos: lyshastighet
+          organization_form: organisasjonsskjema
+          other_pos: salgssted
+          register_flow: ny flyt
+          register_flow_landing_page: landingsside
+          register_flow_organized: ny flyt organisert
+          sticker: klistremerke
+          transferred_ownership: overført eierskap
+          web: nett
+        creation_kind_description:
+          api_v1: registrert gjennom API-et (v1)
+          api_v2: registrert gjennom API-et (v2)
+          api_v3: registrert gjennom API-et (v3)
+          ascend_pos: automatisk registrert av sykkelbutikkens salgssted (Ascend POS)
+          broken_ascend_pos: automatisk registrert av sykkelbutikkens salgssted (Ascend
+            POS), hvis integrasjon er merket som ødelagt
+          broken_lightspeed_pos: automatisk registrert av sykkelbutikkens utsalgssted
+            (Lightspeed POS), hvis integrasjon er merket som ødelagt
+          bulk_import: registrert ved import av regneark
+          bulk_import_worker: registrert ved import av regneark
+          creator_unregistered_parking_notification: registrert via flyten for varsling
+            om uregistrert parkering
+          embed: registrert på en organisasjons innebygde registreringsskjema
+          embed_extended: registrert på organisasjonens innebyggingsskjema, utvidet
+            versjon
+          embed_partial: registreringen startet med ufullstendig registrering, via
+            organisasjonens landingsside
+          impound_import: registrert av impound regnearkimport
+          impound_process: overført som en del av beslagsprosessen
+          lightspeed_pos: automatisk registrert av sykkelbutikkens utsalgssted (Lightspeed
+            POS)
+          organization_form: registrert av et organisasjonsmedlem, på organisasjonsskjemaet
+            på Bike Index
+          other_pos: automatisk registrert av sykkelbutikkens utsalgssted
+          register_flow: registrert med flertrinnsregistreringsflyten
+          register_flow_landing_page: registreringen startet via en landingsside for
+            organisasjonen, i registreringsflyten med flere trinn
+          register_flow_organized: registrert av et organisasjonsmedlem, i flertrinnsregistreringsflyten
+          sticker: registreringen startet fra et klistremerke
+          transferred_ownership: overført til en ny eier
+          web: registrert med egenregistreringsprosess
     models:
       ad: Annonse
       ambassador: Ambassadør
@@ -5036,6 +5093,8 @@ nb:
       stolen_hot_sheet: Stjålet Bike Hot Sheet
       stolen_message: Stjålet melding
       in_super_admin: "%{org_name} i superadministrator"
+      registrations_index: Organisasjonsregistreringer
+      search_all_registrations: Søk i alle registreringer
   stolen:
     index:
       ambassador: ambassadør

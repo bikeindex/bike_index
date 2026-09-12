@@ -125,10 +125,10 @@ RSpec.describe CredibilityScorer do
           end
         end
       end
-      context "paid organization" do
+      context "organization with an invoice" do
         let(:organization) { FactoryBot.create(:organization_with_organization_features) }
         it "returns with trusted organization" do
-          expect(organization.is_paid).to be_truthy
+          expect(organization.is_invoiced).to be_truthy
           expect(subject.creation_badges(ownership)).to match_array(%i[creation_organization_trusted created_this_month])
           # It doesn't return anything but created_at_point_of_sale
           ownership.update(pos_kind: "other_pos")
