@@ -9,6 +9,7 @@ class ProcessHotSheetJob < ScheduledJob
 
   def self.enqueue_workers
     Organization.with_enabled_feature_slugs("hot_sheet").joins(:hot_sheet_configuration)
+      .preload(:hot_sheet_configuration)
       .merge(HotSheetConfiguration.on).each do |organization|
       next unless organization.hot_sheet_configuration&.send_today_now?
 

@@ -24,9 +24,8 @@ module Backfills
 
     private
 
-    # A sheet the new code has already written is left alone
     def hot_sheets
-      HotSheet.where(delivery_status_legacy: LEGACY_DELIVERED, delivery_status: :delivery_pending)
+      HotSheet.delivery_pending.where(delivery_status_legacy: LEGACY_DELIVERED)
     end
   end
 end

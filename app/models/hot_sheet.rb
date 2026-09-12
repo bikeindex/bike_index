@@ -39,7 +39,7 @@ class HotSheet < ApplicationRecord
     # The day's sheets, built (unsaved) one per batch of recipients when the day has none
     def for(organization_or_id, date)
       org_id = organization_or_id.is_a?(Integer) ? organization_or_id : organization_or_id.id
-      hot_sheets = where(organization_id: org_id, sheet_date: date).order(:id).to_a
+      hot_sheets = where(organization_id: org_id, sheet_date: date).includes(:organization).order(:id).to_a
       return hot_sheets if hot_sheets.any?
       # A past day is whatever it was - only today's sheets are still to come
       return [] if date.present? && date != Time.current.to_date
@@ -47,10 +47,11 @@ class HotSheet < ApplicationRecord
       configuration = HotSheetConfiguration.find_by(organization_id: org_id)
       return [] if configuration.blank?
 
+      organization = configuration.organization
       stolen_record_ids = calculated_stolen_records(configuration).pluck(:id)
       # At least one sheet, so a day with nobody to email is still marked delivered
       (configuration.current_recipient_ids.each_slice(RECIPIENTS_PER_EMAIL).to_a.presence || [[]])
-        .map { new(organization_id: org_id, sheet_date: date, recipient_ids: it, stolen_record_ids:) }
+        .map { new(organization:, sheet_date: date, recipient_ids: it, stolen_record_ids:) }
     end
 
     private
@@ -72,7 +73,7 @@ class HotSheet < ApplicationRecord
   end
 
   def recipient_emails
-    recipient_users.pluck(:email)
+    recipient_users.map(&:email)
   end
 
   def next_sheet
@@ -89,12 +90,12 @@ class HotSheet < ApplicationRecord
   end
 
   def fetch_stolen_records
-    StolenRecord.current_and_not.where(id: stolen_record_ids)
+    @fetch_stolen_records ||= StolenRecord.current_and_not.where(id: stolen_record_ids)
       .reorder(date_stolen: :desc)
       .joins(:bike).where(bikes: {deleted_at: nil}).includes(:bike)
   end
 
   def recipient_users
-    organization.users.where(id: recipient_ids)
+    @recipient_users ||= organization.users.where(id: recipient_ids).to_a
   end
 end

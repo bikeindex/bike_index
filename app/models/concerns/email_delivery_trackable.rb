@@ -12,8 +12,7 @@ module EmailDeliveryTrackable
   end
 
   class_methods do
-    # Takes the record and a block that delivers its email. Raises the delivery's error,
-    # unless the addresses are undeliverable
+    # Raises the delivery's error, unless the addresses are undeliverable
     def track_email_delivery(record, is_new_email_address: false)
       return if record.delivery_settled?
 
@@ -28,7 +27,11 @@ module EmailDeliveryTrackable
 
       # Only the send is rescued - a ban evaluation that blows up hasn't failed to deliver anything
       begin
-        handle_delivery_success(record, yield, user_emails:)
+        delivery = yield
+        record.update(delivery_status: "delivery_success",
+          message_id: record.message_id || delivery.try(:message_id))
+        user_emails.each { it.update_last_email_errored!(email_errored: false) }
+        nil
       rescue => e
         handle_delivery_error(record, e, addresses:, user_emails:)
       end
@@ -43,13 +46,6 @@ module EmailDeliveryTrackable
       recipients.all? do |user|
         EmailBan.ban?(user, user_email: user_emails.find { it.user_id == user.id }, is_new_email_address:)
       end
-    end
-
-    def handle_delivery_success(record, delivery, user_emails:)
-      record.update(delivery_status: "delivery_success",
-        message_id: record.message_id || delivery.try(:message_id))
-      user_emails.each { it.update_last_email_errored!(email_errored: false) }
-      nil
     end
 
     # Postmark's 406 is a partial delivery - the rest of the batch goes out, whether or not it
@@ -78,8 +74,7 @@ module EmailDeliveryTrackable
     false
   end
 
-  # A settled delivery isn't worth sending again - it delivered, we blocked it, or its
-  # addresses are dead
+  # A settled delivery isn't worth sending again
   def delivery_settled?
     Notification::SETTLED_STATUSES.include?(delivery_status) ||
       Notification::UNDELIVERABLE_ERROR_NAMES.include?(delivery_error)

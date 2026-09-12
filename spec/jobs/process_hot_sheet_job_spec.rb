@@ -86,7 +86,6 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
 
         it "creates a hot sheet for each slice of recipients, and emails each one" do
           expect(ActionMailer::Base.deliveries.count).to eq 0
-          # Saved up front, so a run that dies leaves the rest of the batches to the next
           allow(OrganizedMailer).to receive(:hot_sheet).and_wrap_original do |method, sheet|
             expect(HotSheet.where(sheet_date: Time.current.to_date).count).to eq 3
             method.call(sheet)
