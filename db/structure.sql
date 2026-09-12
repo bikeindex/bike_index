@@ -1722,10 +1722,13 @@ CREATE TABLE public.hot_sheets (
     organization_id bigint,
     stolen_record_ids jsonb,
     recipient_ids jsonb,
-    delivery_status character varying,
     sheet_date date,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    delivery_status_legacy character varying,
+    delivery_status integer DEFAULT 0,
+    delivery_error character varying,
+    message_id character varying
 );
 
 
@@ -7812,6 +7815,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260912094501'),
 ('20260909120000'),
 ('20260908163548'),
 ('20260821100000'),

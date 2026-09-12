@@ -3,36 +3,64 @@
 # Table name: hot_sheets
 # Database name: primary
 #
-#  id                :bigint           not null, primary key
-#  delivery_status   :string
-#  recipient_ids     :jsonb
-#  sheet_date        :date
-#  stolen_record_ids :jsonb
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  organization_id   :bigint
+#  id                     :bigint           not null, primary key
+#  delivery_error         :string
+#  delivery_status        :integer          default("delivery_pending")
+#  delivery_status_legacy :string
+#  recipient_ids          :jsonb
+#  sheet_date             :date
+#  stolen_record_ids      :jsonb
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  message_id             :string
+#  organization_id        :bigint
 #
 # Indexes
 #
 #  index_hot_sheets_on_organization_id  (organization_id)
 #
 class HotSheet < ApplicationRecord
+  include EmailDeliveryTrackable
+
+  # Postmark only allows 50 recipients per email, so a day's recipients are split across
+  # sheets - all rendering the same bikes
+  RECIPIENTS_PER_EMAIL = 48
+  MAX_BIKES = 10
+
+  enum :delivery_status, Notification::DELIVERY_STATUS_ENUM
+
   belongs_to :organization
 
   has_one :hot_sheet_configuration, through: :organization
 
   validates_presence_of :organization_id, :sheet_date
 
-  delegate :bounding_box, :timezone, to: :hot_sheet_configuration, allow_nil: true
+  class << self
+    # The day's sheets, built (unsaved) one per batch of recipients when the day has none
+    def for(organization_or_id, date)
+      org_id = organization_or_id.is_a?(Integer) ? organization_or_id : organization_or_id.id
+      hot_sheets = where(organization_id: org_id, sheet_date: date).includes(:organization).order(:id).to_a
+      return hot_sheets if hot_sheets.any?
+      # A past day is whatever it was - only today's sheets are still to come
+      return [] if date.present? && date != Time.current.to_date
 
-  scope :email_success, -> { where(delivery_status: "email_success") }
+      configuration = HotSheetConfiguration.find_by(organization_id: org_id)
+      return [] if configuration.blank?
 
-  def self.for(organization_or_id, date = nil)
-    org_id = organization_or_id.is_a?(Integer) ? organization_or_id : organization_or_id.id
-    if date.present?
-      where(organization_id: org_id, sheet_date: date).first
-    else
-      new(organization_id: org_id)
+      organization = configuration.organization
+      stolen_record_ids = calculated_stolen_records(configuration).pluck(:id)
+      # At least one sheet, so a day with nobody to email is still marked delivered
+      (configuration.current_recipient_ids.each_slice(RECIPIENTS_PER_EMAIL).to_a.presence || [[]])
+        .map { new(organization:, sheet_date: date, recipient_ids: it, stolen_record_ids:) }
+    end
+
+    private
+
+    def calculated_stolen_records(hot_sheet_configuration)
+      StolenRecord.within_bounding_box(hot_sheet_configuration.bounding_box)
+        .reorder(date_stolen: :desc)
+        .joins(:bike).where(bikes: {deleted_at: nil})
+        .limit(MAX_BIKES)
     end
   end
 
@@ -40,21 +68,12 @@ class HotSheet < ApplicationRecord
     sheet_date.blank?
   end
 
-  def email_success?
-    delivery_status == "email_success"
-  end
-
   def subject
     "Stolen Bike Hot Sheet: #{sheet_date.strftime("%A, %b %-d")}"
   end
 
   def recipient_emails
-    fetch_recipients.pluck(:email)
-  end
-
-  # This may become a configurable option
-  def max_bikes
-    10
+    recipient_users.map(&:email)
   end
 
   def next_sheet
@@ -71,40 +90,12 @@ class HotSheet < ApplicationRecord
   end
 
   def fetch_stolen_records
-    if stolen_record_ids.is_a?(Array)
-      stolen_records = StolenRecord.current_and_not.where(id: stolen_record_ids)
-        .reorder(date_stolen: :desc)
-    else
-      stolen_records = calculated_stolen_records
-      update(stolen_record_ids: stolen_records.pluck(:id))
-    end
-    stolen_records.joins(:bike).where(bikes: {deleted_at: nil})
-  end
-
-  def fetch_recipients
-    unless recipient_ids.is_a?(Array)
-      update(recipient_ids: hot_sheet_configuration.current_recipient_ids)
-    end
-    organization.users.where(id: recipient_ids)
-  end
-
-  def deliver_email
-    if recipient_emails.any?
-      # Postmark only allows 50 emails per sent email, so abide by that
-      recipient_emails.each_slice(48).map do |permitted_recipient_emails|
-        # This is called from process_hot_sheet_worker, so it can be delivered inline
-        OrganizedMailer.hot_sheet(self, permitted_recipient_emails).deliver_now
-      end
-    end
-    update(delivery_status: "email_success")
-  end
-
-  private
-
-  def calculated_stolen_records
-    StolenRecord.current.within_bounding_box(bounding_box)
+    @fetch_stolen_records ||= StolenRecord.current_and_not.where(id: stolen_record_ids)
       .reorder(date_stolen: :desc)
-      .joins(:bike).where(bikes: {deleted_at: nil})
-      .limit(max_bikes)
+      .joins(:bike).where(bikes: {deleted_at: nil}).includes(:bike)
+  end
+
+  def recipient_users
+    @recipient_users ||= organization.users.where(id: recipient_ids).to_a
   end
 end

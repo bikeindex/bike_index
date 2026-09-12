@@ -29,6 +29,8 @@
 #
 
 class Notification < ApplicationRecord
+  include EmailDeliveryTrackable
+
   # TODO: create notifications for every email we send (including other models, e.g. Feedback)
   #
   # Every single notification that we send has a separate enum key - which is a lot!
@@ -36,9 +38,13 @@ class Notification < ApplicationRecord
   KIND_ENUM = YAML.load_file(Rails.root.join("config/notification_kinds_enums.yml")).freeze
 
   MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
-  DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2, delivery_banned: 3}.freeze
+  DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2,
+                          delivery_banned: 3, delivery_partial_success: 4}.freeze
+  DELIVERED_STATUSES = %w[delivery_success delivery_partial_success].freeze
+  SETTLED_STATUSES = (DELIVERED_STATUSES + %w[delivery_banned]).freeze
 
   UNDELIVERABLE_ERRORS = [Postmark::InactiveRecipientError, Postmark::InvalidEmailRequestError].freeze
+  UNDELIVERABLE_ERROR_NAMES = UNDELIVERABLE_ERRORS.map(&:name).freeze
 
   enum :kind, KIND_ENUM
   enum :message_channel, MESSAGE_CHANNEL_ENUM
@@ -59,8 +65,6 @@ class Notification < ApplicationRecord
   scope :theft_survey, -> { where(kind: theft_survey_kinds) }
   scope :admin, -> { where(kind: admin_kinds) }
   scope :with_message_id, -> { where.not(message_id: nil) }
-  # A send we blocked is as undelivered as one postmark refused
-  scope :delivery_failed, -> { where(delivery_status: %w[delivery_failure delivery_banned]) }
 
   class << self
     def kinds
@@ -142,38 +146,6 @@ class Notification < ApplicationRecord
         .or(where(notifiable_type: "CustomerContact", notifiable_id: customer_contact_ids))
         .or(where(notifiable_type: "StolenNotification", notifiable_id: stolen_notification_ids))
     end
-
-    def track_email_delivery(notification, is_new_email_address: false)
-      return if notification.delivery_success?
-
-      user_email = notification.user_email
-
-      return notification.update(delivery_status: "delivery_banned") if delivery_email_banned?(notification, user_email:, is_new_email_address:)
-
-      # Only the send is rescued - a ban evaluation that blows up hasn't failed to deliver anything
-      begin
-        delivery = yield
-
-        notification.update(delivery_status: "delivery_success",
-          message_id: notification.message_id || delivery.try(:message_id))
-        user_email&.update_last_email_errored!(email_errored: false)
-      rescue => e
-        notification.update(delivery_status: "delivery_failure", delivery_error: e.class)
-        # Postmark refuses the address itself once it's deactivated, so last_email_errored
-        # doesn't block anything - it's recorded to show why the emails stopped arriving
-        user_email&.update_last_email_errored!(email_errored: true)
-
-        raise e unless UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
-      end
-    end
-
-    private
-
-    def delivery_email_banned?(notification, user_email:, is_new_email_address:)
-      return false if email_ban_exempt_kinds.include?(notification.kind)
-
-      EmailBan.ban?(notification.user, user_email:, is_new_email_address:)
-    end
   end
 
   def theft_alert?
@@ -212,12 +184,6 @@ class Notification < ApplicationRecord
     return nil unless twilio_sid.present?
 
     Integrations::Twilio.new.get_message(twilio_sid)
-  end
-
-  def user_email
-    return nil unless email?
-
-    user&.user_emails&.friendly_find(message_channel_target)
   end
 
   def notifiable_display_name
@@ -278,6 +244,18 @@ class Notification < ApplicationRecord
 
   def delivery_error_invalid?
     delivery_error == "Postmark::InvalidEmailRequestError"
+  end
+
+  def email_ban_exempt?
+    self.class.email_ban_exempt_kinds.include?(kind)
+  end
+
+  def recipient_users
+    [user].compact
+  end
+
+  def recipient_emails
+    [message_channel_target].compact
   end
 
   private

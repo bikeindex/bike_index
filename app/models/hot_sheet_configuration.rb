@@ -46,8 +46,9 @@ class HotSheetConfiguration < ApplicationRecord
     organization.users.where(id: current_recipient_ids)
   end
 
+  # Ordered, so re-running a day slices the same recipients onto the same sheets
   def current_recipient_ids
-    organization.organization_roles.claimed.notification_daily.pluck(:user_id)
+    organization.organization_roles.claimed.notification_daily.order(:user_id).pluck(:user_id)
   end
 
   def timezone
@@ -71,10 +72,15 @@ class HotSheetConfiguration < ApplicationRecord
   end
 
   def send_today_now?
-    return false if off? ||
-      hot_sheets.where(sheet_date: current_date).email_success.any?
+    return false if off? || sent_today?
 
     time_in_zone > send_today_at
+  end
+
+  def sent_today?
+    sheets = hot_sheets.where(sheet_date: current_date).to_a
+
+    sheets.any? && sheets.all?(&:delivery_settled?)
   end
 
   def send_hour=(val)

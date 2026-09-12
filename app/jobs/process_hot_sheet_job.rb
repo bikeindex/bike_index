@@ -7,30 +7,42 @@ class ProcessHotSheetJob < ScheduledJob
     30.minutes
   end
 
-  def perform(org_id = nil)
-    return enqueue_workers unless org_id.present?
-
-    hot_sheet = HotSheet.for(org_id, Time.current.to_date)
-    return hot_sheet if hot_sheet&.email_success?
-
-    hot_sheet ||= HotSheet.create!(organization_id: org_id, sheet_date: Time.current.to_date)
-    # Bump bike cached attributes, to be sure the email has all the info. Once per sheet -
-    # deliver_email sends a separate email per 48 recipients, all rendering the same bikes
-    hot_sheet.fetch_stolen_records.each { it.bike.update(updated_at: Time.current) }
-    hot_sheet.fetch_recipients
-    hot_sheet.deliver_email
-  end
-
-  def organizations
-    Organization.with_enabled_feature_slugs("hot_sheet").left_joins(:hot_sheet_configuration)
-      .where(hot_sheet_configurations: {is_on: true})
-  end
-
-  def enqueue_workers
-    organizations.each do |organization|
+  def self.enqueue_workers
+    Organization.with_enabled_feature_slugs("hot_sheet").joins(:hot_sheet_configuration)
+      .preload(:hot_sheet_configuration)
+      .merge(HotSheetConfiguration.on).each do |organization|
       next unless organization.hot_sheet_configuration&.send_today_now?
 
-      self.class.perform_async(organization.id)
+      perform_async(organization.id)
     end
+  end
+
+  def perform(org_id = nil)
+    return self.class.enqueue_workers unless org_id.present?
+
+    hot_sheets = HotSheet.for(org_id, Time.current.to_date)
+    return hot_sheets if hot_sheets.all?(&:delivery_settled?)
+
+    # Saved before any delivery, so a run that dies leaves the rest of the day's batches
+    # to the next one - HotSheet.for builds them only for a day that has none
+    hot_sheets.each(&:save!)
+    # Bump bike cached attributes, so the email has all the info
+    hot_sheets.first.fetch_stolen_records.each { it.bike.update(updated_at: Time.current) }
+    # Deliver every batch before raising, so one failure doesn't block the rest
+    errors = hot_sheets.filter_map { delivery_error(it) }
+    raise errors.first if errors.any?
+  end
+
+  private
+
+  # Returns the batch's error rather than raising it, so the rest still go out - and nil
+  # for a batch that delivered, which is what keeps it out of the errors
+  def delivery_error(hot_sheet)
+    HotSheet.track_email_delivery(hot_sheet) do
+      OrganizedMailer.hot_sheet(hot_sheet).deliver_now if hot_sheet.recipient_ids.any?
+    end
+    nil
+  rescue => e
+    e
   end
 end

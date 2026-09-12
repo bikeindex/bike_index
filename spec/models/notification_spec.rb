@@ -163,7 +163,6 @@ RSpec.describe Notification, type: :model do
         expect(user_email.reload.last_email_errored?).to be_truthy
         expect(user.reload.email).to eq user_email.email
         expect(notification.reload.message_channel_target).to eq user.email
-        expect(notification.user_email&.id).to eq user_email.id
         user.update_column :updated_at, Time.current - 1.hour
         expect(notification.reload.delivery_status).to eq "delivery_pending"
         Notification.track_email_delivery(notification) do
@@ -272,7 +271,6 @@ RSpec.describe Notification, type: :model do
     context "with unknown postmark error" do
       it "raises and adds the error to the notification" do
         expect(notification.reload.delivery_status).to eq "delivery_pending"
-        expect(notification.user_email).to be_nil
         expect do
           expect do
             Notification.track_email_delivery(notification) do
@@ -289,15 +287,14 @@ RSpec.describe Notification, type: :model do
     context "with InactiveRecipientError" do
       let(:error_message) do
         "You tried to send to recipient(s) that have been marked as inactive. Found inactive addresses: " \
-        "example@bikeindex.org. Inactive recipients are ones that have generated a hard bounce, a spam " \
-        "complaint, or a manual suppression."
+        "#{notification.message_channel_target}. Inactive recipients are ones that have generated a hard " \
+        "bounce, a spam complaint, or a manual suppression."
       end
       let(:inactive_recipient_error) do
         Postmark::ApiInputError.build("error", {"ErrorCode" => 406, "Message" => error_message})
       end
-      it "adds the error to the notification without banning" do
+      it "adds the error to the notification without banning, and doesn't deliver again" do
         expect(notification.reload.delivery_status).to eq "delivery_pending"
-        expect(notification.user_email).to be_nil
         expect do
           Notification.track_email_delivery(notification) { raise inactive_recipient_error }
         end.to change(EmailBan, :count).by 0
@@ -305,6 +302,22 @@ RSpec.describe Notification, type: :model do
         expect(notification.reload.delivery_status).to eq "delivery_failure"
         expect(notification.delivery_error).to eq "Postmark::InactiveRecipientError"
         expect(EmailBan.ban?(user)).to be_falsey
+        expect(notification.delivery_settled?).to be_truthy
+        Notification.track_email_delivery(notification) { raise "should not be reached" }
+      end
+
+      context "with an error postmark didn't attribute" do
+        let(:error_message) { "You tried to send to recipient(s) that have been marked as inactive." }
+        before { user_email }
+
+        it "records a failure, and flags the address" do
+          expect(inactive_recipient_error.recipients).to eq([])
+          Notification.track_email_delivery(notification) { raise inactive_recipient_error }
+
+          # One address can't be part-delivered
+          expect(notification.reload.delivery_status).to eq "delivery_failure"
+          expect(user_email.reload.last_email_errored).to be_truthy
+        end
       end
       context "when there is a user_email" do
         it "updates the user_email to be failed" do
@@ -314,7 +327,6 @@ RSpec.describe Notification, type: :model do
           expect(user_email.last_email_errored?).to be_falsey
 
           expect(notification.reload.delivery_status).to eq "delivery_pending"
-          expect(notification.user_email&.id).to eq user_email.id
 
           expect do
             Notification.track_email_delivery(notification) { raise inactive_recipient_error }
@@ -335,8 +347,6 @@ RSpec.describe Notification, type: :model do
               user:, notifiable: additional_email, message_channel_target: additional_email.email)
           end
           it "only records the error on the errored email" do
-            expect(notification.user_email&.id).to eq additional_email.id
-
             expect do
               Notification.track_email_delivery(notification) { raise inactive_recipient_error }
             end.to change(EmailBan, :count).by 0
@@ -350,7 +360,7 @@ RSpec.describe Notification, type: :model do
 
     context "with InvalidEmailRequestError" do
       let(:invalid_email_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 300}) }
-      it "adds the error to the notification without raising" do
+      it "adds the error to the notification without raising, and doesn't deliver again" do
         expect(notification.reload.delivery_status).to eq "delivery_pending"
         expect do
           Notification.track_email_delivery(notification) { raise invalid_email_error }
@@ -359,6 +369,8 @@ RSpec.describe Notification, type: :model do
         expect(notification.reload.delivery_status).to eq "delivery_failure"
         expect(notification.delivery_error).to eq "Postmark::InvalidEmailRequestError"
         expect(notification.delivery_error_invalid?).to be_truthy
+        expect(notification.delivery_settled?).to be_truthy
+        Notification.track_email_delivery(notification) { raise "should not be reached" }
       end
     end
   end
