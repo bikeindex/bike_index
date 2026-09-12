@@ -1,0 +1,8 @@
+<%# The list id and the order url are what the legacy admin bundle's sortable and delete handlers bind to %>
+<%= render(UI::Forms::FileUploadMulti::Component.new(
+      url: public_images_path, file_param: "public_image[image]", params: upload_params,
+      accept: ImageUploader.permitted_extensions,
+      list_html_options: {id: "public_images", class: @list_class,
+                          data: {order_url: order_public_images_url}})) do %>
+  <%= render partial: "public_images/admin_public_image", collection: @imageable.public_images.with_attached_file, as: :public_image %>
+<% end %>

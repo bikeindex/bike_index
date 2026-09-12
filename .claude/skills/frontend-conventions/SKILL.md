@@ -203,7 +203,8 @@ rest of the table's state. Reach it through the reader, not the bare helper:
 
 `application_standalone.js` is a plain `<script src>` in the admin layout, and everything it
 sets up binds once inside one `$(document).ready` gated on `#admin-content` — the per-page
-select, the selectize filters, the nested location fields, the uppy uploader. Turbo Drive
+select, the selectize filters, the nested location fields, the blog image list's delete and
+primary-image handlers. Turbo Drive
 doesn't re-execute an unchanged script tag, and a back/forward restoration hands back a
 *clone* of its snapshot, so that markup comes back looking live with nothing bound to it.
 
@@ -214,7 +215,7 @@ And it's the page you navigate *away from* that breaks, not just the one you lan
 So a screen carrying any of it passes `turbo: false` — `Pages::Admin::Headers::Tabs` takes it, and
 `Pages::Admin::Organizations::CustomLayouts::Form::Wrapper` is the one that does. Before opting a new section in,
 check its tab targets for `#per_page_select`, `.fancy-select`, `.add_fields`,
-`#multipleUserSelect` and `.UppyForm`.
+`#multipleUserSelect` and `#blog-image-form`.
 
 ## Screenshots
 

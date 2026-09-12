@@ -36,17 +36,5 @@
   <% end %>
 <% end %>
 
-<%# Because somewhere, there is overflow hidden and it cuts off the bottom of the save button %>
-<ul
-  id="public_images"
-  class="list-unstyled mt-4 not-blog-public-images"
-  data-order-url="<%= order_public_images_url %>"
->
-  <% if @organization.public_images %>
-    <%= render partial: "public_images/admin_public_image", collection: @organization.public_images, as: :public_image, locals: {skip_order: true} %>
-  <% end %>
-</ul>
-
-<section class="custom-layouts">
-  <%= render partial: "public_images/admin_new_form", locals: {imageable_type: "Organization"} %>
-</section>
+<%# The list's mt-4: somewhere there is overflow hidden that cuts off the bottom of the save button %>
+<%= render(Pages::Admin::PublicImages::Uploader::Component.new(imageable: @organization, list_class: "list-unstyled mt-4")) %>
