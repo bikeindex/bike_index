@@ -68,6 +68,7 @@ RSpec.describe UpdateInvoiceJob, type: :job do
       expect(invoice_to_activate.current?).to be_truthy
       expect(invoice_to_activate.future?).to be_falsey
       expect(organization3.is_invoiced).to be_truthy
+      expect(organization3.paid_money).to be_falsey # the invoice is $0
     end
   end
 end

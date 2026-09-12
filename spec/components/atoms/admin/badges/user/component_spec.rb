@@ -112,7 +112,7 @@ RSpec.describe Atoms::Admin::Badges::User::Component, type: :component do
 
       it "renders paid org icon" do
         expect(user.invoiced_org?).to be_truthy
-        allow_any_instance_of(Organization).to receive(:paid_money?).and_return(true)
+        organization.update_column(:paid_money, true)
         result = render_component(user:)
         expect(result).to have_css("[role='tooltip']", text: "Paid organization member - Law Enforcement", visible: :all)
 

@@ -69,7 +69,7 @@ module CallbackJobs
         return
       end
 
-      user.bike_organizations.select { |o| o.paid_money? }.each do |organization|
+      user.bike_organizations.paid_money.each do |organization|
         user.bikes.each do |bike|
           UserAlert.update_unassigned_bike_org(user: user, organization: organization, bike: bike)
         end

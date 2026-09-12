@@ -2,8 +2,7 @@ class AddPaidMoneyToOrganizations < ActiveRecord::Migration[8.1]
   def up
     add_column :organizations, :paid_money, :boolean, default: false, null: false
 
-    # Nothing re-saves every organization, so without this the column reads false
-    # for organizations that have paid until their next invoice or payment
+    # Nothing re-saves every organization, so without this the ones that have paid read false
     execute <<~SQL.squish
       UPDATE organizations SET paid_money = true WHERE id IN (
         SELECT organization_id FROM invoices
