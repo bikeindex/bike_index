@@ -14,7 +14,7 @@ class CreateUserAlertNotificationJob < ScheduledJob
     notification = Notification.find_or_create_by(notifiable: user_alert,
       kind: "user_alert_#{user_alert.kind}")
 
-    notification.track_email_delivery do
+    Notification.track_email_delivery(notification) do
       CustomerMailer.user_alert_email(user_alert).deliver_now
     end
   end

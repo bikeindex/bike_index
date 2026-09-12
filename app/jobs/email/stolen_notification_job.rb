@@ -20,7 +20,7 @@ module Email
         Notification.find_or_create_by(notifiable: stolen_notification, kind:)
       end
 
-      notification.track_email_delivery do
+      Notification.track_email_delivery(notification) do
         if notification.kind == "stolen_notification_sent"
           CustomerMailer.stolen_notification_email(stolen_notification).deliver_now
         else
