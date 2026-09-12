@@ -197,11 +197,18 @@
 
   <div class="tw:mt-6 tw:flex tw:items-center tw:justify-center tw:gap-4">
     <%= render(UI::Button::Component.new(text: "Update the #{@bike.type}", color: :primary, size: :lg, type: "submit")) %>
+  </div>
+<% end %>
 
-    <% unless @bike.deleted? %>
-      <%= render(UI::ButtonLink::Component.new(text: "Delete #{@bike.type}", href: admin_bike_url(@bike),
-            color: :error, method: :delete, confirm: "Are you sure?")) %>
-    <% end %>
+<%#
+  Outside the form above: a nested <form> is dropped by the parser, which left this
+  submitting the edit form with no confirm
+%>
+
+<% unless @bike.deleted? %>
+  <div class="tw:mt-4 tw:flex tw:items-center tw:justify-center">
+    <%= render(UI::ButtonLink::Component.new(text: "Delete #{@bike.type}", href: admin_bike_url(@bike),
+          color: :error, method: :delete, confirm: "Are you sure?")) %>
   </div>
 <% end %>
 

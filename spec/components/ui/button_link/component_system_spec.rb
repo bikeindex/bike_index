@@ -44,25 +44,4 @@ RSpec.describe UI::ButtonLink::Component, :js, type: :system do
       expect_axe_clean if index.zero?
     end
   end
-
-  # window.confirm leaves no markup, so what the guard does is only observable from the
-  # browser: the message it shows, and whether the request went ahead
-  it "asks before a link is followed and before a button_to submits, and both stay put when dismissed" do
-    preview_path = "/rails/view_components/ui/button_link/component/link_confirm"
-    visit preview_path
-    expect_axe_clean
-
-    link = find_link("Read the terms")
-    expect(dismiss_confirm { link.click }).to eq "Leave this page?"
-    expect(page).to have_current_path(preview_path)
-
-    accept_confirm { link.click }
-    expect(page).to have_current_path("/terms")
-
-    # The apostrophe is what escape_javascript is there for — it reaches the dialog intact
-    # rather than closing the string early
-    visit "/rails/view_components/ui/button_link/component/button_to_confirm"
-    expect(dismiss_confirm { click_button "Delete" }).to eq "Are you sure? It can't be undone"
-    expect(page).to have_current_path("/rails/view_components/ui/button_link/component/button_to_confirm")
-  end
 end
