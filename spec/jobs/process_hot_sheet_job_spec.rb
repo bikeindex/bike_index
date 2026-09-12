@@ -82,7 +82,7 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
         let!(:organization_role_never) { FactoryBot.create(:organization_role_claimed, organization: organization1, hot_sheet_notification: "notification_never") }
         let!(:stolen_record) { FactoryBot.create(:stolen_record, :in_nyc) }
         let(:recipient_ids) { ([organization_role] + organization_roles).map(&:user_id) }
-        before { stub_const("ProcessHotSheetJob::RECIPIENTS_PER_EMAIL", 3) }
+        before { stub_const("HotSheet::RECIPIENTS_PER_EMAIL", 3) }
 
         it "creates a hot sheet for each slice of recipients, and emails each one" do
           expect(ActionMailer::Base.deliveries.count).to eq 0

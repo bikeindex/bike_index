@@ -1,10 +1,6 @@
 class ProcessHotSheetJob < ScheduledJob
   prepend ScheduledJobRecorder
 
-  # Postmark only allows 50 emails per sent email
-  # So split into separate hot sheets, all rendering the same bikes
-  RECIPIENTS_PER_EMAIL = 48
-
   sidekiq_options queue: "low_priority", retry: false
 
   def self.frequency
@@ -23,28 +19,13 @@ class ProcessHotSheetJob < ScheduledJob
   def perform(org_id = nil)
     return self.class.enqueue_workers unless org_id.present?
 
-    sheet_date = Time.current.to_date
-    day_sheets = HotSheet.where(organization_id: org_id, sheet_date:).order(:id).to_a
-    day_sheets = [HotSheet.create!(organization_id: org_id, sheet_date:)] if day_sheets.none?
-    return day_sheets if day_sheets.all?(&:delivery_settled?)
-
-    hot_sheet = day_sheets.first
+    hot_sheets = HotSheet.for(org_id, Time.current.to_date)
+    return hot_sheets if hot_sheets.all?(&:delivery_settled?)
 
     # Bump bike cached attributes, so the email has all the info
-    hot_sheet.fetch_stolen_records.each { it.bike.update(updated_at: Time.current) }
-    # Always at least one slice, so a sheet with nobody to email is still marked delivered
-    recipient_id_slices = hot_sheet.hot_sheet_configuration.current_recipient_ids
-      .each_slice(RECIPIENTS_PER_EMAIL).to_a.presence || [[]]
-
-    # Everything a batch's sheet shares with the others - notably not the delivery status
-    sheet_attributes = {organization_id: org_id, sheet_date:, stolen_record_ids: hot_sheet.stolen_record_ids}
+    hot_sheets.first.fetch_stolen_records.each { it.bike.update(updated_at: Time.current) }
     # Deliver every batch before raising, so one failure doesn't block the rest
-    errors = recipient_id_slices.filter_map.with_index do |recipient_ids, index|
-      # Re-running a day reuses its sheets, rather than stacking up duplicates
-      sheet = day_sheets[index] || HotSheet.new(sheet_attributes)
-      sheet.recipient_ids = recipient_ids
-      deliver_email(sheet)
-    end
+    errors = hot_sheets.filter_map { deliver_email(it) }
     raise errors.first if errors.any?
   end
 

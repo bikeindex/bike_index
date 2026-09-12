@@ -448,7 +448,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
     let(:mail) { OrganizedMailer.hot_sheet(hot_sheet) }
     it "renders email" do
       expect(bike.public_images.count).to eq 1
-      expect(hot_sheet.fetch_recipients.pluck(:id)).to match_array([organization.auto_user.id, recipient.id])
+      expect(hot_sheet.recipient_emails).to match_array([organization.auto_user.email, recipient.email])
       expect(mail.body.encoded).to match header_mail_snippet.body
       expect(mail.body.encoded).to match hot_sheet.subject
       expect(mail.body.encoded).to match bike_path(stolen_record.bike.to_param) # using path because we don't care about specifics

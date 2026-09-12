@@ -22,6 +22,12 @@
 class HotSheet < ApplicationRecord
   include EmailDeliveryTrackable
 
+  # Postmark only allows 50 recipients per email, so a day's recipients are split across
+  # sheets - all rendering the same bikes
+  RECIPIENTS_PER_EMAIL = 48
+  # This may become a configurable option
+  MAX_BIKES = 10
+
   enum :delivery_status, Notification::DELIVERY_STATUS_ENUM
 
   belongs_to :organization
@@ -30,14 +36,29 @@ class HotSheet < ApplicationRecord
 
   validates_presence_of :organization_id, :sheet_date
 
-  delegate :bounding_box, :timezone, to: :hot_sheet_configuration, allow_nil: true
+  class << self
+    # The day's sheets - or, when there are none yet, one built for each batch of recipients
+    def for(organization_or_id, date)
+      org_id = organization_or_id.is_a?(Integer) ? organization_or_id : organization_or_id.id
+      hot_sheets = where(organization_id: org_id, sheet_date: date).order(:id).to_a
+      return hot_sheets if hot_sheets.any?
+      # A past day is whatever it was - only today's sheets are still to come
+      return [] if date.present? && date != Time.current.to_date
 
-  def self.for(organization_or_id, date = nil)
-    org_id = organization_or_id.is_a?(Integer) ? organization_or_id : organization_or_id.id
-    if date.present?
-      where(organization_id: org_id, sheet_date: date).first
-    else
-      new(organization_id: org_id)
+      configuration = HotSheetConfiguration.find_by(organization_id: org_id)
+      stolen_record_ids = calculated_stolen_records(configuration).pluck(:id)
+      # At least one sheet, so a day with nobody to email is still marked delivered
+      (configuration.current_recipient_ids.each_slice(RECIPIENTS_PER_EMAIL).to_a.presence || [[]])
+        .map { new(organization_id: org_id, sheet_date: date, recipient_ids: it, stolen_record_ids:) }
+    end
+
+    private
+
+    def calculated_stolen_records(hot_sheet_configuration)
+      StolenRecord.current.within_bounding_box(hot_sheet_configuration.bounding_box)
+        .reorder(date_stolen: :desc)
+        .joins(:bike).where(bikes: {deleted_at: nil})
+        .limit(MAX_BIKES)
     end
   end
 
@@ -50,12 +71,7 @@ class HotSheet < ApplicationRecord
   end
 
   def recipient_emails
-    fetch_recipients.pluck(:email)
-  end
-
-  # This may become a configurable option
-  def max_bikes
-    10
+    recipient_users.pluck(:email)
   end
 
   def next_sheet
@@ -72,33 +88,14 @@ class HotSheet < ApplicationRecord
   end
 
   def fetch_stolen_records
-    if stolen_record_ids.is_a?(Array)
-      stolen_records = StolenRecord.current_and_not.where(id: stolen_record_ids)
-        .reorder(date_stolen: :desc)
-    else
-      stolen_records = calculated_stolen_records
-      update(stolen_record_ids: stolen_records.pluck(:id))
-    end
-    stolen_records.joins(:bike).where(bikes: {deleted_at: nil})
-  end
-
-  def fetch_recipients
-    unless recipient_ids.is_a?(Array)
-      update(recipient_ids: hot_sheet_configuration.current_recipient_ids)
-    end
-    organization.users.where(id: recipient_ids)
+    StolenRecord.current_and_not.where(id: stolen_record_ids)
+      .reorder(date_stolen: :desc)
+      .joins(:bike).where(bikes: {deleted_at: nil})
   end
 
   private
 
   def recipient_users
-    fetch_recipients
-  end
-
-  def calculated_stolen_records
-    StolenRecord.current.within_bounding_box(bounding_box)
-      .reorder(date_stolen: :desc)
-      .joins(:bike).where(bikes: {deleted_at: nil})
-      .limit(max_bikes)
+    organization.users.where(id: recipient_ids)
   end
 end
