@@ -118,7 +118,7 @@
                 }
               } %>
 
-            <%= column_chart Counts.week_creation_chart, thousands: ",", library: chartkick_library_props %>
+            <%= render(UI::Chart::Component.new(series: Counts.week_creation_chart, library: chartkick_library_props)) %>
 
             <h4 class="chart-label"><%= t(".bikes_registered_this_week") %></h4>
           </div>
