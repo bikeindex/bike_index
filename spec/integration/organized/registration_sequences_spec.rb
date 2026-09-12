@@ -114,5 +114,18 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
     expect(page).to have_css("[data-bullet-editors-target='item']", count: initial + 1, visible: :all, wait: 8)
     # the new row's editor must upgrade into a usable Lexxy editor, not an inert element
     expect(page).to have_css("lexxy-editor lexxy-toolbar", count: initial + 1, wait: 10)
+
+    # Delete is a Turbo DELETE rather than a button_to -- it can't nest in the form above --
+    # so the confirm is an onclick, and dismissing it has to stop Turbo too
+    draft = organization.registration_sequences.draft.first
+    pages_before = draft.registration_sequence_pages.count
+
+    expect(dismiss_confirm { click_link "Delete page" }).to match(/can't be undone/)
+    expect(draft.registration_sequence_pages.count).to eq pages_before
+
+    accept_confirm { click_link "Delete page" }
+
+    expect(page).to have_content("Draft registration sequence")
+    expect(draft.registration_sequence_pages.count).to eq(pages_before - 1)
   end
 end
