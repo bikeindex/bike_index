@@ -75,7 +75,10 @@
             -# Hacky restriction on the number of resends you can do
             - unless resend_notifications.count > 3
               %span.less-strong-right
-                = link_to t(".re_send"), resend_incomplete_email_organization_bike_path(id: b_param.to_param, organization_id: current_organization.to_param), method: :post, data: {confirm: t(".only_resend_with_permission")}, class: "gray-link"
+                = render(UI::ButtonLink::Component.new(text: t(".re_send"),
+                  href: resend_incomplete_email_organization_bike_path(id: b_param.to_param, organization_id: current_organization.to_param),
+                  color: :link, html_class: "gray-link",
+                  confirm: t(".only_resend_with_permission"), data: {turbo: true, turbo_method: :post}))
 
 .pt-4.pb-4
   = render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))

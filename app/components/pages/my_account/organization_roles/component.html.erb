@@ -64,9 +64,9 @@
 
             <% if organization_role.leavable? %>
               <%#
-                A data-method link rather than ButtonLink's method: - the whole page is inside
-                the account form, and a button_to's form nested in another is dropped by the
-                parser, which leaves its button submitting the account form
+                Not ButtonLink's method: - the whole page is inside the account form, and the
+                parser drops a nested button_to form, leaving its button to submit the outer
+                one. Turbo issues the DELETE instead, and confirm: gates it with an onclick
               %>
 
               <div class="tw:flex tw:justify-end tw:max-md:mt-2 tw:md:justify-self-end">
@@ -74,8 +74,8 @@
                 <%= render UI::ButtonLink::Component.new(text: translation(".leave_organization"),
                       href: my_account_organization_role_path(organization_role), color: :link,
                       html_class: "tw:text-xs tw:text-red-700 tw:hover:text-red-800 tw:dark:text-red-400",
-                      data: {method: :delete,
-                             confirm: translation(".leave_confirm", org_name: organization.short_name)}) %>
+                      confirm: translation(".leave_confirm", org_name: organization.short_name),
+                      data: {turbo: true, turbo_method: :delete}) %>
               </div>
             <% end %>
           </div>

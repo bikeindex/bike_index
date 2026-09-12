@@ -6,4 +6,4 @@
 
 = render partial: "form"
 
-= render(UI::ButtonLink::Component.new(text: "Delete recovery display", href: admin_recovery_display_url(@recovery_display), method: :delete, color: :error, form: {onsubmit: "return confirm('#{j "Are you sure?"}')"}))
+= render(UI::ButtonLink::Component.new(text: "Delete recovery display", href: admin_recovery_display_url(@recovery_display), method: :delete, color: :error, confirm: "Are you sure?"))

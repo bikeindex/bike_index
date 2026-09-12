@@ -22,7 +22,6 @@
       <% end %>
     </div>
 
-    <%# onsubmit, not turbo_confirm: Turbo Drive is off app-wide, so it never fires %>
     <div
       class="
         tw:ml-auto tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-4
@@ -35,7 +34,7 @@
 
       <% if @registration_sequence.draft? %>
         <%= render UI::ButtonLink::Component.new(text: "Activate", href: activate_path, method: :patch, color: :primary, size: :sm,
-          form: {onsubmit: "return confirm('#{j activate_confirm}')"}) %>
+          confirm: activate_confirm) %>
       <% else %>
         <%= render UI::ButtonLink::Component.new(text: create_draft_text, href: create_draft_path, method: :post, color: :primary, size: :sm) %>
       <% end %>

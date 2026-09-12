@@ -63,7 +63,9 @@
             %hr
 
             .delete-from-index.no-divider-row
-              = link_to bike_version_path(@bike_version), method: :delete, confirm: "Are you sure?" do
+              -# Inside the edit form above, so Turbo issues the DELETE rather than a button_to
+              = render(UI::ButtonLink::Component.new(href: bike_version_path(@bike_version), color: :link,
+                confirm: "Are you sure?", data: {turbo: true, turbo_method: :delete})) do
                 = render "/shared/trash_icon"
                 = t(".delete_this_version_html", version_name: @bike.display_name)
           - else

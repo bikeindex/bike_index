@@ -4,7 +4,7 @@
       Editing
       = @blog.blog? ? "Blog" : "Info piece"
   .col-2.mt-2.text-right
-    = render(UI::ButtonLink::Component.new(text: "Delete", href: admin_news_url(@blog), method: :delete, color: :error, size: :sm, form: {onsubmit: "return confirm('#{j "Are you sure?"}')"}))
+    = render(UI::ButtonLink::Component.new(text: "Delete", href: admin_news_url(@blog), method: :delete, color: :error, size: :sm, confirm: "Are you sure?"))
 
 - if params[:show_photos]
   %p

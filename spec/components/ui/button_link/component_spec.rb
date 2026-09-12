@@ -104,6 +104,14 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
     end
   end
 
+  context "with confirm" do
+    let(:options) { {text: "Delete", href: "/thing", confirm: "Are you sure? It can't be undone"} }
+
+    it "guards the link, escaping the message" do
+      expect(component.css("a").first["onclick"]).to eq("return confirm('Are you sure? It can\\'t be undone')")
+    end
+  end
+
   context "with a size for link color" do
     let(:options) { {text: "Link", href: "/test", color: :link, size: :lg} }
 
@@ -129,11 +137,12 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
       end
     end
 
-    context "with form attributes" do
-      let(:options) { {text: "Revoke", href: "/thing", method: :delete, form: {onsubmit: "return confirm('Are you sure?')"}} }
+    context "with confirm and form attributes" do
+      let(:options) { {text: "Delete", href: "/thing", method: :delete, confirm: "Are you sure? It can't be undone", form: {class: "tw:inline-block"}} }
 
-      it "sets attributes on the form element" do
-        expect(component).to have_css("form[onsubmit=\"return confirm('Are you sure?')\"]")
+      it "guards the submit without dropping the passed form attributes" do
+        expect(component).to have_css("form.tw\\:inline-block")
+        expect(component.css("form").first["onsubmit"]).to eq("return confirm('Are you sure? It can\\'t be undone')")
       end
     end
 
