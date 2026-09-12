@@ -36,8 +36,7 @@
 
 <div class="text-right">
   <% if @organization.deleted? %>
-    <%= render(UI::ButtonLink::Component.new(text: "Un-Delete organization", href: admin_recover_organization_path(id: @organization.id),
-          color: :secondary, confirm: "Are you sure?")) %>
+    <%= render(UI::ButtonLink::Component.new(text: "Un-Delete organization", href: admin_recover_organization_path(id: @organization.id), confirm: "Are you sure?")) %>
   <% else %>
     <%= render(UI::ButtonLink::Component.new(text: "Delete", href: admin_organization_url(@organization), method: :delete, color: :error,
           confirm: "Are you sure?")) %>

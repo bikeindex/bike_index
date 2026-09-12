@@ -38,11 +38,9 @@ get back local PNG paths.
   moved — so a passing curl can be followed by `ActiveRecord::PendingMigrationError` on every page.
   `bundle exec rails db:migrate`, and read `log/development.log` before blaming the capture.
 - If `mcp__playwright__*` tools aren't registered, tell the user to run `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart.
-- **Check the workspace DB has records before planning a real-page capture** — `Bike.count`
-  and friends come back 0 in a Conductor workspace whose `db:seed` never ran, so every page
-  that needs a record is unreachable and only preview routes render. `bundle exec rails db:seed`
-  (safe: `bikeindex_development_<WORKSPACE_ID>` is the seeded throwaway, not the production-derived
-  default DB), or pick preview URLs instead.
+- **Check the workspace DB has records before planning a real-page capture** — `Bike.count` comes
+  back 0 in a workspace whose `db:seed` never ran, so only preview routes render. Seed it (it's the
+  per-workspace throwaway DB), or capture previews.
 
 ## Sign in (with the PII gate)
 

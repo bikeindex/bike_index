@@ -1,7 +1,6 @@
 .mb-4
   = render(UI::Header::Component.new(text: t(".edit_organization_role_html", email: @organization_role.invited_email), html_class: "uncap"))
 
--# A div, not a %p: the button_to's form is flow content and would close the paragraph
 .text-right
   = render(UI::ButtonLink::Component.new(text: t(".remove_from_organization"),
     href: organization_user_path(id: @organization_role.id, organization_id: current_organization.to_param),

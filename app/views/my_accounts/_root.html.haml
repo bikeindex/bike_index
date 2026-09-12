@@ -111,7 +111,7 @@
               = user_email.email
             .right-input-help.right-text-help.mt-2
               = link_to t(".make_primary_email"), make_primary_user_email_path(user_email.id), method: :post, class: "d-block"
-              = render(UI::ButtonLink::Component.new(text: t(".remove_email"), href: user_email_path(user_email.id), color: :link, html_class: "delete-email", confirm: "Are you sure you want to remove #{user_email.email}?", data: {turbo: true, turbo_method: :delete}))
+              = render("remove_email_button", user_email:)
     - if @user.user_emails.unconfirmed.count > 0
       .related-fields.no-divider-row
         - labeled = false
@@ -125,7 +125,7 @@
               = user_email.email
             .right-input-help.right-text-help.mt-2
               = link_to t(".resend_confirmation"), resend_confirmation_user_email_path(user_email.id), method: :post, class: "d-block"
-              = render(UI::ButtonLink::Component.new(text: t(".remove_email"), href: user_email_path(user_email.id), color: :link, html_class: "delete-email", confirm: "Are you sure you want to remove #{user_email.email}?", data: {turbo: true, turbo_method: :delete}))
+              = render("remove_email_button", user_email:)
 
   .related-fields#additional_email_fields
     = f.hidden_field :additional_emails, value: nil

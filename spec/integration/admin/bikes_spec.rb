@@ -11,8 +11,7 @@ RSpec.describe "Admin bikes", :js, type: :system do
     sign_in(superuser)
   end
 
-  # The delete is a UI::ButtonLink(method:, confirm:), whose guard is an onsubmit on the
-  # form it renders — whether that actually holds the request back is only visible here
+  # Whether the confirm actually holds the request back is only observable in a browser
   it "asks before deleting a bike, and deletes it only once confirmed" do
     visit "/admin/bikes/#{bike.id}/edit"
 
