@@ -80,7 +80,7 @@ class HotSheetConfiguration < ApplicationRecord
   def sent_today?
     sheets = hot_sheets.where(sheet_date: current_date).to_a
 
-    sheets.any? && sheets.all?(&:delivery_settled?)
+    sheets.any? && sheets.all?(&:settled?)
   end
 
   def send_hour=(val)

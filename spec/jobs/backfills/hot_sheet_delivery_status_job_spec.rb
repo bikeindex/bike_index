@@ -10,12 +10,12 @@ RSpec.describe Backfills::HotSheetDeliveryStatusJob, type: :job do
     end
 
     it "settles the sheets that delivered, and leaves the rest" do
-      expect(delivered.delivery_settled?).to be_falsey
+      expect(delivered.settled?).to be_falsey
 
       Sidekiq::Testing.inline! { described_class.perform_async }
 
       expect(delivered.reload.delivery_status).to eq "delivery_success"
-      expect(delivered.delivery_settled?).to be_truthy
+      expect(delivered.settled?).to be_truthy
       expect(unsent.reload.delivery_status).to eq "delivery_pending"
       expect(redelivered.reload.delivery_status).to eq "delivery_partial_success"
     end

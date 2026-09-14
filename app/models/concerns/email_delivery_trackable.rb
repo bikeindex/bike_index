@@ -9,12 +9,17 @@ module EmailDeliveryTrackable
     scope :delivered, -> { where(delivery_status: Notification::DELIVERED_STATUSES) }
     # A send we blocked is as undelivered as one postmark refused
     scope :delivery_failed, -> { where(delivery_status: %w[delivery_failure delivery_banned]) }
+    # Must match settled?
+    scope :settled, -> {
+      where(delivery_status: Notification::SETTLED_STATUSES)
+        .or(where(delivery_error: Notification::UNDELIVERABLE_ERROR_NAMES))
+    }
   end
 
   class_methods do
     # Raises the delivery's error, unless the addresses are undeliverable
     def track_email_delivery(record, is_new_email_address: false)
-      return if record.delivery_settled?
+      return if record.settled?
 
       recipients = record.recipient_users.to_a
       addresses = normalized(record.recipient_emails)
@@ -75,7 +80,7 @@ module EmailDeliveryTrackable
   end
 
   # A settled delivery isn't worth sending again
-  def delivery_settled?
+  def settled?
     Notification::SETTLED_STATUSES.include?(delivery_status) ||
       Notification::UNDELIVERABLE_ERROR_NAMES.include?(delivery_error)
   end
