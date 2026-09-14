@@ -151,6 +151,7 @@ class Organization < ApplicationRecord
 
   before_validation :set_calculated_attributes
   after_destroy :rename_as_deleted
+  after_restore :rename_as_restored
   after_commit :update_associations
 
   default_scope { order(:name) }
@@ -564,8 +565,7 @@ class Organization < ApplicationRecord
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
       orgs = id.present? ? Organization.unscoped.where("id != ?", id) : Organization.unscoped.all
-      # Legacy rows only -- deleting renames as it goes now. Writing here runs inside whatever
-      # request triggered the save, and a GET is on the reading role, so it raises
+      # Legacy rows only; a GET's reading-role connection raises on this write
       orgs.deleted.where.not("short_name ILIKE ?", "%-deleted")
         .each { |o| o.update_columns(short_name: "#{o.short_name}-deleted", slug: "#{o.slug}-deleted") }
       while orgs.where(slug: new_slug).exists?
@@ -624,15 +624,31 @@ class Organization < ApplicationRecord
     UpdateOrganizationAssociationsJob.perform_async(id)
   end
 
-  # Frees the slug for a new organization of the same name. update_columns because destroy
-  # doesn't run validations, so set_calculated_attributes never sees the deletion
-  def rename_as_deleted
-    return if short_name.match?("-deleted")
+  private
 
-    update_columns(short_name: "#{short_name}-deleted", slug: "#{slug}-deleted")
+  # Frees the slug for a new organization of the same name; update_columns because destroy
+  # skips validations
+  def rename_as_deleted
+    return if short_name.end_with?("-deleted")
+
+    update_columns(short_name: "#{short_name}-deleted", slug: unique_slug("#{slug}-deleted"))
   end
 
-  private
+  # Without this the organization comes back from admin's un-delete still called "-deleted"
+  def rename_as_restored
+    return unless short_name.end_with?("-deleted")
+
+    restored = short_name.delete_suffix("-deleted")
+    update_columns(short_name: restored, slug: unique_slug(Slugifyer.slugify(restored)))
+  end
+
+  # slug is unique, so the second organization of a name to be deleted takes -deleted-2
+  def unique_slug(candidate)
+    taken = Organization.unscoped.where.not(id:)
+    return candidate unless taken.exists?(slug: candidate)
+
+    (2..).each { |i| break "#{candidate}-#{i}" unless taken.exists?(slug: "#{candidate}-#{i}") }
+  end
 
   def user_email_domain_format
     return if user_email_domain.blank?

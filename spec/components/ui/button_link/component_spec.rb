@@ -129,6 +129,14 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
       expect(component.css("button").first["class"]).to include("tw:bg-blue-600")
     end
 
+    context "with form attributes" do
+      let(:options) { {text: "Follow", href: "/follow", method: :post, form: {class: "tw:inline-block"}} }
+
+      it "puts them on the wrapping form" do
+        expect(component).to have_css("form.tw\\:inline-block")
+      end
+    end
+
     context "with a non-post method" do
       let(:options) { {text: "Delete", href: "/thing", method: :delete} }
 
@@ -140,8 +148,6 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
     context "with confirm" do
       let(:options) { {text: "Delete", href: "/thing", method: :delete, confirm: "Are you sure? It can't be undone"} }
 
-      # A button_to's form can't nest inside the forms these sit in, so the method moves
-      # onto a link that Turbo submits
       it "renders a Turbo link rather than a form, gated by an escaped onclick" do
         expect(component).to have_no_css("form")
         link = component.css("a").first

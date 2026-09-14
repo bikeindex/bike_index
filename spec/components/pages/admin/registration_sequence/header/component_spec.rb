@@ -19,7 +19,7 @@ RSpec.describe Pages::Admin::RegistrationSequence::Header::Component, type: :com
     expect(page).to_not have_css("[role='tooltip']", visible: :all)
     # Making the draft live is the header's action; discarding it lives at the foot of the page
     expect(page).to have_css("a[href='#{admin_url}?activate=true'][data-turbo-method='patch']", text: "Activate")
-    expect(page).to_not have_link("Create draft")
+    expect(page).to_not have_button("Create draft")
     expect(page).to_not have_link("Discard draft")
   end
 

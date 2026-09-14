@@ -20,10 +20,8 @@ module UI
         UI::Button::Component.validate_options!(color: @color, size: @size, html_options:)
       end
 
-      # Passing method: renders a button_to form (a styled button that submits a
-      # request to href) instead of a plain link — unless it also has to prompt, since a
-      # button_to's form can't nest inside the forms these sit in. Then Turbo carries the
-      # method on a link instead.
+      # A button_to's <form> can't nest inside the forms these sit in, so a confirm puts the
+      # method on a Turbo link instead
       def call
         return button_to_form if @method && @confirm.nil?
         return disabled_link if @disabled
@@ -33,16 +31,14 @@ module UI
 
       private
 
-      # onclick, not data-turbo-confirm (Turbo Drive is off unless a call site opts in) and
-      # not data-confirm (rails-ujs, which we're retiring). Turbo's click handler checks
-      # defaultPrevented, so returning false here stops the request it would have issued.
+      # onclick, not data-turbo-confirm (Turbo Drive is off unless a call site opts in) or
+      # data-confirm (rails-ujs, which we're retiring); returning false stops Turbo's handler
       def confirmable_attributes
-        return html_attributes if @confirm.nil?
+        attributes = html_attributes
+        return attributes if @confirm.nil?
 
-        attributes = html_attributes.merge(onclick: "return confirm('#{j @confirm}')")
-        return attributes if @method.nil?
-
-        attributes.merge(data: attributes[:data].merge(turbo: true, turbo_method: @method))
+        turbo = @method ? {turbo: true, turbo_method: @method} : {}
+        attributes.merge(onclick: "return confirm('#{j @confirm}')", data: attributes[:data].merge(turbo))
       end
 
       # An <a> takes no disabled attribute, so dropping the href is what makes it

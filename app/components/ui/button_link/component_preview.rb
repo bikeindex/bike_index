@@ -84,7 +84,6 @@ module UI
         render(UI::ButtonLink::Component.new(text: "Delete", href: "#", color: :error, method: :delete))
       end
 
-      # method: with confirm: renders a Turbo link, not a button_to -- its form can't nest
       # @label method with confirm
       def method_confirm
         render(UI::ButtonLink::Component.new(text: "Delete", href: "#", color: :error, method: :delete, confirm: "Are you sure? It can't be undone"))

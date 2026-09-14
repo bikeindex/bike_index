@@ -81,7 +81,8 @@ RSpec.describe Admin::UsersController, type: :request do
     # It rendered a link with ?method=delete, so deleting quietly did nothing but show the user again
     it "carries the delete on the element, never as a query param" do
       get "#{base_url}/#{user_subject.id}/edit"
-      link = Nokogiri::HTML(response.body).at_css("a[href='/admin/users/#{user_subject.id}']")
+      link = Nokogiri::HTML(response.body).at_css("a[data-turbo-method][href='/admin/users/#{user_subject.id}']")
+      expect(link).to be_present
       expect(link["data-turbo-method"]).to eq "delete"
       expect(link["data-turbo"]).to eq "true" # turbo_method alone is inert
       expect(response.body).to_not include("method=delete")

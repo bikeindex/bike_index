@@ -61,13 +61,13 @@ class PublicImagesController < ApplicationController
 
   def destroy
     @imageable = @public_image.imageable
-    image_path = public_image_path(@public_image)
     imageable_id = @public_image.imageable_id
     imageable_type = @public_image.imageable_type
     if imageable_type == "MailSnippet"
       flash[:error] = translation(:cannot_delete)
       redirect_to(admin_organization_custom_layouts_path(imageable_id)) && return
     end
+    image_referer = %r{#{public_image_path(@public_image)}(\z|[/?])}
     @public_image.destroy
     flash[:success] = translation(:image_deleted)
     if imageable_type == "Blog"
@@ -78,8 +78,8 @@ class PublicImagesController < ApplicationController
       else
         edit_bike_url(imageable_id, edit_template: params[:edit_template])
       end
-      # Deleting from the image's own page makes it the referer, and it 404s now
-      if request.referer.to_s.include?(image_path)
+      # The image's own page is the referer when deleting from it, and it's gone
+      if request.referer.to_s.match?(image_referer)
         redirect_to(fallback_link)
       else
         redirect_back(fallback_location: fallback_link)

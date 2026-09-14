@@ -686,14 +686,28 @@ RSpec.describe Organization, type: :model do
         expect(org1.short_name).to eq "buckshot-deleted"
       end
 
-      # That sweep runs inside whatever request next saves an organization -- on a GET
-      # that's the reading role, which raises. Destroying renames as it goes instead
       it "renames as it deletes, rather than waiting for another organization to save" do
         organization = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
         organization.destroy
 
         expect(organization.reload.short_name).to eq "buckshot-deleted"
         expect(organization.slug).to eq "buckshot-deleted"
+
+        # slug is unique, so a second deletion of the name can't take the same one
+        second = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
+        second.destroy
+
+        expect(second.reload.deleted_at).to be_present
+        expect(second.slug).to eq "buckshot-deleted-2"
+      end
+
+      it "gives the name back when it's restored" do
+        organization = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
+        organization.destroy
+        organization.restore(recursive: true)
+
+        expect(organization.reload.short_name).to eq "buckshot"
+        expect(organization.slug).to eq "buckshot"
       end
     end
 

@@ -253,7 +253,6 @@ RSpec.describe PublicImagesController, type: :request do
           delete "#{base_url}/#{public_image.id}"
         }.to change(PublicImage, :count).by(-1)
       end
-      # Deleting from the image's own page used to redirect_back onto it, which 404s
       it "redirects to the bike when the image's own page is the referer" do
         expect {
           delete "#{base_url}/#{public_image.id}",
