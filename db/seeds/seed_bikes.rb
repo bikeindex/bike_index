@@ -284,6 +284,7 @@ puts "  Created stolen Trek at #{trek_location[:street]}, #{trek_location[:city]
 # --- Specific real bike: Riese & Müller Load4 75 rohloff cargo e-bike (child carrying) ---
 puts "Creating Riese & Müller Load4 75 rohloff cargo bike..."
 rm_manufacturer = Manufacturer.friendly_find("Riese & Müller")
+rm_owner = User.find_by_email("user@fakegmail.com")
 brakebills_org = Organization.friendly_find("Brakebills")
 grey = Color.friendly_find("Silver, gray or bare metal")
 child_carrying_activity = PrimaryActivity.friendly_find("Child Carrying")
@@ -333,7 +334,7 @@ rm_components = [
 
 rm_bike = seed_bike(
   creator:, user:, origin: "organization_form", label: "Riese & Müller bike",
-  params: {bike: bike_params(owner_email: "user@fakegmail.com", manufacturer_id: rm_manufacturer.id).merge(
+  params: {bike: bike_params(owner_email: rm_owner.email, manufacturer_id: rm_manufacturer.id).merge(
     creation_organization_id: brakebills_org.id.to_s,
     cycle_type: "cargo",
     propulsion_type: "pedal-assist",

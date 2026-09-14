@@ -8,7 +8,7 @@ user_attrs = {
   user: {name: "Test User", email: "user@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true},
   api_accessor: {name: "Api Accessor", email: "api@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true},
   example_user: {name: "Example User", email: "example_user@bikeindex.org", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true},
-  gmail_user: {name: "Gmail User", email: "user@fakegmail.com", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true}
+  owner: {name: "Owner User", email: "user@fakegmail.com", password: "pleaseplease12", password_confirmation: "pleaseplease12", terms_of_service: true}
 }
 
 user_attrs.values.each do |attributes|
