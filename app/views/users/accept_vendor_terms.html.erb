@@ -1,0 +1,10 @@
+<section class="content">
+  <div class="receptacle">
+    <div class="inner-recep legal-content">
+      <%= render partial: "/info/vendor_terms_text" %>
+    </div>
+  </div>
+</section>
+
+<%= render(Pages::Users::AcceptTerms::Component.new(user: @user, attribute: :vendor_terms_of_service,
+  label: t(".i_agree_to_tos_html"), submit_text: t(".submit"))) %>
