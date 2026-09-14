@@ -40,7 +40,7 @@ class HotSheet < ApplicationRecord
     def for(organization_or_id, date)
       org_id = organization_or_id.is_a?(Integer) ? organization_or_id : organization_or_id.id
       hot_sheets = where(organization_id: org_id, sheet_date: date).includes(:organization).order(:id).to_a
-      return hot_sheets if hot_sheets.any?
+      return rebatched(hot_sheets) if hot_sheets.any?
       # A past day is whatever it was - only today's sheets are still to come
       return [] if date.present? && date != Time.current.to_date
 
@@ -55,6 +55,20 @@ class HotSheet < ApplicationRecord
     end
 
     private
+
+    # A sheet from before delivery was batched holds the whole day's recipients on one row
+    def rebatched(hot_sheets)
+      oversized = hot_sheets.reject(&:settled?)
+        .find { it.recipient_ids.to_a.size > RECIPIENTS_PER_EMAIL }
+      return hot_sheets if oversized.blank?
+
+      first_batch, *batches = oversized.recipient_ids.each_slice(RECIPIENTS_PER_EMAIL).to_a
+      oversized.recipient_ids = first_batch
+      hot_sheets + batches.map do
+        new(organization: oversized.organization, sheet_date: oversized.sheet_date,
+          recipient_ids: it, stolen_record_ids: oversized.stolen_record_ids)
+      end
+    end
 
     def calculated_stolen_records(hot_sheet_configuration)
       StolenRecord.within_bounding_box(hot_sheet_configuration.bounding_box)

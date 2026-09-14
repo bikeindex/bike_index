@@ -42,6 +42,18 @@ RSpec.describe ProcessHotSheetJob, type: :lib do
       expect(ActionMailer::Base.deliveries).to eq([])
     end
 
+    context "with a saved sheet whose recipients have left the organization" do
+      it "settles the sheet without delivering" do
+        hot_sheet = FactoryBot.create(:hot_sheet, organization: organization1,
+          sheet_date: Time.current.to_date, recipient_ids: [FactoryBot.create(:user).id])
+
+        expect { described_class.new.perform(organization1.id) }.to_not change(HotSheet, :count)
+
+        expect(hot_sheet.reload.delivery_status).to eq "delivery_success"
+        expect(ActionMailer::Base.deliveries).to eq([])
+      end
+    end
+
     context "with recipients" do
       let!(:organization_role) { FactoryBot.create(:organization_role_claimed, organization: organization1, hot_sheet_notification: "notification_daily") }
       let!(:organization_role_unclaimed) { FactoryBot.create(:organization_role, organization: organization1, hot_sheet_notification: "notification_daily") }
