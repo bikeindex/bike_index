@@ -129,6 +129,14 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
       expect(component.css("button").first["class"]).to include("tw:bg-blue-600")
     end
 
+    context "with form attributes" do
+      let(:options) { {text: "Follow", href: "/follow", method: :post, form: {class: "tw:inline-block"}} }
+
+      it "puts them on the wrapping form" do
+        expect(component).to have_css("form.tw\\:inline-block")
+      end
+    end
+
     context "with a non-post method" do
       let(:options) { {text: "Delete", href: "/thing", method: :delete} }
 
@@ -137,12 +145,15 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
       end
     end
 
-    context "with confirm and form attributes" do
-      let(:options) { {text: "Delete", href: "/thing", method: :delete, confirm: "Are you sure? It can't be undone", form: {class: "tw:inline-block"}} }
+    context "with confirm" do
+      let(:options) { {text: "Delete", href: "/thing", method: :delete, confirm: "Are you sure? It can't be undone"} }
 
-      it "guards the submit without dropping the passed form attributes" do
-        expect(component).to have_css("form.tw\\:inline-block")
-        expect(component.css("form").first["onsubmit"]).to eq("return confirm('Are you sure? It can\\'t be undone')")
+      it "renders a Turbo link rather than a form, gated by an escaped onclick" do
+        expect(component).to have_no_css("form")
+        link = component.css("a").first
+        expect(link["onclick"]).to eq("return confirm('Are you sure? It can\\'t be undone')")
+        expect(link["data-turbo"]).to eq "true"
+        expect(link["data-turbo-method"]).to eq "delete"
       end
     end
 

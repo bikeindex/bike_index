@@ -70,6 +70,20 @@ migration (`migration_error = :page_load` raises for every request; the real cau
 race). Both read as obvious. Also check what the edit *moved* — a rule relocated into a skill is a rule
 that only loads when that skill triggers.
 
+### The churn audit
+
+**Required.** Read the branch's own diff and ask of each hunk what it changes about what the code does. A moved argument, a re-ordered hash, a re-wrapped line: revert it rather than defending it in review.
+
+```bash
+rtk proxy git diff origin/main...HEAD --stat
+```
+
+Smallest files first — one at `+1 -1` is either the point of the branch or pure churn, and telling which takes a moment. `git checkout origin/main -- <file>` when the whole file is churn; when it rides along inside a real change, put the surrounding lines back so the diff shows only what moved.
+
+**What `bin/lint` wrote is not churn** and stays, including in files the branch otherwise didn't touch — see the rule at the top of `CLAUDE.md`.
+
+Sweeping mechanical edits are where this collects, since the script that made them had one shape and the file had another. One branch here reverted 17 files whose only change was a moved keyword argument.
+
 ### The comment audit
 
 **Required, not conditional on the diff looking clean.** List the comments the branch adds or edits:

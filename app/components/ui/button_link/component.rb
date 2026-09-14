@@ -20,24 +20,37 @@ module UI
         UI::Button::Component.validate_options!(color: @color, size: @size, html_options:)
       end
 
-      # Passing method: renders a button_to form (a styled button that submits a
-      # request to href) instead of a plain link.
+      # A button_to's <form> can't nest inside the forms these sit in, so a confirm puts the
+      # method on a Turbo link instead
       def call
-        return button_to_form if @method
+        return button_to_form if @method && @confirm.nil?
         return disabled_link if @disabled
 
-        helpers.link_to(@text || content, @href, guarded(html_attributes, :onclick))
+        helpers.link_to(@text || content, @href, link_attributes)
       end
 
       private
 
-      # The confirm goes on whatever the browser acts on: the form for a button_to, the
-      # anchor for a link. Not data-turbo-confirm — Turbo Drive is off unless a call site
-      # opts in — and not data-confirm, which needs the rails-ujs we're retiring.
-      def guarded(attributes, event)
-        return attributes unless @confirm
+      # onclick, not data-turbo-confirm (Turbo Drive is off unless a call site opts in) or
+      # data-confirm (rails-ujs, which we're retiring); returning false stops Turbo's handler
+      def confirmable_attributes
+        attributes = html_attributes
+        return attributes if @confirm.nil?
 
-        attributes.merge(event => "return confirm('#{j @confirm}')")
+        turbo = @method ? {turbo: true, turbo_method: @method} : {}
+        attributes.merge(onclick: "return confirm('#{j @confirm}')", data: attributes[:data].merge(turbo))
+      end
+
+      # The spacebar activates a button but scrolls the page on a link, and this renders as
+      # a button -- ui--button-link clicks it instead
+      def link_attributes
+        attributes = confirmable_attributes
+        data = attributes[:data]
+
+        attributes.merge(data: data.merge(
+          controller: [data[:controller], "ui--button-link"].compact.join(" "),
+          action: [data[:action], "keydown->ui--button-link#activate"].compact.join(" ")
+        ))
       end
 
       # An <a> takes no disabled attribute, so dropping the href is what makes it
@@ -48,7 +61,7 @@ module UI
       end
 
       def button_to_form
-        helpers.button_to(@href, html_attributes.merge(method: @method, disabled: @disabled, form: guarded(@form, :onsubmit))) do
+        helpers.button_to(@href, html_attributes.merge(method: @method, disabled: @disabled, form: @form)) do
           @text || content
         end
       end

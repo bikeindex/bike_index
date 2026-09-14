@@ -49,7 +49,7 @@
       </div>
       <div class="tw:mb-6 tw:flex">
         <%= render UI::ButtonLink::Component.new(text: "Discard draft", href: organization_registration_sequence_path(organization_id: current_organization.to_param, id: @draft.id), method: :delete, color: :error, size: :sm,
-          confirm: RegistrationSequence::DISCARD_DRAFT_CONFIRM, form: {class: "button_to tw:ml-auto"}) %>
+          confirm: RegistrationSequence::DISCARD_DRAFT_CONFIRM, html_class: "tw:ml-auto") %>
       </div>
     <% else %>
       <p class="tw:mb-2 tw:text-gray-600">You don't have a draft sequence</p>
