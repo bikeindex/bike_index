@@ -14,7 +14,7 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
     sign_in(user)
   end
 
-  it "builds a draft from the template, then edits a page and the sequence" do
+  it "builds a draft from the template, edits a page and the sequence, then deletes the page" do
     visit "/o/#{organization.to_param}/registration_sequences"
 
     # Build the draft (cloned from the seeded template) and open the management view
@@ -72,6 +72,18 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
     expect(edited.body).to include("reviewed 2026")
     expect(edited.image).to be_attached
     expect(draft.registration_sequence_pages.pluck(:title)).to include("Campus-specific rules")
+
+    # Delete can't be a button_to -- it sits inside the form above -- so it's a Turbo
+    # DELETE gated by an onclick, and dismissing has to stop Turbo too
+    pages_before = draft.registration_sequence_pages.count
+
+    expect(dismiss_confirm { click_link "Delete page" }).to match(/can't be undone/)
+    expect(draft.registration_sequence_pages.count).to eq pages_before
+
+    accept_confirm { click_link "Delete page" }
+
+    expect(page).to have_content("Draft registration sequence")
+    expect(draft.registration_sequence_pages.count).to eq(pages_before - 1)
   end
 
   it "gates each preview page on its rules like the real flow, then finishes to editing" do

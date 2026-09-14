@@ -52,8 +52,10 @@ RSpec.describe Pages::MyAccount::OrganizationRoles::Component, type: :component 
     it "renders the button" do
       expect(component).to have_link("Leave organization", href: leave_path)
       leave_link = component.css("a[href='#{leave_path}']").first
-      expect(leave_link["data-method"]).to eq "delete"
-      expect(leave_link["data-confirm"]).to match("You will have to ask an Admin from Bike Coop")
+      # data-turbo too: turbo_method alone is silently inert, and the page can't use a button_to
+      expect(leave_link["data-turbo"]).to eq "true"
+      expect(leave_link["data-turbo-method"]).to eq "delete"
+      expect(leave_link["onclick"]).to match("You will have to ask an Admin from Bike Coop")
     end
 
     context "admin of the organization" do

@@ -117,7 +117,7 @@
       .col-auto.mt-auto
         = f.submit 'Send it!', class: 'btn btn-success mb-4'
 
-  = render(UI::ButtonLink::Component.new(text: "Delete", href: admin_bike_url(@bike), method: :delete, color: :error, form: {class: "mb-4", onsubmit: "return confirm('#{j "Are you sure?"}')"}))
+  = render(UI::ButtonLink::Component.new(text: "Delete", href: admin_bike_url(@bike), method: :delete, color: :error, confirm: "Are you sure?", form: {class: "mb-4"}))
 
 - else
   %h1

@@ -195,13 +195,17 @@
     <% end %>
   <% end %>
 
-  <div class="tw:mt-6 tw:flex tw:items-center tw:justify-center tw:gap-4">
+  <div class="tw:mt-6 tw:flex tw:items-center tw:justify-center">
     <%= render(UI::Button::Component.new(text: "Update the #{@bike.type}", color: :primary, size: :lg, type: "submit")) %>
+  </div>
+<% end %>
 
-    <% unless @bike.deleted? %>
-      <%= render(UI::ButtonLink::Component.new(text: "Delete #{@bike.type}", href: admin_bike_url(@bike),
-            color: :error, method: :delete, form: {onsubmit: "return confirm('#{j "Are you sure?"}')"})) %>
-    <% end %>
+<%# Outside the form above: the parser drops a nested <form>, leaving its button to submit the outer one %>
+
+<% unless @bike.deleted? %>
+  <div class="tw:mt-4 tw:flex tw:items-center tw:justify-center">
+    <%= render(UI::ButtonLink::Component.new(text: "Delete #{@bike.type}", href: admin_bike_url(@bike),
+          method: :delete, color: :error, confirm: "Are you sure?")) %>
   </div>
 <% end %>
 

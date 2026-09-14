@@ -108,4 +108,4 @@
             = link_to image_tag(@manufacturer.logo.url(:thumb)), @manufacturer.logo_url
   .col-6
     = link_to "Edit", edit_admin_manufacturer_url(@manufacturer), class: "btn btn-success"
-    = render(UI::ButtonLink::Component.new(text: "Delete", href: admin_manufacturer_url(@manufacturer), method: :delete, color: :error, form: {class: "d-inline-block", onsubmit: "return confirm('#{j "Are you sure?"}')"}))
+    = render(UI::ButtonLink::Component.new(text: "Delete", href: admin_manufacturer_url(@manufacturer), method: :delete, color: :error, confirm: "Are you sure?", form: {class: "d-inline-block"}))

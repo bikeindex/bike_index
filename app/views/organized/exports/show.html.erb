@@ -261,7 +261,7 @@
                     text: t(".undo_sticker_assignment"),
                     color: :error,
                     method: :put,
-                    form: {onsubmit: "return confirm('#{j t(".undo_sticker_assignment_confirm")}')"}) %>
+                    confirm: t(".undo_sticker_assignment_confirm")) %>
                 </div>
               <% end %>
             <% else %>

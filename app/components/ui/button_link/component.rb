@@ -3,32 +3,42 @@
 module UI
   module ButtonLink
     class Component < ApplicationComponent
-      def initialize(href:, text: nil, color: :secondary, size: :md, active: false, method: nil, html_class: nil, **html_options)
+      def initialize(href:, text: nil, color: :secondary, size: :md, active: false, method: nil, confirm: nil, html_class: nil, **html_options)
         @text = text
         @href = href
         @color = color
         @size = UI::Button::Component::SIZES.key?(size) ? size : :md
         @active = active
         @method = method
+        @confirm = confirm
         @html_class = html_class
         @data = html_options.delete(:data) || {}
         @disabled = html_options.delete(:disabled)
+        @form = html_options.delete(:form) || {}
         @html_options = html_options
 
         UI::Button::Component.validate_options!(color: @color, size: @size, html_options:)
       end
 
       # Passing method: renders a button_to form (a styled button that submits a
-      # request to href) instead of a plain link. html_options flow through, so a
-      # form: {onsubmit:} confirm reaches the wrapping form.
+      # request to href) instead of a plain link.
       def call
         return button_to_form if @method
         return disabled_link if @disabled
 
-        helpers.link_to(@text || content, @href, html_attributes)
+        helpers.link_to(@text || content, @href, guarded(html_attributes, :onclick))
       end
 
       private
+
+      # The confirm goes on whatever the browser acts on: the form for a button_to, the
+      # anchor for a link. Not data-turbo-confirm — Turbo Drive is off unless a call site
+      # opts in — and not data-confirm, which needs the rails-ujs we're retiring.
+      def guarded(attributes, event)
+        return attributes unless @confirm
+
+        attributes.merge(event => "return confirm('#{j @confirm}')")
+      end
 
       # An <a> takes no disabled attribute, so dropping the href is what makes it
       # unfollowable; aria says so, and tabindex -1 takes it out of the tab order.
@@ -38,7 +48,7 @@ module UI
       end
 
       def button_to_form
-        helpers.button_to(@href, html_attributes.merge(method: @method, disabled: @disabled)) do
+        helpers.button_to(@href, html_attributes.merge(method: @method, disabled: @disabled, form: guarded(@form, :onsubmit))) do
           @text || content
         end
       end

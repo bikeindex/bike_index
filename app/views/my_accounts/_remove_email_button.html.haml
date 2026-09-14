@@ -1,0 +1,5 @@
+-# Absolute key: lazy lookup would resolve against this partial rather than my_accounts.root
+= render(UI::ButtonLink::Component.new(text: t("my_accounts.root.remove_email"),
+  href: user_email_path(user_email.id), color: :link, html_class: "delete-email",
+  confirm: "Are you sure you want to remove #{user_email.email}?",
+  data: {turbo: true, turbo_method: :delete}))
