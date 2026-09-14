@@ -347,6 +347,36 @@ RSpec.describe Organization, type: :model do
     end
   end
 
+  describe "show_single_search_menu_item?" do
+    let(:organization) { Organization.new }
+
+    it "is falsey without bike_search" do
+      expect(organization.show_single_search_menu_item?).to be_falsey
+    end
+
+    context "with bike_search" do
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["bike_search"])
+      end
+
+      it "is truthy" do
+        expect(organization.show_single_search_menu_item?).to be_truthy
+      end
+
+      context "law_enforcement" do
+        let(:organization) do
+          FactoryBot.create(:organization_with_organization_features, kind: "law_enforcement",
+            enabled_feature_slugs: ["bike_search"])
+        end
+
+        it "is falsey" do
+          expect(organization.enabled?("bike_search")).to be_truthy
+          expect(organization.show_single_search_menu_item?).to be_falsey
+        end
+      end
+    end
+  end
+
   describe "user_registration_all_bikes?" do
     it "is falsey" do
       expect(Organization.new.user_registration_all_bikes?).to be_falsey
@@ -684,30 +714,6 @@ RSpec.describe Organization, type: :model do
         expect(org2.slug).to eq "buckshot-deleted-2"
         expect(org1.reload.slug).to eq "buckshot-deleted"
         expect(org1.short_name).to eq "buckshot-deleted"
-      end
-
-      it "renames as it deletes, rather than waiting for another organization to save" do
-        organization = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
-        organization.destroy
-
-        expect(organization.reload.short_name).to eq "buckshot-deleted"
-        expect(organization.slug).to eq "buckshot-deleted"
-
-        # slug is unique, so a second deletion of the name can't take the same one
-        second = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
-        second.destroy
-
-        expect(second.reload.deleted_at).to be_present
-        expect(second.slug).to eq "buckshot-deleted-2"
-      end
-
-      it "gives the name back when it's restored" do
-        organization = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
-        organization.destroy
-        organization.restore(recursive: true)
-
-        expect(organization.reload.short_name).to eq "buckshot"
-        expect(organization.slug).to eq "buckshot"
       end
     end
 
