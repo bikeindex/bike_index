@@ -125,8 +125,8 @@ RSpec.describe "Signup", :js, type: :system do
     expect(page).to have_content("has been confirmed and added to your account", wait: 10)
     expect(user_email.reload.confirmed?).to be_truthy
 
-    # Confirming lands back on the account form, where the new email's remove link is a
-    # Turbo DELETE guarded by an onclick -- the parser would drop a nested button_to form
+    # Confirming lands back on the account form, where the remove link is a Turbo DELETE
+    # guarded by an onclick
     expect(dismiss_confirm { click_link "Remove email" }).to match(/remove #{additional_email}/)
     expect(user.user_emails.pluck(:email)).to include(additional_email)
 

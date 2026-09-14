@@ -73,8 +73,7 @@ RSpec.describe "Organized registration sequences", :js, type: :system do
     expect(edited.image).to be_attached
     expect(draft.registration_sequence_pages.pluck(:title)).to include("Campus-specific rules")
 
-    # Delete can't be a button_to -- it sits inside the form above -- so it's a Turbo
-    # DELETE gated by an onclick, and dismissing has to stop Turbo too
+    # A Turbo DELETE gated by an onclick -- dismissing has to stop Turbo too
     pages_before = draft.registration_sequence_pages.count
 
     expect(dismiss_confirm { click_link "Delete page" }).to match(/can't be undone/)

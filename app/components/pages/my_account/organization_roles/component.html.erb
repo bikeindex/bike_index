@@ -63,12 +63,6 @@
             </div>
 
             <% if organization_role.leavable? %>
-              <%#
-                Not ButtonLink's method: - the whole page is inside the account form, and the
-                parser drops a nested button_to form, leaving its button to submit the outer
-                one. Turbo issues the DELETE instead, and confirm: gates it with an onclick
-              %>
-
               <div class="tw:flex tw:justify-end tw:max-md:mt-2 tw:md:justify-self-end">
                 <%# twlink is in the components layer, so the red utilities outrank it %>
                 <%= render UI::ButtonLink::Component.new(text: translation(".leave_organization"),

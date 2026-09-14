@@ -33,8 +33,8 @@
       <% end %>
 
       <% if @registration_sequence.draft? %>
-        <%= render UI::ButtonLink::Component.new(text: "Activate", href: activate_path, method: :patch, color: :primary, size: :sm,
-          confirm: activate_confirm) %>
+        <%= render UI::ButtonLink::Component.new(text: "Activate", href: activate_path, color: :primary, size: :sm,
+ confirm: activate_confirm, data: {turbo: true, turbo_method: :patch}) %>
       <% else %>
         <%= render UI::ButtonLink::Component.new(text: create_draft_text, href: create_draft_path, method: :post, color: :primary, size: :sm) %>
       <% end %>

@@ -15,11 +15,11 @@ RSpec.describe "Admin bikes", :js, type: :system do
   it "asks before deleting a bike, and deletes it only once confirmed" do
     visit "/admin/bikes/#{bike.id}/edit"
 
-    expect(dismiss_confirm { click_button "Delete bike" }).to eq "Are you sure?"
+    expect(dismiss_confirm { click_link "Delete bike" }).to eq "Are you sure?"
     expect(page).to have_current_path("/admin/bikes/#{bike.id}/edit")
     expect(bike.reload.deleted_at).to be_nil
 
-    accept_confirm { click_button "Delete bike" }
+    accept_confirm { click_link "Delete bike" }
 
     expect(page).to have_content("Bike deleted!")
     expect(bike.reload.deleted_at).to be_present
