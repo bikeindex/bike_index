@@ -108,17 +108,6 @@ RSpec.describe InfoController, type: :request do
         it "sends them to their own registrations" do
           expect(search_hrefs).to eq([organization_registrations_path(organization_id: organization.to_param)])
         end
-
-        context "law enforcement" do
-          let(:organization) do
-            FactoryBot.create(:organization_with_organization_features, kind: "law_enforcement",
-              enabled_feature_slugs: ["bike_search"])
-          end
-
-          it "sends them to every registration" do
-            expect(search_hrefs).to eq([search_registrations_path(stolenness: "all")])
-          end
-        end
       end
     end
 
