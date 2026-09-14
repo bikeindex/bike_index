@@ -10,6 +10,15 @@ RSpec.describe UI::Forms::Checkbox::Component, type: :component do
     expect(component).to have_css("label.twlabel input[type='checkbox'][name='subscribe']")
     expect(component).to have_css("label", text: "Email me updates")
     expect(component).to_not have_css("input[checked]")
+    expect(component).to_not have_css("input[required]")
+  end
+
+  context "when required" do
+    let(:options) { {name: :subscribe, label: "Email me updates", required: true} }
+
+    it "renders the checkbox required" do
+      expect(component).to have_css("input[type='checkbox'][required]")
+    end
   end
 
   context "when checked with custom value and data" do
