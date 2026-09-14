@@ -212,6 +212,14 @@ RSpec.describe HotSheet, type: :model do
         expect(HotSheet.for(organization, Time.current.to_date).map(&:recipient_ids)).to eq([recipient_ids])
       end
     end
+
+    context "for a past day" do
+      let(:sheet_date) { Time.current.to_date - 1.day }
+      before { hot_sheet.update(sheet_date:) }
+      it "leaves the sheet as it went out" do
+        expect(HotSheet.for(organization, sheet_date).map(&:recipient_ids)).to eq([recipient_ids])
+      end
+    end
   end
 
   describe "for a day without sheets" do

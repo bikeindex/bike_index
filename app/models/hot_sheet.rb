@@ -40,9 +40,9 @@ class HotSheet < ApplicationRecord
     def for(organization_or_id, date)
       org_id = organization_or_id.is_a?(Integer) ? organization_or_id : organization_or_id.id
       hot_sheets = where(organization_id: org_id, sheet_date: date).includes(:organization).order(:id).to_a
-      return rebatched(hot_sheets) if hot_sheets.any?
       # A past day is whatever it was - only today's sheets are still to come
-      return [] if date.present? && date != Time.current.to_date
+      return hot_sheets if date.present? && date != Time.current.to_date
+      return rebatched(hot_sheets) if hot_sheets.any?
 
       configuration = HotSheetConfiguration.find_by(organization_id: org_id)
       return [] if configuration.blank?
@@ -58,8 +58,7 @@ class HotSheet < ApplicationRecord
 
     # A sheet from before delivery was batched holds the whole day's recipients on one row
     def rebatched(hot_sheets)
-      oversized = hot_sheets.reject(&:settled?)
-        .find { it.recipient_ids.to_a.size > RECIPIENTS_PER_EMAIL }
+      oversized = hot_sheets.find { !it.settled? && it.recipient_ids.to_a.size > RECIPIENTS_PER_EMAIL }
       return hot_sheets if oversized.blank?
 
       first_batch, *batches = oversized.recipient_ids.each_slice(RECIPIENTS_PER_EMAIL).to_a
