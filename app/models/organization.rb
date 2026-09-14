@@ -564,7 +564,7 @@ class Organization < ApplicationRecord
     # For now, just use them. However - nesting organizations probably need slightly modified organization_feature slugs
     self.enabled_feature_slugs = calculated_enabled_feature_slugs.compact.sort
     new_slug = Slugifyer.slugify(short_name).delete_prefix("admin")
-    set_calculated_slug(new_slug) if new_slug != slug
+    self.slug = calculated_slug(new_slug) if new_slug != slug
     self.access_token ||= SecurityTokenizer.new_token
     # NOTE: only organizations with child_organizations feature can be selected in admin view, but this doesn't block assignment
     self.child_ids = calculated_children.pluck(:id).presence || []
@@ -619,13 +619,13 @@ class Organization < ApplicationRecord
 
   # A deleted organization keeps its slug - the unique index counts deleted rows, and destroy
   # skips validations - so it's renamed here, by the save of the organization claiming the name
-  def set_calculated_slug(new_slug)
+  def calculated_slug(new_slug)
     # If the organization exists, don't invalidate because of it's own slug
     orgs = id.present? ? Organization.unscoped.where.not(id:) : Organization.unscoped.all
     orgs.deleted.find_by(slug: new_slug)&.save
-    return self.slug = new_slug unless orgs.exists?(slug: new_slug)
+    return new_slug unless orgs.exists?(slug: new_slug)
 
-    self.slug = (2..).each { |i| break "#{new_slug}-#{i}" unless orgs.exists?(slug: "#{new_slug}-#{i}") }
+    (2..).each { |i| break "#{new_slug}-#{i}" unless orgs.exists?(slug: "#{new_slug}-#{i}") }
   end
 
   def user_email_domain_format
