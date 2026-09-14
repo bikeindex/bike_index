@@ -100,9 +100,7 @@ module UserServices
 
     def registrations_links(organization)
       path = routes.organization_registrations_path(organization_id: organization.to_param)
-      unless organization.show_separate_search_all_menu_item
-        return [ComponentStructs::Shapes.link(translation(:search_registrations), path)]
-      end
+      return [ComponentStructs::Shapes.link(translation(:search_registrations), path)] unless organization.show_separate_search_all_menu_item
 
       [ComponentStructs::Shapes.link(translation(:registrations_index), path),
         ComponentStructs::Shapes.link(translation(:search_all_registrations),
