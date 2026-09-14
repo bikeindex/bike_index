@@ -98,10 +98,11 @@ module UserServices
         translation(:org_registrations, org_name: organization.short_name), "bike", children)
     end
 
-    # Without bike_search the index lists the organization's own registrations rather than searching them
     def registrations_links(organization)
       path = routes.organization_registrations_path(organization_id: organization.to_param)
-      return [ComponentStructs::Shapes.link(translation(:search_registrations), path)] if organization.enabled?("bike_search")
+      unless organization.show_separate_search_all_menu_item
+        return [ComponentStructs::Shapes.link(translation(:search_registrations), path)]
+      end
 
       [ComponentStructs::Shapes.link(translation(:registrations_index), path),
         ComponentStructs::Shapes.link(translation(:search_all_registrations),

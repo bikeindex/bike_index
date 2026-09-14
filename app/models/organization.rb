@@ -338,6 +338,12 @@ class Organization < ApplicationRecord
     enabled?("impound_bikes_public") # feature slug applied in calculated_enabled_feature_slugs
   end
 
+  # Without bike_search, /o/<slug>/registrations lists the organization's own registrations
+  # rather than searching them - and law enforcement is here for the whole registry anyway
+  def show_separate_search_all_menu_item
+    !enabled?("bike_search") || law_enforcement?
+  end
+
   # WARNING! This is not efficient
   def law_enforcement_features_enabled?
     law_enforcement? && current_invoices.any? { |i| i.law_enforcement_functionality_invoice? }
