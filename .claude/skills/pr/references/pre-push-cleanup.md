@@ -30,8 +30,6 @@ A clean run over Ruby-only paths prints **nothing at all** — the summary table
 
 Scope specs the same way — the ones covering what the branch changed, never a bare `bundle exec rspec` or a whole top-level directory (see the `rspec-testing` skill). CI runs the full suite; a green PR isn't your job to prove locally.
 
-**Changing what element a component renders needs a grep, not just the neighbouring specs.** The examples that pin a shape — `have_button`, `form[action=…]`, a `_method` hidden field — sit in whichever spec renders the page, not next to the component, so scoping by changed path misses them. `grep -rn "have_button\|form\[action" spec/` against the text of what you changed. A `button_to` becoming a link took three files down on CI this way.
-
 **`bin/rails tailwindcss:build` before the `:js` ones, after the last template edit.** Tailwind's content scan reads the templates, so adding or removing a class in an `.erb` changes the built CSS — and a system spec asserting a computed style (`spec/components/ui/dropdown/component_system_spec.rb` reads `getComputedStyle(...).color`) fails against the stale build until it's rebuilt. A merge that brings in `app/assets/tailwind/**` does it too. The failure names the assertion, not the build, so it reads as a real regression.
 
 Then review the changed files against `CLAUDE.md` (root and any nested ones in touched directories) and fix what doesn't conform — code style, testing conventions, and frontend rules. Only touch lines this branch already changed.
