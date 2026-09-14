@@ -685,6 +685,16 @@ RSpec.describe Organization, type: :model do
         expect(org1.reload.slug).to eq "buckshot-deleted"
         expect(org1.short_name).to eq "buckshot-deleted"
       end
+
+      # That sweep runs inside whatever request next saves an organization -- on a GET
+      # that's the reading role, which raises. Destroying renames as it goes instead
+      it "renames as it deletes, rather than waiting for another organization to save" do
+        organization = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
+        organization.destroy
+
+        expect(organization.reload.short_name).to eq "buckshot-deleted"
+        expect(organization.slug).to eq "buckshot-deleted"
+      end
     end
 
     describe "set_locations_shown" do

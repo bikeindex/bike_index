@@ -61,6 +61,7 @@ class PublicImagesController < ApplicationController
 
   def destroy
     @imageable = @public_image.imageable
+    image_path = public_image_path(@public_image)
     imageable_id = @public_image.imageable_id
     imageable_type = @public_image.imageable_type
     if imageable_type == "MailSnippet"
@@ -77,7 +78,12 @@ class PublicImagesController < ApplicationController
       else
         edit_bike_url(imageable_id, edit_template: params[:edit_template])
       end
-      redirect_back(fallback_location: fallback_link)
+      # Deleting from the image's own page makes it the referer, and it 404s now
+      if request.referer.to_s.include?(image_path)
+        redirect_to(fallback_link)
+      else
+        redirect_back(fallback_location: fallback_link)
+      end
     end
   end
 

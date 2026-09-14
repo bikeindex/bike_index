@@ -150,6 +150,7 @@ class Organization < ApplicationRecord
   attr_accessor :embedable_user_email, :skip_update
 
   before_validation :set_calculated_attributes
+  after_destroy :rename_as_deleted
   after_commit :update_associations
 
   default_scope { order(:name) }
@@ -563,7 +564,8 @@ class Organization < ApplicationRecord
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
       orgs = id.present? ? Organization.unscoped.where("id != ?", id) : Organization.unscoped.all
-      # Force update the deleted short_names and slugs
+      # Legacy rows only -- deleting renames as it goes now. Writing here runs inside whatever
+      # request triggered the save, and a GET is on the reading role, so it raises
       orgs.deleted.where.not("short_name ILIKE ?", "%-deleted")
         .each { |o| o.update_columns(short_name: "#{o.short_name}-deleted", slug: "#{o.slug}-deleted") }
       while orgs.where(slug: new_slug).exists?
@@ -620,6 +622,14 @@ class Organization < ApplicationRecord
     return true if skip_update
 
     UpdateOrganizationAssociationsJob.perform_async(id)
+  end
+
+  # Frees the slug for a new organization of the same name. update_columns because destroy
+  # doesn't run validations, so set_calculated_attributes never sees the deletion
+  def rename_as_deleted
+    return if short_name.match?("-deleted")
+
+    update_columns(short_name: "#{short_name}-deleted", slug: "#{slug}-deleted")
   end
 
   private
