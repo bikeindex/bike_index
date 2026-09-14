@@ -44,4 +44,18 @@ RSpec.describe UI::ButtonLink::Component, :js, type: :system do
       expect_axe_clean if index.zero?
     end
   end
+
+  it "answers the spacebar, which scrolls a link but activates the button this looks like" do
+    preview_path = "/rails/view_components/ui/button_link/component/link_confirm"
+    visit preview_path
+    expect_axe_clean
+
+    link = find_link("Read the terms")
+    expect(dismiss_confirm { link.send_keys(" ") }).to eq "Leave this page?"
+    expect(page).to have_current_path(preview_path)
+
+    accept_confirm { link.send_keys(" ") }
+
+    expect(page).to have_current_path("/terms")
+  end
 end

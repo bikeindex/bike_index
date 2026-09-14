@@ -26,7 +26,7 @@ module UI
         return button_to_form if @method && @confirm.nil?
         return disabled_link if @disabled
 
-        helpers.link_to(@text || content, @href, confirmable_attributes)
+        helpers.link_to(@text || content, @href, link_attributes)
       end
 
       private
@@ -39,6 +39,18 @@ module UI
 
         turbo = @method ? {turbo: true, turbo_method: @method} : {}
         attributes.merge(onclick: "return confirm('#{j @confirm}')", data: attributes[:data].merge(turbo))
+      end
+
+      # The spacebar activates a button but scrolls the page on a link, and this renders as
+      # a button -- ui--button-link clicks it instead
+      def link_attributes
+        attributes = confirmable_attributes
+        data = attributes[:data]
+
+        attributes.merge(data: data.merge(
+          controller: [data[:controller], "ui--button-link"].compact.join(" "),
+          action: [data[:action], "keydown->ui--button-link#activate"].compact.join(" ")
+        ))
       end
 
       # An <a> takes no disabled attribute, so dropping the href is what makes it
