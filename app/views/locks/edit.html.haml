@@ -7,4 +7,4 @@
 
   .form-group.destroy-button
     = render(UI::ButtonLink::Component.new(text: t(".delete_this_lock"), href: {action: "destroy", id: @lock},
-      color: :error, size: :lg, confirm: t(".are_you_sure"), data: {turbo: true, turbo_method: :delete}))
+      color: :error, size: :lg, method: :delete, confirm: t(".are_you_sure")))

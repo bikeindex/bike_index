@@ -19,7 +19,7 @@
     <div>
       <%= link_to t(".edit"), edit_public_image_path(@public_image) %> |
       <%= render(UI::ButtonLink::Component.new(text: t(".destroy"), href: @public_image, color: :link,
-            confirm: t(".are_you_sure"), data: {turbo: true, turbo_method: :delete})) %>
+            method: :delete, confirm: t(".are_you_sure"))) %>
       | <%= link_to t(".back_to_images"), public_images_path %>
     </div>
   </div>

@@ -137,12 +137,17 @@ RSpec.describe UI::ButtonLink::Component, type: :component do
       end
     end
 
-    context "with confirm and form attributes" do
-      let(:options) { {text: "Delete", href: "/thing", method: :delete, confirm: "Are you sure? It can't be undone", form: {class: "tw:inline-block"}} }
+    context "with confirm" do
+      let(:options) { {text: "Delete", href: "/thing", method: :delete, confirm: "Are you sure? It can't be undone"} }
 
-      it "guards the submit without dropping the passed form attributes" do
-        expect(component).to have_css("form.tw\\:inline-block")
-        expect(component.css("form").first["onsubmit"]).to eq("return confirm('Are you sure? It can\\'t be undone')")
+      # A button_to's form can't nest inside the forms these sit in, so the method moves
+      # onto a link that Turbo submits
+      it "renders a Turbo link rather than a form, gated by an escaped onclick" do
+        expect(component).to have_no_css("form")
+        link = component.css("a").first
+        expect(link["onclick"]).to eq("return confirm('Are you sure? It can\\'t be undone')")
+        expect(link["data-turbo"]).to eq "true"
+        expect(link["data-turbo-method"]).to eq "delete"
       end
     end
 

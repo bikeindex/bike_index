@@ -18,8 +18,7 @@
 
       <% if editing? %>
         <%= render UI::ButtonLink::Component.new(text: "Delete page", href: page_path, color: :error, size: :sm,
-              confirm: "This action can't be undone, you'll have to re-create the page",
-              data: {turbo: true, turbo_method: :delete}) %>
+              method: :delete, confirm: "This action can't be undone, you'll have to re-create the page") %>
       <% end %>
     </div>
   <% end %>

@@ -260,7 +260,7 @@
                         href: organization_export_path(@export.id, organization_id: current_organization.to_param, undo_bike_stickers: true),
                         text: t(".undo_sticker_assignment"),
                         color: :error,
-                        confirm: t(".undo_sticker_assignment_confirm"), data: {turbo: true, turbo_method: :put}) %>
+                        method: :put, confirm: t(".undo_sticker_assignment_confirm")) %>
                 </div>
               <% end %>
             <% else %>

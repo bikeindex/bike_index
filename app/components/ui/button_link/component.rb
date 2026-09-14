@@ -21,23 +21,28 @@ module UI
       end
 
       # Passing method: renders a button_to form (a styled button that submits a
-      # request to href) instead of a plain link.
+      # request to href) instead of a plain link — unless it also has to prompt, since a
+      # button_to's form can't nest inside the forms these sit in. Then Turbo carries the
+      # method on a link instead.
       def call
-        return button_to_form if @method
+        return button_to_form if @method && @confirm.nil?
         return disabled_link if @disabled
 
-        helpers.link_to(@text || content, @href, guarded(html_attributes, :onclick))
+        helpers.link_to(@text || content, @href, confirmable_attributes)
       end
 
       private
 
-      # The confirm goes on whatever the browser acts on: the form for a button_to, the
-      # anchor for a link. Not data-turbo-confirm — Turbo Drive is off unless a call site
-      # opts in — and not data-confirm, which needs the rails-ujs we're retiring.
-      def guarded(attributes, event)
-        return attributes unless @confirm
+      # onclick, not data-turbo-confirm (Turbo Drive is off unless a call site opts in) and
+      # not data-confirm (rails-ujs, which we're retiring). Turbo's click handler checks
+      # defaultPrevented, so returning false here stops the request it would have issued.
+      def confirmable_attributes
+        return html_attributes if @confirm.nil?
 
-        attributes.merge(event => "return confirm('#{j @confirm}')")
+        attributes = html_attributes.merge(onclick: "return confirm('#{j @confirm}')")
+        return attributes if @method.nil?
+
+        attributes.merge(data: attributes[:data].merge(turbo: true, turbo_method: @method))
       end
 
       # An <a> takes no disabled attribute, so dropping the href is what makes it
@@ -48,7 +53,7 @@ module UI
       end
 
       def button_to_form
-        helpers.button_to(@href, html_attributes.merge(method: @method, disabled: @disabled, form: guarded(@form, :onsubmit))) do
+        helpers.button_to(@href, html_attributes.merge(method: @method, disabled: @disabled, form: @form)) do
           @text || content
         end
       end
