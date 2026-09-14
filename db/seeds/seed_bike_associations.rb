@@ -1,8 +1,11 @@
 # Seed the lock types
 
+# Production slugged this one before the name was pluralized, and locks/_form finds it by
+# slug -- deriving it from the name here leaves that page calling .id on a nil
+lock_type_slugs = {"Locking skewers" => "locking-skewer"}
 lock_types = ["U-lock", "Chain with lock", "Cable", "Locking skewers", "Other style", "Battery or e-bike key"]
 lock_types.each do |type_name|
-  lock_type = LockType.create(name: type_name)
+  lock_type = LockType.create(name: type_name, slug: lock_type_slugs[type_name])
   lock_type.save
 end
 
@@ -17,7 +20,7 @@ colors = [
   {name: "Purple", priority: 1, display: "#a745c0"},
   {name: "Red", priority: 1, display: "#ec1313"},
   {name: "Silver, gray or bare metal", priority: 1, display: "#b0b0b0"},
-  {name: "Stickers tape or other cover-up", priority: 3, display: "#fff"},
+  {name: "Stickers tape or other cover-up", priority: 3},
   {name: "Teal", priority: 1, display: "#3bede7"},
   {name: "White", priority: 1, display: "#fff"},
   {name: "Yellow or Gold", priority: 1, display: "#fff44b"}

@@ -67,6 +67,7 @@ class PublicImagesController < ApplicationController
       flash[:error] = translation(:cannot_delete)
       redirect_to(admin_organization_custom_layouts_path(imageable_id)) && return
     end
+    image_path = public_image_path(@public_image)
     @public_image.destroy
     flash[:success] = translation(:image_deleted)
     if imageable_type == "Blog"
@@ -77,7 +78,12 @@ class PublicImagesController < ApplicationController
       else
         edit_bike_url(imageable_id, edit_template: params[:edit_template])
       end
-      redirect_back(fallback_location: fallback_link)
+      # The image's own page is the referer when deleting from it, and it's gone
+      if request.referer.to_s.include?(image_path)
+        redirect_to(fallback_link)
+      else
+        redirect_back(fallback_location: fallback_link)
+      end
     end
   end
 

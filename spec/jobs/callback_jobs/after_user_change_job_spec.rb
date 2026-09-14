@@ -178,40 +178,36 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let!(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: user) }
     let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
-    it "does not add alert" do
+    it "adds alerts for unassigned bikes" do
       expect(organization.reload.is_invoiced?).to be_truthy
       expect(organization.enabled?("no_address")).to be_truthy
-      expect(organization.paid_money?).to be_falsey
+      expect(organization.paid_money?).to be_falsey # an invoice is enough, paying isn't required
       expect(organization.bikes.pluck(:id)).to match_array([bike1.id])
       expect(user.bike_organizations.pluck(:id)).to eq([organization.id])
       expect(user.reload.bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
       expect(user.user_alerts.pluck(:kind)).to eq([])
-      expect(user.bike_organizations.pluck(:id)).to eq([organization.id])
       instance.perform(user.id)
       user.reload
-      expect(user.user_alerts.count).to eq 0
-      expect(user.alert_slugs).to eq([])
+      expect(user.alert_slugs).to eq(["unassigned_bike_org"])
+      expect(user.user_alerts.count).to eq 1
       expect(user.no_address?).to be_truthy
+      user_alert = user.user_alerts.last
+      expect(user_alert.kind).to eq "unassigned_bike_org"
+      expect(user_alert.active?).to be_truthy
+      expect(user_alert.organization_id).to eq organization.id
+      expect(user_alert.bike_id).to eq bike2.id
     end
-    context "paid money org" do
-      let(:feature_slugs) { ["regional_bike_counts"] }
-      let!(:invoice) { FactoryBot.create(:invoice_with_payment, organization: organization) }
-      it "adds alerts for unassigned bikes" do
-        expect(organization.reload.is_invoiced?).to be_truthy
-        expect(organization.paid_money?).to be_truthy
-        expect(organization.bikes.pluck(:id)).to match_array([bike1.id])
-        expect(user.user_alerts.pluck(:kind)).to eq([])
+    context "organization without an invoice" do
+      let(:organization) { FactoryBot.create(:organization) }
+      it "does not add alert" do
+        expect(organization.reload.is_invoiced?).to be_falsey
+        expect(user.bike_organizations.pluck(:id)).to eq([organization.id])
+        expect(user.reload.bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
         instance.perform(user.id)
         user.reload
-        expect(user.alert_slugs).to eq(["unassigned_bike_org"])
-        expect(user.user_alerts.count).to eq 1
-        expect(user.bike_organizations.pluck(:id)).to eq([organization.id])
+        expect(user.user_alerts.count).to eq 0
+        expect(user.alert_slugs).to eq([])
         expect(user.no_address?).to be_falsey
-        user_alert = user.user_alerts.last
-        expect(user_alert.kind).to eq "unassigned_bike_org"
-        expect(user_alert.active?).to be_truthy
-        expect(user_alert.organization_id).to eq organization.id
-        expect(user_alert.bike_id).to eq bike2.id
       end
     end
   end

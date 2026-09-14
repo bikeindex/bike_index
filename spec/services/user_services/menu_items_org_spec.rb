@@ -120,6 +120,19 @@ RSpec.describe UserServices::MenuItemsOrg do
         ])
       end
 
+      context "law enforcement" do
+        let(:organization) { FactoryBot.create(:organization_brakebills, kind: "law_enforcement") }
+
+        it "splits the registrations row, the whole registry being what they search" do
+          registrations = items.find { |item| item[:key] == :registrations }
+
+          expect(registrations[:children].first(2)).to eq([
+            link_item("Organization Registrations", "/o/#{slug}/registrations"),
+            link_item("Search all registrations", "/search/registrations?stolenness=all")
+          ])
+        end
+      end
+
       it "renders the one row with nowhere to link as disabled" do
         impounded = items.find { |item| item[:key] == :impounded }
 
