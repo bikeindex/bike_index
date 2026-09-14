@@ -562,6 +562,274 @@ RSpec.describe "BikesController#create", type: :request do
       end
     end
   end
+  context "embeded" do
+    let(:current_user) { nil }
+    let(:organization) { FactoryBot.create(:organization_with_auto_user) }
+    let(:b_param) { BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true}) }
+    let(:bike_params) do
+      {
+        serial_number: "69",
+        b_param_id_token: b_param.id_token,
+        creation_organization_id: organization.id,
+        embeded: true,
+        extra_registration_number: "Testly secondary",
+        cycle_type_slug: " Tricycle ",
+        manufacturer_id: manufacturer.id,
+        manufacturer_other: "",
+        primary_frame_color_id: color.id,
+        handlebar_type: "bmx",
+        owner_email: "flow@goodtimes.com"
+      }
+    end
+    let(:testable_bike_params) { bike_params.except(:b_param_id_token, :embeded, :cycle_type_slug) }
+
+    it "creates a new ownership and bike from the organization" do
+      expect {
+        post base_url, params: {bike: bike_params}
+      }.to change(Ownership, :count).by 1
+      bike = Bike.last
+      expect(bike.address_record.country.name).to eq("United States")
+      expect(bike.creator_id).to eq organization.auto_user_id
+      expect(bike.cycle_type).to eq "tricycle"
+      expect(bike.current_ownership).to have_attributes(origin: "embed", organization:, creator: bike.creator)
+      testable_bike_params.each { |key, value| expect(bike.send(key).to_s).to eq value.to_s }
+    end
+
+    # The embed form is posted from the organization's own site, so it can't carry our token
+    context "unverified authenticity token" do
+      include_context :test_csrf_token
+      it "permits" do
+        expect(b_param).to be_present # create the organization's users before clearing the queue
+        Sidekiq::Job.clear_all
+        ActionMailer::Base.deliveries = []
+        expect {
+          post base_url, params: {bike: bike_params}
+        }.to change(Ownership, :count).by 1
+        Sidekiq::Job.drain_all
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        bike = Bike.reorder(:created_at).last
+        expect(bike.address_record.country.name).to eq("United States")
+        expect(bike.current_ownership).to have_attributes(origin: "embed", organization:, creator: organization.auto_user)
+        expect(bike.current_ownership_id).to eq bike.current_ownership.id
+      end
+    end
+
+    context "with parking_notification" do
+      let(:parking_notification) do
+        {
+          latitude: "40.7143528",
+          longitude: "-74.0059731",
+          accuracy: "12",
+          kind: "parked_incorrectly_notification",
+          internal_notes: "some details about the abandoned thing",
+          use_entered_address: "false",
+          message: "Some message to the user",
+          street: "whatever"
+        }
+      end
+      it "registers, without creating a parking_notification" do
+        expect {
+          post base_url, params: {bike: bike_params, parking_notification:}
+        }.to change(Ownership, :count).by 1
+        bike = Bike.last
+        expect(bike.address_record.country.name).to eq("United States")
+        expect(bike.current_ownership).to have_attributes(origin: "embed", organization:)
+        expect(ParkingNotification.count).to eq 0
+      end
+    end
+
+    context "stolen" do
+      let(:stolen_params) do
+        {
+          country_id: country.id,
+          street: "2459 W Division St",
+          city: "Chicago",
+          postal_code: "60622",
+          region_record_id: state.id,
+          date_stolen: (Time.current - 1.day).utc,
+          timezone: "UTC"
+        }
+      end
+      let(:target_time) { Time.current.yesterday.to_i }
+
+      context "valid" do
+        include_context :geocoder_real
+
+        it "creates a stolen bike from the organization" do
+          VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
+            expect {
+              post base_url, params: {bike: bike_params, stolen_record: stolen_params}
+              expect(assigns(:bike).errors&.full_messages).to_not be_present
+            }.to change(Ownership, :count).by 1
+            bike = Bike.last
+            expect(bike.status).to eq "status_stolen"
+            expect(bike.current_ownership).to have_attributes(origin: "embed", organization:, creator: bike.creator)
+            testable_bike_params.each { |key, value| expect(bike.send(key).to_s).to eq value.to_s }
+            stolen_record = bike.current_stolen_record
+            stolen_params.except(:date_stolen, :timezone).each { |key, value| expect(stolen_record.send(key).to_s).to eq value.to_s }
+            expect(stolen_record.date_stolen.to_i).to be_within(1).of target_time
+          end
+        end
+
+        context "new date input" do
+          let(:stolen_params) { super().merge(date_stolen: "2018-07-28T23:34:00", timezone: "America/New_York") }
+          let(:target_time) { 1532835240 }
+          it "creates a stolen bike from the organization" do
+            VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
+              expect {
+                post base_url, params: {bike: bike_params, stolen_record: stolen_params}
+              }.to change(Ownership, :count).by 1
+              bike = Bike.last
+              expect(bike.status).to eq "status_stolen"
+              expect(bike.current_ownership).to have_attributes(origin: "embed", organization:, creator: bike.creator)
+              expect(bike.current_stolen_record.date_stolen.to_i).to be_within(1).of target_time
+            end
+          end
+        end
+      end
+
+      context "invalid" do
+        it "redirects back to the embed form, keeping the attributes" do
+          expect {
+            post base_url, params: {bike: bike_params.merge(manufacturer_id: nil), stolen_record: stolen_params}
+            expect(assigns(:bike).errors&.full_messages).to be_present
+          }.to change(Ownership, :count).by(0)
+
+          expect(response).to redirect_to embed_organization_path(id: organization.slug, b_param_id_token: b_param.id_token)
+          expect(b_param.reload.status).to eq "status_stolen"
+          testable_bike_params.except(:manufacturer_id)
+            .each { |key, value| expect(assigns(:bike).send(key).to_s).to eq(value.to_s) }
+        end
+      end
+    end
+  end
+
+  context "embeded_extended" do
+    let(:current_user) { nil }
+    let(:organization) { FactoryBot.create(:organization_with_auto_user) }
+    let(:b_param) { BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true}) }
+    let(:bike_params) do
+      {
+        serial_number: "69",
+        b_param_id_token: b_param.id_token,
+        creation_organization_id: organization.id,
+        embeded: true,
+        embeded_extended: true,
+        cycle_type: "pedi-cab",
+        manufacturer_id: manufacturer.slug,
+        primary_frame_color_id: color.id,
+        handlebar_type: "bmx",
+        owner_email: "Flow@goodtimes.com"
+      }
+    end
+    before { expect(b_param).to be_present }
+
+    context "with an image" do
+      let(:test_photo) { Rack::Test::UploadedFile.new(File.open(Rails.root.join("spec/fixtures/bike.jpg"))) }
+      it "registers a bike and uploads the image" do
+        Sidekiq::Job.clear_all
+        expect {
+          post base_url, params: {persist_email: "", bike: bike_params.merge(image: test_photo)}
+        }.to change(Bike, :count).by(1)
+        expect(assigns[:persist_email]).to be_falsey
+        expect(response).to redirect_to(embed_extended_organization_url(organization))
+        Sidekiq::Job.drain_all
+        # The image is associated by a scheduled job, once created_bike is present
+        ImageJobs::AssociatorJob.new.perform
+
+        bike = Bike.reorder(:id).last
+        expect(bike.owner_email).to eq bike_params[:owner_email].downcase
+        expect(bike.current_ownership).to have_attributes(origin: "embed_extended", organization:, creator: bike.creator)
+        expect(bike.cycle_type_name).to eq "Pedi Cab (rickshaw)"
+        expect(bike.manufacturer).to eq manufacturer
+        expect(bike.public_images.count).to eq 1
+        expect(bike.credibility_score).to eq 50
+      end
+    end
+
+    context "signed in non-member, parent organization, persisted email" do
+      include_context :test_csrf_token
+      let(:organization_parent) { FactoryBot.create(:organization) }
+      let(:organization) { FactoryBot.create(:organization_with_auto_user, parent_organization_id: organization_parent.id) }
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+
+      it "registers to the organization's auto_user, not the signed in user" do
+        post base_url, params: {bike: bike_params.merge(manufacturer_id: "A crazy different thing"), persist_email: true}
+        expect(assigns[:persist_email]).to be_truthy
+        expect(response).to redirect_to(embed_extended_organization_url(organization, email: "flow@goodtimes.com"))
+        bike = Bike.last
+        expect(bike.current_ownership).to have_attributes(origin: "embed_extended", organization:, creator: bike.creator)
+        expect(bike.manufacturer).to eq Manufacturer.other
+        expect(bike.manufacturer_other).to eq "A crazy different thing"
+        expect(bike.creator_id).to eq organization.auto_user_id
+        expect(bike.organizations.pluck(:id)).to match_array([organization.id, organization_parent.id])
+      end
+    end
+
+    context "with an organization bike sticker and a signed in member" do
+      let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization:, code: "aaa", kind: "sticker") }
+      let!(:wrong_bike_sticker) { FactoryBot.create(:bike_sticker, code: "aaa", kind: "sticker") }
+
+      it "registers under the signed in user and claims their organization's sticker" do
+        post base_url, params: {bike: bike_params.merge(bike_sticker: "AAA")}
+        expect(response).to redirect_to(embed_extended_organization_url(organization))
+        bike = Bike.last
+        expect(bike.current_ownership).to have_attributes(origin: "embed_extended", organization:, creator: bike.creator)
+        expect(bike.manufacturer).to eq manufacturer
+        expect(bike.creator_id).to eq current_user.id
+        expect(bike_sticker.reload).to have_attributes(claimed?: true, bike:, user: bike.creator)
+        expect(wrong_bike_sticker.reload.claimed?).to be_falsey
+      end
+    end
+  end
+
+  context "legacy b_param" do
+    let(:b_param) { FactoryBot.create(:b_param, creator: b_param_creator) }
+    let(:b_param_creator) { current_user }
+    let(:bike_params) do
+      {
+        serial_number: "1234567890",
+        b_param_id_token: b_param.id_token,
+        cycle_type: "stroller",
+        manufacturer_id: manufacturer.name,
+        rear_tire_narrow: "true",
+        rear_wheel_size_id: FactoryBot.create(:wheel_size).id,
+        primary_frame_color_id: color.id,
+        handlebar_type: "bmx",
+        owner_email: current_user.email
+      }
+    end
+
+    context "b_param not owned by the user" do
+      let(:b_param_creator) { FactoryBot.create(:user) }
+      it "does not use the b_param" do
+        post base_url, params: {bike: bike_params}
+        expect(b_param.reload.created_bike_id).to_not be_present
+      end
+    end
+
+    it "creates a stolen bike and assigns the user phone" do
+      expect {
+        post base_url, params: {bike: bike_params.merge(phone: "312.379.9513", date_stolen: Time.current.to_s)}
+      }.to change(StolenRecord, :count).by(1)
+      expect(b_param.reload).to have_attributes(bike_errors: nil, image_processed: false)
+      expect(b_param.created_bike_id).to be_present
+      expect(current_user.reload.phone).to eq("3123799513")
+    end
+
+    context "b_param created by an organization's auto_user" do
+      let(:organization) { FactoryBot.create(:organization_with_auto_user) }
+      let(:b_param_creator) { organization.auto_user }
+      it "creates a bike for the organization" do
+        expect {
+          post base_url, params: {bike: bike_params.merge(creation_organization_id: organization.id)}
+        }.to change(Ownership, :count).by(1)
+        expect(Bike.last.creation_organization_id).to eq(organization.id)
+      end
+    end
+  end
+
   context "existing b_param, no bike" do
     let(:bike_params) do
       basic_bike_params.merge(cycle_type: "cargo-rear",

@@ -223,16 +223,65 @@ RSpec.describe SessionsController, type: :request do
   end
 
   describe "new" do
-    it "renders" do
-      get "/session/new"
+    it "renders, storing return_to" do
+      get "/session/new", params: {return_to: "/bikes/12?contact_owner=true"}
       expect(response.code).to eq "200"
       expect(response).to render_template(:new)
+      expect(response).to render_template("layouts/application")
+      expect(flash).to_not be_present
+      expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
     end
     context "json format" do
       it "renders html (scanners request .json)" do
         get "/session/new.json"
         expect(response.code).to eq "200"
         expect(response).to render_template(:new)
+      end
+    end
+    context "with partner" do
+      it "renders the bikehub layout" do
+        get "/session/new", params: {return_to: "/bikes/12?contact_owner=true", partner: "bikehub"}
+        expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
+        expect(response).to render_template("layouts/application_bikehub")
+      end
+    end
+    context "with partner in session" do
+      include_context :existing_doorkeeper_app
+      it "renders the bikehub layout, naming the company" do
+        get "/oauth/authorize", params: {client_id: doorkeeper_app.uid, response_type: "code",
+                                         scope: "read_bikes", partner: "bikehub", company: "Some BikeHub"}
+        expect(session[:partner]).to eq "bikehub"
+        expect(session[:company]).to eq "Some BikeHub"
+
+        get "/session/new"
+        expect(response).to render_template("layouts/application_bikehub")
+        expect(response.body).to match("Some BikeHub")
+      end
+    end
+    context "signed in user" do
+      # signed in for real: log_in's User.from_auth stub answers User.unconfirmed too,
+      # and skip_if_signed_in asks that before it asks whether the user is confirmed
+      let(:password) { "example_password2" }
+      let(:user) { FactoryBot.create(:user_confirmed, password:, password_confirmation: password) }
+      before { post "/session", params: {session: {email: user.email, password:}} }
+
+      it "redirects to return_to, and drops one that would loop back to signing in" do
+        get "/session/new", params: {return_to: "/bikes/12?contact_owner=true"}
+        expect(response).to redirect_to "/bikes/12?contact_owner=true"
+
+        ["/session/new", "/users/new/", "/users/new?something=true"].each do |looping_return_to|
+          get "/session/new", params: {return_to: looping_return_to}
+          expect(response).to redirect_to my_account_path
+          expect(session[:return_to]).to be_blank
+        end
+      end
+      context "unconfirmed" do
+        let(:user) { FactoryBot.create(:user, password:, password_confirmation: password) }
+        it "redirects to please_confirm_email, keeping return_to" do
+          get "/session/new", params: {return_to: "/bikes/12?contact_owner=true"}
+          expect(response).to redirect_to please_confirm_email_users_path
+          expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
+        end
       end
     end
   end
@@ -245,6 +294,9 @@ RSpec.describe SessionsController, type: :request do
       token = user.refreshed_magic_link_token
       get "/session/magic_link", params: {token:}
       expect(response).to render_template(:magic_link)
+      expect(response).to render_template("layouts/application")
+      expect(assigns(:failure)).to be_falsey
+      expect(signed_auth_cookie).to be_nil
       expect(user.reload.magic_link_token).to be_present
       expect(Capybara.string(response.body))
         .to have_css("form[action='/session/sign_in_with_magic_link'] input[name='token'][value='#{token}']", visible: :hidden)
@@ -255,6 +307,8 @@ RSpec.describe SessionsController, type: :request do
       def failure_for(token)
         get "/session/magic_link", params: {incorrect_token: token}
         expect(response).to render_template(:magic_link)
+        expect(assigns(:failure)).to be_truthy
+        expect(signed_auth_cookie).to be_nil
         response.body
       end
 
@@ -271,6 +325,19 @@ RSpec.describe SessionsController, type: :request do
         body = failure_for("mangled-by-some-email-client")
         expect(body).to match(/unable to authenticate/i)
         expect(body).to_not match(/already been used|link has expired/i)
+      end
+    end
+
+    context "user signed in" do
+      let(:password) { "example_password2" }
+      let!(:user) { FactoryBot.create(:user_confirmed, password:, password_confirmation: password) }
+      before { post "/session", params: {session: {email: user.email, password:}} }
+
+      it "says they're already signed in and sends them home" do
+        get "/session/magic_link", params: {token: SecurityTokenizer.new_token}
+        expect(response).to redirect_to(my_account_url)
+        expect(flash[:success]).to be_present
+        expect(signed_auth_cookie).to_not be_nil
       end
     end
   end
@@ -306,6 +373,72 @@ RSpec.describe SessionsController, type: :request do
       expect(response).to redirect_to magic_link_session_path(incorrect_token: token)
       follow_redirect!
       expect(response.body).to match(/already been used/i)
+    end
+
+    context "matching magic_link" do
+      let(:user) { FactoryBot.create(:user_confirmed) }
+      before { user.update_auth_token("magic_link_token") }
+
+      it "signs in and redirects" do
+        post "/session/sign_in_with_magic_link", params: {token: user.reload.magic_link_token},
+          headers: {"HTTP_CF_CONNECTING_IP" => "66.66.66.66"}
+        expect(response).to redirect_to my_account_url
+        user.reload
+        expect(signed_auth_cookie[1]).to eq(user.auth_token)
+        expect(user.last_login_at).to be_within(1.second).of Time.current
+        expect(user.last_login_ip).to eq "66.66.66.66"
+        expect(user.magic_link_token).to be_blank
+      end
+
+      context "unconfirmed user" do
+        let(:user) { FactoryBot.create(:user) }
+        it "confirms the user" do
+          expect(user.reload.confirmed?).to be_falsey
+          post "/session/sign_in_with_magic_link", params: {token: user.magic_link_token}
+          expect(response).to redirect_to my_account_url
+          user.reload
+          expect(signed_auth_cookie[1]).to eq(user.auth_token)
+          expect(user.confirmed?).to be_truthy
+          expect(user.magic_link_token).to be_blank
+        end
+      end
+
+      context "expired magic_link" do
+        before { user.update_auth_token("magic_link_token", (User::AUTH_TOKEN_EXPIRY + 1.minute).ago) }
+        it "doesn't sign in, and leaves the token unspent" do
+          og_token = user.reload.magic_link_token
+          post "/session/sign_in_with_magic_link", params: {token: og_token},
+            headers: {"HTTP_CF_CONNECTING_IP" => "66.66.66.66"}
+          expect(response).to redirect_to(magic_link_session_path(incorrect_token: og_token))
+          expect(signed_auth_cookie).to be_nil
+          user.reload
+          expect(user.magic_link_token).to eq og_token
+          expect(user.last_login_at).to be_blank
+          expect(user.last_login_ip).to be_blank
+        end
+      end
+
+      context "banned user" do
+        let(:user) { FactoryBot.create(:user_confirmed, banned: true) }
+        it "says the account is locked" do
+          post "/session/sign_in_with_magic_link", params: {token: user.reload.magic_link_token}
+          expect(response).to redirect_to new_session_path
+          expect(flash[:error]).to match "locked"
+          expect(signed_auth_cookie).to be_nil
+          user.reload
+          expect(user.last_login_at).to be_blank
+          expect(user.last_login_ip).to be_blank
+        end
+      end
+
+      context "token matching no user" do
+        it "redirects to the magic link page" do
+          unknown_token = SecurityTokenizer.new_token
+          post "/session/sign_in_with_magic_link", params: {token: unknown_token}
+          expect(response).to redirect_to(magic_link_session_path(incorrect_token: unknown_token))
+          expect(signed_auth_cookie).to be_nil
+        end
+      end
     end
 
     it "redirects back to return_to when passed (review-app banner)" do
@@ -425,11 +558,15 @@ RSpec.describe SessionsController, type: :request do
     let!(:user) { FactoryBot.create(:user_confirmed, password: password, password_confirmation: password, banned: banned) }
     let(:banned) { false }
     it "signs in" do
-      post "/session", params: {session: {email: user.email, password: password}}
+      post "/session", params: {session: {email: user.email, password: password}},
+        headers: {"HTTP_CF_CONNECTING_IP" => "66.66.66.66"}
       expect(response).to redirect_to my_account_url
       expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
+      expect(session[:partner]).to be_nil
       user.reload
+      expect(signed_auth_cookie[1]).to eq user.auth_token
       expect(user.last_login_at).to be_within(1.second).of Time.current
+      expect(user.last_login_ip).to eq "66.66.66.66"
     end
     context "unconfirmed" do
       let(:user) { FactoryBot.create(:user, password: password, password_confirmation: password) }
@@ -438,9 +575,160 @@ RSpec.describe SessionsController, type: :request do
         post "/session", params: {session: {email: user.email, password: password}}
         expect(response).to redirect_to please_confirm_email_users_path
         user.reload
+        expect(signed_in_user).to eq user
         expect(user.last_login_at).to be_within(1.second).of Time.current
         get "/my_account"
         expect(response).to redirect_to please_confirm_email_users_path
+      end
+      context "with a confirmed secondary user_email" do
+        let!(:user_email) { FactoryBot.create(:user_email, user:) }
+        it "still sends them to please_confirm_email" do
+          expect(user_email.confirmed?).to be_truthy
+          post "/session", params: {session: {email: user.email, password: password}}
+          expect(signed_in_user).to eq user
+          expect(response).to redirect_to please_confirm_email_users_path
+        end
+      end
+    end
+    context "wrong password" do
+      it "stays on the credential step rather than the email step" do
+        post "/session", params: {session: {email: user.email, password: "something incorrect"}}
+        expect(response).to render_template("identify")
+        expect(response).to render_template("layouts/application")
+        expect(signed_auth_cookie).to be_nil
+      end
+    end
+    context "email with no account" do
+      it "re-renders the email step" do
+        post "/session", params: {session: {email: "notThere@example.com"}}
+        expect(response).to render_template(:new)
+        expect(response).to render_template("layouts/application")
+        expect(signed_auth_cookie).to be_nil
+      end
+    end
+    # Prior to #1738 the password minimum was 8 characters - accounts predating it still sign in
+    context "password shorter than the current minimum" do
+      before { user.update_attribute(:password, "old_pass") }
+      it "still signs in" do
+        expect(user.reload.authenticate("old_pass")).to be_truthy
+        post "/session", params: {session: {email: user.email, password: "old_pass"}},
+          headers: {"HTTP_CF_CONNECTING_IP" => "192.168.1.644"}
+        expect(response).to redirect_to my_account_url
+        expect(signed_in_user).to eq user
+        expect(user.reload.last_login_ip).to eq "192.168.1.644"
+      end
+    end
+    context "superuser" do
+      let!(:user) { FactoryBot.create(:superuser, password:, password_confirmation: password) }
+      it "redirects to admin" do
+        post "/session", params: {session: {email: user.email, password:}}
+        expect(signed_auth_cookie[1]).to eq user.reload.auth_token
+        expect(response).to redirect_to admin_root_url
+      end
+    end
+    context "user is an organization member" do
+      let(:organization) { FactoryBot.create(:organization, kind: organization_kind) }
+      let(:organization_kind) { "bike_shop" }
+      let!(:user) { FactoryBot.create(:organization_user, organization:, password:, password_confirmation: password) }
+      it "signs in to the organization" do
+        post "/session", params: {session: {email: user.email, password:}}
+        expect(signed_auth_cookie[1]).to eq user.reload.auth_token
+        expect(session[:render_donation_request]).to be_falsey
+        expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
+      end
+      context "organization is law_enforcement" do
+        let(:organization_kind) { "law_enforcement" }
+        it "queues the donation request and sends them to search" do
+          post "/session", params: {session: {email: user.email, password:}}
+          expect(signed_auth_cookie[1]).to eq user.reload.auth_token
+          expect(session[:render_donation_request]).to eq "law_enforcement"
+          expect(response).to redirect_to search_registrations_path(stolenness: "all")
+        end
+      end
+    end
+    context "partner" do
+      include_context :existing_doorkeeper_app
+      let!(:user) { FactoryBot.create(:user_confirmed, password:, password_confirmation: password) }
+      let(:partner_app) { doorkeeper_app }
+      # valid_partner_domain reads a redirect_uri out of the stored return_to and matches it
+      # against doorkeeper apps 264 and 356, which the id sequence reaches
+      let(:redirect_uri) { nil }
+      # Arriving through the partner's OAuth link is what puts partner into the session
+      before do
+        get "/oauth/authorize", params: {client_id: partner_app.uid, redirect_uri:,
+                                         response_type: "code", scope: "read_bikes", partner: "bikehub"}.compact
+        expect(session[:partner]).to eq "bikehub"
+      end
+
+      it "signs in, returns to the partner and drops the partner session" do
+        post "/session", params: {session: {email: user.email, password:}},
+          headers: {"HTTP_CF_CONNECTING_IP" => "66.66.66.66"}
+        expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
+        expect(session[:partner]).to be_nil
+        user.reload
+        expect(signed_auth_cookie[1]).to eq user.auth_token
+        expect(user.last_login_at).to be_within(1.second).of Time.current
+        expect(user.last_login_ip).to eq "66.66.66.66"
+      end
+
+      context "redirect_uri the bikehub app registered" do
+        let(:partner_app) { bikehub_doorkeeper_app }
+        let(:redirect_uri) { "https://STAGING.bikehub.com/users/auth/bike_index/callback" }
+        it "returns to that subdomain" do
+          post "/session", params: {session: {email: user.email, password:}}
+          expect(response).to redirect_to "https://staging.bikehub.com/account?reauthenticate_bike_index=true"
+          expect(session[:partner]).to be_nil
+        end
+      end
+    end
+    context "discourse_redirect stored" do
+      before { get "/discourse_authentication?sso=foo&sig=bar" }
+      it "redirects to discourse" do
+        expect(session[:discourse_redirect]).to eq "sso=foo&sig=bar"
+        post "/session", params: {session: {email: user.email, password:}}
+        expect(signed_in_user).to eq user
+        expect(response).to redirect_to discourse_authentication_url
+      end
+    end
+    context "stored return_to" do
+      let(:return_to) { "https://facebook.com/bikeindex" }
+      before { get "/session/new", params: {return_to:} }
+
+      it "redirects to it" do
+        post "/session", params: {session: {email: user.email, password:}}
+        expect(signed_in_user).to eq user
+        expect(session[:return_to]).to be_nil
+        expect(response).to redirect_to return_to
+      end
+
+      context "an oauth authorization url" do
+        let(:return_to) { "/oauth/authorize?cool_thing=true" }
+        it "redirects to it" do
+          post "/session", params: {session: {email: user.email, password:}}
+          expect(signed_in_user).to eq user
+          expect(session[:return_to]).to be_nil
+          expect(response).to redirect_to return_to
+        end
+      end
+
+      context "a different facebook page" do
+        let(:return_to) { "https://facebook.com/bikeindex-mean-place" }
+        it "ignores it" do
+          post "/session", params: {session: {email: user.email, password:}}
+          expect(signed_in_user).to eq user
+          expect(session[:return_to]).to be_nil
+          expect(response).to redirect_to my_account_url
+        end
+      end
+
+      context "an off-site url carrying one of ours" do
+        let(:return_to) { "http://testhost.com/bad_place?f=/oauth/authorize?cool_thing=true" }
+        it "ignores it" do
+          post "/session", params: {session: {email: user.email, password:}}
+          expect(signed_in_user).to eq user
+          expect(session[:return_to]).to be_nil
+          expect(response).to redirect_to my_account_url
+        end
       end
     end
     describe "secure_headers" do
@@ -539,6 +827,66 @@ RSpec.describe SessionsController, type: :request do
           response
         end
         expect(throttled.headers["retry-after"]).to eq "20"
+      end
+    end
+  end
+
+  describe "destroy" do
+    let(:password) { "example_password2" }
+    let(:organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
+    let!(:user) { FactoryBot.create(:organization_user, organization:, password:, password_confirmation: password) }
+    before { post "/session", params: {session: {email: user.email, password:}} }
+
+    it "empties the session and the auth cookie" do
+      expect(session[:passive_organization_id]).to eq organization.id
+      expect(session.keys).to include("last_seen")
+
+      get "/logout"
+      expect(response).to redirect_to goodbye_url
+      expect(flash[:notice]).to be_present
+      # nothing the signed-in session was holding survives - only the flash it just set
+      expect(session.keys).to eq(["flash"])
+      expect(response.cookies["auth"]).to be_blank
+
+      get "/my_account"
+      expect(response).to redirect_to(/session\/new/)
+    end
+
+    context "partner=bikehub" do
+      it "redirects to bikehub" do
+        get "/logout", params: {partner: "bikehub"}
+        expect(response).to redirect_to "https://parkit.bikehub.com/"
+        expect(session.keys).to eq([])
+        expect(response.cookies["auth"]).to be_blank
+      end
+
+      context "with the bikehub doorkeeper app" do
+        include_context :existing_doorkeeper_app
+        before { expect(bikehub_doorkeeper_app).to be_present }
+
+        it "redirects to a return_to the app registered" do
+          get "/logout", params: {partner: "bikehub", return_to: "https://staging.bikehub.com/"}
+          expect(response).to redirect_to "https://staging.bikehub.com/"
+          expect(session.keys).to eq([])
+        end
+
+        context "return_to the app didn't register" do
+          it "redirects to parkit" do
+            get "/logout", params: {partner: "bikehub", return_to: "https://badplace.stuff.com/"}
+            expect(response).to redirect_to "https://parkit.bikehub.com/"
+            expect(session.keys).to eq([])
+          end
+        end
+      end
+    end
+
+    context "unconfirmed user" do
+      let!(:user) { FactoryBot.create(:user, password:, password_confirmation: password) }
+      it "logs out the user" do
+        get "/logout"
+        expect(response).to redirect_to goodbye_url
+        expect(session.keys).to eq(["flash"])
+        expect(response.cookies["auth"]).to be_blank
       end
     end
   end

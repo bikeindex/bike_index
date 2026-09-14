@@ -57,12 +57,9 @@ RSpec.configure do |config|
 
   # Add our request/controller spec helpers
   config.include RequestSpecHelpers, type: :request
-  config.include ControllerSpecHelpers, type: :controller
-  config.include JsonHelpers, type: :controller
   config.include JsonHelpers, type: :request
   config.include HtmlContentHelpers, type: :request
   config.include StripeHelpers, type: :request
-  config.include StripeHelpers, type: :controller
   config.include StripeHelpers, type: :service
 
   # Set default geocoder location

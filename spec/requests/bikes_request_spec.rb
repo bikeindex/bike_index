@@ -15,6 +15,17 @@ RSpec.describe BikesController, type: :request do
 
   describe "new" do
     before { Country.united_states && Organization.example } # Read replica
+
+    context "not signed in" do
+      let(:current_user) { nil }
+      it "stores return_to and sends them to sign up" do
+        get "#{base_url}/new?stolen=true&b_param_token=cool-token-thing"
+        expect(response).to redirect_to new_user_url
+        expect(flash[:notice]).to be_present
+        expect(session[:return_to]).to eq new_bike_path(stolen: true, b_param_token: "cool-token-thing")
+      end
+    end
+
     it "renders" do
       get "#{base_url}/new"
       expect(response.code).to eq("200")
@@ -57,6 +68,18 @@ RSpec.describe BikesController, type: :request do
         expect(assigns(:bike).creation_organization_id).to eq organization.id
         expect(assigns(:bike).primary_frame_color_id).to be_nil
         expect(assigns(:bike).address_record).to be_blank
+        # The user isn't necessarily a member of the organization they're registering through
+        expect(assigns[:passive_organization]).to be_nil
+      end
+
+      context "current_user is a member" do
+        let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+        it "renders with their organization, without being passed one" do
+          get "#{base_url}/new"
+          expect(response.code).to eq("200")
+          expect(assigns(:bike).creation_organization).to eq organization
+          expect(assigns[:passive_organization]).to eq organization
+        end
       end
 
       context "existing b_param with creation_organization_id" do
@@ -84,6 +107,53 @@ RSpec.describe BikesController, type: :request do
         end
       end
     end
+
+    context "bike through b_param" do
+      let(:manufacturer) { FactoryBot.create(:manufacturer) }
+      let(:bike_attrs) do
+        {manufacturer_id: manufacturer.id, primary_frame_color_id: Color.black.id, owner_email: "something@stuff.com"}
+      end
+
+      it "renders the bike from the b_param" do
+        b_param = BParam.create(params: {bike: bike_attrs.merge("revised_new" => true)})
+        get "#{base_url}/new?b_param_token=#{b_param.id_token}"
+        expect(assigns(:b_param)).to eq b_param
+        expect(assigns(:bike)).to have_attributes bike_attrs
+      end
+
+      context "partial registration by an organization" do
+        let(:organization) { FactoryBot.create(:organization_with_auto_user) }
+        let(:organized_bike_attrs) { bike_attrs.merge(creation_organization_id: organization.id) }
+
+        it "renders for the user, even though the organization created it" do
+          b_param = BParam.create(params: {bike: organized_bike_attrs.merge("revised_new" => true)})
+          get "#{base_url}/new?b_param_token=#{b_param.id_token}"
+          expect(assigns(:b_param)).to eq b_param
+          expect(assigns(:bike)).to have_attributes organized_bike_attrs
+          expect(assigns(:organization)).to eq organization
+        end
+      end
+
+      context "b_param belonging to someone else" do
+        it "renders a new bike with a flash message" do
+          b_param = BParam.create(creator_id: FactoryBot.create(:user).id)
+          get "#{base_url}/new?b_param_token=#{b_param.id_token}"
+          expect(assigns(:bike)).to be_a(Bike)
+          expect(assigns(:b_param)).to_not eq b_param
+          expect(flash[:notice]).to match(/couldn.t find/i)
+        end
+      end
+
+      context "b_param already has a created bike" do
+        let(:created_bike) { FactoryBot.create(:bike) }
+        let(:b_param) { BParam.create(params: {bike: {}}, created_bike_id: created_bike.id, creator_id: current_user.id) }
+        it "redirects to the bike" do
+          get "#{base_url}/new?b_param_token=#{b_param.id_token}"
+          expect(response).to redirect_to(bike_path(created_bike.id))
+        end
+      end
+    end
+
     context "stolen from params" do
       it "renders a new stolen bike" do
         get "#{base_url}/new?stolen=true"
@@ -415,6 +485,83 @@ RSpec.describe BikesController, type: :request do
     let(:organization) { FactoryBot.create(:organization) }
     let(:organization2) { FactoryBot.create(:organization) }
     let!(:bike_sticker1) { FactoryBot.create(:bike_sticker, code: "UC1101", organization: organization) }
+
+    context "code passed as a param" do
+      let(:current_user) { nil }
+      let(:bike) { FactoryBot.create(:bike) }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, bike:, code: "D900") }
+
+      it "redirects to the bike, however the code arrives" do
+        get "#{base_url}/scanned", params: {card_id: " 000000900"}
+        expect(response).to redirect_to bike_url(bike)
+
+        get "#{base_url}/scanned", params: {id: 900}
+        expect(response).to redirect_to bike_url(bike)
+      end
+
+      context "unknown code" do
+        it "redirects to user root with a flash error" do
+          get "#{base_url}/scanned", params: {card_id: " 1393242"}
+          expect(response).to redirect_to root_path
+          expect(flash[:error]).to be_present
+        end
+      end
+
+      context "scanned_id" do
+        let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "sss", bike:) }
+        it "redirects, preserving scanned_id" do
+          get "#{base_url}/scanned", params: {scanned_id: "sss"}
+          expect(response).to redirect_to bike_url(bike, scanned_id: "sss")
+        end
+
+        context "organization sticker" do
+          let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "XD934292", organization:, bike:) }
+          it "redirects, preserving scanned_id and organization_id" do
+            get "#{base_url}/scanned", params: {scanned_id: "XD934292", organization_id: organization.id}
+            expect(response).to redirect_to bike_url(bike, scanned_id: "XD934292", organization_id: organization.id)
+          end
+        end
+      end
+    end
+
+    context "sticker with no bike" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      let!(:bike_sticker_unclaimed) { FactoryBot.create(:bike_sticker, organization:, code: "D0900") }
+
+      it "renders the scanned page" do
+        get "#{base_url}/scanned", params: {id: "000D0900", organization_id: organization.to_param}
+        expect(response.code).to eq("200")
+        expect(response).to render_template(:scanned)
+        expect(assigns(:bike_sticker)).to eq bike_sticker_unclaimed
+        expect(assigns(:show_organization_bikes)).to be_falsey
+        expect(session[:passive_organization_id]).to eq "0"
+      end
+
+      context "user is a member of the sticker's organization" do
+        let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+
+        it "sets the organization and sends them to its registrations" do
+          get "#{base_url}/scanned", params: {id: "D0900", organization_id: organization.to_param}
+          expect(assigns(:bike_sticker)).to eq bike_sticker_unclaimed
+          expect(session[:passive_organization_id]).to eq organization.id
+          expect(response).to redirect_to organization_registrations_path(organization_id: organization.to_param,
+            bike_sticker: bike_sticker_unclaimed.code)
+        end
+
+        context "passed a different organization_id" do
+          let!(:other_organization) { FactoryBot.create(:organization, short_name: "BikeIndex") }
+
+          it "still resolves through the user's own organization" do
+            expect(current_user.organization_roles.pluck(:organization_id)).to eq([organization.id])
+            get "#{base_url}/scanned", params: {id: "D900", organization_id: "BikeIndex"}
+            expect(assigns(:bike_sticker)).to eq bike_sticker_unclaimed
+            expect(session[:passive_organization_id]).to eq organization.id
+            expect(response).to redirect_to organization_registrations_path(organization_id: organization.to_param,
+              bike_sticker: bike_sticker_unclaimed.code)
+          end
+        end
+      end
+    end
     it "redirects to scanned" do
       get "/bikes/scanned/UC1101"
       expect(response).to render_template("scanned")
