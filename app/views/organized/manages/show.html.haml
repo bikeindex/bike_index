@@ -93,5 +93,6 @@
   #delete-organization.collapse
     .text-md-center
       = render(UI::ButtonLink::Component.new(text: t(".delete_organization"),
-        href: organization_manage_path(id: current_organization.to_param, organization_id: current_organization.to_param), color: :error,
-        method: :delete, confirm: t(".removal_confirmation", org_name: current_organization.name)))
+        href: organization_manage_path(id: current_organization.to_param, organization_id: current_organization.to_param),
+        method: :delete, color: :error,
+        confirm: t(".removal_confirmation", org_name: current_organization.name)))
