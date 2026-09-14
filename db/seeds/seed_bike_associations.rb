@@ -1,7 +1,6 @@
 # Seed the lock types
 
-# locks/_form friendly_finds each type by its derived slug, so these must match production
-lock_types = ["U-lock", "Chain with lock", "Cable", "Locking skewer", "Other style", "Battery or e-bike key"]
+lock_types = ["U-lock", "Chain with lock", "Cable", "Locking skewers", "Other style", "Battery or e-bike key"]
 lock_types.each do |type_name|
   lock_type = LockType.create(name: type_name)
   lock_type.save

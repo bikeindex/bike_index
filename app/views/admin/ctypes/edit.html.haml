@@ -4,4 +4,4 @@
 
 = render partial: "form"
 
-= render(UI::ButtonLink::Component.new(text: "Delete component type", href: admin_ctype_url(@ctype), color: :error, html_class: "float-right", method: :delete, confirm: "Are you sure?"))
+= render(UI::ButtonLink::Component.new(text: "Delete component type", href: admin_ctype_url(@ctype), method: :delete, color: :error, confirm: "Are you sure?", html_class: "float-right"))
