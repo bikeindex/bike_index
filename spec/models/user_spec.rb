@@ -797,8 +797,8 @@ RSpec.describe User, type: :model do
       expect(user.reload.paid_organization_registration?).to be_falsey
     end
 
-    context "organization has an invoice" do
-      before { organization.update_column :is_invoiced, true }
+    context "organization paid money" do
+      before { organization.update_column :paid_money, true }
 
       it "is true" do
         expect(user.reload.paid_organization_registration?).to be_truthy

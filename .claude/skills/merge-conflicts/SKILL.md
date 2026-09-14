@@ -36,6 +36,7 @@ If 1–3 turn up nothing and the branch clearly builds on another feature branch
 ## Bring a branch up to date
 
 - `git fetch origin`, then `git merge --no-edit origin/<base>` (the base resolved above, not reflexively `main`).
+- **Read what the merge brought in from the merge itself, not from an earlier ahead/behind count** — `git log --oneline <pre-merge-HEAD>..<merge-commit>^2`. Conductor worktrees share one `.git`, so `refs/remotes/origin/*` is shared too: another session's `git fetch` advances your base mid-conversation, and a count taken before the merge under-reports it. Telling the user "1 commit behind" and then merging 2 is how that surfaces.
 - **Merge, never rebase.** Rebasing rewrites the branch's history; if the branch is already pushed, republishing it needs a force-push, and we never force-push. A merge commit keeps the real history and is always safe to push on top of.
 - If uncommitted work blocks the merge, commit that work first (it belongs to the branch anyway), then merge.
 - Already up to date → nothing to do.

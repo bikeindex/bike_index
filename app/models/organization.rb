@@ -24,6 +24,7 @@
 #  manual_pos_kind                 :integer
 #  name                            :string(255)
 #  opted_into_theft_survey_2023    :boolean          default(FALSE)
+#  paid_money                      :boolean          default(FALSE), not null
 #  pos_kind                        :integer          default("no_pos")
 #  previous_slug                   :string
 #  regional_ids                    :jsonb
@@ -155,7 +156,7 @@ class Organization < ApplicationRecord
   scope :name_ordered, -> { order(arel_table["name"].lower) }
   scope :show_on_map, -> { where(show_on_map: true, approved: true) }
   scope :invoiced, -> { where(is_invoiced: true) }
-  scope :paid_money, -> { where(is_invoiced: true) } # TODO: make this actually show paid money, rather than just having an invoice
+  scope :paid_money, -> { where(paid_money: true) }
   scope :not_invoiced, -> { where(is_invoiced: false) }
   scope :approved, -> { where(approved: true) }
   scope :broken_pos, -> { where(pos_kind: broken_pos_kinds) }
@@ -364,10 +365,6 @@ class Organization < ApplicationRecord
       USER_REGISTRATION_ALL_BIKES_EXCLUDED_IDS.exclude?(id)
   end
 
-  def paid_money?
-    is_invoiced? && current_invoices.any? { |i| i.paid_money_in_full? }
-  end
-
   def paid_previously?
     !paid_money? && invoices.expired.any? { |i| i.was_active? }
   end
@@ -556,6 +553,7 @@ class Organization < ApplicationRecord
     self.short_name = name_shortener(short_name.presence || name)
     self.ascend_name = nil if ascend_name.blank?
     self.is_invoiced = calculated_is_invoiced
+    self.paid_money = calculated_paid_money?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     self.user_email_domain = EmailNormalizer.normalize(user_email_domain)
     self.graduated_notification_interval = nil unless graduated_notification_interval.to_i > 0
@@ -656,6 +654,10 @@ class Organization < ApplicationRecord
 
   def calculated_is_invoiced
     current_invoices.any? || current_parent_invoices.any?
+  end
+
+  def calculated_paid_money?
+    is_invoiced? && current_invoices.any? { |i| i.paid_money_in_full? }
   end
 
   def calculated_enabled_feature_slugs

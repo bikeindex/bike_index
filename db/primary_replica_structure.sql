@@ -2979,7 +2979,8 @@ CREATE TABLE public.organizations (
     manufacturer_id bigint,
     direct_unclaimed_notifications boolean DEFAULT false,
     spam_registrations boolean DEFAULT false,
-    opted_into_theft_survey_2023 boolean DEFAULT false
+    opted_into_theft_survey_2023 boolean DEFAULT false,
+    paid_money boolean DEFAULT false NOT NULL
 );
 
 
@@ -7812,6 +7813,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260912102406'),
 ('20260909120000'),
 ('20260908163548'),
 ('20260821100000'),
