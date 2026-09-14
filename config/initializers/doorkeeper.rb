@@ -21,22 +21,18 @@ Doorkeeper.configure do
   orm :active_record
 
   # This block is be called to check whether the resource owner is authenticated or not.
-  resource_owner_authenticator do |request_envi|
+  resource_owner_authenticator do
     user = User.from_auth(cookies.signed[ControllerHelpers::AUTH_COOKIE_KEY])
     if user.present? && user.confirmed?
       user # Return user immediately, if user is confirmed
     else
       # If user isn't confirmed, check for unconfirmed scope. If it's present, return user even tho unconfirmed
-      unconfirmed_scope = request_envi&.params && request_envi.params[:scope].to_s[/unconfirmed/i].present?
+      unconfirmed_scope = params[:scope].to_s[/unconfirmed/i].present?
       if user.present? && unconfirmed_scope
         user
       else
         session[:return_to] = request.fullpath
-        if request_envi&.params && request_envi.params[:unauthenticated_redirect] == "sign_up"
-          redirect_to(new_user_url)
-        else
-          redirect_to(new_session_url)
-        end
+        redirect_to(force_sign_up? ? new_user_url : new_session_url)
       end
     end
   end
