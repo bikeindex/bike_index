@@ -15,7 +15,8 @@ en:
           shipping: Shipping
           shipping_cycle_type: we can't ship a %{bike_type} yet
           shipping_false: Local pickup only
-          shipping_motorized: a motorized %{bike_type} can't be shipped - the battery is
-            regulated as hazardous material
+          shipping_motorized: >-
+            a motorized %{bike_type} can't be shipped - the battery is regulated as
+            hazardous material
           shipping_true: Can be shipped
           still_for_sale_at: Still selling at
