@@ -72,17 +72,17 @@ that only loads when that skill triggers.
 
 ### The churn audit
 
-**Required.** Read the branch's own diff, file by file, and ask of every hunk: *what does this change about what the code does?* A hunk with no answer — an argument moved within a call, a hash re-ordered, a line re-wrapped, a value swapped for an equivalent one — is churn, and churn is reverted, not explained in review.
+**Required.** Read the branch's own diff and ask of each hunk what it changes about what the code does. A moved argument, a re-ordered hash, a re-wrapped line: revert it rather than defending it in review.
 
 ```bash
 rtk proxy git diff origin/main...HEAD --stat
 ```
 
-Take the small ones first: a file at `+1 -1` is usually either the whole point of the branch or pure churn, and it's quick to tell which. `git checkout origin/main -- <file>` is the fix when a file is entirely churn; when it's one hunk inside a real change, restore the surrounding lines so the diff shows only what moved the behaviour.
+Smallest files first — one at `+1 -1` is either the point of the branch or pure churn, and telling which takes a moment. `git checkout origin/main -- <file>` when the whole file is churn; when it rides along inside a real change, put the surrounding lines back so the diff shows only what moved.
 
-**"Consistency" and "matching production" are the two that talk their way in.** Both feel like tidying and neither shows up in the rendered page, the query, or the response — so check the claim before keeping the hunk: does anything read that order (a `default_scope` may already sort it, an unordered `.all` guarantees nothing), does anything query that value (`where(standard: false)` never matching a NULL is a real difference; nothing querying it at all is not)? If the answer is no, it's churn with a rationale attached.
+**What `bin/lint` wrote is not churn** and stays, including in files the branch otherwise didn't touch — see the rule at the top of `CLAUDE.md`.
 
-Sweeping mechanical edits are where this collects, because the script that made them had one shape and the file had another. One branch here reverted 17 files whose only change was a moved keyword argument.
+Sweeping mechanical edits are where this collects, since the script that made them had one shape and the file had another. One branch here reverted 17 files whose only change was a moved keyword argument.
 
 ### The comment audit
 
