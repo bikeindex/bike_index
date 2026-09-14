@@ -333,7 +333,7 @@ rm_components = [
 
 rm_bike = seed_bike(
   creator:, user:, origin: "organization_form", label: "Riese & Müller bike",
-  params: {bike: bike_params(owner_email: "user_3@gmail.com", manufacturer_id: rm_manufacturer.id).merge(
+  params: {bike: bike_params(owner_email: "user@fakegmail.com", manufacturer_id: rm_manufacturer.id).merge(
     creation_organization_id: brakebills_org.id.to_s,
     cycle_type: "cargo",
     propulsion_type: "pedal-assist",
@@ -352,6 +352,7 @@ rm_bike = seed_bike(
     description: "Bosch Cargo Line mid-drive (Class 1) with 725Wh PowerPack, Rohloff Speedhub E14 14-speed internal hub and Gates CDX belt drive. Aluminum frame with front box cargo area, 200kg max total weight, SKS fenders, Supernova lights."
   )}
 )
+rm_bike.current_ownership.mark_claimed
 
 ["riese_muller_load4_with_passenger.jpg", "riese_muller_load4.jpg"].each_with_index do |filename, i|
   public_image = PublicImage.new(imageable: rm_bike, listing_order: i + 1)
