@@ -338,6 +338,10 @@ class Organization < ApplicationRecord
     enabled?("impound_bikes_public") # feature slug applied in calculated_enabled_feature_slugs
   end
 
+  def show_single_search_menu_item?
+    enabled?("bike_search") && !law_enforcement?
+  end
+
   # WARNING! This is not efficient
   def law_enforcement_features_enabled?
     law_enforcement? && current_invoices.any? { |i| i.law_enforcement_functionality_invoice? }

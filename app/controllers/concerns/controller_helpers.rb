@@ -192,10 +192,8 @@ module ControllerHelpers
     @show_general_alert = !no_alerts
   end
 
-  # Without bike_search the organization's index lists their registrations rather than
-  # searching them, so the whole registry is the search they get
   def default_bike_search_path
-    return every_bike_search_path unless passive_organization&.enabled?("bike_search")
+    return every_bike_search_path unless passive_organization&.show_single_search_menu_item?
 
     organization_registrations_path(organization_id: passive_organization.to_param)
   end
