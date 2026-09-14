@@ -1,11 +1,12 @@
 # Seed the lock types
 
 # Production slugged this one before the name was pluralized, and locks/_form finds it by
-# slug -- deriving it from the name here instead leaves that page raising on a nil
+# slug -- deriving it from the name here leaves that page calling .id on a nil
 lock_type_slugs = {"Locking skewers" => "locking-skewer"}
 lock_types = ["U-lock", "Chain with lock", "Cable", "Locking skewers", "Other style", "Battery or e-bike key"]
 lock_types.each do |type_name|
-  LockType.create(name: type_name, slug: lock_type_slugs[type_name])
+  lock_type = LockType.create(name: type_name, slug: lock_type_slugs[type_name])
+  lock_type.save
 end
 
 # Seed the colors
@@ -59,24 +60,24 @@ r_gear_types = [
   {name: "10", count: 10, internal: false, standard: true},
   {name: "11", count: 11, internal: false, standard: true},
   {name: "12", count: 12, internal: false, standard: true},
-  {name: "Fixed", count: 1, internal: false, standard: false},
-  {name: "1 internal", count: 1, internal: true},
-  {name: "2 internal", count: 2, internal: true},
-  {name: "3 internal", count: 3, internal: true},
-  {name: "4 internal", count: 4, internal: true},
-  {name: "5 internal", count: 5, internal: true},
-  {name: "6 internal", count: 6, internal: true},
-  {name: "7 internal", count: 7, internal: true},
-  {name: "8 internal", count: 8, internal: true},
-  {name: "9 internal", count: 9, internal: true},
-  {name: "10 internal", count: 10, internal: true},
-  {name: "11 internal", count: 11, internal: true},
-  {name: "12 internal", count: 12, internal: true},
-  {name: "Continuously variable", count: 0, internal: true, standard: true},
   {name: "13", count: 13, internal: false, standard: true},
   {name: "14", count: 14, internal: false, standard: true},
+  {name: "1 internal", count: 1, internal: true, standard: false},
+  {name: "2 internal", count: 2, internal: true, standard: false},
+  {name: "3 internal", count: 3, internal: true, standard: false},
+  {name: "4 internal", count: 4, internal: true, standard: false},
+  {name: "5 internal", count: 5, internal: true, standard: false},
+  {name: "6 internal", count: 6, internal: true, standard: false},
+  {name: "7 internal", count: 7, internal: true, standard: false},
+  {name: "8 internal", count: 8, internal: true, standard: false},
+  {name: "9 internal", count: 9, internal: true, standard: false},
+  {name: "10 internal", count: 10, internal: true, standard: false},
+  {name: "11 internal", count: 11, internal: true, standard: false},
+  {name: "12 internal", count: 12, internal: true, standard: false},
   {name: "13 internal", count: 13, internal: true, standard: false},
-  {name: "14 internal", count: 14, internal: true, standard: false}
+  {name: "14 internal", count: 14, internal: true, standard: false},
+  {name: "Continuously variable", count: 0, internal: true, standard: true},
+  {name: "Fixed", count: 1, internal: false}
 ]
 r_gear_types.each do |gear|
   r_gear_type = RearGearType.create(name: gear[:name], count: gear[:count], internal: gear[:internal], standard: gear[:standard])

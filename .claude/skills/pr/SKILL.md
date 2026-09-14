@@ -54,9 +54,9 @@ This has to happen before the cleanup below, which diffs against `origin/main`.
 
 ### Simplify, lint, and conform to CLAUDE.md
 
-`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `CLAUDE.md`, the required spec and comment audits, and the cycle-type translation check. Commit everything it produces before re-dating migrations.
+`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `CLAUDE.md`, the required churn, spec and comment audits, and the cycle-type translation check. Commit everything it produces before re-dating migrations.
 
-Both audits are required every run, not just when the diff looks messy. The spec one asks of every example the branch adds: *what bug does this fail on?* — and deletes the ones that only restate the code.
+All three audits are required every run, not just when the diff looks messy. The churn one asks of every hunk *what does this change about what the code does?* and reverts the ones with no answer; the spec one asks of every example the branch adds *what bug does this fail on?* and deletes the ones that only restate the code.
 
 ### Freshen stale migration timestamps
 
