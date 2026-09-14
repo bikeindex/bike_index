@@ -9,7 +9,7 @@
   <div class="mt-4 mb-4 row">
     <div class="col-sm-6 mb-4">
       <%= render UI::ButtonLink::Component.new(text: "Delete #{@user.email}!", href: admin_user_path(@user.id), color: :error,
- confirm: "Are you sure? Generally it's better to ban than delete", data: {turbo: true, turbo_method: :delete}) %>
+            confirm: "Are you sure? Generally it's better to ban than delete", data: {turbo: true, turbo_method: :delete}) %>
     </div>
 
     <div class="col-sm-6 mb-4" data-controller="ui--collapse">

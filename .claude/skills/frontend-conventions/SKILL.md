@@ -74,7 +74,7 @@ Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesh
 - A link styled as a button: `UI::ButtonLink::Component.new(href:, text:, color:, size:)` — same palette, renders an `<a>`.
 - A standalone action button (POST/DELETE/etc. to a URL) — a link that performs an action: pass `method:` to `ButtonLink` and it renders `button_to` for you (`render UI::ButtonLink::Component.new(text: "Delete", color: :error, href: bike_path(@bike), method: :delete)`), so don't hand-roll a `button_to` or wrap a submit button in a bare form. Extra `html_options` flow through: pass `params:` for a POST that carries params (they render as hidden fields — no manual `form_with`/`hidden_field_tag` needed).
 
-  - **Not inside another form** — `button_to` renders a `<form>`, and the parser drops a nested one, hoisting its button into the outer form, which that button then submits. Nothing errors; it just does the wrong thing when clicked.
+  - **Not inside another form** — `button_to` renders a `<form>`, and the parser drops a nested one, hoisting its button into the outer form, which that button then submits. Nothing errors; it just does the wrong thing when clicked. Drop `method:` there and let Turbo carry the verb instead: `data: {turbo: true, turbo_method: :put}` on the link.
 
 - **An action that needs confirming doesn't use `method:` at all** — `confirm:` plus `data: {turbo: true, turbo_method: :delete}`, which renders an `<a>` carrying an `onclick` that Turbo's click handler honours. One mechanism everywhere, and it nests anywhere a link does. `Pages::MyAccount::OrganizationRoles` is the worked example. **`turbo_method` without `turbo: true` is inert** — the click falls through to a GET of the href.
 

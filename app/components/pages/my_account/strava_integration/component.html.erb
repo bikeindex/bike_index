@@ -46,8 +46,8 @@
       <p><%= translation(".sync_error_description") %></p>
     <% end %>
     <%= render(UI::ButtonLink::Component.new(text: translation(".disconnect_strava"),
- href: strava_integration_path, color: :error, size: :sm,
- html_class: "tw:mt-4", confirm: translation(".disconnect_confirm"), data: {turbo: true, turbo_method: :delete})) %>
+          href: strava_integration_path, color: :error, size: :sm,
+          html_class: "tw:mt-4", confirm: translation(".disconnect_confirm"), data: {turbo: true, turbo_method: :delete})) %>
   <% else %>
     <p><%= translation(".integrate_your_bikes_with_strava") %></p>
     <%= link_to new_strava_integration_path do %>

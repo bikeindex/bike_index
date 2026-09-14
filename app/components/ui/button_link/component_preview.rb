@@ -94,8 +94,7 @@ module UI
         render(UI::ButtonLink::Component.new(text: "Read the terms", href: "/terms", confirm: "Leave this page?"))
       end
 
-      # What a delete uses where a button_to's form can't nest — Turbo carries the verb, and
-      # confirm:'s onclick gates it
+      # What every confirm uses: Turbo carries the verb, confirm:'s onclick gates it
       # @label link with Turbo DELETE
       def link_turbo_delete
         render(UI::ButtonLink::Component.new(text: "Delete page", href: "#", color: :error, size: :sm,
