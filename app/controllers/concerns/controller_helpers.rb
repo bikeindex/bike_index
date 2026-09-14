@@ -193,8 +193,7 @@ module ControllerHelpers
   end
 
   def default_bike_search_path
-    return every_bike_search_path if passive_organization.nil? ||
-      passive_organization.show_separate_search_all_menu_item
+    return every_bike_search_path unless passive_organization&.show_single_search_menu_item?
 
     organization_registrations_path(organization_id: passive_organization.to_param)
   end

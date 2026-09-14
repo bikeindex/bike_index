@@ -347,11 +347,11 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "show_separate_search_all_menu_item" do
+  describe "show_single_search_menu_item?" do
     let(:organization) { Organization.new }
 
-    it "is truthy without bike_search" do
-      expect(organization.show_separate_search_all_menu_item).to be_truthy
+    it "is falsey without bike_search" do
+      expect(organization.show_single_search_menu_item?).to be_falsey
     end
 
     context "with bike_search" do
@@ -359,8 +359,8 @@ RSpec.describe Organization, type: :model do
         FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["bike_search"])
       end
 
-      it "is falsey" do
-        expect(organization.show_separate_search_all_menu_item).to be_falsey
+      it "is truthy" do
+        expect(organization.show_single_search_menu_item?).to be_truthy
       end
 
       context "law_enforcement" do
@@ -369,9 +369,9 @@ RSpec.describe Organization, type: :model do
             enabled_feature_slugs: ["bike_search"])
         end
 
-        it "is truthy" do
+        it "is falsey" do
           expect(organization.enabled?("bike_search")).to be_truthy
-          expect(organization.show_separate_search_all_menu_item).to be_truthy
+          expect(organization.show_single_search_menu_item?).to be_falsey
         end
       end
     end
