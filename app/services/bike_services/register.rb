@@ -205,7 +205,8 @@ module BikeServices
     # registration's token can ask for a resend
     def send_confirmation_email(b_param)
       return false unless confirmation_email_pending?(b_param)
-      # Silently, and without stamping - the flow reads the same as it does for anyone else
+      # Not folded into confirmation_email_pending? - both steps read that to render
+      # "link sent", so suppressing has to leave the flow looking the same
       return false if b_param.likely_spam?
       return false if b_param.email_confirmation_sent_at.to_i > (Time.current - CONFIRMATION_EMAIL_INTERVAL).to_i
 
@@ -495,8 +496,8 @@ module BikeServices
 
     def translation(key) = I18n.t(key, scope: "shared.register_flow")
 
-    # `additional` is a honeypot - merged rather than assigned, so a resubmission
-    # without it doesn't clear a flag already earned
+    # Merged rather than assigned, so a resubmission without the honeypot doesn't
+    # clear a flag already earned
     def honeypot_spam(bike_params, additional)
       bike_params = bike_params.to_h
       additional.present? ? bike_params.merge("likely_spam" => true) : bike_params

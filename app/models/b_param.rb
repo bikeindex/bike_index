@@ -299,7 +299,7 @@ class BParam < ApplicationRecord
       PropulsionType.motorized?(PropulsionType.for_vehicle(cycle_type)) # Fallback to PropulsionType lookup
   end
 
-  # Set by a register step's honeypot, and carried onto the bike it creates
+  # Set by a register step's honeypot
   def likely_spam? = Binxtils::InputNormalizer.boolean(bike["likely_spam"])
 
   def with_bike?
