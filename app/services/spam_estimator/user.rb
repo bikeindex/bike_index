@@ -20,7 +20,12 @@ module SpamEstimator
         nha\s+cai | ca\s+cuoc | da\s+ga | soi\s+keo | no\s+hu | xoc\s+dia |
         nap\s+tien | dang\s+nhap | truc\s+tuyen | khuyen\s+mai | uy\s+tin |
         game\s+bai | co\s+bac | song\s+bac | xo\s+so | lo\s+de |
-        link\s+truy\s+cap | clip\s+(?:hot|nong)
+        link\s+truy\s+cap | clip\s+(?:hot|nong) |
+        # generic medical words stay out of Text::PHARMACY_REGEX, which also flags bike models ("Omega Pharma")
+        pharmacists? | pharma | drugstore | prescriptions? | medications? | medicines? | meds | painkillers? |
+        opioids? | impotence |
+        # "MG Road" is a common street name in India
+        \d+\s?mg(?!\s+r(?:oa)?d\b)
       )\b | 18\+ |
       # Gift-card "check your balance" farms run the brand together in usernames and
       # domains (mcgiftgiftcardmall3, vanillaprepaid.io), so these can't be \b-anchored.

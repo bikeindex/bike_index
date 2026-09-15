@@ -20,8 +20,7 @@ module SpamEstimator
       ;\s*(?:drop|delete|truncate|exec)\b
     /xi
 
-    # Soma, Norco and Ultram are bike names, so they only count after a buying verb. Generic words
-    # (medicine, prescription, 10mg) are left out: they match clinics, opticians and CBD shops
+    # Soma, Norco and Ultram are bike names, so they only count after a buying verb
     PHARMACY_REGEX = /(?:
       \b(?:
         pharmacy | pharmacies | erectile\s+dysfunction | (?:buy|order|purchase)\s+(?:soma|norco|ultram) |

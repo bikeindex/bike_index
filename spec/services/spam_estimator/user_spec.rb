@@ -113,7 +113,7 @@ RSpec.describe SpamEstimator::User do
       end
 
       it "is above the spam threshold" do
-        expect(described_class.seo_spam_matches(user)).to eq({"pills" => 3, "pharmacy" => 1, "erectile dysfunction" => 1})
+        expect(described_class.seo_spam_matches(user)).to eq({"pills" => 3, "pharmacy" => 1, "medications" => 1, "erectile dysfunction" => 1})
         expect(described_class.estimate(user)).to be > SpamEstimator::User::MARK_SPAM_PERCENT
       end
     end
@@ -121,8 +121,17 @@ RSpec.describe SpamEstimator::User do
     context "generic medical words" do
       let(:description) { "Sports medicine clinic. We manage medication and fit prescription glasses. Fish oil 1000mg." }
 
-      it "does not count them as references" do
-        expect(described_class.seo_spam_matches(user)).to eq({})
+      it "counts them as references" do
+        expect(described_class.seo_spam_matches(user))
+          .to eq({"medicine" => 1, "medication" => 1, "prescription" => 1, "1000mg" => 1})
+      end
+
+      context "an MG Road address" do
+        let(:description) { "Visit us at 123 MG Road, Bengaluru, or 45 MG Rd" }
+
+        it "is not a dosage" do
+          expect(described_class.seo_spam_matches(user)).to eq({})
+        end
       end
     end
 
