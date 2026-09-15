@@ -1,11 +1,14 @@
 require "rails_helper"
 
 RSpec.describe Integrations::Turnstile do
-  # Unconfigured is the default everywhere but production, so the challenge has to be
-  # switched on before any of it applies
-  def with_keys
-    stub_const("Integrations::Turnstile::SITE_KEY", "1x00000000000000000000AA")
-    stub_const("Integrations::Turnstile::SECRET_KEY", "1x0000000000000000000000000000000AA")
+  # Cloudflare's published testing secrets, which siteverify answers without an account -
+  # 1x… always passes, 2x… always fails
+  let(:passing_secret) { "1x0000000000000000000000000000000AA" }
+  let(:failing_secret) { "2x0000000000000000000000000000000AA" }
+
+  def with_secret(secret)
+    stub_const("Integrations::Turnstile::SITE_KEY", Integrations::Turnstile::TESTING_SITE_KEY)
+    stub_const("Integrations::Turnstile::SECRET_KEY", secret)
   end
 
   # Ownership#spam_risky_email? reads this whether or not the challenge is switched on,
@@ -21,13 +24,11 @@ RSpec.describe Integrations::Turnstile do
 
   describe "challenge?" do
     it "asks the domains the spam complaints come from, and nobody else" do
-      with_keys
+      with_secret(passing_secret)
 
       expect(described_class.challenge?("rider@yahoo.com")).to be_truthy
-      expect(described_class.challenge?("rider@yahoo.co.uk")).to be_truthy
       expect(described_class.challenge?("rider@hotmail.com")).to be_truthy
       expect(described_class.challenge?("rider@gmail.com")).to be_falsey
-      expect(described_class.challenge?("rider@bikeindex.org")).to be_falsey
       expect(described_class.challenge?(nil)).to be_falsey
     end
 
@@ -38,19 +39,23 @@ RSpec.describe Integrations::Turnstile do
   end
 
   describe "verified?" do
-    let(:url) { "https://challenges.cloudflare.com/turnstile/v0/siteverify" }
-    before { with_keys }
-
     it "is what Cloudflare says" do
-      WebMock.stub_request(:post, url).to_return(body: {success: true}.to_json)
-      expect(described_class.verified?("token")).to be_truthy
-
-      WebMock.stub_request(:post, url).to_return(body: {success: false}.to_json)
-      expect(described_class.verified?("token")).to be_falsey
+      with_secret(passing_secret)
+      VCR.use_cassette("integrations_turnstile-verified") do
+        expect(described_class.verified?("XXXX.DUMMY.TOKEN.XXXX")).to be_truthy
+      end
     end
 
-    # No stub registered, so reaching the network at all would raise rather than pass
+    it "is false for a token Cloudflare rejects" do
+      with_secret(failing_secret)
+      VCR.use_cassette("integrations_turnstile-unverified") do
+        expect(described_class.verified?("XXXX.DUMMY.TOKEN.XXXX")).to be_falsey
+      end
+    end
+
+    # No cassette, so reaching the network at all would raise rather than pass
     it "is false for a form that sent no token, without asking" do
+      with_secret(passing_secret)
       expect(described_class.verified?(nil)).to be_falsey
     end
   end

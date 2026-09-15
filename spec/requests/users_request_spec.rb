@@ -93,7 +93,6 @@ RSpec.describe UsersController, type: :request do
 
     context "a risky email, with the challenge configured" do
       let(:email) { "rider@hotmail.com" }
-      let(:verify_url) { "https://challenges.cloudflare.com/turnstile/v0/siteverify" }
       before do
         stub_const("Integrations::Turnstile::SITE_KEY", "1x00000000000000000000AA")
         stub_const("Integrations::Turnstile::SECRET_KEY", "1x0000000000000000000000000000000AA")
@@ -103,11 +102,12 @@ RSpec.describe UsersController, type: :request do
         expect { post base_url, params: {user: user_attributes} }.to_not change(User, :count)
         expect(response.body).to include "not a robot"
 
-        WebMock.stub_request(:post, verify_url).to_return(body: {success: true}.to_json)
         # Cloudflare injects the input itself, so it isn't scoped to the form's model
-        expect {
-          post base_url, params: {:user => user_attributes, "cf-turnstile-response" => "token"}
-        }.to change(User, :count).by(1)
+        VCR.use_cassette("integrations_turnstile-verified") do
+          expect {
+            post base_url, params: {:user => user_attributes, "cf-turnstile-response" => "XXXX.DUMMY.TOKEN.XXXX"}
+          }.to change(User, :count).by(1)
+        end
         expect(response).to redirect_to(please_confirm_email_users_path)
       end
     end

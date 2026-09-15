@@ -540,7 +540,6 @@ RSpec.describe RegisterController, type: :request do
 
     context "a risky email, with the challenge configured" do
       let(:owner_email) { "rider@yahoo.com" }
-      let(:verify_url) { "https://challenges.cloudflare.com/turnstile/v0/siteverify" }
       before do
         stub_const("Integrations::Turnstile::SITE_KEY", "1x00000000000000000000AA")
         stub_const("Integrations::Turnstile::SECRET_KEY", "1x0000000000000000000000000000000AA")
@@ -555,9 +554,10 @@ RSpec.describe RegisterController, type: :request do
         expect(empty_b_param.reload.owner_email).to eq owner_email
         expect(empty_b_param.email_confirmation_token).to be_blank
 
-        WebMock.stub_request(:post, verify_url).to_return(body: {success: true}.to_json)
-        expect { post base_url, params: create_params.merge("cf-turnstile-response" => "token") }
-          .to change(Email::PartialRegistrationJob.jobs, :size).by 1
+        VCR.use_cassette("integrations_turnstile-verified") do
+          expect { post base_url, params: create_params.merge("cf-turnstile-response" => "XXXX.DUMMY.TOKEN.XXXX") }
+            .to change(Email::PartialRegistrationJob.jobs, :size).by 1
+        end
         expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
       end
     end
