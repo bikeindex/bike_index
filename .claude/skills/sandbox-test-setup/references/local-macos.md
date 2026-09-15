@@ -46,3 +46,10 @@ and the jsdelivr proxy are handled by your local dev environment, so
 nothing else here applies **except** the Tailwind build in SKILL.md,
 which can still bite a fresh Conductor workspace where `bin/dev`
 hasn't run.
+
+One way redis isn't handled for you: a spec failing with `MISCONF Redis is
+configured to save RDB snapshots, but it's currently unable to persist to disk`
+means `redis-server` was started from a directory that has since been deleted,
+and `redis-cli config get dir` comes back empty. `dir` is a protected config, so
+only a restart fixes it — `redis-cli config set stop-writes-on-bgsave-error no`
+unblocks the run without touching a service other workspaces are using.
