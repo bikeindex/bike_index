@@ -141,6 +141,24 @@ RSpec.describe Notification, type: :model do
     end
   end
 
+  describe "settled" do
+    let(:statuses) { Notification.delivery_statuses.keys }
+    let!(:notifications) { statuses.map { FactoryBot.create(:notification, delivery_status: it) } }
+    let!(:undeliverable) do
+      FactoryBot.create(:notification, delivery_status: :delivery_failure,
+        delivery_error: "Postmark::InactiveRecipientError")
+    end
+
+    it "matches the records that are settled?" do
+      expect(statuses).to match_array(%w[delivery_pending delivery_success delivery_failure delivery_banned])
+      settled = (notifications + [undeliverable]).select(&:settled?)
+
+      expect(settled.map(&:delivery_status))
+        .to match_array(%w[delivery_success delivery_banned delivery_failure])
+      expect(Notification.settled.pluck(:id)).to match_array(settled.map(&:id))
+    end
+  end
+
   describe "track_email_delivery" do
     let(:user) { FactoryBot.create(:user) }
     let(:notification) { FactoryBot.create(:notification, kind: :confirmation_email, user:) }
@@ -295,7 +313,7 @@ RSpec.describe Notification, type: :model do
       let(:inactive_recipient_error) do
         Postmark::ApiInputError.build("error", {"ErrorCode" => 406, "Message" => error_message})
       end
-      it "adds the error to the notification without banning" do
+      it "adds the error to the notification without banning, and doesn't deliver again" do
         expect(notification.reload.delivery_status).to eq "delivery_pending"
         expect(notification.user_email).to be_nil
         expect do
@@ -305,6 +323,8 @@ RSpec.describe Notification, type: :model do
         expect(notification.reload.delivery_status).to eq "delivery_failure"
         expect(notification.delivery_error).to eq "Postmark::InactiveRecipientError"
         expect(EmailBan.ban?(user)).to be_falsey
+        expect(notification.settled?).to be_truthy
+        Notification.track_email_delivery(notification) { raise "should not be reached" }
       end
       context "when there is a user_email" do
         it "updates the user_email to be failed" do
@@ -350,7 +370,7 @@ RSpec.describe Notification, type: :model do
 
     context "with InvalidEmailRequestError" do
       let(:invalid_email_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 300}) }
-      it "adds the error to the notification without raising" do
+      it "adds the error to the notification without raising, and doesn't deliver again" do
         expect(notification.reload.delivery_status).to eq "delivery_pending"
         expect do
           Notification.track_email_delivery(notification) { raise invalid_email_error }
@@ -359,6 +379,8 @@ RSpec.describe Notification, type: :model do
         expect(notification.reload.delivery_status).to eq "delivery_failure"
         expect(notification.delivery_error).to eq "Postmark::InvalidEmailRequestError"
         expect(notification.delivery_error_invalid?).to be_truthy
+        expect(notification.settled?).to be_truthy
+        Notification.track_email_delivery(notification) { raise "should not be reached" }
       end
     end
   end

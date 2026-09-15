@@ -38,7 +38,10 @@ class Notification < ApplicationRecord
   MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
   DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2, delivery_banned: 3}.freeze
 
+  SETTLED_STATUSES = %w[delivery_success delivery_banned].freeze
+
   UNDELIVERABLE_ERRORS = [Postmark::InactiveRecipientError, Postmark::InvalidEmailRequestError].freeze
+  UNDELIVERABLE_ERROR_NAMES = UNDELIVERABLE_ERRORS.map(&:name).freeze
 
   enum :kind, KIND_ENUM
   enum :message_channel, MESSAGE_CHANNEL_ENUM
@@ -61,6 +64,10 @@ class Notification < ApplicationRecord
   scope :with_message_id, -> { where.not(message_id: nil) }
   # A send we blocked is as undelivered as one postmark refused
   scope :delivery_failed, -> { where(delivery_status: %w[delivery_failure delivery_banned]) }
+  # Must match settled?
+  scope :settled, -> {
+    where(delivery_status: SETTLED_STATUSES).or(where(delivery_error: UNDELIVERABLE_ERROR_NAMES))
+  }
 
   class << self
     def kinds
@@ -144,7 +151,7 @@ class Notification < ApplicationRecord
     end
 
     def track_email_delivery(notification, is_new_email_address: false)
-      return if notification.delivery_success?
+      return if notification.settled?
 
       user_email = notification.user_email
 
@@ -270,6 +277,11 @@ class Notification < ApplicationRecord
     return calculated_phone if message_channel == "text" || phone_verification?
 
     calculated_email
+  end
+
+  # A settled delivery isn't worth sending again
+  def settled?
+    SETTLED_STATUSES.include?(delivery_status) || UNDELIVERABLE_ERROR_NAMES.include?(delivery_error)
   end
 
   def delivery_error_spam?
