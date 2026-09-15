@@ -1,0 +1,5 @@
+<%= render(UI::Forms::FileUploadMulti::Component.new(url: "/rails/view_components/nothing_stores_this",
+      file_param: "public_image[image]", accept: ImageUploader.permitted_extensions,
+      list_html_options: {class: "tw:list-disc tw:pl-6"})) do %>
+  <li>An item that was already stored</li>
+<% end %>

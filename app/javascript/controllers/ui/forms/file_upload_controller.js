@@ -1,6 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { DirectUpload } from '@rails/activestorage'
 import { collapse } from 'utils/collapse_utils'
+import * as dropZone from 'utils/drop_zone'
 
 // Connects to data-controller='ui--forms--file-upload'
 // Shows the selected filename (or a count for multiple files) in the field, previews an
@@ -48,50 +49,15 @@ export default class extends Controller {
     this.inputTarget.removeAttribute('capture')
   }
 
-  dragOver (event) {
-    if (!draggingFile(event)) return
-    event.preventDefault() // without this the browser opens the file instead
+  dragOver (event) { dropZone.dragOver(event, this.dropZoneTarget) }
 
-    this.dropZoneTarget.dataset.dragging = 'true'
-  }
+  endDrag (event) { dropZone.endDrag(event, this.dropZoneTarget) }
 
-  // Bound to both dragleave and drop. dragleave fires for every element crossed, but
-  // relatedTarget is null only on leaving the window -- and on a drop, which ends it too.
-  endDrag (event) {
-    if (event.relatedTarget) return
-    event.preventDefault()
+  highlightDropZone () { dropZone.highlight(this.dropZoneTarget) }
 
-    delete this.dropZoneTarget.dataset.dragging
-    this.unhighlightDropZone()
-  }
+  unhighlightDropZone (event) { dropZone.unhighlight(event, this.dropZoneTarget) }
 
-  highlightDropZone () {
-    this.dropZoneTarget.dataset.over = 'true'
-  }
-
-  // The frame wraps the controls, so dragging onto one of them leaves the frame
-  // in the event's terms -- only a relatedTarget outside it is a real exit.
-  unhighlightDropZone (event) {
-    if (event?.relatedTarget && this.dropZoneTarget.contains(event.relatedTarget)) return
-
-    delete this.dropZoneTarget.dataset.over
-  }
-
-  drop (event) {
-    event.preventDefault()
-    const dropped = [...event.dataTransfer.files]
-    if (dropped.length === 0) return
-
-    // Assigning a FileList is the only way to fill a file input; `multiple`
-    // decides how much of the drop it can hold.
-    const transfer = new window.DataTransfer()
-    ;(this.inputTarget.multiple ? dropped : dropped.slice(0, 1)).forEach((file) => transfer.items.add(file))
-    this.inputTarget.files = transfer.files
-    // Assigning files fires nothing. Picking a file natively fires both, and both
-    // have listeners: `input` drives display(), `change` is what callers bind to.
-    this.inputTarget.dispatchEvent(new Event('input', { bubbles: true }))
-    this.inputTarget.dispatchEvent(new Event('change', { bubbles: true }))
-  }
+  drop (event) { dropZone.assignDroppedFiles(event, this.inputTarget) }
 
   display () {
     const { files } = this.inputTarget
@@ -211,9 +177,4 @@ export default class extends Controller {
     await this.pending
     this.form.requestSubmit()
   }
-}
-
-// Dragged text and page elements fire these events too; only files matter here.
-function draggingFile (event) {
-  return event.dataTransfer?.types?.includes('Files')
 }

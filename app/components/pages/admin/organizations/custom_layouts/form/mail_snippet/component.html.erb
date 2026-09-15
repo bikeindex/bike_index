@@ -19,16 +19,4 @@
   <% end %>
 <% end %>
 
-<ul
-  id="public_images"
-  class="list-unstyled mt-4 not-blog-public-images"
-  data-order-url="<%= order_public_images_url %>"
->
-  <% if @mail_snippet.public_images %>
-    <%= render partial: "public_images/admin_public_image", collection: @mail_snippet.public_images, as: :public_image, locals: {skip_order: true} %>
-  <% end %>
-</ul>
-
-<section class="custom-layouts">
-  <%= render partial: "public_images/admin_new_form", locals: {imageable_type: "MailSnippet"} %>
-</section>
+<%= render(Pages::Admin::PublicImages::Uploader::Component.new(imageable: @mail_snippet, list_class: "list-unstyled mt-4")) %>
