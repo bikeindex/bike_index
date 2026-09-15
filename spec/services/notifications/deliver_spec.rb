@@ -235,5 +235,150 @@ RSpec.describe Notifications::Deliver do
         end
       end
     end
+
+    context "for a hot sheet" do
+      let(:hot_sheet) { FactoryBot.create(:hot_sheet, recipient_ids: []) }
+
+      it "records the success, and doesn't deliver a second time" do
+        expect(hot_sheet.reload.delivery_status).to eq "delivery_pending"
+        expect(hot_sheet.delivery_success?).to be_falsey
+        deliveries = 0
+        expect(Notifications::Deliver.track_email(hot_sheet) { deliveries += 1 }).to be_nil
+        expect(hot_sheet.reload.delivery_status).to eq "delivery_success"
+        expect(hot_sheet.delivery_error).to be_nil
+        expect(hot_sheet.delivery_success?).to be_truthy
+
+        Notifications::Deliver.track_email(hot_sheet) { deliveries += 1 }
+        expect(deliveries).to eq 1
+      end
+
+      context "with an unknown postmark error" do
+        let(:api_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 499}) }
+        it "records the failure and raises" do
+          expect { Notifications::Deliver.track_email(hot_sheet) { raise api_error } }.to raise_error(Postmark::ApiInputError)
+          expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
+          expect(hot_sheet.delivery_error).to eq "Postmark::ApiInputError"
+          expect(hot_sheet.delivery_success?).to be_falsey
+        end
+      end
+
+      context "with an undeliverable error" do
+        let(:invalid_email_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 300}) }
+        it "records the failure without returning an error" do
+          expect(Notifications::Deliver.track_email(hot_sheet) { raise invalid_email_error }).to be_nil
+          expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
+          expect(hot_sheet.delivery_error).to eq "Postmark::InvalidEmailRequestError"
+          # There is no way to tell which of the batch failed, so nobody is flagged
+          expect(UserEmail.last_email_errored.count).to eq 0
+          expect(hot_sheet.settled?).to be_truthy
+          deliveries = 0
+          Notifications::Deliver.track_email(hot_sheet) { deliveries += 1 }
+          expect(deliveries).to eq 0
+        end
+      end
+
+      context "with banned recipients" do
+        let(:organization) { FactoryBot.create(:organization) }
+        let(:users) { Array.new(2) { FactoryBot.create(:organization_role_claimed, organization:).user } }
+        let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization:, recipient_ids: users.map(&:id)) }
+        let(:banned_users) { users }
+        before { banned_users.each { FactoryBot.create(:email_ban, user: it, reason: :honeypot) } }
+
+        it "doesn't deliver, and doesn't try again" do
+          deliveries = 0
+          Notifications::Deliver.track_email(hot_sheet) { deliveries += 1 }
+          expect(deliveries).to eq 0
+          expect(hot_sheet.reload.delivery_status).to eq "delivery_banned"
+          expect(hot_sheet.settled?).to be_truthy
+
+          Notifications::Deliver.track_email(hot_sheet) { deliveries += 1 }
+          expect(deliveries).to eq 0
+        end
+
+        context "with only some banned" do
+          let(:banned_users) { users.first(1) }
+          it "delivers" do
+            deliveries = 0
+            Notifications::Deliver.track_email(hot_sheet) { deliveries += 1 }
+            expect(deliveries).to eq 1
+            expect(hot_sheet.reload.delivery_status).to eq "delivery_success"
+          end
+        end
+      end
+
+      context "with an inactive recipient" do
+        let(:organization) { FactoryBot.create(:organization) }
+        let(:users) { Array.new(3) { FactoryBot.create(:organization_role_claimed, organization:).user } }
+        let(:hot_sheet) { FactoryBot.create(:hot_sheet, organization:, recipient_ids: users.map(&:id)) }
+        let(:inactive_emails) { [users.first.email] }
+        let(:error_message) do
+          "You tried to send to recipient(s) that have been marked as inactive. Found inactive addresses: " \
+          "#{inactive_emails.join(", ")}. Inactive recipients are ones that have generated a hard bounce, " \
+          "a spam complaint, or a manual suppression."
+        end
+        let(:inactive_recipient_error) do
+          Postmark::ApiInputError.build("error", {"ErrorCode" => 406, "Message" => error_message})
+        end
+
+        it "records a partial success, and only flags the address that was rejected" do
+          expect(hot_sheet.recipient_emails).to match_array(users.map(&:email))
+          expect(UserEmail.last_email_errored.count).to eq 0
+          expect(Notifications::Deliver.track_email(hot_sheet) { raise inactive_recipient_error }).to be_nil
+
+          # Postmark delivered to the rest of the batch, so this isn't a total failure
+          expect(hot_sheet.reload.delivery_status).to eq "delivery_partial_success"
+          expect(hot_sheet.delivery_error).to eq "Postmark::InactiveRecipientError"
+          expect(hot_sheet.delivery_success?).to be_falsey
+          expect(UserEmail.last_email_errored.pluck(:email)).to eq(inactive_emails)
+          # ... so the batch isn't worth sending again
+          expect(hot_sheet.settled?).to be_truthy
+          deliveries = 0
+          Notifications::Deliver.track_email(hot_sheet) { deliveries += 1 }
+          expect(deliveries).to eq 0
+        end
+
+        # The live failure this settles: an organization whose one subscriber is the
+        # suppressed address, re-raising out of the 30-minute schedule ~30 times a day
+        context "with the only recipient inactive" do
+          let(:users) { [FactoryBot.create(:organization_role_claimed, organization:).user] }
+          let(:inactive_emails) { users.map(&:email) }
+          it "records a failure that settles, without raising" do
+            expect(Notifications::Deliver.track_email(hot_sheet) { raise inactive_recipient_error }).to be_nil
+
+            # Nobody was left to deliver to, so it isn't a partial success
+            expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
+            expect(hot_sheet.delivery_error).to eq "Postmark::InactiveRecipientError"
+            expect(hot_sheet.settled?).to be_truthy
+            expect(UserEmail.last_email_errored.pluck(:email)).to eq(inactive_emails)
+            deliveries = 0
+            Notifications::Deliver.track_email(hot_sheet) { deliveries += 1 }
+            expect(deliveries).to eq 0
+          end
+        end
+
+        context "with every recipient inactive" do
+          let(:inactive_emails) { users.map(&:email) }
+          it "records a failure, and flags them all" do
+            Notifications::Deliver.track_email(hot_sheet) { raise inactive_recipient_error }
+
+            expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
+            expect(hot_sheet.delivery_error).to eq "Postmark::InactiveRecipientError"
+            expect(UserEmail.last_email_errored.pluck(:email)).to match_array(inactive_emails)
+          end
+        end
+
+        context "with an error postmark didn't attribute" do
+          let(:error_message) { "You tried to send to recipient(s) that have been marked as inactive." }
+          it "records a partial success, without flagging anyone" do
+            expect(inactive_recipient_error.recipients).to eq([])
+            expect(Notifications::Deliver.track_email(hot_sheet) { raise inactive_recipient_error }).to be_nil
+
+            expect(hot_sheet.reload.delivery_status).to eq "delivery_partial_success"
+            expect(hot_sheet.delivery_error).to eq "Postmark::InactiveRecipientError"
+            expect(UserEmail.last_email_errored.count).to eq 0
+          end
+        end
+      end
+    end
   end
 end

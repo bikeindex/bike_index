@@ -29,6 +29,8 @@
 #
 
 class Notification < ApplicationRecord
+  include EmailDeliveryTrackable
+
   # TODO: create notifications for every email we send (including other models, e.g. Feedback)
   #
   # Every single notification that we send has a separate enum key - which is a lot!
@@ -38,7 +40,6 @@ class Notification < ApplicationRecord
   MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
   DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2,
                           delivery_banned: 3, delivery_partial_success: 4}.freeze
-
   DELIVERED_STATUSES = %w[delivery_success delivery_partial_success].freeze
   SETTLED_STATUSES = (DELIVERED_STATUSES + %w[delivery_banned]).freeze
 
@@ -64,13 +65,6 @@ class Notification < ApplicationRecord
   scope :theft_survey, -> { where(kind: theft_survey_kinds) }
   scope :admin, -> { where(kind: admin_kinds) }
   scope :with_message_id, -> { where.not(message_id: nil) }
-  scope :delivered, -> { where(delivery_status: DELIVERED_STATUSES) }
-  # A send we blocked is as undelivered as one postmark refused
-  scope :delivery_failed, -> { where(delivery_status: %w[delivery_failure delivery_banned]) }
-  # Must match settled?
-  scope :settled, -> {
-    where(delivery_status: SETTLED_STATUSES).or(where(delivery_error: UNDELIVERABLE_ERROR_NAMES))
-  }
 
   class << self
     def kinds
@@ -244,9 +238,12 @@ class Notification < ApplicationRecord
     calculated_email
   end
 
-  # A settled delivery isn't worth sending again
-  def settled?
-    SETTLED_STATUSES.include?(delivery_status) || UNDELIVERABLE_ERROR_NAMES.include?(delivery_error)
+  def delivery_error_spam?
+    delivery_error == "Postmark::InactiveRecipientError"
+  end
+
+  def delivery_error_invalid?
+    delivery_error == "Postmark::InvalidEmailRequestError"
   end
 
   def email_ban_exempt?
@@ -259,14 +256,6 @@ class Notification < ApplicationRecord
 
   def recipient_emails
     [message_channel_target].compact
-  end
-
-  def delivery_error_spam?
-    delivery_error == "Postmark::InactiveRecipientError"
-  end
-
-  def delivery_error_invalid?
-    delivery_error == "Postmark::InvalidEmailRequestError"
   end
 
   private
