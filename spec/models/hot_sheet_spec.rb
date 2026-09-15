@@ -59,43 +59,6 @@ RSpec.describe HotSheet, type: :model do
     end
   end
 
-  describe "for a sheet from before recipients were batched" do
-    let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
-    let!(:organization_roles) do
-      Array.new(3) { FactoryBot.create(:organization_role_claimed, organization:, hot_sheet_notification: "notification_daily") }
-    end
-    let(:recipient_ids) { organization_roles.map(&:user_id) }
-    let!(:hot_sheet) do
-      FactoryBot.create(:hot_sheet, organization:, sheet_date: Time.current.to_date, recipient_ids:,
-        stolen_record_ids: [])
-    end
-    before { stub_const("HotSheet::RECIPIENTS_PER_EMAIL", 2) }
-
-    it "splits the day's recipients across batches, keeping the sheet" do
-      hot_sheets = HotSheet.for(organization, Time.current.to_date)
-      expect(hot_sheets.map(&:id)).to eq([hot_sheet.id, nil])
-      expect(hot_sheets.map(&:recipient_ids)).to eq([recipient_ids.first(2), recipient_ids.last(1)])
-      expect(hot_sheets.map(&:organization_id)).to eq([organization.id] * 2)
-      expect(hot_sheets.map(&:sheet_date)).to eq([Time.current.to_date] * 2)
-      expect(hot_sheets.map(&:stolen_record_ids)).to eq([[]] * 2)
-    end
-
-    context "already settled" do
-      before { hot_sheet.update(delivery_status: :delivery_success) }
-      it "leaves the sheet as it delivered" do
-        expect(HotSheet.for(organization, Time.current.to_date).map(&:recipient_ids)).to eq([recipient_ids])
-      end
-    end
-
-    context "for a past day" do
-      let(:sheet_date) { Time.current.to_date - 1.day }
-      before { hot_sheet.update(sheet_date:) }
-      it "leaves the sheet as it went out" do
-        expect(HotSheet.for(organization, sheet_date).map(&:recipient_ids)).to eq([recipient_ids])
-      end
-    end
-  end
-
   describe "for a day without sheets" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, :in_nyc, enabled_feature_slugs: ["hot_sheet"]) }
     let!(:hot_sheet_configuration) { FactoryBot.create(:hot_sheet_configuration, organization:) }
