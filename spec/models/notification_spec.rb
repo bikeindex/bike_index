@@ -141,7 +141,7 @@ RSpec.describe Notification, type: :model do
     end
   end
 
-  describe "settled" do
+  describe "delivery scopes" do
     let(:statuses) { Notification.delivery_statuses.keys }
     let!(:notifications) { statuses.map { FactoryBot.create(:notification, delivery_status: it) } }
     let!(:undeliverable) do
@@ -149,13 +149,14 @@ RSpec.describe Notification, type: :model do
         delivery_error: "Postmark::InactiveRecipientError")
     end
 
-    it "matches the records that are settled?" do
+    it "settles what settled? does, and delivers only a successful send" do
       expect(statuses).to match_array(%w[delivery_pending delivery_success delivery_failure delivery_banned])
       settled = (notifications + [undeliverable]).select(&:settled?)
 
       expect(settled.map(&:delivery_status))
         .to match_array(%w[delivery_success delivery_banned delivery_failure])
       expect(Notification.settled.pluck(:id)).to match_array(settled.map(&:id))
+      expect(Notification.delivered.pluck(:delivery_status)).to eq(%w[delivery_success])
     end
   end
 

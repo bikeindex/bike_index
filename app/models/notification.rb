@@ -38,7 +38,9 @@ class Notification < ApplicationRecord
   MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
   DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2, delivery_banned: 3}.freeze
 
-  SETTLED_STATUSES = %w[delivery_success delivery_banned].freeze
+  # The only delivered status today - a partial success will be one too
+  DELIVERED_STATUSES = %w[delivery_success].freeze
+  SETTLED_STATUSES = (DELIVERED_STATUSES + %w[delivery_banned]).freeze
 
   UNDELIVERABLE_ERRORS = [Postmark::InactiveRecipientError, Postmark::InvalidEmailRequestError].freeze
   UNDELIVERABLE_ERROR_NAMES = UNDELIVERABLE_ERRORS.map(&:name).freeze
@@ -62,6 +64,7 @@ class Notification < ApplicationRecord
   scope :theft_survey, -> { where(kind: theft_survey_kinds) }
   scope :admin, -> { where(kind: admin_kinds) }
   scope :with_message_id, -> { where.not(message_id: nil) }
+  scope :delivered, -> { where(delivery_status: DELIVERED_STATUSES) }
   # A send we blocked is as undelivered as one postmark refused
   scope :delivery_failed, -> { where(delivery_status: %w[delivery_failure delivery_banned]) }
   # Must match settled?
