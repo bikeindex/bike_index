@@ -14,7 +14,7 @@ RSpec.shared_context :register_flow_steps do
 
   # A rider can't see or reach the honeypot, so only a bot fills it in
   def fill_honeypot
-    honeypot = find_field("Additional", visible: :hidden)
+    honeypot = find_field("Additional information", visible: :hidden)
     expect(honeypot[:tabindex]).to eq "-1"
     page.execute_script("arguments[0].value = 'http://spam.example.com'", honeypot)
   end

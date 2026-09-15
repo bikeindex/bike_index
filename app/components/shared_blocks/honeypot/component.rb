@@ -13,7 +13,7 @@ module SharedBlocks
         builder = @form_builder || BikeIndexFormBuilder.new(nil, nil, helpers, {})
 
         tag.div(class: "tw:hidden") do
-          safe_join([builder.label(:additional, "Additional"),
+          safe_join([builder.label(:additional, "Additional information"),
             builder.text_field(:additional, tabindex: -1, autocomplete: "off")])
         end
       end
