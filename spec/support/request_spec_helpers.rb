@@ -23,15 +23,18 @@ module RequestSpecHelpers
       .signed[ControllerHelpers::AUTH_COOKIE_KEY]
   end
 
-  def signed_in_user
-    User.from_auth(signed_auth_cookie)
-  end
-
   def log_in(current_user = nil)
     return if current_user == false # Allow skipping log in by setting current_user: false
 
     current_user ||= FactoryBot.create(:user_confirmed)
     allow(User).to receive(:from_auth) { current_user }
+  end
+
+  # log_in's stub answers User.unconfirmed too, and skip_if_signed_in asks that before it asks
+  # whether the user is confirmed - so anything reaching it has to sign in for real
+  RSpec.shared_context :request_spec_signed_in_for_real do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    before { post "/session", params: {session: {email: user.email, password: user.password}} }
   end
 
   RSpec.shared_context :request_spec_logged_in_as_user do
@@ -89,17 +92,25 @@ module RequestSpecHelpers
   end
 
   RSpec.shared_context :existing_doorkeeper_app do
+    # The id sequence eventually reaches the real partner ids, which would make this app a partner
+    before { stub_const("ControllerHelpers::PARTNER_DOORKEEPER_APP_IDS", partner_doorkeeper_app_ids) }
+    let(:partner_doorkeeper_app_ids) { [] }
     let(:doorkeeper_app) { FactoryBot.create(:doorkeeper_app, owner: application_owner) }
     let(:application_owner) { FactoryBot.create(:user_confirmed) }
     let(:user) { application_owner } # So we don't waste time creating extra users
     let(:v2_access_id) { ENV["V2_ACCESSOR_ID"] = user.id.to_s }
     let(:token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }
     let(:all_scopes) { OAUTH_SCOPES.join(" ") }
-    # Partner Doorkeeper app looked up by ID
+    # The partner app, which valid_partner_domain looks up by id
     let(:bikehub_doorkeeper_app) do
-      doorkeeper_app.update(id: 264,
-        redirect_uri: "https://parkit.bikehub.com/users/auth/bike_index/callback\r\nhttps://staging.bikehub.com/users/auth/bike_index/callback\r\n")
+      doorkeeper_app.update(redirect_uri: "https://parkit.bikehub.com/users/auth/bike_index/callback\r\nhttps://staging.bikehub.com/users/auth/bike_index/callback\r\n")
       doorkeeper_app
+    end
+
+    # Arriving through the partner's OAuth link is what puts partner/company into the session
+    def arrive_via_partner(app: doorkeeper_app, **params)
+      get "/oauth/authorize", params: {client_id: app.uid, response_type: "code",
+                                       scope: "read_bikes", partner: "bikehub"}.merge(params)
     end
 
     let(:v2_access_token) do

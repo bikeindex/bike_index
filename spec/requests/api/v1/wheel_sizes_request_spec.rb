@@ -7,6 +7,7 @@ RSpec.describe API::V1::WheelSizesController, type: :request do
       FactoryBot.create(:wheel_size)
       get base_url, headers: {format: :json}
       expect(response.code).to eq("200")
+      expect(response.media_type).to eq "application/json"
     end
   end
 end

@@ -565,7 +565,7 @@ RSpec.describe "BikesController#create", type: :request do
   context "embeded" do
     let(:current_user) { nil }
     let(:organization) { FactoryBot.create(:organization_with_auto_user) }
-    let(:b_param) { BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true}) }
+    let!(:b_param) { BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true}) }
     let(:bike_params) do
       {
         serial_number: "69",
@@ -599,13 +599,12 @@ RSpec.describe "BikesController#create", type: :request do
     context "unverified authenticity token" do
       include_context :test_csrf_token
       it "permits" do
-        expect(b_param).to be_present # create the organization's users before clearing the queue
         Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         expect {
           post base_url, params: {bike: bike_params}
         }.to change(Ownership, :count).by 1
-        Sidekiq::Job.drain_all
+        Email::OwnershipInvitationJob.drain
         expect(ActionMailer::Base.deliveries.count).to eq 1
         bike = Bike.reorder(:created_at).last
         expect(bike.address_record.country.name).to eq("United States")
@@ -639,17 +638,7 @@ RSpec.describe "BikesController#create", type: :request do
     end
 
     context "stolen" do
-      let(:stolen_params) do
-        {
-          country_id: country.id,
-          street: "2459 W Division St",
-          city: "Chicago",
-          postal_code: "60622",
-          region_record_id: state.id,
-          date_stolen: (Time.current - 1.day).utc,
-          timezone: "UTC"
-        }
-      end
+      let(:stolen_params) { chicago_stolen_params.merge(date_stolen: 1.day.ago.utc, timezone: "UTC") }
       let(:target_time) { Time.current.yesterday.to_i }
 
       context "valid" do
@@ -674,15 +663,10 @@ RSpec.describe "BikesController#create", type: :request do
         context "new date input" do
           let(:stolen_params) { super().merge(date_stolen: "2018-07-28T23:34:00", timezone: "America/New_York") }
           let(:target_time) { 1532835240 }
-          it "creates a stolen bike from the organization" do
+          it "parses the date in the passed timezone" do
             VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
-              expect {
-                post base_url, params: {bike: bike_params, stolen_record: stolen_params}
-              }.to change(Ownership, :count).by 1
-              bike = Bike.last
-              expect(bike.status).to eq "status_stolen"
-              expect(bike.current_ownership).to have_attributes(origin: "embed", organization:, creator: bike.creator)
-              expect(bike.current_stolen_record.date_stolen.to_i).to be_within(1).of target_time
+              post base_url, params: {bike: bike_params, stolen_record: stolen_params}
+              expect(Bike.last.current_stolen_record.date_stolen.to_i).to be_within(1).of target_time
             end
           end
         end
@@ -707,7 +691,7 @@ RSpec.describe "BikesController#create", type: :request do
   context "embeded_extended" do
     let(:current_user) { nil }
     let(:organization) { FactoryBot.create(:organization_with_auto_user) }
-    let(:b_param) { BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true}) }
+    let!(:b_param) { BParam.create(creator_id: organization.auto_user.id, params: {creation_organization_id: organization.id, embeded: true}) }
     let(:bike_params) do
       {
         serial_number: "69",
@@ -722,7 +706,6 @@ RSpec.describe "BikesController#create", type: :request do
         owner_email: "Flow@goodtimes.com"
       }
     end
-    before { expect(b_param).to be_present }
 
     context "with an image" do
       let(:test_photo) { Rack::Test::UploadedFile.new(File.open(Rails.root.join("spec/fixtures/bike.jpg"))) }

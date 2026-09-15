@@ -709,7 +709,7 @@ RSpec.describe "BikesController#update", type: :request do
     let(:current_user) { FactoryBot.create(:user_confirmed, email:) }
     let(:ownership) { FactoryBot.create(:ownership, creator: current_user, owner_email: "otheroriginal@email.com") }
 
-    def expect_bike_transferred_but_unclaimed(bike)
+    def expect_bike_transferred_but_unclaimed
       bike.reload
       ownership.reload
       expect(ownership.current?).to be_falsey
@@ -738,8 +738,8 @@ RSpec.describe "BikesController#update", type: :request do
       expect {
         patch base_url, params: {bike: {owner_email: new_email}}
       }.to change(Ownership, :count).by(1)
-      Sidekiq::Job.drain_all
-      expect_bike_transferred_but_unclaimed(bike)
+      Email::OwnershipInvitationJob.drain
+      expect_bike_transferred_but_unclaimed
     end
 
     context "claimed ownership" do
@@ -752,19 +752,17 @@ RSpec.describe "BikesController#update", type: :request do
         expect {
           patch base_url, params: {bike: {owner_email: "#{new_email.upcase} "}}
         }.to change(Ownership, :count).by(1)
-        Sidekiq::Job.drain_all
-        expect_bike_transferred_but_unclaimed(bike)
+        Email::OwnershipInvitationJob.drain
+        expect_bike_transferred_but_unclaimed
       end
     end
   end
 
-  context "with a stored return_to" do
+  context "with a return_to" do
     let(:return_to) { "/about" }
-    # Landing on the sign in form with a return_to is what stores one
-    before { get "/session/new", params: {return_to:} }
 
     it "redirects to it" do
-      patch base_url, params: {bike: {description: "69", marked_user_hidden: "0"}}
+      patch base_url, params: {return_to:, bike: {description: "69", marked_user_hidden: "0"}}
       expect(bike.reload.description).to eq("69")
       expect(response).to redirect_to return_to
       expect(session[:return_to]).to be_nil
@@ -773,7 +771,7 @@ RSpec.describe "BikesController#update", type: :request do
     context "an off-site url" do
       let(:return_to) { "http://testhost.com/bad_place" }
       it "ignores it" do
-        patch base_url, params: {bike: {description: "69", marked_user_hidden: "0"}}
+        patch base_url, params: {return_to:, bike: {description: "69", marked_user_hidden: "0"}}
         expect(bike.reload.description).to eq("69")
         expect(session[:return_to]).to be_nil
         expect(response).to redirect_to edit_bike_url(bike)
@@ -781,11 +779,10 @@ RSpec.describe "BikesController#update", type: :request do
     end
   end
 
-  # Applying stolen changes through stolen_records_attributes, and returning to the edit_template
   context "stolen update through stolen_records_attributes" do
     include_context :geocoder_real
-    let!(:state) { State.find_or_create_by(name: "Illinois", abbreviation: "IL", country: Country.united_states) }
-    let(:country) { state.country }
+    let!(:state) { FactoryBot.create(:state_illinois) }
+    let(:country) { Country.united_states }
     let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:, city: "party") }
     let(:target_time) { 1454925600 }
     let(:stolen_attrs) do
@@ -793,9 +790,10 @@ RSpec.describe "BikesController#update", type: :request do
         date_stolen: "2016-02-08 04:00:00",
         timezone: "America/Chicago",
         phone: "9999999999",
+        # the trailing commas and spaces are what real submissions paste in
         street: "66666666 foo street ,",
         country_id: country.id,
-        city: "Chicago ", # people commonly paste a trailing comma
+        city: "Chicago ",
         postal_code: "60647 , ",
         region_record_id: state.id,
         locking_description: "Some description",
@@ -886,7 +884,7 @@ RSpec.describe "BikesController#update", type: :request do
         marked_user_hidden: "0",
         primary_frame_color_id: color.id,
         secondary_frame_color_id: color.id,
-        tertiary_frame_color_id: Color.black.id,
+        tertiary_frame_color_id: color.id,
         handlebar_type: "other",
         coaster_brake: true,
         belt_drive: true,
@@ -904,7 +902,7 @@ RSpec.describe "BikesController#update", type: :request do
     let(:target_attributes) { allowed_attributes.except(:marked_user_hidden, :bike_organization_ids) }
     before { ownership.mark_claimed }
 
-    it "updates with the allowed attributes, and lets the named organization edit" do
+    it "updates with the allowed attributes, and organization_ids_can_edit_claimed picks the editors" do
       expect(ownership.reload.owner).to eq current_user
       patch base_url, params: {bike: allowed_attributes, organization_ids_can_edit_claimed: [organization2.id]}
       expect(response).to redirect_to edit_bike_url(bike)
@@ -914,20 +912,18 @@ RSpec.describe "BikesController#update", type: :request do
       expect(bike).to have_attributes target_attributes
       expect(bike.bike_organization_ids).to match_array([organization.id, organization2.id])
       expect(bike.send(:editable_organization_ids)).to eq([organization2.id])
+
+      # _present without any ids is how the form says "none of them"
+      patch base_url, params: {bike: allowed_attributes, organization_ids_can_edit_claimed_present: "1"}
+      expect(response).to redirect_to edit_bike_url(bike)
+      bike.reload
+      expect(bike).to have_attributes target_attributes
+      expect(bike.bike_organization_ids).to match_array([organization.id, organization2.id])
+      expect(bike.send(:editable_organization_ids)).to eq([])
     end
 
-    context "organization_ids_can_edit_claimed_present" do
-      it "updates, letting no organization edit" do
-        patch base_url, params: {bike: allowed_attributes, organization_ids_can_edit_claimed_present: "1"}
-        expect(response).to redirect_to edit_bike_url(bike)
-        bike.reload
-        expect(bike.user_hidden).to be_falsey
-        expect(bike).to have_attributes target_attributes
-        expect(bike.bike_organization_ids).to match_array([organization.id, organization2.id])
-        expect(bike.send(:editable_organization_ids)).to eq([])
-      end
-
-      it "replaces the creation organization when only the new one is passed" do
+    context "only the new organization passed" do
+      it "replaces the creation organization" do
         expect(bike.reload.bike_organization_ids).to eq([organization.id])
         expect(bike.creation_organization_id).to eq organization.id
         patch base_url, params: {edit_template: "groups", organization_ids_can_edit_claimed: "true",

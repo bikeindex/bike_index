@@ -237,7 +237,7 @@ RSpec.describe "BikesController#show", type: :request do
         expect(assigns(:current_organization)&.id).to eq organization.id
         expect(session[:passive_organization_id]).to eq organization.id
         expect(whitespace_normalized_body_text).to match("#{organization.short_name} Access Panel")
-        # Renders with current organization passed, by id or by name
+        # Renders with current organization passed
         get "#{base_url}/#{bike.id}?organization_id=#{organization2.id}"
         expect(response).to render_template(:show)
         expect(flash).to_not be_present
@@ -789,7 +789,6 @@ RSpec.describe "BikesController#show", type: :request do
       expect(assigns[:passive_organization]).to be_nil
       expect(session[:passive_organization_id]).to eq "0"
 
-      # Passing the organization explicitly doesn't get them back in either
       get "#{base_url}/#{bike.id}", params: {sign_in_if_not: true, organization_id: organization.id}
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
@@ -799,53 +798,42 @@ RSpec.describe "BikesController#show", type: :request do
     end
   end
 
-  context "organized user viewing a bike their organization has no claim on" do
+  context "organized user viewing a bike" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:current_user) { FactoryBot.create(:organization_user, organization:) }
 
-    it "renders, setting passive_organization_id" do
-      expect(bike.send(:editable_organization_ids)).to eq([])
-      get "#{base_url}/#{bike.id}"
-      expect(response.status).to eq(200)
-      expect(response).to render_template(:show)
-      expect(flash).to_not be_present
-      expect(session[:passive_organization_id]).to eq organization.id
+    shared_examples "renders with the organization" do
+      it "renders, setting passive_organization_id" do
+        expect(bike.send(:editable_organization_ids)).to eq(editable_organization_ids)
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(flash).to_not be_present
+        expect(session[:passive_organization_id]).to eq organization.id
+      end
+    end
+
+    context "organization has no claim on it" do
+      let(:editable_organization_ids) { [] }
+      include_examples "renders with the organization"
     end
 
     context "bike created by the organization" do
       let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
-      it "renders" do
-        expect(bike.send(:editable_organization_ids)).to eq([organization.id])
-        get "#{base_url}/#{bike.id}"
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:show)
-        expect(flash).to_not be_present
-        expect(session[:passive_organization_id]).to eq organization.id
-      end
+      let(:editable_organization_ids) { [organization.id] }
+      include_examples "renders with the organization"
     end
 
     context "bike claimed by its owner" do
       let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
-      it "renders" do
-        expect(bike.send(:editable_organization_ids)).to eq([organization.id])
-        get "#{base_url}/#{bike.id}"
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:show)
-        expect(flash).to_not be_present
-        expect(session[:passive_organization_id]).to eq organization.id
-      end
+      let(:editable_organization_ids) { [organization.id] }
+      include_examples "renders with the organization"
     end
 
     context "bike claimed by its owner, without can_edit_claimed" do
       let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, can_edit_claimed: false, creation_organization: organization) }
-      it "renders" do
-        expect(bike.send(:editable_organization_ids)).to eq([])
-        get "#{base_url}/#{bike.id}"
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:show)
-        expect(flash).to_not be_present
-        expect(session[:passive_organization_id]).to eq organization.id
-      end
+      let(:editable_organization_ids) { [] }
+      include_examples "renders with the organization"
     end
   end
 

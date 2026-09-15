@@ -114,11 +114,17 @@ RSpec.describe BikesController, type: :request do
         {manufacturer_id: manufacturer.id, primary_frame_color_id: Color.black.id, owner_email: "something@stuff.com"}
       end
 
-      it "renders the bike from the b_param" do
+      it "renders the bike from the b_param, and ignores one belonging to someone else" do
         b_param = BParam.create(params: {bike: bike_attrs.merge("revised_new" => true)})
         get "#{base_url}/new?b_param_token=#{b_param.id_token}"
         expect(assigns(:b_param)).to eq b_param
         expect(assigns(:bike)).to have_attributes bike_attrs
+
+        others = BParam.create(creator_id: FactoryBot.create(:user).id)
+        get "#{base_url}/new?b_param_token=#{others.id_token}"
+        expect(assigns(:bike)).to be_a(Bike)
+        expect(assigns(:b_param)).to_not eq others
+        expect(flash[:notice]).to match(/couldn.t find/i)
       end
 
       context "partial registration by an organization" do
@@ -131,16 +137,6 @@ RSpec.describe BikesController, type: :request do
           expect(assigns(:b_param)).to eq b_param
           expect(assigns(:bike)).to have_attributes organized_bike_attrs
           expect(assigns(:organization)).to eq organization
-        end
-      end
-
-      context "b_param belonging to someone else" do
-        it "renders a new bike with a flash message" do
-          b_param = BParam.create(creator_id: FactoryBot.create(:user).id)
-          get "#{base_url}/new?b_param_token=#{b_param.id_token}"
-          expect(assigns(:bike)).to be_a(Bike)
-          expect(assigns(:b_param)).to_not eq b_param
-          expect(flash[:notice]).to match(/couldn.t find/i)
         end
       end
 
@@ -491,20 +487,16 @@ RSpec.describe BikesController, type: :request do
       let(:bike) { FactoryBot.create(:bike) }
       let!(:bike_sticker) { FactoryBot.create(:bike_sticker, bike:, code: "D900") }
 
-      it "redirects to the bike, however the code arrives" do
+      it "redirects to the bike however the code arrives, and to user root when it matches none" do
         get "#{base_url}/scanned", params: {card_id: " 000000900"}
         expect(response).to redirect_to bike_url(bike)
 
         get "#{base_url}/scanned", params: {id: 900}
         expect(response).to redirect_to bike_url(bike)
-      end
 
-      context "unknown code" do
-        it "redirects to user root with a flash error" do
-          get "#{base_url}/scanned", params: {card_id: " 1393242"}
-          expect(response).to redirect_to root_path
-          expect(flash[:error]).to be_present
-        end
+        get "#{base_url}/scanned", params: {card_id: " 1393242"}
+        expect(response).to redirect_to root_path
+        expect(flash[:error]).to be_present
       end
 
       context "scanned_id" do

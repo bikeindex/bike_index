@@ -97,14 +97,13 @@ RSpec.describe Organized::BikesController, type: :request do
       end
 
       it "creates, overriding the passed creator and organization" do
-        stub_const("UpdateMailchimpDatumJob::UPDATE_MAILCHIMP", false)
         Sidekiq::Job.clear_all
         ActionMailer::Base.deliveries = []
         expect(current_organization.reload.auto_user_id).to_not eq current_user.id
         expect {
           post base_url, params: {bike: bike_params}
         }.to change(Bike.unscoped, :count).by 1
-        Sidekiq::Job.drain_all
+        Email::OwnershipInvitationJob.drain
 
         b_param = BParam.reorder(:created_at).last
         expect(b_param.owner_email).to eq bike_params[:owner_email]

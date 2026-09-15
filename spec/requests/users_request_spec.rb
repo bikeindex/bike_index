@@ -26,8 +26,7 @@ RSpec.describe UsersController, type: :request do
     context "with partner in session" do
       include_context :existing_doorkeeper_app
       it "renders the partner layout, naming the company" do
-        get "/oauth/authorize", params: {client_id: doorkeeper_app.uid, response_type: "code",
-                                         scope: "read_bikes", partner: "bikehub", company: "Some BikeHub"}
+        arrive_via_partner(company: "Some BikeHub")
 
         get "#{base_url}/new", params: {return_to: "/bikes/12?contact_owner=true"}
         expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
@@ -38,11 +37,7 @@ RSpec.describe UsersController, type: :request do
     end
 
     context "already signed in" do
-      # signed in for real: log_in's User.from_auth stub answers User.unconfirmed too,
-      # and skip_if_signed_in asks that before it asks whether the user is confirmed
-      let(:password) { "example_password2" }
-      let(:user) { FactoryBot.create(:user_confirmed, password:, password_confirmation: password) }
-      before { post "/session", params: {session: {email: user.email, password:}} }
+      include_context :request_spec_signed_in_for_real
 
       it "redirects home, or to return_to when there is one" do
         get "#{base_url}/new"
@@ -54,7 +49,7 @@ RSpec.describe UsersController, type: :request do
       end
 
       context "unconfirmed" do
-        let(:user) { FactoryBot.create(:user, password:, password_confirmation: password) }
+        let(:user) { FactoryBot.create(:user) }
         it "redirects to please_confirm_email, keeping return_to" do
           get "#{base_url}/new", params: {return_to: "/bikes/12?contact_owner=true"}
           expect(response).to redirect_to please_confirm_email_users_path
@@ -91,7 +86,7 @@ RSpec.describe UsersController, type: :request do
       expect(flash).to_not be_present
       expect(response).to redirect_to(please_confirm_email_users_path)
       user = User.order(:created_at).last
-      expect(signed_in_user).to eq user
+      expect(signed_auth_cookie).to eq [user.id, user.auth_token]
       expect(user).to have_attributes(partner_sign_up: nil, unconfirmed?: true,
         passwordless_user?: true, preferred_language: nil)
     end
@@ -114,7 +109,7 @@ RSpec.describe UsersController, type: :request do
         expect(response).to redirect_to(please_confirm_email_users_path)
 
         user = User.order(:created_at).last
-        expect(signed_in_user).to eq user
+        expect(signed_auth_cookie).to eq [user.id, user.auth_token]
         expect(user).to have_attributes(partner_sign_up: nil, unconfirmed?: true,
           preferred_language: "nl", last_login_ip: "99.99.99.9")
         expect(user.last_login_at).to be_within(3.seconds).of Time.current
@@ -146,7 +141,7 @@ RSpec.describe UsersController, type: :request do
         user = User.where(email:).first
         expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
         expect(session[:passive_organization_id]).to eq organization.id
-        expect(signed_in_user).to eq user
+        expect(signed_auth_cookie).to eq [user.id, user.auth_token]
         expect(user).to have_attributes(terms_of_service: true, email:, confirmed?: true,
           last_login_ip: "99.99.99.9", preferred_language: nil)
         expect(user.last_login_at).to be_within(3.seconds).of Time.current
@@ -174,7 +169,7 @@ RSpec.describe UsersController, type: :request do
         expect(response).to redirect_to("https://parkit.bikehub.com/account?reauthenticate_bike_index=true")
         user = User.find_by_email(email)
         expect(Email::WelcomeJob.jobs.last["args"]).to eq([user.id])
-        expect(signed_in_user).to eq user
+        expect(signed_auth_cookie).to eq [user.id, user.auth_token]
         expect(user).to have_attributes(partner_sign_up: "bikehub", email:, preferred_language: "nl")
         expect(user.last_login_at).to be_within(2.seconds).of Time.current
         expect(session[:passive_organization_id]).to eq organization_role.organization_id
@@ -185,10 +180,7 @@ RSpec.describe UsersController, type: :request do
       include_context :existing_doorkeeper_app
 
       it "signs up into the partner, and drops the partner session" do
-        # No redirect_uri: valid_partner_domain reads one out of the stored return_to and
-        # matches it against doorkeeper apps 264 and 356, which the id sequence reaches
-        get "/oauth/authorize", params: {client_id: doorkeeper_app.uid, response_type: "code",
-                                         scope: "read_bikes", partner: "bikehub", company: "Some BikeHub"}
+        arrive_via_partner(company: "Some BikeHub")
         expect {
           post base_url, params: {user: user_attributes}
         }.to change(User, :count).by(1)
@@ -197,7 +189,7 @@ RSpec.describe UsersController, type: :request do
         expect(session[:partner]).to be_nil
         expect(session[:company]).to be_nil
         user = User.order(:created_at).last
-        expect(signed_in_user).to eq user
+        expect(signed_auth_cookie).to eq [user.id, user.auth_token]
         expect(user).to have_attributes(email:, partner_sign_up: "bikehub")
         # return_to rides along too, since arriving through the partner's OAuth link stored one
         expect(user.partner_data).to include("sign_up" => "bikehub")
@@ -217,12 +209,12 @@ RSpec.describe UsersController, type: :request do
         expect {
           post base_url, params: {user: user_attributes}, headers: {"HTTP_CF_CONNECTING_IP" => "169.99.69.2"}
         }.to change(User, :count).by 1
-        Sidekiq::Job.drain_all
+        Email::ConfirmationJob.drain
 
         user = User.where(email:).first
         expect(flash).to_not be_present
         expect(response).to redirect_to(please_confirm_email_users_path)
-        expect(signed_in_user).to eq user
+        expect(signed_auth_cookie).to eq [user.id, user.auth_token]
         expect(user).to have_attributes(terms_of_service: true, confirmed?: false,
           last_login_ip: "169.99.69.2", preferred_language: nil)
         expect(user.last_login_at).to be_within(3.seconds).of Time.current
@@ -445,12 +437,10 @@ RSpec.describe UsersController, type: :request do
   describe "confirm" do
     let(:user) { FactoryBot.create(:user) }
 
-    it "renders a 404 view when there is no such user" do
+    it "renders an error view for an unknown user or a code that doesn't match" do
       post "#{base_url}/confirm", params: {id: 1234, code: "Wtfmate"}
       expect(response).to render_template :confirm_error_404
-    end
 
-    it "renders an error view when the code doesn't match" do
       post "#{base_url}/confirm", params: {id: user.id, code: "Wtfmate"}
       expect(response).to render_template :confirm_error_bad_token
       expect(user.reload.confirmed?).to be_falsey
@@ -466,7 +456,7 @@ RSpec.describe UsersController, type: :request do
 
     it "signs in and redirects" do
       post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token}
-      expect(signed_in_user).to eq user
+      expect(signed_auth_cookie).to eq [user.id, user.auth_token]
       expect(response).to redirect_to my_account_url
       expect(session[:partner]).to be_nil
       expect(flash[:success]).to eq "Logged in!"
@@ -477,7 +467,7 @@ RSpec.describe UsersController, type: :request do
       let(:user) { FactoryBot.create(:user, passwordless_user: true) }
       it "offers to set a password" do
         post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token}
-        expect(signed_in_user).to eq user
+        expect(signed_auth_cookie).to eq [user.id, user.auth_token]
         expect(response).to redirect_to my_account_url
         expect(flash[:success]).to be_blank
         expect(flash[:notice]).to eq({translation_key: :signed_up, url: update_password_form_with_reset_token_users_path})
@@ -497,39 +487,35 @@ RSpec.describe UsersController, type: :request do
 
     context "with partner in session" do
       include_context :existing_doorkeeper_app
-      let(:user) { FactoryBot.create(:user) }
+      let(:user) { FactoryBot.create(:user) } # :existing_doorkeeper_app defines its own
 
       it "signs in and redirects to the partner, dropping the partner session" do
-        # No redirect_uri: valid_partner_domain reads one out of the stored return_to and
-        # matches it against doorkeeper apps 264 and 356, which the id sequence reaches
-        get "/oauth/authorize", params: {client_id: doorkeeper_app.uid, response_type: "code",
-                                         scope: "read_bikes", partner: "bikehub"}
+        arrive_via_partner
         post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token}
-        expect(signed_in_user).to eq user
+        expect(signed_auth_cookie).to eq [user.id, user.auth_token]
         expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
         expect(session[:partner]).to be_nil
       end
     end
 
     context "user already signed in" do
-      let(:password) { "example_password2" }
-      let(:user) { FactoryBot.create(:user, password:, password_confirmation: password) }
-      before { post "/session", params: {session: {email: user.email, password:}} }
+      include_context :request_spec_signed_in_for_real
+      let(:user) { FactoryBot.create(:user) }
 
       it "confirms them and redirects to the partner" do
         expect(user.reload.confirmed?).to be_falsey
         post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
-        expect(signed_in_user).to eq user
+        expect(signed_auth_cookie).to eq [user.id, user.auth_token]
         expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
         expect(session[:partner]).to be_nil
         expect(user.reload.confirmed?).to be_truthy
       end
 
       context "already confirmed" do
-        let(:user) { FactoryBot.create(:user_confirmed, password:, password_confirmation: password) }
+        let(:user) { FactoryBot.create(:user_confirmed) }
         it "redirects to the partner" do
           post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token, partner: "bikehub"}
-          expect(signed_in_user).to eq user
+          expect(signed_auth_cookie).to eq [user.id, user.auth_token]
           expect(response).to redirect_to "https://parkit.bikehub.com/account?reauthenticate_bike_index=true"
           expect(session[:partner]).to be_nil
         end
@@ -545,20 +531,22 @@ RSpec.describe UsersController, type: :request do
       let(:email) { "something@ladot.com" }
       let(:user) { FactoryBot.create(:user, email:) }
 
-      def expect_confirmed_and_signed_in(user)
+      let(:login_ip) { "169.99.69.2" }
+
+      def expect_confirmed_and_signed_in
         user.reload
-        expect(signed_in_user).to eq user
-        expect(user).to have_attributes(confirmed?: true, last_login_ip: "169.99.69.2")
+        expect(signed_auth_cookie).to eq [user.id, user.auth_token]
+        expect(user).to have_attributes(confirmed?: true, last_login_ip: login_ip)
         expect(user.last_login_at).to be_within(3.seconds).of Time.current
       end
 
       it "signs in without associating the organization" do
         expect(user.reload.confirmed?).to be_falsey
         post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token},
-          headers: {"HTTP_CF_CONNECTING_IP" => "169.99.69.2"}
+          headers: {"HTTP_CF_CONNECTING_IP" => login_ip}
         expect(response).to redirect_to my_account_url
         expect(session[:partner]).to be_nil
-        expect_confirmed_and_signed_in(user)
+        expect_confirmed_and_signed_in
         expect(user.organization_roles.count).to eq 0
         expect(session[:passive_organization_id]).to eq "0"
       end
@@ -567,9 +555,9 @@ RSpec.describe UsersController, type: :request do
         let(:email) { "something@ladot.online" }
         it "signs in without granting a role" do
           post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token},
-            headers: {"HTTP_CF_CONNECTING_IP" => "169.99.69.2"}
+            headers: {"HTTP_CF_CONNECTING_IP" => login_ip}
           expect(response).to redirect_to my_account_url
-          expect_confirmed_and_signed_in(user)
+          expect_confirmed_and_signed_in
           expect(user.organization_roles.count).to eq 0
         end
 
@@ -577,10 +565,10 @@ RSpec.describe UsersController, type: :request do
           let(:enabled_feature_slugs) { ["passwordless_users", "user_role_for_user_email_domain"] }
           it "signs in and redirects to the organization" do
             post "#{base_url}/confirm", params: {id: user.id, code: user.confirmation_token},
-              headers: {"HTTP_CF_CONNECTING_IP" => "169.99.69.2"}
+              headers: {"HTTP_CF_CONNECTING_IP" => login_ip}
             expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
             expect(session[:passive_organization_id]).to eq organization.id
-            expect_confirmed_and_signed_in(user)
+            expect_confirmed_and_signed_in
             expect(user.organization_roles.count).to eq 1
           end
         end
@@ -608,9 +596,7 @@ RSpec.describe UsersController, type: :request do
     end
 
     context "signed in" do
-      let(:password) { "example_password2" }
-      let(:user) { FactoryBot.create(:user_confirmed, password:, password_confirmation: password) }
-      before { post "/session", params: {session: {email: user.email, password:}} }
+      include_context :request_spec_signed_in_for_real
 
       it "redirects to my_account" do
         get "#{base_url}/please_confirm_email"
@@ -618,7 +604,7 @@ RSpec.describe UsersController, type: :request do
       end
 
       context "unconfirmed user" do
-        let(:user) { FactoryBot.create(:user, password:, password_confirmation: password) }
+        let(:user) { FactoryBot.create(:user) }
         it "renders" do
           get "#{base_url}/please_confirm_email"
           expect(response).to render_template(:please_confirm_email)

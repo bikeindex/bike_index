@@ -223,13 +223,17 @@ RSpec.describe SessionsController, type: :request do
   end
 
   describe "new" do
-    it "renders, storing return_to" do
+    it "renders, storing return_to, and takes the partner layout from the param" do
       get "/session/new", params: {return_to: "/bikes/12?contact_owner=true"}
       expect(response.code).to eq "200"
       expect(response).to render_template(:new)
       expect(response).to render_template("layouts/application")
       expect(flash).to_not be_present
       expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
+
+      get "/session/new", params: {return_to: "/bikes/12?contact_owner=true", partner: "bikehub"}
+      expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
+      expect(response).to render_template("layouts/application_bikehub")
     end
     context "json format" do
       it "renders html (scanners request .json)" do
@@ -238,18 +242,10 @@ RSpec.describe SessionsController, type: :request do
         expect(response).to render_template(:new)
       end
     end
-    context "with partner" do
-      it "renders the bikehub layout" do
-        get "/session/new", params: {return_to: "/bikes/12?contact_owner=true", partner: "bikehub"}
-        expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
-        expect(response).to render_template("layouts/application_bikehub")
-      end
-    end
     context "with partner in session" do
       include_context :existing_doorkeeper_app
       it "renders the bikehub layout, naming the company" do
-        get "/oauth/authorize", params: {client_id: doorkeeper_app.uid, response_type: "code",
-                                         scope: "read_bikes", partner: "bikehub", company: "Some BikeHub"}
+        arrive_via_partner(company: "Some BikeHub")
         expect(session[:partner]).to eq "bikehub"
         expect(session[:company]).to eq "Some BikeHub"
 
@@ -259,11 +255,7 @@ RSpec.describe SessionsController, type: :request do
       end
     end
     context "signed in user" do
-      # signed in for real: log_in's User.from_auth stub answers User.unconfirmed too,
-      # and skip_if_signed_in asks that before it asks whether the user is confirmed
-      let(:password) { "example_password2" }
-      let(:user) { FactoryBot.create(:user_confirmed, password:, password_confirmation: password) }
-      before { post "/session", params: {session: {email: user.email, password:}} }
+      include_context :request_spec_signed_in_for_real
 
       it "redirects to return_to, and drops one that would loop back to signing in" do
         get "/session/new", params: {return_to: "/bikes/12?contact_owner=true"}
@@ -276,7 +268,7 @@ RSpec.describe SessionsController, type: :request do
         end
       end
       context "unconfirmed" do
-        let(:user) { FactoryBot.create(:user, password:, password_confirmation: password) }
+        let(:user) { FactoryBot.create(:user) }
         it "redirects to please_confirm_email, keeping return_to" do
           get "/session/new", params: {return_to: "/bikes/12?contact_owner=true"}
           expect(response).to redirect_to please_confirm_email_users_path
@@ -329,9 +321,7 @@ RSpec.describe SessionsController, type: :request do
     end
 
     context "user signed in" do
-      let(:password) { "example_password2" }
-      let!(:user) { FactoryBot.create(:user_confirmed, password:, password_confirmation: password) }
-      before { post "/session", params: {session: {email: user.email, password:}} }
+      include_context :request_spec_signed_in_for_real
 
       it "says they're already signed in and sends them home" do
         get "/session/magic_link", params: {token: SecurityTokenizer.new_token}
@@ -575,7 +565,7 @@ RSpec.describe SessionsController, type: :request do
         post "/session", params: {session: {email: user.email, password: password}}
         expect(response).to redirect_to please_confirm_email_users_path
         user.reload
-        expect(signed_in_user).to eq user
+        expect(signed_auth_cookie[1]).to eq user.auth_token
         expect(user.last_login_at).to be_within(1.second).of Time.current
         get "/my_account"
         expect(response).to redirect_to please_confirm_email_users_path
@@ -585,26 +575,21 @@ RSpec.describe SessionsController, type: :request do
         it "still sends them to please_confirm_email" do
           expect(user_email.confirmed?).to be_truthy
           post "/session", params: {session: {email: user.email, password: password}}
-          expect(signed_in_user).to eq user
+          expect(signed_auth_cookie[1]).to eq user.auth_token
           expect(response).to redirect_to please_confirm_email_users_path
         end
       end
     end
-    context "wrong password" do
-      it "stays on the credential step rather than the email step" do
-        post "/session", params: {session: {email: user.email, password: "something incorrect"}}
-        expect(response).to render_template("identify")
-        expect(response).to render_template("layouts/application")
-        expect(signed_auth_cookie).to be_nil
-      end
-    end
-    context "email with no account" do
-      it "re-renders the email step" do
-        post "/session", params: {session: {email: "notThere@example.com"}}
-        expect(response).to render_template(:new)
-        expect(response).to render_template("layouts/application")
-        expect(signed_auth_cookie).to be_nil
-      end
+    it "stays on the credential step for a wrong password, and the email step for an unknown email" do
+      post "/session", params: {session: {email: user.email, password: "something incorrect"}}
+      expect(response).to render_template("identify")
+      expect(response).to render_template("layouts/application")
+      expect(signed_auth_cookie).to be_nil
+
+      post "/session", params: {session: {email: "notThere@example.com"}}
+      expect(response).to render_template(:new)
+      expect(response).to render_template("layouts/application")
+      expect(signed_auth_cookie).to be_nil
     end
     # Prior to #1738 the password minimum was 8 characters - accounts predating it still sign in
     context "password shorter than the current minimum" do
@@ -614,7 +599,7 @@ RSpec.describe SessionsController, type: :request do
         post "/session", params: {session: {email: user.email, password: "old_pass"}},
           headers: {"HTTP_CF_CONNECTING_IP" => "192.168.1.644"}
         expect(response).to redirect_to my_account_url
-        expect(signed_in_user).to eq user
+        expect(signed_auth_cookie[1]).to eq user.auth_token
         expect(user.reload.last_login_ip).to eq "192.168.1.644"
       end
     end
@@ -649,14 +634,9 @@ RSpec.describe SessionsController, type: :request do
     context "partner" do
       include_context :existing_doorkeeper_app
       let!(:user) { FactoryBot.create(:user_confirmed, password:, password_confirmation: password) }
-      let(:partner_app) { doorkeeper_app }
-      # valid_partner_domain reads a redirect_uri out of the stored return_to and matches it
-      # against doorkeeper apps 264 and 356, which the id sequence reaches
-      let(:redirect_uri) { nil }
-      # Arriving through the partner's OAuth link is what puts partner into the session
+      let(:redirect_uri) { doorkeeper_app.redirect_uri }
       before do
-        get "/oauth/authorize", params: {client_id: partner_app.uid, redirect_uri:,
-                                         response_type: "code", scope: "read_bikes", partner: "bikehub"}.compact
+        arrive_via_partner(redirect_uri:)
         expect(session[:partner]).to eq "bikehub"
       end
 
@@ -672,7 +652,7 @@ RSpec.describe SessionsController, type: :request do
       end
 
       context "redirect_uri the bikehub app registered" do
-        let(:partner_app) { bikehub_doorkeeper_app }
+        let(:partner_doorkeeper_app_ids) { [bikehub_doorkeeper_app.id] }
         let(:redirect_uri) { "https://STAGING.bikehub.com/users/auth/bike_index/callback" }
         it "returns to that subdomain" do
           post "/session", params: {session: {email: user.email, password:}}
@@ -686,48 +666,45 @@ RSpec.describe SessionsController, type: :request do
       it "redirects to discourse" do
         expect(session[:discourse_redirect]).to eq "sso=foo&sig=bar"
         post "/session", params: {session: {email: user.email, password:}}
-        expect(signed_in_user).to eq user
+        expect(signed_auth_cookie[1]).to eq user.auth_token
         expect(response).to redirect_to discourse_authentication_url
       end
     end
+    # Landing on the sign in form with a return_to is what stores one, and signing in
+    # consumes it - so a target can't share an example with the next
     context "stored return_to" do
       let(:return_to) { "https://facebook.com/bikeindex" }
       before { get "/session/new", params: {return_to:} }
 
-      it "redirects to it" do
+      def expect_signed_in_and_redirected_to(target)
         post "/session", params: {session: {email: user.email, password:}}
-        expect(signed_in_user).to eq user
+        expect(signed_auth_cookie[1]).to eq user.auth_token
         expect(session[:return_to]).to be_nil
-        expect(response).to redirect_to return_to
+        expect(response).to redirect_to target
+      end
+
+      it "redirects to it" do
+        expect_signed_in_and_redirected_to(return_to)
       end
 
       context "an oauth authorization url" do
         let(:return_to) { "/oauth/authorize?cool_thing=true" }
         it "redirects to it" do
-          post "/session", params: {session: {email: user.email, password:}}
-          expect(signed_in_user).to eq user
-          expect(session[:return_to]).to be_nil
-          expect(response).to redirect_to return_to
+          expect_signed_in_and_redirected_to(return_to)
         end
       end
 
       context "a different facebook page" do
         let(:return_to) { "https://facebook.com/bikeindex-mean-place" }
         it "ignores it" do
-          post "/session", params: {session: {email: user.email, password:}}
-          expect(signed_in_user).to eq user
-          expect(session[:return_to]).to be_nil
-          expect(response).to redirect_to my_account_url
+          expect_signed_in_and_redirected_to(my_account_url)
         end
       end
 
       context "an off-site url carrying one of ours" do
         let(:return_to) { "http://testhost.com/bad_place?f=/oauth/authorize?cool_thing=true" }
         it "ignores it" do
-          post "/session", params: {session: {email: user.email, password:}}
-          expect(signed_in_user).to eq user
-          expect(session[:return_to]).to be_nil
-          expect(response).to redirect_to my_account_url
+          expect_signed_in_and_redirected_to(my_account_url)
         end
       end
     end
@@ -832,10 +809,9 @@ RSpec.describe SessionsController, type: :request do
   end
 
   describe "destroy" do
-    let(:password) { "example_password2" }
+    include_context :request_spec_signed_in_for_real
     let(:organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
-    let!(:user) { FactoryBot.create(:organization_user, organization:, password:, password_confirmation: password) }
-    before { post "/session", params: {session: {email: user.email, password:}} }
+    let(:user) { FactoryBot.create(:organization_user, organization:) }
 
     it "empties the session and the auth cookie" do
       expect(session[:passive_organization_id]).to eq organization.id
@@ -862,7 +838,7 @@ RSpec.describe SessionsController, type: :request do
 
       context "with the bikehub doorkeeper app" do
         include_context :existing_doorkeeper_app
-        before { expect(bikehub_doorkeeper_app).to be_present }
+        let(:partner_doorkeeper_app_ids) { [bikehub_doorkeeper_app.id] }
 
         it "redirects to a return_to the app registered" do
           get "/logout", params: {partner: "bikehub", return_to: "https://staging.bikehub.com/"}
@@ -881,7 +857,7 @@ RSpec.describe SessionsController, type: :request do
     end
 
     context "unconfirmed user" do
-      let!(:user) { FactoryBot.create(:user, password:, password_confirmation: password) }
+      let(:user) { FactoryBot.create(:user) }
       it "logs out the user" do
         get "/logout"
         expect(response).to redirect_to goodbye_url
