@@ -45,6 +45,12 @@ let!(:bike_transferred) do
 end
 ```
 
+## Session state in a request spec comes from a real request
+
+A request spec reads `session` and `assigns` freely, but a write doesn't outlive the call — the next request rebuilds the session from the cookie. There is no controller spec to fall back on; `spec/controllers/` is gone.
+
+So drive the request that sets the key: `/oauth/authorize?partner=…&company=…` for `partner`/`company` (`arrive_via_partner` in `:existing_doorkeeper_app`), `/session/new?return_to=…` for `return_to`, a bike's recovery link for `recovery_link_token`, a page render as an organization member for `passive_organization_id`. Where a param reaches the same code — `return_to` is read from `params` too — prefer the param over a priming request. `spec/requests/sessions_request_spec.rb` and `spec/requests/users_request_spec.rb` are the patterns.
+
 ## A component's own markup is tested in its component spec
 
 What a component decides about its markup — a label, a placeholder, a class, whether a field renders at all — belongs in `spec/components/**/component_spec.rb`, not in the request spec for a page that happens to render it. Request specs cover the request: status, redirects, what was saved, what the page is wired to.
@@ -59,9 +65,13 @@ A component needing a `form_builder` renders inside `render_in_view_context { fo
 
 `ControllerHelpers#display_dev_info?` opens with `!Rails.env.test?`. Every `only-dev-visible` block it wraps is unrendered in the suite, so threading the flag through a component — a wrong default, a missed hop — passes green and is wrong only in development. Reading the call sites isn't enough either — it can't show that a `UI::Table` cell block is `instance_exec`'d, so an `@ivar` in one resolves against the table and is always nil. Check it in the browser signed in as `dev@bikeindex.org`; the flag needs `developer?` *and* MiniProfiler, so the superadmin banner button won't do it.
 
-## `log_in` stubs the auth lookup, so it can't answer whether a session ends
+## `log_in` stubs the auth lookup, so it can't answer whether a session ends — or whether a user is confirmed
 
-`spec/support/request_spec_helpers.rb`'s `log_in` (and every `:request_spec_logged_in_as_*` context) stubs `User.from_auth` to return the user, so the cookie is never read and the session outlives anything done to that user — deleting, banning, rotating their `auth_token`. A spec asserting a request signs someone *out* has to sign in for real: `post "/session", params: {session: {email:, password:}}`, then make the request. `spec/requests/sessions_request_spec.rb`'s "deleted after signing in" is the pattern.
+`spec/support/request_spec_helpers.rb`'s `log_in` (and every `:request_spec_logged_in_as_*` context) stubs `User.from_auth` to return the user, so the cookie is never read and the session outlives anything done to that user — deleting, banning, rotating their `auth_token`.
+
+The stub also answers `User.unconfirmed.from_auth`, so `unconfirmed_current_user` is always present. `Sessionable#skip_if_signed_in` asks that *before* it asks whether the user is confirmed, so every request it guards — `/session/new`, `/session/magic_link`, `/users/new` — redirects to `please_confirm_email` under `log_in`, whatever the user is.
+
+Either one means signing in for real: `include_context :request_spec_signed_in_for_real`, which posts real credentials and takes a `let(:user)` override. `spec/requests/sessions_request_spec.rb`'s "deleted after signing in" and its `describe "destroy"` are the patterns.
 
 ## VCR cassettes: never hand-edit, always re-record
 
@@ -216,6 +226,8 @@ The bad version repeats setup, mocks the object, and doesn't communicate what ea
 This is the same instinct as "everything making the same request should be in a single test", generalized: splitting same-setup assertions across sibling `it` blocks re-runs identical setup (factories, HTTP requests, renders) once per block for zero isolation benefit, and scatters one logical behavior across the file. Two `it` blocks that differ *only* in the request params or the assertion — with identical `let`s and no `before` between them — are one example.
 
 After writing a spec, scan each `context`/`describe`: if it holds multiple `it` blocks and they don't each sit behind a distinct `context`/`before`/`let`, merge them.
+
+**Not when the first request changes what the next one does.** Same setup isn't the same starting state once a request has run: signing in consumes `session[:return_to]`, and `session[:discourse_redirect]` is set with `||=` so a second arrival can't replace the first. Both merges pass review and go red. Leave those as sibling contexts with a `let` for what differs, and say in a comment why they can't share one example — otherwise the next cleanup pass merges them again.
 
 **A helper that reads the response has to be a `def`, not a `let`.** One example making several requests is exactly where a `let` that parses `response.body` bites: it memoizes the first response and every later assertion re-reads it, so the example fails while the code is right (or worse, passes while the code is wrong). `def` re-evaluates.
 
