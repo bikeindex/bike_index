@@ -332,6 +332,24 @@ RSpec.describe "Register flow", :js, type: :system do
       a_string_matching(/additional_colors_controller/))
   end
 
+  it "mails nothing when a bot fills step 1's honeypot, without letting on" do
+    visit "/register/new"
+
+    # A rider can't see or reach the honeypot, so only a bot fills it in
+    honeypot = find_field("Additional", visible: :hidden)
+    expect(honeypot[:tabindex]).to eq "-1"
+    page.execute_script("arguments[0].value = 'http://spam.example.com'", honeypot)
+
+    submit_step_1
+
+    # The bot gets the same step 2 it would if it had gotten away with it, told the
+    # link is on its way - but the address it entered is never mailed
+    wait_for_details_step
+    expect(page).to have_content("We've sent a confirmation link to your email")
+    expect(BParam.last.likely_spam?).to be_truthy
+    expect { Email::PartialRegistrationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
+  end
+
   describe "signed in" do
     let(:current_user) { FactoryBot.create(:user_confirmed, email: owner_email) }
     let(:friend_email) { "friend@bikeindex.org" }

@@ -205,6 +205,8 @@ module BikeServices
     # registration's token can ask for a resend
     def send_confirmation_email(b_param)
       return false unless confirmation_email_pending?(b_param)
+      # Silently, and without stamping - the flow reads the same as it does for anyone else
+      return false if b_param.likely_spam?
       return false if b_param.email_confirmation_sent_at.to_i > (Time.current - CONFIRMATION_EMAIL_INTERVAL).to_i
 
       b_param.generate_email_confirmation_token!
@@ -238,7 +240,8 @@ module BikeServices
 
     # Step 1 is the least a registration can be: who owns it and what it is. The params are
     # merged in whether or not it passes, so a re-render still shows everything they entered
-    def save_step_1(b_param, bike_params:, propulsion_type_motorized:)
+    def save_step_1(b_param, bike_params:, propulsion_type_motorized:, additional: nil)
+      bike_params = honeypot_spam(bike_params, additional)
       b_param.clean_params({bike: bike_params, propulsion_type_motorized:}.as_json)
       # Before save, which clears the errors it's about to re-run validations for
       b_param.errors.add(:base, translation(:email_required)) if b_param.owner_email.blank?
@@ -258,10 +261,7 @@ module BikeServices
     def save_step_2(b_param, user:, image:, image_signed_id:, bike_params:, register_with_organization: nil, additional: nil)
       b_param.creator_id ||= user&.id
       b_param.image = image if image.present?
-      bike_params = bike_params.to_h
-      # `additional` is a honeypot - merged rather than assigned, so a resubmission
-      # without it doesn't clear a flag already earned
-      bike_params = bike_params.merge("likely_spam" => true) if additional.present?
+      bike_params = honeypot_spam(bike_params, additional)
       completed = b_param.self_made?(user) || bike_params["user_name"].present?
       clear_stale_report(b_param, bike_params["status"])
       set_auto_organization(b_param, register_with_organization)
@@ -495,11 +495,18 @@ module BikeServices
 
     def translation(key) = I18n.t(key, scope: "shared.register_flow")
 
+    # `additional` is a honeypot - merged rather than assigned, so a resubmission
+    # without it doesn't clear a flag already earned
+    def honeypot_spam(bike_params, additional)
+      bike_params = bike_params.to_h
+      additional.present? ? bike_params.merge("likely_spam" => true) : bike_params
+    end
+
     conceal :auto_organization, :assign_auto_organization, :set_auto_organization,
       :claim_creator, :create_bike_if_ready, :create_bike, :ready_for_bike?,
       :details_and_acknowledged?, :report_completed?, :clear_stale_report, :report_errors, :stolen_report_attrs,
       :impound_report_attrs, :reusable?, :destroy_discardable, :permitted_steps, :step_completed?,
       :confirmed_email_creator_id, :owner_email_for, :assign_start_params, :reused_owner_email, :details_completed?,
-      :step_2_params, :translation
+      :step_2_params, :translation, :honeypot_spam
   end
 end
