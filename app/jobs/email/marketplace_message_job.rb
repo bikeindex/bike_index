@@ -24,7 +24,7 @@ module Email
       return if notification.settled?
 
       delivery = nil
-      Notification.track_email_delivery(notification) do
+      Notifications::Deliver.track_email_delivery(notification) do
         delivery = if likely_spam
           AdminMailer.blocked_marketplace_message_email(marketplace_message).deliver_now
         else
