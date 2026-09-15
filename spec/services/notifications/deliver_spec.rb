@@ -337,6 +337,25 @@ RSpec.describe Notifications::Deliver do
           expect(deliveries).to eq 0
         end
 
+        # The live failure this settles: an organization whose one subscriber is the
+        # suppressed address, re-raising out of the 30-minute schedule ~30 times a day
+        context "with the only recipient inactive" do
+          let(:users) { [FactoryBot.create(:organization_role_claimed, organization:).user] }
+          let(:inactive_emails) { users.map(&:email) }
+          it "records a failure that settles, without raising" do
+            expect(Notifications::Deliver.track_email(hot_sheet) { raise inactive_recipient_error }).to be_nil
+
+            # Nobody was left to deliver to, so it isn't a partial success
+            expect(hot_sheet.reload.delivery_status).to eq "delivery_failure"
+            expect(hot_sheet.delivery_error).to eq "Postmark::InactiveRecipientError"
+            expect(hot_sheet.settled?).to be_truthy
+            expect(UserEmail.last_email_errored.pluck(:email)).to eq(inactive_emails)
+            deliveries = 0
+            Notifications::Deliver.track_email(hot_sheet) { deliveries += 1 }
+            expect(deliveries).to eq 0
+          end
+        end
+
         context "with every recipient inactive" do
           let(:inactive_emails) { users.map(&:email) }
           it "records a failure, and flags them all" do
