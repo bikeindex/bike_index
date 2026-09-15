@@ -180,6 +180,21 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("Change the bike it links to")
         expect(response.body).to match(bike_sticker_path(id: bike_sticker.code))
       end
+
+      context "viewer isn't the bike owner" do
+        # current_user is the claimant above, so the sticker has to name the owner itself
+        let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike:, user: bike.reload.user) }
+        let(:current_user) { FactoryBot.create(:user_confirmed) }
+        it "names the sticker, without offering to re-link it" do
+          expect(current_user.authorized?(bike_sticker)).to be_falsey
+          get "#{base_url}/#{bike.id}", params: {scanned_id: bike_sticker.code}
+          expect(response.status).to eq(200)
+          body = whitespace_normalized_body_text
+          expect(body).to match("You scanned")
+          expect(body).to match(bike_sticker.pretty_code)
+          expect(body).to_not match("Change the bike it links to")
+        end
+      end
     end
   end
 
@@ -260,6 +275,34 @@ RSpec.describe "RegistrationsController#show", type: :request do
         get "#{base_url}/#{bike.id}"
         expect(response.status).to eq 404
       end
+    end
+  end
+
+  context "bike is soft deleted" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:current_user) { bike.reload.user }
+    before { bike.destroy }
+
+    it "404s, even for the owner" do
+      expect(bike.reload.deleted?).to be_truthy
+      get "#{base_url}/#{bike.id}"
+      expect(response.status).to eq 404
+    end
+
+    context "superuser" do
+      let(:current_user) { FactoryBot.create(:superuser) }
+      it "renders" do
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq(200)
+        expect(whitespace_normalized_body_text).to match("View in Super Admin")
+      end
+    end
+  end
+
+  context "bike_id too large for the column" do
+    it "404s" do
+      get "#{base_url}/57549641769762268311552"
+      expect(response.status).to eq 404
     end
   end
 
@@ -600,6 +643,27 @@ RSpec.describe "RegistrationsController#show", type: :request do
       end
     end
 
+    context "passive_organization the user is no longer a member of" do
+      let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
+
+      it "falls back to the public view" do
+        get "#{base_url}/#{bike.id}"
+        expect(whitespace_normalized_body_text).to match("Staff")
+        expect(session[:passive_organization_id]).to eq organization.id
+        current_user.organization_roles.destroy_all
+        current_user.reload
+
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq(200)
+        body = whitespace_normalized_body_text
+        expect(body).to match("Public view")
+        expect(body).to_not match("Staff")
+        # Unlike bikes#show, nothing rewrites the stale id - available views are
+        # filtered by authorized?, so it buys the ex-member no access
+        expect(session[:passive_organization_id]).to eq organization.id
+      end
+    end
+
     context "removing the organization via organization_id=false" do
       let(:current_user) { FactoryBot.create(:organization_admin, organization: organization) }
       it "drops the admin view on the same request, not only on reload" do
@@ -664,6 +728,13 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(session[:passive_organization_id]).to eq other_organization.id
 
         get "#{base_url}/#{bike.id}"
+        expect(whitespace_normalized_body_text).to match("Viewing as #{other_organization.short_name} staff")
+      end
+
+      # Can't share the example above - switching by name first is the switch it's proving view_as makes
+      it "takes an organization_id by name, not only by slug" do
+        get "#{base_url}/#{bike.id}", params: {organization_id: other_organization.name}
+        expect(session[:passive_organization_id]).to eq other_organization.id
         expect(whitespace_normalized_body_text).to match("Viewing as #{other_organization.short_name} staff")
       end
     end
