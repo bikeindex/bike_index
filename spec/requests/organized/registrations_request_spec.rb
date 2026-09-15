@@ -7,7 +7,6 @@ RSpec.describe Organized::RegistrationsController, type: :request do
   let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
 
   describe "index" do
-    # NOTE: Additional index tests in controller spec because of session
     let(:query_params) do
       {
         search_no_js: true,
@@ -488,10 +487,26 @@ RSpec.describe Organized::RegistrationsController, type: :request do
     let!(:current_organization) { FactoryBot.create(:organization) }
     let(:base_url) { "/o/#{current_organization.to_param}/registrations" }
 
-    it "redirects the user" do
+    it "redirects the user, blanking passive_organization_id" do
       get base_url
       expect(response).to redirect_to my_account_url
       expect(flash[:error]).to be_present
+      # zero rather than nil, so we don't look it up again
+      expect(session[:passive_organization_id]).to eq "0"
+    end
+
+    context "superuser" do
+      include_context :request_spec_logged_in_as_superuser
+
+      it "renders, assigning the organization" do
+        get base_url
+        expect(response.status).to eq(200)
+        expect(response).to render_template :index
+        expect(assigns(:current_organization)).to eq current_organization
+        expect(assigns(:passive_organization)).to eq current_organization
+        expect(assigns(:page_id)).to eq "organized_registrations_index"
+        expect(session[:passive_organization_id]).to eq current_organization.id
+      end
     end
   end
 end

@@ -715,6 +715,17 @@ RSpec.describe Organization, type: :model do
         expect(org1.reload.slug).to eq "buckshot-deleted"
         expect(org1.short_name).to eq "buckshot-deleted"
       end
+
+      it "leaves alone the deleted things whose slug isn't claimed" do
+        deleted = FactoryBot.create(:organization, name: "wobble", short_name: "wobble")
+        deleted.delete
+        org = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
+        org.update(name: "rambling", short_name: "rambling")
+
+        expect(org.reload.slug).to eq "rambling"
+        expect(deleted.reload.short_name).to eq "wobble"
+        expect(deleted.slug).to eq "wobble"
+      end
     end
 
     describe "set_locations_shown" do
