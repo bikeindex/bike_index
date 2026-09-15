@@ -617,15 +617,15 @@ class Organization < ApplicationRecord
 
   private
 
-  # A deleted organization keeps its slug - the unique index counts deleted rows, and destroy
-  # skips validations - so it's renamed here, by the save of the organization claiming the name
   def calculated_slug(new_slug)
-    # If the organization exists, don't invalidate because of it's own slug
     orgs = id.present? ? Organization.unscoped.where.not(id:) : Organization.unscoped.all
-    orgs.deleted.find_by(slug: new_slug)&.save
-    return new_slug unless orgs.exists?(slug: new_slug)
+    holder = orgs.find_by(slug: new_slug)
+    # The unique index counts deleted rows and destroy skips validations, so a deleted
+    # organization holds its slug until the organization claiming the name saves it
+    holder.save if holder&.deleted?
+    return new_slug if holder.nil? || holder.slug != new_slug
 
-    (2..).each { |i| break "#{new_slug}-#{i}" unless orgs.exists?(slug: "#{new_slug}-#{i}") }
+    (2..).lazy.map { "#{new_slug}-#{it}" }.find { |candidate| !orgs.exists?(slug: candidate) }
   end
 
   def user_email_domain_format

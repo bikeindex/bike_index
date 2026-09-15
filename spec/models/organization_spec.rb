@@ -719,10 +719,10 @@ RSpec.describe Organization, type: :model do
       it "leaves alone the deleted things whose slug isn't claimed" do
         deleted = FactoryBot.create(:organization, name: "wobble", short_name: "wobble")
         deleted.delete
-        organization = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
-        organization.update(name: "rambling", short_name: "rambling")
+        org = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
+        org.update(name: "rambling", short_name: "rambling")
 
-        expect(organization.reload.slug).to eq "rambling"
+        expect(org.reload.slug).to eq "rambling"
         expect(deleted.reload.short_name).to eq "wobble"
         expect(deleted.slug).to eq "wobble"
       end
