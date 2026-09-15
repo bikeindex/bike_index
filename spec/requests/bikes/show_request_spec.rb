@@ -837,7 +837,7 @@ RSpec.describe "BikesController#show", type: :request do
     end
   end
 
-  context "sticker scanned by someone who can't claim it" do
+  context "scanned sticker on the bike page" do
     let(:organization) { FactoryBot.create(:organization) }
     let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization:, bike:, code: "ED09999") }
 

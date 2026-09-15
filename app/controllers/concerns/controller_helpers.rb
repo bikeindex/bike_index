@@ -11,7 +11,7 @@ module ControllerHelpers
 
   # The BikeHub app and BikeHub dev app, whose registered domains we'll hand a signed-in
   # partner back to. Named rather than inline so specs can stub it.
-  PARTNER_DOORKEEPER_APP_IDS = ENV.fetch("PARTNER_DOORKEEPER_APP_IDS", "264,356").split(",").map(&:to_i)
+  PARTNER_DOORKEEPER_APP_IDS = [264, 356].freeze
 
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,

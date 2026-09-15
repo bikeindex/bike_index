@@ -542,6 +542,8 @@ RSpec.describe BikesController, type: :request do
 
         context "passed a different organization_id" do
           let!(:other_organization) { FactoryBot.create(:organization, short_name: "BikeIndex") }
+          # An unorganized sticker with the same code_integer, so the organization is what picks
+          let!(:bike_sticker_with_bike) { FactoryBot.create(:bike_sticker, code: "D900", bike: FactoryBot.create(:bike)) }
 
           it "still resolves through the user's own organization" do
             expect(current_user.organization_roles.pluck(:organization_id)).to eq([organization.id])
