@@ -9,6 +9,8 @@ module Integrations
     # Substrings, so each covers its country domains too (@yahoo.co.uk, @hotmail.co.nz).
     # Every spam complaint Postmark has on file is one of these two
     RISKY_EMAIL_DOMAINS = ["@yahoo.co", "@hotmail.co"].freeze
+    # Cloudflare's published always-passes key, for previews and the system spec
+    TESTING_SITE_KEY = "1x00000000000000000000AA"
 
     def enabled? = SITE_KEY.present? && SECRET_KEY.present?
 
