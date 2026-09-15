@@ -105,6 +105,36 @@ RSpec.describe SpamEstimator::User do
       end
     end
 
+    context "online pharmacy profile" do
+      let(:user) do
+        User.new(show_bikes: true, username: "pills4cure", title: "Pills4Cure",
+          description: "An online pharmacy offering medications for pain relief, erectile dysfunction and more.",
+          my_bikes_hash: {"link_target" => "https://www.pills4cure.com/"})
+      end
+
+      it "is above the spam threshold" do
+        expect(described_class.seo_spam_matches(user)).to eq({"pills" => 3, "pharmacy" => 1, "erectile dysfunction" => 1})
+        expect(described_class.estimate(user)).to be > SpamEstimator::User::MARK_SPAM_PERCENT
+      end
+    end
+
+    context "generic medical words" do
+      let(:description) { "Sports medicine clinic. We manage medication and fit prescription glasses. Fish oil 1000mg." }
+
+      it "does not count them as references" do
+        expect(described_class.seo_spam_matches(user)).to eq({})
+      end
+    end
+
+    context "bike brands that share a drug's name" do
+      it "counts them only after a buying verb" do
+        expect(described_class.seo_spam_matches(User.new(show_bikes: true, description: "I ride a Soma Wolverine and a Norco Search")))
+          .to eq({})
+        expect(described_class.seo_spam_matches(User.new(show_bikes: true, description: "Buy Soma online, order Norco")))
+          .to eq({"buy soma" => 1, "order norco" => 1})
+      end
+    end
+
     context "real names that contain spam terms as substrings" do
       # usernames are auto-generated random strings, so substring matching would ban real people
       it "does not count them as references" do

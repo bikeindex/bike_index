@@ -23,6 +23,19 @@ RSpec.describe SpamEstimator::Bike do
           expect(described_class.estimate(bike)).to be_between(9, 20)
         end
       end
+      context "pharmacy spam" do
+        let(:str) { "Aspadol 100mg" }
+        it "is above the spam threshold" do
+          expect(described_class.estimate(bike)).to be > SpamEstimator::Bike::MARK_SPAM_PERCENT
+        end
+      end
+      context "models that share a drug or gambling term" do
+        it "is only the text estimate" do
+          ["Soma Wolverine", "Norco Search XR", "RXR Ultram", "S-Works Venge Omega Pharma Quickstep", "Casino BMX"].each do |frame_model|
+            expect(described_class.estimate(Bike.new(frame_model:))).to eq(0.2 * SpamEstimator::Text.estimate(frame_model))
+          end
+        end
+      end
     end
     context "manufacturer_other" do
       let(:bike) { FactoryBot.build(:bike, manufacturer: Manufacturer.other, manufacturer_other: str) }

@@ -20,6 +20,23 @@ module SpamEstimator
       ;\s*(?:drop|delete|truncate|exec)\b
     /xi
 
+    # Soma, Norco and Ultram are bike names, so they only count after a buying verb. Generic words
+    # (medicine, prescription, 10mg) are left out: they match clinics, opticians and CBD shops
+    PHARMACY_REGEX = /(?:
+      \b(?:
+        pharmacy | pharmacies | erectile\s+dysfunction | (?:buy|order|purchase)\s+(?:soma|norco|ultram) |
+        pain\s?o\s?soma | viagra | cialis | levitra | kamagra | sildenafil | tadalafil | vardenafil | avanafil |
+        cenforce | vidalista | fildena | tramadol | tapentadol | aspadol | oxycodone | oxycontin | roxicodone | hydrocodone | percocet |
+        vicodin | lorcet | lortab | codeine | fentanyl | dilaudid | hydromorphone | suboxone | subutex | buprenorphine |
+        methadone | demerol | meperidine | opana | darvocet | darvon | xanax | alprazolam | farmapram | ksalol | valium |
+        diazepam | klonopin | clonazepam | rivotril | lorazepam | ativan | adderall | ritalin | concerta | methylphenidate |
+        vyvanse | provigil | modafinil | modalert | modvigil | armodafinil | artvigil | waklert | ambien | zolpidem |
+        belbien | belbein | zopiclone | eszopiclone | restoril | carisoprodol | fioricet | butalbital | pregabalin |
+        gabapentin | phentermine | adipex | meridia | sibutramine | reductil | ozempic | semaglutide | cytotec | misoprostol
+      )\b |
+      (?<![a-z])pills?(?![a-z])
+    )/xi
+
     def looks_malicious?(str)
       return false if str.blank?
 

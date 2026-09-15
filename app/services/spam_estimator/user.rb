@@ -4,10 +4,10 @@ module SpamEstimator
 
     MARK_SPAM_PERCENT = 90 # May modify in the future!
 
-    # crypto, gambling, adult and gift-card terms that SEO-spam profiles exist to promote.
+    # crypto, gambling, adult, gift-card and pharmacy terms that SEO-spam profiles exist to promote.
     # Word boundaries matter: usernames are auto-generated random strings, so
     # unanchored substrings ("Judith", "Hagen", "Sloth", "Donohue") would ban real people.
-    SEO_SPAM_REGEX = /(?:
+    SEO_SPAM_REGEX = Regexp.union(/(?:
       \b(?:
         bitcoin | btc | ethereum | crypto(?:currency|\s?wallet)? | blockchain | binance |
         coinbase | dogecoin | altcoin | memecoin | defi | web3 | metamask | airdrop |
@@ -31,7 +31,7 @@ module SpamEstimator
       check\s?(?:my|your|the)?\s?balance | reward\s?cards? |
       card\s?activation | activate\s+(?:my\s|your\s|the\s)?(?:gift\s?)?card |
       redeem\s+(?:code|card)
-    )/xi
+    )/xi, SpamEstimator::Text::PHARMACY_REGEX)
 
     def estimate(user)
       return 0 if user.blank?

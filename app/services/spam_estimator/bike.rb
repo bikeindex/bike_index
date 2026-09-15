@@ -13,6 +13,8 @@ module SpamEstimator
       estimate += 35 if bike.creation_organization&.spam_registrations
       estimate += 0.2 * Text.estimate(bike.frame_model)
       estimate += 0.4 * Text.estimate(bike.manufacturer_other)
+      # the user estimator's other SEO terms are real bike models (Casino, Blackjack, Slot)
+      estimate += 100 if SpamEstimator::Text::PHARMACY_REGEX.match?("#{bike.frame_model} #{bike.manufacturer_other}")
       estimate += 50 if low_entropy_fingerprint?(bike)
       estimate += domain_estimate(bike.owner_email)
       estimate += estimate_stolen_record(stolen_record || bike.current_stolen_record)
