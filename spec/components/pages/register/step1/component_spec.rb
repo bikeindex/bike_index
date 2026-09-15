@@ -58,14 +58,12 @@ RSpec.describe Pages::Register::Step1::Component, type: :component do
     end
   end
 
-  # Outside the form it would submit nothing, and outside the wrapper a rider would
-  # fill it in - neither of which the specs posting `additional` directly can see
-  it "renders the honeypot inside the form, in its hidden wrapper" do
+  # Outside the form it submits nothing, which the specs posting `additional` directly
+  # can't see. What the field itself has to be is SharedBlocks::Honeypot's own spec
+  it "renders the honeypot inside the form" do
     render_step_1
-    honeypot = page.find("form div.tw\\:hidden input[name='additional']", visible: :all)
 
-    expect(honeypot[:tabindex]).to eq "-1"
-    expect(honeypot[:autocomplete]).to eq "off"
+    expect(page).to have_css("form input[name='additional']", visible: :all)
   end
 
   describe "button_color" do

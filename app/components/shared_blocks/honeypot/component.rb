@@ -2,7 +2,6 @@
 
 module SharedBlocks
   module Honeypot
-    # The name is load-bearing - the spam checks key on `additional` coming back filled
     class Component < ApplicationComponent
       def initialize(form_builder: nil)
         @form_builder = form_builder
