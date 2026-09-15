@@ -86,7 +86,7 @@ class UpdateEmailDomainJob < ScheduledJob
     return false if EmailDomain.invalid_domain?(domain)
 
     conn = Faraday.new do |faraday|
-      faraday.use FaradayMiddleware::FollowRedirects, limit: 15
+      faraday.use Faraday::FollowRedirects::Middleware, limit: 15
       faraday.adapter Faraday.default_adapter
       # Set reasonable timeouts to avoid hanging
       faraday.options.timeout = 5 # 5 seconds for open/read timeout

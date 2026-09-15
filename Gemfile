@@ -87,7 +87,7 @@ gem "postmark-rails" # Transactional email
 gem "MailchimpMarketing", github: "mailchimp/mailchimp-marketing-ruby" # Marketing emails
 gem "facebookbusiness", github: "facebook/facebook-ruby-business-sdk", branch: "main" # For promoted alerts
 gem "down" # used to generate a local tempfile
-gem "faraday_middleware" # Manage faraday request flow
+gem "faraday-follow_redirects" # Follow redirects in faraday requests
 gem "ruby-saml" # Organization SSO
 
 # OAuth provider, Grape, associated parts of API V2

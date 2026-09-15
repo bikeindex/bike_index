@@ -42,7 +42,7 @@ module Spreadsheets
 
     def connection
       Faraday.new do |faraday|
-        faraday.use FaradayMiddleware::FollowRedirects, limit: 15
+        faraday.use Faraday::FollowRedirects::Middleware, limit: 15
         faraday.adapter Faraday.default_adapter
         faraday.options.timeout = 30
         faraday.options.open_timeout = 10
