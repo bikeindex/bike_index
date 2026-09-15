@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller='turnstile'
+// Connects to data-controller='shared-blocks--turnstile'
 //
 // Only the domains the spam complaints come from are asked, so the widget stays hidden
 // until the address typed in is one of them. This is which addresses get asked, not

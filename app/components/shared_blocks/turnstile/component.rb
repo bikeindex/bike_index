@@ -12,7 +12,7 @@ module SharedBlocks
       def render? = Integrations::Turnstile.enabled?
 
       def call
-        safe_join([tag.div(widget, class: wrapper_class, data: {turnstile_target: "widget"}), script])
+        safe_join([tag.div(widget, class: wrapper_class, data: {"shared-blocks--turnstile-target": "widget"}), script])
       end
 
       private

@@ -36,9 +36,9 @@
             - else
               = t(".sign_up")
 
-          = form_for @user, html: { data: { controller: "turnstile",
-            turnstile_domains_value: Ownership::RISKY_EMAIL_DOMAINS.to_json,
-            action: "input->turnstile#update" } } do |f|
+          = form_for @user, html: { data: { controller: "shared-blocks--turnstile",
+            "shared-blocks--turnstile-domains-value": Ownership::RISKY_EMAIL_DOMAINS.to_json,
+            action: "input->shared-blocks--turnstile#update" } } do |f|
             - if sign_in_partner
               = hidden_field_tag :partner, sign_in_partner
 
