@@ -16,7 +16,7 @@ module Email
       return if !force_send && no_survey?(bike)
 
       notification = Notification.create(kind: :theft_survey_2023, bike: bike, user: bike.user)
-      Notifications::Deliver.track_email_delivery(notification) do
+      Notifications::Deliver.track_email(notification) do
         CustomerMailer.theft_survey(notification).deliver_now
       end
     end

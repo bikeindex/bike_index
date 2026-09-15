@@ -5,7 +5,7 @@ module Notifications
     extend Functionable
 
     # Raises the delivery's error, unless the addresses are undeliverable
-    def track_email_delivery(record, is_new_email_address: false)
+    def track_email(record, is_new_email_address: false)
       return if record.settled?
 
       recipients = record.recipient_users.to_a
