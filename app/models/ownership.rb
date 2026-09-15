@@ -72,6 +72,9 @@ class Ownership < ApplicationRecord
   ORIGIN_REG_FLOW = %w[register_flow register_flow_organized register_flow_landing_page].freeze
   # Registered on bikeindex.org - not an embed form, the API, an import or a transfer
   ORIGIN_WEBSITE_REG = (ORIGIN_REG_FLOW + %w[web organization_form sticker]).freeze
+  # Substrings, so each covers its country domains too (@yahoo.co.uk, @hotmail.co.nz).
+  # Every spam complaint Postmark has on file is one of these two
+  RISKY_EMAIL_DOMAINS = ["@yahoo.co", "@hotmail.co"].freeze
 
   enum :status, Bike::STATUS_ENUM
   enum :pos_kind, Organization::POS_KIND_ENUM
@@ -116,6 +119,10 @@ class Ownership < ApplicationRecord
   class << self
     def origins
       ORIGIN_ENUM.keys.map(&:to_s)
+    end
+
+    def risky_email?(email)
+      email.present? && RISKY_EMAIL_DOMAINS.any? { email.match?(it) }
     end
 
     # Every value creation_kind can return. It restates that method's branching, so
@@ -363,8 +370,7 @@ class Ownership < ApplicationRecord
   end
 
   def spam_risky_email?
-    risky_domains = ["@yahoo.co", "@hotmail.co"]
-    return false unless owner_email.present? && risky_domains.any? { |d| owner_email.match?(d) }
+    return false unless self.class.risky_email?(owner_email)
     return true if pos?
 
     embed? && organization&.spam_registrations?

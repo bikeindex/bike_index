@@ -81,7 +81,7 @@ class RegisterController < ApplicationController
   def create
     saved = BikeServices::Register.save_step_1(@b_param, bike_params: create_params,
       propulsion_type_motorized: params[:propulsion_type_motorized], additional: params[:additional])
-    unless saved
+    unless saved && turnstile_verified?
       return render(Pages::Register::Step1::Component.new(b_param: @b_param, steps: flow_steps, current_user:),
         status: :unprocessable_entity)
     end
@@ -172,6 +172,17 @@ class RegisterController < ApplicationController
   end
 
   private
+
+  # The browser's reveal decides who is asked, this decides whether they answered - a
+  # form posted without running any of it lands here the same way
+  def turnstile_verified?
+    return true unless Integrations::Turnstile.challenge?(@b_param.owner_email)
+    return true if Integrations::Turnstile.verified?(params[Integrations::Turnstile::RESPONSE_PARAM],
+      remote_ip: forwarded_ip_address)
+
+    @b_param.errors.add(:base, translation(:verify_not_a_robot, controller_method: :create))
+    false
+  end
 
   def complete_registration
     bike = BikeServices::Register.complete(@b_param, user: current_user,

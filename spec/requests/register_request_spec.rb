@@ -538,6 +538,30 @@ RSpec.describe RegisterController, type: :request do
       end
     end
 
+    context "a risky email, with the challenge configured" do
+      let(:owner_email) { "rider@yahoo.com" }
+      let(:verify_url) { "https://challenges.cloudflare.com/turnstile/v0/siteverify" }
+      before do
+        stub_const("Integrations::Turnstile::SITE_KEY", "1x00000000000000000000AA")
+        stub_const("Integrations::Turnstile::SECRET_KEY", "1x0000000000000000000000000000000AA")
+      end
+
+      it "re-renders step 1 without emailing, until the challenge is answered" do
+        expect { post base_url, params: create_params }
+          .to_not change(Email::PartialRegistrationJob.jobs, :size)
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.body).to include "not a robot"
+        # Saved either way, so the re-render still has what they entered
+        expect(empty_b_param.reload.owner_email).to eq owner_email
+        expect(empty_b_param.email_confirmation_token).to be_blank
+
+        WebMock.stub_request(:post, verify_url).to_return(body: {success: true}.to_json)
+        expect { post base_url, params: create_params.merge("cf-turnstile-response" => "token") }
+          .to change(Email::PartialRegistrationJob.jobs, :size).by 1
+        expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: 2)
+      end
+    end
+
     context "motorized, stolen, manufacturer not in the list" do
       let(:step_1_params) do
         {b_param: {manufacturer_id: "Fancy Cycles", owner_email:},

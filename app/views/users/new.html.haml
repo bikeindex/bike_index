@@ -36,7 +36,9 @@
             - else
               = t(".sign_up")
 
-          = form_for @user do |f|
+          = form_for @user, html: { data: { controller: "turnstile",
+            turnstile_domains_value: Ownership::RISKY_EMAIL_DOMAINS.to_json,
+            action: "input->turnstile#update" } } do |f|
             - if sign_in_partner
               = hidden_field_tag :partner, sign_in_partner
 
@@ -65,5 +67,7 @@
                 %label
                   = f.check_box :notification_newsletters
                   = t(".get_bike_indexs_newsletter")
+
+            = render(SharedBlocks::Turnstile::Component.new(email: @user.email))
 
             = f.submit t(".sign_up"), class: 'btn btn-primary btn-lg'

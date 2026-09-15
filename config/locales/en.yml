@@ -1993,6 +1993,8 @@ en:
         signed_in_as_other: >-
           You're signed in as %{email}, so we kept you in that account. The registration
           is still saved to the address we emailed.
+      create:
+        verify_not_a_robot: Please confirm you're not a robot
       find_b_param:
         registration_not_found: We couldn't find that registration — start a new one
           below
@@ -2062,6 +2064,8 @@ en:
     users:
       confirm:
         already_confirmed: Your user account is already confirmed. Please log in.
+      create:
+        verify_not_a_robot: Please confirm you're not a robot
       find_user_from_token_for_password_reset!:
         does_not_match_token: Doesn't match user's password reset token
         token_expired: Password reset token expired, try resetting password again.
