@@ -1,0 +1,77 @@
+<div class="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+  <span class="tw:text-2xs tw:font-bold tw:tracking-wider tw:text-gray-400 tw:uppercase">
+    <%= translation(".quick_filters") %>
+  </span>
+
+  <%= render(UI::ButtonGroup::Component.new(entries: quick_filter_entries)) %>
+
+  <%# The gear opens what the date range opens, so it stays on the same line as it %>
+  <div class="tw:flex tw:items-center tw:gap-2">
+    <%= render(UI::Button::Component.new(size: :sm, data: {action: "click->org--search#toggleFilters"})) do %>
+      <%= translation(".date_range") %>
+      <span class="tw:font-bold"><%= period_label %></span>
+      <%= render(UI::IconChevron::Component.new(direction: :down)) %>
+    <% end %>
+
+    <%= render(UI::Button::Component.new(size: :sm, aria: {expanded: false},
+      title: translation(".search_settings"),
+      data: {action: "click->org--search#toggleFilters", "org--search-target": "filtersButton"})) do %>
+      <%= helpers.inline_svg_tag "icons/settings_slider.svg", class: "tw:inline", aria: {hidden: true} %>
+      <span class="tw:sr-only"><%= translation(".search_settings") %></span>
+    <% end %>
+  </div>
+</div>
+
+<div
+  class="
+    tw:mt-3 tw:flex tw:hidden! tw:flex-col tw:gap-3 tw:rounded-xl tw:border
+    tw:border-gray-200 tw:bg-gray-50 tw:p-4 tw:dark:border-gray-700
+    tw:dark:bg-gray-900
+  "
+  data-org--search-target="filters"
+>
+  <div class="tw:flex tw:items-center tw:gap-2">
+    <%= render(UI::Header::Component.new(text: translation(".search_settings"), tag: :h3, html_class: "uncap tw:mb-0!")) %>
+
+    <div class="tw:ml-auto">
+      <%= render(UI::Button::Component.new(text: translation(".done"), size: :sm,
+        data: {action: "click->org--search#toggleFilters"})) %>
+    </div>
+  </div>
+
+  <% filter_groups.each do |group| %>
+    <div class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
+      <span class="sort-group-label tw:w-28 tw:shrink-0"><%= group[:label] %></span>
+
+      <%= render(group_chips(group)) %>
+    </div>
+  <% end %>
+
+  <div class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
+    <span class="sort-group-label tw:w-28 tw:shrink-0"><%= translation(".date_range") %></span>
+
+    <%#
+      No flex-1: shrink-to-fit leaves the period select's own justify-end with nothing to
+      push against, so its buttons line up with the filter rows above
+    %>
+
+    <div class="tw:min-w-0">
+      <%= render(UI::PeriodSelect::Component.new(period: @period, start_time: @start_time,
+        end_time: @end_time, sortable_search_params: @sortable_search_params)) %>
+    </div>
+  </div>
+
+  <% if @notes_search %>
+    <label
+      class="
+        tw:mb-0! tw:flex tw:cursor-pointer tw:items-center tw:gap-2
+        tw:border-t tw:border-gray-200 tw:pt-3 tw:dark:border-gray-700
+      "
+    >
+      <%= check_box_tag :show_notes_search, "1", false,
+        data: {action: "change->org--search#toggleNotesSearch", "org--search-target": "notesCheckbox"} %>
+
+      <%= notes_search_label %>
+    </label>
+  <% end %>
+</div>

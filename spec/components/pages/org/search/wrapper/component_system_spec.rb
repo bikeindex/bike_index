@@ -9,14 +9,14 @@ RSpec.describe Pages::Org::Search::Wrapper::Component, :js, type: :system do
 
   before do
     visit(preview_path)
-    page.execute_script("localStorage.removeItem('orgRegistrationColumns'); localStorage.setItem('orgRegistrationSettingsOpen', 'false')")
+    page.execute_script("localStorage.removeItem('orgRegistrationColumns'); localStorage.setItem('orgRegistrationColumnsOpen', 'false')")
     visit(preview_path)
     expect(page).to have_css("[data-controller~='org--search']", wait: 5)
   end
 
-  it "toggles settings panel visibility" do
+  it "toggles column panel visibility" do
     expect_axe_clean
-    settings_selector = "[data-org--search-target='settings']"
+    settings_selector = "[data-org--search-target='columns']"
     expect(page).not_to have_css(settings_selector, visible: true, wait: 2)
 
     click_button "settings"

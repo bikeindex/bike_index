@@ -1,4 +1,11 @@
-<div data-controller="<%= turbo? ? "search--form" : "" %>">
+<div
+  data-controller="<%= turbo? ? "search--form" : "" %>"
+  class="<%= card_classes if card? %>"
+>
+  <% if card? %>
+    <%= render(UI::Header::Component.new(text: @heading, tag: :h2, html_class: "uncap tw:mb-3!")) %>
+  <% end %>
+
   <%= form_with(url: @target_search_path,
     builder: BikeIndexFormBuilder,
     method: :get,
@@ -56,14 +63,16 @@
       </div>
 
       <%# shrink-0: the fields column would otherwise squeeze this to a sliver on phones %>
-      <div class="tw:w-20 tw:shrink-0">
-        <%= render UI::Button::Component.new(color: :primary, type: "submit", html_class: "tw:w-full tw:h-full#{" tw:disabled:cursor-wait" if turbo?}") do %>
-          <%= helpers.inline_svg_tag "icons/searcher.svg",
-          id: "search-button",
-          class: "tw:text-white tw:w-full tw:h-auto",
-          title: "searcher" %>
-        <% end %>
-      </div>
+      <% unless card? %>
+        <div class="tw:w-20 tw:shrink-0">
+          <%= render UI::Button::Component.new(color: :primary, type: "submit", html_class: "tw:w-full tw:h-full#{" tw:disabled:cursor-wait" if turbo?}") do %>
+            <%= helpers.inline_svg_tag "icons/searcher.svg",
+            id: "search-button",
+            class: "tw:text-white tw:w-full tw:h-auto",
+            title: "searcher" %>
+          <% end %>
+        </div>
+      <% end %>
     </div>
 
     <% if render_serial_field? && serial_looks_like_not_a_serial? %>
@@ -80,7 +89,9 @@
 
     <%= render partial: "/shared/hidden_search_fields", locals: {kind: "organized_bike_search", skip_organization: true} %>
 
-    <% unless @settings_component %>
+    <% if @filters_component %>
+      <%= hidden_field_tag :propulsion_type, @interpreted_params[:propulsion_type] %>
+    <% else %>
       <%= hidden_field_tag :search_stickers, @interpreted_params[:search_stickers] %>
       <%= hidden_field_tag :search_address, @interpreted_params[:search_address] %>
       <%= hidden_field_tag :search_status, @interpreted_params[:search_status] %>
@@ -89,8 +100,14 @@
     <%= hidden_field_tag :search_secondary, @interpreted_params[:search_secondary] %>
     <%= hidden_field_tag :search_model_audit_id, @interpreted_params[:search_model_audit_id] %>
   <% end %>
-</div>
 
-<% if @settings_component %>
-  <%= render(@settings_component) %>
-<% end %>
+  <%# Outside the form: the settings panel holds the custom date range, which is a form of its own %>
+  <%= render(@filters_component) if @filters_component %>
+
+  <% if card? %>
+    <%= render(UI::Button::Component.new(text: @submit_text, color: :primary, size: :lg, type: "submit",
+      form: "Search_Form", html_class: "tw:mt-3 tw:w-full#{" tw:disabled:cursor-wait" if turbo?}")) %>
+
+    <%= below_submit %>
+  <% end %>
+</div>

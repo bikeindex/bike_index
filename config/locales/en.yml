@@ -4609,7 +4609,10 @@ en:
         resolved: Resolved
     registrations:
       search:
-        render_chart: Render chart
+        find_a_bike: Find a bike
+        search_all_bikes_html: Search all bikes <span class="less-strong">(not just
+          %{org_name})</span>
+        search_registrations: Search registrations
     stickers:
       edit:
         bike: Bike
