@@ -18,7 +18,7 @@
     <%# So the organization survives a submission that has to build a registration %>
     <%= hidden_field_tag :organization_id, organization.id if organization.present? %>
 
-    <%= render Pages::Register::Honeypot::Component.new %>
+    <%= render SharedBlocks::Honeypot::Component.new %>
 
     <%= render Pages::Register::SectionLabel::Component.new(text: translation(".bike_info_html", cycle_type: cycle_type_tag)) %>
 
