@@ -5,13 +5,13 @@ module Notifications
     extend Functionable
 
     # Raises the delivery's error, unless the addresses are undeliverable
-    def track_email_delivery(record, is_new_email_address: false)
+    def track_email(record, is_new_email_address: false)
       return if record.settled?
 
       recipients = record.recipient_users.to_a
       addresses = normalized(record.recipient_emails)
       # Addresses are held per user, so an address another account also holds is theirs alone
-      user_emails = UserEmail.where(user_id: recipients.map(&:id), email: addresses).to_a
+      user_emails = recipients.any? ? UserEmail.where(user_id: recipients.map(&:id), email: addresses).to_a : []
 
       if delivery_email_banned?(record, recipients:, user_emails:, is_new_email_address:)
         return record.update(delivery_status: "delivery_banned")
