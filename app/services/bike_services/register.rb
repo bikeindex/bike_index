@@ -205,8 +205,7 @@ module BikeServices
     # registration's token can ask for a resend
     def send_confirmation_email(b_param)
       return false unless confirmation_email_pending?(b_param)
-      # Not folded into confirmation_email_pending? - both steps read that to render
-      # "link sent", so suppressing has to leave the flow looking the same
+      # Not in confirmation_email_pending? - both steps read that to render "link sent"
       return false if b_param.likely_spam?
       return false if b_param.email_confirmation_sent_at.to_i > (Time.current - CONFIRMATION_EMAIL_INTERVAL).to_i
 
@@ -499,8 +498,7 @@ module BikeServices
     # Merged rather than assigned, so a resubmission without the honeypot doesn't
     # clear a flag already earned
     def honeypot_spam(bike_params, additional)
-      bike_params = bike_params.to_h
-      additional.present? ? bike_params.merge("likely_spam" => true) : bike_params
+      additional.present? ? bike_params.to_h.merge("likely_spam" => true) : bike_params.to_h
     end
 
     conceal :auto_organization, :assign_auto_organization, :set_auto_organization,

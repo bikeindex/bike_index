@@ -58,6 +58,16 @@ RSpec.describe Pages::Register::Step1::Component, type: :component do
     end
   end
 
+  # Outside the form it would submit nothing, and outside the wrapper a rider would
+  # fill it in - neither of which the specs posting `additional` directly can see
+  it "renders the honeypot inside the form, in its hidden wrapper" do
+    render_step_1
+    honeypot = page.find("form div.tw\\:hidden input[name='additional']", visible: :all)
+
+    expect(honeypot[:tabindex]).to eq "-1"
+    expect(honeypot[:autocomplete]).to eq "off"
+  end
+
   describe "button_color" do
     def submit_button
       page.find("form button[type=submit]")
