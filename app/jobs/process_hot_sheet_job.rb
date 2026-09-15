@@ -29,15 +29,15 @@ class ProcessHotSheetJob < ScheduledJob
     # Bump bike cached attributes, so the email has all the info
     hot_sheets.first.fetch_stolen_records.each { it.bike.update(updated_at: Time.current) }
     # Deliver every batch before raising, so one failure doesn't block the rest
-    errors = hot_sheets.filter_map { track_email_delivery(it) }
+    errors = hot_sheets.filter_map { track_email(it) }
     raise errors.first if errors.any?
   end
 
   private
 
   # Returns the batch's error rather than raising, so the rest still go out
-  def track_email_delivery(hot_sheet)
-    Notifications::Deliver.track_email_delivery(hot_sheet) do
+  def track_email(hot_sheet)
+    Notifications::Deliver.track_email(hot_sheet) do
       OrganizedMailer.hot_sheet(hot_sheet).deliver_now if hot_sheet.recipient_emails.any?
     end
     nil
