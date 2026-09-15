@@ -17,6 +17,7 @@ module Email
       return if b_param.blank?
       # confirm_email! spends the token, so a blank one means there's no link left to send
       return if kind == "partial_register_confirmation" && b_param.email_confirmation_token.blank?
+      return if b_param.likely_spam?
 
       if EmailDomain::VERIFICATION_ENABLED
         email_domain = EmailDomain.find_or_create_for(b_param.owner_email)
