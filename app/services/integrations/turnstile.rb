@@ -6,11 +6,16 @@ module Integrations
     SECRET_KEY = ENV["TURNSTILE_SECRET_KEY"]
     RESPONSE_PARAM = "cf-turnstile-response"
     TIMEOUT_SECONDS = 5
+    # Substrings, so each covers its country domains too (@yahoo.co.uk, @hotmail.co.nz).
+    # Every spam complaint Postmark has on file is one of these two
+    RISKY_EMAIL_DOMAINS = ["@yahoo.co", "@hotmail.co"].freeze
 
     def enabled? = SITE_KEY.present? && SECRET_KEY.present?
 
     # Unconfigured is unchallenged, so a missing key can't lock anyone out of registering
-    def challenge?(email) = enabled? && Ownership.risky_email?(email)
+    def challenge?(email) = enabled? && risky_email?(email)
+
+    def risky_email?(email) = email.present? && RISKY_EMAIL_DOMAINS.any? { email.match?(it) }
 
     # The token is single use - a form re-rendered for some other error has to mint a
     # fresh one, which is why the widget renders on every challenged submission

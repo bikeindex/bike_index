@@ -8,6 +8,17 @@ RSpec.describe Integrations::Turnstile do
     stub_const("Integrations::Turnstile::SECRET_KEY", "1x0000000000000000000000000000000AA")
   end
 
+  # Ownership#spam_risky_email? reads this whether or not the challenge is switched on,
+  # so it can't grow an enabled? check the way challenge? has one
+  describe "risky_email?" do
+    it "matches the domains, configured or not" do
+      expect(described_class.risky_email?("rider@yahoo.com")).to be_truthy
+      expect(described_class.risky_email?("rider@hotmail.co.uk")).to be_truthy
+      expect(described_class.risky_email?("rider@gmail.com")).to be_falsey
+      expect(described_class.enabled?).to be_falsey
+    end
+  end
+
   describe "challenge?" do
     it "asks the domains the spam complaints come from, and nobody else" do
       with_keys
