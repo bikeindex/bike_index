@@ -9,5 +9,7 @@ class AddDeliveryStatusEnumToHotSheets < ActiveRecord::Migration[8.1]
     reversible do |dir|
       dir.up { execute "UPDATE hot_sheets SET delivery_status = 1 WHERE delivery_status_legacy = 'email_success'" }
     end
+
+    remove_column :organization_roles, :receive_hot_sheet, :boolean, default: false
   end
 end

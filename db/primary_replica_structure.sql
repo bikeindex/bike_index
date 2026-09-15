@@ -2835,7 +2835,6 @@ CREATE TABLE public.organization_roles (
     claimed_at timestamp without time zone,
     email_invitation_sent_at timestamp without time zone,
     created_by_magic_link boolean DEFAULT false,
-    receive_hot_sheet boolean DEFAULT false,
     hot_sheet_notification integer DEFAULT 0,
     role integer,
     priority integer DEFAULT 0 NOT NULL
@@ -7816,7 +7815,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20260914141710'),
+('20260915110042'),
 ('20260912102406'),
 ('20260909120000'),
 ('20260908163548'),
