@@ -42,11 +42,5 @@ RSpec.describe Integrations::Turnstile do
     it "is false for a form that sent no token, without asking" do
       expect(described_class.verified?(nil)).to be_falsey
     end
-
-    # Registration is worth more than the trap, so an outage passes rather than blocks
-    it "passes when Cloudflare can't be reached" do
-      WebMock.stub_request(:post, url).to_timeout
-      expect(described_class.verified?("token")).to be_truthy
-    end
   end
 end

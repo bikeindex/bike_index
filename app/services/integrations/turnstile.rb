@@ -5,6 +5,7 @@ module Integrations
     SITE_KEY = ENV["TURNSTILE_SITE_KEY"]
     SECRET_KEY = ENV["TURNSTILE_SECRET_KEY"]
     RESPONSE_PARAM = "cf-turnstile-response"
+    TIMEOUT_SECONDS = 5
 
     def enabled? = SITE_KEY.present? && SECRET_KEY.present?
 
@@ -20,10 +21,6 @@ module Integrations
         req.body = {secret: SECRET_KEY, response: token, remoteip: remote_ip}.compact.to_json
       end
       JSON.parse(response.body)["success"]
-    rescue Faraday::Error, JSON::ParserError => e
-      # Cloudflare being unreachable shouldn't take registration down with it
-      Honeybadger.notify(e) if Rails.env.production?
-      true
     end
 
     #
@@ -33,6 +30,8 @@ module Integrations
     def connection
       Faraday.new(url: "https://challenges.cloudflare.com") do |conn|
         conn.headers["Content-Type"] = "application/json"
+        # Registration blocks on this, so it gives up well inside rack-timeout's 30s
+        conn.options.timeout = TIMEOUT_SECONDS
         conn.adapter Faraday.default_adapter
       end
     end
