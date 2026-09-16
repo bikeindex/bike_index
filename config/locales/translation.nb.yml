@@ -5030,6 +5030,31 @@ nb:
       you: Du
       your_bikes: Syklene dine
       your_preferences: Dine preferanser
+    org_search_columns:
+      avery_cell: Avery eksporterbar
+      color_cell: Farge
+      created_at_cell: Registrert
+      creation_description_cell: Kilde
+      cycle_type_cell: Bil type
+      impound_id_cell: Beslags-ID
+      impounded_cell: Beslaglagt
+      manufacturer_cell: Produsent
+      model_cell: Modell
+      notes_cell: Notater
+      owner_email_cell: Sendt til
+      owner_name_cell: Eiers navn
+      propulsion_type_cell: Elbil (fremdrift)
+      reg_address_cell: Adresse
+      reg_extra_registration_number_cell: Sekundærnr.
+      reg_organization_affiliation_cell: Tilknytning
+      reg_phone_cell: Telefon
+      reg_student_id_cell: Student ID
+      serial_number_cell: Serienummer
+      status_cell: Status
+      sticker_cell: Klistremerke
+      stolen_cell: Stjålet
+      updated_at_cell: Oppdatert
+      url_cell: URL-adresse
     recovery_display:
       bike: Sykkel
       recovered_date: gjenopprettet %{date}
@@ -5562,13 +5587,8 @@ nb:
           settings:
             address: 'Adresse:'
             all: Alle
-            avery_cell: Avery eksporterbar
             bike: registrering
-            color_cell: Farge
             create_export_of_vehicles: Opprett eksport av søkte %{cycle_type}
-            created_at_cell: Registrert
-            creation_description_cell: Kilde
-            cycle_type_cell: Bil type
             default: misligholde
             filter_impounded_html: bare <strong>beslaglagt</strong>
             filter_no_address_html: bare <strong>ingen</strong> adresse
@@ -5578,74 +5598,24 @@ nb:
             filter_stolen_html: bare stjålet
             filter_with_address_html: bare <strong>med</strong> adresse
             filter_with_stickers_html: bare <strong>med</strong> klistremerker
-            impound_id_cell: Beslags-ID
-            impounded_cell: Beslaglagt
-            manufacturer_cell: Produsent
-            model_cell: Modell
-            multi_search: søk i flere serier
             none: ingen
-            notes_cell: Notater
-            owner_email_cell: Sendt til
-            owner_name_cell: Eiers navn
-            propulsion_type_cell: Elbil (fremdrift)
-            reg_address_cell: Adresse
-            reg_extra_registration_number_cell: Sekundærnr.
-            reg_organization_affiliation_cell: Tilknytning
-            reg_phone_cell: Telefon
-            reg_student_id_cell: Student ID
-            serial_number_cell: Serienummer
             settings: innstillinger
             show_notes_search: vis notatsøk
             status: 'Status:'
-            status_cell: Status
-            sticker_cell: Klistremerke
             stickers: 'Klistremerker:'
-            stolen_cell: Stjålet
-            updated_at_cell: Oppdatert
-            url_cell: URL-adresse
             vehicle: registrering
             visible_columns: Synlige kolonner
           wrapper:
-            affiliation: Tilknytning
-            avery_exportable: Avery eksporterbar
-            bike: registrering
-            e_vehicle_propulsion: Elbil (fremdrift)
             e_vehicles_for_audit: 'Elbiler for revisjon:'
-            link: Link
             matching_bikes_html: "%{count} %{cycle_type} samsvarende"
-            mfg_model_color_html: produsent, modell, <span class="less-strong">farge</span>
-            phone: Telefon
-            reg_address: Adresse
             registered_bikes_html: "%{count} %{cycle_type} samsvarer med %{org_name}"
-            student_id: Student ID
-            vehicle: registrering
             view_matching_any_audit: visning som samsvarer med enhver revisjon
         search_results:
           bikes_table:
             assign_bike_sticker: Tildel klistremerke
-            avery: Avery?
-            color: Farge
             email_hidden: e-post skjult
             hidden_not_registered: skjult, ikke registrert hos %{org_name}
-            impound_id: Beslags-ID
-            impounded: Beslaglagt
             link_sticker: lenkeklistremerke
-            manufacturer: Produsent
-            model: Modell
-            notes: Notater
-            owner_name: Eiers navn
-            propulsion_type: Fremdrift
-            registered: Registrert
-            secondary_number: Sekundærnr.
-            sent_to: Sendt til
-            serial: Serienummer
-            source: Kilde
-            status_cell: Status
-            sticker: Klistremerke
-            stolen: Stjålet
-            updated: Oppdatert
-            url: URL-adresse
-            vehicle_type: Bil type
           multi_result_chip:
             no_results: ingen treff
           multi_results:

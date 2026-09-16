@@ -10,12 +10,10 @@ module Pages
         # registrations on the show page). Pass render_sortable to enable sort links.
         class Component < ApplicationComponent
           # Digest of the markup inside the row cache — the cached_markup_digest spec keeps it current
-          MARKUP_DIGEST = "09bce6c6bede"
-
-          delegate :additional_registration_fields, :column_renames, to: :settings_component
+          MARKUP_DIGEST = "118bce4e2300"
 
           def initialize(organization:, bikes:, current_user: nil, render_sortable: false,
-            cache_key: nil, sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings_component: nil)
+            cache_key: nil, sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings: nil)
             @organization = organization
             @bikes = bikes
             @current_user = current_user
@@ -23,16 +21,15 @@ module Pages
             @cache_key = cache_key || "org-#{organization.id}-#{MARKUP_DIGEST}"
             @sort_state = sort_state
             @bike_sticker = bike_sticker
-            @settings_component = settings_component
+            @settings = settings
           end
 
           private
 
-          # Column labels and additional fields derive from the organization alone, so
-          # a bare settings component is enough when a caller (e.g. Wrapper)
-          # doesn't pass its own already-built one in.
-          def settings_component
-            @settings_component ||= Pages::Org::Search::Settings::Component.new(organization: @organization)
+          # Column labels and additional fields derive from the organization alone, so bare
+          # settings are enough when a caller (e.g. Wrapper) doesn't pass its own in.
+          def settings
+            @settings ||= ComponentStructs::OrgSearchSettings.new(organization: @organization)
           end
 
           def hidden_not_registered_tag

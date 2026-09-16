@@ -5272,6 +5272,31 @@ es:
       you: Tú
       your_bikes: Tus bicicletas
       your_preferences: Tus preferencias
+    org_search_columns:
+      avery_cell: Exportable de Avery
+      color_cell: Color
+      created_at_cell: Registrado
+      creation_description_cell: Fuente
+      cycle_type_cell: Tipo de vehículo
+      impound_id_cell: ID del depósito
+      impounded_cell: Incautado
+      manufacturer_cell: Fabricante
+      model_cell: Modelo
+      notes_cell: Notas de registro
+      owner_email_cell: Enviado a
+      owner_name_cell: Nombre del propietario
+      propulsion_type_cell: Vehículo eléctrico (propulsión)
+      reg_address_cell: DIRECCIÓN
+      reg_extra_registration_number_cell: Secundario#
+      reg_organization_affiliation_cell: Afiliación
+      reg_phone_cell: Teléfono
+      reg_student_id_cell: Carné de estudiante
+      serial_number_cell: De serie
+      status_cell: Estado
+      sticker_cell: Etiqueta engomada
+      stolen_cell: Robado
+      updated_at_cell: Actualizado
+      url_cell: URL
     recovery_display:
       bike: Bicicleta
       recovered_date: recuperado %{date}
@@ -5823,13 +5848,8 @@ es:
           settings:
             address: 'DIRECCIÓN:'
             all: todo
-            avery_cell: Exportable de Avery
             bike: registro
-            color_cell: Color
             create_export_of_vehicles: Crear exportación de la búsqueda %{cycle_type}
-            created_at_cell: Registrado
-            creation_description_cell: Fuente
-            cycle_type_cell: Tipo de vehículo
             default: por defecto
             filter_impounded_html: únicamente <strong>confiscado</strong>
             filter_no_address_html: "<strong>Sin</strong> dirección"
@@ -5839,74 +5859,24 @@ es:
             filter_stolen_html: solo robado
             filter_with_address_html: solo <strong>con</strong> dirección
             filter_with_stickers_html: solo <strong>con</strong> pegatinas
-            impound_id_cell: ID del depósito
-            impounded_cell: Incautado
-            manufacturer_cell: Fabricante
-            model_cell: Modelo
-            multi_search: búsqueda serial múltiple
             none: ninguno
-            notes_cell: Notas de registro
-            owner_email_cell: Enviado a
-            owner_name_cell: Nombre del propietario
-            propulsion_type_cell: Vehículo eléctrico (propulsión)
-            reg_address_cell: DIRECCIÓN
-            reg_extra_registration_number_cell: Secundario#
-            reg_organization_affiliation_cell: Afiliación
-            reg_phone_cell: Teléfono
-            reg_student_id_cell: Carné de estudiante
-            serial_number_cell: De serie
             settings: ajustes
             show_notes_search: mostrar notas de búsqueda
             status: 'Estado:'
-            status_cell: Estado
-            sticker_cell: Etiqueta engomada
             stickers: 'Pegatinas:'
-            stolen_cell: Robado
-            updated_at_cell: Actualizado
-            url_cell: URL
             vehicle: registro
             visible_columns: Columnas visibles
           wrapper:
-            affiliation: Afiliación
-            avery_exportable: Exportable de Avery
-            bike: registro
-            e_vehicle_propulsion: Vehículo eléctrico (propulsión)
             e_vehicles_for_audit: 'Vehículos eléctricos para auditoría:'
-            link: Enlace
             matching_bikes_html: "%{count} %{cycle_type} coincidentes"
-            mfg_model_color_html: fabricante, modelo, <span class="less-strong">color</span>
-            phone: Teléfono
-            reg_address: DIRECCIÓN
             registered_bikes_html: "%{count} %{cycle_type} coincidente para %{org_name}"
-            student_id: Carné de estudiante
-            vehicle: registro
             view_matching_any_audit: ver coincidencia con cualquier auditoría
         search_results:
           bikes_table:
             assign_bike_sticker: Asignar pegatina
-            avery: "¿Avery?"
-            color: Color
             email_hidden: Correo electrónico oculto
             hidden_not_registered: oculto, no registrado con %{org_name}
-            impound_id: ID del depósito
-            impounded: Incautado
             link_sticker: pegatina de enlace
-            manufacturer: Fabricante
-            model: Modelo
-            notes: Notas de registro
-            owner_name: Nombre del propietario
-            propulsion_type: Propulsión
-            registered: Registrado
-            secondary_number: Secundario#
-            sent_to: Enviado a
-            serial: De serie
-            source: Fuente
-            status_cell: Estado
-            sticker: Etiqueta engomada
-            stolen: Robado
-            updated: Actualizado
-            url: URL
-            vehicle_type: Tipo de vehículo
           multi_result_chip:
             no_results: no hay coincidencias
           multi_results:
