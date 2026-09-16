@@ -89,6 +89,8 @@ The only way a cassette changes is a spec run that records it:
 
 `git status` after a spec run is the only signal; a run that re-records prints nothing.
 
+**Don't reach for `WebMock.stub_request` on a host a cassette also covers.** VCR hooks into WebMock, so a raw stub registered by one example outlives it and answers the *other* example's cassette — the spec then passes or fails on file order, which reads as a flake rather than a fixture fighting itself. A third-party endpoint is recordable more often than it looks: Cloudflare, Stripe and the like publish testing credentials that their real API answers, so "I don't have keys" usually isn't the blocker. Keep WebMock for what can't be recorded — `bike_book_spec.rb`'s `to_timeout` is the case.
+
 ## Stubbing ENV
 
 Never partial-mock `ENV` with `allow(ENV).to receive(:[]).and_call_original` — it makes every subsequent `ENV[...]` lookup go through RSpec's message router, which is slow and easy to break by forgetting a `.with(...)` branch.
