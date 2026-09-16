@@ -3920,7 +3920,6 @@ it:
         automaticamente ogni bicicletta venduta. La configurazione richiede circa
         10 minuti.
     bike_shop_packages:
-      additional: Ulteriori
       bike_index_for_bike_shops: Indice dei negozi di biciclette
       choose_a_package_size: Scegli la dimensione della confezione
       compare_plans_and_features: Confronta piani e caratteristiche

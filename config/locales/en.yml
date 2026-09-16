@@ -3596,7 +3596,6 @@ en:
         uses Ascend as your POS, our new Ascend point of sale integration will allow
         you to register each bike you sell automatically. Setup takes about 10 minutes.
     bike_shop_packages:
-      additional: Additional
       bike_index_for_bike_shops: Bike Index for bike shops
       choose_a_package_size: Choose a package size
       compare_plans_and_features: Compare Plans and Features

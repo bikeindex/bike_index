@@ -58,6 +58,14 @@ RSpec.describe Pages::Register::Step1::Component, type: :component do
     end
   end
 
+  # Outside the form it submits nothing, which the specs posting `additional` directly
+  # can't see. What the field itself has to be is SharedBlocks::Honeypot's own spec
+  it "renders the honeypot inside the form" do
+    render_step_1
+
+    expect(page).to have_css("form input[name='additional']", visible: :all)
+  end
+
   describe "button_color" do
     def submit_button
       page.find("form button[type=submit]")
