@@ -6,9 +6,9 @@ Bike Index is a Rails webapp
 
 Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right WORKSPACE_ID fallback.
 
-**`bin/rails restart` reboots the web process and leaves bin/dev's watchers alone** — reach for it rather than restarting `bin/dev` for anything a reload doesn't pick up: a renamed initializer, a pin dropped from `config/importmap.rb` (re-drawing merges into the same map and never clears the old one), a Lookbook preview registry that has stopped listing new scenarios, a gem a merge just bumped. It restarts puma only, and `rerun` watches `app,db,lib` — not `config` — so dev Sidekiq holds its old constants until a `bin/dev` bounce. Running it against a server someone else started is fine; starting or killing `bin/dev` still isn't.
+**`bin/rails restart` for anything a reload misses** — a renamed initializer, a pin dropped from `config/importmap.rb`, a Lookbook registry that's stopped listing new scenarios, a gem a merge bumped. It bounces puma alone, so bin/dev's watchers survive and dev Sidekiq doesn't (`rerun` watches `app,db,lib`, not `config`). Fine to run against a server someone else started; starting or killing `bin/dev` isn't.
 
-**Renaming a `config/initializers/` file** is the case that reads as anything but a stale boot. Initializers don't re-run on reload, so a running server still holds the old constant and none of the new one — and `config/routes.rb`, which does reload, then dies partway through its draw. Everything routed below that line 404s, and the page reading the constant raises a bare `NameError` on a route helper.
+**A renamed initializer is the one that reads as anything but a stale boot**: `config/routes.rb` reloads, dies partway through its draw on the missing constant, and everything below that line 404s while the page itself raises a bare `NameError` on a route helper.
 
 ## Code style
 
