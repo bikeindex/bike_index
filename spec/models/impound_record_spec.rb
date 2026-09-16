@@ -445,7 +445,7 @@ RSpec.describe ImpoundRecord, type: :model do
     it "is false without a user, and for a user whose organization qualifies on nothing" do
       expect(impound_record.contactable_without_claiming?).to be_falsey
       expect(impound_record.contactable_without_claiming?(FactoryBot.create(:user_confirmed))).to be_falsey
-      expect(contactable_organization.reload.paid?).to be_falsey
+      expect(contactable_organization.reload.paid_money?).to be_falsey
       expect(impound_record.contactable_without_claiming?(contactable_user)).to be_falsey
     end
 
@@ -460,7 +460,7 @@ RSpec.describe ImpoundRecord, type: :model do
     # paid_money is a wider allowance than the feature - an organization can be paid
     # without having bought unstolen_notifications
     context "organization is paid" do
-      before { contactable_organization.update_attribute :is_paid, true }
+      before { contactable_organization.update_attribute :paid_money, true }
 
       it "is true, without the unstolen_notifications feature" do
         expect(contactable_organization.reload.enabled?("unstolen_notifications")).to be_falsey

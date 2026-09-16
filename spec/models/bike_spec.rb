@@ -582,7 +582,7 @@ RSpec.describe Bike, type: :model do
         expect(bike.contact_owner?(user)).to be_falsey
         expect(bike.phoneable_by?(user)).to be_falsey
 
-        organization.update_attribute :is_paid, true
+        organization.update_attribute :paid_money, true
 
         expect(bike.contact_owner?(user.reload)).to be_truthy
         expect(bike.phoneable_by?(user)).to be_truthy
@@ -591,7 +591,7 @@ RSpec.describe Bike, type: :model do
       # The owner's opt-out still wins - the allowance is about which organizations may
       # ask, not about overriding the answer
       it "respects notification_unstolen" do
-        organization.update_attribute :is_paid, true
+        organization.update_attribute :paid_money, true
         owner.update(notification_unstolen: false)
 
         expect(bike.reload.contact_owner?(user.reload)).to be_falsey
