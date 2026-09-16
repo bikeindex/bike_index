@@ -2172,7 +2172,7 @@ en:
         area: area
         improve_your_chances_of_recovery_by_doing: Improve your chances of recovery
           by doing all these things!
-        stolen_bike_alerter: 'a Bike Index stolen %{bike_type} alerter:'
+        stolen_bike_alerter: 'a Bike Index stolen bike alerter:'
         this_email_is_about_the_stolen_bike: This email is about the stolen %{bike_type}
           registered on Bike Index on %{date}
         we_sent_out_this_tweet_from: We sent out this tweet from
@@ -2184,9 +2184,8 @@ en:
           Give us a heads up when you do!
         make: 'Make:'
         serial: 'Serial:'
-        we_sent_out_this_tweet_from: >-
-          We sent out this tweet from %{twitter_handle}, a Bike Index stolen %{bike_type}
-          alerter:
+        we_sent_out_this_tweet_from: 'We sent out this tweet from %{twitter_handle},
+          a Bike Index stolen bike alerter:'
         were_spreading_the_word_about_your_stolen: We are spreading the word about
           your stolen %{bike_type}!
     stolen_notification_email:

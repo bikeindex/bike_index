@@ -10,7 +10,7 @@
   - if @location.present?
     = @location
     = t(".html.area")
-  = t(".html.stolen_bike_alerter", bike_type: @bike_type)
+  = t(".html.stolen_bike_alerter")
 
 - if @tweet_text.blank?
   = link_to @tweet_url, @tweet_url
