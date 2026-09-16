@@ -4,7 +4,7 @@ en:
     emails:
       partials:
         bike_box:
-          bike_photo: Bike photo
+          bike_photo: "%{bike_type} photo"
           color: Color
           color_may_be_incorrect: Color may be incorrect because it was set during
             POS import

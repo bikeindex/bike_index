@@ -23,7 +23,7 @@ RSpec.describe Autocomplete::Loader do
       info = subject.info
       # IDK, db0 seems to cause problems
       expect(info.keys - [:db0]).to match_array(%i[category_keys cache_keys used_memory used_memory_peak])
-      expect(info[:category_keys]).to eq 4072
+      expect(info[:category_keys]).to eq 4152
       expect(info[:cache_keys]).to eq 0
     end
 
@@ -167,14 +167,14 @@ RSpec.describe Autocomplete::Loader do
     context "cycle_type" do
       let(:item_hash) do
         {
-          id: 18, text: "e-Personal Mobility (EPAMD, e-Skateboard, Segway, e-Unicycle, etc)",
+          id: 18, text: "e-Personal Mobility Device (EPAMD, e-Skateboard, Segway, e-Unicycle, etc)",
           category: "cycle_type", priority: 920,
           data: {priority: 920, slug: :"personal-mobility", search_id: "v_18"}
         }
       end
       let(:item) { subject.send(:clean_hash, item_hash) }
       let(:target) { item_hash.except(:data).merge(item_hash[:data]) }
-      let(:item_term) { "e personal mobility epamd e skateboard segway e unicycle etc" }
+      let(:item_term) { "e personal mobility device epamd e skateboard segway e unicycle etc" }
       it "adds an item, adds prefix scopes, adds category" do
         expect(Autocomplete.normalize(item_hash[:text])).to eq item_term
         expect(item[:term]).to eq item_term

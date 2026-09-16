@@ -32,23 +32,21 @@
 
     <% if bike_submitting.present? %>
       <tr>
-        <td>Bike</td>
+        <td><%= bike_submitting.type_titleize %></td>
 
         <td>
           <%= link_to helpers.organized_bike_text(bike_submitting), bike_url(bike_submitting, organization_id: organization.to_param) %>
         </td>
       </tr>
-    <% end %>
 
-    <tr>
-      <td>Bike registered</td>
+      <tr>
+        <td><%= bike_submitting.type_titleize %> registered</td>
 
-      <td>
-        <% if bike_submitting.present? %>
+        <td>
           <%= helpers.email_time_display(bike_submitting.created_at) %>
-        <% end %>
-      </td>
-    </tr>
+        </td>
+      </tr>
+    <% end %>
   </tbody>
 </table>
 
@@ -77,15 +75,15 @@
           </tr>
         <% end %>
 
-        <tr>
-          <td>Bike</td>
+        <% if bike_claimed.present? %>
+          <tr>
+            <td><%= bike_claimed.type_titleize %></td>
 
-          <td>
-            <% if bike_claimed.present? %>
+            <td>
               <%= link_to helpers.organized_bike_text(bike_claimed), bike_url(bike_claimed, organization_id: organization.to_param) %>
-            <% end %>
-          </td>
-        </tr>
+            </td>
+          </tr>
+        <% end %>
 
         <tr>
           <td><%= @impound_claim.kind %></td>
