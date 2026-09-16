@@ -18,8 +18,8 @@
  * 320px column stops fitting, and a container query can't read that from a var(). */
 @utility twfullbleed {
   @container twwiderow (width < 672px) {
-    /* All forced: tailwind emits this utility ahead of the card's own tw:border, tw:p-4 and
-     * tw:rounded-*, so unforced every one of them wins */
+    /* All forced. Tailwind sorts a custom utility by the properties it sets, so each one added
+     * here moves the whole rule and can drop it behind a card class it used to outrank */
     @apply tw:border-x-0! tw:border-t-0! tw:px-0! tw:rounded-none!;
   }
 }
