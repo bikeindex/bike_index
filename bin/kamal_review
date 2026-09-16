@@ -33,10 +33,13 @@
 # bin/docker-entrypoint creates the per-PR Postgres role on first boot and
 # db:prepare handles schema/seed-or-migrate.
 #
-# Called by .github/workflows/review-app.yml; runs locally too with kamal
-# installed and SSH access. Kamal reads .kamal/secrets — locally from 1Password
-# (account bike-index, item Kamal/BikeIndex Review) + `gh auth token`; CI copies
-# .kamal/secrets-ci over it first.
+# Called by .github/workflows/review-app.yml; runs locally too with SSH access and
+# kamal installed under the *active* ruby — the gem's `env ruby` shebang falls
+# through to system ruby 2.6 when the install is a leftover from an older mise
+# version, and reports `can't find gem kamal` as though it were never installed.
+# Kamal reads .kamal/secrets — locally from 1Password (account bike-index, item
+# Kamal/BikeIndex Review) + `gh auth token`; CI copies .kamal/secrets-ci over it
+# first.
 
 set -euo pipefail
 
