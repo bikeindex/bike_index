@@ -77,6 +77,7 @@ Four jobs: `resolve` (PR number + action, and labels on deploy), `op` (calls the
 | `workflow_dispatch` → destroy | `destroy` | tear down, remove label, delete PR images from GHCR |
 | `workflow_dispatch` → reload_database (a PR, or `pr_number: sandbox`) | `reload_database` | drop both databases, then create + seed them again ([below](#reloading-the-database)) |
 | `pull_request: closed` (any PR) | `destroy` | tear down, remove label, delete PR images from GHCR |
+| `schedule` (nightly, 10:00 UTC — 3am PDT / 2am PST) | `reload_database` | reseed sandbox ([below](#reloading-the-database)) |
 
 Fork PRs are filtered by `resolve`'s same-repo check (`proceed=false`). On **deploy**:
 
@@ -94,7 +95,7 @@ Destroy reverses it: purge the PR's ActiveStorage objects from the shared R2 buc
 
 `reload_database` resets a running app's data to a freshly seeded state without redeploying — for when seeds change, or a demo leaves the data in a mess. Containers, image, volumes and the Postgres role are untouched; only the two databases are rebuilt, by `bin/kamal_review reload_database --app <pr>` (which also purges the app's R2 objects and flushes its redis DB first — see the comments there for why the order matters). It runs the same `db:prepare` the entrypoint runs at boot, so it's as slow as a first deploy, and the app serves partly-seeded data while it runs.
 
-It's the one action that also takes `--app sandbox` / `pr_number: sandbox` ([above](#sandbox-persistent-main-deploy)). With no PR behind it, the workflow skips everything PR-side — labels, the deployment link, the failure comment — so a sandbox failure shows up only in the run.
+It's the one action that also takes `--app sandbox` / `pr_number: sandbox` ([above](#sandbox-persistent-main-deploy)), and it runs against sandbox nightly on a `schedule` trigger. With no PR behind it, the workflow skips everything PR-side — labels, the deployment link, the failure comment — so a sandbox failure shows up only in the run.
 
 **Failures comment on the PR.** These runs are `workflow_dispatch`-triggered, so their check runs never hit the PR's rollup. The `report` job comments the failure (edited in place on repeats); the next successful deploy deletes it.
 
